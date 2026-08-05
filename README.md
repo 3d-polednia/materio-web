@@ -1,68 +1,70 @@
 # materio-web
 
-Marketing website for **Materio** — an offline-first material calculator &
-optimizer for Android. *Policz. Kup. Nie marnuj.* (Calculate. Buy. Waste less.)
+Strona (landing page) aplikacji **Materio** — offline-first kalkulator i
+optymalizator materiałów budowlanych na Androida. *Policz. Kup. Nie marnuj.*
 
-App on Google Play: <https://play.google.com/store/apps/details?id=pl.materio.app>
+Aplikacja w Google Play: <https://play.google.com/store/apps/details?id=pl.materio.app>
 
-## What this is
+> 📚 **Pełna dokumentacja:** [`docs/DOKUMENTACJA.md`](docs/DOKUMENTACJA.md) —
+> architektura, wdrożenie, edycja treści, języki, wyszukiwarka sklepów, SEO i assety.
 
-A fast, dependency-free static site:
+## Czym jest ten projekt
 
-- **Zero external requests** — no CDN, no web fonts, no analytics, no tracking
-  cookies. All CSS/JS is served from this repo; the interactive calculators run
-  entirely in the visitor's browser.
-- **Crawlable** — the landing copy is real HTML (Polish by default), not
-  hydrated-in-by-JS, so search engines index full content. The language switcher
-  (10 languages) is progressive enhancement on top.
-- **SEO-ready** — canonical URL, Open Graph + Twitter cards, `MobileApplication`
-  and `FAQPage` JSON-LD, `sitemap.xml`, `robots.txt`, PWA manifest.
-- **Accessible & responsive** — semantic landmarks, skip link, focus styles,
-  light/dark via `prefers-color-scheme`.
+Szybka, statyczna strona bez frameworków i bez procesu budowania (czysty
+HTML/CSS/JS):
 
-## Structure
+- **Minimum zewnętrznych zależności** — brak CDN, brak czcionek z sieci, brak
+  analityki i ciasteczek śledzących. Kalkulatory liczą w przeglądarce. Jedyne
+  zewnętrzne usługi to sekcja „Sklepy": mapa **Google Maps** (embed) i lista
+  sklepów z **OpenStreetMap (Overpass API)** — obie ładowane dopiero, gdy z niej korzystasz.
+- **Indeksowalna** — polskie treści są w HTML (nie doklejane przez JS), więc
+  wyszukiwarki widzą pełną zawartość. Przełącznik 10 języków to progressive
+  enhancement na wierzchu.
+- **Gotowa pod SEO** — canonical, Open Graph + Twitter, dane strukturalne
+  `MobileApplication` + `Organization` + `FAQPage`, `sitemap.xml`, `robots.txt`,
+  manifest PWA, obraz OG 1200×630.
+- **Dostępna i responsywna** — znaczniki semantyczne, skip-link, widoczny focus,
+  tryb jasny/ciemny (`prefers-color-scheme`).
+
+## Struktura
 
 ```
-index.html              Landing page (hero, features, how-it-works,
-                        live calculators, projects, trust/privacy, FAQ, CTA)
-privacy-policy.html     Full bilingual (PL/EN) privacy policy
-404.html                Not-found page
+index.html              Strona główna (hero, funkcje, jak to działa, kalkulatory
+                        na żywo, pomieszczenia, projekty, sklepy, zaufanie, FAQ, CTA)
+privacy-policy.html     Pełna polityka prywatności (PL + EN)
+404.html                Strona „nie znaleziono"
 assets/
-  styles.css            Olive Green Material 3 design system
-  i18n.js               10-language dictionary + switcher
-  calculators.js        Calculation engines (ported 1:1 from the app), pure JS
-  main.js               Page wiring (switcher, tabs, room helper, mobile nav)
-  logo.svg / favicon.svg
-  og-image.png          1200×630 social preview
-  icon-192.png / icon-512.png
+  styles.css            System projektowy Olive Green Material 3
+  i18n.js               Słownik 10 języków + przełącznik
+  calculators.js        Silniki liczące (1:1 z aplikacji), czysty JS
+  stores.js             Wyszukiwarka sklepów (mapa + lista z OpenStreetMap)
+  main.js               Spójne wiązanie strony (przełącznik, zakładki, pomieszczenia, menu)
+  icon-192.png / icon-512.png / apple-touch-icon.png / favicon-32.png   Ikona z Google Play
+  og-image.jpg          Podgląd społecznościowy 1200×630 (baner z Play)
+  banner.jpg            Baner (grafika promocyjna)
 robots.txt · sitemap.xml · site.webmanifest · .nojekyll
-.github/workflows/pages.yml   Auto-deploy to GitHub Pages
+.github/workflows/pages.yml   Automatyczne wdrożenie na GitHub Pages
+docs/DOKUMENTACJA.md    Pełna dokumentacja projektu
 ```
 
-## Run locally
+## Uruchomienie lokalnie
 
-It's plain static files — open `index.html`, or serve the folder:
+To zwykłe pliki statyczne. Otwórz `index.html` albo wystaw folder serwerem
+(potrzebne, by działała geolokalizacja w wyszukiwarce sklepów):
 
 ```bash
-python3 -m http.server 8080   # then visit http://localhost:8080
+python3 -m http.server 8080   # potem wejdź na http://localhost:8080
 ```
 
-## Deployment (GitHub Pages)
+## Wdrożenie (GitHub Pages)
 
-The workflow in `.github/workflows/pages.yml` publishes the repo root to Pages on
-every push. One-time setup: **repo → Settings → Pages → Build and deployment →
-Source: GitHub Actions**. The site then serves at
-`https://3d-polednia.github.io/materio-web/`.
+Workflow `.github/workflows/pages.yml` publikuje katalog główny repo przy każdym
+pushu. Jednorazowa konfiguracja: **repo → Settings → Pages → Source: „GitHub
+Actions"**. Strona rusza pod `https://3d-polednia.github.io/materio-web/`.
 
-### Using a custom domain (e.g. `materio.pl`)
+Zmiana na własną domenę (np. `materio.pl`) i cała reszta — zobacz
+[`docs/DOKUMENTACJA.md`](docs/DOKUMENTACJA.md).
 
-1. Add a `CNAME` file at the repo root containing the domain.
-2. Point the domain's DNS at GitHub Pages.
-3. Find-and-replace the absolute base URL
-   `https://3d-polednia.github.io/materio-web` → your domain in
-   `index.html`, `privacy-policy.html`, `sitemap.xml` and `robots.txt`
-   (canonical, Open Graph and sitemap links).
+## Licencja
 
-## License
-
-Marketing content and brand "Materio" © Materio. Code is free to reuse.
+Treści marketingowe i marka „Materio" © Materio. Kod strony jest wolny do użytku.
