@@ -60,7 +60,7 @@ python3 -m http.server 8080   # potem wejdź na http://localhost:8080
 
 Workflow `.github/workflows/pages.yml` publikuje katalog główny repo przy każdym
 pushu. Jednorazowa konfiguracja: **repo → Settings → Pages → Source: „GitHub
-Actions"**. Strona rusza pod `https://3d-polednia.github.io/materio-web/`.
+Actions"**. Strona rusza pod `https://materio-app.com/`.
 
 Zmiana na własną domenę (np. `materio.pl`) i cała reszta — zobacz
 [`docs/DOKUMENTACJA.md`](docs/DOKUMENTACJA.md).

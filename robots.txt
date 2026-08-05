@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://3d-polednia.github.io/materio-web/sitemap.xml
+Sitemap: https://materio-app.com/sitemap.xml

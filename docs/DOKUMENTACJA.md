@@ -5,7 +5,7 @@ sposób uruchomienia i wdrożenia, edycję treści i języków, działanie wyszu
 sklepów, SEO oraz zarządzanie assetami.
 
 - **Repozytorium:** `3d-polednia/materio-web`
-- **Adres docelowy:** `https://3d-polednia.github.io/materio-web/`
+- **Adres docelowy:** `https://materio-app.com/`
 - **Aplikacja:** `pl.materio.app` (Google Play), Android 7.0+ (API 24), 10 języków
 
 ---
@@ -102,7 +102,7 @@ pushu pakuje katalog główny repo i publikuje go na Pages.
 2. W „Build and deployment" ustaw **Source: GitHub Actions**.
 3. Zrób dowolny push (albo w Actions uruchom workflow ręcznie — „Run workflow").
 
-Po tym strona jest pod `https://3d-polednia.github.io/materio-web/`.
+Po tym strona jest pod `https://materio-app.com/`.
 
 > **Dlaczego trzeba kliknąć ręcznie?** Token GitHub Actions w tym repo nie ma
 > uprawnień, by samodzielnie *włączyć* Pages (zwraca „Resource not accessible by
@@ -115,11 +115,14 @@ Workflow reaguje na push do gałęzi `main` oraz
 
 ## 5. Własna domena i zmiana adresu bazowego
 
-Adres bazowy `https://3d-polednia.github.io/materio-web` jest wpisany na sztywno w
-kilku miejscach (canonical, Open Graph, sitemap, dane strukturalne). Przy zmianie
-domeny podmień go wszędzie.
+**Stan aktualny:** stroną steruje własna domena **`materio-app.com`** — jej
+adres bazowy jest wpisany na sztywno w kilku miejscach (canonical, Open Graph,
+sitemap, dane strukturalne), a w korzeniu repo leży plik `CNAME`.
 
-**Kroki dla domeny (np. `https://materio.pl`):**
+Poniższa instrukcja zostaje na wypadek **kolejnej** zmiany domeny — wtedy trzeba
+podmienić adres bazowy wszędzie.
+
+**Kroki dla nowej domeny (przykład `https://materio.pl`):**
 
 1. Dodaj plik `CNAME` w katalogu głównym repo z samą domeną:
    ```

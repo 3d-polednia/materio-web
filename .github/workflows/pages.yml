@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["main", "claude/cavemem-global-install-7z2q8u"]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
