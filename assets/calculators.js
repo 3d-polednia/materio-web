@@ -197,15 +197,15 @@ const CALCS = [
     F("area", "fld_area", "25"), F("cov", "fld_coverage_unit", "40"),
     F("coats", "fld_coats", "2"), F("openings", "fld_openings", "0"), F("price", "fld_price", ""),
   ], presets: [
-    { l: "Farba 10 l", v: { cov: "100", coats: "2" } }, { l: "Grunt 5 l", v: { cov: "35", coats: "1" } },
-    { l: "Gładź 20 kg", v: { cov: "20", coats: "1" } }, { l: "Klej C2 25 kg", v: { cov: "5", coats: "1" } },
+    { l: "Farba 10 l", k: "preset_paint", v: { cov: "100", coats: "2" } }, { l: "Grunt 5 l", k: "preset_primer", v: { cov: "35", coats: "1" } },
+    { l: "Gładź 20 kg", k: "preset_filler", v: { cov: "20", coats: "1" } }, { l: "Klej C2 25 kg", k: "preset_adhesive", v: { cov: "5", coats: "1" } },
   ] },
   { id: "waste", tab: "surface", engine: "waste", fields: [
     F("area", "fld_area", "20"), F("cov", "fld_pkg_cov", "1.44"),
     F("waste", "fld_waste", "7"), F("price", "fld_price", ""),
   ], presets: [
-    { l: "Gres 60×60", v: { cov: "1.44", waste: "7" } }, { l: "Gres 120×278", v: { cov: "3.34", waste: "12" } },
-    { l: "Panel AC4", v: { cov: "2.22", waste: "8" } }, { l: "Glazura 30×60", v: { cov: "1.44", waste: "5" } },
+    { l: "Gres 60×60", k: "preset_gres1", v: { cov: "1.44", waste: "7" } }, { l: "Gres 120×278", k: "preset_gres2", v: { cov: "3.34", waste: "12" } },
+    { l: "Panel AC4", k: "preset_panel", v: { cov: "2.22", waste: "8" } }, { l: "Glazura 30×60", k: "preset_glaze", v: { cov: "1.44", waste: "5" } },
   ] },
   { id: "wallpaper", tab: "surface", engine: "wallpaper", fields: [
     F("wallW", "fld_width", "4"), F("wallH", "fld_height", "2.6"),
@@ -277,7 +277,7 @@ function buildCalculators() {
       return `<div class="field"><label data-i18n="${f.label}"></label><input type="text" inputmode="decimal" data-k="${f.k}" value="${f.def}"></div>`;
     }).join("");
     const chips = c.presets ? `<div class="chips">${c.presets.map((p, i) =>
-      `<button class="chip" data-preset="${i}">${p.l}</button>`).join("")}</div>` : "";
+      `<button class="chip" data-preset="${i}"${p.k ? ` data-i18n="${p.k}"` : ""}>${p.l}</button>`).join("")}</div>` : "";
     return `<div class="calc" data-calc="${c.id}" data-tab="${c.tab}">
       <h3><span class="ico">${CUT_ICON}</span><span data-i18n="c_${c.id}_t"></span></h3>
       <p class="desc" data-i18n="c_${c.id}_d"></p>

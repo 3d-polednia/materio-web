@@ -12,10 +12,10 @@ const OSM_TAGS = [
   ["shop", "doityourself"], ["shop", "hardware"], ["shop", "trade"],
   ["shop", "building_materials"], ["shop", "paint"], ["shop", "tiles"], ["shop", "timber"],
 ];
-const TYPE_LABEL = {
-  doityourself: "Market budowlany", hardware: "Narzędzia i art. metalowe",
-  trade: "Hurtownia / skład", building_materials: "Skład budowlany",
-  paint: "Farby i lakiery", tiles: "Płytki i glazura", timber: "Drewno i tarcica",
+const TYPE_KEY = {
+  doityourself: "st_doityourself", hardware: "st_hardware",
+  trade: "st_trade", building_materials: "st_building",
+  paint: "st_paint", tiles: "st_tiles", timber: "st_timber",
 };
 const OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"];
 
@@ -26,7 +26,7 @@ function haversineKm(la1, lo1, la2, lo2) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 function fmtDist(km) { return km < 1 ? Math.round(km * 1000) + " m" : km.toFixed(1).replace(".", ",") + " km"; }
-function fmtType(tags) { for (const [k, v] of OSM_TAGS) if (tags[k] === v) return TYPE_LABEL[v]; return "Sklep budowlany"; }
+function typeKey(tags) { for (const [k, v] of OSM_TAGS) if (tags[k] === v) return TYPE_KEY[v]; return "st_generic"; }
 function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
 function buildQuery(lat, lon) {
@@ -63,7 +63,7 @@ function normalize(elements, lat, lon) {
     if (dist > RADIUS_M / 1000 + 0.5) continue;
     let addr = [t["addr:street"], t["addr:housenumber"]].filter(Boolean).join(" ");
     if (t["addr:city"]) addr += (addr ? ", " : "") + t["addr:city"];
-    out.push({ name, type: fmtType(t), dist, lat: plat, lon: plon, addr });
+    out.push({ name, typeKey: typeKey(t), dist, lat: plat, lon: plon, addr });
   }
   out.sort((a, b) => a.dist - b.dist);
   return out;
@@ -72,9 +72,9 @@ function normalize(elements, lat, lon) {
 function storeRow(s) {
   const nav = "https://www.google.com/maps/dir/?api=1&destination=" + s.lat + "," + s.lon;
   return `<li class="store-item">
-      <div class="store-info"><b>${esc(s.name)}</b><span class="store-meta">${s.type}${s.addr ? " · " + esc(s.addr) : ""}</span></div>
+      <div class="store-info"><b>${esc(s.name)}</b><span class="store-meta">${t(s.typeKey)}${s.addr ? " · " + esc(s.addr) : ""}</span></div>
       <div class="store-actions"><span class="store-dist">${fmtDist(s.dist)}</span>
-        <a class="btn btn-primary btn-sm" href="${nav}" target="_blank" rel="noopener">Nawiguj</a></div>
+        <a class="btn btn-primary btn-sm" href="${nav}" target="_blank" rel="noopener">${t("res_navigate")}</a></div>
     </li>`;
 }
 
@@ -99,46 +99,55 @@ function buildStoreFinder() {
 
   if (form) form.addEventListener("submit", (e) => { e.preventDefault(); recenter(); });
   document.querySelectorAll("[data-example]").forEach((chip) => {
-    chip.addEventListener("click", () => { input.value = chip.dataset.example; recenter(); input.focus(); });
+    // Use the chip's visible (localized) label as the search term so the map
+    // query matches the active language; fall back to the raw data-example.
+    chip.addEventListener("click", () => { input.value = (chip.textContent || chip.dataset.example).trim(); recenter(); input.focus(); });
   });
 
-  function renderList(list) {
+  let currentList = null;   // last rendered list, so we can re-render on language change
+  let expanded = false;
+
+  function renderList(list, keepState) {
+    if (!keepState) expanded = false;
+    currentList = list;
     if (!list.length) {
-      listEl.innerHTML = `<li class="store-empty">Nie znaleziono sklepów w promieniu 20 km. Spróbuj wyszukać po nazwie miasta powyżej.</li>`;
+      listEl.innerHTML = `<li class="store-empty">${t("stores_empty")}</li>`;
       moreBtn.hidden = true;
       return;
     }
-    let expanded = false;
     const draw = () => {
       const shown = expanded ? list : list.slice(0, SHOW_FIRST);
       listEl.innerHTML = shown.map(storeRow).join("");
       if (list.length > SHOW_FIRST) {
         moreBtn.hidden = false;
-        moreBtn.textContent = expanded ? "Pokaż mniej" : `Pokaż więcej (${list.length - SHOW_FIRST})`;
+        moreBtn.textContent = expanded ? t("stores_less") : t("stores_more").replace("{n}", list.length - SHOW_FIRST);
       } else moreBtn.hidden = true;
     };
     moreBtn.onclick = () => { expanded = !expanded; draw(); if (!expanded) listEl.scrollIntoView({ behavior: "smooth", block: "nearest" }); };
     draw();
   }
 
+  // Re-render the store list and its status when the language changes.
+  document.addEventListener("langchange", () => { if (currentList) renderList(currentList, true); });
+
   if (near) near.addEventListener("click", () => {
-    if (!navigator.geolocation) { status.textContent = "Twoja przeglądarka nie udostępnia lokalizacji — wyszukaj po nazwie miasta."; return; }
-    status.textContent = "Ustalam lokalizację…";
+    if (!navigator.geolocation) { status.textContent = t("stores_unsupported"); return; }
+    status.textContent = t("stores_locating");
     near.disabled = true;
     navigator.geolocation.getCurrentPosition(async (p) => {
       loc = { lat: p.coords.latitude, lng: p.coords.longitude };
       recenter();
-      status.textContent = "Szukam sklepów w promieniu 20 km…";
+      status.textContent = t("stores_searching");
       try {
         const raw = await fetchStores(loc.lat, loc.lng);
         const list = normalize(raw, loc.lat, loc.lng);
-        status.textContent = list.length ? `Znaleziono ${list.length} — od najbliższego:` : "";
+        status.textContent = list.length ? t("stores_found").replace("{n}", list.length) : "";
         renderList(list);
       } catch (e) {
-        status.innerHTML = `Nie udało się pobrać listy. <a href="https://www.google.com/maps/search/sklep+budowlany/@${loc.lat},${loc.lng},12z" target="_blank" rel="noopener">Otwórz sklepy w Google Maps →</a>`;
+        status.innerHTML = `${esc(t("stores_failed"))} <a href="https://www.google.com/maps/search/sklep+budowlany/@${loc.lat},${loc.lng},12z" target="_blank" rel="noopener">${esc(t("stores_open_maps"))}</a>`;
       } finally { near.disabled = false; }
     }, () => {
-      status.textContent = "Brak zgody na lokalizację — wpisz miasto lub nazwę sklepu powyżej.";
+      status.textContent = t("stores_denied");
       near.disabled = false;
     }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
   });
