@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Materio">
+  <rect x="2" y="2" width="44" height="44" rx="11" fill="#626b38"/>
+  <path d="M12 34V15.5c0-.6.75-.9 1.16-.44L24 27l10.84-11.94c.41-.46 1.16-.16 1.16.44V34" fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="24" cy="33" r="2.4" fill="#cbd88a"/>
+</svg>
