@@ -348,3 +348,17 @@ footer h4 { font-size: .82rem; text-transform: uppercase; letter-spacing: .08em;
   .trust-split { grid-template-columns: 1fr; gap: 28px; }
   .doc .toc ul { grid-template-columns: 1fr; }
 }
+
+/* Two-column split (rooms, store finder) */
+.split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.store-panel .fld-label { display: block; font-weight: 600; font-size: .85rem; margin-bottom: 6px; }
+.search-row { display: flex; gap: 8px; }
+.search-row input {
+  flex: 1; min-width: 0; font: inherit; font-size: .98rem;
+  padding: 11px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--outline); background: var(--bg); color: var(--on-bg);
+}
+.search-row input:focus { outline: 2px solid var(--olive); border-color: var(--olive); }
+.search-row .btn { flex: none; }
+@media (max-width: 900px) { .split-2 { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .search-row { flex-wrap: wrap; } .search-row .btn { width: 100%; justify-content: center; } }

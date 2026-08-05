@@ -1,11 +1,11 @@
-/* Materio website — page wiring: language switcher, mobile nav, calculator
-   tabs, the room helper, and FAQ deep-linking. Progressive enhancement: the
-   HTML already ships full Polish copy, so the page is complete without JS —
-   this only adds the language switcher and the in-browser calculators. */
+/* Materio website — shared page wiring across all subpages: language switcher,
+   mobile nav, and (where present) calculator tabs, the room helper and the
+   store finder. Everything is guarded, so each page runs only what it contains.
+   The HTML ships full Polish copy; this is progressive enhancement on top. */
 
 function buildLangSwitcher() {
   const sel = document.getElementById("lang-select");
-  if (!sel) return;
+  if (!sel || typeof LANGS === "undefined") return;
   sel.innerHTML = LANGS.map((l) => `<option value="${l.code}">${l.label}</option>`).join("");
   sel.addEventListener("change", () => applyLang(sel.value));
   document.addEventListener("langchange", (e) => { sel.value = e.detail.lang; });
@@ -13,6 +13,7 @@ function buildLangSwitcher() {
 
 function buildTabs() {
   const tabs = document.querySelectorAll(".calc-tab");
+  if (!tabs.length) return;
   const show = (tab) => {
     tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === tab)));
     document.querySelectorAll("#calc-grid .calc").forEach((c) => {
@@ -20,7 +21,7 @@ function buildTabs() {
     });
   };
   tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.tab)));
-  if (tabs.length) show(tabs[0].dataset.tab);
+  show(tabs[0].dataset.tab);
 }
 
 function buildRoomHelper() {
@@ -56,19 +57,21 @@ function buildMobileNav() {
 }
 
 function setYear() {
-  const el = document.getElementById("year");
-  if (el) el.textContent = new Date().getFullYear();
+  document.querySelectorAll("[data-year]").forEach((el) => { el.textContent = new Date().getFullYear(); });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof buildCalculators === "function") buildCalculators();
+  if (typeof buildStoreFinder === "function") buildStoreFinder();
   buildLangSwitcher();
   buildTabs();
   buildRoomHelper();
   buildMobileNav();
   setYear();
-  const lang = initialLang();
-  applyLang(lang);
-  const sel = document.getElementById("lang-select");
-  if (sel) sel.value = lang;
+  if (typeof initialLang === "function") {
+    const lang = initialLang();
+    applyLang(lang);
+    const sel = document.getElementById("lang-select");
+    if (sel) sel.value = lang;
+  }
 });
