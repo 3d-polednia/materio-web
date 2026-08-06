@@ -186,6 +186,10 @@ aplikacja). Waluty i formaty liczb per język definiuje `CURRENCY` w
   serwer.
 - `buildCalculators()` renderuje karty do `#calc-grid`; zakładki (`.calc-tab`)
   przełącza `buildTabs()` w `main.js`.
+- **Rozkrój 2D** (`ENGINES.sheet` + `tryPlaceGuillotine`) to port
+  `GuillotinePackingEngine.kt`: wolne prostokąty, cięcie gilotynowe, dopasowanie
+  best-area-fit, rzaz piły i obrót elementów o 90°. Strona liczy tę samą liczbę
+  arkuszy co aplikacja.
 - Kalkulator pomieszczeń to osobny, prostszy blok obsługiwany przez
   `buildRoomHelper()` (pola L×W×H → podłoga/ściany/obwód/kubatura).
 - Formatowanie liczb i walut zależy od aktywnego języka (`Intl.NumberFormat`,

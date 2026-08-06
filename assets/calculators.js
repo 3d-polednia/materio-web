@@ -43,6 +43,36 @@ function parsePieces(text) {
   }).filter(Boolean);
 }
 
+/* ---------- 2D guillotine packing helper (GuillotinePackingEngine.kt) ---------- */
+const PACK_EPS = 1e-6;
+
+/** Best-Area-Fit within the sheet's free rectangles, then guillotine-split. */
+function tryPlaceGuillotine(sheet, w, h, canRotate, kerf) {
+  let bestIdx = -1, bestRotated = false, bestLeftover = Infinity;
+  sheet.free.forEach((r, i) => {
+    if (w <= r.w + PACK_EPS && h <= r.h + PACK_EPS) {
+      const leftover = r.w * r.h - w * h;
+      if (leftover < bestLeftover) { bestLeftover = leftover; bestIdx = i; bestRotated = false; }
+    }
+    if (canRotate && h <= r.w + PACK_EPS && w <= r.h + PACK_EPS) {
+      const leftover = r.w * r.h - w * h;
+      if (leftover < bestLeftover) { bestLeftover = leftover; bestIdx = i; bestRotated = true; }
+    }
+  });
+  if (bestIdx < 0) return false;
+
+  const rect = sheet.free.splice(bestIdx, 1)[0];
+  const pw = bestRotated ? h : w, ph = bestRotated ? w : h;
+  sheet.placements.push({ sheet: sheet.index, x: rect.x, y: rect.y, w: pw, h: ph, rotated: bestRotated });
+
+  // Guillotine split: a right offcut and a bottom offcut, each shrunk by kerf.
+  const rightW = rect.w - pw - kerf;
+  if (rightW > PACK_EPS && rect.h > PACK_EPS) sheet.free.push({ x: rect.x + pw + kerf, y: rect.y, w: rightW, h: rect.h });
+  const bottomH = rect.h - ph - kerf;
+  if (bottomH > PACK_EPS && pw > PACK_EPS) sheet.free.push({ x: rect.x, y: rect.y + ph + kerf, w: pw, h: bottomH });
+  return true;
+}
+
 /* ---------- Engines (ports) ---------- */
 const ENGINES = {
   coverage(f) {
@@ -88,29 +118,45 @@ const ENGINES = {
     return { tobuy: bars.length, unit: "res_stocks", cost: bars.length * price, rows: [["res_waste", wastePct.toFixed(1) + "%"], ...plan] };
   },
   sheet(f) {
-    // Honest shelf/first-fit-decreasing 2D packing → number of sheets (kerf ignored, like a quick estimate).
-    const SW = num(f.sheetW), SL = num(f.sheetL), price = num(f.price) || 0, pieces = [];
-    if (!(SW > 0) || !(SL > 0)) return { err: "err_positive" };
+    // 2D guillotine bin-packing — ported 1:1 from GuillotinePackingEngine.kt.
+    // Free-rectangle guillotine split: on each placement the used free rect is cut into a
+    // right and a bottom offcut, both shrunk by the kerf. Placement is best-area-fit.
+    const SW = num(f.sheetW), SH = num(f.sheetL), kerf = num(f.kerf) || 0, price = num(f.price) || 0;
+    const canRotate = String(f.rotate === undefined ? "1" : f.rotate) !== "0";
+    if (!(SW > 0) || !(SH > 0) || kerf < 0 || price < 0) return { err: "err_positive" };
+    if (kerf >= SW || kerf >= SH) return { err: "err_kerf" };
+
+    const fitsSheet = (w, h) =>
+      (w <= SW + PACK_EPS && h <= SH + PACK_EPS) || (canRotate && h <= SW + PACK_EPS && w <= SH + PACK_EPS);
+
+    const units = [];
     for (const p of parsePieces(f.pieces)) {
-      if (!(p.w > 0) || !(p.l > 0) || p.q <= 0) continue;
-      // normalise so w<=l and orient to fit the sheet
-      let w = Math.min(p.w, p.l), l = Math.max(p.w, p.l);
-      if (w > SW || l > SL) { if (l <= SW && w <= SL) { const t = w; w = l; l = t; } else return { err: "err_toobig" }; }
-      for (let i = 0; i < Math.min(p.q, 100000); i++) pieces.push({ w, l });
+      if (!(p.w > 0) || !(p.l > 0)) return { err: "err_positive" };
+      if (p.q <= 0) continue;
+      if (p.q > 100000) return { err: "err_toomany" };
+      if (!fitsSheet(p.w, p.l)) return { err: "err_toobig" };
+      for (let i = 0; i < p.q; i++) units.push({ w: p.w, h: p.l });
     }
-    if (!pieces.length) return { err: "err_positive" };
-    pieces.sort((a, b) => b.l - a.l || b.w - a.w);
+    if (!units.length) return { err: "err_positive" };
+
+    // Largest area first — better packing.
+    const sorted = units.slice().sort((a, b) => b.w * b.h - a.w * a.h);
     const sheets = [];
-    for (const pc of pieces) {
+    for (const u of sorted) {
       let placed = false;
-      for (const s of sheets) {
-        for (const sh of s.shelves) { if (sh.h >= pc.l && sh.freeW >= pc.w) { sh.freeW -= pc.w; placed = true; break; } }
-        if (placed) break;
-        if (s.usedH + pc.l <= SL) { s.shelves.push({ h: pc.l, freeW: SW - pc.w }); s.usedH += pc.l; placed = true; break; }
+      for (const sheet of sheets) {
+        if (tryPlaceGuillotine(sheet, u.w, u.h, canRotate, kerf)) { placed = true; break; }
       }
-      if (!placed) sheets.push({ usedH: pc.l, shelves: [{ h: pc.l, freeW: SW - pc.w }] });
+      if (!placed) {
+        const sheet = { index: sheets.length + 1, free: [{ x: 0, y: 0, w: SW, h: SH }], placements: [] };
+        sheets.push(sheet);
+        // Guaranteed to fit an empty sheet (validated above), but guard anyway.
+        if (!tryPlaceGuillotine(sheet, u.w, u.h, canRotate, kerf)) return { err: "err_toobig" };
+      }
     }
-    const useful = pieces.reduce((a, p) => a + p.w * p.l, 0) / 1e6, purchased = sheets.length * SW * SL / 1e6;
+
+    const useful = units.reduce((a, u) => a + u.w * u.h, 0) / 1e6;
+    const purchased = sheets.length * SW * SH / 1e6;
     const wastePct = purchased > 0 ? (purchased - useful) / purchased * 100 : 0;
     return { tobuy: sheets.length, unit: "res_sheets", cost: sheets.length * price, rows: [["res_waste", wastePct.toFixed(1) + "%"]] };
   },
@@ -218,8 +264,10 @@ const CALCS = [
     F("cuts", "fld_cuts", "2400x4\n1800x6\n900x8", { ta: true }), F("price", "fld_price", ""),
   ] },
   { id: "sheet", tab: "cutting", engine: "sheet", fields: [
-    F("sheetW", "fld_sheet_w", "2800"), F("sheetL", "fld_sheet_l", "2070"),
-    F("pieces", "fld_pieces_list", "600x400x6\n800x300x4", { ta: true }), F("price", "fld_price", ""),
+    F("sheetW", "fld_sheet_w", "2800"), F("sheetL", "fld_sheet_l", "2070"), F("kerf", "fld_kerf", "3"),
+    F("pieces", "fld_pieces_list", "600x400x6\n800x300x4", { ta: true }),
+    F("rotate", "fld_rotate", "1", { sel: [["1", "Tak", "opt_yes"], ["0", "Nie", "opt_no"]] }),
+    F("price", "fld_price", ""),
   ] },
   // TRADE
   { id: "concrete", tab: "trade", engine: "concrete", fields: [
@@ -270,7 +318,8 @@ function buildCalculators() {
   grid.innerHTML = CALCS.map((c) => {
     const fields = c.fields.map((f) => {
       if (f.sel) {
-        const opts = f.sel.map(([v, l]) => `<option value="${v}"${v === f.def ? " selected" : ""}>${l}</option>`).join("");
+        const opts = f.sel.map(([v, l, key]) =>
+          `<option value="${v}"${v === f.def ? " selected" : ""}${key ? ` data-i18n="${key}"` : ""}>${l}</option>`).join("");
         return `<div class="field"><label data-i18n="${f.label}"></label><select data-k="${f.k}">${opts}</select></div>`;
       }
       if (f.ta) return `<div class="field"><label data-i18n="${f.label}"></label><textarea rows="3" data-k="${f.k}">${f.def}</textarea></div>`;
