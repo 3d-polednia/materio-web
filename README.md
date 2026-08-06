@@ -13,10 +13,11 @@ Aplikacja w Google Play: <https://play.google.com/store/apps/details?id=pl.mater
 Szybka, statyczna strona bez frameworków i bez procesu budowania (czysty
 HTML/CSS/JS):
 
-- **Minimum zewnętrznych zależności** — brak CDN, brak czcionek z sieci, brak
-  analityki i ciasteczek śledzących. Kalkulatory liczą w przeglądarce. Jedyne
-  zewnętrzne usługi to sekcja „Sklepy": mapa **Google Maps** (embed) i lista
-  sklepów z **OpenStreetMap (Overpass API)** — obie ładowane dopiero, gdy z niej korzystasz.
+- **Minimum zewnętrznych zależności** — brak CDN i brak czcionek z sieci.
+  Kalkulatory liczą w przeglądarce. Usługi zewnętrzne: **Google Analytics** (GA4
+  z Consent Mode v2 — nic nie zapisuje, dopóki odwiedzający nie kliknie zgody
+  w banerze) oraz sekcja „Sklepy": mapa **Google Maps** (embed) i lista sklepów
+  z **OpenStreetMap (Overpass API)**, ładowane dopiero, gdy z niej korzystasz.
 - **Indeksowalna** — polskie treści są w HTML (nie doklejane przez JS), więc
   wyszukiwarki widzą pełną zawartość. Przełącznik 10 języków to progressive
   enhancement na wierzchu.

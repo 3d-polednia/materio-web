@@ -38,9 +38,12 @@ sklepów, SEO oraz zarządzanie assetami.
   twierdzi, że jest „bez reklam". Zamiast tego uczciwie komunikuje realne atuty:
   liczenie offline na urządzeniu, brak konta, dane zostają u użytkownika, zgodność
   z RODO. Zmieniając treści, trzymaj się tej zasady.
-- **Minimum zewnętrznych zapytań.** Strona nie ładuje czcionek z sieci, analityki
-  ani ciasteczek śledzących. Jedyne wyjątki (i tylko na żądanie użytkownika, w
-  sekcji „Sklepy"): embed Google Maps oraz zapytanie do OpenStreetMap/Overpass.
+- **Minimum zewnętrznych zapytań.** Strona nie ładuje czcionek z sieci. Google
+  Analytics (GA4) działa w Consent Mode v2: `analytics_storage` startuje jako
+  `denied` i włącza się dopiero po kliknięciu zgody w banerze — wybór zapisuje
+  `localStorage['materio_consent']`. Pozostałe wyjątki, tylko na żądanie
+  użytkownika w sekcji „Sklepy": embed Google Maps oraz zapytanie do
+  OpenStreetMap/Overpass.
 - **Treść indeksowalna.** Polskie teksty są zapisane wprost w HTML. JavaScript
   jedynie *podmienia* je przy zmianie języka (progressive enhancement). Dzięki temu
   strona ma sens także bez JS i jest dobrze widziana przez wyszukiwarki.
