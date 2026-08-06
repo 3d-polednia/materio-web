@@ -97,6 +97,12 @@
     uruchomieniu wyświetlamy okno zgody (Google User Messaging Platform), w którym decydujesz o reklamach spersonalizowanych.
     Bez Twojej zgody wyświetlane są wyłącznie reklamy <strong>niespersonalizowane</strong>. Zgodę możesz w każdej chwili
     zmienić lub wycofać — usuwając dane aplikacji w ustawieniach systemu albo resetując identyfikator reklamowy w ustawieniach Androida.</p>
+    <h3>3.2. Analityka aplikacji (Firebase / Google Analytics)</h3>
+    <p>Aplikacja korzysta z <strong>Google Analytics dla Firebase</strong>, aby anonimowo i zbiorczo mierzyć, jak używane
+    są jej funkcje (np. które kalkulatory otwierasz, liczba aktywnych użytkowników) — pomaga nam to ulepszać Materio.
+    Analityka jest domyślnie <strong>wyłączona</strong> i włącza się dopiero po wyrażeniu przez Ciebie zgody w tym samym
+    oknie (Google User Messaging Platform). Bez zgody nic nie jest zbierane. Dane są przetwarzane przez Google zgodnie z
+    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Polityką prywatności Google</a>.</p>
 
     <h2 id="pl-4">4. Lokalizacja i wyszukiwarka sklepów (Google Maps / Places)</h2>
     <p>Funkcja „Znajdź sklep” korzysta z <strong>Google Maps</strong> i <strong>Google Places</strong>. Jeżeli udzielisz
@@ -106,15 +112,18 @@
     funkcje działają bez zmian. Lokalizacja nie jest zapisywana na naszych serwerach (nie mamy takich serwerów).</p>
 
     <h2 id="pl-5">5. Strona internetowa</h2>
-    <p>Strona <strong>materio-web</strong> jest statyczną wizytówką aplikacji. Nie używa plików cookie do śledzenia,
-    nie osadza zewnętrznych skryptów analitycznych ani czcionek z sieci — cały kod i style są serwowane z domeny Strony,
-    a interaktywne kalkulatory liczą wyłącznie w Twojej przeglądarce. Wyjątkiem jest sekcja „Sklepy”: gdy z niej korzystasz, Strona osadza mapę <strong>Google Maps</strong>, która ładuje się z serwerów Google — jeśli udostępnisz lokalizację, służy ona tylko do wyśrodkowania mapy i nie jest nigdzie zapisywana. Aby pokazać listę najbliższych sklepów, Strona wysyła Twoje przybliżone współrzędne do usługi <strong>OpenStreetMap (Overpass API)</strong> i pobiera publiczne dane o sklepach; przycisk „Nawiguj” otwiera trasę w Google Maps. Współrzędne są używane wyłącznie do tego zapytania i nie są u nas zapisywane. Jeśli Strona jest hostowana na infrastrukturze
+    <p>Strona <strong>materio-web</strong> jest statyczną wizytówką aplikacji. Używa <strong>Google Analytics</strong> (GA4),
+    aby anonimowo i zbiorczo mierzyć ruch — na przykład ile osób odwiedza Stronę i ile przechodzi do Google Play — dzięki
+    czemu możemy ją ulepszać. Analityka jest domyślnie wyłączona: zgodnie z RODO najpierw prosimy o Twoją zgodę, a Google
+    Analytics uruchamia się (i zapisuje własne pliki cookie) dopiero po jej udzieleniu. Możesz odmówić, a wszystkie
+    pozostałe funkcje działają dalej. Poza Analytics Strona nie używa czcionek z sieci — cały pozostały kod i style są
+    serwowane z domeny Strony, a interaktywne kalkulatory liczą wyłącznie w Twojej przeglądarce. Wyjątkiem jest sekcja „Sklepy”: gdy z niej korzystasz, Strona osadza mapę <strong>Google Maps</strong>, która ładuje się z serwerów Google — jeśli udostępnisz lokalizację, służy ona tylko do wyśrodkowania mapy i nie jest nigdzie zapisywana. Aby pokazać listę najbliższych sklepów, Strona wysyła Twoje przybliżone współrzędne do usługi <strong>OpenStreetMap (Overpass API)</strong> i pobiera publiczne dane o sklepach; przycisk „Nawiguj” otwiera trasę w Google Maps. Współrzędne są używane wyłącznie do tego zapytania i nie są u nas zapisywane. Jeśli Strona jest hostowana na infrastrukturze
     dostawcy (np. GitHub Pages), dostawca może przetwarzać standardowe logi serwera (adres IP, typ przeglądarki) w celach
     technicznych i bezpieczeństwa, zgodnie z własną polityką prywatności.</p>
 
     <h2 id="pl-6">6. Komu udostępniamy dane</h2>
     <p>Nie sprzedajemy danych i nie prowadzimy profili użytkowników. Dane opisane wyżej są przetwarzane przez
-    <strong>Google</strong> (AdMob, Maps, Places) jako dostawcę tych usług. Poza tym nie udostępniamy danych innym
+    <strong>Google</strong> (AdMob, Maps, Places, Analytics) jako dostawcę tych usług. Poza tym nie udostępniamy danych innym
     podmiotom, chyba że wymaga tego obowiązujące prawo.</p>
 
     <h2 id="pl-7">7. Twoje prawa (RODO)</h2>
@@ -172,6 +181,12 @@
     <p>If you are in the EEA, UK or Switzerland, on first launch we show a consent dialog (Google User Messaging Platform)
     where you decide about personalized ads. Without your consent, only <strong>non-personalized</strong> ads are shown. You
     can change or withdraw consent at any time by clearing the app data in system settings or resetting your advertising ID in Android settings.</p>
+    <h3>3.2. App analytics (Firebase / Google Analytics)</h3>
+    <p>The App uses <strong>Google Analytics for Firebase</strong> to measure, anonymously and in aggregate, how its
+    features are used (for example which calculators you open, the number of active users) — this helps us improve Materio.
+    Analytics is <strong>off by default</strong> and only turns on after you give consent in the same dialog (Google User
+    Messaging Platform). Nothing is collected without your consent. Data is processed by Google under the
+    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
 
     <h2>4. Location and store finder (Google Maps / Places)</h2>
     <p>The “Find a store” feature uses <strong>Google Maps</strong> and <strong>Google Places</strong>. If you grant location
