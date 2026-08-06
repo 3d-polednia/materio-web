@@ -19,6 +19,8 @@ const LANGS = [
 const I18N = {
   pl: {
     nav_calc: "Kalkulatory", nav_rooms: "Pomieszczenia", nav_projects: "Projekty", nav_stores: "Sklepy", nav_download: "Pobierz",
+    consent_text: "Używamy Google Analytics, żeby liczyć anonimowy ruch na stronie i to, ile osób przechodzi do Google Play. Zgadzasz się?",
+    consent_accept: "Zgoda", consent_reject: "Odrzuć", consent_more: "Więcej w polityce prywatności",
     hero_badge: "Działa offline · bez konta",
     hero_title: "Policz materiał. Kup tyle, ile trzeba. Nie marnuj.",
     hero_lead: "Materio to kalkulator i optymalizator materiałów budowlanych dla ekip, fachowców i majsterkowiczów. Wszystkie kalkulatory, pomieszczenia, projekty — teraz także w przeglądarce.",
@@ -89,6 +91,8 @@ const I18N = {
 
   en: {
     nav_calc: "Calculators", nav_rooms: "Rooms", nav_projects: "Projects", nav_stores: "Stores", nav_download: "Download",
+    consent_text: "We use Google Analytics to measure anonymous site traffic and how many people head to Google Play. Do you agree?",
+    consent_accept: "Agree", consent_reject: "Decline", consent_more: "More in the privacy policy",
     hero_badge: "Works offline · no account",
     hero_title: "Count the material. Buy just enough. Waste less.",
     hero_lead: "Materio is a building-material calculator and optimizer for crews, tradespeople and DIYers. Every calculator, room and project — now in your browser too.",

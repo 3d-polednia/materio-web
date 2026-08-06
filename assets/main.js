@@ -60,6 +60,48 @@ function setYear() {
   document.querySelectorAll("[data-year]").forEach((el) => { el.textContent = new Date().getFullYear(); });
 }
 
+// Tag every Google Play link with UTM params (so Play Console attributes the
+// visit/install to the website) and count the click in Google Analytics.
+function trackStoreClicks() {
+  document.querySelectorAll('a[href*="play.google.com"]').forEach((a) => {
+    const loc = a.getAttribute("data-loc") || "other";
+    try {
+      const url = new URL(a.href);
+      url.searchParams.set("utm_source", "materio_web");
+      url.searchParams.set("utm_medium", "referral");
+      url.searchParams.set("utm_campaign", "site_download");
+      url.searchParams.set("utm_content", loc);
+      a.href = url.toString();
+    } catch (e) { /* leave the link untouched if it cannot be parsed */ }
+    a.addEventListener("click", () => {
+      if (typeof gtag === "function") {
+        gtag("event", "play_store_click", { link_location: loc });
+      }
+    });
+  });
+}
+
+// GDPR consent banner: Google Analytics stays denied until the visitor accepts.
+function buildConsent() {
+  const banner = document.getElementById("consent-banner");
+  if (!banner) return;
+  let saved = null;
+  try { saved = localStorage.getItem("materio_consent"); } catch (e) {}
+  if (saved) return; // choice already made — banner stays hidden
+  banner.hidden = false;
+  const decide = (granted) => {
+    try { localStorage.setItem("materio_consent", granted ? "granted" : "denied"); } catch (e) {}
+    if (typeof gtag === "function") {
+      gtag("consent", "update", { analytics_storage: granted ? "granted" : "denied" });
+    }
+    banner.hidden = true;
+  };
+  const accept = document.getElementById("consent-accept");
+  const reject = document.getElementById("consent-reject");
+  if (accept) accept.addEventListener("click", () => decide(true));
+  if (reject) reject.addEventListener("click", () => decide(false));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof buildCalculators === "function") buildCalculators();
   if (typeof buildStoreFinder === "function") buildStoreFinder();
@@ -67,6 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
   buildTabs();
   buildRoomHelper();
   buildMobileNav();
+  trackStoreClicks();
+  buildConsent();
   setYear();
   if (typeof initialLang === "function") {
     const lang = initialLang();

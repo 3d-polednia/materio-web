@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
 
   gtag('config', 'G-22PS16K79V');
 </script>
@@ -169,7 +183,7 @@
       <a href="#sklepy" data-i18n="nav_stores">Sklepy</a>
       <a href="#faq">FAQ</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-i18n="nav_download">Pobierz</a>
+      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav" data-i18n="nav_download">Pobierz</a>
     </nav>
   </div>
 </header>
@@ -182,7 +196,7 @@
       <p class="lead" data-i18n="hero_lead">Materio to kalkulator i optymalizator materiałów budowlanych dla ekip, fachowców i majsterkowiczów. Kalkulatory, pomieszczenia, projekty i mapa sklepów — w telefonie i w przeglądarce.</p>
       <div class="store-badges">
         
-  <a class="gp-badge" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" aria-label="Pobierz z Google Play">
+  <a class="gp-badge" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="hero" aria-label="Pobierz z Google Play">
     <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
     <span><small data-i18n="gp_getit">Dostępne w</small><b data-i18n="hero_download">Pobierz na Androida</b></span>
   </a>
@@ -419,7 +433,7 @@
     <div class="cta-banner">
       <h2 id="cta-h" data-i18n="cta_title">Zbuduj taniej. Zacznij liczyć.</h2>
       <p data-i18n="cta_lead">Pobierz Materio na telefon — pełny katalog, zapisane projekty i eksport PDF. Za darmo, offline, bez konta.</p>
-      <a class="badge-store" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener">
+      <a class="badge-store" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="cta">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
         <span><small data-i18n="hero_download">Pobierz na Androida</small><b data-i18n="cta_download">Pobierz z Google Play</b></span>
       </a>
@@ -447,7 +461,7 @@
         <h4 data-i18n="foot_legal">Informacje prawne</h4>
         <ul>
           <li><a href="privacy-policy.html" data-i18n="foot_privacy">Polityka prywatności</a></li>
-          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener">Google Play</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
       </div>
     </div>
@@ -457,6 +471,14 @@
     </div>
   </div>
 </footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Zgoda na analitykę" hidden>
+  <p class="consent-text" data-i18n="consent_text">Używamy Google Analytics, żeby liczyć anonimowy ruch na stronie i to, ile osób przechodzi do Google Play. Zgadzasz się?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="privacy-policy.html" data-i18n="consent_more">Więcej w polityce prywatności</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm" data-i18n="consent_reject">Odrzuć</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm" data-i18n="consent_accept">Zgoda</button>
+  </div>
+</div>
 <script src="assets/i18n.js"></script>
 <script src="assets/calculators.js"></script>
 <script src="assets/stores.js"></script>
