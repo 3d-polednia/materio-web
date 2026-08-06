@@ -209,17 +209,16 @@
       </div>
     </div>
     <div class="hero-media">
-      <div class="phone" role="img" aria-label="Podgląd aplikacji Materio">
-        <div class="status"></div>
-        <div class="screen">
-          <div class="p-title" data-i18n="ph_title">Materio</div>
-          <div class="p-sub" data-i18n="ph_sub">Policz. Kup. Nie marnuj.</div>
-          <div class="p-card"><span class="p-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg></span><div><b data-i18n="ph_c1">Optymalizator rozkroju</b><small>1D · 2D · FFD</small></div></div>
-          <div class="p-card"><span class="p-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18M12 3v18"/></svg></span><div><b data-i18n="ph_c2">Płytki i panele</b><small>60×60 · 120×278</small></div></div>
-          <div class="p-card"><span class="p-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></span><div><b data-i18n="ph_c3">Farby i tynki</b><small data-i18n="ph_c3_sub">m² · warstwy</small></div></div>
-          <div class="p-card"><span class="p-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></span><div><b data-i18n="ph_c4">Mapa sklepów</b><small data-i18n="ph_c4_sub">w pobliżu</small></div></div>
+      <!-- Real app screenshots (Compose UI rendered by app/src/test/.../WebHeroShotsTest.kt).
+           The track advances on its own and loops; no controls by design. -->
+      <div class="phone" aria-roledescription="carousel" aria-label="Zrzuty ekranu z aplikacji Materio">
+        <div class="phone-track" id="hero-shots">
+          <img src="assets/screens/pl_home.webp" width="618" height="1340" alt="Ekran główny Materio" data-i18n-alt="shot_home" fetchpriority="high" decoding="async">
+          <img src="assets/screens/pl_calc.webp" width="618" height="1340" alt="Wynik obliczeń w Materio" data-i18n-alt="shot_calc" loading="lazy" decoding="async">
+          <img src="assets/screens/pl_stores.webp" width="618" height="1340" alt="Sklepy budowlane w pobliżu" data-i18n-alt="shot_stores" loading="lazy" decoding="async">
         </div>
       </div>
+      <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
     </div>
   </div>
 </section>

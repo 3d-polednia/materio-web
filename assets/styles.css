@@ -130,21 +130,27 @@ header.site {
 .trust span { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: .92rem; color: var(--muted); }
 .trust svg { color: var(--olive); flex: none; }
 
-/* Phone mockup */
+/* Phone mockup — auto-playing carousel of real app screenshots.
+   Aspect ratio matches the captured frames (Pixel 5: 411 × 891 dp), so the
+   screenshots fill the screen area exactly, with no cropping. */
 .phone {
-  width: 300px; max-width: 82%; margin: 0 auto; aspect-ratio: 300/620;
-  background: var(--surface); border: 10px solid #14150f;
+  width: 300px; max-width: 82%; margin: 0 auto; aspect-ratio: 411/891;
+  background: #14150f; border: 10px solid #14150f;
   border-radius: 40px; box-shadow: var(--shadow-lg); overflow: hidden;
-  display: flex; flex-direction: column;
+  position: relative;
 }
-.phone .status { height: 30px; background: var(--olive); }
-.phone .screen { flex: 1; padding: 16px 14px; background: var(--bg); overflow: hidden; }
-.phone .p-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 2px; }
-.phone .p-sub { font-size: .72rem; color: var(--muted); margin-bottom: 14px; }
-.p-card { background: var(--surface); border: 1px solid var(--outline); border-radius: 12px; padding: 11px 12px; margin-bottom: 9px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow); }
-.p-ico { width: 34px; height: 34px; border-radius: 9px; background: var(--primary-container); color: var(--on-primary-container); display: grid; place-items: center; flex: none; }
-.p-card b { font-size: .82rem; }
-.p-card small { display: block; color: var(--muted); font-size: .68rem; }
+.phone-track { display: flex; height: 100%; transition: transform .8s cubic-bezier(.4, 0, .2, 1); }
+.phone-track.instant { transition: none; }
+.phone-track img {
+  flex: 0 0 100%; width: 100%; height: 100%;
+  object-fit: cover; object-position: top center; display: block;
+}
+.phone-dots { display: flex; justify-content: center; gap: 7px; margin-top: 18px; }
+.phone-dots i { width: 7px; height: 7px; border-radius: 999px; background: var(--outline); transition: width .3s ease, background .3s ease; }
+.phone-dots i.on { width: 20px; background: var(--olive); }
+@media (prefers-reduced-motion: reduce) {
+  .phone-track { transition: none; }
+}
 
 /* ---------- Sections ---------- */
 section.block { padding: 68px 0; }

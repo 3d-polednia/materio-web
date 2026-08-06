@@ -42,6 +42,47 @@ function buildRoomHelper() {
   calc();
 }
 
+// Hero phone mockup: real app screenshots that advance on their own and loop.
+// No prev/next controls by design. Honours prefers-reduced-motion (first frame
+// only) and stops while the tab is in the background.
+function buildHeroCarousel() {
+  const track = document.getElementById("hero-shots");
+  if (!track) return;
+  const slides = Array.from(track.children);
+  if (slides.length < 2) return;
+
+  const dots = document.getElementById("hero-dots");
+  if (dots) dots.innerHTML = slides.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("");
+  const marks = dots ? dots.querySelectorAll("i") : [];
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  // A copy of the first frame placed after the last one turns the wrap-around
+  // into one more step forward instead of a visible rewind to the start.
+  track.appendChild(slides[0].cloneNode(true));
+
+  let i = 0;
+  const go = (n) => {
+    i = n;
+    track.style.transform = `translateX(-${i * 100}%)`;
+    marks.forEach((d, k) => d.classList.toggle("on", k === i % slides.length));
+  };
+  track.addEventListener("transitionend", () => {
+    if (i !== slides.length) return; // only when the clone is on screen
+    track.classList.add("instant");
+    track.style.transform = "translateX(0)";
+    void track.offsetWidth; // flush the jump so the next step animates again
+    track.classList.remove("instant");
+    i = 0;
+  });
+
+  let timer = null;
+  const start = () => { if (!timer) timer = setInterval(() => go(i + 1), 3500); };
+  const stop = () => { clearInterval(timer); timer = null; };
+  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+  start();
+}
+
 function buildMobileNav() {
   const toggle = document.getElementById("menu-toggle");
   const links = document.getElementById("nav-links");
@@ -108,6 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
   buildLangSwitcher();
   buildTabs();
   buildRoomHelper();
+  buildHeroCarousel();
   buildMobileNav();
   trackStoreClicks();
   buildConsent();
