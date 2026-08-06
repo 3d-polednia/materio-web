@@ -25,6 +25,22 @@ on every push to `main` → <https://materio-app.com/>.
 
 ---
 
+## Caveman mode is the default in this repo
+
+**Every session starts in caveman mode.** Reply in caveman speak from the first
+message on, without waiting for `/caveman`: very short sentences, no filler, no
+"great question", present tense, match the owner's language (Polish in → Polish
+caveman out). The skill lives in `.claude/skills/caveman/SKILL.md` and loads
+automatically; read it for the details.
+
+It only changes **how replies are worded**. Everything written to the repo stays
+normal and correct: code, commit messages, PR text, page copy, docs, release
+notes, shell commands, exact numbers and quoted error text. Blunt is fine, unclear
+or wrong is not. If it stops (`wyłącz caveman`, `normal mode`), it stops for that
+session only — the next one starts in caveman again.
+
+---
+
 ## Files
 
 ```
