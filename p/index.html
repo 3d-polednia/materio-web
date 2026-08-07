@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Udostępniona wycena — Materio</title>
+<meta name="description" content="Widok tylko do odczytu. Nie musisz zakładać konta.">
+<meta name="author" content="Materio">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="Materio">
+<meta name="application-name" content="Materio">
+<link rel="canonical" href="https://materio-app.com/p/">
+
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Materio">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:title" content="Udostępniona wycena — Materio">
+<meta property="og:description" content="Widok tylko do odczytu. Nie musisz zakładać konta.">
+<meta property="og:url" content="https://materio-app.com/p/">
+<meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Materio — Policz. Kup. Nie marnuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Udostępniona wycena — Materio">
+<meta name="twitter:description" content="Widok tylko do odczytu. Nie musisz zakładać konta.">
+<meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260807a">
+
+
+</head>
+<body>
+<a class="skip-link" href="#main">Przejdź do treści</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
+    <nav class="nav-links" aria-label="Materio">
+      <a href="/kalkulatory/" data-i18n="nav_calc">Kalkulatory</a>
+      <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
+      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="app">Pobierz</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap narrow">
+      <h1 data-i18n="share_title">Udostępniona wycena</h1>
+      <p class="lead" data-i18n="share_lead">Widok tylko do odczytu. Nie musisz zakładać konta.</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <p id="share-loading" class="muted" data-i18n="share_loading">Wczytuję wycenę…</p>
+      <p id="share-notfound" class="result err show" hidden data-i18n="share_notfound">Nie ma takiej wyceny. Link mógł zostać wyłączony przez autora.</p>
+
+      <div id="share-content" hidden>
+        <h2 id="share-project-name"></h2>
+        <p class="muted" id="share-updated"></p>
+        <p id="share-empty" class="muted" hidden data-i18n="share_empty">Ta wycena jest pusta.</p>
+
+        <div id="share-estimations-block" hidden>
+          <h3 data-i18n="share_estimations">Wyceny</h3>
+          <ul id="share-estimations" class="data-list"></ul>
+          <p class="share-total"><span data-i18n="share_total">Razem</span> <b id="share-total"></b></p>
+        </div>
+
+        <div id="share-shopping-block" hidden>
+          <h3 data-i18n="share_shopping">Lista zakupów</h3>
+          <ul id="share-shopping" class="data-list"></ul>
+        </div>
+
+        <p class="muted" style="margin-top:24px" data-i18n="share_owner_note">Wycenę przygotowano w aplikacji Materio.</p>
+        <p><a class="btn btn-ghost" href="/" data-i18n="bc_home">Start</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> Materio.</span>
+      <span><a href="/privacy-policy.html" data-i18n="foot_privacy">Polityka prywatności</a></span>
+      <span class="muted" data-i18n="app_noindex_note">Ta strona nie jest indeksowana przez wyszukiwarki.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/i18n.all.js?v=20260807a"></script>
+<script src="/assets/i18n-runtime.js?v=20260807a"></script>
+<script type="module" src="/assets/share.js?v=20260807a"></script>
+<script src="/assets/main.js?v=20260807a"></script>
+
+</body>
+</html>

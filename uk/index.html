@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materio — калькулятор і оптимізатор будівельних матеріалів для Android</title>
+<meta name="description" content="Безкоштовний будівельний калькулятор: фарба, штукатурка, плитка, панелі, шпалери та розкрій 1D/2D. Порахуй матеріал, купи скільки треба, зменш відходи. Карта магазинів, проєкти, кошторис у PDF. Рахує офлайн, акаунт необов'язковий, 10 мов.">
+<meta name="author" content="Materio">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="Materio">
+<meta name="application-name" content="Materio">
+<link rel="canonical" href="https://materio-app.com/uk/">
+<link rel="alternate" hreflang="pl" href="https://materio-app.com/">
+<link rel="alternate" hreflang="en" href="https://materio-app.com/en/">
+<link rel="alternate" hreflang="de" href="https://materio-app.com/de/">
+<link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/">
+<link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/">
+<link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/">
+<link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/">
+<link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/">
+<link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/">
+<link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/">
+<link rel="alternate" hreflang="x-default" href="https://materio-app.com/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Materio">
+<meta property="og:locale" content="uk_UA">
+<meta property="og:title" content="Materio — калькулятор і оптимізатор будівельних матеріалів для Android">
+<meta property="og:description" content="Безкоштовний будівельний калькулятор: фарба, штукатурка, плитка, панелі, шпалери та розкрій 1D/2D. Порахуй матеріал, купи скільки треба, зменш відходи. Карта магазинів, проєкти, кошторис у PDF. Рахує офлайн, акаунт необов'язковий, 10 мов.">
+<meta property="og:url" content="https://materio-app.com/uk/">
+<meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Materio — Policz. Kup. Nie marnuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Materio — калькулятор і оптимізатор будівельних матеріалів для Android">
+<meta name="twitter:description" content="Безкоштовний будівельний калькулятор: фарба, штукатурка, плитка, панелі, шпалери та розкрій 1D/2D. Порахуй матеріал, купи скільки треба, зменш відходи. Карта магазинів, проєкти, кошторис у PDF. Рахує офлайн, акаунт необов'язковий, 10 мов.">
+<meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260807a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "Materio",
+  "operatingSystem": "Android 7.0+",
+  "applicationCategory": "UtilitiesApplication",
+  "inLanguage": [
+    "pl",
+    "en",
+    "de",
+    "cs",
+    "sk",
+    "ro",
+    "hr",
+    "sr",
+    "uk",
+    "ru"
+  ],
+  "url": "https://materio-app.com/uk/",
+  "downloadUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
+  "installUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
+  "image": "https://materio-app.com/assets/og-image.jpg",
+  "description": "Materio — калькулятор і оптимізатор будівельних матеріалів для бригад, майстрів і майстрів-самоучок. Калькулятори, кімнати, проєкти й карта магазинів працюють у телефоні та тут, у браузері.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "PLN"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "Materio"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Materio"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Materio",
+  "url": "https://materio-app.com/",
+  "logo": "https://materio-app.com/assets/icon-512.png"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Materio безкоштовний?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Так. Materio завантажуєш і використовуєш безкоштовно. Немає передплати чи платних функцій. Акаунт необов'язковий і теж безкоштовний. Застосунок утримується з реклами Google AdMob."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Застосунок працює без інтернету?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Так. Усі калькулятори та оптимізатор розкрою рахують офлайн, просто в телефоні. Без акаунта проєкти й результати лишаються на пристрої. Синхронізація з хмарою потребує входу та інтернету."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Чи потрібно створювати акаунт?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ні. Відкриваєш застосунок і одразу рахуєш. Акаунт створюєш лише тоді, коли хочеш мати збережені проєкти й кімнати на телефоні та в браузері."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Як працює пошук магазинів?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Вводиш місто або назву магазину, і Materio показує найближчі точки на Google Maps і веде до обраної. Можеш також поділитися локацією, щоб побачити магазини навколо себе."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Які дані збирає Materio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Без акаунта твої проєкти, кошториси й налаштування зберігаються лише на пристрої. Після входу проєкти, кімнати, кошториси та списки покупок копіюються в Google Firestore (europe-central2, Варшава), де їх бачить лише твій акаунт. Застосунок використовує сервіси Google (реклама AdMob і карти при пошуку магазинів), які обробляють обмежені дані. Усе описано в"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Якими мовами працює застосунок?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "10 мовами: польською, англійською, німецькою, чеською, словацькою, румунською, хорватською, сербською, українською та російською."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "На яких телефонах працює Materio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "На телефонах і планшетах з Android 7.0 (API 24) або новіше."
+      }
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Перейти до вмісту</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/uk/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
+    <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <nav id="nav-links" class="nav-links" aria-label="Калькулятори">
+      <a href="/uk/kalkulyatory/">Калькулятори</a>
+      <a href="/uk/porady/">Поради</a>
+      <a href="/uk/magazyny/">Магазини</a>
+      <a href="/app/" rel="nofollow">Мій акаунт</a>
+      <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
+      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Завантажити</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<section class="hero" aria-labelledby="hero-h">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="badge"><span class="dot"></span><span>Рахує офлайн · акаунт необов'язковий</span></span>
+      <h1 id="hero-h">Порахуй матеріал. Купи рівно скільки треба. Не марнуй.</h1>
+      <p class="lead">Materio — калькулятор і оптимізатор будівельних матеріалів для бригад, майстрів і майстрів-самоучок. Калькулятори, кімнати, проєкти й карта магазинів працюють у телефоні та тут, у браузері.</p>
+      <div class="store-badges">
+        
+  <a class="gp-badge" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="hero" aria-label="Завантажити на Android">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
+    <span><small>Завантажити в</small><b>Завантажити на Android</b></span>
+  </a>
+        <a class="btn btn-ghost" href="/uk/kalkulyatory/">Спробувати калькулятори</a>
+      </div>
+      <div class="trust">
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>Рахує на 100% офлайн</span></span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Акаунт необов'язковий</span></span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg><span>10 мов</span></span>
+      </div>
+    </div>
+    <div class="hero-media">
+      <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+        <div class="phone-track" id="hero-shots">
+          <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Головний екран Materio" fetchpriority="high" decoding="async">
+          <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Результат розрахунку: скільки купити і скільки відходів" loading="lazy" decoding="async">
+          <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Будівельні магазини поруч" loading="lazy" decoding="async">
+        </div>
+      </div>
+      <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-label="Materio" style="padding-top:8px">
+  <div class="wrap">
+    <div class="stat-band">
+      <div class="stat"><div class="num">0 ₴</div><div class="lbl">Безкоштовно, акаунт необов'язковий</div></div>
+      <div class="stat"><div class="num">15</div><div class="lbl">Калькуляторів</div></div>
+      <div class="stat"><div class="num">150+</div><div class="lbl">Матеріалів у каталозі</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Мов</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="block alt" aria-labelledby="feat-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Функції</div>
+      <h2 id="feat-h">Що рахує Materio</h2>
+      <p class="muted">Ті самі обчислювальні рушії та той самий каталог матеріалів, що й у застосунку.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></div><h3>Калькулятори матеріалів</h3><p>Фарби, штукатурки, клеї, плитка, панелі, керамограніт, шпалери. Площа й запас у цілих упаковках.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg></div><h3>Оптимізатор розкрою</h3><p>Розкрій 1D і 2D методом first-fit. Скільки хлистів чи плит купити, з різом і відходами.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Каталог матеріалів</h3><p>Понад 150 матеріалів із реальними розмірами й запасом. Обираєш зі списку, кожне значення можна змінити.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></div><h3>Кімнати</h3><p>Введи розміри кімнати раз і отримаєш підлогу, стіни, стелю й периметр. Звідти переходиш прямо до матеріалу.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Проєкти й кошториси</h3><p>Збери розрахунки в проєкт, побач загальну вартість і відходи, експортуй кошторис у PDF.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Карта магазинів</h3><p>Знайди будівельні маркети й гуртівні за розташуванням і прокладай маршрут до найближчого.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Як це працює</div>
+      <h2 id="how-h">Від розмірів до списку покупок</h2>
+      <p class="muted">Три кроки: розміри, результат, покупки.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Введи розміри</h3><p>Введи площу або розміри приміщення. Обери матеріал із каталогу або введи власний.</p></div>
+      <div class="step"><h3>Materio рахує</h3><p>Обчислювальне ядро рахує потребу, запас і план розкрою. Одразу бачиш, скільки купити, вартість і відходи.</p></div>
+      <div class="step"><h3>Купуй і будуй</h3><p>Збережи в проєкт, експортуй кошторис у PDF і вирушай до магазину з готовим списком.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="calculators" class="block alt" aria-labelledby="calc-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Калькулятори</div>
+      <h2 id="calc-h">Порахуй просто в браузері</h2>
+      <p class="muted">Ті самі формули, що й у застосунку. Нічого не надсилаємо на сервер. Рахує твій браузер.</p>
+    </div>
+    <h3 class="calc-group">Поверхні</h3>
+    <div class="calc-links"><a class="calc-link" href="/uk/kalkulyatory/farba-shtukaturka-hrunt/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Фарби, штукатурки, ґрунти</b>
+        <span class="muted">Упаковок на площу, з шарами.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/plytka-paneli-keramohranit/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Плитка, панелі, керамограніт</b>
+        <span class="muted">Площа + запас → цілі коробки.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/shpalery/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Шпалери</b>
+        <span class="muted">Скільки рулонів, з рапортом малюнка.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a></div>
+    <h3 class="calc-group">Розкрій</h3>
+    <div class="calc-links"><a class="calc-link" href="/uk/kalkulyatory/rozkriy-liniynyi-1d/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Лінійний розкрій (1D)</b>
+        <span class="muted">Хлисти, планки, труби: скільки й як різати.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/rozkriy-plyt-2d/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Розкрій плит (2D)</b>
+        <span class="muted">Плити, стільниці, фанера: скільки аркушів.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a></div>
+    <h3 class="calc-group">Будівельні роботи</h3>
+    <div class="calc-links"><a class="calc-link" href="/uk/kalkulyatory/beton-z-mishka/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Бетон із мішка</b>
+        <span class="muted">Скільки мішків сухого бетону й води.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/kliy-rozchyn/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Клей / розчин</b>
+        <span class="muted">Витрата кг/м² → мішки.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/styazhka-shtukaturka/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Стяжка / штукатурка</b>
+        <span class="muted">Площа й товщина → мішки.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/zatyrka/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Затирка</b>
+        <span class="muted">Скільки кг на затирання швів.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/muruvannya/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Мурування</b>
+        <span class="muted">Блоки/цегла й розчин на стіну.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/uteplennya-etics/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Утеплення (ETICS)</b>
+        <span class="muted">Пінопласт, дюбелі, клей, сітка.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a></div>
+    <h3 class="calc-group">Гіпсокартон</h3>
+    <div class="calc-links"><a class="calc-link" href="/uk/kalkulyatory/peregorodka-hk/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Перегородка ГК</b>
+        <span class="muted">Профілі CW/UW, дюбелі й листи.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/pidvisna-stelya/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Підвісна стеля</b>
+        <span class="muted">Профілі CD/UD, підвіси й листи.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/hk-na-kliy/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>ГК на клей</b>
+        <span class="muted">Листи «на маячки» + гіпсовий клей.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a><a class="calc-link" href="/uk/kalkulyatory/obshyvka-osb/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Обшивка (OSB/дошки)</b>
+        <span class="muted">Скільки аркушів на покриття.</span>
+      </span>
+      <span class="calc-link-go">Відкрити калькулятор</span>
+    </a></div>
+    <p class="center" style="margin-top:24px"><a class="btn btn-ghost" href="/uk/kalkulyatory/">Усі калькулятори</a></p>
+  </div>
+</section>
+
+<section id="rooms" class="block" aria-labelledby="rooms-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Кімнати</div>
+      <h2 id="rooms-h">Введи кімнату один раз</h2>
+      <p class="muted">Дай розміри, і Materio обчислить площі та передасть їх калькуляторам. У застосунку зберігаєш кімнати (вітальня, ванна, кухня) і повертаєшся до них будь-коли.</p>
+    </div>
+    <div class="split-2">
+      <div id="room-helper" class="calc">
+        <h3><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></span><span>Кімнати</span></h3>
+        <div class="field-row">
+          <div class="field"><label for="room-l">Довжина (м)</label><input id="room-l" type="text" inputmode="decimal" value="5"></div>
+          <div class="field"><label for="room-w">Ширина (м)</label><input id="room-w" type="text" inputmode="decimal" value="4"></div>
+        </div>
+        <div class="field"><label for="room-h">Висота (м)</label><input id="room-h" type="text" inputmode="decimal" value="2.6"></div>
+        <div class="result show">
+          <div class="rows">
+            <div><span>Підлога / стеля</span><b id="room-floor"></b></div>
+            <div><span>Стіни (без отворів)</span><b id="room-walls"></b></div>
+            <div><span>Периметр</span><b id="room-perim"></b></div>
+            <div><span>Об'єм</span><b id="room-vol"></b></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <ul class="trust-list">
+          <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Збережені кімнати в застосунку</b></span></li><li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Автоматична площа стін і підлоги</b></span></li><li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Один дотик до калькулятора матеріалу</b></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projekty" class="block alt" aria-labelledby="proj-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Проєкти</div>
+      <h2 id="proj-h">Увесь кошторис в одному місці</h2>
+      <p class="muted">Кожен розрахунок додаєш у проєкт. Materio підсумовує кількість, вартість і відходи, а все експортуєш у PDF для клієнта.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><h3>Список матеріалів</h3><p>Усі позиції з кількістю й цінами в одному вікні.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><h3>Вартість і відходи</h3><p>Сума, а також скільки йде у відходи й за скільки. Одразу видно.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Експорт у PDF</h3><p>Готовий кошторис для клієнта або магазину.</p></div>
+    </div>
+    <p class="center" style="margin-top:24px"><a class="btn btn-ghost" href="/app/" rel="nofollow">Мій акаунт</a></p>
+  </div>
+</section>
+
+<section id="konto" class="block" aria-labelledby="acct-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Акаунт необов'язковий</div>
+      <h2 id="acct-h">Акаунт і синхронізація</h2>
+      <p class="muted">Акаунт Materio необов'язковий. Калькулятор рахує без входу — акаунт потрібен лише щоб зберегти проєкти й кімнати і мати їх на телефоні та в браузері.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></div><h3>Акаунт необов'язковий</h3><p>Без входу все рахується на твоєму пристрої, точно як досі.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></div><h3>Той самий проєкт на телефоні та в браузері</h3><p>Після входу проєкти, кімнати, кошториси та списки покупок ідуть у Google Firestore і повертаються на другому пристрої.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><h3>Твої дані бачиш тільки ти</h3><p>Правила безпеки пускають до даних акаунта виключно його власника. Виняток — посилання, яке ти створиш сам.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg></div><h3>Дані лежать у Європейському Союзі</h3><p>База Firestore працює в регіоні europe-central2 (Варшава).</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" aria-labelledby="stores-teaser-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Магазини</div>
+      <h2 id="stores-teaser-h">Знайди будівельний магазин поруч</h2>
+      <p class="muted">Введи місто або назву магазину, і Materio покаже найближчі точки на карті та проведе до вибраної. Так само працює пошук магазинів у застосунку.</p>
+    </div>
+    <p class="center"><a class="btn btn-primary" href="/uk/magazyny/">Показати на карті</a></p>
+  </div>
+</section>
+
+<section id="prywatnosc" class="block alt" aria-labelledby="trust-h">
+  <div class="wrap trust-split">
+    <div>
+      <div class="kicker">Дані</div>
+      <h2 id="trust-h">Що відбувається з твоїми даними</h2>
+      <p class="muted">Рахує твій пристрій. Нижче пишемо, що лишається локально, що йде на акаунт і якими сервісами Google користуємось.</p>
+      <ul class="trust-list">
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>Рахує офлайн, на твоєму телефоні</b><span class="d">Калькулятори і розкрій рахують на пристрої. Без мережі працюють так само.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span><span><b>Акаунт лише якщо хочеш</b><span class="d">Обчислення ніколи не потребує входу. Акаунт створюєш, щоб мати проєкти на телефоні та в браузері.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span><span><b>Твої проєкти залишаються в тебе</b><span class="d">Без акаунта все лишається на пристрої, а резервна копія — це файл, який ти сам експортуєш. Після входу копія лежить у Google Firestore у регіоні europe-central2 (Варшава), і бачить її лише твій акаунт.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></span><span><b>Згода на рекламу в ЄС</b><span class="d">У ЄС застосунок запитує згоду на персоналізовану рекламу.</span></span></li>
+      </ul>
+    </div>
+    <aside class="trust-panel">
+      <h3><span class="shield"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/></svg></span><span>Реклама і дані</span></h3>
+      <p class="muted" style="margin-top:12px">Materio безкоштовний і живе з реклами.</p>
+      <ul>
+        <li>Рекламу надає Google AdMob; у ЄС ти вирішуєш щодо персоналізованої реклами.</li>
+        <li>Карта магазинів використовує Google Maps і, за твоєю згодою, твою локацію, лише щоб показати магазини поблизу.</li>
+        <li>Ми не продаємо дані й не створюємо профілі користувачів.</li>
+      </ul>
+      <p style="margin-top:16px"><a class="btn btn-ghost btn-sm" href="/privacy-policy.html">Читати політику конфіденційності</a></p>
+    </aside>
+  </div>
+</section>
+<section id="faq" class="block" aria-labelledby="faq-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">FAQ</div>
+      <h2 id="faq-h">Часті запитання</h2>
+    </div>
+    <div class="faq">
+      <details open><summary>Materio безкоштовний?</summary><p>Так. Materio завантажуєш і використовуєш безкоштовно. Немає передплати чи платних функцій. Акаунт необов'язковий і теж безкоштовний. Застосунок утримується з реклами Google AdMob.</p></details>
+      <details><summary>Застосунок працює без інтернету?</summary><p>Так. Усі калькулятори та оптимізатор розкрою рахують офлайн, просто в телефоні. Без акаунта проєкти й результати лишаються на пристрої. Синхронізація з хмарою потребує входу та інтернету.</p></details>
+      <details><summary>Чи потрібно створювати акаунт?</summary><p>Ні. Відкриваєш застосунок і одразу рахуєш. Акаунт створюєш лише тоді, коли хочеш мати збережені проєкти й кімнати на телефоні та в браузері.</p></details>
+      <details><summary>Як працює пошук магазинів?</summary><p>Вводиш місто або назву магазину, і Materio показує найближчі точки на Google Maps і веде до обраної. Можеш також поділитися локацією, щоб побачити магазини навколо себе.</p></details>
+      <details><summary>Які дані збирає Materio?</summary><p><span>Без акаунта твої проєкти, кошториси й налаштування зберігаються лише на пристрої. Після входу проєкти, кімнати, кошториси та списки покупок копіюються в Google Firestore (europe-central2, Варшава), де їх бачить лише твій акаунт. Застосунок використовує сервіси Google (реклама AdMob і карти при пошуку магазинів), які обробляють обмежені дані. Усе описано в</span> <a href="/privacy-policy.html">Політика конфіденційності</a>.</p></details>
+      <details><summary>Якими мовами працює застосунок?</summary><p>10 мовами: польською, англійською, німецькою, чеською, словацькою, румунською, хорватською, сербською, українською та російською.</p></details>
+      <details><summary>На яких телефонах працює Materio?</summary><p>На телефонах і планшетах з Android 7.0 (API 24) або новіше.</p></details>
+    </div>
+  </div>
+</section>
+<section class="block" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div class="cta-banner">
+      <h2 id="cta-h">Завантаж Materio на телефон</h2>
+      <p>Повний каталог матеріалів, збережені проєкти, карта магазинів і експорт у PDF. Безкоштовно, рахує офлайн, акаунт необов'язковий.</p>
+      
+  <a class="badge-store" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="cta" aria-label="Завантажити на Android">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
+    <span><small>Завантажити в</small><b>Завантажити на Android</b></span>
+  </a>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</div>
+        <p class="muted">Калькулятор і оптимізатор будівельних матеріалів. Порахуй. Купи. Не марнуй.</p>
+      </div>
+      <div>
+        <h4>Продукт</h4>
+        <ul>
+          <li><a href="/uk/kalkulyatory/">Усі калькулятори</a></li>
+          <li><a href="/uk/porady/">Поради</a></li>
+          <li><a href="/uk/magazyny/">Магазини</a></li>
+          <li><a href="/uk/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Правова інформація</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Політика конфіденційності</a></li>
+          <li><a href="/app/" rel="nofollow">Мій акаунт</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> Materio. Усі права захищені.</span>
+      <span>Результати орієнтовні. Завжди перевіряй перед покупкою.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Погоджуюсь" hidden>
+  <p class="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Докладніше в політиці конфіденційності</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Відхилити</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Погоджуюсь</button>
+  </div>
+</div>
+<script>window.MATERIO_ALTERNATES = {
+  "pl": "/",
+  "en": "/en/",
+  "de": "/de/",
+  "cs": "/cs/",
+  "sk": "/sk/",
+  "ro": "/ro/",
+  "hr": "/hr/",
+  "sr": "/sr/",
+  "uk": "/uk/",
+  "ru": "/ru/"
+};</script>
+<script src="/assets/i18n.uk.js?v=20260807a"></script>
+<script src="/assets/i18n-runtime.js?v=20260807a"></script>
+<script src="/assets/calculators.js?v=20260807a"></script>
+<script src="/assets/main.js?v=20260807a"></script>
+
+</body>
+</html>

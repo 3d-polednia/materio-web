@@ -30,40 +30,58 @@ sklepów, SEO oraz zarządzanie assetami.
 
 ## 1. Filozofia i założenia
 
-- **Statyczna strona bez procesu budowania.** Czysty HTML/CSS/JS. Nie ma
-  `npm run build`, bundlera ani frameworka. Pliki, które widzisz w repo, to pliki,
-  które trafiają na serwer.
+- **Statyczna strona, ale generowana.** W przeglądarce dalej czysty HTML/CSS/JS —
+  bez frameworka, bundlera i zależności runtime. Strony powstają jednak z jednego
+  szablonu: `node scripts/build.mjs` (Node bez `package.json` i bez `node_modules`)
+  zapisuje ~230 plików `.html`. Wynik jest commitowany, bo GitHub Pages serwuje
+  katalog repo bez własnego budowania. Pliki, które widzisz w repo, to pliki, które
+  trafiają na serwer — część z nich pisze generator, nie człowiek.
 - **Prawda ponad marketing.** Aplikacja w wydaniu produkcyjnym zawiera reklamy
   (Google AdMob) oraz mapy/lokalizację (Google Maps/Places). Strona **nie**
-  twierdzi, że jest „bez reklam". Zamiast tego uczciwie komunikuje realne atuty:
-  liczenie offline na urządzeniu, brak konta, dane zostają u użytkownika, zgodność
-  z RODO. Zmieniając treści, trzymaj się tej zasady.
+  twierdzi, że jest „bez reklam". Od sierpnia 2026 istnieje też **opcjonalne konto**
+  z synchronizacją przez Firestore, więc strona **nie** mówi już „bez konta" ani
+  „nic nie opuszcza urządzenia". Uczciwe atuty, które komunikujemy: liczenie offline
+  na urządzeniu, konto opcjonalne, dane konta w regionie UE i widoczne tylko dla
+  właściciela, zgodność z RODO. Zmieniając treści, trzymaj się tej zasady.
 - **Minimum zewnętrznych zapytań.** Strona nie ładuje czcionek z sieci. Google
   Analytics (GA4) działa w Consent Mode v2: `analytics_storage` startuje jako
   `denied` i włącza się dopiero po kliknięciu zgody w banerze — wybór zapisuje
   `localStorage['materio_consent']`. Pozostałe wyjątki, tylko na żądanie
   użytkownika w sekcji „Sklepy": embed Google Maps oraz zapytanie do
   OpenStreetMap/Overpass.
-- **Treść indeksowalna.** Polskie teksty są zapisane wprost w HTML. JavaScript
-  jedynie *podmienia* je przy zmianie języka (progressive enhancement). Dzięki temu
-  strona ma sens także bez JS i jest dobrze widziana przez wyszukiwarki.
+- **Treść indeksowalna w każdym z 10 języków.** Każdy język ma własny adres
+  (`/kalkulatory/farby-tynki-grunty/`, `/en/calculators/paint-plaster-primer/`),
+  a tekst jest zwykłym HTML-em wygenerowanym ze słownika. Przełącznik języka
+  **nawiguje** do odpowiednika, zamiast podmieniać tekst — dopiero to sprawia, że
+  pozostałe dziewięć języków w ogóle da się zaindeksować. Strona ma sens bez JS.
 
 ## 2. Struktura plików
 
+Pliki pisane ręcznie:
+
 ```
-index.html              Strona główna (jedna strona, sekcje po kotwicach)
+scripts/build.mjs        Generator stron; `--check` waliduje bez zapisu
+src/site.mjs             Mapa serwisu: języki, slugi sekcji/kalkulatorów/poradników
+src/template.mjs         Wspólny <head>, nagłówek, stopka, baner zgody, okruszki
+src/pages.mjs            Zawartość <main> każdego typu strony
+src/calc-meta.mjs        Wzory „Jak to liczymy" + ich tłumaczenia
+src/app-pages.mjs        /app/ i /p/ (noindex)
 privacy-policy.html      Polityka prywatności (PL + EN) — osobna podstrona (wymóg Google Play)
-404.html                 Strona błędu 404
+404.html                 Strona błędu 404; przekierowuje też /p/<token> na /p/?t=<token>
 site.webmanifest         Manifest PWA (nazwa, ikony, kolory)
 robots.txt               Reguły dla robotów + odnośnik do sitemap
-sitemap.xml              Mapa strony (index + polityka prywatności)
 .nojekyll                Wyłącza przetwarzanie Jekyll na GitHub Pages
 assets/
   styles.css             System projektowy Olive Green Material 3 + wszystkie komponenty
-  i18n.js                Słownik 10 języków (LANGS, I18N) + applyLang()/initialLang()
-  calculators.js         Silniki liczące + budowa UI kalkulatorów (buildCalculators)
+  i18n.js                Słownik 10 języków (LANGS, I18N) — wejście builda
+  i18n-pages.js          Słownik podstron, te same 10 języków — wejście builda
+  i18n-runtime.js        t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/
+  calculators.js         Silniki liczące + podpięcie formularzy (wireCalculator)
   stores.js              Wyszukiwarka sklepów (buildStoreFinder): mapa + lista OSM
-  main.js                Spójne wiązanie strony (język, zakładki, pomieszczenia, menu mobilne)
+  main.js                Wiązanie strony (pomieszczenia, menu mobilne, karuzela, zgoda)
+  app.js                 /app/ — Firebase Auth + synchronizacja Firestore
+  share.js               /p/<token> — udostępniona wycena, tylko do odczytu
+  firebase-config.js     Konfiguracja Firebase Web (placeholdery do uzupełnienia)
   icon-192.png,          Ikona z Google Play w kilku rozmiarach (nagłówek, PWA, favicon)
   icon-512.png,
   apple-touch-icon.png,
@@ -250,20 +268,47 @@ bezpośrednio w HTML.
 
 ## 9. SEO
 
-Co jest już zrobione (`index.html`, jeśli nie zaznaczono inaczej):
+Wszystkie poniższe elementy generuje `scripts/build.mjs` dla każdej strony:
 
 - **Meta:** `title`, `description`, `robots`, `canonical`, `theme-color`
   (jasny/ciemny), `application-name`.
-- **Treść indeksowalna:** polskie teksty w HTML (nie renderowane przez JS).
-- **Open Graph + Twitter Card:** tytuł, opis, `og:image` = `assets/og-image.jpg`
-  (1200×630), lokalizacja `pl_PL`.
-- **Dane strukturalne (JSON-LD):** `MobileApplication` (darmowa, Android 7+, 10
-  języków, cena 0), `Organization`, `FAQPage` (spójne z sekcją FAQ).
-- **Techniczne:** `sitemap.xml`, `robots.txt`, manifest PWA, `404.html`,
-  brak zewnętrznych zapytań na starcie (szybkość).
+- **Wielojęzyczność:** każda strona ma `hreflang` dla wszystkich 10 języków oraz
+  `x-default` wskazujący wersję polską. To jest sedno zmiany — wcześniej dziewięć
+  języków dzieliło jeden adres i nie mogło się zaindeksować.
+- **Treść indeksowalna:** teksty są zwykłym HTML-em w języku danej strony.
+- **Open Graph + Twitter Card:** tytuł, opis, `og:image` = `/assets/og-image.jpg`
+  (1200×630), `og:locale` dopasowany do języka.
+- **Dane strukturalne (JSON-LD):** `MobileApplication`, `Organization` i `FAQPage`
+  na stronie głównej; `BreadcrumbList` na każdej podstronie; `ItemList` na hubie
+  kalkulatorów; `WebApplication` na stronie kalkulatora; `HowTo` w poradniku.
+- **Techniczne:** `sitemap.xml` (generowany, ~224 adresy), `robots.txt`, manifest
+  PWA, `404.html`. `/app/` i `/p/` są `noindex` i nie ma ich w sitemapie.
 
-Przy zmianie treści FAQ pamiętaj, by zaktualizować **oba** miejsca — widoczny blok
-`<details>` w `index.html` **oraz** blok `FAQPage` w JSON-LD (muszą się zgadzać).
+FAQ nie trzeba już synchronizować ręcznie — widoczny blok `<details>` i blok
+`FAQPage` w JSON-LD powstają z tych samych kluczy `faq_q*`/`faq_a*`.
+
+### Strona per kalkulator
+
+Każdy z 15 kalkulatorów ma własną stronę w każdym języku: formularz na żywo obok
+sekcji „Jak to liczymy" (co podajesz → wzór → przykład → na co uważać). **Przykład
+liczy prawdziwy silnik** na wartościach domyślnych formularza, w trakcie builda —
+więc liczba na stronie nie może rozjechać się z kodem. Wzory żyją w
+`src/calc-meta.mjs`; zmieniając silnik w `assets/calculators.js`, popraw wzór obok.
+
+## 9a. Konto i synchronizacja (/app/, /p/)
+
+- `/app/` — logowanie e-mailem (Firebase Auth), lista projektów i pomieszczeń,
+  tworzenie i usuwanie (tombstone), przycisk „Udostępnij".
+- `/p/<token>` — kopia wyceny tylko do odczytu, bez logowania. GitHub Pages nie ma
+  przepisywania adresów, więc `404.html` przekierowuje na `/p/?t=<token>`.
+- Schemat dokumentów jest **wspólny z aplikacją Androida** — kontrakt opisuje
+  `docs/FIRESTORE_SYNC.md` w repo `3d-polednia/Materio`, a po stronie Kotlina
+  `core/sync/SyncContract.kt`. Zmiana w jednym miejscu wymaga zmiany we wszystkich.
+- `assets/firebase-config.js` ma **dwa placeholdery** (`apiKey`, `appId`) do
+  uzupełnienia z konsoli Firebase (Project settings → Web app → Config). Do tego
+  czasu `/app/` pokazuje komunikat o braku konfiguracji zamiast zepsutego formularza.
+  Klucz Web API Firebase **nie jest sekretem** — dane chronią reguły bezpieczeństwa
+  i lista autoryzowanych domen.
 
 Sprawdzenie po wdrożeniu: [Google Rich Results Test](https://search.google.com/test/rich-results),
 [PageSpeed Insights](https://pagespeed.web.dev/), podgląd OG:

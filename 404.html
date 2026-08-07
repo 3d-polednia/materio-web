@@ -3,20 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nie znaleziono strony — Materio</title>
+<title>Nie ma takiej strony — Materio</title>
 <meta name="robots" content="noindex, follow">
-<link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="assets/icon-192.png" sizes="192x192" type="image/png">
-<link rel="stylesheet" href="assets/styles.css?v=20260806c">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="stylesheet" href="/assets/styles.css?v=20260807a">
+<script>
+  // GitHub Pages serves this file for every path it cannot resolve, and it has no
+  // rewrite rules. A shared estimate lives at /p/<token>, where the token is an
+  // unbounded random string and therefore cannot be a real directory — so catch it
+  // here and hand it to /p/, which reads the token from ?t=.
+  (function () {
+    var m = location.pathname.match(/^\/p\/([A-Za-z0-9_-]{16,})\/?$/);
+    if (m) location.replace("/p/?t=" + encodeURIComponent(m[1]) + location.hash);
+  })();
+</script>
 </head>
 <body>
-<section class="hero" style="min-height:70vh;display:grid;place-items:center;text-align:center">
-  <div class="wrap">
-    <img class="logo" src="assets/icon-192.png" alt="Materio" width="64" height="64" style="margin-bottom:20px">
-    <h1>404 — nie ma tu nic do policzenia</h1>
-    <p class="lead" style="margin:0 auto 24px">Ta strona nie istnieje albo została przeniesiona.</p>
-    <a class="btn btn-primary" href="index.html">Wróć na stronę główną</a>
+<main id="main" class="block" style="min-height:60vh;display:flex;align-items:center">
+  <div class="wrap narrow" style="text-align:center">
+    <h1>404</h1>
+    <p class="lead">Nie ma takiej strony.</p>
+    <p style="margin-top:24px">
+      <a class="btn btn-primary" href="/">Strona główna</a>
+      <a class="btn btn-ghost" href="/kalkulatory/">Kalkulatory</a>
+    </p>
   </div>
-</section>
+</main>
 </body>
 </html>

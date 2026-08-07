@@ -1,28 +1,10 @@
-/* Materio website — shared page wiring across all subpages: language switcher,
-   mobile nav, and (where present) calculator tabs, the room helper and the
-   store finder. Everything is guarded, so each page runs only what it contains.
-   The HTML ships full Polish copy; this is progressive enhancement on top. */
+/* Materio website — shared page wiring across all pages: mobile nav, the room helper,
+   Play-Store click tracking and the consent banner. Everything is guarded, so each page
+   runs only what it actually contains.
 
-function buildLangSwitcher() {
-  const sel = document.getElementById("lang-select");
-  if (!sel || typeof LANGS === "undefined") return;
-  sel.innerHTML = LANGS.map((l) => `<option value="${l.code}">${l.label}</option>`).join("");
-  sel.addEventListener("change", () => applyLang(sel.value));
-  document.addEventListener("langchange", (e) => { sel.value = e.detail.lang; });
-}
-
-function buildTabs() {
-  const tabs = document.querySelectorAll(".calc-tab");
-  if (!tabs.length) return;
-  const show = (tab) => {
-    tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === tab)));
-    document.querySelectorAll("#calc-grid .calc").forEach((c) => {
-      c.style.display = c.dataset.tab === tab ? "" : "none";
-    });
-  };
-  tabs.forEach((t) => t.addEventListener("click", () => show(t.dataset.tab)));
-  show(tabs[0].dataset.tab);
-}
+   The pages ship their copy as real HTML in their own language (scripts/build.mjs), so
+   there is no text-swapping pass here any more — the language switcher lives in
+   assets/i18n-runtime.js and navigates between per-language URLs. */
 
 function buildRoomHelper() {
   const box = document.getElementById("room-helper");
@@ -38,7 +20,6 @@ function buildRoomHelper() {
     box.querySelector("#room-vol").textContent = fmt(vol) + " m³";
   };
   box.querySelectorAll("input").forEach((i) => i.addEventListener("input", calc));
-  document.addEventListener("langchange", calc);
   calc();
 }
 
@@ -146,18 +127,10 @@ function buildConsent() {
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof buildCalculators === "function") buildCalculators();
   if (typeof buildStoreFinder === "function") buildStoreFinder();
-  buildLangSwitcher();
-  buildTabs();
   buildRoomHelper();
   buildHeroCarousel();
   buildMobileNav();
   trackStoreClicks();
   buildConsent();
   setYear();
-  if (typeof initialLang === "function") {
-    const lang = initialLang();
-    applyLang(lang);
-    const sel = document.getElementById("lang-select");
-    if (sel) sel.value = lang;
-  }
 });

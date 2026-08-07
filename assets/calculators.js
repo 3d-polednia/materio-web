@@ -309,45 +309,39 @@ const CALCS = [
   ] },
 ];
 
-const CUT_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>';
+/* ---------- Wiring ----------
+   The markup for a calculator is rendered by scripts/build.mjs, server-side and already
+   translated, so a crawler and a visitor without JavaScript both see the real fields.
+   All this file does in the browser is attach the handlers to what is already there. */
 
-/* ---------- Render + wire ---------- */
+/** Attach run / preset / Enter-key behaviour to one server-rendered `.calc` card. */
+function wireCalculator(card) {
+  const def = CALCS.find((c) => c.id === card.dataset.calc);
+  if (!def || card.dataset.wired) return;
+  card.dataset.wired = "1";
+
+  const read = () => {
+    const o = {};
+    card.querySelectorAll("[data-k]").forEach((el) => (o[el.dataset.k] = el.value));
+    return o;
+  };
+  const run = () => renderResult(card, ENGINES[def.engine](read()));
+
+  const runBtn = card.querySelector("[data-run]");
+  if (runBtn) runBtn.addEventListener("click", run);
+  card.querySelectorAll("input").forEach((i) =>
+    i.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); run(); } }));
+
+  if (def.presets) card.querySelectorAll("[data-preset]").forEach((btn) => btn.addEventListener("click", () => {
+    const p = def.presets[+btn.dataset.preset];
+    Object.entries(p.v).forEach(([k, v]) => { const el = card.querySelector(`[data-k="${k}"]`); if (el) el.value = v; });
+    run();
+  }));
+}
+
+/** Wire every calculator present on the page. */
 function buildCalculators() {
-  const grid = document.getElementById("calc-grid");
-  if (!grid) return;
-  grid.innerHTML = CALCS.map((c) => {
-    const fields = c.fields.map((f) => {
-      if (f.sel) {
-        const opts = f.sel.map(([v, l, key]) =>
-          `<option value="${v}"${v === f.def ? " selected" : ""}${key ? ` data-i18n="${key}"` : ""}>${l}</option>`).join("");
-        return `<div class="field"><label data-i18n="${f.label}"></label><select data-k="${f.k}">${opts}</select></div>`;
-      }
-      if (f.ta) return `<div class="field"><label data-i18n="${f.label}"></label><textarea rows="3" data-k="${f.k}">${f.def}</textarea></div>`;
-      return `<div class="field"><label data-i18n="${f.label}"></label><input type="text" inputmode="decimal" data-k="${f.k}" value="${f.def}"></div>`;
-    }).join("");
-    const chips = c.presets ? `<div class="chips">${c.presets.map((p, i) =>
-      `<button class="chip" data-preset="${i}"${p.k ? ` data-i18n="${p.k}"` : ""}>${p.l}</button>`).join("")}</div>` : "";
-    return `<div class="calc" data-calc="${c.id}" data-tab="${c.tab}">
-      <h3><span class="ico">${CUT_ICON}</span><span data-i18n="c_${c.id}_t"></span></h3>
-      <p class="desc" data-i18n="c_${c.id}_d"></p>
-      ${chips}${fields}
-      <button class="btn btn-primary" data-run data-i18n="act_calc"></button>
-      <div class="result" data-result></div>
-    </div>`;
-  }).join("");
-
-  grid.querySelectorAll(".calc").forEach((card) => {
-    const id = card.dataset.calc, def = CALCS.find((c) => c.id === id);
-    const read = () => { const o = {}; card.querySelectorAll("[data-k]").forEach((el) => (o[el.dataset.k] = el.value)); return o; };
-    const run = () => renderResult(card, ENGINES[def.engine](read()));
-    card.querySelector("[data-run]").addEventListener("click", run);
-    card.querySelectorAll("input").forEach((i) => i.addEventListener("keydown", (e) => { if (e.key === "Enter") run(); }));
-    if (def.presets) card.querySelectorAll("[data-preset]").forEach((btn) => btn.addEventListener("click", () => {
-      const p = def.presets[+btn.dataset.preset];
-      Object.entries(p.v).forEach(([k, v]) => { const el = card.querySelector(`[data-k="${k}"]`); if (el) el.value = v; });
-      run();
-    }));
-  });
+  document.querySelectorAll(".calc[data-calc]").forEach(wireCalculator);
 }
 
 function renderResult(card, res) {

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materio — Rechner und Optimierer für Baumaterial für Android</title>
+<meta name="description" content="Kostenloser Baurechner: Farbe, Putz, Fliesen, Paneele, Tapete und Zuschnitt 1D/2D. Material berechnen, nur so viel kaufen wie nötig, Verschnitt senken. Baumarktkarte, Projekte, PDF-Angebote. Rechnet offline, Konto optional, 10 Sprachen.">
+<meta name="author" content="Materio">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="Materio">
+<meta name="application-name" content="Materio">
+<link rel="canonical" href="https://materio-app.com/de/">
+<link rel="alternate" hreflang="pl" href="https://materio-app.com/">
+<link rel="alternate" hreflang="en" href="https://materio-app.com/en/">
+<link rel="alternate" hreflang="de" href="https://materio-app.com/de/">
+<link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/">
+<link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/">
+<link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/">
+<link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/">
+<link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/">
+<link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/">
+<link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/">
+<link rel="alternate" hreflang="x-default" href="https://materio-app.com/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Materio">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Materio — Rechner und Optimierer für Baumaterial für Android">
+<meta property="og:description" content="Kostenloser Baurechner: Farbe, Putz, Fliesen, Paneele, Tapete und Zuschnitt 1D/2D. Material berechnen, nur so viel kaufen wie nötig, Verschnitt senken. Baumarktkarte, Projekte, PDF-Angebote. Rechnet offline, Konto optional, 10 Sprachen.">
+<meta property="og:url" content="https://materio-app.com/de/">
+<meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Materio — Policz. Kup. Nie marnuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Materio — Rechner und Optimierer für Baumaterial für Android">
+<meta name="twitter:description" content="Kostenloser Baurechner: Farbe, Putz, Fliesen, Paneele, Tapete und Zuschnitt 1D/2D. Material berechnen, nur so viel kaufen wie nötig, Verschnitt senken. Baumarktkarte, Projekte, PDF-Angebote. Rechnet offline, Konto optional, 10 Sprachen.">
+<meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260807a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "Materio",
+  "operatingSystem": "Android 7.0+",
+  "applicationCategory": "UtilitiesApplication",
+  "inLanguage": [
+    "pl",
+    "en",
+    "de",
+    "cs",
+    "sk",
+    "ro",
+    "hr",
+    "sr",
+    "uk",
+    "ru"
+  ],
+  "url": "https://materio-app.com/de/",
+  "downloadUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
+  "installUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
+  "image": "https://materio-app.com/assets/og-image.jpg",
+  "description": "Materio ist ein Baustoff-Rechner und -Optimierer für Handwerker, Profis und Heimwerker. Rechner, Räume, Projekte und Marktkarte laufen auf dem Handy und hier im Browser.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "PLN"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "Materio"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Materio"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Materio",
+  "url": "https://materio-app.com/",
+  "logo": "https://materio-app.com/assets/icon-512.png"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Ist Materio kostenlos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Materio ist kostenlos zum Laden und Nutzen. Es gibt kein Abo und keine kostenpflichtigen Funktionen. Das Konto ist optional und ebenfalls kostenlos. Die App finanziert sich über Google-AdMob-Werbung."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Funktioniert die App ohne Internet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ja. Alle Rechner und die Zuschnittoptimierung laufen offline, direkt auf deinem Handy. Ohne Konto bleiben Projekte und Ergebnisse auf dem Gerät. Die Cloud-Synchronisierung braucht eine Anmeldung und Internet."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Muss ich ein Konto anlegen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nein. Du öffnest die App und rechnest sofort. Ein Konto legst du nur an, wenn du gespeicherte Projekte und Räume auf Handy und im Browser haben willst."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Wie funktioniert die Marktsuche?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Du gibst eine Stadt oder einen Marktnamen ein und Materio zeigt die nächsten Standorte auf Google Maps und führt dich zum gewählten. Du kannst auch deinen Standort teilen, um Märkte in deiner Nähe zu sehen."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Welche Daten erfasst Materio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ohne Konto liegen deine Projekte, Kalkulationen und Einstellungen nur auf dem Gerät. Nach der Anmeldung werden Projekte, Räume, Kalkulationen und Einkaufslisten nach Google Firestore (europe-central2, Warschau) kopiert, wo nur dein Konto sie sieht. Die App nutzt Google-Dienste (AdMob-Werbung und Karten für die Baumarktsuche), die begrenzte Daten verarbeiten. Alles steht in der"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "In wie vielen Sprachen ist die App?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In 10 Sprachen: Polnisch, Englisch, Deutsch, Tschechisch, Slowakisch, Rumänisch, Kroatisch, Serbisch, Ukrainisch und Russisch."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Auf welchen Handys läuft Materio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Auf Handys und Tablets mit Android 7.0 (API 24) oder neuer."
+      }
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/de/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
+    <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <nav id="nav-links" class="nav-links" aria-label="Rechner">
+      <a href="/de/rechner/">Rechner</a>
+      <a href="/de/ratgeber/">Ratgeber</a>
+      <a href="/de/baumaerkte/">Märkte</a>
+      <a href="/app/" rel="nofollow">Mein Konto</a>
+      <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
+      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Laden</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<section class="hero" aria-labelledby="hero-h">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="badge"><span class="dot"></span><span>Rechnet offline · Konto optional</span></span>
+      <h1 id="hero-h">Material berechnen. Genau richtig kaufen. Weniger verschwenden.</h1>
+      <p class="lead">Materio ist ein Baustoff-Rechner und -Optimierer für Handwerker, Profis und Heimwerker. Rechner, Räume, Projekte und Marktkarte laufen auf dem Handy und hier im Browser.</p>
+      <div class="store-badges">
+        
+  <a class="gp-badge" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="hero" aria-label="Für Android laden">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
+    <span><small>Erhältlich bei</small><b>Für Android laden</b></span>
+  </a>
+        <a class="btn btn-ghost" href="/de/rechner/">Rechner ausprobieren</a>
+      </div>
+      <div class="trust">
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>Rechnet 100 % offline</span></span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Konto optional</span></span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg><span>10 Sprachen</span></span>
+      </div>
+    </div>
+    <div class="hero-media">
+      <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+        <div class="phone-track" id="hero-shots">
+          <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Materio Startbildschirm" fetchpriority="high" decoding="async">
+          <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Berechnungsergebnis: wie viel kaufen, wie viel Verschnitt" loading="lazy" decoding="async">
+          <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Baumärkte in der Nähe" loading="lazy" decoding="async">
+        </div>
+      </div>
+      <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-label="Materio" style="padding-top:8px">
+  <div class="wrap">
+    <div class="stat-band">
+      <div class="stat"><div class="num">0 €</div><div class="lbl">Kostenlos, Konto optional</div></div>
+      <div class="stat"><div class="num">15</div><div class="lbl">Rechner</div></div>
+      <div class="stat"><div class="num">150+</div><div class="lbl">Materialien im Katalog</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Sprachen</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="block alt" aria-labelledby="feat-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Funktionen</div>
+      <h2 id="feat-h">Was Materio berechnet</h2>
+      <p class="muted">Dieselben Rechenkerne und derselbe Materialkatalog wie in der App.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></div><h3>Materialrechner</h3><p>Farbe, Putz, Kleber, Fliesen, Paneele, Feinsteinzeug, Tapete. Fläche und Verschnitt als ganze Gebinde.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg></div><h3>Zuschnitt-Optimierer</h3><p>1D- und 2D-Zuschnitt nach First-Fit. Wie viele Stangen oder Platten, inkl. Schnittfuge und Verschnitt.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Materialkatalog</h3><p>Über 150 Materialien mit echten Maßen und Verschnitt. Aus der Liste wählen, jeder Wert bleibt änderbar.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></div><h3>Räume</h3><p>Raummaße einmal eingeben und Boden, Wände, Decke und Umfang erhalten. Von dort direkt zum Material.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Projekte &amp; Angebote</h3><p>Berechnungen zum Projekt bündeln, Gesamtkosten und Verschnitt sehen, Angebot als PDF exportieren.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Marktkarte</h3><p>Baumärkte und Großhändler nach Standort finden und zum nächsten navigieren.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">So funktioniert’s</div>
+      <h2 id="how-h">Von den Maßen zur Einkaufsliste</h2>
+      <p class="muted">Drei Schritte: Maße, Ergebnis, Einkauf.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Maße eingeben</h3><p>Gib die Fläche oder die Raummaße ein. Wähle ein Material aus dem Katalog oder trag dein eigenes ein.</p></div>
+      <div class="step"><h3>Materio rechnet</h3><p>Der Rechenkern ermittelt Bedarf, Verschnitt und Zuschnitt. Du siehst sofort die Kaufmenge, die Kosten und den Verschnitt.</p></div>
+      <div class="step"><h3>Kaufen und bauen</h3><p>Ins Projekt speichern, das Angebot als PDF exportieren und mit fertiger Liste zum Markt.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="calculators" class="block alt" aria-labelledby="calc-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Rechner</div>
+      <h2 id="calc-h">Direkt im Browser rechnen</h2>
+      <p class="muted">Dieselben Formeln wie in der App. Nichts geht an einen Server. Dein Browser rechnet.</p>
+    </div>
+    <h3 class="calc-group">Flächen</h3>
+    <div class="calc-links"><a class="calc-link" href="/de/rechner/farbe-putz-grundierung/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Farbe, Putz, Grund</b>
+        <span class="muted">Gebinde je Fläche, mit Schichten.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/fliesen-paneele-feinsteinzeug/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Fliesen, Paneele, Gres</b>
+        <span class="muted">Fläche + Verschnitt → ganze Kartons.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/tapete/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Tapete</b>
+        <span class="muted">Wie viele Rollen, inkl. Rapport.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a></div>
+    <h3 class="calc-group">Zuschnitt</h3>
+    <div class="calc-links"><a class="calc-link" href="/de/rechner/linearer-zuschnitt-1d/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Linearer Zuschnitt (1D)</b>
+        <span class="muted">Stangen, Leisten, Rohre: Menge und Schnitt.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/plattenzuschnitt-2d/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Plattenzuschnitt (2D)</b>
+        <span class="muted">Platten, Arbeitsplatten, Sperrholz: Anzahl.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a></div>
+    <h3 class="calc-group">Bauarbeiten</h3>
+    <div class="calc-links"><a class="calc-link" href="/de/rechner/sackbeton/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Sackbeton</b>
+        <span class="muted">Säcke Trockenbeton und Wasser.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/kleber-moertel/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Kleber / Mörtel</b>
+        <span class="muted">Verbrauch kg/m² → Säcke.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/estrich-putz/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Estrich / Putz</b>
+        <span class="muted">Fläche und Dicke → Säcke.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/fugenmasse/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Fugenmasse</b>
+        <span class="muted">Wie viel kg zum Verfugen.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/mauerwerk/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Mauerwerk</b>
+        <span class="muted">Steine und Mörtel je Wand.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/daemmung-wdvs/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Dämmung (WDVS)</b>
+        <span class="muted">EPS, Dübel, Kleber, Gewebe.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a></div>
+    <h3 class="calc-group">Trockenbau</h3>
+    <div class="calc-links"><a class="calc-link" href="/de/rechner/staenderwand/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Ständerwand</b>
+        <span class="muted">CW/UW-Profile, Dübel und Platten.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/abgehaengte-decke/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Abgehängte Decke</b>
+        <span class="muted">CD/UD-Profile, Abhänger und Platten.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/ansetzbinder-platten/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Ansetzbinder-Platten</b>
+        <span class="muted">Platten „auf Batzen“ + Ansetzgips.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a><a class="calc-link" href="/de/rechner/beplankung-osb/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Beplankung (OSB)</b>
+        <span class="muted">Wie viele Platten zum Decken.</span>
+      </span>
+      <span class="calc-link-go">Rechner öffnen</span>
+    </a></div>
+    <p class="center" style="margin-top:24px"><a class="btn btn-ghost" href="/de/rechner/">Alle Rechner</a></p>
+  </div>
+</section>
+
+<section id="rooms" class="block" aria-labelledby="rooms-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Räume</div>
+      <h2 id="rooms-h">Raum einmal eingeben</h2>
+      <p class="muted">Maße angeben und Materio berechnet die Flächen und gibt sie an die Rechner weiter. In der App speicherst du Räume (Wohnzimmer, Bad, Küche) und kehrst jederzeit zurück.</p>
+    </div>
+    <div class="split-2">
+      <div id="room-helper" class="calc">
+        <h3><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></span><span>Räume</span></h3>
+        <div class="field-row">
+          <div class="field"><label for="room-l">Länge (m)</label><input id="room-l" type="text" inputmode="decimal" value="5"></div>
+          <div class="field"><label for="room-w">Breite (m)</label><input id="room-w" type="text" inputmode="decimal" value="4"></div>
+        </div>
+        <div class="field"><label for="room-h">Höhe (m)</label><input id="room-h" type="text" inputmode="decimal" value="2.6"></div>
+        <div class="result show">
+          <div class="rows">
+            <div><span>Boden / Decke</span><b id="room-floor"></b></div>
+            <div><span>Wände (ohne Öffnungen)</span><b id="room-walls"></b></div>
+            <div><span>Umfang</span><b id="room-perim"></b></div>
+            <div><span>Volumen</span><b id="room-vol"></b></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <ul class="trust-list">
+          <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Gespeicherte Räume in der App</b></span></li><li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Automatische Wand- und Bodenfläche</b></span></li><li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Ein Tipp zum Materialrechner</b></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projekty" class="block alt" aria-labelledby="proj-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Projekte</div>
+      <h2 id="proj-h">Das ganze Angebot an einem Ort</h2>
+      <p class="muted">Jede Berechnung kommt ins Projekt. Materio summiert Mengen, Kosten und Verschnitt, und du exportierst alles als PDF für den Kunden.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><h3>Materialliste</h3><p>Alle Positionen mit Mengen und Preisen in einer Ansicht.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><h3>Kosten &amp; Verschnitt</h3><p>Summe plus wie viel Verschnitt kostet. Auf einen Blick.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>PDF-Export</h3><p>Fertiges Angebot für Kunde oder Markt.</p></div>
+    </div>
+    <p class="center" style="margin-top:24px"><a class="btn btn-ghost" href="/app/" rel="nofollow">Mein Konto</a></p>
+  </div>
+</section>
+
+<section id="konto" class="block" aria-labelledby="acct-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Das Konto ist optional</div>
+      <h2 id="acct-h">Konto und Synchronisierung</h2>
+      <p class="muted">Ein Materio-Konto ist optional. Der Rechner funktioniert ohne Anmeldung — ein Konto brauchst du erst, um Projekte und Räume zu speichern und sie auf Handy und im Browser zu haben.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></div><h3>Das Konto ist optional</h3><p>Ohne Anmeldung wird alles auf deinem Gerät gerechnet, genau wie bisher.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></div><h3>Dasselbe Projekt auf dem Handy und im Browser</h3><p>Nach der Anmeldung gehen Projekte, Räume, Kalkulationen und Einkaufslisten zu Google Firestore und kommen auf dem anderen Gerät zurück.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><h3>Deine Daten sieht nur du</h3><p>Die Sicherheitsregeln lassen nur den Eigentümer an die Daten eines Kontos. Die einzige Ausnahme ist ein Link, den du selbst erstellst.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg></div><h3>Die Daten liegen in der Europäischen Union</h3><p>Die Firestore-Datenbank läuft in der Region europe-central2 (Warschau).</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" aria-labelledby="stores-teaser-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Märkte</div>
+      <h2 id="stores-teaser-h">Baumarkt in der Nähe finden</h2>
+      <p class="muted">Gib eine Stadt oder einen Marktnamen ein und Materio zeigt die nächsten Standorte auf der Karte und führt dich zum gewählten. Die Marktsuche in der App funktioniert genauso.</p>
+    </div>
+    <p class="center"><a class="btn btn-primary" href="/de/baumaerkte/">Auf Karte zeigen</a></p>
+  </div>
+</section>
+
+<section id="prywatnosc" class="block alt" aria-labelledby="trust-h">
+  <div class="wrap trust-split">
+    <div>
+      <div class="kicker">Daten</div>
+      <h2 id="trust-h">Was mit deinen Daten passiert</h2>
+      <p class="muted">Dein Gerät rechnet. Unten steht, was lokal bleibt, was ins Konto geht und welche Google-Dienste wir nutzen.</p>
+      <ul class="trust-list">
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>Rechnet offline, auf deinem Handy</b><span class="d">Rechner und Zuschnittoptimierung laufen auf dem Gerät. Ohne Verbindung funktionieren sie genauso.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span><span><b>Ein Konto nur, wenn du willst</b><span class="d">Rechnen braucht nie eine Anmeldung. Ein Konto legst du an, um deine Projekte auf Handy und im Browser zu haben.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span><span><b>Deine Projekte bleiben bei dir</b><span class="d">Ohne Konto bleibt alles auf dem Gerät und die Sicherung ist eine Datei, die du selbst exportierst. Nach der Anmeldung liegt eine Kopie in Google Firestore in der Region europe-central2 (Warschau) und nur dein Konto sieht sie.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></span><span><b>Werbe-Einwilligung in der EU</b><span class="d">In der EU fragt die App nach der Einwilligung für personalisierte Werbung.</span></span></li>
+      </ul>
+    </div>
+    <aside class="trust-panel">
+      <h3><span class="shield"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/></svg></span><span>Werbung und Daten</span></h3>
+      <p class="muted" style="margin-top:12px">Materio ist kostenlos und finanziert sich über Werbung.</p>
+      <ul>
+        <li>Werbung liefert Google AdMob; in der EU entscheidest du über personalisierte Werbung.</li>
+        <li>Die Marktkarte nutzt Google Maps und, mit deiner Einwilligung, deinen Standort, nur um Märkte in der Nähe zu zeigen.</li>
+        <li>Wir verkaufen keine Daten und erstellen keine Nutzerprofile.</li>
+      </ul>
+      <p style="margin-top:16px"><a class="btn btn-ghost btn-sm" href="/privacy-policy.html">Datenschutzerklärung lesen</a></p>
+    </aside>
+  </div>
+</section>
+<section id="faq" class="block" aria-labelledby="faq-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">FAQ</div>
+      <h2 id="faq-h">Häufige Fragen</h2>
+    </div>
+    <div class="faq">
+      <details open><summary>Ist Materio kostenlos?</summary><p>Ja. Materio ist kostenlos zum Laden und Nutzen. Es gibt kein Abo und keine kostenpflichtigen Funktionen. Das Konto ist optional und ebenfalls kostenlos. Die App finanziert sich über Google-AdMob-Werbung.</p></details>
+      <details><summary>Funktioniert die App ohne Internet?</summary><p>Ja. Alle Rechner und die Zuschnittoptimierung laufen offline, direkt auf deinem Handy. Ohne Konto bleiben Projekte und Ergebnisse auf dem Gerät. Die Cloud-Synchronisierung braucht eine Anmeldung und Internet.</p></details>
+      <details><summary>Muss ich ein Konto anlegen?</summary><p>Nein. Du öffnest die App und rechnest sofort. Ein Konto legst du nur an, wenn du gespeicherte Projekte und Räume auf Handy und im Browser haben willst.</p></details>
+      <details><summary>Wie funktioniert die Marktsuche?</summary><p>Du gibst eine Stadt oder einen Marktnamen ein und Materio zeigt die nächsten Standorte auf Google Maps und führt dich zum gewählten. Du kannst auch deinen Standort teilen, um Märkte in deiner Nähe zu sehen.</p></details>
+      <details><summary>Welche Daten erfasst Materio?</summary><p><span>Ohne Konto liegen deine Projekte, Kalkulationen und Einstellungen nur auf dem Gerät. Nach der Anmeldung werden Projekte, Räume, Kalkulationen und Einkaufslisten nach Google Firestore (europe-central2, Warschau) kopiert, wo nur dein Konto sie sieht. Die App nutzt Google-Dienste (AdMob-Werbung und Karten für die Baumarktsuche), die begrenzte Daten verarbeiten. Alles steht in der</span> <a href="/privacy-policy.html">Datenschutzerklärung</a>.</p></details>
+      <details><summary>In wie vielen Sprachen ist die App?</summary><p>In 10 Sprachen: Polnisch, Englisch, Deutsch, Tschechisch, Slowakisch, Rumänisch, Kroatisch, Serbisch, Ukrainisch und Russisch.</p></details>
+      <details><summary>Auf welchen Handys läuft Materio?</summary><p>Auf Handys und Tablets mit Android 7.0 (API 24) oder neuer.</p></details>
+    </div>
+  </div>
+</section>
+<section class="block" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div class="cta-banner">
+      <h2 id="cta-h">Materio aufs Handy holen</h2>
+      <p>Der volle Materialkatalog, gespeicherte Projekte, die Baumarktkarte und PDF-Export. Kostenlos, rechnet offline, Konto optional.</p>
+      
+  <a class="badge-store" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="cta" aria-label="Für Android laden">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
+    <span><small>Erhältlich bei</small><b>Für Android laden</b></span>
+  </a>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</div>
+        <p class="muted">Baustoff-Rechner und -Optimierer. Rechnen. Kaufen. Nicht verschwenden.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/de/rechner/">Alle Rechner</a></li>
+          <li><a href="/de/ratgeber/">Ratgeber</a></li>
+          <li><a href="/de/baumaerkte/">Märkte</a></li>
+          <li><a href="/de/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Datenschutz</a></li>
+          <li><a href="/app/" rel="nofollow">Mein Konto</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> Materio. Alle Rechte vorbehalten.</span>
+      <span>Ergebnisse sind Schätzungen. Vor dem Kauf prüfen.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Einverstanden" hidden>
+  <p class="consent-text">Wir nutzen Google Analytics, um anonym zu zählen, wie viele Leute die Seite besuchen und zu Google Play weitergehen. Einverstanden?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Mehr in der Datenschutzerklärung</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Ablehnen</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Einverstanden</button>
+  </div>
+</div>
+<script>window.MATERIO_ALTERNATES = {
+  "pl": "/",
+  "en": "/en/",
+  "de": "/de/",
+  "cs": "/cs/",
+  "sk": "/sk/",
+  "ro": "/ro/",
+  "hr": "/hr/",
+  "sr": "/sr/",
+  "uk": "/uk/",
+  "ru": "/ru/"
+};</script>
+<script src="/assets/i18n.de.js?v=20260807a"></script>
+<script src="/assets/i18n-runtime.js?v=20260807a"></script>
+<script src="/assets/calculators.js?v=20260807a"></script>
+<script src="/assets/main.js?v=20260807a"></script>
+
+</body>
+</html>

@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
+# The signed-in workspace and shared estimates are private by nature: /app/ needs an
+# account and /p/<token> is only meaningful to whoever was handed the link. Both also
+# carry a robots noindex meta tag, which is what actually keeps them out of the index —
+# Disallow alone would only stop the crawl, not the listing.
+Disallow: /app/
+Disallow: /p/
+
 Sitemap: https://materio-app.com/sitemap.xml

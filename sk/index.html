@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materio — kalkulačka a optimalizátor stavebného materiálu pre Android</title>
+<meta name="description" content="Bezplatná stavebná kalkulačka: farby, omietky, obklady, panely, tapety a rez 1D/2D. Spočítaj materiál, kúp len čo potrebuješ, zníž odpad. Mapa obchodov, projekty, rozpočet do PDF. Počíta offline, účet voliteľný, 10 jazykov.">
+<meta name="author" content="Materio">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="Materio">
+<meta name="application-name" content="Materio">
+<link rel="canonical" href="https://materio-app.com/sk/">
+<link rel="alternate" hreflang="pl" href="https://materio-app.com/">
+<link rel="alternate" hreflang="en" href="https://materio-app.com/en/">
+<link rel="alternate" hreflang="de" href="https://materio-app.com/de/">
+<link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/">
+<link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/">
+<link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/">
+<link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/">
+<link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/">
+<link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/">
+<link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/">
+<link rel="alternate" hreflang="x-default" href="https://materio-app.com/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Materio">
+<meta property="og:locale" content="sk_SK">
+<meta property="og:title" content="Materio — kalkulačka a optimalizátor stavebného materiálu pre Android">
+<meta property="og:description" content="Bezplatná stavebná kalkulačka: farby, omietky, obklady, panely, tapety a rez 1D/2D. Spočítaj materiál, kúp len čo potrebuješ, zníž odpad. Mapa obchodov, projekty, rozpočet do PDF. Počíta offline, účet voliteľný, 10 jazykov.">
+<meta property="og:url" content="https://materio-app.com/sk/">
+<meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Materio — Policz. Kup. Nie marnuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Materio — kalkulačka a optimalizátor stavebného materiálu pre Android">
+<meta name="twitter:description" content="Bezplatná stavebná kalkulačka: farby, omietky, obklady, panely, tapety a rez 1D/2D. Spočítaj materiál, kúp len čo potrebuješ, zníž odpad. Mapa obchodov, projekty, rozpočet do PDF. Počíta offline, účet voliteľný, 10 jazykov.">
+<meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260807a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "Materio",
+  "operatingSystem": "Android 7.0+",
+  "applicationCategory": "UtilitiesApplication",
+  "inLanguage": [
+    "pl",
+    "en",
+    "de",
+    "cs",
+    "sk",
+    "ro",
+    "hr",
+    "sr",
+    "uk",
+    "ru"
+  ],
+  "url": "https://materio-app.com/sk/",
+  "downloadUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
+  "installUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
+  "image": "https://materio-app.com/assets/og-image.jpg",
+  "description": "Materio je kalkulačka a optimalizátor stavebného materiálu pre party, remeselníkov aj domácich majstrov. Kalkulačky, miestnosti, projekty aj mapa obchodov bežia v telefóne a tu v prehliadači.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "PLN"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "Materio"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Materio"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Materio",
+  "url": "https://materio-app.com/",
+  "logo": "https://materio-app.com/assets/icon-512.png"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Je Materio zadarmo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Áno. Materio si stiahneš a používaš zadarmo. Nie je žiadne predplatné ani platené funkcie. Účet je voliteľný a tiež nič nestojí. Aplikáciu živia reklamy Google AdMob."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Funguje aplikácia bez internetu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Áno. Všetky kalkulačky aj optimalizátor rezu počítajú offline, priamo v telefóne. Bez účtu zostávajú projekty a výsledky na zariadení. Synchronizácia s cloudom vyžaduje prihlásenie a internet."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Musím si zakladať účet?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nie. Otvoríš aplikáciu a rovno počítaš. Účet zakladáš len vtedy, keď chceš mať uložené projekty a miestnosti v telefóne aj v prehliadači."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Ako funguje vyhľadávanie obchodov?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Zadáš mesto alebo názov obchodu a Materio ukáže najbližšie miesta na Google Maps a navedie ťa k vybranému. Môžeš tiež zdieľať polohu a vidieť obchody vo svojom okolí."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Aké údaje Materio zbiera?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Bez účtu sú tvoje projekty, rozpočty a nastavenia uložené len na zariadení. Po prihlásení sa projekty, miestnosti, rozpočty a nákupné zoznamy kopírujú do Google Firestore (europe-central2, Varšava), kde ich vidí len tvoj účet. Aplikácia používa služby Google (reklamy AdMob a mapy pri hľadaní obchodov), ktoré spracúvajú obmedzené dáta. Všetko popisujú"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "V koľkých jazykoch aplikácia funguje?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "V 10 jazykoch: poľštine, angličtine, nemčine, češtine, slovenčine, rumunčine, chorvátčine, srbčine, ukrajinčine a ruštine."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Na akých telefónoch Materio beží?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Na telefónoch a tabletoch so systémom Android 7.0 (API 24) alebo novším."
+      }
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Preskočiť na obsah</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/sk/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
+    <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <nav id="nav-links" class="nav-links" aria-label="Kalkulačky">
+      <a href="/sk/kalkulacky/">Kalkulačky</a>
+      <a href="/sk/navody/">Návody</a>
+      <a href="/sk/obchody/">Obchody</a>
+      <a href="/app/" rel="nofollow">Môj účet</a>
+      <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
+      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Stiahnuť</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<section class="hero" aria-labelledby="hero-h">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="badge"><span class="dot"></span><span>Počíta offline · účet voliteľný</span></span>
+      <h1 id="hero-h">Spočítaj materiál. Kúp akurát. Neplytvaj.</h1>
+      <p class="lead">Materio je kalkulačka a optimalizátor stavebného materiálu pre party, remeselníkov aj domácich majstrov. Kalkulačky, miestnosti, projekty aj mapa obchodov bežia v telefóne a tu v prehliadači.</p>
+      <div class="store-badges">
+        
+  <a class="gp-badge" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="hero" aria-label="Stiahnuť pre Android">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
+    <span><small>Na stiahnutie na</small><b>Stiahnuť pre Android</b></span>
+  </a>
+        <a class="btn btn-ghost" href="/sk/kalkulacky/">Vyskúšať kalkulačky</a>
+      </div>
+      <div class="trust">
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>Počíta 100 % offline</span></span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Účet voliteľný</span></span>
+        <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg><span>10 jazykov</span></span>
+      </div>
+    </div>
+    <div class="hero-media">
+      <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+        <div class="phone-track" id="hero-shots">
+          <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Hlavná obrazovka Materio" fetchpriority="high" decoding="async">
+          <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Výsledok výpočtu: koľko kúpiť a koľko odpadu" loading="lazy" decoding="async">
+          <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Stavebniny v okolí" loading="lazy" decoding="async">
+        </div>
+      </div>
+      <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-label="Materio" style="padding-top:8px">
+  <div class="wrap">
+    <div class="stat-band">
+      <div class="stat"><div class="num">0 €</div><div class="lbl">Zadarmo, účet voliteľný</div></div>
+      <div class="stat"><div class="num">15</div><div class="lbl">Kalkulačiek</div></div>
+      <div class="stat"><div class="num">150+</div><div class="lbl">Materiálov v katalógu</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Jazykov</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="block alt" aria-labelledby="feat-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Funkcie</div>
+      <h2 id="feat-h">Čo Materio spočíta</h2>
+      <p class="muted">Rovnaké výpočtové jadro a rovnaký katalóg materiálov ako v aplikácii.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></div><h3>Kalkulačky materiálu</h3><p>Farby, omietky, lepidlá, obklady, panely, dlažba, tapety. Plocha a prerez v celých baleniach.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg></div><h3>Optimalizácia rezu</h3><p>Rez 1D a 2D metódou first-fit. Koľko tyčí alebo dosiek kúpiť, vrátane prerezu a odpadu.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Katalóg materiálu</h3><p>Vyše 150 materiálov so skutočnými rozmermi a prerezom. Vyberieš zo zoznamu, každú hodnotu môžeš prepísať.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></div><h3>Miestnosti</h3><p>Zadaj rozmery miestnosti raz a získaš podlahu, steny, strop aj obvod. Odtiaľ ideš rovno k materiálu.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Projekty a rozpočty</h3><p>Spoj výpočty do projektu, uvidíš celkovú cenu a odpad, rozpočet vyexportuješ do PDF.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Mapa obchodov</h3><p>Nájdi stavebniny a veľkoobchody podľa polohy a nechaj sa naviesť k najbližšiemu.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Ako to funguje</div>
+      <h2 id="how-h">Od rozmerov k nákupnému zoznamu</h2>
+      <p class="muted">Tri kroky: rozmery, výsledok, nákup.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Zadaj rozmery</h3><p>Zadaj plochu alebo rozmery miestnosti. Vyber materiál z katalógu alebo zadaj vlastný.</p></div>
+      <div class="step"><h3>Materio počíta</h3><p>Výpočtové jadro spočíta spotrebu, rezervu a rezací plán. Hneď vidíš, koľko kúpiť, cenu aj odpad.</p></div>
+      <div class="step"><h3>Kúp a stavaj</h3><p>Ulož do projektu, exportuj cenovú ponuku do PDF a vyraz do obchodu s hotovým zoznamom.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="calculators" class="block alt" aria-labelledby="calc-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Kalkulačky</div>
+      <h2 id="calc-h">Spočítaj rovno v prehliadači</h2>
+      <p class="muted">Rovnaké vzorce ako v aplikácii. Nič sa neposiela na server. Počíta tvoj prehliadač.</p>
+    </div>
+    <h3 class="calc-group">Plochy</h3>
+    <div class="calc-links"><a class="calc-link" href="/sk/kalkulacky/farby-omietky-penetracie/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Farby, omietky, penetrácie</b>
+        <span class="muted">Balenia na plochu, s vrstvami.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/obklady-panely-dlazba/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Obklady, panely, dlažba</b>
+        <span class="muted">Plocha + prerez → celé balenia.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/tapety/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Tapety</b>
+        <span class="muted">Koľko roliek, vrátane raportu vzoru.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a></div>
+    <h3 class="calc-group">Rez</h3>
+    <div class="calc-links"><a class="calc-link" href="/sk/kalkulacky/linearny-rez-1d/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Lineárny rez (1D)</b>
+        <span class="muted">Tyče, lišty, rúry: koľko a ako rezať.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/rez-dosiek-2d/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Rez dosiek (2D)</b>
+        <span class="muted">Dosky, pracovné dosky, preglejka: počet.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a></div>
+    <h3 class="calc-group">Stavebné práce</h3>
+    <div class="calc-links"><a class="calc-link" href="/sk/kalkulacky/beton-z-vreca/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Betón z vreca</b>
+        <span class="muted">Koľko vriec suchého betónu a vody.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/lepidlo-malta/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Lepidlo / malta</b>
+        <span class="muted">Spotreba kg/m² → vrecia.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/poter-omietka/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Poter / omietka</b>
+        <span class="muted">Plocha a hrúbka → vrecia.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/skarovacia-hmota/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Škárovacia hmota</b>
+        <span class="muted">Koľko kg na škárovanie.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/murovanie/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Murovanie</b>
+        <span class="muted">Tvárnice/tehly a malta na stenu.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/zateplenie-etics/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Zateplenie (ETICS)</b>
+        <span class="muted">Polystyrén, hmoždinky, lepidlo, sieť.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a></div>
+    <h3 class="calc-group">Sadrokartón</h3>
+    <div class="calc-links"><a class="calc-link" href="/sk/kalkulacky/priecka-sdk/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Priečka SDK</b>
+        <span class="muted">Profily CW/UW, hmoždinky a dosky.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/podhlad/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Podhľad</b>
+        <span class="muted">Profily CD/UD, závesy a dosky.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/sdk-na-lepidlo/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>SDK na lepidlo</b>
+        <span class="muted">Dosky „na terče“ + sadrové lepidlo.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a><a class="calc-link" href="/sk/kalkulacky/zaklop-osb/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Záklop (OSB/dosky)</b>
+        <span class="muted">Koľko dosiek na pokrytie.</span>
+      </span>
+      <span class="calc-link-go">Otvoriť kalkulačku</span>
+    </a></div>
+    <p class="center" style="margin-top:24px"><a class="btn btn-ghost" href="/sk/kalkulacky/">Všetky kalkulačky</a></p>
+  </div>
+</section>
+
+<section id="rooms" class="block" aria-labelledby="rooms-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Miestnosti</div>
+      <h2 id="rooms-h">Zadaj miestnosť raz</h2>
+      <p class="muted">Zadaj rozmery a Materio spočíta plochy a odovzdá ich kalkulačkám. V aplikácii uložíš miestnosti (obývačka, kúpeľňa, kuchyňa) a kedykoľvek sa k nim vrátiš.</p>
+    </div>
+    <div class="split-2">
+      <div id="room-helper" class="calc">
+        <h3><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></span><span>Miestnosti</span></h3>
+        <div class="field-row">
+          <div class="field"><label for="room-l">Dĺžka (m)</label><input id="room-l" type="text" inputmode="decimal" value="5"></div>
+          <div class="field"><label for="room-w">Šírka (m)</label><input id="room-w" type="text" inputmode="decimal" value="4"></div>
+        </div>
+        <div class="field"><label for="room-h">Výška (m)</label><input id="room-h" type="text" inputmode="decimal" value="2.6"></div>
+        <div class="result show">
+          <div class="rows">
+            <div><span>Podlaha / strop</span><b id="room-floor"></b></div>
+            <div><span>Steny (bez otvorov)</span><b id="room-walls"></b></div>
+            <div><span>Obvod</span><b id="room-perim"></b></div>
+            <div><span>Objem</span><b id="room-vol"></b></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <ul class="trust-list">
+          <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Uložené miestnosti v aplikácii</b></span></li><li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Automatická plocha stien a podlahy</b></span></li><li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Jedno klepnutie ku kalkulačke</b></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projekty" class="block alt" aria-labelledby="proj-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Projekty</div>
+      <h2 id="proj-h">Celý rozpočet na jednom mieste</h2>
+      <p class="muted">Každý výpočet pridáš do projektu. Materio spočíta množstvá, cenu a odpad a všetko vyexportuješ do PDF pre klienta.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><h3>Zoznam materiálu</h3><p>Všetky položky s množstvami a cenami v jednom pohľade.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><h3>Cena a odpad</h3><p>Súčet aj koľko ide do odpadu a za koľko. Hneď vidíš.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Export do PDF</h3><p>Hotový rozpočet pre klienta alebo obchod.</p></div>
+    </div>
+    <p class="center" style="margin-top:24px"><a class="btn btn-ghost" href="/app/" rel="nofollow">Môj účet</a></p>
+  </div>
+</section>
+
+<section id="konto" class="block" aria-labelledby="acct-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Účet je voliteľný</div>
+      <h2 id="acct-h">Účet a synchronizácia</h2>
+      <p class="muted">Účet Materio je voliteľný. Kalkulačka počíta bez prihlásenia — účet potrebuješ až na uloženie projektov a miestností a na to, aby si ich mal v telefóne aj v prehliadači.</p>
+    </div>
+    <div class="features">
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></div><h3>Účet je voliteľný</h3><p>Bez prihlásenia sa všetko počíta na tvojom zariadení, presne ako doteraz.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></div><h3>Rovnaký projekt v telefóne aj v prehliadači</h3><p>Po prihlásení idú projekty, miestnosti, rozpočty a nákupné zoznamy do Google Firestore a vrátia sa na druhom zariadení.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><h3>Tvoje dáta vidíš len ty</h3><p>Bezpečnostné pravidlá púšťajú k dátam účtu výhradne jeho vlastníka. Výnimkou je odkaz, ktorý si sám vytvoríš.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg></div><h3>Dáta ležia v Európskej únii</h3><p>Databáza Firestore beží v regióne europe-central2 (Varšava).</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" aria-labelledby="stores-teaser-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Obchody</div>
+      <h2 id="stores-teaser-h">Nájdi stavebniny v okolí</h2>
+      <p class="muted">Zadaj mesto alebo názov obchodu a Materio ukáže najbližšie miesta na mape a navedie ťa k vybranému. Rovnako funguje hľadanie obchodov v aplikácii.</p>
+    </div>
+    <p class="center"><a class="btn btn-primary" href="/sk/obchody/">Zobraziť na mape</a></p>
+  </div>
+</section>
+
+<section id="prywatnosc" class="block alt" aria-labelledby="trust-h">
+  <div class="wrap trust-split">
+    <div>
+      <div class="kicker">Údaje</div>
+      <h2 id="trust-h">Čo sa deje s tvojimi údajmi</h2>
+      <p class="muted">Počíta tvoje zariadenie. Nižšie píšeme, čo zostáva lokálne, čo ide na účet a ktoré služby Google používame.</p>
+      <ul class="trust-list">
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>Počíta offline, v tvojom telefóne</b><span class="d">Kalkulačky a rez počítajú na zariadení. Bez siete fungujú rovnako.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span><span><b>Účet len keď chceš</b><span class="d">Počítanie nikdy nevyžaduje prihlásenie. Účet zakladáš preto, aby si mal projekty v telefóne aj v prehliadači.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></span><span><b>Tvoje projekty zostávajú u teba</b><span class="d">Bez účtu zostáva všetko na zariadení a záloha je súbor, ktorý si sám vyexportuješ. Po prihlásení leží kópia v Google Firestore v regióne europe-central2 (Varšava) a vidí ju len tvoj účet.</span></span></li>
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></span><span><b>Súhlas s reklamou v EÚ</b><span class="d">V EÚ sa aplikácia pýta na súhlas s personalizovanou reklamou.</span></span></li>
+      </ul>
+    </div>
+    <aside class="trust-panel">
+      <h3><span class="shield"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/></svg></span><span>Reklama a údaje</span></h3>
+      <p class="muted" style="margin-top:12px">Materio je zadarmo a živí sa reklamou.</p>
+      <ul>
+        <li>Reklamu dodáva Google AdMob; v EÚ rozhoduješ o personalizovanej reklame.</li>
+        <li>Mapa obchodov používa Google Maps a, s tvojím súhlasom, tvoju polohu, len aby ukázala obchody v okolí.</li>
+        <li>Nepredávame údaje a nevytvárame profily používateľov.</li>
+      </ul>
+      <p style="margin-top:16px"><a class="btn btn-ghost btn-sm" href="/privacy-policy.html">Prečítať zásady ochrany súkromia</a></p>
+    </aside>
+  </div>
+</section>
+<section id="faq" class="block" aria-labelledby="faq-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">FAQ</div>
+      <h2 id="faq-h">Časté otázky</h2>
+    </div>
+    <div class="faq">
+      <details open><summary>Je Materio zadarmo?</summary><p>Áno. Materio si stiahneš a používaš zadarmo. Nie je žiadne predplatné ani platené funkcie. Účet je voliteľný a tiež nič nestojí. Aplikáciu živia reklamy Google AdMob.</p></details>
+      <details><summary>Funguje aplikácia bez internetu?</summary><p>Áno. Všetky kalkulačky aj optimalizátor rezu počítajú offline, priamo v telefóne. Bez účtu zostávajú projekty a výsledky na zariadení. Synchronizácia s cloudom vyžaduje prihlásenie a internet.</p></details>
+      <details><summary>Musím si zakladať účet?</summary><p>Nie. Otvoríš aplikáciu a rovno počítaš. Účet zakladáš len vtedy, keď chceš mať uložené projekty a miestnosti v telefóne aj v prehliadači.</p></details>
+      <details><summary>Ako funguje vyhľadávanie obchodov?</summary><p>Zadáš mesto alebo názov obchodu a Materio ukáže najbližšie miesta na Google Maps a navedie ťa k vybranému. Môžeš tiež zdieľať polohu a vidieť obchody vo svojom okolí.</p></details>
+      <details><summary>Aké údaje Materio zbiera?</summary><p><span>Bez účtu sú tvoje projekty, rozpočty a nastavenia uložené len na zariadení. Po prihlásení sa projekty, miestnosti, rozpočty a nákupné zoznamy kopírujú do Google Firestore (europe-central2, Varšava), kde ich vidí len tvoj účet. Aplikácia používa služby Google (reklamy AdMob a mapy pri hľadaní obchodov), ktoré spracúvajú obmedzené dáta. Všetko popisujú</span> <a href="/privacy-policy.html">Zásady ochrany súkromia</a>.</p></details>
+      <details><summary>V koľkých jazykoch aplikácia funguje?</summary><p>V 10 jazykoch: poľštine, angličtine, nemčine, češtine, slovenčine, rumunčine, chorvátčine, srbčine, ukrajinčine a ruštine.</p></details>
+      <details><summary>Na akých telefónoch Materio beží?</summary><p>Na telefónoch a tabletoch so systémom Android 7.0 (API 24) alebo novším.</p></details>
+    </div>
+  </div>
+</section>
+<section class="block" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div class="cta-banner">
+      <h2 id="cta-h">Stiahni Materio do telefónu</h2>
+      <p>Celý katalóg materiálov, uložené projekty, mapa obchodov a export do PDF. Zadarmo, počíta offline, účet voliteľný.</p>
+      
+  <a class="badge-store" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="cta" aria-label="Stiahnuť pre Android">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
+    <span><small>Na stiahnutie na</small><b>Stiahnuť pre Android</b></span>
+  </a>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</div>
+        <p class="muted">Kalkulačka a optimalizátor stavebného materiálu. Spočítaj. Kúp. Neplytvaj.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/sk/kalkulacky/">Všetky kalkulačky</a></li>
+          <li><a href="/sk/navody/">Návody</a></li>
+          <li><a href="/sk/obchody/">Obchody</a></li>
+          <li><a href="/sk/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Právne informácie</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Ochrana súkromia</a></li>
+          <li><a href="/app/" rel="nofollow">Môj účet</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> Materio. Všetky práva vyhradené.</span>
+      <span>Výsledky sú orientačné. Pred nákupom over.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Súhlasím" hidden>
+  <p class="consent-text">Používame Google Analytics, aby sme anonymne počítali návštevnosť webu a koľko ľudí prejde na Google Play. Súhlasíš?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Viac v zásadách ochrany súkromia</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odmietnuť</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Súhlasím</button>
+  </div>
+</div>
+<script>window.MATERIO_ALTERNATES = {
+  "pl": "/",
+  "en": "/en/",
+  "de": "/de/",
+  "cs": "/cs/",
+  "sk": "/sk/",
+  "ro": "/ro/",
+  "hr": "/hr/",
+  "sr": "/sr/",
+  "uk": "/uk/",
+  "ru": "/ru/"
+};</script>
+<script src="/assets/i18n.sk.js?v=20260807a"></script>
+<script src="/assets/i18n-runtime.js?v=20260807a"></script>
+<script src="/assets/calculators.js?v=20260807a"></script>
+<script src="/assets/main.js?v=20260807a"></script>
+
+</body>
+</html>

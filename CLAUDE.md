@@ -3,9 +3,10 @@
 Landing page for **Materio**, the offline-first construction-material calculator
 for Android. *Policz. Kup. Nie marnuj.*
 
-Plain static HTML/CSS/JS. No framework, no build step, no package manager.
-Deployed to GitHub Pages from the repo root by `.github/workflows/pages.yml`
-on every push to `main` → <https://materio-app.com/>.
+Plain static HTML/CSS/JS in the browser: no framework, no runtime dependency, no
+package manager. There **is** a build step now — a dependency-free Node script that
+generates the pages — see "The build step" below. Deployed to GitHub Pages from the repo
+root by `.github/workflows/pages.yml` on every push to `main` → <https://materio-app.com/>.
 
 ---
 
@@ -41,39 +42,100 @@ session only — the next one starts in caveman again.
 
 ---
 
+## The build step
+
+The site used to be one `index.html`. It is now ~230 pages: a home page, a calculator
+hub, one page per calculator, guides and a store finder — each in all ten languages, at
+its own URL, so search engines can index more than the Polish front page. Writing that by
+hand is not possible; a generator writes it from one template plus the dictionary.
+
+```bash
+node scripts/build.mjs           # regenerate every page + sitemap.xml
+node scripts/build.mjs --check    # validate dictionaries/slugs only, write nothing
+python3 -m http.server 8080       # then open http://localhost:8080/
+```
+
+Plain Node, **no package.json, no node_modules, nothing to install**. It reads the same
+`assets/i18n.js` and `assets/calculators.js` the browser used to load, so a translation or
+a calculator is still authored exactly once. The browser still gets plain HTML/CSS/JS with
+no dependency; the build only moves the work from the visitor's browser to commit time.
+
+**Run the build and commit its output whenever you touch anything it reads.** The output
+is committed because GitHub Pages serves the repo root as-is — there is no CI build.
+
+### Authored vs generated
+
+| Authored (edit these) | Generated (never edit — `build.mjs` overwrites) |
+|---|---|
+| `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
+| `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**` and their per-language twins |
+| `assets/calculators.js` — engines, ported 1:1 from Kotlin | `app/index.html`, `p/index.html` |
+| `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js` | `assets/i18n.<lang>.js`, `assets/i18n.all.js` |
+| `assets/app.js`, `share.js`, `firebase-config.js` | `sitemap.xml` |
+| `src/*.mjs` — site map, templates, page bodies, formulas | |
+| `privacy-policy.html`, `404.html`, `robots.txt` | |
+
+The build **fails loudly** rather than emitting a broken page: a key missing in one
+language, a calculator without a slug or a formula, two pages claiming the same URL, or a
+formula identifier that collides with a field label in some language all abort it.
+
 ## Files
 
 ```
-index.html            Single-page site (hero, features, how-it-works, live
-                      calculators, rooms, projects, stores, data, FAQ, CTA)
-privacy-policy.html   Full privacy policy (PL + EN) — required by Google Play
-404.html
+scripts/build.mjs     The generator (dependency-free Node)
+src/site.mjs          Languages, URL slugs per section/calculator/guide — the site map
+src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
+src/pages.mjs         The <main> of each page type
+src/calc-meta.mjs     Per-calculator formula lines + their translations
+src/app-pages.mjs     /app/ and /p/ (noindex, translated in the browser)
 assets/styles.css     Olive Green Material 3 design system
-assets/i18n.js        10-language dictionary + language switcher
-assets/calculators.js Calculation engines ported 1:1 from the Kotlin app
+assets/i18n.js        10-language dictionary (build input)
+assets/i18n-pages.js  Sub-page dictionary, same 10 languages (build input)
+assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/
+assets/calculators.js Calculation engines ported 1:1 from the Kotlin app + form wiring
 assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
-assets/main.js        Wiring: language, tabs, rooms, menu, consent banner
+assets/main.js        Wiring: rooms, menu, hero carousel, consent banner
+assets/app.js         /app/ — Firebase Auth + Firestore sync, same schema as the app
+assets/share.js       /p/<token> — read-only shared estimate
+assets/firebase-config.js  Firebase Web config (see the placeholders inside)
+privacy-policy.html   Full privacy policy (PL + EN) — required by Google Play
 docs/DOKUMENTACJA.md  Full project documentation
 ```
 
-Run it locally with `python3 -m http.server 8080` (a server is needed for
-geolocation in the store finder). There is no `npm run build` and no test suite;
-verify changes by loading the page.
+There is no test suite; verify changes by running the build and loading the page.
+
+## The account layer (/app/ and /p/)
+
+`/app/` is the signed-in workspace and `/p/<token>` a read-only shared estimate. Both talk
+to the **same Firestore schema as the Android app** — the contract is
+`docs/FIRESTORE_SYNC.md` in `3d-polednia/Materio`, and `core/sync/SyncContract.kt` is the
+Kotlin side of it. Change one, change all three.
+
+- Both are **noindex** (robots meta tag *and* `robots.txt`) and stay out of `sitemap.xml`.
+- They have no per-language URLs; they load the whole dictionary and translate in place.
+- `/p/<token>` cannot be a real directory, and GitHub Pages has no rewrites — `404.html`
+  forwards `/p/<token>` to `/p/?t=<token>`.
+- **`assets/firebase-config.js` still has two placeholders** (`apiKey`, `appId`). Until the
+  owner pastes the real Web-app values from the Firebase console, `/app/` shows "Firebase
+  configuration missing" instead of a broken form. A Firebase Web apiKey is *not* a secret;
+  the security rules and the authorized-domains list are what protect the data.
 
 ---
 
 ## Rules for editing the site
 
-- **Bump the `?v=` stamp** on `styles.css` / the scripts in every HTML file
-  whenever those assets change. GitHub Pages serves both with `max-age=600`, so
-  without it a visitor can run new markup against a stale stylesheet.
-- **Ten languages, always.** `pl, en, de, cs, sk, ro, hr, sr, uk, ru`. Every key
-  must exist in all ten — a missing key silently falls back to English and the
-  page ends up mixed. Check with:
-  `node -e '…; const plKeys=Object.keys(I18N.pl); for (const l of Object.keys(I18N)) console.log(l, plKeys.filter(k=>!(k in I18N[l])))'`
-- **The Polish text in the HTML is the source of truth for SEO and must match
-  `I18N.pl` character for character.** If they drift, picking "Polski" rewrites
-  the page in front of the visitor. Change both together.
+- **Bump `STAMP` in `scripts/build.mjs`** whenever a shipped asset changes, then rebuild.
+  It is the single `?v=` value for every page. GitHub Pages serves assets with
+  `max-age=600`, so without it a visitor can run new markup against a stale stylesheet.
+  `privacy-policy.html` and `404.html` are hand-written — bump their `?v=` by hand too.
+- **Ten languages, always.** `pl, en, de, cs, sk, ro, hr, sr, uk, ru`. Every key must
+  exist in all ten, in **both** `assets/i18n.js` and `assets/i18n-pages.js`. Check with
+  `node scripts/build.mjs --check`, which fails and names the missing keys.
+- **Polish HTML matching `I18N.pl` is now automatic** — the pages are generated *from* the
+  dictionary, so they cannot drift. Edit the dictionary, rebuild, commit the output. Never
+  hand-edit a generated `.html`: the next build silently reverts it.
+- **A slug is permanent.** Renaming one in `src/site.mjs` breaks every inbound link and the
+  ranking that came with it. Add a redirect instead.
 - **No marketing slop.** No hype headings that say nothing, no claims nobody can
   verify ("in a minute", "the best"), no em dash used as a rhetorical pause. Every
   number on the page must be traceable to the code: the calculator count comes
@@ -82,7 +144,12 @@ verify changes by loading the page.
 - **Truth over marketing.** The production app carries ads (Google AdMob) and uses
   Google Maps/location; the site says so plainly instead of claiming "no ads". The
   site itself loads Google Analytics (GA4, Consent Mode v2) which stays denied
-  until the visitor accepts the banner. Keep README and `docs/DOKUMENTACJA.md`
-  honest about this when it changes.
-- Content stays indexable: Polish copy lives in the HTML, JavaScript only swaps it
-  on language change.
+  until the visitor accepts the banner. Since 2026-08 there is also an **optional
+  account** with Firestore sync, so the site must not say "no account" or "nothing ever
+  leaves your device" — it says the calculation is offline and the account is optional.
+  When any of that changes, update the copy, `privacy-policy.html` **and** its twin at
+  `docs/privacy-policy.html` in the app repo in the same session.
+- Content stays indexable: every language has its own URL with `canonical` + `hreflang`,
+  and the copy is real HTML. The switcher navigates; it does not rewrite the DOM. It never
+  auto-redirects on `navigator.language` — that would bounce Googlebot off the Polish home
+  page — only on a language the visitor picked by hand.

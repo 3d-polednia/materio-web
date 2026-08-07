@@ -420,3 +420,97 @@ footer h4 { font-size: .82rem; text-transform: uppercase; letter-spacing: .08em;
   color: var(--muted);
   text-decoration: underline;
 }
+
+/* ---------------------------------------------------------------- generated sub-pages
+   Styles for the page types scripts/build.mjs emits: the calculator hub, a single
+   calculator with its "how we calculate" column, the guides and the store finder. */
+
+.page-head { padding-bottom: 8px; }
+.page-head h1 { margin: 10px 0 8px; font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.15; }
+.page-head .lead { color: var(--muted); max-width: 62ch; margin: 0; }
+
+.breadcrumbs { font-size: .85rem; color: var(--muted); }
+.breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; }
+.breadcrumbs li + li::before { content: "›"; margin-right: 6px; color: var(--outline); }
+.breadcrumbs a { color: var(--muted); text-decoration: none; }
+.breadcrumbs a:hover { color: var(--olive); text-decoration: underline; }
+
+.calc-group { margin: 0 0 14px; font-size: 1.05rem; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted); }
+
+.calc-links { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.calc-link {
+  display: flex; align-items: flex-start; gap: 12px; padding: 16px;
+  background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius);
+  color: inherit; text-decoration: none; transition: border-color .15s, box-shadow .15s;
+}
+.calc-link:hover { border-color: var(--olive); box-shadow: var(--shadow); }
+.calc-link .ico { flex: none; color: var(--olive); line-height: 0; margin-top: 2px; }
+.calc-link-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.calc-link-body b { font-size: 1rem; }
+.calc-link-body .muted { font-size: .88rem; }
+.calc-link-go { margin-left: auto; flex: none; align-self: center; font-size: .82rem;
+  font-weight: 700; color: var(--olive); white-space: nowrap; }
+@media (max-width: 520px) { .calc-link-go { display: none; } }
+
+/* A calculator page: the live form on the left, the explanation on the right. */
+.calc-page { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 900px) { .calc-page { grid-template-columns: 1fr; } }
+.calc-page-form .calc { position: sticky; top: 84px; }
+@media (max-width: 900px) { .calc-page-form .calc { position: static; } }
+.calc-page-how h2 { margin-top: 0; }
+.calc-page-how h3 { margin: 22px 0 8px; font-size: 1rem; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--muted); }
+.calc-page-how .src-note { margin-top: 22px; font-size: .82rem; }
+
+.plain-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.plain-list li { background: var(--surface-container); border-radius: var(--radius-sm);
+  padding: 6px 10px; font-size: .88rem; }
+
+pre.formula {
+  margin: 0; padding: 14px 16px; overflow-x: auto;
+  background: var(--surface-container); border: 1px solid var(--outline);
+  border-radius: var(--radius-sm);
+}
+pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .86rem; line-height: 1.7; white-space: pre; }
+
+/* Guides */
+.wrap.narrow { max-width: 760px; }
+.steps-list { padding-left: 1.2em; margin: 0 0 8px; }
+.steps-list li { margin-bottom: 10px; line-height: 1.6; }
+.tip { margin-top: 24px; padding: 16px; border-radius: var(--radius);
+  background: var(--primary-container); color: var(--on-primary-container); }
+.tip b { display: block; margin-bottom: 6px; text-transform: uppercase;
+  letter-spacing: .06em; font-size: .8rem; }
+.tip p { margin: 0; line-height: 1.6; }
+
+.center { text-align: center; }
+
+/* ---------------------------------------------------------------- /app/ and /p/
+   The signed-in workspace and the read-only shared estimate. Both are noindex and
+   deliberately plain: lists of rows, not a marketing surface. */
+
+.app-bar { display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--outline); }
+
+.inline-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.inline-form input { flex: 1 1 160px; min-width: 0; padding: 10px 12px;
+  border: 1px solid var(--outline); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--on-surface); font: inherit; font-size: .95rem; }
+.inline-form input[inputmode="decimal"] { flex: 0 1 84px; }
+.inline-form button { flex: none; }
+
+.data-list { list-style: none; margin: 0 0 8px; padding: 0; }
+.data-list li { display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+  background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius-sm);
+  margin-bottom: 8px; }
+.data-list li.empty { display: block; background: none; border-style: dashed; }
+.data-list li.done .row-name { text-decoration: line-through; opacity: .6; }
+.row-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.row-name em { font-style: normal; font-size: .85rem; }
+.row-actions { display: flex; gap: 6px; flex: none; }
+
+.share-total { display: flex; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; border-top: 2px solid var(--olive); font-size: 1.05rem; }
+.share-total b { font-size: 1.2rem; }

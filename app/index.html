@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moje projekty — Materio</title>
+<meta name="description" content="Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji Materio.">
+<meta name="author" content="Materio">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="Materio">
+<meta name="application-name" content="Materio">
+<link rel="canonical" href="https://materio-app.com/app/">
+
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Materio">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:title" content="Moje projekty — Materio">
+<meta property="og:description" content="Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji Materio.">
+<meta property="og:url" content="https://materio-app.com/app/">
+<meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Materio — Policz. Kup. Nie marnuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Moje projekty — Materio">
+<meta name="twitter:description" content="Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji Materio.">
+<meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260807a">
+
+
+</head>
+<body>
+<a class="skip-link" href="#main">Przejdź do treści</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
+    <nav class="nav-links" aria-label="Materio">
+      <a href="/kalkulatory/" data-i18n="nav_calc">Kalkulatory</a>
+      <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
+      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="app">Pobierz</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap narrow">
+      <h1 data-i18n="app_title">Moje projekty</h1>
+      <p class="lead" data-i18n="app_lead">Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji Materio.</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <p id="app-config-missing" class="result err show" hidden data-i18n="app_err_config">Brak konfiguracji Firebase. Uzupełnij assets/firebase-config.js.</p>
+      <p id="app-status" class="result show" role="status" aria-live="polite" hidden></p>
+
+      <div id="app-auth" class="calc">
+        <form id="auth-form" autocomplete="on">
+          <div class="field">
+            <label for="auth-email" data-i18n="app_email">E-mail</label>
+            <input id="auth-email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="auth-password" data-i18n="app_password">Hasło</label>
+            <input id="auth-password" type="password" autocomplete="current-password" minlength="6" required>
+          </div>
+          <button id="auth-submit" type="submit" class="btn btn-primary" data-i18n="app_signin">Zaloguj się</button>
+        </form>
+        <p style="margin-top:14px">
+          <a href="#" id="auth-switch" data-i18n="app_switch_signup">Nie masz konta? Załóż je</a>
+        </p>
+      </div>
+
+      <div id="app-workspace" hidden>
+        <div class="app-bar">
+          <span id="app-email-label" class="muted"></span>
+          <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">Wyloguj</button>
+        </div>
+
+        <h2 data-i18n="app_projects">Projekty</h2>
+        <form id="project-form" class="inline-form">
+          <input id="project-name" type="text" maxlength="120" placeholder="Nowy projekt" data-i18n-ph="app_new_project" required>
+          <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">Dodaj</button>
+        </form>
+        <ul id="project-list" class="data-list"></ul>
+        <p class="muted" style="font-size:.85rem" data-i18n="app_share_hint">Kto ma link, zobaczy wycenę bez logowania. Link wyłączysz w każdej chwili.</p>
+
+        <h2 style="margin-top:32px" data-i18n="app_rooms">Pokoje</h2>
+        <form id="room-form" class="inline-form">
+          <input id="room-name" type="text" maxlength="120" placeholder="Nowy pokój" data-i18n-ph="app_new_room" required>
+          <input id="room-length" type="text" inputmode="decimal" value="5" aria-label="Długość (m)">
+          <input id="room-width" type="text" inputmode="decimal" value="4" aria-label="Szerokość (m)">
+          <input id="room-height" type="text" inputmode="decimal" value="2.6" aria-label="Wysokość (m)">
+          <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">Dodaj</button>
+        </form>
+        <ul id="room-list" class="data-list"></ul>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> Materio.</span>
+      <span><a href="/privacy-policy.html" data-i18n="foot_privacy">Polityka prywatności</a></span>
+      <span class="muted" data-i18n="app_noindex_note">Ta strona nie jest indeksowana przez wyszukiwarki.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/i18n.all.js?v=20260807a"></script>
+<script src="/assets/i18n-runtime.js?v=20260807a"></script>
+<script type="module" src="/assets/app.js?v=20260807a"></script>
+<script src="/assets/main.js?v=20260807a"></script>
+
+</body>
+</html>

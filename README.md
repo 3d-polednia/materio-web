@@ -10,50 +10,94 @@ Aplikacja w Google Play: <https://play.google.com/store/apps/details?id=pl.mater
 
 ## Czym jest ten projekt
 
-Szybka, statyczna strona bez frameworków i bez procesu budowania (czysty
-HTML/CSS/JS):
+Szybka, statyczna strona bez frameworków (czysty HTML/CSS/JS w przeglądarce).
+Strony generuje bezzależnościowy skrypt Node — patrz [Budowanie](#budowanie).
 
 - **Minimum zewnętrznych zależności** — brak CDN i brak czcionek z sieci.
   Kalkulatory liczą w przeglądarce. Usługi zewnętrzne: **Google Analytics** (GA4
   z Consent Mode v2 — nic nie zapisuje, dopóki odwiedzający nie kliknie zgody
   w banerze) oraz sekcja „Sklepy": mapa **Google Maps** (embed) i lista sklepów
   z **OpenStreetMap (Overpass API)**, ładowane dopiero, gdy z niej korzystasz.
-- **Indeksowalna** — polskie treści są w HTML (nie doklejane przez JS), więc
-  wyszukiwarki widzą pełną zawartość. Przełącznik 10 języków to progressive
-  enhancement na wierzchu.
-- **Gotowa pod SEO** — canonical, Open Graph + Twitter, dane strukturalne
-  `MobileApplication` + `Organization` + `FAQPage`, `sitemap.xml`, `robots.txt`,
-  manifest PWA, obraz OG 1200×630.
+  Wyjątkiem są `/app/` i `/p/`, które ładują Firebase SDK z CDN Google.
+- **Indeksowalna w 10 językach** — każdy język ma własny adres (`/kalkulatory/…`,
+  `/en/calculators/…`), treść jest zwykłym HTML-em, a `canonical` + `hreflang`
+  wiążą wersje ze sobą. Przełącznik języka nawiguje, nie podmienia tekstu.
+- **Strona per kalkulator** — 15 kalkulatorów × 10 języków, każdy z własnym
+  `title`/`description`/`schema.org` i sekcją „Jak to liczymy" (wzór, przykład
+  policzony tym samym silnikiem, uwagi praktyczne).
+- **Gotowa pod SEO** — canonical, hreflang, Open Graph + Twitter, dane strukturalne
+  `MobileApplication` + `Organization` + `FAQPage` + `BreadcrumbList` + `ItemList`
+  + `WebApplication` + `HowTo`, `sitemap.xml`, `robots.txt`, manifest PWA,
+  obraz OG 1200×630.
+- **Konto opcjonalne** — `/app/` to zalogowana przestrzeń (Firebase Auth +
+  Firestore, ten sam schemat co apka na Androida), `/p/<token>` to udostępniona
+  wycena tylko do odczytu. Obie są `noindex`. Liczenie nigdy nie wymaga konta.
 - **Dostępna i responsywna** — znaczniki semantyczne, skip-link, widoczny focus,
   tryb jasny/ciemny (`prefers-color-scheme`).
 
+## Budowanie
+
+```bash
+node scripts/build.mjs          # generuje ~230 stron + sitemap.xml
+node scripts/build.mjs --check  # tylko walidacja słowników i slugów
+```
+
+Bez `package.json` i bez `node_modules` — skrypt czyta te same `assets/i18n.js`
+i `assets/calculators.js`, których używa przeglądarka. **Wynik jest commitowany**,
+bo GitHub Pages serwuje katalog repo bez żadnego budowania po swojej stronie.
+Nie edytuj wygenerowanych plików `.html` — kolejny build je nadpisze.
+
 ## Struktura
 
+Pliki **pisane ręcznie**:
+
 ```
-index.html              Strona główna (hero, funkcje, jak to działa, kalkulatory
-                        na żywo, pomieszczenia, projekty, sklepy, zaufanie, FAQ, CTA)
-privacy-policy.html     Pełna polityka prywatności (PL + EN)
-404.html                Strona „nie znaleziono"
+scripts/build.mjs       Generator stron (Node, bez zależności)
+src/
+  site.mjs              Mapa serwisu: języki i slugi sekcji, kalkulatorów, poradników
+  template.mjs          Wspólny <head>, nagłówek, stopka, baner zgody, okruszki
+  pages.mjs             Zawartość <main> każdego typu strony
+  calc-meta.mjs         Wzory kalkulatorów i ich tłumaczenia
+  app-pages.mjs         /app/ i /p/ (noindex)
 assets/
   styles.css            System projektowy Olive Green Material 3
-  i18n.js               Słownik 10 języków + przełącznik
-  calculators.js        Silniki liczące (1:1 z aplikacji), czysty JS
+  i18n.js               Słownik 10 języków (wejście builda)
+  i18n-pages.js         Słownik podstron, te same 10 języków (wejście builda)
+  i18n-runtime.js       t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/
+  calculators.js        Silniki liczące (1:1 z aplikacji) + podpięcie formularzy
   stores.js             Wyszukiwarka sklepów (mapa + lista z OpenStreetMap)
-  main.js               Spójne wiązanie strony (przełącznik, zakładki, pomieszczenia, menu)
+  main.js               Wiązanie strony (pomieszczenia, menu, karuzela, baner zgody)
+  app.js                /app/ — Firebase Auth + synchronizacja Firestore
+  share.js              /p/<token> — udostępniona wycena, tylko do odczytu
+  firebase-config.js    Konfiguracja Firebase Web (uzupełnij placeholdery w środku)
   icon-192.png / icon-512.png / apple-touch-icon.png / favicon-32.png   Ikona z Google Play
   og-image.jpg          Podgląd społecznościowy 1200×630 (baner z Play)
   banner.jpg            Baner (grafika promocyjna)
-robots.txt · sitemap.xml · site.webmanifest · .nojekyll
+privacy-policy.html · 404.html · robots.txt · site.webmanifest · .nojekyll
 .github/workflows/pages.yml   Automatyczne wdrożenie na GitHub Pages
 docs/DOKUMENTACJA.md    Pełna dokumentacja projektu
 ```
 
+Pliki **generowane** (`node scripts/build.mjs`, nie edytuj ręcznie):
+
+```
+index.html · <lang>/index.html            Strona główna, 10 języków
+kalkulatory/ · kalkulatory/<materiał>/    Hub + strona per kalkulator
+poradniki/ · poradniki/<slug>/            Poradniki
+sklepy/                                   Wyszukiwarka sklepów
+<lang>/…                                  To samo dla pozostałych 9 języków
+app/index.html · p/index.html             Konto i udostępniona wycena (noindex)
+assets/i18n.<lang>.js · assets/i18n.all.js
+sitemap.xml
+```
+
 ## Uruchomienie lokalnie
 
-To zwykłe pliki statyczne. Otwórz `index.html` albo wystaw folder serwerem
-(potrzebne, by działała geolokalizacja w wyszukiwarce sklepów):
+Wystaw folder serwerem — potrzebne, bo strony linkują się adresami bezwzględnymi
+(`/kalkulatory/…`), a geolokalizacja w wyszukiwarce sklepów wymaga origin:
 
 ```bash
+node scripts/build.mjs        # jeśli zmieniałeś cokolwiek, co czyta build
 python3 -m http.server 8080   # potem wejdź na http://localhost:8080
 ```
 
