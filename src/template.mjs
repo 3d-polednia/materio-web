@@ -8,7 +8,7 @@
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, SECTION,
   urlHome, urlCalcIndex, urlGuideIndex, urlStores, urlMaterials, urlProjects, urlEstimate,
-  urlAndroid,
+  urlAndroid, urlCookies,
   URL_PRIVACY, URL_APP, PLAY_URL,
 } from "./site.mjs";
 
@@ -178,7 +178,7 @@ ${p.headExtra || ""}
 </head>
 <body${p.bodyClass ? ` class="${p.bodyClass}"` : ""}>
 <a class="skip-link" href="#main">${esc(t("skip_main"))}</a>
-${bare ? main : `${header(lang, t)}\n${main}\n${footer(lang, t)}\n${consentBanner(t)}`}
+${bare ? main : `${header(lang, t)}\n${main}\n${footer(lang, t)}\n${consentBanner(lang, t)}`}
 ${bare ? "" : `<script>window.MATERIO_ALTERNATES = ${altJson};</script>`}
 <script src="/assets/i18n.${bare ? "all" : lang}.js?v=${stamp}"></script>
 <script src="/assets/i18n-runtime.js?v=${stamp}"></script>
@@ -237,6 +237,7 @@ function footer(lang, t) {
         <h4>${esc(t("foot_legal"))}</h4>
         <ul>
           <li><a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a></li>
+          <li><a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a></li>
           <li><a href="${urlAndroid(lang)}">${esc(t("nav_app_page"))}</a></li>
           <li><a href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a></li>
           <li><a href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
@@ -251,11 +252,12 @@ function footer(lang, t) {
 </footer>`;
 }
 
-function consentBanner(t) {
+function consentBanner(lang, t) {
   return `<div id="consent-banner" class="consent-banner" role="dialog" aria-label="${esc(t("consent_accept"))}" hidden>
   <p class="consent-text">${esc(t("consent_text"))}</p>
   <div class="consent-actions">
     <a class="consent-more" href="${URL_PRIVACY}">${esc(t("consent_more"))}</a>
+    <a class="consent-more" href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a>
     <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">${esc(t("consent_reject"))}</button>
     <button type="button" id="consent-accept" class="btn btn-primary btn-sm">${esc(t("consent_accept"))}</button>
   </div>

@@ -103,25 +103,68 @@ function trackStoreClicks() {
   });
 }
 
-// GDPR consent banner: Google Analytics stays denied until the visitor accepts.
+const CONSENT_KEY = "materio_consent";
+
+const readConsent = () => {
+  try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; }
+};
+
+/**
+ * GDPR consent banner: Google Analytics stays denied until the visitor accepts.
+ *
+ * The decision has to be reversible — consent that cannot be withdrawn as easily as it was
+ * given is not consent. /cookies/ lists what is stored and calls back in here to reopen
+ * the banner, which is why the wiring is done once and the banner is only hidden, never
+ * removed.
+ */
 function buildConsent() {
   const banner = document.getElementById("consent-banner");
   if (!banner) return;
-  let saved = null;
-  try { saved = localStorage.getItem("materio_consent"); } catch (e) {}
-  if (saved) return; // choice already made — banner stays hidden
-  banner.hidden = false;
+
   const decide = (granted) => {
-    try { localStorage.setItem("materio_consent", granted ? "granted" : "denied"); } catch (e) {}
+    try { localStorage.setItem(CONSENT_KEY, granted ? "granted" : "denied"); } catch (e) {}
     if (typeof gtag === "function") {
       gtag("consent", "update", { analytics_storage: granted ? "granted" : "denied" });
     }
     banner.hidden = true;
+    document.dispatchEvent(new CustomEvent("consentchange", { detail: { granted } }));
   };
+
   const accept = document.getElementById("consent-accept");
   const reject = document.getElementById("consent-reject");
   if (accept) accept.addEventListener("click", () => decide(true));
   if (reject) reject.addEventListener("click", () => decide(false));
+
+  banner.hidden = Boolean(readConsent());
+  window.materioReopenConsent = () => {
+    try { localStorage.removeItem(CONSENT_KEY); } catch (e) {}
+    if (typeof gtag === "function") gtag("consent", "update", { analytics_storage: "denied" });
+    banner.hidden = false;
+    banner.scrollIntoView({ block: "nearest" });
+    document.dispatchEvent(new CustomEvent("consentchange", { detail: { granted: null } }));
+  };
+}
+
+/** /cookies/: show the current decision and let the visitor take it back. */
+function buildCookiesPage() {
+  const label = document.getElementById("consent-state");
+  const button = document.getElementById("consent-change");
+  if (!label || !button) return;
+
+  const render = () => {
+    const saved = readConsent();
+    const key = saved === "granted" ? "cookiepage_granted"
+      : saved === "denied" ? "cookiepage_denied" : "cookiepage_unset";
+    label.textContent = t(key);
+    label.classList.toggle("on", saved === "granted");
+    button.hidden = !saved;
+  };
+
+  button.addEventListener("click", () => {
+    if (typeof window.materioReopenConsent === "function") window.materioReopenConsent();
+  });
+  document.addEventListener("consentchange", render);
+  render();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -132,5 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
   buildMobileNav();
   trackStoreClicks();
   buildConsent();
+  buildCookiesPage();
   setYear();
 });

@@ -59,6 +59,10 @@ export const SECTION = {
     pl: "aplikacja", en: "android-app", de: "android-app", cs: "aplikace", sk: "aplikacia",
     ro: "aplicatie", hr: "aplikacija", sr: "aplikacija", uk: "dodatok", ru: "prilozhenie",
   },
+  cookies: {
+    pl: "cookies", en: "cookies", de: "cookies", cs: "cookies", sk: "cookies",
+    ro: "cookies", hr: "kolacici", sr: "kolacici", uk: "cookies", ru: "cookies",
+  },
   estimate: {
     pl: "kosztorys", en: "cost-estimate", de: "kostenvoranschlag", cs: "rozpocet",
     sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun",
@@ -249,6 +253,8 @@ export const urlStores = (lang) => `${prefix(lang)}/${SECTION.stores[lang]}/`;
 export const urlMaterials = (lang) => `${prefix(lang)}/${SECTION.materials[lang]}/`;
 export const urlProjects = (lang) => `${prefix(lang)}/${SECTION.projects[lang]}/`;
 export const urlEstimate = (lang) => `${prefix(lang)}/${SECTION.estimate[lang]}/`;
+
+export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
 
 /** The Android app's own page. Not the same thing as URL_APP, which is the account. */
 export const urlAndroid = (lang) => `${prefix(lang)}/${SECTION.app[lang]}/`;

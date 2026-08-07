@@ -706,3 +706,10 @@ pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, m
 @media (max-width: 760px) {
   .shot-grid { grid-template-columns: 1fr; }
 }
+
+/* ---------------------------------------------------------------- /cookies/ */
+/* The storage tables are wide and the page is often read on a phone, so they scroll
+   inside their own box rather than pushing the page sideways. */
+.table-scroll { overflow-x: auto; margin: 8px 0 4px; }
+.table-scroll table { min-width: 560px; }
+.table-scroll code { font-size: .84rem; overflow-wrap: anywhere; }

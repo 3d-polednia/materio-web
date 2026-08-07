@@ -26,12 +26,12 @@ import { fileURLToPath } from "node:url";
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid,
+  urlProjects, urlEstimate, urlAndroid, urlCookies,
 } from "../src/site.mjs";
 import { page } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, projectsMain, estimateMain, androidMain, renderFormula, FAQ_KEYS,
+  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
 import { appMain, shareMain } from "../src/app-pages.mjs";
@@ -40,7 +40,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260808f";
+const STAMP = "20260808g";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -157,7 +157,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -404,6 +404,22 @@ function buildMaterials() {
   }
 }
 
+function buildCookiesPage() {
+  const alt = alternatesFor(urlCookies);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = cookiesMain(lang, t);
+    write(join(urlCookies(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("cookiepage_title")} \u2014 Materio`,
+      description: t("cookiepage_meta"),
+      path: urlCookies(lang),
+      alternates: alt,
+      main, jsonld: [ld],
+    }));
+  }
+}
+
 function buildAndroidPage() {
   const alt = alternatesFor(urlAndroid);
   for (const lang of LANGS) {
@@ -523,6 +539,7 @@ function buildSitemap() {
     add(urlMaterials(lang), "0.8", "monthly", alternatesFor(urlMaterials));
     add(urlAndroid(lang), "0.8", "monthly", alternatesFor(urlAndroid));
     add(urlProjects(lang), "0.6", "monthly", alternatesFor(urlProjects));
+    add(urlCookies(lang), "0.3", "yearly", alternatesFor(urlCookies));
     add(urlEstimate(lang), "0.7", "monthly", alternatesFor(urlEstimate));
     add(urlGuideIndex(lang), "0.7", "monthly", alternatesFor(urlGuideIndex));
     add(urlStores(lang), "0.7", "monthly", alternatesFor(urlStores));
@@ -591,6 +608,7 @@ buildCalculatorPages();
 buildGuides();
 buildMaterials();
 buildAndroidPage();
+buildCookiesPage();
 buildWorkspacePages();
 buildStores();
 buildPrivatePages();

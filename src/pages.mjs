@@ -9,7 +9,7 @@ import { esc, calcIcon, playBadge, breadcrumbs } from "./template.mjs";
 import {
   BASE as BASE_URL,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid,
+  urlProjects, urlEstimate, urlAndroid, urlCookies,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -654,6 +654,93 @@ export function materialsMain(lang, t, cat) {
     })),
   }];
   return { main, ld };
+}
+
+/* ------------------------------------------------------------------ cookies */
+
+/**
+ * Every cookie and every piece of browser storage the site uses, one row each.
+ *
+ * `name` and `type` are literal — a storage key is not translated — so only the purpose
+ * is a dictionary key. Keeping the list here rather than in the dictionary means it can be
+ * checked against the code: each row names the file that writes it.
+ */
+const COOKIE_ROWS = [
+  { name: "materio_consent", type: "ck_type_local", purpose: "ck_p_consent", life: "ck_life_until_cleared" },
+  { name: "materio-lang", type: "ck_type_local", purpose: "ck_p_lang", life: "ck_life_until_cleared" },
+  { name: "materio-redirected", type: "ck_type_session", purpose: "ck_p_redirect", life: "ck_life_session" },
+  { name: "materio-workspace-v1", type: "ck_type_local", purpose: "ck_p_workspace", life: "ck_life_until_cleared" },
+  { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },
+];
+
+const COOKIE_THIRD_ROWS = [
+  { name: "_ga, _ga_*", type: "ck_type_cookie", purpose: "ck_p_ga", life: "ck_life_2y" },
+  { name: "firebaseLocalStorageDb", type: "ck_type_idb", purpose: "ck_p_firebase", life: "ck_life_until_signout" },
+  { name: "google.com / maps.google.com", type: "ck_type_cookie", purpose: "ck_p_maps", life: "ck_life_google" },
+];
+
+export function cookiesMain(lang, t) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("cookiepage_title"), path: urlCookies(lang) },
+  ]);
+
+  const table = (rows) => `<div class="table-scroll"><table class="ws-table">
+      <thead><tr>
+        <th>${esc(t("ck_col_name"))}</th>
+        <th>${esc(t("ck_col_type"))}</th>
+        <th>${esc(t("ck_col_purpose"))}</th>
+        <th>${esc(t("ck_col_life"))}</th>
+      </tr></thead>
+      <tbody>${rows.map((r) => `<tr>
+        <td><code>${esc(r.name)}</code></td>
+        <td>${esc(t(r.type))}</td>
+        <td>${esc(t(r.purpose))}</td>
+        <td>${esc(t(r.life))}</td>
+      </tr>`).join("")}</tbody>
+    </table></div>`;
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("cookiepage_title"))}</h1>
+      <p class="lead">${esc(t("cookiepage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>${esc(t("cookiepage_h_choice"))}</h2>
+      <p class="muted">${esc(t("cookiepage_choice_d"))}</p>
+      <p class="ws-links">
+        <span class="chip" id="consent-state">${esc(t("cookiepage_unset"))}</span>
+        <button type="button" id="consent-change" class="btn btn-primary btn-sm">${esc(t("cookiepage_change"))}</button>
+      </p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap narrow">
+      <h2>${esc(t("cookiepage_h_own"))}</h2>
+      <p class="muted">${esc(t("cookiepage_own_d"))}</p>
+      ${table(COOKIE_ROWS)}
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>${esc(t("cookiepage_h_third"))}</h2>
+      <p class="muted">${esc(t("cookiepage_third_d"))}</p>
+      ${table(COOKIE_THIRD_ROWS)}
+      <p class="muted src-note">${esc(t("cookiepage_note"))}
+        <a href="/privacy-policy.html">${esc(t("foot_privacy"))}</a></p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+  return { main, ld: crumbs.ld };
 }
 
 /* ------------------------------------------------------------------ the Android app */

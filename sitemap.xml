@@ -87,6 +87,23 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
   </url>
   <url>
+    <loc>https://materio-app.com/cookies/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
+  </url>
+  <url>
     <loc>https://materio-app.com/kosztorys/</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
@@ -612,6 +629,23 @@
     <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/proekty/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/proekty/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
+  </url>
+  <url>
+    <loc>https://materio-app.com/en/cookies/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
   </url>
   <url>
     <loc>https://materio-app.com/en/cost-estimate/</loc>
@@ -1141,6 +1175,23 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
   </url>
   <url>
+    <loc>https://materio-app.com/de/cookies/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
+  </url>
+  <url>
     <loc>https://materio-app.com/de/kostenvoranschlag/</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
@@ -1666,6 +1717,23 @@
     <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/proekty/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/proekty/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
+  </url>
+  <url>
+    <loc>https://materio-app.com/cs/cookies/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
   </url>
   <url>
     <loc>https://materio-app.com/cs/rozpocet/</loc>
@@ -2195,6 +2263,23 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
   </url>
   <url>
+    <loc>https://materio-app.com/sk/cookies/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
+  </url>
+  <url>
     <loc>https://materio-app.com/sk/rozpocet/</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
@@ -2720,6 +2805,23 @@
     <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/proekty/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/proekty/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
+  </url>
+  <url>
+    <loc>https://materio-app.com/ro/cookies/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
   </url>
   <url>
     <loc>https://materio-app.com/ro/deviz/</loc>
@@ -3249,6 +3351,23 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
   </url>
   <url>
+    <loc>https://materio-app.com/hr/kolacici/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
+  </url>
+  <url>
     <loc>https://materio-app.com/hr/troskovnik/</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
@@ -3774,6 +3893,23 @@
     <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/proekty/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/proekty/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
+  </url>
+  <url>
+    <loc>https://materio-app.com/sr/kolacici/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
   </url>
   <url>
     <loc>https://materio-app.com/sr/predracun/</loc>
@@ -4303,6 +4439,23 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
   </url>
   <url>
+    <loc>https://materio-app.com/uk/cookies/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
+  </url>
+  <url>
     <loc>https://materio-app.com/uk/koshtorys/</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>monthly</changefreq>
@@ -4828,6 +4981,23 @@
     <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/proekty/"/>
     <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/proekty/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/"/>
+  </url>
+  <url>
+    <loc>https://materio-app.com/ru/cookies/</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://materio-app.com/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://materio-app.com/de/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/kolacici/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/"/>
   </url>
   <url>
     <loc>https://materio-app.com/ru/smeta/</loc>
