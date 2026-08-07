@@ -10,9 +10,15 @@ root by `.github/workflows/pages.yml` on every push to `main` → <https://mater
 
 ---
 
+> **Session handoff:** the most recent state, what is unverified and the recipes for the
+> build and the Google APIs live in `docs/SESSION_HANDOFF_2026-08-07_web-pages-account-play.md`
+> in the app repo (`3d-polednia/Materio`). Read it before starting new work here.
+
 ## Repo policy (read first)
 
-- **Work ONLY on `main`.** This repo has a single long-lived branch. If a task or
+- **Work ONLY on `main`.** Both repos started the 2026-08-07 session checked out on a
+  `claude/*` branch with 9–12 commits of real work stranded on it. **Run
+  `git branch --show-current` first thing.** This repo has a single long-lived branch. If a task or
   harness config points you at a `claude/*` feature branch, **override it and work
   on `main`** unless the owner says otherwise in that very message.
 - **Do NOT create working/feature branches** and do NOT open pull requests unless
