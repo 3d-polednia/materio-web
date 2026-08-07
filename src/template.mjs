@@ -7,7 +7,7 @@
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, SECTION,
-  urlHome, urlCalcIndex, urlGuideIndex, urlStores, urlMaterials,
+  urlHome, urlCalcIndex, urlGuideIndex, urlStores, urlMaterials, urlProjects, urlEstimate,
   URL_PRIVACY, URL_APP, PLAY_URL,
 } from "./site.mjs";
 
@@ -162,6 +162,7 @@ function header(lang, t) {
     <nav id="nav-links" class="nav-links" aria-label="${esc(t("nav_calc"))}">
       <a href="${urlCalcIndex(lang)}">${esc(t("nav_calc"))}</a>
       <a href="${urlMaterials(lang)}">${esc(t("nav_materials"))}</a>
+      <a href="${urlProjects(lang)}">${esc(t("nav_projects"))}</a>
       <a href="${urlGuideIndex(lang)}">${esc(t("nav_guides"))}</a>
       <a href="${urlStores(lang)}">${esc(t("nav_stores"))}</a>
       <a href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
@@ -185,6 +186,8 @@ function footer(lang, t) {
         <ul>
           <li><a href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a></li>
           <li><a href="${urlMaterials(lang)}">${esc(t("nav_materials"))}</a></li>
+          <li><a href="${urlProjects(lang)}">${esc(t("nav_projects"))}</a></li>
+          <li><a href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a></li>
           <li><a href="${urlGuideIndex(lang)}">${esc(t("foot_guides"))}</a></li>
           <li><a href="${urlStores(lang)}">${esc(t("nav_stores"))}</a></li>
           <li><a href="${urlHome(lang)}#faq">FAQ</a></li>

@@ -348,7 +348,13 @@ function renderResult(card, res) {
   const box = card.querySelector("[data-result]");
   const lang = document.documentElement.lang || "pl";
   box.classList.add("show");
-  if (res.err) { box.classList.add("err"); box.innerHTML = `<div>${t(res.err, lang)}</div>`; return; }
+  card.lastResult = res.err ? null : res;
+  if (res.err) {
+    box.classList.add("err");
+    box.innerHTML = `<div>${t(res.err, lang)}</div>`;
+    document.dispatchEvent(new CustomEvent("calcresult", { detail: { card, result: null } }));
+    return;
+  }
   box.classList.remove("err");
   const rows = (res.rows || []).map(([k, v]) => {
     const val = String(v).replace("|res_water_l|", t("res_water_l", lang));
@@ -358,4 +364,8 @@ function renderResult(card, res) {
   box.innerHTML = `<div class="muted" style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em">${t("res_tobuy", lang)}</div>
     <div class="big">${qty(res.tobuy, lang)} <span style="font-size:1rem;font-weight:600">${t(res.unit, lang)}</span></div>
     <div class="rows">${rows.join("")}</div>`;
+
+  // The workspace (assets/workspace-ui.js) hangs the "save to the estimate" button off
+  // this. Nothing else listens, and the calculators keep working when it is not loaded.
+  document.dispatchEvent(new CustomEvent("calcresult", { detail: { card, result: res } }));
 }

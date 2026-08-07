@@ -26,11 +26,12 @@ import { fileURLToPath } from "node:url";
 import {
   BASE, LANGS, DEFAULT_LANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
+  urlProjects, urlEstimate,
 } from "../src/site.mjs";
 import { page } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, renderFormula, FAQ_KEYS,
+  materialsMain, projectsMain, estimateMain, renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
 import { appMain, shareMain } from "../src/app-pages.mjs";
@@ -39,7 +40,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260808a";
+const STAMP = "20260808b";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -155,7 +156,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -186,7 +187,13 @@ const written = [];
 const alternatesFor = (fn) => Object.fromEntries(LANGS.map((l) => [l, fn(l)]));
 
 /** Every page carrying a calculator form needs the engines and the material picker. */
-const CALC_SCRIPTS = ["/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js"];
+const CALC_SCRIPTS = [
+  "/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js",
+  "/assets/workspace.js", "/assets/workspace-ui.js",
+];
+
+/** The workspace pages need the store and its interface, but no calculation engine. */
+const WS_SCRIPTS = ["/assets/workspace.js", "/assets/workspace-ui.js"];
 
 /* ------------------------------------------------------------------ worked examples */
 
@@ -397,6 +404,36 @@ function buildMaterials() {
   }
 }
 
+function buildWorkspacePages() {
+  const projAlt = alternatesFor(urlProjects);
+  const estAlt = alternatesFor(urlEstimate);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+
+    const projects = projectsMain(lang, t);
+    write(join(urlProjects(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("wspage_title")} \u2014 Materio`,
+      description: t("wspage_meta"),
+      path: urlProjects(lang),
+      alternates: projAlt,
+      main: projects.main, jsonld: [projects.ld],
+      scripts: WS_SCRIPTS,
+    }));
+
+    const estimate = estimateMain(lang, t);
+    write(join(urlEstimate(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("estpage_title")} \u2014 Materio`,
+      description: t("estpage_meta"),
+      path: urlEstimate(lang),
+      alternates: estAlt,
+      main: estimate.main, jsonld: estimate.ld,
+      scripts: WS_SCRIPTS,
+    }));
+  }
+}
+
 function buildStores() {
   const alt = alternatesFor(urlStores);
   for (const lang of LANGS) {
@@ -455,6 +492,8 @@ function buildSitemap() {
     add(urlHome(lang), lang === DEFAULT_LANG ? "1.0" : "0.8", "monthly");
     add(urlCalcIndex(lang), "0.9", "monthly");
     add(urlMaterials(lang), "0.8", "monthly");
+    add(urlProjects(lang), "0.6", "monthly");
+    add(urlEstimate(lang), "0.7", "monthly");
     add(urlGuideIndex(lang), "0.7", "monthly");
     add(urlStores(lang), "0.7", "monthly");
     for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly");
@@ -512,6 +551,7 @@ buildHome();
 buildCalculatorPages();
 buildGuides();
 buildMaterials();
+buildWorkspacePages();
 buildStores();
 buildPrivatePages();
 buildSitemap();

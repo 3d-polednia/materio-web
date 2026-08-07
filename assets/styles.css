@@ -603,3 +603,59 @@ pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, m
 @media (max-width: 640px) {
   .mat-page-list li { flex-direction: column; align-items: flex-start; }
 }
+
+/* ---------------------------------------------------------------- workspace */
+/* A saved room feeds the form: pick the room, pick the surface, the area lands in
+   the field. The bar is inserted by assets/workspace-ui.js and stays hidden until
+   there is at least one room to offer. */
+.ws-bar { margin-bottom: 14px; }
+.ws-bar-label { display: block; font-weight: 600; font-size: .85rem; margin-bottom: 5px; }
+.ws-bar-row { display: flex; gap: 8px; }
+.ws-bar-row select {
+  flex: 1 1 auto; min-width: 0; padding: 10px 12px; border: 1px solid var(--outline);
+  border-radius: var(--radius-sm); background: var(--surface-alt); color: var(--on-bg); font: inherit;
+}
+.ws-bar-row .btn { flex: none; }
+.ws-bar-hint { font-size: .84rem; margin: 0; }
+.ws-save { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.ws-save-note { font-size: .84rem; }
+.ws-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+
+.data-list li.on { border-color: var(--olive); }
+.data-list .row-name em { display: block; font-style: normal; font-size: .84rem; }
+
+/* The estimate is the one thing on the site meant to leave the screen on paper, so it
+   is laid out as a document rather than as a page section. */
+.ws-estimate-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; align-items: center; }
+.ws-estimate-bar select { padding: 8px 12px; border: 1px solid var(--outline);
+  border-radius: var(--radius-sm); background: var(--surface); color: var(--on-bg); font: inherit; }
+.ws-estimate { background: var(--surface); border: 1px solid var(--outline);
+  border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+.ws-estimate-head { display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+.ws-estimate-head h2 { margin: 0; }
+.ws-estimate-brand { margin: 0; font-weight: 800; color: var(--olive-dark);
+  text-transform: uppercase; letter-spacing: .1em; font-size: .78rem; }
+.ws-estimate-meta { display: flex; flex-direction: column; align-items: flex-end;
+  gap: 2px; color: var(--muted); font-size: .88rem; }
+.ws-table { width: 100%; border-collapse: collapse; font-size: .94rem; }
+.ws-table th, .ws-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--outline); }
+.ws-table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.ws-table .num { text-align: right; white-space: nowrap; }
+.ws-estimate-total { display: flex; justify-content: space-between; gap: 16px;
+  margin-top: 18px; font-size: 1.15rem; font-weight: 800; }
+.ws-estimate-foot { font-size: .82rem; margin-top: 16px; }
+
+/* Print: the estimate alone, on white, without the site around it. This is the "save
+   as PDF" path — the browser's own print engine, so the file stays small and its text
+   stays selectable. */
+@media print {
+  header.site, footer.site, .consent-banner, .breadcrumbs, .no-print,
+  .app-note, .skip-link, .mat-dialog { display: none !important; }
+  body { background: #fff; color: #000; }
+  .block { padding: 0 !important; background: #fff !important; }
+  .wrap { max-width: none; padding: 0; }
+  .ws-estimate { border: 0; box-shadow: none; padding: 0; }
+  .ws-table th, .ws-table td { border-bottom: 1px solid #ccc; }
+  @page { margin: 18mm 14mm; }
+}

@@ -51,6 +51,15 @@ export const SECTION = {
     pl: "materialy", en: "materials", de: "materialien", cs: "materialy", sk: "materialy",
     ro: "materiale", hr: "materijali", sr: "materijali", uk: "materialy", ru: "materialy",
   },
+  projects: {
+    pl: "projekty", en: "projects", de: "projekte", cs: "projekty", sk: "projekty",
+    ro: "proiecte", hr: "projekti", sr: "projekti", uk: "proekty", ru: "proekty",
+  },
+  estimate: {
+    pl: "kosztorys", en: "cost-estimate", de: "kostenvoranschlag", cs: "rozpocet",
+    sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun",
+    uk: "koshtorys", ru: "smeta",
+  },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
@@ -190,6 +199,8 @@ export const urlGuideIndex = (lang) => `${prefix(lang)}/${SECTION.guides[lang]}/
 export const urlGuide = (lang, guide) => `${urlGuideIndex(lang)}${guide.slug[lang]}/`;
 export const urlStores = (lang) => `${prefix(lang)}/${SECTION.stores[lang]}/`;
 export const urlMaterials = (lang) => `${prefix(lang)}/${SECTION.materials[lang]}/`;
+export const urlProjects = (lang) => `${prefix(lang)}/${SECTION.projects[lang]}/`;
+export const urlEstimate = (lang) => `${prefix(lang)}/${SECTION.estimate[lang]}/`;
 
 /** Privacy policy, the workspace and the shared-project view are single, language-neutral pages. */
 export const URL_PRIVACY = "/privacy-policy.html";

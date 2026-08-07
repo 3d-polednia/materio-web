@@ -128,6 +128,10 @@ function openMaterialPicker(calcId, onPick) {
 /** Write a material's values into one calculator card and say what was filled in. */
 function applyMaterial(card, m) {
   const calcId = card.dataset.calc;
+  // Remembered so a saved estimate can carry the material's name and shop aisle.
+  card.dataset.matId = m.id;
+  card.dataset.matCat = m.c;
+  card.dataset.matName = matName(m, matLang(), (k) => matT(k));
   const values = materialFill(m, calcId);
   Object.entries(values).forEach(([k, v]) => {
     const el = card.querySelector(`[data-k="${k}"]`);

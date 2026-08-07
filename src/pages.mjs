@@ -8,6 +8,7 @@
 import { esc, calcIcon, playBadge, breadcrumbs } from "./template.mjs";
 import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
+  urlProjects, urlEstimate,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -172,7 +173,11 @@ ${roomsSection(t)}
       ${featureCard('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', t("proj_b2_t"), t("proj_b2_d"))}
       ${featureCard('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>', t("proj_b3_t"), t("proj_b3_d"))}
     </div>
-    <p class="center" style="margin-top:24px"><a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a></p>
+    <p class="center" style="margin-top:24px">
+      <a class="btn btn-primary" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+      <a class="btn btn-ghost" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
+      <a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
+    </p>
   </div>
 </section>
 
@@ -636,6 +641,151 @@ export function materialsMain(lang, t, cat) {
       position: i + 1,
       name: cat.name(m, lang, t),
     })),
+  }];
+  return { main, ld };
+}
+
+/* ------------------------------------------------------------------ workspace */
+
+/**
+ * /projekty/ — projects and rooms, kept in the browser.
+ *
+ * The account layer at /app/ used to be the only place a room could exist, which meant a
+ * calculator could not offer one unless the visitor signed in first. Counting never
+ * requires an account (FIRESTORE_SYNC §1.2), so the rooms live in localStorage in the
+ * same document shape and sync upward when somebody does sign in.
+ */
+export function projectsMain(lang, t) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("wspage_title"), path: urlProjects(lang) },
+  ]);
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("wspage_title"))}</h1>
+      <p class="lead">${esc(t("wspage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="ws-page">
+    <div class="wrap narrow">
+      <h2>${esc(t("ws_projects"))}</h2>
+      <p class="muted">${esc(t("wspage_projects_d"))}</p>
+      <form id="ws-project-form" class="inline-form">
+        <input id="ws-project-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_project"))}" required>
+        <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+      </form>
+      <ul id="ws-project-list" class="data-list"></ul>
+
+      <h2 style="margin-top:36px">${esc(t("ws_rooms"))}</h2>
+      <p class="muted">${esc(t("wspage_rooms_d"))}</p>
+      <form id="ws-room-form" class="inline-form">
+        <input id="ws-room-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_room"))}" required>
+        <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="${esc(t("fld_length"))}">
+        <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="${esc(t("fld_width"))}">
+        <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="${esc(t("fld_height"))}">
+        <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+      </form>
+      <ul id="ws-room-list" class="data-list"></ul>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
+        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
+      </p>
+      <p class="muted src-note">${esc(t("wspage_local_note"))}</p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+  return { main, ld: crumbs.ld };
+}
+
+/** /kosztorys/ — the saved lines of the active project, priced, printable to PDF. */
+export function estimateMain(lang, t) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("estpage_title"), path: urlEstimate(lang) },
+  ]);
+
+  const main = `<main id="main">
+  <section class="block page-head no-print">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("estpage_title"))}</h1>
+      <p class="lead">${esc(t("estpage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <div class="ws-estimate-bar no-print">
+        <select id="ws-estimate-project" aria-label="${esc(t("ws_project"))}" hidden></select>
+        <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">${esc(t("est_print"))}</button>
+        <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">${esc(t("est_csv"))}</button>
+      </div>
+
+      <article id="ws-estimate" class="ws-estimate">
+        <header class="ws-estimate-head">
+          <div>
+            <p class="ws-estimate-brand">Materio</p>
+            <h2 id="ws-estimate-title"></h2>
+          </div>
+          <div class="ws-estimate-meta">
+            <span id="ws-estimate-date"></span>
+            <span id="ws-estimate-count"></span>
+          </div>
+        </header>
+        <table class="ws-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>${esc(t("ws_col_name"))}</th>
+              <th class="num">${esc(t("ws_col_qty"))}</th>
+              <th class="num">${esc(t("ws_col_cost"))}</th>
+              <th class="no-print"></th>
+            </tr>
+          </thead>
+          <tbody id="ws-estimate-rows"></tbody>
+        </table>
+        <p class="ws-estimate-total"><span>${esc(t("share_total"))}</span> <b id="ws-estimate-total"></b></p>
+        <p class="muted ws-estimate-foot">${esc(t("est_foot"))}</p>
+      </article>
+
+      <p class="ws-links no-print">
+        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+      </p>
+      <p class="muted src-note no-print">${esc(t("estpage_how"))}</p>
+    </div>
+  </section>
+
+  <section class="block no-print">
+    <div class="wrap narrow">
+      <h2>${esc(t("estpage_h2"))}</h2>
+      <ol class="steps-list">
+        <li>${esc(t("estpage_s1"))}</li>
+        <li>${esc(t("estpage_s2"))}</li>
+        <li>${esc(t("estpage_s3"))}</li>
+      </ol>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+
+  const ld = [crumbs.ld, {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: t("estpage_h2"),
+    description: t("estpage_lead"),
+    inLanguage: lang,
+    step: [t("estpage_s1"), t("estpage_s2"), t("estpage_s3")]
+      .map((s, i) => ({ "@type": "HowToStep", position: i + 1, text: s })),
   }];
   return { main, ld };
 }
