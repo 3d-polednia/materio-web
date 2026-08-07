@@ -15,6 +15,12 @@ const wsLang = () => document.documentElement.lang || "pl";
 const wsEsc = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const wsPlain = (v) => String(Math.round(Number(v) * 1000) / 1000);
+
+/** Read a number a person typed: a comma is a decimal point in most of these languages. */
+const wsDecimal = (v) => {
+  const n = parseFloat(String(v).replace(",", "."));
+  return isFinite(n) ? n : 0;
+};
 const wsNum = (v) => new Intl.NumberFormat(wsLang(), { maximumFractionDigits: 2 }).format(v);
 
 /* ------------------------------------------------------------------ calculator cards */
@@ -232,6 +238,38 @@ function buildProjectsPage() {
 
 /* ------------------------------------------------------------------ /kosztorys/ */
 
+/** One estimate line, either as text or as the form that edits it. */
+function wsEstimateRow(r, i) {
+  if (r.id !== wsEditingId) {
+    return `<tr data-id="${wsEsc(r.id)}">
+        <td>${i + 1}</td>
+        <td>${wsEsc(r.name)}</td>
+        <td class="num">${wsNum(r.requiredUnits)} ${wsEsc(r.unitLabel)}</td>
+        <td class="num">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</td>
+        <td class="no-print ws-row-actions">
+          <button type="button" class="btn btn-ghost btn-sm" data-edit>${wsEsc(wsT("ws_edit"))}</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
+        </td>
+      </tr>`;
+  }
+  return `<tr data-id="${wsEsc(r.id)}" class="ws-editing">
+      <td>${i + 1}</td>
+      <td><input type="text" maxlength="120" data-f="name" value="${wsEsc(r.name)}" aria-label="${wsEsc(wsT("ws_col_name"))}"></td>
+      <td class="num">
+        <input type="text" inputmode="decimal" class="ws-qty" data-f="qty" value="${r.requiredUnits}" aria-label="${wsEsc(wsT("ws_col_qty"))}">
+        <input type="text" maxlength="24" class="ws-unit" data-f="unit" value="${wsEsc(r.unitLabel)}" aria-label="${wsEsc(wsT("ws_col_unit"))}">
+      </td>
+      <td class="num"><input type="text" inputmode="decimal" class="ws-qty" data-f="cost" value="${(r.totalCostMinor / 100).toFixed(2)}" aria-label="${wsEsc(wsT("ws_col_cost"))}"></td>
+      <td class="no-print ws-row-actions">
+        <button type="button" class="btn btn-primary btn-sm" data-save>${wsEsc(wsT("app_save"))}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-cancel>${wsEsc(wsT("action_cancel"))}</button>
+      </td>
+    </tr>`;
+}
+
+/** Which line is open for editing, or "" when none is. */
+let wsEditingId = "";
+
 function wsRenderEstimate() {
   const wrap = document.getElementById("ws-estimate");
   if (!wrap) return;
@@ -255,13 +293,7 @@ function wsRenderEstimate() {
   if (!rows.length) {
     body.innerHTML = `<tr><td colspan="5" class="muted">${wsEsc(wsT("ws_empty_estimate"))}</td></tr>`;
   } else {
-    body.innerHTML = rows.map((r, i) => `<tr data-id="${wsEsc(r.id)}">
-        <td>${i + 1}</td>
-        <td>${wsEsc(r.name)}</td>
-        <td class="num">${wsNum(r.requiredUnits)} ${wsEsc(r.unitLabel)}</td>
-        <td class="num">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</td>
-        <td class="no-print"><button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button></td>
-      </tr>`).join("");
+    body.innerHTML = rows.map((r, i) => wsEstimateRow(r, i)).join("");
   }
   document.getElementById("ws-estimate-total").textContent = wsMoney(total.minor, total.currencyCode);
   document.getElementById("ws-estimate-count").textContent = `${total.count} ${wsT("ws_lines")}`;
@@ -273,7 +305,43 @@ function buildEstimatePage() {
 
   document.getElementById("ws-estimate-rows").addEventListener("click", (e) => {
     const tr = e.target.closest("tr[data-id]");
-    if (tr && e.target.closest("[data-del]")) wsDeleteEstimation(tr.dataset.id);
+    if (!tr) return;
+    const id = tr.dataset.id;
+
+    if (e.target.closest("[data-del]")) {
+      wsDeleteEstimation(id);
+    } else if (e.target.closest("[data-edit]")) {
+      wsEditingId = id;
+      wsRenderEstimate();
+    } else if (e.target.closest("[data-cancel]")) {
+      wsEditingId = "";
+      wsRenderEstimate();
+    } else if (e.target.closest("[data-save]")) {
+      const get = (f) => tr.querySelector(`[data-f="${f}"]`).value;
+      wsEditingId = "";
+      wsUpdateEstimation(id, {
+        name: get("name").trim(),
+        requiredUnits: wsDecimal(get("qty")),
+        unitLabel: get("unit").trim(),
+        costMajor: wsDecimal(get("cost")),
+      });
+      wsRenderEstimate();
+    }
+  });
+
+  const addForm = document.getElementById("ws-line-form");
+  if (addForm) addForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("ws-line-name");
+    if (!name.value.trim()) return;
+    wsAddManualEstimation({
+      name: name.value.trim(),
+      requiredUnits: wsDecimal(document.getElementById("ws-line-qty").value),
+      unitLabel: document.getElementById("ws-line-unit").value.trim(),
+      costMajor: wsDecimal(document.getElementById("ws-line-cost").value),
+    });
+    name.value = "";
+    document.getElementById("ws-line-cost").value = "";
   });
 
   const picker = document.getElementById("ws-estimate-project");

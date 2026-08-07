@@ -1006,6 +1006,18 @@ export function estimateMain(lang, t) {
         <p class="muted ws-estimate-foot">${esc(t("est_foot"))}</p>
       </article>
 
+      <div class="no-print ws-add-line">
+        <h3>${esc(t("ws_add_line"))}</h3>
+        <p class="muted">${esc(t("ws_add_line_d"))}</p>
+        <form id="ws-line-form" class="inline-form">
+          <input id="ws-line-name" type="text" maxlength="120" placeholder="${esc(t("ws_col_name"))}" required>
+          <input id="ws-line-qty" type="text" inputmode="decimal" value="1" aria-label="${esc(t("ws_col_qty"))}">
+          <input id="ws-line-unit" type="text" maxlength="24" value="${esc(t("ws_unit_default"))}" aria-label="${esc(t("ws_col_unit"))}">
+          <input id="ws-line-cost" type="text" inputmode="decimal" placeholder="${esc(t("ws_col_cost"))}" aria-label="${esc(t("ws_col_cost"))}">
+          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+        </form>
+      </div>
+
       <p class="ws-links no-print">
         <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
         <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>

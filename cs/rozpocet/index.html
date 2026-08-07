@@ -68,7 +68,7 @@
 <meta name="twitter:title" content="Rozpočet — Materio">
 <meta name="twitter:description" content="Stavební rozpočet online: sešli výsledky kalkulaček do jednoho seznamu s množstvím a náklady, vytiskni nebo ulož jako PDF. Bez registrace.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -179,6 +179,18 @@
         <p class="muted ws-estimate-foot">Rozpočet spočítaný v Materio. Množství je zaokrouhleno na celá balení; ceny jsou ty, které jsi zadal.</p>
       </article>
 
+      <div class="no-print ws-add-line">
+        <h3>Přidat položku ručně</h3>
+        <p class="muted">Práce, doprava, materiál koupený od oka — cokoli, co kalkulačka nepočítá.</p>
+        <form id="ws-line-form" class="inline-form">
+          <input id="ws-line-name" type="text" maxlength="120" placeholder="Položka" required>
+          <input id="ws-line-qty" type="text" inputmode="decimal" value="1" aria-label="Množství">
+          <input id="ws-line-unit" type="text" maxlength="24" value="ks" aria-label="Jednotka">
+          <input id="ws-line-cost" type="text" inputmode="decimal" placeholder="Náklady" aria-label="Náklady">
+          <button type="submit" class="btn btn-primary btn-sm">Přidat</button>
+        </form>
+      </div>
+
       <p class="ws-links no-print">
         <a class="btn btn-ghost" href="/cs/projekty/">Projekty a místnosti</a>
         <a class="btn btn-ghost" href="/cs/kalkulacky/">Všechny kalkulačky</a>
@@ -262,12 +274,12 @@
   "uk": "/uk/koshtorys/",
   "ru": "/ru/smeta/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260808g"></script>
-<script src="/assets/i18n-runtime.js?v=20260808g"></script>
+<script src="/assets/i18n.cs.js?v=20260808h"></script>
+<script src="/assets/i18n-runtime.js?v=20260808h"></script>
 
-<script src="/assets/workspace.js?v=20260808g"></script>
-<script src="/assets/workspace-ui.js?v=20260808g"></script>
-<script src="/assets/main.js?v=20260808g"></script>
+<script src="/assets/workspace.js?v=20260808h"></script>
+<script src="/assets/workspace-ui.js?v=20260808h"></script>
+<script src="/assets/main.js?v=20260808h"></script>
 
 </body>
 </html>

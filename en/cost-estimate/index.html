@@ -68,7 +68,7 @@
 <meta name="twitter:title" content="Cost estimate — Materio">
 <meta name="twitter:description" content="Online building cost estimate: collect calculator results into one list with quantities and cost, then print it or save it as a PDF. No sign-up.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -179,6 +179,18 @@
         <p class="muted ws-estimate-foot">Estimate calculated in Materio. Quantities are rounded up to whole packages; the prices are the ones you entered.</p>
       </article>
 
+      <div class="no-print ws-add-line">
+        <h3>Add a line by hand</h3>
+        <p class="muted">Labour, delivery, something bought by eye — anything no calculator works out.</p>
+        <form id="ws-line-form" class="inline-form">
+          <input id="ws-line-name" type="text" maxlength="120" placeholder="Item" required>
+          <input id="ws-line-qty" type="text" inputmode="decimal" value="1" aria-label="Quantity">
+          <input id="ws-line-unit" type="text" maxlength="24" value="pc" aria-label="Unit">
+          <input id="ws-line-cost" type="text" inputmode="decimal" placeholder="Cost" aria-label="Cost">
+          <button type="submit" class="btn btn-primary btn-sm">Add</button>
+        </form>
+      </div>
+
       <p class="ws-links no-print">
         <a class="btn btn-ghost" href="/en/projects/">Projects and rooms</a>
         <a class="btn btn-ghost" href="/en/calculators/">All calculators</a>
@@ -262,12 +274,12 @@
   "uk": "/uk/koshtorys/",
   "ru": "/ru/smeta/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260808g"></script>
-<script src="/assets/i18n-runtime.js?v=20260808g"></script>
+<script src="/assets/i18n.en.js?v=20260808h"></script>
+<script src="/assets/i18n-runtime.js?v=20260808h"></script>
 
-<script src="/assets/workspace.js?v=20260808g"></script>
-<script src="/assets/workspace-ui.js?v=20260808g"></script>
-<script src="/assets/main.js?v=20260808g"></script>
+<script src="/assets/workspace.js?v=20260808h"></script>
+<script src="/assets/workspace-ui.js?v=20260808h"></script>
+<script src="/assets/main.js?v=20260808h"></script>
 
 </body>
 </html>

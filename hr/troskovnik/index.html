@@ -68,7 +68,7 @@
 <meta name="twitter:title" content="Troškovnik — Materio">
 <meta name="twitter:description" content="Građevinski troškovnik online: skupi rezultate kalkulatora u jedan popis s količinama i troškom, pa ispiši ili spremi kao PDF. Bez registracije.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -179,6 +179,18 @@
         <p class="muted ws-estimate-foot">Troškovnik izračunat u Materiju. Količine su zaokružene na cijela pakiranja; cijene su one koje si upisao.</p>
       </article>
 
+      <div class="no-print ws-add-line">
+        <h3>Dodaj stavku ručno</h3>
+        <p class="muted">Rad, dostava, materijal kupljen od oka — bilo što što kalkulator ne računa.</p>
+        <form id="ws-line-form" class="inline-form">
+          <input id="ws-line-name" type="text" maxlength="120" placeholder="Stavka" required>
+          <input id="ws-line-qty" type="text" inputmode="decimal" value="1" aria-label="Količina">
+          <input id="ws-line-unit" type="text" maxlength="24" value="kom" aria-label="Jedinica">
+          <input id="ws-line-cost" type="text" inputmode="decimal" placeholder="Trošak" aria-label="Trošak">
+          <button type="submit" class="btn btn-primary btn-sm">Dodaj</button>
+        </form>
+      </div>
+
       <p class="ws-links no-print">
         <a class="btn btn-ghost" href="/hr/projekti/">Projekti i prostorije</a>
         <a class="btn btn-ghost" href="/hr/kalkulatori/">Svi kalkulatori</a>
@@ -262,12 +274,12 @@
   "uk": "/uk/koshtorys/",
   "ru": "/ru/smeta/"
 };</script>
-<script src="/assets/i18n.hr.js?v=20260808g"></script>
-<script src="/assets/i18n-runtime.js?v=20260808g"></script>
+<script src="/assets/i18n.hr.js?v=20260808h"></script>
+<script src="/assets/i18n-runtime.js?v=20260808h"></script>
 
-<script src="/assets/workspace.js?v=20260808g"></script>
-<script src="/assets/workspace-ui.js?v=20260808g"></script>
-<script src="/assets/main.js?v=20260808g"></script>
+<script src="/assets/workspace.js?v=20260808h"></script>
+<script src="/assets/workspace-ui.js?v=20260808h"></script>
+<script src="/assets/main.js?v=20260808h"></script>
 
 </body>
 </html>

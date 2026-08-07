@@ -149,6 +149,13 @@ const I18N_PAGES = {
     share_owner_note: "Wycenę przygotowano w aplikacji Materio.",
     share_empty: "Ta wycena jest pusta.",
 
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Popraw",
+    action_cancel: "Anuluj",
+    ws_add_line: "Dopisz pozycję ręcznie",
+    ws_add_line_d: "Robocizna, transport, materiał kupiony na oko — cokolwiek, czego nie liczy kalkulator.",
+    ws_unit_default: "szt.",
+
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
     cookiepage_title: "Pliki cookie i pamięć przeglądarki",
@@ -462,6 +469,13 @@ const I18N_PAGES = {
     share_total: "Total", share_refreshed: "Updated",
     share_owner_note: "This estimate was prepared in the Materio app.",
     share_empty: "This estimate is empty.",
+
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Edit",
+    action_cancel: "Cancel",
+    ws_add_line: "Add a line by hand",
+    ws_add_line_d: "Labour, delivery, something bought by eye — anything no calculator works out.",
+    ws_unit_default: "pc",
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
@@ -777,6 +791,13 @@ const I18N_PAGES = {
     share_owner_note: "Diese Kalkulation wurde in der Materio-App erstellt.",
     share_empty: "Diese Kalkulation ist leer.",
 
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Ändern",
+    action_cancel: "Abbrechen",
+    ws_add_line: "Position von Hand ergänzen",
+    ws_add_line_d: "Arbeitszeit, Lieferung, nach Augenmaß Gekauftes — alles, was kein Rechner ermittelt.",
+    ws_unit_default: "Stk.",
+
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
     cookiepage_title: "Cookies und Browser-Speicher",
@@ -1090,6 +1111,13 @@ const I18N_PAGES = {
     share_total: "Celkem", share_refreshed: "Aktualizováno",
     share_owner_note: "Rozpočet byl připraven v aplikaci Materio.",
     share_empty: "Tento rozpočet je prázdný.",
+
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Upravit",
+    action_cancel: "Zrušit",
+    ws_add_line: "Přidat položku ručně",
+    ws_add_line_d: "Práce, doprava, materiál koupený od oka — cokoli, co kalkulačka nepočítá.",
+    ws_unit_default: "ks",
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
@@ -1405,6 +1433,13 @@ const I18N_PAGES = {
     share_owner_note: "Rozpočet bol pripravený v aplikácii Materio.",
     share_empty: "Tento rozpočet je prázdny.",
 
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Upraviť",
+    action_cancel: "Zrušiť",
+    ws_add_line: "Pridať položku ručne",
+    ws_add_line_d: "Práca, doprava, materiál kúpený od oka — čokoľvek, čo kalkulačka nepočíta.",
+    ws_unit_default: "ks",
+
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
     cookiepage_title: "Cookies a úložisko prehliadača",
@@ -1718,6 +1753,13 @@ const I18N_PAGES = {
     share_total: "Total", share_refreshed: "Actualizat",
     share_owner_note: "Devizul a fost pregătit în aplicația Materio.",
     share_empty: "Acest deviz este gol.",
+
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Modifică",
+    action_cancel: "Anulează",
+    ws_add_line: "Adaugă o linie manual",
+    ws_add_line_d: "Manoperă, transport, ceva cumpărat din ochi — orice nu calculează un calculator.",
+    ws_unit_default: "buc",
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookie-uri",
@@ -2033,6 +2075,13 @@ const I18N_PAGES = {
     share_owner_note: "Troškovnik je pripremljen u aplikaciji Materio.",
     share_empty: "Ovaj troškovnik je prazan.",
 
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Uredi",
+    action_cancel: "Odustani",
+    ws_add_line: "Dodaj stavku ručno",
+    ws_add_line_d: "Rad, dostava, materijal kupljen od oka — bilo što što kalkulator ne računa.",
+    ws_unit_default: "kom",
+
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Kolačići",
     cookiepage_title: "Kolačići i pohrana u pregledniku",
@@ -2346,6 +2395,13 @@ const I18N_PAGES = {
     share_total: "Ukupno", share_refreshed: "Ažurirano",
     share_owner_note: "Predmer je pripremljen u aplikaciji Materio.",
     share_empty: "Ovaj predmer je prazan.",
+
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Izmeni",
+    action_cancel: "Otkaži",
+    ws_add_line: "Dodaj stavku ručno",
+    ws_add_line_d: "Rad, dostava, materijal kupljen od oka — bilo šta što kalkulator ne računa.",
+    ws_unit_default: "kom",
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Kolačići",
@@ -2661,6 +2717,13 @@ const I18N_PAGES = {
     share_owner_note: "Кошторис підготовано в застосунку Materio.",
     share_empty: "Цей кошторис порожній.",
 
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Змінити",
+    action_cancel: "Скасувати",
+    ws_add_line: "Додати позицію вручну",
+    ws_add_line_d: "Робота, доставка, матеріал куплений на око — усе, чого калькулятор не рахує.",
+    ws_unit_default: "шт.",
+
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
     cookiepage_title: "Файли cookie та сховище браузера",
@@ -2974,6 +3037,13 @@ const I18N_PAGES = {
     share_total: "Итого", share_refreshed: "Обновлено",
     share_owner_note: "Смета подготовлена в приложении Materio.",
     share_empty: "Эта смета пуста.",
+
+    /* Correcting an estimate line, and adding one the calculators cannot produce. */
+    ws_edit: "Изменить",
+    action_cancel: "Отмена",
+    ws_add_line: "Добавить позицию вручную",
+    ws_add_line_d: "Работа, доставка, материал купленный на глаз — всё, что калькулятор не считает.",
+    ws_unit_default: "шт.",
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",

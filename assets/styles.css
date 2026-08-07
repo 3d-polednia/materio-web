@@ -477,8 +477,12 @@ pre.formula {
   background: var(--surface-container); border: 1px solid var(--outline);
   border-radius: var(--radius-sm);
 }
+/* A formula line can be longer than the column (the waste line on the coverage
+   calculator is), and a sideways scrollbar hides the end of it on a phone. Wrap
+   instead, with the continuation indented so a wrapped line still reads as one. */
 pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: .86rem; line-height: 1.7; white-space: pre; }
+  font-size: .86rem; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere;
+  display: block; padding-left: 1.6em; text-indent: -1.6em; }
 
 /* Guides */
 .wrap.narrow { max-width: 760px; }
@@ -713,3 +717,16 @@ pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, m
 .table-scroll { overflow-x: auto; margin: 8px 0 4px; }
 .table-scroll table { min-width: 560px; }
 .table-scroll code { font-size: .84rem; overflow-wrap: anywhere; }
+
+/* An estimate line opened for correction: the cells become inputs in place, so the
+   row keeps its position and the table keeps its column widths. */
+.ws-row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.ws-editing input { width: 100%; padding: 7px 9px; font: inherit; font-size: .9rem;
+  border: 1px solid var(--outline); border-radius: 8px;
+  background: var(--surface); color: var(--on-bg); }
+.ws-editing input:focus { outline: 2px solid var(--olive); border-color: var(--olive); }
+.ws-editing .ws-qty { width: 5.5em; text-align: right; display: inline-block; }
+.ws-editing .ws-unit { width: 4.5em; display: inline-block; margin-left: 4px; }
+.ws-add-line { margin-top: 28px; }
+.ws-add-line h3 { margin-bottom: 4px; }
+.ws-add-line p { margin-bottom: 12px; font-size: .9rem; }

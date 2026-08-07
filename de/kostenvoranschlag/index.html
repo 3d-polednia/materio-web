@@ -68,7 +68,7 @@
 <meta name="twitter:title" content="Kostenvoranschlag — Materio">
 <meta name="twitter:description" content="Kostenvoranschlag online: Rechnerergebnisse in einer Liste mit Mengen und Kosten sammeln, drucken oder als PDF sichern. Ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -179,6 +179,18 @@
         <p class="muted ws-estimate-foot">Kalkulation aus Materio. Mengen sind auf ganze Gebinde aufgerundet; die Preise sind die von dir eingetragenen.</p>
       </article>
 
+      <div class="no-print ws-add-line">
+        <h3>Position von Hand ergänzen</h3>
+        <p class="muted">Arbeitszeit, Lieferung, nach Augenmaß Gekauftes — alles, was kein Rechner ermittelt.</p>
+        <form id="ws-line-form" class="inline-form">
+          <input id="ws-line-name" type="text" maxlength="120" placeholder="Position" required>
+          <input id="ws-line-qty" type="text" inputmode="decimal" value="1" aria-label="Menge">
+          <input id="ws-line-unit" type="text" maxlength="24" value="Stk." aria-label="Einheit">
+          <input id="ws-line-cost" type="text" inputmode="decimal" placeholder="Kosten" aria-label="Kosten">
+          <button type="submit" class="btn btn-primary btn-sm">Hinzufügen</button>
+        </form>
+      </div>
+
       <p class="ws-links no-print">
         <a class="btn btn-ghost" href="/de/projekte/">Projekte und Räume</a>
         <a class="btn btn-ghost" href="/de/rechner/">Alle Rechner</a>
@@ -262,12 +274,12 @@
   "uk": "/uk/koshtorys/",
   "ru": "/ru/smeta/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260808g"></script>
-<script src="/assets/i18n-runtime.js?v=20260808g"></script>
+<script src="/assets/i18n.de.js?v=20260808h"></script>
+<script src="/assets/i18n-runtime.js?v=20260808h"></script>
 
-<script src="/assets/workspace.js?v=20260808g"></script>
-<script src="/assets/workspace-ui.js?v=20260808g"></script>
-<script src="/assets/main.js?v=20260808g"></script>
+<script src="/assets/workspace.js?v=20260808h"></script>
+<script src="/assets/workspace-ui.js?v=20260808h"></script>
+<script src="/assets/main.js?v=20260808h"></script>
 
 </body>
 </html>

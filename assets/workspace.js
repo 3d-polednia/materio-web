@@ -254,6 +254,41 @@ function wsAddEstimation(r) {
   return row;
 }
 
+/**
+ * A line typed by hand rather than produced by a calculator: labour, delivery, a bag of
+ * something bought by eye. Same document as any other estimate line, so it syncs and
+ * prints with the rest; `calculationType` has to be one of the four the app knows, and
+ * SURFACE_COVERAGE is the closest thing to "no engine".
+ */
+function wsAddManualEstimation({ name, requiredUnits, unitLabel, costMajor }) {
+  return wsAddEstimation({
+    calcId: "coverage",
+    name,
+    requiredUnits,
+    unitLabel,
+    costMajor,
+    wastePercent: 0,
+    input: { manual: true },
+  });
+}
+
+/** Correct a line in place. Anything not passed keeps its current value. */
+function wsUpdateEstimation(id, fields) {
+  const data = wsLoad();
+  const row = data.estimations.find((e) => e.id === id);
+  if (!row) return;
+  if (fields.name !== undefined) row.name = String(fields.name).slice(0, 120);
+  if (fields.requiredUnits !== undefined) row.requiredUnits = Math.max(0, Math.round(Number(fields.requiredUnits) || 0));
+  if (fields.unitLabel !== undefined) row.unitLabel = String(fields.unitLabel).slice(0, 24);
+  if (fields.costMajor !== undefined) {
+    row.totalCostMinor = Math.max(0, wsMinor(fields.costMajor));
+    // The waste share is a percentage of the line, so it has to follow the new total.
+    row.wasteCostMinor = Math.round(row.totalCostMinor * (Number(row.wastePercentage) || 0) / 100);
+  }
+  row.updatedAt = Date.now();
+  wsSave(data);
+}
+
 function wsDeleteEstimation(id) {
   const data = wsLoad();
   const row = data.estimations.find((e) => e.id === id);
