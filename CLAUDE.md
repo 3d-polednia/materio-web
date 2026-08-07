@@ -115,10 +115,19 @@ Kotlin side of it. Change one, change all three.
 - They have no per-language URLs; they load the whole dictionary and translate in place.
 - `/p/<token>` cannot be a real directory, and GitHub Pages has no rewrites — `404.html`
   forwards `/p/<token>` to `/p/?t=<token>`.
-- **`assets/firebase-config.js` still has two placeholders** (`apiKey`, `appId`). Until the
-  owner pastes the real Web-app values from the Firebase console, `/app/` shows "Firebase
-  configuration missing" instead of a broken form. A Firebase Web apiKey is *not* a secret;
-  the security rules and the authorized-domains list are what protect the data.
+- **`assets/firebase-config.js` holds the live values** for the Web app registered in
+  project `materio-502513` (2026-08-07). A Firebase Web apiKey is *not* a secret — it
+  cannot be hidden in a browser app. The security rules and the authorized-domains list
+  are what protect the data. `FIREBASE_READY` still guards the placeholder case, so a
+  fork or a half-finished edit fails with a readable message instead of a dead form.
+- **Verified against the live backend** (2026-08-07, throwaway account, deleted after):
+  sign-up with the Web key works, the rules accept the document shape `assets/app.js`
+  sends, and they return 403 for a write to another account or an `updatedAt` that is
+  not an integer.
+- Chromium in the agent container cannot reach `gstatic.com` (the egress proxy resets
+  the connection), so `/app/` cannot be exercised end-to-end from a session here. Test
+  the page in a real browser; `curl` against the Firebase REST API works and is what the
+  verification above used.
 
 ---
 

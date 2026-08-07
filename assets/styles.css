@@ -202,6 +202,11 @@ section.block { padding: 68px 0; }
   display: none;
 }
 .result.show { display: block; }
+/* `.result.show` is an author rule, so it outranks the UA stylesheet's `[hidden]`
+   and an element carrying both would stay on screen — which is how /app/ managed to
+   show "Firebase configuration missing" over a perfectly good configuration. Any
+   element the JS hides with .hidden must actually disappear, whatever classes it has. */
+[hidden] { display: none !important; }
 .result.err { background: color-mix(in srgb, var(--error) 16%, var(--surface)); color: var(--error); }
 .result .big { font-size: 1.8rem; font-weight: 800; line-height: 1.1; }
 .result .rows { margin-top: 10px; display: grid; gap: 3px; font-size: .9rem; }
