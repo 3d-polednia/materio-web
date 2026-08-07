@@ -659,3 +659,35 @@ pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, m
   .ws-table th, .ws-table td { border-bottom: 1px solid #ccc; }
   @page { margin: 18mm 14mm; }
 }
+
+/* ---------------------------------------------------------------- the account page */
+.auth-links { display: flex; justify-content: space-between; gap: 16px; margin-top: 14px; font-size: .92rem; }
+.auth-sep { display: flex; align-items: center; gap: 12px; margin: 18px 0 14px;
+  color: var(--muted); font-size: .85rem; }
+.auth-sep::before, .auth-sep::after { content: ""; flex: 1; height: 1px; background: var(--outline); }
+.auth-google { width: 100%; justify-content: center; gap: 10px; }
+.auth-note { font-size: .85rem; margin-top: 16px; }
+
+.app-identity { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.app-identity b { overflow-wrap: anywhere; }
+.chip.warn { background: color-mix(in srgb, var(--error) 14%, var(--surface)); color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 34%, var(--outline)); }
+
+.app-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 22px;
+  border-bottom: 1px solid var(--outline); padding-bottom: 10px; }
+.app-tab { font: inherit; font-weight: 600; font-size: .92rem; cursor: pointer;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid transparent;
+  background: transparent; color: var(--muted); }
+.app-tab:hover { background: var(--surface-alt); color: var(--on-bg); }
+.app-tab[aria-selected="true"] { background: var(--olive); color: var(--on-primary); border-color: var(--olive); }
+
+.app-card { background: var(--surface); border: 1px solid var(--outline);
+  border-radius: var(--radius-sm); padding: 20px; margin-bottom: 16px; }
+.app-card h3 { margin: 0 0 6px; font-size: 1.02rem; }
+.app-card p { margin: 0 0 14px; font-size: .9rem; }
+/* Account deletion is irreversible, so it is set apart rather than sitting in the
+   same list as "change your password". */
+.app-card.danger { border-color: color-mix(in srgb, var(--error) 40%, var(--outline));
+  background: color-mix(in srgb, var(--error) 5%, var(--surface)); }
+.btn-danger { background: var(--error); color: #fff; }
+.btn-danger:hover { opacity: .92; }

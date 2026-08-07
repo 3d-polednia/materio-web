@@ -54,7 +54,7 @@
 <meta name="twitter:title" content="Moje projekty — Materio">
 <meta name="twitter:description" content="Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji Materio.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808b">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
 
 
 </head>
@@ -86,43 +86,126 @@
       <div id="app-auth" class="calc">
         <form id="auth-form" autocomplete="on">
           <div class="field">
-            <label for="auth-email" data-i18n="app_email">E-mail</label>
-            <input id="auth-email" type="email" autocomplete="email" required>
-          </div>
+    <label for="auth-email" data-i18n="app_email">E-mail</label>
+    <input id="auth-email" type="email" autocomplete="email" required>
+  </div>
           <div class="field">
-            <label for="auth-password" data-i18n="app_password">Hasło</label>
-            <input id="auth-password" type="password" autocomplete="current-password" minlength="6" required>
-          </div>
+    <label for="auth-password" data-i18n="app_password">Hasło</label>
+    <input id="auth-password" type="password" autocomplete="current-password" minlength="6" required>
+  </div>
           <button id="auth-submit" type="submit" class="btn btn-primary" data-i18n="app_signin">Zaloguj się</button>
         </form>
-        <p style="margin-top:14px">
+        <p class="auth-links">
+          <a href="#" id="auth-forgot" data-i18n="app_forgot">Nie pamiętam hasła</a>
           <a href="#" id="auth-switch" data-i18n="app_switch_signup">Nie masz konta? Załóż je</a>
         </p>
+        <div class="auth-sep"><span data-i18n="app_or">albo</span></div>
+        <button type="button" id="auth-google" class="btn btn-ghost auth-google">
+          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.1Z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.4 46 24 46Z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.5A22 22 0 0 0 2 24c0 3.6.9 6.9 2.5 9.9l7.3-5.7Z"/><path fill="#EA4335" d="M24 10.4c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 3.9 29.9 2 24 2 15.4 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9.4 12.2-9.4Z"/></svg><span data-i18n="app_google">Zaloguj przez Google</span>
+        </button>
+        <p class="muted auth-note" data-i18n="app_auth_note">Konto jest opcjonalne. Kalkulatory liczą bez logowania — konto potrzebne jest dopiero, żeby mieć te same projekty na telefonie i w przeglądarce.</p>
       </div>
 
       <div id="app-workspace" hidden>
         <div class="app-bar">
-          <span id="app-email-label" class="muted"></span>
+          <span class="app-identity">
+            <b id="app-email-label"></b>
+            <span id="app-provider" class="chip"></span>
+            <span id="app-verified" class="chip"></span>
+          </span>
           <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">Wyloguj</button>
         </div>
 
-        <h2 data-i18n="app_projects">Projekty</h2>
-        <form id="project-form" class="inline-form">
-          <input id="project-name" type="text" maxlength="120" placeholder="Nowy projekt" data-i18n-ph="app_new_project" required>
-          <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">Dodaj</button>
-        </form>
-        <ul id="project-list" class="data-list"></ul>
-        <p class="muted" style="font-size:.85rem" data-i18n="app_share_hint">Kto ma link, zobaczy wycenę bez logowania. Link wyłączysz w każdej chwili.</p>
+        <div class="app-tabs" role="tablist">
+          <button type="button" class="app-tab" role="tab" data-tab="projects" aria-selected="true" data-i18n="app_tab_projects">Projekty</button>
+          <button type="button" class="app-tab" role="tab" data-tab="rooms" aria-selected="false" data-i18n="app_tab_rooms">Pomieszczenia</button>
+          <button type="button" class="app-tab" role="tab" data-tab="sync" aria-selected="false" data-i18n="app_tab_sync">Synchronizacja</button>
+          <button type="button" class="app-tab" role="tab" data-tab="account" aria-selected="false" data-i18n="app_tab_account">Konto</button>
+        </div>
 
-        <h2 style="margin-top:32px" data-i18n="app_rooms">Pokoje</h2>
-        <form id="room-form" class="inline-form">
-          <input id="room-name" type="text" maxlength="120" placeholder="Nowy pokój" data-i18n-ph="app_new_room" required>
-          <input id="room-length" type="text" inputmode="decimal" value="5" aria-label="Długość (m)">
-          <input id="room-width" type="text" inputmode="decimal" value="4" aria-label="Szerokość (m)">
-          <input id="room-height" type="text" inputmode="decimal" value="2.6" aria-label="Wysokość (m)">
-          <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">Dodaj</button>
-        </form>
-        <ul id="room-list" class="data-list"></ul>
+        <section data-panel="projects" role="tabpanel">
+          <h2 data-i18n="app_projects">Projekty</h2>
+          <form id="project-form" class="inline-form">
+            <input id="project-name" type="text" maxlength="120" placeholder="Nowy projekt" data-i18n-ph="app_new_project" required>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">Dodaj</button>
+          </form>
+          <ul id="project-list" class="data-list"></ul>
+          <p class="muted" data-i18n="app_share_hint">Kto ma link, zobaczy wycenę bez logowania. Link wyłączysz w każdej chwili.</p>
+        </section>
+
+        <section data-panel="rooms" role="tabpanel" hidden>
+          <h2 data-i18n="app_rooms">Pokoje</h2>
+          <form id="room-form" class="inline-form">
+            <input id="room-name" type="text" maxlength="120" placeholder="Nowy pokój" data-i18n-ph="app_new_room" required>
+            <input id="room-length" type="text" inputmode="decimal" value="5" aria-label="Długość (m)">
+            <input id="room-width" type="text" inputmode="decimal" value="4" aria-label="Szerokość (m)">
+            <input id="room-height" type="text" inputmode="decimal" value="2.6" aria-label="Wysokość (m)">
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">Dodaj</button>
+          </form>
+          <ul id="room-list" class="data-list"></ul>
+        </section>
+
+        <section data-panel="sync" role="tabpanel" hidden>
+          <h2 data-i18n="app_sync_title">Synchronizacja z przeglądarką</h2>
+          <p class="muted" data-i18n="app_sync_d">Projekty, pomieszczenia i kosztorysy zapisane na stronie bez logowania leżą w tej przeglądarce. Tu przenosisz je na konto albo pobierasz z konta.</p>
+          <p id="app-sync-local" class="muted"></p>
+          <p class="ws-links">
+            <button type="button" id="app-sync-push" class="btn btn-primary btn-sm" data-i18n="app_sync_push">Wyślij z przeglądarki na konto</button>
+            <button type="button" id="app-sync-pull" class="btn btn-ghost btn-sm" data-i18n="app_sync_pull">Pobierz z konta do przeglądarki</button>
+          </p>
+          <p class="muted src-note" data-i18n="app_sync_note">Konflikty rozstrzyga nowszy zapis, tak samo jak między telefonem a chmurą.</p>
+        </section>
+
+        <section data-panel="account" role="tabpanel" hidden>
+          <h2 data-i18n="app_sec_title">Ustawienia konta</h2>
+
+          <div id="app-verify-row" class="app-card" hidden>
+            <p class="muted" data-i18n="app_verify_d">Potwierdź adres, żeby móc odzyskać hasło.</p>
+            <button type="button" id="app-verify-send" class="btn btn-ghost btn-sm" data-i18n="app_verify_send">Wyślij link potwierdzający</button>
+          </div>
+
+          <form id="email-form" class="app-card">
+            <h3 data-i18n="app_change_email">Zmień adres e-mail</h3>
+            <div class="field">
+    <label for="email-new" data-i18n="app_new_email">Nowy e-mail</label>
+    <input id="email-new" type="email" autocomplete="email" required>
+  </div>
+            <div class="field">
+    <label for="email-password" data-i18n="app_current_password">Obecne hasło</label>
+    <input id="email-password" type="password" autocomplete="current-password" required>
+  </div>
+            <button type="submit" class="btn btn-ghost btn-sm" data-i18n="app_save">Zapisz</button>
+          </form>
+
+          <form id="password-form" class="app-card">
+            <h3 data-i18n="app_change_password">Zmień hasło</h3>
+            <div class="field">
+    <label for="password-current" data-i18n="app_current_password">Obecne hasło</label>
+    <input id="password-current" type="password" autocomplete="current-password" required>
+  </div>
+            <div class="field">
+    <label for="password-new" data-i18n="app_new_password">Nowe hasło</label>
+    <input id="password-new" type="password" autocomplete="new-password" minlength="6" required>
+  </div>
+            <button type="submit" class="btn btn-ghost btn-sm" data-i18n="app_save">Zapisz</button>
+          </form>
+
+          <div class="app-card">
+            <h3 data-i18n="app_export">Pobierz swoje dane</h3>
+            <p class="muted" data-i18n="app_export_d">Cała zawartość konta jako plik JSON: projekty, pomieszczenia, wyceny i listy zakupów.</p>
+            <button type="button" id="app-export" class="btn btn-ghost btn-sm" data-i18n="app_export_btn">Pobierz JSON</button>
+          </div>
+
+          <div class="app-card danger">
+            <h3 data-i18n="app_delete_account">Usuń konto</h3>
+            <p class="muted" data-i18n="app_delete_account_d">Usuwamy konto razem z projektami, pomieszczeniami, wycenami i udostępnionymi linkami. Tego nie da się cofnąć. Dane w tej przeglądarce zostają — wyczyść je osobno.</p>
+            <div class="field" id="app-delete-password-field">
+              <label for="delete-password" data-i18n="app_current_password">Obecne hasło</label>
+              <input id="delete-password" type="password" autocomplete="current-password">
+            </div>
+            <button type="button" id="app-delete-account" class="btn btn-danger btn-sm" data-i18n="app_delete_account">Usuń konto</button>
+          </div>
+        </section>
       </div>
     </div>
   </section>
@@ -137,10 +220,11 @@
   </div>
 </footer>
 
-<script src="/assets/i18n.all.js?v=20260808b"></script>
-<script src="/assets/i18n-runtime.js?v=20260808b"></script>
-<script type="module" src="/assets/app.js?v=20260808b"></script>
-<script src="/assets/main.js?v=20260808b"></script>
+<script src="/assets/i18n.all.js?v=20260808c"></script>
+<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/workspace.js?v=20260808c"></script>
+<script type="module" src="/assets/app.js?v=20260808c"></script>
+<script src="/assets/main.js?v=20260808c"></script>
 
 </body>
 </html>

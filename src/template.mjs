@@ -143,6 +143,7 @@ ${bare ? main : `${header(lang, t)}\n${main}\n${footer(lang, t)}\n${consentBanne
 ${bare ? "" : `<script>window.MATERIO_ALTERNATES = ${altJson};</script>`}
 <script src="/assets/i18n.${bare ? "all" : lang}.js?v=${stamp}"></script>
 <script src="/assets/i18n-runtime.js?v=${stamp}"></script>
+${(p.classicScripts || []).map((s) => `<script src="${s}?v=${stamp}"></script>`).join("\n")}
 ${scripts.map((s) => {
     const attrs = s.endsWith(".mjs") || p.moduleScripts ? ' type="module"' : "";
     return `<script${attrs} src="${s}${s.includes("?") ? "" : `?v=${stamp}`}"></script>`;
