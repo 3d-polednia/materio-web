@@ -64,7 +64,7 @@
 <meta name="twitter:title" content="Lepidlo / malta — Stavební kalkulačky online | Materio">
 <meta name="twitter:description" content="Lepidlo / malta — bezplatná online kalkulačka. Spotřeba kg/m² → pytle. Stejný vzorec jako v aplikaci Materio pro Android, bez registrace.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260807f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -123,6 +123,7 @@
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Kalkulačky">
       <a href="/cs/kalkulacky/">Kalkulačky</a>
+      <a href="/cs/materialy/">Materiály</a>
       <a href="/cs/navody/">Návody</a>
       <a href="/cs/obchody/">Obchody</a>
       <a href="/app/" rel="nofollow">Můj účet</a>
@@ -146,10 +147,12 @@
         <div class="calc" data-calc="mortar" data-tab="trade">
       <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Lepidlo / malta</span></h2>
       <p class="desc">Spotřeba kg/m² → pytle.</p>
-      <div class="field"><label for="f-mortar-area">Plocha (m²)</label><input id="f-mortar-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-mortar-usage">Spotřeba (kg/m²)</label><input id="f-mortar-usage" type="text" inputmode="decimal" data-k="usage" value="5"></div><div class="field"><label for="f-mortar-bag">Pytel (kg)</label><input id="f-mortar-bag" type="text" inputmode="decimal" data-k="bag" value="25"></div><div class="field"><label for="f-mortar-price">Cena za kus/balení</label><input id="f-mortar-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Vybrat materiál</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-mortar-area">Plocha (m²)</label><input id="f-mortar-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-mortar-usage">Spotřeba (kg/m²)</label><input id="f-mortar-usage" type="text" inputmode="decimal" data-k="usage" value="5"></div><div class="field"><label for="f-mortar-bag">Pytel (kg)</label><input id="f-mortar-bag" type="text" inputmode="decimal" data-k="bag" value="25"></div><div class="field"><label for="f-mortar-price">Cena za kus/balení</label><input id="f-mortar-price" type="text" inputmode="decimal" data-k="price" value=""></div>
       <button type="button" class="btn btn-primary" data-run>Spočítat</button>
       <div class="result" data-result></div>
     </div>
+        <p class="muted src-note"><a href="/cs/materialy/">Katalog stavebních materiálů</a> — 16 materiálů v katalogu</p>
       </div>
       <div class="calc-page-how">
         <h2>Jak to počítáme</h2>
@@ -203,6 +206,7 @@ pytle = ⌈ kilogramy ÷ Pytel ⌉</code></pre>
         <h4>Produkt</h4>
         <ul>
           <li><a href="/cs/kalkulacky/">Všechny kalkulačky</a></li>
+          <li><a href="/cs/materialy/">Materiály</a></li>
           <li><a href="/cs/navody/">Návody</a></li>
           <li><a href="/cs/obchody/">Obchody</a></li>
           <li><a href="/cs/#faq">FAQ</a></li>
@@ -243,10 +247,12 @@ pytle = ⌈ kilogramy ÷ Pytel ⌉</code></pre>
   "uk": "/uk/kalkulyatory/kliy-rozchyn/",
   "ru": "/ru/kalkulyatory/kley-rastvor/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260807f"></script>
-<script src="/assets/i18n-runtime.js?v=20260807f"></script>
-<script src="/assets/calculators.js?v=20260807f"></script>
-<script src="/assets/main.js?v=20260807f"></script>
+<script src="/assets/i18n.cs.js?v=20260808a"></script>
+<script src="/assets/i18n-runtime.js?v=20260808a"></script>
+<script src="/assets/calculators.js?v=20260808a"></script>
+<script src="/assets/materials.js?v=20260808a"></script>
+<script src="/assets/materials-ui.js?v=20260808a"></script>
+<script src="/assets/main.js?v=20260808a"></script>
 
 </body>
 </html>

@@ -64,7 +64,7 @@
 <meta name="twitter:title" content="Croire liniară (1D) — Calculatoare pentru construcții online | Materio">
 <meta name="twitter:description" content="Croire liniară (1D) — calculator online gratuit. Bare, profile, țevi: câte și cum tai. Aceeași formulă ca în aplicația Materio pentru Android, fără cont.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260807f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -123,6 +123,7 @@
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Calculatoare">
       <a href="/ro/calculatoare/">Calculatoare</a>
+      <a href="/ro/materiale/">Materiale</a>
       <a href="/ro/ghiduri/">Ghiduri</a>
       <a href="/ro/magazine/">Magazine</a>
       <a href="/app/" rel="nofollow">Contul meu</a>
@@ -146,12 +147,14 @@
         <div class="calc" data-calc="linear" data-tab="cutting">
       <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Croire liniară (1D)</span></h2>
       <p class="desc">Bare, profile, țevi: câte și cum tai.</p>
-      <div class="field"><label for="f-linear-stock">Lungime bară (mm)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" value="6000"></div><div class="field"><label for="f-linear-kerf">Grosime tăietură (mm)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" value="3"></div><div class="field"><label for="f-linear-cuts">Piese: lungime×buc (mm)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts">2400x4
+      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Alege materialul</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-linear-stock">Lungime bară (mm)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" value="6000"></div><div class="field"><label for="f-linear-kerf">Grosime tăietură (mm)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" value="3"></div><div class="field"><label for="f-linear-cuts">Piese: lungime×buc (mm)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts">2400x4
 1800x6
 900x8</textarea></div><div class="field"><label for="f-linear-price">Preț pe bucată/ambalaj</label><input id="f-linear-price" type="text" inputmode="decimal" data-k="price" value=""></div>
       <button type="button" class="btn btn-primary" data-run>Calculează</button>
       <div class="result" data-result></div>
     </div>
+        <p class="muted src-note"><a href="/ro/materiale/">Catalog de materiale de construcții</a> — 39 materiale în catalog</p>
       </div>
       <div class="calc-page-how">
         <h2>Cum calculăm</h2>
@@ -208,6 +211,7 @@ pierderi reale = (Lungime bară × bare − Σ elemente) ÷ (Lungime bară × ba
         <h4>Produs</h4>
         <ul>
           <li><a href="/ro/calculatoare/">Toate calculatoarele</a></li>
+          <li><a href="/ro/materiale/">Materiale</a></li>
           <li><a href="/ro/ghiduri/">Ghiduri</a></li>
           <li><a href="/ro/magazine/">Magazine</a></li>
           <li><a href="/ro/#faq">FAQ</a></li>
@@ -248,10 +252,12 @@ pierderi reale = (Lungime bară × bare − Σ elemente) ÷ (Lungime bară × ba
   "uk": "/uk/kalkulyatory/rozkriy-liniynyi-1d/",
   "ru": "/ru/kalkulyatory/raskroy-lineynyy-1d/"
 };</script>
-<script src="/assets/i18n.ro.js?v=20260807f"></script>
-<script src="/assets/i18n-runtime.js?v=20260807f"></script>
-<script src="/assets/calculators.js?v=20260807f"></script>
-<script src="/assets/main.js?v=20260807f"></script>
+<script src="/assets/i18n.ro.js?v=20260808a"></script>
+<script src="/assets/i18n-runtime.js?v=20260808a"></script>
+<script src="/assets/calculators.js?v=20260808a"></script>
+<script src="/assets/materials.js?v=20260808a"></script>
+<script src="/assets/materials-ui.js?v=20260808a"></script>
+<script src="/assets/main.js?v=20260808a"></script>
 
 </body>
 </html>

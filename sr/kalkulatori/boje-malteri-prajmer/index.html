@@ -64,7 +64,7 @@
 <meta name="twitter:title" content="Boje, malteri, prajmeri — Građevinski kalkulatori onlajn | Materio">
 <meta name="twitter:description" content="Boje, malteri, prajmeri — besplatan onlajn kalkulator. Pakovanja po površini, sa slojevima. Ista formula kao u aplikaciji Materio za Android, bez registracije.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260807f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -123,6 +123,7 @@
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Kalkulatori">
       <a href="/sr/kalkulatori/">Kalkulatori</a>
+      <a href="/sr/materijali/">Materijali</a>
       <a href="/sr/vodici/">Vodiči</a>
       <a href="/sr/prodavnice/">Prodavnice</a>
       <a href="/app/" rel="nofollow">Moj nalog</a>
@@ -146,10 +147,12 @@
         <div class="calc" data-calc="coverage" data-tab="surface">
       <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Boje, malteri, prajmeri</span></h2>
       <p class="desc">Pakovanja po površini, sa slojevima.</p>
-      <div class="chips"><button type="button" class="chip" data-preset="0">Boja 10 l</button><button type="button" class="chip" data-preset="1">Prajmer 5 l</button><button type="button" class="chip" data-preset="2">Gletkit 20 kg</button><button type="button" class="chip" data-preset="3">Lepak C2 25 kg</button></div><div class="field"><label for="f-coverage-area">Površina (m²)</label><input id="f-coverage-area" type="text" inputmode="decimal" data-k="area" value="25"></div><div class="field"><label for="f-coverage-cov">Izdašnost (m²/pak.)</label><input id="f-coverage-cov" type="text" inputmode="decimal" data-k="cov" value="40"></div><div class="field"><label for="f-coverage-coats">Broj slojeva</label><input id="f-coverage-coats" type="text" inputmode="decimal" data-k="coats" value="2"></div><div class="field"><label for="f-coverage-openings">Otvori (m²)</label><input id="f-coverage-openings" type="text" inputmode="decimal" data-k="openings" value="0"></div><div class="field"><label for="f-coverage-price">Cena po komadu/pak.</label><input id="f-coverage-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Izaberi materijal</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Boja 10 l</button><button type="button" class="chip" data-preset="1">Prajmer 5 l</button><button type="button" class="chip" data-preset="2">Gletkit 20 kg</button><button type="button" class="chip" data-preset="3">Lepak C2 25 kg</button></div><div class="field"><label for="f-coverage-area">Površina (m²)</label><input id="f-coverage-area" type="text" inputmode="decimal" data-k="area" value="25"></div><div class="field"><label for="f-coverage-cov">Izdašnost (m²/pak.)</label><input id="f-coverage-cov" type="text" inputmode="decimal" data-k="cov" value="40"></div><div class="field"><label for="f-coverage-coats">Broj slojeva</label><input id="f-coverage-coats" type="text" inputmode="decimal" data-k="coats" value="2"></div><div class="field"><label for="f-coverage-openings">Otvori (m²)</label><input id="f-coverage-openings" type="text" inputmode="decimal" data-k="openings" value="0"></div><div class="field"><label for="f-coverage-price">Cena po komadu/pak.</label><input id="f-coverage-price" type="text" inputmode="decimal" data-k="price" value=""></div>
       <button type="button" class="btn btn-primary" data-run>Izračunaj</button>
       <div class="result" data-result></div>
     </div>
+        <p class="muted src-note"><a href="/sr/materijali/">Katalog građevinskih materijala</a> — 48 materijala u katalogu</p>
       </div>
       <div class="calc-page-how">
         <h2>Kako računamo</h2>
@@ -205,6 +208,7 @@ stvarni otpad = (pakovanja × Izdašnost − površina za farbanje) ÷ (pakovanj
         <h4>Proizvod</h4>
         <ul>
           <li><a href="/sr/kalkulatori/">Svi kalkulatori</a></li>
+          <li><a href="/sr/materijali/">Materijali</a></li>
           <li><a href="/sr/vodici/">Vodiči</a></li>
           <li><a href="/sr/prodavnice/">Prodavnice</a></li>
           <li><a href="/sr/#faq">FAQ</a></li>
@@ -245,10 +249,12 @@ stvarni otpad = (pakovanja × Izdašnost − površina za farbanje) ÷ (pakovanj
   "uk": "/uk/kalkulyatory/farba-shtukaturka-hrunt/",
   "ru": "/ru/kalkulyatory/kraska-shtukaturka-grunt/"
 };</script>
-<script src="/assets/i18n.sr.js?v=20260807f"></script>
-<script src="/assets/i18n-runtime.js?v=20260807f"></script>
-<script src="/assets/calculators.js?v=20260807f"></script>
-<script src="/assets/main.js?v=20260807f"></script>
+<script src="/assets/i18n.sr.js?v=20260808a"></script>
+<script src="/assets/i18n-runtime.js?v=20260808a"></script>
+<script src="/assets/calculators.js?v=20260808a"></script>
+<script src="/assets/materials.js?v=20260808a"></script>
+<script src="/assets/materials-ui.js?v=20260808a"></script>
+<script src="/assets/main.js?v=20260808a"></script>
 
 </body>
 </html>

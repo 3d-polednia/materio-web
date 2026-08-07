@@ -64,7 +64,7 @@
 <meta name="twitter:title" content="Paint, plaster, primer — Construction calculators online | Materio">
 <meta name="twitter:description" content="Paint, plaster, primer — free online calculator. Packs per area, with coats. The same formula as in the Materio app for Android, no sign-up.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260807f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -123,6 +123,7 @@
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Calculators">
       <a href="/en/calculators/">Calculators</a>
+      <a href="/en/materials/">Materials</a>
       <a href="/en/guides/">Guides</a>
       <a href="/en/stores/">Stores</a>
       <a href="/app/" rel="nofollow">My account</a>
@@ -146,10 +147,12 @@
         <div class="calc" data-calc="coverage" data-tab="surface">
       <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Paint, plaster, primer</span></h2>
       <p class="desc">Packs per area, with coats.</p>
-      <div class="chips"><button type="button" class="chip" data-preset="0">Paint 10 l</button><button type="button" class="chip" data-preset="1">Primer 5 l</button><button type="button" class="chip" data-preset="2">Filler 20 kg</button><button type="button" class="chip" data-preset="3">Adhesive C2 25 kg</button></div><div class="field"><label for="f-coverage-area">Area (m²)</label><input id="f-coverage-area" type="text" inputmode="decimal" data-k="area" value="25"></div><div class="field"><label for="f-coverage-cov">Coverage (m²/pack)</label><input id="f-coverage-cov" type="text" inputmode="decimal" data-k="cov" value="40"></div><div class="field"><label for="f-coverage-coats">Number of coats</label><input id="f-coverage-coats" type="text" inputmode="decimal" data-k="coats" value="2"></div><div class="field"><label for="f-coverage-openings">Openings (m²)</label><input id="f-coverage-openings" type="text" inputmode="decimal" data-k="openings" value="0"></div><div class="field"><label for="f-coverage-price">Price per piece/pack</label><input id="f-coverage-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Pick a material</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Paint 10 l</button><button type="button" class="chip" data-preset="1">Primer 5 l</button><button type="button" class="chip" data-preset="2">Filler 20 kg</button><button type="button" class="chip" data-preset="3">Adhesive C2 25 kg</button></div><div class="field"><label for="f-coverage-area">Area (m²)</label><input id="f-coverage-area" type="text" inputmode="decimal" data-k="area" value="25"></div><div class="field"><label for="f-coverage-cov">Coverage (m²/pack)</label><input id="f-coverage-cov" type="text" inputmode="decimal" data-k="cov" value="40"></div><div class="field"><label for="f-coverage-coats">Number of coats</label><input id="f-coverage-coats" type="text" inputmode="decimal" data-k="coats" value="2"></div><div class="field"><label for="f-coverage-openings">Openings (m²)</label><input id="f-coverage-openings" type="text" inputmode="decimal" data-k="openings" value="0"></div><div class="field"><label for="f-coverage-price">Price per piece/pack</label><input id="f-coverage-price" type="text" inputmode="decimal" data-k="price" value=""></div>
       <button type="button" class="btn btn-primary" data-run>Calculate</button>
       <div class="result" data-result></div>
     </div>
+        <p class="muted src-note"><a href="/en/materials/">Building material catalogue</a> — 48 materials in the catalogue</p>
       </div>
       <div class="calc-page-how">
         <h2>How we calculate it</h2>
@@ -205,6 +208,7 @@ actual waste = (packs × Coverage − area to cover) ÷ (packs × Coverage) × 1
         <h4>Product</h4>
         <ul>
           <li><a href="/en/calculators/">All calculators</a></li>
+          <li><a href="/en/materials/">Materials</a></li>
           <li><a href="/en/guides/">Guides</a></li>
           <li><a href="/en/stores/">Stores</a></li>
           <li><a href="/en/#faq">FAQ</a></li>
@@ -245,10 +249,12 @@ actual waste = (packs × Coverage − area to cover) ÷ (packs × Coverage) × 1
   "uk": "/uk/kalkulyatory/farba-shtukaturka-hrunt/",
   "ru": "/ru/kalkulyatory/kraska-shtukaturka-grunt/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260807f"></script>
-<script src="/assets/i18n-runtime.js?v=20260807f"></script>
-<script src="/assets/calculators.js?v=20260807f"></script>
-<script src="/assets/main.js?v=20260807f"></script>
+<script src="/assets/i18n.en.js?v=20260808a"></script>
+<script src="/assets/i18n-runtime.js?v=20260808a"></script>
+<script src="/assets/calculators.js?v=20260808a"></script>
+<script src="/assets/materials.js?v=20260808a"></script>
+<script src="/assets/materials-ui.js?v=20260808a"></script>
+<script src="/assets/main.js?v=20260808a"></script>
 
 </body>
 </html>

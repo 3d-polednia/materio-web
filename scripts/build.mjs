@@ -25,12 +25,12 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
-  urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores,
+  urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
 } from "../src/site.mjs";
 import { page } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  renderFormula, FAQ_KEYS,
+  materialsMain, renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
 import { appMain, shareMain } from "../src/app-pages.mjs";
@@ -39,7 +39,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260807f";
+const STAMP = "20260808a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -51,11 +51,38 @@ function evalScript(file, returns) {
 
 const { I18N, LANGS: LANG_META } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
+const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
 const { CALCS, ENGINES } = evalScript("assets/calculators.js", ["CALCS", "ENGINES"]);
+const CATALOG = evalScript("assets/materials.js", [
+  "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "matName", "matNote", "primaryCalcFor",
+]);
 
-/** The merged dictionary: the original keys plus the ones only sub-pages use. */
+/** The merged dictionary: the base keys, the sub-page keys and the material names. */
 const DICT = {};
-for (const lang of LANGS) DICT[lang] = { ...(I18N[lang] || {}), ...(I18N_PAGES[lang] || {}) };
+for (const lang of LANGS) {
+  DICT[lang] = {
+    ...(I18N[lang] || {}),
+    ...(I18N_PAGES[lang] || {}),
+    ...(I18N_MATERIALS[lang] || {}),
+  };
+}
+
+/**
+ * What the page templates get to see of the catalogue. `src/pages.mjs` is plain ESM and
+ * assets/materials.js is a browser script, so the bridge is built here rather than
+ * imported: one object with the lookups the pages need, nothing else.
+ */
+const CAT = {
+  all: CATALOG.MATERIALS,
+  total: CATALOG.MATERIALS.length,
+  categories: CATALOG.MAT_CATS_USED,
+  byCategory: (c) => CATALOG.MATERIALS.filter((m) => m.c === c),
+  countFor: (calcId) => CATALOG.materialsForCalc(calcId).length,
+  primary: (m) => CATALOG.primaryCalcFor(m),
+  name: (m, lang, t) => CATALOG.matName(m, lang, (k) => t(k)),
+  note: (m, lang, t) => CATALOG.matNote(m, lang, (k) => t(k)),
+  fold: (s) => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+};
 
 /* ------------------------------------------------------------------ validation */
 
@@ -108,10 +135,27 @@ function validate() {
     }
   }
 
+  // Every material needs a name in every language, and a calculator to open from the
+  // catalogue page. A term key that nobody translated would otherwise render as "m_gres".
+  for (const m of CATALOG.MATERIALS) {
+    if (!(m.t in DICT[DEFAULT_LANG])) problems.push(`material "${m.id}" has no term key "${m.t}"`);
+    if (m.layer && !(m.layer in DICT[DEFAULT_LANG])) problems.push(`material "${m.id}" has no layer key "${m.layer}"`);
+    if (!CATALOG.primaryCalcFor(m)) problems.push(`material "${m.id}" (kind "${m.k}") has no primary calculator`);
+    if (!CATALOG.MAT_CATS_USED.includes(m.c)) problems.push(`material "${m.id}" has unknown category "${m.c}"`);
+  }
+  for (const c of CATALOG.MAT_CATS_USED) {
+    if (!(`cat_${c}` in DICT[DEFAULT_LANG])) problems.push(`category "${c}" has no cat_ key`);
+  }
+  const matIds = new Set();
+  for (const m of CATALOG.MATERIALS) {
+    if (matIds.has(m.id)) problems.push(`duplicate material id "${m.id}"`);
+    matIds.add(m.id);
+  }
+
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -140,6 +184,9 @@ const written = [];
 
 /** Map of every language's URL for one logical page, for hreflang and the switcher. */
 const alternatesFor = (fn) => Object.fromEntries(LANGS.map((l) => [l, fn(l)]));
+
+/** Every page carrying a calculator form needs the engines and the material picker. */
+const CALC_SCRIPTS = ["/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js"];
 
 /* ------------------------------------------------------------------ worked examples */
 
@@ -239,12 +286,12 @@ function buildHome() {
       description: t("meta_desc"),
       path: urlHome(lang),
       alternates: alt,
-      main: homeMain(lang, t, CALCS),
+      main: homeMain(lang, t, CALCS, CAT),
       jsonld: [appLd(lang, t), {
         "@context": "https://schema.org", "@type": "Organization",
         name: "Materio", url: BASE + "/", logo: `${BASE}/assets/icon-512.png`,
       }, faqLd(t)],
-      scripts: ["/assets/calculators.js"],
+      scripts: CALC_SCRIPTS,
     }));
   }
 }
@@ -285,6 +332,7 @@ function buildCalculatorPages() {
       const { main, ld } = calcPageMain(calc, lang, t, {
         example: workedExample(calc, lang, t),
         formula: renderFormula(CALC_META[calc.id].formula, lang, t),
+        materials: CAT.countFor(calc.id),
       });
       write(join(urlCalc(lang, calc.id), "index.html").replace(/^\//, ""), page({
         lang, t, stamp: STAMP,
@@ -294,7 +342,7 @@ function buildCalculatorPages() {
         alternates: alt,
         main,
         jsonld: [ld, calcLd(calc, lang, t)],
-        scripts: ["/assets/calculators.js"],
+        scripts: CALC_SCRIPTS,
       }));
     }
   }
@@ -329,6 +377,23 @@ function buildGuides() {
         main, jsonld: ld,
       }));
     }
+  }
+}
+
+function buildMaterials() {
+  const alt = alternatesFor(urlMaterials);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = materialsMain(lang, t, CAT);
+    write(join(urlMaterials(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("matpage_title")} — Materio`,
+      description: t("matpage_meta"),
+      path: urlMaterials(lang),
+      alternates: alt,
+      main, jsonld: ld,
+      scripts: ["/assets/materials.js", "/assets/materials-ui.js"],
+    }));
   }
 }
 
@@ -389,6 +454,7 @@ function buildSitemap() {
   for (const lang of LANGS) {
     add(urlHome(lang), lang === DEFAULT_LANG ? "1.0" : "0.8", "monthly");
     add(urlCalcIndex(lang), "0.9", "monthly");
+    add(urlMaterials(lang), "0.8", "monthly");
     add(urlGuideIndex(lang), "0.7", "monthly");
     add(urlStores(lang), "0.7", "monthly");
     for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly");
@@ -445,6 +511,7 @@ buildDictionaries();
 buildHome();
 buildCalculatorPages();
 buildGuides();
+buildMaterials();
 buildStores();
 buildPrivatePages();
 buildSitemap();

@@ -7,7 +7,7 @@
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, SECTION,
-  urlHome, urlCalcIndex, urlGuideIndex, urlStores,
+  urlHome, urlCalcIndex, urlGuideIndex, urlStores, urlMaterials,
   URL_PRIVACY, URL_APP, PLAY_URL,
 } from "./site.mjs";
 
@@ -161,6 +161,7 @@ function header(lang, t) {
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">${ICON.menu}</button>
     <nav id="nav-links" class="nav-links" aria-label="${esc(t("nav_calc"))}">
       <a href="${urlCalcIndex(lang)}">${esc(t("nav_calc"))}</a>
+      <a href="${urlMaterials(lang)}">${esc(t("nav_materials"))}</a>
       <a href="${urlGuideIndex(lang)}">${esc(t("nav_guides"))}</a>
       <a href="${urlStores(lang)}">${esc(t("nav_stores"))}</a>
       <a href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
@@ -183,6 +184,7 @@ function footer(lang, t) {
         <h4>${esc(t("foot_product"))}</h4>
         <ul>
           <li><a href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a></li>
+          <li><a href="${urlMaterials(lang)}">${esc(t("nav_materials"))}</a></li>
           <li><a href="${urlGuideIndex(lang)}">${esc(t("foot_guides"))}</a></li>
           <li><a href="${urlStores(lang)}">${esc(t("nav_stores"))}</a></li>
           <li><a href="${urlHome(lang)}#faq">FAQ</a></li>

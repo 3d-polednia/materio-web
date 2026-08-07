@@ -74,10 +74,12 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | Authored (edit these) | Generated (never edit — `build.mjs` overwrites) |
 |---|---|
 | `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
-| `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**` and their per-language twins |
-| `assets/calculators.js` — engines, ported 1:1 from Kotlin | `app/index.html`, `p/index.html` |
-| `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js` | `assets/i18n.<lang>.js`, `assets/i18n.all.js` |
-| `assets/app.js`, `share.js`, `firebase-config.js` | `sitemap.xml` |
+| `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**`, `materialy/**` and their per-language twins |
+| `assets/i18n-materials.js` — material names, 10 languages | `app/index.html`, `p/index.html` |
+| `assets/calculators.js` — engines, ported 1:1 from Kotlin | `assets/i18n.<lang>.js`, `assets/i18n.all.js` |
+| `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `sitemap.xml` |
+| `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js` | |
+| `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
 | `src/*.mjs` — site map, templates, page bodies, formulas | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
 
@@ -97,6 +99,9 @@ src/app-pages.mjs     /app/ and /p/ (noindex, translated in the browser)
 assets/styles.css     Olive Green Material 3 design system
 assets/i18n.js        10-language dictionary (build input)
 assets/i18n-pages.js  Sub-page dictionary, same 10 languages (build input)
+assets/i18n-materials.js  Material names/terms, same 10 languages (build input)
+assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
+assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
 assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/
 assets/calculators.js Calculation engines ported 1:1 from the Kotlin app + form wiring
 assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
@@ -144,7 +149,8 @@ Kotlin side of it. Change one, change all three.
   `max-age=600`, so without it a visitor can run new markup against a stale stylesheet.
   `privacy-policy.html` and `404.html` are hand-written — bump their `?v=` by hand too.
 - **Ten languages, always.** `pl, en, de, cs, sk, ro, hr, sr, uk, ru`. Every key must
-  exist in all ten, in **both** `assets/i18n.js` and `assets/i18n-pages.js`. Check with
+  exist in all ten, in **each** of `assets/i18n.js`, `assets/i18n-pages.js` and
+  `assets/i18n-materials.js`. Check with
   `node scripts/build.mjs --check`, which fails and names the missing keys.
 - **Polish HTML matching `I18N.pl` is now automatic** — the pages are generated *from* the
   dictionary, so they cannot drift. Edit the dictionary, rebuild, commit the output. Never
@@ -154,8 +160,8 @@ Kotlin side of it. Change one, change all three.
 - **No marketing slop.** No hype headings that say nothing, no claims nobody can
   verify ("in a minute", "the best"), no em dash used as a rhetorical pause. Every
   number on the page must be traceable to the code: the calculator count comes
-  from `CALCS` in `calculators.js`, the material count from `Catalog*.kt` in the
-  app repo. If a claim cannot be checked, cut it.
+  from `CALCS` in `calculators.js`, the material count from `MATERIALS` in
+  `assets/materials.js` (which is the port of `Catalog*.kt` in the app repo). If a claim cannot be checked, cut it.
 - **Truth over marketing.** The production app carries ads (Google AdMob) and uses
   Google Maps/location; the site says so plainly instead of claiming "no ads". The
   site itself loads Google Analytics (GA4, Consent Mode v2) which stays denied

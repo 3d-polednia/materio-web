@@ -7,7 +7,7 @@
 
 import { esc, calcIcon, playBadge, breadcrumbs } from "./template.mjs";
 import {
-  urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores,
+  urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -16,8 +16,16 @@ const TABS = ["surface", "cutting", "trade", "framing"];
 
 /* ------------------------------------------------------------------ calculator form */
 
-/** The interactive card for one calculator, with every label already in `lang`. */
-export function calcCard(calc, t, { heading = "h2" } = {}) {
+const PICK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>';
+
+/**
+ * The interactive card for one calculator, with every label already in `lang`.
+ *
+ * `materials` is how many catalogue entries can pre-fill this calculator; when there are
+ * none (volume of concrete, blocks per m²) the picker button is left out entirely rather
+ * than opening an empty dialog.
+ */
+export function calcCard(calc, t, { heading = "h2", materials = 0 } = {}) {
   const fields = calc.fields.map((f) => {
     const label = esc(t(f.label));
     if (f.sel) {
@@ -36,10 +44,15 @@ export function calcCard(calc, t, { heading = "h2" } = {}) {
         `<button type="button" class="chip" data-preset="${i}">${esc(p.k ? t(p.k) : p.l)}</button>`).join("")}</div>`
     : "";
 
+  const picker = materials
+    ? `<button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open>${PICK_ICON}<span>${esc(t("mat_pick"))}</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p>`
+    : "";
+
   return `<div class="calc" data-calc="${calc.id}" data-tab="${calc.tab}">
       <${heading}><span class="ico">${calcIcon}</span><span>${esc(t(`c_${calc.id}_t`))}</span></${heading}>
       <p class="desc">${esc(t(`c_${calc.id}_d`))}</p>
-      ${chips}${fields}
+      ${picker}${chips}${fields}
       <button type="button" class="btn btn-primary" data-run>${esc(t("act_calc"))}</button>
       <div class="result" data-result></div>
     </div>`;
@@ -59,7 +72,7 @@ function calcLinkCard(calc, lang, t) {
 
 /* ------------------------------------------------------------------ home */
 
-export function homeMain(lang, t, calcs) {
+export function homeMain(lang, t, calcs, cat) {
   const byTab = TABS.map((tab) => ({ tab, list: calcs.filter((c) => c.tab === tab) }));
 
   return `<main id="main">
@@ -80,7 +93,7 @@ export function homeMain(lang, t, calcs) {
       </div>
     </div>
     <div class="hero-media">
-      ${calcCard(calcs.find((c) => c.id === "coverage"), t, { heading: "h2" })}
+      ${calcCard(calcs.find((c) => c.id === "coverage"), t, { heading: "h2", materials: cat.countFor("coverage") })}
     </div>
   </div>
 </section>
@@ -90,7 +103,7 @@ export function homeMain(lang, t, calcs) {
     <div class="stat-band">
       <div class="stat"><div class="num">${esc(t("stat_price"))}</div><div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
       <div class="stat"><div class="num">${calcs.length}</div><div class="lbl">${esc(t("stat_calc_lbl"))}</div></div>
-      <div class="stat"><div class="num">150+</div><div class="lbl">${esc(t("stat_catalog_lbl"))}</div></div>
+      <div class="stat"><div class="num">${cat.total}</div><div class="lbl">${esc(t("stat_catalog_lbl"))}</div></div>
       <div class="stat"><div class="num">10</div><div class="lbl">${esc(t("stat_langs_lbl"))}</div></div>
     </div>
   </div>
@@ -138,7 +151,10 @@ export function homeMain(lang, t, calcs) {
     </div>
     ${byTab.map(({ tab, list }) => `<h3 class="calc-group">${esc(t(`tab_${tab}`))}</h3>
     <div class="calc-links">${list.map((c) => calcLinkCard(c, lang, t)).join("")}</div>`).join("\n    ")}
-    <p class="center" style="margin-top:24px"><a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a></p>
+    <p class="center" style="margin-top:24px">
+      <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+      <a class="btn btn-ghost" href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>
+    </p>
   </div>
 </section>
 
@@ -390,7 +406,7 @@ export function renderFormula(lines, lang, t) {
   });
 }
 
-export function calcPageMain(calc, lang, t, { example, formula }) {
+export function calcPageMain(calc, lang, t, { example, formula, materials = 0 }) {
   const meta = CALC_META[calc.id];
   const name = t(`c_${calc.id}_t`);
   const crumbs = breadcrumbs([
@@ -422,7 +438,8 @@ export function calcPageMain(calc, lang, t, { example, formula }) {
   <section class="block alt">
     <div class="wrap calc-page">
       <div class="calc-page-form">
-        ${calcCard(calc, t, { heading: "h2" })}
+        ${calcCard(calc, t, { heading: "h2", materials })}
+        ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a> — ${esc(materials)} ${esc(t("mat_count_label"))}</p>` : ""}
       </div>
       <div class="calc-page-how">
         <h2>${esc(t("hwc_title"))}</h2>
@@ -543,6 +560,84 @@ export function guideMain(guide, lang, t) {
 </main>`;
 
   return { main, ld: [crumbs.ld, howTo] };
+}
+
+/* ------------------------------------------------------------------ materials */
+
+/**
+ * The whole catalogue as one indexable page per language.
+ *
+ * Every row is real HTML, grouped by shop aisle, so "ile paneli AC4 w paczce" can find
+ * the answer without running the picker. The numbers come from the same catalogue the
+ * picker writes into the form, so the page cannot document a value the calculator
+ * does not use.
+ *
+ * @param {object} cat  the catalogue bridge built in scripts/build.mjs
+ */
+export function materialsMain(lang, t, cat) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("matpage_title"), path: urlMaterials(lang) },
+  ]);
+
+  const blocks = cat.categories.map((c) => {
+    const rows = cat.byCategory(c).map((m) => {
+      const name = cat.name(m, lang, t);
+      const calcId = cat.primary(m);
+      const href = calcId ? `${urlCalc(lang, calcId)}?m=${encodeURIComponent(m.id)}` : urlCalcIndex(lang);
+      return `<li id="${esc(m.id)}" data-find="${esc(cat.fold(`${name} ${m.id}`))}">
+          <span class="mat-item">
+            <b>${esc(name)}</b>
+            <span class="muted">${esc(cat.note(m, lang, t))}</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="${href}">${esc(t("mat_open_calc"))}</a>
+        </li>`;
+    }).join("");
+
+    return `<section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-${c}">${esc(t(`cat_${c}`))}</h2>
+        <ul class="mat-page-list">${rows}</ul>
+      </div>
+    </section>`;
+  }).join("\n  ");
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("matpage_title"))}</h1>
+      <p class="lead">${esc(t("matpage_lead"))}</p>
+    </div>
+  </section>
+
+  <div id="materials-page">
+    <section class="block alt">
+      <div class="wrap">
+        <label class="fld-label" for="matpage-search">${esc(t("mat_search_ph"))}</label>
+        <input id="matpage-search" type="search" class="mat-search" placeholder="${esc(t("mat_search_ph"))}" autocomplete="off">
+        <p class="muted" style="margin-top:10px">${cat.total} ${esc(t("mat_count_label"))} · ${esc(t("matpage_note"))}</p>
+        <p class="muted" id="matpage-empty" hidden>${esc(t("mat_none"))}</p>
+      </div>
+    </section>
+    ${blocks}
+  </div>
+
+  ${appNote(t)}
+</main>`;
+
+  const ld = [crumbs.ld, {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: t("matpage_title"),
+    numberOfItems: cat.total,
+    itemListElement: cat.all.map((m, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: cat.name(m, lang, t),
+    })),
+  }];
+  return { main, ld };
 }
 
 /* ------------------------------------------------------------------ stores */

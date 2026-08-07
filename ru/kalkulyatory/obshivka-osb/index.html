@@ -64,7 +64,7 @@
 <meta name="twitter:title" content="Обшивка (OSB/доски) — Строительные калькуляторы онлайн | Materio">
 <meta name="twitter:description" content="Обшивка (OSB/доски) — бесплатный онлайн-калькулятор. Сколько листов на покрытие. Та же формула, что и в приложении Materio для Android, без регистрации.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260807f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -123,6 +123,7 @@
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Калькуляторы">
       <a href="/ru/kalkulyatory/">Калькуляторы</a>
+      <a href="/ru/materialy/">Материалы</a>
       <a href="/ru/rukovodstva/">Руководства</a>
       <a href="/ru/magaziny/">Магазины</a>
       <a href="/app/" rel="nofollow">Мой аккаунт</a>
@@ -146,10 +147,12 @@
         <div class="calc" data-calc="sheathing" data-tab="framing">
       <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Обшивка (OSB/доски)</span></h2>
       <p class="desc">Сколько листов на покрытие.</p>
-      <div class="field"><label for="f-sheathing-area">Площадь (м²)</label><input id="f-sheathing-area" type="text" inputmode="decimal" data-k="area" value="30"></div><div class="field"><label for="f-sheathing-pieceW">Ширина плиты (мм)</label><input id="f-sheathing-pieceW" type="text" inputmode="decimal" data-k="pieceW" value="1250"></div><div class="field"><label for="f-sheathing-pieceL">Длина плиты (мм)</label><input id="f-sheathing-pieceL" type="text" inputmode="decimal" data-k="pieceL" value="2500"></div><div class="field"><label for="f-sheathing-waste">Запас (%)</label><input id="f-sheathing-waste" type="text" inputmode="decimal" data-k="waste" value="10"></div><div class="field"><label for="f-sheathing-price">Цена за штуку/упак.</label><input id="f-sheathing-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Выбрать материал</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-sheathing-area">Площадь (м²)</label><input id="f-sheathing-area" type="text" inputmode="decimal" data-k="area" value="30"></div><div class="field"><label for="f-sheathing-pieceW">Ширина плиты (мм)</label><input id="f-sheathing-pieceW" type="text" inputmode="decimal" data-k="pieceW" value="1250"></div><div class="field"><label for="f-sheathing-pieceL">Длина плиты (мм)</label><input id="f-sheathing-pieceL" type="text" inputmode="decimal" data-k="pieceL" value="2500"></div><div class="field"><label for="f-sheathing-waste">Запас (%)</label><input id="f-sheathing-waste" type="text" inputmode="decimal" data-k="waste" value="10"></div><div class="field"><label for="f-sheathing-price">Цена за штуку/упак.</label><input id="f-sheathing-price" type="text" inputmode="decimal" data-k="price" value=""></div>
       <button type="button" class="btn btn-primary" data-run>Посчитать</button>
       <div class="result" data-result></div>
     </div>
+        <p class="muted src-note"><a href="/ru/materialy/">Каталог строительных материалов</a> — 34 материалов в каталоге</p>
       </div>
       <div class="calc-page-how">
         <h2>Как мы это считаем</h2>
@@ -203,6 +206,7 @@
         <h4>Продукт</h4>
         <ul>
           <li><a href="/ru/kalkulyatory/">Все калькуляторы</a></li>
+          <li><a href="/ru/materialy/">Материалы</a></li>
           <li><a href="/ru/rukovodstva/">Руководства</a></li>
           <li><a href="/ru/magaziny/">Магазины</a></li>
           <li><a href="/ru/#faq">FAQ</a></li>
@@ -243,10 +247,12 @@
   "uk": "/uk/kalkulyatory/obshyvka-osb/",
   "ru": "/ru/kalkulyatory/obshivka-osb/"
 };</script>
-<script src="/assets/i18n.ru.js?v=20260807f"></script>
-<script src="/assets/i18n-runtime.js?v=20260807f"></script>
-<script src="/assets/calculators.js?v=20260807f"></script>
-<script src="/assets/main.js?v=20260807f"></script>
+<script src="/assets/i18n.ru.js?v=20260808a"></script>
+<script src="/assets/i18n-runtime.js?v=20260808a"></script>
+<script src="/assets/calculators.js?v=20260808a"></script>
+<script src="/assets/materials.js?v=20260808a"></script>
+<script src="/assets/materials-ui.js?v=20260808a"></script>
+<script src="/assets/main.js?v=20260808a"></script>
 
 </body>
 </html>

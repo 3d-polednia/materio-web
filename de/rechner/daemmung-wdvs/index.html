@@ -64,7 +64,7 @@
 <meta name="twitter:title" content="Dämmung (WDVS) — Baurechner online | Materio">
 <meta name="twitter:description" content="Dämmung (WDVS) — kostenloser Online-Rechner. EPS, Dübel, Kleber, Gewebe. Dieselbe Formel wie in der Materio-App für Android, ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260807f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -123,6 +123,7 @@
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Rechner">
       <a href="/de/rechner/">Rechner</a>
+      <a href="/de/materialien/">Materialien</a>
       <a href="/de/ratgeber/">Ratgeber</a>
       <a href="/de/baumaerkte/">Märkte</a>
       <a href="/app/" rel="nofollow">Mein Konto</a>
@@ -146,10 +147,12 @@
         <div class="calc" data-calc="insulation" data-tab="trade">
       <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Dämmung (WDVS)</span></h2>
       <p class="desc">EPS, Dübel, Kleber, Gewebe.</p>
-      <div class="field"><label for="f-insulation-area">Fläche (m²)</label><input id="f-insulation-area" type="text" inputmode="decimal" data-k="area" value="80"></div><div class="field"><label for="f-insulation-foamThk">EPS-Dicke (cm)</label><input id="f-insulation-foamThk" type="text" inputmode="decimal" data-k="foamThk" value="15"></div><div class="field"><label for="f-insulation-dowels">Dübel pro m²</label><input id="f-insulation-dowels" type="text" inputmode="decimal" data-k="dowels" value="6"></div><div class="field"><label for="f-insulation-adhesive">Kleber (kg/m²)</label><input id="f-insulation-adhesive" type="text" inputmode="decimal" data-k="adhesive" value="5"></div><div class="field"><label for="f-insulation-price">Preis je Stück/Gebinde</label><input id="f-insulation-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-insulation-area">Fläche (m²)</label><input id="f-insulation-area" type="text" inputmode="decimal" data-k="area" value="80"></div><div class="field"><label for="f-insulation-foamThk">EPS-Dicke (cm)</label><input id="f-insulation-foamThk" type="text" inputmode="decimal" data-k="foamThk" value="15"></div><div class="field"><label for="f-insulation-dowels">Dübel pro m²</label><input id="f-insulation-dowels" type="text" inputmode="decimal" data-k="dowels" value="6"></div><div class="field"><label for="f-insulation-adhesive">Kleber (kg/m²)</label><input id="f-insulation-adhesive" type="text" inputmode="decimal" data-k="adhesive" value="5"></div><div class="field"><label for="f-insulation-price">Preis je Stück/Gebinde</label><input id="f-insulation-price" type="text" inputmode="decimal" data-k="price" value=""></div>
       <button type="button" class="btn btn-primary" data-run>Berechnen</button>
       <div class="result" data-result></div>
     </div>
+        <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a> — 13 Materialien im Katalog</p>
       </div>
       <div class="calc-page-how">
         <h2>So rechnen wir</h2>
@@ -206,6 +209,7 @@ Gewebe = Fläche × 1,10 m²</code></pre>
         <h4>Produkt</h4>
         <ul>
           <li><a href="/de/rechner/">Alle Rechner</a></li>
+          <li><a href="/de/materialien/">Materialien</a></li>
           <li><a href="/de/ratgeber/">Ratgeber</a></li>
           <li><a href="/de/baumaerkte/">Märkte</a></li>
           <li><a href="/de/#faq">FAQ</a></li>
@@ -246,10 +250,12 @@ Gewebe = Fläche × 1,10 m²</code></pre>
   "uk": "/uk/kalkulyatory/uteplennya-etics/",
   "ru": "/ru/kalkulyatory/uteplenie-etics/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260807f"></script>
-<script src="/assets/i18n-runtime.js?v=20260807f"></script>
-<script src="/assets/calculators.js?v=20260807f"></script>
-<script src="/assets/main.js?v=20260807f"></script>
+<script src="/assets/i18n.de.js?v=20260808a"></script>
+<script src="/assets/i18n-runtime.js?v=20260808a"></script>
+<script src="/assets/calculators.js?v=20260808a"></script>
+<script src="/assets/materials.js?v=20260808a"></script>
+<script src="/assets/materials-ui.js?v=20260808a"></script>
+<script src="/assets/main.js?v=20260808a"></script>
 
 </body>
 </html>

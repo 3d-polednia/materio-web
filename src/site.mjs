@@ -47,6 +47,10 @@ export const SECTION = {
     pl: "sklepy", en: "stores", de: "baumaerkte", cs: "obchody", sk: "obchody",
     ro: "magazine", hr: "trgovine", sr: "prodavnice", uk: "magazyny", ru: "magaziny",
   },
+  materials: {
+    pl: "materialy", en: "materials", de: "materialien", cs: "materialy", sk: "materialy",
+    ro: "materiale", hr: "materijali", sr: "materijali", uk: "materialy", ru: "materialy",
+  },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
@@ -185,6 +189,7 @@ export const urlCalc = (lang, id) => `${urlCalcIndex(lang)}${CALC_SLUG[id][lang]
 export const urlGuideIndex = (lang) => `${prefix(lang)}/${SECTION.guides[lang]}/`;
 export const urlGuide = (lang, guide) => `${urlGuideIndex(lang)}${guide.slug[lang]}/`;
 export const urlStores = (lang) => `${prefix(lang)}/${SECTION.stores[lang]}/`;
+export const urlMaterials = (lang) => `${prefix(lang)}/${SECTION.materials[lang]}/`;
 
 /** Privacy policy, the workspace and the shared-project view are single, language-neutral pages. */
 export const URL_PRIVACY = "/privacy-policy.html";

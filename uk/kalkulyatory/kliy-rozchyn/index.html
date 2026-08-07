@@ -64,7 +64,7 @@
 <meta name="twitter:title" content="Клей / розчин — Будівельні калькулятори онлайн | Materio">
 <meta name="twitter:description" content="Клей / розчин — безкоштовний онлайн-калькулятор. Витрата кг/м² → мішки. Та сама формула, що й у застосунку Materio для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260807f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -123,6 +123,7 @@
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Калькулятори">
       <a href="/uk/kalkulyatory/">Калькулятори</a>
+      <a href="/uk/materialy/">Матеріали</a>
       <a href="/uk/porady/">Поради</a>
       <a href="/uk/magazyny/">Магазини</a>
       <a href="/app/" rel="nofollow">Мій акаунт</a>
@@ -146,10 +147,12 @@
         <div class="calc" data-calc="mortar" data-tab="trade">
       <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Клей / розчин</span></h2>
       <p class="desc">Витрата кг/м² → мішки.</p>
-      <div class="field"><label for="f-mortar-area">Площа (м²)</label><input id="f-mortar-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-mortar-usage">Витрата (кг/м²)</label><input id="f-mortar-usage" type="text" inputmode="decimal" data-k="usage" value="5"></div><div class="field"><label for="f-mortar-bag">Мішок (кг)</label><input id="f-mortar-bag" type="text" inputmode="decimal" data-k="bag" value="25"></div><div class="field"><label for="f-mortar-price">Ціна за штуку/упак.</label><input id="f-mortar-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-mortar-area">Площа (м²)</label><input id="f-mortar-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-mortar-usage">Витрата (кг/м²)</label><input id="f-mortar-usage" type="text" inputmode="decimal" data-k="usage" value="5"></div><div class="field"><label for="f-mortar-bag">Мішок (кг)</label><input id="f-mortar-bag" type="text" inputmode="decimal" data-k="bag" value="25"></div><div class="field"><label for="f-mortar-price">Ціна за штуку/упак.</label><input id="f-mortar-price" type="text" inputmode="decimal" data-k="price" value=""></div>
       <button type="button" class="btn btn-primary" data-run>Порахувати</button>
       <div class="result" data-result></div>
     </div>
+        <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a> — 16 матеріалів у каталозі</p>
       </div>
       <div class="calc-page-how">
         <h2>Як ми це рахуємо</h2>
@@ -203,6 +206,7 @@
         <h4>Продукт</h4>
         <ul>
           <li><a href="/uk/kalkulyatory/">Усі калькулятори</a></li>
+          <li><a href="/uk/materialy/">Матеріали</a></li>
           <li><a href="/uk/porady/">Поради</a></li>
           <li><a href="/uk/magazyny/">Магазини</a></li>
           <li><a href="/uk/#faq">FAQ</a></li>
@@ -243,10 +247,12 @@
   "uk": "/uk/kalkulyatory/kliy-rozchyn/",
   "ru": "/ru/kalkulyatory/kley-rastvor/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260807f"></script>
-<script src="/assets/i18n-runtime.js?v=20260807f"></script>
-<script src="/assets/calculators.js?v=20260807f"></script>
-<script src="/assets/main.js?v=20260807f"></script>
+<script src="/assets/i18n.uk.js?v=20260808a"></script>
+<script src="/assets/i18n-runtime.js?v=20260808a"></script>
+<script src="/assets/calculators.js?v=20260808a"></script>
+<script src="/assets/materials.js?v=20260808a"></script>
+<script src="/assets/materials-ui.js?v=20260808a"></script>
+<script src="/assets/main.js?v=20260808a"></script>
 
 </body>
 </html>
