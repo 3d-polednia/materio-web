@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Građevinski kalkulatori onlajn — Materio</title>
 <meta name="description" content="Besplatni građevinski kalkulatori onlajn: boje, pločice, paneli, tapete, beton, malteri, fug mase, izolacija, GK pregrade i sečenje 1D/2D. Bez registracije.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Građevinski kalkulatori onlajn — Materio">
 <meta name="twitter:description" content="Besplatni građevinski kalkulatori onlajn: boje, pločice, paneli, tapete, beton, malteri, fug mase, izolacija, GK pregrade i sečenje 1D/2D. Bez registracije.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -199,9 +203,9 @@
       <a href="/sr/projekti/">Projekti</a>
       <a href="/sr/vodici/">Vodiči</a>
       <a href="/sr/prodavnice/">Prodavnice</a>
-      <a href="/app/" rel="nofollow">Moj nalog</a>
+      <a href="/sr/aplikacija/">Aplikacija</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Preuzmi</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Moj nalog</a>
     </nav>
   </div>
 </header>
@@ -372,6 +376,7 @@
         <h4>Pravne informacije</h4>
         <ul>
           <li><a href="/privacy-policy.html">Politika privatnosti</a></li>
+          <li><a href="/sr/aplikacija/">Aplikacija</a></li>
           <li><a href="/app/" rel="nofollow">Moj nalog</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -403,11 +408,11 @@
   "uk": "/uk/kalkulyatory/",
   "ru": "/ru/kalkulyatory/"
 };</script>
-<script src="/assets/i18n.sr.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.sr.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
 
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

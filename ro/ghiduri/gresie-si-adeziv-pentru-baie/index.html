@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Câtă gresie și cât adeziv pentru baie — Materio</title>
 <meta name="description" content="Pardoseala și pereții în metri pătrați, rezervă pentru tăieri, adeziv și chit de rosturi transformate în saci.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Câtă gresie și cât adeziv pentru baie — Materio">
 <meta name="twitter:description" content="Pardoseala și pereții în metri pătrați, rezervă pentru tăieri, adeziv și chit de rosturi transformate în saci.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -131,9 +135,9 @@
       <a href="/ro/proiecte/">Proiecte</a>
       <a href="/ro/ghiduri/">Ghiduri</a>
       <a href="/ro/magazine/">Magazine</a>
-      <a href="/app/" rel="nofollow">Contul meu</a>
+      <a href="/ro/aplicatie/">Aplicația</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Descarcă</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Contul meu</a>
     </nav>
   </div>
 </header>
@@ -191,6 +195,7 @@
         <h4>Informații legale</h4>
         <ul>
           <li><a href="/privacy-policy.html">Politica de confidențialitate</a></li>
+          <li><a href="/ro/aplicatie/">Aplicația</a></li>
           <li><a href="/app/" rel="nofollow">Contul meu</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -222,11 +227,11 @@
   "uk": "/uk/porady/plytka-i-kliy-u-vannu/",
   "ru": "/ru/rukovodstva/plitka-i-kley-v-vannuyu/"
 };</script>
-<script src="/assets/i18n.ro.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.ro.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
 
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

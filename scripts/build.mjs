@@ -24,14 +24,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  BASE, LANGS, DEFAULT_LANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
+  BASE, LANGS, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate,
+  urlProjects, urlEstimate, urlAndroid,
 } from "../src/site.mjs";
 import { page } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, projectsMain, estimateMain, renderFormula, FAQ_KEYS,
+  materialsMain, projectsMain, estimateMain, androidMain, renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
 import { appMain, shareMain } from "../src/app-pages.mjs";
@@ -40,7 +40,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260808c";
+const STAMP = "20260808e";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -156,7 +156,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -404,6 +404,22 @@ function buildMaterials() {
   }
 }
 
+function buildAndroidPage() {
+  const alt = alternatesFor(urlAndroid);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = androidMain(lang, t, CALCS, CAT);
+    write(join(urlAndroid(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("apppage_title")} \u2014 Materio`,
+      description: t("apppage_meta"),
+      path: urlAndroid(lang),
+      alternates: alt,
+      main, jsonld: ld,
+    }));
+  }
+}
+
 function buildWorkspacePages() {
   const projAlt = alternatesFor(urlProjects);
   const estAlt = alternatesFor(urlEstimate);
@@ -486,32 +502,52 @@ function buildPrivatePages() {
   }));
 }
 
+/**
+ * sitemap.xml, with the hreflang set repeated on every entry.
+ *
+ * The HTML already carries <link rel="alternate" hreflang>, which is what Google reads
+ * first; declaring the same set in the sitemap is the second supported channel and the
+ * one that survives a page being fetched from cache. Every alternate group has to list
+ * every member of the group, including the page itself — a one-way declaration is
+ * ignored — so each URL carries the whole map plus x-default.
+ */
 function buildSitemap() {
   const today = new Date().toISOString().slice(0, 10);
   const urls = [];
-  const add = (loc, priority, changefreq) => urls.push({ loc, priority, changefreq });
+  const add = (loc, priority, changefreq, alternates) =>
+    urls.push({ loc, priority, changefreq, alternates });
 
   for (const lang of LANGS) {
-    add(urlHome(lang), lang === DEFAULT_LANG ? "1.0" : "0.8", "monthly");
-    add(urlCalcIndex(lang), "0.9", "monthly");
-    add(urlMaterials(lang), "0.8", "monthly");
-    add(urlProjects(lang), "0.6", "monthly");
-    add(urlEstimate(lang), "0.7", "monthly");
-    add(urlGuideIndex(lang), "0.7", "monthly");
-    add(urlStores(lang), "0.7", "monthly");
-    for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly");
-    for (const g of GUIDES) add(urlGuide(lang, g), "0.6", "monthly");
+    add(urlHome(lang), lang === DEFAULT_LANG ? "1.0" : "0.8", "monthly", alternatesFor(urlHome));
+    add(urlCalcIndex(lang), "0.9", "monthly", alternatesFor(urlCalcIndex));
+    add(urlMaterials(lang), "0.8", "monthly", alternatesFor(urlMaterials));
+    add(urlAndroid(lang), "0.8", "monthly", alternatesFor(urlAndroid));
+    add(urlProjects(lang), "0.6", "monthly", alternatesFor(urlProjects));
+    add(urlEstimate(lang), "0.7", "monthly", alternatesFor(urlEstimate));
+    add(urlGuideIndex(lang), "0.7", "monthly", alternatesFor(urlGuideIndex));
+    add(urlStores(lang), "0.7", "monthly", alternatesFor(urlStores));
+    for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly", alternatesFor((l) => urlCalc(l, c.id)));
+    for (const g of GUIDES) add(urlGuide(lang, g), "0.6", "monthly", alternatesFor((l) => urlGuide(l, g)));
   }
   add("/privacy-policy.html", "0.3", "yearly");
 
   // /app/ and /p/ stay out: they are noindex, and a sitemap entry contradicts that.
+  const alternateLinks = (map) => {
+    if (!map) return "";
+    return "\n" + LANGS
+      .map((l) => `    <xhtml:link rel="alternate" hreflang="${HREFLANG[l]}" href="${BASE}${map[l]}"/>`)
+      .concat([`    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE}${map[DEFAULT_LANG]}"/>`])
+      .join("\n");
+  };
+
   const body = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.map((u) => `  <url>
     <loc>${BASE}${u.loc}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
+    <priority>${u.priority}</priority>${alternateLinks(u.alternates)}
   </url>`).join("\n")}
 </urlset>
 `;
@@ -554,6 +590,7 @@ buildHome();
 buildCalculatorPages();
 buildGuides();
 buildMaterials();
+buildAndroidPage();
 buildWorkspacePages();
 buildStores();
 buildPrivatePages();

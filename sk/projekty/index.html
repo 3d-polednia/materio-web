@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projekty a miestnosti — Materio</title>
 <meta name="description" content="Projekty a miestnosti v Materio: ulož rozmery miestnosti raz a kalkulačky doplnia plochu podlahy, stien alebo stropu. Bez registrácie, dáta zostávajú v prehliadači.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Projekty a miestnosti — Materio">
 <meta name="twitter:description" content="Projekty a miestnosti v Materio: ulož rozmery miestnosti raz a kalkulačky doplnia plochu podlahy, stien alebo stropu. Bez registrácie, dáta zostávajú v prehliadači.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -99,9 +103,9 @@
       <a href="/sk/projekty/">Projekty</a>
       <a href="/sk/navody/">Návody</a>
       <a href="/sk/obchody/">Obchody</a>
-      <a href="/app/" rel="nofollow">Môj účet</a>
+      <a href="/sk/aplikacia/">Aplikácia</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Stiahnuť</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Môj účet</a>
     </nav>
   </div>
 </header>
@@ -174,6 +178,7 @@
         <h4>Právne informácie</h4>
         <ul>
           <li><a href="/privacy-policy.html">Ochrana súkromia</a></li>
+          <li><a href="/sk/aplikacia/">Aplikácia</a></li>
           <li><a href="/app/" rel="nofollow">Môj účet</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -205,12 +210,12 @@
   "uk": "/uk/proekty/",
   "ru": "/ru/proekty/"
 };</script>
-<script src="/assets/i18n.sk.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.sk.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/workspace.js?v=20260808c"></script>
-<script src="/assets/workspace-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/workspace.js?v=20260808e"></script>
+<script src="/assets/workspace-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

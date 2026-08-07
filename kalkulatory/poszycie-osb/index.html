@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Poszycie (OSB/deski) — Kalkulatory budowlane online | Materio</title>
 <meta name="description" content="Poszycie (OSB/deski) — darmowy kalkulator online. Ile arkuszy na pokrycie. Ten sam wzór co w aplikacji Materio na Androida, bez rejestracji.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Poszycie (OSB/deski) — Kalkulatory budowlane online | Materio">
 <meta name="twitter:description" content="Poszycie (OSB/deski) — darmowy kalkulator online. Ile arkuszy na pokrycie. Ten sam wzór co w aplikacji Materio na Androida, bez rejestracji.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -127,9 +131,9 @@
       <a href="/projekty/">Projekty</a>
       <a href="/poradniki/">Poradniki</a>
       <a href="/sklepy/">Sklepy</a>
-      <a href="/app/" rel="nofollow">Moje konto</a>
+      <a href="/aplikacja/">Aplikacja</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Pobierz</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Moje konto</a>
     </nav>
   </div>
 </header>
@@ -219,6 +223,7 @@ arkusze = ⌈ Powierzchnia × (1 + Zapas ÷ 100) ÷ pole arkusza ⌉</code></pre
         <h4>Informacje prawne</h4>
         <ul>
           <li><a href="/privacy-policy.html">Polityka prywatności</a></li>
+          <li><a href="/aplikacja/">Aplikacja</a></li>
           <li><a href="/app/" rel="nofollow">Moje konto</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -250,15 +255,15 @@ arkusze = ⌈ Powierzchnia × (1 + Zapas ÷ 100) ÷ pole arkusza ⌉</code></pre
   "uk": "/uk/kalkulyatory/obshyvka-osb/",
   "ru": "/ru/kalkulyatory/obshivka-osb/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.pl.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/calculators.js?v=20260808c"></script>
-<script src="/assets/materials.js?v=20260808c"></script>
-<script src="/assets/materials-ui.js?v=20260808c"></script>
-<script src="/assets/workspace.js?v=20260808c"></script>
-<script src="/assets/workspace-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/calculators.js?v=20260808e"></script>
+<script src="/assets/materials.js?v=20260808e"></script>
+<script src="/assets/materials-ui.js?v=20260808e"></script>
+<script src="/assets/workspace.js?v=20260808e"></script>
+<script src="/assets/workspace-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

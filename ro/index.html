@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Materio — calculator și optimizator de materiale de construcții pentru Android</title>
 <meta name="description" content="Calculator gratuit pentru construcții: vopsea, tencuială, gresie, parchet, tapet și debitare 1D/2D. Calculează materialul, cumpără cât îți trebuie, redu pierderile. Hartă magazine, proiecte, deviz PDF. Calculează offline, cont opțional, 10 limbi.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Materio — calculator și optimizator de materiale de construcții pentru Android">
 <meta name="twitter:description" content="Calculator gratuit pentru construcții: vopsea, tencuială, gresie, parchet, tapet și debitare 1D/2D. Calculează materialul, cumpără cât îți trebuie, redu pierderile. Hartă magazine, proiecte, deviz PDF. Calculează offline, cont opțional, 10 limbi.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -191,9 +195,9 @@
       <a href="/ro/proiecte/">Proiecte</a>
       <a href="/ro/ghiduri/">Ghiduri</a>
       <a href="/ro/magazine/">Magazine</a>
-      <a href="/app/" rel="nofollow">Contul meu</a>
+      <a href="/ro/aplicatie/">Aplicația</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Descarcă</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Contul meu</a>
     </nav>
   </div>
 </header>
@@ -252,7 +256,7 @@
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></div><h3>Calculatoare de materiale</h3><p>Vopsea, tencuială, adeziv, faianță, panouri, gresie, tapet. Suprafața și pierderea în ambalaje întregi.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg></div><h3>Optimizator de croire</h3><p>Croire 1D și 2D prin first-fit. Câte bare sau plăci să cumperi, cu tăietură și pierdere incluse.</p></div>
-      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Catalog de materiale</h3><p>Peste 150 de materiale cu dimensiuni reale și pierdere. Alegi din listă, orice valoare rămâne editabilă.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Catalog de materiale</h3><p>Tot catalogul de materiale, cu dimensiuni reale, randament pe ambalaj și pierderi. Alegi din listă, orice valoare rămâne editabilă.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></div><h3>Camere</h3><p>Introdu dimensiunile camerei o dată și obții pardoseala, pereții, tavanul și perimetrul. De acolo mergi direct la material.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Proiecte și devize</h3><p>Aduni calculele într-un proiect, vezi costul total și pierderea, exporți devizul în PDF.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Harta magazinelor</h3><p>Găsește magazine de bricolaj și depozite după locație și primești traseul spre cel mai apropiat.</p></div>
@@ -573,6 +577,7 @@
         <h4>Informații legale</h4>
         <ul>
           <li><a href="/privacy-policy.html">Politica de confidențialitate</a></li>
+          <li><a href="/ro/aplicatie/">Aplicația</a></li>
           <li><a href="/app/" rel="nofollow">Contul meu</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -604,15 +609,15 @@
   "uk": "/uk/",
   "ru": "/ru/"
 };</script>
-<script src="/assets/i18n.ro.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.ro.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/calculators.js?v=20260808c"></script>
-<script src="/assets/materials.js?v=20260808c"></script>
-<script src="/assets/materials-ui.js?v=20260808c"></script>
-<script src="/assets/workspace.js?v=20260808c"></script>
-<script src="/assets/workspace-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/calculators.js?v=20260808e"></script>
+<script src="/assets/materials.js?v=20260808e"></script>
+<script src="/assets/materials-ui.js?v=20260808e"></script>
+<script src="/assets/workspace.js?v=20260808e"></script>
+<script src="/assets/workspace-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

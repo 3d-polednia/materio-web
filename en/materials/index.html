@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Building material catalogue — Materio</title>
 <meta name="description" content="Building material catalogue: tiles, flooring, paints, renders, adhesives, insulation, boards, profiles and pipes. Dimensions, coverage per package and waste — the data the Materio calculators fill the form with.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Building material catalogue — Materio">
 <meta name="twitter:description" content="Building material catalogue: tiles, flooring, paints, renders, adhesives, insulation, boards, profiles and pipes. Dimensions, coverage per package and waste — the data the Materio calculators fill the form with.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -914,9 +918,9 @@
       <a href="/en/projects/">Projects</a>
       <a href="/en/guides/">Guides</a>
       <a href="/en/stores/">Stores</a>
-      <a href="/app/" rel="nofollow">My account</a>
+      <a href="/en/android-app/">The app</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Download</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">My account</a>
     </nav>
   </div>
 </header>
@@ -2026,6 +2030,7 @@
         <h4>Legal</h4>
         <ul>
           <li><a href="/privacy-policy.html">Privacy policy</a></li>
+          <li><a href="/en/android-app/">The app</a></li>
           <li><a href="/app/" rel="nofollow">My account</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -2057,12 +2062,12 @@
   "uk": "/uk/materialy/",
   "ru": "/ru/materialy/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.en.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/materials.js?v=20260808c"></script>
-<script src="/assets/materials-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/materials.js?v=20260808e"></script>
+<script src="/assets/materials-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

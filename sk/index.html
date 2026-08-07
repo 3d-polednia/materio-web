@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Materio — kalkulačka a optimalizátor stavebného materiálu pre Android</title>
 <meta name="description" content="Bezplatná stavebná kalkulačka: farby, omietky, obklady, panely, tapety a rez 1D/2D. Spočítaj materiál, kúp len čo potrebuješ, zníž odpad. Mapa obchodov, projekty, rozpočet do PDF. Počíta offline, účet voliteľný, 10 jazykov.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Materio — kalkulačka a optimalizátor stavebného materiálu pre Android">
 <meta name="twitter:description" content="Bezplatná stavebná kalkulačka: farby, omietky, obklady, panely, tapety a rez 1D/2D. Spočítaj materiál, kúp len čo potrebuješ, zníž odpad. Mapa obchodov, projekty, rozpočet do PDF. Počíta offline, účet voliteľný, 10 jazykov.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -191,9 +195,9 @@
       <a href="/sk/projekty/">Projekty</a>
       <a href="/sk/navody/">Návody</a>
       <a href="/sk/obchody/">Obchody</a>
-      <a href="/app/" rel="nofollow">Môj účet</a>
+      <a href="/sk/aplikacia/">Aplikácia</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Stiahnuť</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Môj účet</a>
     </nav>
   </div>
 </header>
@@ -252,7 +256,7 @@
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></div><h3>Kalkulačky materiálu</h3><p>Farby, omietky, lepidlá, obklady, panely, dlažba, tapety. Plocha a prerez v celých baleniach.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg></div><h3>Optimalizácia rezu</h3><p>Rez 1D a 2D metódou first-fit. Koľko tyčí alebo dosiek kúpiť, vrátane prerezu a odpadu.</p></div>
-      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Katalóg materiálu</h3><p>Vyše 150 materiálov so skutočnými rozmermi a prerezom. Vyberieš zo zoznamu, každú hodnotu môžeš prepísať.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Katalóg materiálu</h3><p>Celý katalóg materiálov so skutočnými rozmermi, výdatnosťou balenia a prierezom. Vyberieš zo zoznamu, každú hodnotu môžeš prepísať.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></div><h3>Miestnosti</h3><p>Zadaj rozmery miestnosti raz a získaš podlahu, steny, strop aj obvod. Odtiaľ ideš rovno k materiálu.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Projekty a rozpočty</h3><p>Spoj výpočty do projektu, uvidíš celkovú cenu a odpad, rozpočet vyexportuješ do PDF.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Mapa obchodov</h3><p>Nájdi stavebniny a veľkoobchody podľa polohy a nechaj sa naviesť k najbližšiemu.</p></div>
@@ -573,6 +577,7 @@
         <h4>Právne informácie</h4>
         <ul>
           <li><a href="/privacy-policy.html">Ochrana súkromia</a></li>
+          <li><a href="/sk/aplikacia/">Aplikácia</a></li>
           <li><a href="/app/" rel="nofollow">Môj účet</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -604,15 +609,15 @@
   "uk": "/uk/",
   "ru": "/ru/"
 };</script>
-<script src="/assets/i18n.sk.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.sk.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/calculators.js?v=20260808c"></script>
-<script src="/assets/materials.js?v=20260808c"></script>
-<script src="/assets/materials-ui.js?v=20260808c"></script>
-<script src="/assets/workspace.js?v=20260808c"></script>
-<script src="/assets/workspace-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/calculators.js?v=20260808e"></script>
+<script src="/assets/materials.js?v=20260808e"></script>
+<script src="/assets/materials-ui.js?v=20260808e"></script>
+<script src="/assets/workspace.js?v=20260808e"></script>
+<script src="/assets/workspace-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

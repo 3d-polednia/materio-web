@@ -691,3 +691,18 @@ pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, m
   background: color-mix(in srgb, var(--error) 5%, var(--surface)); }
 .btn-danger { background: var(--error); color: #fff; }
 .btn-danger:hover { opacity: .92; }
+
+/* ---------------------------------------------------------------- /aplikacja/ */
+/* The one page whose subject is the Android app, so the phone mockup comes back —
+   here it is the product being described, not decoration around a calculator. */
+.app-hero { padding-top: 20px; }
+.app-hero .hero-media { display: flex; flex-direction: column; align-items: center; }
+.app-hero .phone { margin: 0; }
+.shot-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.shot { margin: 0; text-align: center; }
+.shot img { width: 100%; max-width: 300px; height: auto; border-radius: 20px;
+  border: 1px solid var(--outline); box-shadow: var(--shadow-lg); }
+.shot figcaption { margin-top: 10px; font-size: .86rem; }
+@media (max-width: 760px) {
+  .shot-grid { grid-template-columns: 1fr; }
+}

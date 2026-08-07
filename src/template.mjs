@@ -8,6 +8,7 @@
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, SECTION,
   urlHome, urlCalcIndex, urlGuideIndex, urlStores, urlMaterials, urlProjects, urlEstimate,
+  urlAndroid,
   URL_PRIVACY, URL_APP, PLAY_URL,
 } from "./site.mjs";
 
@@ -105,6 +106,10 @@ export function page(p) {
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <meta name="author" content="Materio">
@@ -166,9 +171,9 @@ function header(lang, t) {
       <a href="${urlProjects(lang)}">${esc(t("nav_projects"))}</a>
       <a href="${urlGuideIndex(lang)}">${esc(t("nav_guides"))}</a>
       <a href="${urlStores(lang)}">${esc(t("nav_stores"))}</a>
-      <a href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
+      <a href="${urlAndroid(lang)}">${esc(t("nav_app_page"))}</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="nav">${esc(t("nav_download"))}</a>
+      <a class="btn btn-primary btn-sm" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
     </nav>
   </div>
 </header>`;
@@ -198,6 +203,7 @@ function footer(lang, t) {
         <h4>${esc(t("foot_legal"))}</h4>
         <ul>
           <li><a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a></li>
+          <li><a href="${urlAndroid(lang)}">${esc(t("nav_app_page"))}</a></li>
           <li><a href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a></li>
           <li><a href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>

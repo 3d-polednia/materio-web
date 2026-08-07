@@ -7,8 +7,9 @@
 
 import { esc, calcIcon, playBadge, breadcrumbs } from "./template.mjs";
 import {
+  BASE as BASE_URL,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate,
+  urlProjects, urlEstimate, urlAndroid,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -641,6 +642,158 @@ export function materialsMain(lang, t, cat) {
       position: i + 1,
       name: cat.name(m, lang, t),
     })),
+  }];
+  return { main, ld };
+}
+
+/* ------------------------------------------------------------------ the Android app */
+
+/**
+ * /aplikacja/ — the one page where the Android app is the subject.
+ *
+ * The rest of the site is the tool and mentions the app once, quietly, at the foot of a
+ * page. This is where the download pitch belongs, so it carries the screenshots, the
+ * whole feature list and the things a visitor has to know before installing: it is free,
+ * it carries ads, and the store map asks for a location.
+ */
+export function androidMain(lang, t, calcs, cat) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("apppage_title"), path: urlAndroid(lang) },
+  ]);
+
+  const shot = (file, altKey) =>
+    `<figure class="shot">
+      <img src="/assets/screens/${file}" width="618" height="1340" alt="${esc(t(altKey))}" loading="lazy" decoding="async">
+      <figcaption class="muted">${esc(t(altKey))}</figcaption>
+    </figure>`;
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+    </div>
+  </section>
+
+  <section class="hero app-hero" aria-labelledby="app-h">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="badge"><span class="dot"></span><span>${esc(t("hero_badge"))}</span></span>
+        <h1 id="app-h">${esc(t("apppage_title"))}</h1>
+        <p class="lead">${esc(t("apppage_lead"))}</p>
+        <div class="store-badges">
+          ${playBadge(t, "apppage")}
+          <a class="btn btn-ghost btn-lg" href="${urlCalcIndex(lang)}">${esc(t("hero_try"))}</a>
+        </div>
+        <div class="trust">
+          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>${esc(t("trust_offline"))}</span></span>
+          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>${esc(t("trust_noaccount"))}</span></span>
+          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg><span>${esc(t("trust_langs"))}</span></span>
+        </div>
+      </div>
+      <div class="hero-media">
+        <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+          <div class="phone-track" id="hero-shots">
+            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" decoding="async">
+            <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="${esc(t("shot_stores"))}" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:8px">
+    <div class="wrap">
+      <div class="stat-band">
+        <div class="stat"><div class="num">${esc(t("stat_price"))}</div><div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
+        <div class="stat"><div class="num">${calcs.length}</div><div class="lbl">${esc(t("stat_calc_lbl"))}</div></div>
+        <div class="stat"><div class="num">${cat.total}</div><div class="lbl">${esc(t("stat_catalog_lbl"))}</div></div>
+        <div class="stat"><div class="num">10</div><div class="lbl">${esc(t("stat_langs_lbl"))}</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="appfeat-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="appfeat-h">${esc(t("apppage_h_features"))}</h2>
+        <p class="muted">${esc(t("apppage_features_d"))}</p>
+      </div>
+      <div class="features">
+        ${featureCard('<path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/>', t("f_calc_t"), t("f_calc_d"))}
+        ${featureCard('<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/>', t("f_optim_t"), t("f_optim_d"))}
+        ${featureCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/>', t("f_catalog_t"), t("f_catalog_d"))}
+        ${featureCard('<path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/>', t("f_rooms_t"), t("f_rooms_d"))}
+        ${featureCard('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>', t("f_projects_t"), t("f_projects_d"))}
+        ${featureCard('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 18h4"/>', t("af_pdf_t"), t("af_pdf_d"))}
+        ${featureCard('<path d="M3 7h13l-3-3M21 17H8l3 3"/>', t("af_converter_t"), t("af_converter_d"))}
+        ${featureCard('<path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/>', t("f_stores_t"), t("f_stores_d"))}
+        ${featureCard('<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>', t("af_sync_t"), t("af_sync_d"))}
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="appshots-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="appshots-h">${esc(t("apppage_h_shots"))}</h2>
+      </div>
+      <div class="shot-grid">
+        ${shot("pl_home.webp", "shot_home")}
+        ${shot("pl_calc.webp", "shot_calc")}
+        ${shot("pl_stores.webp", "shot_stores")}
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="appweb-h">
+    <div class="wrap narrow">
+      <h2 id="appweb-h">${esc(t("apppage_h_web"))}</h2>
+      <p class="muted">${esc(t("apppage_web_d"))}</p>
+      <ul class="trust-list">
+        ${[["apppage_web_1"], ["apppage_web_2"], ["apppage_web_3"]].map(([k]) =>
+          `<li><span class="tick">${TICK}</span><span><b>${esc(t(k))}</b></span></li>`).join("")}
+      </ul>
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a class="btn btn-ghost" href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>
+        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="appreq-h">
+    <div class="wrap narrow">
+      <h2 id="appreq-h">${esc(t("apppage_h_reqs"))}</h2>
+      <ul class="steps-list">
+        <li>${esc(t("apppage_req_1"))}</li>
+        <li>${esc(t("apppage_req_2"))}</li>
+        <li>${esc(t("apppage_req_3"))}</li>
+        <li>${esc(t("apppage_req_4"))}</li>
+      </ul>
+      <p class="muted src-note"><a href="/privacy-policy.html">${esc(t("foot_privacy"))}</a></p>
+    </div>
+  </section>
+
+  ${ctaSection(t)}
+</main>`;
+
+  const ld = [crumbs.ld, {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    name: "Materio",
+    operatingSystem: "Android 7.0+",
+    applicationCategory: "UtilitiesApplication",
+    inLanguage: lang,
+    url: BASE_URL + urlAndroid(lang),
+    downloadUrl: PLAY_URL,
+    installUrl: PLAY_URL,
+    description: t("apppage_lead"),
+    offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
+    screenshot: ["pl_home.webp", "pl_calc.webp", "pl_stores.webp"]
+      .map((f) => `${BASE_URL}/assets/screens/${f}`),
   }];
   return { main, ld };
 }

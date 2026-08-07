@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Стяжка / штукатурка — Будівельні калькулятори онлайн | Materio</title>
 <meta name="description" content="Стяжка / штукатурка — безкоштовний онлайн-калькулятор. Площа й товщина → мішки. Та сама формула, що й у застосунку Materio для Android, без реєстрації.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Стяжка / штукатурка — Будівельні калькулятори онлайн | Materio">
 <meta name="twitter:description" content="Стяжка / штукатурка — безкоштовний онлайн-калькулятор. Площа й товщина → мішки. Та сама формула, що й у застосунку Materio для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -127,9 +131,9 @@
       <a href="/uk/proekty/">Проєкти</a>
       <a href="/uk/porady/">Поради</a>
       <a href="/uk/magazyny/">Магазини</a>
-      <a href="/app/" rel="nofollow">Мій акаунт</a>
+      <a href="/uk/dodatok/">Застосунок</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Завантажити</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Мій акаунт</a>
     </nav>
   </div>
 </header>
@@ -219,6 +223,7 @@
         <h4>Правова інформація</h4>
         <ul>
           <li><a href="/privacy-policy.html">Політика конфіденційності</a></li>
+          <li><a href="/uk/dodatok/">Застосунок</a></li>
           <li><a href="/app/" rel="nofollow">Мій акаунт</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -250,15 +255,15 @@
   "uk": "/uk/kalkulyatory/styazhka-shtukaturka/",
   "ru": "/ru/kalkulyatory/styazhka-shtukaturka/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.uk.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/calculators.js?v=20260808c"></script>
-<script src="/assets/materials.js?v=20260808c"></script>
-<script src="/assets/materials-ui.js?v=20260808c"></script>
-<script src="/assets/workspace.js?v=20260808c"></script>
-<script src="/assets/workspace-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/calculators.js?v=20260808e"></script>
+<script src="/assets/materials.js?v=20260808e"></script>
+<script src="/assets/materials-ui.js?v=20260808e"></script>
+<script src="/assets/workspace.js?v=20260808e"></script>
+<script src="/assets/workspace-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

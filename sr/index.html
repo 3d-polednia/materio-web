@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Materio — kalkulator i optimizator građevinskog materijala za Android</title>
 <meta name="description" content="Besplatan građevinski kalkulator: boje, malteri, pločice, paneli, tapete i sečenje 1D/2D. Izračunaj materijal, kupi koliko treba, smanji otpad. Mapa prodavnica, projekti, predmer u PDF-u. Računa oflajn, nalog opcion, 10 jezika.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Materio — kalkulator i optimizator građevinskog materijala za Android">
 <meta name="twitter:description" content="Besplatan građevinski kalkulator: boje, malteri, pločice, paneli, tapete i sečenje 1D/2D. Izračunaj materijal, kupi koliko treba, smanji otpad. Mapa prodavnica, projekti, predmer u PDF-u. Računa oflajn, nalog opcion, 10 jezika.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -191,9 +195,9 @@
       <a href="/sr/projekti/">Projekti</a>
       <a href="/sr/vodici/">Vodiči</a>
       <a href="/sr/prodavnice/">Prodavnice</a>
-      <a href="/app/" rel="nofollow">Moj nalog</a>
+      <a href="/sr/aplikacija/">Aplikacija</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Preuzmi</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Moj nalog</a>
     </nav>
   </div>
 </header>
@@ -252,7 +256,7 @@
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></div><h3>Kalkulatori materijala</h3><p>Boje, malteri, lepkovi, pločice, paneli, gres, tapete. Površina i otpad u celim pakovanjima.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg></div><h3>Optimizacija sečenja</h3><p>Sečenje 1D i 2D metodom first-fit. Koliko šipki ili ploča kupiti, sa rezom i otpadom.</p></div>
-      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Katalog materijala</h3><p>Preko 150 materijala sa stvarnim dimenzijama i otpadom. Biraš sa liste, svaku vrednost možeš izmeniti.</p></div>
+      <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Katalog materijala</h3><p>Ceo katalog materijala sa stvarnim dimenzijama, izdašnošću pakovanja i otpadom. Biraš sa liste, svaku vrednost možeš izmeniti.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></div><h3>Prostorije</h3><p>Unesi dimenzije prostorije jednom i dobiješ pod, zidove, plafon i obim. Odatle ideš pravo na materijal.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Projekti i predračuni</h3><p>Skupi proračune u projekat, vidi ukupan trošak i otpad, izvezi predračun u PDF.</p></div>
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Mapa prodavnica</h3><p>Pronađi građevinske markete i veleprodaje po lokaciji i navigiraj do najbliže.</p></div>
@@ -573,6 +577,7 @@
         <h4>Pravne informacije</h4>
         <ul>
           <li><a href="/privacy-policy.html">Politika privatnosti</a></li>
+          <li><a href="/sr/aplikacija/">Aplikacija</a></li>
           <li><a href="/app/" rel="nofollow">Moj nalog</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -604,15 +609,15 @@
   "uk": "/uk/",
   "ru": "/ru/"
 };</script>
-<script src="/assets/i18n.sr.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.sr.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/calculators.js?v=20260808c"></script>
-<script src="/assets/materials.js?v=20260808c"></script>
-<script src="/assets/materials-ui.js?v=20260808c"></script>
-<script src="/assets/workspace.js?v=20260808c"></script>
-<script src="/assets/workspace-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/calculators.js?v=20260808e"></script>
+<script src="/assets/materials.js?v=20260808e"></script>
+<script src="/assets/materials-ui.js?v=20260808e"></script>
+<script src="/assets/workspace.js?v=20260808e"></script>
+<script src="/assets/workspace-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

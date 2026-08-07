@@ -55,6 +55,10 @@ export const SECTION = {
     pl: "projekty", en: "projects", de: "projekte", cs: "projekty", sk: "projekty",
     ro: "proiecte", hr: "projekti", sr: "projekti", uk: "proekty", ru: "proekty",
   },
+  app: {
+    pl: "aplikacja", en: "android-app", de: "android-app", cs: "aplikace", sk: "aplikacia",
+    ro: "aplicatie", hr: "aplikacija", sr: "aplikacija", uk: "dodatok", ru: "prilozhenie",
+  },
   estimate: {
     pl: "kosztorys", en: "cost-estimate", de: "kostenvoranschlag", cs: "rozpocet",
     sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun",
@@ -201,6 +205,9 @@ export const urlStores = (lang) => `${prefix(lang)}/${SECTION.stores[lang]}/`;
 export const urlMaterials = (lang) => `${prefix(lang)}/${SECTION.materials[lang]}/`;
 export const urlProjects = (lang) => `${prefix(lang)}/${SECTION.projects[lang]}/`;
 export const urlEstimate = (lang) => `${prefix(lang)}/${SECTION.estimate[lang]}/`;
+
+/** The Android app's own page. Not the same thing as URL_APP, which is the account. */
+export const urlAndroid = (lang) => `${prefix(lang)}/${SECTION.app[lang]}/`;
 
 /** Privacy policy, the workspace and the shared-project view are single, language-neutral pages. */
 export const URL_PRIVACY = "/privacy-policy.html";

@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Záklop (OSB/desky) — Stavební kalkulačky online | Materio</title>
 <meta name="description" content="Záklop (OSB/desky) — bezplatná online kalkulačka. Kolik desek na pokrytí. Stejný vzorec jako v aplikaci Materio pro Android, bez registrace.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Záklop (OSB/desky) — Stavební kalkulačky online | Materio">
 <meta name="twitter:description" content="Záklop (OSB/desky) — bezplatná online kalkulačka. Kolik desek na pokrytí. Stejný vzorec jako v aplikaci Materio pro Android, bez registrace.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -127,9 +131,9 @@
       <a href="/cs/projekty/">Projekty</a>
       <a href="/cs/navody/">Návody</a>
       <a href="/cs/obchody/">Obchody</a>
-      <a href="/app/" rel="nofollow">Můj účet</a>
+      <a href="/cs/aplikace/">Aplikace</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Stáhnout</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Můj účet</a>
     </nav>
   </div>
 </header>
@@ -219,6 +223,7 @@ desky = ⌈ Plocha × (1 + Prořez ÷ 100) ÷ plocha desky ⌉</code></pre>
         <h4>Právní informace</h4>
         <ul>
           <li><a href="/privacy-policy.html">Zásady ochrany soukromí</a></li>
+          <li><a href="/cs/aplikace/">Aplikace</a></li>
           <li><a href="/app/" rel="nofollow">Můj účet</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -250,15 +255,15 @@ desky = ⌈ Plocha × (1 + Prořez ÷ 100) ÷ plocha desky ⌉</code></pre>
   "uk": "/uk/kalkulyatory/obshyvka-osb/",
   "ru": "/ru/kalkulyatory/obshivka-osb/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.cs.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/calculators.js?v=20260808c"></script>
-<script src="/assets/materials.js?v=20260808c"></script>
-<script src="/assets/materials-ui.js?v=20260808c"></script>
-<script src="/assets/workspace.js?v=20260808c"></script>
-<script src="/assets/workspace-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/calculators.js?v=20260808e"></script>
+<script src="/assets/materials.js?v=20260808e"></script>
+<script src="/assets/materials-ui.js?v=20260808e"></script>
+<script src="/assets/workspace.js?v=20260808e"></script>
+<script src="/assets/workspace-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>

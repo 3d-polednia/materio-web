@@ -26,6 +26,10 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Estrich / Putz — Baurechner online | Materio</title>
 <meta name="description" content="Estrich / Putz — kostenloser Online-Rechner. Fläche und Dicke → Säcke. Dieselbe Formel wie in der Materio-App für Android, ohne Anmeldung.">
 <meta name="author" content="Materio">
@@ -64,7 +68,7 @@
 <meta name="twitter:title" content="Estrich / Putz — Baurechner online | Materio">
 <meta name="twitter:description" content="Estrich / Putz — kostenloser Online-Rechner. Fläche und Dicke → Säcke. Dieselbe Formel wie in der Materio-App für Android, ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -127,9 +131,9 @@
       <a href="/de/projekte/">Projekte</a>
       <a href="/de/ratgeber/">Ratgeber</a>
       <a href="/de/baumaerkte/">Märkte</a>
-      <a href="/app/" rel="nofollow">Mein Konto</a>
+      <a href="/de/android-app/">Die App</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="nav">Laden</a>
+      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Mein Konto</a>
     </nav>
   </div>
 </header>
@@ -219,6 +223,7 @@ Säcke = ⌈ Kilogramm ÷ Sack ⌉</code></pre>
         <h4>Rechtliches</h4>
         <ul>
           <li><a href="/privacy-policy.html">Datenschutz</a></li>
+          <li><a href="/de/android-app/">Die App</a></li>
           <li><a href="/app/" rel="nofollow">Mein Konto</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
@@ -250,15 +255,15 @@ Säcke = ⌈ Kilogramm ÷ Sack ⌉</code></pre>
   "uk": "/uk/kalkulyatory/styazhka-shtukaturka/",
   "ru": "/ru/kalkulyatory/styazhka-shtukaturka/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260808c"></script>
-<script src="/assets/i18n-runtime.js?v=20260808c"></script>
+<script src="/assets/i18n.de.js?v=20260808e"></script>
+<script src="/assets/i18n-runtime.js?v=20260808e"></script>
 
-<script src="/assets/calculators.js?v=20260808c"></script>
-<script src="/assets/materials.js?v=20260808c"></script>
-<script src="/assets/materials-ui.js?v=20260808c"></script>
-<script src="/assets/workspace.js?v=20260808c"></script>
-<script src="/assets/workspace-ui.js?v=20260808c"></script>
-<script src="/assets/main.js?v=20260808c"></script>
+<script src="/assets/calculators.js?v=20260808e"></script>
+<script src="/assets/materials.js?v=20260808e"></script>
+<script src="/assets/materials-ui.js?v=20260808e"></script>
+<script src="/assets/workspace.js?v=20260808e"></script>
+<script src="/assets/workspace-ui.js?v=20260808e"></script>
+<script src="/assets/main.js?v=20260808e"></script>
 
 </body>
 </html>
