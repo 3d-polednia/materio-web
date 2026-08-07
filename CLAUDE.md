@@ -138,12 +138,15 @@ Kotlin side of it. Change one, change all three.
   sign-up with the Web key works, the rules accept the document shape `assets/app.js`
   sends, and they return 403 for a write to another account or an `updatedAt` that is
   not an integer.
-- **Google sign-in is written but not switched on.** `/app/` offers `signInWithPopup`
-  with `GoogleAuthProvider`; until the Google provider is enabled in Firebase
-  Authentication (Sign-in method) the SDK returns `auth/operation-not-allowed`, which the
-  page reports in plain words. The Android side is equally ready and equally blocked:
-  `BuildConfig.FIREBASE_WEB_CLIENT_ID` is empty because the project has no OAuth client
-  (`app/google-services.json` carries `oauth_client: []`).
+- **Google sign-in is switched on** (2026-08-07). The Google provider is enabled in
+  Firebase Authentication → Sign-in method, so `/app/`'s `signInWithPopup` with
+  `GoogleAuthProvider` has everything it needs — `materio-app.com`, `www.materio-app.com`
+  and `localhost` are on the authorized-domains list. The `auth/operation-not-allowed`
+  branch in `assets/app.js` stays as the message for a fork whose project has the provider
+  off. Enabling it created the Web OAuth client, which the Android app now reads straight
+  out of the committed `app/google-services.json`. **Nobody has clicked the button against
+  the live backend yet** — Chromium here cannot reach `gstatic.com`, so test it in a real
+  browser.
 - **Account deletion needs the deployed rules.** `users/{uid}` was `allow delete: if false`
   until 2026-08-08; the account page cannot finish deleting until
   `firebase deploy --only firestore` has run in the app repo.
