@@ -70,8 +70,8 @@ export function homeMain(lang, t, calcs) {
       <h1 id="hero-h">${esc(t("hero_title"))}</h1>
       <p class="lead">${esc(t("hero_lead"))}</p>
       <div class="store-badges">
+        <a class="btn btn-primary btn-lg" href="${urlCalcIndex(lang)}">${esc(t("hero_try"))}</a>
         ${playBadge(t, "hero")}
-        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("hero_try"))}</a>
       </div>
       <div class="trust">
         <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>${esc(t("trust_offline"))}</span></span>
@@ -80,14 +80,7 @@ export function homeMain(lang, t, calcs) {
       </div>
     </div>
     <div class="hero-media">
-      <div class="phone" aria-roledescription="carousel" aria-label="Materio">
-        <div class="phone-track" id="hero-shots">
-          <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" fetchpriority="high" decoding="async">
-          <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
-          <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="${esc(t("shot_stores"))}" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+      ${calcCard(calcs.find((c) => c.id === "coverage"), t, { heading: "h2" })}
     </div>
   </div>
 </section>
@@ -298,13 +291,42 @@ function faqSection(t) {
 </section>`;
 }
 
+/**
+ * The app, mentioned once and briefly, at the foot of a sub-page.
+ *
+ * These pages exist to answer the question the visitor arrived with; closing each of
+ * them with a full-width "download the app" banner turned the site into an advert for
+ * something the visitor had not asked about. The banner now appears on the home page
+ * only, where a visitor is plausibly looking at the product as a whole.
+ */
+function appNote(t) {
+  return `<section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">${esc(t("appnote_t"))}</b> ${esc(t("appnote_d"))}
+      <a href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="appnote">${esc(t("nav_download"))}</a></p>
+    </div>
+  </section>`;
+}
+
 function ctaSection(t) {
   return `<section class="block" aria-labelledby="cta-h">
   <div class="wrap">
     <div class="cta-banner">
-      <h2 id="cta-h">${esc(t("cta_title"))}</h2>
-      <p>${esc(t("cta_lead"))}</p>
-      ${playBadge(t, "cta", "badge-store")}
+      <div class="cta-copy">
+        <h2 id="cta-h">${esc(t("cta_title"))}</h2>
+        <p>${esc(t("cta_lead"))}</p>
+        ${playBadge(t, "cta", "badge-store")}
+      </div>
+      <div class="cta-shots">
+        <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+          <div class="phone-track" id="hero-shots">
+            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="${esc(t("shot_stores"))}" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+      </div>
     </div>
   </div>
 </section>`;
@@ -336,7 +358,7 @@ export function calcHubMain(lang, t, calcs) {
     </div>
   </section>
   ${groups}
-  ${ctaSection(t)}
+  ${appNote(t)}
 </main>`;
 
   return { main, ld: crumbs.ld };
@@ -435,7 +457,7 @@ export function calcPageMain(calc, lang, t, { example, formula }) {
     </div>
   </section>
 
-  ${ctaSection(t)}
+  ${appNote(t)}
 </main>`;
 
   return { main, ld: crumbs.ld };
@@ -467,7 +489,7 @@ export function guideIndexMain(lang, t, guides) {
   <section class="block alt">
     <div class="wrap"><div class="calc-links">${cards}</div></div>
   </section>
-  ${ctaSection(t)}
+  ${appNote(t)}
 </main>`;
   return { main, ld: crumbs.ld };
 }
@@ -517,7 +539,7 @@ export function guideMain(guide, lang, t) {
       <p style="margin-top:24px"><a class="btn btn-ghost" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a></p>
     </div>
   </section>
-  ${ctaSection(t)}
+  ${appNote(t)}
 </main>`;
 
   return { main, ld: [crumbs.ld, howTo] };
@@ -578,7 +600,7 @@ export function storesMain(lang, t) {
       </div>
     </div>
   </section>
-  ${ctaSection(t)}
+  ${appNote(t)}
 </main>`;
 
   return { main, ld: crumbs.ld };

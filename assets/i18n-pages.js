@@ -20,6 +20,9 @@
 
 const I18N_PAGES = {
   pl: {
+    appnote_t: "Ten sam wzór w aplikacji",
+    appnote_d: "Materio na Androida liczy tym samym silnikiem, offline — z katalogiem materiałów i zapisem wyniku do projektu.",
+
     meta_title: "Materio — kalkulator i optymalizator materiałów budowlanych na Androida",
     meta_desc: "Darmowy kalkulator budowlany: farby, tynki, płytki, panele, tapety i rozkrój 1D/2D. Policz materiał, kup tyle ile trzeba, ogranicz odpad. Mapa sklepów, projekty, wycena PDF. Liczy offline, konto opcjonalne, 10 języków.",
 
@@ -148,6 +151,9 @@ const I18N_PAGES = {
   },
 
   en: {
+    appnote_t: "The same formula in the app",
+    appnote_d: "Materio for Android uses the same engine offline — with the material catalogue and results saved into a project.",
+
     meta_title: "Materio — construction material calculator and optimizer for Android",
     meta_desc: "Free construction calculator: paint, plaster, tiles, panels, wallpaper and 1D/2D cutting. Work out the material, buy what you need, cut the waste. Store map, projects, PDF estimates. Calculates offline, account optional, 10 languages.",
 
@@ -276,6 +282,9 @@ const I18N_PAGES = {
   },
 
   de: {
+    appnote_t: "Dieselbe Formel in der App",
+    appnote_d: "Materio für Android rechnet offline mit demselben Kern — samt Materialkatalog und Speichern ins Projekt.",
+
     meta_title: "Materio — Rechner und Optimierer für Baumaterial für Android",
     meta_desc: "Kostenloser Baurechner: Farbe, Putz, Fliesen, Paneele, Tapete und Zuschnitt 1D/2D. Material berechnen, nur so viel kaufen wie nötig, Verschnitt senken. Baumarktkarte, Projekte, PDF-Angebote. Rechnet offline, Konto optional, 10 Sprachen.",
 
@@ -404,6 +413,9 @@ const I18N_PAGES = {
   },
 
   cs: {
+    appnote_t: "Stejný vzorec v aplikaci",
+    appnote_d: "Materio pro Android počítá stejným jádrem offline — s katalogem materiálů a uložením výsledku do projektu.",
+
     meta_title: "Materio — kalkulačka a optimalizátor stavebního materiálu pro Android",
     meta_desc: "Bezplatná stavební kalkulačka: barvy, omítky, obklady, panely, tapety a nářez 1D/2D. Spočítej materiál, kup jen co potřebuješ, sniž odpad. Mapa obchodů, projekty, rozpočet do PDF. Počítá offline, účet volitelný, 10 jazyků.",
 
@@ -532,6 +544,9 @@ const I18N_PAGES = {
   },
 
   sk: {
+    appnote_t: "Rovnaký vzorec v aplikácii",
+    appnote_d: "Materio pre Android počíta rovnakým jadrom offline — s katalógom materiálov a uložením výsledku do projektu.",
+
     meta_title: "Materio — kalkulačka a optimalizátor stavebného materiálu pre Android",
     meta_desc: "Bezplatná stavebná kalkulačka: farby, omietky, obklady, panely, tapety a rez 1D/2D. Spočítaj materiál, kúp len čo potrebuješ, zníž odpad. Mapa obchodov, projekty, rozpočet do PDF. Počíta offline, účet voliteľný, 10 jazykov.",
 
@@ -660,6 +675,9 @@ const I18N_PAGES = {
   },
 
   ro: {
+    appnote_t: "Aceeași formulă în aplicație",
+    appnote_d: "Materio pentru Android calculează offline cu același motor — cu catalogul de materiale și salvarea rezultatului în proiect.",
+
     meta_title: "Materio — calculator și optimizator de materiale de construcții pentru Android",
     meta_desc: "Calculator gratuit pentru construcții: vopsea, tencuială, gresie, parchet, tapet și debitare 1D/2D. Calculează materialul, cumpără cât îți trebuie, redu pierderile. Hartă magazine, proiecte, deviz PDF. Calculează offline, cont opțional, 10 limbi.",
 
@@ -788,6 +806,9 @@ const I18N_PAGES = {
   },
 
   hr: {
+    appnote_t: "Ista formula u aplikaciji",
+    appnote_d: "Materio za Android računa istim motorom offline — s katalogom materijala i spremanjem rezultata u projekt.",
+
     meta_title: "Materio — kalkulator i optimizator građevinskog materijala za Android",
     meta_desc: "Besplatan građevinski kalkulator: boje, žbuke, pločice, paneli, tapete i rezanje 1D/2D. Izračunaj materijal, kupi koliko treba, smanji otpad. Karta trgovina, projekti, troškovnik u PDF-u. Računa offline, račun neobavezan, 10 jezika.",
 
@@ -916,6 +937,9 @@ const I18N_PAGES = {
   },
 
   sr: {
+    appnote_t: "Ista formula u aplikaciji",
+    appnote_d: "Materio za Android računa istim motorom oflajn — s katalogom materijala i čuvanjem rezultata u projekat.",
+
     meta_title: "Materio — kalkulator i optimizator građevinskog materijala za Android",
     meta_desc: "Besplatan građevinski kalkulator: boje, malteri, pločice, paneli, tapete i sečenje 1D/2D. Izračunaj materijal, kupi koliko treba, smanji otpad. Mapa prodavnica, projekti, predmer u PDF-u. Računa oflajn, nalog opcion, 10 jezika.",
 
@@ -1044,6 +1068,9 @@ const I18N_PAGES = {
   },
 
   uk: {
+    appnote_t: "Та сама формула в застосунку",
+    appnote_d: "Materio для Android рахує тим самим ядром офлайн — з каталогом матеріалів і збереженням результату в проєкт.",
+
     meta_title: "Materio — калькулятор і оптимізатор будівельних матеріалів для Android",
     meta_desc: "Безкоштовний будівельний калькулятор: фарба, штукатурка, плитка, панелі, шпалери та розкрій 1D/2D. Порахуй матеріал, купи скільки треба, зменш відходи. Карта магазинів, проєкти, кошторис у PDF. Рахує офлайн, акаунт необов'язковий, 10 мов.",
 
@@ -1172,6 +1199,9 @@ const I18N_PAGES = {
   },
 
   ru: {
+    appnote_t: "Та же формула в приложении",
+    appnote_d: "Materio для Android считает тем же ядром офлайн — с каталогом материалов и сохранением результата в проект.",
+
     meta_title: "Materio — калькулятор и оптимизатор строительных материалов для Android",
     meta_desc: "Бесплатный строительный калькулятор: краска, штукатурка, плитка, панели, обои и раскрой 1D/2D. Посчитай материал, купи сколько нужно, сократи отходы. Карта магазинов, проекты, смета в PDF. Считает офлайн, аккаунт необязателен, 10 языков.",
 

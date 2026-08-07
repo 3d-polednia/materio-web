@@ -184,7 +184,7 @@ section.block { padding: 68px 0; }
   border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
 }
 .calc h3 { display: flex; align-items: center; gap: 10px; }
-.calc h3 .ico { width: 34px; height: 34px; border-radius: 9px; background: var(--tertiary-container); color: var(--tertiary); display: grid; place-items: center; flex: none; }
+.calc h2 .ico, .calc h3 .ico { width: 34px; height: 34px; border-radius: 9px; background: var(--tertiary-container); color: var(--tertiary); display: grid; place-items: center; flex: none; }
 .calc .desc { color: var(--muted); font-size: .9rem; margin: 4px 0 16px; }
 .field { margin-bottom: 12px; }
 .field label { display: block; font-weight: 600; font-size: .85rem; margin-bottom: 5px; }
@@ -519,3 +519,36 @@ pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, m
 .share-total { display: flex; justify-content: space-between; gap: 12px;
   padding: 12px 14px; border-top: 2px solid var(--olive); font-size: 1.05rem; }
 .share-total b { font-size: 1.2rem; }
+
+/* A sub-page closes with one quiet line about the app, not a download banner.
+   The site is the product; the app is the offline companion. */
+.app-note { padding-top: 8px; padding-bottom: 28px; }
+.app-note p { margin: 0; font-size: .9rem; color: var(--muted); line-height: 1.6;
+  padding-top: 18px; border-top: 1px solid var(--outline); }
+.app-note b { color: var(--on-bg); }
+.app-note a { color: var(--olive); font-weight: 600; white-space: nowrap; }
+
+/* The hero's primary action is "start calculating", so it needs to outweigh the
+   Play badge sitting next to it. */
+.btn-lg { padding: 14px 26px; font-size: 1.02rem; }
+
+/* The hero holds a live calculator, so it needs a white card on the tinted gradient
+   rather than the phone frame that used to sit there. */
+.hero-media .calc { margin: 0; box-shadow: var(--shadow-lg); }
+
+/* The app section: copy on the left, one phone on the right. This is the only place
+   on the site where the Android app is the subject. */
+.cta-banner { display: grid; grid-template-columns: 1.2fr .8fr; gap: 36px; align-items: center; text-align: left; }
+.cta-copy h2 { margin-bottom: .4em; }
+.cta-shots { display: flex; flex-direction: column; align-items: center; }
+.cta-shots .phone { width: 230px; margin: 0; }
+@media (max-width: 860px) {
+  .cta-banner { grid-template-columns: 1fr; text-align: center; }
+  .cta-copy { display: flex; flex-direction: column; align-items: center; }
+  .cta-shots { display: none; }
+}
+
+/* A calculator card's heading is an h2 on a calculator page (it is the page's main
+   content) and in the hero, but it must stay card-sized either way. */
+.calc > h2, .calc > h3 { display: flex; align-items: center; gap: 10px;
+  font-size: 1.2rem; font-weight: 700; letter-spacing: normal; margin: 0 0 6px; }

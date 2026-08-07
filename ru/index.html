@@ -64,7 +64,7 @@
 <meta name="twitter:title" content="Materio — калькулятор и оптимизатор строительных материалов для Android">
 <meta name="twitter:description" content="Бесплатный строительный калькулятор: краска, штукатурка, плитка, панели, обои и раскрой 1D/2D. Посчитай материал, купи сколько нужно, сократи отходы. Карта магазинов, проекты, смета в PDF. Считает офлайн, аккаунт необязателен, 10 языков.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260807c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260807f">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -203,12 +203,12 @@
       <h1 id="hero-h">Посчитай материал. Купи ровно сколько нужно. Не трать зря.</h1>
       <p class="lead">Materio — калькулятор и оптимизатор строительных материалов для бригад, мастеров и домашних умельцев. Калькуляторы, помещения, проекты и карта магазинов работают в телефоне и здесь, в браузере.</p>
       <div class="store-badges">
+        <a class="btn btn-primary btn-lg" href="/ru/kalkulyatory/">Попробовать калькуляторы</a>
         
   <a class="gp-badge" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="hero" aria-label="Скачать на Android">
     <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
     <span><small>Доступно в</small><b>Скачать на Android</b></span>
   </a>
-        <a class="btn btn-ghost" href="/ru/kalkulyatory/">Попробовать калькуляторы</a>
       </div>
       <div class="trust">
         <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>Считает на 100% офлайн</span></span>
@@ -217,14 +217,13 @@
       </div>
     </div>
     <div class="hero-media">
-      <div class="phone" aria-roledescription="carousel" aria-label="Materio">
-        <div class="phone-track" id="hero-shots">
-          <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Главный экран Materio" fetchpriority="high" decoding="async">
-          <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Результат расчёта: сколько купить и сколько отходов" loading="lazy" decoding="async">
-          <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Строительные магазины рядом" loading="lazy" decoding="async">
-        </div>
-      </div>
-      <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+      <div class="calc" data-calc="coverage" data-tab="surface">
+      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Краски, штукатурки, грунты</span></h2>
+      <p class="desc">Упаковок на площадь, со слоями.</p>
+      <div class="chips"><button type="button" class="chip" data-preset="0">Краска 10 л</button><button type="button" class="chip" data-preset="1">Грунтовка 5 л</button><button type="button" class="chip" data-preset="2">Шпаклёвка 20 кг</button><button type="button" class="chip" data-preset="3">Клей C2 25 кг</button></div><div class="field"><label for="f-coverage-area">Площадь (м²)</label><input id="f-coverage-area" type="text" inputmode="decimal" data-k="area" value="25"></div><div class="field"><label for="f-coverage-cov">Расход (м²/упак.)</label><input id="f-coverage-cov" type="text" inputmode="decimal" data-k="cov" value="40"></div><div class="field"><label for="f-coverage-coats">Число слоёв</label><input id="f-coverage-coats" type="text" inputmode="decimal" data-k="coats" value="2"></div><div class="field"><label for="f-coverage-openings">Проёмы (м²)</label><input id="f-coverage-openings" type="text" inputmode="decimal" data-k="openings" value="0"></div><div class="field"><label for="f-coverage-price">Цена за штуку/упак.</label><input id="f-coverage-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <button type="button" class="btn btn-primary" data-run>Посчитать</button>
+      <div class="result" data-result></div>
+    </div>
     </div>
   </div>
 </section>
@@ -245,7 +244,7 @@
     <div class="section-head">
       <div class="kicker">Функции</div>
       <h2 id="feat-h">Что считает Materio</h2>
-      <p class="muted">Те же вычислительные движки и тот же каталог материалов, что и в приложении.</p>
+      <p class="muted">Пятнадцать калькуляторов считают здесь, в браузере. То же ядро работает в приложении для Android.</p>
     </div>
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></div><h3>Калькуляторы материалов</h3><p>Краски, штукатурки, клеи, плитка, панели, керамогранит, обои. Площадь и запас в целых упаковках.</p></div>
@@ -518,13 +517,25 @@
 <section class="block" aria-labelledby="cta-h">
   <div class="wrap">
     <div class="cta-banner">
-      <h2 id="cta-h">Скачай Materio на телефон</h2>
-      <p>Полный каталог материалов, сохранённые проекты, карта магазинов и экспорт в PDF. Бесплатно, считает офлайн, аккаунт необязателен.</p>
-      
+      <div class="cta-copy">
+        <h2 id="cta-h">Тот же калькулятор в кармане</h2>
+        <p>Приложение для Android добавляет каталог материалов, сохранённые проекты и экспорт в PDF. Считает офлайн, так что работает на стройке без связи. Бесплатно, аккаунт необязателен.</p>
+        
   <a class="badge-store" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="cta" aria-label="Скачать на Android">
     <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
     <span><small>Доступно в</small><b>Скачать на Android</b></span>
   </a>
+      </div>
+      <div class="cta-shots">
+        <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+          <div class="phone-track" id="hero-shots">
+            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Главный экран Materio" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Результат расчёта: сколько купить и сколько отходов" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Строительные магазины рядом" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -580,10 +591,10 @@
   "uk": "/uk/",
   "ru": "/ru/"
 };</script>
-<script src="/assets/i18n.ru.js?v=20260807c"></script>
-<script src="/assets/i18n-runtime.js?v=20260807c"></script>
-<script src="/assets/calculators.js?v=20260807c"></script>
-<script src="/assets/main.js?v=20260807c"></script>
+<script src="/assets/i18n.ru.js?v=20260807f"></script>
+<script src="/assets/i18n-runtime.js?v=20260807f"></script>
+<script src="/assets/calculators.js?v=20260807f"></script>
+<script src="/assets/main.js?v=20260807f"></script>
 
 </body>
 </html>
