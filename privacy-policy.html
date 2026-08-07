@@ -46,7 +46,7 @@
   <!-- ============================== POLSKI ============================== -->
   <article id="pl" lang="pl">
     <h1>Polityka prywatności — Materio</h1>
-    <p class="muted">Data wejścia w życie: 5 sierpnia 2026 r. · Ostatnia aktualizacja: 7 sierpnia 2026 r.</p>
+    <p class="muted">Data wejścia w życie: 5 sierpnia 2026 r. · Ostatnia aktualizacja: 8 sierpnia 2026 r.</p>
 
     <p>Niniejsza polityka opisuje, jakie dane przetwarza aplikacja mobilna <strong>Materio — kalkulator materiałów
     budowlanych</strong> („Aplikacja”) oraz strona <strong>materio-app.com</strong> („Strona”), i w jakim celu. Administratorem
@@ -98,6 +98,9 @@
     <ul>
       <li><strong>Adres e-mail i hasło</strong> — obsługiwane przez <strong>Firebase Authentication</strong>. Hasła nie
       widzimy i nie przechowujemy; przechowuje je Google w formie skrótu (hash).</li>
+      <li><strong>Logowanie przez Google</strong> (opcjonalna alternatywa dla hasła) — wtedy hasła nie ma w ogóle, a od
+      Google otrzymujemy tylko adres e-mail i identyfikator konta, żeby powiązać je z Twoimi danymi w Materio. Nie
+      pobieramy żadnych innych danych z Twojego konta Google.</li>
       <li><strong>Identyfikator konta (UID)</strong> nadany przez Firebase.</li>
       <li><strong>Treść konta:</strong> projekty, pomieszczenia, wyceny i listy zakupów — nazwy, ilości, jednostki, ceny,
       waluta, dane wejściowe kalkulatora oraz znaczniki czasu utworzenia i zmiany.</li>
@@ -129,9 +132,12 @@
 
     <h3>3.6. Jak długo trzymamy dane i jak je usunąć</h3>
     <p>Dane konta trzymamy tak długo, jak długo konto istnieje. Możesz w każdej chwili usunąć pojedyncze projekty i
-    pomieszczenia albo poprosić o usunięcie całego konta, pisząc na
-    <a href="mailto:polednia@gmail.com">polednia@gmail.com</a> — usuwamy wtedy konto w Firebase Authentication oraz
-    wszystkie jego dokumenty w Firestore. Dane na urządzeniu usuwasz sam, czyszcząc dane Aplikacji.</p>
+    pomieszczenia, a całe konto skasujesz samodzielnie: <a href="/app/">materio-app.com/app/</a> → zakładka
+    <em>Konto</em> → <em>Usuń konto</em>. Kasujemy wtedy wszystkie dokumenty konta w Firestore (projekty, pomieszczenia,
+    wyceny, listy zakupów i utworzone linki do wycen), a na końcu samo konto w Firebase Authentication. Operacji nie da
+    się cofnąć. Na tej samej zakładce pobierzesz wcześniej całą zawartość konta jako plik JSON. Jeżeli wolisz, żebyśmy
+    zrobili to za Ciebie, napisz na <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>. Dane zapisane na
+    urządzeniu albo w przeglądarce usuwasz osobno, czyszcząc dane Aplikacji lub dane witryny.</p>
 
     <h3>3.7. Podstawa prawna</h3>
     <p>Przetwarzanie danych konta jest niezbędne do wykonania usługi, o którą prosisz — art. 6 ust. 1 lit. b RODO
@@ -184,6 +190,11 @@
     Firestore) na zasadach z sekcji 3 i zapisuje dane logowania w pamięci przeglądarki, żeby nie pytać o hasło przy każdym
     wejściu. <strong>/p/&lt;token&gt;:</strong> Strona pobiera z Firestore udostępnioną kopię wyceny — bez logowania i bez
     zbierania danych osoby, która otwiera link. Obie te podstrony są wyłączone z indeksowania.</p>
+    <p><strong>Projekty, pomieszczenia i kosztorysy zapisane na Stronie bez logowania</strong> leżą wyłącznie w pamięci
+    Twojej przeglądarki (<code>localStorage</code>) i nigdzie ich nie wysyłamy. Nie widzimy ich i nie mamy do nich
+    dostępu. Usuwasz je, czyszcząc dane witryny w przeglądarce. Trafiają do chmury dopiero wtedy, gdy zalogujesz się na
+    konto i sam klikniesz „Wyślij z przeglądarki na konto” — od tego momentu obowiązuje sekcja 3. W przeglądarce
+    zapisujemy też Twój wybór języka i Twoją decyzję w sprawie zgody na analitykę.</p>
     <p>Jeśli Strona jest hostowana na infrastrukturze dostawcy (dziś: GitHub Pages), dostawca może przetwarzać standardowe
     logi serwera (adres IP, typ przeglądarki) w celach technicznych i bezpieczeństwa, zgodnie z własną polityką prywatności.</p>
 
@@ -218,7 +229,7 @@
   <!-- ============================== ENGLISH ============================== -->
   <article id="en" lang="en">
     <h1>Privacy Policy — Materio</h1>
-    <p class="muted">Effective date: 5 August 2026 · Last updated: 7 August 2026</p>
+    <p class="muted">Effective date: 5 August 2026 · Last updated: 8 August 2026</p>
 
     <p>This policy explains what data the <strong>Materio — construction materials calculator</strong> mobile app (the
     “App”) and the <strong>materio-app.com</strong> website (the “Site”) process, and why. The data controller is the
@@ -269,6 +280,9 @@
     <ul>
       <li><strong>E-mail address and password</strong> — handled by <strong>Firebase Authentication</strong>. We never see
       or store your password; Google stores it hashed.</li>
+      <li><strong>Sign in with Google</strong> (an optional alternative to a password) — then there is no password at all,
+      and all we receive from Google is your e-mail address and an account identifier, so we can attach it to your Materio
+      data. We request nothing else from your Google account.</li>
       <li><strong>The account identifier (UID)</strong> issued by Firebase.</li>
       <li><strong>Account content:</strong> projects, rooms, estimates and shopping lists — names, quantities, units,
       prices, currency, calculator inputs, and creation/modification timestamps.</li>
@@ -299,10 +313,13 @@
     analytics (section 6).</p>
 
     <h3>3.6. How long we keep it and how to delete it</h3>
-    <p>We keep account data for as long as the account exists. You can delete individual projects and rooms at any time, or
-    ask for the whole account to be deleted by writing to <a href="mailto:polednia@gmail.com">polednia@gmail.com</a> — we then
-    remove the Firebase Authentication account and all of its Firestore documents. Data on the device is removed by you, by
-    clearing the App's data.</p>
+    <p>We keep account data for as long as the account exists. You can delete individual projects and rooms at any time,
+    and you can delete the whole account yourself: <a href="/app/">materio-app.com/app/</a> → the <em>Account</em> tab →
+    <em>Delete the account</em>. That removes every document the account owns in Firestore (projects, rooms, estimates,
+    shopping lists and any share links you created) and finally the Firebase Authentication account itself. It cannot be
+    undone. The same tab lets you download the whole account as a JSON file first. If you would rather we did it for you,
+    write to <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>. Data stored on your device or in your browser is
+    separate — clear the App's data or the site data.</p>
 
     <h3>3.7. Legal basis</h3>
     <p>Processing account data is necessary to provide the service you asked for — Art. 6(1)(b) GDPR (performance of a
@@ -353,6 +370,11 @@
     keeps your session in browser storage so it does not ask for the password on every visit. <strong>/p/&lt;token&gt;:</strong>
     the Site fetches a shared copy of an estimate from Firestore — no sign-in, and nothing collected about whoever opens the
     link. Both of those pages are excluded from indexing.</p>
+    <p><strong>Projects, rooms and estimates saved on the Site without signing in</strong> live only in your browser's own
+    storage (<code>localStorage</code>) and are never sent anywhere. We cannot see them and cannot reach them. You delete
+    them by clearing the site data in your browser. They reach the cloud only once you sign in and press "Send this
+    browser's copy to the account" yourself — from that moment section 3 applies. The browser also keeps your language
+    choice and your answer to the analytics consent banner.</p>
     <p>If the Site is hosted on a provider (today: GitHub Pages), that provider may process standard server logs (IP address,
     browser type) for technical and security purposes under its own privacy policy.</p>
 

@@ -11,7 +11,7 @@ root by `.github/workflows/pages.yml` on every push to `main` → <https://mater
 ---
 
 > **Session handoff:** the most recent state, what is unverified and the recipes for the
-> build and the Google APIs live in `docs/SESSION_HANDOFF_2026-08-07_web-pages-account-play.md`
+> build and the Google APIs live in `docs/SESSION_HANDOFF_2026-08-08_materials-workspace-account.md`
 > in the app repo (`3d-polednia/Materio`). Read it before starting new work here.
 
 ## Repo policy (read first)
@@ -102,6 +102,8 @@ assets/i18n-pages.js  Sub-page dictionary, same 10 languages (build input)
 assets/i18n-materials.js  Material names/terms, same 10 languages (build input)
 assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
 assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
+assets/workspace.js   Projects, rooms and estimate lines in localStorage (Firestore schema)
+assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/
 assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/
 assets/calculators.js Calculation engines ported 1:1 from the Kotlin app + form wiring
 assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
@@ -117,7 +119,8 @@ There is no test suite; verify changes by running the build and loading the page
 
 ## The account layer (/app/ and /p/)
 
-`/app/` is the signed-in workspace and `/p/<token>` a read-only shared estimate. Both talk
+`/app/` is the signed-in account (projects, rooms, sync, account settings) and
+`/p/<token>` a read-only shared estimate. Both talk
 to the **same Firestore schema as the Android app** — the contract is
 `docs/FIRESTORE_SYNC.md` in `3d-polednia/Materio`, and `core/sync/SyncContract.kt` is the
 Kotlin side of it. Change one, change all three.
@@ -135,6 +138,19 @@ Kotlin side of it. Change one, change all three.
   sign-up with the Web key works, the rules accept the document shape `assets/app.js`
   sends, and they return 403 for a write to another account or an `updatedAt` that is
   not an integer.
+- **Google sign-in is written but not switched on.** `/app/` offers `signInWithPopup`
+  with `GoogleAuthProvider`; until the Google provider is enabled in Firebase
+  Authentication (Sign-in method) the SDK returns `auth/operation-not-allowed`, which the
+  page reports in plain words. The Android side is equally ready and equally blocked:
+  `BuildConfig.FIREBASE_WEB_CLIENT_ID` is empty because the project has no OAuth client
+  (`app/google-services.json` carries `oauth_client: []`).
+- **Account deletion needs the deployed rules.** `users/{uid}` was `allow delete: if false`
+  until 2026-08-08; the account page cannot finish deleting until
+  `firebase deploy --only firestore` has run in the app repo.
+- **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms and
+  estimate lines in `localStorage` in the *same document shape* as Firestore, so the sync
+  tab in `/app/` is a plain copy in either direction. Counting must never require an
+  account (FIRESTORE_SYNC §1.2) — do not move these behind the sign-in wall.
 - Chromium in the agent container cannot reach `gstatic.com` (the egress proxy resets
   the connection), so `/app/` cannot be exercised end-to-end from a session here. Test
   the page in a real browser; `curl` against the Firebase REST API works and is what the
