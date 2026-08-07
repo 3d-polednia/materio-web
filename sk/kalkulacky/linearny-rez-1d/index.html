@@ -68,7 +68,7 @@
 <meta name="twitter:title" content="Lineárny rez (1D) — Stavebné kalkulačky online | Materio">
 <meta name="twitter:description" content="Lineárny rez (1D) — bezplatná online kalkulačka. Tyče, lišty, rúry: koľko a ako rezať. Rovnaký vzorec ako v aplikácii Materio pre Android, bez registrácie.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808f">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -150,7 +150,7 @@
     <div class="wrap calc-page">
       <div class="calc-page-form">
         <div class="calc" data-calc="linear" data-tab="cutting">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Lineárny rez (1D)</span></h2>
+      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Lineárny rez (1D)</span></h2>
       <p class="desc">Tyče, lišty, rúry: koľko a ako rezať.</p>
       <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Vybrať materiál</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-linear-stock">Dĺžka tyče (mm)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" value="6000"></div><div class="field"><label for="f-linear-kerf">Prerez píly (mm)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" value="3"></div><div class="field"><label for="f-linear-cuts">Diely: dĺžka×počet (mm)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts">2400x4
@@ -179,7 +179,7 @@ odpad = (Dĺžka tyče × tyče − Σ prvky) ÷ (Dĺžka tyče × tyče) × 100
         <div class="result show">
           <div class="muted" style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Kúpiť</div>
           <div class="big">5 <span style="font-size:1rem;font-weight:600">tyčí</span></div>
-          <div class="rows"><div><span>Odpad</span><b>8.0%</b></div><div><span>Tyč</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Tyč</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Tyč</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Tyč</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Tyč</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Odpad</span><b>8%</b></div><div><span>Tyč</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Tyč</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Tyč</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Tyč</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Tyč</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
 
         <h3>Na čo si dať pozor</h3>
@@ -194,7 +194,12 @@ odpad = (Dĺžka tyče × tyče − Σ prvky) ÷ (Dĺžka tyče × tyče) × 100
     <div class="wrap">
       <h2>Ďalšie kalkulačky</h2>
       <div class="chips"><a class="chip" href="/sk/kalkulacky/rez-dosiek-2d/">Rez dosiek (2D)</a><a class="chip" href="/sk/kalkulacky/zaklop-osb/">Záklop (OSB/dosky)</a><a class="chip" href="/sk/kalkulacky/priecka-sdk/">Priečka SDK</a></div>
-      <p style="margin-top:20px"><a class="btn btn-ghost" href="/sk/kalkulacky/">Všetky kalkulačky</a></p>
+      <h2 style="margin-top:28px">Návody s touto kalkulačkou</h2>
+      <div class="chips"><a class="chip" href="/sk/navody/rez-nabytkovej-dosky-s-malym-prierezom/">Rez nábytkovej dosky s malým prierezom</a></div>
+      <p style="margin-top:20px">
+        <a class="btn btn-ghost" href="/sk/kalkulacky/">Všetky kalkulačky</a>
+        <a class="btn btn-ghost" href="/sk/navody/">Všetky návody</a>
+      </p>
     </div>
   </section>
 
@@ -260,15 +265,15 @@ odpad = (Dĺžka tyče × tyče − Σ prvky) ÷ (Dĺžka tyče × tyče) × 100
   "uk": "/uk/kalkulyatory/rozkriy-liniynyi-1d/",
   "ru": "/ru/kalkulyatory/raskroy-lineynyy-1d/"
 };</script>
-<script src="/assets/i18n.sk.js?v=20260808e"></script>
-<script src="/assets/i18n-runtime.js?v=20260808e"></script>
+<script src="/assets/i18n.sk.js?v=20260808f"></script>
+<script src="/assets/i18n-runtime.js?v=20260808f"></script>
 
-<script src="/assets/calculators.js?v=20260808e"></script>
-<script src="/assets/materials.js?v=20260808e"></script>
-<script src="/assets/materials-ui.js?v=20260808e"></script>
-<script src="/assets/workspace.js?v=20260808e"></script>
-<script src="/assets/workspace-ui.js?v=20260808e"></script>
-<script src="/assets/main.js?v=20260808e"></script>
+<script src="/assets/calculators.js?v=20260808f"></script>
+<script src="/assets/materials.js?v=20260808f"></script>
+<script src="/assets/materials-ui.js?v=20260808f"></script>
+<script src="/assets/workspace.js?v=20260808f"></script>
+<script src="/assets/workspace-ui.js?v=20260808f"></script>
+<script src="/assets/main.js?v=20260808f"></script>
 
 </body>
 </html>

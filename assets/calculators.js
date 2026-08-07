@@ -81,14 +81,14 @@ const ENGINES = {
     const net = Math.max(gross - open, 0), covered = net * coats;
     const units = ceil(covered / cov), purchased = units * cov;
     const wastePct = purchased > 0 ? (purchased - covered) / purchased * 100 : 0;
-    return { tobuy: units, unit: "res_pkgs", cost: units * price, rows: [["res_waste", wastePct.toFixed(1) + "%"]] };
+    return { tobuy: units, unit: "res_pkgs", cost: units * price, rows: [["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"]] };
   },
   waste(f) {
     const area = num(f.area), cov = num(f.cov), w = num(f.waste) || 0, price = num(f.price) || 0;
     if (!(area > 0) || !(cov > 0) || w < 0) return { err: "err_positive" };
     const req = area * (1 + w / 100), pkgs = ceil(req / cov), purchased = pkgs * cov;
     const wastePct = purchased > 0 ? (purchased - area) / purchased * 100 : 0;
-    return { tobuy: pkgs, unit: "res_pkgs", cost: pkgs * price, rows: [["res_waste", wastePct.toFixed(1) + "%"]] };
+    return { tobuy: pkgs, unit: "res_pkgs", cost: pkgs * price, rows: [["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"]] };
   },
   wallpaper(f) {
     const ww = num(f.wallW), wh = num(f.wallH), rw = num(f.rollW) || 0.53, rl = num(f.rollL) || 10.05, rep = num(f.pattern) || 0, price = num(f.price) || 0;
@@ -115,7 +115,7 @@ const ENGINES = {
     const useful = pieces.reduce((a, b) => a + b, 0), purchased = bars.length * stock;
     const wastePct = purchased > 0 ? (purchased - useful) / purchased * 100 : 0;
     const plan = bars.slice(0, 8).map((b, i) => ["res_bar", (i + 1) + ": " + b.pieces.map((x) => Math.round(x)).join(" + ") + " mm"]);
-    return { tobuy: bars.length, unit: "res_stocks", cost: bars.length * price, rows: [["res_waste", wastePct.toFixed(1) + "%"], ...plan] };
+    return { tobuy: bars.length, unit: "res_stocks", cost: bars.length * price, rows: [["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"], ...plan] };
   },
   sheet(f) {
     // 2D guillotine bin-packing — ported 1:1 from GuillotinePackingEngine.kt.
@@ -158,7 +158,7 @@ const ENGINES = {
     const useful = units.reduce((a, u) => a + u.w * u.h, 0) / 1e6;
     const purchased = sheets.length * SW * SH / 1e6;
     const wastePct = purchased > 0 ? (purchased - useful) / purchased * 100 : 0;
-    return { tobuy: sheets.length, unit: "res_sheets", cost: sheets.length * price, rows: [["res_waste", wastePct.toFixed(1) + "%"]] };
+    return { tobuy: sheets.length, unit: "res_sheets", cost: sheets.length * price, rows: [["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"]] };
   },
   concrete(f) {
     const vol = num(f.vol), price = num(f.price) || 0;
@@ -232,8 +232,24 @@ const ENGINES = {
     return { tobuy: pieces, unit: "res_sheets", cost: pieces * price, rows: [] };
   },
 };
-// plain (locale-less) number for embedding inside strings before localisation
-function qtyG(v) { return (Math.round(v * 100) / 100).toString().replace(".", ","); }
+/**
+ * A number on its way into a result row, as a token rather than as text.
+ *
+ * The engines run at build time (scripts/build.mjs, for the worked example on every
+ * calculator page) and in the browser, and neither knows the page's language at the point
+ * the row is built. So a row carries `|n:12.5|` and whoever renders it formats the number
+ * for the language it is rendering into — which is how "12,5 kg" and "12.5 kg" come out of
+ * the same engine. Same idea as the existing |res_water_l| token for the litre word.
+ */
+function qtyG(v) { return "|n:" + (Math.round(v * 100) / 100) + "|"; }
+
+/** Replace every |n:…| and |res_water_l| in a row value with localized text. */
+function localizeRow(value, lang, translate) {
+  const fmt = (x) => new Intl.NumberFormat(lang, { maximumFractionDigits: 2 }).format(x);
+  return String(value)
+    .replace(/\|n:(-?[0-9.]+)\|/g, (_, n) => fmt(parseFloat(n)))
+    .replace("|res_water_l|", translate("res_water_l"));
+}
 
 /* ---------- Calculator definitions (fields + presets) ---------- */
 const F = (k, label, def, extra = {}) => Object.assign({ k, label, def }, extra);
@@ -357,7 +373,7 @@ function renderResult(card, res) {
   }
   box.classList.remove("err");
   const rows = (res.rows || []).map(([k, v]) => {
-    const val = String(v).replace("|res_water_l|", t("res_water_l", lang));
+    const val = localizeRow(v, lang, (key) => t(key, lang));
     return `<div><span>${t(k, lang)}</span><b>${val}</b></div>`;
   });
   if (res.cost && res.cost > 0) rows.unshift(`<div><span>${t("res_cost", lang)}</span><b>${money(res.cost, lang)}</b></div>`);

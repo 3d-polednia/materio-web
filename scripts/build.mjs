@@ -40,7 +40,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260808e";
+const STAMP = "20260808f";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -53,7 +53,8 @@ function evalScript(file, returns) {
 const { I18N, LANGS: LANG_META } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
-const { CALCS, ENGINES } = evalScript("assets/calculators.js", ["CALCS", "ENGINES"]);
+const { CALCS, ENGINES, localizeRow } = evalScript("assets/calculators.js",
+  ["CALCS", "ENGINES", "localizeRow"]);
 const CATALOG = evalScript("assets/materials.js", [
   "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "matName", "matNote", "primaryCalcFor",
 ]);
@@ -210,10 +211,8 @@ function workedExample(calc, lang, t) {
     ro: "ro-RO", hr: "hr-HR", sr: "sr-RS", uk: "uk-UA", ru: "ru-RU" }[lang];
   const number = (v) => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(v);
 
-  const rows = (res.rows || []).map(([k, v]) => [
-    t(k),
-    String(v).replace("|res_water_l|", t("res_water_l")),
-  ]);
+  // The engines emit numbers as |n:…| tokens; the language is only known here.
+  const rows = (res.rows || []).map(([k, v]) => [t(k), localizeRow(v, locale, t)]);
 
   return { tobuy: number(res.tobuy), unit: t(res.unit), rows };
 }
@@ -340,6 +339,7 @@ function buildCalculatorPages() {
         example: workedExample(calc, lang, t),
         formula: renderFormula(CALC_META[calc.id].formula, lang, t),
         materials: CAT.countFor(calc.id),
+        guides: GUIDES,
       });
       write(join(urlCalc(lang, calc.id), "index.html").replace(/^\//, ""), page({
         lang, t, stamp: STAMP,

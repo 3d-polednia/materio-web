@@ -68,7 +68,7 @@
 <meta name="twitter:title" content="Linearer Zuschnitt (1D) — Baurechner online | Materio">
 <meta name="twitter:description" content="Linearer Zuschnitt (1D) — kostenloser Online-Rechner. Stangen, Leisten, Rohre: Menge und Schnitt. Dieselbe Formel wie in der Materio-App für Android, ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808e">
+<link rel="stylesheet" href="/assets/styles.css?v=20260808f">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -150,7 +150,7 @@
     <div class="wrap calc-page">
       <div class="calc-page-form">
         <div class="calc" data-calc="linear" data-tab="cutting">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Linearer Zuschnitt (1D)</span></h2>
+      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span><span>Linearer Zuschnitt (1D)</span></h2>
       <p class="desc">Stangen, Leisten, Rohre: Menge und Schnitt.</p>
       <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-linear-stock">Stangenlänge (mm)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" value="6000"></div><div class="field"><label for="f-linear-kerf">Schnittfuge (mm)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" value="3"></div><div class="field"><label for="f-linear-cuts">Teile: Länge×Anzahl (mm)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts">2400x4
@@ -179,7 +179,7 @@ tatsächlicher Verschnitt = (Stangenlänge × Stangen − Σ Teile) ÷ (Stangenl
         <div class="result show">
           <div class="muted" style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Zu kaufen</div>
           <div class="big">5 <span style="font-size:1rem;font-weight:600">Stangen</span></div>
-          <div class="rows"><div><span>Verschnitt</span><b>8.0%</b></div><div><span>Stange</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Stange</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Stange</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Stange</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Stange</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Verschnitt</span><b>8%</b></div><div><span>Stange</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Stange</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Stange</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Stange</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Stange</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
 
         <h3>Worauf du achten solltest</h3>
@@ -194,7 +194,12 @@ tatsächlicher Verschnitt = (Stangenlänge × Stangen − Σ Teile) ÷ (Stangenl
     <div class="wrap">
       <h2>Weitere Rechner</h2>
       <div class="chips"><a class="chip" href="/de/rechner/plattenzuschnitt-2d/">Plattenzuschnitt (2D)</a><a class="chip" href="/de/rechner/beplankung-osb/">Beplankung (OSB)</a><a class="chip" href="/de/rechner/staenderwand/">Ständerwand</a></div>
-      <p style="margin-top:20px"><a class="btn btn-ghost" href="/de/rechner/">Alle Rechner</a></p>
+      <h2 style="margin-top:28px">Ratgeber mit diesem Rechner</h2>
+      <div class="chips"><a class="chip" href="/de/ratgeber/moebelplatte-mit-wenig-verschnitt-zuschneiden/">Möbelplatte mit wenig Verschnitt zuschneiden</a></div>
+      <p style="margin-top:20px">
+        <a class="btn btn-ghost" href="/de/rechner/">Alle Rechner</a>
+        <a class="btn btn-ghost" href="/de/ratgeber/">Alle Ratgeber</a>
+      </p>
     </div>
   </section>
 
@@ -260,15 +265,15 @@ tatsächlicher Verschnitt = (Stangenlänge × Stangen − Σ Teile) ÷ (Stangenl
   "uk": "/uk/kalkulyatory/rozkriy-liniynyi-1d/",
   "ru": "/ru/kalkulyatory/raskroy-lineynyy-1d/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260808e"></script>
-<script src="/assets/i18n-runtime.js?v=20260808e"></script>
+<script src="/assets/i18n.de.js?v=20260808f"></script>
+<script src="/assets/i18n-runtime.js?v=20260808f"></script>
 
-<script src="/assets/calculators.js?v=20260808e"></script>
-<script src="/assets/materials.js?v=20260808e"></script>
-<script src="/assets/materials-ui.js?v=20260808e"></script>
-<script src="/assets/workspace.js?v=20260808e"></script>
-<script src="/assets/workspace-ui.js?v=20260808e"></script>
-<script src="/assets/main.js?v=20260808e"></script>
+<script src="/assets/calculators.js?v=20260808f"></script>
+<script src="/assets/materials.js?v=20260808f"></script>
+<script src="/assets/materials-ui.js?v=20260808f"></script>
+<script src="/assets/workspace.js?v=20260808f"></script>
+<script src="/assets/workspace-ui.js?v=20260808f"></script>
+<script src="/assets/main.js?v=20260808f"></script>
 
 </body>
 </html>

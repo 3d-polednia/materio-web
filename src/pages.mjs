@@ -52,7 +52,7 @@ export function calcCard(calc, t, { heading = "h2", materials = 0 } = {}) {
     : "";
 
   return `<div class="calc" data-calc="${calc.id}" data-tab="${calc.tab}">
-      <${heading}><span class="ico">${calcIcon}</span><span>${esc(t(`c_${calc.id}_t`))}</span></${heading}>
+      <${heading}><span class="ico">${calcIcon(calc.id)}</span><span>${esc(t(`c_${calc.id}_t`))}</span></${heading}>
       <p class="desc">${esc(t(`c_${calc.id}_d`))}</p>
       ${picker}${chips}${fields}
       <button type="button" class="btn btn-primary" data-run>${esc(t("act_calc"))}</button>
@@ -63,7 +63,7 @@ export function calcCard(calc, t, { heading = "h2", materials = 0 } = {}) {
 /** A link card used on the home page and the calculator hub. */
 function calcLinkCard(calc, lang, t) {
   return `<a class="calc-link" href="${urlCalc(lang, calc.id)}">
-      <span class="ico">${calcIcon}</span>
+      <span class="ico">${calcIcon(calc.id)}</span>
       <span class="calc-link-body">
         <b>${esc(t(`c_${calc.id}_t`))}</b>
         <span class="muted">${esc(t(`c_${calc.id}_d`))}</span>
@@ -412,7 +412,7 @@ export function renderFormula(lines, lang, t) {
   });
 }
 
-export function calcPageMain(calc, lang, t, { example, formula, materials = 0 }) {
+export function calcPageMain(calc, lang, t, { example, formula, materials = 0, guides = [] }) {
   const meta = CALC_META[calc.id];
   const name = t(`c_${calc.id}_t`);
   const crumbs = breadcrumbs([
@@ -431,6 +431,11 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0 })
   const related = (meta.related || [])
     .filter((id) => CALC_SLUG[id])
     .map((id) => `<a class="chip" href="${urlCalc(lang, id)}">${esc(t(`c_${id}_t`))}</a>`).join("");
+
+  // The guides link down to the calculators; without this the trail only ran one way.
+  const guideLinks = guides
+    .filter((g) => g.calcs.includes(calc.id))
+    .map((g) => `<a class="chip" href="${urlGuide(lang, g)}">${esc(t(`g_${g.id}_t`))}</a>`).join("");
 
   const main = `<main id="main">
   <section class="block page-head">
@@ -476,7 +481,12 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0 })
     <div class="wrap">
       <h2>${esc(t("calc_related"))}</h2>
       <div class="chips">${related}</div>
-      <p style="margin-top:20px"><a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a></p>
+      ${guideLinks ? `<h2 style="margin-top:28px">${esc(t("guide_calcs_back"))}</h2>
+      <div class="chips">${guideLinks}</div>` : ""}
+      <p style="margin-top:20px">
+        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a class="btn btn-ghost" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a>
+      </p>
     </div>
   </section>
 

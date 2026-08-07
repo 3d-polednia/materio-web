@@ -190,6 +190,50 @@ export const GUIDES = [
       uk: "hk-perehorodka-profili-ta-lysty", ru: "gk-peregorodka-profili-i-listy",
     },
   },
+  {
+    id: "klej",
+    calcs: ["mortar", "waste", "grout"],
+    slug: {
+      pl: "ile-kleju-do-plytek", en: "how-much-tile-adhesive", de: "wie-viel-fliesenkleber",
+      cs: "kolik-lepidla-na-obklady", sk: "kolko-lepidla-na-obklady",
+      ro: "cat-adeziv-pentru-gresie", hr: "koliko-ljepila-za-plocice",
+      sr: "koliko-lepka-za-plocice", uk: "skilky-kliyu-dlya-plytky",
+      ru: "skolko-kleya-dlya-plitki",
+    },
+  },
+  {
+    id: "gladz",
+    calcs: ["coverage"],
+    slug: {
+      pl: "ile-gladzi-na-sciane", en: "how-much-skim-coat", de: "wie-viel-spachtelmasse",
+      cs: "kolik-stuku-na-stenu", sk: "kolko-stuku-na-stenu",
+      ro: "cat-glet-pentru-perete", hr: "koliko-gleta-za-zid",
+      sr: "koliko-gleta-za-zid", uk: "skilky-shpaklivky-na-stinu",
+      ru: "skolko-shpaklevki-na-stenu",
+    },
+  },
+  {
+    id: "ocieplenie",
+    calcs: ["insulation", "coverage", "mortar"],
+    slug: {
+      pl: "ocieplenie-domu-styropianem", en: "insulating-a-house-with-eps",
+      de: "haus-mit-eps-daemmen", cs: "zatepleni-domu-polystyrenem",
+      sk: "zateplenie-domu-polystyrenom", ro: "termoizolarea-casei-cu-polistiren",
+      hr: "izolacija-kuce-stiroporom", sr: "izolacija-kuce-stiroporom",
+      uk: "uteplennya-budynku-pinoplastom", ru: "uteplenie-doma-penoplastom",
+    },
+  },
+  {
+    id: "rozkroj",
+    calcs: ["sheet", "linear"],
+    slug: {
+      pl: "rozkroj-plyty-meblowej-bez-odpadu", en: "cutting-a-furniture-board-with-less-waste",
+      de: "moebelplatte-mit-wenig-verschnitt-zuschneiden", cs: "narez-nabytkove-desky-s-malym-prorezem",
+      sk: "rez-nabytkovej-dosky-s-malym-prierezom", ro: "debitarea-placii-de-mobila-cu-pierderi-mici",
+      hr: "rezanje-namjestajne-ploce-s-manje-otpada", sr: "secenje-namestajne-ploce-sa-manje-otpada",
+      uk: "rozkriy-mebleovoyi-plyty-bez-vidkhodiv", ru: "raskroy-mebelnoy-plity-bez-otkhodov",
+    },
+  },
 ];
 
 /* ------------------------------------------------------------------ URL helpers */

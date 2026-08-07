@@ -22,8 +22,11 @@ export const esc = (s) => String(s)
 /** JSON-LD must not be able to close its own <script>. */
 const jsonLd = (obj) => JSON.stringify(obj, null, 2).replace(/</g, "\\u003c");
 
+/** The scissors, as bare paths: the cutting calculators use them, so does the fallback. */
+const ICON_CUT_PATH = '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>';
+
 const ICON = {
-  cut: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>',
+  cut: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${ICON_CUT_PATH}</svg>`,
   play: '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>',
   menu: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',
 };
@@ -34,7 +37,38 @@ export const playBadge = (t, loc, cls = "gp-badge") => `
     <span><small>${esc(t("gp_getit"))}</small><b>${esc(t("hero_download"))}</b></span>
   </a>`;
 
-export const calcIcon = ICON.cut;
+/**
+ * One icon per calculator, keyed by the id in CALCS.
+ *
+ * Every calculator used to show the same pair of scissors, which is right for the two
+ * cutting optimisers and meaningless on paint or grout. These are stroke paths on the
+ * shared 24×24 grid; `calcIcon()` wraps whichever one the calculator asks for.
+ */
+const CALC_PATHS = {
+  // Surfaces: a roller, a tiled field, a roll of paper.
+  coverage: '<rect x="3" y="4" width="12" height="5" rx="1"/><path d="M15 6.5h4a2 2 0 0 1 2 2V11a2 2 0 0 1-2 2h-6v3"/><rect x="10.5" y="16" width="5" height="6" rx="1"/>',
+  waste: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
+  wallpaper: '<path d="M6 3h12v16a3 3 0 0 1-3 3H6Z"/><path d="M6 22a3 3 0 0 1 0-6h9"/><path d="M10 7h4M10 11h4"/>',
+  // Cutting: the scissors keep the two jobs they actually describe.
+  linear: ICON_CUT_PATH,
+  sheet: '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M11 4v16M3 12h8M11 8h10"/>',
+  // Trade: a bag, a trowel, a screed bar, a grout joint, a brick bond, layered insulation.
+  concrete: '<path d="M8 3h8l2 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8Z"/><path d="M9 3c1 1.5 5 1.5 6 0"/><path d="M9 13h6"/>',
+  mortar: '<path d="M14 3 21 10l-6 2-3-3Z"/><path d="m11 9-8 8 4 4 8-8"/>',
+  screed: '<path d="M3 16h18"/><path d="M5 16V9l7-4 7 4v7"/><path d="M3 20h18"/>',
+  grout: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18" stroke-dasharray="3 2"/>',
+  masonry: '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9.3h18M3 14.6h18M9 4v5.3M15 9.3v5.3M9 14.6V20"/>',
+  insulation: '<path d="M3 7h18M3 12h18M3 17h18"/><path d="M6 7v10M12 7v10M18 7v10" stroke-dasharray="2 3"/>',
+  // Framing: a stud wall, a ceiling grid, boards on dabs, sheathing.
+  studwall: '<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M8 3v18M13 3v18M18 3v18"/>',
+  ceiling: '<path d="M3 6h18"/><path d="M6 6v12M12 6v12M18 6v12"/><path d="M3 18h18"/>',
+  drylining: '<rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8" cy="8" r="1.4"/><circle cx="16" cy="8" r="1.4"/><circle cx="8" cy="16" r="1.4"/><circle cx="16" cy="16" r="1.4"/>',
+  sheathing: '<rect x="2" y="6" width="20" height="5" rx="1"/><rect x="2" y="13" width="20" height="5" rx="1"/><path d="M9 6v5M15 13v5"/>',
+};
+
+/** The icon for one calculator; the scissors are the fallback for an unmapped id. */
+export const calcIcon = (id) =>
+  `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CALC_PATHS[id] || ICON_CUT_PATH}</svg>`;
 
 /**
  * Render one page.
