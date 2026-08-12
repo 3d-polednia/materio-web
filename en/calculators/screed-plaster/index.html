@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/screed-plaster/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/wylewka-tynk/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812i" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812j" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Screed / plaster — Construction calculators online | LiczMat">
 <meta name="twitter:description" content="Screed / plaster — free online calculator. Area and thickness → bags. The same formula as in the LiczMat app for Android, no sign-up.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812i">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812j">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Your figures</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Pick a material</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-screed-area">Area (m²)</label><input id="f-screed-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-screed-thk">Thickness (mm)</label><input id="f-screed-thk" type="text" inputmode="decimal" data-k="thk" value="40"></div><div class="field"><label for="f-screed-bag">Bag (kg)</label><input id="f-screed-bag" type="text" inputmode="decimal" data-k="bag" value="25"></div><div class="field"><label for="f-screed-price">Price per piece/pack</label><input id="f-screed-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-screed-area">Area (m²)</label><input id="f-screed-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-screed-thk">Thickness (mm)</label><input id="f-screed-thk" type="text" inputmode="decimal" data-k="thk" value="40"></div><div class="field"><label for="f-screed-rate">Usage (kg/m²/mm)</label><input id="f-screed-rate" type="text" inputmode="decimal" data-k="rate" value="2"></div><div class="field"><label for="f-screed-bag">Bag (kg)</label><input id="f-screed-bag" type="text" inputmode="decimal" data-k="bag" value="25"></div><div class="field"><label for="f-screed-price">Price per bag</label><input id="f-screed-price" type="text" inputmode="decimal" data-k="price" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Calculate"
           data-label-again="Calculate again">Calculate</button>
@@ -187,7 +187,7 @@
         <div class="result show" data-result>
           <div class="muted eyebrow">To buy</div>
           <div class="big">64 <span class="figure-line">bags</span></div>
-          <div class="rows"><div><span>kg</span><b>1,600 kg</b></div></div>
+          <div class="rows"><div><span>Total</span><b>1,600 kg</b></div><div><span>Usage</span><b>80 kg/m²</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>The figures changed. Press “Calculate again” to see the new result.</p>
         <div class="calc-actions" data-calc-actions></div>
@@ -204,14 +204,14 @@
       <div class="calc-how-grid">
         <div>
           <h3>What you enter</h3>
-          <ul class="plain-list"><li><b>Area (m²)</b></li><li><b>Thickness (mm)</b></li><li><b>Bag (kg)</b></li></ul>
+          <ul class="plain-list"><li><b>Area (m²)</b></li><li><b>Thickness (mm)</b></li><li><b>Usage (kg/m²/mm)</b></li><li><b>Bag (kg)</b></li></ul>
 
           <h3>What to watch out for</h3>
           <p>The conversion assumes a density of about 2.0 kg per litre of mortar. Anhydrite screeds and lightweight screeds have a different density — check the bag.</p>
         </div>
         <div>
           <h3>Formula</h3>
-          <pre class="formula"><code>kilograms = Area × Thickness × 2.0
+          <pre class="formula"><code>kilograms = Area × Thickness × Usage
 bags = ⌈ kilograms ÷ Bag ⌉</code></pre>
           <p class="muted src-note">The LiczMat app for Android uses the same formula. The site's engine is a 1:1 port of the app's code.</p>
         </div>
@@ -303,16 +303,16 @@ bags = ⌈ kilograms ÷ Bag ⌉</code></pre>
   "de": "/de/rechner/estrich-putz/",
   "en": "/en/calculators/screed-plaster/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260812i"></script>
-<script src="/assets/i18n-runtime.js?v=20260812i"></script>
-<script src="/assets/currency.js?v=20260812i"></script>
+<script src="/assets/i18n.en.js?v=20260812j"></script>
+<script src="/assets/i18n-runtime.js?v=20260812j"></script>
+<script src="/assets/currency.js?v=20260812j"></script>
 
-<script src="/assets/calculators.js?v=20260812i"></script>
-<script src="/assets/materials.js?v=20260812i"></script>
-<script src="/assets/materials-ui.js?v=20260812i"></script>
-<script src="/assets/workspace.js?v=20260812i"></script>
-<script src="/assets/workspace-ui.js?v=20260812i"></script>
-<script src="/assets/main.js?v=20260812i"></script>
+<script src="/assets/calculators.js?v=20260812j"></script>
+<script src="/assets/materials.js?v=20260812j"></script>
+<script src="/assets/materials-ui.js?v=20260812j"></script>
+<script src="/assets/workspace.js?v=20260812j"></script>
+<script src="/assets/workspace-ui.js?v=20260812j"></script>
+<script src="/assets/main.js?v=20260812j"></script>
 
 </body>
 </html>

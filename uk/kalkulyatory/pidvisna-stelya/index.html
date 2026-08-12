@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/suspended-ceiling/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/sufit-podwieszany/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812i" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812j" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Підвісна стеля — Будівельні калькулятори онлайн | LiczMat">
 <meta name="twitter:description" content="Підвісна стеля — безкоштовний онлайн-калькулятор. Профілі CD/UD, підвіси й листи. Та сама формула, що й у застосунку LiczMat для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812i">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812j">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Твої дані</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-ceiling-width">Ширина (м)</label><input id="f-ceiling-width" type="text" inputmode="decimal" data-k="width" value="4"></div><div class="field"><label for="f-ceiling-length">Довжина (м)</label><input id="f-ceiling-length" type="text" inputmode="decimal" data-k="length" value="5"></div><div class="field"><label for="f-ceiling-mainSp">Крок CD (м)</label><input id="f-ceiling-mainSp" type="text" inputmode="decimal" data-k="mainSp" value="0.4"></div><div class="field"><label for="f-ceiling-hangSp">Крок підвісів (м)</label><input id="f-ceiling-hangSp" type="text" inputmode="decimal" data-k="hangSp" value="0.9"></div><div class="field"><label for="f-ceiling-price">Ціна за штуку/упак.</label><input id="f-ceiling-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-ceiling-width">Ширина (м)</label><input id="f-ceiling-width" type="text" inputmode="decimal" data-k="width" value="4"></div><div class="field"><label for="f-ceiling-length">Довжина (м)</label><input id="f-ceiling-length" type="text" inputmode="decimal" data-k="length" value="5"></div><div class="field"><label for="f-ceiling-mainSp">Крок CD (м)</label><input id="f-ceiling-mainSp" type="text" inputmode="decimal" data-k="mainSp" value="0.4"></div><div class="field"><label for="f-ceiling-hangSp">Крок підвісів (м)</label><input id="f-ceiling-hangSp" type="text" inputmode="decimal" data-k="hangSp" value="0.9"></div><div class="field"><label for="f-ceiling-price">Ціна за лист</label><input id="f-ceiling-price" type="text" inputmode="decimal" data-k="price" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Порахувати"
           data-label-again="Порахувати знову">Порахувати</button>
@@ -187,7 +187,7 @@
         <div class="result show" data-result>
           <div class="muted eyebrow">Купити</div>
           <div class="big">10 <span class="figure-line">листів</span></div>
-          <div class="rows"><div><span>Профілі CW</span><b>CD: 14 × 4 m</b></div><div><span>Профілі UW</span><b>UD: 6 × 3 m</b></div><div><span>Підвіси</span><b>66 (+3)</b></div></div>
+          <div class="rows"><div><span>Площа</span><b>20 m²</b></div><div><span>Профілі CW</span><b>CD: 14 × 4 m</b></div><div><span>Профілі UW</span><b>UD: 6 × 3 m</b></div><div><span>Підвіси</span><b>66 (+3)</b></div><div><span>Анкери</span><b>30</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Дані змінилися. Натисни «Порахувати знову», щоб побачити новий результат.</p>
         <div class="calc-actions" data-calc-actions></div>
@@ -215,6 +215,7 @@
 профілі CD = ⌈ ряди CD × Довжина ÷ 4 ⌉
 профілі UD = ⌈ 2 × (Ширина + Довжина) ÷ 3 ⌉
 підвіси = ряди CD × (⌊ Довжина ÷ Крок підвісів ⌋ + 1)
+кріплення = ⌈ 2 × (Ширина + Довжина) ÷ 0,6 ⌉
 листи = ⌈ Ширина × Довжина × 1,10 ÷ 2,4 ⌉</code></pre>
           <p class="muted src-note">Застосунок LiczMat для Android рахує тією самою формулою. Обчислювальне ядро сайту — це порт 1:1 коду із застосунку.</p>
         </div>
@@ -306,16 +307,16 @@
   "de": "/de/rechner/abgehaengte-decke/",
   "en": "/en/calculators/suspended-ceiling/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260812i"></script>
-<script src="/assets/i18n-runtime.js?v=20260812i"></script>
-<script src="/assets/currency.js?v=20260812i"></script>
+<script src="/assets/i18n.uk.js?v=20260812j"></script>
+<script src="/assets/i18n-runtime.js?v=20260812j"></script>
+<script src="/assets/currency.js?v=20260812j"></script>
 
-<script src="/assets/calculators.js?v=20260812i"></script>
-<script src="/assets/materials.js?v=20260812i"></script>
-<script src="/assets/materials-ui.js?v=20260812i"></script>
-<script src="/assets/workspace.js?v=20260812i"></script>
-<script src="/assets/workspace-ui.js?v=20260812i"></script>
-<script src="/assets/main.js?v=20260812i"></script>
+<script src="/assets/calculators.js?v=20260812j"></script>
+<script src="/assets/materials.js?v=20260812j"></script>
+<script src="/assets/materials-ui.js?v=20260812j"></script>
+<script src="/assets/workspace.js?v=20260812j"></script>
+<script src="/assets/workspace-ui.js?v=20260812j"></script>
+<script src="/assets/main.js?v=20260812j"></script>
 
 </body>
 </html>

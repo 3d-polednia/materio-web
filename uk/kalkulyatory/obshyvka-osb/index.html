@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/sheathing-osb/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/poszycie-osb/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812i" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812j" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Обшивка (OSB/дошки) — Будівельні калькулятори онлайн | LiczMat">
 <meta name="twitter:description" content="Обшивка (OSB/дошки) — безкоштовний онлайн-калькулятор. Скільки аркушів на покриття. Та сама формула, що й у застосунку LiczMat для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812i">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812j">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Твої дані</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-sheathing-area">Площа (м²)</label><input id="f-sheathing-area" type="text" inputmode="decimal" data-k="area" value="30"></div><div class="field"><label for="f-sheathing-pieceW">Ширина плити (мм)</label><input id="f-sheathing-pieceW" type="text" inputmode="decimal" data-k="pieceW" value="1250"></div><div class="field"><label for="f-sheathing-pieceL">Довжина плити (мм)</label><input id="f-sheathing-pieceL" type="text" inputmode="decimal" data-k="pieceL" value="2500"></div><div class="field"><label for="f-sheathing-waste">Запас (%)</label><input id="f-sheathing-waste" type="text" inputmode="decimal" data-k="waste" value="10"></div><div class="field"><label for="f-sheathing-price">Ціна за штуку/упак.</label><input id="f-sheathing-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-sheathing-area">Площа (м²)</label><input id="f-sheathing-area" type="text" inputmode="decimal" data-k="area" value="30"></div><div class="field"><label for="f-sheathing-pieceW">Ширина плити (мм)</label><input id="f-sheathing-pieceW" type="text" inputmode="decimal" data-k="pieceW" value="1250"></div><div class="field"><label for="f-sheathing-pieceL">Довжина плити (мм)</label><input id="f-sheathing-pieceL" type="text" inputmode="decimal" data-k="pieceL" value="2500"></div><div class="field"><label for="f-sheathing-waste">Запас (%)</label><input id="f-sheathing-waste" type="text" inputmode="decimal" data-k="waste" value="10"></div><div class="field"><label for="f-sheathing-price">Ціна за аркуш</label><input id="f-sheathing-price" type="text" inputmode="decimal" data-k="price" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Порахувати"
           data-label-again="Порахувати знову">Порахувати</button>
@@ -187,7 +187,7 @@
         <div class="result show" data-result>
           <div class="muted eyebrow">Купити</div>
           <div class="big">11 <span class="figure-line">аркушів</span></div>
-          <div class="rows"></div>
+          <div class="rows"><div><span>Площа аркуша</span><b>3,13 m²</b></div><div><span>Із запасом</span><b>33 m²</b></div><div><span>Купуєш</span><b>34,38 m²</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Дані змінилися. Натисни «Порахувати знову», щоб побачити новий результат.</p>
         <div class="calc-actions" data-calc-actions></div>
@@ -212,7 +212,8 @@
         <div>
           <h3>Формула</h3>
           <pre class="formula"><code>площа аркуша = (Ширина плити ÷ 1000) × (Довжина плити ÷ 1000)
-аркуші = ⌈ Площа × (1 + Запас ÷ 100) ÷ площа аркуша ⌉</code></pre>
+із запасом = Площа × (1 + Запас ÷ 100)
+аркуші = ⌈ із запасом ÷ площа аркуша ⌉</code></pre>
           <p class="muted src-note">Застосунок LiczMat для Android рахує тією самою формулою. Обчислювальне ядро сайту — це порт 1:1 коду із застосунку.</p>
         </div>
       </div>
@@ -304,16 +305,16 @@
   "de": "/de/rechner/beplankung-osb/",
   "en": "/en/calculators/sheathing-osb/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260812i"></script>
-<script src="/assets/i18n-runtime.js?v=20260812i"></script>
-<script src="/assets/currency.js?v=20260812i"></script>
+<script src="/assets/i18n.uk.js?v=20260812j"></script>
+<script src="/assets/i18n-runtime.js?v=20260812j"></script>
+<script src="/assets/currency.js?v=20260812j"></script>
 
-<script src="/assets/calculators.js?v=20260812i"></script>
-<script src="/assets/materials.js?v=20260812i"></script>
-<script src="/assets/materials-ui.js?v=20260812i"></script>
-<script src="/assets/workspace.js?v=20260812i"></script>
-<script src="/assets/workspace-ui.js?v=20260812i"></script>
-<script src="/assets/main.js?v=20260812i"></script>
+<script src="/assets/calculators.js?v=20260812j"></script>
+<script src="/assets/materials.js?v=20260812j"></script>
+<script src="/assets/materials-ui.js?v=20260812j"></script>
+<script src="/assets/workspace.js?v=20260812j"></script>
+<script src="/assets/workspace-ui.js?v=20260812j"></script>
+<script src="/assets/main.js?v=20260812j"></script>
 
 </body>
 </html>

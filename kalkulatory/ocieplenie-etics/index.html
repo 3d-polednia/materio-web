@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/insulation-etics/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/ocieplenie-etics/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812i" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812j" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Ocieplenie (ETICS) — Kalkulatory budowlane online | LiczMat">
 <meta name="twitter:description" content="Ocieplenie (ETICS) — darmowy kalkulator online. Styropian, kołki, klej, siatka. Ten sam wzór co w aplikacji LiczMat na Androida, bez rejestracji.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812i">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812j">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Twoje dane</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Wybierz materiał</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-insulation-area">Powierzchnia (m²)</label><input id="f-insulation-area" type="text" inputmode="decimal" data-k="area" value="80"></div><div class="field"><label for="f-insulation-foamThk">Grubość styropianu (cm)</label><input id="f-insulation-foamThk" type="text" inputmode="decimal" data-k="foamThk" value="15"></div><div class="field"><label for="f-insulation-dowels">Kołki na m²</label><input id="f-insulation-dowels" type="text" inputmode="decimal" data-k="dowels" value="6"></div><div class="field"><label for="f-insulation-adhesive">Klej (kg/m²)</label><input id="f-insulation-adhesive" type="text" inputmode="decimal" data-k="adhesive" value="5"></div><div class="field"><label for="f-insulation-price">Cena za sztukę/opak.</label><input id="f-insulation-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-insulation-area">Powierzchnia (m²)</label><input id="f-insulation-area" type="text" inputmode="decimal" data-k="area" value="80"></div><div class="field"><label for="f-insulation-foamThk">Grubość styropianu (cm)</label><input id="f-insulation-foamThk" type="text" inputmode="decimal" data-k="foamThk" value="15"></div><div class="field"><label for="f-insulation-dowels">Kołki na m²</label><input id="f-insulation-dowels" type="text" inputmode="decimal" data-k="dowels" value="6"></div><div class="field"><label for="f-insulation-adhesive">Klej (kg/m²)</label><input id="f-insulation-adhesive" type="text" inputmode="decimal" data-k="adhesive" value="5"></div><div class="field"><label for="f-insulation-price">Cena za opakowanie</label><input id="f-insulation-price" type="text" inputmode="decimal" data-k="price" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Policz"
           data-label-again="Oblicz ponownie">Policz</button>
@@ -187,7 +187,7 @@
         <div class="result show" data-result>
           <div class="muted eyebrow">Do kupienia</div>
           <div class="big">40 <span class="figure-line">opak.</span></div>
-          <div class="rows"><div><span>Styropian</span><b>80 m² · 15 cm</b></div><div><span>Kołki</span><b>480</b></div><div><span>Klej</span><b>400 kg</b></div><div><span>Siatka</span><b>88 m²</b></div></div>
+          <div class="rows"><div><span>Opakowanie</span><b>2 m²</b></div><div><span>Płyty styropianu</span><b>160</b></div><div><span>Kołki</span><b>480</b></div><div><span>Klej</span><b>400 kg</b></div><div><span>Siatka</span><b>88 m²</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Dane się zmieniły. Kliknij „Oblicz ponownie”, żeby zobaczyć nowy wynik.</p>
         <div class="calc-actions" data-calc-actions></div>
@@ -213,6 +213,7 @@
           <h3>Wzór</h3>
           <pre class="formula"><code>m² z opakowania = 0,30 × 100 ÷ Grubość styropianu
 opakowania styropianu = ⌈ Powierzchnia ÷ m² z opakowania ⌉
+płyty styropianu = ⌈ Powierzchnia ÷ 0,5 ⌉
 kołki = ⌈ Powierzchnia × Kołki na m² ⌉
 klej razem = Powierzchnia × Klej kg
 siatka = Powierzchnia × 1,10 m²</code></pre>
@@ -307,16 +308,16 @@ siatka = Powierzchnia × 1,10 m²</code></pre>
   "de": "/de/rechner/daemmung-wdvs/",
   "en": "/en/calculators/insulation-etics/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260812i"></script>
-<script src="/assets/i18n-runtime.js?v=20260812i"></script>
-<script src="/assets/currency.js?v=20260812i"></script>
+<script src="/assets/i18n.pl.js?v=20260812j"></script>
+<script src="/assets/i18n-runtime.js?v=20260812j"></script>
+<script src="/assets/currency.js?v=20260812j"></script>
 
-<script src="/assets/calculators.js?v=20260812i"></script>
-<script src="/assets/materials.js?v=20260812i"></script>
-<script src="/assets/materials-ui.js?v=20260812i"></script>
-<script src="/assets/workspace.js?v=20260812i"></script>
-<script src="/assets/workspace-ui.js?v=20260812i"></script>
-<script src="/assets/main.js?v=20260812i"></script>
+<script src="/assets/calculators.js?v=20260812j"></script>
+<script src="/assets/materials.js?v=20260812j"></script>
+<script src="/assets/materials-ui.js?v=20260812j"></script>
+<script src="/assets/workspace.js?v=20260812j"></script>
+<script src="/assets/workspace-ui.js?v=20260812j"></script>
+<script src="/assets/main.js?v=20260812j"></script>
 
 </body>
 </html>

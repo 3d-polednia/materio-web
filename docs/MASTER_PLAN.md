@@ -35,8 +35,10 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 7 | Centrum kalkulatorów | **Zrobione** — 2026-08-12 |
 | 8 | Pojedynczy kalkulator | **Zrobione** — 2026-08-12 |
 | 9 | Kalkulatory grupa 1 (Płytki i wykończenie) | **Zrobione** — 2026-08-12 |
-| 10 | Kalkulatory grupa 2 | **Następna** |
-| 11–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 10 | Kalkulatory grupa 2 (Malowanie + Budowa) | **Zrobione** — 2026-08-12 |
+| 11 | Kalkulatory grupa 3 (Rozkrój + Zabudowa G-K) | **Zrobione** — 2026-08-12 |
+| 12 | Test kalkulatorów | **Następna** |
+| 13–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -68,6 +70,76 @@ Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystki
 dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)
 został zaktualizowany na żywo. Matematyka kalkulatorów nietknięta.
 
+### Co zrobiły Sesje 10 i 11
+
+Właściciel zlecił obie naraz, świadomie zawieszając rozdział XXXV na ten przebieg.
+Zakres razem: **pozostałe dwanaście kalkulatorów** — grupa 2 (Malowanie: farby/tynki,
+tapety; Budowa: beton z worka, wylewka, murowanie, ocieplenie) i grupa 3 (Rozkrój 1D
+i 2D; Zabudowa G-K: ściana działowa, sufit podwieszany, G-K na klej, poszycie).
+
+Motyw obu sesji jest jeden i wyszedł już przy grupie 1: **silniki liczą więcej, niż
+strona pokazuje.** Kotlinowe wyniki (`SurfaceWasteResult`, `WallpaperResult`,
+`InsulationResult`, `CeilingGridResult`, `SheathingResult`, `StudWallResult`) niosą
+pola, które port wyrzucał do kosza. Nic z poniższych nie jest nową matematyką — to
+liczby, które silnik i tak miał w ręku.
+
+- **Dwa panele wyniku były puste.** „Tapety” pokazywały samo „3 rolek”, „Poszycie
+  (OSB/deski)” samo „11 arkuszy”. Tapety mają teraz pasy (`stripsNeeded` × długość pasa)
+  i pasy z rolki (`stripsPerRoll`) — czyli dokładnie to, co tłumaczy, dlaczego raport
+  wzoru podnosi liczbę rolek. Poszycie: pole arkusza, powierzchnia z zapasem i to, co
+  arkusze faktycznie pokryją.
+- **Tapety przestały milczeć o przypadku granicznym.** Gdy pas jest dłuższy niż cała
+  rolka, silnik przechodzi na „jedna rolka na pas” — kotlinowy komentarz nazywa to
+  `rough upper bound`. Strona pokazywała po prostu wynik, bez słowa. Teraz mówi to wprost
+  zamiast wypisać „0 pasów z rolki”.
+- **Ocieplenie pokazywało wiersz, który powtarzał pola formularza.** „Styropian 80 m² ·
+  15 cm” to były te same dwie liczby, które stały nad nim w formularzu.
+  `InsulationResult` zwraca dwie, które naprawdę tłumaczą liczbę opakowań: ile m² ma
+  jedno opakowanie i ile pojedynczych płyt 0,5 m² z tego wychodzi (160 przy 80 m²).
+- **Sufit podwieszany gubił kotwy.** `CeilingGridResult.perimeterAnchors` nie trafiało
+  na stronę, więc lista zakupów była niepełna — profilu UD nie ma czym przykręcić do
+  ścian.
+- **Ściana działowa myliła słupki z profilami.** Na stronie były tylko „profile CW: 8 × 3
+  m”, choć `studCount` i `studBars` to dwie różne liczby: ściana wyższa niż jedna sztanga
+  potrzebuje dwóch profili na słupek. Teraz widać obie, plus powierzchnię ściany.
+- **Dwie stałe zaszyte w kodzie stały się polami.** `TradeCalc.concrete` przyjmuje
+  wydajność worka (12,5 l), `TradeCalc.screed` zużycie (2,0 kg/m²/mm) — obie jako
+  parametry z wartością domyślną. Serwis miał je wpisane na sztywno, więc „40 worków”
+  nie dało się sprawdzić z workiem w ręku, a produktu o innej gęstości nie dało się
+  policzyć wcale. Są na formularzu, w wartościach domyślnych z Kotlina, więc liczba dla
+  wartości, z jakimi otwiera się strona, nie drgnęła.
+- **Rozkrój liniowy ucinał plan bez ostrzeżenia.** Plan cięcia pokazuje osiem sztang;
+  przy dwunastu cztery znikały po cichu. Teraz jest wiersz mówiący, ile jeszcze zostało.
+  Doszła też liczba elementów, bo lista wejściowa jest tekstem i łatwo się w niej pomylić.
+- **Rozkrój płyt** dostał liczbę formatek, metry użyteczne i kupione — te same trzy
+  liczby, z których i tak liczył się procent odpadu.
+- **„2 rolek”, „2 płyt”, „2 sztang”, „2 arkuszy”.** Mechanizm odmiany z Sesji 9 obejmuje
+  teraz wszystkie pięć jednostek, które serwis wypisuje słowem. `res_pkgs` („opak.”)
+  i `res_pieces` („szt.”) zostają nieodmienne i takie zostaną — skrótu się nie odmienia.
+- **Wpisane 0 znaczy 0.** Najgorsze były `|| 5` w murowaniu i `|| 10` w poszyciu:
+  poproszenie o zerowy zapas po cichu dokładało 5 % albo 10 %. `orDefault()` obowiązuje
+  teraz w każdym polu z wartością domyślną — a celowo nie tam, gdzie zero jest prawdziwą
+  wartością (rzaz piły, zapas w kalkulatorze płytek).
+- **Ujemna cena odrzucana we wszystkich piętnastu silnikach.** Rozkrój liniowy nie miał
+  żadnej kontroli, rozkrój płyt zwracał „Podaj dodatnie wartości”, czyli komunikat
+  o innym polu.
+- **Każde pole ceny nazywa swoją jednostkę** — za rolkę, za sztangę, za arkusz, za płytę,
+  za sztukę, za worek, za opakowanie. `fld_price` („Cena za sztukę/opak.”) nie jest już
+  używane przez żaden kalkulator.
+- **Wiersze wyniku mogą nieść słowa, nie tylko liczby.** `localizeRow()` tłumaczy teraz
+  dowolny klucz w pionowych kreskach, a `|klucz:liczba|` dodatkowo odmienia go przez
+  liczbę. Wcześniej umiał jedno słowo: litr. Bez tego połowy nowych wierszy nie dałoby
+  się napisać raz na cztery języki.
+- Sprawdzone: **976 testów silników + 442 testy stron w Chromium — 1418/1418 przechodzi.**
+  Silniki: **488 kombinacji wejść puszczonych równolegle przez kod z Sesji 8** (`git show
+  22ec3ec`) i przez nowy — liczba do kupienia i koszt zgadzają się co do jednego we
+  wszystkich piętnastu kalkulatorach. Strony: osiem kalkulatorów × cztery języki
+  (wynik z odmienioną jednostką, wiersze, przetłumaczone etykiety wierszy, brak
+  niepodmienionego tokenu `|…|`, etykieta ceny, odmowa ujemnej ceny, brak błędów
+  w konsoli), cztery stelażowe po polsku, przejście 1 → 3 → 8 rolek na jednej stronie
+  (trzy formy liczby mnogiej), nowe pola betonu i wylewki realnie zmieniające wynik oraz
+  brak przewijania w bok na wszystkich piętnastu stronach przy 360 i 1280 px.
+
 ### Co zrobiła Sesja 9
 
 Pierwsza grupa kalkulatorów — **Płytki i wykończenie**: „Płytki, panele, gres”,
@@ -95,14 +167,14 @@ matematykę tylko wtedy, gdy znaleziono konkretny błąd”.
   „Podaj dodatnie wartości”, który mówiłby nie o tym polu.
 - **Wpisane 0 przestało znaczyć „domyślne”.** `num(f.bag) || 25` nie odróżnia pustego pola
   od wpisanego zera i odpowiadało workiem 25 kg, o który nikt nie prosił. `orDefault()`
-  rozróżnia: puste = domyślne, wpisane = wpisane, zero = błąd. Założone na dwa pola
-  grupy 1; `|| n` zostaje w wylewce, ociepleniu i stelażach.
+  rozróżnia: puste = domyślne, wpisane = wpisane, zero = błąd. Założone wtedy na dwa pola
+  grupy 1; Sesje 10–11 rozciągnęły to na wszystkie pola z wartością domyślną.
 - **„4 worków” → „4 worki”.** Liczebnik odmienia rzeczownik w trzech formach po polsku
   i ukraińsku (1 / 2–4 / 5+, nastki idą z ostatnią), w dwóch po niemiecku i angielsku,
   a skrót i symbol (kg, m², opak., szt.) w żadnej. `unitLabel()` w `assets/calculators.js`
   wybiera formę; klucz bazowy nadal trzyma formę „5+”, więc jednostka bez zadeklarowanych
-  form renderuje się dokładnie jak wcześniej. Zrobione dla `res_bags`, czyli jedynej
-  jednostki-słowa w grupie 1. Ta sama poprawka idzie w ślad za wynikiem do kosztorysu
+  form renderuje się dokładnie jak wcześniej. Zrobione wtedy dla `res_bags`, czyli
+  jedynej jednostki-słowa w grupie 1; reszta doszła w Sesjach 10–11. Ta sama poprawka idzie w ślad za wynikiem do kosztorysu
   (`assets/workspace-ui.js`), żeby zapisana pozycja nie mówiła „1 worków”.
 - **Wynik mówi, ile naprawdę kupujesz.** Płytki: „Kupujesz 21,6 m²” — to `purchasedArea`,
   które kotlinowy raport liczy od zawsze i względem którego liczony jest odpad; bez tego
@@ -111,8 +183,8 @@ matematykę tylko wtedy, gdy znaleziono konkretny błąd”.
   „100 kg” — etykieta to teraz „Razem”.
 - **Cena mówi, za co.** Jedno „Cena za sztukę/opak.” na trzech stronach, na których
   odpowiedź jest w opakowaniach, workach i workach. Teraz „Cena za opakowanie” /
-  „Cena za worek”. Pozostałe dwanaście kalkulatorów zostaje przy wspólnym `fld_price` —
-  ich grupy to Sesje 10–11.
+  „Cena za worek”. Pozostałe dwanaście kalkulatorów zostawało wtedy przy wspólnym
+  `fld_price`; Sesje 10–11 dokończyły to dla wszystkich.
 - **Fuga dostała skróty formatów.** Te same, które ma kalkulator płytek, bez panelu AC4
   (podłoga pływająca nie ma spoiny do wyfugowania). Wpisują tylko dwa wymiary; grubość
   i spoina zostają, bo format ich nie przesądza.

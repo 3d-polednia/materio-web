@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/bagged-concrete/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/beton-z-worka/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812i" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812j" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Bagged concrete — Construction calculators online | LiczMat">
 <meta name="twitter:description" content="Bagged concrete — free online calculator. Dry-concrete bags and water. The same formula as in the LiczMat app for Android, no sign-up.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812i">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812j">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -176,7 +176,7 @@
       <div class="calc" data-calc="concrete" data-tab="trade">
       <div class="calc-form">
         <h2 id="calc-form-h">Your figures</h2>
-        <div class="field"><label for="f-concrete-vol">Volume (m³)</label><input id="f-concrete-vol" type="text" inputmode="decimal" data-k="vol" value="0.5"></div><div class="field"><label for="f-concrete-price">Price per piece/pack</label><input id="f-concrete-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+        <div class="field"><label for="f-concrete-vol">Volume (m³)</label><input id="f-concrete-vol" type="text" inputmode="decimal" data-k="vol" value="0.5"></div><div class="field"><label for="f-concrete-yield">Bag yield (l)</label><input id="f-concrete-yield" type="text" inputmode="decimal" data-k="yield" value="12.5"></div><div class="field"><label for="f-concrete-price">Price per bag</label><input id="f-concrete-price" type="text" inputmode="decimal" data-k="price" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Calculate"
           data-label-again="Calculate again">Calculate</button>
@@ -186,7 +186,7 @@
         <div class="result show" data-result>
           <div class="muted eyebrow">To buy</div>
           <div class="big">40 <span class="figure-line">bags</span></div>
-          <div class="rows"><div><span>Water</span><b>80 l</b></div></div>
+          <div class="rows"><div><span>Volume</span><b>500 l</b></div><div><span>Water</span><b>80 l</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>The figures changed. Press “Calculate again” to see the new result.</p>
         <div class="calc-actions" data-calc-actions></div>
@@ -203,14 +203,15 @@
       <div class="calc-how-grid">
         <div>
           <h3>What you enter</h3>
-          <ul class="plain-list"><li><b>Volume (m³)</b></li></ul>
+          <ul class="plain-list"><li><b>Volume (m³)</b></li><li><b>Bag yield (l)</b></li></ul>
 
           <h3>What to watch out for</h3>
           <p>The conversion assumes a 25 kg bag of dry mix yielding about 12.5 l of concrete. Check the yield on the bag — it differs between manufacturers.</p>
         </div>
         <div>
           <h3>Formula</h3>
-          <pre class="formula"><code>bags = ⌈ Volume × 1000 ÷ 12.5 ⌉
+          <pre class="formula"><code>litres = Volume × 1000
+bags = ⌈ litres ÷ Bag yield ⌉
 water ≈ bags × 2 l</code></pre>
           <p class="muted src-note">The LiczMat app for Android uses the same formula. The site's engine is a 1:1 port of the app's code.</p>
         </div>
@@ -302,16 +303,16 @@ water ≈ bags × 2 l</code></pre>
   "de": "/de/rechner/sackbeton/",
   "en": "/en/calculators/bagged-concrete/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260812i"></script>
-<script src="/assets/i18n-runtime.js?v=20260812i"></script>
-<script src="/assets/currency.js?v=20260812i"></script>
+<script src="/assets/i18n.en.js?v=20260812j"></script>
+<script src="/assets/i18n-runtime.js?v=20260812j"></script>
+<script src="/assets/currency.js?v=20260812j"></script>
 
-<script src="/assets/calculators.js?v=20260812i"></script>
-<script src="/assets/materials.js?v=20260812i"></script>
-<script src="/assets/materials-ui.js?v=20260812i"></script>
-<script src="/assets/workspace.js?v=20260812i"></script>
-<script src="/assets/workspace-ui.js?v=20260812i"></script>
-<script src="/assets/main.js?v=20260812i"></script>
+<script src="/assets/calculators.js?v=20260812j"></script>
+<script src="/assets/materials.js?v=20260812j"></script>
+<script src="/assets/materials-ui.js?v=20260812j"></script>
+<script src="/assets/workspace.js?v=20260812j"></script>
+<script src="/assets/workspace-ui.js?v=20260812j"></script>
+<script src="/assets/main.js?v=20260812j"></script>
 
 </body>
 </html>

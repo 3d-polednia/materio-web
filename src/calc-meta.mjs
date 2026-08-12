@@ -68,7 +68,8 @@ export const CALC_META = {
   },
   concrete: {
     formula: [
-      "worki = ⌈ {fld_volume} × 1000 ÷ 12,5 ⌉",
+      "litry = {fld_volume} × 1000",
+      "worki = ⌈ litry ÷ {fld_bag_yield} ⌉",
       "woda ≈ worki × 2 {l}",
     ],
     related: ["screed", "mortar", "masonry"],
@@ -82,7 +83,7 @@ export const CALC_META = {
   },
   screed: {
     formula: [
-      "kilogramy = {fld_area} × {fld_thickness} × 2,0",
+      "kilogramy = {fld_area} × {fld_thickness} × {fld_kg_m2_mm}",
       "worki = ⌈ kilogramy ÷ {fld_bag_kg} ⌉",
     ],
     related: ["concrete", "mortar", "coverage"],
@@ -107,6 +108,7 @@ export const CALC_META = {
     formula: [
       "m² z opakowania = 0,30 × 100 ÷ {fld_foam_thk}",
       "opakowania styropianu = ⌈ {fld_area} ÷ m² z opakowania ⌉",
+      "płyty styropianu = ⌈ {fld_area} ÷ 0,5 ⌉",
       "kołki = ⌈ {fld_area} × {fld_dowels_m2} ⌉",
       "klej razem = {fld_area} × {fld_adhesive_m2} {kg}",
       "siatka = {fld_area} × 1,10 {m2}",
@@ -129,6 +131,7 @@ export const CALC_META = {
       "profile CD = ⌈ rzędy CD × {fld_length} ÷ 4 ⌉",
       "profile UD = ⌈ 2 × ({fld_width} + {fld_length}) ÷ 3 ⌉",
       "wieszaki = rzędy CD × (⌊ {fld_length} ÷ {fld_hanger_spacing} ⌋ + 1)",
+      "kotwy = ⌈ 2 × ({fld_width} + {fld_length}) ÷ 0,6 ⌉",
       "płyty = ⌈ {fld_width} × {fld_length} × 1,10 ÷ 2,4 ⌉",
     ],
     related: ["studwall", "drylining", "coverage"],
@@ -143,7 +146,8 @@ export const CALC_META = {
   sheathing: {
     formula: [
       "pole arkusza = ({fld_sheet_w} ÷ 1000) × ({fld_sheet_l} ÷ 1000)",
-      "arkusze = ⌈ {fld_area} × (1 + {fld_waste} ÷ 100) ÷ pole arkusza ⌉",
+      "z zapasem = {fld_area} × (1 + {fld_waste} ÷ 100)",
+      "arkusze = ⌈ z zapasem ÷ pole arkusza ⌉",
     ],
     related: ["sheet", "linear", "studwall"],
   },
@@ -160,7 +164,7 @@ export const FORMULA_I18N = {
   pl: null, // the lines above are authored in Polish
   en: {
     "netto": "net", "pole do pokrycia": "area to cover", "opakowania": "packs", "odpad": "actual waste",
-    "kupujesz": "you buy",
+    "kupujesz": "you buy", "litry": "litres", "płyty styropianu": "EPS boards", "z zapasem": "with allowance",
     "potrzeba": "required", "pas": "strip", "pasów potrzeba": "strips needed",
     "pasów z rolki": "strips per roll", "rolki": "rolls", "worki": "bags", "woda": "water",
     "kilogramy": "kilograms", "sztuki": "pieces", "zaprawa razem": "mortar total", "kołki": "anchors",
@@ -193,7 +197,7 @@ export const FORMULA_I18N = {
   },
   de: {
     "netto": "netto", "pole do pokrycia": "zu beschichtende Fläche", "opakowania": "Gebinde", "odpad": "tatsächlicher Verschnitt",
-    "kupujesz": "Kaufmenge",
+    "kupujesz": "Kaufmenge", "litry": "Liter", "płyty styropianu": "EPS-Platten", "z zapasem": "mit Zuschlag",
     "potrzeba": "Bedarf", "pas": "Bahn", "pasów potrzeba": "Bahnen nötig",
     "pasów z rolki": "Bahnen je Rolle", "rolki": "Rollen", "worki": "Säcke", "woda": "Wasser",
     "kilogramy": "Kilogramm", "sztuki": "Stück", "zaprawa razem": "Mörtel gesamt", "kołki": "Dübel",
@@ -226,7 +230,7 @@ export const FORMULA_I18N = {
   },
   uk: {
     "netto": "нетто", "pole do pokrycia": "площа під фарбування", "opakowania": "упаковки", "odpad": "відходи",
-    "kupujesz": "купуєш",
+    "kupujesz": "купуєш", "litry": "літри", "płyty styropianu": "плити пінопласту", "z zapasem": "із запасом",
     "potrzeba": "потрібно", "pas": "смуга", "pasów potrzeba": "смуг потрібно",
     "pasów z rolki": "смуг з рулону", "rolki": "рулони", "worki": "мішки", "woda": "вода",
     "kilogramy": "кілограми", "sztuki": "штуки", "zaprawa razem": "розчин разом", "kołki": "дюбелі",
