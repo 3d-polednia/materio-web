@@ -32,6 +32,12 @@ const ICON_CUT_PATH = '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"
    geometry is in assets/logo-mark.svg, which is what the PNG icons are rendered from. */
 export const LOGO_MARK = `<svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg>`;
 
+/* What assets/og-image.jpg actually says, written out for anyone who cannot see it.
+   The image has the wordmark and the slogan painted into the pixels, so this line has to
+   be changed in the same commit as the image — it was left behind once already, and every
+   share of every page carried the retired "Policz. Kup. Nie marnuj." for it. */
+export const OG_IMAGE_ALT = "LiczMat — Policz. Zaplanuj. Zrealizuj.";
+
 const ICON = {
   cut: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${ICON_CUT_PATH}</svg>`,
   play: '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>',
@@ -240,7 +246,7 @@ ${hreflangs}
 <meta property="og:image" content="${BASE}/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="LiczMat — Policz. Kup. Nie marnuj.">
+<meta property="og:image:alt" content="${esc(OG_IMAGE_ALT)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
