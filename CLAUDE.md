@@ -3,13 +3,24 @@
 The site for **LiczMat** (renamed from Materio on 2026-08-12), the offline-first
 construction-material calculator. *Policz. Kup. Nie marnuj.*
 
-> **Read `docs/MASTER_PLAN.md` before starting work.** It is the owner's plan for turning
-> this site into the LiczMat platform: the product vision, the three access levels
-> (guest / LiczMat / LiczMat Pro), the branding and design rules, and a numbered list of
-> 36 sessions. Its top section tracks which sessions are done and which decisions are
-> still open. **One session = one task** is the plan's hardest rule: do the session you
-> were asked for, report, and stop — do not roll the next one in because you noticed
-> something worth fixing. Put it in the report instead.
+> **Read `docs/MASTER_PLAN.txt` before starting work.** It is the owner's plan for turning
+> this site into the LiczMat platform, verbatim: the product vision, the three access
+> levels (guest / LiczMat / LiczMat Pro), the branding and design rules, the language and
+> currency targets, and a numbered list of 36 sessions. It is the only source of truth
+> about scope — when the plan changes, that file changes. Do not make a second copy of
+> its contents anywhere; two copies drift.
+>
+> `docs/MASTER_PLAN.md` next to it is the short working document: which sessions are
+> done, and which decisions are still open. Update it at the end of a session.
+>
+> **One session = one task** is the plan's hardest rule (chapter XXXV). Do the session
+> you were asked for, write the report chapter XXXIII asks for, and stop — do not roll
+> the next session in because you noticed something worth fixing. Put it in the report
+> instead. Name the next session; do not start it.
+>
+> Neither file is published: `.github/workflows/pages.yml` strips `docs/`, `src/`,
+> `scripts/`, `CLAUDE.md` and `README.md` out of the Pages artifact, because the repo
+> root is the site root and everything in it is otherwise world-readable.
 >
 > The repo directory, the GitHub remote and the live domain are all still called
 > `materio-web` / `materio-app.com`. That is deliberate — see the open decisions in the

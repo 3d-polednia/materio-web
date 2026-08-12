@@ -4,8 +4,9 @@ Dokumentacja techniczna strony aplikacji **LiczMat**. Opisuje architekturę,
 sposób uruchomienia i wdrożenia, edycję treści i języków, działanie wyszukiwarki
 sklepów, SEO oraz zarządzanie assetami.
 
-- **Plan produktu:** [`MASTER_PLAN.md`](MASTER_PLAN.md) — wizja LiczMat,
-  poziomy dostępu, branding, kolejność 36 sesji. Przeczytaj przed zmianami.
+- **Plan produktu:** [`MASTER_PLAN.txt`](MASTER_PLAN.txt) — wizja LiczMat, poziomy
+  dostępu, branding, kolejność 36 sesji. Oryginał właściciela, źródło prawdy o zakresie.
+  Status prac i otwarte decyzje: [`MASTER_PLAN.md`](MASTER_PLAN.md).
 - **Repozytorium:** `3d-polednia/materio-web`
 - **Adres docelowy:** `https://materio-app.com/`
 - **Aplikacja:** `pl.materio.app` (Google Play), Android 7.0+ (API 24), 10 języków

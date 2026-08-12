@@ -27,6 +27,13 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      # Pages serves whatever is uploaded, and the repo root holds more than the site:
+      # the product plan, the generator sources and the working notes. Nothing the site
+      # renders links to any of them, so they are dropped from the artifact. This
+      # deletes from the runner's checkout only — the files stay in the repository.
+      # (.github is excluded by Pages already; .claude and .gitignore are not.)
+      - name: Drop internal files from the published site
+        run: rm -rf docs src scripts CLAUDE.md README.md .claude .gitignore
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
