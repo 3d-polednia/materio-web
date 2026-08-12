@@ -1,4 +1,4 @@
-/* Materio website — Firebase Web configuration for /app/ and /p/.
+/* LiczMat website — Firebase Web configuration for /app/ and /p/.
  *
  * These are the real values for the Web app registered in project `materio-502513`
  * (Firebase console → Project settings → General → Your apps → "materio-app.com").

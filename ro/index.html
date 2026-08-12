@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+  } catch (e) {}
+</script>
 <!-- Google tag (gtag.js) with Consent Mode v2 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
@@ -30,14 +38,14 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Materio — calculator și optimizator de materiale de construcții pentru Android</title>
+<title>LiczMat — calculator și optimizator de materiale de construcții pentru Android</title>
 <meta name="description" content="Calculator gratuit pentru construcții: vopsea, tencuială, gresie, parchet, tapet și debitare 1D/2D. Calculează materialul, cumpără cât îți trebuie, redu pierderile. Hartă magazine, proiecte, deviz PDF. Calculează offline, cont opțional, 10 limbi.">
-<meta name="author" content="Materio">
+<meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-title" content="Materio">
-<meta name="application-name" content="Materio">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
 <link rel="canonical" href="https://materio-app.com/ro/">
 <link rel="alternate" hreflang="pl" href="https://materio-app.com/">
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/">
@@ -51,29 +59,30 @@
 <link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260812a" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Materio">
+<meta property="og:site_name" content="LiczMat">
 <meta property="og:locale" content="ro_RO">
-<meta property="og:title" content="Materio — calculator și optimizator de materiale de construcții pentru Android">
+<meta property="og:title" content="LiczMat — calculator și optimizator de materiale de construcții pentru Android">
 <meta property="og:description" content="Calculator gratuit pentru construcții: vopsea, tencuială, gresie, parchet, tapet și debitare 1D/2D. Calculează materialul, cumpără cât îți trebuie, redu pierderile. Hartă magazine, proiecte, deviz PDF. Calculează offline, cont opțional, 10 limbi.">
 <meta property="og:url" content="https://materio-app.com/ro/">
 <meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Materio — Policz. Kup. Nie marnuj.">
+<meta property="og:image:alt" content="LiczMat — Policz. Kup. Nie marnuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Materio — calculator și optimizator de materiale de construcții pentru Android">
+<meta name="twitter:title" content="LiczMat — calculator și optimizator de materiale de construcții pentru Android">
 <meta name="twitter:description" content="Calculator gratuit pentru construcții: vopsea, tencuială, gresie, parchet, tapet și debitare 1D/2D. Calculează materialul, cumpără cât îți trebuie, redu pierderile. Hartă magazine, proiecte, deviz PDF. Calculează offline, cont opțional, 10 limbi.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "MobileApplication",
-  "name": "Materio",
+  "name": "LiczMat",
   "operatingSystem": "Android 7.0+",
   "applicationCategory": "UtilitiesApplication",
   "inLanguage": [
@@ -92,7 +101,7 @@
   "downloadUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
   "installUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
   "image": "https://materio-app.com/assets/og-image.jpg",
-  "description": "Materio este un calculator și optimizator de materiale de construcții pentru echipe, meseriași și pasionați de bricolaj. Calculatoarele, camerele, proiectele și harta magazinelor merg pe telefon și aici, în browser.",
+  "description": "LiczMat este un calculator și optimizator de materiale de construcții pentru echipe, meseriași și pasionați de bricolaj. Calculatoarele, camerele, proiectele și harta magazinelor merg pe telefon și aici, în browser.",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -100,11 +109,11 @@
   },
   "author": {
     "@type": "Organization",
-    "name": "Materio"
+    "name": "LiczMat"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "Materio"
+    "name": "LiczMat"
   }
 }
 </script>
@@ -112,7 +121,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Materio",
+  "name": "LiczMat",
   "url": "https://materio-app.com/",
   "logo": "https://materio-app.com/assets/icon-512.png"
 }
@@ -124,10 +133,10 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Materio este gratuit?",
+      "name": "LiczMat este gratuit?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Da. Materio se descarcă și se folosește gratuit. Nu există abonament și nici funcții cu plată. Contul este opțional și tot gratuit. Aplicația se susține din reclame Google AdMob."
+        "text": "Da. LiczMat se descarcă și se folosește gratuit. Nu există abonament și nici funcții cu plată. Contul este opțional și tot gratuit. Aplicația se susține din reclame Google AdMob."
       }
     },
     {
@@ -151,12 +160,12 @@
       "name": "Cum funcționează căutarea magazinelor?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Introduci un oraș sau numele unui magazin, iar Materio arată cele mai apropiate locuri pe Google Maps și te ghidează spre cel ales. Poți partaja și locația ca să vezi magazinele din jurul tău."
+        "text": "Introduci un oraș sau numele unui magazin, iar LiczMat arată cele mai apropiate locuri pe Google Maps și te ghidează spre cel ales. Poți partaja și locația ca să vezi magazinele din jurul tău."
       }
     },
     {
       "@type": "Question",
-      "name": "Ce date colectează Materio?",
+      "name": "Ce date colectează LiczMat?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Fără cont, proiectele, devizele și setările tale sunt stocate doar pe dispozitiv. După autentificare, proiectele, camerele, devizele și listele de cumpărături sunt copiate în Google Firestore (europe-central2, Varșovia), unde le vede doar contul tău. Aplicația folosește servicii Google (reclame AdMob și hărți la căutarea magazinelor) care prelucrează date limitate. Totul este descris în"
@@ -172,7 +181,7 @@
     },
     {
       "@type": "Question",
-      "name": "Pe ce telefoane rulează Materio?",
+      "name": "Pe ce telefoane rulează LiczMat?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Pe telefoane și tablete cu Android 7.0 (API 24) sau mai nou."
@@ -187,7 +196,8 @@
 <a class="skip-link" href="#main">Sari la conținut</a>
 <header class="site">
   <div class="wrap nav">
-    <a class="brand" href="/ro/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
+    <a class="brand" href="/ro/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Schimbă tema" title="Schimbă tema"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Calculatoare">
       <a href="/ro/calculatoare/">Calculatoare</a>
@@ -207,7 +217,7 @@
     <div class="hero-copy">
       <span class="badge"><span class="dot"></span><span>Calculează offline · cont opțional</span></span>
       <h1 id="hero-h">Calculează materialul. Cumpără exact cât trebuie. Nu risipi.</h1>
-      <p class="lead">Materio este un calculator și optimizator de materiale de construcții pentru echipe, meseriași și pasionați de bricolaj. Calculatoarele, camerele, proiectele și harta magazinelor merg pe telefon și aici, în browser.</p>
+      <p class="lead">LiczMat este un calculator și optimizator de materiale de construcții pentru echipe, meseriași și pasionați de bricolaj. Calculatoarele, camerele, proiectele și harta magazinelor merg pe telefon și aici, în browser.</p>
       <div class="store-badges">
         <a class="btn btn-primary btn-lg" href="/ro/calculatoare/">Încearcă calculatoarele</a>
         
@@ -235,7 +245,7 @@
   </div>
 </section>
 
-<section class="block" aria-label="Materio" style="padding-top:8px">
+<section class="block" aria-label="LiczMat" style="padding-top:8px">
   <div class="wrap">
     <div class="stat-band">
       <div class="stat"><div class="num">0 lei</div><div class="lbl">Gratuit, cont opțional</div></div>
@@ -250,7 +260,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Funcții</div>
-      <h2 id="feat-h">Ce calculează Materio</h2>
+      <h2 id="feat-h">Ce calculează LiczMat</h2>
       <p class="muted">Cincisprezece calculatoare rulează chiar aici, în browser. Același motor stă în spatele aplicației Android.</p>
     </div>
     <div class="features">
@@ -273,7 +283,7 @@
     </div>
     <div class="steps">
       <div class="step"><h3>Introdu dimensiunile</h3><p>Introdu suprafața sau dimensiunile camerei. Alege un material din catalog sau introdu-l pe al tău.</p></div>
-      <div class="step"><h3>Materio calculează</h3><p>Motorul calculează necesarul, rezerva și planul de debitare. Vezi imediat cât să cumperi, costul și pierderea.</p></div>
+      <div class="step"><h3>LiczMat calculează</h3><p>Motorul calculează necesarul, rezerva și planul de debitare. Vezi imediat cât să cumperi, costul și pierderea.</p></div>
       <div class="step"><h3>Cumpără și construiește</h3><p>Salvează în proiect, exportă oferta în PDF și mergi la magazin cu lista gata.</p></div>
     </div>
   </div>
@@ -411,7 +421,7 @@
     <div class="section-head">
       <div class="kicker">Camere</div>
       <h2 id="rooms-h">Introdu camera o dată</h2>
-      <p class="muted">Dă dimensiunile și Materio calculează suprafețele și le trimite calculatoarelor. În aplicație salvezi camere (living, baie, bucătărie) și revii oricând.</p>
+      <p class="muted">Dă dimensiunile și LiczMat calculează suprafețele și le trimite calculatoarelor. În aplicație salvezi camere (living, baie, bucătărie) și revii oricând.</p>
     </div>
     <div class="split-2">
       <div id="room-helper" class="calc">
@@ -444,7 +454,7 @@
     <div class="section-head">
       <div class="kicker">Proiecte</div>
       <h2 id="proj-h">Tot devizul într-un singur loc</h2>
-      <p class="muted">Adaugi fiecare calcul într-un proiect. Materio adună cantitățile, costul și pierderea, iar totul îl exporți în PDF pentru client.</p>
+      <p class="muted">Adaugi fiecare calcul într-un proiect. LiczMat adună cantitățile, costul și pierderea, iar totul îl exporți în PDF pentru client.</p>
     </div>
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><h3>Listă de materiale</h3><p>Toate pozițiile cu cantități și prețuri într-o singură vedere.</p></div>
@@ -464,7 +474,7 @@
     <div class="section-head">
       <div class="kicker">Contul este opțional</div>
       <h2 id="acct-h">Cont și sincronizare</h2>
-      <p class="muted">Contul Materio este opțional. Calculatorul funcționează fără autentificare — contul e necesar abia ca să salvezi proiecte și camere și să le ai și pe telefon, și în browser.</p>
+      <p class="muted">Contul LiczMat este opțional. Calculatorul funcționează fără autentificare — contul e necesar abia ca să salvezi proiecte și camere și să le ai și pe telefon, și în browser.</p>
     </div>
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></div><h3>Contul este opțional</h3><p>Fără autentificare totul se calculează pe dispozitivul tău, exact ca până acum.</p></div>
@@ -480,7 +490,7 @@
     <div class="section-head">
       <div class="kicker">Magazine</div>
       <h2 id="stores-teaser-h">Găsește un magazin de construcții în apropiere</h2>
-      <p class="muted">Scrie un oraș sau numele unui magazin, iar Materio arată cele mai apropiate locuri pe hartă și te duce la cel ales. La fel funcționează și căutarea magazinelor din aplicație.</p>
+      <p class="muted">Scrie un oraș sau numele unui magazin, iar LiczMat arată cele mai apropiate locuri pe hartă și te duce la cel ales. La fel funcționează și căutarea magazinelor din aplicație.</p>
     </div>
     <p class="center"><a class="btn btn-primary" href="/ro/magazine/">Arată pe hartă</a></p>
   </div>
@@ -501,7 +511,7 @@
     </div>
     <aside class="trust-panel">
       <h3><span class="shield"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/></svg></span><span>Reclame și date</span></h3>
-      <p class="muted" style="margin-top:12px">Materio este gratuit și se susține din reclame.</p>
+      <p class="muted" style="margin-top:12px">LiczMat este gratuit și se susține din reclame.</p>
       <ul>
         <li>Reclamele sunt furnizate de Google AdMob; în UE decizi asupra reclamelor personalizate.</li>
         <li>Harta magazinelor folosește Google Maps și, cu acordul tău, locația ta, doar pentru a afișa magazinele din apropiere.</li>
@@ -518,13 +528,13 @@
       <h2 id="faq-h">Întrebări frecvente</h2>
     </div>
     <div class="faq">
-      <details open><summary>Materio este gratuit?</summary><p>Da. Materio se descarcă și se folosește gratuit. Nu există abonament și nici funcții cu plată. Contul este opțional și tot gratuit. Aplicația se susține din reclame Google AdMob.</p></details>
+      <details open><summary>LiczMat este gratuit?</summary><p>Da. LiczMat se descarcă și se folosește gratuit. Nu există abonament și nici funcții cu plată. Contul este opțional și tot gratuit. Aplicația se susține din reclame Google AdMob.</p></details>
       <details><summary>Aplicația funcționează fără internet?</summary><p>Da. Toate calculatoarele și optimizatorul de debitare rulează offline, direct pe telefon. Fără cont, proiectele și rezultatele rămân pe dispozitiv. Sincronizarea în cloud cere autentificare și internet.</p></details>
       <details><summary>Trebuie să-mi fac cont?</summary><p>Nu. Deschizi aplicația și calculezi imediat. Creezi un cont doar dacă vrei proiectele și camerele salvate și pe telefon, și în browser.</p></details>
-      <details><summary>Cum funcționează căutarea magazinelor?</summary><p>Introduci un oraș sau numele unui magazin, iar Materio arată cele mai apropiate locuri pe Google Maps și te ghidează spre cel ales. Poți partaja și locația ca să vezi magazinele din jurul tău.</p></details>
-      <details><summary>Ce date colectează Materio?</summary><p><span>Fără cont, proiectele, devizele și setările tale sunt stocate doar pe dispozitiv. După autentificare, proiectele, camerele, devizele și listele de cumpărături sunt copiate în Google Firestore (europe-central2, Varșovia), unde le vede doar contul tău. Aplicația folosește servicii Google (reclame AdMob și hărți la căutarea magazinelor) care prelucrează date limitate. Totul este descris în</span> <a href="/privacy-policy.html">Politica de confidențialitate</a>.</p></details>
+      <details><summary>Cum funcționează căutarea magazinelor?</summary><p>Introduci un oraș sau numele unui magazin, iar LiczMat arată cele mai apropiate locuri pe Google Maps și te ghidează spre cel ales. Poți partaja și locația ca să vezi magazinele din jurul tău.</p></details>
+      <details><summary>Ce date colectează LiczMat?</summary><p><span>Fără cont, proiectele, devizele și setările tale sunt stocate doar pe dispozitiv. După autentificare, proiectele, camerele, devizele și listele de cumpărături sunt copiate în Google Firestore (europe-central2, Varșovia), unde le vede doar contul tău. Aplicația folosește servicii Google (reclame AdMob și hărți la căutarea magazinelor) care prelucrează date limitate. Totul este descris în</span> <a href="/privacy-policy.html">Politica de confidențialitate</a>.</p></details>
       <details><summary>În câte limbi funcționează aplicația?</summary><p>În 10 limbi: poloneză, engleză, germană, cehă, slovacă, română, croată, sârbă, ucraineană și rusă.</p></details>
-      <details><summary>Pe ce telefoane rulează Materio?</summary><p>Pe telefoane și tablete cu Android 7.0 (API 24) sau mai nou.</p></details>
+      <details><summary>Pe ce telefoane rulează LiczMat?</summary><p>Pe telefoane și tablete cu Android 7.0 (API 24) sau mai nou.</p></details>
     </div>
   </div>
 </section>
@@ -541,9 +551,9 @@
   </a>
       </div>
       <div class="cta-shots">
-        <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
           <div class="phone-track" id="hero-shots">
-            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Ecranul principal Materio" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Ecranul principal LiczMat" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Rezultatul calculului: cât cumperi și cât deșeu" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Magazine de construcții în apropiere" loading="lazy" decoding="async">
           </div>
@@ -558,7 +568,7 @@
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <div class="brand"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
         <p class="muted">Calculator și optimizator de materiale de construcții. Calculează. Cumpără. Nu risipi.</p>
       </div>
       <div>
@@ -585,7 +595,7 @@
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© <span data-year>2026</span> Materio. Toate drepturile rezervate.</span>
+      <span>© <span data-year>2026</span> LiczMat. Toate drepturile rezervate.</span>
       <span>Rezultatele sunt estimative. Verifică înainte de cumpărare.</span>
     </div>
   </div>
@@ -599,7 +609,7 @@
     <button type="button" id="consent-accept" class="btn btn-primary btn-sm">De acord</button>
   </div>
 </div>
-<script>window.MATERIO_ALTERNATES = {
+<script>window.LICZMAT_ALTERNATES = {
   "pl": "/",
   "en": "/en/",
   "de": "/de/",
@@ -611,15 +621,15 @@
   "uk": "/uk/",
   "ru": "/ru/"
 };</script>
-<script src="/assets/i18n.ro.js?v=20260808h"></script>
-<script src="/assets/i18n-runtime.js?v=20260808h"></script>
+<script src="/assets/i18n.ro.js?v=20260812a"></script>
+<script src="/assets/i18n-runtime.js?v=20260812a"></script>
 
-<script src="/assets/calculators.js?v=20260808h"></script>
-<script src="/assets/materials.js?v=20260808h"></script>
-<script src="/assets/materials-ui.js?v=20260808h"></script>
-<script src="/assets/workspace.js?v=20260808h"></script>
-<script src="/assets/workspace-ui.js?v=20260808h"></script>
-<script src="/assets/main.js?v=20260808h"></script>
+<script src="/assets/calculators.js?v=20260812a"></script>
+<script src="/assets/materials.js?v=20260812a"></script>
+<script src="/assets/materials-ui.js?v=20260812a"></script>
+<script src="/assets/workspace.js?v=20260812a"></script>
+<script src="/assets/workspace-ui.js?v=20260812a"></script>
+<script src="/assets/main.js?v=20260812a"></script>
 
 </body>
 </html>

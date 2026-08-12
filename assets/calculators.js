@@ -1,4 +1,4 @@
-/* Materio website — calculator engines ported 1:1 from the Kotlin app
+/* LiczMat website — calculator engines ported 1:1 from the Kotlin app
    (core/calculation/**) and the UI that renders them. Pure math, runs entirely
    in the browser — nothing is sent anywhere, exactly like the offline app. */
 

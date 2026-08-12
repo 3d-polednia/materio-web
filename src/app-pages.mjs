@@ -1,4 +1,4 @@
-/* Materio website — the two pages that are not part of the public, indexable layer:
+/* LiczMat website — the two pages that are not part of the public, indexable layer:
    /app/  the signed-in account: projects, rooms, sync and the account settings
    /p/    the read-only view of a shared estimate
 
@@ -7,14 +7,15 @@
    place — see buildInPlaceSwitcher() in assets/i18n-runtime.js. That is why the markup
    below uses data-i18n attributes while every generated page uses real text. */
 
-import { esc } from "./template.mjs";
+import { esc, LOGO_MARK, themeToggle } from "./template.mjs";
 import { urlCalcIndex, urlHome, PLAY_URL, URL_APP } from "./site.mjs";
 
 /** Header/footer are deliberately minimal here — these pages are a tool, not a funnel. */
 const chrome = (t, bodyMain) => `<header class="site">
   <div class="wrap nav">
-    <a class="brand" href="/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
-    <nav class="nav-links" aria-label="Materio">
+    <a class="brand" href="/">${LOGO_MARK}<span>LiczMat</span></a>
+    ${themeToggle(t)}
+    <nav class="nav-links" aria-label="LiczMat">
       <a href="${urlCalcIndex("pl")}" data-i18n="nav_calc">${esc(t("nav_calc"))}</a>
       <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
       <a class="btn btn-primary btn-sm" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="app">${esc(t("nav_download"))}</a>
@@ -25,7 +26,7 @@ ${bodyMain}
 <footer class="site">
   <div class="wrap">
     <div class="foot-bottom">
-      <span>© <span data-year>2026</span> Materio.</span>
+      <span>© <span data-year>2026</span> LiczMat.</span>
       <span><a href="/privacy-policy.html" data-i18n="foot_privacy">${esc(t("foot_privacy"))}</a></span>
       <span class="muted" data-i18n="app_noindex_note">${esc(t("app_noindex_note"))}</span>
     </div>

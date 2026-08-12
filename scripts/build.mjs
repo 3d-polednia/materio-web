@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Materio website — the page generator.
+/* LiczMat website — the page generator.
  *
  *   node scripts/build.mjs            build everything
  *   node scripts/build.mjs --check    validate the dictionaries and exit
@@ -40,7 +40,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260808h";
+const STAMP = "20260812a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -222,7 +222,7 @@ function workedExample(calc, lang, t) {
 const appLd = (lang, t) => ({
   "@context": "https://schema.org",
   "@type": "MobileApplication",
-  name: "Materio",
+  name: "LiczMat",
   operatingSystem: "Android 7.0+",
   applicationCategory: "UtilitiesApplication",
   inLanguage: LANGS,
@@ -232,8 +232,8 @@ const appLd = (lang, t) => ({
   image: `${BASE}/assets/og-image.jpg`,
   description: t("hero_lead"),
   offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
-  author: { "@type": "Organization", name: "Materio" },
-  publisher: { "@type": "Organization", name: "Materio" },
+  author: { "@type": "Organization", name: "LiczMat" },
+  publisher: { "@type": "Organization", name: "LiczMat" },
 });
 
 const faqLd = (t) => ({
@@ -256,7 +256,7 @@ const calcLd = (calc, lang, t) => ({
   applicationCategory: "UtilitiesApplication",
   browserRequirements: "Requires JavaScript",
   inLanguage: lang,
-  isPartOf: { "@type": "WebSite", name: "Materio", url: BASE + "/" },
+  isPartOf: { "@type": "WebSite", name: "LiczMat", url: BASE + "/" },
   offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
 });
 
@@ -295,7 +295,7 @@ function buildHome() {
       main: homeMain(lang, t, CALCS, CAT),
       jsonld: [appLd(lang, t), {
         "@context": "https://schema.org", "@type": "Organization",
-        name: "Materio", url: BASE + "/", logo: `${BASE}/assets/icon-512.png`,
+        name: "LiczMat", url: BASE + "/", logo: `${BASE}/assets/icon-512.png`,
       }, faqLd(t)],
       scripts: CALC_SCRIPTS,
     }));
@@ -309,7 +309,7 @@ function buildCalculatorPages() {
     const { main, ld } = calcHubMain(lang, t, CALCS);
     write(join(urlCalcIndex(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("calchub_title")} — Materio`,
+      title: `${t("calchub_title")} — LiczMat`,
       description: t("calchub_meta"),
       path: urlCalcIndex(lang),
       alternates: hubAlt,
@@ -343,7 +343,7 @@ function buildCalculatorPages() {
       });
       write(join(urlCalc(lang, calc.id), "index.html").replace(/^\//, ""), page({
         lang, t, stamp: STAMP,
-        title: `${name} — ${t("calchub_title")} | Materio`,
+        title: `${name} — ${t("calchub_title")} | LiczMat`,
         description,
         path: urlCalc(lang, calc.id),
         alternates: alt,
@@ -362,7 +362,7 @@ function buildGuides() {
     const { main, ld } = guideIndexMain(lang, t, GUIDES);
     write(join(urlGuideIndex(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("guides_title")} — Materio`,
+      title: `${t("guides_title")} — LiczMat`,
       description: t("guides_meta"),
       path: urlGuideIndex(lang),
       alternates: indexAlt,
@@ -377,7 +377,7 @@ function buildGuides() {
       const { main, ld } = guideMain(guide, lang, t);
       write(join(urlGuide(lang, guide), "index.html").replace(/^\//, ""), page({
         lang, t, stamp: STAMP,
-        title: `${t(`g_${guide.id}_t`)} — Materio`,
+        title: `${t(`g_${guide.id}_t`)} — LiczMat`,
         description: t(`g_${guide.id}_d`),
         path: urlGuide(lang, guide),
         alternates: alt,
@@ -394,7 +394,7 @@ function buildMaterials() {
     const { main, ld } = materialsMain(lang, t, CAT);
     write(join(urlMaterials(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("matpage_title")} — Materio`,
+      title: `${t("matpage_title")} — LiczMat`,
       description: t("matpage_meta"),
       path: urlMaterials(lang),
       alternates: alt,
@@ -411,7 +411,7 @@ function buildCookiesPage() {
     const { main, ld } = cookiesMain(lang, t);
     write(join(urlCookies(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("cookiepage_title")} \u2014 Materio`,
+      title: `${t("cookiepage_title")} \u2014 LiczMat`,
       description: t("cookiepage_meta"),
       path: urlCookies(lang),
       alternates: alt,
@@ -427,7 +427,7 @@ function buildAndroidPage() {
     const { main, ld } = androidMain(lang, t, CALCS, CAT);
     write(join(urlAndroid(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("apppage_title")} \u2014 Materio`,
+      title: `${t("apppage_title")} \u2014 LiczMat`,
       description: t("apppage_meta"),
       path: urlAndroid(lang),
       alternates: alt,
@@ -445,7 +445,7 @@ function buildWorkspacePages() {
     const projects = projectsMain(lang, t);
     write(join(urlProjects(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("wspage_title")} \u2014 Materio`,
+      title: `${t("wspage_title")} \u2014 LiczMat`,
       description: t("wspage_meta"),
       path: urlProjects(lang),
       alternates: projAlt,
@@ -456,7 +456,7 @@ function buildWorkspacePages() {
     const estimate = estimateMain(lang, t);
     write(join(urlEstimate(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("estpage_title")} \u2014 Materio`,
+      title: `${t("estpage_title")} \u2014 LiczMat`,
       description: t("estpage_meta"),
       path: urlEstimate(lang),
       alternates: estAlt,
@@ -473,7 +473,7 @@ function buildStores() {
     const { main, ld } = storesMain(lang, t);
     write(join(urlStores(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("storespage_title")} — Materio`,
+      title: `${t("storespage_title")} — LiczMat`,
       description: t("storespage_meta"),
       path: urlStores(lang),
       alternates: alt,
@@ -498,7 +498,7 @@ function buildPrivatePages() {
 
   write("app/index.html", page({
     ...common,
-    title: `${t("app_title")} — Materio`,
+    title: `${t("app_title")} — LiczMat`,
     description: t("app_lead"),
     path: URL_APP,
     main: appMain(t),
@@ -510,7 +510,7 @@ function buildPrivatePages() {
 
   write("p/index.html", page({
     ...common,
-    title: `${t("share_title")} — Materio`,
+    title: `${t("share_title")} — LiczMat`,
     description: t("share_lead"),
     path: URL_SHARE,
     main: shareMain(t),

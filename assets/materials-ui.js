@@ -1,4 +1,4 @@
-/* Materio website — the "pick a material" dialog and the /materialy/ page filter.
+/* LiczMat website — the "pick a material" dialog and the /materialy/ page filter.
  *
  * The catalog itself is assets/materials.js; this file is only the interface to it.
  * The dialog is built on first use rather than emitted by the build: it is a control,

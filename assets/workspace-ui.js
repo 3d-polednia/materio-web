@@ -1,4 +1,4 @@
-/* Materio website — the workspace in the browser.
+/* LiczMat website — the workspace in the browser.
  *
  * Three things, each guarded so a page runs only what it contains:
  *   1. a room bar on every calculator card: pick a saved room and a surface, and the
@@ -362,7 +362,7 @@ function buildEstimatePage() {
     const text = [head, ...body]
       .map((line) => line.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";"))
       .join("\r\n");
-    wsDownload(`materio-${(project && project.name) || "kosztorys"}.csv`, "text/csv;charset=utf-8", "﻿" + text);
+    wsDownload(`liczmat-${(project && project.name) || "kosztorys"}.csv`, "text/csv;charset=utf-8", "﻿" + text);
   });
 
   document.addEventListener("workspacechange", wsRenderEstimate);

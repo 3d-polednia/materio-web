@@ -1,4 +1,4 @@
-/* Materio website — the small runtime that goes with a generated per-language bundle.
+/* LiczMat website — the small runtime that goes with a generated per-language bundle.
 
    The pages ship their copy as real HTML in the page's own language, so this file no
    longer rewrites the DOM on load. It does three things:
@@ -7,7 +7,7 @@
       store-finder status lines).
    2. The language switcher. Every language has its own URL, so switching is a
       navigation, not a text swap — that is what makes the other nine languages
-      indexable at all. `window.MATERIO_ALTERNATES` is emitted by the build and maps
+      indexable at all. `window.LICZMAT_ALTERNATES` is emitted by the build and maps
       a language code to this page's address in that language.
    3. Remembering the choice, so the next visit to a shared "/" link lands in the
       language the visitor picked. */
@@ -71,12 +71,12 @@ function buildInPlaceSwitcher() {
 }
 
 function buildLangSwitcher() {
-  if (!window.MATERIO_ALTERNATES) { buildInPlaceSwitcher(); return; }
+  if (!window.LICZMAT_ALTERNATES) { buildInPlaceSwitcher(); return; }
 
   const sel = document.getElementById("lang-select");
   if (!sel || typeof LANGS === "undefined") return;
 
-  const alternates = window.MATERIO_ALTERNATES;
+  const alternates = window.LICZMAT_ALTERNATES;
   const here = pageLang();
 
   sel.innerHTML = LANGS

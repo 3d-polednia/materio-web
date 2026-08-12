@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+  } catch (e) {}
+</script>
 <!-- Google tag (gtag.js) with Consent Mode v2 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
@@ -30,14 +38,14 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Materio — kalkulator i optymalizator materiałów budowlanych na Androida</title>
+<title>LiczMat — kalkulator i optymalizator materiałów budowlanych na Androida</title>
 <meta name="description" content="Darmowy kalkulator budowlany: farby, tynki, płytki, panele, tapety i rozkrój 1D/2D. Policz materiał, kup tyle ile trzeba, ogranicz odpad. Mapa sklepów, projekty, wycena PDF. Liczy offline, konto opcjonalne, 10 języków.">
-<meta name="author" content="Materio">
+<meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-title" content="Materio">
-<meta name="application-name" content="Materio">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
 <link rel="canonical" href="https://materio-app.com/">
 <link rel="alternate" hreflang="pl" href="https://materio-app.com/">
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/">
@@ -51,29 +59,30 @@
 <link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260812a" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Materio">
+<meta property="og:site_name" content="LiczMat">
 <meta property="og:locale" content="pl_PL">
-<meta property="og:title" content="Materio — kalkulator i optymalizator materiałów budowlanych na Androida">
+<meta property="og:title" content="LiczMat — kalkulator i optymalizator materiałów budowlanych na Androida">
 <meta property="og:description" content="Darmowy kalkulator budowlany: farby, tynki, płytki, panele, tapety i rozkrój 1D/2D. Policz materiał, kup tyle ile trzeba, ogranicz odpad. Mapa sklepów, projekty, wycena PDF. Liczy offline, konto opcjonalne, 10 języków.">
 <meta property="og:url" content="https://materio-app.com/">
 <meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Materio — Policz. Kup. Nie marnuj.">
+<meta property="og:image:alt" content="LiczMat — Policz. Kup. Nie marnuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Materio — kalkulator i optymalizator materiałów budowlanych na Androida">
+<meta name="twitter:title" content="LiczMat — kalkulator i optymalizator materiałów budowlanych na Androida">
 <meta name="twitter:description" content="Darmowy kalkulator budowlany: farby, tynki, płytki, panele, tapety i rozkrój 1D/2D. Policz materiał, kup tyle ile trzeba, ogranicz odpad. Mapa sklepów, projekty, wycena PDF. Liczy offline, konto opcjonalne, 10 języków.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "MobileApplication",
-  "name": "Materio",
+  "name": "LiczMat",
   "operatingSystem": "Android 7.0+",
   "applicationCategory": "UtilitiesApplication",
   "inLanguage": [
@@ -92,7 +101,7 @@
   "downloadUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
   "installUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
   "image": "https://materio-app.com/assets/og-image.jpg",
-  "description": "Materio to kalkulator i optymalizator materiałów budowlanych dla ekip, fachowców i majsterkowiczów. Kalkulatory, pomieszczenia, projekty i mapa sklepów działają w telefonie i tutaj, w przeglądarce.",
+  "description": "LiczMat to kalkulator i optymalizator materiałów budowlanych dla ekip, fachowców i majsterkowiczów. Kalkulatory, pomieszczenia, projekty i mapa sklepów działają w telefonie i tutaj, w przeglądarce.",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -100,11 +109,11 @@
   },
   "author": {
     "@type": "Organization",
-    "name": "Materio"
+    "name": "LiczMat"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "Materio"
+    "name": "LiczMat"
   }
 }
 </script>
@@ -112,7 +121,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Materio",
+  "name": "LiczMat",
   "url": "https://materio-app.com/",
   "logo": "https://materio-app.com/assets/icon-512.png"
 }
@@ -124,10 +133,10 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Czy Materio jest darmowe?",
+      "name": "Czy LiczMat jest darmowe?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Tak. Materio pobierzesz i używasz za darmo. Nie ma subskrypcji ani opłat za funkcje. Konto jest opcjonalne i też nic nie kosztuje. Aplikacja utrzymuje się z reklam Google AdMob."
+        "text": "Tak. LiczMat pobierzesz i używasz za darmo. Nie ma subskrypcji ani opłat za funkcje. Konto jest opcjonalne i też nic nie kosztuje. Aplikacja utrzymuje się z reklam Google AdMob."
       }
     },
     {
@@ -151,12 +160,12 @@
       "name": "Jak działa wyszukiwanie sklepów?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Wpisujesz miasto lub nazwę sklepu, a Materio pokazuje najbliższe punkty na mapie Google i prowadzi do wybranego. Możesz też udostępnić lokalizację, żeby zobaczyć sklepy w swojej okolicy."
+        "text": "Wpisujesz miasto lub nazwę sklepu, a LiczMat pokazuje najbliższe punkty na mapie Google i prowadzi do wybranego. Możesz też udostępnić lokalizację, żeby zobaczyć sklepy w swojej okolicy."
       }
     },
     {
       "@type": "Question",
-      "name": "Jakie dane zbiera Materio?",
+      "name": "Jakie dane zbiera LiczMat?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Bez konta Twoje projekty, wyceny i ustawienia są przechowywane wyłącznie lokalnie na urządzeniu. Po zalogowaniu projekty, pokoje, wyceny i listy zakupów są kopiowane do Google Firestore (region europe-central2, Warszawa) i widzi je tylko Twoje konto. Aplikacja korzysta z usług Google (reklamy AdMob oraz mapy przy wyszukiwaniu sklepów), które przetwarzają ograniczone dane. Wszystko opisuje"
@@ -172,7 +181,7 @@
     },
     {
       "@type": "Question",
-      "name": "Na jakich telefonach działa Materio?",
+      "name": "Na jakich telefonach działa LiczMat?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Na telefonach i tabletach z systemem Android 7.0 (API 24) lub nowszym."
@@ -187,7 +196,8 @@
 <a class="skip-link" href="#main">Przejdź do treści</a>
 <header class="site">
   <div class="wrap nav">
-    <a class="brand" href="/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
+    <a class="brand" href="/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Zmień motyw" title="Zmień motyw"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Kalkulatory">
       <a href="/kalkulatory/">Kalkulatory</a>
@@ -207,7 +217,7 @@
     <div class="hero-copy">
       <span class="badge"><span class="dot"></span><span>Liczy offline · konto opcjonalne</span></span>
       <h1 id="hero-h">Policz materiał. Kup tyle, ile trzeba. Nie marnuj.</h1>
-      <p class="lead">Materio to kalkulator i optymalizator materiałów budowlanych dla ekip, fachowców i majsterkowiczów. Kalkulatory, pomieszczenia, projekty i mapa sklepów działają w telefonie i tutaj, w przeglądarce.</p>
+      <p class="lead">LiczMat to kalkulator i optymalizator materiałów budowlanych dla ekip, fachowców i majsterkowiczów. Kalkulatory, pomieszczenia, projekty i mapa sklepów działają w telefonie i tutaj, w przeglądarce.</p>
       <div class="store-badges">
         <a class="btn btn-primary btn-lg" href="/kalkulatory/">Wypróbuj kalkulatory</a>
         
@@ -235,7 +245,7 @@
   </div>
 </section>
 
-<section class="block" aria-label="Materio" style="padding-top:8px">
+<section class="block" aria-label="LiczMat" style="padding-top:8px">
   <div class="wrap">
     <div class="stat-band">
       <div class="stat"><div class="num">0 zł</div><div class="lbl">Za darmo, konto opcjonalne</div></div>
@@ -250,7 +260,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Funkcje</div>
-      <h2 id="feat-h">Co Materio policzy</h2>
+      <h2 id="feat-h">Co LiczMat policzy</h2>
       <p class="muted">Piętnaście kalkulatorów liczy tutaj, w przeglądarce. Ten sam silnik napędza aplikację na Androida.</p>
     </div>
     <div class="features">
@@ -273,7 +283,7 @@
     </div>
     <div class="steps">
       <div class="step"><h3>Podaj wymiary</h3><p>Wpisz powierzchnię lub wymiary pomieszczenia. Wybierz materiał z katalogu albo wpisz własny.</p></div>
-      <div class="step"><h3>Materio liczy</h3><p>Silnik przelicza zapotrzebowanie, zapas i rozkrój. Od razu widzisz ilość do kupienia, koszt i odpad.</p></div>
+      <div class="step"><h3>LiczMat liczy</h3><p>Silnik przelicza zapotrzebowanie, zapas i rozkrój. Od razu widzisz ilość do kupienia, koszt i odpad.</p></div>
       <div class="step"><h3>Kup i buduj</h3><p>Zapisz do projektu, wyeksportuj wycenę do PDF i rusz do sklepu z gotową listą.</p></div>
     </div>
   </div>
@@ -411,7 +421,7 @@
     <div class="section-head">
       <div class="kicker">Pomieszczenia</div>
       <h2 id="rooms-h">Wpisz wymiary pokoju raz</h2>
-      <p class="muted">Podaj wymiary, a Materio przeliczy powierzchnie i przekaże je do kalkulatorów. W aplikacji zapiszesz pomieszczenia (salon, łazienka, kuchnia) i wrócisz do nich w każdej chwili.</p>
+      <p class="muted">Podaj wymiary, a LiczMat przeliczy powierzchnie i przekaże je do kalkulatorów. W aplikacji zapiszesz pomieszczenia (salon, łazienka, kuchnia) i wrócisz do nich w każdej chwili.</p>
     </div>
     <div class="split-2">
       <div id="room-helper" class="calc">
@@ -444,7 +454,7 @@
     <div class="section-head">
       <div class="kicker">Projekty</div>
       <h2 id="proj-h">Cała wycena w jednym miejscu</h2>
-      <p class="muted">Każde wyliczenie dodajesz do projektu. Materio sumuje ilości, koszt i odpad, a całość wyeksportujesz do PDF dla klienta.</p>
+      <p class="muted">Każde wyliczenie dodajesz do projektu. LiczMat sumuje ilości, koszt i odpad, a całość wyeksportujesz do PDF dla klienta.</p>
     </div>
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><h3>Lista materiałów</h3><p>Wszystkie pozycje projektu z ilościami i cenami w jednym widoku.</p></div>
@@ -464,7 +474,7 @@
     <div class="section-head">
       <div class="kicker">Konto jest opcjonalne</div>
       <h2 id="acct-h">Konto i synchronizacja</h2>
-      <p class="muted">Konto Materio jest opcjonalne. Kalkulator liczy bez logowania — konto jest potrzebne dopiero, żeby zapisać projekty i pokoje i mieć je na telefonie i w przeglądarce.</p>
+      <p class="muted">Konto LiczMat jest opcjonalne. Kalkulator liczy bez logowania — konto jest potrzebne dopiero, żeby zapisać projekty i pokoje i mieć je na telefonie i w przeglądarce.</p>
     </div>
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></div><h3>Konto jest opcjonalne</h3><p>Bez logowania wszystko liczy się na Twoim urządzeniu, tak jak dotąd.</p></div>
@@ -480,7 +490,7 @@
     <div class="section-head">
       <div class="kicker">Sklepy</div>
       <h2 id="stores-teaser-h">Znajdź sklep budowlany w pobliżu</h2>
-      <p class="muted">Wpisz miasto albo nazwę sklepu, a Materio pokaże najbliższe punkty na mapie i poprowadzi do wybranego. Tak samo działa „Znajdź sklep” w aplikacji.</p>
+      <p class="muted">Wpisz miasto albo nazwę sklepu, a LiczMat pokaże najbliższe punkty na mapie i poprowadzi do wybranego. Tak samo działa „Znajdź sklep” w aplikacji.</p>
     </div>
     <p class="center"><a class="btn btn-primary" href="/sklepy/">Pokaż na mapie</a></p>
   </div>
@@ -501,7 +511,7 @@
     </div>
     <aside class="trust-panel">
       <h3><span class="shield"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/></svg></span><span>Reklamy i dane</span></h3>
-      <p class="muted" style="margin-top:12px">Materio jest darmowe i utrzymuje się z reklam.</p>
+      <p class="muted" style="margin-top:12px">LiczMat jest darmowe i utrzymuje się z reklam.</p>
       <ul>
         <li>Reklamy dostarcza Google AdMob; w UE decydujesz o reklamach spersonalizowanych.</li>
         <li>Mapa sklepów korzysta z Google Maps i, za Twoją zgodą, z lokalizacji, wyłącznie by pokazać sklepy w pobliżu.</li>
@@ -518,13 +528,13 @@
       <h2 id="faq-h">Najczęstsze pytania</h2>
     </div>
     <div class="faq">
-      <details open><summary>Czy Materio jest darmowe?</summary><p>Tak. Materio pobierzesz i używasz za darmo. Nie ma subskrypcji ani opłat za funkcje. Konto jest opcjonalne i też nic nie kosztuje. Aplikacja utrzymuje się z reklam Google AdMob.</p></details>
+      <details open><summary>Czy LiczMat jest darmowe?</summary><p>Tak. LiczMat pobierzesz i używasz za darmo. Nie ma subskrypcji ani opłat za funkcje. Konto jest opcjonalne i też nic nie kosztuje. Aplikacja utrzymuje się z reklam Google AdMob.</p></details>
       <details><summary>Czy aplikacja działa bez internetu?</summary><p>Tak. Wszystkie kalkulatory i optymalizator rozkroju liczą offline, bezpośrednio na Twoim telefonie. Bez konta projekty i wyliczenia zostają na urządzeniu. Synchronizacja z chmurą wymaga zalogowania i internetu.</p></details>
       <details><summary>Czy muszę zakładać konto?</summary><p>Nie. Otwierasz aplikację i od razu liczysz. Konto zakładasz tylko wtedy, gdy chcesz mieć zapisane projekty i pokoje na telefonie i w przeglądarce.</p></details>
-      <details><summary>Jak działa wyszukiwanie sklepów?</summary><p>Wpisujesz miasto lub nazwę sklepu, a Materio pokazuje najbliższe punkty na mapie Google i prowadzi do wybranego. Możesz też udostępnić lokalizację, żeby zobaczyć sklepy w swojej okolicy.</p></details>
-      <details><summary>Jakie dane zbiera Materio?</summary><p><span>Bez konta Twoje projekty, wyceny i ustawienia są przechowywane wyłącznie lokalnie na urządzeniu. Po zalogowaniu projekty, pokoje, wyceny i listy zakupów są kopiowane do Google Firestore (region europe-central2, Warszawa) i widzi je tylko Twoje konto. Aplikacja korzysta z usług Google (reklamy AdMob oraz mapy przy wyszukiwaniu sklepów), które przetwarzają ograniczone dane. Wszystko opisuje</span> <a href="/privacy-policy.html">Polityka prywatności</a>.</p></details>
+      <details><summary>Jak działa wyszukiwanie sklepów?</summary><p>Wpisujesz miasto lub nazwę sklepu, a LiczMat pokazuje najbliższe punkty na mapie Google i prowadzi do wybranego. Możesz też udostępnić lokalizację, żeby zobaczyć sklepy w swojej okolicy.</p></details>
+      <details><summary>Jakie dane zbiera LiczMat?</summary><p><span>Bez konta Twoje projekty, wyceny i ustawienia są przechowywane wyłącznie lokalnie na urządzeniu. Po zalogowaniu projekty, pokoje, wyceny i listy zakupów są kopiowane do Google Firestore (region europe-central2, Warszawa) i widzi je tylko Twoje konto. Aplikacja korzysta z usług Google (reklamy AdMob oraz mapy przy wyszukiwaniu sklepów), które przetwarzają ograniczone dane. Wszystko opisuje</span> <a href="/privacy-policy.html">Polityka prywatności</a>.</p></details>
       <details><summary>W ilu językach działa aplikacja?</summary><p>W 10 językach: polskim, angielskim, niemieckim, czeskim, słowackim, rumuńskim, chorwackim, serbskim, ukraińskim i rosyjskim.</p></details>
-      <details><summary>Na jakich telefonach działa Materio?</summary><p>Na telefonach i tabletach z systemem Android 7.0 (API 24) lub nowszym.</p></details>
+      <details><summary>Na jakich telefonach działa LiczMat?</summary><p>Na telefonach i tabletach z systemem Android 7.0 (API 24) lub nowszym.</p></details>
     </div>
   </div>
 </section>
@@ -541,9 +551,9 @@
   </a>
       </div>
       <div class="cta-shots">
-        <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
           <div class="phone-track" id="hero-shots">
-            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Ekran główny aplikacji Materio" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Ekran główny aplikacji LiczMat" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Wynik obliczeń: ile kupić i ile odpadu" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Sklepy budowlane w pobliżu" loading="lazy" decoding="async">
           </div>
@@ -558,7 +568,7 @@
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <div class="brand"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
         <p class="muted">Kalkulator i optymalizator materiałów budowlanych. Policz. Kup. Nie marnuj.</p>
       </div>
       <div>
@@ -585,7 +595,7 @@
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© <span data-year>2026</span> Materio. Wszelkie prawa zastrzeżone.</span>
+      <span>© <span data-year>2026</span> LiczMat. Wszelkie prawa zastrzeżone.</span>
       <span>Wyniki są szacunkowe. Zawsze zweryfikuj przed zakupem.</span>
     </div>
   </div>
@@ -599,7 +609,7 @@
     <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Zgoda</button>
   </div>
 </div>
-<script>window.MATERIO_ALTERNATES = {
+<script>window.LICZMAT_ALTERNATES = {
   "pl": "/",
   "en": "/en/",
   "de": "/de/",
@@ -611,15 +621,15 @@
   "uk": "/uk/",
   "ru": "/ru/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260808h"></script>
-<script src="/assets/i18n-runtime.js?v=20260808h"></script>
+<script src="/assets/i18n.pl.js?v=20260812a"></script>
+<script src="/assets/i18n-runtime.js?v=20260812a"></script>
 
-<script src="/assets/calculators.js?v=20260808h"></script>
-<script src="/assets/materials.js?v=20260808h"></script>
-<script src="/assets/materials-ui.js?v=20260808h"></script>
-<script src="/assets/workspace.js?v=20260808h"></script>
-<script src="/assets/workspace-ui.js?v=20260808h"></script>
-<script src="/assets/main.js?v=20260808h"></script>
+<script src="/assets/calculators.js?v=20260812a"></script>
+<script src="/assets/materials.js?v=20260812a"></script>
+<script src="/assets/materials-ui.js?v=20260812a"></script>
+<script src="/assets/workspace.js?v=20260812a"></script>
+<script src="/assets/workspace-ui.js?v=20260812a"></script>
+<script src="/assets/main.js?v=20260812a"></script>
 
 </body>
 </html>

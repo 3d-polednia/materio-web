@@ -1,4 +1,4 @@
-/* Materio website — the local workspace: projects, rooms and saved estimates.
+/* LiczMat website — the local workspace: projects, rooms and saved estimates.
  *
  * Deliberately local-first and account-free. Counting never requires signing in
  * (FIRESTORE_SYNC §1.2), so the browser keeps the same documents the Android app keeps,
@@ -226,7 +226,7 @@ const wsMinor = (major) => Math.round((Number(major) || 0) * 100);
  */
 function wsAddEstimation(r) {
   let projectId = wsActiveProjectId();
-  if (!projectId) projectId = wsAddProject(r.projectName || "Materio").id;
+  if (!projectId) projectId = wsAddProject(r.projectName || "LiczMat").id;
 
   const lang = document.documentElement.lang || "pl";
   const currencyCode = (WS_CURRENCY[lang] || WS_CURRENCY.pl)[1];

@@ -1,6 +1,6 @@
 # materio-web
 
-Strona (landing page) aplikacji **Materio** — offline-first kalkulator i
+Strona (landing page) aplikacji **LiczMat** — offline-first kalkulator i
 optymalizator materiałów budowlanych na Androida. *Policz. Kup. Nie marnuj.*
 
 Aplikacja w Google Play: <https://play.google.com/store/apps/details?id=pl.materio.app>
@@ -112,4 +112,4 @@ Zmiana na własną domenę (np. `materio.pl`) i cała reszta — zobacz
 
 ## Licencja
 
-Treści marketingowe i marka „Materio" © Materio. Kod strony jest wolny do użytku.
+Treści marketingowe i marka „LiczMat" © LiczMat. Kod strony jest wolny do użytku.

@@ -1,4 +1,4 @@
-/* Materio website — the account at /app/.
+/* LiczMat website — the account at /app/.
  *
  * Reads and writes exactly the documents the Android app does: the contract is
  * docs/FIRESTORE_SYNC.md in the app repo, mirrored in Kotlin by core/sync/SyncContract.kt.

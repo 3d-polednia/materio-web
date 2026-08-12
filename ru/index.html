@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+  } catch (e) {}
+</script>
 <!-- Google tag (gtag.js) with Consent Mode v2 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
@@ -30,14 +38,14 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Materio — калькулятор и оптимизатор строительных материалов для Android</title>
+<title>LiczMat — калькулятор и оптимизатор строительных материалов для Android</title>
 <meta name="description" content="Бесплатный строительный калькулятор: краска, штукатурка, плитка, панели, обои и раскрой 1D/2D. Посчитай материал, купи сколько нужно, сократи отходы. Карта магазинов, проекты, смета в PDF. Считает офлайн, аккаунт необязателен, 10 языков.">
-<meta name="author" content="Materio">
+<meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-title" content="Materio">
-<meta name="application-name" content="Materio">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
 <link rel="canonical" href="https://materio-app.com/ru/">
 <link rel="alternate" hreflang="pl" href="https://materio-app.com/">
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/">
@@ -51,29 +59,30 @@
 <link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260812a" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Materio">
+<meta property="og:site_name" content="LiczMat">
 <meta property="og:locale" content="ru_RU">
-<meta property="og:title" content="Materio — калькулятор и оптимизатор строительных материалов для Android">
+<meta property="og:title" content="LiczMat — калькулятор и оптимизатор строительных материалов для Android">
 <meta property="og:description" content="Бесплатный строительный калькулятор: краска, штукатурка, плитка, панели, обои и раскрой 1D/2D. Посчитай материал, купи сколько нужно, сократи отходы. Карта магазинов, проекты, смета в PDF. Считает офлайн, аккаунт необязателен, 10 языков.">
 <meta property="og:url" content="https://materio-app.com/ru/">
 <meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Materio — Policz. Kup. Nie marnuj.">
+<meta property="og:image:alt" content="LiczMat — Policz. Kup. Nie marnuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Materio — калькулятор и оптимизатор строительных материалов для Android">
+<meta name="twitter:title" content="LiczMat — калькулятор и оптимизатор строительных материалов для Android">
 <meta name="twitter:description" content="Бесплатный строительный калькулятор: краска, штукатурка, плитка, панели, обои и раскрой 1D/2D. Посчитай материал, купи сколько нужно, сократи отходы. Карта магазинов, проекты, смета в PDF. Считает офлайн, аккаунт необязателен, 10 языков.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "MobileApplication",
-  "name": "Materio",
+  "name": "LiczMat",
   "operatingSystem": "Android 7.0+",
   "applicationCategory": "UtilitiesApplication",
   "inLanguage": [
@@ -92,7 +101,7 @@
   "downloadUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
   "installUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
   "image": "https://materio-app.com/assets/og-image.jpg",
-  "description": "Materio — калькулятор и оптимизатор строительных материалов для бригад, мастеров и домашних умельцев. Калькуляторы, помещения, проекты и карта магазинов работают в телефоне и здесь, в браузере.",
+  "description": "LiczMat — калькулятор и оптимизатор строительных материалов для бригад, мастеров и домашних умельцев. Калькуляторы, помещения, проекты и карта магазинов работают в телефоне и здесь, в браузере.",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -100,11 +109,11 @@
   },
   "author": {
     "@type": "Organization",
-    "name": "Materio"
+    "name": "LiczMat"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "Materio"
+    "name": "LiczMat"
   }
 }
 </script>
@@ -112,7 +121,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "Materio",
+  "name": "LiczMat",
   "url": "https://materio-app.com/",
   "logo": "https://materio-app.com/assets/icon-512.png"
 }
@@ -124,10 +133,10 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Materio бесплатный?",
+      "name": "LiczMat бесплатный?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Да. Materio скачиваешь и используешь бесплатно. Нет подписки и платных функций. Аккаунт необязателен и тоже бесплатен. Приложение живёт за счёт рекламы Google AdMob."
+        "text": "Да. LiczMat скачиваешь и используешь бесплатно. Нет подписки и платных функций. Аккаунт необязателен и тоже бесплатен. Приложение живёт за счёт рекламы Google AdMob."
       }
     },
     {
@@ -151,12 +160,12 @@
       "name": "Как работает поиск магазинов?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Вводишь город или название магазина, и Materio показывает ближайшие места на Google Maps и ведёт к выбранному. Можно также поделиться геолокацией, чтобы увидеть магазины вокруг себя."
+        "text": "Вводишь город или название магазина, и LiczMat показывает ближайшие места на Google Maps и ведёт к выбранному. Можно также поделиться геолокацией, чтобы увидеть магазины вокруг себя."
       }
     },
     {
       "@type": "Question",
-      "name": "Какие данные собирает Materio?",
+      "name": "Какие данные собирает LiczMat?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Без аккаунта твои проекты, сметы и настройки хранятся только на устройстве. После входа проекты, комнаты, сметы и списки покупок копируются в Google Firestore (europe-central2, Варшава), где их видит только твой аккаунт. Приложение использует сервисы Google (реклама AdMob и карты при поиске магазинов), которые обрабатывают ограниченные данные. Всё описано в"
@@ -172,7 +181,7 @@
     },
     {
       "@type": "Question",
-      "name": "На каких телефонах работает Materio?",
+      "name": "На каких телефонах работает LiczMat?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "На телефонах и планшетах с Android 7.0 (API 24) или новее."
@@ -187,7 +196,8 @@
 <a class="skip-link" href="#main">Перейти к содержимому</a>
 <header class="site">
   <div class="wrap nav">
-    <a class="brand" href="/ru/"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</a>
+    <a class="brand" href="/ru/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Сменить тему" title="Сменить тему"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <nav id="nav-links" class="nav-links" aria-label="Калькуляторы">
       <a href="/ru/kalkulyatory/">Калькуляторы</a>
@@ -207,7 +217,7 @@
     <div class="hero-copy">
       <span class="badge"><span class="dot"></span><span>Считает офлайн · аккаунт необязателен</span></span>
       <h1 id="hero-h">Посчитай материал. Купи ровно сколько нужно. Не трать зря.</h1>
-      <p class="lead">Materio — калькулятор и оптимизатор строительных материалов для бригад, мастеров и домашних умельцев. Калькуляторы, помещения, проекты и карта магазинов работают в телефоне и здесь, в браузере.</p>
+      <p class="lead">LiczMat — калькулятор и оптимизатор строительных материалов для бригад, мастеров и домашних умельцев. Калькуляторы, помещения, проекты и карта магазинов работают в телефоне и здесь, в браузере.</p>
       <div class="store-badges">
         <a class="btn btn-primary btn-lg" href="/ru/kalkulyatory/">Попробовать калькуляторы</a>
         
@@ -235,7 +245,7 @@
   </div>
 </section>
 
-<section class="block" aria-label="Materio" style="padding-top:8px">
+<section class="block" aria-label="LiczMat" style="padding-top:8px">
   <div class="wrap">
     <div class="stat-band">
       <div class="stat"><div class="num">0 ₽</div><div class="lbl">Бесплатно, аккаунт необязателен</div></div>
@@ -250,7 +260,7 @@
   <div class="wrap">
     <div class="section-head">
       <div class="kicker">Функции</div>
-      <h2 id="feat-h">Что считает Materio</h2>
+      <h2 id="feat-h">Что считает LiczMat</h2>
       <p class="muted">Пятнадцать калькуляторов считают здесь, в браузере. То же ядро работает в приложении для Android.</p>
     </div>
     <div class="features">
@@ -273,7 +283,7 @@
     </div>
     <div class="steps">
       <div class="step"><h3>Введи размеры</h3><p>Введи площадь или размеры помещения. Выбери материал из каталога или введи свой.</p></div>
-      <div class="step"><h3>Materio считает</h3><p>Расчётное ядро считает потребность, запас и план раскроя. Сразу видно, сколько купить, стоимость и отходы.</p></div>
+      <div class="step"><h3>LiczMat считает</h3><p>Расчётное ядро считает потребность, запас и план раскроя. Сразу видно, сколько купить, стоимость и отходы.</p></div>
       <div class="step"><h3>Покупай и строй</h3><p>Сохрани в проект, экспортируй смету в PDF и отправляйся в магазин с готовым списком.</p></div>
     </div>
   </div>
@@ -411,7 +421,7 @@
     <div class="section-head">
       <div class="kicker">Помещения</div>
       <h2 id="rooms-h">Введи комнату один раз</h2>
-      <p class="muted">Дай размеры, и Materio вычислит площади и передаст их калькуляторам. В приложении сохраняешь помещения (гостиная, ванная, кухня) и возвращаешься к ним в любой момент.</p>
+      <p class="muted">Дай размеры, и LiczMat вычислит площади и передаст их калькуляторам. В приложении сохраняешь помещения (гостиная, ванная, кухня) и возвращаешься к ним в любой момент.</p>
     </div>
     <div class="split-2">
       <div id="room-helper" class="calc">
@@ -444,7 +454,7 @@
     <div class="section-head">
       <div class="kicker">Проекты</div>
       <h2 id="proj-h">Вся смета в одном месте</h2>
-      <p class="muted">Каждый расчёт добавляешь в проект. Materio суммирует количество, стоимость и отходы, а всё экспортируешь в PDF для клиента.</p>
+      <p class="muted">Каждый расчёт добавляешь в проект. LiczMat суммирует количество, стоимость и отходы, а всё экспортируешь в PDF для клиента.</p>
     </div>
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><h3>Список материалов</h3><p>Все позиции с количеством и ценами в одном окне.</p></div>
@@ -464,7 +474,7 @@
     <div class="section-head">
       <div class="kicker">Аккаунт необязателен</div>
       <h2 id="acct-h">Аккаунт и синхронизация</h2>
-      <p class="muted">Аккаунт Materio необязателен. Калькулятор считает без входа — аккаунт нужен только чтобы сохранить проекты и комнаты и иметь их на телефоне и в браузере.</p>
+      <p class="muted">Аккаунт LiczMat необязателен. Калькулятор считает без входа — аккаунт нужен только чтобы сохранить проекты и комнаты и иметь их на телефоне и в браузере.</p>
     </div>
     <div class="features">
       <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></div><h3>Аккаунт необязателен</h3><p>Без входа всё считается на твоём устройстве, точно как раньше.</p></div>
@@ -480,7 +490,7 @@
     <div class="section-head">
       <div class="kicker">Магазины</div>
       <h2 id="stores-teaser-h">Найди строительный магазин рядом</h2>
-      <p class="muted">Введи город или название магазина, и Materio покажет ближайшие точки на карте и проведёт к выбранной. Так же работает поиск магазинов в приложении.</p>
+      <p class="muted">Введи город или название магазина, и LiczMat покажет ближайшие точки на карте и проведёт к выбранной. Так же работает поиск магазинов в приложении.</p>
     </div>
     <p class="center"><a class="btn btn-primary" href="/ru/magaziny/">Показать на карте</a></p>
   </div>
@@ -501,7 +511,7 @@
     </div>
     <aside class="trust-panel">
       <h3><span class="shield"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/></svg></span><span>Реклама и данные</span></h3>
-      <p class="muted" style="margin-top:12px">Materio бесплатен и живёт за счёт рекламы.</p>
+      <p class="muted" style="margin-top:12px">LiczMat бесплатен и живёт за счёт рекламы.</p>
       <ul>
         <li>Рекламу предоставляет Google AdMob; в ЕС ты решаешь насчёт персонализированной рекламы.</li>
         <li>Карта магазинов использует Google Maps и, с твоего согласия, твою геолокацию, только чтобы показать магазины рядом.</li>
@@ -518,13 +528,13 @@
       <h2 id="faq-h">Частые вопросы</h2>
     </div>
     <div class="faq">
-      <details open><summary>Materio бесплатный?</summary><p>Да. Materio скачиваешь и используешь бесплатно. Нет подписки и платных функций. Аккаунт необязателен и тоже бесплатен. Приложение живёт за счёт рекламы Google AdMob.</p></details>
+      <details open><summary>LiczMat бесплатный?</summary><p>Да. LiczMat скачиваешь и используешь бесплатно. Нет подписки и платных функций. Аккаунт необязателен и тоже бесплатен. Приложение живёт за счёт рекламы Google AdMob.</p></details>
       <details><summary>Приложение работает без интернета?</summary><p>Да. Все калькуляторы и оптимизатор раскроя считают офлайн, прямо в телефоне. Без аккаунта проекты и результаты остаются на устройстве. Синхронизация с облаком требует входа и интернета.</p></details>
       <details><summary>Нужно ли создавать аккаунт?</summary><p>Нет. Открываешь приложение и сразу считаешь. Аккаунт создаёшь только если хочешь сохранённые проекты и комнаты и на телефоне, и в браузере.</p></details>
-      <details><summary>Как работает поиск магазинов?</summary><p>Вводишь город или название магазина, и Materio показывает ближайшие места на Google Maps и ведёт к выбранному. Можно также поделиться геолокацией, чтобы увидеть магазины вокруг себя.</p></details>
-      <details><summary>Какие данные собирает Materio?</summary><p><span>Без аккаунта твои проекты, сметы и настройки хранятся только на устройстве. После входа проекты, комнаты, сметы и списки покупок копируются в Google Firestore (europe-central2, Варшава), где их видит только твой аккаунт. Приложение использует сервисы Google (реклама AdMob и карты при поиске магазинов), которые обрабатывают ограниченные данные. Всё описано в</span> <a href="/privacy-policy.html">Политика конфиденциальности</a>.</p></details>
+      <details><summary>Как работает поиск магазинов?</summary><p>Вводишь город или название магазина, и LiczMat показывает ближайшие места на Google Maps и ведёт к выбранному. Можно также поделиться геолокацией, чтобы увидеть магазины вокруг себя.</p></details>
+      <details><summary>Какие данные собирает LiczMat?</summary><p><span>Без аккаунта твои проекты, сметы и настройки хранятся только на устройстве. После входа проекты, комнаты, сметы и списки покупок копируются в Google Firestore (europe-central2, Варшава), где их видит только твой аккаунт. Приложение использует сервисы Google (реклама AdMob и карты при поиске магазинов), которые обрабатывают ограниченные данные. Всё описано в</span> <a href="/privacy-policy.html">Политика конфиденциальности</a>.</p></details>
       <details><summary>На скольких языках работает приложение?</summary><p>На 10 языках: польском, английском, немецком, чешском, словацком, румынском, хорватском, сербском, украинском и русском.</p></details>
-      <details><summary>На каких телефонах работает Materio?</summary><p>На телефонах и планшетах с Android 7.0 (API 24) или новее.</p></details>
+      <details><summary>На каких телефонах работает LiczMat?</summary><p>На телефонах и планшетах с Android 7.0 (API 24) или новее.</p></details>
     </div>
   </div>
 </section>
@@ -541,9 +551,9 @@
   </a>
       </div>
       <div class="cta-shots">
-        <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
           <div class="phone-track" id="hero-shots">
-            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Главный экран Materio" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Главный экран LiczMat" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Результат расчёта: сколько купить и сколько отходов" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Строительные магазины рядом" loading="lazy" decoding="async">
           </div>
@@ -558,7 +568,7 @@
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <div class="brand"><img class="logo" src="/assets/icon-192.png" alt="" width="32" height="32">Materio</div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
         <p class="muted">Калькулятор и оптимизатор строительных материалов. Посчитай. Купи. Не трать зря.</p>
       </div>
       <div>
@@ -585,7 +595,7 @@
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© <span data-year>2026</span> Materio. Все права защищены.</span>
+      <span>© <span data-year>2026</span> LiczMat. Все права защищены.</span>
       <span>Результаты приблизительны. Всегда проверяй перед покупкой.</span>
     </div>
   </div>
@@ -599,7 +609,7 @@
     <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Согласен</button>
   </div>
 </div>
-<script>window.MATERIO_ALTERNATES = {
+<script>window.LICZMAT_ALTERNATES = {
   "pl": "/",
   "en": "/en/",
   "de": "/de/",
@@ -611,15 +621,15 @@
   "uk": "/uk/",
   "ru": "/ru/"
 };</script>
-<script src="/assets/i18n.ru.js?v=20260808h"></script>
-<script src="/assets/i18n-runtime.js?v=20260808h"></script>
+<script src="/assets/i18n.ru.js?v=20260812a"></script>
+<script src="/assets/i18n-runtime.js?v=20260812a"></script>
 
-<script src="/assets/calculators.js?v=20260808h"></script>
-<script src="/assets/materials.js?v=20260808h"></script>
-<script src="/assets/materials-ui.js?v=20260808h"></script>
-<script src="/assets/workspace.js?v=20260808h"></script>
-<script src="/assets/workspace-ui.js?v=20260808h"></script>
-<script src="/assets/main.js?v=20260808h"></script>
+<script src="/assets/calculators.js?v=20260812a"></script>
+<script src="/assets/materials.js?v=20260812a"></script>
+<script src="/assets/materials-ui.js?v=20260812a"></script>
+<script src="/assets/workspace.js?v=20260812a"></script>
+<script src="/assets/workspace-ui.js?v=20260812a"></script>
+<script src="/assets/main.js?v=20260812a"></script>
 
 </body>
 </html>

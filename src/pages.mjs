@@ -1,4 +1,4 @@
-/* Materio website — the <main> of every page type.
+/* LiczMat website — the <main> of every page type.
 
    Each function returns markup only; `template.page()` wraps it in the shared shell.
    Calculator forms are rendered here, server-side, with the labels already translated,
@@ -100,7 +100,7 @@ export function homeMain(lang, t, calcs, cat) {
   </div>
 </section>
 
-<section class="block" aria-label="Materio" style="padding-top:8px">
+<section class="block" aria-label="LiczMat" style="padding-top:8px">
   <div class="wrap">
     <div class="stat-band">
       <div class="stat"><div class="num">${esc(t("stat_price"))}</div><div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
@@ -340,7 +340,7 @@ function ctaSection(t) {
         ${playBadge(t, "cta", "badge-store")}
       </div>
       <div class="cta-shots">
-        <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
           <div class="phone-track" id="hero-shots">
             <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
@@ -789,7 +789,7 @@ export function androidMain(lang, t, calcs, cat) {
         </div>
       </div>
       <div class="hero-media">
-        <div class="phone" aria-roledescription="carousel" aria-label="Materio">
+        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
           <div class="phone-track" id="hero-shots">
             <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
@@ -880,7 +880,7 @@ export function androidMain(lang, t, calcs, cat) {
   const ld = [crumbs.ld, {
     "@context": "https://schema.org",
     "@type": "MobileApplication",
-    name: "Materio",
+    name: "LiczMat",
     operatingSystem: "Android 7.0+",
     applicationCategory: "UtilitiesApplication",
     inLanguage: lang,
@@ -982,7 +982,7 @@ export function estimateMain(lang, t) {
       <article id="ws-estimate" class="ws-estimate">
         <header class="ws-estimate-head">
           <div>
-            <p class="ws-estimate-brand">Materio</p>
+            <p class="ws-estimate-brand">LiczMat</p>
             <h2 id="ws-estimate-title"></h2>
           </div>
           <div class="ws-estimate-meta">

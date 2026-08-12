@@ -1,4 +1,4 @@
-/* Materio website — store finder for the "Sklepy" section.
+/* LiczMat website — store finder for the "Sklepy" section.
    Lists the nearest building-supply stores, wholesalers and yards within 20 km,
    sorted by distance (5 shown, the rest behind a "show more" toggle), each with a
    "Nawiguj" button that opens Google Maps directions. Data comes from OpenStreetMap

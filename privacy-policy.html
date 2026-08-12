@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+<script>
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+  } catch (e) {}
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Polityka prywatności — Materio</title>
-<meta name="description" content="Polityka prywatności aplikacji Materio — kalkulator materiałów budowlanych. Liczy offline, konto i synchronizacja są opcjonalne. Informacje o Firebase, reklamach Google AdMob, mapach Google i RODO.">
-<meta name="theme-color" content="#626b38" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#12140d" media="(prefers-color-scheme: dark)">
+<title>Polityka prywatności — LiczMat</title>
+<meta name="description" content="Polityka prywatności aplikacji LiczMat — kalkulator materiałów budowlanych. Liczy offline, konto i synchronizacja są opcjonalne. Informacje o Firebase, reklamach Google AdMob, mapach Google i RODO.">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://materio-app.com/privacy-policy.html">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260812a" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="/assets/icon-192.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Polityka prywatności — Materio">
-<meta property="og:description" content="Jak Materio traktuje Twoje dane: liczy offline, konto opcjonalne, jawne zasady dot. synchronizacji, reklam i map.">
+<meta property="og:title" content="Polityka prywatności — LiczMat">
+<meta property="og:description" content="Jak LiczMat traktuje Twoje dane: liczy offline, konto opcjonalne, jawne zasady dot. synchronizacji, reklam i map.">
 <meta property="og:url" content="https://materio-app.com/privacy-policy.html">
 <meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812a">
 </head>
 <body>
 
 <!-- Header -->
 <header class="site">
   <div class="wrap nav">
-    <a class="brand" href="/"><img class="logo" src="/assets/icon-192.png" alt="" width="30" height="30">Materio</a>
+    <a class="brand" href="/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Zmień motyw" title="Zmień motyw"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
     <nav class="nav-links" aria-label="Główne">
       <a href="/kalkulatory/">Kalkulatory</a>
       <a href="/poradniki/">Poradniki</a>
@@ -45,14 +53,14 @@
 
   <!-- ============================== POLSKI ============================== -->
   <article id="pl" lang="pl">
-    <h1>Polityka prywatności — Materio</h1>
+    <h1>Polityka prywatności — LiczMat</h1>
     <p class="muted">Data wejścia w życie: 5 sierpnia 2026 r. · Ostatnia aktualizacja: 8 sierpnia 2026 r.</p>
 
-    <p>Niniejsza polityka opisuje, jakie dane przetwarza aplikacja mobilna <strong>Materio — kalkulator materiałów
+    <p>Niniejsza polityka opisuje, jakie dane przetwarza aplikacja mobilna <strong>LiczMat — kalkulator materiałów
     budowlanych</strong> („Aplikacja”) oraz strona <strong>materio-app.com</strong> („Strona”), i w jakim celu. Administratorem
-    danych jest zespół <strong>Materio</strong> („my”), kontakt: <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>.</p>
+    danych jest zespół <strong>LiczMat</strong> („my”), kontakt: <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>.</p>
 
-    <p class="muted"><strong>Co się zmieniło 7 sierpnia 2026 r.:</strong> Materio ma teraz <strong>opcjonalne konto</strong>
+    <p class="muted"><strong>Co się zmieniło 7 sierpnia 2026 r.:</strong> LiczMat ma teraz <strong>opcjonalne konto</strong>
     i synchronizację między telefonem a przeglądarką (sekcja 3). Bez założenia konta nic się nie zmienia — Aplikacja
     dalej liczy offline, a dane zostają na urządzeniu.</p>
 
@@ -61,7 +69,7 @@
       <ul>
         <li><a href="#pl-1">1. Podejście do prywatności</a></li>
         <li><a href="#pl-2">2. Dane na urządzeniu</a></li>
-        <li><a href="#pl-3">3. Konto Materio i synchronizacja (opcjonalne)</a></li>
+        <li><a href="#pl-3">3. Konto LiczMat i synchronizacja (opcjonalne)</a></li>
         <li><a href="#pl-4">4. Reklamy (Google AdMob)</a></li>
         <li><a href="#pl-5">5. Lokalizacja i sklepy (Google Maps / Places)</a></li>
         <li><a href="#pl-6">6. Strona internetowa</a></li>
@@ -73,7 +81,7 @@
     </div>
 
     <h2 id="pl-1">1. Podejście do prywatności</h2>
-    <p>Materio działa <strong>offline-first</strong>. Wszystkie obliczenia wykonuje Twoje urządzenie i działają bez
+    <p>LiczMat działa <strong>offline-first</strong>. Wszystkie obliczenia wykonuje Twoje urządzenie i działają bez
     internetu. Źródłem prawdy jest baza na urządzeniu — chmura jest tylko jej kopią.</p>
     <p><strong>Konto jest opcjonalne.</strong> Liczenie nigdy nie wymaga logowania. Dopóki nie założysz konta, nie
     wysyłamy Twoich projektów ani wyliczeń na żaden serwer, a kopia zapasowa to plik, który sam eksportujesz i
@@ -89,8 +97,8 @@
     <p><strong>Katalog materiałów, własne materiały i ceny oraz ustawienia nie są synchronizowane</strong> — zostają
     wyłącznie na urządzeniu, także wtedy, gdy masz konto.</p>
 
-    <h2 id="pl-3">3. Konto Materio i synchronizacja (opcjonalne)</h2>
-    <p>Możesz założyć <strong>konto Materio</strong>, żeby mieć te same projekty na telefonie i w przeglądarce
+    <h2 id="pl-3">3. Konto LiczMat i synchronizacja (opcjonalne)</h2>
+    <p>Możesz założyć <strong>konto LiczMat</strong>, żeby mieć te same projekty na telefonie i w przeglądarce
     (<a href="/app/">materio-app.com/app/</a>). Konto jest darmowe i całkowicie dobrowolne — bez niego Aplikacja i Strona
     działają jak dotąd.</p>
 
@@ -99,7 +107,7 @@
       <li><strong>Adres e-mail i hasło</strong> — obsługiwane przez <strong>Firebase Authentication</strong>. Hasła nie
       widzimy i nie przechowujemy; przechowuje je Google w formie skrótu (hash).</li>
       <li><strong>Logowanie przez Google</strong> (opcjonalna alternatywa dla hasła) — wtedy hasła nie ma w ogóle, a od
-      Google otrzymujemy tylko adres e-mail i identyfikator konta, żeby powiązać je z Twoimi danymi w Materio. Nie
+      Google otrzymujemy tylko adres e-mail i identyfikator konta, żeby powiązać je z Twoimi danymi w LiczMat. Nie
       pobieramy żadnych innych danych z Twojego konta Google.</li>
       <li><strong>Identyfikator konta (UID)</strong> nadany przez Firebase.</li>
       <li><strong>Treść konta:</strong> projekty, pomieszczenia, wyceny i listy zakupów — nazwy, ilości, jednostki, ceny,
@@ -163,7 +171,7 @@
     zmienić lub wycofać — usuwając dane aplikacji w ustawieniach systemu albo resetując identyfikator reklamowy w ustawieniach Androida.</p>
     <h3>4.2. Analityka aplikacji (Firebase / Google Analytics)</h3>
     <p>Aplikacja korzysta z <strong>Google Analytics dla Firebase</strong>, aby anonimowo i zbiorczo mierzyć, jak używane
-    są jej funkcje (np. które kalkulatory otwierasz, liczba aktywnych użytkowników) — pomaga nam to ulepszać Materio.
+    są jej funkcje (np. które kalkulatory otwierasz, liczba aktywnych użytkowników) — pomaga nam to ulepszać LiczMat.
     Analityka jest domyślnie <strong>wyłączona</strong> i włącza się dopiero po wyrażeniu przez Ciebie zgody w tym samym
     oknie (Google User Messaging Platform). Bez zgody nic nie jest zbierane. Dane są przetwarzane przez Google zgodnie z
     <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Polityką prywatności Google</a>.</p>
@@ -215,12 +223,12 @@
     (w Polsce: Prezes Urzędu Ochrony Danych Osobowych).</p>
 
     <h2 id="pl-9">9. Dzieci</h2>
-    <p>Aplikacja nie jest kierowana do dzieci i nie zbieramy świadomie danych osób poniżej 13. roku życia. Konto Materio
+    <p>Aplikacja nie jest kierowana do dzieci i nie zbieramy świadomie danych osób poniżej 13. roku życia. Konto LiczMat
     jest przeznaczone dla osób, które ukończyły 16 lat lub mają zgodę opiekuna.</p>
 
     <h2 id="pl-10">10. Zmiany i kontakt</h2>
     <p>Możemy aktualizować niniejszą politykę. Istotne zmiany zasygnalizujemy w Aplikacji lub w sklepie Google Play. Data
-    ostatniej aktualizacji znajduje się na górze dokumentu. Kontakt: <strong>Materio</strong>,
+    ostatniej aktualizacji znajduje się na górze dokumentu. Kontakt: <strong>LiczMat</strong>,
     e-mail: <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>.</p>
   </article>
 
@@ -228,14 +236,14 @@
 
   <!-- ============================== ENGLISH ============================== -->
   <article id="en" lang="en">
-    <h1>Privacy Policy — Materio</h1>
+    <h1>Privacy Policy — LiczMat</h1>
     <p class="muted">Effective date: 5 August 2026 · Last updated: 8 August 2026</p>
 
-    <p>This policy explains what data the <strong>Materio — construction materials calculator</strong> mobile app (the
+    <p>This policy explains what data the <strong>LiczMat — construction materials calculator</strong> mobile app (the
     “App”) and the <strong>materio-app.com</strong> website (the “Site”) process, and why. The data controller is the
-    <strong>Materio</strong> team (“we”), contact: <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>.</p>
+    <strong>LiczMat</strong> team (“we”), contact: <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>.</p>
 
-    <p class="muted"><strong>What changed on 7 August 2026:</strong> Materio now has an <strong>optional account</strong>
+    <p class="muted"><strong>What changed on 7 August 2026:</strong> LiczMat now has an <strong>optional account</strong>
     and sync between the phone and the browser (section 3). Nothing changes if you do not create one — the App still
     calculates offline and the data stays on the device.</p>
 
@@ -244,7 +252,7 @@
       <ul>
         <li><a href="#en-1">1. Privacy approach</a></li>
         <li><a href="#en-2">2. Data stored on your device</a></li>
-        <li><a href="#en-3">3. The Materio account and sync (optional)</a></li>
+        <li><a href="#en-3">3. The LiczMat account and sync (optional)</a></li>
         <li><a href="#en-4">4. Advertising (Google AdMob)</a></li>
         <li><a href="#en-5">5. Location and store finder (Google Maps / Places)</a></li>
         <li><a href="#en-6">6. The website</a></li>
@@ -256,7 +264,7 @@
     </div>
 
     <h2 id="en-1">1. Privacy approach</h2>
-    <p>Materio is <strong>offline-first</strong>. Every calculation runs on your device and works without a connection.
+    <p>LiczMat is <strong>offline-first</strong>. Every calculation runs on your device and works without a connection.
     The database on the device is the source of truth; the cloud is only a copy of it.</p>
     <p><strong>The account is optional.</strong> Calculating never requires a sign-in. Until you create an account we send
     none of your projects or calculations to any server, and a backup is a file you export and keep yourself. If you do
@@ -271,8 +279,8 @@
     <p><strong>The material catalogue, your custom materials and prices, and your settings are never synced</strong> — they
     stay on the device even when you have an account.</p>
 
-    <h2 id="en-3">3. The Materio account and sync (optional)</h2>
-    <p>You can create a <strong>Materio account</strong> to have the same projects on your phone and in the browser
+    <h2 id="en-3">3. The LiczMat account and sync (optional)</h2>
+    <p>You can create a <strong>LiczMat account</strong> to have the same projects on your phone and in the browser
     (<a href="/app/">materio-app.com/app/</a>). The account is free and entirely voluntary — without it the App and the Site
     work exactly as before.</p>
 
@@ -281,7 +289,7 @@
       <li><strong>E-mail address and password</strong> — handled by <strong>Firebase Authentication</strong>. We never see
       or store your password; Google stores it hashed.</li>
       <li><strong>Sign in with Google</strong> (an optional alternative to a password) — then there is no password at all,
-      and all we receive from Google is your e-mail address and an account identifier, so we can attach it to your Materio
+      and all we receive from Google is your e-mail address and an account identifier, so we can attach it to your LiczMat
       data. We request nothing else from your Google account.</li>
       <li><strong>The account identifier (UID)</strong> issued by Firebase.</li>
       <li><strong>Account content:</strong> projects, rooms, estimates and shopping lists — names, quantities, units,
@@ -343,7 +351,7 @@
     can change or withdraw consent at any time by clearing the app data in system settings or resetting your advertising ID in Android settings.</p>
     <h3>4.2. App analytics (Firebase / Google Analytics)</h3>
     <p>The App uses <strong>Google Analytics for Firebase</strong> to measure, anonymously and in aggregate, how its
-    features are used (for example which calculators you open, the number of active users) — this helps us improve Materio.
+    features are used (for example which calculators you open, the number of active users) — this helps us improve LiczMat.
     Analytics is <strong>off by default</strong> and only turns on after you give consent in the same dialog (Google User
     Messaging Platform). Nothing is collected without your consent. Data is processed by Google under the
     <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
@@ -393,12 +401,12 @@
     <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>. You may also lodge a complaint with your supervisory authority.</p>
 
     <h2 id="en-9">9. Children</h2>
-    <p>The App is not directed at children and we do not knowingly collect data from anyone under 13. The Materio account is
+    <p>The App is not directed at children and we do not knowingly collect data from anyone under 13. The LiczMat account is
     intended for people aged 16 or over, or with a guardian’s consent.</p>
 
     <h2 id="en-10">10. Changes and contact</h2>
     <p>We may update this policy. We will signal material changes in the App or on Google Play. The last-updated date is at the
-    top of this document. Contact: <strong>Materio</strong>, email: <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>.</p>
+    top of this document. Contact: <strong>LiczMat</strong>, email: <a href="mailto:polednia@gmail.com">polednia@gmail.com</a>.</p>
   </article>
 </main>
 
@@ -406,11 +414,27 @@
 <footer class="site">
   <div class="wrap">
     <div class="foot-bottom">
-      <span>© <span id="year">2026</span> Materio. Wszelkie prawa zastrzeżone.</span>
+      <span>© <span id="year">2026</span> LiczMat. Wszelkie prawa zastrzeżone.</span>
       <span><a href="/">Strona główna</a> · <a href="https://play.google.com/store/apps/details?id=pl.materio.app&utm_source=materio_web&utm_medium=referral&utm_campaign=site_download&utm_content=privacy_footer" target="_blank" rel="noopener">Google Play</a></span>
     </div>
   </div>
 </footer>
 <script>document.getElementById("year").textContent=new Date().getFullYear();</script>
+<script>
+  (function () {
+    var b = document.getElementById('theme-toggle');
+    if (!b) return;
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var now = function () {
+      try { var v = localStorage.getItem('liczmat-theme'); if (v === 'dark' || v === 'light') return v; } catch (e) {}
+      return mq.matches ? 'dark' : 'light';
+    };
+    b.addEventListener('click', function () {
+      var next = now() === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('liczmat-theme', next); } catch (e) {}
+    });
+  })();
+</script>
 </body>
 </html>

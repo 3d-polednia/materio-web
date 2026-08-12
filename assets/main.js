@@ -1,4 +1,4 @@
-/* Materio website — shared page wiring across all pages: mobile nav, the room helper,
+/* LiczMat website — shared page wiring across all pages: mobile nav, the room helper,
    Play-Store click tracking and the consent banner. Everything is guarded, so each page
    runs only what it actually contains.
 
@@ -136,7 +136,7 @@ function buildConsent() {
   if (reject) reject.addEventListener("click", () => decide(false));
 
   banner.hidden = Boolean(readConsent());
-  window.materioReopenConsent = () => {
+  window.liczmatReopenConsent = () => {
     try { localStorage.removeItem(CONSENT_KEY); } catch (e) {}
     if (typeof gtag === "function") gtag("consent", "update", { analytics_storage: "denied" });
     banner.hidden = false;
@@ -161,10 +161,59 @@ function buildCookiesPage() {
   };
 
   button.addEventListener("click", () => {
-    if (typeof window.materioReopenConsent === "function") window.materioReopenConsent();
+    if (typeof window.liczmatReopenConsent === "function") window.liczmatReopenConsent();
   });
   document.addEventListener("consentchange", render);
   render();
+}
+
+/* Theme switch. Three states, but only two of them are stored: no entry in
+   localStorage means "follow the system", which is what the CSS does on its own. A
+   click writes the opposite of whatever is on screen right now, so the first click
+   always visibly changes something, whichever way the system is set. */
+const THEME_KEY = "liczmat-theme";
+
+function readTheme() {
+  try { const v = localStorage.getItem(THEME_KEY); return v === "dark" || v === "light" ? v : ""; }
+  catch (e) { return ""; }
+}
+
+function effectiveTheme() {
+  return readTheme() || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+
+function buildThemeToggle() {
+  const button = document.getElementById("theme-toggle");
+  if (!button) return;
+
+  const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+  const paint = () => {
+    const mode = effectiveTheme();
+    button.setAttribute("aria-pressed", mode === "dark" ? "true" : "false");
+    // The media-scoped theme-colors cannot answer a hand-picked theme, so an
+    // unscoped one is added and kept in step with the choice.
+    const bar = mode === "dark" ? "#060c12" : "#faf7f0";
+    if (meta) meta.setAttribute("content", bar);
+    else {
+      const m = document.createElement("meta");
+      m.name = "theme-color"; m.content = bar;
+      document.head.appendChild(m);
+    }
+  };
+
+  button.addEventListener("click", () => {
+    const next = effectiveTheme() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    paint();
+  });
+
+  // A visitor who never chose still follows the OS when it flips mid-session.
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (!readTheme()) paint();
+  });
+
+  paint();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -173,6 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
   buildRoomHelper();
   buildHeroCarousel();
   buildMobileNav();
+  buildThemeToggle();
   trackStoreClicks();
   buildConsent();
   buildCookiesPage();

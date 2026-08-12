@@ -1,4 +1,4 @@
-/* Materio website — the "how we calculate it" content for every calculator page.
+/* LiczMat website — the "how we calculate it" content for every calculator page.
 
    Each entry mirrors one engine in assets/calculators.js, which is itself a 1:1 port
    of the Kotlin engine in the app (core/calculation/**). When an engine changes, the

@@ -1,4 +1,4 @@
-/* Materio website — the bundled material catalog.
+/* LiczMat website — the bundled material catalog.
  *
  * Ported 1:1 from the Android app: core/catalog/CatalogSurface.kt, CatalogCoverage.kt,
  * CatalogSheets.kt and CatalogLinear.kt, plus core/model/ProjectMaterialCategory.kt for

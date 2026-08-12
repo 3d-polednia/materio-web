@@ -1,4 +1,4 @@
-/* Materio website — the names behind assets/materials.js.
+/* LiczMat website — the names behind assets/materials.js.
  *
  * A material in the catalog carries a term key and a language-neutral size ("60×60",
  * "10 l", "CW50 · 3 m"); the displayed name is the term in the page's language plus
@@ -107,8 +107,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Policz",
     nav_materials: "Materiały",
     matpage_title: "Katalog materiałów budowlanych",
-    matpage_lead: "Wszystkie materiały, którymi Materio wypełnia kalkulatory: wymiary, wydajność opakowania i domyślny zapas. Wybierz materiał, żeby policzyć go w kalkulatorze.",
-    matpage_meta: "Katalog materiałów budowlanych: płytki, panele, farby, tynki, kleje, izolacja, płyty, profile i rury. Wymiary, wydajność opakowania i zapas — dane, którymi kalkulatory Materio wypełniają formularz.",
+    matpage_lead: "Wszystkie materiały, którymi LiczMat wypełnia kalkulatory: wymiary, wydajność opakowania i domyślny zapas. Wybierz materiał, żeby policzyć go w kalkulatorze.",
+    matpage_meta: "Katalog materiałów budowlanych: płytki, panele, farby, tynki, kleje, izolacja, płyty, profile i rury. Wymiary, wydajność opakowania i zapas — dane, którymi kalkulatory LiczMat wypełniają formularz.",
     matpage_note: "Wartości są typowe i różnią się między producentami. Po wstawieniu do kalkulatora każdą można poprawić.",
   },
 
@@ -201,8 +201,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Calculate",
     nav_materials: "Materials",
     matpage_title: "Building material catalogue",
-    matpage_lead: "Every material Materio fills the calculators with: dimensions, coverage per package and the default waste allowance. Pick one to calculate it.",
-    matpage_meta: "Building material catalogue: tiles, flooring, paints, renders, adhesives, insulation, boards, profiles and pipes. Dimensions, coverage per package and waste — the data the Materio calculators fill the form with.",
+    matpage_lead: "Every material LiczMat fills the calculators with: dimensions, coverage per package and the default waste allowance. Pick one to calculate it.",
+    matpage_meta: "Building material catalogue: tiles, flooring, paints, renders, adhesives, insulation, boards, profiles and pipes. Dimensions, coverage per package and waste — the data the LiczMat calculators fill the form with.",
     matpage_note: "The values are typical and vary between manufacturers. Every one can be edited after it lands in the calculator.",
   },
 
@@ -295,8 +295,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Berechnen",
     nav_materials: "Materialien",
     matpage_title: "Baustoffkatalog",
-    matpage_lead: "Alle Materialien, mit denen Materio die Rechner füllt: Maße, Ergiebigkeit je Gebinde und der voreingestellte Verschnitt. Material wählen und rechnen.",
-    matpage_meta: "Baustoffkatalog: Fliesen, Bodenbeläge, Farben, Putze, Kleber, Dämmung, Platten, Profile und Rohre. Maße, Ergiebigkeit je Gebinde und Verschnitt — die Daten, mit denen die Materio-Rechner das Formular füllen.",
+    matpage_lead: "Alle Materialien, mit denen LiczMat die Rechner füllt: Maße, Ergiebigkeit je Gebinde und der voreingestellte Verschnitt. Material wählen und rechnen.",
+    matpage_meta: "Baustoffkatalog: Fliesen, Bodenbeläge, Farben, Putze, Kleber, Dämmung, Platten, Profile und Rohre. Maße, Ergiebigkeit je Gebinde und Verschnitt — die Daten, mit denen die LiczMat-Rechner das Formular füllen.",
     matpage_note: "Die Werte sind typisch und je Hersteller verschieden. Nach dem Übernehmen lässt sich jeder Wert im Rechner ändern.",
   },
 
@@ -389,8 +389,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Spočítat",
     nav_materials: "Materiály",
     matpage_title: "Katalog stavebních materiálů",
-    matpage_lead: "Všechny materiály, kterými Materio vyplňuje kalkulačky: rozměry, vydatnost balení a výchozí prořez. Vyberte materiál a spočítejte ho.",
-    matpage_meta: "Katalog stavebních materiálů: obklady, podlahy, barvy, omítky, lepidla, izolace, desky, profily a trubky. Rozměry, vydatnost balení a prořez — data, kterými kalkulačky Materio vyplňují formulář.",
+    matpage_lead: "Všechny materiály, kterými LiczMat vyplňuje kalkulačky: rozměry, vydatnost balení a výchozí prořez. Vyberte materiál a spočítejte ho.",
+    matpage_meta: "Katalog stavebních materiálů: obklady, podlahy, barvy, omítky, lepidla, izolace, desky, profily a trubky. Rozměry, vydatnost balení a prořez — data, kterými kalkulačky LiczMat vyplňují formulář.",
     matpage_note: "Hodnoty jsou typické a liší se podle výrobce. Po vložení do kalkulačky lze každou upravit.",
   },
 
@@ -483,8 +483,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Spočítať",
     nav_materials: "Materiály",
     matpage_title: "Katalóg stavebných materiálov",
-    matpage_lead: "Všetky materiály, ktorými Materio vypĺňa kalkulačky: rozmery, výdatnosť balenia a predvolený prierez. Vyberte materiál a spočítajte ho.",
-    matpage_meta: "Katalóg stavebných materiálov: obklady, podlahy, farby, omietky, lepidlá, izolácie, dosky, profily a rúry. Rozmery, výdatnosť balenia a prierez — dáta, ktorými kalkulačky Materio vypĺňajú formulár.",
+    matpage_lead: "Všetky materiály, ktorými LiczMat vypĺňa kalkulačky: rozmery, výdatnosť balenia a predvolený prierez. Vyberte materiál a spočítajte ho.",
+    matpage_meta: "Katalóg stavebných materiálov: obklady, podlahy, farby, omietky, lepidlá, izolácie, dosky, profily a rúry. Rozmery, výdatnosť balenia a prierez — dáta, ktorými kalkulačky LiczMat vypĺňajú formulár.",
     matpage_note: "Hodnoty sú typické a líšia sa podľa výrobcu. Po vložení do kalkulačky sa dá každá upraviť.",
   },
 
@@ -577,8 +577,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Calculează",
     nav_materials: "Materiale",
     matpage_title: "Catalog de materiale de construcții",
-    matpage_lead: "Toate materialele cu care Materio completează calculatoarele: dimensiuni, randament pe ambalaj și pierderea implicită. Alege un material și calculează-l.",
-    matpage_meta: "Catalog de materiale de construcții: gresie, parchet, vopsele, tencuieli, adezivi, izolații, plăci, profile și țevi. Dimensiuni, randament pe ambalaj și pierderi — datele cu care calculatoarele Materio completează formularul.",
+    matpage_lead: "Toate materialele cu care LiczMat completează calculatoarele: dimensiuni, randament pe ambalaj și pierderea implicită. Alege un material și calculează-l.",
+    matpage_meta: "Catalog de materiale de construcții: gresie, parchet, vopsele, tencuieli, adezivi, izolații, plăci, profile și țevi. Dimensiuni, randament pe ambalaj și pierderi — datele cu care calculatoarele LiczMat completează formularul.",
     matpage_note: "Valorile sunt orientative și diferă de la un producător la altul. După completare, fiecare poate fi modificată în calculator.",
   },
 
@@ -671,8 +671,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Izračunaj",
     nav_materials: "Materijali",
     matpage_title: "Katalog građevinskih materijala",
-    matpage_lead: "Svi materijali kojima Materio popunjava kalkulatore: dimenzije, izdašnost pakiranja i zadani otpad. Odaberi materijal i izračunaj ga.",
-    matpage_meta: "Katalog građevinskih materijala: pločice, podovi, boje, žbuke, ljepila, izolacija, ploče, profili i cijevi. Dimenzije, izdašnost pakiranja i otpad — podaci kojima Materio kalkulatori popunjavaju obrazac.",
+    matpage_lead: "Svi materijali kojima LiczMat popunjava kalkulatore: dimenzije, izdašnost pakiranja i zadani otpad. Odaberi materijal i izračunaj ga.",
+    matpage_meta: "Katalog građevinskih materijala: pločice, podovi, boje, žbuke, ljepila, izolacija, ploče, profili i cijevi. Dimenzije, izdašnost pakiranja i otpad — podaci kojima LiczMat kalkulatori popunjavaju obrazac.",
     matpage_note: "Vrijednosti su tipične i razlikuju se ovisno o proizvođaču. Nakon unosa u kalkulator svaku se može promijeniti.",
   },
 
@@ -765,8 +765,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Izračunaj",
     nav_materials: "Materijali",
     matpage_title: "Katalog građevinskih materijala",
-    matpage_lead: "Svi materijali kojima Materio popunjava kalkulatore: dimenzije, izdašnost pakovanja i podrazumevani otpad. Izaberi materijal i izračunaj ga.",
-    matpage_meta: "Katalog građevinskih materijala: pločice, podovi, boje, malteri, lepkovi, izolacija, ploče, profili i cevi. Dimenzije, izdašnost pakovanja i otpad — podaci kojima Materio kalkulatori popunjavaju formular.",
+    matpage_lead: "Svi materijali kojima LiczMat popunjava kalkulatore: dimenzije, izdašnost pakovanja i podrazumevani otpad. Izaberi materijal i izračunaj ga.",
+    matpage_meta: "Katalog građevinskih materijala: pločice, podovi, boje, malteri, lepkovi, izolacija, ploče, profili i cevi. Dimenzije, izdašnost pakovanja i otpad — podaci kojima LiczMat kalkulatori popunjavaju formular.",
     matpage_note: "Vrednosti su tipične i razlikuju se po proizvođaču. Nakon unosa u kalkulator svaka se može izmeniti.",
   },
 
@@ -859,8 +859,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Порахувати",
     nav_materials: "Матеріали",
     matpage_title: "Каталог будівельних матеріалів",
-    matpage_lead: "Усі матеріали, якими Materio заповнює калькулятори: розміри, витрата пакування і типовий запас. Вибери матеріал і порахуй його.",
-    matpage_meta: "Каталог будівельних матеріалів: плитка, підлоги, фарби, штукатурки, клеї, ізоляція, плити, профілі та труби. Розміри, витрата пакування і запас — дані, якими калькулятори Materio заповнюють форму.",
+    matpage_lead: "Усі матеріали, якими LiczMat заповнює калькулятори: розміри, витрата пакування і типовий запас. Вибери матеріал і порахуй його.",
+    matpage_meta: "Каталог будівельних матеріалів: плитка, підлоги, фарби, штукатурки, клеї, ізоляція, плити, профілі та труби. Розміри, витрата пакування і запас — дані, якими калькулятори LiczMat заповнюють форму.",
     matpage_note: "Значення типові й відрізняються у різних виробників. Після підстановки в калькулятор кожне можна змінити.",
   },
 
@@ -953,8 +953,8 @@ const I18N_MATERIALS = {
     mat_open_calc: "Посчитать",
     nav_materials: "Материалы",
     matpage_title: "Каталог строительных материалов",
-    matpage_lead: "Все материалы, которыми Materio заполняет калькуляторы: размеры, расход упаковки и типовой запас. Выбери материал и посчитай его.",
-    matpage_meta: "Каталог строительных материалов: плитка, полы, краски, штукатурки, клеи, изоляция, плиты, профили и трубы. Размеры, расход упаковки и запас — данные, которыми калькуляторы Materio заполняют форму.",
+    matpage_lead: "Все материалы, которыми LiczMat заполняет калькуляторы: размеры, расход упаковки и типовой запас. Выбери материал и посчитай его.",
+    matpage_meta: "Каталог строительных материалов: плитка, полы, краски, штукатурки, клеи, изоляция, плиты, профили и трубы. Размеры, расход упаковки и запас — данные, которыми калькуляторы LiczMat заполняют форму.",
     matpage_note: "Значения типовые и различаются у разных производителей. После подстановки в калькулятор каждое можно изменить.",
   },
 };

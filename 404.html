@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+<script>
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+  } catch (e) {}
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nie ma takiej strony — Materio</title>
+<title>Nie ma takiej strony — LiczMat</title>
 <meta name="robots" content="noindex, follow">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="stylesheet" href="/assets/styles.css?v=20260808h">
+<link rel="icon" href="/assets/favicon.svg?v=20260812a" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812a">
 <script>
   // GitHub Pages serves this file for every path it cannot resolve, and it has no
   // rewrite rules. A shared estimate lives at /p/<token>, where the token is an

@@ -1,4 +1,4 @@
-/* Materio website — the site map: which languages exist, what each URL segment is
+/* LiczMat website — the site map: which languages exist, what each URL segment is
    called in each of them, and which slug every calculator and guide gets.
 
    This is the single source of truth for URLs. `scripts/build.mjs` reads it to emit

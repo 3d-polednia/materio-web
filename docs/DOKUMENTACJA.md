@@ -1,6 +1,6 @@
 # Dokumentacja — materio-web
 
-Dokumentacja techniczna strony aplikacji **Materio**. Opisuje architekturę,
+Dokumentacja techniczna strony aplikacji **LiczMat**. Opisuje architekturę,
 sposób uruchomienia i wdrożenia, edycję treści i języków, działanie wyszukiwarki
 sklepów, SEO oraz zarządzanie assetami.
 
@@ -302,7 +302,7 @@ więc liczba na stronie nie może rozjechać się z kodem. Wzory żyją w
 - `/p/<token>` — kopia wyceny tylko do odczytu, bez logowania. GitHub Pages nie ma
   przepisywania adresów, więc `404.html` przekierowuje na `/p/?t=<token>`.
 - Schemat dokumentów jest **wspólny z aplikacją Androida** — kontrakt opisuje
-  `docs/FIRESTORE_SYNC.md` w repo `3d-polednia/Materio`, a po stronie Kotlina
+  `docs/FIRESTORE_SYNC.md` w repo `3d-polednia/LiczMat`, a po stronie Kotlina
   `core/sync/SyncContract.kt`. Zmiana w jednym miejscu wymaga zmiany we wszystkich.
 - `assets/firebase-config.js` ma **dwa placeholdery** (`apiKey`, `appId`) do
   uzupełnienia z konsoli Firebase (Project settings → Web app → Config). Do tego

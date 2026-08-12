@@ -1,12 +1,12 @@
 {
-  "name": "Materio — kalkulator materiałów budowlanych",
-  "short_name": "Materio",
+  "name": "LiczMat — kalkulator materiałów budowlanych",
+  "short_name": "LiczMat",
   "description": "Kalkulator i optymalizator materiałów budowlanych. Policz. Kup. Nie marnuj.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#fbfaf3",
-  "theme_color": "#626b38",
+  "background_color": "#faf7f0",
+  "theme_color": "#91d206",
   "lang": "pl",
   "categories": ["utilities", "productivity", "business"],
   "icons": [

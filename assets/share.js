@@ -1,4 +1,4 @@
-/* Materio website — the read-only shared estimate at /p/<token>.
+/* LiczMat website — the read-only shared estimate at /p/<token>.
  *
  * The visitor is the contractor's client: no account, no sign-in, nothing to install.
  * `sharedProjects/{token}` is world-readable by design — the 128-bit token in the URL is
