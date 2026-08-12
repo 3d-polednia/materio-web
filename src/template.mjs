@@ -7,12 +7,12 @@
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, SECTION,
-  urlHome, urlCalcIndex, urlGuideIndex, urlStores, urlMaterials, urlProjects, urlEstimate,
-  urlAndroid, urlCookies,
+  urlHome, urlAndroid, urlCookies,
   URL_PRIVACY, URL_APP, PLAY_URL,
 } from "./site.mjs";
 import { FLAG, LANG_NAME } from "./flags.mjs";
 import { CURRENCIES, DEFAULT_CURRENCY } from "./currency.mjs";
+import { navRoutes } from "./ia.mjs";
 
 export const GA_ID = "G-22PS16K79V";
 
@@ -261,6 +261,15 @@ ${p.bodyEnd || ""}
 `;
 }
 
+/**
+ * The main navigation and the footer's product column both come out of `ROUTES` in
+ * src/ia.mjs, in the order the architecture gives them. A page that is not declared
+ * there cannot show up in the menu, and a link here cannot point at a page that does
+ * not exist — src/ia.mjs holds the URL, the label key and the position in one place.
+ */
+const navLinks = (slot, lang, t) => navRoutes(slot)
+  .map((r) => `<a href="${r.path(lang)}">${esc(t(r[slot].key))}</a>`);
+
 function header(lang, t, alternates) {
   return `<header class="site">
   <div class="wrap nav">
@@ -268,12 +277,7 @@ function header(lang, t, alternates) {
     ${themeToggle(t)}
     <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">${ICON.menu}</button>
     <nav id="nav-links" class="nav-links" aria-label="${esc(t("nav_calc"))}">
-      <a href="${urlCalcIndex(lang)}">${esc(t("nav_calc"))}</a>
-      <a href="${urlMaterials(lang)}">${esc(t("nav_materials"))}</a>
-      <a href="${urlProjects(lang)}">${esc(t("nav_projects"))}</a>
-      <a href="${urlGuideIndex(lang)}">${esc(t("nav_guides"))}</a>
-      <a href="${urlStores(lang)}">${esc(t("nav_stores"))}</a>
-      <a href="${urlAndroid(lang)}">${esc(t("nav_app_page"))}</a>
+      ${navLinks("header", lang, t).join("\n      ")}
       <div class="pickers">
         ${langPicker(lang, t, alternates)}
         ${currencyPicker(lang, t)}
@@ -295,12 +299,7 @@ function footer(lang, t) {
       <div>
         <h4>${esc(t("foot_product"))}</h4>
         <ul>
-          <li><a href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a></li>
-          <li><a href="${urlMaterials(lang)}">${esc(t("nav_materials"))}</a></li>
-          <li><a href="${urlProjects(lang)}">${esc(t("nav_projects"))}</a></li>
-          <li><a href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a></li>
-          <li><a href="${urlGuideIndex(lang)}">${esc(t("foot_guides"))}</a></li>
-          <li><a href="${urlStores(lang)}">${esc(t("nav_stores"))}</a></li>
+          ${navLinks("footer", lang, t).map((a) => `<li>${a}</li>`).join("\n          ")}
           <li><a href="${urlHome(lang)}#faq">FAQ</a></li>
         </ul>
       </div>

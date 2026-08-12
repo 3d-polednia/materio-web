@@ -27,8 +27,36 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 |---|---|---|
 | 1 | Rebranding + nowy design | **Zrobione** — 2026-08-12, commit `2422c46` |
 | 2 | Języki i waluty | **Zrobione** — 2026-08-12 |
-| 3 | Architektura informacji | **Następna** |
-| 4–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 3 | Architektura informacji | **Zrobione** — 2026-08-12 |
+| 4 | Design system | **Następna** |
+| 5–36 | patrz rozdział XXXII planu | Nie zaczęte |
+
+### Co zrobiła Sesja 3
+
+Sesja projektowa — ustalenie docelowej struktury, bez zmian funkcjonalnych. Żadna
+z 130 wygenerowanych stron nie zmieniła się o bajt (`git diff` po przebudowie: puste).
+
+- **[`ARCHITEKTURA.md`](ARCHITEKTURA.md)** — dokument architektury informacji: trzy
+  poziomy dostępu, inwentarz wszystkich stron, zasady routingu, nawigacja, relacje
+  między modułami, przepływy użytkownika dla `GOŚĆ → LICZMAT → LICZMAT PRO`.
+- **`src/ia.mjs`** — ta sama architektura zapisana maszynowo. Każda trasa ma poziom
+  dostępu (`GUEST` / `LICZMAT` / `PRO`), rodzica, status (`LIVE` / `PLANNED`) i pozycję
+  w nawigacji. Realizuje zasadę z rozdziału II: „każdy element aplikacji powinien
+  jednoznacznie wiedzieć, do którego poziomu dostępu należy" — poziom jest polem, nie
+  komentarzem.
+- **Siedem tras planowanych** z numerem sesji, która je zbuduje: `/liczmat-pro/` (29),
+  pulpit (14), projekt (15), `/klienci/` (22), `/zlecenia/` (23), `/wyceny/` (24),
+  `/terminarz/` (25). Slugi we wszystkich czterech językach ustalone z góry. Nic z tego
+  nie jest budowane; build pilnuje, żeby nie zajęły działającego adresu ani menu.
+- **Menu i stopka powstają teraz z `ROUTES`**, nie z listy wpisanej ręcznie
+  w `src/template.mjs`. Wynikowy HTML identyczny co do bajtu — to był refaktor
+  źródła prawdy, nie zmiana wyglądu.
+- **Build sprawdza architekturę.** Zbiór wygenerowanych stron musi się zgadzać
+  z `livePaths()`, a `validateIA()` pilnuje poziomów, drzewa, tras planowanych,
+  nawigacji i przepływów. Jedenaście sprawdzeń, każde przetestowane negatywnie —
+  celowo zepsute, build faktycznie padł. Szczegóły w `ARCHITEKTURA.md` §9.
+
+Matematyka kalkulatorów nietknięta. `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 2
 
@@ -75,6 +103,19 @@ komentarz nagłówka.
 ## Otwarte decyzje
 
 Rozstrzygnąć, zanim dotknie ich któraś z kolejnych sesji.
+
+### Poziom dostępu `/projekty/` i `/kosztorys/` — decyzja z Sesji 3
+
+Rozdział II planu mówi, że gość **nie może** tworzyć projektów ani list materiałów.
+Serwis dziś na to pozwala bez konta (`assets/workspace.js`, `localStorage`), a
+`docs/FIRESTORE_SYNC.md` §1.2 zabrania przenoszenia liczenia za ścianę logowania.
+Sesja 3 zachowała stan faktyczny (poziom `GUEST`) i **nie rozstrzygnęła sporu** — to
+zmiana funkcjonalna, a sesja miała mandat wyłącznie projektowy.
+
+Propozycja: zostawić `GUEST`, a rozdział II czytać jako granicę konta, nie granicę
+przeglądarki — konto dokłada sync między urządzeniami, przetrwanie wyczyszczenia
+przeglądarki i udostępnianie linkiem. Pełne uzasadnienie i alternatywa:
+[`ARCHITEKTURA.md`](ARCHITEKTURA.md) §8.1. **Potrzebna decyzja właściciela.**
 
 ### Slogan
 
@@ -139,6 +180,8 @@ warstwy językowej, czyli dokładnie zakres tej sesji.
 - **`docs/` nie jest publikowane.** `.github/workflows/pages.yml` usuwa `docs/`, `src/`,
   `scripts/`, `CLAUDE.md` i `README.md` z artefaktu przed wdrożeniem, więc plan produktu
   nie leży pod publicznym adresem. Nie przenoś go do korzenia repozytorium.
+- **Architektura informacji:** [`ARCHITEKTURA.md`](ARCHITEKTURA.md) — strony, routing,
+  nawigacja, poziomy dostępu, przepływy. Wersja maszynowa: `src/ia.mjs`.
 - **Dokumentacja techniczna:** [`DOKUMENTACJA.md`](DOKUMENTACJA.md) — architektura,
   build, i18n, kalkulatory, SEO, assety.
 - **Zasady pracy w repo:** `CLAUDE.md` w korzeniu — praca tylko na `main`, brak

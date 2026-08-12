@@ -104,7 +104,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | |
 | `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
-| `src/*.mjs` — site map, templates, page bodies, formulas | |
+| `src/*.mjs` — information architecture, site map, templates, page bodies, formulas | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
 
 The build **fails loudly** rather than emitting a broken page: a key missing in one
@@ -115,6 +115,10 @@ formula identifier that collides with a field label in some language all abort i
 
 ```
 scripts/build.mjs     The generator (dependency-free Node)
+src/ia.mjs            The information architecture: every route, its access level
+                      (guest/liczmat/pro), its parent, its place in the navigation.
+                      The build fails if the pages it wrote are not exactly the
+                      pages declared here. Narrative version: docs/ARCHITEKTURA.md
 src/site.mjs          Languages, URL slugs per section/calculator/guide — the site map
 src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
 src/pages.mjs         The <main> of each page type
@@ -138,6 +142,8 @@ assets/app.js         /app/ — Firebase Auth + Firestore sync, same schema as t
 assets/share.js       /p/<token> — read-only shared estimate
 assets/firebase-config.js  Firebase Web config (see the placeholders inside)
 privacy-policy.html   Full privacy policy (PL + EN) — required by Google Play
+docs/ARCHITEKTURA.md  Information architecture: pages, routing, navigation, the
+                      three access levels, user flows, and the open decisions
 docs/DOKUMENTACJA.md  Full project documentation
 ```
 
@@ -209,6 +215,13 @@ Kotlin side of it. Change one, change all three.
   hand-edit a generated `.html`: the next build silently reverts it.
 - **A slug is permanent.** Renaming one in `src/site.mjs` breaks every inbound link and the
   ranking that came with it. Add a redirect instead.
+- **A new page must be declared in `src/ia.mjs` before it can be built.** The build
+  compares the pages it wrote against the routes declared there and aborts on either
+  kind of mismatch, so adding a `build…()` function is only half the change. Give the
+  route its access level (`GUEST` / `LICZMAT` / `PRO`), its parent and — if it belongs in
+  the menu — its position; the header and the footer are generated from that list, so a
+  navigation link cannot point anywhere else. Turning a `PLANNED` route into a live one
+  also means moving its `plannedSlug` into `SECTION` in `src/site.mjs`.
 - **No marketing slop.** No hype headings that say nothing, no claims nobody can
   verify ("in a minute", "the best"), no em dash used as a rhetorical pause. Every
   number on the page must be traceable to the code: the calculator count comes

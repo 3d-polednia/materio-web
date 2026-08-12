@@ -29,6 +29,7 @@ import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies,
 } from "../src/site.mjs";
+import { livePaths, validateIA } from "../src/ia.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
 import { DEFAULT_CURRENCY } from "../src/currency.mjs";
 import { page } from "../src/template.mjs";
@@ -168,6 +169,9 @@ function validate() {
     if (matIds.has(m.id)) problems.push(`duplicate material id "${m.id}"`);
     matIds.add(m.id);
   }
+
+  // The architecture itself: levels, the page tree, the navigation, the user flows.
+  problems.push(...validateIA());
 
   // Two pages must never claim the same URL.
   const seen = new Map();
@@ -640,6 +644,35 @@ buildStores();
 buildPrivatePages();
 buildSitemap();
 
+/**
+ * The pages that were written have to be exactly the pages the architecture declares.
+ *
+ * src/ia.mjs is the inventory: every route, its access level and its place in the tree.
+ * Without this check it would be a document, and a document drifts — a new page could
+ * ship undeclared, or a declared page could quietly stop being built. Comparing the two
+ * sets makes that a build failure instead.
+ */
+function checkAgainstIA() {
+  const declared = livePaths(CALCS, GUIDES);
+  const built = new Set(written.filter((f) => f.endsWith(".html")));
+  const mismatches = [
+    ...[...built].filter((f) => !declared.has(f)).map((f) => `built but not declared: ${f}`),
+    ...[...declared].filter((f) => !built.has(f)).map((f) => `declared but not built: ${f}`),
+  ];
+  // The two hand-written pages are declared too; they are never overwritten, only checked.
+  for (const f of ["privacy-policy.html", "404.html"]) {
+    if (!existsSync(p(f))) mismatches.push(`hand-written page is missing: ${f}`);
+  }
+  if (mismatches.length) {
+    console.error("Build aborted — the pages do not match src/ia.mjs:\n");
+    for (const m of mismatches.sort()) console.error(`  - ${m}`);
+    process.exit(1);
+  }
+  return declared.size;
+}
+
+const declared = checkAgainstIA();
 const pages = written.filter((f) => f.endsWith(".html")).length;
 console.log(`Built ${pages} pages and ${written.length - pages} assets ` +
   `(${LANGS.length} languages, ${CALCS.length} calculators, ${GUIDES.length} guides), stamp ${STAMP}.`);
+console.log(`Architecture: ${declared} pages declared in src/ia.mjs, all present.`);
