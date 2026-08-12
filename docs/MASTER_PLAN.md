@@ -1,0 +1,1643 @@
+# LiczMat — Master Plan
+
+## Postęp
+
+Gdzie jesteśmy w [kolejności sesji](#xxxii-kolejność-sesji). Aktualizuj po każdej sesji.
+
+| Sesja | Zakres | Status |
+|---|---|---|
+| 1 | Rebranding + nowy design | **Zrobione** (2026-08-12) |
+| 2 | Języki i waluty | Następna |
+| 3–36 | — | Nie zaczęte |
+
+**Otwarte decyzje z Sesji 1**, do rozstrzygnięcia zanim dotknie ich któraś z kolejnych sesji:
+
+- **Slogan.** Grafika referencyjna pokazuje „POLICZ. ZAPLANUJ. ZREALIZUJ.” i nagłówek
+  „Policz materiały. Zaplanuj swoją pracę.” Serwis dalej ma „Policz. Kup. Nie marnuj.”
+  (klucze `hero_title` i `foot_tagline` w `assets/i18n.js`). To copy strony głównej,
+  więc należy do Sesji 6 — chyba że właściciel zdecyduje inaczej.
+- **Domena.** `materio-app.com` zostaje. Zmiana wymaga DNS-u i przekierowań; dotyka
+  `BASE` w `src/site.mjs`, pliku `CNAME`, `robots.txt`, `sitemap.xml` oraz canonical
+  i hreflang na ~230 stronach.
+- **Klucze `localStorage`.** `materio_consent`, `materio-lang`, `materio-redirected`,
+  `materio-workspace-v`, `materio-active-project`, `materio-account` celowo zachowały
+  stare nazwy. Zmiana kasuje odwiedzającym zgodę na cookies, wybór języka i **zapisane
+  projekty**. Jeżeli kiedyś mają się zmienić, potrzebna jest migracja, nie zwykłe
+  przemianowanie. To samo dotyczy `utm_source=materio_web`, na którym oparta jest
+  historia w GA, oraz identyfikatora projektu Firebase `materio-502513`.
+- **Układ ze wzorca.** Grafika referencyjna zawiera wyszukiwarkę kalkulatorów, kafelki
+  popularnych, mockup pulpitu i selektor języka z flagami. To Sesje 2, 5, 6 i 7 —
+  Sesja 1 wdrożyła sam system wizualny, bez przebudowy strony głównej.
+
+---
+
+## Status dokumentu
+
+To jest nadrzędny plan przebudowy istniejącego projektu Materio Web w platformę **LICZMAT**.
+
+Master Plan określa:
+
+- wizję produktu,
+- branding,
+- wygląd strony,
+- model użytkowników,
+- obsługę języków i walut,
+- architekturę funkcjonalną,
+- zasady UX/UI,
+- zasady techniczne,
+- kolejność prac,
+- zakres kolejnych sesji.
+
+> **WAŻNE**
+>
+> **NIE WYKONUJ CAŁEGO MASTER PLANU JEDNOCZEŚNIE.**
+>
+> Master Plan jest MAPĄ projektu.
+>
+> Aktualna instrukcja sesji określa, co należy wykonać TERAZ.
+
+---
+
+## Spis treści
+
+| # | Rozdział |
+|---|---|
+| [I](#i-główna-wizja-liczmat) | Główna wizja LiczMat |
+| [II](#ii-fundamentalny-model--3-poziomy-użytkownika) | Fundamentalny model — 3 poziomy użytkownika |
+| [III](#iii-branding--materio--liczmat) | Branding — Materio → LiczMat |
+| [IV](#iv-design--tryb-ciemny-i-jasny) | Design — tryb ciemny i jasny |
+| [V](#v-języki) | Języki |
+| [VI](#vi-waluty) | Waluty |
+| [VII](#vii-android) | Android |
+| [VIII](#viii-najważniejsze-zasady-projektu) | Najważniejsze zasady projektu |
+| [IX](#ix-docelowa-architektura-produktu) | Docelowa architektura produktu |
+| [X](#x-strona-główna) | Strona główna |
+| [XI](#xi-kalkulatory) | Kalkulatory |
+| [XII](#xii-pojedynczy-kalkulator) | Pojedynczy kalkulator |
+| [XIII](#xiii-logika-kalkulatorów) | Logika kalkulatorów |
+| [XIV](#xiv-projekty) | Projekty |
+| [XV](#xv-zapisywanie-kalkulacji) | Zapisywanie kalkulacji |
+| [XVI](#xvi-listy-materiałów) | Listy materiałów |
+| [XVII](#xvii-koszty) | Koszty |
+| [XVIII](#xviii-pomieszczenia) | Pomieszczenia |
+| [XIX](#xix-liczmat-pro) | LiczMat Pro |
+| [XX](#xx-klienci) | Klienci |
+| [XXI](#xxi-zlecenia) | Zlecenia |
+| [XXII](#xxii-wyceny) | Wyceny |
+| [XXIII](#xxiii-terminarz) | Terminarz |
+| [XXIV](#xxiv-crm) | CRM |
+| [XXV](#xxv-płatności-i-paywall) | Płatności i paywall |
+| [XXVI](#xxvi-seo) | SEO |
+| [XXVII](#xxvii-design-system) | Design system |
+| [XXVIII](#xxviii-mobile) | Mobile |
+| [XXIX](#xxix-performance) | Performance |
+| [XXX](#xxx-accessibility) | Accessibility |
+| [XXXI](#xxxi-security) | Security |
+| [XXXII](#xxxii-kolejność-sesji) | Kolejność sesji |
+| [XXXIII](#xxxiii-raport-po-każdej-sesji) | Raport po każdej sesji |
+| [XXXIV](#xxxiv-zasada-zachowania-istniejącego-kodu) | Zasada zachowania istniejącego kodu |
+| [XXXV](#xxxv-najważniejsza-zasada-całego-projektu) | Najważniejsza zasada całego projektu |
+| [XXXVI](#xxxvi-definicja-sukcesu) | Definicja sukcesu |
+| [XXXVII](#xxxvii-ostateczne-wymagania-dla-pierwszej-sesji) | Ostateczne wymagania dla pierwszej sesji |
+
+---
+
+## I. Główna wizja LiczMat
+
+LICZMAT to webowa platforma do szybkiego liczenia materiałów, organizowania prac, remontów i zleceń.
+
+Główna idea:
+
+**POLICZ → ZAPISZ → ZORGANIZUJ → ZREALIZUJ**
+
+LiczMat ma być przede wszystkim praktycznym narzędziem.
+
+Nie ma być:
+
+- katalogiem samych kalkulatorów,
+- stroną reklamującą aplikację Android,
+- ogromnym katalogiem materiałów,
+- rozbudowanym ERP,
+- skomplikowanym CRM-em,
+- ścianą tekstu,
+- stroną z kilometrami list i kart.
+
+Przykład:
+
+Użytkownik chce wiedzieć:
+
+> „Ile kleju potrzebuję do 35 m² płytek?”
+
+→ wchodzi na LiczMat
+→ wybiera kalkulator
+→ podaje dane
+→ otrzymuje wynik
+→ może zakończyć korzystanie.
+
+Jeżeli chce zachować wynik:
+
+→ zakłada darmowe konto
+→ zapisuje kalkulację
+→ dodaje ją do projektu
+→ tworzy listę materiałów
+→ może kontrolować koszty.
+
+Dla fachowca:
+
+→ klienci
+→ zlecenia
+→ projekty
+→ materiały
+→ wyceny
+→ terminarz
+→ historia.
+
+To jest kierunek lekkiego CRM.
+
+---
+
+## II. Fundamentalny model — 3 poziomy użytkownika
+
+LICZMAT od początku jest projektowany wokół trzech poziomów dostępu:
+
+1. **UŻYTKOWNIK NIEZAREJESTROWANY — GOŚĆ**
+2. **UŻYTKOWNIK ZAREJESTROWANY — LICZMAT**
+3. **UŻYTKOWNIK PRO — LICZMAT PRO**
+
+To jest jedna z najważniejszych zasad całego projektu.
+
+Nie należy obecnie tworzyć dodatkowych typów kont.
+
+### Poziom 1 — GOŚĆ
+
+Użytkownik nie posiada konta.
+
+Jego głównym celem jest szybkie rozwiązanie konkretnego problemu.
+
+**MOŻE:**
+
+- wejść na stronę,
+- przeglądać kalkulatory,
+- wyszukiwać kalkulatory,
+- korzystać z publicznych kalkulatorów,
+- wykonywać obliczenia,
+- otrzymywać wyniki,
+- czytać poradniki i treści informacyjne.
+
+**NIE MOŻE:**
+
+- zapisywać kalkulacji,
+- tworzyć projektów,
+- tworzyć list materiałów,
+- zapisywać historii,
+- posiadać klientów,
+- posiadać zleceń,
+- korzystać z CRM.
+
+> **WAŻNE**
+>
+> Podstawowe kalkulatory NIE MOGĄ wymagać rejestracji.
+>
+> Użytkownik ma otrzymać realną wartość bez zakładania konta.
+
+Przykład:
+
+> „Ile potrzebuję kleju do płytek?”
+
+→ kalkulator
+→ dane
+→ wynik
+
+Dopiero po uzyskaniu wyniku można zaproponować:
+
+> „Chcesz zachować ten wynik?”
+>
+> „Załóż darmowe konto w LiczMat.”
+
+Rejestracja ma być naturalnym kolejnym krokiem, a nie barierą.
+
+### Poziom 2 — LICZMAT
+
+Użytkownik posiada darmowe konto.
+
+To jest podstawowy produkt LiczMat.
+
+**MOŻE:**
+
+- korzystać z kalkulatorów,
+- zapisywać kalkulacje,
+- tworzyć projekty,
+- edytować projekty,
+- tworzyć listy materiałów,
+- dodawać własne materiały,
+- zapisywać ceny materiałów,
+- kontrolować koszty,
+- przypisywać kalkulacje do projektów,
+- przypisywać materiały do projektów,
+- korzystać z historii,
+- wracać do wcześniejszych obliczeń.
+
+Przykład:
+
+Projekt: **Remont łazienki**
+
+Kalkulacje:
+
+- powierzchnia płytek,
+- ilość kleju,
+- ilość fugi,
+- ilość gruntu.
+
+Materiały:
+
+- płytki,
+- klej,
+- fuga,
+- grunt,
+- silikon.
+
+Koszty:
+
+- materiały,
+- dodatkowe wydatki.
+
+Historia:
+
+- wykonane kalkulacje,
+- zmiany projektu.
+
+> **WAŻNE**
+>
+> LiczMat nie jest wersją demonstracyjną.
+>
+> Darmowy użytkownik powinien otrzymać pełnowartościowe narzędzie do organizacji własnych projektów.
+>
+> Nie należy sztucznie blokować podstawowych funkcji tylko po to, aby wymusić przejście na Pro.
+
+### Poziom 3 — LICZMAT PRO
+
+LiczMat Pro jest płatnym rozszerzeniem dla fachowca.
+
+Nie jest tylko „większą wersją kalkulatora”.
+
+Jest lekkim systemem CRM do prowadzenia pracy.
+
+Użytkownik Pro otrzymuje wszystko z LiczMat oraz dodatkowo:
+
+**KLIENCI**
+
+- lista klientów,
+- dane kontaktowe,
+- notatki,
+- historia współpracy.
+
+**ZLECENIA**
+
+- klient,
+- opis,
+- status,
+- termin,
+- wartość,
+- powiązany projekt.
+
+**PROJEKTY**
+
+- projekty przypisane do klientów/zleceń,
+- kalkulacje,
+- materiały,
+- koszty.
+
+**WYCENY**
+
+- materiały,
+- robocizna,
+- dodatkowe koszty,
+- marża,
+- suma.
+
+**TERMINARZ**
+
+- terminy zleceń,
+- podstawowe informacje.
+
+**CRM**
+
+- klient → zlecenie → projekt → wycena → historia.
+
+### Relacja między 3 poziomami
+
+```
+GOŚĆ                 LICZMAT              LICZMAT PRO
+
+KALKULATORY          KALKULATORY          KLIENT
+    ↓                    ↓                    ↓
+  WYNIK                PROJEKT             ZLECENIE
+    ↓                    ↓                    ↓
+„ZAPISZ WYNIK”        KALKULACJE           PROJEKT
+    ↓                    ↓                    ↓
+REJESTRACJA           MATERIAŁY           KALKULACJE
+                         ↓                    ↓
+                      KOSZTY               MATERIAŁY
+                         ↓                    ↓
+                      HISTORIA              WYCENA
+                                              ↓
+                                            TERMIN
+                                              ↓
+                                           HISTORIA
+```
+
+### Najważniejsza zasada uprawnień
+
+Każdy element aplikacji powinien jednoznacznie wiedzieć, do którego poziomu dostępu należy.
+
+- POZIOM 1: **GOŚĆ**
+- POZIOM 2: **LICZMAT**
+- POZIOM 3: **LICZMAT PRO**
+
+Nie tworzyć obecnie:
+
+- LiczMat Firma,
+- Team,
+- Administrator,
+- Manager,
+- wielu użytkowników w jednym koncie,
+- zespołów,
+- ról pracowników.
+
+Model wieloużytkownikowy zostanie zaprojektowany dopiero w przyszłości jako osobny etap: **LICZMAT FIRMA**.
+
+---
+
+## III. Branding — Materio → LiczMat
+
+Istniejący projekt Materio należy przekształcić w LICZMAT.
+
+Nowa nazwa marki: **LICZMAT**
+
+Należy zmienić branding w całym serwisie:
+
+- logo,
+- favicon,
+- ikonę,
+- nazwy,
+- teksty,
+- metadata,
+- tytuły stron,
+- Open Graph,
+- manifest,
+- komunikaty UI,
+- elementy nawigacji,
+- stopkę,
+- strony informacyjne,
+- nazwy komponentów, jeżeli jest to potrzebne.
+
+Nie należy zmieniać logiki kalkulatorów tylko dlatego, że zmieniana jest marka.
+
+### Logo i assety
+
+Użytkownik dostarczy Claude Code:
+
+- nowe logo LiczMat,
+- ikonę LiczMat,
+- grafikę referencyjną wyglądu strony.
+
+Te materiały są nadrzędnym punktem odniesienia dla nowego wyglądu.
+
+Claude Code powinien:
+
+- wykorzystać dostarczone logo,
+- wykorzystać dostarczoną ikonę,
+- zachować proporcje i czytelność logo,
+- przygotować odpowiednie warianty dla headera, favicon, mobile i innych wymaganych miejsc,
+- nie generować własnego logo,
+- nie zastępować dostarczonego brandingu innym rozwiązaniem.
+
+Grafika referencyjna strony określa kierunek wizualny.
+
+Nie należy kopiować jej bezmyślnie piksel po pikselu.
+
+Należy wykorzystać:
+
+- układ,
+- charakter,
+- hierarchię,
+- sposób prezentowania treści,
+- atmosferę,
+- styl komponentów,
+
+jako punkt odniesienia dla implementacji LiczMat.
+
+---
+
+## IV. Design — tryb ciemny i jasny
+
+LiczMat ma posiadać dwa główne motywy:
+
+1. **TRYB CIEMNY**
+2. **TRYB JASNY**
+
+### Tryb ciemny
+
+Tryb ciemny powinien być zgodny z dostarczoną grafiką referencyjną.
+
+Dominujące tło:
+
+- grafitowe / bardzo ciemne,
+- niekoniecznie absolutna czerń,
+- eleganckie,
+- profesjonalne,
+- zapewniające odpowiedni kontrast.
+
+Nie należy używać przesadnych gradientów.
+
+Nie należy przesadzać z efektami glow.
+
+Interfejs ma być nowoczesny, ale praktyczny.
+
+### Tryb jasny
+
+Tryb jasny powinien zachować ten sam charakter wizualny.
+
+Zamiast grafitowego/czarnego tła należy zastosować **CIEPŁĄ, LEKKO KREMOWĄ BIEL**.
+
+Preferowany kierunek:
+
+- off-white,
+- bardzo jasny krem,
+- delikatnie cieplejszy od czystej bieli.
+
+Nie używać agresywnej żółci ani mocnego beżu.
+
+Tryb jasny powinien być:
+
+- czysty,
+- profesjonalny,
+- lekki,
+- czytelny,
+- wygodny podczas długiej pracy.
+
+### Ważna zasada
+
+Tryb jasny i ciemny muszą wyglądać jak ten sam produkt.
+
+Nie projektować dwóch całkowicie różnych stron.
+
+Zmianie powinny podlegać przede wszystkim:
+
+- tła,
+- powierzchnie,
+- kontrast,
+- kolory tekstu,
+- kolory obramowań,
+- odpowiednie warianty komponentów.
+
+Struktura UI pozostaje spójna.
+
+Użytkownik powinien móc przełączać: **CIEMNY ↔ JASNY**
+
+Preferencja motywu powinna być zapisywana.
+
+Jeżeli aplikacja obsługuje automatyczne wykrywanie motywu systemowego, można uwzględnić opcję **SYSTEMOWY**, ale nie jest to wymagane, jeżeli komplikuje implementację.
+
+---
+
+## V. Języki
+
+LiczMat ma obsługiwać WYŁĄCZNIE cztery języki:
+
+1. Polski
+2. Ukraiński
+3. Niemiecki
+4. Angielski
+
+Nie pozostawiać innych języków z obecnego projektu.
+
+Należy usunąć:
+
+- niepotrzebne opcje językowe,
+- stare tłumaczenia,
+- stare selektory,
+- nieużywane pliki lokalizacyjne,
+- stare linki językowe,
+- niepotrzebne metadata językowe.
+
+Nie usuwać istniejących tłumaczeń dla czterech wymaganych języków, jeżeli można je wykorzystać.
+
+### Wybór języka
+
+W selektorze języka nazwa języka musi być przedstawiona razem z **GRAFICZNĄ FLAGĄ** odpowiadającego państwa.
+
+Przykład:
+
+```
+[FLAGA] Polski
+[FLAGA] Українська
+[FLAGA] Deutsch
+[FLAGA] English
+```
+
+> **WAŻNE**
+>
+> NIE używać emoji flag.
+>
+> Nie stosować znaków 🇵🇱 🇺🇦 🇩🇪 🇬🇧 jako podstawowej grafiki interfejsu.
+
+Flagi należy pobierać jako rzeczywiste assety graficzne z odpowiedniej biblioteki/icon setu lub przechowywać jako lokalne assety projektu.
+
+Wybrana metoda powinna zapewniać:
+
+- identyczny wygląd na różnych urządzeniach,
+- poprawne renderowanie na Androidzie,
+- poprawne renderowanie na iOS,
+- poprawne renderowanie na desktopie,
+- odpowiednią jakość na ekranach HiDPI/Retina,
+- mały rozmiar plików,
+- brak zależności od emoji systemowych.
+
+Flaga jest elementem wizualnym.
+
+Tekstowa nazwa języka zawsze pozostaje widoczna.
+
+Nie używać samej flagi jako jedynego oznaczenia języka.
+
+---
+
+## VI. Waluty
+
+Ponieważ LiczMat ma działać na wielu rynkach, język i waluta NIE mogą być ze sobą sztywno związane.
+
+Użytkownik powinien móc wybrać język oraz walutę niezależnie.
+
+Przykład: **Deutsch + PLN** jest poprawnym ustawieniem.
+
+Obsługiwane waluty:
+
+| Kod | Waluta |
+|---|---|
+| PLN | złoty polski |
+| EUR | euro |
+| USD | dolar amerykański |
+| UAH | hrywna ukraińska |
+
+### Wybór waluty
+
+Waluta może być dostępna:
+
+- w ustawieniach użytkownika,
+- w ustawieniach kalkulatora,
+- w projekcie,
+- przy odpowiednich polach cenowych,
+- w globalnym selektorze, jeżeli UX będzie tego wymagał.
+
+Nie należy wymuszać jednej waluty tylko dlatego, że użytkownik wybrał dany język.
+
+Przykłady:
+
+```
+Polski + PLN
+Polski + EUR
+Deutsch + EUR
+Deutsch + PLN
+English + USD
+English + EUR
+Українська + UAH
+```
+
+### Ważna zasada dotycząca kalkulatorów
+
+Wartości techniczne kalkulatorów nie powinny być automatycznie przeliczane tylko dlatego, że użytkownik zmienił walutę.
+
+Waluta dotyczy przede wszystkim:
+
+- cen materiałów,
+- kosztów,
+- wycen,
+- robocizny,
+- podsumowań finansowych.
+
+Jednostki fizyczne kalkulatorów pozostają zgodne z logiką danego kalkulatora.
+
+---
+
+## VII. Android
+
+Aplikacja Android nie jest obecnie priorytetem.
+
+Podczas przebudowy strony WWW **NIE**:
+
+- rozwijaj aplikacji Android,
+- przebudowuj aplikacji Android,
+- uzależniaj architektury strony od aplikacji Android,
+- traktuj aplikacji Android jako głównego produktu.
+
+Android jest dodatkiem do ekosystemu LiczMat.
+
+Na obecnym etapie pracujemy przede wszystkim nad **LICZMAT WEB**.
+
+Strona internetowa nie może wyglądać jak landing page reklamujący aplikację Android.
+
+---
+
+## VIII. Najważniejsze zasady projektu
+
+- Jedna sesja = jedno zadanie.
+- Najpierw zrozum istniejący kod dotyczący aktualnie wykonywanego zadania.
+- Zachowuj istniejącą wartość.
+- Nie zmieniaj matematyki kalkulatorów bez konkretnej potrzeby.
+- UX > ilość funkcji.
+- Homepage ma być krótki.
+- Kalkulatory mają być dostępne bez konta.
+- Lista materiałów jest funkcją zalogowanego użytkownika.
+- SEO nie może niszczyć UX.
+- Mobile jest równie ważny jak desktop.
+- Nie dodawaj nowych funkcji bez konkretnego zadania.
+- Nie usuwaj działających funkcji bez powodu.
+- Najpierw narzędzie, potem marketing.
+- Nie buduj strony jako reklamy aplikacji.
+- Zachowaj spójność designu.
+- Nie komplikuj produktu bez potrzeby.
+- Nie buduj feature factory.
+- Każda nowa funkcja musi mieć konkretny cel użytkowy.
+
+---
+
+## IX. Docelowa architektura produktu
+
+```
+GOŚĆ                        LICZMAT PRO (dla fachowca)
+  ↓                             ↓
+KALKULATOR                   KLIENCI
+  ↓                             ↓
+WYNIK                        ZLECENIA
+  ↓                             ↓
+ZAPIS                        PROJEKTY
+  ↓                             ↓
+REJESTRACJA                  MATERIAŁY
+  ↓                             ↓
+LICZMAT                      WYCENY
+  ↓                             ↓
+PROJEKT                      TERMINARZ
+  ↓                             ↓
+KALKULACJE                   HISTORIA / CRM
+  ↓
+MATERIAŁY
+  ↓
+KOSZTY
+  ↓
+HISTORIA
+```
+
+Przykładowa struktura:
+
+```
+/
+/kalkulatory
+/kalkulatory/...
+/projekty
+/projekty/...
+/liczmat-pro
+/poradniki
+/konto
+```
+
+Nie traktuj tej struktury jako absolutnej.
+
+Jeżeli podczas implementacji zostanie znalezione lepsze rozwiązanie, nie zmieniaj go samodzielnie w ramach bieżącego zadania.
+
+Zgłoś propozycję w raporcie.
+
+---
+
+## X. Strona główna
+
+Homepage ma być przede wszystkim wejściem do produktu.
+
+Nie powinien wyglądać jak reklama aplikacji.
+
+Główna idea komunikacyjna powinna być związana z:
+
+- liczeniem,
+- materiałami,
+- budową,
+- remontem,
+- organizacją pracy.
+
+Homepage powinien prowadzić przede wszystkim do trzech obszarów:
+
+| Obszar | Pytanie |
+|---|---|
+| KALKULATORY | „Co chcesz policzyć?” |
+| LICZMAT | „Chcesz zachować i uporządkować swoją pracę?” |
+| LICZMAT PRO | „Robisz to zawodowo?” |
+
+Nie pokazuj na homepage:
+
+- ogromnej listy wszystkich kalkulatorów,
+- ogromnej listy materiałów,
+- wielokrotnie powtarzających się CTA,
+- długich opisów wszystkich funkcji,
+- technicznych informacji,
+- dużej promocji aplikacji Android.
+
+Funkcje mają istnieć w produkcie.
+
+Nie muszą wszystkie być pokazane na homepage.
+
+---
+
+## XI. Kalkulatory
+
+Kalkulatory są jednym z głównych wejść do LiczMat.
+
+Wszystkie wartościowe istniejące kalkulatory należy zachować, chyba że późniejsza analiza konkretnej funkcji wykaże realny powód do usunięcia.
+
+Strona `/kalkulatory` powinna mieć:
+
+- wyszukiwarkę,
+- logiczne kategorie,
+- filtrowanie,
+- popularne kalkulatory,
+- czytelny dostęp do wszystkich kalkulatorów.
+
+Nie wyświetlaj wszystkiego jako gigantycznej ściany kart.
+
+Przykładowe kategorie:
+
+- płytki i wykończenie,
+- malowanie,
+- budowa,
+- rozkrój,
+- zabudowa,
+- inne grupy wynikające z faktycznej zawartości projektu.
+
+Nie twórz sztucznych kategorii.
+
+---
+
+## XII. Pojedynczy kalkulator
+
+Każdy kalkulator powinien przede wszystkim być narzędziem.
+
+Docelowy schemat:
+
+```
+TYTUŁ
+  ↓
+KRÓTKI OPIS
+  ↓
+FORMULARZ
+  ↓
+WYNIK
+  ↓
+AKCJE
+  ↓
+INFORMACJE DODATKOWE / SEO
+```
+
+Najważniejszy jest wynik.
+
+Przykładowe akcje:
+
+- Oblicz ponownie
+- Dodaj do projektu
+
+Dla niezalogowanego:
+
+> „Zaloguj się lub załóż darmowe konto, aby zapisać wynik.”
+
+Długie treści SEO, instrukcje i FAQ nie mogą zasłaniać kalkulatora.
+
+---
+
+## XIII. Logika kalkulatorów
+
+Przed zmianą istniejącego kalkulatora:
+
+- zrozum aktualną implementację,
+- sprawdź sposób obliczeń,
+- zachowaj działającą logikę,
+- zmieniaj matematykę tylko wtedy, gdy znaleziono konkretny błąd lub wymaganie,
+- nie przepisuj kodu bez potrzeby.
+
+Szczególnie ważne:
+
+- jednostki,
+- zaokrąglenia,
+- wartości graniczne,
+- odpady,
+- przeliczenia,
+- wydajność materiałów,
+- logika rozkroju,
+- zużycie materiału.
+
+---
+
+## XIV. Projekty
+
+Projekt jest centralnym elementem darmowego konta LiczMat.
+
+Projekt może zawierać:
+
+- nazwę,
+- opis,
+- pomieszczenia,
+- kalkulacje,
+- materiały,
+- koszty,
+- notatki,
+- historię.
+
+Przykład — **REMONT ŁAZIENKI**:
+
+```
+Kalkulacje
+Materiały
+Koszty
+Notatki
+Podsumowanie
+```
+
+Interfejs ma być prosty i praktyczny.
+
+---
+
+## XV. Zapisywanie kalkulacji
+
+Najważniejsza mechanika:
+
+```
+KALKULATOR
+   ↓
+WYNIK
+   ↓
+DODAJ DO PROJEKTU
+   ↓
+PROJEKT
+```
+
+Zapis powinien zachować wystarczające informacje, aby użytkownik później rozumiał:
+
+- jaki kalkulator został użyty,
+- jakie dane wprowadził,
+- jaki otrzymał wynik,
+- jakie były jednostki,
+- kiedy wykonano obliczenie.
+
+Nie zapisuj tylko samej liczby, jeśli później nie będzie wiadomo, skąd się wzięła.
+
+---
+
+## XVI. Listy materiałów
+
+Lista materiałów jest funkcją zalogowanego użytkownika.
+
+Nie powinna być głównym elementem marketingowym strony.
+
+Docelowo:
+
+```
+Kalkulator
+   ↓
+Wynik
+   ↓
+Dodaj do projektu
+   ↓
+Materiał trafia do listy
+```
+
+Przykład:
+
+| Materiał | Ilość |
+|---|---|
+| Płytki | 26,4 m² |
+| Klej | 7 worków |
+| Fuga | 4 kg |
+
+Użytkownik powinien móc:
+
+- edytować ilość,
+- zmienić nazwę,
+- zmienić jednostkę,
+- usunąć materiał,
+- dodać własny materiał,
+- dodać notatkę.
+
+---
+
+## XVII. Koszty
+
+Materiały mogą mieć ceny.
+
+Przykład:
+
+```
+Klej
+7 × 35 PLN
+= 245 PLN
+```
+
+Waluta powinna być zgodna z wybraną przez użytkownika.
+
+Projekt może pokazywać:
+
+- koszt materiałów,
+- inne koszty,
+- sumę projektu.
+
+Nie buduj z tego systemu księgowego.
+
+---
+
+## XVIII. Pomieszczenia
+
+Pomieszczenia są elementem projektu.
+
+Przykład:
+
+```
+Projekt:        Remont łazienki
+Pomieszczenie:  Łazienka
+Wymiary:        2,4 × 3,2 × 2,5 m
+```
+
+Kalkulacje mogą być przypisane do konkretnego pomieszczenia.
+
+Nie promuj pomieszczeń jako osobnego wielkiego modułu na homepage.
+
+---
+
+## XIX. LiczMat Pro
+
+LiczMat Pro powinno być naturalnym rozszerzeniem LiczMat.
+
+| | |
+|---|---|
+| **LICZMAT** | „Ogarniam swoje projekty.” |
+| **LICZMAT PRO** | „Ogarniam swoją pracę.” |
+
+Pro obejmuje:
+
+- klientów,
+- zlecenia,
+- projekty,
+- materiały,
+- wyceny,
+- koszty,
+- terminarz,
+- notatki,
+- historię,
+- lekki CRM.
+
+Nie buduj zaawansowanego ERP.
+
+---
+
+## XX. Klienci
+
+LiczMat Pro: lista klientów.
+
+Klient może posiadać:
+
+- dane kontaktowe,
+- notatki,
+- historię,
+- zlecenia,
+- projekty,
+- wyceny.
+
+Użytkownik Pro powinien łatwo przejść: **Klient → Zlecenie → Projekt → Wycena**.
+
+---
+
+## XXI. Zlecenia
+
+Zlecenie może mieć:
+
+- klienta,
+- nazwę,
+- opis,
+- status,
+- termin,
+- wartość,
+- projekt,
+- notatki.
+
+Przykładowe statusy:
+
+- nowe,
+- w toku,
+- zakończone,
+- anulowane.
+
+---
+
+## XXII. Wyceny
+
+Wycena może zawierać:
+
+- materiały,
+- robociznę,
+- inne koszty,
+- marżę,
+- sumę.
+
+Nie buduj pełnego programu księgowego.
+
+---
+
+## XXIII. Terminarz
+
+Prosty terminarz zleceń.
+
+Powinien pozwolić zobaczyć:
+
+- terminy,
+- zlecenia,
+- podstawowe informacje.
+
+Nie buduj pełnego odpowiednika Google Calendar.
+
+---
+
+## XXIV. CRM
+
+CRM LiczMat Pro ma być lekki.
+
+Główna relacja:
+
+```
+KLIENT
+   ↓
+ZLECENIE
+   ↓
+PROJEKT
+   ↓
+WYCENA
+   ↓
+HISTORIA
+```
+
+Celem jest szybkie zarządzanie pracą fachowca.
+
+Nie tworzymy ogromnego systemu ERP.
+
+---
+
+## XXV. Płatności i paywall
+
+Najpierw należy przygotować model: **FREE / PRO**
+
+Użytkownik darmowy powinien rozumieć, które funkcje są Pro.
+
+Przykład:
+
+> „Klienci — Dostępne w LiczMat Pro”
+>
+> „Poznaj LiczMat Pro”
+
+Płatności implementujemy dopiero po:
+
+- zbudowaniu funkcji Pro,
+- sprawdzeniu ich działania,
+- przetestowaniu uprawnień,
+- przygotowaniu paywalla.
+
+---
+
+## XXVI. SEO
+
+SEO jest ważne, ale nie może powodować przeładowania interfejsu.
+
+Każdy ważny kalkulator powinien mieć możliwość pozycjonowania się na własne zapytania.
+
+Treść SEO może znajdować się:
+
+- pod kalkulatorem,
+- po wyniku,
+- w rozwijanych sekcjach,
+- w FAQ,
+- w structured data.
+
+Sprawdź:
+
+- title,
+- meta description,
+- H1,
+- H2,
+- canonical,
+- sitemap,
+- robots.txt,
+- Open Graph,
+- breadcrumbs,
+- structured data,
+- indeksowalność,
+- hreflang dla obsługiwanych języków.
+
+W przypadku czterech języków należy prawidłowo przygotować:
+
+- alternatywne wersje językowe,
+- hreflang,
+- canonical,
+- sitemap,
+- metadata.
+
+Nie upychaj słów kluczowych.
+
+---
+
+## XXVII. Design system
+
+Design LiczMat ma być:
+
+- nowoczesny,
+- prosty,
+- profesjonalny,
+- lekki,
+- funkcjonalny.
+
+Inspiracja wizualna: dostarczona przez użytkownika grafika strony.
+
+Branding: dostarczone przez użytkownika logo i ikona LiczMat.
+
+Nie chcemy:
+
+- przesadnych gradientów,
+- nadmiaru animacji,
+- ogromnych kart,
+- marketingowego „krzyku”,
+- ścian tekstu,
+- powtarzających się CTA,
+- niepotrzebnego przewijania,
+- wielokilometrowych list.
+
+Priorytet:
+
+**CZYTELNOŚĆ + SZYBKOŚĆ + UŻYTECZNOŚĆ**
+
+Nie tworzyć designu oderwanego od istniejącej funkcjonalności.
+
+---
+
+## XXVIII. Mobile
+
+Projektuj mobile-first.
+
+Szczególnie ważne:
+
+- pola formularzy,
+- klawiatura ekranowa,
+- wyniki kalkulatorów,
+- duże przyciski,
+- tabele,
+- dashboard,
+- projekty,
+- materiały,
+- CRM.
+
+Sprawdź minimum:
+
+```
+320 px
+375 px
+390 px
+430 px
+tablet
+desktop
+```
+
+---
+
+## XXIX. Performance
+
+Po ukończeniu funkcjonalności sprawdź:
+
+- obrazy,
+- fonty,
+- JS,
+- CSS,
+- assety,
+- lazy loading,
+- bundle size,
+- niepotrzebne biblioteki.
+
+Nie poświęcaj użyteczności tylko dla wyniku Lighthouse.
+
+---
+
+## XXX. Accessibility
+
+Sprawdź:
+
+- kontrast,
+- focus,
+- klawiaturę,
+- aria,
+- formularze,
+- komunikaty błędów,
+- podstawową obsługę screen readerów.
+
+Szczególnie sprawdź kontrast zarówno w trybie ciemnym, jak i jasnym.
+
+---
+
+## XXXI. Security
+
+Szczególnie ważne:
+
+> Użytkownik A NIGDY nie może mieć dostępu do danych użytkownika B.
+
+Sprawdź:
+
+- autoryzację,
+- uprawnienia,
+- API,
+- projekty,
+- kalkulacje,
+- materiały,
+- klientów,
+- zlecenia,
+- wyceny.
+
+Model uprawnień musi uwzględniać trzy poziomy: **GOŚĆ → LICZMAT → LICZMAT PRO**
+
+---
+
+## XXXII. Kolejność sesji
+
+### Sesja 1 — Rebranding + nowy design
+
+To jest NOWA SESJA 1.
+
+Nie wykonujemy osobnego audytu jako pierwszego zadania.
+
+Cel: przekształcenie obecnego Materio Web w LICZMAT oraz wdrożenie nowego kierunku wizualnego.
+
+W ramach tej sesji należy:
+
+1. Zmienić branding: Materio → LiczMat, logo, ikonę, favicon, nazwy, podstawowe metadata.
+2. Wykorzystać dostarczone przez użytkownika: logo LiczMat, ikonę LiczMat, grafikę referencyjną strony.
+3. Zbudować nowy design: zgodny z grafiką referencyjną, nowoczesny, profesjonalny, prosty, funkcjonalny.
+4. Wdrożyć tryb ciemny i tryb jasny.
+5. Tryb ciemny: grafitowe / bardzo ciemne tło, zgodne z dostarczoną grafiką referencyjną.
+6. Tryb jasny: ciepła, lekko kremowa biel, zachowanie tego samego charakteru wizualnego.
+7. Przygotować spójny system: kolorów, tła, tekstu, borderów, przycisków, kart, formularzy, stanów.
+8. Nie zmieniać matematyki istniejących kalkulatorów.
+9. Nie przebudowywać aplikacji Android.
+10. Nie wykonywać kolejnych sesji.
+
+Po wykonaniu: **STOP**.
+
+### Sesja 2 — Języki i waluty
+
+Cel: uporządkowanie międzynarodowej wersji LiczMat.
+
+Obsługiwane języki: Polski, Українська, Deutsch, English.
+
+Usunąć wszystkie inne języki.
+
+Wdrożyć selektor języka. Każdy język musi być pokazany z nazwą i z rzeczywistą grafiką flagi.
+
+NIE używać emoji flag. Flagi mają pochodzić z biblioteki ikon lub lokalnych assetów.
+
+Wdrożyć obsługę walut: PLN, EUR, USD, UAH.
+
+Język i waluta muszą być niezależne. Użytkownik powinien móc wybrać np. **Deutsch + PLN** lub **English + EUR**.
+
+Waluta ma wpływać na: ceny materiałów, koszty, wyceny, robociznę, podsumowania finansowe.
+
+Nie zmieniać jednostek fizycznych kalkulatorów tylko przez zmianę waluty.
+
+Przygotować również prawidłową obsługę SEO dla czterech języków.
+
+Po wykonaniu: **STOP**.
+
+### Sesja 3 — Architektura informacji
+
+Docelowa struktura LiczMat. Bez dużych zmian funkcjonalnych.
+
+Określić: strony, routing, nawigację, relacje między modułami, przepływy użytkowników.
+
+Model: GOŚĆ → LICZMAT → LICZMAT PRO
+
+### Sesja 4 — Design system
+
+Ustalenie: typografii, spacingu, przycisków, kart, formularzy, kolorów, stanów, komponentów, responsywności, obu motywów.
+
+### Sesja 5 — Globalny layout
+
+Header. Footer. Nawigacja. Mobile navigation. Globalny routing/layout. Selektor języka. Selektor waluty. Przełącznik motywu.
+
+### Sesja 6 — Homepage
+
+Stworzenie krótkiego, przejrzystego homepage.
+
+Bez: gigantycznych list, ścian tekstu, reklamy aplikacji.
+
+Priorytet: Kalkulatory + LiczMat + LiczMat Pro
+
+### Sesja 7 — Centrum kalkulatorów
+
+Wyszukiwarka, kategorie, filtrowanie, popularne kalkulatory, czytelna lista.
+
+### Sesja 8 — Wzorzec UX kalkulatorów
+
+Wspólny model: formularz → wynik → akcja → zapis → SEO
+
+Uwzględnić lokalizację: tekstów, jednostek, waluty w części finansowej.
+
+### Sesja 9 — Kalkulatory grupa 1
+
+Przebudowa UX pierwszej grupy.
+
+### Sesja 10 — Kalkulatory grupa 2
+
+Przebudowa UX drugiej grupy.
+
+### Sesja 11 — Kalkulatory grupa 3
+
+Dokończenie pozostałych.
+
+### Sesja 12 — Test kalkulatorów
+
+Test: matematyki, danych wejściowych, jednostek, wyników, wartości granicznych, mobile, lokalizacji, walut w częściach finansowych.
+
+### Sesja 13 — System konta
+
+Rejestracja, logowanie, wylogowanie, reset hasła, profil, sesja użytkownika.
+
+Uwzględnić model: GOŚĆ → LICZMAT → LICZMAT PRO
+
+### Sesja 14 — Dashboard LiczMat
+
+Dashboard darmowego użytkownika.
+
+Powinien pokazywać przede wszystkim: projekty, ostatnie kalkulacje, szybkie akcje, ostatnio używane narzędzia.
+
+### Sesja 15 — Projekty
+
+CRUD projektów.
+
+### Sesja 16 — Zapis kalkulacji
+
+Kalkulator → wynik → projekt.
+
+### Sesja 17 — Listy materiałów
+
+Materiały w projektach.
+
+### Sesja 18 — Edycja materiałów
+
+Edycja, własne materiały, jednostki, ilości, notatki.
+
+### Sesja 19 — Koszty projektu
+
+Ceny materiałów, koszty, waluty, podsumowanie.
+
+### Sesja 20 — Pomieszczenia
+
+Pomieszczenia jako element projektu.
+
+### Sesja 21 — LiczMat Pro: fundament
+
+Model Free / Pro. Bez płatności.
+
+Przygotowanie: uprawnień, feature gating, statusu planu, struktury Pro.
+
+### Sesja 22 — Klienci
+
+CRM klientów.
+
+### Sesja 23 — Zlecenia
+
+Zlecenia i statusy.
+
+### Sesja 24 — Wyceny
+
+Materiały, robocizna, koszty, marża, suma, waluta.
+
+### Sesja 25 — Terminarz
+
+Terminy zleceń.
+
+### Sesja 26 — CRM
+
+Połączenie: klient → zlecenie → projekt → wycena → historia.
+
+### Sesja 27 — Paywall Pro
+
+Blokady, komunikaty, prezentacja funkcji Pro, przejście Free → Pro.
+
+### Sesja 28 — Płatności
+
+Subskrypcja, status planu, obsługa aktywnego Pro, obsługa anulowania, zabezpieczenie uprawnień.
+
+### Sesja 29 — Strona LiczMat Pro
+
+Krótka, konkretna strona prezentująca Pro. Bez marketingowego przesytu.
+
+### Sesja 30 — SEO techniczne
+
+Cały serwis: metadata, sitemap, robots, canonical, Open Graph, structured data, indeksowanie, hreflang, wersje językowe.
+
+### Sesja 31 — SEO kalkulatorów
+
+Indywidualne SEO dla kalkulatorów.
+
+Każdy kalkulator powinien być możliwie dobrym landing page'em dla konkretnego zapytania użytkownika.
+
+Uwzględnić wszystkie cztery wersje językowe tam, gdzie istnieje odpowiednia treść.
+
+### Sesja 32 — Mobile QA
+
+Pełny test mobilny.
+
+Sprawdzenie: kalkulatorów, kont, projektów, materiałów, Pro, CRM, wyboru języka, wyboru waluty, przełącznika motywu.
+
+### Sesja 33 — Performance
+
+Optymalizacja: ładowania, JS, CSS, obrazów, fontów, bundle.
+
+Szczególnie sprawdzić assety flag, logo i ikon.
+
+### Sesja 34 — Accessibility
+
+Dostępność całego produktu.
+
+Sprawdzić: oba motywy, selektor języka, selektor waluty, formularze, focus, kontrast, keyboard navigation.
+
+### Sesja 35 — Security
+
+Autoryzacja, izolacja danych, API, uprawnienia, poziomy dostępu.
+
+GOŚĆ → LICZMAT → LICZMAT PRO
+
+### Sesja 36 — Finalny QA
+
+Pełna ścieżka:
+
+```
+GOŚĆ → kalkulator → wynik → rejestracja → LICZMAT → projekt → kalkulacja
+     → materiały → koszty → LICZMAT PRO → klient → zlecenie → projekt
+     → wycena → historia
+```
+
+Dodatkowo sprawdzić: Polski, Ukraiński, Niemiecki, Angielski, PLN, EUR, USD, UAH, tryb ciemny, tryb jasny, mobile, desktop.
+
+Naprawić wszystkie znalezione krytyczne problemy.
+
+---
+
+## XXXIII. Raport po każdej sesji
+
+Po zakończeniu KAŻDEJ sesji Claude Code powinien podać:
+
+**WYKONANO** — dokładnie co zostało zrobione.
+
+**ZMIENIONE PLIKI** — lista plików dodanych, zmienionych, usuniętych.
+
+**TESTY** — co zostało sprawdzone, jakie testy przeszły.
+
+**PROBLEMY** — znalezione problemy, problemy nierozwiązane, rzeczy wymagające decyzji.
+
+**STATUS** — czy zadanie jest ukończone.
+
+**NASTĘPNE ZADANIE** — podać tylko nazwę kolejnego zadania z Master Planu.
+
+Następnego zadania NIE wykonywać automatycznie.
+
+---
+
+## XXXIV. Zasada zachowania istniejącego kodu
+
+Przed zmianą istniejącej funkcji:
+
+- zrozum jej aktualne działanie,
+- określ zależności,
+- zachowaj działającą logikę,
+- zmieniaj tylko to, co jest potrzebne,
+- nie wykonuj niepotrzebnych refaktorów,
+- po zmianie wykonaj test.
+
+Szczególnie dotyczy to kalkulatorów.
+
+Zmiana marki i designu nie jest powodem do przepisywania działającej logiki obliczeń.
+
+---
+
+## XXXV. Najważniejsza zasada całego projektu
+
+> **JEDNO ZADANIE = JEDNA SESJA**
+>
+> TO JEST NAJWAŻNIEJSZA ZASADA CAŁEGO PROJEKTU.
+
+- Nie wykonuj kilku sesji jednocześnie.
+- Nie przechodź automatycznie do kolejnego etapu.
+- Nie dodawaj funkcji „przy okazji”.
+- Nie przebudowuj całej aplikacji, jeśli aktualne zadanie dotyczy tylko jednego modułu.
+- Nie wykonuj kolejnego zadania tylko dlatego, że zauważyłeś coś, co można poprawić.
+
+Zgłoś to w raporcie i **ZATRZYMAJ SIĘ**.
+
+Każda sesja ma:
+
+- jeden jasno określony cel,
+- określony zakres,
+- określony koniec,
+- test po wykonaniu.
+
+Po ukończeniu zadania: **STOP**. Czekaj na kolejną instrukcję.
+
+Master Plan jest MAPĄ całego projektu.
+
+Aktualna instrukcja sesji określa, co masz zrobić TERAZ.
+
+**NIGDY NIE WYKONUJ CAŁEGO MASTER PLANU W JEDNEJ SESJI.**
+
+---
+
+## XXXVI. Definicja sukcesu
+
+**GOŚĆ:**
+
+```
+Wejście na LiczMat → wybór kalkulatora → dane → wynik
+```
+
+**LICZMAT:**
+
+```
+Rejestracja → projekt → kalkulacja → materiały → koszty → historia
+```
+
+**LICZMAT PRO:**
+
+```
+Klient → zlecenie → projekt → materiały → wycena → termin → historia
+```
+
+Całość ma być:
+
+- szybka,
+- logiczna,
+- prosta,
+- nowoczesna,
+- praktyczna,
+- pozbawiona chaosu,
+- dostępna po polsku,
+- dostępna po ukraińsku,
+- dostępna po niemiecku,
+- dostępna po angielsku,
+- obsługująca PLN,
+- obsługująca EUR,
+- obsługująca USD,
+- obsługująca UAH,
+- dostępna w trybie ciemnym,
+- dostępna w trybie jasnym,
+- wygodna na mobile,
+- wygodna na desktopie.
+
+---
+
+## XXXVII. Ostateczne wymagania dla pierwszej sesji
+
+Pierwszą sesją jest: **REBRANDING + NOWY DESIGN**
+
+Claude Code otrzyma od użytkownika:
+
+1. logo LiczMat,
+2. ikonę LiczMat,
+3. grafikę referencyjną wyglądu strony.
+
+Claude Code ma wykorzystać te materiały.
+
+Pierwsza sesja NIE jest audytem całego projektu.
+
+Nie należy wykonywać:
+
+- systemu kont,
+- projektów,
+- CRM,
+- płatności,
+- nowych kalkulatorów,
+- nowych funkcji,
+- kolejnych sesji.
+
+Pierwsza sesja ma skupić się na:
+
+```
+MATERIO  →  LICZMAT
+STARY DESIGN  →  NOWY DESIGN LICZMAT
+```
+
+z dwoma motywami: **CIEMNY + JASNY**
+
+- Tryb jasny: CIEPŁA, LEKKO KREMOWA BIEL
+- Tryb ciemny: GRAFITOWE / BARDZO CIEMNE TŁO
+
+Zachować działającą funkcjonalność.
+
+Po wykonaniu: **RAPORT → TESTY → STOP**
+
+---
+
+**KONIEC MASTER PLANU LICZMAT**

@@ -1,7 +1,19 @@
 # materio-web — Claude Code Configuration
 
-Landing page for **Materio**, the offline-first construction-material calculator
-for Android. *Policz. Kup. Nie marnuj.*
+The site for **LiczMat** (renamed from Materio on 2026-08-12), the offline-first
+construction-material calculator. *Policz. Kup. Nie marnuj.*
+
+> **Read `docs/MASTER_PLAN.md` before starting work.** It is the owner's plan for turning
+> this site into the LiczMat platform: the product vision, the three access levels
+> (guest / LiczMat / LiczMat Pro), the branding and design rules, and a numbered list of
+> 36 sessions. Its top section tracks which sessions are done and which decisions are
+> still open. **One session = one task** is the plan's hardest rule: do the session you
+> were asked for, report, and stop — do not roll the next one in because you noticed
+> something worth fixing. Put it in the report instead.
+>
+> The repo directory, the GitHub remote and the live domain are all still called
+> `materio-web` / `materio-app.com`. That is deliberate — see the open decisions in the
+> master plan before changing any of them.
 
 Plain static HTML/CSS/JS in the browser: no framework, no runtime dependency, no
 package manager. There **is** a build step now — a dependency-free Node script that
