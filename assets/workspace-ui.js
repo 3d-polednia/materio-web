@@ -150,7 +150,12 @@ function wsRenderSave(card, result) {
       name: card.dataset.matName || card.dataset.wsRoomName || wsT(`c_${card.dataset.calc}_t`),
       materialCategory: card.dataset.matCat || "OTHER",
       requiredUnits: result.tobuy,
-      unitLabel: wsT(result.unit),
+      // Inflected for the count, exactly as the result panel above shows it — a saved
+      // line reading "1 worków" would be the same defect one screen further on. The
+      // guard is for /projekty/ and /kosztorys/, which load this file without the engines.
+      unitLabel: typeof unitLabel === "function"
+        ? unitLabel(result.unit, result.tobuy, wsLang(), wsT)
+        : wsT(result.unit),
       costMajor: result.cost || 0,
       wastePercent: waste ? parseFloat(String(waste[1])) : 0,
       input,

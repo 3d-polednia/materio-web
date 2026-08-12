@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/grout/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/fuga/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812i" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Fugenmasse — Baurechner online | LiczMat">
 <meta name="twitter:description" content="Fugenmasse — kostenloser Online-Rechner. Wie viel kg zum Verfugen. Dieselbe Formel wie in der LiczMat-App für Android, ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812i">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Deine Angaben</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-grout-area">Fläche (m²)</label><input id="f-grout-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-grout-tileL">Fliesenlänge (mm)</label><input id="f-grout-tileL" type="text" inputmode="decimal" data-k="tileL" value="600"></div><div class="field"><label for="f-grout-tileW">Fliesenbreite (mm)</label><input id="f-grout-tileW" type="text" inputmode="decimal" data-k="tileW" value="600"></div><div class="field"><label for="f-grout-tileThk">Fliesendicke (mm)</label><input id="f-grout-tileThk" type="text" inputmode="decimal" data-k="tileThk" value="9"></div><div class="field"><label for="f-grout-joint">Fugenbreite (mm)</label><input id="f-grout-joint" type="text" inputmode="decimal" data-k="joint" value="3"></div><div class="field"><label for="f-grout-price">Preis je Stück/Gebinde</label><input id="f-grout-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Feinsteinzeug 60×60</button><button type="button" class="chip" data-preset="1">Feinsteinzeug 120×278</button><button type="button" class="chip" data-preset="2">Wandfliese 30×60</button></div><div class="field"><label for="f-grout-area">Fläche (m²)</label><input id="f-grout-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-grout-tileL">Fliesenlänge (mm)</label><input id="f-grout-tileL" type="text" inputmode="decimal" data-k="tileL" value="600"></div><div class="field"><label for="f-grout-tileW">Fliesenbreite (mm)</label><input id="f-grout-tileW" type="text" inputmode="decimal" data-k="tileW" value="600"></div><div class="field"><label for="f-grout-tileThk">Fliesendicke (mm)</label><input id="f-grout-tileThk" type="text" inputmode="decimal" data-k="tileThk" value="9"></div><div class="field"><label for="f-grout-joint">Fugenbreite (mm)</label><input id="f-grout-joint" type="text" inputmode="decimal" data-k="joint" value="3"></div><div class="field"><label for="f-grout-bag">Sack (kg)</label><input id="f-grout-bag" type="text" inputmode="decimal" data-k="bag" value="5"></div><div class="field"><label for="f-grout-price">Preis je Sack</label><input id="f-grout-price" type="text" inputmode="decimal" data-k="price" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Berechnen"
           data-label-again="Neu berechnen">Berechnen</button>
@@ -186,8 +186,8 @@
         <h2 id="calc-result-h">Ergebnis</h2>
         <div class="result show" data-result>
           <div class="muted eyebrow">Zu kaufen</div>
-          <div class="big">3,2 <span class="figure-line">kg</span></div>
-          <div class="rows"></div>
+          <div class="big">1 <span class="figure-line">Sack</span></div>
+          <div class="rows"><div><span>Gesamt</span><b>3,24 kg</b></div><div><span>Verbrauch</span><b>0,16 kg/m²</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Die Angaben haben sich geändert. Klicke „Neu berechnen“ für das neue Ergebnis.</p>
         <div class="calc-actions" data-calc-actions></div>
@@ -204,7 +204,7 @@
       <div class="calc-how-grid">
         <div>
           <h3>Was du eingibst</h3>
-          <ul class="plain-list"><li><b>Fläche (m²)</b></li><li><b>Fliesenlänge (mm)</b></li><li><b>Fliesenbreite (mm)</b></li><li><b>Fliesendicke (mm)</b></li><li><b>Fugenbreite (mm)</b></li></ul>
+          <ul class="plain-list"><li><b>Fläche (m²)</b></li><li><b>Fliesenlänge (mm)</b></li><li><b>Fliesenbreite (mm)</b></li><li><b>Fliesendicke (mm)</b></li><li><b>Fugenbreite (mm)</b></li><li><b>Sack (kg)</b></li></ul>
 
           <h3>Worauf du achten solltest</h3>
           <p>Der Fugenverbrauch steigt mit Fugenbreite und Fliesendicke und sinkt mit dem Format. Großes Feinsteinzeug auf schmaler Fuge braucht sehr wenig.</p>
@@ -212,7 +212,8 @@
         <div>
           <h3>Formel</h3>
           <pre class="formula"><code>kg/m² = (Fliesenlänge + Fliesenbreite) ÷ (Fliesenlänge × Fliesenbreite) × Fliesendicke × Fugenbreite × 1,8
-Kilogramm = kg/m² × Fläche</code></pre>
+Kilogramm = kg/m² × Fläche
+Säcke = ⌈ Kilogramm ÷ Sack ⌉</code></pre>
           <p class="muted src-note">Die LiczMat-App für Android nutzt dieselbe Formel. Die Rechenkerne der Website sind 1:1-Portierungen des App-Codes.</p>
         </div>
       </div>
@@ -304,16 +305,16 @@ Kilogramm = kg/m² × Fläche</code></pre>
   "de": "/de/rechner/fugenmasse/",
   "en": "/en/calculators/grout/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260812h"></script>
-<script src="/assets/i18n-runtime.js?v=20260812h"></script>
-<script src="/assets/currency.js?v=20260812h"></script>
+<script src="/assets/i18n.de.js?v=20260812i"></script>
+<script src="/assets/i18n-runtime.js?v=20260812i"></script>
+<script src="/assets/currency.js?v=20260812i"></script>
 
-<script src="/assets/calculators.js?v=20260812h"></script>
-<script src="/assets/materials.js?v=20260812h"></script>
-<script src="/assets/materials-ui.js?v=20260812h"></script>
-<script src="/assets/workspace.js?v=20260812h"></script>
-<script src="/assets/workspace-ui.js?v=20260812h"></script>
-<script src="/assets/main.js?v=20260812h"></script>
+<script src="/assets/calculators.js?v=20260812i"></script>
+<script src="/assets/materials.js?v=20260812i"></script>
+<script src="/assets/materials-ui.js?v=20260812i"></script>
+<script src="/assets/workspace.js?v=20260812i"></script>
+<script src="/assets/workspace-ui.js?v=20260812i"></script>
+<script src="/assets/main.js?v=20260812i"></script>
 
 </body>
 </html>

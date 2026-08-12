@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/tiles-panels-porcelain/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/plytki-panele-gres/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812i" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Płytki, panele, gres — Kalkulatory budowlane online | LiczMat">
 <meta name="twitter:description" content="Płytki, panele, gres — darmowy kalkulator online. Powierzchnia + zapas → całe kartony. Ten sam wzór co w aplikacji LiczMat na Androida, bez rejestracji.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812i">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Twoje dane</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Wybierz materiał</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Gres 60×60</button><button type="button" class="chip" data-preset="1">Gres 120×278</button><button type="button" class="chip" data-preset="2">Panel AC4</button><button type="button" class="chip" data-preset="3">Glazura 30×60</button></div><div class="field"><label for="f-waste-area">Powierzchnia (m²)</label><input id="f-waste-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-waste-cov">Wydajność opak. (m²)</label><input id="f-waste-cov" type="text" inputmode="decimal" data-k="cov" value="1.44"></div><div class="field"><label for="f-waste-waste">Zapas (%)</label><input id="f-waste-waste" type="text" inputmode="decimal" data-k="waste" value="7"></div><div class="field"><label for="f-waste-price">Cena za sztukę/opak.</label><input id="f-waste-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Gres 60×60</button><button type="button" class="chip" data-preset="1">Gres 120×278</button><button type="button" class="chip" data-preset="2">Panel AC4</button><button type="button" class="chip" data-preset="3">Glazura 30×60</button></div><div class="field"><label for="f-waste-area">Powierzchnia (m²)</label><input id="f-waste-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-waste-cov">Wydajność opak. (m²)</label><input id="f-waste-cov" type="text" inputmode="decimal" data-k="cov" value="1.44"></div><div class="field"><label for="f-waste-waste">Zapas (%)</label><input id="f-waste-waste" type="text" inputmode="decimal" data-k="waste" value="7"></div><div class="field"><label for="f-waste-price">Cena za opakowanie</label><input id="f-waste-price" type="text" inputmode="decimal" data-k="price" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Policz"
           data-label-again="Oblicz ponownie">Policz</button>
@@ -187,7 +187,7 @@
         <div class="result show" data-result>
           <div class="muted eyebrow">Do kupienia</div>
           <div class="big">15 <span class="figure-line">opak.</span></div>
-          <div class="rows"><div><span>Odpad</span><b>7,4%</b></div></div>
+          <div class="rows"><div><span>Kupujesz</span><b>21,6 m²</b></div><div><span>Odpad</span><b>7,4%</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Dane się zmieniły. Kliknij „Oblicz ponownie”, żeby zobaczyć nowy wynik.</p>
         <div class="calc-actions" data-calc-actions></div>
@@ -213,7 +213,8 @@
           <h3>Wzór</h3>
           <pre class="formula"><code>potrzeba = Powierzchnia × (1 + Zapas ÷ 100)
 opakowania = ⌈ potrzeba ÷ Wydajność opak. ⌉
-odpad = (opakowania × Wydajność opak. − Powierzchnia) ÷ (opakowania × Wydajność opak.) × 100%</code></pre>
+kupujesz = opakowania × Wydajność opak.
+odpad = (kupujesz − Powierzchnia) ÷ kupujesz × 100%</code></pre>
           <p class="muted src-note">Ten sam wzór liczy aplikacja LiczMat na Androida. Silnik strony jest portem 1:1 kodu z aplikacji.</p>
         </div>
       </div>
@@ -305,16 +306,16 @@ odpad = (opakowania × Wydajność opak. − Powierzchnia) ÷ (opakowania × Wyd
   "de": "/de/rechner/fliesen-paneele-feinsteinzeug/",
   "en": "/en/calculators/tiles-panels-porcelain/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260812h"></script>
-<script src="/assets/i18n-runtime.js?v=20260812h"></script>
-<script src="/assets/currency.js?v=20260812h"></script>
+<script src="/assets/i18n.pl.js?v=20260812i"></script>
+<script src="/assets/i18n-runtime.js?v=20260812i"></script>
+<script src="/assets/currency.js?v=20260812i"></script>
 
-<script src="/assets/calculators.js?v=20260812h"></script>
-<script src="/assets/materials.js?v=20260812h"></script>
-<script src="/assets/materials-ui.js?v=20260812h"></script>
-<script src="/assets/workspace.js?v=20260812h"></script>
-<script src="/assets/workspace-ui.js?v=20260812h"></script>
-<script src="/assets/main.js?v=20260812h"></script>
+<script src="/assets/calculators.js?v=20260812i"></script>
+<script src="/assets/materials.js?v=20260812i"></script>
+<script src="/assets/materials-ui.js?v=20260812i"></script>
+<script src="/assets/workspace.js?v=20260812i"></script>
+<script src="/assets/workspace-ui.js?v=20260812i"></script>
+<script src="/assets/main.js?v=20260812i"></script>
 
 </body>
 </html>

@@ -47,7 +47,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260812h";
+const STAMP = "20260812i";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -72,8 +72,8 @@ const LANG_META = LANGS.map((code) => ({
 }));
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
-const { CALCS, ENGINES, localizeRow } = evalScript("assets/calculators.js",
-  ["CALCS", "ENGINES", "localizeRow"]);
+const { CALCS, ENGINES, localizeRow, unitLabel } = evalScript("assets/calculators.js",
+  ["CALCS", "ENGINES", "localizeRow", "unitLabel"]);
 const CATALOG = evalScript("assets/materials.js", [
   "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "matName", "matNote", "primaryCalcFor",
 ]);
@@ -263,7 +263,8 @@ function workedExample(calc, lang, t) {
   // The engines emit numbers as |n:…| tokens; the language is only known here.
   const rows = (res.rows || []).map(([k, v]) => [t(k), localizeRow(v, locale, t)]);
 
-  return { tobuy: number(res.tobuy), unit: t(res.unit), rows };
+  // The unit is inflected for the count the page opens on — "4 worki", not "4 worków".
+  return { tobuy: number(res.tobuy), unit: unitLabel(res.unit, res.tobuy, lang, t), rows };
 }
 
 /* ------------------------------------------------------------------ schema.org */

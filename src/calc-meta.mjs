@@ -28,7 +28,8 @@ export const CALC_META = {
     formula: [
       "potrzeba = {fld_area} × (1 + {fld_waste} ÷ 100)",
       "opakowania = ⌈ potrzeba ÷ {fld_pkg_cov} ⌉",
-      "odpad = (opakowania × {fld_pkg_cov} − {fld_area}) ÷ (opakowania × {fld_pkg_cov}) × 100%",
+      "kupujesz = opakowania × {fld_pkg_cov}",
+      "odpad = (kupujesz − {fld_area}) ÷ kupujesz × 100%",
     ],
     related: ["mortar", "grout", "coverage"],
   },
@@ -90,6 +91,7 @@ export const CALC_META = {
     formula: [
       "kg/m² = ({fld_tile_len} + {fld_tile_w}) ÷ ({fld_tile_len} × {fld_tile_w}) × {fld_tile_thk} × {fld_joint} × 1,8",
       "kilogramy = kg/m² × {fld_area}",
+      "worki = ⌈ kilogramy ÷ {fld_bag_kg} ⌉",
     ],
     related: ["waste", "mortar", "coverage"],
   },
@@ -158,6 +160,7 @@ export const FORMULA_I18N = {
   pl: null, // the lines above are authored in Polish
   en: {
     "netto": "net", "pole do pokrycia": "area to cover", "opakowania": "packs", "odpad": "actual waste",
+    "kupujesz": "you buy",
     "potrzeba": "required", "pas": "strip", "pasów potrzeba": "strips needed",
     "pasów z rolki": "strips per roll", "rolki": "rolls", "worki": "bags", "woda": "water",
     "kilogramy": "kilograms", "sztuki": "pieces", "zaprawa razem": "mortar total", "kołki": "anchors",
@@ -190,6 +193,7 @@ export const FORMULA_I18N = {
   },
   de: {
     "netto": "netto", "pole do pokrycia": "zu beschichtende Fläche", "opakowania": "Gebinde", "odpad": "tatsächlicher Verschnitt",
+    "kupujesz": "Kaufmenge",
     "potrzeba": "Bedarf", "pas": "Bahn", "pasów potrzeba": "Bahnen nötig",
     "pasów z rolki": "Bahnen je Rolle", "rolki": "Rollen", "worki": "Säcke", "woda": "Wasser",
     "kilogramy": "Kilogramm", "sztuki": "Stück", "zaprawa razem": "Mörtel gesamt", "kołki": "Dübel",
@@ -222,6 +226,7 @@ export const FORMULA_I18N = {
   },
   uk: {
     "netto": "нетто", "pole do pokrycia": "площа під фарбування", "opakowania": "упаковки", "odpad": "відходи",
+    "kupujesz": "купуєш",
     "potrzeba": "потрібно", "pas": "смуга", "pasów potrzeba": "смуг потрібно",
     "pasów z rolki": "смуг з рулону", "rolki": "рулони", "worki": "мішки", "woda": "вода",
     "kilogramy": "кілограми", "sztuki": "штуки", "zaprawa razem": "розчин разом", "kołki": "дюбелі",

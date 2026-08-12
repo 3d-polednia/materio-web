@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/grout/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/fuga/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812i" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Затирка — Будівельні калькулятори онлайн | LiczMat">
 <meta name="twitter:description" content="Затирка — безкоштовний онлайн-калькулятор. Скільки кг на затирання швів. Та сама формула, що й у застосунку LiczMat для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812i">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Твої дані</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-grout-area">Площа (м²)</label><input id="f-grout-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-grout-tileL">Довжина плитки (мм)</label><input id="f-grout-tileL" type="text" inputmode="decimal" data-k="tileL" value="600"></div><div class="field"><label for="f-grout-tileW">Ширина плитки (мм)</label><input id="f-grout-tileW" type="text" inputmode="decimal" data-k="tileW" value="600"></div><div class="field"><label for="f-grout-tileThk">Товщина плитки (мм)</label><input id="f-grout-tileThk" type="text" inputmode="decimal" data-k="tileThk" value="9"></div><div class="field"><label for="f-grout-joint">Ширина шва (мм)</label><input id="f-grout-joint" type="text" inputmode="decimal" data-k="joint" value="3"></div><div class="field"><label for="f-grout-price">Ціна за штуку/упак.</label><input id="f-grout-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Керамограніт 60×60</button><button type="button" class="chip" data-preset="1">Керамограніт 120×278</button><button type="button" class="chip" data-preset="2">Плитка 30×60</button></div><div class="field"><label for="f-grout-area">Площа (м²)</label><input id="f-grout-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-grout-tileL">Довжина плитки (мм)</label><input id="f-grout-tileL" type="text" inputmode="decimal" data-k="tileL" value="600"></div><div class="field"><label for="f-grout-tileW">Ширина плитки (мм)</label><input id="f-grout-tileW" type="text" inputmode="decimal" data-k="tileW" value="600"></div><div class="field"><label for="f-grout-tileThk">Товщина плитки (мм)</label><input id="f-grout-tileThk" type="text" inputmode="decimal" data-k="tileThk" value="9"></div><div class="field"><label for="f-grout-joint">Ширина шва (мм)</label><input id="f-grout-joint" type="text" inputmode="decimal" data-k="joint" value="3"></div><div class="field"><label for="f-grout-bag">Мішок (кг)</label><input id="f-grout-bag" type="text" inputmode="decimal" data-k="bag" value="5"></div><div class="field"><label for="f-grout-price">Ціна за мішок</label><input id="f-grout-price" type="text" inputmode="decimal" data-k="price" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Порахувати"
           data-label-again="Порахувати знову">Порахувати</button>
@@ -186,8 +186,8 @@
         <h2 id="calc-result-h">Результат</h2>
         <div class="result show" data-result>
           <div class="muted eyebrow">Купити</div>
-          <div class="big">3,2 <span class="figure-line">кг</span></div>
-          <div class="rows"></div>
+          <div class="big">1 <span class="figure-line">мішок</span></div>
+          <div class="rows"><div><span>Разом</span><b>3,24 kg</b></div><div><span>Витрата</span><b>0,16 kg/m²</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Дані змінилися. Натисни «Порахувати знову», щоб побачити новий результат.</p>
         <div class="calc-actions" data-calc-actions></div>
@@ -204,7 +204,7 @@
       <div class="calc-how-grid">
         <div>
           <h3>Що вводиш</h3>
-          <ul class="plain-list"><li><b>Площа (м²)</b></li><li><b>Довжина плитки (мм)</b></li><li><b>Ширина плитки (мм)</b></li><li><b>Товщина плитки (мм)</b></li><li><b>Ширина шва (мм)</b></li></ul>
+          <ul class="plain-list"><li><b>Площа (м²)</b></li><li><b>Довжина плитки (мм)</b></li><li><b>Ширина плитки (мм)</b></li><li><b>Товщина плитки (мм)</b></li><li><b>Ширина шва (мм)</b></li><li><b>Мішок (кг)</b></li></ul>
 
           <h3>На що зважати</h3>
           <p>Витрата затирки росте з шириною шва і товщиною плитки, а падає з форматом. При великому керамограніті на тонкому шві виходить дуже мало.</p>
@@ -212,7 +212,8 @@
         <div>
           <h3>Формула</h3>
           <pre class="formula"><code>kg/m² = (Довжина плитки + Ширина плитки) ÷ (Довжина плитки × Ширина плитки) × Товщина плитки × Ширина шва × 1,8
-кілограми = kg/m² × Площа</code></pre>
+кілограми = kg/m² × Площа
+мішки = ⌈ кілограми ÷ Мішок ⌉</code></pre>
           <p class="muted src-note">Застосунок LiczMat для Android рахує тією самою формулою. Обчислювальне ядро сайту — це порт 1:1 коду із застосунку.</p>
         </div>
       </div>
@@ -304,16 +305,16 @@
   "de": "/de/rechner/fugenmasse/",
   "en": "/en/calculators/grout/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260812h"></script>
-<script src="/assets/i18n-runtime.js?v=20260812h"></script>
-<script src="/assets/currency.js?v=20260812h"></script>
+<script src="/assets/i18n.uk.js?v=20260812i"></script>
+<script src="/assets/i18n-runtime.js?v=20260812i"></script>
+<script src="/assets/currency.js?v=20260812i"></script>
 
-<script src="/assets/calculators.js?v=20260812h"></script>
-<script src="/assets/materials.js?v=20260812h"></script>
-<script src="/assets/materials-ui.js?v=20260812h"></script>
-<script src="/assets/workspace.js?v=20260812h"></script>
-<script src="/assets/workspace-ui.js?v=20260812h"></script>
-<script src="/assets/main.js?v=20260812h"></script>
+<script src="/assets/calculators.js?v=20260812i"></script>
+<script src="/assets/materials.js?v=20260812i"></script>
+<script src="/assets/materials-ui.js?v=20260812i"></script>
+<script src="/assets/workspace.js?v=20260812i"></script>
+<script src="/assets/workspace-ui.js?v=20260812i"></script>
+<script src="/assets/main.js?v=20260812i"></script>
 
 </body>
 </html>

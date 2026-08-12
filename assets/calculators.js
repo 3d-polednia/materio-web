@@ -5,6 +5,19 @@
 const ceil = Math.ceil, floor = Math.floor;
 const num = (v) => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
 const profilesAcross = (span, spacing) => floor(span / spacing) + 1;
+/**
+ * A field the engine has a default for: empty means "use the default", typed means typed.
+ *
+ * `num(f.bag) || 25` cannot tell those apart — it turns a typed 0 into 25 and answers with
+ * a bag size nobody asked for, which is worse than refusing. The Kotlin defaults are
+ * parameter defaults and only apply when the argument is left out, so this is what they
+ * mean. Session 9 put it on the two group-1 fields that carry a default; the same `|| n`
+ * still stands in screed, insulation and the framing engines.
+ */
+const orDefault = (v, fallback) => {
+  const s = String(v === undefined || v === null ? "" : v).trim();
+  return s === "" ? fallback : num(s);
+};
 const GK_BOARD = 2.4, GK_WASTE = 10.0;
 const boardsFor = (area, sides, boardArea = GK_BOARD, waste = GK_WASTE) =>
   ceil((area * sides * (1 + waste / 100)) / boardArea);
@@ -86,9 +99,15 @@ const ENGINES = {
   waste(f) {
     const area = num(f.area), cov = num(f.cov), w = num(f.waste) || 0, price = num(f.price) || 0;
     if (!(area > 0) || !(cov > 0) || w < 0) return { err: "err_positive" };
+    if (price < 0) return { err: "err_price" };
     const req = area * (1 + w / 100), pkgs = ceil(req / cov), purchased = pkgs * cov;
     const wastePct = purchased > 0 ? (purchased - area) / purchased * 100 : 0;
-    return { tobuy: pkgs, unit: "res_pkgs", cost: pkgs * price, rows: [["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"]] };
+    // `purchased` is the m² those whole packs actually contain — the figure the waste
+    // percentage is measured against, and the only one you can check against the floor.
+    return { tobuy: pkgs, unit: "res_pkgs", cost: pkgs * price, rows: [
+      ["res_purchased", qtyG(purchased) + " m²"],
+      ["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"],
+    ] };
   },
   wallpaper(f) {
     const ww = num(f.wallW), wh = num(f.wallH), rw = num(f.rollW) || 0.53, rl = num(f.rollL) || 10.05, rep = num(f.pattern) || 0, price = num(f.price) || 0;
@@ -167,10 +186,11 @@ const ENGINES = {
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [["res_water", qtyG(bags * 2) + " " + "|res_water_l|"]] };
   },
   mortar(f) {
-    const area = num(f.area), usage = num(f.usage), bag = num(f.bag) || 25, price = num(f.price) || 0;
+    const area = num(f.area), usage = num(f.usage), bag = orDefault(f.bag, 25), price = num(f.price) || 0;
     if (!(area > 0) || !(usage > 0) || !(bag > 0)) return { err: "err_positive" };
+    if (price < 0) return { err: "err_price" };
     const kg = area * usage, bags = ceil(kg / bag);
-    return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [["res_kg", qtyG(kg) + " kg"]] };
+    return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [["res_kg_total", qtyG(kg) + " kg"]] };
   },
   screed(f) {
     const area = num(f.area), thk = num(f.thk), bag = num(f.bag) || 25, price = num(f.price) || 0;
@@ -178,11 +198,25 @@ const ENGINES = {
     const kg = area * thk * 2.0, bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [["res_kg", qtyG(kg) + " kg"]] };
   },
+  /**
+   * Grout. TradeCalc.groutKg gives the kilograms and stops there, because the Android
+   * screen has no price field at all; the site does, and until session 9 it charged
+   * `⌈kg⌉ × price` against a field labelled "price per piece/pack" and answered "3,2 kg"
+   * under a page that promises whole packs. The kilograms are the same number as before —
+   * the packaging step below them is new, and it is the same `⌈kg ÷ bag⌉` mortar has used
+   * all along. The 5 kg default is the `fuga-5` bag in assets/materials.js.
+   */
   grout(f) {
-    const area = num(f.area), L = num(f.tileL), W = num(f.tileW), thk = num(f.tileThk), joint = num(f.joint), price = num(f.price) || 0;
-    if (!(area > 0) || !(L > 0) || !(W > 0) || !(thk > 0) || !(joint > 0)) return { err: "err_positive" };
+    const area = num(f.area), L = num(f.tileL), W = num(f.tileW), thk = num(f.tileThk), joint = num(f.joint);
+    const bag = orDefault(f.bag, 5), price = num(f.price) || 0;
+    if (!(area > 0) || !(L > 0) || !(W > 0) || !(thk > 0) || !(joint > 0) || !(bag > 0)) return { err: "err_positive" };
+    if (price < 0) return { err: "err_price" };
     const kgPerM2 = (L + W) / (L * W) * thk * joint * 1.8, kg = kgPerM2 * area;
-    return { tobuy: Math.round(kg * 10) / 10, unit: "res_kg", cost: (price ? Math.ceil(kg) * price : 0), rows: [] };
+    const bags = ceil(kg / bag);
+    return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
+      ["res_kg_total", qtyG(kg) + " kg"],
+      ["res_kg_m2", qtyG(kgPerM2) + " kg/m²"],
+    ] };
   },
   masonry(f) {
     const area = num(f.area), open = num(f.openings) || 0, pcs = num(f.pieces), binder = num(f.binder) || 0, w = num(f.waste) || 5, price = num(f.price) || 0;
@@ -243,6 +277,41 @@ const ENGINES = {
  */
 function qtyG(v) { return "|n:" + (Math.round(v * 100) / 100) + "|"; }
 
+/* -------- the unit standing next to the number --------
+   The result panel used to read "4 worków". Polish and Ukrainian inflect a counted noun
+   in three forms — 1 / 2–4 / 5 and up, with the teens taking the last one — German and
+   English in two, and a symbol or an abbreviation (kg, m², opak., szt.) in none at all.
+
+   Only the keys listed here carry the extra forms; every other unit renders from its
+   single key exactly as before. An abbreviation must not be inflected, and a unit spelled
+   out as a word is worth forms only where it is on screen: session 9 rebuilt group 1, so
+   res_bags has them. res_rolls, res_boards, res_stocks and res_sheets — groups 2 and 3 —
+   still read as one form and are named in the session report. */
+const PLURAL_UNITS = new Set(["res_bags"]);
+const SLAVIC_PLURAL = new Set(["pl", "uk"]);
+
+/**
+ * "one" | "few" | "many" for `n` in `lang`. The base key holds the "many" form, so a
+ * language or a unit with nothing extra declared keeps working unchanged.
+ *
+ * A fraction falls back to "many": every unit with forms is counted in whole packages,
+ * so the case cannot arise today, and guessing at "3,5 worka" would need a fourth form.
+ */
+function pluralForm(n, lang) {
+  if (!Number.isInteger(n)) return "many";
+  if (n === 1) return "one";
+  if (!SLAVIC_PLURAL.has(lang)) return "many";
+  const last = n % 10, teens = n % 100;
+  return last >= 2 && last <= 4 && !(teens >= 12 && teens <= 14) ? "few" : "many";
+}
+
+/** The unit label for `n` of them. `tr` is the page's translator, bound to `lang`. */
+function unitLabel(key, n, lang, tr) {
+  if (!PLURAL_UNITS.has(key)) return tr(key);
+  const form = pluralForm(Number(n), lang);
+  return form === "many" ? tr(key) : tr(`${key}_${form}`);
+}
+
 /** Replace every |n:…| and |res_water_l| in a row value with localized text. */
 function localizeRow(value, lang, translate) {
   const fmt = (x) => new Intl.NumberFormat(lang, { maximumFractionDigits: 2 }).format(x);
@@ -264,7 +333,7 @@ const CALCS = [
   ] },
   { id: "waste", tab: "surface", engine: "waste", fields: [
     F("area", "fld_area", "20"), F("cov", "fld_pkg_cov", "1.44"),
-    F("waste", "fld_waste", "7"), F("price", "fld_price", ""),
+    F("waste", "fld_waste", "7"), F("price", "fld_price_pkg", ""),
   ], presets: [
     { l: "Gres 60×60", k: "preset_gres1", v: { cov: "1.44", waste: "7" } }, { l: "Gres 120×278", k: "preset_gres2", v: { cov: "3.34", waste: "12" } },
     { l: "Panel AC4", k: "preset_panel", v: { cov: "2.22", waste: "8" } }, { l: "Glazura 30×60", k: "preset_glaze", v: { cov: "1.44", waste: "5" } },
@@ -290,14 +359,23 @@ const CALCS = [
     F("vol", "fld_volume", "0.5"), F("price", "fld_price", ""),
   ] },
   { id: "mortar", tab: "trade", engine: "mortar", fields: [
-    F("area", "fld_area", "20"), F("usage", "fld_usage", "5"), F("bag", "fld_bag_kg", "25"), F("price", "fld_price", ""),
+    F("area", "fld_area", "20"), F("usage", "fld_usage", "5"), F("bag", "fld_bag_kg", "25"), F("price", "fld_price_bag", ""),
   ] },
   { id: "screed", tab: "trade", engine: "screed", fields: [
     F("area", "fld_area", "20"), F("thk", "fld_thickness", "40"), F("bag", "fld_bag_kg", "25"), F("price", "fld_price", ""),
   ] },
   { id: "grout", tab: "trade", engine: "grout", fields: [
     F("area", "fld_area", "20"), F("tileL", "fld_tile_len", "600"), F("tileW", "fld_tile_w", "600"),
-    F("tileThk", "fld_tile_thk", "9"), F("joint", "fld_joint", "3"), F("price", "fld_price", ""),
+    F("tileThk", "fld_tile_thk", "9"), F("joint", "fld_joint", "3"),
+    F("bag", "fld_bag_kg", "5"), F("price", "fld_price_bag", ""),
+  ], presets: [
+    // The same tile sizes the "tiles, panels, porcelain" calculator offers, minus the
+    // laminate panel: a floating floor has no grouted joint. Only the two dimensions —
+    // the thickness and the joint stay whatever is in the fields, because a format does
+    // not fix either of them.
+    { l: "Gres 60×60", k: "preset_gres1", v: { tileL: "600", tileW: "600" } },
+    { l: "Gres 120×278", k: "preset_gres2", v: { tileL: "2780", tileW: "1200" } },
+    { l: "Glazura 30×60", k: "preset_glaze", v: { tileL: "600", tileW: "300" } },
   ] },
   { id: "masonry", tab: "trade", engine: "masonry", fields: [
     F("area", "fld_area", "12"), F("openings", "fld_openings", "2"), F("pieces", "fld_pieces_per_m2", "11"),
@@ -420,7 +498,7 @@ function renderResult(card, res) {
   });
   if (res.cost && res.cost > 0) rows.unshift(`<div><span>${t("res_cost", lang)}</span><b>${money(res.cost, lang)}</b></div>`);
   box.innerHTML = `<div class="muted eyebrow">${t("res_tobuy", lang)}</div>
-    <div class="big">${qty(res.tobuy, lang)} <span class="figure-line">${t(res.unit, lang)}</span></div>
+    <div class="big">${qty(res.tobuy, lang)} <span class="figure-line">${unitLabel(res.unit, res.tobuy, lang, (k) => t(k, lang))}</span></div>
     <div class="rows">${rows.join("")}</div>`;
 
   // The workspace (assets/workspace-ui.js) hangs the "save to the estimate" button off

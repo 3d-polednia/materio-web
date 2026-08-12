@@ -34,8 +34,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | — | *Etap dodatkowy: rebranding Androida + sekcja „Aplikacja"* | **Zrobione** — 2026-08-12 |
 | 7 | Centrum kalkulatorów | **Zrobione** — 2026-08-12 |
 | 8 | Pojedynczy kalkulator | **Zrobione** — 2026-08-12 |
-| 9 | Logika kalkulatorów | **Następna** |
-| 10–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 9 | Kalkulatory grupa 1 (Płytki i wykończenie) | **Zrobione** — 2026-08-12 |
+| 10 | Kalkulatory grupa 2 | **Następna** |
+| 11–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -66,6 +67,67 @@ w repo `3d-polednia/Materio`. W skrócie, po stronie serwisu:
 Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystkich
 dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)
 został zaktualizowany na żywo. Matematyka kalkulatorów nietknięta.
+
+### Co zrobiła Sesja 9
+
+Pierwsza grupa kalkulatorów — **Płytki i wykończenie**: „Płytki, panele, gres”,
+„Klej / zaprawa”, „Fuga”. Wzorzec UX ustaliła Sesja 8; ta sesja przeszła z nim przez trzy
+konkretne narzędzia, pod regułą rozdziału XIII: „zachowaj działającą logikę, zmieniaj
+matematykę tylko wtedy, gdy znaleziono konkretny błąd”.
+
+- **Silniki sprawdzone z kodem aplikacji, nie z pamięcią.** `SurfaceWasteEngine.kt`,
+  `TradeCalc.bagsByArea` i `TradeCalc.groutKg` w `3d-polednia/Materio` przeczytane linijka
+  po linijce. Port jest wierny — wzory, zaokrąglenia i jednostki się zgadzają. Wypadły
+  z tego dwie różnice, obie po stronie serwisu, obie opisane niżej.
+- **Fuga odpowiada w workach, nie w kilogramach.** Panel pokazywał „DO KUPIENIA 3,2 kg”
+  pod zdaniem, które ta sama strona ma w nagłówku: „Wynik zaokrąglamy do całych opakowań,
+  tak jak w sklepie”. Koszt liczył się jako `⌈kg⌉ × cena` przy polu podpisanym „Cena za
+  sztukę/opak.” — ani cena za kilogram, ani za opakowanie. Doszło pole **Worek (kg)**
+  (domyślnie 5 kg, bo tyle waży `fuga-5` w `assets/materials.js`), a wynik to
+  `⌈kilogramy ÷ worek⌉` — dokładnie ten sam krok, który „Klej / zaprawa” ma od zawsze.
+  **Kilogramy się nie zmieniły**: `groutKg` jest nietknięty i stoi teraz jako wiersz
+  „Razem” pod liczbą worków, razem z „Zużycie … kg/m²”. Aplikacja Android nie ma tu pola
+  ceny w ogóle (`TradeViewModel`: „trade results are quantities without a price”), więc ten
+  rachunek nigdy nie był portem — był dodatkiem serwisu.
+- **Ujemna cena była przyjmowana.** Kotlinowy `SurfaceWasteEngine` odrzuca
+  `pricePerPackage < 0`; port zgubił ten warunek, więc „−10” dawało ujemny koszt. Trzy
+  silniki grupy 1 mają go z powrotem, z własnym komunikatem `err_price` zamiast
+  „Podaj dodatnie wartości”, który mówiłby nie o tym polu.
+- **Wpisane 0 przestało znaczyć „domyślne”.** `num(f.bag) || 25` nie odróżnia pustego pola
+  od wpisanego zera i odpowiadało workiem 25 kg, o który nikt nie prosił. `orDefault()`
+  rozróżnia: puste = domyślne, wpisane = wpisane, zero = błąd. Założone na dwa pola
+  grupy 1; `|| n` zostaje w wylewce, ociepleniu i stelażach.
+- **„4 worków” → „4 worki”.** Liczebnik odmienia rzeczownik w trzech formach po polsku
+  i ukraińsku (1 / 2–4 / 5+, nastki idą z ostatnią), w dwóch po niemiecku i angielsku,
+  a skrót i symbol (kg, m², opak., szt.) w żadnej. `unitLabel()` w `assets/calculators.js`
+  wybiera formę; klucz bazowy nadal trzyma formę „5+”, więc jednostka bez zadeklarowanych
+  form renderuje się dokładnie jak wcześniej. Zrobione dla `res_bags`, czyli jedynej
+  jednostki-słowa w grupie 1. Ta sama poprawka idzie w ślad za wynikiem do kosztorysu
+  (`assets/workspace-ui.js`), żeby zapisana pozycja nie mówiła „1 worków”.
+- **Wynik mówi, ile naprawdę kupujesz.** Płytki: „Kupujesz 21,6 m²” — to `purchasedArea`,
+  które kotlinowy raport liczy od zawsze i względem którego liczony jest odpad; bez tego
+  strona podawała procent odpadu bez liczby, do której się odnosi. Fuga: kilogramy
+  i kg/m². Klej miał kilogramy już wcześniej, ale wiersz nazywał się „kg” i miał wartość
+  „100 kg” — etykieta to teraz „Razem”.
+- **Cena mówi, za co.** Jedno „Cena za sztukę/opak.” na trzech stronach, na których
+  odpowiedź jest w opakowaniach, workach i workach. Teraz „Cena za opakowanie” /
+  „Cena za worek”. Pozostałe dwanaście kalkulatorów zostaje przy wspólnym `fld_price` —
+  ich grupy to Sesje 10–11.
+- **Fuga dostała skróty formatów.** Te same, które ma kalkulator płytek, bez panelu AC4
+  (podłoga pływająca nie ma spoiny do wyfugowania). Wpisują tylko dwa wymiary; grubość
+  i spoina zostają, bo format ich nie przesądza.
+- Sprawdzone: **257 testów silników + 200 testów stron w Chromium — 457/457 przechodzi.**
+  Silniki: siatka wejść puszczona **równolegle przez wersję sprzed tej sesji** (z `git
+  show HEAD`) i przez nową — dwanaście kalkulatorów spoza grupy 1 co do bajta identyczne,
+  a w grupie 1 identyczne liczby opakowań, worków i kilogramów. Do tego wartości graniczne
+  (zero, tekst, wartość ujemna, przecinek dziesiętny, dokładne trafienie w opakowanie
+  i jedno ponad) oraz wszystkie formy liczby mnogiej dla 1, 2, 4, 5, 11, 12, 14, 22, 25,
+  101, 102 w czterech językach. Strony: cztery języki × trzy kalkulatory × (wynik
+  z jednostką, wiersze, etykieta ceny, przeliczenie, ostrzeżenie „dane się zmieniły”,
+  odmowa ujemnej ceny, wiersz kosztu, brak błędów w konsoli), skróty fugi, wybierak
+  materiałów, wariant bez JavaScriptu, przełącznik waluty (przelicza etykietę, nie ilość),
+  brak przewijania w bok przy 360 / 414 / 768 / 1280 px oraz pozostałe dwanaście
+  kalkulatorów.
 
 ### Co zrobiła Sesja 8
 
@@ -345,6 +407,35 @@ komentarz nagłówka.
 ## Otwarte decyzje
 
 Rozstrzygnąć, zanim dotknie ich któraś z kolejnych sesji.
+
+### Zostawione grupom 2 i 3 (Sesje 10–11) — znalezione w Sesji 9
+
+Nie są to decyzje do podjęcia, tylko ten sam defekt na stronach, których Sesja 9 nie
+miała w zakresie. Spisane, żeby kolejna sesja nie musiała ich znajdować od nowa.
+
+| Co | Gdzie |
+|---|---|
+| Jednostka wyniku bez odmiany: „2 rolek”, „2 płyt”, „2 sztang”, „2 arkuszy” | `res_rolls`, `res_boards`, `res_stocks`, `res_sheets` — mechanizm `unitLabel()` już jest, brakuje form w słowniku |
+| Wiersz wyniku podpisany „kg” z wartością „1600 kg” | `screed` (wylewka) — w kleju i fudze etykieta to już „Razem” |
+| Wpisane `0` w polu z wartością domyślną liczy się jak puste | `screed`, `insulation`, `wallpaper`, `studwall`, `ceiling`, `drylining` — `orDefault()` już jest |
+| Ujemna cena przyjmowana bez ostrzeżenia | wszystkie poza grupą 1 i `sheet` |
+| Wspólne „Cena za sztukę/opak.” przy wyniku w rolkach / płytach / arkuszach | `fld_price` w pozostałych dwunastu |
+
+### Fuga: format płytki w mm, nie w cm — bez ostrzeżenia
+
+Wpisanie „60×60” zamiast „600×600” daje wynik zawyżony stukrotnie, a strona przyjmuje to
+bez słowa: 60 mm to legalny mozaikowy format. Kontrola wiarygodności („to wygląda na
+centymetry”) byłaby nowym zachowaniem, nie poprawką błędu, więc Sesja 9 jej nie dopisała.
+**Do decyzji właściciela**, czy taki próg ma się pojawić — i czy w kalkulatorach, czy
+dopiero w Sesji 12 (test kalkulatorów).
+
+### Klej / zaprawa nie ma skrótów, a płytki i fuga mają
+
+Zużycie kleju wynika z zębatki pacy. Skróty typu „zębatka 8 mm → 3,2 kg/m²” wymagałyby
+liczb, których nie ma w kodzie, a `CLAUDE.md` zabrania liczby, której nie da się wywieść
+z repozytorium. Dziś zastępuje je wybierak materiałów — 16 worków z `kgm2` z katalogu —
+i nota „na co uważać”. **Do decyzji właściciela**, czy dołożyć tabelę zębatek jako dane
+katalogowe (wtedy trafia do `assets/materials.js`, a nie do skrótów).
 
 ### Poziom dostępu `/projekty/` i `/kosztorys/` — decyzja z Sesji 3
 
