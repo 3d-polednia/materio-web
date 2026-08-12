@@ -1,0 +1,443 @@
+REBRANDING APLIKACJI ANDROID + SEKCJA „APLIKACJA” NA WEB
+
+───
+
+0. NAJWAŻNIEJSZA ZASADA
+Ta sesja jest dodatkowym, zamkniętym etapem technicznym pomiędzy Sesją 6 a kolejną sesją Master Planu.
+Nie zastępuje żadnej sesji Master Planu.
+Nie zmieniaj kolejności, zakresu ani założeń istniejącego MASTER_PLAN.md.
+Nie realizuj zadań przewidzianych na późniejsze sesje Master Planu.
+Po wykonaniu wszystkich zadań z tego dokumentu projekt ma być gotowy do rozpoczęcia kolejnej sesji Master Planu.
+
+───
+
+1. CEL SESJI
+Celem Sesji 7 jest całkowite przejście aplikacji Android z marki:
+Materio
+na:
+LiczMat
+oraz przygotowanie na stronie internetowej LiczMat profesjonalnej sekcji:
+„Aplikacja”
+Tak, aby użytkownik widział jeden spójny produkt:
+LICZMAT
+ platforma webowa + aplikacja Android
+Po zakończeniu tej sesji użytkownik nie powinien napotykać na stronie ani w aplikacji widocznych elementów starej marki „Materio”, z wyjątkiem sytuacji, w których nazwa jest wymagana technicznie i nie jest widoczna dla użytkownika.
+
+───
+
+2. ZASADA: NIE ZMIENIAJ FUNKCJONALNOŚCI
+Rebranding nie jest refaktoryzacją aplikacji.
+Nie dodawaj nowych funkcji biznesowych.
+Nie przebudowuj architektury.
+Nie zmieniaj logiki kalkulatorów.
+Nie zmieniaj modelu użytkowników.
+Nie zmieniaj Firebase/Firestore bez konkretnej konieczności.
+Nie zmieniaj istniejących funkcji tylko dlatego, że można je ulepszyć.
+Zakres tej sesji:
+BRANDING + UI BRANDINGU + ASSETY + SEKCJA APLIKACJI NA WEB
+
+───
+
+3. KRYTYCZNE: NIE ZMIENIAJ APPLICATION ID
+Jeżeli obecna aplikacja jest już opublikowana w Google Play, zachowaj istniejący:
+• applicationId
+• package name
+• identyfikator aplikacji w Google Play
+• istniejącą bazę Firebase powiązaną z aplikacją
+Nie twórz nowej aplikacji tylko dlatego, że zmieniamy nazwę marki.
+Celem jest:
+aktualizacja istniejącej aplikacji Materio → LiczMat
+a nie publikacja drugiej aplikacji.
+Jeżeli gdziekolwiek występuje ryzyko, że zmiana spowoduje utworzenie nowej aplikacji w Google Play, zatrzymaj się i zgłoś to przed wykonaniem zmiany.
+
+───
+
+4. REBRANDING APLIKACJI ANDROID
+Przejdź przez cały projekt Android i zamień widoczną markę:
+Materio → LiczMat
+Sprawdź wszystkie miejsca, w których użytkownik może zobaczyć nazwę produktu.
+Sprawdź między innymi:
+• nazwę aplikacji,
+• launcher label,
+• splash screen,
+• ekran startowy,
+• top bar / toolbar,
+• drawer / menu,
+• ustawienia,
+• ekran informacji o aplikacji,
+• ekrany logowania,
+• rejestracji,
+• komunikaty,
+• dialogi,
+• snackbar,
+• onboarding,
+• help / FAQ,
+• informacje o wersji,
+• ekrany synchronizacji,
+• ekrany błędów,
+• teksty związane z kontem,
+• linki,
+• stopkę, jeżeli występuje,
+• wszystkie inne widoczne elementy UI.
+Nie zakładaj, że wystarczy globalne Find & Replace.
+Przeprowadź rzeczywisty audyt projektu.
+
+───
+
+5. IDENTYFIKACJA STAREJ MARKI
+Przeszukaj cały projekt pod kątem:
+text
+Materio
+materio
+MATERIO
+materio-app.com
+pl.materio.app
+
+oraz innych oczywistych wariantów starej marki.
+Dla każdego znalezionego wystąpienia określ:
+1. Czy jest widoczne dla użytkownika?
+2. Czy jest częścią konfiguracji technicznej?
+3. Czy można je bezpiecznie zmienić?
+4. Czy musi pozostać ze względów technicznych?
+Ważne
+Nie zmieniaj automatycznie technicznych identyfikatorów tylko dlatego, że zawierają „materio”.
+Szczególnie nie zmieniaj bez potrzeby:
+• applicationId,
+• package name,
+• identyfikatorów Firebase,
+• istniejących identyfikatorów baz danych,
+• kluczy API,
+• nazw kolekcji Firestore,
+• istniejących identyfikatorów użytkowników,
+• innych identyfikatorów, których zmiana mogłaby spowodować utratę kompatybilności.
+Widoczna marka ma być LiczMat.
+Techniczna kompatybilność istniejącej aplikacji ma zostać zachowana.
+
+───
+
+6. LOGO I IKONA
+Sprawdź obecne:
+• logo,
+• launcher icon,
+• adaptive icon,
+• favicon, jeżeli jest częścią wspólnych assetów,
+• grafiki brandingowe,
+• splash screen.
+Jeżeli obecne assety zawierają Materio:
+zastąp je brandingiem LiczMat.
+Zachowaj profesjonalny, spójny styl zgodny z aktualnym brandingiem webowym LiczMat.
+Nie twórz przypadkowego nowego stylu.
+Aplikacja i web muszą wyglądać jak jeden produkt.
+
+───
+
+7. SCREENSHOTY I GRAFIKI
+To jest bardzo ważna część tej sesji.
+Przeszukaj projekt Android oraz projekt web pod kątem wszystkich screenshotów i grafik przedstawiających aplikację.
+Szukaj między innymi:
+• screenshotów telefonu,
+• mockupów telefonu,
+• grafik promocyjnych,
+• bannerów,
+• obrazów używanych na homepage,
+• obrazów używanych w sekcji aplikacji,
+• grafik Google Play,
+• OG images,
+• social preview images,
+• ilustracji,
+• ikon,
+• starych logo.
+Żaden nowy materiał promocyjny nie może prezentować aplikacji jako „Materio”.
+Jeżeli istnieją screenshoty starej wersji, przygotuj ich odpowiedniki dla LiczMat.
+Screenshoty mają przedstawiać rzeczywisty aktualny interfejs aplikacji.
+Nie używaj starych screenshotów tylko dlatego, że są już dostępne.
+
+───
+
+8. GOOGLE PLAY
+Przygotuj aplikację do dalszego rebrandingu w Google Play.
+Sprawdź aktualne:
+• nazwę aplikacji,
+• krótki opis,
+• pełny opis,
+• grafikę aplikacji,
+• ikonę,
+• screenshoty,
+• teksty promocyjne,
+• link do strony,
+• linki pomocnicze,
+• branding.
+Docelowo wszędzie, gdzie użytkownik widzi markę:
+LiczMat
+Nie publikuj automatycznie nowej wersji do produkcji, jeżeli środowisko projektu nie wymaga tego na tym etapie.
+Jeżeli do pełnego rebrandingu Google Play wymagane jest przygotowanie nowego buildu, przygotuj go zgodnie z istniejącym procesem projektu.
+Nie zmieniaj numeracji wersji bez potrzeby.
+
+───
+
+9. SEKCJA „APLIKACJA” NA LICZMAT.COM
+Na stronie internetowej dodaj profesjonalną sekcję/stronę:
+Aplikacja
+Jeżeli architektura istniejącego projektu posiada już odpowiednią stronę lub sekcję, wykorzystaj ją zamiast tworzyć duplikat.
+Cel
+Użytkownik ma zrozumieć:
+LiczMat działa również jako aplikacja Android.
+Ale strona nie może wyglądać jak reklama aplikacji, w której web jest tylko dodatkiem.
+To nadal jest:
+platforma LiczMat
+a aplikacja jest jednym ze sposobów korzystania z niej.
+
+───
+
+10. TREŚĆ SEKCJI „APLIKACJA”
+Sekcja powinna jasno komunikować wartość aplikacji.
+Powinna zawierać między innymi:
+Nagłówek
+LiczMat na Androida
+Krótkie wyjaśnienie
+Aplikacja LiczMat pozwala korzystać z najważniejszych funkcji platformy również na telefonie.
+Nie używaj komunikacji sugerującej, że użytkownik musi mieć aplikację.
+Web pozostaje dostępny bez instalowania aplikacji.
+
+───
+
+11. CTA
+Dodaj wyraźny przycisk:
+Pobierz LiczMat na Androida
+CTA powinno prowadzić do oficjalnej strony aplikacji LiczMat w Google Play.
+Nie używaj starych linków prowadzących do Materio, jeżeli istnieje możliwość ich aktualizacji.
+
+───
+
+12. SCREENSHOTY NA STRONIE
+Sekcja aplikacji powinna prezentować rzeczywiste screenshoty aktualnej aplikacji LiczMat.
+Nie używaj:
+• screenshotów Materio,
+• starych logo,
+• grafik z poprzednią nazwą,
+• nieaktualnych ekranów,
+• przypadkowych stockowych ekranów aplikacji.
+Jeżeli potrzeba, przygotuj nowe screenshoty na podstawie aktualnej aplikacji.
+Screenshoty powinny być spójne wizualnie z LiczMat.com.
+
+───
+
+13. CO WARTO POKAZAĆ
+Sekcja aplikacji może pokazywać najważniejsze funkcje, np.:
+• kalkulatory,
+• projekty,
+• materiały,
+• listy materiałów,
+• koszty,
+• zapisane dane,
+• synchronizację,
+• dostęp mobilny.
+Nie wymyślaj funkcji, których aplikacja faktycznie nie posiada.
+Opisuj wyłącznie istniejące możliwości.
+
+───
+
+14. RESPONSYWNOŚĆ
+Sekcja „Aplikacja” musi działać prawidłowo:
+• desktop,
+• tablet,
+• telefon.
+Na telefonie screenshoty aplikacji nie mogą powodować:
+• poziomego scrollowania,
+• wychodzenia poza ekran,
+• przesuwania layoutu,
+• zbyt dużych odstępów,
+• problemów z CTA.
+
+───
+
+15. SEO SEKCJI APLIKACJI
+Dodaj poprawne:
+• title,
+• meta description,
+• H1,
+• logiczne H2,
+• alt texty dla grafik,
+• canonical.
+Nie spamuj słowami kluczowymi.
+Sekcja powinna być naturalnie zoptymalizowana pod frazy związane z:
+• LiczMat,
+• kalkulator budowlany,
+• aplikacja budowlana,
+• kalkulatory budowlane,
+• aplikacja dla budowlańców,
+oraz odpowiedniki w obsługiwanych językach, zgodnie z istniejącą architekturą wielojęzyczną projektu.
+Nie twórz nowych wersji językowych poza tymi, które obecnie obsługuje projekt.
+
+───
+
+16. WIELOJĘZYCZNOŚĆ
+Jeżeli web posiada już system wielojęzyczny, sekcja „Aplikacja” musi być dostępna w tych samych językach.
+Nie dodawaj tekstów tylko po polsku.
+Sprawdź:
+• PL,
+• DE,
+• EN,
+• UK,
+zgodnie z aktualną konfiguracją projektu.
+Tłumaczenia mają być naturalne dla danego języka.
+Nie stosuj automatycznego, dosłownego tłumaczenia, jeśli prowadzi ono do nienaturalnych fraz.
+
+───
+
+17. DOMENA — WAŻNE
+Domena:
+liczmat.com
+została już zakupiona.
+Jednak TA SESJA NIE JEST SESJĄ MIGRACJI DOMENY.
+Nie przenoś jeszcze całego serwisu z:
+materio-app.com
+na:
+liczmat.com
+Nie wykonuj teraz pełnej migracji SEO.
+Nie zmieniaj DNS bez wyraźnej potrzeby.
+Nie konfiguruj jeszcze pełnego redirectu domeny.
+Migracja domeny będzie osobnym etapem po zakończeniu rebrandingu.
+Jeżeli w kodzie znajdują się stare URL-e, zmieniaj je tylko wtedy, gdy są częścią widocznej marki lub istnieje bezpieczna możliwość przygotowania ich do późniejszej migracji.
+Nie wykonuj pochopnej globalnej zamiany domeny.
+
+───
+
+18. MATERIO NIE POWINNO POZOSTAĆ W WIDOCZNYM BRANDINGU
+Po wykonaniu zmian przeprowadź końcowe wyszukiwanie całego repozytorium.
+Szukaj:
+text
+Materio
+materio
+MATERIO
+materio-app.com
+
+Podziel wyniki na:
+A. Do usunięcia/zmiany
+Wszystko, co użytkownik może zobaczyć.
+B. Do pozostawienia
+Elementy techniczne, których zmiana mogłaby zerwać kompatybilność.
+Na końcu raportu podaj dokładnie, co pozostało i dlaczego.
+
+───
+
+19. TESTY
+Po zakończeniu wykonaj test regresyjny.
+Android
+Sprawdź:
+• uruchomienie aplikacji,
+• splash,
+• ekran główny,
+• nawigację,
+• kalkulatory,
+• projekty,
+• materiały,
+• konto,
+• logowanie,
+• rejestrację,
+• synchronizację,
+• ustawienia,
+• wszystkie miejsca, w których wcześniej występowała marka.
+Web
+Sprawdź:
+• homepage,
+• nawigację,
+• sekcję „Aplikacja”,
+• CTA,
+• screenshoty,
+• responsywność,
+• wszystkie języki,
+• link do Google Play,
+• brak widocznej marki Materio.
+Nie zmieniaj funkcjonalności niezwiązanych z tym zadaniem.
+Jeżeli znajdziesz błąd niezwiązany z rebrandingiem, zapisz go w raporcie zamiast samodzielnie rozszerzać zakres sesji.
+
+───
+
+20. KRYTERIA ZAKOŃCZENIA SESJI 7
+Sesję można uznać za zakończoną dopiero wtedy, gdy:
+• [ ] Aplikacja jest wizualnie oznaczona jako LiczMat.
+• [ ] Widoczne „Materio” zostało usunięte.
+• [ ] Application ID nie zostało bez potrzeby zmienione.
+• [ ] Istniejąca aplikacja Google Play pozostaje tą samą aplikacją.
+• [ ] Logo i ikona są zgodne z LiczMat.
+• [ ] Splash screen jest zgodny z LiczMat.
+• [ ] Screenshoty aplikacji są aktualne.
+• [ ] Web posiada sekcję „Aplikacja”.
+• [ ] Sekcja pokazuje aktualny LiczMat.
+• [ ] Sekcja posiada CTA do Google Play.
+• [ ] Sekcja jest responsywna.
+• [ ] Sekcja jest dostępna w obsługiwanych językach.
+• [ ] Nie ma starych screenshotów Materio na stronie.
+• [ ] Nie ma starego logo Materio na stronie.
+• [ ] Nie ma widocznych starych linków Materio.
+• [ ] Wykonano końcowe wyszukiwanie Materio/materio.
+• [ ] Wszystkie pozostałe techniczne wystąpienia zostały opisane.
+• [ ] Nie wykonano jeszcze migracji domeny materio-app.com → liczmat.com.
+• [ ] Nie zmieniono zakresu kolejnych sesji Master Planu.
+
+───
+
+21. RAPORT KOŃCOWY
+Na końcu sesji przedstaw raport:
+1. Wykonane
+Lista wszystkich rzeczy wykonanych w Sesji 7.
+2. Zmienione pliki
+Lista najważniejszych plików.
+3. Materio — pozostałe wystąpienia
+Każde pozostałe wystąpienie wraz z wyjaśnieniem, dlaczego pozostało.
+4. Google Play
+Co zostało przygotowane, a czego nie można/nie należy jeszcze publikować.
+5. Web
+Co zostało dodane/poprawione w sekcji „Aplikacja”.
+6. Testy
+Jakie testy zostały wykonane i czy zakończyły się powodzeniem.
+7. Problemy
+Wszystkie znalezione problemy, których nie naprawiono.
+8. Status
+Na końcu napisz jednoznacznie:
+SESJA 7 ZAKOŃCZONA
+albo
+SESJA 7 NIEZAKOŃCZONA — wymagane działania: ...
+
+───
+
+22. BARDZO WAŻNE — POWRÓT DO MASTER PLANU
+Po zakończeniu Sesji 7:
+NIE twórz nowego master planu.
+NIE zmieniaj numeracji istniejących sesji.
+NIE oznaczaj kolejnej sesji jako nowego projektu.
+Sesja 7 jest tylko dodatkowym etapem rebrandingu.
+W następnej sesji użytkownik chce kontynuować istniejący MASTER_PLAN.md.
+Dlatego po zakończeniu tej sesji:
+1. Sprawdź MASTER_PLAN.md.
+2. Ustal, które sesje/punkty zostały już wykonane.
+3. Uwzględnij, że Sesje 1–6 zostały wykonane zgodnie z wcześniejszym przebiegiem prac.
+4. Sesję 7 traktuj jako dodatkowy zakończony etap techniczny.
+5. W kolejnej sesji rozpocznij od pierwszego niezrealizowanego punktu istniejącego Master Planu.
+6. Nie pomijaj żadnego punktu.
+7. Nie wracaj do zakończonych sesji, chyba że istnieje konkretny błąd wymagający naprawy.
+
+───
+
+23. ZASADA DLA KOLEJNEJ SESJI
+Po zakończeniu Sesji 7 użytkownik rozpocznie kolejną sesję i oczekuje:
+KONTYNUUJ MASTER PLAN
+Wtedy masz kontynuować istniejący plan, a nie rozpoczynać ponownie Sesji 7.
+Domena liczmat.com jest już zakupiona, ale migracja domeny ma zostać wykonana w osobnym, późniejszym etapie.
+
+───
+
+OSTATECZNA ZASADA
+Najważniejsze jest zachowanie istniejącej pracy.
+Nie rób wielkiego refaktoru.
+Nie przebudowuj działających funkcji.
+Nie zmieniaj architektury bez potrzeby.
+Nie zmieniaj identyfikatorów aplikacji.
+Nie migruj jeszcze domeny.
+Nie dodawaj funkcji spoza zakresu.
+Wykonaj dokładnie:
+MATERIO → LICZMAT
+oraz:
+LICZMAT.COM → SEKCJA „APLIKACJA”
+a następnie pozostaw projekt w stabilnym stanie gotowym do dalszej realizacji istniejącego Master Planu.

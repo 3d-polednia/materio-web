@@ -31,8 +31,39 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 4 | Design system | **Zrobione** — 2026-08-12 |
 | 5 | Globalny layout | **Zrobione** — 2026-08-12 |
 | 6 | Homepage | **Zrobione** — 2026-08-12 |
+| — | *Etap dodatkowy: rebranding Androida + sekcja „Aplikacja"* | **Zrobione** — 2026-08-12 |
 | 7 | Centrum kalkulatorów | **Następna** |
 | 8–36 | patrz rozdział XXXII planu | Nie zaczęte |
+
+### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
+
+Zlecenie właściciela w całości: [`SESJA_REBRANDING_ANDROID_I_APLIKACJA.txt`](SESJA_REBRANDING_ANDROID_I_APLIKACJA.txt).
+Jego punkt 0 mówi wprost, że to **zamknięty etap techniczny pomiędzy Sesją 6 a kolejną
+sesją**, który nie zastępuje żadnej sesji i nie zmienia numeracji — dlatego stoi w tabeli
+bez numeru, a następna w kolejce nadal jest **Sesja 7**. (Zlecenie nazywa go „Sesją 7";
+Sesja 7 Master Planu to Centrum kalkulatorów i jest nietknięta.)
+
+Raport w całości: `docs/SESSION_HANDOFF_2026-08-12_rebranding-liczmat.md`
+w repo `3d-polednia/Materio`. W skrócie, po stronie serwisu:
+
+- **Trzy zrzuty ekranu na `/aplikacja/` pokazywały Materio** — stary wordmark i „Witaj
+  w Materio!". Przerenderowane z aktualnej aplikacji tym samym testem Roborazzi, który
+  wyprodukował poprzednie, więc pokazują to, co użytkownik dziś instaluje.
+- **`og-image.jpg` miał wypalony w pikselach slogan „Policz. Kup. Nie marnuj."** Sesja 6
+  zmieniła slogan i nie przegenerowała obrazka, więc każde udostępnienie dowolnej
+  podstrony rozdawało wycofane hasło. Ten sam układ, aktualny slogan; `banner.jpg` tak samo.
+- **`og:image:alt` powtarzał stary slogan w kodzie 130 stron** — jest teraz nazwaną stałą
+  obok obrazka, który opisuje.
+- Sama strona `/aplikacja/` nie była pisana od nowa: miała już własny adres w czterech
+  językach z `canonical` i `hreflang`, H1, plakietkę Google Play, uczciwe noty o reklamach,
+  lokalizacji i opcjonalnym koncie oraz structured data `MobileApplication`. Została
+  **sprawdzona**: Chromium, cztery języki × 360/414/768/1280 px, 16/16 przechodzi.
+- **Domena się nie zmieniła.** `materio-app.com` zostaje wszędzie — migracja na
+  `liczmat.com` to osobny, późniejszy etap (§17 zlecenia).
+
+Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystkich
+dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)
+został zaktualizowany na żywo. Matematyka kalkulatorów nietknięta.
 
 ### Co zrobiła Sesja 6
 
@@ -246,6 +277,19 @@ walutę z języka (`AppLanguage.defaultCurrency`). Kosztorys zsynchronizowany z 
 może więc mieć inną walutę niż ta wybrana w przeglądarce — pozycja zachowuje własny
 `currencyCode`, więc nic się nie fałszuje, ale docelowo aplikacja powinna pójść tą samą
 drogą. Android jest poza zakresem prac nad webem (rozdział VII planu).
+
+### Akcent aplikacji Android a limonka serwisu
+
+Znak, ikona i splash w aplikacji są już limonkowo-grafitowe (ten sam wektor, co
+`assets/logo-mark.svg`), ale interfejs zostaje **oliwkowy `#626B38`**, a serwis jest
+limonkowy `#91d206`. Etap rebrandingu tego nie ruszał, bo „Oliwka" to pozycja
+w **wybieraku kolorów** aplikacji (`palette_names`) — nazwa koloru, nie marki;
+przemalowanie jej kłóciłoby się z etykietą. Sama limonka na jasnym tle nie przechodzi
+WCAG AA jako kolor tekstu — serwis używa do tego przyciemnionego `#476c00`.
+
+Propozycja: dodać w aplikacji siódmą paletę „LiczMat" (limonka + grafit, wariant tekstowy
+przyciemniony) i uczynić ją domyślną, zostawiając sześć obecnych do wyboru. **Potrzebna
+decyzja właściciela**; zmiana jest po stronie `3d-polednia/Materio`.
 
 ### Języki aplikacji Android
 
