@@ -1,27 +1,10 @@
-/* LiczMat website — shared page wiring across all pages: mobile nav, the room helper,
+/* LiczMat website — shared page wiring across all pages: mobile nav, the phone carousel,
    Play-Store click tracking and the consent banner. Everything is guarded, so each page
    runs only what it actually contains.
 
    The pages ship their copy as real HTML in their own language (scripts/build.mjs), so
    there is no text-swapping pass here any more — the language switcher lives in
    assets/i18n-runtime.js and navigates between per-language URLs. */
-
-function buildRoomHelper() {
-  const box = document.getElementById("room-helper");
-  if (!box) return;
-  const get = (id) => { const n = parseFloat(String(box.querySelector("#" + id).value).replace(",", ".")); return isFinite(n) ? n : 0; };
-  const fmt = (v) => (Math.round(v * 100) / 100).toLocaleString(document.documentElement.lang || "pl", { maximumFractionDigits: 2 });
-  const calc = () => {
-    const L = get("room-l"), W = get("room-w"), H = get("room-h");
-    const floor = L * W, perim = 2 * (L + W), walls = perim * H, vol = floor * H;
-    box.querySelector("#room-floor").textContent = fmt(floor) + " m²";
-    box.querySelector("#room-walls").textContent = fmt(walls) + " m²";
-    box.querySelector("#room-perim").textContent = fmt(perim) + " m";
-    box.querySelector("#room-vol").textContent = fmt(vol) + " m³";
-  };
-  box.querySelectorAll("input").forEach((i) => i.addEventListener("input", calc));
-  calc();
-}
 
 // Hero phone mockup: real app screenshots that advance on their own and loop.
 // No prev/next controls by design. Honours prefers-reduced-motion (first frame
@@ -268,7 +251,6 @@ function buildThemeToggle() {
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof buildCalculators === "function") buildCalculators();
   if (typeof buildStoreFinder === "function") buildStoreFinder();
-  buildRoomHelper();
   buildHeroCarousel();
   buildMobileNav();
   buildThemeToggle();

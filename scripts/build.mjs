@@ -29,7 +29,7 @@ import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies,
 } from "../src/site.mjs";
-import { livePaths, validateIA } from "../src/ia.mjs";
+import { livePaths, validateIA, HOME_DOORS, route, STATUS } from "../src/ia.mjs";
 import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
 import { DEFAULT_CURRENCY } from "../src/currency.mjs";
@@ -45,7 +45,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260812d";
+const STAMP = "20260812e";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -174,6 +174,18 @@ function validate() {
   // The architecture itself: levels, the page tree, the navigation, the user flows.
   problems.push(...validateIA());
 
+  // Each door of the home page needs its own strings. t() falls back to the key name, so
+  // without this a missing translation ships as the literal "door_pro_q" on the front
+  // page. Checking the reference language is enough — the loop above requires the other
+  // three to carry exactly the same keys.
+  for (const door of HOME_DOORS) {
+    const keys = [`${door.key}_t`, `${door.key}_q`, `${door.key}_d`, `lvl_${door.level}`];
+    if (route(door.route) && route(door.route).status === STATUS.LIVE) keys.push(`${door.key}_go`);
+    for (const key of keys) {
+      if (!(key in DICT[DEFAULT_LANG])) problems.push(`home door "${door.id}" has no "${key}" in the dictionary`);
+    }
+  }
+
   // The design system: the two themes in step, every var() defined, no literal
   // colour, radius or duration in a rule that should be spending a token.
   problems.push(...validateTokens());
@@ -242,23 +254,26 @@ function workedExample(calc, lang, t) {
 
 /* ------------------------------------------------------------------ schema.org */
 
-const appLd = (lang, t) => ({
+/**
+ * The home page is a website, not an Android app.
+ *
+ * It used to declare itself a MobileApplication with a Play Store downloadUrl — accurate
+ * when the page was an advert for the app, wrong since session 6 made it the way into the
+ * web product. The MobileApplication entity still exists, on /aplikacja/, which is the
+ * page that is actually about the app.
+ */
+const siteLd = (lang, t) => ({
   "@context": "https://schema.org",
-  "@type": "MobileApplication",
+  "@type": "WebSite",
   name: "LiczMat",
-  operatingSystem: "Android 7.0+",
-  applicationCategory: "UtilitiesApplication",
-  inLanguage: LANGS,
   url: BASE + urlHome(lang),
-  downloadUrl: "https://play.google.com/store/apps/details?id=pl.materio.app",
-  installUrl: "https://play.google.com/store/apps/details?id=pl.materio.app",
+  inLanguage: lang,
+  description: t("meta_desc"),
   image: `${BASE}/assets/og-image.jpg`,
-  description: t("hero_lead"),
-  // The app is free, so the currency only has to be a real one; the visitor's own choice
-  // lives in the browser and cannot be known at build time.
+  // Free in every currency, so the visitor's own choice — which only the browser knows —
+  // cannot make this wrong.
   offers: { "@type": "Offer", price: "0", priceCurrency: DEFAULT_CURRENCY[lang] },
-  author: { "@type": "Organization", name: "LiczMat" },
-  publisher: { "@type": "Organization", name: "LiczMat" },
+  publisher: { "@type": "Organization", name: "LiczMat", url: BASE + "/" },
 });
 
 const faqLd = (t) => ({
@@ -318,11 +333,15 @@ function buildHome() {
       path: urlHome(lang),
       alternates: alt,
       main: homeMain(lang, t, CALCS, CAT),
-      jsonld: [appLd(lang, t), {
+      jsonld: [siteLd(lang, t), {
         "@context": "https://schema.org", "@type": "Organization",
         name: "LiczMat", url: BASE + "/", logo: `${BASE}/assets/icon-512.png`,
       }, faqLd(t)],
-      scripts: CALC_SCRIPTS,
+      // No scripts of its own since session 6: the home page leads to the calculators
+      // instead of carrying one, so the engines, the catalogue, the material picker and
+      // the workspace load on the pages that use them. Everything left on it — the
+      // menu, the pickers, the theme switch, the consent banner — is in main.js, which
+      // every page gets.
     }));
   }
 }

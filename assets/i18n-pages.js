@@ -23,8 +23,8 @@ const I18N_PAGES = {
     appnote_t: "Ten sam wzór w aplikacji",
     appnote_d: "LiczMat na Androida liczy tym samym silnikiem, offline — z katalogiem materiałów i zapisem wyniku do projektu.",
 
-    meta_title: "LiczMat — kalkulator i optymalizator materiałów budowlanych na Androida",
-    meta_desc: "Darmowy kalkulator budowlany: farby, tynki, płytki, panele, tapety i rozkrój 1D/2D. Policz materiał, kup tyle ile trzeba, ogranicz odpad. Mapa sklepów, projekty, wycena PDF. Liczy offline, konto opcjonalne, 4 języki i 4 waluty.",
+    meta_title: "LiczMat — kalkulator materiałów budowlanych",
+    meta_desc: "Policz materiał na remont i budowę: farby, tynki, płytki, panele, tapety, beton, rozkrój 1D i 2D. Wynik dostajesz w przeglądarce, bez konta. Zapisz go w projekcie razem z listą materiałów i kosztami.",
 
     nav_guides: "Poradniki", nav_app: "Moje konto",
     nav_main: "Nawigacja główna", nav_menu: "Otwórz menu", nav_close: "Zamknij menu",
@@ -105,16 +105,6 @@ const I18N_PAGES = {
     note_drylining: "Metoda na kleju gipsowy działa tylko na równym, nośnym podłożu. Przy większych nierównościach potrzebny jest stelaż.",
     note_sheathing: "Wynik to liczba całych arkuszy bez planu rozkroju. Gdy chcesz wiedzieć, jak je pociąć, użyj kalkulatora rozkroju płyt 2D.",
 
-    acct_title: "Konto i synchronizacja",
-    acct_lead: "Konto LiczMat jest opcjonalne. Kalkulator liczy bez logowania — konto jest potrzebne dopiero, żeby zapisać projekty i pokoje i mieć je na telefonie i w przeglądarce.",
-    acct_optional: "Konto jest opcjonalne",
-    acct_optional_d: "Bez logowania wszystko liczy się na Twoim urządzeniu, tak jak dotąd.",
-    acct_sync_t: "Ten sam projekt na telefonie i w przeglądarce",
-    acct_sync_d: "Po zalogowaniu projekty, pokoje, wyceny i listy zakupów trafiają do Google Firestore i wracają na drugim urządzeniu.",
-    acct_private_t: "Twoje dane widzisz tylko Ty",
-    acct_private_d: "Reguły bezpieczeństwa dopuszczają do danych konta wyłącznie jego właściciela. Wyjątkiem jest link, który sam utworzysz.",
-    acct_where_t: "Dane leżą w Unii Europejskiej",
-    acct_where_d: "Baza Firestore działa w regionie europe-central2 (Warszawa).",
 
     app_title: "Moje projekty",
     app_lead: "Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji LiczMat.",
@@ -349,8 +339,8 @@ const I18N_PAGES = {
     appnote_t: "The same formula in the app",
     appnote_d: "LiczMat for Android uses the same engine offline — with the material catalogue and results saved into a project.",
 
-    meta_title: "LiczMat — construction material calculator and optimizer for Android",
-    meta_desc: "Free construction calculator: paint, plaster, tiles, panels, wallpaper and 1D/2D cutting. Work out the material, buy what you need, cut the waste. Store map, projects, PDF estimates. Calculates offline, account optional, 4 languages and 4 currencies.",
+    meta_title: "LiczMat — construction material calculator",
+    meta_desc: "Work out the material for a renovation or a build: paint, plaster, tiles, panels, wallpaper, concrete, 1D and 2D cutting. The result arrives in your browser, with no account. Keep it in a project with the material list and the costs.",
 
     nav_guides: "Guides", nav_app: "My account",
     nav_main: "Main navigation", nav_menu: "Open menu", nav_close: "Close menu",
@@ -431,16 +421,6 @@ const I18N_PAGES = {
     note_drylining: "The adhesive-dab method only works on a flat, sound substrate. Bigger deviations need a metal frame.",
     note_sheathing: "The result is a count of whole sheets with no cutting plan. If you need to know how to cut them, use the 2D sheet cutting calculator.",
 
-    acct_title: "Account and sync",
-    acct_lead: "A LiczMat account is optional. The calculator works without signing in — an account is only needed to save projects and rooms and have them on both your phone and your browser.",
-    acct_optional: "The account is optional",
-    acct_optional_d: "Without signing in everything is calculated on your device, exactly as before.",
-    acct_sync_t: "The same project on your phone and in your browser",
-    acct_sync_d: "Once you sign in, projects, rooms, estimates and shopping lists go to Google Firestore and come back on your other device.",
-    acct_private_t: "Only you can see your data",
-    acct_private_d: "The security rules let only the owner reach an account's data. The one exception is a link you create yourself.",
-    acct_where_t: "The data sits in the European Union",
-    acct_where_d: "The Firestore database runs in the europe-central2 (Warsaw) region.",
 
     app_title: "My projects",
     app_lead: "Sign in to see the projects and rooms saved in the LiczMat app.",
@@ -675,8 +655,8 @@ const I18N_PAGES = {
     appnote_t: "Dieselbe Formel in der App",
     appnote_d: "LiczMat für Android rechnet offline mit demselben Kern — samt Materialkatalog und Speichern ins Projekt.",
 
-    meta_title: "LiczMat — Rechner und Optimierer für Baumaterial für Android",
-    meta_desc: "Kostenloser Baurechner: Farbe, Putz, Fliesen, Paneele, Tapete und Zuschnitt 1D/2D. Material berechnen, nur so viel kaufen wie nötig, Verschnitt senken. Baumarktkarte, Projekte, PDF-Angebote. Rechnet offline, Konto optional, 4 Sprachen und 4 Währungen.",
+    meta_title: "LiczMat — Rechner für Baumaterial",
+    meta_desc: "Material für Umbau und Neubau berechnen: Farbe, Putz, Fliesen, Paneele, Tapete, Beton, Zuschnitt 1D und 2D. Das Ergebnis kommt im Browser, ohne Konto. Behalte es im Projekt, mit Materialliste und Kosten.",
 
     nav_guides: "Ratgeber", nav_app: "Mein Konto",
     nav_main: "Hauptnavigation", nav_menu: "Menü öffnen", nav_close: "Menü schließen",
@@ -757,16 +737,6 @@ const I18N_PAGES = {
     note_drylining: "Die Ansetzbinder-Methode funktioniert nur auf ebenem, tragfähigem Untergrund. Größere Abweichungen brauchen eine Unterkonstruktion.",
     note_sheathing: "Das Ergebnis ist die Zahl ganzer Platten ohne Schnittplan. Wenn du wissen willst, wie du sie zuschneidest, nimm den 2D-Plattenzuschnitt.",
 
-    acct_title: "Konto und Synchronisierung",
-    acct_lead: "Ein LiczMat-Konto ist optional. Der Rechner funktioniert ohne Anmeldung — ein Konto brauchst du erst, um Projekte und Räume zu speichern und sie auf Handy und im Browser zu haben.",
-    acct_optional: "Das Konto ist optional",
-    acct_optional_d: "Ohne Anmeldung wird alles auf deinem Gerät gerechnet, genau wie bisher.",
-    acct_sync_t: "Dasselbe Projekt auf dem Handy und im Browser",
-    acct_sync_d: "Nach der Anmeldung gehen Projekte, Räume, Kalkulationen und Einkaufslisten zu Google Firestore und kommen auf dem anderen Gerät zurück.",
-    acct_private_t: "Deine Daten sieht nur du",
-    acct_private_d: "Die Sicherheitsregeln lassen nur den Eigentümer an die Daten eines Kontos. Die einzige Ausnahme ist ein Link, den du selbst erstellst.",
-    acct_where_t: "Die Daten liegen in der Europäischen Union",
-    acct_where_d: "Die Firestore-Datenbank läuft in der Region europe-central2 (Warschau).",
 
     app_title: "Meine Projekte",
     app_lead: "Melde dich an, um die in der LiczMat-App gespeicherten Projekte und Räume zu sehen.",
@@ -1001,8 +971,8 @@ const I18N_PAGES = {
     appnote_t: "Та сама формула в застосунку",
     appnote_d: "LiczMat для Android рахує тим самим ядром офлайн — з каталогом матеріалів і збереженням результату в проєкт.",
 
-    meta_title: "LiczMat — калькулятор і оптимізатор будівельних матеріалів для Android",
-    meta_desc: "Безкоштовний будівельний калькулятор: фарба, штукатурка, плитка, панелі, шпалери та розкрій 1D/2D. Порахуй матеріал, купи скільки треба, зменш відходи. Карта магазинів, проєкти, кошторис у PDF. Рахує офлайн, акаунт необов'язковий, 4 мови і 4 валюти.",
+    meta_title: "LiczMat — калькулятор будівельних матеріалів",
+    meta_desc: "Порахуй матеріал на ремонт і будівництво: фарба, штукатурка, плитка, панелі, шпалери, бетон, розкрій 1D і 2D. Результат отримуєш у браузері, без акаунта. Збережи його в проєкті разом зі списком матеріалів і витратами.",
 
     nav_guides: "Поради", nav_app: "Мій акаунт",
     nav_main: "Головна навігація", nav_menu: "Відкрити меню", nav_close: "Закрити меню",
@@ -1083,16 +1053,6 @@ const I18N_PAGES = {
     note_drylining: "Метод на клейові марки працює лише на рівній, міцній основі. Більші відхилення потребують каркаса.",
     note_sheathing: "Результат — кількість цілих аркушів без плану розкрою. Якщо треба знати, як їх різати, скористайся калькулятором розкрою плит 2D.",
 
-    acct_title: "Акаунт і синхронізація",
-    acct_lead: "Акаунт LiczMat необов'язковий. Калькулятор рахує без входу — акаунт потрібен лише щоб зберегти проєкти й кімнати і мати їх на телефоні та в браузері.",
-    acct_optional: "Акаунт необов'язковий",
-    acct_optional_d: "Без входу все рахується на твоєму пристрої, точно як досі.",
-    acct_sync_t: "Той самий проєкт на телефоні та в браузері",
-    acct_sync_d: "Після входу проєкти, кімнати, кошториси та списки покупок ідуть у Google Firestore і повертаються на другому пристрої.",
-    acct_private_t: "Твої дані бачиш тільки ти",
-    acct_private_d: "Правила безпеки пускають до даних акаунта виключно його власника. Виняток — посилання, яке ти створиш сам.",
-    acct_where_t: "Дані лежать у Європейському Союзі",
-    acct_where_d: "База Firestore працює в регіоні europe-central2 (Варшава).",
 
     app_title: "Мої проєкти",
     app_lead: "Увійди, щоб побачити проєкти й кімнати, збережені в застосунку LiczMat.",

@@ -213,11 +213,33 @@ bezwarunkowo, więc przy wyłączonym skrypcie na telefonie nie dało się przej
 `home → guides → guide`, `home → projects → estimate`. Każda strona ma dokładnie jednego
 rodzica i `validateIA()` sprawdza, że w drzewie nie ma cyklu.
 
+### 5.1. Strona główna — trzy kierunki
+
+Rozdział X: strona główna prowadzi przede wszystkim do trzech obszarów. Sesja 6 zapisała
+je jako `HOME_DOORS` w `src/ia.mjs` — po jednym na poziom dostępu, w kolejności poziomów:
+
+| Drzwi | Trasa | Poziom | Pytanie z rozdziału X |
+|---|---|---|---|
+| Kalkulatory | `calculators` → `/kalkulatory/` | `GUEST` | „Co chcesz policzyć?” |
+| LiczMat | `projects` → `/projekty/` | `LICZMAT` | „Chcesz zachować i uporządkować swoją pracę?” |
+| LiczMat Pro | `liczmat-pro` (`PLANNED`, Sesja 29) | `PRO` | „Robisz to zawodowo?” |
+
+`level` w `HOME_DOORS` mówi, **dla kogo są te drzwi**, a nie jakiego poziomu wymaga
+strona za nimi: `/projekty/` jest trasą `GUEST` (działa w przeglądarce bez konta),
+a drzwi „LiczMat” opowiadają o tym, co dokłada konto. Drzwi na trasę `PLANNED` nie mają
+linku — zamiast przycisku dostają „W przygotowaniu”, bo adres jeszcze nie istnieje.
+Status czyta się z architektury, więc w dniu, w którym Sesja 29 zbuduje `/liczmat-pro/`,
+drzwi same staną się linkiem.
+
+`validateIA()` pilnuje, żeby drzwi zostały trzy, w kolejności poziomów i na istniejących
+trasach, a `scripts/build.mjs` — żeby każde miały komplet tekstów we wszystkich czterech
+językach (bez tego `t()` wypisałby na stronie głównej sam klucz).
+
 **Czego w nawigacji nadal brakuje** wobec docelowej architektury:
 
-- nie ma wejścia do **LiczMat Pro** — rozdział X chce trzech kierunków ze strony głównej
-  (Kalkulatory / LiczMat / LiczMat Pro). Trasa `liczmat-pro` powstaje w Sesji 29 i wtedy
-  zajmie miejsce w menu; przy limicie czterech linków coś będzie musiało ustąpić;
+- **LiczMat Pro** ma wejście na stronie głównej (drzwi wyżej), ale nie ma go w menu —
+  trasa `liczmat-pro` powstaje w Sesji 29 i dopiero wtedy zajmie miejsce w pasku; przy
+  limicie czterech linków coś będzie musiało ustąpić;
 - menu jest płaską listą i nie pokazuje, że `Kosztorys` należy do `Projektów`;
 - „Konto” jest przyciskiem po prawej i nic nie mówi o stanie zalogowania — pulpit
   zalogowanego to Sesja 14.
@@ -357,7 +379,10 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | trasy planowane | brak numeru sesji; działający `path`; obecność w menu; slug kolidujący z istniejącą sekcją lub z inną trasą planowaną |
 | nawigacja | dwa linki na tej samej pozycji (w stopce: w tej samej kolumnie); link bez klucza tłumaczenia; więcej niż cztery linki w menu (Sesja 5) |
 | przepływy | krok na nieistniejącą trasę; przepływ sięgający po wyższy poziom bez kroku, który go nadaje |
+| strona główna (Sesja 6) | inna liczba drzwi niż trzy albo inna kolejność poziomów; drzwi na nieistniejącą trasę; brak tekstu drzwi w słowniku |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.
-Tak samo sprawdzone są dwa dołożone w Sesji 5: piąty link w menu i dwie pozycje na tym
-samym miejscu w tej samej kolumnie stopki.
+Tak samo sprawdzone są dwa dołożone w Sesji 5 (piąty link w menu, dwie pozycje na tym
+samym miejscu w tej samej kolumnie stopki) i cztery z Sesji 6: czwarte drzwi, drzwi
+z poziomem nie na swoim miejscu, drzwi na trasę, której nie ma, i brakujący klucz
+tłumaczenia drzwi.

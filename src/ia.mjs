@@ -336,6 +336,30 @@ export function trail(id) {
   return out;
 }
 
+/* ------------------------------------------------------------------ home page */
+
+/**
+ * The three ways out of the home page, in order — chapter X.
+ *
+ * "Homepage powinien prowadzić przede wszystkim do trzech obszarów: KALKULATORY /
+ * LICZMAT / LICZMAT PRO." Written here rather than in `src/pages.mjs` because it is an
+ * architecture decision: it is the only place the three access levels of chapter II are
+ * offered to the visitor as a choice, so the set has to stay exactly three, in level
+ * order, each pointing at a route that exists.
+ *
+ *   route  the page the door opens. A PLANNED one is rendered as text with no link —
+ *          `src/pages.mjs` reads the status, so the door cannot promise a dead URL.
+ *   level  who the door is for. This is the audience, not the route's access level:
+ *          `/projekty/` is GUEST (it works in the browser without an account) while the
+ *          LiczMat door is about what an account adds on top of it.
+ *   keys   the dictionary prefix; `<key>_t`, `_q`, `_d`, `_go` in all four languages.
+ */
+export const HOME_DOORS = [
+  { id: "calculators", route: "calculators", level: LEVEL.GUEST, key: "door_calc" },
+  { id: "liczmat", route: "projects", level: LEVEL.LICZMAT, key: "door_lm" },
+  { id: "pro", route: "liczmat-pro", level: LEVEL.PRO, key: "door_pro" },
+];
+
 /* ------------------------------------------------------------------ user flows */
 
 /**
@@ -509,6 +533,23 @@ export function validateIA() {
   // the header starts wrapping between 900px and 1080px.
   const inHeader = navRoutes("header").length;
   if (inHeader > 4) problems.push(`IA: ${inHeader} links in the header — the row fits four`);
+
+  // The home page offers the three areas of chapter X, one per access level, in order.
+  // Anything else — a fourth door, two doors for the same level, a door onto a route
+  // nobody declared — is the home page drifting back into a list of everything.
+  const doorLevels = HOME_DOORS.map((d) => d.level);
+  if (doorLevels.join() !== LEVEL_ORDER.join()) {
+    problems.push(`IA: the home page offers [${doorLevels.join(", ")}] — chapter X wants ` +
+      `exactly [${LEVEL_ORDER.join(", ")}], in that order`);
+  }
+  for (const door of HOME_DOORS) {
+    const r = BY_ID.get(door.route);
+    if (!r) { problems.push(`IA: home door "${door.id}" opens onto unknown route "${door.route}"`); continue; }
+    if (!door.key) problems.push(`IA: home door "${door.id}" has no dictionary key`);
+    if (r.level === LEVEL.PRO && r.status === STATUS.LIVE && !r.gate) {
+      problems.push(`IA: home door "${door.id}" leads to a Pro page with no public state`);
+    }
+  }
 
   // Flows: every step names a real route, and a step that raises the level says so.
   for (const flow of FLOWS) {

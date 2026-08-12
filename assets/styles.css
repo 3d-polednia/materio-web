@@ -429,11 +429,11 @@ section.block { padding: var(--section-y) 0; }
    The one raised surface of the site. Everything that looks like a card is this
    rule; what differs is padding and what sits inside. Only .card lifts on hover,
    because only .card is ever a link. */
-.card, .calc, .step, .trust-panel, .app-card, .ws-estimate {
+.card, .calc, .step, .door, .app-card, .ws-estimate {
   background: var(--surface); border: 1px solid var(--outline);
   border-radius: var(--radius); box-shadow: var(--shadow-2);
 }
-.card, .trust-panel, .ws-estimate { padding: var(--sp-7); }
+.card, .door, .ws-estimate { padding: var(--sp-7); }
 .calc { padding: var(--sp-6); }
 .app-card { padding: var(--sp-5); border-radius: var(--radius-sm); margin-bottom: var(--sp-4); }
 .card { transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
@@ -456,12 +456,11 @@ section.block { padding: var(--section-y) 0; }
   display: grid; place-items: center; flex: none;
 }
 .card .ico { width: 46px; height: 46px; margin-bottom: var(--sp-3); }
-.calc h2 .ico, .calc h3 .ico, .trust-panel .shield {
+.calc h2 .ico, .calc h3 .ico {
   border-radius: var(--radius-xs); background: var(--tertiary-container); color: var(--tertiary);
   display: grid; place-items: center; flex: none;
+  width: 34px; height: 34px;
 }
-.calc h2 .ico, .calc h3 .ico { width: 34px; height: 34px; }
-.trust-panel .shield { width: 40px; height: 40px; }
 
 /* ---------- Form controls
    Every field on the site is this one rule: same height as a button, 16px text
@@ -802,13 +801,13 @@ footer h4 {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background: radial-gradient(70% 60% at 12% 0%, color-mix(in srgb, var(--accent-soft) 45%, transparent), transparent 72%);
 }
+/* Two arrangements: the home page's hero is one column of copy, /aplikacja/ puts the
+   phone beside it. */
 .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: var(--sp-12); align-items: center; }
 .hero h1 { font-size: var(--fs-display); }
+.hero .hero-copy { max-width: 42rem; }
 .hero p.lead { font-size: var(--fs-md); color: var(--muted); max-width: 44ch; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-7) 0 var(--sp-6); }
-/* The hero holds a live calculator, so it needs a white card on the tinted gradient
-   rather than the phone frame that used to sit there. */
-.hero-media .calc { margin: 0; box-shadow: var(--shadow-3); }
 
 .trust { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-7); margin-top: var(--sp-2); }
 .trust span {
@@ -861,7 +860,40 @@ footer h4 {
 .phone-dots i.on { width: 20px; background: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .phone-track { transition: none; } }
 
-/* ---------- Home: features, stats, steps, trust ---------- */
+/* ---------- Home: the three doors, the four steps ----------
+   Chapter X: the home page leads to three areas — calculators, LiczMat, LiczMat Pro.
+   One card each, same height, the action pinned to the bottom edge so the three
+   buttons line up however long the copy runs. A door onto a page that is not built
+   yet carries .door-soon in place of the button, and is not a link. */
+.doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
+.door { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
+.door h3 { font-size: var(--fs-lg); margin: 0; }
+.door p { margin: 0; }
+.door-q { font-weight: var(--fw-semi); color: var(--accent-strong); }
+.door-level {
+  align-self: flex-start; border-radius: var(--radius-pill);
+  background: var(--accent-soft); color: var(--on-accent-soft);
+  padding: var(--sp-1) var(--sp-3); font-size: var(--fs-xs); font-weight: var(--fw-bold);
+  letter-spacing: .02em; text-transform: uppercase;
+}
+.door-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.door-list a {
+  display: inline-block; border-radius: var(--radius-pill);
+  border: 1px solid var(--outline); background: var(--surface-alt);
+  padding: var(--sp-1) var(--sp-3); font-size: var(--fs-sm); font-weight: var(--fw-semi);
+  color: var(--on-bg); transition: background var(--dur) var(--ease);
+}
+.door-list a:hover { background: var(--accent-soft-2); text-decoration: none; }
+.door-meta { color: var(--muted); font-size: var(--fs-sm); }
+/* Pin the action to the bottom of the card. The two live doors end in a button; the
+   planned one ends in this line instead, so it needs the same treatment. */
+.door .btn, .door-soon { margin-top: auto; }
+.door-soon {
+  border-radius: var(--radius-pill); border: 1px dashed var(--outline-strong);
+  padding: var(--sp-2) var(--sp-4); color: var(--muted);
+  font-size: var(--fs-sm); font-weight: var(--fw-semi);
+}
+
 .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
 
 .stat-band { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
@@ -872,7 +904,7 @@ footer h4 {
 }
 .stat .lbl { color: var(--muted); font-weight: var(--fw-semi); font-size: var(--fs-sm); margin-top: var(--sp-2); }
 
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); counter-reset: step; }
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); counter-reset: step; }
 .step { position: relative; padding: var(--sp-7) var(--sp-6) var(--sp-6); }
 .step::before {
   counter-increment: step; content: counter(step);
@@ -883,15 +915,11 @@ footer h4 {
 .step h3 { margin-bottom: var(--sp-2); }
 .step p { color: var(--muted); margin: 0; }
 
-.trust-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-10); align-items: center; }
 .trust-list { list-style: none; padding: 0; margin: var(--sp-4) 0 0; display: grid; gap: var(--sp-4); }
 .trust-list li { display: flex; gap: var(--sp-3); align-items: flex-start; }
 .trust-list .tick { width: 30px; height: 30px; margin-top: 2px; }
 .trust-list b { display: block; }
 .trust-list span.d { color: var(--muted); font-size: var(--fs-sm); }
-.trust-panel h3 { display: flex; align-items: center; gap: var(--sp-3); }
-.trust-panel ul { margin: var(--sp-3) 0 0; padding-left: var(--sp-5); color: var(--muted); display: grid; gap: var(--sp-2); }
-.trust-panel ul li::marker { color: var(--accent-strong); }
 
 /* ---------- The app section: copy on the left, one phone on the right.
    This is the only place on the home page where the Android app is the subject. */
@@ -1164,8 +1192,8 @@ footer h4 {
   .calc-page { grid-template-columns: 1fr; }
   .calc-page-form .calc { position: static; }
   .stat-band { grid-template-columns: 1fr 1fr; gap: var(--sp-6) var(--sp-4); }
-  .steps { grid-template-columns: 1fr; }
-  .trust-split { grid-template-columns: 1fr; gap: var(--sp-7); }
+  .doors { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; }
   .doc .toc ul { grid-template-columns: 1fr; }
   .cta-banner { grid-template-columns: 1fr; text-align: center; }
   .cta-copy { display: flex; flex-direction: column; align-items: center; }
@@ -1213,6 +1241,7 @@ footer h4 {
 @media (max-width: 560px) {
   :root { --gutter: var(--sp-4); }
   .features { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr; }
   .foot-grid { grid-template-columns: 1fr; }
   .calc-link-go { display: none; }

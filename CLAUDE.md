@@ -1,7 +1,7 @@
 # materio-web — Claude Code Configuration
 
 The site for **LiczMat** (renamed from Materio on 2026-08-12), the offline-first
-construction-material calculator. *Policz. Kup. Nie marnuj.*
+construction-material calculator. *Policz. Zaplanuj. Zrealizuj.*
 
 > **Read `docs/MASTER_PLAN.txt` before starting work.** It is the owner's plan for turning
 > this site into the LiczMat platform, verbatim: the product vision, the three access
@@ -144,7 +144,7 @@ assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/
 assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/
 assets/calculators.js Calculation engines ported 1:1 from the Kotlin app + form wiring
 assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
-assets/main.js        Wiring: rooms, menu, hero carousel, consent banner
+assets/main.js        Wiring: menu, hero carousel, consent banner
 assets/app.js         /app/ — Firebase Auth + Firestore sync, same schema as the app
 assets/share.js       /p/<token> — read-only shared estimate
 assets/firebase-config.js  Firebase Web config (see the placeholders inside)

@@ -304,9 +304,11 @@ Wszystkie poniższe elementy generuje `scripts/build.mjs` dla każdej strony:
 - **Treść indeksowalna:** teksty są zwykłym HTML-em w języku danej strony.
 - **Open Graph + Twitter Card:** tytuł, opis, `og:image` = `/assets/og-image.jpg`
   (1200×630), `og:locale` dopasowany do języka.
-- **Dane strukturalne (JSON-LD):** `MobileApplication`, `Organization` i `FAQPage`
-  na stronie głównej; `BreadcrumbList` na każdej podstronie; `ItemList` na hubie
-  kalkulatorów; `WebApplication` na stronie kalkulatora; `HowTo` w poradniku.
+- **Dane strukturalne (JSON-LD):** `WebSite`, `Organization` i `FAQPage` na stronie
+  głównej; `MobileApplication` na `/aplikacja/` (Sesja 6 przeniosła ją tam ze strony
+  głównej, która nie jest aplikacją Androida); `BreadcrumbList` na każdej podstronie;
+  `ItemList` na hubie kalkulatorów; `WebApplication` na stronie kalkulatora; `HowTo`
+  w poradniku.
 - **Techniczne:** `sitemap.xml` (generowany, ~224 adresy), `robots.txt`, manifest
   PWA, `404.html`. `/app/` i `/p/` są `noindex` i nie ma ich w sitemapie.
 
@@ -413,11 +415,14 @@ nagłówek, sekcja „Twoje prawa", „Kontakt", w PL i EN).
 **Dodanie typu punktu do listy sklepów:**
 `assets/stores.js` → dopisz parę do `OSM_TAGS` i etykietę do `TYPE_LABEL`.
 
-**Zmiana wersji aplikacji w danych strukturalnych:**
-`index.html` → JSON-LD `MobileApplication` → `"softwareVersion"`.
+**Zmiana danych strukturalnych aplikacji:**
+`scripts/build.mjs` → `androidMain()` w `src/pages.mjs` (encja `MobileApplication`
+stoi na `/aplikacja/`). Nigdy w wygenerowanym `.html` — build to nadpisze.
 
 **Aktualizacja tekstu FAQ:**
-Zmień w `index.html` blok `<details>` **oraz** odpowiedni wpis w JSON-LD `FAQPage`.
+Klucze `faq_q*` / `faq_a*` w `assets/i18n.js`, we wszystkich czterech językach;
+które pytania trafiają na stronę główną, mówi `FAQ_KEYS` w `src/pages.mjs`. Widoczny
+blok `<details>` i JSON-LD `FAQPage` powstają z tej samej listy.
 
 **Zmiana kolorystyki:**
 `assets/styles.css` → zmienne w `:root` (i odpowiedniki w bloku dark-mode).

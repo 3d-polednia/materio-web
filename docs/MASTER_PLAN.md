@@ -30,8 +30,45 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 3 | Architektura informacji | **Zrobione** — 2026-08-12 |
 | 4 | Design system | **Zrobione** — 2026-08-12 |
 | 5 | Globalny layout | **Zrobione** — 2026-08-12 |
-| 6 | Homepage | **Następna** |
-| 7–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 6 | Homepage | **Zrobione** — 2026-08-12 |
+| 7 | Centrum kalkulatorów | **Następna** |
+| 8–36 | patrz rozdział XXXII planu | Nie zaczęte |
+
+### Co zrobiła Sesja 6
+
+Strona główna napisana od nowa według rozdziału X: wejście do produktu, nie opis
+produktu. **8845 px → 2660 px wysokości, 999 → 209 słów, 12 → 4 sekcje** (zmierzone
+w Chromium przy 1280 px).
+
+- **Trzy kierunki z rozdziału X, po jednym na poziom dostępu**: Kalkulatory („Co chcesz
+  policzyć?”), LiczMat („Chcesz zachować i uporządkować swoją pracę?”), LiczMat Pro
+  („Robisz to zawodowo?”). Zapisane jako `HOME_DOORS` w `src/ia.mjs`, nie w szablonie —
+  to decyzja architektoniczna, więc build pilnuje, że drzwi zostaną trzy i w kolejności
+  poziomów. Drzwi do Pro **nie mają linku** („W przygotowaniu”), bo `/liczmat-pro/`
+  powstaje w Sesji 29; status czyta się z architektury, więc same staną się linkiem.
+- **Zdjęte ze strony głównej** (rozdział X wymienia każde z nich z nazwy): lista
+  wszystkich 15 kalkulatorów w czterech grupach, sześć kart funkcji, kalkulator
+  pomieszczenia, blok projektów, blok konta, zajawka sklepów, rozdział o danych i baner
+  z reklamą aplikacji Android. Każda z tych treści ma własną stronę i tam zostaje.
+- **Ścieżka z rozdziału I** jako cztery linijki: POLICZ → ZAPISZ → ZORGANIZUJ → ZREALIZUJ.
+- **FAQ z siedmiu pytań do czterech** — tych, które decydują przed liczeniem: czy płatne,
+  gdzie liczy, czy potrzebne konto, co z danymi. Structured data `FAQPage` bierze się
+  z tej samej listy, więc nie może obiecywać pytań, których na stronie nie ma.
+- **Strona główna przestała być aplikacją Androida w structured data.** Deklarowała się
+  jako `MobileApplication` z `downloadUrl` do Google Play; teraz jest `WebSite`, a encja
+  `MobileApplication` została tam, gdzie jest prawdziwa — na `/aplikacja/`. Tytuł i opis
+  strony też przestały się kończyć na „na Androida”.
+- **Strona główna nie ładuje już żadnego skryptu poza wspólnymi.** Nie ma na niej
+  kalkulatora, więc silniki, katalog materiałów, wybierak i workspace (5 plików) zostały
+  na stronach, które ich używają.
+- **Slogan rozstrzygnięty zgodnie z grafiką referencyjną właściciela**: „Policz.
+  Zaplanuj. Zrealizuj.” w stopce, H1 „Policz materiały. Zaplanuj swoją pracę.”. Cztery
+  kroki na stronie zostają przy wersji z rozdziału I, bo to opis produktu, nie hasło.
+- **Słownik posprzątany**: 92 linijki kluczy, których nie renderuje już żadna strona,
+  zniknęły z `assets/i18n.js` i `assets/i18n-pages.js` — razem z sekcjami, do których
+  należały. `--check` przechodzi: 705 kluczy × 4 języki.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 5
 
@@ -193,12 +230,14 @@ przeglądarki — konto dokłada sync między urządzeniami, przetrwanie wyczysz
 przeglądarki i udostępnianie linkiem. Pełne uzasadnienie i alternatywa:
 [`ARCHITEKTURA.md`](ARCHITEKTURA.md) §8.1. **Potrzebna decyzja właściciela.**
 
-### Slogan
+### ~~Slogan~~ — rozstrzygnięte w Sesji 6
 
-Grafika referencyjna pokazuje „POLICZ. ZAPLANUJ. ZREALIZUJ.” i nagłówek „Policz
-materiały. Zaplanuj swoją pracę.” Serwis dalej ma „Policz. Kup. Nie marnuj.” — klucze
-`hero_title` i `foot_tagline` w `assets/i18n.js`, w każdym z 4 języków. To copy strony
-głównej, więc należy do Sesji 6, chyba że właściciel zdecyduje inaczej.
+Serwis miał „Policz. Kup. Nie marnuj.”, a grafika referencyjna właściciela „POLICZ.
+ZAPLANUJ. ZREALIZUJ.” z nagłówkiem „Policz materiały. Zaplanuj swoją pracę.”. Sesja 6
+poszła za grafiką: `hero_title` i `foot_tagline` w czterech językach, a przy okazji
+`CLAUDE.md`. Sekcja „jak to działa” zostaje przy czterech krokach z rozdziału I
+(POLICZ → ZAPISZ → ZORGANIZUJ → ZREALIZUJ) — to opis produktu, nie hasło marki.
+**Do potwierdzenia przez właściciela**, jeśli miał na myśli co innego.
 
 ### Waluta a aplikacja Android
 
@@ -240,8 +279,19 @@ zapis pod nowym — a nie zwykłe przemianowanie.
 
 Grafika referencyjna zawiera wyszukiwarkę kalkulatorów, kafelki popularnych, mockup
 pulpitu i selektor języka z flagami. Selektor z flagami zrobiła Sesja 2, ramę strony
-(nagłówek, stopka, nawigacja) Sesja 5; wyszukiwarka i kafelki to Sesje 6 i 7. Sesja 1
-wdrożyła sam system wizualny, bez przebudowy architektury strony głównej.
+(nagłówek, stopka, nawigacja) Sesja 5, treść strony głównej Sesja 6. **Wyszukiwarki
+kalkulatorów na stronie głównej nie ma** — rozdział XI umieszcza ją na `/kalkulatory/`,
+czyli w Sesji 7; strona główna prowadzi do niej drzwiami „Kalkulatory” i skrótami do
+czterech kategorii. Mockup pulpitu należy do Sesji 14. Sesja 1 wdrożyła sam system
+wizualny, bez przebudowy architektury strony głównej.
+
+### Kotwice kategorii na stronie głównej
+
+Drzwi „Kalkulatory” linkują do `/kalkulatory/#g-surface`, `#g-cutting`, `#g-trade`,
+`#g-framing` — kotwic, które hub ma dzisiaj. **Sesja 7 przebudowuje ten hub**
+(wyszukiwarka, kategorie, filtrowanie); jeżeli zmieni identyfikatory sekcji, musi
+poprawić `homeDoors()` w `src/pages.mjs`. Nic tego nie pilnuje automatycznie — kotwica
+nie jest adresem strony, więc nie przechodzi przez `livePaths()`.
 
 ### Miejsce dla „LiczMat Pro” w menu
 
