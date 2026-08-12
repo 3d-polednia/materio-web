@@ -212,7 +212,7 @@ export function shareMain(t) {
           <ul id="share-shopping" class="data-list"></ul>
         </div>
 
-        <p class="muted" style="margin-top:24px" data-i18n="share_owner_note">${esc(t("share_owner_note"))}</p>
+        <p class="muted mt-6" data-i18n="share_owner_note">${esc(t("share_owner_note"))}</p>
         <p><a class="btn btn-ghost" href="${urlHome("pl")}" data-i18n="bc_home">${esc(t("bc_home"))}</a></p>
       </div>
     </div>

@@ -30,6 +30,7 @@ import {
   urlProjects, urlEstimate, urlAndroid, urlCookies,
 } from "../src/site.mjs";
 import { livePaths, validateIA } from "../src/ia.mjs";
+import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
 import { DEFAULT_CURRENCY } from "../src/currency.mjs";
 import { page } from "../src/template.mjs";
@@ -44,7 +45,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260812b";
+const STAMP = "20260812c";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -172,6 +173,10 @@ function validate() {
 
   // The architecture itself: levels, the page tree, the navigation, the user flows.
   problems.push(...validateIA());
+
+  // The design system: the two themes in step, every var() defined, no literal
+  // colour, radius or duration in a rule that should be spending a token.
+  problems.push(...validateTokens());
 
   // Two pages must never claim the same URL.
   const seen = new Map();

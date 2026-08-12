@@ -118,7 +118,7 @@ export function homeMain(lang, t, calcs, cat) {
   </div>
 </section>
 
-<section class="block" aria-label="LiczMat" style="padding-top:8px">
+<section class="block pt-2" aria-label="LiczMat">
   <div class="wrap">
     <div class="stat-band">
       <div class="stat">${freePrice(lang)}<div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
@@ -171,7 +171,7 @@ export function homeMain(lang, t, calcs, cat) {
     </div>
     ${byTab.map(({ tab, list }) => `<h3 class="calc-group">${esc(t(`tab_${tab}`))}</h3>
     <div class="calc-links">${list.map((c) => calcLinkCard(c, lang, t)).join("")}</div>`).join("\n    ")}
-    <p class="center" style="margin-top:24px">
+    <p class="center mt-6">
       <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
       <a class="btn btn-ghost" href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>
     </p>
@@ -192,7 +192,7 @@ ${roomsSection(t)}
       ${featureCard('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', t("proj_b2_t"), t("proj_b2_d"))}
       ${featureCard('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>', t("proj_b3_t"), t("proj_b3_d"))}
     </div>
-    <p class="center" style="margin-top:24px">
+    <p class="center mt-6">
       <a class="btn btn-primary" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
       <a class="btn btn-ghost" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
       <a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
@@ -298,13 +298,13 @@ function trustSection(t) {
     </div>
     <aside class="trust-panel">
       <h3><span class="shield"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/></svg></span><span>${esc(t("trust_panel_t"))}</span></h3>
-      <p class="muted" style="margin-top:12px">${esc(t("trust_panel_lead"))}</p>
+      <p class="muted mt-3">${esc(t("trust_panel_lead"))}</p>
       <ul>
         <li>${esc(t("trust_panel_1"))}</li>
         <li>${esc(t("trust_panel_2"))}</li>
         <li>${esc(t("trust_panel_3"))}</li>
       </ul>
-      <p style="margin-top:16px"><a class="btn btn-ghost btn-sm" href="/privacy-policy.html">${esc(t("trust_privacy_btn"))}</a></p>
+      <p class="mt-4"><a class="btn btn-ghost btn-sm" href="/privacy-policy.html">${esc(t("trust_privacy_btn"))}</a></p>
     </aside>
   </div>
 </section>`;
@@ -482,8 +482,8 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0, g
         <h3>${esc(t("hwc_example"))}</h3>
         <p class="muted">${esc(t("hwc_example_lead"))}</p>
         <div class="result show">
-          <div class="muted" style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em">${esc(t("res_tobuy"))}</div>
-          <div class="big">${esc(example.tobuy)} <span style="font-size:1rem;font-weight:600">${esc(example.unit)}</span></div>
+          <div class="muted eyebrow">${esc(t("res_tobuy"))}</div>
+          <div class="big">${esc(example.tobuy)} <span class="figure-line">${esc(example.unit)}</span></div>
           <div class="rows">${exampleRows}</div>
         </div>
 
@@ -499,9 +499,9 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0, g
     <div class="wrap">
       <h2>${esc(t("calc_related"))}</h2>
       <div class="chips">${related}</div>
-      ${guideLinks ? `<h2 style="margin-top:28px">${esc(t("guide_calcs_back"))}</h2>
+      ${guideLinks ? `<h2 class="mt-8">${esc(t("guide_calcs_back"))}</h2>
       <div class="chips">${guideLinks}</div>` : ""}
-      <p style="margin-top:20px">
+      <p class="mt-6">
         <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
         <a class="btn btn-ghost" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a>
       </p>
@@ -587,7 +587,7 @@ export function guideMain(guide, lang, t) {
         <p>${esc(t(`g_${guide.id}_tip`))}</p>
       </div>
 
-      <p style="margin-top:24px"><a class="btn btn-ghost" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a></p>
+      <p class="mt-6"><a class="btn btn-ghost" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a></p>
     </div>
   </section>
   ${appNote(t)}
@@ -650,7 +650,7 @@ export function materialsMain(lang, t, cat) {
       <div class="wrap">
         <label class="fld-label" for="matpage-search">${esc(t("mat_search_ph"))}</label>
         <input id="matpage-search" type="search" class="mat-search" placeholder="${esc(t("mat_search_ph"))}" autocomplete="off">
-        <p class="muted" style="margin-top:10px">${cat.total} ${esc(t("mat_count_label"))} · ${esc(t("matpage_note"))}</p>
+        <p class="muted mt-3">${cat.total} ${esc(t("mat_count_label"))} · ${esc(t("matpage_note"))}</p>
         <p class="muted" id="matpage-empty" hidden>${esc(t("mat_none"))}</p>
       </div>
     </section>
@@ -821,7 +821,7 @@ export function androidMain(lang, t, calcs, cat) {
     </div>
   </section>
 
-  <section class="block" style="padding-top:8px">
+  <section class="block pt-2">
     <div class="wrap">
       <div class="stat-band">
         <div class="stat">${freePrice(lang)}<div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
@@ -950,7 +950,7 @@ export function projectsMain(lang, t) {
       </form>
       <ul id="ws-project-list" class="data-list"></ul>
 
-      <h2 style="margin-top:36px">${esc(t("ws_rooms"))}</h2>
+      <h2 class="mt-8">${esc(t("ws_rooms"))}</h2>
       <p class="muted">${esc(t("wspage_rooms_d"))}</p>
       <form id="ws-room-form" class="inline-form">
         <input id="ws-room-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_room"))}" required>
@@ -1104,13 +1104,13 @@ export function storesMain(lang, t) {
           <iframe id="store-map" class="map-frame" title="${esc(t("storespage_title"))}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=sklep%20budowlany&amp;z=6&amp;output=embed"></iframe>
         </div>
         <div class="store-panel" id="store-panel">
-          <button id="find-near" type="button" class="btn btn-primary" style="width:100%;justify-content:center">
+          <button id="find-near" type="button" class="btn btn-primary btn-block">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
             <span>${esc(t("stores_near"))}</span>
           </button>
           <p class="store-status" id="store-status" role="status" aria-live="polite"></p>
           <ul id="store-list" class="store-list" aria-label="${esc(t("storespage_title"))}"></ul>
-          <button id="store-more" class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:4px" hidden></button>
+          <button id="store-more" class="btn btn-ghost btn-block mt-3" hidden></button>
 
           <div class="store-search-block">
             <form id="store-search" role="search">
@@ -1120,10 +1120,10 @@ export function storesMain(lang, t) {
                 <button class="btn btn-ghost" type="submit">${esc(t("stores_show_map"))}</button>
               </div>
             </form>
-            <p class="muted" style="font-size:.85rem;margin-top:10px">${esc(t("stores_examples"))}</p>
-            <div class="chips" style="margin-top:8px">${chips}</div>
+            <p class="muted text-sm mt-3">${esc(t("stores_examples"))}</p>
+            <div class="chips mt-3">${chips}</div>
           </div>
-          <p class="muted" style="font-size:.82rem;margin-top:16px">${esc(t("stores_note"))}</p>
+          <p class="muted text-xs mt-4">${esc(t("stores_note"))}</p>
         </div>
       </div>
     </div>

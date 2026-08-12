@@ -123,8 +123,15 @@ src/site.mjs          Languages, URL slugs per section/calculator/guide — the 
 src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
 src/pages.mjs         The <main> of each page type
 src/calc-meta.mjs     Per-calculator formula lines + their translations
+src/tokens.mjs        validateTokens(): the design system, checked. The two themes
+                      must carry the same tokens, every var() must resolve, and no
+                      rule outside the token block may invent a colour, a radius or
+                      a duration. Runs inside the build. Narrative: docs/DESIGN_SYSTEM.md
+scripts/check-contrast.mjs  Every text/background token pair, both themes, against
+                      WCAG AA. Not part of the build — run it after touching a colour
 src/app-pages.mjs     /app/ and /p/ (noindex, translated in the browser)
-assets/styles.css     Olive Green Material 3 design system
+assets/styles.css     The design system: one token block, then the components that
+                      spend it. Never write a literal colour/radius/duration below it
 assets/i18n.js        4-language dictionary (build input)
 assets/i18n-pages.js  Sub-page dictionary, same 4 languages (build input)
 assets/i18n-materials.js  Material names/terms, same 4 languages (build input)
@@ -142,6 +149,8 @@ assets/app.js         /app/ — Firebase Auth + Firestore sync, same schema as t
 assets/share.js       /p/<token> — read-only shared estimate
 assets/firebase-config.js  Firebase Web config (see the placeholders inside)
 privacy-policy.html   Full privacy policy (PL + EN) — required by Google Play
+docs/DESIGN_SYSTEM.md Colour, type, spacing, radius, elevation, motion, components,
+                      states, breakpoints, both themes — and what the build enforces
 docs/ARCHITEKTURA.md  Information architecture: pages, routing, navigation, the
                       three access levels, user flows, and the open decisions
 docs/DOKUMENTACJA.md  Full project documentation

@@ -28,8 +28,44 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 1 | Rebranding + nowy design | **Zrobione** — 2026-08-12, commit `2422c46` |
 | 2 | Języki i waluty | **Zrobione** — 2026-08-12 |
 | 3 | Architektura informacji | **Zrobione** — 2026-08-12 |
-| 4 | Design system | **Następna** |
-| 5–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 4 | Design system | **Zrobione** — 2026-08-12 |
+| 5 | Globalny layout | **Następna** |
+| 6–36 | patrz rozdział XXXII planu | Nie zaczęte |
+
+### Co zrobiła Sesja 4
+
+Sesja materiałowa: ustalenie tokenów i komponentów, bez przebudowy układu stron
+(to Sesje 5–7). Pełny dokument: **[`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md)**.
+
+- **Blok tokenów w `assets/styles.css`** — kolor (osobno dla obu motywów), typografia
+  (7 stopni stałych + 3 płynne), spacing na siatce 4px, 5 zaokrągleń, 3 stopnie
+  cienia, 4 czasy animacji, metryki kontrolek. Żadna reguła poniżej nie wpisuje już
+  własnego koloru, zaokrąglenia ani czasu.
+- **`src/tokens.mjs` — `validateTokens()` w buildzie.** Cztery sprawdzenia: token
+  bez pary w drugim motywie, rozjechane dwie kopie palety ciemnej, `var()` bez
+  definicji, literał tam, gdzie należy się token. Każde przetestowane negatywnie —
+  arkusz celowo zepsuty, build faktycznie padł.
+- **`scripts/check-contrast.mjs`** — 30 par tekst/tło i krawędź/tło w obu motywach.
+  Trzy pary nie przechodziły AA i zostały naprawione: link na sekcji `.alt`
+  i w stopce (`--accent-strong` przyciemniony do `#476c00`), oraz odwrócony przycisk
+  w banerze aplikacji (miał ciemną zieleń na czerni, 3,71:1 — dostał limonkę).
+  Teraz przechodzą wszystkie.
+- **Komponenty scalone w jedną regułę na komponent**: karta (6 selektorów miało tę
+  samą definicję), pole formularza (7 osobnych reguł, każda z innym tłem
+  i innym rozmiarem tekstu), wiersz listy (3), chip/zakładka (3), plakietka Play (2).
+- **Stany zdefiniowane raz**: hover, active, focus, disabled, wybrany, błędny.
+  Wcześniej `:disabled` nie było wcale — wyłączony przycisk w `/app/` wyglądał jak
+  włączony. Obwódka fokusu przestała prostować pigułki (`border-radius: 4px`
+  w regule `:focus-visible`).
+- **Pola formularza**: 44px wysokości, tekst 16px (poniżej 16px iOS Safari przybliża
+  stronę przy kliknięciu w pole) i krawędź `--outline-control` trzymana na 3:1
+  zamiast ledwie widocznego włosa.
+- **Breakpointy: 7 → 4** (560 / 760 / 900 / 1160). Zmiany układu bez zmiany zasad.
+- **Koniec ze stylami inline w HTML** — 24 atrybuty `style="…"` w `src/pages.mjs`,
+  `src/app-pages.mjs`, `assets/calculators.js` i `404.html` zastąpiły klasy systemu.
+
+Matematyka kalkulatorów nietknięta: w `assets/calculators.js` zmieniły się wyłącznie
+dwa fragmenty HTML wyniku (styl inline → klasa).
 
 ### Co zrobiła Sesja 3
 

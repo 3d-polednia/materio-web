@@ -68,6 +68,8 @@ src/site.mjs             Mapa serwisu: języki, slugi sekcji/kalkulatorów/porad
 src/template.mjs         Wspólny <head>, nagłówek, stopka, baner zgody, okruszki
 src/pages.mjs            Zawartość <main> każdego typu strony
 src/calc-meta.mjs        Wzory „Jak to liczymy" + ich tłumaczenia
+src/tokens.mjs           Kontrola systemu projektowego (validateTokens) — czyta styles.css
+scripts/check-contrast.mjs  Pomiar kontrastu tokenów w obu motywach (WCAG AA)
 src/app-pages.mjs        /app/ i /p/ (noindex)
 privacy-policy.html      Polityka prywatności (PL + EN) — osobna podstrona (wymóg Google Play)
 404.html                 Strona błędu 404; przekierowuje też /p/<token> na /p/?t=<token>
@@ -75,7 +77,7 @@ site.webmanifest         Manifest PWA (nazwa, ikony, kolory)
 robots.txt               Reguły dla robotów + odnośnik do sitemap
 .nojekyll                Wyłącza przetwarzanie Jekyll na GitHub Pages
 assets/
-  styles.css             System projektowy Olive Green Material 3 + wszystkie komponenty
+  styles.css             System projektowy: tokeny + wszystkie komponenty (DESIGN_SYSTEM.md)
   i18n.js                Słownik 4 języków (LANGS, I18N) — wejście builda
   i18n-pages.js          Słownik podstron, te same 4 języki — wejście builda
   i18n-runtime.js        t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/
@@ -95,6 +97,8 @@ assets/
   pages.yml              Automatyczne wdrożenie na GitHub Pages
 docs/
   DOKUMENTACJA.md        Ten plik
+  DESIGN_SYSTEM.md       System projektowy: tokeny, komponenty, stany, motywy
+  ARCHITEKTURA.md        Architektura informacji: strony, routing, poziomy dostępu
 ```
 
 Kolejność ładowania skryptów na `index.html` (na końcu `<body>`):
@@ -339,16 +343,23 @@ Google Search Console i zgłosić `sitemap.xml`.
 
 ## 10. System projektowy (CSS)
 
-- Wszystko w `assets/styles.css`. Paleta „Olive Green Material 3" jako zmienne CSS
-  w `:root`, z osobnym zestawem dla trybu ciemnego (`@media (prefers-color-scheme: dark)`).
-- Kluczowe tokeny: `--olive`, `--olive-dark`, `--bg`, `--surface`, `--on-bg`,
-  `--muted`, `--outline`, `--radius`, `--shadow`. Zmiana marki = zmiana kilku
-  zmiennych na górze pliku.
+Pełny opis: **[`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md)** — kolory, typografia, spacing,
+komponenty, stany, responsywność, oba motywy. Skrót:
+
+- Wszystko w `assets/styles.css`: blok tokenów na górze, pod nim warstwy (baza →
+  układ → komponenty → chrom serwisu → strony → narzędzia → responsywność → druk).
+- **Żadna reguła poza blokiem tokenów nie wpisuje własnego koloru, zaokrąglenia ani
+  czasu animacji.** Pilnuje tego `validateTokens()` z `src/tokens.mjs`, wywoływane
+  w buildzie — złamanie zasady przerywa build.
+- Trzy grupy tokenów: kolor (osobno dla motywu jasnego i ciemnego), skale
+  (`--fs-*`, `--sp-*`, `--radius-*`, `--shadow-1..3`, `--dur-*`) i metryki kontrolek
+  (`--control-h` 44px, `--focus-*`).
+- Dwa motywy = te same reguły, inne wartości tokenów koloru. Motyw wybrany ręcznie
+  siedzi w `data-theme` na `<html>`, brak wyboru = motyw systemowy.
 - Font: systemowy stack (`--font`) — bez pobierania czcionek z sieci (szybkość +
   prywatność).
-- Komponenty: nagłówek/nav, hero + „telefon", pasek statystyk, karty funkcji,
-  kroki, kalkulatory, lista sklepów (`.store-list`, `.store-item`), sekcja
-  zaufania, FAQ (`<details>`), CTA, stopka, strona dokumentu (`.doc`) dla polityki.
+- Kontrast: `node scripts/check-contrast.mjs` mierzy każdą parę tekst/tło w obu
+  motywach (WCAG AA) i zwraca kod 1, gdy któraś nie trafia w próg.
 
 ## 11. Assety: ikona, baner, OG, favicon
 

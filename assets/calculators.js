@@ -390,8 +390,8 @@ function renderResult(card, res) {
     return `<div><span>${t(k, lang)}</span><b>${val}</b></div>`;
   });
   if (res.cost && res.cost > 0) rows.unshift(`<div><span>${t("res_cost", lang)}</span><b>${money(res.cost, lang)}</b></div>`);
-  box.innerHTML = `<div class="muted" style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em">${t("res_tobuy", lang)}</div>
-    <div class="big">${qty(res.tobuy, lang)} <span style="font-size:1rem;font-weight:600">${t(res.unit, lang)}</span></div>
+  box.innerHTML = `<div class="muted eyebrow">${t("res_tobuy", lang)}</div>
+    <div class="big">${qty(res.tobuy, lang)} <span class="figure-line">${t(res.unit, lang)}</span></div>
     <div class="rows">${rows.join("")}</div>`;
 
   // The workspace (assets/workspace-ui.js) hangs the "save to the estimate" button off

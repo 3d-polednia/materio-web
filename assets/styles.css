@@ -1,29 +1,63 @@
 /* LiczMat design system.
+   ============================================================================
+   The whole visual language of the site is the token block below. Nothing under
+   it invents a colour, a size, a radius, a shadow or a duration: a component
+   picks tokens, and the two themes stay one product because they differ only in
+   what the colour tokens resolve to.
 
-   Two themes of one product: a warm, slightly creamy off-white by day and the graphite
-   near-black of the reference mockup by night. Only surfaces, text and borders change —
-   the structure, the spacing and the lime brand colour are the same in both.
+   Adding a component? Use the tokens. If none fits, add a token here and say in
+   docs/DESIGN_SYSTEM.md what it is for — a stray literal in a rule 600 lines
+   down is how a design system stops being one.
 
-   Theme resolution has three states. Bare :root is the light theme and the fallback.
-   A visitor who has never chosen follows the system (the prefers-color-scheme block,
-   guarded so an explicit "light" still wins). A visitor who has chosen gets
-   data-theme on <html>, written by the inline script in <head> before the first paint
-   and by assets/main.js on click.
+   Layers, in this order:
+     1. tokens — colour (per theme), then the theme-independent scales
+     2. base   — reset, document, typography
+     3. layout — page shell, sections, grids
+     4. components — buttons, controls, cards, chips, messages, dialogs, tables
+     5. site chrome — header, navigation, footer, consent
+     6. pages — what a single page composes on top of the components
+     7. utilities and print
 
-   --accent       lime fills (buttons, indicators). Only ever carries --on-accent text.
-   --accent-strong readable lime/green for text and links; it is NOT the fill colour,
-                  because #91d206 on cream is far below 4.5:1.
-   --brand-lime   the logo's green. Fixed in both themes — it is the mark, not a surface. */
+   Theme resolution has three states. Bare :root is the light theme and the
+   fallback. A visitor who has never chosen follows the system (the
+   prefers-color-scheme block, guarded so an explicit "light" still wins). A
+   visitor who has chosen gets data-theme on <html>, written by the inline script
+   in <head> before the first paint and by assets/main.js on click.
+
+   The dark palette is therefore written twice — a media query cannot be joined
+   to a selector list, so there is no way to state it once. The two blocks must
+   stay identical; scripts/build.mjs compares them token by token and fails the
+   build if one gains a token the other lacks, or if a light token is missing a
+   dark value. Never edit one of them alone. */
+
+/* ============================================================ 1. TOKENS — colour
+   Roles, not names. A component asks for "the colour of a muted line of text",
+   never for "grey", which is what lets one rule serve both themes.
+
+   --accent        lime fills (buttons, indicators). Only ever carries --on-accent.
+   --accent-strong readable lime/green for text, links and icons. It is NOT the
+                   fill colour: #91d206 on cream is far below 4.5:1.
+   --brand-lime    the logo's green. Fixed in both themes — it is the mark, not a
+                   surface, and it must not drift with the theme.
+   --*-soft        a tinted container; pair it only with the matching --on-*-soft.
+   --outline       hairlines between things that are already distinguishable.
+   --outline-control the border of an input or a select, which is the only thing
+                   telling the visitor where to click, so it is held at 3:1
+                   against the field (WCAG 1.4.11) rather than at hairline weight.
+   Contrast: every text/background pair below is checked in
+   scripts/check-contrast.mjs; body text clears AA 4.5:1, large text and UI
+   borders clear 3:1. */
 
 :root {
   --brand-lime: #91d206;
 
   --accent: #91d206;
-  --accent-strong: #4f7a00;
+  --accent-strong: #476c00;
   --on-accent: #0d1117;
   --accent-soft: #e8f5c8;
   --on-accent-soft: #2b4000;
   --accent-soft-2: #dcedbb;
+  --accent-edge: #476c00;
   --tertiary: #2c6a5e;
   --tertiary-container: #d3ebe4;
   --bg: #faf7f0;
@@ -35,18 +69,25 @@
   --muted: #5c6570;
   --outline: #e0dacd;
   --outline-strong: #cbc4b4;
+  --outline-control: #8b8577;
+  --field-bg: #fbf9f4;
   --error: #b3261e;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --radius-lg: 22px;
-  --shadow: 0 1px 2px rgba(20,24,28,.06), 0 6px 20px rgba(20,24,28,.05);
-  --shadow-lg: 0 8px 40px rgba(20,24,28,.12);
-  --maxw: 1160px;
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --error-soft: #fbe7e5;
+  --on-error-soft: #7d1a14;
+  --success: #24702c;
+  --success-soft: #dff0dc;
+  --on-success-soft: #14471a;
+  --warning: #8a5300;
+  --warning-soft: #fbeed6;
+  --on-warning-soft: #5c3700;
+  --overlay: rgba(20, 24, 28, .45);
+  --shadow-1: 0 1px 2px rgba(20,24,28,.06);
+  --shadow-2: 0 1px 2px rgba(20,24,28,.06), 0 6px 20px rgba(20,24,28,.05);
+  --shadow-3: 0 8px 40px rgba(20,24,28,.12);
 }
 
-/* The dark palette, sampled from the reference mockup. Declared once and applied twice:
-   to visitors following the system, and to visitors who picked dark by hand. */
+/* The dark palette, sampled from the reference mockup. Kept in step with the
+   light one by validateTokens() in scripts/build.mjs — see the header. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --accent: #91d206;
@@ -55,6 +96,7 @@
     --accent-soft: #1c2c06;
     --on-accent-soft: #cbee85;
     --accent-soft-2: #22330b;
+    --accent-edge: #91d206;
     --tertiary: #7fd0c0;
     --tertiary-container: #113a33;
     --bg: #060c12;
@@ -66,9 +108,21 @@
     --muted: #a4abb3;
     --outline: #202932;
     --outline-strong: #2d3236;
+    --outline-control: #5a636d;
+    --field-bg: #080f16;
     --error: #ff8a80;
-    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.35);
-    --shadow-lg: 0 8px 40px rgba(0,0,0,.55);
+    --error-soft: #3a1512;
+    --on-error-soft: #ffb4ab;
+    --success: #86d98a;
+    --success-soft: #10240f;
+    --on-success-soft: #b7ecb9;
+    --warning: #ffc46b;
+    --warning-soft: #30230a;
+    --on-warning-soft: #ffd79a;
+    --overlay: rgba(0, 0, 0, .62);
+    --shadow-1: 0 1px 2px rgba(0,0,0,.5);
+    --shadow-2: 0 1px 2px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.35);
+    --shadow-3: 0 8px 40px rgba(0,0,0,.55);
   }
 }
 
@@ -79,6 +133,7 @@
   --accent-soft: #1c2c06;
   --on-accent-soft: #cbee85;
   --accent-soft-2: #22330b;
+  --accent-edge: #91d206;
   --tertiary: #7fd0c0;
   --tertiary-container: #113a33;
   --bg: #060c12;
@@ -90,10 +145,121 @@
   --muted: #a4abb3;
   --outline: #202932;
   --outline-strong: #2d3236;
+  --outline-control: #5a636d;
+  --field-bg: #080f16;
   --error: #ff8a80;
-  --shadow: 0 1px 2px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.35);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,.55);
+  --error-soft: #3a1512;
+  --on-error-soft: #ffb4ab;
+  --success: #86d98a;
+  --success-soft: #10240f;
+  --on-success-soft: #b7ecb9;
+  --warning: #ffc46b;
+  --warning-soft: #30230a;
+  --on-warning-soft: #ffd79a;
+  --overlay: rgba(0, 0, 0, .62);
+  --shadow-1: 0 1px 2px rgba(0,0,0,.5);
+  --shadow-2: 0 1px 2px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.35);
+  --shadow-3: 0 8px 40px rgba(0,0,0,.55);
 }
+
+/* ================================================ 1b. TOKENS — the scales
+   Theme-independent: a heading is the same size at night as by day.
+
+   TYPE — seven fixed steps plus three fluid heading steps. Body text is 1rem and
+   never smaller than .875rem, except
+   --fs-xs which is for uppercase labels, never for a sentence. A control's text
+   stays at 1rem: below 16px iOS Safari zooms the page when the field is focused.
+   The three heading steps are fluid — one clamp() instead of a phone breakpoint.
+
+   SPACE — a 4px grid. The number in the name is the value in quarters:
+   --sp-3 is 12px, --sp-6 is 24px. Nothing on the site uses a gap that is not on
+   this scale, which is what makes rhythm survive a new component.
+
+   RADIUS — xs for inputs and small rows, sm for chips and tiles, md (--radius)
+   for cards, lg for the big panels, pill for buttons and anything track-shaped.
+
+   ELEVATION — three steps. 1 lifts a row off its background, 2 is the resting
+   card, 3 is "floating above the page": menus, dialogs, hover on a card.
+
+   MOTION — snappy on press, calm on colour, one easing curve. All of it is
+   switched off under prefers-reduced-motion further down.
+
+   BREAKPOINTS — 560 / 760 / 900 / 1160. They are written out in the media
+   queries because CSS cannot use a variable there; do not invent a fifth. */
+
+:root {
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --fs-xs: .78rem;
+  --fs-sm: .875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 1.75rem;
+  --fs-h3: 1.2rem;
+  --fs-h2: clamp(1.6rem, 1.15rem + 2.2vw, 2.4rem);
+  --fs-h1: clamp(1.8rem, 1.35rem + 2.4vw, 2.6rem);
+  --fs-display: clamp(2.1rem, 1.3rem + 4vw, 3.6rem);
+
+  --lh-tight: 1.15;
+  --lh-snug: 1.35;
+  --lh-base: 1.6;
+  --fw-medium: 500;
+  --fw-semi: 600;
+  --fw-bold: 700;
+  --fw-black: 800;
+  --track-tight: -.02em;
+  --track-wide: .06em;
+  --track-wider: .1em;
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 28px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius: 16px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --dur-fast: 100ms;
+  --dur: 180ms;
+  --dur-slow: 320ms;
+  /* The screenshot carousel is content moving on its own, not the interface
+     answering a click, so it is slower than anything a visitor triggers. */
+  --dur-carousel: 800ms;
+  --ease: cubic-bezier(.2, .7, .3, 1);
+
+  /* A tap target is 44px tall, on desktop as well — the plan is mobile-first and
+     a second set of sizes for the mouse is a second design. --control-h-sm is for
+     controls that sit in the header bar, where 44px would outgrow the row. */
+  --control-h: 44px;
+  --control-h-sm: 36px;
+  --control-h-lg: 52px;
+  --control-px: 14px;
+
+  --focus: var(--accent-strong);
+  --focus-w: 2px;
+  --focus-offset: 2px;
+
+  --maxw: 1160px;
+  --gutter: var(--sp-5);
+  --section-y: clamp(48px, 6vw, 68px);
+}
+
+/* ================================================================== 2. BASE
+   The document, the elements the pages use bare, and the two states every
+   interactive thing on the site shares: focus and disabled. */
 
 :root { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }
@@ -101,6 +267,7 @@
 
 * { box-sizing: border-box; }
 
+/* A visitor who asks the system for less movement gets none of ours. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -113,22 +280,343 @@ html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 body {
   margin: 0;
   font-family: var(--font);
+  font-size: var(--fs-base);
   background: var(--bg);
   color: var(--on-bg);
-  line-height: 1.6;
+  line-height: var(--lh-base);
   -webkit-font-smoothing: antialiased;
 }
-h1, h2, h3 { line-height: 1.2; margin: 0 0 .5em; letter-spacing: -.02em; }
-h1 { font-size: clamp(2.1rem, 5vw, 3.6rem); font-weight: 800; }
-h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 750; }
-h3 { font-size: 1.2rem; font-weight: 700; }
+
+/* Type. Four heading levels, three of them fluid, all from the scale. h1 is the
+   page title; --fs-display is bigger still and belongs to the hero alone. */
+h1, h2, h3, h4 { line-height: var(--lh-tight); margin: 0 0 .5em; letter-spacing: var(--track-tight); }
+h1 { font-size: var(--fs-h1); font-weight: var(--fw-black); }
+h2 { font-size: var(--fs-h2); font-weight: var(--fw-bold); }
+h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); }
+h4 { font-size: var(--fs-base); font-weight: var(--fw-bold); }
 p { margin: 0 0 1rem; }
 a { color: var(--accent-strong); text-decoration: none; }
 a:hover { text-decoration: underline; }
 img, svg { max-width: 100%; }
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
-.muted { color: var(--muted); }
-.center { text-align: center; }
+
+/* One focus ring for the whole site. It does not touch border-radius — an
+   outline follows the element's own corners, and forcing a radius here used to
+   square off every pill button the moment it took focus. */
+:focus-visible {
+  outline: var(--focus-w) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+/* Disabled means the same everywhere: dimmed, unclickable, no elevation. */
+:disabled, [aria-disabled="true"] { cursor: not-allowed; opacity: .5; box-shadow: none; }
+
+/* `.result.show` is an author rule, so it outranks the UA stylesheet's `[hidden]`
+   and an element carrying both would stay on screen — which is how /app/ managed to
+   show "Firebase configuration missing" over a perfectly good configuration. Any
+   element the JS hides with .hidden must actually disappear, whatever classes it has. */
+[hidden] { display: none !important; }
+
+/* ================================================================ 3. LAYOUT
+   The page shell: one content width, one gutter, one vertical rhythm for a
+   section. Everything else composes inside them. */
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+.wrap.narrow { max-width: 760px; }
+section.block { padding: var(--section-y) 0; }
+/* A section that has to fill the window even with two lines in it: /404/. */
+.block-fill { min-height: 60vh; display: flex; align-items: center; }
+.alt { background: var(--surface-alt); }
+
+.section-head { max-width: 62ch; margin: 0 auto var(--sp-10); text-align: center; }
+.section-head.left { text-align: left; margin-left: 0; }
+.kicker {
+  color: var(--accent-strong); font-weight: var(--fw-black);
+  text-transform: uppercase; letter-spacing: var(--track-wider); font-size: var(--fs-xs);
+}
+
+/* The head of a generated sub-page: crumbs, title, one line of lead. */
+.page-head { padding-bottom: var(--sp-2); }
+.page-head h1 { margin: var(--sp-2) 0 var(--sp-2); }
+.page-head .lead { color: var(--muted); max-width: 62ch; margin: 0; }
+
+.breadcrumbs { font-size: var(--fs-sm); color: var(--muted); }
+.breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: 0; padding: 0; }
+.breadcrumbs li + li::before { content: "›"; margin-right: var(--sp-2); color: var(--outline-strong); }
+.breadcrumbs a { color: var(--muted); text-decoration: none; }
+.breadcrumbs a:hover { color: var(--accent-strong); text-decoration: underline; }
+
+/* Two equal columns that become one below the desktop breakpoint. */
+.split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-7); align-items: start; }
+@media (max-width: 900px) { .split-2 { grid-template-columns: 1fr; } }
+
+/* ============================================================ 4. COMPONENTS */
+
+/* ---------- Button
+   One shape (pill), three intents (primary, ghost, danger), three sizes. Height
+   comes from --control-h so a button and a field next to it line up. */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  font: inherit; font-weight: var(--fw-bold); cursor: pointer; text-align: center;
+  min-height: var(--control-h); padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-pill); border: 1px solid transparent;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease),
+              background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.btn:hover { text-decoration: none; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled:active, .btn[aria-disabled="true"]:active { transform: none; }
+/* The lime fill is only 1.7:1 against the cream page, so on the light theme the
+   button's own edge is what makes its shape visible (WCAG 1.4.11). On the dark
+   theme the fill already clears 3:1 and --accent-edge is the fill itself. */
+.btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2); }
+.btn-primary:hover { box-shadow: var(--shadow-3); }
+.btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline-strong); }
+.btn-ghost:hover { background: var(--surface-alt); }
+.btn-danger { background: var(--error); color: var(--surface); }
+.btn-danger:hover { opacity: .92; }
+.btn-sm { min-height: var(--control-h-sm); padding: var(--sp-2) var(--sp-4); font-size: var(--fs-sm); }
+.btn-lg { min-height: var(--control-h-lg); padding: var(--sp-3) var(--sp-6); font-size: var(--fs-md); }
+/* A button that owns its line — the form's submit, the dialog opener. */
+.btn-block { width: 100%; }
+
+/* ---------- Chip
+   A small, non-committal control: a filter, a shortcut, a tag. `.on` is the
+   selected state; `.warn` is a chip that reports a problem rather than offering a
+   choice. Tabs are the same object with a different job, hence the shared rule. */
+.chip, .calc-tab, .app-tab {
+  font: inherit; cursor: pointer; text-align: center;
+  border-radius: var(--radius-pill); border: 1px solid var(--outline);
+  background: var(--surface-alt); color: var(--on-bg);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.chip { font-size: var(--fs-xs); padding: var(--sp-1) var(--sp-3); }
+.chip:hover { background: var(--accent-soft-2); }
+.chip.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.chip.warn {
+  background: var(--error-soft); color: var(--on-error-soft);
+  border-color: color-mix(in srgb, var(--error) 34%, var(--outline));
+}
+
+.calc-tab { font-weight: var(--fw-semi); font-size: var(--fs-sm); padding: var(--sp-2) var(--sp-4); background: var(--surface); }
+.calc-tab[aria-selected="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.calc-tabs { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; margin-bottom: var(--sp-7); }
+
+.app-tab { font-weight: var(--fw-semi); font-size: var(--fs-sm); padding: var(--sp-2) var(--sp-4); background: transparent; border-color: transparent; color: var(--muted); }
+.app-tab:hover { background: var(--surface-alt); color: var(--on-bg); }
+.app-tab[aria-selected="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.app-tabs {
+  display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-5) 0 var(--sp-6);
+  border-bottom: 1px solid var(--outline); padding-bottom: var(--sp-3);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+
+/* A badge states a fact; it is not clickable, so it has no hover. */
+.badge {
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  background: var(--surface); border: 1px solid var(--outline);
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-pill);
+  font-weight: var(--fw-semi); font-size: var(--fs-sm);
+  box-shadow: var(--shadow-2); margin-bottom: var(--sp-5);
+}
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+/* ---------- Card
+   The one raised surface of the site. Everything that looks like a card is this
+   rule; what differs is padding and what sits inside. Only .card lifts on hover,
+   because only .card is ever a link. */
+.card, .calc, .step, .trust-panel, .app-card, .ws-estimate {
+  background: var(--surface); border: 1px solid var(--outline);
+  border-radius: var(--radius); box-shadow: var(--shadow-2);
+}
+.card, .trust-panel, .ws-estimate { padding: var(--sp-7); }
+.calc { padding: var(--sp-6); }
+.app-card { padding: var(--sp-5); border-radius: var(--radius-sm); margin-bottom: var(--sp-4); }
+.card { transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
+.card h3 { margin-bottom: var(--sp-2); }
+.card p { color: var(--muted); margin: 0; }
+.app-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
+.app-card p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
+/* Account deletion is irreversible, so it is set apart rather than sitting in the
+   same list as "change your password". */
+.app-card.danger {
+  border-color: color-mix(in srgb, var(--error) 40%, var(--outline));
+  background: color-mix(in srgb, var(--error) 5%, var(--surface));
+}
+
+/* An icon tile — the square behind a card's glyph. Two colour pairs: accent for
+   the product's own features, tertiary for anything about the app or privacy. */
+.card .ico, .trust-list .tick {
+  border-radius: var(--radius-xs); background: var(--accent-soft); color: var(--on-accent-soft);
+  display: grid; place-items: center; flex: none;
+}
+.card .ico { width: 46px; height: 46px; margin-bottom: var(--sp-3); }
+.calc h2 .ico, .calc h3 .ico, .trust-panel .shield {
+  border-radius: var(--radius-xs); background: var(--tertiary-container); color: var(--tertiary);
+  display: grid; place-items: center; flex: none;
+}
+.calc h2 .ico, .calc h3 .ico { width: 34px; height: 34px; }
+.trust-panel .shield { width: 40px; height: 40px; }
+
+/* ---------- Form controls
+   Every field on the site is this one rule: same height as a button, 16px text
+   (anything smaller makes iOS Safari zoom the page on focus), a border strong
+   enough to see against the field, and one focus treatment. */
+.field input, .field select, .search-row input, .inline-form input,
+.mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input {
+  width: 100%; font: inherit; font-size: var(--fs-base); line-height: var(--lh-snug);
+  min-height: var(--control-h); padding: var(--sp-2) var(--control-px);
+  border-radius: var(--radius-xs); border: 1px solid var(--outline-control);
+  background: var(--field-bg); color: var(--on-surface);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.field input:hover, .field select:hover, .search-row input:hover, .inline-form input:hover,
+.mat-search:hover, .ws-bar-row select:hover, .ws-estimate-bar select:hover {
+  border-color: var(--on-surface);
+}
+.field input:focus-visible, .field select:focus-visible, .search-row input:focus-visible,
+.inline-form input:focus-visible, .mat-search:focus-visible, .ws-bar-row select:focus-visible,
+.ws-estimate-bar select:focus-visible, .ws-editing input:focus-visible {
+  border-color: var(--accent);
+}
+/* A field the browser or the page has marked wrong. Colour is never the only
+   signal — the message under the form says what to fix. */
+[aria-invalid="true"] { border-color: var(--error) !important; }
+[aria-invalid="true"]:focus-visible { outline-color: var(--error); }
+
+.field { margin-bottom: var(--sp-3); }
+.field label, .fld-label, .ws-bar-label {
+  display: block; font-weight: var(--fw-semi); font-size: var(--fs-sm); margin-bottom: var(--sp-1);
+}
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+
+/* ---------- Message
+   One box for "here is your answer" and "that did not work": the calculator's
+   result, the account page's status line. `.err` is the failure variant. */
+.result {
+  margin-top: var(--sp-4); padding: var(--sp-4); border-radius: var(--radius-sm);
+  background: var(--accent-soft); color: var(--on-accent-soft);
+  display: none;
+}
+.result.show { display: block; }
+.result.err { background: var(--error-soft); color: var(--on-error-soft); }
+.result .big { font-size: var(--fs-2xl); font-weight: var(--fw-black); line-height: var(--lh-tight); }
+.result .rows { margin-top: var(--sp-3); display: grid; gap: 3px; font-size: var(--fs-sm); }
+.result .rows div { display: flex; justify-content: space-between; gap: var(--sp-3); }
+
+/* A quiet aside inside body copy: the practical warning at the end of a guide. */
+.tip {
+  margin-top: var(--sp-6); padding: var(--sp-4); border-radius: var(--radius);
+  background: var(--accent-soft); color: var(--on-accent-soft);
+}
+.tip b {
+  display: block; margin-bottom: var(--sp-2); text-transform: uppercase;
+  letter-spacing: var(--track-wide); font-size: var(--fs-xs);
+}
+.tip p { margin: 0; }
+
+/* ---------- Row list
+   A list of things you can act on: saved rooms, nearby stores, catalogue entries.
+   Same box, same border, same radius; the contents differ. */
+.data-list, .store-list, .mat-page-list { list-style: none; margin: 0; padding: 0; }
+.data-list li, .store-item, .mat-page-list li {
+  display: flex; align-items: center; gap: var(--sp-3);
+  background: var(--surface); border: 1px solid var(--outline);
+  border-radius: var(--radius-sm); padding: var(--sp-3) var(--sp-4);
+}
+.data-list { margin-bottom: var(--sp-2); }
+.data-list li { margin-bottom: var(--sp-2); }
+.data-list li.empty { display: block; background: none; border-style: dashed; }
+.data-list li.done .row-name { text-decoration: line-through; opacity: .6; }
+.data-list li.on { border-color: var(--accent); }
+.row-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.row-name em { display: block; font-style: normal; font-size: var(--fs-sm); }
+.row-actions { display: flex; gap: var(--sp-2); flex: none; }
+
+/* ---------- Table
+   Used once, by the estimate, which is also the one thing on the site meant to
+   be printed. Numbers are tabular so columns of złoty line up. */
+.ws-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.ws-table th, .ws-table td { text-align: left; padding: var(--sp-3) var(--sp-2); border-bottom: 1px solid var(--outline); }
+.ws-table th {
+  font-size: var(--fs-xs); text-transform: uppercase;
+  letter-spacing: var(--track-wide); color: var(--muted);
+}
+.ws-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* The storage tables on /cookies/ are wide and the page is often read on a phone,
+   so they scroll inside their own box rather than pushing the page sideways. */
+.table-scroll { overflow-x: auto; margin: var(--sp-2) 0 var(--sp-1); }
+.table-scroll table { min-width: 560px; }
+.table-scroll code { font-size: var(--fs-sm); overflow-wrap: anywhere; }
+
+/* ---------- Disclosure (FAQ) */
+.faq { max-width: 780px; margin: 0 auto; display: grid; gap: var(--sp-3); }
+.faq details {
+  background: var(--surface); border: 1px solid var(--outline);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow-2); overflow: hidden;
+}
+.faq summary {
+  cursor: pointer; padding: var(--sp-4) var(--sp-5); font-weight: var(--fw-bold);
+  list-style: none; display: flex; justify-content: space-between; align-items: center; gap: var(--sp-3);
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: "+"; font-size: var(--fs-xl); color: var(--accent-strong);
+  font-weight: var(--fw-bold); line-height: 1; transition: transform var(--dur) var(--ease);
+}
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { margin: 0; padding: 0 var(--sp-5) var(--sp-4); color: var(--muted); }
+
+/* ---------- Code and formulas
+   A formula line can be longer than the column (the waste line on the coverage
+   calculator is), and a sideways scrollbar hides the end of it on a phone. Wrap
+   instead, with the continuation indented so a wrapped line still reads as one. */
+pre.formula {
+  margin: 0; padding: var(--sp-3) var(--sp-4); overflow-x: auto;
+  background: var(--surface-container); border: 1px solid var(--outline);
+  border-radius: var(--radius-sm);
+}
+pre.formula code {
+  font-family: var(--font-mono); font-size: var(--fs-sm); line-height: 1.7;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+  display: block; padding-left: 1.6em; text-indent: -1.6em;
+}
+
+/* ---------- Dialog
+   The catalogue is a modal because a calculator card is too small to hold ~160
+   rows, and because picking a material is a detour from the form, not part of it. */
+.mat-dialog {
+  width: min(680px, 94vw); max-height: 86vh; padding: 0; border: 1px solid var(--outline);
+  border-radius: var(--radius); background: var(--surface); color: var(--on-bg);
+  box-shadow: var(--shadow-3); overflow: hidden;
+}
+.mat-dialog::backdrop { background: var(--overlay); }
+.mat-dialog-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-4); padding: var(--sp-4) var(--sp-5) var(--sp-3);
+}
+.mat-dialog-head h2 { margin: 0; font-size: var(--fs-h3); }
+.mat-search { display: block; width: calc(100% - 2 * var(--sp-5)); margin: 0 var(--sp-5) var(--sp-3); }
+.mat-dialog .mat-cats { padding: 0 var(--sp-5); margin-bottom: var(--sp-2); max-height: 84px; overflow-y: auto; }
+.mat-list { overflow-y: auto; max-height: 52vh; padding: 0 var(--sp-3) var(--sp-4); }
+.mat-group {
+  position: sticky; top: 0; z-index: 1; margin: var(--sp-3) 0 var(--sp-1); padding: var(--sp-2);
+  font-size: var(--fs-xs); font-weight: var(--fw-black); text-transform: uppercase;
+  letter-spacing: var(--track-wide); color: var(--accent-strong); background: var(--surface);
+}
+.mat-row {
+  display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left;
+  font: inherit; cursor: pointer; padding: var(--sp-3); border: 0; border-radius: var(--radius-xs);
+  background: transparent; color: var(--on-bg);
+}
+.mat-row:hover, .mat-row:focus-visible { background: var(--surface-alt); }
+.mat-row-name { font-weight: var(--fw-bold); }
+.mat-row-note { font-size: var(--fs-sm); color: var(--muted); }
+.mat-empty { padding: 0 var(--sp-5) var(--sp-5); }
+
+/* ========================================================== 5. SITE CHROME */
 
 /* ---------- Header / nav ---------- */
 header.site {
@@ -137,8 +625,12 @@ header.site {
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   border-bottom: 1px solid var(--outline);
 }
-.nav { display: flex; align-items: center; gap: 18px; height: 64px; }
-.brand { order: 1; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; color: var(--on-bg); }
+.nav { display: flex; align-items: center; gap: var(--sp-4); height: 64px; }
+.brand {
+  order: 1; display: flex; align-items: center; gap: var(--sp-3);
+  font-weight: var(--fw-black); font-size: var(--fs-lg);
+  letter-spacing: var(--track-tight); color: var(--on-bg);
+}
 .brand:hover { text-decoration: none; }
 /* The mark's "M" is stroke="currentColor", so it inherits .brand's colour and flips
    with the theme; the lime stays lime. */
@@ -148,11 +640,11 @@ header.site {
    nav on mobile, so it is reachable whether or not the menu is open. */
 .theme-toggle {
   order: 3; display: inline-grid; place-items: center;
-  width: 38px; height: 38px; flex: none;
+  width: var(--control-h-sm); height: var(--control-h-sm); flex: none;
   background: var(--surface-alt); color: var(--on-bg);
-  border: 1px solid var(--outline); border-radius: 999px;
+  border: 1px solid var(--outline); border-radius: var(--radius-pill);
   cursor: pointer; padding: 0;
-  transition: background .2s ease, border-color .2s ease;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
 .theme-toggle:hover { background: var(--surface-container); border-color: var(--outline-strong); }
 .theme-toggle svg { grid-area: 1 / 1; }
@@ -165,15 +657,20 @@ header.site {
   :root:not([data-theme="light"]) .theme-toggle .ico-moon { display: none; }
 }
 
-.nav-links { order: 2; display: flex; gap: 4px; margin-left: auto; align-items: center; }
-.nav-links a { color: var(--on-bg); padding: 8px 12px; border-radius: 999px; font-weight: 600; font-size: .95rem; }
+.nav-links { order: 2; display: flex; gap: var(--sp-1); margin-left: auto; align-items: center; }
+.nav-links a {
+  color: var(--on-bg); padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-pill); font-weight: var(--fw-semi); font-size: var(--fs-sm);
+}
 .nav-links a:hover { background: var(--surface-alt); text-decoration: none; }
+.menu-toggle { order: 4; display: none; background: none; border: 0; cursor: pointer; color: var(--on-bg); }
+
 /* ---------- Language and currency ----------
    The plan (chapter V) rules out emoji flags, so a flag is a real SVG inlined next to the
    language's own name — and the name always stays, the flag never stands alone. A native
    <select> cannot hold an image, hence the button + list below. Every row is a link to
    that language's URL, so it works with JavaScript off. */
-.pickers { display: flex; align-items: center; gap: 6px; }
+.pickers { display: flex; align-items: center; gap: var(--sp-2); }
 .flag {
   display: inline-flex; flex: none; width: 20px; height: 14px;
   border-radius: 2px; overflow: hidden;
@@ -183,595 +680,481 @@ header.site {
 
 .lang-picker { position: relative; }
 .lang-btn, .cur-select {
-  font: inherit; font-weight: 600; font-size: .9rem;
+  font: inherit; font-weight: var(--fw-semi); font-size: var(--fs-sm);
   color: var(--on-bg); background: var(--surface-alt);
-  border: 1px solid var(--outline); border-radius: 999px;
-  padding: 7px 10px; cursor: pointer;
+  border: 1px solid var(--outline); border-radius: var(--radius-pill);
+  min-height: var(--control-h-sm); padding: var(--sp-1) var(--sp-3); cursor: pointer;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
-.lang-btn { display: inline-flex; align-items: center; gap: 7px; }
+.lang-btn { display: inline-flex; align-items: center; gap: var(--sp-2); }
 .lang-btn:hover, .cur-select:hover { background: var(--surface-container); border-color: var(--outline-strong); }
 .lang-btn .chev { opacity: .6; }
 .lang-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
 
 .lang-menu {
-  position: absolute; right: 0; top: calc(100% + 6px); z-index: 40;
-  min-width: 190px; margin: 0; padding: 6px; list-style: none;
-  background: var(--surface); border: 1px solid var(--outline); border-radius: 14px;
-  box-shadow: var(--shadow-lg);
+  position: absolute; right: 0; top: calc(100% + var(--sp-2)); z-index: 40;
+  min-width: 190px; margin: 0; padding: var(--sp-2); list-style: none;
+  background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius);
+  box-shadow: var(--shadow-3);
 }
 .lang-menu[hidden] { display: none; }
 .lang-item {
-  display: flex; align-items: center; gap: 10px; width: 100%;
-  font: inherit; font-weight: 600; font-size: .95rem; text-align: left;
-  color: var(--on-bg); background: none; border: 0; border-radius: 10px;
-  padding: 9px 10px; cursor: pointer;
+  display: flex; align-items: center; gap: var(--sp-3); width: 100%;
+  font: inherit; font-weight: var(--fw-semi); font-size: var(--fs-sm); text-align: left;
+  color: var(--on-bg); background: none; border: 0; border-radius: var(--radius-xs);
+  min-height: var(--control-h-sm); padding: var(--sp-2) var(--sp-3); cursor: pointer;
 }
 a.lang-item:hover, button.lang-item:hover { background: var(--surface-alt); text-decoration: none; }
 .lang-item.is-current { cursor: default; background: var(--accent-soft); }
-.btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  font: inherit; font-weight: 700; cursor: pointer;
-  padding: 11px 20px; border-radius: 999px; border: 1px solid transparent;
-  transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: absolute; left: -999px; top: 0; z-index: 100;
+  background: var(--accent); color: var(--on-accent);
+  padding: var(--sp-3) var(--sp-4); border-radius: 0 0 var(--radius-xs) 0; font-weight: var(--fw-bold);
 }
-.btn:hover { text-decoration: none; }
-.btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--accent); color: var(--on-accent); box-shadow: var(--shadow); }
-.btn-primary:hover { box-shadow: var(--shadow-lg); }
-.btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline); }
-.btn-ghost:hover { background: var(--surface-alt); }
-.btn-sm { padding: 8px 14px; font-size: .9rem; }
-.menu-toggle { order: 4; display: none; background: none; border: 0; cursor: pointer; color: var(--on-bg); }
+.skip-link:focus { left: 0; }
+
+/* ---------- Footer ---------- */
+footer.site {
+  background: var(--surface-container); border-top: 1px solid var(--outline);
+  padding: var(--sp-12) 0 var(--sp-7); margin-top: var(--sp-5);
+}
+.foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: var(--sp-7); }
+footer .brand { margin-bottom: var(--sp-3); }
+footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--sp-2); }
+footer a { color: var(--muted); }
+footer h4 {
+  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--track-wide);
+  color: var(--on-bg); margin: 0 0 var(--sp-3);
+}
+.foot-bottom {
+  margin-top: var(--sp-8); padding-top: var(--sp-4); border-top: 1px solid var(--outline);
+  display: flex; flex-wrap: wrap; gap: var(--sp-3) var(--sp-5);
+  justify-content: space-between; color: var(--muted); font-size: var(--fs-sm);
+}
+
+/* ---------- Consent banner (GDPR) ---------- */
+.consent-banner {
+  position: fixed; left: var(--sp-4); right: var(--sp-4); bottom: var(--sp-4); z-index: 1000;
+  max-width: 560px; margin: 0 auto; padding: var(--sp-4) var(--sp-5);
+  background: var(--surface); color: var(--on-surface);
+  border: 1px solid var(--outline); border-radius: var(--radius);
+  box-shadow: var(--shadow-3);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.consent-banner[hidden] { display: none; }
+.consent-text { margin: 0; font-size: var(--fs-sm); line-height: var(--lh-snug); }
+.consent-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-3); }
+.consent-more { margin-right: auto; font-size: var(--fs-sm); color: var(--muted); text-decoration: underline; }
+
+/* ================================================================ 6. PAGES */
 
 /* ---------- Hero ---------- */
-.hero { position: relative; overflow: hidden; padding: 68px 0 40px; }
+.hero { position: relative; overflow: hidden; padding: var(--sp-16) 0 var(--sp-10); }
 /* A single, restrained wash behind the hero — enough to lift it off the page background,
    short of the glow the brief rules out. */
 .hero::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background: radial-gradient(70% 60% at 12% 0%, color-mix(in srgb, var(--accent-soft) 45%, transparent), transparent 72%);
 }
-.hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 48px; align-items: center; }
-.badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--surface); border: 1px solid var(--outline);
-  padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: .85rem;
-  box-shadow: var(--shadow); margin-bottom: 20px;
+.hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: var(--sp-12); align-items: center; }
+.hero h1 { font-size: var(--fs-display); }
+.hero p.lead { font-size: var(--fs-md); color: var(--muted); max-width: 44ch; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-7) 0 var(--sp-6); }
+/* The hero holds a live calculator, so it needs a white card on the tinted gradient
+   rather than the phone frame that used to sit there. */
+.hero-media .calc { margin: 0; box-shadow: var(--shadow-3); }
+
+.trust { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-7); margin-top: var(--sp-2); }
+.trust span {
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  font-weight: var(--fw-semi); font-size: var(--fs-sm); color: var(--muted);
 }
-.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-.hero p.lead { font-size: 1.2rem; color: var(--muted); max-width: 44ch; }
-.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0 22px; }
-.trust { display: flex; flex-wrap: wrap; gap: 18px 26px; margin-top: 8px; }
-.trust span { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: .92rem; color: var(--muted); }
 .trust svg { color: var(--accent-strong); flex: none; }
+
+/* Store badges (Google Play) */
+.store-badges { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-7) 0 var(--sp-6); }
+.gp-badge, .badge-store {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  background: #0d1117; color: #fff; border-radius: var(--radius-sm);
+  font-weight: var(--fw-semi); box-shadow: var(--shadow-2);
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.gp-badge { padding: var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-4); }
+.badge-store { padding: var(--sp-3) var(--sp-4); }
+.gp-badge:hover, .badge-store:hover { text-decoration: none; box-shadow: var(--shadow-3); }
+.gp-badge:active, .badge-store:active { transform: translateY(1px); }
+.gp-badge svg { flex: none; }
+.gp-badge small, .badge-store small {
+  display: block; font-size: var(--fs-xs); opacity: .82;
+  font-weight: var(--fw-medium); letter-spacing: .02em;
+}
+.gp-badge b { font-size: var(--fs-md); line-height: var(--lh-tight); }
+.badge-store b { font-size: var(--fs-base); }
 
 /* Phone mockup — auto-playing carousel of real app screenshots.
    Aspect ratio matches the captured frames (Pixel 5: 411 × 891 dp), so the
-   screenshots fill the screen area exactly, with no cropping. */
+   screenshots fill the screen area exactly, with no cropping. The 40px corner is
+   the device's, not the design system's — it is a picture of a phone. */
 .phone {
   width: 300px; max-width: 82%; margin: 0 auto; aspect-ratio: 411/891;
   background: #0d1117; border: 10px solid #0d1117;
-  border-radius: 40px; box-shadow: var(--shadow-lg); overflow: hidden;
+  border-radius: 40px; box-shadow: var(--shadow-3); overflow: hidden;
   position: relative;
 }
-.phone-track { display: flex; height: 100%; transition: transform .8s cubic-bezier(.4, 0, .2, 1); }
+.phone-track { display: flex; height: 100%; transition: transform var(--dur-carousel) var(--ease); }
 .phone-track.instant { transition: none; }
 .phone-track img {
   flex: 0 0 100%; width: 100%; height: 100%;
   object-fit: cover; object-position: top center; display: block;
 }
-.phone-dots { display: flex; justify-content: center; gap: 7px; margin-top: 18px; }
-.phone-dots i { width: 7px; height: 7px; border-radius: 999px; background: var(--outline); transition: width .3s ease, background .3s ease; }
+.phone-dots { display: flex; justify-content: center; gap: 7px; margin-top: var(--sp-4); }
+.phone-dots i {
+  width: 7px; height: 7px; border-radius: var(--radius-pill); background: var(--outline-strong);
+  transition: width var(--dur-slow) var(--ease), background var(--dur-slow) var(--ease);
+}
 .phone-dots i.on { width: 20px; background: var(--accent); }
-@media (prefers-reduced-motion: reduce) {
-  .phone-track { transition: none; }
-}
+@media (prefers-reduced-motion: reduce) { .phone-track { transition: none; } }
 
-/* ---------- Sections ---------- */
-section.block { padding: 68px 0; }
-.section-head { max-width: 62ch; margin: 0 auto 40px; text-align: center; }
-.section-head .kicker { color: var(--accent-strong); font-weight: 800; text-transform: uppercase; letter-spacing: .1em; font-size: .8rem; }
-.alt { background: var(--surface-alt); }
+/* ---------- Home: features, stats, steps, trust ---------- */
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
 
-/* Feature grid */
-.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.card {
-  background: var(--surface); border: 1px solid var(--outline);
-  border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
-  transition: transform .12s ease, box-shadow .2s ease;
+.stat-band { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+.stat { text-align: center; padding: var(--sp-2); }
+.stat .num {
+  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: var(--fw-black);
+  letter-spacing: -.03em; color: var(--accent-strong); line-height: 1;
 }
-.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-.card .ico { width: 46px; height: 46px; border-radius: 12px; background: var(--accent-soft); color: var(--on-accent-soft); display: grid; place-items: center; margin-bottom: 14px; }
-.card h3 { margin-bottom: 6px; }
-.card p { color: var(--muted); margin: 0; font-size: .96rem; }
+.stat .lbl { color: var(--muted); font-weight: var(--fw-semi); font-size: var(--fs-sm); margin-top: var(--sp-2); }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); counter-reset: step; }
+.step { position: relative; padding: var(--sp-7) var(--sp-6) var(--sp-6); }
+.step::before {
+  counter-increment: step; content: counter(step);
+  display: grid; place-items: center; width: 40px; height: 40px;
+  border-radius: var(--radius-xs); background: var(--accent); color: var(--on-accent);
+  font-weight: var(--fw-black); font-size: var(--fs-md); margin-bottom: var(--sp-3);
+}
+.step h3 { margin-bottom: var(--sp-2); }
+.step p { color: var(--muted); margin: 0; }
+
+.trust-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-10); align-items: center; }
+.trust-list { list-style: none; padding: 0; margin: var(--sp-4) 0 0; display: grid; gap: var(--sp-4); }
+.trust-list li { display: flex; gap: var(--sp-3); align-items: flex-start; }
+.trust-list .tick { width: 30px; height: 30px; margin-top: 2px; }
+.trust-list b { display: block; }
+.trust-list span.d { color: var(--muted); font-size: var(--fs-sm); }
+.trust-panel h3 { display: flex; align-items: center; gap: var(--sp-3); }
+.trust-panel ul { margin: var(--sp-3) 0 0; padding-left: var(--sp-5); color: var(--muted); display: grid; gap: var(--sp-2); }
+.trust-panel ul li::marker { color: var(--accent-strong); }
+
+/* ---------- The app section: copy on the left, one phone on the right.
+   This is the only place on the home page where the Android app is the subject. */
+.cta-banner {
+  background: var(--accent); color: var(--on-accent);
+  border-radius: var(--radius-lg); padding: var(--sp-12) var(--sp-8);
+  box-shadow: var(--shadow-3);
+  display: grid; grid-template-columns: 1.2fr .8fr; gap: var(--sp-8); align-items: center;
+}
+.cta-banner h2 { color: var(--on-accent); }
+.cta-banner p { color: color-mix(in srgb, var(--on-accent) 85%, transparent); max-width: 50ch; margin: 0 auto var(--sp-6); }
+/* Inside the lime banner the primary button inverts: the dark fill needs the
+   lime itself, not the readable-on-cream green, which is far too dark on it. */
+.cta-banner .btn-primary { background: var(--on-accent); color: var(--accent); }
+.cta-copy h2 { margin-bottom: .4em; }
+.cta-shots { display: flex; flex-direction: column; align-items: center; }
+.cta-shots .phone { width: 230px; margin: 0; }
 
 /* ---------- Calculators ---------- */
-.calc-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 28px; }
-.calc-tab {
-  font: inherit; font-weight: 650; font-size: .92rem; cursor: pointer;
-  padding: 9px 16px; border-radius: 999px; border: 1px solid var(--outline);
-  background: var(--surface); color: var(--on-bg);
+.calc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-5); }
+/* A calculator card's heading is an h2 on a calculator page (it is the page's main
+   content) and in the hero, but it must stay card-sized either way. */
+.calc > h2, .calc > h3 {
+  display: flex; align-items: center; gap: var(--sp-3);
+  font-size: var(--fs-h3); font-weight: var(--fw-bold); letter-spacing: normal; margin: 0 0 var(--sp-2);
 }
-.calc-tab[aria-selected="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.calc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-.calc {
-  background: var(--surface); border: 1px solid var(--outline);
-  border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
+.calc .desc { color: var(--muted); font-size: var(--fs-sm); margin: var(--sp-1) 0 var(--sp-4); }
+.calc .btn-primary { width: 100%; margin-top: var(--sp-2); }
+
+.calc-group {
+  margin: 0 0 var(--sp-3); font-size: var(--fs-base); text-transform: uppercase;
+  letter-spacing: var(--track-wide); color: var(--muted);
 }
-.calc h3 { display: flex; align-items: center; gap: 10px; }
-.calc h2 .ico, .calc h3 .ico { width: 34px; height: 34px; border-radius: 9px; background: var(--tertiary-container); color: var(--tertiary); display: grid; place-items: center; flex: none; }
-.calc .desc { color: var(--muted); font-size: .9rem; margin: 4px 0 16px; }
-.field { margin-bottom: 12px; }
-.field label { display: block; font-weight: 600; font-size: .85rem; margin-bottom: 5px; }
-.field input, .field select {
-  width: 100%; font: inherit; font-size: .95rem;
-  padding: 10px 12px; border-radius: var(--radius-sm);
-  border: 1px solid var(--outline); background: var(--bg); color: var(--on-bg);
+.calc-links { display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.calc-link {
+  display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-4);
+  background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius);
+  color: inherit; text-decoration: none;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
-.field input:focus, .field select:focus { outline: 2px solid var(--accent-strong); border-color: var(--accent); }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.calc .btn-primary { width: 100%; justify-content: center; margin-top: 6px; }
-.result {
-  margin-top: 16px; padding: 16px; border-radius: var(--radius-sm);
-  background: var(--accent-soft); color: var(--on-accent-soft);
-  display: none;
+.calc-link:hover { border-color: var(--accent); box-shadow: var(--shadow-2); }
+.calc-link .ico { flex: none; color: var(--accent-strong); line-height: 0; margin-top: 2px; }
+.calc-link-body { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+.calc-link-body b { font-size: var(--fs-base); }
+.calc-link-body .muted { font-size: var(--fs-sm); }
+.calc-link-go {
+  margin-left: auto; flex: none; align-self: center; font-size: var(--fs-xs);
+  font-weight: var(--fw-bold); color: var(--accent-strong); white-space: nowrap;
 }
-.result.show { display: block; }
-/* `.result.show` is an author rule, so it outranks the UA stylesheet's `[hidden]`
-   and an element carrying both would stay on screen — which is how /app/ managed to
-   show "Firebase configuration missing" over a perfectly good configuration. Any
-   element the JS hides with .hidden must actually disappear, whatever classes it has. */
-[hidden] { display: none !important; }
-.result.err { background: color-mix(in srgb, var(--error) 16%, var(--surface)); color: var(--error); }
-.result .big { font-size: 1.8rem; font-weight: 800; line-height: 1.1; }
-.result .rows { margin-top: 10px; display: grid; gap: 3px; font-size: .9rem; }
-.result .rows div { display: flex; justify-content: space-between; gap: 12px; }
-.hint { display: none; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.chip { font: inherit; font-size: .78rem; cursor: pointer; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--outline); background: var(--surface-alt); color: var(--on-bg); }
-.chip:hover { background: var(--accent-soft-2); }
+
+/* A calculator page: the live form on the left, the explanation on the right. */
+.calc-page { display: grid; gap: var(--sp-7); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+.calc-page-form .calc { position: sticky; top: 84px; }
+.calc-page-how h2 { margin-top: 0; }
+.calc-page-how h3 {
+  margin: var(--sp-6) 0 var(--sp-2); font-size: var(--fs-base);
+  text-transform: uppercase; letter-spacing: var(--track-wide); color: var(--muted);
+}
+.calc-page-how .src-note { margin-top: var(--sp-6); font-size: var(--fs-xs); }
+
+.plain-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.plain-list li {
+  background: var(--surface-container); border-radius: var(--radius-xs);
+  padding: var(--sp-2) var(--sp-3); font-size: var(--fs-sm);
+}
+
+/* ---------- Guides ---------- */
+.steps-list { padding-left: 1.2em; margin: 0 0 var(--sp-2); }
+.steps-list li { margin-bottom: var(--sp-3); line-height: var(--lh-base); }
+
+/* ---------- Materials ---------- */
+.mat-open { width: 100%; margin-bottom: var(--sp-3); }
+.mat-chosen {
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--accent-strong);
+  background: var(--accent-soft); border-radius: var(--radius-xs);
+  padding: var(--sp-2) var(--sp-3); margin: 0 0 var(--sp-3);
+}
+/* The same catalogue as a page: one indexable row per material. */
+.mat-page-list { display: grid; gap: var(--sp-2); }
+.mat-page-list li { justify-content: space-between; gap: var(--sp-4); scroll-margin-top: 80px; }
+.mat-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mat-item .muted { font-size: var(--fs-sm); }
+.mat-page-list .btn { flex: none; }
+#materials-page .mat-search { width: 100%; margin: 0; max-width: 460px; }
 
 /* ---------- Stores ---------- */
-.stores-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
-.map-frame { width: 100%; aspect-ratio: 4/3; border: 0; border-radius: var(--radius); box-shadow: var(--shadow); background: var(--surface-alt); }
-.chain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 16px; }
+.stores-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-7); align-items: start; }
+.map-frame {
+  width: 100%; aspect-ratio: 4/3; border: 0; border-radius: var(--radius);
+  box-shadow: var(--shadow-2); background: var(--surface-alt);
+}
+.chain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--sp-3); margin-top: var(--sp-4); }
 .chain {
-  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-3);
   background: var(--surface); border: 1px solid var(--outline);
-  border-radius: var(--radius-sm); font-weight: 600; font-size: .86rem; color: var(--on-bg);
+  border-radius: var(--radius-xs); font-weight: var(--fw-semi); font-size: var(--fs-sm); color: var(--on-bg);
 }
 .chain:hover { background: var(--surface-alt); text-decoration: none; }
 .chain .swatch { width: 12px; height: 12px; border-radius: 3px; flex: none; }
-.store-status { margin-top: 14px; font-size: .9rem; color: var(--muted); min-height: 1.4em; }
+.store-status { margin-top: var(--sp-3); font-size: var(--fs-sm); color: var(--muted); min-height: 1.4em; }
+.search-row { display: flex; gap: var(--sp-2); }
+.search-row input { flex: 1; min-width: 0; }
+.search-row .btn { flex: none; }
 
-/* ---------- CTA banner ---------- */
-.cta-banner {
-  background: var(--accent); color: var(--on-accent);
-  border-radius: 24px; padding: 48px 32px; text-align: center; box-shadow: var(--shadow-lg);
+.store-list { margin-top: var(--sp-3); display: grid; gap: var(--sp-3); }
+.store-item { justify-content: space-between; box-shadow: var(--shadow-1); }
+.store-info { min-width: 0; }
+.store-info b { display: block; font-size: var(--fs-base); line-height: var(--lh-tight); }
+.store-meta {
+  display: block; color: var(--muted); font-size: var(--fs-sm); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.cta-banner h2 { color: var(--on-accent); }
-.cta-banner p { color: color-mix(in srgb, var(--on-accent) 85%, transparent); max-width: 50ch; margin: 0 auto 22px; }
-.cta-banner .btn-primary { background: var(--on-accent); color: var(--accent-strong); }
-.badge-store { display: inline-flex; align-items: center; gap: 10px; background: #0d1117; color: #fff; padding: 10px 18px; border-radius: 12px; font-weight: 600; }
-.badge-store:hover { text-decoration: none; opacity: .92; }
-.badge-store small { display: block; font-size: .66rem; opacity: .8; font-weight: 500; }
-.badge-store b { font-size: 1.05rem; }
+.store-actions { display: flex; align-items: center; gap: var(--sp-3); flex: none; }
+.store-dist { font-weight: var(--fw-bold); color: var(--accent-strong); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.store-empty { color: var(--muted); font-size: var(--fs-sm); padding: var(--sp-2) 2px; }
+.store-search-block { margin-top: var(--sp-6); padding-top: var(--sp-4); border-top: 1px solid var(--outline); }
 
-/* ---------- Footer ---------- */
-footer.site { background: var(--surface-container); border-top: 1px solid var(--outline); padding: 44px 0 28px; margin-top: 20px; }
-.foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 28px; }
-footer .brand { margin-bottom: 10px; }
-footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
-footer a { color: var(--muted); }
-footer h4 { font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; color: var(--on-bg); margin: 0 0 12px; }
-.foot-bottom { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--outline); display: flex; flex-wrap: wrap; gap: 10px 20px; justify-content: space-between; color: var(--muted); font-size: .88rem; }
+/* ---------- /aplikacja/ ----------
+   The one page whose subject is the Android app, so the phone mockup comes back —
+   here it is the product being described, not decoration around a calculator. */
+.app-hero { padding-top: var(--sp-5); }
+.app-hero .hero-media { display: flex; flex-direction: column; align-items: center; }
+.app-hero .phone { margin: 0; }
+.shot-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-6); }
+.shot { margin: 0; text-align: center; }
+.shot img {
+  width: 100%; max-width: 300px; height: auto; border-radius: var(--radius-lg);
+  border: 1px solid var(--outline); box-shadow: var(--shadow-3);
+}
+.shot figcaption { margin-top: var(--sp-3); font-size: var(--fs-sm); }
 
-/* ---------- Responsive ---------- */
+/* A sub-page closes with one quiet line about the app, not a download banner.
+   The site is the product; the app is the offline companion. */
+.app-note { padding-top: var(--sp-2); padding-bottom: var(--sp-7); }
+.app-note p {
+  margin: 0; font-size: var(--fs-sm); color: var(--muted); line-height: var(--lh-base);
+  padding-top: var(--sp-4); border-top: 1px solid var(--outline);
+}
+.app-note b { color: var(--on-bg); }
+.app-note a { color: var(--accent-strong); font-weight: var(--fw-semi); white-space: nowrap; }
+
+/* ---------- /app/ and /p/ ----------
+   The signed-in workspace and the read-only shared estimate. Both are noindex and
+   deliberately plain: lists of rows, not a marketing surface. */
+.app-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-3); margin-bottom: var(--sp-6); padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--outline);
+}
+.inline-form { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+.inline-form input { flex: 1 1 160px; min-width: 0; width: auto; }
+.inline-form input[inputmode="decimal"] { flex: 0 1 84px; }
+.inline-form button { flex: none; }
+
+.share-total {
+  display: flex; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); border-top: 2px solid var(--accent); font-size: var(--fs-md);
+}
+.share-total b { font-size: var(--fs-lg); }
+
+.auth-links { display: flex; justify-content: space-between; gap: var(--sp-4); margin-top: var(--sp-3); font-size: var(--fs-sm); }
+.auth-sep { display: flex; align-items: center; gap: var(--sp-3); margin: var(--sp-4) 0 var(--sp-3); color: var(--muted); font-size: var(--fs-sm); }
+.auth-sep::before, .auth-sep::after { content: ""; flex: 1; height: 1px; background: var(--outline); }
+.auth-google { width: 100%; gap: var(--sp-3); }
+.auth-note { font-size: var(--fs-sm); margin-top: var(--sp-4); }
+.app-identity { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); min-width: 0; }
+.app-identity b { overflow-wrap: anywhere; }
+
+/* ---------- Workspace ----------
+   A saved room feeds the form: pick the room, pick the surface, the area lands in
+   the field. The bar is inserted by assets/workspace-ui.js and stays hidden until
+   there is at least one room to offer. */
+.ws-bar { margin-bottom: var(--sp-3); }
+.ws-bar-row { display: flex; gap: var(--sp-2); }
+.ws-bar-row select { flex: 1 1 auto; min-width: 0; width: auto; }
+.ws-bar-row .btn { flex: none; }
+.ws-bar-hint { font-size: var(--fs-sm); margin: 0; }
+.ws-save { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+.ws-save-note { font-size: var(--fs-sm); }
+.ws-links { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-7); }
+
+/* The estimate is the one thing on the site meant to leave the screen on paper, so it
+   is laid out as a document rather than as a page section. */
+.ws-estimate-bar { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-bottom: var(--sp-4); align-items: center; }
+.ws-estimate-bar select { width: auto; }
+.ws-estimate-head {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: var(--sp-4); align-items: flex-start; margin-bottom: var(--sp-5);
+}
+.ws-estimate-head h2 { margin: 0; }
+.ws-estimate-brand {
+  margin: 0; font-weight: var(--fw-black); color: var(--accent-strong);
+  text-transform: uppercase; letter-spacing: var(--track-wider); font-size: var(--fs-xs);
+}
+.ws-estimate-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; color: var(--muted); font-size: var(--fs-sm); }
+.ws-estimate-total { display: flex; justify-content: space-between; gap: var(--sp-4); margin-top: var(--sp-4); font-size: var(--fs-md); font-weight: var(--fw-black); }
+.ws-estimate-foot { font-size: var(--fs-xs); margin-top: var(--sp-4); }
+
+/* An estimate line opened for correction: the cells become inputs in place, so the
+   row keeps its position and the table keeps its column widths. */
+.ws-row-actions { display: flex; gap: var(--sp-2); justify-content: flex-end; }
+.ws-editing input { min-height: var(--control-h-sm); padding: var(--sp-1) var(--sp-2); font-size: var(--fs-sm); }
+.ws-editing .ws-qty { width: 5.5em; text-align: right; display: inline-block; }
+.ws-editing .ws-unit { width: 4.5em; display: inline-block; margin-left: var(--sp-1); }
+.ws-add-line { margin-top: var(--sp-7); }
+.ws-add-line h3 { margin-bottom: var(--sp-1); }
+.ws-add-line p { margin-bottom: var(--sp-3); font-size: var(--fs-sm); }
+
+/* ---------- Legal / document page ---------- */
+.doc { max-width: 820px; margin: 0 auto; padding: var(--sp-10) var(--gutter) var(--sp-16); }
+.doc h1 { font-size: var(--fs-h1); }
+.doc h2 { font-size: var(--fs-lg); margin-top: 2.2rem; padding-bottom: var(--sp-2); border-bottom: 1px solid var(--outline); }
+.doc h3 { font-size: var(--fs-md); margin-top: 1.5rem; }
+.doc p, .doc li { color: var(--on-bg); }
+.doc .muted { color: var(--muted); }
+.doc ul { padding-left: var(--sp-5); }
+.doc ul li::marker { color: var(--accent-strong); }
+.doc code { background: var(--surface-alt); padding: 1px var(--sp-2); border-radius: 5px; font-size: .92em; }
+.doc hr { border: none; border-top: 2px solid var(--outline); margin: var(--sp-12) 0; }
+.doc .toc {
+  background: var(--surface-alt); border: 1px solid var(--outline); border-radius: var(--radius);
+  padding: var(--sp-4) var(--sp-6); margin: var(--sp-6) 0 var(--sp-2);
+}
+.doc .toc ul { list-style: none; padding: 0; margin: var(--sp-2) 0 0; display: grid; gap: var(--sp-2); grid-template-columns: 1fr 1fr; }
+.doc .lang-switch { display: inline-flex; gap: var(--sp-2); margin: var(--sp-2) 0 var(--sp-6); flex-wrap: wrap; }
+.doc .lang-switch a {
+  padding: var(--sp-2) var(--sp-4); border: 1px solid var(--outline); border-radius: var(--radius-pill);
+  font-weight: var(--fw-semi); font-size: var(--fs-sm); background: var(--surface);
+}
+.doc-back { display: inline-flex; align-items: center; gap: var(--sp-2); font-weight: var(--fw-semi); margin-bottom: var(--sp-3); }
+
+/* ============================================================ 7. UTILITIES
+   Deliberately few. A utility exists when a one-off gap would otherwise be
+   written inline in the HTML; anything used three times is a component. */
+.muted { color: var(--muted); }
+.center { text-align: center; }
+.mt-3 { margin-top: var(--sp-3); }
+.mt-4 { margin-top: var(--sp-4); }
+.mt-6 { margin-top: var(--sp-6); }
+.mt-8 { margin-top: var(--sp-8); }
+.pt-2 { padding-top: var(--sp-2); }
+.text-sm { font-size: var(--fs-sm); }
+.text-xs { font-size: var(--fs-xs); }
+/* The label above a result figure: small, upper-case, quiet. */
+.eyebrow { font-size: var(--fs-xs); font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: var(--track-wide); }
+.figure-line { font-size: var(--fs-base); font-weight: var(--fw-semi); }
+
+/* ========================================================== 8. RESPONSIVE
+   Four widths, no more: 560 (phone), 760 (large phone / small tablet), 900 (the
+   desktop layout), 1160 (the content width, held by --maxw). Mobile-first is the
+   rule — these blocks take things away above the phone layout only where a
+   component genuinely needs a second arrangement. */
+
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; }
   .hero-media { order: -1; }
   .features { grid-template-columns: 1fr 1fr; }
   .stores-wrap { grid-template-columns: 1fr; }
   .foot-grid { grid-template-columns: 1fr 1fr; }
-  .nav-links { position: fixed; inset: 64px 0 auto 0; flex-direction: column; align-items: stretch; gap: 0; background: var(--bg); border-bottom: 1px solid var(--outline); padding: 8px; box-shadow: var(--shadow-lg); display: none; }
+  .calc-page { grid-template-columns: 1fr; }
+  .calc-page-form .calc { position: static; }
+  .stat-band { grid-template-columns: 1fr 1fr; gap: var(--sp-6) var(--sp-4); }
+  .steps { grid-template-columns: 1fr; }
+  .trust-split { grid-template-columns: 1fr; gap: var(--sp-7); }
+  .doc .toc ul { grid-template-columns: 1fr; }
+  .cta-banner { grid-template-columns: 1fr; text-align: center; }
+  .cta-copy { display: flex; flex-direction: column; align-items: center; }
+  .cta-shots { display: none; }
+
+  /* The navigation becomes a drawer. The theme switch and the menu button stay
+     outside it, so both are reachable with the drawer shut. */
+  .nav-links {
+    position: fixed; inset: 64px 0 auto 0; flex-direction: column; align-items: stretch;
+    gap: 0; background: var(--bg); border-bottom: 1px solid var(--outline);
+    padding: var(--sp-2); box-shadow: var(--shadow-3); display: none;
+  }
   .nav-links.open { display: flex; }
-  .nav-links a { padding: 12px; }
-  .nav-links .pickers, .nav-links .btn { margin: 6px 6px; }
+  .nav-links a { padding: var(--sp-3); font-size: var(--fs-base); }
+  .nav-links .pickers, .nav-links .btn { margin: var(--sp-2); }
   /* Inside the mobile drawer the menu is part of the flow, not an overlay. */
   .nav-links .lang-picker { position: static; }
-  .nav-links .lang-menu { position: static; margin-top: 6px; box-shadow: none; }
+  .nav-links .lang-menu { position: static; margin-top: var(--sp-2); box-shadow: none; }
   .menu-toggle { display: inline-flex; }
   .theme-toggle { margin-left: auto; }
 }
+
+@media (max-width: 760px) {
+  .shot-grid { grid-template-columns: 1fr; }
+  .mat-page-list li { flex-direction: column; align-items: flex-start; }
+}
+
 @media (max-width: 560px) {
+  :root { --gutter: var(--sp-4); }
   .features { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr; }
   .foot-grid { grid-template-columns: 1fr; }
-}
-
-/* ============================================================
-   materio-web additions — trust band, steps, FAQ, badges, doc
-   ============================================================ */
-
-/* Skip link (a11y) */
-.skip-link { position: absolute; left: -999px; top: 0; z-index: 100; background: var(--accent); color: var(--on-accent); padding: 10px 16px; border-radius: 0 0 10px 0; font-weight: 700; }
-.skip-link:focus { left: 0; }
-:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; border-radius: 4px; }
-
-/* Store badges (Google Play) */
-.store-badges { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0 22px; }
-.gp-badge {
-  display: inline-flex; align-items: center; gap: 12px;
-  background: #0d1117; color: #fff; padding: 11px 20px 11px 18px;
-  border-radius: 14px; font-weight: 600; box-shadow: var(--shadow);
-  transition: transform .06s ease, box-shadow .2s ease, opacity .2s ease;
-}
-.gp-badge:hover { text-decoration: none; box-shadow: var(--shadow-lg); }
-.gp-badge:active { transform: translateY(1px); }
-.gp-badge svg { flex: none; }
-.gp-badge small { display: block; font-size: .68rem; opacity: .82; font-weight: 500; letter-spacing: .02em; }
-.gp-badge b { font-size: 1.14rem; line-height: 1.1; }
-
-/* Trust / stats band */
-.stat-band { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-.stat { text-align: center; padding: 8px; }
-.stat .num { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -.03em; color: var(--accent-strong); line-height: 1; }
-.stat .lbl { color: var(--muted); font-weight: 600; font-size: .92rem; margin-top: 8px; }
-
-/* How it works — numbered steps */
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; counter-reset: step; }
-.step { position: relative; background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius); padding: 28px 24px 24px; box-shadow: var(--shadow); }
-.step::before {
-  counter-increment: step; content: counter(step);
-  display: grid; place-items: center; width: 40px; height: 40px;
-  border-radius: 12px; background: var(--accent); color: var(--on-accent);
-  font-weight: 800; font-size: 1.15rem; margin-bottom: 14px;
-}
-.step h3 { margin-bottom: 6px; }
-.step p { color: var(--muted); margin: 0; font-size: .96rem; }
-
-/* Trust / privacy split */
-.trust-split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-.trust-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 16px; }
-.trust-list li { display: flex; gap: 14px; align-items: flex-start; }
-.trust-list .tick { flex: none; width: 30px; height: 30px; border-radius: 9px; background: var(--accent-soft); color: var(--on-accent-soft); display: grid; place-items: center; margin-top: 2px; }
-.trust-list b { display: block; }
-.trust-list span.d { color: var(--muted); font-size: .95rem; }
-.trust-panel { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
-.trust-panel h3 { display: flex; align-items: center; gap: 10px; }
-.trust-panel .shield { width: 40px; height: 40px; border-radius: 11px; background: var(--tertiary-container); color: var(--tertiary); display: grid; place-items: center; flex: none; }
-.trust-panel ul { margin: 14px 0 0; padding-left: 18px; color: var(--muted); display: grid; gap: 8px; }
-.trust-panel ul li::marker { color: var(--accent-strong); }
-
-/* FAQ (details/summary) */
-.faq { max-width: 780px; margin: 0 auto; display: grid; gap: 12px; }
-.faq details { background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius-sm); box-shadow: var(--shadow); overflow: hidden; }
-.faq summary { cursor: pointer; padding: 18px 20px; font-weight: 700; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 14px; }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; font-size: 1.4rem; color: var(--accent-strong); font-weight: 700; line-height: 1; transition: transform .2s ease; }
-.faq details[open] summary::after { transform: rotate(45deg); }
-.faq details p { margin: 0; padding: 0 20px 18px; color: var(--muted); }
-
-/* Section intro alignment helper */
-.section-head.left { text-align: left; margin-left: 0; }
-
-/* ---------- Legal / document page ---------- */
-.doc { max-width: 820px; margin: 0 auto; padding: 40px 20px 64px; }
-.doc h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
-.doc h2 { font-size: 1.35rem; margin-top: 2.2rem; padding-bottom: 6px; border-bottom: 1px solid var(--outline); }
-.doc h3 { font-size: 1.08rem; margin-top: 1.5rem; }
-.doc p, .doc li { color: var(--on-bg); }
-.doc .muted { color: var(--muted); }
-.doc ul { padding-left: 20px; }
-.doc ul li::marker { color: var(--accent-strong); }
-.doc code { background: var(--surface-alt); padding: 1px 6px; border-radius: 5px; font-size: .92em; }
-.doc hr { border: none; border-top: 2px solid var(--outline); margin: 48px 0; }
-.doc .toc { background: var(--surface-alt); border: 1px solid var(--outline); border-radius: var(--radius); padding: 18px 22px; margin: 22px 0 8px; }
-.doc .toc ul { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; grid-template-columns: 1fr 1fr; }
-.doc .lang-switch { display: inline-flex; gap: 6px; margin: 8px 0 24px; flex-wrap: wrap; }
-.doc .lang-switch a { padding: 6px 14px; border: 1px solid var(--outline); border-radius: 999px; font-weight: 600; font-size: .9rem; background: var(--surface); }
-.doc-back { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 10px; }
-
-@media (max-width: 900px) {
-  .stat-band { grid-template-columns: 1fr 1fr; gap: 26px 18px; }
-  .steps { grid-template-columns: 1fr; }
-  .trust-split { grid-template-columns: 1fr; gap: 28px; }
-  .doc .toc ul { grid-template-columns: 1fr; }
-}
-
-/* Two-column split (rooms, store finder) */
-.split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
-.store-panel .fld-label { display: block; font-weight: 600; font-size: .85rem; margin-bottom: 6px; }
-.search-row { display: flex; gap: 8px; }
-.search-row input {
-  flex: 1; min-width: 0; font: inherit; font-size: .98rem;
-  padding: 11px 14px; border-radius: var(--radius-sm);
-  border: 1px solid var(--outline); background: var(--bg); color: var(--on-bg);
-}
-.search-row input:focus { outline: 2px solid var(--accent-strong); border-color: var(--accent); }
-.search-row .btn { flex: none; }
-@media (max-width: 900px) { .split-2 { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .search-row { flex-wrap: wrap; } .search-row .btn { width: 100%; justify-content: center; } }
-
-/* Store finder — nearby list */
-.store-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
-.store-item { display: flex; align-items: center; gap: 12px; justify-content: space-between;
-  background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius-sm);
-  padding: 12px 14px; box-shadow: var(--shadow); }
-.store-info { min-width: 0; }
-.store-info b { display: block; font-size: .98rem; line-height: 1.25; }
-.store-meta { display: block; color: var(--muted); font-size: .82rem; margin-top: 2px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.store-actions { display: flex; align-items: center; gap: 10px; flex: none; }
-.store-dist { font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.store-empty { color: var(--muted); font-size: .92rem; padding: 6px 2px; }
-.store-search-block { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--outline); }
-@media (max-width: 420px) {
+  .calc-link-go { display: none; }
+  .search-row { flex-wrap: wrap; }
+  .search-row .btn { width: 100%; }
   .store-item { flex-direction: column; align-items: stretch; }
   .store-actions { justify-content: space-between; }
 }
 
-/* Consent banner (GDPR) */
-.consent-banner {
-  position: fixed;
-  left: 16px;
-  right: 16px;
-  bottom: 16px;
-  z-index: 1000;
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 16px 18px;
-  background: var(--surface);
-  color: var(--on-surface);
-  border: 1px solid var(--outline);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.consent-banner[hidden] { display: none; }
-.consent-text { margin: 0; font-size: .92rem; line-height: 1.45; }
-.consent-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.consent-more {
-  margin-right: auto;
-  font-size: .85rem;
-  color: var(--muted);
-  text-decoration: underline;
-}
-
-/* ---------------------------------------------------------------- generated sub-pages
-   Styles for the page types scripts/build.mjs emits: the calculator hub, a single
-   calculator with its "how we calculate" column, the guides and the store finder. */
-
-.page-head { padding-bottom: 8px; }
-.page-head h1 { margin: 10px 0 8px; font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.15; }
-.page-head .lead { color: var(--muted); max-width: 62ch; margin: 0; }
-
-.breadcrumbs { font-size: .85rem; color: var(--muted); }
-.breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; }
-.breadcrumbs li + li::before { content: "›"; margin-right: 6px; color: var(--outline); }
-.breadcrumbs a { color: var(--muted); text-decoration: none; }
-.breadcrumbs a:hover { color: var(--accent-strong); text-decoration: underline; }
-
-.calc-group { margin: 0 0 14px; font-size: 1.05rem; text-transform: uppercase;
-  letter-spacing: .08em; color: var(--muted); }
-
-.calc-links { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-.calc-link {
-  display: flex; align-items: flex-start; gap: 12px; padding: 16px;
-  background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius);
-  color: inherit; text-decoration: none; transition: border-color .15s, box-shadow .15s;
-}
-.calc-link:hover { border-color: var(--accent); box-shadow: var(--shadow); }
-.calc-link .ico { flex: none; color: var(--accent-strong); line-height: 0; margin-top: 2px; }
-.calc-link-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.calc-link-body b { font-size: 1rem; }
-.calc-link-body .muted { font-size: .88rem; }
-.calc-link-go { margin-left: auto; flex: none; align-self: center; font-size: .82rem;
-  font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
-@media (max-width: 520px) { .calc-link-go { display: none; } }
-
-/* A calculator page: the live form on the left, the explanation on the right. */
-.calc-page { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
-@media (max-width: 900px) { .calc-page { grid-template-columns: 1fr; } }
-.calc-page-form .calc { position: sticky; top: 84px; }
-@media (max-width: 900px) { .calc-page-form .calc { position: static; } }
-.calc-page-how h2 { margin-top: 0; }
-.calc-page-how h3 { margin: 22px 0 8px; font-size: 1rem; text-transform: uppercase;
-  letter-spacing: .06em; color: var(--muted); }
-.calc-page-how .src-note { margin-top: 22px; font-size: .82rem; }
-
-.plain-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.plain-list li { background: var(--surface-container); border-radius: var(--radius-sm);
-  padding: 6px 10px; font-size: .88rem; }
-
-pre.formula {
-  margin: 0; padding: 14px 16px; overflow-x: auto;
-  background: var(--surface-container); border: 1px solid var(--outline);
-  border-radius: var(--radius-sm);
-}
-/* A formula line can be longer than the column (the waste line on the coverage
-   calculator is), and a sideways scrollbar hides the end of it on a phone. Wrap
-   instead, with the continuation indented so a wrapped line still reads as one. */
-pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: .86rem; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere;
-  display: block; padding-left: 1.6em; text-indent: -1.6em; }
-
-/* Guides */
-.wrap.narrow { max-width: 760px; }
-.steps-list { padding-left: 1.2em; margin: 0 0 8px; }
-.steps-list li { margin-bottom: 10px; line-height: 1.6; }
-.tip { margin-top: 24px; padding: 16px; border-radius: var(--radius);
-  background: var(--accent-soft); color: var(--on-accent-soft); }
-.tip b { display: block; margin-bottom: 6px; text-transform: uppercase;
-  letter-spacing: .06em; font-size: .8rem; }
-.tip p { margin: 0; line-height: 1.6; }
-
-.center { text-align: center; }
-
-/* ---------------------------------------------------------------- /app/ and /p/
-   The signed-in workspace and the read-only shared estimate. Both are noindex and
-   deliberately plain: lists of rows, not a marketing surface. */
-
-.app-bar { display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--outline); }
-
-.inline-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.inline-form input { flex: 1 1 160px; min-width: 0; padding: 10px 12px;
-  border: 1px solid var(--outline); border-radius: var(--radius-sm);
-  background: var(--surface); color: var(--on-surface); font: inherit; font-size: .95rem; }
-.inline-form input[inputmode="decimal"] { flex: 0 1 84px; }
-.inline-form button { flex: none; }
-
-.data-list { list-style: none; margin: 0 0 8px; padding: 0; }
-.data-list li { display: flex; align-items: center; gap: 12px; padding: 12px 14px;
-  background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius-sm);
-  margin-bottom: 8px; }
-.data-list li.empty { display: block; background: none; border-style: dashed; }
-.data-list li.done .row-name { text-decoration: line-through; opacity: .6; }
-.row-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-.row-name em { font-style: normal; font-size: .85rem; }
-.row-actions { display: flex; gap: 6px; flex: none; }
-
-.share-total { display: flex; justify-content: space-between; gap: 12px;
-  padding: 12px 14px; border-top: 2px solid var(--accent); font-size: 1.05rem; }
-.share-total b { font-size: 1.2rem; }
-
-/* A sub-page closes with one quiet line about the app, not a download banner.
-   The site is the product; the app is the offline companion. */
-.app-note { padding-top: 8px; padding-bottom: 28px; }
-.app-note p { margin: 0; font-size: .9rem; color: var(--muted); line-height: 1.6;
-  padding-top: 18px; border-top: 1px solid var(--outline); }
-.app-note b { color: var(--on-bg); }
-.app-note a { color: var(--accent-strong); font-weight: 600; white-space: nowrap; }
-
-/* The hero's primary action is "start calculating", so it needs to outweigh the
-   Play badge sitting next to it. */
-.btn-lg { padding: 14px 26px; font-size: 1.02rem; }
-
-/* The hero holds a live calculator, so it needs a white card on the tinted gradient
-   rather than the phone frame that used to sit there. */
-.hero-media .calc { margin: 0; box-shadow: var(--shadow-lg); }
-
-/* The app section: copy on the left, one phone on the right. This is the only place
-   on the site where the Android app is the subject. */
-.cta-banner { display: grid; grid-template-columns: 1.2fr .8fr; gap: 36px; align-items: center; text-align: left; }
-.cta-copy h2 { margin-bottom: .4em; }
-.cta-shots { display: flex; flex-direction: column; align-items: center; }
-.cta-shots .phone { width: 230px; margin: 0; }
-@media (max-width: 860px) {
-  .cta-banner { grid-template-columns: 1fr; text-align: center; }
-  .cta-copy { display: flex; flex-direction: column; align-items: center; }
-  .cta-shots { display: none; }
-}
-
-/* A calculator card's heading is an h2 on a calculator page (it is the page's main
-   content) and in the hero, but it must stay card-sized either way. */
-.calc > h2, .calc > h3 { display: flex; align-items: center; gap: 10px;
-  font-size: 1.2rem; font-weight: 700; letter-spacing: normal; margin: 0 0 6px; }
-
-/* ---------------------------------------------------------------- material picker */
-/* The catalogue is a modal because a calculator card is too small to hold ~160 rows,
-   and because picking a material is a detour from the form, not part of it. */
-.mat-open { width: 100%; justify-content: center; margin-bottom: 12px; gap: 8px; }
-.mat-chosen { font-size: .84rem; font-weight: 600; color: var(--accent-strong);
-  background: var(--accent-soft); border-radius: var(--radius-sm);
-  padding: 8px 12px; margin: 0 0 12px; }
-
-.mat-dialog {
-  width: min(680px, 94vw); max-height: 86vh; padding: 0; border: 1px solid var(--outline);
-  border-radius: var(--radius); background: var(--surface); color: var(--on-bg);
-  box-shadow: var(--shadow-lg); overflow: hidden;
-}
-.mat-dialog::backdrop { background: rgba(20, 21, 15, .55); }
-.mat-dialog-head { display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 18px 20px 12px; }
-.mat-dialog-head h2 { margin: 0; font-size: 1.15rem; }
-.mat-search {
-  display: block; width: calc(100% - 40px); margin: 0 20px 12px; padding: 11px 14px;
-  border: 1px solid var(--outline); border-radius: var(--radius-sm);
-  background: var(--surface-alt); color: var(--on-bg); font: inherit;
-}
-.mat-search:focus { outline: 2px solid var(--accent-strong); border-color: var(--accent); }
-.mat-dialog .mat-cats { padding: 0 20px; margin-bottom: 6px; max-height: 84px; overflow-y: auto; }
-.chip.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.mat-list { overflow-y: auto; max-height: 52vh; padding: 0 12px 16px; }
-.mat-group { position: sticky; top: 0; z-index: 1; margin: 10px 0 4px; padding: 6px 8px;
-  font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
-  color: var(--accent-strong); background: var(--surface); }
-.mat-row { display: flex; flex-direction: column; gap: 2px; width: 100%; text-align: left;
-  font: inherit; cursor: pointer; padding: 10px 12px; border: 0; border-radius: var(--radius-sm);
-  background: transparent; color: var(--on-bg); }
-.mat-row:hover, .mat-row:focus-visible { background: var(--surface-alt); }
-.mat-row-name { font-weight: 700; }
-.mat-row-note { font-size: .82rem; color: var(--muted); }
-.mat-empty { padding: 0 20px 20px; }
-
-/* The same catalogue as a page: one indexable row per material. */
-.mat-page-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.mat-page-list li { display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--outline);
-  border-radius: var(--radius-sm); scroll-margin-top: 80px; }
-.mat-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.mat-item .muted { font-size: .84rem; }
-.mat-page-list .btn { flex: none; }
-#materials-page .mat-search { width: 100%; margin: 0; max-width: 460px; }
-#materials-page .fld-label { display: block; font-weight: 600; font-size: .85rem; margin-bottom: 6px; }
-@media (max-width: 640px) {
-  .mat-page-list li { flex-direction: column; align-items: flex-start; }
-}
-
-/* ---------------------------------------------------------------- workspace */
-/* A saved room feeds the form: pick the room, pick the surface, the area lands in
-   the field. The bar is inserted by assets/workspace-ui.js and stays hidden until
-   there is at least one room to offer. */
-.ws-bar { margin-bottom: 14px; }
-.ws-bar-label { display: block; font-weight: 600; font-size: .85rem; margin-bottom: 5px; }
-.ws-bar-row { display: flex; gap: 8px; }
-.ws-bar-row select {
-  flex: 1 1 auto; min-width: 0; padding: 10px 12px; border: 1px solid var(--outline);
-  border-radius: var(--radius-sm); background: var(--surface-alt); color: var(--on-bg); font: inherit;
-}
-.ws-bar-row .btn { flex: none; }
-.ws-bar-hint { font-size: .84rem; margin: 0; }
-.ws-save { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
-.ws-save-note { font-size: .84rem; }
-.ws-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
-
-.data-list li.on { border-color: var(--accent); }
-.data-list .row-name em { display: block; font-style: normal; font-size: .84rem; }
-
-/* The estimate is the one thing on the site meant to leave the screen on paper, so it
-   is laid out as a document rather than as a page section. */
-.ws-estimate-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; align-items: center; }
-.ws-estimate-bar select { padding: 8px 12px; border: 1px solid var(--outline);
-  border-radius: var(--radius-sm); background: var(--surface); color: var(--on-bg); font: inherit; }
-.ws-estimate { background: var(--surface); border: 1px solid var(--outline);
-  border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
-.ws-estimate-head { display: flex; flex-wrap: wrap; justify-content: space-between;
-  gap: 16px; align-items: flex-start; margin-bottom: 20px; }
-.ws-estimate-head h2 { margin: 0; }
-.ws-estimate-brand { margin: 0; font-weight: 800; color: var(--accent-strong);
-  text-transform: uppercase; letter-spacing: .1em; font-size: .78rem; }
-.ws-estimate-meta { display: flex; flex-direction: column; align-items: flex-end;
-  gap: 2px; color: var(--muted); font-size: .88rem; }
-.ws-table { width: 100%; border-collapse: collapse; font-size: .94rem; }
-.ws-table th, .ws-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--outline); }
-.ws-table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-.ws-table .num { text-align: right; white-space: nowrap; }
-.ws-estimate-total { display: flex; justify-content: space-between; gap: 16px;
-  margin-top: 18px; font-size: 1.15rem; font-weight: 800; }
-.ws-estimate-foot { font-size: .82rem; margin-top: 16px; }
-
-/* Print: the estimate alone, on white, without the site around it. This is the "save
-   as PDF" path — the browser's own print engine, so the file stays small and its text
-   stays selectable. */
+/* ================================================================ 9. PRINT
+   The estimate alone, on white, without the site around it. This is the "save as
+   PDF" path — the browser's own print engine, so the file stays small and its
+   text stays selectable. */
 @media print {
   header.site, footer.site, .consent-banner, .breadcrumbs, .no-print,
   .app-note, .skip-link, .mat-dialog { display: none !important; }
@@ -782,70 +1165,3 @@ pre.formula code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, m
   .ws-table th, .ws-table td { border-bottom: 1px solid #ccc; }
   @page { margin: 18mm 14mm; }
 }
-
-/* ---------------------------------------------------------------- the account page */
-.auth-links { display: flex; justify-content: space-between; gap: 16px; margin-top: 14px; font-size: .92rem; }
-.auth-sep { display: flex; align-items: center; gap: 12px; margin: 18px 0 14px;
-  color: var(--muted); font-size: .85rem; }
-.auth-sep::before, .auth-sep::after { content: ""; flex: 1; height: 1px; background: var(--outline); }
-.auth-google { width: 100%; justify-content: center; gap: 10px; }
-.auth-note { font-size: .85rem; margin-top: 16px; }
-
-.app-identity { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
-.app-identity b { overflow-wrap: anywhere; }
-.chip.warn { background: color-mix(in srgb, var(--error) 14%, var(--surface)); color: var(--error);
-  border-color: color-mix(in srgb, var(--error) 34%, var(--outline)); }
-
-.app-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0 22px;
-  border-bottom: 1px solid var(--outline); padding-bottom: 10px; }
-.app-tab { font: inherit; font-weight: 600; font-size: .92rem; cursor: pointer;
-  padding: 8px 14px; border-radius: 999px; border: 1px solid transparent;
-  background: transparent; color: var(--muted); }
-.app-tab:hover { background: var(--surface-alt); color: var(--on-bg); }
-.app-tab[aria-selected="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-
-.app-card { background: var(--surface); border: 1px solid var(--outline);
-  border-radius: var(--radius-sm); padding: 20px; margin-bottom: 16px; }
-.app-card h3 { margin: 0 0 6px; font-size: 1.02rem; }
-.app-card p { margin: 0 0 14px; font-size: .9rem; }
-/* Account deletion is irreversible, so it is set apart rather than sitting in the
-   same list as "change your password". */
-.app-card.danger { border-color: color-mix(in srgb, var(--error) 40%, var(--outline));
-  background: color-mix(in srgb, var(--error) 5%, var(--surface)); }
-.btn-danger { background: var(--error); color: #fff; }
-.btn-danger:hover { opacity: .92; }
-
-/* ---------------------------------------------------------------- /aplikacja/ */
-/* The one page whose subject is the Android app, so the phone mockup comes back —
-   here it is the product being described, not decoration around a calculator. */
-.app-hero { padding-top: 20px; }
-.app-hero .hero-media { display: flex; flex-direction: column; align-items: center; }
-.app-hero .phone { margin: 0; }
-.shot-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
-.shot { margin: 0; text-align: center; }
-.shot img { width: 100%; max-width: 300px; height: auto; border-radius: 20px;
-  border: 1px solid var(--outline); box-shadow: var(--shadow-lg); }
-.shot figcaption { margin-top: 10px; font-size: .86rem; }
-@media (max-width: 760px) {
-  .shot-grid { grid-template-columns: 1fr; }
-}
-
-/* ---------------------------------------------------------------- /cookies/ */
-/* The storage tables are wide and the page is often read on a phone, so they scroll
-   inside their own box rather than pushing the page sideways. */
-.table-scroll { overflow-x: auto; margin: 8px 0 4px; }
-.table-scroll table { min-width: 560px; }
-.table-scroll code { font-size: .84rem; overflow-wrap: anywhere; }
-
-/* An estimate line opened for correction: the cells become inputs in place, so the
-   row keeps its position and the table keeps its column widths. */
-.ws-row-actions { display: flex; gap: 6px; justify-content: flex-end; }
-.ws-editing input { width: 100%; padding: 7px 9px; font: inherit; font-size: .9rem;
-  border: 1px solid var(--outline); border-radius: 8px;
-  background: var(--surface); color: var(--on-bg); }
-.ws-editing input:focus { outline: 2px solid var(--accent-strong); border-color: var(--accent); }
-.ws-editing .ws-qty { width: 5.5em; text-align: right; display: inline-block; }
-.ws-editing .ws-unit { width: 4.5em; display: inline-block; margin-left: 4px; }
-.ws-add-line { margin-top: 28px; }
-.ws-add-line h3 { margin-bottom: 4px; }
-.ws-add-line p { margin-bottom: 12px; font-size: .9rem; }
