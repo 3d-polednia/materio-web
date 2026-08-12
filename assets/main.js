@@ -64,18 +64,67 @@ function buildHeroCarousel() {
   start();
 }
 
+/**
+ * The mobile navigation: a drawer under the header, on every page of the site.
+ *
+ * It behaves like the overlay it is — the page behind it does not scroll, a tap on the
+ * dimmed area or Escape closes it, and focus goes into the drawer when it opens and back
+ * to the button when it shuts. Above the drawer's breakpoint the same markup is a plain
+ * row, so everything here is a no-op there: the CSS decides, this only tracks state.
+ */
 function buildMobileNav() {
   const toggle = document.getElementById("menu-toggle");
   const links = document.getElementById("nav-links");
   if (!toggle || !links) return;
-  toggle.addEventListener("click", () => {
-    const open = links.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", String(open));
-  });
-  links.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => {
+  const scrim = document.getElementById("nav-scrim");
+  const desktop = window.matchMedia("(min-width: 901px)");
+
+  // The pages carry their copy in their own language, but /app/ and /p/ switch language
+  // in place, so the label is asked for at the moment it changes.
+  const label = (key) => (typeof t === "function" ? t(key) : toggle.getAttribute("aria-label"));
+
+  const open = () => {
+    links.classList.add("open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", label("nav_close"));
+    if (scrim) scrim.hidden = false;
+    document.body.classList.add("nav-open");
+    const first = links.querySelector("a, button, select");
+    if (first) first.focus();
+  };
+
+  const close = (focusToggle) => {
+    if (!links.classList.contains("open")) return;
     links.classList.remove("open");
     toggle.setAttribute("aria-expanded", "false");
-  }));
+    toggle.setAttribute("aria-label", label("nav_menu"));
+    if (scrim) scrim.hidden = true;
+    document.body.classList.remove("nav-open");
+    if (focusToggle) toggle.focus();
+  };
+
+  toggle.addEventListener("click", () => {
+    if (links.classList.contains("open")) close(false); else open();
+  });
+  if (scrim) scrim.addEventListener("click", () => close(false));
+
+  // A link navigates and a picker is a choice; either way the drawer has done its job.
+  links.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => close(false)));
+
+  // Escape, in the capture phase on purpose: the language menu inside the drawer also
+  // listens for it (assets/i18n-runtime.js) and closes on the way up, so by the time a
+  // bubbling listener here ran, an open menu would already look shut — and Escape would
+  // take the drawer with it instead of only the menu the visitor opened.
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    const langMenu = document.getElementById("lang-menu");
+    if (langMenu && !langMenu.hidden) return;
+    close(true);
+  }, true);
+
+  // Rotating the phone can land the visitor on the desktop layout, where "open" would
+  // leave the body locked and the scrim covering a header that is no longer a drawer.
+  desktop.addEventListener("change", (e) => { if (e.matches) close(false); });
 }
 
 function setYear() {

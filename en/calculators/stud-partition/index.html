@@ -4,6 +4,10 @@
 <!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
      flash. No stored choice means "follow the system", which is also the CSS default. -->
 <script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
@@ -53,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/stud-partition/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/sciana-dzialowa-gk/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812c" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812d" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -71,7 +75,7 @@
 <meta name="twitter:title" content="Stud partition — Construction calculators online | LiczMat">
 <meta name="twitter:description" content="Stud partition — free online calculator. CW/UW profiles, anchors and boards. The same formula as in the LiczMat app for Android, no sign-up.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812c">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812d">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -127,15 +131,13 @@
 <header class="site">
   <div class="wrap nav">
     <a class="brand" href="/en/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
-    <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-    <nav id="nav-links" class="nav-links" aria-label="Calculators">
-      <a href="/en/calculators/">Calculators</a>
-      <a href="/en/materials/">Materials</a>
-      <a href="/en/projects/">Projects</a>
-      <a href="/en/guides/">Guides</a>
-      <a href="/en/stores/">Stores</a>
-      <a href="/en/android-app/">The app</a>
+    <nav id="nav-links" class="nav-links" aria-label="Main navigation">
+      <ul class="nav-list">
+        <li><a href="/en/calculators/" aria-current="page">Calculators</a></li>
+        <li><a href="/en/materials/">Materials</a></li>
+        <li><a href="/en/projects/">Projects</a></li>
+        <li><a href="/en/guides/">Guides</a></li>
+      </ul>
       <div class="pickers">
         <div class="lang-picker" id="lang-picker">
     <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Language">
@@ -150,10 +152,16 @@
   </div>
         <select id="currency-select" class="cur-select" aria-label="Currency" title="Currency"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD" selected>USD</option><option value="UAH">UAH</option></select>
       </div>
-      <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">My account</a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow">My account</a>
     </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
   </div>
 </header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main">
   <section class="block page-head">
     <div class="wrap">
@@ -245,16 +253,30 @@ boards = ⌈ Width × Height × Boarded sides × 1.10 ÷ 2.4 ⌉</code></pre>
         </ul>
       </div>
       <div>
-        <h4>Legal</h4>
+        <h4>Account</h4>
         <ul>
-          <li><a href="/privacy-policy.html">Privacy policy</a></li>
-          <li><a href="/en/cookies/">Cookies</a></li>
           <li><a href="/en/android-app/">The app</a></li>
           <li><a href="/app/" rel="nofollow">My account</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
       </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Privacy policy</a></li>
+          <li><a href="/en/cookies/">Cookies</a></li>
+        </ul>
+      </div>
     </div>
+    <nav class="foot-langs" aria-label="Language">
+      <h4>Language</h4>
+      <ul>
+        <li><a href="/kalkulatory/sciana-dzialowa-gk/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/kalkulyatory/peregorodka-hk/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/rechner/staenderwand/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/calculators/stud-partition/" hreflang="en" lang="en" data-lang="en" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      </ul>
+    </nav>
     <div class="foot-bottom">
       <span>© <span data-year>2026</span> LiczMat. All rights reserved.</span>
       <span>Results are estimates. Always verify before buying.</span>
@@ -276,16 +298,16 @@ boards = ⌈ Width × Height × Boarded sides × 1.10 ÷ 2.4 ⌉</code></pre>
   "de": "/de/rechner/staenderwand/",
   "en": "/en/calculators/stud-partition/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260812c"></script>
-<script src="/assets/i18n-runtime.js?v=20260812c"></script>
-<script src="/assets/currency.js?v=20260812c"></script>
+<script src="/assets/i18n.en.js?v=20260812d"></script>
+<script src="/assets/i18n-runtime.js?v=20260812d"></script>
+<script src="/assets/currency.js?v=20260812d"></script>
 
-<script src="/assets/calculators.js?v=20260812c"></script>
-<script src="/assets/materials.js?v=20260812c"></script>
-<script src="/assets/materials-ui.js?v=20260812c"></script>
-<script src="/assets/workspace.js?v=20260812c"></script>
-<script src="/assets/workspace-ui.js?v=20260812c"></script>
-<script src="/assets/main.js?v=20260812c"></script>
+<script src="/assets/calculators.js?v=20260812d"></script>
+<script src="/assets/materials.js?v=20260812d"></script>
+<script src="/assets/materials-ui.js?v=20260812d"></script>
+<script src="/assets/workspace.js?v=20260812d"></script>
+<script src="/assets/workspace-ui.js?v=20260812d"></script>
+<script src="/assets/main.js?v=20260812d"></script>
 
 </body>
 </html>

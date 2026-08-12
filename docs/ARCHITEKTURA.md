@@ -172,38 +172,58 @@ alternatywa (`/app/klienci/`, wszystko `noindex`). Odrzucona, bo:
 
 ## 5. Nawigacja
 
-Menu i kolumna „Produkt” w stopce powstają z `ROUTES` (pole `header` / `footer`
-z pozycją i kluczem tłumaczenia). Nie da się już dodać linku do menu bez dodania strony
-do architektury.
+Menu i wszystkie kolumny stopki powstają z `ROUTES` (pole `header` / `footer` z pozycją,
+kluczem tłumaczenia i — w stopce — kolumną). Nie da się dodać linku do menu bez dodania
+strony do architektury.
 
 **Menu główne** (kolejność z `header.order`):
 
 ```
-Kalkulatory · Materiały · Projekty · Poradniki · Sklepy · Aplikacja
-[ język ] [ waluta ] [ motyw ]            [ Konto ]
+LiczMat   Kalkulatory · Materiały · Projekty · Poradniki
+          [ język ] [ waluta ] [ Konto ]        [ motyw ] [ menu ]
 ```
 
-**Stopka, kolumna „Produkt”** (`footer.order`): Kalkulatory · Materiały · Projekty ·
-Kosztorys · Poradniki · Sklepy · FAQ.
-Kolumna „Prawne”: Polityka prywatności · Cookies · Aplikacja Android · Konto · Google Play.
+**Cztery linki to maksimum** i `validateIA()` tego pilnuje. Sesja 5 zmierzyła pasek
+w przeglądarce: sześć linków plus selektory nie mieściło się w jednym wierszu poniżej
+1080px (po niemiecku „Die App” i „Mein Konto” łamały się na dwie linie). `Sklepy`
+i `Aplikacja` zeszły do stopki — pierwsze jest narzędziem, a nie krokiem żadnego
+przepływu, drugie rozdział X wprost każe trzymać z dala od pierwszego planu.
+
+Strona, na której stoi odwiedzający, dostaje `aria-current="page"` (najdłuższy pasujący
+prefiks, więc `/kalkulatory/tapety/` podświetla „Kalkulatory”).
+
+**Stopka** — cztery kolumny:
+
+| Kolumna | Skąd | Zawartość |
+|---|---|---|
+| znak | — | logo + tagline |
+| Produkt | `footer.group` domyślna | Kalkulatory · Materiały · Projekty · Kosztorys · Poradniki · Sklepy · FAQ |
+| Konto | `footer.group: "account"` | Aplikacja Android · Moje konto · Google Play |
+| Prawne | ręcznie | Polityka prywatności · Cookies |
+
+Pod nimi **rząd języków**: te same adresy co w selektorze w nagłówku, ale jako zwykłe
+linki — działają bez skryptu i robot je przechodzi.
+
+**Nawigacja mobilna** (poniżej 900px) to szuflada pod nagłówkiem: przyciemnia stronę,
+blokuje przewijanie pod sobą, zamyka się Escapem, kliknięciem w tło i po wybraniu linku.
+Bez JavaScriptu szuflady nie ma i nawigacja zostaje na stronie — wcześniej CSS chował ją
+bezwarunkowo, więc przy wyłączonym skrypcie na telefonie nie dało się przejść nigdzie.
 
 **Okruszki** idą po polu `parent`: `home → calculators → calculator`,
 `home → guides → guide`, `home → projects → estimate`. Każda strona ma dokładnie jednego
 rodzica i `validateIA()` sprawdza, że w drzewie nie ma cyklu.
 
-**Czego w nawigacji brakuje wobec docelowej architektury** (do zrobienia w Sesji 5, nie
-teraz):
+**Czego w nawigacji nadal brakuje** wobec docelowej architektury:
 
 - nie ma wejścia do **LiczMat Pro** — rozdział X chce trzech kierunków ze strony głównej
-  (Kalkulatory / LiczMat / LiczMat Pro), a menu prowadzi tylko do pierwszego;
-- menu jest płaską listą sześciu pozycji i nie pokazuje, że `Kosztorys` należy do
-  `Projektów`;
-- „Konto” jest przyciskiem po prawej i nic nie mówi o stanie zalogowania.
-
-To są ustalenia dla Sesji 5 (globalny layout) i Sesji 6 (strona główna). Sesja 3 ich nie
-wdraża — rozdział XXXV.
+  (Kalkulatory / LiczMat / LiczMat Pro). Trasa `liczmat-pro` powstaje w Sesji 29 i wtedy
+  zajmie miejsce w menu; przy limicie czterech linków coś będzie musiało ustąpić;
+- menu jest płaską listą i nie pokazuje, że `Kosztorys` należy do `Projektów`;
+- „Konto” jest przyciskiem po prawej i nic nie mówi o stanie zalogowania — pulpit
+  zalogowanego to Sesja 14.
 
 ---
+
 
 ## 6. Relacje między modułami
 
@@ -335,7 +355,9 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | poziomy dostępu | nieznany poziom; trasa `PRO` bez opisu, co widzi darmowy użytkownik |
 | drzewo | nieznany rodzic; cykl w drzewie |
 | trasy planowane | brak numeru sesji; działający `path`; obecność w menu; slug kolidujący z istniejącą sekcją lub z inną trasą planowaną |
-| nawigacja | dwa linki na tej samej pozycji; link bez klucza tłumaczenia |
+| nawigacja | dwa linki na tej samej pozycji (w stopce: w tej samej kolumnie); link bez klucza tłumaczenia; więcej niż cztery linki w menu (Sesja 5) |
 | przepływy | krok na nieistniejącą trasę; przepływ sięgający po wyższy poziom bez kroku, który go nadaje |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.
+Tak samo sprawdzone są dwa dołożone w Sesji 5: piąty link w menu i dwie pozycje na tym
+samym miejscu w tej samej kolumnie stopki.

@@ -78,7 +78,10 @@ export const STATUS = {
  *   path        (localized) lang => "/…/"   (language-neutral) a literal string.
  *   each        "calculator" | "guide" — this route stands for a family of pages.
  *   header      { order, key } — a link in the main navigation, at that position.
- *   footer      { order, key } — a link in the footer's product column.
+ *               Four at most: session 5 measured the header and six links plus the
+ *               pickers overflow the row between 900px and 1080px wide.
+ *   footer      { order, key, group } — a link in a footer column ("product" when the
+ *               group is left out), at that position within the column.
  *   gate        for a PRO page: what a free user sees instead of the tool.
  *   session     for a PLANNED page: which session builds it (chapter XXXII).
  *   plannedSlug for a PLANNED localized page: the segment in each language. It moves
@@ -134,6 +137,8 @@ export const ROUTES = [
     path: urlGuideIndex,
     header: { order: 4, key: "nav_guides" },
     footer: { order: 5, key: "foot_guides" },
+    note: "Chapter XI: the way into a calculator for somebody who does not yet know " +
+      "which one they need.",
   },
   {
     id: "guide",
@@ -147,16 +152,18 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlStores,
-    header: { order: 5, key: "nav_stores" },
     footer: { order: 6, key: "nav_stores" },
+    note: "Footer only. It is a tool, not a step of any flow — session 5 took it out of " +
+      "the header to get the row back under one line.",
   },
   {
     id: "android",
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlAndroid,
-    header: { order: 6, key: "nav_app_page" },
-    note: "One page for the Android app. Chapter X: it must not be pushed on the home page.",
+    footer: { order: 1, key: "nav_app_page", group: "account" },
+    note: "One page for the Android app. Chapter X: it must not be pushed on the home " +
+      "page, which is also why session 5 left it out of the header.",
   },
 
   /* ---------------------------------------------------------------- the workspace */
@@ -189,6 +196,7 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: false, indexable: false,
     path: URL_APP,
+    footer: { order: 2, key: "nav_app", group: "account" },
     note: "Sign-up, sign-in, sync, account settings and deletion. GUEST because the " +
       "sign-up form has to be reachable without an account. Language-neutral and " +
       "noindex: it holds no content worth ranking and shows private data.",
@@ -287,10 +295,36 @@ export const route = (id) => BY_ID.get(id);
 export const liveRoutes = () => ROUTES.filter((r) => r.status === STATUS.LIVE);
 export const plannedRoutes = () => ROUTES.filter((r) => r.status === STATUS.PLANNED);
 
-/** The main navigation, in order. Header and footer both read this. */
-export const navRoutes = (slot) => ROUTES
+/** The footer column a route belongs to. Everything without one is a product link. */
+export const footerGroup = (r) => (r.footer && r.footer.group) || "product";
+
+/**
+ * The main navigation, in order. Header and footer both read this.
+ *
+ * @param {"header"|"footer"} slot
+ * @param {string} [group] footer only: just that column ("product", "account").
+ */
+export const navRoutes = (slot, group) => ROUTES
   .filter((r) => r.status === STATUS.LIVE && r[slot])
+  .filter((r) => !group || footerGroup(r) === group)
   .sort((a, b) => a[slot].order - b[slot].order);
+
+/**
+ * The route a URL belongs to, for the "you are here" mark in the navigation.
+ *
+ * Longest prefix wins, so /kalkulatory/tapety/ lights up "Kalkulatory" and
+ * /de/rechner/ lights up the German one. The home page is not in the navigation, and
+ * it would prefix-match everything in its language, so it never takes part.
+ */
+export function currentNavRoute(slot, lang, path) {
+  let best = null;
+  for (const r of navRoutes(slot)) {
+    const here = r.localized ? r.path(lang) : r.path;
+    if (path !== here && !path.startsWith(here)) continue;
+    if (!best || here.length > best.len) best = { route: r, len: here.length };
+  }
+  return best && best.route;
+}
 
 /** The trail from the root down to `id`, including it. Breadcrumbs walk this. */
 export function trail(id) {
@@ -457,18 +491,24 @@ export function validateIA() {
     }
   }
 
-  // Navigation: no two links in the same slot at the same position.
+  // Navigation: no two links in the same slot (and footer column) at the same position.
   for (const slot of ["header", "footer"]) {
     const seen = new Map();
     for (const r of ROUTES) {
       if (!r[slot]) continue;
       if (r.status !== STATUS.LIVE) { problems.push(`IA: planned route "${r.id}" is in the ${slot}`); continue; }
       if (!r[slot].key) problems.push(`IA: route "${r.id}" is in the ${slot} without a label key`);
-      const at = r[slot].order;
+      const at = slot === "footer" ? `${footerGroup(r)}:${r[slot].order}` : String(r[slot].order);
       if (seen.has(at)) problems.push(`IA: "${r.id}" and "${seen.get(at)}" are both at ${slot} position ${at}`);
       seen.set(at, r.id);
     }
   }
+
+  // The header row holds four links, the pickers and the account button. Session 5
+  // measured it: a fifth link pushes the row past the content width in German and
+  // the header starts wrapping between 900px and 1080px.
+  const inHeader = navRoutes("header").length;
+  if (inHeader > 4) problems.push(`IA: ${inHeader} links in the header — the row fits four`);
 
   // Flows: every step names a real route, and a step that raises the level says so.
   for (const flow of FLOWS) {

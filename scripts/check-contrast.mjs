@@ -90,6 +90,7 @@ const PAIRS = [
   ["--focus", "--surface", 3, "the focus ring on a card"],
   ["--accent-edge", "--bg", 3, "the edge of a primary button (1.4.11)"],
   ["--accent-edge", "--surface", 3, "that edge on a card"],
+  ["--accent-edge", "--accent-soft", 3, "the rule under the page you are on, in the navigation"],
 ];
 
 let bad = 0;

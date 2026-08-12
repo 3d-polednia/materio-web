@@ -47,6 +47,10 @@ function applyLang(lang) {
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n, l); });
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh, l); });
   document.querySelectorAll("[data-i18n-alt]").forEach((el) => { el.alt = t(el.dataset.i18nAlt, l); });
+  // Controls whose whole label is the aria-label: the menu button, the theme switch,
+  // the currency select. Nothing about them is visible text, so nothing else would
+  // translate them.
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t(el.dataset.i18nAria, l)); });
   try { localStorage.setItem("materio-lang", l); } catch (e) {}
   document.dispatchEvent(new CustomEvent("langchange", { detail: { lang: l } }));
 }
@@ -78,9 +82,34 @@ function wirePicker() {
   const close = () => { menu.hidden = true; button.setAttribute("aria-expanded", "false"); };
   const open = () => { menu.hidden = false; button.setAttribute("aria-expanded", "true"); };
 
+  /** The rows somebody can land on: the current language is a <span>, not a choice. */
+  const items = () => Array.from(menu.querySelectorAll("a.lang-item, button.lang-item"));
+
+  const move = (step, from) => {
+    const rows = items();
+    if (!rows.length) return;
+    const at = from === undefined ? rows.indexOf(document.activeElement) : from;
+    const next = at < 0 ? (step > 0 ? 0 : rows.length - 1) : (at + step + rows.length) % rows.length;
+    rows[next].focus();
+  };
+
   button.addEventListener("click", (e) => {
     e.stopPropagation();
     if (menu.hidden) open(); else close();
+  });
+
+  // A menu opened from the keyboard has to be walkable from the keyboard.
+  button.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    open();
+    move(e.key === "ArrowDown" ? 1 : -1, e.key === "ArrowDown" ? -1 : 0);
+  });
+
+  menu.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); move(e.key === "ArrowDown" ? 1 : -1); }
+    else if (e.key === "Home") { e.preventDefault(); move(1, -1); }
+    else if (e.key === "End") { e.preventDefault(); move(-1, 0); }
   });
 
   if (!pickerDocHandlers) {

@@ -12,7 +12,7 @@ import {
 } from "./site.mjs";
 import { FLAG, LANG_NAME } from "./flags.mjs";
 import { CURRENCIES, DEFAULT_CURRENCY } from "./currency.mjs";
-import { navRoutes } from "./ia.mjs";
+import { navRoutes, currentNavRoute } from "./ia.mjs";
 
 export const GA_ID = "G-22PS16K79V";
 
@@ -35,7 +35,9 @@ export const LOGO_MARK = `<svg class="logo" viewBox="-1 -1 36 34" width="30" hei
 const ICON = {
   cut: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${ICON_CUT_PATH}</svg>`,
   play: '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>',
-  menu: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',
+  // Both glyphs ship; CSS shows the one that matches the drawer's state.
+  menu: '<svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',
+  close: '<svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>',
   // Both glyphs ship; CSS shows the one that matches the theme in force.
   sun: '<svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg>',
   chevron: '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
@@ -78,15 +80,16 @@ export function langPicker(lang, t, alternates) {
  *
  * Plain codes, no flags: EUR belongs to twenty countries, and a flag would pick one.
  */
-export function currencyPicker(lang, t) {
+export function currencyPicker(lang, t, inPlace) {
   const current = DEFAULT_CURRENCY[lang] || CURRENCIES[0];
   const options = CURRENCIES
     .map((c) => `<option value="${c}"${c === current ? " selected" : ""}>${c}</option>`).join("");
-  return `<select id="currency-select" class="cur-select" aria-label="${esc(t("cur_label"))}" title="${esc(t("cur_label"))}">${options}</select>`;
+  const i18n = inPlace ? ' data-i18n-aria="cur_label"' : "";
+  return `<select id="currency-select" class="cur-select" aria-label="${esc(t("cur_label"))}" title="${esc(t("cur_label"))}"${i18n}>${options}</select>`;
 }
 
-export const themeToggle = (t) =>
-  `<button id="theme-toggle" class="theme-toggle" type="button" aria-label="${esc(t("theme_toggle"))}" title="${esc(t("theme_toggle"))}">${ICON.sun}${ICON.moon}</button>`;
+export const themeToggle = (t, inPlace) =>
+  `<button id="theme-toggle" class="theme-toggle" type="button" aria-label="${esc(t("theme_toggle"))}" title="${esc(t("theme_toggle"))}"${inPlace ? ' data-i18n-aria="theme_toggle"' : ""}>${ICON.sun}${ICON.moon}</button>`;
 
 export const playBadge = (t, loc, cls = "gp-badge") => `
   <a class="${cls}" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="${loc}" aria-label="${esc(t("hero_download"))}">
@@ -175,6 +178,10 @@ export function page(p) {
 <!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
      flash. No stored choice means "follow the system", which is also the CSS default. -->
 <script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
@@ -244,7 +251,7 @@ ${p.headExtra || ""}
 </head>
 <body${p.bodyClass ? ` class="${p.bodyClass}"` : ""}>
 <a class="skip-link" href="#main">${esc(t("skip_main"))}</a>
-${bare ? main : `${header(lang, t, alternates)}\n${main}\n${footer(lang, t)}\n${consentBanner(lang, t)}`}
+${bare ? main : `${siteHeader({ lang, t, alternates, path })}\n${main}\n${siteFooter({ lang, t, alternates })}\n${consentBanner(lang, t)}`}
 ${bare ? "" : `<script>window.LICZMAT_ALTERNATES = ${altJson};</script>`}
 <script src="/assets/i18n.${bare ? "all" : lang}.js?v=${stamp}"></script>
 <script src="/assets/i18n-runtime.js?v=${stamp}"></script>
@@ -262,33 +269,120 @@ ${p.bodyEnd || ""}
 }
 
 /**
- * The main navigation and the footer's product column both come out of `ROUTES` in
+ * The main navigation and the footer's columns both come out of `ROUTES` in
  * src/ia.mjs, in the order the architecture gives them. A page that is not declared
  * there cannot show up in the menu, and a link here cannot point at a page that does
  * not exist — src/ia.mjs holds the URL, the label key and the position in one place.
+ *
+ * `current` is the route the visitor is on (or null); its link gets aria-current, which
+ * is both the accessible answer to "where am I" and what the lime mark hangs off.
  */
-const navLinks = (slot, lang, t) => navRoutes(slot)
-  .map((r) => `<a href="${r.path(lang)}">${esc(t(r[slot].key))}</a>`);
+const navLink = (r, slot, lang, t, current) => {
+  const href = r.localized ? r.path(lang) : r.path;
+  const here = current && current.id === r.id;
+  return `<a href="${href}"${here ? ' aria-current="page"' : ""}${r.localized ? "" : ' rel="nofollow"'}>` +
+    `${esc(t(r[slot].key))}</a>`;
+};
 
-function header(lang, t, alternates) {
+/**
+ * The site header. Every page uses this one — the public pages, /app/ and /p/.
+ *
+ * The row is: brand, navigation, pickers, the account button, the theme switch and (on
+ * a phone) the menu button. The theme switch and the menu button live *outside* the
+ * collapsing part, so a visitor can change the theme without opening the menu.
+ *
+ * @param {object} h
+ * @param {string} h.lang
+ * @param {(k:string)=>string} h.t
+ * @param {object} [h.alternates] { lang: path } — the language picker needs it
+ * @param {string} [h.path]      this page's path, for the "you are here" mark
+ * @param {object[]} [h.links]   overrides the routes: [{ href, key, rel }]
+ * @param {object} [h.cta]       the button at the end: { href, key, rel, target, loc }
+ * @param {boolean} [h.inPlace]  /app/ and /p/: labels carry data-i18n and the language
+ *                               picker is an empty shell the browser fills in
+ */
+export function siteHeader(h) {
+  const { lang, t, alternates, inPlace } = h;
+
+  const current = h.path ? currentNavRoute("header", lang, h.path) : null;
+  const links = h.links
+    ? h.links.map((l) => `<a href="${l.href}"${l.rel ? ` rel="${l.rel}"` : ""}` +
+        `${inPlace ? ` data-i18n="${l.key}"` : ""}>${esc(t(l.key))}</a>`)
+    : navRoutes("header").map((r) => navLink(r, "header", lang, t, current));
+
+  const cta = h.cta || { href: URL_APP, key: "nav_app", rel: "nofollow" };
+  const ctaAttrs = [
+    `href="${cta.href}"`,
+    cta.rel ? `rel="${cta.rel}"` : "",
+    cta.target ? `target="${cta.target}"` : "",
+    cta.loc ? `data-loc="${cta.loc}"` : "",
+    inPlace ? `data-i18n="${cta.key}"` : "",
+  ].filter(Boolean).join(" ");
+
+  const picker = inPlace
+    // Filled in by assets/i18n-runtime.js: these pages switch language in place.
+    ? '<div class="lang-picker" id="lang-picker"></div>'
+    : langPicker(lang, t, alternates);
+
   return `<header class="site">
   <div class="wrap nav">
-    <a class="brand" href="${urlHome(lang)}">${LOGO_MARK}<span>LiczMat</span></a>
-    ${themeToggle(t)}
-    <button id="menu-toggle" class="menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">${ICON.menu}</button>
-    <nav id="nav-links" class="nav-links" aria-label="${esc(t("nav_calc"))}">
-      ${navLinks("header", lang, t).join("\n      ")}
+    <a class="brand" href="${inPlace ? "/" : urlHome(lang)}">${LOGO_MARK}<span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="${esc(t("nav_main"))}"${inPlace ? ' data-i18n-aria="nav_main"' : ""}>
+      <ul class="nav-list">
+        ${links.map((a) => `<li>${a}</li>`).join("\n        ")}
+      </ul>
       <div class="pickers">
-        ${langPicker(lang, t, alternates)}
-        ${currencyPicker(lang, t)}
+        ${picker}
+        ${currencyPicker(lang, t, inPlace)}
       </div>
-      <a class="btn btn-primary btn-sm" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
+      <a class="btn btn-primary btn-sm nav-cta" ${ctaAttrs}>${esc(t(cta.key))}</a>
     </nav>
+    ${themeToggle(t, inPlace)}
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="${esc(t("nav_menu"))}"${inPlace ? ' data-i18n-aria="nav_menu"' : ""}>${ICON.menu}${ICON.close}</button>
   </div>
-</header>`;
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>`;
 }
 
-function footer(lang, t) {
+/**
+ * The site footer. Four columns out of the same routes, then the language row and the
+ * legal line.
+ *
+ * The language row is the second half of the language selector: the header's picker is
+ * a menu that has to be opened, these are plain links a crawler follows. Both point at
+ * the same per-language URLs.
+ *
+ * @param {object} f
+ * @param {boolean} [f.minimal] /app/ and /p/: only the bottom line, no site map
+ */
+export function siteFooter(f) {
+  const { lang, t, alternates, minimal, inPlace } = f;
+
+  const bottom = `<div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat.${minimal ? "" : ` ${esc(t("foot_rights"))}`}</span>
+      ${minimal
+        ? `<span><a href="${URL_PRIVACY}"${inPlace ? ' data-i18n="foot_privacy"' : ""}>${esc(t("foot_privacy"))}</a></span>
+      <span class="muted"${inPlace ? ' data-i18n="app_noindex_note"' : ""}>${esc(t("app_noindex_note"))}</span>`
+        : `<span>${esc(t("foot_disclaimer"))}</span>`}
+    </div>`;
+
+  if (minimal) return `<footer class="site">\n  <div class="wrap">\n    ${bottom}\n  </div>\n</footer>`;
+
+  const column = (group) => navRoutes("footer", group)
+    .map((r) => `<li>${navLink(r, "footer", lang, t, null)}</li>`).join("\n          ");
+
+  const langRow = alternates
+    ? `<nav class="foot-langs" aria-label="${esc(t("lang_label"))}">
+      <h4>${esc(t("lang_label"))}</h4>
+      <ul>
+        ${LANGS.filter((l) => alternates[l]).map((l) => `<li><a href="${esc(alternates[l])}" hreflang="${HREFLANG[l]}" lang="${HREFLANG[l]}" data-lang="${l}"${l === lang ? ' aria-current="true"' : ""}><span class="flag">${FLAG[l]}</span><span>${esc(LANG_NAME[l])}</span></a></li>`).join("\n        ")}
+      </ul>
+    </nav>`
+    : "";
+
   return `<footer class="site">
   <div class="wrap">
     <div class="foot-grid">
@@ -299,8 +393,15 @@ function footer(lang, t) {
       <div>
         <h4>${esc(t("foot_product"))}</h4>
         <ul>
-          ${navLinks("footer", lang, t).map((a) => `<li>${a}</li>`).join("\n          ")}
+          ${column("product")}
           <li><a href="${urlHome(lang)}#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>${esc(t("foot_account"))}</h4>
+        <ul>
+          ${column("account")}
+          <li><a href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
       </div>
       <div>
@@ -308,16 +409,11 @@ function footer(lang, t) {
         <ul>
           <li><a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a></li>
           <li><a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a></li>
-          <li><a href="${urlAndroid(lang)}">${esc(t("nav_app_page"))}</a></li>
-          <li><a href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a></li>
-          <li><a href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
       </div>
     </div>
-    <div class="foot-bottom">
-      <span>© <span data-year>2026</span> LiczMat. ${esc(t("foot_rights"))}</span>
-      <span>${esc(t("foot_disclaimer"))}</span>
-    </div>
+    ${langRow}
+    ${bottom}
   </div>
 </footer>`;
 }

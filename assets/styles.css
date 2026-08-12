@@ -254,6 +254,9 @@
 
   --maxw: 1160px;
   --gutter: var(--sp-5);
+  /* The header is sticky, so its height is also the offset an in-page anchor has to
+     clear and the top edge the mobile drawer hangs from. One number, three uses. */
+  --header-h: 64px;
   --section-y: clamp(48px, 6vw, 68px);
 }
 
@@ -276,7 +279,7 @@
   }
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + var(--sp-2)); }
 body {
   margin: 0;
   font-family: var(--font);
@@ -356,6 +359,7 @@ section.block { padding: var(--section-y) 0; }
    comes from --control-h so a button and a field next to it line up. */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  white-space: nowrap;
   font: inherit; font-weight: var(--fw-bold); cursor: pointer; text-align: center;
   min-height: var(--control-h); padding: var(--sp-3) var(--sp-5);
   border-radius: var(--radius-pill); border: 1px solid transparent;
@@ -625,9 +629,12 @@ header.site {
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   border-bottom: 1px solid var(--outline);
 }
-.nav { display: flex; align-items: center; gap: var(--sp-4); height: 64px; }
+/* Brand · navigation · pickers · account · theme · menu, in that order in the markup
+   as well as on screen. Four links is the ceiling (src/ia.mjs enforces it): with six,
+   German wrapped the row onto two lines everywhere under 1080px. */
+.nav { display: flex; align-items: center; gap: var(--sp-4); height: var(--header-h); }
 .brand {
-  order: 1; display: flex; align-items: center; gap: var(--sp-3);
+  display: flex; align-items: center; gap: var(--sp-3);
   font-weight: var(--fw-black); font-size: var(--fs-lg);
   letter-spacing: var(--track-tight); color: var(--on-bg);
 }
@@ -639,7 +646,7 @@ header.site {
 /* Theme switch. Sits next to the brand on desktop and stays out of the collapsing
    nav on mobile, so it is reachable whether or not the menu is open. */
 .theme-toggle {
-  order: 3; display: inline-grid; place-items: center;
+  display: inline-grid; place-items: center;
   width: var(--control-h-sm); height: var(--control-h-sm); flex: none;
   background: var(--surface-alt); color: var(--on-bg);
   border: 1px solid var(--outline); border-radius: var(--radius-pill);
@@ -657,13 +664,42 @@ header.site {
   :root:not([data-theme="light"]) .theme-toggle .ico-moon { display: none; }
 }
 
-.nav-links { order: 2; display: flex; gap: var(--sp-1); margin-left: auto; align-items: center; }
+.nav-links { display: flex; gap: var(--sp-4); margin-left: auto; align-items: center; }
+.nav-list { display: flex; gap: var(--sp-1); align-items: center; list-style: none; margin: 0; padding: 0; }
 .nav-links a {
-  color: var(--on-bg); padding: var(--sp-2) var(--sp-3);
+  display: block; white-space: nowrap; color: var(--on-bg); padding: var(--sp-2) var(--sp-3);
   border-radius: var(--radius-pill); font-weight: var(--fw-semi); font-size: var(--fs-sm);
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .nav-links a:hover { background: var(--surface-alt); text-decoration: none; }
-.menu-toggle { order: 4; display: none; background: none; border: 0; cursor: pointer; color: var(--on-bg); }
+/* Where you are. The tint alone would be a colour-only cue, so the section also keeps
+   a lime rule under it (WCAG 1.4.1). */
+.nav-list a[aria-current="page"] {
+  background: var(--accent-soft); color: var(--on-accent-soft);
+  box-shadow: inset 0 -2px 0 var(--accent-edge);
+}
+
+/* The menu button exists only where the drawer does, and only when a script can open
+   it: without JS the navigation stays on the page instead of behind a dead button. */
+.menu-toggle {
+  display: none; place-items: center; flex: none;
+  width: var(--control-h-sm); height: var(--control-h-sm); padding: 0;
+  background: none; border: 0; cursor: pointer; color: var(--on-bg);
+}
+.menu-toggle svg { grid-area: 1 / 1; }
+.menu-toggle .ico-close { display: none; }
+.menu-toggle[aria-expanded="true"] .ico-close { display: block; }
+.menu-toggle[aria-expanded="true"] .ico-menu { display: none; }
+
+/* The sheet behind the open drawer. It dims the page and it is what a tap outside the
+   menu lands on. */
+.nav-scrim {
+  position: fixed; inset: var(--header-h) 0 0 0; z-index: 45;
+  background: var(--overlay);
+}
+.nav-scrim[hidden] { display: none; }
+/* The drawer is the only thing that scrolls while it is open. */
+body.nav-open { overflow: hidden; }
 
 /* ---------- Language and currency ----------
    The plan (chapter V) rules out emoji flags, so a flag is a real SVG inlined next to the
@@ -720,7 +756,7 @@ footer.site {
   background: var(--surface-container); border-top: 1px solid var(--outline);
   padding: var(--sp-12) 0 var(--sp-7); margin-top: var(--sp-5);
 }
-.foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: var(--sp-7); }
+.foot-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: var(--sp-7); }
 footer .brand { margin-bottom: var(--sp-3); }
 footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--sp-2); }
 footer a { color: var(--muted); }
@@ -728,8 +764,16 @@ footer h4 {
   font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--track-wide);
   color: var(--on-bg); margin: 0 0 var(--sp-3);
 }
+/* The other half of the language selector. The header's picker is a menu somebody has
+   to open; these are plain links, so they work with no script and a crawler follows them
+   to the other three versions of this very page. */
+.foot-langs { margin-top: var(--sp-8); }
+.foot-langs ul { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-5); }
+.foot-langs a { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.foot-langs a[aria-current] { color: var(--on-bg); font-weight: var(--fw-semi); }
+
 .foot-bottom {
-  margin-top: var(--sp-8); padding-top: var(--sp-4); border-top: 1px solid var(--outline);
+  margin-top: var(--sp-5); padding-top: var(--sp-4); border-top: 1px solid var(--outline);
   display: flex; flex-wrap: wrap; gap: var(--sp-3) var(--sp-5);
   justify-content: space-between; color: var(--muted); font-size: var(--fs-sm);
 }
@@ -927,7 +971,7 @@ footer h4 {
 }
 /* The same catalogue as a page: one indexable row per material. */
 .mat-page-list { display: grid; gap: var(--sp-2); }
-.mat-page-list li { justify-content: space-between; gap: var(--sp-4); scroll-margin-top: 80px; }
+.mat-page-list li { justify-content: space-between; gap: var(--sp-4); scroll-margin-top: calc(var(--header-h) + var(--sp-4)); }
 .mat-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .mat-item .muted { font-size: var(--fs-sm); }
 .mat-page-list .btn { flex: none; }
@@ -1101,6 +1145,16 @@ footer h4 {
    rule — these blocks take things away above the phone layout only where a
    component genuinely needs a second arrangement. */
 
+/* Between the content width and the desktop layout the header row has no slack: the
+   links give up their side padding before anything is taken away. Measured in German,
+   which has the longest labels of the four. */
+@media (max-width: 1160px) {
+  .nav, .nav-links { gap: var(--sp-2); }
+  .nav-list { gap: 0; }
+  .nav-list a { padding-left: var(--sp-2); padding-right: var(--sp-2); }
+  .lang-btn, .cur-select { padding-left: var(--sp-2); padding-right: var(--sp-2); }
+}
+
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; }
   .hero-media { order: -1; }
@@ -1117,20 +1171,37 @@ footer h4 {
   .cta-copy { display: flex; flex-direction: column; align-items: center; }
   .cta-shots { display: none; }
 
-  /* The navigation becomes a drawer. The theme switch and the menu button stay
-     outside it, so both are reachable with the drawer shut. */
-  .nav-links {
-    position: fixed; inset: 64px 0 auto 0; flex-direction: column; align-items: stretch;
-    gap: 0; background: var(--bg); border-bottom: 1px solid var(--outline);
+  /* The navigation becomes a drawer under the header. The theme switch and the menu
+     button stay outside it, so both are reachable with the drawer shut. A drawer
+     taller than the phone scrolls on its own; the page behind it does not. */
+  .js .nav-links {
+    position: fixed; inset: var(--header-h) 0 auto 0; z-index: 40;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--bg); border-bottom: 1px solid var(--outline);
     padding: var(--sp-2); box-shadow: var(--shadow-3); display: none;
+    max-height: calc(100vh - var(--header-h));
+    max-height: calc(100dvh - var(--header-h));
+    overflow-y: auto; overscroll-behavior: contain;
   }
-  .nav-links.open { display: flex; }
+  .js .nav-links.open { display: flex; }
+  .js .menu-toggle { display: inline-grid; }
+
+  /* Without a script there is nothing to open the drawer with, so the navigation
+     stays where it is and the header row wraps around it. */
+  html:not(.js) .nav { flex-wrap: wrap; height: auto; padding-top: var(--sp-3); padding-bottom: var(--sp-3); }
+  /* The navigation takes the second row, so the brand and the theme switch keep the
+     first one to themselves instead of leaving a gap beside it. */
+  html:not(.js) .nav-links { order: 1; flex-basis: 100%; flex-wrap: wrap; margin-left: 0; }
+
+  .nav-list { flex-direction: column; align-items: stretch; width: 100%; }
   .nav-links a { padding: var(--sp-3); font-size: var(--fs-base); }
   .nav-links .pickers, .nav-links .btn { margin: var(--sp-2); }
-  /* Inside the mobile drawer the menu is part of the flow, not an overlay. */
+  /* Inside the mobile drawer the menu is part of the flow, not an overlay: it makes the
+     picker taller, and the currency select stays level with the button it opened from
+     instead of sliding down to the middle of the open list. */
+  .nav-links .pickers { align-items: flex-start; }
   .nav-links .lang-picker { position: static; }
   .nav-links .lang-menu { position: static; margin-top: var(--sp-2); box-shadow: none; }
-  .menu-toggle { display: inline-flex; }
   .theme-toggle { margin-left: auto; }
 }
 
@@ -1157,7 +1228,7 @@ footer h4 {
    text stays selectable. */
 @media print {
   header.site, footer.site, .consent-banner, .breadcrumbs, .no-print,
-  .app-note, .skip-link, .mat-dialog { display: none !important; }
+  .app-note, .skip-link, .mat-dialog, .nav-scrim { display: none !important; }
   body { background: #fff; color: #000; }
   .block { padding: 0 !important; background: #fff !important; }
   .wrap { max-width: none; padding: 0; }

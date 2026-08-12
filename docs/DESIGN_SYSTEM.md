@@ -135,6 +135,7 @@ Do tego trzy wartości układu strony:
 |---|---|---|
 | `--maxw` | `1160px` | szerokość treści (`.wrap`) |
 | `--gutter` | `--sp-5`, poniżej 560px `--sp-4` | margines boczny |
+| `--header-h` | `64px` | wysokość paska nagłówka: wiersz `.nav`, górna krawędź szuflady mobilnej i `scroll-padding-top` dla kotwic |
 | `--section-y` | `clamp(48px, 6vw, 68px)` | pion sekcji `.block` |
 
 Odstęp spoza skali jest błędem, nie decyzją — dlatego w generowanym HTML nie ma już
@@ -212,13 +213,55 @@ Jedno pudełko na „oto wynik” i „nie wyszło”: wynik kalkulatora oraz pa
 w `/app/`. Wariant `.err` to rodzina `--error`. `.tip` to spokojniejsza wersja
 w treści poradnika.
 
+### Nagłówek `header.site` (Sesja 5)
+
+Jeden pasek na całym serwisie — także w `/app/` i `/p/`, które przed Sesją 5 miały
+własną kopię. Kolejność w kodzie jest kolejnością na ekranie: znak, nawigacja,
+selektory, przycisk konta, przełącznik motywu, przycisk menu.
+
+- Wysokość: `--header-h` (64px). Ten sam token wyznacza `scroll-padding-top` dla
+  kotwic i górną krawędź szuflady — jedna liczba, trzy zastosowania.
+- **Maksymalnie cztery linki** w nawigacji; pilnuje tego `validateIA()`. Zmierzone:
+  sześć linków plus selektory rozbijało wiersz na dwie linie poniżej 1080px
+  (najgorszy przypadek: niemiecki). Przy czterech najciaśniejszy układ desktopowy
+  (901px, ukraiński) ma jeszcze 41px zapasu.
+- Przełącznik motywu i przycisk menu stoją **poza** zwijaną częścią, więc motyw
+  zmienia się bez otwierania menu.
+- Strona bieżąca: `aria-current="page"` + tło `--accent-soft` i limonkowa kreska
+  `--accent-edge` pod spodem (samo tło byłoby wskazaniem wyłącznie kolorem).
+
+### Nawigacja mobilna `.nav-links.open` (Sesja 5)
+
+Poniżej 900px nawigacja to szuflada pod nagłówkiem, zachowująca się jak nakładka:
+
+- przyciemnienie strony (`.nav-scrim`, `--overlay`) — kliknięcie zamyka,
+- `body.nav-open { overflow: hidden }` — pod szufladą nic się nie przewija,
+- szuflada wyższa niż ekran przewija się sama
+  (`max-height: calc(100dvh - var(--header-h))`, `overscroll-behavior: contain`),
+- Escape zamyka i wraca fokusem na przycisk; otwarcie przenosi fokus do środka,
+- ikona przycisku zmienia się z „hamburgera” na krzyżyk (`aria-expanded`),
+- `.nav-scrim` leży **poza** `<header>`: `backdrop-filter` nagłówka czyni z niego blok
+  zawierający dla `position: fixed`, więc w środku przyciemnienie miałoby wysokość
+  paska.
+
+Cały ten mechanizm zależy od skryptu, dlatego skrypt w `<head>` dopisuje klasę `js`
+do `<html>`, a szuflada chowa się tylko w regułach z `.js`. Bez JavaScriptu nawigacja
+zostaje na stronie (drugi wiersz nagłówka) zamiast chować się za martwym przyciskiem.
+
+### Stopka `footer.site` (Sesja 5)
+
+Cztery kolumny (znak + tagline, Produkt, Konto, Prawne) generowane z `ROUTES`
+(`footer: { order, key, group }`), pod nimi rząd języków — te same adresy co
+w selektorze, ale jako zwykłe linki: działają bez skryptu i robot je przechodzi.
+`/app/` i `/p/` używają wariantu `minimal`: sam dolny wiersz.
+
 ### Pozostałe
 
 Wiersz listy (`.data-list li`, `.store-item`, `.mat-page-list li` — jedna reguła),
 tabela kosztorysu (`.ws-table`, liczby `tabular-nums`), dialog materiałów
 (`.mat-dialog` + `::backdrop` z `--overlay`), FAQ na `<details>`, blok wzoru
 (`pre.formula`, zawija zamiast przewijać w bok), plakietka Google Play
-(`.gp-badge` — czerń Google, celowo poza motywem), baner zgody, nagłówek, stopka.
+(`.gp-badge` — czerń Google, celowo poza motywem), baner zgody.
 
 ---
 
@@ -234,6 +277,7 @@ Sześć stanów, wszędzie tak samo:
 | disabled | `opacity: .5`, `cursor: not-allowed`, bez cienia | **jedna reguła** `:disabled, [aria-disabled="true"]` |
 | wybrany | wypełnienie `--accent` + `--on-accent` | `.chip.on`, `[aria-selected="true"]` |
 | błędny | krawędź i obwódka `--error` | `[aria-invalid="true"]` |
+| bieżący | tło `--accent-soft` + kreska `--accent-edge` pod spodem | `[aria-current="page"]` w nawigacji |
 
 Obwódka fokusu **nie zmienia** `border-radius` elementu. Wcześniej zmieniała
 (`border-radius: 4px` w regule `:focus-visible`), przez co każdy przycisk-pigułka
@@ -250,7 +294,7 @@ Mobile-first (rozdział XXVIII). **Cztery szerokości, ani jednej więcej:**
 | 560px | siatki schodzą do jednej kolumny, wiersz sklepu się rozkłada, `--gutter` → 16px |
 | 760px | zrzuty aplikacji i wiersze katalogu w jednej kolumnie |
 | 900px | układ desktopowy: hero, kalkulator + „jak liczymy”, stopka, **nawigacja staje się szufladą** |
-| 1160px | `--maxw`, szerokość treści |
+| 1160px | `--maxw`, szerokość treści; pasek nagłówka ściska odstępy, żeby zmieścić się w jednym wierszu |
 
 Przed Sesją 4 breakpointów było siedem (420, 520, 560, 640, 760, 860, 900) — każdy
 dodany przy okazji jednego komponentu, żaden nieuzgodniony z resztą.

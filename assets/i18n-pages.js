@@ -27,6 +27,8 @@ const I18N_PAGES = {
     meta_desc: "Darmowy kalkulator budowlany: farby, tynki, płytki, panele, tapety i rozkrój 1D/2D. Policz materiał, kup tyle ile trzeba, ogranicz odpad. Mapa sklepów, projekty, wycena PDF. Liczy offline, konto opcjonalne, 4 języki i 4 waluty.",
 
     nav_guides: "Poradniki", nav_app: "Moje konto",
+    nav_main: "Nawigacja główna", nav_menu: "Otwórz menu", nav_close: "Zamknij menu",
+    foot_account: "Konto",
     bc_home: "Start", foot_guides: "Poradniki", foot_calc_all: "Wszystkie kalkulatory",
 
     calchub_title: "Kalkulatory budowlane online",
@@ -351,6 +353,8 @@ const I18N_PAGES = {
     meta_desc: "Free construction calculator: paint, plaster, tiles, panels, wallpaper and 1D/2D cutting. Work out the material, buy what you need, cut the waste. Store map, projects, PDF estimates. Calculates offline, account optional, 4 languages and 4 currencies.",
 
     nav_guides: "Guides", nav_app: "My account",
+    nav_main: "Main navigation", nav_menu: "Open menu", nav_close: "Close menu",
+    foot_account: "Account",
     bc_home: "Home", foot_guides: "Guides", foot_calc_all: "All calculators",
 
     calchub_title: "Construction calculators online",
@@ -675,6 +679,8 @@ const I18N_PAGES = {
     meta_desc: "Kostenloser Baurechner: Farbe, Putz, Fliesen, Paneele, Tapete und Zuschnitt 1D/2D. Material berechnen, nur so viel kaufen wie nötig, Verschnitt senken. Baumarktkarte, Projekte, PDF-Angebote. Rechnet offline, Konto optional, 4 Sprachen und 4 Währungen.",
 
     nav_guides: "Ratgeber", nav_app: "Mein Konto",
+    nav_main: "Hauptnavigation", nav_menu: "Menü öffnen", nav_close: "Menü schließen",
+    foot_account: "Konto",
     bc_home: "Start", foot_guides: "Ratgeber", foot_calc_all: "Alle Rechner",
 
     calchub_title: "Baurechner online",
@@ -999,6 +1005,8 @@ const I18N_PAGES = {
     meta_desc: "Безкоштовний будівельний калькулятор: фарба, штукатурка, плитка, панелі, шпалери та розкрій 1D/2D. Порахуй матеріал, купи скільки треба, зменш відходи. Карта магазинів, проєкти, кошторис у PDF. Рахує офлайн, акаунт необов'язковий, 4 мови і 4 валюти.",
 
     nav_guides: "Поради", nav_app: "Мій акаунт",
+    nav_main: "Головна навігація", nav_menu: "Відкрити меню", nav_close: "Закрити меню",
+    foot_account: "Акаунт",
     bc_home: "Головна", foot_guides: "Поради", foot_calc_all: "Усі калькулятори",
 
     calchub_title: "Будівельні калькулятори онлайн",

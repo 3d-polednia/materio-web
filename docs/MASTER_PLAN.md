@@ -29,8 +29,48 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 2 | Języki i waluty | **Zrobione** — 2026-08-12 |
 | 3 | Architektura informacji | **Zrobione** — 2026-08-12 |
 | 4 | Design system | **Zrobione** — 2026-08-12 |
-| 5 | Globalny layout | **Następna** |
-| 6–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 5 | Globalny layout | **Zrobione** — 2026-08-12 |
+| 6 | Homepage | **Następna** |
+| 7–36 | patrz rozdział XXXII planu | Nie zaczęte |
+
+### Co zrobiła Sesja 5
+
+Nagłówek, stopka, nawigacja, nawigacja mobilna, selektory i przełącznik motywu — jeden
+zestaw dla całego serwisu. Układ pojedynczych stron nietknięty (to Sesje 6–7).
+
+- **Jeden nagłówek i jedna stopka na cały serwis.** `/app/` i `/p/` miały własną kopię
+  w `src/app-pages.mjs`; teraz wołają `siteHeader()` / `siteFooter()` z `src/template.mjs`
+  z krótszą listą linków. Przy okazji znika **realny błąd**: te dwie strony nie miały
+  przycisku menu, a CSS chował nawigację poniżej 900px — na telefonie selektor języka
+  i waluty w `/app/` był niedostępny (sprawdzone w przeglądarce, zrzut przed i po).
+- **Pasek nagłówka mieści się w jednym wierszu.** Zmierzone w Chromium: sześć linków
+  plus selektory rozbijały wiersz na dwie linie już przy 1024px. `Sklepy` i `Aplikacja`
+  zeszły do stopki, odstępy w paśmie do 1160px są ciaśniejsze, przyciski nie łamią
+  tekstu. Najgorszy przypadek (901px, ukraiński) ma teraz 41px zapasu, wysokość paska
+  zostaje 64px we wszystkich czterech językach. `validateIA()` pilnuje limitu czterech
+  linków, żeby to się nie odbudowało.
+- **Wiadomo, gdzie się jest**: link bieżącej sekcji dostaje `aria-current="page"`, tło
+  `--accent-soft` i limonkową kreskę (samo tło byłoby wskazaniem wyłącznie kolorem).
+  Dopasowanie po najdłuższym prefiksie, więc strona kalkulatora podświetla „Kalkulatory”.
+- **Szuflada mobilna zachowuje się jak nakładka**: przyciemnienie strony (kliknięcie
+  zamyka), zablokowane przewijanie pod spodem, własne przewijanie gdy jest wyższa niż
+  ekran, Escape zamyka i wraca fokusem na przycisk, ikona zmienia się na krzyżyk.
+  Wcześniej nie było nic z tego. 20 sprawdzeń w Chromium, wszystkie przechodzą.
+- **Bez JavaScriptu nawigacja nie znika.** Skrypt w `<head>` dopisuje klasę `js`, a
+  szuflada chowa się tylko w regułach z `.js`. Wcześniej CSS chował menu bezwarunkowo,
+  a otwierał je wyłącznie skrypt — z wyłączonym JS telefon nie miał żadnego linku.
+- **Selektor języka z klawiatury**: strzałki otwierają listę i chodzą po niej, Home/End
+  skaczą na końce, Escape zamyka samo menu (a nie całą szufladę pod nim — stąd nasłuch
+  w fazie przechwytywania w `assets/main.js`).
+- **Stopka: cztery kolumny** (znak, Produkt, Konto, Prawne) generowane z `ROUTES` przez
+  nowe pole `footer.group`, a pod nimi rząd języków — te same adresy co w selektorze, ale
+  jako zwykłe linki: działają bez skryptu i robot je przechodzi.
+- **`--header-h` (64px)** zamiast trzech kopii tej samej liczby: wiersz nagłówka, górna
+  krawędź szuflady i `scroll-padding-top` dla kotwic (było 72px przy pasku 64px).
+- Nowa para w `scripts/check-contrast.mjs` (kreska pod bieżącą stroną): 5,37:1 w jasnym,
+  8,09:1 w ciemnym. Wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 4
 
@@ -199,9 +239,17 @@ zapis pod nowym — a nie zwykłe przemianowanie.
 ### Układ ze wzorca
 
 Grafika referencyjna zawiera wyszukiwarkę kalkulatorów, kafelki popularnych, mockup
-pulpitu i selektor języka z flagami. Selektor z flagami zrobiła Sesja 2; reszta to
-Sesje 5, 6 i 7. Sesja 1 wdrożyła sam system wizualny, bez przebudowy architektury
-strony głównej.
+pulpitu i selektor języka z flagami. Selektor z flagami zrobiła Sesja 2, ramę strony
+(nagłówek, stopka, nawigacja) Sesja 5; wyszukiwarka i kafelki to Sesje 6 i 7. Sesja 1
+wdrożyła sam system wizualny, bez przebudowy architektury strony głównej.
+
+### Miejsce dla „LiczMat Pro” w menu
+
+Menu mieści cztery linki i tyle ich dziś jest (Kalkulatory, Materiały, Projekty,
+Poradniki). Rozdział X chce, żeby ze strony głównej wychodziły trzy kierunki:
+Kalkulatory, LiczMat i LiczMat Pro. Kiedy Sesja 29 zbuduje `/liczmat-pro/`, coś z menu
+będzie musiało ustąpić — najpewniej „Poradniki”, które i tak są w stopce. Decyzja należy
+do tamtej sesji.
 
 ### Drobny błąd zastany — naprawiony
 

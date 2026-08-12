@@ -7,35 +7,25 @@
    place — see buildInPlacePicker() in assets/i18n-runtime.js. That is why the markup
    below uses data-i18n attributes while every generated page uses real text. */
 
-import { esc, LOGO_MARK, themeToggle, currencyPicker } from "./template.mjs";
+import { esc, siteHeader, siteFooter } from "./template.mjs";
 import { urlCalcIndex, urlHome, PLAY_URL, URL_APP } from "./site.mjs";
 
-/** Header/footer are deliberately minimal here — these pages are a tool, not a funnel. */
-const chrome = (t, bodyMain) => `<header class="site">
-  <div class="wrap nav">
-    <a class="brand" href="/">${LOGO_MARK}<span>LiczMat</span></a>
-    ${themeToggle(t)}
-    <nav class="nav-links" aria-label="LiczMat">
-      <a href="${urlCalcIndex("pl")}" data-i18n="nav_calc">${esc(t("nav_calc"))}</a>
-      <div class="pickers">
-        <!-- Filled in by assets/i18n-runtime.js: these pages switch language in place. -->
-        <div class="lang-picker" id="lang-picker"></div>
-        ${currencyPicker("pl", t)}
-      </div>
-      <a class="btn btn-primary btn-sm" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="app" data-i18n="nav_download">${esc(t("nav_download"))}</a>
-    </nav>
-  </div>
-</header>
+/**
+ * The same header and footer as the rest of the site, with a shorter link list: these
+ * pages are a tool, not a funnel. Going through src/template.mjs is what gives them the
+ * mobile drawer — before session 5 they had none, so on a phone the language and
+ * currency pickers sat in a nav that CSS had hidden and no button could open.
+ *
+ * `inPlace` puts data-i18n on every label: /app/ and /p/ have no per-language URLs and
+ * swap text in the DOM (assets/i18n-runtime.js) instead of navigating.
+ */
+const chrome = (t, bodyMain) => `${siteHeader({
+  lang: "pl", t, inPlace: true,
+  links: [{ href: urlCalcIndex("pl"), key: "nav_calc" }],
+  cta: { href: PLAY_URL, key: "nav_download", target: "_blank", rel: "noopener", loc: "app" },
+})}
 ${bodyMain}
-<footer class="site">
-  <div class="wrap">
-    <div class="foot-bottom">
-      <span>© <span data-year>2026</span> LiczMat.</span>
-      <span><a href="/privacy-policy.html" data-i18n="foot_privacy">${esc(t("foot_privacy"))}</a></span>
-      <span class="muted" data-i18n="app_noindex_note">${esc(t("app_noindex_note"))}</span>
-    </div>
-  </div>
-</footer>`;
+${siteFooter({ lang: "pl", t, minimal: true, inPlace: true })}`;
 
 /** A label + input pair, written once because the account panel is mostly forms. */
 const field = (id, labelKey, t, { type = "text", autocomplete, minlength } = {}) =>
