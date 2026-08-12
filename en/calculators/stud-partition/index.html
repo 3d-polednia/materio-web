@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/stud-partition/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/sciana-dzialowa-gk/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Stud partition — Construction calculators online | LiczMat">
 <meta name="twitter:description" content="Stud partition — free online calculator. CW/UW profiles, anchors and boards. The same formula as in the LiczMat app for Android, no sign-up.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -171,49 +171,58 @@
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap calc-page">
-      <div class="calc-page-form">
-        <div class="calc" data-calc="studwall" data-tab="framing">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M8 3v18M13 3v18M18 3v18"/></svg></span><span>Stud partition</span></h2>
-      <p class="desc">CW/UW profiles, anchors and boards.</p>
-      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Pick a material</span></button>
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="studwall" data-tab="framing">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Your figures</h2>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Pick a material</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-studwall-width">Width (m)</label><input id="f-studwall-width" type="text" inputmode="decimal" data-k="width" value="4"></div><div class="field"><label for="f-studwall-height">Height (m)</label><input id="f-studwall-height" type="text" inputmode="decimal" data-k="height" value="2.6"></div><div class="field"><label for="f-studwall-studSp">Stud spacing (m)</label><input id="f-studwall-studSp" type="text" inputmode="decimal" data-k="studSp" value="0.6"></div><div class="field"><label for="f-studwall-bar">Profile length (m)</label><input id="f-studwall-bar" type="text" inputmode="decimal" data-k="bar" value="3"></div><div class="field"><label for="f-studwall-sides">Boarded sides</label><select id="f-studwall-sides" data-k="sides"><option value="1">1</option><option value="2" selected>2</option></select></div><div class="field"><label for="f-studwall-price">Price per piece/pack</label><input id="f-studwall-price" type="text" inputmode="decimal" data-k="price" value=""></div>
-      <button type="button" class="btn btn-primary" data-run>Calculate</button>
-      <div class="result" data-result></div>
-    </div>
-        <p class="muted src-note"><a href="/en/materials/">Building material catalogue</a> — 5 materials in the catalogue</p>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Calculate"
+          data-label-again="Calculate again">Calculate</button>
       </div>
-      <div class="calc-page-how">
-        <h2>How we calculate it</h2>
-
-        <h3>What you enter</h3>
-        <ul class="plain-list"><li><b>Width (m)</b></li><li><b>Height (m)</b></li><li><b>Stud spacing (m)</b></li><li><b>Profile length (m)</b></li><li><b>Boarded sides</b></li></ul>
-
-        <h3>Formula</h3>
-        <pre class="formula"><code>studs = ⌊ Width ÷ Stud spacing ⌋ + 1
-CW profiles = studs × ⌈ Height ÷ Profile length ⌉
-UW profiles = ⌈ 2 × Width ÷ Profile length ⌉
-fixings = 2 × (⌊ Width ÷ 0.6 ⌋ + 1)
-boards = ⌈ Width × Height × Boarded sides × 1.10 ÷ 2.4 ⌉</code></pre>
-
-        <h3>Example</h3>
-        <p class="muted">The default values from the form, run through the same engine:</p>
-        <div class="result show">
+      <div class="calc-out">
+        <h2 id="calc-result-h">Result</h2>
+        <div class="result show" data-result>
           <div class="muted eyebrow">To buy</div>
           <div class="big">10 <span class="figure-line">boards</span></div>
           <div class="rows"><div><span>CW studs</span><b>7 × 3 m</b></div><div><span>UW tracks</span><b>3 × 3 m</b></div><div><span>Anchors</span><b>14</b></div></div>
         </div>
+        <p class="calc-stale" data-calc-stale hidden>The figures changed. Press “Calculate again” to see the new result.</p>
+        <div class="calc-actions" data-calc-actions></div>
+      </div>
+    </div>
+      <p class="muted src-note"><a href="/en/materials/">Building material catalogue</a> — 5 materials in the catalogue</p>
+    </div>
+  </section>
 
-        <h3>What to watch out for</h3>
-        <p>60 cm spacing is standard under a 1.2 m board. Go down to 40 cm under a heavier finish or tiles. Boards are counted for both faces.</p>
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">How we calculate it</h2>
 
-        <p class="muted src-note">The LiczMat app for Android uses the same formula. The site's engine is a 1:1 port of the app's code.</p>
+      <div class="calc-how-grid">
+        <div>
+          <h3>What you enter</h3>
+          <ul class="plain-list"><li><b>Width (m)</b></li><li><b>Height (m)</b></li><li><b>Stud spacing (m)</b></li><li><b>Profile length (m)</b></li><li><b>Boarded sides</b></li></ul>
+
+          <h3>What to watch out for</h3>
+          <p>60 cm spacing is standard under a 1.2 m board. Go down to 40 cm under a heavier finish or tiles. Boards are counted for both faces.</p>
+        </div>
+        <div>
+          <h3>Formula</h3>
+          <pre class="formula"><code>studs = ⌊ Width ÷ Stud spacing ⌋ + 1
+CW profiles = studs × ⌈ Height ÷ Profile length ⌉
+UW profiles = ⌈ 2 × Width ÷ Profile length ⌉
+fixings = 2 × (⌊ Width ÷ 0.6 ⌋ + 1)
+boards = ⌈ Width × Height × Boarded sides × 1.10 ÷ 2.4 ⌉</code></pre>
+          <p class="muted src-note">The LiczMat app for Android uses the same formula. The site's engine is a 1:1 port of the app's code.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block alt">
     <div class="wrap">
       <h2>Other calculators</h2>
       <div class="chips"><a class="chip" href="/en/calculators/suspended-ceiling/">Suspended ceiling</a><a class="chip" href="/en/calculators/glued-plasterboard/">Glued plasterboard</a><a class="chip" href="/en/calculators/sheathing-osb/">Sheathing (OSB/boards)</a></div>
@@ -298,16 +307,16 @@ boards = ⌈ Width × Height × Boarded sides × 1.10 ÷ 2.4 ⌉</code></pre>
   "de": "/de/rechner/staenderwand/",
   "en": "/en/calculators/stud-partition/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260812g"></script>
-<script src="/assets/i18n-runtime.js?v=20260812g"></script>
-<script src="/assets/currency.js?v=20260812g"></script>
+<script src="/assets/i18n.en.js?v=20260812h"></script>
+<script src="/assets/i18n-runtime.js?v=20260812h"></script>
+<script src="/assets/currency.js?v=20260812h"></script>
 
-<script src="/assets/calculators.js?v=20260812g"></script>
-<script src="/assets/materials.js?v=20260812g"></script>
-<script src="/assets/materials-ui.js?v=20260812g"></script>
-<script src="/assets/workspace.js?v=20260812g"></script>
-<script src="/assets/workspace-ui.js?v=20260812g"></script>
-<script src="/assets/main.js?v=20260812g"></script>
+<script src="/assets/calculators.js?v=20260812h"></script>
+<script src="/assets/materials.js?v=20260812h"></script>
+<script src="/assets/materials-ui.js?v=20260812h"></script>
+<script src="/assets/workspace.js?v=20260812h"></script>
+<script src="/assets/workspace-ui.js?v=20260812h"></script>
+<script src="/assets/main.js?v=20260812h"></script>
 
 </body>
 </html>

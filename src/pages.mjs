@@ -54,13 +54,24 @@ function freePrice(lang) {
 const PICK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>';
 
 /**
- * The interactive card for one calculator, with every label already in `lang`.
+ * The tool itself: the form on one side, the result and the actions on the other.
+ *
+ * Chapter XII wants FORMULARZ → WYNIK → AKCJE and says the result matters most, so the
+ * two halves are siblings rather than a form with an answer buried under it, and on a wide
+ * screen the result column is sticky — scrolling the fields never scrolls the answer away.
+ *
+ * **The result box ships filled in.** `example` is the build running this calculator's own
+ * engine over the values the form opens with, so the number on the page is the true answer
+ * for the numbers in the fields — not a sample of one. That is what makes the panel
+ * meaningful before anyone clicks, to a crawler and to a visitor with no JavaScript alike;
+ * assets/calculators.js recalculates it in place from there. It is also why the page no
+ * longer carries a second, identical green box further down labelled "Przykład".
  *
  * `materials` is how many catalogue entries can pre-fill this calculator; when there are
  * none (volume of concrete, blocks per m²) the picker button is left out entirely rather
  * than opening an empty dialog.
  */
-export function calcCard(calc, t, { heading = "h2", materials = 0 } = {}) {
+export function calcCard(calc, t, { materials = 0, example }) {
   const fields = calc.fields.map((f) => {
     const label = esc(t(f.label));
     if (f.sel) {
@@ -84,12 +95,29 @@ export function calcCard(calc, t, { heading = "h2", materials = 0 } = {}) {
       <p class="mat-chosen" data-mat-chosen hidden></p>`
     : "";
 
+  const rows = example.rows
+    .map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("");
+
+  // The card carries both labels so the script can swap them without a dictionary of its
+  // own: "Policz" until the visitor has asked for a number, "Oblicz ponownie" after.
   return `<div class="calc" data-calc="${calc.id}" data-tab="${calc.tab}">
-      <${heading}><span class="ico">${calcIcon(calc.id)}</span><span>${esc(t(`c_${calc.id}_t`))}</span></${heading}>
-      <p class="desc">${esc(t(`c_${calc.id}_d`))}</p>
-      ${picker}${chips}${fields}
-      <button type="button" class="btn btn-primary" data-run>${esc(t("act_calc"))}</button>
-      <div class="result" data-result></div>
+      <div class="calc-form">
+        <h2 id="calc-form-h">${esc(t("calc_form_h"))}</h2>
+        ${picker}${chips}${fields}
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="${esc(t("act_calc"))}"
+          data-label-again="${esc(t("act_recalc"))}">${esc(t("act_calc"))}</button>
+      </div>
+      <div class="calc-out">
+        <h2 id="calc-result-h">${esc(t("calc_result_h"))}</h2>
+        <div class="result show" data-result>
+          <div class="muted eyebrow">${esc(t("res_tobuy"))}</div>
+          <div class="big">${esc(example.tobuy)} <span class="figure-line">${esc(example.unit)}</span></div>
+          <div class="rows">${rows}</div>
+        </div>
+        <p class="calc-stale" data-calc-stale hidden>${esc(t("calc_stale"))}</p>
+        <div class="calc-actions" data-calc-actions></div>
+      </div>
     </div>`;
 }
 
@@ -438,6 +466,22 @@ export function renderFormula(lines, lang, t) {
   });
 }
 
+/**
+ * One calculator — chapter XII.
+ *
+ * The chapter fixes the order: TYTUŁ → KRÓTKI OPIS → FORMULARZ → WYNIK → AKCJE →
+ * INFORMACJE DODATKOWE / SEO, "najważniejszy jest wynik", and "długie treści SEO,
+ * instrukcje i FAQ nie mogą zasłaniać kalkulatora".
+ *
+ * Until session 8 the page put "Jak to liczymy" — the field list, the formula, a worked
+ * example and the warnings — in a column *beside* the form, so the explanation started at
+ * the same height as the tool and the answer was the last thing on the card, below the
+ * fold on a phone. It also rendered the worked example as a second `.result` box styled
+ * exactly like the real one, so the page showed two identical green answers, one of them
+ * not the visitor's. Both are gone: the explanation is a section below the tool, and the
+ * live result panel is the worked example, because it opens on the real answer for the
+ * values the form opens with.
+ */
 export function calcPageMain(calc, lang, t, { example, formula, materials = 0, guides = [] }) {
   const meta = CALC_META[calc.id];
   const name = t(`c_${calc.id}_t`);
@@ -450,9 +494,6 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0, g
   const inputs = calc.fields
     .filter((f) => f.k !== "price")
     .map((f) => `<li><b>${esc(t(f.label))}</b></li>`).join("");
-
-  const exampleRows = example.rows
-    .map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("");
 
   const related = (meta.related || [])
     .filter((id) => CALC_SLUG[id])
@@ -472,38 +513,35 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0, g
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap calc-page">
-      <div class="calc-page-form">
-        ${calcCard(calc, t, { heading: "h2", materials })}
-        ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a> — ${esc(materials)} ${esc(t("mat_count_label"))}</p>` : ""}
-      </div>
-      <div class="calc-page-how">
-        <h2>${esc(t("hwc_title"))}</h2>
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      ${calcCard(calc, t, { materials, example })}
+      ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a> — ${esc(materials)} ${esc(t("mat_count_label"))}</p>` : ""}
+    </div>
+  </section>
 
-        <h3>${esc(t("hwc_inputs"))}</h3>
-        <ul class="plain-list">${inputs}</ul>
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">${esc(t("hwc_title"))}</h2>
 
-        <h3>${esc(t("hwc_formula"))}</h3>
-        <pre class="formula"><code>${formula.map(esc).join("\n")}</code></pre>
+      <div class="calc-how-grid">
+        <div>
+          <h3>${esc(t("hwc_inputs"))}</h3>
+          <ul class="plain-list">${inputs}</ul>
 
-        <h3>${esc(t("hwc_example"))}</h3>
-        <p class="muted">${esc(t("hwc_example_lead"))}</p>
-        <div class="result show">
-          <div class="muted eyebrow">${esc(t("res_tobuy"))}</div>
-          <div class="big">${esc(example.tobuy)} <span class="figure-line">${esc(example.unit)}</span></div>
-          <div class="rows">${exampleRows}</div>
+          <h3>${esc(t("hwc_note"))}</h3>
+          <p>${esc(t(`note_${calc.id}`))}</p>
         </div>
-
-        <h3>${esc(t("hwc_note"))}</h3>
-        <p>${esc(t(`note_${calc.id}`))}</p>
-
-        <p class="muted src-note">${esc(t("hwc_source"))}</p>
+        <div>
+          <h3>${esc(t("hwc_formula"))}</h3>
+          <pre class="formula"><code>${formula.map(esc).join("\n")}</code></pre>
+          <p class="muted src-note">${esc(t("hwc_source"))}</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block alt">
     <div class="wrap">
       <h2>${esc(t("calc_related"))}</h2>
       <div class="chips">${related}</div>
@@ -696,6 +734,7 @@ const COOKIE_ROWS = [
   { name: "materio-lang", type: "ck_type_local", purpose: "ck_p_lang", life: "ck_life_until_cleared" },
   { name: "liczmat-currency", type: "ck_type_local", purpose: "ck_p_currency", life: "ck_life_until_cleared" },
   { name: "liczmat-theme", type: "ck_type_local", purpose: "ck_p_theme", life: "ck_life_until_cleared" },
+  { name: "liczmat-signed-in", type: "ck_type_local", purpose: "ck_p_signed_in", life: "ck_life_until_signout" },
   { name: "materio-redirected", type: "ck_type_session", purpose: "ck_p_redirect", life: "ck_life_session" },
   { name: "materio-workspace-v1", type: "ck_type_local", purpose: "ck_p_workspace", life: "ck_life_until_cleared" },
   { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },

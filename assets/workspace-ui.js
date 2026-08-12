@@ -92,7 +92,27 @@ function wsWireCard(card) {
   wsFillRoomSelect(card);
 }
 
-/** The "save to the estimate" line under a result, rebuilt on every calculation. */
+/**
+ * Whether the visitor has an account, as far as this page can tell.
+ *
+ * The calculator pages do not load Firebase — it would be a network dependency on every
+ * page that only exists to word one sentence — so /app/ leaves this flag behind when the
+ * auth state changes and the calculators read it. It decides copy and nothing else: at
+ * worst (signed out in another tab, an expired token) the visitor is offered an account
+ * they already have, or told about sync they already get. Saving does not consult it, and
+ * must not — FIRESTORE_SYNC §1.2: counting never requires an account.
+ */
+function wsHasAccount() {
+  try { return localStorage.getItem("liczmat-signed-in") === "1"; } catch (e) { return false; }
+}
+
+/**
+ * The actions under the result — chapter XII's AKCJE.
+ *
+ * Rebuilt on every calculation, into the slot the build leaves for it on a calculator
+ * page (`[data-calc-actions]`); anywhere else it falls in after the result box, which is
+ * where it used to live.
+ */
 function wsRenderSave(card, result) {
   let box = card.querySelector("[data-ws-save-box]");
   if (!result) { if (box) box.remove(); return; }
@@ -100,12 +120,25 @@ function wsRenderSave(card, result) {
     box = document.createElement("div");
     box.className = "ws-save";
     box.setAttribute("data-ws-save-box", "");
-    card.querySelector("[data-result]").after(box);
+    const slot = card.querySelector("[data-calc-actions]");
+    if (slot) slot.appendChild(box);
+    else card.querySelector("[data-result]").after(box);
   }
   const project = wsActiveProject();
+  // Chapter XII asks for "Zaloguj się lub załóż darmowe konto, aby zapisać wynik". The
+  // result is already saved by the button next to it, in this browser and without an
+  // account, so the sentence says what the account actually adds instead of pretending
+  // the button needs one.
+  const account = wsHasAccount()
+    ? `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_in"))}</p>`
+    : `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_out"))}
+        <a href="/app/">${wsEsc(wsT("calc_save_link"))}</a></p>`;
   box.innerHTML = `
-    <button type="button" class="btn btn-ghost btn-sm" data-ws-save>${wsEsc(wsT("ws_add_to_estimate"))}</button>
-    <span class="muted ws-save-note">${wsEsc(project ? `${wsT("ws_project")}: ${project.name}` : wsT("ws_no_project"))}</span>`;
+    <div class="ws-save-row">
+      <button type="button" class="btn btn-primary btn-sm" data-ws-save>${wsEsc(wsT("ws_add_to_project"))}</button>
+      <span class="muted ws-save-note">${wsEsc(project ? `${wsT("ws_project")}: ${project.name}` : wsT("ws_no_project"))}</span>
+    </div>
+    ${account}`;
 
   box.querySelector("[data-ws-save]").addEventListener("click", () => {
     const waste = (result.rows || []).find((r) => r[0] === "res_waste");

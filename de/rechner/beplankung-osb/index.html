@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/sheathing-osb/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/poszycie-osb/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Beplankung (OSB) — Baurechner online | LiczMat">
 <meta name="twitter:description" content="Beplankung (OSB) — kostenloser Online-Rechner. Wie viele Platten zum Decken. Dieselbe Formel wie in der LiczMat-App für Android, ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -171,46 +171,55 @@
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap calc-page">
-      <div class="calc-page-form">
-        <div class="calc" data-calc="sheathing" data-tab="framing">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="5" rx="1"/><rect x="2" y="13" width="20" height="5" rx="1"/><path d="M9 6v5M15 13v5"/></svg></span><span>Beplankung (OSB)</span></h2>
-      <p class="desc">Wie viele Platten zum Decken.</p>
-      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="sheathing" data-tab="framing">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Deine Angaben</h2>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-sheathing-area">Fläche (m²)</label><input id="f-sheathing-area" type="text" inputmode="decimal" data-k="area" value="30"></div><div class="field"><label for="f-sheathing-pieceW">Plattenbreite (mm)</label><input id="f-sheathing-pieceW" type="text" inputmode="decimal" data-k="pieceW" value="1250"></div><div class="field"><label for="f-sheathing-pieceL">Plattenlänge (mm)</label><input id="f-sheathing-pieceL" type="text" inputmode="decimal" data-k="pieceL" value="2500"></div><div class="field"><label for="f-sheathing-waste">Verschnitt (%)</label><input id="f-sheathing-waste" type="text" inputmode="decimal" data-k="waste" value="10"></div><div class="field"><label for="f-sheathing-price">Preis je Stück/Gebinde</label><input id="f-sheathing-price" type="text" inputmode="decimal" data-k="price" value=""></div>
-      <button type="button" class="btn btn-primary" data-run>Berechnen</button>
-      <div class="result" data-result></div>
-    </div>
-        <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a> — 34 Materialien im Katalog</p>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Berechnen"
+          data-label-again="Neu berechnen">Berechnen</button>
       </div>
-      <div class="calc-page-how">
-        <h2>So rechnen wir</h2>
-
-        <h3>Was du eingibst</h3>
-        <ul class="plain-list"><li><b>Fläche (m²)</b></li><li><b>Plattenbreite (mm)</b></li><li><b>Plattenlänge (mm)</b></li><li><b>Verschnitt (%)</b></li></ul>
-
-        <h3>Formel</h3>
-        <pre class="formula"><code>Plattenfläche = (Plattenbreite ÷ 1000) × (Plattenlänge ÷ 1000)
-Platten = ⌈ Fläche × (1 + Verschnitt ÷ 100) ÷ Plattenfläche ⌉</code></pre>
-
-        <h3>Beispiel</h3>
-        <p class="muted">Die Standardwerte aus dem Formular, durch denselben Rechenkern geschickt:</p>
-        <div class="result show">
+      <div class="calc-out">
+        <h2 id="calc-result-h">Ergebnis</h2>
+        <div class="result show" data-result>
           <div class="muted eyebrow">Zu kaufen</div>
           <div class="big">11 <span class="figure-line">Platten</span></div>
           <div class="rows"></div>
         </div>
+        <p class="calc-stale" data-calc-stale hidden>Die Angaben haben sich geändert. Klicke „Neu berechnen“ für das neue Ergebnis.</p>
+        <div class="calc-actions" data-calc-actions></div>
+      </div>
+    </div>
+      <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a> — 34 Materialien im Katalog</p>
+    </div>
+  </section>
 
-        <h3>Worauf du achten solltest</h3>
-        <p>Das Ergebnis ist die Zahl ganzer Platten ohne Schnittplan. Wenn du wissen willst, wie du sie zuschneidest, nimm den 2D-Plattenzuschnitt.</p>
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">So rechnen wir</h2>
 
-        <p class="muted src-note">Die LiczMat-App für Android nutzt dieselbe Formel. Die Rechenkerne der Website sind 1:1-Portierungen des App-Codes.</p>
+      <div class="calc-how-grid">
+        <div>
+          <h3>Was du eingibst</h3>
+          <ul class="plain-list"><li><b>Fläche (m²)</b></li><li><b>Plattenbreite (mm)</b></li><li><b>Plattenlänge (mm)</b></li><li><b>Verschnitt (%)</b></li></ul>
+
+          <h3>Worauf du achten solltest</h3>
+          <p>Das Ergebnis ist die Zahl ganzer Platten ohne Schnittplan. Wenn du wissen willst, wie du sie zuschneidest, nimm den 2D-Plattenzuschnitt.</p>
+        </div>
+        <div>
+          <h3>Formel</h3>
+          <pre class="formula"><code>Plattenfläche = (Plattenbreite ÷ 1000) × (Plattenlänge ÷ 1000)
+Platten = ⌈ Fläche × (1 + Verschnitt ÷ 100) ÷ Plattenfläche ⌉</code></pre>
+          <p class="muted src-note">Die LiczMat-App für Android nutzt dieselbe Formel. Die Rechenkerne der Website sind 1:1-Portierungen des App-Codes.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block alt">
     <div class="wrap">
       <h2>Weitere Rechner</h2>
       <div class="chips"><a class="chip" href="/de/rechner/plattenzuschnitt-2d/">Plattenzuschnitt (2D)</a><a class="chip" href="/de/rechner/linearer-zuschnitt-1d/">Linearer Zuschnitt (1D)</a><a class="chip" href="/de/rechner/staenderwand/">Ständerwand</a></div>
@@ -295,16 +304,16 @@ Platten = ⌈ Fläche × (1 + Verschnitt ÷ 100) ÷ Plattenfläche ⌉</code></p
   "de": "/de/rechner/beplankung-osb/",
   "en": "/en/calculators/sheathing-osb/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260812g"></script>
-<script src="/assets/i18n-runtime.js?v=20260812g"></script>
-<script src="/assets/currency.js?v=20260812g"></script>
+<script src="/assets/i18n.de.js?v=20260812h"></script>
+<script src="/assets/i18n-runtime.js?v=20260812h"></script>
+<script src="/assets/currency.js?v=20260812h"></script>
 
-<script src="/assets/calculators.js?v=20260812g"></script>
-<script src="/assets/materials.js?v=20260812g"></script>
-<script src="/assets/materials-ui.js?v=20260812g"></script>
-<script src="/assets/workspace.js?v=20260812g"></script>
-<script src="/assets/workspace-ui.js?v=20260812g"></script>
-<script src="/assets/main.js?v=20260812g"></script>
+<script src="/assets/calculators.js?v=20260812h"></script>
+<script src="/assets/materials.js?v=20260812h"></script>
+<script src="/assets/materials-ui.js?v=20260812h"></script>
+<script src="/assets/workspace.js?v=20260812h"></script>
+<script src="/assets/workspace-ui.js?v=20260812h"></script>
+<script src="/assets/main.js?v=20260812h"></script>
 
 </body>
 </html>

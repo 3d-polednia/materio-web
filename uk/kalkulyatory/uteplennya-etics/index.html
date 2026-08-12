@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/insulation-etics/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/ocieplenie-etics/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Утеплення (ETICS) — Будівельні калькулятори онлайн | LiczMat">
 <meta name="twitter:description" content="Утеплення (ETICS) — безкоштовний онлайн-калькулятор. Пінопласт, дюбелі, клей, сітка. Та сама формула, що й у застосунку LiczMat для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -171,49 +171,58 @@
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap calc-page">
-      <div class="calc-page-form">
-        <div class="calc" data-calc="insulation" data-tab="trade">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/><path d="M6 7v10M12 7v10M18 7v10" stroke-dasharray="2 3"/></svg></span><span>Утеплення (ETICS)</span></h2>
-      <p class="desc">Пінопласт, дюбелі, клей, сітка.</p>
-      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="insulation" data-tab="trade">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Твої дані</h2>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-insulation-area">Площа (м²)</label><input id="f-insulation-area" type="text" inputmode="decimal" data-k="area" value="80"></div><div class="field"><label for="f-insulation-foamThk">Товщина пінопласту (см)</label><input id="f-insulation-foamThk" type="text" inputmode="decimal" data-k="foamThk" value="15"></div><div class="field"><label for="f-insulation-dowels">Дюбелів на м²</label><input id="f-insulation-dowels" type="text" inputmode="decimal" data-k="dowels" value="6"></div><div class="field"><label for="f-insulation-adhesive">Клей (кг/м²)</label><input id="f-insulation-adhesive" type="text" inputmode="decimal" data-k="adhesive" value="5"></div><div class="field"><label for="f-insulation-price">Ціна за штуку/упак.</label><input id="f-insulation-price" type="text" inputmode="decimal" data-k="price" value=""></div>
-      <button type="button" class="btn btn-primary" data-run>Порахувати</button>
-      <div class="result" data-result></div>
-    </div>
-        <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a> — 13 матеріалів у каталозі</p>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Порахувати"
+          data-label-again="Порахувати знову">Порахувати</button>
       </div>
-      <div class="calc-page-how">
-        <h2>Як ми це рахуємо</h2>
-
-        <h3>Що вводиш</h3>
-        <ul class="plain-list"><li><b>Площа (м²)</b></li><li><b>Товщина пінопласту (см)</b></li><li><b>Дюбелів на м²</b></li><li><b>Клей (кг/м²)</b></li></ul>
-
-        <h3>Формула</h3>
-        <pre class="formula"><code>м² з упаковки = 0,30 × 100 ÷ Товщина пінопласту
-упаковки пінопласту = ⌈ Площа ÷ м² з упаковки ⌉
-дюбелі = ⌈ Площа × Дюбелів на м² ⌉
-клей разом = Площа × Клей кг
-сітка = Площа × 1,10 м²</code></pre>
-
-        <h3>Приклад</h3>
-        <p class="muted">Типові значення з форми, пропущені через те саме ядро:</p>
-        <div class="result show">
+      <div class="calc-out">
+        <h2 id="calc-result-h">Результат</h2>
+        <div class="result show" data-result>
           <div class="muted eyebrow">Купити</div>
           <div class="big">40 <span class="figure-line">упак.</span></div>
           <div class="rows"><div><span>Пінопласт</span><b>80 m² · 15 cm</b></div><div><span>Дюбелі</span><b>480</b></div><div><span>Клей</span><b>400 kg</b></div><div><span>Сітка</span><b>88 m²</b></div></div>
         </div>
+        <p class="calc-stale" data-calc-stale hidden>Дані змінилися. Натисни «Порахувати знову», щоб побачити новий результат.</p>
+        <div class="calc-actions" data-calc-actions></div>
+      </div>
+    </div>
+      <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a> — 13 матеріалів у каталозі</p>
+    </div>
+  </section>
 
-        <h3>На що зважати</h3>
-        <p>Кількість дюбелів залежить від висоти будівлі та вітрової зони — 6 шт./м² типово для першого і другого поверху. Сітку рахуй із перекриттям 10%.</p>
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">Як ми це рахуємо</h2>
 
-        <p class="muted src-note">Застосунок LiczMat для Android рахує тією самою формулою. Обчислювальне ядро сайту — це порт 1:1 коду із застосунку.</p>
+      <div class="calc-how-grid">
+        <div>
+          <h3>Що вводиш</h3>
+          <ul class="plain-list"><li><b>Площа (м²)</b></li><li><b>Товщина пінопласту (см)</b></li><li><b>Дюбелів на м²</b></li><li><b>Клей (кг/м²)</b></li></ul>
+
+          <h3>На що зважати</h3>
+          <p>Кількість дюбелів залежить від висоти будівлі та вітрової зони — 6 шт./м² типово для першого і другого поверху. Сітку рахуй із перекриттям 10%.</p>
+        </div>
+        <div>
+          <h3>Формула</h3>
+          <pre class="formula"><code>м² з упаковки = 0,30 × 100 ÷ Товщина пінопласту
+упаковки пінопласту = ⌈ Площа ÷ м² з упаковки ⌉
+дюбелі = ⌈ Площа × Дюбелів на м² ⌉
+клей разом = Площа × Клей кг
+сітка = Площа × 1,10 м²</code></pre>
+          <p class="muted src-note">Застосунок LiczMat для Android рахує тією самою формулою. Обчислювальне ядро сайту — це порт 1:1 коду із застосунку.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block alt">
     <div class="wrap">
       <h2>Інші калькулятори</h2>
       <div class="chips"><a class="chip" href="/uk/kalkulyatory/kliy-rozchyn/">Клей / розчин</a><a class="chip" href="/uk/kalkulyatory/muruvannya/">Мурування</a><a class="chip" href="/uk/kalkulyatory/farba-shtukaturka-hrunt/">Фарби, штукатурки, ґрунти</a></div>
@@ -298,16 +307,16 @@
   "de": "/de/rechner/daemmung-wdvs/",
   "en": "/en/calculators/insulation-etics/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260812g"></script>
-<script src="/assets/i18n-runtime.js?v=20260812g"></script>
-<script src="/assets/currency.js?v=20260812g"></script>
+<script src="/assets/i18n.uk.js?v=20260812h"></script>
+<script src="/assets/i18n-runtime.js?v=20260812h"></script>
+<script src="/assets/currency.js?v=20260812h"></script>
 
-<script src="/assets/calculators.js?v=20260812g"></script>
-<script src="/assets/materials.js?v=20260812g"></script>
-<script src="/assets/materials-ui.js?v=20260812g"></script>
-<script src="/assets/workspace.js?v=20260812g"></script>
-<script src="/assets/workspace-ui.js?v=20260812g"></script>
-<script src="/assets/main.js?v=20260812g"></script>
+<script src="/assets/calculators.js?v=20260812h"></script>
+<script src="/assets/materials.js?v=20260812h"></script>
+<script src="/assets/materials-ui.js?v=20260812h"></script>
+<script src="/assets/workspace.js?v=20260812h"></script>
+<script src="/assets/workspace-ui.js?v=20260812h"></script>
+<script src="/assets/main.js?v=20260812h"></script>
 
 </body>
 </html>

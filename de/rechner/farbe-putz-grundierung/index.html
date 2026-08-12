@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/paint-plaster-primer/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/farby-tynki-grunty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Farbe, Putz, Grund — Baurechner online | LiczMat">
 <meta name="twitter:description" content="Farbe, Putz, Grund — kostenloser Online-Rechner. Gebinde je Fläche, mit Schichten. Dieselbe Formel wie in der LiczMat-App für Android, ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -171,48 +171,57 @@
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap calc-page">
-      <div class="calc-page-form">
-        <div class="calc" data-calc="coverage" data-tab="surface">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="12" height="5" rx="1"/><path d="M15 6.5h4a2 2 0 0 1 2 2V11a2 2 0 0 1-2 2h-6v3"/><rect x="10.5" y="16" width="5" height="6" rx="1"/></svg></span><span>Farbe, Putz, Grund</span></h2>
-      <p class="desc">Gebinde je Fläche, mit Schichten.</p>
-      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="coverage" data-tab="surface">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Deine Angaben</h2>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Farbe 10 l</button><button type="button" class="chip" data-preset="1">Grundierung 5 l</button><button type="button" class="chip" data-preset="2">Spachtelmasse 20 kg</button><button type="button" class="chip" data-preset="3">Kleber C2 25 kg</button></div><div class="field"><label for="f-coverage-area">Fläche (m²)</label><input id="f-coverage-area" type="text" inputmode="decimal" data-k="area" value="25"></div><div class="field"><label for="f-coverage-cov">Ergiebigkeit (m²/Geb.)</label><input id="f-coverage-cov" type="text" inputmode="decimal" data-k="cov" value="40"></div><div class="field"><label for="f-coverage-coats">Anzahl Schichten</label><input id="f-coverage-coats" type="text" inputmode="decimal" data-k="coats" value="2"></div><div class="field"><label for="f-coverage-openings">Öffnungen (m²)</label><input id="f-coverage-openings" type="text" inputmode="decimal" data-k="openings" value="0"></div><div class="field"><label for="f-coverage-price">Preis je Stück/Gebinde</label><input id="f-coverage-price" type="text" inputmode="decimal" data-k="price" value=""></div>
-      <button type="button" class="btn btn-primary" data-run>Berechnen</button>
-      <div class="result" data-result></div>
-    </div>
-        <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a> — 48 Materialien im Katalog</p>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Berechnen"
+          data-label-again="Neu berechnen">Berechnen</button>
       </div>
-      <div class="calc-page-how">
-        <h2>So rechnen wir</h2>
-
-        <h3>Was du eingibst</h3>
-        <ul class="plain-list"><li><b>Fläche (m²)</b></li><li><b>Ergiebigkeit (m²/Geb.)</b></li><li><b>Anzahl Schichten</b></li><li><b>Öffnungen (m²)</b></li></ul>
-
-        <h3>Formel</h3>
-        <pre class="formula"><code>netto = Fläche − Öffnungen
-zu beschichtende Fläche = netto × Anzahl Schichten
-Gebinde = ⌈ zu beschichtende Fläche ÷ Ergiebigkeit ⌉
-tatsächlicher Verschnitt = (Gebinde × Ergiebigkeit − zu beschichtende Fläche) ÷ (Gebinde × Ergiebigkeit) × 100%</code></pre>
-
-        <h3>Beispiel</h3>
-        <p class="muted">Die Standardwerte aus dem Formular, durch denselben Rechenkern geschickt:</p>
-        <div class="result show">
+      <div class="calc-out">
+        <h2 id="calc-result-h">Ergebnis</h2>
+        <div class="result show" data-result>
           <div class="muted eyebrow">Zu kaufen</div>
           <div class="big">2 <span class="figure-line">Gebinde</span></div>
           <div class="rows"><div><span>Verschnitt</span><b>37,5%</b></div></div>
         </div>
+        <p class="calc-stale" data-calc-stale hidden>Die Angaben haben sich geändert. Klicke „Neu berechnen“ für das neue Ergebnis.</p>
+        <div class="calc-actions" data-calc-actions></div>
+      </div>
+    </div>
+      <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a> — 48 Materialien im Katalog</p>
+    </div>
+  </section>
 
-        <h3>Worauf du achten solltest</h3>
-        <p>Die Ergiebigkeit auf dem Etikett (m²/l oder m²/Gebinde) gilt für glatten, grundierten Untergrund. Saugender Putz braucht mehr. Öffnungen nur abziehen, wenn du sie wirklich nicht streichst.</p>
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">So rechnen wir</h2>
 
-        <p class="muted src-note">Die LiczMat-App für Android nutzt dieselbe Formel. Die Rechenkerne der Website sind 1:1-Portierungen des App-Codes.</p>
+      <div class="calc-how-grid">
+        <div>
+          <h3>Was du eingibst</h3>
+          <ul class="plain-list"><li><b>Fläche (m²)</b></li><li><b>Ergiebigkeit (m²/Geb.)</b></li><li><b>Anzahl Schichten</b></li><li><b>Öffnungen (m²)</b></li></ul>
+
+          <h3>Worauf du achten solltest</h3>
+          <p>Die Ergiebigkeit auf dem Etikett (m²/l oder m²/Gebinde) gilt für glatten, grundierten Untergrund. Saugender Putz braucht mehr. Öffnungen nur abziehen, wenn du sie wirklich nicht streichst.</p>
+        </div>
+        <div>
+          <h3>Formel</h3>
+          <pre class="formula"><code>netto = Fläche − Öffnungen
+zu beschichtende Fläche = netto × Anzahl Schichten
+Gebinde = ⌈ zu beschichtende Fläche ÷ Ergiebigkeit ⌉
+tatsächlicher Verschnitt = (Gebinde × Ergiebigkeit − zu beschichtende Fläche) ÷ (Gebinde × Ergiebigkeit) × 100%</code></pre>
+          <p class="muted src-note">Die LiczMat-App für Android nutzt dieselbe Formel. Die Rechenkerne der Website sind 1:1-Portierungen des App-Codes.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block alt">
     <div class="wrap">
       <h2>Weitere Rechner</h2>
       <div class="chips"><a class="chip" href="/de/rechner/fliesen-paneele-feinsteinzeug/">Fliesen, Paneele, Gres</a><a class="chip" href="/de/rechner/tapete/">Tapete</a><a class="chip" href="/de/rechner/kleber-moertel/">Kleber / Mörtel</a></div>
@@ -297,16 +306,16 @@ tatsächlicher Verschnitt = (Gebinde × Ergiebigkeit − zu beschichtende Fläch
   "de": "/de/rechner/farbe-putz-grundierung/",
   "en": "/en/calculators/paint-plaster-primer/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260812g"></script>
-<script src="/assets/i18n-runtime.js?v=20260812g"></script>
-<script src="/assets/currency.js?v=20260812g"></script>
+<script src="/assets/i18n.de.js?v=20260812h"></script>
+<script src="/assets/i18n-runtime.js?v=20260812h"></script>
+<script src="/assets/currency.js?v=20260812h"></script>
 
-<script src="/assets/calculators.js?v=20260812g"></script>
-<script src="/assets/materials.js?v=20260812g"></script>
-<script src="/assets/materials-ui.js?v=20260812g"></script>
-<script src="/assets/workspace.js?v=20260812g"></script>
-<script src="/assets/workspace-ui.js?v=20260812g"></script>
-<script src="/assets/main.js?v=20260812g"></script>
+<script src="/assets/calculators.js?v=20260812h"></script>
+<script src="/assets/materials.js?v=20260812h"></script>
+<script src="/assets/materials-ui.js?v=20260812h"></script>
+<script src="/assets/workspace.js?v=20260812h"></script>
+<script src="/assets/workspace-ui.js?v=20260812h"></script>
+<script src="/assets/main.js?v=20260812h"></script>
 
 </body>
 </html>

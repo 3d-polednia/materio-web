@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/tiles-panels-porcelain/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/plytki-panele-gres/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Fliesen, Paneele, Gres — Baurechner online | LiczMat">
 <meta name="twitter:description" content="Fliesen, Paneele, Gres — kostenloser Online-Rechner. Fläche + Verschnitt → ganze Kartons. Dieselbe Formel wie in der LiczMat-App für Android, ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -171,47 +171,56 @@
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap calc-page">
-      <div class="calc-page-form">
-        <div class="calc" data-calc="waste" data-tab="surface">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span><span>Fliesen, Paneele, Gres</span></h2>
-      <p class="desc">Fläche + Verschnitt → ganze Kartons.</p>
-      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="waste" data-tab="surface">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Deine Angaben</h2>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Feinsteinzeug 60×60</button><button type="button" class="chip" data-preset="1">Feinsteinzeug 120×278</button><button type="button" class="chip" data-preset="2">Paneel AC4</button><button type="button" class="chip" data-preset="3">Wandfliese 30×60</button></div><div class="field"><label for="f-waste-area">Fläche (m²)</label><input id="f-waste-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-waste-cov">Gebinde-Fläche (m²)</label><input id="f-waste-cov" type="text" inputmode="decimal" data-k="cov" value="1.44"></div><div class="field"><label for="f-waste-waste">Verschnitt (%)</label><input id="f-waste-waste" type="text" inputmode="decimal" data-k="waste" value="7"></div><div class="field"><label for="f-waste-price">Preis je Stück/Gebinde</label><input id="f-waste-price" type="text" inputmode="decimal" data-k="price" value=""></div>
-      <button type="button" class="btn btn-primary" data-run>Berechnen</button>
-      <div class="result" data-result></div>
-    </div>
-        <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a> — 40 Materialien im Katalog</p>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Berechnen"
+          data-label-again="Neu berechnen">Berechnen</button>
       </div>
-      <div class="calc-page-how">
-        <h2>So rechnen wir</h2>
-
-        <h3>Was du eingibst</h3>
-        <ul class="plain-list"><li><b>Fläche (m²)</b></li><li><b>Gebinde-Fläche (m²)</b></li><li><b>Verschnitt (%)</b></li></ul>
-
-        <h3>Formel</h3>
-        <pre class="formula"><code>Bedarf = Fläche × (1 + Verschnitt ÷ 100)
-Gebinde = ⌈ Bedarf ÷ Gebinde-Fläche ⌉
-tatsächlicher Verschnitt = (Gebinde × Gebinde-Fläche − Fläche) ÷ (Gebinde × Gebinde-Fläche) × 100%</code></pre>
-
-        <h3>Beispiel</h3>
-        <p class="muted">Die Standardwerte aus dem Formular, durch denselben Rechenkern geschickt:</p>
-        <div class="result show">
+      <div class="calc-out">
+        <h2 id="calc-result-h">Ergebnis</h2>
+        <div class="result show" data-result>
           <div class="muted eyebrow">Zu kaufen</div>
           <div class="big">15 <span class="figure-line">Gebinde</span></div>
           <div class="rows"><div><span>Verschnitt</span><b>7,4%</b></div></div>
         </div>
+        <p class="calc-stale" data-calc-stale hidden>Die Angaben haben sich geändert. Klicke „Neu berechnen“ für das neue Ergebnis.</p>
+        <div class="calc-actions" data-calc-actions></div>
+      </div>
+    </div>
+      <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a> — 40 Materialien im Katalog</p>
+    </div>
+  </section>
 
-        <h3>Worauf du achten solltest</h3>
-        <p>5–7% Zuschlag reichen bei geradem Verband. Großformat, Diagonal- oder Reihenverband brauchen 10–15%. Kauf aus einer Charge.</p>
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">So rechnen wir</h2>
 
-        <p class="muted src-note">Die LiczMat-App für Android nutzt dieselbe Formel. Die Rechenkerne der Website sind 1:1-Portierungen des App-Codes.</p>
+      <div class="calc-how-grid">
+        <div>
+          <h3>Was du eingibst</h3>
+          <ul class="plain-list"><li><b>Fläche (m²)</b></li><li><b>Gebinde-Fläche (m²)</b></li><li><b>Verschnitt (%)</b></li></ul>
+
+          <h3>Worauf du achten solltest</h3>
+          <p>5–7% Zuschlag reichen bei geradem Verband. Großformat, Diagonal- oder Reihenverband brauchen 10–15%. Kauf aus einer Charge.</p>
+        </div>
+        <div>
+          <h3>Formel</h3>
+          <pre class="formula"><code>Bedarf = Fläche × (1 + Verschnitt ÷ 100)
+Gebinde = ⌈ Bedarf ÷ Gebinde-Fläche ⌉
+tatsächlicher Verschnitt = (Gebinde × Gebinde-Fläche − Fläche) ÷ (Gebinde × Gebinde-Fläche) × 100%</code></pre>
+          <p class="muted src-note">Die LiczMat-App für Android nutzt dieselbe Formel. Die Rechenkerne der Website sind 1:1-Portierungen des App-Codes.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block alt">
     <div class="wrap">
       <h2>Weitere Rechner</h2>
       <div class="chips"><a class="chip" href="/de/rechner/kleber-moertel/">Kleber / Mörtel</a><a class="chip" href="/de/rechner/fugenmasse/">Fugenmasse</a><a class="chip" href="/de/rechner/farbe-putz-grundierung/">Farbe, Putz, Grund</a></div>
@@ -296,16 +305,16 @@ tatsächlicher Verschnitt = (Gebinde × Gebinde-Fläche − Fläche) ÷ (Gebinde
   "de": "/de/rechner/fliesen-paneele-feinsteinzeug/",
   "en": "/en/calculators/tiles-panels-porcelain/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260812g"></script>
-<script src="/assets/i18n-runtime.js?v=20260812g"></script>
-<script src="/assets/currency.js?v=20260812g"></script>
+<script src="/assets/i18n.de.js?v=20260812h"></script>
+<script src="/assets/i18n-runtime.js?v=20260812h"></script>
+<script src="/assets/currency.js?v=20260812h"></script>
 
-<script src="/assets/calculators.js?v=20260812g"></script>
-<script src="/assets/materials.js?v=20260812g"></script>
-<script src="/assets/materials-ui.js?v=20260812g"></script>
-<script src="/assets/workspace.js?v=20260812g"></script>
-<script src="/assets/workspace-ui.js?v=20260812g"></script>
-<script src="/assets/main.js?v=20260812g"></script>
+<script src="/assets/calculators.js?v=20260812h"></script>
+<script src="/assets/materials.js?v=20260812h"></script>
+<script src="/assets/materials-ui.js?v=20260812h"></script>
+<script src="/assets/workspace.js?v=20260812h"></script>
+<script src="/assets/workspace-ui.js?v=20260812h"></script>
+<script src="/assets/main.js?v=20260812h"></script>
 
 </body>
 </html>

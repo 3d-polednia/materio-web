@@ -182,9 +182,28 @@ function wireAuthForm() {
 const hasPasswordProvider = (user) =>
   (user.providerData || []).some((p) => p.providerId === "password");
 
+/**
+ * Leave a note for the rest of the site that somebody is signed in.
+ *
+ * The calculator pages need it to word one sentence under the result (chapter XII's
+ * "Dla niezalogowanego") and loading Firebase on all sixty of them to find out would be a
+ * network round trip per page for a line of copy. It is a hint, never a permission: no
+ * code may gate saving, counting or reading on it. Listed on /cookies/ like every other
+ * key this site writes.
+ */
+function markSignedIn(on) {
+  try {
+    if (on) localStorage.setItem("liczmat-signed-in", "1");
+    else localStorage.removeItem("liczmat-signed-in");
+  } catch (e) {
+    // Private mode with storage refused: the sentence falls back to the signed-out one.
+  }
+}
+
 async function onSignedIn(user) {
   state.uid = user.uid;
   state.user = user;
+  markSignedIn(true);
   $("app-auth").hidden = true;
   $("app-workspace").hidden = false;
   $("app-email-label").textContent = user.email || "";
@@ -226,6 +245,7 @@ function onSignedOut() {
   state.unsub = [];
   state.uid = null;
   state.user = null;
+  markSignedIn(false);
   state.projects = [];
   state.rooms = [];
   $("app-auth").hidden = false;

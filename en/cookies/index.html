@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/cookies/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/cookies/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Cookies and browser storage — LiczMat">
 <meta name="twitter:description" content="LiczMat — the list of cookies and data kept in your browser: analytics, language choice, projects and estimates. Consent can be withdrawn at any time.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -185,6 +185,11 @@
         <td>localStorage</td>
         <td>Light or dark, if you set it by hand instead of leaving it to the system.</td>
         <td>Until you clear the site data</td>
+      </tr><tr>
+        <td><code>liczmat-signed-in</code></td>
+        <td>localStorage</td>
+        <td>A “somebody is signed in” marker, written by the account page. The calculators do not load Firebase but need this to decide whether to offer you an account. It holds nothing about you and unlocks nothing.</td>
+        <td>Until you sign out</td>
       </tr><tr>
         <td><code>materio-redirected</code></td>
         <td>sessionStorage</td>
@@ -310,12 +315,12 @@
   "de": "/de/cookies/",
   "en": "/en/cookies/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260812g"></script>
-<script src="/assets/i18n-runtime.js?v=20260812g"></script>
-<script src="/assets/currency.js?v=20260812g"></script>
+<script src="/assets/i18n.en.js?v=20260812h"></script>
+<script src="/assets/i18n-runtime.js?v=20260812h"></script>
+<script src="/assets/currency.js?v=20260812h"></script>
 
 
-<script src="/assets/main.js?v=20260812g"></script>
+<script src="/assets/main.js?v=20260812h"></script>
 
 </body>
 </html>

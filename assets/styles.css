@@ -456,11 +456,6 @@ section.block { padding: var(--section-y) 0; }
   display: grid; place-items: center; flex: none;
 }
 .card .ico { width: 46px; height: 46px; margin-bottom: var(--sp-3); }
-.calc h2 .ico, .calc h3 .ico {
-  border-radius: var(--radius-xs); background: var(--tertiary-container); color: var(--tertiary);
-  display: grid; place-items: center; flex: none;
-  width: 34px; height: 34px;
-}
 
 /* ---------- Form controls
    Every field on the site is this one rule: same height as a button, 16px text
@@ -942,12 +937,9 @@ footer h4 {
 .calc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-5); }
 /* A calculator card's heading is an h2 on a calculator page (it is the page's main
    content) and in the hero, but it must stay card-sized either way. */
-.calc > h2, .calc > h3 {
-  display: flex; align-items: center; gap: var(--sp-3);
-  font-size: var(--fs-h3); font-weight: var(--fw-bold); letter-spacing: normal; margin: 0 0 var(--sp-2);
-}
-.calc .desc { color: var(--muted); font-size: var(--fs-sm); margin: var(--sp-1) 0 var(--sp-4); }
-.calc .btn-primary { width: 100%; margin-top: var(--sp-2); }
+/* Both of the card's own buttons own their line: "Policz" closes the fields, and
+   "Dodaj do projektu" is the step the result leads to (chapter XII's AKCJE). */
+.calc-form > .btn-primary, .ws-save-row > .btn-primary { width: 100%; margin-top: var(--sp-2); }
 
 .calc-group {
   margin: 0 0 var(--sp-3); font-size: var(--fs-base); text-transform: uppercase;
@@ -992,15 +984,39 @@ a.chip:hover { text-decoration: none; }
 .calc-group-block .calc-group { margin-bottom: var(--sp-1); scroll-margin-top: calc(var(--header-h) + var(--sp-4)); }
 .calc-group-d { margin: 0 0 var(--sp-4); font-size: var(--fs-sm); }
 
-/* A calculator page: the live form on the left, the explanation on the right. */
-.calc-page { display: grid; gap: var(--sp-7); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
-.calc-page-form .calc { position: sticky; top: 84px; }
-.calc-page-how h2 { margin-top: 0; }
-.calc-page-how h3 {
+/* ---------- A calculator page (Sesja 8)
+   Chapter XII: TYTUŁ → OPIS → FORMULARZ → WYNIK → AKCJE → SEO, and the result
+   matters most. So the card is the tool and nothing else — fields on one side,
+   the answer and its actions on the other — and the explanation is a section
+   below it rather than a column beside it. The output column sticks, so
+   scrolling a long form never scrolls the answer off the screen. */
+.calc-tool .calc {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-7); align-items: start; padding: var(--sp-7);
+}
+.calc-tool .calc > div > h2 {
+  margin: 0 0 var(--sp-4); font-size: var(--fs-h3); letter-spacing: normal;
+}
+.calc-out { position: sticky; top: calc(var(--header-h) + var(--sp-5)); }
+.calc-out .result { margin-top: 0; }
+/* The answer is the page's point, so it is bigger here than the same box is anywhere
+   else on the site. */
+.calc-out .result .big { font-size: var(--fs-display); }
+.calc-stale {
+  margin: var(--sp-3) 0 0; padding: var(--sp-3);
+  border-radius: var(--radius-xs); font-size: var(--fs-sm);
+  background: var(--warning-soft); color: var(--on-warning-soft);
+}
+.calc-actions:empty { display: none; }
+
+.calc-how h2 { margin-top: 0; }
+.calc-how-grid { display: grid; gap: var(--sp-7) var(--sp-10); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+.calc-how h3 {
   margin: var(--sp-6) 0 var(--sp-2); font-size: var(--fs-base);
   text-transform: uppercase; letter-spacing: var(--track-wide); color: var(--muted);
 }
-.calc-page-how .src-note { margin-top: var(--sp-6); font-size: var(--fs-xs); }
+.calc-how .src-note { margin-top: var(--sp-6); font-size: var(--fs-xs); }
+.calc-how > div > *:first-child, .calc-how-grid > div > h3:first-child { margin-top: 0; }
 
 .plain-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .plain-list li {
@@ -1119,8 +1135,12 @@ a.chip:hover { text-decoration: none; }
 .ws-bar-row select { flex: 1 1 auto; min-width: 0; width: auto; }
 .ws-bar-row .btn { flex: none; }
 .ws-bar-hint { font-size: var(--fs-sm); margin: 0; }
-.ws-save { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
+.ws-save { margin-top: var(--sp-4); }
+.ws-save-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
 .ws-save-note { font-size: var(--fs-sm); }
+/* Chapter XII's line about the account. It sits under the action it explains, quiet
+   enough not to compete with the answer above it. */
+.ws-save-account { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); line-height: var(--lh-snug); }
 .ws-links { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-7); }
 
 /* The estimate is the one thing on the site meant to leave the screen on paper, so it
@@ -1215,8 +1235,9 @@ a.chip:hover { text-decoration: none; }
   .features { grid-template-columns: 1fr 1fr; }
   .stores-wrap { grid-template-columns: 1fr; }
   .foot-grid { grid-template-columns: 1fr 1fr; }
-  .calc-page { grid-template-columns: 1fr; }
-  .calc-page-form .calc { position: static; }
+  .calc-tool .calc { grid-template-columns: 1fr; gap: var(--sp-6); padding: var(--sp-6); }
+  .calc-out { position: static; }
+  .calc-how-grid { grid-template-columns: 1fr; }
   .stat-band { grid-template-columns: 1fr 1fr; gap: var(--sp-6) var(--sp-4); }
   .doors { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr 1fr; }

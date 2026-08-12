@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/tiles-panels-porcelain/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/plytki-panele-gres/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Плитка, панелі, керамограніт — Будівельні калькулятори онлайн | LiczMat">
 <meta name="twitter:description" content="Плитка, панелі, керамограніт — безкоштовний онлайн-калькулятор. Площа + запас → цілі коробки. Та сама формула, що й у застосунку LiczMat для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -171,47 +171,56 @@
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap calc-page">
-      <div class="calc-page-form">
-        <div class="calc" data-calc="waste" data-tab="surface">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span><span>Плитка, панелі, керамограніт</span></h2>
-      <p class="desc">Площа + запас → цілі коробки.</p>
-      <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="waste" data-tab="surface">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Твої дані</h2>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Керамограніт 60×60</button><button type="button" class="chip" data-preset="1">Керамограніт 120×278</button><button type="button" class="chip" data-preset="2">Панель AC4</button><button type="button" class="chip" data-preset="3">Плитка 30×60</button></div><div class="field"><label for="f-waste-area">Площа (м²)</label><input id="f-waste-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-waste-cov">Витрата упак. (м²)</label><input id="f-waste-cov" type="text" inputmode="decimal" data-k="cov" value="1.44"></div><div class="field"><label for="f-waste-waste">Запас (%)</label><input id="f-waste-waste" type="text" inputmode="decimal" data-k="waste" value="7"></div><div class="field"><label for="f-waste-price">Ціна за штуку/упак.</label><input id="f-waste-price" type="text" inputmode="decimal" data-k="price" value=""></div>
-      <button type="button" class="btn btn-primary" data-run>Порахувати</button>
-      <div class="result" data-result></div>
-    </div>
-        <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a> — 40 матеріалів у каталозі</p>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Порахувати"
+          data-label-again="Порахувати знову">Порахувати</button>
       </div>
-      <div class="calc-page-how">
-        <h2>Як ми це рахуємо</h2>
-
-        <h3>Що вводиш</h3>
-        <ul class="plain-list"><li><b>Площа (м²)</b></li><li><b>Витрата упак. (м²)</b></li><li><b>Запас (%)</b></li></ul>
-
-        <h3>Формула</h3>
-        <pre class="formula"><code>потрібно = Площа × (1 + Запас ÷ 100)
-упаковки = ⌈ потрібно ÷ Витрата упак. ⌉
-відходи = (упаковки × Витрата упак. − Площа) ÷ (упаковки × Витрата упак.) × 100%</code></pre>
-
-        <h3>Приклад</h3>
-        <p class="muted">Типові значення з форми, пропущені через те саме ядро:</p>
-        <div class="result show">
+      <div class="calc-out">
+        <h2 id="calc-result-h">Результат</h2>
+        <div class="result show" data-result>
           <div class="muted eyebrow">Купити</div>
           <div class="big">15 <span class="figure-line">упак.</span></div>
           <div class="rows"><div><span>Відходи</span><b>7,4%</b></div></div>
         </div>
+        <p class="calc-stale" data-calc-stale hidden>Дані змінилися. Натисни «Порахувати знову», щоб побачити новий результат.</p>
+        <div class="calc-actions" data-calc-actions></div>
+      </div>
+    </div>
+      <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a> — 40 матеріалів у каталозі</p>
+    </div>
+  </section>
 
-        <h3>На що зважати</h3>
-        <p>Запасу 5–7% вистачає при прямому розкладі. Великий формат, діагональ або розклад у цеглу потребують 10–15%. Купуй з однієї партії.</p>
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">Як ми це рахуємо</h2>
 
-        <p class="muted src-note">Застосунок LiczMat для Android рахує тією самою формулою. Обчислювальне ядро сайту — це порт 1:1 коду із застосунку.</p>
+      <div class="calc-how-grid">
+        <div>
+          <h3>Що вводиш</h3>
+          <ul class="plain-list"><li><b>Площа (м²)</b></li><li><b>Витрата упак. (м²)</b></li><li><b>Запас (%)</b></li></ul>
+
+          <h3>На що зважати</h3>
+          <p>Запасу 5–7% вистачає при прямому розкладі. Великий формат, діагональ або розклад у цеглу потребують 10–15%. Купуй з однієї партії.</p>
+        </div>
+        <div>
+          <h3>Формула</h3>
+          <pre class="formula"><code>потрібно = Площа × (1 + Запас ÷ 100)
+упаковки = ⌈ потрібно ÷ Витрата упак. ⌉
+відходи = (упаковки × Витрата упак. − Площа) ÷ (упаковки × Витрата упак.) × 100%</code></pre>
+          <p class="muted src-note">Застосунок LiczMat для Android рахує тією самою формулою. Обчислювальне ядро сайту — це порт 1:1 коду із застосунку.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block alt">
     <div class="wrap">
       <h2>Інші калькулятори</h2>
       <div class="chips"><a class="chip" href="/uk/kalkulyatory/kliy-rozchyn/">Клей / розчин</a><a class="chip" href="/uk/kalkulyatory/zatyrka/">Затирка</a><a class="chip" href="/uk/kalkulyatory/farba-shtukaturka-hrunt/">Фарби, штукатурки, ґрунти</a></div>
@@ -296,16 +305,16 @@
   "de": "/de/rechner/fliesen-paneele-feinsteinzeug/",
   "en": "/en/calculators/tiles-panels-porcelain/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260812g"></script>
-<script src="/assets/i18n-runtime.js?v=20260812g"></script>
-<script src="/assets/currency.js?v=20260812g"></script>
+<script src="/assets/i18n.uk.js?v=20260812h"></script>
+<script src="/assets/i18n-runtime.js?v=20260812h"></script>
+<script src="/assets/currency.js?v=20260812h"></script>
 
-<script src="/assets/calculators.js?v=20260812g"></script>
-<script src="/assets/materials.js?v=20260812g"></script>
-<script src="/assets/materials-ui.js?v=20260812g"></script>
-<script src="/assets/workspace.js?v=20260812g"></script>
-<script src="/assets/workspace-ui.js?v=20260812g"></script>
-<script src="/assets/main.js?v=20260812g"></script>
+<script src="/assets/calculators.js?v=20260812h"></script>
+<script src="/assets/materials.js?v=20260812h"></script>
+<script src="/assets/materials-ui.js?v=20260812h"></script>
+<script src="/assets/workspace.js?v=20260812h"></script>
+<script src="/assets/workspace-ui.js?v=20260812h"></script>
+<script src="/assets/main.js?v=20260812h"></script>
 
 </body>
 </html>

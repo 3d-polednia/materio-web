@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/masonry/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/murowanie/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Masonry — Construction calculators online | LiczMat">
 <meta name="twitter:description" content="Masonry — free online calculator. Blocks/bricks and mortar per wall. The same formula as in the LiczMat app for Android, no sign-up.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -171,46 +171,55 @@
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap calc-page">
-      <div class="calc-page-form">
-        <div class="calc" data-calc="masonry" data-tab="trade">
-      <h2><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9.3h18M3 14.6h18M9 4v5.3M15 9.3v5.3M9 14.6V20"/></svg></span><span>Masonry</span></h2>
-      <p class="desc">Blocks/bricks and mortar per wall.</p>
-      <div class="field"><label for="f-masonry-area">Area (m²)</label><input id="f-masonry-area" type="text" inputmode="decimal" data-k="area" value="12"></div><div class="field"><label for="f-masonry-openings">Openings (m²)</label><input id="f-masonry-openings" type="text" inputmode="decimal" data-k="openings" value="2"></div><div class="field"><label for="f-masonry-pieces">Pieces per m²</label><input id="f-masonry-pieces" type="text" inputmode="decimal" data-k="pieces" value="11"></div><div class="field"><label for="f-masonry-binder">Mortar (kg/m²)</label><input id="f-masonry-binder" type="text" inputmode="decimal" data-k="binder" value="20"></div><div class="field"><label for="f-masonry-waste">Waste (%)</label><input id="f-masonry-waste" type="text" inputmode="decimal" data-k="waste" value="5"></div><div class="field"><label for="f-masonry-price">Price per piece/pack</label><input id="f-masonry-price" type="text" inputmode="decimal" data-k="price" value=""></div>
-      <button type="button" class="btn btn-primary" data-run>Calculate</button>
-      <div class="result" data-result></div>
-    </div>
-        
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="masonry" data-tab="trade">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Your figures</h2>
+        <div class="field"><label for="f-masonry-area">Area (m²)</label><input id="f-masonry-area" type="text" inputmode="decimal" data-k="area" value="12"></div><div class="field"><label for="f-masonry-openings">Openings (m²)</label><input id="f-masonry-openings" type="text" inputmode="decimal" data-k="openings" value="2"></div><div class="field"><label for="f-masonry-pieces">Pieces per m²</label><input id="f-masonry-pieces" type="text" inputmode="decimal" data-k="pieces" value="11"></div><div class="field"><label for="f-masonry-binder">Mortar (kg/m²)</label><input id="f-masonry-binder" type="text" inputmode="decimal" data-k="binder" value="20"></div><div class="field"><label for="f-masonry-waste">Waste (%)</label><input id="f-masonry-waste" type="text" inputmode="decimal" data-k="waste" value="5"></div><div class="field"><label for="f-masonry-price">Price per piece/pack</label><input id="f-masonry-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Calculate"
+          data-label-again="Calculate again">Calculate</button>
       </div>
-      <div class="calc-page-how">
-        <h2>How we calculate it</h2>
-
-        <h3>What you enter</h3>
-        <ul class="plain-list"><li><b>Area (m²)</b></li><li><b>Openings (m²)</b></li><li><b>Pieces per m²</b></li><li><b>Mortar (kg/m²)</b></li><li><b>Waste (%)</b></li></ul>
-
-        <h3>Formula</h3>
-        <pre class="formula"><code>net = Area − Openings
-pieces = ⌈ net × Pieces per m² × (1 + Waste ÷ 100) ⌉
-mortar total = net × Mortar kg</code></pre>
-
-        <h3>Example</h3>
-        <p class="muted">The default values from the form, run through the same engine:</p>
-        <div class="result show">
+      <div class="calc-out">
+        <h2 id="calc-result-h">Result</h2>
+        <div class="result show" data-result>
           <div class="muted eyebrow">To buy</div>
           <div class="big">116 <span class="figure-line">pcs</span></div>
           <div class="rows"><div><span>Mortar</span><b>200 kg</b></div></div>
         </div>
+        <p class="calc-stale" data-calc-stale hidden>The figures changed. Press “Calculate again” to see the new result.</p>
+        <div class="calc-actions" data-calc-actions></div>
+      </div>
+    </div>
+      
+    </div>
+  </section>
 
-        <h3>What to watch out for</h3>
-        <p>Pieces per m² come from the block size including the joint. A 5% allowance covers cuts and breakages in transport.</p>
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">How we calculate it</h2>
 
-        <p class="muted src-note">The LiczMat app for Android uses the same formula. The site's engine is a 1:1 port of the app's code.</p>
+      <div class="calc-how-grid">
+        <div>
+          <h3>What you enter</h3>
+          <ul class="plain-list"><li><b>Area (m²)</b></li><li><b>Openings (m²)</b></li><li><b>Pieces per m²</b></li><li><b>Mortar (kg/m²)</b></li><li><b>Waste (%)</b></li></ul>
+
+          <h3>What to watch out for</h3>
+          <p>Pieces per m² come from the block size including the joint. A 5% allowance covers cuts and breakages in transport.</p>
+        </div>
+        <div>
+          <h3>Formula</h3>
+          <pre class="formula"><code>net = Area − Openings
+pieces = ⌈ net × Pieces per m² × (1 + Waste ÷ 100) ⌉
+mortar total = net × Mortar kg</code></pre>
+          <p class="muted src-note">The LiczMat app for Android uses the same formula. The site's engine is a 1:1 port of the app's code.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block">
+  <section class="block alt">
     <div class="wrap">
       <h2>Other calculators</h2>
       <div class="chips"><a class="chip" href="/en/calculators/adhesive-mortar/">Adhesive / mortar</a><a class="chip" href="/en/calculators/bagged-concrete/">Bagged concrete</a><a class="chip" href="/en/calculators/insulation-etics/">Insulation (ETICS)</a></div>
@@ -294,16 +303,16 @@ mortar total = net × Mortar kg</code></pre>
   "de": "/de/rechner/mauerwerk/",
   "en": "/en/calculators/masonry/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260812g"></script>
-<script src="/assets/i18n-runtime.js?v=20260812g"></script>
-<script src="/assets/currency.js?v=20260812g"></script>
+<script src="/assets/i18n.en.js?v=20260812h"></script>
+<script src="/assets/i18n-runtime.js?v=20260812h"></script>
+<script src="/assets/currency.js?v=20260812h"></script>
 
-<script src="/assets/calculators.js?v=20260812g"></script>
-<script src="/assets/materials.js?v=20260812g"></script>
-<script src="/assets/materials-ui.js?v=20260812g"></script>
-<script src="/assets/workspace.js?v=20260812g"></script>
-<script src="/assets/workspace-ui.js?v=20260812g"></script>
-<script src="/assets/main.js?v=20260812g"></script>
+<script src="/assets/calculators.js?v=20260812h"></script>
+<script src="/assets/materials.js?v=20260812h"></script>
+<script src="/assets/materials-ui.js?v=20260812h"></script>
+<script src="/assets/workspace.js?v=20260812h"></script>
+<script src="/assets/workspace-ui.js?v=20260812h"></script>
+<script src="/assets/main.js?v=20260812h"></script>
 
 </body>
 </html>

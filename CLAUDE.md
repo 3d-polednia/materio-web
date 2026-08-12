@@ -194,6 +194,12 @@ Kotlin side of it. Change one, change all three.
 - **Account deletion needs the deployed rules.** `users/{uid}` was `allow delete: if false`
   until 2026-08-08; the account page cannot finish deleting until
   `firebase deploy --only firestore` has run in the app repo.
+- **`liczmat-signed-in` is a copy hint, never a gate.** `/app/` writes it to
+  `localStorage` on sign-in and clears it on sign-out, because the 60 calculator pages do
+  not load Firebase and still have to choose between "create a free account" and "your
+  account will sync this" under the result (master plan XII). It can be stale — signed out
+  in another tab, an expired token — so nothing may gate saving, counting or reading on
+  it. Listed on `/cookies/`.
 - **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms and
   estimate lines in `localStorage` in the *same document shape* as Firestore, so the sync
   tab in `/app/` is a plain copy in either direction. Counting must never require an

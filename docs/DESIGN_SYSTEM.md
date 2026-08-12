@@ -196,6 +196,26 @@ Chip bywa `<button>` (presety kalkulatora) albo `<a>` (kategorie na `/kalkulator
 które bez skryptu są zwykłymi kotwicami). Wariant linkowy `a.chip` tylko zdejmuje
 podkreślenie i ustawia `display: inline-flex` — kolor, kształt i stany są wspólne.
 
+### Strona kalkulatora (Sesja 8)
+
+Rozdział XII: TYTUŁ → OPIS → FORMULARZ → WYNIK → AKCJE → SEO, „najważniejszy jest wynik",
+a długie treści SEO nie mogą zasłaniać kalkulatora. Karta `.calc` jest więc **samym
+narzędziem**, ułożonym w dwie kolumny:
+
+| Element | Co robi |
+|---|---|
+| `.calc-form` | pola, presety, wybierak materiału, przycisk liczenia |
+| `.calc-out` | `.result`, `.calc-stale`, `.calc-actions` — przyklejona (`position: sticky`) |
+| `.calc-stale` | ostrzeżenie „dane się zmieniły", rodzina `--warning` |
+| `.calc-how` + `.calc-how-grid` | wyjaśnienie **pod** narzędziem, dwie kolumny prozy |
+
+`.calc-out .result .big` to jedyne miejsce, gdzie liczba dostaje `--fs-display` — wynik
+jest sensem strony, więc jest na niej największy.
+
+Karta straciła własny nagłówek z ikoną: powtarzał `H1` strony co do słowa. Razem z nim
+zniknęła reguła `.calc h2 .ico` (nic już jej nie używało). Zamiast tego obie kolumny mają
+własne `h2` — „Twoje dane" i „Wynik".
+
 ### Centrum kalkulatorów (Sesja 7)
 
 `.calc-filter` to pasek nad listą: pole `.mat-search` w `.calc-search`, rząd chipów

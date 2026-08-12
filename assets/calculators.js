@@ -341,18 +341,47 @@ function wireCalculator(card) {
     card.querySelectorAll("[data-k]").forEach((el) => (o[el.dataset.k] = el.value));
     return o;
   };
-  const run = () => renderResult(card, ENGINES[def.engine](read()));
-
   const runBtn = card.querySelector("[data-run]");
-  if (runBtn) runBtn.addEventListener("click", run);
+  const stale = card.querySelector("[data-calc-stale]");
+
+  /**
+   * `byHand` separates the visitor asking for a number from the page catching up with
+   * itself. The silent run on load only turns the server-rendered result into a live one
+   * so "add to the project" has something to save; it is not somebody pressing a button,
+   * so it must not relabel that button or scroll the page.
+   */
+  const run = (byHand) => {
+    renderResult(card, ENGINES[def.engine](read()));
+    if (stale) stale.hidden = true;
+    if (!byHand) return;
+    if (runBtn && runBtn.dataset.labelAgain) runBtn.textContent = runBtn.dataset.labelAgain;
+    const box = card.querySelector("[data-result]");
+    // On a phone the fields push the answer off screen; on a wide screen it is already
+    // beside them and `nearest` correctly does nothing.
+    if (box) box.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  };
+
+  if (runBtn) runBtn.addEventListener("click", () => run(true));
   card.querySelectorAll("input").forEach((i) =>
-    i.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); run(); } }));
+    i.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); run(true); } }));
+
+  // A number on screen next to fields that no longer produced it is worse than no number.
+  // Editing anything says so until the next calculation clears it.
+  if (stale) {
+    card.querySelectorAll("[data-k]").forEach((el) =>
+      el.addEventListener("input", () => { stale.hidden = false; }));
+  }
 
   if (def.presets) card.querySelectorAll("[data-preset]").forEach((btn) => btn.addEventListener("click", () => {
     const p = def.presets[+btn.dataset.preset];
     Object.entries(p.v).forEach(([k, v]) => { const el = card.querySelector(`[data-k="${k}"]`); if (el) el.value = v; });
-    run();
+    run(true);
   }));
+
+  // The result box arrives from the build already holding the answer for the values the
+  // form opens with (see calcCard() in src/pages.mjs). Running once turns that markup into
+  // a real result object, so the actions under it work before the visitor changes anything.
+  run(false);
 }
 
 /** Wire every calculator present on the page. */

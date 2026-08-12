@@ -370,6 +370,22 @@ kontu żadnej wartości.
 Alternatywa — przenieść projekty za logowanie — jest zgodna z literą rozdziału II, ale
 łamie `FIRESTORE_SYNC` §1.2 i zabiera gościowi to, co dziś działa. **Wymaga decyzji.**
 
+**Sesja 8 uderzyła w to samo.** Rozdział XII każe pokazać niezalogowanemu zdanie
+„Zaloguj się lub załóż darmowe konto, aby zapisać wynik” — czyli zakłada, że bez konta
+wyniku zapisać się nie da. Serwis zapisuje go dziś bez konta, do `localStorage`. Sesja 8
+zachowała stan faktyczny tak samo jak Sesja 3: przycisk „Dodaj do projektu” działa od
+razu, a zdanie obok mówi, co dokłada konto (telefon, przetrwanie wyczyszczenia
+przeglądarki), zamiast udawać, że przycisk go potrzebuje. Jeżeli właściciel rozstrzygnie
+spór po stronie rozdziału II, to zdanie i ten przycisk zmieniają się razem — treść jest
+w kluczach `calc_save_out` / `calc_save_in`, a nie wpisana w kod.
+
+Żeby to zdanie mogło w ogóle rozróżnić zalogowanego od niezalogowanego, `/app/` zostawia
+w `localStorage` znacznik `liczmat-signed-in` (Sesja 8). Strony kalkulatorów nie ładują
+Firebase — byłoby to zapytanie sieciowe na każdej z sześćdziesięciu stron dla jednego
+zdania. Znacznik **decyduje wyłącznie o treści**: nic nie wolno na nim bramkować, bo
+`FIRESTORE_SYNC` §1.2 zabrania wymagać konta do liczenia, a znacznik bywa nieaktualny
+(wylogowanie w innej karcie, wygasły token). Jest wypisany na `/cookies/`.
+
 ### 8.2. `/app/` czy `/konto/`
 
 Rozdział IX wymienia `/konto`. Konto siedzi dziś pod `/app/`. Przeniesienie jest tanie

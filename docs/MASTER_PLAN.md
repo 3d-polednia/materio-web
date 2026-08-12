@@ -33,8 +33,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 6 | Homepage | **Zrobione** — 2026-08-12 |
 | — | *Etap dodatkowy: rebranding Androida + sekcja „Aplikacja"* | **Zrobione** — 2026-08-12 |
 | 7 | Centrum kalkulatorów | **Zrobione** — 2026-08-12 |
-| 8 | Pojedynczy kalkulator | **Następna** |
-| 9–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 8 | Pojedynczy kalkulator | **Zrobione** — 2026-08-12 |
+| 9 | Logika kalkulatorów | **Następna** |
+| 10–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -65,6 +66,47 @@ w repo `3d-polednia/Materio`. W skrócie, po stronie serwisu:
 Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystkich
 dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)
 został zaktualizowany na żywo. Matematyka kalkulatorów nietknięta.
+
+### Co zrobiła Sesja 8
+
+Strona pojedynczego kalkulatora ułożona według rozdziału XII: TYTUŁ → KRÓTKI OPIS →
+FORMULARZ → WYNIK → AKCJE → SEO, „najważniejszy jest wynik”, „długie treści SEO,
+instrukcje i FAQ nie mogą zasłaniać kalkulatora”.
+
+- **Wyjaśnienie zeszło spod boku kalkulatora pod niego.** „Jak to liczymy” — lista pól,
+  wzór, przykład i ostrzeżenia — stało dotąd w kolumnie **obok** formularza, więc zaczynało
+  się na tej samej wysokości co narzędzie, a odpowiedź była ostatnią rzeczą na karcie.
+  Teraz karta to samo narzędzie, a wyjaśnienie jest sekcją poniżej.
+- **Dwa identyczne zielone wyniki zredukowane do jednego.** Przykład renderował się jako
+  drugi blok `.result`, wyglądający dokładnie jak prawdziwy wynik — strona pokazywała dwie
+  takie same odpowiedzi, z czego jedna nie była odpowiedzią odwiedzającego. Sekcja
+  „Przykład” zniknęła, bo **panel wyniku sam nim jest**: build wpisuje w niego wynik
+  policzony silnikiem tego kalkulatora z wartości, z jakimi otwiera się formularz. Liczba
+  na stronie jest więc prawdziwą odpowiedzią dla liczb w polach — także dla robota i dla
+  kogoś z wyłączonym JavaScriptem, którzy wcześniej widzieli pusty prostokąt.
+- **Wynik jest teraz największą rzeczą na stronie** (`--fs-display`), w prawej kolumnie,
+  przyklejonej przy przewijaniu. Na telefonie kolumny się składają, a po kliknięciu
+  „Policz” strona sama przewija do wyniku.
+- **AKCJE pod wynikiem.** „Dodaj do projektu” (dotąd „Dodaj do kosztorysu”, chowane do
+  pierwszego kliknięcia — teraz jest od razu, bo wynik też jest od razu) i zdanie
+  o koncie. Przycisk liczenia po pierwszym użyciu zmienia napis na **„Oblicz ponownie”**,
+  czyli dokładnie tę akcję, którą rozdział XII wymienia z nazwy.
+- **„Dane się zmieniły”.** Edycja dowolnego pola zapala ostrzeżenie nad akcjami. Bez tego
+  strona pokazywałaby liczbę obok pól, które jej nie wyprodukowały — a to gorsze niż brak
+  liczby.
+- **Zdanie o koncie rozróżnia zalogowanego.** `/app/` zostawia w `localStorage` znacznik
+  `liczmat-signed-in`; kalkulatory nie ładują Firebase, więc bez tego jedno zdanie
+  kosztowałoby zapytanie sieciowe na każdej z 60 stron. Znacznik decyduje **wyłącznie
+  o treści** — nic na nim nie jest bramkowane. Wypisany na `/cookies/` w czterech językach.
+- **Matematyka nietknięta.** W `assets/calculators.js` zmieniło się tylko podłączanie
+  zdarzeń; żaden silnik, żadne zaokrąglenie, żadna jednostka. Test sprawdza to wprost:
+  25 m² ÷ 40 m²/opak. × 2 warstwy → 2 opak., po zmianie na 50 m² → 3 opak.
+- Sprawdzone w Chromium: **69 testów strony kalkulatora + 21 testów tego, co mogło się przy
+  okazji zepsuć + 80 testów Sesji 7 — 170/170 przechodzi.** W tym: kolejność rozdziału XII
+  zmierzona w DOM, wszystkie 15 kalkulatorów × otwiera się na prawdziwym wyniku, cztery
+  języki, wariant bez JavaScriptu, wybierak materiałów, wejście z `/materialy/?m=`, pasek
+  pomieszczeń, przełącznik waluty (przelicza etykietę, nie ilość) i brak przewijania w bok
+  przy 360 / 414 / 768 / 1280 px.
 
 ### Co zrobiła Sesja 7
 
