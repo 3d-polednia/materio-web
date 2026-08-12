@@ -5,10 +5,11 @@
 
    1. `t(key)` for the strings JavaScript builds at runtime (calculator results,
       store-finder status lines).
-   2. The language switcher. Every language has its own URL, so switching is a
-      navigation, not a text swap — that is what makes the other nine languages
-      indexable at all. `window.LICZMAT_ALTERNATES` is emitted by the build and maps
-      a language code to this page's address in that language.
+   2. The language picker. Every language has its own URL, so switching is a navigation,
+      not a text swap — that is what makes the other three languages indexable at all.
+      The build writes the whole picker, flags included, into the page; this file only
+      opens and closes it. `window.LICZMAT_ALTERNATES` maps a language code to this
+      page's address in that language.
    3. Remembering the choice, so the next visit to a shared "/" link lands in the
       language the visitor picked. */
 
@@ -29,7 +30,7 @@ function pageLang() {
  * Deliberately does NOT fall back to navigator.language: an automatic redirect on
  * browser locale would send Googlebot (which crawls as en-US) away from the Polish
  * home page, and the Polish page is the one that has to rank. Only a click on the
- * switcher counts as a choice.
+ * picker counts as a choice.
  */
 function chosenLang() {
   try { return localStorage.getItem("materio-lang") || ""; } catch (e) { return ""; }
@@ -38,7 +39,7 @@ function chosenLang() {
 /**
  * In-place translation, used only by the two pages that have no per-language URLs:
  * /app/ and /p/. They are noindex, so there is nothing for a crawler to miss, and they
- * ship the full ten-language dictionary (assets/i18n.all.js) instead.
+ * ship the full four-language dictionary (assets/i18n.all.js) instead.
  */
 function applyLang(lang) {
   const l = I18N[lang] ? lang : "pl";
@@ -58,42 +59,100 @@ function initialLang() {
   return I18N[nav] ? nav : "pl";
 }
 
-/** /app/ and /p/ carry every language in one bundle and swap text rather than navigate. */
-function buildInPlaceSwitcher() {
+/** One row of the picker: the flag, then the language's own name. Never the flag alone. */
+function langRow(entry) {
+  return `<span class="flag">${entry.flag || ""}</span><span>${entry.label}</span>`;
+}
+
+/* The two document-level handlers below are attached once. /app/ redraws its picker on
+   every switch, and re-attaching them each time would stack up listeners. */
+let pickerDocHandlers = false;
+
+/** Give the open/close behaviour to a picker that is already in the DOM. */
+function wirePicker() {
+  const picker = document.getElementById("lang-picker");
+  const button = document.getElementById("lang-toggle");
+  const menu = document.getElementById("lang-menu");
+  if (!picker || !button || !menu) return;
+
+  const close = () => { menu.hidden = true; button.setAttribute("aria-expanded", "false"); };
+  const open = () => { menu.hidden = false; button.setAttribute("aria-expanded", "true"); };
+
+  button.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menu.hidden) open(); else close();
+  });
+
+  if (!pickerDocHandlers) {
+    pickerDocHandlers = true;
+    document.addEventListener("click", (e) => {
+      const box = document.getElementById("lang-picker");
+      const list = document.getElementById("lang-menu");
+      const toggle = document.getElementById("lang-toggle");
+      if (box && list && toggle && !box.contains(e.target)) {
+        list.hidden = true;
+        toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+    document.addEventListener("keydown", (e) => {
+      const list = document.getElementById("lang-menu");
+      const toggle = document.getElementById("lang-toggle");
+      if (e.key === "Escape" && list && toggle && !list.hidden) {
+        list.hidden = true;
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.focus();
+      }
+    });
+  }
+
+  // Remember the language somebody picks, so a later bare "/" link lands in it.
+  menu.querySelectorAll("a[data-lang]").forEach((a) => {
+    a.addEventListener("click", () => {
+      try { localStorage.setItem("materio-lang", a.dataset.lang); } catch (e) {}
+    });
+  });
+}
+
+/**
+ * /app/ and /p/ carry every language in one bundle and swap text rather than navigate,
+ * so their picker is built here instead of by the generator. Same markup, same flags.
+ */
+function buildInPlacePicker() {
+  const picker = document.getElementById("lang-picker");
+  if (!picker || typeof LANGS === "undefined") return;
   const lang = initialLang();
   applyLang(lang);
 
-  const sel = document.getElementById("lang-select");
-  if (!sel || typeof LANGS === "undefined") return;
-  sel.innerHTML = LANGS.map((l) =>
-    `<option value="${l.code}"${l.code === lang ? " selected" : ""}>${l.label}</option>`).join("");
-  sel.addEventListener("change", () => applyLang(sel.value));
+  const render = (current) => {
+    const now = LANGS.filter((l) => l.code === current)[0] || LANGS[0];
+    picker.innerHTML = `<button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="${t("lang_label", current)}">
+      <span class="flag">${now.flag || ""}</span><span class="lang-btn-name">${now.label}</span>
+      <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>${LANGS.map((l) => (l.code === current
+      ? `<li><span class="lang-item is-current" aria-current="true">${langRow(l)}</span></li>`
+      : `<li><button type="button" class="lang-item" data-lang="${l.code}" lang="${l.code}">${langRow(l)}</button></li>`
+    )).join("")}</ul>`;
+
+    picker.querySelectorAll("button[data-lang]").forEach((b) => {
+      b.addEventListener("click", () => { applyLang(b.dataset.lang); render(b.dataset.lang); });
+    });
+    wirePicker();
+  };
+
+  render(lang);
 }
 
-function buildLangSwitcher() {
-  if (!window.LICZMAT_ALTERNATES) { buildInPlaceSwitcher(); return; }
+function buildLangPicker() {
+  if (!window.LICZMAT_ALTERNATES) { buildInPlacePicker(); return; }
 
-  const sel = document.getElementById("lang-select");
-  if (!sel || typeof LANGS === "undefined") return;
-
-  const alternates = window.LICZMAT_ALTERNATES;
-  const here = pageLang();
-
-  sel.innerHTML = LANGS
-    .filter((l) => alternates[l.code] || l.code === here)
-    .map((l) => `<option value="${l.code}"${l.code === here ? " selected" : ""}>${l.label}</option>`)
-    .join("");
-
-  sel.addEventListener("change", () => {
-    const target = alternates[sel.value];
-    if (!target || sel.value === here) return;
-    try { localStorage.setItem("materio-lang", sel.value); } catch (e) {}
-    window.location.href = target + window.location.hash;
-  });
+  wirePicker();
 
   // A visitor who already picked a language should not have to pick it again after
   // following a bare "/" link. Guarded by a session flag so a missing alternate or a
   // stale saved value can never produce a redirect loop.
+  const alternates = window.LICZMAT_ALTERNATES;
+  const here = pageLang();
   const wanted = chosenLang();
   if (wanted && wanted !== here && alternates[wanted]) {
     let redirected = "1";
@@ -105,4 +164,4 @@ function buildLangSwitcher() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", buildLangSwitcher);
+document.addEventListener("DOMContentLoaded", buildLangPicker);

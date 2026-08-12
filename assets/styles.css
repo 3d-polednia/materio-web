@@ -168,12 +168,46 @@ header.site {
 .nav-links { order: 2; display: flex; gap: 4px; margin-left: auto; align-items: center; }
 .nav-links a { color: var(--on-bg); padding: 8px 12px; border-radius: 999px; font-weight: 600; font-size: .95rem; }
 .nav-links a:hover { background: var(--surface-alt); text-decoration: none; }
-.lang-select {
+/* ---------- Language and currency ----------
+   The plan (chapter V) rules out emoji flags, so a flag is a real SVG inlined next to the
+   language's own name — and the name always stays, the flag never stands alone. A native
+   <select> cannot hold an image, hence the button + list below. Every row is a link to
+   that language's URL, so it works with JavaScript off. */
+.pickers { display: flex; align-items: center; gap: 6px; }
+.flag {
+  display: inline-flex; flex: none; width: 20px; height: 14px;
+  border-radius: 2px; overflow: hidden;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--on-bg) 22%, transparent);
+}
+.flag svg { display: block; width: 100%; height: 100%; }
+
+.lang-picker { position: relative; }
+.lang-btn, .cur-select {
   font: inherit; font-weight: 600; font-size: .9rem;
   color: var(--on-bg); background: var(--surface-alt);
   border: 1px solid var(--outline); border-radius: 999px;
   padding: 7px 10px; cursor: pointer;
 }
+.lang-btn { display: inline-flex; align-items: center; gap: 7px; }
+.lang-btn:hover, .cur-select:hover { background: var(--surface-container); border-color: var(--outline-strong); }
+.lang-btn .chev { opacity: .6; }
+.lang-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+.lang-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 40;
+  min-width: 190px; margin: 0; padding: 6px; list-style: none;
+  background: var(--surface); border: 1px solid var(--outline); border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+}
+.lang-menu[hidden] { display: none; }
+.lang-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  font: inherit; font-weight: 600; font-size: .95rem; text-align: left;
+  color: var(--on-bg); background: none; border: 0; border-radius: 10px;
+  padding: 9px 10px; cursor: pointer;
+}
+a.lang-item:hover, button.lang-item:hover { background: var(--surface-alt); text-decoration: none; }
+.lang-item.is-current { cursor: default; background: var(--accent-soft); }
 .btn {
   display: inline-flex; align-items: center; gap: 8px;
   font: inherit; font-weight: 700; cursor: pointer;
@@ -342,7 +376,10 @@ footer h4 { font-size: .82rem; text-transform: uppercase; letter-spacing: .08em;
   .nav-links { position: fixed; inset: 64px 0 auto 0; flex-direction: column; align-items: stretch; gap: 0; background: var(--bg); border-bottom: 1px solid var(--outline); padding: 8px; box-shadow: var(--shadow-lg); display: none; }
   .nav-links.open { display: flex; }
   .nav-links a { padding: 12px; }
-  .nav-links .lang-select, .nav-links .btn { margin: 6px 6px; }
+  .nav-links .pickers, .nav-links .btn { margin: 6px 6px; }
+  /* Inside the mobile drawer the menu is part of the flow, not an overlay. */
+  .nav-links .lang-picker { position: static; }
+  .nav-links .lang-menu { position: static; margin-top: 6px; box-shadow: none; }
   .menu-toggle { display: inline-flex; }
   .theme-toggle { margin-left: auto; }
 }

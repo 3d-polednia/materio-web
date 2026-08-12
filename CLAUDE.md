@@ -73,8 +73,8 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now ~230 pages: a home page, a calculator
-hub, one page per calculator, guides and a store finder — each in all ten languages, at
+The site used to be one `index.html`. It is now 130 pages: a home page, a calculator
+hub, one page per calculator, guides and a store finder — each in all four languages, at
 its own URL, so search engines can index more than the Polish front page. Writing that by
 hand is not possible; a generator writes it from one template plus the dictionary.
 
@@ -98,10 +98,11 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 |---|---|
 | `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
 | `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**`, `materialy/**` and their per-language twins |
-| `assets/i18n-materials.js` — material names, 10 languages | `app/index.html`, `p/index.html` |
+| `assets/i18n-materials.js` — material names, 4 languages | `app/index.html`, `p/index.html` |
 | `assets/calculators.js` — engines, ported 1:1 from Kotlin | `assets/i18n.<lang>.js`, `assets/i18n.all.js` |
 | `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `sitemap.xml` |
-| `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js` | |
+| `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | |
+| `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
 | `src/*.mjs` — site map, templates, page bodies, formulas | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
@@ -120,9 +121,11 @@ src/pages.mjs         The <main> of each page type
 src/calc-meta.mjs     Per-calculator formula lines + their translations
 src/app-pages.mjs     /app/ and /p/ (noindex, translated in the browser)
 assets/styles.css     Olive Green Material 3 design system
-assets/i18n.js        10-language dictionary (build input)
-assets/i18n-pages.js  Sub-page dictionary, same 10 languages (build input)
-assets/i18n-materials.js  Material names/terms, same 10 languages (build input)
+assets/i18n.js        4-language dictionary (build input)
+assets/i18n-pages.js  Sub-page dictionary, same 4 languages (build input)
+assets/i18n-materials.js  Material names/terms, same 4 languages (build input)
+assets/currency.js    PLN/EUR/USD/UAH — the currency, independent of the language
+assets/flags/*.svg    The flag next to each language name (never an emoji flag)
 assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
 assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
 assets/workspace.js   Projects, rooms and estimate lines in localStorage (Firestore schema)
@@ -190,10 +193,17 @@ Kotlin side of it. Change one, change all three.
   It is the single `?v=` value for every page. GitHub Pages serves assets with
   `max-age=600`, so without it a visitor can run new markup against a stale stylesheet.
   `privacy-policy.html` and `404.html` are hand-written — bump their `?v=` by hand too.
-- **Ten languages, always.** `pl, en, de, cs, sk, ro, hr, sr, uk, ru`. Every key must
-  exist in all ten, in **each** of `assets/i18n.js`, `assets/i18n-pages.js` and
-  `assets/i18n-materials.js`. Check with
+- **Four languages, always.** `pl, uk, de, en` — the set the master plan's chapter V
+  fixes. Every key must exist in all four, in **each** of `assets/i18n.js`,
+  `assets/i18n-pages.js` and `assets/i18n-materials.js`. Check with
   `node scripts/build.mjs --check`, which fails and names the missing keys.
+  The six languages dropped on 2026-08-12 (`cs, sk, ro, hr, sr, ru`) are listed as
+  `RETIRED_LANGS` in `src/site.mjs`: the build sweeps their directories and `404.html`
+  sends their old URLs to the home page. Do not re-add a language without the plan.
+- **Currency is not language.** `PLN, EUR, USD, UAH` in `assets/currency.js`, chosen by
+  the visitor and stored under `liczmat-currency`. Nothing is ever converted at an
+  exchange rate, and no physical quantity changes when the currency does. An estimate
+  line keeps the `currencyCode` it was saved with.
 - **Polish HTML matching `I18N.pl` is now automatic** — the pages are generated *from* the
   dictionary, so they cannot drift. Edit the dictionary, rebuild, commit the output. Never
   hand-edit a generated `.html`: the next build silently reverts it.

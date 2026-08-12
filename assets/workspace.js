@@ -23,12 +23,12 @@ const WS_KEY = "materio-workspace-v1";
 const WS_ACTIVE_KEY = "materio-active-project";
 const WS_SCHEMA = 1;
 
-/** Same currency table as assets/calculators.js — the language picks the currency. */
-const WS_CURRENCY = {
-  pl: ["pl-PL", "PLN"], en: ["en-US", "USD"], de: ["de-DE", "EUR"], cs: ["cs-CZ", "CZK"],
-  sk: ["sk-SK", "EUR"], ro: ["ro-RO", "RON"], hr: ["hr-HR", "EUR"], sr: ["sr-RS", "RSD"],
-  uk: ["uk-UA", "UAH"], ru: ["ru-RU", "RUB"],
-};
+/* The currency comes from assets/currency.js — the visitor's choice, independent of the
+   language. A line is stamped with the currency in force when it was saved and keeps it
+   for good: an estimate priced in PLN stays in PLN after a switch to EUR, because there
+   is no exchange rate here and inventing one would silently falsify a saved quote. */
+const WS_FALLBACK_CURRENCY = "PLN";
+const wsCurrency = () => (typeof lmCurrency === "function" ? lmCurrency() : WS_FALLBACK_CURRENCY);
 
 /** The four engines the app knows (core/model/CalculationType.kt), by site engine id. */
 const WS_CALC_TYPE = {
@@ -228,8 +228,7 @@ function wsAddEstimation(r) {
   let projectId = wsActiveProjectId();
   if (!projectId) projectId = wsAddProject(r.projectName || "LiczMat").id;
 
-  const lang = document.documentElement.lang || "pl";
-  const currencyCode = (WS_CURRENCY[lang] || WS_CURRENCY.pl)[1];
+  const currencyCode = wsCurrency();
   const totalCostMinor = wsMinor(r.costMajor);
   const waste = Number(r.wastePercent) || 0;
 
@@ -298,27 +297,29 @@ function wsDeleteEstimation(id) {
   wsSave(data);
 }
 
-/** Total of one project's lines. Mixed currencies keep the first one seen. */
+/**
+ * Total of one project's lines.
+ *
+ * `mixed` is true when the lines were not all saved in the same currency — adding those
+ * amounts up is arithmetic on unlike things, so the interface says so rather than
+ * pretending the sum means something. The total is still shown in the first line's
+ * currency, which is the one the project started in.
+ */
 function wsProjectTotal(projectId) {
   const rows = wsEstimations(projectId);
-  const lang = document.documentElement.lang || "pl";
+  const codes = new Set(rows.map((r) => r.currencyCode || wsCurrency()));
   return {
     minor: rows.reduce((sum, r) => sum + (r.totalCostMinor || 0), 0),
-    currencyCode: (rows[0] && rows[0].currencyCode) || (WS_CURRENCY[lang] || WS_CURRENCY.pl)[1],
+    currencyCode: (rows[0] && rows[0].currencyCode) || wsCurrency(),
+    mixed: codes.size > 1,
     count: rows.length,
   };
 }
 
-/** Money for display, from minor units. */
+/** Money for display, from minor units, in the currency the line was saved with. */
 function wsMoney(minor, currencyCode) {
-  const lang = document.documentElement.lang || "pl";
-  const [loc, fallback] = WS_CURRENCY[lang] || WS_CURRENCY.pl;
-  try {
-    return new Intl.NumberFormat(loc, { style: "currency", currency: currencyCode || fallback })
-      .format(minor / 100);
-  } catch (e) {
-    return (minor / 100).toFixed(2);
-  }
+  if (typeof lmMoneyMinor === "function") return lmMoneyMinor(minor, currencyCode || wsCurrency());
+  return (Number(minor) / 100 || 0).toFixed(2);
 }
 
 /** Everything, tombstones included — what /app/ uploads and what the export button writes. */

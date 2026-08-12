@@ -7,146 +7,93 @@
 
    Rules that keep the URLs stable:
    - Polish is the default language and lives at the root (`/kalkulatory/farby/`).
-     The other nine sit under a language prefix (`/en/calculators/paint/`).
-   - Slugs are ASCII-only, lower case, hyphen separated. Ukrainian and Russian are
-     transliterated rather than written in Cyrillic — a percent-encoded URL is
-     unreadable everywhere it gets pasted.
+     The other three sit under a language prefix (`/en/calculators/paint/`).
+   - Slugs are ASCII-only, lower case, hyphen separated. Ukrainian is transliterated
+     rather than written in Cyrillic — a percent-encoded URL is unreadable everywhere
+     it gets pasted.
    - A slug is permanent. Renaming one breaks every inbound link and the ranking
-     that came with it; add a redirect instead. */
+     that came with it; add a redirect instead. The slugs below are the ones the site
+     has always used; dropping six languages did not touch the four that stay. */
 
 export const BASE = "https://materio-app.com";
 
-/** The ten languages the app ships (AppLanguage.kt). Polish first — it is the default. */
-export const LANGS = ["pl", "en", "de", "cs", "sk", "ro", "hr", "sr", "uk", "ru"];
+/** The four languages LiczMat ships. Polish first — it is the default. */
+export const LANGS = ["pl", "uk", "de", "en"];
 
 export const DEFAULT_LANG = "pl";
 
+/** Languages that were published until 2026-08-12 and are gone: /cs/, /sk/, … */
+export const RETIRED_LANGS = ["cs", "sk", "ro", "hr", "sr", "ru"];
+
 /** BCP-47 tags for <html lang> and hreflang. */
-export const HREFLANG = {
-  pl: "pl", en: "en", de: "de", cs: "cs", sk: "sk",
-  ro: "ro", hr: "hr", sr: "sr", uk: "uk", ru: "ru",
-};
+export const HREFLANG = { pl: "pl", uk: "uk", de: "de", en: "en" };
 
 /** og:locale needs the territory, unlike hreflang. */
-export const OG_LOCALE = {
-  pl: "pl_PL", en: "en_US", de: "de_DE", cs: "cs_CZ", sk: "sk_SK",
-  ro: "ro_RO", hr: "hr_HR", sr: "sr_RS", uk: "uk_UA", ru: "ru_RU",
-};
+export const OG_LOCALE = { pl: "pl_PL", uk: "uk_UA", de: "de_DE", en: "en_US" };
 
 /** The path segment for each section, per language. */
 export const SECTION = {
-  calculators: {
-    pl: "kalkulatory", en: "calculators", de: "rechner", cs: "kalkulacky", sk: "kalkulacky",
-    ro: "calculatoare", hr: "kalkulatori", sr: "kalkulatori", uk: "kalkulyatory", ru: "kalkulyatory",
-  },
-  guides: {
-    pl: "poradniki", en: "guides", de: "ratgeber", cs: "navody", sk: "navody",
-    ro: "ghiduri", hr: "vodici", sr: "vodici", uk: "porady", ru: "rukovodstva",
-  },
-  stores: {
-    pl: "sklepy", en: "stores", de: "baumaerkte", cs: "obchody", sk: "obchody",
-    ro: "magazine", hr: "trgovine", sr: "prodavnice", uk: "magazyny", ru: "magaziny",
-  },
-  materials: {
-    pl: "materialy", en: "materials", de: "materialien", cs: "materialy", sk: "materialy",
-    ro: "materiale", hr: "materijali", sr: "materijali", uk: "materialy", ru: "materialy",
-  },
-  projects: {
-    pl: "projekty", en: "projects", de: "projekte", cs: "projekty", sk: "projekty",
-    ro: "proiecte", hr: "projekti", sr: "projekti", uk: "proekty", ru: "proekty",
-  },
-  app: {
-    pl: "aplikacja", en: "android-app", de: "android-app", cs: "aplikace", sk: "aplikacia",
-    ro: "aplicatie", hr: "aplikacija", sr: "aplikacija", uk: "dodatok", ru: "prilozhenie",
-  },
-  cookies: {
-    pl: "cookies", en: "cookies", de: "cookies", cs: "cookies", sk: "cookies",
-    ro: "cookies", hr: "kolacici", sr: "kolacici", uk: "cookies", ru: "cookies",
-  },
-  estimate: {
-    pl: "kosztorys", en: "cost-estimate", de: "kostenvoranschlag", cs: "rozpocet",
-    sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun",
-    uk: "koshtorys", ru: "smeta",
-  },
+  calculators: { pl: "kalkulatory", uk: "kalkulyatory", de: "rechner", en: "calculators" },
+  guides: { pl: "poradniki", uk: "porady", de: "ratgeber", en: "guides" },
+  stores: { pl: "sklepy", uk: "magazyny", de: "baumaerkte", en: "stores" },
+  materials: { pl: "materialy", uk: "materialy", de: "materialien", en: "materials" },
+  projects: { pl: "projekty", uk: "proekty", de: "projekte", en: "projects" },
+  app: { pl: "aplikacja", uk: "dodatok", de: "android-app", en: "android-app" },
+  cookies: { pl: "cookies", uk: "cookies", de: "cookies", en: "cookies" },
+  estimate: { pl: "kosztorys", uk: "koshtorys", de: "kostenvoranschlag", en: "cost-estimate" },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
 export const CALC_SLUG = {
   coverage: {
-    pl: "farby-tynki-grunty", en: "paint-plaster-primer", de: "farbe-putz-grundierung",
-    cs: "barvy-omitky-penetrace", sk: "farby-omietky-penetracie", ro: "vopsea-tencuiala-grund",
-    hr: "boje-zbuke-temeljni-premaz", sr: "boje-malteri-prajmer",
-    uk: "farba-shtukaturka-hrunt", ru: "kraska-shtukaturka-grunt",
+    pl: "farby-tynki-grunty", uk: "farba-shtukaturka-hrunt",
+    de: "farbe-putz-grundierung", en: "paint-plaster-primer",
   },
   waste: {
-    pl: "plytki-panele-gres", en: "tiles-panels-porcelain", de: "fliesen-paneele-feinsteinzeug",
-    cs: "obklady-panely-dlazba", sk: "obklady-panely-dlazba", ro: "gresie-faianta-parchet",
-    hr: "plocice-paneli-gres", sr: "plocice-paneli-gres",
-    uk: "plytka-paneli-keramohranit", ru: "plitka-paneli-keramogranit",
+    pl: "plytki-panele-gres", uk: "plytka-paneli-keramohranit",
+    de: "fliesen-paneele-feinsteinzeug", en: "tiles-panels-porcelain",
   },
   wallpaper: {
-    pl: "tapety", en: "wallpaper", de: "tapete", cs: "tapety", sk: "tapety",
-    ro: "tapet", hr: "tapete", sr: "tapete", uk: "shpalery", ru: "oboi",
+    pl: "tapety", uk: "shpalery", de: "tapete", en: "wallpaper",
   },
   linear: {
-    pl: "rozkroj-liniowy-1d", en: "linear-cutting-1d", de: "linearer-zuschnitt-1d",
-    cs: "linearni-narez-1d", sk: "linearny-rez-1d", ro: "debitare-liniara-1d",
-    hr: "linearno-rezanje-1d", sr: "linearno-secenje-1d",
-    uk: "rozkriy-liniynyi-1d", ru: "raskroy-lineynyy-1d",
+    pl: "rozkroj-liniowy-1d", uk: "rozkriy-liniynyi-1d",
+    de: "linearer-zuschnitt-1d", en: "linear-cutting-1d",
   },
   sheet: {
-    pl: "rozkroj-plyt-2d", en: "sheet-cutting-2d", de: "plattenzuschnitt-2d",
-    cs: "narez-desek-2d", sk: "rez-dosiek-2d", ro: "debitare-placi-2d",
-    hr: "rezanje-ploca-2d", sr: "secenje-ploca-2d",
-    uk: "rozkriy-plyt-2d", ru: "raskroy-plit-2d",
+    pl: "rozkroj-plyt-2d", uk: "rozkriy-plyt-2d",
+    de: "plattenzuschnitt-2d", en: "sheet-cutting-2d",
   },
   concrete: {
-    pl: "beton-z-worka", en: "bagged-concrete", de: "sackbeton", cs: "beton-z-pytle",
-    sk: "beton-z-vreca", ro: "beton-la-sac", hr: "beton-iz-vrece", sr: "beton-iz-dzaka",
-    uk: "beton-z-mishka", ru: "beton-iz-meshka",
+    pl: "beton-z-worka", uk: "beton-z-mishka", de: "sackbeton", en: "bagged-concrete",
   },
   mortar: {
-    pl: "klej-zaprawa", en: "adhesive-mortar", de: "kleber-moertel", cs: "lepidlo-malta",
-    sk: "lepidlo-malta", ro: "adeziv-mortar", hr: "ljepilo-mort", sr: "lepak-malter",
-    uk: "kliy-rozchyn", ru: "kley-rastvor",
+    pl: "klej-zaprawa", uk: "kliy-rozchyn", de: "kleber-moertel", en: "adhesive-mortar",
   },
   screed: {
-    pl: "wylewka-tynk", en: "screed-plaster", de: "estrich-putz", cs: "poter-omitka",
-    sk: "poter-omietka", ro: "sapa-tencuiala", hr: "estrih-zbuka", sr: "estrih-malter",
-    uk: "styazhka-shtukaturka", ru: "styazhka-shtukaturka",
+    pl: "wylewka-tynk", uk: "styazhka-shtukaturka", de: "estrich-putz", en: "screed-plaster",
   },
   grout: {
-    pl: "fuga", en: "grout", de: "fugenmasse", cs: "sparovaci-hmota", sk: "skarovacia-hmota",
-    ro: "chit-de-rosturi", hr: "fugir-masa", sr: "fug-masa", uk: "zatyrka", ru: "zatirka",
+    pl: "fuga", uk: "zatyrka", de: "fugenmasse", en: "grout",
   },
   masonry: {
-    pl: "murowanie", en: "masonry", de: "mauerwerk", cs: "zdeni", sk: "murovanie",
-    ro: "zidarie", hr: "zidanje", sr: "zidanje", uk: "muruvannya", ru: "kladka",
+    pl: "murowanie", uk: "muruvannya", de: "mauerwerk", en: "masonry",
   },
   insulation: {
-    pl: "ocieplenie-etics", en: "insulation-etics", de: "daemmung-wdvs", cs: "zatepleni-etics",
-    sk: "zateplenie-etics", ro: "termoizolatie-etics", hr: "izolacija-etics", sr: "izolacija-etics",
-    uk: "uteplennya-etics", ru: "uteplenie-etics",
+    pl: "ocieplenie-etics", uk: "uteplennya-etics", de: "daemmung-wdvs", en: "insulation-etics",
   },
   studwall: {
-    pl: "sciana-dzialowa-gk", en: "stud-partition", de: "staenderwand", cs: "pricka-sdk",
-    sk: "priecka-sdk", ro: "perete-gips-carton", hr: "gk-pregrada", sr: "gk-pregrada",
-    uk: "peregorodka-hk", ru: "peregorodka-gk",
+    pl: "sciana-dzialowa-gk", uk: "peregorodka-hk", de: "staenderwand", en: "stud-partition",
   },
   ceiling: {
-    pl: "sufit-podwieszany", en: "suspended-ceiling", de: "abgehaengte-decke", cs: "podhled",
-    sk: "podhlad", ro: "tavan-suspendat", hr: "spusteni-strop", sr: "spusteni-plafon",
-    uk: "pidvisna-stelya", ru: "podvesnoy-potolok",
+    pl: "sufit-podwieszany", uk: "pidvisna-stelya",
+    de: "abgehaengte-decke", en: "suspended-ceiling",
   },
   drylining: {
-    pl: "gk-na-klej", en: "glued-plasterboard", de: "ansetzbinder-platten", cs: "sdk-na-lepidlo",
-    sk: "sdk-na-lepidlo", ro: "gips-carton-lipit", hr: "gk-na-ljepilo", sr: "gk-na-lepak",
-    uk: "hk-na-kliy", ru: "gk-na-kley",
+    pl: "gk-na-klej", uk: "hk-na-kliy", de: "ansetzbinder-platten", en: "glued-plasterboard",
   },
   sheathing: {
-    pl: "poszycie-osb", en: "sheathing-osb", de: "beplankung-osb", cs: "zaklop-osb",
-    sk: "zaklop-osb", ro: "astereala-osb", hr: "oplata-osb", sr: "oplata-osb",
-    uk: "obshyvka-osb", ru: "obshivka-osb",
+    pl: "poszycie-osb", uk: "obshyvka-osb", de: "beplankung-osb", en: "sheathing-osb",
   },
 };
 
@@ -156,86 +103,65 @@ export const GUIDES = [
     id: "malowanie",
     calcs: ["coverage"],
     slug: {
-      pl: "ile-farby-na-pokoj", en: "how-much-paint-for-a-room", de: "wie-viel-farbe-fuer-ein-zimmer",
-      cs: "kolik-barvy-na-pokoj", sk: "kolko-farby-na-izbu", ro: "cata-vopsea-pentru-o-camera",
-      hr: "koliko-boje-za-sobu", sr: "koliko-boje-za-sobu",
-      uk: "skilky-farby-na-kimnatu", ru: "skolko-kraski-na-komnatu",
+      pl: "ile-farby-na-pokoj", uk: "skilky-farby-na-kimnatu",
+      de: "wie-viel-farbe-fuer-ein-zimmer", en: "how-much-paint-for-a-room",
     },
   },
   {
     id: "plytki",
     calcs: ["waste", "mortar", "grout"],
     slug: {
-      pl: "plytki-i-klej-do-lazienki", en: "tiles-and-adhesive-for-a-bathroom",
-      de: "fliesen-und-kleber-fuers-bad", cs: "obklady-a-lepidlo-do-koupelny",
-      sk: "obklady-a-lepidlo-do-kupelne", ro: "gresie-si-adeziv-pentru-baie",
-      hr: "plocice-i-ljepilo-za-kupaonicu", sr: "plocice-i-lepak-za-kupatilo",
-      uk: "plytka-i-kliy-u-vannu", ru: "plitka-i-kley-v-vannuyu",
+      pl: "plytki-i-klej-do-lazienki", uk: "plytka-i-kliy-u-vannu",
+      de: "fliesen-und-kleber-fuers-bad", en: "tiles-and-adhesive-for-a-bathroom",
     },
   },
   {
     id: "panele",
     calcs: ["waste"],
     slug: {
-      pl: "ile-paneli-na-podloge", en: "how-many-floor-panels", de: "wie-viele-bodenpaneele",
-      cs: "kolik-panelu-na-podlahu", sk: "kolko-panelov-na-podlahu", ro: "cate-placi-de-parchet",
-      hr: "koliko-panela-za-pod", sr: "koliko-panela-za-pod",
-      uk: "skilky-paneley-na-pidlohu", ru: "skolko-paneley-na-pol",
+      pl: "ile-paneli-na-podloge", uk: "skilky-paneley-na-pidlohu",
+      de: "wie-viele-bodenpaneele", en: "how-many-floor-panels",
     },
   },
   {
     id: "sciana",
     calcs: ["studwall", "sheathing"],
     slug: {
-      pl: "sciana-dzialowa-gk-profile-i-plyty", en: "stud-partition-profiles-and-boards",
-      de: "staenderwand-profile-und-platten", cs: "sdk-pricka-profily-a-desky",
-      sk: "sdk-priecka-profily-a-dosky", ro: "perete-gips-carton-profile-si-placi",
-      hr: "gk-pregrada-profili-i-ploce", sr: "gk-pregrada-profili-i-ploce",
-      uk: "hk-perehorodka-profili-ta-lysty", ru: "gk-peregorodka-profili-i-listy",
+      pl: "sciana-dzialowa-gk-profile-i-plyty", uk: "hk-perehorodka-profili-ta-lysty",
+      de: "staenderwand-profile-und-platten", en: "stud-partition-profiles-and-boards",
     },
   },
   {
     id: "klej",
     calcs: ["mortar", "waste", "grout"],
     slug: {
-      pl: "ile-kleju-do-plytek", en: "how-much-tile-adhesive", de: "wie-viel-fliesenkleber",
-      cs: "kolik-lepidla-na-obklady", sk: "kolko-lepidla-na-obklady",
-      ro: "cat-adeziv-pentru-gresie", hr: "koliko-ljepila-za-plocice",
-      sr: "koliko-lepka-za-plocice", uk: "skilky-kliyu-dlya-plytky",
-      ru: "skolko-kleya-dlya-plitki",
+      pl: "ile-kleju-do-plytek", uk: "skilky-kliyu-dlya-plytky",
+      de: "wie-viel-fliesenkleber", en: "how-much-tile-adhesive",
     },
   },
   {
     id: "gladz",
     calcs: ["coverage"],
     slug: {
-      pl: "ile-gladzi-na-sciane", en: "how-much-skim-coat", de: "wie-viel-spachtelmasse",
-      cs: "kolik-stuku-na-stenu", sk: "kolko-stuku-na-stenu",
-      ro: "cat-glet-pentru-perete", hr: "koliko-gleta-za-zid",
-      sr: "koliko-gleta-za-zid", uk: "skilky-shpaklivky-na-stinu",
-      ru: "skolko-shpaklevki-na-stenu",
+      pl: "ile-gladzi-na-sciane", uk: "skilky-shpaklivky-na-stinu",
+      de: "wie-viel-spachtelmasse", en: "how-much-skim-coat",
     },
   },
   {
     id: "ocieplenie",
     calcs: ["insulation", "coverage", "mortar"],
     slug: {
-      pl: "ocieplenie-domu-styropianem", en: "insulating-a-house-with-eps",
-      de: "haus-mit-eps-daemmen", cs: "zatepleni-domu-polystyrenem",
-      sk: "zateplenie-domu-polystyrenom", ro: "termoizolarea-casei-cu-polistiren",
-      hr: "izolacija-kuce-stiroporom", sr: "izolacija-kuce-stiroporom",
-      uk: "uteplennya-budynku-pinoplastom", ru: "uteplenie-doma-penoplastom",
+      pl: "ocieplenie-domu-styropianem", uk: "uteplennya-budynku-pinoplastom",
+      de: "haus-mit-eps-daemmen", en: "insulating-a-house-with-eps",
     },
   },
   {
     id: "rozkroj",
     calcs: ["sheet", "linear"],
     slug: {
-      pl: "rozkroj-plyty-meblowej-bez-odpadu", en: "cutting-a-furniture-board-with-less-waste",
-      de: "moebelplatte-mit-wenig-verschnitt-zuschneiden", cs: "narez-nabytkove-desky-s-malym-prorezem",
-      sk: "rez-nabytkovej-dosky-s-malym-prierezom", ro: "debitarea-placii-de-mobila-cu-pierderi-mici",
-      hr: "rezanje-namjestajne-ploce-s-manje-otpada", sr: "secenje-namestajne-ploce-sa-manje-otpada",
-      uk: "rozkriy-mebleovoyi-plyty-bez-vidkhodiv", ru: "raskroy-mebelnoy-plity-bez-otkhodov",
+      pl: "rozkroj-plyty-meblowej-bez-odpadu", uk: "rozkriy-mebleovoyi-plyty-bez-vidkhodiv",
+      de: "moebelplatte-mit-wenig-verschnitt-zuschneiden",
+      en: "cutting-a-furniture-board-with-less-waste",
     },
   },
 ];

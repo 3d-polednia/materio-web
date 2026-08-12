@@ -7,14 +7,32 @@
 
 import { esc, calcIcon, playBadge, breadcrumbs } from "./template.mjs";
 import {
-  BASE as BASE_URL,
+  BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
+import { DEFAULT_CURRENCY } from "./currency.mjs";
 
 const TABS = ["surface", "cutting", "trade", "framing"];
+
+const LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
+
+/**
+ * "It costs nothing", written as money.
+ *
+ * The page is generated in the language's default currency, and assets/currency.js
+ * rewrites it from `data-lm-money` once the visitor's own choice is known — the price is
+ * zero in every currency, so this is the one amount on the site that can be stated
+ * without knowing which one is in force.
+ */
+function freePrice(lang) {
+  const zero = new Intl.NumberFormat(LOCALE[lang] || LOCALE.pl, {
+    style: "currency", currency: DEFAULT_CURRENCY[lang], maximumFractionDigits: 0,
+  }).format(0);
+  return `<div class="num" data-lm-money="0">${esc(zero)}</div>`;
+}
 
 /* ------------------------------------------------------------------ calculator form */
 
@@ -103,10 +121,10 @@ export function homeMain(lang, t, calcs, cat) {
 <section class="block" aria-label="LiczMat" style="padding-top:8px">
   <div class="wrap">
     <div class="stat-band">
-      <div class="stat"><div class="num">${esc(t("stat_price"))}</div><div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
+      <div class="stat">${freePrice(lang)}<div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
       <div class="stat"><div class="num">${calcs.length}</div><div class="lbl">${esc(t("stat_calc_lbl"))}</div></div>
       <div class="stat"><div class="num">${cat.total}</div><div class="lbl">${esc(t("stat_catalog_lbl"))}</div></div>
-      <div class="stat"><div class="num">10</div><div class="lbl">${esc(t("stat_langs_lbl"))}</div></div>
+      <div class="stat"><div class="num">${LANGS.length}</div><div class="lbl">${esc(t("stat_langs_lbl"))}</div></div>
     </div>
   </div>
 </section>
@@ -668,6 +686,8 @@ export function materialsMain(lang, t, cat) {
 const COOKIE_ROWS = [
   { name: "materio_consent", type: "ck_type_local", purpose: "ck_p_consent", life: "ck_life_until_cleared" },
   { name: "materio-lang", type: "ck_type_local", purpose: "ck_p_lang", life: "ck_life_until_cleared" },
+  { name: "liczmat-currency", type: "ck_type_local", purpose: "ck_p_currency", life: "ck_life_until_cleared" },
+  { name: "liczmat-theme", type: "ck_type_local", purpose: "ck_p_theme", life: "ck_life_until_cleared" },
   { name: "materio-redirected", type: "ck_type_session", purpose: "ck_p_redirect", life: "ck_life_session" },
   { name: "materio-workspace-v1", type: "ck_type_local", purpose: "ck_p_workspace", life: "ck_life_until_cleared" },
   { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },
@@ -804,10 +824,10 @@ export function androidMain(lang, t, calcs, cat) {
   <section class="block" style="padding-top:8px">
     <div class="wrap">
       <div class="stat-band">
-        <div class="stat"><div class="num">${esc(t("stat_price"))}</div><div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
+        <div class="stat">${freePrice(lang)}<div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
         <div class="stat"><div class="num">${calcs.length}</div><div class="lbl">${esc(t("stat_calc_lbl"))}</div></div>
         <div class="stat"><div class="num">${cat.total}</div><div class="lbl">${esc(t("stat_catalog_lbl"))}</div></div>
-        <div class="stat"><div class="num">10</div><div class="lbl">${esc(t("stat_langs_lbl"))}</div></div>
+        <div class="stat"><div class="num">${LANGS.length}</div><div class="lbl">${esc(t("stat_langs_lbl"))}</div></div>
       </div>
     </div>
   </section>
@@ -1003,6 +1023,7 @@ export function estimateMain(lang, t) {
           <tbody id="ws-estimate-rows"></tbody>
         </table>
         <p class="ws-estimate-total"><span>${esc(t("share_total"))}</span> <b id="ws-estimate-total"></b></p>
+        <p class="muted ws-estimate-mixed" id="ws-estimate-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
         <p class="muted ws-estimate-foot">${esc(t("est_foot"))}</p>
       </article>
 

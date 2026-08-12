@@ -48,18 +48,12 @@
 <meta name="application-name" content="LiczMat">
 <link rel="canonical" href="https://materio-app.com/uk/porady/skilky-kliyu-dlya-plytky/">
 <link rel="alternate" hreflang="pl" href="https://materio-app.com/poradniki/ile-kleju-do-plytek/">
-<link rel="alternate" hreflang="en" href="https://materio-app.com/en/guides/how-much-tile-adhesive/">
-<link rel="alternate" hreflang="de" href="https://materio-app.com/de/ratgeber/wie-viel-fliesenkleber/">
-<link rel="alternate" hreflang="cs" href="https://materio-app.com/cs/navody/kolik-lepidla-na-obklady/">
-<link rel="alternate" hreflang="sk" href="https://materio-app.com/sk/navody/kolko-lepidla-na-obklady/">
-<link rel="alternate" hreflang="ro" href="https://materio-app.com/ro/ghiduri/cat-adeziv-pentru-gresie/">
-<link rel="alternate" hreflang="hr" href="https://materio-app.com/hr/vodici/koliko-ljepila-za-plocice/">
-<link rel="alternate" hreflang="sr" href="https://materio-app.com/sr/vodici/koliko-lepka-za-plocice/">
 <link rel="alternate" hreflang="uk" href="https://materio-app.com/uk/porady/skilky-kliyu-dlya-plytky/">
-<link rel="alternate" hreflang="ru" href="https://materio-app.com/ru/rukovodstva/skolko-kleya-dlya-plitki/">
+<link rel="alternate" hreflang="de" href="https://materio-app.com/de/ratgeber/wie-viel-fliesenkleber/">
+<link rel="alternate" hreflang="en" href="https://materio-app.com/en/guides/how-much-tile-adhesive/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/poradniki/ile-kleju-do-plytek/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260812b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -77,7 +71,7 @@
 <meta name="twitter:title" content="Скільки клею для плитки — LiczMat">
 <meta name="twitter:description" content="Витрата клею залежить від гребінки, а гребінка — від формату плитки. До цього затирка і сама плитка із запасом на підрізку.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,7 +140,20 @@
       <a href="/uk/porady/">Поради</a>
       <a href="/uk/magazyny/">Магазини</a>
       <a href="/uk/dodatok/">Застосунок</a>
-      <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Мова">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span class="lang-btn-name">Українська</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/poradniki/ile-kleju-do-plytek/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></span></li>
+      <li><a class="lang-item" href="/de/ratgeber/wie-viel-fliesenkleber/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/guides/how-much-tile-adhesive/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Валюта" title="Валюта"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH" selected>UAH</option></select>
+      </div>
       <a class="btn btn-primary btn-sm" href="/app/" rel="nofollow">Мій акаунт</a>
     </nav>
   </div>
@@ -229,21 +236,16 @@
 </div>
 <script>window.LICZMAT_ALTERNATES = {
   "pl": "/poradniki/ile-kleju-do-plytek/",
-  "en": "/en/guides/how-much-tile-adhesive/",
-  "de": "/de/ratgeber/wie-viel-fliesenkleber/",
-  "cs": "/cs/navody/kolik-lepidla-na-obklady/",
-  "sk": "/sk/navody/kolko-lepidla-na-obklady/",
-  "ro": "/ro/ghiduri/cat-adeziv-pentru-gresie/",
-  "hr": "/hr/vodici/koliko-ljepila-za-plocice/",
-  "sr": "/sr/vodici/koliko-lepka-za-plocice/",
   "uk": "/uk/porady/skilky-kliyu-dlya-plytky/",
-  "ru": "/ru/rukovodstva/skolko-kleya-dlya-plitki/"
+  "de": "/de/ratgeber/wie-viel-fliesenkleber/",
+  "en": "/en/guides/how-much-tile-adhesive/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260812a"></script>
-<script src="/assets/i18n-runtime.js?v=20260812a"></script>
+<script src="/assets/i18n.uk.js?v=20260812b"></script>
+<script src="/assets/i18n-runtime.js?v=20260812b"></script>
+<script src="/assets/currency.js?v=20260812b"></script>
 
 
-<script src="/assets/main.js?v=20260812a"></script>
+<script src="/assets/main.js?v=20260812b"></script>
 
 </body>
 </html>

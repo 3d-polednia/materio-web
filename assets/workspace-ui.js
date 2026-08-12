@@ -297,6 +297,10 @@ function wsRenderEstimate() {
   }
   document.getElementById("ws-estimate-total").textContent = wsMoney(total.minor, total.currencyCode);
   document.getElementById("ws-estimate-count").textContent = `${total.count} ${wsT("ws_lines")}`;
+
+  // Lines saved in different currencies do not add up, and the sum above says so.
+  const mixed = document.getElementById("ws-estimate-mixed");
+  if (mixed) mixed.hidden = !total.mixed;
 }
 
 function buildEstimatePage() {
@@ -385,4 +389,11 @@ document.addEventListener("DOMContentLoaded", () => {
   buildWorkspaceCalculators();
   buildProjectsPage();
   buildEstimatePage();
+});
+
+/* Saved lines keep the currency they were priced in, but a new line is stamped with the
+   one in force — so both lists are redrawn when the visitor switches. */
+document.addEventListener("currencychange", () => {
+  wsRenderProjects();
+  wsRenderEstimate();
 });

@@ -19,10 +19,14 @@ Strony generuje bezzależnościowy skrypt Node — patrz [Budowanie](#budowanie)
   w banerze) oraz sekcja „Sklepy": mapa **Google Maps** (embed) i lista sklepów
   z **OpenStreetMap (Overpass API)**, ładowane dopiero, gdy z niej korzystasz.
   Wyjątkiem są `/app/` i `/p/`, które ładują Firebase SDK z CDN Google.
-- **Indeksowalna w 10 językach** — każdy język ma własny adres (`/kalkulatory/…`,
-  `/en/calculators/…`), treść jest zwykłym HTML-em, a `canonical` + `hreflang`
-  wiążą wersje ze sobą. Przełącznik języka nawiguje, nie podmienia tekstu.
-- **Strona per kalkulator** — 15 kalkulatorów × 10 języków, każdy z własnym
+- **Indeksowalna w 4 językach** (polski, українська, Deutsch, English) — każdy język ma
+  własny adres (`/kalkulatory/…`, `/en/calculators/…`), treść jest zwykłym HTML-em,
+  a `canonical` + `hreflang` wiążą wersje ze sobą. Przełącznik języka nawiguje,
+  nie podmienia tekstu, i pokazuje flagę obok nazwy języka (nie emoji).
+- **Waluta niezależna od języka** — PLN, EUR, USD, UAH. Wybór zapisuje się w
+  przeglądarce i dotyczy cen, kosztów i kosztorysów. Nic nie jest przeliczane po
+  kursie, a jednostki fizyczne kalkulatorów nie zmieniają się przy zmianie waluty.
+- **Strona per kalkulator** — 15 kalkulatorów × 4 języki, każdy z własnym
   `title`/`description`/`schema.org` i sekcją „Jak to liczymy" (wzór, przykład
   policzony tym samym silnikiem, uwagi praktyczne).
 - **Gotowa pod SEO** — canonical, hreflang, Open Graph + Twitter, dane strukturalne
@@ -38,7 +42,7 @@ Strony generuje bezzależnościowy skrypt Node — patrz [Budowanie](#budowanie)
 ## Budowanie
 
 ```bash
-node scripts/build.mjs          # generuje ~230 stron + sitemap.xml
+node scripts/build.mjs          # generuje 130 stron + sitemap.xml
 node scripts/build.mjs --check  # tylko walidacja słowników i slugów
 ```
 
@@ -61,9 +65,11 @@ src/
   app-pages.mjs         /app/ i /p/ (noindex)
 assets/
   styles.css            System projektowy Olive Green Material 3
-  i18n.js               Słownik 10 języków (wejście builda)
-  i18n-pages.js         Słownik podstron, te same 10 języków (wejście builda)
+  i18n.js               Słownik 4 języków (wejście builda)
+  i18n-pages.js         Słownik podstron, te same 4 języki (wejście builda)
   i18n-runtime.js       t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/
+  currency.js           Waluta (PLN/EUR/USD/UAH), niezależna od języka
+  flags/<lang>.svg      Flagi przy nazwach języków (bez emoji)
   calculators.js        Silniki liczące (1:1 z aplikacji) + podpięcie formularzy
   stores.js             Wyszukiwarka sklepów (mapa + lista z OpenStreetMap)
   main.js               Wiązanie strony (pomieszczenia, menu, karuzela, baner zgody)
@@ -81,11 +87,11 @@ docs/DOKUMENTACJA.md    Pełna dokumentacja projektu
 Pliki **generowane** (`node scripts/build.mjs`, nie edytuj ręcznie):
 
 ```
-index.html · <lang>/index.html            Strona główna, 10 języków
+index.html · <lang>/index.html            Strona główna, 4 języki
 kalkulatory/ · kalkulatory/<materiał>/    Hub + strona per kalkulator
 poradniki/ · poradniki/<slug>/            Poradniki
 sklepy/                                   Wyszukiwarka sklepów
-<lang>/…                                  To samo dla pozostałych 9 języków
+<lang>/…                                  To samo dla pozostałych 3 języków
 app/index.html · p/index.html             Konto i udostępniona wycena (noindex)
 assets/i18n.<lang>.js · assets/i18n.all.js
 sitemap.xml

@@ -12,8 +12,8 @@
 <title>Nie ma takiej strony — LiczMat</title>
 <meta name="robots" content="noindex, follow">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260812a" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/styles.css?v=20260812a">
+<link rel="icon" href="/assets/favicon.svg?v=20260812b" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/styles.css?v=20260812b">
 <script>
   // GitHub Pages serves this file for every path it cannot resolve, and it has no
   // rewrite rules. A shared estimate lives at /p/<token>, where the token is an
@@ -22,6 +22,12 @@
   (function () {
     var m = location.pathname.match(/^\/p\/([A-Za-z0-9_-]{16,})\/?$/);
     if (m) location.replace("/p/?t=" + encodeURIComponent(m[1]) + location.hash);
+
+    // LiczMat shipped ten languages until 2026-08-12 and now ships four. The six that
+    // went away leave inbound links behind: /cs/, /sk/, /ro/, /hr/, /sr/, /ru/ and
+    // everything under them. Their slugs have no counterpart in the languages that
+    // stayed, so the honest landing place is the home page rather than a guess.
+    if (/^\/(cs|sk|ro|hr|sr|ru)(\/|$)/.test(location.pathname)) location.replace("/");
   })();
 </script>
 </head>

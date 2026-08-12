@@ -26,8 +26,30 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | Sesja | Zakres | Status |
 |---|---|---|
 | 1 | Rebranding + nowy design | **Zrobione** — 2026-08-12, commit `2422c46` |
-| 2 | Języki i waluty | **Następna** |
-| 3–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 2 | Języki i waluty | **Zrobione** — 2026-08-12 |
+| 3 | Architektura informacji | **Następna** |
+| 4–36 | patrz rozdział XXXII planu | Nie zaczęte |
+
+### Co zrobiła Sesja 2
+
+- **Cztery języki**: `pl, uk, de, en`. Sześć (`cs, sk, ro, hr, sr, ru`) usunięte ze
+  słowników, mapy serwisu, wzorów kalkulatorów i z dysku. Slugi czterech pozostałych
+  nietknięte — żaden adres, który działał, nie przestał działać.
+- Stare adresy (`/cs/…`, `/ru/…`) przechwytuje `404.html` i kieruje na stronę główną.
+  `RETIRED_LANGS` w `src/site.mjs` trzyma listę; `clean()` w buildzie kasuje katalogi.
+- **Selektor języka z prawdziwymi flagami**: `assets/flags/<kod>.svg`, wstawiane inline
+  przez build (`src/flags.mjs`). Bez emoji. Nazwa języka zawsze widoczna obok flagi.
+  Każda pozycja to link do adresu tej wersji, więc działa bez JS i indeksuje się.
+- **Waluty PLN / EUR / USD / UAH** w `assets/currency.js`, niezależne od języka.
+  Wybór w `localStorage` (`liczmat-currency`), domyślna wynika z języka. Nic nie jest
+  przeliczane po kursie, jednostki fizyczne nie zmieniają się nigdy. Pozycja kosztorysu
+  zachowuje walutę z chwili zapisu; przy mieszanych walutach `/kosztorys/` mówi to wprost.
+- SEO dla czterech języków: `canonical`, `hreflang` + `x-default`, `og:locale`,
+  `sitemap.xml` — wszystko wypada z tej samej listy `LANGS`.
+- Copy poprawione tam, gdzie mówiło „10 języków"; liczba języków na stronie głównej
+  bierze się teraz z `LANGS.length`, a cena „0 zł" z wybranej waluty.
+
+Matematyka kalkulatorów nietknięta.
 
 ### Co zrobiła Sesja 1
 
@@ -58,8 +80,21 @@ Rozstrzygnąć, zanim dotknie ich któraś z kolejnych sesji.
 
 Grafika referencyjna pokazuje „POLICZ. ZAPLANUJ. ZREALIZUJ.” i nagłówek „Policz
 materiały. Zaplanuj swoją pracę.” Serwis dalej ma „Policz. Kup. Nie marnuj.” — klucze
-`hero_title` i `foot_tagline` w `assets/i18n.js`, w każdym z 10 języków. To copy strony
+`hero_title` i `foot_tagline` w `assets/i18n.js`, w każdym z 4 języków. To copy strony
 głównej, więc należy do Sesji 6, chyba że właściciel zdecyduje inaczej.
+
+### Waluta a aplikacja Android
+
+Strona pozwala wybrać walutę niezależnie od języka; aplikacja Android nadal bierze
+walutę z języka (`AppLanguage.defaultCurrency`). Kosztorys zsynchronizowany z telefonu
+może więc mieć inną walutę niż ta wybrana w przeglądarce — pozycja zachowuje własny
+`currencyCode`, więc nic się nie fałszuje, ale docelowo aplikacja powinna pójść tą samą
+drogą. Android jest poza zakresem prac nad webem (rozdział VII planu).
+
+### Języki aplikacji Android
+
+Aplikacja dalej ma 10 języków, serwis ma 4. FAQ na stronie mówi teraz o serwisie,
+nie o aplikacji. Zrównanie wymaga zmian w repo `3d-polednia/Materio`.
 
 ### Domena
 
@@ -87,14 +122,15 @@ zapis pod nowym — a nie zwykłe przemianowanie.
 ### Układ ze wzorca
 
 Grafika referencyjna zawiera wyszukiwarkę kalkulatorów, kafelki popularnych, mockup
-pulpitu i selektor języka z flagami. To Sesje 2, 5, 6 i 7. Sesja 1 wdrożyła sam system
-wizualny, bez przebudowy architektury strony głównej.
+pulpitu i selektor języka z flagami. Selektor z flagami zrobiła Sesja 2; reszta to
+Sesje 5, 6 i 7. Sesja 1 wdrożyła sam system wizualny, bez przebudowy architektury
+strony głównej.
 
-### Drobny błąd zastany
+### Drobny błąd zastany — naprawiony
 
-W `/app/` przycisk „Pobierz” nie ma atrybutu `data-i18n`, więc zostaje po polsku przy
-interfejsie w innym języku — `src/app-pages.mjs:20`. Nie naprawiony, bo poza zakresem
-Sesji 1.
+W `/app/` przycisk „Pobierz” nie miał atrybutu `data-i18n` i zostawał po polsku przy
+interfejsie w innym języku. Naprawione w Sesji 2 (`src/app-pages.mjs`) — to defekt
+warstwy językowej, czyli dokładnie zakres tej sesji.
 
 ---
 

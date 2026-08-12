@@ -9,19 +9,19 @@ const GK_BOARD = 2.4, GK_WASTE = 10.0;
 const boardsFor = (area, sides, boardArea = GK_BOARD, waste = GK_WASTE) =>
   ceil((area * sides * (1 + waste / 100)) / boardArea);
 
-/* -------- language → locale + currency (mirrors AppLanguage.defaultCurrency) -------- */
-const CURRENCY = {
-  pl: ["pl-PL", "PLN"], en: ["en-US", "USD"], de: ["de-DE", "EUR"], cs: ["cs-CZ", "CZK"],
-  sk: ["sk-SK", "EUR"], ro: ["ro-RO", "RON"], hr: ["hr-HR", "EUR"], sr: ["sr-RS", "RSD"],
-  uk: ["uk-UA", "UAH"], ru: ["ru-RU", "RUB"],
-};
+/* -------- money and quantities --------
+   The currency is the visitor's own choice and no longer follows the language
+   (assets/currency.js, master plan VI): Deutsch + PLN is a valid setting. The price you
+   type is read in that currency and the cost is shown in it. Nothing is converted, and
+   no quantity — m², kg, packs, sheets — changes because the currency changed.
+   Number formatting still follows the language: 1 234,56 in Polish, 1,234.56 in English. */
+const LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
 function money(major, lang) {
-  const [loc, cur] = CURRENCY[lang] || CURRENCY.pl;
-  try { return new Intl.NumberFormat(loc, { style: "currency", currency: cur, maximumFractionDigits: 2 }).format(major); }
-  catch (e) { return major.toFixed(2); }
+  if (typeof lmMoney === "function") return lmMoney(major);
+  return (Number(major) || 0).toFixed(2);
 }
 function qty(v, lang) {
-  const [loc] = CURRENCY[lang] || CURRENCY.pl;
+  const loc = LOCALE[lang] || LOCALE.pl;
   return new Intl.NumberFormat(loc, { maximumFractionDigits: 2 }).format(v);
 }
 
@@ -358,6 +358,19 @@ function wireCalculator(card) {
 /** Wire every calculator present on the page. */
 function buildCalculators() {
   document.querySelectorAll(".calc[data-calc]").forEach(wireCalculator);
+}
+
+/* A result on screen carries a currency symbol, so it has to be redrawn when the visitor
+   picks another currency. The amount is the one already calculated — switching currency
+   relabels it, it does not convert it.
+   The guard is for scripts/build.mjs, which runs the engines in Node to print the worked
+   example on every calculator page and has no DOM. */
+if (typeof document !== "undefined") {
+  document.addEventListener("currencychange", () => {
+    document.querySelectorAll(".calc[data-calc]").forEach((card) => {
+      if (card.lastResult) renderResult(card, card.lastResult);
+    });
+  });
 }
 
 function renderResult(card, res) {

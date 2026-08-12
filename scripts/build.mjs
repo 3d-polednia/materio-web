@@ -25,9 +25,12 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
+  RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies,
 } from "../src/site.mjs";
+import { FLAG, LANG_NAME } from "../src/flags.mjs";
+import { DEFAULT_CURRENCY } from "../src/currency.mjs";
 import { page } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
@@ -40,7 +43,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260812a";
+const STAMP = "20260812b";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -50,7 +53,19 @@ function evalScript(file, returns) {
   return new Function(`${src}\nreturn {${returns.join(",")}};`)();
 }
 
-const { I18N, LANGS: LANG_META } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
+const { I18N, LANGS: LANG_META_RAW } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
+
+/**
+ * What the browser gets to know about the languages: the code, the name in that language
+ * and the flag, in the order the picker shows them. The flag travels with the entry so
+ * /app/ and /p/, which build their picker at runtime, draw the same rows the generator
+ * writes into every other page.
+ */
+const LANG_META = LANGS.map((code) => ({
+  code,
+  label: (LANG_META_RAW.find((l) => l.code === code) || {}).label || LANG_NAME[code],
+  flag: FLAG[code],
+}));
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
 const { CALCS, ENGINES, localizeRow } = evalScript("assets/calculators.js",
@@ -207,8 +222,7 @@ function workedExample(calc, lang, t) {
   const res = ENGINES[calc.engine](input);
   if (res.err) throw new Error(`calculator "${calc.id}" fails on its own defaults: ${res.err}`);
 
-  const locale = { pl: "pl-PL", en: "en-US", de: "de-DE", cs: "cs-CZ", sk: "sk-SK",
-    ro: "ro-RO", hr: "hr-HR", sr: "sr-RS", uk: "uk-UA", ru: "ru-RU" }[lang];
+  const locale = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" }[lang];
   const number = (v) => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(v);
 
   // The engines emit numbers as |n:…| tokens; the language is only known here.
@@ -231,7 +245,9 @@ const appLd = (lang, t) => ({
   installUrl: "https://play.google.com/store/apps/details?id=pl.materio.app",
   image: `${BASE}/assets/og-image.jpg`,
   description: t("hero_lead"),
-  offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
+  // The app is free, so the currency only has to be a real one; the visitor's own choice
+  // lives in the browser and cannot be known at build time.
+  offers: { "@type": "Offer", price: "0", priceCurrency: DEFAULT_CURRENCY[lang] },
   author: { "@type": "Organization", name: "LiczMat" },
   publisher: { "@type": "Organization", name: "LiczMat" },
 });
@@ -257,7 +273,7 @@ const calcLd = (calc, lang, t) => ({
   browserRequirements: "Requires JavaScript",
   inLanguage: lang,
   isPartOf: { "@type": "WebSite", name: "LiczMat", url: BASE + "/" },
-  offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
+  offers: { "@type": "Offer", price: "0", priceCurrency: DEFAULT_CURRENCY[lang] },
 });
 
 /* ------------------------------------------------------------------ emit */
@@ -571,9 +587,15 @@ ${urls.map((u) => `  <url>
   write("sitemap.xml", body);
 }
 
-/** Remove generated directories so a renamed slug cannot leave an orphan page behind. */
+/**
+ * Remove generated directories so a renamed slug cannot leave an orphan page behind.
+ *
+ * The six languages LiczMat dropped on 2026-08-12 are swept too: their pages were
+ * generated into /cs/, /sk/ … and nothing else would ever delete them. 404.html sends
+ * whatever still links to them to the home page.
+ */
 function clean() {
-  const dirs = new Set();
+  const dirs = new Set(RETIRED_LANGS);
   for (const lang of LANGS) {
     if (lang !== DEFAULT_LANG) { dirs.add(lang); continue; }
     for (const section of Object.values(SECTION)) dirs.add(section[lang]);
@@ -583,6 +605,10 @@ function clean() {
   for (const d of dirs) {
     const full = p(d);
     if (existsSync(full)) rmSync(full, { recursive: true, force: true });
+  }
+  for (const lang of RETIRED_LANGS) {
+    const bundle = p(`assets/i18n.${lang}.js`);
+    if (existsSync(bundle)) rmSync(bundle, { force: true });
   }
 }
 

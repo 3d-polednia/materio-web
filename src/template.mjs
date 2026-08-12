@@ -2,7 +2,7 @@
 
    One <head>, one header, one footer, one consent banner. Pages differ only in the
    <main> they pass in, the metadata they declare and the scripts they ask for, so a
-   change to the chrome lands on all ~210 pages at once instead of drifting between
+   change to the chrome lands on all 130 pages at once instead of drifting between
    them. Nothing here runs in the browser; it produces plain HTML strings. */
 
 import {
@@ -11,6 +11,8 @@ import {
   urlAndroid, urlCookies,
   URL_PRIVACY, URL_APP, PLAY_URL,
 } from "./site.mjs";
+import { FLAG, LANG_NAME } from "./flags.mjs";
+import { CURRENCIES, DEFAULT_CURRENCY } from "./currency.mjs";
 
 export const GA_ID = "G-22PS16K79V";
 
@@ -36,8 +38,52 @@ const ICON = {
   menu: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',
   // Both glyphs ship; CSS shows the one that matches the theme in force.
   sun: '<svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg>',
+  chevron: '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
   moon: '<svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg>',
 };
+
+/**
+ * The language picker: a flag and the language's own name, one row per language.
+ *
+ * Every entry is a real link to that language's URL for this very page, so it works
+ * before any script runs and a crawler can follow it — that is what makes the other
+ * three languages indexable. `assets/i18n-runtime.js` only opens and closes the menu and
+ * remembers the choice.
+ *
+ * @param {object} alternates { lang: path } for this page; missing languages are dropped.
+ */
+export function langPicker(lang, t, alternates) {
+  const langs = LANGS.filter((l) => l === lang || (alternates && alternates[l]));
+
+  const row = (l) => `<span class="flag">${FLAG[l]}</span><span>${esc(LANG_NAME[l])}</span>`;
+  const items = langs.map((l) => (l === lang
+    ? `<li><span class="lang-item is-current" aria-current="true">${row(l)}</span></li>`
+    : `<li><a class="lang-item" href="${esc(alternates[l])}" hreflang="${HREFLANG[l]}" lang="${HREFLANG[l]}" data-lang="${l}">${row(l)}</a></li>`
+  )).join("\n      ");
+
+  return `<div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="${esc(t("lang_label"))}">
+      <span class="flag">${FLAG[lang]}</span><span class="lang-btn-name">${esc(LANG_NAME[lang])}</span>${ICON.chevron}
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      ${items}
+    </ul>
+  </div>`;
+}
+
+/**
+ * The currency picker. Language and currency are independent (master plan VI), so this is
+ * a separate control and nothing about it follows from the URL's language — it only
+ * starts at that language's default until the visitor chooses.
+ *
+ * Plain codes, no flags: EUR belongs to twenty countries, and a flag would pick one.
+ */
+export function currencyPicker(lang, t) {
+  const current = DEFAULT_CURRENCY[lang] || CURRENCIES[0];
+  const options = CURRENCIES
+    .map((c) => `<option value="${c}"${c === current ? " selected" : ""}>${c}</option>`).join("");
+  return `<select id="currency-select" class="cur-select" aria-label="${esc(t("cur_label"))}" title="${esc(t("cur_label"))}">${options}</select>`;
+}
 
 export const themeToggle = (t) =>
   `<button id="theme-toggle" class="theme-toggle" type="button" aria-label="${esc(t("theme_toggle"))}" title="${esc(t("theme_toggle"))}">${ICON.sun}${ICON.moon}</button>`;
@@ -198,10 +244,11 @@ ${p.headExtra || ""}
 </head>
 <body${p.bodyClass ? ` class="${p.bodyClass}"` : ""}>
 <a class="skip-link" href="#main">${esc(t("skip_main"))}</a>
-${bare ? main : `${header(lang, t)}\n${main}\n${footer(lang, t)}\n${consentBanner(lang, t)}`}
+${bare ? main : `${header(lang, t, alternates)}\n${main}\n${footer(lang, t)}\n${consentBanner(lang, t)}`}
 ${bare ? "" : `<script>window.LICZMAT_ALTERNATES = ${altJson};</script>`}
 <script src="/assets/i18n.${bare ? "all" : lang}.js?v=${stamp}"></script>
 <script src="/assets/i18n-runtime.js?v=${stamp}"></script>
+<script src="/assets/currency.js?v=${stamp}"></script>
 ${(p.classicScripts || []).map((s) => `<script src="${s}?v=${stamp}"></script>`).join("\n")}
 ${scripts.map((s) => {
     const attrs = s.endsWith(".mjs") || p.moduleScripts ? ' type="module"' : "";
@@ -214,7 +261,7 @@ ${p.bodyEnd || ""}
 `;
 }
 
-function header(lang, t) {
+function header(lang, t, alternates) {
   return `<header class="site">
   <div class="wrap nav">
     <a class="brand" href="${urlHome(lang)}">${LOGO_MARK}<span>LiczMat</span></a>
@@ -227,7 +274,10 @@ function header(lang, t) {
       <a href="${urlGuideIndex(lang)}">${esc(t("nav_guides"))}</a>
       <a href="${urlStores(lang)}">${esc(t("nav_stores"))}</a>
       <a href="${urlAndroid(lang)}">${esc(t("nav_app_page"))}</a>
-      <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
+      <div class="pickers">
+        ${langPicker(lang, t, alternates)}
+        ${currencyPicker(lang, t)}
+      </div>
       <a class="btn btn-primary btn-sm" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
     </nav>
   </div>

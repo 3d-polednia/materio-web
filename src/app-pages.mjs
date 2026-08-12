@@ -3,11 +3,11 @@
    /p/    the read-only view of a shared estimate
 
    Both are noindex (robots.txt and a robots meta tag), so they have no per-language URLs
-   and no hreflang. Instead they carry the whole ten-language dictionary and swap text in
-   place — see buildInPlaceSwitcher() in assets/i18n-runtime.js. That is why the markup
+   and no hreflang. Instead they carry the whole four-language dictionary and swap text in
+   place — see buildInPlacePicker() in assets/i18n-runtime.js. That is why the markup
    below uses data-i18n attributes while every generated page uses real text. */
 
-import { esc, LOGO_MARK, themeToggle } from "./template.mjs";
+import { esc, LOGO_MARK, themeToggle, currencyPicker } from "./template.mjs";
 import { urlCalcIndex, urlHome, PLAY_URL, URL_APP } from "./site.mjs";
 
 /** Header/footer are deliberately minimal here — these pages are a tool, not a funnel. */
@@ -17,8 +17,12 @@ const chrome = (t, bodyMain) => `<header class="site">
     ${themeToggle(t)}
     <nav class="nav-links" aria-label="LiczMat">
       <a href="${urlCalcIndex("pl")}" data-i18n="nav_calc">${esc(t("nav_calc"))}</a>
-      <select id="lang-select" class="lang-select" aria-label="Język / Language"></select>
-      <a class="btn btn-primary btn-sm" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="app">${esc(t("nav_download"))}</a>
+      <div class="pickers">
+        <!-- Filled in by assets/i18n-runtime.js: these pages switch language in place. -->
+        <div class="lang-picker" id="lang-picker"></div>
+        ${currencyPicker("pl", t)}
+      </div>
+      <a class="btn btn-primary btn-sm" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="app" data-i18n="nav_download">${esc(t("nav_download"))}</a>
     </nav>
   </div>
 </header>

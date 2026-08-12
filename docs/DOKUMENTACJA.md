@@ -9,7 +9,7 @@ sklepów, SEO oraz zarządzanie assetami.
   Status prac i otwarte decyzje: [`MASTER_PLAN.md`](MASTER_PLAN.md).
 - **Repozytorium:** `3d-polednia/materio-web`
 - **Adres docelowy:** `https://materio-app.com/`
-- **Aplikacja:** `pl.materio.app` (Google Play), Android 7.0+ (API 24), 10 języków
+- **Aplikacja:** `pl.materio.app` (Google Play), Android 7.0+ (API 24)
 
 ---
 
@@ -36,7 +36,7 @@ sklepów, SEO oraz zarządzanie assetami.
 - **Statyczna strona, ale generowana.** W przeglądarce dalej czysty HTML/CSS/JS —
   bez frameworka, bundlera i zależności runtime. Strony powstają jednak z jednego
   szablonu: `node scripts/build.mjs` (Node bez `package.json` i bez `node_modules`)
-  zapisuje ~230 plików `.html`. Wynik jest commitowany, bo GitHub Pages serwuje
+  zapisuje 130 plików `.html`. Wynik jest commitowany, bo GitHub Pages serwuje
   katalog repo bez własnego budowania. Pliki, które widzisz w repo, to pliki, które
   trafiają na serwer — część z nich pisze generator, nie człowiek.
 - **Prawda ponad marketing.** Aplikacja w wydaniu produkcyjnym zawiera reklamy
@@ -52,11 +52,11 @@ sklepów, SEO oraz zarządzanie assetami.
   `localStorage['materio_consent']`. Pozostałe wyjątki, tylko na żądanie
   użytkownika w sekcji „Sklepy": embed Google Maps oraz zapytanie do
   OpenStreetMap/Overpass.
-- **Treść indeksowalna w każdym z 10 języków.** Każdy język ma własny adres
+- **Treść indeksowalna w każdym z 4 języków.** Każdy język ma własny adres
   (`/kalkulatory/farby-tynki-grunty/`, `/en/calculators/paint-plaster-primer/`),
   a tekst jest zwykłym HTML-em wygenerowanym ze słownika. Przełącznik języka
   **nawiguje** do odpowiednika, zamiast podmieniać tekst — dopiero to sprawia, że
-  pozostałe dziewięć języków w ogóle da się zaindeksować. Strona ma sens bez JS.
+  pozostałe trzy języki w ogóle da się zaindeksować. Strona ma sens bez JS.
 
 ## 2. Struktura plików
 
@@ -76,8 +76,8 @@ robots.txt               Reguły dla robotów + odnośnik do sitemap
 .nojekyll                Wyłącza przetwarzanie Jekyll na GitHub Pages
 assets/
   styles.css             System projektowy Olive Green Material 3 + wszystkie komponenty
-  i18n.js                Słownik 10 języków (LANGS, I18N) — wejście builda
-  i18n-pages.js          Słownik podstron, te same 10 języków — wejście builda
+  i18n.js                Słownik 4 języków (LANGS, I18N) — wejście builda
+  i18n-pages.js          Słownik podstron, te same 4 języki — wejście builda
   i18n-runtime.js        t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/
   calculators.js         Silniki liczące + podpięcie formularzy (wireCalculator)
   stores.js              Wyszukiwarka sklepów (buildStoreFinder): mapa + lista OSM
@@ -189,16 +189,35 @@ podmienić adres bazowy wszędzie.
 - Tekst **bez** `data-i18n` (np. sekcje „Jak to działa", „FAQ", „Sklepy") jest
   tylko po polsku — edytuj bezpośrednio w `index.html`.
 
-### Dodanie nowego języka
+### Języki
 
-1. Dopisz wpis do `LANGS` w `i18n.js`: `{ code: "xx", label: "Nazwa" }`.
-2. Dodaj obiekt `xx: { ... }` do `I18N` z tłumaczeniami wszystkich kluczy
-   (najprościej skopiować blok `en` i przetłumaczyć).
-3. Gotowe — przełącznik języka w nagłówku podchwyci nowy język automatycznie.
+Obsługiwane: `pl, uk, de, en` — zestaw z rozdziału V Master Planu. Sześć języków
+(`cs, sk, ro, hr, sr, ru`) zostało usuniętych 12.08.2026; ich katalogi kasuje
+`clean()` w buildzie, a `404.html` przekierowuje stare adresy na stronę główną.
+Lista `RETIRED_LANGS` w `src/site.mjs` trzyma ich kody.
 
-Obsługiwane obecnie: `pl, en, de, cs, sk, ro, hr, sr, uk, ru` (10 — tyle, ile
-aplikacja). Waluty i formaty liczb per język definiuje `CURRENCY` w
-`calculators.js`.
+Dodanie języka wymaga decyzji właściciela (plan mówi: wyłącznie te cztery). Gdyby
+kiedyś doszedł kolejny, potrzebne są cztery rzeczy:
+
+1. Kod w `LANGS` w `src/site.mjs` oraz wpis `{ code, label }` w `assets/i18n.js`.
+2. Slugi sekcji, kalkulatorów i poradników w `src/site.mjs` (slug jest na zawsze).
+3. Blok tłumaczeń w `assets/i18n.js`, `i18n-pages.js`, `i18n-materials.js`
+   i `src/calc-meta.mjs` — build przerywa i wypisuje brakujące klucze.
+4. Flaga jako `assets/flags/<kod>.svg` (nigdy emoji — rozdział V planu).
+
+### Waluty
+
+`assets/currency.js`: `PLN, EUR, USD, UAH`. Waluta jest **niezależna od języka**
+(rozdział VI planu) — Deutsch + PLN to poprawne ustawienie. Wybór trzymany jest w
+`localStorage` pod kluczem `liczmat-currency`; bez wyboru obowiązuje domyślna dla
+języka (pl→PLN, uk→UAH, de→EUR, en→USD).
+
+Nic nie jest przeliczane po kursie — offline'owy kalkulator nie ma skąd wziąć kursu,
+a zmyślony kurs fałszowałby kosztorys. Zmiana waluty zmienia tylko to, w czym czytamy
+i pokazujemy wpisane ceny. Jednostki fizyczne (m², kg, opakowania, płyty) nie zmieniają
+się nigdy. Zapisana pozycja kosztorysu zachowuje `currencyCode` z chwili zapisu, więc po
+zmianie waluty stara wycena nadal mówi prawdę; gdy pozycje mają różne waluty, strona
+`/kosztorys/` pisze to wprost pod sumą.
 
 ## 7. Kalkulatory
 
@@ -275,7 +294,7 @@ Wszystkie poniższe elementy generuje `scripts/build.mjs` dla każdej strony:
 
 - **Meta:** `title`, `description`, `robots`, `canonical`, `theme-color`
   (jasny/ciemny), `application-name`.
-- **Wielojęzyczność:** każda strona ma `hreflang` dla wszystkich 10 języków oraz
+- **Wielojęzyczność:** każda strona ma `hreflang` dla wszystkich 4 języków oraz
   `x-default` wskazujący wersję polską. To jest sedno zmiany — wcześniej dziewięć
   języków dzieliło jeden adres i nie mogło się zaindeksować.
 - **Treść indeksowalna:** teksty są zwykłym HTML-em w języku danej strony.
