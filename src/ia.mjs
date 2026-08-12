@@ -107,7 +107,8 @@ export const ROUTES = [
     path: urlCalcIndex,
     header: { order: 1, key: "nav_calc" },
     footer: { order: 1, key: "foot_calc_all" },
-    note: "Chapter XI: search, categories, filters, popular. Session 7 rebuilds it.",
+    note: "Chapter XI: search, categories, filtering, a shortlist and readable access to " +
+      "all of them. Session 7 built it; the groups are CALC_CATEGORIES below.",
   },
   {
     id: "calculator",
@@ -334,6 +335,115 @@ export function trail(id) {
     if (out.length > ROUTES.length) break; // a cycle; validate() reports it properly
   }
   return out;
+}
+
+/* ------------------------------------------------------------------ calculator hub */
+
+/**
+ * How `/kalkulatory/` groups the calculators — chapter XI.
+ *
+ * "Logiczne kategorie … nie twórz sztucznych kategorii": the groups below are the ones
+ * the fifteen calculators actually fall into, and chapter XI names four of the five by
+ * hand (płytki i wykończenie, malowanie, budowa, rozkrój, zabudowa).
+ *
+ * They are not the four tabs `assets/calculators.js` carries on `calc.tab`. That field is
+ * the Android app's own grouping, ported with the engines, and it puts "Klej / zaprawa"
+ * and "Fuga" under building work — three screens away from the tile calculator they are
+ * always used with. How the website sorts its own hub is a website decision, so it lives
+ * here; the engines keep their field and their maths untouched (chapter XIII).
+ *
+ *   id     the section's anchor on the hub: `#g-<id>`, and the filter's value.
+ *   key    dictionary prefix — `cc_<id>` is the name, `cc_<id>_d` the line under it.
+ *   calcs  ids from CALCS, in the order the group lists them.
+ *
+ * `validateCalcHub()` requires every calculator to sit in exactly one group, so a new
+ * calculator cannot quietly fail to appear on the hub.
+ */
+export const CALC_CATEGORIES = [
+  { id: "tiling", key: "cc_tiling", calcs: ["waste", "mortar", "grout"] },
+  { id: "painting", key: "cc_painting", calcs: ["coverage", "wallpaper"] },
+  { id: "building", key: "cc_building", calcs: ["concrete", "screed", "masonry", "insulation"] },
+  { id: "cutting", key: "cc_cutting", calcs: ["linear", "sheet"] },
+  { id: "drywall", key: "cc_drywall", calcs: ["studwall", "ceiling", "drylining", "sheathing"] },
+];
+
+const CAT_OF = new Map(
+  CALC_CATEGORIES.flatMap((c) => c.calcs.map((id) => [id, c])));
+
+/** The group one calculator belongs to, or undefined if nobody placed it. */
+export const calcCategory = (calcId) => CAT_OF.get(calcId);
+
+/**
+ * The shortlist the hub puts above the full list — chapter XI's "popularne kalkulatory".
+ *
+ * There is no traffic data on this site to rank by, and CLAUDE.md forbids a number on a
+ * page that cannot be traced to the code, so "popular" is not asserted: the shortlist is
+ * the calculators the site's own guides send people to most often, counted from GUIDES.
+ * The page says exactly that under the heading, so the claim is checkable by reading it.
+ *
+ * Ties are broken by the order of CALCS, which makes the list deterministic — the build
+ * writes the same four pages twice in a row.
+ *
+ * @param {object[]} guides GUIDES from src/site.mjs
+ * @param {object[]} calcs CALCS from assets/calculators.js
+ * @param {number} n how many to return
+ */
+export function popularCalcs(guides, calcs, n = 4) {
+  const uses = new Map(calcs.map((c) => [c.id, 0]));
+  for (const g of guides) {
+    for (const id of g.calcs || []) if (uses.has(id)) uses.set(id, uses.get(id) + 1);
+  }
+  const order = new Map(calcs.map((c, i) => [c.id, i]));
+  return calcs
+    .filter((c) => uses.get(c.id) > 0)
+    .sort((a, b) => (uses.get(b.id) - uses.get(a.id)) || (order.get(a.id) - order.get(b.id)))
+    .slice(0, n);
+}
+
+/**
+ * The hub's own consistency, checked at build time.
+ *
+ * `validateIA()` cannot do this: it has no access to CALCS or GUIDES, which are browser
+ * scripts that `scripts/build.mjs` evaluates. Same contract — one line per problem.
+ *
+ * @param {object[]} calcs CALCS from assets/calculators.js
+ * @param {object[]} guides GUIDES from src/site.mjs
+ * @returns {string[]}
+ */
+export function validateCalcHub(calcs, guides) {
+  const problems = [];
+  const known = new Set(calcs.map((c) => c.id));
+  const placed = new Map();
+
+  const ids = new Set();
+  for (const cat of CALC_CATEGORIES) {
+    if (ids.has(cat.id)) problems.push(`IA: duplicate calculator category "${cat.id}"`);
+    ids.add(cat.id);
+    if (!cat.calcs.length) problems.push(`IA: calculator category "${cat.id}" is empty`);
+    for (const id of cat.calcs) {
+      if (!known.has(id)) problems.push(`IA: category "${cat.id}" lists unknown calculator "${id}"`);
+      if (placed.has(id)) problems.push(`IA: calculator "${id}" is in both "${placed.get(id)}" and "${cat.id}"`);
+      placed.set(id, cat.id);
+    }
+  }
+  for (const c of calcs) {
+    if (!placed.has(c.id)) {
+      problems.push(`IA: calculator "${c.id}" is in no category — it would not appear on ` +
+        `the hub. Add it to CALC_CATEGORIES in src/ia.mjs.`);
+    }
+  }
+
+  // The shortlist is only honest while it really is the guides' own ranking.
+  const popular = popularCalcs(guides, calcs);
+  if (!popular.length) {
+    problems.push("IA: no guide links to any calculator, so the hub's shortlist would be " +
+      "empty — drop the section or give it another source");
+  }
+  for (const c of popular) {
+    if (!known.has(c.id)) problems.push(`IA: shortlist names unknown calculator "${c.id}"`);
+  }
+
+  return problems;
 }
 
 /* ------------------------------------------------------------------ home page */

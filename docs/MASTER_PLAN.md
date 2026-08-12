@@ -32,8 +32,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 5 | Globalny layout | **Zrobione** — 2026-08-12 |
 | 6 | Homepage | **Zrobione** — 2026-08-12 |
 | — | *Etap dodatkowy: rebranding Androida + sekcja „Aplikacja"* | **Zrobione** — 2026-08-12 |
-| 7 | Centrum kalkulatorów | **Następna** |
-| 8–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 7 | Centrum kalkulatorów | **Zrobione** — 2026-08-12 |
+| 8 | Pojedynczy kalkulator | **Następna** |
+| 9–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -64,6 +65,61 @@ w repo `3d-polednia/Materio`. W skrócie, po stronie serwisu:
 Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystkich
 dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)
 został zaktualizowany na żywo. Matematyka kalkulatorów nietknięta.
+
+### Co zrobiła Sesja 7
+
+`/kalkulatory/` przebudowane według rozdziału XI. Rozdział wymaga pięciu rzeczy —
+wyszukiwarki, logicznych kategorii, filtrowania, popularnych kalkulatorów i czytelnego
+dostępu do wszystkich — i zabrania jednej: „nie wyświetlaj wszystkiego jako gigantycznej
+ściany kart”.
+
+- **Pięć kategorii zamiast czterech zakładek z aplikacji.** Cztery grupy, które strona
+  pokazywała do tej pory (Powierzchnie / Rozkrój / Roboty budowlane / Stelaże G-K), to
+  pole `calc.tab` przeniesione z Androida razem z silnikami. Stawia ono „Klej / zaprawa”
+  i „Fugę” w robotach budowlanych, czyli daleko od kalkulatora płytek, z którym zawsze
+  idą razem. Nowy podział — **Płytki i wykończenie, Malowanie, Budowa, Rozkrój,
+  Zabudowa G-K** — jest ten, który rozdział XI wymienia z nazwy. Zapisany jako
+  `CALC_CATEGORIES` w `src/ia.mjs`, bo to decyzja architektoniczna: build sprawdza, że
+  każdy kalkulator należy do dokładnie jednej kategorii, więc nowy kalkulator nie może po
+  cichu wypaść z centrum. **`assets/calculators.js` bez zmian** — matematyka i `calc.tab`
+  nietknięte (rozdział XIII).
+- **Wyszukiwarka i filtr, ale strona działa bez skryptu.** Kategorie to zwykłe linki do
+  `#g-<id>`: bez JS skaczą do grupy, z JS zawężają listę w miejscu. Każdy z 15
+  kalkulatorów jest w kodzie prawdziwym `<a>`, więc robot indeksuje to samo, co widzi
+  człowiek. Pole wyszukiwania to jedyna kontrolka, której skrypt jest naprawdę potrzebny,
+  więc siedzi w `.js-only` i przy wyłączonym JS w ogóle się nie pokazuje, zamiast leżeć
+  martwe. Szuka po nazwie, opisie i nazwie kategorii — dlatego „malowanie” znajduje
+  „Farby, tynki, grunty”, choć tego słowa nie ma ani w nazwie, ani w opisie.
+- **„plytki” znajduje „Płytki”.** Standardowe składanie NFD zdejmuje ogonki i kreski, ale
+  polskiego `ł` nie rusza — Unicode nie uważa go za `l` z akcentem. Na stronie, której
+  całym zadaniem jest wyszukiwanie, to jest realna dziura, więc `fold()` mapuje je ręcznie,
+  po obu stronach porównania.
+- **„Od czego zacząć” zamiast „Popularne”.** Rozdział XI prosi o popularne kalkulatory,
+  ale serwis nie ma żadnych danych o ruchu, z których dałoby się je policzyć, a CLAUDE.md
+  zabrania liczby, której nie da się wywieść z kodu. Skrót bierze się więc z tego, co jest
+  policzalne: `popularCalcs()` liczy odesłania z `GUIDES[].calcs` i pokazuje cztery
+  kalkulatory, do których odsyła najwięcej poradników — a strona mówi to wprost pod
+  nagłówkiem. **Do decyzji właściciela**, czy to wystarcza, czy skrót ma być ustalony
+  ręcznie.
+- **Ślepe kotwice ze strony głównej naprawione.** Drzwi „Kalkulatory” prowadziły do
+  `#g-surface`, `#g-trade`, `#g-framing` — po przebudowie takich sekcji nie ma. Lista
+  kategorii na stronie głównej bierze się teraz z tego samego `CALC_CATEGORIES`, więc nie
+  może wskazać nagłówka, którego centrum nie ma. Przy okazji te linki otwierają centrum
+  **już zawężone** do klikniętej kategorii.
+- **Cztery klucze `tab_*` usunięte** ze słownika — nazwy grup, których nie renderuje już
+  żadna strona. Słownik: 720 kluczy × 4 języki.
+- Sprawdzone w Chromium: **80 testów, 80 przechodzi** — cztery języki × (filtr kategorii,
+  licznik, chowanie pustych grup, brak błędów w konsoli), wyszukiwanie z ogonkami i bez,
+  stan pusty, Escape, wejście z `#g-drywall`, wariant bez JavaScriptu i brak przewijania
+  w bok przy 360 / 414 / 768 / 1280 px. Cztery nowe sprawdzenia buildu przetestowane
+  negatywnie — celowo zepsute, build faktycznie padł.
+- **Strona jest wyższa, nie niższa**: 2327 px → 3180 px przy 1280 px, 203 → 316 słów.
+  Dokłada ją pasek filtra i skrót „Od czego zacząć”, czyli dokładnie to, o co prosi
+  rozdział XI. Sam spis kalkulatorów jest krótszy w odbiorze: pięć nazwanych grup zamiast
+  czterech bloków po całej szerokości, a po wpisaniu jednego słowa zostaje kilka pozycji
+  (np. „płyt” → 7 z 15).
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 6
 
@@ -323,19 +379,23 @@ zapis pod nowym — a nie zwykłe przemianowanie.
 
 Grafika referencyjna zawiera wyszukiwarkę kalkulatorów, kafelki popularnych, mockup
 pulpitu i selektor języka z flagami. Selektor z flagami zrobiła Sesja 2, ramę strony
-(nagłówek, stopka, nawigacja) Sesja 5, treść strony głównej Sesja 6. **Wyszukiwarki
-kalkulatorów na stronie głównej nie ma** — rozdział XI umieszcza ją na `/kalkulatory/`,
-czyli w Sesji 7; strona główna prowadzi do niej drzwiami „Kalkulatory” i skrótami do
-czterech kategorii. Mockup pulpitu należy do Sesji 14. Sesja 1 wdrożyła sam system
-wizualny, bez przebudowy architektury strony głównej.
+(nagłówek, stopka, nawigacja) Sesja 5, treść strony głównej Sesja 6, a wyszukiwarkę
+i skrót „Od czego zacząć” Sesja 7. **Wyszukiwarki kalkulatorów na stronie głównej nadal
+nie ma** — rozdział XI umieszcza ją na `/kalkulatory/` i tam stoi; strona główna prowadzi
+do niej drzwiami „Kalkulatory” i skrótami do pięciu kategorii. Mockup pulpitu należy do
+Sesji 14. Sesja 1 wdrożyła sam system wizualny, bez przebudowy architektury strony
+głównej.
 
-### Kotwice kategorii na stronie głównej
+### ~~Kotwice kategorii na stronie głównej~~ — rozstrzygnięte w Sesji 7
 
-Drzwi „Kalkulatory” linkują do `/kalkulatory/#g-surface`, `#g-cutting`, `#g-trade`,
-`#g-framing` — kotwic, które hub ma dzisiaj. **Sesja 7 przebudowuje ten hub**
-(wyszukiwarka, kategorie, filtrowanie); jeżeli zmieni identyfikatory sekcji, musi
-poprawić `homeDoors()` w `src/pages.mjs`. Nic tego nie pilnuje automatycznie — kotwica
-nie jest adresem strony, więc nie przechodzi przez `livePaths()`.
+Drzwi „Kalkulatory” linkowały do `#g-surface`, `#g-cutting`, `#g-trade`, `#g-framing`.
+Sesja 7 zmieniła podział na pięć kategorii, więc trzy z tych kotwic przestały istnieć —
+i dlatego lista na stronie głównej powstaje teraz z `CALC_CATEGORIES`, tak samo jak
+nagłówki grup w centrum. Wskazanie nieistniejącej sekcji wymagałoby dopisania jej do
+architektury, czyli do miejsca, z którego biorą się obie listy naraz.
+
+Kotwica nadal nie przechodzi przez `livePaths()` — to nie jest adres strony. Pilnuje jej
+teraz test w Chromium (patrz raport Sesji 7), nie build.
 
 ### Miejsce dla „LiczMat Pro” w menu
 

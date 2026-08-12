@@ -244,6 +244,36 @@ językach (bez tego `t()` wypisałby na stronie głównej sam klucz).
 - „Konto” jest przyciskiem po prawej i nic nie mówi o stanie zalogowania — pulpit
   zalogowanego to Sesja 14.
 
+### 5.2. Centrum kalkulatorów — pięć kategorii
+
+Rozdział XI wymaga na `/kalkulatory/` wyszukiwarki, logicznych kategorii, filtrowania,
+popularnych kalkulatorów i czytelnego dostępu do wszystkich — i zabrania jednego:
+„nie wyświetlaj wszystkiego jako gigantycznej ściany kart”. Sesja 7 zapisała podział
+jako `CALC_CATEGORIES` w `src/ia.mjs`:
+
+| Kategoria | `#g-` | Kalkulatory |
+|---|---|---|
+| Płytki i wykończenie | `#g-tiling` | płytki/panele/gres, klej/zaprawa, fuga |
+| Malowanie | `#g-painting` | farby/tynki/grunty, tapety |
+| Budowa | `#g-building` | beton z worka, wylewka/tynk, murowanie, ocieplenie ETICS |
+| Rozkrój | `#g-cutting` | rozkrój liniowy 1D, rozkrój płyt 2D |
+| Zabudowa G-K | `#g-drywall` | ściana działowa, sufit podwieszany, G-K na klej, poszycie OSB |
+
+**To nie są cztery zakładki z `calc.tab`.** Tamto pole przyszło z aplikacji Android razem
+z silnikami i stawia „Klej / zaprawa” oraz „Fugę” w „Robotach budowlanych” — trzy ekrany
+od kalkulatora płytek, z którym zawsze idą w parze. Jak serwis sortuje własne centrum, to
+decyzja serwisu, więc mieszka w architekturze; silniki i ich matematyka zostają nietknięte
+(rozdział XIII). `calc.tab` nadal jest w `assets/calculators.js` i nadal trafia do
+atrybutu `data-tab` karty.
+
+Adres kategorii jest jednocześnie kotwicą sekcji i wartością filtra: `#g-tiling` bez
+skryptu skacze do nagłówka grupy, a ze skryptem otwiera centrum już zawężone do niej.
+Dzięki temu linki kategorii ze strony głównej prowadzą w jedno miejsce w obu przypadkach.
+
+Skrót „Od czego zacząć” nie twierdzi, że coś jest popularne — nie ma tu danych o ruchu,
+z których dałoby się to policzyć. `popularCalcs()` liczy, do których kalkulatorów odsyła
+najwięcej poradników (`GUIDES[].calcs`), a strona mówi to wprost pod nagłówkiem.
+
 ---
 
 
@@ -380,9 +410,14 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | nawigacja | dwa linki na tej samej pozycji (w stopce: w tej samej kolumnie); link bez klucza tłumaczenia; więcej niż cztery linki w menu (Sesja 5) |
 | przepływy | krok na nieistniejącą trasę; przepływ sięgający po wyższy poziom bez kroku, który go nadaje |
 | strona główna (Sesja 6) | inna liczba drzwi niż trzy albo inna kolejność poziomów; drzwi na nieistniejącą trasę; brak tekstu drzwi w słowniku |
+| centrum kalkulatorów (Sesja 7) | kalkulator w żadnej kategorii albo w dwóch naraz; kategoria z nieznanym kalkulatorem lub pusta; brak nazwy albo opisu kategorii w słowniku; skrót „Od czego zacząć”, którego nie potwierdza żaden poradnik |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.
 Tak samo sprawdzone są dwa dołożone w Sesji 5 (piąty link w menu, dwie pozycje na tym
-samym miejscu w tej samej kolumnie stopki) i cztery z Sesji 6: czwarte drzwi, drzwi
-z poziomem nie na swoim miejscu, drzwi na trasę, której nie ma, i brakujący klucz
-tłumaczenia drzwi.
+samym miejscu w tej samej kolumnie stopki), cztery z Sesji 6 (czwarte drzwi, drzwi
+z poziomem nie na swoim miejscu, drzwi na trasę, której nie ma, brakujący klucz
+tłumaczenia drzwi) i cztery z Sesji 7: kalkulator wyjęty z kategorii, kalkulator wpisany
+do dwóch kategorii, nieznany identyfikator w kategorii i skasowany klucz `cc_*_d`.
+
+`validateCalcHub()` stoi obok `validateIA()`, a nie w niej: potrzebuje `CALCS` i `GUIDES`,
+czyli skryptów przeglądarkowych, które dopiero `scripts/build.mjs` wykonuje.

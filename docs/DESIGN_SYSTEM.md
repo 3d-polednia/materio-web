@@ -192,6 +192,19 @@ Ten sam obiekt w trzech rolach: filtr, skrót, zakładka. `.chip.on`
 i `[aria-selected="true"]` to stan wybrany (limonka). `.chip.warn` zgłasza problem
 (rodzina `--error`).
 
+Chip bywa `<button>` (presety kalkulatora) albo `<a>` (kategorie na `/kalkulatory/`,
+które bez skryptu są zwykłymi kotwicami). Wariant linkowy `a.chip` tylko zdejmuje
+podkreślenie i ustawia `display: inline-flex` — kolor, kształt i stany są wspólne.
+
+### Centrum kalkulatorów (Sesja 7)
+
+`.calc-filter` to pasek nad listą: pole `.mat-search` w `.calc-search`, rząd chipów
+`.calc-cats` i licznik `.calc-shown`. Grupy to `.calc-group-block` — nagłówek
+`.calc-group` (wersaliki, `--muted`) i jedna linijka `.calc-group-d`.
+
+`.calc-links` jest teraz `<ul>`: każda karta siedzi w `<li>`, żeby filtr miał co ukrywać
+poza samym linkiem. Siatka i wygląd karty `.calc-link` bez zmian.
+
 ### Karta
 
 `.card`, `.calc`, `.step`, `.trust-panel`, `.app-card`, `.ws-estimate` to **jedna
@@ -262,6 +275,11 @@ tabela kosztorysu (`.ws-table`, liczby `tabular-nums`), dialog materiałów
 (`.mat-dialog` + `::backdrop` z `--overlay`), FAQ na `<details>`, blok wzoru
 (`pre.formula`, zawija zamiast przewijać w bok), plakietka Google Play
 (`.gp-badge` — czerń Google, celowo poza motywem), baner zgody.
+
+Jedna nowa użytkówka: **`.js-only`** — kontrolka, która bez skryptu nie ma co robić
+(dziś tylko pole wyszukiwania na `/kalkulatory/`). Domyślnie `display: none`, pokazuje
+ją dopiero `.js` na `<html>`. Zasada z Sesji 5 zostaje w mocy: treść i nawigacja mają
+działać bez JS, więc `.js-only` wolno objąć wyłącznie to, co bez JS byłoby martwe.
 
 ---
 

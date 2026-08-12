@@ -6,7 +6,9 @@
    only attaches the handlers afterwards — see wireCalculator() in assets/calculators.js. */
 
 import { esc, calcIcon, playBadge, breadcrumbs } from "./template.mjs";
-import { HOME_DOORS, route as iaRoute, STATUS } from "./ia.mjs";
+import {
+  HOME_DOORS, route as iaRoute, STATUS, CALC_CATEGORIES, calcCategory, popularCalcs,
+} from "./ia.mjs";
 import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
@@ -16,9 +18,21 @@ import {
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
 import { DEFAULT_CURRENCY } from "./currency.mjs";
 
-const TABS = ["surface", "cutting", "trade", "framing"];
-
 const LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
+
+/**
+ * Case- and accent-insensitive text for the hub's search haystack.
+ *
+ * NFD splits a letter from its accent so the accent can be dropped — "Räume" becomes
+ * "raume", "wykończenie" becomes "wykonczenie". Polish ł is not an accented l in Unicode
+ * and survives that, so it is mapped by hand: the hub's own search box is the place
+ * somebody types "plytki" for "płytki", and it has to find it.
+ *
+ * assets/calc-hub.js folds what the visitor types with exactly this function. Change one,
+ * change both, or half the searches stop matching.
+ */
+const fold = (s) => String(s).toLowerCase().normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "").replace(/\u0142/g, "l");
 
 /**
  * "It costs nothing", written as money.
@@ -158,9 +172,13 @@ function homeDoors(lang, t, calcs, cat) {
     const live = r.status === STATUS.LIVE;
     const href = live ? r.path(lang) : null;
 
+    // The category shortcuts are the hub's own groups, so the door cannot offer a
+    // heading the hub does not have. `#g-<id>` is an anchor on the hub and also the
+    // filter's value — assets/calc-hub.js reads the fragment on load and opens the
+    // hub already narrowed to that group.
     const extra = door.id === "calculators"
-      ? `<ul class="door-list">${TABS.map((tab) =>
-          `<li><a href="${urlCalcIndex(lang)}#g-${tab}">${esc(t(`tab_${tab}`))}</a></li>`).join("")}</ul>
+      ? `<ul class="door-list">${CALC_CATEGORIES.map((c) =>
+          `<li><a href="${urlCalcIndex(lang)}#g-${c.id}">${esc(t(c.key))}</a></li>`).join("")}</ul>
         <p class="door-meta">${esc(t("door_calc_count")
           .replace("{calc}", calcs.length).replace("{mat}", cat.total))}</p>`
       : "";
@@ -286,20 +304,60 @@ function ctaSection(t) {
 
 /* ------------------------------------------------------------------ calculator hub */
 
-export function calcHubMain(lang, t, calcs) {
+/**
+ * The calculator hub — chapter XI.
+ *
+ * The chapter asks for five things: a search box, logical categories, filtering, a
+ * shortlist, and readable access to every calculator — and rules out one thing, "nie
+ * wyświetlaj wszystkiego jako gigantycznej ściany kart". So the page is a control bar, a
+ * shortlist of four, and then the fifteen calculators in five groups from
+ * `CALC_CATEGORIES` (src/ia.mjs), each group a heading and a compact row per calculator
+ * rather than fifteen equal cards in one wall.
+ *
+ * Everything on it is server-rendered and works with JavaScript off:
+ *   - the category chips are ordinary links to `#g-<id>`, so without a script they jump
+ *     to the group and with one they filter in place (assets/calc-hub.js);
+ *   - the search field is the only control a script is required for, so it is inside
+ *     `.js-only` and simply is not shown when there is no script to run it;
+ *   - every calculator is a real `<a>` in the markup, which is what a crawler indexes.
+ *
+ * `data-find` is the haystack the search reads: the name, the one-line description and
+ * the group's name, already folded to lower case without accents. It is built here rather
+ * than in the browser because the page is generated per language anyway, and doing it at
+ * build time keeps the script down to comparing two strings.
+ */
+export function calcHubMain(lang, t, calcs, guides) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("calchub_title"), path: urlCalcIndex(lang) },
   ]);
-  const groups = TABS.map((tab) => {
-    const list = calcs.filter((c) => c.tab === tab);
-    return `<section class="block${TABS.indexOf(tab) % 2 ? " alt" : ""}" aria-labelledby="g-${tab}">
-    <div class="wrap">
-      <h2 id="g-${tab}" class="calc-group">${esc(t(`tab_${tab}`))}</h2>
-      <div class="calc-links">${list.map((c) => calcLinkCard(c, lang, t)).join("")}</div>
-    </div>
-  </section>`;
-  }).join("\n  ");
+  const byId = new Map(calcs.map((c) => [c.id, c]));
+
+  /** One calculator, as a row the filter can hide. */
+  const row = (calc) => {
+    const cat = calcCategory(calc.id);
+    const find = fold([t(`c_${calc.id}_t`), t(`c_${calc.id}_d`), cat ? t(cat.key) : ""].join(" "));
+    return `<li data-calc-row data-cat="${esc(cat ? cat.id : "")}" data-find="${esc(find)}">
+          ${calcLinkCard(calc, lang, t)}
+        </li>`;
+  };
+
+  const chips = [
+    `<a class="chip on" href="#g-all" data-cat-chip="" aria-current="true">${esc(t("calchub_all"))}</a>`,
+    ...CALC_CATEGORIES.map((c) =>
+      `<a class="chip" href="#g-${c.id}" data-cat-chip="${c.id}">${esc(t(c.key))}</a>`),
+  ].join("\n        ");
+
+  const groups = CALC_CATEGORIES.map((cat) => {
+    const list = cat.calcs.map((id) => byId.get(id)).filter(Boolean);
+    return `<section class="calc-group-block" data-cat-block="${cat.id}" aria-labelledby="g-${cat.id}">
+        <h3 id="g-${cat.id}" class="calc-group">${esc(t(cat.key))}</h3>
+        <p class="calc-group-d muted">${esc(t(`${cat.key}_d`))}</p>
+        <ul class="calc-links">${list.map(row).join("")}</ul>
+      </section>`;
+  }).join("\n      ");
+
+  const popular = popularCalcs(guides, calcs);
 
   const main = `<main id="main">
   <section class="block page-head">
@@ -309,7 +367,45 @@ export function calcHubMain(lang, t, calcs) {
       <p class="lead">${esc(t("calchub_lead"))}</p>
     </div>
   </section>
-  ${groups}
+
+  <div id="calc-hub" data-total="${calcs.length}">
+    <section class="block alt calc-filter" aria-label="${esc(t("calchub_filter_h"))}">
+      <div class="wrap">
+        <form class="calc-search js-only" role="search" data-calc-search>
+          <label class="fld-label" for="calc-search">${esc(t("calchub_search_l"))}</label>
+          <input id="calc-search" type="search" class="mat-search" autocomplete="off"
+                 placeholder="${esc(t("calchub_search_ph"))}">
+        </form>
+        <div class="chips calc-cats">
+        ${chips}
+        </div>
+        <p class="muted calc-shown" role="status" data-calc-shown="${esc(t("calchub_shown"))}">${esc(
+          t("calchub_shown").replace("{n}", calcs.length).replace("{total}", calcs.length))}</p>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="popular-h" data-hub-popular>
+      <div class="wrap">
+        <div class="section-head left">
+          <h2 id="popular-h">${esc(t("calchub_start_t"))}</h2>
+          <p class="muted">${esc(t("calchub_start_d"))}</p>
+        </div>
+        <ul class="calc-links">${popular.map((c) =>
+          `<li>${calcLinkCard(c, lang, t)}</li>`).join("")}</ul>
+      </div>
+    </section>
+
+    <section class="block alt" id="g-all" aria-labelledby="all-h">
+      <div class="wrap">
+        <div class="section-head left">
+          <h2 id="all-h">${esc(t("calchub_all_t"))}</h2>
+        </div>
+        <p class="muted" data-calc-empty hidden>${esc(t("calchub_none"))}</p>
+      ${groups}
+      </div>
+    </section>
+  </div>
+
   ${appNote(t)}
 </main>`;
 

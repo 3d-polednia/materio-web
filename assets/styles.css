@@ -953,7 +953,14 @@ footer h4 {
   margin: 0 0 var(--sp-3); font-size: var(--fs-base); text-transform: uppercase;
   letter-spacing: var(--track-wide); color: var(--muted);
 }
-.calc-links { display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.calc-links {
+  display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  list-style: none; margin: 0; padding: 0;
+}
+/* The hub wraps each card in an <li> so the filter has something to hide that is not
+   the link itself; the row has to stretch or a short card would sit half-height. */
+.calc-links > li { display: flex; }
+.calc-links > li > .calc-link { flex: 1; }
 .calc-link {
   display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-4);
   background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius);
@@ -969,6 +976,21 @@ footer h4 {
   margin-left: auto; flex: none; align-self: center; font-size: var(--fs-xs);
   font-weight: var(--fw-bold); color: var(--accent-strong); white-space: nowrap;
 }
+
+/* ---------- The calculator hub
+   Chapter XI: a control bar, a shortlist, then the five groups. The chips are links
+   (they work as in-page jumps with no script and as filters with one), so they need
+   the underline taken off that every other link on the site keeps. */
+.calc-filter .calc-search { max-width: 460px; margin-bottom: var(--sp-4); }
+#calc-hub .mat-search { width: 100%; margin: 0; }
+a.chip { display: inline-flex; align-items: center; text-decoration: none; }
+a.chip:hover { text-decoration: none; }
+.calc-cats { margin-bottom: var(--sp-3); }
+.calc-shown { margin: 0; font-size: var(--fs-sm); }
+
+.calc-group-block + .calc-group-block { margin-top: var(--sp-8); }
+.calc-group-block .calc-group { margin-bottom: var(--sp-1); scroll-margin-top: calc(var(--header-h) + var(--sp-4)); }
+.calc-group-d { margin: 0 0 var(--sp-4); font-size: var(--fs-sm); }
 
 /* A calculator page: the live form on the left, the explanation on the right. */
 .calc-page { display: grid; gap: var(--sp-7); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
@@ -1156,6 +1178,10 @@ footer h4 {
    written inline in the HTML; anything used three times is a component. */
 .muted { color: var(--muted); }
 .center { text-align: center; }
+/* A control that has nothing to do without a script — the hub's search box. The page
+   is complete without it, so it is not shown rather than shown and dead. */
+.js-only { display: none; }
+.js .js-only { display: block; }
 .mt-3 { margin-top: var(--sp-3); }
 .mt-4 { margin-top: var(--sp-4); }
 .mt-6 { margin-top: var(--sp-6); }

@@ -116,7 +116,8 @@ formula identifier that collides with a field label in some language all abort i
 ```
 scripts/build.mjs     The generator (dependency-free Node)
 src/ia.mjs            The information architecture: every route, its access level
-                      (guest/liczmat/pro), its parent, its place in the navigation.
+                      (guest/liczmat/pro), its parent, its place in the navigation,
+                      and how /kalkulatory/ groups the calculators (CALC_CATEGORIES).
                       The build fails if the pages it wrote are not exactly the
                       pages declared here. Narrative version: docs/ARCHITEKTURA.md
 src/site.mjs          Languages, URL slugs per section/calculator/guide — the site map
@@ -139,6 +140,8 @@ assets/currency.js    PLN/EUR/USD/UAH — the currency, independent of the langu
 assets/flags/*.svg    The flag next to each language name (never an emoji flag)
 assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
 assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
+assets/calc-hub.js    The search + category filter on /kalkulatory/. The hub is fully
+                      server-rendered; this only narrows what is already there
 assets/workspace.js   Projects, rooms and estimate lines in localStorage (Firestore schema)
 assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/
 assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/

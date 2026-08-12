@@ -29,7 +29,9 @@ import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies,
 } from "../src/site.mjs";
-import { livePaths, validateIA, HOME_DOORS, route, STATUS } from "../src/ia.mjs";
+import {
+  livePaths, validateIA, validateCalcHub, HOME_DOORS, CALC_CATEGORIES, route, STATUS,
+} from "../src/ia.mjs";
 import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
 import { DEFAULT_CURRENCY } from "../src/currency.mjs";
@@ -45,7 +47,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260812f";
+const STAMP = "20260812g";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -173,6 +175,18 @@ function validate() {
 
   // The architecture itself: levels, the page tree, the navigation, the user flows.
   problems.push(...validateIA());
+
+  // The calculator hub: every calculator in exactly one of chapter XI's categories, and
+  // a shortlist the guides actually back up. validateIA() cannot see CALCS or GUIDES.
+  problems.push(...validateCalcHub(CALCS, GUIDES));
+
+  // The hub's category names and the line under each of them. A missing one would ship
+  // as the literal "cc_tiling_d" at the top of a group.
+  for (const cat of CALC_CATEGORIES) {
+    for (const key of [cat.key, `${cat.key}_d`]) {
+      if (!(key in DICT[DEFAULT_LANG])) problems.push(`calculator category "${cat.id}" has no "${key}" in the dictionary`);
+    }
+  }
 
   // Each door of the home page needs its own strings. t() falls back to the key name, so
   // without this a missing translation ships as the literal "door_pro_q" on the front
@@ -350,7 +364,7 @@ function buildCalculatorPages() {
   const hubAlt = alternatesFor(urlCalcIndex);
   for (const lang of LANGS) {
     const t = translator(lang);
-    const { main, ld } = calcHubMain(lang, t, CALCS);
+    const { main, ld } = calcHubMain(lang, t, CALCS, GUIDES);
     write(join(urlCalcIndex(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("calchub_title")} — LiczMat`,
@@ -368,6 +382,9 @@ function buildCalculatorPages() {
           name: t(`c_${c.id}_t`), url: BASE + urlCalc(lang, c.id),
         })),
       }],
+      // The hub's search and category filter. Everything it filters is already in the
+      // markup, so the page is complete without it — see assets/calc-hub.js.
+      scripts: ["/assets/calc-hub.js"],
     }));
   }
 
