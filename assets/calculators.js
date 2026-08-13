@@ -568,7 +568,7 @@ function wireCalculator(card) {
    * so it must not relabel that button or scroll the page.
    */
   const run = (byHand) => {
-    renderResult(card, ENGINES[def.engine](read()));
+    renderResult(card, ENGINES[def.engine](read()), byHand);
     if (stale) stale.hidden = true;
     if (!byHand) return;
     if (runBtn && runBtn.dataset.labelAgain) runBtn.textContent = runBtn.dataset.labelAgain;
@@ -619,7 +619,15 @@ if (typeof document !== "undefined") {
   });
 }
 
-function renderResult(card, res) {
+/**
+ * Draw one result into a card.
+ *
+ * `byHand` travels out on the `calcresult` event because two listeners need to tell the
+ * visitor apart from the page: assets/recent.js records a tool as *used* only when
+ * somebody asked for the number, and the silent run on load (and the redraw after a
+ * currency switch) must not count as using it.
+ */
+function renderResult(card, res, byHand) {
   const box = card.querySelector("[data-result]");
   const lang = document.documentElement.lang || "pl";
   box.classList.add("show");
@@ -627,7 +635,7 @@ function renderResult(card, res) {
   if (res.err) {
     box.classList.add("err");
     box.innerHTML = `<div>${t(res.err, lang)}</div>`;
-    document.dispatchEvent(new CustomEvent("calcresult", { detail: { card, result: null } }));
+    document.dispatchEvent(new CustomEvent("calcresult", { detail: { card, result: null, byHand: Boolean(byHand) } }));
     return;
   }
   box.classList.remove("err");
@@ -642,5 +650,5 @@ function renderResult(card, res) {
 
   // The workspace (assets/workspace-ui.js) hangs the "save to the estimate" button off
   // this. Nothing else listens, and the calculators keep working when it is not loaded.
-  document.dispatchEvent(new CustomEvent("calcresult", { detail: { card, result: res } }));
+  document.dispatchEvent(new CustomEvent("calcresult", { detail: { card, result: res, byHand: Boolean(byHand) } }));
 }

@@ -75,7 +75,7 @@ nie wymaga konta**.
 
 ## 2. Inwentarz stron — stan na dziś
 
-130 wygenerowanych stron: 32 strony logiczne × 4 języki, plus dwie bezjęzykowe.
+131 wygenerowanych stron: 32 strony logiczne × 4 języki, plus trzy bezjęzykowe.
 Adresy w kolumnie „URL (PL)”; pozostałe języki mają prefiks (`/en/…`, `/de/…`, `/uk/…`)
 i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 
@@ -93,6 +93,7 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 | `estimate` | `/kosztorys/` | GUEST | `projects` | tak | 4 |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 4 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
+| `dashboard` | `/app/pulpit/` | GUEST | `account` | **nie** | 1 |
 | `share` | `/p/` | GUEST | `estimate` | **nie** | 1 |
 | `privacy` | `/privacy-policy.html` | GUEST | `home` | tak | pisana ręcznie |
 
@@ -168,7 +169,6 @@ adresu, który już działa, i żeby żadna nie trafiła do menu przed czasem.
 | Trasa | URL (PL) | Poziom | Sesja | Po co |
 |---|---|---|---|---|
 | `liczmat-pro` | `/liczmat-pro/` | GUEST | 29 | publiczna strona Pro: co to, dla kogo, ile kosztuje |
-| `dashboard` | `/app/pulpit/` | LICZMAT | 14 | projekty, ostatnie kalkulacje, szybkie akcje |
 | `project` | `/projekty/?id=…` | LICZMAT | 15 | jeden projekt: pomieszczenia, kalkulacje, materiały, koszty |
 | `clients` | `/klienci/` | PRO | 22 | lista klientów |
 | `jobs` | `/zlecenia/` | PRO | 23 | zlecenia: status, termin, wartość |
@@ -314,6 +314,9 @@ KALKULATOR ──wynik──► [ zapisz ] ──► PROJEKT ──► KOSZTORYS
                           │             └─ KALKULACJE      (wejście + wynik + jednostka + data)
                           │
                      KONTO (/app/) ──sync──► Firestore ──► aplikacja Android
+                          │
+                     PULPIT (/app/pulpit/) ──czyta──► projekty, ostatnie kalkulacje,
+                                                      ostatnio używane narzędzia
 
 MATERIAŁ ──► kalkulator właściwy dla rodzaju materiału
 PORADNIK ──► kalkulatory wymienione w GUIDES[].calcs
@@ -332,6 +335,12 @@ Co z tego wynika i co trzeba utrzymać:
   i nie wchodzi do menu.
 - **Kalkulacja musi być odtwarzalna.** Rozdział XV: zapis trzyma kalkulator, dane wejściowe,
   wynik, jednostki i datę — nie samą liczbę.
+- **Pulpit niczego nie posiada.** `/app/pulpit/` jest widokiem na to, co już jest
+  w przeglądarce — nie zapisuje projektu, nie zapisuje pozycji kosztorysu i nie jest
+  źródłem prawdy o niczym poza jedną własną listą: `liczmat-recent-calcs`
+  (`assets/recent.js`), czyli które kalkulatory były używane i kiedy. Ta lista **nie jest
+  dokumentem Firestore i nie synchronizuje się** — nie ma jej w `FIRESTORE_SYNC.md`, bo
+  historia klikania w narzędzia to nie jest praca, którą warto przenosić na telefon.
 - **Schemat danych jest wspólny z Androidem.** `assets/workspace.js` trzyma projekty
   w `localStorage` w tym samym kształcie dokumentu, co Firestore. Kontrakt:
   `docs/FIRESTORE_SYNC.md` + `core/sync/SyncContract.kt` w repo `3d-polednia/Materio`.
@@ -362,8 +371,13 @@ Wynik jest pełny bez konta. Rozdział II: rejestracja to następny krok, nie br
 ```
 kalkulator ──► WYNIK ──► „Dodaj do projektu” ──► /projekty/ ──► projekt
                                                                   │
-                                                    /kosztorys/ ──┴──► HISTORIA
+                                          /kosztorys/ ──┴──► /app/pulpit/ (HISTORIA)
 ```
+
+Ostatni krok — „powrót do wcześniejszych obliczeń” — ma od Sesji 14 własną stronę.
+Pulpit jest tym miejscem, w którym widać naraz projekty, ostatnio zapisane kalkulacje
+i kalkulatory, których się używało; wcześniej ten krok był w `FLOWS` samym opisem, bez
+trasy.
 
 **LICZMAT PRO** — cel: prowadzić pracę.
 
@@ -413,6 +427,28 @@ Firebase — byłoby to zapytanie sieciowe na każdej z sześćdziesięciu stron
 zdania. Znacznik **decyduje wyłącznie o treści**: nic nie wolno na nim bramkować, bo
 `FIRESTORE_SYNC` §1.2 zabrania wymagać konta do liczenia, a znacznik bywa nieaktualny
 (wylogowanie w innej karcie, wygasły token). Jest wypisany na `/cookies/`.
+
+### 8.1a. Poziom `/app/pulpit/` — Sesja 14 zbudowała pulpit jako GUEST
+
+Ta sama sprawa, jeszcze raz, na nowej stronie. Sesja 3 zadeklarowała trasę `dashboard`
+jako `LICZMAT`, bo plan nazywa ją „dashboardem darmowego użytkownika”. Sesja 14 zbudowała
+ją jako **`GUEST`** i to jest zmiana wobec deklaracji, więc jest tutaj, a nie po cichu
+w kodzie.
+
+Powód jest ten sam co w §8.1, tylko ostrzejszy. Pole `level` w `src/ia.mjs` mówi, czego
+strona **wymaga**, a nie co **oferuje**. Pulpit nie czyta niczego poza `localStorage` tej
+przeglądarki: projekty i kosztorysy z `assets/workspace.js`, listę użytych narzędzi
+z `assets/recent.js`. Nie ma tam ani jednego bajtu, który przyszedł z serwera. Jedyną
+rzeczą, którą dałoby się zabramkować, jest znacznik `liczmat-signed-in` — a on **bywa
+nieaktualny** (wylogowanie w innej karcie, wygasły token), więc bramka na nim schowałaby
+komuś jego własne projekty w chwili, w której token wygasł. To byłoby zgubienie pracy
+odwiedzającego na jego oczach.
+
+Gość widzi więc swoje dane i kartę „Ten pulpit jest tylko w tej przeglądarce” z linkiem
+do rejestracji — zamiast zamkniętych drzwi. **Do decyzji właściciela**, czy pulpit ma
+jednak wymagać konta; jeśli tak, zmienia się `level` trasy i dochodzi przekierowanie na
+`/app/?next=/app/pulpit/`, ale wtedy trzeba świadomie przyjąć, że nieaktualny znacznik
+odetnie zalogowanego od jego danych.
 
 ### 8.2. `/app/` czy `/konto/` — Sesja 13 nie przeniosła, i dlaczego
 

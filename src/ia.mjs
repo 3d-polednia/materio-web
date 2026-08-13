@@ -28,7 +28,7 @@ import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies,
-  URL_APP, URL_SHARE, URL_PRIVACY,
+  URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
 /* ------------------------------------------------------------------ access levels */
@@ -203,6 +203,24 @@ export const ROUTES = [
       "noindex: it holds no content worth ranking and shows private data.",
   },
   {
+    id: "dashboard",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "account", localized: false, indexable: false,
+    path: URL_DASHBOARD,
+    footer: { order: 3, key: "nav_dashboard", group: "account" },
+    note: "Chapter XIV of the sessions list (session 14): projects, recent calculations, " +
+      "quick actions and recently used tools. It is the free account's home screen, and " +
+      "session 3 declared it LICZMAT for that reason. Session 14 built it as GUEST, " +
+      "because `level` is what a page *needs*: everything on it comes from " +
+      "assets/workspace.js and assets/recent.js, which are localStorage in this browser " +
+      "and belong to whoever is sitting at it. The only thing that could lock a guest " +
+      "out is `liczmat-signed-in`, and that is a copy hint which may be stale — gating " +
+      "on it would hide somebody's own projects from them after a token expired. So a " +
+      "guest sees their own data and a card saying what an account adds; the same rule " +
+      "as /projekty/ (see docs/ARCHITEKTURA.md). Language-neutral and noindex, under " +
+      "/app/, because it shows private data.",
+  },
+  {
     id: "share",
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "estimate", localized: false, indexable: false,
@@ -238,14 +256,6 @@ export const ROUTES = [
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
       "indexable — the paywall sits on the Pro modules, not on their description.",
-  },
-  {
-    id: "dashboard",
-    level: LEVEL.LICZMAT, status: STATUS.PLANNED, session: 14,
-    parent: "account", localized: false, indexable: false,
-    plannedPath: "/app/pulpit/",
-    note: "Chapter XIV of the sessions list: projects, recent calculations, quick " +
-      "actions, recently used tools. Lives under /app/ because it is all private data.",
   },
   {
     id: "project",
@@ -545,7 +555,9 @@ export const FLOWS = [
       { route: "projects", via: "„Dodaj do projektu”" },
       { route: "project", via: "kalkulacje + pomieszczenia" },
       { route: "estimate", via: "materiały → koszty" },
-      { via: "HISTORIA — powrót do wcześniejszych obliczeń" },
+      // Session 14 gave that last step a page: the dashboard is where the earlier
+      // calculations, the projects and the tools already used are listed.
+      { route: "dashboard", via: "HISTORIA — powrót do wcześniejszych obliczeń" },
     ],
   },
   {

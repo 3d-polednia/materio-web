@@ -1,14 +1,18 @@
-/* LiczMat website — the two pages that are not part of the public, indexable layer:
-   /app/  the signed-in account: projects, rooms, sync and the account settings
-   /p/    the read-only view of a shared estimate
+/* LiczMat website — the three pages that are not part of the public, indexable layer:
+   /app/        the signed-in account: projects, rooms, sync and the account settings
+   /app/pulpit/ the dashboard: projects, recent calculations, quick actions, tools
+   /p/          the read-only view of a shared estimate
 
-   Both are noindex (robots.txt and a robots meta tag), so they have no per-language URLs
-   and no hreflang. Instead they carry the whole four-language dictionary and swap text in
-   place — see buildInPlacePicker() in assets/i18n-runtime.js. That is why the markup
-   below uses data-i18n attributes while every generated page uses real text. */
+   All three are noindex (robots.txt and a robots meta tag), so they have no per-language
+   URLs and no hreflang. Instead they carry the whole four-language dictionary and swap
+   text in place — see buildInPlacePicker() in assets/i18n-runtime.js. That is why the
+   markup below uses data-i18n attributes while every generated page uses real text. */
 
 import { esc, siteHeader, siteFooter } from "./template.mjs";
-import { urlCalcIndex, urlHome, PLAY_URL, URL_APP } from "./site.mjs";
+import {
+  urlCalcIndex, urlHome, urlProjects, urlEstimate,
+  DEFAULT_LANG, PLAY_URL, URL_APP, URL_DASHBOARD,
+} from "./site.mjs";
 import { ACCOUNT_LEVELS, LEVEL, STATUS, route } from "./ia.mjs";
 
 /**
@@ -189,7 +193,13 @@ export function appMain(t) {
             <span id="app-provider" class="chip"></span>
             <span id="app-verified" class="chip"></span>
           </span>
-          <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
+          <span class="app-bar-actions">
+            <!-- Session 14: the dashboard is where somebody signed in actually starts —
+                 projects, the last calculations and the tools they use. /app/ is the
+                 settings, so it points at it rather than being it. -->
+            <a class="btn btn-ghost btn-sm" href="${URL_DASHBOARD}" data-i18n="nav_dashboard">${esc(t("nav_dashboard"))}</a>
+            <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
+          </span>
         </div>
 
         <!-- Where the visitor came from, when they arrived at a sign-up prompt under a
@@ -322,6 +332,167 @@ export function appMain(t) {
 </main>`;
   return chrome(t, main);
 }
+
+/* ------------------------------------------------------------------ /app/pulpit/ */
+
+/**
+ * The four quick actions — chapter XIV's "szybkie akcje".
+ *
+ * They are real links, rendered by the build with the Polish URL, and not one of them
+ * needs a script to work; assets/dashboard.js only swaps the href when the visitor
+ * switches language, because this page has no per-language address of its own.
+ *
+ *   url   the key in window.LM_URLS that holds this link's address per language, or
+ *         null for a language-neutral page whose href is already final.
+ *   key   dictionary prefix: `<key>` is the label, `<key>_d` the line under it.
+ *   icon  a stroke path on the shared 24×24 grid, like calcIcon() in src/template.mjs.
+ */
+/**
+ * The address each `data-dash-url` link is written with.
+ *
+ * The dashboard has no per-language URL, so its links cannot be right in four languages
+ * at once; assets/dashboard.js repoints them from window.LM_DASH when the visitor
+ * switches. Rendering the default language rather than a placeholder is what makes them
+ * work with no script at all — the one part of this page that does.
+ */
+const DASH_HREF = {
+  calculators: urlCalcIndex(DEFAULT_LANG),
+  projects: urlProjects(DEFAULT_LANG),
+  estimate: urlEstimate(DEFAULT_LANG),
+};
+
+const QUICK_ACTIONS = [
+  {
+    id: "calc", url: "calculators", key: "dash_q_calc",
+    // A calculator: a small display over a keypad.
+    icon: '<rect x="4" y="2.5" width="16" height="19" rx="2"/><path d="M7.5 6.5h9v3.5h-9z"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>',
+  },
+  {
+    id: "projects", url: "projects", key: "dash_q_projects",
+    // A folder.
+    icon: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+  },
+  {
+    id: "estimate", url: "estimate", key: "dash_q_estimate",
+    // A priced list.
+    icon: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  },
+  {
+    id: "account", url: null, href: URL_APP, key: "dash_q_account",
+    // Two arrows going round: synchronisation.
+    icon: '<path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
+  },
+];
+
+/**
+ * The dashboard of the free account — session 14, chapter XIV of the sessions list:
+ * projects, recent calculations, quick actions, recently used tools.
+ *
+ * Everything on it comes out of this browser: `assets/workspace.js` (projects, rooms and
+ * estimate lines, in the Firestore document shape) and `assets/recent.js` (which
+ * calculators were used). **No Firebase.** That is the whole point of the page — it is
+ * the first screen after signing in, and making it wait for an SDK download and an auth
+ * round-trip before it can list somebody's own local projects would be slower than the
+ * calculator it came from. The level shown in the strip is the copy hint from
+ * assets/account.js, which is a hint and never a gate: a guest sees their own data and a
+ * card explaining what an account adds, not a locked door.
+ *
+ * The lists are drawn by assets/dashboard.js. What the build renders is the frame — the
+ * headings, the quick actions as real links, and one empty state per section — so the
+ * page is readable and navigable before a single list has been filled in.
+ */
+export function dashboardMain(t) {
+  const i = (key, tag = "span", cls = "") =>
+    `<${tag}${cls ? ` class="${cls}"` : ""} data-i18n="${key}">${esc(t(key))}</${tag}>`;
+
+  const quick = QUICK_ACTIONS.map((a) => `<li><a class="calc-link" href="${a.href || DASH_HREF[a.url]}"${
+    a.url ? ` data-dash-url="${a.url}"` : ""}>
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${a.icon}</svg></span>
+        <span class="calc-link-body">
+          <b data-i18n="${a.key}">${esc(t(a.key))}</b>
+          <span class="muted" data-i18n="${a.key}_d">${esc(t(`${a.key}_d`))}</span>
+        </span>
+      </a></li>`).join("\n        ");
+
+  /** A section with a heading, a "see all" link beside it and a list the script fills. */
+  const section = (id, titleKey, allKey, urlKey, listClass) =>
+    `<section class="dash-sec" aria-labelledby="dash-${id}-h">
+        <div class="dash-head">
+          <h2 id="dash-${id}-h" data-i18n="${titleKey}">${esc(t(titleKey))}</h2>
+          <a class="dash-more" href="${DASH_HREF[urlKey]}" data-dash-url="${urlKey}" data-i18n="${allKey}">${esc(t(allKey))}</a>
+        </div>
+        <ul class="${listClass}" id="dash-${id}"></ul>
+      </section>`;
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <h1 data-i18n="dash_title">${esc(t("dash_title"))}</h1>
+      <p class="lead" data-i18n="dash_lead">${esc(t("dash_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <!-- Which of chapter II's three levels this browser was last told it is on. It is
+           a hint (assets/account.js), so it words the strip and nothing else. -->
+      <div class="app-bar">
+        <span class="app-identity">
+          <span id="dash-level" class="chip">${esc(t("acc_guest_t"))}</span>
+          <span class="muted" id="dash-level-note" data-dash-note>${esc(t("dash_level_guest"))}</span>
+        </span>
+        <a class="btn btn-ghost btn-sm" href="${URL_APP}" data-i18n="dash_q_account">${esc(t("dash_q_account"))}</a>
+      </div>
+
+      <!-- Chapter II: registration is the next step after a result, never a barrier. The
+           card is what a guest sees; assets/dashboard.js hides it once the hint says
+           somebody signed in. It opens the sign-up form and comes back here. -->
+      <div class="app-card" id="dash-signup">
+        <h3 data-i18n="dash_guest_t">${esc(t("dash_guest_t"))}</h3>
+        ${i("dash_guest_d", "p", "muted")}
+        <a class="btn btn-primary btn-sm" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_DASHBOARD)}" data-i18n="dash_guest_go">${esc(t("dash_guest_go"))}</a>
+      </div>
+
+      <section class="dash-sec" aria-labelledby="dash-quick-h">
+        <h2 id="dash-quick-h" data-i18n="dash_quick_t">${esc(t("dash_quick_t"))}</h2>
+        <ul class="calc-links dash-quad">
+        ${quick}
+        </ul>
+      </section>
+
+      ${section("projects", "dash_projects_t", "dash_projects_all", "projects", "data-list")}
+
+      ${section("recent", "dash_recent_t", "dash_recent_all", "estimate", "data-list")}
+
+      <section class="dash-sec" aria-labelledby="dash-tools-h">
+        <div class="dash-head">
+          <h2 id="dash-tools-h" data-i18n="dash_tools_t">${esc(t("dash_tools_t"))}</h2>
+          <a class="dash-more" href="${DASH_HREF.calculators}" data-dash-url="calculators" data-i18n="dash_tools_all">${esc(t("dash_tools_all"))}</a>
+        </div>
+        <ul class="calc-links dash-quad" id="dash-tools"></ul>
+        <!-- The list is the visitor's own history of which tools they opened, so they get
+             to delete it, on the page that shows it. Hidden while there is nothing to
+             forget — chapter XXV: no button that does nothing. -->
+        <p><button type="button" class="linkish" id="dash-tools-forget" data-i18n="dash_tools_forget" hidden>${esc(t("dash_tools_forget"))}</button></p>
+      </section>
+
+      ${i("dash_local_note", "p", "muted src-note")}
+    </div>
+  </section>
+</main>`;
+  return chrome(t, main);
+}
+
+/** Every dictionary key the dashboard renders, so the build can check all four languages. */
+export const dashboardKeys = () => [
+  "dash_title", "dash_lead", "dash_level_guest", "dash_level_in", "dash_level_pro",
+  "dash_guest_t", "dash_guest_d", "dash_guest_go",
+  "dash_quick_t", "dash_projects_t", "dash_projects_all", "dash_projects_empty",
+  "dash_recent_t", "dash_recent_all", "dash_recent_empty",
+  "dash_tools_t", "dash_tools_all", "dash_tools_empty", "dash_tools_forget",
+  "dash_open", "dash_mixed", "dash_local_note", "nav_dashboard",
+  ...QUICK_ACTIONS.flatMap((a) => [a.key, `${a.key}_d`]),
+];
 
 /* ------------------------------------------------------------------ /p/<token> */
 

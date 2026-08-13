@@ -25,7 +25,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
-  RETIRED_LANGS,
+  URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies,
 } from "../src/site.mjs";
@@ -36,19 +36,19 @@ import {
 import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
 import { DEFAULT_CURRENCY } from "../src/currency.mjs";
-import { page } from "../src/template.mjs";
+import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
   materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
-import { appMain, shareMain } from "../src/app-pages.mjs";
+import { appMain, shareMain, dashboardMain, dashboardKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260813d";
+const STAMP = "20260813e";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -185,6 +185,15 @@ function validate() {
     }
   }
 
+  // The dashboard renders every one of its strings through t() in the browser, so a key
+  // nobody translated does not fail any of the checks above — it ships as the literal
+  // "dash_recent_empty" on the page, in that one language only.
+  for (const key of dashboardKeys()) {
+    for (const lang of LANGS) {
+      if (!(key in DICT[lang])) problems.push(`dashboard key "${key}" is missing in ${lang}`);
+    }
+  }
+
   // The calculator hub: every calculator in exactly one of chapter XI's categories, and
   // a shortlist the guides actually back up. validateIA() cannot see CALCS or GUIDES.
   problems.push(...validateCalcHub(CALCS, GUIDES));
@@ -246,10 +255,14 @@ const written = [];
 /** Map of every language's URL for one logical page, for hreflang and the switcher. */
 const alternatesFor = (fn) => Object.fromEntries(LANGS.map((l) => [l, fn(l)]));
 
-/** Every page carrying a calculator form needs the engines and the material picker. */
+/**
+ * Every page carrying a calculator form needs the engines and the material picker — and,
+ * since session 14, the one-line note that this tool was used, which is what the
+ * dashboard's "ostatnio używane narzędzia" reads.
+ */
 const CALC_SCRIPTS = [
   "/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js",
-  "/assets/workspace.js", "/assets/workspace-ui.js",
+  "/assets/workspace.js", "/assets/workspace-ui.js", "/assets/recent.js",
 ];
 
 /** The workspace pages need the store and its interface, but no calculation engine. */
@@ -577,6 +590,36 @@ function buildPrivatePages() {
     // through its globals, which a module's own scope would hide.
     classicScripts: ["/assets/workspace.js"],
     scripts: ["/assets/app.js"],
+  }));
+
+  // The dashboard has no per-language URL either, so it cannot render a link to
+  // /kalkulatory/ as HTML and be right in German. The build hands it every address it
+  // might need, per language, plus the icon of each calculator — the same calcIcon() the
+  // hub uses, so a tile on the dashboard cannot drift from the tile on /kalkulatory/.
+  const dashData = {
+    urls: {
+      calculators: alternatesFor(urlCalcIndex),
+      projects: alternatesFor(urlProjects),
+      estimate: alternatesFor(urlEstimate),
+    },
+    calcs: Object.fromEntries(CALCS.map((c) => [c.id, {
+      url: alternatesFor((l) => urlCalc(l, c.id)),
+      icon: calcIcon(c.id),
+    }])),
+  };
+
+  write("app/pulpit/index.html", page({
+    ...common,
+    title: `${t("dash_title")} — LiczMat`,
+    description: t("dash_lead"),
+    path: URL_DASHBOARD,
+    main: dashboardMain(t),
+    // A page's own data, before any script that reads it. JSON.stringify cannot emit a
+    // literal "</script>"; the icons are SVG markup, so the escape is not optional.
+    headExtra: `<script>window.LM_DASH = ${JSON.stringify(dashData).replace(/</g, "\\u003c")};</script>`,
+    // Classic scripts, in this order and not modules: the dashboard reads the workspace
+    // and the recents through their globals, which a module's own scope would hide.
+    classicScripts: ["/assets/workspace.js", "/assets/recent.js", "/assets/dashboard.js"],
   }));
 
   write("p/index.html", page({

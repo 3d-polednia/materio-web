@@ -1178,6 +1178,39 @@ a.chip:hover { text-decoration: none; }
 .fact dt { color: var(--muted); }
 .fact dd { margin: 0; font-weight: var(--fw-semi); overflow-wrap: anywhere; }
 
+/* ---------- The dashboard (/app/pulpit/, session 14)
+   Four blocks under each other — quick actions, projects, the last calculations,
+   the tools used — because chapter XXVIII asks for mobile first and a dashboard read
+   on a phone is a column. Everything inside them is a component that already exists:
+   .calc-link for a tile, .data-list for a row. Only the spacing and the figure column
+   are new. */
+.dash-sec { margin-top: var(--sp-8); }
+.dash-sec > h2, .dash-head h2 { font-size: var(--fs-h3); margin: 0 0 var(--sp-4); }
+/* The heading and its "see all" link share a line, and the link drops under the
+   heading rather than squeezing it when the language makes both long. */
+.dash-head {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+  gap: var(--sp-2) var(--sp-4); margin-bottom: var(--sp-4);
+}
+.dash-head h2 { margin: 0; }
+.dash-more { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+/* Both tile rows hold exactly four: the quick actions, and the four most recent tools.
+   auto-fill would leave one orphan on its own row at desktop width, so the count is
+   named instead — two abreast on a tablet, one row on a wide screen. */
+.dash-quad { grid-template-columns: 1fr; margin-bottom: var(--sp-2); }
+@media (min-width: 560px) { .dash-quad { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1160px) { .dash-quad { grid-template-columns: repeat(4, 1fr); } }
+/* The number a row is about, on the right: quantity over cost, right-aligned so the
+   figures in a list line up under each other. */
+.dash-fig {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+  flex: none; text-align: right; font-variant-numeric: tabular-nums;
+}
+.dash-fig em { font-style: normal; font-size: var(--fs-sm); }
+#dash-signup { margin-bottom: var(--sp-2); }
+/* The strip carries a chip and a sentence, and both have to survive 320px. */
+.app-bar-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); flex: none; }
+
 /* ---------- Workspace ----------
    A saved room feeds the form: pick the room, pick the surface, the area lands in
    the field. The bar is inserted by assets/workspace-ui.js and stays hidden until

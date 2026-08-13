@@ -39,8 +39,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 11 | Kalkulatory grupa 3 (Rozkrój + Zabudowa G-K) | **Zrobione** — 2026-08-12 |
 | 12 | Test kalkulatorów | **Zrobione** — 2026-08-13 |
 | 13 | System konta | **Zrobione** — 2026-08-13 |
-| 14 | Dashboard LiczMat | **Następna** |
-| 15–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 14 | Dashboard LiczMat | **Zrobione** — 2026-08-13 |
+| 15 | Projekty (CRUD) | **Następna** |
+| 16–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -143,6 +144,96 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 14
+
+Rozdział XXXII wymienia cztery rzeczy: **projekty, ostatnie kalkulacje, szybkie akcje,
+ostatnio używane narzędzia** — „dashboard darmowego użytkownika”. Trzy z nich serwis miał
+skąd wziąć i nie pokazywał ich razem nigdzie; czwartej nie miał w ogóle.
+
+**Pulpit jest teraz stroną: `/app/pulpit/`.** Trasa `dashboard` była zadeklarowana
+w `src/ia.mjs` od Sesji 3 jako `PLANNED` z tym właśnie adresem; ta sesja zamieniła ją
+w stronę. Build pilnuje jednego i drugiego: strona, której nie ma w architekturze, przerywa
+build, a trasa zadeklarowana i niezbudowana też. Oba przypadki sprawdzone negatywnie —
+celowo zepsute, build faktycznie padł.
+
+**Pulpit nie ładuje Firebase i to jest cała jego konstrukcja.** Wszystko, co pokazuje,
+leży już w tej przeglądarce: projekty i pozycje kosztorysu w `assets/workspace.js`
+(w kształcie dokumentu Firestore), lista użytych narzędzi w nowym `assets/recent.js`.
+To pierwszy ekran po zalogowaniu — kazać mu czekać na pobranie SDK i na odpowiedź
+serwera, zanim wypisze czyjeś własne, lokalne projekty, znaczyłoby zrobić pulpit
+wolniejszym od kalkulatora, z którego się na niego wchodzi. Poziom w pasku bierze się ze
+znacznika `liczmat-signed-in`, czyli z podpowiedzi — więc **decyduje o treści i nic nie
+bramkuje**.
+
+**Poziom trasy: `GUEST`, wbrew deklaracji z Sesji 3 (`LICZMAT`).** To jedyna decyzja
+architektoniczna tej sesji i jest opisana w `docs/ARCHITEKTURA.md` §8.1a. Pole `level`
+mówi, czego strona **wymaga**. Pulpit nie wymaga niczego — jedyną rzeczą, na której dałoby
+się postawić bramkę, jest znacznik, który bywa nieaktualny (wylogowanie w innej karcie,
+wygasły token), więc bramka schowałaby komuś jego własne projekty dokładnie w chwili
+wygaśnięcia tokena. Gość widzi swoje dane i kartę „Ten pulpit jest tylko w tej
+przeglądarce” z linkiem do rejestracji. **Do decyzji właściciela**, czy ma być inaczej.
+
+Cztery listy, cztery źródła:
+
+- **Projekty** — cztery ostatnio ruszane, z liczbą pozycji, sumą i datą; aktywny jest
+  oznaczony, „Otwórz” ustawia projekt jako aktywny i przechodzi do kosztorysu, czyli robi
+  obie rzeczy zamiast kazać wybierać projekt jeszcze raz stronę dalej. Projekt z pozycjami
+  w dwóch walutach dostaje plakietkę **„różne waluty”** z pełnym zdaniem w tytule: suma
+  różnych walut nic nie znaczy, a rozdział VI zabrania przeliczać po kursie.
+- **Ostatnie kalkulacje** — pięć ostatnio zapisanych pozycji kosztorysu, z projektem,
+  ilością, jednostką i kwotą. Czytane jako **to, co zostało zachowane**, a nie „co ktoś
+  wpisał”: serwis nigdzie nie zapisuje obliczeń, których nikt nie kazał zapisać, i
+  dokładanie takiego magazynu wpisywałoby cudze dane do `localStorage` bez pytania.
+  Zapisana pozycja trzyma walutę, w której powstała — przełączenie waluty jej nie
+  przepisuje.
+- **Szybkie akcje** — cztery kafle: policz, projekty, kosztorys, konto. To zwykłe linki
+  z prawdziwym adresem wpisanym przez build, więc **działają bez JavaScriptu**; skrypt
+  tylko przestawia je na język, który odwiedzający wybrał.
+- **Ostatnio używane narzędzia** — cztery ostatnie kalkulatory, z ikoną z centrum
+  kalkulatorów i datą.
+
+**Nowy magazyn: `liczmat-recent-calcs` (`assets/recent.js`, 2 kB).** Trzyma **wyłącznie
+identyfikator kalkulatora i czas** — żadnych danych wejściowych, żadnych wyników, żadnych
+cen. Jest **lokalny i nie synchronizuje się**: nie ma go w `docs/FIRESTORE_SYNC.md`, bo
+historia klikania w narzędzia to nie jest praca, którą warto przenosić na telefon. Jest
+wypisany na `/cookies/` w czterech językach obok pozostałych kluczy `liczmat-*`, a na
+samym pulpicie jest przycisk, który go kasuje — to historia odwiedzającego, więc kasuje
+ją odwiedzający, na stronie, która ją pokazuje.
+
+**Kalkulator zapisuje się do tej listy dopiero, gdy ktoś poprosił o liczbę.** Zdarzenie
+`calcresult` leci również przy wczytaniu strony — to jest strona doganiająca samą siebie,
+bo panel wyniku przychodzi z buildu już policzony (Sesja 8). Bez rozróżnienia lista
+wypełniłaby się każdym kalkulatorem, jaki ktokolwiek otworzył. Zdarzenie niesie więc
+`byHand`, a `assets/calculators.js` zmieniło się **wyłącznie o to** — matematyka,
+zaokrąglenia i jednostki nietknięte (rozdział XIII).
+
+**Wejścia na pulpit są trzy**, żeby nie był stroną, do której trafia się z paska adresu:
+link „Pulpit” w kolumnie „Konto” w stopce wszystkich 128 stron publicznych, przycisk obok
+„Wyloguj” na `/app/` i adres w karcie rejestracji (`?next=/app/pulpit/`).
+
+**Strona jest kolumną, nie siatką** (rozdział XXVIII, mobile-first), i nie ma w niej ani
+jednego nowego komponentu: kafel to `.calc-link` z centrum kalkulatorów, wiersz to
+`.data-list` z `/projekty/`. Nowe w arkuszu są odstępy sekcji i kolumna z liczbą po
+prawej stronie wiersza.
+
+- Sprawdzone: **180 testów logiki + 90 testów `/app/pulpit/` w Chromium — 270/270
+  przechodzi**, a wcześniejsze 1117 + 111 + 331 + 121 nadal przechodzą (razem **1950**).
+  Dwa nowe pliki: `scripts/test-dashboard.mjs` (bez zależności) i
+  `scripts/test-dashboard-page.mjs`. Ten drugi **niczego nie podstawia** — pulpit nie
+  dotyka sieci, więc test sadza dane w `localStorage`, otwiera stronę i czyta, co
+  narysowała. W tym: szerokości, które rozdział XXVIII wymienia z nazwy (320 / 375 / 390 /
+  430 / 768 / 1280 px) bez przewijania w bok i bez błędu w konsoli, przełączenie języka
+  przerysowujące wiersze, daty i adresy linków, zapisana pozycja niezmieniająca waluty,
+  skasowany projekt nietrafiający na listę, kalkulator, którego już nie ma, wyrzucany
+  zamiast renderowany jako martwy kafel, nieaktualny znacznik sesji **niechowający**
+  projektów, oraz wariant z wyłączonym JavaScriptem, w którym sześć linków nadal ma
+  prawdziwe adresy.
+- Kontrast: bez nowej pary — pulpit wydaje wyłącznie tokeny, które już przechodziły.
+  `scripts/check-contrast.mjs`: wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` zmieniło się tylko o flagę
+`byHand` na zdarzeniu.
 
 ### Co zrobiła Sesja 13
 

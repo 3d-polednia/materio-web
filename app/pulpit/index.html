@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Pulpit — LiczMat</title>
+<meta name="description" content="Twoje projekty, ostatnie kalkulacje i narzędzia, których używasz. Wszystko z tej przeglądarki.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://materio-app.com/app/pulpit/">
+
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260813e" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:title" content="Pulpit — LiczMat">
+<meta property="og:description" content="Twoje projekty, ostatnie kalkulacje i narzędzia, których używasz. Wszystko z tej przeglądarki.">
+<meta property="og:url" content="https://materio-app.com/app/pulpit/">
+<meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pulpit — LiczMat">
+<meta name="twitter:description" content="Twoje projekty, ostatnie kalkulacje i narzędzia, których używasz. Wszystko z tej przeglądarki.">
+<meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813e">
+
+<script>window.LM_DASH = {"urls":{"calculators":{"pl":"/kalkulatory/","uk":"/uk/kalkulyatory/","de":"/de/rechner/","en":"/en/calculators/"},"projects":{"pl":"/projekty/","uk":"/uk/proekty/","de":"/de/projekte/","en":"/en/projects/"},"estimate":{"pl":"/kosztorys/","uk":"/uk/koshtorys/","de":"/de/kostenvoranschlag/","en":"/en/cost-estimate/"}},"calcs":{"coverage":{"url":{"pl":"/kalkulatory/farby-tynki-grunty/","uk":"/uk/kalkulyatory/farba-shtukaturka-hrunt/","de":"/de/rechner/farbe-putz-grundierung/","en":"/en/calculators/paint-plaster-primer/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003crect x=\"3\" y=\"4\" width=\"12\" height=\"5\" rx=\"1\"/>\u003cpath d=\"M15 6.5h4a2 2 0 0 1 2 2V11a2 2 0 0 1-2 2h-6v3\"/>\u003crect x=\"10.5\" y=\"16\" width=\"5\" height=\"6\" rx=\"1\"/>\u003c/svg>"},"waste":{"url":{"pl":"/kalkulatory/plytki-panele-gres/","uk":"/uk/kalkulyatory/plytka-paneli-keramohranit/","de":"/de/rechner/fliesen-paneele-feinsteinzeug/","en":"/en/calculators/tiles-panels-porcelain/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003crect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/>\u003cpath d=\"M3 9h18M3 15h18M9 3v18M15 3v18\"/>\u003c/svg>"},"wallpaper":{"url":{"pl":"/kalkulatory/tapety/","uk":"/uk/kalkulyatory/shpalery/","de":"/de/rechner/tapete/","en":"/en/calculators/wallpaper/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M6 3h12v16a3 3 0 0 1-3 3H6Z\"/>\u003cpath d=\"M6 22a3 3 0 0 1 0-6h9\"/>\u003cpath d=\"M10 7h4M10 11h4\"/>\u003c/svg>"},"linear":{"url":{"pl":"/kalkulatory/rozkroj-liniowy-1d/","uk":"/uk/kalkulyatory/rozkriy-liniynyi-1d/","de":"/de/rechner/linearer-zuschnitt-1d/","en":"/en/calculators/linear-cutting-1d/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003ccircle cx=\"6\" cy=\"6\" r=\"3\"/>\u003ccircle cx=\"6\" cy=\"18\" r=\"3\"/>\u003cline x1=\"20\" y1=\"4\" x2=\"8.12\" y2=\"15.88\"/>\u003cline x1=\"14.47\" y1=\"14.48\" x2=\"20\" y2=\"20\"/>\u003cline x1=\"8.12\" y1=\"8.12\" x2=\"12\" y2=\"12\"/>\u003c/svg>"},"sheet":{"url":{"pl":"/kalkulatory/rozkroj-plyt-2d/","uk":"/uk/kalkulyatory/rozkriy-plyt-2d/","de":"/de/rechner/plattenzuschnitt-2d/","en":"/en/calculators/sheet-cutting-2d/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003crect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"1\"/>\u003cpath d=\"M11 4v16M3 12h8M11 8h10\"/>\u003c/svg>"},"concrete":{"url":{"pl":"/kalkulatory/beton-z-worka/","uk":"/uk/kalkulyatory/beton-z-mishka/","de":"/de/rechner/sackbeton/","en":"/en/calculators/bagged-concrete/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M8 3h8l2 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8Z\"/>\u003cpath d=\"M9 3c1 1.5 5 1.5 6 0\"/>\u003cpath d=\"M9 13h6\"/>\u003c/svg>"},"mortar":{"url":{"pl":"/kalkulatory/klej-zaprawa/","uk":"/uk/kalkulyatory/kliy-rozchyn/","de":"/de/rechner/kleber-moertel/","en":"/en/calculators/adhesive-mortar/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M14 3 21 10l-6 2-3-3Z\"/>\u003cpath d=\"m11 9-8 8 4 4 8-8\"/>\u003c/svg>"},"screed":{"url":{"pl":"/kalkulatory/wylewka-tynk/","uk":"/uk/kalkulyatory/styazhka-shtukaturka/","de":"/de/rechner/estrich-putz/","en":"/en/calculators/screed-plaster/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M3 16h18\"/>\u003cpath d=\"M5 16V9l7-4 7 4v7\"/>\u003cpath d=\"M3 20h18\"/>\u003c/svg>"},"grout":{"url":{"pl":"/kalkulatory/fuga/","uk":"/uk/kalkulyatory/zatyrka/","de":"/de/rechner/fugenmasse/","en":"/en/calculators/grout/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003crect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/>\u003cpath d=\"M12 3v18M3 12h18\" stroke-dasharray=\"3 2\"/>\u003c/svg>"},"masonry":{"url":{"pl":"/kalkulatory/murowanie/","uk":"/uk/kalkulyatory/muruvannya/","de":"/de/rechner/mauerwerk/","en":"/en/calculators/masonry/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003crect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"1\"/>\u003cpath d=\"M3 9.3h18M3 14.6h18M9 4v5.3M15 9.3v5.3M9 14.6V20\"/>\u003c/svg>"},"insulation":{"url":{"pl":"/kalkulatory/ocieplenie-etics/","uk":"/uk/kalkulyatory/uteplennya-etics/","de":"/de/rechner/daemmung-wdvs/","en":"/en/calculators/insulation-etics/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M3 7h18M3 12h18M3 17h18\"/>\u003cpath d=\"M6 7v10M12 7v10M18 7v10\" stroke-dasharray=\"2 3\"/>\u003c/svg>"},"studwall":{"url":{"pl":"/kalkulatory/sciana-dzialowa-gk/","uk":"/uk/kalkulyatory/peregorodka-hk/","de":"/de/rechner/staenderwand/","en":"/en/calculators/stud-partition/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003crect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"1\"/>\u003cpath d=\"M8 3v18M13 3v18M18 3v18\"/>\u003c/svg>"},"ceiling":{"url":{"pl":"/kalkulatory/sufit-podwieszany/","uk":"/uk/kalkulyatory/pidvisna-stelya/","de":"/de/rechner/abgehaengte-decke/","en":"/en/calculators/suspended-ceiling/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003cpath d=\"M3 6h18\"/>\u003cpath d=\"M6 6v12M12 6v12M18 6v12\"/>\u003cpath d=\"M3 18h18\"/>\u003c/svg>"},"drylining":{"url":{"pl":"/kalkulatory/gk-na-klej/","uk":"/uk/kalkulyatory/hk-na-kliy/","de":"/de/rechner/ansetzbinder-platten/","en":"/en/calculators/glued-plasterboard/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003crect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"1\"/>\u003ccircle cx=\"8\" cy=\"8\" r=\"1.4\"/>\u003ccircle cx=\"16\" cy=\"8\" r=\"1.4\"/>\u003ccircle cx=\"8\" cy=\"16\" r=\"1.4\"/>\u003ccircle cx=\"16\" cy=\"16\" r=\"1.4\"/>\u003c/svg>"},"sheathing":{"url":{"pl":"/kalkulatory/poszycie-osb/","uk":"/uk/kalkulyatory/obshyvka-osb/","de":"/de/rechner/beplankung-osb/","en":"/en/calculators/sheathing-osb/"},"icon":"\u003csvg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\">\u003crect x=\"2\" y=\"6\" width=\"20\" height=\"5\" rx=\"1\"/>\u003crect x=\"2\" y=\"13\" width=\"20\" height=\"5\" rx=\"1\"/>\u003cpath d=\"M9 6v5M15 13v5\"/>\u003c/svg>"}}};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Przejdź do treści</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Nawigacja główna" data-i18n-aria="nav_main">
+      <ul class="nav-list">
+        <li><a href="/kalkulatory/" data-i18n="nav_calc">Kalkulatory</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker"></div>
+        <select id="currency-select" class="cur-select" aria-label="Waluta" title="Waluta" data-i18n-aria="cur_label"><option value="PLN" selected>PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="https://play.google.com/store/apps/details?id=pl.materio.app" rel="noopener" target="_blank" data-loc="app" data-i18n="nav_download">Pobierz</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Zmień motyw" title="Zmień motyw" data-i18n-aria="theme_toggle"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otwórz menu" data-i18n-aria="nav_menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <h1 data-i18n="dash_title">Pulpit</h1>
+      <p class="lead" data-i18n="dash_lead">Twoje projekty, ostatnie kalkulacje i narzędzia, których używasz. Wszystko z tej przeglądarki.</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <!-- Which of chapter II's three levels this browser was last told it is on. It is
+           a hint (assets/account.js), so it words the strip and nothing else. -->
+      <div class="app-bar">
+        <span class="app-identity">
+          <span id="dash-level" class="chip">Gość</span>
+          <span class="muted" id="dash-level-note" data-dash-note>Liczysz bez konta.</span>
+        </span>
+        <a class="btn btn-ghost btn-sm" href="/app/" data-i18n="dash_q_account">Konto</a>
+      </div>
+
+      <!-- Chapter II: registration is the next step after a result, never a barrier. The
+           card is what a guest sees; assets/dashboard.js hides it once the hint says
+           somebody signed in. It opens the sign-up form and comes back here. -->
+      <div class="app-card" id="dash-signup">
+        <h3 data-i18n="dash_guest_t">Ten pulpit jest tylko w tej przeglądarce</h3>
+        <p class="muted" data-i18n="dash_guest_d">Kalkulatory liczą bez konta i tak zostanie. Konto dokłada jedno: te same projekty i kosztorysy w przeglądarce i w telefonie.</p>
+        <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fapp%2Fpulpit%2F" data-i18n="dash_guest_go">Załóż darmowe konto</a>
+      </div>
+
+      <section class="dash-sec" aria-labelledby="dash-quick-h">
+        <h2 id="dash-quick-h" data-i18n="dash_quick_t">Szybkie akcje</h2>
+        <ul class="calc-links dash-quad">
+        <li><a class="calc-link" href="/kalkulatory/" data-dash-url="calculators">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="2"/><path d="M7.5 6.5h9v3.5h-9z"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg></span>
+        <span class="calc-link-body">
+          <b data-i18n="dash_q_calc">Policz materiał</b>
+          <span class="muted" data-i18n="dash_q_calc_d">Wybierz kalkulator i sprawdź, ile kupić.</span>
+        </span>
+      </a></li>
+        <li><a class="calc-link" href="/projekty/" data-dash-url="projects">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></span>
+        <span class="calc-link-body">
+          <b data-i18n="dash_q_projects">Projekty</b>
+          <span class="muted" data-i18n="dash_q_projects_d">Załóż projekt, dodaj pomieszczenia i wymiary.</span>
+        </span>
+      </a></li>
+        <li><a class="calc-link" href="/kosztorys/" data-dash-url="estimate">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span>
+        <span class="calc-link-body">
+          <b data-i18n="dash_q_estimate">Kosztorys</b>
+          <span class="muted" data-i18n="dash_q_estimate_d">Pozycje, ceny i suma. Do druku i do CSV.</span>
+        </span>
+      </a></li>
+        <li><a class="calc-link" href="/app/">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20v-4.5h4.5"/></svg></span>
+        <span class="calc-link-body">
+          <b data-i18n="dash_q_account">Konto</b>
+          <span class="muted" data-i18n="dash_q_account_d">Logowanie, synchronizacja i ustawienia konta.</span>
+        </span>
+      </a></li>
+        </ul>
+      </section>
+
+      <section class="dash-sec" aria-labelledby="dash-projects-h">
+        <div class="dash-head">
+          <h2 id="dash-projects-h" data-i18n="dash_projects_t">Projekty</h2>
+          <a class="dash-more" href="/projekty/" data-dash-url="projects" data-i18n="dash_projects_all">Wszystkie projekty</a>
+        </div>
+        <ul class="data-list" id="dash-projects"></ul>
+      </section>
+
+      <section class="dash-sec" aria-labelledby="dash-recent-h">
+        <div class="dash-head">
+          <h2 id="dash-recent-h" data-i18n="dash_recent_t">Ostatnie kalkulacje</h2>
+          <a class="dash-more" href="/kosztorys/" data-dash-url="estimate" data-i18n="dash_recent_all">Cały kosztorys</a>
+        </div>
+        <ul class="data-list" id="dash-recent"></ul>
+      </section>
+
+      <section class="dash-sec" aria-labelledby="dash-tools-h">
+        <div class="dash-head">
+          <h2 id="dash-tools-h" data-i18n="dash_tools_t">Ostatnio używane narzędzia</h2>
+          <a class="dash-more" href="/kalkulatory/" data-dash-url="calculators" data-i18n="dash_tools_all">Wszystkie kalkulatory</a>
+        </div>
+        <ul class="calc-links dash-quad" id="dash-tools"></ul>
+        <!-- The list is the visitor's own history of which tools they opened, so they get
+             to delete it, on the page that shows it. Hidden while there is nothing to
+             forget — chapter XXV: no button that does nothing. -->
+        <p><button type="button" class="linkish" id="dash-tools-forget" data-i18n="dash_tools_forget" hidden>Wyczyść tę listę</button></p>
+      </section>
+
+      <p class="muted src-note" data-i18n="dash_local_note">Ta strona nie pobiera niczego z sieci. Projekty, kosztorysy i lista narzędzi leżą w pamięci tej przeglądarki; konto służy do tego, żeby ta sama praca była też w telefonie.</p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat.</span>
+      <span><a href="/privacy-policy.html" data-i18n="foot_privacy">Polityka prywatności</a></span>
+      <span class="muted" data-i18n="app_noindex_note">Ta strona nie jest indeksowana przez wyszukiwarki.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/i18n.all.js?v=20260813e"></script>
+<script src="/assets/i18n-runtime.js?v=20260813e"></script>
+<script src="/assets/currency.js?v=20260813e"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260813e"></script>
+<script src="/assets/workspace.js?v=20260813e"></script>
+<script src="/assets/recent.js?v=20260813e"></script>
+<script src="/assets/dashboard.js?v=20260813e"></script>
+
+<script src="/assets/main.js?v=20260813e"></script>
+
+</body>
+</html>
