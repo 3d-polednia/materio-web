@@ -93,7 +93,7 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 | `estimate` | `/kosztorys/` | GUEST | `projects` | tak | 4 |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 4 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
-| `dashboard` | `/app/pulpit/` | GUEST | `account` | **nie** | 1 |
+| `dashboard` | `/app/dashboard/` | GUEST | `account` | **nie** | 1 |
 | `share` | `/p/` | GUEST | `estimate` | **nie** | 1 |
 | `privacy` | `/privacy-policy.html` | GUEST | `home` | tak | pisana ręcznie |
 
@@ -315,7 +315,7 @@ KALKULATOR ──wynik──► [ zapisz ] ──► PROJEKT ──► KOSZTORYS
                           │
                      KONTO (/app/) ──sync──► Firestore ──► aplikacja Android
                           │
-                     PULPIT (/app/pulpit/) ──czyta──► projekty, ostatnie kalkulacje,
+                     PULPIT (/app/dashboard/) ──czyta──► projekty, ostatnie kalkulacje,
                                                       ostatnio używane narzędzia
 
 MATERIAŁ ──► kalkulator właściwy dla rodzaju materiału
@@ -335,7 +335,7 @@ Co z tego wynika i co trzeba utrzymać:
   i nie wchodzi do menu.
 - **Kalkulacja musi być odtwarzalna.** Rozdział XV: zapis trzyma kalkulator, dane wejściowe,
   wynik, jednostki i datę — nie samą liczbę.
-- **Pulpit niczego nie posiada.** `/app/pulpit/` jest widokiem na to, co już jest
+- **Pulpit niczego nie posiada.** `/app/dashboard/` jest widokiem na to, co już jest
   w przeglądarce — nie zapisuje projektu, nie zapisuje pozycji kosztorysu i nie jest
   źródłem prawdy o niczym poza jedną własną listą: `liczmat-recent-calcs`
   (`assets/recent.js`), czyli które kalkulatory były używane i kiedy. Ta lista **nie jest
@@ -371,7 +371,7 @@ Wynik jest pełny bez konta. Rozdział II: rejestracja to następny krok, nie br
 ```
 kalkulator ──► WYNIK ──► „Dodaj do projektu” ──► /projekty/ ──► projekt
                                                                   │
-                                          /kosztorys/ ──┴──► /app/pulpit/ (HISTORIA)
+                                          /kosztorys/ ──┴──► /app/dashboard/ (HISTORIA)
 ```
 
 Ostatni krok — „powrót do wcześniejszych obliczeń” — ma od Sesji 14 własną stronę.
@@ -428,7 +428,7 @@ zdania. Znacznik **decyduje wyłącznie o treści**: nic nie wolno na nim bramko
 `FIRESTORE_SYNC` §1.2 zabrania wymagać konta do liczenia, a znacznik bywa nieaktualny
 (wylogowanie w innej karcie, wygasły token). Jest wypisany na `/cookies/`.
 
-### 8.1a. Poziom `/app/pulpit/` — Sesja 14 zbudowała pulpit jako GUEST
+### 8.1a. ~~Poziom `/app/dashboard/`~~ — rozstrzygnięte po Sesji 14
 
 Ta sama sprawa, jeszcze raz, na nowej stronie. Sesja 3 zadeklarowała trasę `dashboard`
 jako `LICZMAT`, bo plan nazywa ją „dashboardem darmowego użytkownika”. Sesja 14 zbudowała
@@ -445,10 +445,18 @@ komuś jego własne projekty w chwili, w której token wygasł. To byłoby zgubi
 odwiedzającego na jego oczach.
 
 Gość widzi więc swoje dane i kartę „Ten pulpit jest tylko w tej przeglądarce” z linkiem
-do rejestracji — zamiast zamkniętych drzwi. **Do decyzji właściciela**, czy pulpit ma
-jednak wymagać konta; jeśli tak, zmienia się `level` trasy i dochodzi przekierowanie na
-`/app/?next=/app/pulpit/`, ale wtedy trzeba świadomie przyjąć, że nieaktualny znacznik
-odetnie zalogowanego od jego danych.
+do rejestracji — zamiast zamkniętych drzwi.
+
+**Właściciel zatwierdził `GUEST` (2026-08-13).** Odrzucona alternatywa: `LICZMAT`
+z przekierowaniem na `/app/?next=/app/dashboard/` — wtedy nieaktualny znacznik odcina
+zalogowanego od jego własnych, lokalnych danych, i to był argument rozstrzygający.
+
+Przy tej samej okazji **adres zmienił się z `/app/pulpit/` na `/app/dashboard/`**. Slug
+jest permanentny (`CLAUDE.md`), a strona wyszła na świat tego samego dnia i nic z zewnątrz
+na nią nie linkowało, więc zmiana kosztowała jeden build zamiast wiecznego przekierowania.
+Powód: `/app/` i `/p/` są bezjęzykowe, a `pulpit` to polskie słowo w adresie, którego
+Niemiec i tak nie przeczyta. Widoczna nazwa zostaje przetłumaczona — „Pulpit”,
+„Übersicht”, „Dashboard”, „Панель” (`nav_dashboard`); po angielsku zmienia się tylko URL.
 
 ### 8.2. `/app/` czy `/konto/` — Sesja 13 nie przeniosła, i dlaczego
 

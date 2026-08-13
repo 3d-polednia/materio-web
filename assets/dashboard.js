@@ -1,4 +1,4 @@
-/* LiczMat website — /app/pulpit/, the dashboard of the free account.
+/* LiczMat website — /app/dashboard/, the dashboard of the free account.
  *
  * Master plan, session 14: "Dashboard darmowego użytkownika. Powinien pokazywać przede
  * wszystkim: projekty, ostatnie kalkulacje, szybkie akcje, ostatnio używane narzędzia."

@@ -154,11 +154,11 @@ scripts/test-dashboard.mjs  The dashboard: the route, the "recently used tools" 
                       the frame the build writes, the addresses it hands the page and the
                       copy in four languages. Dependency-free — run it after touching
                       assets/recent.js, assets/dashboard.js, dashboardMain() or a dash_* key
-scripts/test-dashboard-page.mjs  /app/pulpit/ in Chromium, nothing stubbed (the page
+scripts/test-dashboard-page.mjs  /app/dashboard/ in Chromium, nothing stubbed (the page
                       loads no Firebase): the four lists from a planted localStorage, the
                       level strip, the language and currency switches, and the widths
                       chapter XXVIII names — 320/375/390/430/768/1280 px
-src/app-pages.mjs     /app/, /app/pulpit/ and /p/ (noindex, translated in the browser)
+src/app-pages.mjs     /app/, /app/dashboard/ and /p/ (noindex, translated in the browser)
 assets/styles.css     The design system: one token block, then the components that
                       spend it. Never write a literal colour/radius/duration below it
 assets/i18n.js        4-language dictionary (build input)
@@ -175,7 +175,7 @@ assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/
 assets/recent.js      Which calculators this browser used, and when. Device-local, never
                       synced, no inputs and no results — only a calculator id and a time.
                       It is what the dashboard's "ostatnio używane narzędzia" reads
-assets/dashboard.js   /app/pulpit/ — the four lists of chapter XIV, drawn from the local
+assets/dashboard.js   /app/dashboard/ — the four lists of chapter XIV, drawn from the local
                       workspace and assets/recent.js. Loads no Firebase on purpose
 assets/account.js     The user session and the three access levels of chapter II. Loaded
                       on every page: it is what lets a calculator word the sentence under
@@ -201,10 +201,10 @@ the floating-point rounding that sold a sixteenth box of tiles for a floor that 
 fifteen. `scripts/test-pages.mjs` covers the same calculators in a real browser and needs
 Playwright installed outside the repo; it skips itself, exit 0, when that is absent.
 
-## The account layer (/app/, /app/pulpit/ and /p/)
+## The account layer (/app/, /app/dashboard/ and /p/)
 
 `/app/` is the signed-in account (projects, rooms, sync, account settings),
-`/app/pulpit/` the dashboard of the free account (session 14) and
+`/app/dashboard/` the dashboard of the free account (session 14) and
 `/p/<token>` a read-only shared estimate. The first and the third talk
 to the **same Firestore schema as the Android app** — the contract is
 `docs/FIRESTORE_SYNC.md` in `3d-polednia/Materio`, and `core/sync/SyncContract.kt` is the
@@ -286,7 +286,7 @@ Kotlin side of it. Change one, change all three.
   nothing may gate saving, counting or reading on it. The value it held before session 13
   (`"1"`) still reads as signed in. Listed on `/cookies/`, next to `liczmat-remember`,
   which is this device's answer to "keep me signed in".
-- **`/app/pulpit/` loads no Firebase at all.** It is the first screen after signing in,
+- **`/app/dashboard/` loads no Firebase at all.** It is the first screen after signing in,
   and everything on it — projects, the last saved estimate lines, the tools that were
   used — is already in `localStorage`. Waiting for an SDK download and an auth round-trip
   before listing somebody's own local projects would make the dashboard slower than the

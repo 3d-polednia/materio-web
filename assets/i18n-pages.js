@@ -133,7 +133,7 @@ const I18N_PAGES = {
     note_sheathing: "Wynik to liczba całych arkuszy bez planu rozkroju. Gdy chcesz wiedzieć, jak je pociąć, użyj kalkulatora rozkroju płyt 2D.",
 
 
-    /* --- /app/pulpit/ — the dashboard of the free account (session 14) --- */
+    /* --- /app/dashboard/ — the dashboard of the free account (session 14) --- */
     nav_dashboard: "Pulpit",
     dash_title: "Pulpit",
     dash_lead: "Twoje projekty, ostatnie kalkulacje i narzędzia, których używasz. Wszystko z tej przeglądarki.",
@@ -564,7 +564,7 @@ const I18N_PAGES = {
     note_sheathing: "The result is a count of whole sheets with no cutting plan. If you need to know how to cut them, use the 2D sheet cutting calculator.",
 
 
-    /* --- /app/pulpit/ — the dashboard of the free account (session 14) --- */
+    /* --- /app/dashboard/ — the dashboard of the free account (session 14) --- */
     nav_dashboard: "Dashboard",
     dash_title: "Dashboard",
     dash_lead: "Your projects, your latest calculations and the tools you use. All of it out of this browser.",
@@ -995,7 +995,7 @@ const I18N_PAGES = {
     note_sheathing: "Das Ergebnis ist die Zahl ganzer Platten ohne Schnittplan. Wenn du wissen willst, wie du sie zuschneidest, nimm den 2D-Plattenzuschnitt.",
 
 
-    /* --- /app/pulpit/ — the dashboard of the free account (session 14) --- */
+    /* --- /app/dashboard/ — the dashboard of the free account (session 14) --- */
     nav_dashboard: "Übersicht",
     dash_title: "Übersicht",
     dash_lead: "Deine Projekte, die letzten Berechnungen und die Werkzeuge, die du nutzt. Alles aus diesem Browser.",
@@ -1426,7 +1426,7 @@ const I18N_PAGES = {
     note_sheathing: "Результат — кількість цілих аркушів без плану розкрою. Якщо треба знати, як їх різати, скористайся калькулятором розкрою плит 2D.",
 
 
-    /* --- /app/pulpit/ — the dashboard of the free account (session 14) --- */
+    /* --- /app/dashboard/ — the dashboard of the free account (session 14) --- */
     nav_dashboard: "Панель",
     dash_title: "Панель",
     dash_lead: "Твої проєкти, останні розрахунки та інструменти, якими ти користуєшся. Усе з цього браузера.",

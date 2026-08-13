@@ -608,7 +608,7 @@ function buildPrivatePages() {
     }])),
   };
 
-  write("app/pulpit/index.html", page({
+  write("app/dashboard/index.html", page({
     ...common,
     title: `${t("dash_title")} — LiczMat`,
     description: t("dash_lead"),

@@ -114,7 +114,7 @@ head("1. the dashboard is a declared page, not a page that just appeared");
   const r = route("dashboard");
   check("the route exists", Boolean(r));
   eq("it is live now", r.status, STATUS.LIVE);
-  eq("at /app/pulpit/", r.path, URL_DASHBOARD);
+  eq("at /app/dashboard/", r.path, URL_DASHBOARD);
   eq("under the account", r.parent, "account");
   eq("it has no per-language URL", r.localized, false);
   eq("and is never indexed", r.indexable, false);
@@ -246,7 +246,7 @@ head("6. the addresses the build hands the page");
   // The page has no per-language URL, so it cannot render /kalkulatory/ and be right in
   // German. window.LM_DASH is what assets/dashboard.js re-points the links from, and it
   // is written by the build — so it is read back out of the built page.
-  const file = p("app/pulpit/index.html");
+  const file = p("app/dashboard/index.html");
   if (!check("the page has been built", existsSync(file), "run: node scripts/build.mjs")) {
     // Nothing below can say anything useful without it.
   } else {

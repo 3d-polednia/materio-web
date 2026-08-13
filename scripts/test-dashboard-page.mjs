@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * LiczMat — /app/pulpit/, the dashboard, tested in a real browser.
+ * LiczMat — /app/dashboard/, the dashboard, tested in a real browser.
  *
  *     node scripts/test-dashboard-page.mjs
  *
@@ -202,7 +202,7 @@ async function open(ctx, url, opts = {}) {
 const rows = (page, sel) => page.$$eval(`${sel} > li`, (li) => li.map((n) => n.innerText.trim()));
 const text = (page, sel) => page.$eval(sel, (n) => n.innerText.trim());
 
-const DASH = "/app/pulpit/";
+const DASH = "/app/dashboard/";
 const ctx = await context({ viewport: { width: 1280, height: 900 } });
 
 /* ------------------------------------------------------------------ 1. a guest */
@@ -404,14 +404,14 @@ head("10. there are ways in that are not the address bar");
   // /app/ and the dashboard carry the minimal footer — one line, no site map — so the
   // footer link is checked where it actually renders: on a public page.
   const home = await open(ctx, "/");
-  const foot = await home.$$eval('footer a[href="/app/pulpit/"]', (a) => a.map((n) => n.textContent.trim()));
+  const foot = await home.$$eval('footer a[href="/app/dashboard/"]', (a) => a.map((n) => n.textContent.trim()));
   eq("the footer's account column has it, on every public page", foot.length, 1);
   eq("under its own name", foot[0], "Pulpit");
   await home.close();
 
   const app = await open(ctx, "/app/");
   check("and the account page carries a link to it",
-    await app.$('#app-workspace a[href="/app/pulpit/"]') !== null);
+    await app.$('#app-workspace a[href="/app/dashboard/"]') !== null);
   await app.close();
 }
 

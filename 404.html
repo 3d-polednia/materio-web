@@ -28,6 +28,12 @@
     // everything under them. Their slugs have no counterpart in the languages that
     // stayed, so the honest landing place is the home page rather than a guess.
     if (/^\/(cs|sk|ro|hr|sr|ru)(\/|$)/.test(location.pathname)) location.replace("/");
+
+    // The dashboard shipped as /app/pulpit/ on 2026-08-13 and was renamed to
+    // /app/dashboard/ the same day, before anything linked to it: /app/ and /p/ are
+    // language-neutral, and a Polish word in the address of a page that has no language
+    // was the odd one out. Three lines of insurance for a bookmark made in those hours.
+    if (/^\/app\/pulpit\/?$/.test(location.pathname)) location.replace("/app/dashboard/");
   })();
 </script>
 </head>

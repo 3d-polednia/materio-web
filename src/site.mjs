@@ -191,6 +191,6 @@ export const URL_APP = "/app/";
 export const URL_SHARE = "/p/";
 
 /** The dashboard, under the account. Language-neutral like /app/ — it shows private data. */
-export const URL_DASHBOARD = "/app/pulpit/";
+export const URL_DASHBOARD = "/app/dashboard/";
 
 export const PLAY_URL = "https://play.google.com/store/apps/details?id=pl.materio.app";

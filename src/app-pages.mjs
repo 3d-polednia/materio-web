@@ -1,6 +1,6 @@
 /* LiczMat website — the three pages that are not part of the public, indexable layer:
    /app/        the signed-in account: projects, rooms, sync and the account settings
-   /app/pulpit/ the dashboard: projects, recent calculations, quick actions, tools
+   /app/dashboard/ the dashboard: projects, recent calculations, quick actions, tools
    /p/          the read-only view of a shared estimate
 
    All three are noindex (robots.txt and a robots meta tag), so they have no per-language
@@ -333,7 +333,7 @@ export function appMain(t) {
   return chrome(t, main);
 }
 
-/* ------------------------------------------------------------------ /app/pulpit/ */
+/* ------------------------------------------------------------------ /app/dashboard/ */
 
 /**
  * The four quick actions — chapter XIV's "szybkie akcje".

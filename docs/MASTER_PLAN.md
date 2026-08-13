@@ -151,7 +151,7 @@ Rozdział XXXII wymienia cztery rzeczy: **projekty, ostatnie kalkulacje, szybkie
 ostatnio używane narzędzia** — „dashboard darmowego użytkownika”. Trzy z nich serwis miał
 skąd wziąć i nie pokazywał ich razem nigdzie; czwartej nie miał w ogóle.
 
-**Pulpit jest teraz stroną: `/app/pulpit/`.** Trasa `dashboard` była zadeklarowana
+**Pulpit jest teraz stroną: `/app/dashboard/`.** Trasa `dashboard` była zadeklarowana
 w `src/ia.mjs` od Sesji 3 jako `PLANNED` z tym właśnie adresem; ta sesja zamieniła ją
 w stronę. Build pilnuje jednego i drugiego: strona, której nie ma w architekturze, przerywa
 build, a trasa zadeklarowana i niezbudowana też. Oba przypadki sprawdzone negatywnie —
@@ -172,7 +172,14 @@ mówi, czego strona **wymaga**. Pulpit nie wymaga niczego — jedyną rzeczą, n
 się postawić bramkę, jest znacznik, który bywa nieaktualny (wylogowanie w innej karcie,
 wygasły token), więc bramka schowałaby komuś jego własne projekty dokładnie w chwili
 wygaśnięcia tokena. Gość widzi swoje dane i kartę „Ten pulpit jest tylko w tej
-przeglądarce” z linkiem do rejestracji. **Do decyzji właściciela**, czy ma być inaczej.
+przeglądarce” z linkiem do rejestracji. **Właściciel zatwierdził `GUEST` (2026-08-13).**
+
+**Adres: `/app/dashboard/`, nie `/app/pulpit/`.** Sesja 3 zadeklarowała polski slug na
+stronie, która nie ma wersji językowych — obok bezjęzykowych `/app/` i `/p/`. Właściciel
+rozstrzygnął to tego samego dnia, zanim slug zdążył się utrwalić: strona wyszła na świat
+kilka godzin wcześniej i nic z zewnątrz na nią nie linkowało, więc zmiana kosztowała jeden
+build zamiast wiecznego przekierowania. Widoczna nazwa zostaje przetłumaczona
+(`nav_dashboard`: „Pulpit”, „Übersicht”, „Dashboard”, „Панель”) — zmienił się wyłącznie URL.
 
 Cztery listy, cztery źródła:
 
@@ -210,14 +217,14 @@ zaokrąglenia i jednostki nietknięte (rozdział XIII).
 
 **Wejścia na pulpit są trzy**, żeby nie był stroną, do której trafia się z paska adresu:
 link „Pulpit” w kolumnie „Konto” w stopce wszystkich 128 stron publicznych, przycisk obok
-„Wyloguj” na `/app/` i adres w karcie rejestracji (`?next=/app/pulpit/`).
+„Wyloguj” na `/app/` i adres w karcie rejestracji (`?next=/app/dashboard/`).
 
 **Strona jest kolumną, nie siatką** (rozdział XXVIII, mobile-first), i nie ma w niej ani
 jednego nowego komponentu: kafel to `.calc-link` z centrum kalkulatorów, wiersz to
 `.data-list` z `/projekty/`. Nowe w arkuszu są odstępy sekcji i kolumna z liczbą po
 prawej stronie wiersza.
 
-- Sprawdzone: **180 testów logiki + 90 testów `/app/pulpit/` w Chromium — 270/270
+- Sprawdzone: **180 testów logiki + 90 testów `/app/dashboard/` w Chromium — 270/270
   przechodzi**, a wcześniejsze 1117 + 111 + 331 + 121 nadal przechodzą (razem **1950**).
   Dwa nowe pliki: `scripts/test-dashboard.mjs` (bez zależności) i
   `scripts/test-dashboard-page.mjs`. Ten drugi **niczego nie podstawia** — pulpit nie
