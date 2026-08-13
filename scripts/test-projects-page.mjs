@@ -233,7 +233,9 @@ head("2. the index, with projects in it");
     !(await page.content()).includes("Skasowany"));
 
   // Two lines: 749,85 + 210,00 zł.
-  check("a row says how many lines it holds", /\b2 pozycji\b/.test(list[0]), list[0]);
+  // Two of them: "2 pozycje", not the "2 pozycji" this row said until session 16 —
+  // the inflection lives in assets/units.js now, where /projekty/ can reach it.
+  check("a row says how many lines it holds", /\b2 pozycje\b/.test(list[0]), list[0]);
   check("and what they come to", list[0].replace(/[\s\u00a0\u202f]/g, " ").includes("959,85"), list[0]);
   check("the active project is marked", (await page.$$eval("#ws-project-list li.on b", (b) => b.map((n) => n.textContent)))[0] === "Łazienka");
 

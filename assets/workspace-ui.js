@@ -106,25 +106,94 @@ function wsHasAccount() {
   return typeof lmSignedIn === "function" ? lmSignedIn() : false;
 }
 
+/** The value the project picker uses for "a project that does not exist yet". */
+const WS_NEW_PROJECT = "__new";
+
 /**
- * The actions under the result — chapter XII's AKCJE.
+ * Everything the saved line needs to explain itself later — chapter XV.
  *
- * Rebuilt on every calculation, into the slot the build leaves for it on a calculator
- * page (`[data-calc-actions]`); anywhere else it falls in after the result box, which is
- * where it used to live.
+ * The chapter names five questions a visitor must be able to answer weeks later: which
+ * calculator, what they typed, what came out, in what unit, and when. The estimate
+ * document answers none of them on its own (`calculationType` lumps eleven of the fifteen
+ * calculators into "SURFACE_COVERAGE"), so this is what goes into `inputJson` beside the
+ * field values that were already there.
+ *
+ * Nothing here is text in the page's language. A field travels as its dictionary key
+ * (`data-lk`, written by the build), a chosen option as its own key (`data-ok`), a result
+ * row as the key and token the engine emitted — so the line reads correctly in German
+ * after being saved in Polish, which text frozen at save time could never do.
+ */
+function wsSnapshotOf(card, result) {
+  const fields = [];
+  card.querySelectorAll("[data-k]").forEach((el) => {
+    const f = { k: el.dataset.k };
+    if (el.dataset.lk) f.l = el.dataset.lk;
+    const chosen = el.tagName === "SELECT" ? el.options[el.selectedIndex] : null;
+    if (chosen && chosen.dataset.ok) f.o = chosen.dataset.ok;
+    fields.push(f);
+  });
+  return {
+    v: typeof WS_SNAPSHOT === "number" ? WS_SNAPSHOT : 1,
+    calc: card.dataset.calc,
+    at: Date.now(),
+    fields,
+    unit: result.unit,
+    tobuy: result.tobuy,
+    rows: (result.rows || []).map(([k, v]) => [k, String(v)]),
+  };
+}
+
+/** The unit next to a count, inflected. assets/units.js, loaded before this file. */
+const wsUnit = (key, n) =>
+  (typeof unitLabel === "function" ? unitLabel(key, n, wsLang(), wsT) : wsT(key));
+
+/** The project picker, rebuilt from the store while keeping whatever is selected. */
+function wsFillSaveProjects(box) {
+  const sel = box.querySelector("[data-ws-project]");
+  const note = box.querySelector("[data-ws-note]");
+  const projects = wsProjects();
+  const keep = sel.value;
+  sel.innerHTML = projects.map((p) =>
+    `<option value="${wsEsc(p.id)}">${wsEsc(p.name)}</option>`).join("")
+    + `<option value="${WS_NEW_PROJECT}">${wsEsc(wsT("ws_new_project_opt"))}</option>`;
+  sel.value = keep === WS_NEW_PROJECT || projects.some((p) => p.id === keep)
+    ? keep : wsActiveProjectId();
+  // With nothing to choose between, the picker would be a control with one dead option
+  // and one that opens a text field. The button makes the first project on its own.
+  sel.hidden = projects.length === 0;
+  note.hidden = projects.length > 0;
+  box.querySelector("[data-ws-new]").hidden = sel.hidden || sel.value !== WS_NEW_PROJECT;
+}
+
+/**
+ * The actions under the result — chapter XII's AKCJE, and chapter XV's arrow into a
+ * project.
+ *
+ * Built once into the slot the build leaves for it on a calculator page
+ * (`[data-calc-actions]`); anywhere else it falls in after the result box, which is where
+ * it used to live. Every later calculation refreshes it rather than replacing it, so a
+ * project name half-typed into the picker survives pressing Enter in a field.
  */
 function wsRenderSave(card, result) {
   let box = card.querySelector("[data-ws-save-box]");
   if (!result) { if (box) box.remove(); return; }
-  if (!box) {
-    box = document.createElement("div");
-    box.className = "ws-save";
-    box.setAttribute("data-ws-save-box", "");
-    const slot = card.querySelector("[data-calc-actions]");
-    if (slot) slot.appendChild(box);
-    else card.querySelector("[data-result]").after(box);
-  }
-  const project = wsActiveProject();
+  if (!box) box = wsBuildSaveBox(card);
+  // The click reads this rather than a captured argument: the box outlives the result it
+  // was first drawn for, and saving the previous number would be worse than not saving.
+  box.lmResult = result;
+  // A new number makes the last confirmation stale — it was about a different result.
+  box.querySelector("[data-ws-saved]").hidden = true;
+  wsFillSaveProjects(box);
+}
+
+function wsBuildSaveBox(card) {
+  const box = document.createElement("div");
+  box.className = "ws-save";
+  box.setAttribute("data-ws-save-box", "");
+  const slot = card.querySelector("[data-calc-actions]");
+  if (slot) slot.appendChild(box);
+  else card.querySelector("[data-result]").after(box);
+
   // Chapter XII asks for "Zaloguj się lub załóż darmowe konto, aby zapisać wynik". The
   // result is already saved by the button next to it, in this browser and without an
   // account, so the sentence says what the account actually adds instead of pretending
@@ -136,36 +205,88 @@ function wsRenderSave(card, result) {
     ? `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_in"))}</p>`
     : `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_out"))}
         <a href="${wsEsc(lmSignupUrl(location.pathname))}">${wsEsc(wsT("calc_save_link"))}</a></p>`;
+
   box.innerHTML = `
     <div class="ws-save-row">
       <button type="button" class="btn btn-primary btn-sm" data-ws-save>${wsEsc(wsT("ws_add_to_project"))}</button>
-      <span class="muted ws-save-note">${wsEsc(project ? `${wsT("ws_project")}: ${project.name}` : wsT("ws_no_project"))}</span>
+      <select data-ws-project aria-label="${wsEsc(wsT("ws_project"))}" hidden></select>
+      <span class="muted ws-save-note" data-ws-note hidden>${wsEsc(wsT("ws_no_project"))}</span>
     </div>
+    <div class="ws-save-new" data-ws-new hidden>
+      <label class="ws-bar-label" for="ws-new-${wsEsc(card.dataset.calc)}">${wsEsc(wsT("ws_new_project"))}</label>
+      <input id="ws-new-${wsEsc(card.dataset.calc)}" type="text" maxlength="120"
+        data-ws-new-name placeholder="${wsEsc(wsT("ws_default_project"))}">
+    </div>
+    <p class="ws-saved" data-ws-saved role="status" hidden></p>
     ${account}`;
 
-  box.querySelector("[data-ws-save]").addEventListener("click", () => {
-    const waste = (result.rows || []).find((r) => r[0] === "res_waste");
-    const input = {};
-    card.querySelectorAll("[data-k]").forEach((el) => { input[el.dataset.k] = el.value; });
-
-    const row = wsAddEstimation({
-      calcId: card.dataset.calc,
-      name: card.dataset.matName || card.dataset.wsRoomName || wsT(`c_${card.dataset.calc}_t`),
-      materialCategory: card.dataset.matCat || "OTHER",
-      requiredUnits: result.tobuy,
-      // Inflected for the count, exactly as the result panel above shows it — a saved
-      // line reading "1 worków" would be the same defect one screen further on. The
-      // guard is for /projekty/ and /kosztorys/, which load this file without the engines.
-      unitLabel: typeof unitLabel === "function"
-        ? unitLabel(result.unit, result.tobuy, wsLang(), wsT)
-        : wsT(result.unit),
-      costMajor: result.cost || 0,
-      wastePercent: waste ? parseFloat(String(waste[1])) : 0,
-      input,
-      projectName: wsT("ws_default_project"),
-    });
-    box.querySelector(".ws-save-note").textContent = `${wsT("ws_saved")} ${row.name}`;
+  const sel = box.querySelector("[data-ws-project]");
+  sel.addEventListener("change", () => {
+    const isNew = sel.value === WS_NEW_PROJECT;
+    box.querySelector("[data-ws-new]").hidden = !isNew;
+    if (isNew) box.querySelector("[data-ws-new-name]").focus();
+    // Picking a project here picks it everywhere: the estimate, the dashboard and the next
+    // result all mean the same "active project", and two answers to that would diverge.
+    else wsSetActiveProject(sel.value);
   });
+  box.querySelector("[data-ws-save]").addEventListener("click", () => wsSaveResult(card, box));
+  return box;
+}
+
+/** Put the result on screen into the project the picker names. */
+function wsSaveResult(card, box) {
+  const result = box.lmResult;
+  if (!result) return;
+  const sel = box.querySelector("[data-ws-project]");
+  const nameField = box.querySelector("[data-ws-new-name]");
+
+  let projectId = "";
+  if (!sel.hidden && sel.value === WS_NEW_PROJECT) {
+    projectId = wsAddProject(nameField.value.trim() || wsT("ws_default_project")).id;
+    nameField.value = "";
+  } else if (!sel.hidden) {
+    projectId = sel.value;
+  }
+
+  const waste = (result.rows || []).find((r) => r[0] === "res_waste");
+  const input = {};
+  card.querySelectorAll("[data-k]").forEach((el) => { input[el.dataset.k] = el.value; });
+
+  const row = wsAddEstimation({
+    calcId: card.dataset.calc,
+    projectId,
+    name: card.dataset.matName || card.dataset.wsRoomName || wsT(`c_${card.dataset.calc}_t`),
+    materialCategory: card.dataset.matCat || "OTHER",
+    requiredUnits: result.tobuy,
+    // Inflected for the count, exactly as the result panel above shows it — a saved
+    // line reading "1 worków" would be the same defect one screen further on.
+    unitLabel: wsUnit(result.unit, result.tobuy),
+    costMajor: result.cost || 0,
+    wastePercent: waste ? parseFloat(String(waste[1])) : 0,
+    input,
+    snapshot: wsSnapshotOf(card, result),
+    projectName: wsT("ws_default_project"),
+  });
+
+  const project = wsProject(row.projectId);
+  sel.value = row.projectId;
+  box.querySelector("[data-ws-new]").hidden = true;
+  wsSaid(box, project ? project.name : "", row.projectId);
+}
+
+/**
+ * The third step of chapter XV: the result is in a project, and the project is a click
+ * away. Without the link the arrow stops at "saved" and the visitor has to go and find it.
+ */
+function wsSaid(box, projectName, projectId) {
+  const said = box.querySelector("[data-ws-saved]");
+  const slot = box.closest("[data-calc-actions]");
+  const base = (slot && slot.dataset.projectsUrl) || "";
+  const link = base && projectId
+    ? ` <a href="${wsEsc(base)}?id=${encodeURIComponent(projectId)}">${wsEsc(wsT("proj_open"))}</a>`
+    : "";
+  said.innerHTML = `<b>${wsEsc(wsT("ws_saved_in"))} ${wsEsc(projectName)}</b>${link}`;
+  said.hidden = false;
 }
 
 function buildWorkspaceCalculators() {
@@ -173,7 +294,11 @@ function buildWorkspaceCalculators() {
   if (!cards.length) return;
   cards.forEach(wsWireCard);
   document.addEventListener("calcresult", (e) => wsRenderSave(e.detail.card, e.detail.result));
-  document.addEventListener("workspacechange", () => cards.forEach(wsFillRoomSelect));
+  document.addEventListener("workspacechange", () => cards.forEach((card) => {
+    wsFillRoomSelect(card);
+    const box = card.querySelector("[data-ws-save-box]");
+    if (box) wsFillSaveProjects(box);
+  }));
 }
 
 /* ------------------------------------------------------------------ /projekty/
@@ -227,7 +352,7 @@ function wsProjectRow(p, active) {
   return `<li data-id="${wsEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
       <span class="row-name">
         <a href="?id=${encodeURIComponent(p.id)}" data-open><b>${wsEsc(p.name)}</b></a>
-        <em class="muted">${total.count} ${wsEsc(wsT("ws_lines"))}${money} · ${wsEsc(wsDate(p.updatedAt))}${mixed}</em>
+        <em class="muted">${total.count} ${wsEsc(wsUnit("ws_lines", total.count))}${money} · ${wsEsc(wsDate(p.updatedAt))}${mixed}</em>
       </span>
       <span class="row-actions">
         ${p.archived
@@ -304,6 +429,74 @@ function wsCrumb(name) {
   extra.textContent = name;
 }
 
+/** A date with the time on it: "kiedy wykonano obliczenie" is a moment, not a day. */
+const wsMoment = (ms) => {
+  const at = Number(ms);
+  if (!isFinite(at) || at <= 0) return "";
+  return new Date(at).toLocaleString(wsLang(), {
+    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+};
+
+/** One value as it was typed, or the word a dropdown was set to. */
+function wsFieldValue(field, snapshot) {
+  if (field.o) return wsT(field.o);
+  const raw = String(snapshot.input[field.k] === undefined ? "" : snapshot.input[field.k]).trim();
+  if (!raw) return "";
+  // A cutting list is several lines of free text; everything else is one number, which is
+  // written back in this language's own notation rather than in whatever was typed.
+  if (raw.includes("\n")) return raw.split("\n").map((s) => s.trim()).filter(Boolean).join(" · ");
+  const n = parseFloat(raw.replace(",", "."));
+  return isFinite(n) && String(n) === raw.replace(",", ".") ? wsNum(n) : raw;
+}
+
+/**
+ * Where the number came from — chapter XV, the whole point of it.
+ *
+ * "Nie zapisuj tylko samej liczby, jeśli później nie będzie wiadomo, skąd się wzięła."
+ * The five answers are the five things the snapshot keeps, and they are folded away
+ * because a project with a dozen lines would otherwise be a wall of numbers: the list is
+ * the estimate, this is the working behind one row of it.
+ *
+ * A line saved before session 16 has no snapshot and gets no disclosure — an empty
+ * "where from" is worse than none, and chapter XXV forbids a control with nothing behind
+ * it. So does a line typed by hand on /kosztorys/: it was never calculated.
+ */
+function wsLineSource(row) {
+  const snap = wsLineSnapshot(row);
+  if (!snap) return "";
+  const url = ((typeof window !== "undefined" && window.LM_PROJ) || { calcs: {} }).calcs[snap.calc];
+  const name = wsT(`c_${snap.calc}_t`);
+  const calc = url
+    ? `<a href="${wsEsc(url)}">${wsEsc(name)}</a>`
+    : wsEsc(name);
+
+  const inputs = snap.fields
+    .map((f) => [f.l ? wsT(f.l) : f.k, wsFieldValue(f, snap)])
+    .filter(([, v]) => v !== "")
+    .map(([l, v]) => `<span class="ws-src-pair"><span class="muted">${wsEsc(l)}</span> ${wsEsc(v)}</span>`)
+    .join("");
+
+  const rows = snap.rows
+    .map(([k, v]) => `<span class="ws-src-pair"><span class="muted">${wsEsc(wsT(k))}</span> ${wsEsc(
+      typeof localizeRow === "function" ? localizeRow(v, wsLang(), wsT) : v)}</span>`)
+    .join("");
+
+  const line = (label, body) =>
+    `<div><dt class="muted">${wsEsc(label)}</dt><dd>${body}</dd></div>`;
+
+  return `<details class="ws-src">
+      <summary>${wsEsc(wsT("proj_src_t"))}</summary>
+      <dl>
+        ${line(wsT("proj_src_calc"), calc)}
+        ${inputs ? line(wsT("proj_src_input"), inputs) : ""}
+        ${line(wsT("proj_src_result"),
+          `<b>${wsNum(snap.tobuy)} ${wsEsc(wsUnit(snap.unit, snap.tobuy))}</b>${rows}`)}
+        ${snap.at ? line(wsT("proj_src_when"), wsEsc(wsMoment(snap.at))) : ""}
+      </dl>
+    </details>`;
+}
+
 /** The saved lines of one project, newest last — the order they were added in. */
 function wsRenderProjectLines(id) {
   const list = document.getElementById("ws-project-lines");
@@ -316,7 +509,7 @@ function wsRenderProjectLines(id) {
   list.innerHTML = rows.map((r) => {
     const cost = r.totalCostMinor > 0
       ? `<em class="muted">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</em>` : "";
-    return `<li>
+    return `<li class="ws-line">
         <span class="row-name">
           <b>${wsEsc(r.name)}</b>
           <em class="muted">${wsEsc(wsDate(r.createdAt))}</em>
@@ -325,6 +518,7 @@ function wsRenderProjectLines(id) {
           <b>${wsNum(r.requiredUnits)} ${wsEsc(r.unitLabel)}</b>
           ${cost}
         </span>
+        ${wsLineSource(r)}
       </li>`;
   }).join("");
 }
@@ -399,6 +593,11 @@ function wsRenderWorkspace() {
 
   detail.hidden = !wsOpenId;
   index.hidden = Boolean(wsOpenId);
+
+  // Opening and closing a project changes the address without a reload, and the language
+  // links carry that address so the visitor keeps the project they are looking at when
+  // they switch language. assets/i18n-runtime.js does it once on load; this is the rest.
+  if (typeof keepQueryOnLangLinks === "function") keepQueryOnLangLinks();
 
   if (wsOpenId) {
     // Opening a project is moving on: the strip about the last delete has had its say.
@@ -634,7 +833,7 @@ function wsRenderEstimate() {
     body.innerHTML = rows.map((r, i) => wsEstimateRow(r, i)).join("");
   }
   document.getElementById("ws-estimate-total").textContent = wsMoney(total.minor, total.currencyCode);
-  document.getElementById("ws-estimate-count").textContent = `${total.count} ${wsT("ws_lines")}`;
+  document.getElementById("ws-estimate-count").textContent = `${total.count} ${wsUnit("ws_lines", total.count)}`;
 
   // Lines saved in different currencies do not add up, and the sum above says so.
   const mixed = document.getElementById("ws-estimate-mixed");

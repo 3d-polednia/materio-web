@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/linear-cutting-1d/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/rozkroj-liniowy-1d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260813f" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260813g" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Лінійний розкрій (1D) — Будівельні калькулятори онлайн | LiczMat">
 <meta name="twitter:description" content="Лінійний розкрій (1D) — безкоштовний онлайн-калькулятор. Хлисти, планки, труби: скільки й як різати. Та сама формула, що й у застосунку LiczMat для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260813f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813g">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,9 +177,9 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Твої дані</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-linear-stock">Довжина хлиста (мм)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" value="6000"></div><div class="field"><label for="f-linear-kerf">Різ пилки (мм)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" value="3"></div><div class="field"><label for="f-linear-cuts">Елементи: довжина×кіл. (мм)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts">2400x4
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-linear-stock">Довжина хлиста (мм)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" data-lk="fld_stock_len" value="6000"></div><div class="field"><label for="f-linear-kerf">Різ пилки (мм)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" data-lk="fld_kerf" value="3"></div><div class="field"><label for="f-linear-cuts">Елементи: довжина×кіл. (мм)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts" data-lk="fld_cuts">2400x4
 1800x6
-900x8</textarea></div><div class="field"><label for="f-linear-price">Ціна за хлист</label><input id="f-linear-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+900x8</textarea></div><div class="field"><label for="f-linear-price">Ціна за хлист</label><input id="f-linear-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bar" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Порахувати"
           data-label-again="Порахувати знову">Порахувати</button>
@@ -192,7 +192,7 @@
           <div class="rows"><div><span>Елементи</span><b>18</b></div><div><span>Відходи</span><b>8%</b></div><div><span>Хлист</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Хлист</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Хлист</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Хлист</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Хлист</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Дані змінилися. Натисни «Порахувати знову», щоб побачити новий результат.</p>
-        <div class="calc-actions" data-calc-actions></div>
+        <div class="calc-actions" data-calc-actions data-projects-url="/uk/proekty/"></div>
       </div>
     </div>
       <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a> — 39 матеріалів у каталозі</p>
@@ -310,21 +310,22 @@
   "de": "/de/rechner/linearer-zuschnitt-1d/",
   "en": "/en/calculators/linear-cutting-1d/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260813f"></script>
-<script src="/assets/i18n-runtime.js?v=20260813f"></script>
-<script src="/assets/currency.js?v=20260813f"></script>
+<script src="/assets/i18n.uk.js?v=20260813g"></script>
+<script src="/assets/i18n-runtime.js?v=20260813g"></script>
+<script src="/assets/currency.js?v=20260813g"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260813f"></script>
+<script src="/assets/account.js?v=20260813g"></script>
 
-<script src="/assets/calculators.js?v=20260813f"></script>
-<script src="/assets/materials.js?v=20260813f"></script>
-<script src="/assets/materials-ui.js?v=20260813f"></script>
-<script src="/assets/workspace.js?v=20260813f"></script>
-<script src="/assets/workspace-ui.js?v=20260813f"></script>
-<script src="/assets/recent.js?v=20260813f"></script>
-<script src="/assets/main.js?v=20260813f"></script>
+<script src="/assets/units.js?v=20260813g"></script>
+<script src="/assets/calculators.js?v=20260813g"></script>
+<script src="/assets/materials.js?v=20260813g"></script>
+<script src="/assets/materials-ui.js?v=20260813g"></script>
+<script src="/assets/workspace.js?v=20260813g"></script>
+<script src="/assets/workspace-ui.js?v=20260813g"></script>
+<script src="/assets/recent.js?v=20260813g"></script>
+<script src="/assets/main.js?v=20260813g"></script>
 
 </body>
 </html>

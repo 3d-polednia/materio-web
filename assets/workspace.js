@@ -23,6 +23,24 @@ const WS_KEY = "materio-workspace-v1";
 const WS_ACTIVE_KEY = "materio-active-project";
 const WS_SCHEMA = 1;
 
+/**
+ * Version of the snapshot a saved calculation carries inside `inputJson` (session 16).
+ *
+ * Chapter XV asks a saved line to answer five questions later: which calculator, what was
+ * typed, what came out, in what unit, and when. The estimate document has room for none of
+ * that — `calculationType` is one of four coarse engines, so tiles, mortar and screed are
+ * all "SURFACE_COVERAGE" — and a field invented at the top level would be erased without a
+ * word by the phone's next push, exactly as a project description would be
+ * (SyncContract.estimationToDoc() builds the document from a fixed map).
+ *
+ * `inputJson` is the one field that is already contract, already a free-form string and
+ * already round-trips: it is a column on `EstimationEntity`, the app writes its own
+ * snapshot into it with `ignoreUnknownKeys = true` and never reads a foreign one back. So
+ * the snapshot goes in there, under `_lm`, beside the flat field map that was there
+ * before — nothing that read `json.area` stops working.
+ */
+const WS_SNAPSHOT = 1;
+
 /* The currency comes from assets/currency.js — the visitor's choice, independent of the
    language. A line is stamped with the currency in force when it was saved and keeps it
    for good: an estimate priced in PLN stays in PLN after a switch to EUR, because there
@@ -314,13 +332,72 @@ function wsEstimations(projectId) {
 /** Minor units, rounded once, never carried as a float (the Money rule from the app). */
 const wsMinor = (major) => Math.round((Number(major) || 0) * 100);
 
+/** The contract's ceiling on `inputJson` (FIRESTORE_SYNC §2): a hard limit in the rules. */
+const WS_INPUT_MAX = 20000;
+
 /**
- * Save one calculator result as an estimate line in the active project.
+ * The input map plus the snapshot, as one JSON string that fits.
  *
- * @param {object} r  { calcId, name, requiredUnits, unitLabel, costMajor, wastePercent, input }
+ * Cutting a JSON string to length leaves a broken one, so nothing here ever does: an
+ * oversized line drops the snapshot first (the fields are the part the visitor typed), and
+ * an input map that is somehow oversized on its own drops down to the snapshot alone. The
+ * only calculators that can approach the limit are the two cutting lists, which are free
+ * text — a thousand pieces is a real, if rare, list.
+ */
+function wsInputJson(input, snapshot) {
+  const full = JSON.stringify(snapshot ? { ...input, _lm: snapshot } : { ...input });
+  if (full.length <= WS_INPUT_MAX) return full;
+  const bare = JSON.stringify({ ...input });
+  if (bare.length <= WS_INPUT_MAX) return bare;
+  const meta = JSON.stringify(snapshot ? { _lm: snapshot } : {});
+  return meta.length <= WS_INPUT_MAX ? meta : "{}";
+}
+
+/**
+ * What was saved, as the line itself recorded it — or null for a line saved before
+ * session 16, or one whose snapshot did not survive the size limit.
+ *
+ * Nothing that reads this may assume a shape: the string travels through Firestore and
+ * through another application, so it is parsed defensively and answers null on anything
+ * that is not this site's own snapshot.
+ */
+function wsLineSnapshot(row) {
+  try {
+    const data = JSON.parse(String((row && row.inputJson) || "{}"));
+    const snap = data && data._lm;
+    if (!snap || snap.v !== WS_SNAPSHOT || !snap.calc) return null;
+    return {
+      v: snap.v,
+      calc: String(snap.calc),
+      at: Number(snap.at) || 0,
+      fields: Array.isArray(snap.fields) ? snap.fields : [],
+      rows: Array.isArray(snap.rows) ? snap.rows : [],
+      unit: String(snap.unit || ""),
+      tobuy: Number(snap.tobuy) || 0,
+      /** The values, by field key: the flat map that has been in `inputJson` all along. */
+      input: Object.fromEntries(Object.entries(data).filter(([k]) => k !== "_lm")),
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Save one calculator result as an estimate line.
+ *
+ * @param {object} r  { calcId, name, requiredUnits, unitLabel, costMajor, wastePercent,
+ *                      input, snapshot, projectId }
+ *
+ * `projectId` is the project the visitor picked under the result (chapter XV: the arrow
+ * from the result goes to a project, not to wherever the last one went). Without one it is
+ * the active project, and without that a first project is made, because a result that
+ * cannot be saved until the visitor has been somewhere else first is a result they lose.
  */
 function wsAddEstimation(r) {
-  let projectId = wsActiveProjectId();
+  // An archived project takes no new lines — that is what archiving it meant — so a stale
+  // picker naming one falls back to the active project rather than filing the result away.
+  const picked = r.projectId ? wsProject(r.projectId) : null;
+  let projectId = picked && !picked.archived ? picked.id : wsActiveProjectId();
   if (!projectId) projectId = wsAddProject(r.projectName || "LiczMat").id;
 
   const currencyCode = wsCurrency();
@@ -340,7 +417,7 @@ function wsAddEstimation(r) {
     wastePercentage: waste,
     wasteCostMinor: Math.round(totalCostMinor * waste / 100),
     currencyCode,
-    inputJson: JSON.stringify(r.input || {}).slice(0, 20000),
+    inputJson: wsInputJson(r.input || {}, r.snapshot || null),
     ...wsSyncFields(Date.now()),
   };
   data.estimations.push(row);

@@ -85,6 +85,7 @@ node scripts/test-calculators.mjs # the calculator maths, units and localization
 node scripts/test-account.mjs     # the account: levels, the session, the copy
 node scripts/test-dashboard.mjs   # the dashboard: the route, the tool list, the copy
 node scripts/test-projects.mjs    # projects: the route, the CRUD, the undo, the copy
+node scripts/test-save.mjs        # saving a calculation: the snapshot, the project, the copy
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -103,7 +104,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
 | `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**`, `materialy/**` and their per-language twins |
 | `assets/i18n-materials.js` — material names, 4 languages | `app/index.html`, `p/index.html` |
-| `assets/calculators.js` — engines, ported 1:1 from Kotlin | `assets/i18n.<lang>.js`, `assets/i18n.all.js` |
+| `assets/calculators.js` — engines, ported 1:1 from Kotlin, and `assets/units.js` next to it | `assets/i18n.<lang>.js`, `assets/i18n.all.js` |
 | `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `sitemap.xml` |
 | `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | |
 | `assets/flags/<lang>.svg` — the picker's flags | |
@@ -170,6 +171,16 @@ scripts/test-dashboard-page.mjs  /app/dashboard/ in Chromium, nothing stubbed (t
                       loads no Firebase): the four lists from a planted localStorage, the
                       level strip, the language and currency switches, and the widths
                       chapter XXVIII names — 320/375/390/430/768/1280 px
+scripts/test-save.mjs  Saving a calculation: the snapshot a saved line carries inside
+                      `inputJson`, the contract's 20 000-character cap, which project the
+                      line lands in, the `data-lk`/`data-ok` keys the build puts on every
+                      field, and the copy in four languages. Dependency-free — run it
+                      after touching assets/workspace.js, the save box in
+                      assets/workspace-ui.js, calcCard() or a proj_src_*/ws_saved_in key
+scripts/test-save-page.mjs  The same arrow clicked through in Chromium, nothing stubbed:
+                      result → project picker → saved line → the project screen reading it
+                      back, including a line saved in Polish and read in German after
+                      switching language on the open project
 src/app-pages.mjs     /app/, /app/dashboard/ and /p/ (noindex, translated in the browser)
 assets/styles.css     The design system: one token block, then the components that
                       spend it. Never write a literal colour/radius/duration below it
@@ -194,7 +205,14 @@ assets/dashboard.js   /app/dashboard/ — the four lists of chapter XIV, drawn f
 assets/account.js     The user session and the three access levels of chapter II. Loaded
                       on every page: it is what lets a calculator word the sentence under
                       the result without loading Firebase. /app/ is its only writer
-assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/
+assets/units.js       The word next to a number: the plural forms of a counted noun and
+                      the |token| substitution in a result row. Split out of
+                      assets/calculators.js in session 16 so /projekty/, /kosztorys/ and
+                      the dashboard can print a saved result without downloading the
+                      engines. Loaded before assets/calculators.js everywhere
+assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/.
+                      A language link carries the page's query string, so switching
+                      language on /projekty/?id=<id> keeps the project
 assets/calculators.js Calculation engines ported 1:1 from the Kotlin app + form wiring
 assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
 assets/main.js        Wiring: menu, hero carousel, consent banner
@@ -324,6 +342,19 @@ Kotlin side of it. Change one, change all three.
   §8.1c. Deleting a project writes a tombstone and hands back the ids it tombstoned, and
   `wsRestoreProject()` takes that token: undo is exact rather than a guess from
   timestamps, and it never resurrects a line the visitor deleted by hand.
+- **An estimate line's extra information goes inside `inputJson`, never beside it.** A
+  saved calculation has to answer, later, which calculator made it, what was typed, what
+  came out, in what unit and when (master plan XV) — and the document has room for none of
+  that. A new top-level field would be erased by the phone without a word, exactly as a
+  project description would be. `inputJson` is the one contract field that is free-form and
+  round-trips (a column on `EstimationEntity`; the app writes its own snapshot there with
+  `ignoreUnknownKeys` and never reads a foreign one), so session 16 put the snapshot in it
+  under `_lm`, beside the flat field map that was already there. It stores **keys, never
+  words** — `fld_area`, `res_pkgs`, the engine's own `|n:21.6| m²` tokens — which is what
+  lets a line saved in Polish read correctly in German; the keys come from `data-lk` and
+  `data-ok`, written onto every form control by `calcCard()`. Read it with
+  `wsLineSnapshot()`, which answers `null` for anything that is not this site's snapshot.
+  `docs/ARCHITEKTURA.md` §7.1.
 - **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms and
   estimate lines in `localStorage` in the *same document shape* as Firestore, so the sync
   tab in `/app/` is a plain copy in either direction. Counting must never require an

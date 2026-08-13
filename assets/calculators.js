@@ -401,62 +401,10 @@ const ENGINES = {
  */
 function qtyG(v) { return "|n:" + (Math.round(v * 100) / 100) + "|"; }
 
-/* -------- the unit standing next to the number --------
-   The result panel used to read "4 worków". Polish and Ukrainian inflect a counted noun
-   in three forms — 1 / 2–4 / 5 and up, with the teens taking the last one — German and
-   English in two, and a symbol or an abbreviation (kg, m², opak., szt.) in none at all.
-
-   Only the keys listed here carry the extra forms; every other unit renders from its
-   single key exactly as before. An abbreviation must not be inflected, which is why
-   res_pkgs ("opak.") and res_pieces ("szt.") are absent and always will be — the five
-   entries below are every result unit the site spells out as a word. */
-const PLURAL_UNITS = new Set([
-  "res_bags", "res_rolls", "res_boards", "res_stocks", "res_sheets",
-]);
-const SLAVIC_PLURAL = new Set(["pl", "uk"]);
-
-/**
- * "one" | "few" | "many" for `n` in `lang`. The base key holds the "many" form, so a
- * language or a unit with nothing extra declared keeps working unchanged.
- *
- * A fraction falls back to "many": every unit with forms is counted in whole packages,
- * so the case cannot arise today, and guessing at "3,5 worka" would need a fourth form.
- */
-function pluralForm(n, lang) {
-  if (!Number.isInteger(n)) return "many";
-  if (n === 1) return "one";
-  if (!SLAVIC_PLURAL.has(lang)) return "many";
-  const last = n % 10, teens = n % 100;
-  return last >= 2 && last <= 4 && !(teens >= 12 && teens <= 14) ? "few" : "many";
-}
-
-/** The unit label for `n` of them. `tr` is the page's translator, bound to `lang`. */
-function unitLabel(key, n, lang, tr) {
-  if (!PLURAL_UNITS.has(key)) return tr(key);
-  const form = pluralForm(Number(n), lang);
-  return form === "many" ? tr(key) : tr(`${key}_${form}`);
-}
-
-/**
- * Replace every |n:…| number and every |key| word in a row value with localized text.
- *
- * The word form started as the single `|res_water_l|` litre token. Sessions 10 and 11 need
- * more of them — "160 płyt", "6 worków", "480 szt." — so any dictionary key inside pipes is
- * translated, and a plain `|res_bags:6|` inflects that word for the number in front of it.
- * Same reason as the number token: the engines run at build time and in the browser, and
- * neither knows the page's language at the point a row is built.
- */
-function localizeRow(value, lang, translate) {
-  const fmt = (x) => new Intl.NumberFormat(lang, { maximumFractionDigits: 2 }).format(x);
-  // Intl wants a language tag; the plural rules want the bare code, and both forms reach
-  // this function ("pl-PL" from the build, "pl" from the browser).
-  const code = String(lang).slice(0, 2);
-  return String(value)
-    .replace(/\|n:(-?[0-9.]+)\|/g, (_, n) => fmt(parseFloat(n)))
-    .replace(/\|([a-z0-9_]+):(-?[0-9.]+)\|/gi, (_, key, n) =>
-      unitLabel(key, parseFloat(n), code, translate))
-    .replace(/\|([a-z0-9_]+)\|/gi, (_, key) => translate(key));
-}
+/* The unit next to the number, the plural rules behind it and the |token| substitution
+   moved to assets/units.js in session 16: /projekty/ has to write "15 opak." under a
+   saved calculation and has no business downloading the engines to do it. Every page that
+   loads this file loads that one first. */
 
 /* ---------- Calculator definitions (fields + presets) ---------- */
 const F = (k, label, def, extra = {}) => Object.assign({ k, label, def }, extra);

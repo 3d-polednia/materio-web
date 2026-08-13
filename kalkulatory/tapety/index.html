@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/wallpaper/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/tapety/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260813f" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260813g" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Tapety — Kalkulatory budowlane online | LiczMat">
 <meta name="twitter:description" content="Tapety — darmowy kalkulator online. Ile rolek, z uwzględnieniem raportu wzoru. Ten sam wzór co w aplikacji LiczMat na Androida, bez rejestracji.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260813f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813g">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Twoje dane</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Wybierz materiał</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-wallpaper-wallW">Szerokość (m)</label><input id="f-wallpaper-wallW" type="text" inputmode="decimal" data-k="wallW" value="4"></div><div class="field"><label for="f-wallpaper-wallH">Wysokość (m)</label><input id="f-wallpaper-wallH" type="text" inputmode="decimal" data-k="wallH" value="2.6"></div><div class="field"><label for="f-wallpaper-rollW">Szerokość rolki (m)</label><input id="f-wallpaper-rollW" type="text" inputmode="decimal" data-k="rollW" value="0.53"></div><div class="field"><label for="f-wallpaper-rollL">Długość rolki (m)</label><input id="f-wallpaper-rollL" type="text" inputmode="decimal" data-k="rollL" value="10.05"></div><div class="field"><label for="f-wallpaper-pattern">Raport wzoru (m, 0 = brak)</label><input id="f-wallpaper-pattern" type="text" inputmode="decimal" data-k="pattern" value="0"></div><div class="field"><label for="f-wallpaper-price">Cena za rolkę</label><input id="f-wallpaper-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-wallpaper-wallW">Szerokość (m)</label><input id="f-wallpaper-wallW" type="text" inputmode="decimal" data-k="wallW" data-lk="fld_width" value="4"></div><div class="field"><label for="f-wallpaper-wallH">Wysokość (m)</label><input id="f-wallpaper-wallH" type="text" inputmode="decimal" data-k="wallH" data-lk="fld_height" value="2.6"></div><div class="field"><label for="f-wallpaper-rollW">Szerokość rolki (m)</label><input id="f-wallpaper-rollW" type="text" inputmode="decimal" data-k="rollW" data-lk="fld_roll_w" value="0.53"></div><div class="field"><label for="f-wallpaper-rollL">Długość rolki (m)</label><input id="f-wallpaper-rollL" type="text" inputmode="decimal" data-k="rollL" data-lk="fld_roll_l" value="10.05"></div><div class="field"><label for="f-wallpaper-pattern">Raport wzoru (m, 0 = brak)</label><input id="f-wallpaper-pattern" type="text" inputmode="decimal" data-k="pattern" data-lk="fld_pattern" value="0"></div><div class="field"><label for="f-wallpaper-price">Cena za rolkę</label><input id="f-wallpaper-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_roll" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Policz"
           data-label-again="Oblicz ponownie">Policz</button>
@@ -190,7 +190,7 @@
           <div class="rows"><div><span>Pasy</span><b>8 × 2,6 m</b></div><div><span>Pasów z rolki</span><b>3</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Dane się zmieniły. Kliknij „Oblicz ponownie”, żeby zobaczyć nowy wynik.</p>
-        <div class="calc-actions" data-calc-actions></div>
+        <div class="calc-actions" data-calc-actions data-projects-url="/projekty/"></div>
       </div>
     </div>
       <p class="muted src-note"><a href="/materialy/">Katalog materiałów budowlanych</a> — 1 materiałów w katalogu</p>
@@ -306,21 +306,22 @@ rolki = ⌈ pasów potrzeba ÷ pasów z rolki ⌉</code></pre>
   "de": "/de/rechner/tapete/",
   "en": "/en/calculators/wallpaper/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260813f"></script>
-<script src="/assets/i18n-runtime.js?v=20260813f"></script>
-<script src="/assets/currency.js?v=20260813f"></script>
+<script src="/assets/i18n.pl.js?v=20260813g"></script>
+<script src="/assets/i18n-runtime.js?v=20260813g"></script>
+<script src="/assets/currency.js?v=20260813g"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260813f"></script>
+<script src="/assets/account.js?v=20260813g"></script>
 
-<script src="/assets/calculators.js?v=20260813f"></script>
-<script src="/assets/materials.js?v=20260813f"></script>
-<script src="/assets/materials-ui.js?v=20260813f"></script>
-<script src="/assets/workspace.js?v=20260813f"></script>
-<script src="/assets/workspace-ui.js?v=20260813f"></script>
-<script src="/assets/recent.js?v=20260813f"></script>
-<script src="/assets/main.js?v=20260813f"></script>
+<script src="/assets/units.js?v=20260813g"></script>
+<script src="/assets/calculators.js?v=20260813g"></script>
+<script src="/assets/materials.js?v=20260813g"></script>
+<script src="/assets/materials-ui.js?v=20260813g"></script>
+<script src="/assets/workspace.js?v=20260813g"></script>
+<script src="/assets/workspace-ui.js?v=20260813g"></script>
+<script src="/assets/recent.js?v=20260813g"></script>
+<script src="/assets/main.js?v=20260813g"></script>
 
 </body>
 </html>

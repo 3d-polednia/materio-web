@@ -71,18 +71,24 @@ const PICK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" s
  * none (volume of concrete, blocks per m²) the picker button is left out entirely rather
  * than opening an empty dialog.
  */
-export function calcCard(calc, t, { materials = 0, example }) {
+export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) {
+  /* `data-lk` is the field's dictionary key, next to the value the field holds. Saving a
+     result keeps what the visitor typed (chapter XV), and a saved line has to stay
+     readable after a switch to another language — so the line keeps the key and the page
+     showing it translates, instead of freezing "Powierzchnia" into storage. A <select>
+     puts the same on its options: the answer is the word, not the "1". */
   const fields = calc.fields.map((f) => {
     const label = esc(t(f.label));
+    const keys = `data-k="${f.k}" data-lk="${esc(f.label)}"`;
     if (f.sel) {
       const opts = f.sel.map(([v, l, key]) =>
-        `<option value="${esc(v)}"${v === f.def ? " selected" : ""}>${esc(key ? t(key) : l)}</option>`).join("");
-      return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><select id="f-${calc.id}-${f.k}" data-k="${f.k}">${opts}</select></div>`;
+        `<option value="${esc(v)}"${key ? ` data-ok="${esc(key)}"` : ""}${v === f.def ? " selected" : ""}>${esc(key ? t(key) : l)}</option>`).join("");
+      return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><select id="f-${calc.id}-${f.k}" ${keys}>${opts}</select></div>`;
     }
     if (f.ta) {
-      return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><textarea id="f-${calc.id}-${f.k}" rows="3" data-k="${f.k}">${esc(f.def)}</textarea></div>`;
+      return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><textarea id="f-${calc.id}-${f.k}" rows="3" ${keys}>${esc(f.def)}</textarea></div>`;
     }
-    return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><input id="f-${calc.id}-${f.k}" type="text" inputmode="decimal" data-k="${f.k}" value="${esc(f.def)}"></div>`;
+    return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><input id="f-${calc.id}-${f.k}" type="text" inputmode="decimal" ${keys} value="${esc(f.def)}"></div>`;
   }).join("");
 
   const chips = calc.presets
@@ -116,7 +122,7 @@ export function calcCard(calc, t, { materials = 0, example }) {
           <div class="rows">${rows}</div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>${esc(t("calc_stale"))}</p>
-        <div class="calc-actions" data-calc-actions></div>
+        <div class="calc-actions" data-calc-actions${projectsUrl ? ` data-projects-url="${esc(projectsUrl)}"` : ""}></div>
       </div>
     </div>`;
 }
@@ -515,7 +521,7 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0, g
 
   <section class="block alt calc-tool">
     <div class="wrap">
-      ${calcCard(calc, t, { materials, example })}
+      ${calcCard(calc, t, { materials, example, projectsUrl: urlProjects(lang) })}
       ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a> — ${esc(materials)} ${esc(t("mat_count_label"))}</p>` : ""}
     </div>
   </section>

@@ -381,15 +381,50 @@ Wynik jest pełny bez konta. Rozdział II: rejestracja to następny krok, nie br
 **LICZMAT** — cel: uporządkować własną robotę.
 
 ```
-kalkulator ──► WYNIK ──► „Dodaj do projektu” ──► /projekty/ ──► projekt
-                                                                  │
+kalkulator ──► WYNIK ──► „Dodaj do projektu” ──► /projekty/?id=<projectId>
+                   (z wyborem projektu)                           │
                                           /kosztorys/ ──┴──► /app/dashboard/ (HISTORIA)
 ```
+
+Strzałka „Dodaj do projektu” była do Sesji 16 skrótem: wynik wpadał do projektu
+aktywnego, a odwiedzający dowiadywał się o tym słowem „Zapisano”. Teraz projekt się
+**wybiera** (albo zakłada) obok przycisku, a po zapisie jest link **do tego projektu** —
+to jest trzeci człon strzałki z rozdziału XV, wcześniej nieistniejący.
 
 Ostatni krok — „powrót do wcześniejszych obliczeń” — ma od Sesji 14 własną stronę.
 Pulpit jest tym miejscem, w którym widać naraz projekty, ostatnio zapisane kalkulacje
 i kalkulatory, których się używało; wcześniej ten krok był w `FLOWS` samym opisem, bez
 trasy.
+
+### 7.1. Co niesie zapisana kalkulacja (Sesja 16)
+
+Rozdział XV: „Nie zapisuj tylko samej liczby, jeśli później nie będzie wiadomo, skąd się
+wzięła.” Dokument wyceny (`FIRESTORE_SYNC.md` §2) nie ma na to miejsca — `calculationType`
+ma cztery wartości na piętnaście kalkulatorów, więc płytki, zaprawa i wylewka to ta sama
+`SURFACE_COVERAGE`. Dołożenie pola na najwyższym poziomie dokumentu jest wykluczone:
+telefon zbudowałby dokument od nowa z ustalonej mapy i pole zniknęłoby bez słowa — ten sam
+mur, o który rozbija się opis projektu (§8.1c).
+
+Jedyne pole kontraktu, które jest **wolnym tekstem i wraca nietknięte**, to `inputJson`:
+jest kolumną `EstimationEntity`, aplikacja zapisuje w nim własną migawkę i nigdy nie czyta
+cudzej (`SnapshotJson` ma `ignoreUnknownKeys`). Migawka Sesji 16 siedzi więc **w nim**, pod
+kluczem `_lm`, obok płaskiej mapy pól, która była tam wcześniej:
+
+```
+inputJson = { area: "43.2", cov: "1.44", …,          ← to, co było (nadal działa)
+              _lm: { v, calc, at, fields[], unit, tobuy, rows[] } }
+```
+
+**Nic w migawce nie jest tekstem w języku strony.** Pole jedzie jako klucz słownika
+(`fld_area`), wybór z listy jako własny klucz (`opt_yes`), wiersz wyniku jako klucz plus
+token silnika (`|n:21.6| m²`). Dlatego pozycja zapisana po polsku czyta się po niemiecku —
+gdyby zapisać etykiety, zostałaby polska na zawsze. Klucze biorą się z `data-lk` i
+`data-ok`, które build wypisuje przy każdym polu formularza.
+
+Czyta to `wsLineSnapshot()` — obronnie, bo ten string przechodzi przez Firestore i przez
+drugą aplikację: cokolwiek innego niż migawka tego serwisu daje `null`, a wtedy pozycja po
+prostu nie ma sekcji „Skąd ta liczba” (pozycje sprzed Sesji 16 i pozycje wpisane ręcznie na
+`/kosztorys/` nigdy jej nie mają — rozdział XXV zabrania pustego przycisku).
 
 **LICZMAT PRO** — cel: prowadzić pracę.
 

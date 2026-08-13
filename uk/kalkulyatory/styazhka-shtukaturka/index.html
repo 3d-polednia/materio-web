@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/screed-plaster/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/wylewka-tynk/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260813f" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260813g" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Стяжка / штукатурка — Будівельні калькулятори онлайн | LiczMat">
 <meta name="twitter:description" content="Стяжка / штукатурка — безкоштовний онлайн-калькулятор. Площа й товщина → мішки. Та сама формула, що й у застосунку LiczMat для Android, без реєстрації.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260813f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813g">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,7 +177,7 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Твої дані</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-screed-area">Площа (м²)</label><input id="f-screed-area" type="text" inputmode="decimal" data-k="area" value="20"></div><div class="field"><label for="f-screed-thk">Товщина (мм)</label><input id="f-screed-thk" type="text" inputmode="decimal" data-k="thk" value="40"></div><div class="field"><label for="f-screed-rate">Витрата (кг/м²/мм)</label><input id="f-screed-rate" type="text" inputmode="decimal" data-k="rate" value="2"></div><div class="field"><label for="f-screed-bag">Мішок (кг)</label><input id="f-screed-bag" type="text" inputmode="decimal" data-k="bag" value="25"></div><div class="field"><label for="f-screed-price">Ціна за мішок</label><input id="f-screed-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-screed-area">Площа (м²)</label><input id="f-screed-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="20"></div><div class="field"><label for="f-screed-thk">Товщина (мм)</label><input id="f-screed-thk" type="text" inputmode="decimal" data-k="thk" data-lk="fld_thickness" value="40"></div><div class="field"><label for="f-screed-rate">Витрата (кг/м²/мм)</label><input id="f-screed-rate" type="text" inputmode="decimal" data-k="rate" data-lk="fld_kg_m2_mm" value="2"></div><div class="field"><label for="f-screed-bag">Мішок (кг)</label><input id="f-screed-bag" type="text" inputmode="decimal" data-k="bag" data-lk="fld_bag_kg" value="25"></div><div class="field"><label for="f-screed-price">Ціна за мішок</label><input id="f-screed-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bag" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Порахувати"
           data-label-again="Порахувати знову">Порахувати</button>
@@ -190,7 +190,7 @@
           <div class="rows"><div><span>Разом</span><b>1 600 kg</b></div><div><span>Витрата</span><b>80 kg/m²</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Дані змінилися. Натисни «Порахувати знову», щоб побачити новий результат.</p>
-        <div class="calc-actions" data-calc-actions></div>
+        <div class="calc-actions" data-calc-actions data-projects-url="/uk/proekty/"></div>
       </div>
     </div>
       <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a> — 16 матеріалів у каталозі</p>
@@ -304,21 +304,22 @@
   "de": "/de/rechner/estrich-putz/",
   "en": "/en/calculators/screed-plaster/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260813f"></script>
-<script src="/assets/i18n-runtime.js?v=20260813f"></script>
-<script src="/assets/currency.js?v=20260813f"></script>
+<script src="/assets/i18n.uk.js?v=20260813g"></script>
+<script src="/assets/i18n-runtime.js?v=20260813g"></script>
+<script src="/assets/currency.js?v=20260813g"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260813f"></script>
+<script src="/assets/account.js?v=20260813g"></script>
 
-<script src="/assets/calculators.js?v=20260813f"></script>
-<script src="/assets/materials.js?v=20260813f"></script>
-<script src="/assets/materials-ui.js?v=20260813f"></script>
-<script src="/assets/workspace.js?v=20260813f"></script>
-<script src="/assets/workspace-ui.js?v=20260813f"></script>
-<script src="/assets/recent.js?v=20260813f"></script>
-<script src="/assets/main.js?v=20260813f"></script>
+<script src="/assets/units.js?v=20260813g"></script>
+<script src="/assets/calculators.js?v=20260813g"></script>
+<script src="/assets/materials.js?v=20260813g"></script>
+<script src="/assets/materials-ui.js?v=20260813g"></script>
+<script src="/assets/workspace.js?v=20260813g"></script>
+<script src="/assets/workspace-ui.js?v=20260813g"></script>
+<script src="/assets/recent.js?v=20260813g"></script>
+<script src="/assets/main.js?v=20260813g"></script>
 
 </body>
 </html>

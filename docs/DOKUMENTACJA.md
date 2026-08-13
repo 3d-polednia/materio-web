@@ -88,6 +88,8 @@ assets/
   i18n.js                Słownik 4 języków (LANGS, I18N) — wejście builda
   i18n-pages.js          Słownik podstron, te same 4 języki — wejście builda
   i18n-runtime.js        t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/
+  units.js               Odmiana liczebnika i podstawianie |tokenów| — wspólne dla
+                         kalkulatorów, projektów, kosztorysu i pulpitu
   calculators.js         Silniki liczące + podpięcie formularzy (wireCalculator)
   stores.js              Wyszukiwarka sklepów (buildStoreFinder): mapa + lista OSM
   main.js                Wiązanie strony (pomieszczenia, menu mobilne, karuzela, zgoda)

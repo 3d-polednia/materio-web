@@ -238,7 +238,7 @@ head("2. projekty");
     !list.join("\n").includes("Piwnica"));
 
   // The count and the total are the project's own, counted from its lines.
-  check("Łazienka shows its two lines", /2 pozycji/.test(list[0]), list[0]);
+  check("Łazienka shows its two lines, inflected", /2 pozycje/.test(list[0]), list[0]);
   check("and their total", /959,85/.test(list[0]), list[0]);
   eq("the link beside the heading goes to all of them",
     await page.$eval('#dash-projects-h ~ a, .dash-head [data-dash-url="projects"]', (a) => new URL(a.href).pathname),
@@ -337,7 +337,7 @@ head("7. switching language redraws everything JavaScript wrote");
   eq("the headings follow", await text(page, "#dash-tools-h"), "Zuletzt benutzte Werkzeuge");
   eq("so does the level strip", await text(page, "#dash-level"), "Gast");
   const list = await rows(page, "#dash-projects");
-  // A row drawn once and left alone would still say "2 pozycji" here.
+  // A row drawn once and left alone would still say "2 pozycje" here.
   check("and so do the rows the script drew", /2 Zeilen/.test(list[0]), list[0]);
   check("including their dates", /Jul|Juli/.test(list[0]), list[0]);
 

@@ -172,10 +172,34 @@ function buildInPlacePicker() {
   render(lang);
 }
 
+/**
+ * Carry the query string across a language change.
+ *
+ * A query is this page's state, and every language of this page understands it the same
+ * way: on `/projekty/?id=…` it is the project being looked at, and that id was made in
+ * this browser rather than in an address, so it means the same thing in Polish and in
+ * German. The switcher's links are written by the build, which knows the pages and not
+ * the state, so until session 16 switching language while a project was open landed the
+ * visitor on the list of projects instead — with the language changed and the project
+ * gone. The same goes for the redirect below.
+ */
+function langQuery() {
+  return window.location.search + window.location.hash;
+}
+
+function keepQueryOnLangLinks() {
+  const query = langQuery();
+  document.querySelectorAll("a[data-lang][href]").forEach((a) => {
+    if (a.dataset.langBase === undefined) a.dataset.langBase = a.getAttribute("href");
+    a.setAttribute("href", a.dataset.langBase + query);
+  });
+}
+
 function buildLangPicker() {
   if (!window.LICZMAT_ALTERNATES) { buildInPlacePicker(); return; }
 
   wirePicker();
+  keepQueryOnLangLinks();
 
   // A visitor who already picked a language should not have to pick it again after
   // following a bare "/" link. Guarded by a session flag so a missing alternate or a
@@ -189,7 +213,7 @@ function buildLangPicker() {
       redirected = sessionStorage.getItem("materio-redirected") || "";
       sessionStorage.setItem("materio-redirected", "1");
     } catch (e) { redirected = "1"; }
-    if (!redirected) window.location.replace(alternates[wanted] + window.location.hash);
+    if (!redirected) window.location.replace(alternates[wanted] + langQuery());
   }
 }
 

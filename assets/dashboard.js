@@ -34,6 +34,9 @@ const dashT = (key) => (typeof t === "function" ? t(key, dashLang()) : key);
 const dashEsc = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const dashNum = (v) => new Intl.NumberFormat(dashLang(), { maximumFractionDigits: 2 }).format(v);
+/** The counted noun next to a number, inflected — assets/units.js, loaded before this. */
+const dashUnit = (key, n) =>
+  (typeof unitLabel === "function" ? unitLabel(key, n, dashLang(), dashT) : dashT(key));
 
 /** A section's page, in the language showing right now; Polish is the fallback. */
 function dashUrl(key) {
@@ -107,7 +110,7 @@ function dashRenderProjects() {
     return `<li data-id="${dashEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
         <span class="row-name">
           <b>${dashEsc(p.name)}</b>
-          <em class="muted">${total.count} ${dashEsc(dashT("ws_lines"))}${money} · ${dashEsc(dashDate(p.updatedAt))}${mixed}</em>
+          <em class="muted">${total.count} ${dashEsc(dashUnit("ws_lines", total.count))}${money} · ${dashEsc(dashDate(p.updatedAt))}${mixed}</em>
         </span>
         <span class="row-actions">
           ${p.id === active ? `<span class="chip on">${dashEsc(dashT("ws_active"))}</span>` : ""}

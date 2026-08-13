@@ -48,13 +48,19 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260813f";
+const STAMP = "20260813g";
 
 /* ------------------------------------------------------------------ load sources */
 
-/** Evaluate a browser script that has no exports and hand back the globals we need. */
+/**
+ * Evaluate a browser script that has no exports and hand back the globals we need.
+ *
+ * `file` may be a list, in which case they are evaluated as one scope, in order — which is
+ * what the browser does with two classic <script> tags and what assets/calculators.js
+ * needs from assets/units.js.
+ */
 function evalScript(file, returns) {
-  const src = readFileSync(p(file), "utf8");
+  const src = [].concat(file).map((f) => readFileSync(p(f), "utf8")).join("\n");
   return new Function(`${src}\nreturn {${returns.join(",")}};`)();
 }
 
@@ -73,7 +79,8 @@ const LANG_META = LANGS.map((code) => ({
 }));
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
-const { CALCS, ENGINES, localizeRow, unitLabel } = evalScript("assets/calculators.js",
+const { CALCS, ENGINES, localizeRow, unitLabel } = evalScript(
+  ["assets/units.js", "assets/calculators.js"],
   ["CALCS", "ENGINES", "localizeRow", "unitLabel"]);
 const CATALOG = evalScript("assets/materials.js", [
   "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "matName", "matNote", "primaryCalcFor",
@@ -261,12 +268,16 @@ const alternatesFor = (fn) => Object.fromEntries(LANGS.map((l) => [l, fn(l)]));
  * dashboard's "ostatnio używane narzędzia" reads.
  */
 const CALC_SCRIPTS = [
-  "/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js",
+  "/assets/units.js", "/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js",
   "/assets/workspace.js", "/assets/workspace-ui.js", "/assets/recent.js",
 ];
 
-/** The workspace pages need the store and its interface, but no calculation engine. */
-const WS_SCRIPTS = ["/assets/workspace.js", "/assets/workspace-ui.js"];
+/**
+ * The workspace pages need the store and its interface, but no calculation engine — and
+ * since session 16 they print saved results, so they need the words that go next to a
+ * number (assets/units.js), which is the reason that file exists apart from the engines.
+ */
+const WS_SCRIPTS = ["/assets/units.js", "/assets/workspace.js", "/assets/workspace-ui.js"];
 
 /* ------------------------------------------------------------------ worked examples */
 
@@ -534,6 +545,13 @@ function buildWorkspacePages() {
       path: urlProjects(lang),
       alternates: projAlt,
       main: projects.main, jsonld: [projects.ld],
+      // A saved line names the calculator it came from (session 16, chapter XV) and links
+      // back to it. The script draws that line and has no site map, so the build hands it
+      // this page's own language's address for every calculator \u2014 one short map, written
+      // before the script that reads it.
+      headExtra: `<script>window.LM_PROJ = ${JSON.stringify({
+        calcs: Object.fromEntries(CALCS.map((c) => [c.id, urlCalc(lang, c.id)])),
+      })};</script>`,
       scripts: WS_SCRIPTS,
     }));
 
@@ -619,7 +637,9 @@ function buildPrivatePages() {
     headExtra: `<script>window.LM_DASH = ${JSON.stringify(dashData).replace(/</g, "\\u003c")};</script>`,
     // Classic scripts, in this order and not modules: the dashboard reads the workspace
     // and the recents through their globals, which a module's own scope would hide.
-    classicScripts: ["/assets/workspace.js", "/assets/recent.js", "/assets/dashboard.js"],
+    classicScripts: [
+      "/assets/units.js", "/assets/workspace.js", "/assets/recent.js", "/assets/dashboard.js",
+    ],
   }));
 
   write("p/index.html", page({

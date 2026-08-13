@@ -462,7 +462,8 @@ section.block { padding: var(--section-y) 0; }
    (anything smaller makes iOS Safari zoom the page on focus), a border strong
    enough to see against the field, and one focus treatment. */
 .field input, .field select, .search-row input, .inline-form input,
-.mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input {
+.mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input,
+.ws-save-row select, .ws-save-new input {
   width: 100%; font: inherit; font-size: var(--fs-base); line-height: var(--lh-snug);
   min-height: var(--control-h); padding: var(--sp-2) var(--control-px);
   border-radius: var(--radius-xs); border: 1px solid var(--outline-control);
@@ -470,12 +471,14 @@ section.block { padding: var(--section-y) 0; }
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .field input:hover, .field select:hover, .search-row input:hover, .inline-form input:hover,
-.mat-search:hover, .ws-bar-row select:hover, .ws-estimate-bar select:hover {
+.mat-search:hover, .ws-bar-row select:hover, .ws-estimate-bar select:hover,
+.ws-save-row select:hover, .ws-save-new input:hover {
   border-color: var(--on-surface);
 }
 .field input:focus-visible, .field select:focus-visible, .search-row input:focus-visible,
 .inline-form input:focus-visible, .mat-search:focus-visible, .ws-bar-row select:focus-visible,
-.ws-estimate-bar select:focus-visible, .ws-editing input:focus-visible {
+.ws-estimate-bar select:focus-visible, .ws-editing input:focus-visible,
+.ws-save-row select:focus-visible, .ws-save-new input:focus-visible {
   border-color: var(--accent);
 }
 /* A field the browser or the page has marked wrong. Colour is never the only
@@ -1223,6 +1226,14 @@ a.chip:hover { text-decoration: none; }
 .ws-save { margin-top: var(--sp-4); }
 .ws-save-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
 .ws-save-note { font-size: var(--fs-sm); }
+/* Which project the result goes into — chapter XV. The picker sits next to the button
+   it feeds and takes the rest of the line; on a phone it wraps under it. */
+.ws-save-row select { flex: 1 1 12rem; min-width: 0; width: auto; }
+.ws-save-new { margin-top: var(--sp-3); }
+.ws-save-new .ws-bar-label { display: block; margin-bottom: var(--sp-1); }
+/* Said after the result is in a project, with the way to it. */
+.ws-saved { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); }
+.ws-saved a { margin-left: var(--sp-2); }
 /* Chapter XII's line about the account. It sits under the action it explains, quiet
    enough not to compete with the answer above it. */
 .ws-save-account { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); line-height: var(--lh-snug); }
@@ -1284,6 +1295,20 @@ a.chip:hover { text-decoration: none; }
   background: var(--accent-soft); color: var(--on-accent-soft);
   padding: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-5);
 }
+
+/* Where one saved number came from — chapter XV, folded away under the line it belongs
+   to. The row keeps its two columns and the disclosure takes a line of its own; a project
+   with a dozen lines is a list first and a set of workings second. */
+.data-list li.ws-line { flex-wrap: wrap; }
+.ws-src { flex-basis: 100%; font-size: var(--fs-sm); }
+.ws-src summary { cursor: pointer; color: var(--muted); }
+.ws-src dl { display: grid; gap: var(--sp-2); margin: var(--sp-3) 0 0; }
+.ws-src dt {
+  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--track-wide);
+  margin-bottom: 2px;
+}
+.ws-src dd { margin: 0; display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); }
+.ws-src-pair { display: inline-flex; flex-wrap: wrap; gap: var(--sp-1); }
 
 /* The archive is folded away: it is the part of the list that is finished. */
 .ws-archive { margin-top: var(--sp-6); }

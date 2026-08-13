@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/sheet-cutting-2d/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/rozkroj-plyt-2d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260813f" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260813g" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Plattenzuschnitt (2D) — Baurechner online | LiczMat">
 <meta name="twitter:description" content="Plattenzuschnitt (2D) — kostenloser Online-Rechner. Platten, Arbeitsplatten, Sperrholz: Anzahl. Dieselbe Formel wie in der LiczMat-App für Android, ohne Anmeldung.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260813f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813g">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -177,8 +177,8 @@
       <div class="calc-form">
         <h2 id="calc-form-h">Deine Angaben</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-sheet-sheetW">Plattenbreite (mm)</label><input id="f-sheet-sheetW" type="text" inputmode="decimal" data-k="sheetW" value="2800"></div><div class="field"><label for="f-sheet-sheetL">Plattenlänge (mm)</label><input id="f-sheet-sheetL" type="text" inputmode="decimal" data-k="sheetL" value="2070"></div><div class="field"><label for="f-sheet-kerf">Schnittfuge (mm)</label><input id="f-sheet-kerf" type="text" inputmode="decimal" data-k="kerf" value="3"></div><div class="field"><label for="f-sheet-pieces">Teile: B×L×Anzahl (mm)</label><textarea id="f-sheet-pieces" rows="3" data-k="pieces">600x400x6
-800x300x4</textarea></div><div class="field"><label for="f-sheet-rotate">Teile drehen</label><select id="f-sheet-rotate" data-k="rotate"><option value="1" selected>Ja</option><option value="0">Nein</option></select></div><div class="field"><label for="f-sheet-price">Preis je Platte</label><input id="f-sheet-price" type="text" inputmode="decimal" data-k="price" value=""></div>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-sheet-sheetW">Plattenbreite (mm)</label><input id="f-sheet-sheetW" type="text" inputmode="decimal" data-k="sheetW" data-lk="fld_sheet_w" value="2800"></div><div class="field"><label for="f-sheet-sheetL">Plattenlänge (mm)</label><input id="f-sheet-sheetL" type="text" inputmode="decimal" data-k="sheetL" data-lk="fld_sheet_l" value="2070"></div><div class="field"><label for="f-sheet-kerf">Schnittfuge (mm)</label><input id="f-sheet-kerf" type="text" inputmode="decimal" data-k="kerf" data-lk="fld_kerf" value="3"></div><div class="field"><label for="f-sheet-pieces">Teile: B×L×Anzahl (mm)</label><textarea id="f-sheet-pieces" rows="3" data-k="pieces" data-lk="fld_pieces_list">600x400x6
+800x300x4</textarea></div><div class="field"><label for="f-sheet-rotate">Teile drehen</label><select id="f-sheet-rotate" data-k="rotate" data-lk="fld_rotate"><option value="1" data-ok="opt_yes" selected>Ja</option><option value="0" data-ok="opt_no">Nein</option></select></div><div class="field"><label for="f-sheet-price">Preis je Platte</label><input id="f-sheet-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_sheet" value=""></div>
         <button type="button" class="btn btn-primary" data-run
           data-label-run="Berechnen"
           data-label-again="Neu berechnen">Berechnen</button>
@@ -191,7 +191,7 @@
           <div class="rows"><div><span>Teile</span><b>10</b></div><div><span>Genutzt</span><b>2,4 m²</b></div><div><span>Kaufmenge</span><b>5,8 m²</b></div><div><span>Verschnitt</span><b>58,6%</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Die Angaben haben sich geändert. Klicke „Neu berechnen“ für das neue Ergebnis.</p>
-        <div class="calc-actions" data-calc-actions></div>
+        <div class="calc-actions" data-calc-actions data-projects-url="/de/projekte/"></div>
       </div>
     </div>
       <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a> — 34 Materialien im Katalog</p>
@@ -311,21 +311,22 @@ tatsächlicher Verschnitt = (Platten × Plattenbreite × Plattenlänge − Σ Zu
   "de": "/de/rechner/plattenzuschnitt-2d/",
   "en": "/en/calculators/sheet-cutting-2d/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260813f"></script>
-<script src="/assets/i18n-runtime.js?v=20260813f"></script>
-<script src="/assets/currency.js?v=20260813f"></script>
+<script src="/assets/i18n.de.js?v=20260813g"></script>
+<script src="/assets/i18n-runtime.js?v=20260813g"></script>
+<script src="/assets/currency.js?v=20260813g"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260813f"></script>
+<script src="/assets/account.js?v=20260813g"></script>
 
-<script src="/assets/calculators.js?v=20260813f"></script>
-<script src="/assets/materials.js?v=20260813f"></script>
-<script src="/assets/materials-ui.js?v=20260813f"></script>
-<script src="/assets/workspace.js?v=20260813f"></script>
-<script src="/assets/workspace-ui.js?v=20260813f"></script>
-<script src="/assets/recent.js?v=20260813f"></script>
-<script src="/assets/main.js?v=20260813f"></script>
+<script src="/assets/units.js?v=20260813g"></script>
+<script src="/assets/calculators.js?v=20260813g"></script>
+<script src="/assets/materials.js?v=20260813g"></script>
+<script src="/assets/materials-ui.js?v=20260813g"></script>
+<script src="/assets/workspace.js?v=20260813g"></script>
+<script src="/assets/workspace-ui.js?v=20260813g"></script>
+<script src="/assets/recent.js?v=20260813g"></script>
+<script src="/assets/main.js?v=20260813g"></script>
 
 </body>
 </html>

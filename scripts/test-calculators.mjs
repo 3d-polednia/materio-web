@@ -28,9 +28,12 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
-/** Evaluate a browser script that has no exports and hand back the globals we need. */
+/**
+ * Evaluate a browser script that has no exports and hand back the globals we need.
+ * A list of files is evaluated as one scope, in order, exactly as the browser loads them.
+ */
 function evalScript(file, returns, args = {}) {
-  const src = readFileSync(p(file), "utf8");
+  const src = [].concat(file).map((f) => readFileSync(p(f), "utf8")).join("\n");
   const names = Object.keys(args);
   return new Function(...names, `${src}\nreturn {${returns.join(",")}};`)(...names.map((n) => args[n]));
 }
@@ -39,7 +42,7 @@ const { I18N, LANGS } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const {
   CALCS, ENGINES, localizeRow, unitLabel, pluralForm, num, orDefault, parseCuts, parsePieces,
-} = evalScript("assets/calculators.js", [
+} = evalScript(["assets/units.js", "assets/calculators.js"], [
   "CALCS", "ENGINES", "localizeRow", "unitLabel", "pluralForm", "num", "orDefault",
   "parseCuts", "parsePieces",
 ]);

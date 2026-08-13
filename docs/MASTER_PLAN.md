@@ -41,8 +41,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 13 | System konta | **Zrobione** — 2026-08-13 |
 | 14 | Dashboard LiczMat | **Zrobione** — 2026-08-13 |
 | 15 | Projekty (CRUD) | **Zrobione** — 2026-08-13 |
-| 16 | Zapis kalkulacji | **Następna** |
-| 17–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 16 | Zapis kalkulacji | **Zrobione** — 2026-08-13 |
+| 17 | Listy materiałów | **Następna** |
+| 18–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -145,6 +146,98 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 16
+
+Rozdział XV rysuje strzałkę: **KALKULATOR → WYNIK → DODAJ DO PROJEKTU → PROJEKT**, a pod
+nią stawia warunek — zapis ma zachować tyle, żeby użytkownik później zrozumiał, **jaki
+kalkulator** został użyty, **jakie dane wpisał**, **jaki wynik** dostał, **w jakich
+jednostkach** i **kiedy** to policzył. „Nie zapisuj tylko samej liczby, jeśli później nie
+będzie wiadomo, skąd się wzięła.”
+
+Serwis miał pierwszy człon strzałki i połowę drugiego. Przycisk „Dodaj do projektu”
+wrzucał wynik do projektu **aktywnego** — tego, którego odwiedzający nie wybierał w tym
+miejscu i którego nazwy nie widział, dopóki nie poszedł na inną stronę — a zapisana pozycja
+niosła nazwę, liczbę, jednostkę i koszt. Skąd ta liczba, **nie mówiło nic**.
+
+**Migawka siedzi w `inputJson` i nie mogła siedzieć nigdzie indziej.** Dokument wyceny
+(`FIRESTORE_SYNC.md` §2) nie ma pola na kalkulator: `calculationType` ma cztery wartości na
+piętnaście narzędzi, więc płytki, zaprawa, wylewka i jedenaście innych to ta sama
+`SURFACE_COVERAGE`. Dołożenie własnego pola na najwyższym poziomie dokumentu to ten sam mur,
+o który rozbił się opis projektu w Sesji 15 — `SyncContract.estimationToDoc()` buduje
+dokument z ustalonej mapy, więc telefon skasowałby je przy najbliższej synchronizacji **bez
+słowa**. Jedyne pole kontraktu, które jest wolnym tekstem i **wraca nietknięte**, to
+`inputJson`: jest kolumną `EstimationEntity`, aplikacja zapisuje w nim własną migawkę
+(`SnapshotJson`, `ignoreUnknownKeys = true`) i **nigdy nie czyta cudzej** — sprawdzone
+w repo `3d-polednia/Materio`, nie z pamięci. Migawka poszła więc **do środka**, pod klucz
+`_lm`, obok płaskiej mapy pól, która była tam wcześniej i została dokładnie tam, gdzie była.
+
+**W migawce nie ma ani jednego słowa w języku strony.** Pole jedzie jako klucz słownika
+(`fld_area`), wybór z listy jako własny klucz (`opt_yes`), wiersz wyniku jako klucz plus
+token silnika (`|n:21.6| m²`), jednostka jako `res_pkgs`. Dlatego pozycja **zapisana po
+polsku czyta się po niemiecku** — test klika to od początku do końca. Gdyby zapisać
+etykiety, zostałyby polskie na zawsze. Klucze biorą się z nowych `data-lk` i `data-ok`,
+które build wypisuje przy każdym polu formularza; test pilnuje, że ma je **każde pole
+każdego z piętnastu kalkulatorów** i że każdy taki klucz tłumaczy się w czterech językach.
+
+**Projekt się wybiera, a po zapisie jest do niego link.** Obok przycisku stoi lista
+projektów (z pozycją „+ Nowy projekt”, bo pierwszy wynik zwykle wyprzedza pierwszy projekt),
+a po zapisie pasek mówi, do którego projektu pozycja trafiła, i prowadzi **prosto do
+niego** — to jest trzeci człon strzałki z rozdziału XV, którego wcześniej nie było. Jedno
+kliknięcie nadal wystarcza: bez żadnego projektu lista się nie pokazuje, a przycisk zakłada
+pierwszy projekt sam, bo wynik, którego nie da się zapisać przed założeniem czegokolwiek, to
+wynik stracony. Wybór listy jest **tym samym** „projektem aktywnym”, którym posługują się
+kosztorys i pulpit — dwie odpowiedzi na to samo pytanie rozjechałyby się w tydzień.
+Zarchiwizowany projekt nie przyjmuje pozycji ani z listy, ani ze starej zawartości pickera.
+
+**Na ekranie projektu pozycja tłumaczy się sama.** Pod wierszem jest złożona sekcja „Skąd ta
+liczba”: kalkulator (linkiem z powrotem do niego), wpisane dane z etykietami, wynik
+z wierszami, które pokazywał panel, i **moment** obliczenia z godziną. Złożona, bo projekt
+z tuzinem pozycji to najpierw lista, a dopiero potem rachunki. Pozycja sprzed tej sesji
+i pozycja wpisana ręcznie na `/kosztorys/` **nie dostają sekcji w ogóle** — pusta „skąd”
+jest gorsza niż żadna, a rozdział XXV zabrania przycisku, za którym nic nie ma.
+
+**`assets/units.js` — nowy plik, 2 kB, i powód, dla którego trzy strony kłamały.** Odmiana
+liczebnika istniała od Sesji 9, ale mieszkała w pliku silników; `/projekty/`, `/kosztorys/`
+i pulpit go nie ładują (25 kB arytmetyki, żeby wypisać jedno słowo), więc mówiły
+**„1 pozycji”** — to była otwarta decyzja z Sesji 15, przypisana do sesji 16–19. Sesja 16
+i tak musiała wypisać na `/projekty/` „15 opak.” z zapisanego klucza, więc odmiana
+i podstawianie `|tokenów|` wyszły do wspólnego pliku, a trzy strony dostały to samo
+zdanie co kalkulator: 1 pozycja / 2 pozycje / 5 pozycji, w czterech językach.
+
+**Znaleziony i naprawiony błąd zastany: przełączenie języka gubiło otwarty projekt.**
+Linki językowe pisze build, który zna strony, ale nie zna stanu — a od Sesji 15 stanem jest
+`?id=<projectId>` w adresie. Przełączenie języka na otwartym projekcie zabierało więc na
+**listę** projektów, z projektem gubionym po drodze; to samo robiło automatyczne
+przekierowanie na wybrany wcześniej język. Teraz link językowy i przekierowanie niosą
+`location.search` — identyfikator powstał w tej przeglądarce, więc znaczy to samo w każdym
+języku. Znalazł to test tej sesji, przy próbie przeczytania polskiej pozycji po niemiecku.
+
+**Limit 20 000 znaków na `inputJson` przestał być cichy.** Kod obcinał ten string
+`slice(0, 20000)`, czyli w najgorszym razie zostawiał **JSON, którego nic nie sparsuje**.
+Migawka powiększyła plik, więc limit zaczął mieć znaczenie: teraz przy przekroczeniu
+odpada **najpierw migawka** (dane wpisane przez człowieka są ważniejsze), a to, co zostaje,
+zawsze parsuje się jako JSON. Dotyczy dwóch kalkulatorów rozkroju, gdzie lista elementów
+jest wolnym tekstem — tysiąc pozycji to lista rzadka, ale prawdziwa.
+
+- Sprawdzone: **596 testów logiki + 70 testów w Chromium — 666/666 przechodzi**, a
+  wcześniejsze 1117 + 111 + 180 + 415 + 331 + 121 + 90 + 177 nadal przechodzą (razem
+  **3208**). Dwa nowe pliki: `scripts/test-save.mjs` (bez zależności)
+  i `scripts/test-save-page.mjs`. Ten drugi **niczego nie podstawia** — ani kalkulator, ani
+  `/projekty/` nie dotykają sieci — więc otwiera prawdziwą stronę, klika to, co klika
+  odwiedzający, i czyta jedno i drugie: co narysowano i co wróciło do magazynu. W tym:
+  jedno kliknięcie w przeglądarce bez niczego, wybór projektu i założenie nowego z listy,
+  druga kalkulacja unieważniająca poprzedni komunikat „zapisano”, pozycja zapisana po
+  polsku i przeczytana po niemiecku po przełączeniu języka **przyciskiem**, szerokości
+  z rozdziału XXVIII (320 / 375 / 390 / 430 / 768 / 1280 px) z rozwiniętą sekcją „skąd ta
+  liczba” i wariant z wyłączonym JavaScriptem, w którym przycisku zapisu **nie ma**, bo
+  magazyn pisze skrypt.
+- Kontrast: bez nowej pary — sekcja „skąd ta liczba” wydaje wyłącznie tokeny, które już
+  przechodziły. `scripts/check-contrast.mjs`: wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — z `assets/calculators.js` **wyszła** odmiana
+liczebnika i podstawianie tokenów (do `assets/units.js`, bez zmiany treści), silniki bez
+zmian, a `scripts/test-calculators.mjs` przechodzi 1117/1117 tak jak przedtem.
 
 ### Co zrobiła Sesja 15
 
@@ -949,15 +1042,11 @@ decyzja właściciela**, czy zlecić to jako etap w tamtym repo.
 Do tego czasu strona projektu pokazuje to, co dokument naprawdę niesie: nazwę, stan
 (w archiwum czy nie) i dwa stemple czasu jako „historię”.
 
-### Odmiana liczebnika przy „pozycji” — znalezione w Sesji 15
+### ~~Odmiana liczebnika przy „pozycji”~~ — naprawione w Sesji 16
 
-Wiersz projektu mówi **„1 pozycji”** zamiast „1 pozycja”. Klucz `ws_lines` trzyma jedną
-formę — tę dla 5 i więcej — i tak było od początku: to samo zdanie stoi już na pulpicie
-(Sesja 14) i na `/kosztorys/`. Mechanizm odmiany istnieje (`unitLabel()` w
-`assets/calculators.js`, Sesje 9–11), ale mieszka w pliku silników, którego `/projekty/`,
-`/kosztorys/` ani pulpit nie ładują — więc naprawa oznacza wyjęcie go do wspólnego miejsca
-i przejście przez trzy strony naraz. Sesja 15 tego nie ruszała (rozdział XXXV: jedno
-zadanie na sesję). **Do wpisania w którąś z sesji 16–19**, które i tak dotykają tych stron.
+Było: wiersz projektu mówił „1 pozycji”, bo `unitLabel()` mieszkał w pliku silników,
+którego `/projekty/`, `/kosztorys/` ani pulpit nie ładują. Sesja 16 wyjęła odmianę do
+`assets/units.js` i wszystkie trzy strony dostały tę samą formę co kalkulator.
 
 ### Ten sam błąd zaokrąglenia w aplikacji Android — znalezione w Sesji 12
 
