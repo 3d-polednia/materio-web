@@ -738,7 +738,24 @@ Serwis został naprawiony, telefon nie. Zrównanie wymaga zmiany w repo
 i osobnego wydania. **Poza zakresem prac nad webem** (rozdział VII) — **potrzebna decyzja
 właściciela**, czy zlecić to jako etap w tamtym repo.
 
-### Reguły Firestore — zestaw gotowy, brakuje przełączenia release'u
+### ~~Reguły Firestore~~ — wdrożone przez właściciela 2026-08-13, usuwanie konta działa
+
+Poniższy opis zostaje, bo tłumaczy, dlaczego kod kasuje profil jako pierwszy — i tak ma
+zostać.
+
+### Aplikacja 1.10.1 na produkcji (2026-08-13)
+
+Zbudowana i wysłana na kanał produkcyjny przez Play Developer API kontem `pracownik@`;
+odczytane po zatwierdzeniu: release `1.10.1`, versionCode `11001`, status `completed`,
+notatki w dziesięciu językach. Czeka na weryfikację Google. Zawiera poprawkę logowania
+Google (`GetSignInWithGoogleOption` zamiast podpowiedzi one-tap, plus pokazywanie
+prawdziwego powodu awarii) i tę samą co web zmianę kolejności przy usuwaniu konta.
+Pełny opis: `docs/RELEASE_NOTES_1.10.1.md` w repo aplikacji.
+
+**Nie sprawdzone na urządzeniu** — kontener nie ma telefonu. Jeżeli logowanie nadal padnie,
+ekran poda teraz typ wyjątku i to jest następny krok, a nie kolejne zgadywanie.
+
+### Historia: reguły Firestore nie były wdrożone
 
 Zmierzone 2026-08-13 na żywym projekcie: usunięcie `users/{uid}` wraca z 403, choć plik
 reguł w repo aplikacji dopuszcza je od 2026-08-08. Wdrożony release wskazuje ruleset

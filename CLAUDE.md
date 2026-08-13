@@ -225,20 +225,15 @@ Kotlin side of it. Change one, change all three.
   out of the committed `app/google-services.json`. **Nobody has clicked the button against
   the live backend yet** — Chromium here cannot reach `gstatic.com`, so test it in a real
   browser.
-- **Account deletion needs the rules release switched — the ruleset is ready, not yet live.**
-  `config/firebase/firestore.rules` in the app repo says `allow delete: if isOwner(uid)`,
-  but the *deployed* release still answers `403 PERMISSION_DENIED` for a delete of
-  `users/{uid}` (probed live with a throwaway account: project documents delete fine, the
-  profile document does not). Until `firebase deploy --only firestore` has run in the app
-  repo, deleting an account cannot finish. A corrected ruleset **has been created and
-  validated** through the Rules API —
-  `projects/materio-502513/rulesets/daf56186-2298-4cb7-96ba-d41580e301a6`, one line
-  different from the live one — but pointing the `cloud.firestore` release at it is still
-  outstanding. `deleteEverything()` therefore deletes the profile document **first**: it is
-  the one delete that gets refused, and attempting it last destroyed every project before
-  finding out. A refusal leaves the account untouched and says so
-  (`app_err_delete_denied`). Nothing in this repo changes when the release is switched —
-  `scripts/test-account-page.mjs` already covers both states.
+- **Account deletion works (rules deployed 2026-08-13 by the owner).** Kept here because the
+  history explains the code: for six days the deployed release said `allow delete: if false`
+  while the rules file in the app repo said `isOwner(uid)`.
+  Probed live with a throwaway account: project documents deleted fine, the profile
+  document came back `403 PERMISSION_DENIED`, so the account page destroyed everything and
+  then failed. `deleteEverything()` therefore deletes the profile document **first** — it
+  is the one delete that has ever been refused, so a refusal now costs nothing and says so
+  (`app_err_delete_denied`). Keep that order. `scripts/test-account-page.mjs` covers both
+  states, so the test still passes now that the rules allow the delete.
 - **Google sign-in on the web works (2026-08-13).** It was broken by the browser API key's
   referrer restriction: `signInWithPopup` runs its handler on
   `materio-502513.firebaseapp.com/__/auth/handler`, which was not on the key's allowed
