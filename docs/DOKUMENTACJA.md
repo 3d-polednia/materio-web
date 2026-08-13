@@ -22,6 +22,7 @@ sklepów, SEO oraz zarządzanie assetami.
 5. [Własna domena i zmiana adresu bazowego](#5-własna-domena-i-zmiana-adresu-bazowego)
 6. [Treści i tłumaczenia (i18n)](#6-treści-i-tłumaczenia-i18n)
 7. [Kalkulatory](#7-kalkulatory)
+   - [7a. Testy kalkulatorów](#7a-testy-kalkulatorów)
 8. [Wyszukiwarka sklepów](#8-wyszukiwarka-sklepów)
 9. [SEO](#9-seo)
 10. [System projektowy (CSS)](#10-system-projektowy-css)
@@ -241,6 +242,43 @@ zmianie waluty stara wycena nadal mówi prawdę; gdy pozycje mają różne walut
 
 Dodanie nowego kalkulatora wymaga edycji `calculators.js` (definicja pól + wzór +
 render) — to najbardziej „aplikacyjna" część strony.
+
+## 7a. Testy kalkulatorów
+
+Dwa skrypty, uruchamiane ręcznie — w repozytorium nie ma CI, które by je odpalało.
+
+```bash
+node scripts/test-calculators.mjs   # matematyka, dane wejściowe, jednostki, wyniki,
+                                    # wartości graniczne, lokalizacja, waluta
+LM_PLAYWRIGHT=/tmp/lm-test/node_modules/playwright \
+  node scripts/test-pages.mjs       # te same kalkulatory w Chromium
+```
+
+- **`scripts/test-calculators.mjs`** nie wymaga niczego poza `node` — czyta
+  `assets/calculators.js`, `assets/currency.js` i słowniki tą samą sztuczką
+  (`new Function`), co `scripts/build.mjs`. Liczby oczekiwane są **wyprowadzone ręcznie
+  ze wzoru**, który dany silnik dokumentuje, a nie odczytane z poprzedniego uruchomienia.
+  Dwa silniki są heurystykami, nie wzorami (pakowanie 1D i gilotynowe 2D) — tam ręcznie
+  wyprowadzone jest tylko to, co ma jedną możliwą odpowiedź (dokładne kafelkowanie,
+  element większy od arkusza); reszta jest zapisana jako punkt odniesienia i mówi o tym
+  wprost w komentarzu.
+- **`scripts/test-pages.mjs`** podnosi statyczny serwer na katalogu repozytorium
+  (to samo, co robi GitHub Pages) i przechodzi po stronach w Chromium. Jedyna zależność
+  zewnętrzna — Playwright — **leży poza repozytorium**, bo serwis nie ma i nie ma mieć
+  `package.json` ani `node_modules`. Bez Playwrighta skrypt mówi, że go pomija, i kończy
+  się kodem 0, żeby brak przeglądarki nie blokował testów czystej logiki.
+- Oba kończą się kodem 1 przy pierwszej awarii i wypisują, co i dlaczego nie przeszło.
+
+**Kiedy uruchamiać:** po każdej zmianie w `assets/calculators.js`, po dodaniu lub zmianie
+klucza `res_*` / `err_*` / `fld_*` w słowniku i po zmianie w `assets/currency.js`.
+
+**Uwaga o zaokrągleniach.** Silniki liczą opakowania przez `⌈⌉` i profile przez `⌊⌋`, a
+binarny float potrafi położyć dokładny wynik ułamek poniżej albo powyżej całkowitej —
+`21.6 / 1.44` to `15.000000000000002`, a `2.4 / 0.4` to `5.999999999999999`. Dlatego
+`ceil` i `floor` w `assets/calculators.js` przechodzą przez `snap()`, który przyciąga
+wartość leżącą bliżej niż jedna miliardowa część od liczby całkowitej. Nie wolno wrócić do
+gołych `Math.ceil` / `Math.floor` — sekcja „wartości graniczne" w teście pilnuje tego
+dziesięcioma przypadkami.
 
 ## 8. Wyszukiwarka sklepów
 

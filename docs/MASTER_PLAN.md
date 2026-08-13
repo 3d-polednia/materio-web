@@ -37,8 +37,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 9 | Kalkulatory grupa 1 (Płytki i wykończenie) | **Zrobione** — 2026-08-12 |
 | 10 | Kalkulatory grupa 2 (Malowanie + Budowa) | **Zrobione** — 2026-08-12 |
 | 11 | Kalkulatory grupa 3 (Rozkrój + Zabudowa G-K) | **Zrobione** — 2026-08-12 |
-| 12 | Test kalkulatorów | **Następna** |
-| 13–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 12 | Test kalkulatorów | **Zrobione** — 2026-08-13 |
+| 13 | System konta | **Następna** |
+| 14–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -69,6 +70,80 @@ w repo `3d-polednia/Materio`. W skrócie, po stronie serwisu:
 Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystkich
 dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)
 został zaktualizowany na żywo. Matematyka kalkulatorów nietknięta.
+
+### Co zrobiła Sesja 12
+
+Rozdział XXXII wymienia osiem rzeczy do przetestowania: matematykę, dane wejściowe,
+jednostki, wyniki, wartości graniczne, mobile, lokalizację i waluty w częściach
+finansowych. Do tej sesji serwis nie miał żadnych testów — `CLAUDE.md` mówił wprost
+„there is no test suite". Teraz ma dwa skrypty, oba zatwierdzone w repozytorium, i oba
+znajdują się na liście plików.
+
+- **`scripts/test-calculators.mjs` — 1117 sprawdzeń, wszystkie przechodzą.** Czysta
+  logika, zero zależności, uruchamia się samym `node` tak jak build. Siedem sekcji
+  odpowiada siedmiu punktom rozdziału XXXII, które da się sprawdzić bez przeglądarki.
+  Liczby oczekiwane są **wyprowadzone ręcznie ze wzoru**, który dany silnik dokumentuje —
+  nie odczytane z poprzedniego uruchomienia, bo wtedy test potwierdzałby błąd zamiast go
+  znaleźć. Dwa silniki są heurystykami, nie wzorami (pakowanie 1D i gilotynowe 2D); tam
+  ręcznie wyprowadzone jest tylko to, co ma jedną możliwą odpowiedź — dokładne
+  kafelkowanie, element większy od arkusza, obrót decydujący o zmieszczeniu się — a
+  reszta jest zapisana jako punkt odniesienia i mówi o tym w komentarzu.
+- **`scripts/test-pages.mjs` — 331 sprawdzeń, wszystkie przechodzą.** Te same kalkulatory
+  w Chromium: 15 stron × 360 / 414 / 768 / 1280 px bez przewijania w bok i bez błędu
+  w konsoli, panel wyniku, przycisk „Oblicz ponownie", ostrzeżenie „dane się zmieniły",
+  Enter w polu, komunikat błędu po wpisaniu 0, cztery języki, przełącznik waluty i wariant
+  z wyłączonym JavaScriptem. Jedyna zależność — Playwright — **leży poza repozytorium**,
+  bo serwis nie ma `package.json` ani `node_modules` i mieć nie będzie. Bez Playwrighta
+  skrypt mówi, że go pomija, i kończy się kodem 0.
+
+**Znaleziony i naprawiony błąd: zaokrąglenie zmiennoprzecinkowe sprzedawało zbędne
+opakowanie i gubiło profil.** To jedyna zmiana w logice, jaką ta sesja wprowadziła.
+
+- Silniki liczą opakowania przez `⌈⌉`, a profile przez `⌊⌋ + 1`. Binarny float nie
+  potrafi zapisać ani 0,4, ani 1,44, więc dzielenie, które **matematycznie wypada
+  równo**, wypada obok: `21.6 / 1.44` to `15.000000000000002`, a `2.4 / 0.4` to
+  `5.999999999999999`.
+- Skutek dla odwiedzającego: podłoga **21,6 m²** przy paczce **1,44 m²** (domyślny gres
+  60×60 z presetu) to dokładnie 15 paczek, a kalkulator kazał kupić **16**. W drugą
+  stronę sufit **2,4 m** przy rozstawie **0,4 m** ma 7 profili CD, a kalkulator liczył
+  **6** — czyli lista zakupów była o jeden profil za krótka. To nie są wartości
+  egzotyczne: 2,4 m, 4,8 m i 1,2 m to zwykłe wymiary pomieszczeń, a 0,4 m to domyślny
+  rozstaw na formularzu.
+- Naprawa to `snap()` w `assets/calculators.js`: wartość leżąca bliżej niż jedna
+  miliardowa **względem** liczby całkowitej jest do niej przyciągana, zanim zaokrąglenie
+  podejmie decyzję. Tolerancja jest względna i **wyklucza zero** — kawałek metra
+  kwadratowego nadal wymaga całego opakowania. Prawdziwa reszta jest miliony razy większa
+  i dalej idzie w górę: 21,61 m² to nadal 16 paczek, a 1,21 m przy 0,4 m to nadal
+  4 profile. Test pilnuje obu stron dziesięcioma przypadkami granicznymi.
+- **Żadna z 130 stron nie zmieniła treści po tej naprawie** — wartości, z jakimi otwiera
+  się każdy formularz, akurat w tę pułapkę nie wpadały. Błąd dotykał wyłącznie liczb
+  wpisanych przez odwiedzającego, czyli był niewidoczny dla każdego sprawdzenia, jakie
+  robiły poprzednie sesje.
+- **Aplikacja Android dzieli tak samo i ma ten sam błąd.** `core/calculation/**` to
+  oryginał, z którego przeniesiono te silniki. Poprawka jest po stronie repo
+  `3d-polednia/Materio` i **nie należy do zakresu prac nad webem** (rozdział VII) — patrz
+  otwarte decyzje.
+
+Co jeszcze test potwierdził, a co wcześniej nikt nie sprawdzał:
+
+- **Pusty formularz ≠ wpisane zero.** Wszystkie 15 kalkulatorów: puste pole bierze
+  wartość domyślną, wpisane `0` zostaje zerem — a tam, gdzie zero nie ma sensu (worek
+  0 kg, 0 warstw), silnik odmawia zamiast po cichu podstawić 25 kg albo 1 warstwę.
+- **Każdy kalkulator odmawia** pustego formularza, samych liter i ujemnej ceny — 45
+  sprawdzeń, po trzy na kalkulator.
+- **Jednostka zgadza się z tym, co policzono** — kafelki w opakowaniach, zaprawa
+  w workach, płyty G-K w płytach; 15 sprawdzeń plus istnienie każdego klucza jednostki
+  we wszystkich czterech językach.
+- **Odmiana liczebnika działa poprawnie**: 1 worek / 2 worki / 64 worków po polsku
+  i ukraińsku, dwie formy po niemiecku i angielsku, a skrót („opak.", „szt.") nie odmienia
+  się nigdy. Przy okazji: **21 to „worków", nie „worki"** — pierwsza wersja testu miała tu
+  złe oczekiwanie, silnik był od początku poprawny.
+- **Żaden wiersz wyniku nie zostawia nieprzetłumaczonego `|klucza|`** w żadnym z czterech
+  języków — 15 kalkulatorów × 4 języki × każdy wiersz.
+- **Separator dziesiętny idzie za językiem, waluta za wyborem odwiedzającego.**
+  Przełączenie PLN → EUR → USD → UAH zmienia wyłącznie symbol: liczba paczek, metry
+  kwadratowe i kilogramy stoją w miejscu, a kwota 749,85 zostaje kwotą 749,85. Nic nie
+  jest przeliczane po kursie, zgodnie z rozdziałem VI.
 
 ### Co zrobiły Sesje 10 i 11
 
@@ -479,6 +554,25 @@ komentarz nagłówka.
 ## Otwarte decyzje
 
 Rozstrzygnąć, zanim dotknie ich któraś z kolejnych sesji.
+
+### Ten sam błąd zaokrąglenia w aplikacji Android — znalezione w Sesji 12
+
+Silniki w `assets/calculators.js` są przeniesione 1:1 z `core/calculation/**`, a błąd
+opisany wyżej siedzi w samym dzieleniu, nie w porcie: `ceil(21.6 / 1.44)` daje 16 zamiast
+15 w każdym języku z binarnym floatem, więc **aplikacja liczy dziś to samo błędnie**.
+Serwis został naprawiony, telefon nie. Zrównanie wymaga zmiany w repo
+`3d-polednia/Materio` (odpowiednik `snap()` przy każdym `ceil`/`floor` w silnikach)
+i osobnego wydania. **Poza zakresem prac nad webem** (rozdział VII) — **potrzebna decyzja
+właściciela**, czy zlecić to jako etap w tamtym repo.
+
+### `DOKUMENTACJA.md` §7 opisuje kalkulatory sprzed Sesji 7 — znalezione w Sesji 12
+
+Sekcja „7. Kalkulatory" mówi o `buildCalculators()` renderującym karty do `#calc-grid`,
+o zakładkach `.calc-tab` i o `buildRoomHelper()`. Nic z tego nie jest już prawdą: strony
+kalkulatorów są generowane przez build, kategorie zastąpiły zakładki (Sesja 7), a układ
+karty zmieniła Sesja 8. Sesja 12 dopisała obok **§7a o testach**, ale samego §7 nie
+przepisywała — to nie jest test, tylko osobna robota dokumentacyjna. Do zrobienia
+w sesji, która i tak dotknie tej sekcji.
 
 ### Zostawione grupom 2 i 3 (Sesje 10–11) — znalezione w Sesji 9
 

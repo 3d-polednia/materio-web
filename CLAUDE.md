@@ -79,8 +79,9 @@ its own URL, so search engines can index more than the Polish front page. Writin
 hand is not possible; a generator writes it from one template plus the dictionary.
 
 ```bash
-node scripts/build.mjs           # regenerate every page + sitemap.xml
+node scripts/build.mjs            # regenerate every page + sitemap.xml
 node scripts/build.mjs --check    # validate dictionaries/slugs only, write nothing
+node scripts/test-calculators.mjs # the calculator maths, units and localization
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -130,6 +131,14 @@ src/tokens.mjs        validateTokens(): the design system, checked. The two them
                       a duration. Runs inside the build. Narrative: docs/DESIGN_SYSTEM.md
 scripts/check-contrast.mjs  Every text/background token pair, both themes, against
                       WCAG AA. Not part of the build — run it after touching a colour
+scripts/test-calculators.mjs  The 15 engines: the maths against the formula each one
+                      documents, the inputs, the units, the boundary values, the four
+                      languages and the currency. Dependency-free — run it after
+                      touching assets/calculators.js or a res_* key
+scripts/test-pages.mjs  The same calculators in Chromium: 360/414/768/1280 px, the
+                      form, the result panel, the currency selector, the no-JavaScript
+                      variant. Needs Playwright installed OUTSIDE the repo — see the
+                      header of the file
 src/app-pages.mjs     /app/ and /p/ (noindex, translated in the browser)
 assets/styles.css     The design system: one token block, then the components that
                       spend it. Never write a literal colour/radius/duration below it
@@ -159,7 +168,11 @@ docs/ARCHITEKTURA.md  Information architecture: pages, routing, navigation, the
 docs/DOKUMENTACJA.md  Full project documentation
 ```
 
-There is no test suite; verify changes by running the build and loading the page.
+**Run `node scripts/test-calculators.mjs` after touching a calculator.** It needs nothing
+installed, it is the only check that reads the engines' arithmetic, and it is what caught
+the floating-point rounding that sold a sixteenth box of tiles for a floor that takes
+fifteen. `scripts/test-pages.mjs` covers the same calculators in a real browser and needs
+Playwright installed outside the repo; it skips itself, exit 0, when that is absent.
 
 ## The account layer (/app/ and /p/)
 

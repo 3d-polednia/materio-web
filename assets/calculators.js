@@ -2,7 +2,29 @@
    (core/calculation/**) and the UI that renders them. Pure math, runs entirely
    in the browser — nothing is sent anywhere, exactly like the offline app. */
 
-const ceil = Math.ceil, floor = Math.floor;
+/**
+ * ⌈x⌉ and ⌊x⌋ that do not count a floating-point crumb as a whole extra package.
+ *
+ * 21,6 m² of floor at 1,44 m² per pack is exactly fifteen packs, but 21.6 / 1.44 comes
+ * out of binary floating point as 15.000000000000002, so Math.ceil sold a sixteenth box.
+ * The same error the other way loses a profile: 2,4 m ÷ 0,4 m is 5.999999999999999, so
+ * Math.floor(…) + 1 gave a 2,4 m ceiling six CD runs instead of seven. Both are ordinary
+ * room dimensions off the default forms, not exotic input.
+ *
+ * `snap` pulls a value lying within one part in 10⁹ of a whole number onto it before the
+ * rounding decides. Nothing physical lives in that gap — needing 15,000000000000002
+ * packs means fifteen packs — while a real remainder is millions of times larger and
+ * still rounds up: 21,61 m² is sixteen packs here, exactly as before.
+ *
+ * The tolerance is relative and zero is excluded from it on purpose: a sliver of a square
+ * metre still needs a whole package, so a positive quantity must never be snapped down to
+ * nothing.
+ */
+const snap = (x) => {
+  const r = Math.round(x);
+  return r !== 0 && Math.abs(x - r) <= 1e-9 * Math.abs(r) ? r : x;
+};
+const ceil = (x) => Math.ceil(snap(x)), floor = (x) => Math.floor(snap(x));
 const num = (v) => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
 const profilesAcross = (span, spacing) => floor(span / spacing) + 1;
 /**
