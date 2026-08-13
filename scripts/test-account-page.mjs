@@ -174,13 +174,30 @@ export function updateProfile(user, fields) {
   emit();
   return Promise.resolve();
 }
-export function updatePassword() { log("updatePassword"); return Promise.resolve(); }
+export function updatePassword(user, password) {
+  log("updatePassword", password);
+  // Measured against the live backend: WEAK_PASSWORD below six characters.
+  if (String(password).length < 6) {
+    return Promise.reject(Object.assign(new Error("x"), { code: "auth/weak-password" }));
+  }
+  S.accounts[user.email].password = password;
+  return Promise.resolve();
+}
 export function verifyBeforeUpdateEmail() { log("updateEmail"); return Promise.resolve(); }
 export function deleteUser() { log("deleteUser"); setUser(null); return Promise.resolve(); }
-export function reauthenticateWithCredential() { return Promise.resolve(); }
+export function reauthenticateWithCredential(user, credential) {
+  log("reauth", credential.password);
+  // Measured against the live backend: signInWithPassword with the wrong password is
+  // INVALID_LOGIN_CREDENTIALS, which the SDK surfaces as auth/invalid-credential.
+  const account = S.accounts[user.email];
+  if (!account || account.password !== credential.password) {
+    return Promise.reject(Object.assign(new Error("x"), { code: "auth/invalid-credential" }));
+  }
+  return Promise.resolve();
+}
 export function reauthenticateWithPopup() { return Promise.resolve(); }
 export class GoogleAuthProvider {}
-export const EmailAuthProvider = { credential: () => ({}) };
+export const EmailAuthProvider = { credential: (email, password) => ({ email, password }) };
 export function signInWithPopup() {
   log("googlePopup");
   const user = {
@@ -212,7 +229,18 @@ export function updateDoc(ref, data) {
   DOCS.set(ref.path, { ...(DOCS.get(ref.path) || {}), ...data });
   return Promise.resolve();
 }
-export function deleteDoc(ref) { DOCS.delete(ref.path); return Promise.resolve(); }
+export function deleteDoc(ref) {
+  // The deployed rules still refuse a delete on users/{uid} (allow delete: if false) — measured
+  // on 2026-08-13 against the live project, see MASTER_PLAN.md. window.__fbNoProfileDelete
+  // turns that on, so the test can show both what a visitor meets today and what they
+  // will meet once the rules in the app repo have actually been deployed.
+  const isProfile = ref.path.indexOf("users/") === 0 && ref.path.split("/").length === 2;
+  if (window.__fbNoProfileDelete && isProfile) {
+    return Promise.reject(Object.assign(new Error("x"), { code: "permission-denied" }));
+  }
+  DOCS.delete(ref.path);
+  return Promise.resolve();
+}
 export function getDocs(ref) {
   const rows = [];
   DOCS.forEach((value, path) => {
@@ -221,7 +249,10 @@ export function getDocs(ref) {
   });
   return Promise.resolve({ docs: rows, forEach: (fn) => rows.forEach(fn) });
 }
-export function onSnapshot(ref, onNext) {
+export function onSnapshot(ref, onNext, onError) {
+  // Firestore pushes a permission-denied error into every live listener when the user
+  // signs out or is deleted. window.__fbListeners lets the test fire that.
+  (window.__fbListeners = window.__fbListeners || []).push(onError);
   const rows = [];
   DOCS.forEach((value, path) => {
     const at = path.lastIndexOf("/");
@@ -301,16 +332,16 @@ async function openApp(ctx, url, opts = {}) {
     Object.entries(storage).forEach(([k, v]) => localStorage.setItem(k, v));
   }, [opts.accounts || {}, opts.docs || {}, opts.storage || {}]);
   await page.goto(base + url, { waitUntil: "domcontentloaded" });
-  // The fake Firestore is created when the page imports it; seed it right after.
-  await page.evaluate(() => {
-    const wait = () => new Promise((r) => setTimeout(r, 0));
-    return (async () => {
-      for (let i = 0; i < 50 && !window.__fbDocs; i++) await wait();
-      if (window.__fbDocs) {
-        Object.entries(window.__fbSeed || {}).forEach(([k, v]) => window.__fbDocs.set(k, v));
-      }
-    })();
-  });
+  // /app/ boots asynchronously — it imports the SDK, then wires the forms — and sets
+  // data-app-ready when it is done. Clicking before that clicks a button nothing is
+  // listening to, so every test would race the import.
+  if (url.startsWith("/app/")) {
+    await page.waitForSelector("html[data-app-ready]", { state: "attached", timeout: 10000 });
+    // The fake Firestore exists by then; seed it before anything asks for a document.
+    await page.evaluate(() => {
+      Object.entries(window.__fbSeed || {}).forEach(([k, v]) => window.__fbDocs.set(k, v));
+    });
+  }
   page.lmErrors = errors;
   return page;
 }
@@ -693,6 +724,144 @@ head("12. the account page on a phone");
     await page.close();
     await ctx.close();
   }
+}
+
+/* --- 12b. the account tab: the password, and deleting the account -------------------- */
+
+/** Sign in with the standing test account and open one tab. */
+async function openTab(ctx, tab, opts = {}) {
+  const page = await openApp(ctx, "/app/", { accounts: structuredClone(ACCOUNT), ...opts });
+  await page.fill("#signin-email", "kto@example.com");
+  await page.fill("#signin-password", "sekret123");
+  await page.click("#signin-form button[type=submit]");
+  await signedIn(page);
+  await page.click(`[data-tab="${tab}"]`);
+  return page;
+}
+
+head("12b. changing the password");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+
+  const wrong = await openTab(ctx, "account");
+  await wrong.fill("#password-current", "nie-to-haslo");
+  await wrong.fill("#password-new", "nowe123456");
+  await wrong.click("#password-form button[type=submit]");
+  await wrong.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
+  eq("the current password has to be right",
+    await wrong.locator("#app-status").innerText(), "Zły e-mail lub hasło.");
+  await wrong.close();
+
+  const page = await openTab(ctx, "account");
+  await page.fill("#password-current", "sekret123");
+  await page.fill("#password-new", "nowe123456");
+  await page.click("#password-form button[type=submit]");
+  await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
+  eq("the right one changes it", await page.locator("#app-status").innerText(), "Hasło zmienione.");
+  const calls = await page.evaluate(() => window.__fbCalls);
+  eq("reauthentication happens first", calls.filter((c) => c[0] === "reauth").pop()[1], "sekret123");
+  eq("and the new password is the one sent",
+    calls.filter((c) => c[0] === "updatePassword").pop()[1], "nowe123456");
+  eq("neither field is left holding a password",
+    await page.evaluate(() => document.getElementById("password-current").value
+      + document.getElementById("password-new").value), "");
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+head("12c. deleting the account, against the rules as deployed today");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openTab(ctx, "account", {
+    docs: {
+      "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web" },
+      "users/u1/projects/p1": { name: "Łazienka", archived: false, createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      "users/u1/rooms/r1": { name: "Kuchnia", lengthM: 3, widthM: 2, heightM: 2.6, createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+    },
+  });
+  // `allow delete: if false` on users/{uid} is still what the live project answers with.
+  await page.evaluate(() => { window.__fbNoProfileDelete = true; });
+  page.on("dialog", (d) => d.accept());
+
+  await page.fill("#delete-password", "sekret123");
+  await page.click("#app-delete-account");
+  await page.waitForSelector("#app-status.err", { timeout: 5000 });
+
+  eq("the visitor is told the refusal, not \"something went wrong\"",
+    await page.locator("#app-status").innerText(),
+    "Nie udało się usunąć konta — serwer odrzucił żądanie. Twoje dane są nietknięte. " +
+    "Napisz do nas, usuniemy je ręcznie.");
+  const left = await page.evaluate(() => [...window.__fbDocs.keys()].sort());
+  check("and nothing was destroyed on the way to finding out",
+    left.join() === "users/u1,users/u1/projects/p1,users/u1/rooms/r1", left.join());
+  check("the account is still signed in", await visible(page, "#app-workspace"));
+  const calls = await page.evaluate(() => window.__fbCalls.map((c) => c[0]));
+  check("and the Firebase user was never deleted", !calls.includes("deleteUser"), calls.join(","));
+
+  // The listeners are dropped before the deletion starts. A refused deletion has to put
+  // them back, or the visitor is left looking at a workspace that no longer updates.
+  // (The fake Firestore does not push changes, so this counts subscriptions rather than
+  // watching a row appear.)
+  eq("and both collection listeners were re-subscribed",
+    await page.evaluate(() => window.__fbListeners.length), 4);
+  check("the projects are still on the page",
+    (await page.locator("#project-list").innerText()).includes("Łazienka"));
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+head("12d. deleting the account, once the rules are deployed");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openTab(ctx, "account", {
+    docs: {
+      "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web" },
+      "users/u1/projects/p1": { name: "Łazienka", archived: false, createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      "users/u1/projects/p1/estimations/e1": { name: "Płytki", createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      "users/u1/projects/p1/shoppingItems/s1": { name: "Klej", createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      "users/u1/rooms/r1": { name: "Kuchnia", lengthM: 3, widthM: 2, heightM: 2.6, createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      "sharedProjects/tok1": { ownerId: "u1", projectName: "Łazienka" },
+    },
+  });
+  page.on("dialog", (d) => d.accept());
+  await page.fill("#delete-password", "sekret123");
+  await page.click("#app-delete-account");
+  await page.locator("#app-auth").waitFor({ state: "visible", timeout: 5000 });
+
+  const left = await page.evaluate(() => [...window.__fbDocs.keys()]);
+  eq("every document the account owned is gone, subcollections included", left.join(), "");
+  const calls = await page.evaluate(() => window.__fbCalls.map((c) => c[0]));
+  check("the Firebase user goes last, after the documents",
+    calls.indexOf("deleteUser") === calls.length - 1, calls.join(","));
+  eq("and the page says so", await page.locator("#app-status").innerText(), "Konto usunięte.");
+  check("which the listeners losing their permission must not overwrite",
+    (await page.locator("#app-status.err").count()) === 0);
+  eq("the session hint is cleared",
+    await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), null);
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+head("12e. a listener losing its permission is not a message to the visitor");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openTab(ctx, "profile");
+  await page.fill("#prof-name", "Jan Kowalski");
+  await page.click("#name-form button[type=submit]");
+  await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
+
+  // Firestore pushes permission-denied into every live listener when the user signs out.
+  await page.evaluate(() => (window.__fbListeners || []).forEach((fn) => fn && fn({ code: "permission-denied" })));
+  await page.waitForTimeout(100);
+  eq("the confirmation survives it",
+    await page.locator("#app-status").innerText(), "Nazwa zapisana.");
+  check("and it is not reported as an error",
+    (await page.locator("#app-status.err").count()) === 0);
+  await page.close();
+  await ctx.close();
 }
 
 /* --- 13. what the rest of the site does with the session ----------------------------- */

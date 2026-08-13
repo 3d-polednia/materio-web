@@ -225,9 +225,24 @@ Kotlin side of it. Change one, change all three.
   out of the committed `app/google-services.json`. **Nobody has clicked the button against
   the live backend yet** — Chromium here cannot reach `gstatic.com`, so test it in a real
   browser.
-- **Account deletion needs the deployed rules.** `users/{uid}` was `allow delete: if false`
-  until 2026-08-08; the account page cannot finish deleting until
-  `firebase deploy --only firestore` has run in the app repo.
+- **Account deletion still needs the deployed rules — measured 2026-08-13, still refused.**
+  `config/firebase/firestore.rules` in the app repo says `allow delete: if isOwner(uid)`,
+  but the *deployed* release still answers `403 PERMISSION_DENIED` for a delete of
+  `users/{uid}` (probed live with a throwaway account: project documents delete fine, the
+  profile document does not). Until `firebase deploy --only firestore` has run in the app
+  repo, deleting an account cannot finish. `deleteEverything()` therefore deletes the
+  profile document **first**: it is the one delete that gets refused, and attempting it
+  last destroyed every project before finding out. A refusal now leaves the account
+  untouched and says so (`app_err_delete_denied`).
+- **Google sign-in is blocked by the API key's referrer restriction — measured 2026-08-13.**
+  The browser key is restricted to `materio-app.com/*`, `www.materio-app.com/*` and
+  `localhost:*`, but `signInWithPopup` runs its handler on
+  `materio-502513.firebaseapp.com/__/auth/handler`, which is not on that list, so the
+  popup shows "The requested action is invalid." The e-mailed password-reset link lands
+  on `/__/auth/action` on the same host and fails the same way. Fix is in the Google Cloud
+  console, not in this repo: add `https://materio-502513.firebaseapp.com/*` and
+  `https://materio-502513.web.app/*` to the key's website restrictions. A custom
+  `authDomain` is not an option — GitHub Pages cannot serve `/__/auth/`.
 - **The visitor's level is derived, never asserted.** `lmLevelOf()` in
   `assets/account.js`: no Firebase user → `guest`; signed in → `liczmat`; signed in with
   `users/{uid}.plan == "premium"` (still valid) → `pro`. `plan` and `planValidUntil` are

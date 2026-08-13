@@ -72,6 +72,78 @@ Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystki
 dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)
 został zaktualizowany na żywo. Matematyka kalkulatorów nietknięta.
 
+### Poprawki po Sesji 13 — zgłoszone przez właściciela, sprawdzone na żywym backendzie
+
+Właściciel kliknął logowanie Google i zgłosił, że nie działa usuwanie konta. Sprawdzone
+**na żywym projekcie `materio-502513`** kontem jednorazowym (2026-08-13), nie z pamięci.
+
+**1. Logowanie Google — „The requested action is invalid.". Wina po stronie konsoli, nie kodu.**
+Klucz przeglądarkowy jest ograniczony do odsyłaczy `materio-app.com/*`,
+`www.materio-app.com/*` i `localhost:*` (`FIRESTORE_SYNC.md` §8, zrobione 2026-08-07).
+Popup Google wykonuje się na `materio-502513.firebaseapp.com/__/auth/handler`, którego na
+tej liście nie ma. Zmierzone:
+
+```
+Referer: https://materio-app.com/app/                            → 200
+Referer: https://materio-502513.firebaseapp.com/__/auth/handler  → 403
+   "Requests from referer https://materio-502513.firebaseapp.com/__/auth/handler are blocked."
+```
+
+**To samo dotyczy linku z maila resetującego hasło** — ląduje on na `/__/auth/action` na
+tym samym hoście. Formularz wyśle maila (sprawdzone: `sendOobCode` → 200), a kliknięcie
+w link padnie. Naprawa jest w Google Cloud Console → Credentials → klucz przeglądarkowy →
+Website restrictions: dopisać `https://materio-502513.firebaseapp.com/*` i
+`https://materio-502513.web.app/*`. Własny `authDomain` odpada — GitHub Pages nie umie
+serwować `/__/auth/`. **Właściciel to robi.**
+
+**2. Usuwanie konta — reguły z repo aplikacji NIE są wdrożone.** Plik
+`config/firebase/firestore.rules` mówi `allow delete: if isOwner(uid)`, ale wdrożone
+wydanie nadal odmawia. Zmierzone kontem jednorazowym:
+
+```
+usunięcie users/{uid}/projects/p1  → 200 OK
+usunięcie users/{uid}              → 403 PERMISSION_DENIED
+```
+
+Potrzebne `firebase deploy --only firestore` w repo `3d-polednia/Materio`.
+**Poza zakresem prac nad webem — potrzebna decyzja/akcja właściciela.**
+
+Serwis został na to przygotowany, bo zachowywał się przy tym najgorzej, jak mógł:
+`deleteEverything()` kasowało projekty, pomieszczenia, wyceny i linki, a **dopiero na
+końcu** profil — czyli odmowa przychodziła po skasowaniu wszystkiego, a odwiedzający
+dostawał „Coś poszło nie tak. Spróbuj ponownie.". Teraz profil idzie **pierwszy**: to
+jedyne usunięcie, które kiedykolwiek zostało odrzucone, więc odmowa przychodzi zanim
+cokolwiek zniknie. Komunikat mówi prawdę: „serwer odrzucił żądanie, Twoje dane są
+nietknięte". Użytkownik Firebase nadal kasowany jest na samym końcu (`FIRESTORE_SYNC.md`
+§7). Po wdrożeniu reguł nic w kodzie nie trzeba zmieniać — test na to czeka.
+
+**3. Zmiana hasła działa.** Sprawdzone na żywo: złe obecne hasło →
+`INVALID_LOGIN_CREDENTIALS`, dobre → zmiana przechodzi, stare hasło przestaje działać,
+hasło krótsze niż 6 znaków → `WEAK_PASSWORD`. Zakładka „Konto" robi dokładnie to i ma
+teraz własne testy.
+
+**4. Trzy błędy w kodzie, znalezione przy okazji.**
+
+- **`boot()` połykało wyjątek.** `boot().catch(() => status(…))` bez logu. Wyjątek
+  w środku zostawiał stronę **w połowie podłączoną** — jedne przyciski odpowiadały, inne
+  nie — i wyglądało to identycznie jak strona, która się nie wczytała. Teraz leci
+  `console.error` z prawdziwym błędem. Bez tego nie znalazłbym punktu 5.
+- **Nasłuchy Firestore przeżywały koniec sesji.** Firestore wrzuca `permission-denied`
+  do każdego żywego nasłuchu w chwili wylogowania albo usunięcia konta. Trafiało to
+  w pasek statusu jako „Coś poszło nie tak." — **na wierzch komunikatu „Konto
+  usunięte."**. Teraz wylogowanie i usuwanie najpierw odpinają nasłuchy
+  (`stopListening()`), a `permission-denied` bez zalogowanego użytkownika jest
+  ignorowany. Odrzucone usunięcie podpina je z powrotem.
+- **`data-app-ready`** na `<html>` po zakończeniu `boot()` — inaczej test klika
+  w przycisk, którego jeszcze nikt nie słucha. Ta sama konwencja, co `data-wired`
+  na stronie kalkulatora.
+
+Sprawdzone: **118 testów `/app/` w Chromium** (było 97) — w tym zmiana hasła ze złym
+i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdrożone**
+(nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
+po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
+na końcu). Razem 1677/1677.
+
 ### Co zrobiła Sesja 13
 
 Rozdział XXXII wymienia sześć rzeczy: rejestrację, logowanie, wylogowanie, reset hasła,
@@ -665,6 +737,29 @@ Serwis został naprawiony, telefon nie. Zrównanie wymaga zmiany w repo
 `3d-polednia/Materio` (odpowiednik `snap()` przy każdym `ceil`/`floor` w silnikach)
 i osobnego wydania. **Poza zakresem prac nad webem** (rozdział VII) — **potrzebna decyzja
 właściciela**, czy zlecić to jako etap w tamtym repo.
+
+### Reguły Firestore nie są wdrożone — usuwanie konta nie może się udać
+
+Zmierzone 2026-08-13 na żywym projekcie: usunięcie `users/{uid}` wraca z 403, choć plik
+reguł w repo aplikacji dopuszcza je od 2026-08-08. Trzeba uruchomić
+`firebase deploy --only firestore` w `3d-polednia/Materio`. Do tego czasu strona odmawia
+uczciwie i nie kasuje niczego. Google Play wymaga usuwania konta z poziomu produktu, więc
+to nie jest kosmetyka. **Poza zakresem prac nad webem — akcja właściciela.**
+
+### Osierocony dokument w Firestore — po moim teście
+
+Sprawdzając reguły, założyłem konto jednorazowe, skasowałem jego projekt, dostałem 403 na
+profilu, a potem skasowałem użytkownika Firebase. Została jedna sierota, której już nikt
+nie odczyta ani nie skasuje z przeglądarki, bo reguły kluczują po `request.auth.uid`:
+
+```
+users/anNltlUcvChVl8fT0HezJ5f5Mg22   { createdAt, lastSeenAt, appVersion: "web" }
+```
+
+Trzy pola, żadnych podkolekcji, żadnych danych osobowych — ale to śmieć i mój błąd:
+powinienem był skasować użytkownika **przed** sprawdzeniem, czy profil da się usunąć.
+Kasuje się go dwoma kliknięciami w konsoli Firebase → Firestore Database. Drugi taki
+przypadek nie powstanie: kolejność w `deleteEverything()` jest teraz odwrotna.
 
 ### `/app/` czy `/konto/` — propozycja z Sesji 13, decyzja właściciela
 

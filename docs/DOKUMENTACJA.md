@@ -331,6 +331,17 @@ Zakładka „Profil” na `/app/`: adres, sposób logowania, data założenia i 
 (z `users/{uid}`), nazwa konta, poziom i sesja na urządzeniu. **Nazwa idzie do Firebase
 Auth (`updateProfile`), nie do Firestore** — reguły odrzuciłyby dodatkowe pole w profilu.
 
+### Usuwanie konta
+
+Kolejność w `deleteEverything()`: **najpierw dokument profilu**, potem podkolekcje,
+projekty, pomieszczenia i linki `sharedProjects`, a użytkownik Firebase **na samym
+końcu** (reguły kluczują po `request.auth.uid`, więc po jego skasowaniu dokumenty stają
+się nieosiągalne — `FIRESTORE_SYNC.md` §7). Profil idzie pierwszy, bo to jedyne
+usunięcie, które reguły kiedykolwiek odrzuciły: **wdrożone reguły odmawiają go do dziś**
+(zmierzone 2026-08-13, 403 `PERMISSION_DENIED`). Odmowa przychodzi więc, zanim cokolwiek
+zniknie, a strona mówi „serwer odrzucił żądanie, Twoje dane są nietknięte" zamiast
+„spróbuj ponownie". Naprawa: `firebase deploy --only firestore` w repo aplikacji.
+
 ### Testy
 
 ```bash

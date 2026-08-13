@@ -140,6 +140,11 @@ async function boot() {
     renderRooms();
     renderLocalSummary();
   });
+
+  // Everything above is wired. The forms exist in the markup from the first paint but do
+  // nothing until this point, so a test that clicks earlier clicks a dead button — the
+  // same reason a calculator page carries data-wired (scripts/test-pages.mjs).
+  document.documentElement.setAttribute("data-app-ready", "1");
 }
 
 /* ------------------------------------------------------------------ auth */
@@ -247,6 +252,7 @@ function wireAuthForms() {
   });
 
   const signOut = async () => {
+    stopListening();
     await fb.signOut(auth);
     status(T("app_signed_out"));
   };
@@ -318,8 +324,7 @@ async function onSignedIn(user) {
 }
 
 function onSignedOut() {
-  state.unsub.forEach((fn) => fn());
-  state.unsub = [];
+  stopListening();
   state.uid = null;
   state.user = null;
   state.profile = null;
@@ -432,9 +437,22 @@ function listen(collectionName, onRows) {
       if (snap.metadata.fromCache) status(T("app_offline"));
       else if ($("app-status").textContent === T("app_offline")) status("");
     },
-    () => status(T("app_err_unknown"), true),
+    (err) => {
+      // Firestore pushes permission-denied into every live listener the moment the user
+      // stops being that user. Signing out and deleting the account both do that on
+      // purpose, and stopListening() gets ahead of it — this is the belt to that
+      // braces, so a straggler cannot land on top of "Konto usunięte."
+      if (!state.uid || (err && err.code === "permission-denied")) return;
+      status(T("app_err_unknown"), true);
+    },
   );
   state.unsub.push(unsub);
+}
+
+/** Drop the snapshot listeners. Anything that ends the session calls this first. */
+function stopListening() {
+  state.unsub.forEach((fn) => fn());
+  state.unsub = [];
 }
 
 /* ------------------------------------------------------------------ tabs */
@@ -787,11 +805,23 @@ function wireAccountPanel() {
     button.disabled = true;
     try {
       await reauthenticate($("delete-password").value);
+      // Nothing may be listening to documents that are about to stop existing.
+      stopListening();
       await deleteEverything();
       await fb.deleteUser(auth.currentUser);
       status(T("app_deleted"));
     } catch (err) {
-      status(authMessage(err && err.code), true);
+      const code = err && err.code;
+      // Firestore refusing the delete is not the visitor getting something wrong, and
+      // "Coś poszło nie tak. Spróbuj ponownie." would ask them to keep trying something
+      // that cannot work. Say what happened and that their data is still there.
+      status(code === "permission-denied" ? T("app_err_delete_denied") : authMessage(code), true);
+      // The listeners were dropped a moment ago; a refused deletion means the account is
+      // still there and still wants its lists.
+      if (state.uid) {
+        listen("projects", (rows) => { state.projects = rows; renderProjects(); });
+        listen("rooms", (rows) => { state.rooms = rows; renderRooms(); });
+      }
     } finally {
       button.disabled = false;
     }
@@ -807,6 +837,18 @@ function wireAccountPanel() {
  */
 async function deleteEverything() {
   const del = (ref) => fb.deleteDoc(ref);
+
+  // The profile document goes FIRST, and not because Firestore cares about the order.
+  // It is the one delete the rules have ever refused: `allow delete: if false` until
+  // 2026-08-08, and the deployed rules still answered PERMISSION_DENIED when this was
+  // measured on 2026-08-13. Attempting it last meant a visitor whose deletion was going
+  // to be refused first lost every project, room and estimate and *then* got told
+  // "something went wrong". Attempting it first turns that into "nothing happened, and
+  // here is why". The Firebase user still goes last: every rule keys on
+  // request.auth.uid, so once it is gone nothing can reach the documents at all
+  // (FIRESTORE_SYNC §7). A later step failing leaves the account without its profile
+  // document, which the next sign-in writes again.
+  await del(fb.doc(db, "users", state.uid));
 
   const projSnap = await fb.getDocs(fb.collection(db, "users", state.uid, "projects"));
   for (const project of projSnap.docs) {
@@ -825,10 +867,14 @@ async function deleteEverything() {
   const shared = await fb.getDocs(
     fb.query(fb.collection(db, "sharedProjects"), fb.where("ownerId", "==", state.uid)));
   for (const d of shared.docs) await del(d.ref);
-
-  await del(fb.doc(db, "users", state.uid));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  boot().catch(() => status(T("app_err_unknown"), true));
+  boot().catch((err) => {
+    // Say what happened. boot() wires the panels one after another, so a throw halfway
+    // through leaves a page where some buttons answer and others are dead — and with a
+    // bare catch that looked exactly like a page that had simply not loaded.
+    console.error("LiczMat /app/ did not finish starting:", err);
+    status(T("app_err_unknown"), true);
+  });
 });
