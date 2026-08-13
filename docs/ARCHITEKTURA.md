@@ -90,6 +90,7 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 | `stores` | `/sklepy/` | GUEST | `home` | tak | 4 |
 | `android` | `/aplikacja/` | GUEST | `home` | tak | 4 |
 | `projects` | `/projekty/` | GUEST | `home` | tak | 4 |
+| `project` | `/projekty/?id=…` | GUEST | `projects` | **nie** | 0 — widok |
 | `estimate` | `/kosztorys/` | GUEST | `projects` | tak | 4 |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 4 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
@@ -99,6 +100,18 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 
 `404.html` też jest pisany ręcznie i nie jest trasą — jest obsługą błędu i przekierowaniem
 (patrz §3).
+
+**`project` jest pierwszym „widokiem” (`view: true`) — ekranem bez własnego pliku.**
+Liczba wygenerowanych stron się przez niego nie zmienia i to jest cała jego definicja:
+`/projekty/?id=…` to ten sam `projekty/index.html`, w który `assets/workspace-ui.js`
+wpisuje jeden projekt zamiast listy. Powstał tak, bo id projektu robi się w przeglądarce
+i nie może być katalogiem (patrz §3), a nie dlatego, że tak wygodniej.
+
+Trasa-widok to nadal trasa: ma poziom dostępu, rodzica, miejsce w przepływie i wpis
+w inwentarzu. Build sprawdza o niej pięć rzeczy (§9), z których najważniejsza jest ta, że
+jej adres leży **wewnątrz** adresu rodzica — `livePaths()` pomija widoki, więc widok
+wskazujący gdzie indziej byłby stroną, której build nigdy nie napisze i której brak
+nigdy by nie zauważył.
 
 Czego w tym inwentarzu **nie ma**, a plan wymienia w rozdziale IX: `/liczmat-pro` i
 `/konto`. Są w §4 jako trasy planowane.
@@ -169,7 +182,6 @@ adresu, który już działa, i żeby żadna nie trafiła do menu przed czasem.
 | Trasa | URL (PL) | Poziom | Sesja | Po co |
 |---|---|---|---|---|
 | `liczmat-pro` | `/liczmat-pro/` | GUEST | 29 | publiczna strona Pro: co to, dla kogo, ile kosztuje |
-| `project` | `/projekty/?id=…` | LICZMAT | 15 | jeden projekt: pomieszczenia, kalkulacje, materiały, koszty |
 | `clients` | `/klienci/` | PRO | 22 | lista klientów |
 | `jobs` | `/zlecenia/` | PRO | 23 | zlecenia: status, termin, wartość |
 | `quotes` | `/wyceny/` | PRO | 24 | materiały + robocizna + marża |
@@ -458,6 +470,40 @@ Powód: `/app/` i `/p/` są bezjęzykowe, a `pulpit` to polskie słowo w adresie
 Niemiec i tak nie przeczyta. Widoczna nazwa zostaje przetłumaczona — „Pulpit”,
 „Übersicht”, „Dashboard”, „Панель” (`nav_dashboard`); po angielsku zmienia się tylko URL.
 
+### 8.1b. ~~Poziom `project`~~ — rozstrzygnięte w Sesji 15
+
+Trzeci raz to samo pytanie. Sesja 3 zadeklarowała trasę `project` jako `LICZMAT`. Sesja 15
+zbudowała ją jako **`GUEST`**, i to znowu jest zmiana wobec deklaracji, więc stoi tutaj.
+
+Argument jest identyczny jak w §8.1 i §8.1a i tym razem jest wymuszony konstrukcyjnie:
+`project` to **widok** `/projekty/`, czyli ten sam plik. Strona nie może wymagać więcej
+niż strona, w którą jest wpisana — inaczej `/projekty/` musiałoby bramkować kawałek
+samego siebie. Build tego pilnuje wprost (§9): widok o poziomie wyższym niż rodzic
+przerywa build.
+
+Nie ma tu też czego bramkować. Projekt jest wierszem w `localStorage` **tej**
+przeglądarki, wpisanym tam przez tego, kto przy niej siedzi. Konto dokłada synchronizację
+z telefonem, a nie prawo do odczytu własnej pracy.
+
+### 8.1c. Opis, notatki i historia projektu — czeka na zmianę kontraktu
+
+Rozdział XIV mówi, że projekt może zawierać nazwę, opis, pomieszczenia, kalkulacje,
+materiały, koszty, notatki i historię. Sesja 15 zbudowała CRUD na tym, co dokument
+projektu **naprawdę niesie**: `name` i `archived`, plus stemple `createdAt` / `updatedAt`,
+które są dzisiejszą „historią”.
+
+**Opisu i notatek celowo nie dopisano.** Reguły bezpieczeństwa sprawdzają kształt
+dokumentu, a nie listę pól, więc przeglądarka mogłaby taki dokument zapisać — ale
+`SyncContract.projectToDoc()` w repo `3d-polednia/Materio` buduje dokument z ustalonej
+mapy, a `ProjectEntity` nie ma gdzie takiego pola trzymać. Telefon nadpisałby całość przy
+najbliższej synchronizacji i opis zniknąłby **bez słowa**. To jest zmiana kontraktu
+(`docs/FIRESTORE_SYNC.md`, `SyncContract.kt`, encja Room, migracja), czyli praca po
+stronie aplikacji — rozdział VII, poza zakresem sesji webowej. **Do decyzji właściciela.**
+
+Pomieszczenia (sesja 20), materiały (17), koszty (19) i zapis kalkulacji (16) mają własne
+sesje i dlatego nie ma po nich pustych sekcji na stronie projektu: rozdział XXV zabrania
+martwego przycisku, a pusty nagłówek jest tym samym, tylko cichszym.
+
 ### 8.2. `/app/` czy `/konto/` — Sesja 13 nie przeniosła, i dlaczego
 
 Rozdział IX wymienia `/konto`. Konto siedzi dziś pod `/app/`. Sesja 13 przebudowała samą
@@ -526,6 +572,7 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | strona główna (Sesja 6) | inna liczba drzwi niż trzy albo inna kolejność poziomów; drzwi na nieistniejącą trasę; brak tekstu drzwi w słowniku |
 | centrum kalkulatorów (Sesja 7) | kalkulator w żadnej kategorii albo w dwóch naraz; kategoria z nieznanym kalkulatorem lub pusta; brak nazwy albo opisu kategorii w słowniku; skrót „Od czego zacząć”, którego nie potwierdza żaden poradnik |
 | poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z czterech języków |
+| widoki (Sesja 15) | widok bez rodzica, na trasie planowanej albo na innym widoku; widok indeksowany; widok w menu lub w stopce; widok wymagający wyższego poziomu niż rodzic; widok inaczej zlokalizowany niż rodzic; adres widoku poza adresem rodzica albo gubiący identyfikator; `view: true` na trasie, która nie jest `LIVE` |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.
 Tak samo sprawdzone są dwa dołożone w Sesji 5 (piąty link w menu, dwie pozycje na tym

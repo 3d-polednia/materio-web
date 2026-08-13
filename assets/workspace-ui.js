@@ -176,33 +176,251 @@ function buildWorkspaceCalculators() {
   document.addEventListener("workspacechange", () => cards.forEach(wsFillRoomSelect));
 }
 
-/* ------------------------------------------------------------------ /projekty/ */
+/* ------------------------------------------------------------------ /projekty/
+ *
+ * One page, two screens — the `project` route in src/ia.mjs is a `view`, because a
+ * project id is made in this browser and can never be a directory on GitHub Pages:
+ *
+ *   /projekty/          the index: the projects, the archive, the rooms
+ *   /projekty/?id=<id>  one project — chapter XIV
+ *
+ * A project name in the index is a real <a href="?id=…">, so opening one is an ordinary
+ * navigation: the back button works, a link can be copied, and nothing here has to
+ * reimplement history. The single exception is deleting from the detail, which puts the
+ * index back with `replaceState` instead of navigating — a reload would throw away the
+ * "undo" the delete has just offered.
+ */
+
+/** The project the address bar is asking for, or "" for the index. */
+const wsUrlId = () => {
+  try { return new URLSearchParams(location.search).get("id") || ""; } catch (e) { return ""; }
+};
+
+/** The project the page is currently showing. Set once per render pass. */
+let wsOpenId = "";
+/** Whether the rename form and the delete question are open, so a redraw keeps them. */
+let wsRenaming = false;
+let wsAsking = false;
+/** The last delete, until the visitor undoes it or does something else. */
+let wsUndone = null;
+
+const wsDate = (ms) => {
+  const at = Number(ms);
+  if (!isFinite(at) || at <= 0) return "";
+  return new Date(at).toLocaleDateString(wsLang(), { day: "numeric", month: "short", year: "numeric" });
+};
+
+/** The index's own address, without the query that opens a project. */
+const wsIndexUrl = () => location.pathname;
+
+/* ---------------------------------------------------------------- the index */
+
+/** One row of either list: the name links to the project, the meta says what is in it. */
+function wsProjectRow(p, active) {
+  const total = wsProjectTotal(p.id);
+  const money = total.count ? ` · ${wsEsc(wsMoney(total.minor, total.currencyCode))}` : "";
+  // Lines saved in different currencies do not add up, and chapter VI forbids converting
+  // them. The row has room for a chip; the whole sentence is its title.
+  const mixed = total.mixed
+    ? ` <span class="chip warn" title="${wsEsc(wsT("ws_mixed_currency"))}">${wsEsc(wsT("dash_mixed"))}</span>`
+    : "";
+  return `<li data-id="${wsEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
+      <span class="row-name">
+        <a href="?id=${encodeURIComponent(p.id)}" data-open><b>${wsEsc(p.name)}</b></a>
+        <em class="muted">${total.count} ${wsEsc(wsT("ws_lines"))}${money} · ${wsEsc(wsDate(p.updatedAt))}${mixed}</em>
+      </span>
+      <span class="row-actions">
+        ${p.archived
+          ? `<button type="button" class="btn btn-ghost btn-sm" data-unarchive>${wsEsc(wsT("proj_archive_undo"))}</button>`
+          : p.id === active
+            ? `<span class="chip on">${wsEsc(wsT("ws_active"))}</span>`
+            : `<button type="button" class="btn btn-ghost btn-sm" data-activate>${wsEsc(wsT("ws_activate"))}</button>`}
+      </span>
+    </li>`;
+}
 
 function wsRenderProjects() {
   const list = document.getElementById("ws-project-list");
   if (!list) return;
   const projects = wsProjects();
   const active = wsActiveProjectId();
-  if (!projects.length) {
-    list.innerHTML = `<li class="empty muted">${wsEsc(wsT("ws_empty_projects"))}</li>`;
+  list.innerHTML = projects.length
+    ? projects.map((p) => wsProjectRow(p, active)).join("")
+    : `<li class="empty muted">${wsEsc(wsT("ws_empty_projects"))}</li>`;
+
+  // The archive is folded away and absent entirely while it is empty: a permanently
+  // empty disclosure is a control with nothing behind it.
+  const box = document.getElementById("ws-archive");
+  if (!box) return;
+  const archived = wsArchivedProjects();
+  box.hidden = archived.length === 0;
+  if (!archived.length) return;
+  document.getElementById("ws-archive-summary").textContent = `${wsT("proj_archive_t")} (${archived.length})`;
+  document.getElementById("ws-archive-list").innerHTML =
+    archived.map((p) => wsProjectRow(p, active)).join("");
+}
+
+/** The strip that offers the last delete back. Hidden the moment there is nothing to undo. */
+function wsRenderUndo() {
+  const strip = document.getElementById("ws-undo");
+  if (!strip) return;
+  strip.hidden = !wsUndone;
+  if (!wsUndone) return;
+  document.getElementById("ws-undo-text").textContent =
+    `${wsT(wsUndone.restored ? "proj_restored" : "proj_deleted")} ${wsUndone.name}`;
+  document.getElementById("ws-undo-go").hidden = Boolean(wsUndone.restored);
+}
+
+/* ---------------------------------------------------------------- one project */
+
+/** The breadcrumb gains the project; the trail is server-rendered for the index only. */
+function wsCrumb(name) {
+  const ol = document.querySelector(".breadcrumbs ol");
+  if (!ol) return;
+  const last = ol.lastElementChild;
+  if (!last) return;
+  if (!name) {
+    // Back on the index: undo whatever the detail did to the trail.
+    const extra = ol.querySelector("[data-ws-crumb]");
+    if (extra) extra.remove();
+    const link = ol.lastElementChild;
+    if (link && link.dataset.wsCrumbWas) {
+      link.innerHTML = link.dataset.wsCrumbWas;
+      link.setAttribute("aria-current", "page");
+      delete link.dataset.wsCrumbWas;
+    }
     return;
   }
-  list.innerHTML = projects.map((p) => {
-    const total = wsProjectTotal(p.id);
-    return `<li data-id="${wsEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
+  let extra = ol.querySelector("[data-ws-crumb]");
+  if (!extra) {
+    last.dataset.wsCrumbWas = last.innerHTML;
+    last.removeAttribute("aria-current");
+    last.innerHTML = `<a href="${wsEsc(wsIndexUrl())}">${last.dataset.wsCrumbWas}</a>`;
+    extra = document.createElement("li");
+    extra.setAttribute("data-ws-crumb", "");
+    extra.setAttribute("aria-current", "page");
+    ol.appendChild(extra);
+  }
+  extra.textContent = name;
+}
+
+/** The saved lines of one project, newest last — the order they were added in. */
+function wsRenderProjectLines(id) {
+  const list = document.getElementById("ws-project-lines");
+  if (!list) return;
+  const rows = wsEstimations(id);
+  if (!rows.length) {
+    list.innerHTML = `<li class="empty muted">${wsEsc(wsT("proj_lines_empty"))}</li>`;
+    return;
+  }
+  list.innerHTML = rows.map((r) => {
+    const cost = r.totalCostMinor > 0
+      ? `<em class="muted">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</em>` : "";
+    return `<li>
         <span class="row-name">
-          <b>${wsEsc(p.name)}</b>
-          <em class="muted">${total.count} ${wsEsc(wsT("ws_lines"))} · ${wsEsc(wsMoney(total.minor, total.currencyCode))}</em>
+          <b>${wsEsc(r.name)}</b>
+          <em class="muted">${wsEsc(wsDate(r.createdAt))}</em>
         </span>
-        <span class="row-actions">
-          ${p.id === active
-            ? `<span class="chip on">${wsEsc(wsT("ws_active"))}</span>`
-            : `<button type="button" class="btn btn-ghost btn-sm" data-activate>${wsEsc(wsT("ws_activate"))}</button>`}
-          <button type="button" class="btn btn-ghost btn-sm" data-rename>${wsEsc(wsT("ws_rename"))}</button>
-          <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
+        <span class="dash-fig">
+          <b>${wsNum(r.requiredUnits)} ${wsEsc(r.unitLabel)}</b>
+          ${cost}
         </span>
       </li>`;
   }).join("");
+}
+
+/**
+ * Draw the detail for the id in the address bar.
+ *
+ * An id nobody has is not an error page: the browser it was made in is the only one that
+ * ever had it, so the page says exactly that and offers the way back.
+ */
+function wsRenderProject(id) {
+  const project = wsProject(id);
+  const missing = document.getElementById("ws-project-missing");
+  const body = document.getElementById("ws-project-body");
+  const title = document.getElementById("ws-title");
+  const lead = document.getElementById("ws-lead");
+
+  missing.hidden = Boolean(project);
+  body.hidden = !project;
+  lead.hidden = true;
+
+  if (!project) {
+    title.textContent = wsT("proj_none_t");
+    wsCrumb(wsT("proj_none_t"));
+    return;
+  }
+
+  title.textContent = project.name;
+  wsCrumb(project.name);
+
+  // Chapter XIV asks a project to carry its history. The two stamps the sync contract
+  // already keeps are the whole of it today: when it was made and when it last moved.
+  document.getElementById("ws-project-hist").textContent =
+    `${wsT("proj_created")} ${wsDate(project.createdAt)} · ${wsT("proj_updated")} ${wsDate(project.updatedAt)}`;
+
+  const total = wsProjectTotal(project.id);
+  document.getElementById("ws-project-count").textContent = String(total.count);
+  document.getElementById("ws-project-total").textContent = wsMoney(total.minor, total.currencyCode);
+  document.getElementById("ws-project-mixed").hidden = !total.mixed;
+
+  const isActive = wsActiveProjectId() === project.id;
+  // An archived project takes no new lines, so it cannot be the active one either, and
+  // offering the button would be offering something the store refuses to do.
+  document.getElementById("ws-project-activate").hidden = isActive || Boolean(project.archived);
+  document.getElementById("ws-project-active").hidden = !isActive;
+  document.getElementById("ws-project-archive").textContent =
+    wsT(project.archived ? "proj_archive_undo" : "proj_archive_do");
+
+  const rename = document.getElementById("ws-rename-form");
+  rename.hidden = !wsRenaming;
+  if (wsRenaming && document.activeElement !== document.getElementById("ws-rename-name")) {
+    document.getElementById("ws-rename-name").value = project.name;
+  }
+  document.getElementById("ws-project-rename").hidden = wsRenaming;
+
+  const ask = document.getElementById("ws-delete-ask");
+  ask.hidden = !wsAsking;
+  document.getElementById("ws-delete-q").textContent = wsT("ws_confirm_delete");
+  document.getElementById("ws-project-delete").hidden = wsAsking;
+
+  wsRenderProjectLines(project.id);
+}
+
+/* ---------------------------------------------------------------- the switch */
+
+/** Show the screen the address bar asks for, and fill it. */
+function wsRenderWorkspace() {
+  const detail = document.getElementById("ws-project");
+  if (!detail) return;
+  wsOpenId = wsUrlId();
+  const index = document.getElementById("ws-index");
+
+  detail.hidden = !wsOpenId;
+  index.hidden = Boolean(wsOpenId);
+
+  if (wsOpenId) {
+    // Opening a project is moving on: the strip about the last delete has had its say.
+    wsUndone = null;
+    wsRenderProject(wsOpenId);
+    return;
+  }
+
+  document.getElementById("ws-title").textContent = wsT("wspage_title");
+  const lead = document.getElementById("ws-lead");
+  lead.textContent = wsT("wspage_lead");
+  lead.hidden = false;
+  wsCrumb("");
+  wsRenderUndo();
+  wsRenderProjects();
+  wsRenderRooms();
+}
+
+/** Leave the detail without a reload, so an undo offered by a delete survives. */
+function wsBackToIndex() {
+  try { history.replaceState({}, "", wsIndexUrl()); } catch (e) {}
+  wsRenderWorkspace();
 }
 
 function wsRenderRooms() {
@@ -237,21 +455,30 @@ function buildProjectsPage() {
     const name = input.value.trim();
     if (!name) return;
     input.value = "";
+    wsUndone = null; // a new project is a new subject; the old undo is stale
     wsAddProject(name);
   });
 
-  document.getElementById("ws-project-list").addEventListener("click", (e) => {
+  // The two lists behave the same, so one handler serves both. The name is a real link
+  // and is left alone: letting it navigate is what makes the back button and a copied
+  // address work without any history code here.
+  const rowAction = (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li) return;
-    const id = li.dataset.id;
-    if (e.target.closest("[data-activate]")) wsSetActiveProject(id);
-    else if (e.target.closest("[data-del]")) { if (confirm(wsT("ws_confirm_delete"))) wsDeleteProject(id); }
-    else if (e.target.closest("[data-rename]")) {
-      const current = (wsProjects().find((p) => p.id === id) || {}).name || "";
-      const name = prompt(wsT("ws_rename"), current);
-      if (name && name.trim()) wsRenameProject(id, name.trim());
-    }
+    if (e.target.closest("[data-activate]")) wsSetActiveProject(li.dataset.id);
+    else if (e.target.closest("[data-unarchive]")) wsArchiveProject(li.dataset.id, false);
+  };
+  document.getElementById("ws-project-list").addEventListener("click", rowAction);
+  document.getElementById("ws-archive-list").addEventListener("click", rowAction);
+
+  document.getElementById("ws-undo-go").addEventListener("click", () => {
+    if (!wsUndone) return;
+    const back = wsRestoreProject(wsUndone.token);
+    wsUndone = back ? { token: wsUndone.token, name: back.name, restored: true } : null;
+    wsRenderWorkspace();
   });
+
+  wireProjectDetail();
 
   document.getElementById("ws-room-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -272,9 +499,79 @@ function buildProjectsPage() {
     if (li && e.target.closest("[data-del]")) wsDeleteRoom(li.dataset.id);
   });
 
-  const render = () => { wsRenderProjects(); wsRenderRooms(); };
-  document.addEventListener("workspacechange", render);
-  render();
+  document.addEventListener("workspacechange", wsRenderWorkspace);
+  // A visitor who presses Back after opening a project is asking for the other screen;
+  // the page never reloaded, so nothing else would notice.
+  window.addEventListener("popstate", wsRenderWorkspace);
+  wsRenderWorkspace();
+  document.documentElement.setAttribute("data-ws-ready", "1");
+}
+
+/**
+ * The four writes of chapter XIV's CRUD, on the project that is open.
+ *
+ * Rename and delete used to be `prompt()` and `confirm()`. Both are the browser's own
+ * dialogs: they cannot be styled, they cannot be reached by the page's own translations
+ * once they are open, several browsers suppress them outright, and on a phone they cover
+ * the thing being renamed — chapter XXVIII asks for the opposite. So both are forms on
+ * the page, next to the project they are about.
+ */
+function wireProjectDetail() {
+  const on = (id, event, fn) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener(event, fn);
+  };
+
+  on("ws-project-activate", "click", () => { wsSetActiveProject(wsOpenId); });
+
+  on("ws-project-rename", "click", () => {
+    wsRenaming = true;
+    wsAsking = false;
+    wsRenderWorkspace();
+    const input = document.getElementById("ws-rename-name");
+    input.focus();
+    input.select();
+  });
+  on("ws-rename-form", "submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("ws-rename-name").value.trim();
+    if (!name) return; // a project with no name is a row nobody can tell apart
+    wsRenaming = false;
+    // wsUpdateProject fires workspacechange, which redraws this screen.
+    if (!wsUpdateProject(wsOpenId, { name })) wsRenderWorkspace();
+  });
+  on("ws-rename-form", "click", (e) => {
+    if (!e.target.closest("[data-ws-rename-cancel]")) return;
+    wsRenaming = false;
+    wsRenderWorkspace();
+  });
+
+  on("ws-project-archive", "click", () => {
+    const project = wsProject(wsOpenId);
+    if (!project) return;
+    wsArchiveProject(project.id, !project.archived);
+  });
+
+  on("ws-project-delete", "click", () => { wsAsking = true; wsRenaming = false; wsRenderWorkspace(); });
+  on("ws-delete-no", "click", () => { wsAsking = false; wsRenderWorkspace(); });
+  on("ws-delete-yes", "click", () => {
+    const project = wsProject(wsOpenId);
+    if (!project) return;
+    wsAsking = false;
+    const token = wsDeleteProject(project.id);
+    // The delete is a tombstone, so the undo costs nothing and is offered rather than
+    // asked about twice. The token names the rows that went, so the undo brings back
+    // those and not a line the visitor deleted by hand a moment earlier. It lands on the
+    // index without a reload — a reload would throw the offer away before anybody could
+    // take it.
+    wsUndone = token ? { token, name: project.name, restored: false } : null;
+    wsBackToIndex();
+  });
+
+  // /kosztorys/ is about the active project, so the link does what the dashboard's
+  // "Otwórz" does: makes this the one, then goes. It stays a real <a href>, so it also
+  // works with the script off.
+  on("ws-project-estimate", "click", () => { if (wsOpenId) wsSetActiveProject(wsOpenId); });
 }
 
 /* ------------------------------------------------------------------ /kosztorys/ */
@@ -433,8 +730,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* Saved lines keep the currency they were priced in, but a new line is stamped with the
-   one in force — so both lists are redrawn when the visitor switches. */
+   one in force — so every list that prints money is redrawn when the visitor switches. */
 document.addEventListener("currencychange", () => {
-  wsRenderProjects();
+  wsRenderWorkspace();
   wsRenderEstimate();
 });

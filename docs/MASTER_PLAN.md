@@ -40,8 +40,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 12 | Test kalkulatorów | **Zrobione** — 2026-08-13 |
 | 13 | System konta | **Zrobione** — 2026-08-13 |
 | 14 | Dashboard LiczMat | **Zrobione** — 2026-08-13 |
-| 15 | Projekty (CRUD) | **Następna** |
-| 16–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 15 | Projekty (CRUD) | **Zrobione** — 2026-08-13 |
+| 16 | Zapis kalkulacji | **Następna** |
+| 17–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -144,6 +145,108 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 15
+
+Rozdział XXXII mówi w całości: **„CRUD projektów”**. Serwis miał do tej pory pół litery
+z czterech: projekt dało się dodać, listę dało się zobaczyć, a zmiana nazwy i usunięcie
+były `prompt()` i `confirm()` — dwoma oknami przeglądarki. Projektu **nie dało się
+otworzyć**: nie było ekranu, na którym jeden projekt jest tematem strony.
+
+**Projekt ma teraz własny ekran: `/projekty/?id=<projectId>`.** Trasa `project` była
+zadeklarowana w `src/ia.mjs` od Sesji 3 jako `PLANNED` z sesją 15 i dokładnie tym
+adresem; ta sesja zamieniła ją w ekran. Liczba wygenerowanych stron się nie zmieniła —
+131 przed i 131 po — i to jest cała konstrukcja: **id projektu robi się w przeglądarce
+i nigdy nie będzie katalogiem**, bo GitHub Pages serwuje pliki i nie umie przepisywać
+adresów (ta sama ściana, o którą rozbija się `/p/<token>`).
+
+**Nowe pojęcie w architekturze: `view` — ekran bez własnego pliku.** Trasa-widok to nadal
+trasa: ma poziom dostępu, rodzica, miejsce w przepływie i wiersz w inwentarzu, ale
+`livePaths()` jej nie liczy, bo plikiem jest plik rodzica. Build sprawdza o niej siedem
+rzeczy, z których najważniejsza jest ta, że **adres widoku leży wewnątrz adresu
+rodzica** — widok wskazujący gdzie indziej byłby stroną, której build nigdy nie napisze
+i której braku nigdy by nie zauważył. **Wszystkie osiem sprawdzeń przetestowanych
+negatywnie** — nie opisem, tylko kodem: `scripts/test-projects.mjs` psuje każde po kolei
+i sprawdza, że build faktycznie protestuje, po czym przywraca.
+
+**Poziom trasy: `GUEST`, wbrew deklaracji z Sesji 3 (`LICZMAT`)** — trzeci raz to samo
+pytanie, opisane w `docs/ARCHITEKTURA.md` §8.1b. Tym razem jest wymuszone konstrukcyjnie:
+widok jest wpisywany w `/projekty/`, czyli w ten sam plik, więc nie może wymagać więcej
+niż strona, która go rysuje — inaczej `/projekty/` musiałoby bramkować kawałek samego
+siebie. Build tego pilnuje wprost. Poza tym nie ma tu czego bramkować: projekt jest
+wierszem w `localStorage` **tej** przeglądarki.
+
+Cztery litery CRUD-a, po kolei:
+
+- **C — dodanie** działało i zostało. Nowy projekt od razu staje się aktywny, czyli tym,
+  do którego trafia następny zapisany wynik.
+- **R — odczyt.** Ekran projektu to nagłówek z jego nazwą, **historia** (kiedy powstał,
+  kiedy ostatnio się zmienił — dwa stemple, które kontrakt synchronizacji i tak trzyma,
+  a których dotąd nie widział nikt), **podsumowanie** (liczba pozycji i suma, z plakietką
+  „różne waluty” zamiast sumy, która nic nie znaczy) oraz **kalkulacje**: pozycje zapisane
+  w tym projekcie, z ilością, jednostką, kwotą i datą. Adres, pod którym nie ma projektu,
+  nie jest błędem — przeglądarka, w której go zrobiono, jest jedyną, która go kiedykolwiek
+  miała, więc strona mówi dokładnie to i daje drogę powrotną.
+- **U — zmiana.** Nazwa: formularz **na stronie**, obok projektu, którego dotyczy. Do tej
+  sesji było to `prompt()`. Doszło **archiwum**: pole `archived` jest w kształcie dokumentu
+  i w regułach bezpieczeństwa od pierwszej synchronizacji i **nic nigdy go nie ustawiało**.
+  Zarchiwizowany projekt wypada z listy, z pulpitu i z wyboru na kosztorysie, nic z niego
+  nie ginie, a jeżeli był aktywny — aktywny staje się ten, którego się nadal używa, bo
+  inaczej następny zapisany wynik wpadłby do projektu odłożonego na bok.
+- **D — usunięcie.** Pytanie zadaje **strona**, nie `confirm()`, a po usunięciu jest
+  **„Cofnij”**. Usunięcie zawsze było nagrobkiem (`deletedAt`, `FIRESTORE_SYNC` §3), więc
+  cofnięcie nic nie kosztuje — dziwne było raczej pytać dwa razy i nie dawać drogi
+  powrotnej. Usunięcie oddaje **listę identyfikatorów**, które nagrobkowało, a cofnięcie
+  bierze tę listę: przywraca dokładnie te wiersze i **nie wskrzesza** pozycji, którą
+  odwiedzający skasował wcześniej ręcznie. Pierwsza wersja rozpoznawała je po znaczniku
+  czasu i test to złapał — dwa usunięcia w tej samej milisekundzie nie do odróżnienia.
+
+**Dlaczego `prompt()` i `confirm()` wyleciały.** To okna przeglądarki: nie da się ich
+ostylować, po otwarciu nie sięga do nich żaden przekład strony, kilka przeglądarek je
+po prostu tłumi, a na telefonie zasłaniają dokładnie tę rzecz, którą się zmienia —
+rozdział XXVIII prosi o odwrotność. Test pilnuje, że nie wróciły.
+
+**Znaleziony i naprawiony błąd zastany: `materio-active-project` zostawał z martwym id.**
+Usunięcie aktywnego projektu miało przekazać aktywność dalej przez
+`if (wsActiveProjectId() === id) …`, ale w chwili tego porównania wiersz był już
+nagrobkiem, więc `wsActiveProjectId()` **odpowiadał już następnym projektem** — warunek
+nie trafiał nigdy i w `localStorage` zostawał identyfikator skasowanego projektu. Nic się
+przez to nie psuło widocznie, bo odczyt i tak rozwiązuje id od nowa, ale klucz kłamał.
+Teraz zapis jest bezwarunkowy. Znalazł to test w przeglądarce, nie czytanie kodu.
+
+**Czego rozdział XIV wymienia, a czego ta sesja świadomie nie dopisała: opis, notatki.**
+Reguły sprawdzają kształt dokumentu, a nie listę pól, więc przeglądarka mogłaby to
+zapisać — ale `SyncContract.projectToDoc()` w repo `3d-polednia/Materio` buduje dokument
+z ustalonej mapy, a `ProjectEntity` nie ma gdzie takiego pola trzymać, więc telefon
+nadpisałby całość przy najbliższej synchronizacji i opis zniknąłby **bez słowa**. To jest
+zmiana kontraktu (`FIRESTORE_SYNC.md`, `SyncContract.kt`, encja Room + migracja), czyli
+praca po stronie aplikacji — rozdział VII. **Do decyzji właściciela** (patrz otwarte
+decyzje). Pomieszczenia, materiały, koszty i zapis kalkulacji mają własne sesje (20, 17,
+19, 16), więc nie ma po nich pustych sekcji: rozdział XXV zabrania martwego przycisku,
+a pusty nagłówek jest tym samym, tylko cichszym.
+
+**Pomieszczenia przestały być odpinane przy usuwaniu projektu.** Kasowały wtedy jedyną
+informację potrzebną do cofnięcia, a pomieszczenie to fizyczne miejsce, które i tak
+przeżywa projekt zmierzony dla niego. Nic tego dziś nie renderuje po projekcie (to sesja
+20), więc zmiana nic nie kosztuje, a kupuje całe cofnięcie.
+
+- Sprawdzone: **415 testów logiki + 177 testów `/projekty/` w Chromium — 592/592
+  przechodzi**, a wcześniejsze 1117 + 111 + 180 + 331 + 121 + 90 nadal przechodzą
+  (razem **2542**). Dwa nowe pliki: `scripts/test-projects.mjs` (bez zależności)
+  i `scripts/test-projects-page.mjs`. Ten drugi **niczego nie podstawia** — strona nie
+  dotyka sieci — więc sadza magazyn w `localStorage`, otwiera stronę, klika to, co klika
+  odwiedzający, i czyta jedno i drugie: co narysowano i co wróciło do magazynu. W tym:
+  usunięty projekt niepokazujący się na żadnym z dwóch ekranów, zarchiwizowany schowany
+  pod złożonym „Archiwum”, projekt w dwóch walutach oznaczony zamiast zsumowany, przycisk
+  wstecz wracający na listę (bo otwarcie projektu to zwykła nawigacja, a nie zakładka),
+  cztery języki, przełączenie waluty niezmieniające ani kwoty, ani ilości, szerokości
+  wymienione w rozdziale XXVIII (320 / 375 / 390 / 430 / 768 / 1280 px) na **obu** ekranach
+  i wariant z wyłączonym JavaScriptem.
+- Kontrast: bez nowej pary — pasek „Cofnij” wydaje `--on-accent-soft` na `--accent-soft`,
+  czyli parę, którą sprawdzano już dla panelu wyniku (9,98:1 w jasnym, 11,41:1
+  w ciemnym). `scripts/check-contrast.mjs`: wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 14
 
@@ -825,6 +928,36 @@ komentarz nagłówka.
 ## Otwarte decyzje
 
 Rozstrzygnąć, zanim dotknie ich któraś z kolejnych sesji.
+
+### Opis i notatki projektu wymagają zmiany kontraktu — z Sesji 15
+
+Rozdział XIV wymienia w projekcie **opis** i **notatki**. Sesja 15 ich nie dopisała
+i zrobiła to celowo. Reguły bezpieczeństwa sprawdzają kształt dokumentu projektu, a nie
+listę pól (`validProject` w `config/firebase/firestore.rules` nie ma `hasOnly`), więc
+przeglądarka **mogłaby** zapisać dodatkowe pole i serwer by je przyjął. Problem jest po
+drugiej stronie: `SyncContract.projectToDoc()` buduje dokument z ustalonej mapy
+(`name`, `archived` + stemple), a `ProjectEntity` nie ma gdzie takiego pola trzymać — więc
+telefon nadpisuje dokument w całości przy najbliższej synchronizacji i opis znika **bez
+komunikatu, bez błędu i bez śladu**. To najgorszy możliwy sposób gubienia cudzych danych.
+
+Zrobienie tego jak należy dotyka czterech rzeczy w repo `3d-polednia/Materio`:
+`docs/FIRESTORE_SYNC.md` (kontrakt), `SyncContract.kt` (mapowanie w obie strony),
+`ProjectEntity` (kolumna) i migracja Room. Plus ekran w aplikacji, jeżeli opis ma być
+widoczny także na telefonie. **Poza zakresem prac nad webem** (rozdział VII) — **potrzebna
+decyzja właściciela**, czy zlecić to jako etap w tamtym repo.
+
+Do tego czasu strona projektu pokazuje to, co dokument naprawdę niesie: nazwę, stan
+(w archiwum czy nie) i dwa stemple czasu jako „historię”.
+
+### Odmiana liczebnika przy „pozycji” — znalezione w Sesji 15
+
+Wiersz projektu mówi **„1 pozycji”** zamiast „1 pozycja”. Klucz `ws_lines` trzyma jedną
+formę — tę dla 5 i więcej — i tak było od początku: to samo zdanie stoi już na pulpicie
+(Sesja 14) i na `/kosztorys/`. Mechanizm odmiany istnieje (`unitLabel()` w
+`assets/calculators.js`, Sesje 9–11), ale mieszka w pliku silników, którego `/projekty/`,
+`/kosztorys/` ani pulpit nie ładują — więc naprawa oznacza wyjęcie go do wspólnego miejsca
+i przejście przez trzy strony naraz. Sesja 15 tego nie ruszała (rozdział XXXV: jedno
+zadanie na sesję). **Do wpisania w którąś z sesji 16–19**, które i tak dotykają tych stron.
 
 ### Ten sam błąd zaokrąglenia w aplikacji Android — znalezione w Sesji 12
 

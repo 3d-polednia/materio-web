@@ -180,6 +180,16 @@ export const urlMaterials = (lang) => `${prefix(lang)}/${SECTION.materials[lang]
 export const urlProjects = (lang) => `${prefix(lang)}/${SECTION.projects[lang]}/`;
 export const urlEstimate = (lang) => `${prefix(lang)}/${SECTION.estimate[lang]}/`;
 
+/**
+ * One project, as a query string on /projekty/ rather than a path segment.
+ *
+ * A project id is made in the browser and is unbounded, so it can never be a directory:
+ * GitHub Pages serves files and has no rewrites, which is the same wall /p/<token> hits.
+ * The detail is therefore a state of the projects page — see the `project` route in
+ * src/ia.mjs, which is declared `view: true` for exactly this reason.
+ */
+export const urlProject = (lang, id) => `${urlProjects(lang)}?id=${encodeURIComponent(id)}`;
+
 export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
 
 /** The Android app's own page. Not the same thing as URL_APP, which is the account. */

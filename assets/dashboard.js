@@ -131,8 +131,11 @@ function dashRenderProjects() {
 function dashRenderRecent() {
   const list = document.getElementById("dash-recent");
   if (!list) return;
+  // Archived projects too (wsAllProjects, not wsProjects): a line saved in a project that
+  // has since been put away is still one of the last things kept, and dropping the name
+  // would leave the row saying where it came from with a blank.
   const names = {};
-  wsProjects().forEach((p) => { names[p.id] = p.name; });
+  wsAllProjects().forEach((p) => { names[p.id] = p.name; });
 
   const rows = wsEstimations()
     .slice()

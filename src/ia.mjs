@@ -27,7 +27,7 @@
 import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies,
+  urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -77,6 +77,11 @@ export const STATUS = {
  *   indexable   whether the page belongs in sitemap.xml and may be crawled.
  *   path        (localized) lang => "/…/"   (language-neutral) a literal string.
  *   each        "calculator" | "guide" — this route stands for a family of pages.
+ *   view        true → a screen of its own with no file of its own: it is a state of its
+ *               parent page, reached by a query string, and the build writes nothing for
+ *               it. `path(lang, key)` returns the parent's URL plus that query. Used
+ *               where the key is made in the browser and is unbounded, so it can never
+ *               be a directory on GitHub Pages — /projekty/?id=<projectId>.
  *   header      { order, key } — a link in the main navigation, at that position.
  *               Four at most: session 5 measured the header and six links plus the
  *               pickers overflow the row between 900px and 1080px wide.
@@ -182,6 +187,22 @@ export const ROUTES = [
       "'Poziom /projekty/ i /kosztorys/'.",
   },
   {
+    id: "project",
+    level: LEVEL.GUEST, status: STATUS.LIVE, view: true,
+    parent: "projects", localized: true, indexable: false,
+    path: urlProject,
+    note: "One project. Chapter XIV: „Projekt jest centralnym elementem darmowego konta " +
+      "LiczMat.” The id goes in the query string, not the path — a project id is made in " +
+      "the browser and is unbounded, and GitHub Pages serves files with no rewrites, " +
+      "which is the same wall /p/<token> hits. That makes it a `view`: a screen of its " +
+      "own with no file of its own, rendered into /projekty/ by assets/workspace-ui.js. " +
+      "GUEST for the reason /projekty/ and the dashboard are — the project is a row in " +
+      "this browser's localStorage and belongs to whoever is sitting at it; an account " +
+      "adds sync, not the right to read your own work. Session 15 built the C, R, U and " +
+      "D of it; the sections chapter XIV also names arrive with their own sessions " +
+      "(materials 17, notes 18, costs 19, rooms 20).",
+  },
+  {
     id: "estimate",
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "projects", localized: true, indexable: true,
@@ -256,15 +277,6 @@ export const ROUTES = [
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
       "indexable — the paywall sits on the Pro modules, not on their description.",
-  },
-  {
-    id: "project",
-    level: LEVEL.LICZMAT, status: STATUS.PLANNED, session: 15,
-    parent: "projects", localized: true, indexable: false,
-    plannedPath: "?id=<projectId>",
-    note: "One project: rooms, calculations, materials, costs, notes, history. The id " +
-      "goes in the query string, not the path — GitHub Pages cannot rewrite an " +
-      "unbounded segment, which is why /p/<token> already needs a 404.html hop.",
   },
   {
     id: "clients",
@@ -595,6 +607,7 @@ export function livePaths(calcs, guides) {
 
   for (const r of liveRoutes()) {
     if (r.generated === false) continue; // hand-written: privacy-policy.html
+    if (r.view) continue; // a state of its parent page: the parent's file is the file
     if (!r.localized) { out.add(file(r.path)); continue; }
     for (const lang of LANGS) {
       if (r.each === "calculator") for (const c of calcs) out.add(file(r.path(lang, c)));
@@ -629,6 +642,7 @@ export function validateIA() {
       if (r.localized && typeof r.path !== "function") problems.push(`IA: localized route "${r.id}" needs a path(lang)`);
       if (!r.localized && typeof r.path !== "string") problems.push(`IA: language-neutral route "${r.id}" needs a literal path`);
     } else {
+      if (r.view) problems.push(`IA: route "${r.id}" is a view but is not live — a view has no page of its own to plan`);
       if (!r.session) problems.push(`IA: planned route "${r.id}" does not name its session`);
       if (r.path) problems.push(`IA: planned route "${r.id}" must not have a live path`);
       if (r.localized && r.plannedSlug) {
@@ -654,6 +668,40 @@ export function validateIA() {
     for (let cur = r; cur; cur = cur.parent ? BY_ID.get(cur.parent) : null) {
       if (seen.has(cur.id)) { problems.push(`IA: parent cycle through "${r.id}"`); break; }
       seen.add(cur.id);
+    }
+  }
+
+  // A view is a screen with no file of its own, so it can only be honest about four
+  // things: it hangs off a real page, that page is the one that renders it, nothing may
+  // link to it from the navigation (the URL needs a key only one visitor has), and it may
+  // not be indexed. The last check is the load-bearing one: `livePaths()` skips views, so
+  // a view whose URL is not inside its parent's would be a page the build never writes
+  // and the check against the IA would never notice.
+  for (const r of ROUTES) {
+    if (!r.view || r.status !== STATUS.LIVE) continue;
+    const parent = r.parent ? BY_ID.get(r.parent) : null;
+    if (!parent) { problems.push(`IA: view "${r.id}" has no parent page to be a state of`); continue; }
+    if (parent.status !== STATUS.LIVE) problems.push(`IA: view "${r.id}" is a state of "${parent.id}", which is not built`);
+    if (parent.view) problems.push(`IA: view "${r.id}" hangs off another view ("${parent.id}")`);
+    if (r.indexable) problems.push(`IA: view "${r.id}" is indexable, but it has no URL of its own to index`);
+    if (r.header || r.footer) problems.push(`IA: view "${r.id}" is in the navigation, but its URL needs a key only one visitor has`);
+    if (!allows(parent.level, r.level)) {
+      problems.push(`IA: view "${r.id}" needs ${r.level} while "${parent.id}" needs ` +
+        `${parent.level} — the page that renders it would have to gate part of itself`);
+    }
+    if (r.localized !== parent.localized) {
+      problems.push(`IA: view "${r.id}" is ${r.localized ? "" : "not "}localized but "${parent.id}" is ` +
+        `${parent.localized ? "" : "not "}— they are the same file`);
+    }
+    if (typeof r.path === "function" && typeof parent.path === "function") {
+      for (const lang of LANGS) {
+        const url = r.path(lang, "probe");
+        if (!url.startsWith(parent.path(lang))) {
+          problems.push(`IA: view "${r.id}" points at ${url} in ${lang}, outside "${parent.id}" ` +
+            `(${parent.path(lang)}) — the build writes no file for it`);
+        }
+        if (!url.includes("probe")) problems.push(`IA: view "${r.id}" drops its key from the ${lang} URL`);
+      }
     }
   }
 

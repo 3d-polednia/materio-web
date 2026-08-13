@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/projects/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260813e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260813f" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Projects and rooms — LiczMat">
 <meta name="twitter:description" content="Projects and rooms in LiczMat: save a room's dimensions once and the calculators fill in the floor, wall or ceiling area. No sign-up, the data stays in your browser.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260813e">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813f">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -138,31 +138,94 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li aria-current="page">Projects and rooms</li></ol></nav>
-      <h1>Projects and rooms</h1>
-      <p class="lead">Save rooms with their dimensions and collect results into projects. Everything stays in this browser; an account is only needed to carry it to the phone.</p>
+      <h1 id="ws-title">Projects and rooms</h1>
+      <p class="lead" id="ws-lead">Save rooms with their dimensions and collect results into projects. Everything stays in this browser; an account is only needed to carry it to the phone.</p>
     </div>
   </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
-      <h2>Projects</h2>
-      <p class="muted">A project collects calculator results into one estimate. Every new line goes to the active project.</p>
-      <form id="ws-project-form" class="inline-form">
-        <input id="ws-project-name" type="text" maxlength="120" placeholder="Project name" required>
-        <button type="submit" class="btn btn-primary btn-sm">Add</button>
-      </form>
-      <ul id="ws-project-list" class="data-list"></ul>
+      <article id="ws-project" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/en/projects/" data-ws-back>All projects</a></p>
 
-      <h2 class="mt-8">Rooms</h2>
-      <p class="muted">A room is a name and three dimensions. The calculators work out floor, walls and ceiling from them.</p>
-      <form id="ws-room-form" class="inline-form">
-        <input id="ws-room-name" type="text" maxlength="120" placeholder="Room name" required>
-        <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Length (m)">
-        <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Width (m)">
-        <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Height (m)">
-        <button type="submit" class="btn btn-primary btn-sm">Add</button>
-      </form>
-      <ul id="ws-room-list" class="data-list"></ul>
+        <div id="ws-project-missing" hidden>
+          <h2>No such project</h2>
+          <p class="muted">This address points at a project this browser does not have. It may have been deleted, or it was made on another device.</p>
+        </div>
+
+        <div id="ws-project-body" hidden>
+          <p class="ws-project-hist muted" id="ws-project-hist"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Lines</span> <b id="ws-project-count"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Total</span> <b id="ws-project-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>These lines are in different currencies. The total adds them up but converts nothing — check the currency on each cost.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Make active</button>
+            <span class="chip on" id="ws-project-active" hidden>Active</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">Rename</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">Delete</button>
+          </div>
+
+          <form id="ws-rename-form" class="inline-form mt-4" hidden>
+            <input id="ws-rename-name" type="text" maxlength="120" aria-label="Project name" required>
+            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Cancel</button>
+          </form>
+
+          <div id="ws-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="ws-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="ws-delete-yes">Yes, delete it</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="ws-delete-no">Cancel</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Calculations</h2>
+              <a class="dash-more" href="/en/cost-estimate/" id="ws-project-estimate">Open the estimate</a>
+            </div>
+            <p class="muted">The results kept in this project with the “Add to the project” button.</p>
+            <ul id="ws-project-lines" class="data-list"></ul>
+          </section>
+        </div>
+      </article>
+
+      <div id="ws-index">
+        <p class="ws-undo" id="ws-undo" role="status" hidden>
+          <span id="ws-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="ws-undo-go">Undo</button>
+        </p>
+
+        <h2>Projects</h2>
+        <p class="muted">A project collects calculator results into one estimate. Every new line goes to the active project.</p>
+        <form id="ws-project-form" class="inline-form">
+          <input id="ws-project-name" type="text" maxlength="120" placeholder="Project name" required>
+          <button type="submit" class="btn btn-primary btn-sm">Add</button>
+        </form>
+        <ul id="ws-project-list" class="data-list"></ul>
+
+        <details id="ws-archive" class="ws-archive" hidden>
+          <summary id="ws-archive-summary">Archive</summary>
+          <p class="muted">Projects put aside. Nothing in them is lost: they take no new lines and stay out of the list above and off the dashboard.</p>
+          <ul id="ws-archive-list" class="data-list"></ul>
+        </details>
+
+        <h2 class="mt-8">Rooms</h2>
+        <p class="muted">A room is a name and three dimensions. The calculators work out floor, walls and ceiling from them.</p>
+        <form id="ws-room-form" class="inline-form">
+          <input id="ws-room-name" type="text" maxlength="120" placeholder="Room name" required>
+          <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Length (m)">
+          <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Width (m)">
+          <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Height (m)">
+          <button type="submit" class="btn btn-primary btn-sm">Add</button>
+        </form>
+        <ul id="ws-room-list" class="data-list"></ul>
+      </div>
 
       <p class="ws-links">
         <a class="btn btn-ghost" href="/en/cost-estimate/">Cost estimate</a>
@@ -246,17 +309,17 @@
   "de": "/de/projekte/",
   "en": "/en/projects/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260813e"></script>
-<script src="/assets/i18n-runtime.js?v=20260813e"></script>
-<script src="/assets/currency.js?v=20260813e"></script>
+<script src="/assets/i18n.en.js?v=20260813f"></script>
+<script src="/assets/i18n-runtime.js?v=20260813f"></script>
+<script src="/assets/currency.js?v=20260813f"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260813e"></script>
+<script src="/assets/account.js?v=20260813f"></script>
 
-<script src="/assets/workspace.js?v=20260813e"></script>
-<script src="/assets/workspace-ui.js?v=20260813e"></script>
-<script src="/assets/main.js?v=20260813e"></script>
+<script src="/assets/workspace.js?v=20260813f"></script>
+<script src="/assets/workspace-ui.js?v=20260813f"></script>
+<script src="/assets/main.js?v=20260813f"></script>
 
 </body>
 </html>

@@ -84,6 +84,7 @@ node scripts/build.mjs --check    # validate dictionaries/slugs only, write noth
 node scripts/test-calculators.mjs # the calculator maths, units and localization
 node scripts/test-account.mjs     # the account: levels, the session, the copy
 node scripts/test-dashboard.mjs   # the dashboard: the route, the tool list, the copy
+node scripts/test-projects.mjs    # projects: the route, the CRUD, the undo, the copy
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -154,6 +155,17 @@ scripts/test-dashboard.mjs  The dashboard: the route, the "recently used tools" 
                       the frame the build writes, the addresses it hands the page and the
                       copy in four languages. Dependency-free — run it after touching
                       assets/recent.js, assets/dashboard.js, dashboardMain() or a dash_* key
+scripts/test-projects.mjs  Projects: the `project` view declared in src/ia.mjs (and the
+                      eight ways a view can lie, each broken on purpose), the four writes
+                      in assets/workspace.js — create, read, rename, archive, delete —
+                      the undo the tombstone makes possible, the frame the build writes
+                      for both screens and the copy in four languages. Dependency-free —
+                      run it after touching assets/workspace.js, projectsMain() or a
+                      proj_*/ws_* key
+scripts/test-projects-page.mjs  /projekty/ and /projekty/?id=<id> in Chromium, nothing
+                      stubbed: the two screens, the CRUD done by clicking, the archive,
+                      the undo strip, the back button, four languages, the currency
+                      switch, the widths of chapter XXVIII and the no-JavaScript variant
 scripts/test-dashboard-page.mjs  /app/dashboard/ in Chromium, nothing stubbed (the page
                       loads no Firebase): the four lists from a planted localStorage, the
                       level strip, the language and currency switches, and the widths
@@ -171,7 +183,9 @@ assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
 assets/calc-hub.js    The search + category filter on /kalkulatory/. The hub is fully
                       server-rendered; this only narrows what is already there
 assets/workspace.js   Projects, rooms and estimate lines in localStorage (Firestore schema)
-assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/
+assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/. The
+                      projects page holds two screens — the index and one project at
+                      ?id=<projectId> — and this file shows one of them
 assets/recent.js      Which calculators this browser used, and when. Device-local, never
                       synced, no inputs and no results — only a calculator id and a time.
                       It is what the dashboard's "ostatnio używane narzędzia" reads
@@ -300,6 +314,16 @@ Kotlin side of it. Change one, change all three.
   device-local, is listed on `/cookies/`, and the visitor can clear it on the page that
   shows it. A calculator records itself only on a calculation the visitor asked for
   (`byHand` on the `calcresult` event), never on the silent run that happens on load.
+- **A project document carries `name` and `archived`, and nothing you add to it.** The
+  deployed rules validate the shape rather than a key whitelist, so a browser *can* write
+  an extra field — but `SyncContract.projectToDoc()` in `3d-polednia/Materio` builds the
+  document from a fixed map and `ProjectEntity` has nowhere to keep one, so the phone
+  erases it on its next push, silently. Chapter XIV's description, notes and per-project
+  history therefore wait on a contract change in the app repo (`docs/FIRESTORE_SYNC.md`,
+  `SyncContract.kt`, the Room entity and its migration) — see `docs/ARCHITEKTURA.md`
+  §8.1c. Deleting a project writes a tombstone and hands back the ids it tombstoned, and
+  `wsRestoreProject()` takes that token: undo is exact rather than a guess from
+  timestamps, and it never resurrects a line the visitor deleted by hand.
 - **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms and
   estimate lines in `localStorage` in the *same document shape* as Firestore, so the sync
   tab in `/app/` is a plain copy in either direction. Counting must never require an

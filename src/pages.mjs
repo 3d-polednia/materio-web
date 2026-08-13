@@ -973,6 +973,17 @@ export function androidMain(lang, t, calcs, cat) {
  * calculator could not offer one unless the visitor signed in first. Counting never
  * requires an account (FIRESTORE_SYNC §1.2), so the rooms live in localStorage in the
  * same document shape and sync upward when somebody does sign in.
+ *
+ * Two screens share this one file, because a project id is made in the browser and can
+ * never be a directory on GitHub Pages — the `project` route in src/ia.mjs is declared
+ * `view: true` for that reason:
+ *
+ *   /projekty/            the index: the projects, the archive, the rooms
+ *   /projekty/?id=<id>    one project — chapter XIV
+ *
+ * The build writes both frames; assets/workspace-ui.js shows one of them and fills it
+ * from localStorage. Without a script the index is what stands, which is right: there is
+ * nothing on either screen that does not come out of this browser's own storage.
  */
 export function projectsMain(lang, t) {
   const crumbs = breadcrumbs([
@@ -980,35 +991,102 @@ export function projectsMain(lang, t) {
     { name: t("wspage_title"), path: urlProjects(lang) },
   ]);
 
+  /* The detail. Every figure in it is written by the script; what the build fixes is the
+     shape, the headings and the labels, so nothing here has to be translated twice. */
+  const detail = `<article id="ws-project" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="${urlProjects(lang)}" data-ws-back>${esc(t("proj_back"))}</a></p>
+
+        <div id="ws-project-missing" hidden>
+          <h2>${esc(t("proj_none_t"))}</h2>
+          <p class="muted">${esc(t("proj_none_d"))}</p>
+        </div>
+
+        <div id="ws-project-body" hidden>
+          <p class="ws-project-hist muted" id="ws-project-hist"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_count_l"))}</span> <b id="ws-project-count"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("share_total"))}</span> <b id="ws-project-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">${esc(t("ws_activate"))}</button>
+            <span class="chip on" id="ws-project-active" hidden>${esc(t("ws_active"))}</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">${esc(t("ws_rename"))}</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">${esc(t("app_delete"))}</button>
+          </div>
+
+          <form id="ws-rename-form" class="inline-form mt-4" hidden>
+            <input id="ws-rename-name" type="text" maxlength="120" aria-label="${esc(t("ws_new_project"))}" required>
+            <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>${esc(t("action_cancel"))}</button>
+          </form>
+
+          <div id="ws-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="ws-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="ws-delete-yes">${esc(t("proj_delete_yes"))}</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="ws-delete-no">${esc(t("action_cancel"))}</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("proj_lines_t"))}</h2>
+              <a class="dash-more" href="${urlEstimate(lang)}" id="ws-project-estimate">${esc(t("proj_open_estimate"))}</a>
+            </div>
+            <p class="muted">${esc(t("proj_lines_d"))}</p>
+            <ul id="ws-project-lines" class="data-list"></ul>
+          </section>
+        </div>
+      </article>`;
+
   const main = `<main id="main">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
-      <h1>${esc(t("wspage_title"))}</h1>
-      <p class="lead">${esc(t("wspage_lead"))}</p>
+      <h1 id="ws-title">${esc(t("wspage_title"))}</h1>
+      <p class="lead" id="ws-lead">${esc(t("wspage_lead"))}</p>
     </div>
   </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
-      <h2>${esc(t("ws_projects"))}</h2>
-      <p class="muted">${esc(t("wspage_projects_d"))}</p>
-      <form id="ws-project-form" class="inline-form">
-        <input id="ws-project-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_project"))}" required>
-        <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
-      </form>
-      <ul id="ws-project-list" class="data-list"></ul>
+      ${detail}
 
-      <h2 class="mt-8">${esc(t("ws_rooms"))}</h2>
-      <p class="muted">${esc(t("wspage_rooms_d"))}</p>
-      <form id="ws-room-form" class="inline-form">
-        <input id="ws-room-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_room"))}" required>
-        <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="${esc(t("fld_length"))}">
-        <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="${esc(t("fld_width"))}">
-        <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="${esc(t("fld_height"))}">
-        <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
-      </form>
-      <ul id="ws-room-list" class="data-list"></ul>
+      <div id="ws-index">
+        <p class="ws-undo" id="ws-undo" role="status" hidden>
+          <span id="ws-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="ws-undo-go">${esc(t("proj_undo"))}</button>
+        </p>
+
+        <h2>${esc(t("ws_projects"))}</h2>
+        <p class="muted">${esc(t("wspage_projects_d"))}</p>
+        <form id="ws-project-form" class="inline-form">
+          <input id="ws-project-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_project"))}" required>
+          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+        </form>
+        <ul id="ws-project-list" class="data-list"></ul>
+
+        <details id="ws-archive" class="ws-archive" hidden>
+          <summary id="ws-archive-summary">${esc(t("proj_archive_t"))}</summary>
+          <p class="muted">${esc(t("proj_archive_d"))}</p>
+          <ul id="ws-archive-list" class="data-list"></ul>
+        </details>
+
+        <h2 class="mt-8">${esc(t("ws_rooms"))}</h2>
+        <p class="muted">${esc(t("wspage_rooms_d"))}</p>
+        <form id="ws-room-form" class="inline-form">
+          <input id="ws-room-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_room"))}" required>
+          <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="${esc(t("fld_length"))}">
+          <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="${esc(t("fld_width"))}">
+          <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="${esc(t("fld_height"))}">
+          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+        </form>
+        <ul id="ws-room-list" class="data-list"></ul>
+      </div>
 
       <p class="ws-links">
         <a class="btn btn-ghost" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>

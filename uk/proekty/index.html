@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/projects/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260813e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260813f" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Проєкти та приміщення — LiczMat">
 <meta name="twitter:description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі. Без реєстрації, дані залишаються в браузері.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260813e">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813f">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -138,31 +138,94 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li aria-current="page">Проєкти та приміщення</li></ol></nav>
-      <h1>Проєкти та приміщення</h1>
-      <p class="lead">Збережи приміщення з розмірами й збирай результати в проєкти. Усе залишається в цьому браузері; акаунт потрібен лише для перенесення на телефон.</p>
+      <h1 id="ws-title">Проєкти та приміщення</h1>
+      <p class="lead" id="ws-lead">Збережи приміщення з розмірами й збирай результати в проєкти. Усе залишається в цьому браузері; акаунт потрібен лише для перенесення на телефон.</p>
     </div>
   </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
-      <h2>Проєкти</h2>
-      <p class="muted">Проєкт збирає результати калькуляторів у один кошторис. Кожна нова позиція йде в активний проєкт.</p>
-      <form id="ws-project-form" class="inline-form">
-        <input id="ws-project-name" type="text" maxlength="120" placeholder="Назва проєкту" required>
-        <button type="submit" class="btn btn-primary btn-sm">Додати</button>
-      </form>
-      <ul id="ws-project-list" class="data-list"></ul>
+      <article id="ws-project" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/uk/proekty/" data-ws-back>Усі проєкти</a></p>
 
-      <h2 class="mt-8">Приміщення</h2>
-      <p class="muted">Приміщення — це назва й три розміри. З них калькулятори рахують підлогу, стіни й стелю.</p>
-      <form id="ws-room-form" class="inline-form">
-        <input id="ws-room-name" type="text" maxlength="120" placeholder="Назва приміщення" required>
-        <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Довжина (м)">
-        <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Ширина (м)">
-        <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Висота (м)">
-        <button type="submit" class="btn btn-primary btn-sm">Додати</button>
-      </form>
-      <ul id="ws-room-list" class="data-list"></ul>
+        <div id="ws-project-missing" hidden>
+          <h2>Такого проєкту немає</h2>
+          <p class="muted">Ця адреса вказує на проєкт, якого немає в цьому браузері. Його могли видалити або він виник на іншому пристрої.</p>
+        </div>
+
+        <div id="ws-project-body" hidden>
+          <p class="ws-project-hist muted" id="ws-project-hist"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Позицій</span> <b id="ws-project-count"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Разом</span> <b id="ws-project-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Позиції в різних валютах. Сума додає їх, але нічого не перераховує за курсом — перевір валюту в колонці вартості.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Зробити активним</button>
+            <span class="chip on" id="ws-project-active" hidden>Активний</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">Перейменувати</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">Видалити</button>
+          </div>
+
+          <form id="ws-rename-form" class="inline-form mt-4" hidden>
+            <input id="ws-rename-name" type="text" maxlength="120" aria-label="Назва проєкту" required>
+            <button type="submit" class="btn btn-primary btn-sm">Зберегти</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Скасувати</button>
+          </form>
+
+          <div id="ws-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="ws-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="ws-delete-yes">Так, видалити</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="ws-delete-no">Скасувати</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Розрахунки</h2>
+              <a class="dash-more" href="/uk/koshtorys/" id="ws-project-estimate">Відкрити кошторис</a>
+            </div>
+            <p class="muted">Результати, збережені в цьому проєкті кнопкою „Додати до проєкту“.</p>
+            <ul id="ws-project-lines" class="data-list"></ul>
+          </section>
+        </div>
+      </article>
+
+      <div id="ws-index">
+        <p class="ws-undo" id="ws-undo" role="status" hidden>
+          <span id="ws-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="ws-undo-go">Скасувати</button>
+        </p>
+
+        <h2>Проєкти</h2>
+        <p class="muted">Проєкт збирає результати калькуляторів у один кошторис. Кожна нова позиція йде в активний проєкт.</p>
+        <form id="ws-project-form" class="inline-form">
+          <input id="ws-project-name" type="text" maxlength="120" placeholder="Назва проєкту" required>
+          <button type="submit" class="btn btn-primary btn-sm">Додати</button>
+        </form>
+        <ul id="ws-project-list" class="data-list"></ul>
+
+        <details id="ws-archive" class="ws-archive" hidden>
+          <summary id="ws-archive-summary">Архів</summary>
+          <p class="muted">Відкладені проєкти. Нічого з них не зникає: вони не отримують нових позицій і їх немає ні у списку вище, ні на панелі.</p>
+          <ul id="ws-archive-list" class="data-list"></ul>
+        </details>
+
+        <h2 class="mt-8">Приміщення</h2>
+        <p class="muted">Приміщення — це назва й три розміри. З них калькулятори рахують підлогу, стіни й стелю.</p>
+        <form id="ws-room-form" class="inline-form">
+          <input id="ws-room-name" type="text" maxlength="120" placeholder="Назва приміщення" required>
+          <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Довжина (м)">
+          <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Ширина (м)">
+          <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Висота (м)">
+          <button type="submit" class="btn btn-primary btn-sm">Додати</button>
+        </form>
+        <ul id="ws-room-list" class="data-list"></ul>
+      </div>
 
       <p class="ws-links">
         <a class="btn btn-ghost" href="/uk/koshtorys/">Кошторис</a>
@@ -246,17 +309,17 @@
   "de": "/de/projekte/",
   "en": "/en/projects/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260813e"></script>
-<script src="/assets/i18n-runtime.js?v=20260813e"></script>
-<script src="/assets/currency.js?v=20260813e"></script>
+<script src="/assets/i18n.uk.js?v=20260813f"></script>
+<script src="/assets/i18n-runtime.js?v=20260813f"></script>
+<script src="/assets/currency.js?v=20260813f"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260813e"></script>
+<script src="/assets/account.js?v=20260813f"></script>
 
-<script src="/assets/workspace.js?v=20260813e"></script>
-<script src="/assets/workspace-ui.js?v=20260813e"></script>
-<script src="/assets/main.js?v=20260813e"></script>
+<script src="/assets/workspace.js?v=20260813f"></script>
+<script src="/assets/workspace-ui.js?v=20260813f"></script>
+<script src="/assets/main.js?v=20260813f"></script>
 
 </body>
 </html>

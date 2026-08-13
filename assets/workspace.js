@@ -81,9 +81,32 @@ const wsAlive = (rows) => rows.filter((r) => !r.deletedAt);
 
 /* ------------------------------------------------------------------ projects */
 
-function wsProjects() {
+/**
+ * Every project that still exists, archived ones included, newest change first.
+ *
+ * The two lists below are the ones pages ask for. This one is what a lookup by id needs:
+ * an archived project is not a deleted project, so opening it, renaming it or taking it
+ * back out of the archive all have to keep working.
+ */
+function wsAllProjects() {
   return wsAlive(wsLoad().projects).sort((a, b) => b.updatedAt - a.updatedAt);
 }
+
+/**
+ * The working set: what the picker, the dashboard and "the active project" mean.
+ *
+ * Archiving is the answer to a project that is finished but worth keeping — chapter XIV
+ * makes the project the centre of the free account, and a centre that only grows is a
+ * list nobody reads by the tenth bathroom. `archived` has been in the document shape and
+ * in the security rules since the first sync; until session 15 nothing ever set it.
+ */
+const wsProjects = () => wsAllProjects().filter((p) => !p.archived);
+
+/** The other half of the same list. /projekty/ shows it folded away. */
+const wsArchivedProjects = () => wsAllProjects().filter((p) => p.archived);
+
+/** One project by id, archived or not. Null when it never existed or was deleted. */
+const wsProject = (id) => wsAllProjects().find((p) => p.id === id) || null;
 
 function wsAddProject(name) {
   const data = wsLoad();
@@ -94,24 +117,96 @@ function wsAddProject(name) {
   return project;
 }
 
-function wsRenameProject(id, name) {
+/**
+ * Correct a project in place. Anything not passed keeps its current value.
+ *
+ * Only the two fields the sync contract carries — `name` and `archived`. A project also
+ * has a description, notes and a history in chapter XIV; none of them is in
+ * `SyncContract.projectToDoc()` in the app repo, and the phone rewrites the whole
+ * document on its next push, so a field invented here would be erased without a word.
+ * See the report for session 15: that is a change to the contract, not to this file.
+ */
+function wsUpdateProject(id, fields) {
   const data = wsLoad();
-  const project = data.projects.find((p) => p.id === id);
-  if (!project) return;
-  project.name = String(name).slice(0, 120);
+  const project = data.projects.find((p) => p.id === id && !p.deletedAt);
+  if (!project) return null;
+  if (fields.name !== undefined) {
+    const name = String(fields.name).trim().slice(0, 120);
+    if (!name) return null; // a project with no name is a row nobody can tell apart
+    project.name = name;
+  }
+  if (fields.archived !== undefined) project.archived = Boolean(fields.archived);
   project.updatedAt = Date.now();
   wsSave(data);
+  // The active project is the one every new estimate line lands in, so it can never be
+  // one the visitor has just put away. wsActiveProjectId() resolves to a project that is
+  // still in the working set, so writing that answer back is the whole handoff.
+  if (project.archived) wsSetActiveProject(wsActiveProjectId());
+  return project;
 }
 
-/** Tombstone the project and everything hanging off it, exactly as the app cascades. */
+const wsRenameProject = (id, name) => wsUpdateProject(id, { name });
+const wsArchiveProject = (id, on) => wsUpdateProject(id, { archived: on !== false });
+
+/**
+ * Tombstone the project and its estimate lines, exactly as the app cascades.
+ *
+ * Rooms are deliberately left alone. They used to be unlinked here, which threw away the
+ * one fact needed to put the project back, and a room is a physical place that outlives
+ * the project it was measured for anyway. Nothing renders a room by project yet — that
+ * is session 20 — so this costs nothing today and buys a whole undo.
+ *
+ * @returns {{id: string, at: number, lines: string[]}|null} what was tombstoned. Hand it
+ *   to wsRestoreProject() to undo exactly this delete and nothing else.
+ */
 function wsDeleteProject(id) {
   const data = wsLoad();
+  const project = data.projects.find((p) => p.id === id && !p.deletedAt);
+  if (!project) return null;
   const now = Date.now();
-  data.projects.filter((p) => p.id === id).forEach((p) => { p.deletedAt = now; p.updatedAt = now; });
-  data.estimations.filter((e) => e.projectId === id).forEach((e) => { e.deletedAt = now; e.updatedAt = now; });
-  data.rooms.filter((r) => r.projectId === id).forEach((r) => { r.projectId = null; r.updatedAt = now; });
+  project.deletedAt = now;
+  project.updatedAt = now;
+  const lines = data.estimations.filter((e) => e.projectId === id && !e.deletedAt);
+  lines.forEach((e) => { e.deletedAt = now; e.updatedAt = now; });
   wsSave(data);
-  if (wsActiveProjectId() === id) wsSetActiveProject((wsProjects()[0] || {}).id || "");
+  // The stored id is now a tombstone. wsActiveProjectId() already resolves past it, so
+  // writing that answer back is the handoff — and it has to be unconditional: comparing
+  // the stored id with the deleted one has just stopped matching, because the resolution
+  // moved on the moment the row was tombstoned, leaving the deleted id in storage.
+  wsSetActiveProject(wsActiveProjectId());
+  return { id, at: now, lines: lines.map((e) => e.id) };
+}
+
+/**
+ * Undo one delete.
+ *
+ * A tombstone is a row with a `deletedAt`, not a row that is gone (FIRESTORE_SYNC §3), so
+ * putting a project back is clearing that field. What comes back with it is named by the
+ * token the delete handed out, not worked out again here: a line the visitor deleted by
+ * hand stays deleted, because they asked for that separately, and naming the rows means
+ * two deletes in the same millisecond cannot be confused for each other.
+ *
+ * `updatedAt` moves to now, so a phone that already heard about the delete hears about
+ * the undo as well instead of re-deleting the row on the next sync.
+ *
+ * @param {{id: string, lines: string[]}|string} token what wsDeleteProject() returned. A
+ *   bare id restores the project on its own, which is what a project with no lines is.
+ */
+function wsRestoreProject(token) {
+  const id = typeof token === "string" ? token : (token && token.id);
+  const lines = (token && token.lines) || [];
+  if (!id) return null;
+  const data = wsLoad();
+  const project = data.projects.find((p) => p.id === id);
+  if (!project || !project.deletedAt) return null;
+  const now = Date.now();
+  project.deletedAt = null;
+  project.updatedAt = now;
+  const wanted = new Set(lines);
+  data.estimations.filter((e) => wanted.has(e.id) && e.projectId === id)
+    .forEach((e) => { e.deletedAt = null; e.updatedAt = now; });
+  wsSave(data);
+  return project;
 }
 
 function wsActiveProjectId() {
