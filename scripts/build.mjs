@@ -30,7 +30,8 @@ import {
   urlProjects, urlEstimate, urlAndroid, urlCookies,
 } from "../src/site.mjs";
 import {
-  livePaths, validateIA, validateCalcHub, HOME_DOORS, CALC_CATEGORIES, route, STATUS,
+  livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
+  route, STATUS,
 } from "../src/ia.mjs";
 import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
@@ -47,7 +48,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260813a";
+const STAMP = "20260813b";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -175,6 +176,14 @@ function validate() {
 
   // The architecture itself: levels, the page tree, the navigation, the user flows.
   problems.push(...validateIA());
+
+  // The three access levels are rendered from ACCOUNT_LEVELS, and a key nobody wrote
+  // would render as "acc_pro_3" on the account page in that one language.
+  for (const key of accountLevelKeys()) {
+    for (const lang of LANGS) {
+      if (!(key in DICT[lang])) problems.push(`account level key "${key}" is missing in ${lang}`);
+    }
+  }
 
   // The calculator hub: every calculator in exactly one of chapter XI's categories, and
   // a shortlist the guides actually back up. validateIA() cannot see CALCS or GUIDES.

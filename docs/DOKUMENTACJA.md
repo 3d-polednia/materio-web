@@ -23,6 +23,7 @@ sklepów, SEO oraz zarządzanie assetami.
 6. [Treści i tłumaczenia (i18n)](#6-treści-i-tłumaczenia-i18n)
 7. [Kalkulatory](#7-kalkulatory)
    - [7a. Testy kalkulatorów](#7a-testy-kalkulatorów)
+7b. [Konto, sesja i poziomy dostępu](#7b-konto-sesja-i-poziomy-dostępu)
 8. [Wyszukiwarka sklepów](#8-wyszukiwarka-sklepów)
 9. [SEO](#9-seo)
 10. [System projektowy (CSS)](#10-system-projektowy-css)
@@ -72,6 +73,11 @@ src/calc-meta.mjs        Wzory „Jak to liczymy" + ich tłumaczenia
 src/tokens.mjs           Kontrola systemu projektowego (validateTokens) — czyta styles.css
 scripts/check-contrast.mjs  Pomiar kontrastu tokenów w obu motywach (WCAG AA)
 src/app-pages.mjs        /app/ i /p/ (noindex)
+src/ia.mjs               Architektura informacji: trasy, poziomy dostępu, ACCOUNT_LEVELS
+scripts/test-calculators.mjs  Testy silników (czysta logika, bez zależności)
+scripts/test-pages.mjs        Testy stron kalkulatorów w Chromium (Playwright spoza repo)
+scripts/test-account.mjs      Testy konta: poziomy, sesja, ?next=, słownik (bez zależności)
+scripts/test-account-page.mjs Testy /app/ w Chromium z podstawionym SDK Firebase
 privacy-policy.html      Polityka prywatności (PL + EN) — osobna podstrona (wymóg Google Play)
 404.html                 Strona błędu 404; przekierowuje też /p/<token> na /p/?t=<token>
 site.webmanifest         Manifest PWA (nazwa, ikony, kolory)
@@ -85,6 +91,7 @@ assets/
   calculators.js         Silniki liczące + podpięcie formularzy (wireCalculator)
   stores.js              Wyszukiwarka sklepów (buildStoreFinder): mapa + lista OSM
   main.js                Wiązanie strony (pomieszczenia, menu mobilne, karuzela, zgoda)
+  account.js             Sesja i poziomy dostępu — ładowana na każdej stronie
   app.js                 /app/ — Firebase Auth + synchronizacja Firestore
   share.js               /p/<token> — udostępniona wycena, tylko do odczytu
   firebase-config.js     Konfiguracja Firebase Web (placeholdery do uzupełnienia)
@@ -279,6 +286,65 @@ binarny float potrafi położyć dokładny wynik ułamek poniżej albo powyżej 
 wartość leżącą bliżej niż jedna miliardowa część od liczby całkowitej. Nie wolno wrócić do
 gołych `Math.ceil` / `Math.floor` — sekcja „wartości graniczne" w teście pilnuje tego
 dziesięcioma przypadkami.
+
+## 7b. Konto, sesja i poziomy dostępu
+
+Kod: `assets/account.js` (sesja, wspólna dla całego serwisu), `assets/app.js` (`/app/` —
+jedyna strona, która rozmawia z Firebase), `src/app-pages.mjs` (widoki), `ACCOUNT_LEVELS`
+w `src/ia.mjs` (trzy poziomy rozdziału II). Kontrakt danych:
+`docs/FIRESTORE_SYNC.md` w repo `3d-polednia/Materio`.
+
+### Poziom
+
+`lmLevelOf(user, profile)` zwraca `guest` bez użytkownika, `pro` gdy
+`users/{uid}.plan == "premium"` i jest ważny, w pozostałych przypadkach `liczmat`. `plan`
+i `planValidUntil` zapisuje **wyłącznie serwer** — reguły dopuszczają z profilu tylko
+`lastSeenAt` i `appVersion`, więc przeglądarka poziom czyta, ale nie nadaje. Dziś nikt
+`plan` nie zapisuje (brak Cloud Functions i Play Billing), więc realnie istnieją dwa
+poziomy: gość i LiczMat. Karta Pro mówi „W przygotowaniu” i nie ma przycisku zakupu.
+
+### Sesja poza `/app/`
+
+129 stron nie ładuje Firebase. Dostają jeden klucz `localStorage`:
+
+| Klucz | Wartość | Kto pisze | Do czego |
+|---|---|---|---|
+| `liczmat-signed-in` | `liczmat` / `pro` (brak = gość) | `/app/` przy zmianie stanu logowania | zdanie pod wynikiem kalkulatora, kropka przy „Moje konto” w nagłówku |
+| `liczmat-remember` | `1` / `0` | formularz logowania i profil | czy prosić Firebase o `browserLocalPersistence`, czy o `browserSessionPersistence` |
+
+`liczmat-signed-in` to **podpowiedź, nigdy uprawnienie**. Może być nieaktualna, więc nic
+nie wolno na niej bramkować — `FIRESTORE_SYNC.md` §1.2 mówi, że liczenie nigdy nie wymaga
+konta. Wartość `1`, którą klucz trzymał przed Sesją 13, nadal czyta się jako „zalogowany”.
+
+### Widoki logowania
+
+Jedna karta, trzy widoki (`[data-auth-view]`): `signin`, `signup`, `reset`. Każdy ma
+**własny formularz**, bo przeglądarka podpowiada hasło po `autocomplete`, a jedno pole na
+dwa tryby dawało zapisane hasło na formularzu zakładania konta. Widok wybiera
+`?mode=signup` albo `?mode=reset`; `?next=<ścieżka>` pokazuje po zalogowaniu przycisk
+powrotu. `lmSafeNext()` przepuszcza wyłącznie ścieżkę tego serwisu — `//gdzieś.example`
+i `javascript:` są odrzucane, żeby strona logowania nie była otwartym przekierowaniem.
+
+### Profil
+
+Zakładka „Profil” na `/app/`: adres, sposób logowania, data założenia i ostatniego użycia
+(z `users/{uid}`), nazwa konta, poziom i sesja na urządzeniu. **Nazwa idzie do Firebase
+Auth (`updateProfile`), nie do Firestore** — reguły odrzuciłyby dodatkowe pole w profilu.
+
+### Testy
+
+```bash
+node scripts/test-account.mjs        # poziomy, sesja, ?next=, cztery języki
+LM_PLAYWRIGHT=/tmp/lm-test/node_modules/playwright \
+  node scripts/test-account-page.mjs # /app/ w Chromium, SDK Firebase podstawiony
+```
+
+`test-account-page.mjs` przechwytuje trzy importy z `gstatic.com` i odpowiada własnym
+modułem: konta w obiekcie, Firestore jako `Map`, każde wywołanie zapisane. Dzięki temu
+test dotyczy kodu tego repozytorium, a nie dostępności Google — i daje się uruchomić
+z kontenera, który do `gstatic.com` i tak nie dociera. Czego **nie** sprawdza: czy samo
+Firebase zachowuje się tak, jak zakłada `assets/app.js`; to weryfikacja na żywo,
+opisana w `FIRESTORE_SYNC.md` §8.
 
 ## 8. Wyszukiwarka sklepów
 

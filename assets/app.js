@@ -22,6 +22,11 @@
  * password change, a data export and account deletion. Deleting an account has to
  * remove the documents before the user, because the rules key on request.auth.uid —
  * once the user is gone nothing can reach them.
+ *
+ * The session itself — which of chapter II's three levels the visitor is on, how long
+ * the sign-in survives, and what the other 129 pages get to know about it — is
+ * assets/account.js. This file is its only writer: it is the only page that loads
+ * Firebase and can therefore ask who is actually signed in.
  */
 
 import { FIREBASE_CONFIG, FIREBASE_READY, FIREBASE_SDK, SCHEMA_VERSION } from "./firebase-config.js";
@@ -29,7 +34,12 @@ import { FIREBASE_CONFIG, FIREBASE_READY, FIREBASE_SDK, SCHEMA_VERSION } from ".
 const $ = (id) => document.getElementById(id);
 const T = (key) => (typeof t === "function" ? t(key) : key);
 
-const state = { uid: null, user: null, projects: [], rooms: [], unsub: [] };
+const state = {
+  uid: null, user: null, projects: [], rooms: [], unsub: [],
+  /** users/{uid} as last read. `plan` in it is what decides LICZMAT vs LICZMAT PRO. */
+  profile: null,
+  level: LM_LEVEL.GUEST,
+};
 let db = null, auth = null, fb = null;
 
 /* ------------------------------------------------------------------ helpers */
@@ -111,109 +121,163 @@ async function boot() {
   }
 
   authMod.onAuthStateChanged(auth, (user) => (user ? onSignedIn(user) : onSignedOut()));
-  wireAuthForm();
+  wireAuthForms();
   wireWorkspace();
   wireTabs();
+  wireProfilePanel();
   wireAccountPanel();
   wireSyncPanel();
+
+  // Everything above renders its text through T(). The language picker on this page
+  // swaps the DOM in place instead of navigating, so anything JavaScript wrote has to
+  // be written again — before this, switching language left the identity bar, the
+  // level, the dates and both lists in the previous one.
+  document.addEventListener("langchange", () => {
+    if (!state.user) return;
+    renderIdentity();
+    renderProfile();
+    renderProjects();
+    renderRooms();
+    renderLocalSummary();
+  });
 }
 
 /* ------------------------------------------------------------------ auth */
 
-function wireAuthForm() {
-  const form = $("auth-form");
-  let mode = "signin";
+/**
+ * Show one of the three sign-in views; the Google button belongs to two of them.
+ *
+ * `focus` only when the visitor asked for the view by clicking. Moving focus on load
+ * would scroll a signed-in visitor to a form they are not going to use.
+ */
+function showAuthView(view, focus) {
+  document.querySelectorAll("[data-auth-view]").forEach((box) => {
+    box.hidden = box.dataset.authView !== view;
+  });
+  $("auth-google-box").hidden = view === "reset";
+  status("");
+  const first = document.querySelector(`[data-auth-view="${view}"] input`);
+  if (focus && first) first.focus();
+}
 
-  $("auth-switch").addEventListener("click", (e) => {
-    e.preventDefault();
-    mode = mode === "signin" ? "signup" : "signin";
-    $("auth-submit").textContent = T(mode === "signin" ? "app_signin" : "app_signup");
-    $("auth-switch").textContent = T(mode === "signin" ? "app_switch_signup" : "app_switch_signin");
-    status("");
+/**
+ * How long the sign-in survives, decided before it happens.
+ *
+ * Firebase defaults to browserLocalPersistence — the session outlives the window, which
+ * is what a phone wants and a shared computer does not. The checkbox is remembered on
+ * the device, so the answer is given once rather than at every sign-in.
+ */
+async function applyPersistence(remember) {
+  lmWriteRemember(remember);
+  try {
+    await fb.setPersistence(auth, remember ? fb.browserLocalPersistence : fb.browserSessionPersistence);
+  } catch (e) {
+    // A browser with no storage at all: Firebase falls back to in-memory, which is the
+    // stricter of the two anyway. Nothing here should stop somebody signing in.
+  }
+}
+
+/** The remember checkbox next to whichever form was just submitted. */
+const rememberedIn = (form) => {
+  const box = form.querySelector("[data-remember]");
+  return box ? box.checked : lmReadRemember();
+};
+
+/** Run one auth call with the submit button disabled and errors turned into copy. */
+async function submitting(form, run) {
+  const button = form.querySelector("button[type=submit]");
+  if (button) button.disabled = true;
+  status("");
+  try {
+    await run();
+  } catch (err) {
+    status(authMessage(err && err.code), true);
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function wireAuthForms() {
+  // Every remember checkbox opens on what this device chose last time.
+  document.querySelectorAll("[data-remember]").forEach((box) => { box.checked = lmReadRemember(); });
+
+  document.querySelectorAll("[data-auth-go]").forEach((button) => {
+    button.addEventListener("click", () => showAuthView(button.dataset.authGo, true));
   });
 
-  form.addEventListener("submit", async (e) => {
+  $("signin-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const email = $("auth-email").value.trim();
-    const password = $("auth-password").value;
-    $("auth-submit").disabled = true;
-    status("");
-    try {
-      if (mode === "signin") await fb.signInWithEmailAndPassword(auth, email, password);
-      else {
-        const cred = await fb.createUserWithEmailAndPassword(auth, email, password);
-        // A fresh account gets its verification mail straight away; nothing is gated
-        // on it, it is there so a password reset has somewhere to land.
-        fb.sendEmailVerification(cred.user).catch(() => {});
-      }
-    } catch (err) {
-      status(authMessage(err && err.code), true);
-    } finally {
-      $("auth-submit").disabled = false;
-    }
+    const form = e.currentTarget;
+    submitting(form, async () => {
+      await applyPersistence(rememberedIn(form));
+      await fb.signInWithEmailAndPassword(auth, $("signin-email").value.trim(), $("signin-password").value);
+    });
+  });
+
+  $("signup-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    submitting(form, async () => {
+      await applyPersistence(rememberedIn(form));
+      const cred = await fb.createUserWithEmailAndPassword(
+        auth, $("signup-email").value.trim(), $("signup-password").value);
+      // A fresh account gets its verification mail straight away; nothing is gated
+      // on it, it is there so a password reset has somewhere to land.
+      fb.sendEmailVerification(cred.user).catch(() => {});
+    });
+  });
+
+  $("reset-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    submitting(form, async () => {
+      await fb.sendPasswordResetEmail(auth, $("reset-email").value.trim());
+      status(T("app_reset_sent"));
+    });
   });
 
   $("auth-google").addEventListener("click", async () => {
     status("");
     try {
-      const provider = new fb.GoogleAuthProvider();
-      await fb.signInWithPopup(auth, provider);
+      await applyPersistence(lmReadRemember());
+      await fb.signInWithPopup(auth, new fb.GoogleAuthProvider());
     } catch (err) {
       status(authMessage(err && err.code), true);
     }
   });
 
-  $("auth-forgot").addEventListener("click", async (e) => {
-    e.preventDefault();
-    const email = $("auth-email").value.trim();
-    if (!email) { status(T("app_err_email"), true); return; }
-    try {
-      await fb.sendPasswordResetEmail(auth, email);
-      status(T("app_reset_sent"));
-    } catch (err) {
-      status(authMessage(err && err.code), true);
-    }
-  });
+  const signOut = async () => {
+    await fb.signOut(auth);
+    status(T("app_signed_out"));
+  };
+  $("app-signout").addEventListener("click", signOut);
+  $("prof-signout").addEventListener("click", signOut);
 
-  $("app-signout").addEventListener("click", () => fb.signOut(auth));
+  // A link from a calculator can ask for the sign-up form directly: chapter II wants
+  // registration to be the next step after a result, not a form somebody has to find.
+  showAuthView(lmAuthMode(location.search));
 }
 
 /** Which sign-in methods the account actually has — it decides what can be changed. */
 const hasPasswordProvider = (user) =>
   (user.providerData || []).some((p) => p.providerId === "password");
 
-/**
- * Leave a note for the rest of the site that somebody is signed in.
- *
- * The calculator pages need it to word one sentence under the result (chapter XII's
- * "Dla niezalogowanego") and loading Firebase on all sixty of them to find out would be a
- * network round trip per page for a line of copy. It is a hint, never a permission: no
- * code may gate saving, counting or reading on it. Listed on /cookies/ like every other
- * key this site writes.
- */
-function markSignedIn(on) {
-  try {
-    if (on) localStorage.setItem("liczmat-signed-in", "1");
-    else localStorage.removeItem("liczmat-signed-in");
-  } catch (e) {
-    // Private mode with storage refused: the sentence falls back to the signed-out one.
-  }
-}
-
 async function onSignedIn(user) {
+  // onAuthStateChanged fires again for the same account — a token refresh, a profile
+  // update, a reload. Running the whole of this a second time would stack a second pair
+  // of snapshot listeners on the same two collections and re-read the profile for
+  // nothing, so a repeat only redraws what changed.
+  if (state.uid === user.uid) {
+    state.user = user;
+    renderIdentity();
+    renderProfile();
+    return;
+  }
+
   state.uid = user.uid;
   state.user = user;
-  markSignedIn(true);
   $("app-auth").hidden = true;
   $("app-workspace").hidden = false;
-  $("app-email-label").textContent = user.email || "";
-
-  const providers = (user.providerData || []).map((p) => p.providerId);
-  $("app-provider").textContent = providers.includes("google.com")
-    ? T("app_provider_google") : T("app_provider_password");
-  $("app-verified").textContent = user.emailVerified ? T("app_verified") : T("app_unverified");
-  $("app-verified").classList.toggle("warn", !user.emailVerified);
-  $("app-verify-row").hidden = user.emailVerified;
 
   // A Google account has no password to change, and its e-mail belongs to Google.
   const password = hasPasswordProvider(user);
@@ -224,16 +288,29 @@ async function onSignedIn(user) {
   // Profile: create on first sign-in, then only ever touch lastSeenAt/appVersion —
   // the rules reject anything else, and `plan` is server-side only.
   const profile = fb.doc(db, "users", user.uid);
+  const now = Date.now();
   try {
     const snap = await fb.getDoc(profile);
     if (snap.exists()) {
-      await fb.updateDoc(profile, { lastSeenAt: Date.now(), appVersion: "web" });
+      state.profile = snap.data();
+      await fb.updateDoc(profile, { lastSeenAt: now, appVersion: "web" });
     } else {
-      await fb.setDoc(profile, { createdAt: Date.now(), lastSeenAt: Date.now(), appVersion: "web" });
+      state.profile = { createdAt: now, lastSeenAt: now, appVersion: "web" };
+      await fb.setDoc(profile, state.profile);
     }
   } catch (e) {
-    // A profile write failing must never block the workspace.
+    // A profile write failing must never block the workspace. Without the document the
+    // level falls back to LICZMAT, which is what a signed-in account without a plan is.
   }
+
+  // The level is chapter II's, derived from the profile the server owns — see
+  // lmLevelOf() in assets/account.js. Writing it is what tells the other 129 pages.
+  state.level = lmLevelOf(user, state.profile);
+  lmWriteLevel(state.level);
+
+  renderIdentity();
+  renderProfile();
+  renderNext();
 
   listen("projects", (rows) => { state.projects = rows; renderProjects(); });
   listen("rooms", (rows) => { state.rooms = rows; renderRooms(); });
@@ -245,11 +322,95 @@ function onSignedOut() {
   state.unsub = [];
   state.uid = null;
   state.user = null;
-  markSignedIn(false);
+  state.profile = null;
+  state.level = LM_LEVEL.GUEST;
+  lmWriteLevel(LM_LEVEL.GUEST);
   state.projects = [];
   state.rooms = [];
   $("app-auth").hidden = false;
   $("app-workspace").hidden = true;
+  showAuthView("signin");
+}
+
+/* ------------------------------------------------------------------ profile */
+
+/** The name to greet somebody by: what they chose, else the address they signed in with. */
+const displayName = (user) => (user && (user.displayName || user.email)) || "";
+
+/** The bar above the tabs: who is signed in, at which level, how, and whether verified. */
+function renderIdentity() {
+  const user = state.user;
+  if (!user) return;
+  $("app-who").textContent = displayName(user);
+  $("app-level").textContent = T(state.level === LM_LEVEL.PRO ? "acc_pro_t" : "acc_liczmat_t");
+  $("app-provider").textContent = hasPasswordProvider(user)
+    ? T("app_provider_password") : T("app_provider_google");
+  $("app-verified").textContent = user.emailVerified ? T("app_verified") : T("app_unverified");
+  $("app-verified").classList.toggle("warn", !user.emailVerified);
+  $("app-verify-row").hidden = user.emailVerified;
+}
+
+/** A stored millisecond timestamp as a date in the page's language, or a dash. */
+function whenText(millis) {
+  if (!millis) return "—";
+  const date = new Date(Number(millis));
+  if (isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat(document.documentElement.lang || "pl",
+    { dateStyle: "medium" }).format(date);
+}
+
+/** The Profil tab: the facts, the name, the level and how the session is kept. */
+function renderProfile() {
+  const user = state.user;
+  if (!user) return;
+  const profile = state.profile || {};
+
+  $("prof-email").textContent = user.email || "—";
+  $("prof-provider").textContent = hasPasswordProvider(user)
+    ? T("app_provider_password") : T("app_provider_google");
+  $("prof-created").textContent = whenText(profile.createdAt);
+  $("prof-seen").textContent = whenText(profile.lastSeenAt);
+  if (document.activeElement !== $("prof-name")) $("prof-name").value = user.displayName || "";
+
+  // Mark the level the visitor is on, in the copy of the cards inside this tab.
+  document.querySelectorAll("#panel-profile [data-levels] .lvl-card").forEach((card) => {
+    const here = card.dataset.level === state.level;
+    card.toggleAttribute("data-current", here);
+    card.querySelector(".lvl-badge").hidden = !here;
+  });
+
+  const remember = lmReadRemember();
+  $("prof-remember").checked = remember;
+  $("prof-session-state").textContent = T(remember ? "prof_session_kept" : "prof_session_tab");
+}
+
+/** The way back to wherever the sign-up prompt was clicked, if there was one. */
+function renderNext() {
+  const next = lmSafeNext(new URLSearchParams(location.search).get("next"));
+  if (!next) return;
+  $("app-next-link").href = next;
+  $("app-next").hidden = false;
+}
+
+function wireProfilePanel() {
+  $("name-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    submitting(form, async () => {
+      // displayName is a Firebase Auth field, not a Firestore one: the rules allow
+      // nothing but lastSeenAt and appVersion in users/{uid}, and this needs no rules.
+      await fb.updateProfile(auth.currentUser, { displayName: $("prof-name").value.trim().slice(0, 60) });
+      renderIdentity();
+      status(T("prof_name_saved"));
+    });
+  });
+
+  // Changing the answer after signing in migrates the session Firebase already has.
+  $("prof-remember").addEventListener("change", async (e) => {
+    await applyPersistence(e.target.checked);
+    document.querySelectorAll("[data-remember]").forEach((box) => { box.checked = e.target.checked; });
+    $("prof-session-state").textContent = T(e.target.checked ? "prof_session_kept" : "prof_session_tab");
+  });
 }
 
 /** Live list of one collection, tombstones filtered out, newest change first. */
@@ -265,7 +426,11 @@ function listen(collectionName, onRows) {
         rows.push({ id: d.id, ...data });
       });
       onRows(rows);
-      status(snap.metadata.fromCache ? T("app_offline") : "");
+      // A snapshot arrives whenever anything changes, including a moment after a save.
+      // It may report that the data came from the cache; it may not clear a message
+      // somebody else put there — "Nazwa zapisana." used to vanish this way.
+      if (snap.metadata.fromCache) status(T("app_offline"));
+      else if ($("app-status").textContent === T("app_offline")) status("");
     },
     () => status(T("app_err_unknown"), true),
   );
@@ -274,15 +439,41 @@ function listen(collectionName, onRows) {
 
 /* ------------------------------------------------------------------ tabs */
 
+/**
+ * Five tabs, driven by the mouse and by the keyboard.
+ *
+ * `role="tablist"` promises arrow-key navigation and one stop in the tab order for the
+ * whole strip; a screen reader announces it either way, so the promise has to be kept.
+ * Only the selected tab is reachable with Tab, and the arrows move between them.
+ */
 function wireTabs() {
-  const tabs = document.querySelectorAll(".app-tab");
-  tabs.forEach((btn) => btn.addEventListener("click", () => {
-    tabs.forEach((b) => b.setAttribute("aria-selected", String(b === btn)));
+  const tabs = Array.from(document.querySelectorAll(".app-tab"));
+
+  const select = (btn, focus) => {
+    tabs.forEach((b) => {
+      const on = b === btn;
+      b.setAttribute("aria-selected", String(on));
+      b.tabIndex = on ? 0 : -1;
+    });
     document.querySelectorAll("[data-panel]").forEach((panel) => {
       panel.hidden = panel.dataset.panel !== btn.dataset.tab;
     });
+    if (focus) btn.focus();
     if (btn.dataset.tab === "sync") renderLocalSummary();
-  }));
+    if (btn.dataset.tab === "profile") renderProfile();
+  };
+
+  tabs.forEach((btn, index) => {
+    btn.addEventListener("click", () => select(btn));
+    btn.addEventListener("keydown", (e) => {
+      const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (step) select(tabs[(index + step + tabs.length) % tabs.length], true);
+      else if (e.key === "Home") select(tabs[0], true);
+      else if (e.key === "End") select(tabs[tabs.length - 1], true);
+      else return;
+      e.preventDefault();
+    });
+  });
 }
 
 /* ------------------------------------------------------------------ projects & rooms */

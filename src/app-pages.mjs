@@ -9,6 +9,7 @@
 
 import { esc, siteHeader, siteFooter } from "./template.mjs";
 import { urlCalcIndex, urlHome, PLAY_URL, URL_APP } from "./site.mjs";
+import { ACCOUNT_LEVELS, LEVEL, STATUS, route } from "./ia.mjs";
 
 /**
  * The same header and footer as the rest of the site, with a shorter link list: these
@@ -28,22 +29,77 @@ ${bodyMain}
 ${siteFooter({ lang: "pl", t, minimal: true, inPlace: true })}`;
 
 /** A label + input pair, written once because the account panel is mostly forms. */
-const field = (id, labelKey, t, { type = "text", autocomplete, minlength } = {}) =>
-  `<div class="field">
+const field = (id, labelKey, t, opts = {}) => {
+  const { type = "text", autocomplete, minlength, maxlength, required = true } = opts;
+  return `<div class="field">
     <label for="${id}" data-i18n="${labelKey}">${esc(t(labelKey))}</label>
-    <input id="${id}" type="${type}"${autocomplete ? ` autocomplete="${autocomplete}"` : ""}${minlength ? ` minlength="${minlength}"` : ""} required>
+    <input id="${id}" type="${type}"${autocomplete ? ` autocomplete="${autocomplete}"` : ""}${minlength ? ` minlength="${minlength}"` : ""}${maxlength ? ` maxlength="${maxlength}"` : ""}${required ? " required" : ""}>
+  </div>`;
+};
+
+/**
+ * "Pamiętaj mnie na tym urządzeniu" — the one control that decides how long the session
+ * outlives the tab. Unchecked, /app/ asks Firebase for browserSessionPersistence, so
+ * closing the browser signs the visitor out; that is the setting a shared or borrowed
+ * computer needs, and until now there was no way to ask for it.
+ */
+const rememberBox = (id, t) => `<div class="field-check">
+    <input id="${id}" type="checkbox" data-remember checked>
+    <label for="${id}" data-i18n="app_remember">${esc(t("app_remember"))}</label>
   </div>`;
 
 const GOOGLE_G = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.1Z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.4 46 24 46Z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.5A22 22 0 0 0 2 24c0 3.6.9 6.9 2.5 9.9l7.3-5.7Z"/><path fill="#EA4335" d="M24 10.4c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 3.9 29.9 2 24 2 15.4 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9.4 12.2-9.4Z"/></svg>';
 
 /* ------------------------------------------------------------------ /app/ */
 
+/**
+ * The three access levels of chapter II, as three cards.
+ *
+ * Generated from `ACCOUNT_LEVELS` in src/ia.mjs, so the set cannot quietly become two or
+ * four, and so the wording of a level is written once for the whole product. Both the
+ * signed-out page and the profile tab render this: a guest is told what an account adds,
+ * and somebody signed in is told which level they are on.
+ *
+ * The Pro card never carries a button. `/liczmat-pro/` is built in session 29, and the
+ * `plan` field that would grant the level is server-side only with nothing to write it
+ * yet (FIRESTORE_SYNC §9.2) — a "buy" button would be a promise the product cannot keep.
+ *
+ * @param {(k:string)=>string} t
+ * @param {string} current the level this copy of the list should mark, "" for none
+ */
+function levelCards(t, current) {
+  const cards = ACCOUNT_LEVELS.map((entry) => {
+    const bullets = entry.can
+      .map((key) => `<li data-i18n="${key}">${esc(t(key))}</li>`).join("");
+    const r = entry.route ? route(entry.route) : null;
+    const soon = r && r.status !== STATUS.LIVE
+      ? `<p class="lvl-soon" data-i18n="door_soon">${esc(t("door_soon"))}</p>` : "";
+
+    const here = entry.level === current;
+    return `<article class="lvl-card" data-level="${entry.level}"${here ? ' data-current="1"' : ""}>
+        <span class="lvl-badge chip" data-i18n="acc_you_are"${here ? "" : " hidden"}>${esc(t("acc_you_are"))}</span>
+        <h3 data-i18n="${entry.key}_t">${esc(t(`${entry.key}_t`))}</h3>
+        <p class="muted" data-i18n="${entry.key}_d">${esc(t(`${entry.key}_d`))}</p>
+        <ul class="lvl-can">${bullets}</ul>
+        ${soon}
+      </article>`;
+  }).join("\n      ");
+
+  return `<div class="lvl-cards" data-levels>
+      ${cards}
+    </div>`;
+}
+
 export function appMain(t) {
   const i = (key, tag = "span", cls = "") =>
     `<${tag}${cls ? ` class="${cls}"` : ""} data-i18n="${key}">${esc(t(key))}</${tag}>`;
 
   const tab = (id, key, first) =>
-    `<button type="button" class="app-tab" role="tab" data-tab="${id}" aria-selected="${first ? "true" : "false"}" data-i18n="${key}">${esc(t(key))}</button>`;
+    `<button type="button" class="app-tab" role="tab" id="tab-${id}" aria-controls="panel-${id}" data-tab="${id}" aria-selected="${first ? "true" : "false"}" tabindex="${first ? "0" : "-1"}" data-i18n="${key}">${esc(t(key))}</button>`;
+
+  /** One row of the profile's read-only facts. The value is filled in by assets/app.js. */
+  const fact = (id, key) =>
+    `<div class="fact"><dt data-i18n="${key}">${esc(t(key))}</dt><dd id="${id}">—</dd></div>`;
 
   const main = `<main id="main">
   <section class="block page-head">
@@ -58,41 +114,100 @@ export function appMain(t) {
       <p id="app-config-missing" class="result err show" hidden data-i18n="app_err_config">${esc(t("app_err_config"))}</p>
       <p id="app-status" class="result show" role="status" aria-live="polite" hidden></p>
 
-      <div id="app-auth" class="calc">
-        <form id="auth-form" autocomplete="on">
-          ${field("auth-email", "app_email", t, { type: "email", autocomplete: "email" })}
-          ${field("auth-password", "app_password", t, { type: "password", autocomplete: "current-password", minlength: 6 })}
-          <button id="auth-submit" type="submit" class="btn btn-primary" data-i18n="app_signin">${esc(t("app_signin"))}</button>
-        </form>
-        <p class="auth-links">
-          <a href="#" id="auth-forgot" data-i18n="app_forgot">${esc(t("app_forgot"))}</a>
-          <a href="#" id="auth-switch" data-i18n="app_switch_signup">${esc(t("app_switch_signup"))}</a>
-        </p>
-        <div class="auth-sep">${i("app_or")}</div>
-        <button type="button" id="auth-google" class="btn btn-ghost auth-google">
-          ${GOOGLE_G}${i("app_google")}
-        </button>
-        <p class="muted auth-note" data-i18n="app_auth_note">${esc(t("app_auth_note"))}</p>
+      <div id="app-auth">
+        <div class="calc">
+          <!-- Three views, one card. Sign-in and sign-up are separate forms rather than
+               one form with a toggled label: they want different autocomplete hints, and
+               a browser offering to save a password only gets that right when the form
+               says which of the two it is. Resetting a password had no field of its own
+               at all and borrowed the sign-in one, which failed when it was empty. -->
+          <div data-auth-view="signin">
+            <h2 data-i18n="app_signin">${esc(t("app_signin"))}</h2>
+            <form id="signin-form" autocomplete="on">
+              ${field("signin-email", "app_email", t, { type: "email", autocomplete: "email" })}
+              ${field("signin-password", "app_password", t, { type: "password", autocomplete: "current-password", minlength: 6 })}
+              ${rememberBox("signin-remember", t)}
+              <button type="submit" class="btn btn-primary" data-i18n="app_signin">${esc(t("app_signin"))}</button>
+            </form>
+            <p class="auth-links">
+              <button type="button" class="linkish" data-auth-go="reset" data-i18n="app_forgot">${esc(t("app_forgot"))}</button>
+              <button type="button" class="linkish" data-auth-go="signup" data-i18n="app_switch_signup">${esc(t("app_switch_signup"))}</button>
+            </p>
+          </div>
+
+          <div data-auth-view="signup" hidden>
+            <h2 data-i18n="app_signup_t">${esc(t("app_signup_t"))}</h2>
+            <p class="muted" data-i18n="app_signup_d">${esc(t("app_signup_d"))}</p>
+            <form id="signup-form" autocomplete="on">
+              ${field("signup-email", "app_email", t, { type: "email", autocomplete: "email" })}
+              ${field("signup-password", "app_password", t, { type: "password", autocomplete: "new-password", minlength: 6 })}
+              ${i("app_password_rule", "p", "muted field-note")}
+              ${rememberBox("signup-remember", t)}
+              <button type="submit" class="btn btn-primary" data-i18n="app_signup">${esc(t("app_signup"))}</button>
+            </form>
+            <p class="auth-links">
+              <button type="button" class="linkish" data-auth-go="signin" data-i18n="app_switch_signin">${esc(t("app_switch_signin"))}</button>
+            </p>
+            ${i("app_signup_free", "p", "muted field-note")}
+          </div>
+
+          <div data-auth-view="reset" hidden>
+            <h2 data-i18n="app_reset_t">${esc(t("app_reset_t"))}</h2>
+            <p class="muted" data-i18n="app_reset_d">${esc(t("app_reset_d"))}</p>
+            <form id="reset-form" autocomplete="on">
+              ${field("reset-email", "app_email", t, { type: "email", autocomplete: "email" })}
+              <button type="submit" class="btn btn-primary" data-i18n="app_reset_send">${esc(t("app_reset_send"))}</button>
+            </form>
+            <p class="auth-links">
+              <button type="button" class="linkish" data-auth-go="signin" data-i18n="app_back_signin">${esc(t("app_back_signin"))}</button>
+            </p>
+          </div>
+
+          <div id="auth-google-box">
+            <div class="auth-sep">${i("app_or")}</div>
+            <button type="button" id="auth-google" class="btn btn-ghost auth-google">
+              ${GOOGLE_G}${i("app_google")}
+            </button>
+          </div>
+          <p class="muted auth-note" data-i18n="app_auth_note">${esc(t("app_auth_note"))}</p>
+        </div>
+
+        <!-- Chapter II, for somebody who has not signed in yet: what a guest already
+             gets, what the free account adds, and what Pro is going to be. -->
+        <section class="app-levels" aria-labelledby="acc-levels-h">
+          <h2 id="acc-levels-h" data-i18n="acc_levels_t">${esc(t("acc_levels_t"))}</h2>
+          <p class="muted" data-i18n="acc_levels_d">${esc(t("acc_levels_d"))}</p>
+          ${levelCards(t, LEVEL.GUEST)}
+        </section>
       </div>
 
       <div id="app-workspace" hidden>
         <div class="app-bar">
           <span class="app-identity">
-            <b id="app-email-label"></b>
+            <b id="app-who"></b>
+            <span id="app-level" class="chip"></span>
             <span id="app-provider" class="chip"></span>
             <span id="app-verified" class="chip"></span>
           </span>
           <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
         </div>
 
-        <div class="app-tabs" role="tablist">
+        <!-- Where the visitor came from, when they arrived at a sign-up prompt under a
+             calculator result. Shown only after signing in, and only for a path on this
+             site — see lmSafeNext() in assets/account.js. -->
+        <p id="app-next" class="app-next" hidden>
+          <a id="app-next-link" class="btn btn-primary btn-sm" href="/" data-i18n="app_back_to">${esc(t("app_back_to"))}</a>
+        </p>
+
+        <div class="app-tabs" role="tablist" aria-label="${esc(t("app_tabs_label"))}" data-i18n-aria="app_tabs_label">
           ${tab("projects", "app_tab_projects", true)}
           ${tab("rooms", "app_tab_rooms")}
           ${tab("sync", "app_tab_sync")}
+          ${tab("profile", "app_tab_profile")}
           ${tab("account", "app_tab_account")}
         </div>
 
-        <section data-panel="projects" role="tabpanel">
+        <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0">
           <h2 data-i18n="app_projects">${esc(t("app_projects"))}</h2>
           <form id="project-form" class="inline-form">
             <input id="project-name" type="text" maxlength="120" placeholder="${esc(t("app_new_project"))}" data-i18n-ph="app_new_project" required>
@@ -102,7 +217,7 @@ export function appMain(t) {
           ${i("app_share_hint", "p", "muted")}
         </section>
 
-        <section data-panel="rooms" role="tabpanel" hidden>
+        <section data-panel="rooms" id="panel-rooms" role="tabpanel" aria-labelledby="tab-rooms" tabindex="0" hidden>
           <h2 data-i18n="app_rooms">${esc(t("app_rooms"))}</h2>
           <form id="room-form" class="inline-form">
             <input id="room-name" type="text" maxlength="120" placeholder="${esc(t("app_new_room"))}" data-i18n-ph="app_new_room" required>
@@ -114,7 +229,7 @@ export function appMain(t) {
           <ul id="room-list" class="data-list"></ul>
         </section>
 
-        <section data-panel="sync" role="tabpanel" hidden>
+        <section data-panel="sync" id="panel-sync" role="tabpanel" aria-labelledby="tab-sync" tabindex="0" hidden>
           <h2 data-i18n="app_sync_title">${esc(t("app_sync_title"))}</h2>
           ${i("app_sync_d", "p", "muted")}
           <p id="app-sync-local" class="muted"></p>
@@ -125,7 +240,45 @@ export function appMain(t) {
           ${i("app_sync_note", "p", "muted src-note")}
         </section>
 
-        <section data-panel="account" role="tabpanel" hidden>
+        <section data-panel="profile" id="panel-profile" role="tabpanel" aria-labelledby="tab-profile" tabindex="0" hidden>
+          <h2 data-i18n="prof_title">${esc(t("prof_title"))}</h2>
+
+          <div class="app-card">
+            <h3 data-i18n="prof_facts">${esc(t("prof_facts"))}</h3>
+            <dl class="facts">
+              ${fact("prof-email", "app_email")}
+              ${fact("prof-provider", "prof_provider")}
+              ${fact("prof-created", "prof_created")}
+              ${fact("prof-seen", "prof_seen")}
+            </dl>
+          </div>
+
+          <form id="name-form" class="app-card">
+            <h3 data-i18n="prof_name_t">${esc(t("prof_name_t"))}</h3>
+            ${i("prof_name_d", "p", "muted")}
+            ${field("prof-name", "prof_name", t, { maxlength: 60, autocomplete: "name", required: false })}
+            <button type="submit" class="btn btn-ghost btn-sm" data-i18n="app_save">${esc(t("app_save"))}</button>
+          </form>
+
+          <div class="app-card">
+            <h3 data-i18n="prof_level_t">${esc(t("prof_level_t"))}</h3>
+            ${i("prof_level_d", "p", "muted")}
+            ${levelCards(t, "")}
+          </div>
+
+          <div class="app-card">
+            <h3 data-i18n="prof_session_t">${esc(t("prof_session_t"))}</h3>
+            ${i("prof_session_d", "p", "muted")}
+            <div class="field-check">
+              <input id="prof-remember" type="checkbox" checked>
+              <label for="prof-remember" data-i18n="app_remember">${esc(t("app_remember"))}</label>
+            </div>
+            <p id="prof-session-state" class="muted field-note"></p>
+            <button type="button" id="prof-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
+          </div>
+        </section>
+
+        <section data-panel="account" id="panel-account" role="tabpanel" aria-labelledby="tab-account" tabindex="0" hidden>
           <h2 data-i18n="app_sec_title">${esc(t("app_sec_title"))}</h2>
 
           <div id="app-verify-row" class="app-card" hidden>

@@ -470,6 +470,48 @@ export const HOME_DOORS = [
   { id: "pro", route: "liczmat-pro", level: LEVEL.PRO, key: "door_pro" },
 ];
 
+/* ------------------------------------------------------------------ account levels */
+
+/**
+ * The three levels as the *visitor* meets them, not as a route needs them.
+ *
+ * `LEVEL` above answers "what does this page require". This answers the other half of
+ * chapter II — "każdy element aplikacji powinien jednoznacznie wiedzieć, do którego
+ * poziomu dostępu należy" — for the person: /app/ renders the level somebody is on, and
+ * what the next one adds, out of this list. Written here rather than in the page so the
+ * set stays exactly the three of chapter II, in order, and so a fourth one ("Firma",
+ * "Team", "Admin" — all forbidden today) cannot be added by editing a template.
+ *
+ *   level  LEVEL.*
+ *   key    dictionary prefix: `<key>_t` is the name, `<key>_d` the line under it.
+ *   can    the bullet keys — what chapter II says this level may do.
+ *   route  the page that explains the level, when it has one.
+ *
+ * Which level a signed-in visitor is actually on is decided in the browser, from
+ * `users/{uid}.plan` — see lmLevelOf() in assets/account.js. That field is written
+ * server-side only, so the page can read the level but nobody can grant themselves one.
+ */
+export const ACCOUNT_LEVELS = [
+  {
+    level: LEVEL.GUEST, key: "acc_guest",
+    can: ["acc_guest_1", "acc_guest_2", "acc_guest_3"],
+  },
+  {
+    level: LEVEL.LICZMAT, key: "acc_liczmat",
+    can: ["acc_liczmat_1", "acc_liczmat_2", "acc_liczmat_3", "acc_liczmat_4"],
+  },
+  {
+    level: LEVEL.PRO, key: "acc_pro", route: "liczmat-pro",
+    can: ["acc_pro_1", "acc_pro_2", "acc_pro_3", "acc_pro_4"],
+  },
+];
+
+export const accountLevel = (level) => ACCOUNT_LEVELS.find((l) => l.level === level);
+
+/** Every dictionary key the level cards spend, so the build can check all four languages. */
+export const accountLevelKeys = () => ACCOUNT_LEVELS
+  .flatMap((l) => [`${l.key}_t`, `${l.key}_d`, ...l.can]);
+
 /* ------------------------------------------------------------------ user flows */
 
 /**
@@ -658,6 +700,28 @@ export function validateIA() {
     if (!door.key) problems.push(`IA: home door "${door.id}" has no dictionary key`);
     if (r.level === LEVEL.PRO && r.status === STATUS.LIVE && !r.gate) {
       problems.push(`IA: home door "${door.id}" leads to a Pro page with no public state`);
+    }
+  }
+
+  // The account levels are chapter II's three, in order, each saying what it may do.
+  // A fourth level, a missing one or a reordering is the model drifting, and the model
+  // is what /app/ tells the visitor they are on.
+  const levels = ACCOUNT_LEVELS.map((l) => l.level);
+  if (levels.join() !== LEVEL_ORDER.join()) {
+    problems.push(`IA: the account levels are [${levels.join(", ")}] — chapter II has ` +
+      `exactly [${LEVEL_ORDER.join(", ")}], in that order`);
+  }
+  const levelKeys = new Set();
+  for (const l of ACCOUNT_LEVELS) {
+    if (!l.key) { problems.push(`IA: account level "${l.level}" has no dictionary key`); continue; }
+    if (levelKeys.has(l.key)) problems.push(`IA: two account levels use the key "${l.key}"`);
+    levelKeys.add(l.key);
+    if (!l.can || l.can.length < 2) {
+      problems.push(`IA: account level "${l.level}" lists ${(l.can || []).length} thing(s) ` +
+        `it can do — chapter II gives every level more than one`);
+    }
+    if (l.route && !BY_ID.has(l.route)) {
+      problems.push(`IA: account level "${l.level}" points at unknown route "${l.route}"`);
     }
   }
 

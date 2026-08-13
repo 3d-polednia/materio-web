@@ -96,14 +96,14 @@ function wsWireCard(card) {
  * Whether the visitor has an account, as far as this page can tell.
  *
  * The calculator pages do not load Firebase — it would be a network dependency on every
- * page that only exists to word one sentence — so /app/ leaves this flag behind when the
- * auth state changes and the calculators read it. It decides copy and nothing else: at
- * worst (signed out in another tab, an expired token) the visitor is offered an account
- * they already have, or told about sync they already get. Saving does not consult it, and
- * must not — FIRESTORE_SYNC §1.2: counting never requires an account.
+ * page that only exists to word one sentence — so /app/ leaves the level behind when the
+ * auth state changes and assets/account.js reads it here. It decides copy and nothing
+ * else: at worst (signed out in another tab, an expired token) the visitor is offered an
+ * account they already have, or told about sync they already get. Saving does not consult
+ * it, and must not — FIRESTORE_SYNC §1.2: counting never requires an account.
  */
 function wsHasAccount() {
-  try { return localStorage.getItem("liczmat-signed-in") === "1"; } catch (e) { return false; }
+  return typeof lmSignedIn === "function" ? lmSignedIn() : false;
 }
 
 /**
@@ -129,10 +129,13 @@ function wsRenderSave(card, result) {
   // result is already saved by the button next to it, in this browser and without an
   // account, so the sentence says what the account actually adds instead of pretending
   // the button needs one.
+  // The link opens the sign-up form itself, not the sign-in form with a toggle to find,
+  // and remembers the page to come back to — chapter II wants registration to be the
+  // next step after a result rather than a detour away from it.
   const account = wsHasAccount()
     ? `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_in"))}</p>`
     : `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_out"))}
-        <a href="/app/">${wsEsc(wsT("calc_save_link"))}</a></p>`;
+        <a href="${wsEsc(lmSignupUrl(location.pathname))}">${wsEsc(wsT("calc_save_link"))}</a></p>`;
   box.innerHTML = `
     <div class="ws-save-row">
       <button type="button" class="btn btn-primary btn-sm" data-ws-save>${wsEsc(wsT("ws_add_to_project"))}</button>

@@ -262,6 +262,10 @@ ${bare ? "" : `<script>window.LICZMAT_ALTERNATES = ${altJson};</script>`}
 <script src="/assets/i18n.${bare ? "all" : lang}.js?v=${stamp}"></script>
 <script src="/assets/i18n-runtime.js?v=${stamp}"></script>
 <script src="/assets/currency.js?v=${stamp}"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=${stamp}"></script>
 ${(p.classicScripts || []).map((s) => `<script src="${s}?v=${stamp}"></script>`).join("\n")}
 ${scripts.map((s) => {
     const attrs = s.endsWith(".mjs") || p.moduleScripts ? ' type="module"' : "";
@@ -322,6 +326,9 @@ export function siteHeader(h) {
     cta.rel ? `rel="${cta.rel}"` : "",
     cta.target ? `target="${cta.target}"` : "",
     cta.loc ? `data-loc="${cta.loc}"` : "",
+    // The account button is the one place the session is visible outside /app/;
+    // lmMarkHeader() in assets/account.js hangs a dot off this attribute.
+    cta.href === URL_APP ? "data-account-cta" : "",
     inPlace ? `data-i18n="${cta.key}"` : "",
   ].filter(Boolean).join(" ");
 

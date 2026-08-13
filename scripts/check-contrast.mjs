@@ -75,6 +75,7 @@ const PAIRS = [
   ["--accent", "--on-accent", 4.5, "the inverted button inside the app banner"],
   ["--accent-strong", "--accent-soft", 4.5, "the chosen material, on its tint"],
   ["--on-accent-soft", "--accent-soft", 4.5, "the result box, the tip box"],
+  ["--on-bg", "--accent-soft", 4.5, "the heading and the list on the level card you are on"],
   ["--on-error-soft", "--error-soft", 4.5, "an error message"],
   ["--on-success-soft", "--success-soft", 4.5, "a success message"],
   ["--on-warning-soft", "--warning-soft", 4.5, "a warning message"],

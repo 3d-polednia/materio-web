@@ -42,8 +42,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Moje projekty — LiczMat</title>
-<meta name="description" content="Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji LiczMat.">
+<title>Moje konto — LiczMat</title>
+<meta name="description" content="Konto jest darmowe i opcjonalne. Trzyma projekty, pomieszczenia i kosztorysy w telefonie i w przeglądarce naraz.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -53,25 +53,25 @@
 <link rel="canonical" href="https://materio-app.com/app/">
 
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260813a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260813b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
 <meta property="og:locale" content="pl_PL">
-<meta property="og:title" content="Moje projekty — LiczMat">
-<meta property="og:description" content="Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji LiczMat.">
+<meta property="og:title" content="Moje konto — LiczMat">
+<meta property="og:description" content="Konto jest darmowe i opcjonalne. Trzyma projekty, pomieszczenia i kosztorysy w telefonie i w przeglądarce naraz.">
 <meta property="og:url" content="https://materio-app.com/app/">
 <meta property="og:image" content="https://materio-app.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Moje projekty — LiczMat">
-<meta name="twitter:description" content="Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji LiczMat.">
+<meta name="twitter:title" content="Moje konto — LiczMat">
+<meta name="twitter:description" content="Konto jest darmowe i opcjonalne. Trzyma projekty, pomieszczenia i kosztorysy w telefonie i w przeglądarce naraz.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260813a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260813b">
 
 
 </head>
@@ -101,8 +101,8 @@
 <main id="main">
   <section class="block page-head">
     <div class="wrap narrow">
-      <h1 data-i18n="app_title">Moje projekty</h1>
-      <p class="lead" data-i18n="app_lead">Zaloguj się, żeby zobaczyć projekty i pokoje zapisane w aplikacji LiczMat.</p>
+      <h1 data-i18n="app_title">Moje konto</h1>
+      <p class="lead" data-i18n="app_lead">Konto jest darmowe i opcjonalne. Trzyma projekty, pomieszczenia i kosztorysy w telefonie i w przeglądarce naraz.</p>
     </div>
   </section>
 
@@ -111,47 +111,143 @@
       <p id="app-config-missing" class="result err show" hidden data-i18n="app_err_config">Brak konfiguracji Firebase. Uzupełnij assets/firebase-config.js.</p>
       <p id="app-status" class="result show" role="status" aria-live="polite" hidden></p>
 
-      <div id="app-auth" class="calc">
-        <form id="auth-form" autocomplete="on">
-          <div class="field">
-    <label for="auth-email" data-i18n="app_email">E-mail</label>
-    <input id="auth-email" type="email" autocomplete="email" required>
+      <div id="app-auth">
+        <div class="calc">
+          <!-- Three views, one card. Sign-in and sign-up are separate forms rather than
+               one form with a toggled label: they want different autocomplete hints, and
+               a browser offering to save a password only gets that right when the form
+               says which of the two it is. Resetting a password had no field of its own
+               at all and borrowed the sign-in one, which failed when it was empty. -->
+          <div data-auth-view="signin">
+            <h2 data-i18n="app_signin">Zaloguj się</h2>
+            <form id="signin-form" autocomplete="on">
+              <div class="field">
+    <label for="signin-email" data-i18n="app_email">E-mail</label>
+    <input id="signin-email" type="email" autocomplete="email" required>
   </div>
-          <div class="field">
-    <label for="auth-password" data-i18n="app_password">Hasło</label>
-    <input id="auth-password" type="password" autocomplete="current-password" minlength="6" required>
+              <div class="field">
+    <label for="signin-password" data-i18n="app_password">Hasło</label>
+    <input id="signin-password" type="password" autocomplete="current-password" minlength="6" required>
   </div>
-          <button id="auth-submit" type="submit" class="btn btn-primary" data-i18n="app_signin">Zaloguj się</button>
-        </form>
-        <p class="auth-links">
-          <a href="#" id="auth-forgot" data-i18n="app_forgot">Nie pamiętam hasła</a>
-          <a href="#" id="auth-switch" data-i18n="app_switch_signup">Nie masz konta? Załóż je</a>
-        </p>
-        <div class="auth-sep"><span data-i18n="app_or">albo</span></div>
-        <button type="button" id="auth-google" class="btn btn-ghost auth-google">
-          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.1Z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.4 46 24 46Z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.5A22 22 0 0 0 2 24c0 3.6.9 6.9 2.5 9.9l7.3-5.7Z"/><path fill="#EA4335" d="M24 10.4c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 3.9 29.9 2 24 2 15.4 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9.4 12.2-9.4Z"/></svg><span data-i18n="app_google">Zaloguj przez Google</span>
-        </button>
-        <p class="muted auth-note" data-i18n="app_auth_note">Konto jest opcjonalne. Kalkulatory liczą bez logowania — konto potrzebne jest dopiero, żeby mieć te same projekty na telefonie i w przeglądarce.</p>
+              <div class="field-check">
+    <input id="signin-remember" type="checkbox" data-remember checked>
+    <label for="signin-remember" data-i18n="app_remember">Pamiętaj mnie na tym urządzeniu</label>
+  </div>
+              <button type="submit" class="btn btn-primary" data-i18n="app_signin">Zaloguj się</button>
+            </form>
+            <p class="auth-links">
+              <button type="button" class="linkish" data-auth-go="reset" data-i18n="app_forgot">Nie pamiętam hasła</button>
+              <button type="button" class="linkish" data-auth-go="signup" data-i18n="app_switch_signup">Nie masz konta? Załóż je</button>
+            </p>
+          </div>
+
+          <div data-auth-view="signup" hidden>
+            <h2 data-i18n="app_signup_t">Załóż darmowe konto</h2>
+            <p class="muted" data-i18n="app_signup_d">Konto jest darmowe i służy do jednego: żeby to, co policzyłeś, nie zniknęło.</p>
+            <form id="signup-form" autocomplete="on">
+              <div class="field">
+    <label for="signup-email" data-i18n="app_email">E-mail</label>
+    <input id="signup-email" type="email" autocomplete="email" required>
+  </div>
+              <div class="field">
+    <label for="signup-password" data-i18n="app_password">Hasło</label>
+    <input id="signup-password" type="password" autocomplete="new-password" minlength="6" required>
+  </div>
+              <p class="muted field-note" data-i18n="app_password_rule">Hasło musi mieć co najmniej 6 znaków.</p>
+              <div class="field-check">
+    <input id="signup-remember" type="checkbox" data-remember checked>
+    <label for="signup-remember" data-i18n="app_remember">Pamiętaj mnie na tym urządzeniu</label>
+  </div>
+              <button type="submit" class="btn btn-primary" data-i18n="app_signup">Załóż konto</button>
+            </form>
+            <p class="auth-links">
+              <button type="button" class="linkish" data-auth-go="signin" data-i18n="app_switch_signin">Masz już konto? Zaloguj się</button>
+            </p>
+            <p class="muted field-note" data-i18n="app_signup_free">Kalkulatory liczą bez konta i tak zostanie. Konto potrzebne jest dopiero do zapisania wyniku na stałe.</p>
+          </div>
+
+          <div data-auth-view="reset" hidden>
+            <h2 data-i18n="app_reset_t">Resetowanie hasła</h2>
+            <p class="muted" data-i18n="app_reset_d">Podaj adres konta. Wyślemy na niego link do ustawienia nowego hasła.</p>
+            <form id="reset-form" autocomplete="on">
+              <div class="field">
+    <label for="reset-email" data-i18n="app_email">E-mail</label>
+    <input id="reset-email" type="email" autocomplete="email" required>
+  </div>
+              <button type="submit" class="btn btn-primary" data-i18n="app_reset_send">Wyślij link</button>
+            </form>
+            <p class="auth-links">
+              <button type="button" class="linkish" data-auth-go="signin" data-i18n="app_back_signin">Wróć do logowania</button>
+            </p>
+          </div>
+
+          <div id="auth-google-box">
+            <div class="auth-sep"><span data-i18n="app_or">albo</span></div>
+            <button type="button" id="auth-google" class="btn btn-ghost auth-google">
+              <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.1Z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.4 46 24 46Z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.5A22 22 0 0 0 2 24c0 3.6.9 6.9 2.5 9.9l7.3-5.7Z"/><path fill="#EA4335" d="M24 10.4c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 3.9 29.9 2 24 2 15.4 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9.4 12.2-9.4Z"/></svg><span data-i18n="app_google">Zaloguj przez Google</span>
+            </button>
+          </div>
+          <p class="muted auth-note" data-i18n="app_auth_note">Konto jest opcjonalne. Kalkulatory liczą bez logowania — konto potrzebne jest dopiero, żeby mieć te same projekty na telefonie i w przeglądarce.</p>
+        </div>
+
+        <!-- Chapter II, for somebody who has not signed in yet: what a guest already
+             gets, what the free account adds, and what Pro is going to be. -->
+        <section class="app-levels" aria-labelledby="acc-levels-h">
+          <h2 id="acc-levels-h" data-i18n="acc_levels_t">Trzy poziomy LiczMat</h2>
+          <p class="muted" data-i18n="acc_levels_d">Liczenie nie wymaga konta. Konto zaczyna się tam, gdzie chcesz coś zachować.</p>
+          <div class="lvl-cards" data-levels>
+      <article class="lvl-card" data-level="guest" data-current="1">
+        <span class="lvl-badge chip" data-i18n="acc_you_are">Tu jesteś</span>
+        <h3 data-i18n="acc_guest_t">Gość</h3>
+        <p class="muted" data-i18n="acc_guest_d">Bez konta. Wchodzisz, liczysz, dostajesz pełny wynik.</p>
+        <ul class="lvl-can"><li data-i18n="acc_guest_1">Wszystkie kalkulatory i cały katalog materiałów</li><li data-i18n="acc_guest_2">Pełny wynik, bez ukrytych pól i bez rejestracji</li><li data-i18n="acc_guest_3">Poradniki i mapa sklepów</li></ul>
+        
+      </article>
+      <article class="lvl-card" data-level="liczmat">
+        <span class="lvl-badge chip" data-i18n="acc_you_are" hidden>Tu jesteś</span>
+        <h3 data-i18n="acc_liczmat_t">LiczMat</h3>
+        <p class="muted" data-i18n="acc_liczmat_d">Darmowe konto. To, co policzysz, zostaje i idzie z Tobą na telefon.</p>
+        <ul class="lvl-can"><li data-i18n="acc_liczmat_1">Zapisane kalkulacje, do których wracasz</li><li data-i18n="acc_liczmat_2">Projekty: pomieszczenia, lista materiałów, koszty</li><li data-i18n="acc_liczmat_3">Te same dane w telefonie i w przeglądarce</li><li data-i18n="acc_liczmat_4">Kosztorys udostępniony linkiem, bez konta po drugiej stronie</li></ul>
+        
+      </article>
+      <article class="lvl-card" data-level="pro">
+        <span class="lvl-badge chip" data-i18n="acc_you_are" hidden>Tu jesteś</span>
+        <h3 data-i18n="acc_pro_t">LiczMat Pro</h3>
+        <p class="muted" data-i18n="acc_pro_d">Płatne rozszerzenie dla fachowca: nie większy kalkulator, tylko prowadzenie pracy.</p>
+        <ul class="lvl-can"><li data-i18n="acc_pro_1">Klienci i historia współpracy</li><li data-i18n="acc_pro_2">Zlecenia ze statusem i terminem</li><li data-i18n="acc_pro_3">Wyceny: materiał, robocizna, marża</li><li data-i18n="acc_pro_4">Terminarz zleceń</li></ul>
+        <p class="lvl-soon" data-i18n="door_soon">W przygotowaniu</p>
+      </article>
+    </div>
+        </section>
       </div>
 
       <div id="app-workspace" hidden>
         <div class="app-bar">
           <span class="app-identity">
-            <b id="app-email-label"></b>
+            <b id="app-who"></b>
+            <span id="app-level" class="chip"></span>
             <span id="app-provider" class="chip"></span>
             <span id="app-verified" class="chip"></span>
           </span>
           <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">Wyloguj</button>
         </div>
 
-        <div class="app-tabs" role="tablist">
-          <button type="button" class="app-tab" role="tab" data-tab="projects" aria-selected="true" data-i18n="app_tab_projects">Projekty</button>
-          <button type="button" class="app-tab" role="tab" data-tab="rooms" aria-selected="false" data-i18n="app_tab_rooms">Pomieszczenia</button>
-          <button type="button" class="app-tab" role="tab" data-tab="sync" aria-selected="false" data-i18n="app_tab_sync">Synchronizacja</button>
-          <button type="button" class="app-tab" role="tab" data-tab="account" aria-selected="false" data-i18n="app_tab_account">Konto</button>
+        <!-- Where the visitor came from, when they arrived at a sign-up prompt under a
+             calculator result. Shown only after signing in, and only for a path on this
+             site — see lmSafeNext() in assets/account.js. -->
+        <p id="app-next" class="app-next" hidden>
+          <a id="app-next-link" class="btn btn-primary btn-sm" href="/" data-i18n="app_back_to">Wróć na poprzednią stronę</a>
+        </p>
+
+        <div class="app-tabs" role="tablist" aria-label="Sekcje konta" data-i18n-aria="app_tabs_label">
+          <button type="button" class="app-tab" role="tab" id="tab-projects" aria-controls="panel-projects" data-tab="projects" aria-selected="true" tabindex="0" data-i18n="app_tab_projects">Projekty</button>
+          <button type="button" class="app-tab" role="tab" id="tab-rooms" aria-controls="panel-rooms" data-tab="rooms" aria-selected="false" tabindex="-1" data-i18n="app_tab_rooms">Pomieszczenia</button>
+          <button type="button" class="app-tab" role="tab" id="tab-sync" aria-controls="panel-sync" data-tab="sync" aria-selected="false" tabindex="-1" data-i18n="app_tab_sync">Synchronizacja</button>
+          <button type="button" class="app-tab" role="tab" id="tab-profile" aria-controls="panel-profile" data-tab="profile" aria-selected="false" tabindex="-1" data-i18n="app_tab_profile">Profil</button>
+          <button type="button" class="app-tab" role="tab" id="tab-account" aria-controls="panel-account" data-tab="account" aria-selected="false" tabindex="-1" data-i18n="app_tab_account">Konto</button>
         </div>
 
-        <section data-panel="projects" role="tabpanel">
+        <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0">
           <h2 data-i18n="app_projects">Projekty</h2>
           <form id="project-form" class="inline-form">
             <input id="project-name" type="text" maxlength="120" placeholder="Nowy projekt" data-i18n-ph="app_new_project" required>
@@ -161,7 +257,7 @@
           <p class="muted" data-i18n="app_share_hint">Kto ma link, zobaczy wycenę bez logowania. Link wyłączysz w każdej chwili.</p>
         </section>
 
-        <section data-panel="rooms" role="tabpanel" hidden>
+        <section data-panel="rooms" id="panel-rooms" role="tabpanel" aria-labelledby="tab-rooms" tabindex="0" hidden>
           <h2 data-i18n="app_rooms">Pokoje</h2>
           <form id="room-form" class="inline-form">
             <input id="room-name" type="text" maxlength="120" placeholder="Nowy pokój" data-i18n-ph="app_new_room" required>
@@ -173,7 +269,7 @@
           <ul id="room-list" class="data-list"></ul>
         </section>
 
-        <section data-panel="sync" role="tabpanel" hidden>
+        <section data-panel="sync" id="panel-sync" role="tabpanel" aria-labelledby="tab-sync" tabindex="0" hidden>
           <h2 data-i18n="app_sync_title">Synchronizacja z przeglądarką</h2>
           <p class="muted" data-i18n="app_sync_d">Projekty, pomieszczenia i kosztorysy zapisane na stronie bez logowania leżą w tej przeglądarce. Tu przenosisz je na konto albo pobierasz z konta.</p>
           <p id="app-sync-local" class="muted"></p>
@@ -184,7 +280,70 @@
           <p class="muted src-note" data-i18n="app_sync_note">Konflikty rozstrzyga nowszy zapis, tak samo jak między telefonem a chmurą.</p>
         </section>
 
-        <section data-panel="account" role="tabpanel" hidden>
+        <section data-panel="profile" id="panel-profile" role="tabpanel" aria-labelledby="tab-profile" tabindex="0" hidden>
+          <h2 data-i18n="prof_title">Profil</h2>
+
+          <div class="app-card">
+            <h3 data-i18n="prof_facts">Twoje konto</h3>
+            <dl class="facts">
+              <div class="fact"><dt data-i18n="app_email">E-mail</dt><dd id="prof-email">—</dd></div>
+              <div class="fact"><dt data-i18n="prof_provider">Sposób logowania</dt><dd id="prof-provider">—</dd></div>
+              <div class="fact"><dt data-i18n="prof_created">Konto od</dt><dd id="prof-created">—</dd></div>
+              <div class="fact"><dt data-i18n="prof_seen">Ostatnie użycie</dt><dd id="prof-seen">—</dd></div>
+            </dl>
+          </div>
+
+          <form id="name-form" class="app-card">
+            <h3 data-i18n="prof_name_t">Nazwa</h3>
+            <p class="muted" data-i18n="prof_name_d">Jak się do Ciebie zwracać. Widać ją tylko na tej stronie — nie trafia do kosztorysu ani do udostępnionego linku.</p>
+            <div class="field">
+    <label for="prof-name" data-i18n="prof_name">Nazwa na koncie</label>
+    <input id="prof-name" type="text" autocomplete="name" maxlength="60">
+  </div>
+            <button type="submit" class="btn btn-ghost btn-sm" data-i18n="app_save">Zapisz</button>
+          </form>
+
+          <div class="app-card">
+            <h3 data-i18n="prof_level_t">Poziom konta</h3>
+            <p class="muted" data-i18n="prof_level_d">Poziom nadaje serwer. Z przeglądarki nie da się go sobie podnieść.</p>
+            <div class="lvl-cards" data-levels>
+      <article class="lvl-card" data-level="guest">
+        <span class="lvl-badge chip" data-i18n="acc_you_are" hidden>Tu jesteś</span>
+        <h3 data-i18n="acc_guest_t">Gość</h3>
+        <p class="muted" data-i18n="acc_guest_d">Bez konta. Wchodzisz, liczysz, dostajesz pełny wynik.</p>
+        <ul class="lvl-can"><li data-i18n="acc_guest_1">Wszystkie kalkulatory i cały katalog materiałów</li><li data-i18n="acc_guest_2">Pełny wynik, bez ukrytych pól i bez rejestracji</li><li data-i18n="acc_guest_3">Poradniki i mapa sklepów</li></ul>
+        
+      </article>
+      <article class="lvl-card" data-level="liczmat">
+        <span class="lvl-badge chip" data-i18n="acc_you_are" hidden>Tu jesteś</span>
+        <h3 data-i18n="acc_liczmat_t">LiczMat</h3>
+        <p class="muted" data-i18n="acc_liczmat_d">Darmowe konto. To, co policzysz, zostaje i idzie z Tobą na telefon.</p>
+        <ul class="lvl-can"><li data-i18n="acc_liczmat_1">Zapisane kalkulacje, do których wracasz</li><li data-i18n="acc_liczmat_2">Projekty: pomieszczenia, lista materiałów, koszty</li><li data-i18n="acc_liczmat_3">Te same dane w telefonie i w przeglądarce</li><li data-i18n="acc_liczmat_4">Kosztorys udostępniony linkiem, bez konta po drugiej stronie</li></ul>
+        
+      </article>
+      <article class="lvl-card" data-level="pro">
+        <span class="lvl-badge chip" data-i18n="acc_you_are" hidden>Tu jesteś</span>
+        <h3 data-i18n="acc_pro_t">LiczMat Pro</h3>
+        <p class="muted" data-i18n="acc_pro_d">Płatne rozszerzenie dla fachowca: nie większy kalkulator, tylko prowadzenie pracy.</p>
+        <ul class="lvl-can"><li data-i18n="acc_pro_1">Klienci i historia współpracy</li><li data-i18n="acc_pro_2">Zlecenia ze statusem i terminem</li><li data-i18n="acc_pro_3">Wyceny: materiał, robocizna, marża</li><li data-i18n="acc_pro_4">Terminarz zleceń</li></ul>
+        <p class="lvl-soon" data-i18n="door_soon">W przygotowaniu</p>
+      </article>
+    </div>
+          </div>
+
+          <div class="app-card">
+            <h3 data-i18n="prof_session_t">Sesja na tym urządzeniu</h3>
+            <p class="muted" data-i18n="prof_session_d">Jak długo zostajesz zalogowany na tym telefonie albo komputerze. Na cudzym sprzęcie wyłącz.</p>
+            <div class="field-check">
+              <input id="prof-remember" type="checkbox" checked>
+              <label for="prof-remember" data-i18n="app_remember">Pamiętaj mnie na tym urządzeniu</label>
+            </div>
+            <p id="prof-session-state" class="muted field-note"></p>
+            <button type="button" id="prof-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">Wyloguj</button>
+          </div>
+        </section>
+
+        <section data-panel="account" id="panel-account" role="tabpanel" aria-labelledby="tab-account" tabindex="0" hidden>
           <h2 data-i18n="app_sec_title">Ustawienia konta</h2>
 
           <div id="app-verify-row" class="app-card" hidden>
@@ -248,12 +407,16 @@
   </div>
 </footer>
 
-<script src="/assets/i18n.all.js?v=20260813a"></script>
-<script src="/assets/i18n-runtime.js?v=20260813a"></script>
-<script src="/assets/currency.js?v=20260813a"></script>
-<script src="/assets/workspace.js?v=20260813a"></script>
-<script type="module" src="/assets/app.js?v=20260813a"></script>
-<script src="/assets/main.js?v=20260813a"></script>
+<script src="/assets/i18n.all.js?v=20260813b"></script>
+<script src="/assets/i18n-runtime.js?v=20260813b"></script>
+<script src="/assets/currency.js?v=20260813b"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260813b"></script>
+<script src="/assets/workspace.js?v=20260813b"></script>
+<script type="module" src="/assets/app.js?v=20260813b"></script>
+<script src="/assets/main.js?v=20260813b"></script>
 
 </body>
 </html>

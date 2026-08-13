@@ -43,6 +43,34 @@ Propozycja konta pojawia się **po wyniku**, nigdy przed. Moduł Pro pokazuje da
 użytkownikowi, czym jest, i napis „Dostępne w LiczMat Pro” — nigdy martwego przycisku.
 W `src/ia.mjs` wymusza to `validateIA()`: trasa `PRO` bez pola `gate` przerywa build.
 
+### 1.1. Poziom odwiedzającego — skąd się bierze (Sesja 13)
+
+Pole `level` na trasie mówi, **czego wymaga strona**. Od Sesji 13 drugą połowę zdania
+z rozdziału II — który poziom ma **człowiek** — trzyma `ACCOUNT_LEVELS` w `src/ia.mjs`
+(nazwa, opis i lista możliwości każdego poziomu) oraz `lmLevelOf()` w `assets/account.js`
+(wyliczenie). Poziom jest **wyprowadzany, nigdy deklarowany**:
+
+| Stan | Poziom |
+|---|---|
+| brak użytkownika Firebase | `GUEST` |
+| zalogowany | `LICZMAT` |
+| zalogowany i `users/{uid}.plan == "premium"` (ważny) | `PRO` |
+
+`plan` i `planValidUntil` to pola **wyłącznie serwerowe** — reguły w
+`config/firebase/firestore.rules` (repo aplikacji) dopuszczają z profilu tylko
+`lastSeenAt` i `appVersion`. Przeglądarka może więc poziom **przeczytać**, ale nie może go
+sobie nadać. Dziś nic ich nie zapisuje (`FIRESTORE_SYNC.md` §9.2: brak Cloud Functions
+i Play Billing), więc każde istniejące konto jest na poziomie `LICZMAT` — karta Pro na
+`/app/` mówi „W przygotowaniu” i **nie ma przycisku zakupu**, bo nie byłoby czego kupić.
+
+Pozostałe 129 stron nie ładuje Firebase. Dostają jedną wskazówkę: klucz
+`liczmat-signed-in` w `localStorage`, którego wartością jest poziom (`liczmat` albo
+`pro`). To jest **podpowiedź do treści, nigdy uprawnienie** — może być nieaktualna
+(wylogowanie w innej karcie, wygasły token), więc nic nie wolno na niej bramkować.
+Decyduje o dwóch rzeczach: zdaniu pod wynikiem kalkulatora i kropce przy „Moje konto”
+w nagłówku. Zasada, której nie wolno złamać, to `FIRESTORE_SYNC.md` §1.2: **liczenie nigdy
+nie wymaga konta**.
+
 ---
 
 ## 2. Inwentarz stron — stan na dziś
@@ -386,12 +414,26 @@ zdania. Znacznik **decyduje wyłącznie o treści**: nic nie wolno na nim bramko
 `FIRESTORE_SYNC` §1.2 zabrania wymagać konta do liczenia, a znacznik bywa nieaktualny
 (wylogowanie w innej karcie, wygasły token). Jest wypisany na `/cookies/`.
 
-### 8.2. `/app/` czy `/konto/`
+### 8.2. `/app/` czy `/konto/` — Sesja 13 nie przeniosła, i dlaczego
 
-Rozdział IX wymienia `/konto`. Konto siedzi dziś pod `/app/`. Przeniesienie jest tanie
-(strona jest `noindex`, więc nie ma pozycji do stracenia), ale dotyka `URL_APP`,
-`404.html`, linków w menu i stopce oraz listy autoryzowanych domen Firebase. Nie ma powodu
-robić tego przed Sesją 13, która i tak przebudowuje system konta. Do decyzji tam.
+Rozdział IX wymienia `/konto`. Konto siedzi dziś pod `/app/`. Sesja 13 przebudowała samą
+stronę i **adresu nie ruszyła**, bo tak mówi ten sam rozdział IX: „Nie traktuj tej
+struktury jako absolutnej. Jeżeli podczas implementacji zostanie znalezione lepsze
+rozwiązanie, **nie zmieniaj go samodzielnie w ramach bieżącego zadania. Zgłoś propozycję
+w raporcie**”.
+
+Propozycja więc jest: przenieść na `/konto/`, bo `/app/` myli się z `/aplikacja/` (§8.3),
+a rozdział IX wymienia właśnie `/konto`. Koszt jest niewielki, ale nie zerowy i nie
+wyłącznie webowy:
+
+- `URL_APP` w `src/site.mjs`, `404.html`, linki w stopce i w nagłówku, `robots.txt` —
+  wszystko to jedno miejsce każde, bo strony generuje build;
+- **przekierowanie ze starego adresu**, bo `/app/` jest w obiegu: linkuje do niego
+  `docs/FIRESTORE_SYNC.md` w repo aplikacji, a `404.html` obsługuje obok niego `/p/<token>`;
+- lista **autoryzowanych domen** Firebase się nie zmienia — są w niej hosty
+  (`materio-app.com`), nie ścieżki. Wcześniejsza wersja tego akapitu twierdziła inaczej.
+
+**Potrzebna decyzja właściciela.** Sama zmiana to jedna krótka sesja.
 
 ### 8.3. Nazwa `/aplikacja/` przy `/app/`
 
@@ -400,12 +442,24 @@ Android, `/app/` to konto. Slug `/aplikacja/` jest wieczny (§3), więc zmiana w
 przekierowania. Naturalne rozwiązanie to punkt 8.2 — jeśli konto przeniesie się na
 `/konto/`, kolizja nazw znika sama.
 
-### 8.4. Waluta a poziom dostępu
+### 8.4. ~~Waluta a poziom dostępu~~ — rozstrzygnięte w Sesji 13
 
-Wybór waluty jest dziś wyborem gościa (`localStorage`). Przy koncie powstaje pytanie, czy
-waluta ma być polem profilu synchronizowanym przez Firestore. Pozycja kosztorysu i tak
-zachowuje `currencyCode` z chwili zapisu, więc nic się nie fałszuje — to jest wygoda, nie
-poprawność. Do rozstrzygnięcia w Sesji 13.
+Pytanie brzmiało, czy waluta ma być polem profilu synchronizowanym przez Firestore.
+**Zostaje w `localStorage`**, i nie jest to preferencja, tylko stan faktyczny kontraktu:
+reguły dopuszczają w `users/{uid}` **wyłącznie** `createdAt`, `lastSeenAt` i `appVersion`
+(`hasOnly` przy tworzeniu, `affectedKeys().hasOnly` przy zapisie). Dopisanie waluty do
+profilu dostałoby dziś 403, a zmiana reguł leży w repo `3d-polednia/Materio` — poza
+zakresem prac nad webem (rozdział VII). Do tego aplikacja Android bierze walutę z języka
+(`AppLanguage.defaultCurrency`), więc pole w chmurze musiałoby najpierw mieć drugą stronę.
+
+Nic się przez to nie fałszuje: pozycja kosztorysu zachowuje `currencyCode` z chwili
+zapisu, a `/kosztorys/` mówi wprost, gdy waluty się mieszają. Otwarte zostaje to samo, co
+było — „Waluta a aplikacja Android” w `MASTER_PLAN.md`.
+
+Sesja 13 dołożyła obok **drugi wybór, który jest wyborem urządzenia, a nie konta**:
+`liczmat-remember` — czy sesja przeżywa zamknięcie przeglądarki. Ten świadomie nigdy nie
+pojedzie do chmury: „nie pamiętaj mnie na tym komputerze” traci sens, gdy synchronizuje
+się na wszystkie urządzenia naraz.
 
 Decyzje otwarte po Sesjach 1–2 (slogan, waluta w aplikacji Android, języki Androida,
 domena, nazwy przy „materio”) nadal stoją — patrz `MASTER_PLAN.md`.
@@ -427,6 +481,7 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | przepływy | krok na nieistniejącą trasę; przepływ sięgający po wyższy poziom bez kroku, który go nadaje |
 | strona główna (Sesja 6) | inna liczba drzwi niż trzy albo inna kolejność poziomów; drzwi na nieistniejącą trasę; brak tekstu drzwi w słowniku |
 | centrum kalkulatorów (Sesja 7) | kalkulator w żadnej kategorii albo w dwóch naraz; kategoria z nieznanym kalkulatorem lub pusta; brak nazwy albo opisu kategorii w słowniku; skrót „Od czego zacząć”, którego nie potwierdza żaden poradnik |
+| poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z czterech języków |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.
 Tak samo sprawdzone są dwa dołożone w Sesji 5 (piąty link w menu, dwie pozycje na tym

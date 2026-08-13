@@ -672,6 +672,14 @@ header.site {
   background: var(--accent-soft); color: var(--on-accent-soft);
   box-shadow: inset 0 -2px 0 var(--accent-edge);
 }
+/* The account button, when this browser was last told somebody is signed in. It is a
+   hint and never a permission (assets/account.js), so it says "there is a session here"
+   and nothing more — the title attribute carries the wording. */
+.nav-cta[data-level]::after {
+  content: ""; width: var(--sp-2); height: var(--sp-2); border-radius: var(--radius-pill);
+  background: var(--on-accent); margin-left: var(--sp-2); flex: none;
+}
+.nav-cta[data-level] { display: inline-flex; align-items: center; }
 
 /* The menu button exists only where the drawer does, and only when a script can open
    it: without JS the navigation stays on the page instead of behind a dead button. */
@@ -1125,6 +1133,50 @@ a.chip:hover { text-decoration: none; }
 .auth-note { font-size: var(--fs-sm); margin-top: var(--sp-4); }
 .app-identity { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); min-width: 0; }
 .app-identity b { overflow-wrap: anywhere; }
+.app-next { margin: 0 0 var(--sp-5); }
+
+/* A button that has to read as a link: switching between the sign-in, sign-up and
+   reset views is not navigation, so it must not be an <a href="#"> that a middle
+   click opens in a new tab and a crawler follows. */
+.linkish {
+  font: inherit; font-size: var(--fs-sm); padding: 0; border: 0; background: none;
+  color: var(--accent-strong); font-weight: var(--fw-semi); cursor: pointer;
+  text-decoration: underline; text-underline-offset: var(--sp-1);
+}
+.linkish:hover { color: var(--on-bg); }
+
+.field-check { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-4); }
+.field-check input { width: var(--sp-5); height: var(--sp-5); flex: none; accent-color: var(--accent-strong); }
+.field-check label { font-size: var(--fs-sm); margin: 0; }
+.field-note { font-size: var(--fs-sm); margin: calc(-1 * var(--sp-2)) 0 var(--sp-4); }
+
+/* ---------- The three access levels (master plan II)
+   One card per level, on the signed-out page and again in the Profil tab. The card
+   for the level the visitor is on is the only one with a full-strength edge. */
+.app-levels { margin-top: var(--sp-10); }
+.lvl-cards { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; margin-top: var(--sp-4); }
+@media (min-width: 760px) { .lvl-cards { grid-template-columns: repeat(3, 1fr); } }
+.lvl-card {
+  padding: var(--sp-5); border: 1px solid var(--outline); border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.lvl-card[data-current] { border-color: var(--accent-edge); background: var(--accent-soft); }
+.lvl-card[data-current] .muted { color: var(--on-accent-soft); }
+.lvl-card h3 { margin: var(--sp-2) 0 var(--sp-2); font-size: var(--fs-base); }
+.lvl-card p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
+.lvl-badge { cursor: default; background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.lvl-can { list-style: none; margin: 0; padding: 0; font-size: var(--fs-sm); }
+.lvl-can li { padding-left: var(--sp-5); position: relative; margin-bottom: var(--sp-1); }
+.lvl-can li::before { content: "✓"; position: absolute; left: 0; color: var(--accent-strong); }
+.lvl-soon {
+  margin: var(--sp-3) 0 0; font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--muted);
+}
+
+/* The profile's read-only facts: a label and a value, one pair per row. */
+.facts { margin: 0; display: grid; gap: var(--sp-2); }
+.fact { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: space-between; font-size: var(--fs-sm); }
+.fact dt { color: var(--muted); }
+.fact dd { margin: 0; font-weight: var(--fw-semi); overflow-wrap: anywhere; }
 
 /* ---------- Workspace ----------
    A saved room feeds the form: pick the room, pick the surface, the area lands in

@@ -82,6 +82,7 @@ hand is not possible; a generator writes it from one template plus the dictionar
 node scripts/build.mjs            # regenerate every page + sitemap.xml
 node scripts/build.mjs --check    # validate dictionaries/slugs only, write nothing
 node scripts/test-calculators.mjs # the calculator maths, units and localization
+node scripts/test-account.mjs     # the account: levels, the session, the copy
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -139,6 +140,14 @@ scripts/test-pages.mjs  The same calculators in Chromium: 360/414/768/1280 px, t
                       form, the result panel, the currency selector, the no-JavaScript
                       variant. Needs Playwright installed OUTSIDE the repo — see the
                       header of the file
+scripts/test-account.mjs  The account system: which of the three levels a visitor is on,
+                      what the other 129 pages are told about the session, where a
+                      ?next= link may point, and the copy in four languages.
+                      Dependency-free — run it after touching assets/account.js,
+                      assets/app.js, ACCOUNT_LEVELS or an acc_*/prof_* key
+scripts/test-account-page.mjs  /app/ in Chromium with the Firebase SDK stubbed: sign-up,
+                      sign-in, sign-out, the reset, the profile, the level, the tabs.
+                      Same outside-the-repo Playwright as test-pages.mjs
 src/app-pages.mjs     /app/ and /p/ (noindex, translated in the browser)
 assets/styles.css     The design system: one token block, then the components that
                       spend it. Never write a literal colour/radius/duration below it
@@ -153,6 +162,9 @@ assets/calc-hub.js    The search + category filter on /kalkulatory/. The hub is 
                       server-rendered; this only narrows what is already there
 assets/workspace.js   Projects, rooms and estimate lines in localStorage (Firestore schema)
 assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/
+assets/account.js     The user session and the three access levels of chapter II. Loaded
+                      on every page: it is what lets a calculator word the sentence under
+                      the result without loading Firebase. /app/ is its only writer
 assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/
 assets/calculators.js Calculation engines ported 1:1 from the Kotlin app + form wiring
 assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
@@ -184,6 +196,15 @@ Kotlin side of it. Change one, change all three.
 
 - Both are **noindex** (robots meta tag *and* `robots.txt`) and stay out of `sitemap.xml`.
 - They have no per-language URLs; they load the whole dictionary and translate in place.
+  **Anything JavaScript writes has to be redrawn on `langchange`** — `/app/` swaps the DOM
+  instead of navigating, so a list, a date or a chip rendered once stays in the old
+  language otherwise.
+- `/app/` signed out is three views in one card — sign in, sign up, reset the password —
+  each with its own form, because the browser's password manager keys off `autocomplete`
+  and one field cannot be both `current-password` and `new-password`. `?mode=signup` and
+  `?mode=reset` open a view directly, and `?next=<path>` offers the way back afterwards.
+  Only a path on this site is ever accepted there (`lmSafeNext()`): a sign-in page that
+  redirects anywhere is a phishing link with a real domain on it.
 - `/p/<token>` cannot be a real directory, and GitHub Pages has no rewrites — `404.html`
   forwards `/p/<token>` to `/p/?t=<token>`.
 - **`assets/firebase-config.js` holds the live values** for the Web app registered in
@@ -207,12 +228,24 @@ Kotlin side of it. Change one, change all three.
 - **Account deletion needs the deployed rules.** `users/{uid}` was `allow delete: if false`
   until 2026-08-08; the account page cannot finish deleting until
   `firebase deploy --only firestore` has run in the app repo.
-- **`liczmat-signed-in` is a copy hint, never a gate.** `/app/` writes it to
-  `localStorage` on sign-in and clears it on sign-out, because the 60 calculator pages do
-  not load Firebase and still have to choose between "create a free account" and "your
-  account will sync this" under the result (master plan XII). It can be stale — signed out
-  in another tab, an expired token — so nothing may gate saving, counting or reading on
-  it. Listed on `/cookies/`.
+- **The visitor's level is derived, never asserted.** `lmLevelOf()` in
+  `assets/account.js`: no Firebase user → `guest`; signed in → `liczmat`; signed in with
+  `users/{uid}.plan == "premium"` (still valid) → `pro`. `plan` and `planValidUntil` are
+  **server-only** — the deployed rules let a client write nothing in the profile but
+  `lastSeenAt` and `appVersion` — so a browser can read the level and can never grant
+  itself one. Nothing writes `plan` today (no Cloud Functions, no Play Billing:
+  FIRESTORE_SYNC §9.2), so every real account is `liczmat` and the Pro card says
+  "W przygotowaniu" with nothing to click. **Do not add a field to `users/{uid}`** — a
+  name, a currency, a preference — the rules reject it; a profile name goes to Firebase
+  Auth (`updateProfile`) instead.
+- **`liczmat-signed-in` is a copy hint, never a gate.** `/app/` writes the level into it
+  on sign-in and clears it on sign-out, because the 60 calculator pages do not load
+  Firebase and still have to choose between "create a free account" and "your account
+  will sync this" under the result (master plan XII); it is also the mark on the header's
+  account button. It can be stale — signed out in another tab, an expired token — so
+  nothing may gate saving, counting or reading on it. The value it held before session 13
+  (`"1"`) still reads as signed in. Listed on `/cookies/`, next to `liczmat-remember`,
+  which is this device's answer to "keep me signed in".
 - **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms and
   estimate lines in `localStorage` in the *same document shape* as Firestore, so the sync
   tab in `/app/` is a plain copy in either direction. Counting must never require an

@@ -38,8 +38,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 10 | Kalkulatory grupa 2 (Malowanie + Budowa) | **Zrobione** — 2026-08-12 |
 | 11 | Kalkulatory grupa 3 (Rozkrój + Zabudowa G-K) | **Zrobione** — 2026-08-12 |
 | 12 | Test kalkulatorów | **Zrobione** — 2026-08-13 |
-| 13 | System konta | **Następna** |
-| 14–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 13 | System konta | **Zrobione** — 2026-08-13 |
+| 14 | Dashboard LiczMat | **Następna** |
+| 15–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -70,6 +71,106 @@ w repo `3d-polednia/Materio`. W skrócie, po stronie serwisu:
 Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystkich
 dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)
 został zaktualizowany na żywo. Matematyka kalkulatorów nietknięta.
+
+### Co zrobiła Sesja 13
+
+Rozdział XXXII wymienia sześć rzeczy: rejestrację, logowanie, wylogowanie, reset hasła,
+profil i sesję użytkownika — „uwzględnić model GOŚĆ → LICZMAT → LICZMAT PRO”. Pięć
+pierwszych serwis miał od 2026-08-08, ale jako jeden formularz z przełącznikiem: profilu
+nie było wcale, sesji nie było widać poza `/app/`, a model trzech poziomów istniał
+wyłącznie w `src/ia.mjs` jako pole trasy — nigdzie nie mówił odwiedzającemu, gdzie jest.
+
+**Poziom przestał być komentarzem.** `ACCOUNT_LEVELS` w `src/ia.mjs` trzyma trzy poziomy
+rozdziału II z nazwą, opisem i listą tego, co każdy potrafi; `/app/` renderuje z tego trzy
+karty — raz dla gościa (żeby wiedział, co daje konto), raz w profilu (żeby wiedział, na
+czym jest). Build sprawdza, że poziomy są trzy, w kolejności, każdy z własnym kluczem, że
+żaden nie wskazuje nieistniejącej trasy i że każdy klucz `acc_*` istnieje w czterech
+językach. Pięć nowych sprawdzeń, wszystkie przetestowane negatywnie — celowo zepsute,
+build faktycznie padł.
+
+**Poziom jest wyprowadzany, nie deklarowany.** `lmLevelOf()`: brak użytkownika → GOŚĆ,
+zalogowany → LICZMAT, `users/{uid}.plan == "premium"` (ważny) → LICZMAT PRO. `plan`
+i `planValidUntil` zapisuje wyłącznie serwer — reguły dopuszczają z profilu tylko
+`lastSeenAt` i `appVersion` — więc przeglądarka poziom **czyta**, ale sobie go nie nadaje.
+Test sprawdza to wprost: `plan: "pro"` i `plan: "PREMIUM"` **nie** dają Pro, a premium po
+terminie wraca do LiczMat. Dziś `plan` nie zapisuje nic (brak Cloud Functions i Play
+Billing, `FIRESTORE_SYNC.md` §9.2), więc karta Pro mówi „W przygotowaniu” i **nie ma
+przycisku zakupu** — nie byłoby czego kupić, a rozdział XXV zabrania martwego przycisku.
+
+**Rejestracja, logowanie i reset hasła to trzy widoki, nie jeden formularz z etykietą.**
+
+- Jedno pole hasła obsługiwało oba tryby, z `autocomplete="current-password"`. Menedżer
+  haseł przeglądarki czyta właśnie ten atrybut, więc na formularzu **zakładania** konta
+  podpowiadał stare hasło. Teraz to dwa formularze: `current-password` i `new-password`.
+- **Reset hasła nie miał własnego pola** — pożyczał adres z formularza logowania i przy
+  pustym polu odpowiadał „Niepoprawny adres e-mail”, choć nikt niczego nie wpisywał. Ma
+  własny widok, własne pole i własne zdanie, co się stanie.
+- Widok zakładania konta mówi teraz, po co konto jest, i wprost: **kalkulatory liczą bez
+  konta i tak zostanie** (rozdział II: „rejestracja ma być naturalnym kolejnym krokiem,
+  a nie barierą”).
+- Zdanie pod wynikiem kalkulatora prowadzi **prosto na formularz rejestracji**
+  (`/app/?mode=signup&next=…`), a nie na logowanie z przełącznikiem do znalezienia. Po
+  zalogowaniu jest przycisk powrotu na tę samą stronę. `lmSafeNext()` przepuszcza
+  wyłącznie ścieżkę tego serwisu — `//gdzieś.example`, `javascript:` i adres z innym
+  hostem są odrzucane, bo strona logowania, która przekierowuje gdziekolwiek, jest
+  gotowym linkiem phishingowym z prawdziwą domeną.
+
+**Profil, którego nie było.** Nowa zakładka: adres, sposób logowania, data założenia
+i ostatniego użycia (z `users/{uid}`), nazwa konta, poziom i sesja. Nazwa idzie do
+**Firebase Auth** (`updateProfile`), nie do Firestore — reguły odrzucają w profilu każde
+pole poza trzema, więc dopisanie tam czegokolwiek dałoby 403. Test pilnuje jednego i
+drugiego: nazwa trafia do Auth, a dokument profilu **nadal ma dokładnie trzy pola**.
+
+**Sesja przestała być niewidzialna.** Do tej pory jedyną informacją „ktoś jest
+zalogowany” było zdanie pod wynikiem kalkulatora.
+
+- Nowy `assets/account.js` na **każdej** stronie (dwa kilobajty, zero sieci): trzyma
+  poziom, czyta i zapisuje wskazówkę, i zaznacza kropką „Moje konto” w nagłówku.
+  `liczmat-signed-in` niesie teraz poziom (`liczmat` / `pro`) zamiast `"1"`; stara
+  wartość nadal czyta się jako „zalogowany”, więc nikt nie zostaje wylogowany przez
+  wdrożenie. Nadal jest to **podpowiedź do treści, nigdy uprawnienie**.
+- **„Pamiętaj mnie na tym urządzeniu”** — Firebase domyślnie trzyma sesję po zamknięciu
+  przeglądarki (`browserLocalPersistence`), co jest właściwe dla telefonu i niewłaściwe
+  dla cudzego komputera. Odznaczenie prosi o `browserSessionPersistence`; odpowiedź jest
+  zapamiętana na urządzeniu (`liczmat-remember`) i da się ją zmienić w profilu, co
+  przenosi także trwającą sesję. Oba klucze są wypisane na `/cookies/` w czterech
+  językach.
+
+**Dwa błędy zastane, znalezione przy pisaniu testu.**
+
+- **Każde powtórne zdarzenie `onAuthStateChanged` zakładało drugi komplet nasłuchów.**
+  Firebase woła je nie tylko przy logowaniu, ale też przy odświeżeniu tokena i po zmianie
+  profilu. `onSignedIn()` przechodziło wtedy całą ścieżkę jeszcze raz: drugi
+  `onSnapshot` na tych samych dwóch kolekcjach, kolejny odczyt profilu, i tak w kółko.
+  Teraz powtórka dla tego samego `uid` tylko przerysowuje to, co mogło się zmienić.
+- **Komunikat znikał sam.** Nasłuch kolekcji kończył się `status(fromCache ? … : "")`,
+  więc pierwszy snapshot po zapisie **kasował** cokolwiek stało w pasku — „Nazwa
+  zapisana.” gasło zanim ktokolwiek zdążył je przeczytać. Teraz „brak sieci” może
+  skasować tylko samo siebie.
+
+**Dostępność zakładek.** Pasek ma `role="tablist"`, co obiecuje czytnikowi ekranu
+strzałki i jedno miejsce w kolejności tabulacji — i do tej sesji nie dotrzymywał tego:
+działało wyłącznie kliknięcie. Doszły strzałki (z zawijaniem), Home/End, roving
+`tabindex` oraz `aria-controls` / `aria-labelledby` wiążące zakładkę z panelem. Zakładek
+jest teraz pięć; na 360 px zawijają się do dwóch rzędów i nic nie wyjeżdża w bok.
+
+**Przełączenie języka na `/app/` przerysowuje to, co napisał JavaScript.** Strona nie ma
+adresów per język i podmienia tekst w miejscu, więc pasek tożsamości, poziom, daty i obie
+listy zostawały w poprzednim języku. Teraz `langchange` je odbudowuje.
+
+- Sprawdzone: **111 testów logiki + 97 testów `/app/` w Chromium — 208/208 przechodzi**,
+  a wcześniejsze 1117 + 331 nadal przechodzi (razem 1656). Dwa nowe pliki:
+  `scripts/test-account.mjs` (bez zależności) i `scripts/test-account-page.mjs`.
+  Ten drugi **podstawia SDK Firebase**: przechwytuje trzy importy z `gstatic.com`
+  i odpowiada własnym modułem (konta w obiekcie, Firestore jako `Map`, każde wywołanie
+  zapisane). Dzięki temu test dotyczy kodu tego repozytorium, a nie dostępności Google —
+  i w ogóle daje się uruchomić z kontenera, który do `gstatic.com` nie dociera. Czego
+  **nie** sprawdza: czy samo Firebase zachowuje się tak, jak zakłada `assets/app.js`.
+  To jest weryfikacja na żywo i **nikt jej po tej sesji nie powtórzył** — patrz problemy.
+- Kontrast: nowa para (nagłówek i lista na karcie poziomu, na którym stoisz) — 15,57:1
+  w jasnym, 12,63:1 w ciemnym. Wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 12
 
@@ -565,6 +666,41 @@ Serwis został naprawiony, telefon nie. Zrównanie wymaga zmiany w repo
 i osobnego wydania. **Poza zakresem prac nad webem** (rozdział VII) — **potrzebna decyzja
 właściciela**, czy zlecić to jako etap w tamtym repo.
 
+### `/app/` czy `/konto/` — propozycja z Sesji 13, decyzja właściciela
+
+Rozdział IX wymienia w przykładowej strukturze `/konto`. Konto stoi pod `/app/`, dwa
+znaki od `/aplikacja/`, która jest czymś zupełnie innym (strona aplikacji Android).
+Sesja 13 **adresu nie ruszyła**, bo ten sam rozdział IX mówi wprost: znalezione lepsze
+rozwiązanie „zgłoś w raporcie”, a nie wprowadzaj przy okazji bieżącego zadania.
+
+Propozycja: przenieść na `/konto/` z przekierowaniem ze starego adresu. Strona jest
+`noindex`, więc nie ma pozycji do stracenia, ale `/app/` jest w obiegu — linkuje do niego
+`docs/FIRESTORE_SYNC.md` w repo aplikacji, a `404.html` obsługuje obok niego `/p/<token>`.
+Lista autoryzowanych domen Firebase **nie** wymaga zmiany: są w niej hosty, nie ścieżki.
+Koszt: jedna krótka sesja. Pełne uzasadnienie: [`ARCHITEKTURA.md`](ARCHITEKTURA.md) §8.2.
+
+### Zawartość poziomu Pro — nadal nieustalona, a strona już go opisuje
+
+`/app/` pokazuje od Sesji 13 kartę „LiczMat Pro” z czterema pozycjami, które **wymienia
+rozdział II planu**: klienci, zlecenia, wyceny, terminarz. Karta mówi „W przygotowaniu”
+i nie ma na niej nic do kliknięcia, bo `/liczmat-pro/` powstaje w Sesji 29, a `plan`
+w Firestore **nikt dziś nie nadaje** — nie ma Cloud Functions ani Play Billing
+(`FIRESTORE_SYNC.md` §9.1–9.2). To znaczy, że poziom PRO jest w kodzie policzalny
+i przetestowany, ale w praktyce nieosiągalny. Nic tu nie jest zepsute; trzeba tylko
+wiedzieć, że **kolejność jest taka: najpierw ktoś musi nadawać `plan`, potem paywall
+z rozdziału XXV ma czego pilnować**. Do decyzji właściciela, w której sesji.
+
+### Warstwa konta nie została po tej sesji sprawdzona na żywym Firebase
+
+`scripts/test-account-page.mjs` przeklikuje `/app/` w Chromium z **podstawionym** SDK,
+bo kontener agenta nie dociera do `gstatic.com` (ta sama przeszkoda, co w Sesji 12
+i wcześniej). To sprawdza kod tego repozytorium — widoki, poziom, profil, co ląduje
+w `localStorage` — ale **nie** sprawdza, czy prawdziwe Firebase zachowuje się tak, jak
+zakłada `assets/app.js`. Trzy rzeczy warto kliknąć w prawdziwej przeglądarce, zanim uzna
+się je za działające: `setPersistence` przed logowaniem, `updateProfile` z nazwą i reset
+hasła. Ostatnia weryfikacja na żywo to `FIRESTORE_SYNC.md` §8 (2026-08-07) i nie obejmuje
+niczego, co dołożyła ta sesja.
+
 ### `DOKUMENTACJA.md` §7 opisuje kalkulatory sprzed Sesji 7 — znalezione w Sesji 12
 
 Sekcja „7. Kalkulatory" mówi o `buildCalculators()` renderującym karty do `#calc-grid`,
@@ -615,6 +751,11 @@ Propozycja: zostawić `GUEST`, a rozdział II czytać jako granicę konta, nie g
 przeglądarki — konto dokłada sync między urządzeniami, przetrwanie wyczyszczenia
 przeglądarki i udostępnianie linkiem. Pełne uzasadnienie i alternatywa:
 [`ARCHITEKTURA.md`](ARCHITEKTURA.md) §8.1. **Potrzebna decyzja właściciela.**
+
+Sesja 13 stanu nie zmieniła, ale go **napisała wprost na stronie**: karta „Gość” na
+`/app/` mówi, że bez konta działają wszystkie kalkulatory i pełny wynik, a karta
+„LiczMat”, że konto dokłada zapis, projekty i te same dane na telefonie. Jeżeli
+właściciel rozstrzygnie spór w drugą stronę, zmieni się i ta treść, i poziom trasy.
 
 ### ~~Slogan~~ — rozstrzygnięte w Sesji 6
 
