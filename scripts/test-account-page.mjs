@@ -122,10 +122,14 @@ function emit() { S.listeners.forEach((fn) => fn(S.user)); }
 function setUser(u) { S.user = u; emit(); }
 
 export function getAuth() {
-  return {
-    get currentUser() { return S.user; },
-    __store: S,
-  };
+  if (!S.auth) {
+    S.auth = {
+      get currentUser() { return S.user; },
+      languageCode: null,
+      __store: S,
+    };
+  }
+  return S.auth;
 }
 export function onAuthStateChanged(auth, fn) { S.listeners.push(fn); fn(S.user); return () => {}; }
 
@@ -671,6 +675,26 @@ head("10. five tabs, reachable from the keyboard");
     await page.evaluate(() => document.activeElement.dataset.tab), "account");
   eq("no console error", page.lmErrors.join(" / "), "");
   await page.close();
+  await ctx.close();
+}
+
+head("10b. the mail Firebase sends follows the page's language");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openApp(ctx, "/app/?mode=reset");
+  eq("Polish to begin with",
+    await page.evaluate(() => window.__fb.auth.languageCode), "pl");
+
+  await page.click("#lang-toggle");
+  await page.click('.lang-item[data-lang="uk"]');
+  eq("and it follows the picker",
+    await page.evaluate(() => window.__fb.auth.languageCode), "uk");
+  await page.close();
+
+  const de = await openApp(ctx, "/app/", { lang: "de" });
+  eq("a visitor who chose German gets German",
+    await de.evaluate(() => window.__fb.auth.languageCode), "de");
+  await de.close();
   await ctx.close();
 }
 

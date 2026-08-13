@@ -112,6 +112,14 @@ async function boot() {
   auth = authMod.getAuth(app);
   db = storeMod.getFirestore(app);
 
+  // Firebase sends the password-reset and address-verification mail in whatever language
+  // this is set to, and defaults to English. The page says "Wysłaliśmy link do zmiany
+  // hasła" and then an English mail arrived. It follows the language picker, because
+  // /app/ switches language in place and the next mail should follow the visitor.
+  const followLanguage = () => { auth.languageCode = document.documentElement.lang || "pl"; };
+  followLanguage();
+  document.addEventListener("langchange", followLanguage);
+
   // The same offline persistence the Android SDK has: writes queue while the
   // connection is down and go out when it returns.
   try {
