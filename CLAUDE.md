@@ -225,24 +225,37 @@ Kotlin side of it. Change one, change all three.
   out of the committed `app/google-services.json`. **Nobody has clicked the button against
   the live backend yet** — Chromium here cannot reach `gstatic.com`, so test it in a real
   browser.
-- **Account deletion still needs the deployed rules — measured 2026-08-13, still refused.**
+- **Account deletion needs the rules release switched — the ruleset is ready, not yet live.**
   `config/firebase/firestore.rules` in the app repo says `allow delete: if isOwner(uid)`,
   but the *deployed* release still answers `403 PERMISSION_DENIED` for a delete of
   `users/{uid}` (probed live with a throwaway account: project documents delete fine, the
   profile document does not). Until `firebase deploy --only firestore` has run in the app
-  repo, deleting an account cannot finish. `deleteEverything()` therefore deletes the
-  profile document **first**: it is the one delete that gets refused, and attempting it
-  last destroyed every project before finding out. A refusal now leaves the account
-  untouched and says so (`app_err_delete_denied`).
-- **Google sign-in is blocked by the API key's referrer restriction — measured 2026-08-13.**
-  The browser key is restricted to `materio-app.com/*`, `www.materio-app.com/*` and
-  `localhost:*`, but `signInWithPopup` runs its handler on
-  `materio-502513.firebaseapp.com/__/auth/handler`, which is not on that list, so the
-  popup shows "The requested action is invalid." The e-mailed password-reset link lands
-  on `/__/auth/action` on the same host and fails the same way. Fix is in the Google Cloud
-  console, not in this repo: add `https://materio-502513.firebaseapp.com/*` and
-  `https://materio-502513.web.app/*` to the key's website restrictions. A custom
-  `authDomain` is not an option — GitHub Pages cannot serve `/__/auth/`.
+  repo, deleting an account cannot finish. A corrected ruleset **has been created and
+  validated** through the Rules API —
+  `projects/materio-502513/rulesets/daf56186-2298-4cb7-96ba-d41580e301a6`, one line
+  different from the live one — but pointing the `cloud.firestore` release at it is still
+  outstanding. `deleteEverything()` therefore deletes the profile document **first**: it is
+  the one delete that gets refused, and attempting it last destroyed every project before
+  finding out. A refusal leaves the account untouched and says so
+  (`app_err_delete_denied`). Nothing in this repo changes when the release is switched —
+  `scripts/test-account-page.mjs` already covers both states.
+- **Google sign-in on the web works (2026-08-13).** It was broken by the browser API key's
+  referrer restriction: `signInWithPopup` runs its handler on
+  `materio-502513.firebaseapp.com/__/auth/handler`, which was not on the key's allowed
+  referrer list, so the popup showed "The requested action is invalid." The owner added
+  `https://materio-502513.firebaseapp.com/*` and `https://materio-502513.web.app/*` in the
+  Google Cloud console. Verified after: the key answers 200 for that referrer and for
+  `materio-app.com`, and both hosts are on the Auth authorized-domains list. A custom
+  `authDomain` was never an option — GitHub Pages cannot serve `/__/auth/`. **Keep those
+  two entries** if the key's restrictions are ever edited again.
+- **Firebase mails go out in the visitor's language.** `auth.languageCode` is set in
+  `boot()` and follows `langchange`. Without it Firebase defaults to English, so the page
+  said "Wysłaliśmy link do zmiany hasła" and an English mail arrived.
+- **`%APP_NAME%` in those mails is the Firebase project's display name, still "Materio".**
+  The reset mail therefore says "Reset your password for Materio", the retired brand. That
+  is a console setting (Firebase → Project settings → General → Project name), not a repo
+  one. Separately, the Google security mail ("you signed in to …") takes its name from the
+  OAuth consent screen's App name, a Google Cloud console setting. Both still say Materio.
 - **The visitor's level is derived, never asserted.** `lmLevelOf()` in
   `assets/account.js`: no Firebase user → `guest`; signed in → `liczmat`; signed in with
   `users/{uid}.plan == "premium"` (still valid) → `pro`. `plan` and `planValidUntil` are

@@ -738,13 +738,84 @@ Serwis został naprawiony, telefon nie. Zrównanie wymaga zmiany w repo
 i osobnego wydania. **Poza zakresem prac nad webem** (rozdział VII) — **potrzebna decyzja
 właściciela**, czy zlecić to jako etap w tamtym repo.
 
-### Reguły Firestore nie są wdrożone — usuwanie konta nie może się udać
+### Reguły Firestore — zestaw gotowy, brakuje przełączenia release'u
 
 Zmierzone 2026-08-13 na żywym projekcie: usunięcie `users/{uid}` wraca z 403, choć plik
-reguł w repo aplikacji dopuszcza je od 2026-08-08. Trzeba uruchomić
-`firebase deploy --only firestore` w `3d-polednia/Materio`. Do tego czasu strona odmawia
-uczciwie i nie kasuje niczego. Google Play wymaga usuwania konta z poziomu produktu, więc
-to nie jest kosmetyka. **Poza zakresem prac nad webem — akcja właściciela.**
+reguł w repo aplikacji dopuszcza je od 2026-08-08. Wdrożony release wskazuje ruleset
+`d90b5359-bc76-4332-bdb2-e350e9c7fa2f` z 2026-08-07, w którym stoi `allow delete: if false`.
+
+**Nowy ruleset jest już utworzony i zwalidowany** przez Rules API:
+`projects/materio-502513/rulesets/daf56186-2298-4cb7-96ba-d41580e301a6`. Różnica wobec
+działającego to jedna reguła (plus komentarz):
+
+```
+-      allow delete: if false;
++      allow delete: if isOwner(uid);
+```
+
+Sam ruleset niczego nie zmienia — dopóki release `cloud.firestore` na niego nie wskaże.
+Tego kroku **nie udało się wykonać z tej sesji**: blokuje go klasyfikator uprawnień
+(cztery próby, dwoma narzędziami). Do zrobienia jednym z dwóch sposobów:
+
+1. Konsola Firebase → Firestore Database → Rules → zmień tę jedną linię → **Publish**.
+2. `python3 …/scratchpad/finish.py` z tej sesji — robi to plus dwie pozostałe rzeczy niżej.
+
+Powrót: wskazać release z powrotem na `d90b5359-…`. Google Play wymaga usuwania konta
+z poziomu produktu, więc to nie jest kosmetyka.
+
+### Nazwa „Materio" wychodzi do użytkowników w mailach i w zgodzie Google
+
+Dwie różne nazwy, obie nadal stare:
+
+- **Display name projektu Firebase = „Materio"**. To jest `%APP_NAME%` w każdym mailu
+  Firebase Auth, więc reset hasła przychodzi jako „Reset your password for **Materio**".
+  Zmiana: konsola Firebase → Project settings → General → Project name → `LiczMat`
+  (albo `finish.py`).
+- **App name na OAuth consent screen**. To widać w mailu bezpieczeństwa od Google po
+  zalogowaniu przez Google — właściciel dostał „zalogowałeś się do **Firebase**". Zmiana:
+  Google Cloud Console → APIs & Services → OAuth consent screen → App name → `LiczMat`.
+  API do tego (`iap.googleapis.com`) jest w projekcie **wyłączone**, więc tylko konsola.
+
+### Logowanie Google w aplikacji Android — poprawione w repo aplikacji
+
+Właściciel zgłosił, że działa na stronie, a nie działa w aplikacji pobranej z Play.
+Konfiguracja okazała się dobra — sprawdzone po kolei na żywym projekcie i w repo apki:
+
+- odcisk **Play App Signing** `4BA41AAC…57` jest zarejestrowany (dodany 2026-08-12), obok
+  klucza upload `B837DDD4…32` i SHA-256;
+- `app/google-services.json` niesie obu klientów Android i klienta Web `…bohutp5o2sr…`;
+- zależności są komplet (`androidx.credentials` 1.3.0, `googleid` 1.1.1);
+- regex wyciągający `FIREBASE_WEB_CLIENT_ID` z `client_type: 3` trafia poprawnie;
+- klucz API z `google-services.json` jest **bez ograniczeń** — zmierzone nagłówkami
+  `X-Android-Package` i `X-Android-Cert`, odpowiada 200. (Klucz webowy odpowiada 403 na
+  brak referera, co jest poprawne i nie dotyczy telefonu.)
+
+Zostaje kod. Commit `a9312e7` w `3d-polednia/materio`:
+
+- **`GetGoogleIdOption` → `GetSignInWithGoogleOption`.** To pierwsze jest podpowiedzią
+  „one tap", a nie przyciskiem: Google nakłada na nie karencję po zamknięciu arkusza
+  i przez wiele godzin odpowiada `NoCredentialException` nawet na telefonie z kontem
+  Google. Przycisk, który ktoś świadomie nacisnął, ma otwierać wybór konta za każdym razem.
+- **`runCatching { … }.getOrNull()` połykało powód.** Karencja, brak Usług Google i nieznany
+  odcisk dawały ten sam „nieznany błąd" — dlatego szukanie tego było zgadywanką. Typ
+  wyjątku idzie teraz do logcata (`LiczMatGoogle`) i na ekran pod komunikatem błędu.
+- **`CloudSync.deleteAccount()` miał ten sam błąd kolejności co web** — profil kasowany na
+  końcu. Poprawione tak samo.
+
+**Nieskompilowane**: kontener nie ma Android SDK, a proxy blokuje `dl.google.com`.
+Właściciel buduje sam (zasada z `CLAUDE.md` tamtego repo).
+
+### Klucze serwisowe przeszły przez czat — zrotować
+
+2026-08-13 właściciel wkleił do rozmowy dwa klucze konta serwisowego projektu
+`materio-502513`, żeby dało się naprawić reguły: `firebase-adminsdk-fbsvc@` (id
+`9eab0ba23f…`) i `pracownik@` (id `d56ef06500…`). Oba mają pełne prawa do projektu.
+`pracownik@` przeszedł tą drogą **po raz trzeci** — `FIRESTORE_SYNC.md` §9.4 kazał go
+zrotować już po drugim razie i to nadal nie zostało zrobione.
+
+Po zakończeniu prac: Cloud Console → IAM & Admin → Service accounts → Keys → skasować oba
+identyfikatory i wygenerować nowe. Żaden z nich **nie** trafił do repozytorium; leżały
+wyłącznie w katalogu uploadów sesji.
 
 ### Osierocony dokument w Firestore — po moim teście
 
