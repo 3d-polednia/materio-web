@@ -12,6 +12,8 @@
  *   estimation  { id, projectId, name, calculationType, materialCategory, requiredUnits,
  *                 unitLabel, totalCostMinor, wastePercentage, wasteCostMinor,
  *                 currencyCode, inputJson, ...sync }
+ *   shoppingItem{ id, projectId, estimationId, name, materialCategory, quantity, unit,
+ *                 estimatedCostMinor, currencyCode, isPurchased, ...sync }
  *   ...sync     { createdAt, updatedAt, deletedAt, schemaVersion }
  *
  * Money is minor units (grosze) and an integer, never a Double — the Money rule from the
@@ -59,7 +61,7 @@ const WS_CALC_TYPE = {
 
 /* ------------------------------------------------------------------ storage */
 
-const wsEmpty = () => ({ projects: [], rooms: [], estimations: [] });
+const wsEmpty = () => ({ projects: [], rooms: [], estimations: [], shoppingItems: [] });
 
 /** Read the whole workspace. A corrupt or absent store reads as an empty one. */
 function wsLoad() {
@@ -71,6 +73,9 @@ function wsLoad() {
       projects: Array.isArray(data.projects) ? data.projects : [],
       rooms: Array.isArray(data.rooms) ? data.rooms : [],
       estimations: Array.isArray(data.estimations) ? data.estimations : [],
+      // Absent in every workspace written before session 17, which is why it is read the
+      // same defensive way as the other three rather than assumed into existence.
+      shoppingItems: Array.isArray(data.shoppingItems) ? data.shoppingItems : [],
     };
   } catch (e) {
     return wsEmpty();
@@ -167,15 +172,21 @@ const wsRenameProject = (id, name) => wsUpdateProject(id, { name });
 const wsArchiveProject = (id, on) => wsUpdateProject(id, { archived: on !== false });
 
 /**
- * Tombstone the project and its estimate lines, exactly as the app cascades.
+ * Tombstone the project, its estimate lines and its materials, exactly as the app cascades.
+ *
+ * Both subcollections go, because both are subcollections: in Room they hang off `projects`
+ * with `ForeignKey(onDelete = CASCADE)`, and `ProjectRepository.recordTombstones()` writes a
+ * tombstone for the estimations *and* the shopping items of every project it deletes —
+ * otherwise the next pull from another device puts the materials back under a project that
+ * no longer exists.
  *
  * Rooms are deliberately left alone. They used to be unlinked here, which threw away the
  * one fact needed to put the project back, and a room is a physical place that outlives
  * the project it was measured for anyway. Nothing renders a room by project yet — that
  * is session 20 — so this costs nothing today and buys a whole undo.
  *
- * @returns {{id: string, at: number, lines: string[]}|null} what was tombstoned. Hand it
- *   to wsRestoreProject() to undo exactly this delete and nothing else.
+ * @returns {{id: string, at: number, lines: string[], items: string[]}|null} what was
+ *   tombstoned. Hand it to wsRestoreProject() to undo exactly this delete and nothing else.
  */
 function wsDeleteProject(id) {
   const data = wsLoad();
@@ -186,13 +197,15 @@ function wsDeleteProject(id) {
   project.updatedAt = now;
   const lines = data.estimations.filter((e) => e.projectId === id && !e.deletedAt);
   lines.forEach((e) => { e.deletedAt = now; e.updatedAt = now; });
+  const items = data.shoppingItems.filter((s) => s.projectId === id && !s.deletedAt);
+  items.forEach((s) => { s.deletedAt = now; s.updatedAt = now; });
   wsSave(data);
   // The stored id is now a tombstone. wsActiveProjectId() already resolves past it, so
   // writing that answer back is the handoff — and it has to be unconditional: comparing
   // the stored id with the deleted one has just stopped matching, because the resolution
   // moved on the moment the row was tombstoned, leaving the deleted id in storage.
   wsSetActiveProject(wsActiveProjectId());
-  return { id, at: now, lines: lines.map((e) => e.id) };
+  return { id, at: now, lines: lines.map((e) => e.id), items: items.map((s) => s.id) };
 }
 
 /**
@@ -207,12 +220,14 @@ function wsDeleteProject(id) {
  * `updatedAt` moves to now, so a phone that already heard about the delete hears about
  * the undo as well instead of re-deleting the row on the next sync.
  *
- * @param {{id: string, lines: string[]}|string} token what wsDeleteProject() returned. A
- *   bare id restores the project on its own, which is what a project with no lines is.
+ * @param {{id: string, lines: string[], items: string[]}|string} token what
+ *   wsDeleteProject() returned. A bare id restores the project on its own, which is what a
+ *   project with no lines and no materials is.
  */
 function wsRestoreProject(token) {
   const id = typeof token === "string" ? token : (token && token.id);
   const lines = (token && token.lines) || [];
+  const items = (token && token.items) || [];
   if (!id) return null;
   const data = wsLoad();
   const project = data.projects.find((p) => p.id === id);
@@ -220,9 +235,13 @@ function wsRestoreProject(token) {
   const now = Date.now();
   project.deletedAt = null;
   project.updatedAt = now;
-  const wanted = new Set(lines);
-  data.estimations.filter((e) => wanted.has(e.id) && e.projectId === id)
-    .forEach((e) => { e.deletedAt = null; e.updatedAt = now; });
+  const revive = (rows, ids) => {
+    const wanted = new Set(ids);
+    rows.filter((r) => wanted.has(r.id) && r.projectId === id)
+      .forEach((r) => { r.deletedAt = null; r.updatedAt = now; });
+  };
+  revive(data.estimations, lines);
+  revive(data.shoppingItems, items);
   wsSave(data);
   return project;
 }
@@ -422,6 +441,31 @@ function wsAddEstimation(r) {
   };
   data.estimations.push(row);
   wsSave(data);
+
+  // Chapter XVI's arrow: the result is in the project, so the material is on its list.
+  // The app does exactly this and in this order — `CalculatorViewModel.save()` inserts the
+  // estimation, takes the id it got back and inserts the shopping item with it — so a
+  // project built on the phone and a project built here come out the same shape. The
+  // quantity and the unit are the ones the result panel printed, because two different
+  // answers to "how much do I buy" on two screens of one project is a defect, not a
+  // feature; the app's `shoppingQuantity` is its `requiredUnits` for the same reason.
+  //
+  // A line typed by hand is not a material and gets none: `wsAddManualEstimation()` exists
+  // for labour, delivery and a bag bought by eye, and "Robocizna · 8 h" on a shopping list
+  // is worse than a short list. Chapter XVI's "dodać własny materiał" is a material added
+  // as a material, which is session 18.
+  if (!r.manual) {
+    wsAddItem({
+      projectId,
+      estimationId: row.id,
+      name: row.name,
+      materialCategory: row.materialCategory,
+      quantity: row.requiredUnits,
+      unit: row.unitLabel,
+      costMajor: r.costMajor,
+      currencyCode,
+    });
+  }
   return row;
 }
 
@@ -430,6 +474,8 @@ function wsAddEstimation(r) {
  * something bought by eye. Same document as any other estimate line, so it syncs and
  * prints with the rest; `calculationType` has to be one of the four the app knows, and
  * SURFACE_COVERAGE is the closest thing to "no engine".
+ *
+ * `manual` keeps it off the material list — see wsAddEstimation().
  */
 function wsAddManualEstimation({ name, requiredUnits, unitLabel, costMajor }) {
   return wsAddEstimation({
@@ -439,6 +485,7 @@ function wsAddManualEstimation({ name, requiredUnits, unitLabel, costMajor }) {
     unitLabel,
     costMajor,
     wastePercent: 0,
+    manual: true,
     input: { manual: true },
   });
 }
@@ -467,6 +514,131 @@ function wsDeleteEstimation(id) {
   row.deletedAt = Date.now();
   row.updatedAt = row.deletedAt;
   wsSave(data);
+}
+
+/* --------------------------------------------------------------- material list
+ *
+ * Chapter XVI: KALKULATOR → WYNIK → DODAJ DO PROJEKTU → MATERIAŁ TRAFIA DO LISTY.
+ *
+ * The list is `shoppingItems`, a subcollection of the project, and it has been in the sync
+ * contract since the first version (FIRESTORE_SYNC §2) — `ShoppingItemEntity` in Room, a
+ * document under `users/{uid}/projects/{id}/shoppingItems/{itemId}` in Firestore, a
+ * validated shape in the deployed security rules, and a rendered block on `/p/<token>`.
+ * Nothing on this site ever wrote one, so a project made in the browser reached the phone
+ * and the shared link with its material list empty, while the same project made on the
+ * phone did not: `CalculatorViewModel.save()` writes the estimation **and** the shopping
+ * item, in that order, linked by the estimation's id. This is the missing half.
+ *
+ * Two fields are worth naming, because they are the two that differ from an estimate line:
+ *
+ *   `quantity` is a number, not an integer. The estimate line rounds — `requiredUnits` is
+ *   an Int in Room and `d.requiredUnits is int` in the rules — so a line can only ever say
+ *   "19". A material may say 26,4 m², which is chapter XVI's own example.
+ *
+ *   `materialCategory` is a free string here and an enum name on the estimate line
+ *   (`doc.string("materialCategory").orEmpty()` against
+ *   `ProjectMaterialCategory.valueOf(...)`). It is the shop aisle the material is bought
+ *   in, and it is what makes the list a shopping list rather than a second estimate.
+ */
+
+/** A material list, oldest first — the order the app reads it in (`ORDER BY id`). */
+function wsItems(projectId) {
+  const rows = wsAlive(wsLoad().shoppingItems);
+  return (projectId ? rows.filter((s) => s.projectId === projectId) : rows)
+    .sort((a, b) => a.createdAt - b.createdAt);
+}
+
+/** One material by id, or null. */
+const wsItem = (id) => wsItems().find((s) => s.id === id) || null;
+
+/**
+ * Put one material on a project's list.
+ *
+ * @param {object} r { projectId, estimationId, name, materialCategory, quantity, unit,
+ *                     costMajor, currencyCode }
+ *
+ * `estimationId` is what the saved calculation behind the material is called — the
+ * contract's own link between the two, and the reason the list can say where a quantity
+ * came from instead of being a second, unexplained set of numbers. It is null for a
+ * material that was never calculated.
+ *
+ * A shopping item has no `createdAt` of its own in Room, so `SyncContract.shoppingItemToDoc()`
+ * puts `updatedAt` in both fields. Here they start out equal for the same reason, and the
+ * ordering above leans on `createdAt` staying put afterwards.
+ */
+function wsAddItem(r) {
+  const project = r.projectId ? wsProject(r.projectId) : null;
+  if (!project || project.archived) return null;
+
+  const data = wsLoad();
+  const now = Date.now();
+  const row = {
+    id: wsId(),
+    projectId: project.id,
+    // ≤ 64 characters in the rules, which every id made by crypto.randomUUID() is.
+    estimationId: r.estimationId ? String(r.estimationId).slice(0, 64) : null,
+    name: String(r.name || "").slice(0, 120),
+    materialCategory: String(r.materialCategory || "OTHER").slice(0, 40),
+    // `nonNegative(d.quantity)` in the rules, and a quantity below zero is not a purchase.
+    quantity: Math.max(0, Number(r.quantity) || 0),
+    unit: String(r.unit || "").slice(0, 24),
+    estimatedCostMinor: Math.max(0, wsMinor(r.costMajor)),
+    currencyCode: r.currencyCode || wsCurrency(),
+    isPurchased: false,
+    ...wsSyncFields(now),
+  };
+  data.shoppingItems.push(row);
+  wsSave(data);
+  return row;
+}
+
+/**
+ * Tick a material off the list, or put it back.
+ *
+ * The one write on a material that is not editing it: `isPurchased` is what the list is
+ * for once the shopping has started, and the app's project screen has had the checkbox
+ * since before the sync contract existed. Renaming, re-measuring and re-unit-ing a
+ * material is session 18.
+ */
+function wsSetItemPurchased(id, on) {
+  const data = wsLoad();
+  const row = data.shoppingItems.find((s) => s.id === id && !s.deletedAt);
+  if (!row) return null;
+  row.isPurchased = on !== false;
+  row.updatedAt = Date.now();
+  wsSave(data);
+  return row;
+}
+
+/** Tombstone one material. Same rule as everywhere else: the row stays, `deletedAt` moves. */
+function wsDeleteItem(id) {
+  const data = wsLoad();
+  const row = data.shoppingItems.find((s) => s.id === id && !s.deletedAt);
+  if (!row) return null;
+  row.deletedAt = Date.now();
+  row.updatedAt = row.deletedAt;
+  wsSave(data);
+  return row;
+}
+
+/**
+ * What a project's material list adds up to.
+ *
+ * Same shape and the same `mixed` rule as wsProjectTotal(): amounts saved in different
+ * currencies are not summable and chapter VI forbids converting them, so the interface is
+ * told rather than handed a number that means nothing. `bought` is the part of the list
+ * that has already been ticked off.
+ */
+function wsItemsTotal(projectId) {
+  const rows = wsItems(projectId);
+  const codes = new Set(rows.map((r) => r.currencyCode || wsCurrency()));
+  return {
+    minor: rows.reduce((sum, r) => sum + (r.estimatedCostMinor || 0), 0),
+    currencyCode: (rows[0] && rows[0].currencyCode) || wsCurrency(),
+    mixed: codes.size > 1,
+    count: rows.length,
+    bought: rows.filter((r) => r.isPurchased).length,
+  };
 }
 
 /**
@@ -503,7 +675,7 @@ const wsExport = () => ({ ...wsLoad(), exportedAt: Date.now(), schemaVersion: WS
  */
 function wsImport(incoming) {
   const data = wsLoad();
-  ["projects", "rooms", "estimations"].forEach((key) => {
+  ["projects", "rooms", "estimations", "shoppingItems"].forEach((key) => {
     const rows = Array.isArray(incoming[key]) ? incoming[key] : [];
     rows.forEach((row) => {
       if (!row || !row.id) return;

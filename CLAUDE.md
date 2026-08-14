@@ -86,6 +86,7 @@ node scripts/test-account.mjs     # the account: levels, the session, the copy
 node scripts/test-dashboard.mjs   # the dashboard: the route, the tool list, the copy
 node scripts/test-projects.mjs    # projects: the route, the CRUD, the undo, the copy
 node scripts/test-save.mjs        # saving a calculation: the snapshot, the project, the copy
+node scripts/test-materials.mjs   # the material list: the document, the arrow, the copy
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -177,6 +178,17 @@ scripts/test-save.mjs  Saving a calculation: the snapshot a saved line carries i
                       field, and the copy in four languages. Dependency-free — run it
                       after touching assets/workspace.js, the save box in
                       assets/workspace-ui.js, calcCard() or a proj_src_*/ws_saved_in key
+scripts/test-materials.mjs  The material list of a project: the `shoppingItems` document
+                      against the contract it comes from (ShoppingItemEntity, shoppingItemToDoc()
+                      and the deployed validShoppingItem() rule), the arrow that puts a
+                      material on the list when a calculation is saved, the cascade when the
+                      project goes and the undo that brings it back, and the copy in four
+                      languages. Dependency-free — run it after touching the material half of
+                      assets/workspace.js, wsRenderMaterials() or a proj_mat_* key
+scripts/test-materials-page.mjs  The same arrow clicked in Chromium, nothing stubbed: a real
+                      calculator page, "Dodaj do projektu", and the material on the project
+                      screen one navigation later; ticking it off, taking it off, four
+                      languages, the currency switch and the widths of chapter XXVIII
 scripts/test-save-page.mjs  The same arrow clicked through in Chromium, nothing stubbed:
                       result → project picker → saved line → the project screen reading it
                       back, including a line saved in Polish and read in German after
@@ -193,10 +205,14 @@ assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
 assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
 assets/calc-hub.js    The search + category filter on /kalkulatory/. The hub is fully
                       server-rendered; this only narrows what is already there
-assets/workspace.js   Projects, rooms and estimate lines in localStorage (Firestore schema)
+assets/workspace.js   Projects, rooms, estimate lines and the material list in localStorage
+                      — the four collections of the sync contract, in the Firestore
+                      document shape. The material list (`shoppingItems`) arrived in
+                      session 17; it is written by the same call that saves a calculation
 assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/. The
                       projects page holds two screens — the index and one project at
-                      ?id=<projectId> — and this file shows one of them
+                      ?id=<projectId> — and this file shows one of them, including the
+                      material list of chapter XVI
 assets/recent.js      Which calculators this browser used, and when. Device-local, never
                       synced, no inputs and no results — only a calculator id and a time.
                       It is what the dashboard's "ostatnio używane narzędzia" reads
@@ -355,10 +371,26 @@ Kotlin side of it. Change one, change all three.
   `data-ok`, written onto every form control by `calcCard()`. Read it with
   `wsLineSnapshot()`, which answers `null` for anything that is not this site's snapshot.
   `docs/ARCHITEKTURA.md` §7.1.
-- **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms and
-  estimate lines in `localStorage` in the *same document shape* as Firestore, so the sync
-  tab in `/app/` is a plain copy in either direction. Counting must never require an
-  account (FIRESTORE_SYNC §1.2) — do not move these behind the sign-in wall.
+- **The material list is `shoppingItems`, and the app was already writing it.** Chapter
+  XVI's arrow ends at "materiał trafia do listy", and the list has been in the contract
+  since its first version: `users/{uid}/projects/{id}/shoppingItems/{itemId}`, its own
+  entity in Room, its own `SyncContract.shoppingItemToDoc()`, its own `validShoppingItem()`
+  in the deployed rules, and a rendered block on `/p/<token>`. `CalculatorViewModel.save()`
+  on Android inserts the estimation, takes the id back and inserts the shopping item with
+  it — the web inserted only the estimation, so a project built in a browser reached the
+  phone and the shared link with an **empty** material list. Session 17 writes the other
+  half, in the same order and with the same fields. Two fields differ from an estimate
+  line and both matter: `quantity` is a **number**, not an integer (a line can only say
+  26, a material can say 26,4 m² — chapter XVI's own example), and `materialCategory` is a
+  free string here rather than an enum name, because it is the shop aisle. **Do not add a
+  field to the document** — a note, a supplier, a link: `shoppingItemToDoc()` builds it
+  from a fixed map and the phone erases anything else, silently, exactly as it would a
+  project description. Chapter XVI's note is therefore a contract change and waits for
+  session 18. `docs/ARCHITEKTURA.md` §7.2.
+- **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms,
+  estimate lines and materials in `localStorage` in the *same document shape* as Firestore,
+  so the sync tab in `/app/` is a plain copy in either direction. Counting must never
+  require an account (FIRESTORE_SYNC §1.2) — do not move these behind the sign-in wall.
 - Chromium in the agent container cannot reach `gstatic.com` (the egress proxy resets
   the connection), so `/app/` cannot be exercised end-to-end from a session here. Test
   the page in a real browser; `curl` against the Firebase REST API works and is what the

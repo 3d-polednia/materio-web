@@ -1310,6 +1310,17 @@ a.chip:hover { text-decoration: none; }
 .ws-src dd { margin: 0; display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4); }
 .ws-src-pair { display: inline-flex; flex-wrap: wrap; gap: var(--sp-1); }
 
+/* The material list — chapter XVI. Same row as an estimate line, with a tick in front of
+   it: the list is read in a shop, so the box has to be the first thing under the thumb.
+   The label next to the box is there for the screen reader and for a pointer that misses;
+   on a narrow screen it is the box alone, because the row already says what it is. */
+.ws-mat-tick { display: inline-flex; align-items: center; gap: var(--sp-2); flex: none; cursor: pointer; }
+.ws-mat-tick input { width: 1.15rem; height: 1.15rem; accent-color: var(--accent); cursor: pointer; }
+.ws-mat-tick-label { font-size: var(--fs-xs); color: var(--muted); }
+@media (max-width: 560px) { .ws-mat-tick-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } }
+.data-list li.ws-mat.done .dash-fig { opacity: .6; }
+.ws-mat-tally { font-size: var(--fs-sm); }
+
 /* The archive is folded away: it is the part of the list that is finished. */
 .ws-archive { margin-top: var(--sp-6); }
 .ws-archive summary { cursor: pointer; font-weight: var(--fw-semi); }

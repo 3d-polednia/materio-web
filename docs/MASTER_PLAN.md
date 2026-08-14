@@ -42,8 +42,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 14 | Dashboard LiczMat | **Zrobione** — 2026-08-13 |
 | 15 | Projekty (CRUD) | **Zrobione** — 2026-08-13 |
 | 16 | Zapis kalkulacji | **Zrobione** — 2026-08-13 |
-| 17 | Listy materiałów | **Następna** |
-| 18–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 17 | Listy materiałów | **Zrobione** — 2026-08-13 |
+| 18 | Edycja materiałów | **Następna** |
+| 19–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -146,6 +147,103 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 17
+
+Rozdział XVI dorysowuje strzałce z Sesji 16 czwarty człon: **KALKULATOR → WYNIK → DODAJ DO
+PROJEKTU → MATERIAŁ TRAFIA DO LISTY**, z przykładem „Płytki | 26,4 m², Klej | 7 worków,
+Fuga | 4 kg”.
+
+**Lista materiałów była w kontrakcie od pierwszej wersji i nikt jej po stronie web nie
+zapisywał.** To nie jest nowy pomysł tej sesji, tylko brakująca połowa czegoś, co po
+drugiej stronie działa od dawna — sprawdzone w repo `3d-polednia/Materio`, nie z pamięci:
+
+- `users/{uid}/projects/{id}/shoppingItems/{itemId}` stoi w `docs/FIRESTORE_SYNC.md` §2,
+- ma własną encję Room (`ShoppingItemEntity`) i własne `SyncContract.shoppingItemToDoc()`,
+- ma **wdrożoną** regułę walidującą `validShoppingItem()` w `config/firebase/firestore.rules`,
+- `assets/share.js` **renderuje ją** na `/p/<token>` od 2026-08-08,
+- a `CalculatorViewModel.save()` w aplikacji Android **zapisuje pozycję listy przy każdym
+  zapisie kalkulacji**: wstawia wycenę, bierze zwrócone id i wstawia obok pozycję zakupową.
+
+Serwis wstawiał samą wycenę. Skutek: projekt zrobiony w przeglądarce docierał na telefon
+i do udostępnionego linku z **pustą** listą materiałów, a ten sam projekt zrobiony na
+telefonie — z pełną. Blok „lista zakupów” na `/p/<token>` nie mógł się nigdy pokazać.
+Ta sesja dokłada drugą połowę, w tej samej kolejności i z tymi samymi polami.
+
+**Dwa pola różnią się od wiersza kosztorysu i to one robią z tego listę zakupów.**
+`quantity` jest **liczbą, nie liczbą całkowitą** — `requiredUnits` to `Int` w Room
+i `d.requiredUnits is int` w regułach, więc wiersz kosztorysu umie powiedzieć wyłącznie
+„26”, a materiał umie powiedzieć **26,4 m²**, czyli dokładnie pierwszy przykład rozdziału
+XVI. `materialCategory` jest tu **wolnym tekstem**, a na wycenie nazwą enuma: to alejka
+w markecie, jedzie jako nazwa (`TILES`), nigdy jako słowo, więc wiersz **zapisany po polsku
+czyta się po niemiecku** — klucze `cat_*` są te same, których używa wybór materiału. Nazwa
+materiału jest jedyną rzeczą w wierszu, która się nie tłumaczy: `name` to w kontrakcie
+tekst i nie ma go gdzie indziej trzymać, dokładnie tak samo jak w wierszu kosztorysu i tak
+samo jak zapisuje ją telefon.
+
+**Lista jest na ekranie projektu, pod kalkulacjami.** Kalkulacje odpowiadają „ile to
+kosztowało i skąd ta liczba”; materiały odpowiadają „co włożyć do koszyka” — inne pytanie,
+inny kształt: nazwa, ilość, alejka, kwota i **pole do odhaczenia**, bo `isPurchased` jest
+w kontrakcie od początku i nic po stronie web nigdy go nie ustawiało. Pod nagłówkiem stoi
+licznik „kupione 2 z 7”. Pusta lista mówi, jak się na nią coś dostaje, zamiast pokazywać
+nic (rozdział XXV).
+
+**Czego rozdział XVI wymienia, a czego ta sesja świadomie nie dopisała: notatki, własne
+materiały, edycja ilości, nazwy i jednostki.** `ShoppingItemEntity` nie ma kolumny na
+notatkę, a `shoppingItemToDoc()` buduje dokument z ustalonej mapy — czyli ten sam mur, o
+który rozbił się opis projektu w Sesji 15. To wszystko jest **Sesją 18** („edycja, własne
+materiały, jednostki, ilości, notatki”), a notatka dodatkowo wymaga zmiany kontraktu po
+stronie aplikacji. Ceny i podsumowanie kosztów to **Sesja 19** (rozdział XVII), więc pod
+listą nie ma sumy — byłaby to praca następnej sesji.
+
+**Dwie decyzje podjęte przez zgodność z aplikacją, nie z gustu.**
+
+- **Pozycja wpisana ręcznie na `/kosztorys/` nie tworzy materiału.**
+  `wsAddManualEstimation()` istnieje dla robocizny, dostawy i worka kupionego na oko;
+  „Robocizna · 8 h” na liście zakupów jest gorsza niż krótsza lista.
+- **Usunięcie jednej kalkulacji nie usuwa jej materiału.** `ProjectRepository` w repo
+  aplikacji kaskaduje wyłącznie przy usunięciu **projektu** — `recordTombstones()`
+  nagrobkuje wtedy i wyceny, i pozycje zakupowe — a usunięcie samej wyceny nie rusza listy
+  zakupów. Robienie tu inaczej znaczyłoby, że to samo kliknięcie daje inny wynik
+  w przeglądarce i na telefonie. Usunięcie projektu kaskaduje po obu stronach, a „Cofnij”
+  z Sesji 15 przywraca **dokładnie te** materiały, które zabrało, i nie wskrzesza tego,
+  który odwiedzający skasował wcześniej ręcznie.
+
+**Synchronizacja: `/app/` wysyła teraz materiały, a odbierała je od zawsze.**
+`downloadAccount()` czytał `shoppingItems` od czasu napisania zakładki synchronizacji, ale
+`wsImport()` wyrzucał tę kolekcję, bo lokalnie nic jej nie produkowało — więc pobranie
+konta z telefonu gubiło całą listę zakupów po cichu. Teraz push wysyła obie podkolekcje
+projektu, a import bierze cztery kolekcje zamiast trzech. Wiersz „w tej przeglądarce” liczy
+też materiały.
+
+**Znaleziony i naprawiony błąd zastany: przełącznik języka w stopce nie działał.**
+Każda strona ma przełącznik **dwa razy** — w nagłówku i w kolumnie „Język” w stopce — a
+`assets/i18n-runtime.js` zapisywał wybór tylko z nagłówka (`menu.querySelectorAll`).
+Kliknięcie „English” w stopce polskiej strony przechodziło na `/en/…`, po czym
+przekierowanie na zapamiętany język zawracało odwiedzającego na polską — bo wybór, którego
+właśnie dokonał, nie został nigdzie zapisany. Dotyczyło **wszystkich 128 stron publicznych**
+i było widoczne raz na sesję (przekierowanie jest strzeżone znacznikiem w `sessionStorage`).
+Teraz zapisują wybór wszystkie linki `a[data-lang]`, w nagłówku i w stopce. Znalazł to test
+tej sesji, przy próbie przeczytania polskiego materiału po angielsku.
+
+- Sprawdzone: **132 testy logiki + 114 testów w Chromium — 246/246 przechodzi**, a
+  wcześniejsze 1117 + 111 + 180 + 415 + 596 + 331 + 121 + 90 + 177 + 70 nadal przechodzą
+  (razem **3454**). Dwa nowe pliki: `scripts/test-materials.mjs` (bez zależności)
+  i `scripts/test-materials-page.mjs`. Ten drugi **niczego nie podstawia** — ani kalkulator,
+  ani `/projekty/` nie dotykają sieci — więc otwiera prawdziwą stronę kalkulatora, klika
+  „Dodaj do projektu” i czyta materiał na ekranie projektu jedną nawigację dalej. W tym:
+  jedno kliknięcie w przeglądarce, która nie ma żadnego projektu, odhaczenie i odznaczenie
+  pozycji, usunięcie pozycji nietykające kalkulacji, usunięcie projektu z „Cofnij”
+  przywracającym całą listę, cztery języki, przełączenie języka **przyciskiem** na otwartym
+  projekcie, przełączenie waluty nieruszające ani ilości, ani kwot, szerokości z rozdziału
+  XXVIII (320 / 375 / 390 / 430 / 768 / 1280 px) z polem do odhaczenia na ekranie i nie
+  mniejszym niż 16 px, oraz wariant z wyłączonym JavaScriptem. Testy logiki są dodatkowo
+  sprawdzone negatywnie: trzy zepsucia po kolei (brak strzałki, brak kaskady, pozycja ręczna
+  trafiająca na listę) i za każdym razem test faktycznie protestuje.
+- Kontrast: bez nowej pary — wiersz materiału wydaje wyłącznie tokeny, które już
+  przechodziły. `scripts/check-contrast.mjs`: wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 16
 
@@ -1041,6 +1139,16 @@ decyzja właściciela**, czy zlecić to jako etap w tamtym repo.
 
 Do tego czasu strona projektu pokazuje to, co dokument naprawdę niesie: nazwę, stan
 (w archiwum czy nie) i dwa stemple czasu jako „historię”.
+
+**To samo dotyczy notatki przy materiale — z Sesji 17.** Rozdział XVI wymienia „dodać
+notatkę” obok edycji ilości, nazwy i jednostki. Cztery pierwsze rzeczy da się zrobić
+w istniejącym dokumencie i są Sesją 18; notatka — nie. `ShoppingItemEntity` nie ma na nią
+kolumny, `SyncContract.shoppingItemToDoc()` buduje dokument z ustalonej mapy
+(`estimationId`, `name`, `materialCategory`, `quantity`, `unit`, `estimatedCostMinor`,
+`currencyCode`, `isPurchased` + stemple), a reguła `validShoppingItem()` też nie ma
+`hasOnly` — czyli serwer przyjmie dodatkowe pole, a telefon skasuje je przy najbliższej
+synchronizacji, tak samo cicho jak opis projektu. **Ta sama decyzja, ta sama lista czterech
+plików w repo aplikacji.**
 
 ### ~~Odmiana liczebnika przy „pozycji”~~ — naprawione w Sesji 16
 

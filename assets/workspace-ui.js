@@ -524,6 +524,64 @@ function wsRenderProjectLines(id) {
 }
 
 /**
+ * The material list of one project — chapter XVI's "Materiał | Ilość".
+ *
+ * The calculations above answer "what did this cost and where did the number come from".
+ * This answers "what do I put in the trolley", which is a different question with a
+ * different shape: a name, a quantity, the aisle it is bought in, and a box to tick once it
+ * is in the van. The rows are `shoppingItems` — the project subcollection the sync contract
+ * has always had — so the same list is on the phone and inside a shared `/p/<token>` link.
+ *
+ * The aisle travels as the enum name (`TILES`), never as a word, so it reads in whatever
+ * language the page is in; `cat_*` are the same keys the material picker uses. The name
+ * cannot do that — `name` is a string in the contract and there is nowhere else to put it,
+ * so a material saved in Polish keeps its Polish name, exactly as the estimate line above
+ * it always has and exactly as the app writes it.
+ */
+function wsRenderMaterials(id) {
+  const list = document.getElementById("ws-project-materials");
+  if (!list) return;
+  const rows = wsItems(id);
+  const tally = document.getElementById("ws-mat-tally");
+
+  if (!rows.length) {
+    list.innerHTML = `<li class="empty muted">${wsEsc(wsT("proj_mat_empty"))}</li>`;
+    if (tally) tally.textContent = "";
+    return;
+  }
+
+  const bought = rows.filter((r) => r.isPurchased).length;
+  if (tally) {
+    tally.textContent = wsT("proj_mat_tally")
+      .replace("{bought}", wsNum(bought)).replace("{count}", wsNum(rows.length));
+  }
+
+  list.innerHTML = rows.map((r) => {
+    const cost = r.estimatedCostMinor > 0
+      ? `<em class="muted">${wsEsc(wsMoney(r.estimatedCostMinor, r.currencyCode))}</em>` : "";
+    const aisle = r.materialCategory
+      ? `<em class="muted">${wsEsc(wsT("cat_" + r.materialCategory))}</em>` : "";
+    return `<li class="ws-mat${r.isPurchased ? " done" : ""}" data-id="${wsEsc(r.id)}">
+        <label class="ws-mat-tick">
+          <input type="checkbox" data-buy${r.isPurchased ? " checked" : ""}>
+          <span class="ws-mat-tick-label">${wsEsc(wsT("proj_mat_buy"))}</span>
+        </label>
+        <span class="row-name">
+          <b>${wsEsc(r.name)}</b>
+          ${aisle}
+        </span>
+        <span class="dash-fig">
+          <b>${wsNum(r.quantity)} ${wsEsc(r.unit)}</b>
+          ${cost}
+        </span>
+        <span class="row-actions">
+          <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
+        </span>
+      </li>`;
+  }).join("");
+}
+
+/**
  * Draw the detail for the id in the address bar.
  *
  * An id nobody has is not an error page: the browser it was made in is the only one that
@@ -580,6 +638,7 @@ function wsRenderProject(id) {
   document.getElementById("ws-project-delete").hidden = wsAsking;
 
   wsRenderProjectLines(project.id);
+  wsRenderMaterials(project.id);
 }
 
 /* ---------------------------------------------------------------- the switch */
@@ -771,6 +830,17 @@ function wireProjectDetail() {
   // "Otwórz" does: makes this the one, then goes. It stays a real <a href>, so it also
   // works with the script off.
   on("ws-project-estimate", "click", () => { if (wsOpenId) wsSetActiveProject(wsOpenId); });
+
+  // The material list: tick one off, or take it off the list. Both write through the store,
+  // which fires `workspacechange` and redraws the screen — so the checkbox reflects what was
+  // actually saved rather than what was clicked, and a write refused by a full quota leaves
+  // the box where it was instead of lying about it.
+  on("ws-project-materials", "click", (e) => {
+    const li = e.target.closest("li[data-id]");
+    if (!li) return;
+    if (e.target.closest("[data-buy]")) wsSetItemPurchased(li.dataset.id, e.target.checked);
+    else if (e.target.closest("[data-del]")) wsDeleteItem(li.dataset.id);
+  });
 }
 
 /* ------------------------------------------------------------------ /kosztorys/ */

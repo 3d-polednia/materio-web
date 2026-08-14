@@ -658,7 +658,8 @@ function renderLocalSummary() {
   const local = wsExport();
   const alive = (rows) => rows.filter((r) => !r.deletedAt).length;
   box.textContent = `${T("app_sync_local")}: ${alive(local.projects)} × ${T("app_projects")}, ` +
-    `${alive(local.rooms)} × ${T("app_rooms")}, ${alive(local.estimations)} × ${T("ws_lines")}`;
+    `${alive(local.rooms)} × ${T("app_rooms")}, ${alive(local.estimations)} × ${T("ws_lines")}, ` +
+    `${alive(local.shoppingItems)} × ${T("proj_mat_t")}`;
 }
 
 function wireSyncPanel() {
@@ -699,6 +700,25 @@ function wireSyncPanel() {
           currencyCode: String(e.currencyCode).slice(0, 3),
           inputJson: String(e.inputJson || "{}").slice(0, 20000),
           ...syncFields(e.createdAt, e.deletedAt),
+        });
+      }
+      for (const s of local.shoppingItems) {
+        // The material list, the project's other subcollection (FIRESTORE_SYNC §2). The
+        // pull has always read it — downloadAccount() has returned shoppingItems since the
+        // sync tab was written — but nothing local ever produced one until session 17, so
+        // the push had nothing to send. Every field is clamped to what the deployed rules
+        // validate; `estimationId` is the remote id of the calculation, or null.
+        const ref = fb.doc(db, "users", state.uid, "projects", s.projectId, "shoppingItems", s.id);
+        await fb.setDoc(ref, {
+          estimationId: s.estimationId ? String(s.estimationId).slice(0, 64) : null,
+          name: String(s.name).slice(0, 120),
+          materialCategory: String(s.materialCategory || "OTHER").slice(0, 40),
+          quantity: Math.max(0, num(s.quantity)),
+          unit: String(s.unit || "").slice(0, 24),
+          estimatedCostMinor: Math.round(s.estimatedCostMinor) || 0,
+          currencyCode: String(s.currencyCode || "PLN").slice(0, 3),
+          isPurchased: !!s.isPurchased,
+          ...syncFields(s.createdAt, s.deletedAt),
         });
       }
       status(T("app_sync_pushed"));

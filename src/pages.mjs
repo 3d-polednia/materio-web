@@ -1046,6 +1046,19 @@ export function projectsMain(lang, t) {
             <p class="muted">${esc(t("proj_lines_d"))}</p>
             <ul id="ws-project-lines" class="data-list"></ul>
           </section>
+
+          <!-- Chapter XVI. The estimate above says what a calculation cost; this says what
+               to carry out of the shop. It is the project's shoppingItems subcollection,
+               which the sync contract has carried since its first version and which
+               nothing on this site wrote until session 17. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("proj_mat_t"))}</h2>
+              <span class="muted ws-mat-tally" id="ws-mat-tally"></span>
+            </div>
+            <p class="muted">${esc(t("proj_mat_d"))}</p>
+            <ul id="ws-project-materials" class="data-list"></ul>
+          </section>
         </div>
       </article>`;
 

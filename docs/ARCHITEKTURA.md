@@ -382,7 +382,8 @@ Wynik jest pełny bez konta. Rozdział II: rejestracja to następny krok, nie br
 
 ```
 kalkulator ──► WYNIK ──► „Dodaj do projektu” ──► /projekty/?id=<projectId>
-                   (z wyborem projektu)                           │
+                   (z wyborem projektu)              │           │
+                                     MATERIAŁ ───────┘           │
                                           /kosztorys/ ──┴──► /app/dashboard/ (HISTORIA)
 ```
 
@@ -425,6 +426,58 @@ Czyta to `wsLineSnapshot()` — obronnie, bo ten string przechodzi przez Firesto
 drugą aplikację: cokolwiek innego niż migawka tego serwisu daje `null`, a wtedy pozycja po
 prostu nie ma sekcji „Skąd ta liczba” (pozycje sprzed Sesji 16 i pozycje wpisane ręcznie na
 `/kosztorys/` nigdy jej nie mają — rozdział XXV zabrania pustego przycisku).
+
+### 7.2. Lista materiałów projektu (Sesja 17)
+
+Rozdział XVI dorysowuje strzałce z §7.1 czwarty człon: **KALKULATOR → WYNIK → DODAJ DO
+PROJEKTU → MATERIAŁ TRAFIA DO LISTY**, z przykładem „Płytki | 26,4 m², Klej | 7 worków,
+Fuga | 4 kg”.
+
+**Ta lista jest w kontrakcie od pierwszej wersji i nikt jej po stronie web nie zapisywał.**
+`users/{uid}/projects/{id}/shoppingItems/{itemId}` (`FIRESTORE_SYNC.md` §2) to
+`ShoppingItemEntity` w Room, osobna funkcja `SyncContract.shoppingItemToDoc()`, osobna
+walidacja `validShoppingItem()` we wdrożonych regułach — i renderowany blok na
+`/p/<token>`. Aplikacja Android **zapisuje pozycję listy przy każdym zapisie kalkulacji**:
+`CalculatorViewModel.save()` wstawia wycenę, bierze zwrócone id i wstawia obok pozycję
+zakupową. Serwis wstawiał tylko wycenę, więc projekt zrobiony w przeglądarce docierał na
+telefon i do udostępnionego linku z **pustą** listą materiałów, a ten sam projekt zrobiony
+na telefonie — z pełną. Sesja 17 dokłada brakującą połowę, w tej samej kolejności.
+
+Dokument, w całości (nic ponad kontrakt — pole dołożone na wierzchu zostałoby skasowane
+przez telefon bez słowa, tak jak opis projektu w §8.1c):
+
+```
+shoppingItem { estimationId, name, materialCategory, quantity, unit,
+               estimatedCostMinor, currencyCode, isPurchased, …sync }
+```
+
+Dwa pola różnią się od wiersza kosztorysu i to one robią z tego listę zakupów:
+
+- **`quantity` jest liczbą, nie liczbą całkowitą.** `requiredUnits` na wycenie to `Int`
+  w Room i `d.requiredUnits is int` w regułach, więc wiersz kosztorysu potrafi powiedzieć
+  wyłącznie „26”. Materiał potrafi powiedzieć **26,4 m²** — czyli dokładnie pierwszy
+  przykład rozdziału XVI.
+- **`materialCategory` jest tu wolnym tekstem**, a na wycenie nazwą enuma. To alejka
+  w markecie i to ona odróżnia listę zakupów od drugiego kosztorysu. Jedzie jako nazwa
+  (`TILES`), nigdy jako słowo, więc wiersz zapisany po polsku czyta się po niemiecku —
+  klucze `cat_*` są te same, których używa wybór materiału.
+
+Czego lista **nie** niesie: **notatki**. Rozdział XVI ją wymienia, `ShoppingItemEntity` nie
+ma na nią kolumny, a `shoppingItemToDoc()` buduje dokument z ustalonej mapy — czyli ten sam
+mur co opis projektu (§8.1c) i ta sama odpowiedź: to zmiana kontraktu po stronie aplikacji.
+Notatki, własne materiały i edycja ilości/jednostki to **Sesja 18**.
+
+Dwie decyzje warte zapisania, obie podjęte przez zgodność z aplikacją:
+
+- **Pozycja wpisana ręcznie na `/kosztorys/` nie tworzy materiału.**
+  `wsAddManualEstimation()` istnieje dla robocizny, dostawy i worka kupionego na oko;
+  „Robocizna · 8 h” na liście zakupów jest gorsza niż krótsza lista.
+- **Usunięcie jednej kalkulacji nie usuwa jej materiału.** `ProjectRepository`
+  w repo aplikacji kaskaduje wyłącznie przy usunięciu **projektu**
+  (`recordTombstones()` nagrobkuje wtedy i wyceny, i pozycje zakupowe); usunięcie samej
+  wyceny nie rusza listy zakupów. Robienie tu inaczej znaczyłoby, że to samo kliknięcie
+  daje inny wynik na telefonie i w przeglądarce. Usunięcie projektu kaskaduje po obu
+  stronach, a „Cofnij” z Sesji 15 przywraca dokładnie te materiały, które zabrało.
 
 **LICZMAT PRO** — cel: prowadzić pracę.
 

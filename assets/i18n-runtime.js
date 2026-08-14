@@ -133,9 +133,22 @@ function wirePicker() {
       }
     });
   }
+}
 
-  // Remember the language somebody picks, so a later bare "/" link lands in it.
-  menu.querySelectorAll("a[data-lang]").forEach((a) => {
+/**
+ * Remember the language somebody picks, so a later bare "/" link lands in it.
+ *
+ * `document`, not the header menu: every page has the same switcher **twice** — once in
+ * the header, once in the footer's "Język" column — and until session 17 only the header
+ * copy was wired. The footer link navigated to the other language and the redirect below
+ * sent the visitor straight back, because the choice they had just made was never written
+ * down. Clicking "English" in the footer of a Polish page therefore did nothing at all,
+ * once per session, on all 128 public pages.
+ */
+function rememberLangChoice() {
+  document.querySelectorAll("a[data-lang]").forEach((a) => {
+    if (a.dataset.langWired) return;
+    a.dataset.langWired = "1";
     a.addEventListener("click", () => {
       try { localStorage.setItem("materio-lang", a.dataset.lang); } catch (e) {}
     });
@@ -200,6 +213,7 @@ function buildLangPicker() {
 
   wirePicker();
   keepQueryOnLangLinks();
+  rememberLangChoice();
 
   // A visitor who already picked a language should not have to pick it again after
   // following a bare "/" link. Guarded by a session flag so a missing alternate or a
