@@ -301,7 +301,7 @@ const I18N_PAGES = {
     af_converter_t: "Przelicznik jednostek",
     af_converter_d: "Długość, powierzchnia, objętość i masa. Metry na cale, litry na kilogramy przy znanej gęstości.",
     af_sync_t: "Synchronizacja z przeglądarką",
-    af_sync_d: "Zaloguj się w aplikacji i na materio-app.com, a projekty i pomieszczenia będą w obu miejscach.",
+    af_sync_d: "Zaloguj się w aplikacji i na liczmat.com, a projekty i pomieszczenia będą w obu miejscach.",
 
     /* The account page: sign-in options, sync and the account settings. */
     app_forgot: "Nie pamiętam hasła",
@@ -792,7 +792,7 @@ const I18N_PAGES = {
     af_converter_t: "Unit converter",
     af_converter_d: "Length, area, volume and mass. Metres to inches, litres to kilograms at a known density.",
     af_sync_t: "Sync with the browser",
-    af_sync_d: "Sign in in the app and on materio-app.com, and the projects and rooms are in both places.",
+    af_sync_d: "Sign in in the app and on liczmat.com, and the projects and rooms are in both places.",
 
     /* The account page: sign-in options, sync and the account settings. */
     app_forgot: "Forgot your password",
@@ -1282,7 +1282,7 @@ const I18N_PAGES = {
     af_converter_t: "Einheitenrechner",
     af_converter_d: "Länge, Fläche, Volumen und Masse. Meter in Zoll, Liter in Kilogramm bei bekannter Dichte.",
     af_sync_t: "Sync mit dem Browser",
-    af_sync_d: "Melde dich in der App und auf materio-app.com an, dann liegen Projekte und Räume an beiden Orten.",
+    af_sync_d: "Melde dich in der App und auf liczmat.com an, dann liegen Projekte und Räume an beiden Orten.",
 
     /* The account page: sign-in options, sync and the account settings. */
     app_forgot: "Passwort vergessen",
@@ -1772,7 +1772,7 @@ const I18N_PAGES = {
     af_converter_t: "Конвертер одиниць",
     af_converter_d: "Довжина, площа, об’єм і маса. Метри в дюйми, літри в кілограми за відомої густини.",
     af_sync_t: "Синхронізація з браузером",
-    af_sync_d: "Увійди в застосунку й на materio-app.com — проєкти та приміщення будуть в обох місцях.",
+    af_sync_d: "Увійди в застосунку й на liczmat.com — проєкти та приміщення будуть в обох місцях.",
 
     /* The account page: sign-in options, sync and the account settings. */
     app_forgot: "Забув пароль",

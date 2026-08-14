@@ -15,7 +15,13 @@
      that came with it; add a redirect instead. The slugs below are the ones the site
      has always used; dropping six languages did not touch the four that stay. */
 
-export const BASE = "https://materio-app.com";
+/* The live domain. Changed from materio-app.com to liczmat.com on 2026-08-14, when the
+   owner pointed the GitHub Pages custom domain at the new one. GitHub Pages serves a
+   single custom domain, so the moment `CNAME` said `liczmat.com` the old host started
+   answering 404 — leaving canonical, hreflang, og:url and sitemap.xml pointing at a
+   dead address. Everything the build writes derives the absolute URL from this one
+   constant, so it is the only place the domain is decided. */
+export const BASE = "https://liczmat.com";
 
 /** The four languages LiczMat ships. Polish first — it is the default. */
 export const LANGS = ["pl", "uk", "de", "en"];

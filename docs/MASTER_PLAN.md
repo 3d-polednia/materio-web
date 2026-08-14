@@ -74,6 +74,43 @@ w repo `3d-polednia/Materio`. W skrócie, po stronie serwisu:
   **sprawdzona**: Chromium, cztery języki × 360/414/768/1280 px, 16/16 przechodzi.
 - **Domena się nie zmieniła.** `materio-app.com` zostaje wszędzie — migracja na
   `liczmat.com` to osobny, późniejszy etap (§17 zlecenia).
+  **Nieaktualne od 2026-08-14** — patrz „Migracja domeny" niżej.
+
+## Migracja domeny na `liczmat.com` (2026-08-14, §17 zlecenia)
+
+Właściciel kupił `liczmat.com`, wskazał na nią custom domain w GitHub Pages i **świadomie
+wyłączył** `materio-app.com` — 500 wyświetleń w dwa dni, przekierowanie niepotrzebne.
+Jeden serwis Pages obsługuje jedną domenę własną, więc stary host odpowiada teraz
+„Site not found". Zrobione w repo:
+
+- `BASE` w `src/site.mjs` → `https://liczmat.com`. To jedyne miejsce, w którym adres jest
+  decydowany; `canonical`, `hreflang`, `og:url` i `sitemap.xml` biorą się z niego.
+- 131 stron przebudowanych, `STAMP` podbity na `20260814f`, `?v=` w ręcznie pisanych
+  `404.html` i `privacy-policy.html` podbity tak samo.
+- `robots.txt` → `Sitemap: https://liczmat.com/sitemap.xml`.
+- `privacy-policy.html` — adres w treści i w `canonical`/`og` w obu językach.
+- `af_sync_d` w `assets/i18n-pages.js`, cztery języki.
+- 3100 sprawdzeń w ośmiu zestawach testów przechodzi.
+
+DNS w OVH (zrobione przez właściciela w tej sesji): cztery rekordy A GitHuba były już
+dobre, blokadą HTTPS był `@ AAAA 2001:41d0:301:1::29` wskazujący na OVH — GitHub wystawia
+certyfikat dopiero, gdy **wszystkie** A i AAAA wierzchołka należą do Pages. Rekord
+skasowany, cztery AAAA GitHuba (`2606:50c0:800{0..3}::153`) dopisane. Zweryfikowane.
+
+### Zostało do zrobienia poza repo
+
+- **Certyfikat.** W chwili commitu `https://liczmat.com` serwuje jeszcze `CN=*.github.io`.
+  GitHub → Settings → Pages → **Remove**, zapisać, wpisać `liczmat.com` ponownie, **Save**.
+  To wymusza ponowną próbę wystawienia.
+- **Firebase Auth → Authorized domains**: dopisać `liczmat.com` i `www.liczmat.com`, bez
+  tego `/app/` zwraca `auth/unauthorized-domain`.
+- **Google Cloud → Credentials → klucz przeglądarkowy → HTTP referrers**: dopisać
+  `https://liczmat.com/*` i `https://www.liczmat.com/*`, zachowując wpisy
+  `materio-502513.firebaseapp.com/*` i `materio-502513.web.app/*`.
+- **Google Search Console**: nowa własność dla `liczmat.com` i zgłoszenie sitemapy.
+- **Bliźniak polityki prywatności** — `docs/privacy-policy.html` w repo
+  `3d-polednia/Materio` nadal mówi `materio-app.com`. Tamto repo nie jest podpięte do tej
+  sesji; poprawić przy najbliższej pracy nad aplikacją.
 
 Po stronie aplikacji: nazwa, slogan, ikona, splash i znak to LiczMat we wszystkich
 dziesięciu językach, a listing w Google Play (11 języków, teksty + grafika + zrzuty)

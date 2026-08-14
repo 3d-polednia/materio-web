@@ -22,14 +22,20 @@ construction-material calculator. *Policz. Zaplanuj. Zrealizuj.*
 > `scripts/`, `CLAUDE.md` and `README.md` out of the Pages artifact, because the repo
 > root is the site root and everything in it is otherwise world-readable.
 >
-> The repo directory, the GitHub remote and the live domain are all still called
-> `materio-web` / `materio-app.com`. That is deliberate — see the open decisions in the
-> master plan before changing any of them.
+> **The live domain is `liczmat.com` since 2026-08-14.** The owner bought it, pointed the
+> GitHub Pages custom domain at it and switched `materio-app.com` off on purpose — it had
+> served 500 views in two days and no redirect was wanted, so the old host now answers
+> GitHub's "Site not found". One Pages site carries one custom domain; there is no way to
+> keep both. `BASE` in `src/site.mjs` is the single place the domain is decided and every
+> absolute URL the build writes comes from it.
+>
+> The repo directory and the GitHub remote are still called `materio-web`. That is
+> deliberate — renaming a remote is a separate decision in the master plan.
 
 Plain static HTML/CSS/JS in the browser: no framework, no runtime dependency, no
 package manager. There **is** a build step now — a dependency-free Node script that
 generates the pages — see "The build step" below. Deployed to GitHub Pages from the repo
-root by `.github/workflows/pages.yml` on every push to `main` → <https://materio-app.com/>.
+root by `.github/workflows/pages.yml` on every push to `main` → <https://liczmat.com/>.
 
 ---
 
@@ -330,6 +336,16 @@ Kotlin side of it. Change one, change all three.
   the only credential such an account has. The `app_google` copy stays in the dictionaries
   in all four languages for the same reason. The two bullets below describe that machinery
   and stay true — they are what comes back on.
+- **The domain moved to `liczmat.com` and the two Google console lists did not (2026-08-14).**
+  Both name only the old host, both are console settings no commit can change, and until
+  the owner edits them `/app/` signs nobody in from the new domain — every call comes back
+  `auth/unauthorized-domain`. Firebase console → Authentication → Settings → Authorized
+  domains: add `liczmat.com` and `www.liczmat.com`. Google Cloud console → Credentials →
+  the browser key → HTTP referrers: add `https://liczmat.com/*` and
+  `https://www.liczmat.com/*`. **Keep every existing entry**, including the two
+  `materio-502513.*` ones the bullets below explain. The same note sits in
+  `assets/firebase-config.js`, next to the config it applies to. The three bullets that
+  follow are history and stay accurate as history — they describe the old host.
 - **Google sign-in is switched on** (2026-08-07). The Google provider is enabled in
   Firebase Authentication → Sign-in method, so `/app/`'s `signInWithPopup` with
   `GoogleAuthProvider` has everything it needs — `materio-app.com`, `www.materio-app.com`

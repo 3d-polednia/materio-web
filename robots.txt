@@ -8,4 +8,4 @@ Allow: /
 Disallow: /app/
 Disallow: /p/
 
-Sitemap: https://materio-app.com/sitemap.xml
+Sitemap: https://liczmat.com/sitemap.xml
