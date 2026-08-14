@@ -284,6 +284,18 @@ Kotlin side of it. Change one, change all three.
   sign-up with the Web key works, the rules accept the document shape `assets/app.js`
   sends, and they return 403 for a write to another account or an `updatedAt` that is
   not an integer.
+- **The Google sign-in button is hidden — site and app both (2026-08-14, owner's decision).**
+  One switch each: `GOOGLE_SIGN_IN` in `src/app-pages.mjs` here, `GOOGLE_SIGN_IN_ENABLED` in
+  `AccountViewModel.kt` in the app repo. Both are `false`, both were flipped in the same
+  session so the two products never offer different ways in, and flipping either back needs
+  no other edit. The button is **absent from the markup**, not merely invisible — an element
+  that is only hidden is still clickable from a script. Nothing else changed: the provider is
+  still enabled in Firebase, an account created with Google still exists and still owns its
+  projects, `signInWithPopup`/`signInWithGoogle` still compile and run, and `/app/` still
+  re-authenticates a Google account with a Google popup before deleting it, because that is
+  the only credential such an account has. The `app_google` copy stays in the dictionaries
+  in all four languages for the same reason. The two bullets below describe that machinery
+  and stay true — they are what comes back on.
 - **Google sign-in is switched on** (2026-08-07). The Google provider is enabled in
   Firebase Authentication → Sign-in method, so `/app/`'s `signInWithPopup` with
   `GoogleAuthProvider` has everything it needs — `materio-app.com`, `www.materio-app.com`

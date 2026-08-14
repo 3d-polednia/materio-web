@@ -363,19 +363,19 @@ head("1. signed out: three views, one card");
   check("the sign-in view is the one on show", await visible(page, '[data-auth-view="signin"]'));
   check("the sign-up view is not", !(await visible(page, '[data-auth-view="signup"]')));
   check("nor the reset view", !(await visible(page, '[data-auth-view="reset"]')));
-  check("Google sign-in is offered", await visible(page, "#auth-google"));
+  check("Google sign-in is not offered", !(await visible(page, "#auth-google")));
   check("the workspace is hidden", !(await visible(page, "#app-workspace")));
 
   await page.click('[data-auth-go="signup"]');
   check("the sign-up link opens the sign-up view", await visible(page, '[data-auth-view="signup"]'));
   check("and closes the sign-in one", !(await visible(page, '[data-auth-view="signin"]')));
-  check("Google is still an option there", await visible(page, "#auth-google"));
+  check("nor on the sign-up view", !(await visible(page, "#auth-google")));
 
   await page.click('[data-auth-view="signup"] [data-auth-go="signin"]');
   await page.click('[data-auth-view="signin"] [data-auth-go="reset"]');
   check("the forgotten-password link opens the reset view", await visible(page, '[data-auth-view="reset"]'));
   check("which has an e-mail field of its own", await visible(page, "#reset-email"));
-  check("and no Google button, which would not reset anything",
+  check("and no Google button here either",
     !(await visible(page, "#auth-google")));
 
   await page.click('[data-auth-view="reset"] [data-auth-go="signin"]');

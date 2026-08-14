@@ -18,7 +18,10 @@
  * - The browser workspace (assets/workspace.js, localStorage) is the same schema, so
  *   "push" and "pull" on the sync tab are plain document copies, not a translation.
  *
- * Account management lives here too: Google sign-in, password reset, e-mail change,
+ * Account management lives here too: password reset, e-mail change, Google sign-in (the
+ * button is hidden since 2026-08-14 — see GOOGLE_SIGN_IN in src/app-pages.mjs — but the
+ * code stays, because an account created with Google still has to re-authenticate that way
+ * before it can be deleted),
  * password change, a data export and account deletion. Deleting an account has to
  * remove the documents before the user, because the rules key on request.auth.uid —
  * once the user is gone nothing can reach them.
@@ -162,12 +165,16 @@ async function boot() {
  *
  * `focus` only when the visitor asked for the view by clicking. Moving focus on load
  * would scroll a signed-in visitor to a form they are not going to use.
+ *
+ * The Google box is only in the page when `GOOGLE_SIGN_IN` in `src/app-pages.mjs` is on —
+ * it is off since 2026-08-14 — so everything that touches it checks it is there first.
  */
 function showAuthView(view, focus) {
   document.querySelectorAll("[data-auth-view]").forEach((box) => {
     box.hidden = box.dataset.authView !== view;
   });
-  $("auth-google-box").hidden = view === "reset";
+  const googleBox = $("auth-google-box");
+  if (googleBox) googleBox.hidden = view === "reset";
   status("");
   const first = document.querySelector(`[data-auth-view="${view}"] input`);
   if (focus && first) first.focus();
@@ -249,15 +256,18 @@ function wireAuthForms() {
     });
   });
 
-  $("auth-google").addEventListener("click", async () => {
-    status("");
-    try {
-      await applyPersistence(lmReadRemember());
-      await fb.signInWithPopup(auth, new fb.GoogleAuthProvider());
-    } catch (err) {
-      status(authMessage(err && err.code), true);
-    }
-  });
+  const googleBtn = $("auth-google");
+  if (googleBtn) {
+    googleBtn.addEventListener("click", async () => {
+      status("");
+      try {
+        await applyPersistence(lmReadRemember());
+        await fb.signInWithPopup(auth, new fb.GoogleAuthProvider());
+      } catch (err) {
+        status(authMessage(err && err.code), true);
+      }
+    });
+  }
 
   const signOut = async () => {
     stopListening();
