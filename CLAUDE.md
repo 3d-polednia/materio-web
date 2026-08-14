@@ -88,6 +88,7 @@ node scripts/test-projects.mjs    # projects: the route, the CRUD, the undo, the
 node scripts/test-save.mjs        # saving a calculation: the snapshot, the project, the copy
 node scripts/test-materials.mjs   # the material list: the document, the arrow, editing, the copy
 node scripts/test-costs.mjs       # costs: the unit price, the currency rule, the three figures
+node scripts/test-rooms.mjs       # rooms: the document, the project link, the assignment
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -193,6 +194,22 @@ scripts/test-materials-page.mjs  The same arrow clicked in Chromium, nothing stu
                       screen one navigation later; ticking it off, editing it in place,
                       typing one in by hand, taking it off, four languages, the currency
                       switch and the widths of chapter XXVIII
+scripts/test-rooms.mjs  Rooms (session 20, chapter XVIII): the room document against the
+                      contract it comes from (RoomEntity, roomToDoc(), the deployed
+                      validRoom()) plus the one field this repo keeps beside it —
+                      `projectId`, and the test guards that it is the *only* one; the four
+                      writes; what a project's delete does to its rooms, which is nothing;
+                      the assignment of a calculation to a room inside `inputJson`; and the
+                      floor/wall/ceiling arithmetic a calculator is filled from.
+                      Dependency-free — run it after touching the room half of
+                      assets/workspace.js, wsRenderProjectRooms() or a proj_room_*/ws_room*
+                      key
+scripts/test-rooms-page.mjs  The same in Chromium, nothing stubbed: a room added to a
+                      project and corrected in its own row, a calculator filled from it,
+                      the result filed under it from the save box, the same line moved to
+                      another room and taken out of all of them, the index naming each
+                      room's project, four languages, the currency switch, the widths of
+                      chapter XXVIII and the no-JavaScript variant
 scripts/test-costs.mjs  What a project costs (session 19, chapter XVII): the unit price,
                       which is `estimatedCostMinor / quantity` and never a stored field;
                       the write that goes the other way (ilość × cena, rounded once); the
@@ -231,7 +248,8 @@ assets/workspace.js   Projects, rooms, estimate lines and the material list in l
 assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/. The
                       projects page holds two screens — the index and one project at
                       ?id=<projectId> — and this file shows one of them, including the
-                      material list of chapter XVI
+                      material list of chapter XVI and, since session 20, the project's
+                      rooms and the picker that files one calculation under one of them
 assets/recent.js      Which calculators this browser used, and when. Device-local, never
                       synced, no inputs and no results — only a calculator id and a time.
                       It is what the dashboard's "ostatnio używane narzędzia" reads
@@ -453,6 +471,28 @@ Kotlin side of it. Change one, change all three.
   screen all read this one function, so "what does this project cost" has one answer.
   `/kosztorys/` still totals the estimate lines — it is the document of what was calculated,
   and the estimate with labour and margin is session 24.
+- **A room belongs to a project by a field the contract does not have, and the phone cannot
+  show.** Chapter XVIII says "pomieszczenia są elementem projektu"; FIRESTORE_SYNC §2 puts
+  them at `users/{uid}/rooms/{roomId}` — *beside* projects — and says why: "wybór pokoju
+  i wybór kalkulatora to dwie niezależne osie". Both hold, because the link is `projectId`
+  and `projectId` survives: `RoomEntity` has no column and `SyncContract.roomToDoc()` no
+  key, but `CloudSync.pushLocal()` writes every room with `SetOptions.merge()`, the deployed
+  `validRoom()` validates by shape with no `hasOnly`, and `roomFromDoc()` ignores keys it
+  does not know. Read for rooms specifically in `3d-polednia/Materio`, not copied from
+  session 18's note. `assets/workspace.js` has written the field since the workspace
+  existed and never read it; `/app/` did not even send it, so the link died at the browser's
+  edge until session 20. **Deleting a project does not delete its rooms** — the phone does
+  not either (`recordTombstones()` walks estimations and shopping items and stops), and the
+  room keeping its `projectId` is what makes the undo exact. `docs/ARCHITEKTURA.md` §7.5.
+- **Which room a calculation was made for goes inside `inputJson`, under `_room`.** Same
+  wall as the snapshot: `EstimationEntity` has a `projectId` and no `roomId`. A top-level
+  field would survive the merge, but `inputJson` is already contract, already free-form and
+  already round-trips, and session 16 put the snapshot there for that reason — a second
+  mechanism for one job is one more thing to keep in step. `_room` sits beside `manual` at
+  the top level rather than inside `_lm`, because a hand-typed line has no snapshot and may
+  still belong to a room. Read it with `wsLineRoomId()`, write it with `wsSetLineRoom()`,
+  which leaves the rest of the string alone and refuses rather than truncating at the
+  contract's 20 000-character cap. A room another project owns is dropped on the way in.
 - **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms,
   estimate lines and materials in `localStorage` in the *same document shape* as Firestore,
   so the sync tab in `/app/` is a plain copy in either direction. Counting must never

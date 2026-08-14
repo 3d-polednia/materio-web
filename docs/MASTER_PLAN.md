@@ -45,8 +45,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 17 | Listy materiałów | **Zrobione** — 2026-08-13 |
 | 18 | Edycja materiałów | **Zrobione** — 2026-08-14 |
 | 19 | Koszty projektu | **Zrobione** — 2026-08-14 |
-| 20 | Pomieszczenia | **Następna** |
-| 21–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 20 | Pomieszczenia | **Zrobione** — 2026-08-14 |
+| 21 | LiczMat Pro: fundament | **Następna** |
+| 22–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -149,6 +150,113 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 20
+
+Rozdział XVIII w całości: „Pomieszczenia są elementem projektu", przykład `Projekt: Remont
+łazienki / Pomieszczenie: Łazienka / Wymiary: 2,4 × 3,2 × 2,5 m`, do tego „Kalkulacje mogą
+być przypisane do konkretnego pomieszczenia" i „Nie promuj pomieszczeń jako osobnego
+wielkiego modułu na homepage".
+
+**Kontrakt mówi coś dokładnie przeciwnego niż rozdział XVIII, i to jest cała konstrukcja tej
+sesji.** `FIRESTORE_SYNC.md` §2 stawia pomieszczenia w `users/{uid}/rooms/{roomId}` — **obok**
+projektów, nie w nich — i pisze wprost dlaczego: „Wybór pokoju i wybór kalkulatora to dwie
+niezależne osie". To nie jest niedopatrzenie: pomieszczenie jest fizycznym miejscem, przeżywa
+projekt, dla którego je zmierzono, i jedno pomieszczenie może obsłużyć kilka projektów.
+
+Oba zdania są prawdziwe, bo powiązanie jest **polem**, a pole przeżywa synchronizację.
+Sprawdzone w repo `3d-polednia/Materio` **dla pomieszczeń osobno**, nie przepisane z Sesji 18:
+
+- `RoomEntity` nie ma kolumny `projectId`, a `SyncContract.roomToDoc()` nie zapisuje takiego
+  klucza — telefon nigdy go nie wyśle;
+- `CloudSync.pushLocal()` wysyła każde pomieszczenie przez
+  `.set(SyncContract.roomToDoc(...), SetOptions.merge())`, a merge zapisuje **wyłącznie
+  klucze, które dostał**;
+- wdrożone reguły walidują `validRoom()` po kształcie i **nie mają `hasOnly`** → serwer
+  przyjmuje zapis;
+- `roomFromDoc()` czyta po kluczach i ignoruje nieznane → kopia w telefonie jest bezpieczna.
+
+Czego to **nie** daje: telefon nie **pokaże** przypisania, bo nie ma go gdzie trzymać.
+Powiązanie jest przenoszone, nie gubione — dokładnie tak jak notatka materiału z Sesji 18 —
+i formularz mówi to odwiedzającemu wprost, zamiast obiecywać coś, czego nie ma.
+
+**Znalezisko: serwis wpisywał `projectId` do każdego pomieszczenia od początku istnienia
+magazynu i ani razu go nie przeczytał.** Pole było w `wsAddRoom()` od zawsze, żaden ekran go
+nie używał, a `/app/` **nie wysyłał go w ogóle** — więc powiązanie ginęło na granicy
+przeglądarki, a pobranie konta nadpisywało je pustką. Ta sesja je wysyła, czyta i pozwala
+zmienić. Przy okazji `tombstone()` w `assets/app.js` wysyła teraz z `{ merge: true }` z tego
+samego powodu, dla którego robi to push: zwykłe `setDoc` kasowało przy oznaczaniu wiersza za
+usunięty **każde pole, o którym przeglądarka nie wie** — notatkę materiału i teraz projekt
+pomieszczenia.
+
+**Ekran projektu dostał sekcję „Pomieszczenia", i stoi ona nad kalkulacjami.** Taka jest
+kolejność z rozdziału XIV (nazwa, opis, **pomieszczenia**, kalkulacje, materiały, koszty) i
+taka jest kolejność przykładu z rozdziału XVIII: projekt → pomieszczenie → wymiary. Wiersz
+mówi `2,4 × 3,2 × 2,5 m`, a obok — podłoga, ściany i kubatura, liczone `wsRoomAreas()`, czyli
+**tą samą funkcją**, którą pasek „weź wymiary z pomieszczenia" wypełnia kalkulator. Dwie
+odpowiedzi na „ile ma metrów ta podłoga" rozjechałyby się w tydzień. Edycja jest formularzem
+w wierszu — nie `prompt()`, z powodu, dla którego Sesja 15 go stąd wyrzuciła — a pod polami
+leci ta sama linijka wyniku, co przy dodawaniu.
+
+**Usunięcie projektu nadal nie kasuje jego pomieszczeń, i to jest decyzja, nie zaniechanie.**
+`ProjectRepository.recordTombstones()` w aplikacji nagrobkuje wyceny i pozycje zakupowe i na
+tym kończy, bo pomieszczenia nie są podkolekcją projektu. Kasowanie ich tutaj znaczyłoby, że
+to samo kliknięcie daje inny wynik w przeglądarce i na telefonie — argument Sesji 17,
+nietknięty. Pomieszczenie zostaje i **zachowuje swoje `projectId`**, dzięki czemu „Cofnij"
+przywraca projekt razem z jego pomieszczeniami zamiast z pustą listą.
+
+**Przypisanie kalkulacji siedzi w `inputJson`, pod kluczem `_room`.** `EstimationEntity` ma
+`projectId` i nie ma `roomId`. Pole na najwyższym poziomie dokumentu **przeżyłoby** merge —
+to nadal prawda — ale `inputJson` jest polem, które **już** jest kontraktem, wolnym tekstem
+i wraca nietknięte, i Sesja 16 włożyła tam migawkę dokładnie z tego powodu. Drugi mechanizm
+do tej samej roboty to druga rzecz do pilnowania. `_room` stoi **obok** `manual`, na
+najwyższym poziomie mapy, a nie w `_lm`: wiersz wpisany ręcznie nie ma migawki, a może
+należeć do pomieszczenia.
+
+**Przypisuje się w dwóch miejscach i w obu widać tylko pomieszczenia właściwego projektu.**
+Przy zapisie wyniku — lista obok wyboru projektu, z pomieszczeniem wybranym już wtedy, gdy to
+z niego wzięto wymiary — i później, listą przy każdym wierszu kalkulacji na ekranie projektu.
+`wsAddEstimation()` odrzuca cudze pomieszczenie, więc oferowanie go byłoby oferowaniem
+przypisania, które i tak przepada; projekt bez pomieszczeń nie dostaje listy w ogóle
+(rozdział XXV zabrania przycisku, za którym nic nie ma).
+
+**Lista pomieszczeń na `/projekty/` mówi teraz, do którego projektu należy które.** Bez tego
+te same trzy nazwy w dwóch mieszkaniach są nie do odróżnienia. Pomieszczenie bez projektu —
+czyli takie, jakie przychodzi z telefonu, bo `roomToDoc()` nie ma czego wysłać — nie mówi nic
+zamiast zgadywać, i nadal wypełnia kalkulator.
+
+**Czego ta sesja świadomie nie zrobiła.** Pomieszczeń nie ma na stronie głównej ani
+w nawigacji — ostatnie zdanie rozdziału XVIII zabrania tego wprost. Materiał nie dostał
+pomieszczenia: rozdział mówi o kalkulacjach, a lista zakupów jest jedna na projekt, bo kupuje
+się raz. Grupowania kalkulacji w drzewo „po pomieszczeniach" też nie ma — wiersz mówi, do
+którego należy, a przebudowa listy to zmiana ekranu, nie zmiana z rozdziału XVIII.
+
+- Sprawdzone: **229 testów logiki + 136 testów w Chromium — 365/365 przechodzi**, a
+  wcześniejsze 1117 + 112 + 180 + 415 + 596 + 251 + 147 + 331 + 121 + 177 + 90 + 70 + 166 +
+  134 nadal przechodzą (razem **4272**). Dwa nowe pliki: `scripts/test-rooms.mjs` (bez
+  zależności) i `scripts/test-rooms-page.mjs`. Ten drugi **niczego nie podstawia** — ani
+  kalkulator, ani `/projekty/` nie dotykają sieci — więc otwiera prawdziwe strony, klika to,
+  co klika odwiedzający, i czyta jedno i drugie: co narysowano i co wróciło do magazynu.
+  W tym: pomieszczenie dodane do otwartego projektu z przecinkiem jako separatorem
+  dziesiętnym, poprawione w swoim wierszu, porzucona edycja, usunięcie nietykające
+  kalkulacji, kalkulator wypełniony z pomieszczenia i wynik trafiający pod nie, ten sam
+  wiersz przenoszony do drugiego pomieszczenia i wyjmowany ze wszystkich, projekt bez
+  pomieszczeń nieoferujący listy, indeks nazywający projekt przy każdym pomieszczeniu,
+  cztery języki, przełączenie języka przyciskiem na otwartym projekcie, przełączenie waluty
+  nieruszające żadnego wymiaru, szerokości z rozdziału XXVIII (320 / 375 / 390 / 430 / 768 /
+  1280 px) z formularzem edycji na ekranie i wariant z wyłączonym JavaScriptem.
+  Testy logiki sprawdzone **negatywnie cztery razy**: pomieszczenie niepamiętające projektu,
+  usunięcie projektu kaskadujące na pomieszczenia, przyjmowanie cudzego pomieszczenia i
+  `roomId` wymyślony jako własne pole dokumentu — za każdym razem test faktycznie protestuje.
+  Test w przeglądarce sprawdzony negatywnie trzy razy (lista oferująca wszystkie
+  pomieszczenia, projekt pokazujący cudze, wiersz bez kubatury).
+- Kontrast: bez nowej pary — wiersz i formularz pomieszczenia wydają wyłącznie tokeny, które
+  już przechodziły. `scripts/check-contrast.mjs`: wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
+
+**Następne zadanie: Sesja 21 — LICZMAT PRO: FUNDAMENT** (model Free / Pro, bez płatności:
+uprawnienia, feature gating, status planu, struktura Pro).
 
 ### Co zrobiła Sesja 19
 

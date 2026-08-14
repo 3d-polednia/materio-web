@@ -601,6 +601,69 @@ jest przeoczenie: kosztorys jest dokumentem tego, co policzono, a „materiały,
 koszty, marża, suma, waluta" to Sesja 24 (WYCENY). Marży, narzutu i podatku tu nie ma —
 rozdział XVII kończy się zdaniem „Nie buduj z tego systemu księgowego".
 
+### 7.5. Pomieszczenia jako element projektu (Sesja 20)
+
+Rozdział XVIII w całości: „Pomieszczenia są elementem projektu", przykład `Projekt: Remont
+łazienki / Pomieszczenie: Łazienka / Wymiary: 2,4 × 3,2 × 2,5 m`, do tego „Kalkulacje mogą
+być przypisane do konkretnego pomieszczenia" i „Nie promuj pomieszczeń jako osobnego
+wielkiego modułu na homepage".
+
+**Kontrakt mówi coś przeciwnego, i oba zdania są prawdziwe.** `FIRESTORE_SYNC.md` §2 stawia
+pomieszczenia w `users/{uid}/rooms/{roomId}` — **obok** projektów, nie w nich — i pisze
+dlaczego: „Wybór pokoju i wybór kalkulatora to dwie niezależne osie". Pomieszczenie to
+fizyczne miejsce: przeżywa projekt, dla którego je zmierzono, i jedno pomieszczenie może
+obsłużyć kilka projektów. Powiązanie jest więc **polem**, a pole przeżywa. Sprawdzone
+w repo `3d-polednia/Materio` dla pomieszczeń osobno, nie przepisane z Sesji 18:
+
+- `RoomEntity` nie ma kolumny `projectId`, a `SyncContract.roomToDoc()` nie zapisuje
+  takiego klucza — czyli telefon nigdy go nie wyśle;
+- `CloudSync.pushLocal()` wysyła każde pomieszczenie przez
+  `.set(SyncContract.roomToDoc(...), SetOptions.merge())`, a merge zapisuje **wyłącznie
+  klucze, które dostał** — ustalona mapa nie kasuje tego, o czym nie wspomina;
+- wdrożone reguły walidują `validRoom()` po kształcie i **nie mają `hasOnly`** → serwer
+  zapis przyjmuje;
+- `roomFromDoc()` czyta po kluczach i ignoruje nieznane → kopia w telefonie jest bezpieczna.
+
+Czego to nie daje: telefon **nie pokaże** przypisania, bo nie ma go gdzie trzymać.
+Powiązanie jest przenoszone, nie gubione — dokładnie jak notatka materiału z Sesji 18 — i
+formularz mówi to odwiedzającemu wprost (`proj_room_phone`).
+
+Serwis wpisywał `projectId` do każdego pomieszczenia **od początku istnienia magazynu i ani
+razu go nie przeczytał**; `/app/` nie wysyłał go w ogóle, więc powiązanie ginęło na granicy
+przeglądarki. Sesja 20 je wysyła, czyta i pozwala zmienić.
+
+**Usunięcie projektu nie kasuje jego pomieszczeń.** `ProjectRepository.recordTombstones()`
+w aplikacji nagrobkuje wyceny i pozycje zakupowe i na tym kończy — pomieszczenia nie są
+podkolekcją projektu. Robienie tu inaczej znaczyłoby, że to samo kliknięcie daje inny wynik
+w przeglądarce i na telefonie (argument Sesji 17). Pomieszczenie zostaje, zachowuje swoje
+`projectId` — i właśnie dlatego „Cofnij" przywraca projekt razem z jego pomieszczeniami.
+
+**Przypisanie kalkulacji siedzi w `inputJson`, pod kluczem `_room`.** `EstimationEntity` ma
+`projectId` i nie ma `roomId`; `estimationToDoc()` nie zapisuje takiego klucza, a
+`validEstimation()` go nie waliduje. Reguła merge'a znaczy, że pole na najwyższym poziomie
+dokumentu też by przeżyło — ale `inputJson` jest polem, które **już** jest kontraktem,
+wolnym tekstem i wraca nietknięte, i Sesja 16 włożyła tam migawkę dokładnie z tego powodu.
+Drugi mechanizm do tej samej roboty to druga rzecz do pilnowania. `_room` stoi **obok**
+`manual` na najwyższym poziomie mapy, a nie w `_lm`, bo wiersz wpisany ręcznie nie ma
+migawki, a może należeć do pomieszczenia.
+
+Identyfikator pomieszczenia powstaje w tej przeglądarce, więc na telefonie nic nie znaczy —
+tam i tak nie ma kolumny, do której miałby trafić. Przypisanie jest przenoszone, nie
+pokazywane.
+
+**Gdzie się przypisuje.** Przy zapisie wyniku (lista obok wyboru projektu, z pomieszczeniem
+wybranym już wtedy, gdy to z niego wzięto wymiary) i później, na ekranie projektu, listą
+przy każdym wierszu kalkulacji. Pokazywane są **wyłącznie pomieszczenia otwartego
+projektu**: `wsAddEstimation()` odrzuca cudze, więc oferowanie ich byłoby oferowaniem
+przypisania, które i tak przepada. Projekt bez pomieszczeń nie dostaje listy w ogóle —
+rozdział XXV zabrania przycisku, za którym nic nie ma.
+
+**Czego ta sesja świadomie nie zrobiła.** Nie ma pomieszczeń na stronie głównej ani
+w nawigacji — rozdział XVIII wprost tego zabrania. Materiał nie dostał pomieszczenia:
+rozdział mówi o kalkulacjach, a lista zakupów jest jedna na projekt, bo kupuje się raz.
+Grupowania kalkulacji „po pomieszczeniach" też nie ma — wiersz mówi, do którego należy,
+a przebudowa listy w drzewo to zmiana ekranu, nie zmiana z rozdziału XVIII.
+
 ---
 
 ## 8. Otwarte decyzje

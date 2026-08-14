@@ -180,10 +180,14 @@ const wsArchiveProject = (id, on) => wsUpdateProject(id, { archived: on !== fals
  * otherwise the next pull from another device puts the materials back under a project that
  * no longer exists.
  *
- * Rooms are deliberately left alone. They used to be unlinked here, which threw away the
- * one fact needed to put the project back, and a room is a physical place that outlives
- * the project it was measured for anyway. Nothing renders a room by project yet — that
- * is session 20 — so this costs nothing today and buys a whole undo.
+ * Rooms are deliberately left alone, and session 20 — which is what put a room on a
+ * project screen — kept it that way. They used to be unlinked here, which threw away the
+ * one fact needed to put the project back. Beyond that, the phone does not cascade them
+ * either: `recordTombstones()` walks the estimations and the shopping items of every
+ * project it deletes and stops there, because rooms are not a subcollection of a project
+ * at all (FIRESTORE_SYNC §2). Deleting rooms here would mean one click doing two different
+ * things on two devices — session 17's argument, unchanged. A room is a physical place; it
+ * survives the project measured for it, keeps its `projectId`, and comes back with it.
  *
  * @returns {{id: string, at: number, lines: string[], items: string[]}|null} what was
  *   tombstoned. Hand it to wsRestoreProject() to undo exactly this delete and nothing else.
@@ -261,20 +265,71 @@ function wsSetActiveProject(id) {
 
 const wsActiveProject = () => wsProjects().find((p) => p.id === wsActiveProjectId()) || null;
 
-/* ------------------------------------------------------------------ rooms */
+/* ------------------------------------------------------------------ rooms
+ *
+ * Chapter XVIII: "Pomieszczenia są elementem projektu." The sync contract says the
+ * opposite in as many words — rooms are `users/{uid}/rooms/{roomId}`, a collection
+ * **beside** projects rather than a subcollection of one, and FIRESTORE_SYNC §2 gives the
+ * reason: "Wybór pokoju i wybór kalkulatora to dwie niezależne osie — dlatego pokoje
+ * siedzą obok projektów, nie w nich." A room is a physical place; it outlives the project
+ * measured for it, and one room can be measured for several.
+ *
+ * Both hold, because the link is a field and the field survives. `projectId` is not in the
+ * contract — `RoomEntity` has no column for it, `SyncContract.roomToDoc()` never writes
+ * one, `validRoom()` validates none — and it is carried anyway, for the three reasons
+ * session 18 established for a material's note and this session re-checked in
+ * `3d-polednia/Materio` for rooms specifically:
+ *
+ *   - `CloudSync.pushLocal()` writes every room with
+ *     `.set(SyncContract.roomToDoc(...), SetOptions.merge())`, and a merge writes only the
+ *     keys it is handed, so the fixed map cannot erase a key it does not mention;
+ *   - the deployed rules validate `validRoom()` by shape and have no `hasOnly`, so the
+ *     write is accepted;
+ *   - `roomFromDoc()` reads by key and ignores what it does not know, so the phone's copy
+ *     of the room is unharmed.
+ *
+ * What it does not buy is visibility: the phone has no column for `projectId`, so a room
+ * there is still a room in one flat list. The link is carried, not shown — the same honest
+ * claim the note gets, and the page says so.
+ *
+ * This file has written `projectId` onto every room since the workspace existed and has
+ * never read it back; `/app/` did not even send it, so the link died at the browser's
+ * edge. Session 20 sends it, reads it, and lets it be changed.
+ */
 
-function wsRooms() {
-  return wsAlive(wsLoad().rooms).sort((a, b) => b.updatedAt - a.updatedAt);
+/**
+ * The rooms of one project, or every live room when no project is named.
+ *
+ * A room whose project was deleted keeps naming it — that is what makes the undo exact —
+ * and stays in the flat list. Nothing draws a deleted project's rooms, because nothing
+ * draws a deleted project; the index simply stops printing a name it can no longer look
+ * up. See wsDeleteProject(): a room is a place, not a line of the project's paperwork.
+ */
+function wsRooms(projectId) {
+  const rows = wsAlive(wsLoad().rooms).sort((a, b) => b.updatedAt - a.updatedAt);
+  return projectId ? rows.filter((r) => r.projectId === projectId) : rows;
 }
+
+/** One room by id, or null. */
+const wsRoom = (id) => wsRooms().find((r) => r.id === id) || null;
 
 /** Clamp to the ranges the security rules accept (FIRESTORE_SYNC §2, rooms). */
 const wsDim = (v, max) => Math.min(Math.max(Number(v) || 0, 0), max);
 
+/**
+ * Add a room, optionally to a project.
+ *
+ * The positional form is the one the index's form has always used. A room with no name is
+ * a row nobody can tell apart, so it is refused rather than saved blank — the same rule a
+ * project and a material get.
+ */
 function wsAddRoom(name, lengthM, widthM, heightM, projectId) {
+  const clean = String(name || "").trim().slice(0, 120);
+  if (!clean) return null;
   const data = wsLoad();
   const room = {
     id: wsId(),
-    name: String(name).slice(0, 120),
+    name: clean,
     lengthM: wsDim(lengthM, 1000),
     widthM: wsDim(widthM, 1000),
     heightM: wsDim(heightM, 100),
@@ -286,26 +341,34 @@ function wsAddRoom(name, lengthM, widthM, heightM, projectId) {
   return room;
 }
 
+/** Correct a room in place. Anything not passed keeps its current value. */
 function wsUpdateRoom(id, fields) {
   const data = wsLoad();
-  const room = data.rooms.find((r) => r.id === id);
-  if (!room) return;
-  if (fields.name !== undefined) room.name = String(fields.name).slice(0, 120);
+  const room = data.rooms.find((r) => r.id === id && !r.deletedAt);
+  if (!room) return null;
+  if (fields.name !== undefined) {
+    const name = String(fields.name).trim().slice(0, 120);
+    if (!name) return null;
+    room.name = name;
+  }
   if (fields.lengthM !== undefined) room.lengthM = wsDim(fields.lengthM, 1000);
   if (fields.widthM !== undefined) room.widthM = wsDim(fields.widthM, 1000);
   if (fields.heightM !== undefined) room.heightM = wsDim(fields.heightM, 100);
   if (fields.projectId !== undefined) room.projectId = fields.projectId || null;
   room.updatedAt = Date.now();
   wsSave(data);
+  return room;
 }
 
+/** Tombstone one room. Same rule as everywhere else: the row stays, `deletedAt` moves. */
 function wsDeleteRoom(id) {
   const data = wsLoad();
-  const room = data.rooms.find((r) => r.id === id);
-  if (!room) return;
+  const room = data.rooms.find((r) => r.id === id && !r.deletedAt);
+  if (!room) return null;
   room.deletedAt = Date.now();
   room.updatedAt = room.deletedAt;
   wsSave(data);
+  return room;
 }
 
 /** Floor, wall and ceiling areas of a room, plus its perimeter and volume. */
@@ -402,10 +465,64 @@ function wsLineSnapshot(row) {
 }
 
 /**
+ * Which room a saved calculation was made for — chapter XVIII: "Kalkulacje mogą być
+ * przypisane do konkretnego pomieszczenia."
+ *
+ * **It lives inside `inputJson`, under `_room`, and it could not live anywhere else.**
+ * `EstimationEntity` has a `projectId` and no `roomId`; `SyncContract.estimationToDoc()`
+ * writes no such key and `validEstimation()` validates none. The merge rule means a
+ * top-level field would survive the sync — that is session 18's finding and it holds here
+ * — but `inputJson` is the field that is *already* free-form, already contract and already
+ * round-trips, and session 16 put the calculation's whole snapshot in it for exactly that
+ * reason. A second mechanism for the same job would be one more thing to keep in step.
+ *
+ * `_room` is a room id made by this browser, so it means nothing on the phone — which has
+ * no room column on an estimation to put it in either way. The link is carried, not shown.
+ * The key sits beside `manual` (session 19) at the top level of the map rather than inside
+ * `_lm`, because a line typed by hand has no snapshot and may still belong to a room.
+ */
+function wsLineRoomId(row) {
+  try {
+    const id = JSON.parse(String((row && row.inputJson) || "{}"))._room;
+    return typeof id === "string" && id ? id : "";
+  } catch (e) {
+    return "";
+  }
+}
+
+/**
+ * Assign a saved line to a room, or take it out of one with "".
+ *
+ * The rest of `inputJson` is read back and written out untouched: it carries what the
+ * visitor typed and the snapshot that explains the number, and neither has anything to do
+ * with which room this was. A string that will not parse is left alone rather than
+ * replaced — it belongs to whoever wrote it.
+ */
+function wsSetLineRoom(id, roomId) {
+  const data = wsLoad();
+  const row = data.estimations.find((e) => e.id === id && !e.deletedAt);
+  if (!row) return null;
+  let json;
+  try { json = JSON.parse(String(row.inputJson || "{}")); } catch (e) { return null; }
+  if (!json || typeof json !== "object") return null;
+  const room = roomId ? String(roomId).slice(0, 64) : "";
+  if (room) json._room = room;
+  else delete json._room;
+  const text = JSON.stringify(json);
+  // The contract's ceiling still applies. Nothing here can cut a JSON string to fit, so a
+  // line already at the limit keeps the room it had rather than becoming unparseable.
+  if (text.length > WS_INPUT_MAX) return null;
+  row.inputJson = text;
+  row.updatedAt = Date.now();
+  wsSave(data);
+  return row;
+}
+
+/**
  * Save one calculator result as an estimate line.
  *
  * @param {object} r  { calcId, name, requiredUnits, unitLabel, costMajor, wastePercent,
- *                      input, snapshot, projectId }
+ *                      input, snapshot, projectId, roomId }
  *
  * `projectId` is the project the visitor picked under the result (chapter XV: the arrow
  * from the result goes to a project, not to wherever the last one went). Without one it is
@@ -423,6 +540,14 @@ function wsAddEstimation(r) {
   const totalCostMinor = wsMinor(r.costMajor);
   const waste = Number(r.wastePercent) || 0;
 
+  // Chapter XVIII's assignment, made where the result is saved. A room the project does
+  // not own is dropped rather than filed: the picker is rebuilt whenever the project
+  // changes, and a stale one naming somebody else's room would put the line in a place
+  // the project screen will never show it.
+  const room = r.roomId ? wsRoom(r.roomId) : null;
+  const roomId = room && room.projectId === projectId ? room.id : "";
+  const input = roomId ? { ...(r.input || {}), _room: roomId } : { ...(r.input || {}) };
+
   const data = wsLoad();
   const row = {
     id: wsId(),
@@ -436,7 +561,7 @@ function wsAddEstimation(r) {
     wastePercentage: waste,
     wasteCostMinor: Math.round(totalCostMinor * waste / 100),
     currencyCode,
-    inputJson: wsInputJson(r.input || {}, r.snapshot || null),
+    inputJson: wsInputJson(input, r.snapshot || null),
     ...wsSyncFields(Date.now()),
   };
   data.estimations.push(row);

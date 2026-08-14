@@ -527,9 +527,18 @@ async function addRoom(name, lengthM, widthM, heightM) {
   await fb.setDoc(roomDoc(newId()), { name, lengthM, widthM, heightM, ...syncFields(now) });
 }
 
-/** Tombstone, not removal — the phone has to learn the row is gone (FIRESTORE_SYNC §4). */
+/**
+ * Tombstone, not removal — the phone has to learn the row is gone (FIRESTORE_SYNC §4).
+ *
+ * Merged, for the same reason the sync push is: this browser writes the contract's fields
+ * and a document may carry others it has never heard of — a material's note, a room's
+ * project. A plain `setDoc` would erase them while marking the row deleted, and an undo on
+ * another device would then bring back a row with its links stripped. Every tombstone in
+ * `CloudSync.kt` is a merge too.
+ */
 async function tombstone(ref, row, fields) {
-  await fb.setDoc(ref, { ...fields, ...syncFields(row.createdAt || Date.now(), Date.now()) });
+  await fb.setDoc(ref, { ...fields, ...syncFields(row.createdAt || Date.now(), Date.now()) },
+    { merge: true });
 }
 
 function renderProjects() {
@@ -697,9 +706,17 @@ function wireSyncPanel() {
         }, MERGE);
       }
       for (const r of local.rooms) {
+        // `projectId` is chapter XVIII's "pomieszczenia są elementem projektu" and is not
+        // in the contract: `RoomEntity` has no column, `roomToDoc()` no key, `validRoom()`
+        // no check. It goes up anyway for the reason session 18 established and session 20
+        // re-checked for rooms — every write on both sides is a merge, the rules validate
+        // by shape with no `hasOnly`, and `roomFromDoc()` ignores keys it does not know —
+        // so the phone carries the link without being able to show it. Omitting it here is
+        // what made the link die at the browser's edge until now.
         await fb.setDoc(roomDoc(r.id), {
           name: String(r.name).slice(0, 120),
           lengthM: num(r.lengthM), widthM: num(r.widthM), heightM: num(r.heightM),
+          projectId: r.projectId || null,
           ...syncFields(r.createdAt, r.deletedAt),
         }, MERGE);
       }

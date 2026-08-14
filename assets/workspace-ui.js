@@ -85,6 +85,11 @@ function wsWireCard(card) {
       if (el) el.value = wsPlain(v);
     });
     card.dataset.wsRoomName = room.name;
+    // Chapter XVIII: the result about to be produced is a result *for this room*, so the
+    // save box below offers that room already chosen. The visitor can still change it —
+    // taking the dimensions from one room and filing the answer under another is theirs to
+    // decide — but the common case needs no second choice.
+    card.dataset.wsRoomId = room.id;
     const run = card.querySelector("[data-run]");
     if (run) run.click();
   });
@@ -163,6 +168,32 @@ function wsFillSaveProjects(box) {
   sel.hidden = projects.length === 0;
   note.hidden = projects.length > 0;
   box.querySelector("[data-ws-new]").hidden = sel.hidden || sel.value !== WS_NEW_PROJECT;
+  wsFillSaveRooms(box);
+}
+
+/**
+ * The room picker beside it — chapter XVIII's "kalkulacje mogą być przypisane do
+ * konkretnego pomieszczenia", asked where the assignment can actually be made.
+ *
+ * It lists the rooms of the project the picker above names, and nothing else: a room
+ * belongs to a project, so offering another project's rooms would offer an assignment
+ * `wsAddEstimation()` drops on the way in. A project with no rooms gets no picker at all
+ * rather than one empty dropdown — chapter XXV's rule about a control with nothing behind
+ * it. Whichever room filled the form is preselected the first time.
+ */
+function wsFillSaveRooms(box) {
+  const sel = box.querySelector("[data-ws-room-pick]");
+  if (!sel) return;
+  const project = box.querySelector("[data-ws-project]");
+  const projectId = project.hidden || project.value === WS_NEW_PROJECT
+    ? wsActiveProjectId() : project.value;
+  const rooms = projectId ? wsRooms(projectId) : [];
+  const card = box.closest(".calc");
+  const keep = sel.dataset.touched ? sel.value : ((card && card.dataset.wsRoomId) || "");
+  sel.innerHTML = `<option value="">${wsEsc(wsT("ws_room_no"))}</option>` + rooms.map((r) =>
+    `<option value="${wsEsc(r.id)}">${wsEsc(r.name)}</option>`).join("");
+  sel.value = rooms.some((r) => r.id === keep) ? keep : "";
+  sel.hidden = rooms.length === 0;
 }
 
 /**
@@ -210,6 +241,7 @@ function wsBuildSaveBox(card) {
     <div class="ws-save-row">
       <button type="button" class="btn btn-primary btn-sm" data-ws-save>${wsEsc(wsT("ws_add_to_project"))}</button>
       <select data-ws-project aria-label="${wsEsc(wsT("ws_project"))}" hidden></select>
+      <select data-ws-room-pick aria-label="${wsEsc(wsT("ws_room"))}" hidden></select>
       <span class="muted ws-save-note" data-ws-note hidden>${wsEsc(wsT("ws_no_project"))}</span>
     </div>
     <div class="ws-save-new" data-ws-new hidden>
@@ -228,7 +260,16 @@ function wsBuildSaveBox(card) {
     // Picking a project here picks it everywhere: the estimate, the dashboard and the next
     // result all mean the same "active project", and two answers to that would diverge.
     else wsSetActiveProject(sel.value);
+    // Another project is another set of rooms, and the one chosen a moment ago is not in
+    // it. Starting the room over is the honest redraw.
+    const room = box.querySelector("[data-ws-room-pick]");
+    if (room) delete room.dataset.touched;
+    wsFillSaveRooms(box);
   });
+  // Once the visitor has named a room, a redraw stops overriding them with the room the
+  // form was filled from — the two are the same choice until they are not.
+  box.querySelector("[data-ws-room-pick]")
+    .addEventListener("change", (e) => { e.target.dataset.touched = "1"; });
   box.querySelector("[data-ws-save]").addEventListener("click", () => wsSaveResult(card, box));
   return box;
 }
@@ -252,9 +293,13 @@ function wsSaveResult(card, box) {
   const input = {};
   card.querySelectorAll("[data-k]").forEach((el) => { input[el.dataset.k] = el.value; });
 
+  const roomPick = box.querySelector("[data-ws-room-pick]");
+  const roomId = roomPick && !roomPick.hidden ? roomPick.value : "";
+
   const row = wsAddEstimation({
     calcId: card.dataset.calc,
     projectId,
+    roomId,
     name: card.dataset.matName || card.dataset.wsRoomName || wsT(`c_${card.dataset.calc}_t`),
     materialCategory: card.dataset.matCat || "OTHER",
     requiredUnits: result.tobuy,
@@ -271,21 +316,28 @@ function wsSaveResult(card, box) {
   const project = wsProject(row.projectId);
   sel.value = row.projectId;
   box.querySelector("[data-ws-new]").hidden = true;
-  wsSaid(box, project ? project.name : "", row.projectId);
+  // The room the store actually filed it under, not the one that was asked for: a stale
+  // pick naming another project's room is dropped on the way in, and saying otherwise
+  // would be the one sentence on the page that is not true.
+  const saved = wsRoom(wsLineRoomId(row));
+  wsSaid(box, project ? project.name : "", row.projectId, saved ? saved.name : "");
 }
 
 /**
  * The third step of chapter XV: the result is in a project, and the project is a click
  * away. Without the link the arrow stops at "saved" and the visitor has to go and find it.
  */
-function wsSaid(box, projectName, projectId) {
+function wsSaid(box, projectName, projectId, roomName) {
   const said = box.querySelector("[data-ws-saved]");
   const slot = box.closest("[data-calc-actions]");
   const base = (slot && slot.dataset.projectsUrl) || "";
   const link = base && projectId
     ? ` <a href="${wsEsc(base)}?id=${encodeURIComponent(projectId)}">${wsEsc(wsT("proj_open"))}</a>`
     : "";
-  said.innerHTML = `<b>${wsEsc(wsT("ws_saved_in"))} ${wsEsc(projectName)}</b>${link}`;
+  // The room is named only when there is one — a project without rooms has no picker, and
+  // "· " with nothing after it would be punctuation reporting on an absence.
+  const room = roomName ? ` <span class="muted">· ${wsEsc(roomName)}</span>` : "";
+  said.innerHTML = `<b>${wsEsc(wsT("ws_saved_in"))} ${wsEsc(projectName)}</b>${room}${link}`;
   said.hidden = false;
 }
 
@@ -330,6 +382,8 @@ let wsAsking = false;
 let wsUndone = null;
 /** Which material is open for editing, or "" when none is. */
 let wsEditingItemId = "";
+/** Which room is open for editing, or "" when none is. */
+let wsEditingRoomId = "";
 
 const wsDate = (ms) => {
   const at = Number(ms);
@@ -503,6 +557,118 @@ function wsLineSource(row) {
     </details>`;
 }
 
+/* ------------------------------------------------------- the rooms of a project
+ *
+ * Chapter XVIII, in the chapter's own shape:
+ *
+ *     Projekt:        Remont łazienki
+ *     Pomieszczenie:  Łazienka
+ *     Wymiary:        2,4 × 3,2 × 2,5 m
+ *
+ * The three dimensions are what the room *is* — everything else on the row is worked out
+ * from them by wsRoomAreas(), which is the same function the calculators' room bar spends,
+ * so a floor area read here and a floor area typed into a calculator cannot disagree.
+ *
+ * The rooms are the project's, by the `projectId` the store carries beside the contract
+ * (see assets/workspace.js). A room whose project has been deleted stays on the index and
+ * leaves this list, because it is a place and not a line of the project's paperwork.
+ */
+
+/** The dimensions of a room as the chapter writes them: "2,4 × 3,2 × 2,5 m". */
+const wsRoomDims = (a) => `${wsNum(a.L)} × ${wsNum(a.W)} × ${wsNum(a.H)} m`;
+
+/** Floor, walls and ceiling, in the order a room is usually finished. */
+function wsRoomFigures(a) {
+  return [
+    [wsT("room_floor"), `${wsNum(a.floor)} m²`],
+    [wsT("ws_surface_walls"), `${wsNum(a.walls)} m²`],
+    [wsT("proj_room_volume"), `${wsNum(a.volume)} m³`],
+  ].map(([l, v]) =>
+    `<span class="ws-src-pair"><span class="muted">${wsEsc(l)}</span> ${wsEsc(v)}</span>`).join("");
+}
+
+/** One room as it reads, with its dimensions and what they come to. */
+function wsRoomRow(r) {
+  const a = wsRoomAreas(r);
+  return `<li class="ws-room" data-id="${wsEsc(r.id)}">
+      <span class="row-name">
+        <b>${wsEsc(r.name)}</b>
+        <em class="muted">${wsEsc(wsRoomDims(a))}</em>
+      </span>
+      <span class="ws-room-figs">${wsRoomFigures(a)}</span>
+      <span class="row-actions">
+        <button type="button" class="btn btn-ghost btn-sm" data-edit>${wsEsc(wsT("proj_mat_edit"))}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
+      </span>
+    </li>`;
+}
+
+/**
+ * The same room, open for editing: the name and the three dimensions.
+ *
+ * A form on the page rather than `prompt()`, for the reason session 15 gave when it took
+ * the browser's dialogs out of this file — and in the row it belongs to, so the numbers
+ * being changed stay on screen while they are typed.
+ */
+function wsRoomForm(r) {
+  const f = (key, name, value) => `<label class="ws-mat-f ws-mat-f-sm">
+          <span class="ws-bar-label">${wsEsc(wsT(key))}</span>
+          <input type="text" inputmode="decimal" data-f="${name}" value="${wsEsc(wsPlain(value))}">
+        </label>`;
+  return `<li class="ws-room ws-editing" data-id="${wsEsc(r.id)}">
+      <form class="ws-mat-edit" data-room-edit>
+        <p class="ws-mat-grid">
+          <label class="ws-mat-f">
+            <span class="ws-bar-label">${wsEsc(wsT("ws_col_name"))}</span>
+            <input type="text" maxlength="120" data-f="name" value="${wsEsc(r.name)}" required>
+          </label>
+          ${f("fld_length", "lengthM", r.lengthM)}
+          ${f("fld_width", "widthM", r.widthM)}
+          ${f("fld_height", "heightM", r.heightM)}
+        </p>
+        <p class="ws-mat-sum" data-room-sum aria-live="polite"></p>
+        <p class="ws-ask-row">
+          <button type="submit" class="btn btn-primary btn-sm">${wsEsc(wsT("app_save"))}</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-cancel>${wsEsc(wsT("action_cancel"))}</button>
+        </p>
+      </form>
+    </li>`;
+}
+
+/** What the three dimensions in the open form come to, recomputed as they are typed. */
+function wsRoomSum(form) {
+  const out = form.querySelector("[data-room-sum]");
+  if (!out) return;
+  const get = (f) => {
+    const el = form.querySelector(`[data-f="${f}"]`);
+    return el ? wsDecimal(el.value) : 0;
+  };
+  const a = wsRoomAreas({ lengthM: get("lengthM"), widthM: get("widthM"), heightM: get("heightM") });
+  out.textContent = a.floor > 0 || a.walls > 0
+    ? `${wsRoomDims(a)} · ${wsT("room_floor")} ${wsNum(a.floor)} m² · ${wsT("ws_surface_walls")} ${wsNum(a.walls)} m²`
+    : "";
+}
+
+function wsRenderProjectRooms(id) {
+  const list = document.getElementById("ws-project-rooms");
+  if (!list) return;
+  const rooms = wsRooms(id);
+  list.innerHTML = rooms.length
+    ? rooms.map((r) => (r.id === wsEditingRoomId ? wsRoomForm(r) : wsRoomRow(r))).join("")
+    : `<li class="empty muted">${wsEsc(wsT("proj_room_empty"))}</li>`;
+}
+
+/**
+ * The rooms a calculation may be filed under, as `<option>`s — chapter XVIII's second
+ * sentence. The room the line already carries is the one selected; "" is no room, which is
+ * what every line saved before this session is.
+ */
+function wsRoomOptions(projectId, current) {
+  return `<option value="">${wsEsc(wsT("ws_room_no"))}</option>` + wsRooms(projectId)
+    .map((r) => `<option value="${wsEsc(r.id)}"${r.id === current ? " selected" : ""}>${wsEsc(r.name)}</option>`)
+    .join("");
+}
+
 /**
  * The saved lines of one project, newest last — the order they were added in.
  *
@@ -519,10 +685,20 @@ function wsRenderProjectLines(id) {
     list.innerHTML = `<li class="empty muted">${wsEsc(wsT("proj_lines_empty"))}</li>`;
     return;
   }
+  // Chapter XVIII: "Kalkulacje mogą być przypisane do konkretnego pomieszczenia." The
+  // picker is absent from every row while the project has no rooms — a dropdown whose only
+  // entry is "no room" is chapter XXV's control with nothing behind it.
+  const rooms = wsRooms(id);
   list.innerHTML = rows.map((r) => {
     const cost = r.totalCostMinor > 0
       ? `<em class="muted">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</em>` : "";
-    return `<li class="ws-line">
+    const room = rooms.length
+      ? `<span class="ws-line-room">
+          <label class="ws-bar-label muted" for="ws-line-room-${wsEsc(r.id)}">${wsEsc(wsT("ws_room"))}</label>
+          <select id="ws-line-room-${wsEsc(r.id)}" data-line-room>${wsRoomOptions(id, wsLineRoomId(r))}</select>
+        </span>`
+      : "";
+    return `<li class="ws-line" data-id="${wsEsc(r.id)}">
         <span class="row-name">
           <b>${wsEsc(r.name)}</b>
           <em class="muted">${wsEsc(wsDate(r.createdAt))}</em>
@@ -531,6 +707,7 @@ function wsRenderProjectLines(id) {
           <b>${wsNum(r.requiredUnits)} ${wsEsc(r.unitLabel)}</b>
           ${cost}
         </span>
+        ${room}
         ${wsLineSource(r)}
       </li>`;
   }).join("");
@@ -800,6 +977,7 @@ function wsRenderProject(id) {
   document.getElementById("ws-delete-q").textContent = wsT("ws_confirm_delete");
   document.getElementById("ws-project-delete").hidden = wsAsking;
 
+  wsRenderProjectRooms(project.id);
   wsRenderProjectLines(project.id);
   wsRenderMaterials(project.id);
   wsRenderOtherCosts(project.id);
@@ -813,10 +991,10 @@ function wsRenderWorkspace() {
   if (!detail) return;
   const was = wsOpenId;
   wsOpenId = wsUrlId();
-  // A half-finished edit belongs to the material it was opened on. Leaving the project, or
-  // opening another one, ends it — carrying it across would put somebody's typing into a
-  // row on a different screen.
-  if (wsOpenId !== was) wsEditingItemId = "";
+  // A half-finished edit belongs to the material or the room it was opened on. Leaving the
+  // project, or opening another one, ends it — carrying it across would put somebody's
+  // typing into a row on a different screen.
+  if (wsOpenId !== was) { wsEditingItemId = ""; wsEditingRoomId = ""; }
   const index = document.getElementById("ws-index");
 
   detail.hidden = !wsOpenId;
@@ -860,10 +1038,17 @@ function wsRenderRooms() {
   }
   list.innerHTML = rooms.map((r) => {
     const a = wsRoomAreas(r);
+    // Chapter XVIII makes a room an element of a project, so the index says which one —
+    // otherwise the same three names appear in two flats and nothing tells them apart. A
+    // room with no project, or one whose project was deleted, simply says nothing: it is
+    // still a place, and it still fills a calculator.
+    const project = r.projectId ? wsProject(r.projectId) : null;
+    const where = project
+      ? ` <a class="ws-room-of" href="?id=${encodeURIComponent(project.id)}">${wsEsc(project.name)}</a>` : "";
     return `<li data-id="${wsEsc(r.id)}">
         <span class="row-name">
-          <b>${wsEsc(r.name)}</b>
-          <em class="muted">${wsNum(a.L)} × ${wsNum(a.W)} × ${wsNum(a.H)} m · ${wsT("room_floor")} ${wsNum(a.floor)} m² · ${wsT("room_walls")} ${wsNum(a.walls)} m²</em>
+          <b>${wsEsc(r.name)}</b>${where}
+          <em class="muted">${wsEsc(wsRoomDims(a))} · ${wsT("room_floor")} ${wsNum(a.floor)} m² · ${wsT("room_walls")} ${wsNum(a.walls)} m²</em>
         </span>
         <span class="row-actions">
           <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
@@ -1053,6 +1238,79 @@ function wireProjectDetail() {
       // the visitor is looking at — chapter XVII's "7 × 35 PLN = 245 PLN".
       priceMajor: wsDecimal(get("priceMajor")),
     })) wsRenderWorkspace();
+  });
+
+  /* Chapter XVIII's rooms, on the project they belong to: add one, correct its dimensions,
+     take it off. The store fires `workspacechange`, which redraws the screen, so what
+     appears is what was written rather than what was typed at it. */
+  on("ws-project-rooms", "click", (e) => {
+    const li = e.target.closest("li[data-id]");
+    if (!li) return;
+    if (e.target.closest("[data-del]")) {
+      // A room carries no money and no shopping list, so it goes without a question — and
+      // it is a tombstone either way, which is what makes it recoverable at all.
+      if (wsEditingRoomId === li.dataset.id) wsEditingRoomId = "";
+      wsDeleteRoom(li.dataset.id);
+    } else if (e.target.closest("[data-edit]")) {
+      wsEditingRoomId = li.dataset.id;
+      wsRenderWorkspace();
+      const first = document.querySelector('#ws-project-rooms [data-f="name"]');
+      if (first) { first.focus(); first.select(); }
+    } else if (e.target.closest("[data-cancel]")) {
+      wsEditingRoomId = "";
+      wsRenderWorkspace();
+    }
+  });
+
+  on("ws-project-rooms", "input", (e) => {
+    const form = e.target.closest("[data-room-edit]");
+    if (form) wsRoomSum(form);
+  });
+
+  on("ws-project-rooms", "submit", (e) => {
+    const form = e.target.closest("[data-room-edit]");
+    if (!form) return;
+    e.preventDefault();
+    const li = form.closest("li[data-id]");
+    const get = (f) => form.querySelector(`[data-f="${f}"]`).value;
+    if (!String(get("name")).trim()) return; // a room with no name is a row nobody can place
+    wsEditingRoomId = "";
+    if (!wsUpdateRoom(li.dataset.id, {
+      name: get("name"),
+      lengthM: wsDecimal(get("lengthM")),
+      widthM: wsDecimal(get("widthM")),
+      heightM: wsDecimal(get("heightM")),
+    })) wsRenderWorkspace();
+  });
+
+  on("ws-proj-room-form", "input", (e) => wsRoomSum(e.currentTarget));
+  on("ws-proj-room-form", "submit", (e) => {
+    e.preventDefault();
+    const el = (id) => document.getElementById(id);
+    const name = el("ws-proj-room-name");
+    if (!name.value.trim() || !wsOpenId) return;
+    const made = wsAddRoom(
+      name.value.trim(),
+      wsDecimal(el("ws-proj-room-length").value),
+      wsDecimal(el("ws-proj-room-width").value),
+      wsDecimal(el("ws-proj-room-height").value),
+      wsOpenId,
+    );
+    if (!made) return;
+    // The name is about one room and goes; the three dimensions are usually a small edit
+    // away from the next room in the same flat and stay.
+    name.value = "";
+    wsRoomSum(e.currentTarget);
+    name.focus();
+  });
+
+  /* Chapter XVIII's second sentence, on a line that is already saved: a calculation can be
+     put into a room, moved to another, or taken out of all of them. The room id goes inside
+     `inputJson` — see wsSetLineRoom() — so the assignment travels with the line. */
+  on("ws-project-lines", "change", (e) => {
+    const sel = e.target.closest("[data-line-room]");
+    const li = e.target.closest("li[data-id]");
+    if (sel && li) wsSetLineRoom(li.dataset.id, sel.value);
   });
 
   // Chapter XVI's "dodać własny materiał", now with chapter XVII's price on it.

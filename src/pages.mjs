@@ -1044,6 +1044,49 @@ export function projectsMain(lang, t, aisles = []) {
             </p>
           </div>
 
+          <!-- Chapter XVIII: "Pomieszczenia są elementem projektu." It stands above the
+               calculations because that is the order chapter XIV lists a project's parts
+               in, and because the chapter's own example reads project → room → dimensions.
+               The rooms are the project's by a projectId the sync contract does not carry
+               and a Firestore merge does not erase — assets/workspace.js says how, and the
+               note under the form says what the phone can and cannot do with it. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("ws_rooms"))}</h2>
+            </div>
+            <p class="muted">${esc(t("proj_room_d"))}</p>
+            <ul id="ws-project-rooms" class="data-list"></ul>
+
+            <details class="ws-mat-add" id="ws-room-add">
+              <summary>${esc(t("proj_room_add"))}</summary>
+              <form id="ws-proj-room-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">${esc(t("ws_col_name"))}</span>
+                    <input id="ws-proj-room-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">${esc(t("fld_length"))}</span>
+                    <input id="ws-proj-room-length" type="text" inputmode="decimal" value="5" data-f="lengthM">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">${esc(t("fld_width"))}</span>
+                    <input id="ws-proj-room-width" type="text" inputmode="decimal" value="4" data-f="widthM">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">${esc(t("fld_height"))}</span>
+                    <input id="ws-proj-room-height" type="text" inputmode="decimal" value="2.6" data-f="heightM">
+                  </label>
+                </p>
+                <!-- What the three numbers above come to, while they are typed: the same
+                     wsRoomAreas() the calculators' room bar spends. -->
+                <p class="ws-mat-sum" data-room-sum aria-live="polite"></p>
+                <p class="muted ws-mat-hint">${esc(t("proj_room_phone"))}</p>
+                <p><button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button></p>
+              </form>
+            </details>
+          </section>
+
           <section class="dash-sec">
             <div class="dash-head">
               <h2>${esc(t("proj_lines_t"))}</h2>

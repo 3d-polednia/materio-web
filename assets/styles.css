@@ -1352,6 +1352,22 @@ a.chip:hover { text-decoration: none; }
 .ws-mat-add summary { cursor: pointer; font-weight: var(--fw-semi); }
 .ws-mat-add form { margin-top: var(--sp-3); }
 
+/* Rooms — chapter XVIII. A room is a name and three dimensions; everything else on the
+   row is worked out from them, so the figures sit apart from the name in the same
+   inline-pair shape "where did this number come from" uses, and wrap onto their own line
+   before the row starts squeezing the name. */
+.data-list li.ws-room { flex-wrap: wrap; }
+.ws-room-figs {
+  display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4);
+  font-size: var(--fs-sm); flex: 1 1 14rem;
+}
+/* Which project a room belongs to, on the index where several projects' rooms meet. */
+.ws-room-of { font-size: var(--fs-sm); }
+/* Filing one calculation under one room. It takes a line of its own under the row for the
+   same reason the note does: the two things beside it are a name and a number. */
+.ws-line-room { flex-basis: 100%; display: flex; align-items: center; gap: var(--sp-2); }
+.ws-line-room select { max-width: 16rem; }
+
 /* The archive is folded away: it is the part of the list that is finished. */
 .ws-archive { margin-top: var(--sp-6); }
 .ws-archive summary { cursor: pointer; font-weight: var(--fw-semi); }
