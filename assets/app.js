@@ -667,6 +667,14 @@ function wireSyncPanel() {
   const pull = $("app-sync-pull");
   if (!push || !pull || typeof wsExport !== "function") return;
 
+  // Every push is a merge, exactly as `CloudSync.pushLocal()` on Android is
+  // (`set(..., SetOptions.merge())`). The browser always sends the complete contract
+  // document, so for the fields it knows about a merge and a replace are the same write —
+  // but a replace would also delete any field the browser has never heard of, which is
+  // precisely how the phone protects the note of chapter XVI and would have been how the
+  // browser destroyed it. Symmetry here is the point.
+  const MERGE = { merge: true };
+
   push.addEventListener("click", async () => {
     push.disabled = true;
     try {
@@ -676,14 +684,14 @@ function wireSyncPanel() {
           name: String(p.name).slice(0, 120),
           archived: !!p.archived,
           ...syncFields(p.createdAt, p.deletedAt),
-        });
+        }, MERGE);
       }
       for (const r of local.rooms) {
         await fb.setDoc(roomDoc(r.id), {
           name: String(r.name).slice(0, 120),
           lengthM: num(r.lengthM), widthM: num(r.widthM), heightM: num(r.heightM),
           ...syncFields(r.createdAt, r.deletedAt),
-        });
+        }, MERGE);
       }
       for (const e of local.estimations) {
         // Estimates are a subcollection of their project, exactly as in Room.
@@ -700,7 +708,7 @@ function wireSyncPanel() {
           currencyCode: String(e.currencyCode).slice(0, 3),
           inputJson: String(e.inputJson || "{}").slice(0, 20000),
           ...syncFields(e.createdAt, e.deletedAt),
-        });
+        }, MERGE);
       }
       for (const s of local.shoppingItems) {
         // The material list, the project's other subcollection (FIRESTORE_SYNC §2). The
@@ -718,8 +726,13 @@ function wireSyncPanel() {
           estimatedCostMinor: Math.round(s.estimatedCostMinor) || 0,
           currencyCode: String(s.currencyCode || "PLN").slice(0, 3),
           isPurchased: !!s.isPurchased,
+          // Chapter XVI's note (session 18). Not named in FIRESTORE_SYNC §2 and not read
+          // by the phone yet, but it survives there: every write in the app's CloudSync is
+          // `set(..., SetOptions.merge())`, and a merge leaves keys it was not given alone.
+          // Always sent, including empty — a merge can only clear what it is handed.
+          note: String(s.note || "").slice(0, 500),
           ...syncFields(s.createdAt, s.deletedAt),
-        });
+        }, MERGE);
       }
       status(T("app_sync_pushed"));
     } catch (err) {

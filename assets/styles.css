@@ -1321,6 +1321,24 @@ a.chip:hover { text-decoration: none; }
 .data-list li.ws-mat.done .dash-fig { opacity: .6; }
 .ws-mat-tally { font-size: var(--fs-sm); }
 
+/* A material's note takes a whole line under its row rather than a third column: it is a
+   sentence, and the two things beside it are a name and a number. Chapter XVI. */
+.data-list li.ws-mat { flex-wrap: wrap; }
+.ws-mat-note { flex-basis: 100%; font-size: var(--fs-sm); }
+.data-list li.ws-mat.done .ws-mat-note { opacity: .6; }
+
+/* Editing a material, and typing one in by hand: the same form in two places, so it reads
+   and wraps the same way. One column on a phone, name-wide + two narrow + aisle above it. */
+.ws-mat-edit, .ws-mat-add form { flex-basis: 100%; }
+.ws-mat-grid { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: 0 0 var(--sp-3); }
+.ws-mat-f { display: flex; flex-direction: column; gap: 2px; flex: 1 1 12rem; min-width: 0; }
+.ws-mat-f-sm { flex: 1 1 5.5rem; }
+.ws-mat-f input, .ws-mat-f select { width: 100%; }
+.ws-mat-hint { font-size: var(--fs-xs); margin: var(--sp-3) 0 0; }
+.ws-mat-add { margin-top: var(--sp-4); }
+.ws-mat-add summary { cursor: pointer; font-weight: var(--fw-semi); }
+.ws-mat-add form { margin-top: var(--sp-3); }
+
 /* The archive is folded away: it is the part of the list that is finished. */
 .ws-archive { margin-top: var(--sp-6); }
 .ws-archive summary { cursor: pointer; font-weight: var(--fw-semi); }

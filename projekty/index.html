@@ -57,7 +57,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/projects/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260813h" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260814a" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +75,7 @@
 <meta name="twitter:title" content="Projekty i pomieszczenia — LiczMat">
 <meta name="twitter:description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu. Bez rejestracji, dane zostają w przeglądarce.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260813h">
+<link rel="stylesheet" href="/assets/styles.css?v=20260814a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -96,7 +96,7 @@
   ]
 }
 </script>
-<script>window.LM_PROJ = {"calcs":{"coverage":"/kalkulatory/farby-tynki-grunty/","waste":"/kalkulatory/plytki-panele-gres/","wallpaper":"/kalkulatory/tapety/","linear":"/kalkulatory/rozkroj-liniowy-1d/","sheet":"/kalkulatory/rozkroj-plyt-2d/","concrete":"/kalkulatory/beton-z-worka/","mortar":"/kalkulatory/klej-zaprawa/","screed":"/kalkulatory/wylewka-tynk/","grout":"/kalkulatory/fuga/","masonry":"/kalkulatory/murowanie/","insulation":"/kalkulatory/ocieplenie-etics/","studwall":"/kalkulatory/sciana-dzialowa-gk/","ceiling":"/kalkulatory/sufit-podwieszany/","drylining":"/kalkulatory/gk-na-klej/","sheathing":"/kalkulatory/poszycie-osb/"}};</script>
+<script>window.LM_PROJ = {"calcs":{"coverage":"/kalkulatory/farby-tynki-grunty/","waste":"/kalkulatory/plytki-panele-gres/","wallpaper":"/kalkulatory/tapety/","linear":"/kalkulatory/rozkroj-liniowy-1d/","sheet":"/kalkulatory/rozkroj-plyt-2d/","concrete":"/kalkulatory/beton-z-worka/","mortar":"/kalkulatory/klej-zaprawa/","screed":"/kalkulatory/wylewka-tynk/","grout":"/kalkulatory/fuga/","masonry":"/kalkulatory/murowanie/","insulation":"/kalkulatory/ocieplenie-etics/","studwall":"/kalkulatory/sciana-dzialowa-gk/","ceiling":"/kalkulatory/sufit-podwieszany/","drylining":"/kalkulatory/gk-na-klej/","sheathing":"/kalkulatory/poszycie-osb/"},"aisles":["TILES","FLOORING","TRIM","PAINT","CHEMICALS","BOARDS","WOOD","PROFILES","METAL","GLASS","TEXTILES","INSULATION","PLUMBING","ELECTRICAL","OTHER"]};</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Przejdź do treści</a>
@@ -204,6 +204,45 @@
             </div>
             <p class="muted">Lista zakupów tego projektu. Każdy zapisany wynik dokłada do niej jedną pozycję.</p>
             <ul id="ws-project-materials" class="data-list"></ul>
+
+            <!-- Chapter XVI, "dodać własny materiał": a row nothing calculated. Folded
+                 away, because the list is normally filled by the arrow from a result and
+                 this is the exception — but a real <form>, so Enter submits it. -->
+            <details class="ws-mat-add" id="ws-mat-add">
+              <summary>Dodaj własny materiał</summary>
+              <form id="ws-mat-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Pozycja</span>
+                    <input id="ws-mat-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Ilość</span>
+                    <input id="ws-mat-qty" type="text" inputmode="decimal" value="1">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Jednostka</span>
+                    <input id="ws-mat-unit" type="text" maxlength="24" list="ws-mat-units">
+                  </label>
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Alejka</span>
+                    <select id="ws-mat-cat"><option value="TILES">Płytki i gres</option><option value="FLOORING">Podłogi</option><option value="TRIM">Listwy i wykończenia</option><option value="PAINT">Farby i lakiery</option><option value="CHEMICALS">Chemia budowlana</option><option value="BOARDS">Płyty</option><option value="WOOD">Drewno</option><option value="PROFILES">Profile G-K</option><option value="METAL">Metal i zbrojenie</option><option value="GLASS">Szkło i tworzywa</option><option value="TEXTILES">Tkaniny i tapicerka</option><option value="INSULATION">Izolacja</option><option value="PLUMBING">Hydraulika i wentylacja</option><option value="ELECTRICAL">Elektryka</option><option value="OTHER">Pozostałe</option></select>
+                  </label>
+                </p>
+                <label class="ws-mat-f">
+                  <span class="ws-bar-label">Notatka</span>
+                  <input id="ws-mat-note" type="text" maxlength="500"
+                    placeholder="np. kupić w tym samym odcieniu">
+                </label>
+                <p><button type="submit" class="btn btn-primary btn-sm">Dodaj</button></p>
+              </form>
+            </details>
+
+            <!-- The units this site already writes onto a saved material, so a hand-typed
+                 row uses the same words as a calculated one instead of inventing a second
+                 vocabulary. A suggestion list, never a restriction: the field stays free
+                 text, because chapter XVI asks for the unit to be changeable. -->
+            <datalist id="ws-mat-units"><option value="opak."></option><option value="szt."></option><option value="m²"></option><option value="m"></option><option value="kg"></option><option value="l"></option></datalist>
           </section>
         </div>
       </article>
@@ -322,18 +361,18 @@
   "de": "/de/projekte/",
   "en": "/en/projects/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260813h"></script>
-<script src="/assets/i18n-runtime.js?v=20260813h"></script>
-<script src="/assets/currency.js?v=20260813h"></script>
+<script src="/assets/i18n.pl.js?v=20260814a"></script>
+<script src="/assets/i18n-runtime.js?v=20260814a"></script>
+<script src="/assets/currency.js?v=20260814a"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260813h"></script>
+<script src="/assets/account.js?v=20260814a"></script>
 
-<script src="/assets/units.js?v=20260813h"></script>
-<script src="/assets/workspace.js?v=20260813h"></script>
-<script src="/assets/workspace-ui.js?v=20260813h"></script>
-<script src="/assets/main.js?v=20260813h"></script>
+<script src="/assets/units.js?v=20260814a"></script>
+<script src="/assets/workspace.js?v=20260814a"></script>
+<script src="/assets/workspace-ui.js?v=20260814a"></script>
+<script src="/assets/main.js?v=20260814a"></script>
 
 </body>
 </html>

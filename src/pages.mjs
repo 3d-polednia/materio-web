@@ -991,7 +991,7 @@ export function androidMain(lang, t, calcs, cat) {
  * from localStorage. Without a script the index is what stands, which is right: there is
  * nothing on either screen that does not come out of this browser's own storage.
  */
-export function projectsMain(lang, t) {
+export function projectsMain(lang, t, aisles = []) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("wspage_title"), path: urlProjects(lang) },
@@ -1058,6 +1058,50 @@ export function projectsMain(lang, t) {
             </div>
             <p class="muted">${esc(t("proj_mat_d"))}</p>
             <ul id="ws-project-materials" class="data-list"></ul>
+
+            <!-- Chapter XVI, "dodać własny materiał": a row nothing calculated. Folded
+                 away, because the list is normally filled by the arrow from a result and
+                 this is the exception — but a real <form>, so Enter submits it. -->
+            <details class="ws-mat-add" id="ws-mat-add">
+              <summary>${esc(t("proj_mat_add"))}</summary>
+              <form id="ws-mat-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">${esc(t("ws_col_name"))}</span>
+                    <input id="ws-mat-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">${esc(t("ws_col_qty"))}</span>
+                    <input id="ws-mat-qty" type="text" inputmode="decimal" value="1">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">${esc(t("ws_col_unit"))}</span>
+                    <input id="ws-mat-unit" type="text" maxlength="24" list="ws-mat-units">
+                  </label>
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">${esc(t("proj_mat_aisle"))}</span>
+                    <select id="ws-mat-cat">${
+                      aisles.map((c) => `<option value="${esc(c)}">${esc(t(`cat_${c}`))}</option>`).join("")
+                    }</select>
+                  </label>
+                </p>
+                <label class="ws-mat-f">
+                  <span class="ws-bar-label">${esc(t("proj_mat_note"))}</span>
+                  <input id="ws-mat-note" type="text" maxlength="500"
+                    placeholder="${esc(t("proj_mat_note_ph"))}">
+                </label>
+                <p><button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button></p>
+              </form>
+            </details>
+
+            <!-- The units this site already writes onto a saved material, so a hand-typed
+                 row uses the same words as a calculated one instead of inventing a second
+                 vocabulary. A suggestion list, never a restriction: the field stays free
+                 text, because chapter XVI asks for the unit to be changeable. -->
+            <datalist id="ws-mat-units">${
+              [t("mu_pkg"), t("mu_pc"), "m²", "m", "kg", "l"]
+                .map((u) => `<option value="${esc(u)}"></option>`).join("")
+            }</datalist>
           </section>
         </div>
       </article>`;

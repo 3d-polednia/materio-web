@@ -48,7 +48,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260813h";
+const STAMP = "20260814a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -537,7 +537,7 @@ function buildWorkspacePages() {
   for (const lang of LANGS) {
     const t = translator(lang);
 
-    const projects = projectsMain(lang, t);
+    const projects = projectsMain(lang, t, CAT.categories);
     write(join(urlProjects(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("wspage_title")} \u2014 LiczMat`,
@@ -551,6 +551,10 @@ function buildWorkspacePages() {
       // before the script that reads it.
       headExtra: `<script>window.LM_PROJ = ${JSON.stringify({
         calcs: Object.fromEntries(CALCS.map((c) => [c.id, urlCalc(lang, c.id)])),
+        // The shop aisles, for the material the visitor edits or types in by hand
+        // (session 18). The page does not load assets/materials.js — 12 kB of catalogue
+        // to render a fifteen-item <select> — so the build hands it the list instead.
+        aisles: CAT.categories,
       })};</script>`,
       scripts: WS_SCRIPTS,
     }));

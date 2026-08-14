@@ -328,6 +328,8 @@ let wsRenaming = false;
 let wsAsking = false;
 /** The last delete, until the visitor undoes it or does something else. */
 let wsUndone = null;
+/** Which material is open for editing, or "" when none is. */
+let wsEditingItemId = "";
 
 const wsDate = (ms) => {
   const at = Number(ms);
@@ -556,29 +558,92 @@ function wsRenderMaterials(id) {
       .replace("{bought}", wsNum(bought)).replace("{count}", wsNum(rows.length));
   }
 
-  list.innerHTML = rows.map((r) => {
-    const cost = r.estimatedCostMinor > 0
-      ? `<em class="muted">${wsEsc(wsMoney(r.estimatedCostMinor, r.currencyCode))}</em>` : "";
-    const aisle = r.materialCategory
-      ? `<em class="muted">${wsEsc(wsT("cat_" + r.materialCategory))}</em>` : "";
-    return `<li class="ws-mat${r.isPurchased ? " done" : ""}" data-id="${wsEsc(r.id)}">
-        <label class="ws-mat-tick">
-          <input type="checkbox" data-buy${r.isPurchased ? " checked" : ""}>
-          <span class="ws-mat-tick-label">${wsEsc(wsT("proj_mat_buy"))}</span>
+  list.innerHTML = rows.map((r) =>
+    (r.id === wsEditingItemId ? wsMaterialForm(r) : wsMaterialRow(r))).join("");
+}
+
+/** One material as it reads: name, aisle, how much, what it costs, and the note under it. */
+function wsMaterialRow(r) {
+  const cost = r.estimatedCostMinor > 0
+    ? `<em class="muted">${wsEsc(wsMoney(r.estimatedCostMinor, r.currencyCode))}</em>` : "";
+  const aisle = r.materialCategory
+    ? `<em class="muted">${wsEsc(wsT("cat_" + r.materialCategory))}</em>` : "";
+  // Chapter XVI's note. It takes a line of its own rather than a column, because it is a
+  // sentence and the two columns beside it are a name and a number; and it is absent
+  // entirely when empty, so a list nobody annotated reads exactly as it did before.
+  const note = r.note
+    ? `<span class="ws-mat-note"><span class="muted">${wsEsc(wsT("proj_mat_note"))}</span> ${wsEsc(r.note)}</span>`
+    : "";
+  return `<li class="ws-mat${r.isPurchased ? " done" : ""}" data-id="${wsEsc(r.id)}">
+      <label class="ws-mat-tick">
+        <input type="checkbox" data-buy${r.isPurchased ? " checked" : ""}>
+        <span class="ws-mat-tick-label">${wsEsc(wsT("proj_mat_buy"))}</span>
+      </label>
+      <span class="row-name">
+        <b>${wsEsc(r.name)}</b>
+        ${aisle}
+      </span>
+      <span class="dash-fig">
+        <b>${wsNum(r.quantity)} ${wsEsc(r.unit)}</b>
+        ${cost}
+      </span>
+      <span class="row-actions">
+        <button type="button" class="btn btn-ghost btn-sm" data-edit>${wsEsc(wsT("proj_mat_edit"))}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
+      </span>
+      ${note}
+    </li>`;
+}
+
+/**
+ * The same material, open for editing — chapter XVI's four writes: the quantity, the name,
+ * the unit and the note.
+ *
+ * A form on the page, in the row it belongs to, for the reason session 15 gave when it took
+ * `prompt()` out: a browser dialog cannot be styled, cannot be reached by the page's own
+ * translation once it is open, and on a phone covers the thing being changed.
+ *
+ * **There is no price field.** A material carries `estimatedCostMinor` and editing it is
+ * chapter XVII — session 19 — so the quantity moves without the cost following it, rather
+ * than the cost being re-derived from a unit price nobody has entered.
+ */
+function wsMaterialForm(r) {
+  const aisles = ((typeof window !== "undefined" && window.LM_PROJ) || {}).aisles || [];
+  const options = (aisles.length ? aisles : [r.materialCategory || "OTHER"])
+    .map((c) => `<option value="${wsEsc(c)}"${c === r.materialCategory ? " selected" : ""}>${wsEsc(wsT("cat_" + c))}</option>`)
+    .join("");
+  return `<li class="ws-mat ws-editing" data-id="${wsEsc(r.id)}">
+      <form class="ws-mat-edit" data-mat-edit>
+        <p class="ws-mat-grid">
+          <label class="ws-mat-f">
+            <span class="ws-bar-label">${wsEsc(wsT("ws_col_name"))}</span>
+            <input type="text" maxlength="120" data-f="name" value="${wsEsc(r.name)}" required>
+          </label>
+          <label class="ws-mat-f ws-mat-f-sm">
+            <span class="ws-bar-label">${wsEsc(wsT("ws_col_qty"))}</span>
+            <input type="text" inputmode="decimal" data-f="quantity" value="${wsEsc(wsPlain(r.quantity))}">
+          </label>
+          <label class="ws-mat-f ws-mat-f-sm">
+            <span class="ws-bar-label">${wsEsc(wsT("ws_col_unit"))}</span>
+            <input type="text" maxlength="24" data-f="unit" value="${wsEsc(r.unit)}" list="ws-mat-units">
+          </label>
+          <label class="ws-mat-f">
+            <span class="ws-bar-label">${wsEsc(wsT("proj_mat_aisle"))}</span>
+            <select data-f="materialCategory">${options}</select>
+          </label>
+        </p>
+        <label class="ws-mat-f">
+          <span class="ws-bar-label">${wsEsc(wsT("proj_mat_note"))}</span>
+          <input type="text" maxlength="500" data-f="note" value="${wsEsc(r.note || "")}"
+            placeholder="${wsEsc(wsT("proj_mat_note_ph"))}">
         </label>
-        <span class="row-name">
-          <b>${wsEsc(r.name)}</b>
-          ${aisle}
-        </span>
-        <span class="dash-fig">
-          <b>${wsNum(r.quantity)} ${wsEsc(r.unit)}</b>
-          ${cost}
-        </span>
-        <span class="row-actions">
-          <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
-        </span>
-      </li>`;
-  }).join("");
+        <p class="muted ws-mat-hint">${wsEsc(wsT("proj_mat_phone"))}</p>
+        <p class="ws-ask-row">
+          <button type="submit" class="btn btn-primary btn-sm">${wsEsc(wsT("app_save"))}</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-cancel>${wsEsc(wsT("action_cancel"))}</button>
+        </p>
+      </form>
+    </li>`;
 }
 
 /**
@@ -647,7 +712,12 @@ function wsRenderProject(id) {
 function wsRenderWorkspace() {
   const detail = document.getElementById("ws-project");
   if (!detail) return;
+  const was = wsOpenId;
   wsOpenId = wsUrlId();
+  // A half-finished edit belongs to the material it was opened on. Leaving the project, or
+  // opening another one, ends it — carrying it across would put somebody's typing into a
+  // row on a different screen.
+  if (wsOpenId !== was) wsEditingItemId = "";
   const index = document.getElementById("ws-index");
 
   detail.hidden = !wsOpenId;
@@ -840,6 +910,60 @@ function wireProjectDetail() {
     if (!li) return;
     if (e.target.closest("[data-buy]")) wsSetItemPurchased(li.dataset.id, e.target.checked);
     else if (e.target.closest("[data-del]")) wsDeleteItem(li.dataset.id);
+    else if (e.target.closest("[data-edit]")) {
+      wsEditingItemId = li.dataset.id;
+      wsRenderWorkspace();
+      const first = document.querySelector('#ws-project-materials [data-f="name"]');
+      if (first) { first.focus(); first.select(); }
+    } else if (e.target.closest("[data-cancel]")) {
+      wsEditingItemId = "";
+      wsRenderWorkspace();
+    }
+  });
+
+  // Chapter XVI's four writes, in one submit: the quantity, the name, the unit, the note.
+  on("ws-project-materials", "submit", (e) => {
+    const form = e.target.closest("[data-mat-edit]");
+    if (!form) return;
+    e.preventDefault();
+    const li = form.closest("li[data-id]");
+    const get = (f) => {
+      const el = form.querySelector(`[data-f="${f}"]`);
+      return el ? el.value : undefined;
+    };
+    if (!String(get("name")).trim()) return; // a material with no name cannot be shopped for
+    wsEditingItemId = "";
+    // The store fires `workspacechange`, which redraws the screen — so what appears is what
+    // was actually written, not what was typed at it.
+    if (!wsUpdateItem(li.dataset.id, {
+      name: get("name"),
+      quantity: wsDecimal(get("quantity")),
+      unit: get("unit"),
+      materialCategory: get("materialCategory"),
+      note: get("note"),
+    })) wsRenderWorkspace();
+  });
+
+  // Chapter XVI's "dodać własny materiał".
+  on("ws-mat-form", "submit", (e) => {
+    e.preventDefault();
+    const el = (id) => document.getElementById(id);
+    const name = el("ws-mat-name").value.trim();
+    if (!name || !wsOpenId) return;
+    const made = wsAddOwnItem({
+      projectId: wsOpenId,
+      name,
+      materialCategory: el("ws-mat-cat").value,
+      quantity: wsDecimal(el("ws-mat-qty").value),
+      unit: el("ws-mat-unit").value.trim(),
+      note: el("ws-mat-note").value.trim(),
+    });
+    if (!made) return;
+    // The name and the note are about one material and go; the quantity, the unit and the
+    // aisle are usually the same for the next two rows and stay.
+    el("ws-mat-name").value = "";
+    el("ws-mat-note").value = "";
+    el("ws-mat-name").focus();
   });
 }
 

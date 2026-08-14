@@ -125,7 +125,8 @@ function fixture() {
       // Chapter XVI's own example list: tiles, adhesive, grout.
       item("s1", "p1", "e1", "Gres 60×60", "TILES", 15, "opak.", 74985, T0 + 1 * DAY),
       item("s2", "p1", "e2", "Klej C2 25 kg", "CHEMICALS", 7, "worków", 21000, T0 + 2 * DAY),
-      item("s3", "p1", null, "Fuga", "CHEMICALS", 4, "kg", 6000, T0 + 3 * DAY),
+      { ...item("s3", "p1", null, "Fuga", "CHEMICALS", 4, "kg", 6000, T0 + 3 * DAY),
+        note: "antracyt, ten sam co w kuchni" },
       // Somebody else's project — it must not show up on this one.
       item("s4", "p2", null, "Farba biała", "PAINT", 3, "opak.", 18900, T0 + 4 * DAY),
       // A tombstone is not a row.
@@ -373,15 +374,153 @@ head("3b. deleting the project takes the list, and the undo brings it back");
   await page.close();
 }
 
+/* ------------------------------------------------------ 3c. session 18: editing */
+
+head("3c. editing a material, in the row it belongs to");
+{
+  const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: fixture(), active: "p1" });
+
+  // Chapter XVI's note reads on the row when there is one, and takes no space when there
+  // is not — the first two materials of the fixture have none.
+  const drawn = await rows(page, MATS);
+  check("a material with a note shows it", drawn[2].includes("antracyt"), drawn[2]);
+  check("one without does not invent an empty line",
+    !drawn[0].includes("Notatka"), drawn[0]);
+
+  await page.click(`${MATS} li[data-id="s1"] [data-edit]`);
+  await page.waitForSelector(`${MATS} li[data-id="s1"] form[data-mat-edit]`);
+  eq("the form opens on that row and no other",
+    await page.$$eval(`${MATS} form[data-mat-edit]`, (f) => f.length), 1);
+  eq("it opens with the material's own name",
+    await page.$eval(`${MATS} [data-f="name"]`, (n) => n.value), "Gres 60×60");
+  eq("its own quantity", await page.$eval(`${MATS} [data-f="quantity"]`, (n) => n.value), "15");
+  eq("its own unit", await page.$eval(`${MATS} [data-f="unit"]`, (n) => n.value), "opak.");
+  eq("and its own aisle selected",
+    await page.$eval(`${MATS} [data-f="materialCategory"]`, (n) => n.value), "TILES");
+  // Chapter XVII is session 19: there is nothing here that edits money.
+  eq("there is no price field", await page.$$eval(`${MATS} [data-f="cost"]`, (n) => n.length), 0);
+  // Session 15 took prompt() out of this page; it must not come back through this door.
+  check("and no browser dialog is involved",
+    !(await page.content()).includes("prompt("));
+
+  await page.fill(`${MATS} [data-f="name"]`, "Gres 60×60 szary");
+  await page.fill(`${MATS} [data-f="quantity"]`, "26,4");
+  await page.fill(`${MATS} [data-f="unit"]`, "m²");
+  await page.selectOption(`${MATS} [data-f="materialCategory"]`, "FLOORING");
+  await page.fill(`${MATS} [data-f="note"]`, "ten sam odcień co w kuchni");
+  await page.click(`${MATS} form[data-mat-edit] button[type=submit]`);
+  await page.waitForFunction(() => {
+    const ws = JSON.parse(localStorage.getItem("materio-workspace-v1") || "{}");
+    return (ws.shoppingItems || []).some((s) => s.id === "s1" && s.name === "Gres 60×60 szary");
+  });
+
+  const saved = (await items(page)).find((s) => s.id === "s1");
+  eq("the name is written", saved.name, "Gres 60×60 szary");
+  // A comma is the decimal point in three of these four languages.
+  eq("the quantity is read as a decimal", saved.quantity, 26.4);
+  eq("the unit is written", saved.unit, "m²");
+  eq("the aisle is written", saved.materialCategory, "FLOORING");
+  eq("the note is written", saved.note, "ten sam odcień co w kuchni");
+  eq("the cost is untouched — chapter XVII is session 19", saved.estimatedCostMinor, 74985);
+  eq("and the link back to the calculation survives", saved.estimationId, "e1");
+
+  const back = await rows(page, MATS);
+  eq("the form closed", await page.$$eval(`${MATS} form[data-mat-edit]`, (f) => f.length), 0);
+  check("and the row reads what was saved", back[0].includes("Gres 60×60 szary"), back[0]);
+  check("with the new quantity and unit", /26,4 m²/.test(back[0]), back[0]);
+  check("the new aisle", back[0].includes("Podłogi"), back[0]);
+  check("and the note under it", back[0].includes("ten sam odcień"), back[0]);
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
+}
+
+head("3d. an edit can be abandoned");
+{
+  const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: fixture(), active: "p1" });
+  await page.click(`${MATS} li[data-id="s1"] [data-edit]`);
+  await page.waitForSelector(`${MATS} form[data-mat-edit]`);
+  await page.fill(`${MATS} [data-f="name"]`, "Coś zupełnie innego");
+  await page.click(`${MATS} form[data-mat-edit] [data-cancel]`);
+  await page.waitForSelector(`${MATS} form[data-mat-edit]`, { state: "detached" });
+  eq("nothing was written", (await items(page)).find((s) => s.id === "s1").name, "Gres 60×60");
+  check("and the row reads what it always did",
+    (await rows(page, MATS))[0].includes("Gres 60×60"));
+
+  // A material cannot lose its name: it is what the visitor shops by.
+  await page.click(`${MATS} li[data-id="s1"] [data-edit]`);
+  await page.waitForSelector(`${MATS} form[data-mat-edit]`);
+  await page.fill(`${MATS} [data-f="name"]`, "   ");
+  await page.click(`${MATS} form[data-mat-edit] button[type=submit]`);
+  eq("an empty name does not save", (await items(page)).find((s) => s.id === "s1").name, "Gres 60×60");
+
+  // Leaving the project ends the edit — it belongs to a row on a screen being left.
+  await page.click("[data-ws-back]");
+  await page.waitForSelector("#ws-index:not([hidden])");
+  await page.goBack();
+  await page.waitForSelector("#ws-project-body:not([hidden])");
+  eq("and it is not still open on the way back",
+    await page.$$eval(`${MATS} form[data-mat-edit]`, (f) => f.length), 0);
+  await page.close();
+}
+
+head("3e. a material typed in by hand");
+{
+  const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: fixture(), active: "p1" });
+  const add = await page.$("#ws-mat-add");
+  check("the page offers it", Boolean(add));
+  eq("folded away, because the arrow from a result is the usual way in",
+    await page.$eval("#ws-mat-add", (n) => n.open), false);
+
+  await page.click("#ws-mat-add summary");
+  await page.fill("#ws-mat-name", "Silikon sanitarny");
+  await page.fill("#ws-mat-qty", "2");
+  await page.fill("#ws-mat-unit", "szt.");
+  await page.selectOption("#ws-mat-cat", "CHEMICALS");
+  await page.fill("#ws-mat-note", "biały");
+  await page.click("#ws-mat-form button[type=submit]");
+  await page.waitForFunction(() => {
+    const ws = JSON.parse(localStorage.getItem("materio-workspace-v1") || "{}");
+    return (ws.shoppingItems || []).some((s) => s.name === "Silikon sanitarny");
+  });
+
+  const own = (await items(page)).find((s) => s.name === "Silikon sanitarny");
+  eq("it lands on the open project", own.projectId, "p1");
+  eq("with the quantity typed", own.quantity, 2);
+  eq("the unit typed", own.unit, "szt.");
+  eq("the aisle chosen", own.materialCategory, "CHEMICALS");
+  eq("the note typed", own.note, "biały");
+  eq("and nothing calculated it", own.estimationId, null);
+  eq("it is not on the estimate either",
+    (await store(page)).estimations.filter((e) => !e.deletedAt).length, 2);
+
+  eq("the list grew by one", (await rows(page, MATS)).length, 4);
+  eq("the tally follows", await text(page, "#ws-mat-tally"), "kupione 0 z 4");
+
+  // The name and the note are about one material; the unit and the aisle are usually the
+  // same for the next two rows, so they stay and the next row is two fields of typing.
+  eq("the name field is cleared for the next one",
+    await page.$eval("#ws-mat-name", (n) => n.value), "");
+  eq("and the note", await page.$eval("#ws-mat-note", (n) => n.value), "");
+  eq("but the unit stays", await page.$eval("#ws-mat-unit", (n) => n.value), "szt.");
+  eq("and the aisle stays", await page.$eval("#ws-mat-cat", (n) => n.value), "CHEMICALS");
+
+  // A row with no name is a row nobody can shop for; the form is `required`, so the
+  // browser refuses before anything is written.
+  await page.click("#ws-mat-form button[type=submit]");
+  eq("an empty name adds nothing", (await rows(page, MATS)).length, 4);
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
+}
+
 /* ------------------------------------------------------------------ 4. languages */
 
 head("4. four languages");
 {
   const WANT = {
-    pl: ["Materiały", "Płytki i gres", "kupione 0 z 3", "Kupione"],
-    en: ["Materials", "Tiles", "bought 0 of 3", "Bought"],
-    de: ["Material", "Fliesen", "gekauft 0 von 3", "Gekauft"],
-    uk: ["Матеріали", "Плитка", "куплено 0 з 3", "Куплено"],
+    pl: ["Materiały", "Płytki i gres", "kupione 0 z 3", "Kupione", "Dodaj własny materiał"],
+    en: ["Materials", "Tiles", "bought 0 of 3", "Bought", "Add your own material"],
+    de: ["Material", "Fliesen", "gekauft 0 von 3", "Gekauft", "Eigenes Material hinzufügen"],
+    uk: ["Матеріали", "Плитка", "куплено 0 з 3", "Куплено", "Додати власний матеріал"],
   };
   for (const lang of LANGS) {
     const page = await open(ctx, `${urlProjects(lang)}?id=p1`,
@@ -396,6 +535,9 @@ head("4. four languages");
     // The material's own name is text in the contract and is the visitor's own words —
     // it is the one thing on the row that does not translate, exactly as on the phone.
     check(`${lang}: the material's own name is left alone`, body.includes("Gres 60×60"));
+    check(`${lang}: the add form is translated`, body.includes(WANT[lang][4]), WANT[lang][4]);
+    // The note is the visitor's own words, so it is the other thing that does not translate.
+    check(`${lang}: and so is the note they wrote`, body.includes("antracyt"));
     check(`${lang}: no error in the console`, page.errors.length === 0, page.errors.join("\n      "));
     await page.close();
   }

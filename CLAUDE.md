@@ -86,7 +86,7 @@ node scripts/test-account.mjs     # the account: levels, the session, the copy
 node scripts/test-dashboard.mjs   # the dashboard: the route, the tool list, the copy
 node scripts/test-projects.mjs    # projects: the route, the CRUD, the undo, the copy
 node scripts/test-save.mjs        # saving a calculation: the snapshot, the project, the copy
-node scripts/test-materials.mjs   # the material list: the document, the arrow, the copy
+node scripts/test-materials.mjs   # the material list: the document, the arrow, editing, the copy
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -183,12 +183,15 @@ scripts/test-materials.mjs  The material list of a project: the `shoppingItems` 
                       and the deployed validShoppingItem() rule), the arrow that puts a
                       material on the list when a calculation is saved, the cascade when the
                       project goes and the undo that brings it back, and the copy in four
-                      languages. Dependency-free — run it after touching the material half of
+                      languages, plus session 18: editing a material, typing one in by hand,
+                      the unit list and the one field this repo keeps beside the contract
+                      (`note`). Dependency-free — run it after touching the material half of
                       assets/workspace.js, wsRenderMaterials() or a proj_mat_* key
 scripts/test-materials-page.mjs  The same arrow clicked in Chromium, nothing stubbed: a real
                       calculator page, "Dodaj do projektu", and the material on the project
-                      screen one navigation later; ticking it off, taking it off, four
-                      languages, the currency switch and the widths of chapter XXVIII
+                      screen one navigation later; ticking it off, editing it in place,
+                      typing one in by hand, taking it off, four languages, the currency
+                      switch and the widths of chapter XXVIII
 scripts/test-save-page.mjs  The same arrow clicked through in Chromium, nothing stubbed:
                       result → project picker → saved line → the project screen reading it
                       back, including a line saved in Polish and read in German after
@@ -382,11 +385,24 @@ Kotlin side of it. Change one, change all three.
   half, in the same order and with the same fields. Two fields differ from an estimate
   line and both matter: `quantity` is a **number**, not an integer (a line can only say
   26, a material can say 26,4 m² — chapter XVI's own example), and `materialCategory` is a
-  free string here rather than an enum name, because it is the shop aisle. **Do not add a
-  field to the document** — a note, a supplier, a link: `shoppingItemToDoc()` builds it
-  from a fixed map and the phone erases anything else, silently, exactly as it would a
-  project description. Chapter XVI's note is therefore a contract change and waits for
-  session 18. `docs/ARCHITEKTURA.md` §7.2.
+  free string here rather than an enum name, because it is the shop aisle.
+  `docs/ARCHITEKTURA.md` §7.2.
+- **An extra field on a synced document is NOT erased by the phone — sessions 15, 16 and 17
+  all said it was, and were wrong.** The half they had right: `SyncContract.*ToDoc()` builds
+  each document from a fixed map, so a field the browser invents is never in what the phone
+  sends. The half they missed: `CloudSync.pushLocal()` sends it with
+  `.set(map, SetOptions.merge())`, and a Firestore merge writes only the keys it is handed
+  and leaves every other key on the document alone. **Every** write in `CloudSync.kt` is a
+  merge, tombstones included. So the fixed map cannot erase what it does not mention. Read
+  it in `3d-polednia/Materio` before relying on either version of this.
+  That is what lets session 18 put chapter XVI's **note** on the material as a plain `note`
+  field: the deployed rules validate `validShoppingItem()` by shape and have no `hasOnly`,
+  so the write is accepted; `shoppingItemFromDoc()` reads by key and ignores what it does
+  not know; and the merge carries it back. What it does **not** buy is visibility — the
+  phone has no column for it, so the note is invisible there and missing from the app's CSV
+  until the app repo adds one. The note is carried, not lost, and the page says so.
+  `assets/app.js` now pushes with `{ merge: true }` for the same reason the app does: the
+  browser knowing every contract field is not the same as the browser knowing every field.
 - **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms,
   estimate lines and materials in `localStorage` in the *same document shape* as Firestore,
   so the sync tab in `/app/` is a plain copy in either direction. Counting must never

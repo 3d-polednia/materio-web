@@ -75,7 +75,8 @@ function loadWorkspace(seed) {
     "wsDeleteProject", "wsRestoreProject",
     "wsActiveProjectId", "wsSetActiveProject",
     "wsEstimations", "wsAddEstimation", "wsAddManualEstimation", "wsDeleteEstimation",
-    "wsItems", "wsItem", "wsAddItem", "wsSetItemPurchased", "wsDeleteItem", "wsItemsTotal",
+    "wsItems", "wsItem", "wsAddItem", "wsAddOwnItem", "wsUpdateItem",
+    "wsSetItemPurchased", "wsDeleteItem", "wsItemsTotal", "WS_NOTE_MAX",
     "wsExport", "wsImport",
   ], {
     localStorage,
@@ -147,10 +148,22 @@ head("1. the material is the contract's document and nothing else");
     "estimatedCostMinor", "currencyCode", "isPurchased",
     "createdAt", "updatedAt", "deletedAt", "schemaVersion",
   ];
+  /**
+   * The one field beside the contract, and it is deliberate — chapter XVI's note, added in
+   * session 18. It is listed here separately rather than folded into CONTRACT so that a
+   * *second* invented field still fails this check.
+   *
+   * It survives the phone because `CloudSync.pushLocal()` writes every document with
+   * `SetOptions.merge()`, and a merge leaves keys it was not handed alone. Sessions 15, 16
+   * and 17 all said the opposite; the fixed map in `shoppingItemToDoc()` is real, but a
+   * fixed map cannot erase what it does not mention when the write is a merge.
+   */
+  const EXTENSION = ["note"];
   const extra = Object.keys(item).filter((k) => !CONTRACT.includes(k));
   const missing = CONTRACT.filter((k) => !(k in item));
-  eq("no field the contract does not carry", extra.join(","), "");
+  eq("the only field beside the contract is the note", extra.join(","), EXTENSION.join(","));
   eq("and none of the contract's own missing", missing.join(","), "");
+  eq("the note is a string, even when nobody wrote one", typeof item.note, "string");
 
   // The rules validate types before anything else does (validShoppingItem, deployed).
   eq("name is a string", typeof item.name, "string");
@@ -187,6 +200,12 @@ head("1. the material is the contract's document and nothing else");
   eq("materialCategory is cut to 40", long.materialCategory.length, 40);
   eq("unit is cut to 24", long.unit.length, 24);
   eq("estimationId is cut to 64", long.estimationId.length, 64);
+  const noted = ws2.wsAddItem({
+    projectId: project.id, name: "Klej", materialCategory: "CHEMICALS",
+    quantity: 1, unit: "worek", costMajor: 1, currencyCode: "PLN",
+    note: "n".repeat(2000),
+  });
+  eq("and the note to its own cap", noted.note.length, ws2.WS_NOTE_MAX);
   eq("a negative quantity is refused, not stored", long.quantity, 0);
   eq("and so is a negative cost", long.estimatedCostMinor, 0);
   }
@@ -379,6 +398,155 @@ head("3c. deleting one calculation leaves its material, exactly as on the phone"
     at(ws.wsItems(row.projectId)).estimationId, row.id);
 }
 
+/* ------------------------------------------------ 3e-3h. session 18: editing */
+
+head("3e. editing a material — chapter XVI's four writes");
+{
+  const ws = loadWorkspace();
+  const row = save(ws);
+  const item = at(ws.wsItems(row.projectId));
+  ws.tick();
+
+  const done = ws.wsUpdateItem(item.id, {
+    name: "Gres 60×60 szary",
+    quantity: 26.4,
+    unit: "m²",
+    materialCategory: "FLOORING",
+    note: "ten sam odcień co w kuchni",
+  });
+  eq("the name changes", done.name, "Gres 60×60 szary");
+  eq("the quantity changes, and keeps its decimals", done.quantity, 26.4);
+  eq("the unit changes", done.unit, "m²");
+  eq("the aisle changes", done.materialCategory, "FLOORING");
+  eq("the note is written", done.note, "ten sam odcień co w kuchni");
+  check("and updatedAt moved, so the phone hears about it", done.updatedAt > done.createdAt);
+  eq("createdAt did not move", done.createdAt, item.createdAt);
+
+  // The price is chapter XVII, session 19. Changing the quantity must not silently
+  // re-derive a cost from a unit price nobody has entered.
+  eq("the cost is left exactly where it was", done.estimatedCostMinor, item.estimatedCostMinor);
+  eq("and so is the currency", done.currencyCode, item.currencyCode);
+  eq("the link back to the calculation survives an edit", done.estimationId, row.id);
+
+  // Anything not passed keeps its value — the same rule as wsUpdateProject/wsUpdateEstimation.
+  ws.tick();
+  const partial = ws.wsUpdateItem(item.id, { quantity: 30 });
+  eq("an edit of one field leaves the others", partial.name, "Gres 60×60 szary");
+  eq("and the note", partial.note, "ten sam odcień co w kuchni");
+  eq("while the one field moves", partial.quantity, 30);
+
+  // The same clamps as a fresh row: the rules are the last gate and they refuse the rest.
+  const clamped = ws.wsUpdateItem(item.id, {
+    name: "n".repeat(400), unit: "u".repeat(90), quantity: -5, note: "x".repeat(2000),
+  });
+  eq("a long name is cut, not refused", clamped.name.length, 120);
+  eq("a long unit too", clamped.unit.length, 24);
+  eq("a negative quantity becomes zero", clamped.quantity, 0);
+  eq("and the note is capped", clamped.note.length, ws.WS_NOTE_MAX);
+
+  // A name is the only thing a row cannot do without: it is what the visitor shops by.
+  eq("an empty name is refused outright", ws.wsUpdateItem(item.id, { name: "   " }), null);
+  eq("and the row is untouched by the refusal", at(ws.wsItems(row.projectId)).name.length, 120);
+
+  // Editing something that is not there, or is a tombstone, answers null rather than
+  // resurrecting it.
+  eq("an unknown material cannot be edited", ws.wsUpdateItem("nope", { name: "x" }), null);
+  ws.wsDeleteItem(item.id);
+  eq("nor can a deleted one", ws.wsUpdateItem(item.id, { name: "x" }), null);
+}
+
+head("3f. a material typed in by hand — chapter XVI's own material");
+{
+  const ws = loadWorkspace();
+  const project = ws.wsAddProject("Łazienka");
+  ws.tick();
+  const own = ws.wsAddOwnItem({
+    projectId: project.id,
+    name: "Silikon sanitarny",
+    materialCategory: "CHEMICALS",
+    quantity: 2,
+    unit: "szt.",
+    note: "biały",
+  });
+  check("it lands on the list", Boolean(own));
+  eq("on the right project", own.projectId, project.id);
+  eq("with the name typed", own.name, "Silikon sanitarny");
+  eq("the quantity typed", own.quantity, 2);
+  eq("the unit typed", own.unit, "szt.");
+  eq("the aisle chosen", own.materialCategory, "CHEMICALS");
+  eq("and the note typed", own.note, "biały");
+
+  // No calculator behind it, so there is no calculation to point at — the same answer
+  // session 16 gave a hand-typed estimate line, for the same reason.
+  eq("nothing calculated it, so it points at no calculation", own.estimationId, null);
+  eq("and it costs nothing until session 19 gives it a price", own.estimatedCostMinor, 0);
+  eq("it is not on the estimate", ws.wsEstimations(project.id).length, 0);
+
+  // It is an ordinary material in every other way.
+  ws.tick();
+  eq("it ticks off like any other", ws.wsSetItemPurchased(own.id, true).isPurchased, true);
+  eq("it edits like any other", ws.wsUpdateItem(own.id, { quantity: 3 }).quantity, 3);
+  const token = ws.wsDeleteProject(project.id);
+  eq("and it goes with the project", token.items.length, 1);
+  ws.wsRestoreProject(token);
+  eq("and comes back with it", ws.wsItems(project.id).length, 1);
+
+  // A row with no name is a row nobody can shop for.
+  eq("a nameless material is refused", ws.wsAddOwnItem({ projectId: project.id, name: "  " }), null);
+  eq("nothing landed", ws.wsItems(project.id).length, 1);
+
+  // Without a project named, it goes to the active one — the same fallback the save box uses.
+  ws.wsSetActiveProject(project.id);
+  const active = ws.wsAddOwnItem({ name: "Grunt", quantity: 1, unit: "szt." });
+  eq("no project named means the active project", active.projectId, project.id);
+  eq("and the aisle falls back to OTHER", active.materialCategory, "OTHER");
+}
+
+head("3g. the note survives the round trip");
+{
+  const ws = loadWorkspace();
+  const project = ws.wsAddProject("P");
+  const own = ws.wsAddOwnItem({
+    projectId: project.id, name: "Fuga", materialCategory: "CHEMICALS",
+    quantity: 4, unit: "kg", note: "antracyt",
+  });
+
+  // The note is always on the document, empty or not: the push is a merge, so the only way
+  // to *clear* one remotely is to send the empty string. A key left out stays put.
+  const plain = ws.wsAddOwnItem({ projectId: project.id, name: "Klej", quantity: 1, unit: "szt." });
+  eq("a material with no note still carries the field", plain.note, "");
+  ws.tick();
+  eq("a note can be cleared", ws.wsUpdateItem(own.id, { note: "" }).note, "");
+  eq("and written again", ws.wsUpdateItem(own.id, { note: "antracyt" }).note, "antracyt");
+  eq("and it is trimmed on the way in", ws.wsUpdateItem(own.id, { note: "  szary  " }).note, "szary");
+
+  const dump = ws.wsExport();
+  const fresh = loadWorkspace();
+  fresh.wsImport(dump);
+  eq("an exported and re-imported note is the same note",
+    at(fresh.wsItems(project.id)).note, "szary");
+}
+
+head("3h. the units a hand-typed material is offered");
+{
+  // Chapter XVI asks for the unit to be changeable, so the field is free text and the list
+  // is only a suggestion. What it suggests has to exist in every language, or a German
+  // visitor is offered a Polish abbreviation.
+  for (const lang of LANGS) {
+    for (const key of ["mu_pkg", "mu_pc"]) {
+      check(`${lang}: ${key} is a real word`, Boolean(DICT[lang][key]) && DICT[lang][key] !== key,
+        DICT[lang][key]);
+    }
+  }
+  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), MAT_CATS);
+  check("the page carries the suggestion list", main.includes('id="ws-mat-units"'));
+  for (const unit of ["m²", "kg", "l"]) {
+    check(`it offers ${unit}`, main.includes(`value="${unit}"`), unit);
+  }
+  check("and the unit field points at it", /data-|list="ws-mat-units"/.test(main)
+    || main.includes('list="ws-mat-units"'));
+}
+
 head("3d. the store carries materials in and out with everything else");
 {
   const ws = loadWorkspace();
@@ -419,8 +587,13 @@ head("3d. the store carries materials in and out with everything else");
 
 head("4. the build writes the frame the list is drawn into");
 {
-  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG));
-  const needs = ["ws-project-materials", "ws-mat-tally"];
+  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), MAT_CATS);
+  const needs = [
+    "ws-project-materials", "ws-mat-tally",
+    // Session 18: the form that types a material in by hand.
+    "ws-mat-add", "ws-mat-form", "ws-mat-name", "ws-mat-qty", "ws-mat-unit",
+    "ws-mat-cat", "ws-mat-note", "ws-mat-units",
+  ];
   for (const id of needs) check(`the frame has #${id}`, main.includes(`id="${id}"`));
   check("the list is a .data-list, the component every other list on the page uses",
     /id="ws-project-materials" class="data-list"/.test(main));
@@ -430,18 +603,34 @@ head("4. the build writes the frame the list is drawn into");
     main.indexOf("ws-project-materials") > main.indexOf('id="ws-project-body"')
     && main.indexOf("ws-project-materials") < main.indexOf('id="ws-index"'));
 
+  // The aisle picker is filled by the build rather than by loading the 12 kB catalogue on
+  // a page that needs fifteen words out of it.
+  for (const cat of MAT_CATS) {
+    check(`the aisle picker offers ${cat}`, main.includes(`<option value="${cat}">`), cat);
+  }
+  check("with the aisle named in words, not as the enum",
+    main.includes(`>${tr(DEFAULT_LANG)("cat_TILES")}<`));
+
   // The frame is server-rendered in every language, so the section exists with the script
   // off; what is missing then is the rows, which come out of this browser's own storage.
   for (const lang of LANGS) {
-    const built = projectsMain(lang, tr(lang)).main;
+    const built = projectsMain(lang, tr(lang), MAT_CATS).main;
     check(`${lang}: the section is in the page`, built.includes('id="ws-project-materials"'));
     check(`${lang}: with the heading in that language`, built.includes(tr(lang)("proj_mat_t")));
+    check(`${lang}: and the add form in that language`, built.includes(tr(lang)("proj_mat_add")));
+    check(`${lang}: nothing in the frame shows a raw key`,
+      !/\b(proj_mat_[a-z_]+|cat_[A-Z]+|ws_col_[a-z]+)\b/.test(built));
   }
 }
 
 head("5. the copy exists in all four languages");
 {
-  const KEYS = ["proj_mat_t", "proj_mat_d", "proj_mat_empty", "proj_mat_tally", "proj_mat_buy"];
+  const KEYS = [
+    "proj_mat_t", "proj_mat_d", "proj_mat_empty", "proj_mat_tally", "proj_mat_buy",
+    // Session 18.
+    "proj_mat_add", "proj_mat_aisle", "proj_mat_note", "proj_mat_note_ph",
+    "proj_mat_edit", "proj_mat_edit_t", "proj_mat_phone",
+  ];
   for (const lang of LANGS) {
     for (const key of KEYS) {
       check(`${lang}: ${key} is translated`,

@@ -43,8 +43,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 15 | Projekty (CRUD) | **Zrobione** — 2026-08-13 |
 | 16 | Zapis kalkulacji | **Zrobione** — 2026-08-13 |
 | 17 | Listy materiałów | **Zrobione** — 2026-08-13 |
-| 18 | Edycja materiałów | **Następna** |
-| 19–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 18 | Edycja materiałów | **Zrobione** — 2026-08-14 |
+| 19 | Koszty projektu | **Następna** |
+| 20–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -147,6 +148,89 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 18
+
+Rozdział XXXII wymienia pięć rzeczy: **edycja, własne materiały, jednostki, ilości,
+notatki**. Rozdział XVI mówi to samo pełnym zdaniem: użytkownik ma móc „edytować ilość,
+zmienić nazwę, zmienić jednostkę, usunąć materiał, dodać własny materiał, dodać notatkę”.
+Usunięcie zrobiła Sesja 17. Ta robi pozostałe pięć — łącznie z notatką, której trzy
+poprzednie sesje uznały za niemożliwą.
+
+**Notatka jest możliwa, a powód, dla którego nie była, był nieprawdziwy.** Sesje 15, 16
+i 17 napisały — każda powołując się na poprzednią — że pole dołożone do dokumentu obok
+kontraktu zostanie skasowane przez telefon „bez słowa”. Sprawdziłem to w kodzie zamiast
+przepisać po raz czwarty. Połowa jest prawdą: `SyncContract.*ToDoc()` faktycznie buduje
+dokument z ustalonej mapy, więc telefon nigdy takiego pola nie wyśle. Druga połowa była
+błędna — `CloudSync.pushLocal()` wysyła tę mapę tak:
+
+```kotlin
+.set(SyncContract.shoppingItemToDoc(item, estimationRemoteId), SetOptions.merge())
+```
+
+**Merge zapisuje wyłącznie klucze, które dostał.** Pozostałe pola dokumentu zostają
+nietknięte. Każdy zapis w `CloudSync.kt` jest merge'em, nagrobki też. Ustalona mapa nie
+kasuje tego, o czym nie wspomina.
+
+Sprawdziłem też trzy pozostałe bramki, każdą w pliku:
+
+- wdrożone reguły walidują `validShoppingItem()` po kształcie i **nie mają `hasOnly`** →
+  serwer zapis przyjmuje;
+- `shoppingItemFromDoc()` czyta po kluczach i ignoruje nieznane → nie zepsuje kopii
+  w telefonie;
+- nic po stronie telefonu nie nadpisuje pozycji zakupowej bez merge'a.
+
+Notatka siedzi więc w polu `note` na pozycji zakupowej, limit 500 znaków, i **przeżywa
+synchronizację w obie strony**. Czego to nie daje: telefon jej nie **pokaże**, bo
+`ShoppingItemEntity` nie ma kolumny — jest niewidoczna w aplikacji i nie ma jej w tamtejszym
+eksporcie CSV, dopóki repo aplikacji nie doda kolumny. Notatka jest **przenoszona, nie
+gubiona**, i formularz mówi to odwiedzającemu wprost, zamiast obiecywać coś, czego nie ma.
+To jedyne pole w całym magazynie poza kontraktem i test pilnuje, że **jedyne** — drugie
+wymyślone pole nadal wywala sprawdzenie.
+
+**Edycja jest formularzem w wierszu materiału.** Zmienia nazwę, ilość, jednostkę, alejkę
+i notatkę — cztery z pięciu punktów rozdziału XXXII naraz. Nie `prompt()`, z tego samego
+powodu, dla którego Sesja 15 go stąd wyrzuciła. **Ceny w formularzu nie ma i to jest
+świadome**: `estimatedCostMinor` to rozdział XVII, czyli Sesja 19, więc zmiana ilości
+zostawia koszt tam, gdzie był, zamiast przeliczać go z ceny jednostkowej, której nikt
+jeszcze nie podał. Test sprawdza wprost, że pola ceny nie ma.
+
+**Własny materiał to wiersz, którego nic nie policzyło.** `estimationId` jest `null`, koszt
+zerowy, „skąd ta liczba” nie ma — ta sama odpowiedź, którą Sesja 16 dała pozycji wpisanej
+ręcznie na `/kosztorys/`. Formularz jest złożony, bo zwykłą drogą na listę jest strzałka
+z wyniku, a to jest wyjątek. Po dodaniu znika nazwa i notatka, a **jednostka i alejka
+zostają** — przy trzech materiałach z rzędu to zwykle te same dwie wartości.
+
+**Jednostki: pole wolnego tekstu z podpowiedziami.** Rozdział XVI prosi, żeby jednostkę dało
+się zmienić, więc lista (`opak.`, `szt.`, m², m, kg, l) podpowiada i niczego nie ogranicza.
+Pierwsze dwie idą przez słownik, więc Niemcowi podpowiadają „Pack.” i „Stk.”, nie polski
+skrót. Lista alejek jedzie z buildu w `window.LM_PROJ.aisles` — `/projekty/` nie ładuje
+12 kB katalogu materiałów po piętnaście słów.
+
+**Zmiana wynikająca wprost ze znaleziska: `/app/` wysyła teraz z `{ merge: true }`.**
+Przeglądarka zawsze wysyła komplet pól kontraktu, więc dla nich merge i podmiana to ten sam
+zapis — ale podmiana kasowała **każde pole, o którym przeglądarka nie wie**. Czyli:
+telefon chroni notatkę, a przeglądarka by ją skasowała przy pushu z urządzenia, które jej
+nie pobrało. Teraz obie strony robią to samo.
+
+**Notatka jedzie też w udostępnionym linku.** `shareProject()` kopiuje całe dokumenty, więc
+`/p/<token>` dostaje ją bez żadnej zmiany po tamtej stronie — klient dostaje „antracyt, ten
+sam co w kuchni” obok tego, ile czego kupić.
+
+- Sprawdzone: **251 testów logiki + 165 testów w Chromium — 416/416 przechodzi**, a
+  wcześniejsze 1117 + 111 + 180 + 415 + 596 + 331 + 121 + 90 + 177 + 70 nadal przechodzą
+  (razem **3624**). Oba pliki materiałowe rozbudowane, żadnego nowego nie trzeba było.
+  Testy logiki sprawdzone negatywnie trzy razy — koszt idący za ilością (czyli Sesja 19
+  wchodząca tu bokiem), notatka bez przycięcia, własny materiał udający policzony — i za
+  każdym razem test faktycznie protestuje. W przeglądarce: formularz otwierający się
+  w jednym wierszu i tylko w jednym, przecinek jako separator dziesiętny, porzucenie
+  edycji, pusta nazwa nieprzechodząca, edycja kończąca się przy wyjściu z projektu,
+  dodanie własnego materiału z czyszczeniem połowy pól, cztery języki i notatka, która
+  jako jedyna (obok nazwy) się **nie** tłumaczy, bo to słowa odwiedzającego.
+- Kontrast: bez nowej pary — formularz wydaje wyłącznie tokeny, które już przechodziły.
+  `scripts/check-contrast.mjs`: wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 17
 
@@ -1140,15 +1224,26 @@ decyzja właściciela**, czy zlecić to jako etap w tamtym repo.
 Do tego czasu strona projektu pokazuje to, co dokument naprawdę niesie: nazwę, stan
 (w archiwum czy nie) i dwa stemple czasu jako „historię”.
 
-**To samo dotyczy notatki przy materiale — z Sesji 17.** Rozdział XVI wymienia „dodać
-notatkę” obok edycji ilości, nazwy i jednostki. Cztery pierwsze rzeczy da się zrobić
-w istniejącym dokumencie i są Sesją 18; notatka — nie. `ShoppingItemEntity` nie ma na nią
-kolumny, `SyncContract.shoppingItemToDoc()` buduje dokument z ustalonej mapy
-(`estimationId`, `name`, `materialCategory`, `quantity`, `unit`, `estimatedCostMinor`,
-`currencyCode`, `isPurchased` + stemple), a reguła `validShoppingItem()` też nie ma
-`hasOnly` — czyli serwer przyjmie dodatkowe pole, a telefon skasuje je przy najbliższej
-synchronizacji, tak samo cicho jak opis projektu. **Ta sama decyzja, ta sama lista czterech
-plików w repo aplikacji.**
+**POPRAWKA z Sesji 18: powyższe zdanie „telefon nadpisuje dokument w całości" jest
+nieprawdziwe.** `CloudSync.pushLocal()` wysyła każdy dokument przez
+`.set(mapa, SetOptions.merge())`, a merge zapisuje **wyłącznie klucze, które dostał** —
+reszta dokumentu zostaje nietknięta. Ustalona mapa w `projectToDoc()` jest prawdziwa, ale
+nie kasuje tego, o czym nie wspomina. Sprawdzone w `CloudSync.kt`, nie z pamięci.
+
+To **nie** znaczy, że opis projektu należy teraz dopisać po cichu. Znaczy, że powód był
+zły, a prawdziwy jest inny i słabszy: pole, którego druga strona nie zna, jest polem
+**niewidocznym na telefonie** i nieopisanym w `FIRESTORE_SYNC.md`. Dane nie giną — po
+prostu nikt ich tam nie zobaczy. Decyzja właściciela dotyczy więc tego, czy opis ma być
+widoczny w aplikacji (wtedy cztery pliki wyżej), a nie tego, czy w ogóle da się go zapisać.
+
+**Notatka przy materiale — zrobiona w Sesji 18 na tej właśnie podstawie.** Rozdział XVI
+wymienia „dodać notatkę”; serwis zapisuje ją jako pole `note` na pozycji zakupowej.
+Wdrożona reguła `validShoppingItem()` nie ma `hasOnly`, więc serwer to przyjmuje;
+`shoppingItemFromDoc()` ignoruje nieznane klucze, więc telefonowi to nie szkodzi; merge
+niesie ją z powrotem. **Telefon jej jednak nie pokaże**, dopóki `ShoppingItemEntity` nie
+dostanie kolumny — i tego dotyczy pytanie do właściciela: czy zlecić w repo aplikacji
+kolumnę + migrację + wpis w `FIRESTORE_SYNC.md`, żeby notatka była widoczna także tam
+(i w eksporcie CSV listy zakupów).
 
 ### ~~Odmiana liczebnika przy „pozycji”~~ — naprawione w Sesji 16
 

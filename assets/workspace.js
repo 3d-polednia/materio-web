@@ -13,7 +13,7 @@
  *                 unitLabel, totalCostMinor, wastePercentage, wasteCostMinor,
  *                 currencyCode, inputJson, ...sync }
  *   shoppingItem{ id, projectId, estimationId, name, materialCategory, quantity, unit,
- *                 estimatedCostMinor, currencyCode, isPurchased, ...sync }
+ *                 estimatedCostMinor, currencyCode, isPurchased, note, ...sync }
  *   ...sync     { createdAt, updatedAt, deletedAt, schemaVersion }
  *
  * Money is minor units (grosze) and an integer, never a Double — the Money rule from the
@@ -541,6 +541,35 @@ function wsDeleteEstimation(id) {
  *   in, and it is what makes the list a shopping list rather than a second estimate.
  */
 
+/**
+ * The one field here the sync contract does not name — chapter XVI's "dodać notatkę".
+ *
+ * Sessions 15, 16 and 17 all wrote that a field invented beside the contract is erased by
+ * the phone's next push, "without a word", because `SyncContract.*ToDoc()` builds the
+ * document from a fixed map. **The first half is true and the conclusion was wrong**, and
+ * this is the correction: `CloudSync.pushLocal()` writes every document with
+ *
+ *     .set(SyncContract.shoppingItemToDoc(item, estimationRemoteId), SetOptions.merge())
+ *
+ * and a Firestore merge writes only the keys it is given. A key the map omits is left
+ * exactly as it was. Every write in `CloudSync.kt` is a merge — the pushes, the tombstones,
+ * all of them — so the fixed map cannot erase what it does not mention. Read out of
+ * `3d-polednia/Materio`, not assumed.
+ *
+ * The other three gates were checked the same way:
+ *   - the deployed rules validate `validShoppingItem()` by shape and have no `hasOnly`,
+ *     so the write is accepted;
+ *   - `shoppingItemFromDoc()` reads by key and ignores the ones it does not know, so a
+ *     note cannot crash or corrupt the phone's copy;
+ *   - nothing on the phone rewrites a shopping item without a merge.
+ *
+ * What this does **not** buy: the phone cannot *show* the note. `ShoppingItemEntity` has no
+ * column for it, so it is invisible there and absent from the app's CSV export until the app
+ * repo adds one (`docs/FIRESTORE_SYNC.md`, `SyncContract.kt`, the entity, a Room migration).
+ * The note is carried, not lost — that is the honest claim, and the report says so.
+ */
+const WS_NOTE_MAX = 500;
+
 /** A material list, oldest first — the order the app reads it in (`ORDER BY id`). */
 function wsItems(projectId) {
   const rows = wsAlive(wsLoad().shoppingItems);
@@ -555,7 +584,7 @@ const wsItem = (id) => wsItems().find((s) => s.id === id) || null;
  * Put one material on a project's list.
  *
  * @param {object} r { projectId, estimationId, name, materialCategory, quantity, unit,
- *                     costMajor, currencyCode }
+ *                     costMajor, currencyCode, note }
  *
  * `estimationId` is what the saved calculation behind the material is called — the
  * contract's own link between the two, and the reason the list can say where a quantity
@@ -585,6 +614,9 @@ function wsAddItem(r) {
     estimatedCostMinor: Math.max(0, wsMinor(r.costMajor)),
     currencyCode: r.currencyCode || wsCurrency(),
     isPurchased: false,
+    // Always present, even empty: the push is a merge, so a note can only be *cleared*
+    // remotely by sending the empty string. A key left out stays whatever it was.
+    note: String(r.note || "").slice(0, WS_NOTE_MAX),
     ...wsSyncFields(now),
   };
   data.shoppingItems.push(row);
@@ -593,22 +625,62 @@ function wsAddItem(r) {
 }
 
 /**
- * Tick a material off the list, or put it back.
+ * Correct a material in place — chapter XVI's "edytować ilość, zmienić nazwę, zmienić
+ * jednostkę" plus the note. Anything not passed keeps its current value.
  *
- * The one write on a material that is not editing it: `isPurchased` is what the list is
- * for once the shopping has started, and the app's project screen has had the checkbox
- * since before the sync contract existed. Renaming, re-measuring and re-unit-ing a
- * material is session 18.
+ * **The price is not here.** A material carries `estimatedCostMinor`, and editing it is
+ * chapter XVII — "Materiały mogą mieć ceny", session 19 — along with what a project's
+ * materials come to. Changing the quantity therefore leaves the cost where it was rather
+ * than silently re-multiplying a unit price nobody has entered yet.
  */
-function wsSetItemPurchased(id, on) {
+function wsUpdateItem(id, fields) {
   const data = wsLoad();
   const row = data.shoppingItems.find((s) => s.id === id && !s.deletedAt);
   if (!row) return null;
-  row.isPurchased = on !== false;
+  if (fields.name !== undefined) {
+    const name = String(fields.name).trim().slice(0, 120);
+    if (!name) return null; // a material with no name is a row nobody can shop for
+    row.name = name;
+  }
+  if (fields.quantity !== undefined) row.quantity = Math.max(0, Number(fields.quantity) || 0);
+  if (fields.unit !== undefined) row.unit = String(fields.unit).trim().slice(0, 24);
+  if (fields.materialCategory !== undefined) {
+    row.materialCategory = String(fields.materialCategory || "OTHER").slice(0, 40);
+  }
+  if (fields.note !== undefined) row.note = String(fields.note).trim().slice(0, WS_NOTE_MAX);
+  if (fields.isPurchased !== undefined) row.isPurchased = Boolean(fields.isPurchased);
   row.updatedAt = Date.now();
   wsSave(data);
   return row;
 }
+
+/**
+ * A material put on the list by hand — chapter XVI's "dodać własny materiał".
+ *
+ * No calculator behind it, so `estimationId` is null and the row gets no "where from" of
+ * its own; that is the same answer session 16 gave a hand-typed estimate line. Everything
+ * else is an ordinary material, so it syncs, prints and ticks off with the rest.
+ */
+function wsAddOwnItem({ projectId, name, materialCategory, quantity, unit, note }) {
+  const clean = String(name || "").trim();
+  if (!clean) return null;
+  return wsAddItem({
+    projectId: projectId || wsActiveProjectId(),
+    estimationId: null,
+    name: clean,
+    materialCategory: materialCategory || "OTHER",
+    quantity,
+    unit,
+    costMajor: 0,
+    note,
+  });
+}
+
+/**
+ * Tick a material off the list, or put it back — the one write that is not editing it,
+ * and the one the shopping itself is made of.
+ */
+const wsSetItemPurchased = (id, on) => wsUpdateItem(id, { isPurchased: on !== false });
 
 /** Tombstone one material. Same rule as everywhere else: the row stays, `deletedAt` moves. */
 function wsDeleteItem(id) {

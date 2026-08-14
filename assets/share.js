@@ -67,10 +67,14 @@ function render(data) {
     </li>`).join("");
   $("share-total").textContent = money(total, currency, lang);
 
+  // The note of chapter XVI travels with the item, because the share is a copy of the
+  // whole document (`shareProject()` stores `d.data()`), so a link handed to a client
+  // carries "buy in the same shade" along with what to buy.
   $("share-shopping-block").hidden = !items.length;
   $("share-shopping").innerHTML = items.map((i) => `<li${i.isPurchased ? ' class="done"' : ""}>
       <span class="row-name">${escapeHtml(i.name || "")}
         <em class="muted">${escapeHtml(String(i.quantity ?? ""))} ${escapeHtml(i.unit || "")}</em>
+        ${i.note ? `<em class="muted">${escapeHtml(i.note)}</em>` : ""}
       </span>
       <b>${escapeHtml(money(i.estimatedCostMinor, i.currencyCode || currency, lang))}</b>
     </li>`).join("");
