@@ -397,8 +397,12 @@ head("3c. editing a material, in the row it belongs to");
   eq("its own unit", await page.$eval(`${MATS} [data-f="unit"]`, (n) => n.value), "opak.");
   eq("and its own aisle selected",
     await page.$eval(`${MATS} [data-f="materialCategory"]`, (n) => n.value), "TILES");
-  // Chapter XVII is session 19: there is nothing here that edits money.
-  eq("there is no price field", await page.$$eval(`${MATS} [data-f="cost"]`, (n) => n.length), 0);
+  // Chapter XVII, added by session 19: the money is edited per unit, and the field opens
+  // holding the price the calculator was given — 749,85 for 15 packs is 49,99 each.
+  eq("the price is the price of one unit",
+    await page.$eval(`${MATS} [data-f="priceMajor"]`, (n) => n.value), "49.99");
+  eq("and there is no field for the total, which is the product of the two",
+    await page.$$eval(`${MATS} [data-f="cost"]`, (n) => n.length), 0);
   // Session 15 took prompt() out of this page; it must not come back through this door.
   check("and no browser dialog is involved",
     !(await page.content()).includes("prompt("));
@@ -421,7 +425,10 @@ head("3c. editing a material, in the row it belongs to");
   eq("the unit is written", saved.unit, "m²");
   eq("the aisle is written", saved.materialCategory, "FLOORING");
   eq("the note is written", saved.note, "ten sam odcień co w kuchni");
-  eq("the cost is untouched — chapter XVII is session 19", saved.estimatedCostMinor, 74985);
+  // Chapter XVII: the quantity and the price are on screen together, so the cost is the
+  // two multiplied — 26,4 × 49,99. Session 19; before it, the cost stayed at 749,85.
+  eq("and the cost follows the quantity at the same unit price",
+    saved.estimatedCostMinor, 131974);
   eq("and the link back to the calculation survives", saved.estimationId, "e1");
 
   const back = await rows(page, MATS);

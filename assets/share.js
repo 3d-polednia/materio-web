@@ -70,10 +70,22 @@ function render(data) {
   // The note of chapter XVI travels with the item, because the share is a copy of the
   // whole document (`shareProject()` stores `d.data()`), so a link handed to a client
   // carries "buy in the same shade" along with what to buy.
+  // Chapter XVII's unit price travels the same way: it is the total divided by the
+  // quantity, so a client reading the link sees "7 × 35 PLN" rather than one lump sum with
+  // no way to check it. Divided here rather than sent, because the document has no field
+  // for it — the contract keeps the total and nothing else.
+  const each = (i) => {
+    const qty = Number(i.quantity) || 0;
+    const cost = Number(i.estimatedCostMinor) || 0;
+    if (qty <= 0 || cost <= 0) return "";
+    return `<em class="muted">× ${escapeHtml(money(Math.round(cost / qty), i.currencyCode || currency, lang))}</em>`;
+  };
+
   $("share-shopping-block").hidden = !items.length;
   $("share-shopping").innerHTML = items.map((i) => `<li${i.isPurchased ? ' class="done"' : ""}>
       <span class="row-name">${escapeHtml(i.name || "")}
         <em class="muted">${escapeHtml(String(i.quantity ?? ""))} ${escapeHtml(i.unit || "")}</em>
+        ${each(i)}
         ${i.note ? `<em class="muted">${escapeHtml(i.note)}</em>` : ""}
       </span>
       <b>${escapeHtml(money(i.estimatedCostMinor, i.currencyCode || currency, lang))}</b>

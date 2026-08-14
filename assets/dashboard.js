@@ -100,11 +100,15 @@ function dashRenderProjects() {
 
   list.innerHTML = projects.slice(0, DASH_PROJECTS).map((p) => {
     const total = wsProjectTotal(p.id);
-    const money = total.count ? ` · ${dashEsc(wsMoney(total.minor, total.currencyCode))}` : "";
+    // The money is chapter XVII's project total — the materials plus the costs nothing
+    // calculated — so the dashboard, /projekty/ and the project screen give one answer to
+    // "what does this cost". The count beside it is still the count of saved lines.
+    const costs = wsProjectCosts(p.id);
+    const money = costs.total ? ` · ${dashEsc(wsMoney(costs.total, costs.currencyCode))}` : "";
     // Lines saved in different currencies do not add up. /kosztorys/ has room for the
     // whole sentence; a row has room for two words and the sentence as its tooltip. What
     // it must not do is print the sum as though it meant something.
-    const mixed = total.mixed
+    const mixed = costs.mixed
       ? ` <span class="chip warn" title="${dashEsc(dashT("ws_mixed_currency"))}">${dashEsc(dashT("dash_mixed"))}</span>`
       : "";
     return `<li data-id="${dashEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>

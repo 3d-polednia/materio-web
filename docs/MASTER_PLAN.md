@@ -44,8 +44,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 16 | Zapis kalkulacji | **Zrobione** — 2026-08-13 |
 | 17 | Listy materiałów | **Zrobione** — 2026-08-13 |
 | 18 | Edycja materiałów | **Zrobione** — 2026-08-14 |
-| 19 | Koszty projektu | **Następna** |
-| 20–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 19 | Koszty projektu | **Zrobione** — 2026-08-14 |
+| 20 | Pomieszczenia | **Następna** |
+| 21–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -148,6 +149,97 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 19
+
+Rozdział XVII w całości: „Materiały mogą mieć ceny", przykład `Klej | 7 × 35 PLN | = 245
+PLN`, waluta zgodna z wybraną przez użytkownika, projekt pokazujący **koszt materiałów,
+inne koszty i sumę projektu**, i zdanie na końcu: „Nie buduj z tego systemu księgowego."
+
+**Cena jednostkowa jest dzieleniem, nie polem — i to jest cała konstrukcja tej sesji.**
+Kontrakt trzyma na pozycji zakupowej jedną kwotę, `estimatedCostMinor`, i jest to
+**całość**. Sprawdzone w `3d-polednia/Materio`, nie z pamięci: `ShoppingItemEntity` nie ma
+kolumny na cenę jednostkową, `validShoppingItem()` w regułach jej nie waliduje,
+`ShoppingCsvExporter` jej nie drukuje. Własne pole obok kontraktu **przeżyłoby**
+synchronizację — to ustaliła Sesja 18 przy notatce i nadal jest prawdą — ale mogłoby się
+rozjechać z kwotą, bo telefon umie zmienić ilość albo koszt, nie dotykając pola, o którym
+nic nie wie. „35 PLN za sztukę" obok sumy, która nie jest już 7 × 35, jest gorsze niż brak
+ceny jednostkowej. Dzielenie nie ma jak skłamać.
+
+Dzielenie jest przy tym **dokładne dla wszystkiego, co ten serwis zapisał do tej pory**:
+każdy silnik liczy `cost = units × price`, więc kwota podzielona przez ilość oddaje dokładnie
+tę cenę, którą odwiedzający wpisał w kalkulatorze. **Stare projekty dostają ceny bez żadnej
+migracji** — wiersz zapisany tydzień temu czyta się dziś jako „15 opak. × 49,99 = 749,85".
+
+**Zapis idzie w drugą stronę: ilość × cena.** Obie liczby są w formularzu obok siebie, więc
+zapisywana jest ich suma, zaokrąglona **raz**, na końcu. Zmiana 7 na 8 przy 35 PLN daje 280.
+Sama ilość, bez ceny, nadal nie przelicza niczego — reguła Sesji 18 została nietknięta i jej
+test też. Pod polami leci linijka „7 × 35,00 zł = 245,00 zł", liczona tą samą funkcją, którą
+liczy magazyn — żeby zapisana kwota nie była niespodzianką.
+
+**Waluta: rozdział XVII kontra rozdział VI, rozstrzygnięte po kwocie.** Pozycja, która nigdy
+nie miała kwoty, dostaje walutę wybraną przez odwiedzającego — to jest „waluta zgodna
+z wybraną przez użytkownika". Pozycja, która **już** trzyma 245 PLN, zostaje przy PLN, nawet
+gdy odwiedzający przełączył się na euro: przestemplowanie zrobiłoby z 245 zł 245 €, czyli
+przeliczenie po kursie 1:1, którego rozdział VI zabrania. Etykieta pola mówi, w jakiej
+walucie się wpisuje, więc nie trzeba tego zgadywać.
+
+**Trzy figury i zasada „każda kwota liczona raz".** Zapisanie kalkulacji tworzy **dwa**
+dokumenty niosące tę samą kwotę — wiersz kosztorysu i materiał (rozdział XVI) — więc dodanie
+obu list do siebie podwoiłoby rachunek projektu zrobionego z samych kalkulacji. Stąd:
+
+```
+koszt materiałów = lista zakupów + kalkulacje, które nie mają na niej swojego materiału
+inne koszty      = wiersze wpisane ręcznie
+suma projektu    = jedno + drugie
+```
+
+Materiał wygrywa z kalkulacją, bo to jego cenę odwiedzający edytuje. Kalkulacja bez
+materiału — pozycja sprzed Sesji 17 albo taka, której materiał zdjęto z listy — wchodzi do
+sumy sama, bo inaczej pieniądze znikałyby po cichu z rachunku, mimo że wiersz nadal stoi na
+liście kalkulacji. Ta sama suma jest teraz na liście projektów i na pulpicie, więc „ile
+kosztuje ten projekt" ma jedną odpowiedź w trzech miejscach.
+
+**„Inne koszty" to nie nowy magazyn.** To wiersze kosztorysu wpisane ręcznie —
+`wsAddManualEstimation()` pisze je od zawsze i od zawsze zostawia w `inputJson` znacznik
+`manual`, którego dotąd nic nie czytało. Ekran projektu daje im własną sekcję i własny
+formularz, wkładający je do **otwartego** projektu (`/kosztorys/` nie nazywa projektu, bo
+tamta strona jest o aktywnym). Lista kalkulacji pokazuje od teraz wyłącznie to, co policzył
+kalkulator: wiersz wpisany ręcznie stoi w swojej sekcji i nie jest drukowany dwa razy.
+
+**Cena jedzie też w udostępnionym linku.** `/p/<token>` dzieli tak samo, w trzech linijkach
+bez żadnej biblioteki, więc klient dostaje „7 worków × 30,00 zł" zamiast jednej kwoty, której
+nie ma jak sprawdzić.
+
+**Czego ta sesja świadomie nie zrobiła.** `/kosztorys/` nadal sumuje **wiersze kosztorysu**,
+więc po ręcznej zmianie ceny materiału jego suma i suma projektu mogą się różnić. To nie jest
+przeoczenie: kosztorys jest dokumentem tego, co policzono, a „materiały, robocizna, koszty,
+marża, suma, waluta" to **Sesja 24 (WYCENY)**. Marży, narzutu i podatku tu nie ma — rozdział
+XVII kończy się zdaniem „Nie buduj z tego systemu księgowego".
+
+- Sprawdzone: **147 testów logiki + 134 testy w Chromium — 281/281 przechodzi**, a
+  wcześniejsze 1117 + 112 + 180 + 415 + 596 + 251 + 331 + 177 + 70 + 90 + 166 + 121 nadal
+  przechodzą (razem **3907**). Dwa nowe pliki: `scripts/test-costs.mjs` (bez zależności)
+  i `scripts/test-costs-page.mjs`. Ten drugi **niczego nie podstawia** — ani kalkulator, ani
+  `/projekty/` nie dotykają sieci — więc otwiera prawdziwe strony, klika to, co klika
+  odwiedzający, i czyta jedno i drugie: co narysowano i co wróciło do magazynu. W tym: cena
+  wpisana w kalkulatorze wracająca jako cena jednostkowa materiału, ilość zmieniana przy tej
+  samej cenie, materiał wpisany ręcznie z ceną, koszt „inny" trafiający do otwartego projektu
+  zamiast do aktywnego i znikający z sumy po usunięciu, cztery języki, przełączenie języka
+  przyciskiem na otwartym projekcie, przełączenie waluty nieruszające żadnej kwoty przy
+  jednoczesnym wycenieniu nowej pozycji w nowej walucie, szerokości z rozdziału XXVIII
+  (320 / 375 / 390 / 430 / 768 / 1280 px) i wariant z wyłączonym JavaScriptem.
+  Testy logiki sprawdzone **negatywnie trzy razy**: podwójne liczenie kalkulacji i jej
+  materiału, przestemplowanie waluty przy każdej zmianie ceny i cena zapisana jako własne
+  pole obok kontraktu — za każdym razem test faktycznie protestuje. Test w przeglądarce
+  sprawdzony negatywnie raz (wiersz bez ceny jednostkowej — cztery sprawdzenia padają).
+  Jedno sprawdzenie z Sesji 18 zmieniło treść, bo zmieniło się zachowanie: formularz
+  materiału **ma** teraz pole ceny, a zmiana ilości w nim przelicza kwotę.
+- Kontrast: bez nowej pary — suma projektu wydaje `--accent-strong` na `--surface-alt`,
+  czyli parę sprawdzaną już dla linku w takiej sekcji. `scripts/check-contrast.mjs`:
+  wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
 
 ### Co zrobiła Sesja 18
 

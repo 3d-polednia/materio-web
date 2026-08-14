@@ -508,8 +508,8 @@ przeglądarka kasowałaby ją przy pushu ze starszego urządzenia. Symetria jest
 
 **Edycja jest formularzem w wierszu**, nie oknem `prompt()` — z tego samego powodu, dla
 którego Sesja 15 wyrzuciła `prompt()` z tej strony. Zmienia nazwę, ilość, jednostkę,
-alejkę i notatkę. **Ceny w nim nie ma**: `estimatedCostMinor` to rozdział XVII i Sesja 19,
-więc zmiana ilości nie przelicza kosztu z ceny jednostkowej, której nikt jeszcze nie podał.
+alejkę i notatkę. Ceny w nim wtedy nie było: `estimatedCostMinor` to rozdział XVII i Sesja
+19, która dołożyła do tego samego formularza szóste pole — cenę jednostkową (§7.4).
 
 **Własny materiał** to wiersz, którego nic nie policzyło: `estimationId` jest `null`, koszt
 zerowy, sekcji „skąd ta liczba" nie ma — ta sama odpowiedź, którą Sesja 16 dała pozycji
@@ -535,6 +535,71 @@ Dwie decyzje warte zapisania, obie podjęte przez zgodność z aplikacją:
 ```
 /klienci/ ──► /zlecenia/ ──► projekt ──► /kosztorys/ ──► /wyceny/ ──► /terminarz/ ──► HISTORIA
 ```
+
+### 7.4. Koszty projektu (Sesja 19)
+
+Rozdział XVII: „Materiały mogą mieć ceny", przykład `Klej | 7 × 35 PLN | = 245 PLN`, waluta
+zgodna z wybraną przez użytkownika, a projekt może pokazywać **koszt materiałów, inne
+koszty i sumę projektu**. Na końcu: „Nie buduj z tego systemu księgowego."
+
+**Cena jednostkowa jest dzieleniem, nie polem.** Kontrakt trzyma na pozycji zakupowej
+jedną kwotę — `estimatedCostMinor`, czyli **całość**. Sprawdzone w repo aplikacji, nie
+z pamięci: `ShoppingItemEntity` nie ma kolumny na cenę jednostkową, `validShoppingItem()`
+w regułach jej nie waliduje, a `ShoppingCsvExporter` jej nie drukuje. Pole dołożone obok
+kontraktu przeżyłoby synchronizację (to ustaliła Sesja 18 przy notatce), ale mogłoby się
+**rozjechać z kwotą**: telefon umie zmienić ilość albo koszt pozycji, nie dotykając pola,
+o którym nic nie wie — a „35 PLN za sztukę" obok sumy, która nie jest już 7 × 35, jest
+gorsze niż brak ceny jednostkowej. Dzielenie nie ma jak skłamać.
+
+Dzielenie jest przy tym **dokładne dla wszystkiego, co ten serwis zapisuje**: każdy silnik
+w `assets/calculators.js` liczy `cost = units × price`, więc `estimatedCostMinor / quantity`
+oddaje dokładnie tę cenę, którą odwiedzający wpisał w kalkulatorze. `wsUnitPriceMinor()`
+odpowiada `null`, gdy nie ma czego dzielić (ilość zero, kwota zero) — brak ceny to brak
+ceny, nie „0,00 za sztukę".
+
+**Zapis idzie w drugą stronę: ilość × cena.** Formularz materiału ma obie liczby obok
+siebie, więc zapisywana jest ich suma (`wsItemCostMinor()`, zaokrąglenie **raz**, na końcu
+— reguła Money). Dlatego zmiana 7 na 8 przy 35 PLN daje 280: obie liczby były na ekranie
+w tej samej chwili. Sama ilość, bez ceny, nadal niczego nie przelicza — to reguła Sesji 18
+i została nietknięta.
+
+**Waluta: rozdział XVII kontra rozdział VI.** Pozycja, która nigdy nie miała kwoty, dostaje
+walutę wybraną przez odwiedzającego w chwili wyceniania — to jest „waluta zgodna z wybraną
+przez użytkownika". Pozycja, która **już** trzyma 245 PLN, zostaje przy PLN nawet gdy
+odwiedzający przełączył się na euro: przestemplowanie zrobiłoby z 245 zł 245 €, czyli
+przeliczenie po kursie 1:1, którego rozdział VI zabrania. Etykieta pola mówi wprost, w
+jakiej walucie się wpisuje.
+
+**Trzy figury i zasada „każda kwota liczona raz".** Zapisanie kalkulacji tworzy **dwa**
+dokumenty niosące tę samą kwotę — wiersz kosztorysu i materiał (rozdział XVI) — więc
+dodanie obu list do siebie podwoiłoby rachunek projektu zrobionego z samych kalkulacji.
+`wsProjectCosts()` liczy więc tak:
+
+```
+koszt materiałów = lista zakupów
+                 + kalkulacje, które nie mają na niej swojego materiału
+inne koszty      = wiersze wpisane ręcznie (`manual` w inputJson)
+suma projektu    = jedno + drugie
+```
+
+Materiał wygrywa z kalkulacją, bo to jego cenę odwiedzający edytuje. Kalkulacja bez
+materiału (pozycja sprzed Sesji 17 albo taka, której materiał zdjęto z listy) wchodzi do
+sumy sama — inaczej pieniądze znikałyby po cichu z rachunku, mimo że wiersz nadal stoi na
+liście kalkulacji. `mixed` działa jak wszędzie: różne waluty są oznaczane, nigdy
+przeliczane.
+
+**„Inne koszty" to nie nowy magazyn.** To wiersze kosztorysu wpisane ręcznie —
+`wsAddManualEstimation()` pisze je od zawsze i od zawsze zostawia w `inputJson` znacznik
+`manual`. Ekran projektu daje na nie własną sekcję i własny formularz, który wkłada je do
+**otwartego** projektu, a nie do aktywnego; `/kosztorys/` nie nazywa projektu, bo tamta
+strona jest o aktywnym. Dlatego lista kalkulacji pokazuje wyłącznie to, co policzył
+kalkulator: wiersz wpisany ręcznie stoi w swojej sekcji i nie jest drukowany dwa razy.
+
+**Czego ta sesja świadomie nie zrobiła.** `/kosztorys/` nadal sumuje **wiersze kosztorysu**,
+więc po ręcznej zmianie ceny materiału jego suma i suma projektu mogą się różnić. To nie
+jest przeoczenie: kosztorys jest dokumentem tego, co policzono, a „materiały, robocizna,
+koszty, marża, suma, waluta" to Sesja 24 (WYCENY). Marży, narzutu i podatku tu nie ma —
+rozdział XVII kończy się zdaniem „Nie buduj z tego systemu księgowego".
 
 ---
 

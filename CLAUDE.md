@@ -87,6 +87,7 @@ node scripts/test-dashboard.mjs   # the dashboard: the route, the tool list, the
 node scripts/test-projects.mjs    # projects: the route, the CRUD, the undo, the copy
 node scripts/test-save.mjs        # saving a calculation: the snapshot, the project, the copy
 node scripts/test-materials.mjs   # the material list: the document, the arrow, editing, the copy
+node scripts/test-costs.mjs       # costs: the unit price, the currency rule, the three figures
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -192,6 +193,19 @@ scripts/test-materials-page.mjs  The same arrow clicked in Chromium, nothing stu
                       screen one navigation later; ticking it off, editing it in place,
                       typing one in by hand, taking it off, four languages, the currency
                       switch and the widths of chapter XXVIII
+scripts/test-costs.mjs  What a project costs (session 19, chapter XVII): the unit price,
+                      which is `estimatedCostMinor / quantity` and never a stored field;
+                      the write that goes the other way (ilość × cena, rounded once); the
+                      currency rule — an unpriced row takes the visitor's currency, a
+                      priced one keeps its own; and wsProjectCosts(), which counts every
+                      amount in the project exactly once. Dependency-free — run it after
+                      touching the money half of assets/workspace.js or a proj_cost_*/
+                      proj_other_*/proj_mat_price key
+scripts/test-costs-page.mjs  The same in Chromium, nothing stubbed: a material priced in the
+                      row it belongs to, the running "7 × 35 = 245" under the fields, a cost
+                      nothing calculated typed onto the open project, the three figures
+                      moving with both, four languages, the currency switch, the widths of
+                      chapter XXVIII and the no-JavaScript variant
 scripts/test-save-page.mjs  The same arrow clicked through in Chromium, nothing stubbed:
                       result → project picker → saved line → the project screen reading it
                       back, including a line saved in Polish and read in German after
@@ -211,7 +225,9 @@ assets/calc-hub.js    The search + category filter on /kalkulatory/. The hub is 
 assets/workspace.js   Projects, rooms, estimate lines and the material list in localStorage
                       — the four collections of the sync contract, in the Firestore
                       document shape. The material list (`shoppingItems`) arrived in
-                      session 17; it is written by the same call that saves a calculation
+                      session 17; it is written by the same call that saves a calculation.
+                      Session 19 added the money: a unit price derived by dividing the
+                      total, and wsProjectCosts() — material cost, other costs, project sum
 assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/. The
                       projects page holds two screens — the index and one project at
                       ?id=<projectId> — and this file shows one of them, including the
@@ -415,6 +431,28 @@ Kotlin side of it. Change one, change all three.
   until the app repo adds one. The note is carried, not lost, and the page says so.
   `assets/app.js` now pushes with `{ merge: true }` for the same reason the app does: the
   browser knowing every contract field is not the same as the browser knowing every field.
+- **A material's unit price is a division, not a field — do not add one.** Chapter XVII wants
+  "Klej | 7 × 35 PLN | = 245 PLN", and the contract has one money field on a shopping item:
+  `estimatedCostMinor`, the **total** (`ShoppingItemEntity` has no unit price,
+  `validShoppingItem()` validates none, `ShoppingCsvExporter` prints none). A unit price kept
+  beside the contract would survive the sync — the bullet above says why — but it would be
+  free to disagree with the money the moment the phone changed the quantity or the cost, and
+  a price that contradicts the total is worse than no price. `wsUnitPriceMinor()` divides,
+  answers `null` when there is nothing to divide, and is exact for everything this site
+  writes, because every engine computes `cost = units × price`. The write goes the other way
+  (`wsItemCostMinor()`: quantity × price, rounded once). A price typed onto a row that has
+  never held money stamps it with the visitor's currency; a row that already holds an amount
+  keeps the currency it was priced in, because re-stamping 245 zł as 245 € is a conversion at
+  a rate and chapter VI forbids those. `docs/ARCHITEKTURA.md` §7.4.
+- **`wsProjectCosts()` counts every amount in a project exactly once.** Saving a calculation
+  writes an estimate line **and** a material carrying the same money, so the project's cost is
+  the shopping list, plus any calculation with no material on it, plus the lines nothing
+  calculated (`manual` in `inputJson` — chapter XVII's "inne koszty"). Adding the two
+  collections together would double the bill; dropping the materialless calculations would
+  hide money that is still listed on screen. The projects index, the dashboard and the project
+  screen all read this one function, so "what does this project cost" has one answer.
+  `/kosztorys/` still totals the estimate lines — it is the document of what was calculated,
+  and the estimate with labour and margin is session 24.
 - **The workspace works signed out.** `assets/workspace.js` keeps projects, rooms,
   estimate lines and materials in `localStorage` in the *same document shape* as Firestore,
   so the sync tab in `/app/` is a plain copy in either direction. Counting must never

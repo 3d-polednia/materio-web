@@ -422,8 +422,8 @@ head("3e. editing a material — chapter XVI's four writes");
   check("and updatedAt moved, so the phone hears about it", done.updatedAt > done.createdAt);
   eq("createdAt did not move", done.createdAt, item.createdAt);
 
-  // The price is chapter XVII, session 19. Changing the quantity must not silently
-  // re-derive a cost from a unit price nobody has entered.
+  // The price is chapter XVII, and session 19 put it in this same call as `priceMajor`.
+  // Without one, the rule here is unchanged: a quantity on its own re-multiplies nothing.
   eq("the cost is left exactly where it was", done.estimatedCostMinor, item.estimatedCostMinor);
   eq("and so is the currency", done.currencyCode, item.currencyCode);
   eq("the link back to the calculation survives an edit", done.estimationId, row.id);
@@ -479,7 +479,9 @@ head("3f. a material typed in by hand — chapter XVI's own material");
   // No calculator behind it, so there is no calculation to point at — the same answer
   // session 16 gave a hand-typed estimate line, for the same reason.
   eq("nothing calculated it, so it points at no calculation", own.estimationId, null);
-  eq("and it costs nothing until session 19 gives it a price", own.estimatedCostMinor, 0);
+  // Session 19 added `priceMajor` to this call; without one, a material typed in has no
+  // price, and no price is zero rather than a number nobody entered.
+  eq("and it costs nothing, because no price was typed", own.estimatedCostMinor, 0);
   eq("it is not on the estimate", ws.wsEstimations(project.id).length, 0);
 
   // It is an ordinary material in every other way.

@@ -345,10 +345,14 @@ const wsIndexUrl = () => location.pathname;
 /** One row of either list: the name links to the project, the meta says what is in it. */
 function wsProjectRow(p, active) {
   const total = wsProjectTotal(p.id);
-  const money = total.count ? ` · ${wsEsc(wsMoney(total.minor, total.currencyCode))}` : "";
+  // The money is the project's whole cost — chapter XVII's sum, materials and the rest —
+  // so the list, the dashboard and the project screen answer "what does this cost" with
+  // one number. The count beside it stays the count of saved lines.
+  const costs = wsProjectCosts(p.id);
+  const money = costs.total ? ` · ${wsEsc(wsMoney(costs.total, costs.currencyCode))}` : "";
   // Lines saved in different currencies do not add up, and chapter VI forbids converting
   // them. The row has room for a chip; the whole sentence is its title.
-  const mixed = total.mixed
+  const mixed = costs.mixed
     ? ` <span class="chip warn" title="${wsEsc(wsT("ws_mixed_currency"))}">${wsEsc(wsT("dash_mixed"))}</span>`
     : "";
   return `<li data-id="${wsEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
@@ -499,11 +503,18 @@ function wsLineSource(row) {
     </details>`;
 }
 
-/** The saved lines of one project, newest last — the order they were added in. */
+/**
+ * The saved lines of one project, newest last — the order they were added in.
+ *
+ * Calculations only. A line typed by hand is a cost, not a calculation: it has no snapshot,
+ * no "where did this number come from" and no material behind it, and since session 19 it
+ * has a section of its own further down (chapter XVII's "inne koszty"). Listing it in both
+ * would print the same money twice on one screen.
+ */
 function wsRenderProjectLines(id) {
   const list = document.getElementById("ws-project-lines");
   if (!list) return;
-  const rows = wsEstimations(id);
+  const rows = wsCalcLines(id);
   if (!rows.length) {
     list.innerHTML = `<li class="empty muted">${wsEsc(wsT("proj_lines_empty"))}</li>`;
     return;
@@ -562,10 +573,22 @@ function wsRenderMaterials(id) {
     (r.id === wsEditingItemId ? wsMaterialForm(r) : wsMaterialRow(r))).join("");
 }
 
+/**
+ * The unit price of a material, as a field value: "35" or "33.33", or "" when the row has
+ * no price. Whole minor units, because that is the smallest amount of money there is.
+ */
+const wsPriceValue = (minor) => (minor === null ? "" : String(Math.round(minor) / 100));
+
 /** One material as it reads: name, aisle, how much, what it costs, and the note under it. */
 function wsMaterialRow(r) {
+  // Chapter XVII, in the chapter's own shape: "Klej | 7 × 35 PLN | = 245 PLN". The unit
+  // price is the total divided by the quantity (wsUnitPriceMinor) — the contract keeps the
+  // total and nothing else — so it can never contradict the money beside it.
+  const unit = wsUnitPriceMinor(r);
+  const price = unit !== null
+    ? `<em class="muted ws-mat-price">× ${wsEsc(wsMoney(Math.round(unit), r.currencyCode))}</em>` : "";
   const cost = r.estimatedCostMinor > 0
-    ? `<em class="muted">${wsEsc(wsMoney(r.estimatedCostMinor, r.currencyCode))}</em>` : "";
+    ? `<em class="muted">${unit !== null ? "= " : ""}${wsEsc(wsMoney(r.estimatedCostMinor, r.currencyCode))}</em>` : "";
   const aisle = r.materialCategory
     ? `<em class="muted">${wsEsc(wsT("cat_" + r.materialCategory))}</em>` : "";
   // Chapter XVI's note. It takes a line of its own rather than a column, because it is a
@@ -585,6 +608,7 @@ function wsMaterialRow(r) {
       </span>
       <span class="dash-fig">
         <b>${wsNum(r.quantity)} ${wsEsc(r.unit)}</b>
+        ${price}
         ${cost}
       </span>
       <span class="row-actions">
@@ -603,17 +627,22 @@ function wsMaterialRow(r) {
  * `prompt()` out: a browser dialog cannot be styled, cannot be reached by the page's own
  * translation once it is open, and on a phone covers the thing being changed.
  *
- * **There is no price field.** A material carries `estimatedCostMinor` and editing it is
- * chapter XVII — session 19 — so the quantity moves without the cost following it, rather
- * than the cost being re-derived from a unit price nobody has entered.
+ * The price is chapter XVII's, and it is the price of **one** unit: the quantity is already
+ * in the form next to it, so what gets stored is the two multiplied — the chapter's own
+ * "7 × 35 PLN = 245 PLN". The product is printed under the fields as they are typed,
+ * because the number that is saved should not be a surprise.
+ *
+ * The currency in the label is the row's own, and it is only the visitor's current one when
+ * the row has never been priced — see wsUpdateItem(). Nothing here converts anything.
  */
 function wsMaterialForm(r) {
   const aisles = ((typeof window !== "undefined" && window.LM_PROJ) || {}).aisles || [];
   const options = (aisles.length ? aisles : [r.materialCategory || "OTHER"])
     .map((c) => `<option value="${wsEsc(c)}"${c === r.materialCategory ? " selected" : ""}>${wsEsc(wsT("cat_" + c))}</option>`)
     .join("");
+  const code = r.estimatedCostMinor ? r.currencyCode : (typeof lmCurrency === "function" ? lmCurrency() : r.currencyCode);
   return `<li class="ws-mat ws-editing" data-id="${wsEsc(r.id)}">
-      <form class="ws-mat-edit" data-mat-edit>
+      <form class="ws-mat-edit" data-mat-edit data-currency="${wsEsc(code)}">
         <p class="ws-mat-grid">
           <label class="ws-mat-f">
             <span class="ws-bar-label">${wsEsc(wsT("ws_col_name"))}</span>
@@ -627,11 +656,17 @@ function wsMaterialForm(r) {
             <span class="ws-bar-label">${wsEsc(wsT("ws_col_unit"))}</span>
             <input type="text" maxlength="24" data-f="unit" value="${wsEsc(r.unit)}" list="ws-mat-units">
           </label>
+          <label class="ws-mat-f ws-mat-f-sm">
+            <span class="ws-bar-label">${wsEsc(wsT("proj_mat_price"))} (${wsEsc(code)})</span>
+            <input type="text" inputmode="decimal" data-f="priceMajor"
+              value="${wsEsc(wsPriceValue(wsUnitPriceMinor(r)))}">
+          </label>
           <label class="ws-mat-f">
             <span class="ws-bar-label">${wsEsc(wsT("proj_mat_aisle"))}</span>
             <select data-f="materialCategory">${options}</select>
           </label>
         </p>
+        <p class="ws-mat-sum" data-mat-sum aria-live="polite"></p>
         <label class="ws-mat-f">
           <span class="ws-bar-label">${wsEsc(wsT("proj_mat_note"))}</span>
           <input type="text" maxlength="500" data-f="note" value="${wsEsc(r.note || "")}"
@@ -644,6 +679,63 @@ function wsMaterialForm(r) {
         </p>
       </form>
     </li>`;
+}
+
+/**
+ * Chapter XVII's line of arithmetic, under the fields that make it: "7 × 35,00 zł =
+ * 245,00 zł", recomputed as the quantity and the price are typed.
+ *
+ * The same function serves both forms — editing a material and typing one in — because
+ * they take the same two numbers and store them the same way. It multiplies with
+ * `wsItemCostMinor()`, which is what the store will use, so the number under the form is
+ * the number that gets saved rather than a second opinion about it.
+ */
+function wsMatSum(form) {
+  const out = form.querySelector("[data-mat-sum]");
+  if (!out) return;
+  const get = (f) => {
+    const el = form.querySelector(`[data-f="${f}"]`);
+    return el ? wsDecimal(el.value) : 0;
+  };
+  const qty = get("quantity");
+  const price = get("priceMajor");
+  const code = form.dataset.currency
+    || (typeof lmCurrency === "function" ? lmCurrency() : "PLN");
+  if (!(price > 0) || !(qty > 0)) { out.textContent = ""; return; }
+  out.textContent = `${wsNum(qty)} × ${wsMoney(wsMinor(price), code)}`
+    + ` = ${wsMoney(wsItemCostMinor(price, qty), code)}`;
+}
+
+/**
+ * The other costs of a project — chapter XVII's "inne koszty": the estimate lines nothing
+ * calculated. Labour, delivery, a skip, the tool that had to be hired.
+ *
+ * They are ordinary estimate lines with `manual` in their `inputJson`, which is how
+ * /kosztorys/ has written them since it existed — so this section is a second way into the
+ * same store, not a second store. They are shown apart from the calculations above for the
+ * reason the summary needs them apart: a calculation has a material on the shopping list
+ * carrying its money, and one of these does not.
+ */
+function wsRenderOtherCosts(id) {
+  const list = document.getElementById("ws-project-other-list");
+  if (!list) return;
+  const rows = wsOtherCosts(id);
+  if (!rows.length) {
+    list.innerHTML = `<li class="empty muted">${wsEsc(wsT("proj_other_empty"))}</li>`;
+    return;
+  }
+  list.innerHTML = rows.map((r) => `<li data-id="${wsEsc(r.id)}">
+      <span class="row-name">
+        <b>${wsEsc(r.name)}</b>
+        <em class="muted">${wsEsc(wsDate(r.createdAt))}</em>
+      </span>
+      <span class="dash-fig">
+        <b>${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</b>
+      </span>
+      <span class="row-actions">
+        <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
+      </span>
+    </li>`).join("");
 }
 
 /**
@@ -677,10 +769,16 @@ function wsRenderProject(id) {
   document.getElementById("ws-project-hist").textContent =
     `${wsT("proj_created")} ${wsDate(project.createdAt)} · ${wsT("proj_updated")} ${wsDate(project.updatedAt)}`;
 
-  const total = wsProjectTotal(project.id);
-  document.getElementById("ws-project-count").textContent = String(total.count);
-  document.getElementById("ws-project-total").textContent = wsMoney(total.minor, total.currencyCode);
-  document.getElementById("ws-project-mixed").hidden = !total.mixed;
+  // Chapter XVII: "Projekt może pokazywać: koszt materiałów, inne koszty, sumę projektu."
+  // The three come out of one call so they cannot disagree, and the sum is the two above it
+  // added — never the estimate lines added to the materials, which would count a calculated
+  // line twice (it writes a material carrying the same money).
+  const costs = wsProjectCosts(project.id);
+  document.getElementById("ws-project-count").textContent = String(wsEstimations(project.id).length);
+  document.getElementById("ws-project-mat").textContent = wsMoney(costs.materials, costs.currencyCode);
+  document.getElementById("ws-project-other").textContent = wsMoney(costs.other, costs.currencyCode);
+  document.getElementById("ws-project-total").textContent = wsMoney(costs.total, costs.currencyCode);
+  document.getElementById("ws-project-mixed").hidden = !costs.mixed;
 
   const isActive = wsActiveProjectId() === project.id;
   // An archived project takes no new lines, so it cannot be the active one either, and
@@ -704,6 +802,7 @@ function wsRenderProject(id) {
 
   wsRenderProjectLines(project.id);
   wsRenderMaterials(project.id);
+  wsRenderOtherCosts(project.id);
 }
 
 /* ---------------------------------------------------------------- the switch */
@@ -921,7 +1020,16 @@ function wireProjectDetail() {
     }
   });
 
-  // Chapter XVI's four writes, in one submit: the quantity, the name, the unit, the note.
+  // Chapter XVII's arithmetic while it is being typed, in whichever of the two forms is
+  // open. `input` does not bubble on old browsers; on every browser this site supports it
+  // does, which is what lets one listener serve a list that is redrawn on every write.
+  on("ws-project-materials", "input", (e) => {
+    const form = e.target.closest("[data-mat-edit]");
+    if (form) wsMatSum(form);
+  });
+
+  // Chapter XVI's four writes plus chapter XVII's price, in one submit: the quantity, the
+  // name, the unit, the note and what one unit costs.
   on("ws-project-materials", "submit", (e) => {
     const form = e.target.closest("[data-mat-edit]");
     if (!form) return;
@@ -941,10 +1049,14 @@ function wireProjectDetail() {
       unit: get("unit"),
       materialCategory: get("materialCategory"),
       note: get("note"),
+      // The quantity above is applied first, so the cost is this price times the quantity
+      // the visitor is looking at — chapter XVII's "7 × 35 PLN = 245 PLN".
+      priceMajor: wsDecimal(get("priceMajor")),
     })) wsRenderWorkspace();
   });
 
-  // Chapter XVI's "dodać własny materiał".
+  // Chapter XVI's "dodać własny materiał", now with chapter XVII's price on it.
+  on("ws-mat-form", "input", (e) => wsMatSum(e.currentTarget));
   on("ws-mat-form", "submit", (e) => {
     e.preventDefault();
     const el = (id) => document.getElementById(id);
@@ -957,13 +1069,41 @@ function wireProjectDetail() {
       quantity: wsDecimal(el("ws-mat-qty").value),
       unit: el("ws-mat-unit").value.trim(),
       note: el("ws-mat-note").value.trim(),
+      priceMajor: wsDecimal(el("ws-mat-price").value),
     });
     if (!made) return;
-    // The name and the note are about one material and go; the quantity, the unit and the
-    // aisle are usually the same for the next two rows and stay.
+    // The name, the note and the price are about one material and go; the quantity, the
+    // unit and the aisle are usually the same for the next two rows and stay.
     el("ws-mat-name").value = "";
     el("ws-mat-note").value = "";
+    el("ws-mat-price").value = "";
+    wsMatSum(e.currentTarget);
     el("ws-mat-name").focus();
+  });
+
+  /* Chapter XVII's "inne koszty": the costs of a project that no calculator produces.
+     Same store as /kosztorys/'s hand-typed line — one writer, two ways in — but filed into
+     the project that is open rather than into whichever one is active. */
+  on("ws-project-other-list", "click", (e) => {
+    const li = e.target.closest("li[data-id]");
+    if (li && e.target.closest("[data-del]")) wsDeleteEstimation(li.dataset.id);
+  });
+
+  on("ws-other-form", "submit", (e) => {
+    e.preventDefault();
+    const el = (id) => document.getElementById(id);
+    const name = el("ws-other-name").value.trim();
+    if (!name || !wsOpenId) return;
+    wsAddManualEstimation({
+      projectId: wsOpenId,
+      name,
+      requiredUnits: 1,
+      unitLabel: "",
+      costMajor: wsDecimal(el("ws-other-cost").value),
+    });
+    el("ws-other-name").value = "";
+    el("ws-other-cost").value = "";
+    el("ws-other-name").focus();
   });
 }
 

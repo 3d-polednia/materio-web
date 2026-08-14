@@ -1335,6 +1335,19 @@ a.chip:hover { text-decoration: none; }
 .ws-mat-f-sm { flex: 1 1 5.5rem; }
 .ws-mat-f input, .ws-mat-f select { width: 100%; }
 .ws-mat-hint { font-size: var(--fs-xs); margin: var(--sp-3) 0 0; }
+
+/* Chapter XVII, in the chapter's own shape: the column under the quantity reads
+   "7 opak. / × 35,00 zł / = 245,00 zł". The unit price is the smallest of the three
+   because it is the one that was typed; the total is what the project is charged. */
+.ws-mat-price { font-size: var(--fs-xs); }
+/* The same arithmetic while it is being typed, under the fields that make it. */
+.ws-mat-sum {
+  margin: 0 0 var(--sp-3); font-weight: var(--fw-semi);
+  font-variant-numeric: tabular-nums; min-height: 1.2em;
+}
+/* The sum of the project is the figure the other two add up to, so it carries the accent
+   the rest of the row does not. Same pair as a link on this section (check-contrast). */
+.ws-project-sum b { color: var(--accent-strong); }
 .ws-mat-add { margin-top: var(--sp-4); }
 .ws-mat-add summary { cursor: pointer; font-weight: var(--fw-semi); }
 .ws-mat-add form { margin-top: var(--sp-3); }

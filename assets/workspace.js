@@ -475,11 +475,16 @@ function wsAddEstimation(r) {
  * prints with the rest; `calculationType` has to be one of the four the app knows, and
  * SURFACE_COVERAGE is the closest thing to "no engine".
  *
- * `manual` keeps it off the material list — see wsAddEstimation().
+ * `manual` keeps it off the material list — see wsAddEstimation() — and it is also what
+ * makes the line one of chapter XVII's "inne koszty": see wsIsManualLine().
+ *
+ * `projectId` names the project it belongs to. Without one it is the active project, which
+ * is what /kosztorys/ means by "the estimate": that page is about one project at a time.
  */
-function wsAddManualEstimation({ name, requiredUnits, unitLabel, costMajor }) {
+function wsAddManualEstimation({ name, requiredUnits, unitLabel, costMajor, projectId }) {
   return wsAddEstimation({
     calcId: "coverage",
+    projectId,
     name,
     requiredUnits,
     unitLabel,
@@ -489,6 +494,32 @@ function wsAddManualEstimation({ name, requiredUnits, unitLabel, costMajor }) {
     input: { manual: true },
   });
 }
+
+/**
+ * Whether a line was typed by hand rather than calculated — chapter XVII's "inne koszty".
+ *
+ * The marker is `manual` inside `inputJson`, which `wsAddManualEstimation()` has written
+ * since the estimate page existed. It is read out of the document rather than kept beside
+ * it because `inputJson` is contract and round-trips: a line typed on this site, pushed to
+ * Firestore and pulled back on another device is still a hand-typed line.
+ *
+ * A line that a calculator produced answers "what did this cost and where did the number
+ * come from"; this one answers neither, because nothing computed it. That is exactly what
+ * separates labour and delivery from the materials on the shopping list.
+ */
+function wsIsManualLine(row) {
+  try {
+    return JSON.parse(String((row && row.inputJson) || "{}")).manual === true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/** The hand-typed lines of one project: chapter XVII's other costs, oldest first. */
+const wsOtherCosts = (projectId) => wsEstimations(projectId).filter(wsIsManualLine);
+
+/** The calculated lines of one project — the other half of the same list. */
+const wsCalcLines = (projectId) => wsEstimations(projectId).filter((r) => !wsIsManualLine(r));
 
 /** Correct a line in place. Anything not passed keeps its current value. */
 function wsUpdateEstimation(id, fields) {
@@ -570,6 +601,43 @@ function wsDeleteEstimation(id) {
  */
 const WS_NOTE_MAX = 500;
 
+/**
+ * The price of one unit of a material — chapter XVII: "Klej | 7 × 35 PLN | = 245 PLN".
+ *
+ * **Derived, never stored.** The contract has one money field on a shopping item,
+ * `estimatedCostMinor`, and it is the total: `ShoppingItemEntity` has no unit price,
+ * `validShoppingItem()` validates none, and `ShoppingCsvExporter` prints none. Read out of
+ * `3d-polednia/Materio`, not remembered.
+ *
+ * A unit price kept beside the contract would survive the sync — session 18 established
+ * that, and `note` is the field that proves it — but it would be free to disagree with the
+ * money: the phone can change the quantity or the cost of a material without ever touching
+ * a field it has no column for, and a "35 PLN each" printed next to a total that is no
+ * longer 7 × 35 is worse than no unit price at all. Division cannot drift.
+ *
+ * It is also exact for everything this site saves: every engine in assets/calculators.js
+ * computes `cost = units × price`, so dividing the total by the quantity gives back the
+ * price the visitor typed into the calculator.
+ *
+ * @returns {number|null} minor units per one unit of the material, possibly fractional, or
+ *   null when there is nothing to divide — an unpriced material, or a quantity of zero.
+ */
+function wsUnitPriceMinor(row) {
+  const qty = Number(row && row.quantity) || 0;
+  const cost = Number(row && row.estimatedCostMinor) || 0;
+  if (qty <= 0 || cost <= 0) return null;
+  return cost / qty;
+}
+
+/**
+ * The other direction: what a quantity at a unit price comes to, in minor units.
+ *
+ * Rounded exactly once, at the end — the Money rule. `wsMinor()` turns the typed price into
+ * whole minor units first, so 35 PLN × 7 is 24 500 and not 24 499.999999999996.
+ */
+const wsItemCostMinor = (priceMajor, quantity) =>
+  Math.max(0, Math.round(wsMinor(priceMajor) * Math.max(0, Number(quantity) || 0)));
+
 /** A material list, oldest first — the order the app reads it in (`ORDER BY id`). */
 function wsItems(projectId) {
   const rows = wsAlive(wsLoad().shoppingItems);
@@ -611,7 +679,11 @@ function wsAddItem(r) {
     // `nonNegative(d.quantity)` in the rules, and a quantity below zero is not a purchase.
     quantity: Math.max(0, Number(r.quantity) || 0),
     unit: String(r.unit || "").slice(0, 24),
-    estimatedCostMinor: Math.max(0, wsMinor(r.costMajor)),
+    // `costMinor` is the way in for a price the visitor typed per unit (chapter XVII); the
+    // arrow from a result still hands over the total the calculator produced, in major
+    // units, because that is the number the result panel printed.
+    estimatedCostMinor: Math.max(0, r.costMinor !== undefined
+      ? Math.round(Number(r.costMinor) || 0) : wsMinor(r.costMajor)),
     currencyCode: r.currencyCode || wsCurrency(),
     isPurchased: false,
     // Always present, even empty: the push is a merge, so a note can only be *cleared*
@@ -626,12 +698,20 @@ function wsAddItem(r) {
 
 /**
  * Correct a material in place — chapter XVI's "edytować ilość, zmienić nazwę, zmienić
- * jednostkę" plus the note. Anything not passed keeps its current value.
+ * jednostkę" plus the note, and chapter XVII's price. Anything not passed keeps its
+ * current value.
  *
- * **The price is not here.** A material carries `estimatedCostMinor`, and editing it is
- * chapter XVII — "Materiały mogą mieć ceny", session 19 — along with what a project's
- * materials come to. Changing the quantity therefore leaves the cost where it was rather
- * than silently re-multiplying a unit price nobody has entered yet.
+ * `priceMajor` is the price of **one** unit, and what is stored is the product: the
+ * contract has room for the total and nothing else, so "7 × 35" is kept as 245 and read
+ * back by dividing (wsUnitPriceMinor()). The quantity is applied first, which is what makes
+ * chapter XVII's arithmetic behave the way the form reads: change 7 to 8 at 35 PLN and the
+ * line comes to 280, because both numbers were on screen together when it was saved.
+ *
+ * **The currency follows the visitor only into a row that has never been priced.** Chapter
+ * XVII asks for the visitor's currency; chapter VI forbids converting between currencies at
+ * a rate. A row that already holds 245 PLN therefore keeps PLN when its price is edited —
+ * re-stamping it EUR would turn 245 zł into 245 € without anyone typing a number — while a
+ * material that was saved without a price takes the currency in force when it gets one.
  */
 function wsUpdateItem(id, fields) {
   const data = wsLoad();
@@ -649,6 +729,11 @@ function wsUpdateItem(id, fields) {
   }
   if (fields.note !== undefined) row.note = String(fields.note).trim().slice(0, WS_NOTE_MAX);
   if (fields.isPurchased !== undefined) row.isPurchased = Boolean(fields.isPurchased);
+  if (fields.priceMajor !== undefined) {
+    const cost = wsItemCostMinor(fields.priceMajor, row.quantity);
+    if (!row.estimatedCostMinor) row.currencyCode = wsCurrency();
+    row.estimatedCostMinor = cost;
+  }
   row.updatedAt = Date.now();
   wsSave(data);
   return row;
@@ -659,9 +744,10 @@ function wsUpdateItem(id, fields) {
  *
  * No calculator behind it, so `estimationId` is null and the row gets no "where from" of
  * its own; that is the same answer session 16 gave a hand-typed estimate line. Everything
- * else is an ordinary material, so it syncs, prints and ticks off with the rest.
+ * else is an ordinary material, so it syncs, prints and ticks off with the rest —
+ * `priceMajor` included, which is the same unit price the edit form takes.
  */
-function wsAddOwnItem({ projectId, name, materialCategory, quantity, unit, note }) {
+function wsAddOwnItem({ projectId, name, materialCategory, quantity, unit, note, priceMajor }) {
   const clean = String(name || "").trim();
   if (!clean) return null;
   return wsAddItem({
@@ -671,7 +757,7 @@ function wsAddOwnItem({ projectId, name, materialCategory, quantity, unit, note 
     materialCategory: materialCategory || "OTHER",
     quantity,
     unit,
-    costMajor: 0,
+    costMinor: wsItemCostMinor(priceMajor, quantity),
     note,
   });
 }
@@ -710,6 +796,52 @@ function wsItemsTotal(projectId) {
     mixed: codes.size > 1,
     count: rows.length,
     bought: rows.filter((r) => r.isPurchased).length,
+  };
+}
+
+/**
+ * What a project costs — chapter XVII's three figures: the materials, the other costs and
+ * the sum of the two.
+ *
+ * **Every amount in the project is counted exactly once.** Saving a calculation writes both
+ * an estimate line and a material (chapter XVI), carrying the same money, so adding the two
+ * lists together would double the bill of a project made entirely of calculations. The rule
+ * is therefore: where a calculation has a material on the shopping list, the material's
+ * price is the one that counts — it is the side chapter XVII lets the visitor re-price, so
+ * it is the side that knows what the project will actually cost. Where it has none, the
+ * calculation's own total counts, so nothing falls out of the sum:
+ *
+ *   materials — the shopping list, plus any calculation that never produced one (a line
+ *               saved before session 17, or one whose material was taken off the list).
+ *   other     — the estimate lines nothing calculated: labour, delivery, a skip. They have
+ *               no material and never will, which is exactly what makes them "other".
+ *
+ * `mixed` is the same rule as everywhere else: amounts saved in different currencies are
+ * not summable and chapter VI forbids converting them, so the interface is told rather than
+ * handed a number that means nothing.
+ */
+function wsProjectCosts(projectId) {
+  const items = wsItems(projectId);
+  const lines = wsEstimations(projectId);
+  const priced = new Set(items.map((r) => r.estimationId).filter(Boolean));
+  const other = lines.filter(wsIsManualLine);
+  const bare = lines.filter((r) => !wsIsManualLine(r) && !priced.has(r.id));
+  const codes = new Set([
+    ...items.map((r) => r.currencyCode || wsCurrency()),
+    ...bare.map((r) => r.currencyCode || wsCurrency()),
+    ...other.map((r) => r.currencyCode || wsCurrency()),
+  ]);
+  const materials = items.reduce((sum, r) => sum + (r.estimatedCostMinor || 0), 0)
+    + bare.reduce((sum, r) => sum + (r.totalCostMinor || 0), 0);
+  const otherMinor = other.reduce((sum, r) => sum + (r.totalCostMinor || 0), 0);
+  return {
+    materials,
+    other: otherMinor,
+    total: materials + otherMinor,
+    currencyCode: (items[0] || bare[0] || other[0] || {}).currencyCode || wsCurrency(),
+    mixed: codes.size > 1,
+    items: items.length,
+    others: other.length,
   };
 }
 

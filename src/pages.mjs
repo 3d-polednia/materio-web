@@ -1010,9 +1010,15 @@ export function projectsMain(lang, t, aisles = []) {
         <div id="ws-project-body" hidden>
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
 
+          <!-- Chapter XVII: "Projekt może pokazywać: koszt materiałów, inne koszty, sumę
+               projektu." The three are written by assets/workspace.js's wsProjectCosts(),
+               which counts every amount in the project exactly once — a calculation and
+               the material it put on the shopping list are the same money. -->
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_count_l"))}</span> <b id="ws-project-count"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("share_total"))}</span> <b id="ws-project-total"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_cost_mat"))}</span> <b id="ws-project-mat"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_cost_other"))}</span> <b id="ws-project-other"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("proj_cost_sum"))}</span> <b id="ws-project-total"></b></p>
           </div>
           <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
 
@@ -1072,11 +1078,15 @@ export function projectsMain(lang, t, aisles = []) {
                   </label>
                   <label class="ws-mat-f ws-mat-f-sm">
                     <span class="ws-bar-label">${esc(t("ws_col_qty"))}</span>
-                    <input id="ws-mat-qty" type="text" inputmode="decimal" value="1">
+                    <input id="ws-mat-qty" type="text" inputmode="decimal" value="1" data-f="quantity">
                   </label>
                   <label class="ws-mat-f ws-mat-f-sm">
                     <span class="ws-bar-label">${esc(t("ws_col_unit"))}</span>
                     <input id="ws-mat-unit" type="text" maxlength="24" list="ws-mat-units">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">${esc(t("proj_mat_price"))}</span>
+                    <input id="ws-mat-price" type="text" inputmode="decimal" data-f="priceMajor">
                   </label>
                   <label class="ws-mat-f">
                     <span class="ws-bar-label">${esc(t("proj_mat_aisle"))}</span>
@@ -1085,6 +1095,9 @@ export function projectsMain(lang, t, aisles = []) {
                     }</select>
                   </label>
                 </p>
+                <!-- What the two numbers above come to, in the currency in force, printed
+                     while they are typed. Chapter XVII: "7 × 35 PLN = 245 PLN". -->
+                <p class="ws-mat-sum" data-mat-sum aria-live="polite"></p>
                 <label class="ws-mat-f">
                   <span class="ws-bar-label">${esc(t("proj_mat_note"))}</span>
                   <input id="ws-mat-note" type="text" maxlength="500"
@@ -1102,6 +1115,35 @@ export function projectsMain(lang, t, aisles = []) {
               [t("mu_pkg"), t("mu_pc"), "m²", "m", "kg", "l"]
                 .map((u) => `<option value="${esc(u)}"></option>`).join("")
             }</datalist>
+          </section>
+
+          <!-- Chapter XVII's second figure: "inne koszty". Labour, delivery, a skip — the
+               part of a project no calculator produces. They are the hand-typed estimate
+               lines /kosztorys/ has always written, filed into the project that is open
+               instead of the active one, so this is a second way into one store. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("proj_cost_other"))}</h2>
+            </div>
+            <p class="muted">${esc(t("proj_other_d"))}</p>
+            <ul id="ws-project-other-list" class="data-list"></ul>
+
+            <details class="ws-mat-add" id="ws-other-add">
+              <summary>${esc(t("proj_other_add"))}</summary>
+              <form id="ws-other-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">${esc(t("ws_col_name"))}</span>
+                    <input id="ws-other-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">${esc(t("ws_col_cost"))}</span>
+                    <input id="ws-other-cost" type="text" inputmode="decimal">
+                  </label>
+                </p>
+                <p><button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button></p>
+              </form>
+            </details>
           </section>
         </div>
       </article>`;
