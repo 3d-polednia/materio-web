@@ -337,7 +337,7 @@ async function onSignedIn(user) {
   renderNext();
 
   listen("projects", (rows) => { state.projects = rows; renderProjects(); });
-  listen("rooms", (rows) => { state.rooms = rows; renderRooms(); });
+  listen("rooms", (rows) => { state.rooms = rows; renderRooms(); renderProjects(); });
   renderLocalSummary();
 }
 
@@ -522,9 +522,17 @@ async function addProject(name) {
   await fb.setDoc(projectDoc(newId()), { name, archived: false, ...syncFields(now) });
 }
 
-async function addRoom(name, lengthM, widthM, heightM) {
+/**
+ * `projectId` is chapter XVIII's link and is not in the contract — see the sync push and
+ * assets/workspace.js for why it survives anyway. Until the owner reported it after
+ * session 20, this function did not write it at all, so a room made on this page belonged
+ * to nothing and could never be shown under a project.
+ */
+async function addRoom(name, lengthM, widthM, heightM, projectId) {
   const now = Date.now();
-  await fb.setDoc(roomDoc(newId()), { name, lengthM, widthM, heightM, ...syncFields(now) });
+  await fb.setDoc(roomDoc(newId()), {
+    name, lengthM, widthM, heightM, projectId: projectId || null, ...syncFields(now),
+  });
 }
 
 /**
@@ -547,31 +555,69 @@ function renderProjects() {
     list.innerHTML = `<li class="empty muted">${T("app_empty_projects")}</li>`;
     return;
   }
-  list.innerHTML = state.projects.map((p) => `<li data-id="${p.id}">
+  list.innerHTML = state.projects.map((p) => `<li data-id="${p.id}" class="app-project">
       <span class="row-name">${escapeHtml(p.name)}${p.archived ? ` <em class="muted">(${T("app_archived")})</em>` : ""}</span>
       <span class="row-actions">
         <button type="button" class="btn btn-ghost btn-sm" data-share>${T("app_share")}</button>
         <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
       </span>
+      ${roomBlock(p.id)}
     </li>`).join("");
 }
 
-function renderRooms() {
-  const list = $("room-list");
-  if (!state.rooms.length) {
-    list.innerHTML = `<li class="empty muted">${T("app_empty_rooms")}</li>`;
-    return;
-  }
-  const fmt = (v) => new Intl.NumberFormat(document.documentElement.lang || "pl",
-    { maximumFractionDigits: 2 }).format(v);
-  list.innerHTML = state.rooms.map((r) => `<li data-id="${r.id}">
+/** A number in the visitor's notation. The dimensions are the only numbers on this page. */
+const numFmt = (v) => new Intl.NumberFormat(document.documentElement.lang || "pl",
+  { maximumFractionDigits: 2 }).format(Number(v) || 0);
+
+/** One room, as a row: the name, the three dimensions and the floor they come to. */
+const roomRow = (r) => `<li data-id="${r.id}">
       <span class="row-name">${escapeHtml(r.name)}
-        <em class="muted">${fmt(r.lengthM)} × ${fmt(r.widthM)} × ${fmt(r.heightM)} m — ${fmt(r.lengthM * r.widthM)} m²</em>
+        <em class="muted">${numFmt(r.lengthM)} × ${numFmt(r.widthM)} × ${numFmt(r.heightM)} m — ${numFmt(r.lengthM * r.widthM)} m²</em>
       </span>
       <span class="row-actions">
         <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
       </span>
-    </li>`).join("");
+    </li>`;
+
+/**
+ * The rooms of one project, plus the form that adds another — chapter XVIII's
+ * "pomieszczenia są elementem projektu", inside the project it is about.
+ *
+ * `projectId` is not in the sync contract (`RoomEntity` has no column,
+ * `SyncContract.roomToDoc()` no key) and survives anyway, because every write on both
+ * sides is a merge and the deployed `validRoom()` validates by shape with no `hasOnly` —
+ * see assets/workspace.js. The phone carries the link without being able to show it, which
+ * is what the note under the form says.
+ */
+function roomBlock(projectId) {
+  const rooms = state.rooms.filter((r) => r.projectId === projectId);
+  return `<div class="app-rooms">
+      <ul class="data-list">${
+        rooms.length ? rooms.map(roomRow).join("")
+          : `<li class="empty muted">${T("app_empty_rooms")}</li>`
+      }</ul>
+      <form class="inline-form" data-room-form>
+        <input type="text" maxlength="120" data-f="name" placeholder="${T("app_new_room")}" required>
+        <input type="text" inputmode="decimal" data-f="lengthM" value="5" aria-label="${T("fld_length")}">
+        <input type="text" inputmode="decimal" data-f="widthM" value="4" aria-label="${T("fld_width")}">
+        <input type="text" inputmode="decimal" data-f="heightM" value="2.6" aria-label="${T("fld_height")}">
+        <button type="submit" class="btn btn-ghost btn-sm">${T("app_add_room")}</button>
+      </form>
+    </div>`;
+}
+
+/**
+ * The rooms no project claims — the ones made on the phone, which cannot send a
+ * `projectId` because the contract has no field for it. They are listed rather than hidden:
+ * they are real rooms, and hiding them would look like losing them.
+ */
+function renderRooms() {
+  const list = $("room-list");
+  if (!list) return;
+  const loose = state.rooms.filter((r) => !r.projectId);
+  list.innerHTML = loose.length
+    ? loose.map(roomRow).join("")
+    : `<li class="empty muted">${T("app_rooms_loose_none")}</li>`;
 }
 
 /* ------------------------------------------------------------------ sharing */
@@ -626,22 +672,38 @@ function wireWorkspace() {
     try { await addProject(name); } catch (err) { status(T("app_err_unknown"), true); }
   });
 
-  $("room-form").addEventListener("submit", async (e) => {
+  // Chapter XVIII's room, added inside the project it belongs to. The form is redrawn with
+  // its project on every write, so the listener is on the list and reads the row it fired
+  // in — one handler for however many projects there are.
+  $("project-list").addEventListener("submit", async (e) => {
+    const form = e.target.closest("[data-room-form]");
+    if (!form) return;
     e.preventDefault();
-    const input = $("room-name");
-    const name = input.value.trim().slice(0, 120);
-    if (!name) return;
-    const l = Math.min(num($("room-length").value), 1000);
-    const w = Math.min(num($("room-width").value), 1000);
-    const h = Math.min(num($("room-height").value), 100);
-    input.value = "";
-    try { await addRoom(name, l, w, h); } catch (err) { status(T("app_err_unknown"), true); }
+    const li = form.closest("li[data-id]");
+    const get = (f) => form.querySelector(`[data-f="${f}"]`).value;
+    const name = get("name").trim().slice(0, 120);
+    if (!name || !li) return;
+    // The same clamps the deployed rules impose (FIRESTORE_SYNC §2, validRoom()).
+    const l = Math.min(num(get("lengthM")), 1000);
+    const w = Math.min(num(get("widthM")), 1000);
+    const h = Math.min(num(get("heightM")), 100);
+    try {
+      await addRoom(name, l, w, h, li.dataset.id);
+    } catch (err) { status(T("app_err_unknown"), true); }
   });
 
   $("project-list").addEventListener("click", async (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li) return;
     const project = state.projects.find((p) => p.id === li.dataset.id);
+    // A room's delete button lives inside the project row, so it has to be answered before
+    // the project's own actions — otherwise the closest `li[data-id]` above it wins.
+    const roomLi = e.target.closest(".app-rooms li[data-id]");
+    if (roomLi && e.target.closest("[data-del]")) {
+      const room = state.rooms.find((r) => r.id === roomLi.dataset.id);
+      if (room) await deleteRoom(room);
+      return;
+    }
     if (!project) return;
 
     if (e.target.closest("[data-del]")) {
@@ -661,12 +723,20 @@ function wireWorkspace() {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-del]")) return;
     const room = state.rooms.find((r) => r.id === li.dataset.id);
-    if (!room) return;
-    await tombstone(roomDoc(room.id), room, {
-      name: room.name, lengthM: room.lengthM, widthM: room.widthM, heightM: room.heightM,
-    });
+    if (room) await deleteRoom(room);
   });
 }
+
+/**
+ * Tombstone one room, from either list.
+ *
+ * `projectId` is not repeated in the fields: `tombstone()` merges, so a key it is not
+ * handed is left exactly as it was. That is the whole reason the link survives a delete
+ * and an undo on another device.
+ */
+const deleteRoom = (room) => tombstone(roomDoc(room.id), room, {
+  name: room.name, lengthM: room.lengthM, widthM: room.widthM, heightM: room.heightM,
+});
 
 /* ------------------------------------------------------------------ sync with the browser */
 
@@ -888,7 +958,7 @@ function wireAccountPanel() {
       // still there and still wants its lists.
       if (state.uid) {
         listen("projects", (rows) => { state.projects = rows; renderProjects(); });
-        listen("rooms", (rows) => { state.rooms = rows; renderRooms(); });
+        listen("rooms", (rows) => { state.rooms = rows; renderRooms(); renderProjects(); });
       }
     } finally {
       button.disabled = false;

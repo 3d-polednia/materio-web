@@ -83,8 +83,12 @@ export const STATUS = {
  *               where the key is made in the browser and is unbounded, so it can never
  *               be a directory on GitHub Pages — /projekty/?id=<projectId>.
  *   header      { order, key } — a link in the main navigation, at that position.
- *               Four at most: session 5 measured the header and six links plus the
- *               pickers overflow the row between 900px and 1080px wide.
+ *               Five at most, and the row was measured again when the fifth arrived —
+ *               see the check in validateIA().
+ *   navLevel    the level that has to be reached before the link is *shown*. Separate
+ *               from `level`, and deliberately: `level` is about reaching the page,
+ *               `navLevel` only about offering it in the menu. A page can be GUEST and
+ *               still not belong in a guest's navigation.
  *   footer      { order, key, group } — a link in a footer column ("product" when the
  *               group is left out), at that position within the column.
  *   gate        for a PRO page: what a free user sees instead of the tool.
@@ -167,9 +171,12 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlAndroid,
+    header: { order: 5, key: "nav_app_page" },
     footer: { order: 1, key: "nav_app_page", group: "account" },
-    note: "One page for the Android app. Chapter X: it must not be pushed on the home " +
-      "page, which is also why session 5 left it out of the header.",
+    note: "One page for the Android app. Chapter X still holds — it must not be pushed on " +
+      "the home page — but the owner asked for it in the navigation after session 20, and " +
+      "a link in the menu is not a push: it is last in the row, behind the four tools, and " +
+      "the home page says nothing more about it than it did before.",
   },
 
   /* ---------------------------------------------------------------- the workspace */
@@ -180,11 +187,18 @@ export const ROUTES = [
     path: urlProjects,
     header: { order: 3, key: "nav_projects" },
     footer: { order: 3, key: "nav_projects" },
+    navLevel: LEVEL.LICZMAT,
     note: "Chapter XIV makes the project the centre of the free account. The page is " +
       "GUEST because assets/workspace.js keeps projects in localStorage in the " +
       "Firestore document shape, so it works before anyone signs in; an account adds " +
-      "sync across devices, not the ability to count. See docs/ARCHITEKTURA.md, " +
-      "'Poziom /projekty/ i /kosztorys/'.",
+      "sync across devices, not the ability to count. `navLevel` is the owner's decision " +
+      "after session 20 and settles docs/ARCHITEKTURA.md §8.1: the *link* is for people " +
+      "with an account, because a guest offered 'Projekty' in the menu is being offered a " +
+      "list that is empty until they have counted something. The page itself is not " +
+      "gated and cannot be — it is a static file over rows in this browser's own storage, " +
+      "and FIRESTORE_SYNC §1.2 says counting never requires an account. It stays " +
+      "indexable, stays in sitemap.xml, and stays reachable from 'Otwórz projekt' under " +
+      "a saved result.",
   },
   {
     id: "project",
@@ -740,11 +754,32 @@ export function validateIA() {
     }
   }
 
-  // The header row holds four links, the pickers and the account button. Session 5
-  // measured it: a fifth link pushes the row past the content width in German and
-  // the header starts wrapping between 900px and 1080px.
+  // The header row holds the links, the pickers and the account button. Session 5 put the
+  // ceiling at four after measuring German wrapping between 900px and 1080px; the fifth
+  // ("Aplikacja", asked for after session 20) was measured the same way rather than
+  // assumed — scripts/test-pages.mjs checks the row stays on one line in all four
+  // languages at 900 / 1000 / 1160 / 1280 px, and the tightening at max-width: 1160px in
+  // assets/styles.css is what buys the room. Below 900px the navigation is a drawer and
+  // cannot wrap at all. A sixth link has not been measured, so it is still refused.
   const inHeader = navRoutes("header").length;
-  if (inHeader > 4) problems.push(`IA: ${inHeader} links in the header — the row fits four`);
+  if (inHeader > 5) problems.push(`IA: ${inHeader} links in the header — the row fits five`);
+
+  // A link nobody can be shown is a link nobody wrote on purpose. `navLevel` decides
+  // whether the menu offers a route; it can never be *below* the level needed to use the
+  // page, because that would advertise a door and then refuse it.
+  for (const r of ROUTES) {
+    if (!r.navLevel) continue;
+    if (!LEVEL_ORDER.includes(r.navLevel)) {
+      problems.push(`IA: route "${r.id}" has navLevel "${r.navLevel}", which is not a level`);
+      continue;
+    }
+    if (!r.header && !r.footer) {
+      problems.push(`IA: route "${r.id}" has a navLevel but is in no navigation`);
+    }
+    if (!allows(r.navLevel, r.level)) {
+      problems.push(`IA: route "${r.id}" shows its link at "${r.navLevel}" but needs "${r.level}" to use`);
+    }
+  }
 
   // The home page offers the three areas of chapter X, one per access level, in order.
   // Anything else — a fourth door, two doors for the same level, a door onto a route

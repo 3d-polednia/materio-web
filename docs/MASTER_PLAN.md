@@ -151,6 +151,91 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
 
+### Poprawki po Sesji 20 — zgłoszone przez właściciela
+
+Właściciel przeszedł świeżo wdrożoną Sesję 20 na telefonie i zgłosił cztery rzeczy. **To nie
+jest Sesja 21** — ten sam status, co „Poprawki po Sesji 13”. Numeracja stoi; następna
+w kolejce zostaje Sesja 21.
+
+Trzy z czterech okazały się defektami **starszymi niż Sesja 20**.
+
+**1. „Górne zakładki powinny być ciągle widoczne”.** Nagłówek na `/app/` pokazywał sam
+„Kalkulatory”. Przyczyna nie była kosmetyczna: `chrome()` w `src/app-pages.mjs` podawał
+**jeden link, wpisany na sztywno po polsku**, bo `/app/`, `/app/dashboard/` i `/p/` nie mają
+własnego języka — niosą cały słownik i tłumaczą się w miejscu, więc drugiego linku nie dałoby
+się zrobić poprawnym po niemiecku. Rozwiązane tym samym wzorcem, którym pulpit rozwiązał to
+dla swoich kafelków: build wypisuje adresy polskie i podaje wszystkie języki w
+`window.LM_NAV`, każdy link niesie `data-nav-route`, a `assets/i18n-runtime.js` przepina
+`href` przy zmianie języka — obok przepisywania etykiet, które działało od zawsze i było
+połową roboty. Bez skryptu link nadal działa.
+
+Doszła zakładka **„Aplikacja”**, o którą właściciel poprosił. Limit linków w nagłówku
+podniesiony z czterech na pięć i **zmierzony, nie założony** — Sesja 5 postawiła czwórkę po
+pomiarze zawijania w niemieckim, więc piątka dostała ten sam pomiar:
+`scripts/test-pages.mjs` sprawdza jednolinijkowy rząd w czterech językach na
+900 / 1000 / 1160 / 1280 px, osobno dla gościa (cztery widoczne) i dla zalogowanego (pięć).
+Poniżej 900 px nawigacja jest szufladą i zawinąć się nie może. Szósty link nadal wywala build.
+
+**`/p/<token>` zostaje z krótkim menu, i to jest decyzja, nie przeoczenie.** To udostępniona
+wycena otwierana przez *klienta* wykonawcy, nie przez właściciela konta; pełne menu robi
+z wyceny lejek.
+
+**2. Zakładki „Projekty” i „Pomieszczenia” w `/app/` scalone.** Pomieszczenia są teraz
+rysowane **wewnątrz** projektu, z własnym formularzem w każdym wierszu — tak jak zrobiła to
+Sesja 20 na `/projekty/`. Cztery zakładki zamiast pięciu. Pomieszczenia, których nikt nie
+przypisał, mają jedną listę na dole: to są wszystkie pomieszczenia zrobione na telefonie, bo
+`SyncContract.roomToDoc()` nie ma czego wysłać. Są **wypisane, nie ukryte** — ukrycie
+wyglądałoby jak zgubienie.
+
+**3. „Nie da się przypisać pokoju do projektu” — i miał rację w trzech miejscach naraz.**
+
+- Formularz na `/projekty/` wkładał pomieszczenie do **aktywnego** projektu, nie pytając
+  i nie mówiąc o tym ani słowa. Teraz ma listę projektów, domyślnie aktywny, plus
+  **„— bez projektu —”** jako prawdziwą odpowiedź; wiersz pomieszczenia ma tę samą listę do
+  przeniesienia, w tym samym kształcie, co lista pomieszczeń przy wierszu kalkulacji.
+- **Ten sam formularz gubił przecinek.** Oddawał `wsDim()` surowy tekst z pola, więc „3,5”
+  czytało się jako `Number("3,5")` → `NaN` → 0: pokój wpisany tak, jak wpisuje Polak,
+  wychodził `3 × 0 × 2,6 m`. Formularz na ekranie projektu parsował to od zawsze; ten nie.
+  Znalazł to test tej paczki, nie czytanie kodu.
+- **`addRoom()` w `/app/` w ogóle nie zapisywał `projectId`.** Pomieszczenie założone na
+  koncie nie należało do niczego i nie mogło się nigdy pokazać pod projektem. Przy okazji
+  `tombstone()` wysyła teraz z `{ merge: true }` — z tego samego powodu, dla którego robi to
+  push: zwykłe `setDoc` kasowało przy oznaczaniu wiersza za usunięty **każde pole, o którym
+  przeglądarka nie wie** (notatkę materiału, projekt pomieszczenia).
+
+**4. „Projekty” w menu tylko dla zalogowanych — rozstrzygnięcie otwartej decyzji §8.1.**
+Zakres jest węższy, niż brzmi, i ta różnica jest tu najważniejsza. `level` trasy zostaje
+`GUEST`: strona nie jest bramkowana i **nie może być**, bo to statyczny plik nad wierszami
+w `localStorage` **tej** przeglądarki, a `FIRESTORE_SYNC` §1.2 mówi, że liczenie nigdy nie
+wymaga konta. Nowe pole `navLevel` decyduje wyłącznie o **linku**. Strona zostaje
+indeksowana i zostaje w `sitemap.xml`; gość, który wejdzie z linku „Otwórz projekt” pod
+zapisanym wynikiem, widzi swoje projekty.
+
+Link jest w HTML dla każdego — chowa go arkusz stylów, i tylko wtedy, gdy dokument niesie
+`data-lm-level`. **Bez JavaScriptu klasa `.js` nigdy nie zostaje dopisana, więc reguła nie
+działa**: Googlebot i przeglądarka bez skryptu widzą link dalej. Poziom stemplowany jest
+w skrypcie w `<head>`, tym samym, który stosuje motyw — jeden odczyt `localStorage` więcej
+i zero mignięcia; `assets/account.js` ładuje się na końcu dokumentu i jest na to za późno.
+Znacznik `liczmat-signed-in` **nadal jest podpowiedzią i nadal niczego nie bramkuje**.
+
+- Sprawdzone: **224 nowe sprawdzenia — 4496/4496 przechodzi** (3100 logiki + 1396
+  w Chromium), a wszystkie 4272 sprzed tej paczki nadal przechodzą. Żadnego nowego pliku
+  testowego nie trzeba było: sprawdzenia doszły tam, gdzie mieszka temat —
+  `test-projects.mjs` (nawigacja i poziomy), `test-rooms.mjs` i `test-rooms-page.mjs`
+  (wybór projektu, link w menu), `test-account.mjs` i `test-account-page.mjs` (cztery
+  zakładki, menu, `projectId`), `test-pages.mjs` (pomiar rzędu nagłówka).
+  Sprawdzone **negatywnie dziewięć razy** — link pokazywany wszystkim, znacznik poziomu
+  niewypisywany do `<li>`, brak zakładki „Aplikacja”, brak stempla poziomu w `<head>`
+  (dwa razy: raz w logice, raz w przeglądarce, bo pierwsza wersja tego sprawdzenia **nie
+  protestowała** i trzeba było ją przepisać, żeby mierzyła pozycję skryptu, a nie jego
+  istnienie), `/app/` bez `projectId`, `/app/` z jednym linkiem, formularz ignorujący wybór
+  projektu i nagłówek bez zaciskania na 1160 px — za każdym razem test faktycznie protestuje.
+- Kontrast: bez nowej pary. `scripts/check-contrast.mjs`: wszystkie pary nadal przechodzą.
+
+Matematyka kalkulatorów nietknięta — `assets/calculators.js` bez zmian.
+
+**Następne zadanie: Sesja 21 — LICZMAT PRO: FUNDAMENT.**
+
 ### Co zrobiła Sesja 20
 
 Rozdział XVIII w całości: „Pomieszczenia są elementem projektu", przykład `Projekt: Remont

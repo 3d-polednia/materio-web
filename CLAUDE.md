@@ -375,6 +375,35 @@ Kotlin side of it. Change one, change all three.
   "W przygotowaniu" with nothing to click. **Do not add a field to `users/{uid}`** — a
   name, a currency, a preference — the rules reject it; a profile name goes to Firebase
   Auth (`updateProfile`) instead.
+- **`/app/` has four tabs, and rooms are not one of them.** Chapter XVIII makes a room an
+  element of a project, so `renderProjects()` draws each project's rooms inside its row
+  with an add form of its own, and the rooms nobody assigned get one list at the bottom —
+  that is every room made on the phone, because `SyncContract.roomToDoc()` has no
+  `projectId` to send. `addRoom()` writes `projectId` since the fixes after session 20; it
+  did not before, so a room created on this page belonged to nothing. `tombstone()` writes
+  with `{ merge: true }` for the same reason the sync push does — a plain `setDoc` erased
+  every field the browser does not know about (a material's note, a room's project) while
+  marking the row deleted.
+- **The header carries five links, and `/app/` carries the same ones as everywhere else.**
+  `navRoutes("header")` is the whole list; `validateIA()` caps it at five and the fifth
+  ("Aplikacja", asked for after session 20) was measured rather than assumed —
+  `scripts/test-pages.mjs` checks the row stays on one line in four languages at
+  900/1000/1160/1280 px, for a guest and for a signed-in visitor. A sixth still aborts the
+  build. `/app/`, `/app/dashboard/` and `/p/` have no language of their own, so the build
+  renders `DEFAULT_LANG`'s addresses and hands them every language's in `window.LM_NAV`;
+  `assets/i18n-runtime.js` repoints each `data-nav-route` link on `langchange`. Before
+  that, `/app/` carried one hard-coded Polish link and signing in emptied the menu.
+  **`/p/<token>` keeps the short list on purpose** — it is a quote opened by somebody
+  else's client, and a full menu turns it into a funnel.
+- **`navLevel` hides a link; it never gates a page.** `src/ia.mjs` gives a route two
+  separate levels: `level` is who may use the page, `navLevel` is who is offered the link.
+  `projects` is `GUEST` + `navLevel: LICZMAT` — the owner's decision after session 20,
+  which settles `docs/ARCHITEKTURA.md` §8.1. `src/template.mjs` writes `data-nav-level` on
+  the `<li>` (not the `<a>`: the row is a flex list with a gap), the inline `<head>` script
+  stamps `data-lm-level` from `liczmat-signed-in` before the first paint, and the
+  stylesheet hides the item only when the level is known. **No script means no `.js` class
+  means the link stays** — so Googlebot sees it, `/projekty/` keeps `indexable: true` and
+  stays in `sitemap.xml`, and the page itself is not gated and cannot be.
 - **`liczmat-signed-in` is a copy hint, never a gate.** `/app/` writes the level into it
   on sign-in and clears it on sign-out, because the 60 calculator pages do not load
   Firebase and still have to choose between "create a free account" and "your account

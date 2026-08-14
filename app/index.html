@@ -11,6 +11,13 @@
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
 <!-- Google tag (gtag.js) with Consent Mode v2 -->
@@ -53,7 +60,7 @@
 <link rel="canonical" href="https://materio-app.com/app/">
 
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260814d" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260814e" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -71,9 +78,9 @@
 <meta name="twitter:title" content="Moje konto — LiczMat">
 <meta name="twitter:description" content="Konto jest darmowe i opcjonalne. Trzyma projekty, pomieszczenia i kosztorysy w telefonie i w przeglądarce naraz.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260814d">
+<link rel="stylesheet" href="/assets/styles.css?v=20260814e">
 
-
+<script>window.LM_NAV = {"calculators":{"pl":"/kalkulatory/","uk":"/uk/kalkulyatory/","de":"/de/rechner/","en":"/en/calculators/"},"materials":{"pl":"/materialy/","uk":"/uk/materialy/","de":"/de/materialien/","en":"/en/materials/"},"projects":{"pl":"/projekty/","uk":"/uk/proekty/","de":"/de/projekte/","en":"/en/projects/"},"guides":{"pl":"/poradniki/","uk":"/uk/porady/","de":"/de/ratgeber/","en":"/en/guides/"},"android":{"pl":"/aplikacja/","uk":"/uk/dodatok/","de":"/de/android-app/","en":"/en/android-app/"}};</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Przejdź do treści</a>
@@ -82,7 +89,11 @@
     <a class="brand" href="/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
     <nav id="nav-links" class="nav-links" aria-label="Nawigacja główna" data-i18n-aria="nav_main">
       <ul class="nav-list">
-        <li><a href="/kalkulatory/" data-i18n="nav_calc">Kalkulatory</a></li>
+        <li><a href="/kalkulatory/" data-i18n="nav_calc" data-nav-route="calculators">Kalkulatory</a></li>
+        <li><a href="/materialy/" data-i18n="nav_materials" data-nav-route="materials">Materiały</a></li>
+        <li data-nav-level="liczmat"><a href="/projekty/" data-i18n="nav_projects" data-nav-route="projects">Projekty</a></li>
+        <li><a href="/poradniki/" data-i18n="nav_guides" data-nav-route="guides">Poradniki</a></li>
+        <li><a href="/aplikacja/" data-i18n="nav_app_page" data-nav-route="android">Aplikacja</a></li>
       </ul>
       <div class="pickers">
         <div class="lang-picker" id="lang-picker"></div>
@@ -242,12 +253,18 @@
 
         <div class="app-tabs" role="tablist" aria-label="Sekcje konta" data-i18n-aria="app_tabs_label">
           <button type="button" class="app-tab" role="tab" id="tab-projects" aria-controls="panel-projects" data-tab="projects" aria-selected="true" tabindex="0" data-i18n="app_tab_projects">Projekty</button>
-          <button type="button" class="app-tab" role="tab" id="tab-rooms" aria-controls="panel-rooms" data-tab="rooms" aria-selected="false" tabindex="-1" data-i18n="app_tab_rooms">Pomieszczenia</button>
           <button type="button" class="app-tab" role="tab" id="tab-sync" aria-controls="panel-sync" data-tab="sync" aria-selected="false" tabindex="-1" data-i18n="app_tab_sync">Synchronizacja</button>
           <button type="button" class="app-tab" role="tab" id="tab-profile" aria-controls="panel-profile" data-tab="profile" aria-selected="false" tabindex="-1" data-i18n="app_tab_profile">Profil</button>
           <button type="button" class="app-tab" role="tab" id="tab-account" aria-controls="panel-account" data-tab="account" aria-selected="false" tabindex="-1" data-i18n="app_tab_account">Konto</button>
         </div>
 
+        <!-- Chapter XVIII: "Pomieszczenia są elementem projektu." Until the owner reported
+             it after session 20, /app/ had two tabs and no link between them at all —
+             addRoom() did not even write a projectId, so a room made here belonged to
+             nothing. One tab now, rooms under the project they were measured for, and the
+             rooms nobody assigned in a group of their own at the bottom: that is what a
+             room pulled off the phone looks like, because SyncContract.roomToDoc() has no
+             projectId to send. The lists are drawn by assets/app.js. -->
         <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0">
           <h2 data-i18n="app_projects">Projekty</h2>
           <form id="project-form" class="inline-form">
@@ -256,17 +273,9 @@
           </form>
           <ul id="project-list" class="data-list"></ul>
           <p class="muted" data-i18n="app_share_hint">Kto ma link, zobaczy wycenę bez logowania. Link wyłączysz w każdej chwili.</p>
-        </section>
 
-        <section data-panel="rooms" id="panel-rooms" role="tabpanel" aria-labelledby="tab-rooms" tabindex="0" hidden>
-          <h2 data-i18n="app_rooms">Pokoje</h2>
-          <form id="room-form" class="inline-form">
-            <input id="room-name" type="text" maxlength="120" placeholder="Nowy pokój" data-i18n-ph="app_new_room" required>
-            <input id="room-length" type="text" inputmode="decimal" value="5" aria-label="Długość (m)">
-            <input id="room-width" type="text" inputmode="decimal" value="4" aria-label="Szerokość (m)">
-            <input id="room-height" type="text" inputmode="decimal" value="2.6" aria-label="Wysokość (m)">
-            <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">Dodaj</button>
-          </form>
+          <h3 class="mt-8" data-i18n="app_rooms_loose">Pomieszczenia bez projektu</h3>
+          <p class="muted" data-i18n="app_rooms_loose_d">Pomieszczenia zapisane w aplikacji na telefonie nie niosą projektu — telefon nie ma na to pola. Dodaj je tutaj do projektu w przeglądarce.</p>
           <ul id="room-list" class="data-list"></ul>
         </section>
 
@@ -408,16 +417,16 @@
   </div>
 </footer>
 
-<script src="/assets/i18n.all.js?v=20260814d"></script>
-<script src="/assets/i18n-runtime.js?v=20260814d"></script>
-<script src="/assets/currency.js?v=20260814d"></script>
+<script src="/assets/i18n.all.js?v=20260814e"></script>
+<script src="/assets/i18n-runtime.js?v=20260814e"></script>
+<script src="/assets/currency.js?v=20260814e"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260814d"></script>
-<script src="/assets/workspace.js?v=20260814d"></script>
-<script type="module" src="/assets/app.js?v=20260814d"></script>
-<script src="/assets/main.js?v=20260814d"></script>
+<script src="/assets/account.js?v=20260814e"></script>
+<script src="/assets/workspace.js?v=20260814e"></script>
+<script type="module" src="/assets/app.js?v=20260814e"></script>
+<script src="/assets/main.js?v=20260814e"></script>
 
 </body>
 </html>

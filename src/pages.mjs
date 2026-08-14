@@ -1226,11 +1226,17 @@ export function projectsMain(lang, t, aisles = []) {
 
         <h2 class="mt-8">${esc(t("ws_rooms"))}</h2>
         <p class="muted">${esc(t("wspage_rooms_d"))}</p>
+        <!-- Chapter XVIII: a room is an element of a project, so the form asks which one
+             instead of silently taking the active project — which is what it did until the
+             owner reported that a room could not be assigned at all. The list is filled by
+             assets/workspace-ui.js; "no project" is a real answer, because a room measured
+             before there is a project is still a room. -->
         <form id="ws-room-form" class="inline-form">
           <input id="ws-room-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_room"))}" required>
           <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="${esc(t("fld_length"))}">
           <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="${esc(t("fld_width"))}">
           <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="${esc(t("fld_height"))}">
+          <select id="ws-room-project" aria-label="${esc(t("ws_project"))}"></select>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="ws-room-list" class="data-list"></ul>

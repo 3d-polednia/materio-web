@@ -19,8 +19,9 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { LEVEL, STATUS, route, validateIA, livePaths, FLOWS } from "../src/ia.mjs";
+import { LEVEL, STATUS, route, validateIA, livePaths, FLOWS, navRoutes, ROUTES } from "../src/ia.mjs";
 import { projectsMain } from "../src/pages.mjs";
+import { siteHeader, siteFooter } from "../src/template.mjs";
 import { LANGS, DEFAULT_LANG, urlProject, urlProjects, urlEstimate, GUIDES } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -519,6 +520,99 @@ head("11. the copy, in four languages");
       check(`${lang}: "${key}" is written to be followed by a name`, DICT[lang][key].endsWith(":"));
     }
   }
+}
+
+/* ------------------------------------------- 12. the navigation (fixes after session 20) */
+
+head("12. the header carries five links, and one of them is only offered with an account");
+{
+  const inHeader = navRoutes("header");
+  eq("five links in the header", inHeader.length, 5);
+  eq("and they are in the architecture's order",
+    inHeader.map((r) => r.id).join(","), "calculators,materials,projects,guides,android");
+
+  // The owner asked for "Aplikacja" in the menu after session 20. Chapter X still forbids
+  // pushing the app on the home page; a link last in the row is not that.
+  const android = route("android");
+  check("the app page is in the header", Boolean(android.header));
+  eq("last, behind the four tools", android.header.order, 5);
+  eq("with the label it already had in the footer", android.header.key, "nav_app_page");
+
+  // A sixth link has never been measured, so the build still refuses it.
+  const spare = ROUTES.find((r) => r.id === "stores");
+  const was = spare.header;
+  spare.header = { order: 6, key: "nav_stores" };
+  check("a sixth link still aborts the build",
+    validateIA().some((p) => /links in the header/.test(p)), validateIA().join("\n      "));
+  spare.header = was;
+  check("and the architecture is happy once it is put back", validateIA().length === 0);
+}
+
+head("13. /projekty/ hides its link without gating its page");
+{
+  const r = route("projects");
+  // The two are deliberately different, and that difference is the whole change: `level`
+  // is who may use the page, `navLevel` is who is offered the link.
+  eq("a guest may still use the page", r.level, LEVEL.GUEST);
+  eq("but the link is for an account", r.navLevel, LEVEL.LICZMAT);
+  eq("and the page stays in the index", r.indexable, true);
+  check("the build still writes its file", livePaths(CALCS, GUIDES).has("projekty/index.html"));
+
+  // A link nobody could ever be shown is a mistake the build has to catch.
+  const target = ROUTES.find((x) => x.id === "calculators");
+  const was = target.navLevel;
+  target.navLevel = "nonsense";
+  check("an unknown navLevel aborts the build",
+    validateIA().some((p) => /is not a level/.test(p)));
+  target.navLevel = was;
+
+  const guides = ROUTES.find((x) => x.id === "guide");
+  guides.navLevel = LEVEL.LICZMAT;
+  check("a navLevel on a route that is in no navigation aborts the build",
+    validateIA().some((p) => /navLevel but is in no navigation/.test(p)));
+  delete guides.navLevel;
+  check("the architecture is happy once both are put back", validateIA().length === 0);
+
+  // The markup: the item carries the level, so CSS can take the whole <li> out of the row
+  // rather than leaving the gap an empty one would.
+  const t = tr(DEFAULT_LANG);
+  const header = siteHeader({ lang: DEFAULT_LANG, t, alternates: {}, path: urlProjects(DEFAULT_LANG) });
+  check("the header item carries the level",
+    header.includes('<li data-nav-level="liczmat">'), header.slice(0, 400));
+  check("and only that one does",
+    (header.match(/data-nav-level=/g) || []).length === 1);
+  check("the app page is in the rendered header", header.includes(t("nav_app_page")));
+
+  const footer = siteFooter({ lang: DEFAULT_LANG, t, alternates: {} });
+  check("the footer item carries it too", footer.includes('<li data-nav-level="liczmat">'));
+
+  // The rule that hides it must never fire without the level being known: no `data-lm-level`
+  // is a guest *or* a browser with no script, and the second one is Googlebot.
+  const css = readFileSync(p("assets/styles.css"), "utf8");
+  check("the stylesheet only hides it once the level is known",
+    css.includes('html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) [data-nav-level="liczmat"]'));
+  // A built page is the proof: the link is in the HTML for everybody, and it is the
+  // stylesheet — not the build — that takes it away.
+  const built = readFileSync(p("index.html"), "utf8");
+  check("the home page ships the link in its markup",
+    built.includes('<li data-nav-level="liczmat">'));
+  check("and ships the app page beside it", built.includes(">Aplikacja</a>"));
+
+  // The level has to be stamped **before the first paint**, or a signed-in visitor watches
+  // the link appear. assets/account.js also stamps it, but that file is at the end of
+  // <body> and is therefore too late — so this measures the position, not just the fact.
+  const stamp = built.indexOf("setAttribute('data-lm-level'");
+  check("the level is stamped by a script in the document", stamp > 0);
+  check("read from the session hint",
+    built.indexOf("liczmat-signed-in") > 0 && built.indexOf("liczmat-signed-in") < stamp);
+  const headEnd = built.indexOf("</head>");
+  check("and it happens inside the head, so the link never flickers",
+    stamp > 0 && stamp < headEnd, `stamp at ${stamp}, head ends at ${headEnd}`);
+  // The one script that runs before anything is drawn already reads localStorage for the
+  // theme; putting the level there costs one more read and no second script.
+  const themeAt = built.indexOf("liczmat-theme");
+  check("in the same script the theme is applied in", themeAt > 0 && Math.abs(stamp - themeAt) < 800,
+    `theme at ${themeAt}, level at ${stamp}`);
 }
 
 /* ------------------------------------------------------------------ report */

@@ -1028,9 +1028,37 @@ function wsBackToIndex() {
   wsRenderWorkspace();
 }
 
+/**
+ * The projects a room can be put into, as `<option>`s, with "no project" first.
+ *
+ * "No project" is a real answer and not a placeholder: a room measured before there is
+ * anything to file it under is still a room, and it still fills a calculator. It is also
+ * what a room pulled off the phone looks like — `SyncContract.roomToDoc()` has no
+ * `projectId` to send.
+ */
+function wsProjectOptions(current) {
+  return `<option value="">${wsEsc(wsT("ws_room_free"))}</option>` + wsProjects()
+    .map((p) => `<option value="${wsEsc(p.id)}"${p.id === current ? " selected" : ""}>${wsEsc(p.name)}</option>`)
+    .join("");
+}
+
+/** The picker in the "add a room" form, kept on whatever is selected. */
+function wsFillRoomProject() {
+  const sel = document.getElementById("ws-room-project");
+  if (!sel) return;
+  const projects = wsProjects();
+  const keep = sel.dataset.touched ? sel.value : wsActiveProjectId();
+  sel.innerHTML = wsProjectOptions("");
+  sel.value = projects.some((p) => p.id === keep) ? keep : "";
+  // With no project at all there is one option and it is "no project" — a control with a
+  // single dead choice. The form still works; it just stops pretending to ask.
+  sel.hidden = projects.length === 0;
+}
+
 function wsRenderRooms() {
   const list = document.getElementById("ws-room-list");
   if (!list) return;
+  wsFillRoomProject();
   const rooms = wsRooms();
   if (!rooms.length) {
     list.innerHTML = `<li class="empty muted">${wsEsc(wsT("ws_empty_rooms"))}</li>`;
@@ -1045,12 +1073,20 @@ function wsRenderRooms() {
     const project = r.projectId ? wsProject(r.projectId) : null;
     const where = project
       ? ` <a class="ws-room-of" href="?id=${encodeURIComponent(project.id)}">${wsEsc(project.name)}</a>` : "";
+    // The same control the calculation rows got in session 20, doing the same job one
+    // level up: a room can be moved between projects, or taken out of all of them. Absent
+    // while there is no project to move it into.
+    const move = wsProjects().length
+      ? `<select data-room-project aria-label="${wsEsc(wsT("ws_project"))}">${
+        wsProjectOptions(r.projectId || "")}</select>`
+      : "";
     return `<li data-id="${wsEsc(r.id)}">
         <span class="row-name">
           <b>${wsEsc(r.name)}</b>${where}
           <em class="muted">${wsEsc(wsRoomDims(a))} · ${wsT("room_floor")} ${wsNum(a.floor)} m² · ${wsT("room_walls")} ${wsNum(a.walls)} m²</em>
         </span>
         <span class="row-actions">
+          ${move}
           <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
         </span>
       </li>`;
@@ -1096,19 +1132,43 @@ function buildProjectsPage() {
     e.preventDefault();
     const name = document.getElementById("ws-room-name");
     if (!name.value.trim()) return;
+    const picker = document.getElementById("ws-room-project");
+    // The picker's answer, not the active project. Until the owner reported it, this form
+    // filed the room into whichever project happened to be active and said nothing about
+    // it — which is why it looked like a room could not be assigned at all.
+    const projectId = picker && !picker.hidden ? picker.value : wsActiveProjectId();
+    // Through wsDecimal(), because a comma is the decimal separator in all four languages
+    // and wsDim() reads a raw "3,5" as Number("3,5") — NaN, clamped to 0. The form on the
+    // project screen has always parsed it; this one handed the string straight to the
+    // store, so a room typed the way a Pole types it came out 3 × 0 × 2,6 m.
     wsAddRoom(
       name.value.trim(),
-      document.getElementById("ws-room-length").value,
-      document.getElementById("ws-room-width").value,
-      document.getElementById("ws-room-height").value,
-      wsActiveProjectId(),
+      wsDecimal(document.getElementById("ws-room-length").value),
+      wsDecimal(document.getElementById("ws-room-width").value),
+      wsDecimal(document.getElementById("ws-room-height").value),
+      projectId,
     );
     name.value = "";
+    name.focus();
+  });
+
+  // Once the visitor has named a project, a redraw stops moving them back to the active
+  // one — the same rule the room picker under a result follows.
+  document.getElementById("ws-room-project").addEventListener("change", (e) => {
+    e.target.dataset.touched = "1";
   });
 
   document.getElementById("ws-room-list").addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (li && e.target.closest("[data-del]")) wsDeleteRoom(li.dataset.id);
+  });
+
+  // Chapter XVIII, on a room that already exists: move it to another project, or take it
+  // out of all of them. wsUpdateRoom() has taken `projectId` since session 20.
+  document.getElementById("ws-room-list").addEventListener("change", (e) => {
+    const sel = e.target.closest("[data-room-project]");
+    const li = e.target.closest("li[data-id]");
+    if (sel && li) wsUpdateRoom(li.dataset.id, { projectId: sel.value });
   });
 
   document.addEventListener("workspacechange", wsRenderWorkspace);

@@ -27,7 +27,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LANGS, CALC_SLUG, urlCalc } from "../src/site.mjs";
+import { LANGS, CALC_SLUG, urlCalc, urlHome } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -365,6 +365,61 @@ head("bez javascriptu");
     await page.close();
   }
   await ctx.close();
+}
+
+/* --- 7. the header row, with five links ----------------------------------------------- */
+
+head("nagłówek");
+{
+  // Session 5 put the ceiling at four links after measuring German wrapping between 900px
+  // and 1080px; the owner asked for a fifth ("Aplikacja") after session 20. This is the
+  // measurement that decides whether the fifth is allowed, in the language with the
+  // longest labels and at every width where the row is still a row.
+  //
+  // Below 900px the navigation is a drawer and cannot wrap. Above 1160px the tightening in
+  // assets/styles.css stops applying, so both sides of that breakpoint are checked. The
+  // guest view is the honest one to measure at four visible links AND at five: the fifth,
+  // "Projekty", comes back the moment somebody signs in.
+  for (const width of [900, 1000, 1160, 1280]) {
+    const ctx = await context({ viewport: { width, height: 800 } });
+    for (const lang of LANGS) {
+      for (const signedIn of [false, true]) {
+        const page = await ctx.newPage();
+        await page.goto(`${base}/404.html`, { waitUntil: "domcontentloaded" });
+        await page.evaluate((on) => {
+          localStorage.clear();
+          if (on) localStorage.setItem("liczmat-signed-in", "liczmat");
+        }, signedIn);
+        await page.goto(base + urlHome(lang), { waitUntil: "load" });
+
+        const who = `${lang} at ${width}px${signedIn ? " signed in" : ""}`;
+        const row = await page.evaluate(() => {
+          const nav = document.querySelector(".nav");
+          const items = [...document.querySelectorAll(".nav-list li")]
+            .filter((li) => getComputedStyle(li).display !== "none");
+          const tops = new Set(items.map((li) => Math.round(li.getBoundingClientRect().top)));
+          const cta = document.querySelector(".nav-cta").getBoundingClientRect();
+          return {
+            shown: items.length,
+            lines: tops.size,
+            navBottom: Math.round(nav.getBoundingClientRect().bottom),
+            ctaRight: Math.round(cta.right),
+            width: document.documentElement.clientWidth,
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          };
+        });
+
+        eq(`${who}: the links a visitor sees`, row.shown, signedIn ? 5 : 4);
+        eq(`${who}: they are all on one line`, row.lines, 1);
+        check(`${who}: the account button is inside the viewport`,
+          row.ctaRight <= row.width, `button ends at ${row.ctaRight} of ${row.width}`);
+        check(`${who}: the page does not scroll sideways`, row.overflow <= 0,
+          `overflows by ${row.overflow}px`);
+        await page.close();
+      }
+    }
+    await ctx.close();
+  }
 }
 
 /* ------------------------------------------------------------------ the verdict */

@@ -51,8 +51,29 @@ function applyLang(lang) {
   // the currency select. Nothing about them is visible text, so nothing else would
   // translate them.
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t(el.dataset.i18nAria, l)); });
+  applyNavUrls(l);
   try { localStorage.setItem("materio-lang", l); } catch (e) {}
   document.dispatchEvent(new CustomEvent("langchange", { detail: { lang: l } }));
+}
+
+/**
+ * Repoint the navigation on a page that has no language of its own.
+ *
+ * Translating the label is only half of a menu: "Materiały" on a German /app/ pointing at
+ * the Polish page is a link that lies. The build writes DEFAULT_LANG's address into the
+ * markup — so the link works with no script at all — plus every language's address in
+ * `window.LM_NAV`, keyed by the route id in `data-nav-route`. This swaps them.
+ *
+ * A route the map does not name is left exactly as it is: the markup's own address is the
+ * fallback, never a blank or a guess.
+ */
+function applyNavUrls(lang) {
+  const map = (typeof window !== "undefined" && window.LM_NAV) || null;
+  if (!map) return;
+  document.querySelectorAll("a[data-nav-route]").forEach((a) => {
+    const urls = map[a.dataset.navRoute];
+    if (urls && urls[lang]) a.setAttribute("href", urls[lang]);
+  });
 }
 
 /** Best language for an in-place page: saved choice → browser language → Polish. */

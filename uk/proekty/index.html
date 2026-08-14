@@ -11,6 +11,13 @@
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
 <!-- Google tag (gtag.js) with Consent Mode v2 -->
@@ -57,7 +64,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/projects/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/projekty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260814d" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260814e" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +82,7 @@
 <meta name="twitter:title" content="Проєкти та приміщення — LiczMat">
 <meta name="twitter:description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі. Без реєстрації, дані залишаються в браузері.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260814d">
+<link rel="stylesheet" href="/assets/styles.css?v=20260814e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -107,8 +114,9 @@
       <ul class="nav-list">
         <li><a href="/uk/kalkulyatory/">Калькулятори</a></li>
         <li><a href="/uk/materialy/">Матеріали</a></li>
-        <li><a href="/uk/proekty/" aria-current="page">Проєкти</a></li>
+        <li data-nav-level="liczmat"><a href="/uk/proekty/" aria-current="page">Проєкти</a></li>
         <li><a href="/uk/porady/">Поради</a></li>
+        <li><a href="/uk/dodatok/">Застосунок</a></li>
       </ul>
       <div class="pickers">
         <div class="lang-picker" id="lang-picker">
@@ -354,11 +362,17 @@
 
         <h2 class="mt-8">Приміщення</h2>
         <p class="muted">Приміщення — це назва й три розміри. З них калькулятори рахують підлогу, стіни й стелю.</p>
+        <!-- Chapter XVIII: a room is an element of a project, so the form asks which one
+             instead of silently taking the active project — which is what it did until the
+             owner reported that a room could not be assigned at all. The list is filled by
+             assets/workspace-ui.js; "no project" is a real answer, because a room measured
+             before there is a project is still a room. -->
         <form id="ws-room-form" class="inline-form">
           <input id="ws-room-name" type="text" maxlength="120" placeholder="Назва приміщення" required>
           <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Довжина (м)">
           <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Ширина (м)">
           <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Висота (м)">
+          <select id="ws-room-project" aria-label="Проєкт"></select>
           <button type="submit" class="btn btn-primary btn-sm">Додати</button>
         </form>
         <ul id="ws-room-list" class="data-list"></ul>
@@ -392,7 +406,7 @@
         <ul>
           <li><a href="/uk/kalkulyatory/">Усі калькулятори</a></li>
           <li><a href="/uk/materialy/">Матеріали</a></li>
-          <li><a href="/uk/proekty/">Проєкти</a></li>
+          <li data-nav-level="liczmat"><a href="/uk/proekty/">Проєкти</a></li>
           <li><a href="/uk/koshtorys/">Кошторис</a></li>
           <li><a href="/uk/porady/">Поради</a></li>
           <li><a href="/uk/magazyny/">Магазини</a></li>
@@ -446,18 +460,18 @@
   "de": "/de/projekte/",
   "en": "/en/projects/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260814d"></script>
-<script src="/assets/i18n-runtime.js?v=20260814d"></script>
-<script src="/assets/currency.js?v=20260814d"></script>
+<script src="/assets/i18n.uk.js?v=20260814e"></script>
+<script src="/assets/i18n-runtime.js?v=20260814e"></script>
+<script src="/assets/currency.js?v=20260814e"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260814d"></script>
+<script src="/assets/account.js?v=20260814e"></script>
 
-<script src="/assets/units.js?v=20260814d"></script>
-<script src="/assets/workspace.js?v=20260814d"></script>
-<script src="/assets/workspace-ui.js?v=20260814d"></script>
-<script src="/assets/main.js?v=20260814d"></script>
+<script src="/assets/units.js?v=20260814e"></script>
+<script src="/assets/workspace.js?v=20260814e"></script>
+<script src="/assets/workspace-ui.js?v=20260814e"></script>
+<script src="/assets/main.js?v=20260814e"></script>
 
 </body>
 </html>

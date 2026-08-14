@@ -646,7 +646,7 @@ head("9. the level comes from the profile the server owns");
 
 /* --- 10. the tabs, the language switch, the phone ------------------------------------ */
 
-head("10. five tabs, reachable from the keyboard");
+head("10. four tabs, reachable from the keyboard");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
   const page = await openApp(ctx, "/app/", { accounts: ACCOUNT });
@@ -655,15 +655,17 @@ head("10. five tabs, reachable from the keyboard");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
 
-  eq("there are five", await page.locator(".app-tab").count(), 5);
+  // Four since the owner asked for "Pomieszczenia" to be folded into the project it
+  // belongs to: a room is an element of a project (chapter XVIII), not a second subject.
+  eq("there are four", await page.locator(".app-tab").count(), 4);
   eq("only the selected one is in the tab order",
     await page.locator('.app-tab[tabindex="0"]').count(), 1);
 
   await page.locator('[data-tab="projects"]').focus();
   await page.keyboard.press("ArrowRight");
   eq("the right arrow moves to the next tab",
-    await page.evaluate(() => document.activeElement.dataset.tab), "rooms");
-  check("and opens its panel", await visible(page, '[data-panel="rooms"]'));
+    await page.evaluate(() => document.activeElement.dataset.tab), "sync");
+  check("and opens its panel", await visible(page, '[data-panel="sync"]'));
   await page.keyboard.press("End");
   eq("End goes to the last one",
     await page.evaluate(() => document.activeElement.dataset.tab), "account");
@@ -932,6 +934,106 @@ head("13. the session, as the other pages see it");
     JSON.parse(localStorage.getItem("materio-workspace-v1")).estimations.length);
   check("a result still saves with a session hint present", lines === 1, `saved ${lines}`);
   await stale.close();
+  await ctx.close();
+}
+
+/* --- 15. the navigation and the rooms (fixes after session 20) ----------------------- */
+
+head("15. /app/ carries the whole menu, in whatever language it is showing");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openApp(ctx, "/app/", { accounts: ACCOUNT });
+
+  // Until the owner reported it, this page had one link — "Kalkulatory", hard-coded in
+  // Polish — so signing in emptied the menu.
+  const labels = await page.$$eval(".nav-list a", (a) => a.map((e) => e.textContent.trim()));
+  eq("five links, the architecture's own", labels.length, 5);
+  eq("in the architecture's order", labels.join(","),
+    "Kalkulatory,Materiały,Projekty,Poradniki,Aplikacja");
+
+  const hrefs = () => page.$$eval(".nav-list a", (a) => a.map((e) => e.getAttribute("href")));
+  eq("and they point at the Polish pages", (await hrefs()).join(","),
+    "/kalkulatory/,/materialy/,/projekty/,/poradniki/,/aplikacja/");
+
+  // Translating the label is only half a menu: "Materialien" pointing at /materialy/ is a
+  // link that lies. The build hands the page every language's address in window.LM_NAV.
+  await page.click("#lang-picker button");
+  await page.click('#lang-picker [data-lang="de"]');
+  await page.waitForFunction(() => document.documentElement.lang === "de");
+  const german = await page.$$eval(".nav-list a", (a) => a.map((e) => e.textContent.trim()));
+  eq("the labels follow the language", german.join(","),
+    "Rechner,Materialien,Projekte,Ratgeber,Die App");
+  eq("and so do the addresses", (await hrefs()).join(","),
+    "/de/rechner/,/de/materialien/,/de/projekte/,/de/ratgeber/,/de/android-app/");
+  eq("no console error", page.lmErrors.join(" / "), "");
+
+  // /p/<token> keeps the short list on purpose: it is a quote opened by somebody else's
+  // client, and a full menu turns it into a funnel.
+  const share = await openApp(ctx, "/p/?t=nic", { lang: "pl" });
+  eq("the shared estimate keeps one way back", await share.locator(".nav-list a").count(), 1);
+  await share.close();
+  await page.close();
+  await ctx.close();
+}
+
+head("16. rooms stand inside the project they belong to");
+{
+  const sync = { createdAt: 1, updatedAt: 1, deletedAt: null, schemaVersion: 1 };
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  // The fake Firestore does not push changes, so the lists are seeded rather than typed
+  // into — what is being measured here is the rendering and the document that is written.
+  const page = await openTab(ctx, "projects", {
+    docs: {
+      "users/u1": { plan: "free" },
+      "users/u1/projects/p1": { name: "Remont łazienki", archived: false, ...sync },
+      "users/u1/projects/p2": { name: "Salon", archived: false, ...sync },
+      // Chapter XVIII's link, on a room this site pushed.
+      "users/u1/rooms/r1": { name: "Łazienka", lengthM: 2.4, widthM: 3.2, heightM: 2.5, projectId: "p1", ...sync },
+      // And a room the phone made: roomToDoc() has no projectId to send, so it has none.
+      "users/u1/rooms/r2": { name: "Garaż", lengthM: 6, widthM: 3, heightM: 2.4, ...sync },
+    },
+  });
+  await page.waitForSelector('#project-list li[data-id="p1"] .app-rooms li[data-id="r1"]');
+
+  const p1 = '#project-list li[data-id="p1"]';
+  const text = await page.locator(`${p1} .app-rooms`).innerText();
+  check("the project draws its own room", text.includes("Łazienka"), text);
+  check("with the dimensions", /2,4\s*×\s*3,2\s*×\s*2,5\s*m/.test(text), text);
+  check("and the floor they come to", text.includes("7,68"), text);
+  check("another project's rooms are not in it", !text.includes("Garaż"), text);
+  eq("a project with no room says so",
+    await page.locator('#project-list li[data-id="p2"] .app-rooms .empty').count(), 1);
+
+  // The rooms nobody assigned are listed rather than hidden: they are real rooms, and
+  // hiding them would look like losing them.
+  const loose = await page.locator("#room-list").innerText();
+  check("the unassigned room has a list of its own", loose.includes("Garaż"), loose);
+  check("and the assigned one is not repeated in it", !loose.includes("Łazienka"), loose);
+
+  // Adding one, inside the project it belongs to. Until the owner reported it, addRoom()
+  // did not write a projectId at all, so a room made here belonged to nothing.
+  await page.fill(`${p1} [data-f="name"]`, "Przedpokój");
+  await page.fill(`${p1} [data-f="lengthM"]`, "1,4");
+  await page.fill(`${p1} [data-f="widthM"]`, "4");
+  await page.fill(`${p1} [data-f="heightM"]`, "2,5");
+  await page.click(`${p1} [data-room-form] button[type=submit]`);
+  await page.waitForFunction(() =>
+    [...window.__fbDocs.values()].some((d) => d.name === "Przedpokój"));
+
+  const doc = await page.evaluate(() => {
+    for (const [path, data] of window.__fbDocs) {
+      if (data.name === "Przedpokój") return { path, data };
+    }
+    return null;
+  });
+  check("the room reached the store", Boolean(doc), "no room document written");
+  check("beside the projects, as the contract says (FIRESTORE_SYNC §2)",
+    /^users\/u1\/rooms\//.test(doc.path), doc.path);
+  eq("and it names the project it was added inside", doc.data.projectId, "p1");
+  eq("with a comma read as a decimal point", doc.data.lengthM, 1.4);
+  eq("and the contract's own fields", `${doc.data.widthM}|${doc.data.heightM}`, "4|2.5");
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
   await ctx.close();
 }
 

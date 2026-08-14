@@ -81,6 +81,21 @@ function lmSignedIn() {
   return lmReadLevel() !== LM_LEVEL.GUEST;
 }
 
+/**
+ * Put the level on <html>, where the stylesheet can see it.
+ *
+ * The inline script in <head> (src/template.mjs) does this on the first paint, from the
+ * same key, so a navigation link gated on `navLevel` is right before anything is drawn.
+ * This is the other half: /app/ signs somebody in or out without a reload, and the menu
+ * has to follow.
+ */
+function lmMarkLevel() {
+  if (typeof document === "undefined" || !document.documentElement) return;
+  var level = lmReadLevel();
+  if (level === LM_LEVEL.GUEST) document.documentElement.removeAttribute("data-lm-level");
+  else document.documentElement.setAttribute("data-lm-level", level);
+}
+
 /** Record the level for the rest of the site. GUEST clears the key instead of storing it. */
 function lmWriteLevel(level) {
   try {
@@ -89,6 +104,7 @@ function lmWriteLevel(level) {
   } catch (e) {
     // Private mode with storage refused: every reader falls back to the guest wording.
   }
+  lmMarkLevel();
   if (typeof document !== "undefined" && typeof CustomEvent === "function") {
     document.dispatchEvent(new CustomEvent("lm-session", { detail: { level: lmReadLevel() } }));
   }
@@ -174,6 +190,9 @@ function lmMarkHeader() {
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", lmMarkHeader);
   document.addEventListener("lm-session", lmMarkHeader);
+  // The head script already stamped the level from this key. Re-stamping on load catches
+  // the one case it cannot: a page cached before the visitor signed in on another tab.
+  document.addEventListener("DOMContentLoaded", lmMarkLevel);
   // The header's title comes out of the dictionary, so it has to be redrawn when /app/
   // switches language in place.
   document.addEventListener("langchange", lmMarkHeader);

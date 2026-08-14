@@ -517,9 +517,14 @@ head("5. the index says which project each room belongs to");
   const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
   const list = await rows(page, "#ws-room-list");
   eq("every room is on the index, assigned or not", list.length, 4);
-  const bath = list.find((r) => r.includes("Łazienka"));
+
+  // The name column, not the whole row: the row also carries the picker that moves the
+  // room, and every project's name is an option inside it.
+  const named = (id) => page.$eval(`#ws-room-list li[data-id="${id}"] .row-name`,
+    (n) => n.textContent.replace(/\s+/g, " ").trim());
+  const bath = await named("r1");
   check("a room says the project it belongs to", bath.includes("Remont łazienki"), bath);
-  const garage = list.find((r) => r.includes("Garaż"));
+  const garage = await named("r4");
   check("a room with no project says nothing instead of guessing",
     !garage.includes("Remont łazienki") && !garage.includes("Salon"), garage);
   check("and the dimensions are still on the row", /6\s*×\s*3\s*×\s*2,4\s*m/.test(garage), garage);
@@ -530,6 +535,144 @@ head("5. the index says which project each room belongs to");
   eq("and a room with no project has no such link",
     await page.$$eval('#ws-room-list li[data-id="r4"] a.ws-room-of', (a) => a.length), 0);
   await page.close();
+}
+
+/* -------------------------------- 5c. picking the project (fixes after session 20) */
+
+head("5c. the project a room goes into is chosen, not guessed");
+{
+  const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
+
+  // Until the owner reported it, this form filed the room into whichever project happened
+  // to be active and said nothing about it — so it looked like a room could not be
+  // assigned at all.
+  const picker = "#ws-room-project";
+  eq("the form starts on the active project", await page.inputValue(picker), "p1");
+  const options = await page.$$eval(`${picker} option`, (o) => o.map((e) => e.textContent.trim()));
+  eq("it offers both projects and 'no project'", options.length, 3);
+  check("including a real 'no project' answer", options[0].includes("bez projektu"), options.join(" | "));
+
+  await page.selectOption(picker, "p2");
+  await page.fill("#ws-room-name", "Sypialnia");
+  await page.fill("#ws-room-length", "4");
+  await page.fill("#ws-room-width", "3,5");
+  await page.click("#ws-room-form button[type=submit]");
+  await page.waitForFunction(() =>
+    JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms.some((r) => r.name === "Sypialnia"));
+  let saved = (await roomsOf(page)).find((r) => r.name === "Sypialnia");
+  eq("the room went into the project that was picked", saved.projectId, "p2");
+  eq("not the active one", await page.evaluate(() => localStorage.getItem("materio-active-project")), "p1");
+  eq("with a comma read as a decimal point", saved.widthM, 3.5);
+
+  // "No project" is an answer, not a missing one.
+  await page.selectOption(picker, "");
+  await page.fill("#ws-room-name", "Strych");
+  await page.click("#ws-room-form button[type=submit]");
+  await page.waitForFunction(() =>
+    JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms.some((r) => r.name === "Strych"));
+  eq("a room can be made with no project at all",
+    (await roomsOf(page)).find((r) => r.name === "Strych").projectId, null);
+
+  // And an existing room can be moved, from the row it is on.
+  await page.selectOption('#ws-room-list li[data-id="r4"] [data-room-project]', "p1");
+  await page.waitForFunction(() =>
+    (JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms
+      .find((r) => r.id === "r4") || {}).projectId === "p1");
+  saved = (await roomsOf(page)).find((r) => r.id === "r4");
+  eq("the unassigned room was adopted", saved.projectId, "p1");
+  await page.selectOption('#ws-room-list li[data-id="r4"] [data-room-project]', "");
+  await page.waitForFunction(() =>
+    !(JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms
+      .find((r) => r.id === "r4") || {}).projectId);
+  eq("and can be taken back out of every project",
+    (await roomsOf(page)).find((r) => r.id === "r4").projectId, null);
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
+}
+
+head("5d. with no project at all, the form stops asking");
+{
+  const ws = fixture();
+  ws.projects = [];
+  ws.estimations = [];
+  const page = await open(ctx, PROJECTS, { workspace: ws, active: "" });
+  eq("the picker is not offered", await page.$eval("#ws-room-project", (n) => n.hidden), true);
+  eq("nor is one on any row",
+    await page.$$eval("#ws-room-list [data-room-project]", (n) => n.length), 0);
+  // The form still works — a room with no project is still a room.
+  await page.fill("#ws-room-name", "Garaż 2");
+  await page.click("#ws-room-form button[type=submit]");
+  await page.waitForFunction(() =>
+    JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms.some((r) => r.name === "Garaż 2"));
+  eq("and the room is saved with no project",
+    (await roomsOf(page)).find((r) => r.name === "Garaż 2").projectId, null);
+  await page.close();
+}
+
+/* ------------------------- 5e. the "Projekty" link (fixes after session 20) */
+
+head("5e. the Projekty link is offered to an account and shipped to everybody");
+{
+  const guest = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
+  const item = '.site .nav-list li[data-nav-level="liczmat"]';
+  eq("the item is in the markup for a guest too",
+    await guest.$$eval(item, (n) => n.length), 1);
+  eq("but it is not shown", await guest.$eval(item, (n) => getComputedStyle(n).display), "none");
+  eq("and nothing stamped a level on the document",
+    await guest.evaluate(() => document.documentElement.hasAttribute("data-lm-level")), false);
+  // The page itself is not gated by any of this — that is the whole point of the split.
+  check("the projects are on screen all the same",
+    (await rows(guest, "#ws-project-list")).join(" ").includes("Remont łazienki"));
+  await guest.close();
+
+  const member = await ctx.newPage();
+  await member.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
+  await member.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem("materio-lang", "pl");
+    localStorage.setItem("liczmat-signed-in", "liczmat");
+  });
+  await member.goto(base + PROJECTS, { waitUntil: "load" });
+  await member.waitForSelector("html[data-ws-ready]");
+  eq("a signed-in browser is stamped before the first paint",
+    await member.evaluate(() => document.documentElement.getAttribute("data-lm-level")), "liczmat");
+  check("and the link is shown",
+    (await member.$eval(item, (n) => getComputedStyle(n).display)) !== "none");
+  // The value the key held before session 13 still reads as signed in.
+  await member.evaluate(() => localStorage.setItem("liczmat-signed-in", "1"));
+  await member.reload({ waitUntil: "load" });
+  await member.waitForSelector("html[data-ws-ready]");
+  check('the old "1" still counts as signed in',
+    (await member.$eval(item, (n) => getComputedStyle(n).display)) !== "none");
+  await member.close();
+
+  // The stamp has to come from the script in <head>, not from assets/account.js at the end
+  // of <body> — otherwise a signed-in visitor watches the link appear. Blocking that file
+  // is the only way to tell the two apart from out here.
+  const noAccountJs = await ctx.newPage();
+  await noAccountJs.route("**/assets/account.js*", (r) => r.abort());
+  await noAccountJs.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
+  await noAccountJs.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem("materio-lang", "pl");
+    localStorage.setItem("liczmat-signed-in", "liczmat");
+  });
+  await noAccountJs.goto(base + PROJECTS, { waitUntil: "domcontentloaded" });
+  eq("the head script stamps the level on its own",
+    await noAccountJs.evaluate(() => document.documentElement.getAttribute("data-lm-level")), "liczmat");
+  check("so the link is right from the first paint",
+    (await noAccountJs.$eval(item, (n) => getComputedStyle(n).display)) !== "none");
+  await noAccountJs.close();
+
+  // No script: no `.js` on <html>, so the rule never fires. That is Googlebot's view, and
+  // it is why /projekty/ keeps its place in the index and in sitemap.xml.
+  const noJs = await context({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
+  const plain = await noJs.newPage();
+  await plain.goto(base + PROJECTS, { waitUntil: "load" });
+  check("without a script the link is visible",
+    (await plain.$eval(item, (n) => getComputedStyle(n).display)) !== "none");
+  await plain.close();
+  await noJs.close();
 }
 
 head("5b. a room whose project was deleted keeps the room and drops the name");

@@ -277,13 +277,22 @@ head("8. /app/ carries the account system in every language");
     check("the Pro card offers nothing to click", !/<a |<button/.test(card), card.trim().slice(0, 120));
   }
 
-  // Five tabs, each pointing at the panel it opens.
-  for (const id of ["projects", "rooms", "sync", "profile", "account"]) {
+  // Four tabs, each pointing at the panel it opens. "Pomieszczenia" was the fifth until
+  // the owner asked for it to be folded into the project it belongs to (chapter XVIII):
+  // a room is an element of a project, and two tabs made it look like two subjects.
+  for (const id of ["projects", "sync", "profile", "account"]) {
     check(`the "${id}" tab points at its panel`,
       html.includes(`id="tab-${id}" aria-controls="panel-${id}"`));
     check(`the "${id}" panel points back at its tab`,
       html.includes(`id="panel-${id}" role="tabpanel" aria-labelledby="tab-${id}"`));
   }
+  check("there is no rooms tab any more", !html.includes('id="tab-rooms"'));
+  check("nor a rooms panel", !html.includes('id="panel-rooms"'));
+  // The rooms are still on the page: the ones a project owns are drawn inside its row by
+  // assets/app.js, and the ones nobody assigned — which is every room made on the phone,
+  // because SyncContract.roomToDoc() has no projectId to send — get their own list.
+  check("the unassigned rooms have a list of their own", html.includes('id="room-list"'));
+  check("and it says why a room lands there", html.includes(DICT.pl.app_rooms_loose_d));
 }
 
 head("9. the copy exists in all four languages");

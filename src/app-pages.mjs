@@ -16,21 +16,36 @@ import {
 import { ACCOUNT_LEVELS, LEVEL, STATUS, route } from "./ia.mjs";
 
 /**
- * The same header and footer as the rest of the site, with a shorter link list: these
- * pages are a tool, not a funnel. Going through src/template.mjs is what gives them the
- * mobile drawer — before session 5 they had none, so on a phone the language and
- * currency pickers sat in a nav that CSS had hidden and no button could open.
+ * The same header and footer as the rest of the site.
  *
- * `inPlace` puts data-i18n on every label: /app/ and /p/ have no per-language URLs and
- * swap text in the DOM (assets/i18n-runtime.js) instead of navigating.
+ * `/app/` and `/app/dashboard/` used to carry a single hand-written link — "Kalkulatory",
+ * hard-coded in Polish — on the argument that these pages are a tool and not a funnel. The
+ * owner reported the consequence after session 20: signing in emptied the menu. The real
+ * reason it was one link is that these pages have **no language of their own**, so a
+ * per-language address cannot be written into them once and be right.
+ *
+ * That is now solved the way the dashboard already solved it for its own links: the build
+ * writes DEFAULT_LANG's addresses and hands the page every language's in `window.LM_NAV`,
+ * and assets/i18n-runtime.js repoints them on `langchange`. So the navigation is the
+ * architecture's own (src/ia.mjs), in every language, on a page that never reloads.
+ *
+ * `inPlace` puts data-i18n on every label, and data-nav-route on every link — the first is
+ * what the runtime rewrites, the second is what it repoints.
+ *
+ * `/p/<token>` keeps the short list on purpose: that page is a shared estimate opened by
+ * somebody else's client, not by the account holder, and a full menu turns a quote into a
+ * funnel. It passes `links` explicitly.
  */
-const chrome = (t, bodyMain) => `${siteHeader({
-  lang: "pl", t, inPlace: true,
-  links: [{ href: urlCalcIndex("pl"), key: "nav_calc" }],
+const chrome = (t, bodyMain, links) => `${siteHeader({
+  lang: DEFAULT_LANG, t, inPlace: true,
+  ...(links ? { links } : {}),
   cta: { href: PLAY_URL, key: "nav_download", target: "_blank", rel: "noopener", loc: "app" },
 })}
 ${bodyMain}
-${siteFooter({ lang: "pl", t, minimal: true, inPlace: true })}`;
+${siteFooter({ lang: DEFAULT_LANG, t, minimal: true, inPlace: true })}`;
+
+/** The short list /p/<token> keeps — one way back into the product, and no more. */
+const SHARE_LINKS = [{ href: urlCalcIndex(DEFAULT_LANG), key: "nav_calc" }];
 
 /** A label + input pair, written once because the account panel is mostly forms. */
 const field = (id, labelKey, t, opts = {}) => {
@@ -222,12 +237,18 @@ export function appMain(t) {
 
         <div class="app-tabs" role="tablist" aria-label="${esc(t("app_tabs_label"))}" data-i18n-aria="app_tabs_label">
           ${tab("projects", "app_tab_projects", true)}
-          ${tab("rooms", "app_tab_rooms")}
           ${tab("sync", "app_tab_sync")}
           ${tab("profile", "app_tab_profile")}
           ${tab("account", "app_tab_account")}
         </div>
 
+        <!-- Chapter XVIII: "Pomieszczenia są elementem projektu." Until the owner reported
+             it after session 20, /app/ had two tabs and no link between them at all —
+             addRoom() did not even write a projectId, so a room made here belonged to
+             nothing. One tab now, rooms under the project they were measured for, and the
+             rooms nobody assigned in a group of their own at the bottom: that is what a
+             room pulled off the phone looks like, because SyncContract.roomToDoc() has no
+             projectId to send. The lists are drawn by assets/app.js. -->
         <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0">
           <h2 data-i18n="app_projects">${esc(t("app_projects"))}</h2>
           <form id="project-form" class="inline-form">
@@ -236,17 +257,9 @@ export function appMain(t) {
           </form>
           <ul id="project-list" class="data-list"></ul>
           ${i("app_share_hint", "p", "muted")}
-        </section>
 
-        <section data-panel="rooms" id="panel-rooms" role="tabpanel" aria-labelledby="tab-rooms" tabindex="0" hidden>
-          <h2 data-i18n="app_rooms">${esc(t("app_rooms"))}</h2>
-          <form id="room-form" class="inline-form">
-            <input id="room-name" type="text" maxlength="120" placeholder="${esc(t("app_new_room"))}" data-i18n-ph="app_new_room" required>
-            <input id="room-length" type="text" inputmode="decimal" value="5" aria-label="${esc(t("fld_length"))}">
-            <input id="room-width" type="text" inputmode="decimal" value="4" aria-label="${esc(t("fld_width"))}">
-            <input id="room-height" type="text" inputmode="decimal" value="2.6" aria-label="${esc(t("fld_height"))}">
-            <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">${esc(t("app_add"))}</button>
-          </form>
+          <h3 class="mt-8" data-i18n="app_rooms_loose">${esc(t("app_rooms_loose"))}</h3>
+          ${i("app_rooms_loose_d", "p", "muted")}
           <ul id="room-list" class="data-list"></ul>
         </section>
 
@@ -538,12 +551,12 @@ export function shareMain(t) {
         </div>
 
         <p class="muted mt-6" data-i18n="share_owner_note">${esc(t("share_owner_note"))}</p>
-        <p><a class="btn btn-ghost" href="${urlHome("pl")}" data-i18n="bc_home">${esc(t("bc_home"))}</a></p>
+        <p><a class="btn btn-ghost" href="${urlHome(DEFAULT_LANG)}" data-i18n="bc_home">${esc(t("bc_home"))}</a></p>
       </div>
     </div>
   </section>
 </main>`;
-  return chrome(t, main);
+  return chrome(t, main, SHARE_LINKS);
 }
 
 export const APP_PATH = URL_APP;

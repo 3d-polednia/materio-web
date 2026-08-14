@@ -259,6 +259,16 @@ head("2. add, read by project, correct, take off");
   ws.wsUpdateRoom(r3.id, { projectId: "" });
   eq("and can be taken out of every project", ws.wsRoom(r3.id).projectId, null);
 
+  // "No project" is an answer, not a missing one. A room measured before there is anything
+  // to file it under is still a room and still fills a calculator — and it is what every
+  // room made on the phone looks like, because roomToDoc() has no projectId to send.
+  const free = ws.wsAddRoom("Piwnica", 3, 3, 2.2, "");
+  eq("a room can be made with no project at all", free.projectId, null);
+  eq("and it is in the flat list", ws.wsRooms().some((r) => r.id === free.id), true);
+  eq("but in no project's list", ws.wsRooms(bath.id).some((r) => r.id === free.id), false);
+  ws.wsUpdateRoom(free.id, { projectId: bath.id });
+  eq("and it can be adopted later", ws.wsRoom(free.id).projectId, bath.id);
+
   // D — the delete is a tombstone, exactly like every other row here (FIRESTORE_SYNC §3).
   const gone = ws.wsDeleteRoom(r1.id);
   check("the delete answers with the row", Boolean(gone) && gone.id === r1.id);
@@ -543,6 +553,10 @@ head("7. the frame the build writes");
   // still has to be able to measure one.
   check("the index still has its rooms form", built.includes('id="ws-room-form"'));
   check("and its list", built.includes('id="ws-room-list"'));
+  // Fixes after session 20: the form asks which project instead of silently taking the
+  // active one, which is what made it look like a room could not be assigned at all.
+  check("and a project picker in that form", built.includes('id="ws-room-project"'));
+  check("labelled as the project it is", built.includes(t("ws_project")));
 
   // Chapter XVIII's last sentence: rooms are not a module to promote. The project screen
   // is where they live, and nothing about the frame turns them into a section of their own.
@@ -565,7 +579,9 @@ head("8. the copy exists in all four languages");
 {
   const KEYS = [
     "proj_room_d", "proj_room_empty", "proj_room_add", "proj_room_volume",
-    "proj_room_phone", "ws_room", "ws_room_no",
+    "proj_room_phone", "ws_room", "ws_room_no", "ws_room_free",
+    // /app/ after the fixes: rooms under the project, and the ones nobody assigned.
+    "app_add_room", "app_rooms_loose", "app_rooms_loose_d", "app_rooms_loose_none",
     // The keys session 20 leans on that were already here.
     "ws_rooms", "ws_new_room", "ws_empty_rooms", "room_floor", "room_walls",
     "ws_surface_walls", "fld_length", "fld_width", "fld_height",

@@ -11,6 +11,13 @@
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
 <!-- Google tag (gtag.js) with Consent Mode v2 -->
@@ -57,7 +64,7 @@
 <link rel="alternate" hreflang="en" href="https://materio-app.com/en/calculators/linear-cutting-1d/">
 <link rel="alternate" hreflang="x-default" href="https://materio-app.com/kalkulatory/rozkroj-liniowy-1d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260814d" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260814e" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -75,7 +82,7 @@
 <meta name="twitter:title" content="Linear cut (1D) — Construction calculators online | LiczMat">
 <meta name="twitter:description" content="Linear cut (1D) — free online calculator. Bars, trims, pipes: how many and how to cut. The same formula as in the LiczMat app for Android, no sign-up.">
 <meta name="twitter:image" content="https://materio-app.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260814d">
+<link rel="stylesheet" href="/assets/styles.css?v=20260814e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -135,8 +142,9 @@
       <ul class="nav-list">
         <li><a href="/en/calculators/" aria-current="page">Calculators</a></li>
         <li><a href="/en/materials/">Materials</a></li>
-        <li><a href="/en/projects/">Projects</a></li>
+        <li data-nav-level="liczmat"><a href="/en/projects/">Projects</a></li>
         <li><a href="/en/guides/">Guides</a></li>
+        <li><a href="/en/android-app/">The app</a></li>
       </ul>
       <div class="pickers">
         <div class="lang-picker" id="lang-picker">
@@ -256,7 +264,7 @@ actual waste = (Stock length × bars − Σ pieces) ÷ (Stock length × bars) ×
         <ul>
           <li><a href="/en/calculators/">All calculators</a></li>
           <li><a href="/en/materials/">Materials</a></li>
-          <li><a href="/en/projects/">Projects</a></li>
+          <li data-nav-level="liczmat"><a href="/en/projects/">Projects</a></li>
           <li><a href="/en/cost-estimate/">Cost estimate</a></li>
           <li><a href="/en/guides/">Guides</a></li>
           <li><a href="/en/stores/">Stores</a></li>
@@ -310,22 +318,22 @@ actual waste = (Stock length × bars − Σ pieces) ÷ (Stock length × bars) ×
   "de": "/de/rechner/linearer-zuschnitt-1d/",
   "en": "/en/calculators/linear-cutting-1d/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260814d"></script>
-<script src="/assets/i18n-runtime.js?v=20260814d"></script>
-<script src="/assets/currency.js?v=20260814d"></script>
+<script src="/assets/i18n.en.js?v=20260814e"></script>
+<script src="/assets/i18n-runtime.js?v=20260814e"></script>
+<script src="/assets/currency.js?v=20260814e"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260814d"></script>
+<script src="/assets/account.js?v=20260814e"></script>
 
-<script src="/assets/units.js?v=20260814d"></script>
-<script src="/assets/calculators.js?v=20260814d"></script>
-<script src="/assets/materials.js?v=20260814d"></script>
-<script src="/assets/materials-ui.js?v=20260814d"></script>
-<script src="/assets/workspace.js?v=20260814d"></script>
-<script src="/assets/workspace-ui.js?v=20260814d"></script>
-<script src="/assets/recent.js?v=20260814d"></script>
-<script src="/assets/main.js?v=20260814d"></script>
+<script src="/assets/units.js?v=20260814e"></script>
+<script src="/assets/calculators.js?v=20260814e"></script>
+<script src="/assets/materials.js?v=20260814e"></script>
+<script src="/assets/materials-ui.js?v=20260814e"></script>
+<script src="/assets/workspace.js?v=20260814e"></script>
+<script src="/assets/workspace-ui.js?v=20260814e"></script>
+<script src="/assets/recent.js?v=20260814e"></script>
+<script src="/assets/main.js?v=20260814e"></script>
 
 </body>
 </html>

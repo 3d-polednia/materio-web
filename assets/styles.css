@@ -661,6 +661,19 @@ header.site {
   :root:not([data-theme="light"]) .theme-toggle .ico-moon { display: none; }
 }
 
+/* A navigation item the visitor's level does not reach — `navLevel` in src/ia.mjs. Today
+   that is "Projekty", which is offered to people with an account: a guest handed it in the
+   menu is handed a list that is empty until they have counted something.
+
+   It hides only when the document says what the level is. `data-lm-level` is stamped in
+   the head from the `liczmat-signed-in` hint, so a signed-in visitor never sees the link
+   flicker; a browser with no script — and Googlebot — get `.js` never added and keep the
+   link, which is why /projekty/ stays indexed and stays in sitemap.xml. The page itself is
+   not gated by any of this and cannot be: it is a static file over this browser's own
+   storage (FIRESTORE_SYNC §1.2). */
+html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) [data-nav-level="liczmat"],
+html.js:not([data-lm-level="pro"]) [data-nav-level="pro"] { display: none; }
+
 .nav-links { display: flex; gap: var(--sp-4); margin-left: auto; align-items: center; }
 .nav-list { display: flex; gap: var(--sp-1); align-items: center; list-style: none; margin: 0; padding: 0; }
 .nav-links a {
@@ -1367,6 +1380,14 @@ a.chip:hover { text-decoration: none; }
    same reason the note does: the two things beside it are a name and a number. */
 .ws-line-room { flex-basis: 100%; display: flex; align-items: center; gap: var(--sp-2); }
 .ws-line-room select { max-width: 16rem; }
+
+/* /app/: the rooms of one project, inside the project's own row. They take the whole width
+   under the name and the actions, for the reason a material's note does — what is above
+   them is a name and two buttons, and this is a list. */
+.data-list li.app-project { flex-wrap: wrap; }
+.app-rooms { flex-basis: 100%; margin-top: var(--sp-3); }
+.app-rooms .data-list li { background: var(--bg); }
+.app-rooms .inline-form { margin-top: var(--sp-2); }
 
 /* The archive is folded away: it is the part of the list that is finished. */
 .ws-archive { margin-top: var(--sp-6); }

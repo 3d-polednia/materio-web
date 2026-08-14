@@ -191,6 +191,13 @@ export function page(p) {
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
 <!-- Google tag (gtag.js) with Consent Mode v2 -->
@@ -287,12 +294,34 @@ ${p.bodyEnd || ""}
  * `current` is the route the visitor is on (or null); its link gets aria-current, which
  * is both the accessible answer to "where am I" and what the lime mark hangs off.
  */
-const navLink = (r, slot, lang, t, current) => {
+const navLink = (r, slot, lang, t, current, inPlace) => {
   const href = r.localized ? r.path(lang) : r.path;
   const here = current && current.id === r.id;
-  return `<a href="${href}"${here ? ' aria-current="page"' : ""}${r.localized ? "" : ' rel="nofollow"'}>` +
+  // `/app/`, `/app/dashboard/` and `/p/` have no language of their own — they carry the
+  // whole dictionary and swap text in place. So the label is marked for the runtime to
+  // rewrite, and the route id lets it repoint the address too: the href written here is
+  // DEFAULT_LANG's, and assets/i18n-runtime.js swaps in the right one from window.LM_NAV
+  // on `langchange`. Without that, "Materiały" on a German /app/ would still go to the
+  // Polish page.
+  const marks = inPlace ? ` data-i18n="${r[slot].key}" data-nav-route="${r.id}"` : "";
+  return `<a href="${href}"${here ? ' aria-current="page"' : ""}${r.localized ? "" : ' rel="nofollow"'}${marks}>` +
     `${esc(t(r[slot].key))}</a>`;
 };
+
+/**
+ * The `<li>` a navigation link sits in, and the one attribute that can hide it.
+ *
+ * `navLevel` in src/ia.mjs says which level is offered the link — not which level may use
+ * the page. It goes on the item rather than the anchor because the row is a flex list with
+ * a gap: hiding the anchor alone would leave the space it stood in.
+ *
+ * The item is written for everybody. `assets/styles.css` hides it only when the document
+ * carries `data-lm-level` (stamped in the head, from the `liczmat-signed-in` hint) and
+ * that level is not enough — so a browser with no script, and Googlebot, keep the link.
+ */
+const navItem = (r, slot, lang, t, current, inPlace) =>
+  `<li${r.navLevel ? ` data-nav-level="${r.navLevel}"` : ""}>` +
+  `${navLink(r, slot, lang, t, current, inPlace)}</li>`;
 
 /**
  * The site header. Every page uses this one — the public pages, /app/ and /p/.
@@ -315,10 +344,10 @@ export function siteHeader(h) {
   const { lang, t, alternates, inPlace } = h;
 
   const current = h.path ? currentNavRoute("header", lang, h.path) : null;
-  const links = h.links
-    ? h.links.map((l) => `<a href="${l.href}"${l.rel ? ` rel="${l.rel}"` : ""}` +
-        `${inPlace ? ` data-i18n="${l.key}"` : ""}>${esc(t(l.key))}</a>`)
-    : navRoutes("header").map((r) => navLink(r, "header", lang, t, current));
+  const items = h.links
+    ? h.links.map((l) => `<li><a href="${l.href}"${l.rel ? ` rel="${l.rel}"` : ""}` +
+        `${inPlace ? ` data-i18n="${l.key}"` : ""}>${esc(t(l.key))}</a></li>`)
+    : navRoutes("header").map((r) => navItem(r, "header", lang, t, current, inPlace));
 
   const cta = h.cta || { href: URL_APP, key: "nav_app", rel: "nofollow" };
   const ctaAttrs = [
@@ -342,7 +371,7 @@ export function siteHeader(h) {
     <a class="brand" href="${inPlace ? "/" : urlHome(lang)}">${LOGO_MARK}<span>LiczMat</span></a>
     <nav id="nav-links" class="nav-links" aria-label="${esc(t("nav_main"))}"${inPlace ? ' data-i18n-aria="nav_main"' : ""}>
       <ul class="nav-list">
-        ${links.map((a) => `<li>${a}</li>`).join("\n        ")}
+        ${items.join("\n        ")}
       </ul>
       <div class="pickers">
         ${picker}
@@ -385,7 +414,7 @@ export function siteFooter(f) {
   if (minimal) return `<footer class="site">\n  <div class="wrap">\n    ${bottom}\n  </div>\n</footer>`;
 
   const column = (group) => navRoutes("footer", group)
-    .map((r) => `<li>${navLink(r, "footer", lang, t, null)}</li>`).join("\n          ");
+    .map((r) => navItem(r, "footer", lang, t, null, inPlace)).join("\n          ");
 
   const langRow = alternates
     ? `<nav class="foot-langs" aria-label="${esc(t("lang_label"))}">

@@ -31,7 +31,7 @@ import {
 } from "../src/site.mjs";
 import {
   livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
-  route, STATUS,
+  route, STATUS, navRoutes,
 } from "../src/ia.mjs";
 import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
@@ -48,7 +48,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260814d";
+const STAMP = "20260814e";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -597,6 +597,16 @@ function buildStores() {
  */
 function buildPrivatePages() {
   const t = translator(DEFAULT_LANG);
+  // The navigation, per language, for the pages that have no language of their own. They
+  // render DEFAULT_LANG's addresses and assets/i18n-runtime.js swaps in the right ones on
+  // `langchange`, keyed by the `data-nav-route` src/template.mjs writes on each link.
+  // Before this, /app/ carried one hard-coded Polish link because a second one could not
+  // have been right in German — the owner reported the result: signing in emptied the menu.
+  const navData = Object.fromEntries(navRoutes("header")
+    .filter((r) => r.localized)
+    .map((r) => [r.id, alternatesFor(r.path)]));
+  const navScript = `<script>window.LM_NAV = ${JSON.stringify(navData).replace(/</g, "\\u003c")};</script>`;
+
   const common = {
     lang: DEFAULT_LANG, t, stamp: STAMP, bare: true, noindex: true,
     alternates: {}, moduleScripts: true,
@@ -608,6 +618,7 @@ function buildPrivatePages() {
     description: t("app_lead"),
     path: URL_APP,
     main: appMain(t),
+    headExtra: navScript,
     // workspace.js is a classic script on purpose: /app/ reads the browser workspace
     // through its globals, which a module's own scope would hide.
     classicScripts: ["/assets/workspace.js"],
@@ -638,7 +649,7 @@ function buildPrivatePages() {
     main: dashboardMain(t),
     // A page's own data, before any script that reads it. JSON.stringify cannot emit a
     // literal "</script>"; the icons are SVG markup, so the escape is not optional.
-    headExtra: `<script>window.LM_DASH = ${JSON.stringify(dashData).replace(/</g, "\\u003c")};</script>`,
+    headExtra: `${navScript}\n<script>window.LM_DASH = ${JSON.stringify(dashData).replace(/</g, "\\u003c")};</script>`,
     // Classic scripts, in this order and not modules: the dashboard reads the workspace
     // and the recents through their globals, which a module's own scope would hide.
     classicScripts: [

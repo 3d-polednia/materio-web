@@ -664,13 +664,85 @@ rozdział mówi o kalkulacjach, a lista zakupów jest jedna na projekt, bo kupuj
 Grupowania kalkulacji „po pomieszczeniach" też nie ma — wiersz mówi, do którego należy,
 a przebudowa listy w drzewo to zmiana ekranu, nie zmiana z rozdziału XVIII.
 
+#### 7.5a. Gdzie się wybiera projekt (poprawki po Sesji 20)
+
+Właściciel zgłosił po Sesji 20, że **nie da się przypisać pokoju do projektu**, i miał
+rację w trzech miejscach naraz:
+
+- formularz na `/projekty/` wkładał pomieszczenie do **aktywnego** projektu, nie pytając
+  i nie mówiąc o tym ani słowa — więc wyglądało to jak brak przypisania;
+- ten sam formularz oddawał `wsDim()` surowy tekst z pola, więc `„3,5"` czytało się jako
+  `Number("3,5")`, czyli `NaN` → 0: pokój wpisany tak, jak wpisuje Polak, wychodził
+  `3 × 0 × 2,6 m`;
+- `addRoom()` w `/app/` **w ogóle nie zapisywał `projectId`**, więc pomieszczenie założone
+  na koncie nie należało do niczego i nigdy nie mogło się pokazać pod projektem.
+
+Po poprawce: formularz ma listę projektów (domyślnie aktywny, plus **„— bez projektu —”**
+jako prawdziwą odpowiedź), wiersz pomieszczenia ma tę samą listę do przeniesienia — ten sam
+kształt kontrolki, co lista pomieszczeń przy wierszu kalkulacji — a `/app/` rysuje
+pomieszczenia **wewnątrz** projektu i wysyła `projectId`. „Bez projektu” nie jest brakiem:
+pomieszczenie zmierzone, zanim jest co pod nim podpiąć, nadal wypełnia kalkulator, i tak
+właśnie wygląda każde pomieszczenie przyniesione z telefonu.
+
+#### 7.5b. Menu na `/app/` (poprawki po Sesji 20)
+
+`/app/`, `/app/dashboard/` i `/p/` nie mają własnego języka — niosą cały słownik i tłumaczą
+się w miejscu. Dlatego `chrome()` wypisywał **jeden** link, wpisany na sztywno po polsku:
+drugiego nie dałoby się zrobić poprawnym po niemiecku. Skutkiem, który zgłosił właściciel,
+było menu znikające po wejściu na konto.
+
+Rozwiązane tym samym wzorcem, którym pulpit rozwiązał to dla swoich kafelków: build wypisuje
+adresy `DEFAULT_LANG` i podaje **wszystkie języki** w `window.LM_NAV`, a każdy link niesie
+`data-nav-route`. `assets/i18n-runtime.js` przepina `href` przy `langchange`, obok
+przepisywania etykiet. Bez skryptu link nadal działa — pokazuje polską stronę, co jest
+prawdą, a nie placeholderem.
+
+**`/p/<token>` zostaje z krótkim menu, i to jest decyzja.** Tamta strona to udostępniona
+wycena otwierana przez *klienta* wykonawcy, a nie przez właściciela konta. Pełna nawigacja
+robi z wyceny lejek.
+
+Do menu doszła też zakładka **„Aplikacja”** (`/aplikacja/`), o którą poprosił właściciel.
+Rozdział X nadal zabrania **wypychania** aplikacji na stronie głównej i strona główna nie
+mówi o niej ani słowa więcej niż przedtem; link na końcu rzędu to nie to samo. Limit linków
+w nagłówku podniesiony z czterech na pięć — **zmierzony, nie założony**:
+`scripts/test-pages.mjs` sprawdza, że rząd zostaje jednolinijkowy w czterech językach na
+900 / 1000 / 1160 / 1280 px, dla gościa (cztery widoczne) i dla zalogowanego (pięć).
+Poniżej 900 px nawigacja jest szufladą i zawinąć się nie może. Szósty link nadal wywala
+build, bo szóstego nikt nie mierzył.
+
 ---
 
 ## 8. Otwarte decyzje
 
 Do rozstrzygnięcia przez właściciela, zanim dotknie ich któraś z kolejnych sesji.
 
-### 8.1. Poziom `/projekty/` i `/kosztorys/` — najważniejsza z nich
+### 8.1. ~~Poziom `/projekty/` i `/kosztorys/`~~ — rozstrzygnięte po Sesji 20
+
+**Decyzja właściciela (2026-08-14): zakładka „Projekty” w menu tylko dla zalogowanych.**
+Zakres jest węższy, niż brzmi, i ta różnica jest tu najważniejsza:
+
+- **`level` obu tras zostaje `GUEST`.** Strona nie jest bramkowana i **nie może być**: to
+  statyczny plik nad wierszami w `localStorage` **tej** przeglądarki, a `FIRESTORE_SYNC`
+  §1.2 mówi, że liczenie nigdy nie wymaga konta. Gość, który wejdzie na `/projekty/` —
+  z linku „Otwórz projekt” pod zapisanym wynikiem, z zakładki, z wyszukiwarki — zobaczy
+  swoje własne projekty.
+- **Nowe pole `navLevel` decyduje wyłącznie o linku.** `navLevel: LICZMAT` na trasie
+  `projects` znaczy: menu oferuje ją komuś, kto ma konto. Powód jest treściowy, nie
+  bezpieczeństwowy — gość, któremu menu proponuje „Projekty”, dostaje propozycję listy,
+  która jest pusta, dopóki czegoś nie policzy.
+- **Strona zostaje indeksowana i zostaje w `sitemap.xml`.** Link jest w HTML dla każdego;
+  chowa go arkusz stylów, i tylko wtedy, gdy dokument niesie `data-lm-level`. Bez
+  JavaScriptu klasa `.js` nigdy nie zostaje dopisana, więc reguła nie działa — czyli
+  Googlebot i przeglądarka bez skryptu widzą link dalej.
+- **Poziom stemplowany jest w skrypcie w `<head>`**, tym samym, który stosuje motyw —
+  jeden odczyt `localStorage` więcej i zero mignięcia. `assets/account.js` ładuje się na
+  końcu dokumentu i jest na to za późno; on tylko dopisuje atrybut po wylogowaniu bez
+  przeładowania. Znacznik `liczmat-signed-in` **nadal jest podpowiedzią i nadal niczego nie
+  bramkuje** — teraz decyduje o treści menu tak samo, jak decydował o zdaniu pod wynikiem.
+
+Poniżej zostaje zapis sporu, bo tłumaczy, dlaczego kod wygląda tak, jak wygląda.
+
+---
 
 **Konflikt jest realny.** Rozdział II wymienia wprost, czego gość **nie może**: zapisywać
 kalkulacji, tworzyć projektów, tworzyć list materiałów. Tymczasem serwis dziś pozwala na
@@ -678,10 +750,10 @@ wszystkie trzy rzeczy bez konta — `assets/workspace.js` trzyma to w `localStor
 `CLAUDE.md` i `docs/FIRESTORE_SYNC.md` §1.2 mówią: „liczenie nigdy nie może wymagać konta,
 nie przenoś tego za ścianę logowania”.
 
-W `src/ia.mjs` obie trasy mają na razie poziom `GUEST`, czyli **stan faktyczny został
-zachowany** — Sesja 3 nie miała mandatu na zmianę funkcjonalną.
+W `src/ia.mjs` obie trasy mają poziom `GUEST`, czyli **stan faktyczny został zachowany** —
+Sesja 3 nie miała mandatu na zmianę funkcjonalną.
 
-Propozycja do zatwierdzenia: **zostawić `GUEST`** i doprecyzować, że rozdział II opisuje
+Propozycja, którą właściciel zatwierdził wyżej: **zostawić `GUEST`** i doprecyzować, że rozdział II opisuje
 granicę konta, a nie granicę przeglądarki. Konto dokłada wtedy rzeczy, których lokalny
 schowek nie umie: synchronizację między urządzeniami i telefonem, przetrwanie wyczyszczenia
 przeglądarki, udostępnianie kosztorysu linkiem. To zgadza się z własnym zdaniem rozdziału II
@@ -689,7 +761,8 @@ przeglądarki, udostępnianie kosztorysu linkiem. To zgadza się z własnym zdan
 kontu żadnej wartości.
 
 Alternatywa — przenieść projekty za logowanie — jest zgodna z literą rozdziału II, ale
-łamie `FIRESTORE_SYNC` §1.2 i zabiera gościowi to, co dziś działa. **Wymaga decyzji.**
+łamie `FIRESTORE_SYNC` §1.2 i zabiera gościowi to, co dziś działa. Właściciel jej **nie**
+wybrał: schowana została zakładka, nie strona.
 
 **Sesja 8 uderzyła w to samo.** Rozdział XII każe pokazać niezalogowanemu zdanie
 „Zaloguj się lub załóż darmowe konto, aby zapisać wynik” — czyli zakłada, że bez konta
