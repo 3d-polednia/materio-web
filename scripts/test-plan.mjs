@@ -249,13 +249,15 @@ head("7. the Pro modules, in the order the plan builds them");
   for (const m of mods) {
     check(`"${m.id}" has a name and a line under it`, !!m.key);
   }
-  // Session 22 built the first of them, so the statuses are no longer all the same — and
-  // the card has to follow the route rather than a hard-coded sentence. A module whose
+  // Sessions 22 and 23 built the first two, so the statuses are no longer all the same —
+  // and the card has to follow the route rather than a hard-coded sentence. A module whose
   // page exists is offered; one whose session has not happened yet says so and links
   // nowhere, which is chapter XXV's "never a dead button" in both directions.
+  const BUILT = ["clients", "jobs"];
   eq("clients is built — session 22", route("clients").status, STATUS.LIVE);
+  eq("and jobs — session 23", route("jobs").status, STATUS.LIVE);
   for (const m of mods) {
-    if (!m.route || m.id === "clients") continue;
+    if (!m.route || BUILT.indexOf(m.id) !== -1) continue;
     eq(`"${m.id}" is still planned`, route(m.route).status, STATUS.PLANNED);
   }
   for (const m of mods) {

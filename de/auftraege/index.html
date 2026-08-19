@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Aufträge — LiczMat</title>
+<meta name="description" content="Aufträge in LiczMat Pro: eine Auftragsliste mit Status, Termin und vereinbartem Wert, die Verbindung zu Kunde und Projekt und der vereinbarte Wert neben den tatsächlichen Materialkosten. Die Daten bleiben in diesem Browser.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/de/auftraege/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/zlecenia/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/zamovlennya/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/auftraege/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/jobs/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819c" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Aufträge — LiczMat">
+<meta property="og:description" content="Aufträge in LiczMat Pro: eine Auftragsliste mit Status, Termin und vereinbartem Wert, die Verbindung zu Kunde und Projekt und der vereinbarte Wert neben den tatsächlichen Materialkosten. Die Daten bleiben in diesem Browser.">
+<meta property="og:url" content="https://liczmat.com/de/auftraege/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Aufträge — LiczMat">
+<meta name="twitter:description" content="Aufträge in LiczMat Pro: eine Auftragsliste mit Status, Termin und vereinbartem Wert, die Verbindung zu Kunde und Projekt und der vereinbarte Wert neben den tatsächlichen Materialkosten. Die Daten bleiben in diesem Browser.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819c">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Start",
+      "item": "https://liczmat.com/de/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kunden",
+      "item": "https://liczmat.com/de/kunden/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Aufträge",
+      "item": "https://liczmat.com/de/auftraege/"
+    }
+  ]
+}
+</script>
+<script>window.LM_JOBS = {"projects":"/de/projekte/","clients":"/de/kunden/"};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/de/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hauptnavigation">
+      <ul class="nav-list">
+        <li><a href="/de/rechner/">Rechner</a></li>
+        <li><a href="/de/materialien/">Materialien</a></li>
+        <li data-nav-level="liczmat"><a href="/de/projekte/">Projekte</a></li>
+        <li><a href="/de/ratgeber/">Ratgeber</a></li>
+        <li><a href="/de/android-app/">Die App</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Sprache">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span class="lang-btn-name">Deutsch</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/zlecenia/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/zamovlennya/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></span></li>
+      <li><a class="lang-item" href="/en/jobs/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Währung" title="Währung"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mein Konto</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Design wechseln" title="Design wechseln"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menü öffnen"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li><a href="/de/kunden/">Kunden</a></li><li aria-current="page">Aufträge</li></ol></nav>
+      <h1 id="job-title">Aufträge</h1>
+      <p class="lead" id="job-lead">Aufträge in LiczMat Pro: Kunde, Status, Termin, vereinbarter Wert und das Projekt, in dem Sie das Material rechnen.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="job-page">
+    <div class="wrap narrow">
+      <!-- Chapter XXV, first sentence: a free user should understand which features are
+           Pro. The strip says so on every visit, whatever the level. -->
+      <p class="crm-pro" id="job-pro">
+        <span class="chip" id="job-pro-chip">In LiczMat Pro verfügbar</span>
+        <span class="muted" id="job-pro-note">Aufträge sind ein LiczMat-Pro-Modul. Den Pro-Plan vergibt bisher nichts, deshalb ist das Modul vorerst offen — die Sperre kommt mit der Bezahlschranke.</span>
+      </p>
+
+      <div class="app-card crm-gate" id="job-gate" hidden>
+        <h2>Aufträge</h2>
+        <p class="muted">Ein Auftrag mit Kunde, Beschreibung, Status, Termin, Wert und dem Projekt dazu.</p>
+        <p><span class="chip">In LiczMat Pro verfügbar</span></p>
+        <p><span class="muted">LiczMat Pro kennenlernen — In Vorbereitung</span></p>
+      </div>
+
+      <div id="job-tool">
+        <article id="job-detail" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/de/auftraege/" data-job-back>← Alle Aufträge</a></p>
+
+        <div id="job-missing" hidden>
+          <h2>Diesen Auftrag gibt es nicht</h2>
+          <p class="muted">Der Auftrag wurde gelöscht, oder die Adresse stammt aus einem anderen Browser.</p>
+        </div>
+
+        <div id="job-body" hidden>
+          <!-- Status and date sit above everything else: they are what a tradesman opens
+               a job to check, and chapter XXI names them before the money. -->
+          <p class="ws-mat-grid job-head-row">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label">Status</span>
+              <select id="job-status"><option value="new">Neu</option><option value="active">In Arbeit</option><option value="done">Abgeschlossen</option><option value="cancelled">Storniert</option></select>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label">Termin</span>
+              <input id="job-due" type="date">
+            </label>
+          </p>
+
+          <p class="crm-contact" id="job-client-line"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Vereinbarter Wert</span> <b id="job-fig-value"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Kosten aus dem Projekt</span> <b id="job-fig-cost"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Bleibt</span> <b id="job-fig-left"></b></p>
+          </div>
+          <p class="muted field-note">Der vereinbarte Wert wird eingetragen, die Kosten werden aus den im Projekt gespeicherten Materialien und Berechnungen ermittelt. Das sind zwei verschiedene Zahlen, und nichts verbindet sie.</p>
+          <p class="muted ws-estimate-mixed" id="job-mixed" hidden>Diese Zeilen stehen in verschiedenen Währungen. Die Summe addiert sie, rechnet aber nichts um — prüfe die Währung je Kostenzeile.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="job-edit">Auftrag bearbeiten</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="job-delete">Löschen</button>
+          </div>
+
+          <!-- The whole record in one form on the page, for the reason /klienci/ gives:
+               prompt() cannot be translated once it is open and covers the row it is
+               about on a phone (chapter XXVIII). -->
+          <form id="job-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Name</span>
+                <input id="job-edit-name" type="text" maxlength="120" required>
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">Vereinbarter Wert</span>
+                <input id="job-edit-value" type="text" inputmode="decimal">
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Kunde</span>
+                <select id="job-edit-client"></select>
+              </label>
+            </p>
+            <p class="muted field-note">Der Betrag, den Sie mit dem Kunden vereinbart haben. Sie tragen ihn ein — nichts rechnet ihn aus.</p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="job-edit-desc">Beschreibung</label>
+              <textarea id="job-edit-desc" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="job-edit-note">Notizen</label>
+              <textarea id="job-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">Speichern</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-job-edit-cancel>Abbrechen</button>
+            </p>
+          </form>
+
+          <div id="job-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="job-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="job-delete-yes">Auftrag löschen</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="job-delete-no">Abbrechen</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Beschreibung</h2>
+            </div>
+            <p id="job-desc" class="crm-note"></p>
+          </section>
+
+          <!-- Chapter XXIV's third step: ZLECENIE → PROJEKT. The project is the free
+               workspace's own row — the same one /projekty/ shows — and nothing here
+               renames, archives or deletes it. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Projekt</h2>
+              <a class="dash-more" href="/de/projekte/">Projekte und Räume</a>
+            </div>
+            <ul id="job-project-list" class="data-list"></ul>
+            <form id="job-project-form" class="inline-form">
+              <select id="job-project-pick" aria-label="Projekt zuordnen"></select>
+              <button type="submit" class="btn btn-primary btn-sm">Projekt zuordnen</button>
+            </form>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Notizen</h2>
+            </div>
+            <p id="job-note" class="crm-note"></p>
+          </section>
+        </div>
+      </article>
+        <div id="job-index">
+        <p class="ws-undo" id="job-undo" role="status" hidden>
+          <span id="job-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="job-undo-go">Rückgängig</button>
+        </p>
+
+        <h2>Laufende Aufträge</h2>
+        <p class="muted">Neue und begonnene. Kunde, Projekt und Termin stellen Sie im Auftrag selbst ein.</p>
+        <form id="job-form" class="inline-form">
+          <input id="job-name" type="text" maxlength="120" placeholder="Name des Auftrags" required>
+          <select id="job-client" aria-label="Kunde"></select>
+          <input id="job-new-due" type="date" aria-label="Termin">
+          <button type="submit" class="btn btn-primary btn-sm">Hinzufügen</button>
+        </form>
+        <ul id="job-list" class="data-list"></ul>
+
+        <details id="job-closed" class="ws-archive" hidden>
+          <summary id="job-closed-summary">Abgeschlossen</summary>
+          <p class="muted">Erledigte und stornierte Aufträge. Nichts geht verloren — Sie können sie wieder öffnen.</p>
+          <ul id="job-closed-list" class="data-list"></ul>
+        </details>
+      </div>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/de/kunden/">Kunden</a>
+        <a class="btn btn-ghost" href="/de/projekte/">Projekte und Räume</a>
+      </p>
+      <p class="muted src-note">Aufträge liegen im Speicher dieses Browsers (localStorage). Sie werden nirgendwohin gesendet und sind nicht in der Android-App — die Synchronisierung umfasst Projekte, Räume, Berechnungen und Materiallisten. Wer die Website-Daten löscht, löscht die Aufträge.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Dieselbe Formel in der App</b> LiczMat für Android rechnet offline mit demselben Kern — samt Materialkatalog und Speichern ins Projekt.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Laden</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Baustoff-Rechner. Rechnen. Planen. Umsetzen.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/de/rechner/">Alle Rechner</a></li>
+          <li><a href="/de/materialien/">Materialien</a></li>
+          <li data-nav-level="liczmat"><a href="/de/projekte/">Projekte</a></li>
+          <li><a href="/de/kostenvoranschlag/">Kostenvoranschlag</a></li>
+          <li><a href="/de/ratgeber/">Ratgeber</a></li>
+          <li><a href="/de/baumaerkte/">Märkte</a></li>
+          <li data-nav-level="pro"><a href="/de/kunden/">Kunden</a></li>
+          <li data-nav-level="pro"><a href="/de/auftraege/">Aufträge</a></li>
+          <li><a href="/de/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Konto</h4>
+        <ul>
+          <li><a href="/de/android-app/">Die App</a></li>
+          <li><a href="/app/" rel="nofollow">Mein Konto</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Übersicht</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Datenschutz</a></li>
+          <li><a href="/de/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Sprache">
+      <h4>Sprache</h4>
+      <ul>
+        <li><a href="/zlecenia/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/zamovlennya/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/auftraege/" hreflang="de" lang="de" data-lang="de" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/jobs/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Alle Rechte vorbehalten.</span>
+      <span>Ergebnisse sind Schätzungen. Vor dem Kauf prüfen.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Einverstanden" hidden>
+  <p class="consent-text">Wir nutzen Google Analytics, um anonym zu zählen, wie viele Leute die Seite besuchen und zu Google Play weitergehen. Einverstanden?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Mehr in der Datenschutzerklärung</a>
+    <a class="consent-more" href="/de/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Ablehnen</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Einverstanden</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/zlecenia/",
+  "uk": "/uk/zamovlennya/",
+  "de": "/de/auftraege/",
+  "en": "/en/jobs/"
+};</script>
+<script src="/assets/i18n.de.js?v=20260819c"></script>
+<script src="/assets/i18n-runtime.js?v=20260819c"></script>
+<script src="/assets/currency.js?v=20260819c"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819c"></script>
+
+<script src="/assets/workspace.js?v=20260819c"></script>
+<script src="/assets/plan.js?v=20260819c"></script>
+<script src="/assets/crm.js?v=20260819c"></script>
+<script src="/assets/jobs-ui.js?v=20260819c"></script>
+<script src="/assets/main.js?v=20260819c"></script>
+
+</body>
+</html>

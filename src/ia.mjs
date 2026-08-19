@@ -28,6 +28,7 @@ import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlClients, urlClient,
+  urlJobs, urlJob,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -261,6 +262,36 @@ export const ROUTES = [
       "browser, so /klienci/?id=<clientId> is the only shape GitHub Pages can serve.",
   },
 
+  {
+    id: "jobs",
+    level: LEVEL.PRO, status: STATUS.LIVE,
+    parent: "clients", localized: true, indexable: true,
+    path: urlJobs,
+    footer: { order: 8, key: "jobpage_title" },
+    navLevel: LEVEL.PRO,
+    gate: "As clients — the same notice above a working module, and the same one switch " +
+      "(LM_PRO_LOCKED in assets/plan.js) closes both when session 27 builds the paywall.",
+    note: "Chapter XXI, and the second of the five Pro modules. A job is chapter XXIV's " +
+      "middle step — KLIENT → ZLECENIE → PROJEKT — so it carries a client, a project, a " +
+      "status, a date, an agreed value and notes. It lives in assets/crm.js beside the " +
+      "clients, in the same browser-only store and for the same reason: `jobs` is not in " +
+      "the sync contract either, so nothing here is pushed anywhere and the page says " +
+      "so. Parented under `clients` because that is where the path starts; `navLevel` " +
+      "keeps the footer link for a Pro account and for a crawler, which is what leaves " +
+      "the page indexable.",
+  },
+  {
+    id: "job",
+    level: LEVEL.PRO, status: STATUS.LIVE, view: true,
+    parent: "jobs", localized: true, indexable: false,
+    path: urlJob,
+    gate: "As jobs — it is the same file.",
+    note: "One job: its client, its project, the status and the date, what was agreed " +
+      "and what the work has actually cost so far. A `view` for the reason `client` is " +
+      "one — the id is made in this browser, so /zlecenia/?id=<jobId> is the only shape " +
+      "GitHub Pages can serve.",
+  },
+
   /* ---------------------------------------------------------------- account */
   {
     id: "account",
@@ -326,13 +357,6 @@ export const ROUTES = [
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
       "indexable — the paywall sits on the Pro modules, not on their description.",
-  },
-  {
-    id: "jobs",
-    level: LEVEL.PRO, status: STATUS.PLANNED, session: 23,
-    parent: "clients", localized: true, indexable: true,
-    plannedSlug: { pl: "zlecenia", uk: "zamovlennya", de: "auftraege", en: "jobs" },
-    gate: "As clients.",
   },
   {
     id: "quotes",

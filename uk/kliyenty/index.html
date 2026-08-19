@@ -64,7 +64,7 @@
 <link rel="alternate" hreflang="en" href="https://liczmat.com/en/clients/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260819b" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260819c" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -82,7 +82,7 @@
 <meta name="twitter:title" content="Клієнти — LiczMat">
 <meta name="twitter:description" content="Клієнти в LiczMat Pro: список клієнтів із контактними даними й нотатками, проєкти, прив'язані до клієнта, та історія збережених розрахунків. Дані лишаються в цьому браузері.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260819b">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819c">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -103,7 +103,7 @@
   ]
 }
 </script>
-<script>window.LM_CRM = {"projects":"/uk/proekty/"};</script>
+<script>window.LM_CRM = {"projects":"/uk/proekty/","jobs":"/uk/zamovlennya/"};</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Перейти до вмісту</a>
@@ -260,6 +260,18 @@
             </form>
           </section>
 
+          <!-- Chapter XX: "Klient może posiadać … zlecenia", and chapter XXIV's path runs
+               through them. The job is written on /zlecenia/ — this is the client's end of
+               the same link, read-only, so one screen owns the writes. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Замовлення</h2>
+              <a class="dash-more" href="/uk/zamovlennya/">Усі замовлення</a>
+            </div>
+            <p class="muted">Замовлення цього клієнта. Замовлення поєднує клієнта з проєктом і тримає статус та термін.</p>
+            <ul id="crm-client-jobs" class="data-list"></ul>
+          </section>
+
           <!-- Chapter XX's "historia", derived: every calculation saved into one of this
                client's projects, newest first. Nothing is logged separately — a second
                copy would drift the first time a line was corrected. -->
@@ -328,6 +340,7 @@
           <li><a href="/uk/porady/">Поради</a></li>
           <li><a href="/uk/magazyny/">Магазини</a></li>
           <li data-nav-level="pro"><a href="/uk/kliyenty/">Клієнти</a></li>
+          <li data-nav-level="pro"><a href="/uk/zamovlennya/">Замовлення</a></li>
           <li><a href="/uk/#faq">FAQ</a></li>
         </ul>
       </div>
@@ -378,19 +391,19 @@
   "de": "/de/kunden/",
   "en": "/en/clients/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260819b"></script>
-<script src="/assets/i18n-runtime.js?v=20260819b"></script>
-<script src="/assets/currency.js?v=20260819b"></script>
+<script src="/assets/i18n.uk.js?v=20260819c"></script>
+<script src="/assets/i18n-runtime.js?v=20260819c"></script>
+<script src="/assets/currency.js?v=20260819c"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260819b"></script>
+<script src="/assets/account.js?v=20260819c"></script>
 
-<script src="/assets/workspace.js?v=20260819b"></script>
-<script src="/assets/plan.js?v=20260819b"></script>
-<script src="/assets/crm.js?v=20260819b"></script>
-<script src="/assets/crm-ui.js?v=20260819b"></script>
-<script src="/assets/main.js?v=20260819b"></script>
+<script src="/assets/workspace.js?v=20260819c"></script>
+<script src="/assets/plan.js?v=20260819c"></script>
+<script src="/assets/crm.js?v=20260819c"></script>
+<script src="/assets/crm-ui.js?v=20260819c"></script>
+<script src="/assets/main.js?v=20260819c"></script>
 
 </body>
 </html>

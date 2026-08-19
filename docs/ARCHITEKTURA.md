@@ -75,7 +75,7 @@ nie wymaga konta**.
 
 ## 2. Inwentarz stron — stan na dziś
 
-135 wygenerowanych stron: 33 strony logiczne × 4 języki, plus trzy bezjęzykowe.
+139 wygenerowanych stron: 34 strony logiczne × 4 języki, plus trzy bezjęzykowe.
 Adresy w kolumnie „URL (PL)”; pozostałe języki mają prefiks (`/en/…`, `/de/…`, `/uk/…`)
 i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 
@@ -94,6 +94,8 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 | `estimate` | `/kosztorys/` | GUEST | `projects` | tak | 4 |
 | `clients` | `/klienci/` | **PRO** | `home` | tak | 4 |
 | `client` | `/klienci/?id=…` | **PRO** | `clients` | **nie** | 0 — widok |
+| `jobs` | `/zlecenia/` | **PRO** | `clients` | tak | 4 |
+| `job` | `/zlecenia/?id=…` | **PRO** | `jobs` | **nie** | 0 — widok |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 4 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
 | `dashboard` | `/app/dashboard/` | GUEST | `account` | **nie** | 1 |
@@ -103,9 +105,9 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 `404.html` też jest pisany ręcznie i nie jest trasą — jest obsługą błędu i przekierowaniem
 (patrz §3).
 
-`clients` (Sesja 22) jest pierwszą trasą `PRO`, która naprawdę istnieje, i jedyną stroną
-w inwentarzu, której link jest ukryty przed kimś poniżej Pro (`navLevel`, §5). Sama strona
-nie jest bramkowana — patrz §7.7.
+`clients` (Sesja 22) jest pierwszą trasą `PRO`, która naprawdę istnieje, `jobs` (Sesja 23)
+drugą. To jedyne strony w inwentarzu, których link jest ukryty przed kimś poniżej Pro
+(`navLevel`, §5). Żadna z nich nie jest bramkowana — patrz §7.7 i §7.8.
 
 **`project` jest pierwszym „widokiem” (`view: true`) — ekranem bez własnego pliku.**
 Liczba wygenerowanych stron się przez niego nie zmienia i to jest cała jego definicja:
@@ -188,15 +190,15 @@ adresu, który już działa, i żeby żadna nie trafiła do menu przed czasem.
 | Trasa | URL (PL) | Poziom | Sesja | Po co |
 |---|---|---|---|---|
 | `liczmat-pro` | `/liczmat-pro/` | GUEST | 29 | publiczna strona Pro: co to, dla kogo, ile kosztuje |
-| `jobs` | `/zlecenia/` | PRO | 23 | zlecenia: status, termin, wartość |
 | `quotes` | `/wyceny/` | PRO | 24 | materiały + robocizna + marża |
 | `calendar` | `/terminarz/` | PRO | 25 | terminy zleceń |
 
 Slugi w pozostałych trzech językach są już ustalone w `src/ia.mjs` (`plannedSlug`) — po to,
 żeby sesja, która buduje stronę, nie wymyślała ich w pośpiechu. Przenoszą się do `SECTION`
 w `src/site.mjs` w chwili, gdy to się dzieje: Sesja 22 przeniosła w ten sposób `clients`
-(`klienci` / `kliyenty` / `kunden` / `clients`), bez zmiany choćby jednej litery — slug
-jest trwały od momentu, w którym został zaplanowany.
+(`klienci` / `kliyenty` / `kunden` / `clients`), a Sesja 23 `jobs` (`zlecenia` /
+`zamovlennya` / `auftraege` / `jobs`) — obie bez zmiany choćby jednej litery, bo slug jest
+trwały od momentu, w którym został zaplanowany.
 
 **`/liczmat-pro/` jest publiczna i indeksowana, moduły Pro też.** To nie jest sprzeczność:
 paywall stoi na *narzędziu*, nie na *opisie narzędzia*. Rozdział XXV wymaga, żeby darmowy
@@ -858,6 +860,77 @@ widzi nazwę modułu, opis i zdanie „Dostępne w LiczMat Pro"; danych klienta 
 poza przeglądarką, w której powstały. Karta modułu w zakładce Pro na `/app/` prowadzi teraz
 do strony (`data-nav-route` + `window.LM_NAV`, bo `/app/` nie ma własnego języka) — martwy
 przycisk zamienił się w działający dokładnie wtedy, gdy moduł zaczął istnieć.
+
+### 7.8. Zlecenia — status, termin i środek drogi klient → projekt (Sesja 23)
+
+Rozdział XXXII, Sesja 23: „ZLECENIA — Zlecenia i statusy". Rozdział XXI mówi, co zlecenie
+może mieć: klienta, nazwę, opis, status, termin, wartość, projekt, notatki — wszystkie
+osiem są. Rozdział XXIV mówi, **po co** ono jest: KLIENT → ZLECENIE → PROJEKT → WYCENA →
+HISTORIA. Wycena to Sesja 24; Sesja 23 domyka środkowe ogniwo, w obie strony.
+
+**Strona.** `/zlecenia/` w czterech językach, plus `/zlecenia/?id=<jobId>` jako `view` —
+z tego samego powodu, z którego `client` nim jest (§3). Indeks ma dwie połowy: zlecenia
+w toku i zamknięte. Ekran zlecenia to status i termin na górze, klient, dwie kwoty,
+projekt, opis i notatki. W `src/ia.mjs` trasa siedzi pod `clients`, bo tam zaczyna się
+droga rozdziału XXIV.
+
+**Magazyn: ten sam co klienci** — `assets/crm.js`, klucz `liczmat-crm-v1`, druga kolekcja
+obok `clients`. `jobs` też **nie ma w kontrakcie synchronizacji**: żadnego `JobEntity`,
+żadnego `SyncContract.jobToDoc()`, żadnego `validJob()` we wdrożonych regułach. Więc nic
+stąd nigdzie nie jedzie, `wsExport()` tego nie zawiera, a strona mówi to wprost. Jeden plik
+na dwie kolekcje, bo to jeden magazyn: dwa pliki czytające i piszące ten sam klucz
+`localStorage` to jeden wyścig od zgubionego zapisu. Magazyn zapisany przed Sesją 23 nie ma
+tablicy `jobs` i czyta się jako pusty — na tym polega cała migracja.
+
+**Cztery statusy rozdziału XXI i ani jednego więcej.** `nowe`, `w toku`, `zakończone`,
+`anulowane` — `JOB_STATUS` w `assets/crm.js`, w kolejności rozdziału. Wartość spoza tej
+czwórki nigdy nie trafia do wiersza: `crmSetJobStatus()` odmawia, a nowe zlecenie
+z nieznanym statusem startuje jako `nowe`. **Zlecenie nie ma pola `archived`** — rozdział
+XXI dał mu już dwa stany zamknięte, a trzeci sposób chowania wiersza byłby czymś, co strona
+musiałaby tłumaczyć. Indeks dzieli listę po statusie: otwarte na wierzchu, zamknięte
+w zwiniętym `<details>`.
+
+**Termin to dzień kalendarzowy, nie moment.** `dueDate` jest napisem `"YYYY-MM-DD"`, a nie
+milisekundami jak każdy inny znacznik czasu w magazynie. Moment przesunąłby się na dzień
+wcześniej albo później dla przeglądarki w innej strefie, a terminarz (Sesja 25) nie ma jak
+się z tego wycofać. Walidacja jest ścisła: dokładnie dziesięć znaków, prawdziwy dzień
+(`2026-02-31` odpada), i **nigdy prefiks czegoś dłuższego** — pierwsze dziesięć znaków
+pełnego ISO to zgadywanie, a zgadywanie przy terminie jest gorsze niż brak terminu.
+
+**Powiązania leżą na zleceniu — odwrotnie niż klient → projekt, i nie przez symetrię.**
+Dokument projektu jest kontraktem (jedzie do Firestore, wraca na telefon, renderuje się na
+`/p/<token>`), więc `jobId` na nim byłby połową powiązania w tej połowie, która podróżuje —
+ten sam argument, co w §7.7. Zlecenie jest lokalne jak klient, więc link trzymany na nim
+nie jedzie nigdzie i nikogo nie wprowadzi w błąd. Test sprawdza, że dokument projektu po
+przypisaniu jest bajt w bajt ten sam, bez `jobId` i bez `clientId`.
+
+Jeden projekt należy do jednego zlecenia; drugie przypisanie **przenosi** go. Zlecenie,
+które ma jednocześnie klienta i projekt, przypisuje ten projekt także temu klientowi
+(`crmLinkProject()` — jedyny zapis, który wie, że projekt ma jednego klienta), więc droga
+rozdziału XXIV jest jednym łańcuchem, a strona klienta opowiada tę samą historię, co strona
+zlecenia.
+
+Usunięcie klienta **nie usuwa jego zleceń**, a usunięcie projektu **nie zrywa powiązania** —
+oba z tego samego powodu, co w §7.5 i §7.7: obie te rzeczy da się cofnąć, a link zerwany „na
+wszelki wypadek" oznaczałby, że cofnięcie przywraca wiersz do nikogo. Zlecenie osieroconego
+klienta mówi „Klient został usunięty" zamiast rysować odnośnik do wiersza, którego nikt nie
+otworzy.
+
+**Dwie kwoty, i tylko jedna z nich jest wpisywana.** `valueMinor` to **uzgodniona wartość**
+rozdziału XXI — kwota, na którą fachowiec umówił się z klientem, wpisana ręcznie. Koszt
+liczy `wsProjectCosts()` z projektu (§7.4) i **nigdzie nie jest zapisywany na zleceniu**:
+kopia rozjechałaby się przy pierwszej zmianie ceny materiału. Różnica („Zostaje") powstaje
+tylko wtedy, gdy obie kwoty są w tej samej walucie — inaczej strona mówi, że waluty się
+różnią, bo odjęcie ich od siebie to przeliczenie po kursie, którego rozdział VI zabrania.
+Waluta stempluje się raz, przy pierwszej wpisanej kwocie, i zostaje przy poprawkach;
+wyczyszczenie kwoty czyści też walutę, więc następna dostaje własny stempel.
+
+**Rozdział XXV — tak samo jak przy klientach.** Ten sam pasek „Dostępne w LiczMat Pro", ta
+sama uczciwa uwaga o tym, że planu Pro nic jeszcze nie nadaje, ta sama bramka w HTML-u od
+pierwszego renderu i **ten sam jedyny przełącznik Sesji 27: `LM_PRO_LOCKED`**. Link jest
+w stopce z `navLevel: PRO`, strona zostaje `indexable` i w `sitemap.xml`, a karta modułu
+w zakładce Pro na `/app/` prowadzi teraz do strony — drugi martwy przycisk zamienił się
+w działający.
 
 ---
 

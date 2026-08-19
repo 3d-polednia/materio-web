@@ -222,6 +222,35 @@ function crmRenderProjects(id) {
 }
 
 /**
+ * Chapter XX: "Klient może posiadać … zlecenia" — the client's end of the link session 23
+ * put on the job.
+ *
+ * Read-only on purpose: the job is written on /zlecenia/, and one screen owning the writes
+ * is what keeps a status from being set in two places with two different rules. The row
+ * says what the index of that page says — the status, the date and what was agreed — so a
+ * client's page answers "where does this stand" without a navigation.
+ */
+function crmRenderJobs(id) {
+  const list = document.getElementById("crm-client-jobs");
+  if (!list) return;
+  if (typeof crmClientJobs !== "function") { list.innerHTML = ""; return; }
+  const jobs = crmClientJobs(id);
+  const url = (window.LM_CRM && window.LM_CRM.jobs) || "/zlecenia/";
+  list.innerHTML = jobs.length ? jobs.map((j) => {
+    const money = j.valueMinor === null || j.valueMinor === undefined
+      ? "" : ` · ${crmEsc(crmMoney(j.valueMinor, j.currencyCode))}`;
+    const due = j.dueDate ? ` · ${crmEsc(crmDate(new Date(`${j.dueDate}T00:00:00`).getTime()))}` : "";
+    return `<li data-id="${crmEsc(j.id)}">
+        <span class="row-name">
+          <a href="${crmEsc(url)}?id=${encodeURIComponent(j.id)}"><b>${crmEsc(j.name)}</b></a>
+          <em class="muted"><span class="chip job-chip">${
+      crmEsc(crmT(`job_st_${j.status}`))}</span>${due}${money}</em>
+        </span>
+      </li>`;
+  }).join("") : `<li class="empty muted">${crmEsc(crmT("cli_jobs_empty"))}</li>`;
+}
+
+/**
  * Chapter XX's history: the calculations saved into this client's projects.
  *
  * The line carries its own name, how much was needed, the unit and the currency it was
@@ -307,6 +336,7 @@ function crmRenderClient(id) {
   document.getElementById("crm-delete-q").textContent = crmT("cli_delete_q");
 
   crmRenderProjects(id);
+  crmRenderJobs(id);
   crmRenderHistory(id);
 }
 

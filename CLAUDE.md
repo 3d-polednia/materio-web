@@ -79,7 +79,7 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now 135 pages: a home page, a calculator
+The site used to be one `index.html`. It is now 139 pages: a home page, a calculator
 hub, one page per calculator, guides and a store finder — each in all four languages, at
 its own URL, so search engines can index more than the Polish front page. Writing that by
 hand is not possible; a generator writes it from one template plus the dictionary.
@@ -96,6 +96,7 @@ node scripts/test-materials.mjs   # the material list: the document, the arrow, 
 node scripts/test-costs.mjs       # costs: the unit price, the currency rule, the three figures
 node scripts/test-rooms.mjs       # rooms: the document, the project link, the assignment
 node scripts/test-plan.mjs        # the Free/Pro model: permissions, gating, plan status
+node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadline, the links
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -120,7 +121,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
 | `assets/plan.js` — the Free/Pro model and the permission table | |
-| `assets/crm.js`, `assets/crm-ui.js` — the clients of LiczMat Pro | |
+| `assets/crm.js` — the clients and jobs of LiczMat Pro, plus `crm-ui.js` and `jobs-ui.js` | |
 | `assets/recent.js`, `assets/dashboard.js` | |
 | `src/*.mjs` — information architecture, site map, templates, page bodies, formulas | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
@@ -234,6 +235,22 @@ scripts/test-clients.mjs  Clients (session 22, chapter XX): the client document 
                       its states — including the one after LM_PRO_LOCKED is flipped — and
                       the copy in four languages. Dependency-free — run it after touching
                       assets/crm.js, clientsMain() or a cli_*/clipage_* key
+scripts/test-jobs.mjs  Jobs (session 23, chapter XXI): the job document and chapter XXI's
+                      eight fields, the four statuses and the one that is refused, the
+                      deadline that is a calendar day rather than an instant, the four
+                      writes plus the undo, chapter XXIV's chain — client → job → project,
+                      with the project document byte-for-byte untouched — the two amounts
+                      (what was agreed, what wsProjectCosts() says it has run to) and the
+                      currency rule between them, the route, chapter XXV's gate in both of
+                      its states and the copy in four languages. Dependency-free — run it
+                      after touching the job half of assets/crm.js, jobsMain() or a
+                      job_*/jobpage_*/cli_jobs_* key
+scripts/test-jobs-page.mjs  The same clicked through in Chromium, nothing stubbed: a job
+                      added with a client and a date, opened, corrected, moved through the
+                      statuses, its project attached and detached, deleted with its undo,
+                      the client's own page reading the link back, the Pro notice for a
+                      guest and for a Pro account, four languages, the currency switch, the
+                      widths of chapter XXVIII and the no-JavaScript variant
 scripts/test-clients-page.mjs  The same clicked through in Chromium, nothing stubbed: a
                       client added and corrected, a project filed under them and taken off,
                       the archive, the delete with its undo, the Pro notice for a guest and
@@ -282,12 +299,15 @@ assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/.
                       ?id=<projectId> — and this file shows one of them, including the
                       material list of chapter XVI and, since session 20, the project's
                       rooms and the picker that files one calculation under one of them
-assets/crm.js         The Pro workspace: clients. localStorage under its own key
+assets/crm.js         The Pro workspace: clients and jobs. localStorage under its own key
                       (`liczmat-crm-v1`), this browser only — `clients` is NOT in the sync
                       contract, so nothing here is uploaded and nothing on the phone reads
                       it. Written in the contract's shape anyway (id, fields, the sync
                       block, a tombstone instead of a delete) so a later contract change
                       can carry the rows that are already there
+assets/jobs-ui.js     /zlecenia/ — the index (open jobs and closed ones) and one job at
+                      ?id=<jobId>: its client, its project, chapter XXI's status and
+                      deadline, what was agreed and what the work has cost
 assets/crm-ui.js      /klienci/ — the index and one client at ?id=<clientId>. Contact
                       details, notes, the projects filed under a client and what they have
                       cost, and the history, which is derived from the saved calculations
@@ -471,6 +491,46 @@ Kotlin side of it. Change one, change all three.
   read-only to a client. `lmCan()` takes the level as an argument rather than reading
   `liczmat-signed-in`, because that hint can be stale and a function that quietly gated on
   it would hide somebody's own projects from them.
+- **Jobs are the second Pro module, they share the clients' store, and they are the middle
+  of chapter XXIV's path.** Session 23 built `/zlecenia/` — the index plus one job at
+  `?id=<jobId>`, the same two-screens-in-one-file shape as `/klienci/`. The rows live in
+  `assets/crm.js` beside the clients, under the same `liczmat-crm-v1` key, because it is
+  one store: two files reading and writing one localStorage key is one race away from a
+  lost write. `jobs` is not in the sync contract either (no `JobEntity`, no
+  `SyncContract.jobToDoc()`, no `validJob()` in the deployed rules), so nothing here is
+  uploaded and the page says so. A store written before session 23 has no `jobs` array and
+  reads as an empty one — that is the whole migration.
+- **Chapter XXI's four statuses are the whole set, and a job has no `archived` field.**
+  `JOB_STATUS` is `new, active, done, cancelled`, in the chapter's own order; anything else
+  is refused rather than stored, and a job created with an unknown status starts `new`. The
+  index splits on `JOB_OPEN_STATUS` — the open half on top, the closed one folded into a
+  `<details>` — so a second way of putting a row out of sight would be one the page had to
+  explain on top of the two the chapter already gave it.
+- **A deadline is a calendar day (`"YYYY-MM-DD"`), not millis.** Every other timestamp in
+  the store is an instant; this one cannot be, because "the 14th" moves to the 13th or the
+  15th for a browser in another timezone and session 25's terminarz has no way to recover
+  from that. `crmDay()` validates strictly: exactly ten characters, a day that really
+  exists (`2026-02-31` is refused), and **never a prefix of something longer** — the first
+  ten characters of a full ISO instant are a guess.
+- **The job carries both links; the project document carries neither.** `clientId` and
+  `projectId` live on the job — the opposite direction from client → project, and not for
+  symmetry: a project document is contract (it syncs, the phone reads it, `/p/<token>`
+  renders it), so a `jobId` on it would be half a link in the half that travels, while a
+  job travels nowhere. One project belongs to one job; a second link moves it. A job that
+  carries both a client and a project files that project under that client too
+  (`crmLinkProject()`), so chapter XXIV's chain is one chain and the client's page tells
+  the same story as the job's. Deleting a client leaves their jobs alone and deleting a
+  project leaves the link alone — both can be undone, and a link dropped on sight would
+  return the row to nobody.
+- **A job carries what was *agreed*; what it *cost* is still `wsProjectCosts()`.**
+  `valueMinor` is chapter XXI's "wartość" — typed by hand, the amount agreed with the
+  client — and it is the only figure on the page that is not derived. The cost is read from
+  the project and never written back onto the job: a copy would disagree the moment a
+  material was re-priced. The difference is computed only when both are in the same
+  currency; otherwise the page says the currencies differ, because subtracting them is a
+  conversion at a rate and chapter VI forbids those. The currency is stamped once, at the
+  first amount typed, and kept through corrections; clearing the amount clears it so the
+  next one is stamped fresh.
 - **Clients are LiczMat Pro's first real module, and they are not in the sync contract.**
   Session 22 built `/klienci/` — the index plus one client at `?id=<clientId>`, the same
   two-screens-in-one-file shape as `/projekty/`. The store is `assets/crm.js` under its own
@@ -502,7 +562,9 @@ Kotlin side of it. Change one, change all three.
   plan is not granted yet, and the module runs under it. The machinery is complete:
   `lmFeatureState(id, level)` in `assets/plan.js` answers `allowed / gated / locked`, the
   gate block is in the markup from the first paint, and session 27 flips one variable —
-  `scripts/test-clients.mjs` exercises both answers, the flipped one included.
+  `scripts/test-clients.mjs` exercises both answers, the flipped one included, and
+  `scripts/test-jobs.mjs` does the same for the second module — the switch is still one
+  variable, whatever number of modules hang off it.
 
 - **`/app/` has five tabs, and rooms are not one of them.** Chapter XVIII makes a room an
   element of a project, so `renderProjects()` draws each project's rooms inside its row

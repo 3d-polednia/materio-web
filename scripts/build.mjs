@@ -27,7 +27,7 @@ import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
   URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients,
+  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs,
 } from "../src/site.mjs";
 import {
   livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
@@ -39,7 +39,7 @@ import { DEFAULT_CURRENCY } from "../src/currency.mjs";
 import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain,
+  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain, jobsMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
@@ -49,7 +49,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819b";
+const STAMP = "20260819c";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -286,7 +286,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang), urlJobs(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -344,6 +344,17 @@ const WS_SCRIPTS = ["/assets/units.js", "/assets/workspace.js", "/assets/workspa
  */
 const CRM_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-ui.js",
+];
+
+/**
+ * /zlecenia/ (session 23). The same four files with the job page's own interface in place
+ * of the client one: the store is shared (assets/crm.js holds both collections), and the
+ * job screen reads a project's costs through assets/workspace.js exactly as the client
+ * screen does. No engine and no catalogue — the page prints saved figures and one typed
+ * amount, and calculates nothing.
+ */
+const JOBS_SCRIPTS = [
+  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/jobs-ui.js",
 ];
 
 /* ------------------------------------------------------------------ worked examples */
@@ -660,8 +671,40 @@ function buildClientsPages() {
       main, jsonld: [ld],
       // A client's projects link back to /projekty/?id=<id>, and the script has no site
       // map — so the build hands it this page's own language's address for that page.
-      headExtra: `<script>window.LM_CRM = ${JSON.stringify({ projects: urlProjects(lang) })};</script>`,
+      // A client's projects link back to /projekty/?id=<id> and their jobs to
+      // /zlecenia/?id=<id>; the script has no site map, so the build hands it this
+      // language's address for both.
+      headExtra: `<script>window.LM_CRM = ${JSON.stringify({
+        projects: urlProjects(lang), jobs: urlJobs(lang),
+      })};</script>`,
       scripts: CRM_SCRIPTS,
+    }));
+  }
+}
+
+/**
+ * /zlecenia/ — the job list of LiczMat Pro. Session 23, chapter XXI.
+ *
+ * Two screens in one file again: the index, and one job at ?id=<jobId>. Only the frame is
+ * written here; the client, the project, the status and the money all come out of the
+ * browser's own store.
+ */
+function buildJobsPages() {
+  const alt = alternatesFor(urlJobs);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = jobsMain(lang, t);
+    write(join(urlJobs(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("jobpage_title")} \u2014 LiczMat`,
+      description: t("jobpage_meta"),
+      path: urlJobs(lang),
+      alternates: alt,
+      main, jsonld: [ld],
+      headExtra: `<script>window.LM_JOBS = ${JSON.stringify({
+        projects: urlProjects(lang), clients: urlClients(lang),
+      })};</script>`,
+      scripts: JOBS_SCRIPTS,
     }));
   }
 }
@@ -798,6 +841,7 @@ function buildSitemap() {
     // sees is the module's name, what it is for and that it belongs to LiczMat Pro —
     // never a client, because every client row is in one browser's own storage.
     add(urlClients(lang), "0.5", "monthly", alternatesFor(urlClients));
+    add(urlJobs(lang), "0.5", "monthly", alternatesFor(urlJobs));
     add(urlGuideIndex(lang), "0.7", "monthly", alternatesFor(urlGuideIndex));
     add(urlStores(lang), "0.7", "monthly", alternatesFor(urlStores));
     for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly", alternatesFor((l) => urlCalc(l, c.id)));
@@ -878,6 +922,7 @@ buildAndroidPage();
 buildCookiesPage();
 buildWorkspacePages();
 buildClientsPages();
+buildJobsPages();
 buildStores();
 buildPrivatePages();
 buildSitemap();

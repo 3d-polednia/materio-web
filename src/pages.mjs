@@ -12,7 +12,7 @@ import {
 import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients,
+  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -1385,6 +1385,18 @@ export function clientsMain(lang, t) {
             </form>
           </section>
 
+          <!-- Chapter XX: "Klient może posiadać … zlecenia", and chapter XXIV's path runs
+               through them. The job is written on /zlecenia/ — this is the client's end of
+               the same link, read-only, so one screen owns the writes. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("cli_jobs_t"))}</h2>
+              <a class="dash-more" href="${urlJobs(lang)}">${esc(t("cli_jobs_all"))}</a>
+            </div>
+            <p class="muted">${esc(t("cli_jobs_d"))}</p>
+            <ul id="crm-client-jobs" class="data-list"></ul>
+          </section>
+
           <!-- Chapter XX's "historia", derived: every calculation saved into one of this
                client's projects, newest first. Nothing is logged separately — a second
                copy would drift the first time a line was corrected. -->
@@ -1452,6 +1464,218 @@ export function clientsMain(lang, t) {
         <a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
       </p>
       <p class="muted src-note">${esc(t("cli_local_note"))}</p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+  return { main, ld: crumbs.ld };
+}
+
+/**
+ * /zlecenia/ — the job list of LiczMat Pro. Chapter XXI, session 23.
+ *
+ * One page, two screens, the same shape as /klienci/ and /projekty/: the index, and one
+ * job at `?id=<jobId>` — the `job` route in src/ia.mjs is a `view` because a job id is
+ * made in this browser and can never be a directory on GitHub Pages.
+ *
+ * The build fixes the frame, the headings, chapter XXV's Pro notice and the honest note
+ * about where the rows live. Everything with a name, a date or a figure in it is written
+ * by assets/jobs-ui.js from the store — nothing about a job can be server-rendered,
+ * because every job is in one browser.
+ */
+export function jobsMain(lang, t) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("clipage_title"), path: urlClients(lang) },
+    { name: t("jobpage_title"), path: urlJobs(lang) },
+  ]);
+
+  // Chapter XXV's block, worded exactly as on /klienci/ — one module, one rule. The
+  // "Poznaj LiczMat Pro" line is a sentence rather than a button while /liczmat-pro/ is
+  // planned (session 29); it becomes a link with no edit here the moment that goes live.
+  const pro = iaRoute("liczmat-pro");
+  const more = pro && pro.status === STATUS.LIVE
+    ? `<a class="btn btn-ghost btn-sm" href="${pro.path(lang)}">${esc(t("pro_more"))}</a>`
+    : `<span class="muted">${esc(t("pro_more"))} — ${esc(t("door_soon"))}</span>`;
+
+  const gate = `<div class="app-card crm-gate" id="job-gate" hidden>
+        <h2>${esc(t("feat_jobs_t"))}</h2>
+        <p class="muted">${esc(t("feat_jobs_d"))}</p>
+        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
+        <p>${more}</p>
+      </div>`;
+
+  /* The four statuses of chapter XXI, in the chapter's own order, rendered as a <select>
+     so the whole set is visible at once and a job can be moved in one gesture. The values
+     are the ids JOB_STATUS declares in assets/crm.js; the script checks them again before
+     storing, because a value that is not one of the four must never reach the row. */
+  const statusOptions = [["new", "job_st_new"], ["active", "job_st_active"],
+    ["done", "job_st_done"], ["cancelled", "job_st_cancelled"]]
+    .map(([id, key]) => `<option value="${id}">${esc(t(key))}</option>`).join("");
+
+  const detail = `<article id="job-detail" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="${urlJobs(lang)}" data-job-back>${esc(t("job_back"))}</a></p>
+
+        <div id="job-missing" hidden>
+          <h2>${esc(t("job_none_t"))}</h2>
+          <p class="muted">${esc(t("job_none_d"))}</p>
+        </div>
+
+        <div id="job-body" hidden>
+          <!-- Status and date sit above everything else: they are what a tradesman opens
+               a job to check, and chapter XXI names them before the money. -->
+          <p class="ws-mat-grid job-head-row">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label">${esc(t("job_status"))}</span>
+              <select id="job-status">${statusOptions}</select>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label">${esc(t("job_due"))}</span>
+              <input id="job-due" type="date">
+            </label>
+          </p>
+
+          <p class="crm-contact" id="job-client-line"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("job_value"))}</span> <b id="job-fig-value"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("job_fig_cost"))}</span> <b id="job-fig-cost"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("job_fig_left"))}</span> <b id="job-fig-left"></b></p>
+          </div>
+          <p class="muted field-note">${esc(t("job_cost_d"))}</p>
+          <p class="muted ws-estimate-mixed" id="job-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="job-edit">${esc(t("job_edit"))}</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="job-delete">${esc(t("app_delete"))}</button>
+          </div>
+
+          <!-- The whole record in one form on the page, for the reason /klienci/ gives:
+               prompt() cannot be translated once it is open and covers the row it is
+               about on a phone (chapter XXVIII). -->
+          <form id="job-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">${esc(t("job_name"))}</span>
+                <input id="job-edit-name" type="text" maxlength="120" required>
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">${esc(t("job_value"))}</span>
+                <input id="job-edit-value" type="text" inputmode="decimal">
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">${esc(t("job_client"))}</span>
+                <select id="job-edit-client"></select>
+              </label>
+            </p>
+            <p class="muted field-note">${esc(t("job_value_d"))}</p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="job-edit-desc">${esc(t("job_desc"))}</label>
+              <textarea id="job-edit-desc" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="job-edit-note">${esc(t("job_note"))}</label>
+              <textarea id="job-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-job-edit-cancel>${esc(t("action_cancel"))}</button>
+            </p>
+          </form>
+
+          <div id="job-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="job-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="job-delete-yes">${esc(t("job_delete_yes"))}</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="job-delete-no">${esc(t("action_cancel"))}</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("job_desc"))}</h2>
+            </div>
+            <p id="job-desc" class="crm-note"></p>
+          </section>
+
+          <!-- Chapter XXIV's third step: ZLECENIE → PROJEKT. The project is the free
+               workspace's own row — the same one /projekty/ shows — and nothing here
+               renames, archives or deletes it. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("job_project"))}</h2>
+              <a class="dash-more" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+            </div>
+            <ul id="job-project-list" class="data-list"></ul>
+            <form id="job-project-form" class="inline-form">
+              <select id="job-project-pick" aria-label="${esc(t("job_project_add"))}"></select>
+              <button type="submit" class="btn btn-primary btn-sm">${esc(t("job_project_add"))}</button>
+            </form>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("job_note_t"))}</h2>
+            </div>
+            <p id="job-note" class="crm-note"></p>
+          </section>
+        </div>
+      </article>`;
+
+  const index = `<div id="job-index">
+        <p class="ws-undo" id="job-undo" role="status" hidden>
+          <span id="job-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="job-undo-go">${esc(t("job_undo"))}</button>
+        </p>
+
+        <h2>${esc(t("job_list_t"))}</h2>
+        <p class="muted">${esc(t("job_list_d"))}</p>
+        <form id="job-form" class="inline-form">
+          <input id="job-name" type="text" maxlength="120" placeholder="${esc(t("job_new"))}" required>
+          <select id="job-client" aria-label="${esc(t("job_client"))}"></select>
+          <input id="job-new-due" type="date" aria-label="${esc(t("job_due"))}">
+          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+        </form>
+        <ul id="job-list" class="data-list"></ul>
+
+        <details id="job-closed" class="ws-archive" hidden>
+          <summary id="job-closed-summary">${esc(t("job_closed_t"))}</summary>
+          <p class="muted">${esc(t("job_closed_d"))}</p>
+          <ul id="job-closed-list" class="data-list"></ul>
+        </details>
+      </div>`;
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1 id="job-title">${esc(t("jobpage_title"))}</h1>
+      <p class="lead" id="job-lead">${esc(t("jobpage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="job-page">
+    <div class="wrap narrow">
+      <!-- Chapter XXV, first sentence: a free user should understand which features are
+           Pro. The strip says so on every visit, whatever the level. -->
+      <p class="crm-pro" id="job-pro">
+        <span class="chip" id="job-pro-chip">${esc(t("pro_locked"))}</span>
+        <span class="muted" id="job-pro-note">${esc(t("job_pro_note"))}</span>
+      </p>
+
+      ${gate}
+
+      <div id="job-tool">
+        ${detail}
+        ${index}
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="${urlClients(lang)}">${esc(t("clipage_title"))}</a>
+        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+      </p>
+      <p class="muted src-note">${esc(t("job_local_note"))}</p>
     </div>
   </section>
 

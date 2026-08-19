@@ -1434,6 +1434,18 @@ a.chip:hover { text-decoration: none; }
 /* A note is typed with line breaks in it and has to keep them; long text wraps. */
 .crm-note { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
 
+/* ---------- Jobs: /zlecenia/ (session 23, chapter XXI)
+   The same furniture again — the job screen is the client screen with a status and a date
+   on top of it. Only two things are new: the row that carries those two controls, and the
+   chip that says which of chapter XXI's four statuses a row is in. The chip spends the
+   same tokens as every other chip; the status is told by the *word* inside it, never by
+   colour alone, so it survives a monochrome print and a colour-blind reader. */
+.job-head-row { align-items: flex-end; }
+.job-head-row select, .job-head-row input { width: 100%; }
+.job-chip { font-size: var(--fs-xs); }
+/* A job past its date, and not finished. The word beside it says so as well. */
+.job-due-late { color: var(--error); font-weight: var(--fw-semi); }
+
 /* ---------- Legal / document page ---------- */
 .doc { max-width: 820px; margin: 0 auto; padding: var(--sp-10) var(--gutter) var(--sp-16); }
 .doc h1 { font-size: var(--fs-h1); }

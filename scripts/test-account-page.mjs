@@ -674,14 +674,16 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
   eq("the first is Klienci", await free.locator(".pro-mod h3").first().innerText(), "Klienci");
   eq("and it says so", await free.locator('.pro-mod[data-feature="clients"] .pro-lock').innerText(),
     "Dostępne w LiczMat Pro");
-  // Chapter XXV's rule is "never a dead button", not "never a button". Session 22 built
-  // Klienci, so its card is the one thing in the panel that opens anything; the other four
-  // modules do not exist yet and stay text, and there is still nothing to buy, because no
-  // payment exists (FIRESTORE_SYNC §9.2).
-  eq("the only control in the panel is the module that has been built",
-    await free.locator("#panel-pro a, #panel-pro button").count(), 1);
-  eq("and it opens Klienci",
-    await free.locator("#panel-pro a").getAttribute("href"), "/klienci/");
+  // Chapter XXV's rule is "never a dead button", not "never a button". Sessions 22 and 23
+  // built Klienci and Zlecenia, so their cards are the only things in the panel that open
+  // anything; the other three modules do not exist yet and stay text, and there is still
+  // nothing to buy, because no payment exists (FIRESTORE_SYNC §9.2).
+  eq("the only controls in the panel are the modules that have been built",
+    await free.locator("#panel-pro a, #panel-pro button").count(), 2);
+  eq("the first opens Klienci",
+    await free.locator('.pro-mod[data-feature="clients"] a').getAttribute("href"), "/klienci/");
+  eq("and the second Zlecenia",
+    await free.locator('.pro-mod[data-feature="jobs"] a').getAttribute("href"), "/zlecenia/");
   eq("no console error", free.lmErrors.join(" / "), "");
   await free.close();
 

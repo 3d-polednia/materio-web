@@ -52,6 +52,10 @@ export const SECTION = {
      from the moment it is planned, so turning the page on moves it, it does not rename
      it. Ukrainian is transliterated like every other one: "kliyenty". */
   clients: { pl: "klienci", uk: "kliyenty", de: "kunden", en: "clients" },
+  /* Session 23, the second Pro module. Same rule as `clients`: the segments are the ones
+     the `jobs` route has carried as `plannedSlug` in src/ia.mjs since session 3, so
+     turning the page on moves them, it does not rename them. */
+  jobs: { pl: "zlecenia", uk: "zamovlennya", de: "auftraege", en: "jobs" },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
@@ -209,6 +213,12 @@ export const urlClients = (lang) => `${prefix(lang)}/${SECTION.clients[lang]}/`;
  * same reason: the id is made in this browser and can never be a directory on Pages.
  */
 export const urlClient = (lang, id) => `${urlClients(lang)}?id=${encodeURIComponent(id)}`;
+
+/** The job list of LiczMat Pro — chapter XXI. */
+export const urlJobs = (lang) => `${prefix(lang)}/${SECTION.jobs[lang]}/`;
+
+/** One job, as a query string on /zlecenia/ — the same wall urlClient() hits. */
+export const urlJob = (lang, id) => `${urlJobs(lang)}?id=${encodeURIComponent(id)}`;
 
 export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
 

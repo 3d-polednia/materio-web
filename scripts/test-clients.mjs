@@ -236,7 +236,11 @@ head("1c. the client store is its own, and the phone's workspace is untouched");
   // The two stores are separate documents in localStorage, so a client write cannot
   // rewrite the workspace the phone reads.
   const store = crm.raw();
-  eq("the client store holds exactly one collection", Object.keys(store).join(), "clients");
+  // Session 23 added the second local-only collection beside it — jobs (chapter XXI).
+  // Both are outside the sync contract; what this guards is that neither has leaked into
+  // the workspace store, and that a third one is never added here without a decision.
+  eq("the Pro store holds exactly the two local collections",
+    Object.keys(store).sort().join(), "clients,jobs");
 }
 
 /* ================================================================== 2. the writes */

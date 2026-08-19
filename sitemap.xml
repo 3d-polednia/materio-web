@@ -90,6 +90,17 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/"/>
   </url>
   <url>
+    <loc>https://liczmat.com/zlecenia/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/zlecenia/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/zamovlennya/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/auftraege/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/jobs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/"/>
+  </url>
+  <url>
     <loc>https://liczmat.com/poradniki/</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -451,6 +462,17 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/kunden/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/clients/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/"/>
+  </url>
+  <url>
+    <loc>https://liczmat.com/uk/zamovlennya/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/zlecenia/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/zamovlennya/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/auftraege/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/jobs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/"/>
   </url>
   <url>
     <loc>https://liczmat.com/uk/porady/</loc>
@@ -816,6 +838,17 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/"/>
   </url>
   <url>
+    <loc>https://liczmat.com/de/auftraege/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/zlecenia/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/zamovlennya/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/auftraege/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/jobs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/"/>
+  </url>
+  <url>
     <loc>https://liczmat.com/de/ratgeber/</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -1177,6 +1210,17 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/kunden/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/clients/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/"/>
+  </url>
+  <url>
+    <loc>https://liczmat.com/en/jobs/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/zlecenia/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/zamovlennya/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/auftraege/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/jobs/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/"/>
   </url>
   <url>
     <loc>https://liczmat.com/en/guides/</loc>

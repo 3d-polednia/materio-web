@@ -1,10 +1,14 @@
-/* LiczMat website — the Pro workspace: clients.
+/* LiczMat website — the Pro workspace: clients and jobs.
  *
  * Master plan, session 22 (KLIENCI): "CRM klientów", and chapter XX under it — a client
  * list where a client carries contact details, notes, a history, jobs, projects and
- * quotes. Sessions 23, 24 and 26 build the jobs, the quotes and the path that joins them;
- * this file is the client itself, plus the one link chapter XX allows today: the projects
- * the free workspace already holds.
+ * quotes. Session 23 (ZLECENIA) added the second half: a job with a client, a name, a
+ * description, a status, a date, a value and a project (chapter XXI), which is chapter
+ * XXIV's middle step — KLIENT → ZLECENIE → PROJEKT → WYCENA. The quotes are session 24.
+ *
+ * Both collections live in this one file because they live in one store, and because the
+ * job is the thing that joins a client to a project: splitting them would mean two files
+ * reading and writing the same localStorage key, which is one race away from a lost write.
  *
  * **Local to this browser, and not part of the sync contract.** docs/FIRESTORE_SYNC.md in
  * `3d-polednia/Materio` defines five collections — projects, rooms, estimations,
@@ -42,9 +46,23 @@ const CRM_MAX_NAME = 120;
 const CRM_MAX_CONTACT = 200;
 const CRM_MAX_NOTE = 2000;
 
+/**
+ * Chapter XXI's statuses, in the order the chapter lists them: nowe, w toku, zakończone,
+ * anulowane. The ids are English because every other id in this repo is; the words the
+ * visitor reads are `job_st_<id>` in the dictionary, in four languages.
+ *
+ * "open" is the half a tradesman is actually working on, and it is what the index shows
+ * first — the other two are done with and fold away. That is also why a job has no
+ * `archived` field the way a client does: chapter XXI already gives it two closed states,
+ * and a third way to put a row out of sight would be one the page had to explain.
+ */
+const JOB_STATUS = ["new", "active", "done", "cancelled"];
+const JOB_OPEN_STATUS = ["new", "active"];
+const JOB_DEFAULT_STATUS = "new";
+
 /* ------------------------------------------------------------------ storage */
 
-const crmEmpty = () => ({ clients: [] });
+const crmEmpty = () => ({ clients: [], jobs: [] });
 
 /** Read the whole Pro workspace. A corrupt or absent store reads as an empty one. */
 function crmLoad() {
@@ -52,7 +70,12 @@ function crmLoad() {
     const raw = localStorage.getItem(CRM_KEY);
     if (!raw) return crmEmpty();
     const data = JSON.parse(raw);
-    return { clients: Array.isArray(data.clients) ? data.clients : [] };
+    return {
+      clients: Array.isArray(data.clients) ? data.clients : [],
+      // A store written before session 23 has no jobs array. Reading it as empty is the
+      // whole migration: nothing is rewritten until the visitor adds their first job.
+      jobs: Array.isArray(data.jobs) ? data.jobs : [],
+    };
   } catch (e) {
     return crmEmpty();
   }
@@ -158,11 +181,13 @@ const crmArchiveClient = (id, on) => crmUpdateClient(id, { archived: on !== fals
 /**
  * Tombstone a client.
  *
- * **Their projects are not touched.** A project is the visitor's own work in the free
- * workspace, it syncs to the phone, and it goes on existing when the client it was done
- * for is taken off the list — the same argument that keeps a room alive when its project
- * is deleted. The links stay on the tombstone, which is what lets the undo put the client
- * back with their projects still filed under them.
+ * **Their projects are not touched, and neither are their jobs.** A project is the
+ * visitor's own work in the free workspace, it syncs to the phone, and it goes on existing
+ * when the client it was done for is taken off the list — the same argument that keeps a
+ * room alive when its project is deleted. A job outlives its client for the same reason
+ * and one more: it keeps its `clientId`, so the undo puts the client back with every job
+ * still filed under them. Until then the job's page says the client is gone rather than
+ * drawing a link to a row nobody can open.
  *
  * @returns {{id:string, at:number}|null} hand it to crmRestoreClient()
  */
@@ -279,6 +304,288 @@ function crmFreeProjects() {
   return wsProjects().filter((p) => !taken.has(p.id));
 }
 
+
+/* ------------------------------------------------------------------ jobs
+ *
+ * Chapter XXI: "Zlecenie może mieć: klienta, nazwę, opis, status, termin, wartość,
+ * projekt, notatki." All eight are here; the quote (chapter XXII) is session 24.
+ *
+ * **The client and the project are stored on the job**, which is the opposite direction
+ * from client → project, and for a reason that is not symmetry: a *project* document is
+ * contract — it is pushed to Firestore, pulled by the phone and rendered on /p/<token> —
+ * so a `jobId` on it would be half a link in the half that travels. A *job* is local, like
+ * a client, so a link kept on it travels nowhere and cannot mislead anything. Keeping both
+ * ends of chapter XXIV's path (KLIENT → ZLECENIE → PROJEKT) on the local rows is what lets
+ * the whole chain survive a delete and come back on an undo.
+ *
+ * Money: `valueMinor` is what was **agreed** with the client — chapter XXI's "wartość" —
+ * and it is the one figure on this page that is typed rather than derived. It is not the
+ * project's cost and must never be confused with it: wsProjectCosts() answers what the
+ * work has actually run to so far, the two are different numbers on purpose, and the page
+ * shows them side by side. The currency is stamped once, from the visitor's own choice at
+ * the moment the value is first typed, and never re-stamped: re-labelling 4 000 zł as
+ * 4 000 € is a conversion at a rate, and chapter VI forbids those.
+ */
+
+/** Is this one of chapter XXI's four statuses? An unknown one is never stored. */
+const crmIsStatus = (v) => JOB_STATUS.indexOf(String(v)) !== -1;
+
+/** Chapter XXI's date: a calendar day, as "YYYY-MM-DD", or "" for a job with no deadline.
+ *
+ * Not millis, unlike every timestamp in the store. A deadline is a day in the visitor's
+ * own calendar — "the 14th" — and an instant would move to the 13th or the 15th for a
+ * browser in another timezone, which is exactly the kind of silent wrongness a terminarz
+ * (session 25) cannot recover from. The string sorts correctly as text, which is all the
+ * calendar will need.
+ */
+function crmDay(v) {
+  const s = String(v === undefined || v === null ? "" : v).trim();
+  // Exactly the ten characters, never a prefix of something longer: a full ISO instant
+  // ("2026-09-30T23:00:00Z") names a different day in half the world's timezones, so its
+  // first ten characters are a guess, and a guess about a deadline is worse than nothing.
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return "";
+  const d = new Date(`${s}T00:00:00Z`);
+  if (isNaN(d.getTime())) return "";
+  // "2026-02-31" parses in some engines and rolls over in others; compare it back.
+  return d.toISOString().slice(0, 10) === s ? s : "";
+}
+
+/** Minor units from a typed major amount, or null when nothing was typed. */
+function crmMinor(v) {
+  if (v === undefined || v === null || String(v).trim() === "") return null;
+  const n = Number(String(v).replace(",", "."));
+  if (!isFinite(n) || n < 0) return null;
+  return Math.round(n * 100);
+}
+
+/** The visitor's own currency, for stamping a value that has never carried one. */
+const crmCurrency = () => (typeof wsCurrency === "function" ? wsCurrency()
+  : (typeof lmCurrency === "function" ? lmCurrency() : "PLN"));
+
+/** Every job that still exists, newest change first. */
+function crmAllJobs() {
+  return crmAlive(crmLoad().jobs).sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+/** The jobs still being worked on — chapter XXI's "nowe" and "w toku". */
+const crmOpenJobs = () => crmAllJobs().filter((j) => JOB_OPEN_STATUS.indexOf(j.status) !== -1);
+
+/** The other two statuses: finished and cancelled. Folded away on the page, never lost. */
+const crmClosedJobs = () => crmAllJobs().filter((j) => JOB_OPEN_STATUS.indexOf(j.status) === -1);
+
+/** One job by id, whatever its status. Null when it never existed or was deleted. */
+const crmJob = (id) => crmAllJobs().find((j) => j.id === id) || null;
+
+/**
+ * Add a job. Only the name is required, for the reason only a client's name is: chapter
+ * XXI's other fields are things a tradesman fills in when they know them, and a job with
+ * a name is already the row they wanted.
+ *
+ * @param {{name:string, clientId?:string, projectId?:string, status?:string,
+ *          description?:string, dueDate?:string, valueMajor?:string|number,
+ *          note?:string}} fields
+ * @returns {object|null} the stored job, or null when there is no name
+ */
+function crmAddJob(fields) {
+  const f = fields || {};
+  const name = crmText(f.name, CRM_MAX_NAME);
+  if (!name) return null;
+  const data = crmLoad();
+  const now = Date.now();
+  const value = crmMinor(f.valueMajor);
+  const job = {
+    id: crmId(),
+    name,
+    // A client or a project that is not there is dropped rather than stored: a link to a
+    // row nobody can open is worse than no link, because the page would draw it.
+    clientId: crmClientId(f.clientId),
+    projectId: crmProjectId(f.projectId),
+    status: crmIsStatus(f.status) ? String(f.status) : JOB_DEFAULT_STATUS,
+    description: crmText(f.description, CRM_MAX_NOTE),
+    note: crmText(f.note, CRM_MAX_NOTE),
+    dueDate: crmDay(f.dueDate),
+    valueMinor: value,
+    currencyCode: value === null ? "" : crmCurrency(),
+    createdAt: now,
+    updatedAt: now,
+    deletedAt: null,
+    schemaVersion: CRM_SCHEMA,
+  };
+  data.jobs.push(job);
+  crmSave(data);
+  // Chapter XXIV's path is one chain: a job that arrives with both a client and a project
+  // files that project under that client too, so the client's own page tells the same
+  // story as the job's. crmLinkProject() is the one write that knows a project has one
+  // client, so it is the one that does it.
+  if (job.clientId && job.projectId) crmLinkProject(job.clientId, job.projectId);
+  return crmJob(job.id);
+}
+
+/** An existing client's id, or "" — never a dangling one. */
+function crmClientId(id) {
+  const v = String(id || "");
+  return v && crmClient(v) ? v : "";
+}
+
+/** An existing project's id, or "". The workspace is the authority on what exists. */
+function crmProjectId(id) {
+  const v = String(id || "");
+  if (!v || typeof wsProject !== "function") return "";
+  return wsProject(v) ? v : "";
+}
+
+/**
+ * Correct a job in place. Anything not passed keeps its current value.
+ *
+ * `valueMajor` is the typed amount: "" clears it (and the currency with it), a number
+ * stamps the visitor's currency the first time and keeps the stamped one afterwards.
+ */
+function crmUpdateJob(id, fields) {
+  const f = fields || {};
+  const data = crmLoad();
+  const job = data.jobs.find((j) => j.id === id && !j.deletedAt);
+  if (!job) return null;
+  if (f.name !== undefined) {
+    const name = crmText(f.name, CRM_MAX_NAME);
+    if (!name) return null;
+    job.name = name;
+  }
+  if (f.description !== undefined) job.description = crmText(f.description, CRM_MAX_NOTE);
+  if (f.note !== undefined) job.note = crmText(f.note, CRM_MAX_NOTE);
+  if (f.dueDate !== undefined) job.dueDate = crmDay(f.dueDate);
+  if (f.status !== undefined && crmIsStatus(f.status)) job.status = String(f.status);
+  if (f.valueMajor !== undefined) {
+    const value = crmMinor(f.valueMajor);
+    job.valueMinor = value;
+    // An amount that already exists keeps the currency it was agreed in; a new one takes
+    // the visitor's. Clearing the amount clears the currency, so the next one is stamped
+    // fresh rather than inheriting a code from a figure nobody remembers.
+    if (value === null) job.currencyCode = "";
+    else if (!job.currencyCode) job.currencyCode = crmCurrency();
+  }
+  if (f.clientId !== undefined) job.clientId = crmClientId(f.clientId);
+  if (f.projectId !== undefined) job.projectId = crmProjectId(f.projectId);
+  job.updatedAt = Date.now();
+  crmSave(data);
+  if (job.clientId && job.projectId) crmLinkProject(job.clientId, job.projectId);
+  return crmJob(id);
+}
+
+/** Move a job to one of chapter XXI's four statuses. An unknown one changes nothing. */
+function crmSetJobStatus(id, status) {
+  return crmIsStatus(status) ? crmUpdateJob(id, { status: status }) : null;
+}
+
+/**
+ * Tombstone a job.
+ *
+ * Neither the client nor the project is touched: both exist without it — the project is
+ * the visitor's own work and syncs to the phone, the client is a person who is still a
+ * client. The links stay on the tombstone, which is what lets the undo put the job back
+ * with its client and its project still attached.
+ *
+ * @returns {{id:string, at:number}|null} hand it to crmRestoreJob()
+ */
+function crmDeleteJob(id) {
+  const data = crmLoad();
+  const job = data.jobs.find((j) => j.id === id && !j.deletedAt);
+  if (!job) return null;
+  const now = Date.now();
+  job.deletedAt = now;
+  job.updatedAt = now;
+  crmSave(data);
+  return { id: id, at: now };
+}
+
+/** Undo one delete — the same tombstone-clearing as crmRestoreClient(). */
+function crmRestoreJob(token) {
+  const id = typeof token === "string" ? token : (token && token.id);
+  if (!id) return null;
+  const data = crmLoad();
+  const job = data.jobs.find((j) => j.id === id);
+  if (!job || !job.deletedAt) return null;
+  job.deletedAt = null;
+  job.updatedAt = Date.now();
+  crmSave(data);
+  return crmJob(id);
+}
+
+/** The jobs of one client, newest change first. Chapter XX: "Klient może posiadać … zlecenia". */
+const crmClientJobs = (clientId) =>
+  crmAllJobs().filter((j) => j.clientId && j.clientId === String(clientId || ""));
+
+/** The job a project is being done under, or null. One project has at most one job. */
+function crmJobOfProject(projectId) {
+  const pid = String(projectId || "");
+  if (!pid) return null;
+  return crmAllJobs().find((j) => j.projectId === pid) || null;
+}
+
+/** The projects no job has taken yet — what a job's project picker offers. */
+function crmFreeJobProjects(exceptJobId) {
+  if (typeof wsProjects !== "function") return [];
+  const taken = {};
+  crmAllJobs().forEach((j) => {
+    if (j.projectId && j.id !== exceptJobId) taken[j.projectId] = true;
+  });
+  return wsProjects().filter((p) => !taken[p.id]);
+}
+
+/**
+ * What one job comes to: what was agreed, and what the work has cost so far.
+ *
+ * Two different numbers, and the reason they are both here is that they answer two
+ * different questions — "what did I quote" and "what has it run to". Neither is derived
+ * from the other and neither is stored twice: the agreed value is the job's own field, the
+ * cost is wsProjectCosts() over the one project the job carries, which is the function
+ * that already knows a calculation and the material it produced are the same money.
+ *
+ * `mixed` is chapter VI's rule as everywhere else: the agreed value and the costs may be
+ * in different currencies, they are never converted, and the page is told rather than
+ * handed a difference that means nothing.
+ */
+function crmJobCosts(jobId) {
+  const job = crmJob(jobId);
+  const empty = {
+    value: null, currencyCode: crmCurrency(), cost: 0, costCurrencyCode: crmCurrency(),
+    hasProject: false, mixed: false, left: null,
+  };
+  if (!job) return empty;
+  const costs = job.projectId && typeof wsProjectCosts === "function"
+    ? wsProjectCosts(job.projectId) : null;
+  const cost = costs ? costs.total : 0;
+  const costCode = costs ? costs.currencyCode : crmCurrency();
+  const valueCode = job.currencyCode || crmCurrency();
+  // A difference between two amounts in different currencies is not a number, so it is
+  // not computed — the page says the currencies differ instead.
+  const comparable = job.valueMinor !== null && cost > 0 && valueCode === costCode;
+  return {
+    value: job.valueMinor,
+    currencyCode: valueCode,
+    cost: cost,
+    costCurrencyCode: costCode,
+    hasProject: Boolean(job.projectId && costs),
+    mixed: Boolean((costs && costs.mixed)
+      || (job.valueMinor !== null && cost > 0 && valueCode !== costCode)),
+    left: comparable ? job.valueMinor - cost : null,
+  };
+}
+
+/**
+ * What a client's jobs are worth, by status — the count of each of chapter XXI's four.
+ * Money is deliberately not summed here: two jobs agreed in two currencies do not add up,
+ * and a client's money already has one answer (crmClientCosts()).
+ */
+function crmClientJobCounts(clientId) {
+  const out = { total: 0 };
+  JOB_STATUS.forEach((s) => { out[s] = 0; });
+  crmClientJobs(clientId).forEach((j) => {
+    out.total++;
+    if (Object.prototype.hasOwnProperty.call(out, j.status)) out[j.status]++;
+  });
+  return out;
+}
+
 /* ------------------------------------------------------------------ what it comes to */
 
 /**
@@ -347,5 +654,8 @@ function crmClientLastAt(clientId) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { CRM_KEY, CRM_SCHEMA, CRM_MAX_NAME, CRM_MAX_NOTE };
+  module.exports = {
+    CRM_KEY, CRM_SCHEMA, CRM_MAX_NAME, CRM_MAX_NOTE,
+    JOB_STATUS, JOB_OPEN_STATUS, JOB_DEFAULT_STATUS,
+  };
 }

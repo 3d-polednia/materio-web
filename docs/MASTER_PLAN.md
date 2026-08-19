@@ -48,8 +48,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 20 | Pomieszczenia | **Zrobione** — 2026-08-14 |
 | 21 | LiczMat Pro: fundament | **Zrobione** — 2026-08-19 |
 | 22 | Klienci | **Zrobione** — 2026-08-19 |
-| 23 | Zlecenia | **Następna** |
-| 24–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 23 | Zlecenia | **Zrobione** — 2026-08-19 |
+| 24 | Wyceny | **Następna** |
+| 25–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -1857,6 +1858,28 @@ telefon jest zmianą kontraktu w repo aplikacji**, a nie przepisaniem tego pliku
 w `CloudSync`. To osobne zadanie i osobna decyzja właściciela — kiedy, i czy w ogóle przed
 płatnościami.
 
+### Zlecenia też są tylko w przeglądarce, i dzielą magazyn z klientami (z Sesji 23)
+
+To samo, co akapit wyżej, i z tego samego powodu: kontrakt nie ma kolekcji `jobs` — nie ma
+`JobEntity`, nie ma `SyncContract.jobToDoc()`, nie ma `validJob()` we wdrożonych regułach.
+Zlecenia siedzą więc w `assets/crm.js` obok klientów, pod tym samym kluczem
+`liczmat-crm-v1`, bo to jeden magazyn: dwa pliki piszące do jednego klucza `localStorage`
+to jeden wyścig od zgubionego zapisu. `wsExport()` ich nie zawiera, `/zlecenia/` mówi to
+wprost, a przeniesienie na telefon to ta sama zmiana kontraktu w repo aplikacji.
+
+Do decyzji właściciela zostają dwie rzeczy, obie **poza zakresem Sesji 23** i obie zapisane
+tu zamiast zrobione:
+
+- **Czy zlecenie ma kiedyś jechać na telefon.** Dziś fachowiec ustawia status w
+  przeglądarce, a w aplikacji go nie widzi. Jeśli tak, to razem z klientami — jedna zmiana
+  kontraktu, nie dwie.
+- **Czy `wartość` zlecenia ma się kiedyś brać z wyceny (Sesja 24).** Dziś jest wpisywana
+  ręcznie i celowo niczym nie jest liczona: rozdział XXI nazywa ją polem zlecenia, a
+  rozdział XXII buduje wycenę dopiero w następnej sesji. Kiedy wycena powstanie, trzeba
+  będzie rozstrzygnąć, czy uzgodniona kwota zostaje osobnym polem (umowa z klientem), czy
+  staje się sumą wyceny — **dwie różne rzeczy**, i podmiana jednej na drugą bez decyzji
+  byłaby cichą zmianą znaczenia liczby, którą ktoś już wpisał.
+
 ### Moduł Pro jest dziś otwarty dla każdego — zamek przychodzi z Sesją 27 (z Sesji 22)
 
 `/klienci/` mówi na górze „Dostępne w LiczMat Pro" i jednym zdaniem, że planu Pro nic
@@ -1870,6 +1893,8 @@ Cały mechanizm jest już na miejscu i przetestowany w obie strony: `lmFeatureSt
 w `assets/plan.js` odpowiada `allowed / gated / locked`, blok bramki siedzi w HTML-u od
 pierwszego renderu (ukryty), a **jedynym przełącznikiem jest `LM_PRO_LOCKED`**. Sesja 27
 zmienia jedną linijkę; test sprawdza obie odpowiedzi, więc nie będzie to zmiana na ślepo.
+Sesja 23 dołożyła drugi moduł (`/zlecenia/`) pod ten sam przełącznik i ten sam test — liczba
+modułów nie zmienia tego, że przełącznik jest jeden.
 
 ### Warstwa konta nie została po tej sesji sprawdzona na żywym Firebase
 
