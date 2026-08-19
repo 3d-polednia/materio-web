@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Сколько краски на комнату — LiczMat</title>
+<meta name="description" content="Площадь стен и потолка, вычтенные проёмы, перевод в целые банки с запасом на второй слой.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/ru/rukovodstva/skolko-kraski-na-komnatu/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/poradniki/ile-farby-na-pokoj/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/porady/skilky-farby-na-kimnatu/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/ratgeber/wie-viel-farbe-fuer-ein-zimmer/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/guides/how-much-paint-for-a-room/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/navody/kolik-barvy-na-pokoj/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/navody/kolko-farby-na-izbu/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/ghiduri/cata-vopsea-pentru-o-camera/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/vodici/koliko-boje-za-sobu/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/vodici/koliko-boje-za-sobu/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/rukovodstva/skolko-kraski-na-komnatu/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/poradniki/ile-farby-na-pokoj/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Сколько краски на комнату — LiczMat">
+<meta property="og:description" content="Площадь стен и потолка, вычтенные проёмы, перевод в целые банки с запасом на второй слой.">
+<meta property="og:url" content="https://liczmat.com/ru/rukovodstva/skolko-kraski-na-komnatu/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Сколько краски на комнату — LiczMat">
+<meta name="twitter:description" content="Площадь стен и потолка, вычтенные проёмы, перевод в целые банки с запасом на второй слой.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://liczmat.com/ru/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Руководства",
+      "item": "https://liczmat.com/ru/rukovodstva/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Сколько краски на комнату",
+      "item": "https://liczmat.com/ru/rukovodstva/skolko-kraski-na-komnatu/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Сколько краски на комнату",
+  "description": "Площадь стен и потолка, вычтенные проёмы, перевод в целые банки с запасом на второй слой.",
+  "inLanguage": "ru",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "text": "Измерь комнату: длину, ширину и высоту. Периметр на высоту даёт площадь стен, длина на ширину — потолок."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "text": "Вычти окна и двери. Типичное окно — около 1,5 м², типичная дверь — около 1,8 м²."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "text": "Раздели на расход с этикетки и умножь на число слоёв. Округли вверх до целых банок."
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Перейти к содержимому</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/ru/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Основная навигация">
+      <ul class="nav-list">
+        <li><a href="/ru/kalkulyatory/">Калькуляторы</a></li>
+        <li><a href="/ru/materialy/">Материалы</a></li>
+        <li data-nav-level="liczmat"><a href="/ru/proekty/">Проекты</a></li>
+        <li><a href="/ru/rukovodstva/" aria-current="page">Руководства</a></li>
+        <li><a href="/ru/prilozhenie/">Приложение</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Язык">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/poradniki/ile-farby-na-pokoj/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/porady/skilky-farby-na-kimnatu/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/ratgeber/wie-viel-farbe-fuer-ein-zimmer/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/guides/how-much-paint-for-a-room/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/navody/kolik-barvy-na-pokoj/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sk/navody/kolko-farby-na-izbu/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ro/ghiduri/cata-vopsea-pentru-o-camera/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/hr/vodici/koliko-boje-za-sobu/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sr/vodici/koliko-boje-za-sobu/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></span></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Валюта" title="Валюта"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Мой аккаунт</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Сменить тему" title="Сменить тему"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Открыть меню"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ru/">Главная</a></li><li><a href="/ru/rukovodstva/">Руководства</a></li><li aria-current="page">Сколько краски на комнату</li></ol></nav>
+      <h1>Сколько краски на комнату</h1>
+      <p class="lead">Площадь стен и потолка, вычтенные проёмы, перевод в целые банки с запасом на второй слой.</p>
+    </div>
+  </section>
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>Шаг за шагом</h2>
+      <ol class="steps-list"><li>Измерь комнату: длину, ширину и высоту. Периметр на высоту даёт площадь стен, длина на ширину — потолок.</li><li>Вычти окна и двери. Типичное окно — около 1,5 м², типичная дверь — около 1,8 м².</li><li>Раздели на расход с этикетки и умножь на число слоёв. Округли вверх до целых банок.</li></ol>
+
+      <h2>Калькуляторы из этого руководства</h2>
+      <div class="chips"><a class="chip" href="/ru/kalkulyatory/kraska-shtukaturka-grunt/">Краски, штукатурки, грунты</a></div>
+
+      <div class="tip">
+        <b>Совет</b>
+        <p>Расход с этикетки относится к гладкому, загрунтованному основанию. Впитывающая штукатурка берёт больше, так что считай с запасом или сначала загрунтуй.</p>
+      </div>
+
+      <p class="mt-6"><a class="btn btn-ghost" href="/ru/rukovodstva/">Все руководства</a></p>
+    </div>
+  </section>
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Та же формула в приложении</b> LiczMat для Android считает тем же ядром офлайн — с каталогом материалов и сохранением результата в проект.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Скачать</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Калькулятор строительных материалов. Посчитай. Спланируй. Сделай.</p>
+      </div>
+      <div>
+        <h4>Продукт</h4>
+        <ul>
+          <li><a href="/ru/kalkulyatory/">Все калькуляторы</a></li>
+          <li><a href="/ru/materialy/">Материалы</a></li>
+          <li data-nav-level="liczmat"><a href="/ru/proekty/">Проекты</a></li>
+          <li><a href="/ru/smeta/">Смета</a></li>
+          <li><a href="/ru/rukovodstva/">Руководства</a></li>
+          <li><a href="/ru/magaziny/">Магазины</a></li>
+          <li data-nav-level="pro"><a href="/ru/klienty/">Клиенты</a></li>
+          <li data-nav-level="pro"><a href="/ru/zakazy/">Заказы</a></li>
+          <li data-nav-level="pro"><a href="/ru/kommercheskie-predlozheniya/">Предложения</a></li>
+          <li data-nav-level="pro"><a href="/ru/sroki/">Сроки</a></li>
+          <li><a href="/ru/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Аккаунт</h4>
+        <ul>
+          <li><a href="/ru/prilozhenie/">Приложение</a></li>
+          <li><a href="/app/" rel="nofollow">Мой аккаунт</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Панель</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Правовая информация</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Политика конфиденциальности</a></li>
+          <li><a href="/ru/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Язык">
+      <h4>Язык</h4>
+      <ul>
+        <li><a href="/poradniki/ile-farby-na-pokoj/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/porady/skilky-farby-na-kimnatu/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/ratgeber/wie-viel-farbe-fuer-ein-zimmer/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/guides/how-much-paint-for-a-room/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/navody/kolik-barvy-na-pokoj/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/navody/kolko-farby-na-izbu/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/ghiduri/cata-vopsea-pentru-o-camera/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/vodici/koliko-boje-za-sobu/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/vodici/koliko-boje-za-sobu/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/rukovodstva/skolko-kraski-na-komnatu/" hreflang="ru" lang="ru" data-lang="ru" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Все права защищены.</span>
+      <span>Результаты приблизительны. Всегда проверяй перед покупкой.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Согласен" hidden>
+  <p class="consent-text">Используем Google Analytics, чтобы анонимно считать трафик сайта и сколько людей переходит в Google Play. Согласен?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Подробнее в политике конфиденциальности</a>
+    <a class="consent-more" href="/ru/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Отклонить</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Согласен</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/poradniki/ile-farby-na-pokoj/",
+  "uk": "/uk/porady/skilky-farby-na-kimnatu/",
+  "de": "/de/ratgeber/wie-viel-farbe-fuer-ein-zimmer/",
+  "en": "/en/guides/how-much-paint-for-a-room/",
+  "cs": "/cs/navody/kolik-barvy-na-pokoj/",
+  "sk": "/sk/navody/kolko-farby-na-izbu/",
+  "ro": "/ro/ghiduri/cata-vopsea-pentru-o-camera/",
+  "hr": "/hr/vodici/koliko-boje-za-sobu/",
+  "sr": "/sr/vodici/koliko-boje-za-sobu/",
+  "ru": "/ru/rukovodstva/skolko-kraski-na-komnatu/"
+};</script>
+<script src="/assets/i18n.ru.js?v=20260819i"></script>
+<script src="/assets/i18n-runtime.js?v=20260819i"></script>
+<script src="/assets/currency.js?v=20260819i"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819i"></script>
+
+
+<script src="/assets/main.js?v=20260819i"></script>
+
+</body>
+</html>

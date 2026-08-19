@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Клиенты — LiczMat</title>
+<meta name="description" content="Клиенты в LiczMat Pro: список клиентов с контактными данными и заметками, проекты, закреплённые за клиентом, и история сохранённых расчётов. Данные остаются в этом браузере.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/ru/klienty/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/klienci/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kliyenty/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/kunden/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/clients/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/klienti/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/klienti/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/clienti/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/klijenti/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/klijenti/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/klienty/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="Клиенты — LiczMat">
+<meta property="og:description" content="Клиенты в LiczMat Pro: список клиентов с контактными данными и заметками, проекты, закреплённые за клиентом, и история сохранённых расчётов. Данные остаются в этом браузере.">
+<meta property="og:url" content="https://liczmat.com/ru/klienty/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Клиенты — LiczMat">
+<meta name="twitter:description" content="Клиенты в LiczMat Pro: список клиентов с контактными данными и заметками, проекты, закреплённые за клиентом, и история сохранённых расчётов. Данные остаются в этом браузере.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://liczmat.com/ru/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Клиенты",
+      "item": "https://liczmat.com/ru/klienty/"
+    }
+  ]
+}
+</script>
+<script>window.LM_LINKS = {"clients":"/ru/klienty/","jobs":"/ru/zakazy/","projects":"/ru/proekty/","quotes":"/ru/kommercheskie-predlozheniya/","calendar":"/ru/sroki/"};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Перейти к содержимому</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/ru/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Основная навигация">
+      <ul class="nav-list">
+        <li><a href="/ru/kalkulyatory/">Калькуляторы</a></li>
+        <li><a href="/ru/materialy/">Материалы</a></li>
+        <li data-nav-level="liczmat"><a href="/ru/proekty/">Проекты</a></li>
+        <li><a href="/ru/rukovodstva/">Руководства</a></li>
+        <li><a href="/ru/prilozhenie/">Приложение</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Язык">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/klienci/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/kliyenty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/kunden/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/clients/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/klienti/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sk/klienti/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ro/clienti/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/hr/klijenti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sr/klijenti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></span></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Валюта" title="Валюта"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Мой аккаунт</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Сменить тему" title="Сменить тему"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Открыть меню"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ru/">Главная</a></li><li aria-current="page">Клиенты</li></ol></nav>
+      <h1 id="crm-title">Клиенты</h1>
+      <p class="lead" id="crm-lead">Список клиентов LiczMat Pro: контактные данные, заметки и проекты, которые ты для них считаешь.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="crm-page">
+    <div class="wrap narrow">
+      <!-- Chapter XXV's strip, above the module for somebody who may use it: which plan
+           opened it. assets/paywall.js hides the whole strip when the wall is up,
+           because the wall says all of it and twice is worse than once. -->
+      <p class="crm-pro" id="crm-pro" hidden>
+        <span class="chip" id="crm-pro-chip">Доступно в LiczMat Pro</span>
+      </p>
+
+      <div class="app-card crm-gate pw-gate" id="crm-gate" hidden>
+        <h2>Клиенты</h2>
+        <p class="muted">Список клиентов с контактными данными, заметками и историей сотрудничества.</p>
+        <p><span class="chip">Доступно в LiczMat Pro</span></p>
+
+        <!-- One rung of the Free → Pro path, chosen by assets/paywall.js from the level.
+             Both are in the markup; neither is shown until the script knows which. -->
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro — это план при аккаунте. Сначала заведи бесплатный аккаунт LiczMat или войди — Pro можно включить только на аккаунте.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fru%2Fklienty%2F" rel="nofollow">Завести бесплатный аккаунт</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Твой аккаунт на бесплатном плане. Этот модуль относится к LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Что ещё входит в LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Заказы</b> — <span class="muted">Заказ с клиентом, описанием, статусом, сроком, стоимостью и связанным проектом.</span></li>
+            <li><b>Предложения</b> — <span class="muted">Материал, работа, дополнительные расходы, наценка и сумма — из того, что ты уже посчитал.</span></li>
+            <li><b>Сроки</b> — <span class="muted">Сроки заказов и основные сведения о них. Не второй Google Календарь.</span></li>
+            <li><b>История и CRM</b> — <span class="muted">Путь через всю работу: клиент → заказ → проект → предложение → история.</span></li>
+          </ul>
+        </div>
+
+        <p><span class="muted"><span data-i18n="pro_more">Узнай про LiczMat Pro</span> — <span data-i18n="door_soon">В подготовке</span></span></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Подписка LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Один план, все пять модулей Pro. Оплату проводит Stripe; отменяешь когда угодно, и Pro работает до конца оплаченного периода.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Ежемесячно</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ месяц</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Ежегодно</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ год — на два месяца дешевле</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Перейти в свой аккаунт</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Подписку пока нельзя оформить. Цены окончательные, оплату запускаем скоро.</p>
+        </div>
+      </div>
+
+      <div id="crm-tool">
+        <article id="crm-client" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/ru/klienty/" data-crm-back>← Все клиенты</a></p>
+
+        <div id="crm-client-missing" hidden>
+          <h2>Такого клиента нет</h2>
+          <p class="muted">Этот клиент был удалён, или адрес пришёл из другого браузера.</p>
+        </div>
+
+        <div id="crm-client-body" hidden>
+          <!-- Chapter XX's "dane kontaktowe": a phone that dials and an address that can
+               be copied. Written by the script, because a client with no e-mail must not
+               leave an empty line behind. -->
+          <p class="crm-contact" id="crm-contact"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Проекты</span> <b id="crm-fig-projects"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Последнее изменение</span> <b id="crm-fig-last"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Стоимость работ</span> <b id="crm-fig-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="crm-mixed" hidden>Позиции в разных валютах. Сумма их складывает, но ничего не пересчитывает по курсу — проверь валюты в колонке расхода.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-edit">Изменить данные</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-delete">Удалить</button>
+          </div>
+
+          <!-- The whole record in one form, on the page rather than in a browser dialog:
+               prompt() cannot be translated once it is open and covers the row it is
+               about on a phone (chapter XXVIII). -->
+          <form id="crm-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Название</span>
+                <input id="crm-edit-name" type="text" maxlength="120" required>
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">Телефон</span>
+                <input id="crm-edit-phone" type="tel" maxlength="200" autocomplete="tel">
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">E-mail</span>
+                <input id="crm-edit-email" type="email" maxlength="200" autocomplete="email">
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Адрес</span>
+                <input id="crm-edit-address" type="text" maxlength="200">
+              </label>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="crm-edit-note">Заметки</label>
+              <textarea id="crm-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-crm-edit-cancel>Отмена</button>
+            </p>
+          </form>
+
+          <div id="crm-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="crm-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="crm-delete-yes">Удалить клиента</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="crm-delete-no">Отмена</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Заметки</h2>
+            </div>
+            <p id="crm-note" class="crm-note"></p>
+          </section>
+
+          <!-- Chapter XX: "Klient może posiadać … projekty", and chapter XXIV's path
+               begins with them. The link is stored on the client (assets/crm.js says
+               why); the project itself is the same row /projekty/ shows and is never
+               touched from here. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Проекты</h2>
+              <a class="dash-more" href="/ru/proekty/">Проекты и помещения</a>
+            </div>
+            <p class="muted">Проекты, закреплённые за этим клиентом. Это те же проекты, что и на странице проектов — здесь их ничто не меняет.</p>
+            <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-form" class="inline-form">
+              <select id="crm-project-pick" aria-label="Закрепить проект"></select>
+              <button type="submit" class="btn btn-primary btn-sm">Закрепить проект</button>
+            </form>
+          </section>
+
+          <!-- Chapter XX: "Klient może posiadać … zlecenia", and chapter XXIV's path runs
+               through them. The job is written on /zlecenia/ — this is the client's end of
+               the same link, read-only, so one screen owns the writes. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Заказы</h2>
+              <a class="dash-more" href="/ru/zakazy/">Все заказы</a>
+            </div>
+            <p class="muted">Заказы этого клиента. Заказ связывает клиента с проектом и следит за статусом и сроком.</p>
+            <ul id="crm-client-jobs" class="data-list"></ul>
+          </section>
+
+          <!-- Chapter XX: "Klient może posiadać … wyceny", and the fourth step of chapter
+               XXIV's path seen from its first. Nothing about the link is stored on the
+               client: a quote keeps its project, the client keeps their projects, and
+               crmClientQuotes() is where the two ends meet. Read-only, like the jobs. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Предложения</h2>
+              <a class="dash-more" href="/ru/kommercheskie-predlozheniya/">Все предложения</a>
+            </div>
+            <p class="muted">Предложения, посчитанные из проекта. Материал и прочие расходы берутся из проекта, работа и наценка — из предложения.</p>
+            <ul id="crm-client-quotes" class="data-list"></ul>
+          </section>
+
+          <!-- Chapter XXIV's last step, and chapter XX's "historia": the client, their
+               jobs, the quotes priced from their projects and every calculation and cost
+               saved into one — each read with the date on the document itself. Nothing is
+               logged separately, and crm_hist_note says out loud what that leaves out. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>История</h2>
+            </div>
+            <p class="muted">Что произошло: клиент, заказы, предложения, сохранённые расчёты и дописанные расходы, от самого нового.</p>
+            <ul id="crm-history" class="data-list"></ul>
+            <p class="muted field-note">Историю мы выводим из сохранённых документов и их дат. У изменения статуса или срока нет собственной даты, поэтому его нет в списке.</p>
+          </section>
+        </div>
+      </article>
+        <div id="crm-index">
+        <p class="ws-undo" id="crm-undo" role="status" hidden>
+          <span id="crm-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="crm-undo-go">Отменить</button>
+        </p>
+
+        <h2>Клиенты</h2>
+        <p class="muted">Клиент — это название и контактные данные. Проекты закрепляешь уже внутри, у конкретного клиента.</p>
+        <form id="crm-client-form" class="inline-form">
+          <input id="crm-client-name" type="text" maxlength="120" placeholder="Название клиента" required>
+          <input id="crm-client-phone" type="tel" maxlength="200" placeholder="Телефон" autocomplete="off">
+          <input id="crm-client-email" type="email" maxlength="200" placeholder="E-mail" autocomplete="off">
+          <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
+        </form>
+        <ul id="crm-client-list" class="data-list"></ul>
+
+        <details id="crm-archive" class="ws-archive" hidden>
+          <summary id="crm-archive-summary">Архив</summary>
+          <p class="muted">Клиенты, с которыми ты больше не работаешь. Ничего не пропадает — их можно вернуть.</p>
+          <ul id="crm-archive-list" class="data-list"></ul>
+        </details>
+      </div>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/ru/proekty/">Проекты и помещения</a>
+        <a class="btn btn-ghost" href="/app/" rel="nofollow">Мой аккаунт</a>
+      </p>
+      <p class="muted src-note">Клиентов мы держим в памяти этого браузера (localStorage). Никуда их не отправляем, и в приложении для Android их нет — синхронизация охватывает проекты, помещения, расчёты и списки материалов. Очистка данных сайта удаляет клиентов.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Та же формула в приложении</b> LiczMat для Android считает тем же ядром офлайн — с каталогом материалов и сохранением результата в проект.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Скачать</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Калькулятор строительных материалов. Посчитай. Спланируй. Сделай.</p>
+      </div>
+      <div>
+        <h4>Продукт</h4>
+        <ul>
+          <li><a href="/ru/kalkulyatory/">Все калькуляторы</a></li>
+          <li><a href="/ru/materialy/">Материалы</a></li>
+          <li data-nav-level="liczmat"><a href="/ru/proekty/">Проекты</a></li>
+          <li><a href="/ru/smeta/">Смета</a></li>
+          <li><a href="/ru/rukovodstva/">Руководства</a></li>
+          <li><a href="/ru/magaziny/">Магазины</a></li>
+          <li data-nav-level="pro"><a href="/ru/klienty/">Клиенты</a></li>
+          <li data-nav-level="pro"><a href="/ru/zakazy/">Заказы</a></li>
+          <li data-nav-level="pro"><a href="/ru/kommercheskie-predlozheniya/">Предложения</a></li>
+          <li data-nav-level="pro"><a href="/ru/sroki/">Сроки</a></li>
+          <li><a href="/ru/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Аккаунт</h4>
+        <ul>
+          <li><a href="/ru/prilozhenie/">Приложение</a></li>
+          <li><a href="/app/" rel="nofollow">Мой аккаунт</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Панель</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Правовая информация</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Политика конфиденциальности</a></li>
+          <li><a href="/ru/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Язык">
+      <h4>Язык</h4>
+      <ul>
+        <li><a href="/klienci/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/kliyenty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/kunden/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/clients/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/klienti/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/klienti/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/clienti/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/klijenti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/klijenti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/klienty/" hreflang="ru" lang="ru" data-lang="ru" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Все права защищены.</span>
+      <span>Результаты приблизительны. Всегда проверяй перед покупкой.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Согласен" hidden>
+  <p class="consent-text">Используем Google Analytics, чтобы анонимно считать трафик сайта и сколько людей переходит в Google Play. Согласен?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Подробнее в политике конфиденциальности</a>
+    <a class="consent-more" href="/ru/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Отклонить</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Согласен</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/klienci/",
+  "uk": "/uk/kliyenty/",
+  "de": "/de/kunden/",
+  "en": "/en/clients/",
+  "cs": "/cs/klienti/",
+  "sk": "/sk/klienti/",
+  "ro": "/ro/clienti/",
+  "hr": "/hr/klijenti/",
+  "sr": "/sr/klijenti/",
+  "ru": "/ru/klienty/"
+};</script>
+<script src="/assets/i18n.ru.js?v=20260819i"></script>
+<script src="/assets/i18n-runtime.js?v=20260819i"></script>
+<script src="/assets/currency.js?v=20260819i"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819i"></script>
+
+<script src="/assets/workspace.js?v=20260819i"></script>
+<script src="/assets/plan.js?v=20260819i"></script>
+<script src="/assets/pay.js?v=20260819i"></script>
+<script src="/assets/paywall.js?v=20260819i"></script>
+<script src="/assets/crm.js?v=20260819i"></script>
+<script src="/assets/crm-chain.js?v=20260819i"></script>
+<script src="/assets/crm-ui.js?v=20260819i"></script>
+<script src="/assets/main.js?v=20260819i"></script>
+
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Projekty a miestnosti — LiczMat</title>
+<meta name="description" content="Projekty a miestnosti v LiczMat: ulož rozmery miestnosti raz a kalkulačky doplnia plochu podlahy, stien alebo stropu. Bez registrácie, dáta zostávajú v prehliadači.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/sk/projekty/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/projekty/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/proekty/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/projekte/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/projects/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/projekty/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/projekty/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/proiecte/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/projekti/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/projekti/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/proekty/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/projekty/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="sk_SK">
+<meta property="og:title" content="Projekty a miestnosti — LiczMat">
+<meta property="og:description" content="Projekty a miestnosti v LiczMat: ulož rozmery miestnosti raz a kalkulačky doplnia plochu podlahy, stien alebo stropu. Bez registrácie, dáta zostávajú v prehliadači.">
+<meta property="og:url" content="https://liczmat.com/sk/projekty/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Projekty a miestnosti — LiczMat">
+<meta name="twitter:description" content="Projekty a miestnosti v LiczMat: ulož rozmery miestnosti raz a kalkulačky doplnia plochu podlahy, stien alebo stropu. Bez registrácie, dáta zostávajú v prehliadači.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domov",
+      "item": "https://liczmat.com/sk/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Projekty a miestnosti",
+      "item": "https://liczmat.com/sk/projekty/"
+    }
+  ]
+}
+</script>
+<script>window.LM_PROJ = {"calcs":{"coverage":"/sk/kalkulacky/farby-omietky-penetracie/","waste":"/sk/kalkulacky/obklady-panely-dlazba/","wallpaper":"/sk/kalkulacky/tapety/","linear":"/sk/kalkulacky/linearny-rez-1d/","sheet":"/sk/kalkulacky/rez-dosiek-2d/","concrete":"/sk/kalkulacky/beton-z-vreca/","mortar":"/sk/kalkulacky/lepidlo-malta/","screed":"/sk/kalkulacky/poter-omietka/","grout":"/sk/kalkulacky/skarovacia-hmota/","masonry":"/sk/kalkulacky/murovanie/","insulation":"/sk/kalkulacky/zateplenie-etics/","studwall":"/sk/kalkulacky/priecka-sdk/","ceiling":"/sk/kalkulacky/podhlad/","drylining":"/sk/kalkulacky/sdk-na-lepidlo/","sheathing":"/sk/kalkulacky/zaklop-osb/"},"aisles":["TILES","FLOORING","TRIM","PAINT","CHEMICALS","BOARDS","WOOD","PROFILES","METAL","GLASS","TEXTILES","INSULATION","PLUMBING","ELECTRICAL","OTHER"]};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Preskočiť na obsah</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/sk/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hlavná navigácia">
+      <ul class="nav-list">
+        <li><a href="/sk/kalkulacky/">Kalkulačky</a></li>
+        <li><a href="/sk/materialy/">Materiály</a></li>
+        <li data-nav-level="liczmat"><a href="/sk/projekty/" aria-current="page">Projekty</a></li>
+        <li><a href="/sk/navody/">Návody</a></li>
+        <li><a href="/sk/aplikacia/">Aplikácia</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Jazyk">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/projekty/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/proekty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/projekte/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/projects/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/projekty/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></span></li>
+      <li><a class="lang-item" href="/ro/proiecte/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/hr/projekti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sr/projekti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ru/proekty/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Mena" title="Mena"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Môj účet</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Prepnúť motív" title="Prepnúť motív"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otvoriť menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sk/">Domov</a></li><li aria-current="page">Projekty a miestnosti</li></ol></nav>
+      <h1 id="ws-title">Projekty a miestnosti</h1>
+      <p class="lead" id="ws-lead">Ulož miestnosti s rozmermi a zbieraj výsledky do projektov. Všetko zostáva v tomto prehliadači; účet treba až na prenos do telefónu.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="ws-page">
+    <div class="wrap narrow">
+      <article id="ws-project" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/sk/projekty/" data-ws-back>Všetky projekty</a></p>
+
+        <div id="ws-project-missing" hidden>
+          <h2>Taký projekt neexistuje</h2>
+          <p class="muted">Táto adresa ukazuje na projekt, ktorý v tomto prehliadači nie je. Mohol byť zmazaný, alebo vznikol na inom zariadení.</p>
+        </div>
+
+        <div id="ws-project-body" hidden>
+          <p class="ws-project-hist muted" id="ws-project-hist"></p>
+
+          <!-- Chapter XVII: "Projekt może pokazywać: koszt materiałów, inne koszty, sumę
+               projektu." The three are written by assets/workspace.js's wsProjectCosts(),
+               which counts every amount in the project exactly once — a calculation and
+               the material it put on the shopping list are the same money. -->
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Položiek</span> <b id="ws-project-count"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Náklady na materiál</span> <b id="ws-project-mat"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Ďalšie náklady</span> <b id="ws-project-other"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Súčet projektu</span> <b id="ws-project-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Položky sú v rôznych menách. Súčet ich spočíta, ale nič neprepočítava kurzom — skontroluj meny v stĺpci nákladov.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Nastaviť ako aktívny</button>
+            <span class="chip on" id="ws-project-active" hidden>Aktívny</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">Premenovať</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">Zmazať</button>
+          </div>
+
+          <form id="ws-rename-form" class="inline-form mt-4" hidden>
+            <input id="ws-rename-name" type="text" maxlength="120" aria-label="Názov projektu" required>
+            <button type="submit" class="btn btn-primary btn-sm">Uložiť</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Zrušiť</button>
+          </form>
+
+          <div id="ws-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="ws-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="ws-delete-yes">Áno, zmazať</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="ws-delete-no">Zrušiť</button>
+            </p>
+          </div>
+
+          <!-- Chapter XVIII: "Pomieszczenia są elementem projektu." It stands above the
+               calculations because that is the order chapter XIV lists a project's parts
+               in, and because the chapter's own example reads project → room → dimensions.
+               The rooms are the project's by a projectId the sync contract does not carry
+               and a Firestore merge does not erase — assets/workspace.js says how, and the
+               note under the form says what the phone can and cannot do with it. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Miestnosti</h2>
+            </div>
+            <p class="muted">Miestnosti tohto projektu. Kalkulačka z nich berie rozmery a výpočet možno priradiť ku konkrétnej miestnosti.</p>
+            <ul id="ws-project-rooms" class="data-list"></ul>
+
+            <details class="ws-mat-add" id="ws-room-add">
+              <summary>Pridať miestnosť</summary>
+              <form id="ws-proj-room-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Položka</span>
+                    <input id="ws-proj-room-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Dĺžka (m)</span>
+                    <input id="ws-proj-room-length" type="text" inputmode="decimal" value="5" data-f="lengthM">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Šírka (m)</span>
+                    <input id="ws-proj-room-width" type="text" inputmode="decimal" value="4" data-f="widthM">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Výška (m)</span>
+                    <input id="ws-proj-room-height" type="text" inputmode="decimal" value="2.6" data-f="heightM">
+                  </label>
+                </p>
+                <!-- What the three numbers above come to, while they are typed: the same
+                     wsRoomAreas() the calculators' room bar spends. -->
+                <p class="ws-mat-sum" data-room-sum aria-live="polite"></p>
+                <p class="muted ws-mat-hint">Priradenie miestnosti k projektu je vidieť tu a v prehliadači na inom zariadení. Aplikácia v telefóne drží miestnosti v jednom zozname a zatiaľ to neukazuje.</p>
+                <p><button type="submit" class="btn btn-primary btn-sm">Pridať</button></p>
+              </form>
+            </details>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Výpočty</h2>
+              <a class="dash-more" href="/sk/rozpocet/" id="ws-project-estimate">Otvoriť rozpočet</a>
+            </div>
+            <p class="muted">Výsledky uložené v tomto projekte tlačidlom „Pridať do projektu“.</p>
+            <ul id="ws-project-lines" class="data-list"></ul>
+          </section>
+
+          <!-- Chapter XVI. The estimate above says what a calculation cost; this says what
+               to carry out of the shop. It is the project's shoppingItems subcollection,
+               which the sync contract has carried since its first version and which
+               nothing on this site wrote until session 17. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Materiály</h2>
+              <span class="muted ws-mat-tally" id="ws-mat-tally"></span>
+            </div>
+            <p class="muted">Nákupný zoznam tohto projektu. Každý uložený výsledok k nemu pridá jednu položku.</p>
+            <ul id="ws-project-materials" class="data-list"></ul>
+
+            <!-- Chapter XVI, "dodać własny materiał": a row nothing calculated. Folded
+                 away, because the list is normally filled by the arrow from a result and
+                 this is the exception — but a real <form>, so Enter submits it. -->
+            <details class="ws-mat-add" id="ws-mat-add">
+              <summary>Pridať vlastný materiál</summary>
+              <form id="ws-mat-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Položka</span>
+                    <input id="ws-mat-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Množstvo</span>
+                    <input id="ws-mat-qty" type="text" inputmode="decimal" value="1" data-f="quantity">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Jednotka</span>
+                    <input id="ws-mat-unit" type="text" maxlength="24" list="ws-mat-units">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Jednotková cena</span>
+                    <input id="ws-mat-price" type="text" inputmode="decimal" data-f="priceMajor">
+                  </label>
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Regál</span>
+                    <select id="ws-mat-cat"><option value="TILES">Obklady a dlažba</option><option value="FLOORING">Podlahy</option><option value="TRIM">Lišty a dokončenie</option><option value="PAINT">Farby a laky</option><option value="CHEMICALS">Stavebná chémia</option><option value="BOARDS">Dosky</option><option value="WOOD">Drevo</option><option value="PROFILES">Profily SDK</option><option value="METAL">Kov a výstuž</option><option value="GLASS">Sklo a plasty</option><option value="TEXTILES">Textílie a čalúnenie</option><option value="INSULATION">Izolácia</option><option value="PLUMBING">Inštalácie a vetranie</option><option value="ELECTRICAL">Elektro</option><option value="OTHER">Ostatné</option></select>
+                  </label>
+                </p>
+                <!-- What the two numbers above come to, in the currency in force, printed
+                     while they are typed. Chapter XVII: "7 × 35 PLN = 245 PLN". -->
+                <p class="ws-mat-sum" data-mat-sum aria-live="polite"></p>
+                <label class="ws-mat-f">
+                  <span class="ws-bar-label">Poznámka</span>
+                  <input id="ws-mat-note" type="text" maxlength="500"
+                    placeholder="napr. kúpiť v rovnakom odtieni">
+                </label>
+                <p><button type="submit" class="btn btn-primary btn-sm">Pridať</button></p>
+              </form>
+            </details>
+
+            <!-- The units this site already writes onto a saved material, so a hand-typed
+                 row uses the same words as a calculated one instead of inventing a second
+                 vocabulary. A suggestion list, never a restriction: the field stays free
+                 text, because chapter XVI asks for the unit to be changeable. -->
+            <datalist id="ws-mat-units"><option value="bal."></option><option value="ks"></option><option value="m²"></option><option value="m"></option><option value="kg"></option><option value="l"></option></datalist>
+          </section>
+
+          <!-- Chapter XVII's second figure: "inne koszty". Labour, delivery, a skip — the
+               part of a project no calculator produces. They are the hand-typed estimate
+               lines /kosztorys/ has always written, filed into the project that is open
+               instead of the active one, so this is a second way into one store. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Ďalšie náklady</h2>
+            </div>
+            <p class="muted">Práca, doprava, prenájom — náklady, ktoré nepočíta žiadna kalkulačka. Vstupujú do súčtu projektu vedľa materiálu.</p>
+            <ul id="ws-project-other-list" class="data-list"></ul>
+
+            <details class="ws-mat-add" id="ws-other-add">
+              <summary>Pridať ďalší náklad</summary>
+              <form id="ws-other-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Položka</span>
+                    <input id="ws-other-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Náklady</span>
+                    <input id="ws-other-cost" type="text" inputmode="decimal">
+                  </label>
+                </p>
+                <p><button type="submit" class="btn btn-primary btn-sm">Pridať</button></p>
+              </form>
+            </details>
+          </section>
+        </div>
+      </article>
+
+      <div id="ws-index">
+        <p class="ws-undo" id="ws-undo" role="status" hidden>
+          <span id="ws-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="ws-undo-go">Späť</button>
+        </p>
+
+        <h2>Projekty</h2>
+        <p class="muted">Projekt zbiera výsledky kalkulačiek do jedného rozpočtu. Každá nová položka ide do aktívneho projektu.</p>
+        <form id="ws-project-form" class="inline-form">
+          <input id="ws-project-name" type="text" maxlength="120" placeholder="Názov projektu" required>
+          <button type="submit" class="btn btn-primary btn-sm">Pridať</button>
+        </form>
+        <ul id="ws-project-list" class="data-list"></ul>
+
+        <details id="ws-archive" class="ws-archive" hidden>
+          <summary id="ws-archive-summary">Archív</summary>
+          <p class="muted">Projekty odložené bokom. Nič z nich nemizne: nedostávajú nové položky a nie sú v zozname vyššie ani na prehľade.</p>
+          <ul id="ws-archive-list" class="data-list"></ul>
+        </details>
+
+        <h2 class="mt-8">Miestnosti</h2>
+        <p class="muted">Miestnosť je názov a tri rozmery. Kalkulačky z nich spočítajú podlahu, steny aj strop.</p>
+        <!-- Chapter XVIII: a room is an element of a project, so the form asks which one
+             instead of silently taking the active project — which is what it did until the
+             owner reported that a room could not be assigned at all. The list is filled by
+             assets/workspace-ui.js; "no project" is a real answer, because a room measured
+             before there is a project is still a room. -->
+        <form id="ws-room-form" class="inline-form">
+          <input id="ws-room-name" type="text" maxlength="120" placeholder="Názov miestnosti" required>
+          <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Dĺžka (m)">
+          <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Šírka (m)">
+          <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Výška (m)">
+          <select id="ws-room-project" aria-label="Projekt"></select>
+          <button type="submit" class="btn btn-primary btn-sm">Pridať</button>
+        </form>
+        <ul id="ws-room-list" class="data-list"></ul>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/sk/rozpocet/">Rozpočet</a>
+        <a class="btn btn-ghost" href="/sk/kalkulacky/">Všetky kalkulačky</a>
+        <a class="btn btn-ghost" href="/app/" rel="nofollow">Môj účet</a>
+      </p>
+      <p class="muted src-note">Dáta ležia v úložisku tohto prehliadača (localStorage). Vymazanie dát stránky ich zmaže. Prihlás sa v „Môj účet“, aby si ich mal aj v telefóne.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Rovnaký vzorec v aplikácii</b> LiczMat pre Android počíta rovnakým jadrom offline — s katalógom materiálov a uložením výsledku do projektu.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Stiahnuť</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulačka stavebného materiálu. Spočítaj. Naplánuj. Postav.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/sk/kalkulacky/">Všetky kalkulačky</a></li>
+          <li><a href="/sk/materialy/">Materiály</a></li>
+          <li data-nav-level="liczmat"><a href="/sk/projekty/">Projekty</a></li>
+          <li><a href="/sk/rozpocet/">Rozpočet</a></li>
+          <li><a href="/sk/navody/">Návody</a></li>
+          <li><a href="/sk/obchody/">Obchody</a></li>
+          <li data-nav-level="pro"><a href="/sk/klienti/">Klienti</a></li>
+          <li data-nav-level="pro"><a href="/sk/zakazky/">Zákazky</a></li>
+          <li data-nav-level="pro"><a href="/sk/cenove-ponuky/">Cenové ponuky</a></li>
+          <li data-nav-level="pro"><a href="/sk/terminy/">Termíny</a></li>
+          <li><a href="/sk/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Účet</h4>
+        <ul>
+          <li><a href="/sk/aplikacia/">Aplikácia</a></li>
+          <li><a href="/app/" rel="nofollow">Môj účet</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Prehľad</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Právne informácie</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Ochrana súkromia</a></li>
+          <li><a href="/sk/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Jazyk">
+      <h4>Jazyk</h4>
+      <ul>
+        <li><a href="/projekty/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/proekty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/projekte/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/projects/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/projekty/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/projekty/" hreflang="sk" lang="sk" data-lang="sk" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/proiecte/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/projekti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/projekti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/proekty/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Všetky práva vyhradené.</span>
+      <span>Výsledky sú orientačné. Pred nákupom over.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Súhlasím" hidden>
+  <p class="consent-text">Používame Google Analytics, aby sme anonymne počítali návštevnosť webu a koľko ľudí prejde na Google Play. Súhlasíš?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Viac v zásadách ochrany súkromia</a>
+    <a class="consent-more" href="/sk/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odmietnuť</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Súhlasím</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/projekty/",
+  "uk": "/uk/proekty/",
+  "de": "/de/projekte/",
+  "en": "/en/projects/",
+  "cs": "/cs/projekty/",
+  "sk": "/sk/projekty/",
+  "ro": "/ro/proiecte/",
+  "hr": "/hr/projekti/",
+  "sr": "/sr/projekti/",
+  "ru": "/ru/proekty/"
+};</script>
+<script src="/assets/i18n.sk.js?v=20260819i"></script>
+<script src="/assets/i18n-runtime.js?v=20260819i"></script>
+<script src="/assets/currency.js?v=20260819i"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819i"></script>
+
+<script src="/assets/units.js?v=20260819i"></script>
+<script src="/assets/workspace.js?v=20260819i"></script>
+<script src="/assets/workspace-ui.js?v=20260819i"></script>
+<script src="/assets/main.js?v=20260819i"></script>
+
+</body>
+</html>

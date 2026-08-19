@@ -294,9 +294,12 @@ head("7. the copy exists in all four languages");
     const missing = KEYS.filter((k) => !DICT[lang][k]);
     check(`${lang}: every dashboard key is translated`, missing.length === 0, missing.join(", "));
     const same = KEYS.filter((k) => lang !== DEFAULT_LANG && DICT[lang][k] === DICT[DEFAULT_LANG][k]
-      // A brand name is the same in every language, and "Konto" happens to be the German
-      // and the Polish word for the same thing.
-      && !["acc_liczmat_t", "acc_pro_t", "dash_q_account"].includes(k));
+      // A brand name is the same in every language, "Konto" happens to be the German and
+      // the Polish word for the same thing, and "Projekty" is the correct Czech and
+      // Slovak plural as well as the Polish one. A true cognate is a translation that
+      // landed on the same letters, not Polish left in place.
+      && !["acc_liczmat_t", "acc_pro_t", "dash_q_account",
+           "dash_projects_t", "dash_q_projects"].includes(k));
     check(`${lang}: none of them is the Polish text left in place`, same.length === 0, same.join(", "));
   }
 }

@@ -54,7 +54,7 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 26 | CRM | **Zrobione** — 2026-08-19 |
 | 27 | Paywall Pro | **Zrobione** — 2026-08-19 |
 | 28 | Płatności | **Zrobione** — 2026-08-19 |
-| — | *Etap dodatkowy: przywrócenie 10 języków* | **Następne** — zlecone przez właściciela |
+| — | *Etap dodatkowy: przywrócenie 10 języków* | **Zrobione** — 2026-08-19 |
 | 29–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
@@ -211,6 +211,106 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
 
+### Przywrócenie 10 języków — etap dodatkowy po Sesji 28
+
+Nie jest to sesja Master Planu, tylko zlecenie właściciela wykonane **po** commicie Sesji 28
+i z własnym raportem — rozdział XXXV, jedna sesja = jedno zadanie. Numeracja stoi; następna
+w kolejce zostaje **Sesja 29**.
+
+Wróciło sześć języków wycofanych 2026-08-12: **cs, sk, ro, hr, sr, ru**. Serwis ma znowu
+dziesięć języków i **363 strony** zamiast 147.
+
+**1. Slugi odzyskane z gita, nie wymyślone.** To jest najważniejsza decyzja tego etapu.
+Commit `ab1fb26` — pierwotny upload — niesie kompletne `SECTION`, `CALC_SLUG` i `GUIDES` dla
+wszystkich dziesięciu języków. Te adresy były publiczne i zaindeksowane przez miesiące, więc
+stare slugi nie są wygodniejsze, tylko **poprawne**: `CLAUDE.md` mówi, że slug jest wieczny,
+a wymyślenie nowych zepsułoby każdy przychodzący link **po raz drugi**. Sprawdzone
+mechanicznie przez porównanie listy plików ze starego commita z tym, co build pisze teraz:
+**wszystkie 177 adresów, które istniały przed wycofaniem, odpowiadają znowu — zero
+brakujących.** Nowe segmenty trzeba było napisać tylko dla czterech sekcji Pro
+(`klienci`, `zlecenia`, `wyceny`, `terminarz`), bo w czasach tamtych języków nie istniały.
+
+**2. Tłumaczenia — 6780 ciągów, w trzech kubełkach.** Z 1130 kluczy na język:
+
+| skąd | ile na język | ile razem |
+|---|---|---|
+| odzyskane dosłownie (polski tekst źródłowy się nie zmienił) | 641 | 3846 |
+| przetłumaczone od nowa (polski się zmienił — rebranding, pozycjonowanie) | 17 | 102 |
+| zupełnie nowe (sesje 13–28: konto, projekty, pomieszczenia, materiały, koszty, CRM, płatności) | 472 | 2832 |
+
+Kryterium było mechaniczne, a nie „na oko": jeżeli **polski** tekst pod danym kluczem jest
+dziś dokładnie taki sam jak wtedy, gdy tłumaczenie powstawało, tłumaczenie dalej jest
+prawdziwe. Jeżeli polski się zmienił — a zmienił się m.in. w `hero_title`, `foot_tagline`
+i całym FAQ, bo produkt przeszedł rebranding i zmienił pozycjonowanie z „Policz. Kup. Nie
+marnuj." na „Policz. Zaplanuj. Zrealizuj." — tłumaczenie poszło do przepisania. Bez tego
+kroku serwis mówiłby po czesku o produkcie, którego już nie ma.
+
+**3. Liczba mnoga to trzy różne reguły.** `assets/units.js` miał jedną, słowiańską, dla
+`pl` i `uk`. Trzy z nowych języków (`ru`, `hr`, `sr`) do niej pasują, ale:
+
+| rodzina | języki | „few" |
+|---|---|---|
+| ostatnia cyfra | pl, uk, ru, hr, sr | końcówka 2–4 (poza 12–14): 22 → few |
+| małe 2–4 | cs, sk | dokładnie 2, 3, 4 — **22 to już „many"** |
+| romańska | ro | 2–19 i dalej po setkach; 20 przechodzi na „many" |
+
+Wrzucenie czeskiego do rodziny polskiej dałoby „22 položky", co jest po prostu błędem —
+poprawnie „22 položek". `scripts/test-save.mjs` ma teraz tabelę oczekiwanych form dla
+wszystkich dziesięciu języków i to ona tę różnicę pilnuje.
+
+**4. Waluty i domyślne ustawienia.** Siedem walut z Sesji 28 obsługuje dziesięć języków bez
+zmian — język nie wyznacza waluty (rozdział VI). Domyślne: `cs` → CZK, `ro` → RON,
+`sr` → RSD, `sk` i `hr` → EUR (Chorwacja jest na euro od 2023), **`ru` → EUR**, bo rubla
+celowo nie ma: Stripe nie działa w Rosji, a cena, której nic nie umie pobrać, jest gorsza
+od ceny w walucie, którą czytelnik przeliczy sam.
+
+**5. Poprawione liczby w treści.** `trust_langs` mówiło „4 języki, 4 waluty" — teraz
+„10 języków, 7 walut", we wszystkich dziesięciu. `apppage_meta` mówiło „4 języki" o
+aplikacji Android, która ma dziesięć — poprawione. Obie były nieaktualne **także w czterech
+językach, które nigdy nie wypadły**.
+
+**6. Przekierowanie z `404.html` usunięte.** Linia, która wysyłała `/cs/`, `/sk/`, `/ro/`,
+`/hr/`, `/sr/` i `/ru/` na stronę główną, musiała zniknąć w tej samej zmianie — inaczej
+odbijałaby każdą przywróconą stronę od niej samej. `RETIRED_LANGS` w `src/site.mjs` jest
+teraz pustą listą, zachowaną jako mechanizm.
+
+**Zmienione pliki.** `src/site.mjs` (LANGS, RETIRED_LANGS, HREFLANG, OG_LOCALE i trzy tabele
+slugów — 350 slugów), `src/ia.mjs` (`plannedSlug` dla `/liczmat-pro/`), `assets/i18n.js`,
+`assets/i18n-pages.js`, `assets/i18n-materials.js` (sześć bloków językowych),
+`assets/currency.js` (domyślne waluty i locale), `assets/units.js` (trzy rodziny liczby
+mnogiej), sześć nowych flag w `assets/flags/`, `404.html`, `scripts/build.mjs` (`STAMP` →
+`20260819i`), `scripts/test-save.mjs` i `scripts/test-dashboard.mjs`, `CLAUDE.md`,
+`docs/ARCHITEKTURA.md` §7.8, 363 przebudowane strony.
+
+**Testy.** **11 244 sprawdzeń logiki** w 15 zestawach, wszystkie przechodzą (było 6180 przy
+czterech językach — zestawy same rosną wraz z liczbą języków). `scripts/build.mjs --check`:
+1130 kluczy × 10 języków. `scripts/check-contrast.mjs` bez zmian. Porównanie adresów ze
+starym commitem: 177/177 odzyskanych.
+
+**Problemy.**
+
+- **Tłumaczeń nie weryfikował native speaker.** 2934 ciągi napisane w tej sesji trafiają na
+  ~220 nowych publicznych stron pod domeną właściciela. Odzyskane 3846 są w lepszej
+  sytuacji — były już opublikowane — ale i one nie przeszły niczyjej korekty. **To jest
+  rzecz do zlecenia przed poważnym ruchem SEO w tych językach.**
+- **Testów w Chromium nadal nie dało się uruchomić** (brak Playwrighta). Trzynaście zestawów
+  pominęło się z kodem 0. Dwie rzeczy w szczególności **nie są zmierzone**: czy rząd pięciu
+  linków w nagłówku zostaje jednolinijkowy w czeskim i rumuńskim (limit mierzono kiedyś w
+  niemieckim), i czy selektor języka z dziesięcioma pozycjami mieści się na 320 px.
+- **Chorwacki i serbski zgadzają się dosłownie w 46% kluczy.** To dwa standardy jednego
+  języka i krótkie napisy interfejsu wychodzą identycznie — poprawnie, a nie przez
+  kopiowanie. Testy wymagające, żeby każdy język brzmiał inaczej, liczą te dwa jako jeden
+  głos; gdyby właściciel chciał je wyraźnie rozdzielić, to jest decyzja redakcyjna,
+  nie techniczna.
+- **Rozdział V planu wymienia cztery języki**, a jest ich dziesięć. `MASTER_PLAN.txt` jest
+  plikiem właściciela — ta edycja należy do niego, tak samo jak rozdział VI po Sesji 28.
+- **Aplikacja Android ma własne dziesięć języków** i ta zmiana jej nie dotyczy; teraz oba
+  produkty mają tyle samo, co usuwa rozbieżność opisaną w „Języki aplikacji Android".
+
+**Status: ukończone.**
+
+**Następne zadanie: Sesja 29 — STRONA LICZMAT PRO.**
+
 ### Co zrobiła Sesja 28
 
 Rozdział XXV, pięć punktów zlecenia: **subskrypcja, status planu, obsługa aktywnego Pro,
@@ -354,8 +454,7 @@ Przycisk kasy włączony przed punktem 5 bierze pieniądze za nic.
 **Status: ukończone.**
 
 **Następne zadanie: przywrócenie 10 języków** — etap dodatkowy zlecony przez właściciela,
-przed Sesją 29. Zakres, rozmiar i otwarte pytania: patrz „Przywrócenie 10 języków" w
-Otwartych decyzjach.
+przed Sesją 29. **Wykonany tego samego dnia** — raport wyżej.
 
 ### Co zrobiła Sesja 21
 
@@ -2177,7 +2276,16 @@ Uwaga techniczna dla Sesji 28: podgląd jest celowo **jednym kluczem i jedną pa
 rozplątywaniem. Zamek jest nadal jednym `LM_PRO_LOCKED`, a testy sprawdzają obie jego
 odpowiedzi — również tę sprzed Sesji 27.
 
-### Przywrócenie 10 języków — zlecone przez właściciela w Sesji 28, do zrobienia osobno
+### ~~Przywrócenie 10 języków~~ — zrobione 2026-08-19, raport wyżej
+
+**Wykonane.** Sześć języków wróciło, slugi odzyskano z gita (177/177 starych adresów
+działa), 6780 ciągów w słownikach, trzy rodziny liczby mnogiej w `assets/units.js`.
+Pytanie o `ru` rozstrzygnęło się samo — właściciel prosił o „wszystkie, które były",
+a to jest dziesięć; rubla i tak nie ma, bo Stripe nie działa w Rosji, więc rosyjski
+zaczyna w EUR. **Otwarte zostaje jedno: tłumaczeń nie sprawdzał native speaker.**
+Opis poniżej zostaje jako zapis tego, co trzeba było zrobić.
+
+### Przywrócenie 10 języków — zlecone przez właściciela w Sesji 28 (zapis zakresu)
 
 Właściciel poprosił o powrót sześciu języków wycofanych 2026-08-12 (`RETIRED_LANGS`
 w `src/site.mjs`: **cs, sk, ro, hr, sr, ru**), z powrotem do dziesięciu. To **nie zmieściło
@@ -2308,10 +2416,11 @@ Propozycja: dodać w aplikacji siódmą paletę „LiczMat" (limonka + grafit, w
 przyciemniony) i uczynić ją domyślną, zostawiając sześć obecnych do wyboru. **Potrzebna
 decyzja właściciela**; zmiana jest po stronie `3d-polednia/Materio`.
 
-### Języki aplikacji Android
+### ~~Języki aplikacji Android~~ — zrównane 2026-08-19
 
-Aplikacja dalej ma 10 języków, serwis ma 4. FAQ na stronie mówi teraz o serwisie,
-nie o aplikacji. Zrównanie wymaga zmian w repo `3d-polednia/Materio`.
+Aplikacja ma 10 języków i **serwis ma teraz też 10**, więc rozbieżność zniknęła bez
+zmian w repo aplikacji. FAQ na stronie dalej mówi o serwisie, nie o aplikacji, i to
+zostaje — to dwa różne produkty z dwiema różnymi politykami prywatności.
 
 ### Domena
 

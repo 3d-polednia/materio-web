@@ -27,7 +27,24 @@
 const PLURAL_UNITS = new Set([
   "res_bags", "res_rolls", "res_boards", "res_stocks", "res_sheets", "ws_lines",
 ]);
-const SLAVIC_PLURAL = new Set(["pl", "uk"]);
+/**
+ * Which plural rule each language follows. Three families, because lumping them together
+ * gets real sentences wrong — this is not tidiness, it is "22 položky" being incorrect
+ * Czech for something Polish spells "22 pozycje".
+ *
+ *   LAST_DIGIT  pl, uk, ru, hr, sr — "few" for a number ENDING in 2–4 (but not 12–14),
+ *               so 22 is few and 25 is many.
+ *   SMALL_FEW   cs, sk — "few" for exactly 2, 3 and 4. Czech and Slovak do NOT repeat it
+ *               at 22: that is "22 položek", the same form as 25.
+ *   ROMANCE_FEW ro — Romanian's "few" covers 2–19 and everything ending 01–19 above that;
+ *               20 and 21 take the other form ("20 de saci").
+ *
+ * Everything else (de, en) has one and other, which is what falling through to "many"
+ * already gives.
+ */
+const LAST_DIGIT_PLURAL = new Set(["pl", "uk", "ru", "hr", "sr"]);
+const SMALL_FEW_PLURAL = new Set(["cs", "sk"]);
+const ROMANCE_FEW_PLURAL = new Set(["ro"]);
 
 /**
  * "one" | "few" | "many" for `n` in `lang`. The base key holds the "many" form, so a
@@ -39,7 +56,12 @@ const SLAVIC_PLURAL = new Set(["pl", "uk"]);
 function pluralForm(n, lang) {
   if (!Number.isInteger(n)) return "many";
   if (n === 1) return "one";
-  if (!SLAVIC_PLURAL.has(lang)) return "many";
+  if (SMALL_FEW_PLURAL.has(lang)) return n >= 2 && n <= 4 ? "few" : "many";
+  if (ROMANCE_FEW_PLURAL.has(lang)) {
+    const teens = n % 100;
+    return n < 20 || (teens >= 1 && teens <= 19) ? "few" : "many";
+  }
+  if (!LAST_DIGIT_PLURAL.has(lang)) return "many";
   const last = n % 10, teens = n % 100;
   return last >= 2 && last <= 4 && !(teens >= 12 && teens <= 14) ? "few" : "many";
 }

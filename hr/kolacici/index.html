@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Kolačići i pohrana u pregledniku — LiczMat</title>
+<meta name="description" content="LiczMat — popis kolačića i podataka u pregledniku: analitika, izbor jezika, projekti i troškovnici. Privolu možeš povući u svakom trenutku.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/hr/kolacici/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/cookies/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/cookies/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/cookies/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/cookies/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/cookies/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/cookies/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/cookies/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/kolacici/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/kolacici/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/cookies/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/cookies/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="hr_HR">
+<meta property="og:title" content="Kolačići i pohrana u pregledniku — LiczMat">
+<meta property="og:description" content="LiczMat — popis kolačića i podataka u pregledniku: analitika, izbor jezika, projekti i troškovnici. Privolu možeš povući u svakom trenutku.">
+<meta property="og:url" content="https://liczmat.com/hr/kolacici/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kolačići i pohrana u pregledniku — LiczMat">
+<meta name="twitter:description" content="LiczMat — popis kolačića i podataka u pregledniku: analitika, izbor jezika, projekti i troškovnici. Privolu možeš povući u svakom trenutku.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Početna",
+      "item": "https://liczmat.com/hr/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kolačići i pohrana u pregledniku",
+      "item": "https://liczmat.com/hr/kolacici/"
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Preskoči na sadržaj</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/hr/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Glavna navigacija">
+      <ul class="nav-list">
+        <li><a href="/hr/kalkulatori/">Kalkulatori</a></li>
+        <li><a href="/hr/materijali/">Materijali</a></li>
+        <li data-nav-level="liczmat"><a href="/hr/projekti/">Projekti</a></li>
+        <li><a href="/hr/vodici/">Vodiči</a></li>
+        <li><a href="/hr/aplikacija/">Aplikacija</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Jezik">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/cookies/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/cookies/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/cookies/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/cookies/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/cookies/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sk/cookies/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ro/cookies/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></span></li>
+      <li><a class="lang-item" href="/sr/kolacici/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ru/cookies/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Valuta" title="Valuta"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Moj račun</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Promijeni temu" title="Promijeni temu"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otvori izbornik"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/hr/">Početna</a></li><li aria-current="page">Kolačići i pohrana u pregledniku</li></ol></nav>
+      <h1>Kolačići i pohrana u pregledniku</h1>
+      <p class="lead">Što točno stranica sprema u tvom pregledniku, čemu služi, i kako se predomisliti u svakom trenutku.</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>Tvoja privola</h2>
+      <p class="muted">Google Analytics je prema zadanom isključen i pokreće se tek kad prihvatiš na traci. Povući je možeš jednako lako.</p>
+      <p class="ws-links">
+        <span class="chip" id="consent-state">Još nije odlučeno</span>
+        <button type="button" id="consent-change" class="btn btn-primary btn-sm">Promijeni privolu</button>
+      </p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap narrow">
+      <h2>Što sprema sama stranica</h2>
+      <p class="muted">Ti podaci ne napuštaju tvoj preglednik. Nikamo ih ne šaljemo i ne možemo do njih. Brisanje podataka stranice ih uklanja.</p>
+      <div class="table-scroll"><table class="ws-table">
+      <thead><tr>
+        <th>Naziv</th>
+        <th>Vrsta</th>
+        <th>Čemu služi</th>
+        <th>Koliko dugo</th>
+      </tr></thead>
+      <tbody><tr>
+        <td><code>materio_consent</code></td>
+        <td>localStorage</td>
+        <td>Tvoja odluka o analitici. Bez nje bi traka pitala pri svakom posjetu.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr><tr>
+        <td><code>materio-lang</code></td>
+        <td>localStorage</td>
+        <td>Jezik odabran u izborniku, da sljedeći posjet odmah krene u njemu.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr><tr>
+        <td><code>liczmat-currency</code></td>
+        <td>localStorage</td>
+        <td>Valuta u kojoj računaš cijene. Biraš je neovisno o jeziku.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr><tr>
+        <td><code>liczmat-theme</code></td>
+        <td>localStorage</td>
+        <td>Svijetla ili tamna tema, ako si je postavio ručno umjesto da prepustiš sustavu.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr><tr>
+        <td><code>liczmat-signed-in</code></td>
+        <td>localStorage</td>
+        <td>Razina računa (LiczMat ili LiczMat Pro) zapamćena pri prijavi. Kalkulatori ne učitavaju Firebase, a ovo im treba da znaju hoće li ponuditi račun i da u zaglavlju označe da je netko prijavljen. Ne sadrži adresu e-pošte ni bilo koje druge podatke o tebi i ništa ne otključava.</td>
+        <td>Do odjave</td>
+      </tr><tr>
+        <td><code>liczmat-remember</code></td>
+        <td>localStorage</td>
+        <td>Ostaješ li prijavljen nakon zatvaranja preglednika. Postavljaš to pri prijavi ili u profilu; vrijednost vrijedi samo za ovaj uređaj.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr><tr>
+        <td><code>materio-redirected</code></td>
+        <td>sessionStorage</td>
+        <td>Zaštita od petlje preusmjeravanja pri promjeni jezika.</td>
+        <td>Do zatvaranja kartice</td>
+      </tr><tr>
+        <td><code>materio-workspace-v1</code></td>
+        <td>localStorage</td>
+        <td>Tvoji projekti, prostorije i stavke troškovnika spremljeni bez prijave.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr><tr>
+        <td><code>materio-active-project</code></td>
+        <td>localStorage</td>
+        <td>Koji je projekt aktivan, da nova stavka ode u pravi.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr><tr>
+        <td><code>liczmat-recent-calcs</code></td>
+        <td>localStorage</td>
+        <td>Koji su kalkulatori zadnji korišteni, kako bi ih nadzorna ploča mogla prikazati. Samo naziv alata i datum — bez upisanih brojeva i bez rezultata.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr><tr>
+        <td><code>liczmat-crm-v1</code></td>
+        <td>localStorage</td>
+        <td>Klijenti, nalozi i ponude LiczMat Pro: nazivi, kontaktni podaci, bilješke, statusi, rokovi, dodijeljeni projekti, stavke rada i marža.</td>
+        <td>Do brisanja podataka stranice</td>
+      </tr></tbody>
+    </table></div>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>Što spremaju Googleove usluge</h2>
+      <p class="muted">Samo kad ih koristiš: analitika nakon privole, Firebase nakon prijave, Googleova karta na stranici trgovina.</p>
+      <div class="table-scroll"><table class="ws-table">
+      <thead><tr>
+        <th>Naziv</th>
+        <th>Vrsta</th>
+        <th>Čemu služi</th>
+        <th>Koliko dugo</th>
+      </tr></thead>
+      <tbody><tr>
+        <td><code>_ga, _ga_*</code></td>
+        <td>kolačić</td>
+        <td>Google Analytics: anoniman, zbirni promet. Zapisuje se tek nakon tvoje privole.</td>
+        <td>Do 2 godine</td>
+      </tr><tr>
+        <td><code>firebaseLocalStorageDb</code></td>
+        <td>IndexedDB</td>
+        <td>Prijava u „Moj račun“ i lokalna kopija podataka računa. Samo nakon prijave.</td>
+        <td>Do odjave</td>
+      </tr><tr>
+        <td><code>google.com / maps.google.com</code></td>
+        <td>kolačić</td>
+        <td>Googleova karta ugrađena na stranici trgovina pri učitavanju postavlja Googleove vlastite datoteke.</td>
+        <td>Prema Googleovim pravilima</td>
+      </tr></tbody>
+    </table></div>
+      <p class="muted src-note">Pojedinosti i pravnu osnovu opisuje
+        <a href="/privacy-policy.html">Pravila privatnosti</a></p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Ista formula u aplikaciji</b> LiczMat za Android računa istim motorom offline — s katalogom materijala i spremanjem rezultata u projekt.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Preuzmi</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulator građevinskog materijala. Izračunaj. Isplaniraj. Izvedi.</p>
+      </div>
+      <div>
+        <h4>Proizvod</h4>
+        <ul>
+          <li><a href="/hr/kalkulatori/">Svi kalkulatori</a></li>
+          <li><a href="/hr/materijali/">Materijali</a></li>
+          <li data-nav-level="liczmat"><a href="/hr/projekti/">Projekti</a></li>
+          <li><a href="/hr/troskovnik/">Troškovnik</a></li>
+          <li><a href="/hr/vodici/">Vodiči</a></li>
+          <li><a href="/hr/trgovine/">Trgovine</a></li>
+          <li data-nav-level="pro"><a href="/hr/klijenti/">Klijenti</a></li>
+          <li data-nav-level="pro"><a href="/hr/nalozi/">Nalozi</a></li>
+          <li data-nav-level="pro"><a href="/hr/ponude/">Ponude</a></li>
+          <li data-nav-level="pro"><a href="/hr/rokovi/">Rokovi</a></li>
+          <li><a href="/hr/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Račun</h4>
+        <ul>
+          <li><a href="/hr/aplikacija/">Aplikacija</a></li>
+          <li><a href="/app/" rel="nofollow">Moj račun</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Nadzorna ploča</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Pravne informacije</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Pravila privatnosti</a></li>
+          <li><a href="/hr/kolacici/">Kolačići</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Jezik">
+      <h4>Jezik</h4>
+      <ul>
+        <li><a href="/cookies/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/cookies/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/cookies/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/cookies/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/cookies/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/cookies/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/cookies/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/kolacici/" hreflang="hr" lang="hr" data-lang="hr" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/kolacici/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/cookies/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Sva prava pridržana.</span>
+      <span>Rezultati su procjene. Provjeri prije kupnje.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Slažem se" hidden>
+  <p class="consent-text">Koristimo Google Analytics da anonimno brojimo promet na stranici i koliko ljudi ide na Google Play. Slažeš se?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Više u pravilima privatnosti</a>
+    <a class="consent-more" href="/hr/kolacici/">Kolačići</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odbij</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Slažem se</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/cookies/",
+  "uk": "/uk/cookies/",
+  "de": "/de/cookies/",
+  "en": "/en/cookies/",
+  "cs": "/cs/cookies/",
+  "sk": "/sk/cookies/",
+  "ro": "/ro/cookies/",
+  "hr": "/hr/kolacici/",
+  "sr": "/sr/kolacici/",
+  "ru": "/ru/cookies/"
+};</script>
+<script src="/assets/i18n.hr.js?v=20260819i"></script>
+<script src="/assets/i18n-runtime.js?v=20260819i"></script>
+<script src="/assets/currency.js?v=20260819i"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819i"></script>
+
+
+<script src="/assets/main.js?v=20260819i"></script>
+
+</body>
+</html>

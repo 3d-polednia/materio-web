@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>LiczMat pro Android — LiczMat</title>
+<meta name="description" content="LiczMat pro Android: kalkulačka a optimalizátor stavebního materiálu zdarma. Kalkulačky, katalog materiálů, místnosti, projekty, rozpočet v PDF, převodník jednotek a mapa obchodů. Počítá offline, 10 jazyků.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/cs/aplikace/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/aplikacja/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/dodatok/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/android-app/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/android-app/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/aplikace/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/aplikacia/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/aplicatie/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/aplikacija/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/aplikacija/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/prilozhenie/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/aplikacja/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="cs_CZ">
+<meta property="og:title" content="LiczMat pro Android — LiczMat">
+<meta property="og:description" content="LiczMat pro Android: kalkulačka a optimalizátor stavebního materiálu zdarma. Kalkulačky, katalog materiálů, místnosti, projekty, rozpočet v PDF, převodník jednotek a mapa obchodů. Počítá offline, 10 jazyků.">
+<meta property="og:url" content="https://liczmat.com/cs/aplikace/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LiczMat pro Android — LiczMat">
+<meta name="twitter:description" content="LiczMat pro Android: kalkulačka a optimalizátor stavebního materiálu zdarma. Kalkulačky, katalog materiálů, místnosti, projekty, rozpočet v PDF, převodník jednotek a mapa obchodů. Počítá offline, 10 jazyků.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://liczmat.com/cs/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "LiczMat pro Android",
+      "item": "https://liczmat.com/cs/aplikace/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobileApplication",
+  "name": "LiczMat",
+  "operatingSystem": "Android 7.0+",
+  "applicationCategory": "UtilitiesApplication",
+  "inLanguage": "cs",
+  "url": "https://liczmat.com/cs/aplikace/",
+  "downloadUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
+  "installUrl": "https://play.google.com/store/apps/details?id=pl.materio.app",
+  "description": "Stejná matematika jako na webu, v telefonu a bez signálu. Kalkulačky, katalog materiálů, místnosti, projekty, rozpočet do PDF, převodník jednotek a mapa stavebnin.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "PLN"
+  },
+  "screenshot": [
+    "https://liczmat.com/assets/screens/pl_home.webp",
+    "https://liczmat.com/assets/screens/pl_calc.webp",
+    "https://liczmat.com/assets/screens/pl_stores.webp"
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Přejít k obsahu</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/cs/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hlavní navigace">
+      <ul class="nav-list">
+        <li><a href="/cs/kalkulacky/">Kalkulačky</a></li>
+        <li><a href="/cs/materialy/">Materiály</a></li>
+        <li data-nav-level="liczmat"><a href="/cs/projekty/">Projekty</a></li>
+        <li><a href="/cs/navody/">Návody</a></li>
+        <li><a href="/cs/aplikace/" aria-current="page">Aplikace</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Jazyk">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/aplikacja/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/dodatok/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/android-app/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/android-app/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></span></li>
+      <li><a class="lang-item" href="/sk/aplikacia/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ro/aplicatie/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/hr/aplikacija/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sr/aplikacija/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ru/prilozhenie/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Měna" title="Měna"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK" selected>CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Můj účet</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Přepnout motiv" title="Přepnout motiv"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otevřít menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li aria-current="page">LiczMat pro Android</li></ol></nav>
+    </div>
+  </section>
+
+  <section class="hero app-hero" aria-labelledby="app-h">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="badge"><span class="dot"></span><span>Počítá offline · účet volitelný</span></span>
+        <h1 id="app-h">LiczMat pro Android</h1>
+        <p class="lead">Stejná matematika jako na webu, v telefonu a bez signálu. Kalkulačky, katalog materiálů, místnosti, projekty, rozpočet do PDF, převodník jednotek a mapa stavebnin.</p>
+        <div class="store-badges">
+          
+  <a class="gp-badge" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="apppage" aria-label="Stáhnout pro Android">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
+    <span><small>Ke stažení na</small><b>Stáhnout pro Android</b></span>
+  </a>
+          <a class="btn btn-ghost btn-lg" href="/cs/kalkulacky/">Vyzkoušet kalkulačky</a>
+        </div>
+        <div class="trust">
+          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>Počítá 100% offline</span></span>
+          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Účet volitelný</span></span>
+          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg><span>10 jazyků, 7 měn</span></span>
+        </div>
+      </div>
+      <div class="hero-media">
+        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
+          <div class="phone-track" id="hero-shots">
+            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Hlavní obrazovka LiczMat" decoding="async">
+            <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Výsledek výpočtu: kolik koupit a kolik odpadu" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Stavebniny v okolí" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block pt-2">
+    <div class="wrap">
+      <div class="stat-band">
+        <div class="stat"><div class="num" data-lm-money="0">0 CZK</div><div class="lbl">Zdarma, účet volitelný</div></div>
+        <div class="stat"><div class="num">15</div><div class="lbl">Kalkulaček</div></div>
+        <div class="stat"><div class="num">161</div><div class="lbl">Materiálů v katalogu</div></div>
+        <div class="stat"><div class="num">10</div><div class="lbl">Jazyků</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="appfeat-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="appfeat-h">Co je v aplikaci</h2>
+        <p class="muted">Všechno se počítá v zařízení. I bez signálu.</p>
+      </div>
+      <div class="features">
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/></svg></div><h3>Kalkulačky materiálu</h3><p>Barvy, omítky, lepidla, obklady, panely, dlažba, tapety. Plocha a prořez v celých baleních.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg></div><h3>Optimalizace nářezu</h3><p>Nářez 1D a 2D metodou first-fit. Kolik tyčí nebo desek koupit, včetně prořezu a odpadu.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/></svg></div><h3>Katalog materiálu</h3><p>Celý katalog materiálů se skutečnými rozměry, vydatností balení a prořezem. Vybereš ze seznamu, každou hodnotu lze přepsat.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/></svg></div><h3>Místnosti</h3><p>Zadej rozměry místnosti jednou a získej podlahu, stěny, strop i obvod. Odtud jdeš rovnou k materiálu.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div><h3>Projekty a rozpočty</h3><p>Spoj výpočty do projektu, uvidíš celkovou cenu a odpad, rozpočet vyexportuješ do PDF.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 18h4"/></svg></div><h3>Rozpočet do PDF</h3><p>Hotový dokument s položkami, množstvím a náklady — pro klienta nebo do stavebnin.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7h13l-3-3M21 17H8l3 3"/></svg></div><h3>Převodník jednotek</h3><p>Délka, plocha, objem a hmotnost. Metry na palce, litry na kilogramy při známé hustotě.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Mapa obchodů</h3><p>Najdi stavebniny a velkoobchody podle polohy a nech se navést k nejbližšímu.</p></div>
+        <div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></div><h3>Synchronizace s prohlížečem</h3><p>Přihlas se v aplikaci i na liczmat.com a projekty s místnostmi budou na obou místech.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="appshots-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="appshots-h">Snímky obrazovky</h2>
+      </div>
+      <div class="shot-grid">
+        <figure class="shot">
+      <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Hlavní obrazovka LiczMat" loading="lazy" decoding="async">
+      <figcaption class="muted">Hlavní obrazovka LiczMat</figcaption>
+    </figure>
+        <figure class="shot">
+      <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Výsledek výpočtu: kolik koupit a kolik odpadu" loading="lazy" decoding="async">
+      <figcaption class="muted">Výsledek výpočtu: kolik koupit a kolik odpadu</figcaption>
+    </figure>
+        <figure class="shot">
+      <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Stavebniny v okolí" loading="lazy" decoding="async">
+      <figcaption class="muted">Stavebniny v okolí</figcaption>
+    </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="appweb-h">
+    <div class="wrap narrow">
+      <h2 id="appweb-h">Aplikace a web</h2>
+      <p class="muted">Výpočetní jádro je stejné — kód webu je port 1:1 kódu z aplikace. Liší se jen to, co zvládne zařízení.</p>
+      <ul class="trust-list">
+        <li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Web počítá v prohlížeči a nic neinstaluješ. Všechny kalkulačky i celý katalog materiálů jsou tady.</b></span></li><li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>Aplikace běží bez signálu, exportuje rozpočet do PDF, má převodník jednotek a vlastní materiály s cenami.</b></span></li><li><span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span><b>S účtem jsou projekty a místnosti stejné v telefonu i v prohlížeči.</b></span></li>
+      </ul>
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/cs/kalkulacky/">Všechny kalkulačky</a>
+        <a class="btn btn-ghost" href="/cs/materialy/">Katalog stavebních materiálů</a>
+        <a class="btn btn-ghost" href="/cs/projekty/">Projekty a místnosti</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="appreq-h">
+    <div class="wrap narrow">
+      <h2 id="appreq-h">Než nainstaluješ</h2>
+      <ul class="steps-list">
+        <li>Android 7.0 nebo novější. Aplikace je zdarma a nemá nákupy uvnitř.</li>
+        <li>Aplikace zobrazuje reklamy (Google AdMob). Tak zůstává zdarma.</li>
+        <li>Mapa stavebnin používá Mapy Google a ptá se na polohu. Můžeš ji odmítnout a napsat město ručně.</li>
+        <li>Účet je volitelný. Počítání funguje bez přihlášení; účet slouží jen k synchronizaci projektů.</li>
+      </ul>
+      <p class="muted src-note"><a href="/privacy-policy.html">Zásady ochrany soukromí</a></p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div class="cta-banner">
+      <div class="cta-copy">
+        <h2 id="cta-h">Stejná kalkulačka v kapse</h2>
+        <p>Aplikace pro Android přidává katalog materiálů, uložené projekty a export do PDF. Počítá offline, takže funguje i na stavbě bez signálu. Zdarma, účet volitelný.</p>
+        
+  <a class="badge-store" href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="cta" aria-label="Stáhnout pro Android">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>
+    <span><small>Ke stažení na</small><b>Stáhnout pro Android</b></span>
+  </a>
+      </div>
+      <div class="cta-shots">
+        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
+          <div class="phone-track" id="hero-shots">
+            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Hlavní obrazovka LiczMat" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Výsledek výpočtu: kolik koupit a kolik odpadu" loading="lazy" decoding="async">
+            <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Stavebniny v okolí" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulačka stavebního materiálu. Spočítej. Naplánuj. Postav.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/cs/kalkulacky/">Všechny kalkulačky</a></li>
+          <li><a href="/cs/materialy/">Materiály</a></li>
+          <li data-nav-level="liczmat"><a href="/cs/projekty/">Projekty</a></li>
+          <li><a href="/cs/rozpocet/">Rozpočet</a></li>
+          <li><a href="/cs/navody/">Návody</a></li>
+          <li><a href="/cs/obchody/">Obchody</a></li>
+          <li data-nav-level="pro"><a href="/cs/klienti/">Klienti</a></li>
+          <li data-nav-level="pro"><a href="/cs/zakazky/">Zakázky</a></li>
+          <li data-nav-level="pro"><a href="/cs/cenove-nabidky/">Cenové nabídky</a></li>
+          <li data-nav-level="pro"><a href="/cs/terminy/">Termíny</a></li>
+          <li><a href="/cs/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Účet</h4>
+        <ul>
+          <li><a href="/cs/aplikace/">Aplikace</a></li>
+          <li><a href="/app/" rel="nofollow">Můj účet</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Přehled</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Právní informace</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Zásady ochrany soukromí</a></li>
+          <li><a href="/cs/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Jazyk">
+      <h4>Jazyk</h4>
+      <ul>
+        <li><a href="/aplikacja/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/dodatok/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/android-app/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/android-app/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/aplikace/" hreflang="cs" lang="cs" data-lang="cs" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/aplikacia/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/aplicatie/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/aplikacija/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/aplikacija/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/prilozhenie/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Všechna práva vyhrazena.</span>
+      <span>Výsledky jsou orientační. Před nákupem ověř.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Souhlasím" hidden>
+  <p class="consent-text">Používáme Google Analytics, abychom anonymně počítali návštěvnost webu a kolik lidí přejde na Google Play. Souhlasíš?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Více v zásadách ochrany soukromí</a>
+    <a class="consent-more" href="/cs/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odmítnout</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Souhlasím</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/aplikacja/",
+  "uk": "/uk/dodatok/",
+  "de": "/de/android-app/",
+  "en": "/en/android-app/",
+  "cs": "/cs/aplikace/",
+  "sk": "/sk/aplikacia/",
+  "ro": "/ro/aplicatie/",
+  "hr": "/hr/aplikacija/",
+  "sr": "/sr/aplikacija/",
+  "ru": "/ru/prilozhenie/"
+};</script>
+<script src="/assets/i18n.cs.js?v=20260819i"></script>
+<script src="/assets/i18n-runtime.js?v=20260819i"></script>
+<script src="/assets/currency.js?v=20260819i"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819i"></script>
+
+
+<script src="/assets/main.js?v=20260819i"></script>
+
+</body>
+</html>

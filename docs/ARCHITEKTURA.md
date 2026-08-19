@@ -724,7 +724,7 @@ Do menu doszła też zakładka **„Aplikacja”** (`/aplikacja/`), o którą po
 Rozdział X nadal zabrania **wypychania** aplikacji na stronie głównej i strona główna nie
 mówi o niej ani słowa więcej niż przedtem; link na końcu rzędu to nie to samo. Limit linków
 w nagłówku podniesiony z czterech na pięć — **zmierzony, nie założony**:
-`scripts/test-pages.mjs` sprawdza, że rząd zostaje jednolinijkowy w czterech językach na
+`scripts/test-pages.mjs` sprawdza, że rząd zostaje jednolinijkowy w dziesięciu językach na
 900 / 1000 / 1160 / 1280 px, dla gościa (cztery widoczne) i dla zalogowanego (pięć).
 Poniżej 900 px nawigacja jest szufladą i zawinąć się nie może. Szósty link nadal wywala
 build, bo szóstego nikt nie mierzył.
@@ -799,7 +799,7 @@ dane kontaktowe, notatki, historię, zlecenia, projekty, wyceny. Zlecenia to Ses
 wyceny Sesja 24, a pełna droga „klient → zlecenie → projekt → wycena → historia" Sesja 26 —
 więc Sesja 22 buduje samego klienta i jedyne powiązanie, które **dziś istnieje**: projekt.
 
-**Strona.** `/klienci/` w czterech językach, plus `/klienci/?id=<clientId>` jako `view` —
+**Strona.** `/klienci/` w dziesięciu językach, plus `/klienci/?id=<clientId>` jako `view` —
 dokładnie z tego powodu, z którego `project` nim jest: identyfikator powstaje
 w przeglądarce, a GitHub Pages nie ma przepisywania adresów (§3). Indeks to lista klientów
 i archiwum; ekran klienta to dane kontaktowe, notatki, jego projekty razem z tym, ile już
@@ -877,7 +877,7 @@ może mieć: klienta, nazwę, opis, status, termin, wartość, projekt, notatki 
 osiem są. Rozdział XXIV mówi, **po co** ono jest: KLIENT → ZLECENIE → PROJEKT → WYCENA →
 HISTORIA. Wycena to Sesja 24; Sesja 23 domyka środkowe ogniwo, w obie strony.
 
-**Strona.** `/zlecenia/` w czterech językach, plus `/zlecenia/?id=<jobId>` jako `view` —
+**Strona.** `/zlecenia/` w dziesięciu językach, plus `/zlecenia/?id=<jobId>` jako `view` —
 z tego samego powodu, z którego `client` nim jest (§3). Indeks ma dwie połowy: zlecenia
 w toku i zamknięte. Ekran zlecenia to status i termin na górze, klient, dwie kwoty,
 projekt, opis i notatki. W `src/ia.mjs` trasa siedzi pod `clients`, bo tam zaczyna się
@@ -949,7 +949,7 @@ buduj pełnego programu księgowego". Rozdział XXIV mówi, gdzie wycena stoi: K
 ZLECENIE → PROJEKT → **WYCENA** → HISTORIA — czwarty krok, więc pierwszy, który ma pod
 sobą policzone pieniądze.
 
-**Strona.** `/wyceny/` w czterech językach, plus `/wyceny/?id=<quoteId>` jako `view` —
+**Strona.** `/wyceny/` w dziesięciu językach, plus `/wyceny/?id=<quoteId>` jako `view` —
 z tego samego powodu, z którego `job` nim jest (§3). Indeks to lista wycen z sumą przy
 każdej; ekran wyceny to łańcuch (klient → zlecenie), sześć liczb, pole marży, pozycje
 robocizny, projekt i notatki. W `src/ia.mjs` trasa siedzi pod `jobs`, bo tam droga
@@ -1027,7 +1027,7 @@ dłużej i, jak przy wycenach, jednym zdaniem ustala zakres: „Prosty terminarz
 Powinien pozwolić zobaczyć: terminy, zlecenia, podstawowe informacje. **Nie buduj pełnego
 odpowiednika Google Calendar.**"
 
-**Strona.** `/terminarz/` w czterech językach — i to wszystko: **nie ma widoku `?id=`**,
+**Strona.** `/terminarz/` w dziesięciu językach — i to wszystko: **nie ma widoku `?id=`**,
 bo terminarz nie ma własnego wiersza do otwarcia. Nazwa w wierszu to zwykły link do
 `/zlecenia/?id=<jobId>`, czyli do strony, która to zlecenie posiada. W `src/ia.mjs` trasa
 siedzi pod `jobs`, bo pokazuje ich daty.
@@ -1243,6 +1243,44 @@ rozszerzenia i nie zmieniła kontraktu synchronizacji (`planRenews` zostaje dłu
 
 ---
 
+## 7.8. Dziesięć języków — przywrócenie po Sesji 28
+
+Sześć języków wycofanych 2026-08-12 (**cs, sk, ro, hr, sr, ru**) wróciło na polecenie
+właściciela, zaraz po Sesji 28. Serwis ma znowu dziesięć języków i **363 strony** zamiast 147.
+
+**Slugi zostały odzyskane z gita, nie wymyślone na nowo.** Commit `ab1fb26` — pierwotny
+upload — nosi kompletne tabele `SECTION`, `CALC_SLUG` i `GUIDES` dla wszystkich dziesięciu
+języków. Te adresy były publiczne i zaindeksowane przez miesiące, więc stare slugi nie są
+wygodniejsze, tylko **poprawne**: wymyślenie nowych zepsułoby każdy przychodzący link po
+raz drugi. Sprawdzone mechanicznie: **wszystkie 177 adresów, które istniały przed
+wycofaniem, znowu odpowiadają** — zero brakujących. Nowe segmenty trzeba było napisać
+tylko dla czterech sekcji Pro (`klienci`, `zlecenia`, `wyceny`, `terminarz`), bo w czasach
+tamtych języków jeszcze nie istniały.
+
+**Tłumaczenia w trzech kubełkach.** Z 1130 kluczy na język: **641 odzyskanych dosłownie**
+(polski tekst źródłowy nie zmienił się od czasu, gdy je tłumaczono), **17 przetłumaczonych
+od nowa** (polski się zmienił — rebranding, zmiana pozycjonowania) i **472 zupełnie nowych**
+(funkcje z sesji 13–28: konto, projekty, pomieszczenia, materiały, koszty, CRM, płatności).
+Razem 6780 ciągów w sześciu językach.
+
+**Liczba mnoga to trzy różne reguły, nie jedna.** `assets/units.js` rozróżnia teraz:
+
+| Rodzina | Języki | „few" |
+|---|---|---|
+| ostatnia cyfra | pl, uk, ru, hr, sr | końcówka 2–4 (poza 12–14), więc 22 → few |
+| małe 2–4 | cs, sk | dokładnie 2, 3, 4 — **22 to już „many"** |
+| romańska | ro | 2–19 i dalej po setkach; 20 przechodzi na „many" |
+
+Wrzucenie czeskiego do rodziny polskiej dałoby „22 položky", co jest po prostu błędem.
+`scripts/test-save.mjs` ma tabelę oczekiwanych form dla wszystkich dziesięciu języków.
+
+**Chorwacki i serbski zgadzają się dosłownie w 46% kluczy.** To dwa standardy jednego
+języka i krótkie napisy interfejsu wychodzą identycznie — poprawnie, a nie przez
+kopiowanie. Testy, które wymagały, żeby każdy język brzmiał inaczej, liczą te dwa jako
+jeden głos.
+
+---
+
 ## 8. Otwarte decyzje
 
 Do rozstrzygnięcia przez właściciela, zanim dotknie ich któraś z kolejnych sesji.
@@ -1442,10 +1480,10 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | przepływy | krok na nieistniejącą trasę; przepływ sięgający po wyższy poziom bez kroku, który go nadaje |
 | strona główna (Sesja 6) | inna liczba drzwi niż trzy albo inna kolejność poziomów; drzwi na nieistniejącą trasę; brak tekstu drzwi w słowniku |
 | centrum kalkulatorów (Sesja 7) | kalkulator w żadnej kategorii albo w dwóch naraz; kategoria z nieznanym kalkulatorem lub pusta; brak nazwy albo opisu kategorii w słowniku; skrót „Od czego zacząć”, którego nie potwierdza żaden poradnik |
-| poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z czterech języków |
-| model Free / Pro (Sesja 21) | funkcja zadeklarowana dwa razy; funkcja z nieznanym poziomem albo na nieistniejącej trasie; funkcja `PRO` na trasie, która nie jest `PRO`; trasa `PRO`, której nie pokrywa żadna funkcja; funkcja `PRO` bez tekstu do bramki; `LM_PLAN` rozjeżdżające się z kontraktem; brak któregokolwiek klucza `pro_*` / `plan_*` / `feat_*` w którymkolwiek z czterech języków |
-| paywall (Sesja 27) | ściana przed funkcją, której nie ma w `LM_FEATURES` (`proGate()` przerywa build); brak któregokolwiek klucza `pro_need_*` / `pro_incl_t` / `pro_signin` w którymkolwiek z czterech języków |
-| subskrypcja (Sesja 28) | brak któregokolwiek klucza `pay_*` / `plan_renews` / `plan_cancelled` / `plan_active_d` / `plan_cancel_d` w którymkolwiek z czterech języków |
+| poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z dziesięciu języków |
+| model Free / Pro (Sesja 21) | funkcja zadeklarowana dwa razy; funkcja z nieznanym poziomem albo na nieistniejącej trasie; funkcja `PRO` na trasie, która nie jest `PRO`; trasa `PRO`, której nie pokrywa żadna funkcja; funkcja `PRO` bez tekstu do bramki; `LM_PLAN` rozjeżdżające się z kontraktem; brak któregokolwiek klucza `pro_*` / `plan_*` / `feat_*` w którymkolwiek z dziesięciu języków |
+| paywall (Sesja 27) | ściana przed funkcją, której nie ma w `LM_FEATURES` (`proGate()` przerywa build); brak któregokolwiek klucza `pro_need_*` / `pro_incl_t` / `pro_signin` w którymkolwiek z dziesięciu języków |
+| subskrypcja (Sesja 28) | brak któregokolwiek klucza `pay_*` / `plan_renews` / `plan_cancelled` / `plan_active_d` / `plan_cancel_d` w którymkolwiek z dziesięciu języków |
 | widoki (Sesja 15) | widok bez rodzica, na trasie planowanej albo na innym widoku; widok indeksowany; widok w menu lub w stopce; widok wymagający wyższego poziomu niż rodzic; widok inaczej zlokalizowany niż rodzic; adres widoku poza adresem rodzica albo gubiący identyfikator; `view: true` na trasie, która nie jest `LIVE` |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.

@@ -404,7 +404,13 @@ export const ROUTES = [
     id: "liczmat-pro",
     level: LEVEL.GUEST, status: STATUS.PLANNED, session: 29,
     parent: "home", localized: true, indexable: true,
-    plannedSlug: { pl: "liczmat-pro", uk: "liczmat-pro", de: "liczmat-pro", en: "liczmat-pro" },
+    // A brand name, so it is the same segment in every language — including the six that
+    // came back after session 28.
+    plannedSlug: {
+      pl: "liczmat-pro", uk: "liczmat-pro", de: "liczmat-pro", en: "liczmat-pro",
+      cs: "liczmat-pro", sk: "liczmat-pro", ro: "liczmat-pro", hr: "liczmat-pro",
+      sr: "liczmat-pro", ru: "liczmat-pro",
+    },
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
       "indexable — the paywall sits on the Pro modules, not on their description.",

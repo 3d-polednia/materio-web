@@ -12,8 +12,8 @@
 <title>Nie ma takiej strony — LiczMat</title>
 <meta name="robots" content="noindex, follow">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260819h" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/styles.css?v=20260819h">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
 <script>
   // GitHub Pages serves this file for every path it cannot resolve, and it has no
   // rewrite rules. A shared estimate lives at /p/<token>, where the token is an
@@ -23,11 +23,11 @@
     var m = location.pathname.match(/^\/p\/([A-Za-z0-9_-]{16,})\/?$/);
     if (m) location.replace("/p/?t=" + encodeURIComponent(m[1]) + location.hash);
 
-    // LiczMat shipped ten languages until 2026-08-12 and now ships four. The six that
-    // went away leave inbound links behind: /cs/, /sk/, /ro/, /hr/, /sr/, /ru/ and
-    // everything under them. Their slugs have no counterpart in the languages that
-    // stayed, so the honest landing place is the home page rather than a guess.
-    if (/^\/(cs|sk|ro|hr|sr|ru)(\/|$)/.test(location.pathname)) location.replace("/");
+    // The six languages dropped on 2026-08-12 were brought back after session 28, at the
+    // addresses they always had, so the redirect that used to send /cs/, /sk/, /ro/,
+    // /hr/, /sr/ and /ru/ to the home page is gone. Leaving it in would have bounced
+    // every restored page off itself — which is exactly why it had to go in the same
+    // change that restored them.
 
     // The dashboard shipped as /app/pulpit/ on 2026-08-13 and was renamed to
     // /app/dashboard/ the same day, before anything linked to it: /app/ and /p/ are

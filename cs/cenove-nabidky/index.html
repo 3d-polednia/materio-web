@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Cenové nabídky — LiczMat</title>
+<meta name="description" content="Cenové nabídky v LiczMat Pro: materiál a další náklady načtené z projektu, práce jako množství krát sazba, procentní marže a součet. Data zůstávají v tomto prohlížeči.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/cs/cenove-nabidky/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/wyceny/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/koshtorysy-pro/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/angebote/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/quotes/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/cenove-nabidky/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/cenove-ponuky/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/oferte/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/ponude/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/ponude/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kommercheskie-predlozheniya/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="cs_CZ">
+<meta property="og:title" content="Cenové nabídky — LiczMat">
+<meta property="og:description" content="Cenové nabídky v LiczMat Pro: materiál a další náklady načtené z projektu, práce jako množství krát sazba, procentní marže a součet. Data zůstávají v tomto prohlížeči.">
+<meta property="og:url" content="https://liczmat.com/cs/cenove-nabidky/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cenové nabídky — LiczMat">
+<meta name="twitter:description" content="Cenové nabídky v LiczMat Pro: materiál a další náklady načtené z projektu, práce jako množství krát sazba, procentní marže a součet. Data zůstávají v tomto prohlížeči.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://liczmat.com/cs/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Zakázky",
+      "item": "https://liczmat.com/cs/zakazky/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Cenové nabídky",
+      "item": "https://liczmat.com/cs/cenove-nabidky/"
+    }
+  ]
+}
+</script>
+<script>window.LM_LINKS = {"clients":"/cs/klienti/","jobs":"/cs/zakazky/","projects":"/cs/projekty/","quotes":"/cs/cenove-nabidky/","calendar":"/cs/terminy/"};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Přejít k obsahu</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/cs/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hlavní navigace">
+      <ul class="nav-list">
+        <li><a href="/cs/kalkulacky/">Kalkulačky</a></li>
+        <li><a href="/cs/materialy/">Materiály</a></li>
+        <li data-nav-level="liczmat"><a href="/cs/projekty/">Projekty</a></li>
+        <li><a href="/cs/navody/">Návody</a></li>
+        <li><a href="/cs/aplikace/">Aplikace</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Jazyk">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/wyceny/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/koshtorysy-pro/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/angebote/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/quotes/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></span></li>
+      <li><a class="lang-item" href="/sk/cenove-ponuky/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ro/oferte/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/hr/ponude/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sr/ponude/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ru/kommercheskie-predlozheniya/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Měna" title="Měna"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK" selected>CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Můj účet</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Přepnout motiv" title="Přepnout motiv"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otevřít menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li><a href="/cs/zakazky/">Zakázky</a></li><li aria-current="page">Cenové nabídky</li></ol></nav>
+      <h1 id="quo-title">Cenové nabídky</h1>
+      <p class="lead" id="quo-lead">Cenová nabídka LiczMat Pro: materiál a další náklady z projektu, práce zadaná ručně, marže a součet.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="quo-page">
+    <div class="wrap narrow">
+      <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
+      <p class="crm-pro" id="quo-pro" hidden>
+        <span class="chip" id="quo-pro-chip">Dostupné v LiczMat Pro</span>
+      </p>
+
+      <div class="app-card crm-gate pw-gate" id="quo-gate" hidden>
+        <h2>Cenové nabídky</h2>
+        <p class="muted">Materiál, práce, další náklady, marže a součet — z toho, co jsi už spočítal.</p>
+        <p><span class="chip">Dostupné v LiczMat Pro</span></p>
+
+        <!-- One rung of the Free → Pro path, chosen by assets/paywall.js from the level.
+             Both are in the markup; neither is shown until the script knows which. -->
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je tarif u účtu. Založ si nejdřív účet LiczMat zdarma nebo se přihlas — Pro jde zapnout jen na účtu.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fcs%2Fcenove-nabidky%2F" rel="nofollow">Založit účet zdarma</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tvůj účet je na tarifu zdarma. Tento modul patří do LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Co dál LiczMat Pro zahrnuje</h3>
+          <ul class="pw-incl-list">
+            <li><b>Klienti</b> — <span class="muted">Seznam klientů s kontaktními údaji, poznámkami a historií spolupráce.</span></li>
+            <li><b>Zakázky</b> — <span class="muted">Zakázka s klientem, popisem, stavem, termínem, hodnotou a připojeným projektem.</span></li>
+            <li><b>Termíny</b> — <span class="muted">Termíny zakázek a základní informace o nich. Ne druhý Kalendář Google.</span></li>
+            <li><b>Historie a CRM</b> — <span class="muted">Cesta celou prací: klient → zakázka → projekt → cenová nabídka → historie.</span></li>
+          </ul>
+        </div>
+
+        <p><span class="muted"><span data-i18n="pro_more">Poznej LiczMat Pro</span> — <span data-i18n="door_soon">Připravujeme</span></span></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Předplatné LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Jeden tarif, všech pět modulů Pro. Platbu zajišťuje Stripe; zrušíš kdykoli a Pro běží do konce zaplaceného období.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Měsíčně</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ měsíc</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Ročně</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ rok — o dva měsíce levněji</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Přejít na svůj účet</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Předplatné si zatím koupit nelze. Ceny jsou konečné, platby spouštíme brzy.</p>
+        </div>
+      </div>
+
+      <div id="quo-tool">
+        <article id="quo-detail" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/cs/cenove-nabidky/" data-quo-back>← Všechny nabídky</a></p>
+
+        <div id="quo-missing" hidden>
+          <h2>Taková nabídka neexistuje</h2>
+          <p class="muted">Tato nabídka byla smazána, nebo adresa pochází z jiného prohlížeče.</p>
+        </div>
+
+        <div id="quo-body" hidden>
+          <!-- Chapter XXIV read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT. Every
+               step is derived from the one link the quote stores, so nothing here can
+               disagree with the job's own page. Session 26 draws it with the same strip
+               /zlecenia/ uses — assets/crm-chain.js — so the path reads identically from
+               both ends. -->
+          <nav class="crm-chain" id="quo-chain-line" aria-label="Cesta"></nav>
+
+          <!-- Chapter XXII's five figures. Three of them are the project's own money,
+               read through wsProjectCosts() and never copied onto the quote. -->
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Materiál</span> <b id="quo-fig-materials"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Další náklady</span> <b id="quo-fig-other"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Práce</span> <b id="quo-fig-labour"></b></p>
+          </div>
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Celkem bez marže</span> <b id="quo-fig-sub"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Marže</span> <b id="quo-fig-margin"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Součet</span> <b id="quo-fig-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="quo-mixed" hidden>Položky jsou v různých měnách. Součet je sečte, ale nic nepřepočítává kurzem — zkontroluj měny ve sloupci nákladů.</p>
+
+          <!-- The margin is one field on the page rather than a form to open: it is the
+               number a tradesman moves while looking at the total. -->
+          <p class="ws-mat-grid ws-mat-grid-one">
+            <label class="ws-mat-f ws-mat-f-sm">
+              <span class="ws-bar-label">Marže (%)</span>
+              <input id="quo-margin" type="text" inputmode="decimal">
+            </label>
+          </p>
+          <p class="muted field-note">Procento počítané z materiálu, dalších nákladů a práce dohromady.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="quo-edit">Upravit nabídku</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="quo-delete">Smazat</button>
+          </div>
+
+          <form id="quo-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Název</span>
+                <input id="quo-edit-name" type="text" maxlength="120" required>
+              </label>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="quo-edit-note">Poznámky</label>
+              <textarea id="quo-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">Uložit</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-quo-edit-cancel>Zrušit</button>
+            </p>
+          </form>
+
+          <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="quo-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="quo-delete-yes">Smazat nabídku</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="quo-delete-no">Zrušit</button>
+            </p>
+          </div>
+
+          <!-- Chapter XXII's "robocizna": the only part of a quote nothing else counts. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Práce</h2>
+            </div>
+            <p class="muted">Jediná část nabídky, kterou za tebe nic nespočítá. Množství krát sazba; nech množství prázdné, pokud jde o paušál.</p>
+            <ul id="quo-labour-list" class="data-list"></ul>
+            <form id="quo-labour-form">
+              <p class="ws-mat-grid">
+                <label class="ws-mat-f">
+                  <span class="ws-bar-label">Práce</span>
+                  <input id="quo-labour-name" type="text" maxlength="120" required>
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">Množství</span>
+                  <input id="quo-labour-qty" type="text" inputmode="decimal">
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">Jednotka</span>
+                  <input id="quo-labour-unit" type="text" maxlength="24">
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">Sazba</span>
+                  <input id="quo-labour-price" type="text" inputmode="decimal">
+                </label>
+              </p>
+              <p>
+                <button type="submit" class="btn btn-primary btn-sm">Přidat práci</button>
+                <span class="muted" id="quo-labour-run"></span>
+              </p>
+            </form>
+            <p class="muted" id="quo-labour-full" hidden>Nabídka už má plný počet položek práce.</p>
+          </section>
+
+          <!-- The one link the quote stores. The project is the free workspace's own row;
+               nothing here renames, archives or deletes it. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Projekt</h2>
+              <a class="dash-more" href="/cs/projekty/">Projekty a místnosti</a>
+            </div>
+            <ul id="quo-project-list" class="data-list"></ul>
+            <form id="quo-project-form" class="inline-form">
+              <select id="quo-project-pick" aria-label="Přiřadit projekt"></select>
+              <button type="submit" class="btn btn-primary btn-sm">Přiřadit projekt</button>
+            </form>
+            <p class="muted field-note">Materiál a další náklady se počítají z tohoto projektu. Nabídka je nekopíruje, takže změna ceny v projektu je tu vidět hned.</p>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Poznámky</h2>
+            </div>
+            <p id="quo-note" class="crm-note"></p>
+          </section>
+        </div>
+      </article>
+        <div id="quo-index">
+        <p class="ws-undo" id="quo-undo" role="status" hidden>
+          <span id="quo-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="quo-undo-go">Zpět</button>
+        </p>
+
+        <h2>Cenové nabídky</h2>
+        <p class="muted">Nabídka bere materiál a další náklady z projektu. Práci a marži dopíšeš uvnitř.</p>
+        <form id="quo-form" class="inline-form">
+          <input id="quo-name" type="text" maxlength="120" placeholder="Název nabídky" required>
+          <select id="quo-project" aria-label="Projekt"></select>
+          <button type="submit" class="btn btn-primary btn-sm">Přidat</button>
+        </form>
+        <ul id="quo-list" class="data-list"></ul>
+      </div>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/cs/zakazky/">Zakázky</a>
+        <a class="btn btn-ghost" href="/cs/projekty/">Projekty a místnosti</a>
+      </p>
+      <p class="muted src-note">Cenové nabídky držíme v paměti tohoto prohlížeče (localStorage). Nikam je neposíláme a v aplikaci pro Android nejsou — synchronizace zahrnuje projekty, místnosti, výpočty a seznamy materiálu. Vymazání dat webu nabídky smaže.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Stejný vzorec v aplikaci</b> LiczMat pro Android počítá stejným jádrem offline — s katalogem materiálů a uložením výsledku do projektu.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Stáhnout</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulačka stavebního materiálu. Spočítej. Naplánuj. Postav.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/cs/kalkulacky/">Všechny kalkulačky</a></li>
+          <li><a href="/cs/materialy/">Materiály</a></li>
+          <li data-nav-level="liczmat"><a href="/cs/projekty/">Projekty</a></li>
+          <li><a href="/cs/rozpocet/">Rozpočet</a></li>
+          <li><a href="/cs/navody/">Návody</a></li>
+          <li><a href="/cs/obchody/">Obchody</a></li>
+          <li data-nav-level="pro"><a href="/cs/klienti/">Klienti</a></li>
+          <li data-nav-level="pro"><a href="/cs/zakazky/">Zakázky</a></li>
+          <li data-nav-level="pro"><a href="/cs/cenove-nabidky/">Cenové nabídky</a></li>
+          <li data-nav-level="pro"><a href="/cs/terminy/">Termíny</a></li>
+          <li><a href="/cs/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Účet</h4>
+        <ul>
+          <li><a href="/cs/aplikace/">Aplikace</a></li>
+          <li><a href="/app/" rel="nofollow">Můj účet</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Přehled</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Právní informace</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Zásady ochrany soukromí</a></li>
+          <li><a href="/cs/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Jazyk">
+      <h4>Jazyk</h4>
+      <ul>
+        <li><a href="/wyceny/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/koshtorysy-pro/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/angebote/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/quotes/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/cenove-nabidky/" hreflang="cs" lang="cs" data-lang="cs" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/cenove-ponuky/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/oferte/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/ponude/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/ponude/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/kommercheskie-predlozheniya/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Všechna práva vyhrazena.</span>
+      <span>Výsledky jsou orientační. Před nákupem ověř.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Souhlasím" hidden>
+  <p class="consent-text">Používáme Google Analytics, abychom anonymně počítali návštěvnost webu a kolik lidí přejde na Google Play. Souhlasíš?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Více v zásadách ochrany soukromí</a>
+    <a class="consent-more" href="/cs/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odmítnout</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Souhlasím</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/wyceny/",
+  "uk": "/uk/koshtorysy-pro/",
+  "de": "/de/angebote/",
+  "en": "/en/quotes/",
+  "cs": "/cs/cenove-nabidky/",
+  "sk": "/sk/cenove-ponuky/",
+  "ro": "/ro/oferte/",
+  "hr": "/hr/ponude/",
+  "sr": "/sr/ponude/",
+  "ru": "/ru/kommercheskie-predlozheniya/"
+};</script>
+<script src="/assets/i18n.cs.js?v=20260819i"></script>
+<script src="/assets/i18n-runtime.js?v=20260819i"></script>
+<script src="/assets/currency.js?v=20260819i"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819i"></script>
+
+<script src="/assets/workspace.js?v=20260819i"></script>
+<script src="/assets/plan.js?v=20260819i"></script>
+<script src="/assets/pay.js?v=20260819i"></script>
+<script src="/assets/paywall.js?v=20260819i"></script>
+<script src="/assets/crm.js?v=20260819i"></script>
+<script src="/assets/crm-chain.js?v=20260819i"></script>
+<script src="/assets/quotes-ui.js?v=20260819i"></script>
+<script src="/assets/main.js?v=20260819i"></script>
+
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Termíny — LiczMat</title>
+<meta name="description" content="Termíny zákaziek v LiczMat Pro: termíny zoskupené od zmeškaných po vzdialenejšie, pri každej zákazke klient, stav a hodnota. Termín nastavíš na mieste. Dáta zostávajú v tomto prehliadači.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/sk/terminy/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/terminarz/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kalendar/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/termine/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/schedule/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/terminy/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/terminy/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/termene/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/rokovi/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/rokovi/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/sroki/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/terminarz/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="sk_SK">
+<meta property="og:title" content="Termíny — LiczMat">
+<meta property="og:description" content="Termíny zákaziek v LiczMat Pro: termíny zoskupené od zmeškaných po vzdialenejšie, pri každej zákazke klient, stav a hodnota. Termín nastavíš na mieste. Dáta zostávajú v tomto prehliadači.">
+<meta property="og:url" content="https://liczmat.com/sk/terminy/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Termíny — LiczMat">
+<meta name="twitter:description" content="Termíny zákaziek v LiczMat Pro: termíny zoskupené od zmeškaných po vzdialenejšie, pri každej zákazke klient, stav a hodnota. Termín nastavíš na mieste. Dáta zostávajú v tomto prehliadači.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domov",
+      "item": "https://liczmat.com/sk/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Zákazky",
+      "item": "https://liczmat.com/sk/zakazky/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Termíny",
+      "item": "https://liczmat.com/sk/terminy/"
+    }
+  ]
+}
+</script>
+<script>window.LM_LINKS = {"clients":"/sk/klienti/","jobs":"/sk/zakazky/","projects":"/sk/projekty/","quotes":"/sk/cenove-ponuky/","calendar":"/sk/terminy/"};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Preskočiť na obsah</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/sk/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hlavná navigácia">
+      <ul class="nav-list">
+        <li><a href="/sk/kalkulacky/">Kalkulačky</a></li>
+        <li><a href="/sk/materialy/">Materiály</a></li>
+        <li data-nav-level="liczmat"><a href="/sk/projekty/">Projekty</a></li>
+        <li><a href="/sk/navody/">Návody</a></li>
+        <li><a href="/sk/aplikacia/">Aplikácia</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Jazyk">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/terminarz/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/kalendar/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/termine/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/schedule/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/terminy/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></span></li>
+      <li><a class="lang-item" href="/ro/termene/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/hr/rokovi/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sr/rokovi/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ru/sroki/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Mena" title="Mena"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Môj účet</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Prepnúť motív" title="Prepnúť motív"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otvoriť menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sk/">Domov</a></li><li><a href="/sk/zakazky/">Zákazky</a></li><li aria-current="page">Termíny</li></ol></nav>
+      <h1>Termíny</h1>
+      <p class="lead">Termíny zákaziek LiczMat Pro: čo je po termíne, čo vychádza na dnešok, čo do týždňa a čo ešte nemá dátum.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="cal-page">
+    <div class="wrap narrow">
+      <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
+      <p class="crm-pro" id="cal-pro" hidden>
+        <span class="chip" id="cal-pro-chip">Dostupné v LiczMat Pro</span>
+      </p>
+
+      <div class="app-card crm-gate pw-gate" id="cal-gate" hidden>
+        <h2>Termíny</h2>
+        <p class="muted">Termíny zákaziek a základné informácie o nich. Nie druhý Kalendár Google.</p>
+        <p><span class="chip">Dostupné v LiczMat Pro</span></p>
+
+        <!-- One rung of the Free → Pro path, chosen by assets/paywall.js from the level.
+             Both are in the markup; neither is shown until the script knows which. -->
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je tarif pri účte. Založ si najprv účet LiczMat zadarmo alebo sa prihlás — Pro sa dá zapnúť len na účte.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fsk%2Fterminy%2F" rel="nofollow">Založiť účet zadarmo</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tvoj účet je na tarife zadarmo. Tento modul patrí do LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Čo ďalšie LiczMat Pro zahŕňa</h3>
+          <ul class="pw-incl-list">
+            <li><b>Klienti</b> — <span class="muted">Zoznam klientov s kontaktnými údajmi, poznámkami a históriou spolupráce.</span></li>
+            <li><b>Zákazky</b> — <span class="muted">Zákazka s klientom, popisom, stavom, termínom, hodnotou a pripojeným projektom.</span></li>
+            <li><b>Cenové ponuky</b> — <span class="muted">Materiál, práca, ďalšie náklady, marža a súčet — z toho, čo si už spočítal.</span></li>
+            <li><b>História a CRM</b> — <span class="muted">Cesta celou prácou: klient → zákazka → projekt → cenová ponuka → história.</span></li>
+          </ul>
+        </div>
+
+        <p><span class="muted"><span data-i18n="pro_more">Spoznaj LiczMat Pro</span> — <span data-i18n="door_soon">Pripravujeme</span></span></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Predplatné LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Jeden tarif, všetkých päť modulov Pro. Platbu zabezpečuje Stripe; zrušíš kedykoľvek a Pro beží do konca zaplateného obdobia.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Mesačne</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ mesiac</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Ročne</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ rok — o dva mesiace lacnejšie</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Prejsť na svoj účet</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Predplatné sa zatiaľ kúpiť nedá. Ceny sú konečné, platby spúšťame čoskoro.</p>
+        </div>
+      </div>
+
+      <div id="cal-tool">
+        <!-- What "late" and "today" are measured against, said out loud: the visitor's
+             own calendar day, which is the only reckoning a deadline has. -->
+        <p class="crm-contact"><span class="eyebrow muted">Dnes</span> <b id="cal-today"></b></p>
+
+        <div class="ws-project-figs">
+          <p class="ws-project-fig"><span class="eyebrow muted">Po termíne</span> <b id="cal-fig-late"></b></p>
+          <p class="ws-project-fig"><span class="eyebrow muted">Dnes</span> <b id="cal-fig-today"></b></p>
+          <p class="ws-project-fig"><span class="eyebrow muted">Do 7 dní</span> <b id="cal-fig-soon"></b></p>
+        </div>
+
+        <p class="muted" id="cal-empty" hidden>Zatiaľ tu nie je žiadna zákazka. Termíny ukazujú termíny zákaziek, takže začni tým, že zákazku pridáš.</p>
+
+          <section class="dash-sec cal-sec" id="cal-sec-late">
+            <div class="dash-head">
+              <h2 id="cal-h-late">Po termíne</h2>
+            </div>
+            <p class="muted">Termín uplynul a zákazka je stále otvorená.</p>
+            <ul id="cal-list-late" class="data-list"></ul>
+          </section>
+          <section class="dash-sec cal-sec" id="cal-sec-today">
+            <div class="dash-head">
+              <h2 id="cal-h-today">Dnes</h2>
+            </div>
+            <p class="muted">Termín vychádza na dnešok.</p>
+            <ul id="cal-list-today" class="data-list"></ul>
+          </section>
+          <section class="dash-sec cal-sec" id="cal-sec-soon">
+            <div class="dash-head">
+              <h2 id="cal-h-soon">Do 7 dní</h2>
+            </div>
+            <p class="muted">Termín v najbližšom týždni.</p>
+            <ul id="cal-list-soon" class="data-list"></ul>
+          </section>
+          <section class="dash-sec cal-sec" id="cal-sec-later">
+            <div class="dash-head">
+              <h2 id="cal-h-later">Neskôr</h2>
+            </div>
+            <p class="muted">Termín ďalej než o týždeň.</p>
+            <ul id="cal-list-later" class="data-list"></ul>
+          </section>
+          <section class="dash-sec cal-sec" id="cal-sec-none">
+            <div class="dash-head">
+              <h2 id="cal-h-none">Bez termínu</h2>
+            </div>
+            <p class="muted">Otvorené zákazky, ktorým nikto nenastavil dátum. Môžeš ho nastaviť tu.</p>
+            <ul id="cal-list-none" class="data-list"></ul>
+          </section>
+
+        <details id="cal-closed" class="ws-archive" hidden>
+          <summary id="cal-closed-summary">Dokončené a zrušené</summary>
+          <p class="muted">Uzavreté zákazky, ktoré mali termín. Nikdy sa nerátajú ako zmeškané.</p>
+          <ul id="cal-closed-list" class="data-list"></ul>
+        </details>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/sk/zakazky/">Všetky zákazky</a>
+        <a class="btn btn-ghost" href="/sk/klienti/">Klienti</a>
+        <a class="btn btn-ghost" href="/sk/cenove-ponuky/">Cenové ponuky</a>
+      </p>
+      <p class="muted field-note">Termíny neukladajú nič zvlášť. Termín je pole zákazky, takže dátum zmenený tu je ten istý dátum, ktorý vidíš v „Zákazkách“.</p>
+      <p class="muted src-note">Zákazky a ich termíny držíme v pamäti tohto prehliadača (localStorage). Nikam ich neposielame a v aplikácii pre Android nie sú — synchronizácia zahŕňa projekty, miestnosti, výpočty a zoznamy materiálu. Vymazanie dát webu zmaže zákazky aj s termínmi.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Rovnaký vzorec v aplikácii</b> LiczMat pre Android počíta rovnakým jadrom offline — s katalógom materiálov a uložením výsledku do projektu.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Stiahnuť</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulačka stavebného materiálu. Spočítaj. Naplánuj. Postav.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/sk/kalkulacky/">Všetky kalkulačky</a></li>
+          <li><a href="/sk/materialy/">Materiály</a></li>
+          <li data-nav-level="liczmat"><a href="/sk/projekty/">Projekty</a></li>
+          <li><a href="/sk/rozpocet/">Rozpočet</a></li>
+          <li><a href="/sk/navody/">Návody</a></li>
+          <li><a href="/sk/obchody/">Obchody</a></li>
+          <li data-nav-level="pro"><a href="/sk/klienti/">Klienti</a></li>
+          <li data-nav-level="pro"><a href="/sk/zakazky/">Zákazky</a></li>
+          <li data-nav-level="pro"><a href="/sk/cenove-ponuky/">Cenové ponuky</a></li>
+          <li data-nav-level="pro"><a href="/sk/terminy/">Termíny</a></li>
+          <li><a href="/sk/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Účet</h4>
+        <ul>
+          <li><a href="/sk/aplikacia/">Aplikácia</a></li>
+          <li><a href="/app/" rel="nofollow">Môj účet</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Prehľad</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Právne informácie</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Ochrana súkromia</a></li>
+          <li><a href="/sk/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Jazyk">
+      <h4>Jazyk</h4>
+      <ul>
+        <li><a href="/terminarz/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/kalendar/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/termine/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/schedule/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/terminy/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/terminy/" hreflang="sk" lang="sk" data-lang="sk" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/termene/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/rokovi/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/rokovi/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/sroki/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Všetky práva vyhradené.</span>
+      <span>Výsledky sú orientačné. Pred nákupom over.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Súhlasím" hidden>
+  <p class="consent-text">Používame Google Analytics, aby sme anonymne počítali návštevnosť webu a koľko ľudí prejde na Google Play. Súhlasíš?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Viac v zásadách ochrany súkromia</a>
+    <a class="consent-more" href="/sk/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odmietnuť</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Súhlasím</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/terminarz/",
+  "uk": "/uk/kalendar/",
+  "de": "/de/termine/",
+  "en": "/en/schedule/",
+  "cs": "/cs/terminy/",
+  "sk": "/sk/terminy/",
+  "ro": "/ro/termene/",
+  "hr": "/hr/rokovi/",
+  "sr": "/sr/rokovi/",
+  "ru": "/ru/sroki/"
+};</script>
+<script src="/assets/i18n.sk.js?v=20260819i"></script>
+<script src="/assets/i18n-runtime.js?v=20260819i"></script>
+<script src="/assets/currency.js?v=20260819i"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819i"></script>
+
+<script src="/assets/workspace.js?v=20260819i"></script>
+<script src="/assets/plan.js?v=20260819i"></script>
+<script src="/assets/pay.js?v=20260819i"></script>
+<script src="/assets/paywall.js?v=20260819i"></script>
+<script src="/assets/crm.js?v=20260819i"></script>
+<script src="/assets/schedule-ui.js?v=20260819i"></script>
+<script src="/assets/main.js?v=20260819i"></script>
+
+</body>
+</html>

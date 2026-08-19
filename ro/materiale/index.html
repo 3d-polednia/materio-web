@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Catalog de materiale de construcții — LiczMat</title>
+<meta name="description" content="Catalog de materiale de construcții: gresie, parchet, vopsele, tencuieli, adezivi, izolații, plăci, profile și țevi. Dimensiuni, randament pe ambalaj și pierderi — datele cu care calculatoarele LiczMat completează formularul.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/ro/materiale/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/materialy/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/materialy/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/materialien/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/materials/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/materialy/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/materialy/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/materiale/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/materijali/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/materijali/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/materialy/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/materialy/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819i" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="ro_RO">
+<meta property="og:title" content="Catalog de materiale de construcții — LiczMat">
+<meta property="og:description" content="Catalog de materiale de construcții: gresie, parchet, vopsele, tencuieli, adezivi, izolații, plăci, profile și țevi. Dimensiuni, randament pe ambalaj și pierderi — datele cu care calculatoarele LiczMat completează formularul.">
+<meta property="og:url" content="https://liczmat.com/ro/materiale/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Catalog de materiale de construcții — LiczMat">
+<meta name="twitter:description" content="Catalog de materiale de construcții: gresie, parchet, vopsele, tencuieli, adezivi, izolații, plăci, profile și țevi. Dimensiuni, randament pe ambalaj și pierderi — datele cu care calculatoarele LiczMat completează formularul.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819i">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Acasă",
+      "item": "https://liczmat.com/ro/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Catalog de materiale de construcții",
+      "item": "https://liczmat.com/ro/materiale/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Catalog de materiale de construcții",
+  "numberOfItems": 161,
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Gresie porțelanată 30×30"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Gresie porțelanată 30×60"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Gresie porțelanată 40×40"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Gresie porțelanată 45×45"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Gresie porțelanată 60×60"
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "Gresie porțelanată 75×75"
+    },
+    {
+      "@type": "ListItem",
+      "position": 7,
+      "name": "Gresie porțelanată 80×80"
+    },
+    {
+      "@type": "ListItem",
+      "position": 8,
+      "name": "Gresie porțelanată 90×90"
+    },
+    {
+      "@type": "ListItem",
+      "position": 9,
+      "name": "Gresie porțelanată 60×120"
+    },
+    {
+      "@type": "ListItem",
+      "position": 10,
+      "name": "Gresie porțelanată 120×120"
+    },
+    {
+      "@type": "ListItem",
+      "position": 11,
+      "name": "Gresie format mare 120×278"
+    },
+    {
+      "@type": "ListItem",
+      "position": 12,
+      "name": "Faianță 20×20"
+    },
+    {
+      "@type": "ListItem",
+      "position": 13,
+      "name": "Faianță 25×40"
+    },
+    {
+      "@type": "ListItem",
+      "position": 14,
+      "name": "Faianță 30×60"
+    },
+    {
+      "@type": "ListItem",
+      "position": 15,
+      "name": "Faianță 30×90"
+    },
+    {
+      "@type": "ListItem",
+      "position": 16,
+      "name": "Teracotă 33×33"
+    },
+    {
+      "@type": "ListItem",
+      "position": 17,
+      "name": "Cărămidă metrou 7,5×15"
+    },
+    {
+      "@type": "ListItem",
+      "position": 18,
+      "name": "Placă alungită 6×25"
+    },
+    {
+      "@type": "ListItem",
+      "position": 19,
+      "name": "Mozaic pe plasă 30×30"
+    },
+    {
+      "@type": "ListItem",
+      "position": 20,
+      "name": "Hexagon 20×23"
+    },
+    {
+      "@type": "ListItem",
+      "position": 21,
+      "name": "Dală de terasă 2 cm · 60×60"
+    },
+    {
+      "@type": "ListItem",
+      "position": 22,
+      "name": "Placaj klinker 24,5×6,5"
+    },
+    {
+      "@type": "ListItem",
+      "position": 23,
+      "name": "Placaj de fațadă 24,5×6,5"
+    },
+    {
+      "@type": "ListItem",
+      "position": 24,
+      "name": "Parchet laminat AC3 · 128×19,2"
+    },
+    {
+      "@type": "ListItem",
+      "position": 25,
+      "name": "Parchet laminat AC4 · 138×19,3"
+    },
+    {
+      "@type": "ListItem",
+      "position": 26,
+      "name": "Parchet laminat AC5 · 129×19"
+    },
+    {
+      "@type": "ListItem",
+      "position": 27,
+      "name": "Parchet vinilic LVT 122×18"
+    },
+    {
+      "@type": "ListItem",
+      "position": 28,
+      "name": "Parchet SPC 61×30,5"
+    },
+    {
+      "@type": "ListItem",
+      "position": 29,
+      "name": "Parchet stratificat 220×18,2"
+    },
+    {
+      "@type": "ListItem",
+      "position": 30,
+      "name": "Parchet în trei straturi 209×15"
+    },
+    {
+      "@type": "ListItem",
+      "position": 31,
+      "name": "Parchet clasic 45×7"
+    },
+    {
+      "@type": "ListItem",
+      "position": 32,
+      "name": "Gresie imitație lemn 20×120"
+    },
+    {
+      "@type": "ListItem",
+      "position": 33,
+      "name": "Pardoseală din plută 90×30"
+    },
+    {
+      "@type": "ListItem",
+      "position": 34,
+      "name": "Panou de perete / lamele 275×12"
+    },
+    {
+      "@type": "ListItem",
+      "position": 35,
+      "name": "Placă gips-carton standard 1200×2600"
+    },
+    {
+      "@type": "ListItem",
+      "position": 36,
+      "name": "Placă gips-carton standard 1200×2000"
+    },
+    {
+      "@type": "ListItem",
+      "position": 37,
+      "name": "Placă gips-carton rezistentă la umiditate 1200×2600"
+    },
+    {
+      "@type": "ListItem",
+      "position": 38,
+      "name": "Placă gips-carton ignifugă 1200×2600"
+    },
+    {
+      "@type": "ListItem",
+      "position": 39,
+      "name": "Placă gips-carton foc + umiditate (GKFI) 1200×2600"
+    },
+    {
+      "@type": "ListItem",
+      "position": 40,
+      "name": "Tapet – rolă 0,53×10 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 41,
+      "name": "Vopsea de perete 2,5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 42,
+      "name": "Vopsea de perete 5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 43,
+      "name": "Vopsea de perete 10 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 44,
+      "name": "Vopsea lavabilă latex 5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 45,
+      "name": "Vopsea de tavan 10 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 46,
+      "name": "Vopsea pentru bucătărie și baie 2,5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 47,
+      "name": "Vopsea pentru beton și pardoseli 5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 48,
+      "name": "Vopsea de fațadă acrilică 10 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 49,
+      "name": "Vopsea de fațadă siliconică 10 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 50,
+      "name": "Email pentru lemn și metal 0,75 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 51,
+      "name": "Email pentru lemn și metal 2,5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 52,
+      "name": "Vopsea anticorozivă 3în1 0,75 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 53,
+      "name": "Baiț lac 2,5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 54,
+      "name": "Lac incolor 2,5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 55,
+      "name": "Impregnant pentru lemn 5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 56,
+      "name": "Ulei pentru terase 2,5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 57,
+      "name": "Amorsă de penetrare adâncă 5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 58,
+      "name": "Amorsă sub vopsea 5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 59,
+      "name": "Amorsă cuarțoasă sub tencuială 5 l"
+    },
+    {
+      "@type": "ListItem",
+      "position": 60,
+      "name": "Glet de ipsos 20 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 61,
+      "name": "Glet polimeric 20 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 62,
+      "name": "Glet gata preparat 18 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 63,
+      "name": "Tencuială de ipsos 30 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 64,
+      "name": "Tencuială var-ciment 30 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 65,
+      "name": "Tencuială mozaicată 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 66,
+      "name": "Tencuială decorativă 1,5 mm · 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 67,
+      "name": "Tencuială siliconică 1,5 mm · 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 68,
+      "name": "Tencuială acrilică 1,5 mm · 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 69,
+      "name": "Adeziv pentru plăci C1 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 70,
+      "name": "Adeziv flexibil C2 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 71,
+      "name": "Adeziv pentru polistiren și plasă 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 72,
+      "name": "Mortar de zidărie 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 73,
+      "name": "Șapă autonivelantă 25 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 74,
+      "name": "Chit de rosturi 5 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 75,
+      "name": "Hidroizolație lichidă 15 kg"
+    },
+    {
+      "@type": "ListItem",
+      "position": 76,
+      "name": "Vată minerală 10 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 77,
+      "name": "Vată minerală 15 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 78,
+      "name": "Vată pentru mansardă 20 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 79,
+      "name": "Vată de fațadă 15 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 80,
+      "name": "Polistiren EPS 5 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 81,
+      "name": "EPS de fațadă 10 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 82,
+      "name": "EPS de fațadă 15 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 83,
+      "name": "EPS de pardoseală EPS 100 · 10 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 84,
+      "name": "Placă XPS 5 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 85,
+      "name": "Placă PIR 10 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 86,
+      "name": "Membrană bituminoasă suport 20 m²"
+    },
+    {
+      "@type": "ListItem",
+      "position": 87,
+      "name": "Barieră de vapori 75 m²"
+    },
+    {
+      "@type": "ListItem",
+      "position": 88,
+      "name": "Membrană pentru acoperiș 75 m²"
+    },
+    {
+      "@type": "ListItem",
+      "position": 89,
+      "name": "PAL melaminat 2800×2070"
+    },
+    {
+      "@type": "ListItem",
+      "position": 90,
+      "name": "PAL melaminat 3660×1830"
+    },
+    {
+      "@type": "ListItem",
+      "position": 91,
+      "name": "MDF brut 2800×2070"
+    },
+    {
+      "@type": "ListItem",
+      "position": 92,
+      "name": "HDF 2800×2070"
+    },
+    {
+      "@type": "ListItem",
+      "position": 93,
+      "name": "PAL brut 2800×2070"
+    },
+    {
+      "@type": "ListItem",
+      "position": 94,
+      "name": "Placă MFP 2500×1250"
+    },
+    {
+      "@type": "ListItem",
+      "position": 95,
+      "name": "Placaj din esență tare 2500×1250"
+    },
+    {
+      "@type": "ListItem",
+      "position": 96,
+      "name": "Placaj din mesteacăn 1525×1525"
+    },
+    {
+      "@type": "ListItem",
+      "position": 97,
+      "name": "Placaj rezistent la apă 3000×1500"
+    },
+    {
+      "@type": "ListItem",
+      "position": 98,
+      "name": "OSB-3 2500×1250"
+    },
+    {
+      "@type": "ListItem",
+      "position": 99,
+      "name": "OSB-3 2800×1250"
+    },
+    {
+      "@type": "ListItem",
+      "position": 100,
+      "name": "Placă cimentată 3350×1250"
+    },
+    {
+      "@type": "ListItem",
+      "position": 101,
+      "name": "Placă fibro-gips 1500×1000"
+    },
+    {
+      "@type": "ListItem",
+      "position": 102,
+      "name": "Placaj de cofraj 2000×1000"
+    },
+    {
+      "@type": "ListItem",
+      "position": 103,
+      "name": "Blat de bucătărie postforming 4100×600"
+    },
+    {
+      "@type": "ListItem",
+      "position": 104,
+      "name": "Blat laminat 38 mm · 4100×920"
+    },
+    {
+      "@type": "ListItem",
+      "position": 105,
+      "name": "Glaf interior 4100×250"
+    },
+    {
+      "@type": "ListItem",
+      "position": 106,
+      "name": "Plexiglas (PMMA) 3050×2050"
+    },
+    {
+      "@type": "ListItem",
+      "position": 107,
+      "name": "Policarbonat compact 3050×2050"
+    },
+    {
+      "@type": "ListItem",
+      "position": 108,
+      "name": "Policarbonat celular 2100×6000"
+    },
+    {
+      "@type": "ListItem",
+      "position": 109,
+      "name": "Placă HPL compact 3050×1300"
+    },
+    {
+      "@type": "ListItem",
+      "position": 110,
+      "name": "Dibond 3050×1500"
+    },
+    {
+      "@type": "ListItem",
+      "position": 111,
+      "name": "PVC expandat 3050×1560"
+    },
+    {
+      "@type": "ListItem",
+      "position": 112,
+      "name": "Sticlă float 3210×2250"
+    },
+    {
+      "@type": "ListItem",
+      "position": 113,
+      "name": "Sticlă float 2550×1605"
+    },
+    {
+      "@type": "ListItem",
+      "position": 114,
+      "name": "Oglindă 2550×1605"
+    },
+    {
+      "@type": "ListItem",
+      "position": 115,
+      "name": "Tablă de oțel 2000×1000"
+    },
+    {
+      "@type": "ListItem",
+      "position": 116,
+      "name": "Tablă de aluminiu 2500×1250"
+    },
+    {
+      "@type": "ListItem",
+      "position": 117,
+      "name": "Tablă zincată 2000×1000"
+    },
+    {
+      "@type": "ListItem",
+      "position": 118,
+      "name": "Textilă din balot, lățime 140 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 119,
+      "name": "Textilă din balot, lățime 150 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 120,
+      "name": "Piele ecologică din rolă, lățime 140 cm"
+    },
+    {
+      "@type": "ListItem",
+      "position": 121,
+      "name": "Piele naturală – foaie 2200×1200"
+    },
+    {
+      "@type": "ListItem",
+      "position": 122,
+      "name": "Burete de tapițerie – bloc 2000×1200"
+    },
+    {
+      "@type": "ListItem",
+      "position": 123,
+      "name": "Profil de tavan CD60 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 124,
+      "name": "Profil de tavan CD60 4 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 125,
+      "name": "Profil perimetral UD27 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 126,
+      "name": "Profil de perete CW50 · 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 127,
+      "name": "Profil de perete UW50 · 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 128,
+      "name": "Profil de perete CW75 · 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 129,
+      "name": "Profil de perete CW100 · 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 130,
+      "name": "Profil de rigidizare UA50 · 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 131,
+      "name": "Profil de rigidizare UA75 · 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 132,
+      "name": "Colțar din aluminiu 2,5 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 133,
+      "name": "Plintă MDF 2,5 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 134,
+      "name": "Plintă PVC 2,5 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 135,
+      "name": "Baghetă sfert de cerc / colț 2,5 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 136,
+      "name": "Profil de trecere din aluminiu 0,9 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 137,
+      "name": "Glaf exterior din oțel 2 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 138,
+      "name": "Grindă rindeluită 45×45 · 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 139,
+      "name": "Șipcă 40×50 · 4 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 140,
+      "name": "Căprior 70×140 · 6 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 141,
+      "name": "Deck de terasă 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 142,
+      "name": "Deck WPC 4 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 143,
+      "name": "Scândură de fațadă 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 144,
+      "name": "Șipcă de gard 1,5 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 145,
+      "name": "Țeavă PP 4 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 146,
+      "name": "Țeavă PEX 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 147,
+      "name": "Țeavă de cupru 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 148,
+      "name": "Burlan 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 149,
+      "name": "Tubulatură de ventilație 1 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 150,
+      "name": "Țeavă de canalizare PVC 110 · 2 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 151,
+      "name": "Țeavă de canalizare PVC 50 · 2 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 152,
+      "name": "Jgheab de acoperiș 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 153,
+      "name": "Jgheab de cabluri 2 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 154,
+      "name": "Canal de cablu 2 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 155,
+      "name": "Cornier din aluminiu 2 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 156,
+      "name": "Profil U din oțel 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 157,
+      "name": "Țeavă rectangulară 30×30 · 3 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 158,
+      "name": "Bară de armătură Ø8 · 12 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 159,
+      "name": "Bară de armătură Ø10 · 12 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 160,
+      "name": "Bară de armătură Ø12 · 12 m"
+    },
+    {
+      "@type": "ListItem",
+      "position": 161,
+      "name": "Galerie / bară 2,4 m"
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Sari la conținut</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/ro/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Navigație principală">
+      <ul class="nav-list">
+        <li><a href="/ro/calculatoare/">Calculatoare</a></li>
+        <li><a href="/ro/materiale/" aria-current="page">Materiale</a></li>
+        <li data-nav-level="liczmat"><a href="/ro/proiecte/">Proiecte</a></li>
+        <li><a href="/ro/ghiduri/">Ghiduri</a></li>
+        <li><a href="/ro/aplicatie/">Aplicația</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Limbă">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/materialy/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/materialy/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/materialien/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/materials/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/materialy/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sk/materialy/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></span></li>
+      <li><a class="lang-item" href="/hr/materijali/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sr/materijali/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ru/materialy/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Valută" title="Valută"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON" selected>RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Contul meu</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Schimbă tema" title="Schimbă tema"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Deschide meniul"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ro/">Acasă</a></li><li aria-current="page">Catalog de materiale de construcții</li></ol></nav>
+      <h1>Catalog de materiale de construcții</h1>
+      <p class="lead">Toate materialele cu care LiczMat completează calculatoarele: dimensiuni, randament pe ambalaj și pierderea implicită. Alege un material și calculează-l.</p>
+    </div>
+  </section>
+
+  <div id="materials-page">
+    <section class="block alt">
+      <div class="wrap">
+        <label class="fld-label" for="matpage-search">Caută material…</label>
+        <input id="matpage-search" type="search" class="mat-search" placeholder="Caută material…" autocomplete="off">
+        <p class="muted mt-3">161 materiale în catalog · Valorile sunt orientative și diferă de la un producător la altul. După completare, fiecare poate fi modificată în calculator.</p>
+        <p class="muted" id="matpage-empty" hidden>Nicio potrivire.</p>
+      </div>
+    </section>
+    <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-TILES">Gresie și faianță</h2>
+        <ul class="mat-page-list"><li id="gres-30x30" data-find="gresie portelanata 30×30 gres-30x30">
+          <span class="mat-item">
+            <b>Gresie porțelanată 30×30</b>
+            <span class="muted">30×30 cm · 1 m²/amb. · 5 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-30x30">Calculează</a>
+        </li><li id="gres-30x60" data-find="gresie portelanata 30×60 gres-30x60">
+          <span class="mat-item">
+            <b>Gresie porțelanată 30×60</b>
+            <span class="muted">30×60 cm · 1,44 m²/amb. · 5 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-30x60">Calculează</a>
+        </li><li id="gres-40x40" data-find="gresie portelanata 40×40 gres-40x40">
+          <span class="mat-item">
+            <b>Gresie porțelanată 40×40</b>
+            <span class="muted">40×40 cm · 1,28 m²/amb. · 6 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-40x40">Calculează</a>
+        </li><li id="gres-45x45" data-find="gresie portelanata 45×45 gres-45x45">
+          <span class="mat-item">
+            <b>Gresie porțelanată 45×45</b>
+            <span class="muted">45×45 cm · 1,42 m²/amb. · 7 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-45x45">Calculează</a>
+        </li><li id="gres-60x60" data-find="gresie portelanata 60×60 gres-60x60">
+          <span class="mat-item">
+            <b>Gresie porțelanată 60×60</b>
+            <span class="muted">60×60 cm · 1,44 m²/amb. · 7 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-60x60">Calculează</a>
+        </li><li id="gres-75x75" data-find="gresie portelanata 75×75 gres-75x75">
+          <span class="mat-item">
+            <b>Gresie porțelanată 75×75</b>
+            <span class="muted">75×75 cm · 1,13 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-75x75">Calculează</a>
+        </li><li id="gres-80x80" data-find="gresie portelanata 80×80 gres-80x80">
+          <span class="mat-item">
+            <b>Gresie porțelanată 80×80</b>
+            <span class="muted">80×80 cm · 1,28 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-80x80">Calculează</a>
+        </li><li id="gres-90x90" data-find="gresie portelanata 90×90 gres-90x90">
+          <span class="mat-item">
+            <b>Gresie porțelanată 90×90</b>
+            <span class="muted">90×90 cm · 1,62 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-90x90">Calculează</a>
+        </li><li id="gres-60x120" data-find="gresie portelanata 60×120 gres-60x120">
+          <span class="mat-item">
+            <b>Gresie porțelanată 60×120</b>
+            <span class="muted">60×120 cm · 1,44 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-60x120">Calculează</a>
+        </li><li id="gres-120x120" data-find="gresie portelanata 120×120 gres-120x120">
+          <span class="mat-item">
+            <b>Gresie porțelanată 120×120</b>
+            <span class="muted">120×120 cm · 1,44 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-120x120">Calculează</a>
+        </li><li id="gres-120x278" data-find="gresie format mare 120×278 gres-120x278">
+          <span class="mat-item">
+            <b>Gresie format mare 120×278</b>
+            <span class="muted">120×278 cm · 3,34 m²/amb. · 12 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-120x278">Calculează</a>
+        </li><li id="glaz-20x20" data-find="faianta 20×20 glaz-20x20">
+          <span class="mat-item">
+            <b>Faianță 20×20</b>
+            <span class="muted">20×20 cm · 1 m²/amb. · 5 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=glaz-20x20">Calculează</a>
+        </li><li id="glaz-25x40" data-find="faianta 25×40 glaz-25x40">
+          <span class="mat-item">
+            <b>Faianță 25×40</b>
+            <span class="muted">25×40 cm · 1 m²/amb. · 5 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=glaz-25x40">Calculează</a>
+        </li><li id="glaz-30x60" data-find="faianta 30×60 glaz-30x60">
+          <span class="mat-item">
+            <b>Faianță 30×60</b>
+            <span class="muted">30×60 cm · 1,44 m²/amb. · 5 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=glaz-30x60">Calculează</a>
+        </li><li id="glaz-30x90" data-find="faianta 30×90 glaz-30x90">
+          <span class="mat-item">
+            <b>Faianță 30×90</b>
+            <span class="muted">30×90 cm · 1,62 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=glaz-30x90">Calculează</a>
+        </li><li id="terakota-33" data-find="teracota 33×33 terakota-33">
+          <span class="mat-item">
+            <b>Teracotă 33×33</b>
+            <span class="muted">33×33 cm · 1 m²/amb. · 5 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=terakota-33">Calculează</a>
+        </li><li id="metro-75x150" data-find="caramida metrou 7,5×15 metro-75x150">
+          <span class="mat-item">
+            <b>Cărămidă metrou 7,5×15</b>
+            <span class="muted">7,5×15 cm · 1 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=metro-75x150">Calculează</a>
+        </li><li id="metro-60x250" data-find="placa alungita 6×25 metro-60x250">
+          <span class="mat-item">
+            <b>Placă alungită 6×25</b>
+            <span class="muted">6×25 cm · 0,5 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=metro-60x250">Calculează</a>
+        </li><li id="mozaika-30x30" data-find="mozaic pe plasa 30×30 mozaika-30x30">
+          <span class="mat-item">
+            <b>Mozaic pe plasă 30×30</b>
+            <span class="muted">30×30 cm · 0,99 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=mozaika-30x30">Calculează</a>
+        </li><li id="heksagon" data-find="hexagon 20×23 heksagon">
+          <span class="mat-item">
+            <b>Hexagon 20×23</b>
+            <span class="muted">20×23 cm · 1 m²/amb. · 12 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=heksagon">Calculează</a>
+        </li><li id="taras-60x60" data-find="dala de terasa 2 cm · 60×60 taras-60x60">
+          <span class="mat-item">
+            <b>Dală de terasă 2 cm · 60×60</b>
+            <span class="muted">2 cm · 60×60 cm · 0,72 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=taras-60x60">Calculează</a>
+        </li><li id="klinkier-25x6" data-find="placaj klinker 24,5×6,5 klinkier-25x6">
+          <span class="mat-item">
+            <b>Placaj klinker 24,5×6,5</b>
+            <span class="muted">24,5×6,5 cm · 0,5 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=klinkier-25x6">Calculează</a>
+        </li><li id="elew-plytka" data-find="placaj de fatada 24,5×6,5 elew-plytka">
+          <span class="mat-item">
+            <b>Placaj de fațadă 24,5×6,5</b>
+            <span class="muted">24,5×6,5 cm · 0,5 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=elew-plytka">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-FLOORING">Pardoseli</h2>
+        <ul class="mat-page-list"><li id="panel-ac3" data-find="parchet laminat ac3 · 128×19,2 panel-ac3">
+          <span class="mat-item">
+            <b>Parchet laminat AC3 · 128×19,2</b>
+            <span class="muted">AC3 · 128×19,2 cm · 2,22 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=panel-ac3">Calculează</a>
+        </li><li id="panel-ac4" data-find="parchet laminat ac4 · 138×19,3 panel-ac4">
+          <span class="mat-item">
+            <b>Parchet laminat AC4 · 138×19,3</b>
+            <span class="muted">AC4 · 138×19,3 cm · 2,22 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=panel-ac4">Calculează</a>
+        </li><li id="panel-ac5" data-find="parchet laminat ac5 · 129×19 panel-ac5">
+          <span class="mat-item">
+            <b>Parchet laminat AC5 · 129×19</b>
+            <span class="muted">AC5 · 129×19 cm · 2,22 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=panel-ac5">Calculează</a>
+        </li><li id="lvt" data-find="parchet vinilic lvt 122×18 lvt">
+          <span class="mat-item">
+            <b>Parchet vinilic LVT 122×18</b>
+            <span class="muted">122×18 cm · 2,2 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=lvt">Calculează</a>
+        </li><li id="spc" data-find="parchet spc 61×30,5 spc">
+          <span class="mat-item">
+            <b>Parchet SPC 61×30,5</b>
+            <span class="muted">61×30,5 cm · 2,23 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=spc">Calculează</a>
+        </li><li id="deska-barl" data-find="parchet stratificat 220×18,2 deska-barl">
+          <span class="mat-item">
+            <b>Parchet stratificat 220×18,2</b>
+            <span class="muted">220×18,2 cm · 3,18 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=deska-barl">Calculează</a>
+        </li><li id="deska-3warstw" data-find="parchet in trei straturi 209×15 deska-3warstw">
+          <span class="mat-item">
+            <b>Parchet în trei straturi 209×15</b>
+            <span class="muted">209×15 cm · 2,2 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=deska-3warstw">Calculează</a>
+        </li><li id="parkiet" data-find="parchet clasic 45×7 parkiet">
+          <span class="mat-item">
+            <b>Parchet clasic 45×7</b>
+            <span class="muted">45×7 cm · 1 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=parkiet">Calculează</a>
+        </li><li id="gres-deska-20x120" data-find="gresie imitatie lemn 20×120 gres-deska-20x120">
+          <span class="mat-item">
+            <b>Gresie imitație lemn 20×120</b>
+            <span class="muted">20×120 cm · 0,96 m²/amb. · 10 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gres-deska-20x120">Calculează</a>
+        </li><li id="korek" data-find="pardoseala din pluta 90×30 korek">
+          <span class="mat-item">
+            <b>Pardoseală din plută 90×30</b>
+            <span class="muted">90×30 cm · 1,9 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=korek">Calculează</a>
+        </li><li id="panel-scienny" data-find="panou de perete / lamele 275×12 panel-scienny">
+          <span class="mat-item">
+            <b>Panou de perete / lamele 275×12</b>
+            <span class="muted">275×12 cm · 1,65 m²/amb. · 8 % pierderi</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=panel-scienny">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-TRIM">Baghete și finisaje</h2>
+        <ul class="mat-page-list"><li id="parapet-wewn" data-find="glaf interior 4100×250 parapet-wewn">
+          <span class="mat-item">
+            <b>Glaf interior 4100×250</b>
+            <span class="muted">4100×250 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=parapet-wewn">Calculează</a>
+        </li><li id="listwa-mdf-2_5" data-find="plinta mdf 2,5 m listwa-mdf-2_5">
+          <span class="mat-item">
+            <b>Plintă MDF 2,5 m</b>
+            <span class="muted">bară 2,5 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=listwa-mdf-2_5">Calculează</a>
+        </li><li id="cokol-pvc-2_5" data-find="plinta pvc 2,5 m cokol-pvc-2_5">
+          <span class="mat-item">
+            <b>Plintă PVC 2,5 m</b>
+            <span class="muted">bară 2,5 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=cokol-pvc-2_5">Calculează</a>
+        </li><li id="cwierc-2_5" data-find="bagheta sfert de cerc / colt 2,5 m cwierc-2_5">
+          <span class="mat-item">
+            <b>Baghetă sfert de cerc / colț 2,5 m</b>
+            <span class="muted">bară 2,5 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=cwierc-2_5">Calculează</a>
+        </li><li id="listwa-prog-alu-0_9" data-find="profil de trecere din aluminiu 0,9 m listwa-prog-alu-0_9">
+          <span class="mat-item">
+            <b>Profil de trecere din aluminiu 0,9 m</b>
+            <span class="muted">bară 0,9 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=listwa-prog-alu-0_9">Calculează</a>
+        </li><li id="parapet-zewn-2" data-find="glaf exterior din otel 2 m parapet-zewn-2">
+          <span class="mat-item">
+            <b>Glaf exterior din oțel 2 m</b>
+            <span class="muted">bară 2 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=parapet-zewn-2">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-PAINT">Vopsele și lacuri</h2>
+        <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="vopsea de perete 2,5 l farba-scienna-2_5">
+          <span class="mat-item">
+            <b>Vopsea de perete 2,5 l</b>
+            <span class="muted">2,5 l · ~10 m²/l · 25 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-scienna-2_5">Calculează</a>
+        </li><li id="farba-scienna-5" data-find="vopsea de perete 5 l farba-scienna-5">
+          <span class="mat-item">
+            <b>Vopsea de perete 5 l</b>
+            <span class="muted">5 l · ~10 m²/l · 50 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-scienna-5">Calculează</a>
+        </li><li id="farba-scienna-10" data-find="vopsea de perete 10 l farba-scienna-10">
+          <span class="mat-item">
+            <b>Vopsea de perete 10 l</b>
+            <span class="muted">10 l · ~10 m²/l · 100 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-scienna-10">Calculează</a>
+        </li><li id="farba-lateks-5" data-find="vopsea lavabila latex 5 l farba-lateks-5">
+          <span class="mat-item">
+            <b>Vopsea lavabilă latex 5 l</b>
+            <span class="muted">5 l · ~10 m²/l · 50 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-lateks-5">Calculează</a>
+        </li><li id="farba-sufitowa-10" data-find="vopsea de tavan 10 l farba-sufitowa-10">
+          <span class="mat-item">
+            <b>Vopsea de tavan 10 l</b>
+            <span class="muted">10 l · ~11 m²/l · 110 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-sufitowa-10">Calculează</a>
+        </li><li id="farba-kl-2_5" data-find="vopsea pentru bucatarie si baie 2,5 l farba-kl-2_5">
+          <span class="mat-item">
+            <b>Vopsea pentru bucătărie și baie 2,5 l</b>
+            <span class="muted">2,5 l · ~12 m²/l · 30 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-kl-2_5">Calculează</a>
+        </li><li id="farba-beton-5" data-find="vopsea pentru beton si pardoseli 5 l farba-beton-5">
+          <span class="mat-item">
+            <b>Vopsea pentru beton și pardoseli 5 l</b>
+            <span class="muted">5 l · ~8 m²/l · 40 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-beton-5">Calculează</a>
+        </li><li id="farba-elew-akr-10" data-find="vopsea de fatada acrilica 10 l farba-elew-akr-10">
+          <span class="mat-item">
+            <b>Vopsea de fațadă acrilică 10 l</b>
+            <span class="muted">10 l · ~5 m²/l · 50 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-elew-akr-10">Calculează</a>
+        </li><li id="farba-elew-sil-10" data-find="vopsea de fatada siliconica 10 l farba-elew-sil-10">
+          <span class="mat-item">
+            <b>Vopsea de fațadă siliconică 10 l</b>
+            <span class="muted">10 l · ~6 m²/l · 60 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-elew-sil-10">Calculează</a>
+        </li><li id="emalia-0_75" data-find="email pentru lemn si metal 0,75 l emalia-0_75">
+          <span class="mat-item">
+            <b>Email pentru lemn și metal 0,75 l</b>
+            <span class="muted">0,75 l · ~12 m²/l · 9 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=emalia-0_75">Calculează</a>
+        </li><li id="emalia-2_5" data-find="email pentru lemn si metal 2,5 l emalia-2_5">
+          <span class="mat-item">
+            <b>Email pentru lemn și metal 2,5 l</b>
+            <span class="muted">2,5 l · ~12 m²/l · 30 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=emalia-2_5">Calculează</a>
+        </li><li id="farba-antykor-0_75" data-find="vopsea anticoroziva 3in1 0,75 l farba-antykor-0_75">
+          <span class="mat-item">
+            <b>Vopsea anticorozivă 3în1 0,75 l</b>
+            <span class="muted">0,75 l · ~10 m²/l · 7,5 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=farba-antykor-0_75">Calculează</a>
+        </li><li id="lakierobejca-2_5" data-find="bait lac 2,5 l lakierobejca-2_5">
+          <span class="mat-item">
+            <b>Baiț lac 2,5 l</b>
+            <span class="muted">2,5 l · ~12 m²/l · 30 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=lakierobejca-2_5">Calculează</a>
+        </li><li id="lakier-bezb-2_5" data-find="lac incolor 2,5 l lakier-bezb-2_5">
+          <span class="mat-item">
+            <b>Lac incolor 2,5 l</b>
+            <span class="muted">2,5 l · ~12 m²/l · 30 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=lakier-bezb-2_5">Calculează</a>
+        </li><li id="impregnat-5" data-find="impregnant pentru lemn 5 l impregnat-5">
+          <span class="mat-item">
+            <b>Impregnant pentru lemn 5 l</b>
+            <span class="muted">5 l · ~10 m²/l · 50 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=impregnat-5">Calculează</a>
+        </li><li id="olej-taras-2_5" data-find="ulei pentru terase 2,5 l olej-taras-2_5">
+          <span class="mat-item">
+            <b>Ulei pentru terase 2,5 l</b>
+            <span class="muted">2,5 l · ~12 m²/l · 30 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=olej-taras-2_5">Calculează</a>
+        </li><li id="grunt-gleb-5" data-find="amorsa de penetrare adanca 5 l grunt-gleb-5">
+          <span class="mat-item">
+            <b>Amorsă de penetrare adâncă 5 l</b>
+            <span class="muted">5 l · ~7 m²/l · 35 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=grunt-gleb-5">Calculează</a>
+        </li><li id="grunt-mleczko-5" data-find="amorsa sub vopsea 5 l grunt-mleczko-5">
+          <span class="mat-item">
+            <b>Amorsă sub vopsea 5 l</b>
+            <span class="muted">5 l · ~8 m²/l · 40 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=grunt-mleczko-5">Calculează</a>
+        </li><li id="grunt-kwarc-5" data-find="amorsa cuartoasa sub tencuiala 5 l grunt-kwarc-5">
+          <span class="mat-item">
+            <b>Amorsă cuarțoasă sub tencuială 5 l</b>
+            <span class="muted">5 l · ~4 m²/l · 20 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=grunt-kwarc-5">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-CHEMICALS">Chimicale pentru construcții</h2>
+        <ul class="mat-page-list"><li id="gladz-gips-20" data-find="glet de ipsos 20 kg gladz-gips-20">
+          <span class="mat-item">
+            <b>Glet de ipsos 20 kg</b>
+            <span class="muted">20 kg · ~1 kg/m² (strat de 1 mm) · 20 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=gladz-gips-20">Calculează</a>
+        </li><li id="gladz-polim-20" data-find="glet polimeric 20 kg gladz-polim-20">
+          <span class="mat-item">
+            <b>Glet polimeric 20 kg</b>
+            <span class="muted">20 kg · ~1,2 kg/m² (strat de 1 mm) · 16,67 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=gladz-polim-20">Calculează</a>
+        </li><li id="gladz-gotowa-18" data-find="glet gata preparat 18 kg gladz-gotowa-18">
+          <span class="mat-item">
+            <b>Glet gata preparat 18 kg</b>
+            <span class="muted">18 kg · ~1,2 kg/m² (strat de 1 mm) · 15 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=gladz-gotowa-18">Calculează</a>
+        </li><li id="tynk-gips-30" data-find="tencuiala de ipsos 30 kg tynk-gips-30">
+          <span class="mat-item">
+            <b>Tencuială de ipsos 30 kg</b>
+            <span class="muted">30 kg · ~8,5 kg/m² (strat de 10 mm) · 3,53 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=tynk-gips-30">Calculează</a>
+        </li><li id="tynk-cw-30" data-find="tencuiala var-ciment 30 kg tynk-cw-30">
+          <span class="mat-item">
+            <b>Tencuială var-ciment 30 kg</b>
+            <span class="muted">30 kg · ~15 kg/m² (strat de 10 mm) · 2 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=tynk-cw-30">Calculează</a>
+        </li><li id="tynk-mozaik-25" data-find="tencuiala mozaicata 25 kg tynk-mozaik-25">
+          <span class="mat-item">
+            <b>Tencuială mozaicată 25 kg</b>
+            <span class="muted">25 kg · ~5 kg/m² (un strat) · 5 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=tynk-mozaik-25">Calculează</a>
+        </li><li id="tynk-baranek-25" data-find="tencuiala decorativa 1,5 mm · 25 kg tynk-baranek-25">
+          <span class="mat-item">
+            <b>Tencuială decorativă 1,5 mm · 25 kg</b>
+            <span class="muted">25 kg · ~2,5 kg/m² (strat de 1,5 mm) · 10 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=tynk-baranek-25">Calculează</a>
+        </li><li id="tynk-silik-25" data-find="tencuiala siliconica 1,5 mm · 25 kg tynk-silik-25">
+          <span class="mat-item">
+            <b>Tencuială siliconică 1,5 mm · 25 kg</b>
+            <span class="muted">25 kg · ~2,5 kg/m² (strat de 1,5 mm) · 10 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=tynk-silik-25">Calculează</a>
+        </li><li id="tynk-akryl-25" data-find="tencuiala acrilica 1,5 mm · 25 kg tynk-akryl-25">
+          <span class="mat-item">
+            <b>Tencuială acrilică 1,5 mm · 25 kg</b>
+            <span class="muted">25 kg · ~2,5 kg/m² (strat de 1,5 mm) · 10 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=tynk-akryl-25">Calculează</a>
+        </li><li id="klej-c1-25" data-find="adeziv pentru placi c1 25 kg klej-c1-25">
+          <span class="mat-item">
+            <b>Adeziv pentru plăci C1 25 kg</b>
+            <span class="muted">25 kg · ~4 kg/m² (gletieră 6 mm) · 6,25 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=klej-c1-25">Calculează</a>
+        </li><li id="klej-c2-25" data-find="adeziv flexibil c2 25 kg klej-c2-25">
+          <span class="mat-item">
+            <b>Adeziv flexibil C2 25 kg</b>
+            <span class="muted">25 kg · ~5 kg/m² (gletieră 10 mm) · 5 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=klej-c2-25">Calculează</a>
+        </li><li id="klej-styro-25" data-find="adeziv pentru polistiren si plasa 25 kg klej-styro-25">
+          <span class="mat-item">
+            <b>Adeziv pentru polistiren și plasă 25 kg</b>
+            <span class="muted">25 kg · ~4,5 kg/m² (strat de armare) · 5,56 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=klej-styro-25">Calculează</a>
+        </li><li id="zaprawa-mur-25" data-find="mortar de zidarie 25 kg zaprawa-mur-25">
+          <span class="mat-item">
+            <b>Mortar de zidărie 25 kg</b>
+            <span class="muted">25 kg · ~25 kg/m² (rost de 10 mm) · 1 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=zaprawa-mur-25">Calculează</a>
+        </li><li id="wylewka-samop-25" data-find="sapa autonivelanta 25 kg wylewka-samop-25">
+          <span class="mat-item">
+            <b>Șapă autonivelantă 25 kg</b>
+            <span class="muted">25 kg · ~1,6 kg/m² (strat de 1 mm) · 15,63 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=wylewka-samop-25">Calculează</a>
+        </li><li id="fuga-5" data-find="chit de rosturi 5 kg fuga-5">
+          <span class="mat-item">
+            <b>Chit de rosturi 5 kg</b>
+            <span class="muted">5 kg · ~0,5 kg/m² (rost de 3 mm) · 10 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=fuga-5">Calculează</a>
+        </li><li id="hydroizol-15" data-find="hidroizolatie lichida 15 kg hydroizol-15">
+          <span class="mat-item">
+            <b>Hidroizolație lichidă 15 kg</b>
+            <span class="muted">15 kg · ~3 kg/m² (2 straturi) · 5 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=hydroizol-15">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-BOARDS">Plăci</h2>
+        <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="placa gips-carton standard 1200×2600 gk-zwykla-2600">
+          <span class="mat-item">
+            <b>Placă gips-carton standard 1200×2600</b>
+            <span class="muted">1200×2600 mm · 3,12 m²/buc</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gk-zwykla-2600">Calculează</a>
+        </li><li id="gk-zwykla-2000" data-find="placa gips-carton standard 1200×2000 gk-zwykla-2000">
+          <span class="mat-item">
+            <b>Placă gips-carton standard 1200×2000</b>
+            <span class="muted">1200×2000 mm · 2,4 m²/buc</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gk-zwykla-2000">Calculează</a>
+        </li><li id="gk-impreg-2600" data-find="placa gips-carton rezistenta la umiditate 1200×2600 gk-impreg-2600">
+          <span class="mat-item">
+            <b>Placă gips-carton rezistentă la umiditate 1200×2600</b>
+            <span class="muted">1200×2600 mm · 3,12 m²/buc</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gk-impreg-2600">Calculează</a>
+        </li><li id="gk-ogniowa-2600" data-find="placa gips-carton ignifuga 1200×2600 gk-ogniowa-2600">
+          <span class="mat-item">
+            <b>Placă gips-carton ignifugă 1200×2600</b>
+            <span class="muted">1200×2600 mm · 3,12 m²/buc</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gk-ogniowa-2600">Calculează</a>
+        </li><li id="gk-gksf-2600" data-find="placa gips-carton foc + umiditate (gkfi) 1200×2600 gk-gksf-2600">
+          <span class="mat-item">
+            <b>Placă gips-carton foc + umiditate (GKFI) 1200×2600</b>
+            <span class="muted">1200×2600 mm · 3,12 m²/buc</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/gresie-faianta-parchet/?m=gk-gksf-2600">Calculează</a>
+        </li><li id="plyta-lam-2800" data-find="pal melaminat 2800×2070 plyta-lam-2800">
+          <span class="mat-item">
+            <b>PAL melaminat 2800×2070</b>
+            <span class="muted">2800×2070 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=plyta-lam-2800">Calculează</a>
+        </li><li id="plyta-lam-3660" data-find="pal melaminat 3660×1830 plyta-lam-3660">
+          <span class="mat-item">
+            <b>PAL melaminat 3660×1830</b>
+            <span class="muted">3660×1830 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=plyta-lam-3660">Calculează</a>
+        </li><li id="mdf-2800" data-find="mdf brut 2800×2070 mdf-2800">
+          <span class="mat-item">
+            <b>MDF brut 2800×2070</b>
+            <span class="muted">2800×2070 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=mdf-2800">Calculează</a>
+        </li><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800">
+          <span class="mat-item">
+            <b>HDF 2800×2070</b>
+            <span class="muted">2800×2070 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=hdf-2800">Calculează</a>
+        </li><li id="wior-surowa" data-find="pal brut 2800×2070 wior-surowa">
+          <span class="mat-item">
+            <b>PAL brut 2800×2070</b>
+            <span class="muted">2800×2070 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=wior-surowa">Calculează</a>
+        </li><li id="mfp-2500" data-find="placa mfp 2500×1250 mfp-2500">
+          <span class="mat-item">
+            <b>Placă MFP 2500×1250</b>
+            <span class="muted">2500×1250 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=mfp-2500">Calculează</a>
+        </li><li id="sklejka-lisc" data-find="placaj din esenta tare 2500×1250 sklejka-lisc">
+          <span class="mat-item">
+            <b>Placaj din esență tare 2500×1250</b>
+            <span class="muted">2500×1250 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=sklejka-lisc">Calculează</a>
+        </li><li id="sklejka-brzoza" data-find="placaj din mesteacan 1525×1525 sklejka-brzoza">
+          <span class="mat-item">
+            <b>Placaj din mesteacăn 1525×1525</b>
+            <span class="muted">1525×1525 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=sklejka-brzoza">Calculează</a>
+        </li><li id="sklejka-wodo" data-find="placaj rezistent la apa 3000×1500 sklejka-wodo">
+          <span class="mat-item">
+            <b>Placaj rezistent la apă 3000×1500</b>
+            <span class="muted">3000×1500 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=sklejka-wodo">Calculează</a>
+        </li><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500">
+          <span class="mat-item">
+            <b>OSB-3 2500×1250</b>
+            <span class="muted">2500×1250 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=osb3-2500">Calculează</a>
+        </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800">
+          <span class="mat-item">
+            <b>OSB-3 2800×1250</b>
+            <span class="muted">2800×1250 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=osb3-2800">Calculează</a>
+        </li><li id="cetris-3350" data-find="placa cimentata 3350×1250 cetris-3350">
+          <span class="mat-item">
+            <b>Placă cimentată 3350×1250</b>
+            <span class="muted">3350×1250 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=cetris-3350">Calculează</a>
+        </li><li id="fermacell-1500" data-find="placa fibro-gips 1500×1000 fermacell-1500">
+          <span class="mat-item">
+            <b>Placă fibro-gips 1500×1000</b>
+            <span class="muted">1500×1000 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=fermacell-1500">Calculează</a>
+        </li><li id="szalunek-2000" data-find="placaj de cofraj 2000×1000 szalunek-2000">
+          <span class="mat-item">
+            <b>Placaj de cofraj 2000×1000</b>
+            <span class="muted">2000×1000 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=szalunek-2000">Calculează</a>
+        </li><li id="blat-postform" data-find="blat de bucatarie postforming 4100×600 blat-postform">
+          <span class="mat-item">
+            <b>Blat de bucătărie postforming 4100×600</b>
+            <span class="muted">4100×600 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=blat-postform">Calculează</a>
+        </li><li id="blat-38-4100" data-find="blat laminat 38 mm · 4100×920 blat-38-4100">
+          <span class="mat-item">
+            <b>Blat laminat 38 mm · 4100×920</b>
+            <span class="muted">4100×920 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=blat-38-4100">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-WOOD">Lemn</h2>
+        <ul class="mat-page-list"><li id="kantowka-45-3" data-find="grinda rindeluita 45×45 · 3 m kantowka-45-3">
+          <span class="mat-item">
+            <b>Grindă rindeluită 45×45 · 3 m</b>
+            <span class="muted">bară 3 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=kantowka-45-3">Calculează</a>
+        </li><li id="lata-4x5-4" data-find="sipca 40×50 · 4 m lata-4x5-4">
+          <span class="mat-item">
+            <b>Șipcă 40×50 · 4 m</b>
+            <span class="muted">bară 4 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=lata-4x5-4">Calculează</a>
+        </li><li id="krokiew-2" data-find="caprior 70×140 · 6 m krokiew-2">
+          <span class="mat-item">
+            <b>Căprior 70×140 · 6 m</b>
+            <span class="muted">bară 6 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=krokiew-2">Calculează</a>
+        </li><li id="deska-taras-3" data-find="deck de terasa 3 m deska-taras-3">
+          <span class="mat-item">
+            <b>Deck de terasă 3 m</b>
+            <span class="muted">bară 3 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=deska-taras-3">Calculează</a>
+        </li><li id="deska-wpc-4" data-find="deck wpc 4 m deska-wpc-4">
+          <span class="mat-item">
+            <b>Deck WPC 4 m</b>
+            <span class="muted">bară 4 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=deska-wpc-4">Calculează</a>
+        </li><li id="deska-elew-3" data-find="scandura de fatada 3 m deska-elew-3">
+          <span class="mat-item">
+            <b>Scândură de fațadă 3 m</b>
+            <span class="muted">bară 3 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=deska-elew-3">Calculează</a>
+        </li><li id="sztacheta-1_5" data-find="sipca de gard 1,5 m sztacheta-1_5">
+          <span class="mat-item">
+            <b>Șipcă de gard 1,5 m</b>
+            <span class="muted">bară 1,5 m · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=sztacheta-1_5">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-PROFILES">Profile gips-carton</h2>
+        <ul class="mat-page-list"><li id="cd60-3" data-find="profil de tavan cd60 3 m cd60-3">
+          <span class="mat-item">
+            <b>Profil de tavan CD60 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=cd60-3">Calculează</a>
+        </li><li id="cd60-4" data-find="profil de tavan cd60 4 m cd60-4">
+          <span class="mat-item">
+            <b>Profil de tavan CD60 4 m</b>
+            <span class="muted">bară 4 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=cd60-4">Calculează</a>
+        </li><li id="ud27-3" data-find="profil perimetral ud27 3 m ud27-3">
+          <span class="mat-item">
+            <b>Profil perimetral UD27 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=ud27-3">Calculează</a>
+        </li><li id="cw50-3" data-find="profil de perete cw50 · 3 m cw50-3">
+          <span class="mat-item">
+            <b>Profil de perete CW50 · 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=cw50-3">Calculează</a>
+        </li><li id="uw50-3" data-find="profil de perete uw50 · 3 m uw50-3">
+          <span class="mat-item">
+            <b>Profil de perete UW50 · 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=uw50-3">Calculează</a>
+        </li><li id="cw75-3" data-find="profil de perete cw75 · 3 m cw75-3">
+          <span class="mat-item">
+            <b>Profil de perete CW75 · 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=cw75-3">Calculează</a>
+        </li><li id="cw100-3" data-find="profil de perete cw100 · 3 m cw100-3">
+          <span class="mat-item">
+            <b>Profil de perete CW100 · 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=cw100-3">Calculează</a>
+        </li><li id="ua50-3" data-find="profil de rigidizare ua50 · 3 m ua50-3">
+          <span class="mat-item">
+            <b>Profil de rigidizare UA50 · 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=ua50-3">Calculează</a>
+        </li><li id="ua75-3" data-find="profil de rigidizare ua75 · 3 m ua75-3">
+          <span class="mat-item">
+            <b>Profil de rigidizare UA75 · 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=ua75-3">Calculează</a>
+        </li><li id="narozny-alu-2_5" data-find="coltar din aluminiu 2,5 m narozny-alu-2_5">
+          <span class="mat-item">
+            <b>Colțar din aluminiu 2,5 m</b>
+            <span class="muted">bară 2,5 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=narozny-alu-2_5">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-METAL">Metal și armătură</h2>
+        <ul class="mat-page-list"><li id="blacha-stal" data-find="tabla de otel 2000×1000 blacha-stal">
+          <span class="mat-item">
+            <b>Tablă de oțel 2000×1000</b>
+            <span class="muted">2000×1000 mm · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=blacha-stal">Calculează</a>
+        </li><li id="blacha-alu" data-find="tabla de aluminiu 2500×1250 blacha-alu">
+          <span class="mat-item">
+            <b>Tablă de aluminiu 2500×1250</b>
+            <span class="muted">2500×1250 mm · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=blacha-alu">Calculează</a>
+        </li><li id="blacha-ocynk" data-find="tabla zincata 2000×1000 blacha-ocynk">
+          <span class="mat-item">
+            <b>Tablă zincată 2000×1000</b>
+            <span class="muted">2000×1000 mm · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=blacha-ocynk">Calculează</a>
+        </li><li id="katownik-alu-2" data-find="cornier din aluminiu 2 m katownik-alu-2">
+          <span class="mat-item">
+            <b>Cornier din aluminiu 2 m</b>
+            <span class="muted">bară 2 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=katownik-alu-2">Calculează</a>
+        </li><li id="ceownik-stal-3" data-find="profil u din otel 3 m ceownik-stal-3">
+          <span class="mat-item">
+            <b>Profil U din oțel 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=ceownik-stal-3">Calculează</a>
+        </li><li id="profil-kwadr-3" data-find="teava rectangulara 30×30 · 3 m profil-kwadr-3">
+          <span class="mat-item">
+            <b>Țeavă rectangulară 30×30 · 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=profil-kwadr-3">Calculează</a>
+        </li><li id="pret-8-12" data-find="bara de armatura ø8 · 12 m pret-8-12">
+          <span class="mat-item">
+            <b>Bară de armătură Ø8 · 12 m</b>
+            <span class="muted">bară 12 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=pret-8-12">Calculează</a>
+        </li><li id="pret-10-12" data-find="bara de armatura ø10 · 12 m pret-10-12">
+          <span class="mat-item">
+            <b>Bară de armătură Ø10 · 12 m</b>
+            <span class="muted">bară 12 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=pret-10-12">Calculează</a>
+        </li><li id="pret-12-12" data-find="bara de armatura ø12 · 12 m pret-12-12">
+          <span class="mat-item">
+            <b>Bară de armătură Ø12 · 12 m</b>
+            <span class="muted">bară 12 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=pret-12-12">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-GLASS">Sticlă și plastic</h2>
+        <ul class="mat-page-list"><li id="plexi-3050" data-find="plexiglas (pmma) 3050×2050 plexi-3050">
+          <span class="mat-item">
+            <b>Plexiglas (PMMA) 3050×2050</b>
+            <span class="muted">3050×2050 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=plexi-3050">Calculează</a>
+        </li><li id="poliweglan" data-find="policarbonat compact 3050×2050 poliweglan">
+          <span class="mat-item">
+            <b>Policarbonat compact 3050×2050</b>
+            <span class="muted">3050×2050 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=poliweglan">Calculează</a>
+        </li><li id="poliweglan-kom" data-find="policarbonat celular 2100×6000 poliweglan-kom">
+          <span class="mat-item">
+            <b>Policarbonat celular 2100×6000</b>
+            <span class="muted">2100×6000 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=poliweglan-kom">Calculează</a>
+        </li><li id="hpl" data-find="placa hpl compact 3050×1300 hpl">
+          <span class="mat-item">
+            <b>Placă HPL compact 3050×1300</b>
+            <span class="muted">3050×1300 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=hpl">Calculează</a>
+        </li><li id="dibond" data-find="dibond 3050×1500 dibond">
+          <span class="mat-item">
+            <b>Dibond 3050×1500</b>
+            <span class="muted">3050×1500 mm · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=dibond">Calculează</a>
+        </li><li id="pcv-spienione" data-find="pvc expandat 3050×1560 pcv-spienione">
+          <span class="mat-item">
+            <b>PVC expandat 3050×1560</b>
+            <span class="muted">3050×1560 mm · tăietură 3 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=pcv-spienione">Calculează</a>
+        </li><li id="szklo-jumbo" data-find="sticla float 3210×2250 szklo-jumbo">
+          <span class="mat-item">
+            <b>Sticlă float 3210×2250</b>
+            <span class="muted">3210×2250 mm · tăietură 0 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=szklo-jumbo">Calculează</a>
+        </li><li id="szklo-2550" data-find="sticla float 2550×1605 szklo-2550">
+          <span class="mat-item">
+            <b>Sticlă float 2550×1605</b>
+            <span class="muted">2550×1605 mm · tăietură 0 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=szklo-2550">Calculează</a>
+        </li><li id="lustro-2550" data-find="oglinda 2550×1605 lustro-2550">
+          <span class="mat-item">
+            <b>Oglindă 2550×1605</b>
+            <span class="muted">2550×1605 mm · tăietură 0 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=lustro-2550">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-TEXTILES">Textile și tapițerie</h2>
+        <ul class="mat-page-list"><li id="tkanina-140" data-find="textila din balot, latime 140 cm tkanina-140">
+          <span class="mat-item">
+            <b>Textilă din balot, lățime 140 cm</b>
+            <span class="muted">1400×3000 mm · tăietură 0 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=tkanina-140">Calculează</a>
+        </li><li id="tkanina-150" data-find="textila din balot, latime 150 cm tkanina-150">
+          <span class="mat-item">
+            <b>Textilă din balot, lățime 150 cm</b>
+            <span class="muted">1500×3000 mm · tăietură 0 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=tkanina-150">Calculează</a>
+        </li><li id="ekoskora-140" data-find="piele ecologica din rola, latime 140 cm ekoskora-140">
+          <span class="mat-item">
+            <b>Piele ecologică din rolă, lățime 140 cm</b>
+            <span class="muted">1400×3000 mm · tăietură 0 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=ekoskora-140">Calculează</a>
+        </li><li id="skora-nat" data-find="piele naturala – foaie 2200×1200 skora-nat">
+          <span class="mat-item">
+            <b>Piele naturală – foaie 2200×1200</b>
+            <span class="muted">2200×1200 mm · tăietură 0 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=skora-nat">Calculează</a>
+        </li><li id="pianka-tap" data-find="burete de tapiterie – bloc 2000×1200 pianka-tap">
+          <span class="mat-item">
+            <b>Burete de tapițerie – bloc 2000×1200</b>
+            <span class="muted">2000×1200 mm · tăietură 5 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-placi-2d/?m=pianka-tap">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-INSULATION">Izolație</h2>
+        <ul class="mat-page-list"><li id="welna-10" data-find="vata minerala 10 cm welna-10">
+          <span class="mat-item">
+            <b>Vată minerală 10 cm</b>
+            <span class="muted">pachet ≈ 6 m² · 10 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=welna-10">Calculează</a>
+        </li><li id="welna-15" data-find="vata minerala 15 cm welna-15">
+          <span class="mat-item">
+            <b>Vată minerală 15 cm</b>
+            <span class="muted">pachet ≈ 4,5 m² · 15 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=welna-15">Calculează</a>
+        </li><li id="welna-podd-20" data-find="vata pentru mansarda 20 cm welna-podd-20">
+          <span class="mat-item">
+            <b>Vată pentru mansardă 20 cm</b>
+            <span class="muted">pachet ≈ 3,5 m² · 20 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=welna-podd-20">Calculează</a>
+        </li><li id="welna-fasada-15" data-find="vata de fatada 15 cm welna-fasada-15">
+          <span class="mat-item">
+            <b>Vată de fațadă 15 cm</b>
+            <span class="muted">pachet ≈ 2 m² · 15 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=welna-fasada-15">Calculează</a>
+        </li><li id="styropian-5" data-find="polistiren eps 5 cm styropian-5">
+          <span class="mat-item">
+            <b>Polistiren EPS 5 cm</b>
+            <span class="muted">pachet ≈ 3 m² · 5 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=styropian-5">Calculează</a>
+        </li><li id="styropian-fasada-10" data-find="eps de fatada 10 cm styropian-fasada-10">
+          <span class="mat-item">
+            <b>EPS de fațadă 10 cm</b>
+            <span class="muted">pachet ≈ 3 m² · 10 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=styropian-fasada-10">Calculează</a>
+        </li><li id="styropian-fasada-15" data-find="eps de fatada 15 cm styropian-fasada-15">
+          <span class="mat-item">
+            <b>EPS de fațadă 15 cm</b>
+            <span class="muted">pachet ≈ 2 m² · 15 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=styropian-fasada-15">Calculează</a>
+        </li><li id="styropian-podloga-10" data-find="eps de pardoseala eps 100 · 10 cm styropian-podloga-10">
+          <span class="mat-item">
+            <b>EPS de pardoseală EPS 100 · 10 cm</b>
+            <span class="muted">pachet ≈ 3 m² · EPS 100 · 10 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=styropian-podloga-10">Calculează</a>
+        </li><li id="xps-5" data-find="placa xps 5 cm xps-5">
+          <span class="mat-item">
+            <b>Placă XPS 5 cm</b>
+            <span class="muted">pachet ≈ 5,5 m² · 5 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=xps-5">Calculează</a>
+        </li><li id="pir-10" data-find="placa pir 10 cm pir-10">
+          <span class="mat-item">
+            <b>Placă PIR 10 cm</b>
+            <span class="muted">pachet ≈ 5,7 m² · 10 cm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=pir-10">Calculează</a>
+        </li><li id="papa-rolka" data-find="membrana bituminoasa suport 20 m² papa-rolka">
+          <span class="mat-item">
+            <b>Membrană bituminoasă suport 20 m²</b>
+            <span class="muted">pachet ≈ 20 m² · 20 m²</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=papa-rolka">Calculează</a>
+        </li><li id="folia-paro" data-find="bariera de vapori 75 m² folia-paro">
+          <span class="mat-item">
+            <b>Barieră de vapori 75 m²</b>
+            <span class="muted">pachet ≈ 75 m² · 75 m²</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=folia-paro">Calculează</a>
+        </li><li id="membrana-dach" data-find="membrana pentru acoperis 75 m² membrana-dach">
+          <span class="mat-item">
+            <b>Membrană pentru acoperiș 75 m²</b>
+            <span class="muted">pachet ≈ 75 m² · 75 m²</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/vopsea-tencuiala-grund/?m=membrana-dach">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-PLUMBING">Instalații și ventilație</h2>
+        <ul class="mat-page-list"><li id="rura-pp-4" data-find="teava pp 4 m rura-pp-4">
+          <span class="mat-item">
+            <b>Țeavă PP 4 m</b>
+            <span class="muted">bară 4 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=rura-pp-4">Calculează</a>
+        </li><li id="rura-pex-3" data-find="teava pex 3 m rura-pex-3">
+          <span class="mat-item">
+            <b>Țeavă PEX 3 m</b>
+            <span class="muted">bară 3 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=rura-pex-3">Calculează</a>
+        </li><li id="rura-cu-3" data-find="teava de cupru 3 m rura-cu-3">
+          <span class="mat-item">
+            <b>Țeavă de cupru 3 m</b>
+            <span class="muted">bară 3 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=rura-cu-3">Calculează</a>
+        </li><li id="rura-spust-3" data-find="burlan 3 m rura-spust-3">
+          <span class="mat-item">
+            <b>Burlan 3 m</b>
+            <span class="muted">bară 3 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=rura-spust-3">Calculează</a>
+        </li><li id="kanal-went-1" data-find="tubulatura de ventilatie 1 m kanal-went-1">
+          <span class="mat-item">
+            <b>Tubulatură de ventilație 1 m</b>
+            <span class="muted">bară 1 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=kanal-went-1">Calculează</a>
+        </li><li id="rura-kanal-110-2" data-find="teava de canalizare pvc 110 · 2 m rura-kanal-110-2">
+          <span class="mat-item">
+            <b>Țeavă de canalizare PVC 110 · 2 m</b>
+            <span class="muted">bară 2 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=rura-kanal-110-2">Calculează</a>
+        </li><li id="rura-kanal-50-2" data-find="teava de canalizare pvc 50 · 2 m rura-kanal-50-2">
+          <span class="mat-item">
+            <b>Țeavă de canalizare PVC 50 · 2 m</b>
+            <span class="muted">bară 2 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=rura-kanal-50-2">Calculează</a>
+        </li><li id="rynna-3" data-find="jgheab de acoperis 3 m rynna-3">
+          <span class="mat-item">
+            <b>Jgheab de acoperiș 3 m</b>
+            <span class="muted">bară 3 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=rynna-3">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-ELECTRICAL">Electrice</h2>
+        <ul class="mat-page-list"><li id="korytko-2" data-find="jgheab de cabluri 2 m korytko-2">
+          <span class="mat-item">
+            <b>Jgheab de cabluri 2 m</b>
+            <span class="muted">bară 2 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=korytko-2">Calculează</a>
+        </li><li id="listwa-kabel-2" data-find="canal de cablu 2 m listwa-kabel-2">
+          <span class="mat-item">
+            <b>Canal de cablu 2 m</b>
+            <span class="muted">bară 2 m · tăietură 2 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=listwa-kabel-2">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  <section class="block" data-cat-block>
+      <div class="wrap">
+        <h2 id="cat-OTHER">Altele</h2>
+        <ul class="mat-page-list"><li id="tapeta-standard" data-find="tapet – rola 0,53×10 m tapeta-standard">
+          <span class="mat-item">
+            <b>Tapet – rolă 0,53×10 m</b>
+            <span class="muted">0,53×10 m · 5,3 m²/amb.</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/tapet/?m=tapeta-standard">Calculează</a>
+        </li><li id="karnisz-2_4" data-find="galerie / bara 2,4 m karnisz-2_4">
+          <span class="mat-item">
+            <b>Galerie / bară 2,4 m</b>
+            <span class="muted">bară 2,4 m · tăietură 1 mm</span>
+          </span>
+          <a class="btn btn-ghost btn-sm" href="/ro/calculatoare/debitare-liniara-1d/?m=karnisz-2_4">Calculează</a>
+        </li></ul>
+      </div>
+    </section>
+  </div>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Aceeași formulă în aplicație</b> LiczMat pentru Android calculează offline cu același motor — cu catalogul de materiale și salvarea rezultatului în proiect.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Descarcă</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Calculator de materiale de construcții. Calculează. Planifică. Realizează.</p>
+      </div>
+      <div>
+        <h4>Produs</h4>
+        <ul>
+          <li><a href="/ro/calculatoare/">Toate calculatoarele</a></li>
+          <li><a href="/ro/materiale/">Materiale</a></li>
+          <li data-nav-level="liczmat"><a href="/ro/proiecte/">Proiecte</a></li>
+          <li><a href="/ro/deviz/">Deviz</a></li>
+          <li><a href="/ro/ghiduri/">Ghiduri</a></li>
+          <li><a href="/ro/magazine/">Magazine</a></li>
+          <li data-nav-level="pro"><a href="/ro/clienti/">Clienți</a></li>
+          <li data-nav-level="pro"><a href="/ro/comenzi/">Comenzi</a></li>
+          <li data-nav-level="pro"><a href="/ro/oferte/">Oferte</a></li>
+          <li data-nav-level="pro"><a href="/ro/termene/">Termene</a></li>
+          <li><a href="/ro/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Cont</h4>
+        <ul>
+          <li><a href="/ro/aplicatie/">Aplicația</a></li>
+          <li><a href="/app/" rel="nofollow">Contul meu</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Panou</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Informații legale</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Politica de confidențialitate</a></li>
+          <li><a href="/ro/cookies/">Cookie-uri</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Limbă">
+      <h4>Limbă</h4>
+      <ul>
+        <li><a href="/materialy/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/materialy/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/materialien/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/materials/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/materialy/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/materialy/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/materiale/" hreflang="ro" lang="ro" data-lang="ro" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/materijali/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/materijali/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/materialy/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Toate drepturile rezervate.</span>
+      <span>Rezultatele sunt estimative. Verifică înainte de cumpărare.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="De acord" hidden>
+  <p class="consent-text">Folosim Google Analytics ca să numărăm anonim traficul pe site și câți oameni merg la Google Play. Ești de acord?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Mai multe în politica de confidențialitate</a>
+    <a class="consent-more" href="/ro/cookies/">Cookie-uri</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Refuz</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">De acord</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/materialy/",
+  "uk": "/uk/materialy/",
+  "de": "/de/materialien/",
+  "en": "/en/materials/",
+  "cs": "/cs/materialy/",
+  "sk": "/sk/materialy/",
+  "ro": "/ro/materiale/",
+  "hr": "/hr/materijali/",
+  "sr": "/sr/materijali/",
+  "ru": "/ru/materialy/"
+};</script>
+<script src="/assets/i18n.ro.js?v=20260819i"></script>
+<script src="/assets/i18n-runtime.js?v=20260819i"></script>
+<script src="/assets/currency.js?v=20260819i"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819i"></script>
+
+<script src="/assets/materials.js?v=20260819i"></script>
+<script src="/assets/materials-ui.js?v=20260819i"></script>
+<script src="/assets/main.js?v=20260819i"></script>
+
+</body>
+</html>

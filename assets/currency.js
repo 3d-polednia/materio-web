@@ -32,11 +32,25 @@ const LM_CURRENCIES = ["PLN", "EUR", "USD", "UAH", "CZK", "RON", "RSD"];
 
 const LM_CURRENCY_KEY = "liczmat-currency";
 
-/** The currency a language starts with. Only a default — the visitor overrides it. */
-const LM_LANG_CURRENCY = { pl: "PLN", uk: "UAH", de: "EUR", en: "USD" };
+/**
+ * The currency a language starts with. Only a default — the visitor overrides it, and
+ * chapter VI is explicit that the two are independent (Deutsch + PLN is valid).
+ *
+ * Croatia is on the euro since 2023, so `hr` starts in EUR rather than in a kuna that no
+ * longer exists. `ru` starts in EUR too: the rouble is deliberately not a supported
+ * currency, because Stripe does not operate in Russia and a price nothing can charge is
+ * worse than a price in a currency the reader has to convert themselves.
+ */
+const LM_LANG_CURRENCY = {
+  pl: "PLN", uk: "UAH", de: "EUR", en: "USD",
+  cs: "CZK", sk: "EUR", ro: "RON", hr: "EUR", sr: "RSD", ru: "EUR",
+};
 
 /** Number formatting stays with the language: 1 234,56 in Polish, 1,234.56 in English. */
-const LM_LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
+const LM_LOCALE = {
+  pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US", cs: "cs-CZ",
+  sk: "sk-SK", ro: "ro-RO", hr: "hr-HR", sr: "sr-RS", ru: "ru-RU",
+};
 
 /** The language this page is written in. */
 function lmLang() {
