@@ -190,12 +190,13 @@ async function open(ctx, url, opts = {}) {
   if (opts.crm) plant["liczmat-crm-v1"] = JSON.stringify(opts.crm);
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
   if (opts.level) plant["liczmat-signed-in"] = opts.level;
-  /* Session 27 put a paywall in front of the Pro modules, and nothing grants Pro
-     (FIRESTORE_SYNC §9.2), so a browser that opened this page with nothing planted would
-     see the wall and not the tool. The preview is the door session 27 left in it —
-     `liczmat-pro-preview` in assets/plan.js — and it is on unless a test is looking at
-     the wall itself, which is what `preview: false` is for. */
-  if (opts.preview !== false) plant["liczmat-pro-preview"] = "1";
+  /* Session 27 put a paywall in front of the Pro modules, and session 28 removed the
+     preview that used to be the door through it — with a price on the wall, a local
+     switch that opens the modules for free is the wall contradicting itself.
+     So a test that wants the tool rather than the wall says so by planting the level
+     itself: `liczmat-signed-in` is what assets/paywall.js reads (lmReadLevel()), and
+     "pro" is what a real Pro account writes there. `pro: false` looks at the wall. */
+  if (opts.pro !== false && !opts.level) plant["liczmat-signed-in"] = "pro";
 
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
@@ -368,7 +369,7 @@ head("3b. the terminarz has no screen of its own to open");
 head("4. chapter XXV's paywall: the wall, the two rungs and the one door through it");
 {
   /* The wall, with nothing planted: a guest gets the paywall instead of the tool. */
-  const guest = await open(ctx, CAL, { workspace: workspace(), crm: crm(), preview: false });
+  const guest = await open(ctx, CAL, { workspace: workspace(), crm: crm(), pro: false });
   eq("the module is replaced by the wall", await guest.$eval("#cal-tool", (n) => n.hidden), true);
   eq("and the wall is on screen", await guest.$eval("#cal-gate", (n) => n.hidden), false);
   eq("the strip above it is gone — the wall says all of it",
@@ -384,46 +385,47 @@ head("4. chapter XXV's paywall: the wall, the two rungs and the one door through
   await guest.close();
 
   /* A free account meets the same wall and the other rung. */
-  const free = await open(ctx, CAL, { workspace: workspace(), crm: crm(), level: "liczmat", preview: false });
+  const free = await open(ctx, CAL, { workspace: workspace(), crm: crm(), level: "liczmat", pro: false });
   eq("the wall stands for a free account too",
     await free.$eval("#cal-gate", (n) => n.hidden), false);
   eq("and it is told its plan rather than told to sign up",
     await free.$eval('#cal-gate [data-pw-step="upgrade"]', (n) => n.hidden), false);
 
-  /* The one door through it: the preview, clicked. The page must open without a reload. */
-  await free.click('#cal-gate [data-pw-preview]');
-  await free.waitForSelector("#cal-tool:not([hidden])");
-  eq("the wall comes down", await free.$eval("#cal-gate", (n) => n.hidden), true);
-  eq("the strip comes back", await free.$eval("#cal-pro", (n) => n.hidden), false);
-  check("saying a preview is running, not a plan",
-    (await free.textContent("#cal-pro-chip")) === (await free.evaluate(() => t("pro_prev_chip"))),
-    await free.textContent("#cal-pro-chip"));
-  eq("with the sentence that says the account did not change",
-    await free.$eval("#cal-pro-note", (n) => n.hidden), false);
-  eq("the chip is not the one a paying account gets",
-    await free.$eval("#cal-pro-chip", (n) => n.classList.contains("on")), false);
-  eq("and the preview is remembered",
-    await free.evaluate(() => localStorage.getItem("liczmat-pro-preview")), "1");
-
-  /* And back: the way out is next to the reminder, and it puts the wall up again. */
-  await free.click('#cal-pro [data-pw-preview]');
-  await free.waitForSelector("#cal-gate:not([hidden])");
-  eq("turning the preview off restores the wall",
-    await free.$eval("#cal-tool", (n) => n.hidden), true);
-  eq("and forgets it", await free.evaluate(() => localStorage.getItem("liczmat-pro-preview")), null);
+  /* Session 28: the wall quotes a price instead of offering a way round itself. The
+     amounts come from assets/pay.js in the visitor's currency, and no Payment Link is
+     configured, so the page says the subscription is not open yet — and offers no
+     button that would take money. */
+  eq("the monthly plan is priced", await free.$eval('#cal-gate [data-pw-plan="monthly"]', (n) => n.hidden), false);
+  eq("and the yearly one", await free.$eval('#cal-gate [data-pw-plan="yearly"]', (n) => n.hidden), false);
+  check("with a real amount in it",
+    /[0-9]/.test(await free.$eval('#cal-gate [data-pw-plan="monthly"] [data-pw-price]', (n) => n.textContent)),
+    await free.$eval('#cal-gate [data-pw-plan="monthly"] [data-pw-price]', (n) => n.textContent));
+  eq("the site says the subscription is not open yet",
+    await free.$eval("#cal-gate [data-pw-soon]", (n) => n.hidden), false);
+  eq("and offers nothing to click that would charge",
+    await free.$eval("#cal-gate [data-pw-buy]", (n) => n.hidden), true);
+  check("no Stripe link stands on this page",
+    (await free.content()).indexOf("stripe.com") === -1);
+  /* The wall stays up. Nothing on this page can open it — the level is the only input,
+     and it comes from Firebase by way of /app/. */
+  eq("the wall is still standing", await free.$eval("#cal-gate", (n) => n.hidden), false);
+  eq("and the module is still behind it", await free.$eval("#cal-tool", (n) => n.hidden), true);
   await free.close();
 
   /* A Pro account walks straight in, and is told which plan opened it. */
-  const pro = await open(ctx, CAL, { workspace: workspace(), crm: crm(), level: "pro", preview: false });
+  const pro = await open(ctx, CAL, { workspace: workspace(), crm: crm(), level: "pro", pro: false });
   eq("no wall for a Pro account", await pro.$eval("#cal-gate", (n) => n.hidden), true);
   eq("the module is there", await pro.$eval("#cal-tool", (n) => n.hidden), false);
   check("the chip names the plan they are on",
     (await pro.textContent("#cal-pro-chip")).includes("Pro"));
   eq("the chip is the one that marks a plan somebody has",
     await pro.$eval("#cal-pro-chip", (n) => n.classList.contains("on")), true);
-  eq("nothing lectures them", await pro.$eval("#cal-pro-note", (n) => n.hidden), true);
-  eq("and there is no preview to turn off",
-    await pro.$$eval("#cal-pro [data-pw-preview]", (n) => n.every((b) => b.hidden)), true);
+  /* A paying account is shown the plan and nothing else: no price, and nothing offering
+     to sell them what they already have. */
+  /* The whole wall is hidden for them, so the price it carries is hidden with it:
+     nothing offers to sell somebody what they are already paying for. */
+  eq("and is not quoted a price for what they already pay for",
+    await pro.locator('#cal-gate [data-pw-plan="monthly"]').isVisible(), false);
   await pro.close();
 }
 

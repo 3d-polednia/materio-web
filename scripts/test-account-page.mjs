@@ -676,15 +676,15 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
     "Dostępne w LiczMat Pro");
   // Chapter XXV's rule is "never a dead button", not "never a button". Sessions 22–25
   // built Klienci, Zlecenia, Wyceny and Terminarz, so their cards open something; the CRM
-  // of session 26 is a path through them rather than a page and stays text; and the fifth
-  // control is session 27's preview switch. There is still nothing to *buy* — no payment
-  // exists (FIRESTORE_SYNC §9.2) — and that is what the next check guards.
-  eq("four module links plus the preview switch, and nothing else",
+  // of session 26 is a path through them rather than a page and stays text. Session 28
+  // removed the preview switch and put the checkout in its place — and the checkout is
+  // hidden while assets/pay.js carries no Payment Link, which is what these guard.
+  eq("four module links, and the checkout button that is not offered yet",
     await free.locator("#panel-pro a, #panel-pro button").count(), 5);
-  eq("exactly one of them is the preview switch",
-    await free.locator("#panel-pro [data-pw-preview]").count(), 1);
-  eq("and nothing in the panel offers to take money",
-    await free.locator("#panel-pro [data-plan-upgrade], #panel-pro form").count(), 0);
+  eq("nothing visible in the panel offers to take money",
+    await free.locator("#panel-pro [data-pw-checkout]:visible").count(), 0);
+  eq("and the manage-subscription link is not there for a free account",
+    await free.locator("#plan-manage").isVisible(), false);
   eq("the first opens Klienci",
     await free.locator('.pro-mod[data-feature="clients"] a').getAttribute("href"), "/klienci/");
   eq("the second Zlecenia",
@@ -693,27 +693,25 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
     await free.locator('.pro-mod[data-feature="quotes"] a').getAttribute("href"), "/wyceny/");
   eq("and the fourth Terminarz",
     await free.locator('.pro-mod[data-feature="calendar"] a').getAttribute("href"), "/terminarz/");
-  /* Session 27's preview, from the page somebody goes to in order to find out what plan
-     they are on. It opens the modules and it must never make this card say Pro: the plan
-     is a server field and the preview does not touch it. */
-  eq("the switch offers to turn the preview on",
-    await free.locator("#panel-pro [data-pw-preview]").innerText(), "Włącz podgląd Pro");
-  await free.locator("#panel-pro [data-pw-preview]").click();
-  eq("it is remembered",
-    await free.evaluate(() => localStorage.getItem("liczmat-pro-preview")), "1");
-  eq("and the same switch now offers to turn it off",
-    await free.locator("#panel-pro [data-pw-preview]").innerText(), "Wyłącz podgląd Pro");
+  /* Session 28: the Pro tab is the one place on the site that offers to take money,
+     because it is the only page that knows the uid a payment has to be attached to. With
+     no Payment Link configured it quotes the price and says the subscription has not
+     opened — which is the state the site ships in. */
+  eq("the free account is shown what Pro costs",
+    await free.locator('#plan-buy [data-pw-plan="monthly"]').isVisible(), true);
+  check("with a real amount in it",
+    /[0-9]/.test(await free.locator('#plan-buy [data-pw-plan="monthly"] [data-pw-price]').innerText()),
+    await free.locator('#plan-buy [data-pw-plan="monthly"] [data-pw-price]').innerText());
+  eq("and told the subscription is not open yet",
+    await free.locator("#plan-buy [data-pw-soon]").isVisible(), true);
+  eq("with no button that would charge them",
+    await free.locator("#plan-buy [data-pw-checkout]").isVisible(), false);
   eq("the plan is still the free one", await free.locator("#plan-name").innerText(), "Darmowy");
-  check("and the card says the preview changed nothing about it",
-    (await free.locator("#plan-note").innerText())
-      .includes("Podgląd Pro jest włączony w tej przeglądarce"),
-    await free.locator("#plan-note").innerText());
-  await free.locator("#panel-pro [data-pw-preview]").click();
-  eq("turning it off forgets it",
-    await free.evaluate(() => localStorage.getItem("liczmat-pro-preview")), null);
-  eq("and the card goes back to the plain reason",
+  eq("and the card says why in one plain sentence",
     await free.locator("#plan-note").innerText(),
     "Nic jeszcze nie nadaje planu Pro — nie ma płatności, więc każde konto jest darmowe.");
+  check("no Stripe address is anywhere in the page yet",
+    (await free.content()).indexOf("stripe.com") === -1);
 
   eq("no console error", free.lmErrors.join(" / "), "");
   await free.close();
@@ -723,10 +721,38 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
     "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "premium", planValidUntil: until },
   });
   eq("a Pro account is named as Pro", await pro.locator("#plan-name").innerText(), "LiczMat Pro");
-  check("and told how long it runs",
-    (await pro.locator("#plan-until").innerText()).startsWith("Ważny do:"),
+  /* Session 28: a running subscription is told when it will be CHARGED, not when it will
+     stop. The same instant means the opposite thing on a cancelled plan below. */
+  check("and told when it renews",
+    (await pro.locator("#plan-until").innerText()).startsWith("Odnawia się:"),
     await pro.locator("#plan-until").innerText());
+  eq("with the sentence that it renews by itself",
+    await pro.locator("#plan-note").innerText(),
+    "Subskrypcja jest aktywna i odnowi się automatycznie.");
+  eq("and nobody quotes them a price for what they already have",
+    await pro.locator("#plan-buy").isVisible(), false);
   await pro.close();
+
+  /* Chapter 28's "obsługa anulowania": still Pro, still fully working, and it will not
+     renew. This is the state that cannot be read from plan + planValidUntil alone — it
+     needs planRenews, which is why assets/plan.js reads a third field. */
+  const cancelled = await signIn({
+    "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "premium",
+                  planValidUntil: until, planRenews: false },
+  });
+  eq("a cancelled subscription is still LiczMat Pro",
+    await cancelled.locator("#plan-name").innerText(), "LiczMat Pro");
+  eq("the identity chip still says Pro",
+    await cancelled.locator("#app-level").innerText(), "LiczMat Pro");
+  check("the date now means the end rather than the next charge",
+    (await cancelled.locator("#plan-until").innerText()).startsWith("Pro do:"),
+    await cancelled.locator("#plan-until").innerText());
+  check("and the card explains what happens then",
+    (await cancelled.locator("#plan-note").innerText()).includes("do końca opłaconego okresu"),
+    await cancelled.locator("#plan-note").innerText());
+  // Re-subscribing is exactly what this account might want, so the price comes back.
+  eq("the plans are offered again", await cancelled.locator("#plan-buy").isVisible(), true);
+  await cancelled.close();
 
   // The one case the page can explain from the document itself: plan still says premium,
   // the level is LiczMat again. Without this the account looks demoted for no reason.

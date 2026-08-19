@@ -602,7 +602,9 @@ function currencyModule(lang, saved) {
 
 {
   const c = currencyModule("pl");
-  eq("four currencies", c.LM_CURRENCIES.join(","), "PLN,EUR,USD,UAH");
+  // Chapter VI's four, plus the three session 28 added so the subscription can be priced
+  // where it is sold. RUB is deliberately absent — Stripe does not operate in Russia.
+  eq("seven currencies", c.LM_CURRENCIES.join(","), "PLN,EUR,USD,UAH,CZK,RON,RSD");
   eq("Polish starts in PLN", c.lmCurrency(), "PLN");
   eq("German starts in EUR", currencyModule("de").lmCurrency(), "EUR");
   eq("Ukrainian starts in UAH", currencyModule("uk").lmCurrency(), "UAH");
@@ -612,7 +614,7 @@ function currencyModule(lang, saved) {
   eq("a currency the site does not offer is ignored", currencyModule("pl", "GBP").lmCurrency(), "PLN");
 }
 {
-  // The same amount in four currencies: the digits never change, only the symbol.
+  // The same amount in every currency: the digits never change, only the symbol.
   const digits = (s) => s.replace(/[^0-9]/g, "");
   const c = currencyModule("de", "PLN");
   const amounts = ["PLN", "EUR", "USD", "UAH"].map((code) => c.lmMoney(1234.5, code));

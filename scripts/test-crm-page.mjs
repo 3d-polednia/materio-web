@@ -199,12 +199,13 @@ async function open(ctx, url, opts = {}) {
   if (opts.crm) plant["liczmat-crm-v1"] = JSON.stringify(opts.crm);
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
   if (opts.level) plant["liczmat-signed-in"] = opts.level;
-  /* Session 27 put a paywall in front of the Pro modules, and nothing grants Pro
-     (FIRESTORE_SYNC §9.2), so a browser that opened this page with nothing planted would
-     see the wall and not the tool. The preview is the door session 27 left in it —
-     `liczmat-pro-preview` in assets/plan.js — and it is on unless a test is looking at
-     the wall itself, which is what `preview: false` is for. */
-  if (opts.preview !== false) plant["liczmat-pro-preview"] = "1";
+  /* Session 27 put a paywall in front of the Pro modules, and session 28 removed the
+     preview that used to be the door through it — with a price on the wall, a local
+     switch that opens the modules for free is the wall contradicting itself.
+     So a test that wants the tool rather than the wall says so by planting the level
+     itself: `liczmat-signed-in` is what assets/paywall.js reads (lmReadLevel()), and
+     "pro" is what a real Pro account writes there. `pro: false` looks at the wall. */
+  if (opts.pro !== false && !opts.level) plant["liczmat-signed-in"] = "pro";
 
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {

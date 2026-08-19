@@ -96,6 +96,7 @@ node scripts/test-materials.mjs   # the material list: the document, the arrow, 
 node scripts/test-costs.mjs       # costs: the unit price, the currency rule, the three figures
 node scripts/test-rooms.mjs       # rooms: the document, the project link, the assignment
 node scripts/test-plan.mjs        # the Free/Pro model: permissions, gating, plan status
+node scripts/test-pay.mjs         # the subscription: prices, the checkout URL, the Stripe hosts
 node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadline, the links
 node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
 node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
@@ -229,10 +230,11 @@ scripts/test-plan.mjs  The Free/Pro model and the paywall (sessions 21 and 27, c
                       table against src/ia.mjs, what lmCan()/lmGate() answer for every
                       feature at every level, the five Pro modules in session order — and
                       session 27's wall: that it stands in front of every PRO feature and
-                      no other, the rung lmPaywall() puts each level on, the preview (which
-                      opens all five modules, writes one key, and never reports itself as a
-                      plan), the wall as proGate() builds it in four languages, and that
-                      nothing in the Pro panel offers to take money. Dependency-free — run
+                      no other, the rung lmPaywall() puts each level on, the wall as
+                      proGate() builds it in four languages, and that nothing in the Pro
+                      panel offers to take money. Session 28 added the five subscription
+                      states and §6c, which plants four hopeful keys in localStorage and
+                      checks that not one answer moves. Dependency-free — run
                       it after touching assets/plan.js, assets/paywall.js, src/pro.mjs or a
                       pro_*/plan_*/feat_* key
 scripts/test-clients.mjs  Clients (session 22, chapter XX): the client document and the
@@ -399,14 +401,23 @@ assets/dashboard.js   /app/dashboard/ — the four lists of chapter XIV, drawn f
 assets/plan.js        The Free/Pro model and the paywall: which plan an account is on
                       (lmPlanStatus), what each of the three levels may do (LM_FEATURES,
                       lmCan, lmGate), and since session 27 the wall itself — LM_PRO_LOCKED,
-                      lmPaywall() and the Pro preview beside them. Loaded after
+                      lmPaywall(), plus session 28's lmSubscription() — the five states a
+                      plan can be in, including the cancelled one. Loaded after
                       assets/account.js on the five pages that offer a Pro feature, and
                       nowhere else
 assets/paywall.js     The paywall, drawn. One file for all five Pro modules: the strip
                       above the module, the wall instead of it, the rung of the Free → Pro
-                      path this visitor is on, and the preview switch. It decides nothing —
-                      lmPaywall() does — and it creates no element: the markup is written
-                      by proGate() in src/pro.mjs at build time
+                      path this visitor is on, and — since session 28 — the price of both
+                      plans in the visitor's currency. It decides nothing — lmPaywall() and
+                      lmPayPrice() do — and it creates no element: the markup is written
+                      by proGate() in src/pro.mjs at build time. It never takes money: the
+                      checkout needs a uid, so it lives on /app/ and the wall links there
+assets/pay.js         The subscription: the two plans, their fourteen hand-typed prices in
+                      seven currencies, and the two Stripe addresses (Payment Link,
+                      Customer Portal). Ships priced and NOT buyable — the links are empty
+                      until the owner has verified that paying actually grants the plan;
+                      the ORDER note at the bottom of the file is that checklist. Reads no
+                      storage, fetches nothing, converts nothing
 assets/account.js     The user session and the three access levels of chapter II. Loaded
                       on every page: it is what lets a calculator word the sentence under
                       the result without loading Firebase. /app/ is its only writer
@@ -547,16 +558,16 @@ Kotlin side of it. Change one, change all three.
   `"free"` or `"premium"` (the contract's word, older than the rebranding — do not rename
   it), it is server-only, and nothing writes it: no Cloud Functions, no Play Billing
   (FIRESTORE_SYNC §9.2). So the Pro tab on `/app/` describes the five modules in full,
-  marks each "Dostępne w LiczMat Pro", says out loud that nothing grants Pro yet, and
-  carries no button — chapter XXV asks for a free user who understands what is Pro, and
-  payments only after the Pro features exist (sessions 27–28). `lmPlanStatus()` keeps the
+  marks each "Dostępne w LiczMat Pro", and says out loud that nothing grants Pro yet —
+  chapter XXV asks for a free user who understands what is Pro. `lmPlanStatus()` keeps the
   half `lmLevelOf()` throws away: a `premium` plan whose `planValidUntil` has passed is
   LICZMAT again, and `expired` is what lets the page say why instead of looking demoted
-  for no reason. Session 27 changed the wording, not the fact: the tab now carries the
-  paywall's own preview switch (the same `proPreviewBlock()`, so the two places cannot
-  describe it differently) and the plan card adds one sentence while the preview is on,
-  saying the plan did not move. There is still no button that takes money, and
-  `scripts/test-plan.mjs` and `scripts/test-account-page.mjs` both check there is not.
+  for no reason. **Session 28 put the checkout on that tab** — the one place on the site
+  that may take money, because it is the only page that knows the uid — and it is
+  `hidden` while `assets/pay.js` carries no Payment Link, which is the state the site
+  ships in. So the tab quotes the price, says the subscription has not opened, and still
+  has no live button; `scripts/test-pay.mjs` and `scripts/test-account-page.mjs` both
+  check there is not one.
 - **The visitor's level is derived, never asserted.** `lmLevelOf()` in
   `assets/account.js`: no Firebase user → `guest`; signed in → `liczmat`; signed in with
   `users/{uid}.plan == "premium"` (still valid) → `pro`. `plan` and `planValidUntil` are
@@ -703,22 +714,61 @@ Kotlin side of it. Change one, change all three.
   plural forms and Ukrainian another three, and the browser carries all of them already. A
   browser without the API gets no phrase; the date beside it still says everything, so the
   row degrades to fewer words and never to wrong ones.
-- **The paywall is up (`LM_PRO_LOCKED = true`, session 27), and the preview is the one door
-  through it.** Every PRO feature is walled off from a guest and from a free account, and
-  nothing else is: `lmFeatureState()` only locks when the feature's level is PRO, so `sync`
-  and `share` stay `gated` without a wall — what stands in their way is the sign-in form,
-  which asks for an account rather than for money. The problem sessions 21–26 named has not
-  gone away: nothing grants `plan: premium` (FIRESTORE_SYNC §9.2), so a bare lock would take
-  five working modules from every account there is, including the one that has to check they
-  work before there is anything to buy. Session 27 answered it with the **Pro preview** —
-  one key in `localStorage` (`liczmat-pro-preview`), on one device, opening all five modules
-  at once. It is not a plan and never claims to be: it writes nothing to Firestore, it is
-  not synced, the phone never sees it, and `lmLevelOf()` does not read it, so the level is
-  still derived in exactly one place. `lmFeatureState()` answers `allowed: false,
-  preview: true` under it, which is what stops a page saying "Twój plan: LiczMat Pro" over
-  something nobody bought. Session 28 replaces it with a subscription; it is deliberately
-  one key and one function pair (`lmProPreview()` / `lmSetProPreview()`) so that removal is
-  a deletion rather than an unpicking.
+- **The paywall is up (`LM_PRO_LOCKED = true`), the preview is gone, and the five Pro
+  modules are therefore closed to every account there is — including the owner's.** Every
+  PRO feature is walled off from a guest and from a free account, and nothing else is:
+  `lmFeatureState()` only locks when the feature's level is PRO, so `sync` and `share` stay
+  `gated` without a wall — what stands in their way is the sign-in form, which asks for an
+  account rather than for money. Session 27 softened that with a **Pro preview**, one key in
+  `localStorage` that opened all five modules; **session 28 deleted it** (the owner's
+  decision, taken with the consequence stated). The reason is that a price now stands on the
+  wall: a local switch that opens the modules for free is the wall contradicting itself, and
+  a second answer to "may I use this" when `lmLevelOf()` exists to give exactly one. So
+  until the Stripe extension actually writes `plan: premium` there is **no way for anybody
+  to see a Pro module**, and that is a known, deliberate state rather than a defect to
+  "fix" — do not reintroduce a local override. `scripts/test-plan.mjs` §6c plants four
+  hopeful keys and checks that not one answer moves; `scripts/test-pay.mjs` §6 checks
+  `assets/pay.js` never reads storage at all.
+- **`assets/pay.js` is the subscription, and it ships priced but not buyable.** Two plans
+  (monthly, yearly), seven currencies, fourteen amounts — all typed in by hand, and the same
+  fourteen have to be set on the products in Stripe. **Two thresholds, not one**:
+  `lmPayPriced()` (there is an amount → show the price) and `lmPayBuyable()` (an amount *and*
+  a Payment Link → offer to charge). Today the first is true and the second is false, so the
+  site says what Pro costs and says plainly that the subscription has not opened. Filling in
+  the three URLs turns the buttons on with no other edit — and the ORDER note at the bottom
+  of that file says what must happen first: products → Payment Links → the "Run Payments with
+  Stripe" extension → a function writing `plan`/`planValidUntil`/`planRenews` → **pay once
+  and check the account turns Pro by itself** → only then paste the URLs. A checkout switched
+  on before that last step takes money for nothing.
+- **The prices are converted once, by hand, never in the browser.** The euro rate was applied
+  when the file was written (rates and sources are in its header, all 2026-08-19), because
+  Stripe charges the amount set on the *product*: a price computed from a live rate would
+  disagree with what leaves the card. A currency with no configured amount shows **no price**
+  rather than a derived one. That is also why `assets/currency.js` grew from four currencies
+  to seven — CZK, RON and RSD, so the subscription can be priced where it is sold. Croatia is
+  on the euro; **RUB is deliberately absent, because Stripe does not operate in Russia**.
+  Chapter VI of the master plan still names four currencies: that edit is the owner's.
+- **Only `/app/` may take money.** The checkout URL carries `client_reference_id` (the uid)
+  and `prefilled_email` and **nothing else** — no amount, no plan, no currency, all of which
+  live on the product in Stripe, so a tampered browser can mis-draw its own page and cannot
+  buy Pro for a złoty. A wall on `/klienci/` has no uid (those pages load no Firebase), and a
+  payment with no uid grants nobody anything, so the wall quotes the price and links to
+  `/app/`. `lmPayUrlOk()` accepts `https:` on `buy.stripe.com` or `billing.stripe.com` and
+  matches the **whole host** — `xbuy.stripe.com` ends with the right letters and belongs to
+  somebody else.
+- **`planRenews` is a third plan field, server-only, and absent means renewing.** "Renews on
+  the 12th" and "ends on the 12th" are the same `plan` + `planValidUntil` pair, so
+  cancellation needs one field more. It sits **beside the sync contract** (no `planRenews` in
+  FIRESTORE_SYNC §2 yet) in the same position as `note` on a shopping item and `projectId` on
+  a room, and survives for the same reason: every write in `CloudSync.kt` is a merge. No
+  rules change was needed — the deployed rules already let a client write nothing but
+  `lastSeenAt` and `appVersion`. Every document that exists today lacks the key, and
+  `lmPlanRenews()` reads that as **renewing**: telling somebody their subscription is ending
+  when the document never said so is the one error here that costs a customer. Adding it
+  properly is a contract change in `3d-polednia/Materio`, which is a session of its own.
+  `lmSubscription()` turns the three fields into one word — `none`/`free`/`active`/
+  `cancelled`/`expired` — so `/app/` and the wall pick a sentence by name instead of each
+  re-deriving it from four booleans.
 - **One wall, built once, and it is markup rather than script.** `proGate()` in
   `src/pro.mjs` replaced the four copies of the gate block sessions 22–25 wrote, and
   `assets/paywall.js` replaced the four copies of `xxxRenderPro()`. Four walls are four
@@ -733,12 +783,11 @@ Kotlin side of it. Change one, change all three.
   browser's own and hiding somebody's clients behind a script that did not arrive is the
   worse failure. None of it is a security boundary — the CRM store is `localStorage` and is
   in no sync contract.
-- **The strip above an open module says one of two things, and never both.** "Twój plan:
-  LiczMat Pro" for an account whose plan reaches it (chip `on`), or "Podgląd Pro" plus the
-  sentence that the plan did not change and the button that ends it. When the wall is up the
-  strip is hidden entirely: the wall says all of it, and twice is worse than once. A Pro
-  account gets no "turn the preview off" button — there is nothing to turn off, and offering
-  it to somebody who pays reads as a threat.
+- **The strip above an open module says one thing: which plan opened it.** Since session 28
+  removed the preview there is no second case — the chip is "Twój plan: LiczMat Pro" (class
+  `on`) or the module is behind the wall. When the wall is up the strip is hidden entirely:
+  the wall says all of it, and twice is worse than once. A Pro account is never quoted a
+  price either — offering to sell somebody what they already pay for reads as a threat.
 
 - **The chain is walked, never stored, and session 26 added no collection and no page.**
   Chapter XXIV's path — KLIENT → ZLECENIE → PROJEKT → WYCENA → HISTORIA — is made entirely

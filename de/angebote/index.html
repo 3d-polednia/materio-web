@@ -64,7 +64,7 @@
 <link rel="alternate" hreflang="en" href="https://liczmat.com/en/quotes/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260819g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260819h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -82,7 +82,7 @@
 <meta name="twitter:title" content="Angebote — LiczMat">
 <meta name="twitter:description" content="Angebote in LiczMat Pro: Material und weitere Kosten aus dem Projekt, Arbeitszeit als Menge mal Satz, eine Marge in Prozent und die Summe. Alles bleibt in diesem Browser.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260819g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -136,7 +136,7 @@
       <li><a class="lang-item" href="/en/quotes/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
     </ul>
   </div>
-        <select id="currency-select" class="cur-select" aria-label="Währung" title="Währung"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option></select>
+        <select id="currency-select" class="cur-select" aria-label="Währung" title="Währung"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
       </div>
       <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mein Konto</a>
     </nav>
@@ -162,8 +162,6 @@
       <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
       <p class="crm-pro" id="quo-pro" hidden>
         <span class="chip" id="quo-pro-chip">In LiczMat Pro verfügbar</span>
-        <span class="muted" id="quo-pro-note" hidden></span>
-        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>Pro-Vorschau ausschalten</button>
       </p>
 
       <div class="app-card crm-gate pw-gate" id="quo-gate" hidden>
@@ -191,13 +189,24 @@
 
         <p><span class="muted"><span data-i18n="pro_more">LiczMat Pro kennenlernen</span> — <span data-i18n="door_soon">In Vorbereitung</span></span></p>
 
-        <div class="pw-prev">
-          <h3 data-i18n="pro_prev_t">Pro-Vorschau auf diesem Gerät</h3>
-          <p class="muted" data-i18n="pro_prev_d">Pro lässt sich noch nicht kaufen — die Bezahlung kommt im nächsten Schritt. Die Vorschau öffnet die Pro-Module in diesem Browser, damit man sie ausprobieren kann. Sie ändert den Tarif am Konto nicht, wird nicht synchronisiert, und die App auf dem Telefon sieht sie nie.</p>
-          <p><button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false">Pro-Vorschau einschalten</button></p>
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">LiczMat-Pro-Abo</h3>
+          <p class="muted" data-i18n="pay_d">Ein Tarif, alle fünf Pro-Module. Die Zahlung läuft über Stripe; du kannst jederzeit kündigen, und Pro läuft bis zum Ende des bezahlten Zeitraums.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Monatlich</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ Monat</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Jährlich</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ Jahr — zwei Monate günstiger</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Zu deinem Konto</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Das Abo lässt sich noch nicht kaufen. Die Preise stehen fest, die Bezahlung schalten wir in Kürze frei.</p>
         </div>
-
-        <p class="muted src-note">Bezahlen kann man noch nicht. Die Pro-Funktionen stehen und die Bezahlschranke ist aktiv; das Abo ist der nächste Schritt.</p>
       </div>
 
       <div id="quo-tool">
@@ -430,21 +439,22 @@
   "de": "/de/angebote/",
   "en": "/en/quotes/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260819g"></script>
-<script src="/assets/i18n-runtime.js?v=20260819g"></script>
-<script src="/assets/currency.js?v=20260819g"></script>
+<script src="/assets/i18n.de.js?v=20260819h"></script>
+<script src="/assets/i18n-runtime.js?v=20260819h"></script>
+<script src="/assets/currency.js?v=20260819h"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260819g"></script>
+<script src="/assets/account.js?v=20260819h"></script>
 
-<script src="/assets/workspace.js?v=20260819g"></script>
-<script src="/assets/plan.js?v=20260819g"></script>
-<script src="/assets/paywall.js?v=20260819g"></script>
-<script src="/assets/crm.js?v=20260819g"></script>
-<script src="/assets/crm-chain.js?v=20260819g"></script>
-<script src="/assets/quotes-ui.js?v=20260819g"></script>
-<script src="/assets/main.js?v=20260819g"></script>
+<script src="/assets/workspace.js?v=20260819h"></script>
+<script src="/assets/plan.js?v=20260819h"></script>
+<script src="/assets/pay.js?v=20260819h"></script>
+<script src="/assets/paywall.js?v=20260819h"></script>
+<script src="/assets/crm.js?v=20260819h"></script>
+<script src="/assets/crm-chain.js?v=20260819h"></script>
+<script src="/assets/quotes-ui.js?v=20260819h"></script>
+<script src="/assets/main.js?v=20260819h"></script>
 
 </body>
 </html>

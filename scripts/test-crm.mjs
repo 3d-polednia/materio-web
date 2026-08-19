@@ -124,7 +124,7 @@ function loadPlan({ open = false } = {}) {
     if (src === before) throw new Error("LM_PRO_LOCKED is no longer one line in assets/plan.js");
   }
   return evalSource(src, [
-    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState", "lmPaywall", "lmProPreview",
+    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState", "lmPaywall",
   ], { document: undefined, localStorage: undefined });
 }
 

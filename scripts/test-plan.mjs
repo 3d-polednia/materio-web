@@ -52,18 +52,23 @@ const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 /** The shipped files, evaluated in the order the page loads them. */
 const PLAN = evalScript(["assets/account.js", "assets/plan.js"], [
   "LM_LEVEL", "LM_PLAN", "LM_FEATURES", "lmPlanStatus", "lmFeature", "lmFeaturesAt",
-  "lmCan", "lmGate", "lmLevelOf", "LM_PRO_LOCKED", "LM_PRO_PREVIEW_KEY", "lmFeatureState",
-  "lmPaywall", "lmProPreview", "lmSetProPreview",
+  "lmCan", "lmGate", "lmLevelOf", "LM_PRO_LOCKED", "lmFeatureState", "lmPaywall",
+  // Session 28: the subscription, and the renewal flag the states are read from.
+  "lmSubscription", "lmPlanRenews",
 ]);
 const { LM_LEVEL, LM_PLAN, LM_FEATURES, lmPlanStatus, lmFeature, lmFeaturesAt, lmCan, lmGate } = PLAN;
 
 /**
- * assets/plan.js again, this time over a `localStorage` it can actually write to — the
- * preview is one key in it, and a test that stubbed the function instead of the storage
- * would be checking its own stub.
+ * assets/plan.js again, this time over a `localStorage` it can actually write to.
  *
- * `document` is left undefined: lmSetProPreview() guards on it, and a preview that only
- * works on a page with a DOM would be a preview the tests could never reach.
+ * Session 27 needed this because the preview was a key in storage. Session 28 removed the
+ * preview, so the same harness now proves the opposite: whatever is planted in storage,
+ * every answer this file gives is unchanged. Stubbing the functions instead of the
+ * storage would be checking the stub, so the storage is real and the file is the shipped
+ * one.
+ *
+ * The three preview names are read back deliberately — they must come out `undefined`,
+ * which is what section 6c asserts. `typeof` inside the module keeps that from throwing.
  */
 function loadWithStorage(initial) {
   const store = { ...(initial || {}) };
@@ -75,8 +80,14 @@ function loadWithStorage(initial) {
   const src = ["assets/account.js", "assets/plan.js"]
     .map((f) => readFileSync(p(f), "utf8")).join("\n");
   const api = new Function("localStorage", "document", `${src}
-    return { LM_LEVEL, LM_PRO_LOCKED, LM_PRO_PREVIEW_KEY, lmFeatureState, lmPaywall,
-             lmProPreview, lmSetProPreview };`)(localStorage, undefined);
+    return {
+      LM_LEVEL, LM_PRO_LOCKED, lmFeatureState, lmPaywall,
+      // Session 28 deleted these three. typeof rather than a bare reference, so the
+      // harness reports them as gone instead of throwing before a check can run.
+      lmProPreview: typeof lmProPreview === "function" ? lmProPreview : undefined,
+      lmSetProPreview: typeof lmSetProPreview === "function" ? lmSetProPreview : undefined,
+      LM_PRO_PREVIEW_KEY: typeof LM_PRO_PREVIEW_KEY === "string" ? LM_PRO_PREVIEW_KEY : undefined,
+    };`)(localStorage, undefined);
   return { ...api, store };
 }
 
@@ -310,63 +321,116 @@ head("6b. session 27: the wall itself");
   eq("with no feature to name", unknown.feature, null);
 }
 
-head("6c. the Pro preview: what it opens, and what it must never claim");
+head("6c. nothing in this browser can open a Pro module (session 28)");
 {
-  const off = loadWithStorage();
-  eq("off in a browser that has never seen it", off.lmProPreview(), false);
-  eq("so the wall is up", off.lmFeatureState("clients", off.LM_LEVEL.LICZMAT).locked, true);
+  /* Session 27 left one key in localStorage that opened all five Pro modules without a
+     plan. Session 28 removed it, and this is the check that it stays removed: the wall
+     is a function of the level and of nothing else. A future session that reintroduces a
+     local override has to delete this section to do it, which is the point. */
+  const planted = loadWithStorage({
+    "liczmat-pro-preview": "1",
+    "liczmat-signed-in": "pro",
+    "liczmat-plan": "premium",
+    "lm-pro": "1",
+  });
 
-  off.lmSetProPreview(true);
-  eq("the key is the one assets/plan.js names",
-    off.store[off.LM_PRO_PREVIEW_KEY], "1");
-  eq("and it is the only thing written", Object.keys(off.store).length, 1);
+  eq("the preview function is gone", typeof planted.lmProPreview, "undefined");
+  eq("and so is its setter", typeof planted.lmSetProPreview, "undefined");
+  eq("and the key it used", typeof planted.LM_PRO_PREVIEW_KEY, "undefined");
 
-  const on = loadWithStorage({ "liczmat-pro-preview": "1" });
-  eq("the key is spelled the same way here", on.LM_PRO_PREVIEW_KEY, "liczmat-pro-preview");
-
-  const st = on.lmFeatureState("clients", on.LM_LEVEL.LICZMAT);
-  eq("the module runs", st.locked, false);
-  eq("the page is told it is a preview", st.preview, true);
-  // The whole point of keeping these apart: a preview is not a plan, and a page that
-  // said "Twój plan: LiczMat Pro" over one would be lying about what was bought.
-  eq("but the level still does not reach it", st.allowed, false);
-  eq("and the page still says the module is Pro", st.gated, true);
-
-  const pro = on.lmFeatureState("clients", on.LM_LEVEL.PRO);
-  eq("a real Pro account is allowed, not previewing", pro.allowed, true);
-  eq("with no preview claimed over it", pro.preview, false);
-
-  // Every Pro module opens together. Five switches would be five ways to be half in.
+  // Four hopeful keys planted above, and the wall does not move for any of them.
   for (const f of LM_FEATURES.filter((x) => x.level === LEVEL.PRO)) {
-    eq(`${f.id} opens under the preview`,
-      on.lmFeatureState(f.id, on.LM_LEVEL.GUEST).locked, false);
-  }
-  // And nothing else does. `sync` and `share` need a Firebase user and a document the
-  // deployed rules accept; no key in this browser can supply either.
-  for (const f of LM_FEATURES.filter((x) => x.level === LEVEL.LICZMAT)) {
-    eq(`${f.id} does not`, on.lmFeatureState(f.id, on.LM_LEVEL.GUEST).allowed, false);
-    eq(`nor is ${f.id} claimed as a preview`,
-      on.lmFeatureState(f.id, on.LM_LEVEL.GUEST).preview, false);
+    eq(`${f.id} is still walled off from a free account`,
+      planted.lmFeatureState(f.id, planted.LM_LEVEL.LICZMAT).locked, true);
+    eq(`and from a guest: ${f.id}`,
+      planted.lmFeatureState(f.id, planted.LM_LEVEL.GUEST).locked, true);
+    eq(`only the plan opens ${f.id}`,
+      planted.lmFeatureState(f.id, planted.LM_LEVEL.PRO).allowed, true);
   }
 
-  // The paywall is satisfied — there is nothing to do next — and it still knows the
-  // visitor is on the free plan, which is what lets the strip say so.
-  eq("nothing to do next while previewing",
-    on.lmPaywall("clients", on.LM_LEVEL.LICZMAT).step, "none");
-  eq("the module is open", on.lmPaywall("clients", on.LM_LEVEL.LICZMAT).open, true);
-  eq("and it is still gated", on.lmPaywall("clients", on.LM_LEVEL.LICZMAT).gated, true);
+  // The same answers from a browser with nothing planted at all. If storage moved any of
+  // them, these two would disagree.
+  const bare = loadWithStorage();
+  for (const f of LM_FEATURES) {
+    for (const level of [bare.LM_LEVEL.GUEST, bare.LM_LEVEL.LICZMAT, bare.LM_LEVEL.PRO]) {
+      const a = JSON.stringify(bare.lmFeatureState(f.id, level));
+      const b = JSON.stringify(planted.lmFeatureState(f.id, level));
+      eq(`${f.id} at ${level} reads the same with storage planted`, b, a);
+    }
+  }
 
-  on.lmSetProPreview(false);
-  eq("turning it off removes the key", on.store[on.LM_PRO_PREVIEW_KEY], undefined);
-  eq("and the wall is back", on.lmFeatureState("clients", on.LM_LEVEL.LICZMAT).locked, true);
+  // Nothing reads storage any more, so nothing writes it either.
+  eq("and the file writes no key of its own", Object.keys(bare.store).length, 0);
 
-  // A browser that refuses storage reads as "off" rather than throwing: the wall is the
-  // safe answer, and a paywall that crashed the page would open everything behind it.
+  // A browser that refuses storage entirely still gets the wall rather than an exception:
+  // a paywall that threw would leave the module it guards on screen.
   const noStore = new Function(
     ["assets/account.js", "assets/plan.js"].map((f) => readFileSync(p(f), "utf8")).join("\n")
-      + "\nreturn { lmProPreview, lmFeatureState, LM_LEVEL };")();
-  eq("no storage means no preview", noStore.lmProPreview(), false);
-  eq("and the wall stands", noStore.lmFeatureState("clients", "liczmat").locked, true);
+      + "\nreturn { lmFeatureState, LM_LEVEL };")();
+  eq("no storage at all, and the wall stands",
+    noStore.lmFeatureState("clients", "liczmat").locked, true);
+}
+
+head("6c2. the five states a subscription can be in (session 28)");
+{
+  const { lmSubscription, lmPlanRenews } = PLAN;
+  const NOW = Date.UTC(2026, 7, 19);
+  const day = 86400000;
+  const user = { uid: "u1" };
+  const sub = (profile, now) => lmSubscription(user, profile, now === undefined ? NOW : now);
+
+  eq("a guest has no plan to be in a state", lmSubscription(null, null, NOW).state, "none");
+  eq("an account with no plan field is free", sub({}).state, "free");
+  eq("and one that says so", sub({ plan: "free" }).state, "free");
+
+  // Pro, running, renewing — the ordinary case.
+  const active = sub({ plan: "premium", planValidUntil: NOW + 30 * day });
+  eq("a paid-up subscription is active", active.state, "active");
+  eq("at the Pro level", active.level, LM_LEVEL.PRO);
+  eq("with the days to the next charge", active.daysLeft, 30);
+
+  // Cancelled: still Pro, still fully working, and it will not renew. The distinction
+  // session 28 exists for — and it cannot be read from plan + planValidUntil alone.
+  const cancelled = sub({ plan: "premium", planValidUntil: NOW + 3 * day, planRenews: false });
+  eq("a cancelled subscription is cancelled", cancelled.state, "cancelled");
+  eq("and is STILL Pro until the date", cancelled.level, LM_LEVEL.PRO);
+  eq("with the days left on it", cancelled.daysLeft, 3);
+  eq("the same document without planRenews is active",
+    sub({ plan: "premium", planValidUntil: NOW + 3 * day }).state, "active");
+
+  // Expired.
+  const expired = sub({ plan: "premium", planValidUntil: NOW - day });
+  eq("a plan that ran out is expired", expired.state, "expired");
+  eq("and the account is LICZMAT again", expired.level, LM_LEVEL.LICZMAT);
+  eq("with no days left", expired.daysLeft, 0);
+  eq("a cancelled plan that then ran out is also expired",
+    sub({ plan: "premium", planValidUntil: NOW - day, planRenews: false }).state, "expired");
+
+  // No end date at all: Pro that nothing says will stop.
+  const openEnded = sub({ plan: "premium" });
+  eq("a plan with no end date is active", openEnded.state, "active");
+  eq("and has no day count to show", openEnded.daysLeft, null);
+
+  /* planRenews is absent on every document that exists today, and absent must mean
+     renewing. Telling somebody their subscription is ending when the document never said
+     so is the one error here that costs a customer. */
+  eq("absent reads as renewing", lmPlanRenews({}), true);
+  eq("null too", lmPlanRenews({ planRenews: null }), true);
+  eq("undefined too", lmPlanRenews({ planRenews: undefined }), true);
+  eq("no profile at all", lmPlanRenews(null), true);
+  eq("only an explicit false cancels", lmPlanRenews({ planRenews: false }), false);
+  eq("and true is true", lmPlanRenews({ planRenews: true }), true);
+
+  // The boundary: the moment it lapses. lmLevelOf() uses <=, so the instant itself is out.
+  eq("one millisecond before the end it is active",
+    sub({ plan: "premium", planValidUntil: NOW + 1 }).state, "active");
+  eq("at the exact instant it is expired",
+    sub({ plan: "premium", planValidUntil: NOW }).state, "expired");
+
+  // Same day, part way through: less than a whole day left floors to zero rather than
+  // rounding up to "1 day" for something that ends this afternoon.
+  eq("a few hours left is zero whole days",
+    sub({ plan: "premium", planValidUntil: NOW + 6 * 3600000 }).daysLeft, 0);
 }
 
 head("6d. the wall as it is built, in four languages");
@@ -400,11 +464,22 @@ head("6d. the wall as it is built, in four languages");
     check(`${lang}: the module behind this wall is not listed twice`,
       (html.match(new RegExp(esc(t("feat_clients_t")), "g")) || []).length === 1);
 
-    // The preview, and the three things it says it is not.
-    has("data-pw-preview", "the preview switch is on the wall");
-    has(t("pro_prev_t"), "with its heading");
-    has(t("pro_prev_d"), "and the sentence that says it changes no plan");
-    has(t("pro_pay_later"), "and the note that payments are still to come");
+    // Session 28: the wall quotes a price. The amounts are NOT in the markup — the build
+    // has no idea which currency this visitor reads in — so what is checked is the frame
+    // the script fills, and the two endings it chooses between.
+    has(t("pay_t"), "the subscription block is on the wall");
+    has('data-pw-plan="monthly"', "with a slot for the monthly plan");
+    has('data-pw-plan="yearly"', "and one for the yearly plan");
+    has("data-pw-price", "and an empty slot for the amount");
+    has(t("pay_monthly_per"), "the period is named");
+    has("data-pw-soon", "the 'not open yet' ending is in the markup");
+    has("data-pw-buy", "and so is the other one");
+    has(t("pay_soon"), "with the sentence that says so");
+    // The wall never takes money: paying needs the uid, and only /app/ has one.
+    check(`${lang}: no Stripe link stands on the wall itself`,
+      !html.includes("stripe.com"), html.slice(0, 200));
+    check(`${lang}: the wall's button leads to the account page`,
+      html.includes(`href="/app/"`));
 
     // Chapter XXV's rule, still: never a dead button. /liczmat-pro/ is PLANNED until
     // session 29, so the phrase is text; the moment the route goes LIVE it is a link and

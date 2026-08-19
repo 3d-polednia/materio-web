@@ -64,7 +64,7 @@
 <link rel="alternate" hreflang="en" href="https://liczmat.com/en/schedule/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/terminarz/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260819g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260819h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -82,7 +82,7 @@
 <meta name="twitter:title" content="Schedule — LiczMat">
 <meta name="twitter:description" content="The job schedule in LiczMat Pro: deadlines grouped from overdue to later, with the client, the status and the value beside each job. You set a date on the spot. Everything stays in this browser.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260819g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819h">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -136,7 +136,7 @@
       <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></span></li>
     </ul>
   </div>
-        <select id="currency-select" class="cur-select" aria-label="Currency" title="Currency"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD" selected>USD</option><option value="UAH">UAH</option></select>
+        <select id="currency-select" class="cur-select" aria-label="Currency" title="Currency"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD" selected>USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
       </div>
       <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>My account</a>
     </nav>
@@ -162,8 +162,6 @@
       <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
       <p class="crm-pro" id="cal-pro" hidden>
         <span class="chip" id="cal-pro-chip">Available in LiczMat Pro</span>
-        <span class="muted" id="cal-pro-note" hidden></span>
-        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>Turn the Pro preview off</button>
       </p>
 
       <div class="app-card crm-gate pw-gate" id="cal-gate" hidden>
@@ -191,13 +189,24 @@
 
         <p><span class="muted"><span data-i18n="pro_more">See what LiczMat Pro is</span> — <span data-i18n="door_soon">In preparation</span></span></p>
 
-        <div class="pw-prev">
-          <h3 data-i18n="pro_prev_t">Pro preview on this device</h3>
-          <p class="muted" data-i18n="pro_prev_d">Pro cannot be bought yet — payments come in the next step. The preview opens the Pro modules in this browser so they can be tried out. It does not change the plan on the account, it is not synced, and the phone app never sees it.</p>
-          <p><button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false">Turn the Pro preview on</button></p>
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">LiczMat Pro subscription</h3>
+          <p class="muted" data-i18n="pay_d">One plan, all five Pro modules. Payment is handled by Stripe; cancel whenever you like and Pro runs to the end of the period you paid for.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Monthly</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ month</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Yearly</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ year — two months cheaper</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Go to your account</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">The subscription cannot be bought yet. These prices are final; payments open shortly.</p>
         </div>
-
-        <p class="muted src-note">There is no payment yet. The Pro features are built and the paywall is up; the subscription is the next step.</p>
       </div>
 
       <div id="cal-tool">
@@ -343,20 +352,21 @@
   "de": "/de/termine/",
   "en": "/en/schedule/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260819g"></script>
-<script src="/assets/i18n-runtime.js?v=20260819g"></script>
-<script src="/assets/currency.js?v=20260819g"></script>
+<script src="/assets/i18n.en.js?v=20260819h"></script>
+<script src="/assets/i18n-runtime.js?v=20260819h"></script>
+<script src="/assets/currency.js?v=20260819h"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260819g"></script>
+<script src="/assets/account.js?v=20260819h"></script>
 
-<script src="/assets/workspace.js?v=20260819g"></script>
-<script src="/assets/plan.js?v=20260819g"></script>
-<script src="/assets/paywall.js?v=20260819g"></script>
-<script src="/assets/crm.js?v=20260819g"></script>
-<script src="/assets/schedule-ui.js?v=20260819g"></script>
-<script src="/assets/main.js?v=20260819g"></script>
+<script src="/assets/workspace.js?v=20260819h"></script>
+<script src="/assets/plan.js?v=20260819h"></script>
+<script src="/assets/pay.js?v=20260819h"></script>
+<script src="/assets/paywall.js?v=20260819h"></script>
+<script src="/assets/crm.js?v=20260819h"></script>
+<script src="/assets/schedule-ui.js?v=20260819h"></script>
+<script src="/assets/main.js?v=20260819h"></script>
 
 </body>
 </html>

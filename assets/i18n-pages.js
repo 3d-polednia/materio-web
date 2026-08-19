@@ -421,12 +421,6 @@ const I18N_PAGES = {
     pro_need_pro: "Twoje konto jest na planie darmowym. Ten moduł należy do LiczMat Pro.",
     pro_signin: "Załóż darmowe konto",
     pro_incl_t: "Co jeszcze obejmuje LiczMat Pro",
-    pro_prev_t: "Podgląd Pro na tym urządzeniu",
-    pro_prev_d: "Pro nie da się jeszcze kupić — płatności powstają w następnym kroku. Podgląd otwiera moduły Pro w tej przeglądarce, żeby dało się je sprawdzić. Nie zmienia planu przy koncie, nie synchronizuje się i nie widzi go aplikacja na telefonie.",
-    pro_prev_on: "Włącz podgląd Pro",
-    pro_prev_off: "Wyłącz podgląd Pro",
-    pro_prev_chip: "Podgląd Pro",
-    pro_prev_note: "Podgląd Pro jest włączony w tej przeglądarce. Plan przy koncie się nie zmienił.",
     plan_t: "Twój plan",
     plan_d: "Plan jest zapisany przy koncie na serwerze. Przeglądarka go czyta i nie potrafi zmienić.",
     plan_free: "Darmowy",
@@ -434,6 +428,24 @@ const I18N_PAGES = {
     plan_until: "Ważny do",
     plan_expired: "Plan Pro wygasł. Konto działa dalej jako darmowe LiczMat.",
     plan_none: "Nic jeszcze nie nadaje planu Pro — nie ma płatności, więc każde konto jest darmowe.",
+
+    /* Session 28 — the subscription. Two plans, the states a plan can be in, and the
+       one place money changes hands. The prices themselves are in assets/pay.js. */
+    pay_t: "Subskrypcja LiczMat Pro",
+    pay_d: "Jeden plan, wszystkie pięć modułów Pro. Płatność obsługuje Stripe; anulujesz kiedy chcesz i Pro działa do końca opłaconego okresu.",
+    pay_monthly_t: "Miesięcznie",
+    pay_monthly_per: "/ miesiąc",
+    pay_yearly_t: "Rocznie",
+    pay_yearly_per: "/ rok — dwa miesiące taniej",
+    pay_soon: "Subskrypcji jeszcze nie da się wykupić. Ceny są ostateczne, płatności uruchamiamy wkrótce.",
+    pay_buy: "Wykup LiczMat Pro",
+    pay_go: "Przejdź do swojego konta",
+    pay_manage: "Zarządzaj subskrypcją",
+    pay_manage_d: "Zmiana karty, faktury i anulowanie — po stronie Stripe.",
+    plan_renews: "Odnawia się",
+    plan_cancelled: "Pro do",
+    plan_active_d: "Subskrypcja jest aktywna i odnowi się automatycznie.",
+    plan_cancel_d: "Subskrypcja została anulowana. LiczMat Pro działa do końca opłaconego okresu, potem konto wraca na plan darmowy.",
     feat_clients_t: "Klienci",
     feat_clients_d: "Lista klientów z danymi kontaktowymi, notatkami i historią współpracy.",
     feat_jobs_t: "Zlecenia",
@@ -644,7 +656,6 @@ const I18N_PAGES = {
 
 
     ck_p_crm: "Klienci, zlecenia i wyceny LiczMat Pro: nazwy, dane kontaktowe, notatki, statusy, terminy, przypisane projekty, pozycje robocizny i marża.",
-    ck_p_preview: "Podgląd LiczMat Pro w tej przeglądarce: pojedyncze „tak” albo brak wpisu. Nie zmienia planu przy koncie i nie jest nigdzie wysyłany.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
     nav_projects: "Projekty",
@@ -1151,12 +1162,6 @@ const I18N_PAGES = {
     pro_need_pro: "Your account is on the free plan. This module belongs to LiczMat Pro.",
     pro_signin: "Create a free account",
     pro_incl_t: "What else LiczMat Pro covers",
-    pro_prev_t: "Pro preview on this device",
-    pro_prev_d: "Pro cannot be bought yet — payments come in the next step. The preview opens the Pro modules in this browser so they can be tried out. It does not change the plan on the account, it is not synced, and the phone app never sees it.",
-    pro_prev_on: "Turn the Pro preview on",
-    pro_prev_off: "Turn the Pro preview off",
-    pro_prev_chip: "Pro preview",
-    pro_prev_note: "The Pro preview is on in this browser. The plan on the account has not changed.",
     plan_t: "Your plan",
     plan_d: "The plan is stored with the account on the server. The browser reads it and cannot change it.",
     plan_free: "Free",
@@ -1164,6 +1169,24 @@ const I18N_PAGES = {
     plan_until: "Valid until",
     plan_expired: "The Pro plan has run out. The account carries on as free LiczMat.",
     plan_none: "Nothing grants the Pro plan yet — there is no payment, so every account is free.",
+
+    /* Session 28 — the subscription. Two plans, the states a plan can be in, and the
+       one place money changes hands. The prices themselves are in assets/pay.js. */
+    pay_t: "LiczMat Pro subscription",
+    pay_d: "One plan, all five Pro modules. Payment is handled by Stripe; cancel whenever you like and Pro runs to the end of the period you paid for.",
+    pay_monthly_t: "Monthly",
+    pay_monthly_per: "/ month",
+    pay_yearly_t: "Yearly",
+    pay_yearly_per: "/ year — two months cheaper",
+    pay_soon: "The subscription cannot be bought yet. These prices are final; payments open shortly.",
+    pay_buy: "Get LiczMat Pro",
+    pay_go: "Go to your account",
+    pay_manage: "Manage subscription",
+    pay_manage_d: "Card, invoices and cancellation — on Stripe's side.",
+    plan_renews: "Renews on",
+    plan_cancelled: "Pro until",
+    plan_active_d: "The subscription is active and will renew automatically.",
+    plan_cancel_d: "The subscription has been cancelled. LiczMat Pro runs to the end of the period you paid for, then the account returns to the free plan.",
     feat_clients_t: "Clients",
     feat_clients_d: "A list of clients with contact details, notes and the history of working with them.",
     feat_jobs_t: "Jobs",
@@ -1372,7 +1395,6 @@ const I18N_PAGES = {
 
 
     ck_p_crm: "LiczMat Pro clients, jobs and quotes: names, contact details, notes, statuses, dates, the projects filed under them, labour lines and the margin.",
-    ck_p_preview: "The LiczMat Pro preview in this browser: a single yes, or no entry at all. It does not change the plan on the account and is never sent anywhere.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
     nav_projects: "Projects",
@@ -1878,12 +1900,6 @@ const I18N_PAGES = {
     pro_need_pro: "Dein Konto läuft im kostenlosen Tarif. Dieses Modul gehört zu LiczMat Pro.",
     pro_signin: "Kostenloses Konto anlegen",
     pro_incl_t: "Was LiczMat Pro sonst noch umfasst",
-    pro_prev_t: "Pro-Vorschau auf diesem Gerät",
-    pro_prev_d: "Pro lässt sich noch nicht kaufen — die Bezahlung kommt im nächsten Schritt. Die Vorschau öffnet die Pro-Module in diesem Browser, damit man sie ausprobieren kann. Sie ändert den Tarif am Konto nicht, wird nicht synchronisiert, und die App auf dem Telefon sieht sie nie.",
-    pro_prev_on: "Pro-Vorschau einschalten",
-    pro_prev_off: "Pro-Vorschau ausschalten",
-    pro_prev_chip: "Pro-Vorschau",
-    pro_prev_note: "Die Pro-Vorschau ist in diesem Browser eingeschaltet. Der Tarif am Konto hat sich nicht geändert.",
     plan_t: "Dein Tarif",
     plan_d: "Der Tarif steht beim Konto auf dem Server. Der Browser liest ihn und kann ihn nicht ändern.",
     plan_free: "Kostenlos",
@@ -1891,6 +1907,24 @@ const I18N_PAGES = {
     plan_until: "Gültig bis",
     plan_expired: "Der Pro-Tarif ist abgelaufen. Das Konto läuft als kostenloses LiczMat weiter.",
     plan_none: "Bisher vergibt nichts den Pro-Tarif — es gibt keine Bezahlung, also ist jedes Konto kostenlos.",
+
+    /* Session 28 — the subscription. Two plans, the states a plan can be in, and the
+       one place money changes hands. The prices themselves are in assets/pay.js. */
+    pay_t: "LiczMat-Pro-Abo",
+    pay_d: "Ein Tarif, alle fünf Pro-Module. Die Zahlung läuft über Stripe; du kannst jederzeit kündigen, und Pro läuft bis zum Ende des bezahlten Zeitraums.",
+    pay_monthly_t: "Monatlich",
+    pay_monthly_per: "/ Monat",
+    pay_yearly_t: "Jährlich",
+    pay_yearly_per: "/ Jahr — zwei Monate günstiger",
+    pay_soon: "Das Abo lässt sich noch nicht kaufen. Die Preise stehen fest, die Bezahlung schalten wir in Kürze frei.",
+    pay_buy: "LiczMat Pro holen",
+    pay_go: "Zu deinem Konto",
+    pay_manage: "Abo verwalten",
+    pay_manage_d: "Karte, Rechnungen und Kündigung — auf Stripes Seite.",
+    plan_renews: "Verlängert sich am",
+    plan_cancelled: "Pro bis",
+    plan_active_d: "Das Abo ist aktiv und verlängert sich automatisch.",
+    plan_cancel_d: "Das Abo wurde gekündigt. LiczMat Pro läuft bis zum Ende des bezahlten Zeitraums, danach fällt das Konto auf den kostenlosen Tarif zurück.",
     feat_clients_t: "Kunden",
     feat_clients_d: "Eine Kundenliste mit Kontaktdaten, Notizen und der Historie der Zusammenarbeit.",
     feat_jobs_t: "Aufträge",
@@ -2099,7 +2133,6 @@ const I18N_PAGES = {
 
 
     ck_p_crm: "Kunden, Aufträge und Angebote von LiczMat Pro: Namen, Kontaktdaten, Notizen, Status, Termine, zugeordnete Projekte, Positionen für Arbeitszeit und die Marge.",
-    ck_p_preview: "Die LiczMat-Pro-Vorschau in diesem Browser: ein einzelnes Ja oder gar kein Eintrag. Sie ändert den Tarif am Konto nicht und wird nirgendwohin gesendet.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
     nav_projects: "Projekte",
@@ -2605,12 +2638,6 @@ const I18N_PAGES = {
     pro_need_pro: "Ваш акаунт на безкоштовному плані. Цей модуль належить до LiczMat Pro.",
     pro_signin: "Створити безкоштовний акаунт",
     pro_incl_t: "Що ще охоплює LiczMat Pro",
-    pro_prev_t: "Перегляд Pro на цьому пристрої",
-    pro_prev_d: "Pro поки не можна купити — оплата з’явиться наступним кроком. Перегляд відкриває модулі Pro в цьому браузері, щоб їх можна було перевірити. Він не змінює план на акаунті, не синхронізується, і застосунок на телефоні його не бачить.",
-    pro_prev_on: "Увімкнути перегляд Pro",
-    pro_prev_off: "Вимкнути перегляд Pro",
-    pro_prev_chip: "Перегляд Pro",
-    pro_prev_note: "Перегляд Pro увімкнено в цьому браузері. План на акаунті не змінився.",
     plan_t: "Твій план",
     plan_d: "План записаний при акаунті на сервері. Браузер його читає і не може змінити.",
     plan_free: "Безкоштовний",
@@ -2618,6 +2645,24 @@ const I18N_PAGES = {
     plan_until: "Дійсний до",
     plan_expired: "План Pro закінчився. Акаунт працює далі як безкоштовний LiczMat.",
     plan_none: "Поки що ніщо не надає план Pro — оплати немає, тож кожен акаунт безкоштовний.",
+
+    /* Session 28 — the subscription. Two plans, the states a plan can be in, and the
+       one place money changes hands. The prices themselves are in assets/pay.js. */
+    pay_t: "Передплата LiczMat Pro",
+    pay_d: "Один план, усі п'ять модулів Pro. Оплату опрацьовує Stripe; скасувати можна будь-коли, і Pro працює до кінця сплаченого періоду.",
+    pay_monthly_t: "Щомісяця",
+    pay_monthly_per: "/ місяць",
+    pay_yearly_t: "Щороку",
+    pay_yearly_per: "/ рік — на два місяці дешевше",
+    pay_soon: "Передплату ще не можна оформити. Ціни остаточні, оплату запускаємо незабаром.",
+    pay_buy: "Оформити LiczMat Pro",
+    pay_go: "Перейти до свого акаунта",
+    pay_manage: "Керувати передплатою",
+    pay_manage_d: "Картка, рахунки та скасування — на боці Stripe.",
+    plan_renews: "Поновлюється",
+    plan_cancelled: "Pro до",
+    plan_active_d: "Передплата активна й поновиться автоматично.",
+    plan_cancel_d: "Передплату скасовано. LiczMat Pro працює до кінця сплаченого періоду, потім акаунт повертається на безкоштовний план.",
     feat_clients_t: "Клієнти",
     feat_clients_d: "Список клієнтів із контактами, нотатками та історією співпраці.",
     feat_jobs_t: "Замовлення",
@@ -2826,7 +2871,6 @@ const I18N_PAGES = {
 
 
     ck_p_crm: "Клієнти, замовлення та кошториси LiczMat Pro: назви, контактні дані, нотатки, статуси, терміни, прив'язані проєкти, позиції роботи та маржа.",
-    ck_p_preview: "Перегляд LiczMat Pro у цьому браузері: одне «так» або жодного запису. Він не змінює план на акаунті й нікуди не надсилається.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
     nav_projects: "Проєкти",

@@ -241,8 +241,10 @@ export const ROUTES = [
       "of the Free → Pro path chosen from the visitor's level (a guest is sent to sign " +
       "up, a free account is told its plan). Never a dead button: \"Poznaj LiczMat Pro\" " +
       "stays a sentence while /liczmat-pro/ is PLANNED. LM_PRO_LOCKED in assets/plan.js " +
-      "is `true` from session 27 on; the preview beside it (LM_PRO_PREVIEW_KEY) is what " +
-      "keeps the module checkable while session 28 still owes the payment.",
+      "is `true` from session 27 on. Session 28 removed the preview that stood beside it " +
+      "and put the subscription there instead: the wall quotes both plans from " +
+      "assets/pay.js and sends the visitor to /app/, which is the only page that knows " +
+      "the uid a payment has to be attached to.",
     note: "Chapter XX, and the first of the five Pro modules. The client list lives in " +
       "assets/crm.js — localStorage, this browser only: `clients` is not in the sync " +
       "contract (docs/FIRESTORE_SYNC.md in the app repo has projects, rooms, " +

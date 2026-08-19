@@ -38,12 +38,14 @@ export const proKeys = (features) => [
   "pro_t", "pro_d", "pro_locked", "pro_more", "pro_open", "pro_pay_later",
   "plan_t", "plan_d", "plan_free", "plan_pro", "plan_until", "plan_expired",
   "plan_none",
-  // Session 27, the paywall: the two rungs of chapter XXV's Free → Pro path, the list of
-  // what is behind the wall, and the preview that is the only way through it until
-  // session 28 can sell one.
+  // Session 27, the paywall: the two rungs of chapter XXV's Free → Pro path and the list
+  // of what is behind the wall.
   "pro_need_account", "pro_need_pro", "pro_signin", "pro_incl_t",
-  "pro_prev_t", "pro_prev_d", "pro_prev_on", "pro_prev_off", "pro_prev_chip",
-  "pro_prev_note",
+  // Session 28, the subscription: the two plans, the way to the checkout, and the four
+  // sentences the account page needs for the states a plan can be in.
+  "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_go", "pay_monthly_t", "pay_monthly_per",
+  "pay_yearly_t", "pay_yearly_per", "pay_manage", "pay_manage_d",
+  "plan_renews", "plan_cancelled", "plan_cancel_d", "plan_active_d",
   ...proModules(features).flatMap((f) => [`${f.key}_t`, `${f.key}_d`]),
 ];
 
@@ -96,23 +98,49 @@ export function proMoreLink(t, lang) {
 }
 
 /**
- * The Pro preview, offered. Chapter XXV's "przejście Free → Pro", as far as it can go
- * before session 28 has anything to sell.
+ * What LiczMat Pro costs — the two plans, side by side.
  *
- * The block says what the preview is and what it is not, in that order, because the whole
- * cost of a preview is somebody believing they bought something: it opens the modules in
- * this browser, it does not change the plan on the account, and it is not synced. The
- * The button deliberately carries no `data-i18n`. Its label is one of two keys depending
- * on which way the switch is standing, and assets/paywall.js writes it onto every
- * `[data-pw-preview]` on the page — so the same switch reads correctly from behind the
- * wall and from in front of it. A `data-i18n` here would let i18n-runtime.js put "włącz"
- * back on a preview that is already on, the next time somebody changed language on /app/.
+ * Master plan, session 28: the "przejście Free → Pro" of chapter XXV stops being a
+ * sentence and starts being a price. The block is written once and used twice: on the
+ * wall in front of a module, and in the Pro tab of /app/. Two places quoting one price
+ * from two pieces of markup is two places that can quote two prices.
+ *
+ * **The amounts are not written here.** The build has no idea which currency a visitor
+ * reads in, and this page is cached for everybody; `assets/paywall.js` (or assets/app.js
+ * on /app/) fills in `[data-pw-price]` from `assets/pay.js` at paint time. What the build
+ * writes is the frame: the plan's name, its period, and an empty slot for the amount.
+ *
+ * Two mutually exclusive endings, one shown by the script:
+ *   [data-pw-buy]   the subscription is open — the way to the checkout
+ *   [data-pw-soon]  it is not — said plainly, rather than a button that cannot charge
+ *
+ * @param {object} opts { checkout } true on /app/, where the button is the real checkout;
+ *   false on a wall, where it is a link to /app/ because only that page knows the uid.
  */
-export function proPreviewBlock(t) {
-  return `<div class="pw-prev">
-          <h3 data-i18n="pro_prev_t">${esc(t("pro_prev_t"))}</h3>
-          <p class="muted" data-i18n="pro_prev_d">${esc(t("pro_prev_d"))}</p>
-          <p><button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false">${esc(t("pro_prev_on"))}</button></p>
+export function proPlansBlock(t, opts) {
+  const checkout = Boolean(opts && opts.checkout);
+  const plan = (id) => `<div class="pw-plan" data-pw-plan="${id}" hidden>
+            <h4 data-i18n="pay_${id}_t">${esc(t(`pay_${id}_t`))}</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_${id}_per">${esc(t(`pay_${id}_per`))}</span></p>
+          </div>`;
+
+  /* On /app/ the button is the checkout itself and assets/app.js writes its href from
+     lmCheckoutUrl() — it needs the uid, so the build cannot write it. On a wall it is a
+     plain link to /app/, which is a real address the build does know. */
+  const go = checkout
+    ? `<button type="button" class="btn btn-primary btn-sm" data-pw-checkout hidden>${esc(t("pay_buy"))}</button>`
+    : `<a class="btn btn-primary btn-sm" href="${URL_APP}" data-i18n="pay_go">${esc(t("pay_go"))}</a>`;
+
+  return `<div class="pw-plans">
+          <h3 data-i18n="pay_t">${esc(t("pay_t"))}</h3>
+          <p class="muted" data-i18n="pay_d">${esc(t("pay_d"))}</p>
+          <div class="pw-plan-row">
+            ${plan("monthly")}
+            ${plan("yearly")}
+          </div>
+          <p data-pw-buy hidden>${go}</p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">${esc(t("pay_soon"))}</p>
         </div>`;
 }
 
@@ -133,8 +161,9 @@ export function proPreviewBlock(t) {
  *   funkcji Pro    wall. A wall that says "Klienci — Pro" and nothing else asks somebody
  *                  to buy a product they have been shown one fifth of.
  *   przejście      the sign-up link for a guest, "Poznaj LiczMat Pro" for everybody, and
- *   Free → Pro     the preview — which is the only rung that leads anywhere today, and
- *                  says so rather than pretending to be a purchase.
+ *   Free → Pro     since session 28 the price of both plans, with the way to the checkout
+ *                  on /app/ — or, while no Payment Link is configured, the sentence that
+ *                  the subscription has not opened yet.
  *
  * @param {Function} t        the page's dictionary
  * @param {string} id          the LM_FEATURES id this wall stands in front of
@@ -187,9 +216,7 @@ export function proGate(t, featureId, features, lang, opts) {
 
         <p>${proMoreLink(t, lang)}</p>
 
-        ${proPreviewBlock(t)}
-
-        <p class="muted src-note">${esc(t("pro_pay_later"))}</p>
+        ${proPlansBlock(t, { checkout: false })}
       </div>`;
 }
 
@@ -220,9 +247,11 @@ export function proPanel(t, features) {
   return `<h2 data-i18n="pro_t">${esc(t("pro_t"))}</h2>
       ${i("pro_d", "p", "muted")}
 
-      <!-- Where this account stands. plan and planValidUntil are server-only fields
-           (FIRESTORE_SYNC §2), so the page reads them and can never set them; nothing
-           writes them yet either, which is what plan_none says out loud. -->
+      <!-- Where this account stands. plan, planValidUntil and planRenews are server-only
+           fields, so the page reads them and can never set them; assets/app.js fills all
+           four elements from lmSubscription(). The "manage" link goes to Stripe's own
+           portal — cancelling has to be a write to Stripe, and this site has no server to
+           write with, so offering a cancel button here would be a button that lies. -->
       <div class="app-card" id="plan-card">
         <h3 data-i18n="plan_t">${esc(t("plan_t"))}</h3>
         ${i("plan_d", "p", "muted")}
@@ -231,6 +260,11 @@ export function proPanel(t, features) {
           <span id="plan-until" class="muted"></span>
         </p>
         <p id="plan-note" class="muted field-note"></p>
+        <p id="plan-manage" hidden>
+          <a class="btn btn-ghost btn-sm" id="plan-manage-link" href="#" rel="noopener"
+             target="_blank" data-i18n="pay_manage">${esc(t("pay_manage"))}</a>
+          <span class="muted field-note" data-i18n="pay_manage_d">${esc(t("pay_manage_d"))}</span>
+        </p>
       </div>
 
       <div class="pro-mods">
@@ -239,11 +273,16 @@ export function proPanel(t, features) {
 
       ${more}
 
-      <!-- Session 27: the same preview the paywall offers, offered from the account page
-           too. /app/ is where somebody goes to find out what their plan is, so it is the
-           second place they would look for the switch — and it is one block, shared, so
-           the two cannot describe it differently. assets/app.js relabels the button. -->
-      ${proPreviewBlock(t)}
+      <!-- Session 28: the checkout. This is the ONLY place on the site that offers to
+           take money, because it is the only page that knows the uid a payment has to be
+           attached to — a Payment Link without client_reference_id buys a plan for
+           nobody. The wall on a Pro page links here instead of paying there. The block
+           is shared with that wall, so the two cannot quote different prices. The button
+           stays hidden until assets/pay.js carries a Payment Link — see the ORDER note
+           at the bottom of that file. -->
+      <div id="plan-buy">
+      ${proPlansBlock(t, { checkout: true })}
+      </div>
 
       ${i("pro_pay_later", "p", "muted src-note")}`;
 }

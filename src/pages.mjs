@@ -749,7 +749,6 @@ const COOKIE_ROWS = [
   { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },
   { name: "liczmat-recent-calcs", type: "ck_type_local", purpose: "ck_p_recent", life: "ck_life_until_cleared" },
   { name: "liczmat-crm-v1", type: "ck_type_local", purpose: "ck_p_crm", life: "ck_life_until_cleared" },
-  { name: "liczmat-pro-preview", type: "ck_type_local", purpose: "ck_p_preview", life: "ck_life_until_cleared" },
 ];
 
 const COOKIE_THIRD_ROWS = [
@@ -1450,13 +1449,10 @@ export function clientsMain(lang, t, features) {
   <section class="block alt" id="crm-page">
     <div class="wrap narrow">
       <!-- Chapter XXV's strip, above the module for somebody who may use it: which plan
-           opened it, and — under a preview — the reminder that the plan did not change.
-           assets/paywall.js hides the whole strip when the wall is up, because the wall
-           says all of it and twice is worse than once. -->
+           opened it. assets/paywall.js hides the whole strip when the wall is up,
+           because the wall says all of it and twice is worse than once. -->
       <p class="crm-pro" id="crm-pro" hidden>
         <span class="chip" id="crm-pro-chip">${esc(t("pro_locked"))}</span>
-        <span class="muted" id="crm-pro-note" hidden></span>
-        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>${esc(t("pro_prev_off"))}</button>
       </p>
 
       ${gate}
@@ -1684,8 +1680,6 @@ export function jobsMain(lang, t, features) {
       <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
       <p class="crm-pro" id="job-pro" hidden>
         <span class="chip" id="job-pro-chip">${esc(t("pro_locked"))}</span>
-        <span class="muted" id="job-pro-note" hidden></span>
-        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>${esc(t("pro_prev_off"))}</button>
       </p>
 
       ${gate}
@@ -1886,8 +1880,6 @@ export function quotesMain(lang, t, features) {
       <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
       <p class="crm-pro" id="quo-pro" hidden>
         <span class="chip" id="quo-pro-chip">${esc(t("pro_locked"))}</span>
-        <span class="muted" id="quo-pro-note" hidden></span>
-        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>${esc(t("pro_prev_off"))}</button>
       </p>
 
       ${gate}
@@ -1959,8 +1951,6 @@ export function calendarMain(lang, t, features) {
       <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
       <p class="crm-pro" id="cal-pro" hidden>
         <span class="chip" id="cal-pro-chip">${esc(t("pro_locked"))}</span>
-        <span class="muted" id="cal-pro-note" hidden></span>
-        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>${esc(t("pro_prev_off"))}</button>
       </p>
 
       ${gate}

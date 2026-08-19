@@ -139,11 +139,8 @@ async function boot() {
   wireAccountPanel();
   wireSyncPanel();
 
-  // Session 27: the Pro preview switch, offered on this page as well as behind the wall.
-  // assets/paywall.js owns the click and the label; there is no wall on /app/ to hide or
-  // show, so the page wires only that half and redraws the plan card when it moves.
-  if (typeof pwWirePreview === "function") pwWirePreview();
-  document.addEventListener("lm-preview", renderPlan);
+  // The plan panel quotes a price, and a price is in the visitor's currency.
+  document.addEventListener("currencychange", renderPlan);
 
   // Everything above renders its text through T(). The language picker on this page
   // swaps the DOM in place instead of navigating, so anything JavaScript wrote has to
@@ -415,40 +412,116 @@ function renderProfile() {
 }
 
 /**
- * The LiczMat Pro tab: where this account's plan stands.
+ * The LiczMat Pro tab: where this account's plan stands, and where it is bought.
  *
- * Session 21. The module cards next to it are static markup the build wrote — they say
- * the same thing to everybody, because nobody has Pro. This is the half that differs per
- * account, and all of it comes out of `users/{uid}`: `plan` and `planValidUntil`, which
- * the deployed rules let the client read and never write (FIRESTORE_SYNC §2). A browser
- * therefore cannot promote itself by editing anything on this page, and there is no
- * "upgrade" button because nothing on the server would answer it yet (§9.2).
+ * Session 21 wrote the plan card; session 28 gave it the other four states and the
+ * checkout. Everything about the plan comes out of `users/{uid}` — `plan`,
+ * `planValidUntil` and `planRenews`, all of which the deployed rules let a client read
+ * and never write (FIRESTORE_SYNC §2). A browser cannot promote itself by editing
+ * anything on this page.
  *
- * lmPlanStatus() is in assets/plan.js and calls lmLevelOf() rather than re-deriving the
+ * lmSubscription() is in assets/plan.js and calls lmLevelOf() rather than re-deriving the
  * level: an expired Pro plan is LICZMAT again everywhere or nowhere.
+ *
+ * **This is the only place on the site that offers to take money.** The checkout URL
+ * needs the uid — a Payment Link without `client_reference_id` buys a plan for nobody —
+ * and this is the only page that has one. It stays hidden until assets/pay.js carries a
+ * real Payment Link, so the button cannot appear before paying can actually grant Pro.
  */
 function renderPlan() {
-  if (!state.user || typeof lmPlanStatus !== "function") return;
-  const status = lmPlanStatus(state.user, state.profile);
-  const pro = status.level === LM_LEVEL.PRO;
+  if (!state.user || typeof lmSubscription !== "function") return;
+  const sub = lmSubscription(state.user, state.profile);
+  const pro = sub.level === LM_LEVEL.PRO;
 
   $("plan-name").textContent = T(pro ? "plan_pro" : "plan_free");
-  $("plan-name").classList.toggle("warn", status.expired);
+  $("plan-name").classList.toggle("warn", sub.state === "expired");
 
-  // A date only when there is one to show. A plan with no end is the free one, and
-  // "Ważny do —" reads like something is missing.
-  $("plan-until").textContent = status.validUntil
-    ? `${T("plan_until")}: ${whenText(status.validUntil)}` : "";
+  /* The date, worded by what it means rather than by what it is. The same instant reads
+     "renews on" for a running subscription and "Pro until" for a cancelled one, and
+     saying "valid until" for both would hide the only difference that matters. */
+  const dateLabel = { active: "plan_renews", cancelled: "plan_cancelled", expired: "plan_until" };
+  $("plan-until").textContent = sub.validUntil && dateLabel[sub.state]
+    ? `${T(dateLabel[sub.state])}: ${whenText(sub.validUntil)}` : "";
 
-  // Why the account is on the plan it is on. An expired Pro plan is the one case the
-  // page can explain from the document itself; otherwise it says the true and duller
-  // thing — nothing grants Pro yet, and if this browser has the session-27 preview on,
-  // that the preview did not change the plan this card is describing.
-  const preview = typeof lmProPreview === "function" && lmProPreview();
-  $("plan-note").textContent = status.expired
-    ? T("plan_expired")
-    : `${T("plan_none")}${preview ? ` ${T("pro_prev_note")}` : ""}`;
-  $("plan-note").classList.toggle("warn", status.expired);
+  // Why the account is on the plan it is on. A cancelled subscription is the one state
+  // that has to say what happens next, because nothing else on the page would.
+  const note = {
+    active: "plan_active_d",
+    cancelled: "plan_cancel_d",
+    expired: "plan_expired",
+    free: "plan_none",
+  }[sub.state] || "plan_none";
+  $("plan-note").textContent = T(note);
+  $("plan-note").classList.toggle("warn", sub.state === "expired");
+
+  /* Managing and cancelling are Stripe's own screens. The link is only offered to an
+     account that has something to manage — showing it to a free account would send them
+     to a portal with no subscription in it. */
+  const portal = typeof lmPortalUrl === "function" ? lmPortalUrl() : null;
+  const manage = sub.state === "active" || sub.state === "cancelled";
+  $("plan-manage").hidden = !(manage && portal);
+  if (manage && portal) $("plan-manage-link").href = portal;
+
+  renderPlanPrices(sub);
+}
+
+/**
+ * The two plans and the checkout button, for an account that does not have Pro.
+ *
+ * Hidden entirely for somebody who already pays: quoting a price to an existing
+ * subscriber is asking them to buy what they own. A cancelled subscription still sees it,
+ * because re-subscribing is exactly what that account might want to do.
+ *
+ * The amounts come from assets/pay.js in the visitor's currency and are never converted;
+ * a currency with no configured amount hides that plan rather than guessing one.
+ */
+function renderPlanPrices(sub) {
+  const box = $("plan-buy");
+  if (!box || typeof lmPayPrice !== "function") return;
+  box.hidden = sub.state === "active";
+
+  const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
+  let chosen = null;
+  box.querySelectorAll("[data-pw-plan]").forEach((card) => {
+    const id = card.getAttribute("data-pw-plan");
+    const minor = lmPayPrice(id, code);
+    card.hidden = minor === null;
+    if (minor === null) return;
+    if (!chosen && lmPayBuyable(id, code)) chosen = id;
+    const out = card.querySelector("[data-pw-price]");
+    if (out) out.textContent = lmMoneyMinor(minor, code);
+  });
+
+  /* One of two endings, never both: the checkout, or the sentence that there is not one
+     yet. `chosen` is null whenever no plan has a Payment Link, which is the state the
+     site ships in — see the ORDER note in assets/pay.js. */
+  const buy = box.querySelector("[data-pw-buy]");
+  const soon = box.querySelector("[data-pw-soon]");
+  const btn = box.querySelector("[data-pw-checkout]");
+  if (buy) buy.hidden = !chosen;
+  if (soon) soon.hidden = Boolean(chosen);
+  if (btn) {
+    btn.hidden = !chosen;
+    btn.textContent = T("pay_buy");
+    btn.onclick = chosen ? () => goToCheckout(chosen) : null;
+  }
+}
+
+/**
+ * Leave for Stripe.
+ *
+ * The uid is what the webhook matches the payment back to the account with, so a checkout
+ * without one is a payment that grants nobody anything — lmCheckoutUrl() returns null
+ * rather than a half-built URL, and this refuses to navigate instead of sending somebody
+ * to a page that cannot help them.
+ */
+function goToCheckout(planId) {
+  const url = lmCheckoutUrl(planId, {
+    uid: state.user && state.user.uid,
+    email: state.user && state.user.email,
+  });
+  if (!url) { status(T("pay_soon"), true); return; }
+  location.href = url;
 }
 
 /** The way back to wherever the sign-up prompt was clicked, if there was one. */

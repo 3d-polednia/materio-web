@@ -51,7 +51,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819g";
+const STAMP = "20260819h";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -342,10 +342,13 @@ const WS_SCRIPTS = ["/assets/units.js", "/assets/workspace.js", "/assets/workspa
  * engine and no catalogue: the page prints saved figures and calculates nothing.
  *
  * assets/account.js is already on every page (src/template.mjs) and plan.js reads its
- * globals, so the order below is the order the browser needs.
+ * globals, so the order below is the order the browser needs. assets/pay.js (session 28)
+ * sits between plan.js and paywall.js for the same reason: the wall quotes a price, and
+ * the prices are in pay.js.
  */
 const CRM_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js", "/assets/crm.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm.js",
   "/assets/crm-chain.js", "/assets/crm-ui.js",
 ];
 
@@ -357,7 +360,8 @@ const CRM_SCRIPTS = [
  * amount, and calculates nothing.
  */
 const JOBS_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js", "/assets/crm.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm.js",
   "/assets/crm-chain.js", "/assets/jobs-ui.js",
 ];
 
@@ -369,7 +373,8 @@ const JOBS_SCRIPTS = [
  * rate and adds a percentage, and calculates nothing else.
  */
 const QUOTES_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js", "/assets/crm.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm.js",
   "/assets/crm-chain.js", "/assets/quotes-ui.js",
 ];
 
@@ -380,7 +385,8 @@ const QUOTES_SCRIPTS = [
  * without it would leave those answering for a workspace that is not there.
  */
 const CALENDAR_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js", "/assets/crm.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm.js",
   "/assets/schedule-ui.js",
 ];
 
@@ -865,8 +871,12 @@ function buildPrivatePages() {
     // workspace.js is a classic script on purpose: /app/ reads the browser workspace
     // through its globals, which a module's own scope would hide.
     // plan.js before app.js: the Pro tab reads the permission table and the plan status
-    // through its globals, which a module's own scope would hide.
-    classicScripts: ["/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js"],
+    // through its globals, which a module's own scope would hide. pay.js next to it, for
+    // the same reason and one page later in the story: the Pro tab is where a
+    // subscription is bought, so it is the one page that needs the prices AND the uid.
+    // assets/paywall.js is deliberately absent — it draws a wall, and /app/ has none.
+    // It was here until session 28 only to wire the preview switch, which is gone.
+    classicScripts: ["/assets/workspace.js", "/assets/plan.js", "/assets/pay.js"],
     scripts: ["/assets/app.js"],
   }));
 

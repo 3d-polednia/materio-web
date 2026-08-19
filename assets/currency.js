@@ -15,8 +15,20 @@
  * stores it (docs/FIRESTORE_SYNC.md), so an old line stays honest after a switch.
  */
 
-/** The four currencies LiczMat supports. */
-const LM_CURRENCIES = ["PLN", "EUR", "USD", "UAH"];
+/**
+ * The seven currencies LiczMat supports.
+ *
+ * Chapter VI names four — PLN, EUR, USD, UAH. Session 28 added CZK, RON and RSD because
+ * the subscription has to be priced in them: LiczMat Pro is sold in Czechia, Romania and
+ * Serbia, and a price shown in euro to somebody whose card is charged in koruna is a
+ * price that changes at the checkout. Croatia is on the euro since 2023 and needs no
+ * currency of its own; **RUB is deliberately absent** — Stripe does not operate in
+ * Russia, so a rouble price would be one nothing could take money in.
+ *
+ * Adding a currency converts nothing. Every amount already stored keeps the
+ * `currencyCode` it was saved with, and no existing number moves — see the header.
+ */
+const LM_CURRENCIES = ["PLN", "EUR", "USD", "UAH", "CZK", "RON", "RSD"];
 
 const LM_CURRENCY_KEY = "liczmat-currency";
 
@@ -56,8 +68,8 @@ function lmSetCurrency(code) {
 /**
  * An amount in major units ("12.5") as money, in the page's language and the currency.
  *
- * An explicit code wins even when it is not one of the four: a line saved in CZK while
- * the site still offered Czech is displayed in CZK, because that is the currency its
+ * An explicit code wins even when it is not one of the seven: a line saved in HUF while
+ * the site still offered Hungarian is displayed in HUF, because that is the currency its
  * price was typed in. Only an amount with no currency of its own gets the visitor's.
  */
 function lmMoney(major, code, digits) {

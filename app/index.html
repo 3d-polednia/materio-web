@@ -60,7 +60,7 @@
 <link rel="canonical" href="https://liczmat.com/app/">
 
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260819g" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260819h" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -78,7 +78,7 @@
 <meta name="twitter:title" content="Moje konto — LiczMat">
 <meta name="twitter:description" content="Konto jest darmowe i opcjonalne. Trzyma projekty, pomieszczenia i kosztorysy w telefonie i w przeglądarce naraz.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260819g">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819h">
 
 <script>window.LM_NAV = {"calculators":{"pl":"/kalkulatory/","uk":"/uk/kalkulyatory/","de":"/de/rechner/","en":"/en/calculators/"},"materials":{"pl":"/materialy/","uk":"/uk/materialy/","de":"/de/materialien/","en":"/en/materials/"},"projects":{"pl":"/projekty/","uk":"/uk/proekty/","de":"/de/projekte/","en":"/en/projects/"},"guides":{"pl":"/poradniki/","uk":"/uk/porady/","de":"/de/ratgeber/","en":"/en/guides/"},"android":{"pl":"/aplikacja/","uk":"/uk/dodatok/","de":"/de/android-app/","en":"/en/android-app/"},"clients":{"pl":"/klienci/","uk":"/uk/kliyenty/","de":"/de/kunden/","en":"/en/clients/"},"jobs":{"pl":"/zlecenia/","uk":"/uk/zamovlennya/","de":"/de/auftraege/","en":"/en/jobs/"},"quotes":{"pl":"/wyceny/","uk":"/uk/koshtorysy-pro/","de":"/de/angebote/","en":"/en/quotes/"},"calendar":{"pl":"/terminarz/","uk":"/uk/kalendar/","de":"/de/termine/","en":"/en/schedule/"}};</script>
 </head>
@@ -97,7 +97,7 @@
       </ul>
       <div class="pickers">
         <div class="lang-picker" id="lang-picker"></div>
-        <select id="currency-select" class="cur-select" aria-label="Waluta" title="Waluta" data-i18n-aria="cur_label"><option value="PLN" selected>PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option></select>
+        <select id="currency-select" class="cur-select" aria-label="Waluta" title="Waluta" data-i18n-aria="cur_label"><option value="PLN" selected>PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
       </div>
       <a class="btn btn-primary btn-sm nav-cta" href="https://play.google.com/store/apps/details?id=pl.materio.app" rel="noopener" target="_blank" data-loc="app" data-i18n="nav_download">Pobierz</a>
     </nav>
@@ -363,9 +363,11 @@
           <h2 data-i18n="pro_t">LiczMat Pro</h2>
       <p class="muted" data-i18n="pro_d">LiczMat ogarnia Twoje projekty. Pro ogarnia Twoją pracę: klienci, zlecenia, wyceny i terminy obok tego, co już liczysz.</p>
 
-      <!-- Where this account stands. plan and planValidUntil are server-only fields
-           (FIRESTORE_SYNC §2), so the page reads them and can never set them; nothing
-           writes them yet either, which is what plan_none says out loud. -->
+      <!-- Where this account stands. plan, planValidUntil and planRenews are server-only
+           fields, so the page reads them and can never set them; assets/app.js fills all
+           four elements from lmSubscription(). The "manage" link goes to Stripe's own
+           portal — cancelling has to be a write to Stripe, and this site has no server to
+           write with, so offering a cancel button here would be a button that lies. -->
       <div class="app-card" id="plan-card">
         <h3 data-i18n="plan_t">Twój plan</h3>
         <p class="muted" data-i18n="plan_d">Plan jest zapisany przy koncie na serwerze. Przeglądarka go czyta i nie potrafi zmienić.</p>
@@ -374,6 +376,11 @@
           <span id="plan-until" class="muted"></span>
         </p>
         <p id="plan-note" class="muted field-note"></p>
+        <p id="plan-manage" hidden>
+          <a class="btn btn-ghost btn-sm" id="plan-manage-link" href="#" rel="noopener"
+             target="_blank" data-i18n="pay_manage">Zarządzaj subskrypcją</a>
+          <span class="muted field-note" data-i18n="pay_manage_d">Zmiana karty, faktury i anulowanie — po stronie Stripe.</span>
+        </p>
       </div>
 
       <div class="pro-mods">
@@ -411,15 +418,33 @@
 
       <p class="muted pro-more"><span data-i18n="pro_more">Poznaj LiczMat Pro</span> — <span data-i18n="door_soon">W przygotowaniu</span></p>
 
-      <!-- Session 27: the same preview the paywall offers, offered from the account page
-           too. /app/ is where somebody goes to find out what their plan is, so it is the
-           second place they would look for the switch — and it is one block, shared, so
-           the two cannot describe it differently. assets/app.js relabels the button. -->
-      <div class="pw-prev">
-          <h3 data-i18n="pro_prev_t">Podgląd Pro na tym urządzeniu</h3>
-          <p class="muted" data-i18n="pro_prev_d">Pro nie da się jeszcze kupić — płatności powstają w następnym kroku. Podgląd otwiera moduły Pro w tej przeglądarce, żeby dało się je sprawdzić. Nie zmienia planu przy koncie, nie synchronizuje się i nie widzi go aplikacja na telefonie.</p>
-          <p><button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false">Włącz podgląd Pro</button></p>
+      <!-- Session 28: the checkout. This is the ONLY place on the site that offers to
+           take money, because it is the only page that knows the uid a payment has to be
+           attached to — a Payment Link without client_reference_id buys a plan for
+           nobody. The wall on a Pro page links here instead of paying there. The block
+           is shared with that wall, so the two cannot quote different prices. The button
+           stays hidden until assets/pay.js carries a Payment Link — see the ORDER note
+           at the bottom of that file. -->
+      <div id="plan-buy">
+      <div class="pw-plans">
+          <h3 data-i18n="pay_t">Subskrypcja LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Jeden plan, wszystkie pięć modułów Pro. Płatność obsługuje Stripe; anulujesz kiedy chcesz i Pro działa do końca opłaconego okresu.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Miesięcznie</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ miesiąc</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Rocznie</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ rok — dwa miesiące taniej</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><button type="button" class="btn btn-primary btn-sm" data-pw-checkout hidden>Wykup LiczMat Pro</button></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Subskrypcji jeszcze nie da się wykupić. Ceny są ostateczne, płatności uruchamiamy wkrótce.</p>
         </div>
+      </div>
 
       <p class="muted src-note" data-i18n="pro_pay_later">Płatności jeszcze nie ma. Funkcje Pro są gotowe, paywall stoi — subskrypcja jest następnym krokiem.</p>
         </section>
@@ -488,18 +513,18 @@
   </div>
 </footer>
 
-<script src="/assets/i18n.all.js?v=20260819g"></script>
-<script src="/assets/i18n-runtime.js?v=20260819g"></script>
-<script src="/assets/currency.js?v=20260819g"></script>
+<script src="/assets/i18n.all.js?v=20260819h"></script>
+<script src="/assets/i18n-runtime.js?v=20260819h"></script>
+<script src="/assets/currency.js?v=20260819h"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260819g"></script>
-<script src="/assets/workspace.js?v=20260819g"></script>
-<script src="/assets/plan.js?v=20260819g"></script>
-<script src="/assets/paywall.js?v=20260819g"></script>
-<script type="module" src="/assets/app.js?v=20260819g"></script>
-<script src="/assets/main.js?v=20260819g"></script>
+<script src="/assets/account.js?v=20260819h"></script>
+<script src="/assets/workspace.js?v=20260819h"></script>
+<script src="/assets/plan.js?v=20260819h"></script>
+<script src="/assets/pay.js?v=20260819h"></script>
+<script type="module" src="/assets/app.js?v=20260819h"></script>
+<script src="/assets/main.js?v=20260819h"></script>
 
 </body>
 </html>

@@ -853,8 +853,8 @@ rozjechałby się przy pierwszej poprawionej pozycji.
 nad otwartym modułem stał tylko napis; **jest nieaktualny — patrz §7.12**. Zostaje jako
 zapis powodu, bo powód nie zniknął: planu Pro nadal **nic nie nadaje** (`FIRESTORE_SYNC`
 §9.2), więc sam zamek zamknąłby moduł każdemu istniejącemu kontu, łącznie z tym, które ma
-sprawdzić, czy moduł działa. Sesja 27 odpowiedziała na to podglądem Pro, a nie odłożeniem
-zamka.
+sprawdzić, czy moduł działa. Sesja 27 odpowiedziała na to podglądem Pro; **Sesja 28
+podgląd usunęła i przyjęła tę konsekwencję świadomie** — patrz §7.6 i §7.7.
 
 Kolejność rozdziału XXV jest zachowana: najpierw funkcje Pro (Sesje 22–26), potem
 sprawdzenie działania i uprawnień, paywall (Sesja 27), płatności po nim (Sesja 28).
@@ -1158,25 +1158,18 @@ logowania, a nie ściana z ceną, więc `lmFeatureState()` odpowiada dla nich `g
 nie dotyka — rozdział II mówi wprost, że nie wolno blokować podstawowych funkcji, żeby
 wymusić przejście na Pro.
 
-**Podgląd Pro — jedyne przejście, jakie da się dziś zbudować uczciwie.** Planu Pro nadal
-**nic nie nadaje** (`FIRESTORE_SYNC` §9.2: brak Cloud Functions, brak płatności, `plan`
-jest polem tylko serwera), a płatności to Sesja 28. Zamek bez żadnych drzwi zabrałby pięć
-działających modułów każdemu istniejącemu kontu i nie dałby w zamian niczego — łącznie
-z kontem, które ma sprawdzić, czy moduły działają, czego rozdział XXV wymaga *przed*
-płatnościami. Dlatego paywall proponuje podgląd i mówi wprost, czym on jest:
+**Podgląd Pro usunięty w Sesji 28.** Sesja 27 zostawiła w ścianie jedne drzwi — jeden
+klucz w `localStorage`, otwierający wszystkie pięć modułów bez planu. Sesja 28 go
+skasowała, decyzją właściciela i ze świadomością ceny. Powód: na ścianie stoi teraz
+**cena**, a lokalny przełącznik otwierający moduły za darmo jest ścianą, która sama sobie
+przeczy — i drugą odpowiedzią na pytanie „czy wolno mi tego użyć", podczas gdy `lmLevelOf()`
+istnieje po to, żeby odpowiedź była jedna.
 
-- jeden klucz w `localStorage` (`liczmat-pro-preview`, `assets/plan.js`), na tym
-  urządzeniu;
-- otwiera **wszystkie** moduły Pro naraz — pięć osobnych przełączników to pięć sposobów
-  na bycie w połowie środka;
-- **nie zmienia planu przy koncie**, nie synchronizuje się, telefon go nie widzi;
-- `lmLevelOf()` go nie czyta. Poziom nadal wyprowadzany jest w jednym miejscu, z Firebase;
-  podgląd przesuwa ścianę, nie poziom. `lmFeatureState()` zwraca przy nim `allowed: false`
-  i `preview: true`, więc strona nigdy nie napisze „Twój plan: LiczMat Pro" nad czymś,
-  czego nikt nie kupił.
-
-Sesja 28 zastępuje podgląd subskrypcją. Jest celowo jednym kluczem i jedną parą funkcji,
-żeby jego usunięcie było skasowaniem, a nie rozplątywaniem.
+**Konsekwencja, zapisana wprost:** dopóki rozszerzenie Stripe nie zacznie zapisywać
+`plan: premium`, **żadne konto nie zobaczy modułu Pro** — łącznie z kontem właściciela. To
+stan znany i zamierzony, a nie defekt do „naprawienia": nie wolno przywracać lokalnego
+obejścia. `scripts/test-plan.mjs` §6c sadzi cztery obiecujące klucze w `localStorage`
+i sprawdza, że żadna odpowiedź się nie ruszyła.
 
 **Ściana jest jedna, budowana raz.** `proGate()` w `src/pro.mjs` w miejsce czterech kopii
 z Sesji 22–25; `assets/paywall.js` w miejsce czterech kopii `xxxRenderPro()`. Cztery ściany
@@ -1191,8 +1184,8 @@ niesie:
 | jedno zdanie dobrane do poziomu: gość → załóż konto, darmowe konto → to jest Pro | *komunikaty* |
 | link do rejestracji z `?next=` na tę stronę, w jej języku | *przejście Free → Pro* |
 | „Poznaj LiczMat Pro" — zdanie, dopóki `/liczmat-pro/` jest `PLANNED` (Sesja 29) | *nigdy martwy przycisk* |
-| podgląd Pro i zdanie o tym, czym nie jest | *przejście Free → Pro* |
-| „Płatności jeszcze nie ma" | uczciwość |
+| cena obu planów w walucie odwiedzającego i link do `/app/` (Sesja 28) | *przejście Free → Pro* |
+| „Subskrypcji jeszcze nie da się wykupić" — dopóki nie ma Payment Linku | uczciwość |
 
 **Blok jest w HTML-u od pierwszego renderu i `hidden`.** Ściana tworzona przez skrypt to
 moduł, który mignie otwarty, zanim się zamknie. Odwrotnie też: gdyby `assets/plan.js` się
@@ -1202,21 +1195,47 @@ jest gorszą z dwóch awarii. Ściana nie jest granicą bezpieczeństwa i nigdy 
 granicą są wdrożone reguły Firestore, a magazyn CRM-u nie jedzie nigdzie.
 
 **Pasek nad modułem znika, kiedy ściana stoi** — mówi to samo co ściana, a dwa razy jest
-gorzej niż raz. Kiedy moduł jest otwarty, pasek mówi jedną z dwóch rzeczy: „Twój plan:
-LiczMat Pro" (konto Pro, znacznik `on`) albo „Podgląd Pro" plus zdanie, że plan się nie
-zmienił, i przycisk wyłączający. Konto Pro nie dostaje przycisku „wyłącz podgląd" — nie ma
-czego wyłączać, a taka propozycja u kogoś, kto płaci, czyta się jak groźba.
+gorzej niż raz. Kiedy moduł jest otwarty, pasek mówi jedną rzecz: „Twój plan: LiczMat Pro"
+(znacznik `on`). Od Sesji 28 nie ma drugiego przypadku, bo nie ma podglądu. Konto Pro nie
+dostaje też ceny — propozycja sprzedaży czegoś, za co ktoś już płaci, czyta się jak groźba.
 
-**Ten sam przełącznik jest w zakładce Pro na `/app/`**, bo tam idzie się sprawdzić, jaki
-ma się plan. To jeden wspólny blok (`proPreviewBlock()`), więc dwa miejsca nie mogą go
-opisać inaczej, a karta planu dopisuje przy włączonym podglądzie zdanie, że planu to nie
-ruszyło. Etykieta przycisku jest pisana przez `assets/paywall.js`, nie przez `data-i18n`:
-`/app/` tłumaczy się w miejscu, więc `data-i18n` przywróciłby „włącz" na włączonym
-podglądzie przy pierwszej zmianie języka.
+### 7.7. Gdzie stoi kasa (Sesja 28)
 
-**Czego ta sesja nie zrobiła:** płatności (Sesja 28) i strony `/liczmat-pro/` (Sesja 29).
-`plan` nadal jest polem tylko serwera, nic go nie zapisuje, w panelu nie ma formularza ani
-przycisku, który brałby pieniądze — i test tego pilnuje.
+**Płaci się wyłącznie na `/app/`.** Adres kasy musi nieść `client_reference_id` — czyli uid
+— bo płatność bez niego nie da się przypiąć do żadnego konta, a `/klienci/`, `/zlecenia/`,
+`/wyceny/` i `/terminarz/` nie ładują Firebase i uid-a nie znają. Dlatego ściana **podaje
+cenę i linkuje do `/app/`**, a nie do Stripe'a. Jedno miejsce bierze pieniądze — to, które
+wie, kto płaci.
+
+**Dwa progi zamiast jednego** (`assets/pay.js`): `lmPayPriced()` — jest kwota, więc pokaż
+cenę; `lmPayBuyable()` — jest kwota **i** Payment Link, więc pokaż przycisk. Dziś pierwsze
+jest prawdą, drugie nie, więc serwis mówi, ile Pro kosztuje, i mówi wprost, że subskrypcji
+jeszcze nie da się wykupić. Wpisanie trzech adresów włącza przyciski bez żadnej innej
+edycji — ale dopiero po kolejności z noty ORDER na końcu `assets/pay.js`: produkty →
+Payment Linki → rozszerzenie „Run Payments with Stripe" → funkcja zapisująca
+`plan`/`planValidUntil`/`planRenews` → **zapłacić raz i sprawdzić, że konto samo staje się
+Pro** → dopiero wtedy adresy. Przycisk włączony wcześniej bierze pieniądze za nic.
+
+**Ceny są wpisane ręcznie i nic ich nie przelicza.** Dwa plany, siedem walut, czternaście
+kwot — i te same czternaście musi stać na produktach w Stripe. Kurs euro zastosowano **raz,
+przy pisaniu pliku** (kursy i źródła w jego nagłówku), bo Stripe pobiera kwotę ustawioną na
+produkcie: cena policzona z kursu na żywo rozjechałaby się z tym, co schodzi z karty.
+Waluta bez wpisanej kwoty **nie pokazuje ceny**, a nie cenę wyprowadzoną z innej. Dlatego
+też `assets/currency.js` urosło z czterech walut do siedmiu — CZK, RON i RSD. Chorwacja
+jest na euro; **RUB celowo nie ma, bo Stripe nie działa w Rosji**.
+
+**Pięć stanów planu** (`lmSubscription()`): `none`, `free`, `active`, `cancelled`,
+`expired`. Anulowanie wymaga trzeciego pola — `planRenews` — bo „odnowi się 12 września"
+i „skończy się 12 września" to z `plan` + `planValidUntil` ten sam dokument. Pole jest
+serwerowe (wdrożone reguły i tak nie pozwalają klientowi na nic poza `lastSeenAt`
+i `appVersion`, więc zmiana reguł nie była potrzebna), stoi **obok kontraktu
+synchronizacji** — jak `note` na materiale i `projectId` na pomieszczeniu — a jego brak
+czytany jest jako **odnawia się**: powiedzenie komuś, że jego subskrypcja się kończy, kiedy
+dokument tego nie mówi, jest tu jedynym błędem, który kosztuje klienta.
+
+**Czego ta sesja nie zrobiła:** nie założyła produktów w Stripe, nie zainstalowała
+rozszerzenia i nie zmieniła kontraktu synchronizacji (`planRenews` zostaje długiem wobec
+`3d-polednia/Materio`). Strona `/liczmat-pro/` to nadal Sesja 29.
 
 ---
 
@@ -1425,7 +1444,8 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | centrum kalkulatorów (Sesja 7) | kalkulator w żadnej kategorii albo w dwóch naraz; kategoria z nieznanym kalkulatorem lub pusta; brak nazwy albo opisu kategorii w słowniku; skrót „Od czego zacząć”, którego nie potwierdza żaden poradnik |
 | poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z czterech języków |
 | model Free / Pro (Sesja 21) | funkcja zadeklarowana dwa razy; funkcja z nieznanym poziomem albo na nieistniejącej trasie; funkcja `PRO` na trasie, która nie jest `PRO`; trasa `PRO`, której nie pokrywa żadna funkcja; funkcja `PRO` bez tekstu do bramki; `LM_PLAN` rozjeżdżające się z kontraktem; brak któregokolwiek klucza `pro_*` / `plan_*` / `feat_*` w którymkolwiek z czterech języków |
-| paywall (Sesja 27) | ściana przed funkcją, której nie ma w `LM_FEATURES` (`proGate()` przerywa build); brak któregokolwiek klucza `pro_need_*` / `pro_prev_*` / `pro_incl_t` / `pro_signin` w którymkolwiek z czterech języków |
+| paywall (Sesja 27) | ściana przed funkcją, której nie ma w `LM_FEATURES` (`proGate()` przerywa build); brak któregokolwiek klucza `pro_need_*` / `pro_incl_t` / `pro_signin` w którymkolwiek z czterech języków |
+| subskrypcja (Sesja 28) | brak któregokolwiek klucza `pay_*` / `plan_renews` / `plan_cancelled` / `plan_active_d` / `plan_cancel_d` w którymkolwiek z czterech języków |
 | widoki (Sesja 15) | widok bez rodzica, na trasie planowanej albo na innym widoku; widok indeksowany; widok w menu lub w stopce; widok wymagający wyższego poziomu niż rodzic; widok inaczej zlokalizowany niż rodzic; adres widoku poza adresem rodzica albo gubiący identyfikator; `view: true` na trasie, która nie jest `LIVE` |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.

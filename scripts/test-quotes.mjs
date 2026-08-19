@@ -128,7 +128,7 @@ function loadPlan({ open = false } = {}) {
     if (src === before) throw new Error("LM_PRO_LOCKED is no longer one line in assets/plan.js");
   }
   return evalSource(src, [
-    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState", "lmPaywall", "lmProPreview",
+    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState", "lmPaywall",
   ], { document: undefined, localStorage: undefined });
 }
 
@@ -703,7 +703,13 @@ head("9b. the copy, in four languages");
     check(`${lang}: the wall tells a guest to make an account`,
       DICT[lang].pro_need_account.length > 40);
     check(`${lang}: and a free account what it is on`, DICT[lang].pro_need_pro.length > 20);
-    check(`${lang}: the preview says what it is not`, DICT[lang].pro_prev_d.length > 80);
+    // Session 28 replaced the preview with the subscription. The wall now quotes a
+    // price, so the copy that has to be right is the sentence for the state the site
+    // actually ships in: priced, and not yet possible to buy.
+    check(`${lang}: the subscription block names both plans`,
+      DICT[lang].pay_monthly_t !== DICT[lang].pay_yearly_t);
+    check(`${lang}: and says the subscription is not open yet`,
+      DICT[lang].pay_soon.length > 40, DICT[lang].pay_soon);
     check(`${lang}: the storage note names localStorage`,
       DICT[lang].quo_local_note.includes("localStorage"), DICT[lang].quo_local_note);
     check(`${lang}: and it is a full sentence`, DICT[lang].quo_local_note.length > 100);

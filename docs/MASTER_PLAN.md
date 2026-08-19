@@ -53,7 +53,8 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 25 | Terminarz | **Zrobione** — 2026-08-19 |
 | 26 | CRM | **Zrobione** — 2026-08-19 |
 | 27 | Paywall Pro | **Zrobione** — 2026-08-19 |
-| 28 | Płatności | **Następna** |
+| 28 | Płatności | **Zrobione** — 2026-08-19 |
+| — | *Etap dodatkowy: przywrócenie 10 języków* | **Następne** — zlecone przez właściciela |
 | 29–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
@@ -209,6 +210,152 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 28
+
+Rozdział XXV, pięć punktów zlecenia: **subskrypcja, status planu, obsługa aktywnego Pro,
+obsługa anulowania, zabezpieczenie uprawnień**.
+
+**Fakt, od którego zależy cała reszta, i który się nie zmienił.** `users/{uid}.plan`
+zapisuje wyłącznie serwer, a serwera, który by go zapisywał, nadal nie ma: ani Cloud
+Functions, ani Play Billing (`FIRESTORE_SYNC` §9.2). GitHub Pages nie ma backendu. Ta sesja
+zbudowała więc **całą stronę przeglądarki** i sama z siebie nie sprawia, że jedna złotówka
+wpływa i nadaje komuś Pro. Brakującym serwerem jest rozszerzenie Firebase „Run Payments
+with Stripe", instalowane w konsoli — kolejność jest niżej i stoi też w kodzie, w nocie
+ORDER na końcu `assets/pay.js`.
+
+**1. Subskrypcja — `assets/pay.js`.** Dwa plany (miesięczny, roczny), siedem walut,
+czternaście kwot wpisanych ręcznie. **Dwa progi zamiast jednego**: `lmPayPriced()` — jest
+kwota, więc pokaż cenę — i `lmPayBuyable()` — jest kwota **i** Payment Link, więc pokaż
+przycisk kasy. Dziś pierwsze jest prawdą, drugie nie, i to jest dokładnie stan, w którym
+serwis jedzie: mówi, ile Pro kosztuje, i mówi wprost, że subskrypcji jeszcze nie da się
+wykupić. Wpisanie trzech adresów włącza przyciski bez żadnej innej edycji.
+
+Cennik (te same czternaście kwot musi stanąć na produktach w Stripe):
+
+| plan | PLN | EUR | USD | UAH | CZK | RON | RSD |
+|---|---|---|---|---|---|---|---|
+| miesięczny | 39,99 | 9,99 | 10,99 | 479 | 229 | 49,99 | 1099 |
+| roczny | 399,99 | 99,99 | 109,99 | 4799 | 2290 | 499,99 | 10990 |
+
+**Kursu nie ma w przeglądarce.** Właściciel podał EUR i PLN i poprosił o przeliczenie
+reszty po kursie euro — zostało zrobione **raz, przy pisaniu pliku**, a nie przy każdym
+wczytaniu strony. Powód najważniejszy: Stripe pobiera kwotę ustawioną **na produkcie**, więc
+cena policzona z kursu na żywo rozjeżdżałaby się z tym, co realnie schodzi z karty przy
+kasie. Dalej: kurs w przeglądarce to zapytanie do zewnętrznego API na stronie statycznej —
+nowa zależność sieciowa, nowy odbiorca danych w polityce prywatności i cena, która potrafi
+się zmienić między obejrzeniem a kliknięciem. Kursy i źródła (wszystkie 2026-08-19) stoją
+w nagłówku `assets/pay.js`. Zniżka ok. 7,4% wobec kursu jest ta sama, którą właściciel
+zastosował już do złotówki (9,99 € × 4,3245 = 43,20 zł, ustawione 39,99 zł), więc siedem
+walut jest wycenionych jednakowo względem siebie; rocznie = 10× miesięcznie wszędzie.
+
+**Trzy nowe waluty — CZK, RON, RSD.** Bez nich nie ma czym wycenić subskrypcji w Czechach,
+Rumunii i Serbii. Chorwacja jest na euro od 2023. **RUB celowo nie ma: Stripe nie działa
+w Rosji**, więc cena w rublach byłaby ceną, której nic nie umie pobrać. Dodanie waluty
+niczego nie przelicza — każda zapisana kwota trzyma swój `currencyCode`.
+
+**2. Status planu i 3. aktywne Pro, 4. anulowanie — `lmSubscription()`.** Pięć stanów
+jednym słowem: `none`, `free`, `active`, `cancelled`, `expired`. Anulowanie wymagało
+**trzeciego pola**, bo „odnowi się 12 września" i „skończy się 12 września" to z `plan` +
+`planValidUntil` ten sam dokument. `planRenews` jest polem serwerowym; **zmiana reguł nie
+była potrzebna**, bo wdrożone reguły i tak nie pozwalają klientowi na nic poza `lastSeenAt`
+i `appVersion`. Stoi **obok kontraktu synchronizacji**, w tej samej pozycji co `note` na
+materiale (Sesja 18) i `projectId` na pomieszczeniu (Sesja 20), i przeżyje z tego samego
+powodu: każdy zapis w `CloudSync.kt` jest merge'em. Jego **brak czytany jest jako
+„odnawia się"** — powiedzenie komuś, że jego subskrypcja się kończy, kiedy dokument tego
+nie mówi, jest tu jedynym błędem, który kosztuje klienta. `lmLevelOf()` nietknięte: poziom
+nadal wyprowadzany jest w jednym miejscu, a anulowana-ale-ważna subskrypcja to wciąż PRO.
+
+**5. Zabezpieczenie uprawnień — i usunięty podgląd.** Sesja 27 zostawiła w ścianie jedne
+drzwi: jeden klucz w `localStorage` otwierający wszystkie pięć modułów. **Usunięty na
+polecenie właściciela**, wraz z `lmProPreview()`, `lmSetProPreview()`, zdarzeniem
+`lm-preview`, blokiem `proPreviewBlock()`, sześcioma kluczami słownika × 4 języki i wierszem
+na `/cookies/`. Powód: na ścianie stoi teraz cena, a lokalny przełącznik otwierający moduły
+za darmo jest ścianą, która sama sobie przeczy — i drugą odpowiedzią na pytanie „czy wolno
+mi tego użyć", podczas gdy `lmLevelOf()` istnieje po to, żeby odpowiedź była jedna.
+
+Reszta punktu 5: **kasa stoi wyłącznie na `/app/`**, bo adres kasy musi nieść
+`client_reference_id` (uid), a strony modułów nie ładują Firebase i uid-a nie znają —
+ściana podaje cenę i linkuje do `/app/`. Adres kasy niesie **uid i e-mail, i nic więcej**:
+kwota, plan i waluta stoją po stronie Stripe, więc spreparowana przeglądarka może źle
+narysować własną stronę i **nie kupi Pro za złotówkę**. `lmPayUrlOk()` przyjmuje `https:`
+na `buy.stripe.com` albo `billing.stripe.com` i porównuje **cały host** — `xbuy.stripe.com`
+kończy się właściwymi literami i należy do kogoś innego.
+
+**Polityka prywatności.** Stripe to nowy odbiorca danych, więc `privacy-policy.html` dostał
+sekcję 7.1 po polsku i po angielsku: co idzie do Stripe (e-mail, uid), czego nie widzimy
+(numer karty), co wraca (status planu, data, czy się odnowi) i że dopóki płatności nie są
+uruchomione, **nie idzie tam nic**. Bliźniak `docs/privacy-policy.html` w
+`3d-polednia/Materio` — **dług, repo nie było podpięte w tej sesji**.
+
+**Zmienione pliki.** Dodane: `assets/pay.js`, `scripts/test-pay.mjs`. Zmienione:
+`assets/plan.js` (`lmSubscription()`, `lmPlanRenews()`, podgląd usunięty), `assets/pay.js`,
+`assets/paywall.js` (ceny zamiast podglądu), `assets/app.js` (`renderPlan()` na pięć stanów,
+`renderPlanPrices()`, `goToCheckout()`), `assets/currency.js` (siedem walut),
+`src/pro.mjs` (`proPlansBlock()` zamiast `proPreviewBlock()`, panel subskrypcji),
+`src/pages.mjs` (cztery przyciski podglądu i wiersz `/cookies/`), `src/ia.mjs` (nota),
+`scripts/build.mjs` (`pay.js` na pięciu stronach, `paywall.js` zdjęte z `/app/`, `STAMP` →
+`20260819h`), `assets/i18n-pages.js` (15 nowych kluczy × 4 języki, 7 usuniętych × 4),
+`assets/styles.css` (karty planów — same istniejące tokeny), osiem plików testowych,
+`privacy-policy.html` + `404.html` (`?v=`), `CLAUDE.md`, `docs/ARCHITEKTURA.md` §7.6, §7.7
+i §9, 147 przebudowanych stron.
+
+**Testy.** `scripts/test-pay.mjs` — 243 sprawdzenia, nowy plik. `scripts/test-plan.mjs`
+urósł z 305 do 647: wypadł podgląd, doszło pięć stanów subskrypcji i **§6c**, które sadzi
+cztery obiecujące klucze w `localStorage` i sprawdza, że **żadna odpowiedź się nie ruszyła**.
+Razem **6 180 sprawdzeń logiki** w 15 zestawach, wszystkie przechodzą.
+`scripts/check-contrast.mjs` — bez nowej pary kolorów, wszystkie przechodzą. Matematyka
+kalkulatorów nietknięta.
+
+Sprawdzone **negatywnie osiem razy**, po jednym psuciu na każdą nową bramkę: waluta bez
+ceny, kwota w adresie kasy, dopuszczenie hosta przez `endsWith()`, plan roczny przestający
+być zniżką, `pay.js` sięgające do `localStorage`, Payment Link wpisany zanim cokolwiek
+nadaje plan, build przestający pisać `data-pw-price`, przycisk kasy postawiony na ścianie —
+za każdym razem test faktycznie pada. Pierwsze podejście do testu hostów **nie złapało**
+błędu `endsWith()`, bo przypadek testowy był źle dobrany (`buy.stripe.com.example.org` nie
+kończy się na `buy.stripe.com`); poprawione i sprawdzone ponownie.
+
+**Problemy.**
+
+- **Pięć modułów Pro jest teraz zamkniętych dla każdego konta, łącznie z kontem
+  właściciela.** To bezpośrednia konsekwencja usunięcia podglądu i jest **zamierzona**,
+  a nie regresja — zapisana tu, w `CLAUDE.md` i w `docs/ARCHITEKTURA.md` §7.6 właśnie po to,
+  żeby następna sesja nie uznała jej za defekt i nie „naprawiła". Odblokuje ją dopiero
+  serwer nadający `plan: premium`.
+- **Testów w Chromium nie dało się uruchomić** — Playwright nie jest zainstalowany w tym
+  kontenerze. Trzynaście zestawów (`test-*-page.mjs`) **pominęło się z kodem 0**, zgodnie ze
+  swoją konwencją; sześć z nich zostało przepisanych pod tę sesję (podgląd wypadł, doszły
+  ceny i stan anulowany), ale **nie zostały wykonane ani razu**. Trzeba je przepuścić na maszynie
+  z Playwrightem przed wdrożeniem. Żeby ten brak nie był całkowicie odsłonięty,
+  `scripts/test-pay.mjs` §6b sprawdza **statycznie**, że każdy selektor, o który pytają
+  `assets/paywall.js` i `assets/app.js`, faktycznie stoi w zbudowanym HTML-u — to ta klasa
+  błędu, którą normalnie łapie Chromium.
+- **`planRenews` nie jest w kontrakcie synchronizacji.** Dopisanie go do
+  `docs/FIRESTORE_SYNC.md`, `SyncContract.kt` i encji Room to zmiana w
+  `3d-polednia/Materio`, czyli osobna sesja. Do tego czasu telefon pola nie widzi, ale go
+  nie kasuje.
+- **Rozdziały V i VI planu są nieaktualne.** Rozdział VI wymienia cztery waluty, a jest
+  ich siedem; rozdział V wymienia cztery języki, a właściciel zlecił powrót do dziesięciu.
+  `MASTER_PLAN.txt` jest plikiem właściciela — **te dwie edycje należą do niego**.
+- **Nic nie zostało sprawdzone na żywym Stripie**, bo nie ma konta ani produktów. Cała
+  warstwa przeglądarki jest przetestowana na podstawionej konfiguracji.
+
+**Co właściciel musi zrobić, w tej kolejności** (ta sama lista stoi w `assets/pay.js`):
+
+1. Stripe → dwa produkty z **dokładnie tymi czternastoma kwotami**, po siedem walut każdy.
+2. Stripe → Payment Link na produkt, i włączony Customer Portal.
+3. Firebase → rozszerzenie „Run Payments with Stripe". **To jest ten brakujący serwer.**
+4. Funkcja przepisująca subskrypcję na `users/{uid}.plan`, `planValidUntil` i `planRenews`.
+5. **Zapłacić raz, na prawdziwym koncie, i sprawdzić, że konto samo staje się Pro.**
+6. **Dopiero wtedy** wkleić trzy adresy do `LM_PAY` w `assets/pay.js`.
+
+Przycisk kasy włączony przed punktem 5 bierze pieniądze za nic.
+
+**Status: ukończone.**
+
+**Następne zadanie: przywrócenie 10 języków** — etap dodatkowy zlecony przez właściciela,
+przed Sesją 29. Zakres, rozmiar i otwarte pytania: patrz „Przywrócenie 10 języków" w
+Otwartych decyzjach.
 
 ### Co zrobiła Sesja 21
 
@@ -1977,6 +2124,15 @@ było ruszyć: **`/wyceny/` (Sesja 24) było zadeklarowane jako indeksowane, ale
 w `sitemap.xml`.** Cztery adresy wyceny i cztery terminarza są tam teraz; test Sesji 25
 sprawdza to dla własnych stron, tak samo jak test Sesji 23 dla zleceń.
 
+### ~~Zamek stoi, a przejściem jest podgląd~~ — podgląd usunięty w Sesji 28
+
+**Nieaktualne od Sesji 28.** Podgląd Pro został skasowany na polecenie właściciela, a jego
+miejsce zajęła cena: ściana podaje, ile Pro kosztuje, i linkuje do `/app/`. Trzy pytania
+poniżej są rozstrzygnięte — cena jest ustalona (patrz raport Sesji 28), podgląd nie
+„wygasa", bo go nie ma, i nie zostaje jako okres próbny. **Zostaje w mocy jedno:** dopóki
+nic nie nadaje `plan: premium`, pięć modułów Pro jest zamkniętych dla wszystkich, łącznie
+z kontem właściciela. Akapity niżej zostają jako zapis stanu z Sesji 27.
+
 ### Zamek stoi, a przejściem jest podgląd — bo kupić Pro jeszcze się nie da (z Sesji 27)
 
 `LM_PRO_LOCKED` jest `true`. Pięć modułów Pro jest zamkniętych dla gościa i dla darmowego
@@ -2020,6 +2176,40 @@ Uwaga techniczna dla Sesji 28: podgląd jest celowo **jednym kluczem i jedną pa
 (`lmProPreview()` / `lmSetProPreview()`), żeby jego usunięcie było skasowaniem, a nie
 rozplątywaniem. Zamek jest nadal jednym `LM_PRO_LOCKED`, a testy sprawdzają obie jego
 odpowiedzi — również tę sprzed Sesji 27.
+
+### Przywrócenie 10 języków — zlecone przez właściciela w Sesji 28, do zrobienia osobno
+
+Właściciel poprosił o powrót sześciu języków wycofanych 2026-08-12 (`RETIRED_LANGS`
+w `src/site.mjs`: **cs, sk, ro, hr, sr, ru**), z powrotem do dziesięciu. To **nie zmieściło
+się w Sesji 28** i nie miało prawa: rozdział XXXV mówi „jedna sesja = jedno zadanie",
+a `CLAUDE.md` wprost — *„Do not re-add a language without the plan"*. Właściciel zgodził
+się rozłożyć to na dwa kroki i płatności poszły pierwsze.
+
+**Rozmiar, zmierzony a nie oszacowany:**
+
+- **~4 800 przetłumaczonych ciągów** — ok. 800 kluczy × 6 języków, w `assets/i18n.js`,
+  `i18n-pages.js` i `i18n-materials.js`. Build wywala się na każdym brakującym kluczu, więc
+  albo komplet, albo nie ma strony.
+- **~180 nowych slugów** — 8 sekcji + 15 kalkulatorów + poradniki, × 6 języków. **Slug jest
+  wieczny** (`CLAUDE.md`): zły czeski slug to zepsuty adres i utracona pozycja na zawsze.
+  To najdroższa część i wymaga uwagi, a nie tłumaczenia hurtem.
+- **147 → ~370 stron**, plus `hreflang`, `canonical`, `sitemap.xml`, `HREFLANG`,
+  `OG_LOCALE`, flagi w `assets/flags/` i rozplątanie przekierowań `RETIRED_LANGS`
+  z `404.html`, które dziś wysyłają stare adresy tych sześciu języków na stronę główną.
+
+**Pytania do rozstrzygnięcia przed startem:**
+
+- **Czy `ru` wraca.** Rubla Stripe nie obsłuży (nie działa w Rosji), więc ten język nigdy
+  nie dostanie własnej waluty — i jest to też decyzja pozaproduktowa.
+- **Skąd tłumaczenia.** Sześć języków wygenerowanych bez weryfikacji native speakera
+  trafiłoby na ~220 nowych publicznych stron pod domeną właściciela.
+- **Czy `/app/` i `/p/`** (tłumaczone w miejscu, bez własnych adresów) dostają komplet od razu.
+
+**Waluty są już gotowe.** Sesja 28 dołożyła CZK, RON i RSD, więc siedem walut obsłuży
+dziesięć języków bez zmian — język nie wyznacza waluty (rozdział VI).
+
+**Rozdział V `MASTER_PLAN.txt` ustala cztery języki, a rozdział VI cztery waluty. Obie
+edycje należą do właściciela** — ten plik jest jego i żadna sesja go nie przepisuje.
 
 ### Warstwa konta nie została po tej sesji sprawdzona na żywym Firebase
 

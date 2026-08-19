@@ -125,7 +125,7 @@ function loadPlan({ open = false } = {}) {
   }
   return evalSource(src, [
     "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmGate",
-    "lmFeatureState", "lmPaywall", "lmProPreview",
+    "lmFeatureState", "lmPaywall",
   ], { document: undefined, localStorage: undefined });
 }
 
@@ -566,7 +566,7 @@ head("6. the page the build writes");
   // stops filling in, and the browser test would be the only thing to notice.
   for (const id of [
     "crm-page", "crm-index", "crm-client", "crm-client-missing", "crm-client-body",
-    "crm-title", "crm-lead", "crm-pro", "crm-pro-chip", "crm-pro-note", "crm-gate",
+    "crm-title", "crm-lead", "crm-pro", "crm-pro-chip", "crm-gate",
     "crm-tool", "crm-client-form", "crm-client-name", "crm-client-phone",
     "crm-client-email", "crm-client-list", "crm-archive", "crm-archive-summary",
     "crm-archive-list", "crm-undo", "crm-undo-text", "crm-undo-go", "crm-contact",
@@ -654,7 +654,13 @@ head("7. the copy, in four languages");
     check(`${lang}: the wall tells a guest to make an account`,
       DICT[lang].pro_need_account.length > 40);
     check(`${lang}: and a free account what it is on`, DICT[lang].pro_need_pro.length > 20);
-    check(`${lang}: the preview says what it is not`, DICT[lang].pro_prev_d.length > 80);
+    // Session 28 replaced the preview with the subscription. The wall now quotes a
+    // price, so the copy that has to be right is the sentence for the state the site
+    // actually ships in: priced, and not yet possible to buy.
+    check(`${lang}: the subscription block names both plans`,
+      DICT[lang].pay_monthly_t !== DICT[lang].pay_yearly_t);
+    check(`${lang}: and says the subscription is not open yet`,
+      DICT[lang].pay_soon.length > 40, DICT[lang].pay_soon);
     check(`${lang}: the storage note names localStorage`,
       DICT[lang].cli_local_note.includes("localStorage"), DICT[lang].cli_local_note);
     check(`${lang}: and it is a full sentence`, DICT[lang].cli_local_note.length > 100);
