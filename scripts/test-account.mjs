@@ -31,13 +31,16 @@ const p = (...s) => join(ROOT, ...s);
 
 /** Evaluate a browser script that has no exports and hand back the globals we need. */
 function evalScript(file, returns, globals = {}) {
-  const src = readFileSync(p(file), "utf8");
+  const src = [].concat(file).map((f) => readFileSync(p(f), "utf8")).join("\n");
   const names = Object.keys(globals);
   return new Function(...names, `${src}\nreturn {${returns.join(",")}};`)(...names.map((n) => globals[n]));
 }
 
 const { I18N, LANGS } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
+// Session 21: /app/ renders the Pro tab from the permission table. The table is a
+// browser script and this is the same bridge scripts/build.mjs crosses.
+const { LM_FEATURES } = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATURES"]);
 const CODES = LANGS.map((l) => l.code);
 const DICT = {};
 for (const lang of CODES) DICT[lang] = { ...(I18N[lang] || {}), ...(I18N_PAGES[lang] || {}) };
@@ -224,7 +227,7 @@ head("8. /app/ carries the account system in every language");
 {
   // The page is language-neutral: it ships one copy of the markup and swaps the text in
   // place. So the markup is built once, and the copy is checked for all four.
-  const html = appMain(tr("pl"));
+  const html = appMain(tr("pl"), LM_FEATURES);
 
   const has = (needle, what) => check(what, html.includes(needle), `not in the page: ${needle}`);
   const hasNot = (needle, what) => check(what, !html.includes(needle), `still in the page: ${needle}`);

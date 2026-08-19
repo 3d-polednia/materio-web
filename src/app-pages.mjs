@@ -14,6 +14,7 @@ import {
   DEFAULT_LANG, PLAY_URL, URL_APP, URL_DASHBOARD,
 } from "./site.mjs";
 import { ACCOUNT_LEVELS, LEVEL, STATUS, route } from "./ia.mjs";
+import { proPanel, proKeys } from "./pro.mjs";
 
 /**
  * The same header and footer as the rest of the site.
@@ -120,7 +121,14 @@ function levelCards(t, current) {
     </div>`;
 }
 
-export function appMain(t) {
+/**
+ * @param {(k:string)=>string} t
+ * @param {object[]} features LM_FEATURES from assets/plan.js — session 21's permission
+ *   table. The Pro half of it is the Pro tab; the rest of it is what the other pages are
+ *   allowed to do, and no page asks yet. Handed in rather than imported because
+ *   assets/plan.js is a browser script, the same bridge the catalogue crosses.
+ */
+export function appMain(t, features) {
   const i = (key, tag = "span", cls = "") =>
     `<${tag}${cls ? ` class="${cls}"` : ""} data-i18n="${key}">${esc(t(key))}</${tag}>`;
 
@@ -239,6 +247,7 @@ export function appMain(t) {
           ${tab("projects", "app_tab_projects", true)}
           ${tab("sync", "app_tab_sync")}
           ${tab("profile", "app_tab_profile")}
+          ${tab("pro", "app_tab_pro")}
           ${tab("account", "app_tab_account")}
         </div>
 
@@ -310,6 +319,15 @@ export function appMain(t) {
             <p id="prof-session-state" class="muted field-note"></p>
             <button type="button" id="prof-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
           </div>
+        </section>
+
+        <!-- Session 21: the Free/Pro model. Nothing here is a lock — the modules do not
+             exist yet (sessions 22-26) and the plan field that would grant them is
+             server-only with nothing writing it. What the tab does is what chapter XXV
+             asks for first: make a free user understand what Pro is and where their own
+             plan stands, without a button that goes nowhere. -->
+        <section data-panel="pro" id="panel-pro" role="tabpanel" aria-labelledby="tab-pro" tabindex="0" hidden>
+          ${proPanel(t, features)}
         </section>
 
         <section data-panel="account" id="panel-account" role="tabpanel" aria-labelledby="tab-account" tabindex="0" hidden>
@@ -506,6 +524,9 @@ export function dashboardMain(t) {
 </main>`;
   return chrome(t, main);
 }
+
+/** Every dictionary key the Pro tab spends, in the four languages it is translated to. */
+export const appProKeys = (features) => ["app_tab_pro", ...proKeys(features)];
 
 /** Every dictionary key the dashboard renders, so the build can check all four languages. */
 export const dashboardKeys = () => [

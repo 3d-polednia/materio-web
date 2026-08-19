@@ -147,6 +147,7 @@ async function boot() {
     if (!state.user) return;
     renderIdentity();
     renderProfile();
+    renderPlan();
     renderProjects();
     renderRooms();
     renderLocalSummary();
@@ -407,6 +408,39 @@ function renderProfile() {
   $("prof-session-state").textContent = T(remember ? "prof_session_kept" : "prof_session_tab");
 }
 
+/**
+ * The LiczMat Pro tab: where this account's plan stands.
+ *
+ * Session 21. The module cards next to it are static markup the build wrote — they say
+ * the same thing to everybody, because nobody has Pro. This is the half that differs per
+ * account, and all of it comes out of `users/{uid}`: `plan` and `planValidUntil`, which
+ * the deployed rules let the client read and never write (FIRESTORE_SYNC §2). A browser
+ * therefore cannot promote itself by editing anything on this page, and there is no
+ * "upgrade" button because nothing on the server would answer it yet (§9.2).
+ *
+ * lmPlanStatus() is in assets/plan.js and calls lmLevelOf() rather than re-deriving the
+ * level: an expired Pro plan is LICZMAT again everywhere or nowhere.
+ */
+function renderPlan() {
+  if (!state.user || typeof lmPlanStatus !== "function") return;
+  const status = lmPlanStatus(state.user, state.profile);
+  const pro = status.level === LM_LEVEL.PRO;
+
+  $("plan-name").textContent = T(pro ? "plan_pro" : "plan_free");
+  $("plan-name").classList.toggle("warn", status.expired);
+
+  // A date only when there is one to show. A plan with no end is the free one, and
+  // "Ważny do —" reads like something is missing.
+  $("plan-until").textContent = status.validUntil
+    ? `${T("plan_until")}: ${whenText(status.validUntil)}` : "";
+
+  // Why the account is on the plan it is on. An expired Pro plan is the one case the
+  // page can explain from the document itself; otherwise it says the true and duller
+  // thing — nothing grants Pro yet.
+  $("plan-note").textContent = status.expired ? T("plan_expired") : T("plan_none");
+  $("plan-note").classList.toggle("warn", status.expired);
+}
+
 /** The way back to wherever the sign-up prompt was clicked, if there was one. */
 function renderNext() {
   const next = lmSafeNext(new URLSearchParams(location.search).get("next"));
@@ -497,6 +531,7 @@ function wireTabs() {
     if (focus) btn.focus();
     if (btn.dataset.tab === "sync") renderLocalSummary();
     if (btn.dataset.tab === "profile") renderProfile();
+    if (btn.dataset.tab === "pro") renderPlan();
   };
 
   tabs.forEach((btn, index) => {

@@ -1,0 +1,183 @@
+/* LiczMat website — the Free/Pro model: which plan an account is on, and what each of
+ * chapter II's three levels is allowed to do.
+ *
+ * Master plan, session 21 (LICZMAT PRO: FUNDAMENT): "Model Free / Pro. Bez płatności.
+ * Przygotowanie: uprawnień, feature gatingu, statusu planu, struktury Pro." This file is
+ * the first three of those four; the fourth — which modules Pro consists of and how they
+ * are shown to somebody who does not have it — is `src/pro.mjs`, built from the PRO
+ * routes in `src/ia.mjs` and checked against the table below.
+ *
+ * It is deliberately NOT loaded on every page. `assets/account.js` is, because 128 pages
+ * need to word one sentence about the session; nothing outside /app/ offers a Pro feature
+ * yet, so nothing outside /app/ pays for this. It loads after account.js and uses its
+ * LM_LEVEL and lmLevelOf() — the level is derived in exactly one place and this file does
+ * not derive it a second time.
+ *
+ * Nothing here is a security boundary. The browser decides what to *show*; the deployed
+ * Firestore rules decide what may be *written*, and `plan` is a field only the server can
+ * write (FIRESTORE_SYNC §2). A visitor who edits this file in their own devtools gets a
+ * page that says "Pro" and a backend that still refuses. That is the intended split:
+ * chapter XXV asks for a free user who *understands* which features are Pro, not for a
+ * lock made of JavaScript.
+ */
+
+/* ------------------------------------------------------------------ the plan */
+
+/**
+ * The two values `users/{uid}.plan` may hold. They come from the sync contract
+ * (FIRESTORE_SYNC §2), not from this site: the Android app reads the same field.
+ *
+ * "premium" rather than "pro" is the contract's word and predates the rebranding. Do not
+ * rename it here — the phone and the rules would disagree with the browser.
+ */
+var LM_PLAN = { FREE: "free", PRO: "premium" };
+
+/**
+ * What plan this account is on, in full, for a page that has to explain it.
+ *
+ * `lmLevelOf()` in assets/account.js answers "which of the three levels", and collapses
+ * a Pro plan that ran out into LICZMAT — which is right for gating and useless for
+ * telling somebody *why* they are back on the free level. This keeps both halves.
+ *
+ * @param {object|null} user     the Firebase Auth user, or null when signed out
+ * @param {object|null} profile  users/{uid} as read from Firestore, or null
+ * @param {number} [now]         millis, for the expiry check
+ * @returns {{signedIn:boolean, plan:string|null, level:string, validUntil:number|null,
+ *            expired:boolean}}
+ *   plan       null for a guest (no account, so no plan), else LM_PLAN.*
+ *   level      chapter II's level, from lmLevelOf() — the one derivation
+ *   validUntil millis, or null when the plan carries no end date
+ *   expired    a Pro plan whose planValidUntil has passed. The account is LICZMAT again
+ */
+function lmPlanStatus(user, profile, now) {
+  var at = now === undefined ? Date.now() : now;
+  var level = lmLevelOf(user, profile, at);
+  if (!user) {
+    return { signedIn: false, plan: null, level: level, validUntil: null, expired: false };
+  }
+  var p = profile || {};
+  var plan = p.plan === LM_PLAN.PRO ? LM_PLAN.PRO : LM_PLAN.FREE;
+  var raw = p.planValidUntil;
+  var until = raw === null || raw === undefined || isNaN(Number(raw)) ? null : Number(raw);
+  return {
+    signedIn: true,
+    plan: plan,
+    level: level,
+    validUntil: until,
+    expired: plan === LM_PLAN.PRO && until !== null && until <= at,
+  };
+}
+
+/* ------------------------------------------------------------------ permissions */
+
+/**
+ * Every feature LiczMat has or will have, with the level it needs. Chapter II's
+ * "każdy element aplikacji powinien jednoznacznie wiedzieć, do którego poziomu dostępu
+ * należy", for the features — `src/ia.mjs` already answers it for the pages.
+ *
+ * `level` is what the product actually enforces today, not a wish. Two of them differ
+ * from the bullet lists in chapter II, and both differences are decisions already taken
+ * and written down:
+ *
+ *   - Chapter II puts "zapisywać kalkulacje", "tworzyć projekty" and "tworzyć listy
+ *     materiałów" under NIE MOŻE for a guest. This site keeps all three in
+ *     `localStorage` in the Firestore document shape, so they work before anybody signs
+ *     in, and FIRESTORE_SYNC §1.2 says counting never requires an account. What the free
+ *     account adds is `sync` — the same rows on the phone — and `share`. The routes say
+ *     the same thing: /projekty/ and /kosztorys/ are GUEST in src/ia.mjs.
+ *   - The link to /projekty/ is still only offered to somebody signed in. That is
+ *     `navLevel` in src/ia.mjs and it is about the menu, not about permission; a feature
+ *     table that recorded it as a permission would be a lie a future session acts on.
+ *
+ * Fields:
+ *   id      stable key. Not a URL and not a dictionary key.
+ *   level   LM_LEVEL.* — the lowest level that may use it.
+ *   route   the id of the route in src/ia.mjs it lives on, when it has one.
+ *   key     dictionary prefix (`<key>_t` the name, `<key>_d` one line) — only for the
+ *           features a page names to the visitor, which today is the Pro modules.
+ *           A feature the pages never name carries no copy nobody would read.
+ *   session the master plan session that builds it, for what does not exist yet.
+ *   note    why it is at that level, when the answer is not obvious.
+ */
+var LM_FEATURES = [
+  /* -------------------------------------------------- guest: the whole calculator */
+  { id: "calc", level: LM_LEVEL.GUEST, route: "calculator",
+    note: "Chapter II: „Podstawowe kalkulatory NIE MOGĄ wymagać rejestracji.” The full " +
+      "result, with no field hidden behind an account." },
+  { id: "catalog", level: LM_LEVEL.GUEST, route: "materials" },
+  { id: "guides", level: LM_LEVEL.GUEST, route: "guides" },
+  { id: "stores", level: LM_LEVEL.GUEST, route: "stores" },
+
+  /* -------------------------------------------------- guest: the local workspace */
+  { id: "projects", level: LM_LEVEL.GUEST, route: "projects",
+    note: "localStorage in the Firestore shape. An account adds sync, not the ability " +
+      "to count — see the note on the route itself." },
+  { id: "rooms", level: LM_LEVEL.GUEST, route: "project" },
+  { id: "saved", level: LM_LEVEL.GUEST, route: "project",
+    note: "A calculation saved into a project. Chapter XV." },
+  { id: "shopping", level: LM_LEVEL.GUEST, route: "estimate", note: "Chapter XVI." },
+  { id: "costs", level: LM_LEVEL.GUEST, route: "estimate", note: "Chapter XVII." },
+  { id: "history", level: LM_LEVEL.GUEST, route: "dashboard",
+    note: "The dashboard reads this browser's own storage; gating it would hide " +
+      "somebody's own work from them after a token expired." },
+
+  /* -------------------------------------------------- free account */
+  { id: "sync", level: LM_LEVEL.LICZMAT, route: "account",
+    note: "The one thing an account actually adds to the workspace: the same rows in " +
+      "the browser and on the phone." },
+  { id: "share", level: LM_LEVEL.LICZMAT, route: "share",
+    note: "Reading a shared estimate needs nothing (the route is GUEST). Making the " +
+      "link writes a document under sharedProjects, so it needs an account." },
+
+  /* -------------------------------------------------- pro */
+  { id: "clients", level: LM_LEVEL.PRO, route: "clients", key: "feat_clients", session: 22 },
+  { id: "jobs", level: LM_LEVEL.PRO, route: "jobs", key: "feat_jobs", session: 23 },
+  { id: "quotes", level: LM_LEVEL.PRO, route: "quotes", key: "feat_quotes", session: 24 },
+  { id: "calendar", level: LM_LEVEL.PRO, route: "calendar", key: "feat_calendar", session: 25 },
+  { id: "crm", level: LM_LEVEL.PRO, route: null, key: "feat_crm", session: 26,
+    note: "Chapter XXIV is a path through the other four — klient → zlecenie → projekt " +
+      "→ wycena → historia — not a page of its own, so it has no route." },
+];
+
+var LM_FEATURE_BY_ID = {};
+for (var lmFi = 0; lmFi < LM_FEATURES.length; lmFi++) {
+  LM_FEATURE_BY_ID[LM_FEATURES[lmFi].id] = LM_FEATURES[lmFi];
+}
+
+/** One feature by id, or null. An unknown id is never silently "allowed". */
+function lmFeature(id) {
+  return Object.prototype.hasOwnProperty.call(LM_FEATURE_BY_ID, String(id))
+    ? LM_FEATURE_BY_ID[String(id)] : null;
+}
+
+/** Every feature at exactly this level, in declaration order. */
+function lmFeaturesAt(level) {
+  return LM_FEATURES.filter(function (f) { return f.level === level; });
+}
+
+/**
+ * May a visitor at `level` use this feature?
+ *
+ * `level` is passed in rather than read here on purpose: the only thing a page can read
+ * without Firebase is `liczmat-signed-in`, which is a copy hint and may be stale, and a
+ * function that quietly gated on it would eventually hide somebody's own projects from
+ * them. A caller that wants the hint asks for it (lmReadLevel()) and owns that choice.
+ *
+ * An unknown feature id answers false. A typo should close a door, not open one.
+ */
+function lmCan(id, level) {
+  var f = lmFeature(id);
+  return !!f && lmAllows(level, f.level);
+}
+
+/**
+ * What to show instead of a feature the visitor cannot use — chapter XXV's
+ * "Klienci / Dostępne w LiczMat Pro", never a dead button.
+ *
+ * @returns {null|{feature:object, need:string}} null when the feature is allowed
+ */
+function lmGate(id, level) {
+  var f = lmFeature(id);
+  if (!f) return null;
+  return lmAllows(level, f.level) ? null : { feature: f, need: f.level };
+}

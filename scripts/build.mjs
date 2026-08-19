@@ -31,7 +31,7 @@ import {
 } from "../src/site.mjs";
 import {
   livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
-  route, STATUS, navRoutes,
+  route, STATUS, navRoutes, ROUTES, LEVEL, LEVEL_ORDER,
 } from "../src/ia.mjs";
 import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
@@ -42,13 +42,13 @@ import {
   materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
-import { appMain, shareMain, dashboardMain, dashboardKeys } from "../src/app-pages.mjs";
+import { appMain, shareMain, dashboardMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260814g";
+const STAMP = "20260819a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -82,6 +82,14 @@ const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIA
 const { CALCS, ENGINES, localizeRow, unitLabel } = evalScript(
   ["assets/units.js", "assets/calculators.js"],
   ["CALCS", "ENGINES", "localizeRow", "unitLabel"]);
+/**
+ * Session 21's permission table. assets/plan.js reads LM_LEVEL and lmAllows() from
+ * assets/account.js, exactly as the browser does — the two are evaluated as one scope so
+ * the shipped file is the one that is checked, not a copy of it.
+ */
+const { LM_FEATURES, LM_PLAN } = evalScript(
+  ["assets/account.js", "assets/plan.js"], ["LM_FEATURES", "LM_PLAN"]);
+
 const CATALOG = evalScript("assets/materials.js", [
   "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "matName", "matNote", "primaryCalcFor",
 ]);
@@ -198,6 +206,47 @@ function validate() {
   for (const key of dashboardKeys()) {
     for (const lang of LANGS) {
       if (!(key in DICT[lang])) problems.push(`dashboard key "${key}" is missing in ${lang}`);
+    }
+  }
+
+  // Session 21: the Free/Pro model. The permission table is authored in assets/plan.js
+  // because the browser has to read it, so nothing in src/ia.mjs can validate it — this
+  // is where the two are made to agree. A Pro module that no route declares, or a route
+  // at LEVEL.PRO that the table forgot, would ship as a page nobody can reach or a gate
+  // nobody can see.
+  {
+    const ids = new Set();
+    for (const f of LM_FEATURES) {
+      if (ids.has(f.id)) problems.push(`feature "${f.id}" is declared twice`);
+      ids.add(f.id);
+      if (!LEVEL_ORDER.includes(f.level)) {
+        problems.push(`feature "${f.id}" has level "${f.level}", which is not a level`);
+      }
+      if (f.route && !route(f.route)) {
+        problems.push(`feature "${f.id}" points at route "${f.route}", which does not exist`);
+      }
+      if (f.route && f.level === LEVEL.PRO && route(f.route).level !== LEVEL.PRO) {
+        problems.push(`feature "${f.id}" is PRO but route "${f.route}" is not`);
+      }
+      if (f.level === LEVEL.PRO && !f.key) {
+        problems.push(`feature "${f.id}" is PRO and has no copy — a gate with no name`);
+      }
+    }
+    for (const r of ROUTES) {
+      if (r.level !== LEVEL.PRO) continue;
+      if (!LM_FEATURES.some((f) => f.route === r.id)) {
+        problems.push(`route "${r.id}" is PRO and no feature in assets/plan.js covers it`);
+      }
+    }
+    if (LM_PLAN.PRO !== "premium" || LM_PLAN.FREE !== "free") {
+      problems.push(`LM_PLAN no longer matches the sync contract: ${JSON.stringify(LM_PLAN)}`);
+    }
+    // The Pro tab is translated in the browser like the rest of /app/, so a key nobody
+    // wrote ships as the literal "feat_quotes_d" in that one language.
+    for (const key of appProKeys(LM_FEATURES)) {
+      for (const lang of LANGS) {
+        if (!(key in DICT[lang])) problems.push(`Pro key "${key}" is missing in ${lang}`);
+      }
     }
   }
 
@@ -617,11 +666,13 @@ function buildPrivatePages() {
     title: `${t("app_title")} — LiczMat`,
     description: t("app_lead"),
     path: URL_APP,
-    main: appMain(t),
+    main: appMain(t, LM_FEATURES),
     headExtra: navScript,
     // workspace.js is a classic script on purpose: /app/ reads the browser workspace
     // through its globals, which a module's own scope would hide.
-    classicScripts: ["/assets/workspace.js"],
+    // plan.js before app.js: the Pro tab reads the permission table and the plan status
+    // through its globals, which a module's own scope would hide.
+    classicScripts: ["/assets/workspace.js", "/assets/plan.js"],
     scripts: ["/assets/app.js"],
   }));
 

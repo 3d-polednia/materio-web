@@ -712,6 +712,69 @@ build, bo szóstego nikt nie mierzył.
 
 ---
 
+### 7.6. Model Free / Pro — uprawnienia, gating, status planu (Sesja 21)
+
+Rozdział XXXII, Sesja 21: „Model Free / Pro. Bez płatności. Przygotowanie: uprawnień,
+feature gatingu, statusu planu, struktury Pro." Cztery rzeczy, i żadna z nich nie jest
+modułem Pro — te budują Sesje 22–26, a paywall i płatności Sesje 27–28.
+
+**Uprawnienia: `LM_FEATURES` w `assets/plan.js`.** `src/ia.mjs` od Sesji 3 odpowiada na
+pytanie „jakiego poziomu wymaga ta *strona*". To jest druga połowa zdania z rozdziału II
+(„każdy element aplikacji powinien jednoznacznie wiedzieć, do którego poziomu dostępu
+należy") — dla *funkcji*. Siedemnaście pozycji (10 × gość, 2 × LiczMat, 5 × Pro), każda
+z jednym poziomem, opcjonalną trasą i numerem sesji, jeśli jeszcze nie istnieje.
+
+Tabela zapisuje **to, co serwis faktycznie robi**, nie to, co byłoby ładniejsze. Dwie
+pozycje różnią się od list w rozdziale II i obie różnice są już podjętymi decyzjami:
+
+- Rozdział II wpisuje gościowi „zapisywać kalkulacje", „tworzyć projekty" i „tworzyć listy
+  materiałów" pod NIE MOŻE. Ten serwis trzyma je w `localStorage` w kształcie dokumentu
+  Firestore, `/projekty/` i `/kosztorys/` są trasami `GUEST` (§8.1), a `FIRESTORE_SYNC` §1.2
+  mówi wprost, że liczenie nigdy nie wymaga konta. Darmowe konto dokłada **synchronizację**
+  i **link do udostępnienia** — nie prawo do liczenia. Tabela mówi to samo, bo tabela,
+  która mówiłaby co innego, jest instrukcją dla którejś z kolejnych sesji, żeby zamknąć
+  coś, co dziś działa.
+- Link do `/projekty/` widzi tylko zalogowany. To `navLevel` w `src/ia.mjs`, czyli menu,
+  a nie uprawnienie; w tabeli funkcji go nie ma i być nie może.
+
+**Gating: `lmCan(id, level)` i `lmGate(id, level)`.** Poziom jest **przekazywany**, nie
+odczytywany w środku. Jedyne, co strona bez Firebase potrafi przeczytać, to `liczmat-signed-in`,
+a to podpowiedź, która bywa nieaktualna — funkcja, która po cichu by na niej zamykała,
+prędzej czy później schowałaby komuś jego własne projekty. Kto chce podpowiedzi, prosi
+o nią sam (`lmReadLevel()`) i bierze to na siebie. Nieznany identyfikator funkcji zwraca
+`false`: literówka ma zamykać drzwi, nie otwierać.
+
+**Nic z tego nie jest zabezpieczeniem.** Przeglądarka decyduje, co *pokazać*; co wolno
+*zapisać*, decydują wdrożone reguły Firestore, a `plan` jest polem, które klient może
+tylko czytać (`FIRESTORE_SYNC` §2). Kto podmieni sobie ten plik w devtoolsach, dostanie
+stronę z napisem „Pro" i backend, który dalej odmawia. Rozdział XXV prosi o darmowego
+użytkownika, który **rozumie**, co jest Pro — nie o zamek z JavaScriptu.
+
+**Status planu: `lmPlanStatus()`.** `lmLevelOf()` w `assets/account.js` odpowiada „który
+z trzech poziomów" i sprowadza wygasły plan Pro do LICZMAT — słusznie do gatingu i
+bezużytecznie do wytłumaczenia komuś, **dlaczego** wrócił na darmowy. `lmPlanStatus()`
+trzyma obie połowy: `plan` (`free` / `premium` — słowa z kontraktu, nie z brandingu),
+`validUntil`, `expired` i `level`, przy czym poziom **woła** `lmLevelOf()`, zamiast liczyć
+go po raz drugi. Gość nie ma planu `free` — ma `null`: nie ma konta, więc nie ma na czym
+planu trzymać.
+
+**Struktura Pro: piąta zakładka `/app/`.** Pięć modułów — Klienci (22), Zlecenia (23),
+Wyceny (24), Terminarz (25), Historia i CRM (26) — opisanych w całości i oznaczonych
+zdaniem z rozdziału XXV: „Dostępne w LiczMat Pro". Opis jest pełny, bo rozdział XXV chce,
+żeby darmowy użytkownik rozumiał, co jest Pro; wstrzymany jest sam moduł, którego zresztą
+jeszcze nie ma. **Żadnego martwego przycisku**: „Poznaj LiczMat Pro" jest zdaniem, a nie
+linkiem, dopóki `/liczmat-pro/` jest `PLANNED` (Sesja 29) — dokładnie tak, jak `HOME_DOORS`
+rysuje drzwi do strony, której nie ma. Nad modułami stoi karta planu tego konta, wypełniana
+przez `assets/app.js` z `users/{uid}`; przycisku „kup" nie ma, bo nic po stronie serwera
+by go nie obsłużyło (`FIRESTORE_SYNC` §9.2).
+
+Deklaracja jest jedna. `assets/plan.js` jest skryptem przeglądarki, więc `src/pro.mjs`
+dostaje listę funkcji z zewnątrz — tym samym mostem, którym `src/pages.mjs` dostaje
+katalog materiałów — a `scripts/build.mjs` zestawia tabelę z `ROUTES`: trasa `PRO`, której
+nie pokrywa żadna funkcja, i funkcja `PRO` na trasie, która nie jest `PRO`, wywalają build.
+
+---
+
 ## 8. Otwarte decyzje
 
 Do rozstrzygnięcia przez właściciela, zanim dotknie ich któraś z kolejnych sesji.
@@ -912,6 +975,7 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | strona główna (Sesja 6) | inna liczba drzwi niż trzy albo inna kolejność poziomów; drzwi na nieistniejącą trasę; brak tekstu drzwi w słowniku |
 | centrum kalkulatorów (Sesja 7) | kalkulator w żadnej kategorii albo w dwóch naraz; kategoria z nieznanym kalkulatorem lub pusta; brak nazwy albo opisu kategorii w słowniku; skrót „Od czego zacząć”, którego nie potwierdza żaden poradnik |
 | poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z czterech języków |
+| model Free / Pro (Sesja 21) | funkcja zadeklarowana dwa razy; funkcja z nieznanym poziomem albo na nieistniejącej trasie; funkcja `PRO` na trasie, która nie jest `PRO`; trasa `PRO`, której nie pokrywa żadna funkcja; funkcja `PRO` bez tekstu do bramki; `LM_PLAN` rozjeżdżające się z kontraktem; brak któregokolwiek klucza `pro_*` / `plan_*` / `feat_*` w którymkolwiek z czterech języków |
 | widoki (Sesja 15) | widok bez rodzica, na trasie planowanej albo na innym widoku; widok indeksowany; widok w menu lub w stopce; widok wymagający wyższego poziomu niż rodzic; widok inaczej zlokalizowany niż rodzic; adres widoku poza adresem rodzica albo gubiący identyfikator; `view: true` na trasie, która nie jest `LIVE` |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.

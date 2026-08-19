@@ -46,8 +46,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 18 | Edycja materiałów | **Zrobione** — 2026-08-14 |
 | 19 | Koszty projektu | **Zrobione** — 2026-08-14 |
 | 20 | Pomieszczenia | **Zrobione** — 2026-08-14 |
-| 21 | LiczMat Pro: fundament | **Następna** |
-| 22–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 21 | LiczMat Pro: fundament | **Zrobione** — 2026-08-19 |
+| 22 | Klienci | **Następna** |
+| 23–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -202,6 +203,110 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 21
+
+Rozdział XXXII, Sesja 21 w całości: „Model Free / Pro. Bez płatności. Przygotowanie:
+uprawnień, feature gatingu, statusu planu, struktury Pro." Cztery przygotowania — i **żaden
+moduł Pro**: Klienci to Sesja 22, Zlecenia 23, Wyceny 24, Terminarz 25, CRM 26, paywall
+i płatności 27–28, strona `/liczmat-pro/` 29. Nic z tego nie zostało tknięte.
+
+**1. Uprawnienia — `LM_FEATURES` w nowym `assets/plan.js`.** `src/ia.mjs` od Sesji 3
+odpowiada, jakiego poziomu wymaga *strona*. To jest druga połowa zdania z rozdziału II
+(„każdy element aplikacji powinien jednoznacznie wiedzieć, do którego poziomu dostępu
+należy") — dla *funkcji*: siedemnaście pozycji, każda z jednym poziomem, trasą, jeśli ją ma,
+i numerem sesji, jeśli jeszcze nie istnieje.
+
+Tabela zapisuje **to, co serwis faktycznie robi**. Rozdział II wpisuje gościowi „zapisywać
+kalkulacje", „tworzyć projekty" i „tworzyć listy materiałów" pod NIE MOŻE — ten serwis
+trzyma je w `localStorage` w kształcie dokumentu Firestore, `/projekty/` i `/kosztorys/` są
+trasami `GUEST` (rozstrzygnięcie §8.1 po Sesji 20), a `FIRESTORE_SYNC` §1.2 mówi wprost, że
+liczenie nigdy nie wymaga konta. Dziesięć z siedemnastu funkcji jest więc gościowskich;
+darmowe konto dokłada dwie — synchronizację i link do udostępnienia. Tabela, która mówiłaby
+co innego, byłaby instrukcją dla którejś z kolejnych sesji, żeby zamknąć coś, co dziś działa.
+
+**2. Feature gating — `lmCan(id, level)` i `lmGate(id, level)`.** Poziom jest
+**przekazywany**, nie odczytywany w środku. Jedyne, co strona bez Firebase potrafi
+przeczytać, to `liczmat-signed-in`, a to podpowiedź, która bywa nieaktualna — funkcja, która
+po cichu by na niej zamykała, prędzej czy później schowałaby komuś jego własne projekty.
+Nieznany identyfikator zwraca `false` i **nie ma bramki**: literówka ma zamykać drzwi, nie
+otwierać, i nie ma prawa wypisać na stronie „undefined".
+
+**Nic z tego nie jest zabezpieczeniem, i tak jest napisane w kodzie.** Przeglądarka
+decyduje, co *pokazać*; co wolno *zapisać*, decydują wdrożone reguły Firestore. Kto podmieni
+sobie ten plik w devtoolsach, dostanie stronę z napisem „Pro" i backend, który dalej
+odmawia.
+
+**3. Status planu — `lmPlanStatus()`.** `lmLevelOf()` sprowadza wygasły plan Pro do LICZMAT:
+słusznie do bramkowania i bezużytecznie do wytłumaczenia komuś, **dlaczego** wrócił na
+darmowy. Nowa funkcja trzyma obie połowy — `plan` (`free` / `premium`, słowa z kontraktu,
+starsze niż rebranding), `validUntil`, `expired` i `level`, przy czym poziom **woła**
+`lmLevelOf()`, zamiast liczyć go po raz drugi. Gość nie ma planu `free`, tylko `null`: nie ma
+konta, więc nie ma na czym planu trzymać, a „Darmowy" powiedziane komuś, kto się nigdy nie
+zarejestrował, nazywa plan, którego ten ktoś nie posiada.
+
+**4. Struktura Pro — piąta zakładka `/app/`.** Pięć modułów opisanych w całości i każdy
+oznaczony zdaniem z rozdziału XXV: „Dostępne w LiczMat Pro". Opis jest pełny, bo rozdział XXV
+chce, żeby darmowy użytkownik **rozumiał**, co jest Pro; wstrzymany jest sam moduł, którego
+zresztą jeszcze nie ma. **Żaden przycisk nie prowadzi donikąd** — „Poznaj LiczMat Pro" jest
+zdaniem, a nie linkiem, dopóki `/liczmat-pro/` jest `PLANNED`, dokładnie tak, jak `HOME_DOORS`
+rysuje drzwi do strony, której nie ma. Test w Chromium liczy, że w całym panelu jest **zero**
+elementów klikalnych. Nad modułami stoi karta planu tego konta, wypełniana z `users/{uid}`;
+przycisku „kup" nie ma, bo nic po stronie serwera by go nie obsłużyło.
+
+Deklaracja jest jedna. `assets/plan.js` jest skryptem przeglądarki, więc `src/pro.mjs`
+dostaje listę funkcji z zewnątrz — tym samym mostem, którym `src/pages.mjs` dostaje katalog
+materiałów — a build zestawia tabelę z `ROUTES` i przerywa się, gdy trasa `PRO` nie ma
+funkcji albo funkcja `PRO` siedzi na trasie, która nie jest `PRO`.
+
+**Zmienione pliki.** Dodane: `assets/plan.js`, `src/pro.mjs`, `scripts/test-plan.mjs`.
+Zmienione: `src/app-pages.mjs` (piąta zakładka, panel Pro), `assets/app.js` (`renderPlan()`,
+przerysowanie przy zmianie języka), `scripts/build.mjs` (wczytanie tabeli, osiem nowych
+sprawdzeń, `STAMP` → `20260819a`, `plan.js` na `/app/`), `assets/i18n-pages.js` (23 klucze
+× 4 języki), `assets/styles.css` (karty modułów i pasek planu — same istniejące tokeny),
+`scripts/test-account.mjs` i `scripts/test-account-page.mjs` (piąta zakładka, panel Pro,
+szerokości), `CLAUDE.md`, `docs/ARCHITEKTURA.md` §7.6 i §9, `404.html` i
+`privacy-policy.html` (`?v=`), 131 przebudowanych stron. Usunięte: nic.
+
+**Testy.** `scripts/test-plan.mjs` — 305 sprawdzeń, nowy plik; reszta zestawu przechodzi bez
+zmian. Sprawdzone **negatywnie siedem razy**, po jednym psuciu na każdą nową bramkę
+build’a — trasa `PRO` bez funkcji, funkcja z nieistniejącym poziomem, funkcja na
+nieistniejącej trasie, funkcja `PRO` bez tekstu, `LM_PLAN` rozjeżdżające się z kontraktem,
+brak klucza `feat_quotes_t` w niemieckim i zdublowany identyfikator funkcji — za każdym
+razem build faktycznie pada i mówi, na czym.
+Razem **3405 sprawdzeń logiki** (9 zestawów) i **1418 w Chromium** (8 zestawów,
+Playwright zainstalowany poza repo), w tym 22 nowe w `/app/`: darmowy plan, plan Pro z datą,
+plan Pro, który wygasł (nazwa wraca na „Darmowy", nota mówi dlaczego, plakietka tożsamości
+się zgadza), przerysowanie panelu po przełączeniu na niemiecki, zero klikalnych elementów
+i brak przewijania w bok na 360 / 414 / 768 px. `scripts/check-contrast.mjs` — bez nowej
+pary kolorów, wszystkie przechodzą. Matematyka kalkulatorów nietknięta:
+`assets/calculators.js` bez zmian.
+
+**Problemy.**
+
+- **Poziom PRO jest nadal nieosiągalny w praktyce** i ta sesja tego nie zmieniła, bo nie
+  miała. `plan` nadaje wyłącznie serwer, a serwera, który by go nadawał, nie ma: ani Cloud
+  Functions, ani Play Billing (`FIRESTORE_SYNC` §9.1–9.2). Kolejność z rozdziału XXV jest
+  jednoznaczna — najpierw funkcje Pro, potem uprawnienia, na końcu paywall — więc karta
+  planu mówi to wprost: „Nic jeszcze nie nadaje planu Pro". Do decyzji właściciela zostaje
+  **w której sesji** ktoś zaczyna `plan` nadawać; Sesja 27 (paywall) i 28 (płatności) są
+  w planie po modułach.
+- **Piąta zakładka nie była mierzona w niemieckim tak, jak mierzony był piąty link
+  w nagłówku.** Rząd zakładek ma `flex-wrap: wrap`, więc zawija się zamiast wystawać, i test
+  sprawdza brak przewijania w bok na 360 / 414 / 768 px — ale najdłuższe etykiety
+  („Synchronizacja", „LiczMat Pro") nie były sprawdzane pod kątem tego, czy rząd zostaje
+  jednolinijkowy. Zawinięty rząd zakładek jest poprawny; jednolinijkowy byłby ładniejszy.
+- **Tabela uprawnień nie jest jeszcze przez nic czytana poza zakładką Pro.** To jest zgodne
+  z zakresem („przygotowanie"), ale znaczy, że `lmCan()` ma dziś jednego użytkownika
+  i testy. Sesja 22 będzie pierwszą, która postawi na niej prawdziwą bramkę.
+- **Rozdział II a to, co ships.** Różnica opisana w punkcie 1 jest zapisana w kodzie,
+  w `docs/ARCHITEKTURA.md` §7.6 i tutaj — celowo, w trzech miejscach, bo to jedyne miejsce
+  w całym modelu, w którym plan i produkt mówią co innego. Gdyby właściciel chciał, żeby
+  gość jednak **nie mógł** zapisywać projektów, to jest zmiana produktu, nie tabeli.
+
+**Status: ukończone.**
+
+**Następne zadanie: Sesja 22 — KLIENCI.**
 
 ### Poprawki po Sesji 20 — zgłoszone przez właściciela
 
@@ -1722,16 +1827,18 @@ Propozycja: przenieść na `/konto/` z przekierowaniem ze starego adresu. Strona
 Lista autoryzowanych domen Firebase **nie** wymaga zmiany: są w niej hosty, nie ścieżki.
 Koszt: jedna krótka sesja. Pełne uzasadnienie: [`ARCHITEKTURA.md`](ARCHITEKTURA.md) §8.2.
 
-### Zawartość poziomu Pro — nadal nieustalona, a strona już go opisuje
+### Kto i kiedy zaczyna nadawać `plan` — nadal do decyzji
 
-`/app/` pokazuje od Sesji 13 kartę „LiczMat Pro” z czterema pozycjami, które **wymienia
-rozdział II planu**: klienci, zlecenia, wyceny, terminarz. Karta mówi „W przygotowaniu”
-i nie ma na niej nic do kliknięcia, bo `/liczmat-pro/` powstaje w Sesji 29, a `plan`
-w Firestore **nikt dziś nie nadaje** — nie ma Cloud Functions ani Play Billing
-(`FIRESTORE_SYNC.md` §9.1–9.2). To znaczy, że poziom PRO jest w kodzie policzalny
-i przetestowany, ale w praktyce nieosiągalny. Nic tu nie jest zepsute; trzeba tylko
-wiedzieć, że **kolejność jest taka: najpierw ktoś musi nadawać `plan`, potem paywall
-z rozdziału XXV ma czego pilnować**. Do decyzji właściciela, w której sesji.
+`/app/` pokazuje od Sesji 13 kartę „LiczMat Pro”, a od Sesji 21 całą zakładkę: pięć modułów
+z rozdziału II i XIX, każdy opisany i oznaczony „Dostępne w LiczMat Pro”, plus karta planu
+tego konta. **Zawartość poziomu Pro nie jest już nieustalona** — to jest ta piątka, w tej
+kolejności, i tak samo mówi tabela uprawnień w `assets/plan.js`. Nieustalone zostało co
+innego i węższego: `plan` w Firestore **nikt dziś nie nadaje** — nie ma Cloud Functions ani
+Play Billing (`FIRESTORE_SYNC.md` §9.1–9.2) — więc poziom PRO jest w kodzie policzalny
+i przetestowany, a w praktyce nieosiągalny. Nic tu nie jest zepsute; kolejność z rozdziału
+XXV jest jednoznaczna — **najpierw funkcje Pro (Sesje 22–26), potem uprawnienia, na końcu
+paywall (27) i płatności (28)**. Do decyzji właściciela zostaje, w której sesji ktoś po
+stronie serwera zaczyna ten plan nadawać.
 
 ### Warstwa konta nie została po tej sesji sprawdzona na żywym Firebase
 

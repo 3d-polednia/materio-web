@@ -1188,6 +1188,25 @@ a.chip:hover { text-decoration: none; }
   margin: var(--sp-3) 0 0; font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--muted);
 }
 
+/* Session 21 — LiczMat Pro on /app/: where the plan stands, and the modules Pro is
+   going to consist of. One card per module, described in full and marked as Pro, which
+   is what chapter XXV asks for: understand what is Pro, never meet a dead button. */
+.plan-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin: var(--sp-3) 0 var(--sp-2); }
+.plan-state .chip { cursor: default; }
+.plan-state .muted { font-size: var(--fs-sm); }
+.pro-mods { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; margin: var(--sp-5) 0; }
+@media (min-width: 620px) { .pro-mods { grid-template-columns: repeat(2, 1fr); } }
+.pro-mod {
+  padding: var(--sp-5); border: 1px solid var(--outline); border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.pro-mod h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
+.pro-mod p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
+.pro-lock { margin: 0; }
+.pro-lock .chip { cursor: default; background: var(--accent-soft); color: var(--on-accent-soft); border-color: var(--accent-edge); }
+.pro-soon { margin: var(--sp-2) 0 0; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.pro-more { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+
 /* The profile's read-only facts: a label and a value, one pair per row. */
 .facts { margin: 0; display: grid; gap: var(--sp-2); }
 .fact { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: space-between; font-size: var(--fs-sm); }

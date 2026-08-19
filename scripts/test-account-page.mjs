@@ -644,9 +644,79 @@ head("9. the level comes from the profile the server owns");
   await ctx.close();
 }
 
+head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const hour = 3600e3;
+
+  const signIn = async (docs) => {
+    const page = await openApp(ctx, "/app/", { accounts: ACCOUNT, docs });
+    await page.fill("#signin-email", "kto@example.com");
+    await page.fill("#signin-password", "sekret123");
+    await page.click("#signin-form button[type=submit]");
+    await signedIn(page);
+    await page.click('[data-tab="pro"]');
+    return page;
+  };
+
+  const free = await signIn({ "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web" } });
+  check("the panel opens", await visible(free, '[data-panel="pro"]'));
+  eq("a free account is told it is on the free plan",
+    await free.locator("#plan-name").innerText(), "Darmowy");
+  eq("with no end date to print", await free.locator("#plan-until").innerText(), "");
+  // The true and duller sentence: there is no payment, so nothing grants Pro to anyone.
+  eq("and the honest reason it is not Pro", await free.locator("#plan-note").innerText(),
+    "Nic jeszcze nie nadaje planu Pro — nie ma płatności, więc każde konto jest darmowe.");
+
+  // Chapter XXV: understand what is Pro, and never meet a dead button.
+  eq("all five Pro modules are described", await free.locator(".pro-mod").count(), 5);
+  eq("each one marked as Pro", await free.locator(".pro-lock .chip").count(), 5);
+  eq("the first is Klienci", await free.locator(".pro-mod h3").first().innerText(), "Klienci");
+  eq("and it says so", await free.locator('.pro-mod[data-feature="clients"] .pro-lock').innerText(),
+    "Dostępne w LiczMat Pro");
+  eq("nothing in the panel is clickable, because nothing is built",
+    await free.locator("#panel-pro a, #panel-pro button").count(), 0);
+  eq("no console error", free.lmErrors.join(" / "), "");
+  await free.close();
+
+  const until = Date.UTC(2027, 2, 1);
+  const pro = await signIn({
+    "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "premium", planValidUntil: until },
+  });
+  eq("a Pro account is named as Pro", await pro.locator("#plan-name").innerText(), "LiczMat Pro");
+  check("and told how long it runs",
+    (await pro.locator("#plan-until").innerText()).startsWith("Ważny do:"),
+    await pro.locator("#plan-until").innerText());
+  await pro.close();
+
+  // The one case the page can explain from the document itself: plan still says premium,
+  // the level is LiczMat again. Without this the account looks demoted for no reason.
+  const over = await signIn({
+    "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "premium", planValidUntil: Date.now() - hour },
+  });
+  eq("an expired plan puts the account back on free",
+    await over.locator("#plan-name").innerText(), "Darmowy");
+  eq("and says why", await over.locator("#plan-note").innerText(),
+    "Plan Pro wygasł. Konto działa dalej jako darmowe LiczMat.");
+  eq("the identity chip agrees", await over.locator("#app-level").innerText(), "LiczMat");
+
+  // /app/ swaps the DOM instead of navigating, so anything JavaScript wrote has to be
+  // written again in the new language — the plan chip and its note are both written here.
+  await over.click("#lang-toggle");
+  await over.click('.lang-item[data-lang="de"]');
+  eq("switching language redraws the plan", await over.locator("#plan-name").innerText(), "Kostenlos");
+  eq("and its note", await over.locator("#plan-note").innerText(),
+    "Der Pro-Tarif ist abgelaufen. Das Konto läuft als kostenloses LiczMat weiter.");
+  eq("and the module cards, which the build wrote",
+    await over.locator('.pro-mod[data-feature="clients"] h3').innerText(), "Kunden");
+  eq("no console error", over.lmErrors.join(" / "), "");
+  await over.close();
+  await ctx.close();
+}
+
 /* --- 10. the tabs, the language switch, the phone ------------------------------------ */
 
-head("10. four tabs, reachable from the keyboard");
+head("10. five tabs, reachable from the keyboard");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
   const page = await openApp(ctx, "/app/", { accounts: ACCOUNT });
@@ -655,9 +725,11 @@ head("10. four tabs, reachable from the keyboard");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
 
-  // Four since the owner asked for "Pomieszczenia" to be folded into the project it
-  // belongs to: a room is an element of a project (chapter XVIII), not a second subject.
-  eq("there are four", await page.locator(".app-tab").count(), 4);
+  // Rooms are not one of them: the owner asked for "Pomieszczenia" to be folded into the
+  // project it belongs to, because a room is an element of a project (chapter XVIII), not
+  // a second subject. The fifth is LiczMat Pro, added by session 21 — the plan this
+  // account is on and the modules Pro is going to consist of.
+  eq("there are five", await page.locator(".app-tab").count(), 5);
   eq("only the selected one is in the tab order",
     await page.locator('.app-tab[tabindex="0"]').count(), 1);
 
@@ -747,6 +819,15 @@ head("12. the account page on a phone");
       document.documentElement.scrollWidth - document.documentElement.clientWidth);
     check(`the profile at ${width}px does not scroll sideways`, overflow <= 0,
       `overflows by ${overflow}px`);
+
+    // Session 21 put a fifth tab on the row and a two-column grid of module cards behind
+    // it. Both are the shapes chapter XXVIII catches: a tab row that will not wrap and a
+    // grid that keeps two columns on a phone.
+    await page.click('[data-tab="pro"]');
+    const overflowPro = await page.evaluate(() =>
+      document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    check(`the Pro tab at ${width}px does not scroll sideways`, overflowPro <= 0,
+      `overflows by ${overflowPro}px`);
     await page.close();
     await ctx.close();
   }

@@ -407,6 +407,33 @@ const I18N_PAGES = {
     sess_header_in: "Jesteś zalogowany",
     sess_header_pro: "Jesteś zalogowany — LiczMat Pro",
 
+    /* Session 21 — the Free/Pro model. Which plan an account is on, and the modules
+       LiczMat Pro is going to consist of. Chapter XXV: a free user should understand
+       which features are Pro, and should never meet a dead button. */
+    app_tab_pro: "LiczMat Pro",
+    pro_t: "LiczMat Pro",
+    pro_d: "LiczMat ogarnia Twoje projekty. Pro ogarnia Twoją pracę: klienci, zlecenia, wyceny i terminy obok tego, co już liczysz.",
+    pro_locked: "Dostępne w LiczMat Pro",
+    pro_more: "Poznaj LiczMat Pro",
+    pro_pay_later: "Płatności jeszcze nie ma. Najpierw powstają funkcje Pro, potem sprawdzamy uprawnienia, a paywall jest na końcu.",
+    plan_t: "Twój plan",
+    plan_d: "Plan jest zapisany przy koncie na serwerze. Przeglądarka go czyta i nie potrafi zmienić.",
+    plan_free: "Darmowy",
+    plan_pro: "LiczMat Pro",
+    plan_until: "Ważny do",
+    plan_expired: "Plan Pro wygasł. Konto działa dalej jako darmowe LiczMat.",
+    plan_none: "Nic jeszcze nie nadaje planu Pro — nie ma płatności, więc każde konto jest darmowe.",
+    feat_clients_t: "Klienci",
+    feat_clients_d: "Lista klientów z danymi kontaktowymi, notatkami i historią współpracy.",
+    feat_jobs_t: "Zlecenia",
+    feat_jobs_d: "Zlecenie z klientem, opisem, statusem, terminem, wartością i powiązanym projektem.",
+    feat_quotes_t: "Wyceny",
+    feat_quotes_d: "Materiał, robocizna, dodatkowe koszty, marża i suma — z tego, co już policzyłeś.",
+    feat_calendar_t: "Terminarz",
+    feat_calendar_d: "Terminy zleceń i podstawowe informacje o nich. Nie drugi Kalendarz Google.",
+    feat_crm_t: "Historia i CRM",
+    feat_crm_d: "Droga przez całą pracę: klient → zlecenie → projekt → wycena → historia.",
+
     /* Projects, rooms and the estimate, all kept in the browser. */
     nav_projects: "Projekty",
     wspage_title: "Projekty i pomieszczenia",
@@ -898,6 +925,33 @@ const I18N_PAGES = {
     sess_header_in: "You are signed in",
     sess_header_pro: "You are signed in — LiczMat Pro",
 
+    /* Session 21 — the Free/Pro model. Which plan an account is on, and the modules
+       LiczMat Pro is going to consist of. Chapter XXV: a free user should understand
+       which features are Pro, and should never meet a dead button. */
+    app_tab_pro: "LiczMat Pro",
+    pro_t: "LiczMat Pro",
+    pro_d: "LiczMat runs your projects. Pro runs your work: clients, jobs, quotes and dates next to what you already count.",
+    pro_locked: "Available in LiczMat Pro",
+    pro_more: "See what LiczMat Pro is",
+    pro_pay_later: "There is no payment yet. The Pro features are built first, then the permissions are tested, and the paywall comes last.",
+    plan_t: "Your plan",
+    plan_d: "The plan is stored with the account on the server. The browser reads it and cannot change it.",
+    plan_free: "Free",
+    plan_pro: "LiczMat Pro",
+    plan_until: "Valid until",
+    plan_expired: "The Pro plan has run out. The account carries on as free LiczMat.",
+    plan_none: "Nothing grants the Pro plan yet — there is no payment, so every account is free.",
+    feat_clients_t: "Clients",
+    feat_clients_d: "A list of clients with contact details, notes and the history of working with them.",
+    feat_jobs_t: "Jobs",
+    feat_jobs_d: "A job with its client, description, status, date, value and the project it belongs to.",
+    feat_quotes_t: "Quotes",
+    feat_quotes_d: "Material, labour, other costs, margin and the total, from what you have already counted.",
+    feat_calendar_t: "Schedule",
+    feat_calendar_d: "The dates of the jobs and the basics about them. Not a second Google Calendar.",
+    feat_crm_t: "History and CRM",
+    feat_crm_d: "The path through the whole job: client → job → project → quote → history.",
+
     /* Projects, rooms and the estimate, all kept in the browser. */
     nav_projects: "Projects",
     wspage_title: "Projects and rooms",
@@ -1388,6 +1442,33 @@ const I18N_PAGES = {
     sess_header_in: "Du bist angemeldet",
     sess_header_pro: "Du bist angemeldet — LiczMat Pro",
 
+    /* Session 21 — the Free/Pro model. Which plan an account is on, and the modules
+       LiczMat Pro is going to consist of. Chapter XXV: a free user should understand
+       which features are Pro, and should never meet a dead button. */
+    app_tab_pro: "LiczMat Pro",
+    pro_t: "LiczMat Pro",
+    pro_d: "LiczMat führt deine Projekte. Pro führt deine Arbeit: Kunden, Aufträge, Angebote und Termine neben dem, was du ohnehin rechnest.",
+    pro_locked: "In LiczMat Pro verfügbar",
+    pro_more: "LiczMat Pro kennenlernen",
+    pro_pay_later: "Bezahlen kann man noch nicht. Zuerst entstehen die Pro-Funktionen, dann werden die Rechte geprüft, und die Paywall kommt zuletzt.",
+    plan_t: "Dein Tarif",
+    plan_d: "Der Tarif steht beim Konto auf dem Server. Der Browser liest ihn und kann ihn nicht ändern.",
+    plan_free: "Kostenlos",
+    plan_pro: "LiczMat Pro",
+    plan_until: "Gültig bis",
+    plan_expired: "Der Pro-Tarif ist abgelaufen. Das Konto läuft als kostenloses LiczMat weiter.",
+    plan_none: "Bisher vergibt nichts den Pro-Tarif — es gibt keine Bezahlung, also ist jedes Konto kostenlos.",
+    feat_clients_t: "Kunden",
+    feat_clients_d: "Eine Kundenliste mit Kontaktdaten, Notizen und der Historie der Zusammenarbeit.",
+    feat_jobs_t: "Aufträge",
+    feat_jobs_d: "Ein Auftrag mit Kunde, Beschreibung, Status, Termin, Wert und dem Projekt dazu.",
+    feat_quotes_t: "Angebote",
+    feat_quotes_d: "Material, Arbeitszeit, weitere Kosten, Marge und Summe, aus dem, was du schon gerechnet hast.",
+    feat_calendar_t: "Termine",
+    feat_calendar_d: "Die Termine der Aufträge und das Nötigste dazu. Kein zweiter Google Kalender.",
+    feat_crm_t: "Historie und CRM",
+    feat_crm_d: "Der Weg durch die ganze Arbeit: Kunde → Auftrag → Projekt → Angebot → Historie.",
+
     /* Projects, rooms and the estimate, all kept in the browser. */
     nav_projects: "Projekte",
     wspage_title: "Projekte und Räume",
@@ -1877,6 +1958,33 @@ const I18N_PAGES = {
     prof_session_tab: "Ми вийдемо з акаунта, коли ти закриєш браузер.",
     sess_header_in: "Ти в акаунті",
     sess_header_pro: "Ти в акаунті — LiczMat Pro",
+
+    /* Session 21 — the Free/Pro model. Which plan an account is on, and the modules
+       LiczMat Pro is going to consist of. Chapter XXV: a free user should understand
+       which features are Pro, and should never meet a dead button. */
+    app_tab_pro: "LiczMat Pro",
+    pro_t: "LiczMat Pro",
+    pro_d: "LiczMat веде твої проєкти. Pro веде твою роботу: клієнти, замовлення, кошториси й терміни поряд із тим, що ти вже рахуєш.",
+    pro_locked: "Доступно в LiczMat Pro",
+    pro_more: "Дізнатися про LiczMat Pro",
+    pro_pay_later: "Оплати ще немає. Спершу з’являються функції Pro, потім перевіряємо права, а paywall — наприкінці.",
+    plan_t: "Твій план",
+    plan_d: "План записаний при акаунті на сервері. Браузер його читає і не може змінити.",
+    plan_free: "Безкоштовний",
+    plan_pro: "LiczMat Pro",
+    plan_until: "Дійсний до",
+    plan_expired: "План Pro закінчився. Акаунт працює далі як безкоштовний LiczMat.",
+    plan_none: "Поки що ніщо не надає план Pro — оплати немає, тож кожен акаунт безкоштовний.",
+    feat_clients_t: "Клієнти",
+    feat_clients_d: "Список клієнтів із контактами, нотатками та історією співпраці.",
+    feat_jobs_t: "Замовлення",
+    feat_jobs_d: "Замовлення з клієнтом, описом, статусом, терміном, вартістю та пов’язаним проєктом.",
+    feat_quotes_t: "Кошториси",
+    feat_quotes_d: "Матеріал, робота, додаткові витрати, маржа й сума — з того, що ти вже порахував.",
+    feat_calendar_t: "Календар",
+    feat_calendar_d: "Терміни замовлень і основне про них. Не другий Google Календар.",
+    feat_crm_t: "Історія і CRM",
+    feat_crm_d: "Шлях через усю роботу: клієнт → замовлення → проєкт → кошторис → історія.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
     nav_projects: "Проєкти",

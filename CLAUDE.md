@@ -95,6 +95,7 @@ node scripts/test-save.mjs        # saving a calculation: the snapshot, the proj
 node scripts/test-materials.mjs   # the material list: the document, the arrow, editing, the copy
 node scripts/test-costs.mjs       # costs: the unit price, the currency rule, the three figures
 node scripts/test-rooms.mjs       # rooms: the document, the project link, the assignment
+node scripts/test-plan.mjs        # the Free/Pro model: permissions, gating, plan status
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -118,6 +119,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | |
 | `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
+| `assets/plan.js` — the Free/Pro model and the permission table | |
 | `assets/recent.js`, `assets/dashboard.js` | |
 | `src/*.mjs` — information architecture, site map, templates, page bodies, formulas | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
@@ -216,6 +218,13 @@ scripts/test-rooms-page.mjs  The same in Chromium, nothing stubbed: a room added
                       another room and taken out of all of them, the index naming each
                       room's project, four languages, the currency switch, the widths of
                       chapter XXVIII and the no-JavaScript variant
+scripts/test-plan.mjs  The Free/Pro model (session 21, chapters II, XIX and XXV): the two
+                      plan values against the sync contract, lmPlanStatus() including the
+                      Pro plan that ran out, the permission table against src/ia.mjs, what
+                      lmCan()/lmGate() answer for every feature at every level, the five
+                      Pro modules in session order and the copy in four languages.
+                      Dependency-free — run it after touching assets/plan.js, src/pro.mjs
+                      or a pro_*/plan_*/feat_* key
 scripts/test-costs.mjs  What a project costs (session 19, chapter XVII): the unit price,
                       which is `estimatedCostMinor / quantity` and never a stored field;
                       the write that goes the other way (ilość × cena, rounded once); the
@@ -233,6 +242,9 @@ scripts/test-save-page.mjs  The same arrow clicked through in Chromium, nothing 
                       result → project picker → saved line → the project screen reading it
                       back, including a line saved in Polish and read in German after
                       switching language on the open project
+src/pro.mjs           The build side of LiczMat Pro: the module list (the PRO half of
+                      LM_FEATURES, handed in), chapter XXV's "Dostępne w LiczMat Pro"
+                      block, and the Pro tab of /app/. It renders; it does not declare
 src/app-pages.mjs     /app/, /app/dashboard/ and /p/ (noindex, translated in the browser)
 assets/styles.css     The design system: one token block, then the components that
                       spend it. Never write a literal colour/radius/duration below it
@@ -261,6 +273,10 @@ assets/recent.js      Which calculators this browser used, and when. Device-loca
                       It is what the dashboard's "ostatnio używane narzędzia" reads
 assets/dashboard.js   /app/dashboard/ — the four lists of chapter XIV, drawn from the local
                       workspace and assets/recent.js. Loads no Firebase on purpose
+assets/plan.js        The Free/Pro model: which plan an account is on (lmPlanStatus) and
+                      what each of the three levels may do (LM_FEATURES, lmCan, lmGate).
+                      Loaded on /app/ only, after assets/account.js — nothing outside it
+                      offers a Pro feature yet, so nothing outside it pays for the file
 assets/account.js     The user session and the three access levels of chapter II. Loaded
                       on every page: it is what lets a calculator word the sentence under
                       the result without loading Firebase. /app/ is its only writer
@@ -397,6 +413,16 @@ Kotlin side of it. Change one, change all three.
   is a console setting (Firebase → Project settings → General → Project name), not a repo
   one. Separately, the Google security mail ("you signed in to …") takes its name from the
   OAuth consent screen's App name, a Google Cloud console setting. Both still say Materio.
+- **Nothing grants a plan, and no page may pretend otherwise.** `users/{uid}.plan` is
+  `"free"` or `"premium"` (the contract's word, older than the rebranding — do not rename
+  it), it is server-only, and nothing writes it: no Cloud Functions, no Play Billing
+  (FIRESTORE_SYNC §9.2). So the Pro tab on `/app/` describes the five modules in full,
+  marks each "Dostępne w LiczMat Pro", says out loud that nothing grants Pro yet, and
+  carries no button — chapter XXV asks for a free user who understands what is Pro, and
+  payments only after the Pro features exist (sessions 27–28). `lmPlanStatus()` keeps the
+  half `lmLevelOf()` throws away: a `premium` plan whose `planValidUntil` has passed is
+  LICZMAT again, and `expired` is what lets the page say why instead of looking demoted
+  for no reason.
 - **The visitor's level is derived, never asserted.** `lmLevelOf()` in
   `assets/account.js`: no Firebase user → `guest`; signed in → `liczmat`; signed in with
   `users/{uid}.plan == "premium"` (still valid) → `pro`. `plan` and `planValidUntil` are
@@ -407,7 +433,21 @@ Kotlin side of it. Change one, change all three.
   "W przygotowaniu" with nothing to click. **Do not add a field to `users/{uid}`** — a
   name, a currency, a preference — the rules reject it; a profile name goes to Firebase
   Auth (`updateProfile`) instead.
-- **`/app/` has four tabs, and rooms are not one of them.** Chapter XVIII makes a room an
+- **The Free/Pro model is a table, and it records what ships.** `LM_FEATURES` in
+  `assets/plan.js` gives every feature one of chapter II's three levels — the other half of
+  "każdy element aplikacji powinien jednoznacznie wiedzieć, do którego poziomu dostępu
+  należy", which `src/ia.mjs` already answers for pages. Ten of the seventeen are GUEST,
+  and that includes projects, rooms, saved calculations, the material list and costs: they
+  are `localStorage` in the Firestore shape, the routes are GUEST, and FIRESTORE_SYNC §1.2
+  says counting never requires an account. Chapter II lists three of them under NIE MOŻE
+  for a guest; the table follows the shipped product, because a table that said otherwise
+  is an instruction to a later session to close something that works today. What the free
+  account adds is `sync` and `share`. **None of it is a security boundary** — the browser
+  decides what to *show*, the deployed rules decide what may be *written*, and `plan` is
+  read-only to a client. `lmCan()` takes the level as an argument rather than reading
+  `liczmat-signed-in`, because that hint can be stale and a function that quietly gated on
+  it would hide somebody's own projects from them.
+- **`/app/` has five tabs, and rooms are not one of them.** Chapter XVIII makes a room an
   element of a project, so `renderProjects()` draws each project's rooms inside its row
   with an add form of its own, and the rooms nobody assigned get one list at the bottom —
   that is every room made on the phone, because `SyncContract.roomToDoc()` has no
