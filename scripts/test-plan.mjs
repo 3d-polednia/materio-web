@@ -29,7 +29,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { LEVEL, LEVEL_ORDER, ROUTES, STATUS, route, validateIA } from "../src/ia.mjs";
-import { proModules, proKeys, proPanel } from "../src/pro.mjs";
+import { proModules, proKeys, proPanel, proModuleCard } from "../src/pro.mjs";
 import { appMain, appProKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -159,7 +159,10 @@ head("3. the permission table says one level per feature");
 
 head("4. the table and src/ia.mjs agree about what is Pro");
 {
-  for (const r of ROUTES.filter((x) => x.level === LEVEL.PRO)) {
+  // A view is a state of its parent page — /klienci/?id=<id> is the clients module seen
+  // from the inside, not a sixth module — so it is covered by the feature its parent
+  // carries. scripts/build.mjs skips views in the same check for the same reason.
+  for (const r of ROUTES.filter((x) => x.level === LEVEL.PRO && !x.view)) {
     const f = LM_FEATURES.find((x) => x.route === r.id);
     check(`route "${r.id}" is covered by a feature`, !!f);
     if (f) eq(`and that feature is PRO too`, f.level, LEVEL.PRO);
@@ -246,11 +249,26 @@ head("7. the Pro modules, in the order the plan builds them");
   for (const m of mods) {
     check(`"${m.id}" has a name and a line under it`, !!m.key);
   }
-  // Nothing is built yet, so nothing may claim to be. When session 22 turns /klienci/
-  // LIVE, this check is what forces the "W przygotowaniu" line off that card.
+  // Session 22 built the first of them, so the statuses are no longer all the same — and
+  // the card has to follow the route rather than a hard-coded sentence. A module whose
+  // page exists is offered; one whose session has not happened yet says so and links
+  // nowhere, which is chapter XXV's "never a dead button" in both directions.
+  eq("clients is built — session 22", route("clients").status, STATUS.LIVE);
   for (const m of mods) {
-    if (!m.route) continue;
+    if (!m.route || m.id === "clients") continue;
     eq(`"${m.id}" is still planned`, route(m.route).status, STATUS.PLANNED);
+  }
+  for (const m of mods) {
+    const card = proModuleCard(tr("pl"), m);
+    const live = m.route && route(m.route).status === STATUS.LIVE;
+    check(`"${m.id}": the card ${live ? "does not say" : "says"} "in preparation"`,
+      card.includes('data-i18n="door_soon"') === !live);
+    check(`"${m.id}": the card ${live ? "opens" : "does not open"} the module`,
+      card.includes("data-nav-route=") === Boolean(live));
+    if (live) {
+      check(`"${m.id}": and the link is the route's own address`,
+        card.includes(`href="${route(m.route).path("pl")}"`), card);
+    }
   }
 }
 
@@ -306,7 +324,9 @@ head("9. /app/ carries the Pro tab");
   // route is PLANNED, so the page may not link to one — and /liczmat-pro/ waits for
   // session 29, so "Poznaj LiczMat Pro" is a sentence until then.
   hasNot('href="/liczmat-pro/"', "nothing links to the Pro page before session 29 builds it");
-  hasNot('href="/klienci/"', "nor to Klienci");
+  // Klienci is built (session 22), so its card is the one module the tab can open. A
+  // dead button is what chapter XXV forbids; a live one is what it asks for.
+  has('href="/klienci/"', "and Klienci, which exists, is reachable from its card");
   has('class="muted pro-more"', "so the way in is text, not a button");
 
   // Everything the tab renders is swapped in place on `langchange` (the page has no

@@ -47,8 +47,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 19 | Koszty projektu | **Zrobione** — 2026-08-14 |
 | 20 | Pomieszczenia | **Zrobione** — 2026-08-14 |
 | 21 | LiczMat Pro: fundament | **Zrobione** — 2026-08-19 |
-| 22 | Klienci | **Następna** |
-| 23–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 22 | Klienci | **Zrobione** — 2026-08-19 |
+| 23 | Zlecenia | **Następna** |
+| 24–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -1839,6 +1840,36 @@ i przetestowany, a w praktyce nieosiągalny. Nic tu nie jest zepsute; kolejnoś�
 XXV jest jednoznaczna — **najpierw funkcje Pro (Sesje 22–26), potem uprawnienia, na końcu
 paywall (27) i płatności (28)**. Do decyzji właściciela zostaje, w której sesji ktoś po
 stronie serwera zaczyna ten plan nadawać.
+
+### Klienci są tylko w przeglądarce — telefon ich nie zobaczy (z Sesji 22)
+
+Kontrakt synchronizacji nie ma kolekcji klientów: `docs/FIRESTORE_SYNC.md` w repo aplikacji
+wymienia `projects`, `rooms`, `estimations`, `shoppingItems` i `sharedProjects`, nie ma
+`ClientEntity`, nie ma `SyncContract.clientToDoc()` i nie ma `validClient()` we wdrożonych
+regułach. Dlatego `assets/crm.js` trzyma klientów pod własnym kluczem (`liczmat-crm-v1`),
+nic z nich nie idzie do Firestore, `wsExport()` ich nie zawiera, a strona `/klienci/` mówi
+to wprost — bez tego zdania byłaby to obietnica synchronizacji, której nie ma.
+
+Dokument klienta jest napisany w kształcie kontraktu (id, pola, `createdAt` / `updatedAt` /
+`deletedAt` / `schemaVersion`, nagrobek zamiast kasowania), więc **przeniesienie klientów na
+telefon jest zmianą kontraktu w repo aplikacji**, a nie przepisaniem tego pliku: `ClientEntity`
++ migracja Room, `clientToDoc()` / `clientFromDoc()`, `validClient()` w regułach i kolekcja
+w `CloudSync`. To osobne zadanie i osobna decyzja właściciela — kiedy, i czy w ogóle przed
+płatnościami.
+
+### Moduł Pro jest dziś otwarty dla każdego — zamek przychodzi z Sesją 27 (z Sesji 22)
+
+`/klienci/` mówi na górze „Dostępne w LiczMat Pro" i jednym zdaniem, że planu Pro nic
+jeszcze nie nadaje, więc moduł jest na razie otwarty. To jest świadoma decyzja tej sesji,
+nie luka: gdyby zamek stanął dziś, moduł byłby zamknięty **dla każdego istniejącego konta**,
+bo żadne nie ma `plan: premium` — łącznie z kontem, które ma sprawdzić, czy moduł działa.
+Rozdział XXV podaje kolejność wprost: najpierw funkcje Pro, potem sprawdzenie działania
+i uprawnień, paywall na końcu.
+
+Cały mechanizm jest już na miejscu i przetestowany w obie strony: `lmFeatureState()`
+w `assets/plan.js` odpowiada `allowed / gated / locked`, blok bramki siedzi w HTML-u od
+pierwszego renderu (ukryty), a **jedynym przełącznikiem jest `LM_PRO_LOCKED`**. Sesja 27
+zmienia jedną linijkę; test sprawdza obie odpowiedzi, więc nie będzie to zmiana na ślepo.
 
 ### Warstwa konta nie została po tej sesji sprawdzona na żywym Firebase
 

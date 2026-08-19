@@ -181,3 +181,41 @@ function lmGate(id, level) {
   if (!f) return null;
   return lmAllows(level, f.level) ? null : { feature: f, need: f.level };
 }
+
+/**
+ * Whether a feature the visitor's level does not reach is *closed*, or only marked as Pro.
+ *
+ * Chapter XXV asks for both, in this order: "Użytkownik darmowy powinien rozumieć, które
+ * funkcje są Pro" first, and payments "dopiero po zbudowaniu funkcji Pro, sprawdzeniu ich
+ * działania, przetestowaniu uprawnień, przygotowaniu paywalla". Sessions 22–26 build the
+ * modules; session 27 is the paywall and session 28 the payments.
+ *
+ * Until then this is `false`, and that is a deliberate, reversible decision rather than a
+ * gap: **nothing grants Pro** (FIRESTORE_SYNC §9.2 — no Cloud Functions, no Play Billing,
+ * and `plan` is server-only), so a lock today would close every Pro module to every
+ * account in existence, including the one that has to check the module works before there
+ * is anything to pay for. So a gated visitor is *told* the module is LiczMat Pro — the
+ * words are chapter XXV's own — and the module below the notice still runs.
+ *
+ * Session 27 flips this one variable. Nothing else has to change: every page asks
+ * lmFeatureState() and already renders both answers.
+ */
+var LM_PRO_LOCKED = false;
+
+/**
+ * How a page should present one feature to a visitor at `level`.
+ *
+ * @returns {{allowed:boolean, gated:boolean, locked:boolean, feature:object|null}}
+ *   allowed the level reaches it
+ *   gated   it does not — say what the module is and that it is Pro (chapter XXV)
+ *   locked  and show the gate *instead of* the module. LM_PRO_LOCKED, above
+ *
+ * An unknown feature id is closed, for the reason lmCan() answers false: a typo should
+ * shut a door, not open one.
+ */
+function lmFeatureState(id, level) {
+  var f = lmFeature(id);
+  if (!f) return { allowed: false, gated: true, locked: true, feature: null };
+  var allowed = lmAllows(level, f.level);
+  return { allowed: allowed, gated: !allowed, locked: !allowed && LM_PRO_LOCKED, feature: f };
+}

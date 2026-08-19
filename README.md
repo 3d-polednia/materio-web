@@ -42,7 +42,7 @@ Strony generuje bezzależnościowy skrypt Node — patrz [Budowanie](#budowanie)
 ## Budowanie
 
 ```bash
-node scripts/build.mjs          # generuje 130 stron + sitemap.xml
+node scripts/build.mjs          # generuje 135 stron + sitemap.xml
 node scripts/build.mjs --check  # tylko walidacja słowników i slugów
 ```
 

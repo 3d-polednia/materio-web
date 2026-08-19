@@ -75,7 +75,7 @@ nie wymaga konta**.
 
 ## 2. Inwentarz stron — stan na dziś
 
-131 wygenerowanych stron: 32 strony logiczne × 4 języki, plus trzy bezjęzykowe.
+135 wygenerowanych stron: 33 strony logiczne × 4 języki, plus trzy bezjęzykowe.
 Adresy w kolumnie „URL (PL)”; pozostałe języki mają prefiks (`/en/…`, `/de/…`, `/uk/…`)
 i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 
@@ -92,6 +92,8 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 | `projects` | `/projekty/` | GUEST | `home` | tak | 4 |
 | `project` | `/projekty/?id=…` | GUEST | `projects` | **nie** | 0 — widok |
 | `estimate` | `/kosztorys/` | GUEST | `projects` | tak | 4 |
+| `clients` | `/klienci/` | **PRO** | `home` | tak | 4 |
+| `client` | `/klienci/?id=…` | **PRO** | `clients` | **nie** | 0 — widok |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 4 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
 | `dashboard` | `/app/dashboard/` | GUEST | `account` | **nie** | 1 |
@@ -100,6 +102,10 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 
 `404.html` też jest pisany ręcznie i nie jest trasą — jest obsługą błędu i przekierowaniem
 (patrz §3).
+
+`clients` (Sesja 22) jest pierwszą trasą `PRO`, która naprawdę istnieje, i jedyną stroną
+w inwentarzu, której link jest ukryty przed kimś poniżej Pro (`navLevel`, §5). Sama strona
+nie jest bramkowana — patrz §7.7.
 
 **`project` jest pierwszym „widokiem” (`view: true`) — ekranem bez własnego pliku.**
 Liczba wygenerowanych stron się przez niego nie zmienia i to jest cała jego definicja:
@@ -182,14 +188,15 @@ adresu, który już działa, i żeby żadna nie trafiła do menu przed czasem.
 | Trasa | URL (PL) | Poziom | Sesja | Po co |
 |---|---|---|---|---|
 | `liczmat-pro` | `/liczmat-pro/` | GUEST | 29 | publiczna strona Pro: co to, dla kogo, ile kosztuje |
-| `clients` | `/klienci/` | PRO | 22 | lista klientów |
 | `jobs` | `/zlecenia/` | PRO | 23 | zlecenia: status, termin, wartość |
 | `quotes` | `/wyceny/` | PRO | 24 | materiały + robocizna + marża |
 | `calendar` | `/terminarz/` | PRO | 25 | terminy zleceń |
 
 Slugi w pozostałych trzech językach są już ustalone w `src/ia.mjs` (`plannedSlug`) — po to,
-żeby sesja 22 nie wymyślała ich w pośpiechu. Przenoszą się do `SECTION` w `src/site.mjs`
-w chwili, gdy dana sesja buduje stronę.
+żeby sesja, która buduje stronę, nie wymyślała ich w pośpiechu. Przenoszą się do `SECTION`
+w `src/site.mjs` w chwili, gdy to się dzieje: Sesja 22 przeniosła w ten sposób `clients`
+(`klienci` / `kliyenty` / `kunden` / `clients`), bez zmiany choćby jednej litery — slug
+jest trwały od momentu, w którym został zaplanowany.
 
 **`/liczmat-pro/` jest publiczna i indeksowana, moduły Pro też.** To nie jest sprzeczność:
 paywall stoi na *narzędziu*, nie na *opisie narzędzia*. Rozdział XXV wymaga, żeby darmowy
@@ -772,6 +779,87 @@ Deklaracja jest jedna. `assets/plan.js` jest skryptem przeglądarki, więc `src/
 dostaje listę funkcji z zewnątrz — tym samym mostem, którym `src/pages.mjs` dostaje
 katalog materiałów — a `scripts/build.mjs` zestawia tabelę z `ROUTES`: trasa `PRO`, której
 nie pokrywa żadna funkcja, i funkcja `PRO` na trasie, która nie jest `PRO`, wywalają build.
+
+### 7.7. Klienci — pierwszy moduł LiczMat Pro (Sesja 22)
+
+Rozdział XXXII, Sesja 22: „KLIENCI — CRM klientów". Rozdział XX mówi, co klient może mieć:
+dane kontaktowe, notatki, historię, zlecenia, projekty, wyceny. Zlecenia to Sesja 23,
+wyceny Sesja 24, a pełna droga „klient → zlecenie → projekt → wycena → historia" Sesja 26 —
+więc Sesja 22 buduje samego klienta i jedyne powiązanie, które **dziś istnieje**: projekt.
+
+**Strona.** `/klienci/` w czterech językach, plus `/klienci/?id=<clientId>` jako `view` —
+dokładnie z tego powodu, z którego `project` nim jest: identyfikator powstaje
+w przeglądarce, a GitHub Pages nie ma przepisywania adresów (§3). Indeks to lista klientów
+i archiwum; ekran klienta to dane kontaktowe, notatki, jego projekty razem z tym, ile już
+kosztują, i historia.
+
+**Magazyn: `assets/crm.js`, klucz `liczmat-crm-v1`, tylko ta przeglądarka.** Kontrakt
+synchronizacji (`docs/FIRESTORE_SYNC.md` w repo aplikacji) ma pięć kolekcji — `projects`,
+`rooms`, `estimations`, `shoppingItems`, `sharedProjects` — i **nie ma klientów**: nie ma
+`ClientEntity`, nie ma `SyncContract.clientToDoc()`, nie ma `validClient()` we wdrożonych
+regułach. Więc nic stąd nigdzie nie jedzie, `/app/` tego nie wysyła, `wsExport()` tego nie
+zawiera, a strona mówi to wprost, zamiast sugerować synchronizację, której nie ma.
+Przeniesienie klientów na telefon to zmiana kontraktu po stronie aplikacji — osobna sesja,
+nie doklejka do tej.
+
+Dokument jest mimo to napisany w **kształcie** kontraktu (`id`, pola, `createdAt` /
+`updatedAt` / `deletedAt` / `schemaVersion`), a usunięcie zostawia nagrobek zamiast
+kasować wiersz. To nie ozdoba: nagrobek jest tym, co czyni cofnięcie dokładnym, i tym,
+czego potrzebowałaby przyszła zmiana kontraktu, żeby wysłać w górę wiersze, które już są.
+
+**Osobny klucz, nie `materio-workspace-v1`.** Magazyn warsztatu to „dokumenty, które ma
+też aplikacja". Kolekcja, o której aplikacja nigdy nie słyszała, uczyniłaby to zdanie
+nieprawdziwym — i trafiłaby do `wsExport()`, czyli do tego, co `/app/` wysyła do Firestore.
+
+**Powiązanie klient → projekt leży na kliencie, nie jako `clientId` na projekcie.**
+Dokument projektu jest kontraktem: jedzie do Firestore, wraca na telefon i renderuje się
+na `/p/<token>`. Pole, które rozumie tylko ta przeglądarka, jechałoby przez wszystkie trzy,
+podczas gdy klient, na którego wskazuje, nie jedzie nigdzie — pół powiązania, w tej
+połowie, która podróżuje. Cała relacja wewnątrz lokalnego klienta trzyma się w jednym
+miejscu, przeżywa usunięcie i cofnięcie, i **niczego nie zmienia w projekcie**: test
+sprawdza, że dokument projektu po przypisaniu jest bajt w bajt ten sam. Jeden projekt ma
+jednego klienta — drugie przypisanie **przenosi** projekt, zamiast go kopiować.
+
+Usunięcie klienta **nie usuwa jego projektów** (ten sam argument, co przy pomieszczeniach
+w §7.5: projekt jest własną pracą odwiedzającego i synchronizuje się na telefon), a
+usunięcie projektu **nie zrywa powiązania** — projekt w warsztacie da się przywrócić
+(`wsRestoreProject()`), a link zerwany „na wszelki wypadek" oznaczałby, że przywrócony
+projekt wraca do nikogo.
+
+**Pieniędzy na kliencie nie ma i nie będzie.** Ile warta jest praca dla klienta, wynika
+z jego projektów, a koszt projektu ma już dokładnie jedną odpowiedź — `wsProjectCosts()`
+(§7.4), która liczy każdą kwotę w projekcie raz. Zapisana suma na kliencie byłaby wolna
+od tego, żeby zacząć się z nią kłócić przy pierwszej zmianie ceny materiału. Waluty
+sumują się bez przeliczania (rozdział VI); strona mówi „różne waluty", zamiast pokazywać
+liczbę, która nic nie znaczy.
+
+**Historia jest wyliczana, nie zapisywana.** Wszystko, co się na tym serwisie klientowi
+przydarzyło, to kalkulacje zapisane w jego projektach, a te już mają datę. Drugi dziennik
+rozjechałby się przy pierwszej poprawionej pozycji.
+
+**Rozdział XXV, i dlaczego dziś to jest napis, a nie zamek.** Nad modułem stoi pasek:
+„Dostępne w LiczMat Pro" i jedno zdanie, które mówi prawdę — planu Pro **nic jeszcze nie
+nadaje** (`FIRESTORE_SYNC` §9.2: żadnych Cloud Functions, żadnych płatności; `plan` jest
+polem tylko do zapisu po stronie serwera), więc moduł jest na razie otwarty. Zamek dziś
+zamknąłby moduł **każdemu istniejącemu kontu**, łącznie z tym, które ma sprawdzić, czy
+moduł działa — a rozdział XXV wymaga dokładnie tej kolejności: najpierw funkcje Pro,
+potem sprawdzenie działania i uprawnień, paywall na końcu (Sesja 27), płatności po nim
+(Sesja 28).
+
+Mechanizm jest już cały na miejscu: `lmFeatureState(id, level)` w `assets/plan.js`
+odpowiada `allowed / gated / locked`, blok bramki jest w HTML-u od pierwszego renderu
+(ukryty), a **jedynym przełącznikiem Sesji 27 jest `LM_PRO_LOCKED`**. Test sprawdza obie
+odpowiedzi — także tę po przełączeniu — więc paywall nie będzie pisany na ślepo.
+
+**Link jest w stopce z `navLevel: PRO`.** Menu pokazuje go dopiero na Pro, ale znacznik
+zostaje w HTML-u i bez JavaScriptu jest widoczny — to ten sam mechanizm, co przy
+`/projekty/` (§8.1), i to on pozwala stronie zostać `indexable` i w `sitemap.xml`. Crawler
+widzi nazwę modułu, opis i zdanie „Dostępne w LiczMat Pro"; danych klienta nie widzi nikt
+poza przeglądarką, w której powstały. Karta modułu w zakładce Pro na `/app/` prowadzi teraz
+do strony (`data-nav-route` + `window.LM_NAV`, bo `/app/` nie ma własnego języka) — martwy
+przycisk zamienił się w działający dokładnie wtedy, gdy moduł zaczął istnieć.
+
+---
 
 ---
 

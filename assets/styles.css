@@ -463,7 +463,7 @@ section.block { padding: var(--section-y) 0; }
    enough to see against the field, and one focus treatment. */
 .field input, .field select, .search-row input, .inline-form input,
 .mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input,
-.ws-save-row select, .ws-save-new input {
+.ws-save-row select, .ws-save-new input, .ws-mat-f textarea {
   width: 100%; font: inherit; font-size: var(--fs-base); line-height: var(--lh-snug);
   min-height: var(--control-h); padding: var(--sp-2) var(--control-px);
   border-radius: var(--radius-xs); border: 1px solid var(--outline-control);
@@ -472,13 +472,14 @@ section.block { padding: var(--section-y) 0; }
 }
 .field input:hover, .field select:hover, .search-row input:hover, .inline-form input:hover,
 .mat-search:hover, .ws-bar-row select:hover, .ws-estimate-bar select:hover,
-.ws-save-row select:hover, .ws-save-new input:hover {
+.ws-save-row select:hover, .ws-save-new input:hover, .ws-mat-f textarea:hover {
   border-color: var(--on-surface);
 }
 .field input:focus-visible, .field select:focus-visible, .search-row input:focus-visible,
 .inline-form input:focus-visible, .mat-search:focus-visible, .ws-bar-row select:focus-visible,
 .ws-estimate-bar select:focus-visible, .ws-editing input:focus-visible,
-.ws-save-row select:focus-visible, .ws-save-new input:focus-visible {
+.ws-save-row select:focus-visible, .ws-save-new input:focus-visible,
+.ws-mat-f textarea:focus-visible {
   border-color: var(--accent);
 }
 /* A field the browser or the page has marked wrong. Colour is never the only
@@ -1413,6 +1414,25 @@ a.chip:hover { text-decoration: none; }
 .ws-archive summary { cursor: pointer; font-weight: var(--fw-semi); }
 .ws-archive > p { margin: var(--sp-3) 0; font-size: var(--fs-sm); }
 .ws-archive .data-list li { opacity: .82; }
+
+/* ---------- Clients: /klienci/ (session 22, chapter XX)
+   The screen is the project screen's furniture — the same rows, figures, forms and
+   disclosure — so it inherits nearly all of it. What is new is the strip that says the
+   module is LiczMat Pro, the contact line and the notes, and each of the three is a
+   handful of declarations spending the same tokens. */
+.crm-pro {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3);
+  margin-bottom: var(--sp-5);
+}
+/* Chapter XXV's block when it stands *instead of* the module (LM_PRO_LOCKED). */
+.crm-gate { margin-bottom: var(--sp-5); }
+.crm-gate h2 { margin-top: 0; }
+.crm-contact {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+/* A note is typed with line breaks in it and has to keep them; long text wraps. */
+.crm-note { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
 
 /* ---------- Legal / document page ---------- */
 .doc { max-width: 820px; margin: 0 auto; padding: var(--sp-10) var(--gutter) var(--sp-16); }

@@ -12,7 +12,7 @@ import {
 import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies,
+  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -746,6 +746,7 @@ const COOKIE_ROWS = [
   { name: "materio-workspace-v1", type: "ck_type_local", purpose: "ck_p_workspace", life: "ck_life_until_cleared" },
   { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },
   { name: "liczmat-recent-calcs", type: "ck_type_local", purpose: "ck_p_recent", life: "ck_life_until_cleared" },
+  { name: "liczmat-crm-v1", type: "ck_type_local", purpose: "ck_p_crm", life: "ck_life_until_cleared" },
 ];
 
 const COOKIE_THIRD_ROWS = [
@@ -1248,6 +1249,209 @@ export function projectsMain(lang, t, aisles = []) {
         <a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
       </p>
       <p class="muted src-note">${esc(t("wspage_local_note"))}</p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+  return { main, ld: crumbs.ld };
+}
+
+/**
+ * /klienci/ — the client list of LiczMat Pro. Chapter XX, session 22.
+ *
+ * One page, two screens, exactly like /projekty/: the index, and one client at
+ * `?id=<clientId>` — the `client` route in src/ia.mjs is a `view` because a client id is
+ * made in this browser and can never be a directory on GitHub Pages.
+ *
+ * Three things the build fixes and the script never rewrites: the Pro notice of chapter
+ * XXV, the honest note about where the rows live, and the headings. Everything with a
+ * figure in it is written by assets/crm-ui.js from the store, so nothing on this page is
+ * translated twice.
+ */
+export function clientsMain(lang, t) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("clipage_title"), path: urlClients(lang) },
+  ]);
+
+  // Chapter XXV's block, in the words the chapter uses: the module named, and "Dostępne
+  // w LiczMat Pro" under it. `pro_more` is a sentence rather than a button while
+  // /liczmat-pro/ is planned (session 29) — src/pro.mjs makes the same decision for the
+  // same reason, and both stop being sentences the moment that route goes live.
+  const pro = iaRoute("liczmat-pro");
+  const more = pro && pro.status === STATUS.LIVE
+    ? `<a class="btn btn-ghost btn-sm" href="${pro.path(lang)}">${esc(t("pro_more"))}</a>`
+    : `<span class="muted">${esc(t("pro_more"))} — ${esc(t("door_soon"))}</span>`;
+
+  /* What a visitor whose level does not reach the module is shown *instead of* it. It is
+     in the markup from the first paint and hidden until the script knows the level, so
+     switching it on is a class away — session 27, LM_PRO_LOCKED in assets/plan.js. */
+  const gate = `<div class="app-card crm-gate" id="crm-gate" hidden>
+        <h2>${esc(t("feat_clients_t"))}</h2>
+        <p class="muted">${esc(t("feat_clients_d"))}</p>
+        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
+        <p>${more}</p>
+      </div>`;
+
+  const detail = `<article id="crm-client" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="${urlClients(lang)}" data-crm-back>${esc(t("cli_back"))}</a></p>
+
+        <div id="crm-client-missing" hidden>
+          <h2>${esc(t("cli_none_t"))}</h2>
+          <p class="muted">${esc(t("cli_none_d"))}</p>
+        </div>
+
+        <div id="crm-client-body" hidden>
+          <!-- Chapter XX's "dane kontaktowe": a phone that dials and an address that can
+               be copied. Written by the script, because a client with no e-mail must not
+               leave an empty line behind. -->
+          <p class="crm-contact" id="crm-contact"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cli_fig_projects"))}</span> <b id="crm-fig-projects"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cli_fig_last"))}</span> <b id="crm-fig-last"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("cli_fig_total"))}</span> <b id="crm-fig-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="crm-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-edit">${esc(t("cli_edit"))}</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-delete">${esc(t("app_delete"))}</button>
+          </div>
+
+          <!-- The whole record in one form, on the page rather than in a browser dialog:
+               prompt() cannot be translated once it is open and covers the row it is
+               about on a phone (chapter XXVIII). -->
+          <form id="crm-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">${esc(t("cli_name"))}</span>
+                <input id="crm-edit-name" type="text" maxlength="120" required>
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">${esc(t("cli_phone"))}</span>
+                <input id="crm-edit-phone" type="tel" maxlength="200" autocomplete="tel">
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">${esc(t("cli_email"))}</span>
+                <input id="crm-edit-email" type="email" maxlength="200" autocomplete="email">
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">${esc(t("cli_address"))}</span>
+                <input id="crm-edit-address" type="text" maxlength="200">
+              </label>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="crm-edit-note">${esc(t("cli_note"))}</label>
+              <textarea id="crm-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-crm-edit-cancel>${esc(t("action_cancel"))}</button>
+            </p>
+          </form>
+
+          <div id="crm-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="crm-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="crm-delete-yes">${esc(t("cli_delete_yes"))}</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="crm-delete-no">${esc(t("action_cancel"))}</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("cli_note_t"))}</h2>
+            </div>
+            <p id="crm-note" class="crm-note"></p>
+          </section>
+
+          <!-- Chapter XX: "Klient może posiadać … projekty", and chapter XXIV's path
+               begins with them. The link is stored on the client (assets/crm.js says
+               why); the project itself is the same row /projekty/ shows and is never
+               touched from here. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("cli_projects_t"))}</h2>
+              <a class="dash-more" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+            </div>
+            <p class="muted">${esc(t("cli_projects_d"))}</p>
+            <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-form" class="inline-form">
+              <select id="crm-project-pick" aria-label="${esc(t("cli_project_add"))}"></select>
+              <button type="submit" class="btn btn-primary btn-sm">${esc(t("cli_project_add"))}</button>
+            </form>
+          </section>
+
+          <!-- Chapter XX's "historia", derived: every calculation saved into one of this
+               client's projects, newest first. Nothing is logged separately — a second
+               copy would drift the first time a line was corrected. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("cli_hist_t"))}</h2>
+            </div>
+            <p class="muted">${esc(t("cli_hist_d"))}</p>
+            <ul id="crm-history" class="data-list"></ul>
+          </section>
+        </div>
+      </article>`;
+
+  const index = `<div id="crm-index">
+        <p class="ws-undo" id="crm-undo" role="status" hidden>
+          <span id="crm-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="crm-undo-go">${esc(t("cli_undo"))}</button>
+        </p>
+
+        <h2>${esc(t("cli_list_t"))}</h2>
+        <p class="muted">${esc(t("cli_list_d"))}</p>
+        <form id="crm-client-form" class="inline-form">
+          <input id="crm-client-name" type="text" maxlength="120" placeholder="${esc(t("cli_new"))}" required>
+          <input id="crm-client-phone" type="tel" maxlength="200" placeholder="${esc(t("cli_phone"))}" autocomplete="off">
+          <input id="crm-client-email" type="email" maxlength="200" placeholder="${esc(t("cli_email"))}" autocomplete="off">
+          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+        </form>
+        <ul id="crm-client-list" class="data-list"></ul>
+
+        <details id="crm-archive" class="ws-archive" hidden>
+          <summary id="crm-archive-summary">${esc(t("cli_archive_t"))}</summary>
+          <p class="muted">${esc(t("cli_archive_d"))}</p>
+          <ul id="crm-archive-list" class="data-list"></ul>
+        </details>
+      </div>`;
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1 id="crm-title">${esc(t("clipage_title"))}</h1>
+      <p class="lead" id="crm-lead">${esc(t("clipage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="crm-page">
+    <div class="wrap narrow">
+      <!-- Chapter XXV, first sentence: a free user should understand which features are
+           Pro. The strip says so on every visit, whatever the level, and the script
+           swaps the chip for the one that belongs to a Pro account. -->
+      <p class="crm-pro" id="crm-pro">
+        <span class="chip" id="crm-pro-chip">${esc(t("pro_locked"))}</span>
+        <span class="muted" id="crm-pro-note">${esc(t("cli_pro_note"))}</span>
+      </p>
+
+      ${gate}
+
+      <div id="crm-tool">
+        ${detail}
+        ${index}
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
+      </p>
+      <p class="muted src-note">${esc(t("cli_local_note"))}</p>
     </div>
   </section>
 

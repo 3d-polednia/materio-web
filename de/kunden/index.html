@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Kunden — LiczMat</title>
+<meta name="description" content="Kunden in LiczMat Pro: Kundenliste mit Kontaktdaten und Notizen, die dem Kunden zugeordneten Projekte und der Verlauf gespeicherter Berechnungen. Die Daten bleiben in diesem Browser.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/de/kunden/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/klienci/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kliyenty/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/kunden/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/clients/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819b" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="de_DE">
+<meta property="og:title" content="Kunden — LiczMat">
+<meta property="og:description" content="Kunden in LiczMat Pro: Kundenliste mit Kontaktdaten und Notizen, die dem Kunden zugeordneten Projekte und der Verlauf gespeicherter Berechnungen. Die Daten bleiben in diesem Browser.">
+<meta property="og:url" content="https://liczmat.com/de/kunden/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kunden — LiczMat">
+<meta name="twitter:description" content="Kunden in LiczMat Pro: Kundenliste mit Kontaktdaten und Notizen, die dem Kunden zugeordneten Projekte und der Verlauf gespeicherter Berechnungen. Die Daten bleiben in diesem Browser.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819b">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Start",
+      "item": "https://liczmat.com/de/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Kunden",
+      "item": "https://liczmat.com/de/kunden/"
+    }
+  ]
+}
+</script>
+<script>window.LM_CRM = {"projects":"/de/projekte/"};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/de/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hauptnavigation">
+      <ul class="nav-list">
+        <li><a href="/de/rechner/">Rechner</a></li>
+        <li><a href="/de/materialien/">Materialien</a></li>
+        <li data-nav-level="liczmat"><a href="/de/projekte/">Projekte</a></li>
+        <li><a href="/de/ratgeber/">Ratgeber</a></li>
+        <li><a href="/de/android-app/">Die App</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Sprache">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span class="lang-btn-name">Deutsch</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/klienci/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/kliyenty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></span></li>
+      <li><a class="lang-item" href="/en/clients/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Währung" title="Währung"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="UAH">UAH</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mein Konto</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Design wechseln" title="Design wechseln"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menü öffnen"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li aria-current="page">Kunden</li></ol></nav>
+      <h1 id="crm-title">Kunden</h1>
+      <p class="lead" id="crm-lead">Die Kundenliste von LiczMat Pro: Kontaktdaten, Notizen und die Projekte, die du für sie rechnest.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="crm-page">
+    <div class="wrap narrow">
+      <!-- Chapter XXV, first sentence: a free user should understand which features are
+           Pro. The strip says so on every visit, whatever the level, and the script
+           swaps the chip for the one that belongs to a Pro account. -->
+      <p class="crm-pro" id="crm-pro">
+        <span class="chip" id="crm-pro-chip">In LiczMat Pro verfügbar</span>
+        <span class="muted" id="crm-pro-note">Kunden ist ein Modul von LiczMat Pro. Den Pro-Plan vergibt bisher nichts, deshalb ist das Modul vorerst offen — die Sperre kommt mit der Paywall.</span>
+      </p>
+
+      <div class="app-card crm-gate" id="crm-gate" hidden>
+        <h2>Kunden</h2>
+        <p class="muted">Eine Kundenliste mit Kontaktdaten, Notizen und der Historie der Zusammenarbeit.</p>
+        <p><span class="chip">In LiczMat Pro verfügbar</span></p>
+        <p><span class="muted">LiczMat Pro kennenlernen — In Vorbereitung</span></p>
+      </div>
+
+      <div id="crm-tool">
+        <article id="crm-client" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/de/kunden/" data-crm-back>← Alle Kunden</a></p>
+
+        <div id="crm-client-missing" hidden>
+          <h2>Diesen Kunden gibt es nicht</h2>
+          <p class="muted">Der Kunde wurde gelöscht, oder die Adresse stammt aus einem anderen Browser.</p>
+        </div>
+
+        <div id="crm-client-body" hidden>
+          <!-- Chapter XX's "dane kontaktowe": a phone that dials and an address that can
+               be copied. Written by the script, because a client with no e-mail must not
+               leave an empty line behind. -->
+          <p class="crm-contact" id="crm-contact"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Projekte</span> <b id="crm-fig-projects"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Letzte Änderung</span> <b id="crm-fig-last"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Wert der Arbeiten</span> <b id="crm-fig-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="crm-mixed" hidden>Diese Zeilen stehen in verschiedenen Währungen. Die Summe addiert sie, rechnet aber nichts um — prüfe die Währung je Kostenzeile.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-edit">Daten bearbeiten</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-delete">Löschen</button>
+          </div>
+
+          <!-- The whole record in one form, on the page rather than in a browser dialog:
+               prompt() cannot be translated once it is open and covers the row it is
+               about on a phone (chapter XXVIII). -->
+          <form id="crm-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Name</span>
+                <input id="crm-edit-name" type="text" maxlength="120" required>
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">Telefon</span>
+                <input id="crm-edit-phone" type="tel" maxlength="200" autocomplete="tel">
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">E-Mail</span>
+                <input id="crm-edit-email" type="email" maxlength="200" autocomplete="email">
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Adresse</span>
+                <input id="crm-edit-address" type="text" maxlength="200">
+              </label>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="crm-edit-note">Notizen</label>
+              <textarea id="crm-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">Speichern</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-crm-edit-cancel>Abbrechen</button>
+            </p>
+          </form>
+
+          <div id="crm-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="crm-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="crm-delete-yes">Kunden löschen</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="crm-delete-no">Abbrechen</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Notizen</h2>
+            </div>
+            <p id="crm-note" class="crm-note"></p>
+          </section>
+
+          <!-- Chapter XX: "Klient może posiadać … projekty", and chapter XXIV's path
+               begins with them. The link is stored on the client (assets/crm.js says
+               why); the project itself is the same row /projekty/ shows and is never
+               touched from here. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Projekte</h2>
+              <a class="dash-more" href="/de/projekte/">Projekte und Räume</a>
+            </div>
+            <p class="muted">Projekte, die diesem Kunden zugeordnet sind. Es sind dieselben Projekte wie auf der Projektseite; hier ändert sie nichts.</p>
+            <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-form" class="inline-form">
+              <select id="crm-project-pick" aria-label="Projekt zuordnen"></select>
+              <button type="submit" class="btn btn-primary btn-sm">Projekt zuordnen</button>
+            </form>
+          </section>
+
+          <!-- Chapter XX's "historia", derived: every calculation saved into one of this
+               client's projects, newest first. Nothing is logged separately — a second
+               copy would drift the first time a line was corrected. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Verlauf</h2>
+            </div>
+            <p class="muted">Berechnungen, die in den Projekten dieses Kunden gespeichert wurden, neueste zuerst.</p>
+            <ul id="crm-history" class="data-list"></ul>
+          </section>
+        </div>
+      </article>
+        <div id="crm-index">
+        <p class="ws-undo" id="crm-undo" role="status" hidden>
+          <span id="crm-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="crm-undo-go">Rückgängig</button>
+        </p>
+
+        <h2>Kunden</h2>
+        <p class="muted">Ein Kunde ist ein Name und Kontaktdaten. Projekte ordnest du im geöffneten Kunden zu.</p>
+        <form id="crm-client-form" class="inline-form">
+          <input id="crm-client-name" type="text" maxlength="120" placeholder="Name des Kunden" required>
+          <input id="crm-client-phone" type="tel" maxlength="200" placeholder="Telefon" autocomplete="off">
+          <input id="crm-client-email" type="email" maxlength="200" placeholder="E-Mail" autocomplete="off">
+          <button type="submit" class="btn btn-primary btn-sm">Hinzufügen</button>
+        </form>
+        <ul id="crm-client-list" class="data-list"></ul>
+
+        <details id="crm-archive" class="ws-archive" hidden>
+          <summary id="crm-archive-summary">Archiv</summary>
+          <p class="muted">Kunden, mit denen du nicht mehr arbeitest. Nichts geht verloren — du kannst sie zurückholen.</p>
+          <ul id="crm-archive-list" class="data-list"></ul>
+        </details>
+      </div>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/de/projekte/">Projekte und Räume</a>
+        <a class="btn btn-ghost" href="/app/" rel="nofollow">Mein Konto</a>
+      </p>
+      <p class="muted src-note">Kunden liegen im Speicher dieses Browsers (localStorage). Sie werden nirgendwohin gesendet und sind nicht in der Android-App — die Synchronisierung umfasst Projekte, Räume, Berechnungen und Materiallisten. Wer die Websitedaten löscht, löscht die Kunden.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Dieselbe Formel in der App</b> LiczMat für Android rechnet offline mit demselben Kern — samt Materialkatalog und Speichern ins Projekt.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Laden</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Baustoff-Rechner. Rechnen. Planen. Umsetzen.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/de/rechner/">Alle Rechner</a></li>
+          <li><a href="/de/materialien/">Materialien</a></li>
+          <li data-nav-level="liczmat"><a href="/de/projekte/">Projekte</a></li>
+          <li><a href="/de/kostenvoranschlag/">Kostenvoranschlag</a></li>
+          <li><a href="/de/ratgeber/">Ratgeber</a></li>
+          <li><a href="/de/baumaerkte/">Märkte</a></li>
+          <li data-nav-level="pro"><a href="/de/kunden/">Kunden</a></li>
+          <li><a href="/de/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Konto</h4>
+        <ul>
+          <li><a href="/de/android-app/">Die App</a></li>
+          <li><a href="/app/" rel="nofollow">Mein Konto</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Übersicht</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Rechtliches</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Datenschutz</a></li>
+          <li><a href="/de/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Sprache">
+      <h4>Sprache</h4>
+      <ul>
+        <li><a href="/klienci/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/kliyenty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/kunden/" hreflang="de" lang="de" data-lang="de" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/clients/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Alle Rechte vorbehalten.</span>
+      <span>Ergebnisse sind Schätzungen. Vor dem Kauf prüfen.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Einverstanden" hidden>
+  <p class="consent-text">Wir nutzen Google Analytics, um anonym zu zählen, wie viele Leute die Seite besuchen und zu Google Play weitergehen. Einverstanden?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Mehr in der Datenschutzerklärung</a>
+    <a class="consent-more" href="/de/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Ablehnen</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Einverstanden</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/klienci/",
+  "uk": "/uk/kliyenty/",
+  "de": "/de/kunden/",
+  "en": "/en/clients/"
+};</script>
+<script src="/assets/i18n.de.js?v=20260819b"></script>
+<script src="/assets/i18n-runtime.js?v=20260819b"></script>
+<script src="/assets/currency.js?v=20260819b"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819b"></script>
+
+<script src="/assets/workspace.js?v=20260819b"></script>
+<script src="/assets/plan.js?v=20260819b"></script>
+<script src="/assets/crm.js?v=20260819b"></script>
+<script src="/assets/crm-ui.js?v=20260819b"></script>
+<script src="/assets/main.js?v=20260819b"></script>
+
+</body>
+</html>

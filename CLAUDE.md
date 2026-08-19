@@ -79,7 +79,7 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now 130 pages: a home page, a calculator
+The site used to be one `index.html`. It is now 135 pages: a home page, a calculator
 hub, one page per calculator, guides and a store finder — each in all four languages, at
 its own URL, so search engines can index more than the Polish front page. Writing that by
 hand is not possible; a generator writes it from one template plus the dictionary.
@@ -120,6 +120,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
 | `assets/plan.js` — the Free/Pro model and the permission table | |
+| `assets/crm.js`, `assets/crm-ui.js` — the clients of LiczMat Pro | |
 | `assets/recent.js`, `assets/dashboard.js` | |
 | `src/*.mjs` — information architecture, site map, templates, page bodies, formulas | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
@@ -156,7 +157,7 @@ scripts/test-pages.mjs  The same calculators in Chromium: 360/414/768/1280 px, t
                       variant. Needs Playwright installed OUTSIDE the repo — see the
                       header of the file
 scripts/test-account.mjs  The account system: which of the three levels a visitor is on,
-                      what the other 129 pages are told about the session, where a
+                      what the other 134 pages are told about the session, where a
                       ?next= link may point, and the copy in four languages.
                       Dependency-free — run it after touching assets/account.js,
                       assets/app.js, ACCOUNT_LEVELS or an acc_*/prof_* key
@@ -225,6 +226,19 @@ scripts/test-plan.mjs  The Free/Pro model (session 21, chapters II, XIX and XXV)
                       Pro modules in session order and the copy in four languages.
                       Dependency-free — run it after touching assets/plan.js, src/pro.mjs
                       or a pro_*/plan_*/feat_* key
+scripts/test-clients.mjs  Clients (session 22, chapter XX): the client document and the
+                      money it deliberately does not carry, the four writes plus the undo,
+                      the client → project link (stored on the client, one client per
+                      project, and the project document byte-for-byte untouched), the
+                      derived costs and history, the route, chapter XXV's gate in both of
+                      its states — including the one after LM_PRO_LOCKED is flipped — and
+                      the copy in four languages. Dependency-free — run it after touching
+                      assets/crm.js, clientsMain() or a cli_*/clipage_* key
+scripts/test-clients-page.mjs  The same clicked through in Chromium, nothing stubbed: a
+                      client added and corrected, a project filed under them and taken off,
+                      the archive, the delete with its undo, the Pro notice for a guest and
+                      for a Pro account, four languages, the currency switch, the widths of
+                      chapter XXVIII and the no-JavaScript variant
 scripts/test-costs.mjs  What a project costs (session 19, chapter XVII): the unit price,
                       which is `estimatedCostMinor / quantity` and never a stored field;
                       the write that goes the other way (ilość × cena, rounded once); the
@@ -268,6 +282,16 @@ assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/.
                       ?id=<projectId> — and this file shows one of them, including the
                       material list of chapter XVI and, since session 20, the project's
                       rooms and the picker that files one calculation under one of them
+assets/crm.js         The Pro workspace: clients. localStorage under its own key
+                      (`liczmat-crm-v1`), this browser only — `clients` is NOT in the sync
+                      contract, so nothing here is uploaded and nothing on the phone reads
+                      it. Written in the contract's shape anyway (id, fields, the sync
+                      block, a tombstone instead of a delete) so a later contract change
+                      can carry the rows that are already there
+assets/crm-ui.js      /klienci/ — the index and one client at ?id=<clientId>. Contact
+                      details, notes, the projects filed under a client and what they have
+                      cost, and the history, which is derived from the saved calculations
+                      rather than logged. Chapter XXV's notice sits at the top of it
 assets/recent.js      Which calculators this browser used, and when. Device-local, never
                       synced, no inputs and no results — only a calculator id and a time.
                       It is what the dashboard's "ostatnio używane narzędzia" reads
@@ -447,6 +471,39 @@ Kotlin side of it. Change one, change all three.
   read-only to a client. `lmCan()` takes the level as an argument rather than reading
   `liczmat-signed-in`, because that hint can be stale and a function that quietly gated on
   it would hide somebody's own projects from them.
+- **Clients are LiczMat Pro's first real module, and they are not in the sync contract.**
+  Session 22 built `/klienci/` — the index plus one client at `?id=<clientId>`, the same
+  two-screens-in-one-file shape as `/projekty/`. The store is `assets/crm.js` under its own
+  key (`liczmat-crm-v1`), because `docs/FIRESTORE_SYNC.md` in the app repo has five
+  collections and clients is not one of them: no `ClientEntity`, no
+  `SyncContract.clientToDoc()`, no `validClient()` in the deployed rules. So nothing here
+  is uploaded, `wsExport()` (what `/app/` pushes) does not carry it, and the page says so
+  rather than implying a sync that does not exist. **Do not put clients into
+  `materio-workspace-v1`** — that store is "the documents the app also keeps", and
+  `wsExport()` would start sending a collection Firestore has never heard of. Carrying
+  clients to the phone is a contract change in the app repo, which is a session of its own.
+- **The client → project link lives on the client, and a project document is never
+  touched.** Chapter XX lets a client have projects; the project is contract (it syncs, the
+  phone reads it, `/p/<token>` renders it) while the client travels nowhere, so a `clientId`
+  on the project would be half a link in the half that travels. `projectIds` on the local
+  client keeps the whole relation in one place, survives the delete and the undo, and is
+  what the test guards: after filing a project under a client the project document is
+  byte-for-byte the one it was. One project has one client — a second link *moves* it.
+  Deleting a client leaves their projects alone (the rooms argument, one level up), and
+  deleting a project keeps the link, because `wsRestoreProject()` can bring it back and a
+  link dropped on sight would return it to nobody. A client carries **no money**: what
+  their work is worth is `wsProjectCosts()` over their projects, counted once each.
+- **A Pro module is open today, and `LM_PRO_LOCKED` is the switch that closes it.** Nothing
+  grants `plan: premium` (FIRESTORE_SYNC §9.2), so a lock on `/klienci/` today would shut
+  the module to every account that exists — including the one that has to check it works.
+  Chapter XXV's order is explicit: the Pro features first, then their permissions checked,
+  the paywall after that (session 27) and payments last (session 28). So the page carries
+  chapter XXV's own words ("Dostępne w LiczMat Pro") plus one honest sentence saying the
+  plan is not granted yet, and the module runs under it. The machinery is complete:
+  `lmFeatureState(id, level)` in `assets/plan.js` answers `allowed / gated / locked`, the
+  gate block is in the markup from the first paint, and session 27 flips one variable —
+  `scripts/test-clients.mjs` exercises both answers, the flipped one included.
+
 - **`/app/` has five tabs, and rooms are not one of them.** Chapter XVIII makes a room an
   element of a project, so `renderProjects()` draws each project's rooms inside its row
   with an add form of its own, and the rooms nobody assigned get one list at the bottom —

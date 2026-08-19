@@ -21,6 +21,7 @@
 
 import { esc } from "./template.mjs";
 import { LEVEL, STATUS, route } from "./ia.mjs";
+import { DEFAULT_LANG } from "./site.mjs";
 
 /**
  * The Pro modules, in the order the master plan builds them (chapter XXXII).
@@ -34,7 +35,7 @@ export const proModules = (features) => features
 
 /** Every dictionary key the Pro structure spends, so the build can check four languages. */
 export const proKeys = (features) => [
-  "pro_t", "pro_d", "pro_locked", "pro_more", "pro_pay_later",
+  "pro_t", "pro_d", "pro_locked", "pro_more", "pro_open", "pro_pay_later",
   "plan_t", "plan_d", "plan_free", "plan_pro", "plan_until", "plan_expired",
   "plan_none",
   ...proModules(features).flatMap((f) => [`${f.key}_t`, `${f.key}_d`]),
@@ -49,13 +50,22 @@ export const proKeys = (features) => [
  */
 export function proModuleCard(t, feature) {
   const r = feature.route ? route(feature.route) : null;
-  const soon = !r || r.status !== STATUS.LIVE
-    ? `<p class="pro-soon muted" data-i18n="door_soon">${esc(t("door_soon"))}</p>` : "";
+  const live = Boolean(r && r.status === STATUS.LIVE);
+  const soon = live
+    ? "" : `<p class="pro-soon muted" data-i18n="door_soon">${esc(t("door_soon"))}</p>`;
+  // A module that has been built is reachable from the card that describes it — otherwise
+  // /app/ would say "Klienci" next to a page nothing on this site links to. /app/ has no
+  // language of its own, so the link carries DEFAULT_LANG's address plus `data-nav-route`
+  // and assets/i18n-runtime.js repoints it from window.LM_NAV on `langchange`;
+  // scripts/build.mjs puts every live module route into that map for exactly this.
+  const open = live && r.localized
+    ? `<p><a class="btn btn-ghost btn-sm" data-nav-route="${r.id}" href="${r.path(DEFAULT_LANG)}" data-i18n="pro_open">${esc(t("pro_open"))}</a></p>`
+    : "";
   return `<article class="pro-mod" data-feature="${feature.id}">
         <h3 data-i18n="${feature.key}_t">${esc(t(`${feature.key}_t`))}</h3>
         <p class="muted" data-i18n="${feature.key}_d">${esc(t(`${feature.key}_d`))}</p>
         <p class="pro-lock"><span class="chip" data-i18n="pro_locked">${esc(t("pro_locked"))}</span></p>
-        ${soon}
+        ${soon}${open}
       </article>`;
 }
 

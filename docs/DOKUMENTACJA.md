@@ -38,7 +38,7 @@ sklepów, SEO oraz zarządzanie assetami.
 - **Statyczna strona, ale generowana.** W przeglądarce dalej czysty HTML/CSS/JS —
   bez frameworka, bundlera i zależności runtime. Strony powstają jednak z jednego
   szablonu: `node scripts/build.mjs` (Node bez `package.json` i bez `node_modules`)
-  zapisuje 130 plików `.html`. Wynik jest commitowany, bo GitHub Pages serwuje
+  zapisuje 135 plików `.html`. Wynik jest commitowany, bo GitHub Pages serwuje
   katalog repo bez własnego budowania. Pliki, które widzisz w repo, to pliki, które
   trafiają na serwer — część z nich pisze generator, nie człowiek.
 - **Prawda ponad marketing.** Aplikacja w wydaniu produkcyjnym zawiera reklamy

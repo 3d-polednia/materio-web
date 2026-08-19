@@ -47,6 +47,11 @@ export const SECTION = {
   app: { pl: "aplikacja", uk: "dodatok", de: "android-app", en: "android-app" },
   cookies: { pl: "cookies", uk: "cookies", de: "cookies", en: "cookies" },
   estimate: { pl: "kosztorys", uk: "koshtorys", de: "kostenvoranschlag", en: "cost-estimate" },
+  /* Session 22, the first LiczMat Pro module. The segments are the ones the `clients`
+     route carried as `plannedSlug` in src/ia.mjs since session 3 — a slug is permanent
+     from the moment it is planned, so turning the page on moves it, it does not rename
+     it. Ukrainian is transliterated like every other one: "kliyenty". */
+  clients: { pl: "klienci", uk: "kliyenty", de: "kunden", en: "clients" },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
@@ -195,6 +200,15 @@ export const urlEstimate = (lang) => `${prefix(lang)}/${SECTION.estimate[lang]}/
  * src/ia.mjs, which is declared `view: true` for exactly this reason.
  */
 export const urlProject = (lang, id) => `${urlProjects(lang)}?id=${encodeURIComponent(id)}`;
+
+/** The client list of LiczMat Pro — chapter XX. */
+export const urlClients = (lang) => `${prefix(lang)}/${SECTION.clients[lang]}/`;
+
+/**
+ * One client, as a query string on /klienci/ — the same wall urlProject() hits, for the
+ * same reason: the id is made in this browser and can never be a directory on Pages.
+ */
+export const urlClient = (lang, id) => `${urlClients(lang)}?id=${encodeURIComponent(id)}`;
 
 export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
 

@@ -27,7 +27,7 @@ import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
   URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies,
+  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients,
 } from "../src/site.mjs";
 import {
   livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
@@ -39,7 +39,8 @@ import { DEFAULT_CURRENCY } from "../src/currency.mjs";
 import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, renderFormula, FAQ_KEYS,
+  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain,
+  renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
 import { appMain, shareMain, dashboardMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
@@ -48,7 +49,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819a";
+const STAMP = "20260819b";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -234,6 +235,10 @@ function validate() {
     }
     for (const r of ROUTES) {
       if (r.level !== LEVEL.PRO) continue;
+      // A view is a state of its parent page, not a module of its own: /klienci/?id=<id>
+      // is the clients feature seen from the inside, and giving it a second entry in the
+      // table would mean two rows to keep in step for one thing the visitor can do.
+      if (r.view) continue;
       if (!LM_FEATURES.some((f) => f.route === r.id)) {
         problems.push(`route "${r.id}" is PRO and no feature in assets/plan.js covers it`);
       }
@@ -281,7 +286,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -327,6 +332,19 @@ const CALC_SCRIPTS = [
  * number (assets/units.js), which is the reason that file exists apart from the engines.
  */
 const WS_SCRIPTS = ["/assets/units.js", "/assets/workspace.js", "/assets/workspace-ui.js"];
+
+/**
+ * /klienci/ (session 22). The client store, its page, and the two files it reads:
+ * assets/workspace.js for the projects a client is linked to and what they cost, and
+ * assets/plan.js for the one question chapter XXV asks — is this visitor on Pro. No
+ * engine and no catalogue: the page prints saved figures and calculates nothing.
+ *
+ * assets/account.js is already on every page (src/template.mjs) and plan.js reads its
+ * globals, so the order below is the order the browser needs.
+ */
+const CRM_SCRIPTS = [
+  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-ui.js",
+];
 
 /* ------------------------------------------------------------------ worked examples */
 
@@ -621,6 +639,33 @@ function buildWorkspacePages() {
   }
 }
 
+/**
+ * /klienci/ — the client list of LiczMat Pro. Session 22, chapter XX.
+ *
+ * The page has two screens in one file, exactly like /projekty/: the index, and one
+ * client at ?id=<clientId>. Only the frame is written here; every figure on it comes out
+ * of the browser's own store.
+ */
+function buildClientsPages() {
+  const alt = alternatesFor(urlClients);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = clientsMain(lang, t);
+    write(join(urlClients(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("clipage_title")} \u2014 LiczMat`,
+      description: t("clipage_meta"),
+      path: urlClients(lang),
+      alternates: alt,
+      main, jsonld: [ld],
+      // A client's projects link back to /projekty/?id=<id>, and the script has no site
+      // map — so the build hands it this page's own language's address for that page.
+      headExtra: `<script>window.LM_CRM = ${JSON.stringify({ projects: urlProjects(lang) })};</script>`,
+      scripts: CRM_SCRIPTS,
+    }));
+  }
+}
+
 function buildStores() {
   const alt = alternatesFor(urlStores);
   for (const lang of LANGS) {
@@ -651,7 +696,15 @@ function buildPrivatePages() {
   // `langchange`, keyed by the `data-nav-route` src/template.mjs writes on each link.
   // Before this, /app/ carried one hard-coded Polish link because a second one could not
   // have been right in German — the owner reported the result: signing in emptied the menu.
-  const navData = Object.fromEntries(navRoutes("header")
+  const navData = Object.fromEntries([
+    ...navRoutes("header"),
+    // The Pro modules that have been built. Their cards on /app/ link to them
+    // (src/pro.mjs), and /app/ has no language of its own to derive an address from.
+    ...LM_FEATURES
+      .filter((f) => f.level === LEVEL.PRO && f.route && route(f.route)
+        && route(f.route).status === STATUS.LIVE)
+      .map((f) => route(f.route)),
+  ]
     .filter((r) => r.localized)
     .map((r) => [r.id, alternatesFor(r.path)]));
   const navScript = `<script>window.LM_NAV = ${JSON.stringify(navData).replace(/</g, "\\u003c")};</script>`;
@@ -741,6 +794,10 @@ function buildSitemap() {
     add(urlProjects(lang), "0.6", "monthly", alternatesFor(urlProjects));
     add(urlCookies(lang), "0.3", "yearly", alternatesFor(urlCookies));
     add(urlEstimate(lang), "0.7", "monthly", alternatesFor(urlEstimate));
+    // Indexable, like every other page that describes what LiczMat does: what a crawler
+    // sees is the module's name, what it is for and that it belongs to LiczMat Pro —
+    // never a client, because every client row is in one browser's own storage.
+    add(urlClients(lang), "0.5", "monthly", alternatesFor(urlClients));
     add(urlGuideIndex(lang), "0.7", "monthly", alternatesFor(urlGuideIndex));
     add(urlStores(lang), "0.7", "monthly", alternatesFor(urlStores));
     for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly", alternatesFor((l) => urlCalc(l, c.id)));
@@ -820,6 +877,7 @@ buildMaterials();
 buildAndroidPage();
 buildCookiesPage();
 buildWorkspacePages();
+buildClientsPages();
 buildStores();
 buildPrivatePages();
 buildSitemap();

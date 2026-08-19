@@ -27,7 +27,7 @@
 import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies,
+  urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlClients, urlClient,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -226,6 +226,41 @@ export const ROUTES = [
       "as /projekty/.",
   },
 
+  /* ---------------------------------------------------------------- liczmat pro */
+  {
+    id: "clients",
+    level: LEVEL.PRO, status: STATUS.LIVE,
+    parent: "home", localized: true, indexable: true,
+    path: urlClients,
+    footer: { order: 7, key: "clipage_title" },
+    navLevel: LEVEL.PRO,
+    gate: "Chapter XXV: a free user sees what the module is and the words " +
+      "\"Dostępne w LiczMat Pro\", never a dead button. Session 22 renders that as a " +
+      "notice above a working module rather than as a lock, because nothing grants Pro " +
+      "yet (FIRESTORE_SYNC §9.2: no Cloud Functions, no billing) — a lock today would " +
+      "close the module to every account there is, including the one that has to check " +
+      "it works before payments exist at all. LM_PRO_LOCKED in assets/plan.js is the " +
+      "one switch session 27 flips.",
+    note: "Chapter XX, and the first of the five Pro modules. The client list lives in " +
+      "assets/crm.js — localStorage, this browser only: `clients` is not in the sync " +
+      "contract (docs/FIRESTORE_SYNC.md in the app repo has projects, rooms, " +
+      "estimations, shoppingItems and sharedProjects, and nothing else), so nothing " +
+      "here is pushed anywhere and the page says so. `navLevel` keeps the footer link " +
+      "for a Pro account and for a crawler with no JavaScript, which is what leaves the " +
+      "page indexable — chapter XXVI wants Pro described in public, and the module " +
+      "itself holds no content worth hiding, only somebody's own rows.",
+  },
+  {
+    id: "client",
+    level: LEVEL.PRO, status: STATUS.LIVE, view: true,
+    parent: "clients", localized: true, indexable: false,
+    path: urlClient,
+    gate: "As clients — it is the same file.",
+    note: "One client: contact details, notes, the projects filed under them and what " +
+      "they came to. A `view` for the reason `project` is one — the id is made in this " +
+      "browser, so /klienci/?id=<clientId> is the only shape GitHub Pages can serve.",
+  },
+
   /* ---------------------------------------------------------------- account */
   {
     id: "account",
@@ -291,14 +326,6 @@ export const ROUTES = [
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
       "indexable — the paywall sits on the Pro modules, not on their description.",
-  },
-  {
-    id: "clients",
-    level: LEVEL.PRO, status: STATUS.PLANNED, session: 22,
-    parent: "home", localized: true, indexable: true,
-    plannedSlug: { pl: "klienci", uk: "kliyenty", de: "kunden", en: "clients" },
-    gate: "Chapter XXV: a free user sees what the module is and the words " +
-      "\"Dostępne w LiczMat Pro\", never a dead button.",
   },
   {
     id: "jobs",
