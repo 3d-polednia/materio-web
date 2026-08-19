@@ -102,11 +102,26 @@ skasowany, cztery AAAA GitHuba (`2606:50c0:800{0..3}::153`) dopisane. Zweryfikow
 - **Certyfikat.** W chwili commitu `https://liczmat.com` serwuje jeszcze `CN=*.github.io`.
   GitHub → Settings → Pages → **Remove**, zapisać, wpisać `liczmat.com` ponownie, **Save**.
   To wymusza ponowną próbę wystawienia.
-- **Firebase Auth → Authorized domains**: dopisać `liczmat.com` i `www.liczmat.com`, bez
-  tego `/app/` zwraca `auth/unauthorized-domain`.
-- **Google Cloud → Credentials → klucz przeglądarkowy → HTTP referrers**: dopisać
+- **Google Cloud → Credentials → klucz przeglądarkowy → Website restrictions**: dopisać
   `https://liczmat.com/*` i `https://www.liczmat.com/*`, zachowując wpisy
   `materio-502513.firebaseapp.com/*` i `materio-502513.web.app/*`.
+  **To jest blokada, która wywraca zakładanie konta i logowanie** — zmierzone na żywym
+  backendzie, to samo wywołanie `accounts:signInWithPassword` z trzema nagłówkami
+  `Referer`:
+
+  | Referer | Odpowiedź |
+  |---|---|
+  | `https://liczmat.com/app/` | 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
+  | `https://www.liczmat.com/app/` | 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
+  | `https://materio-app.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` — klucz przepuścił, Auth doszedł do sprawdzenia hasła |
+
+  Ograniczenie klucza obejmuje **każde** wywołanie Identity Toolkit, więc rejestracja,
+  logowanie e-mailem i reset hasła padają razem. Wyłączenie logowania Google (2026-08-14)
+  niczego tu nie zmieniło — blokada siedzi poniżej dostawcy.
+- **Firebase Auth → Authorized domains**: dopisać `liczmat.com` i `www.liczmat.com`.
+  Osobna kontrola, **nie** ta, która zwraca 403 wyżej: odpowiada za popup OAuth i za
+  `continueUrl` w linku z maila akcyjnego, czyli za reset hasła. Listy nie dało się
+  odczytać zdalnie — `getProjectConfig` idzie przez ten sam ograniczony klucz.
 - **Google Search Console**: nowa własność dla `liczmat.com` i zgłoszenie sitemapy.
 - **Bliźniak polityki prywatności** — `docs/privacy-policy.html` w repo
   `3d-polednia/Materio` nadal mówi `materio-app.com`. Tamto repo nie jest podpięte do tej

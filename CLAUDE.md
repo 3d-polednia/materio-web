@@ -338,14 +338,30 @@ Kotlin side of it. Change one, change all three.
   and stay true — they are what comes back on.
 - **The domain moved to `liczmat.com` and the two Google console lists did not (2026-08-14).**
   Both name only the old host, both are console settings no commit can change, and until
-  the owner edits them `/app/` signs nobody in from the new domain — every call comes back
-  `auth/unauthorized-domain`. Firebase console → Authentication → Settings → Authorized
-  domains: add `liczmat.com` and `www.liczmat.com`. Google Cloud console → Credentials →
-  the browser key → HTTP referrers: add `https://liczmat.com/*` and
-  `https://www.liczmat.com/*`. **Keep every existing entry**, including the two
-  `materio-502513.*` ones the bullets below explain. The same note sits in
-  `assets/firebase-config.js`, next to the config it applies to. The three bullets that
-  follow are history and stay accurate as history — they describe the old host.
+  the owner edits them `/app/` signs nobody in from the new domain. **The blocker is the
+  browser API key's referrer restriction, not the authorized-domains list** — measured
+  against the live backend by sending `accounts:signInWithPassword` three times with
+  different `Referer` headers:
+
+  | Referer | Answer |
+  |---|---|
+  | `https://liczmat.com/app/` | 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
+  | `https://www.liczmat.com/app/` | 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
+  | `https://materio-app.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` — the key passed, Auth reached the password check |
+
+  The restriction covers **every** Identity Toolkit call, so sign-up, e-mail sign-in and
+  the password reset all fail the same way; switching Google sign-in off changed nothing,
+  because the block sits a layer below the provider. An earlier version of this bullet
+  said the calls come back `auth/unauthorized-domain` — they do not, and the distinction
+  matters when reading the console: the fix is in Google Cloud, not Firebase.
+  Google Cloud console → Credentials → the browser key → Website restrictions: add
+  `https://liczmat.com/*` and `https://www.liczmat.com/*`. Firebase console →
+  Authentication → Settings → Authorized domains: add `liczmat.com` and `www.liczmat.com`
+  — a second, separate control, needed for the OAuth popup and for the `continueUrl` on an
+  e-mail action link. **Keep every existing entry**, including the two `materio-502513.*`
+  ones the bullets below explain. The same note sits in `assets/firebase-config.js`, next
+  to the config it applies to. The three bullets that follow are history and stay accurate
+  as history — they describe the old host.
 - **Google sign-in is switched on** (2026-08-07). The Google provider is enabled in
   Firebase Authentication → Sign-in method, so `/app/`'s `signInWithPopup` with
   `GoogleAuthProvider` has everything it needs — `materio-app.com`, `www.materio-app.com`

@@ -18,17 +18,28 @@
  * ─── THE DOMAIN MOVED AND THESE TWO LISTS DID NOT (2026-08-14) ──────────────
  * The site is served from liczmat.com now; both controls below still name only the old
  * host, and both are console settings that no commit here can change. Until the owner
- * edits them, /app/ signs nobody in from the new domain:
+ * edits them, /app/ signs nobody in from the new domain. Which of the two is actually
+ * blocking was measured against the live backend rather than guessed — the same
+ * accounts:signInWithPassword call, sent three times with a different Referer:
+ *     https://liczmat.com/app/       → 403 API_KEY_HTTP_REFERRER_BLOCKED
+ *     https://www.liczmat.com/app/   → 403 API_KEY_HTTP_REFERRER_BLOCKED
+ *     https://materio-app.com/app/   → 400 INVALID_LOGIN_CREDENTIALS
+ * The last line is the key passing and Auth reaching the password check. So:
+ *   - Google Cloud console → Credentials → this browser key → Website restrictions is
+ *     THE BLOCKER. Add `https://liczmat.com/*` and `https://www.liczmat.com/*`. It gates
+ *     every Identity Toolkit call, so sign-up, e-mail sign-in and the password reset all
+ *     fail together, and turning Google sign-in off does not help — the block sits below
+ *     the provider. Keep `https://materio-502513.firebaseapp.com/*` and
+ *     `https://materio-502513.web.app/*`, which is what made the Google popup work on
+ *     2026-08-13. The referrer restriction does not protect the data (the rules do); it
+ *     stops another site from running up quota on this project's bill.
  *   - Firebase console → Authentication → Settings → Authorized domains: add
- *     `liczmat.com` and `www.liczmat.com`. Without it every sign-in call comes back
- *     `auth/unauthorized-domain`. Keep materio-502513.firebaseapp.com on the list — the
- *     Google popup runs its handler there.
- *   - Google Cloud console → Credentials → this browser key → HTTP referrers: add
- *     `https://liczmat.com/*` and `https://www.liczmat.com/*`. Keep
- *     `https://materio-502513.firebaseapp.com/*` and `https://materio-502513.web.app/*`,
- *     which is what made the Google popup work on 2026-08-13. The referrer restriction
- *     does not protect the data (the rules do); it stops another site from running up
- *     quota on this project's bill.
+ *     `liczmat.com` and `www.liczmat.com`. A separate control, and NOT the one returning
+ *     the 403 above: it governs the OAuth popup and the continueUrl on an e-mail action
+ *     link, which is why a reset mail's link needs it. Keep
+ *     materio-502513.firebaseapp.com on the list — the Google popup runs its handler
+ *     there. (The list could not be read back from here: getProjectConfig goes through
+ *     the same restricted key and answers 403 for an empty Referer.)
  * Leaving the old entries in place costs nothing and keeps materio-app.com working if
  * it is ever pointed back at the site.
  *
