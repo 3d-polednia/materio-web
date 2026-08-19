@@ -121,7 +121,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
 | `assets/plan.js` — the Free/Pro model and the permission table | |
-| `assets/crm.js` — the clients and jobs of LiczMat Pro, plus `crm-ui.js` and `jobs-ui.js` | |
+| `assets/crm.js` — the clients, jobs and quotes of LiczMat Pro, plus `crm-ui.js`, `jobs-ui.js` and `quotes-ui.js` | |
 | `assets/recent.js`, `assets/dashboard.js` | |
 | `src/*.mjs` — information architecture, site map, templates, page bodies, formulas | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
@@ -251,6 +251,23 @@ scripts/test-jobs-page.mjs  The same clicked through in Chromium, nothing stubbe
                       the client's own page reading the link back, the Pro notice for a
                       guest and for a Pro account, four languages, the currency switch, the
                       widths of chapter XXVIII and the no-JavaScript variant
+scripts/test-quotes.mjs  Quotes (session 24, chapter XXII): the document and the three
+                      figures it deliberately does not store, the labour — quantity × rate
+                      rounded once, the lump sum, the rate read back by dividing and the
+                      cap — the margin, which is a percentage of everything above it, the
+                      five figures each traced to one source with the project document held
+                      byte-for-byte, chapter VI's currency rule in both directions, chapter
+                      XXIV's chain walked backwards from the quote, the route, chapter XXV's
+                      gate in both of its states and the copy in four languages.
+                      Dependency-free — run it after touching the quote half of
+                      assets/crm.js, quotesMain() or a quo_*/quopage_* key
+scripts/test-quotes-page.mjs  The same clicked through in Chromium, nothing stubbed: a quote
+                      added against a project, labour typed on as quantity × rate and as a
+                      lump sum, a line corrected in its own row and removed, the margin
+                      moved with the sum following it, the project detached and attached,
+                      the quote deleted with its undo, the job and the client read back from
+                      the project, four languages, the currency switch, the widths of
+                      chapter XXVIII and the no-JavaScript variant
 scripts/test-clients-page.mjs  The same clicked through in Chromium, nothing stubbed: a
                       client added and corrected, a project filed under them and taken off,
                       the archive, the delete with its undo, the Pro notice for a guest and
@@ -299,7 +316,7 @@ assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/.
                       ?id=<projectId> — and this file shows one of them, including the
                       material list of chapter XVI and, since session 20, the project's
                       rooms and the picker that files one calculation under one of them
-assets/crm.js         The Pro workspace: clients and jobs. localStorage under its own key
+assets/crm.js         The Pro workspace: clients, jobs and quotes. localStorage under its own key
                       (`liczmat-crm-v1`), this browser only — `clients` is NOT in the sync
                       contract, so nothing here is uploaded and nothing on the phone reads
                       it. Written in the contract's shape anyway (id, fields, the sync
@@ -308,6 +325,10 @@ assets/crm.js         The Pro workspace: clients and jobs. localStorage under it
 assets/jobs-ui.js     /zlecenia/ — the index (open jobs and closed ones) and one job at
                       ?id=<jobId>: its client, its project, chapter XXI's status and
                       deadline, what was agreed and what the work has cost
+assets/quotes-ui.js   /wyceny/ — the index and one quote at ?id=<quoteId>: the project it
+                      is priced from, the labour typed onto it, chapter XXII's margin and
+                      the five figures. Three of the five are read out of the project and
+                      copied nowhere
 assets/crm-ui.js      /klienci/ — the index and one client at ?id=<clientId>. Contact
                       details, notes, the projects filed under a client and what they have
                       cost, and the history, which is derived from the saved calculations
@@ -500,6 +521,44 @@ Kotlin side of it. Change one, change all three.
   `SyncContract.jobToDoc()`, no `validJob()` in the deployed rules), so nothing here is
   uploaded and the page says so. A store written before session 23 has no `jobs` array and
   reads as an empty one — that is the whole migration.
+- **A quote stores two of chapter XXII's five figures and derives the other three.**
+  Session 24 built `/wyceny/` — the index plus one quote at `?id=<quoteId>`, the same
+  two-screens-in-one-file shape as `/klienci/` and `/zlecenia/`, in the same
+  `liczmat-crm-v1` store and outside the same sync contract (no `QuoteEntity`, no
+  `SyncContract.quoteToDoc()`, no `validQuote()` in the deployed rules). The material and
+  the other costs are `wsProjectCosts()` over the quote's project; the labour and the
+  margin are the quote's own; the total is computed. Copying the project's money onto the
+  quote would give one amount two homes and let them disagree the moment a material was
+  re-priced — the argument that already keeps a cost off a job and a unit price off a
+  shopping item. It is also what makes a quote answer "what is this worth *now*", which is
+  the question it is opened for.
+- **The one link a quote stores is `projectId`; the job and the client are walked, not
+  kept.** The materials are the project's, so without it there is nothing to price — and
+  `crmJobOfProject()` and `crmClientOfProject()` already reach the other two, so storing
+  them again would be two more links free to disagree with the first. `crmQuoteChain()` is
+  chapter XXIV's path read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT. A quote with no
+  project is allowed and is not a mistake — it is a price for work with no material behind
+  it, and the page says so instead of showing zeroes. One project may carry several quotes:
+  two prices for one job is a variant, not a contradiction.
+- **A labour line stores one money field, and the rate is a division.** `amountMinor` is
+  what the line comes to; `crmLabourRate()` divides it by the quantity, exactly as
+  `wsUnitPriceMinor()` does for a material and for the same reason. The write goes the
+  other way — quantity × rate, rounded once — so "40 × 80 = 3200" behaves the way the form
+  reads. A blank quantity is a lump sum and is stored as `null` rather than as `1`: a line
+  nobody counted and a line counted once are different statements. A labour line is deleted
+  outright rather than tombstoned — it is a field of a document, not a row of a collection,
+  and the undo that matters is the quote's own tombstone, which carries its lines.
+- **The margin is a percentage of everything above it, and the quote's currency is stamped
+  once.** `marginPct` applies to material + other costs + labour, rounded exactly once at
+  the end; a negative margin is a typo rather than a discount and reads as zero. The quote
+  stamps its own currency at the first labour amount and never re-stamps it (chapter VI);
+  clearing the last amount clears the stamp. When the quote's half and the project's half
+  are in different currencies the page says so — the amounts are still added, the same
+  choice `wsProjectCosts()` makes, and nothing is converted at a rate.
+- **What a quote deliberately has no room for:** tax, a discount, a status, a number, an
+  issue date, or "other costs" typed on the quote itself. The first five are the accounting
+  package chapter XXII forbids in one line; the last is a second home for an amount chapter
+  XVII already keeps on the project, where `wsProjectCosts()` counts it once.
 - **Chapter XXI's four statuses are the whole set, and a job has no `archived` field.**
   `JOB_STATUS` is `new, active, done, cancelled`, in the chapter's own order; anything else
   is refused rather than stored, and a job created with an unknown status starts `new`. The
@@ -563,8 +622,8 @@ Kotlin side of it. Change one, change all three.
   `lmFeatureState(id, level)` in `assets/plan.js` answers `allowed / gated / locked`, the
   gate block is in the markup from the first paint, and session 27 flips one variable —
   `scripts/test-clients.mjs` exercises both answers, the flipped one included, and
-  `scripts/test-jobs.mjs` does the same for the second module — the switch is still one
-  variable, whatever number of modules hang off it.
+  `scripts/test-jobs.mjs` and `scripts/test-quotes.mjs` do the same for the second and the
+  third module — the switch is still one variable, whatever number of modules hang off it.
 
 - **`/app/` has five tabs, and rooms are not one of them.** Chapter XVIII makes a room an
   element of a project, so `renderProjects()` draws each project's rooms inside its row

@@ -1366,6 +1366,9 @@ a.chip:hover { text-decoration: none; }
 .ws-mat-grid { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: 0 0 var(--sp-3); }
 .ws-mat-f { display: flex; flex-direction: column; gap: 2px; flex: 1 1 12rem; min-width: 0; }
 .ws-mat-f-sm { flex: 1 1 5.5rem; }
+/* A row with one field in it — the margin on /wyceny/. Without this the single field
+   grows to the full width of the card, which reads as a text box rather than a percentage. */
+.ws-mat-grid-one .ws-mat-f { flex-grow: 0; }
 .ws-mat-f input, .ws-mat-f select { width: 100%; }
 .ws-mat-hint { font-size: var(--fs-xs); margin: var(--sp-3) 0 0; }
 

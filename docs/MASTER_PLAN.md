@@ -49,8 +49,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 21 | LiczMat Pro: fundament | **Zrobione** — 2026-08-19 |
 | 22 | Klienci | **Zrobione** — 2026-08-19 |
 | 23 | Zlecenia | **Zrobione** — 2026-08-19 |
-| 24 | Wyceny | **Następna** |
-| 25–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 24 | Wyceny | **Zrobione** — 2026-08-19 |
+| 25 | Terminarz | **Następna** |
+| 26–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -1880,6 +1881,39 @@ tu zamiast zrobione:
   staje się sumą wyceny — **dwie różne rzeczy**, i podmiana jednej na drugą bez decyzji
   byłaby cichą zmianą znaczenia liczby, którą ktoś już wpisał.
 
+### Wyceny: co zostało rozstrzygnięte, i co zostaje właścicielowi (z Sesji 24)
+
+Wyceny są trzecią kolekcją w tym samym magazynie i poza tym samym kontraktem, co klienci
+i zlecenia — nie ma `QuoteEntity`, nie ma `SyncContract.quoteToDoc()`, nie ma `validQuote()`
+we wdrożonych regułach. `wsExport()` ich nie zawiera, `/wyceny/` mówi to wprost, a
+przeniesienie na telefon to ta sama jedna zmiana kontraktu w repo aplikacji, co dla dwóch
+poprzednich modułów — jeżeli w ogóle, to raz, dla wszystkich trzech.
+
+**Pytanie z raportu Sesji 23 zostało rozstrzygnięte tak, jak było postawione: dwie liczby
+zostają dwiema liczbami.** „Wartość" zlecenia (rozdział XXI) to kwota uzgodniona z klientem
+i dalej jest wpisywana ręcznie; suma wyceny (rozdział XXII) to materiał + inne koszty +
+robocizna + marża i jest liczona. Podmiana jednej na drugą byłaby cichą zmianą znaczenia
+liczby, którą ktoś już wpisał — a to jest dokładnie to, przed czym raport Sesji 23
+ostrzegał. Zlecenie i wycena nie są też ze sobą powiązane wprost: obie wskazują na ten sam
+projekt i tamtędy się widzą.
+
+Do decyzji właściciela zostają trzy rzeczy, wszystkie **poza zakresem Sesji 24**:
+
+- **Czy wycena ma być wychodzącym dokumentem** — czymś, co się drukuje albo wysyła
+  klientowi. Dziś jest ekranem roboczym: liczy i pokazuje. Wydruk ma już `/kosztorys/`
+  i można by mu dać wariant „wycena", ale to jest osobna sesja i osobny projekt strony do
+  druku.
+- **Czy „wartość" zlecenia ma dostać przycisk „przepisz z wyceny"** — jednorazowe
+  przepisanie na życzenie, a nie powiązanie. To jest jedno kliknięcie, ale i jedna decyzja:
+  po nim uzgodniona kwota przestaje być tym, na co ktoś się umówił, jeżeli wycena się potem
+  zmieni.
+- **Czy jedno zlecenie ma mieć wskazaną „tę właściwą" wycenę**, gdy wariantów jest kilka.
+  Dziś projekt może mieć ich dowolnie wiele i żaden nie jest wyróżniony; wyróżnienie to
+  pole, a pole to decyzja, po co ono jest.
+
+Sesja 26 (CRM) łączy klienta, zlecenie, projekt, wycenę i historię w jedną drogę — to tam
+te powiązania mają być pokazane razem, i dlatego Sesja 24 nie dokładała ich po jednym.
+
 ### Moduł Pro jest dziś otwarty dla każdego — zamek przychodzi z Sesją 27 (z Sesji 22)
 
 `/klienci/` mówi na górze „Dostępne w LiczMat Pro" i jednym zdaniem, że planu Pro nic
@@ -1893,8 +1927,9 @@ Cały mechanizm jest już na miejscu i przetestowany w obie strony: `lmFeatureSt
 w `assets/plan.js` odpowiada `allowed / gated / locked`, blok bramki siedzi w HTML-u od
 pierwszego renderu (ukryty), a **jedynym przełącznikiem jest `LM_PRO_LOCKED`**. Sesja 27
 zmienia jedną linijkę; test sprawdza obie odpowiedzi, więc nie będzie to zmiana na ślepo.
-Sesja 23 dołożyła drugi moduł (`/zlecenia/`) pod ten sam przełącznik i ten sam test — liczba
-modułów nie zmienia tego, że przełącznik jest jeden.
+Sesja 23 dołożyła drugi moduł (`/zlecenia/`), Sesja 24 trzeci (`/wyceny/`) — ten sam
+przełącznik i ten sam test w każdym z nich. Liczba modułów nie zmienia tego, że przełącznik
+jest jeden.
 
 ### Warstwa konta nie została po tej sesji sprawdzona na żywym Firebase
 

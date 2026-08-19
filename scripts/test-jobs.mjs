@@ -247,8 +247,10 @@ head("1c. jobs live beside the clients, and the phone's workspace is untouched")
     ["projects", "rooms", "estimations", "shoppingItems"]
       .filter((k) => Array.isArray(exported[k])).length, 4);
 
-  eq("the Pro store holds exactly the two local collections",
-    Object.keys(crm.raw()).sort().join(), "clients,jobs");
+  // Session 24 added the third — quotes (chapter XXII), in the same store and outside
+  // the same contract.
+  eq("the Pro store holds exactly the three local collections",
+    Object.keys(crm.raw()).sort().join(), "clients,jobs,quotes");
 }
 
 head("1d. a store written before session 23 reads as one with no jobs");

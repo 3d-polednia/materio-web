@@ -56,6 +56,11 @@ export const SECTION = {
      the `jobs` route has carried as `plannedSlug` in src/ia.mjs since session 3, so
      turning the page on moves them, it does not rename them. */
   jobs: { pl: "zlecenia", uk: "zamovlennya", de: "auftraege", en: "jobs" },
+  /* Session 24, the third Pro module. Same rule again: the segments are the ones the
+     `quotes` route has carried as `plannedSlug` in src/ia.mjs since session 3. Ukrainian
+     is "koshtorysy-pro" rather than "koshtorysy" because /koshtorys/ is already the free
+     estimate page in Ukrainian, and two sections may not claim one word. */
+  quotes: { pl: "wyceny", uk: "koshtorysy-pro", de: "angebote", en: "quotes" },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
@@ -219,6 +224,12 @@ export const urlJobs = (lang) => `${prefix(lang)}/${SECTION.jobs[lang]}/`;
 
 /** One job, as a query string on /zlecenia/ — the same wall urlClient() hits. */
 export const urlJob = (lang, id) => `${urlJobs(lang)}?id=${encodeURIComponent(id)}`;
+
+/** The quotes of LiczMat Pro — chapter XXII. */
+export const urlQuotes = (lang) => `${prefix(lang)}/${SECTION.quotes[lang]}/`;
+
+/** One quote, as a query string on /wyceny/ — the same wall urlJob() hits. */
+export const urlQuote = (lang, id) => `${urlQuotes(lang)}?id=${encodeURIComponent(id)}`;
 
 export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
 

@@ -12,7 +12,7 @@ import {
 import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs,
+  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -1674,8 +1674,217 @@ export function jobsMain(lang, t) {
       <p class="ws-links">
         <a class="btn btn-ghost" href="${urlClients(lang)}">${esc(t("clipage_title"))}</a>
         <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a class="btn btn-ghost" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
       </p>
       <p class="muted src-note">${esc(t("job_local_note"))}</p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+  return { main, ld: crumbs.ld };
+}
+
+/**
+ * /wyceny/ — the quotes of LiczMat Pro. Session 24, chapter XXII.
+ *
+ * Two screens in one file, the same shape as /klienci/ and /zlecenia/: the index, and one
+ * quote at ?id=<quoteId>. Only the frame is written here — every figure on it is computed
+ * in the browser, and three of the five come out of the project rather than out of the
+ * quote (crmQuoteTotals() in assets/crm.js says why).
+ */
+export function quotesMain(lang, t) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("jobpage_title"), path: urlJobs(lang) },
+    { name: t("quopage_title"), path: urlQuotes(lang) },
+  ]);
+
+  // Chapter XXV's block, worded exactly as on /klienci/ and /zlecenia/ — three modules,
+  // one rule. "Poznaj LiczMat Pro" is a sentence rather than a button while
+  // /liczmat-pro/ is planned (session 29); it becomes a link with no edit here.
+  const pro = iaRoute("liczmat-pro");
+  const more = pro && pro.status === STATUS.LIVE
+    ? `<a class="btn btn-ghost btn-sm" href="${pro.path(lang)}">${esc(t("pro_more"))}</a>`
+    : `<span class="muted">${esc(t("pro_more"))} — ${esc(t("door_soon"))}</span>`;
+
+  const gate = `<div class="app-card crm-gate" id="quo-gate" hidden>
+        <h2>${esc(t("feat_quotes_t"))}</h2>
+        <p class="muted">${esc(t("feat_quotes_d"))}</p>
+        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
+        <p>${more}</p>
+      </div>`;
+
+  const detail = `<article id="quo-detail" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="${urlQuotes(lang)}" data-quo-back>${esc(t("quo_back"))}</a></p>
+
+        <div id="quo-missing" hidden>
+          <h2>${esc(t("quo_none_t"))}</h2>
+          <p class="muted">${esc(t("quo_none_d"))}</p>
+        </div>
+
+        <div id="quo-body" hidden>
+          <!-- Chapter XXIV read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT. Every
+               step is derived from the one link the quote stores, so nothing here can
+               disagree with the job's own page. -->
+          <p class="crm-contact" id="quo-chain-line"></p>
+
+          <!-- Chapter XXII's five figures. Three of them are the project's own money,
+               read through wsProjectCosts() and never copied onto the quote. -->
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_materials"))}</span> <b id="quo-fig-materials"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_other"))}</span> <b id="quo-fig-other"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_labour"))}</span> <b id="quo-fig-labour"></b></p>
+          </div>
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_sub"))}</span> <b id="quo-fig-sub"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_margin"))}</span> <b id="quo-fig-margin"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("quo_fig_total"))}</span> <b id="quo-fig-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="quo-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+
+          <!-- The margin is one field on the page rather than a form to open: it is the
+               number a tradesman moves while looking at the total. -->
+          <p class="ws-mat-grid ws-mat-grid-one">
+            <label class="ws-mat-f ws-mat-f-sm">
+              <span class="ws-bar-label">${esc(t("quo_margin"))}</span>
+              <input id="quo-margin" type="text" inputmode="decimal">
+            </label>
+          </p>
+          <p class="muted field-note">${esc(t("quo_margin_d"))}</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="quo-edit">${esc(t("quo_edit"))}</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="quo-delete">${esc(t("app_delete"))}</button>
+          </div>
+
+          <form id="quo-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">${esc(t("quo_name"))}</span>
+                <input id="quo-edit-name" type="text" maxlength="120" required>
+              </label>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="quo-edit-note">${esc(t("quo_note"))}</label>
+              <textarea id="quo-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-quo-edit-cancel>${esc(t("action_cancel"))}</button>
+            </p>
+          </form>
+
+          <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="quo-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="quo-delete-yes">${esc(t("quo_delete_yes"))}</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="quo-delete-no">${esc(t("action_cancel"))}</button>
+            </p>
+          </div>
+
+          <!-- Chapter XXII's "robocizna": the only part of a quote nothing else counts. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("quo_labour_t"))}</h2>
+            </div>
+            <p class="muted">${esc(t("quo_labour_d"))}</p>
+            <ul id="quo-labour-list" class="data-list"></ul>
+            <form id="quo-labour-form">
+              <p class="ws-mat-grid">
+                <label class="ws-mat-f">
+                  <span class="ws-bar-label">${esc(t("quo_labour_name"))}</span>
+                  <input id="quo-labour-name" type="text" maxlength="120" required>
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">${esc(t("quo_labour_qty"))}</span>
+                  <input id="quo-labour-qty" type="text" inputmode="decimal">
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">${esc(t("quo_labour_unit"))}</span>
+                  <input id="quo-labour-unit" type="text" maxlength="24">
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">${esc(t("quo_labour_price"))}</span>
+                  <input id="quo-labour-price" type="text" inputmode="decimal">
+                </label>
+              </p>
+              <p>
+                <button type="submit" class="btn btn-primary btn-sm">${esc(t("quo_labour_add"))}</button>
+                <span class="muted" id="quo-labour-run"></span>
+              </p>
+            </form>
+            <p class="muted" id="quo-labour-full" hidden>${esc(t("quo_labour_full"))}</p>
+          </section>
+
+          <!-- The one link the quote stores. The project is the free workspace's own row;
+               nothing here renames, archives or deletes it. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("quo_project"))}</h2>
+              <a class="dash-more" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+            </div>
+            <ul id="quo-project-list" class="data-list"></ul>
+            <form id="quo-project-form" class="inline-form">
+              <select id="quo-project-pick" aria-label="${esc(t("quo_project_add"))}"></select>
+              <button type="submit" class="btn btn-primary btn-sm">${esc(t("quo_project_add"))}</button>
+            </form>
+            <p class="muted field-note">${esc(t("quo_project_d"))}</p>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("quo_note_t"))}</h2>
+            </div>
+            <p id="quo-note" class="crm-note"></p>
+          </section>
+        </div>
+      </article>`;
+
+  const index = `<div id="quo-index">
+        <p class="ws-undo" id="quo-undo" role="status" hidden>
+          <span id="quo-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="quo-undo-go">${esc(t("quo_undo"))}</button>
+        </p>
+
+        <h2>${esc(t("quo_list_t"))}</h2>
+        <p class="muted">${esc(t("quo_list_d"))}</p>
+        <form id="quo-form" class="inline-form">
+          <input id="quo-name" type="text" maxlength="120" placeholder="${esc(t("quo_new"))}" required>
+          <select id="quo-project" aria-label="${esc(t("quo_project"))}"></select>
+          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+        </form>
+        <ul id="quo-list" class="data-list"></ul>
+      </div>`;
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1 id="quo-title">${esc(t("quopage_title"))}</h1>
+      <p class="lead" id="quo-lead">${esc(t("quopage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="quo-page">
+    <div class="wrap narrow">
+      <p class="crm-pro" id="quo-pro">
+        <span class="chip" id="quo-pro-chip">${esc(t("pro_locked"))}</span>
+        <span class="muted" id="quo-pro-note">${esc(t("quo_pro_note"))}</span>
+      </p>
+
+      ${gate}
+
+      <div id="quo-tool">
+        ${detail}
+        ${index}
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="${urlJobs(lang)}">${esc(t("jobpage_title"))}</a>
+        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+      </p>
+      <p class="muted src-note">${esc(t("quo_local_note"))}</p>
     </div>
   </section>
 

@@ -96,6 +96,8 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 | `client` | `/klienci/?id=…` | **PRO** | `clients` | **nie** | 0 — widok |
 | `jobs` | `/zlecenia/` | **PRO** | `clients` | tak | 4 |
 | `job` | `/zlecenia/?id=…` | **PRO** | `jobs` | **nie** | 0 — widok |
+| `quotes` | `/wyceny/` | **PRO** | `jobs` | tak | 4 |
+| `quote` | `/wyceny/?id=…` | **PRO** | `quotes` | **nie** | 0 — widok |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 4 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
 | `dashboard` | `/app/dashboard/` | GUEST | `account` | **nie** | 1 |
@@ -106,8 +108,9 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 (patrz §3).
 
 `clients` (Sesja 22) jest pierwszą trasą `PRO`, która naprawdę istnieje, `jobs` (Sesja 23)
-drugą. To jedyne strony w inwentarzu, których link jest ukryty przed kimś poniżej Pro
-(`navLevel`, §5). Żadna z nich nie jest bramkowana — patrz §7.7 i §7.8.
+drugą, `quotes` (Sesja 24) trzecią. To jedyne strony w inwentarzu, których link jest ukryty
+przed kimś poniżej Pro (`navLevel`, §5). Żadna z nich nie jest bramkowana — patrz §7.7,
+§7.8 i §7.9.
 
 **`project` jest pierwszym „widokiem” (`view: true`) — ekranem bez własnego pliku.**
 Liczba wygenerowanych stron się przez niego nie zmienia i to jest cała jego definicja:
@@ -190,14 +193,14 @@ adresu, który już działa, i żeby żadna nie trafiła do menu przed czasem.
 | Trasa | URL (PL) | Poziom | Sesja | Po co |
 |---|---|---|---|---|
 | `liczmat-pro` | `/liczmat-pro/` | GUEST | 29 | publiczna strona Pro: co to, dla kogo, ile kosztuje |
-| `quotes` | `/wyceny/` | PRO | 24 | materiały + robocizna + marża |
 | `calendar` | `/terminarz/` | PRO | 25 | terminy zleceń |
 
 Slugi w pozostałych trzech językach są już ustalone w `src/ia.mjs` (`plannedSlug`) — po to,
 żeby sesja, która buduje stronę, nie wymyślała ich w pośpiechu. Przenoszą się do `SECTION`
 w `src/site.mjs` w chwili, gdy to się dzieje: Sesja 22 przeniosła w ten sposób `clients`
-(`klienci` / `kliyenty` / `kunden` / `clients`), a Sesja 23 `jobs` (`zlecenia` /
-`zamovlennya` / `auftraege` / `jobs`) — obie bez zmiany choćby jednej litery, bo slug jest
+(`klienci` / `kliyenty` / `kunden` / `clients`), Sesja 23 `jobs` (`zlecenia` /
+`zamovlennya` / `auftraege` / `jobs`), a Sesja 24 `quotes` (`wyceny` / `koshtorysy-pro` /
+`angebote` / `quotes`) — wszystkie trzy bez zmiany choćby jednej litery, bo slug jest
 trwały od momentu, w którym został zaplanowany.
 
 **`/liczmat-pro/` jest publiczna i indeksowana, moduły Pro też.** To nie jest sprzeczność:
@@ -607,8 +610,10 @@ kalkulator: wiersz wpisany ręcznie stoi w swojej sekcji i nie jest drukowany dw
 **Czego ta sesja świadomie nie zrobiła.** `/kosztorys/` nadal sumuje **wiersze kosztorysu**,
 więc po ręcznej zmianie ceny materiału jego suma i suma projektu mogą się różnić. To nie
 jest przeoczenie: kosztorys jest dokumentem tego, co policzono, a „materiały, robocizna,
-koszty, marża, suma, waluta" to Sesja 24 (WYCENY). Marży, narzutu i podatku tu nie ma —
-rozdział XVII kończy się zdaniem „Nie buduj z tego systemu księgowego".
+koszty, marża, suma, waluta" to Sesja 24 (WYCENY) — zbudowana, §7.9, i to ona bierze
+materiał i inne koszty z `wsProjectCosts()`, dokłada robociznę i narzuca marżę. Tu marży,
+narzutu i podatku nie ma — rozdział XVII kończy się zdaniem „Nie buduj z tego systemu
+księgowego".
 
 ### 7.5. Pomieszczenia jako element projektu (Sesja 20)
 
@@ -931,6 +936,87 @@ pierwszego renderu i **ten sam jedyny przełącznik Sesji 27: `LM_PRO_LOCKED`**.
 w stopce z `navLevel: PRO`, strona zostaje `indexable` i w `sitemap.xml`, a karta modułu
 w zakładce Pro na `/app/` prowadzi teraz do strony — drugi martwy przycisk zamienił się
 w działający.
+
+### 7.9. Wyceny — pięć liczb, z których zapisane są dwie (Sesja 24)
+
+Rozdział XXXII, Sesja 24: „WYCENY — materiały, robocizna, koszty, marża, suma, waluta".
+Rozdział XXII mówi to samo krócej i dodaje jedno zdanie, które rozstrzyga zakres: „Nie
+buduj pełnego programu księgowego". Rozdział XXIV mówi, gdzie wycena stoi: KLIENT →
+ZLECENIE → PROJEKT → **WYCENA** → HISTORIA — czwarty krok, więc pierwszy, który ma pod
+sobą policzone pieniądze.
+
+**Strona.** `/wyceny/` w czterech językach, plus `/wyceny/?id=<quoteId>` jako `view` —
+z tego samego powodu, z którego `job` nim jest (§3). Indeks to lista wycen z sumą przy
+każdej; ekran wyceny to łańcuch (klient → zlecenie), sześć liczb, pole marży, pozycje
+robocizny, projekt i notatki. W `src/ia.mjs` trasa siedzi pod `jobs`, bo tam droga
+rozdziału XXIV do niej dochodzi.
+
+**Magazyn: ten sam co klienci i zlecenia** — `assets/crm.js`, klucz `liczmat-crm-v1`,
+trzecia kolekcja obok `clients` i `jobs`, z tego samego powodu (jeden magazyn, jeden plik).
+`quotes` też **nie ma w kontrakcie synchronizacji**: żadnego `QuoteEntity`, żadnego
+`SyncContract.quoteToDoc()`, żadnego `validQuote()` we wdrożonych regułach. Nic stąd nigdzie
+nie jedzie, `wsExport()` tego nie zawiera, a strona mówi to wprost. Magazyn zapisany przed
+Sesją 24 nie ma tablicy `quotes` i czyta się jako pusty.
+
+**Każda z pięciu liczb ma dokładnie jedno źródło, a tylko dwie z nich są zapisane.**
+
+| rozdział XXII | skąd | zapisane? |
+|---|---|---|
+| materiały | `wsProjectCosts(projectId).materials` | nie — czytane z projektu |
+| inne koszty | `wsProjectCosts(projectId).other` | nie — czytane z projektu |
+| robocizna | pozycje `labour` na wycenie | **tak** |
+| marża | `marginPct` na wycenie | **tak** |
+| suma | `(materiały + inne koszty + robocizna) + marża` | nie — liczona |
+
+Skopiowanie pieniędzy projektu na wycenę dałoby tej samej kwocie dwa domy i pozwoliłoby im
+się rozjechać przy pierwszej zmianie ceny materiału — ten sam argument, który trzyma koszt
+poza zleceniem (§7.8) i cenę jednostkową poza pozycją listy zakupów (§7.4). Dzięki temu
+wycena odpowiada na pytanie „ile to jest warte **teraz**", a to jest pytanie, dla którego
+się ją otwiera. Test klika przecenienie materiału na ekranie projektu i sprawdza, że suma
+wyceny się zmieniła, a sama wycena nie została ani razu zapisana.
+
+**Jedyne powiązanie, jakie wycena trzyma, to `projectId`.** Materiały są projektu, więc bez
+niego nie ma czego wyceniać; zlecenie i klient są **już** osiągalne z projektu
+(`crmJobOfProject()`, `crmClientOfProject()`), więc zapisanie ich drugi raz to dwa kolejne
+linki, które mogą się rozejść z pierwszym. `crmQuoteChain()` przechodzi tę drogę w drugą
+stronę: WYCENA → PROJEKT → ZLECENIE → KLIENT. Wycena bez projektu jest dozwolona i nie jest
+pomyłką — to cena za robotę bez materiału, i strona mówi to wprost zamiast pokazywać zera
+bez wyjaśnienia. Jeden projekt może mieć kilka wycen: dwie ceny na jedną robotę to wariant,
+nie sprzeczność.
+
+**Robocizna: ilość × stawka, zaokrąglone raz.** To jedyna część wyceny, której nic w
+LiczMacie nie policzy — żaden kalkulator nie liczy godziny czyjejś pracy. Pozycja trzyma
+**jedno** pole pieniężne, `amountMinor`; stawka wychodzi z dzielenia (`crmLabourRate()`),
+dokładnie jak cena jednostkowa materiału i z tego samego powodu. Pusta ilość to ryczałt
+i zapisuje się jako `null`, a nie jako `1`: pozycja, której nikt nie liczył, i pozycja
+policzona raz to dwa różne zdania, i strona drukuje je inaczej. Pozycja robocizny znika
+przy usunięciu na wprost, bez nagrobka — jest polem dokumentu, nie wierszem kolekcji: nic
+jej nie synchronizuje, nic do niej nie linkuje, a cofnięcie, które ma znaczenie (cała
+wycena), to nagrobek samej wyceny, który niesie swoje pozycje.
+
+**Marża to procent od wszystkiego powyżej** (materiał + inne koszty + robocizna) — tak
+działa narzut — zaokrąglony dokładnie raz, na końcu. Ujemna marża nie jest rabatem, tylko
+literówką, i czyta się jako zero; jest też górna granica, bo marża to narzut, a nie
+wykładnik.
+
+**Waluta — rozdział VI, ten sam co wszędzie.** Wycena stempluje własną walutę przy
+pierwszej kwocie robocizny i **nigdy** jej nie przestempluje; usunięcie ostatniej kwoty
+czyści stempel, więc następna dostaje własny. Pieniądze projektu przychodzą w walucie
+projektu. Gdy obie połowy są w różnych walutach, strona to mówi (`ws_mixed_currency`) —
+kwoty są dalej dodawane, tak samo jak w `wsProjectCosts()`, ale nic nie jest przeliczane po
+kursie.
+
+**Czego wycena nie ma, i to celowo:** podatku, rabatu, statusu, numeru, daty wystawienia,
+pozycji „inne koszty" wpisywanych po jej stronie. Pierwsze pięć to program księgowy, którego
+rozdział XXII zabrania jednym zdaniem; ostatnia to drugie miejsce na tę samą kwotę —
+rozdział XVII ma już swoje „inne koszty" na projekcie i `wsProjectCosts()` liczy je raz.
+
+**Rozdział XXV — tak samo jak przy klientach i zleceniach.** Ten sam pasek „Dostępne
+w LiczMat Pro", ta sama uwaga o tym, że planu Pro nic jeszcze nie nadaje, ta sama bramka
+w HTML-u od pierwszego renderu i **ten sam jedyny przełącznik Sesji 27: `LM_PRO_LOCKED`** —
+teraz dla trzech modułów, i wciąż jedna zmienna.
+
+---
 
 ---
 

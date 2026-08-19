@@ -27,7 +27,7 @@ import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
   URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs,
+  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
 } from "../src/site.mjs";
 import {
   livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
@@ -40,6 +40,7 @@ import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
   materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain, jobsMain,
+  quotesMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
@@ -49,7 +50,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819c";
+const STAMP = "20260819d";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -286,7 +287,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang), urlJobs(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -355,6 +356,17 @@ const CRM_SCRIPTS = [
  */
 const JOBS_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/jobs-ui.js",
+];
+
+/**
+ * /wyceny/ (session 24). The same four files again, with the quote page's own interface:
+ * the store is shared (assets/crm.js holds all three collections), and three of chapter
+ * XXII's five figures are read out of a project through assets/workspace.js — the quote
+ * copies none of them. No engine and no catalogue: the page multiplies a quantity by a
+ * rate and adds a percentage, and calculates nothing else.
+ */
+const QUOTES_SCRIPTS = [
+  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/quotes-ui.js",
 ];
 
 /* ------------------------------------------------------------------ worked examples */
@@ -709,6 +721,37 @@ function buildJobsPages() {
   }
 }
 
+/**
+ * /wyceny/ — the quotes of LiczMat Pro. Session 24, chapter XXII.
+ *
+ * Two screens in one file again: the index, and one quote at ?id=<quoteId>. Only the frame
+ * is written here; the material, the other costs, the labour, the margin and the total are
+ * all computed in the browser, and three of the five come out of a project rather than out
+ * of the quote.
+ */
+function buildQuotesPages() {
+  const alt = alternatesFor(urlQuotes);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = quotesMain(lang, t);
+    write(join(urlQuotes(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("quopage_title")} \u2014 LiczMat`,
+      description: t("quopage_meta"),
+      path: urlQuotes(lang),
+      alternates: alt,
+      main, jsonld: [ld],
+      // A quote links back to its project, and — through it — to the job and the client
+      // chapter XXIV's path runs through. The script has no site map, so the build hands
+      // it this language's address for all three.
+      headExtra: `<script>window.LM_QUOTES = ${JSON.stringify({
+        projects: urlProjects(lang), jobs: urlJobs(lang), clients: urlClients(lang),
+      })};</script>`,
+      scripts: QUOTES_SCRIPTS,
+    }));
+  }
+}
+
 function buildStores() {
   const alt = alternatesFor(urlStores);
   for (const lang of LANGS) {
@@ -923,6 +966,7 @@ buildCookiesPage();
 buildWorkspacePages();
 buildClientsPages();
 buildJobsPages();
+buildQuotesPages();
 buildStores();
 buildPrivatePages();
 buildSitemap();

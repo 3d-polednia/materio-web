@@ -1,14 +1,15 @@
-/* LiczMat website — the Pro workspace: clients and jobs.
+/* LiczMat website — the Pro workspace: clients, jobs and quotes.
  *
  * Master plan, session 22 (KLIENCI): "CRM klientów", and chapter XX under it — a client
  * list where a client carries contact details, notes, a history, jobs, projects and
  * quotes. Session 23 (ZLECENIA) added the second half: a job with a client, a name, a
  * description, a status, a date, a value and a project (chapter XXI), which is chapter
- * XXIV's middle step — KLIENT → ZLECENIE → PROJEKT → WYCENA. The quotes are session 24.
+ * XXIV's middle step — KLIENT → ZLECENIE → PROJEKT → WYCENA. Session 24 (WYCENY) added
+ * the last of those, chapter XXII: material, labour, other costs, margin and a total.
  *
- * Both collections live in this one file because they live in one store, and because the
- * job is the thing that joins a client to a project: splitting them would mean two files
- * reading and writing the same localStorage key, which is one race away from a lost write.
+ * All three collections live in this one file because they live in one store, and because
+ * each is the thing that joins the next: splitting them would mean three files reading and
+ * writing the same localStorage key, which is one race away from a lost write.
  *
  * **Local to this browser, and not part of the sync contract.** docs/FIRESTORE_SYNC.md in
  * `3d-polednia/Materio` defines five collections — projects, rooms, estimations,
@@ -45,6 +46,9 @@ const CRM_SCHEMA = 1;
 const CRM_MAX_NAME = 120;
 const CRM_MAX_CONTACT = 200;
 const CRM_MAX_NOTE = 2000;
+/* A unit is a word beside a number — "h", "m²", "dzień" — capped exactly as a material's
+   unit is in assets/workspace.js, because it is the same kind of thing. */
+const CRM_MAX_UNIT = 24;
 
 /**
  * Chapter XXI's statuses, in the order the chapter lists them: nowe, w toku, zakończone,
@@ -62,7 +66,7 @@ const JOB_DEFAULT_STATUS = "new";
 
 /* ------------------------------------------------------------------ storage */
 
-const crmEmpty = () => ({ clients: [], jobs: [] });
+const crmEmpty = () => ({ clients: [], jobs: [], quotes: [] });
 
 /** Read the whole Pro workspace. A corrupt or absent store reads as an empty one. */
 function crmLoad() {
@@ -75,6 +79,8 @@ function crmLoad() {
       // A store written before session 23 has no jobs array. Reading it as empty is the
       // whole migration: nothing is rewritten until the visitor adds their first job.
       jobs: Array.isArray(data.jobs) ? data.jobs : [],
+      // The same for the quotes of session 24.
+      quotes: Array.isArray(data.quotes) ? data.quotes : [],
     };
   } catch (e) {
     return crmEmpty();
@@ -653,9 +659,372 @@ function crmClientLastAt(clientId) {
     .reduce((at, p) => Math.max(at, p.updatedAt || 0), client.updatedAt || 0);
 }
 
+/* ------------------------------------------------------------------ quotes
+ *
+ * Chapter XXII: "Wycena może zawierać: materiały, robociznę, inne koszty, marżę, sumę.
+ * Nie buduj pełnego programu księgowego." Session 24's six bullets are those five plus
+ * the currency, and this is all of them — no tax, no discount, no invoice number, no
+ * status: every one of those is the accounting package the chapter forbids in one line.
+ *
+ * **Each of the five figures has exactly one source, and only two of them are stored.**
+ *
+ *   materiały    wsProjectCosts(projectId).materials — the project's material list
+ *   inne koszty  wsProjectCosts(projectId).other — chapter XVII's hand-typed costs
+ *   robocizna    the quote's own `labour` lines, which is the one thing nothing else knows
+ *   marża        the quote's own `marginPct`
+ *   suma         (materiały + inne koszty + robocizna) + marża, computed here, never stored
+ *
+ * Copying the project's money onto the quote would give the same amount two homes and let
+ * them disagree the moment a material was re-priced — the argument that already keeps a
+ * job's cost out of the job (crmJobCosts()) and a unit price out of a shopping item
+ * (wsUnitPriceMinor()). It also means a quote answers "what is this worth *now*", which is
+ * what a tradesman opens it to see.
+ *
+ * **The one link the quote stores is `projectId`.** The materials are the project's, so
+ * without it there is nothing to price; the job and the client are *already* reachable
+ * from the project — crmJobOfProject() and crmClientOfProject() — so storing them again
+ * would be two more links free to disagree with the first. crmQuoteChain() walks it, and
+ * that walk is chapter XXIV's path read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT.
+ *
+ * A quote with no project is allowed and is not a mistake: it is a price for work with no
+ * material behind it, and it comes to the labour plus the margin. The page says so rather
+ * than showing zeroes with no explanation.
+ */
+
+/** How many labour lines one quote may carry. Chapter XXII, not a cost book. */
+const QUO_MAX_LINES = 60;
+/** The cap on a margin, in percent. A margin is a markup, not an exponent. */
+const QUO_MAX_MARGIN = 1000;
+
+/** A counted amount, or null when the visitor left the field blank — a lump-sum line. */
+function crmQty(v) {
+  if (v === undefined || v === null || String(v).trim() === "") return null;
+  const n = Number(String(v).replace(",", "."));
+  if (!isFinite(n) || n < 0) return null;
+  return n;
+}
+
+/** A margin in percent: never negative, never past the cap, never more than two decimals. */
+function crmPct(v) {
+  if (v === undefined || v === null || String(v).trim() === "") return 0;
+  const n = Number(String(v).replace(",", "."));
+  if (!isFinite(n) || n <= 0) return 0;
+  return Math.round(Math.min(n, QUO_MAX_MARGIN) * 100) / 100;
+}
+
+/** Every quote that still exists, newest change first. */
+function crmQuotes() {
+  return crmAlive(crmLoad().quotes).sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+/** One quote by id. Null when it never existed or was deleted. */
+const crmQuote = (id) => crmQuotes().find((q) => q.id === id) || null;
+
+/** The quotes priced from one project, newest change first. A project may have several —
+ *  two prices for one job is a variant, not a contradiction, and nothing here forbids it. */
+const crmProjectQuotes = (projectId) =>
+  crmQuotes().filter((q) => q.projectId && q.projectId === String(projectId || ""));
+
+/**
+ * Add a quote. Only the name is required, for the reason only a client's or a job's name
+ * is: everything else is filled in as it becomes known, and a named quote is already the
+ * row the visitor wanted.
+ *
+ * @param {{name:string, projectId?:string, marginMajor?:string|number, note?:string}} fields
+ * @returns {object|null} the stored quote, or null when there is no name
+ */
+function crmAddQuote(fields) {
+  const f = fields || {};
+  const name = crmText(f.name, CRM_MAX_NAME);
+  if (!name) return null;
+  const data = crmLoad();
+  const now = Date.now();
+  const quote = {
+    id: crmId(),
+    name,
+    // A project that is not there is dropped rather than stored — the same rule a job's
+    // links follow: a link to a row nobody can open is worse than no link.
+    projectId: crmProjectId(f.projectId),
+    labour: [],
+    marginPct: crmPct(f.marginMajor),
+    note: crmText(f.note, CRM_MAX_NOTE),
+    // Stamped by the first labour amount, not here: a quote with no money in it yet has
+    // no currency to be wrong about.
+    currencyCode: "",
+    createdAt: now,
+    updatedAt: now,
+    deletedAt: null,
+    schemaVersion: CRM_SCHEMA,
+  };
+  data.quotes.push(quote);
+  crmSave(data);
+  return crmQuote(quote.id);
+}
+
+/** Correct a quote in place. Anything not passed keeps its current value. */
+function crmUpdateQuote(id, fields) {
+  const f = fields || {};
+  const data = crmLoad();
+  const quote = data.quotes.find((q) => q.id === id && !q.deletedAt);
+  if (!quote) return null;
+  if (f.name !== undefined) {
+    const name = crmText(f.name, CRM_MAX_NAME);
+    if (!name) return null;
+    quote.name = name;
+  }
+  if (f.note !== undefined) quote.note = crmText(f.note, CRM_MAX_NOTE);
+  if (f.marginMajor !== undefined) quote.marginPct = crmPct(f.marginMajor);
+  if (f.projectId !== undefined) quote.projectId = crmProjectId(f.projectId);
+  quote.updatedAt = Date.now();
+  crmSave(data);
+  return crmQuote(id);
+}
+
+/**
+ * Tombstone a quote. Nothing else is touched: the project it priced is the visitor's own
+ * work and syncs to the phone, and the labour lines ride on the tombstone, which is what
+ * lets the undo bring the whole quote back exactly as it stood.
+ *
+ * @returns {{id:string, at:number}|null} hand it to crmRestoreQuote()
+ */
+function crmDeleteQuote(id) {
+  const data = crmLoad();
+  const quote = data.quotes.find((q) => q.id === id && !q.deletedAt);
+  if (!quote) return null;
+  const now = Date.now();
+  quote.deletedAt = now;
+  quote.updatedAt = now;
+  crmSave(data);
+  return { id: id, at: now };
+}
+
+/** Undo one delete — the same tombstone-clearing as crmRestoreJob(). */
+function crmRestoreQuote(token) {
+  const id = typeof token === "string" ? token : (token && token.id);
+  if (!id) return null;
+  const data = crmLoad();
+  const quote = data.quotes.find((q) => q.id === id);
+  if (!quote || !quote.deletedAt) return null;
+  quote.deletedAt = null;
+  quote.updatedAt = Date.now();
+  crmSave(data);
+  return crmQuote(id);
+}
+
+/* ------------------------------------------------------------------ labour
+ *
+ * Chapter XXII's "robocizna", and the only part of a quote nothing else in LiczMat knows:
+ * no calculator computes an hour of somebody's work, so it is typed.
+ *
+ * A line stores **one** money field, `amountMinor` — what the line comes to. The rate per
+ * unit is read back by dividing (crmLabourRate()), which is the rule session 19 settled
+ * for a material's unit price and for the same reason: two stored numbers that should
+ * agree are two numbers that eventually will not. The write goes the other way, quantity ×
+ * rate rounded exactly once, so "40 × 80 = 3200" behaves the way the form reads.
+ *
+ * A blank quantity is a lump sum — "wykonanie: 2000" — and is stored as null rather than
+ * as 1, because a line that was never counted and a line counted once are different
+ * statements and the page prints them differently.
+ *
+ * A labour line is deleted outright rather than tombstoned. It is a field of a document,
+ * not a row of a collection: nothing syncs it, nothing links to it, and the undo that
+ * matters — the whole quote — is the quote's own tombstone, which carries its lines.
+ */
+
+/** What a line comes to: quantity × rate, rounded once. A blank quantity counts as one. */
+const crmLineAmount = (priceMajor, quantity) =>
+  Math.max(0, Math.round(crmMinor(priceMajor) * (quantity === null ? 1 : Math.max(0, quantity))));
+
+/** The rate behind a line, in minor units, or null when there is nothing to divide. */
+function crmLabourRate(line) {
+  const qty = Number(line && line.quantity) || 0;
+  const amount = Number(line && line.amountMinor) || 0;
+  if (qty <= 0 || amount <= 0) return null;
+  return amount / qty;
+}
+
+/** Every labour line of a quote, oldest first — the order they were typed in. */
+const crmLabour = (quoteId) => {
+  const q = crmQuote(quoteId);
+  return q && Array.isArray(q.labour) ? q.labour.slice() : [];
+};
+
+/**
+ * The currency of a quote's own money, restamped after every labour change.
+ *
+ * Chapter VI: nothing is ever converted at a rate. So a quote that already holds an amount
+ * keeps the currency it was priced in, one that holds none carries no currency at all, and
+ * the stamp is taken from the visitor's own choice the first time money appears.
+ */
+function crmStampQuote(quote) {
+  const money = (quote.labour || []).reduce((sum, l) => sum + (l.amountMinor || 0), 0);
+  if (!money) quote.currencyCode = "";
+  else if (!quote.currencyCode) quote.currencyCode = crmCurrency();
+}
+
+/**
+ * Add one labour line to a quote.
+ *
+ * @param {string} quoteId
+ * @param {{name:string, quantity?:string|number, unit?:string, priceMajor?:string|number}} fields
+ * @returns {object|null} the stored quote, or null when there is no name or no room left
+ */
+function crmAddLabour(quoteId, fields) {
+  const f = fields || {};
+  const name = crmText(f.name, CRM_MAX_NAME);
+  if (!name) return null; // a labour line with no name is a number nobody can explain
+  const data = crmLoad();
+  const quote = data.quotes.find((q) => q.id === quoteId && !q.deletedAt);
+  if (!quote) return null;
+  if (!Array.isArray(quote.labour)) quote.labour = [];
+  if (quote.labour.length >= QUO_MAX_LINES) return null;
+  const qty = crmQty(f.quantity);
+  quote.labour.push({
+    id: crmId(),
+    name,
+    quantity: qty,
+    unit: crmText(f.unit, CRM_MAX_UNIT),
+    amountMinor: crmLineAmount(f.priceMajor, qty),
+  });
+  crmStampQuote(quote);
+  quote.updatedAt = Date.now();
+  crmSave(data);
+  return crmQuote(quoteId);
+}
+
+/**
+ * Correct one labour line. Anything not passed keeps its current value.
+ *
+ * The quantity is applied before the rate, which is what makes the arithmetic behave the
+ * way the form reads: change 40 to 45 at 80 and the line comes to 3600, because both
+ * numbers were on screen together when it was saved.
+ */
+function crmUpdateLabour(quoteId, lineId, fields) {
+  const f = fields || {};
+  const data = crmLoad();
+  const quote = data.quotes.find((q) => q.id === quoteId && !q.deletedAt);
+  if (!quote || !Array.isArray(quote.labour)) return null;
+  const line = quote.labour.find((l) => l.id === lineId);
+  if (!line) return null;
+  if (f.name !== undefined) {
+    const name = crmText(f.name, CRM_MAX_NAME);
+    if (!name) return null;
+    line.name = name;
+  }
+  if (f.quantity !== undefined) line.quantity = crmQty(f.quantity);
+  if (f.unit !== undefined) line.unit = crmText(f.unit, CRM_MAX_UNIT);
+  if (f.priceMajor !== undefined) line.amountMinor = crmLineAmount(f.priceMajor, line.quantity);
+  crmStampQuote(quote);
+  quote.updatedAt = Date.now();
+  crmSave(data);
+  return crmQuote(quoteId);
+}
+
+/** Take one labour line off a quote. */
+function crmDeleteLabour(quoteId, lineId) {
+  const data = crmLoad();
+  const quote = data.quotes.find((q) => q.id === quoteId && !q.deletedAt);
+  if (!quote || !Array.isArray(quote.labour)) return null;
+  const before = quote.labour.length;
+  quote.labour = quote.labour.filter((l) => l.id !== lineId);
+  if (quote.labour.length === before) return null;
+  crmStampQuote(quote);
+  quote.updatedAt = Date.now();
+  crmSave(data);
+  return crmQuote(quoteId);
+}
+
+/* ------------------------------------------------------------------ what it comes to */
+
+/**
+ * Chapter XXII's five figures for one quote, and the currency they are in.
+ *
+ * The material and the other costs are read straight out of wsProjectCosts(), which is the
+ * one function that knows a calculation and the material it produced are the same money —
+ * so a quote and the project screen can never disagree about what the work costs.
+ *
+ * The margin is a percentage of everything above it (material + other + labour), which is
+ * what a markup means, and it is rounded exactly once, at the end.
+ *
+ * `mixed` is chapter VI's rule as everywhere else: the quote's labour and the project's
+ * costs may have been priced in different currencies, they are never converted, and the
+ * page is told so rather than being handed a total that means nothing. The figures are
+ * still added — the same choice wsProjectCosts() makes — because hiding them would leave
+ * the visitor with no way to see which half is in which currency.
+ *
+ * @returns {{materials:number, other:number, labour:number, subtotal:number,
+ *            marginPct:number, margin:number, total:number, currencyCode:string,
+ *            projectCurrencyCode:string, hasProject:boolean, mixed:boolean, lines:number}}
+ */
+function crmQuoteTotals(quoteId) {
+  const quote = crmQuote(quoteId);
+  const own = crmCurrency();
+  if (!quote) {
+    return {
+      materials: 0, other: 0, labour: 0, subtotal: 0, marginPct: 0, margin: 0, total: 0,
+      currencyCode: own, projectCurrencyCode: "", hasProject: false, mixed: false, lines: 0,
+    };
+  }
+  const costs = quote.projectId && typeof wsProjectCosts === "function"
+    ? wsProjectCosts(quote.projectId) : null;
+  const materials = costs ? costs.materials : 0;
+  const other = costs ? costs.other : 0;
+  const lines = Array.isArray(quote.labour) ? quote.labour : [];
+  const labour = lines.reduce((sum, l) => sum + (l.amountMinor || 0), 0);
+  const subtotal = materials + other + labour;
+  const marginPct = Number(quote.marginPct) || 0;
+  const margin = Math.round(subtotal * marginPct / 100);
+  const projectCode = costs && (costs.total || costs.items || costs.others)
+    ? costs.currencyCode : "";
+  return {
+    materials,
+    other,
+    labour,
+    subtotal,
+    marginPct,
+    margin,
+    total: subtotal + margin,
+    // The quote's own stamp first: it is the currency somebody typed. The project's is
+    // the fallback for a quote that is nothing but material so far, and the visitor's
+    // own choice the fallback for one that holds no money at all.
+    currencyCode: quote.currencyCode || projectCode || own,
+    projectCurrencyCode: projectCode,
+    hasProject: Boolean(costs),
+    mixed: Boolean((costs && costs.mixed)
+      || (labour > 0 && projectCode && quote.currencyCode
+        && quote.currencyCode !== projectCode)),
+    lines: lines.length,
+  };
+}
+
+/**
+ * Chapter XXIV's path, read backwards from the quote: WYCENA → PROJEKT → ZLECENIE → KLIENT.
+ *
+ * Every step is derived. The quote stores the project; crmJobOfProject() knows which job
+ * that project is being done under and crmClientOfProject() which client it is filed with,
+ * so the chain is walked rather than copied — and a client renamed on their own page reads
+ * correctly here on the next redraw, with nothing to keep in step.
+ *
+ * @returns {{project:object|null, job:object|null, client:object|null}}
+ */
+function crmQuoteChain(quoteId) {
+  const quote = crmQuote(quoteId);
+  const pid = quote ? quote.projectId : "";
+  const project = pid && typeof wsProject === "function" ? wsProject(pid) : null;
+  const job = pid ? crmJobOfProject(pid) : null;
+  // The client is the project's own, and a job's client when the project has not been
+  // filed under anybody directly — crmAddJob() files it for them, so the two agree, and
+  // the fallback only matters for a link made before that write existed.
+  const client = pid
+    ? (crmClientOfProject(pid) || (job && job.clientId ? crmClient(job.clientId) : null))
+    : null;
+  return { project: project, job: job, client: client };
+}
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     CRM_KEY, CRM_SCHEMA, CRM_MAX_NAME, CRM_MAX_NOTE,
     JOB_STATUS, JOB_OPEN_STATUS, JOB_DEFAULT_STATUS,
+    QUO_MAX_LINES, QUO_MAX_MARGIN,
   };
 }

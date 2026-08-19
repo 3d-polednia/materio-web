@@ -28,7 +28,7 @@ import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlClients, urlClient,
-  urlJobs, urlJob,
+  urlJobs, urlJob, urlQuotes, urlQuote,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -292,6 +292,38 @@ export const ROUTES = [
       "GitHub Pages can serve.",
   },
 
+  {
+    id: "quotes",
+    level: LEVEL.PRO, status: STATUS.LIVE,
+    parent: "jobs", localized: true, indexable: true,
+    path: urlQuotes,
+    footer: { order: 9, key: "quopage_title" },
+    navLevel: LEVEL.PRO,
+    gate: "As clients and jobs — the same notice above a working module, and the same " +
+      "one switch (LM_PRO_LOCKED in assets/plan.js) closes all three at session 27.",
+    note: "Chapter XXII, and the third of the five Pro modules: materials, labour, " +
+      "other costs, margin, total — and no more, because the chapter says in one line " +
+      "not to build an accounting package. It is chapter XXIV's fourth step, and the " +
+      "one field it stores a link in is `projectId`: the materials and the other costs " +
+      "are wsProjectCosts() over that project, and the client and the job are already " +
+      "reachable from it, so storing them again would be two more links free to " +
+      "disagree with the first. The rows live in assets/crm.js beside the clients and " +
+      "the jobs, in the same browser-only store and for the same reason — `quotes` is " +
+      "not in the sync contract — so nothing here is pushed anywhere and the page says " +
+      "so.",
+  },
+  {
+    id: "quote",
+    level: LEVEL.PRO, status: STATUS.LIVE, view: true,
+    parent: "quotes", localized: true, indexable: false,
+    path: urlQuote,
+    gate: "As quotes — it is the same file.",
+    note: "One quote: the project it is priced from, the labour typed onto it, the " +
+      "margin and what the whole thing comes to. A `view` for the reason `job` is one — " +
+      "the id is made in this browser, so /wyceny/?id=<quoteId> is the only shape " +
+      "GitHub Pages can serve.",
+  },
+
   /* ---------------------------------------------------------------- account */
   {
     id: "account",
@@ -357,15 +389,6 @@ export const ROUTES = [
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
       "indexable — the paywall sits on the Pro modules, not on their description.",
-  },
-  {
-    id: "quotes",
-    level: LEVEL.PRO, status: STATUS.PLANNED, session: 24,
-    parent: "jobs", localized: true, indexable: true,
-    plannedSlug: { pl: "wyceny", uk: "koshtorysy-pro", de: "angebote", en: "quotes" },
-    gate: "As clients.",
-    note: "Materials, labour, other costs, margin, total. Chapter XXII: not an " +
-      "accounting package.",
   },
   {
     id: "calendar",

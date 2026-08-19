@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Wyceny — LiczMat</title>
+<meta name="description" content="Wyceny w LiczMat Pro: materiał i dodatkowe koszty pobrane z projektu, robocizna liczona jako ilość razy stawka, marża procentowa i suma. Dane zostają w tej przeglądarce.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/wyceny/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/wyceny/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/koshtorysy-pro/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/angebote/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/quotes/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819d" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:title" content="Wyceny — LiczMat">
+<meta property="og:description" content="Wyceny w LiczMat Pro: materiał i dodatkowe koszty pobrane z projektu, robocizna liczona jako ilość razy stawka, marża procentowa i suma. Dane zostają w tej przeglądarce.">
+<meta property="og:url" content="https://liczmat.com/wyceny/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Wyceny — LiczMat">
+<meta name="twitter:description" content="Wyceny w LiczMat Pro: materiał i dodatkowe koszty pobrane z projektu, robocizna liczona jako ilość razy stawka, marża procentowa i suma. Dane zostają w tej przeglądarce.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819d">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Start",
+      "item": "https://liczmat.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Zlecenia",
+      "item": "https://liczmat.com/zlecenia/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Wyceny",
+      "item": "https://liczmat.com/wyceny/"
+    }
+  ]
+}
+</script>
+<script>window.LM_QUOTES = {"projects":"/projekty/","jobs":"/zlecenia/","clients":"/klienci/"};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Przejdź do treści</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Nawigacja główna">
+      <ul class="nav-list">
+        <li><a href="/kalkulatory/">Kalkulatory</a></li>
+        <li><a href="/materialy/">Materiały</a></li>
+        <li data-nav-level="liczmat"><a href="/projekty/">Projekty</a></li>
+        <li><a href="/poradniki/">Poradniki</a></li>
+        <li><a href="/aplikacja/">Aplikacja</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Język">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span class="lang-btn-name">Polski</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></span></li>
+      <li><a class="lang-item" href="/uk/koshtorysy-pro/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/angebote/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/quotes/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Waluta" title="Waluta"><option value="PLN" selected>PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Moje konto</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Zmień motyw" title="Zmień motyw"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otwórz menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Start</a></li><li><a href="/zlecenia/">Zlecenia</a></li><li aria-current="page">Wyceny</li></ol></nav>
+      <h1 id="quo-title">Wyceny</h1>
+      <p class="lead" id="quo-lead">Wycena LiczMat Pro: materiał i dodatkowe koszty z projektu, robocizna wpisana ręcznie, marża i suma.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="quo-page">
+    <div class="wrap narrow">
+      <p class="crm-pro" id="quo-pro">
+        <span class="chip" id="quo-pro-chip">Dostępne w LiczMat Pro</span>
+        <span class="muted" id="quo-pro-note">Wyceny to moduł LiczMat Pro. Planu Pro nic jeszcze nie nadaje, więc moduł jest na razie otwarty — blokada dochodzi razem z paywallem.</span>
+      </p>
+
+      <div class="app-card crm-gate" id="quo-gate" hidden>
+        <h2>Wyceny</h2>
+        <p class="muted">Materiał, robocizna, dodatkowe koszty, marża i suma — z tego, co już policzyłeś.</p>
+        <p><span class="chip">Dostępne w LiczMat Pro</span></p>
+        <p><span class="muted">Poznaj LiczMat Pro — W przygotowaniu</span></p>
+      </div>
+
+      <div id="quo-tool">
+        <article id="quo-detail" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/wyceny/" data-quo-back>← Wszystkie wyceny</a></p>
+
+        <div id="quo-missing" hidden>
+          <h2>Nie ma takiej wyceny</h2>
+          <p class="muted">Ta wycena została usunięta albo adres pochodzi z innej przeglądarki.</p>
+        </div>
+
+        <div id="quo-body" hidden>
+          <!-- Chapter XXIV read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT. Every
+               step is derived from the one link the quote stores, so nothing here can
+               disagree with the job's own page. -->
+          <p class="crm-contact" id="quo-chain-line"></p>
+
+          <!-- Chapter XXII's five figures. Three of them are the project's own money,
+               read through wsProjectCosts() and never copied onto the quote. -->
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Materiał</span> <b id="quo-fig-materials"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Dodatkowe koszty</span> <b id="quo-fig-other"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Robocizna</span> <b id="quo-fig-labour"></b></p>
+          </div>
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Razem bez marży</span> <b id="quo-fig-sub"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Marża</span> <b id="quo-fig-margin"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Suma</span> <b id="quo-fig-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="quo-mixed" hidden>Pozycje są w różnych walutach. Suma je dodaje, ale nic nie przelicza po kursie — sprawdź waluty w kolumnie kosztu.</p>
+
+          <!-- The margin is one field on the page rather than a form to open: it is the
+               number a tradesman moves while looking at the total. -->
+          <p class="ws-mat-grid ws-mat-grid-one">
+            <label class="ws-mat-f ws-mat-f-sm">
+              <span class="ws-bar-label">Marża (%)</span>
+              <input id="quo-margin" type="text" inputmode="decimal">
+            </label>
+          </p>
+          <p class="muted field-note">Procent liczony od materiału, dodatkowych kosztów i robocizny razem.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="quo-edit">Edytuj wycenę</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="quo-delete">Usuń</button>
+          </div>
+
+          <form id="quo-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Nazwa</span>
+                <input id="quo-edit-name" type="text" maxlength="120" required>
+              </label>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="quo-edit-note">Notatki</label>
+              <textarea id="quo-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">Zapisz</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-quo-edit-cancel>Anuluj</button>
+            </p>
+          </form>
+
+          <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="quo-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="quo-delete-yes">Usuń wycenę</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="quo-delete-no">Anuluj</button>
+            </p>
+          </div>
+
+          <!-- Chapter XXII's "robocizna": the only part of a quote nothing else counts. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Robocizna</h2>
+            </div>
+            <p class="muted">Jedyna część wyceny, której nic za ciebie nie policzy. Ilość razy stawka; zostaw ilość pustą, jeżeli to ryczałt.</p>
+            <ul id="quo-labour-list" class="data-list"></ul>
+            <form id="quo-labour-form">
+              <p class="ws-mat-grid">
+                <label class="ws-mat-f">
+                  <span class="ws-bar-label">Praca</span>
+                  <input id="quo-labour-name" type="text" maxlength="120" required>
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">Ilość</span>
+                  <input id="quo-labour-qty" type="text" inputmode="decimal">
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">Jednostka</span>
+                  <input id="quo-labour-unit" type="text" maxlength="24">
+                </label>
+                <label class="ws-mat-f ws-mat-f-sm">
+                  <span class="ws-bar-label">Stawka</span>
+                  <input id="quo-labour-price" type="text" inputmode="decimal">
+                </label>
+              </p>
+              <p>
+                <button type="submit" class="btn btn-primary btn-sm">Dodaj robociznę</button>
+                <span class="muted" id="quo-labour-run"></span>
+              </p>
+            </form>
+            <p class="muted" id="quo-labour-full" hidden>Wycena ma już komplet pozycji robocizny.</p>
+          </section>
+
+          <!-- The one link the quote stores. The project is the free workspace's own row;
+               nothing here renames, archives or deletes it. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Projekt</h2>
+              <a class="dash-more" href="/projekty/">Projekty i pomieszczenia</a>
+            </div>
+            <ul id="quo-project-list" class="data-list"></ul>
+            <form id="quo-project-form" class="inline-form">
+              <select id="quo-project-pick" aria-label="Przypisz projekt"></select>
+              <button type="submit" class="btn btn-primary btn-sm">Przypisz projekt</button>
+            </form>
+            <p class="muted field-note">Materiał i dodatkowe koszty liczą się z tego projektu. Wycena ich nie kopiuje, więc zmiana ceny w projekcie widać tutaj od razu.</p>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Notatki</h2>
+            </div>
+            <p id="quo-note" class="crm-note"></p>
+          </section>
+        </div>
+      </article>
+        <div id="quo-index">
+        <p class="ws-undo" id="quo-undo" role="status" hidden>
+          <span id="quo-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="quo-undo-go">Cofnij</button>
+        </p>
+
+        <h2>Wyceny</h2>
+        <p class="muted">Wycena bierze materiał i dodatkowe koszty z projektu. Robociznę i marżę dopisujesz w środku.</p>
+        <form id="quo-form" class="inline-form">
+          <input id="quo-name" type="text" maxlength="120" placeholder="Nazwa wyceny" required>
+          <select id="quo-project" aria-label="Projekt"></select>
+          <button type="submit" class="btn btn-primary btn-sm">Dodaj</button>
+        </form>
+        <ul id="quo-list" class="data-list"></ul>
+      </div>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/zlecenia/">Zlecenia</a>
+        <a class="btn btn-ghost" href="/projekty/">Projekty i pomieszczenia</a>
+      </p>
+      <p class="muted src-note">Wyceny trzymamy w pamięci tej przeglądarki (localStorage). Nie wysyłamy ich nigdzie i nie ma ich w aplikacji na Androida — synchronizacja obejmuje projekty, pomieszczenia, kalkulacje i listy materiałów. Wyczyszczenie danych witryny usuwa wyceny.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Ten sam wzór w aplikacji</b> LiczMat na Androida liczy tym samym silnikiem, offline — z katalogiem materiałów i zapisem wyniku do projektu.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Pobierz</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulator materiałów budowlanych. Policz. Zaplanuj. Zrealizuj.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/kalkulatory/">Wszystkie kalkulatory</a></li>
+          <li><a href="/materialy/">Materiały</a></li>
+          <li data-nav-level="liczmat"><a href="/projekty/">Projekty</a></li>
+          <li><a href="/kosztorys/">Kosztorys</a></li>
+          <li><a href="/poradniki/">Poradniki</a></li>
+          <li><a href="/sklepy/">Sklepy</a></li>
+          <li data-nav-level="pro"><a href="/klienci/">Klienci</a></li>
+          <li data-nav-level="pro"><a href="/zlecenia/">Zlecenia</a></li>
+          <li data-nav-level="pro"><a href="/wyceny/">Wyceny</a></li>
+          <li><a href="/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Konto</h4>
+        <ul>
+          <li><a href="/aplikacja/">Aplikacja</a></li>
+          <li><a href="/app/" rel="nofollow">Moje konto</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Pulpit</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Informacje prawne</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Polityka prywatności</a></li>
+          <li><a href="/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Język">
+      <h4>Język</h4>
+      <ul>
+        <li><a href="/wyceny/" hreflang="pl" lang="pl" data-lang="pl" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/koshtorysy-pro/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/angebote/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/quotes/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Wszelkie prawa zastrzeżone.</span>
+      <span>Wyniki są szacunkowe. Zawsze zweryfikuj przed zakupem.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Zgoda" hidden>
+  <p class="consent-text">Używamy Google Analytics, żeby liczyć anonimowy ruch na stronie i to, ile osób przechodzi do Google Play. Zgadzasz się?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Więcej w polityce prywatności</a>
+    <a class="consent-more" href="/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odrzuć</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Zgoda</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/wyceny/",
+  "uk": "/uk/koshtorysy-pro/",
+  "de": "/de/angebote/",
+  "en": "/en/quotes/"
+};</script>
+<script src="/assets/i18n.pl.js?v=20260819d"></script>
+<script src="/assets/i18n-runtime.js?v=20260819d"></script>
+<script src="/assets/currency.js?v=20260819d"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819d"></script>
+
+<script src="/assets/workspace.js?v=20260819d"></script>
+<script src="/assets/plan.js?v=20260819d"></script>
+<script src="/assets/crm.js?v=20260819d"></script>
+<script src="/assets/quotes-ui.js?v=20260819d"></script>
+<script src="/assets/main.js?v=20260819d"></script>
+
+</body>
+</html>
