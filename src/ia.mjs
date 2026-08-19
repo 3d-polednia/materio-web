@@ -28,7 +28,7 @@ import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlClients, urlClient,
-  urlJobs, urlJob, urlQuotes, urlQuote,
+  urlJobs, urlJob, urlQuotes, urlQuote, urlCalendar,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -324,6 +324,24 @@ export const ROUTES = [
       "GitHub Pages can serve.",
   },
 
+  {
+    id: "calendar",
+    level: LEVEL.PRO, status: STATUS.LIVE,
+    parent: "jobs", localized: true, indexable: true,
+    path: urlCalendar,
+    footer: { order: 10, key: "calpage_title" },
+    navLevel: LEVEL.PRO,
+    gate: "As clients, jobs and quotes — the same notice above a working module, and the " +
+      "same one switch (LM_PRO_LOCKED in assets/plan.js) closes all four at session 27.",
+    note: "Chapter XXIII, and the fourth of the five Pro modules: the deadlines of the " +
+      "jobs, grouped by how close they are, and the basics beside each one. It is the " +
+      "one Pro module that **stores nothing**: a deadline is a field of a job " +
+      "(chapter XXI's `termin`), so the page reads `jobs` through crmSchedule() and its " +
+      "single write is crmUpdateJob(). A `calendar` collection of its own would give one " +
+      "date two homes and let them disagree. It is also why the route has no `?id=` " +
+      "view: a row opens the job it belongs to, on /zlecenia/.",
+  },
+
   /* ---------------------------------------------------------------- account */
   {
     id: "account",
@@ -389,14 +407,6 @@ export const ROUTES = [
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
       "indexable — the paywall sits on the Pro modules, not on their description.",
-  },
-  {
-    id: "calendar",
-    level: LEVEL.PRO, status: STATUS.PLANNED, session: 25,
-    parent: "jobs", localized: true, indexable: true,
-    plannedSlug: { pl: "terminarz", uk: "kalendar", de: "termine", en: "schedule" },
-    gate: "As clients.",
-    note: "Chapter XXIII: job dates, nothing resembling Google Calendar.",
   },
 ];
 

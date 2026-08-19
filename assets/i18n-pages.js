@@ -589,6 +589,32 @@ const I18N_PAGES = {
     quo_note: "Notatki",
     quo_note_empty: "Nie ma jeszcze notatek. Dodasz je w „Edytuj wycenę”.",
 
+    /* Sesja 25 — terminarz (rozdział XXIII). Moduł nic nie zapisuje: termin jest polem
+       zlecenia z rozdziału XXI, a ta strona go tylko czyta i poprawia. */
+    calpage_title: "Terminarz",
+    calpage_lead: "Terminy zleceń LiczMat Pro: co jest po terminie, co wypada dziś, co w ciągu tygodnia i co nie ma jeszcze daty.",
+    calpage_meta: "Terminarz zleceń w LiczMat Pro: terminy pogrupowane od zaległych po dalsze, przy każdym zleceniu klient, status i wartość. Termin ustawiasz na miejscu. Dane zostają w tej przeglądarce.",
+    cal_pro_note: "Terminarz to moduł LiczMat Pro. Planu Pro nic jeszcze nie nadaje, więc moduł jest na razie otwarty — blokada dochodzi razem z paywallem.",
+    cal_local_note: "Zlecenia i ich terminy trzymamy w pamięci tej przeglądarki (localStorage). Nie wysyłamy ich nigdzie i nie ma ich w aplikacji na Androida — synchronizacja obejmuje projekty, pomieszczenia, kalkulacje i listy materiałów. Wyczyszczenie danych witryny usuwa zlecenia razem z terminami.",
+    cal_source_note: "Terminarz nie zapisuje niczego osobno. Termin jest polem zlecenia, więc data zmieniona tutaj to ta sama data, którą widać w „Zleceniach”.",
+    cal_today_is: "Dziś",
+    cal_empty: "Nie ma jeszcze żadnego zlecenia. Terminarz pokazuje terminy zleceń, więc zacznij od dodania zlecenia.",
+    cal_late_t: "Po terminie",
+    cal_late_d: "Termin minął, a zlecenie jest nadal otwarte.",
+    cal_today_t: "Dziś",
+    cal_today_d: "Termin wypada dzisiaj.",
+    cal_soon_t: "W ciągu 7 dni",
+    cal_soon_d: "Termin w najbliższym tygodniu.",
+    cal_later_t: "Później",
+    cal_later_d: "Termin dalej niż za tydzień.",
+    cal_none_t: "Bez terminu",
+    cal_none_d: "Otwarte zlecenia, którym nikt nie ustawił daty. Możesz ją ustawić tutaj.",
+    cal_closed_t: "Zakończone i anulowane",
+    cal_closed_d: "Zamknięte zlecenia, które miały termin. Nigdy nie liczą się jako zaległe.",
+    cal_due: "Termin",
+    cal_due_set: "Ustaw termin",
+    cal_jobs_all: "Wszystkie zlecenia",
+
     ck_p_crm: "Klienci, zlecenia i wyceny LiczMat Pro: nazwy, dane kontaktowe, notatki, statusy, terminy, przypisane projekty, pozycje robocizny i marża.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
@@ -1262,6 +1288,32 @@ const I18N_PAGES = {
     quo_note: "Notes",
     quo_note_empty: "No notes yet. You add them under “Edit quote”.",
 
+    /* Session 25 — the schedule (chapter XXIII). The module stores nothing: a deadline is
+       a field of the job from chapter XXI, and this page only reads and corrects it. */
+    calpage_title: "Schedule",
+    calpage_lead: "The deadlines of LiczMat Pro jobs: what is overdue, what falls today, what is due this week and what has no date yet.",
+    calpage_meta: "The job schedule in LiczMat Pro: deadlines grouped from overdue to later, with the client, the status and the value beside each job. You set a date on the spot. Everything stays in this browser.",
+    cal_pro_note: "The schedule is a LiczMat Pro module. Nothing grants the Pro plan yet, so the module is open for now — the lock arrives with the paywall.",
+    cal_local_note: "The jobs and their deadlines are kept in this browser's storage (localStorage). They are not sent anywhere and they are not in the Android app — the sync covers projects, rooms, calculations and material lists. Clearing site data deletes the jobs along with their deadlines.",
+    cal_source_note: "The schedule stores nothing of its own. A deadline is a field of the job, so a date changed here is the same date you see under “Jobs”.",
+    cal_today_is: "Today",
+    cal_empty: "No jobs yet. The schedule shows the deadlines of jobs, so start by adding one.",
+    cal_late_t: "Overdue",
+    cal_late_d: "The date has passed and the job is still open.",
+    cal_today_t: "Today",
+    cal_today_d: "Due today.",
+    cal_soon_t: "Within 7 days",
+    cal_soon_d: "Due in the coming week.",
+    cal_later_t: "Later",
+    cal_later_d: "Due more than a week from now.",
+    cal_none_t: "No date",
+    cal_none_d: "Open jobs nobody has given a date. You can set one here.",
+    cal_closed_t: "Finished and cancelled",
+    cal_closed_d: "Closed jobs that had a deadline. They never count as overdue.",
+    cal_due: "Deadline",
+    cal_due_set: "Set the deadline",
+    cal_jobs_all: "All jobs",
+
     ck_p_crm: "LiczMat Pro clients, jobs and quotes: names, contact details, notes, statuses, dates, the projects filed under them, labour lines and the margin.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
@@ -1934,6 +1986,32 @@ const I18N_PAGES = {
     quo_note: "Notizen",
     quo_note_empty: "Noch keine Notizen. Du trägst sie unter „Angebot bearbeiten“ ein.",
 
+    /* Session 25 — Termine (Kapitel XXIII). Das Modul speichert nichts: ein Termin ist ein
+       Feld des Auftrags aus Kapitel XXI, diese Seite liest und korrigiert ihn nur. */
+    calpage_title: "Termine",
+    calpage_lead: "Die Termine der Aufträge in LiczMat Pro: was überfällig ist, was heute ansteht, was in dieser Woche kommt und was noch kein Datum hat.",
+    calpage_meta: "Die Auftragstermine in LiczMat Pro: von überfällig bis später gruppiert, neben jedem Auftrag Kunde, Status und Wert. Das Datum setzt du direkt hier. Alles bleibt in diesem Browser.",
+    cal_pro_note: "Die Termine sind ein Modul von LiczMat Pro. Den Pro-Plan vergibt noch nichts, deshalb ist das Modul vorerst offen — die Sperre kommt mit der Paywall.",
+    cal_local_note: "Die Aufträge und ihre Termine liegen im Speicher dieses Browsers (localStorage). Sie werden nirgendwohin gesendet und es gibt sie in der Android-App nicht — die Synchronisierung umfasst Projekte, Räume, Berechnungen und Materiallisten. Das Löschen der Websitedaten löscht die Aufträge samt ihren Terminen.",
+    cal_source_note: "Die Terminübersicht speichert nichts Eigenes. Ein Termin ist ein Feld des Auftrags, ein hier geändertes Datum ist also dasselbe, das unter „Aufträge“ steht.",
+    cal_today_is: "Heute",
+    cal_empty: "Noch keine Aufträge. Die Termine kommen aus den Aufträgen, lege also zuerst einen an.",
+    cal_late_t: "Überfällig",
+    cal_late_d: "Der Termin ist vorbei und der Auftrag ist noch offen.",
+    cal_today_t: "Heute",
+    cal_today_d: "Termin ist heute.",
+    cal_soon_t: "In 7 Tagen",
+    cal_soon_d: "Termin in der kommenden Woche.",
+    cal_later_t: "Später",
+    cal_later_d: "Termin später als in einer Woche.",
+    cal_none_t: "Ohne Termin",
+    cal_none_d: "Offene Aufträge, denen niemand ein Datum gegeben hat. Du kannst es hier setzen.",
+    cal_closed_t: "Abgeschlossen und storniert",
+    cal_closed_d: "Geschlossene Aufträge, die einen Termin hatten. Sie gelten nie als überfällig.",
+    cal_due: "Termin",
+    cal_due_set: "Termin setzen",
+    cal_jobs_all: "Alle Aufträge",
+
     ck_p_crm: "Kunden, Aufträge und Angebote von LiczMat Pro: Namen, Kontaktdaten, Notizen, Status, Termine, zugeordnete Projekte, Positionen für Arbeitszeit und die Marge.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
@@ -2605,6 +2683,32 @@ const I18N_PAGES = {
     quo_note_t: "Нотатки",
     quo_note: "Нотатки",
     quo_note_empty: "Нотаток ще немає. Додаси їх у «Редагувати кошторис».",
+
+    /* Сесія 25 — календар (розділ XXIII). Модуль нічого не зберігає: термін — це поле
+       замовлення з розділу XXI, а ця сторінка лише читає та виправляє його. */
+    calpage_title: "Календар",
+    calpage_lead: "Терміни замовлень у LiczMat Pro: що прострочено, що припадає на сьогодні, що протягом тижня і що ще без дати.",
+    calpage_meta: "Календар замовлень у LiczMat Pro: терміни згруповані від прострочених до дальших, поруч із кожним замовленням клієнт, статус і вартість. Дату ставите тут же. Дані залишаються в цьому браузері.",
+    cal_pro_note: "Календар — це модуль LiczMat Pro. План Pro поки що ніщо не надає, тому модуль наразі відкритий — блокування прийде разом із paywall.",
+    cal_local_note: "Замовлення та їхні терміни зберігаються в пам'яті цього браузера (localStorage). Ми їх нікуди не надсилаємо, і їх немає в застосунку на Android — синхронізація охоплює проєкти, приміщення, розрахунки та списки матеріалів. Очищення даних сайту видаляє замовлення разом із термінами.",
+    cal_source_note: "Календар нічого не зберігає окремо. Термін — це поле замовлення, тож дата, змінена тут, це та сама дата, що й у «Замовленнях».",
+    cal_today_is: "Сьогодні",
+    cal_empty: "Ще немає жодного замовлення. Календар показує терміни замовлень, тож почніть із додавання замовлення.",
+    cal_late_t: "Прострочені",
+    cal_late_d: "Термін минув, а замовлення досі відкрите.",
+    cal_today_t: "Сьогодні",
+    cal_today_d: "Термін — сьогодні.",
+    cal_soon_t: "Протягом 7 днів",
+    cal_soon_d: "Термін найближчого тижня.",
+    cal_later_t: "Пізніше",
+    cal_later_d: "Термін пізніше ніж за тиждень.",
+    cal_none_t: "Без терміну",
+    cal_none_d: "Відкриті замовлення, яким ніхто не поставив дату. Її можна поставити тут.",
+    cal_closed_t: "Завершені та скасовані",
+    cal_closed_d: "Закриті замовлення, які мали термін. Вони ніколи не рахуються простроченими.",
+    cal_due: "Термін",
+    cal_due_set: "Поставити термін",
+    cal_jobs_all: "Усі замовлення",
 
     ck_p_crm: "Клієнти, замовлення та кошториси LiczMat Pro: назви, контактні дані, нотатки, статуси, терміни, прив'язані проєкти, позиції роботи та маржа.",
 

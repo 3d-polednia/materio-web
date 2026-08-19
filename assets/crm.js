@@ -1,4 +1,4 @@
-/* LiczMat website — the Pro workspace: clients, jobs and quotes.
+/* LiczMat website — the Pro workspace: clients, jobs, quotes and the terminarz.
  *
  * Master plan, session 22 (KLIENCI): "CRM klientów", and chapter XX under it — a client
  * list where a client carries contact details, notes, a history, jobs, projects and
@@ -6,6 +6,9 @@
  * description, a status, a date, a value and a project (chapter XXI), which is chapter
  * XXIV's middle step — KLIENT → ZLECENIE → PROJEKT → WYCENA. Session 24 (WYCENY) added
  * the last of those, chapter XXII: material, labour, other costs, margin and a total.
+ * Session 25 (TERMINARZ) added a *reading* rather than a fourth collection: chapter
+ * XXIII's terminarz is the jobs sorted by their deadline, and it stores nothing — see the
+ * block at the bottom of this file for why a date may only have one home.
  *
  * All three collections live in this one file because they live in one store, and because
  * each is the thing that joins the next: splitting them would mean three files reading and
@@ -63,6 +66,20 @@ const CRM_MAX_UNIT = 24;
 const JOB_STATUS = ["new", "active", "done", "cancelled"];
 const JOB_OPEN_STATUS = ["new", "active"];
 const JOB_DEFAULT_STATUS = "new";
+
+/**
+ * The terminarz's buckets, in the order the page draws them — session 25, chapter XXIII.
+ *
+ * They are the answer to "kiedy", which is the only question a terminarz is opened with:
+ * what is already late, what is due today, what is due within the week, what is further
+ * out, and what still has no date at all. "none" is last and is not a filler bucket — a
+ * job nobody has dated is the row a tradesman most often has to fix, and a terminarz that
+ * hid it would be a list of the deadlines that already exist rather than of the work.
+ */
+const CAL_BUCKETS = ["late", "today", "soon", "later", "none"];
+
+/** How far ahead "soon" reaches, in days. A week is what a tradesman plans in. */
+const CAL_SOON_DAYS = 7;
 
 /* ------------------------------------------------------------------ storage */
 
@@ -1021,10 +1038,119 @@ function crmQuoteChain(quoteId) {
   return { project: project, job: job, client: client };
 }
 
+/* ------------------------------------------------------------------ the terminarz
+ *
+ * Master plan, session 25 (TERMINARZ), chapter XXIII: "Prosty terminarz zleceń. Powinien
+ * pozwolić zobaczyć: terminy, zlecenia, podstawowe informacje. Nie buduj pełnego
+ * odpowiednika Google Calendar."
+ *
+ * **Nothing below stores anything.** A deadline is already a field of a job — chapter
+ * XXI's `termin`, written by crmUpdateJob() and validated by crmDay() — so the terminarz
+ * is a *reading* of the jobs, not a collection beside them. An `events` array of its own
+ * would give one date two homes and let them disagree the first time somebody changed a
+ * deadline on the job's own page, which is the argument that already keeps a cost off a
+ * job and a unit price off a shopping item. It is also why the module has no `?id=` view:
+ * a row here opens the job it belongs to, on /zlecenia/.
+ *
+ * The comparisons are all between calendar days, never between instants. That is what
+ * crmDay() is for, and it is why a deadline was stored as "YYYY-MM-DD" in session 23:
+ * "the 14th" has to be the 14th for a browser in Rzeszów and for one in Lisbon.
+ */
+
+/**
+ * Today, in the visitor's own timezone, as "YYYY-MM-DD".
+ *
+ * Deliberately not `new Date().toISOString().slice(0, 10)`, which is today in UTC: at
+ * 23:30 in Warsaw that string already says tomorrow, so a job due today would be filed
+ * under "late" — the terminarz would be wrong every evening. The parts come from the
+ * local getters instead, which is the same reckoning the visitor's own calendar uses.
+ */
+function crmToday() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/**
+ * Whole days from `from` to `day`, both calendar days — negative for a day in the past,
+ * 0 for the same day, null when either is not a real date.
+ *
+ * Both are read at UTC midnight, which has no daylight saving in it: the difference
+ * between two calendar days is a count of days, and parsing them locally would make it
+ * 23 or 25 hours twice a year and round the wrong way.
+ */
+function crmDaysUntil(day, from) {
+  const a = crmDay(day);
+  const b = crmDay(from === undefined ? crmToday() : from);
+  if (!a || !b) return null;
+  return Math.round((Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86400000);
+}
+
+/**
+ * Which of the terminarz's buckets a job belongs in, measured against `today`.
+ *
+ * A closed job — chapter XXI's "zakończone" and "anulowane" — is never in one: it is done
+ * with, and a finished job whose date has passed is not late. crmSchedule() folds those
+ * away separately rather than dropping them, so nothing disappears from the page.
+ */
+function crmJobBucket(job, today) {
+  if (!job || JOB_OPEN_STATUS.indexOf(job.status) === -1) return "";
+  const days = crmDaysUntil(job.dueDate, today);
+  if (days === null) return "none";
+  if (days < 0) return "late";
+  if (days === 0) return "today";
+  return days <= CAL_SOON_DAYS ? "soon" : "later";
+}
+
+/**
+ * The whole terminarz: every job this browser holds, in the bucket its deadline puts it.
+ *
+ * Within a bucket the nearest deadline comes first, because that is the order the work
+ * has to be done in; the undated bucket keeps the store's own order (newest change
+ * first), because there is nothing else to sort it by. The closed half carries only the
+ * jobs that *had* a date — a finished job nobody ever dated has no place on a page about
+ * dates, and it is still one click away on /zlecenia/.
+ *
+ * @param {string} [today] the day to measure against. Passed in by the tests; the page
+ *   leaves it out and gets crmToday().
+ * @returns {{day:string, buckets:object, closed:object[], counts:object, total:number}}
+ */
+function crmSchedule(today) {
+  const day = crmDay(today) || crmToday();
+  const buckets = {};
+  CAL_BUCKETS.forEach((b) => { buckets[b] = []; });
+  const closed = [];
+
+  crmAllJobs().forEach((job) => {
+    const bucket = crmJobBucket(job, day);
+    if (bucket) buckets[bucket].push(job);
+    else if (job.dueDate) closed.push(job);
+  });
+
+  const byDue = (a, b) => (a.dueDate < b.dueDate ? -1 : a.dueDate > b.dueDate ? 1
+    : b.updatedAt - a.updatedAt);
+  ["late", "today", "soon", "later"].forEach((b) => { buckets[b].sort(byDue); });
+  // The closed half reads backwards: the most recent deadline first, because it is a
+  // record of what has been finished rather than a queue of what is coming.
+  closed.sort((a, b) => (a.dueDate < b.dueDate ? 1 : a.dueDate > b.dueDate ? -1
+    : b.updatedAt - a.updatedAt));
+
+  const counts = { closed: closed.length };
+  CAL_BUCKETS.forEach((b) => { counts[b] = buckets[b].length; });
+  return {
+    day: day,
+    buckets: buckets,
+    closed: closed,
+    counts: counts,
+    total: CAL_BUCKETS.reduce((n, b) => n + buckets[b].length, 0) + closed.length,
+  };
+}
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     CRM_KEY, CRM_SCHEMA, CRM_MAX_NAME, CRM_MAX_NOTE,
     JOB_STATUS, JOB_OPEN_STATUS, JOB_DEFAULT_STATUS,
+    CAL_BUCKETS, CAL_SOON_DAYS,
     QUO_MAX_LINES, QUO_MAX_MARGIN,
   };
 }

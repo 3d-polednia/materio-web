@@ -249,14 +249,19 @@ head("7. the Pro modules, in the order the plan builds them");
   for (const m of mods) {
     check(`"${m.id}" has a name and a line under it`, !!m.key);
   }
-  // Sessions 22, 23 and 24 built the first three, so the statuses are no longer all the
-  // same — and the card has to follow the route rather than a hard-coded sentence. A
-  // module whose page exists is offered; one whose session has not happened yet says so
-  // and links nowhere, which is chapter XXV's "never a dead button" in both directions.
-  const BUILT = ["clients", "jobs", "quotes"];
+  // Sessions 22–25 built the first four, so the statuses are no longer all the same —
+  // and the card has to follow the route rather than a hard-coded sentence. A module
+  // whose page exists is offered; one whose session has not happened yet says so and
+  // links nowhere, which is chapter XXV's "never a dead button" in both directions.
+  const BUILT = ["clients", "jobs", "quotes", "calendar"];
   eq("clients is built — session 22", route("clients").status, STATUS.LIVE);
   eq("and jobs — session 23", route("jobs").status, STATUS.LIVE);
   eq("and quotes — session 24", route("quotes").status, STATUS.LIVE);
+  eq("and the terminarz — session 25", route("calendar").status, STATUS.LIVE);
+  // The fifth is chapter XXIV's CRM, and it has no route of its own on purpose: it is a
+  // path through the other four, which is why nothing here can be "still planned" but it.
+  eq("the one that is still planned is the CRM", mods.filter(
+    (m) => m.route && route(m.route).status === STATUS.PLANNED).length, 0);
   for (const m of mods) {
     if (!m.route || BUILT.indexOf(m.id) !== -1) continue;
     eq(`"${m.id}" is still planned`, route(m.route).status, STATUS.PLANNED);

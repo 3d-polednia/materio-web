@@ -75,7 +75,7 @@ nie wymaga konta**.
 
 ## 2. Inwentarz stron — stan na dziś
 
-139 wygenerowanych stron: 34 strony logiczne × 4 języki, plus trzy bezjęzykowe.
+147 wygenerowanych stron: 36 stron logicznych × 4 języki, plus trzy bezjęzykowe.
 Adresy w kolumnie „URL (PL)”; pozostałe języki mają prefiks (`/en/…`, `/de/…`, `/uk/…`)
 i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 
@@ -98,6 +98,7 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 | `job` | `/zlecenia/?id=…` | **PRO** | `jobs` | **nie** | 0 — widok |
 | `quotes` | `/wyceny/` | **PRO** | `jobs` | tak | 4 |
 | `quote` | `/wyceny/?id=…` | **PRO** | `quotes` | **nie** | 0 — widok |
+| `calendar` | `/terminarz/` | **PRO** | `jobs` | tak | 4 |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 4 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
 | `dashboard` | `/app/dashboard/` | GUEST | `account` | **nie** | 1 |
@@ -108,9 +109,13 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 (patrz §3).
 
 `clients` (Sesja 22) jest pierwszą trasą `PRO`, która naprawdę istnieje, `jobs` (Sesja 23)
-drugą, `quotes` (Sesja 24) trzecią. To jedyne strony w inwentarzu, których link jest ukryty
-przed kimś poniżej Pro (`navLevel`, §5). Żadna z nich nie jest bramkowana — patrz §7.7,
-§7.8 i §7.9.
+drugą, `quotes` (Sesja 24) trzecią, `calendar` (Sesja 25) czwartą. To jedyne strony
+w inwentarzu, których link jest ukryty przed kimś poniżej Pro (`navLevel`, §5). Żadna
+z nich nie jest bramkowana — patrz §7.7, §7.8, §7.9 i §7.10.
+
+`calendar` jest jedyną trasą `PRO` **bez** widoku obok siebie, i to nie z przeoczenia:
+terminarz nie zapisuje własnych wierszy, więc nie ma czego otwierać — wiersz prowadzi do
+zlecenia, na `/zlecenia/?id=…` (§7.10).
 
 **`project` jest pierwszym „widokiem” (`view: true`) — ekranem bez własnego pliku.**
 Liczba wygenerowanych stron się przez niego nie zmienia i to jest cała jego definicja:
@@ -193,15 +198,15 @@ adresu, który już działa, i żeby żadna nie trafiła do menu przed czasem.
 | Trasa | URL (PL) | Poziom | Sesja | Po co |
 |---|---|---|---|---|
 | `liczmat-pro` | `/liczmat-pro/` | GUEST | 29 | publiczna strona Pro: co to, dla kogo, ile kosztuje |
-| `calendar` | `/terminarz/` | PRO | 25 | terminy zleceń |
 
 Slugi w pozostałych trzech językach są już ustalone w `src/ia.mjs` (`plannedSlug`) — po to,
 żeby sesja, która buduje stronę, nie wymyślała ich w pośpiechu. Przenoszą się do `SECTION`
 w `src/site.mjs` w chwili, gdy to się dzieje: Sesja 22 przeniosła w ten sposób `clients`
 (`klienci` / `kliyenty` / `kunden` / `clients`), Sesja 23 `jobs` (`zlecenia` /
-`zamovlennya` / `auftraege` / `jobs`), a Sesja 24 `quotes` (`wyceny` / `koshtorysy-pro` /
-`angebote` / `quotes`) — wszystkie trzy bez zmiany choćby jednej litery, bo slug jest
-trwały od momentu, w którym został zaplanowany.
+`zamovlennya` / `auftraege` / `jobs`), Sesja 24 `quotes` (`wyceny` / `koshtorysy-pro` /
+`angebote` / `quotes`), a Sesja 25 `calendar` (`terminarz` / `kalendar` / `termine` /
+`schedule`) — wszystkie cztery bez zmiany choćby jednej litery, bo slug jest trwały od
+momentu, w którym został zaplanowany.
 
 **`/liczmat-pro/` jest publiczna i indeksowana, moduły Pro też.** To nie jest sprzeczność:
 paywall stoi na *narzędziu*, nie na *opisie narzędzia*. Rozdział XXV wymaga, żeby darmowy
@@ -1015,6 +1020,71 @@ rozdział XVII ma już swoje „inne koszty" na projekcie i `wsProjectCosts()` l
 w LiczMat Pro", ta sama uwaga o tym, że planu Pro nic jeszcze nie nadaje, ta sama bramka
 w HTML-u od pierwszego renderu i **ten sam jedyny przełącznik Sesji 27: `LM_PRO_LOCKED`** —
 teraz dla trzech modułów, i wciąż jedna zmienna.
+
+### 7.10. Terminarz — moduł, który nic nie zapisuje (Sesja 25)
+
+Rozdział XXXII, Sesja 25: „TERMINARZ — Terminy zleceń". Rozdział XXIII mówi to samo
+dłużej i, jak przy wycenach, jednym zdaniem ustala zakres: „Prosty terminarz zleceń.
+Powinien pozwolić zobaczyć: terminy, zlecenia, podstawowe informacje. **Nie buduj pełnego
+odpowiednika Google Calendar.**"
+
+**Strona.** `/terminarz/` w czterech językach — i to wszystko: **nie ma widoku `?id=`**,
+bo terminarz nie ma własnego wiersza do otwarcia. Nazwa w wierszu to zwykły link do
+`/zlecenia/?id=<jobId>`, czyli do strony, która to zlecenie posiada. W `src/ia.mjs` trasa
+siedzi pod `jobs`, bo pokazuje ich daty.
+
+**To jedyny moduł Pro, który niczego nie zapisuje.** Termin jest polem zlecenia —
+`dueDate` z rozdziału XXI, zapisywane przez `crmUpdateJob()` i sprawdzane przez
+`crmDay()` — więc terminarz jest *czytaniem* zleceń, a nie kolekcją obok nich. Własna
+tablica `calendar` albo `events` dałaby jednej dacie dwa domy i pozwoliłaby im się
+rozjechać przy pierwszej zmianie terminu na stronie zlecenia: dokładnie ten sam argument,
+który trzyma koszt poza zleceniem (§7.8) i pieniądze projektu poza wyceną (§7.9). Jedyny
+zapis, jaki robi ta strona, to `crmUpdateJob(id, { dueDate })` — ta sama funkcja, którą
+wywołuje `/zlecenia/`.
+
+**Pięć kubełków, i to jest cała „struktura" terminarza.**
+
+| kubełek | co w nim jest |
+|---|---|
+| `late` | termin minął, zlecenie nadal otwarte |
+| `today` | termin wypada dziś |
+| `soon` | termin w ciągu 7 dni (`CAL_SOON_DAYS`) |
+| `later` | termin dalej niż za tydzień |
+| `none` | otwarte zlecenia bez daty |
+
+Zlecenia zamknięte — „zakończone" i „anulowane" z rozdziału XXI — **nie trafiają do
+żadnego kubełka**: skończona robota po terminie nie jest zaległa. Te, które miały termin,
+składają się w `<details>` (najnowszy termin pierwszy); zamknięte bez terminu nie
+pojawiają się wcale, bo strona jest o datach. Kubełek bez wierszy znika, zamiast stać
+pusty. `none` jest ostatni i nie jest wypełniaczem: zlecenie, któremu nikt nie dał daty,
+to wiersz, który najczęściej trzeba poprawić, a kontrolka daty stoi w nim od razu.
+
+**„Dziś" to dzień kalendarzowy odwiedzającego, nigdy UTC.** `crmToday()` składa datę
+z lokalnych getterów, a nie z `toISOString().slice(0, 10)`: o 23:30 w Warszawie ten drugi
+mówi już „jutro", więc zlecenie na dziś wylądowałoby w „po terminie" — terminarz byłby
+błędny każdego wieczoru. `crmDaysUntil()` liczy odwrotnie: obie daty czyta o północy UTC,
+bo różnica dwóch dni kalendarzowych to liczba dni, a liczona lokalnie miałaby dwa razy
+w roku 23 albo 25 godzin i zaokrągliłaby się w złą stronę. Testy sprawdzają obie strony
+tego, w prawdziwej strefie `Europe/Warsaw`.
+
+**Odległość do terminu jest słowami, i pisze ją przeglądarka.**
+`Intl.RelativeTimeFormat` z `numeric: "auto"` daje „za 3 dni", „in 3 Tagen", „через 3 дні"
+i „yesterday" — z poprawną liczbą mnogą, której sam polski ma trzy formy, a ukraiński
+kolejne trzy. Czwarty komplet form w słowniku byłby czwartym miejscem, w którym można się
+pomylić. Przeglądarka bez tego API nie dostaje żadnej frazy — data obok mówi wszystko,
+więc wiersz degraduje się do mniejszej liczby słów, nigdy do złych.
+
+**Podstawowe informacje** (rozdział XXIII) to te trzy, które czyta się razem z terminem:
+klient, status i uzgodniona wartość. Reszta zlecenia jest jedno kliknięcie dalej, na
+stronie, która je posiada. Data w wierszu to `<input type="date">`, a nie tekst z guzikiem
+„edytuj": kontrolka **jest** wyświetleniem — przeglądarka drukuje ją w lokalnym formacie
+i otwiera kalendarz na telefonie — i to ona pozwala uzupełnić brakujący termin tam, gdzie
+się go zauważyło. Wiersz zamknięty ma datę jako tekst: to zapis, nie kolejka.
+
+**Rozdział XXV — tak samo jak przy trzech poprzednich modułach.** Ten sam pasek „Dostępne
+w LiczMat Pro", ta sama uwaga o tym, że planu Pro nic jeszcze nie nadaje, ta sama bramka
+w HTML-u od pierwszego renderu i **ten sam jedyny przełącznik Sesji 27: `LM_PRO_LOCKED`**
+— teraz dla czterech modułów, i wciąż jedna zmienna.
 
 ---
 

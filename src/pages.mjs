@@ -13,6 +13,7 @@ import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
+  urlCalendar,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -1675,6 +1676,7 @@ export function jobsMain(lang, t) {
         <a class="btn btn-ghost" href="${urlClients(lang)}">${esc(t("clipage_title"))}</a>
         <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
         <a class="btn btn-ghost" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
+        <a class="btn btn-ghost" href="${urlCalendar(lang)}">${esc(t("calpage_title"))}</a>
       </p>
       <p class="muted src-note">${esc(t("job_local_note"))}</p>
     </div>
@@ -1885,6 +1887,108 @@ export function quotesMain(lang, t) {
         <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
       </p>
       <p class="muted src-note">${esc(t("quo_local_note"))}</p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+  return { main, ld: crumbs.ld };
+}
+
+/**
+ * /terminarz/ — the schedule of LiczMat Pro. Session 25, chapter XXIII.
+ *
+ * One screen, unlike the other three Pro modules: there is no `?id=` view, because a row
+ * here opens the job it belongs to on /zlecenia/. The module stores nothing of its own —
+ * a deadline is chapter XXI's `termin`, a field of the job — so what is written here is
+ * five empty lists and the words above them, and assets/schedule-ui.js fills them from
+ * crmSchedule().
+ *
+ * The five headings and their lines are server-rendered rather than drawn by the script,
+ * so a visitor with no JavaScript and a crawler both read what the module is: the page is
+ * indexable, and chapter XXVI wants Pro described in public.
+ */
+export function calendarMain(lang, t) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("jobpage_title"), path: urlJobs(lang) },
+    { name: t("calpage_title"), path: urlCalendar(lang) },
+  ]);
+
+  // Chapter XXV's block, worded exactly as on the other three modules. "Poznaj LiczMat
+  // Pro" is a sentence rather than a button while /liczmat-pro/ is planned (session 29).
+  const pro = iaRoute("liczmat-pro");
+  const more = pro && pro.status === STATUS.LIVE
+    ? `<a class="btn btn-ghost btn-sm" href="${pro.path(lang)}">${esc(t("pro_more"))}</a>`
+    : `<span class="muted">${esc(t("pro_more"))} — ${esc(t("door_soon"))}</span>`;
+
+  const gate = `<div class="app-card crm-gate" id="cal-gate" hidden>
+        <h2>${esc(t("feat_calendar_t"))}</h2>
+        <p class="muted">${esc(t("feat_calendar_d"))}</p>
+        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
+        <p>${more}</p>
+      </div>`;
+
+  /* The buckets of CAL_BUCKETS in assets/crm.js, in the same order and with the same ids.
+     The script hides the ones that are empty; the markup carries all five, so the page
+     says what a terminarz sorts by even before anything has a date. */
+  const buckets = ["late", "today", "soon", "later", "none"].map((b) => `
+          <section class="dash-sec cal-sec" id="cal-sec-${b}">
+            <div class="dash-head">
+              <h2 id="cal-h-${b}">${esc(t(`cal_${b}_t`))}</h2>
+            </div>
+            <p class="muted">${esc(t(`cal_${b}_d`))}</p>
+            <ul id="cal-list-${b}" class="data-list"></ul>
+          </section>`).join("");
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("calpage_title"))}</h1>
+      <p class="lead">${esc(t("calpage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="cal-page">
+    <div class="wrap narrow">
+      <!-- Chapter XXV, first sentence: a free user should understand which features are
+           Pro. The strip says so on every visit, whatever the level. -->
+      <p class="crm-pro" id="cal-pro">
+        <span class="chip" id="cal-pro-chip">${esc(t("pro_locked"))}</span>
+        <span class="muted" id="cal-pro-note">${esc(t("cal_pro_note"))}</span>
+      </p>
+
+      ${gate}
+
+      <div id="cal-tool">
+        <!-- What "late" and "today" are measured against, said out loud: the visitor's
+             own calendar day, which is the only reckoning a deadline has. -->
+        <p class="crm-contact"><span class="eyebrow muted">${esc(t("cal_today_is"))}</span> <b id="cal-today"></b></p>
+
+        <div class="ws-project-figs">
+          <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_late_t"))}</span> <b id="cal-fig-late"></b></p>
+          <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_today_t"))}</span> <b id="cal-fig-today"></b></p>
+          <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_soon_t"))}</span> <b id="cal-fig-soon"></b></p>
+        </div>
+
+        <p class="muted" id="cal-empty" hidden>${esc(t("cal_empty"))}</p>
+${buckets}
+
+        <details id="cal-closed" class="ws-archive" hidden>
+          <summary id="cal-closed-summary">${esc(t("cal_closed_t"))}</summary>
+          <p class="muted">${esc(t("cal_closed_d"))}</p>
+          <ul id="cal-closed-list" class="data-list"></ul>
+        </details>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="${urlJobs(lang)}">${esc(t("cal_jobs_all"))}</a>
+        <a class="btn btn-ghost" href="${urlClients(lang)}">${esc(t("clipage_title"))}</a>
+        <a class="btn btn-ghost" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
+      </p>
+      <p class="muted field-note">${esc(t("cal_source_note"))}</p>
+      <p class="muted src-note">${esc(t("cal_local_note"))}</p>
     </div>
   </section>
 

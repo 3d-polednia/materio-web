@@ -28,6 +28,7 @@ import {
   URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
+  urlCalendar,
 } from "../src/site.mjs";
 import {
   livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
@@ -40,7 +41,7 @@ import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
   materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain, jobsMain,
-  quotesMain,
+  quotesMain, calendarMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
@@ -50,7 +51,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819d";
+const STAMP = "20260819e";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -287,7 +288,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang), urlCalendar(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -367,6 +368,16 @@ const JOBS_SCRIPTS = [
  */
 const QUOTES_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/quotes-ui.js",
+];
+
+/**
+ * /terminarz/ (session 25). The same four files once more. assets/workspace.js is still
+ * here even though the terminarz counts no money: assets/crm.js reads the workspace
+ * through its globals — crmProjectId() and the job's own costs — and loading the store
+ * without it would leave those answering for a workspace that is not there.
+ */
+const CALENDAR_SCRIPTS = [
+  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/schedule-ui.js",
 ];
 
 /* ------------------------------------------------------------------ worked examples */
@@ -752,6 +763,36 @@ function buildQuotesPages() {
   }
 }
 
+/**
+ * /terminarz/ — the schedule of LiczMat Pro. Session 25, chapter XXIII.
+ *
+ * One page per language and no view beside it: a row here opens the job it belongs to, on
+ * /zlecenia/. The build writes the five bucket headings and five empty lists; the rows,
+ * the counts and today's date are all filled in by the browser, because the jobs are in
+ * one browser and nothing about them can be server-rendered.
+ */
+function buildCalendarPages() {
+  const alt = alternatesFor(urlCalendar);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = calendarMain(lang, t);
+    write(join(urlCalendar(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("calpage_title")} \u2014 LiczMat`,
+      description: t("calpage_meta"),
+      path: urlCalendar(lang),
+      alternates: alt,
+      main, jsonld: [ld],
+      // Every row links to the job it stands for. The script has no site map, so the
+      // build hands it this language's address for the page that owns those rows.
+      headExtra: `<script>window.LM_CAL = ${JSON.stringify({
+        jobs: urlJobs(lang), clients: urlClients(lang), projects: urlProjects(lang),
+      })};</script>`,
+      scripts: CALENDAR_SCRIPTS,
+    }));
+  }
+}
+
 function buildStores() {
   const alt = alternatesFor(urlStores);
   for (const lang of LANGS) {
@@ -885,6 +926,8 @@ function buildSitemap() {
     // never a client, because every client row is in one browser's own storage.
     add(urlClients(lang), "0.5", "monthly", alternatesFor(urlClients));
     add(urlJobs(lang), "0.5", "monthly", alternatesFor(urlJobs));
+    add(urlQuotes(lang), "0.5", "monthly", alternatesFor(urlQuotes));
+    add(urlCalendar(lang), "0.5", "monthly", alternatesFor(urlCalendar));
     add(urlGuideIndex(lang), "0.7", "monthly", alternatesFor(urlGuideIndex));
     add(urlStores(lang), "0.7", "monthly", alternatesFor(urlStores));
     for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly", alternatesFor((l) => urlCalc(l, c.id)));
@@ -967,6 +1010,7 @@ buildWorkspacePages();
 buildClientsPages();
 buildJobsPages();
 buildQuotesPages();
+buildCalendarPages();
 buildStores();
 buildPrivatePages();
 buildSitemap();

@@ -101,6 +101,28 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/"/>
   </url>
   <url>
+    <loc>https://liczmat.com/wyceny/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/wyceny/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/koshtorysy-pro/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/angebote/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/quotes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/"/>
+  </url>
+  <url>
+    <loc>https://liczmat.com/terminarz/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/terminarz/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kalendar/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/termine/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/schedule/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/terminarz/"/>
+  </url>
+  <url>
     <loc>https://liczmat.com/poradniki/</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -473,6 +495,28 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/auftraege/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/jobs/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/"/>
+  </url>
+  <url>
+    <loc>https://liczmat.com/uk/koshtorysy-pro/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/wyceny/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/koshtorysy-pro/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/angebote/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/quotes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/"/>
+  </url>
+  <url>
+    <loc>https://liczmat.com/uk/kalendar/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/terminarz/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kalendar/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/termine/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/schedule/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/terminarz/"/>
   </url>
   <url>
     <loc>https://liczmat.com/uk/porady/</loc>
@@ -849,6 +893,28 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/"/>
   </url>
   <url>
+    <loc>https://liczmat.com/de/angebote/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/wyceny/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/koshtorysy-pro/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/angebote/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/quotes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/"/>
+  </url>
+  <url>
+    <loc>https://liczmat.com/de/termine/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/terminarz/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kalendar/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/termine/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/schedule/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/terminarz/"/>
+  </url>
+  <url>
     <loc>https://liczmat.com/de/ratgeber/</loc>
     <lastmod>2026-08-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -1221,6 +1287,28 @@
     <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/auftraege/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/jobs/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/"/>
+  </url>
+  <url>
+    <loc>https://liczmat.com/en/quotes/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/wyceny/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/koshtorysy-pro/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/angebote/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/quotes/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/"/>
+  </url>
+  <url>
+    <loc>https://liczmat.com/en/schedule/</loc>
+    <lastmod>2026-08-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://liczmat.com/terminarz/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kalendar/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://liczmat.com/de/termine/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://liczmat.com/en/schedule/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://liczmat.com/terminarz/"/>
   </url>
   <url>
     <loc>https://liczmat.com/en/guides/</loc>

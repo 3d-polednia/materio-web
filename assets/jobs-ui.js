@@ -33,12 +33,11 @@ function jobDay(day) {
   return d.toLocaleDateString(jobLang(), { day: "numeric", month: "short", year: "numeric" });
 }
 
-/** Today as "YYYY-MM-DD" in the visitor's own timezone — what a deadline is compared to. */
-function jobToday() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
+/** Today as "YYYY-MM-DD" in the visitor's own timezone — what a deadline is compared to.
+ *
+ * One definition, in assets/crm.js, since session 25: the terminarz asks the same
+ * question, and "is this job late" answered two ways is a page that contradicts itself. */
+const jobToday = () => (typeof crmToday === "function" ? crmToday() : "");
 
 /** Money through the workspace's own formatter, so a job reads like a project. */
 const jobMoney = (minor, code) =>

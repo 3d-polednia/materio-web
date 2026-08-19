@@ -1449,6 +1449,17 @@ a.chip:hover { text-decoration: none; }
 /* A job past its date, and not finished. The word beside it says so as well. */
 .job-due-late { color: var(--error); font-weight: var(--fw-semi); }
 
+/* ---------- Schedule: /terminarz/ (session 25, chapter XXIII)
+   Nothing new to build: a bucket is a .dash-sec and a row is a .data-list row, the same
+   furniture as every other list on the site. What the terminarz adds is the right-hand end
+   of a row — the distance to the deadline in words, and the date control that is both the
+   display and the way to change it. On a narrow screen the two wrap under the name rather
+   than squeezing it, which is chapter XXVIII's rule at 320 px. */
+.cal-when { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); }
+.cal-rel { font-size: var(--fs-xs); font-style: normal; }
+.cal-when input[type="date"] { max-width: 11rem; }
+.data-list li.cal-row { flex-wrap: wrap; }
+
 /* ---------- Legal / document page ---------- */
 .doc { max-width: 820px; margin: 0 auto; padding: var(--sp-10) var(--gutter) var(--sp-16); }
 .doc h1 { font-size: var(--fs-h1); }

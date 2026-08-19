@@ -50,8 +50,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 22 | Klienci | **Zrobione** — 2026-08-19 |
 | 23 | Zlecenia | **Zrobione** — 2026-08-19 |
 | 24 | Wyceny | **Zrobione** — 2026-08-19 |
-| 25 | Terminarz | **Następna** |
-| 26–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 25 | Terminarz | **Zrobione** — 2026-08-19 |
+| 26 | CRM | **Następna** |
+| 27–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -1914,6 +1915,35 @@ Do decyzji właściciela zostają trzy rzeczy, wszystkie **poza zakresem Sesji 2
 Sesja 26 (CRM) łączy klienta, zlecenie, projekt, wycenę i historię w jedną drogę — to tam
 te powiązania mają być pokazane razem, i dlatego Sesja 24 nie dokładała ich po jednym.
 
+### Terminarz niczego nie zapisuje — i co z tego wynika dla właściciela (z Sesji 25)
+
+Terminarz **nie jest** czwartą kolekcją. Termin jest polem zlecenia (`dueDate`, rozdział
+XXI), więc `/terminarz/` czyta zlecenia i sortuje je do pięciu kubełków, a jedyny zapis,
+jaki robi, to ten sam `crmUpdateJob()`, którego używa `/zlecenia/`. Własna tablica dałaby
+tej samej dacie dwa domy — dokładnie ten problem, który Sesja 24 rozstrzygnęła dla
+pieniędzy wyceny. Skutek praktyczny: terminarz nie dołożył **nic** do tego, co i tak nie
+jedzie na telefon; migracja Pro na telefon (jeżeli kiedyś) to nadal ta sama jedna zmiana
+kontraktu dla trzech kolekcji, nie czterech.
+
+Do decyzji właściciela zostają trzy rzeczy, wszystkie **poza zakresem Sesji 25**:
+
+- **Czy „w ciągu 7 dni" ma być tygodniem, czy dwoma.** Dziś to `CAL_SOON_DAYS = 7` —
+  jedna stała, jedna linijka. Siedem dni to okno, w którym fachowiec planuje robotę; komuś,
+  kto pracuje z miesięcznym wyprzedzeniem, wszystko wpadnie do „później". Zmiana jest
+  trywialna, ale to jest decyzja o tym, czym jest ta strona, więc jej nie podjąłem sam.
+- **Czy terminarz ma przypominać.** Rozdział XXIII mówi „zobaczyć", nie „przypomnieć",
+  i wprost zabrania budowania Kalendarza Google. Powiadomienie to zgoda przeglądarki,
+  Service Worker i coś, co musi działać przy zamkniętej karcie — to jest osobna sesja
+  i osobna rozmowa o tym, czy serwis ma prosić o taką zgodę.
+- **Czy zlecenie ma mieć datę startu obok terminu.** Dziś ma jedną datę, bo rozdział XXI
+  wymienia jeden „termin". Druga zamieniłaby listę w oś czasu, czyli w to, czego rozdział
+  XXIII zabrania — chyba że właściciel chce właśnie tego.
+
+Jedno drobne znalezisko przy okazji, naprawione, bo leżało w linijce, którą i tak trzeba
+było ruszyć: **`/wyceny/` (Sesja 24) było zadeklarowane jako indeksowane, ale nie było
+w `sitemap.xml`.** Cztery adresy wyceny i cztery terminarza są tam teraz; test Sesji 25
+sprawdza to dla własnych stron, tak samo jak test Sesji 23 dla zleceń.
+
 ### Moduł Pro jest dziś otwarty dla każdego — zamek przychodzi z Sesją 27 (z Sesji 22)
 
 `/klienci/` mówi na górze „Dostępne w LiczMat Pro" i jednym zdaniem, że planu Pro nic
@@ -1927,9 +1957,9 @@ Cały mechanizm jest już na miejscu i przetestowany w obie strony: `lmFeatureSt
 w `assets/plan.js` odpowiada `allowed / gated / locked`, blok bramki siedzi w HTML-u od
 pierwszego renderu (ukryty), a **jedynym przełącznikiem jest `LM_PRO_LOCKED`**. Sesja 27
 zmienia jedną linijkę; test sprawdza obie odpowiedzi, więc nie będzie to zmiana na ślepo.
-Sesja 23 dołożyła drugi moduł (`/zlecenia/`), Sesja 24 trzeci (`/wyceny/`) — ten sam
-przełącznik i ten sam test w każdym z nich. Liczba modułów nie zmienia tego, że przełącznik
-jest jeden.
+Sesja 23 dołożyła drugi moduł (`/zlecenia/`), Sesja 24 trzeci (`/wyceny/`), Sesja 25
+czwarty (`/terminarz/`) — ten sam przełącznik i ten sam test w każdym z nich. Liczba
+modułów nie zmienia tego, że przełącznik jest jeden.
 
 ### Warstwa konta nie została po tej sesji sprawdzona na żywym Firebase
 

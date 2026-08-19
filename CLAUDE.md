@@ -79,7 +79,7 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now 139 pages: a home page, a calculator
+The site used to be one `index.html`. It is now 147 pages: a home page, a calculator
 hub, one page per calculator, guides and a store finder — each in all four languages, at
 its own URL, so search engines can index more than the Polish front page. Writing that by
 hand is not possible; a generator writes it from one template plus the dictionary.
@@ -97,6 +97,8 @@ node scripts/test-costs.mjs       # costs: the unit price, the currency rule, th
 node scripts/test-rooms.mjs       # rooms: the document, the project link, the assignment
 node scripts/test-plan.mjs        # the Free/Pro model: permissions, gating, plan status
 node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadline, the links
+node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
+node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -261,6 +263,26 @@ scripts/test-quotes.mjs  Quotes (session 24, chapter XXII): the document and the
                       gate in both of its states and the copy in four languages.
                       Dependency-free — run it after touching the quote half of
                       assets/crm.js, quotesMain() or a quo_*/quopage_* key
+scripts/test-calendar.mjs  The terminarz (session 25, chapter XXIII): that the module stores
+                      nothing — the Pro store is byte-for-byte what it was and a deadline
+                      has exactly one home, the job's own `dueDate`; crmToday(), which is
+                      the visitor's calendar day and never UTC's, checked under a real
+                      non-UTC timezone; crmDaysUntil(), which counts days across both
+                      daylight-saving changes; the five buckets and every boundary
+                      (yesterday / today / +1 / +7 / +8 / no date), and the closed jobs
+                      that are in none of them; crmSchedule()'s order, counts and closed
+                      half; the one write, which is crmUpdateJob(); the route, chapter
+                      XXV's gate in both of its states and the copy in four languages.
+                      Dependency-free — run it after touching the terminarz half of
+                      assets/crm.js, calendarMain() or a cal_* key
+scripts/test-calendar-page.mjs  The same clicked through in Chromium, nothing stubbed: seven
+                      jobs dated against the day the test runs, one in each bucket, a
+                      deadline typed onto an undated job and the row moving because of it,
+                      a date cleared, a row opening its job on /zlecenia/, the closed
+                      disclosure, the Pro notice for a guest and for a Pro account, four
+                      languages (including the relative wording the browser writes), the
+                      currency switch, the widths of chapter XXVIII and the no-JavaScript
+                      variant
 scripts/test-quotes-page.mjs  The same clicked through in Chromium, nothing stubbed: a quote
                       added against a project, labour typed on as quantity × rate and as a
                       lump sum, a line corrected in its own row and removed, the margin
@@ -316,7 +338,9 @@ assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/.
                       ?id=<projectId> — and this file shows one of them, including the
                       material list of chapter XVI and, since session 20, the project's
                       rooms and the picker that files one calculation under one of them
-assets/crm.js         The Pro workspace: clients, jobs and quotes. localStorage under its own key
+assets/crm.js         The Pro workspace: clients, jobs and quotes — plus the terminarz of
+                      session 25, which is a reading of the jobs rather than a fourth
+                      collection. localStorage under its own key
                       (`liczmat-crm-v1`), this browser only — `clients` is NOT in the sync
                       contract, so nothing here is uploaded and nothing on the phone reads
                       it. Written in the contract's shape anyway (id, fields, the sync
@@ -325,6 +349,10 @@ assets/crm.js         The Pro workspace: clients, jobs and quotes. localStorage 
 assets/jobs-ui.js     /zlecenia/ — the index (open jobs and closed ones) and one job at
                       ?id=<jobId>: its client, its project, chapter XXI's status and
                       deadline, what was agreed and what the work has cost
+assets/schedule-ui.js /terminarz/ — the deadlines of the jobs in five buckets, the basics
+                      beside each one, and a date control on the row. One screen and no
+                      ?id=: a row opens the job it stands for. It writes one field, and it
+                      is the job's own
 assets/quotes-ui.js   /wyceny/ — the index and one quote at ?id=<quoteId>: the project it
                       is priced from, the labour typed onto it, chapter XXII's margin and
                       the five figures. Three of the five are read out of the project and
@@ -612,6 +640,28 @@ Kotlin side of it. Change one, change all three.
   deleting a project keeps the link, because `wsRestoreProject()` can bring it back and a
   link dropped on sight would return it to nobody. A client carries **no money**: what
   their work is worth is `wsProjectCosts()` over their projects, counted once each.
+- **The terminarz stores nothing, and that is the whole session.** Session 25 built
+  `/terminarz/` — chapter XXIII's "prosty terminarz zleceń" — and it is the one Pro module
+  with no collection of its own. A deadline is already a field of a job (`dueDate`, chapter
+  XXI), so the page is a *reading* of the jobs: `crmSchedule()` sorts them into five buckets
+  (late, today, within 7 days, later, no date), closed jobs are in none of them, and the one
+  write the page makes is `crmUpdateJob(id, { dueDate })` — the same call `/zlecenia/` makes.
+  An `events` array beside the jobs would give one date two homes and let them disagree the
+  first time somebody changed a deadline on the job's own page. It is also why the route has
+  no `?id=` view: a row opens the job it stands for.
+- **"Today" is the visitor's calendar day, and computing it in UTC is a bug that only shows
+  up in the evening.** `crmToday()` builds the string from the local getters;
+  `new Date().toISOString().slice(0, 10)` already says tomorrow at 23:30 in Warsaw, which
+  would file a job due today under "late" every evening. `crmDaysUntil()` goes the other way
+  and reads *both* calendar days at UTC midnight, because the difference between two
+  calendar days is a count of days and a local reckoning has 23 or 25 hours in it twice a
+  year. `jobs-ui.js` delegates to `crmToday()` rather than keeping its own copy — "is this
+  job late" answered two ways is a site that contradicts itself.
+- **The distance to a deadline is written by `Intl.RelativeTimeFormat`, not by the
+  dictionary.** "za 3 dni", "in 3 Tagen", "через 3 дні", "yesterday" — Polish alone has three
+  plural forms and Ukrainian another three, and the browser carries all of them already. A
+  browser without the API gets no phrase; the date beside it still says everything, so the
+  row degrades to fewer words and never to wrong ones.
 - **A Pro module is open today, and `LM_PRO_LOCKED` is the switch that closes it.** Nothing
   grants `plan: premium` (FIRESTORE_SYNC §9.2), so a lock on `/klienci/` today would shut
   the module to every account that exists — including the one that has to check it works.

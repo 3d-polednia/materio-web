@@ -61,6 +61,9 @@ export const SECTION = {
      is "koshtorysy-pro" rather than "koshtorysy" because /koshtorys/ is already the free
      estimate page in Ukrainian, and two sections may not claim one word. */
   quotes: { pl: "wyceny", uk: "koshtorysy-pro", de: "angebote", en: "quotes" },
+  /* Session 25, the fourth Pro module. Same rule once more: the segments are the ones the
+     `calendar` route has carried as `plannedSlug` in src/ia.mjs since session 3. */
+  calendar: { pl: "terminarz", uk: "kalendar", de: "termine", en: "schedule" },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
@@ -230,6 +233,10 @@ export const urlQuotes = (lang) => `${prefix(lang)}/${SECTION.quotes[lang]}/`;
 
 /** One quote, as a query string on /wyceny/ — the same wall urlJob() hits. */
 export const urlQuote = (lang, id) => `${urlQuotes(lang)}?id=${encodeURIComponent(id)}`;
+
+/** The terminarz of LiczMat Pro — chapter XXIII. One screen: it has no `?id=` of its own,
+ *  because a row on it opens the job it belongs to on /zlecenia/. */
+export const urlCalendar = (lang) => `${prefix(lang)}/${SECTION.calendar[lang]}/`;
 
 export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
 
