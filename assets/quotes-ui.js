@@ -52,7 +52,7 @@ const quoUrlId = () => {
 };
 
 /** The address of another page of this site, in this page's language, from the build. */
-const quoUrl = (key, fallback) => ((window.LM_QUOTES && window.LM_QUOTES[key]) || fallback);
+const quoUrl = (key, fallback) => ((window.LM_LINKS && window.LM_LINKS[key]) || fallback);
 
 /** The quote the page is currently showing. Set once per render pass. */
 let quoOpenId = "";
@@ -167,25 +167,11 @@ function quoCrumb(name) {
  * so a client renamed on their own page reads correctly here on the next redraw.
  */
 function quoRenderChain(q) {
-  const box = document.getElementById("quo-chain-line");
-  if (!box) return;
-  if (!q.projectId) {
-    box.innerHTML = `<span class="muted">${quoEsc(quoT("quo_project_none"))}</span>`;
-    return;
-  }
-  const chain = crmQuoteChain(q.id);
-  const parts = [];
-  if (chain.client) {
-    parts.push(`<a href="${quoEsc(quoUrl("clients", "/klienci/"))}?id=${
-      encodeURIComponent(chain.client.id)}">${quoEsc(chain.client.name)}</a>`);
-  }
-  if (chain.job) {
-    parts.push(`<a href="${quoEsc(quoUrl("jobs", "/zlecenia/"))}?id=${
-      encodeURIComponent(chain.job.id)}">${quoEsc(chain.job.name)}</a>`);
-  }
-  box.innerHTML = parts.length
-    ? parts.join(" <span class=\"muted\">→</span> ")
-    : `<span class="muted">${quoEsc(quoT("quo_chain_none"))}</span>`;
+  // Session 26 draws it with the strip assets/crm-chain.js gives every CRM screen, in
+  // place of the client → job line session 24 wrote here: the same four nodes in the
+  // chapter's own order, and a step nobody has filled in linking to the page that would
+  // fill it — which for a quote with no project is the way to give it one.
+  chnRenderStrip(document.getElementById("quo-chain-line"), crmChain("quote", q.id), "quote");
 }
 
 /** One labour line as it reads: the work, how much of it, at what rate, and the amount. */

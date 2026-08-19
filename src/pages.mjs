@@ -1398,15 +1398,30 @@ export function clientsMain(lang, t) {
             <ul id="crm-client-jobs" class="data-list"></ul>
           </section>
 
-          <!-- Chapter XX's "historia", derived: every calculation saved into one of this
-               client's projects, newest first. Nothing is logged separately — a second
-               copy would drift the first time a line was corrected. -->
+          <!-- Chapter XX: "Klient może posiadać … wyceny", and the fourth step of chapter
+               XXIV's path seen from its first. Nothing about the link is stored on the
+               client: a quote keeps its project, the client keeps their projects, and
+               crmClientQuotes() is where the two ends meet. Read-only, like the jobs. -->
           <section class="dash-sec">
             <div class="dash-head">
-              <h2>${esc(t("cli_hist_t"))}</h2>
+              <h2>${esc(t("crm_quotes_t"))}</h2>
+              <a class="dash-more" href="${urlQuotes(lang)}">${esc(t("crm_quotes_all"))}</a>
             </div>
-            <p class="muted">${esc(t("cli_hist_d"))}</p>
+            <p class="muted">${esc(t("crm_quotes_d"))}</p>
+            <ul id="crm-client-quotes" class="data-list"></ul>
+          </section>
+
+          <!-- Chapter XXIV's last step, and chapter XX's "historia": the client, their
+               jobs, the quotes priced from their projects and every calculation and cost
+               saved into one — each read with the date on the document itself. Nothing is
+               logged separately, and crm_hist_note says out loud what that leaves out. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("crm_hist_t"))}</h2>
+            </div>
+            <p class="muted">${esc(t("crm_hist_d"))}</p>
             <ul id="crm-history" class="data-list"></ul>
+            <p class="muted field-note">${esc(t("crm_hist_note"))}</p>
           </section>
         </div>
       </article>`;
@@ -1524,6 +1539,12 @@ export function jobsMain(lang, t) {
         </div>
 
         <div id="job-body" hidden>
+          <!-- Chapter XXIV's path through this job: KLIENT → ZLECENIE → PROJEKT → WYCENA.
+               Drawn by assets/crm-chain.js, which the three CRM screens share so the path
+               reads the same wherever it is standing. A step nobody has filled in links to
+               the page that would fill it. -->
+          <nav class="crm-chain" id="job-chain" aria-label="${esc(t("crm_chain_t"))}"></nav>
+
           <!-- Status and date sit above everything else: they are what a tradesman opens
                a job to check, and chapter XXI names them before the money. -->
           <p class="ws-mat-grid job-head-row">
@@ -1615,11 +1636,34 @@ export function jobsMain(lang, t) {
             </form>
           </section>
 
+          <!-- Chapter XXIV's fourth step. A quote is priced from the *project*, so these
+               are the quotes of the project this job carries — crmJobQuotes() — and the
+               figure beside each one is read live rather than copied. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("crm_quotes_t"))}</h2>
+              <a class="dash-more" href="${urlQuotes(lang)}">${esc(t("crm_quotes_all"))}</a>
+            </div>
+            <p class="muted">${esc(t("crm_quotes_d"))}</p>
+            <ul id="job-quotes" class="data-list"></ul>
+          </section>
+
           <section class="dash-sec">
             <div class="dash-head">
               <h2>${esc(t("job_note_t"))}</h2>
             </div>
             <p id="job-note" class="crm-note"></p>
+          </section>
+
+          <!-- Chapter XXIV's last step, for one job: the job itself, the quotes on its
+               project and what was saved into that project. Derived, like everywhere. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("crm_hist_t"))}</h2>
+            </div>
+            <p class="muted">${esc(t("crm_hist_d"))}</p>
+            <ul id="job-history" class="data-list"></ul>
+            <p class="muted field-note">${esc(t("crm_hist_note"))}</p>
           </section>
         </div>
       </article>`;
@@ -1728,8 +1772,10 @@ export function quotesMain(lang, t) {
         <div id="quo-body" hidden>
           <!-- Chapter XXIV read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT. Every
                step is derived from the one link the quote stores, so nothing here can
-               disagree with the job's own page. -->
-          <p class="crm-contact" id="quo-chain-line"></p>
+               disagree with the job's own page. Session 26 draws it with the same strip
+               /zlecenia/ uses — assets/crm-chain.js — so the path reads identically from
+               both ends. -->
+          <nav class="crm-chain" id="quo-chain-line" aria-label="${esc(t("crm_chain_t"))}"></nav>
 
           <!-- Chapter XXII's five figures. Three of them are the project's own money,
                read through wsProjectCosts() and never copied onto the quote. -->

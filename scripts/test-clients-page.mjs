@@ -262,11 +262,17 @@ head("2. opening a client shows chapter XX's record");
   eq("and links back to the project page",
     await page.getAttribute("#crm-client-projects a", "href"), `${urlProjects("pl")}?id=p1`);
 
+  // Session 26 made the history chapter XXIV's, not only chapter XX's: the client's own
+  // row is in it beside the two saved lines, and a job or a quote would be too.
   const history = await rows(page, "#crm-history");
-  eq("the history has both saved lines", history.length, 2);
-  check("newest first", history[0].includes("Robocizna"), history.join(" | "));
-  check("each row names the project it happened in", history[0].includes("Remont łazienki"),
-    history[0]);
+  eq("both saved lines are in the history, and the client's own row with them",
+    history.length, 3);
+  check("newest first", history[0].includes("Jan Kowalski"), history.join(" | "));
+  check("a saved line names the project it happened in",
+    history[1].includes("Remont łazienki"), history[1]);
+  check("and says which of the two it was",
+    history[1].includes("Dopisano koszt") && history[2].includes("Zapisano kalkulację"),
+    history.join(" | "));
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }

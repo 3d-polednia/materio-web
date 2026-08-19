@@ -64,7 +64,7 @@
 <link rel="alternate" hreflang="en" href="https://liczmat.com/en/clients/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260819e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260819f" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -82,7 +82,7 @@
 <meta name="twitter:title" content="Kunden — LiczMat">
 <meta name="twitter:description" content="Kunden in LiczMat Pro: Kundenliste mit Kontaktdaten und Notizen, die dem Kunden zugeordneten Projekte und der Verlauf gespeicherter Berechnungen. Die Daten bleiben in diesem Browser.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260819e">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819f">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -103,7 +103,7 @@
   ]
 }
 </script>
-<script>window.LM_CRM = {"projects":"/de/projekte/","jobs":"/de/auftraege/"};</script>
+<script>window.LM_LINKS = {"clients":"/de/kunden/","jobs":"/de/auftraege/","projects":"/de/projekte/","quotes":"/de/angebote/","calendar":"/de/termine/"};</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Zum Inhalt springen</a>
@@ -272,15 +272,30 @@
             <ul id="crm-client-jobs" class="data-list"></ul>
           </section>
 
-          <!-- Chapter XX's "historia", derived: every calculation saved into one of this
-               client's projects, newest first. Nothing is logged separately — a second
-               copy would drift the first time a line was corrected. -->
+          <!-- Chapter XX: "Klient może posiadać … wyceny", and the fourth step of chapter
+               XXIV's path seen from its first. Nothing about the link is stored on the
+               client: a quote keeps its project, the client keeps their projects, and
+               crmClientQuotes() is where the two ends meet. Read-only, like the jobs. -->
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Angebote</h2>
+              <a class="dash-more" href="/de/angebote/">Alle Angebote</a>
+            </div>
+            <p class="muted">Angebote, die aus dem Projekt gerechnet werden. Material und sonstige Kosten kommen aus dem Projekt, Arbeit und Marge aus dem Angebot.</p>
+            <ul id="crm-client-quotes" class="data-list"></ul>
+          </section>
+
+          <!-- Chapter XXIV's last step, and chapter XX's "historia": the client, their
+               jobs, the quotes priced from their projects and every calculation and cost
+               saved into one — each read with the date on the document itself. Nothing is
+               logged separately, and crm_hist_note says out loud what that leaves out. -->
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Verlauf</h2>
             </div>
-            <p class="muted">Berechnungen, die in den Projekten dieses Kunden gespeichert wurden, neueste zuerst.</p>
+            <p class="muted">Was passiert ist: der Kunde, die Aufträge, die Angebote, die gespeicherten Berechnungen und die eingetragenen Kosten, neueste zuerst.</p>
             <ul id="crm-history" class="data-list"></ul>
+            <p class="muted field-note">Der Verlauf wird aus den gespeicherten Dokumenten und ihren Daten abgeleitet. Ein geänderter Status oder Termin hat kein eigenes Datum und steht deshalb nicht in der Liste.</p>
           </section>
         </div>
       </article>
@@ -393,19 +408,20 @@
   "de": "/de/kunden/",
   "en": "/en/clients/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260819e"></script>
-<script src="/assets/i18n-runtime.js?v=20260819e"></script>
-<script src="/assets/currency.js?v=20260819e"></script>
+<script src="/assets/i18n.de.js?v=20260819f"></script>
+<script src="/assets/i18n-runtime.js?v=20260819f"></script>
+<script src="/assets/currency.js?v=20260819f"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260819e"></script>
+<script src="/assets/account.js?v=20260819f"></script>
 
-<script src="/assets/workspace.js?v=20260819e"></script>
-<script src="/assets/plan.js?v=20260819e"></script>
-<script src="/assets/crm.js?v=20260819e"></script>
-<script src="/assets/crm-ui.js?v=20260819e"></script>
-<script src="/assets/main.js?v=20260819e"></script>
+<script src="/assets/workspace.js?v=20260819f"></script>
+<script src="/assets/plan.js?v=20260819f"></script>
+<script src="/assets/crm.js?v=20260819f"></script>
+<script src="/assets/crm-chain.js?v=20260819f"></script>
+<script src="/assets/crm-ui.js?v=20260819f"></script>
+<script src="/assets/main.js?v=20260819f"></script>
 
 </body>
 </html>

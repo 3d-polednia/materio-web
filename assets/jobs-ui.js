@@ -52,8 +52,7 @@ const jobUrlId = () => {
 };
 
 /** The address of another page of this site, in this page's language, from the build. */
-const jobUrl = (key, fallback) =>
-  ((window.LM_JOBS && window.LM_JOBS[key]) || fallback);
+const jobUrl = (key, fallback) => ((window.LM_LINKS && window.LM_LINKS[key]) || fallback);
 
 /** The job the page is currently showing. Set once per render pass. */
 let jobOpenId = "";
@@ -243,6 +242,20 @@ function jobRenderProject(j) {
   none.hidden = free.length > 0 || Boolean(project);
 }
 
+/**
+ * Chapter XXIV's path through this job, and the two lists that hang off its far end.
+ *
+ * All three are drawn by assets/crm-chain.js, which /klienci/ and /wyceny/ load too: the
+ * strip reads the same standing on a job as standing on the quote priced from it, which
+ * is the whole point of a chain that is walked rather than copied.
+ */
+function jobRenderChain(j) {
+  const chain = crmChain("job", j.id);
+  chnRenderStrip(document.getElementById("job-chain"), chain, "job");
+  chnRenderQuotes(document.getElementById("job-quotes"), crmJobQuotes(j.id));
+  chnRenderHistory(document.getElementById("job-history"), crmHistory({ jobId: j.id }, 12));
+}
+
 /** The whole detail screen for one job. */
 function jobRenderDetail(id) {
   const j = crmJob(id);
@@ -313,6 +326,7 @@ function jobRenderDetail(id) {
   document.getElementById("job-delete-q").textContent = jobT("job_delete_q");
 
   jobRenderProject(j);
+  jobRenderChain(j);
 }
 
 /* ------------------------------------------------------------------ the switch */

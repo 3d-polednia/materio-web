@@ -58,7 +58,7 @@ const calMoney = (minor, code) =>
   (typeof wsMoney === "function" ? wsMoney(minor, code) : `${(Number(minor) / 100).toFixed(2)}`);
 
 /** The address of another page of this site, in this page's language, from the build. */
-const calUrl = (key, fallback) => ((window.LM_CAL && window.LM_CAL[key]) || fallback);
+const calUrl = (key, fallback) => ((window.LM_LINKS && window.LM_LINKS[key]) || fallback);
 
 /* ------------------------------------------------------------------ the Pro notice */
 

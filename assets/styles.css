@@ -1449,6 +1449,25 @@ a.chip:hover { text-decoration: none; }
 /* A job past its date, and not finished. The word beside it says so as well. */
 .job-due-late { color: var(--error); font-weight: var(--fw-semi); }
 
+/* ---------- The chain: /klienci/, /zlecenia/, /wyceny/ (session 26, chapter XXIV)
+   KLIENT → ZLECENIE → PROJEKT → WYCENA as one row of steps. Nothing new is invented for
+   it: a step is a label plus a link, the same eyebrow and the same link colour the rest of
+   the page spends. The arrow is drawn by the stylesheet rather than typed into the markup,
+   so it never lands in a copied line of text and a screen reader reads four steps instead
+   of four steps and three arrows. On a narrow screen the row wraps step by step, which is
+   chapter XXVIII's rule at 320 px. */
+.crm-chain { margin-bottom: var(--sp-4); }
+.crm-chain-list {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2) var(--sp-4);
+  margin: 0; padding: 0; list-style: none;
+}
+.crm-chain-list li { display: flex; align-items: baseline; gap: var(--sp-2); }
+.crm-chain-list li + li::before { content: "\2192"; color: var(--muted); }
+.crm-chain-list .eyebrow { font-size: var(--fs-xs); }
+/* The step the visitor is standing on is a name, not a link: a link to this page is a
+   dead click, and the weight is what says "you are here". */
+.crm-chain-list li.on b { font-weight: var(--fw-semi); }
+
 /* ---------- Schedule: /terminarz/ (session 25, chapter XXIII)
    Nothing new to build: a bucket is a .dash-sec and a row is a .data-list row, the same
    furniture as every other list on the site. What the terminarz adds is the right-hand end

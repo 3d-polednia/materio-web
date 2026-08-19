@@ -478,9 +478,6 @@ const I18N_PAGES = {
     cli_project_add: "Przypisz projekt",
     cli_project_none: "Każdy projekt należy już do jakiegoś klienta.",
     cli_unlink: "Odepnij",
-    cli_hist_t: "Historia",
-    cli_hist_d: "Kalkulacje zapisane w projektach tego klienta, od najnowszej.",
-    cli_hist_empty: "W projektach tego klienta nie ma jeszcze zapisanych kalkulacji.",
     cli_jobs_t: "Zlecenia",
     cli_jobs_d: "Zlecenia tego klienta. Zlecenie łączy klienta z projektem i pilnuje statusu oraz terminu.",
     cli_jobs_empty: "Ten klient nie ma jeszcze zlecenia.",
@@ -614,6 +611,31 @@ const I18N_PAGES = {
     cal_due: "Termin",
     cal_due_set: "Ustaw termin",
     cal_jobs_all: "Wszystkie zlecenia",
+
+    /* Sesja 26 — CRM (rozdział XXIV): ścieżka klient → zlecenie → projekt → wycena →
+       historia. Nic nowego się tu nie zapisuje — każdy krok czytamy z powiązań, które
+       zapisały sesje 22–25, a historię z dat zapisanych dokumentów. */
+    crm_chain_t: "Ścieżka",
+    crm_chain_d: "Klient → zlecenie → projekt → wycena. Każdy krok otwiera stronę, na której go poprawisz.",
+    crm_node_client: "Klient",
+    crm_node_job: "Zlecenie",
+    crm_node_project: "Projekt",
+    crm_node_quote: "Wycena",
+    crm_node_none: "Brak — dodaj",
+    crm_quotes_t: "Wyceny",
+    crm_quotes_d: "Wyceny liczone z projektu. Materiał i inne koszty biorą się z projektu, robocizna i marża z wyceny.",
+    crm_quotes_empty: "Nie ma jeszcze żadnej wyceny.",
+    crm_quotes_all: "Wszystkie wyceny",
+    crm_hist_t: "Historia",
+    crm_hist_d: "Co się wydarzyło: klient, zlecenia, wyceny, zapisane kalkulacje i dopisane koszty, od najnowszego.",
+    crm_hist_empty: "Nie ma jeszcze czego pokazać.",
+    crm_hist_note: "Historię wyliczamy z zapisanych dokumentów i ich dat. Zmiana statusu albo terminu nie ma własnej daty, więc nie ma jej na liście.",
+    crm_ev_client: "Dodano klienta",
+    crm_ev_job: "Dodano zlecenie",
+    crm_ev_quote: "Dodano wycenę",
+    crm_ev_calc: "Zapisano kalkulację",
+    crm_ev_cost: "Dopisano koszt",
+
 
     ck_p_crm: "Klienci, zlecenia i wyceny LiczMat Pro: nazwy, dane kontaktowe, notatki, statusy, terminy, przypisane projekty, pozycje robocizny i marża.",
 
@@ -1177,9 +1199,6 @@ const I18N_PAGES = {
     cli_project_add: "Add a project",
     cli_project_none: "Every project already belongs to a client.",
     cli_unlink: "Take off",
-    cli_hist_t: "History",
-    cli_hist_d: "Calculations saved into this client's projects, newest first.",
-    cli_hist_empty: "Nothing has been saved into this client's projects yet.",
     cli_jobs_t: "Jobs",
     cli_jobs_d: "This client's jobs. A job joins a client to a project and keeps the status and the date.",
     cli_jobs_empty: "This client has no job yet.",
@@ -1313,6 +1332,31 @@ const I18N_PAGES = {
     cal_due: "Deadline",
     cal_due_set: "Set the deadline",
     cal_jobs_all: "All jobs",
+
+    /* Session 26 — CRM (chapter XXIV): the path client → job → project → quote → history.
+       Nothing new is stored: every step is read from the links sessions 22–25 wrote, and
+       the history from the dates on the documents themselves. */
+    crm_chain_t: "Path",
+    crm_chain_d: "Client → job → project → quote. Each step opens the page that owns it.",
+    crm_node_client: "Client",
+    crm_node_job: "Job",
+    crm_node_project: "Project",
+    crm_node_quote: "Quote",
+    crm_node_none: "None — add one",
+    crm_quotes_t: "Quotes",
+    crm_quotes_d: "Quotes priced from the project. The material and the other costs come from the project, the labour and the margin from the quote.",
+    crm_quotes_empty: "No quote yet.",
+    crm_quotes_all: "All quotes",
+    crm_hist_t: "History",
+    crm_hist_d: "What has happened: the client, the jobs, the quotes, the saved calculations and the costs typed in, newest first.",
+    crm_hist_empty: "Nothing to show yet.",
+    crm_hist_note: "The history is worked out from the saved documents and their dates. A status or a deadline that was changed has no date of its own, so it is not on the list.",
+    crm_ev_client: "Client added",
+    crm_ev_job: "Job added",
+    crm_ev_quote: "Quote added",
+    crm_ev_calc: "Calculation saved",
+    crm_ev_cost: "Cost added",
+
 
     ck_p_crm: "LiczMat Pro clients, jobs and quotes: names, contact details, notes, statuses, dates, the projects filed under them, labour lines and the margin.",
 
@@ -1875,9 +1919,6 @@ const I18N_PAGES = {
     cli_project_add: "Projekt zuordnen",
     cli_project_none: "Jedes Projekt gehört bereits zu einem Kunden.",
     cli_unlink: "Entfernen",
-    cli_hist_t: "Verlauf",
-    cli_hist_d: "Berechnungen, die in den Projekten dieses Kunden gespeichert wurden, neueste zuerst.",
-    cli_hist_empty: "In den Projekten dieses Kunden ist noch nichts gespeichert.",
     cli_jobs_t: "Aufträge",
     cli_jobs_d: "Die Aufträge dieses Kunden. Ein Auftrag verbindet Kunde und Projekt und hält Status und Termin fest.",
     cli_jobs_empty: "Dieser Kunde hat noch keinen Auftrag.",
@@ -2011,6 +2052,31 @@ const I18N_PAGES = {
     cal_due: "Termin",
     cal_due_set: "Termin setzen",
     cal_jobs_all: "Alle Aufträge",
+
+    /* Sitzung 26 — CRM (Kapitel XXIV): der Weg Kunde → Auftrag → Projekt → Angebot →
+       Verlauf. Es wird nichts Neues gespeichert: jeder Schritt wird aus den Verknüpfungen
+       der Sitzungen 22–25 gelesen, der Verlauf aus den Daten der Dokumente selbst. */
+    crm_chain_t: "Weg",
+    crm_chain_d: "Kunde → Auftrag → Projekt → Angebot. Jeder Schritt öffnet die Seite, auf der du ihn änderst.",
+    crm_node_client: "Kunde",
+    crm_node_job: "Auftrag",
+    crm_node_project: "Projekt",
+    crm_node_quote: "Angebot",
+    crm_node_none: "Noch nichts — anlegen",
+    crm_quotes_t: "Angebote",
+    crm_quotes_d: "Angebote, die aus dem Projekt gerechnet werden. Material und sonstige Kosten kommen aus dem Projekt, Arbeit und Marge aus dem Angebot.",
+    crm_quotes_empty: "Noch kein Angebot.",
+    crm_quotes_all: "Alle Angebote",
+    crm_hist_t: "Verlauf",
+    crm_hist_d: "Was passiert ist: der Kunde, die Aufträge, die Angebote, die gespeicherten Berechnungen und die eingetragenen Kosten, neueste zuerst.",
+    crm_hist_empty: "Noch nichts zu zeigen.",
+    crm_hist_note: "Der Verlauf wird aus den gespeicherten Dokumenten und ihren Daten abgeleitet. Ein geänderter Status oder Termin hat kein eigenes Datum und steht deshalb nicht in der Liste.",
+    crm_ev_client: "Kunde angelegt",
+    crm_ev_job: "Auftrag angelegt",
+    crm_ev_quote: "Angebot angelegt",
+    crm_ev_calc: "Berechnung gespeichert",
+    crm_ev_cost: "Kosten eingetragen",
+
 
     ck_p_crm: "Kunden, Aufträge und Angebote von LiczMat Pro: Namen, Kontaktdaten, Notizen, Status, Termine, zugeordnete Projekte, Positionen für Arbeitszeit und die Marge.",
 
@@ -2573,9 +2639,6 @@ const I18N_PAGES = {
     cli_project_add: "Прив'язати проєкт",
     cli_project_none: "Кожен проєкт уже належить якомусь клієнтові.",
     cli_unlink: "Відв'язати",
-    cli_hist_t: "Історія",
-    cli_hist_d: "Розрахунки, збережені в проєктах цього клієнта, від найновішого.",
-    cli_hist_empty: "У проєктах цього клієнта ще нічого не збережено.",
     cli_jobs_t: "Замовлення",
     cli_jobs_d: "Замовлення цього клієнта. Замовлення поєднує клієнта з проєктом і тримає статус та термін.",
     cli_jobs_empty: "У цього клієнта ще немає замовлення.",
@@ -2709,6 +2772,31 @@ const I18N_PAGES = {
     cal_due: "Термін",
     cal_due_set: "Поставити термін",
     cal_jobs_all: "Усі замовлення",
+
+    /* Сесія 26 — CRM (розділ XXIV): шлях клієнт → замовлення → проєкт → кошторис →
+       історія. Нічого нового не зберігаємо: кожен крок читаємо зі зв'язків, які записали
+       сесії 22–25, а історію — з дат самих документів. */
+    crm_chain_t: "Шлях",
+    crm_chain_d: "Клієнт → замовлення → проєкт → кошторис. Кожен крок відкриває сторінку, де його можна змінити.",
+    crm_node_client: "Клієнт",
+    crm_node_job: "Замовлення",
+    crm_node_project: "Проєкт",
+    crm_node_quote: "Кошторис",
+    crm_node_none: "Немає — додати",
+    crm_quotes_t: "Кошториси",
+    crm_quotes_d: "Кошториси, пораховані з проєкту. Матеріал та інші витрати беруться з проєкту, робота й націнка — з кошторису.",
+    crm_quotes_empty: "Кошторису ще немає.",
+    crm_quotes_all: "Усі кошториси",
+    crm_hist_t: "Історія",
+    crm_hist_d: "Що сталося: клієнт, замовлення, кошториси, збережені розрахунки та дописані витрати, від найновішого.",
+    crm_hist_empty: "Поки немає чого показати.",
+    crm_hist_note: "Історію обчислюємо зі збережених документів та їхніх дат. Зміна статусу чи терміну не має власної дати, тому її в списку немає.",
+    crm_ev_client: "Додано клієнта",
+    crm_ev_job: "Додано замовлення",
+    crm_ev_quote: "Додано кошторис",
+    crm_ev_calc: "Збережено розрахунок",
+    crm_ev_cost: "Дописано витрату",
+
 
     ck_p_crm: "Клієнти, замовлення та кошториси LiczMat Pro: назви, контактні дані, нотатки, статуси, терміни, прив'язані проєкти, позиції роботи та маржа.",
 

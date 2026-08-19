@@ -64,7 +64,7 @@
 <link rel="alternate" hreflang="en" href="https://liczmat.com/en/quotes/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260819e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260819f" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -82,7 +82,7 @@
 <meta name="twitter:title" content="Angebote — LiczMat">
 <meta name="twitter:description" content="Angebote in LiczMat Pro: Material und weitere Kosten aus dem Projekt, Arbeitszeit als Menge mal Satz, eine Marge in Prozent und die Summe. Alles bleibt in diesem Browser.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260819e">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819f">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -109,7 +109,7 @@
   ]
 }
 </script>
-<script>window.LM_QUOTES = {"projects":"/de/projekte/","jobs":"/de/auftraege/","clients":"/de/kunden/"};</script>
+<script>window.LM_LINKS = {"clients":"/de/kunden/","jobs":"/de/auftraege/","projects":"/de/projekte/","quotes":"/de/angebote/","calendar":"/de/termine/"};</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Zum Inhalt springen</a>
@@ -183,8 +183,10 @@
         <div id="quo-body" hidden>
           <!-- Chapter XXIV read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT. Every
                step is derived from the one link the quote stores, so nothing here can
-               disagree with the job's own page. -->
-          <p class="crm-contact" id="quo-chain-line"></p>
+               disagree with the job's own page. Session 26 draws it with the same strip
+               /zlecenia/ uses — assets/crm-chain.js — so the path reads identically from
+               both ends. -->
+          <nav class="crm-chain" id="quo-chain-line" aria-label="Weg"></nav>
 
           <!-- Chapter XXII's five figures. Three of them are the project's own money,
                read through wsProjectCosts() and never copied onto the quote. -->
@@ -399,19 +401,20 @@
   "de": "/de/angebote/",
   "en": "/en/quotes/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260819e"></script>
-<script src="/assets/i18n-runtime.js?v=20260819e"></script>
-<script src="/assets/currency.js?v=20260819e"></script>
+<script src="/assets/i18n.de.js?v=20260819f"></script>
+<script src="/assets/i18n-runtime.js?v=20260819f"></script>
+<script src="/assets/currency.js?v=20260819f"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260819e"></script>
+<script src="/assets/account.js?v=20260819f"></script>
 
-<script src="/assets/workspace.js?v=20260819e"></script>
-<script src="/assets/plan.js?v=20260819e"></script>
-<script src="/assets/crm.js?v=20260819e"></script>
-<script src="/assets/quotes-ui.js?v=20260819e"></script>
-<script src="/assets/main.js?v=20260819e"></script>
+<script src="/assets/workspace.js?v=20260819f"></script>
+<script src="/assets/plan.js?v=20260819f"></script>
+<script src="/assets/crm.js?v=20260819f"></script>
+<script src="/assets/crm-chain.js?v=20260819f"></script>
+<script src="/assets/quotes-ui.js?v=20260819f"></script>
+<script src="/assets/main.js?v=20260819f"></script>
 
 </body>
 </html>

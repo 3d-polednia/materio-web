@@ -24,7 +24,6 @@ const crmT = (key) => (typeof t === "function" ? t(key) : key);
 const crmLang = () => document.documentElement.lang || "pl";
 const crmEsc = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-const crmNum = (v) => new Intl.NumberFormat(crmLang(), { maximumFractionDigits: 2 }).format(v);
 
 const crmDate = (ms) => {
   const at = Number(ms);
@@ -40,6 +39,15 @@ const crmMoney = (minor, code) =>
 const crmUrlId = () => {
   try { return new URLSearchParams(location.search).get("id") || ""; } catch (e) { return ""; }
 };
+
+/**
+ * The address of another page of this site, in this page's language, from the build.
+ *
+ * `window.LM_LINKS` is one map for the whole CRM — session 26 — because the four Pro
+ * screens link to each other in every direction now and four maps holding overlapping
+ * halves of the same site map is one edit away from disagreeing.
+ */
+const crmUrl = (key, fallback) => ((window.LM_LINKS && window.LM_LINKS[key]) || fallback);
 
 /** The index's own address, without the query that opens a client. */
 const crmIndexUrl = () => location.pathname;
@@ -189,7 +197,7 @@ function crmRenderProjects(id) {
   list.innerHTML = projects.length ? projects.map((p) => {
     const costs = wsProjectCosts(p.id);
     const money = costs.total ? ` · ${crmEsc(crmMoney(costs.total, costs.currencyCode))}` : "";
-    const url = (window.LM_CRM && window.LM_CRM.projects) || "/projekty/";
+    const url = crmUrl("projects", "/projekty/");
     return `<li data-id="${crmEsc(p.id)}">
         <span class="row-name">
           <a href="${crmEsc(url)}?id=${encodeURIComponent(p.id)}"><b>${crmEsc(p.name)}</b></a>
@@ -235,7 +243,7 @@ function crmRenderJobs(id) {
   if (!list) return;
   if (typeof crmClientJobs !== "function") { list.innerHTML = ""; return; }
   const jobs = crmClientJobs(id);
-  const url = (window.LM_CRM && window.LM_CRM.jobs) || "/zlecenia/";
+  const url = crmUrl("jobs", "/zlecenia/");
   list.innerHTML = jobs.length ? jobs.map((j) => {
     const money = j.valueMinor === null || j.valueMinor === undefined
       ? "" : ` · ${crmEsc(crmMoney(j.valueMinor, j.currencyCode))}`;
@@ -251,29 +259,27 @@ function crmRenderJobs(id) {
 }
 
 /**
- * Chapter XX's history: the calculations saved into this client's projects.
+ * Chapter XX's "wyceny", and chapter XXIV's fourth step seen from its first.
  *
- * The line carries its own name, how much was needed, the unit and the currency it was
- * saved in (session 16), so the row is read straight off the document — no engine is
- * loaded here and no number is recomputed.
+ * The link is not stored on the client: a quote keeps its project and the client keeps
+ * their projects, so crmClientQuotes() is where the two ends meet. Read-only for the
+ * reason the jobs are — a quote is written on /wyceny/, and one screen owning the writes
+ * is what keeps two rules for one row from existing.
+ */
+function crmRenderQuotes(id) {
+  chnRenderQuotes(document.getElementById("crm-client-quotes"), crmClientQuotes(id));
+}
+
+/**
+ * Chapter XXIV's last step: everything that has happened for this client, newest first.
+ *
+ * Drawn by assets/crm-chain.js, which /zlecenia/ shares, and derived by crmHistory() —
+ * the client's own row, their jobs, the quotes priced from their projects and every
+ * calculation and cost saved into one. Nothing is logged; crm_hist_note under the list
+ * says what that leaves out.
  */
 function crmRenderHistory(id) {
-  const list = document.getElementById("crm-history");
-  if (!list) return;
-  const rows = crmClientHistory(id, 12);
-  list.innerHTML = rows.length ? rows.map(({ line, project }) => {
-    const amount = line.requiredUnits
-      ? `${crmNum(line.requiredUnits)} ${crmEsc(line.unitLabel || "")}`.trim() : "";
-    const money = line.totalCostMinor
-      ? ` · ${crmEsc(crmMoney(line.totalCostMinor, line.currencyCode))}` : "";
-    return `<li>
-        <span class="row-name">
-          <b>${crmEsc(line.name)}</b>
-          <em class="muted">${crmEsc(project.name)} · ${amount}${money} · ${
-      crmEsc(crmDate(line.createdAt))}</em>
-        </span>
-      </li>`;
-  }).join("") : `<li class="empty muted">${crmEsc(crmT("cli_hist_empty"))}</li>`;
+  chnRenderHistory(document.getElementById("crm-history"), crmHistory({ clientId: id }, 12));
 }
 
 /** The whole detail screen for one client. */
@@ -337,6 +343,7 @@ function crmRenderClient(id) {
 
   crmRenderProjects(id);
   crmRenderJobs(id);
+  crmRenderQuotes(id);
   crmRenderHistory(id);
 }
 

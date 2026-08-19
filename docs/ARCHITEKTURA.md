@@ -1086,6 +1086,63 @@ w LiczMat Pro", ta sama uwaga o tym, że planu Pro nic jeszcze nie nadaje, ta sa
 w HTML-u od pierwszego renderu i **ten sam jedyny przełącznik Sesji 27: `LM_PRO_LOCKED`**
 — teraz dla czterech modułów, i wciąż jedna zmienna.
 
+### 7.11. CRM — ścieżka klient → zlecenie → projekt → wycena → historia (Sesja 26)
+
+Rozdział XXXII, Sesja 26: „CRM — Połączenie: klient → zlecenie → projekt → wycena →
+historia". Rozdział XXIV podaje tę samą relację pionowo i ogranicza ją dwoma zdaniami:
+„CRM LiczMat Pro ma być lekki" i „**Nie tworzymy ogromnego systemu ERP.**"
+
+**Ta sesja nie dołożyła ani kolekcji, ani strony.** Wszystkie powiązania rozdziału XXIV
+były już zapisane: klient trzyma `projectIds` (§7.7), zlecenie trzyma `clientId`
+i `projectId` (§7.8), wycena trzyma `projectId` (§7.9). Brakowało samej ścieżki —
+i dlatego `crm` jest jedyną funkcją w `LM_FEATURES`, która ma `route: null`.
+
+**Jeden spacer w obie strony: `crmChain(kind, id)`.**
+
+| kierunek | co daje |
+|---|---|
+| w górę | dokładność: wycena ma jeden projekt, projekt ma najwyżej jedno zlecenie, zlecenie najwyżej jednego klienta |
+| w dół | listę, nigdy zgadywanie: klient ma wiele zleceń, projekt może mieć kilka wycen |
+
+Spacer z klienta zatrzymuje się więc na kliencie, a strona wypisuje jego zlecenia,
+projekty i wyceny listami. `crmQuoteChain()` z Sesji 24 został pod tą samą nazwą, ale
+w środku woła `crmChain()`: dwa spacery po tych samych powiązaniach mogłyby kiedyś dać
+dwie różne odpowiedzi na to samo pytanie.
+
+**Pasek ścieżki** rysuje cztery węzły w kolejności rozdziału — `assets/crm-chain.js`,
+jeden plik dla `/klienci/`, `/zlecenia/` i `/wyceny/`. Węzeł, na którym stoi
+odwiedzający, jest nazwą, a nie linkiem (link do strony, na której się jest, to martwe
+kliknięcie). Węzeł nierozstrzygnięty prowadzi do **indeksu swojej sekcji** — i mówi
+prawdę w obu przypadkach, w których się pojawia: krok, którego nikt jeszcze nie wypełnił,
+i krok, który ma więcej niż jedną odpowiedź. Pasek jest więc sposobem, żeby iść dalej,
+a nie raportem.
+
+**Historia jest wyliczana z dokumentów i ich dat** — `crmHistory({clientId | jobId |
+projectId})`. Wiersz powstaje z: klienta, zlecenia, wyceny, zapisanej kalkulacji
+i dopisanego kosztu (`manual` w `inputJson`, §7.4), każdy z datą, którą ten dokument
+i tak nosi. Dziennik zdarzeń obok nich byłby drugą kopią tych samych faktów i zacząłby
+kłamać przy pierwszym skasowanym wierszu — wiersza by nie było, a wpis by został.
+
+**Czego historia świadomie nie pokazuje.** Zmian. W magazynie są tylko daty powstania:
+wiersz ma jedno `updatedAt`, które mówi *kiedy* coś się zmieniło i nigdy *co*. Status
+przestawiony na „w toku" i termin przesunięty o tydzień nie zostawiają śladu — i strona
+mówi to wprost zdaniem pod listą (`crm_hist_note`), zamiast udawać komplet. Zapamiętanie
+tego to dziennik zdarzeń, czyli ERP z ostatniego zdania rozdziału XXIV.
+
+**Jedna mapa adresów zamiast czterech.** Cztery ekrany Pro linkują teraz do siebie
+w każdą stronę, więc build wpisuje w każdy z nich `window.LM_LINKS` — komplet pięciu
+adresów w języku tej strony — w miejsce dawnych `LM_CRM`, `LM_JOBS`, `LM_QUOTES`
+i `LM_CAL`, z których każda niosła połowę tego samego. `/terminarz/` dostaje tę samą
+mapę i **nie** ładuje `crm-chain.js`: nie rysuje ścieżki, więc jej nie pobiera.
+
+**Czego ścieżka nie dotyka: `/projekty/`.** Projekt jest środkiem łańcucha, ale jego
+trasa jest `GUEST` i nie ładuje niczego z CRM-u. Pasek na stronie projektu oznaczałby
+wożenie danych Pro na stronę gościa — link idzie tam w jedną stronę, z paska.
+
+**Rozdział XXV — bez zmian.** Ścieżka nie ma własnego paska „Dostępne w LiczMat Pro",
+bo nie ma własnej strony: rysuje się wewnątrz trzech modułów, które ten pasek już mają,
+i znika razem z nimi, kiedy `LM_PRO_LOCKED` zostanie przestawione w Sesji 27.
+
 ---
 
 ---

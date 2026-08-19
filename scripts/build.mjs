@@ -51,7 +51,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819e";
+const STAMP = "20260819f";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -345,7 +345,8 @@ const WS_SCRIPTS = ["/assets/units.js", "/assets/workspace.js", "/assets/workspa
  * globals, so the order below is the order the browser needs.
  */
 const CRM_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-ui.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-chain.js",
+  "/assets/crm-ui.js",
 ];
 
 /**
@@ -356,7 +357,8 @@ const CRM_SCRIPTS = [
  * amount, and calculates nothing.
  */
 const JOBS_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/jobs-ui.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-chain.js",
+  "/assets/jobs-ui.js",
 ];
 
 /**
@@ -367,7 +369,8 @@ const JOBS_SCRIPTS = [
  * rate and adds a percentage, and calculates nothing else.
  */
 const QUOTES_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/quotes-ui.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-chain.js",
+  "/assets/quotes-ui.js",
 ];
 
 /**
@@ -692,13 +695,13 @@ function buildClientsPages() {
       path: urlClients(lang),
       alternates: alt,
       main, jsonld: [ld],
-      // A client's projects link back to /projekty/?id=<id>, and the script has no site
-      // map — so the build hands it this page's own language's address for that page.
-      // A client's projects link back to /projekty/?id=<id> and their jobs to
-      // /zlecenia/?id=<id>; the script has no site map, so the build hands it this
-      // language's address for both.
-      headExtra: `<script>window.LM_CRM = ${JSON.stringify({
-        projects: urlProjects(lang), jobs: urlJobs(lang),
+      // Every address the CRM links to, in this page's language. src/site.mjs is the
+      // only place a slug is decided; the script has no site map, so the build hands it
+      // the whole set — one map for all four Pro screens (session 26), because they now
+      // link to each other in every direction.
+      headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
+        clients: urlClients(lang), jobs: urlJobs(lang), projects: urlProjects(lang),
+        quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: CRM_SCRIPTS,
     }));
@@ -724,8 +727,13 @@ function buildJobsPages() {
       path: urlJobs(lang),
       alternates: alt,
       main, jsonld: [ld],
-      headExtra: `<script>window.LM_JOBS = ${JSON.stringify({
-        projects: urlProjects(lang), clients: urlClients(lang),
+      // Every address the CRM links to, in this page's language. src/site.mjs is the
+      // only place a slug is decided; the script has no site map, so the build hands it
+      // the whole set — one map for all four Pro screens (session 26), because they now
+      // link to each other in every direction.
+      headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
+        clients: urlClients(lang), jobs: urlJobs(lang), projects: urlProjects(lang),
+        quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: JOBS_SCRIPTS,
     }));
@@ -752,11 +760,13 @@ function buildQuotesPages() {
       path: urlQuotes(lang),
       alternates: alt,
       main, jsonld: [ld],
-      // A quote links back to its project, and — through it — to the job and the client
-      // chapter XXIV's path runs through. The script has no site map, so the build hands
-      // it this language's address for all three.
-      headExtra: `<script>window.LM_QUOTES = ${JSON.stringify({
-        projects: urlProjects(lang), jobs: urlJobs(lang), clients: urlClients(lang),
+      // Every address the CRM links to, in this page's language. src/site.mjs is the
+      // only place a slug is decided; the script has no site map, so the build hands it
+      // the whole set — one map for all four Pro screens (session 26), because they now
+      // link to each other in every direction.
+      headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
+        clients: urlClients(lang), jobs: urlJobs(lang), projects: urlProjects(lang),
+        quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: QUOTES_SCRIPTS,
     }));
@@ -783,10 +793,13 @@ function buildCalendarPages() {
       path: urlCalendar(lang),
       alternates: alt,
       main, jsonld: [ld],
-      // Every row links to the job it stands for. The script has no site map, so the
-      // build hands it this language's address for the page that owns those rows.
-      headExtra: `<script>window.LM_CAL = ${JSON.stringify({
-        jobs: urlJobs(lang), clients: urlClients(lang), projects: urlProjects(lang),
+      // Every address the CRM links to, in this page's language. src/site.mjs is the
+      // only place a slug is decided; the script has no site map, so the build hands it
+      // the whole set — one map for all four Pro screens (session 26), because they now
+      // link to each other in every direction.
+      headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
+        clients: urlClients(lang), jobs: urlJobs(lang), projects: urlProjects(lang),
+        quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: CALENDAR_SCRIPTS,
     }));

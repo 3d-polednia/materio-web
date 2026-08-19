@@ -646,28 +646,6 @@ function crmClientCosts(clientId) {
   };
 }
 
-/**
- * The client's history — chapter XX's "historia", derived and never stored.
- *
- * Everything that has happened to a client on this site is a calculation saved into one of
- * their projects, and those lines are already in the workspace with the date they were
- * saved on. Reading them is therefore the whole history; a second log would be a copy that
- * drifts the first time a line is corrected or deleted.
- *
- * @param {string} clientId
- * @param {number} [limit] how many rows to hand back, newest first
- * @returns {{line:object, project:object}[]}
- */
-function crmClientHistory(clientId, limit) {
-  if (typeof wsEstimations !== "function") return [];
-  const rows = [];
-  crmClientProjects(clientId).forEach((p) => {
-    wsEstimations(p.id).forEach((line) => rows.push({ line, project: p }));
-  });
-  rows.sort((a, b) => (b.line.createdAt || 0) - (a.line.createdAt || 0));
-  return limit ? rows.slice(0, limit) : rows;
-}
-
 /** When anything last happened for this client: their own row, or a project of theirs. */
 function crmClientLastAt(clientId) {
   const client = crmClient(clientId);
@@ -1014,28 +992,204 @@ function crmQuoteTotals(quoteId) {
   };
 }
 
+/* ------------------------------------------------------------------ the chain
+ *
+ * Master plan, session 26 (CRM), chapter XXIV:
+ *
+ *     CRM LiczMat Pro ma być lekki. Główna relacja:
+ *     KLIENT → ZLECENIE → PROJEKT → WYCENA → HISTORIA
+ *     Celem jest szybkie zarządzanie pracą fachowca. Nie tworzymy ogromnego systemu ERP.
+ *
+ * **Session 26 adds no collection and no page.** Every link the chapter names was stored
+ * by the four sessions before it — the client keeps `projectIds`, the job keeps `clientId`
+ * and `projectId`, the quote keeps `projectId` — and each of the four screens already
+ * walked its own step. What was missing is the path itself: from a quote there was no way
+ * back to the client without opening two pages, and from a client no way at all to the
+ * quotes their work was priced in. So this section is one walker and one reading, both
+ * derived, and `crm` is the one feature in LM_FEATURES with `route: null` for exactly that
+ * reason.
+ *
+ * Nothing below writes. A chain that was stored would be a fifth copy of four links, free
+ * to disagree with all of them the first time a project changed hands — the argument that
+ * already keeps a cost off a job, a unit price off a shopping item and a date out of the
+ * terminarz.
+ */
+
+/** The nodes of chapter XXIV's path, in the chapter's own order. */
+const CRM_CHAIN = ["client", "job", "project", "quote"];
+
 /**
- * Chapter XXIV's path, read backwards from the quote: WYCENA → PROJEKT → ZLECENIE → KLIENT.
+ * Chapter XXIV's path through one node, walked in both directions.
  *
- * Every step is derived. The quote stores the project; crmJobOfProject() knows which job
- * that project is being done under and crmClientOfProject() which client it is filed with,
- * so the chain is walked rather than copied — and a client renamed on their own page reads
- * correctly here on the next redraw, with nothing to keep in step.
+ * Upwards it is exact: a quote is priced from one project, a project is done under at most
+ * one job, a job is filed with at most one client. Downwards it is not — a client has many
+ * jobs and a project may carry several quotes — so the walker fills in what it can prove
+ * and hands back the rest as a list rather than guessing. `quote` is therefore null for
+ * everything except a walk that *started* at a quote; `quotes` is what the page lists.
  *
- * @returns {{project:object|null, job:object|null, client:object|null}}
+ * @param {"client"|"job"|"project"|"quote"} kind which node `id` names
+ * @param {string} id
+ * @returns {{from:string, client:object|null, job:object|null, project:object|null,
+ *            quote:object|null, quotes:object[]}}
+ */
+function crmChain(kind, id) {
+  const out = { from: String(kind || ""), client: null, job: null, project: null, quote: null, quotes: [] };
+  const key = String(id || "");
+  if (!key || CRM_CHAIN.indexOf(out.from) === -1) return out;
+
+  if (out.from === "quote") {
+    out.quote = crmQuote(key);
+    if (!out.quote) return out;
+    out.quotes = [out.quote];
+  }
+
+  // The project every walk passes through, whichever end it started from.
+  let pid = "";
+  if (out.from === "project") pid = key;
+  else if (out.from === "quote") pid = out.quote.projectId || "";
+  else if (out.from === "job") {
+    out.job = crmJob(key);
+    if (!out.job) return out;
+    pid = out.job.projectId || "";
+  } else {
+    out.client = crmClient(key);
+    if (!out.client) return out;
+    out.quotes = crmClientQuotes(key);
+    return out;
+  }
+
+  if (pid && typeof wsProject === "function") out.project = wsProject(pid);
+  if (pid && !out.job) out.job = crmJobOfProject(pid);
+  // The client is the project's own, and the job's when the project has been filed under
+  // nobody directly: crmAddJob()/crmLinkProject() file it for them, so the two agree, and
+  // the fallback only matters for a link made before that write existed. A walk that
+  // started at a job trusts the job's own field first — the job is where it was typed.
+  if (out.from === "job" && out.job.clientId) out.client = crmClient(out.job.clientId);
+  if (!out.client && pid) {
+    out.client = crmClientOfProject(pid)
+      || (out.job && out.job.clientId ? crmClient(out.job.clientId) : null);
+  }
+  if (pid && out.from !== "quote") out.quotes = crmProjectQuotes(pid);
+  return out;
+}
+
+/**
+ * Chapter XXIV read backwards from a quote: WYCENA → PROJEKT → ZLECENIE → KLIENT.
+ *
+ * Kept as its own name because that is what /wyceny/ asks for and what session 24's test
+ * checks; it is crmChain() underneath, so there is one walker rather than two that can
+ * come to different answers.
  */
 function crmQuoteChain(quoteId) {
-  const quote = crmQuote(quoteId);
-  const pid = quote ? quote.projectId : "";
-  const project = pid && typeof wsProject === "function" ? wsProject(pid) : null;
-  const job = pid ? crmJobOfProject(pid) : null;
-  // The client is the project's own, and a job's client when the project has not been
-  // filed under anybody directly — crmAddJob() files it for them, so the two agree, and
-  // the fallback only matters for a link made before that write existed.
-  const client = pid
-    ? (crmClientOfProject(pid) || (job && job.clientId ? crmClient(job.clientId) : null))
-    : null;
-  return { project: project, job: job, client: client };
+  const chain = crmChain("quote", quoteId);
+  return { project: chain.project, job: chain.job, client: chain.client };
+}
+
+/** The quotes priced from one job's project. A job with no project has none. */
+function crmJobQuotes(jobId) {
+  const job = crmJob(jobId);
+  return job && job.projectId ? crmProjectQuotes(job.projectId) : [];
+}
+
+/**
+ * The quotes priced from any of one client's projects, newest change first.
+ *
+ * Chapter XX lists "wyceny" among the things a client may have, and this is the whole of
+ * that link: a quote stores a project, the client stores their projects, and the two ends
+ * meet here. Nothing is stored on the client for it.
+ */
+function crmClientQuotes(clientId) {
+  const ids = {};
+  crmClientProjects(clientId).forEach((p) => { ids[p.id] = true; });
+  return crmQuotes().filter((q) => q.projectId && ids[q.projectId]);
+}
+
+/* ------------------------------------------------------------------ the history
+ *
+ * Chapter XXIV's last step, and chapter XX's "historia".
+ *
+ * **It is derived and nothing logs it.** Every row below is a document that already exists
+ * with the date it was written on: a client, a job, a quote, a calculation saved into a
+ * project, a cost typed onto one. A log beside them would be a second copy of the same
+ * facts, and it would start lying the first time a row was corrected or deleted — the row
+ * would be gone and its entry would remain.
+ *
+ * What that costs, said plainly: only *creations* are in it. A status moved from "nowe" to
+ * "w toku", a deadline pushed by a week, a margin corrected — none of those leave a dated
+ * trace anywhere in the store (a row carries one `updatedAt`, which says when it last
+ * changed and never what changed), so the history does not claim them. Storing them would
+ * be an event log, which is the ERP chapter XXIV forbids in its last line.
+ */
+
+/** The kinds of row a history can carry, newest-first when they share a millisecond. */
+const CRM_HISTORY_KINDS = ["client", "job", "quote", "calc", "cost"];
+
+/**
+ * What has happened, for a client, a job or a project.
+ *
+ * @param {{clientId?:string, jobId?:string, projectId?:string}} scope exactly one of the
+ *   three. An empty or unknown scope answers [].
+ * @param {number} [limit] how many rows to hand back, newest first
+ * @returns {{at:number, kind:string, id:string, name:string, project:object|null,
+ *            line:object|null, job:object|null, quote:object|null}[]}
+ */
+function crmHistory(scope, limit) {
+  const s = scope || {};
+  const rows = [];
+  const add = (at, kind, id, name, extra) => {
+    const when = Number(at);
+    if (!isFinite(when) || when <= 0) return;
+    rows.push(Object.assign({
+      at: when, kind: kind, id: String(id || ""), name: String(name || ""),
+      project: null, line: null, job: null, quote: null,
+    }, extra || {}));
+  };
+
+  let projects = [];
+  let jobs = [];
+  if (s.clientId) {
+    const client = crmClient(s.clientId);
+    if (!client) return [];
+    add(client.createdAt, "client", client.id, client.name);
+    projects = crmClientProjects(s.clientId);
+    jobs = crmClientJobs(s.clientId);
+  } else if (s.jobId) {
+    const job = crmJob(s.jobId);
+    if (!job) return [];
+    jobs = [job];
+    const project = job.projectId && typeof wsProject === "function" ? wsProject(job.projectId) : null;
+    projects = project ? [project] : [];
+  } else if (s.projectId) {
+    const project = typeof wsProject === "function" ? wsProject(s.projectId) : null;
+    if (!project) return [];
+    projects = [project];
+    const job = crmJobOfProject(s.projectId);
+    if (job) jobs = [job];
+  } else {
+    return [];
+  }
+
+  jobs.forEach((j) => add(j.createdAt, "job", j.id, j.name, { job: j }));
+
+  projects.forEach((project) => {
+    crmProjectQuotes(project.id).forEach((q) =>
+      add(q.createdAt, "quote", q.id, q.name, { quote: q, project: project }));
+    if (typeof wsEstimations !== "function") return;
+    wsEstimations(project.id).forEach((line) => {
+      // A line nothing calculated is chapter XVII's "inne koszty" — it happened too, and
+      // saying which of the two it was is the difference between "policzono" and "dopisano".
+      const manual = typeof wsIsManualLine === "function" && wsIsManualLine(line);
+      add(line.createdAt, manual ? "cost" : "calc", line.id, line.name,
+        { line: line, project: project });
+    });
+  });
+
+  // Newest first. Rows written in the same millisecond — a job and the project it was
+  // created with — are ordered by how far along the chain they are, latest step first, so
+  // a tie reads the same way the list does rather than in whatever order the store held.
+  rows.sort((a, b) => (b.at - a.at)
+    || (CRM_HISTORY_KINDS.indexOf(b.kind) - CRM_HISTORY_KINDS.indexOf(a.kind)));
+  return limit ? rows.slice(0, limit) : rows;
 }
 
 /* ------------------------------------------------------------------ the terminarz
@@ -1151,6 +1305,7 @@ if (typeof module !== "undefined" && module.exports) {
     CRM_KEY, CRM_SCHEMA, CRM_MAX_NAME, CRM_MAX_NOTE,
     JOB_STATUS, JOB_OPEN_STATUS, JOB_DEFAULT_STATUS,
     CAL_BUCKETS, CAL_SOON_DAYS,
+    CRM_CHAIN, CRM_HISTORY_KINDS,
     QUO_MAX_LINES, QUO_MAX_MARGIN,
   };
 }

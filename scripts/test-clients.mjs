@@ -91,7 +91,7 @@ function loadCrm() {
     "crmClients", "crmAllClients", "crmArchivedClients", "crmClient",
     "crmAddClient", "crmUpdateClient", "crmArchiveClient", "crmDeleteClient",
     "crmRestoreClient", "crmLinkProject", "crmUnlinkProject", "crmClientOfProject",
-    "crmClientProjects", "crmFreeProjects", "crmClientCosts", "crmClientHistory",
+    "crmClientProjects", "crmFreeProjects", "crmClientCosts", "crmHistory",
     "crmClientLastAt", "CRM_KEY", "CRM_SCHEMA", "CRM_MAX_NAME", "CRM_MAX_NOTE",
   ], {
     localStorage,
@@ -451,16 +451,17 @@ head("4c. the history is the saved calculations, newest first, and nothing is lo
   crm.tick(60_000);
   save(crm, { projectId: one.id, name: "Fuga" });
 
-  const rows = crm.crmClientHistory(jan.id);
+  const calcs = (id) => crm.crmHistory({ clientId: id }).filter((r) => r.kind === "calc");
+  const rows = calcs(jan.id);
   eq("every saved line is in it", rows.length, 3);
   eq("newest first", rows.map((r) => r.line.name).join(), "Fuga,Panele,Gres");
   eq("each row names the project it happened in", rows[0].project.id, one.id);
-  eq("the limit is honoured", crm.crmClientHistory(jan.id, 2).length, 2);
+  eq("the limit is honoured", crm.crmHistory({ clientId: jan.id }, 2).length, 2);
 
   // A line saved into a project this client does not own is not their history.
   const other = crm.wsAddProject("Cudzy projekt");
   save(crm, { projectId: other.id, name: "Nie moje" });
-  eq("somebody else's project is not in the history", crm.crmClientHistory(jan.id).length, 3);
+  eq("somebody else's project is not in the history", calcs(jan.id).length, 3);
 
   // The last change is the client's own row or any project of theirs, whichever is later.
   crm.tick(60_000);
@@ -611,7 +612,7 @@ head("7. the copy, in four languages");
     "cli_note_t", "cli_note_empty", "cli_contact_none",
     "cli_projects_t", "cli_projects_d", "cli_projects_empty", "cli_project_add",
     "cli_project_none", "cli_unlink",
-    "cli_hist_t", "cli_hist_d", "cli_hist_empty",
+    "crm_hist_t", "crm_hist_d", "crm_hist_empty",
     "ck_p_crm", "pro_open",
     // The keys session 22 leans on that were already here.
     "pro_locked", "pro_more", "feat_clients_t", "feat_clients_d", "ws_mixed_currency",
@@ -623,7 +624,7 @@ head("7. the copy, in four languages");
         Boolean(DICT[lang][key]) && DICT[lang][key] !== key, key);
     }
   }
-  for (const key of ["clipage_title", "cli_new", "cli_edit", "cli_hist_t", "cli_unlink"]) {
+  for (const key of ["clipage_title", "cli_new", "cli_edit", "crm_hist_t", "cli_unlink"]) {
     const all = LANGS.map((l) => DICT[l][key]);
     check(`${key} is actually translated, not copied`, new Set(all).size > 1, all.join(" | "));
   }
@@ -640,7 +641,7 @@ head("7. the copy, in four languages");
   }
   // Chapter XX's own vocabulary, in the language the plan is written in.
   eq("the page is called Klienci in Polish", DICT.pl.clipage_title, "Klienci");
-  eq("and the history is Historia", DICT.pl.cli_hist_t, "Historia");
+  eq("and the history is Historia", DICT.pl.crm_hist_t, "Historia");
 }
 
 /* ------------------------------------------------------------------ report */

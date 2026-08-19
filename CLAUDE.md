@@ -99,6 +99,7 @@ node scripts/test-plan.mjs        # the Free/Pro model: permissions, gating, pla
 node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadline, the links
 node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
 node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
+node scripts/test-crm.mjs         # the chain: the walk, the derived history, one link map
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -123,7 +124,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
 | `assets/plan.js` — the Free/Pro model and the permission table | |
-| `assets/crm.js` — the clients, jobs and quotes of LiczMat Pro, plus `crm-ui.js`, `jobs-ui.js` and `quotes-ui.js` | |
+| `assets/crm.js` — the clients, jobs and quotes of LiczMat Pro, plus `crm-ui.js`, `jobs-ui.js`, `quotes-ui.js` and `crm-chain.js` | |
 | `assets/recent.js`, `assets/dashboard.js` | |
 | `src/*.mjs` — information architecture, site map, templates, page bodies, formulas | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
@@ -283,6 +284,25 @@ scripts/test-calendar-page.mjs  The same clicked through in Chromium, nothing st
                       languages (including the relative wording the browser writes), the
                       currency switch, the widths of chapter XXVIII and the no-JavaScript
                       variant
+scripts/test-crm.mjs   The chain (session 26, chapter XXIV): that the session added no
+                      collection and no page — the Pro store still holds three collections
+                      and walking the chain writes nothing; crmChain() from all four ends,
+                      exact upwards and a list downwards, with every way a walk can fail;
+                      crmQuoteChain() answering out of the same walker; a client's quotes
+                      and a job's quotes, neither of them stored anywhere; crmHistory() —
+                      which documents make a row, the order, the three scopes, and the
+                      status change that deliberately leaves no trace; the `crm` feature,
+                      which is PRO with no route, and chapter XXV's gate in both states;
+                      the one `window.LM_LINKS` map that replaced four; and the copy in
+                      four languages. Dependency-free — run it after touching the chain
+                      half of assets/crm.js, assets/crm-chain.js or a crm_* key
+scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
+                      strip on a job, a step nobody filled in, the quotes and the history
+                      on both the job and the client, the whole loop walked by clicking
+                      (job → client → quote → job) with the Back button through it, the
+                      store byte-for-byte unchanged by all of it, four languages with each
+                      language's own addresses, the currency, the widths of chapter XXVIII
+                      and the no-JavaScript variant
 scripts/test-quotes-page.mjs  The same clicked through in Chromium, nothing stubbed: a quote
                       added against a project, labour typed on as quantity × rate and as a
                       lump sum, a line corrected in its own row and removed, the margin
@@ -338,6 +358,11 @@ assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/.
                       ?id=<projectId> — and this file shows one of them, including the
                       material list of chapter XVI and, since session 20, the project's
                       rooms and the picker that files one calculation under one of them
+assets/crm-chain.js   Chapter XXIV's path, drawn: the strip of four steps, the quotes list
+                      and the history list, shared by /klienci/, /zlecenia/ and /wyceny/ so
+                      the chain reads the same wherever it is standing. Every name in it
+                      starts `chn` — these are plain scripts in one global scope. It reads
+                      and never writes; the addresses come from window.LM_LINKS
 assets/crm.js         The Pro workspace: clients, jobs and quotes — plus the terminarz of
                       session 25, which is a reading of the jobs rather than a fourth
                       collection. localStorage under its own key
@@ -675,6 +700,39 @@ Kotlin side of it. Change one, change all three.
   `scripts/test-jobs.mjs` and `scripts/test-quotes.mjs` do the same for the second and the
   third module — the switch is still one variable, whatever number of modules hang off it.
 
+- **The chain is walked, never stored, and session 26 added no collection and no page.**
+  Chapter XXIV's path — KLIENT → ZLECENIE → PROJEKT → WYCENA → HISTORIA — is made entirely
+  of links sessions 22–25 already wrote: `projectIds` on the client, `clientId` and
+  `projectId` on the job, `projectId` on the quote. So `crmChain(kind, id)` walks them
+  from any end and `crm` is the one feature in `LM_FEATURES` with `route: null`. A stored
+  chain would be a fifth copy of four links, free to disagree with all of them the first
+  time a project changed hands — the argument that already keeps a cost off a job, a unit
+  price off a shopping item and a date out of the terminarz. Upwards the walk is exact (a
+  quote has one project, a project at most one job, a job at most one client); downwards it
+  hands back a list and guesses nothing, because a client has many jobs. `crmQuoteChain()`
+  kept its name and calls `crmChain()` underneath: two walkers over the same links would
+  eventually answer one question two ways.
+- **The history is derived from the documents and their dates, and it does not claim
+  changes.** `crmHistory({clientId | jobId | projectId})` builds a row out of the client,
+  each job, each quote, each saved calculation and each hand-typed cost — every one of them
+  a document that already carries the date it was written on. What that leaves out is said
+  out loud on the page (`crm_hist_note`): a status moved from "nowe" to "w toku" and a
+  deadline pushed by a week leave **no** dated trace anywhere in the store, because a row
+  carries one `updatedAt` that says when it last changed and never what changed. Recording
+  them means an event log, which is the ERP chapter XXIV forbids in its last line — and a
+  log would start lying the first time a row was deleted: the row would be gone and its
+  entry would remain. Deleting a job removes its history row; the undo brings it back.
+- **One link map, `window.LM_LINKS`, on all four Pro pages.** The build writes the five
+  addresses (clients, jobs, projects, quotes, calendar) in that page's own language, in
+  place of the four half-maps sessions 22–25 wrote (`LM_CRM`, `LM_JOBS`, `LM_QUOTES`,
+  `LM_CAL`). The screens link to each other in every direction now, and four maps each
+  holding half the site map is one moved slug away from disagreeing. `/terminarz/` gets the
+  same map and does **not** load `assets/crm-chain.js`: it draws no chain, so it does not
+  download one.
+- **The chain stops at the edge of Pro, and `/projekty/` is that edge.** A project is the
+  middle of chapter XXIV's path, but its route is GUEST and it loads nothing from the CRM.
+  A strip there would carry Pro data onto a guest page, so the link runs one way: from the
+  strip into the project, never back.
 - **`/app/` has five tabs, and rooms are not one of them.** Chapter XVIII makes a room an
   element of a project, so `renderProjects()` draws each project's rooms inside its row
   with an add form of its own, and the rooms nobody assigned get one list at the bottom —

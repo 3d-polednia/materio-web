@@ -51,8 +51,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 23 | Zlecenia | **Zrobione** — 2026-08-19 |
 | 24 | Wyceny | **Zrobione** — 2026-08-19 |
 | 25 | Terminarz | **Zrobione** — 2026-08-19 |
-| 26 | CRM | **Następna** |
-| 27–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 26 | CRM | **Zrobione** — 2026-08-19 |
+| 27 | Paywall Pro | **Następna** |
+| 28–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -1914,6 +1915,37 @@ Do decyzji właściciela zostają trzy rzeczy, wszystkie **poza zakresem Sesji 2
 
 Sesja 26 (CRM) łączy klienta, zlecenie, projekt, wycenę i historię w jedną drogę — to tam
 te powiązania mają być pokazane razem, i dlatego Sesja 24 nie dokładała ich po jednym.
+
+### Ścieżka CRM jest chodzona, nie zapisana — i czego historia nie umie pokazać (z Sesji 26)
+
+Sesja 26 nie dołożyła ani kolekcji, ani strony. Wszystkie powiązania rozdziału XXIV
+zapisały już sesje 22–25: klient trzyma swoje projekty, zlecenie trzyma klienta i projekt,
+wycena trzyma projekt. Brakowało samej **ścieżki** — z wyceny nie było jak wrócić do klienta
+bez otwierania dwóch stron, a z klienta nie było jak dojść do wycen w ogóle. Doszły więc
+jeden spacer po powiązaniach (`crmChain()`) i jedno czytanie (`crmHistory()`), oba
+wyliczane, plus jeden pasek, który rysuje je tak samo na `/klienci/`, `/zlecenia/`
+i `/wyceny/`. Zapisana ścieżka byłaby piątą kopią czterech powiązań i rozjechałaby się
+z nimi przy pierwszej zmianie właściciela projektu — ten sam argument, który trzyma koszt
+poza zleceniem, cenę jednostkową poza materiałem, a datę poza terminarzem.
+
+**Czego historia świadomie nie pokazuje: zmian.** W magazynie są tylko daty *powstania*
+dokumentów. Wiersz ma jedno `updatedAt`, które mówi *kiedy* coś się zmieniło i nigdy *co*,
+więc historia pokazuje: dodano klienta, dodano zlecenie, dodano wycenę, zapisano kalkulację,
+dopisano koszt — i nic ponadto. Status przestawiony z „nowe" na „w toku" i termin przesunięty
+o tydzień **nie zostawiają śladu**, i strona mówi to wprost zdaniem pod listą, zamiast udawać
+komplet. Dziennik zdarzeń, który by je zapamiętał, jest dokładnie tym ERP-em, którego
+rozdział XXIV zakazuje w ostatnim zdaniu — i zacząłby kłamać przy pierwszym skasowanym
+wierszu, bo wiersza by nie było, a wpis by został.
+
+Do decyzji właściciela zostają dwie rzeczy, obie **poza zakresem Sesji 26**:
+
+- **Czy historia ma pamiętać zmiany statusu i terminu.** To jest decyzja o dzienniku
+  zdarzeń: własna kolekcja, własne reguły przy kasowaniu i cofaniu, i pytanie, co robić
+  z wpisem po skasowaniu zlecenia. Da się to zrobić uczciwie, ale to jest osobna sesja
+  i wprost pod granicą z rozdziału XXIV.
+- **Czy ścieżka ma sięgać na strony spoza Pro.** Projekt jest środkiem łańcucha, ale
+  `/projekty/` jest trasą `GUEST` i nie ładuje niczego z CRM-u. Pasek na projekcie
+  oznaczałby wożenie Pro na stronę gościa — świadomie tego nie zrobiłem.
 
 ### Terminarz niczego nie zapisuje — i co z tego wynika dla właściciela (z Sesji 25)
 

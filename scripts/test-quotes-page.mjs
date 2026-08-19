@@ -306,15 +306,22 @@ head("2b. chapter XXII's five figures, on the page");
 head("2c. chapter XXIV read backwards: the quote names its job and its client");
 {
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  // Session 26 draws the strip every CRM screen shares: chapter XXIV's four nodes in the
+  // chapter's own order. The quote is the node the visitor is standing on, so it is a name
+  // and not a link — a link to this page is a dead click — which leaves three.
   const links = await page.$$eval("#quo-chain-line a",
     (a) => a.map((n) => `${n.getAttribute("href")}|${n.textContent.trim()}`));
-  eq("both steps are there", links.length, 2);
+  eq("the three steps above this quote are there", links.length, 3);
   check("the client, linked to their own page",
     links[0].includes("c1") && links[0].includes("Jan Kowalski"), links[0]);
   check("and the job, linked to its own", links[1].includes("j1") && links[1].includes("Łazienka na Pięknej"), links[1]);
+  check("and the project it is priced from", links[2].includes("p1"), links[2]);
   check("the client link is this language's address",
     links[0].startsWith(urlClients("pl")), links[0]);
   check("and so is the job's", links[1].startsWith(urlJobs("pl")), links[1]);
+  eq("the quote itself is the step you are on, and links nowhere",
+    await page.$eval("#quo-chain-line li.on b", (n) => n.textContent.trim()),
+    "Łazienka — wycena");
 
   // Derived means derived: nothing about either is written onto the quote.
   const stored = (await liveQuotes(page))[0];
@@ -475,8 +482,12 @@ head("5. the project is read, never written — and it can be detached and attac
   eq("detaching empties the two derived figures",
     minor(await page.textContent("#quo-fig-other")), 0);
   eq("and the labour is untouched", minor(await page.textContent("#quo-fig-labour")), LABOUR);
-  eq("the chain has nothing left to show",
-    await page.$$eval("#quo-chain-line a", (a) => a.length), 0);
+  // With no project there is nothing above the quote any more, so every step of the strip
+  // is the way to make one: the section's own index, with no ?id= behind it.
+  eq("no step of the chain resolves any more",
+    await page.$$eval("#quo-chain-line a[href*='?id=']", (a) => a.length), 0);
+  eq("and each one offers the page that would fill it",
+    await page.$$eval("#quo-chain-line li.off a", (a) => a.length), 3);
 
   await page.selectOption("#quo-project-pick", { label: "Remont łazienki" });
   await page.click("#quo-project-form button[type=submit]");
