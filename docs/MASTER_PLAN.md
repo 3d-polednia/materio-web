@@ -52,8 +52,9 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 24 | Wyceny | **Zrobione** — 2026-08-19 |
 | 25 | Terminarz | **Zrobione** — 2026-08-19 |
 | 26 | CRM | **Zrobione** — 2026-08-19 |
-| 27 | Paywall Pro | **Następna** |
-| 28–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 27 | Paywall Pro | **Zrobione** — 2026-08-19 |
+| 28 | Płatności | **Następna** |
+| 29–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -1976,22 +1977,49 @@ było ruszyć: **`/wyceny/` (Sesja 24) było zadeklarowane jako indeksowane, ale
 w `sitemap.xml`.** Cztery adresy wyceny i cztery terminarza są tam teraz; test Sesji 25
 sprawdza to dla własnych stron, tak samo jak test Sesji 23 dla zleceń.
 
-### Moduł Pro jest dziś otwarty dla każdego — zamek przychodzi z Sesją 27 (z Sesji 22)
+### Zamek stoi, a przejściem jest podgląd — bo kupić Pro jeszcze się nie da (z Sesji 27)
 
-`/klienci/` mówi na górze „Dostępne w LiczMat Pro" i jednym zdaniem, że planu Pro nic
-jeszcze nie nadaje, więc moduł jest na razie otwarty. To jest świadoma decyzja tej sesji,
-nie luka: gdyby zamek stanął dziś, moduł byłby zamknięty **dla każdego istniejącego konta**,
-bo żadne nie ma `plan: premium` — łącznie z kontem, które ma sprawdzić, czy moduł działa.
-Rozdział XXV podaje kolejność wprost: najpierw funkcje Pro, potem sprawdzenie działania
-i uprawnień, paywall na końcu.
+`LM_PRO_LOCKED` jest `true`. Pięć modułów Pro jest zamkniętych dla gościa i dla darmowego
+konta, a zamiast nich stoi paywall: nazwa modułu, „Dostępne w LiczMat Pro", pozostałe
+cztery moduły z opisami, jedno zdanie dobrane do poziomu (gość → załóż konto, darmowe
+konto → to jest Pro) i link do rejestracji, który wraca na tę samą stronę w tym samym
+języku. Zamek dotyczy **tylko** funkcji `PRO`: kalkulatory, projekty, materiały, koszty
+i pomieszczenia zostają otwarte, bo rozdział II zabrania blokowania podstaw po to, żeby
+wymusić przejście na Pro.
 
-Cały mechanizm jest już na miejscu i przetestowany w obie strony: `lmFeatureState()`
-w `assets/plan.js` odpowiada `allowed / gated / locked`, blok bramki siedzi w HTML-u od
-pierwszego renderu (ukryty), a **jedynym przełącznikiem jest `LM_PRO_LOCKED`**. Sesja 27
-zmienia jedną linijkę; test sprawdza obie odpowiedzi, więc nie będzie to zmiana na ślepo.
-Sesja 23 dołożyła drugi moduł (`/zlecenia/`), Sesja 24 trzeci (`/wyceny/`), Sesja 25
-czwarty (`/terminarz/`) — ten sam przełącznik i ten sam test w każdym z nich. Liczba
-modułów nie zmienia tego, że przełącznik jest jeden.
+**Problem, który sesje 21–26 zostawiły, i odpowiedź na niego.** Planu Pro nadal nic nie
+nadaje (`FIRESTORE_SYNC` §9.2), a płatności to Sesja 28. Sam zamek zabrałby więc pięć
+działających modułów **każdemu istniejącemu kontu** i nie dałby w zamian niczego — łącznie
+z kontem właściciela, które ma sprawdzić, czy moduły działają, czego rozdział XXV wymaga
+*przed* płatnościami. Dlatego paywall proponuje **podgląd Pro**: jeden klucz
+w `localStorage` (`liczmat-pro-preview`), na tym urządzeniu, otwierający wszystkie moduły
+Pro naraz i mówiący wprost, czym nie jest — nie zmienia planu przy koncie, nie
+synchronizuje się, telefon go nie widzi, a `lmLevelOf()` go nie czyta. Pasek nad otwartym
+modułem pisze wtedy „Podgląd Pro", nie „Twój plan: LiczMat Pro". Ten sam przełącznik jest
+w zakładce Pro na `/app/`, bo tam idzie się sprawdzić, jaki ma się plan.
+
+**Ściana jest jedna.** `proGate()` w `src/pro.mjs` zastąpił cztery kopie bloku z sesji
+22–25, a `assets/paywall.js` cztery kopie `xxxRenderPro()`. Cztery ściany to cztery szanse
+na opisanie tego samego produktu czterema zdaniami, a to jedyne miejsce w serwisie, gdzie
+taka rozbieżność kosztuje pieniądze.
+
+Do decyzji właściciela zostają trzy rzeczy, wszystkie **poza zakresem Sesji 27**:
+
+- **Ile Pro ma kosztować i w jakim modelu.** Paywall nie podaje ceny, bo jej nie ma.
+  Kwota, okres rozliczeniowy i to, czy jest plan roczny, są wejściem do Sesji 28, nie jej
+  wynikiem — i do Sesji 29, która ma tę cenę pokazać na `/liczmat-pro/`.
+- **Kiedy podgląd Pro ma zniknąć.** Dziś nie ma daty końca ani licznika: byłyby obietnicą
+  terminu, którego nikt nie zna. Sesja 28 zastępuje podgląd subskrypcją i wtedy trzeba
+  zdecydować, co dzieje się z przeglądarką, która ma podgląd włączony — wygasa cicho, czy
+  mówi, że teraz jest to płatne.
+- **Czy podgląd ma zostać po uruchomieniu płatności jako okres próbny.** To jest to samo
+  jedno pole, ale zupełnie inna decyzja produktowa: okres próbny liczy się na koncie i na
+  serwerze, a podgląd jest lokalny i niczego nie obiecuje.
+
+Uwaga techniczna dla Sesji 28: podgląd jest celowo **jednym kluczem i jedną parą funkcji**
+(`lmProPreview()` / `lmSetProPreview()`), żeby jego usunięcie było skasowaniem, a nie
+rozplątywaniem. Zamek jest nadal jednym `LM_PRO_LOCKED`, a testy sprawdzają obie jego
+odpowiedzi — również tę sprzed Sesji 27.
 
 ### Warstwa konta nie została po tej sesji sprawdzona na żywym Firebase
 

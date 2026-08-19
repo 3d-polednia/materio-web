@@ -849,19 +849,18 @@ liczbę, która nic nie znaczy.
 przydarzyło, to kalkulacje zapisane w jego projektach, a te już mają datę. Drugi dziennik
 rozjechałby się przy pierwszej poprawionej pozycji.
 
-**Rozdział XXV, i dlaczego dziś to jest napis, a nie zamek.** Nad modułem stoi pasek:
-„Dostępne w LiczMat Pro" i jedno zdanie, które mówi prawdę — planu Pro **nic jeszcze nie
-nadaje** (`FIRESTORE_SYNC` §9.2: żadnych Cloud Functions, żadnych płatności; `plan` jest
-polem tylko do zapisu po stronie serwera), więc moduł jest na razie otwarty. Zamek dziś
-zamknąłby moduł **każdemu istniejącemu kontu**, łącznie z tym, które ma sprawdzić, czy
-moduł działa — a rozdział XXV wymaga dokładnie tej kolejności: najpierw funkcje Pro,
-potem sprawdzenie działania i uprawnień, paywall na końcu (Sesja 27), płatności po nim
-(Sesja 28).
+**Rozdział XXV — od Sesji 27 to jest zamek.** Ten akapit opisywał stan Sesji 22, w którym
+nad otwartym modułem stał tylko napis; **jest nieaktualny — patrz §7.12**. Zostaje jako
+zapis powodu, bo powód nie zniknął: planu Pro nadal **nic nie nadaje** (`FIRESTORE_SYNC`
+§9.2), więc sam zamek zamknąłby moduł każdemu istniejącemu kontu, łącznie z tym, które ma
+sprawdzić, czy moduł działa. Sesja 27 odpowiedziała na to podglądem Pro, a nie odłożeniem
+zamka.
 
-Mechanizm jest już cały na miejscu: `lmFeatureState(id, level)` w `assets/plan.js`
-odpowiada `allowed / gated / locked`, blok bramki jest w HTML-u od pierwszego renderu
-(ukryty), a **jedynym przełącznikiem Sesji 27 jest `LM_PRO_LOCKED`**. Test sprawdza obie
-odpowiedzi — także tę po przełączeniu — więc paywall nie będzie pisany na ślepo.
+Kolejność rozdziału XXV jest zachowana: najpierw funkcje Pro (Sesje 22–26), potem
+sprawdzenie działania i uprawnień, paywall (Sesja 27), płatności po nim (Sesja 28).
+Mechanizm był na miejscu od Sesji 21 — `lmFeatureState(id, level)` odpowiada
+`allowed / gated / locked`, blok bramki jest w HTML-u od pierwszego renderu — i test
+sprawdzał obie odpowiedzi, także tę po przełączeniu, więc paywall nie był pisany na ślepo.
 
 **Link jest w stopce z `navLevel: PRO`.** Menu pokazuje go dopiero na Pro, ale znacznik
 zostaje w HTML-u i bez JavaScriptu jest widoczny — to ten sam mechanizm, co przy
@@ -1141,7 +1140,83 @@ wożenie danych Pro na stronę gościa — link idzie tam w jedną stronę, z pa
 
 **Rozdział XXV — bez zmian.** Ścieżka nie ma własnego paska „Dostępne w LiczMat Pro",
 bo nie ma własnej strony: rysuje się wewnątrz trzech modułów, które ten pasek już mają,
-i znika razem z nimi, kiedy `LM_PRO_LOCKED` zostanie przestawione w Sesji 27.
+i znika razem z nimi — co nastąpiło w Sesji 27, patrz niżej.
+
+---
+
+### 7.12. Paywall — zamek, komunikaty i przejście Free → Pro (Sesja 27)
+
+Rozdział XXV, cztery punkty Sesji 27: **blokady, komunikaty, prezentacja funkcji Pro,
+przejście Free → Pro**. Sesje 21–26 zostawiły całą mechanikę gotową i jeden przełącznik
+nieprzestawiony; ta sesja go przestawiła i dobudowała ścianę, którą teraz widać.
+
+**`LM_PRO_LOCKED` jest `true`.** Pięć modułów Pro — klienci, zlecenia, wyceny, terminarz
+i sama ścieżka CRM — jest zamkniętych dla gościa i dla darmowego konta. Zamek dotyczy
+**wyłącznie** funkcji `PRO`: `sync` i `share` są `LICZMAT` i stoi przed nimi formularz
+logowania, a nie ściana z ceną, więc `lmFeatureState()` odpowiada dla nich `gated` bez
+`locked`. Kalkulatory, projekty, materiały, koszty i pomieszczenia są `GUEST` i zamek ich
+nie dotyka — rozdział II mówi wprost, że nie wolno blokować podstawowych funkcji, żeby
+wymusić przejście na Pro.
+
+**Podgląd Pro — jedyne przejście, jakie da się dziś zbudować uczciwie.** Planu Pro nadal
+**nic nie nadaje** (`FIRESTORE_SYNC` §9.2: brak Cloud Functions, brak płatności, `plan`
+jest polem tylko serwera), a płatności to Sesja 28. Zamek bez żadnych drzwi zabrałby pięć
+działających modułów każdemu istniejącemu kontu i nie dałby w zamian niczego — łącznie
+z kontem, które ma sprawdzić, czy moduły działają, czego rozdział XXV wymaga *przed*
+płatnościami. Dlatego paywall proponuje podgląd i mówi wprost, czym on jest:
+
+- jeden klucz w `localStorage` (`liczmat-pro-preview`, `assets/plan.js`), na tym
+  urządzeniu;
+- otwiera **wszystkie** moduły Pro naraz — pięć osobnych przełączników to pięć sposobów
+  na bycie w połowie środka;
+- **nie zmienia planu przy koncie**, nie synchronizuje się, telefon go nie widzi;
+- `lmLevelOf()` go nie czyta. Poziom nadal wyprowadzany jest w jednym miejscu, z Firebase;
+  podgląd przesuwa ścianę, nie poziom. `lmFeatureState()` zwraca przy nim `allowed: false`
+  i `preview: true`, więc strona nigdy nie napisze „Twój plan: LiczMat Pro" nad czymś,
+  czego nikt nie kupił.
+
+Sesja 28 zastępuje podgląd subskrypcją. Jest celowo jednym kluczem i jedną parą funkcji,
+żeby jego usunięcie było skasowaniem, a nie rozplątywaniem.
+
+**Ściana jest jedna, budowana raz.** `proGate()` w `src/pro.mjs` w miejsce czterech kopii
+z Sesji 22–25; `assets/paywall.js` w miejsce czterech kopii `xxxRenderPro()`. Cztery ściany
+to cztery szanse na to, żeby ten sam produkt opisać czterema różnymi zdaniami — a paywall
+jest jedynym miejscem w serwisie, w którym taka rozbieżność kosztuje pieniądze. Ściana
+niesie:
+
+| Element | Rozdział XXV |
+|---|---|
+| nazwa modułu i zdanie o nim, „Dostępne w LiczMat Pro" | *blokady*, *komunikaty* |
+| pozostałe cztery moduły Pro, każdy z nazwą i opisem | *prezentacja funkcji Pro* |
+| jedno zdanie dobrane do poziomu: gość → załóż konto, darmowe konto → to jest Pro | *komunikaty* |
+| link do rejestracji z `?next=` na tę stronę, w jej języku | *przejście Free → Pro* |
+| „Poznaj LiczMat Pro" — zdanie, dopóki `/liczmat-pro/` jest `PLANNED` (Sesja 29) | *nigdy martwy przycisk* |
+| podgląd Pro i zdanie o tym, czym nie jest | *przejście Free → Pro* |
+| „Płatności jeszcze nie ma" | uczciwość |
+
+**Blok jest w HTML-u od pierwszego renderu i `hidden`.** Ściana tworzona przez skrypt to
+moduł, który mignie otwarty, zanim się zamknie. Odwrotnie też: gdyby `assets/plan.js` się
+nie wczytał, `pwState()` odpowiada „otwarte" — wiersze leżą w `localStorage` tej
+przeglądarki, więc ukrycie komuś jego własnych klientów za skryptem, który nie dojechał,
+jest gorszą z dwóch awarii. Ściana nie jest granicą bezpieczeństwa i nigdy nią nie była:
+granicą są wdrożone reguły Firestore, a magazyn CRM-u nie jedzie nigdzie.
+
+**Pasek nad modułem znika, kiedy ściana stoi** — mówi to samo co ściana, a dwa razy jest
+gorzej niż raz. Kiedy moduł jest otwarty, pasek mówi jedną z dwóch rzeczy: „Twój plan:
+LiczMat Pro" (konto Pro, znacznik `on`) albo „Podgląd Pro" plus zdanie, że plan się nie
+zmienił, i przycisk wyłączający. Konto Pro nie dostaje przycisku „wyłącz podgląd" — nie ma
+czego wyłączać, a taka propozycja u kogoś, kto płaci, czyta się jak groźba.
+
+**Ten sam przełącznik jest w zakładce Pro na `/app/`**, bo tam idzie się sprawdzić, jaki
+ma się plan. To jeden wspólny blok (`proPreviewBlock()`), więc dwa miejsca nie mogą go
+opisać inaczej, a karta planu dopisuje przy włączonym podglądzie zdanie, że planu to nie
+ruszyło. Etykieta przycisku jest pisana przez `assets/paywall.js`, nie przez `data-i18n`:
+`/app/` tłumaczy się w miejscu, więc `data-i18n` przywróciłby „włącz" na włączonym
+podglądzie przy pierwszej zmianie języka.
+
+**Czego ta sesja nie zrobiła:** płatności (Sesja 28) i strony `/liczmat-pro/` (Sesja 29).
+`plan` nadal jest polem tylko serwera, nic go nie zapisuje, w panelu nie ma formularza ani
+przycisku, który brałby pieniądze — i test tego pilnuje.
 
 ---
 
@@ -1350,6 +1425,7 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | centrum kalkulatorów (Sesja 7) | kalkulator w żadnej kategorii albo w dwóch naraz; kategoria z nieznanym kalkulatorem lub pusta; brak nazwy albo opisu kategorii w słowniku; skrót „Od czego zacząć”, którego nie potwierdza żaden poradnik |
 | poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z czterech języków |
 | model Free / Pro (Sesja 21) | funkcja zadeklarowana dwa razy; funkcja z nieznanym poziomem albo na nieistniejącej trasie; funkcja `PRO` na trasie, która nie jest `PRO`; trasa `PRO`, której nie pokrywa żadna funkcja; funkcja `PRO` bez tekstu do bramki; `LM_PLAN` rozjeżdżające się z kontraktem; brak któregokolwiek klucza `pro_*` / `plan_*` / `feat_*` w którymkolwiek z czterech języków |
+| paywall (Sesja 27) | ściana przed funkcją, której nie ma w `LM_FEATURES` (`proGate()` przerywa build); brak któregokolwiek klucza `pro_need_*` / `pro_prev_*` / `pro_incl_t` / `pro_signin` w którymkolwiek z czterech języków |
 | widoki (Sesja 15) | widok bez rodzica, na trasie planowanej albo na innym widoku; widok indeksowany; widok w menu lub w stopce; widok wymagający wyższego poziomu niż rodzic; widok inaczej zlokalizowany niż rodzic; adres widoku poza adresem rodzica albo gubiący identyfikator; `view: true` na trasie, która nie jest `LIVE` |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.

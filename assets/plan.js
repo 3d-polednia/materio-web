@@ -7,11 +7,16 @@
  * are shown to somebody who does not have it — is `src/pro.mjs`, built from the PRO
  * routes in `src/ia.mjs` and checked against the table below.
  *
+ * Session 27 added the fifth thing: the paywall. LM_PRO_LOCKED, the preview beside it and
+ * lmPaywall() are the decision; `assets/paywall.js` draws it and `src/pro.mjs` builds the
+ * markup it draws into.
+ *
  * It is deliberately NOT loaded on every page. `assets/account.js` is, because 128 pages
- * need to word one sentence about the session; nothing outside /app/ offers a Pro feature
- * yet, so nothing outside /app/ pays for this. It loads after account.js and uses its
- * LM_LEVEL and lmLevelOf() — the level is derived in exactly one place and this file does
- * not derive it a second time.
+ * need to word one sentence about the session; this one is loaded by the five pages that
+ * offer a Pro feature — /klienci/, /zlecenia/, /wyceny/, /terminarz/ and /app/ — and by
+ * nothing else. It loads after account.js and uses its LM_LEVEL and lmLevelOf(): the
+ * level is derived in exactly one place and this file does not derive it a second time.
+ * The preview does not derive one either — it moves the wall, never the level.
  *
  * Nothing here is a security boundary. The browser decides what to *show*; the deployed
  * Firestore rules decide what may be *written*, and `plan` is a field only the server can
@@ -182,40 +187,142 @@ function lmGate(id, level) {
   return lmAllows(level, f.level) ? null : { feature: f, need: f.level };
 }
 
+/* ------------------------------------------------------------------ the paywall */
+
 /**
  * Whether a feature the visitor's level does not reach is *closed*, or only marked as Pro.
  *
  * Chapter XXV asks for both, in this order: "Użytkownik darmowy powinien rozumieć, które
  * funkcje są Pro" first, and payments "dopiero po zbudowaniu funkcji Pro, sprawdzeniu ich
- * działania, przetestowaniu uprawnień, przygotowaniu paywalla". Sessions 22–26 build the
- * modules; session 27 is the paywall and session 28 the payments.
+ * działania, przetestowaniu uprawnień, przygotowaniu paywalla". Sessions 22–26 built the
+ * five modules; **session 27 flipped this to `true`** and session 28 adds the payments.
  *
- * Until then this is `false`, and that is a deliberate, reversible decision rather than a
- * gap: **nothing grants Pro** (FIRESTORE_SYNC §9.2 — no Cloud Functions, no Play Billing,
- * and `plan` is server-only), so a lock today would close every Pro module to every
- * account in existence, including the one that has to check the module works before there
- * is anything to pay for. So a gated visitor is *told* the module is LiczMat Pro — the
- * words are chapter XXV's own — and the module below the notice still runs.
+ * Sessions 21–26 left it `false` on purpose, and said why: nothing grants Pro
+ * (FIRESTORE_SYNC §9.2 — no Cloud Functions, no Play Billing, and `plan` is server-only),
+ * so a lock closes every Pro module to every account there is, including the one that has
+ * to check the module works. That argument did not disappear when the paywall was built —
+ * it is answered by LM_PRO_PREVIEW_KEY below, which is the one door through this lock
+ * until a payment can open it properly.
  *
- * Session 27 flips this one variable. Nothing else has to change: every page asks
- * lmFeatureState() and already renders both answers.
+ * Still not a security boundary. The CRM store is `localStorage` on one device and is in
+ * no sync contract; this decides what the page *shows*.
  */
-var LM_PRO_LOCKED = false;
+var LM_PRO_LOCKED = true;
+
+/**
+ * The Pro preview: this browser's own answer to "let me see what I would be paying for".
+ *
+ * Session 27 turned the lock on while session 28 still owes the payment, which leaves a
+ * gap nobody can cross: a free account cannot become Pro, so a hard lock would take five
+ * working modules away and give nothing back — including from the owner, who has to check
+ * they work before there is anything to buy (chapter XXV's own order).
+ *
+ * So the paywall offers the preview, and is honest about what it is: one key in
+ * `localStorage`, on this device, that opens the Pro modules **without touching the plan
+ * on the account**. It grants nothing on the server — `plan` is server-only and the
+ * deployed rules refuse a client write — it is not synced, the phone never sees it, and
+ * `lmLevelOf()` does not read it: the visitor's level is still derived in exactly one
+ * place, from Firebase, and the preview moves the paywall rather than the level.
+ *
+ * Session 28 replaces it with a subscription. It is deliberately one key and one function
+ * pair, so that removal is a deletion rather than an unpicking.
+ */
+var LM_PRO_PREVIEW_KEY = "liczmat-pro-preview";
+
+/** Whether the Pro preview is on in this browser. Storage refused reads as off. */
+function lmProPreview() {
+  try { return localStorage.getItem(LM_PRO_PREVIEW_KEY) === "1"; } catch (e) { return false; }
+}
+
+/**
+ * Turn the preview on or off, and tell the page.
+ *
+ * `lm-preview` is a separate event from `lm-session` because it is a separate thing: the
+ * session moved (somebody signed in) versus the paywall moved (somebody looked behind it).
+ * A page that redraws on both keeps them apart in its own head too.
+ */
+function lmSetProPreview(on) {
+  try {
+    if (on) localStorage.setItem(LM_PRO_PREVIEW_KEY, "1");
+    else localStorage.removeItem(LM_PRO_PREVIEW_KEY);
+  } catch (e) {
+    // Private mode with storage refused: the preview cannot be remembered, so it is off.
+  }
+  if (typeof document !== "undefined" && typeof CustomEvent === "function") {
+    document.dispatchEvent(new CustomEvent("lm-preview", { detail: { on: lmProPreview() } }));
+  }
+}
 
 /**
  * How a page should present one feature to a visitor at `level`.
  *
- * @returns {{allowed:boolean, gated:boolean, locked:boolean, feature:object|null}}
- *   allowed the level reaches it
+ * @returns {{allowed:boolean, gated:boolean, locked:boolean, preview:boolean,
+ *            feature:object|null}}
+ *   allowed the level reaches it — the plan on the account says so
  *   gated   it does not — say what the module is and that it is Pro (chapter XXV)
- *   locked  and show the gate *instead of* the module. LM_PRO_LOCKED, above
+ *   locked  and show the paywall *instead of* the module. LM_PRO_LOCKED, above
+ *   preview the level does not reach it and the module runs anyway, because this browser
+ *           turned the preview on. Never true together with `allowed`: a preview is not
+ *           a plan, and a page that said "Twój plan: LiczMat Pro" over one would be lying
  *
  * An unknown feature id is closed, for the reason lmCan() answers false: a typo should
- * shut a door, not open one.
+ * shut a door, not open one — and the preview does not open it either.
  */
 function lmFeatureState(id, level) {
   var f = lmFeature(id);
-  if (!f) return { allowed: false, gated: true, locked: true, feature: null };
+  if (!f) return { allowed: false, gated: true, locked: true, preview: false, feature: null };
   var allowed = lmAllows(level, f.level);
-  return { allowed: allowed, gated: !allowed, locked: !allowed && LM_PRO_LOCKED, feature: f };
+  // The preview answers for Pro and for nothing else. `sync` and `share` need a real
+  // Firebase user and a document the rules accept; no key in this browser can supply one,
+  // so offering to preview them would be a switch that does nothing.
+  var preview = !allowed && f.level === LM_LEVEL.PRO && lmProPreview();
+  // LM_PRO_LOCKED is the *Pro* lock, and it walls off Pro features only. A LICZMAT
+  // feature out of a guest's reach — `sync`, `share` — is gated and not locked: what
+  // stands in its way is the sign-in form on /app/, which asks for an account rather
+  // than for money, and a paywall in front of it would be asking for the wrong thing.
+  return {
+    allowed: allowed,
+    gated: !allowed,
+    locked: !allowed && f.level === LM_LEVEL.PRO && LM_PRO_LOCKED && !preview,
+    preview: preview,
+    feature: f,
+  };
+}
+
+/**
+ * The whole paywall decision for one feature, in one call — chapter XXV's "blokady",
+ * "komunikaty" and "przejście Free → Pro" answered together, so that four pages cannot
+ * word the same wall four ways.
+ *
+ * `step` is what this visitor does next, and it is the Free → Pro path with the rung they
+ * are standing on named:
+ *
+ *   "none"    nothing to do — the plan already reaches the module, or the preview is on
+ *   "account" LiczMat Pro is a plan on an account, and this visitor has no account.
+ *             Signing up comes before anything that could be bought
+ *   "upgrade" there is an account on the free plan. This is the rung session 28 turns
+ *             into a payment; today it is the preview and the page that explains Pro
+ *
+ * The level is passed in, never read here, for the reason lmCan() gives: the only thing a
+ * page can read without Firebase is a hint that may be stale.
+ *
+ * @returns {{feature:object|null, open:boolean, locked:boolean, preview:boolean,
+ *            gated:boolean, step:string}}
+ */
+function lmPaywall(id, level) {
+  var st = lmFeatureState(id, level);
+  var step = "none";
+  // Only a Pro feature has a Free → Pro path to put somebody on. An unknown id gets no
+  // step either: there is nothing to name and nowhere to send them.
+  if (st.feature && st.feature.level === LM_LEVEL.PRO && !st.allowed && !st.preview) {
+    step = level === LM_LEVEL.GUEST ? "account" : "upgrade";
+  }
+  return {
+    feature: st.feature,
+    open: st.allowed || st.preview,
+    locked: st.locked,
+    preview: st.preview,
+    gated: st.gated,
+    step: step,
+  };
 }

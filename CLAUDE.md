@@ -223,13 +223,18 @@ scripts/test-rooms-page.mjs  The same in Chromium, nothing stubbed: a room added
                       another room and taken out of all of them, the index naming each
                       room's project, four languages, the currency switch, the widths of
                       chapter XXVIII and the no-JavaScript variant
-scripts/test-plan.mjs  The Free/Pro model (session 21, chapters II, XIX and XXV): the two
-                      plan values against the sync contract, lmPlanStatus() including the
-                      Pro plan that ran out, the permission table against src/ia.mjs, what
-                      lmCan()/lmGate() answer for every feature at every level, the five
-                      Pro modules in session order and the copy in four languages.
-                      Dependency-free — run it after touching assets/plan.js, src/pro.mjs
-                      or a pro_*/plan_*/feat_* key
+scripts/test-plan.mjs  The Free/Pro model and the paywall (sessions 21 and 27, chapters
+                      II, XIX and XXV): the two plan values against the sync contract,
+                      lmPlanStatus() including the Pro plan that ran out, the permission
+                      table against src/ia.mjs, what lmCan()/lmGate() answer for every
+                      feature at every level, the five Pro modules in session order — and
+                      session 27's wall: that it stands in front of every PRO feature and
+                      no other, the rung lmPaywall() puts each level on, the preview (which
+                      opens all five modules, writes one key, and never reports itself as a
+                      plan), the wall as proGate() builds it in four languages, and that
+                      nothing in the Pro panel offers to take money. Dependency-free — run
+                      it after touching assets/plan.js, assets/paywall.js, src/pro.mjs or a
+                      pro_*/plan_*/feat_* key
 scripts/test-clients.mjs  Clients (session 22, chapter XX): the client document and the
                       money it deliberately does not carry, the four writes plus the undo,
                       the client → project link (stored on the client, one client per
@@ -391,10 +396,17 @@ assets/recent.js      Which calculators this browser used, and when. Device-loca
                       It is what the dashboard's "ostatnio używane narzędzia" reads
 assets/dashboard.js   /app/dashboard/ — the four lists of chapter XIV, drawn from the local
                       workspace and assets/recent.js. Loads no Firebase on purpose
-assets/plan.js        The Free/Pro model: which plan an account is on (lmPlanStatus) and
-                      what each of the three levels may do (LM_FEATURES, lmCan, lmGate).
-                      Loaded on /app/ only, after assets/account.js — nothing outside it
-                      offers a Pro feature yet, so nothing outside it pays for the file
+assets/plan.js        The Free/Pro model and the paywall: which plan an account is on
+                      (lmPlanStatus), what each of the three levels may do (LM_FEATURES,
+                      lmCan, lmGate), and since session 27 the wall itself — LM_PRO_LOCKED,
+                      lmPaywall() and the Pro preview beside them. Loaded after
+                      assets/account.js on the five pages that offer a Pro feature, and
+                      nowhere else
+assets/paywall.js     The paywall, drawn. One file for all five Pro modules: the strip
+                      above the module, the wall instead of it, the rung of the Free → Pro
+                      path this visitor is on, and the preview switch. It decides nothing —
+                      lmPaywall() does — and it creates no element: the markup is written
+                      by proGate() in src/pro.mjs at build time
 assets/account.js     The user session and the three access levels of chapter II. Loaded
                       on every page: it is what lets a calculator word the sentence under
                       the result without loading Firebase. /app/ is its only writer
@@ -540,7 +552,11 @@ Kotlin side of it. Change one, change all three.
   payments only after the Pro features exist (sessions 27–28). `lmPlanStatus()` keeps the
   half `lmLevelOf()` throws away: a `premium` plan whose `planValidUntil` has passed is
   LICZMAT again, and `expired` is what lets the page say why instead of looking demoted
-  for no reason.
+  for no reason. Session 27 changed the wording, not the fact: the tab now carries the
+  paywall's own preview switch (the same `proPreviewBlock()`, so the two places cannot
+  describe it differently) and the plan card adds one sentence while the preview is on,
+  saying the plan did not move. There is still no button that takes money, and
+  `scripts/test-plan.mjs` and `scripts/test-account-page.mjs` both check there is not.
 - **The visitor's level is derived, never asserted.** `lmLevelOf()` in
   `assets/account.js`: no Firebase user → `guest`; signed in → `liczmat`; signed in with
   `users/{uid}.plan == "premium"` (still valid) → `pro`. `plan` and `planValidUntil` are
@@ -687,18 +703,42 @@ Kotlin side of it. Change one, change all three.
   plural forms and Ukrainian another three, and the browser carries all of them already. A
   browser without the API gets no phrase; the date beside it still says everything, so the
   row degrades to fewer words and never to wrong ones.
-- **A Pro module is open today, and `LM_PRO_LOCKED` is the switch that closes it.** Nothing
-  grants `plan: premium` (FIRESTORE_SYNC §9.2), so a lock on `/klienci/` today would shut
-  the module to every account that exists — including the one that has to check it works.
-  Chapter XXV's order is explicit: the Pro features first, then their permissions checked,
-  the paywall after that (session 27) and payments last (session 28). So the page carries
-  chapter XXV's own words ("Dostępne w LiczMat Pro") plus one honest sentence saying the
-  plan is not granted yet, and the module runs under it. The machinery is complete:
-  `lmFeatureState(id, level)` in `assets/plan.js` answers `allowed / gated / locked`, the
-  gate block is in the markup from the first paint, and session 27 flips one variable —
-  `scripts/test-clients.mjs` exercises both answers, the flipped one included, and
-  `scripts/test-jobs.mjs` and `scripts/test-quotes.mjs` do the same for the second and the
-  third module — the switch is still one variable, whatever number of modules hang off it.
+- **The paywall is up (`LM_PRO_LOCKED = true`, session 27), and the preview is the one door
+  through it.** Every PRO feature is walled off from a guest and from a free account, and
+  nothing else is: `lmFeatureState()` only locks when the feature's level is PRO, so `sync`
+  and `share` stay `gated` without a wall — what stands in their way is the sign-in form,
+  which asks for an account rather than for money. The problem sessions 21–26 named has not
+  gone away: nothing grants `plan: premium` (FIRESTORE_SYNC §9.2), so a bare lock would take
+  five working modules from every account there is, including the one that has to check they
+  work before there is anything to buy. Session 27 answered it with the **Pro preview** —
+  one key in `localStorage` (`liczmat-pro-preview`), on one device, opening all five modules
+  at once. It is not a plan and never claims to be: it writes nothing to Firestore, it is
+  not synced, the phone never sees it, and `lmLevelOf()` does not read it, so the level is
+  still derived in exactly one place. `lmFeatureState()` answers `allowed: false,
+  preview: true` under it, which is what stops a page saying "Twój plan: LiczMat Pro" over
+  something nobody bought. Session 28 replaces it with a subscription; it is deliberately
+  one key and one function pair (`lmProPreview()` / `lmSetProPreview()`) so that removal is
+  a deletion rather than an unpicking.
+- **One wall, built once, and it is markup rather than script.** `proGate()` in
+  `src/pro.mjs` replaced the four copies of the gate block sessions 22–25 wrote, and
+  `assets/paywall.js` replaced the four copies of `xxxRenderPro()`. Four walls are four
+  chances to describe one product four ways, and the paywall is the one place on this site
+  where that costs money. The block is in the page from the first paint and `hidden` — a
+  wall created by a script is a module that flashes open before it shuts — and it carries
+  both rungs of chapter XXV's Free → Pro path (`data-pw-step="account"` for a guest, who has
+  no account for a plan to sit on; `"upgrade"` for a free account), with the script showing
+  one. It also lists the other four Pro modules, because a wall that shows one fifth of the
+  product is asking somebody to buy the other four unseen. The fallback runs the other way:
+  if `assets/plan.js` fails to load, `pwState()` answers "open", because the rows are this
+  browser's own and hiding somebody's clients behind a script that did not arrive is the
+  worse failure. None of it is a security boundary — the CRM store is `localStorage` and is
+  in no sync contract.
+- **The strip above an open module says one of two things, and never both.** "Twój plan:
+  LiczMat Pro" for an account whose plan reaches it (chip `on`), or "Podgląd Pro" plus the
+  sentence that the plan did not change and the button that ends it. When the wall is up the
+  strip is hidden entirely: the wall says all of it, and twice is worse than once. A Pro
+  account gets no "turn the preview off" button — there is nothing to turn off, and offering
+  it to somebody who pays reads as a threat.
 
 - **The chain is walked, never stored, and session 26 added no collection and no page.**
   Chapter XXIV's path — KLIENT → ZLECENIE → PROJEKT → WYCENA → HISTORIA — is made entirely

@@ -120,17 +120,22 @@ function loadCrm() {
 }
 
 /** assets/plan.js as the browser loads it: after assets/account.js, in one scope. */
-function loadPlan({ locked = false } = {}) {
+function loadPlan({ open = false } = {}) {
   let src = read(["assets/account.js", "assets/plan.js"]);
-  if (locked) {
+  if (open) {
     const before = src;
-    src = src.replace("var LM_PRO_LOCKED = false;", "var LM_PRO_LOCKED = true;");
+    src = src.replace("var LM_PRO_LOCKED = true;", "var LM_PRO_LOCKED = false;");
     if (src === before) throw new Error("LM_PRO_LOCKED is no longer one line in assets/plan.js");
   }
   return evalSource(src, [
-    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState",
+    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState", "lmPaywall", "lmProPreview",
   ], { document: undefined, localStorage: undefined });
 }
+
+/* The permission table as the browser has it, for the page builders: proGate() renders
+   the wall out of LM_FEATURES, so a test that called clientsMain() without it would be
+   checking a page the build never writes. */
+const FEATURES = loadPlan().LM_FEATURES;
 
 /** One saved calculation, exactly as assets/workspace-ui.js writes it after a result. */
 const save = (ws, over = {}) => ws.wsAddEstimation({
@@ -623,20 +628,25 @@ head("8. the route, and chapter XXV's gate");
     check(`${lang}: the page has its own address`, urlQuotes(lang).endsWith(`/${SECTION.quotes[lang]}/`));
   }
 
-  const open = loadPlan();
+  const open = loadPlan({ open: true });
   eq("quotes is a Pro feature", open.lmFeature("quotes").level, open.LM_LEVEL.PRO);
   eq("a guest may not use it", open.lmCan("quotes", open.LM_LEVEL.GUEST), false);
   eq("nor a free account", open.lmCan("quotes", open.LM_LEVEL.LICZMAT), false);
   eq("a Pro account may", open.lmCan("quotes", open.LM_LEVEL.PRO), true);
 
-  // Session 27 flips one variable. Until then the module is named as Pro and runs.
-  const g = open.lmFeatureState("quotes", open.LM_LEVEL.GUEST);
-  eq("today a guest is told, not shut out", g.gated, true);
-  eq("and the module still runs", g.locked, false);
-  const locked = loadPlan({ locked: true });
-  eq("with the switch flipped the same visitor is shut out",
-    locked.lmFeatureState("quotes", locked.LM_LEVEL.GUEST).locked, true);
-  eq("and a Pro account is not", locked.lmFeatureState("quotes", locked.LM_LEVEL.PRO).locked, false);
+  // Chapter XXV's wall, in both of its states. `open` above is the shipped file with
+  // session 27's switch put back, so the answer sessions 22–26 ran under stays tested.
+  eq("before session 27 a guest was told, not shut out",
+    open.lmFeatureState("quotes", open.LM_LEVEL.GUEST).locked, false);
+  const shipped = loadPlan();
+  eq("the paywall is up", shipped.LM_PRO_LOCKED, true);
+  eq("so the same visitor is shut out",
+    shipped.lmFeatureState("quotes", shipped.LM_LEVEL.GUEST).locked, true);
+  eq("and a Pro account is not", shipped.lmFeatureState("quotes", shipped.LM_LEVEL.PRO).locked, false);
+  eq("a guest is sent to make an account",
+    shipped.lmPaywall("quotes", shipped.LM_LEVEL.GUEST).step, "account");
+  eq("a free account is offered the upgrade",
+    shipped.lmPaywall("quotes", shipped.LM_LEVEL.LICZMAT).step, "upgrade");
 }
 
 /* ================================================================== 9. the frame */
@@ -645,7 +655,7 @@ head("9. the frame the build writes");
 {
   for (const lang of LANGS) {
     const t = tr(lang);
-    const { main } = quotesMain(lang, t);
+    const { main } = quotesMain(lang, t, FEATURES);
 
     for (const id of ["quo-page", "quo-index", "quo-detail", "quo-list", "quo-form",
       "quo-labour-list", "quo-labour-form", "quo-project-list", "quo-project-form",
@@ -665,7 +675,7 @@ head("9. the frame the build writes");
       lang === "pl" || !main.includes(`href="${urlQuotes("pl")}"`), urlQuotes("pl"));
 
     // The way back: /zlecenia/ points at the quotes now, in its own language.
-    const jobs = jobsMain(lang, t);
+    const jobs = jobsMain(lang, t, FEATURES);
     check(`${lang}: the jobs page links to the quotes`, jobs.main.includes(urlQuotes(lang)));
   }
 }
@@ -688,7 +698,12 @@ head("9b. the copy, in four languages");
   // The two sentences that carry the honesty of this session. Chapter XXV wants a free
   // user to understand what is Pro; CLAUDE.md forbids implying a sync that does not exist.
   for (const lang of LANGS) {
-    check(`${lang}: the Pro note is a full sentence`, DICT[lang].quo_pro_note.length > 60);
+    // Session 27 replaced the per-module "the module is open for now" sentence with the
+    // paywall's own copy, which is shared by all five modules and says what to do next.
+    check(`${lang}: the wall tells a guest to make an account`,
+      DICT[lang].pro_need_account.length > 40);
+    check(`${lang}: and a free account what it is on`, DICT[lang].pro_need_pro.length > 20);
+    check(`${lang}: the preview says what it is not`, DICT[lang].pro_prev_d.length > 80);
     check(`${lang}: the storage note names localStorage`,
       DICT[lang].quo_local_note.includes("localStorage"), DICT[lang].quo_local_note);
     check(`${lang}: and it is a full sentence`, DICT[lang].quo_local_note.length > 100);

@@ -15,9 +15,9 @@
  * (assets/workspace.js), read here and never written: nothing on this page can rename,
  * archive or delete a project.
  *
- * Chapter XXV lives at the top of the page, exactly as on /klienci/: the module says it is
- * LiczMat Pro on every visit, and whether that notice *replaces* the module is
- * lmFeatureState() in assets/plan.js — LM_PRO_LOCKED, false until session 27.
+ * Chapter XXV stands in front of the page exactly as on /klienci/ — the same wall, from
+ * the same builder (proGate() in src/pro.mjs, drawn by assets/paywall.js), and the same
+ * one decision in lmPaywall().
  */
 
 const jobT = (key) => (typeof t === "function" ? t(key) : key);
@@ -64,30 +64,15 @@ let jobUndone = null;
 
 /* ------------------------------------------------------------------ the Pro notice */
 
-/** What this browser was last told about the session — a copy hint, never a gate. */
-const jobLevel = () => (typeof lmReadLevel === "function" ? lmReadLevel() : "guest");
-
-/** The state of the "jobs" feature for this visitor: allowed, gated, or locked out. */
-function jobState() {
-  if (typeof lmFeatureState === "function") return lmFeatureState("jobs", jobLevel());
-  return { allowed: true, gated: false, locked: false, feature: null };
-}
-
-/** Chapter XXV's block at the top of the page, and — when locked — instead of it. */
-function jobRenderPro() {
-  const state = jobState();
-  const chip = document.getElementById("job-pro-chip");
-  const note = document.getElementById("job-pro-note");
-  if (chip) {
-    chip.textContent = state.allowed ? jobT("cli_pro_yours") : jobT("pro_locked");
-    chip.classList.toggle("on", state.allowed);
-  }
-  if (note) note.hidden = state.allowed || state.locked;
-  const gate = document.getElementById("job-gate");
-  const tool = document.getElementById("job-tool");
-  if (gate) gate.hidden = !state.locked;
-  if (tool) tool.hidden = state.locked;
-}
+/**
+ * Chapter XXV's paywall — the strip above the module, and the wall instead of it.
+ *
+ * Session 27 moved the whole of it into assets/paywall.js: sessions 22–25 wrote these
+ * twenty lines once per module, identical but for a three-letter prefix, and four walls
+ * are four chances to describe the same product differently. What is left here is the
+ * name this file calls it by and the two arguments that make it this page's wall.
+ */
+const jobRenderPro = () => pwRender("job", "jobs");
 
 /* ------------------------------------------------------------------ the index */
 
@@ -467,8 +452,9 @@ function buildJobsPage() {
   document.addEventListener("workspacechange", jobRender);
   // An unpriced job falls back to the visitor's own currency, so a switch has to redraw.
   document.addEventListener("currencychange", jobRender);
-  // Signing in or out on /app/ moves the level, and the notice at the top follows it.
-  document.addEventListener("lm-session", jobRenderPro);
+  // Signing in or out on /app/ moves the level; the preview switch moves the wall. Both
+  // are wired here, once, by assets/paywall.js.
+  pwMount("job", "jobs");
   // Back after opening a job: the page never reloaded, so nothing else would notice.
   window.addEventListener("popstate", jobRender);
 

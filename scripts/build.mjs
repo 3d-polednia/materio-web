@@ -51,7 +51,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819f";
+const STAMP = "20260819g";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -345,8 +345,8 @@ const WS_SCRIPTS = ["/assets/units.js", "/assets/workspace.js", "/assets/workspa
  * globals, so the order below is the order the browser needs.
  */
 const CRM_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-chain.js",
-  "/assets/crm-ui.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js", "/assets/crm.js",
+  "/assets/crm-chain.js", "/assets/crm-ui.js",
 ];
 
 /**
@@ -357,8 +357,8 @@ const CRM_SCRIPTS = [
  * amount, and calculates nothing.
  */
 const JOBS_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-chain.js",
-  "/assets/jobs-ui.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js", "/assets/crm.js",
+  "/assets/crm-chain.js", "/assets/jobs-ui.js",
 ];
 
 /**
@@ -369,8 +369,8 @@ const JOBS_SCRIPTS = [
  * rate and adds a percentage, and calculates nothing else.
  */
 const QUOTES_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/crm-chain.js",
-  "/assets/quotes-ui.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js", "/assets/crm.js",
+  "/assets/crm-chain.js", "/assets/quotes-ui.js",
 ];
 
 /**
@@ -380,7 +380,8 @@ const QUOTES_SCRIPTS = [
  * without it would leave those answering for a workspace that is not there.
  */
 const CALENDAR_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/crm.js", "/assets/schedule-ui.js",
+  "/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js", "/assets/crm.js",
+  "/assets/schedule-ui.js",
 ];
 
 /* ------------------------------------------------------------------ worked examples */
@@ -687,7 +688,7 @@ function buildClientsPages() {
   const alt = alternatesFor(urlClients);
   for (const lang of LANGS) {
     const t = translator(lang);
-    const { main, ld } = clientsMain(lang, t);
+    const { main, ld } = clientsMain(lang, t, LM_FEATURES);
     write(join(urlClients(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("clipage_title")} \u2014 LiczMat`,
@@ -719,7 +720,7 @@ function buildJobsPages() {
   const alt = alternatesFor(urlJobs);
   for (const lang of LANGS) {
     const t = translator(lang);
-    const { main, ld } = jobsMain(lang, t);
+    const { main, ld } = jobsMain(lang, t, LM_FEATURES);
     write(join(urlJobs(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("jobpage_title")} \u2014 LiczMat`,
@@ -752,7 +753,7 @@ function buildQuotesPages() {
   const alt = alternatesFor(urlQuotes);
   for (const lang of LANGS) {
     const t = translator(lang);
-    const { main, ld } = quotesMain(lang, t);
+    const { main, ld } = quotesMain(lang, t, LM_FEATURES);
     write(join(urlQuotes(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("quopage_title")} \u2014 LiczMat`,
@@ -785,7 +786,7 @@ function buildCalendarPages() {
   const alt = alternatesFor(urlCalendar);
   for (const lang of LANGS) {
     const t = translator(lang);
-    const { main, ld } = calendarMain(lang, t);
+    const { main, ld } = calendarMain(lang, t, LM_FEATURES);
     write(join(urlCalendar(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("calpage_title")} \u2014 LiczMat`,
@@ -865,7 +866,7 @@ function buildPrivatePages() {
     // through its globals, which a module's own scope would hide.
     // plan.js before app.js: the Pro tab reads the permission table and the plan status
     // through its globals, which a module's own scope would hide.
-    classicScripts: ["/assets/workspace.js", "/assets/plan.js"],
+    classicScripts: ["/assets/workspace.js", "/assets/plan.js", "/assets/paywall.js"],
     scripts: ["/assets/app.js"],
   }));
 

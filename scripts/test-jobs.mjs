@@ -119,17 +119,22 @@ function loadCrm() {
 }
 
 /** assets/plan.js as the browser loads it: after assets/account.js, in one scope. */
-function loadPlan({ locked = false } = {}) {
+function loadPlan({ open = false } = {}) {
   let src = read(["assets/account.js", "assets/plan.js"]);
-  if (locked) {
+  if (open) {
     const before = src;
-    src = src.replace("var LM_PRO_LOCKED = false;", "var LM_PRO_LOCKED = true;");
+    src = src.replace("var LM_PRO_LOCKED = true;", "var LM_PRO_LOCKED = false;");
     if (src === before) throw new Error("LM_PRO_LOCKED is no longer one line in assets/plan.js");
   }
   return evalSource(src, [
-    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState",
+    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState", "lmPaywall", "lmProPreview",
   ], { document: undefined, localStorage: undefined });
 }
+
+/* The permission table as the browser has it, for the page builders: proGate() renders
+   the wall out of LM_FEATURES, so a test that called clientsMain() without it would be
+   checking a page the build never writes. */
+const FEATURES = loadPlan().LM_FEATURES;
 
 /** One saved calculation, exactly as assets/workspace-ui.js writes it after a result. */
 const save = (ws, over = {}) => ws.wsAddEstimation({
@@ -629,10 +634,13 @@ head("6. the route says what the page is, and the architecture still validates")
   eq("and the transliterated Ukrainian one", SECTION.jobs.uk, "zamovlennya");
 }
 
-head("6b. chapter XXV's gate, and the one switch session 27 flips");
+head("6b. chapter XXV's paywall, in both of its states");
 {
-  const open = loadPlan();
-  eq("nothing is locked while payments do not exist", open.LM_PRO_LOCKED, false);
+  // The shipped value since session 27. `open` below is the same file with the switch
+  // put back, so the answer the module ran under for sessions 22–26 stays tested.
+  const shipped = loadPlan();
+  eq("the paywall is up", shipped.LM_PRO_LOCKED, true);
+  const open = loadPlan({ open: true });
 
   const guest = open.lmFeatureState("jobs", open.LM_LEVEL.GUEST);
   eq("a guest is not allowed the module", guest.allowed, false);
@@ -644,11 +652,20 @@ head("6b. chapter XXV's gate, and the one switch session 27 flips");
   eq("a Pro account is allowed it", pro.allowed, true);
   eq("with nothing to say about a gate", pro.gated, false);
 
-  const shut = loadPlan({ locked: true });
-  const later = shut.lmFeatureState("jobs", shut.LM_LEVEL.LICZMAT);
-  eq("after session 27 the same visitor is gated", later.gated, true);
-  eq("and the module is replaced by the gate", later.locked, true);
-  eq("while Pro is unaffected", shut.lmFeatureState("jobs", shut.LM_LEVEL.PRO).locked, false);
+  const later = shipped.lmFeatureState("jobs", shipped.LM_LEVEL.LICZMAT);
+  eq("with the paywall up the same visitor is gated", later.gated, true);
+  eq("and the module is replaced by the wall", later.locked, true);
+  eq("while Pro is unaffected", shipped.lmFeatureState("jobs", shipped.LM_LEVEL.PRO).locked, false);
+
+  // Chapter XXV's "przejście Free → Pro", one rung per level: a guest has no account for
+  // a plan to sit on, so they are sent to make one; a free account is offered the upgrade.
+  eq("a guest is sent to make an account",
+    shipped.lmPaywall("jobs", shipped.LM_LEVEL.GUEST).step, "account");
+  eq("a free account is offered the upgrade",
+    shipped.lmPaywall("jobs", shipped.LM_LEVEL.LICZMAT).step, "upgrade");
+  eq("and a Pro account has nothing left to do",
+    shipped.lmPaywall("jobs", shipped.LM_LEVEL.PRO).step, "none");
+  eq("with the module open for them", shipped.lmPaywall("jobs", shipped.LM_LEVEL.PRO).open, true);
 
   eq("the jobs feature is PRO", open.lmFeature("jobs").level, open.LM_LEVEL.PRO);
   eq("built by session 23", open.lmFeature("jobs").session, 23);
@@ -660,7 +677,7 @@ head("6b. chapter XXV's gate, and the one switch session 27 flips");
 
 head("7. the page the build writes");
 {
-  const html = jobsMain(DEFAULT_LANG, tr(DEFAULT_LANG)).main;
+  const html = jobsMain(DEFAULT_LANG, tr(DEFAULT_LANG), FEATURES).main;
   const has = (needle, why) => check(why, html.includes(needle), needle);
 
   // Every id assets/jobs-ui.js reaches for. A renamed element is a screen that silently
@@ -682,7 +699,7 @@ head("7. the page the build writes");
   has("<h1", "the page has one heading");
   has('class="breadcrumbs"', "and a trail back");
   has(tr(DEFAULT_LANG)("pro_locked"), "chapter XXV's words are in the markup, not only in a script");
-  has(tr(DEFAULT_LANG)("job_pro_note"), "with the sentence that says why the module is open");
+  has(tr(DEFAULT_LANG)("pro_need_pro"), "with the sentence a free account is shown");
   has(tr(DEFAULT_LANG)("job_local_note"), "and the honest note about where the rows live");
   has(tr(DEFAULT_LANG)("feat_jobs_t"), "the gate names the module");
   has(tr(DEFAULT_LANG)("feat_jobs_d"), "and describes it in full — chapter XXV");
@@ -714,7 +731,7 @@ head("7. the page the build writes");
     /id="job-due" type="date"/.test(html) && /id="job-new-due" type="date"/.test(html));
 
   for (const lang of LANGS) {
-    const page = jobsMain(lang, tr(lang)).main;
+    const page = jobsMain(lang, tr(lang), FEATURES).main;
     check(`${lang}: the trail points at this language's page`, page.includes(urlJobs(lang)));
     check(`${lang}: and back at this language's clients`, page.includes(urlClients(lang)));
   }
@@ -730,7 +747,7 @@ head("7. the page the build writes");
   check("and one job is not — it has no URL of its own", !sitemap.includes("?id="));
 
   // The client's own page carries the other end of the link — read-only, chapter XX.
-  const client = clientsMain(DEFAULT_LANG, tr(DEFAULT_LANG)).main;
+  const client = clientsMain(DEFAULT_LANG, tr(DEFAULT_LANG), FEATURES).main;
   check("the client page lists their jobs", client.includes('id="crm-client-jobs"'));
   check("and links to the page that writes them", client.includes(urlJobs(DEFAULT_LANG)));
 }
@@ -741,7 +758,7 @@ head("8. the copy, in four languages");
 {
   const KEYS = [
     "jobpage_title", "jobpage_lead", "jobpage_meta",
-    "job_pro_note", "job_local_note",
+    "job_local_note",
     "job_list_t", "job_list_d", "job_new", "job_name", "job_desc", "job_desc_empty",
     "job_note_t", "job_note", "job_note_empty", "job_empty",
     "job_closed_t", "job_closed_d",
@@ -771,7 +788,12 @@ head("8. the copy, in four languages");
   // The two sentences that carry the honesty of this session. Chapter XXV wants a free
   // user to understand what is Pro; CLAUDE.md forbids implying a sync that does not exist.
   for (const lang of LANGS) {
-    check(`${lang}: the Pro note is a full sentence`, DICT[lang].job_pro_note.length > 60);
+    // Session 27 replaced the per-module "the module is open for now" sentence with the
+    // paywall's own copy, which is shared by all five modules and says what to do next.
+    check(`${lang}: the wall tells a guest to make an account`,
+      DICT[lang].pro_need_account.length > 40);
+    check(`${lang}: and a free account what it is on`, DICT[lang].pro_need_pro.length > 20);
+    check(`${lang}: the preview says what it is not`, DICT[lang].pro_prev_d.length > 80);
     check(`${lang}: the storage note names localStorage`,
       DICT[lang].job_local_note.includes("localStorage"), DICT[lang].job_local_note);
     check(`${lang}: and it is a full sentence`, DICT[lang].job_local_note.length > 100);

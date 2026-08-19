@@ -15,9 +15,9 @@
  * (assets/workspace.js), read here and never written: nothing on this page can rename,
  * re-price, archive or delete anything that belongs to a project.
  *
- * Chapter XXV lives at the top of the page, exactly as on the other two Pro modules: the
- * page says it is LiczMat Pro on every visit, and whether that notice *replaces* the
- * module is lmFeatureState() in assets/plan.js — LM_PRO_LOCKED, false until session 27.
+ * Chapter XXV stands in front of the page exactly as on the other two Pro modules — the
+ * same wall, from the same builder (proGate() in src/pro.mjs, drawn by
+ * assets/paywall.js), and the same one decision in lmPaywall().
  */
 
 const quoT = (key) => (typeof t === "function" ? t(key) : key);
@@ -66,30 +66,15 @@ let quoUndone = null;
 
 /* ------------------------------------------------------------------ the Pro notice */
 
-/** What this browser was last told about the session — a copy hint, never a gate. */
-const quoLevel = () => (typeof lmReadLevel === "function" ? lmReadLevel() : "guest");
-
-/** The state of the "quotes" feature for this visitor: allowed, gated, or locked out. */
-function quoState() {
-  if (typeof lmFeatureState === "function") return lmFeatureState("quotes", quoLevel());
-  return { allowed: true, gated: false, locked: false, feature: null };
-}
-
-/** Chapter XXV's block at the top of the page, and — when locked — instead of it. */
-function quoRenderPro() {
-  const state = quoState();
-  const chip = document.getElementById("quo-pro-chip");
-  const note = document.getElementById("quo-pro-note");
-  if (chip) {
-    chip.textContent = state.allowed ? quoT("cli_pro_yours") : quoT("pro_locked");
-    chip.classList.toggle("on", state.allowed);
-  }
-  if (note) note.hidden = state.allowed || state.locked;
-  const gate = document.getElementById("quo-gate");
-  const tool = document.getElementById("quo-tool");
-  if (gate) gate.hidden = !state.locked;
-  if (tool) tool.hidden = state.locked;
-}
+/**
+ * Chapter XXV's paywall — the strip above the module, and the wall instead of it.
+ *
+ * Session 27 moved the whole of it into assets/paywall.js: sessions 22–25 wrote these
+ * twenty lines once per module, identical but for a three-letter prefix, and four walls
+ * are four chances to describe the same product differently. What is left here is the
+ * name this file calls it by and the two arguments that make it this page's wall.
+ */
+const quoRenderPro = () => pwRender("quo", "quotes");
 
 /* ------------------------------------------------------------------ the index */
 
@@ -577,8 +562,9 @@ function buildQuotesPage() {
   // A quote with no money of its own falls back to the visitor's currency, so a switch
   // has to redraw.
   document.addEventListener("currencychange", quoRender);
-  // Signing in or out on /app/ moves the level, and the notice at the top follows it.
-  document.addEventListener("lm-session", quoRenderPro);
+  // Signing in or out on /app/ moves the level; the preview switch moves the wall. Both
+  // are wired here, once, by assets/paywall.js.
+  pwMount("quo", "quotes");
   // Back after opening a quote: the page never reloaded, so nothing else would notice.
   window.addEventListener("popstate", quoRender);
 

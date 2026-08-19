@@ -14,10 +14,10 @@
  * projects it links to are the free workspace's own rows (assets/workspace.js), read here
  * and never written: nothing on this page can rename, archive or delete a project.
  *
- * Chapter XXV lives at the top of the page: the module says it is LiczMat Pro on every
- * visit. Whether that notice *replaces* the module is lmFeatureState() in assets/plan.js
- * — LM_PRO_LOCKED, false until session 27 builds the paywall, because nothing grants Pro
- * yet and a lock today would close the module to every account there is.
+ * Chapter XXV stands in front of the page since session 27: the wall is built by
+ * proGate() in src/pro.mjs and shown by assets/paywall.js, and this file calls it by one
+ * name (crmRenderPro) and hands it two arguments. Whether the module runs at all is
+ * lmPaywall() in assets/plan.js — the plan on the account, or the Pro preview.
  */
 
 const crmT = (key) => (typeof t === "function" ? t(key) : key);
@@ -63,38 +63,14 @@ let crmUndone = null;
 /* ------------------------------------------------------------------ the Pro notice */
 
 /**
- * What this browser was last told about the session.
+ * Chapter XXV's paywall — the strip above the module, and the wall instead of it.
  *
- * `liczmat-signed-in` is a copy hint and can be stale (assets/account.js says so), which
- * is exactly why the notice it drives only *words* the page. Nothing on /klienci/ reads
- * it before saving, and the client rows belong to whoever is sitting at this browser —
- * gating a local list on a stale hint would hide somebody's own clients from them.
+ * Session 27 moved the whole of it into assets/paywall.js: sessions 22–25 wrote these
+ * twenty lines once per module, identical but for a three-letter prefix, and four walls
+ * are four chances to describe the same product differently. What is left here is the
+ * name this file calls it by and the two arguments that make it this page's wall.
  */
-const crmLevel = () => (typeof lmReadLevel === "function" ? lmReadLevel() : "guest");
-
-/** The state of the "clients" feature for this visitor: allowed, gated, or locked out. */
-function crmState() {
-  if (typeof lmFeatureState === "function") return lmFeatureState("clients", crmLevel());
-  return { allowed: true, gated: false, locked: false, feature: null };
-}
-
-/** Chapter XXV's block at the top of the page, and — when locked — instead of it. */
-function crmRenderPro() {
-  const state = crmState();
-  const chip = document.getElementById("crm-pro-chip");
-  const note = document.getElementById("crm-pro-note");
-  if (chip) {
-    chip.textContent = state.allowed ? crmT("cli_pro_yours") : crmT("pro_locked");
-    chip.classList.toggle("on", state.allowed);
-  }
-  // A Pro account is told which plan it is on and nothing else; the sentence about the
-  // module being open is only true, and only useful, for somebody who is not on Pro.
-  if (note) note.hidden = state.allowed || state.locked;
-  const gate = document.getElementById("crm-gate");
-  const tool = document.getElementById("crm-tool");
-  if (gate) gate.hidden = !state.locked;
-  if (tool) tool.hidden = state.locked;
-}
+const crmRenderPro = () => pwRender("crm", "clients");
 
 /* ------------------------------------------------------------------ the index */
 
@@ -504,8 +480,9 @@ function buildClientsPage() {
   // Money is shown in the currency each amount was saved in, but "nothing saved yet"
   // falls back to the visitor's own choice — so a switch has to redraw.
   document.addEventListener("currencychange", crmRender);
-  // Signing in or out on /app/ moves the level, and the notice at the top follows it.
-  document.addEventListener("lm-session", crmRenderPro);
+  // Signing in or out on /app/ moves the level; the preview switch moves the wall. Both
+  // are wired here, once, by assets/paywall.js.
+  pwMount("crm", "clients");
   // Back after opening a client: the page never reloaded, so nothing else would notice.
   window.addEventListener("popstate", crmRender);
 

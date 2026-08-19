@@ -118,17 +118,22 @@ function loadCrm({ now = Date.parse("2026-08-19T09:00:00+02:00") } = {}) {
 }
 
 /** assets/plan.js as the browser loads it: after assets/account.js, in one scope. */
-function loadPlan({ locked = false } = {}) {
+function loadPlan({ open = false } = {}) {
   let src = read(["assets/account.js", "assets/plan.js"]);
-  if (locked) {
+  if (open) {
     const before = src;
-    src = src.replace("var LM_PRO_LOCKED = false;", "var LM_PRO_LOCKED = true;");
+    src = src.replace("var LM_PRO_LOCKED = true;", "var LM_PRO_LOCKED = false;");
     if (src === before) throw new Error("LM_PRO_LOCKED is no longer one line in assets/plan.js");
   }
   return evalSource(src, [
-    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState",
+    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState", "lmPaywall", "lmProPreview",
   ], { document: undefined, localStorage: undefined });
 }
+
+/* The permission table as the browser has it, for the page builders: proGate() renders
+   the wall out of LM_FEATURES, so a test that called clientsMain() without it would be
+   checking a page the build never writes. */
+const FEATURES = loadPlan().LM_FEATURES;
 
 /* ------------------------------------------------------------------ the runner */
 
@@ -438,10 +443,13 @@ head("6. the route says what the page is, and the architecture still validates")
   eq("and the transliterated Ukrainian one", SECTION.calendar.uk, "kalendar");
 }
 
-head("6b. chapter XXV's gate, and the one switch session 27 flips");
+head("6b. chapter XXV's paywall, in both of its states");
 {
-  const open = loadPlan();
-  eq("nothing is locked while payments do not exist", open.LM_PRO_LOCKED, false);
+  // The shipped value since session 27. `open` below is the same file with the switch
+  // put back, so the answer the module ran under for sessions 22–26 stays tested.
+  const shipped = loadPlan();
+  eq("the paywall is up", shipped.LM_PRO_LOCKED, true);
+  const open = loadPlan({ open: true });
 
   const guest = open.lmFeatureState("calendar", open.LM_LEVEL.GUEST);
   eq("a guest is not allowed the module", guest.allowed, false);
@@ -453,11 +461,20 @@ head("6b. chapter XXV's gate, and the one switch session 27 flips");
   eq("a Pro account is allowed it", pro.allowed, true);
   eq("with nothing to say about a gate", pro.gated, false);
 
-  const shut = loadPlan({ locked: true });
-  const later = shut.lmFeatureState("calendar", shut.LM_LEVEL.LICZMAT);
-  eq("after session 27 the same visitor is gated", later.gated, true);
-  eq("and the module is replaced by the gate", later.locked, true);
-  eq("while Pro is unaffected", shut.lmFeatureState("calendar", shut.LM_LEVEL.PRO).locked, false);
+  const later = shipped.lmFeatureState("calendar", shipped.LM_LEVEL.LICZMAT);
+  eq("with the paywall up the same visitor is gated", later.gated, true);
+  eq("and the module is replaced by the wall", later.locked, true);
+  eq("while Pro is unaffected", shipped.lmFeatureState("calendar", shipped.LM_LEVEL.PRO).locked, false);
+
+  // Chapter XXV's "przejście Free → Pro", one rung per level: a guest has no account for
+  // a plan to sit on, so they are sent to make one; a free account is offered the upgrade.
+  eq("a guest is sent to make an account",
+    shipped.lmPaywall("calendar", shipped.LM_LEVEL.GUEST).step, "account");
+  eq("a free account is offered the upgrade",
+    shipped.lmPaywall("calendar", shipped.LM_LEVEL.LICZMAT).step, "upgrade");
+  eq("and a Pro account has nothing left to do",
+    shipped.lmPaywall("calendar", shipped.LM_LEVEL.PRO).step, "none");
+  eq("with the module open for them", shipped.lmPaywall("calendar", shipped.LM_LEVEL.PRO).open, true);
 
   eq("the calendar feature is PRO", open.lmFeature("calendar").level, open.LM_LEVEL.PRO);
   eq("built by session 25", open.lmFeature("calendar").session, 25);
@@ -471,7 +488,7 @@ head("6b. chapter XXV's gate, and the one switch session 27 flips");
 head("7. the page the build writes");
 {
   const t = tr(DEFAULT_LANG);
-  const html = calendarMain(DEFAULT_LANG, t).main;
+  const html = calendarMain(DEFAULT_LANG, t, FEATURES).main;
   const has = (needle, why) => check(why, html.includes(needle), needle);
 
   // Every id assets/schedule-ui.js reaches for. A renamed element is a screen that
@@ -494,7 +511,7 @@ head("7. the page the build writes");
   has("<h1", "the page has one heading");
   has('class="breadcrumbs"', "and a trail back");
   has(t("pro_locked"), "chapter XXV's words are in the markup, not only in a script");
-  has(t("cal_pro_note"), "with the sentence that says why the module is open");
+  has(t("pro_need_pro"), "with the sentence a free account is shown");
   has(t("cal_local_note"), "and the honest note about where the rows live");
   has(t("cal_source_note"), "and the one that says the module stores nothing");
   has(t("feat_calendar_t"), "the gate names the module");
@@ -511,7 +528,7 @@ head("7. the page the build writes");
     !/\d{4}-\d{2}-\d{2}/.test(code));
 
   for (const lang of LANGS) {
-    const page = calendarMain(lang, tr(lang)).main;
+    const page = calendarMain(lang, tr(lang), FEATURES).main;
     check(`${lang}: the trail leads back to this language's jobs`, page.includes(urlJobs(lang)));
     const file = readFileSync(p(join(urlCalendar(lang), "index.html").replace(/^\//, "")), "utf8");
     check(`${lang}: and the page claims its own address as canonical`,
@@ -529,7 +546,7 @@ head("7. the page the build writes");
   }
 
   // The page the deadlines belong to offers the one that shows them.
-  const jobs = jobsMain(DEFAULT_LANG, t).main;
+  const jobs = jobsMain(DEFAULT_LANG, t, FEATURES).main;
   check("the jobs page links to the terminarz", jobs.includes(urlCalendar(DEFAULT_LANG)));
 
   // The script the page is served with, read out of the build rather than assumed.
@@ -548,7 +565,7 @@ head("8. the copy, in four languages");
 {
   const KEYS = [
     "calpage_title", "calpage_lead", "calpage_meta",
-    "cal_pro_note", "cal_local_note", "cal_source_note",
+    "cal_local_note", "cal_source_note",
     "cal_today_is", "cal_empty", "cal_due", "cal_due_set", "cal_jobs_all",
     "cal_late_t", "cal_late_d", "cal_today_t", "cal_today_d", "cal_soon_t", "cal_soon_d",
     "cal_later_t", "cal_later_d", "cal_none_t", "cal_none_d",
@@ -569,7 +586,12 @@ head("8. the copy, in four languages");
   }
 
   for (const lang of LANGS) {
-    check(`${lang}: the Pro note is a full sentence`, DICT[lang].cal_pro_note.length > 60);
+    // Session 27 replaced the per-module "the module is open for now" sentence with the
+    // paywall's own copy, which is shared by all five modules and says what to do next.
+    check(`${lang}: the wall tells a guest to make an account`,
+      DICT[lang].pro_need_account.length > 40);
+    check(`${lang}: and a free account what it is on`, DICT[lang].pro_need_pro.length > 20);
+    check(`${lang}: the preview says what it is not`, DICT[lang].pro_prev_d.length > 80);
     check(`${lang}: the storage note names localStorage`,
       DICT[lang].cal_local_note.includes("localStorage"), DICT[lang].cal_local_note);
     check(`${lang}: and it is a full sentence`, DICT[lang].cal_local_note.length > 100);

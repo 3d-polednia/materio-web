@@ -190,6 +190,12 @@ async function open(ctx, url, opts = {}) {
   if (opts.crm) plant["liczmat-crm-v1"] = JSON.stringify(opts.crm);
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
   if (opts.level) plant["liczmat-signed-in"] = opts.level;
+  /* Session 27 put a paywall in front of the Pro modules, and nothing grants Pro
+     (FIRESTORE_SYNC §9.2), so a browser that opened this page with nothing planted would
+     see the wall and not the tool. The preview is the door session 27 left in it —
+     `liczmat-pro-preview` in assets/plan.js — and it is on unless a test is looking at
+     the wall itself, which is what `preview: false` is for. */
+  if (opts.preview !== false) plant["liczmat-pro-preview"] = "1";
 
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
@@ -359,22 +365,65 @@ head("3b. the terminarz has no screen of its own to open");
 
 /* ---------------------------------------------------- 4. chapter XXV */
 
-head("4. the module says it is LiczMat Pro, and runs");
+head("4. chapter XXV's paywall: the wall, the two rungs and the one door through it");
 {
-  const guest = await open(ctx, CAL, { workspace: workspace(), crm: crm() });
-  check("the chip says the module is Pro",
-    (await guest.textContent("#cal-pro-chip")).includes("Pro"),
-    await guest.textContent("#cal-pro-chip"));
-  eq("with the sentence that says why it is open anyway",
-    await guest.$eval("#cal-pro-note", (n) => n.hidden), false);
-  eq("the gate is not in the way", await guest.$eval("#cal-gate", (n) => n.hidden), true);
-  eq("and the module itself is on screen", await guest.$eval("#cal-tool", (n) => n.hidden), false);
+  /* The wall, with nothing planted: a guest gets the paywall instead of the tool. */
+  const guest = await open(ctx, CAL, { workspace: workspace(), crm: crm(), preview: false });
+  eq("the module is replaced by the wall", await guest.$eval("#cal-tool", (n) => n.hidden), true);
+  eq("and the wall is on screen", await guest.$eval("#cal-gate", (n) => n.hidden), false);
+  eq("the strip above it is gone — the wall says all of it",
+    await guest.$eval("#cal-pro", (n) => n.hidden), true);
+  // Chapter XXV's Free → Pro path, one rung: a guest has no account for a plan to sit on.
+  eq("a guest is sent to make an account",
+    await guest.$eval('#cal-gate [data-pw-step="account"]', (n) => n.hidden), false);
+  eq("and is not offered an upgrade they cannot put anywhere",
+    await guest.$eval('#cal-gate [data-pw-step="upgrade"]', (n) => n.hidden), true);
+  check("the sign-up link comes back to this page",
+    await guest.$eval('#cal-gate [data-pw-step="account"] a', (n) => n.getAttribute("href"))
+      === `/app/?mode=signup&next=${encodeURIComponent(CAL)}`);
   await guest.close();
 
-  const pro = await open(ctx, CAL, { workspace: workspace(), crm: crm(), level: "pro" });
-  eq("a Pro account is told it is theirs",
+  /* A free account meets the same wall and the other rung. */
+  const free = await open(ctx, CAL, { workspace: workspace(), crm: crm(), level: "liczmat", preview: false });
+  eq("the wall stands for a free account too",
+    await free.$eval("#cal-gate", (n) => n.hidden), false);
+  eq("and it is told its plan rather than told to sign up",
+    await free.$eval('#cal-gate [data-pw-step="upgrade"]', (n) => n.hidden), false);
+
+  /* The one door through it: the preview, clicked. The page must open without a reload. */
+  await free.click('#cal-gate [data-pw-preview]');
+  await free.waitForSelector("#cal-tool:not([hidden])");
+  eq("the wall comes down", await free.$eval("#cal-gate", (n) => n.hidden), true);
+  eq("the strip comes back", await free.$eval("#cal-pro", (n) => n.hidden), false);
+  check("saying a preview is running, not a plan",
+    (await free.textContent("#cal-pro-chip")) === (await free.evaluate(() => t("pro_prev_chip"))),
+    await free.textContent("#cal-pro-chip"));
+  eq("with the sentence that says the account did not change",
+    await free.$eval("#cal-pro-note", (n) => n.hidden), false);
+  eq("the chip is not the one a paying account gets",
+    await free.$eval("#cal-pro-chip", (n) => n.classList.contains("on")), false);
+  eq("and the preview is remembered",
+    await free.evaluate(() => localStorage.getItem("liczmat-pro-preview")), "1");
+
+  /* And back: the way out is next to the reminder, and it puts the wall up again. */
+  await free.click('#cal-pro [data-pw-preview]');
+  await free.waitForSelector("#cal-gate:not([hidden])");
+  eq("turning the preview off restores the wall",
+    await free.$eval("#cal-tool", (n) => n.hidden), true);
+  eq("and forgets it", await free.evaluate(() => localStorage.getItem("liczmat-pro-preview")), null);
+  await free.close();
+
+  /* A Pro account walks straight in, and is told which plan opened it. */
+  const pro = await open(ctx, CAL, { workspace: workspace(), crm: crm(), level: "pro", preview: false });
+  eq("no wall for a Pro account", await pro.$eval("#cal-gate", (n) => n.hidden), true);
+  eq("the module is there", await pro.$eval("#cal-tool", (n) => n.hidden), false);
+  check("the chip names the plan they are on",
+    (await pro.textContent("#cal-pro-chip")).includes("Pro"));
+  eq("the chip is the one that marks a plan somebody has",
     await pro.$eval("#cal-pro-chip", (n) => n.classList.contains("on")), true);
-  eq("and the explanation is dropped", await pro.$eval("#cal-pro-note", (n) => n.hidden), true);
+  eq("nothing lectures them", await pro.$eval("#cal-pro-note", (n) => n.hidden), true);
+  eq("and there is no preview to turn off",
+    await pro.$$eval("#cal-pro [data-pw-preview]", (n) => n.every((b) => b.hidden)), true);
   await pro.close();
 }
 

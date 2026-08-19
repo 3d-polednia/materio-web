@@ -675,12 +675,16 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
   eq("and it says so", await free.locator('.pro-mod[data-feature="clients"] .pro-lock').innerText(),
     "Dostępne w LiczMat Pro");
   // Chapter XXV's rule is "never a dead button", not "never a button". Sessions 22–25
-  // built Klienci, Zlecenia, Wyceny and Terminarz, so their cards are the only things in
-  // the panel that open anything; the CRM of session 26 does not exist yet and stays
-  // text, and there is still nothing to buy, because no payment exists
-  // (FIRESTORE_SYNC §9.2).
-  eq("the only controls in the panel are the modules that have been built",
-    await free.locator("#panel-pro a, #panel-pro button").count(), 4);
+  // built Klienci, Zlecenia, Wyceny and Terminarz, so their cards open something; the CRM
+  // of session 26 is a path through them rather than a page and stays text; and the fifth
+  // control is session 27's preview switch. There is still nothing to *buy* — no payment
+  // exists (FIRESTORE_SYNC §9.2) — and that is what the next check guards.
+  eq("four module links plus the preview switch, and nothing else",
+    await free.locator("#panel-pro a, #panel-pro button").count(), 5);
+  eq("exactly one of them is the preview switch",
+    await free.locator("#panel-pro [data-pw-preview]").count(), 1);
+  eq("and nothing in the panel offers to take money",
+    await free.locator("#panel-pro [data-plan-upgrade], #panel-pro form").count(), 0);
   eq("the first opens Klienci",
     await free.locator('.pro-mod[data-feature="clients"] a').getAttribute("href"), "/klienci/");
   eq("the second Zlecenia",
@@ -689,6 +693,28 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
     await free.locator('.pro-mod[data-feature="quotes"] a').getAttribute("href"), "/wyceny/");
   eq("and the fourth Terminarz",
     await free.locator('.pro-mod[data-feature="calendar"] a').getAttribute("href"), "/terminarz/");
+  /* Session 27's preview, from the page somebody goes to in order to find out what plan
+     they are on. It opens the modules and it must never make this card say Pro: the plan
+     is a server field and the preview does not touch it. */
+  eq("the switch offers to turn the preview on",
+    await free.locator("#panel-pro [data-pw-preview]").innerText(), "Włącz podgląd Pro");
+  await free.locator("#panel-pro [data-pw-preview]").click();
+  eq("it is remembered",
+    await free.evaluate(() => localStorage.getItem("liczmat-pro-preview")), "1");
+  eq("and the same switch now offers to turn it off",
+    await free.locator("#panel-pro [data-pw-preview]").innerText(), "Wyłącz podgląd Pro");
+  eq("the plan is still the free one", await free.locator("#plan-name").innerText(), "Darmowy");
+  check("and the card says the preview changed nothing about it",
+    (await free.locator("#plan-note").innerText())
+      .includes("Podgląd Pro jest włączony w tej przeglądarce"),
+    await free.locator("#plan-note").innerText());
+  await free.locator("#panel-pro [data-pw-preview]").click();
+  eq("turning it off forgets it",
+    await free.evaluate(() => localStorage.getItem("liczmat-pro-preview")), null);
+  eq("and the card goes back to the plain reason",
+    await free.locator("#plan-note").innerText(),
+    "Nic jeszcze nie nadaje planu Pro — nie ma płatności, więc każde konto jest darmowe.");
+
   eq("no console error", free.lmErrors.join(" / "), "");
   await free.close();
 

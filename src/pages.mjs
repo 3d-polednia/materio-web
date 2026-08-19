@@ -17,6 +17,7 @@ import {
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
+import { proGate } from "./pro.mjs";
 import { DEFAULT_CURRENCY } from "./currency.mjs";
 
 const LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
@@ -748,6 +749,7 @@ const COOKIE_ROWS = [
   { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },
   { name: "liczmat-recent-calcs", type: "ck_type_local", purpose: "ck_p_recent", life: "ck_life_until_cleared" },
   { name: "liczmat-crm-v1", type: "ck_type_local", purpose: "ck_p_crm", life: "ck_life_until_cleared" },
+  { name: "liczmat-pro-preview", type: "ck_type_local", purpose: "ck_p_preview", life: "ck_life_until_cleared" },
 ];
 
 const COOKIE_THIRD_ROWS = [
@@ -1270,30 +1272,17 @@ export function projectsMain(lang, t, aisles = []) {
  * figure in it is written by assets/crm-ui.js from the store, so nothing on this page is
  * translated twice.
  */
-export function clientsMain(lang, t) {
+export function clientsMain(lang, t, features) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("clipage_title"), path: urlClients(lang) },
   ]);
 
-  // Chapter XXV's block, in the words the chapter uses: the module named, and "Dostępne
-  // w LiczMat Pro" under it. `pro_more` is a sentence rather than a button while
-  // /liczmat-pro/ is planned (session 29) — src/pro.mjs makes the same decision for the
-  // same reason, and both stop being sentences the moment that route goes live.
-  const pro = iaRoute("liczmat-pro");
-  const more = pro && pro.status === STATUS.LIVE
-    ? `<a class="btn btn-ghost btn-sm" href="${pro.path(lang)}">${esc(t("pro_more"))}</a>`
-    : `<span class="muted">${esc(t("pro_more"))} — ${esc(t("door_soon"))}</span>`;
-
-  /* What a visitor whose level does not reach the module is shown *instead of* it. It is
-     in the markup from the first paint and hidden until the script knows the level, so
-     switching it on is a class away — session 27, LM_PRO_LOCKED in assets/plan.js. */
-  const gate = `<div class="app-card crm-gate" id="crm-gate" hidden>
-        <h2>${esc(t("feat_clients_t"))}</h2>
-        <p class="muted">${esc(t("feat_clients_d"))}</p>
-        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
-        <p>${more}</p>
-      </div>`;
+  /* Chapter XXV's paywall — session 27. One implementation for all five Pro modules
+     (proGate() in src/pro.mjs), so that four pages cannot describe the same wall four
+     ways. It is in the markup from the first paint and `hidden`; assets/paywall.js
+     unhides it when lmPaywall() says this visitor's plan does not reach the module. */
+  const gate = proGate(t, "clients", features, lang, { id: "crm-gate" });
 
   const detail = `<article id="crm-client" class="ws-project" hidden>
         <p class="ws-project-back"><a href="${urlClients(lang)}" data-crm-back>${esc(t("cli_back"))}</a></p>
@@ -1460,12 +1449,14 @@ export function clientsMain(lang, t) {
 
   <section class="block alt" id="crm-page">
     <div class="wrap narrow">
-      <!-- Chapter XXV, first sentence: a free user should understand which features are
-           Pro. The strip says so on every visit, whatever the level, and the script
-           swaps the chip for the one that belongs to a Pro account. -->
-      <p class="crm-pro" id="crm-pro">
+      <!-- Chapter XXV's strip, above the module for somebody who may use it: which plan
+           opened it, and — under a preview — the reminder that the plan did not change.
+           assets/paywall.js hides the whole strip when the wall is up, because the wall
+           says all of it and twice is worse than once. -->
+      <p class="crm-pro" id="crm-pro" hidden>
         <span class="chip" id="crm-pro-chip">${esc(t("pro_locked"))}</span>
-        <span class="muted" id="crm-pro-note">${esc(t("cli_pro_note"))}</span>
+        <span class="muted" id="crm-pro-note" hidden></span>
+        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>${esc(t("pro_prev_off"))}</button>
       </p>
 
       ${gate}
@@ -1500,27 +1491,15 @@ export function clientsMain(lang, t) {
  * by assets/jobs-ui.js from the store — nothing about a job can be server-rendered,
  * because every job is in one browser.
  */
-export function jobsMain(lang, t) {
+export function jobsMain(lang, t, features) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("clipage_title"), path: urlClients(lang) },
     { name: t("jobpage_title"), path: urlJobs(lang) },
   ]);
 
-  // Chapter XXV's block, worded exactly as on /klienci/ — one module, one rule. The
-  // "Poznaj LiczMat Pro" line is a sentence rather than a button while /liczmat-pro/ is
-  // planned (session 29); it becomes a link with no edit here the moment that goes live.
-  const pro = iaRoute("liczmat-pro");
-  const more = pro && pro.status === STATUS.LIVE
-    ? `<a class="btn btn-ghost btn-sm" href="${pro.path(lang)}">${esc(t("pro_more"))}</a>`
-    : `<span class="muted">${esc(t("pro_more"))} — ${esc(t("door_soon"))}</span>`;
-
-  const gate = `<div class="app-card crm-gate" id="job-gate" hidden>
-        <h2>${esc(t("feat_jobs_t"))}</h2>
-        <p class="muted">${esc(t("feat_jobs_d"))}</p>
-        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
-        <p>${more}</p>
-      </div>`;
+  // Chapter XXV's paywall, from the same builder as /klienci/ — one module, one wall.
+  const gate = proGate(t, "jobs", features, lang, { id: "job-gate" });
 
   /* The four statuses of chapter XXI, in the chapter's own order, rendered as a <select>
      so the whole set is visible at once and a job can be moved in one gesture. The values
@@ -1702,11 +1681,11 @@ export function jobsMain(lang, t) {
 
   <section class="block alt" id="job-page">
     <div class="wrap narrow">
-      <!-- Chapter XXV, first sentence: a free user should understand which features are
-           Pro. The strip says so on every visit, whatever the level. -->
-      <p class="crm-pro" id="job-pro">
+      <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
+      <p class="crm-pro" id="job-pro" hidden>
         <span class="chip" id="job-pro-chip">${esc(t("pro_locked"))}</span>
-        <span class="muted" id="job-pro-note">${esc(t("job_pro_note"))}</span>
+        <span class="muted" id="job-pro-note" hidden></span>
+        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>${esc(t("pro_prev_off"))}</button>
       </p>
 
       ${gate}
@@ -1739,27 +1718,15 @@ export function jobsMain(lang, t) {
  * in the browser, and three of the five come out of the project rather than out of the
  * quote (crmQuoteTotals() in assets/crm.js says why).
  */
-export function quotesMain(lang, t) {
+export function quotesMain(lang, t, features) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("jobpage_title"), path: urlJobs(lang) },
     { name: t("quopage_title"), path: urlQuotes(lang) },
   ]);
 
-  // Chapter XXV's block, worded exactly as on /klienci/ and /zlecenia/ — three modules,
-  // one rule. "Poznaj LiczMat Pro" is a sentence rather than a button while
-  // /liczmat-pro/ is planned (session 29); it becomes a link with no edit here.
-  const pro = iaRoute("liczmat-pro");
-  const more = pro && pro.status === STATUS.LIVE
-    ? `<a class="btn btn-ghost btn-sm" href="${pro.path(lang)}">${esc(t("pro_more"))}</a>`
-    : `<span class="muted">${esc(t("pro_more"))} — ${esc(t("door_soon"))}</span>`;
-
-  const gate = `<div class="app-card crm-gate" id="quo-gate" hidden>
-        <h2>${esc(t("feat_quotes_t"))}</h2>
-        <p class="muted">${esc(t("feat_quotes_d"))}</p>
-        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
-        <p>${more}</p>
-      </div>`;
+  // Chapter XXV's paywall, from the same builder as the other modules.
+  const gate = proGate(t, "quotes", features, lang, { id: "quo-gate" });
 
   const detail = `<article id="quo-detail" class="ws-project" hidden>
         <p class="ws-project-back"><a href="${urlQuotes(lang)}" data-quo-back>${esc(t("quo_back"))}</a></p>
@@ -1916,9 +1883,11 @@ export function quotesMain(lang, t) {
 
   <section class="block alt" id="quo-page">
     <div class="wrap narrow">
-      <p class="crm-pro" id="quo-pro">
+      <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
+      <p class="crm-pro" id="quo-pro" hidden>
         <span class="chip" id="quo-pro-chip">${esc(t("pro_locked"))}</span>
-        <span class="muted" id="quo-pro-note">${esc(t("quo_pro_note"))}</span>
+        <span class="muted" id="quo-pro-note" hidden></span>
+        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>${esc(t("pro_prev_off"))}</button>
       </p>
 
       ${gate}
@@ -1954,26 +1923,15 @@ export function quotesMain(lang, t) {
  * so a visitor with no JavaScript and a crawler both read what the module is: the page is
  * indexable, and chapter XXVI wants Pro described in public.
  */
-export function calendarMain(lang, t) {
+export function calendarMain(lang, t, features) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("jobpage_title"), path: urlJobs(lang) },
     { name: t("calpage_title"), path: urlCalendar(lang) },
   ]);
 
-  // Chapter XXV's block, worded exactly as on the other three modules. "Poznaj LiczMat
-  // Pro" is a sentence rather than a button while /liczmat-pro/ is planned (session 29).
-  const pro = iaRoute("liczmat-pro");
-  const more = pro && pro.status === STATUS.LIVE
-    ? `<a class="btn btn-ghost btn-sm" href="${pro.path(lang)}">${esc(t("pro_more"))}</a>`
-    : `<span class="muted">${esc(t("pro_more"))} — ${esc(t("door_soon"))}</span>`;
-
-  const gate = `<div class="app-card crm-gate" id="cal-gate" hidden>
-        <h2>${esc(t("feat_calendar_t"))}</h2>
-        <p class="muted">${esc(t("feat_calendar_d"))}</p>
-        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
-        <p>${more}</p>
-      </div>`;
+  // Chapter XXV's paywall, from the same builder as the other modules.
+  const gate = proGate(t, "calendar", features, lang, { id: "cal-gate" });
 
   /* The buckets of CAL_BUCKETS in assets/crm.js, in the same order and with the same ids.
      The script hides the ones that are empty; the markup carries all five, so the page
@@ -1998,11 +1956,11 @@ export function calendarMain(lang, t) {
 
   <section class="block alt" id="cal-page">
     <div class="wrap narrow">
-      <!-- Chapter XXV, first sentence: a free user should understand which features are
-           Pro. The strip says so on every visit, whatever the level. -->
-      <p class="crm-pro" id="cal-pro">
+      <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
+      <p class="crm-pro" id="cal-pro" hidden>
         <span class="chip" id="cal-pro-chip">${esc(t("pro_locked"))}</span>
-        <span class="muted" id="cal-pro-note">${esc(t("cal_pro_note"))}</span>
+        <span class="muted" id="cal-pro-note" hidden></span>
+        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>${esc(t("pro_prev_off"))}</button>
       </p>
 
       ${gate}

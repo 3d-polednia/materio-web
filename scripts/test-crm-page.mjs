@@ -199,6 +199,12 @@ async function open(ctx, url, opts = {}) {
   if (opts.crm) plant["liczmat-crm-v1"] = JSON.stringify(opts.crm);
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
   if (opts.level) plant["liczmat-signed-in"] = opts.level;
+  /* Session 27 put a paywall in front of the Pro modules, and nothing grants Pro
+     (FIRESTORE_SYNC §9.2), so a browser that opened this page with nothing planted would
+     see the wall and not the tool. The preview is the door session 27 left in it —
+     `liczmat-pro-preview` in assets/plan.js — and it is on unless a test is looking at
+     the wall itself, which is what `preview: false` is for. */
+  if (opts.preview !== false) plant["liczmat-pro-preview"] = "1";
 
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {

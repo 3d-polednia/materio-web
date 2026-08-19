@@ -113,21 +113,26 @@ function loadCrm() {
 }
 
 /** assets/plan.js as the browser loads it: after assets/account.js, in one scope. */
-function loadPlan({ locked = false } = {}) {
+function loadPlan({ open = false } = {}) {
   let src = read(["assets/account.js", "assets/plan.js"]);
-  if (locked) {
-    // Session 27's whole switch, applied here so both answers are tested before it is
-    // thrown. If this replacement ever stops matching, the constant has been renamed and
-    // the paywall session has one more file to touch than the comment in plan.js says.
+  if (open) {
+    // Session 27 threw the switch; this puts it back, so both answers stay tested. If
+    // the replacement ever stops matching, the constant has been renamed and the wall is
+    // being decided somewhere this test cannot see.
     const before = src;
-    src = src.replace("var LM_PRO_LOCKED = false;", "var LM_PRO_LOCKED = true;");
+    src = src.replace("var LM_PRO_LOCKED = true;", "var LM_PRO_LOCKED = false;");
     if (src === before) throw new Error("LM_PRO_LOCKED is no longer one line in assets/plan.js");
   }
   return evalSource(src, [
     "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmGate",
-    "lmFeatureState",
+    "lmFeatureState", "lmPaywall", "lmProPreview",
   ], { document: undefined, localStorage: undefined });
 }
+
+/* The permission table as the browser has it, for the page builders: proGate() renders
+   the wall out of LM_FEATURES, so a test that called clientsMain() without it would be
+   checking a page the build never writes. */
+const FEATURES = loadPlan().LM_FEATURES;
 
 /** One saved calculation, exactly as assets/workspace-ui.js writes it after a result. */
 const save = (ws, over = {}) => ws.wsAddEstimation({
@@ -505,10 +510,13 @@ head("5. the route says what the page is, and the architecture still validates")
   eq("and the transliterated Ukrainian one", SECTION.clients.uk, "kliyenty");
 }
 
-head("5b. chapter XXV's gate, and the one switch session 27 flips");
+head("5b. chapter XXV's paywall, in both of its states");
 {
-  const open = loadPlan();
-  eq("nothing is locked while payments do not exist", open.LM_PRO_LOCKED, false);
+  // The shipped value since session 27. `open` below is the same file with the switch
+  // put back, so the answer the module ran under for sessions 22–26 stays tested.
+  const shipped = loadPlan();
+  eq("the paywall is up", shipped.LM_PRO_LOCKED, true);
+  const open = loadPlan({ open: true });
 
   const guest = open.lmFeatureState("clients", open.LM_LEVEL.GUEST);
   eq("a guest is not allowed the module", guest.allowed, false);
@@ -520,11 +528,20 @@ head("5b. chapter XXV's gate, and the one switch session 27 flips");
   eq("a Pro account is allowed it", pro.allowed, true);
   eq("with nothing to say about a gate", pro.gated, false);
 
-  const shut = loadPlan({ locked: true });
-  const later = shut.lmFeatureState("clients", shut.LM_LEVEL.LICZMAT);
-  eq("after session 27 the same visitor is gated", later.gated, true);
-  eq("and the module is replaced by the gate", later.locked, true);
-  eq("while Pro is unaffected", shut.lmFeatureState("clients", shut.LM_LEVEL.PRO).locked, false);
+  const later = shipped.lmFeatureState("clients", shipped.LM_LEVEL.LICZMAT);
+  eq("with the paywall up the same visitor is gated", later.gated, true);
+  eq("and the module is replaced by the wall", later.locked, true);
+  eq("while Pro is unaffected", shipped.lmFeatureState("clients", shipped.LM_LEVEL.PRO).locked, false);
+
+  // Chapter XXV's "przejście Free → Pro", one rung per level: a guest has no account for
+  // a plan to sit on, so they are sent to make one; a free account is offered the upgrade.
+  eq("a guest is sent to make an account",
+    shipped.lmPaywall("clients", shipped.LM_LEVEL.GUEST).step, "account");
+  eq("a free account is offered the upgrade",
+    shipped.lmPaywall("clients", shipped.LM_LEVEL.LICZMAT).step, "upgrade");
+  eq("and a Pro account has nothing left to do",
+    shipped.lmPaywall("clients", shipped.LM_LEVEL.PRO).step, "none");
+  eq("with the module open for them", shipped.lmPaywall("clients", shipped.LM_LEVEL.PRO).open, true);
 
   // A typo shuts a door rather than opening one — the same rule lmCan() follows.
   const unknown = open.lmFeatureState("teleportation", open.LM_LEVEL.PRO);
@@ -542,7 +559,7 @@ head("5b. chapter XXV's gate, and the one switch session 27 flips");
 
 head("6. the page the build writes");
 {
-  const html = clientsMain(DEFAULT_LANG, tr(DEFAULT_LANG)).main;
+  const html = clientsMain(DEFAULT_LANG, tr(DEFAULT_LANG), FEATURES).main;
   const has = (needle, why) => check(why, html.includes(needle), needle);
 
   // Every id assets/crm-ui.js reaches for. A renamed element is a screen that silently
@@ -565,7 +582,7 @@ head("6. the page the build writes");
   has("<h1", "the page has one heading");
   has('class="breadcrumbs"', "and a trail back");
   has(tr(DEFAULT_LANG)("pro_locked"), "chapter XXV's words are in the markup, not only in a script");
-  has(tr(DEFAULT_LANG)("cli_pro_note"), "with the sentence that says why the module is open");
+  has(tr(DEFAULT_LANG)("pro_need_pro"), "with the sentence a free account is shown");
   has(tr(DEFAULT_LANG)("cli_local_note"), "and the honest note about where the rows live");
   has(tr(DEFAULT_LANG)("feat_clients_t"), "the gate names the module");
   has(tr(DEFAULT_LANG)("feat_clients_d"), "and describes it in full — chapter XXV");
@@ -589,7 +606,7 @@ head("6. the page the build writes");
 
   // The page is one file per language, so its own address is the one in the trail.
   for (const lang of LANGS) {
-    const page = clientsMain(lang, tr(lang)).main;
+    const page = clientsMain(lang, tr(lang), FEATURES).main;
     check(`${lang}: the trail points at this language's page`, page.includes(urlClients(lang)));
     check(`${lang}: and the projects link is this language's too`,
       page.includes(`href="${DEFAULT_LANG === lang ? "/projekty/" : ""}`) || true);
@@ -602,7 +619,7 @@ head("7. the copy, in four languages");
 {
   const KEYS = [
     "clipage_title", "clipage_lead", "clipage_meta",
-    "cli_pro_note", "cli_pro_yours", "cli_local_note",
+    "cli_pro_yours", "cli_local_note",
     "cli_list_t", "cli_list_d", "cli_new", "cli_name", "cli_phone", "cli_email",
     "cli_address", "cli_note", "cli_empty",
     "cli_archive_t", "cli_archive_d", "cli_archive_do", "cli_archive_undo",
@@ -632,7 +649,12 @@ head("7. the copy, in four languages");
   // The two sentences that carry the honesty of this session. Chapter XXV wants a free
   // user to understand what is Pro; CLAUDE.md forbids implying a sync that does not exist.
   for (const lang of LANGS) {
-    check(`${lang}: the Pro note is a full sentence`, DICT[lang].cli_pro_note.length > 60);
+    // Session 27 replaced the per-module "the module is open for now" sentence with the
+    // paywall's own copy, which is shared by all five modules and says what to do next.
+    check(`${lang}: the wall tells a guest to make an account`,
+      DICT[lang].pro_need_account.length > 40);
+    check(`${lang}: and a free account what it is on`, DICT[lang].pro_need_pro.length > 20);
+    check(`${lang}: the preview says what it is not`, DICT[lang].pro_prev_d.length > 80);
     check(`${lang}: the storage note names localStorage`,
       DICT[lang].cli_local_note.includes("localStorage"), DICT[lang].cli_local_note);
     check(`${lang}: and it is a full sentence`, DICT[lang].cli_local_note.length > 100);

@@ -1430,6 +1430,26 @@ a.chip:hover { text-decoration: none; }
 /* Chapter XXV's block when it stands *instead of* the module (LM_PRO_LOCKED). */
 .crm-gate { margin-bottom: var(--sp-5); }
 .crm-gate h2 { margin-top: 0; }
+
+/* ---------- The paywall: /klienci/, /zlecenia/, /wyceny/, /terminarz/ (session 27)
+   One wall, built once by proGate() in src/pro.mjs, so the four modules cannot describe
+   the same product four ways. Everything below is the two blocks the wall added to the
+   card it already was: what else Pro covers, and the preview that is the only way
+   through it until session 28 can sell one. */
+.pw-gate .pw-step { margin: 0 0 var(--sp-3); }
+.pw-incl { margin: var(--sp-5) 0; }
+.pw-incl h3 { margin: 0 0 var(--sp-3); font-size: var(--fs-base); }
+.pw-incl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.pw-incl-list li { font-size: var(--fs-sm); }
+/* The preview is a decision, not a footnote: it is set apart from the description above
+   it so that nobody switches it on while reading about what Pro costs. */
+.pw-prev {
+  margin: var(--sp-5) 0 var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--outline);
+}
+.pw-prev h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
+.pw-prev p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
 .crm-contact {
   display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3);
   margin-bottom: var(--sp-4);

@@ -29,7 +29,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { LEVEL, LEVEL_ORDER, ROUTES, STATUS, route, validateIA } from "../src/ia.mjs";
-import { proModules, proKeys, proPanel, proModuleCard } from "../src/pro.mjs";
+import { LANGS as SITE_LANGS, urlClients } from "../src/site.mjs";
+import { proModules, proKeys, proPanel, proModuleCard, proGate } from "../src/pro.mjs";
 import { appMain, appProKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -51,9 +52,33 @@ const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 /** The shipped files, evaluated in the order the page loads them. */
 const PLAN = evalScript(["assets/account.js", "assets/plan.js"], [
   "LM_LEVEL", "LM_PLAN", "LM_FEATURES", "lmPlanStatus", "lmFeature", "lmFeaturesAt",
-  "lmCan", "lmGate", "lmLevelOf",
+  "lmCan", "lmGate", "lmLevelOf", "LM_PRO_LOCKED", "LM_PRO_PREVIEW_KEY", "lmFeatureState",
+  "lmPaywall", "lmProPreview", "lmSetProPreview",
 ]);
 const { LM_LEVEL, LM_PLAN, LM_FEATURES, lmPlanStatus, lmFeature, lmFeaturesAt, lmCan, lmGate } = PLAN;
+
+/**
+ * assets/plan.js again, this time over a `localStorage` it can actually write to — the
+ * preview is one key in it, and a test that stubbed the function instead of the storage
+ * would be checking its own stub.
+ *
+ * `document` is left undefined: lmSetProPreview() guards on it, and a preview that only
+ * works on a page with a DOM would be a preview the tests could never reach.
+ */
+function loadWithStorage(initial) {
+  const store = { ...(initial || {}) };
+  const localStorage = {
+    getItem: (k) => (Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null),
+    setItem: (k, v) => { store[k] = String(v); },
+    removeItem: (k) => { delete store[k]; },
+  };
+  const src = ["assets/account.js", "assets/plan.js"]
+    .map((f) => readFileSync(p(f), "utf8")).join("\n");
+  const api = new Function("localStorage", "document", `${src}
+    return { LM_LEVEL, LM_PRO_LOCKED, LM_PRO_PREVIEW_KEY, lmFeatureState, lmPaywall,
+             lmProPreview, lmSetProPreview };`)(localStorage, undefined);
+  return { ...api, store };
+}
 
 /* ------------------------------------------------------------------ the runner */
 
@@ -67,6 +92,9 @@ function check(name, cond, detail) {
   failures.push(`${section} — ${name}${detail ? `\n      ${detail}` : ""}`);
   return false;
 }
+
+/** Escape a translated string so it can be counted with a RegExp. */
+const esc = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const eq = (name, got, want) =>
   check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
@@ -235,6 +263,165 @@ head("6. the gate: what a free user is shown instead");
   // An unknown id has no gate to show, because it has no name and no level. lmCan()
   // refuses it; a gate that invented one would put "undefined" on the page.
   eq("an unknown feature has no gate either", lmGate("nope", LM_LEVEL.GUEST), null);
+}
+
+/* ------------------------------------------------------------------ 6b. the paywall */
+
+head("6b. session 27: the wall itself");
+{
+  eq("the paywall is up", PLAN.LM_PRO_LOCKED, true);
+
+  // Every Pro module is behind it, and nothing below Pro is. A wall in front of a
+  // calculator would break chapter II's hardest rule in the same commit that built it.
+  for (const f of LM_FEATURES) {
+    const st = PLAN.lmFeatureState(f.id, LM_LEVEL.LICZMAT);
+    if (f.level === LEVEL.PRO) {
+      check(`${f.id} is walled off from a free account`, st.locked);
+    } else {
+      check(`${f.id} is not`, !st.locked);
+    }
+  }
+  for (const f of lmFeaturesAt(LEVEL.GUEST)) {
+    check(`${f.id} is open to a guest`, PLAN.lmFeatureState(f.id, LM_LEVEL.GUEST).allowed);
+  }
+
+  // A free account meets a wall on sync too — but sync is LICZMAT, so the level reaches
+  // it and there is nothing to lock. The lock is LM_PRO_LOCKED and it is about Pro.
+  check("sync is open to the account that has one",
+    PLAN.lmFeatureState("sync", LM_LEVEL.LICZMAT).allowed);
+  check("and walled off from a guest without one — but not by the Pro lock",
+    !PLAN.lmFeatureState("sync", LM_LEVEL.GUEST).allowed
+      && !PLAN.lmFeatureState("sync", LM_LEVEL.GUEST).locked);
+
+  // Chapter XXV's "przejście Free → Pro", one rung per level.
+  eq("a guest is sent to make an account first",
+    PLAN.lmPaywall("clients", LM_LEVEL.GUEST).step, "account");
+  eq("a free account is offered the upgrade",
+    PLAN.lmPaywall("clients", LM_LEVEL.LICZMAT).step, "upgrade");
+  eq("a Pro account has nothing left to do",
+    PLAN.lmPaywall("clients", LM_LEVEL.PRO).step, "none");
+  eq("and the module is open for them", PLAN.lmPaywall("clients", LM_LEVEL.PRO).open, true);
+  eq("closed for everybody else", PLAN.lmPaywall("clients", LM_LEVEL.GUEST).open, false);
+
+  // A typo shuts a door rather than opening one — the rule lmCan() already follows.
+  const unknown = PLAN.lmPaywall("teleportation", LM_LEVEL.PRO);
+  eq("an unknown feature is not open", unknown.open, false);
+  eq("and it is locked", unknown.locked, true);
+  eq("with no feature to name", unknown.feature, null);
+}
+
+head("6c. the Pro preview: what it opens, and what it must never claim");
+{
+  const off = loadWithStorage();
+  eq("off in a browser that has never seen it", off.lmProPreview(), false);
+  eq("so the wall is up", off.lmFeatureState("clients", off.LM_LEVEL.LICZMAT).locked, true);
+
+  off.lmSetProPreview(true);
+  eq("the key is the one assets/plan.js names",
+    off.store[off.LM_PRO_PREVIEW_KEY], "1");
+  eq("and it is the only thing written", Object.keys(off.store).length, 1);
+
+  const on = loadWithStorage({ "liczmat-pro-preview": "1" });
+  eq("the key is spelled the same way here", on.LM_PRO_PREVIEW_KEY, "liczmat-pro-preview");
+
+  const st = on.lmFeatureState("clients", on.LM_LEVEL.LICZMAT);
+  eq("the module runs", st.locked, false);
+  eq("the page is told it is a preview", st.preview, true);
+  // The whole point of keeping these apart: a preview is not a plan, and a page that
+  // said "Twój plan: LiczMat Pro" over one would be lying about what was bought.
+  eq("but the level still does not reach it", st.allowed, false);
+  eq("and the page still says the module is Pro", st.gated, true);
+
+  const pro = on.lmFeatureState("clients", on.LM_LEVEL.PRO);
+  eq("a real Pro account is allowed, not previewing", pro.allowed, true);
+  eq("with no preview claimed over it", pro.preview, false);
+
+  // Every Pro module opens together. Five switches would be five ways to be half in.
+  for (const f of LM_FEATURES.filter((x) => x.level === LEVEL.PRO)) {
+    eq(`${f.id} opens under the preview`,
+      on.lmFeatureState(f.id, on.LM_LEVEL.GUEST).locked, false);
+  }
+  // And nothing else does. `sync` and `share` need a Firebase user and a document the
+  // deployed rules accept; no key in this browser can supply either.
+  for (const f of LM_FEATURES.filter((x) => x.level === LEVEL.LICZMAT)) {
+    eq(`${f.id} does not`, on.lmFeatureState(f.id, on.LM_LEVEL.GUEST).allowed, false);
+    eq(`nor is ${f.id} claimed as a preview`,
+      on.lmFeatureState(f.id, on.LM_LEVEL.GUEST).preview, false);
+  }
+
+  // The paywall is satisfied — there is nothing to do next — and it still knows the
+  // visitor is on the free plan, which is what lets the strip say so.
+  eq("nothing to do next while previewing",
+    on.lmPaywall("clients", on.LM_LEVEL.LICZMAT).step, "none");
+  eq("the module is open", on.lmPaywall("clients", on.LM_LEVEL.LICZMAT).open, true);
+  eq("and it is still gated", on.lmPaywall("clients", on.LM_LEVEL.LICZMAT).gated, true);
+
+  on.lmSetProPreview(false);
+  eq("turning it off removes the key", on.store[on.LM_PRO_PREVIEW_KEY], undefined);
+  eq("and the wall is back", on.lmFeatureState("clients", on.LM_LEVEL.LICZMAT).locked, true);
+
+  // A browser that refuses storage reads as "off" rather than throwing: the wall is the
+  // safe answer, and a paywall that crashed the page would open everything behind it.
+  const noStore = new Function(
+    ["assets/account.js", "assets/plan.js"].map((f) => readFileSync(p(f), "utf8")).join("\n")
+      + "\nreturn { lmProPreview, lmFeatureState, LM_LEVEL };")();
+  eq("no storage means no preview", noStore.lmProPreview(), false);
+  eq("and the wall stands", noStore.lmFeatureState("clients", "liczmat").locked, true);
+}
+
+head("6d. the wall as it is built, in four languages");
+{
+  for (const lang of SITE_LANGS.map((l) => l.code)) {
+    const t = tr(lang);
+    const html = proGate(t, "clients", LM_FEATURES, lang, { id: "crm-gate" });
+    const has = (needle, what) => check(`${lang}: ${what}`, html.includes(needle),
+      `not in the wall: ${needle}`);
+
+    has('id="crm-gate"', "the wall carries the id the page's script looks for");
+    has("hidden", "and is hidden until the script knows the level");
+    has(t("feat_clients_t"), "the module is named");
+    has(t("feat_clients_d"), "and described");
+    has(t("pro_locked"), "with chapter XXV's own sentence");
+
+    // Both rungs are in the markup; assets/paywall.js shows one. A wall that had to be
+    // rebuilt to change rung would flash the wrong sentence first.
+    has('data-pw-step="account"', "the guest's rung is there");
+    has('data-pw-step="upgrade"', "and the free account's");
+    has(t("pro_need_account"), "with the sentence for a guest");
+    has(t("pro_need_pro"), "and the one for a free account");
+    has(`href="/app/?mode=signup&amp;next=${encodeURIComponent(urlClients(lang))}"`,
+      "and a sign-up link that comes back to this page, in this language");
+
+    // "Prezentacja funkcji Pro": the wall shows the whole product, not one fifth of it.
+    has(t("pro_incl_t"), "the rest of Pro is listed");
+    for (const f of proModules(LM_FEATURES).filter((x) => x.id !== "clients")) {
+      has(t(`${f.key}_t`), `and ${f.id} is named on it`);
+    }
+    check(`${lang}: the module behind this wall is not listed twice`,
+      (html.match(new RegExp(esc(t("feat_clients_t")), "g")) || []).length === 1);
+
+    // The preview, and the three things it says it is not.
+    has("data-pw-preview", "the preview switch is on the wall");
+    has(t("pro_prev_t"), "with its heading");
+    has(t("pro_prev_d"), "and the sentence that says it changes no plan");
+    has(t("pro_pay_later"), "and the note that payments are still to come");
+
+    // Chapter XXV's rule, still: never a dead button. /liczmat-pro/ is PLANNED until
+    // session 29, so the phrase is text; the moment the route goes LIVE it is a link and
+    // this check flips to the other branch on its own.
+    const proPage = route("liczmat-pro");
+    has(t("pro_more"), "the way to find out what Pro is, is offered");
+    check(`${lang}: and it is a sentence while /liczmat-pro/ is planned`,
+      proPage.status === STATUS.LIVE
+        ? html.includes(`href="${proPage.path(lang)}"`)
+        : html.includes(t("door_soon")));
+  }
+
+  // The wall is built from LM_FEATURES, so a module the table never heard of must not
+  // reach a page as an empty heading.
+  let threw = false;
+  try { proGate(tr("pl"), "teleportation", LM_FEATURES, "pl", {}); } catch (e) { threw = true; }
+  check("a wall in front of an unknown feature aborts the build", threw);
 }
 
 /* ------------------------------------------------------------------ 7. the structure */

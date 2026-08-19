@@ -15,9 +15,9 @@
  * buckets that answer "kiedy", the basics of each job beside its date, and a date control
  * on the row so a missing deadline can be fixed where it is noticed.
  *
- * Chapter XXV sits at the top exactly as on the other three modules: the module says it is
- * LiczMat Pro on every visit, and whether that notice *replaces* it is lmFeatureState() in
- * assets/plan.js — LM_PRO_LOCKED, false until session 27.
+ * Chapter XXV stands in front of the page exactly as on the other three modules — the
+ * same wall, from the same builder (proGate() in src/pro.mjs, drawn by
+ * assets/paywall.js), and the same one decision in lmPaywall().
  */
 
 const calT = (key) => (typeof t === "function" ? t(key) : key);
@@ -62,30 +62,15 @@ const calUrl = (key, fallback) => ((window.LM_LINKS && window.LM_LINKS[key]) || 
 
 /* ------------------------------------------------------------------ the Pro notice */
 
-/** What this browser was last told about the session — a copy hint, never a gate. */
-const calLevel = () => (typeof lmReadLevel === "function" ? lmReadLevel() : "guest");
-
-/** The state of the "calendar" feature for this visitor: allowed, gated, or locked out. */
-function calState() {
-  if (typeof lmFeatureState === "function") return lmFeatureState("calendar", calLevel());
-  return { allowed: true, gated: false, locked: false, feature: null };
-}
-
-/** Chapter XXV's block at the top of the page, and — when locked — instead of it. */
-function calRenderPro() {
-  const state = calState();
-  const chip = document.getElementById("cal-pro-chip");
-  const note = document.getElementById("cal-pro-note");
-  if (chip) {
-    chip.textContent = state.allowed ? calT("cli_pro_yours") : calT("pro_locked");
-    chip.classList.toggle("on", state.allowed);
-  }
-  if (note) note.hidden = state.allowed || state.locked;
-  const gate = document.getElementById("cal-gate");
-  const tool = document.getElementById("cal-tool");
-  if (gate) gate.hidden = !state.locked;
-  if (tool) tool.hidden = state.locked;
-}
+/**
+ * Chapter XXV's paywall — the strip above the module, and the wall instead of it.
+ *
+ * Session 27 moved the whole of it into assets/paywall.js: sessions 22–25 wrote these
+ * twenty lines once per module, identical but for a three-letter prefix, and four walls
+ * are four chances to describe the same product differently. What is left here is the
+ * name this file calls it by and the two arguments that make it this page's wall.
+ */
+const calRenderPro = () => pwRender("cal", "calendar");
 
 /* ------------------------------------------------------------------ the rows */
 
@@ -204,8 +189,9 @@ function buildSchedulePage() {
   // Switching language re-renders every row: the status word, the date and the relative
   // phrase are all written by this script, so nothing on the page translates itself.
   document.addEventListener("langchange", calRender);
-  // Signing in or out on /app/ moves the level, and the notice at the top follows it.
-  document.addEventListener("lm-session", calRenderPro);
+  // Signing in or out on /app/ moves the level; the preview switch moves the wall. Both
+  // are wired here, once, by assets/paywall.js.
+  pwMount("cal", "calendar");
 
   calRender();
   document.documentElement.setAttribute("data-schedule-ready", "1");

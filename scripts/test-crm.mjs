@@ -116,17 +116,22 @@ function loadChain() {
 }
 
 /** assets/plan.js as the browser loads it: after assets/account.js, in one scope. */
-function loadPlan({ locked = false } = {}) {
+function loadPlan({ open = false } = {}) {
   let src = read(["assets/account.js", "assets/plan.js"]);
-  if (locked) {
+  if (open) {
     const before = src;
-    src = src.replace("var LM_PRO_LOCKED = false;", "var LM_PRO_LOCKED = true;");
+    src = src.replace("var LM_PRO_LOCKED = true;", "var LM_PRO_LOCKED = false;");
     if (src === before) throw new Error("LM_PRO_LOCKED is no longer one line in assets/plan.js");
   }
   return evalSource(src, [
-    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState",
+    "LM_LEVEL", "LM_FEATURES", "LM_PRO_LOCKED", "lmFeature", "lmCan", "lmFeatureState", "lmPaywall", "lmProPreview",
   ], { document: undefined, localStorage: undefined });
 }
+
+/* The permission table as the browser has it, for the page builders: proGate() renders
+   the wall out of LM_FEATURES, so a test that called clientsMain() without it would be
+   checking a page the build never writes. */
+const FEATURES = loadPlan().LM_FEATURES;
 
 /** One saved calculation, exactly as assets/workspace-ui.js writes it after a result. */
 const save = (ws, over = {}) => ws.wsAddEstimation({
@@ -444,15 +449,15 @@ head("5. `crm` is a Pro feature with no page of its own");
     eq(`${id} is PRO as well`, plan.lmFeature(id).level, LEVEL.PRO);
   }
 
-  // Chapter XXV's gate, in both of its states. Session 27 flips one variable.
-  eq("nothing is locked today", plan.LM_PRO_LOCKED, false);
-  eq("a free account is told the module is Pro and still sees it",
-    plan.lmFeatureState("crm", "liczmat").locked, false);
-  check("and is told", plan.lmFeatureState("crm", "liczmat").gated);
-  const locked = loadPlan({ locked: true });
-  eq("with the paywall on, the same account is shut out",
-    locked.lmFeatureState("crm", "liczmat").locked, true);
-  eq("and a Pro account is not", locked.lmFeatureState("crm", "pro").locked, false);
+  // Chapter XXV's wall, in both of its states. Session 27 threw the switch; `open` is
+  // the same file with it put back, so the answer sessions 22–26 ran under stays tested.
+  eq("the paywall is up", plan.LM_PRO_LOCKED, true);
+  eq("a free account is shut out", plan.lmFeatureState("crm", "liczmat").locked, true);
+  check("and is told what it is", plan.lmFeatureState("crm", "liczmat").gated);
+  eq("and a Pro account is not", plan.lmFeatureState("crm", "pro").locked, false);
+  const open = loadPlan({ open: true });
+  eq("before session 27 the same account saw the module",
+    open.lmFeatureState("crm", "liczmat").locked, false);
 }
 
 /* ================================================================== 6. the frame */
@@ -460,9 +465,9 @@ head("5. `crm` is a Pro feature with no page of its own");
 head("6. the frame the build writes, and the one link map behind it");
 {
   const t = tr(DEFAULT_LANG);
-  const client = clientsMain(DEFAULT_LANG, t).main;
-  const job = jobsMain(DEFAULT_LANG, t).main;
-  const quote = quotesMain(DEFAULT_LANG, t).main;
+  const client = clientsMain(DEFAULT_LANG, t, FEATURES).main;
+  const job = jobsMain(DEFAULT_LANG, t, FEATURES).main;
+  const quote = quotesMain(DEFAULT_LANG, t, FEATURES).main;
 
   for (const [where, html, ids] of [
     ["/klienci/", client, ["crm-client-quotes", "crm-history"]],

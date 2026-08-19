@@ -235,13 +235,14 @@ export const ROUTES = [
     path: urlClients,
     footer: { order: 7, key: "clipage_title" },
     navLevel: LEVEL.PRO,
-    gate: "Chapter XXV: a free user sees what the module is and the words " +
-      "\"Dostępne w LiczMat Pro\", never a dead button. Session 22 renders that as a " +
-      "notice above a working module rather than as a lock, because nothing grants Pro " +
-      "yet (FIRESTORE_SYNC §9.2: no Cloud Functions, no billing) — a lock today would " +
-      "close the module to every account there is, including the one that has to check " +
-      "it works before payments exist at all. LM_PRO_LOCKED in assets/plan.js is the " +
-      "one switch session 27 flips.",
+    gate: "Chapter XXV, built in session 27: proGate() in src/pro.mjs stands in place " +
+      "of the module — the module named and described, \"Dostępne w LiczMat Pro\", the " +
+      "other four Pro modules listed so the wall shows the whole product, and one rung " +
+      "of the Free → Pro path chosen from the visitor's level (a guest is sent to sign " +
+      "up, a free account is told its plan). Never a dead button: \"Poznaj LiczMat Pro\" " +
+      "stays a sentence while /liczmat-pro/ is PLANNED. LM_PRO_LOCKED in assets/plan.js " +
+      "is `true` from session 27 on; the preview beside it (LM_PRO_PREVIEW_KEY) is what " +
+      "keeps the module checkable while session 28 still owes the payment.",
     note: "Chapter XX, and the first of the five Pro modules. The client list lives in " +
       "assets/crm.js — localStorage, this browser only: `clients` is not in the sync " +
       "contract (docs/FIRESTORE_SYNC.md in the app repo has projects, rooms, " +
@@ -269,8 +270,8 @@ export const ROUTES = [
     path: urlJobs,
     footer: { order: 8, key: "jobpage_title" },
     navLevel: LEVEL.PRO,
-    gate: "As clients — the same notice above a working module, and the same one switch " +
-      "(LM_PRO_LOCKED in assets/plan.js) closes both when session 27 builds the paywall.",
+    gate: "As clients — the same wall, from the same builder (proGate() in " +
+      "src/pro.mjs) and behind the same switch.",
     note: "Chapter XXI, and the second of the five Pro modules. A job is chapter XXIV's " +
       "middle step — KLIENT → ZLECENIE → PROJEKT — so it carries a client, a project, a " +
       "status, a date, an agreed value and notes. It lives in assets/crm.js beside the " +
@@ -299,8 +300,7 @@ export const ROUTES = [
     path: urlQuotes,
     footer: { order: 9, key: "quopage_title" },
     navLevel: LEVEL.PRO,
-    gate: "As clients and jobs — the same notice above a working module, and the same " +
-      "one switch (LM_PRO_LOCKED in assets/plan.js) closes all three at session 27.",
+    gate: "As clients and jobs — the same wall, from the same builder.",
     note: "Chapter XXII, and the third of the five Pro modules: materials, labour, " +
       "other costs, margin, total — and no more, because the chapter says in one line " +
       "not to build an accounting package. It is chapter XXIV's fourth step, and the " +
@@ -331,8 +331,7 @@ export const ROUTES = [
     path: urlCalendar,
     footer: { order: 10, key: "calpage_title" },
     navLevel: LEVEL.PRO,
-    gate: "As clients, jobs and quotes — the same notice above a working module, and the " +
-      "same one switch (LM_PRO_LOCKED in assets/plan.js) closes all four at session 27.",
+    gate: "As clients, jobs and quotes — the same wall, from the same builder.",
     note: "Chapter XXIII, and the fourth of the five Pro modules: the deadlines of the " +
       "jobs, grouped by how close they are, and the basics beside each one. It is the " +
       "one Pro module that **stores nothing**: a deadline is a field of a job " +

@@ -64,7 +64,7 @@
 <link rel="alternate" hreflang="en" href="https://liczmat.com/en/schedule/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/terminarz/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260819f" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260819g" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -82,7 +82,7 @@
 <meta name="twitter:title" content="Календар — LiczMat">
 <meta name="twitter:description" content="Календар замовлень у LiczMat Pro: терміни згруповані від прострочених до дальших, поруч із кожним замовленням клієнт, статус і вартість. Дату ставите тут же. Дані залишаються в цьому браузері.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
-<link rel="stylesheet" href="/assets/styles.css?v=20260819f">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819g">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -159,18 +159,45 @@
 
   <section class="block alt" id="cal-page">
     <div class="wrap narrow">
-      <!-- Chapter XXV, first sentence: a free user should understand which features are
-           Pro. The strip says so on every visit, whatever the level. -->
-      <p class="crm-pro" id="cal-pro">
+      <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
+      <p class="crm-pro" id="cal-pro" hidden>
         <span class="chip" id="cal-pro-chip">Доступно в LiczMat Pro</span>
-        <span class="muted" id="cal-pro-note">Календар — це модуль LiczMat Pro. План Pro поки що ніщо не надає, тому модуль наразі відкритий — блокування прийде разом із paywall.</span>
+        <span class="muted" id="cal-pro-note" hidden></span>
+        <button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false" hidden>Вимкнути перегляд Pro</button>
       </p>
 
-      <div class="app-card crm-gate" id="cal-gate" hidden>
+      <div class="app-card crm-gate pw-gate" id="cal-gate" hidden>
         <h2>Календар</h2>
         <p class="muted">Терміни замовлень і основне про них. Не другий Google Календар.</p>
         <p><span class="chip">Доступно в LiczMat Pro</span></p>
-        <p><span class="muted">Дізнатися про LiczMat Pro — У підготовці</span></p>
+
+        <!-- One rung of the Free → Pro path, chosen by assets/paywall.js from the level.
+             Both are in the markup; neither is shown until the script knows which. -->
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro — це план на акаунті. Спершу створіть безкоштовний акаунт LiczMat або увійдіть — Pro вмикається лише на акаунті.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fuk%2Fkalendar%2F" rel="nofollow">Створити безкоштовний акаунт</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Ваш акаунт на безкоштовному плані. Цей модуль належить до LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Що ще охоплює LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Клієнти</b> — <span class="muted">Список клієнтів із контактами, нотатками та історією співпраці.</span></li>
+            <li><b>Замовлення</b> — <span class="muted">Замовлення з клієнтом, описом, статусом, терміном, вартістю та пов’язаним проєктом.</span></li>
+            <li><b>Кошториси</b> — <span class="muted">Матеріал, робота, додаткові витрати, маржа й сума — з того, що ти вже порахував.</span></li>
+            <li><b>Історія і CRM</b> — <span class="muted">Шлях через усю роботу: клієнт → замовлення → проєкт → кошторис → історія.</span></li>
+          </ul>
+        </div>
+
+        <p><span class="muted"><span data-i18n="pro_more">Дізнатися про LiczMat Pro</span> — <span data-i18n="door_soon">У підготовці</span></span></p>
+
+        <div class="pw-prev">
+          <h3 data-i18n="pro_prev_t">Перегляд Pro на цьому пристрої</h3>
+          <p class="muted" data-i18n="pro_prev_d">Pro поки не можна купити — оплата з’явиться наступним кроком. Перегляд відкриває модулі Pro в цьому браузері, щоб їх можна було перевірити. Він не змінює план на акаунті, не синхронізується, і застосунок на телефоні його не бачить.</p>
+          <p><button type="button" class="btn btn-ghost btn-sm" data-pw-preview aria-pressed="false">Увімкнути перегляд Pro</button></p>
+        </div>
+
+        <p class="muted src-note">Оплати ще немає. Функції Pro готові, paywall стоїть — передплата є наступним кроком.</p>
       </div>
 
       <div id="cal-tool">
@@ -316,19 +343,20 @@
   "de": "/de/termine/",
   "en": "/en/schedule/"
 };</script>
-<script src="/assets/i18n.uk.js?v=20260819f"></script>
-<script src="/assets/i18n-runtime.js?v=20260819f"></script>
-<script src="/assets/currency.js?v=20260819f"></script>
+<script src="/assets/i18n.uk.js?v=20260819g"></script>
+<script src="/assets/i18n-runtime.js?v=20260819g"></script>
+<script src="/assets/currency.js?v=20260819g"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260819f"></script>
+<script src="/assets/account.js?v=20260819g"></script>
 
-<script src="/assets/workspace.js?v=20260819f"></script>
-<script src="/assets/plan.js?v=20260819f"></script>
-<script src="/assets/crm.js?v=20260819f"></script>
-<script src="/assets/schedule-ui.js?v=20260819f"></script>
-<script src="/assets/main.js?v=20260819f"></script>
+<script src="/assets/workspace.js?v=20260819g"></script>
+<script src="/assets/plan.js?v=20260819g"></script>
+<script src="/assets/paywall.js?v=20260819g"></script>
+<script src="/assets/crm.js?v=20260819g"></script>
+<script src="/assets/schedule-ui.js?v=20260819g"></script>
+<script src="/assets/main.js?v=20260819g"></script>
 
 </body>
 </html>

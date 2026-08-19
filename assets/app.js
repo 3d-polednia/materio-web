@@ -139,6 +139,12 @@ async function boot() {
   wireAccountPanel();
   wireSyncPanel();
 
+  // Session 27: the Pro preview switch, offered on this page as well as behind the wall.
+  // assets/paywall.js owns the click and the label; there is no wall on /app/ to hide or
+  // show, so the page wires only that half and redraws the plan card when it moves.
+  if (typeof pwWirePreview === "function") pwWirePreview();
+  document.addEventListener("lm-preview", renderPlan);
+
   // Everything above renders its text through T(). The language picker on this page
   // swaps the DOM in place instead of navigating, so anything JavaScript wrote has to
   // be written again — before this, switching language left the identity bar, the
@@ -436,8 +442,12 @@ function renderPlan() {
 
   // Why the account is on the plan it is on. An expired Pro plan is the one case the
   // page can explain from the document itself; otherwise it says the true and duller
-  // thing — nothing grants Pro yet.
-  $("plan-note").textContent = status.expired ? T("plan_expired") : T("plan_none");
+  // thing — nothing grants Pro yet, and if this browser has the session-27 preview on,
+  // that the preview did not change the plan this card is describing.
+  const preview = typeof lmProPreview === "function" && lmProPreview();
+  $("plan-note").textContent = status.expired
+    ? T("plan_expired")
+    : `${T("plan_none")}${preview ? ` ${T("pro_prev_note")}` : ""}`;
   $("plan-note").classList.toggle("warn", status.expired);
 }
 
