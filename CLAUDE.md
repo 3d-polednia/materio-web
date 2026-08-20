@@ -104,6 +104,7 @@ node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmet
 node scripts/test-crm.mjs         # the chain: the walk, the derived history, one link map
 node scripts/test-propage.mjs     # /liczmat-pro/: the route, the price in the HTML, the copy
 node scripts/test-seo.mjs         # technical SEO: sitemap, robots, canonical, hreflang, OG
+node scripts/test-calc-seo.mjs    # the calculators as landing pages: title, description, FAQ
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -130,7 +131,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/plan.js` — the Free/Pro model and the permission table | |
 | `assets/crm.js` — the clients, jobs and quotes of LiczMat Pro, plus `crm-ui.js`, `jobs-ui.js`, `quotes-ui.js` and `crm-chain.js` | |
 | `assets/recent.js`, `assets/dashboard.js` | |
-| `src/*.mjs` — information architecture, site map, templates, page bodies, formulas | |
+| `src/*.mjs` — information architecture, site map, templates, page bodies, formulas, the calculators' SEO copy | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
 
 The build **fails loudly** rather than emitting a broken page: a key missing in one
@@ -151,6 +152,11 @@ src/site.mjs          Languages, URL slugs per section/calculator/guide — the 
 src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
 src/pages.mjs         The <main> of each page type
 src/calc-meta.mjs     Per-calculator formula lines + their translations
+src/calc-seo.mjs      Per-calculator SEO copy, ten languages: the <title> stem (which is
+                      also the H1), the meta description (which is also the paragraph
+                      under it) and two questions with their answers. Build-time only —
+                      it is deliberately NOT a dictionary, because every page on the site
+                      downloads assets/i18n.<lang>.js and none of this is needed there
 src/tokens.mjs        validateTokens(): the design system, checked. The two themes
                       must carry the same tokens, every var() must resolve, and no
                       rule outside the token block may invent a colour, a radius or
@@ -342,6 +348,17 @@ scripts/test-seo.mjs  The technical SEO of the whole site (session 30, chapter X
                       run it after touching the <head> in src/template.mjs,
                       buildSitemap(), sitemapUrls(), robots.txt, a *_meta key or a
                       route's `indexable` flag
+scripts/test-calc-seo.mjs  What the 150 calculator pages SAY (session 31, chapters XII and
+                      XXVI): the title — this calculator's own, ≤ 60 characters with the
+                      brand on it, and never repeated inside one language; the description,
+                      which is the same text in the <meta> and in the paragraph under the
+                      H1; the H1, of which there is one and it is the title; the FAQ — both
+                      questions in the markup and a FAQPage saying exactly what the markup
+                      says; chapter XII's order, checked by position (H1 → form → result →
+                      explanation → FAQ); chapter XXVI's "nie upychaj słów kluczowych"; and
+                      that none of this copy reached the dictionary every page downloads.
+                      Dependency-free — run it after touching src/calc-seo.mjs,
+                      calcPageMain() or buildCalculatorPages()
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -838,6 +855,40 @@ Kotlin side of it. Change one, change all three.
   `on`) or the module is behind the wall. When the wall is up the strip is hidden entirely:
   the wall says all of it, and twice is worse than once. A Pro account is never quoted a
   price either — offering to sell somebody what they already pay for reads as a threat.
+
+- **A calculator page's title, its H1 and its first paragraph are one piece of copy, written
+  per calculator and per language.** Session 31 replaced `calc_meta_pattern` — one shape
+  filled in 150 times — with `src/calc-seo.mjs`: a title that is the sentence somebody
+  searched for ("Kalkulator płytek i paneli — ile kartonów"), the same string as the H1
+  because a page has one subject, and a description that is both the SERP snippet and the
+  paragraph under the H1, because a snippet promising what the page does not open with is
+  the same defect from two directions. The stem is capped at `TITLE_MAX` (50) so
+  `" | LiczMat"` still fits inside Google's ~60, and the build **aborts** on a missing
+  language, an over-long title, a description outside 50–160, an FAQ that is not two
+  question/answer pairs, a question with no question mark, or two calculators claiming one
+  title inside a language. That cap is why `scripts/test-seo.mjs` no longer exempts these
+  pages from the 60-character rule.
+- **It is a build module, not a fourth dictionary, and that is the point.** Every page on
+  the site downloads `assets/i18n.<lang>.js`; 90 keys per language of copy that only a
+  crawler and a reader of the finished HTML ever see would be some 13 kB on every page load
+  for nothing. `src/` is also stripped from the Pages artifact. `scripts/test-calc-seo.mjs`
+  §7 fails if any of it turns up in a shipped dictionary.
+- **The FAQ under a calculator is two questions, and the structured data reads the very
+  list the page renders.** Same rule the home page's FAQ has followed since session 6: an
+  answer in the JSON-LD that is not in the markup is a page telling Google something it
+  does not tell a reader. It sits **below** the tool and below "Jak to liczymy" — chapter
+  XII's "długie treści SEO, instrukcje i FAQ nie mogą zasłaniać kalkulatora" is a rule
+  about position, so the test checks it by position. It reuses the home page's `.faq`
+  component inside a `wrap narrow`, so it added no CSS.
+- **Every number in that copy is one the site already states.** The 5–7% and 10–15%
+  allowances, the 25 kg bag yielding ~12.5 l, 6 dowels per m², the 10% mesh overlap, the
+  2.0 kg/l density, the 60/40 cm stud spacing: each is already in a `note_<id>` key or is
+  a field of the calculator. No brand, no price, no invented figure — the same rule that
+  ties the calculator count to `CALCS`.
+- **The breadcrumb keeps the short name.** The trail still says "Płytki, panele, gres"
+  rather than the new title: a trail is a map of the site, and a sentence like "Kalkulator
+  płytek i paneli — ile kartonów" is a title in it, not a place. `c_<id>_t` therefore
+  stays what the hub cards, the related chips and the trail use.
 
 - **`/liczmat-pro/` is the one Pro address with no wall in front of it, and it cannot have
   one.** Session 29 built the public page: GUEST, indexable, the same slug in all ten

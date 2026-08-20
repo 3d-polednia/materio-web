@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Lineární nářez (1D) — Stavební kalkulačky online | LiczMat</title>
-<meta name="description" content="Lineární nářez (1D) — bezplatná online kalkulačka. Tyče, lišty, trubky: kolik a jak řezat. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<title>Kalkulačka nářezu 1D: kolik tyčí | LiczMat</title>
+<meta name="description" content="Seznam dílů, délka tyče a šířka řezu dají počet tyčí k nákupu a hotový plán řezání i s prořezem v procentech.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/raskroy-lineynyy-1d/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/rozkroj-liniowy-1d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Lineární nářez (1D) — Stavební kalkulačky online | LiczMat">
-<meta property="og:description" content="Lineární nářez (1D) — bezplatná online kalkulačka. Tyče, lišty, trubky: kolik a jak řezat. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta property="og:title" content="Kalkulačka nářezu 1D: kolik tyčí | LiczMat">
+<meta property="og:description" content="Seznam dílů, délka tyče a šířka řezu dají počet tyčí k nákupu a hotový plán řezání i s prořezem v procentech.">
 <meta property="og:url" content="https://liczmat.com/cs/kalkulacky/linearni-narez-1d/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Lineární nářez (1D) — Stavební kalkulačky online | LiczMat">
-<meta name="twitter:description" content="Lineární nářez (1D) — bezplatná online kalkulačka. Tyče, lišty, trubky: kolik a jak řezat. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta name="twitter:title" content="Kalkulačka nářezu 1D: kolik tyčí | LiczMat">
+<meta name="twitter:description" content="Seznam dílů, délka tyče a šířka řezu dají počet tyčí k nákupu a hotový plán řezání i s prořezem v procentech.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "CZK"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Kolik tyčí je potřeba na seznam dílů?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kalkulačka seřadí díly od nejdelšího a každý vloží do první tyče, kam se vejde. Počet otevřených tyčí je nákup, plán ukazuje, co se z které tyče řeže."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Počítá se i šířka řezu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ano. Řez se odečítá při každém dalším řezu v tyči, ne při prvním, protože první díl začíná na čele materiálu."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li><a href="/cs/kalkulacky/">Stavební kalkulačky online</a></li><li aria-current="page">Lineární nářez (1D)</li></ol></nav>
-      <h1>Lineární nářez (1D)</h1>
-      <p class="lead">Tyče, lišty, trubky: kolik a jak řezat. Počítej v prohlížeči. Výsledek zaokrouhlujeme na celá balení, tak jak se prodávají.</p>
+      <h1>Kalkulačka nářezu 1D: kolik tyčí</h1>
+      <p class="lead">Seznam dílů, délka tyče a šířka řezu dají počet tyčí k nákupu a hotový plán řezání i s prořezem v procentech.</p>
     </div>
   </section>
 
@@ -255,7 +279,17 @@ odpad = (Délka tyče × sztangi − Σ elementy) ÷ (Délka tyče × sztangi) �
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté dotazy</h2>
+      <div class="faq">
+        <details open><summary>Kolik tyčí je potřeba na seznam dílů?</summary><p>Kalkulačka seřadí díly od nejdelšího a každý vloží do první tyče, kam se vejde. Počet otevřených tyčí je nákup, plán ukazuje, co se z které tyče řeže.</p></details>
+        <details><summary>Počítá se i šířka řezu?</summary><p>Ano. Řez se odečítá při každém dalším řezu v tyči, ne při prvním, protože první díl začíná na čele materiálu.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Další kalkulačky</h2>
       <div class="chips"><a class="chip" href="/cs/kalkulacky/narez-desek-2d/">Nářez desek (2D)</a><a class="chip" href="/cs/kalkulacky/zaklop-osb/">Záklop (OSB/desky)</a><a class="chip" href="/cs/kalkulacky/pricka-sdk/">Příčka SDK</a></div>
@@ -358,22 +392,22 @@ odpad = (Délka tyče × sztangi − Σ elementy) ÷ (Délka tyče × sztangi) �
   "sr": "/sr/kalkulatori/linearno-secenje-1d/",
   "ru": "/ru/kalkulyatory/raskroy-lineynyy-1d/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.cs.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

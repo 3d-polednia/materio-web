@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Sheathing (OSB/boards) — Construction calculators online | LiczMat</title>
-<meta name="description" content="Sheathing (OSB/boards) — free online calculator. How many sheets to cover. The same formula as in the LiczMat app, no sign-up.">
+<title>OSB sheathing calculator: how many sheets | LiczMat</title>
+<meta name="description" content="The area to cover, the sheet size and a waste allowance give the number of whole OSB panels or boards for a wall or a roof.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/obshivka-osb/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/poszycie-osb/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Sheathing (OSB/boards) — Construction calculators online | LiczMat">
-<meta property="og:description" content="Sheathing (OSB/boards) — free online calculator. How many sheets to cover. The same formula as in the LiczMat app, no sign-up.">
+<meta property="og:title" content="OSB sheathing calculator: how many sheets | LiczMat">
+<meta property="og:description" content="The area to cover, the sheet size and a waste allowance give the number of whole OSB panels or boards for a wall or a roof.">
 <meta property="og:url" content="https://liczmat.com/en/calculators/sheathing-osb/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Sheathing (OSB/boards) — Construction calculators online | LiczMat">
-<meta name="twitter:description" content="Sheathing (OSB/boards) — free online calculator. How many sheets to cover. The same formula as in the LiczMat app, no sign-up.">
+<meta name="twitter:title" content="OSB sheathing calculator: how many sheets | LiczMat">
+<meta name="twitter:description" content="The area to cover, the sheet size and a waste allowance give the number of whole OSB panels or boards for a wall or a roof.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "USD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How many OSB sheets per m² of sheathing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The calculator divides the area plus the waste allowance by the area of one sheet and rounds up to whole panels."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does the result include a cutting plan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, it is the number of whole sheets with no cutting plan. To see how to cut them, use the 2D sheet cutting calculator."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li><a href="/en/calculators/">Construction calculators online</a></li><li aria-current="page">Sheathing (OSB/boards)</li></ol></nav>
-      <h1>Sheathing (OSB/boards)</h1>
-      <p class="lead">How many sheets to cover. Calculate in your browser. Results are rounded up to whole packs, the way you buy them.</p>
+      <h1>OSB sheathing calculator: how many sheets</h1>
+      <p class="lead">The area to cover, the sheet size and a waste allowance give the number of whole OSB panels or boards for a wall or a roof.</p>
     </div>
   </section>
 
@@ -251,7 +275,17 @@ sheets = ⌈ with allowance ÷ sheet area ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Frequently asked questions</h2>
+      <div class="faq">
+        <details open><summary>How many OSB sheets per m² of sheathing?</summary><p>The calculator divides the area plus the waste allowance by the area of one sheet and rounds up to whole panels.</p></details>
+        <details><summary>Does the result include a cutting plan?</summary><p>No, it is the number of whole sheets with no cutting plan. To see how to cut them, use the 2D sheet cutting calculator.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Other calculators</h2>
       <div class="chips"><a class="chip" href="/en/calculators/sheet-cutting-2d/">Sheet cut (2D)</a><a class="chip" href="/en/calculators/linear-cutting-1d/">Linear cut (1D)</a><a class="chip" href="/en/calculators/stud-partition/">Stud partition</a></div>
@@ -354,22 +388,22 @@ sheets = ⌈ with allowance ÷ sheet area ⌉</code></pre>
   "sr": "/sr/kalkulatori/oplata-osb/",
   "ru": "/ru/kalkulyatory/obshivka-osb/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.en.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

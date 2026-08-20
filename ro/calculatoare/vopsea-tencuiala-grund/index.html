@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Vopsea, tencuială, amorsă — Calculatoare pentru construcții online | LiczMat</title>
-<meta name="description" content="Vopsea, tencuială, amorsă — calculator online gratuit. Ambalaje pe suprafață, cu straturi. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<title>Calculator vopsea: câte ambalaje pe m² | LiczMat</title>
+<meta name="description" content="Suprafața, randamentul de pe etichetă și numărul de straturi dau ambalaje întregi de vopsea, tencuială sau amorsă și pierderea în procente.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/kraska-shtukaturka-grunt/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/farby-tynki-grunty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Vopsea, tencuială, amorsă — Calculatoare pentru construcții online | LiczMat">
-<meta property="og:description" content="Vopsea, tencuială, amorsă — calculator online gratuit. Ambalaje pe suprafață, cu straturi. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<meta property="og:title" content="Calculator vopsea: câte ambalaje pe m² | LiczMat">
+<meta property="og:description" content="Suprafața, randamentul de pe etichetă și numărul de straturi dau ambalaje întregi de vopsea, tencuială sau amorsă și pierderea în procente.">
 <meta property="og:url" content="https://liczmat.com/ro/calculatoare/vopsea-tencuiala-grund/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Vopsea, tencuială, amorsă — Calculatoare pentru construcții online | LiczMat">
-<meta name="twitter:description" content="Vopsea, tencuială, amorsă — calculator online gratuit. Ambalaje pe suprafață, cu straturi. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<meta name="twitter:title" content="Calculator vopsea: câte ambalaje pe m² | LiczMat">
+<meta name="twitter:description" content="Suprafața, randamentul de pe etichetă și numărul de straturi dau ambalaje întregi de vopsea, tencuială sau amorsă și pierderea în procente.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RON"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Câtă vopsea trebuie pe 1 m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Atât cât spune randamentul de pe etichetă, dat de obicei în m² pe litru sau pe ambalaj. Calculatorul împarte suprafața la acest randament, înmulțește cu numărul de straturi și rotunjește în sus la ambalaje întregi."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Se scad ferestrele și ușile?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Doar dacă într-adevăr nu le vopsești. Suprafața golurilor se introduce separat și se scade din suprafață înainte de transformarea în ambalaje."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ro/">Acasă</a></li><li><a href="/ro/calculatoare/">Calculatoare pentru construcții online</a></li><li aria-current="page">Vopsea, tencuială, amorsă</li></ol></nav>
-      <h1>Vopsea, tencuială, amorsă</h1>
-      <p class="lead">Ambalaje pe suprafață, cu straturi. Calculează în browser. Rotunjim rezultatul la ambalaje întregi, așa cum le cumperi.</p>
+      <h1>Calculator vopsea: câte ambalaje pe m²</h1>
+      <p class="lead">Suprafața, randamentul de pe etichetă și numărul de straturi dau ambalaje întregi de vopsea, tencuială sau amorsă și pierderea în procente.</p>
     </div>
   </section>
 
@@ -252,7 +276,17 @@ odpad = (opakowania × Randament − pole do pokrycia) ÷ (opakowania × Randame
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Întrebări frecvente</h2>
+      <div class="faq">
+        <details open><summary>Câtă vopsea trebuie pe 1 m²?</summary><p>Atât cât spune randamentul de pe etichetă, dat de obicei în m² pe litru sau pe ambalaj. Calculatorul împarte suprafața la acest randament, înmulțește cu numărul de straturi și rotunjește în sus la ambalaje întregi.</p></details>
+        <details><summary>Se scad ferestrele și ușile?</summary><p>Doar dacă într-adevăr nu le vopsești. Suprafața golurilor se introduce separat și se scade din suprafață înainte de transformarea în ambalaje.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Alte calculatoare</h2>
       <div class="chips"><a class="chip" href="/ro/calculatoare/gresie-faianta-parchet/">Faianță, panouri, gresie</a><a class="chip" href="/ro/calculatoare/tapet/">Tapet</a><a class="chip" href="/ro/calculatoare/adeziv-mortar/">Adeziv / mortar</a></div>
@@ -355,22 +389,22 @@ odpad = (opakowania × Randament − pole do pokrycia) ÷ (opakowania × Randame
   "sr": "/sr/kalkulatori/boje-malteri-prajmer/",
   "ru": "/ru/kalkulyatory/kraska-shtukaturka-grunt/"
 };</script>
-<script src="/assets/i18n.ro.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.ro.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

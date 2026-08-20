@@ -1366,6 +1366,49 @@ subskrypcji jeszcze nie da się wykupić, dokładnie tak jak ściana.
 
 ---
 
+### 7.14. Strona kalkulatora jako landing page (Sesja 31)
+
+Rozdział XXXII, Sesja 31 w całości: „Indywidualne SEO dla kalkulatorów. Każdy kalkulator
+powinien być możliwie dobrym landing page'em dla konkretnego zapytania użytkownika."
+
+**Do tej sesji wszystkie 150 stron kalkulatorów mówiły o sobie jednym wzorcem.** Tytuł
+brzmiał `{nazwa} — {tytuł centrum} | LiczMat`, opis pochodził z `calc_meta_pattern`
+z podstawioną nazwą i jednozdaniowym opisem, a `<h1>` był etykietą z listy w centrum
+kalkulatorów. Wszystko trzy technicznie poprawne i żadne nie zawierające zdania, które ktoś
+naprawdę wpisuje: „ile płytek na m²", „wie viele Rollen Tapete", „cât adeziv la m²".
+
+**Kopia stoi w `src/calc-seo.mjs`, kalkulator po kalkulatorze, język po języku.** Trzy
+rzeczy na wpis: `title` (tekst `<title>`, on sam jest też `<h1>`), `desc` (meta description,
+ona sama jest też akapitem pod `<h1>`) i `faq` — dwa pytania z odpowiedziami. Jedno zdanie
+w dwóch miejscach zamiast dwóch zdań, bo snippet obiecujący coś, czym strona się nie
+zaczyna, to ten sam błąd widziany z dwóch stron.
+
+**To nie jest czwarty słownik i nie może nim być.** `assets/i18n.<lang>.js` pobiera każda
+strona serwisu; 90 kluczy na język treści, którą zobaczy wyłącznie czytelnik gotowego
+HTML-a i robot, to kilkanaście kilobajtów na każde wejście za nic. `src/` jest do tego
+wycinany z artefaktu Pages. Test §7 pilnuje, że nic z tej kopii nie wyciekło do słownika.
+
+**Kolejność jest regułą rozdziału XII i jest sprawdzana po położeniu.** `<h1>` → formularz
+→ wynik → „Jak to liczymy" → FAQ. „Długie treści SEO, instrukcje i FAQ nie mogą zasłaniać
+kalkulatora" mówi o *miejscu*, więc `scripts/test-calc-seo.mjs` §5 porównuje pozycje
+w pliku, a nie obecność sekcji.
+
+**FAQ i dane strukturalne czytają jedną listę.** `calcPageMain()` renderuje pytania,
+`calcFaqLd()` w `scripts/build.mjs` buduje z tej samej tablicy `FAQPage` — odpowiedź
+w JSON-LD, której nie ma w markupie, to strona mówiąca robotowi coś, czego nie mówi
+czytelnikowi. Ta sama zasada rządzi FAQ strony głównej od Sesji 6.
+
+**Okruszek został przy krótkiej nazwie.** Ścieżka nawigacyjna nadal niesie `c_<id>_t`
+(„Płytki, panele, gres"), bo okruszek jest mapą serwisu, a „Kalkulator płytek i paneli —
+ile kartonów" jest w nim tytułem, nie miejscem. Z tego samego klucza żyją karty w centrum
+kalkulatorów i plakietki „Inne kalkulatory".
+
+**Limit 60 znaków obowiązuje teraz wszystkie 375 stron.** Sesja 30 wyłączyła spod niego
+strony kalkulatorów, bo ich tytuły były tematem tej sesji; `TITLE_MAX` = 50 plus
+`" | LiczMat"` mieści się w 60, więc wyjątek w `scripts/test-seo.mjs` zniknął.
+
+---
+
 ## 8. Otwarte decyzje
 
 Do rozstrzygnięcia przez właściciela, zanim dotknie ich któraś z kolejnych sesji.
@@ -1569,6 +1612,7 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | model Free / Pro (Sesja 21) | funkcja zadeklarowana dwa razy; funkcja z nieznanym poziomem albo na nieistniejącej trasie; funkcja `PRO` na trasie, która nie jest `PRO`; trasa `PRO`, której nie pokrywa żadna funkcja; funkcja `PRO` bez tekstu do bramki; `LM_PLAN` rozjeżdżające się z kontraktem; brak któregokolwiek klucza `pro_*` / `plan_*` / `feat_*` w którymkolwiek z dziesięciu języków |
 | paywall (Sesja 27) | ściana przed funkcją, której nie ma w `LM_FEATURES` (`proGate()` przerywa build); brak któregokolwiek klucza `pro_need_*` / `pro_incl_t` / `pro_signin` w którymkolwiek z dziesięciu języków |
 | subskrypcja (Sesja 28) | brak któregokolwiek klucza `pay_*` / `plan_renews` / `plan_cancelled` / `plan_active_d` / `plan_cancel_d` w którymkolwiek z dziesięciu języków |
+| SEO kalkulatorów (Sesja 31) | kalkulator bez kopii w `src/calc-seo.mjs` albo bez któregoś z dziesięciu języków; tytuł dłuższy niż `TITLE_MAX` (50); opis poza 50–160 znakami; FAQ, które nie jest dwiema parami pytanie/odpowiedź; pytanie bez znaku zapytania; dwa kalkulatory z tym samym tytułem w jednym języku albo z tym samym opisem gdziekolwiek |
 | widoki (Sesja 15) | widok bez rodzica, na trasie planowanej albo na innym widoku; widok indeksowany; widok w menu lub w stopce; widok wymagający wyższego poziomu niż rodzic; widok inaczej zlokalizowany niż rodzic; adres widoku poza adresem rodzica albo gubiący identyfikator; `view: true` na trasie, która nie jest `LIVE` |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.

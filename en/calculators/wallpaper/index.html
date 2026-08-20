@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Wallpaper — Construction calculators online | LiczMat</title>
-<meta name="description" content="Wallpaper — free online calculator. How many rolls, pattern repeat included. The same formula as in the LiczMat app, no sign-up.">
+<title>Wallpaper calculator: how many rolls | LiczMat</title>
+<meta name="description" content="Wall width and height, the size of the roll and the pattern repeat give the number of rolls and how many drops one roll yields.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/oboi/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/tapety/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Wallpaper — Construction calculators online | LiczMat">
-<meta property="og:description" content="Wallpaper — free online calculator. How many rolls, pattern repeat included. The same formula as in the LiczMat app, no sign-up.">
+<meta property="og:title" content="Wallpaper calculator: how many rolls | LiczMat">
+<meta property="og:description" content="Wall width and height, the size of the roll and the pattern repeat give the number of rolls and how many drops one roll yields.">
 <meta property="og:url" content="https://liczmat.com/en/calculators/wallpaper/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Wallpaper — Construction calculators online | LiczMat">
-<meta name="twitter:description" content="Wallpaper — free online calculator. How many rolls, pattern repeat included. The same formula as in the LiczMat app, no sign-up.">
+<meta name="twitter:title" content="Wallpaper calculator: how many rolls | LiczMat">
+<meta name="twitter:description" content="Wall width and height, the size of the roll and the pattern repeat give the number of rolls and how many drops one roll yields.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "USD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How many rolls of wallpaper for a room?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Wall width divided by roll width gives the number of drops; roll length divided by drop height gives the drops per roll. The calculator does both and rounds up."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the pattern repeat change the count?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "With a patterned paper every drop is stretched to a whole multiple of the repeat, so one roll yields fewer drops. A repeat of 0 means there is no pattern to match."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li><a href="/en/calculators/">Construction calculators online</a></li><li aria-current="page">Wallpaper</li></ol></nav>
-      <h1>Wallpaper</h1>
-      <p class="lead">How many rolls, pattern repeat included. Calculate in your browser. Results are rounded up to whole packs, the way you buy them.</p>
+      <h1>Wallpaper calculator: how many rolls</h1>
+      <p class="lead">Wall width and height, the size of the roll and the pattern repeat give the number of rolls and how many drops one roll yields.</p>
     </div>
   </section>
 
@@ -252,7 +276,17 @@ rolls = ⌈ strips needed ÷ strips per roll ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Frequently asked questions</h2>
+      <div class="faq">
+        <details open><summary>How many rolls of wallpaper for a room?</summary><p>Wall width divided by roll width gives the number of drops; roll length divided by drop height gives the drops per roll. The calculator does both and rounds up.</p></details>
+        <details><summary>How does the pattern repeat change the count?</summary><p>With a patterned paper every drop is stretched to a whole multiple of the repeat, so one roll yields fewer drops. A repeat of 0 means there is no pattern to match.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Other calculators</h2>
       <div class="chips"><a class="chip" href="/en/calculators/paint-plaster-primer/">Paint, plaster, primer</a><a class="chip" href="/en/calculators/tiles-panels-porcelain/">Tiles, panels, porcelain</a></div>
@@ -354,22 +388,22 @@ rolls = ⌈ strips needed ÷ strips per roll ⌉</code></pre>
   "sr": "/sr/kalkulatori/tapete/",
   "ru": "/ru/kalkulyatory/oboi/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.en.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

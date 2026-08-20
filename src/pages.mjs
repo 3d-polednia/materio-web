@@ -489,8 +489,14 @@ export function renderFormula(lines, lang, t) {
  * not the visitor's. Both are gone: the explanation is a section below the tool, and the
  * live result panel is the worked example, because it opens on the real answer for the
  * values the form opens with.
+ *
+ * Session 31 gave the page its own words. The H1 and the paragraph under it are the
+ * calculator's SEO copy from `src/calc-seo.mjs` — the sentence somebody searched for,
+ * rather than the site's own label for the tool — and the FAQ at the foot answers two
+ * questions about THIS calculator. The breadcrumb keeps the short name: a trail is a map
+ * of the site, and "Kalkulator farby — ile puszek na m²" in it is a title, not a place.
  */
-export function calcPageMain(calc, lang, t, { example, formula, materials = 0, guides = [] }) {
+export function calcPageMain(calc, lang, t, { seo, example, formula, materials = 0, guides = [] }) {
   const meta = CALC_META[calc.id];
   const name = t(`c_${calc.id}_t`);
   const crumbs = breadcrumbs([
@@ -516,8 +522,8 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0, g
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
-      <h1>${esc(name)}</h1>
-      <p class="lead">${esc(t(`c_${calc.id}_d`))} ${esc(t("calc_page_lead"))}</p>
+      <h1>${esc(seo.title)}</h1>
+      <p class="lead">${esc(seo.desc)}</p>
     </div>
   </section>
 
@@ -549,7 +555,16 @@ export function calcPageMain(calc, lang, t, { example, formula, materials = 0, g
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">${esc(t("faq_title"))}</h2>
+      <div class="faq">
+        ${seo.faq.map(([q, a], i) => `<details${i === 0 ? " open" : ""}><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("\n        ")}
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>${esc(t("calc_related"))}</h2>
       <div class="chips">${related}</div>

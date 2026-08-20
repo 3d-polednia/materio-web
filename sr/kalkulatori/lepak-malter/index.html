@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Lepak / malter — Građevinski kalkulatori onlajn | LiczMat</title>
-<meta name="description" content="Lepak / malter — besplatan onlajn kalkulator. Potrošnja kg/m² → vreće. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<title>Kalkulator lepka za pločice: vreće | LiczMat</title>
+<meta name="description" content="Površina i potrošnja u kg/m² iz tehničkog lista daju broj celih vreća lepka ili maltera za kupovinu.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/kley-rastvor/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/klej-zaprawa/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="ro_RO">
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Lepak / malter — Građevinski kalkulatori onlajn | LiczMat">
-<meta property="og:description" content="Lepak / malter — besplatan onlajn kalkulator. Potrošnja kg/m² → vreće. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta property="og:title" content="Kalkulator lepka za pločice: vreće | LiczMat">
+<meta property="og:description" content="Površina i potrošnja u kg/m² iz tehničkog lista daju broj celih vreća lepka ili maltera za kupovinu.">
 <meta property="og:url" content="https://liczmat.com/sr/kalkulatori/lepak-malter/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Lepak / malter — Građevinski kalkulatori onlajn | LiczMat">
-<meta name="twitter:description" content="Lepak / malter — besplatan onlajn kalkulator. Potrošnja kg/m² → vreće. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta name="twitter:title" content="Kalkulator lepka za pločice: vreće | LiczMat">
+<meta name="twitter:description" content="Površina i potrošnja u kg/m² iz tehničkog lista daju broj celih vreća lepka ili maltera za kupovinu.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RSD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koliko lepka ide na 1 m² pločica?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Potrošnja zavisi od zuba gletarice i od ravnosti podloge, a piše u tehničkom listu. Kalkulator je množi površinom i deli težinom vreće."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Zašto lepka ode više nego što piše?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Vrednost iz tehničkog lista važi za ravnu podlogu. Na krivom zidu potrošnja ume da poraste za polovinu, pa kod neravnina unesite veću vrednost."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li><a href="/sr/kalkulatori/">Građevinski kalkulatori onlajn</a></li><li aria-current="page">Lepak / malter</li></ol></nav>
-      <h1>Lepak / malter</h1>
-      <p class="lead">Potrošnja kg/m² → vreće. Računaj u pregledaču. Rezultat zaokružujemo na cela pakovanja, onako kako se kupuju.</p>
+      <h1>Kalkulator lepka za pločice: vreće</h1>
+      <p class="lead">Površina i potrošnja u kg/m² iz tehničkog lista daju broj celih vreća lepka ili maltera za kupovinu.</p>
     </div>
   </section>
 
@@ -250,7 +274,17 @@ worki = ⌈ kilogramy ÷ Vreća ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Česta pitanja</h2>
+      <div class="faq">
+        <details open><summary>Koliko lepka ide na 1 m² pločica?</summary><p>Potrošnja zavisi od zuba gletarice i od ravnosti podloge, a piše u tehničkom listu. Kalkulator je množi površinom i deli težinom vreće.</p></details>
+        <details><summary>Zašto lepka ode više nego što piše?</summary><p>Vrednost iz tehničkog lista važi za ravnu podlogu. Na krivom zidu potrošnja ume da poraste za polovinu, pa kod neravnina unesite veću vrednost.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ostali kalkulatori</h2>
       <div class="chips"><a class="chip" href="/sr/kalkulatori/plocice-paneli-gres/">Pločice, paneli, gres</a><a class="chip" href="/sr/kalkulatori/fug-masa/">Fug masa</a><a class="chip" href="/sr/kalkulatori/estrih-malter/">Estrih / malter</a></div>
@@ -353,22 +387,22 @@ worki = ⌈ kilogramy ÷ Vreća ⌉</code></pre>
   "sr": "/sr/kalkulatori/lepak-malter/",
   "ru": "/ru/kalkulyatory/kley-rastvor/"
 };</script>
-<script src="/assets/i18n.sr.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.sr.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

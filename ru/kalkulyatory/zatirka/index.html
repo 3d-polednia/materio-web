@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Затирка — Строительные калькуляторы онлайн | LiczMat</title>
-<meta name="description" content="Затирка — бесплатный онлайн-калькулятор. Сколько кг на затирку швов. Та же формула, что и в приложении LiczMat, без регистрации.">
+<title>Калькулятор затирки: сколько кг | LiczMat</title>
+<meta name="description" content="Размеры плитки, ширина шва и площадь дают расход затирки в килограммах и количество мешков к покупке.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/zatirka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/fuga/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="ro_RO">
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
-<meta property="og:title" content="Затирка — Строительные калькуляторы онлайн | LiczMat">
-<meta property="og:description" content="Затирка — бесплатный онлайн-калькулятор. Сколько кг на затирку швов. Та же формула, что и в приложении LiczMat, без регистрации.">
+<meta property="og:title" content="Калькулятор затирки: сколько кг | LiczMat">
+<meta property="og:description" content="Размеры плитки, ширина шва и площадь дают расход затирки в килограммах и количество мешков к покупке.">
 <meta property="og:url" content="https://liczmat.com/ru/kalkulyatory/zatirka/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Затирка — Строительные калькуляторы онлайн | LiczMat">
-<meta name="twitter:description" content="Затирка — бесплатный онлайн-калькулятор. Сколько кг на затирку швов. Та же формула, что и в приложении LiczMat, без регистрации.">
+<meta name="twitter:title" content="Калькулятор затирки: сколько кг | LiczMat">
+<meta name="twitter:description" content="Размеры плитки, ширина шва и площадь дают расход затирки в килограммах и количество мешков к покупке.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "EUR"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Сколько затирки на 1 м² плитки?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Расход растёт с шириной шва и толщиной плитки и падает с форматом. На крупном керамограните с тонким швом выходит очень мало, на мозаике — много."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Какие размеры плитки вводить?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Длину, ширину и толщину одной плитки и ширину шва. Из этих четырёх чисел получается объём швов на квадратном метре, а из него килограммы."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ru/">Главная</a></li><li><a href="/ru/kalkulyatory/">Строительные калькуляторы онлайн</a></li><li aria-current="page">Затирка</li></ol></nav>
-      <h1>Затирка</h1>
-      <p class="lead">Сколько кг на затирку швов. Считай в браузере. Результат округляем до целых упаковок, как их продают.</p>
+      <h1>Калькулятор затирки: сколько кг</h1>
+      <p class="lead">Размеры плитки, ширина шва и площадь дают расход затирки в килограммах и количество мешков к покупке.</p>
     </div>
   </section>
 
@@ -251,7 +275,17 @@ worki = ⌈ kilogramy ÷ Мешок ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Частые вопросы</h2>
+      <div class="faq">
+        <details open><summary>Сколько затирки на 1 м² плитки?</summary><p>Расход растёт с шириной шва и толщиной плитки и падает с форматом. На крупном керамограните с тонким швом выходит очень мало, на мозаике — много.</p></details>
+        <details><summary>Какие размеры плитки вводить?</summary><p>Длину, ширину и толщину одной плитки и ширину шва. Из этих четырёх чисел получается объём швов на квадратном метре, а из него килограммы.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Другие калькуляторы</h2>
       <div class="chips"><a class="chip" href="/ru/kalkulyatory/plitka-paneli-keramogranit/">Плитка, панели, керамогранит</a><a class="chip" href="/ru/kalkulyatory/kley-rastvor/">Клей / раствор</a><a class="chip" href="/ru/kalkulyatory/kraska-shtukaturka-grunt/">Краски, штукатурки, грунты</a></div>
@@ -354,22 +388,22 @@ worki = ⌈ kilogramy ÷ Мешок ⌉</code></pre>
   "sr": "/sr/kalkulatori/fug-masa/",
   "ru": "/ru/kalkulyatory/zatirka/"
 };</script>
-<script src="/assets/i18n.ru.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.ru.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

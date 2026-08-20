@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Chit de rosturi — Calculatoare pentru construcții online | LiczMat</title>
-<meta name="description" content="Chit de rosturi — calculator online gratuit. Câte kg pentru rostuire. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<title>Calculator chit de rosturi: câte kg | LiczMat</title>
+<meta name="description" content="Dimensiunile plăcii, lățimea rostului și suprafața dau consumul de chit în kilograme și numărul de saci de cumpărat.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/zatirka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/fuga/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Chit de rosturi — Calculatoare pentru construcții online | LiczMat">
-<meta property="og:description" content="Chit de rosturi — calculator online gratuit. Câte kg pentru rostuire. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<meta property="og:title" content="Calculator chit de rosturi: câte kg | LiczMat">
+<meta property="og:description" content="Dimensiunile plăcii, lățimea rostului și suprafața dau consumul de chit în kilograme și numărul de saci de cumpărat.">
 <meta property="og:url" content="https://liczmat.com/ro/calculatoare/chit-de-rosturi/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Chit de rosturi — Calculatoare pentru construcții online | LiczMat">
-<meta name="twitter:description" content="Chit de rosturi — calculator online gratuit. Câte kg pentru rostuire. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<meta name="twitter:title" content="Calculator chit de rosturi: câte kg | LiczMat">
+<meta name="twitter:description" content="Dimensiunile plăcii, lățimea rostului și suprafața dau consumul de chit în kilograme și numărul de saci de cumpărat.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RON"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Cât chit de rosturi intră la 1 m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Consumul crește cu lățimea rostului și grosimea plăcii și scade cu formatul. La gresie mare cu rost subțire iese foarte puțin, la mozaic iese mult."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Ce dimensiuni ale plăcii se introduc?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Lungimea, lățimea și grosimea unei plăci, plus lățimea rostului. Din aceste patru numere iese volumul rosturilor pe metru pătrat, iar de acolo kilogramele."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ro/">Acasă</a></li><li><a href="/ro/calculatoare/">Calculatoare pentru construcții online</a></li><li aria-current="page">Chit de rosturi</li></ol></nav>
-      <h1>Chit de rosturi</h1>
-      <p class="lead">Câte kg pentru rostuire. Calculează în browser. Rotunjim rezultatul la ambalaje întregi, așa cum le cumperi.</p>
+      <h1>Calculator chit de rosturi: câte kg</h1>
+      <p class="lead">Dimensiunile plăcii, lățimea rostului și suprafața dau consumul de chit în kilograme și numărul de saci de cumpărat.</p>
     </div>
   </section>
 
@@ -251,7 +275,17 @@ worki = ⌈ kilogramy ÷ Sac ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Întrebări frecvente</h2>
+      <div class="faq">
+        <details open><summary>Cât chit de rosturi intră la 1 m²?</summary><p>Consumul crește cu lățimea rostului și grosimea plăcii și scade cu formatul. La gresie mare cu rost subțire iese foarte puțin, la mozaic iese mult.</p></details>
+        <details><summary>Ce dimensiuni ale plăcii se introduc?</summary><p>Lungimea, lățimea și grosimea unei plăci, plus lățimea rostului. Din aceste patru numere iese volumul rosturilor pe metru pătrat, iar de acolo kilogramele.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Alte calculatoare</h2>
       <div class="chips"><a class="chip" href="/ro/calculatoare/gresie-faianta-parchet/">Faianță, panouri, gresie</a><a class="chip" href="/ro/calculatoare/adeziv-mortar/">Adeziv / mortar</a><a class="chip" href="/ro/calculatoare/vopsea-tencuiala-grund/">Vopsea, tencuială, amorsă</a></div>
@@ -354,22 +388,22 @@ worki = ⌈ kilogramy ÷ Sac ⌉</code></pre>
   "sr": "/sr/kalkulatori/fug-masa/",
   "ru": "/ru/kalkulyatory/zatirka/"
 };</script>
-<script src="/assets/i18n.ro.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.ro.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

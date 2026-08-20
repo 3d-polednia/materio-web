@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Linearno sečenje (1D) — Građevinski kalkulatori onlajn | LiczMat</title>
-<meta name="description" content="Linearno sečenje (1D) — besplatan onlajn kalkulator. Šipke, lajsne, cevi: koliko i kako seći. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<title>Kalkulator sečenja 1D: koliko šipki | LiczMat</title>
+<meta name="description" content="Spisak elemenata, dužina šipke i širina reza daju broj šipki za kupovinu i gotov plan sečenja sa otpadom u procentima.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/raskroy-lineynyy-1d/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/rozkroj-liniowy-1d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="ro_RO">
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Linearno sečenje (1D) — Građevinski kalkulatori onlajn | LiczMat">
-<meta property="og:description" content="Linearno sečenje (1D) — besplatan onlajn kalkulator. Šipke, lajsne, cevi: koliko i kako seći. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta property="og:title" content="Kalkulator sečenja 1D: koliko šipki | LiczMat">
+<meta property="og:description" content="Spisak elemenata, dužina šipke i širina reza daju broj šipki za kupovinu i gotov plan sečenja sa otpadom u procentima.">
 <meta property="og:url" content="https://liczmat.com/sr/kalkulatori/linearno-secenje-1d/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Linearno sečenje (1D) — Građevinski kalkulatori onlajn | LiczMat">
-<meta name="twitter:description" content="Linearno sečenje (1D) — besplatan onlajn kalkulator. Šipke, lajsne, cevi: koliko i kako seći. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta name="twitter:title" content="Kalkulator sečenja 1D: koliko šipki | LiczMat">
+<meta name="twitter:description" content="Spisak elemenata, dužina šipke i širina reza daju broj šipki za kupovinu i gotov plan sečenja sa otpadom u procentima.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RSD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koliko šipki treba za spisak elemenata?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kalkulator ređa elemente od najdužeg i svaki stavlja u prvu šipku u koju stane. Broj otvorenih šipki je ono što kupujete, a plan pokazuje šta se iz koje seče."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Da li se računa širina reza?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Da. Rez se oduzima kod svakog sledećeg sečenja u šipki, ali ne kod prvog, jer prvi element počinje na čelu materijala."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li><a href="/sr/kalkulatori/">Građevinski kalkulatori onlajn</a></li><li aria-current="page">Linearno sečenje (1D)</li></ol></nav>
-      <h1>Linearno sečenje (1D)</h1>
-      <p class="lead">Šipke, lajsne, cevi: koliko i kako seći. Računaj u pregledaču. Rezultat zaokružujemo na cela pakovanja, onako kako se kupuju.</p>
+      <h1>Kalkulator sečenja 1D: koliko šipki</h1>
+      <p class="lead">Spisak elemenata, dužina šipke i širina reza daju broj šipki za kupovinu i gotov plan sečenja sa otpadom u procentima.</p>
     </div>
   </section>
 
@@ -255,7 +279,17 @@ odpad = (Dužina šipke × sztangi − Σ elementy) ÷ (Dužina šipke × sztang
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Česta pitanja</h2>
+      <div class="faq">
+        <details open><summary>Koliko šipki treba za spisak elemenata?</summary><p>Kalkulator ređa elemente od najdužeg i svaki stavlja u prvu šipku u koju stane. Broj otvorenih šipki je ono što kupujete, a plan pokazuje šta se iz koje seče.</p></details>
+        <details><summary>Da li se računa širina reza?</summary><p>Da. Rez se oduzima kod svakog sledećeg sečenja u šipki, ali ne kod prvog, jer prvi element počinje na čelu materijala.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ostali kalkulatori</h2>
       <div class="chips"><a class="chip" href="/sr/kalkulatori/secenje-ploca-2d/">Sečenje ploča (2D)</a><a class="chip" href="/sr/kalkulatori/oplata-osb/">Oplata (OSB/daske)</a><a class="chip" href="/sr/kalkulatori/gk-pregrada/">Pregradni zid</a></div>
@@ -358,22 +392,22 @@ odpad = (Dužina šipke × sztangi − Σ elementy) ÷ (Dužina šipke × sztang
   "sr": "/sr/kalkulatori/linearno-secenje-1d/",
   "ru": "/ru/kalkulyatory/raskroy-lineynyy-1d/"
 };</script>
-<script src="/assets/i18n.sr.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.sr.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

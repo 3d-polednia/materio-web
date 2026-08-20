@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Rez dosiek (2D) — Stavebné kalkulačky online | LiczMat</title>
-<meta name="description" content="Rez dosiek (2D) — bezplatná online kalkulačka. Dosky, pracovné dosky, preglejka: počet. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<title>Kalkulačka rezu dosiek: koľko dosiek | LiczMat</title>
+<meta name="description" content="Formátky, rozmer dosky a šírka rezu dajú počet dosiek a plán gilotínového rezu, s otáčaním dielov alebo bez neho.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/raskroy-plit-2d/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/rozkroj-plyt-2d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Rez dosiek (2D) — Stavebné kalkulačky online | LiczMat">
-<meta property="og:description" content="Rez dosiek (2D) — bezplatná online kalkulačka. Dosky, pracovné dosky, preglejka: počet. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<meta property="og:title" content="Kalkulačka rezu dosiek: koľko dosiek | LiczMat">
+<meta property="og:description" content="Formátky, rozmer dosky a šírka rezu dajú počet dosiek a plán gilotínového rezu, s otáčaním dielov alebo bez neho.">
 <meta property="og:url" content="https://liczmat.com/sk/kalkulacky/rez-dosiek-2d/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Rez dosiek (2D) — Stavebné kalkulačky online | LiczMat">
-<meta name="twitter:description" content="Rez dosiek (2D) — bezplatná online kalkulačka. Dosky, pracovné dosky, preglejka: počet. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<meta name="twitter:title" content="Kalkulačka rezu dosiek: koľko dosiek | LiczMat">
+<meta name="twitter:description" content="Formátky, rozmer dosky a šírka rezu dajú počet dosiek a plán gilotínového rezu, s otáčaním dielov alebo bez neho.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "EUR"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koľko dosiek moje formátky zaberú?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kalkulačka kladie formátky od najväčšej do voľného obdĺžnika s najmenším zvyškom. Keď sa už nič nezmestí, otvorí ďalšiu dosku, a to je nákup."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kedy otáčanie dielov vypnúť?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Keď má doska kresbu alebo smerový dekor. Otočený diel by potom viditeľne bežal naprieč, aj keď rozmer sedí."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sk/">Domov</a></li><li><a href="/sk/kalkulacky/">Stavebné kalkulačky online</a></li><li aria-current="page">Rez dosiek (2D)</li></ol></nav>
-      <h1>Rez dosiek (2D)</h1>
-      <p class="lead">Dosky, pracovné dosky, preglejka: počet. Počítaj v prehliadači. Výsledok zaokrúhľujeme na celé balenia, tak ako sa predávajú.</p>
+      <h1>Kalkulačka rezu dosiek: koľko dosiek</h1>
+      <p class="lead">Formátky, rozmer dosky a šírka rezu dajú počet dosiek a plán gilotínového rezu, s otáčaním dielov alebo bez neho.</p>
     </div>
   </section>
 
@@ -256,7 +280,17 @@ odpad = (płyty × Šírka dosky × Dĺžka dosky − Σ formatki) ÷ (płyty ×
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté otázky</h2>
+      <div class="faq">
+        <details open><summary>Koľko dosiek moje formátky zaberú?</summary><p>Kalkulačka kladie formátky od najväčšej do voľného obdĺžnika s najmenším zvyškom. Keď sa už nič nezmestí, otvorí ďalšiu dosku, a to je nákup.</p></details>
+        <details><summary>Kedy otáčanie dielov vypnúť?</summary><p>Keď má doska kresbu alebo smerový dekor. Otočený diel by potom viditeľne bežal naprieč, aj keď rozmer sedí.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ďalšie kalkulačky</h2>
       <div class="chips"><a class="chip" href="/sk/kalkulacky/linearny-rez-1d/">Lineárny rez (1D)</a><a class="chip" href="/sk/kalkulacky/zaklop-osb/">Záklop (OSB/dosky)</a><a class="chip" href="/sk/kalkulacky/obklady-panely-dlazba/">Obklady, panely, dlažba</a></div>
@@ -359,22 +393,22 @@ odpad = (płyty × Šírka dosky × Dĺžka dosky − Σ formatki) ÷ (płyty ×
   "sr": "/sr/kalkulatori/secenje-ploca-2d/",
   "ru": "/ru/kalkulyatory/raskroy-plit-2d/"
 };</script>
-<script src="/assets/i18n.sk.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.sk.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Mauerwerk — Baurechner online | LiczMat</title>
-<meta name="description" content="Mauerwerk — kostenloser Online-Rechner. Steine und Mörtel je Wand. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<title>Mauerrechner: Steine und Mörtel | LiczMat</title>
+<meta name="description" content="Wandfläche minus Öffnungen, Steine je m² und Verschnitt ergeben die Anzahl der Steine und die Kilogramm Mörtel.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/kladka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/murowanie/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Mauerwerk — Baurechner online | LiczMat">
-<meta property="og:description" content="Mauerwerk — kostenloser Online-Rechner. Steine und Mörtel je Wand. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<meta property="og:title" content="Mauerrechner: Steine und Mörtel | LiczMat">
+<meta property="og:description" content="Wandfläche minus Öffnungen, Steine je m² und Verschnitt ergeben die Anzahl der Steine und die Kilogramm Mörtel.">
 <meta property="og:url" content="https://liczmat.com/de/rechner/mauerwerk/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Mauerwerk — Baurechner online | LiczMat">
-<meta name="twitter:description" content="Mauerwerk — kostenloser Online-Rechner. Steine und Mörtel je Wand. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<meta name="twitter:title" content="Mauerrechner: Steine und Mörtel | LiczMat">
+<meta name="twitter:description" content="Wandfläche minus Öffnungen, Steine je m² und Verschnitt ergeben die Anzahl der Steine und die Kilogramm Mörtel.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "EUR"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Wie viele Steine braucht 1 m² Wand?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Die Stückzahl je m² folgt aus dem Steinmaß samt Fuge. Trage sie ein, der Rechner multipliziert sie mit der Fläche, nachdem Fenster und Türen abgezogen sind."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Wie viel Verschnitt rechnet man beim Mauern?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "5% decken Zuschnitt und Transportbruch. Bei vielen Passsteinen, Schrägen oder schmalen Pfeilern lohnt ein höherer Wert."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li><a href="/de/rechner/">Baurechner online</a></li><li aria-current="page">Mauerwerk</li></ol></nav>
-      <h1>Mauerwerk</h1>
-      <p class="lead">Steine und Mörtel je Wand. Rechne im Browser. Ergebnisse werden auf ganze Gebinde aufgerundet, so wie du sie kaufst.</p>
+      <h1>Mauerrechner: Steine und Mörtel</h1>
+      <p class="lead">Wandfläche minus Öffnungen, Steine je m² und Verschnitt ergeben die Anzahl der Steine und die Kilogramm Mörtel.</p>
     </div>
   </section>
 
@@ -250,7 +274,17 @@ Mörtel gesamt = netto × Mörtel kg</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Häufige Fragen</h2>
+      <div class="faq">
+        <details open><summary>Wie viele Steine braucht 1 m² Wand?</summary><p>Die Stückzahl je m² folgt aus dem Steinmaß samt Fuge. Trage sie ein, der Rechner multipliziert sie mit der Fläche, nachdem Fenster und Türen abgezogen sind.</p></details>
+        <details><summary>Wie viel Verschnitt rechnet man beim Mauern?</summary><p>5% decken Zuschnitt und Transportbruch. Bei vielen Passsteinen, Schrägen oder schmalen Pfeilern lohnt ein höherer Wert.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Weitere Rechner</h2>
       <div class="chips"><a class="chip" href="/de/rechner/kleber-moertel/">Kleber / Mörtel</a><a class="chip" href="/de/rechner/sackbeton/">Sackbeton</a><a class="chip" href="/de/rechner/daemmung-wdvs/">Dämmung (WDVS)</a></div>
@@ -352,22 +386,22 @@ Mörtel gesamt = netto × Mörtel kg</code></pre>
   "sr": "/sr/kalkulatori/zidanje/",
   "ru": "/ru/kalkulyatory/kladka/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.de.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

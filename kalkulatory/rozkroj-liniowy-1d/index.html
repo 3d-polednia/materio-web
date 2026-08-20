@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Rozkrój liniowy (1D) — Kalkulatory budowlane online | LiczMat</title>
-<meta name="description" content="Rozkrój liniowy (1D) — darmowy kalkulator online. Sztangi, listwy, rury: ile kupić i jak pociąć. Ten sam wzór co w aplikacji LiczMat, bez rejestracji.">
+<title>Kalkulator rozkroju 1D — ile sztang | LiczMat</title>
+<meta name="description" content="Lista elementów, długość sztangi i rzaz piły dają liczbę sztang do kupienia oraz gotowy plan cięcia z procentem odpadu.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/raskroy-lineynyy-1d/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/rozkroj-liniowy-1d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Rozkrój liniowy (1D) — Kalkulatory budowlane online | LiczMat">
-<meta property="og:description" content="Rozkrój liniowy (1D) — darmowy kalkulator online. Sztangi, listwy, rury: ile kupić i jak pociąć. Ten sam wzór co w aplikacji LiczMat, bez rejestracji.">
+<meta property="og:title" content="Kalkulator rozkroju 1D — ile sztang | LiczMat">
+<meta property="og:description" content="Lista elementów, długość sztangi i rzaz piły dają liczbę sztang do kupienia oraz gotowy plan cięcia z procentem odpadu.">
 <meta property="og:url" content="https://liczmat.com/kalkulatory/rozkroj-liniowy-1d/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Rozkrój liniowy (1D) — Kalkulatory budowlane online | LiczMat">
-<meta name="twitter:description" content="Rozkrój liniowy (1D) — darmowy kalkulator online. Sztangi, listwy, rury: ile kupić i jak pociąć. Ten sam wzór co w aplikacji LiczMat, bez rejestracji.">
+<meta name="twitter:title" content="Kalkulator rozkroju 1D — ile sztang | LiczMat">
+<meta name="twitter:description" content="Lista elementów, długość sztangi i rzaz piły dają liczbę sztang do kupienia oraz gotowy plan cięcia z procentem odpadu.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "PLN"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Ile sztang kupić na listę elementów?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kalkulator układa elementy od najdłuższego i wkłada każdy do pierwszej sztangi, w której się mieści. Liczba otwartych sztang to liczba, którą kupujesz, a plan pokazuje, co z której wyciąć."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Czy rzaz piły jest doliczany?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tak. Rzaz odejmuje się przy każdym kolejnym cięciu w sztandze, nie przy pierwszym, bo pierwszy element zaczyna się od czoła materiału."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Start</a></li><li><a href="/kalkulatory/">Kalkulatory budowlane online</a></li><li aria-current="page">Rozkrój liniowy (1D)</li></ol></nav>
-      <h1>Rozkrój liniowy (1D)</h1>
-      <p class="lead">Sztangi, listwy, rury: ile kupić i jak pociąć. Policz w przeglądarce. Wynik zaokrąglamy do całych opakowań, tak jak w sklepie.</p>
+      <h1>Kalkulator rozkroju 1D — ile sztang</h1>
+      <p class="lead">Lista elementów, długość sztangi i rzaz piły dają liczbę sztang do kupienia oraz gotowy plan cięcia z procentem odpadu.</p>
     </div>
   </section>
 
@@ -255,7 +279,17 @@ odpad = (Długość sztangi × sztangi − Σ elementy) ÷ (Długość sztangi �
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Najczęstsze pytania</h2>
+      <div class="faq">
+        <details open><summary>Ile sztang kupić na listę elementów?</summary><p>Kalkulator układa elementy od najdłuższego i wkłada każdy do pierwszej sztangi, w której się mieści. Liczba otwartych sztang to liczba, którą kupujesz, a plan pokazuje, co z której wyciąć.</p></details>
+        <details><summary>Czy rzaz piły jest doliczany?</summary><p>Tak. Rzaz odejmuje się przy każdym kolejnym cięciu w sztandze, nie przy pierwszym, bo pierwszy element zaczyna się od czoła materiału.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Inne kalkulatory</h2>
       <div class="chips"><a class="chip" href="/kalkulatory/rozkroj-plyt-2d/">Rozkrój płyt (2D)</a><a class="chip" href="/kalkulatory/poszycie-osb/">Poszycie (OSB/deski)</a><a class="chip" href="/kalkulatory/sciana-dzialowa-gk/">Ściana działowa G-K</a></div>
@@ -358,22 +392,22 @@ odpad = (Długość sztangi × sztangi − Σ elementy) ÷ (Długość sztangi �
   "sr": "/sr/kalkulatori/linearno-secenje-1d/",
   "ru": "/ru/kalkulyatory/raskroy-lineynyy-1d/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.pl.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

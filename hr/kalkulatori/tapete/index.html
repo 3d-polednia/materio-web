@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Tapete — Građevinski kalkulatori online | LiczMat</title>
-<meta name="description" content="Tapete — besplatan online kalkulator. Koliko rola, s raportom uzorka. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<title>Kalkulator tapeta: koliko rola | LiczMat</title>
+<meta name="description" content="Širina i visina zida, dimenzije role i raport uzorka daju broj rola i broj traka koje izlaze iz jedne role.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/oboi/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/tapety/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="ro_RO">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Tapete — Građevinski kalkulatori online | LiczMat">
-<meta property="og:description" content="Tapete — besplatan online kalkulator. Koliko rola, s raportom uzorka. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta property="og:title" content="Kalkulator tapeta: koliko rola | LiczMat">
+<meta property="og:description" content="Širina i visina zida, dimenzije role i raport uzorka daju broj rola i broj traka koje izlaze iz jedne role.">
 <meta property="og:url" content="https://liczmat.com/hr/kalkulatori/tapete/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Tapete — Građevinski kalkulatori online | LiczMat">
-<meta name="twitter:description" content="Tapete — besplatan online kalkulator. Koliko rola, s raportom uzorka. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta name="twitter:title" content="Kalkulator tapeta: koliko rola | LiczMat">
+<meta name="twitter:description" content="Širina i visina zida, dimenzije role i raport uzorka daju broj rola i broj traka koje izlaze iz jedne role.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "EUR"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koliko rola tapeta za sobu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Širina zida podijeljena širinom role daje broj traka, a duljina role podijeljena visinom trake daje trake iz jedne role. Kalkulator radi oboje i zaokružuje naviše."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kako raport uzorka mijenja broj rola?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kod tapete s raportom svaka se traka produljuje na puni višekratnik raporta, pa iz role izlazi manje traka. Raport 0 znači tapetu bez usklađivanja uzorka."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/hr/">Početna</a></li><li><a href="/hr/kalkulatori/">Građevinski kalkulatori online</a></li><li aria-current="page">Tapete</li></ol></nav>
-      <h1>Tapete</h1>
-      <p class="lead">Koliko rola, s raportom uzorka. Računaj u pregledniku. Rezultat zaokružujemo na cijela pakiranja, onako kako se kupuju.</p>
+      <h1>Kalkulator tapeta: koliko rola</h1>
+      <p class="lead">Širina i visina zida, dimenzije role i raport uzorka daju broj rola i broj traka koje izlaze iz jedne role.</p>
     </div>
   </section>
 
@@ -252,7 +276,17 @@ rolki = ⌈ pasów potrzeba ÷ pasów z rolki ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Česta pitanja</h2>
+      <div class="faq">
+        <details open><summary>Koliko rola tapeta za sobu?</summary><p>Širina zida podijeljena širinom role daje broj traka, a duljina role podijeljena visinom trake daje trake iz jedne role. Kalkulator radi oboje i zaokružuje naviše.</p></details>
+        <details><summary>Kako raport uzorka mijenja broj rola?</summary><p>Kod tapete s raportom svaka se traka produljuje na puni višekratnik raporta, pa iz role izlazi manje traka. Raport 0 znači tapetu bez usklađivanja uzorka.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ostali kalkulatori</h2>
       <div class="chips"><a class="chip" href="/hr/kalkulatori/boje-zbuke-temeljni-premaz/">Boje, žbuke, prajmeri</a><a class="chip" href="/hr/kalkulatori/plocice-paneli-gres/">Pločice, paneli, gres</a></div>
@@ -354,22 +388,22 @@ rolki = ⌈ pasów potrzeba ÷ pasów z rolki ⌉</code></pre>
   "sr": "/sr/kalkulatori/tapete/",
   "ru": "/ru/kalkulyatory/oboi/"
 };</script>
-<script src="/assets/i18n.hr.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.hr.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

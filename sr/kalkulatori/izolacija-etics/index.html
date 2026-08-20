@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Termoizolacija (ETICS) — Građevinski kalkulatori onlajn | LiczMat</title>
-<meta name="description" content="Termoizolacija (ETICS) — besplatan onlajn kalkulator. Stiropor, tiplovi, lepak, mrežica. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<title>Kalkulator izolacije: stiropor i tiplovi | LiczMat</title>
+<meta name="description" content="Površina fasade daje ploče stiropora, tiplove, kilograme lepka i metre mrežice za termoizolaciju u sistemu ETICS.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/uteplenie-etics/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/ocieplenie-etics/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="ro_RO">
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Termoizolacija (ETICS) — Građevinski kalkulatori onlajn | LiczMat">
-<meta property="og:description" content="Termoizolacija (ETICS) — besplatan onlajn kalkulator. Stiropor, tiplovi, lepak, mrežica. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta property="og:title" content="Kalkulator izolacije: stiropor i tiplovi | LiczMat">
+<meta property="og:description" content="Površina fasade daje ploče stiropora, tiplove, kilograme lepka i metre mrežice za termoizolaciju u sistemu ETICS.">
 <meta property="og:url" content="https://liczmat.com/sr/kalkulatori/izolacija-etics/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Termoizolacija (ETICS) — Građevinski kalkulatori onlajn | LiczMat">
-<meta name="twitter:description" content="Termoizolacija (ETICS) — besplatan onlajn kalkulator. Stiropor, tiplovi, lepak, mrežica. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta name="twitter:title" content="Kalkulator izolacije: stiropor i tiplovi | LiczMat">
+<meta name="twitter:description" content="Površina fasade daje ploče stiropora, tiplove, kilograme lepka i metre mrežice za termoizolaciju u sistemu ETICS.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RSD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koliko tiplova ide na m² stiropora?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "6 komada po m² tipična je vrednost za prizemlje i prvi sprat. Broj zavisi od visine zgrade i vetrovne zone, pa za više zidove unesite više."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Koliko mrežice ide na izolaciju?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Mrežicu računajte sa preklopom od 10%, jer susedne trake moraju ići jedna preko druge. Kalkulator taj preklop dodaje na površinu fasade."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li><a href="/sr/kalkulatori/">Građevinski kalkulatori onlajn</a></li><li aria-current="page">Termoizolacija (ETICS)</li></ol></nav>
-      <h1>Termoizolacija (ETICS)</h1>
-      <p class="lead">Stiropor, tiplovi, lepak, mrežica. Računaj u pregledaču. Rezultat zaokružujemo na cela pakovanja, onako kako se kupuju.</p>
+      <h1>Kalkulator izolacije: stiropor i tiplovi</h1>
+      <p class="lead">Površina fasade daje ploče stiropora, tiplove, kilograme lepka i metre mrežice za termoizolaciju u sistemu ETICS.</p>
     </div>
   </section>
 
@@ -254,7 +278,17 @@ siatka = Površina × 1,10 m²</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Česta pitanja</h2>
+      <div class="faq">
+        <details open><summary>Koliko tiplova ide na m² stiropora?</summary><p>6 komada po m² tipična je vrednost za prizemlje i prvi sprat. Broj zavisi od visine zgrade i vetrovne zone, pa za više zidove unesite više.</p></details>
+        <details><summary>Koliko mrežice ide na izolaciju?</summary><p>Mrežicu računajte sa preklopom od 10%, jer susedne trake moraju ići jedna preko druge. Kalkulator taj preklop dodaje na površinu fasade.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ostali kalkulatori</h2>
       <div class="chips"><a class="chip" href="/sr/kalkulatori/lepak-malter/">Lepak / malter</a><a class="chip" href="/sr/kalkulatori/zidanje/">Zidanje</a><a class="chip" href="/sr/kalkulatori/boje-malteri-prajmer/">Boje, malteri, prajmeri</a></div>
@@ -357,22 +391,22 @@ siatka = Površina × 1,10 m²</code></pre>
   "sr": "/sr/kalkulatori/izolacija-etics/",
   "ru": "/ru/kalkulyatory/uteplenie-etics/"
 };</script>
-<script src="/assets/i18n.sr.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.sr.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

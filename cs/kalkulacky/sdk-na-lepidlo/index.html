@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>SDK na lepidlo — Stavební kalkulačky online | LiczMat</title>
-<meta name="description" content="SDK na lepidlo — bezplatná online kalkulačka. Desky „na terče“ + sádrové lepidlo. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<title>Kalkulačka SDK na lepidlo: kolik desek | LiczMat</title>
+<meta name="description" content="Plocha stěny a spotřeba sádrového lepidla dají počet sádrokartonových desek a pytlů lepidla pro montáž na terče.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/gk-na-kley/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/gk-na-klej/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="SDK na lepidlo — Stavební kalkulačky online | LiczMat">
-<meta property="og:description" content="SDK na lepidlo — bezplatná online kalkulačka. Desky „na terče“ + sádrové lepidlo. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta property="og:title" content="Kalkulačka SDK na lepidlo: kolik desek | LiczMat">
+<meta property="og:description" content="Plocha stěny a spotřeba sádrového lepidla dají počet sádrokartonových desek a pytlů lepidla pro montáž na terče.">
 <meta property="og:url" content="https://liczmat.com/cs/kalkulacky/sdk-na-lepidlo/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="SDK na lepidlo — Stavební kalkulačky online | LiczMat">
-<meta name="twitter:description" content="SDK na lepidlo — bezplatná online kalkulačka. Desky „na terče“ + sádrové lepidlo. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta name="twitter:title" content="Kalkulačka SDK na lepidlo: kolik desek | LiczMat">
+<meta name="twitter:description" content="Plocha stěny a spotřeba sádrového lepidla dají počet sádrokartonových desek a pytlů lepidla pro montáž na terče.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "CZK"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Kolik desek je na m² stěny?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kalkulačka vydělí plochu plochou jedné desky a zaokrouhlí nahoru na celé kusy; lepidlo počítá zvlášť ze spotřeby na metr čtvereční."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kdy desky na terče lepit nelze?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sádrové lepidlo funguje jen na rovném a únosném podkladu. Při větších nerovnostech je potřeba rošt z profilů."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li><a href="/cs/kalkulacky/">Stavební kalkulačky online</a></li><li aria-current="page">SDK na lepidlo</li></ol></nav>
-      <h1>SDK na lepidlo</h1>
-      <p class="lead">Desky „na terče“ + sádrové lepidlo. Počítej v prohlížeči. Výsledek zaokrouhlujeme na celá balení, tak jak se prodávají.</p>
+      <h1>Kalkulačka SDK na lepidlo: kolik desek</h1>
+      <p class="lead">Plocha stěny a spotřeba sádrového lepidla dají počet sádrokartonových desek a pytlů lepidla pro montáž na terče.</p>
     </div>
   </section>
 
@@ -250,7 +274,17 @@ klej gipsowy = ⌈ Plocha × Lepidlo ÷ 25 ⌉ worków</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté dotazy</h2>
+      <div class="faq">
+        <details open><summary>Kolik desek je na m² stěny?</summary><p>Kalkulačka vydělí plochu plochou jedné desky a zaokrouhlí nahoru na celé kusy; lepidlo počítá zvlášť ze spotřeby na metr čtvereční.</p></details>
+        <details><summary>Kdy desky na terče lepit nelze?</summary><p>Sádrové lepidlo funguje jen na rovném a únosném podkladu. Při větších nerovnostech je potřeba rošt z profilů.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Další kalkulačky</h2>
       <div class="chips"><a class="chip" href="/cs/kalkulacky/pricka-sdk/">Příčka SDK</a><a class="chip" href="/cs/kalkulacky/podhled/">Podhled</a><a class="chip" href="/cs/kalkulacky/lepidlo-malta/">Lepidlo / malta</a></div>
@@ -352,22 +386,22 @@ klej gipsowy = ⌈ Plocha × Lepidlo ÷ 25 ⌉ worków</code></pre>
   "sr": "/sr/kalkulatori/gk-na-lepak/",
   "ru": "/ru/kalkulyatory/gk-na-kley/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.cs.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

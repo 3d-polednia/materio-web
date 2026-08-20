@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Nářez desek (2D) — Stavební kalkulačky online | LiczMat</title>
-<meta name="description" content="Nářez desek (2D) — bezplatná online kalkulačka. Desky, pracovní desky, překližka: počet. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<title>Kalkulačka nářezu desek: kolik desek | LiczMat</title>
+<meta name="description" content="Formátky, rozměr desky a šířka řezu dají počet desek a plán gilotinového nářezu, s otáčením dílů nebo bez něj.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/raskroy-plit-2d/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/rozkroj-plyt-2d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Nářez desek (2D) — Stavební kalkulačky online | LiczMat">
-<meta property="og:description" content="Nářez desek (2D) — bezplatná online kalkulačka. Desky, pracovní desky, překližka: počet. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta property="og:title" content="Kalkulačka nářezu desek: kolik desek | LiczMat">
+<meta property="og:description" content="Formátky, rozměr desky a šířka řezu dají počet desek a plán gilotinového nářezu, s otáčením dílů nebo bez něj.">
 <meta property="og:url" content="https://liczmat.com/cs/kalkulacky/narez-desek-2d/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Nářez desek (2D) — Stavební kalkulačky online | LiczMat">
-<meta name="twitter:description" content="Nářez desek (2D) — bezplatná online kalkulačka. Desky, pracovní desky, překližka: počet. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta name="twitter:title" content="Kalkulačka nářezu desek: kolik desek | LiczMat">
+<meta name="twitter:description" content="Formátky, rozměr desky a šířka řezu dají počet desek a plán gilotinového nářezu, s otáčením dílů nebo bez něj.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "CZK"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Kolik desek moje formátky zaberou?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kalkulačka klade formátky od největší do volného obdélníku s nejmenším zbytkem. Když se už nic nevejde, otevře další desku, a to je nákup."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kdy otáčení dílů vypnout?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Když má deska kresbu nebo směrový dekor. Otočený díl by pak viditelně běžel napříč, i když rozměr sedí."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li><a href="/cs/kalkulacky/">Stavební kalkulačky online</a></li><li aria-current="page">Nářez desek (2D)</li></ol></nav>
-      <h1>Nářez desek (2D)</h1>
-      <p class="lead">Desky, pracovní desky, překližka: počet. Počítej v prohlížeči. Výsledek zaokrouhlujeme na celá balení, tak jak se prodávají.</p>
+      <h1>Kalkulačka nářezu desek: kolik desek</h1>
+      <p class="lead">Formátky, rozměr desky a šířka řezu dají počet desek a plán gilotinového nářezu, s otáčením dílů nebo bez něj.</p>
     </div>
   </section>
 
@@ -256,7 +280,17 @@ odpad = (płyty × Šířka desky × Délka desky − Σ formatki) ÷ (płyty ×
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté dotazy</h2>
+      <div class="faq">
+        <details open><summary>Kolik desek moje formátky zaberou?</summary><p>Kalkulačka klade formátky od největší do volného obdélníku s nejmenším zbytkem. Když se už nic nevejde, otevře další desku, a to je nákup.</p></details>
+        <details><summary>Kdy otáčení dílů vypnout?</summary><p>Když má deska kresbu nebo směrový dekor. Otočený díl by pak viditelně běžel napříč, i když rozměr sedí.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Další kalkulačky</h2>
       <div class="chips"><a class="chip" href="/cs/kalkulacky/linearni-narez-1d/">Lineární nářez (1D)</a><a class="chip" href="/cs/kalkulacky/zaklop-osb/">Záklop (OSB/desky)</a><a class="chip" href="/cs/kalkulacky/obklady-panely-dlazba/">Obklady, panely, dlažba</a></div>
@@ -359,22 +393,22 @@ odpad = (płyty × Šířka desky × Délka desky − Σ formatki) ÷ (płyty ×
   "sr": "/sr/kalkulatori/secenje-ploca-2d/",
   "ru": "/ru/kalkulyatory/raskroy-plit-2d/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.cs.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

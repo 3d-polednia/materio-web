@@ -14,14 +14,16 @@
  * shows up in a browser, and all of them cost traffic. So they are checked here, against
  * the 375 files that actually shipped, rather than against the code that wrote them.
  *
- * Two deliberate exceptions, both named where they are made:
+ * One deliberate exception, named where it is made: /privacy-policy.html carries no
+ * hreflang and no lastmod. It is hand-written, it is Polish and English in one document
+ * rather than two URLs, and the build does not generate it, so it cannot know when it
+ * last changed.
  *
- *   - a calculator page's <title> may run past 60 characters. That is session 31
- *     (SEO KALKULATORÓW), whose whole subject is what those titles should say; codifying
- *     today's pattern here would be this session telling the next one it was right;
- *   - /privacy-policy.html carries no hreflang and no lastmod. It is hand-written, it is
- *     Polish and English in one document rather than two URLs, and the build does not
- *     generate it, so it cannot know when it last changed.
+ * The second exception is gone. Session 30 let a calculator page's <title> run past 60
+ * characters, because what those titles should say was session 31's subject and pinning
+ * today's pattern down here would have been this session telling the next one it was
+ * right. Session 31 wrote them, so the limit now applies to all 375 pages; what each one
+ * says is checked in scripts/test-calc-seo.mjs.
  *
  * Dependency-free, plain `node`, exit 1 on failure — the same shape as the other logic
  * suites. Run it after touching src/template.mjs's <head>, buildSitemap() or
@@ -104,9 +106,6 @@ const byUrl = new Map(PAGES.map((page) => [page.url, page]));
 const byCanonical = new Map(PAGES.filter((page) => page.canonical).map((page) => [page.canonical, page]));
 const isNoindex = (page) => Boolean(page.robots && page.robots.includes("noindex"));
 const INDEXED = PAGES.filter((page) => !isNoindex(page));
-
-/** The calculator pages, whose <title> is session 31's subject rather than this one's. */
-const CALC_URLS = new Set(LANGS.flatMap((l) => CALCS.map((c) => urlCalc(l, c.id))));
 
 head("0. the tree this suite is reading");
 {
@@ -349,12 +348,10 @@ head("5. metadata: the title and the description of every page");
   for (const page of PAGES) {
     check(`${page.url}: the title is not empty`, page.title.trim().length > 0);
     check(`${page.url}: the title carries the brand`, page.title.includes("LiczMat"), page.title);
-    // Google truncates a title at roughly 60 characters. The calculator pages are session
-    // 31's subject — see the header of this file.
-    if (!CALC_URLS.has(page.url)) {
-      check(`${page.url}: the title fits a result row (≤ 60)`,
-        page.title.length <= 60, `${page.title.length}: ${page.title}`);
-    }
+    // Google truncates a title at roughly 60 characters, so a longer one is words
+    // written for nobody. Session 31 brought the calculator pages under this too.
+    check(`${page.url}: the title fits a result row (≤ 60)`,
+      page.title.length <= 60, `${page.title.length}: ${page.title}`);
   }
   for (const page of INDEXED) {
     if (!check(`${page.url}: has a description`, Boolean(page.description))) continue;

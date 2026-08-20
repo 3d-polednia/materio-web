@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Grout — Construction calculators online | LiczMat</title>
-<meta name="description" content="Grout — free online calculator. How many kg to grout the tiles. The same formula as in the LiczMat app, no sign-up.">
+<title>Grout calculator: how many kg for tiles | LiczMat</title>
+<meta name="description" content="Tile size, joint width and area give the grout usage in kilograms and the number of bags to buy.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/zatirka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/fuga/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Grout — Construction calculators online | LiczMat">
-<meta property="og:description" content="Grout — free online calculator. How many kg to grout the tiles. The same formula as in the LiczMat app, no sign-up.">
+<meta property="og:title" content="Grout calculator: how many kg for tiles | LiczMat">
+<meta property="og:description" content="Tile size, joint width and area give the grout usage in kilograms and the number of bags to buy.">
 <meta property="og:url" content="https://liczmat.com/en/calculators/grout/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Grout — Construction calculators online | LiczMat">
-<meta name="twitter:description" content="Grout — free online calculator. How many kg to grout the tiles. The same formula as in the LiczMat app, no sign-up.">
+<meta name="twitter:title" content="Grout calculator: how many kg for tiles | LiczMat">
+<meta name="twitter:description" content="Tile size, joint width and area give the grout usage in kilograms and the number of bags to buy.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "USD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How much grout does 1 m² of tiles take?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Usage rises with the joint width and the tile thickness and falls with the format. Large-format porcelain with a narrow joint takes very little; mosaic takes a lot."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which tile dimensions do you enter?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The length, width and thickness of one tile, plus the joint width. Those four numbers give the volume of the joints in a square metre, and from that the kilograms."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li><a href="/en/calculators/">Construction calculators online</a></li><li aria-current="page">Grout</li></ol></nav>
-      <h1>Grout</h1>
-      <p class="lead">How many kg to grout the tiles. Calculate in your browser. Results are rounded up to whole packs, the way you buy them.</p>
+      <h1>Grout calculator: how many kg for tiles</h1>
+      <p class="lead">Tile size, joint width and area give the grout usage in kilograms and the number of bags to buy.</p>
     </div>
   </section>
 
@@ -251,7 +275,17 @@ bags = ⌈ kilograms ÷ Bag ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Frequently asked questions</h2>
+      <div class="faq">
+        <details open><summary>How much grout does 1 m² of tiles take?</summary><p>Usage rises with the joint width and the tile thickness and falls with the format. Large-format porcelain with a narrow joint takes very little; mosaic takes a lot.</p></details>
+        <details><summary>Which tile dimensions do you enter?</summary><p>The length, width and thickness of one tile, plus the joint width. Those four numbers give the volume of the joints in a square metre, and from that the kilograms.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Other calculators</h2>
       <div class="chips"><a class="chip" href="/en/calculators/tiles-panels-porcelain/">Tiles, panels, porcelain</a><a class="chip" href="/en/calculators/adhesive-mortar/">Adhesive / mortar</a><a class="chip" href="/en/calculators/paint-plaster-primer/">Paint, plaster, primer</a></div>
@@ -354,22 +388,22 @@ bags = ⌈ kilograms ÷ Bag ⌉</code></pre>
   "sr": "/sr/kalkulatori/fug-masa/",
   "ru": "/ru/kalkulyatory/zatirka/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.en.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

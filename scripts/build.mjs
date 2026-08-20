@@ -46,13 +46,14 @@ import {
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
+import { CALC_SEO, TITLE_MAX } from "../src/calc-seo.mjs";
 import { appMain, shareMain, dashboardMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260820a";
+const STAMP = "20260820b";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -155,6 +156,59 @@ function validate() {
       if (!CALC_SLUG[calc.id][lang]) problems.push(`calculator "${calc.id}" has no ${lang} slug`);
     }
     if (!(`note_${calc.id}` in DICT[DEFAULT_LANG])) problems.push(`calculator "${calc.id}" has no note_ key`);
+
+    // Session 31: and its own SEO copy, in every language. A calculator whose title fell
+    // back to a pattern would be the one page in 150 that says nothing a searcher typed,
+    // and nothing on the rendered page would look wrong.
+    const seo = CALC_SEO[calc.id];
+    if (!seo) { problems.push(`calculator "${calc.id}" has no SEO copy (src/calc-seo.mjs)`); continue; }
+    for (const lang of LANGS) {
+      const copy = seo[lang];
+      if (!copy) { problems.push(`calculator "${calc.id}" has no ${lang} SEO copy`); continue; }
+      const where = `${calc.id}/${lang}`;
+      if (!copy.title) problems.push(`${where}: no title`);
+      // " | LiczMat" is ten more characters and Google cuts a title at roughly 60.
+      else if (copy.title.length > TITLE_MAX) {
+        problems.push(`${where}: the title is ${copy.title.length} characters, over ${TITLE_MAX}`);
+      }
+      if (!copy.desc) problems.push(`${where}: no description`);
+      else if (copy.desc.length < 50 || copy.desc.length > 160) {
+        problems.push(`${where}: the description is ${copy.desc.length} characters, outside 50–160`);
+      }
+      if (!Array.isArray(copy.faq) || copy.faq.length !== 2) {
+        problems.push(`${where}: the FAQ must be exactly two questions`);
+      } else {
+        for (const entry of copy.faq) {
+          if (!Array.isArray(entry) || entry.length !== 2 || !entry[0] || !entry[1]) {
+            problems.push(`${where}: an FAQ entry is not a [question, answer] pair`);
+          } else if (!entry[0].trim().endsWith("?")) {
+            problems.push(`${where}: "${entry[0]}" is not a question`);
+          }
+        }
+        if (copy.faq[0][0] === copy.faq[1][0]) problems.push(`${where}: both FAQ questions are the same`);
+      }
+    }
+  }
+
+  // Two pages competing for one result. Titles may repeat across languages — Czech and
+  // Slovak really do spell some of these the same — but never inside one, and a
+  // description is a page's own sentence everywhere.
+  {
+    const byDesc = new Map();
+    const byTitle = new Map();
+    for (const calc of CALCS) {
+      for (const lang of LANGS) {
+        const copy = (CALC_SEO[calc.id] || {})[lang];
+        if (!copy) continue;
+        const seen = byDesc.get(copy.desc);
+        if (seen) problems.push(`${calc.id}/${lang}: its description is also ${seen}'s`);
+        byDesc.set(copy.desc, `${calc.id}/${lang}`);
+        const key = `${lang}\n${copy.title}`;
+        const twin = byTitle.get(key);
+        if (twin) problems.push(`${calc.id}/${lang}: its title is also ${twin}'s`);
+        byTitle.set(key, `${calc.id}/${lang}`);
+      }
+    }
   }
   for (const g of GUIDES) {
     for (const lang of LANGS) if (!g.slug[lang]) problems.push(`guide "${g.id}" has no ${lang} slug`);
@@ -510,6 +564,22 @@ const faqLd = (t) => ({
   })),
 });
 
+/**
+ * The two questions at the foot of a calculator page, as structured data.
+ *
+ * Same rule as the home page's FAQ: this reads the very list `calcPageMain()` renders,
+ * so an answer in the markup and an answer in the JSON-LD cannot say different things.
+ */
+const calcFaqLd = (seo) => ({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: seo.faq.map(([q, a]) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+});
+
 /** A calculator page is a small web app; declaring it as one is accurate and indexable. */
 const calcLd = (calc, lang, t) => ({
   "@context": "https://schema.org",
@@ -602,11 +672,11 @@ function buildCalculatorPages() {
     const alt = alternatesFor((l) => urlCalc(l, calc.id));
     for (const lang of LANGS) {
       const t = translator(lang);
-      const name = t(`c_${calc.id}_t`);
-      const description = t("calc_meta_pattern")
-        .replace("{name}", name)
-        .replace("{desc}", t(`c_${calc.id}_d`));
+      // Session 31: this page's own words — the title, the paragraph under the H1 and
+      // the two questions — rather than one pattern filled in 150 times.
+      const seo = CALC_SEO[calc.id][lang];
       const { main, ld } = calcPageMain(calc, lang, t, {
+        seo,
         example: workedExample(calc, lang, t),
         formula: renderFormula(CALC_META[calc.id].formula, lang, t),
         materials: CAT.countFor(calc.id),
@@ -614,12 +684,12 @@ function buildCalculatorPages() {
       });
       write(join(urlCalc(lang, calc.id), "index.html").replace(/^\//, ""), page({
         lang, t, stamp: STAMP,
-        title: `${name} — ${t("calchub_title")} | LiczMat`,
-        description,
+        title: `${seo.title} | LiczMat`,
+        description: seo.desc,
         path: urlCalc(lang, calc.id),
         alternates: alt,
         main,
-        jsonld: [ld, calcLd(calc, lang, t)],
+        jsonld: [ld, calcLd(calc, lang, t), calcFaqLd(seo)],
         scripts: CALC_SCRIPTS,
       }));
     }
@@ -1157,7 +1227,8 @@ if (problems.length) {
 
 if (process.argv.includes("--check")) {
   console.log(`OK: ${Object.keys(DICT[DEFAULT_LANG]).length} keys × ${LANGS.length} languages, ` +
-    `${CALCS.length} calculators, ${GUIDES.length} guides.`);
+    `${CALCS.length} calculators, ${GUIDES.length} guides, ` +
+    `${CALCS.length * LANGS.length} pages of calculator SEO copy.`);
   process.exit(0);
 }
 

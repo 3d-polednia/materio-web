@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Obklady, panely, dlažba — Stavební kalkulačky online | LiczMat</title>
-<meta name="description" content="Obklady, panely, dlažba — bezplatná online kalkulačka. Plocha + prořez → celá balení. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<title>Kalkulačka obkladů: kolik balení | LiczMat</title>
+<meta name="description" content="Plocha plus prořez přepočtené na celá balení obkladů, panelů nebo dlažby, včetně metrů, které nákupem opravdu dostanete.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/plitka-paneli-keramogranit/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/plytki-panele-gres/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Obklady, panely, dlažba — Stavební kalkulačky online | LiczMat">
-<meta property="og:description" content="Obklady, panely, dlažba — bezplatná online kalkulačka. Plocha + prořez → celá balení. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta property="og:title" content="Kalkulačka obkladů: kolik balení | LiczMat">
+<meta property="og:description" content="Plocha plus prořez přepočtené na celá balení obkladů, panelů nebo dlažby, včetně metrů, které nákupem opravdu dostanete.">
 <meta property="og:url" content="https://liczmat.com/cs/kalkulacky/obklady-panely-dlazba/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Obklady, panely, dlažba — Stavební kalkulačky online | LiczMat">
-<meta name="twitter:description" content="Obklady, panely, dlažba — bezplatná online kalkulačka. Plocha + prořez → celá balení. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta name="twitter:title" content="Kalkulačka obkladů: kolik balení | LiczMat">
+<meta name="twitter:description" content="Plocha plus prořez přepočtené na celá balení obkladů, panelů nebo dlažby, včetně metrů, které nákupem opravdu dostanete.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "CZK"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Kolik obkladů je potřeba na 10 m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "K ploše přičtěte prořez a vydělte metráží jednoho balení. Kalkulačka zaokrouhlí nahoru na celé balení a ukáže, kolik metrů nákup vydá."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Kolik prořezu počítat?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "5–7% stačí u rovné pokládky. Velký formát, diagonála nebo vazba na půl potřebují 10–15%. Kupujte z jedné výrobní šarže, další může mít jiný odstín."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li><a href="/cs/kalkulacky/">Stavební kalkulačky online</a></li><li aria-current="page">Obklady, panely, dlažba</li></ol></nav>
-      <h1>Obklady, panely, dlažba</h1>
-      <p class="lead">Plocha + prořez → celá balení. Počítej v prohlížeči. Výsledek zaokrouhlujeme na celá balení, tak jak se prodávají.</p>
+      <h1>Kalkulačka obkladů: kolik balení</h1>
+      <p class="lead">Plocha plus prořez přepočtené na celá balení obkladů, panelů nebo dlažby, včetně metrů, které nákupem opravdu dostanete.</p>
     </div>
   </section>
 
@@ -252,7 +276,17 @@ odpad = (kupujesz − Plocha) ÷ kupujesz × 100%</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté dotazy</h2>
+      <div class="faq">
+        <details open><summary>Kolik obkladů je potřeba na 10 m²?</summary><p>K ploše přičtěte prořez a vydělte metráží jednoho balení. Kalkulačka zaokrouhlí nahoru na celé balení a ukáže, kolik metrů nákup vydá.</p></details>
+        <details><summary>Kolik prořezu počítat?</summary><p>5–7% stačí u rovné pokládky. Velký formát, diagonála nebo vazba na půl potřebují 10–15%. Kupujte z jedné výrobní šarže, další může mít jiný odstín.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Další kalkulačky</h2>
       <div class="chips"><a class="chip" href="/cs/kalkulacky/lepidlo-malta/">Lepidlo / malta</a><a class="chip" href="/cs/kalkulacky/sparovaci-hmota/">Spárovací hmota</a><a class="chip" href="/cs/kalkulacky/barvy-omitky-penetrace/">Barvy, omítky, penetrace</a></div>
@@ -355,22 +389,22 @@ odpad = (kupujesz − Plocha) ÷ kupujesz × 100%</code></pre>
   "sr": "/sr/kalkulatori/plocice-paneli-gres/",
   "ru": "/ru/kalkulyatory/plitka-paneli-keramogranit/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.cs.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

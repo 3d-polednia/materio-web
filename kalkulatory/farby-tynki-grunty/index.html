@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Farby, tynki, grunty — Kalkulatory budowlane online | LiczMat</title>
-<meta name="description" content="Farby, tynki, grunty — darmowy kalkulator online. Ile opakowań na powierzchnię (z warstwami). Ten sam wzór co w aplikacji LiczMat, bez rejestracji.">
+<title>Kalkulator farby — ile puszek na m² | LiczMat</title>
+<meta name="description" content="Powierzchnia, wydajność z etykiety i liczba warstw dają liczbę całych opakowań farby, tynku albo gruntu oraz procent odpadu.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/kraska-shtukaturka-grunt/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/farby-tynki-grunty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Farby, tynki, grunty — Kalkulatory budowlane online | LiczMat">
-<meta property="og:description" content="Farby, tynki, grunty — darmowy kalkulator online. Ile opakowań na powierzchnię (z warstwami). Ten sam wzór co w aplikacji LiczMat, bez rejestracji.">
+<meta property="og:title" content="Kalkulator farby — ile puszek na m² | LiczMat">
+<meta property="og:description" content="Powierzchnia, wydajność z etykiety i liczba warstw dają liczbę całych opakowań farby, tynku albo gruntu oraz procent odpadu.">
 <meta property="og:url" content="https://liczmat.com/kalkulatory/farby-tynki-grunty/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Farby, tynki, grunty — Kalkulatory budowlane online | LiczMat">
-<meta name="twitter:description" content="Farby, tynki, grunty — darmowy kalkulator online. Ile opakowań na powierzchnię (z warstwami). Ten sam wzór co w aplikacji LiczMat, bez rejestracji.">
+<meta name="twitter:title" content="Kalkulator farby — ile puszek na m² | LiczMat">
+<meta name="twitter:description" content="Powierzchnia, wydajność z etykiety i liczba warstw dają liczbę całych opakowań farby, tynku albo gruntu oraz procent odpadu.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "PLN"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Ile farby potrzeba na 1 m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tyle, ile mówi wydajność z etykiety, podawana jako m² z litra albo z opakowania. Kalkulator dzieli powierzchnię przez tę wydajność i mnoży przez liczbę warstw, a wynik zaokrągla w górę do całych opakowań."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Czy odejmować okna i drzwi od powierzchni?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Odejmij je tylko wtedy, gdy naprawdę ich nie malujesz. Pole otworów wpisuje się osobno i kalkulator odejmuje je od powierzchni, zanim przeliczy ją na opakowania."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Start</a></li><li><a href="/kalkulatory/">Kalkulatory budowlane online</a></li><li aria-current="page">Farby, tynki, grunty</li></ol></nav>
-      <h1>Farby, tynki, grunty</h1>
-      <p class="lead">Ile opakowań na powierzchnię (z warstwami). Policz w przeglądarce. Wynik zaokrąglamy do całych opakowań, tak jak w sklepie.</p>
+      <h1>Kalkulator farby — ile puszek na m²</h1>
+      <p class="lead">Powierzchnia, wydajność z etykiety i liczba warstw dają liczbę całych opakowań farby, tynku albo gruntu oraz procent odpadu.</p>
     </div>
   </section>
 
@@ -252,7 +276,17 @@ odpad = (opakowania × Wydajność − pole do pokrycia) ÷ (opakowania × Wydaj
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Najczęstsze pytania</h2>
+      <div class="faq">
+        <details open><summary>Ile farby potrzeba na 1 m²?</summary><p>Tyle, ile mówi wydajność z etykiety, podawana jako m² z litra albo z opakowania. Kalkulator dzieli powierzchnię przez tę wydajność i mnoży przez liczbę warstw, a wynik zaokrągla w górę do całych opakowań.</p></details>
+        <details><summary>Czy odejmować okna i drzwi od powierzchni?</summary><p>Odejmij je tylko wtedy, gdy naprawdę ich nie malujesz. Pole otworów wpisuje się osobno i kalkulator odejmuje je od powierzchni, zanim przeliczy ją na opakowania.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Inne kalkulatory</h2>
       <div class="chips"><a class="chip" href="/kalkulatory/plytki-panele-gres/">Płytki, panele, gres</a><a class="chip" href="/kalkulatory/tapety/">Tapety</a><a class="chip" href="/kalkulatory/klej-zaprawa/">Klej / zaprawa</a></div>
@@ -355,22 +389,22 @@ odpad = (opakowania × Wydajność − pole do pokrycia) ÷ (opakowania × Wydaj
   "sr": "/sr/kalkulatori/boje-malteri-prajmer/",
   "ru": "/ru/kalkulyatory/kraska-shtukaturka-grunt/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.pl.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

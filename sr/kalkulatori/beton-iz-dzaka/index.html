@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Beton iz vreće — Građevinski kalkulatori onlajn | LiczMat</title>
-<meta name="description" content="Beton iz vreće — besplatan onlajn kalkulator. Koliko vreća suvog betona i vode. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<title>Kalkulator betona: koliko vreća po m³ | LiczMat</title>
+<meta name="description" content="Zapremina i izdašnost vreće daju broj vreća suve mešavine i približnu količinu vode za mešanje betona.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/beton-iz-meshka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/beton-z-worka/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="ro_RO">
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Beton iz vreće — Građevinski kalkulatori onlajn | LiczMat">
-<meta property="og:description" content="Beton iz vreće — besplatan onlajn kalkulator. Koliko vreća suvog betona i vode. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta property="og:title" content="Kalkulator betona: koliko vreća po m³ | LiczMat">
+<meta property="og:description" content="Zapremina i izdašnost vreće daju broj vreća suve mešavine i približnu količinu vode za mešanje betona.">
 <meta property="og:url" content="https://liczmat.com/sr/kalkulatori/beton-iz-dzaka/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Beton iz vreće — Građevinski kalkulatori onlajn | LiczMat">
-<meta name="twitter:description" content="Beton iz vreće — besplatan onlajn kalkulator. Koliko vreća suvog betona i vode. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta name="twitter:title" content="Kalkulator betona: koliko vreća po m³ | LiczMat">
+<meta name="twitter:description" content="Zapremina i izdašnost vreće daju broj vreća suve mešavine i približnu količinu vode za mešanje betona.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RSD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koliko vreća betona ide na 1 m³?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kubni metar je 1000 litara gotove mešavine. Te litre podelite izdašnošću jedne vreće sa ambalaže, a kalkulator zaokružuje naviše na cele vreće."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Koliko litara daje jedna vreća?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Preračun pretpostavlja vreću od 25 kg koja daje oko 12,5 l betona. Proverite izdašnost na svojoj vreći jer se razlikuje među proizvođačima i unesite je u obrazac."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li><a href="/sr/kalkulatori/">Građevinski kalkulatori onlajn</a></li><li aria-current="page">Beton iz vreće</li></ol></nav>
-      <h1>Beton iz vreće</h1>
-      <p class="lead">Koliko vreća suvog betona i vode. Računaj u pregledaču. Rezultat zaokružujemo na cela pakovanja, onako kako se kupuju.</p>
+      <h1>Kalkulator betona: koliko vreća po m³</h1>
+      <p class="lead">Zapremina i izdašnost vreće daju broj vreća suve mešavine i približnu količinu vode za mešanje betona.</p>
     </div>
   </section>
 
@@ -250,7 +274,17 @@ woda ≈ worki × 2 l</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Česta pitanja</h2>
+      <div class="faq">
+        <details open><summary>Koliko vreća betona ide na 1 m³?</summary><p>Kubni metar je 1000 litara gotove mešavine. Te litre podelite izdašnošću jedne vreće sa ambalaže, a kalkulator zaokružuje naviše na cele vreće.</p></details>
+        <details><summary>Koliko litara daje jedna vreća?</summary><p>Preračun pretpostavlja vreću od 25 kg koja daje oko 12,5 l betona. Proverite izdašnost na svojoj vreći jer se razlikuje među proizvođačima i unesite je u obrazac.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ostali kalkulatori</h2>
       <div class="chips"><a class="chip" href="/sr/kalkulatori/estrih-malter/">Estrih / malter</a><a class="chip" href="/sr/kalkulatori/lepak-malter/">Lepak / malter</a><a class="chip" href="/sr/kalkulatori/zidanje/">Zidanje</a></div>
@@ -352,22 +386,22 @@ woda ≈ worki × 2 l</code></pre>
   "sr": "/sr/kalkulatori/beton-iz-dzaka/",
   "ru": "/ru/kalkulyatory/beton-iz-meshka/"
 };</script>
-<script src="/assets/i18n.sr.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.sr.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

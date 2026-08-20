@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Poter / omietka — Stavebné kalkulačky online | LiczMat</title>
-<meta name="description" content="Poter / omietka — bezplatná online kalkulačka. Plocha a hrúbka → vrecia. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<title>Kalkulačka poteru: koľko vriec na m² | LiczMat</title>
+<meta name="description" content="Plocha, hrúbka vrstvy a spotreba v kg na m² a mm dajú počet vriec poteru, samonivelačnej stierky alebo omietky.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/styazhka-shtukaturka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/wylewka-tynk/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Poter / omietka — Stavebné kalkulačky online | LiczMat">
-<meta property="og:description" content="Poter / omietka — bezplatná online kalkulačka. Plocha a hrúbka → vrecia. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<meta property="og:title" content="Kalkulačka poteru: koľko vriec na m² | LiczMat">
+<meta property="og:description" content="Plocha, hrúbka vrstvy a spotreba v kg na m² a mm dajú počet vriec poteru, samonivelačnej stierky alebo omietky.">
 <meta property="og:url" content="https://liczmat.com/sk/kalkulacky/poter-omietka/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Poter / omietka — Stavebné kalkulačky online | LiczMat">
-<meta name="twitter:description" content="Poter / omietka — bezplatná online kalkulačka. Plocha a hrúbka → vrecia. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<meta name="twitter:title" content="Kalkulačka poteru: koľko vriec na m² | LiczMat">
+<meta name="twitter:description" content="Plocha, hrúbka vrstvy a spotreba v kg na m² a mm dajú počet vriec poteru, samonivelačnej stierky alebo omietky.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "EUR"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koľko vriec poteru je na m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Spotreba sa udáva v kilogramoch na meter štvorcový a milimeter hrúbky. Kalkulačka ju vynásobí plochou a hrúbkou a súčet vydelí hmotnosťou vreca."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Akú spotrebu zadať?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Prepočet počíta s hustotou okolo 2,0 kg na liter malty. Anhydritové potery a ľahké potery majú inú hustotu, hodnotu preto skontrolujte na vreci."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sk/">Domov</a></li><li><a href="/sk/kalkulacky/">Stavebné kalkulačky online</a></li><li aria-current="page">Poter / omietka</li></ol></nav>
-      <h1>Poter / omietka</h1>
-      <p class="lead">Plocha a hrúbka → vrecia. Počítaj v prehliadači. Výsledok zaokrúhľujeme na celé balenia, tak ako sa predávajú.</p>
+      <h1>Kalkulačka poteru: koľko vriec na m²</h1>
+      <p class="lead">Plocha, hrúbka vrstvy a spotreba v kg na m² a mm dajú počet vriec poteru, samonivelačnej stierky alebo omietky.</p>
     </div>
   </section>
 
@@ -250,7 +274,17 @@ worki = ⌈ kilogramy ÷ Vrece ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté otázky</h2>
+      <div class="faq">
+        <details open><summary>Koľko vriec poteru je na m²?</summary><p>Spotreba sa udáva v kilogramoch na meter štvorcový a milimeter hrúbky. Kalkulačka ju vynásobí plochou a hrúbkou a súčet vydelí hmotnosťou vreca.</p></details>
+        <details><summary>Akú spotrebu zadať?</summary><p>Prepočet počíta s hustotou okolo 2,0 kg na liter malty. Anhydritové potery a ľahké potery majú inú hustotu, hodnotu preto skontrolujte na vreci.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ďalšie kalkulačky</h2>
       <div class="chips"><a class="chip" href="/sk/kalkulacky/beton-z-vreca/">Betón z vreca</a><a class="chip" href="/sk/kalkulacky/lepidlo-malta/">Lepidlo / malta</a><a class="chip" href="/sk/kalkulacky/farby-omietky-penetracie/">Farby, omietky, penetrácie</a></div>
@@ -352,22 +386,22 @@ worki = ⌈ kilogramy ÷ Vrece ⌉</code></pre>
   "sr": "/sr/kalkulatori/estrih-malter/",
   "ru": "/ru/kalkulyatory/styazhka-shtukaturka/"
 };</script>
-<script src="/assets/i18n.sk.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.sk.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

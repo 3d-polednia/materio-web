@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Murovanie — Stavebné kalkulačky online | LiczMat</title>
-<meta name="description" content="Murovanie — bezplatná online kalkulačka. Tvárnice/tehly a malta na stenu. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<title>Kalkulačka muriva: tvárnice a malta | LiczMat</title>
+<meta name="description" content="Plocha steny bez otvorov, počet kusov na m² a prerez dajú počet tvárnic alebo tehál a kilogramy malty.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/kladka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/murowanie/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Murovanie — Stavebné kalkulačky online | LiczMat">
-<meta property="og:description" content="Murovanie — bezplatná online kalkulačka. Tvárnice/tehly a malta na stenu. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<meta property="og:title" content="Kalkulačka muriva: tvárnice a malta | LiczMat">
+<meta property="og:description" content="Plocha steny bez otvorov, počet kusov na m² a prerez dajú počet tvárnic alebo tehál a kilogramy malty.">
 <meta property="og:url" content="https://liczmat.com/sk/kalkulacky/murovanie/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Murovanie — Stavebné kalkulačky online | LiczMat">
-<meta name="twitter:description" content="Murovanie — bezplatná online kalkulačka. Tvárnice/tehly a malta na stenu. Rovnaký vzorec ako v aplikácii LiczMat, bez registrácie.">
+<meta name="twitter:title" content="Kalkulačka muriva: tvárnice a malta | LiczMat">
+<meta name="twitter:description" content="Plocha steny bez otvorov, počet kusov na m² a prerez dajú počet tvárnic alebo tehál a kilogramy malty.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "EUR"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koľko tvárnic je na m² steny?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Počet kusov na m² vyplýva z rozmeru tvárnice vrátane škáry. Zadajte ho a kalkulačka ho vynásobí plochou po odčítaní okien a dverí."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Koľko prerezu počítať pri murovaní?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "5% pokryje dorez a praskliny pri doprave. Pri veľkom počte dorezov, šikmín alebo úzkych pilierov sa oplatí hodnotu zvýšiť."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sk/">Domov</a></li><li><a href="/sk/kalkulacky/">Stavebné kalkulačky online</a></li><li aria-current="page">Murovanie</li></ol></nav>
-      <h1>Murovanie</h1>
-      <p class="lead">Tvárnice/tehly a malta na stenu. Počítaj v prehliadači. Výsledok zaokrúhľujeme na celé balenia, tak ako sa predávajú.</p>
+      <h1>Kalkulačka muriva: tvárnice a malta</h1>
+      <p class="lead">Plocha steny bez otvorov, počet kusov na m² a prerez dajú počet tvárnic alebo tehál a kilogramy malty.</p>
     </div>
   </section>
 
@@ -250,7 +274,17 @@ zaprawa razem = netto × Malta kg</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté otázky</h2>
+      <div class="faq">
+        <details open><summary>Koľko tvárnic je na m² steny?</summary><p>Počet kusov na m² vyplýva z rozmeru tvárnice vrátane škáry. Zadajte ho a kalkulačka ho vynásobí plochou po odčítaní okien a dverí.</p></details>
+        <details><summary>Koľko prerezu počítať pri murovaní?</summary><p>5% pokryje dorez a praskliny pri doprave. Pri veľkom počte dorezov, šikmín alebo úzkych pilierov sa oplatí hodnotu zvýšiť.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ďalšie kalkulačky</h2>
       <div class="chips"><a class="chip" href="/sk/kalkulacky/lepidlo-malta/">Lepidlo / malta</a><a class="chip" href="/sk/kalkulacky/beton-z-vreca/">Betón z vreca</a><a class="chip" href="/sk/kalkulacky/zateplenie-etics/">Zateplenie (ETICS)</a></div>
@@ -352,22 +386,22 @@ zaprawa razem = netto × Malta kg</code></pre>
   "sr": "/sr/kalkulatori/zidanje/",
   "ru": "/ru/kalkulyatory/kladka/"
 };</script>
-<script src="/assets/i18n.sk.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.sk.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

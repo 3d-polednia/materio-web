@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Barvy, omítky, penetrace — Stavební kalkulačky online | LiczMat</title>
-<meta name="description" content="Barvy, omítky, penetrace — bezplatná online kalkulačka. Balení na plochu, s vrstvami. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<title>Kalkulačka barvy: kolik balení na m² | LiczMat</title>
+<meta name="description" content="Plocha, vydatnost z etikety a počet vrstev dají počet celých balení barvy, omítky nebo penetrace a prořez v procentech.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/kraska-shtukaturka-grunt/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/farby-tynki-grunty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Barvy, omítky, penetrace — Stavební kalkulačky online | LiczMat">
-<meta property="og:description" content="Barvy, omítky, penetrace — bezplatná online kalkulačka. Balení na plochu, s vrstvami. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta property="og:title" content="Kalkulačka barvy: kolik balení na m² | LiczMat">
+<meta property="og:description" content="Plocha, vydatnost z etikety a počet vrstev dají počet celých balení barvy, omítky nebo penetrace a prořez v procentech.">
 <meta property="og:url" content="https://liczmat.com/cs/kalkulacky/barvy-omitky-penetrace/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Barvy, omítky, penetrace — Stavební kalkulačky online | LiczMat">
-<meta name="twitter:description" content="Barvy, omítky, penetrace — bezplatná online kalkulačka. Balení na plochu, s vrstvami. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta name="twitter:title" content="Kalkulačka barvy: kolik balení na m² | LiczMat">
+<meta name="twitter:description" content="Plocha, vydatnost z etikety a počet vrstev dají počet celých balení barvy, omítky nebo penetrace a prořez v procentech.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "CZK"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Kolik barvy je potřeba na 1 m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Tolik, kolik říká vydatnost na etiketě, obvykle v m² z litru nebo z balení. Kalkulačka vydělí plochu touto vydatností, vynásobí počtem vrstev a zaokrouhlí nahoru na celá balení."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Mají se odečítat okna a dveře?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Jen tehdy, když je opravdu nemalujete. Plocha otvorů se zadává zvlášť a odečte se od plochy dřív, než se přepočítá na balení."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li><a href="/cs/kalkulacky/">Stavební kalkulačky online</a></li><li aria-current="page">Barvy, omítky, penetrace</li></ol></nav>
-      <h1>Barvy, omítky, penetrace</h1>
-      <p class="lead">Balení na plochu, s vrstvami. Počítej v prohlížeči. Výsledek zaokrouhlujeme na celá balení, tak jak se prodávají.</p>
+      <h1>Kalkulačka barvy: kolik balení na m²</h1>
+      <p class="lead">Plocha, vydatnost z etikety a počet vrstev dají počet celých balení barvy, omítky nebo penetrace a prořez v procentech.</p>
     </div>
   </section>
 
@@ -252,7 +276,17 @@ odpad = (opakowania × Vydatnost − pole do pokrycia) ÷ (opakowania × Vydatno
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté dotazy</h2>
+      <div class="faq">
+        <details open><summary>Kolik barvy je potřeba na 1 m²?</summary><p>Tolik, kolik říká vydatnost na etiketě, obvykle v m² z litru nebo z balení. Kalkulačka vydělí plochu touto vydatností, vynásobí počtem vrstev a zaokrouhlí nahoru na celá balení.</p></details>
+        <details><summary>Mají se odečítat okna a dveře?</summary><p>Jen tehdy, když je opravdu nemalujete. Plocha otvorů se zadává zvlášť a odečte se od plochy dřív, než se přepočítá na balení.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Další kalkulačky</h2>
       <div class="chips"><a class="chip" href="/cs/kalkulacky/obklady-panely-dlazba/">Obklady, panely, dlažba</a><a class="chip" href="/cs/kalkulacky/tapety/">Tapety</a><a class="chip" href="/cs/kalkulacky/lepidlo-malta/">Lepidlo / malta</a></div>
@@ -355,22 +389,22 @@ odpad = (opakowania × Vydatnost − pole do pokrycia) ÷ (opakowania × Vydatno
   "sr": "/sr/kalkulatori/boje-malteri-prajmer/",
   "ru": "/ru/kalkulyatory/kraska-shtukaturka-grunt/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.cs.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

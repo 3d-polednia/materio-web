@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Fug masa — Građevinski kalkulatori onlajn | LiczMat</title>
-<meta name="description" content="Fug masa — besplatan onlajn kalkulator. Koliko kg za fugovanje. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<title>Kalkulator fug mase: koliko kg | LiczMat</title>
+<meta name="description" content="Dimenzije pločice, širina fuge i površina daju potrošnju fug mase u kilogramima i broj vreća za kupovinu.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/zatirka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/fuga/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="ro_RO">
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Fug masa — Građevinski kalkulatori onlajn | LiczMat">
-<meta property="og:description" content="Fug masa — besplatan onlajn kalkulator. Koliko kg za fugovanje. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta property="og:title" content="Kalkulator fug mase: koliko kg | LiczMat">
+<meta property="og:description" content="Dimenzije pločice, širina fuge i površina daju potrošnju fug mase u kilogramima i broj vreća za kupovinu.">
 <meta property="og:url" content="https://liczmat.com/sr/kalkulatori/fug-masa/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Fug masa — Građevinski kalkulatori onlajn | LiczMat">
-<meta name="twitter:description" content="Fug masa — besplatan onlajn kalkulator. Koliko kg za fugovanje. Ista formula kao u aplikaciji LiczMat, bez registracije.">
+<meta name="twitter:title" content="Kalkulator fug mase: koliko kg | LiczMat">
+<meta name="twitter:description" content="Dimenzije pločice, širina fuge i površina daju potrošnju fug mase u kilogramima i broj vreća za kupovinu.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RSD"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Koliko fug mase ide na 1 m² pločica?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Potrošnja raste sa širinom fuge i debljinom pločice, a pada sa formatom. Kod velikog gresa sa tankom fugom izlazi vrlo malo, kod mozaika mnogo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Koje dimenzije pločice uneti?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dužinu, širinu i debljinu jedne pločice i širinu fuge. Iz ta četiri broja izlazi zapremina fuga na kvadratnom metru, a iz nje kilogrami."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li><a href="/sr/kalkulatori/">Građevinski kalkulatori onlajn</a></li><li aria-current="page">Fug masa</li></ol></nav>
-      <h1>Fug masa</h1>
-      <p class="lead">Koliko kg za fugovanje. Računaj u pregledaču. Rezultat zaokružujemo na cela pakovanja, onako kako se kupuju.</p>
+      <h1>Kalkulator fug mase: koliko kg</h1>
+      <p class="lead">Dimenzije pločice, širina fuge i površina daju potrošnju fug mase u kilogramima i broj vreća za kupovinu.</p>
     </div>
   </section>
 
@@ -251,7 +275,17 @@ worki = ⌈ kilogramy ÷ Vreća ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Česta pitanja</h2>
+      <div class="faq">
+        <details open><summary>Koliko fug mase ide na 1 m² pločica?</summary><p>Potrošnja raste sa širinom fuge i debljinom pločice, a pada sa formatom. Kod velikog gresa sa tankom fugom izlazi vrlo malo, kod mozaika mnogo.</p></details>
+        <details><summary>Koje dimenzije pločice uneti?</summary><p>Dužinu, širinu i debljinu jedne pločice i širinu fuge. Iz ta četiri broja izlazi zapremina fuga na kvadratnom metru, a iz nje kilogrami.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Ostali kalkulatori</h2>
       <div class="chips"><a class="chip" href="/sr/kalkulatori/plocice-paneli-gres/">Pločice, paneli, gres</a><a class="chip" href="/sr/kalkulatori/lepak-malter/">Lepak / malter</a><a class="chip" href="/sr/kalkulatori/boje-malteri-prajmer/">Boje, malteri, prajmeri</a></div>
@@ -354,22 +388,22 @@ worki = ⌈ kilogramy ÷ Vreća ⌉</code></pre>
   "sr": "/sr/kalkulatori/fug-masa/",
   "ru": "/ru/kalkulyatory/zatirka/"
 };</script>
-<script src="/assets/i18n.sr.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.sr.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

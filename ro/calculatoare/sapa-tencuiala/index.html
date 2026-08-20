@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Șapă / tencuială — Calculatoare pentru construcții online | LiczMat</title>
-<meta name="description" content="Șapă / tencuială — calculator online gratuit. Suprafață și grosime → saci. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<title>Calculator șapă: câți saci pe m² | LiczMat</title>
+<meta name="description" content="Suprafața, grosimea stratului și consumul în kg pe m² și mm dau numărul de saci de șapă, autonivelantă sau tencuială.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/styazhka-shtukaturka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/wylewka-tynk/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Șapă / tencuială — Calculatoare pentru construcții online | LiczMat">
-<meta property="og:description" content="Șapă / tencuială — calculator online gratuit. Suprafață și grosime → saci. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<meta property="og:title" content="Calculator șapă: câți saci pe m² | LiczMat">
+<meta property="og:description" content="Suprafața, grosimea stratului și consumul în kg pe m² și mm dau numărul de saci de șapă, autonivelantă sau tencuială.">
 <meta property="og:url" content="https://liczmat.com/ro/calculatoare/sapa-tencuiala/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Șapă / tencuială — Calculatoare pentru construcții online | LiczMat">
-<meta name="twitter:description" content="Șapă / tencuială — calculator online gratuit. Suprafață și grosime → saci. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<meta name="twitter:title" content="Calculator șapă: câți saci pe m² | LiczMat">
+<meta name="twitter:description" content="Suprafața, grosimea stratului și consumul în kg pe m² și mm dau numărul de saci de șapă, autonivelantă sau tencuială.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RON"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Câți saci de șapă intră pe m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Consumul se dă în kilograme pe metru pătrat și milimetru de grosime. Calculatorul îl înmulțește cu suprafața și grosimea și împarte totalul la greutatea sacului."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Ce consum trebuie introdus?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Conversia pornește de la o densitate de circa 2,0 kg pe litru de mortar. Șapele pe bază de anhidrit și cele ușoare au altă densitate, verifică valoarea de pe sac."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ro/">Acasă</a></li><li><a href="/ro/calculatoare/">Calculatoare pentru construcții online</a></li><li aria-current="page">Șapă / tencuială</li></ol></nav>
-      <h1>Șapă / tencuială</h1>
-      <p class="lead">Suprafață și grosime → saci. Calculează în browser. Rotunjim rezultatul la ambalaje întregi, așa cum le cumperi.</p>
+      <h1>Calculator șapă: câți saci pe m²</h1>
+      <p class="lead">Suprafața, grosimea stratului și consumul în kg pe m² și mm dau numărul de saci de șapă, autonivelantă sau tencuială.</p>
     </div>
   </section>
 
@@ -250,7 +274,17 @@ worki = ⌈ kilogramy ÷ Sac ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Întrebări frecvente</h2>
+      <div class="faq">
+        <details open><summary>Câți saci de șapă intră pe m²?</summary><p>Consumul se dă în kilograme pe metru pătrat și milimetru de grosime. Calculatorul îl înmulțește cu suprafața și grosimea și împarte totalul la greutatea sacului.</p></details>
+        <details><summary>Ce consum trebuie introdus?</summary><p>Conversia pornește de la o densitate de circa 2,0 kg pe litru de mortar. Șapele pe bază de anhidrit și cele ușoare au altă densitate, verifică valoarea de pe sac.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Alte calculatoare</h2>
       <div class="chips"><a class="chip" href="/ro/calculatoare/beton-la-sac/">Beton la sac</a><a class="chip" href="/ro/calculatoare/adeziv-mortar/">Adeziv / mortar</a><a class="chip" href="/ro/calculatoare/vopsea-tencuiala-grund/">Vopsea, tencuială, amorsă</a></div>
@@ -352,22 +386,22 @@ worki = ⌈ kilogramy ÷ Sac ⌉</code></pre>
   "sr": "/sr/kalkulatori/estrih-malter/",
   "ru": "/ru/kalkulyatory/styazhka-shtukaturka/"
 };</script>
-<script src="/assets/i18n.ro.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.ro.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

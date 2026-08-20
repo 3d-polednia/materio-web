@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Croire plăci (2D) — Calculatoare pentru construcții online | LiczMat</title>
-<meta name="description" content="Croire plăci (2D) — calculator online gratuit. Plăci, blaturi, placaj: câte foi. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<title>Calculator croire plăci: câte foi | LiczMat</title>
+<meta name="description" content="Reperele, dimensiunea plăcii și grosimea tăieturii dau numărul de foi și un plan de croire cu ghilotina, cu sau fără rotirea pieselor.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/raskroy-plit-2d/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/rozkroj-plyt-2d/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Croire plăci (2D) — Calculatoare pentru construcții online | LiczMat">
-<meta property="og:description" content="Croire plăci (2D) — calculator online gratuit. Plăci, blaturi, placaj: câte foi. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<meta property="og:title" content="Calculator croire plăci: câte foi | LiczMat">
+<meta property="og:description" content="Reperele, dimensiunea plăcii și grosimea tăieturii dau numărul de foi și un plan de croire cu ghilotina, cu sau fără rotirea pieselor.">
 <meta property="og:url" content="https://liczmat.com/ro/calculatoare/debitare-placi-2d/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Croire plăci (2D) — Calculatoare pentru construcții online | LiczMat">
-<meta name="twitter:description" content="Croire plăci (2D) — calculator online gratuit. Plăci, blaturi, placaj: câte foi. Aceeași formulă ca în aplicația LiczMat, fără cont.">
+<meta name="twitter:title" content="Calculator croire plăci: câte foi | LiczMat">
+<meta name="twitter:description" content="Reperele, dimensiunea plăcii și grosimea tăieturii dau numărul de foi și un plan de croire cu ghilotina, cu sau fără rotirea pieselor.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "RON"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Câte plăci ies din reperele mele?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Calculatorul așază reperele de la cel mai mare în dreptunghiul liber cu restul cel mai mic. Când nu mai încape nimic, deschide o placă nouă, iar acesta este numărul de cumpărat."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Când se oprește rotirea pieselor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Când placa are fibră sau un model direcțional. O piesă rotită ar merge vizibil în alt sens, chiar dacă dimensiunea se potrivește."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ro/">Acasă</a></li><li><a href="/ro/calculatoare/">Calculatoare pentru construcții online</a></li><li aria-current="page">Croire plăci (2D)</li></ol></nav>
-      <h1>Croire plăci (2D)</h1>
-      <p class="lead">Plăci, blaturi, placaj: câte foi. Calculează în browser. Rotunjim rezultatul la ambalaje întregi, așa cum le cumperi.</p>
+      <h1>Calculator croire plăci: câte foi</h1>
+      <p class="lead">Reperele, dimensiunea plăcii și grosimea tăieturii dau numărul de foi și un plan de croire cu ghilotina, cu sau fără rotirea pieselor.</p>
     </div>
   </section>
 
@@ -256,7 +280,17 @@ odpad = (płyty × Lățime placă × Lungime placă − Σ formatki) ÷ (płyty
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Întrebări frecvente</h2>
+      <div class="faq">
+        <details open><summary>Câte plăci ies din reperele mele?</summary><p>Calculatorul așază reperele de la cel mai mare în dreptunghiul liber cu restul cel mai mic. Când nu mai încape nimic, deschide o placă nouă, iar acesta este numărul de cumpărat.</p></details>
+        <details><summary>Când se oprește rotirea pieselor?</summary><p>Când placa are fibră sau un model direcțional. O piesă rotită ar merge vizibil în alt sens, chiar dacă dimensiunea se potrivește.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Alte calculatoare</h2>
       <div class="chips"><a class="chip" href="/ro/calculatoare/debitare-liniara-1d/">Croire liniară (1D)</a><a class="chip" href="/ro/calculatoare/astereala-osb/">Placare (OSB/scânduri)</a><a class="chip" href="/ro/calculatoare/gresie-faianta-parchet/">Faianță, panouri, gresie</a></div>
@@ -359,22 +393,22 @@ odpad = (płyty × Lățime placă × Lungime placă − Σ formatki) ÷ (płyty
   "sr": "/sr/kalkulatori/secenje-ploca-2d/",
   "ru": "/ru/kalkulyatory/raskroy-plit-2d/"
 };</script>
-<script src="/assets/i18n.ro.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.ro.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

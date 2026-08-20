@@ -57,7 +57,8 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | — | *Etap dodatkowy: przywrócenie 10 języków* | **Zrobione** — 2026-08-19 |
 | 29 | Strona LiczMat Pro | **Zrobione** — 2026-08-20 |
 | 30 | SEO techniczne | **Zrobione** — 2026-08-20 |
-| 31–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 31 | SEO kalkulatorów | **Zrobione** — 2026-08-20 |
+| 32–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -213,6 +214,87 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
 
+### Co zrobiła Sesja 31
+
+Rozdział XXXII, Sesja 31 w całości: **„Indywidualne SEO dla kalkulatorów. Każdy kalkulator
+powinien być możliwie dobrym landing page'em dla konkretnego zapytania użytkownika.
+Uwzględnić wszystkie cztery wersje językowe tam, gdzie istnieje odpowiednia treść."**
+
+Sesja 30 sprawdziła, czy serwis mówi do maszyn **poprawnie**. Ta sesja odpowiada na drugie
+pytanie, którego żaden test techniczny nie zada: **co te strony mówią**. Tytuł
+„Płytki, panele, gres — Kalkulatory | LiczMat" jest technicznie bez zarzutu i nie zawiera
+ani jednego słowa z tego, co ktoś naprawdę wpisuje w wyszukiwarkę — „ile płytek na m²".
+
+**1. 150 stron kalkulatorów dostało własne teksty.** Do tej sesji wszystkie 150 dzieliły
+jeden wzorzec (`calc_meta_pattern`) z podstawioną nazwą i jednozdaniowym opisem, a `<h1>`
+był etykietą z listy w centrum kalkulatorów. Teraz każdy kalkulator ma w każdym z dziesięciu
+języków **własny tytuł, własny opis i dwa własne pytania z odpowiedziami** — 15 × 10 × 6
+ciągów, napisanych raz, w `src/calc-seo.mjs`.
+
+**2. Tytuł jest zapytaniem, `<h1>` jest tym samym zdaniem.** „Kalkulator płytek i paneli —
+ile kartonów", „Fliesenrechner: wie viele Kartons", „Calculator gresie și faianță: câte
+cutii". Build dokleja `| LiczMat`, a limit jest twardy: **50 znaków na tekst, 60 na cały
+tytuł**, pilnowane w buildzie i w teście. Tym samym **znika wyjątek, który zostawiła Sesja
+30**: `scripts/test-seo.mjs` wymusza teraz 60 znaków na **wszystkich 375 stronach**, bo 53
+tytuły kalkulatorów, które go przekraczały (najdłuższy 76 znaków), już go nie przekraczają.
+
+**3. Opis jest jeden i stoi w dwóch miejscach, bo to jedno zdanie.** Ten sam tekst idzie
+w `<meta name="description">` i w akapit pod `<h1>`. Snippet, który obiecuje coś, czym
+strona się nie zaczyna, to ten sam błąd widziany z dwóch stron. Każdy z 150 opisów mieści
+się w 50–160 znakach i **żaden nie powtarza się na innej stronie** w całym serwisie.
+
+**4. FAQ pod kalkulatorem, nigdy nad nim.** Dwa pytania na kalkulator, w rozwijanych
+sekcjach (ten sam komponent `.faq`, co na stronie głównej — zero nowego CSS), plus
+`FAQPage` w danych strukturalnych zbudowany **z tej samej listy, którą renderuje strona**,
+więc markup i JSON-LD nie mogą powiedzieć czegoś innego. Rozdział XII mówi „długie treści
+SEO, instrukcje i FAQ nie mogą zasłaniać kalkulatora" — to jest reguła o **położeniu**, więc
+test sprawdza ją po położeniu: `<h1>` → formularz → wynik → „Jak to liczymy" → FAQ.
+
+**5. Liczby w odpowiedziach są tymi, które serwis już podaje.** Zapas 5–7% i 10–15%, worek
+25 kg dający ~12,5 l betonu, 6 kołków na m², zakład siatki 10%, gęstość 2,0 kg/l, rozstaw
+60/40 cm, CD 40 cm i wieszaki 90 cm — wszystko to stoi już w kluczach `note_<id>` albo jest
+polem formularza. Żadna odpowiedź nie wymyśla liczby, marki ani ceny.
+
+**6. Teksty nie trafiły do słownika przeglądarki.** `src/calc-seo.mjs` jest modułem
+buildu, nie czwartym słownikiem: `assets/i18n.<lang>.js` pobiera **każda** strona serwisu,
+a 90 kluczy na język kopii, którą zobaczy tylko czytelnik gotowego HTML-a i robot, to
+kilkanaście kilobajtów na każde wejście za nic. Test pilnuje, że nic z tego nie wyciekło do
+`assets/i18n.<lang>.js`. Przy okazji z `assets/i18n-pages.js` wypadły dwa klucze, których
+już nikt nie czyta: `calc_meta_pattern` i `calc_page_lead`.
+
+**7. Okruszek został przy krótkiej nazwie.** W ścieżce nawigacyjnej nadal jest „Płytki,
+panele, gres", a nie nowy tytuł: okruszek jest mapą serwisu, a „Kalkulator płytek i paneli
+— ile kartonów" jest w nim tytułem, nie miejscem.
+
+**Czego ta sesja nie zrobiła.** Nie ruszała matematyki, formularzy, jednostek ani slugów —
+rozdział XIII i zasada „slug jest wieczny". Nie dopisywała kalkulatorom nowych sekcji poza
+FAQ; „Jak to liczymy" (pola, wzór, ostrzeżenie) zostało dokładnie takie, jakie było.
+Nie tknięte zostały teksty centrum kalkulatorów i poradników — plan mówi o kalkulatorach.
+
+**Znalezione, nienaprawione** (rozdział XXXV — to jest zadanie następnej sesji, nie tej):
+**nagłówek przewija się w bok o 33 px po rosyjsku przy 1000 px u zalogowanego użytkownika.**
+Zmierzone w Chromium **na drzewie sprzed tej sesji i po niej — identycznie**, więc to błąd
+zastany, nie skutek tej sesji. Trafia dokładnie tam, gdzie należy: **Sesja 32 — MOBILE QA**.
+
+**Zmienione pliki.** Nowe `src/calc-seo.mjs` (900 ciągów: 15 kalkulatorów × 10 języków ×
+tytuł, opis i dwa pytania) i nowe `scripts/test-calc-seo.mjs`; `src/pages.mjs`
+(`calcPageMain()` bierze `seo`, sekcja FAQ, `<h1>` i lead z nowej kopii), `scripts/build.mjs`
+(`calcFaqLd()`, walidacja kopii w `validate()`, tytuł i opis z `CALC_SEO`, `STAMP` →
+`20260820b`), `scripts/test-seo.mjs` (wyjątek na tytuły kalkulatorów usunięty),
+`assets/i18n-pages.js` (dwa martwe klucze usunięte, 10 języków), `privacy-policy.html`
+i `404.html` (`?v=`), `CLAUDE.md`, `docs/ARCHITEKTURA.md`, 373 przebudowane strony,
+`sitemap.xml` i dziesięć wygenerowanych słowników.
+
+**Testy.** **53 489 sprawdzeń logiki** w 18 zestawach — wszystkie przechodzą; nowy
+`scripts/test-calc-seo.mjs` wnosi **5 133** i czyta 150 plików, które naprawdę shipują.
+`scripts/test-seo.mjs` po zdjęciu wyjątku: 36 869/36 869. `scripts/build.mjs --check`:
+**1147 kluczy × 10 języków**. Testy w Chromium: **758/759** — jedyna porażka to zastany
+nagłówek po rosyjsku opisany wyżej, potwierdzony jako obecny również przed tą sesją.
+
+**Status: ukończone.**
+
+**Następne zadanie: Sesja 32 — MOBILE QA.**
+
 ### Co zrobiła Sesja 30
 
 Rozdział XXXII, Sesja 30 w całości: **„Cały serwis: metadata, sitemap, robots, canonical,
@@ -323,7 +405,7 @@ zmienia wyłącznie `<head>` i teksty meta, więc nie ma w niej nic, co widać n
 
 **Status: ukończone.**
 
-**Następne zadanie: Sesja 31 — SEO KALKULATORÓW.**
+**Następne zadanie: Sesja 31 — SEO KALKULATORÓW.** *(wykonane 2026-08-20 — raport wyżej.)*
 
 ### Co zrobiła Sesja 29
 

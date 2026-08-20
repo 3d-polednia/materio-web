@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Farbe, Putz, Grund — Baurechner online | LiczMat</title>
-<meta name="description" content="Farbe, Putz, Grund — kostenloser Online-Rechner. Gebinde je Fläche, mit Schichten. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<title>Farbrechner: wie viele Gebinde je m² | LiczMat</title>
+<meta name="description" content="Fläche, Ergiebigkeit vom Etikett und Anzahl der Schichten ergeben ganze Gebinde Farbe, Putz oder Grundierung und den Verschnitt in Prozent.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/kraska-shtukaturka-grunt/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/farby-tynki-grunty/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Farbe, Putz, Grund — Baurechner online | LiczMat">
-<meta property="og:description" content="Farbe, Putz, Grund — kostenloser Online-Rechner. Gebinde je Fläche, mit Schichten. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<meta property="og:title" content="Farbrechner: wie viele Gebinde je m² | LiczMat">
+<meta property="og:description" content="Fläche, Ergiebigkeit vom Etikett und Anzahl der Schichten ergeben ganze Gebinde Farbe, Putz oder Grundierung und den Verschnitt in Prozent.">
 <meta property="og:url" content="https://liczmat.com/de/rechner/farbe-putz-grundierung/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Farbe, Putz, Grund — Baurechner online | LiczMat">
-<meta name="twitter:description" content="Farbe, Putz, Grund — kostenloser Online-Rechner. Gebinde je Fläche, mit Schichten. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<meta name="twitter:title" content="Farbrechner: wie viele Gebinde je m² | LiczMat">
+<meta name="twitter:description" content="Fläche, Ergiebigkeit vom Etikett und Anzahl der Schichten ergeben ganze Gebinde Farbe, Putz oder Grundierung und den Verschnitt in Prozent.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "EUR"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Wie viel Farbe braucht man für 1 m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "So viel, wie die Ergiebigkeit auf dem Etikett angibt, meist in m² je Liter oder je Gebinde. Der Rechner teilt die Fläche durch diese Ergiebigkeit, multipliziert mit den Schichten und rundet auf ganze Gebinde auf."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Zieht man Fenster und Türen ab?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nur wenn sie wirklich nicht gestrichen werden. Die Öffnungsfläche wird getrennt eingetragen und vor der Umrechnung in Gebinde von der Fläche abgezogen."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li><a href="/de/rechner/">Baurechner online</a></li><li aria-current="page">Farbe, Putz, Grund</li></ol></nav>
-      <h1>Farbe, Putz, Grund</h1>
-      <p class="lead">Gebinde je Fläche, mit Schichten. Rechne im Browser. Ergebnisse werden auf ganze Gebinde aufgerundet, so wie du sie kaufst.</p>
+      <h1>Farbrechner: wie viele Gebinde je m²</h1>
+      <p class="lead">Fläche, Ergiebigkeit vom Etikett und Anzahl der Schichten ergeben ganze Gebinde Farbe, Putz oder Grundierung und den Verschnitt in Prozent.</p>
     </div>
   </section>
 
@@ -252,7 +276,17 @@ tatsächlicher Verschnitt = (Gebinde × Ergiebigkeit − zu beschichtende Fläch
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Häufige Fragen</h2>
+      <div class="faq">
+        <details open><summary>Wie viel Farbe braucht man für 1 m²?</summary><p>So viel, wie die Ergiebigkeit auf dem Etikett angibt, meist in m² je Liter oder je Gebinde. Der Rechner teilt die Fläche durch diese Ergiebigkeit, multipliziert mit den Schichten und rundet auf ganze Gebinde auf.</p></details>
+        <details><summary>Zieht man Fenster und Türen ab?</summary><p>Nur wenn sie wirklich nicht gestrichen werden. Die Öffnungsfläche wird getrennt eingetragen und vor der Umrechnung in Gebinde von der Fläche abgezogen.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Weitere Rechner</h2>
       <div class="chips"><a class="chip" href="/de/rechner/fliesen-paneele-feinsteinzeug/">Fliesen, Paneele, Gres</a><a class="chip" href="/de/rechner/tapete/">Tapete</a><a class="chip" href="/de/rechner/kleber-moertel/">Kleber / Mörtel</a></div>
@@ -355,22 +389,22 @@ tatsächlicher Verschnitt = (Gebinde × Ergiebigkeit − zu beschichtende Fläch
   "sr": "/sr/kalkulatori/boje-malteri-prajmer/",
   "ru": "/ru/kalkulyatory/kraska-shtukaturka-grunt/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.de.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

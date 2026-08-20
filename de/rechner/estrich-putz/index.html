@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Estrich / Putz — Baurechner online | LiczMat</title>
-<meta name="description" content="Estrich / Putz — kostenloser Online-Rechner. Fläche und Dicke → Säcke. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<title>Estrichrechner: wie viele Säcke je m² | LiczMat</title>
+<meta name="description" content="Fläche, Schichtdicke und Verbrauch in kg je m² und mm ergeben die Anzahl Säcke Estrich, Ausgleichsmasse oder Putz.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/styazhka-shtukaturka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/wylewka-tynk/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Estrich / Putz — Baurechner online | LiczMat">
-<meta property="og:description" content="Estrich / Putz — kostenloser Online-Rechner. Fläche und Dicke → Säcke. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<meta property="og:title" content="Estrichrechner: wie viele Säcke je m² | LiczMat">
+<meta property="og:description" content="Fläche, Schichtdicke und Verbrauch in kg je m² und mm ergeben die Anzahl Säcke Estrich, Ausgleichsmasse oder Putz.">
 <meta property="og:url" content="https://liczmat.com/de/rechner/estrich-putz/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Estrich / Putz — Baurechner online | LiczMat">
-<meta name="twitter:description" content="Estrich / Putz — kostenloser Online-Rechner. Fläche und Dicke → Säcke. Dieselbe Formel wie in der LiczMat-App, ohne Anmeldung.">
+<meta name="twitter:title" content="Estrichrechner: wie viele Säcke je m² | LiczMat">
+<meta name="twitter:description" content="Fläche, Schichtdicke und Verbrauch in kg je m² und mm ergeben die Anzahl Säcke Estrich, Ausgleichsmasse oder Putz.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "EUR"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Wie viele Säcke Estrich braucht 1 m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Der Verbrauch wird in Kilogramm je Quadratmeter und Millimeter Dicke angegeben. Der Rechner multipliziert ihn mit Fläche und Dicke und teilt die Summe durch das Sackgewicht."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Welchen Verbrauch trägt man ein?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Die Umrechnung geht von rund 2,0 kg je Liter Mörtel aus. Anhydritestriche und leichte Estriche haben eine andere Dichte, prüfe den Wert auf dem Sack."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li><a href="/de/rechner/">Baurechner online</a></li><li aria-current="page">Estrich / Putz</li></ol></nav>
-      <h1>Estrich / Putz</h1>
-      <p class="lead">Fläche und Dicke → Säcke. Rechne im Browser. Ergebnisse werden auf ganze Gebinde aufgerundet, so wie du sie kaufst.</p>
+      <h1>Estrichrechner: wie viele Säcke je m²</h1>
+      <p class="lead">Fläche, Schichtdicke und Verbrauch in kg je m² und mm ergeben die Anzahl Säcke Estrich, Ausgleichsmasse oder Putz.</p>
     </div>
   </section>
 
@@ -250,7 +274,17 @@ Säcke = ⌈ Kilogramm ÷ Sack ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Häufige Fragen</h2>
+      <div class="faq">
+        <details open><summary>Wie viele Säcke Estrich braucht 1 m²?</summary><p>Der Verbrauch wird in Kilogramm je Quadratmeter und Millimeter Dicke angegeben. Der Rechner multipliziert ihn mit Fläche und Dicke und teilt die Summe durch das Sackgewicht.</p></details>
+        <details><summary>Welchen Verbrauch trägt man ein?</summary><p>Die Umrechnung geht von rund 2,0 kg je Liter Mörtel aus. Anhydritestriche und leichte Estriche haben eine andere Dichte, prüfe den Wert auf dem Sack.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Weitere Rechner</h2>
       <div class="chips"><a class="chip" href="/de/rechner/sackbeton/">Sackbeton</a><a class="chip" href="/de/rechner/kleber-moertel/">Kleber / Mörtel</a><a class="chip" href="/de/rechner/farbe-putz-grundierung/">Farbe, Putz, Grund</a></div>
@@ -352,22 +386,22 @@ Säcke = ⌈ Kilogramm ÷ Sack ⌉</code></pre>
   "sr": "/sr/kalkulatori/estrih-malter/",
   "ru": "/ru/kalkulyatory/styazhka-shtukaturka/"
 };</script>
-<script src="/assets/i18n.de.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.de.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>

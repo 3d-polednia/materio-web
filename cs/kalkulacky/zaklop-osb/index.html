@@ -49,8 +49,8 @@
      connection alongside the HTML keeps it off the render path. -->
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>Záklop (OSB/desky) — Stavební kalkulačky online | LiczMat</title>
-<meta name="description" content="Záklop (OSB/desky) — bezplatná online kalkulačka. Kolik desek na pokrytí. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<title>Kalkulačka záklopu OSB: kolik desek | LiczMat</title>
+<meta name="description" content="Plocha k pokrytí, rozměr desky a prořez dají počet celých desek OSB nebo prken na záklop stěny či střechy.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/obshivka-osb/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/poszycie-osb/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -86,19 +86,19 @@
 <meta property="og:locale:alternate" content="hr_HR">
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
-<meta property="og:title" content="Záklop (OSB/desky) — Stavební kalkulačky online | LiczMat">
-<meta property="og:description" content="Záklop (OSB/desky) — bezplatná online kalkulačka. Kolik desek na pokrytí. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta property="og:title" content="Kalkulačka záklopu OSB: kolik desek | LiczMat">
+<meta property="og:description" content="Plocha k pokrytí, rozměr desky a prořez dají počet celých desek OSB nebo prken na záklop stěny či střechy.">
 <meta property="og:url" content="https://liczmat.com/cs/kalkulacky/zaklop-osb/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Záklop (OSB/desky) — Stavební kalkulačky online | LiczMat">
-<meta name="twitter:description" content="Záklop (OSB/desky) — bezplatná online kalkulačka. Kolik desek na pokrytí. Stejný vzorec jako v aplikaci LiczMat, bez registrace.">
+<meta name="twitter:title" content="Kalkulačka záklopu OSB: kolik desek | LiczMat">
+<meta name="twitter:description" content="Plocha k pokrytí, rozměr desky a prořez dají počet celých desek OSB nebo prken na záklop stěny či střechy.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820a">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -146,6 +146,30 @@
     "price": "0",
     "priceCurrency": "CZK"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Kolik desek OSB je na m² záklopu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kalkulačka vydělí plochu zvětšenou o prořez plochou jedné desky a zaokrouhlí nahoru na celé desky."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Obsahuje výsledek plán nářezu?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ne, je to počet celých desek bez plánu řezání. Jak je rozřezat, řekne kalkulačka nářezu desek 2D."
+      }
+    }
+  ]
 }
 </script>
 
@@ -197,8 +221,8 @@
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li><a href="/cs/kalkulacky/">Stavební kalkulačky online</a></li><li aria-current="page">Záklop (OSB/desky)</li></ol></nav>
-      <h1>Záklop (OSB/desky)</h1>
-      <p class="lead">Kolik desek na pokrytí. Počítej v prohlížeči. Výsledek zaokrouhlujeme na celá balení, tak jak se prodávají.</p>
+      <h1>Kalkulačka záklopu OSB: kolik desek</h1>
+      <p class="lead">Plocha k pokrytí, rozměr desky a prořez dají počet celých desek OSB nebo prken na záklop stěny či střechy.</p>
     </div>
   </section>
 
@@ -251,7 +275,17 @@ arkusze = ⌈ z zapasem ÷ pole arkusza ⌉</code></pre>
     </div>
   </section>
 
-  <section class="block alt">
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Časté dotazy</h2>
+      <div class="faq">
+        <details open><summary>Kolik desek OSB je na m² záklopu?</summary><p>Kalkulačka vydělí plochu zvětšenou o prořez plochou jedné desky a zaokrouhlí nahoru na celé desky.</p></details>
+        <details><summary>Obsahuje výsledek plán nářezu?</summary><p>Ne, je to počet celých desek bez plánu řezání. Jak je rozřezat, řekne kalkulačka nářezu desek 2D.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
     <div class="wrap">
       <h2>Další kalkulačky</h2>
       <div class="chips"><a class="chip" href="/cs/kalkulacky/narez-desek-2d/">Nářez desek (2D)</a><a class="chip" href="/cs/kalkulacky/linearni-narez-1d/">Lineární nářez (1D)</a><a class="chip" href="/cs/kalkulacky/pricka-sdk/">Příčka SDK</a></div>
@@ -354,22 +388,22 @@ arkusze = ⌈ z zapasem ÷ pole arkusza ⌉</code></pre>
   "sr": "/sr/kalkulatori/oplata-osb/",
   "ru": "/ru/kalkulyatory/obshivka-osb/"
 };</script>
-<script src="/assets/i18n.cs.js?v=20260820a"></script>
-<script src="/assets/i18n-runtime.js?v=20260820a"></script>
-<script src="/assets/currency.js?v=20260820a"></script>
+<script src="/assets/i18n.cs.js?v=20260820b"></script>
+<script src="/assets/i18n-runtime.js?v=20260820b"></script>
+<script src="/assets/currency.js?v=20260820b"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820a"></script>
+<script src="/assets/account.js?v=20260820b"></script>
 
-<script src="/assets/units.js?v=20260820a"></script>
-<script src="/assets/calculators.js?v=20260820a"></script>
-<script src="/assets/materials.js?v=20260820a"></script>
-<script src="/assets/materials-ui.js?v=20260820a"></script>
-<script src="/assets/workspace.js?v=20260820a"></script>
-<script src="/assets/workspace-ui.js?v=20260820a"></script>
-<script src="/assets/recent.js?v=20260820a"></script>
-<script src="/assets/main.js?v=20260820a"></script>
+<script src="/assets/units.js?v=20260820b"></script>
+<script src="/assets/calculators.js?v=20260820b"></script>
+<script src="/assets/materials.js?v=20260820b"></script>
+<script src="/assets/materials-ui.js?v=20260820b"></script>
+<script src="/assets/workspace.js?v=20260820b"></script>
+<script src="/assets/workspace-ui.js?v=20260820b"></script>
+<script src="/assets/recent.js?v=20260820b"></script>
+<script src="/assets/main.js?v=20260820b"></script>
 
 </body>
 </html>
