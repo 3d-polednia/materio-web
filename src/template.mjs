@@ -209,8 +209,18 @@ export function page(p) {
     if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
-<!-- Google tag (gtag.js) with Consent Mode v2 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
+<!-- Google tag (gtag.js) with Consent Mode v2.
+
+     The library itself is fetched after the load event rather than alongside the page.
+     It is the only third-party request a public page makes and it is by some distance
+     the largest single download on it, and until session 33 it competed for the
+     connection with the stylesheet and with the scripts the calculator actually needs
+     to answer the question the visitor came with. Nothing is lost by waiting: gtag()
+     is defined here, dataLayer is an array, and every call made before the library
+     arrives — the consent defaults, the saved "accept", the config, an event from the
+     consent banner — is queued and replayed by it in order. Consent is therefore still
+     set before the library can read a cookie, which is the one thing about this block
+     that must not move. -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -231,12 +241,30 @@ export function page(p) {
   } catch (e) {}
 
   gtag('config', '${GA_ID}');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=${GA_ID}';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The analytics tag is the only third-party request a public page makes; opening the
-     connection alongside the HTML keeps it off the render path. -->
-<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<!-- The analytics tag is the only third-party request a public page makes, and since
+     session 33 it is fetched after load. A preconnect would open a TLS connection during
+     the render for a request that no longer happens then, and an idle connection is
+     closed before it is used; the name lookup is worth keeping and costs nothing. -->
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
@@ -248,10 +276,15 @@ export function page(p) {
 <meta name="application-name" content="LiczMat">
 <link rel="canonical" href="${esc(canonical)}">
 ${hreflangs}
-<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<!-- Two icons and no more. The SVG is 809 bytes and is what a current browser picks; the
+     32 px PNG is the fallback for one that cannot read it. A third link at 192 px used to
+     sit here, and a browser choosing the largest declared icon would fetch 5.4 kB to draw
+     a 16 px tab — site.webmanifest already declares 192 and 512 for installing, which is
+     where that size is actually wanted. All three carry the stamp now: an icon is cached
+     harder than anything else on a site, and favicon-32.png had no way to be replaced. -->
 <link rel="icon" href="/assets/favicon.svg?v=${stamp}" type="image/svg+xml">
-<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="icon" href="/assets/favicon-32.png?v=${stamp}" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=${stamp}">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -269,7 +302,7 @@ ${ogAlternates}
 <meta name="twitter:description" content="${esc(description)}">
 <meta name="twitter:image" content="${BASE}/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="${esc(OG_IMAGE_ALT)}">
-<link rel="stylesheet" href="/assets/styles.css?v=${stamp}">
+<link rel="stylesheet" href="/assets/styles.min.css?v=${stamp}">
 ${jsonldBlocks}
 ${p.headExtra || ""}
 </head>
@@ -277,7 +310,10 @@ ${p.headExtra || ""}
 <a class="skip-link" href="#main">${esc(t("skip_main"))}</a>
 ${bare ? main : `${siteHeader({ lang, t, alternates, path })}\n${main}\n${siteFooter({ lang, t, alternates })}\n${consentBanner(lang, t)}`}
 ${bare ? "" : `<script>window.LICZMAT_ALTERNATES = ${altJson};</script>`}
-<script src="/assets/i18n.${bare ? "all" : lang}.js?v=${stamp}"></script>
+${bare ? `<!-- The ten flags, for a picker this page builds itself. Every other page has
+     its picker in the markup already, so it does not download them a second time. -->
+<script src="/assets/flags.js?v=${stamp}"></script>` : ""}
+<script src="/assets/i18n.${bare ? DEFAULT_LANG : lang}.js?v=${stamp}"></script>
 <script src="/assets/i18n-runtime.js?v=${stamp}"></script>
 <script src="/assets/currency.js?v=${stamp}"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was

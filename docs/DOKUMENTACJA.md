@@ -71,6 +71,7 @@ src/template.mjs         Wspólny <head>, nagłówek, stopka, baner zgody, okrus
 src/pages.mjs            Zawartość <main> każdego typu strony
 src/calc-meta.mjs        Wzory „Jak to liczymy" + ich tłumaczenia
 src/tokens.mjs           Kontrola systemu projektowego (validateTokens) — czyta styles.css
+                         (plik autorski, nie wysyłany do przeglądarki)
 scripts/check-contrast.mjs  Pomiar kontrastu tokenów w obu motywach (WCAG AA)
 src/app-pages.mjs        /app/ i /p/ (noindex)
 src/ia.mjs               Architektura informacji: trasy, poziomy dostępu, ACCOUNT_LEVELS
@@ -87,10 +88,17 @@ site.webmanifest         Manifest PWA (nazwa, ikony, kolory)
 robots.txt               Reguły dla robotów + odnośnik do sitemap
 .nojekyll                Wyłącza przetwarzanie Jekyll na GitHub Pages
 assets/
-  styles.css             System projektowy: tokeny + wszystkie komponenty (DESIGN_SYSTEM.md)
+  styles.css             System projektowy: tokeny + wszystkie komponenty (DESIGN_SYSTEM.md).
+                         To plik do edycji; strony linkują styles.min.css
+  styles.min.css         Generowany z powyższego: te same reguły, bez komentarzy (Sesja 33)
   i18n.js                Słownik 4 języków (LANGS, I18N) — wejście builda
   i18n-pages.js          Słownik podstron, te same 4 języki — wejście builda
-  i18n-runtime.js        t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/
+  i18n.<lang>.js         Generowany słownik jednego języka. Strona pobiera dokładnie jeden;
+                         /app/, /app/dashboard/ i /p/ dobierają drugi przy zmianie języka
+  flags.js               Generowane dziesięć flag — tylko dla trzech stron, które budują
+                         własny przełącznik języka
+  i18n-runtime.js        t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/,
+                         ensureLang() — dociąganie słownika innego języka
   units.js               Odmiana liczebnika i podstawianie |tokenów| — wspólne dla
                          kalkulatorów, projektów, kosztorysu i pulpitu
   calculators.js         Silniki liczące + podpięcie formularzy (wireCalculator)

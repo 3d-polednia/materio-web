@@ -53,7 +53,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260820c";
+const STAMP = "20260820d";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -72,15 +72,18 @@ function evalScript(file, returns) {
 const { I18N, LANGS: LANG_META_RAW } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
 
 /**
- * What the browser gets to know about the languages: the code, the name in that language
- * and the flag, in the order the picker shows them. The flag travels with the entry so
- * /app/ and /p/, which build their picker at runtime, draw the same rows the generator
- * writes into every other page.
+ * What the browser gets to know about the languages: the code and the name in that
+ * language, in the order the picker shows them.
+ *
+ * The flag is deliberately NOT here. It used to be, and every page on the site therefore
+ * carried ten inline SVGs inside its dictionary — 3.8 kB of a 68 kB bundle — for a picker
+ * that the generator had already written into the markup, flags included. Only the three
+ * pages with no language of their own build their picker at runtime, so only they need
+ * the shapes: they get assets/flags.js, which is the same ten and nothing else.
  */
 const LANG_META = LANGS.map((code) => ({
   code,
   label: (LANG_META_RAW.find((l) => l.code === code) || {}).label || LANG_NAME[code],
-  flag: FLAG[code],
 }));
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
@@ -401,9 +404,54 @@ function snapshotPages(dir = ROOT) {
   }
 }
 
+/**
+ * Take the narrative out of the markup on its way to the visitor.
+ *
+ * src/template.mjs, src/pages.mjs and src/app-pages.mjs explain themselves in HTML
+ * comments standing next to the block they describe, which is where somebody editing
+ * them wants to read it. It is also 2.4 kB of the home page and more than 6 kB of
+ * /klienci/, on every page load, for prose no browser and no crawler will ever act on.
+ * Same decision the stylesheet gets in buildStylesheet(): the comments stay in the
+ * source and stop at the door.
+ *
+ * A comment inside <script>, <style>, <pre> or <textarea> is not a comment — it is code
+ * or it is text somebody is meant to see — so those elements are stepped over whole.
+ * Nothing else is touched: no tag is rewritten, no whitespace is collapsed, and the
+ * markup a browser parses is the markup the generator wrote.
+ */
+const VERBATIM = /<(script|style|pre|textarea)\b/i;
+
+function stripHtmlComments(html) {
+  let out = "";
+  let i = 0;
+  while (i < html.length) {
+    const open = html.indexOf("<!--", i);
+    const verbatim = VERBATIM.exec(html.slice(i));
+    // Whichever comes first: a comment to drop, or an element to step over.
+    if (open < 0 && !verbatim) break;
+    if (verbatim && (open < 0 || i + verbatim.index < open)) {
+      const tag = verbatim[1];
+      const at = i + verbatim.index;
+      const close = html.toLowerCase().indexOf(`</${tag.toLowerCase()}>`, at);
+      const end = close < 0 ? html.length : close + tag.length + 3;
+      out += html.slice(i, end);
+      i = end;
+      continue;
+    }
+    const end = html.indexOf("-->", open + 4);
+    if (end < 0) break;
+    out += html.slice(i, open);
+    i = end + 3;
+    // A comment on a line of its own leaves the line behind; take it with the comment.
+    if (html[i] === "\n" && (out === "" || out.endsWith("\n"))) i += 1;
+  }
+  return out + html.slice(i);
+}
+
 function write(relPath, contents) {
   const full = p(relPath);
   if (relPath.endsWith(".html")) {
+    contents = stripHtmlComments(contents);
     if (previous.get(relPath) !== fingerprint(contents)) changed.add(relPath);
     if (/<meta name="robots" content="noindex/.test(contents)) noindexed.add(relPath);
   }
@@ -429,7 +477,7 @@ const sitemapFile = (loc) => `${loc.replace(/^\//, "")}${loc.endsWith("/") ? "in
  */
 const CALC_SCRIPTS = [
   "/assets/units.js", "/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js",
-  "/assets/workspace.js", "/assets/workspace-ui.js", "/assets/recent.js",
+  "/assets/workspace.js", "/assets/workspace-calc.js", "/assets/recent.js",
 ];
 
 /**
@@ -437,7 +485,12 @@ const CALC_SCRIPTS = [
  * since session 16 they print saved results, so they need the words that go next to a
  * number (assets/units.js), which is the reason that file exists apart from the engines.
  */
-const WS_SCRIPTS = ["/assets/units.js", "/assets/workspace.js", "/assets/workspace-ui.js"];
+const WS_SCRIPTS = [
+  "/assets/units.js", "/assets/workspace.js",
+  // Both halves: these two pages draw the screens, and the screens speak the vocabulary
+  // assets/workspace-calc.js defines. Order matters — plain scripts, one global scope.
+  "/assets/workspace-calc.js", "/assets/workspace-ui.js",
+];
 
 /**
  * /klienci/ (session 22). The client store, its page, and the two files it reads:
@@ -596,21 +649,101 @@ const calcLd = (calc, lang, t) => ({
 
 /* ------------------------------------------------------------------ emit */
 
-function buildDictionaries() {
-  // One bundle carrying every language, for the two pages that translate in place.
-  write("assets/i18n.all.js", `/* Generated by scripts/build.mjs — do not edit.
-   Every language in one file, for the noindex pages (/app/, /p/) that have no
-   per-language URLs and swap text in the DOM instead of navigating. */
-const LANGS = ${JSON.stringify(LANG_META)};
-const I18N = ${JSON.stringify(DICT)};
-`);
+/**
+ * The stylesheet, shipped without the essay in it.
+ *
+ * assets/styles.css is authored to be read: docs/DESIGN_SYSTEM.md is the narrative and
+ * the file itself carries the argument for every token, every component and every
+ * breakpoint next to the rule it explains. That is 31 of its 90 kB — and because prose
+ * compresses far better than selectors do, it is 13 of the 24 kB that actually cross the
+ * wire. The stylesheet is the one render-blocking request every page makes, so those
+ * 13 kB stand in front of the first paint of all 375 pages.
+ *
+ * So the comments are stripped here rather than deleted there. What ships is
+ * assets/styles.min.css; assets/styles.css stays exactly as it is, keeps the comments,
+ * and stays the file src/tokens.mjs validates and a person edits. Nothing else is
+ * rewritten: no selector is reordered, no value is shortened, no rule is merged. A
+ * minifier that rewrites `#ffffff` to `#fff` saves a few hundred bytes and makes the
+ * shipped file something nobody can diff against the source.
+ *
+ * The scan is a tokenizer, not a regular expression, because `content: "/* x *\/"` is a
+ * string and not a comment, and a `url(…)` may hold either quote.
+ */
+function stripCssComments(css) {
+  let out = "";
+  for (let i = 0; i < css.length;) {
+    const ch = css[i];
+    if (ch === "/" && css[i + 1] === "*") {
+      const end = css.indexOf("*/", i + 2);
+      // An unterminated comment would swallow the rest of the stylesheet silently.
+      if (end < 0) throw new Error("assets/styles.css: unterminated /* comment");
+      out += " ";
+      i = end + 2;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      let j = i + 1;
+      while (j < css.length && css[j] !== ch) j += css[j] === "\\" ? 2 : 1;
+      out += css.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    out += ch;
+    i += 1;
+  }
+  return out;
+}
 
+function buildStylesheet() {
+  const authored = readFileSync(p("assets/styles.css"), "utf8");
+  // Indentation and blank lines go with the comments; the line breaks stay, so the
+  // shipped file is still one rule per line and can be read in a browser's dev tools.
+  const shipped = stripCssComments(authored)
+    .split("\n").map((l) => l.trim()).filter(Boolean).join("\n");
+  write("assets/styles.min.css", `/* Generated by scripts/build.mjs from assets/styles.css — do not edit.
+   Same rules, same order, same values; only the comments and the indentation are gone.
+   Edit assets/styles.css and rebuild. */
+${shipped}\n`);
+}
+
+/**
+ * The picker's flags, for the three pages that draw their own picker.
+ *
+ * assets/flags/<lang>.svg is inlined rather than linked from ten <img> tags — the master
+ * plan (chapter V) rules out emoji flags, and ten shapes of 222 to 523 bytes cost less
+ * than ten requests, cannot flash in late and survive with the page when the network is
+ * gone. Measured on the home page, all twenty-one inlined flags together are 536 bytes
+ * once the response is gzipped, which is less than one request's worth of headers.
+ */
+function buildFlags() {
+  write("assets/flags.js", `/* Generated by scripts/build.mjs from assets/flags/*.svg — do not edit.
+   Loaded by /app/, /app/dashboard/ and /p/ only: every other page has its picker written
+   into the markup by the generator, flags and all. */
+var LM_FLAGS = ${JSON.stringify(FLAG)};
+`);
+}
+
+function buildDictionaries() {
+  /* One bundle per language, and a page downloads exactly the one it is written in.
+     assets/i18n.all.js is gone: it carried all ten languages in 703 kB, and /app/,
+     /app/dashboard/ and /p/ were the three pages that downloaded it — 220 kB gzipped
+     to have nine languages nobody had asked for sitting in memory.
+
+     The bundles are additive rather than declarative, which is the whole mechanism that
+     lets those three pages switch language without shipping ten of them. A second bundle
+     loaded later adds its language to the same `I18N` object instead of colliding with
+     `const I18N` already being declared; `LANGS` is the same list of ten in every bundle,
+     so the picker offers every language before any second bundle is fetched. See
+     ensureLang() in assets/i18n-runtime.js for the other half. */
   for (const lang of LANGS) {
     const body = `/* Generated by scripts/build.mjs — do not edit.
    Source: assets/i18n.js + assets/i18n-pages.js. Only the "${lang}" language is here;
-   the language switcher navigates to the other languages' URLs instead of swapping text. */
-const LANGS = ${JSON.stringify(LANG_META)};
-const I18N = ${JSON.stringify({ [lang]: DICT[lang] })};
+   a per-language page navigates to switch, and the three pages that have no language of
+   their own (/app/, /app/dashboard/, /p/) fetch a second bundle, which merges into this
+   one instead of replacing it. */
+var LANGS = ${JSON.stringify(LANG_META)};
+var I18N = (typeof I18N === "object" && I18N) || {};
+I18N[${JSON.stringify(lang)}] = ${JSON.stringify(DICT[lang])};
 `;
     write(`assets/i18n.${lang}.js`, body);
   }
@@ -1214,6 +1347,10 @@ function clean() {
     const bundle = p(`assets/i18n.${lang}.js`);
     if (existsSync(bundle)) rmSync(bundle, { force: true });
   }
+  // Session 33 retired the all-languages bundle; a working tree built before it still
+  // has the 703 kB file, and the Pages artifact is the repo root.
+  const all = p("assets/i18n.all.js");
+  if (existsSync(all)) rmSync(all, { force: true });
 }
 
 /* ------------------------------------------------------------------ main */
@@ -1234,6 +1371,8 @@ if (process.argv.includes("--check")) {
 
 snapshotPages();
 clean();
+buildStylesheet();
+buildFlags();
 buildDictionaries();
 buildHome();
 buildCalculatorPages();

@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
-     flash. No stored choice means "follow the system", which is also the CSS default. -->
 <script>
   // "js" says the drawer, the pop-up menus and everything else that needs a script
   // will work. Without it the navigation renders as a plain list instead of hiding
@@ -20,8 +18,6 @@
     if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
-<!-- Google tag (gtag.js) with Consent Mode v2 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -42,12 +38,26 @@
   } catch (e) {}
 
   gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The analytics tag is the only third-party request a public page makes; opening the
-     connection alongside the HTML keeps it off the render path. -->
-<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projekty i pomieszczenia — LiczMat</title>
 <meta name="description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu. Bez rejestracji.">
@@ -69,10 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/projekti/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/proekty/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/projekty/">
-<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820c" type="image/svg+xml">
-<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -98,7 +107,7 @@
 <meta name="twitter:description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu. Bez rejestracji.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820c">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -160,9 +169,6 @@
     <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otwórz menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
   </div>
 </header>
-<!-- Outside <header>, because the header's backdrop-filter makes it the containing
-     block for anything position:fixed inside it — in there the scrim would be as tall
-     as the header bar and dim nothing. -->
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main">
   <section class="block page-head">
@@ -186,10 +192,7 @@
         <div id="ws-project-body" hidden>
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
 
-          <!-- Chapter XVII: "Projekt może pokazywać: koszt materiałów, inne koszty, sumę
-               projektu." The three are written by assets/workspace.js's wsProjectCosts(),
-               which counts every amount in the project exactly once — a calculation and
-               the material it put on the shopping list are the same money. -->
+          
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">Pozycji</span> <b id="ws-project-count"></b></p>
             <p class="ws-project-fig"><span class="eyebrow muted">Koszt materiałów</span> <b id="ws-project-mat"></b></p>
@@ -220,12 +223,7 @@
             </p>
           </div>
 
-          <!-- Chapter XVIII: "Pomieszczenia są elementem projektu." It stands above the
-               calculations because that is the order chapter XIV lists a project's parts
-               in, and because the chapter's own example reads project → room → dimensions.
-               The rooms are the project's by a projectId the sync contract does not carry
-               and a Firestore merge does not erase — assets/workspace.js says how, and the
-               note under the form says what the phone can and cannot do with it. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Pomieszczenia</h2>
@@ -254,8 +252,7 @@
                     <input id="ws-proj-room-height" type="text" inputmode="decimal" value="2.6" data-f="heightM">
                   </label>
                 </p>
-                <!-- What the three numbers above come to, while they are typed: the same
-                     wsRoomAreas() the calculators' room bar spends. -->
+                
                 <p class="ws-mat-sum" data-room-sum aria-live="polite"></p>
                 <p class="muted ws-mat-hint">Przypisanie pomieszczenia do projektu jest widoczne tutaj i w przeglądarce na innym urządzeniu. Aplikacja na telefon trzyma pomieszczenia na jednej liście i jeszcze tego nie pokazuje.</p>
                 <p><button type="submit" class="btn btn-primary btn-sm">Dodaj</button></p>
@@ -272,10 +269,7 @@
             <ul id="ws-project-lines" class="data-list"></ul>
           </section>
 
-          <!-- Chapter XVI. The estimate above says what a calculation cost; this says what
-               to carry out of the shop. It is the project's shoppingItems subcollection,
-               which the sync contract has carried since its first version and which
-               nothing on this site wrote until session 17. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Materiały</h2>
@@ -284,9 +278,7 @@
             <p class="muted">Lista zakupów tego projektu. Każdy zapisany wynik dokłada do niej jedną pozycję.</p>
             <ul id="ws-project-materials" class="data-list"></ul>
 
-            <!-- Chapter XVI, "dodać własny materiał": a row nothing calculated. Folded
-                 away, because the list is normally filled by the arrow from a result and
-                 this is the exception — but a real <form>, so Enter submits it. -->
+            
             <details class="ws-mat-add" id="ws-mat-add">
               <summary>Dodaj własny materiał</summary>
               <form id="ws-mat-form">
@@ -312,8 +304,7 @@
                     <select id="ws-mat-cat"><option value="TILES">Płytki i gres</option><option value="FLOORING">Podłogi</option><option value="TRIM">Listwy i wykończenia</option><option value="PAINT">Farby i lakiery</option><option value="CHEMICALS">Chemia budowlana</option><option value="BOARDS">Płyty</option><option value="WOOD">Drewno</option><option value="PROFILES">Profile G-K</option><option value="METAL">Metal i zbrojenie</option><option value="GLASS">Szkło i tworzywa</option><option value="TEXTILES">Tkaniny i tapicerka</option><option value="INSULATION">Izolacja</option><option value="PLUMBING">Hydraulika i wentylacja</option><option value="ELECTRICAL">Elektryka</option><option value="OTHER">Pozostałe</option></select>
                   </label>
                 </p>
-                <!-- What the two numbers above come to, in the currency in force, printed
-                     while they are typed. Chapter XVII: "7 × 35 PLN = 245 PLN". -->
+                
                 <p class="ws-mat-sum" data-mat-sum aria-live="polite"></p>
                 <label class="ws-mat-f">
                   <span class="ws-bar-label">Notatka</span>
@@ -324,17 +315,11 @@
               </form>
             </details>
 
-            <!-- The units this site already writes onto a saved material, so a hand-typed
-                 row uses the same words as a calculated one instead of inventing a second
-                 vocabulary. A suggestion list, never a restriction: the field stays free
-                 text, because chapter XVI asks for the unit to be changeable. -->
+            
             <datalist id="ws-mat-units"><option value="opak."></option><option value="szt."></option><option value="m²"></option><option value="m"></option><option value="kg"></option><option value="l"></option></datalist>
           </section>
 
-          <!-- Chapter XVII's second figure: "inne koszty". Labour, delivery, a skip — the
-               part of a project no calculator produces. They are the hand-typed estimate
-               lines /kosztorys/ has always written, filed into the project that is open
-               instead of the active one, so this is a second way into one store. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Inne koszty</h2>
@@ -384,11 +369,7 @@
 
         <h2 class="mt-8">Pomieszczenia</h2>
         <p class="muted">Pomieszczenie to nazwa i trzy wymiary. Kalkulator policzy z nich podłogę, ściany i sufit.</p>
-        <!-- Chapter XVIII: a room is an element of a project, so the form asks which one
-             instead of silently taking the active project — which is what it did until the
-             owner reported that a room could not be assigned at all. The list is filled by
-             assets/workspace-ui.js; "no project" is a real answer, because a room measured
-             before there is a project is still a room. -->
+        
         <form id="ws-room-form" class="inline-form">
           <input id="ws-room-name" type="text" maxlength="120" placeholder="Nazwa pomieszczenia" required>
           <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Długość (m)">
@@ -499,18 +480,17 @@
   "sr": "/sr/projekti/",
   "ru": "/ru/proekty/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260820c"></script>
-<script src="/assets/i18n-runtime.js?v=20260820c"></script>
-<script src="/assets/currency.js?v=20260820c"></script>
-<!-- The session, on every page: which of chapter II's three levels this browser was
-     last told it is on. Two kilobytes, no network, and it is what lets a calculator
-     page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820c"></script>
 
-<script src="/assets/units.js?v=20260820c"></script>
-<script src="/assets/workspace.js?v=20260820c"></script>
-<script src="/assets/workspace-ui.js?v=20260820c"></script>
-<script src="/assets/main.js?v=20260820c"></script>
+<script src="/assets/i18n.pl.js?v=20260820d"></script>
+<script src="/assets/i18n-runtime.js?v=20260820d"></script>
+<script src="/assets/currency.js?v=20260820d"></script>
+<script src="/assets/account.js?v=20260820d"></script>
+
+<script src="/assets/units.js?v=20260820d"></script>
+<script src="/assets/workspace.js?v=20260820d"></script>
+<script src="/assets/workspace-calc.js?v=20260820d"></script>
+<script src="/assets/workspace-ui.js?v=20260820d"></script>
+<script src="/assets/main.js?v=20260820d"></script>
 
 </body>
 </html>

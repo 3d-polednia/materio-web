@@ -106,6 +106,7 @@ node scripts/test-propage.mjs     # /liczmat-pro/: the route, the price in the H
 node scripts/test-seo.mjs         # technical SEO: sitemap, robots, canonical, hreflang, OG
 node scripts/test-calc-seo.mjs    # the calculators as landing pages: title, description, FAQ
 node scripts/test-mobile.mjs      # the whole site on a phone: widths, tap targets, fields
+node scripts/test-perf.mjs        # what a page weighs: bytes, requests, the render path
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -124,11 +125,13 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
 | `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**`, `materialy/**`, `liczmat-pro/**` and their per-language twins |
 | `assets/i18n-materials.js` — material names, 4 languages | `app/index.html`, `p/index.html` |
-| `assets/calculators.js` — engines, ported 1:1 from Kotlin, and `assets/units.js` next to it | `assets/i18n.<lang>.js`, `assets/i18n.all.js` |
-| `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `sitemap.xml` |
-| `assets/styles.css`, `main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | |
+| `assets/calculators.js` — engines, ported 1:1 from Kotlin, and `assets/units.js` next to it | `assets/i18n.<lang>.js` — one per language, and the only kind there is since session 33 |
+| `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `assets/flags.js` — the ten flags, for the three pages that build their own picker |
+| `assets/styles.css` — **authored**; the build emits `assets/styles.min.css` from it, and that is what every page links | `assets/styles.min.css` — the same rules with the commentary stripped |
+| `assets/main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | `sitemap.xml` |
 | `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
+| `assets/workspace-calc.js` — the room bar and the save box on a calculator page | |
 | `assets/plan.js` — the Free/Pro model and the permission table | |
 | `assets/crm.js` — the clients, jobs and quotes of LiczMat Pro, plus `crm-ui.js`, `jobs-ui.js`, `quotes-ui.js` and `crm-chain.js` | |
 | `assets/recent.js`, `assets/dashboard.js` | |
@@ -372,6 +375,19 @@ scripts/test-mobile.mjs  The whole site on a phone (session 32, chapter XXVIII):
                       spinner, the three switches of chapter XXXII work at 320 px, and a
                       calculation can be made on the narrowest phone there is. Needs the
                       same outside-the-repo Playwright as test-pages.mjs
+scripts/test-perf.mjs  What a page weighs (session 33, chapter XXXII): every page read
+                      back with the assets its markup asks for, raw and gzipped, against a
+                      budget per page type plus a ceiling every one of the 375 has to
+                      clear; that the shipped stylesheet is the authored one with the
+                      commentary gone and the same rules underneath; that a page downloads
+                      one language and can fetch a second; the flags, the logo and the
+                      icons chapter XXXII names by hand; what stands on the render path —
+                      no third-party <script src> in the markup, one stylesheet, no
+                      preconnect, one cache stamp; images with width, height and lazy
+                      loading; no HTML comment in a generated page; the two halves of the
+                      workspace and no script named twice; and the fonts, of which there
+                      are none. Dependency-free — run it after adding a script or a
+                      stylesheet to a page, or after changing what the build emits
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -413,7 +429,9 @@ src/pro.mjs           The build side of LiczMat Pro: the module list (the PRO ha
                       block, and the Pro tab of /app/. It renders; it does not declare
 src/app-pages.mjs     /app/, /app/dashboard/ and /p/ (noindex, translated in the browser)
 assets/styles.css     The design system: one token block, then the components that
-                      spend it. Never write a literal colour/radius/duration below it
+                      spend it. Never write a literal colour/radius/duration below it.
+                      Authored, and the file to edit; the build writes assets/styles.min.css
+                      from it — same rules, commentary gone — and that is what pages link
 assets/i18n.js        4-language dictionary (build input)
 assets/i18n-pages.js  Sub-page dictionary, same 4 languages (build input)
 assets/i18n-materials.js  Material names/terms, same 4 languages (build input)
@@ -429,11 +447,18 @@ assets/workspace.js   Projects, rooms, estimate lines and the material list in l
                       session 17; it is written by the same call that saves a calculation.
                       Session 19 added the money: a unit price derived by dividing the
                       total, and wsProjectCosts() — material cost, other costs, project sum
-assets/workspace-ui.js  The room bar on calculators, /projekty/ and /kosztorys/. The
-                      projects page holds two screens — the index and one project at
-                      ?id=<projectId> — and this file shows one of them, including the
-                      material list of chapter XVI and, since session 20, the project's
-                      rooms and the picker that files one calculation under one of them
+assets/workspace-calc.js  The workspace on a calculator page: the room bar that fills a
+                      form from a room somebody measured, the save box that files a result
+                      in a project, and the vocabulary both halves speak (wsT, wsEsc,
+                      wsNum, wsDecimal, wsPlain, wsUnit, wsLang). Split out of
+                      assets/workspace-ui.js in session 33 — 150 of the 373 pages are
+                      calculator pages and none of them draws the projects screen
+assets/workspace-ui.js  The two workspace screens: /projekty/ and /kosztorys/. The projects
+                      page holds two of them — the index and one project at
+                      ?id=<projectId> — including the material list of chapter XVI and,
+                      since session 20, the project's rooms and the picker that files one
+                      calculation under one of them. Loaded after assets/workspace-calc.js,
+                      which defines what it speaks
 assets/crm-chain.js   Chapter XXIV's path, drawn: the strip of four steps, the quotes list
                       and the history list, shared by /klienci/, /zlecenia/ and /wyceny/ so
                       the chain reads the same wherever it is standing. Every name in it
@@ -500,7 +525,10 @@ assets/units.js       The word next to a number: the plural forms of a counted n
                       engines. Loaded before assets/calculators.js everywhere
 assets/i18n-runtime.js  t(), the language switcher, in-place translation for /app/ and /p/.
                       A language link carries the page's query string, so switching
-                      language on /projekty/?id=<id> keeps the project
+                      language on /projekty/?id=<id> keeps the project. ensureLang() is
+                      session 33's half: the three pages with no language of their own
+                      fetch a second dictionary when somebody picks a language, instead of
+                      every page carrying all ten
 assets/calculators.js Calculation engines ported 1:1 from the Kotlin app + form wiring
 assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
 assets/main.js        Wiring: menu, hero carousel, consent banner
@@ -540,10 +568,21 @@ Kotlin side of it. Change one, change all three.
   `/app/` signed out is a sign-in form and `/p/` with no token renders no estimate.
   `scripts/test-seo.mjs` §1b fails the moment a `Disallow` reappears in front of a
   `noindex` page.
-- They have no per-language URLs; they load the whole dictionary and translate in place.
+- They have no per-language URLs; they translate in place, and since session 33 they load
+  **one** dictionary rather than ten. `assets/i18n.all.js` is gone — it was 703 kB (220 kB
+  gzipped) and these were the only three pages that fetched it. They now ship
+  `assets/i18n.<DEFAULT_LANG>.js`, and `ensureLang()` in `assets/i18n-runtime.js` fetches a
+  second bundle when the visitor picks another language. Every generated bundle is additive
+  (`var I18N = (typeof I18N === "object" && I18N) || {}` then `I18N["de"] = …`), so a second
+  one merges instead of colliding; `LANGS` is the same ten in every bundle, so the picker is
+  complete before anything is fetched, and a bundle that never arrives leaves the page in
+  the language it is already in rather than showing keys.
   **Anything JavaScript writes has to be redrawn on `langchange`** — `/app/` swaps the DOM
   instead of navigating, so a list, a date or a chip rendered once stays in the old
-  language otherwise.
+  language otherwise. That rule is now load-bearing rather than tidy: the switch is
+  asynchronous, so the page paints in `DEFAULT_LANG` first and `langchange` is what corrects
+  it. A browser test that clicks the picker has to wait for `document.documentElement.lang`
+  (`pickLang()` in `scripts/test-account-page.mjs`).
 - `/app/` signed out is three views in one card — sign in, sign up, reset the password —
   each with its own form, because the browser's password manager keys off `autocomplete`
   and one field cannot be both `current-password` and `new-password`. `?mode=signup` and
@@ -1149,6 +1188,25 @@ Kotlin side of it. Change one, change all three.
   `white-space: normal; overflow-wrap: anywhere`. With `nowrap` a grid or flex item could
   not shrink below its longest sentence, and one Romanian label took the page 103 px off
   the side of a 320 px phone.
+- **The narrative stays in the source and stops at the door.** `assets/styles.css` is
+  authored with the argument for every token next to the rule it explains — 31 of its 90 kB,
+  and 13 of the 24 kB that actually crossed the wire on the one render-blocking request every
+  page makes. `buildStylesheet()` emits `assets/styles.min.css` from it: comments and
+  indentation gone, **nothing else touched** — no selector reordered, no value shortened, no
+  rule merged, so the shipped file still diffs against the source. `src/tokens.mjs` still
+  validates the authored file and a person still edits it. The same decision applies to the
+  markup: `src/template.mjs`, `src/pages.mjs` and `src/app-pages.mjs` explain themselves in
+  HTML comments, and `write()` strips those from every generated page (2.4 kB on the home
+  page, 6 kB on `/klienci/`). A comment inside `<script>`, `<style>`, `<pre>` or `<textarea>`
+  is stepped over whole — it is code, or it is text somebody is meant to see.
+  `scripts/test-perf.mjs` §2 and §7 fail if either half stops holding.
+- **Analytics is fetched after `load`, and consent is still set before it.** The inline block
+  in `src/template.mjs` defines `gtag()`, pushes the Consent Mode v2 defaults, re-applies a
+  saved "accept" and calls `config` — all before the library exists, because `dataLayer` is
+  an array and gtag.js replays it in order when it arrives. `gtag/js` was the only
+  third-party request on the render path and by some distance the largest download on a
+  page. There is no `preconnect` any more either: it opened a TLS connection for a request
+  that no longer happens during the render.
 - **Bump `STAMP` in `scripts/build.mjs`** whenever a shipped asset changes, then rebuild.
   It is the single `?v=` value for every page. GitHub Pages serves assets with
   `max-age=600`, so without it a visitor can run new markup against a stale stylesheet.

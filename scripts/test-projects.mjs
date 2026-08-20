@@ -464,7 +464,12 @@ head("9. the frame the build writes");
 
 head("10. the script the page runs");
 {
-  const src = readFileSync(p("assets/workspace-ui.js"), "utf8");
+  // Session 33 cut the file in two: the calculator page went to assets/workspace-calc.js
+  // so that 150 calculator pages stop downloading this screen. "Nothing calls prompt()"
+  // is a rule about the workspace and not about one file, so both halves are read.
+  const halves = ["assets/workspace-calc.js", "assets/workspace-ui.js"]
+    .map((f) => readFileSync(p(f), "utf8"));
+  const src = halves.join("\n");
   // The comments below say what these two used to be, so they have to come out before
   // the file is searched for a call to them.
   const code = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");

@@ -8,6 +8,14 @@ Wersja maszynowa leży w **`assets/styles.css`** — blok tokenów na górze pli
 które te tokeny wydają. Ten dokument mówi **dlaczego i kiedy**, arkusz mówi **ile**.
 Gdy się rozjadą, prawdą jest arkusz.
 
+**To jest plik, który się edytuje.** Do przeglądarki idzie `assets/styles.min.css`, który
+Sesja 33 kazała buildowi wypisywać z niego: te same reguły w tej samej kolejności i z tymi
+samymi wartościami, bez komentarzy i bez wcięć. Komentarze w tym arkuszu to 31 z jego
+90 kB, a po kompresji 13 z 24 kB — czyli ponad połowa jedynego żądania, które blokuje
+pierwsze malowanie każdej z 373 stron. Argument zostaje przy regule, którą tłumaczy;
+odwiedzający dostaje regułę. `validateTokens()` czyta nadal `assets/styles.css`,
+a `scripts/test-perf.mjs` §2 pilnuje, że pod spodem to jeden i ten sam arkusz.
+
 Zasada, na której stoi całość:
 
 > **Żadna reguła poza blokiem tokenów nie wymyśla własnego koloru, rozmiaru,

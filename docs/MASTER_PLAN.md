@@ -59,7 +59,8 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 30 | SEO techniczne | **Zrobione** — 2026-08-20 |
 | 31 | SEO kalkulatorów | **Zrobione** — 2026-08-20 |
 | 32 | Mobile QA | **Zrobione** — 2026-08-20 |
-| 33–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 33 | Performance | **Zrobione** — 2026-08-20 |
+| 34–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -214,6 +215,167 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 33
+
+Rozdział XXXII, Sesja 33 w całości: **„PERFORMANCE. Optymalizacja: ładowania, JS, CSS,
+obrazów, fontów, bundle. Szczególnie sprawdzić assety flag, logo i ikon."**
+
+Wydajność jest jedyną cechą tego serwisu, której **nic** dotąd nie pilnowało. Strona może
+być poprawna w dziesięciu językach, przejść każdą szerokość telefonu, mieć bezbłędny
+`canonical` — i kazać komuś na budowie czekać na 300 kB słowników, których nigdy nie
+przeczyta. Żaden z osiemnastu zestawów testów nie oblewał, gdy plik się podwajał, więc pliki
+się podwajały.
+
+**Zmierzone przed i po**, wszystko po gzipie, bo to jest to, co serwuje GitHub Pages:
+
+| Strona | Przed | Po | Mniej |
+|---|---|---|---|
+| `/app/` | 985,9 kB / 308,1 kB | 320,6 kB / 97,3 kB | **−67% / −68%** |
+| `/app/dashboard/` | 922,1 kB / 288,2 kB | 259,2 kB / 78,4 kB | **−72% / −73%** |
+| kalkulator | 410,0 kB / 124,7 kB | 325,7 kB / 99,2 kB | −21% / −20% |
+| strona główna | 223,5 kB / 67,2 kB | 191,6 kB / 54,6 kB | −14% / −19% |
+| poradnik | 220,3 kB / 66,5 kB | 188,4 kB / 53,9 kB | −14% / −19% |
+| `/materialy/` | 321,1 kB / 84,5 kB | 289,2 kB / 71,9 kB | −10% / −15% |
+| `/klienci/` | 398,1 kB / 124,7 kB | 364,2 kB / 111,1 kB | −9% / −11% |
+
+Do tego **gtag.js — jedyne żądanie do obcego hosta i największy pojedynczy plik, jaki
+strona pobiera — zniknął ze ścieżki renderowania.** Tego nie ma w tabeli, bo jego rozmiar
+należy do Google'a, nie do tego repo.
+
+**1. `/app/`, `/app/dashboard/` i `/p/` pobierały dziesięć słowników zamiast jednego.**
+`assets/i18n.all.js` ważył **703 kB (220 kB po gzipie)** i te trzy strony były jedynymi,
+które go pobierały — bo nie mają własnego adresu językowego i tłumaczą się w miejscu.
+Plik został skasowany. Każdy słownik `assets/i18n.<lang>.js` jest teraz **addytywny**
+(`var I18N = (typeof I18N === "object" && I18N) || {}`, potem `I18N["de"] = …`), więc drugi
+dokłada się do pierwszego zamiast się z nim zderzać, a `ensureLang()` w
+`assets/i18n-runtime.js` dociąga go dopiero wtedy, gdy ktoś naprawdę wybierze inny język.
+`LANGS` jest w każdym słowniku ten sam i pełny, więc przełącznik pokazuje dziesięć języków,
+zanim cokolwiek zostanie pobrane. Słownik, który nie dojedzie, zostawia stronę w języku,
+w którym jest — nie w kluczach. To robi z reguły „wszystko, co pisze JavaScript, ma się
+przerysować na `langchange`" regułę **nośną**, a nie porządkową: przełączenie jest teraz
+asynchroniczne. Test w przeglądarce, który klika przełącznik, musi na to poczekać
+(`pickLang()` w `scripts/test-account-page.mjs`).
+
+**2. Ponad połowa arkusza stylów, który blokuje pierwsze malowanie, to komentarze.**
+`assets/styles.css` jest pisany tak, żeby dało się go czytać: argument za każdym tokenem
+stoi obok reguły, którą tłumaczy. To **31 z 90 kB**, a że proza kompresuje się lepiej niż
+selektory — **13 z 24 kB**, które faktycznie szły drutem, na jedynym żądaniu blokującym
+render każdej z 373 stron. Build wypisuje teraz `assets/styles.min.css`: te same reguły,
+ta sama kolejność, te same wartości, bez komentarzy i wcięć. **Nic więcej nie jest
+przepisywane** — żaden selektor nie jest przestawiony, `#ffffff` nie robi się `#fff`, więc
+plik wysyłany nadal da się zdiffować ze źródłem. `src/tokens.mjs` sprawdza dalej plik
+autorski. 24,2 kB → 10,5 kB po gzipie.
+
+**3. To samo dotyczyło znaczników.** `src/template.mjs`, `src/pages.mjs` i
+`src/app-pages.mjs` tłumaczą się komentarzami HTML stojącymi przy bloku, który opisują —
+i te komentarze szły do przeglądarki: 2,4 kB na stronie głównej, ponad 6 kB na
+`/klienci/`, na każde wejście. `write()` zdejmuje je teraz z każdej generowanej strony.
+Komentarz w `<script>`, `<style>`, `<pre>` albo `<textarea>` jest przeskakiwany w całości —
+to kod albo tekst, który ktoś ma zobaczyć. Nic innego nie jest ruszane: żaden znacznik nie
+jest przepisany, białe znaki zostają.
+
+**4. `assets/workspace-ui.js` (70 kB) pobierało 150 stron kalkulatorów, żeby dostać pasek
+pomieszczeń i pudełko zapisu.** Plik był jeden i trzymał trzy rzeczy: kalkulator, cały
+ekran `/projekty/` i cały `/kosztorys/`. Został przecięty w szwie, który już tam był —
+`assets/workspace-calc.js` to wspólne słownictwo (`wsT`, `wsEsc`, `wsNum`, `wsDecimal`,
+`wsPlain`, `wsUnit`, `wsLang`) plus strona kalkulatora, `assets/workspace-ui.js` to dwa
+ekrany. **Nic nie przeszło między połówkami i nic nie zostało przepisane**: ekran projektów
+nigdy nie wołał do kalkulatora ani kalkulator do niego. Kalkulator pobiera 17,8 kB zamiast
+70,2 kB; `/projekty/` i `/kosztorys/` pobierają obie połówki, w tej kolejności.
+
+**5. gtag.js jest dociągany po zdarzeniu `load`.** Blok inline zostaje tam, gdzie był:
+definiuje `gtag()`, ustawia domyślne zgody Consent Mode v2, odtwarza zapisaną zgodę
+i woła `config` — wszystko **zanim biblioteka istnieje**, bo `dataLayer` to tablica,
+a gtag.js odtwarza ją po kolei, gdy dojedzie. Nie ginie ani jedna odsłona, a zgoda jest
+nadal ustawiona zanim cokolwiek może sięgnąć po ciasteczko — to jedyna rzecz w tym bloku,
+która nie mogła się przesunąć. Zniknął też `preconnect`: otwierał połączenie TLS na
+żądanie, które w trakcie renderu już nie następuje, a nieużywane połączenie i tak jest
+zamykane. `dns-prefetch` zostaje.
+
+**6. Flagi, logo i ikony — to, co rozdział XXXII każe sprawdzić osobno.**
+
+- **Flagi w słowniku: 3,8 kB na każdej stronie za nic.** `LANGS` niosło dziesięć wklejonych
+  SVG w **każdym** `assets/i18n.<lang>.js`, czyli na każdym wejściu na serwis — a
+  przełącznik na 370 z 373 stron jest wypisany przez generator do HTML-a, razem z flagami.
+  Kształty przeniosły się do `assets/flags.js`, który pobierają **tylko** te trzy strony,
+  które budują przełącznik same.
+- **Flagi wklejone w HTML zostają i to jest dobra decyzja — zmierzona, nie założona.**
+  Dwadzieścia jeden wklejonych flag na stronie głównej to **536 bajtów** po gzipie, czyli
+  mniej niż nagłówki jednego żądania. Dziesięć `<img>` byłoby dziesięcioma żądaniami,
+  mogłoby doskoczyć po pierwszym malowaniu i znikałoby bez sieci. Nic tu nie zmieniono.
+- **Trzy `rel="icon"` w nagłówku, z czego jeden 192-pikselowy.** Przeglądarka, która
+  wybiera największą zadeklarowaną ikonę, pobierała **5,4 kB, żeby narysować kartę 16 px**.
+  Rozmiary 192 i 512 są już zadeklarowane w `site.webmanifest`, czyli tam, gdzie taki
+  rozmiar jest naprawdę potrzebny. Zostały dwie: `favicon.svg` (809 B) i `favicon-32.png`.
+- **`favicon-32.png` i `apple-touch-icon.png` nie miały `?v=`.** Ikona jest cache'owana
+  mocniej niż cokolwiek innego na serwisie, a te dwie nie miały jak zostać podmienione.
+  Teraz mają stempel jak reszta.
+- **Logo jest geometrią w znacznikach, nie żądaniem.** Bez zmian, z tego samego powodu co
+  flagi.
+
+**7. Fontów nie ma i to jest ta optymalizacja.** Żadnego `@font-face`, żadnego
+`fonts.googleapis.com`, żadnego `.woff2` — system projektowy wydaje font, który urządzenie
+już ma. Font webowy to blokujące pobranie w każdej odmianie, na łączu, na którym ten serwis
+jest używany. Test tego pilnuje, żeby nie wrócił niepostrzeżenie.
+
+**8. Nowy test: `scripts/test-perf.mjs` (13 158 sprawdzeń).** Czyta te same pliki, co
+przeglądarka — stronę, a potem każdy lokalny asset, o który prosi jej HTML — i sumuje je,
+surowo i po gzipie, **wobec budżetu spisanego na typ strony**, plus sufit, który musi
+przejść każda z 375. Liczby, nie przymiotniki. Sprawdza też: że wysyłany arkusz to arkusz
+autorski bez komentarzy i że pod spodem to ten sam CSS; że strona pobiera jeden język i umie
+dobrać drugi; flagi, logo i ikony; co stoi na ścieżce renderu (zero obcych `<script src>`
+w znacznikach, jeden arkusz, brak `preconnect`, jeden stempel `?v=`); obrazy z `width`,
+`height`, `decoding` i `loading="lazy"` poza pierwszym; brak komentarza HTML na stronie
+generowanej; obie połówki workspace'u i to, że żadna strona nie wymienia skryptu dwa razy.
+**Nie mierzy czasu** — czas na tej maszynie jest faktem o tej maszynie; bajty, żądania
+i ścieżka renderu są własnością builda i są takie same wszędzie.
+
+**Czego ta sesja nie zrobiła.** Nie ruszała matematyki kalkulatorów, treści, slugów ani
+adresów (rozdział XIII i XXXIV). Nie minifikowała `assets/*.js`: komentarze w nich są
+dokumentacją tego repo, a bezpieczne zdjęcie komentarzy z JavaScriptu wymaga prawdziwego
+tokenizera (literały regex, ciągi znaków) — to osobna decyzja, nie skutek uboczny sesji
+o wydajności. Nie dzieliła słownika na podzbiory per typ strony: strona kalkulatora zużywa
+kilkaset z 1147 kluczy, ale klucze budowane dynamicznie (`res_*`, `c_<id>_*`) sprawiają, że
+build nie potrafi tego udowodnić, a słownik z brakującym kluczem psuje stronę po cichu.
+Nie tknęła obrazów: zrzuty są w WebP, mają `width`, `height`, `decoding="async"`
+i `loading="lazy"` poza pierwszym — nie było czego poprawiać.
+
+**Znalezione, nienaprawione** (rozdział XXXV — to nie jest zadanie tej sesji):
+
+- **`assets/banner.jpg` (40 kB) nie jest linkowany z żadnej strony.** To materiał źródłowy
+  do listingu Google Play (`DOKUMENTACJA.md`: „Baner promocyjny"), a nie martwy plik — leży
+  jednak w artefakcie Pages, bo korzeń repo jest korzeniem serwisu. Nikt go nie pobiera;
+  decyzja, czy ma tam zostać, należy do właściciela.
+- **Komentarze w skryptach inline w `<head>` (~1,5 kB na stronę) nadal jadą do
+  przeglądarki.** Stripper HTML przeskakuje `<script>` w całości i słusznie; zdjęcie
+  komentarzy z JavaScriptu to ten sam problem co punkt wyżej.
+- **`assets/i18n.ru.js` (96 kB) i `assets/i18n.uk.js` (95 kB)** są o połowę większe niż
+  łacińskie — cyrylica to dwa bajty UTF-8 na literę. Nie da się z tym nic zrobić poza
+  niewysyłaniem języka. Sufit pojedynczego assetu jest ustawiony przez te dwa pliki.
+
+**Zmienione pliki.** Nowe: `scripts/test-perf.mjs`, `assets/workspace-calc.js`,
+`assets/styles.min.css` (generowany), `assets/flags.js` (generowany). Usunięte:
+`assets/i18n.all.js`. Zmienione: `scripts/build.mjs` (`buildStylesheet()`,
+`stripCssComments()`, `buildFlags()`, `stripHtmlComments()` w `write()`, addytywne
+słowniki, `LANG_META` bez flagi, listy skryptów, `STAMP` → `20260820d`),
+`src/template.mjs` (arkusz, ikony, gtag po `load`, brak `preconnect`, `flags.js` na
+stronach bez języka), `assets/i18n-runtime.js` (`ensureLang()`, `LM_ASSET_QUERY`,
+`langOffered()`, `langRow()` z `LM_FLAGS`), `assets/workspace-ui.js` (druga połowa),
+`scripts/test-account-page.mjs` (`pickLang()`), `scripts/test-projects.mjs` (czyta obie
+połówki), `404.html` i `privacy-policy.html` (arkusz, ikony, `?v=`), `CLAUDE.md`,
+`docs/DESIGN_SYSTEM.md`, `docs/DOKUMENTACJA.md`, `docs/MASTER_PLAN.md`, 373 przebudowane
+strony i dziesięć wygenerowanych słowników.
+
+**Testy.** **67 498 sprawdzeń logiki** w 19 zestawach — wszystkie przechodzą, w tym nowy
+`scripts/test-perf.mjs` (13 158). `scripts/build.mjs --check`: 1147 kluczy × 10 języków.
+`scripts/check-contrast.mjs`: wszystkie pary przechodzą. W Chromium **3875 sprawdzeń
+w 15 zestawach, wszystkie zielone** — cały zestaw przebiegnięty po zmianach, bo ta sesja
+ruszyła ładowanie słownika i podział pliku, który czyta pięć z nich.
+
+**Status: ukończone.**
+
+**Następne zadanie: Sesja 34 — ACCESSIBILITY.**
 
 ### Co zrobiła Sesja 32
 

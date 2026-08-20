@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
-     flash. No stored choice means "follow the system", which is also the CSS default. -->
 <script>
   // "js" says the drawer, the pop-up menus and everything else that needs a script
   // will work. Without it the navigation renders as a plain list instead of hiding
@@ -20,8 +18,6 @@
     if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
-<!-- Google tag (gtag.js) with Consent Mode v2 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -42,12 +38,26 @@
   } catch (e) {}
 
   gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The analytics tag is the only third-party request a public page makes; opening the
-     connection alongside the HTML keeps it off the render path. -->
-<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Moje konto — LiczMat</title>
 <meta name="description" content="Konto jest darmowe i opcjonalne. Trzyma projekty, pomieszczenia i kosztorysy w telefonie i w przeglądarce naraz.">
@@ -59,10 +69,9 @@
 <meta name="application-name" content="LiczMat">
 <link rel="canonical" href="https://liczmat.com/app/">
 
-<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820c" type="image/svg+xml">
-<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -80,7 +89,7 @@
 <meta name="twitter:description" content="Konto jest darmowe i opcjonalne. Trzyma projekty, pomieszczenia i kosztorysy w telefonie i w przeglądarce naraz.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820c">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
 
 <script>window.LM_NAV = {"calculators":{"pl":"/kalkulatory/","uk":"/uk/kalkulyatory/","de":"/de/rechner/","en":"/en/calculators/","cs":"/cs/kalkulacky/","sk":"/sk/kalkulacky/","ro":"/ro/calculatoare/","hr":"/hr/kalkulatori/","sr":"/sr/kalkulatori/","ru":"/ru/kalkulyatory/"},"materials":{"pl":"/materialy/","uk":"/uk/materialy/","de":"/de/materialien/","en":"/en/materials/","cs":"/cs/materialy/","sk":"/sk/materialy/","ro":"/ro/materiale/","hr":"/hr/materijali/","sr":"/sr/materijali/","ru":"/ru/materialy/"},"projects":{"pl":"/projekty/","uk":"/uk/proekty/","de":"/de/projekte/","en":"/en/projects/","cs":"/cs/projekty/","sk":"/sk/projekty/","ro":"/ro/proiecte/","hr":"/hr/projekti/","sr":"/sr/projekti/","ru":"/ru/proekty/"},"guides":{"pl":"/poradniki/","uk":"/uk/porady/","de":"/de/ratgeber/","en":"/en/guides/","cs":"/cs/navody/","sk":"/sk/navody/","ro":"/ro/ghiduri/","hr":"/hr/vodici/","sr":"/sr/vodici/","ru":"/ru/rukovodstva/"},"android":{"pl":"/aplikacja/","uk":"/uk/dodatok/","de":"/de/android-app/","en":"/en/android-app/","cs":"/cs/aplikace/","sk":"/sk/aplikacia/","ro":"/ro/aplicatie/","hr":"/hr/aplikacija/","sr":"/sr/aplikacija/","ru":"/ru/prilozhenie/"},"clients":{"pl":"/klienci/","uk":"/uk/kliyenty/","de":"/de/kunden/","en":"/en/clients/","cs":"/cs/klienti/","sk":"/sk/klienti/","ro":"/ro/clienti/","hr":"/hr/klijenti/","sr":"/sr/klijenti/","ru":"/ru/klienty/"},"jobs":{"pl":"/zlecenia/","uk":"/uk/zamovlennya/","de":"/de/auftraege/","en":"/en/jobs/","cs":"/cs/zakazky/","sk":"/sk/zakazky/","ro":"/ro/comenzi/","hr":"/hr/nalozi/","sr":"/sr/nalozi/","ru":"/ru/zakazy/"},"quotes":{"pl":"/wyceny/","uk":"/uk/koshtorysy-pro/","de":"/de/angebote/","en":"/en/quotes/","cs":"/cs/cenove-nabidky/","sk":"/sk/cenove-ponuky/","ro":"/ro/oferte/","hr":"/hr/ponude/","sr":"/sr/ponude/","ru":"/ru/kommercheskie-predlozheniya/"},"calendar":{"pl":"/terminarz/","uk":"/uk/kalendar/","de":"/de/termine/","en":"/en/schedule/","cs":"/cs/terminy/","sk":"/sk/terminy/","ro":"/ro/termene/","hr":"/hr/rokovi/","sr":"/sr/rokovi/","ru":"/ru/sroki/"},"liczmat-pro":{"pl":"/liczmat-pro/","uk":"/uk/liczmat-pro/","de":"/de/liczmat-pro/","en":"/en/liczmat-pro/","cs":"/cs/liczmat-pro/","sk":"/sk/liczmat-pro/","ro":"/ro/liczmat-pro/","hr":"/hr/liczmat-pro/","sr":"/sr/liczmat-pro/","ru":"/ru/liczmat-pro/"}};</script>
 </head>
@@ -107,9 +116,6 @@
     <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otwórz menu" data-i18n-aria="nav_menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
   </div>
 </header>
-<!-- Outside <header>, because the header's backdrop-filter makes it the containing
-     block for anything position:fixed inside it — in there the scrim would be as tall
-     as the header bar and dim nothing. -->
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main">
   <section class="block page-head">
@@ -126,11 +132,7 @@
 
       <div id="app-auth">
         <div class="calc">
-          <!-- Three views, one card. Sign-in and sign-up are separate forms rather than
-               one form with a toggled label: they want different autocomplete hints, and
-               a browser offering to save a password only gets that right when the form
-               says which of the two it is. Resetting a password had no field of its own
-               at all and borrowed the sign-in one, which failed when it was empty. -->
+          
           <div data-auth-view="signin">
             <h2 data-i18n="app_signin">Zaloguj się</h2>
             <form id="signin-form" autocomplete="on">
@@ -198,8 +200,7 @@
           <p class="muted auth-note" data-i18n="app_auth_note">Konto jest opcjonalne. Kalkulatory liczą bez logowania — konto potrzebne jest dopiero, żeby mieć te same projekty na telefonie i w przeglądarce.</p>
         </div>
 
-        <!-- Chapter II, for somebody who has not signed in yet: what a guest already
-             gets, what the free account adds, and what Pro is going to be. -->
+        
         <section class="app-levels" aria-labelledby="acc-levels-h">
           <h2 id="acc-levels-h" data-i18n="acc_levels_t">Trzy poziomy LiczMat</h2>
           <p class="muted" data-i18n="acc_levels_d">Liczenie nie wymaga konta. Konto zaczyna się tam, gdzie chcesz coś zachować.</p>
@@ -238,17 +239,13 @@
             <span id="app-verified" class="chip"></span>
           </span>
           <span class="app-bar-actions">
-            <!-- Session 14: the dashboard is where somebody signed in actually starts —
-                 projects, the last calculations and the tools they use. /app/ is the
-                 settings, so it points at it rather than being it. -->
+            
             <a class="btn btn-ghost btn-sm" href="/app/dashboard/" data-i18n="nav_dashboard">Pulpit</a>
             <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">Wyloguj</button>
           </span>
         </div>
 
-        <!-- Where the visitor came from, when they arrived at a sign-up prompt under a
-             calculator result. Shown only after signing in, and only for a path on this
-             site — see lmSafeNext() in assets/account.js. -->
+        
         <p id="app-next" class="app-next" hidden>
           <a id="app-next-link" class="btn btn-primary btn-sm" href="/" data-i18n="app_back_to">Wróć na poprzednią stronę</a>
         </p>
@@ -261,13 +258,7 @@
           <button type="button" class="app-tab" role="tab" id="tab-account" aria-controls="panel-account" data-tab="account" aria-selected="false" tabindex="-1" data-i18n="app_tab_account">Konto</button>
         </div>
 
-        <!-- Chapter XVIII: "Pomieszczenia są elementem projektu." Until the owner reported
-             it after session 20, /app/ had two tabs and no link between them at all —
-             addRoom() did not even write a projectId, so a room made here belonged to
-             nothing. One tab now, rooms under the project they were measured for, and the
-             rooms nobody assigned in a group of their own at the bottom: that is what a
-             room pulled off the phone looks like, because SyncContract.roomToDoc() has no
-             projectId to send. The lists are drawn by assets/app.js. -->
+        
         <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0">
           <h2 data-i18n="app_projects">Projekty</h2>
           <form id="project-form" class="inline-form">
@@ -356,20 +347,12 @@
           </div>
         </section>
 
-        <!-- Session 21: the Free/Pro model. Nothing here is a lock — the modules do not
-             exist yet (sessions 22-26) and the plan field that would grant them is
-             server-only with nothing writing it. What the tab does is what chapter XXV
-             asks for first: make a free user understand what Pro is and where their own
-             plan stands, without a button that goes nowhere. -->
+        
         <section data-panel="pro" id="panel-pro" role="tabpanel" aria-labelledby="tab-pro" tabindex="0" hidden>
           <h2 data-i18n="pro_t">LiczMat Pro</h2>
       <p class="muted" data-i18n="pro_d">LiczMat ogarnia Twoje projekty. Pro ogarnia Twoją pracę: klienci, zlecenia, wyceny i terminy obok tego, co już liczysz.</p>
 
-      <!-- Where this account stands. plan, planValidUntil and planRenews are server-only
-           fields, so the page reads them and can never set them; assets/app.js fills all
-           four elements from lmSubscription(). The "manage" link goes to Stripe's own
-           portal — cancelling has to be a write to Stripe, and this site has no server to
-           write with, so offering a cancel button here would be a button that lies. -->
+      
       <div class="app-card" id="plan-card">
         <h3 data-i18n="plan_t">Twój plan</h3>
         <p class="muted" data-i18n="plan_d">Plan jest zapisany przy koncie na serwerze. Przeglądarka go czyta i nie potrafi zmienić.</p>
@@ -420,13 +403,7 @@
 
       <p><a class="btn btn-ghost btn-sm" data-nav-route="liczmat-pro" href="/liczmat-pro/" data-i18n="pro_more">Poznaj LiczMat Pro</a></p>
 
-      <!-- Session 28: the checkout. This is the ONLY place on the site that offers to
-           take money, because it is the only page that knows the uid a payment has to be
-           attached to — a Payment Link without client_reference_id buys a plan for
-           nobody. The wall on a Pro page links here instead of paying there. The block
-           is shared with that wall, so the two cannot quote different prices. The button
-           stays hidden until assets/pay.js carries a Payment Link — see the ORDER note
-           at the bottom of that file. -->
+      
       <div id="plan-buy">
       <div class="pw-plans">
           <h3 data-i18n="pay_t">Subskrypcja LiczMat Pro</h3>
@@ -515,18 +492,16 @@
   </div>
 </footer>
 
-<script src="/assets/i18n.all.js?v=20260820c"></script>
-<script src="/assets/i18n-runtime.js?v=20260820c"></script>
-<script src="/assets/currency.js?v=20260820c"></script>
-<!-- The session, on every page: which of chapter II's three levels this browser was
-     last told it is on. Two kilobytes, no network, and it is what lets a calculator
-     page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820c"></script>
-<script src="/assets/workspace.js?v=20260820c"></script>
-<script src="/assets/plan.js?v=20260820c"></script>
-<script src="/assets/pay.js?v=20260820c"></script>
-<script type="module" src="/assets/app.js?v=20260820c"></script>
-<script src="/assets/main.js?v=20260820c"></script>
+<script src="/assets/flags.js?v=20260820d"></script>
+<script src="/assets/i18n.pl.js?v=20260820d"></script>
+<script src="/assets/i18n-runtime.js?v=20260820d"></script>
+<script src="/assets/currency.js?v=20260820d"></script>
+<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/workspace.js?v=20260820d"></script>
+<script src="/assets/plan.js?v=20260820d"></script>
+<script src="/assets/pay.js?v=20260820d"></script>
+<script type="module" src="/assets/app.js?v=20260820d"></script>
+<script src="/assets/main.js?v=20260820d"></script>
 
 </body>
 </html>

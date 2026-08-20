@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
-     flash. No stored choice means "follow the system", which is also the CSS default. -->
 <script>
   // "js" says the drawer, the pop-up menus and everything else that needs a script
   // will work. Without it the navigation renders as a plain list instead of hiding
@@ -20,8 +18,6 @@
     if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
-<!-- Google tag (gtag.js) with Consent Mode v2 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -42,12 +38,26 @@
   } catch (e) {}
 
   gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The analytics tag is the only third-party request a public page makes; opening the
-     connection alongside the HTML keeps it off the render path. -->
-<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Clients — LiczMat</title>
 <meta name="description" content="Clients in LiczMat Pro: a client list with contact details and notes, the client's projects and the history of calculations. The rows stay in this browser.">
@@ -69,10 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/klijenti/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/klienty/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/">
-<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820c" type="image/svg+xml">
-<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -98,7 +107,7 @@
 <meta name="twitter:description" content="Clients in LiczMat Pro: a client list with contact details and notes, the client's projects and the history of calculations. The rows stay in this browser.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820c">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -160,9 +169,6 @@
     <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
   </div>
 </header>
-<!-- Outside <header>, because the header's backdrop-filter makes it the containing
-     block for anything position:fixed inside it — in there the scrim would be as tall
-     as the header bar and dim nothing. -->
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main">
   <section class="block page-head">
@@ -175,9 +181,7 @@
 
   <section class="block alt" id="crm-page">
     <div class="wrap narrow">
-      <!-- Chapter XXV's strip, above the module for somebody who may use it: which plan
-           opened it. assets/paywall.js hides the whole strip when the wall is up,
-           because the wall says all of it and twice is worse than once. -->
+      
       <p class="crm-pro" id="crm-pro" hidden>
         <span class="chip" id="crm-pro-chip">Available in LiczMat Pro</span>
       </p>
@@ -187,8 +191,7 @@
         <p class="muted">A list of clients with contact details, notes and the history of working with them.</p>
         <p><span class="chip">Available in LiczMat Pro</span></p>
 
-        <!-- One rung of the Free → Pro path, chosen by assets/paywall.js from the level.
-             Both are in the markup; neither is shown until the script knows which. -->
+        
         <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro is a plan on an account. Create a free LiczMat account or sign in first — Pro can only be switched on for an account.</p>
         <p class="pw-step" data-pw-step="account" hidden>
           <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fen%2Fclients%2F" rel="nofollow">Create a free account</a>
@@ -237,9 +240,7 @@
         </div>
 
         <div id="crm-client-body" hidden>
-          <!-- Chapter XX's "dane kontaktowe": a phone that dials and an address that can
-               be copied. Written by the script, because a client with no e-mail must not
-               leave an empty line behind. -->
+          
           <p class="crm-contact" id="crm-contact"></p>
 
           <div class="ws-project-figs">
@@ -255,9 +256,7 @@
             <button type="button" class="btn btn-ghost btn-sm" id="crm-client-delete">Delete</button>
           </div>
 
-          <!-- The whole record in one form, on the page rather than in a browser dialog:
-               prompt() cannot be translated once it is open and covers the row it is
-               about on a phone (chapter XXVIII). -->
+          
           <form id="crm-edit-form" class="mt-4" hidden>
             <p class="ws-mat-grid">
               <label class="ws-mat-f">
@@ -302,10 +301,7 @@
             <p id="crm-note" class="crm-note"></p>
           </section>
 
-          <!-- Chapter XX: "Klient może posiadać … projekty", and chapter XXIV's path
-               begins with them. The link is stored on the client (assets/crm.js says
-               why); the project itself is the same row /projekty/ shows and is never
-               touched from here. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Projects</h2>
@@ -319,9 +315,7 @@
             </form>
           </section>
 
-          <!-- Chapter XX: "Klient może posiadać … zlecenia", and chapter XXIV's path runs
-               through them. The job is written on /zlecenia/ — this is the client's end of
-               the same link, read-only, so one screen owns the writes. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Jobs</h2>
@@ -331,10 +325,7 @@
             <ul id="crm-client-jobs" class="data-list"></ul>
           </section>
 
-          <!-- Chapter XX: "Klient może posiadać … wyceny", and the fourth step of chapter
-               XXIV's path seen from its first. Nothing about the link is stored on the
-               client: a quote keeps its project, the client keeps their projects, and
-               crmClientQuotes() is where the two ends meet. Read-only, like the jobs. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Quotes</h2>
@@ -344,10 +335,7 @@
             <ul id="crm-client-quotes" class="data-list"></ul>
           </section>
 
-          <!-- Chapter XXIV's last step, and chapter XX's "historia": the client, their
-               jobs, the quotes priced from their projects and every calculation and cost
-               saved into one — each read with the date on the document itself. Nothing is
-               logged separately, and crm_hist_note says out loud what that leaves out. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>History</h2>
@@ -480,22 +468,20 @@
   "sr": "/sr/klijenti/",
   "ru": "/ru/klienty/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260820c"></script>
-<script src="/assets/i18n-runtime.js?v=20260820c"></script>
-<script src="/assets/currency.js?v=20260820c"></script>
-<!-- The session, on every page: which of chapter II's three levels this browser was
-     last told it is on. Two kilobytes, no network, and it is what lets a calculator
-     page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820c"></script>
 
-<script src="/assets/workspace.js?v=20260820c"></script>
-<script src="/assets/plan.js?v=20260820c"></script>
-<script src="/assets/pay.js?v=20260820c"></script>
-<script src="/assets/paywall.js?v=20260820c"></script>
-<script src="/assets/crm.js?v=20260820c"></script>
-<script src="/assets/crm-chain.js?v=20260820c"></script>
-<script src="/assets/crm-ui.js?v=20260820c"></script>
-<script src="/assets/main.js?v=20260820c"></script>
+<script src="/assets/i18n.en.js?v=20260820d"></script>
+<script src="/assets/i18n-runtime.js?v=20260820d"></script>
+<script src="/assets/currency.js?v=20260820d"></script>
+<script src="/assets/account.js?v=20260820d"></script>
+
+<script src="/assets/workspace.js?v=20260820d"></script>
+<script src="/assets/plan.js?v=20260820d"></script>
+<script src="/assets/pay.js?v=20260820d"></script>
+<script src="/assets/paywall.js?v=20260820d"></script>
+<script src="/assets/crm.js?v=20260820d"></script>
+<script src="/assets/crm-chain.js?v=20260820d"></script>
+<script src="/assets/crm-ui.js?v=20260820d"></script>
+<script src="/assets/main.js?v=20260820d"></script>
 
 </body>
 </html>

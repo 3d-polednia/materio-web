@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
-     flash. No stored choice means "follow the system", which is also the CSS default. -->
 <script>
   // "js" says the drawer, the pop-up menus and everything else that needs a script
   // will work. Without it the navigation renders as a plain list instead of hiding
@@ -20,8 +18,6 @@
     if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
-<!-- Google tag (gtag.js) with Consent Mode v2 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -42,12 +38,26 @@
   } catch (e) {}
 
   gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The analytics tag is the only third-party request a public page makes; opening the
-     connection alongside the HTML keeps it off the render path. -->
-<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Zlecenia — LiczMat</title>
 <meta name="description" content="Zlecenia w LiczMat Pro: lista zleceń ze statusem, terminem i uzgodnioną wartością, powiązanie z klientem i projektem. Dane zostają w tej przeglądarce.">
@@ -69,10 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/nalozi/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/zakazy/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/">
-<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820c" type="image/svg+xml">
-<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -98,7 +107,7 @@
 <meta name="twitter:description" content="Zlecenia w LiczMat Pro: lista zleceń ze statusem, terminem i uzgodnioną wartością, powiązanie z klientem i projektem. Dane zostają w tej przeglądarce.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820c">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -166,9 +175,6 @@
     <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otwórz menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
   </div>
 </header>
-<!-- Outside <header>, because the header's backdrop-filter makes it the containing
-     block for anything position:fixed inside it — in there the scrim would be as tall
-     as the header bar and dim nothing. -->
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main">
   <section class="block page-head">
@@ -181,7 +187,7 @@
 
   <section class="block alt" id="job-page">
     <div class="wrap narrow">
-      <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
+      
       <p class="crm-pro" id="job-pro" hidden>
         <span class="chip" id="job-pro-chip">Dostępne w LiczMat Pro</span>
       </p>
@@ -191,8 +197,7 @@
         <p class="muted">Zlecenie z klientem, opisem, statusem, terminem, wartością i powiązanym projektem.</p>
         <p><span class="chip">Dostępne w LiczMat Pro</span></p>
 
-        <!-- One rung of the Free → Pro path, chosen by assets/paywall.js from the level.
-             Both are in the markup; neither is shown until the script knows which. -->
+        
         <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro to plan przy koncie. Załóż najpierw darmowe konto LiczMat albo zaloguj się — Pro da się włączyć tylko na koncie.</p>
         <p class="pw-step" data-pw-step="account" hidden>
           <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fzlecenia%2F" rel="nofollow">Załóż darmowe konto</a>
@@ -241,14 +246,10 @@
         </div>
 
         <div id="job-body" hidden>
-          <!-- Chapter XXIV's path through this job: KLIENT → ZLECENIE → PROJEKT → WYCENA.
-               Drawn by assets/crm-chain.js, which the three CRM screens share so the path
-               reads the same wherever it is standing. A step nobody has filled in links to
-               the page that would fill it. -->
+          
           <nav class="crm-chain" id="job-chain" aria-label="Ścieżka"></nav>
 
-          <!-- Status and date sit above everything else: they are what a tradesman opens
-               a job to check, and chapter XXI names them before the money. -->
+          
           <p class="ws-mat-grid job-head-row">
             <label class="ws-mat-f">
               <span class="ws-bar-label">Status</span>
@@ -275,9 +276,7 @@
             <button type="button" class="btn btn-ghost btn-sm" id="job-delete">Usuń</button>
           </div>
 
-          <!-- The whole record in one form on the page, for the reason /klienci/ gives:
-               prompt() cannot be translated once it is open and covers the row it is
-               about on a phone (chapter XXVIII). -->
+          
           <form id="job-edit-form" class="mt-4" hidden>
             <p class="ws-mat-grid">
               <label class="ws-mat-f">
@@ -323,9 +322,7 @@
             <p id="job-desc" class="crm-note"></p>
           </section>
 
-          <!-- Chapter XXIV's third step: ZLECENIE → PROJEKT. The project is the free
-               workspace's own row — the same one /projekty/ shows — and nothing here
-               renames, archives or deletes it. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Projekt</h2>
@@ -338,9 +335,7 @@
             </form>
           </section>
 
-          <!-- Chapter XXIV's fourth step. A quote is priced from the *project*, so these
-               are the quotes of the project this job carries — crmJobQuotes() — and the
-               figure beside each one is read live rather than copied. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Wyceny</h2>
@@ -357,8 +352,7 @@
             <p id="job-note" class="crm-note"></p>
           </section>
 
-          <!-- Chapter XXIV's last step, for one job: the job itself, the quotes on its
-               project and what was saved into that project. Derived, like everywhere. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Historia</h2>
@@ -493,22 +487,20 @@
   "sr": "/sr/nalozi/",
   "ru": "/ru/zakazy/"
 };</script>
-<script src="/assets/i18n.pl.js?v=20260820c"></script>
-<script src="/assets/i18n-runtime.js?v=20260820c"></script>
-<script src="/assets/currency.js?v=20260820c"></script>
-<!-- The session, on every page: which of chapter II's three levels this browser was
-     last told it is on. Two kilobytes, no network, and it is what lets a calculator
-     page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820c"></script>
 
-<script src="/assets/workspace.js?v=20260820c"></script>
-<script src="/assets/plan.js?v=20260820c"></script>
-<script src="/assets/pay.js?v=20260820c"></script>
-<script src="/assets/paywall.js?v=20260820c"></script>
-<script src="/assets/crm.js?v=20260820c"></script>
-<script src="/assets/crm-chain.js?v=20260820c"></script>
-<script src="/assets/jobs-ui.js?v=20260820c"></script>
-<script src="/assets/main.js?v=20260820c"></script>
+<script src="/assets/i18n.pl.js?v=20260820d"></script>
+<script src="/assets/i18n-runtime.js?v=20260820d"></script>
+<script src="/assets/currency.js?v=20260820d"></script>
+<script src="/assets/account.js?v=20260820d"></script>
+
+<script src="/assets/workspace.js?v=20260820d"></script>
+<script src="/assets/plan.js?v=20260820d"></script>
+<script src="/assets/pay.js?v=20260820d"></script>
+<script src="/assets/paywall.js?v=20260820d"></script>
+<script src="/assets/crm.js?v=20260820d"></script>
+<script src="/assets/crm-chain.js?v=20260820d"></script>
+<script src="/assets/jobs-ui.js?v=20260820d"></script>
+<script src="/assets/main.js?v=20260820d"></script>
 
 </body>
 </html>

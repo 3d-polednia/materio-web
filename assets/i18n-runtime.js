@@ -11,7 +11,60 @@
       opens and closes it. `window.LICZMAT_ALTERNATES` maps a language code to this
       page's address in that language.
    3. Remembering the choice, so the next visit to a shared "/" link lands in the
-      language the visitor picked. */
+      language the visitor picked.
+   4. Fetching a second language bundle for the three pages that have no language of
+      their own (/app/, /app/dashboard/, /p/) — see ensureLang() below. */
+
+/* The "?v=" this file was loaded with, captured while the tag is still executing:
+   `document.currentScript` is null inside a listener. Every asset on a page carries the
+   same stamp, so a bundle fetched later is fetched from the same build as the page that
+   asks for it — without that, a visitor holding a cached page could pull tomorrow's
+   dictionary and read keys the markup does not have. */
+var LM_ASSET_QUERY = (function () {
+  var s = document.currentScript && document.currentScript.getAttribute("src");
+  var q = s && s.indexOf("?") >= 0 ? s.slice(s.indexOf("?")) : "";
+  return q;
+})();
+
+/** Every language the site ships, whether or not its dictionary is in memory yet. */
+function langOffered(code) {
+  return typeof LANGS !== "undefined" && LANGS.some(function (l) { return l.code === code; });
+}
+
+/* A language whose bundle is on its way, so two clicks on the picker cannot start two
+   downloads of the same file. */
+var langPending = {};
+
+/**
+ * Make sure `I18N[lang]` is in memory, then call back.
+ *
+ * A per-language page never needs this: its own bundle is the only one it will ever
+ * translate into, and switching language is a navigation. It exists for /app/,
+ * /app/dashboard/ and /p/, which have no language of their own and swap text in the DOM.
+ * Until session 33 they downloaded all ten dictionaries at once (703 kB, 220 kB gzipped)
+ * so that a switch could be instant. Now they download the one the page is written in and
+ * fetch a second one only if somebody actually asks for another language.
+ *
+ * A bundle that fails to arrive is not an error the visitor should see: the callback runs
+ * anyway, applyLang() finds no dictionary for that language and leaves the page in the one
+ * it is already in, which is the same thing that happens today when a language is unknown.
+ */
+function ensureLang(lang, done) {
+  if (typeof I18N !== "undefined" && I18N[lang]) { done(); return; }
+  if (!langOffered(lang)) { done(); return; }
+  if (langPending[lang]) { langPending[lang].push(done); return; }
+  langPending[lang] = [done];
+  var finish = function () {
+    var waiting = langPending[lang];
+    langPending[lang] = null;
+    for (var i = 0; i < waiting.length; i++) waiting[i]();
+  };
+  var el = document.createElement("script");
+  el.src = "/assets/i18n." + lang + ".js" + LM_ASSET_QUERY;
+  el.onload = finish;
+  el.onerror = finish;
+  document.head.appendChild(el);
+}
 
 /** Translate a key for the page's language, falling back to the key itself. */
 function t(key, lang) {
@@ -37,12 +90,12 @@ function chosenLang() {
 }
 
 /**
- * In-place translation, used only by the two pages that have no per-language URLs:
- * /app/ and /p/. They are noindex, so there is nothing for a crawler to miss, and they
- * ship the full four-language dictionary (assets/i18n.all.js) instead.
+ * In-place translation, used only by the pages that have no per-language URLs: /app/,
+ * /app/dashboard/ and /p/. They are noindex, so there is nothing for a crawler to miss.
+ * Call it through ensureLang(), which is what puts the language in memory first.
  */
 function applyLang(lang) {
-  const l = I18N[lang] ? lang : "pl";
+  const l = I18N[lang] ? lang : pageLang();
   document.documentElement.lang = l;
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n, l); });
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => { el.placeholder = t(el.dataset.i18nPh, l); });
@@ -52,7 +105,10 @@ function applyLang(lang) {
   // translate them.
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t(el.dataset.i18nAria, l)); });
   applyNavUrls(l);
-  try { localStorage.setItem("materio-lang", l); } catch (e) {}
+  // Only a language that actually arrived is written down. A bundle that failed to load
+  // leaves the page where it was, and recording that as the visitor's choice would turn
+  // one dropped request into a preference they never expressed.
+  if (I18N[lang]) { try { localStorage.setItem("materio-lang", l); } catch (e) {} }
   document.dispatchEvent(new CustomEvent("langchange", { detail: { lang: l } }));
 }
 
@@ -79,14 +135,21 @@ function applyNavUrls(lang) {
 /** Best language for an in-place page: saved choice → browser language → Polish. */
 function initialLang() {
   const saved = chosenLang();
-  if (saved && I18N[saved]) return saved;
+  if (saved && langOffered(saved)) return saved;
   const nav = (navigator.language || "pl").slice(0, 2).toLowerCase();
-  return I18N[nav] ? nav : "pl";
+  return langOffered(nav) ? nav : pageLang();
 }
 
-/** One row of the picker: the flag, then the language's own name. Never the flag alone. */
+/**
+ * One row of the picker: the flag, then the language's own name. Never the flag alone.
+ *
+ * The shapes come from assets/flags.js, which only the three pages that build their own
+ * picker load — everywhere else the generator has already written the rows into the
+ * markup, so those pages would be downloading ten SVGs to redraw something they have.
+ */
 function langRow(entry) {
-  return `<span class="flag">${entry.flag || ""}</span><span>${entry.label}</span>`;
+  const flag = (typeof LM_FLAGS !== "undefined" && LM_FLAGS[entry.code]) || "";
+  return `<span class="flag">${flag}</span><span>${entry.label}</span>`;
 }
 
 /* The two document-level handlers below are attached once. /app/ redraws its picker on
@@ -177,19 +240,20 @@ function rememberLangChoice() {
 }
 
 /**
- * /app/ and /p/ carry every language in one bundle and swap text rather than navigate,
- * so their picker is built here instead of by the generator. Same markup, same flags.
+ * /app/, /app/dashboard/ and /p/ swap text rather than navigate, so their picker is built
+ * here instead of by the generator. Same markup, same flags, all ten languages — the
+ * dictionary for nine of them is fetched only if one is picked.
  */
 function buildInPlacePicker() {
   const picker = document.getElementById("lang-picker");
   if (!picker || typeof LANGS === "undefined") return;
   const lang = initialLang();
-  applyLang(lang);
 
   const render = (current) => {
     const now = LANGS.filter((l) => l.code === current)[0] || LANGS[0];
+    const nowFlag = (typeof LM_FLAGS !== "undefined" && LM_FLAGS[now.code]) || "";
     picker.innerHTML = `<button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="${t("lang_label", current)}">
-      <span class="flag">${now.flag || ""}</span><span class="lang-btn-name">${now.label}</span>
+      <span class="flag">${nowFlag}</span><span class="lang-btn-name">${now.label}</span>
       <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
     </button>
     <ul class="lang-menu" id="lang-menu" hidden>${LANGS.map((l) => (l.code === current
@@ -198,12 +262,20 @@ function buildInPlacePicker() {
     )).join("")}</ul>`;
 
     picker.querySelectorAll("button[data-lang]").forEach((b) => {
-      b.addEventListener("click", () => { applyLang(b.dataset.lang); render(b.dataset.lang); });
+      b.addEventListener("click", () => {
+        const want = b.dataset.lang;
+        ensureLang(want, () => { applyLang(want); render(want); });
+      });
     });
     wirePicker();
   };
 
-  render(lang);
+  // The picker is drawn from LANGS, which lists all ten whether or not their dictionaries
+  // are in memory, so it is complete on the first paint. The page is in DEFAULT_LANG until
+  // the chosen language's bundle arrives; everything JavaScript wrote redraws on
+  // `langchange`, which is the rule /app/ has followed since it was built.
+  render(pageLang());
+  ensureLang(lang, () => { applyLang(lang); render(document.documentElement.lang); });
 }
 
 /**

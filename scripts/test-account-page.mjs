@@ -353,6 +353,19 @@ async function openApp(ctx, url, opts = {}) {
 const visible = (page, selector) => page.locator(selector).isVisible();
 const signedIn = (page) => page.locator("#app-workspace").waitFor({ state: "visible", timeout: 5000 });
 
+/**
+ * Pick a language in the in-place picker and wait for the page to be in it.
+ *
+ * Since session 33 /app/ ships one dictionary rather than ten, so a language nobody has
+ * asked for yet arrives with a request. The click is therefore the start of the switch
+ * and not the end of it; `<html lang>` is set by applyLang(), in the same breath as the
+ * text, so waiting for it is waiting for the redraw.
+ */
+async function pickLang(page, code) {
+  await page.click(`.lang-item[data-lang="${code}"]`);
+  await page.waitForFunction((c) => document.documentElement.lang === c, code, { timeout: 5000 });
+}
+
 /* --- 1. the signed-out page ---------------------------------------------------------- */
 
 head("1. signed out: three views, one card");
@@ -781,7 +794,7 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
   // /app/ swaps the DOM instead of navigating, so anything JavaScript wrote has to be
   // written again in the new language — the plan chip and its note are both written here.
   await over.click("#lang-toggle");
-  await over.click('.lang-item[data-lang="de"]');
+  await pickLang(over, "de");
   eq("switching language redraws the plan", await over.locator("#plan-name").innerText(), "Kostenlos");
   eq("and its note", await over.locator("#plan-note").innerText(),
     "Der Pro-Tarif ist abgelaufen. Das Konto läuft als kostenloses LiczMat weiter.");
@@ -838,7 +851,7 @@ head("10b. the mail Firebase sends follows the page's language");
     await page.evaluate(() => window.__fb.auth.languageCode), "pl");
 
   await page.click("#lang-toggle");
-  await page.click('.lang-item[data-lang="uk"]');
+  await pickLang(page, "uk");
   eq("and it follows the picker",
     await page.evaluate(() => window.__fb.auth.languageCode), "uk");
   await page.close();
@@ -862,7 +875,7 @@ head("11. switching language redraws what JavaScript wrote");
     await page.locator("#app-provider").innerText(), "E-mail i hasło");
 
   await page.click("#lang-toggle");
-  await page.click('.lang-item[data-lang="de"]');
+  await pickLang(page, "de");
   eq("and follows the picker into German",
     await page.locator("#app-provider").innerText(), "E-Mail und Passwort");
   eq("including the tab labels",

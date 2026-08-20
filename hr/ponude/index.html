@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="hr">
 <head>
-<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
-     flash. No stored choice means "follow the system", which is also the CSS default. -->
 <script>
   // "js" says the drawer, the pop-up menus and everything else that needs a script
   // will work. Without it the navigation renders as a plain list instead of hiding
@@ -20,8 +18,6 @@
     if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
   } catch (e) {}
 </script>
-<!-- Google tag (gtag.js) with Consent Mode v2 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -42,12 +38,26 @@
   } catch (e) {}
 
   gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The analytics tag is the only third-party request a public page makes; opening the
-     connection alongside the HTML keeps it off the render path. -->
-<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Ponude — LiczMat</title>
 <meta name="description" content="Ponude u LiczMat Pro: materijal i dodatni troškovi učitani iz projekta, rad kao količina puta cijena, postotna marža i zbroj. Podaci ostaju u ovom pregledniku.">
@@ -69,10 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/ponude/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kommercheskie-predlozheniya/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/">
-<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820c" type="image/svg+xml">
-<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -98,7 +107,7 @@
 <meta name="twitter:description" content="Ponude u LiczMat Pro: materijal i dodatni troškovi učitani iz projekta, rad kao količina puta cijena, postotna marža i zbroj. Podaci ostaju u ovom pregledniku.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820c">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -166,9 +175,6 @@
     <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otvori izbornik"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
   </div>
 </header>
-<!-- Outside <header>, because the header's backdrop-filter makes it the containing
-     block for anything position:fixed inside it — in there the scrim would be as tall
-     as the header bar and dim nothing. -->
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main">
   <section class="block page-head">
@@ -181,7 +187,7 @@
 
   <section class="block alt" id="quo-page">
     <div class="wrap narrow">
-      <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
+      
       <p class="crm-pro" id="quo-pro" hidden>
         <span class="chip" id="quo-pro-chip">Dostupno u LiczMat Pro</span>
       </p>
@@ -191,8 +197,7 @@
         <p class="muted">Materijal, rad, dodatni troškovi, marža i zbroj — iz onoga što si već izračunao.</p>
         <p><span class="chip">Dostupno u LiczMat Pro</span></p>
 
-        <!-- One rung of the Free → Pro path, chosen by assets/paywall.js from the level.
-             Both are in the markup; neither is shown until the script knows which. -->
+        
         <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je plan uz račun. Otvori najprije besplatan LiczMat račun ili se prijavi — Pro se može uključiti samo na računu.</p>
         <p class="pw-step" data-pw-step="account" hidden>
           <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fhr%2Fponude%2F" rel="nofollow">Otvori besplatan račun</a>
@@ -241,15 +246,10 @@
         </div>
 
         <div id="quo-body" hidden>
-          <!-- Chapter XXIV read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT. Every
-               step is derived from the one link the quote stores, so nothing here can
-               disagree with the job's own page. Session 26 draws it with the same strip
-               /zlecenia/ uses — assets/crm-chain.js — so the path reads identically from
-               both ends. -->
+          
           <nav class="crm-chain" id="quo-chain-line" aria-label="Put"></nav>
 
-          <!-- Chapter XXII's five figures. Three of them are the project's own money,
-               read through wsProjectCosts() and never copied onto the quote. -->
+          
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">Materijal</span> <b id="quo-fig-materials"></b></p>
             <p class="ws-project-fig"><span class="eyebrow muted">Dodatni troškovi</span> <b id="quo-fig-other"></b></p>
@@ -262,8 +262,7 @@
           </div>
           <p class="muted ws-estimate-mixed" id="quo-mixed" hidden>Stavke su u različitim valutama. Zbroj ih zbraja, ali ništa ne preračunava po tečaju — provjeri valute u stupcu troška.</p>
 
-          <!-- The margin is one field on the page rather than a form to open: it is the
-               number a tradesman moves while looking at the total. -->
+          
           <p class="ws-mat-grid ws-mat-grid-one">
             <label class="ws-mat-f ws-mat-f-sm">
               <span class="ws-bar-label">Marža (%)</span>
@@ -302,7 +301,7 @@
             </p>
           </div>
 
-          <!-- Chapter XXII's "robocizna": the only part of a quote nothing else counts. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Rad</h2>
@@ -336,8 +335,7 @@
             <p class="muted" id="quo-labour-full" hidden>Ponuda već ima puni broj stavki rada.</p>
           </section>
 
-          <!-- The one link the quote stores. The project is the free workspace's own row;
-               nothing here renames, archives or deletes it. -->
+          
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Projekt</h2>
@@ -474,22 +472,20 @@
   "sr": "/sr/ponude/",
   "ru": "/ru/kommercheskie-predlozheniya/"
 };</script>
-<script src="/assets/i18n.hr.js?v=20260820c"></script>
-<script src="/assets/i18n-runtime.js?v=20260820c"></script>
-<script src="/assets/currency.js?v=20260820c"></script>
-<!-- The session, on every page: which of chapter II's three levels this browser was
-     last told it is on. Two kilobytes, no network, and it is what lets a calculator
-     page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820c"></script>
 
-<script src="/assets/workspace.js?v=20260820c"></script>
-<script src="/assets/plan.js?v=20260820c"></script>
-<script src="/assets/pay.js?v=20260820c"></script>
-<script src="/assets/paywall.js?v=20260820c"></script>
-<script src="/assets/crm.js?v=20260820c"></script>
-<script src="/assets/crm-chain.js?v=20260820c"></script>
-<script src="/assets/quotes-ui.js?v=20260820c"></script>
-<script src="/assets/main.js?v=20260820c"></script>
+<script src="/assets/i18n.hr.js?v=20260820d"></script>
+<script src="/assets/i18n-runtime.js?v=20260820d"></script>
+<script src="/assets/currency.js?v=20260820d"></script>
+<script src="/assets/account.js?v=20260820d"></script>
+
+<script src="/assets/workspace.js?v=20260820d"></script>
+<script src="/assets/plan.js?v=20260820d"></script>
+<script src="/assets/pay.js?v=20260820d"></script>
+<script src="/assets/paywall.js?v=20260820d"></script>
+<script src="/assets/crm.js?v=20260820d"></script>
+<script src="/assets/crm-chain.js?v=20260820d"></script>
+<script src="/assets/quotes-ui.js?v=20260820d"></script>
+<script src="/assets/main.js?v=20260820d"></script>
 
 </body>
 </html>
