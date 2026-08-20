@@ -307,6 +307,10 @@ ${jsonldBlocks}
 ${p.headExtra || ""}
 </head>
 <body${p.bodyClass ? ` class="${p.bodyClass}"` : ""}>
+<!-- The skip link. Its target carries tabindex="-1" (every <main id="main"> in
+     src/pages.mjs and src/app-pages.mjs): without it the browser scrolls to the landmark
+     and leaves the keyboard focus on the link, so the next Tab goes back into the header
+     the visitor just asked to skip. -->
 <a class="skip-link" href="#main">${esc(t("skip_main"))}</a>
 ${bare ? main : `${siteHeader({ lang, t, alternates, path })}\n${main}\n${siteFooter({ lang, t, alternates })}\n${consentBanner(lang, t)}`}
 ${bare ? "" : `<script>window.LICZMAT_ALTERNATES = ${altJson};</script>`}
@@ -465,7 +469,7 @@ export function siteFooter(f) {
 
   const langRow = alternates
     ? `<nav class="foot-langs" aria-label="${esc(t("lang_label"))}">
-      <h4>${esc(t("lang_label"))}</h4>
+      <h2>${esc(t("lang_label"))}</h2>
       <ul>
         ${LANGS.filter((l) => alternates[l]).map((l) => `<li><a href="${esc(alternates[l])}" hreflang="${HREFLANG[l]}" lang="${HREFLANG[l]}" data-lang="${l}"${l === lang ? ' aria-current="true"' : ""}><span class="flag">${FLAG[l]}</span><span>${esc(LANG_NAME[l])}</span></a></li>`).join("\n        ")}
       </ul>
@@ -480,21 +484,21 @@ export function siteFooter(f) {
         <p class="muted">${esc(t("foot_tagline"))}</p>
       </div>
       <div>
-        <h4>${esc(t("foot_product"))}</h4>
+        <h2>${esc(t("foot_product"))}</h2>
         <ul>
           ${column("product")}
           <li><a href="${urlHome(lang)}#faq">FAQ</a></li>
         </ul>
       </div>
       <div>
-        <h4>${esc(t("foot_account"))}</h4>
+        <h2>${esc(t("foot_account"))}</h2>
         <ul>
           ${column("account")}
           <li><a href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
       </div>
       <div>
-        <h4>${esc(t("foot_legal"))}</h4>
+        <h2>${esc(t("foot_legal"))}</h2>
         <ul>
           <li><a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a></li>
           <li><a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a></li>
@@ -508,8 +512,11 @@ export function siteFooter(f) {
 }
 
 function consentBanner(lang, t) {
-  return `<div id="consent-banner" class="consent-banner" role="dialog" aria-label="${esc(t("consent_accept"))}" hidden>
-  <p class="consent-text">${esc(t("consent_text"))}</p>
+  // aria-labelledby rather than aria-label: the name of this dialog used to be the word
+  // on its accept button ("Zgoda"), so a screen reader announced "Zgoda, dialog" and left
+  // the visitor to find out what they were agreeing to. The name is the sentence.
+  return `<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">${esc(t("consent_text"))}</p>
   <div class="consent-actions">
     <a class="consent-more" href="${URL_PRIVACY}">${esc(t("consent_more"))}</a>
     <a class="consent-more" href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a>

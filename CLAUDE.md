@@ -107,6 +107,8 @@ node scripts/test-seo.mjs         # technical SEO: sitemap, robots, canonical, h
 node scripts/test-calc-seo.mjs    # the calculators as landing pages: title, description, FAQ
 node scripts/test-mobile.mjs      # the whole site on a phone: widths, tap targets, fields
 node scripts/test-perf.mjs        # what a page weighs: bytes, requests, the render path
+node scripts/test-a11y.mjs        # names, headings, landmarks, live regions — in the markup
+node scripts/test-a11y-page.mjs   # focus, the keyboard, both themes — in Chromium
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -388,6 +390,33 @@ scripts/test-perf.mjs  What a page weighs (session 33, chapter XXXII): every pag
                       workspace and no script named twice; and the fonts, of which there
                       are none. Dependency-free — run it after adding a script or a
                       stylesheet to a page, or after changing what the build emits
+scripts/test-a11y.mjs  Accessibility as a property of the markup (session 34, chapter
+                      XXXII): the landmarks and the skip link, whose target has to be
+                      focusable or the link scrolls and leaves the focus in the header;
+                      the heading outline — one <h1> per document, no level skipped, no
+                      empty heading a visitor can reach; every field with a name that is
+                      not just its placeholder; every button, link and image with one;
+                      every icon hidden from the tree; ids unique and every aria-controls,
+                      aria-labelledby and aria-describedby resolving; the live regions the
+                      product depends on, starting with the calculator's result; the three
+                      switches of chapter XXXII; the carousel's stop button (WCAG 2.2.2);
+                      table headers with a scope; and the rules in the stylesheet that put
+                      the focus ring on the screen. Dependency-free — run it after touching
+                      anything that writes markup
+scripts/test-a11y-page.mjs  The same product driven by keyboard in Chromium, nothing
+                      stubbed (session 34): Tab to the skip link and Enter into <main>; the
+                      accessibility tree Chromium itself builds, on fourteen screens with
+                      data in them, checked for a control with no name; a ring on every
+                      stop of the way through a calculator and a project; no keyboard trap
+                      between the header and the footer; the language menu opened with
+                      Enter, walked with ArrowDown and shut with Escape, which hands the
+                      focus back; the currency select; the theme toggle in both themes,
+                      with the ring still visible in the one it switched to; a calculation
+                      made with Enter and announced, and nothing written into that live
+                      region before the visitor asked; the material dialog's Escape and the
+                      focus it gives back; the screenshots stopped and started from the
+                      keyboard, and never started at all under prefers-reduced-motion.
+                      Needs the same outside-the-repo Playwright as test-pages.mjs
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -1167,6 +1196,42 @@ Kotlin side of it. Change one, change all three.
 
 ## Rules for editing the site
 
+- **Every control carries its own name, and a placeholder is not one.** A placeholder is
+  gone the moment somebody types, and a screen reader announces a nameless field as "edit,
+  blank" — nine fields on this site had nothing else (the new project, the new room, the
+  new client and their phone and e-mail, the new job, the new quote, the estimate line,
+  the project name in `/app/`), plus the surface picker in the room bar. They take an
+  `aria-label` from the key the placeholder already used, so nothing new was written in ten
+  languages. A `<label for>` or a `<label>` wrapping the control is the same answer and is
+  what every row drawn at runtime uses. `scripts/test-a11y.mjs` §3 fails on a control with
+  no name and on a name that is only a placeholder.
+- **Heading level is structure, not size.** The footer's column headings were `<h4>` under
+  a page full of `<h2>`s, so every one of the 375 pages had a hole in its outline where the
+  site map begins; they are `<h2>` now and the stylesheet makes them look the way they
+  looked. One `<h1>` per document (`privacy-policy.html` is two documents in one file, one
+  per `<article lang>`), no level skipped on the way down, and no empty heading a visitor
+  can reach — a heading a script fills either ships with the fallback text the script would
+  use, or lives inside the `hidden` block it belongs to.
+- **The skip link's target has to be focusable.** Every `<main id="main">` carries
+  `tabindex="-1"`. Without it the browser scrolls to the landmark and leaves the focus
+  where it was, so the next Tab walks back into the header the visitor asked to skip —
+  which is what the link did on this site for its whole life.
+- **What changes on its own says so.** The result box on a calculator page is
+  `role="status"`: pressing "Policz" replaces its contents, moves nothing and changes no
+  focus, so without it a screen reader is told nothing about the one thing the visitor
+  asked for. The price of that is `writeResult()` in `assets/calculators.js` — the silent
+  run on load compares the *words* and writes nothing when they have not changed, or the
+  answer is read out to somebody who never asked for one. The undo strips, the store
+  status and `/app/`'s status line are the same mechanism.
+- **Anything that starts moving by itself can be stopped.** WCAG 2.2.2. The phone mockup
+  advances every 3.5 s, so it carries a stop button — hidden in the markup, unhidden by
+  `assets/main.js` when it starts the timer, so nothing offers to stop what never moved
+  (no script, or `prefers-reduced-motion`). Both labels ship in the page's own language;
+  the visitor's pause outranks the tab coming back into view.
+- **An id is claimed once.** `/aplikacja/` carried two carousels sharing `hero-shots` and
+  `hero-dots`, so `getElementById` found the first and the second never moved. Elements
+  that can appear twice on a page are wired by a `data-` attribute and
+  `querySelectorAll`, never by id.
 - **A field is a field because it is an `<input>`, a `<select>` or a `<textarea>`** — the
   rule in `assets/styles.css` is written on the element, not on a list of classes, so a
   control a new module invents is 16 px of text in a 44 px box without anybody

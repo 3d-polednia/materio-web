@@ -148,7 +148,7 @@ export function appMain(t, features) {
   const fact = (id, key) =>
     `<div class="fact"><dt data-i18n="${key}">${esc(t(key))}</dt><dd id="${id}">—</dd></div>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap narrow">
       <h1 data-i18n="app_title">${esc(t("app_title"))}</h1>
@@ -270,7 +270,8 @@ export function appMain(t, features) {
         <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0">
           <h2 data-i18n="app_projects">${esc(t("app_projects"))}</h2>
           <form id="project-form" class="inline-form">
-            <input id="project-name" type="text" maxlength="120" placeholder="${esc(t("app_new_project"))}" data-i18n-ph="app_new_project" required>
+            <input id="project-name" type="text" maxlength="120" placeholder="${esc(t("app_new_project"))}" data-i18n-ph="app_new_project" required
+              aria-label="${esc(t("app_new_project"))}" data-i18n-aria="app_new_project">
             <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">${esc(t("app_add"))}</button>
           </form>
           <ul id="project-list" class="data-list"></ul>
@@ -475,7 +476,7 @@ export function dashboardMain(t) {
         <ul class="${listClass}" id="dash-${id}"></ul>
       </section>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <h1 data-i18n="dash_title">${esc(t("dash_title"))}</h1>
@@ -499,7 +500,9 @@ export function dashboardMain(t) {
            card is what a guest sees; assets/dashboard.js hides it once the hint says
            somebody signed in. It opens the sign-up form and comes back here. -->
       <div class="app-card" id="dash-signup">
-        <h3 data-i18n="dash_guest_t">${esc(t("dash_guest_t"))}</h3>
+        <!-- An <h2>, not an <h3>: this card is the first thing under the page's own <h1>,
+             so the level below it is the only one that leaves no hole in the outline. -->
+        <h2 data-i18n="dash_guest_t">${esc(t("dash_guest_t"))}</h2>
         ${i("dash_guest_d", "p", "muted")}
         <a class="btn btn-primary btn-sm" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_DASHBOARD)}" data-i18n="dash_guest_go">${esc(t("dash_guest_go"))}</a>
       </div>
@@ -551,7 +554,7 @@ export const dashboardKeys = () => [
 /* ------------------------------------------------------------------ /p/<token> */
 
 export function shareMain(t) {
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap narrow">
       <h1 data-i18n="share_title">${esc(t("share_title"))}</h1>

@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/aplikacija/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/prilozhenie/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/aplikacja/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="LiczMat für Android: kostenloser Rechner und Optimierer für Baustoffe. Materialkatalog, Räume, Projekte, PDF-Kalkulation und Baumarkt-Karte. Rechnet offline.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -194,7 +194,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li aria-current="page">LiczMat für Android</li></ol></nav>
@@ -223,13 +223,19 @@
       </div>
       <div class="hero-media">
         <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
-          <div class="phone-track" id="hero-shots">
+          <div class="phone-track" data-carousel>
             <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="LiczMat Startbildschirm" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Berechnungsergebnis: wie viel kaufen, wie viel Verschnitt" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Baumärkte in der Nähe" loading="lazy" decoding="async">
           </div>
         </div>
-        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+        <p class="phone-controls">
+          <span class="phone-dots" data-carousel-dots aria-hidden="true"></span>
+          <button type="button" class="phone-pause" data-carousel-pause hidden
+            aria-label="Screenshots anhalten"
+            data-label-pause="Screenshots anhalten"
+            data-label-play="Screenshots abspielen"><svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg><svg class="ico-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5Z"/></svg></button>
+        </p>
       </div>
     </div>
   </section>
@@ -329,13 +335,19 @@
       </div>
       <div class="cta-shots">
         <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
-          <div class="phone-track" id="hero-shots">
+          <div class="phone-track" data-carousel>
             <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="LiczMat Startbildschirm" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Berechnungsergebnis: wie viel kaufen, wie viel Verschnitt" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Baumärkte in der Nähe" loading="lazy" decoding="async">
           </div>
         </div>
-        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+        <p class="phone-controls">
+          <span class="phone-dots" data-carousel-dots aria-hidden="true"></span>
+          <button type="button" class="phone-pause" data-carousel-pause hidden
+            aria-label="Screenshots anhalten"
+            data-label-pause="Screenshots anhalten"
+            data-label-play="Screenshots abspielen"><svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg><svg class="ico-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5Z"/></svg></button>
+        </p>
       </div>
     </div>
   </div>
@@ -349,7 +361,7 @@
         <p class="muted">Baustoff-Rechner. Rechnen. Planen. Umsetzen.</p>
       </div>
       <div>
-        <h4>Produkt</h4>
+        <h2>Produkt</h2>
         <ul>
           <li><a href="/de/rechner/">Alle Rechner</a></li>
           <li><a href="/de/materialien/">Materialien</a></li>
@@ -366,7 +378,7 @@
         </ul>
       </div>
       <div>
-        <h4>Konto</h4>
+        <h2>Konto</h2>
         <ul>
           <li><a href="/de/android-app/">Die App</a></li>
           <li><a href="/app/" rel="nofollow">Mein Konto</a></li>
@@ -375,7 +387,7 @@
         </ul>
       </div>
       <div>
-        <h4>Rechtliches</h4>
+        <h2>Rechtliches</h2>
         <ul>
           <li><a href="/privacy-policy.html">Datenschutz</a></li>
           <li><a href="/de/cookies/">Cookies</a></li>
@@ -383,7 +395,7 @@
       </div>
     </div>
     <nav class="foot-langs" aria-label="Sprache">
-      <h4>Sprache</h4>
+      <h2>Sprache</h2>
       <ul>
         <li><a href="/aplikacja/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/dodatok/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -403,8 +415,8 @@
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Einverstanden" hidden>
-  <p class="consent-text">Wir nutzen Google Analytics, um anonym zu zählen, wie viele Leute die Seite besuchen und zu Google Play weitergehen. Einverstanden?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Wir nutzen Google Analytics, um anonym zu zählen, wie viele Leute die Seite besuchen und zu Google Play weitergehen. Einverstanden?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">Mehr in der Datenschutzerklärung</a>
     <a class="consent-more" href="/de/cookies/">Cookies</a>
@@ -425,13 +437,13 @@
   "ru": "/ru/prilozhenie/"
 };</script>
 
-<script src="/assets/i18n.de.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.de.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
 
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/kalkulatori/estrih-malter/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/styazhka-shtukaturka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/wylewka-tynk/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="Plocha, tloušťka vrstvy a spotřeba v kg na m² a mm dají počet pytlů potěru, samonivelační stěrky nebo omítky.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -223,7 +223,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li><a href="/cs/kalkulacky/">Stavební kalkulačky online</a></li><li aria-current="page">Potěr / omítka</li></ol></nav>
@@ -245,7 +245,8 @@
       </div>
       <div class="calc-out">
         <h2 id="calc-result-h">Výsledek</h2>
-        <div class="result show" data-result>
+        
+        <div class="result show" data-result role="status">
           <div class="muted eyebrow">Koupit</div>
           <div class="big">64 <span class="figure-line">pytlů</span></div>
           <div class="rows"><div><span>Celkem</span><b>1,600 kg</b></div><div><span>Spotřeba</span><b>80 kg/m²</b></div></div>
@@ -317,7 +318,7 @@ worki = ⌈ kilogramy ÷ Pytel ⌉</code></pre>
         <p class="muted">Kalkulačka stavebního materiálu. Spočítej. Naplánuj. Postav.</p>
       </div>
       <div>
-        <h4>Produkt</h4>
+        <h2>Produkt</h2>
         <ul>
           <li><a href="/cs/kalkulacky/">Všechny kalkulačky</a></li>
           <li><a href="/cs/materialy/">Materiály</a></li>
@@ -334,7 +335,7 @@ worki = ⌈ kilogramy ÷ Pytel ⌉</code></pre>
         </ul>
       </div>
       <div>
-        <h4>Účet</h4>
+        <h2>Účet</h2>
         <ul>
           <li><a href="/cs/aplikace/">Aplikace</a></li>
           <li><a href="/app/" rel="nofollow">Můj účet</a></li>
@@ -343,7 +344,7 @@ worki = ⌈ kilogramy ÷ Pytel ⌉</code></pre>
         </ul>
       </div>
       <div>
-        <h4>Právní informace</h4>
+        <h2>Právní informace</h2>
         <ul>
           <li><a href="/privacy-policy.html">Zásady ochrany soukromí</a></li>
           <li><a href="/cs/cookies/">Cookies</a></li>
@@ -351,7 +352,7 @@ worki = ⌈ kilogramy ÷ Pytel ⌉</code></pre>
       </div>
     </div>
     <nav class="foot-langs" aria-label="Jazyk">
-      <h4>Jazyk</h4>
+      <h2>Jazyk</h2>
       <ul>
         <li><a href="/kalkulatory/wylewka-tynk/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/kalkulyatory/styazhka-shtukaturka/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -371,8 +372,8 @@ worki = ⌈ kilogramy ÷ Pytel ⌉</code></pre>
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Souhlasím" hidden>
-  <p class="consent-text">Používáme Google Analytics, abychom anonymně počítali návštěvnost webu a kolik lidí přejde na Google Play. Souhlasíš?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Používáme Google Analytics, abychom anonymně počítali návštěvnost webu a kolik lidí přejde na Google Play. Souhlasíš?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">Více v zásadách ochrany soukromí</a>
     <a class="consent-more" href="/cs/cookies/">Cookies</a>
@@ -393,19 +394,19 @@ worki = ⌈ kilogramy ÷ Pytel ⌉</code></pre>
   "ru": "/ru/kalkulyatory/styazhka-shtukaturka/"
 };</script>
 
-<script src="/assets/i18n.cs.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.cs.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
-<script src="/assets/units.js?v=20260820d"></script>
-<script src="/assets/calculators.js?v=20260820d"></script>
-<script src="/assets/materials.js?v=20260820d"></script>
-<script src="/assets/materials-ui.js?v=20260820d"></script>
-<script src="/assets/workspace.js?v=20260820d"></script>
-<script src="/assets/workspace-calc.js?v=20260820d"></script>
-<script src="/assets/recent.js?v=20260820d"></script>
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/units.js?v=20260820e"></script>
+<script src="/assets/calculators.js?v=20260820e"></script>
+<script src="/assets/materials.js?v=20260820e"></script>
+<script src="/assets/materials-ui.js?v=20260820e"></script>
+<script src="/assets/workspace.js?v=20260820e"></script>
+<script src="/assets/workspace-calc.js?v=20260820e"></script>
+<script src="/assets/recent.js?v=20260820e"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

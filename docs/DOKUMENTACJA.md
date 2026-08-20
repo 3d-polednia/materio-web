@@ -82,6 +82,12 @@ scripts/test-account-page.mjs Testy /app/ w Chromium z podstawionym SDK Firebase
 scripts/test-mobile.mjs       Cały serwis na telefonie: szerokości rozdziału XXVIII,
                               cele dotykowe, pola, tabele, klawiatura numeryczna,
                               przełączniki języka/waluty/motywu (Sesja 32)
+scripts/test-a11y.mjs         Dostępność w znacznikach: nazwy kontrolek, konspekt
+                              nagłówków, punkty orientacyjne, cel linku pomijającego,
+                              unikalność id, regiony live, przycisk stopu karuzeli
+                              (Sesja 34, bez zależności)
+scripts/test-a11y-page.mjs    To samo z klawiatury w Chromium: focus, Escape, drzewo
+                              dostępności przeglądarki, oba motywy (Sesja 34)
 privacy-policy.html      Polityka prywatności (PL + EN) — osobna podstrona (wymóg Google Play)
 404.html                 Strona błędu 404; przekierowuje też /p/<token> na /p/?t=<token>
 site.webmanifest         Manifest PWA (nazwa, ikony, kolory)

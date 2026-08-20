@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/aplikacija/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/prilozhenie/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/aplikacja/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="LiczMat для Android: безплатний калькулятор і оптимізатор будівельних матеріалів. Каталог матеріалів, приміщення, проєкти, кошторис у PDF і карта магазинів.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -194,7 +194,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li aria-current="page">LiczMat для Android</li></ol></nav>
@@ -223,13 +223,19 @@
       </div>
       <div class="hero-media">
         <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
-          <div class="phone-track" id="hero-shots">
+          <div class="phone-track" data-carousel>
             <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Головний екран LiczMat" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Результат розрахунку: скільки купити і скільки відходів" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Будівельні магазини поруч" loading="lazy" decoding="async">
           </div>
         </div>
-        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+        <p class="phone-controls">
+          <span class="phone-dots" data-carousel-dots aria-hidden="true"></span>
+          <button type="button" class="phone-pause" data-carousel-pause hidden
+            aria-label="Зупинити показ знімків екрана"
+            data-label-pause="Зупинити показ знімків екрана"
+            data-label-play="Відтворити показ знімків екрана"><svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg><svg class="ico-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5Z"/></svg></button>
+        </p>
       </div>
     </div>
   </section>
@@ -329,13 +335,19 @@
       </div>
       <div class="cta-shots">
         <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
-          <div class="phone-track" id="hero-shots">
+          <div class="phone-track" data-carousel>
             <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="Головний екран LiczMat" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="Результат розрахунку: скільки купити і скільки відходів" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="Будівельні магазини поруч" loading="lazy" decoding="async">
           </div>
         </div>
-        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+        <p class="phone-controls">
+          <span class="phone-dots" data-carousel-dots aria-hidden="true"></span>
+          <button type="button" class="phone-pause" data-carousel-pause hidden
+            aria-label="Зупинити показ знімків екрана"
+            data-label-pause="Зупинити показ знімків екрана"
+            data-label-play="Відтворити показ знімків екрана"><svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg><svg class="ico-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5Z"/></svg></button>
+        </p>
       </div>
     </div>
   </div>
@@ -349,7 +361,7 @@
         <p class="muted">Калькулятор будівельних матеріалів. Порахуй. Сплануй. Зроби.</p>
       </div>
       <div>
-        <h4>Продукт</h4>
+        <h2>Продукт</h2>
         <ul>
           <li><a href="/uk/kalkulyatory/">Усі калькулятори</a></li>
           <li><a href="/uk/materialy/">Матеріали</a></li>
@@ -366,7 +378,7 @@
         </ul>
       </div>
       <div>
-        <h4>Акаунт</h4>
+        <h2>Акаунт</h2>
         <ul>
           <li><a href="/uk/dodatok/">Застосунок</a></li>
           <li><a href="/app/" rel="nofollow">Мій акаунт</a></li>
@@ -375,7 +387,7 @@
         </ul>
       </div>
       <div>
-        <h4>Правова інформація</h4>
+        <h2>Правова інформація</h2>
         <ul>
           <li><a href="/privacy-policy.html">Політика конфіденційності</a></li>
           <li><a href="/uk/cookies/">Cookies</a></li>
@@ -383,7 +395,7 @@
       </div>
     </div>
     <nav class="foot-langs" aria-label="Мова">
-      <h4>Мова</h4>
+      <h2>Мова</h2>
       <ul>
         <li><a href="/aplikacja/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/dodatok/" hreflang="uk" lang="uk" data-lang="uk" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -403,8 +415,8 @@
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Погоджуюсь" hidden>
-  <p class="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">Докладніше в політиці конфіденційності</a>
     <a class="consent-more" href="/uk/cookies/">Cookies</a>
@@ -425,13 +437,13 @@
   "ru": "/ru/prilozhenie/"
 };</script>
 
-<script src="/assets/i18n.uk.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.uk.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
 
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

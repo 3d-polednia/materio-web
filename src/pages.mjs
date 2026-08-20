@@ -53,6 +53,12 @@ function freePrice(lang) {
 
 /* ------------------------------------------------------------------ calculator form */
 
+/* The two glyphs on the carousel's stop button. Both ship; the stylesheet shows the one
+   that matches whether the screenshots are moving, the same arrangement the theme toggle
+   and the menu button use. */
+const ICON_PAUSE = '<svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+const ICON_PLAY = '<svg class="ico-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5Z"/></svg>';
+
 const PICK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>';
 
 /**
@@ -118,7 +124,14 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
       </div>
       <div class="calc-out">
         <h2 id="calc-result-h">${esc(t("calc_result_h"))}</h2>
-        <div class="result show" data-result>
+        <!-- role="status" (an implicit aria-live="polite"): pressing "Policz" replaces
+             the contents of this box and moves nothing on the page, so without it a
+             screen reader is told nothing at all about the one thing the visitor asked
+             for. Polite rather than assertive — the answer waits for the sentence being
+             read to end. The box is in the markup from the first paint holding the worked
+             example, and a live region announces only what changes after it is live, so
+             nothing is read out on load. -->
+        <div class="result show" data-result role="status">
           <div class="muted eyebrow">${esc(t("res_tobuy"))}</div>
           <div class="big">${esc(example.tobuy)} <span class="figure-line">${esc(example.unit)}</span></div>
           <div class="rows">${rows}</div>
@@ -159,7 +172,7 @@ function calcLinkCard(calc, lang, t) {
  * stays three and stays in level order.
  */
 export function homeMain(lang, t, calcs, cat) {
-  return `<main id="main">
+  return `<main id="main" tabindex="-1">
 ${homeHero(t)}
 ${homeDoors(lang, t, calcs, cat)}
 ${homePath(t)}
@@ -314,6 +327,29 @@ function appNote(t) {
   </section>`;
 }
 
+/**
+ * The dots under the phone mockup, and the control that stops it.
+ *
+ * WCAG 2.2.2: the screenshots start moving on their own and go on for longer than five
+ * seconds, so there has to be a way to stop them. assets/main.js unhides the button when
+ * it starts the timer — with no script nothing moves and there is nothing to stop, and
+ * under prefers-reduced-motion the carousel never starts, so the button stays hidden
+ * there too. Both labels travel in the markup, in this page's own language, which is why
+ * main.js needs no dictionary of its own.
+ *
+ * The dots are aria-hidden: they say which of three frames is showing, which is the one
+ * thing about this decoration a screen reader gains nothing from.
+ */
+function carouselControls(t) {
+  return `<p class="phone-controls">
+          <span class="phone-dots" data-carousel-dots aria-hidden="true"></span>
+          <button type="button" class="phone-pause" data-carousel-pause hidden
+            aria-label="${esc(t("shot_pause"))}"
+            data-label-pause="${esc(t("shot_pause"))}"
+            data-label-play="${esc(t("shot_play"))}">${ICON_PAUSE}${ICON_PLAY}</button>
+        </p>`;
+}
+
 function ctaSection(t) {
   return `<section class="block" aria-labelledby="cta-h">
   <div class="wrap">
@@ -325,13 +361,13 @@ function ctaSection(t) {
       </div>
       <div class="cta-shots">
         <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
-          <div class="phone-track" id="hero-shots">
+          <div class="phone-track" data-carousel>
             <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="${esc(t("shot_stores"))}" loading="lazy" decoding="async">
           </div>
         </div>
-        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+        ${carouselControls(t)}
       </div>
     </div>
   </div>
@@ -395,7 +431,7 @@ export function calcHubMain(lang, t, calcs, guides) {
 
   const popular = popularCalcs(guides, calcs);
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -518,7 +554,7 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
     .filter((g) => g.calcs.includes(calc.id))
     .map((g) => `<a class="chip" href="${urlGuide(lang, g)}">${esc(t(`g_${g.id}_t`))}</a>`).join("");
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -598,7 +634,7 @@ export function guideIndexMain(lang, t, guides) {
       <span class="calc-link-go">${esc(t("calc_open"))}</span>
     </a>`).join("");
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -635,7 +671,7 @@ export function guideMain(guide, lang, t) {
     step: steps.map((s, i) => ({ "@type": "HowToStep", position: i + 1, text: s })),
   };
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -705,7 +741,7 @@ export function materialsMain(lang, t, cat) {
     </section>`;
   }).join("\n  ");
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -780,10 +816,10 @@ export function cookiesMain(lang, t) {
 
   const table = (rows) => `<div class="table-scroll"><table class="ws-table">
       <thead><tr>
-        <th>${esc(t("ck_col_name"))}</th>
-        <th>${esc(t("ck_col_type"))}</th>
-        <th>${esc(t("ck_col_purpose"))}</th>
-        <th>${esc(t("ck_col_life"))}</th>
+        <th scope="col">${esc(t("ck_col_name"))}</th>
+        <th scope="col">${esc(t("ck_col_type"))}</th>
+        <th scope="col">${esc(t("ck_col_purpose"))}</th>
+        <th scope="col">${esc(t("ck_col_life"))}</th>
       </tr></thead>
       <tbody>${rows.map((r) => `<tr>
         <td><code>${esc(r.name)}</code></td>
@@ -793,7 +829,7 @@ export function cookiesMain(lang, t) {
       </tr>`).join("")}</tbody>
     </table></div>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -858,7 +894,7 @@ export function androidMain(lang, t, calcs, cat) {
       <figcaption class="muted">${esc(t(altKey))}</figcaption>
     </figure>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -883,13 +919,13 @@ export function androidMain(lang, t, calcs, cat) {
       </div>
       <div class="hero-media">
         <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
-          <div class="phone-track" id="hero-shots">
+          <div class="phone-track" data-carousel>
             <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" decoding="async">
             <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
             <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="${esc(t("shot_stores"))}" loading="lazy" decoding="async">
           </div>
         </div>
-        <div class="phone-dots" id="hero-dots" aria-hidden="true"></div>
+        ${carouselControls(t)}
       </div>
     </div>
   </section>
@@ -1044,7 +1080,7 @@ export function projectsMain(lang, t, aisles = []) {
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">${esc(t("ws_activate"))}</button>
             <span class="chip on" id="ws-project-active" hidden>${esc(t("ws_active"))}</span>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">${esc(t("ws_rename"))}</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive">${esc(t("proj_archive_do"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">${esc(t("app_delete"))}</button>
           </div>
 
@@ -1209,7 +1245,7 @@ export function projectsMain(lang, t, aisles = []) {
         </div>
       </article>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -1231,7 +1267,7 @@ export function projectsMain(lang, t, aisles = []) {
         <h2>${esc(t("ws_projects"))}</h2>
         <p class="muted">${esc(t("wspage_projects_d"))}</p>
         <form id="ws-project-form" class="inline-form">
-          <input id="ws-project-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_project"))}" required>
+          <input id="ws-project-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_project"))}" required aria-label="${esc(t("ws_new_project"))}">
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="ws-project-list" class="data-list"></ul>
@@ -1250,7 +1286,7 @@ export function projectsMain(lang, t, aisles = []) {
              assets/workspace-ui.js; "no project" is a real answer, because a room measured
              before there is a project is still a room. -->
         <form id="ws-room-form" class="inline-form">
-          <input id="ws-room-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_room"))}" required>
+          <input id="ws-room-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_room"))}" required aria-label="${esc(t("ws_new_room"))}">
           <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="${esc(t("fld_length"))}">
           <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="${esc(t("fld_width"))}">
           <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="${esc(t("fld_height"))}">
@@ -1331,7 +1367,7 @@ export function proPageMain(lang, t, features, prices) {
         ${keys.map((k) => `<li>${esc(t(k))}</li>`).join("\n        ")}
       </ul>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -1456,7 +1492,7 @@ export function clientsMain(lang, t, features) {
 
           <div class="ws-project-actions">
             <button type="button" class="btn btn-ghost btn-sm" id="crm-client-edit">${esc(t("cli_edit"))}</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-archive">${esc(t("cli_archive_do"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="crm-client-delete">${esc(t("app_delete"))}</button>
           </div>
 
@@ -1573,9 +1609,9 @@ export function clientsMain(lang, t, features) {
         <h2>${esc(t("cli_list_t"))}</h2>
         <p class="muted">${esc(t("cli_list_d"))}</p>
         <form id="crm-client-form" class="inline-form">
-          <input id="crm-client-name" type="text" maxlength="120" placeholder="${esc(t("cli_new"))}" required>
-          <input id="crm-client-phone" type="tel" maxlength="200" placeholder="${esc(t("cli_phone"))}" autocomplete="off">
-          <input id="crm-client-email" type="email" maxlength="200" placeholder="${esc(t("cli_email"))}" autocomplete="off">
+          <input id="crm-client-name" type="text" maxlength="120" placeholder="${esc(t("cli_new"))}" required aria-label="${esc(t("cli_new"))}">
+          <input id="crm-client-phone" type="tel" maxlength="200" placeholder="${esc(t("cli_phone"))}" autocomplete="off" aria-label="${esc(t("cli_phone"))}">
+          <input id="crm-client-email" type="email" maxlength="200" placeholder="${esc(t("cli_email"))}" autocomplete="off" aria-label="${esc(t("cli_email"))}">
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="crm-client-list" class="data-list"></ul>
@@ -1587,7 +1623,7 @@ export function clientsMain(lang, t, features) {
         </details>
       </div>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -1802,7 +1838,7 @@ export function jobsMain(lang, t, features) {
         <h2>${esc(t("job_list_t"))}</h2>
         <p class="muted">${esc(t("job_list_d"))}</p>
         <form id="job-form" class="inline-form">
-          <input id="job-name" type="text" maxlength="120" placeholder="${esc(t("job_new"))}" required>
+          <input id="job-name" type="text" maxlength="120" placeholder="${esc(t("job_new"))}" required aria-label="${esc(t("job_new"))}">
           <select id="job-client" aria-label="${esc(t("job_client"))}"></select>
           <input id="job-new-due" type="date" aria-label="${esc(t("job_due"))}">
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
@@ -1816,7 +1852,7 @@ export function jobsMain(lang, t, features) {
         </details>
       </div>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -2009,14 +2045,14 @@ export function quotesMain(lang, t, features) {
         <h2>${esc(t("quo_list_t"))}</h2>
         <p class="muted">${esc(t("quo_list_d"))}</p>
         <form id="quo-form" class="inline-form">
-          <input id="quo-name" type="text" maxlength="120" placeholder="${esc(t("quo_new"))}" required>
+          <input id="quo-name" type="text" maxlength="120" placeholder="${esc(t("quo_new"))}" required aria-label="${esc(t("quo_new"))}">
           <select id="quo-project" aria-label="${esc(t("quo_project"))}"></select>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="quo-list" class="data-list"></ul>
       </div>`;
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -2087,7 +2123,7 @@ export function calendarMain(lang, t, features) {
             <ul id="cal-list-${b}" class="data-list"></ul>
           </section>`).join("");
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
@@ -2148,7 +2184,7 @@ export function estimateMain(lang, t) {
     { name: t("estpage_title"), path: urlEstimate(lang) },
   ]);
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head no-print">
     <div class="wrap">
       ${crumbs.nav}
@@ -2169,7 +2205,10 @@ export function estimateMain(lang, t) {
         <header class="ws-estimate-head">
           <div>
             <p class="ws-estimate-brand">LiczMat</p>
-            <h2 id="ws-estimate-title"></h2>
+            <!-- The project's name, or — until one is picked, and with no script at
+                 all — the same "no project" sentence assets/workspace-ui.js falls back
+                 to. An empty heading is a hole in the page's outline. -->
+            <h2 id="ws-estimate-title">${esc(t("ws_no_project"))}</h2>
           </div>
           <div class="ws-estimate-meta">
             <span id="ws-estimate-date"></span>
@@ -2180,11 +2219,11 @@ export function estimateMain(lang, t) {
           <table class="ws-table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>${esc(t("ws_col_name"))}</th>
-                <th class="num">${esc(t("ws_col_qty"))}</th>
-                <th class="num">${esc(t("ws_col_cost"))}</th>
-                <th class="no-print"></th>
+                <th scope="col">#</th>
+                <th scope="col">${esc(t("ws_col_name"))}</th>
+                <th scope="col" class="num">${esc(t("ws_col_qty"))}</th>
+                <th scope="col" class="num">${esc(t("ws_col_cost"))}</th>
+                <th scope="col" class="no-print"></th>
               </tr>
             </thead>
             <tbody id="ws-estimate-rows"></tbody>
@@ -2199,7 +2238,7 @@ export function estimateMain(lang, t) {
         <h3>${esc(t("ws_add_line"))}</h3>
         <p class="muted">${esc(t("ws_add_line_d"))}</p>
         <form id="ws-line-form" class="inline-form">
-          <input id="ws-line-name" type="text" maxlength="120" placeholder="${esc(t("ws_col_name"))}" required>
+          <input id="ws-line-name" type="text" maxlength="120" placeholder="${esc(t("ws_col_name"))}" required aria-label="${esc(t("ws_col_name"))}">
           <input id="ws-line-qty" type="text" inputmode="decimal" value="1" aria-label="${esc(t("ws_col_qty"))}">
           <input id="ws-line-unit" type="text" maxlength="24" value="${esc(t("ws_unit_default"))}" aria-label="${esc(t("ws_col_unit"))}">
           <input id="ws-line-cost" type="text" inputmode="decimal" placeholder="${esc(t("ws_col_cost"))}" aria-label="${esc(t("ws_col_cost"))}">
@@ -2257,7 +2296,7 @@ export function storesMain(lang, t) {
     ["Bricomarché", "Bricomarché"], ["PSB Mrówka", "PSB Mrówka"],
   ].map(([q, label]) => `<button type="button" class="chip" data-example="${esc(q)}">${esc(label)}</button>`).join("");
 
-  const main = `<main id="main">
+  const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}

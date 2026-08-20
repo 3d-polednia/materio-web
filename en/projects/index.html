@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/projekti/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/proekty/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/projekty/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="Projects and rooms in LiczMat: save a room's dimensions once and the calculators fill in the floor, wall or ceiling area. No sign-up needed.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -170,7 +170,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li aria-current="page">Projects and rooms</li></ol></nav>
@@ -205,7 +205,7 @@
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Make active</button>
             <span class="chip on" id="ws-project-active" hidden>Active</span>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">Rename</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive">Move to the archive</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">Delete</button>
           </div>
 
@@ -356,7 +356,7 @@
         <h2>Projects</h2>
         <p class="muted">A project collects calculator results into one estimate. Every new line goes to the active project.</p>
         <form id="ws-project-form" class="inline-form">
-          <input id="ws-project-name" type="text" maxlength="120" placeholder="Project name" required>
+          <input id="ws-project-name" type="text" maxlength="120" placeholder="Project name" required aria-label="Project name">
           <button type="submit" class="btn btn-primary btn-sm">Add</button>
         </form>
         <ul id="ws-project-list" class="data-list"></ul>
@@ -371,7 +371,7 @@
         <p class="muted">A room is a name and three dimensions. The calculators work out floor, walls and ceiling from them.</p>
         
         <form id="ws-room-form" class="inline-form">
-          <input id="ws-room-name" type="text" maxlength="120" placeholder="Room name" required>
+          <input id="ws-room-name" type="text" maxlength="120" placeholder="Room name" required aria-label="Room name">
           <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Length (m)">
           <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Width (m)">
           <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Height (m)">
@@ -405,7 +405,7 @@
         <p class="muted">Building-material calculator. Count. Plan. Build.</p>
       </div>
       <div>
-        <h4>Product</h4>
+        <h2>Product</h2>
         <ul>
           <li><a href="/en/calculators/">All calculators</a></li>
           <li><a href="/en/materials/">Materials</a></li>
@@ -422,7 +422,7 @@
         </ul>
       </div>
       <div>
-        <h4>Account</h4>
+        <h2>Account</h2>
         <ul>
           <li><a href="/en/android-app/">The app</a></li>
           <li><a href="/app/" rel="nofollow">My account</a></li>
@@ -431,7 +431,7 @@
         </ul>
       </div>
       <div>
-        <h4>Legal</h4>
+        <h2>Legal</h2>
         <ul>
           <li><a href="/privacy-policy.html">Privacy policy</a></li>
           <li><a href="/en/cookies/">Cookies</a></li>
@@ -439,7 +439,7 @@
       </div>
     </div>
     <nav class="foot-langs" aria-label="Language">
-      <h4>Language</h4>
+      <h2>Language</h2>
       <ul>
         <li><a href="/projekty/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/proekty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -459,8 +459,8 @@
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Agree" hidden>
-  <p class="consent-text">We use Google Analytics to measure anonymous site traffic and how many people head to Google Play. Do you agree?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">We use Google Analytics to measure anonymous site traffic and how many people head to Google Play. Do you agree?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">More in the privacy policy</a>
     <a class="consent-more" href="/en/cookies/">Cookies</a>
@@ -481,16 +481,16 @@
   "ru": "/ru/proekty/"
 };</script>
 
-<script src="/assets/i18n.en.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.en.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
-<script src="/assets/units.js?v=20260820d"></script>
-<script src="/assets/workspace.js?v=20260820d"></script>
-<script src="/assets/workspace-calc.js?v=20260820d"></script>
-<script src="/assets/workspace-ui.js?v=20260820d"></script>
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/units.js?v=20260820e"></script>
+<script src="/assets/workspace.js?v=20260820e"></script>
+<script src="/assets/workspace-calc.js?v=20260820e"></script>
+<script src="/assets/workspace-ui.js?v=20260820e"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

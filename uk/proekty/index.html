@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/projekti/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/proekty/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/projekty/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі. Без реєстрації.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -170,7 +170,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li aria-current="page">Проєкти та приміщення</li></ol></nav>
@@ -205,7 +205,7 @@
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Зробити активним</button>
             <span class="chip on" id="ws-project-active" hidden>Активний</span>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">Перейменувати</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive"></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive">Перенести до архіву</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">Видалити</button>
           </div>
 
@@ -356,7 +356,7 @@
         <h2>Проєкти</h2>
         <p class="muted">Проєкт збирає результати калькуляторів у один кошторис. Кожна нова позиція йде в активний проєкт.</p>
         <form id="ws-project-form" class="inline-form">
-          <input id="ws-project-name" type="text" maxlength="120" placeholder="Назва проєкту" required>
+          <input id="ws-project-name" type="text" maxlength="120" placeholder="Назва проєкту" required aria-label="Назва проєкту">
           <button type="submit" class="btn btn-primary btn-sm">Додати</button>
         </form>
         <ul id="ws-project-list" class="data-list"></ul>
@@ -371,7 +371,7 @@
         <p class="muted">Приміщення — це назва й три розміри. З них калькулятори рахують підлогу, стіни й стелю.</p>
         
         <form id="ws-room-form" class="inline-form">
-          <input id="ws-room-name" type="text" maxlength="120" placeholder="Назва приміщення" required>
+          <input id="ws-room-name" type="text" maxlength="120" placeholder="Назва приміщення" required aria-label="Назва приміщення">
           <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Довжина (м)">
           <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Ширина (м)">
           <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Висота (м)">
@@ -405,7 +405,7 @@
         <p class="muted">Калькулятор будівельних матеріалів. Порахуй. Сплануй. Зроби.</p>
       </div>
       <div>
-        <h4>Продукт</h4>
+        <h2>Продукт</h2>
         <ul>
           <li><a href="/uk/kalkulyatory/">Усі калькулятори</a></li>
           <li><a href="/uk/materialy/">Матеріали</a></li>
@@ -422,7 +422,7 @@
         </ul>
       </div>
       <div>
-        <h4>Акаунт</h4>
+        <h2>Акаунт</h2>
         <ul>
           <li><a href="/uk/dodatok/">Застосунок</a></li>
           <li><a href="/app/" rel="nofollow">Мій акаунт</a></li>
@@ -431,7 +431,7 @@
         </ul>
       </div>
       <div>
-        <h4>Правова інформація</h4>
+        <h2>Правова інформація</h2>
         <ul>
           <li><a href="/privacy-policy.html">Політика конфіденційності</a></li>
           <li><a href="/uk/cookies/">Cookies</a></li>
@@ -439,7 +439,7 @@
       </div>
     </div>
     <nav class="foot-langs" aria-label="Мова">
-      <h4>Мова</h4>
+      <h2>Мова</h2>
       <ul>
         <li><a href="/projekty/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/proekty/" hreflang="uk" lang="uk" data-lang="uk" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -459,8 +459,8 @@
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Погоджуюсь" hidden>
-  <p class="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">Докладніше в політиці конфіденційності</a>
     <a class="consent-more" href="/uk/cookies/">Cookies</a>
@@ -481,16 +481,16 @@
   "ru": "/ru/proekty/"
 };</script>
 
-<script src="/assets/i18n.uk.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.uk.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
-<script src="/assets/units.js?v=20260820d"></script>
-<script src="/assets/workspace.js?v=20260820d"></script>
-<script src="/assets/workspace-calc.js?v=20260820d"></script>
-<script src="/assets/workspace-ui.js?v=20260820d"></script>
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/units.js?v=20260820e"></script>
+<script src="/assets/workspace.js?v=20260820e"></script>
+<script src="/assets/workspace-calc.js?v=20260820e"></script>
+<script src="/assets/workspace-ui.js?v=20260820e"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

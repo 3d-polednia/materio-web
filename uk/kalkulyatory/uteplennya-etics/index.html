@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/kalkulatori/izolacija-etics/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/uteplenie-etics/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/ocieplenie-etics/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="Площа фасаду дає плити пінопласту, дюбелі, кілограми клею та метри сітки для утеплення в системі ETICS.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -223,7 +223,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li><a href="/uk/kalkulyatory/">Будівельні калькулятори онлайн</a></li><li aria-current="page">Утеплення (ETICS)</li></ol></nav>
@@ -245,7 +245,8 @@
       </div>
       <div class="calc-out">
         <h2 id="calc-result-h">Результат</h2>
-        <div class="result show" data-result>
+        
+        <div class="result show" data-result role="status">
           <div class="muted eyebrow">Купити</div>
           <div class="big">40 <span class="figure-line">упак.</span></div>
           <div class="rows"><div><span>Одна упаковка</span><b>2 m²</b></div><div><span>Плити пінопласту</span><b>160</b></div><div><span>Дюбелі</span><b>480</b></div><div><span>Клей</span><b>400 kg</b></div><div><span>Сітка</span><b>88 m²</b></div></div>
@@ -322,7 +323,7 @@
         <p class="muted">Калькулятор будівельних матеріалів. Порахуй. Сплануй. Зроби.</p>
       </div>
       <div>
-        <h4>Продукт</h4>
+        <h2>Продукт</h2>
         <ul>
           <li><a href="/uk/kalkulyatory/">Усі калькулятори</a></li>
           <li><a href="/uk/materialy/">Матеріали</a></li>
@@ -339,7 +340,7 @@
         </ul>
       </div>
       <div>
-        <h4>Акаунт</h4>
+        <h2>Акаунт</h2>
         <ul>
           <li><a href="/uk/dodatok/">Застосунок</a></li>
           <li><a href="/app/" rel="nofollow">Мій акаунт</a></li>
@@ -348,7 +349,7 @@
         </ul>
       </div>
       <div>
-        <h4>Правова інформація</h4>
+        <h2>Правова інформація</h2>
         <ul>
           <li><a href="/privacy-policy.html">Політика конфіденційності</a></li>
           <li><a href="/uk/cookies/">Cookies</a></li>
@@ -356,7 +357,7 @@
       </div>
     </div>
     <nav class="foot-langs" aria-label="Мова">
-      <h4>Мова</h4>
+      <h2>Мова</h2>
       <ul>
         <li><a href="/kalkulatory/ocieplenie-etics/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/kalkulyatory/uteplennya-etics/" hreflang="uk" lang="uk" data-lang="uk" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -376,8 +377,8 @@
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Погоджуюсь" hidden>
-  <p class="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">Докладніше в політиці конфіденційності</a>
     <a class="consent-more" href="/uk/cookies/">Cookies</a>
@@ -398,19 +399,19 @@
   "ru": "/ru/kalkulyatory/uteplenie-etics/"
 };</script>
 
-<script src="/assets/i18n.uk.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.uk.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
-<script src="/assets/units.js?v=20260820d"></script>
-<script src="/assets/calculators.js?v=20260820d"></script>
-<script src="/assets/materials.js?v=20260820d"></script>
-<script src="/assets/materials-ui.js?v=20260820d"></script>
-<script src="/assets/workspace.js?v=20260820d"></script>
-<script src="/assets/workspace-calc.js?v=20260820d"></script>
-<script src="/assets/recent.js?v=20260820d"></script>
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/units.js?v=20260820e"></script>
+<script src="/assets/calculators.js?v=20260820e"></script>
+<script src="/assets/materials.js?v=20260820e"></script>
+<script src="/assets/materials-ui.js?v=20260820e"></script>
+<script src="/assets/workspace.js?v=20260820e"></script>
+<script src="/assets/workspace-calc.js?v=20260820e"></script>
+<script src="/assets/recent.js?v=20260820e"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

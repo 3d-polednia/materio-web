@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/kalkulatori/zidanje/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kalkulyatory/kladka/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/murowanie/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="Wall area less the openings, the pieces per m² and a waste allowance give the number of blocks or bricks and the kilograms of mortar.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -223,7 +223,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li><a href="/en/calculators/">Construction calculators online</a></li><li aria-current="page">Masonry</li></ol></nav>
@@ -244,7 +244,8 @@
       </div>
       <div class="calc-out">
         <h2 id="calc-result-h">Result</h2>
-        <div class="result show" data-result>
+        
+        <div class="result show" data-result role="status">
           <div class="muted eyebrow">To buy</div>
           <div class="big">116 <span class="figure-line">pcs</span></div>
           <div class="rows"><div><span>Net</span><b>10 m²</b></div><div><span>Mortar</span><b>200 kg</b></div></div>
@@ -317,7 +318,7 @@ mortar total = net × Mortar kg</code></pre>
         <p class="muted">Building-material calculator. Count. Plan. Build.</p>
       </div>
       <div>
-        <h4>Product</h4>
+        <h2>Product</h2>
         <ul>
           <li><a href="/en/calculators/">All calculators</a></li>
           <li><a href="/en/materials/">Materials</a></li>
@@ -334,7 +335,7 @@ mortar total = net × Mortar kg</code></pre>
         </ul>
       </div>
       <div>
-        <h4>Account</h4>
+        <h2>Account</h2>
         <ul>
           <li><a href="/en/android-app/">The app</a></li>
           <li><a href="/app/" rel="nofollow">My account</a></li>
@@ -343,7 +344,7 @@ mortar total = net × Mortar kg</code></pre>
         </ul>
       </div>
       <div>
-        <h4>Legal</h4>
+        <h2>Legal</h2>
         <ul>
           <li><a href="/privacy-policy.html">Privacy policy</a></li>
           <li><a href="/en/cookies/">Cookies</a></li>
@@ -351,7 +352,7 @@ mortar total = net × Mortar kg</code></pre>
       </div>
     </div>
     <nav class="foot-langs" aria-label="Language">
-      <h4>Language</h4>
+      <h2>Language</h2>
       <ul>
         <li><a href="/kalkulatory/murowanie/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/kalkulyatory/muruvannya/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -371,8 +372,8 @@ mortar total = net × Mortar kg</code></pre>
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Agree" hidden>
-  <p class="consent-text">We use Google Analytics to measure anonymous site traffic and how many people head to Google Play. Do you agree?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">We use Google Analytics to measure anonymous site traffic and how many people head to Google Play. Do you agree?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">More in the privacy policy</a>
     <a class="consent-more" href="/en/cookies/">Cookies</a>
@@ -393,19 +394,19 @@ mortar total = net × Mortar kg</code></pre>
   "ru": "/ru/kalkulyatory/kladka/"
 };</script>
 
-<script src="/assets/i18n.en.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.en.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
-<script src="/assets/units.js?v=20260820d"></script>
-<script src="/assets/calculators.js?v=20260820d"></script>
-<script src="/assets/materials.js?v=20260820d"></script>
-<script src="/assets/materials-ui.js?v=20260820d"></script>
-<script src="/assets/workspace.js?v=20260820d"></script>
-<script src="/assets/workspace-calc.js?v=20260820d"></script>
-<script src="/assets/recent.js?v=20260820d"></script>
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/units.js?v=20260820e"></script>
+<script src="/assets/calculators.js?v=20260820e"></script>
+<script src="/assets/materials.js?v=20260820e"></script>
+<script src="/assets/materials-ui.js?v=20260820e"></script>
+<script src="/assets/workspace.js?v=20260820e"></script>
+<script src="/assets/workspace-calc.js?v=20260820e"></script>
+<script src="/assets/recent.js?v=20260820e"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

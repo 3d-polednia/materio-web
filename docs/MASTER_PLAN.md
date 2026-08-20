@@ -60,7 +60,8 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 31 | SEO kalkulatorów | **Zrobione** — 2026-08-20 |
 | 32 | Mobile QA | **Zrobione** — 2026-08-20 |
 | 33 | Performance | **Zrobione** — 2026-08-20 |
-| 34–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 34 | Accessibility | **Zrobione** — 2026-08-20 |
+| 35–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -215,6 +216,152 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 34
+
+Rozdział XXXII, Sesja 34 w całości: **„ACCESSIBILITY. Dostępność całego produktu.
+Sprawdzić: oba motywy, selektor języka, selektor waluty, formularze, focus, kontrast,
+keyboard navigation."**
+
+Fundament był zrobiony wcześniej i trzyma: jedna reguła `:focus-visible` na tokenach
+(Sesja 4), 44px na każdy cel dotykowy (Sesja 32), `prefers-reduced-motion`, natywny
+`<dialog>` z `showModal()`, menu językowe z `aria-expanded`, Escape i powrotem focusa,
+`aria-pressed` na przełączniku motywu, `role="status"` przy paskach cofnięcia i statusie
+sklepów, `aria-live` przy sumach edytowanego wiersza. Wszystkie pary kolorów przechodzą
+AA w obu motywach.
+
+Ta sesja szukała tego, czego **nie widać na ekranie i czego nie oblewał żaden z dziewiętnastu
+zestawów testów**. Znalazła dziesięć rzeczy i naprawiła je wszystkie.
+
+**1. Dziewięć pól miało jako jedyną etykietę placeholder, a jedna lista wyboru nie miała
+żadnej.** Nowy projekt, nowe pomieszczenie, nowy klient wraz z telefonem i e-mailem, nowe
+zlecenie, nowa wycena, pozycja kosztorysu, nazwa projektu w `/app/`, formularz pomieszczenia
+w `/app/` — i lista „podłoga / ściany / sufit" w pasku pomieszczeń na 150 stronach
+kalkulatorów. Placeholder **nie jest etykietą**: znika, gdy ktoś zaczyna pisać, a czytnik
+ekranu ogłasza takie pole jako „edycja, puste". Każde dostało `aria-label` z tego samego
+klucza, którego używał placeholder, więc nie powstał ani jeden nowy tekst do przetłumaczenia;
+listę wyboru nazywa nowy klucz `ws_surface` (dziesięć języków).
+
+**2. Nagłówki kolumn w stopce były `<h4>` — na wszystkich 375 stronach.** Strona szła
+`h1 → h2 → … → h4`, czyli konspekt, po którym czyta się stronę bez patrzenia na nią, miał
+dziurę dokładnie tam, gdzie zaczyna się mapa serwisu. Poziom nagłówka to **struktura
+dokumentu**, a to, jak duży jest, to reguła w arkuszu — więc nagłówki są `<h2>`, a `footer h2`
+robi z nich to samo, co robił `footer h4`. Do tego `<h3>` karty rejestracji na
+`/app/dashboard/` (stała tuż pod `<h1>`) i pusty `<h2>` tytułu kosztorysu, który wypełnia
+skrypt — ten drugi wychodzi teraz z builda z tym samym zdaniem, do którego skrypt się cofa,
+gdy nie ma projektu.
+
+**3. Link „przejdź do treści" nie przenosił focusa.** `<main id="main">` nie był elementem,
+który może focus dostać, więc przeglądarka przewijała stronę i **zostawiała focus na
+linku** — następny Tab wracał w nagłówek, który odwiedzający właśnie kazał pominąć. Wszystkie
+19 wywołań `<main id="main">` w `src/pages.mjs` i `src/app-pages.mjs` (plus
+`privacy-policy.html`) mają `tabindex="-1"`.
+
+**4. `/aplikacja/` miała dwie karuzele o tym samym `id`.** `hero-shots` i `hero-dots`
+występowały dwa razy na stronie: `getElementById` znajdował pierwszą, więc **druga nigdy się
+nie ruszała**, a dokument był niepoprawny w dziesięciu językach. Karuzele są teraz wiązane
+po atrybucie `data-carousel` i `querySelectorAll`, każda ze swoim własnym stanem.
+
+**5. Wynik kalkulacji nie był ogłaszany.** To jedyna rzecz, po którą ktoś przychodzi na tę
+stronę: naciska „Policz", liczba się zmienia — nic się nie przewija, nic nie nawiguje, focus
+nie zmienia miejsca. Czytnik ekranu nie dostawał o tym **żadnej** informacji. Pudełko wyniku
+jest teraz `role="status"`. Cena tego to `writeResult()` w `assets/calculators.js`: cichy
+przebieg silnika przy ładowaniu strony przerysowywał to, co build już napisał, a zapis do
+regionu `live` oznaczałby przeczytanie wyniku komuś, kto o niego nie prosił. Porównywane są
+**słowa**, nie znaczniki (build wcina HTML, skrypt nie), więc gdy odpowiedź jest ta sama,
+zapis się nie odbywa — a gdy się różni, odbywa się jak wcześniej.
+
+**6. Zrzuty ekranu ruszały się same i nie dało się ich zatrzymać (WCAG 2.2.2).** Karuzela
+przesuwa się co 3,5 s, czyli dłużej niż pięć sekund, i klawiatura nie miała na to żadnej
+odpowiedzi — najechanie myszą to nie jest mechanizm. Pod makietą telefonu stoi teraz przycisk
+stopu: 44px, obie etykiety („zatrzymaj" / „odtwórz", dwa nowe klucze w dziesięciu językach)
+jadą z buildem w języku strony, więc `assets/main.js` nadal nie ma własnego słownika.
+Przycisk **wychodzi z builda ukryty** i odsłania go skrypt w momencie uruchomienia zegara:
+bez JavaScriptu i przy `prefers-reduced-motion` nic się nie rusza, więc nie ma czego
+zatrzymywać. Pauza odwiedzającego jest ważniejsza niż powrót karty na wierzch.
+
+**7. Baner zgody nazywał się „Zgoda".** `role="dialog"` z `aria-label` ustawionym na tekst
+przycisku akceptacji — czytnik ogłaszał „Zgoda, okno dialogowe" i zostawiał człowieka
+z pytaniem, na co się zgadza. Nazwą jest teraz samo zdanie (`aria-labelledby`).
+
+**8. Placeholder miał kolor, którego nikt nie wybrał.** Domyślny kolor przeglądarki to około
+3:1 — poniżej 4,5, którego wymaga zdanie. Jest tokenem (`--muted`, `opacity: 1`), a
+`scripts/check-contrast.mjs` ma dwie nowe pary: tekst wpisany w pole i placeholder, oba na
+`--field-bg`, w obu motywach (5,62:1 i 8,31:1).
+
+**9. Komórki nagłówkowe tabel nie mówiły, co nagłówkują.** `<th>` bez `scope` w tabeli
+cookies i w kosztorysie — dziewięć komórek, wszystkie dostały `scope="col"`.
+
+**10. `privacy-policy.html` jest pisany ręcznie i został z tyłu.** Nie miał linku
+pomijającego nawigację, przełącznik wersji językowej był `<div>` z `aria-label` (a `aria-label`
+nazywa punkt orientacyjny — zwykły `div` nim nie jest, więc nazwa szła donikąd), a jego
+własny przełącznik motywu nie ustawiał `aria-pressed`. Wszystkie trzy naprawione; dwa `<h1>`
+zostają, bo to dwa dokumenty w jednym pliku, każdy w swoim `<article lang>`.
+
+**Dwa nowe zestawy testów.** `scripts/test-a11y.mjs` (59 sprawdzeń, bez zależności) czyta
+375 plików, które poszły na produkcję: punkty orientacyjne i cel linku pomijającego,
+konspekt nagłówków, nazwa każdej kontrolki, `alt` każdego obrazka, każda ikona schowana
+przed drzewem dostępności, unikalność `id` i to, że każde `aria-controls`,
+`aria-labelledby` i `aria-describedby` na coś wskazuje, regiony `live`, trzy przełączniki
+rozdziału XXXII, przycisk stopu karuzeli, `scope` w tabelach i reguły w arkuszu, bez których
+obwódka focusa nie trafia na ekran. `scripts/test-a11y-page.mjs` (55 sprawdzeń, Chromium,
+nic nie jest podstawiane) robi to, czego z pliku nie widać: Tab na link pomijający i Enter
+w `<main>`; **drzewo dostępności zbudowane przez samą przeglądarkę** na czternastu ekranach
+z danymi, sprawdzone pod kątem kontrolki bez nazwy (to jedyny sposób na ekrany, które w
+całości rysuje skrypt z `localStorage`); obwódka na każdym przystanku Taba przez kalkulator
+i przez projekt; brak pułapki klawiaturowej między nagłówkiem a stopką; menu językowe
+otwarte Enterem, przejechane strzałką i zamknięte Escape, które oddaje focus; selektor
+waluty; przełącznik motywu w obu kierunkach, z obwódką widoczną w motywie, na który
+przełączył; kalkulacja zrobiona Enterem i ogłoszona, i to, że **nic nie zostało wpisane do
+regionu `live` zanim odwiedzający o to poprosił** (mierzone `MutationObserver`em założonym
+przed skryptami strony); Escape z dialogu materiałów i focus, który wraca; zrzuty
+zatrzymane i puszczone z klawiatury, i to, że przy `prefers-reduced-motion` nie ruszają się
+w ogóle, a przycisk stopu się nie pokazuje.
+
+**Czego ta sesja nie zrobiła.** Nie uruchomiła prawdziwego czytnika ekranu — NVDA, VoiceOver
+i TalkBack nie działają w tym środowisku, a drzewo dostępności Chromium to **to, co czytnik
+dostaje**, nie to, co powie. Nie oceniała, czy `alt` mówi prawdę i czy kolejność Taba
+odpowiada kolejności czytania — to sądy, których generator nie wyda. Nie ruszała treści,
+slugów, matematyki ani niczego, co dotyczy Sesji 35 i 36.
+
+**Znalezione, nienaprawione** (rozdział XXXV — to nie jest zadanie tej sesji):
+
+- **Notka „Dane się zmieniły" nad wynikiem nie jest ogłaszana.** Pokazuje się przy każdym
+  wpisanym znaku; zrobienie z niej regionu `live` oznaczałoby mówienie do kogoś w trakcie
+  pisania. Sam wynik jest ogłaszany po przeliczeniu i to jest ta informacja, która ma
+  znaczenie — ale decyzja, czy notka ma mieć własny głos, jest do podjęcia.
+- **`scripts/check-contrast.mjs` mierzy tokeny, nie to, co naprawdę wyszło na ekranie.**
+  Para, której nikt nie dopisał do listy, nie jest sprawdzana. Zmierzenie kontrastu
+  wyrenderowanej strony (piksel pod pikselem, w przeglądarce) to osobne narzędzie.
+- **`aria-pressed` na przełączniku motywu mówi „ciemny włączony", a nie „motyw: ciemny".**
+  Działa i jest zgodne, ale przycisk z nazwą „Zmień motyw" i stanem wciśnięcia to nie to
+  samo co grupa dwóch przycisków radio. Do rozważenia razem z ewentualnym trzecim stanem
+  („jak w systemie"), którego dziś nie ma.
+
+**Zmienione pliki.** Nowe: `scripts/test-a11y.mjs`, `scripts/test-a11y-page.mjs`.
+Zmienione: `src/pages.mjs` (`aria-label` na ośmiu polach, `role="status"` na pudełku wyniku,
+`carouselControls()` z przyciskiem stopu, `tabindex="-1"` na `<main>`, `scope` w tabelach,
+tytuł kosztorysu, etykiety przycisków archiwizacji), `src/template.mjs` (nagłówki stopki
+jako `<h2>`, nazwa banera zgody, komentarz przy linku pomijającym), `src/app-pages.mjs`
+(`<h2>` karty rejestracji, `aria-label` na polu projektu, `tabindex="-1"`),
+`assets/main.js` (karuzele po `data-carousel`, przycisk stopu, pauza odwiedzającego),
+`assets/calculators.js` (`writeResult()`), `assets/workspace-calc.js` (nazwa listy
+powierzchni), `assets/app.js` (nazwa pola pomieszczenia), `assets/styles.css`
+(`footer h2`, `.app-card h2`, `.phone-controls`, `.phone-pause`, `::placeholder`),
+`assets/i18n.js` (`shot_pause`, `shot_play` × 10), `assets/i18n-pages.js`
+(`ws_surface` × 10), `scripts/check-contrast.mjs` (dwie pary), `scripts/build.mjs`
+(`STAMP` → `20260820e`), `privacy-policy.html`, `404.html` (`?v=`), `CLAUDE.md`,
+`docs/DESIGN_SYSTEM.md`, `docs/MASTER_PLAN.md` oraz 373 przebudowane strony.
+
+**Testy.** **67 557 sprawdzeń logiki** w 20 zestawach — wszystkie przechodzą, w tym nowy
+`scripts/test-a11y.mjs` (59). `scripts/build.mjs --check`: 1150 kluczy × 10 języków.
+`scripts/check-contrast.mjs`: wszystkie pary przechodzą, w tym dwie nowe. W Chromium
+**3930 sprawdzeń w 16 zestawach, wszystkie zielone** — cały zestaw przebiegnięty po
+zmianach, bo ta sesja ruszyła znaczniki, które czyta każdy z nich.
+
+**Status: ukończone.**
+
+**Następne zadanie: Sesja 35 — SECURITY.**
 
 ### Co zrobiła Sesja 33
 

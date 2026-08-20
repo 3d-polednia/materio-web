@@ -80,6 +80,8 @@ const PAIRS = [
   ["--on-success-soft", "--success-soft", 4.5, "a success message"],
   ["--on-warning-soft", "--warning-soft", 4.5, "a warning message"],
   ["--tertiary", "--tertiary-container", 4.5, "the icon tile on a calculator card"],
+  ["--on-surface", "--field-bg", 4.5, "what somebody types into a field"],
+  ["--muted", "--field-bg", 4.5, "the placeholder in a field"],
   ["--error", "--surface", 4.5, "error text on a card"],
   ["--surface", "--error", 4.5, "the label of a danger button"],
   ["--success", "--bg", 4.5, "success text on the page"],

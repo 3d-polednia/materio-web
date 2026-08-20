@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/ponude/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/kommercheskie-predlozheniya/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/wyceny/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="Cenové ponuky v LiczMat Pro: materiál a ďalšie náklady z projektu, práca ako množstvo krát sadzba, marža a súčet. Dáta zostávajú v tomto prehliadači.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -176,7 +176,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sk/">Domov</a></li><li><a href="/sk/zakazky/">Zákazky</a></li><li aria-current="page">Cenové ponuky</li></ol></nav>
@@ -366,7 +366,7 @@
         <h2>Cenové ponuky</h2>
         <p class="muted">Ponuka berie materiál a ďalšie náklady z projektu. Prácu a maržu dopíšeš vnútri.</p>
         <form id="quo-form" class="inline-form">
-          <input id="quo-name" type="text" maxlength="120" placeholder="Názov ponuky" required>
+          <input id="quo-name" type="text" maxlength="120" placeholder="Názov ponuky" required aria-label="Názov ponuky">
           <select id="quo-project" aria-label="Projekt"></select>
           <button type="submit" class="btn btn-primary btn-sm">Pridať</button>
         </form>
@@ -397,7 +397,7 @@
         <p class="muted">Kalkulačka stavebného materiálu. Spočítaj. Naplánuj. Postav.</p>
       </div>
       <div>
-        <h4>Produkt</h4>
+        <h2>Produkt</h2>
         <ul>
           <li><a href="/sk/kalkulacky/">Všetky kalkulačky</a></li>
           <li><a href="/sk/materialy/">Materiály</a></li>
@@ -414,7 +414,7 @@
         </ul>
       </div>
       <div>
-        <h4>Účet</h4>
+        <h2>Účet</h2>
         <ul>
           <li><a href="/sk/aplikacia/">Aplikácia</a></li>
           <li><a href="/app/" rel="nofollow">Môj účet</a></li>
@@ -423,7 +423,7 @@
         </ul>
       </div>
       <div>
-        <h4>Právne informácie</h4>
+        <h2>Právne informácie</h2>
         <ul>
           <li><a href="/privacy-policy.html">Ochrana súkromia</a></li>
           <li><a href="/sk/cookies/">Cookies</a></li>
@@ -431,7 +431,7 @@
       </div>
     </div>
     <nav class="foot-langs" aria-label="Jazyk">
-      <h4>Jazyk</h4>
+      <h2>Jazyk</h2>
       <ul>
         <li><a href="/wyceny/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/koshtorysy-pro/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -451,8 +451,8 @@
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Súhlasím" hidden>
-  <p class="consent-text">Používame Google Analytics, aby sme anonymne počítali návštevnosť webu a koľko ľudí prejde na Google Play. Súhlasíš?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Používame Google Analytics, aby sme anonymne počítali návštevnosť webu a koľko ľudí prejde na Google Play. Súhlasíš?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">Viac v zásadách ochrany súkromia</a>
     <a class="consent-more" href="/sk/cookies/">Cookies</a>
@@ -473,19 +473,19 @@
   "ru": "/ru/kommercheskie-predlozheniya/"
 };</script>
 
-<script src="/assets/i18n.sk.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.sk.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
-<script src="/assets/workspace.js?v=20260820d"></script>
-<script src="/assets/plan.js?v=20260820d"></script>
-<script src="/assets/pay.js?v=20260820d"></script>
-<script src="/assets/paywall.js?v=20260820d"></script>
-<script src="/assets/crm.js?v=20260820d"></script>
-<script src="/assets/crm-chain.js?v=20260820d"></script>
-<script src="/assets/quotes-ui.js?v=20260820d"></script>
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/workspace.js?v=20260820e"></script>
+<script src="/assets/plan.js?v=20260820e"></script>
+<script src="/assets/pay.js?v=20260820e"></script>
+<script src="/assets/paywall.js?v=20260820e"></script>
+<script src="/assets/crm.js?v=20260820e"></script>
+<script src="/assets/crm-chain.js?v=20260820e"></script>
+<script src="/assets/quotes-ui.js?v=20260820e"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

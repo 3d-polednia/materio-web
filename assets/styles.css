@@ -445,7 +445,7 @@ section.block { padding: var(--section-y) 0; }
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
 .card h3 { margin-bottom: var(--sp-2); }
 .card p { color: var(--muted); margin: 0; }
-.app-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
+.app-card h2, .app-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
 .app-card p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
 /* Account deletion is irreversible, so it is set apart rather than sitting in the
    same list as "change your password". */
@@ -491,6 +491,12 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea {
 .field input, .field select, .search-row input, .inline-form input,
 .mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input,
 .ws-save-row select, .ws-save-new input, .ws-mat-f textarea { width: 100%; }
+/* Placeholder text was whatever the browser made of the field's colour — around 3:1 in
+   Chrome, under the 4.5 a sentence has to clear. It is a token now, and
+   scripts/check-contrast.mjs measures it against the field it sits in, both themes. It
+   is never the only label: session 34 gave every field a name of its own, because a
+   placeholder is gone the moment somebody types. */
+::placeholder { color: var(--muted); opacity: 1; }
 input:not([type="checkbox"]):not([type="radio"]):hover, select:hover, textarea:hover {
   border-color: var(--on-surface);
 }
@@ -799,9 +805,13 @@ footer.site {
 footer .brand { margin-bottom: var(--sp-3); }
 footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--sp-2); }
 footer a { color: var(--muted); }
-footer h4 {
+/* A column heading in the footer is an <h2> and looks like a label. It was an <h4>
+   until session 34: the visual size was right and the level was not, so every page on
+   the site went h2 → h4 and a screen reader's outline had a hole in it where the site
+   map begins. Heading level is document structure; how big it looks is this rule. */
+footer h2 {
   font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--track-wide);
-  color: var(--on-bg); margin: 0 0 var(--sp-3);
+  color: var(--on-bg); margin: 0 0 var(--sp-3); font-weight: var(--fw-bold);
 }
 /* The other half of the language selector. The header's picker is a menu somebody has
    to open; these are plain links, so they work with no script and a crawler follows them
@@ -892,7 +902,27 @@ footer h4 {
   flex: 0 0 100%; width: 100%; height: 100%;
   object-fit: cover; object-position: top center; display: block;
 }
-.phone-dots { display: flex; justify-content: center; gap: 7px; margin-top: var(--sp-4); }
+/* The row under the phone: the dots, and the button that stops them moving (WCAG 2.2.2,
+   session 34). The button is 44 px on every screen — it stands on its own under the
+   mockup rather than in a dense row, so the reasons the header's icon buttons are 36 px
+   do not apply here, and it needs no rule in the phone breakpoint. */
+.phone-controls {
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--sp-3); margin: var(--sp-4) 0 0;
+}
+.phone-dots { display: flex; justify-content: center; gap: 7px; }
+.phone-pause {
+  width: var(--control-h); height: var(--control-h);
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--outline); border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+.phone-pause:hover { color: var(--on-bg); border-color: var(--outline-strong); }
+.phone-pause[hidden] { display: none; }
+/* Both glyphs ship; this shows the one that matches whether the screenshots are moving. */
+.phone-pause .ico-play, .phone-pause.paused .ico-pause { display: none; }
+.phone-pause.paused .ico-play { display: block; }
 .phone-dots i {
   width: 7px; height: 7px; border-radius: var(--radius-pill); background: var(--outline-strong);
   transition: width var(--dur-slow) var(--ease), background var(--dur-slow) var(--ease);

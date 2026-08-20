@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/predracun/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/smeta/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kosztorys/">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +107,7 @@
 <meta name="twitter:description" content="Будівельний кошторис онлайн: зібери результати калькуляторів у один список із кількостями та вартістю, друкуй або збережи як PDF. Без реєстрації.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -196,7 +196,7 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="block page-head no-print">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li aria-current="page">Кошторис</li></ol></nav>
@@ -217,7 +217,8 @@
         <header class="ws-estimate-head">
           <div>
             <p class="ws-estimate-brand">LiczMat</p>
-            <h2 id="ws-estimate-title"></h2>
+            
+            <h2 id="ws-estimate-title">Немає активного проєкту</h2>
           </div>
           <div class="ws-estimate-meta">
             <span id="ws-estimate-date"></span>
@@ -228,11 +229,11 @@
           <table class="ws-table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Позиція</th>
-                <th class="num">Кількість</th>
-                <th class="num">Вартість</th>
-                <th class="no-print"></th>
+                <th scope="col">#</th>
+                <th scope="col">Позиція</th>
+                <th scope="col" class="num">Кількість</th>
+                <th scope="col" class="num">Вартість</th>
+                <th scope="col" class="no-print"></th>
               </tr>
             </thead>
             <tbody id="ws-estimate-rows"></tbody>
@@ -247,7 +248,7 @@
         <h3>Додати позицію вручну</h3>
         <p class="muted">Робота, доставка, матеріал куплений на око — усе, чого калькулятор не рахує.</p>
         <form id="ws-line-form" class="inline-form">
-          <input id="ws-line-name" type="text" maxlength="120" placeholder="Позиція" required>
+          <input id="ws-line-name" type="text" maxlength="120" placeholder="Позиція" required aria-label="Позиція">
           <input id="ws-line-qty" type="text" inputmode="decimal" value="1" aria-label="Кількість">
           <input id="ws-line-unit" type="text" maxlength="24" value="шт." aria-label="Одиниця">
           <input id="ws-line-cost" type="text" inputmode="decimal" placeholder="Вартість" aria-label="Вартість">
@@ -289,7 +290,7 @@
         <p class="muted">Калькулятор будівельних матеріалів. Порахуй. Сплануй. Зроби.</p>
       </div>
       <div>
-        <h4>Продукт</h4>
+        <h2>Продукт</h2>
         <ul>
           <li><a href="/uk/kalkulyatory/">Усі калькулятори</a></li>
           <li><a href="/uk/materialy/">Матеріали</a></li>
@@ -306,7 +307,7 @@
         </ul>
       </div>
       <div>
-        <h4>Акаунт</h4>
+        <h2>Акаунт</h2>
         <ul>
           <li><a href="/uk/dodatok/">Застосунок</a></li>
           <li><a href="/app/" rel="nofollow">Мій акаунт</a></li>
@@ -315,7 +316,7 @@
         </ul>
       </div>
       <div>
-        <h4>Правова інформація</h4>
+        <h2>Правова інформація</h2>
         <ul>
           <li><a href="/privacy-policy.html">Політика конфіденційності</a></li>
           <li><a href="/uk/cookies/">Cookies</a></li>
@@ -323,7 +324,7 @@
       </div>
     </div>
     <nav class="foot-langs" aria-label="Мова">
-      <h4>Мова</h4>
+      <h2>Мова</h2>
       <ul>
         <li><a href="/kosztorys/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
         <li><a href="/uk/koshtorys/" hreflang="uk" lang="uk" data-lang="uk" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
@@ -343,8 +344,8 @@
     </div>
   </div>
 </footer>
-<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Погоджуюсь" hidden>
-  <p class="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Використовуємо Google Analytics, щоб анонімно рахувати трафік сайту й скільки людей переходить у Google Play. Погоджуєшся?</p>
   <div class="consent-actions">
     <a class="consent-more" href="/privacy-policy.html">Докладніше в політиці конфіденційності</a>
     <a class="consent-more" href="/uk/cookies/">Cookies</a>
@@ -365,16 +366,16 @@
   "ru": "/ru/smeta/"
 };</script>
 
-<script src="/assets/i18n.uk.js?v=20260820d"></script>
-<script src="/assets/i18n-runtime.js?v=20260820d"></script>
-<script src="/assets/currency.js?v=20260820d"></script>
-<script src="/assets/account.js?v=20260820d"></script>
+<script src="/assets/i18n.uk.js?v=20260820e"></script>
+<script src="/assets/i18n-runtime.js?v=20260820e"></script>
+<script src="/assets/currency.js?v=20260820e"></script>
+<script src="/assets/account.js?v=20260820e"></script>
 
-<script src="/assets/units.js?v=20260820d"></script>
-<script src="/assets/workspace.js?v=20260820d"></script>
-<script src="/assets/workspace-calc.js?v=20260820d"></script>
-<script src="/assets/workspace-ui.js?v=20260820d"></script>
-<script src="/assets/main.js?v=20260820d"></script>
+<script src="/assets/units.js?v=20260820e"></script>
+<script src="/assets/workspace.js?v=20260820e"></script>
+<script src="/assets/workspace-calc.js?v=20260820e"></script>
+<script src="/assets/workspace-ui.js?v=20260820e"></script>
+<script src="/assets/main.js?v=20260820e"></script>
 
 </body>
 </html>

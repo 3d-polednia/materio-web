@@ -15,9 +15,9 @@
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://liczmat.com/privacy-policy.html">
-<link rel="icon" href="/assets/favicon.svg?v=20260820d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820d">
+<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260820e">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="author" content="LiczMat">
 <meta property="og:type" content="article">
@@ -35,9 +35,14 @@
 <meta name="twitter:description" content="Jak LiczMat traktuje Twoje dane: liczy offline, konto opcjonalne, jawne zasady dot. synchronizacji, reklam i map.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
 </head>
 <body>
+
+<!-- The same skip link the generated pages carry (src/template.mjs). This page is
+     hand-written, so it needs its own copy — and its target carries tabindex="-1", or
+     the browser scrolls to the document and leaves the focus on the link. -->
+<a class="skip-link" href="#main">Przejdź do treści</a>
 
 <!-- Header -->
 <header class="site">
@@ -53,13 +58,15 @@
   </div>
 </header>
 
-<main class="doc">
+<main id="main" tabindex="-1" class="doc">
   <a class="doc-back" href="/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Wróć do strony głównej</a>
 
-  <div class="lang-switch" aria-label="Wersja językowa">
+  <!-- A <nav>, not a <div>: aria-label names a landmark, and a plain div is not one,
+       so the name was going nowhere. -->
+  <nav class="lang-switch" aria-label="Wersja językowa">
     <a href="#pl">Polski</a>
     <a href="#en">English</a>
-  </div>
+  </nav>
 
   <!-- ============================== POLSKI ============================== -->
   <article id="pl" lang="pl">
@@ -461,10 +468,16 @@
       try { var v = localStorage.getItem('liczmat-theme'); if (v === 'dark' || v === 'light') return v; } catch (e) {}
       return mq.matches ? 'dark' : 'light';
     };
+    // The button says which theme is in force, the way it does on every generated page
+    // (buildThemeToggle() in assets/main.js). Without it the control announced nothing
+    // but its name, and pressing it changed nothing a screen reader could hear.
+    var mark = function (mode) { b.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false'); };
+    mark(now());
     b.addEventListener('click', function () {
       var next = now() === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('liczmat-theme', next); } catch (e) {}
+      mark(next);
     });
   })();
 </script>

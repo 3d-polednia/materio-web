@@ -72,7 +72,7 @@ function wsWireCard(card) {
       <label class="ws-bar-label" for="ws-room-${calcId}">${wsEsc(wsT("ws_from_room"))}</label>
       <div class="ws-bar-row">
         <select id="ws-room-${calcId}" data-ws-room></select>
-        ${surfaces.length > 1 ? `<select data-ws-surface>${surfaces.map((s) =>
+        ${surfaces.length > 1 ? `<select data-ws-surface aria-label="${wsEsc(wsT("ws_surface"))}">${surfaces.map((s) =>
           `<option value="${s}">${wsEsc(wsT("ws_surface_" + s))}</option>`).join("")}</select>` : ""}
         <button type="button" class="btn btn-ghost btn-sm" data-ws-apply>${wsEsc(wsT("ws_use"))}</button>
       </div>

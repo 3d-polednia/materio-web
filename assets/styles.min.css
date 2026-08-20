@@ -287,7 +287,7 @@ border-radius: var(--radius); box-shadow: var(--shadow-2);
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
 .card h3 { margin-bottom: var(--sp-2); }
 .card p { color: var(--muted); margin: 0; }
-.app-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
+.app-card h2, .app-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
 .app-card p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
 .app-card.danger {
 border-color: color-mix(in srgb, var(--error) 40%, var(--outline));
@@ -308,6 +308,7 @@ transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--eas
 .field input, .field select, .search-row input, .inline-form input,
 .mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input,
 .ws-save-row select, .ws-save-new input, .ws-mat-f textarea { width: 100%; }
+::placeholder { color: var(--muted); opacity: 1; }
 input:not([type="checkbox"]):not([type="radio"]):hover, select:hover, textarea:hover {
 border-color: var(--on-surface);
 }
@@ -533,9 +534,9 @@ padding: var(--sp-12) 0 var(--sp-7); margin-top: var(--sp-5);
 footer .brand { margin-bottom: var(--sp-3); }
 footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--sp-2); }
 footer a { color: var(--muted); }
-footer h4 {
+footer h2 {
 font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--track-wide);
-color: var(--on-bg); margin: 0 0 var(--sp-3);
+color: var(--on-bg); margin: 0 0 var(--sp-3); font-weight: var(--fw-bold);
 }
 .foot-langs { margin-top: var(--sp-8); }
 .foot-langs ul { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-5); }
@@ -604,7 +605,22 @@ position: relative;
 flex: 0 0 100%; width: 100%; height: 100%;
 object-fit: cover; object-position: top center; display: block;
 }
-.phone-dots { display: flex; justify-content: center; gap: 7px; margin-top: var(--sp-4); }
+.phone-controls {
+display: flex; align-items: center; justify-content: center;
+gap: var(--sp-3); margin: var(--sp-4) 0 0;
+}
+.phone-dots { display: flex; justify-content: center; gap: 7px; }
+.phone-pause {
+width: var(--control-h); height: var(--control-h);
+display: inline-flex; align-items: center; justify-content: center;
+background: transparent; color: var(--muted);
+border: 1px solid var(--outline); border-radius: var(--radius-pill);
+cursor: pointer;
+}
+.phone-pause:hover { color: var(--on-bg); border-color: var(--outline-strong); }
+.phone-pause[hidden] { display: none; }
+.phone-pause .ico-play, .phone-pause.paused .ico-pause { display: none; }
+.phone-pause.paused .ico-play { display: block; }
 .phone-dots i {
 width: 7px; height: 7px; border-radius: var(--radius-pill); background: var(--outline-strong);
 transition: width var(--dur-slow) var(--ease), background var(--dur-slow) var(--ease);

@@ -254,6 +254,12 @@ i `radio`, które zostają natywne. Szerokość (`width: 100%`) dalej jest list�
 to decyzja układu, a nie cecha pola. Stany: `:hover` przyciemnia krawędź, `:focus-visible` daje obwódkę
 i limonkową krawędź, `[aria-invalid="true"]` czerwoną, `:disabled` przygasza.
 
+Placeholder ma od **Sesji 34** własny kolor (`--muted`, `opacity: 1`) zamiast tego, co
+przeglądarka zrobi z koloru tekstu — w Chrome wychodziło z tego około 3:1, czyli poniżej
+4,5, którego wymaga zdanie. `scripts/check-contrast.mjs` mierzy teraz obie pary pola:
+tekst wpisany i placeholder, na tle `--field-bg`, w obu motywach. Placeholder **nigdy** nie
+jest jedyną etykietą — znika, gdy ktoś zaczyna pisać.
+
 ### Komunikat `.result`
 
 Jedno pudełko na „oto wynik” i „nie wyszło”: wynik kalkulatora oraz pasek stanu
@@ -444,4 +450,9 @@ nie ma jak tego wywnioskować.
   dla gościa i dla zalogowanego.
 - **Ikonografia.** Ikony są wklejone inline w `src/pages.mjs` jako SVG, każda ze swoim
   `stroke-width`. Ujednolicenie zestawu to osobna praca.
-- **Dostępność poza kontrastem i celem dotykowym** — Sesja 34.
+- ~~**Dostępność poza kontrastem i celem dotykowym**~~ — zamknięte w **Sesji 34**:
+  `scripts/test-a11y.mjs` (nazwy kontrolek, konspekt nagłówków, punkty orientacyjne,
+  regiony `live`) i `scripts/test-a11y-page.mjs` (focus, klawiatura, oba motywy, oba
+  selektory — w Chromium). Z rzeczy, które dotyczą tego dokumentu: nagłówek kolumny
+  w stopce jest `<h2>`, a nie `<h4>` — poziom nagłówka to struktura dokumentu, a jego
+  rozmiar to reguła `footer h2`.

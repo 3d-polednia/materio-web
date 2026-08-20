@@ -568,6 +568,25 @@ if (typeof document !== "undefined") {
 }
 
 /**
+ * Put new markup into the result box — unless it already says the same thing.
+ *
+ * The box is a live region (`role="status"` in src/pages.mjs), which is what tells a
+ * screen reader the answer after somebody presses "Policz". The price of that is this
+ * function: the silent run on load re-renders the result the build had already written
+ * into the page, and writing identical content into a live region has the answer read
+ * out the moment the page finishes loading, unasked.
+ *
+ * The comparison is of the words rather than of the markup, because the build indents
+ * its HTML and this file does not — and the words are exactly what would be announced.
+ * When they differ the write happens as before, so a visitor whose currency is not the
+ * language's default still gets their own symbol on load.
+ */
+function writeResult(box, html) {
+  const words = (s) => s.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (words(html) !== words(box.innerHTML)) box.innerHTML = html;
+}
+
+/**
  * Draw one result into a card.
  *
  * `byHand` travels out on the `calcresult` event because two listeners need to tell the
@@ -582,7 +601,7 @@ function renderResult(card, res, byHand) {
   card.lastResult = res.err ? null : res;
   if (res.err) {
     box.classList.add("err");
-    box.innerHTML = `<div>${t(res.err, lang)}</div>`;
+    writeResult(box, `<div>${t(res.err, lang)}</div>`);
     document.dispatchEvent(new CustomEvent("calcresult", { detail: { card, result: null, byHand: Boolean(byHand) } }));
     return;
   }
@@ -592,9 +611,9 @@ function renderResult(card, res, byHand) {
     return `<div><span>${t(k, lang)}</span><b>${val}</b></div>`;
   });
   if (res.cost && res.cost > 0) rows.unshift(`<div><span>${t("res_cost", lang)}</span><b>${money(res.cost, lang)}</b></div>`);
-  box.innerHTML = `<div class="muted eyebrow">${t("res_tobuy", lang)}</div>
+  writeResult(box, `<div class="muted eyebrow">${t("res_tobuy", lang)}</div>
     <div class="big">${qty(res.tobuy, lang)} <span class="figure-line">${unitLabel(res.unit, res.tobuy, lang, (k) => t(k, lang))}</span></div>
-    <div class="rows">${rows.join("")}</div>`;
+    <div class="rows">${rows.join("")}</div>`);
 
   // The workspace (assets/workspace-ui.js) hangs the "save to the estimate" button off
   // this. Nothing else listens, and the calculators keep working when it is not loaded.

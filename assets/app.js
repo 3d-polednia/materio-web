@@ -715,7 +715,8 @@ function roomBlock(projectId) {
           : `<li class="empty muted">${T("app_empty_rooms")}</li>`
       }</ul>
       <form class="inline-form" data-room-form>
-        <input type="text" maxlength="120" data-f="name" placeholder="${T("app_new_room")}" required>
+        <input type="text" maxlength="120" data-f="name" placeholder="${T("app_new_room")}" required
+          aria-label="${T("app_new_room")}">
         <input type="text" inputmode="decimal" data-f="lengthM" value="5" aria-label="${T("fld_length")}">
         <input type="text" inputmode="decimal" data-f="widthM" value="4" aria-label="${T("fld_width")}">
         <input type="text" inputmode="decimal" data-f="heightM" value="2.6" aria-label="${T("fld_height")}">
