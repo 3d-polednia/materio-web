@@ -178,6 +178,15 @@ export function page(p) {
   // so every language has a real, indexable address.
   const altJson = jsonLd(alternates);
 
+  // Open Graph's own version of hreflang. og:locale says which language this page is in;
+  // og:locale:alternate says the same page exists in the others, which is what lets a
+  // sharing surface pick the reader's language instead of the one the link was copied in.
+  // Same source as the hreflang block above, so the two cannot disagree.
+  const ogAlternates = bare ? "" : LANGS
+    .filter((l) => l !== lang && alternates[l])
+    .map((l) => `<meta property="og:locale:alternate" content="${OG_LOCALE[l]}">`)
+    .join("\n");
+
   return `<!DOCTYPE html>
 <html lang="${HREFLANG[lang]}">
 <head>
@@ -247,6 +256,7 @@ ${hreflangs}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
 <meta property="og:locale" content="${OG_LOCALE[lang]}">
+${ogAlternates}
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${esc(canonical)}">
@@ -258,6 +268,7 @@ ${hreflangs}
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
 <meta name="twitter:image" content="${BASE}/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="${esc(OG_IMAGE_ALT)}">
 <link rel="stylesheet" href="/assets/styles.css?v=${stamp}">
 ${jsonldBlocks}
 ${p.headExtra || ""}

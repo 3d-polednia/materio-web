@@ -1,16 +1,16 @@
 {
   "name": "LiczMat — kalkulator materiałów budowlanych",
   "short_name": "LiczMat",
-  "description": "Kalkulator i optymalizator materiałów budowlanych. Policz. Kup. Nie marnuj.",
-  "start_url": "./index.html",
-  "scope": "./",
+  "description": "Kalkulator i optymalizator materiałów budowlanych. Policz. Zaplanuj. Zrealizuj.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#faf7f0",
   "theme_color": "#91d206",
   "lang": "pl",
   "categories": ["utilities", "productivity", "business"],
   "icons": [
-    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

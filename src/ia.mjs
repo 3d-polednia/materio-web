@@ -725,6 +725,43 @@ export function livePaths(calcs, guides) {
   return out;
 }
 
+/**
+ * Every URL that belongs in sitemap.xml, with its language group.
+ *
+ * The sitemap used to be a second list of the site, hand-kept in `scripts/build.mjs`
+ * beside this one: fifteen `add()` calls that a new session had to remember to extend.
+ * Session 29 did remember; the next one might not, and a page missing from the sitemap
+ * is a page that says nothing about itself being missing. `indexable` is already a field
+ * on the route, so the list can be read off the architecture instead of repeated.
+ *
+ * A `view` is skipped for the same reason it has no file: it is a state of its parent,
+ * reached by a query string, and its parent's URL is the one to index.
+ *
+ * @param {object[]} calcs CALCS from assets/calculators.js
+ * @param {object[]} guides GUIDES from src/site.mjs
+ * @returns {{loc: string, alternates: object|null, generated: boolean}[]}
+ *          `alternates` is { lang: path } for a localized page and null for a page that
+ *          has one language-neutral URL; `generated` is false for the hand-written one.
+ */
+export function sitemapUrls(calcs, guides) {
+  const out = [];
+  const group = (fn) => Object.fromEntries(LANGS.map((l) => [l, fn(l)]));
+
+  for (const r of liveRoutes()) {
+    if (!r.indexable || r.view) continue;
+    const generated = r.generated !== false;
+    if (!r.localized) { out.push({ loc: r.path, alternates: null, generated }); continue; }
+
+    const each = r.each === "calculator" ? calcs : r.each === "guide" ? guides : [null];
+    for (const item of each) {
+      const url = (l) => (item === null ? r.path(l) : r.path(l, item));
+      const alternates = group(url);
+      for (const lang of LANGS) out.push({ loc: url(lang), alternates, generated });
+    }
+  }
+  return out;
+}
+
 /* ------------------------------------------------------------------ validation */
 
 /**

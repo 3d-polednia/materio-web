@@ -19,7 +19,8 @@
  * the number on the page changes with the next build.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync, existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,8 +32,8 @@ import {
   urlCalendar, urlLiczmatPro,
 } from "../src/site.mjs";
 import {
-  livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
-  route, STATUS, navRoutes, ROUTES, LEVEL, LEVEL_ORDER,
+  livePaths, sitemapUrls, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS,
+  CALC_CATEGORIES, route, STATUS, navRoutes, ROUTES, LEVEL, LEVEL_ORDER,
 } from "../src/ia.mjs";
 import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
@@ -51,7 +52,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819j";
+const STAMP = "20260820a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -314,8 +315,44 @@ const translator = (lang) => (key) =>
 /** "Powierzchnia (m²)" -> "Powierzchnia" — the form a field label takes inside a formula. */
 const bareLabel = (label) => String(label).replace(/\s*\([^)]*\)\s*$/, "").trim();
 
+/**
+ * What a page says, with the cache-busting stamp taken out.
+ *
+ * `STAMP` is bumped whenever a shipped asset changes, and that rewrites the `?v=` on
+ * every one of the 373 pages without a word of any of them changing. sitemap.xml's
+ * `lastmod` is a claim about the page, not about the stylesheet it links to, so the
+ * comparison behind it has to ignore exactly this.
+ */
+const fingerprint = (html) =>
+  createHash("sha1").update(String(html).replace(/\?v=[A-Za-z0-9._-]+/g, "?v=")).digest("hex");
+
+/**
+ * The pages the last build left on disk, fingerprinted before clean() deletes them.
+ * `written` is filled as this build goes; `changed` collects the pages that really did
+ * change, which is what gives sitemap.xml an honest date.
+ */
+const previous = new Map();
+const changed = new Set();
+
+/** The pages this build told crawlers to stay out of, read back off the markup. */
+const noindexed = new Set();
+
+function snapshotPages(dir = ROOT) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name.startsWith(".") || entry.name === "node_modules") continue;
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) { snapshotPages(full); continue; }
+    if (!entry.name.endsWith(".html")) continue;
+    previous.set(full.slice(ROOT.length + 1), fingerprint(readFileSync(full, "utf8")));
+  }
+}
+
 function write(relPath, contents) {
   const full = p(relPath);
+  if (relPath.endsWith(".html")) {
+    if (previous.get(relPath) !== fingerprint(contents)) changed.add(relPath);
+    if (/<meta name="robots" content="noindex/.test(contents)) noindexed.add(relPath);
+  }
   mkdirSync(dirname(full), { recursive: true });
   writeFileSync(full, contents);
   written.push(relPath);
@@ -324,6 +361,12 @@ const written = [];
 
 /** Map of every language's URL for one logical page, for hreflang and the switcher. */
 const alternatesFor = (fn) => Object.fromEntries(LANGS.map((l) => [l, fn(l)]));
+
+/** Every URL that belongs in sitemap.xml, read off src/ia.mjs rather than listed again. */
+const SITEMAP = sitemapUrls(CALCS, GUIDES);
+
+/** The file a sitemap URL stands for: "/kalkulatory/" -> "kalkulatory/index.html". */
+const sitemapFile = (loc) => `${loc.replace(/^\//, "")}${loc.endsWith("/") ? "index.html" : ""}`;
 
 /**
  * Every page carrying a calculator form needs the engines and the material picker — and,
@@ -428,18 +471,33 @@ function workedExample(calc, lang, t) {
  * web product. The MobileApplication entity still exists, on /aplikacja/, which is the
  * page that is actually about the app.
  */
+/**
+ * The two entities every page on the site keeps naming, each with one identity.
+ *
+ * Without them the home page declared a `WebSite` whose `publisher` was an unnamed
+ * Organization node *and*, next to it, a second Organization with the same name and the
+ * same URL: one organisation described twice, which is the reading a consumer of the
+ * markup is entitled to take literally. Every calculator page did the same to the
+ * `WebSite` through `isPartOf`. A stable `@id` makes the repeated node a reference to
+ * one thing instead of another copy of it.
+ */
+const ORG_ID = `${BASE}/#organization`;
+const SITE_ID = `${BASE}/#website`;
+
+/** The site as one entity, referenced from everywhere; `url` is the site, not the page. */
+const SITE_REF = { "@type": "WebSite", "@id": SITE_ID, name: "LiczMat", url: BASE + "/" };
+const ORG_REF = { "@type": "Organization", "@id": ORG_ID, name: "LiczMat", url: BASE + "/" };
+
 const siteLd = (lang, t) => ({
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "LiczMat",
-  url: BASE + urlHome(lang),
+  ...SITE_REF,
   inLanguage: lang,
   description: t("meta_desc"),
   image: `${BASE}/assets/og-image.jpg`,
   // Free in every currency, so the visitor's own choice — which only the browser knows —
   // cannot make this wrong.
   offers: { "@type": "Offer", price: "0", priceCurrency: DEFAULT_CURRENCY[lang] },
-  publisher: { "@type": "Organization", name: "LiczMat", url: BASE + "/" },
+  publisher: ORG_REF,
 });
 
 const faqLd = (t) => ({
@@ -462,7 +520,7 @@ const calcLd = (calc, lang, t) => ({
   applicationCategory: "UtilitiesApplication",
   browserRequirements: "Requires JavaScript",
   inLanguage: lang,
-  isPartOf: { "@type": "WebSite", name: "LiczMat", url: BASE + "/" },
+  isPartOf: SITE_REF,
   offers: { "@type": "Offer", price: "0", priceCurrency: DEFAULT_CURRENCY[lang] },
 });
 
@@ -500,8 +558,8 @@ function buildHome() {
       alternates: alt,
       main: homeMain(lang, t, CALCS, CAT),
       jsonld: [siteLd(lang, t), {
-        "@context": "https://schema.org", "@type": "Organization",
-        name: "LiczMat", url: BASE + "/", logo: `${BASE}/assets/icon-512.png`,
+        "@context": "https://schema.org", ...ORG_REF,
+        logo: `${BASE}/assets/icon-512.png`,
       }, faqLd(t)],
       // No scripts of its own since session 6: the home page leads to the calculators
       // instead of carrying one, so the engines, the catalogue, the material picker and
@@ -991,46 +1049,47 @@ function buildPrivatePages() {
 }
 
 /**
- * sitemap.xml, with the hreflang set repeated on every entry.
+ * sitemap.xml: every indexable URL, its language group, and the day it last changed.
  *
- * The HTML already carries <link rel="alternate" hreflang>, which is what Google reads
- * first; declaring the same set in the sitemap is the second supported channel and the
- * one that survives a page being fetched from cache. Every alternate group has to list
- * every member of the group, including the page itself — a one-way declaration is
- * ignored — so each URL carries the whole map plus x-default.
+ * Three decisions, all of them about telling the truth to a crawler:
+ *
+ * **The list comes from src/ia.mjs.** It used to be fifteen `add()` calls right here — a
+ * second copy of the site map, which a new session had to remember to extend. `indexable`
+ * is a field on the route, so `sitemapUrls()` reads the list off the architecture and the
+ * check at the bottom of this file refuses a build where the two disagree.
+ *
+ * **`lastmod` is carried forward.** Writing today's date onto 371 URLs on every build is
+ * the one thing that makes Google stop reading the field at all — it uses `lastmod` when
+ * it is "consistently and verifiably accurate". So a page keeps the date the previous
+ * sitemap gave it unless this build actually changed what it says; `fingerprint()` is
+ * what decides that, and it ignores the `?v=` stamp so bumping STAMP does not re-date the
+ * whole site. The hand-written page is the one exception: the build does not generate it,
+ * so it cannot tell when it changed, and it goes out with no `lastmod` rather than an
+ * invented one — the element is optional and an absent date costs nothing.
+ *
+ * **No `changefreq`, no `priority`.** Google ignores both, and has said so for years;
+ * nothing else reads them either. They were a per-route number that every new page had to
+ * invent and nobody could check — the definition of a claim this repo cuts.
+ *
+ * The hreflang set is repeated on every entry because that is how the sitemap channel
+ * works: every alternate group has to list every member of the group, the page included.
  */
 function buildSitemap() {
   const today = new Date().toISOString().slice(0, 10);
-  const urls = [];
-  const add = (loc, priority, changefreq, alternates) =>
-    urls.push({ loc, priority, changefreq, alternates });
+  const wasLastmod = previousLastmod();
 
-  for (const lang of LANGS) {
-    add(urlHome(lang), lang === DEFAULT_LANG ? "1.0" : "0.8", "monthly", alternatesFor(urlHome));
-    add(urlCalcIndex(lang), "0.9", "monthly", alternatesFor(urlCalcIndex));
-    add(urlMaterials(lang), "0.8", "monthly", alternatesFor(urlMaterials));
-    add(urlAndroid(lang), "0.8", "monthly", alternatesFor(urlAndroid));
-    add(urlProjects(lang), "0.6", "monthly", alternatesFor(urlProjects));
-    add(urlCookies(lang), "0.3", "yearly", alternatesFor(urlCookies));
-    add(urlEstimate(lang), "0.7", "monthly", alternatesFor(urlEstimate));
-    // Indexable, like every other page that describes what LiczMat does: what a crawler
-    // sees is the module's name, what it is for and that it belongs to LiczMat Pro —
-    // never a client, because every client row is in one browser's own storage.
-    add(urlClients(lang), "0.5", "monthly", alternatesFor(urlClients));
-    add(urlJobs(lang), "0.5", "monthly", alternatesFor(urlJobs));
-    add(urlQuotes(lang), "0.5", "monthly", alternatesFor(urlQuotes));
-    add(urlCalendar(lang), "0.5", "monthly", alternatesFor(urlCalendar));
-    // The page that describes what Pro is. Higher than the modules it describes, because
-    // it is the one of them a visitor with no plan is meant to arrive on.
-    add(urlLiczmatPro(lang), "0.7", "monthly", alternatesFor(urlLiczmatPro));
-    add(urlGuideIndex(lang), "0.7", "monthly", alternatesFor(urlGuideIndex));
-    add(urlStores(lang), "0.7", "monthly", alternatesFor(urlStores));
-    for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly", alternatesFor((l) => urlCalc(l, c.id)));
-    for (const g of GUIDES) add(urlGuide(lang, g), "0.6", "monthly", alternatesFor((l) => urlGuide(l, g)));
-  }
-  add("/privacy-policy.html", "0.3", "yearly");
+  const entry = (u) => {
+    const file = sitemapFile(u.loc);
+    // Generated and untouched → keep the date it already had. Anything the build has no
+    // previous date for is new, and today is when it appeared.
+    const date = !u.generated ? null
+      : changed.has(file) ? today
+      : wasLastmod.get(BASE + u.loc) || today;
+    return `  <url>
+    <loc>${BASE}${u.loc}</loc>${date ? `\n    <lastmod>${date}</lastmod>` : ""}${alternateLinks(u.alternates)}
+  </url>`;
+  };
 
-  // /app/ and /p/ stay out: they are noindex, and a sitemap entry contradicts that.
   const alternateLinks = (map) => {
     if (!map) return "";
     return "\n" + LANGS
@@ -1039,18 +1098,27 @@ function buildSitemap() {
       .join("\n");
   };
 
+  // /app/, /app/dashboard/ and /p/ are not here because they are not `indexable` in
+  // src/ia.mjs: they carry a robots noindex, and a sitemap entry contradicts that.
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${urls.map((u) => `  <url>
-    <loc>${BASE}${u.loc}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>${alternateLinks(u.alternates)}
-  </url>`).join("\n")}
+${SITEMAP.map(entry).join("\n")}
 </urlset>
 `;
   write("sitemap.xml", body);
+}
+
+/** The dates the committed sitemap.xml already carries, keyed by absolute URL. */
+function previousLastmod() {
+  const out = new Map();
+  const file = p("sitemap.xml");
+  if (!existsSync(file)) return out;
+  const xml = readFileSync(file, "utf8");
+  for (const m of xml.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*(?:<lastmod>([^<]+)<\/lastmod>)?/g)) {
+    if (m[2]) out.set(m[1], m[2]);
+  }
+  return out;
 }
 
 /**
@@ -1093,6 +1161,7 @@ if (process.argv.includes("--check")) {
   process.exit(0);
 }
 
+snapshotPages();
 clean();
 buildDictionaries();
 buildHome();
@@ -1129,6 +1198,18 @@ function checkAgainstIA() {
   // The two hand-written pages are declared too; they are never overwritten, only checked.
   for (const f of ["privacy-policy.html", "404.html"]) {
     if (!existsSync(p(f))) mismatches.push(`hand-written page is missing: ${f}`);
+  }
+
+  // sitemap.xml against the markup that shipped, not against the list it was built from.
+  // A page that tells crawlers to stay out and is then advertised in the sitemap is the
+  // site contradicting itself, and it is the mistake that a second hand-kept list of
+  // pages used to make possible.
+  const inSitemap = new Set(SITEMAP.filter((u) => u.generated).map((u) => sitemapFile(u.loc)));
+  for (const f of inSitemap) {
+    if (noindexed.has(f)) mismatches.push(`in sitemap.xml but noindex: ${f}`);
+  }
+  for (const f of built) {
+    if (!inSitemap.has(f) && !noindexed.has(f)) mismatches.push(`indexable but not in sitemap.xml: ${f}`);
   }
   if (mismatches.length) {
     console.error("Build aborted — the pages do not match src/ia.mjs:\n");

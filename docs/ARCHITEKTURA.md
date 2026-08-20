@@ -174,7 +174,31 @@ pozycję, którą ten link zbudował. Zamiast zmiany — przekierowanie.
 **Strona z prywatnymi danymi jest bezjęzykowa i `noindex`.** `/app/` i `/p/` ładują cały
 słownik i tłumaczą się w przeglądarce. Nie mają wersji językowych, bo nie mają treści do
 pozycjonowania, a mają dane, których nie wolno indeksować. Wypadają z `sitemap.xml` i mają
-`noindex` w metatagu **oraz** w `robots.txt`.
+`noindex` w metatagu.
+
+**`noindex` i `Disallow` nie sumują się — znoszą się.** Do sesji 30 `robots.txt` zabraniał
+crawlowania `/app/` i `/p/`, a obie strony miały do tego `noindex` w metatagu. To jedno
+kasowało drugie: robot, któremu każe się nie pobierać strony, nigdy nie przeczyta `noindex`
+na niej, a sam adres i tak może trafić na listę wyników, jeżeli ktoś gdzieś do niego
+linkuje. Przy `/p/<token>` to jest gorsze niż zwykłe zaindeksowanie, bo token w adresie
+**jest** całym poświadczeniem — taka pozycja opublikowałaby go. Dlatego `Disallow` zniknął,
+a `noindex` został: robot pobiera stronę, czyta zakaz i wyrzuca adres z indeksu.
+`scripts/test-seo.mjs` §1b pilnuje, żeby żaden `Disallow` nie zasłonił strony z `noindex`.
+
+**`sitemap.xml` bierze się z tego pliku, nie z drugiej listy.** `sitemapUrls()` w
+`src/ia.mjs` czyta pole `indexable` z tras i rozwija je na dziesięć języków; `scripts/build.mjs`
+porównuje wynik z tym, co naprawdę zapisał, i przerywa build, gdy strona z `noindex` trafiła
+do sitemapy albo indeksowalna z niej wypadła. Wcześniej sitemapa była piętnastoma wywołaniami
+`add()` w buildzie — drugą kopią mapy serwisu, którą każda nowa sesja musiała pamiętać, żeby
+rozszerzyć.
+
+**`lastmod` mówi prawdę albo nie ma go wcale.** Data przenosi się z poprzedniej sitemapy,
+jeżeli build nie zmienił treści strony (porównanie ignoruje `?v=`, więc podbicie `STAMP` nie
+przestempluje całego serwisu). Google czyta `lastmod` tylko wtedy, gdy jest wiarygodny, więc
+371 adresów datowanych na dziś przy każdym buildzie kasowało to pole dla całej domeny.
+Ręcznie pisana polityka prywatności nie dostaje `lastmod` w ogóle — build jej nie generuje,
+więc nie wie, kiedy się zmieniła. `<changefreq>` i `<priority>` zniknęły: Google ich nie
+czyta, nikt inny też, a każda nowa strona musiała je sobie wymyślić.
 
 **GitHub Pages nie ma przepisywania adresów.** To ogranicza routing i trzeba to wiedzieć
 zanim się zaprojektuje adres:

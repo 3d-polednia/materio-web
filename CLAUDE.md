@@ -103,6 +103,7 @@ node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
 node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
 node scripts/test-crm.mjs         # the chain: the walk, the derived history, one link map
 node scripts/test-propage.mjs     # /liczmat-pro/: the route, the price in the HTML, the copy
+node scripts/test-seo.mjs         # technical SEO: sitemap, robots, canonical, hreflang, OG
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -144,7 +145,8 @@ src/ia.mjs            The information architecture: every route, its access leve
                       (guest/liczmat/pro), its parent, its place in the navigation,
                       and how /kalkulatory/ groups the calculators (CALC_CATEGORIES).
                       The build fails if the pages it wrote are not exactly the
-                      pages declared here. Narrative version: docs/ARCHITEKTURA.md
+                      pages declared here, and sitemapUrls() reads sitemap.xml's whole
+                      contents off the same list. Narrative: docs/ARCHITEKTURA.md
 src/site.mjs          Languages, URL slugs per section/calculator/guide — the site map
 src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
 src/pages.mjs         The <main> of each page type
@@ -322,6 +324,24 @@ scripts/test-propage-page.mjs  The same page in Chromium, nothing stubbed: the p
                       linking inside their own, the widths of chapter XXVIII, the home
                       page's third door — and the no-JavaScript variant, where the amount
                       is still on the screen because the build wrote it into the markup
+scripts/test-seo.mjs  The technical SEO of the whole site (session 30, chapter XXXII):
+                      the 375 files that shipped, read back — which pages are open to a
+                      crawler and which four are deliberately closed; robots.txt, and
+                      that no `Disallow` stands in front of a page carrying `noindex`;
+                      sitemap.xml against sitemapUrls() in src/ia.mjs, its `lastmod`
+                      (a real date, never in the future, absent on the page the build
+                      does not generate) and the two elements that are gone; the language
+                      groups in the sitemap and the hreflang sets in the markup, both
+                      checked for reciprocity; every canonical pointing at its own page
+                      and no two pages claiming one; title and description lengths, and
+                      that no two pages share a description; the whole Open Graph and
+                      Twitter set, with og:locale:alternate against the same language list
+                      hreflang uses; and the JSON-LD — that it parses, that every sub-page
+                      carries a BreadcrumbList, and that the Organization and the WebSite
+                      are one entity each rather than one per mention. Dependency-free —
+                      run it after touching the <head> in src/template.mjs,
+                      buildSitemap(), sitemapUrls(), robots.txt, a *_meta key or a
+                      route's `indexable` flag
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -480,8 +500,16 @@ to the **same Firestore schema as the Android app** — the contract is
 `docs/FIRESTORE_SYNC.md` in `3d-polednia/Materio`, and `core/sync/SyncContract.kt` is the
 Kotlin side of it. Change one, change all three.
 
-- All three are **noindex** (robots meta tag *and* `robots.txt`) and stay out of
-  `sitemap.xml`; `Disallow: /app/` covers the dashboard too.
+- All three are **noindex** (the robots meta tag, and only that) and stay out of
+  `sitemap.xml`. **`robots.txt` deliberately blocks nothing** — session 30 removed the
+  `Disallow: /app/` and `Disallow: /p/` that used to sit there, because the two do not
+  stack: a crawler told not to fetch a page never reads the `noindex` on it, and can
+  still list the bare URL on the strength of a link elsewhere. For `/p/<token>` that is
+  worse than an ordinary listing — the token in the URL *is* the credential, so the
+  listing would publish it. Nothing on either page is private to a crawler anyway:
+  `/app/` signed out is a sign-in form and `/p/` with no token renders no estimate.
+  `scripts/test-seo.mjs` §1b fails the moment a `Disallow` reappears in front of a
+  `noindex` page.
 - They have no per-language URLs; they load the whole dictionary and translate in place.
   **Anything JavaScript writes has to be redrawn on `langchange`** — `/app/` swaps the DOM
   instead of navigating, so a list, a date or a chip rendered once stays in the old
@@ -1068,6 +1096,18 @@ Kotlin side of it. Change one, change all three.
   the menu — its position; the header and the footer are generated from that list, so a
   navigation link cannot point anywhere else. Turning a `PLANNED` route into a live one
   also means moving its `plannedSlug` into `SECTION` in `src/site.mjs`.
+- **`sitemap.xml` is read off `src/ia.mjs`, not written a second time.** `sitemapUrls()`
+  expands every `indexable` route across the ten languages; the build then compares the
+  file it wrote against the markup that shipped and aborts if a `noindex` page is
+  advertised or a crawlable one is missing. Until session 30 the sitemap was fifteen
+  hand-kept `add()` calls in `scripts/build.mjs` — a second copy of the site map that a
+  new session had to remember to extend.
+- **`lastmod` is carried forward, and a page keeps its date until its content changes.**
+  Stamping today onto all 371 URLs on every build is what makes Google ignore the field
+  for the whole domain; the comparison behind the date ignores `?v=`, so bumping `STAMP`
+  does not re-date the site. `privacy-policy.html` goes out with no `lastmod` — the build
+  does not generate it and cannot know. `<changefreq>` and `<priority>` are gone: nothing
+  reads them, and every new page had to invent a number nobody could check.
 - **No marketing slop.** No hype headings that say nothing, no claims nobody can
   verify ("in a minute", "the best"), no em dash used as a rhetorical pause. Every
   number on the page must be traceable to the code: the calculator count comes

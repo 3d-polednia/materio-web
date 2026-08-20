@@ -1,11 +1,15 @@
 User-agent: *
 Allow: /
 
-# The signed-in workspace and shared estimates are private by nature: /app/ needs an
-# account and /p/<token> is only meaningful to whoever was handed the link. Both also
-# carry a robots noindex meta tag, which is what actually keeps them out of the index —
-# Disallow alone would only stop the crawl, not the listing.
-Disallow: /app/
-Disallow: /p/
+# The signed-in workspace and shared estimates stay out of the index, and the thing that
+# keeps them out is the robots noindex meta tag on both pages — not a Disallow here.
+#
+# Until session 30 this file also said "Disallow: /app/" and "Disallow: /p/", which
+# undid exactly that: a crawler told not to fetch a page never reads the noindex on it,
+# and a URL it was told not to fetch can still be listed on the strength of a link
+# somewhere else. For /p/<token> that is worse than an ordinary listing, because the
+# token in the URL is the whole credential — the listing would publish it. Crawling
+# them costs two pages and nothing is private on either: /app/ signed out is a sign-in
+# form, and /p/ with no token renders no estimate.
 
 Sitemap: https://liczmat.com/sitemap.xml

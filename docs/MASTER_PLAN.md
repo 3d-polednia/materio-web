@@ -56,7 +56,8 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 28 | Płatności | **Zrobione** — 2026-08-19 |
 | — | *Etap dodatkowy: przywrócenie 10 języków* | **Zrobione** — 2026-08-19 |
 | 29 | Strona LiczMat Pro | **Zrobione** — 2026-08-20 |
-| 30–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 30 | SEO techniczne | **Zrobione** — 2026-08-20 |
+| 31–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -212,6 +213,118 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
 
+### Co zrobiła Sesja 30
+
+Rozdział XXXII, Sesja 30 w całości: **„Cały serwis: metadata, sitemap, robots, canonical,
+Open Graph, structured data, indeksowanie, hreflang, wersje językowe."**
+
+Każda z tych dziewięciu rzeczy jest zdaniem, które serwis wypowiada do maszyny, która nigdy
+nie dopyta — i żadnej z nich nie widać w przeglądarce. Sesja zaczęła się od przeczytania
+wszystkich **375 plików HTML**, które naprawdę leżą w repo, i porównania tego, co mówią, z
+tym, co powinny. Cztery rzeczy były zepsute, trzy dało się zrobić lepiej, a jedna była
+zwykłym zaniedbaniem po rebrandingu. Reszta — `canonical`, wzajemność `hreflang`,
+`x-default`, kompletność wersji językowych — była już poprawna i teraz jest **pilnowana**.
+
+**1. `robots.txt` unieważniał `noindex`, przed którym miał stać.** To najpoważniejsze
+znalezisko. Plik mówił `Disallow: /app/` i `Disallow: /p/`, a obie strony miały do tego
+`noindex` w metatagu — i komentarz w pliku tłumaczył, że to metatag „naprawdę trzyma je poza
+indeksem". Te dwa mechanizmy się nie sumują, tylko **znoszą**: robot, któremu zabrania się
+pobrać stronę, nigdy nie przeczyta zakazu indeksowania na niej, a sam adres nadal może
+trafić na listę wyników, jeżeli ktokolwiek gdziekolwiek do niego linkuje. Przy
+`/p/<token>` to jest gorsze niż zwykłe zaindeksowanie: **token w adresie jest całym
+poświadczeniem**, więc pozycja w Google opublikowałaby link do cudzej wyceny. `Disallow`
+zniknął, `noindex` został. Nic prywatnego przez to nie wycieka — `/app/` bez logowania to
+formularz logowania, a `/p/` bez tokenu nie renderuje żadnej wyceny.
+
+**2. `sitemap.xml` był drugą kopią mapy serwisu.** Piętnaście wywołań `add()` w
+`scripts/build.mjs`, prowadzonych ręcznie obok `src/ia.mjs`, w którym `indexable` jest
+polem trasy od Sesji 3. Sesja 29 pamiętała, żeby dopisać `/liczmat-pro/`; następna mogła nie
+pamiętać, a strona nieobecna w sitemapie nie mówi o sobie, że jej brakuje. Teraz
+`sitemapUrls()` w `src/ia.mjs` rozwija trasy na dziesięć języków i **build porównuje wynik z
+markupem, który naprawdę zapisał** — strona z `noindex` w sitemapie albo indeksowalna poza
+nią przerywa build. 371 adresów, tyle samo co wcześniej; różnica jest w tym, że teraz nie
+da się o żadnym zapomnieć.
+
+**3. `lastmod` kłamał przy każdym buildzie.** Wszystkie 371 adresów dostawały datę dnia
+budowania, także wtedy, gdy zmieniła się jedna strona albo żadna. Google czyta `lastmod`
+tylko wtedy, gdy jest „consistently and verifiably accurate", więc to jedno pole kasowało
+się dla całej domeny. Teraz data **przenosi się z poprzedniej sitemapy**, jeżeli build nie
+zmienił treści strony; porównanie idzie po odcisku treści, z którego wycięty jest `?v=`,
+więc podbicie `STAMP` — które przepisuje wszystkie 373 pliki — nie przestemplowuje serwisu.
+Sprawdzone na żywo: po zmianie jednego klucza w słowniku datę zmieniła **jedna** strona;
+po podbiciu `STAMP` — żadna. Ręcznie pisana `privacy-policy.html` nie dostaje `lastmod`
+w ogóle, bo build jej nie generuje i nie wie, kiedy się zmieniła — brak pola jest dozwolony
+i uczciwszy niż wymyślona data.
+
+**4. `<changefreq>` i `<priority>` zniknęły.** Google ich nie czyta i mówi to od lat, Bing
+tak samo. Były liczbą, którą każda nowa strona musiała sobie wymyślić i której nikt nie mógł
+sprawdzić — dokładnie to, co `CLAUDE.md` każe wycinać. 742 elementy mniej.
+
+**5. Meta description: 97 stron miało opis ucinany w połowie zdania.** Wszystko powyżej ~160
+znaków Google obcina, więc ten tekst był pisany dla nikogo. Skrócone zostały **82 ciągi** w
+jedenastu kluczach (`meta_desc`, `apppage_meta`, `matpage_meta`, `wspage_meta`,
+`clipage_meta`, `jobpage_meta`, `quopage_meta`, `calpage_meta`, `calchub_meta`,
+`guides_meta`, `propage_meta`) — nie przez ucięcie w pół zdania, tylko przez wyrzucenie
+całego zdania albo skrócenie wyliczenia, żeby gramatyka została. Do tego **`calc_meta_pattern`
+w dziesięciu językach**: wzorzec mówił „ten sam wzór co w aplikacji LiczMat **na Androida**",
+co wypychało 14 stron kalkulatorów ponad limit; „na Androida" wypadło, bo o systemie mówi
+sama strona. Najdłuższy opis w serwisie ma teraz **160 znaków**, a nie 236. Żadne dwie
+strony nie mają tego samego opisu — to też jest teraz sprawdzane.
+
+**6. Open Graph był niekompletny.** Doszło `og:locale:alternate` dla pozostałych dziewięciu
+języków — to jest odpowiednik `hreflang` po stronie Open Graph, i pochodzi z **tego samego
+źródła**, więc nie może się z nim rozjechać — oraz `twitter:image:alt`. `privacy-policy.html`,
+pisana ręcznie, nie miała w ogóle `og:site_name`, `og:locale`, wymiarów obrazka, jego opisu
+ani karty Twittera: dostała komplet, ten sam co 373 generowane strony.
+
+**7. Structured data: jedna organizacja zamiast dwóch.** Strona główna deklarowała `WebSite`,
+którego `publisher` był bezimiennym węzłem `Organization`, i **obok** drugą `Organization`
+o tej samej nazwie i tym samym adresie — czyta się to jako dwie firmy. Każda strona
+kalkulatora robiła to samo z `WebSite` przez `isPartOf`. Węzły mają teraz stałe `@id`
+(`#organization`, `#website`), więc powtórzenie jest odwołaniem, a nie kolejną kopią.
+
+**8. `site.webmanifest` nadal roznosił wycofany slogan.** „Policz. Kup. Nie marnuj." —
+to samo hasło, które Sesja 6 zmieniła, a etap rebrandingu wypalił na nowo w `og-image.jpg`.
+Manifest jest linkowany z `<head>` każdej z 373 stron, więc rozdawał je 373 razy. Przy okazji
+`start_url` przestał być `./index.html`, czyli drugim adresem strony głównej.
+
+**9. Chorwacki i serbski nadal mówiły „w Materio".** Sześć ciągów (`wspage_meta`,
+`estpage_h2`, `est_foot` w obu językach) niosło odmienioną nazwę wycofanej marki:
+„Projekti i prostorije **u Materiju**". Jeden z nich był meta description strony
+`/hr/projekti/` i `/sr/projekti/`, czyli tym, co widać w wynikach wyszukiwania.
+
+**Czego ta sesja nie zrobiła.** **53 tytuły stron kalkulatorów przekraczają 60 znaków**
+(najdłuższy: 76, rumuński), bo wzorzec brzmi `{nazwa} — {tytuł centrum kalkulatorów} |
+LiczMat` i wkłada pełny tytuł centrum w tytuł każdego kalkulatora. To jest **Sesja 31 —
+SEO KALKULATORÓW**, której całym tematem jest, co te tytuły mają mówić; zaklepanie dzisiejszego
+wzorca w teście byłoby tą sesją mówiącą następnej, że miała rację. `scripts/test-seo.mjs`
+wymusza limit 60 znaków na wszystkich pozostałych stronach i **nazywa ten jeden wyjątek**.
+Nie ruszone zostały też: `HowTo` i `FAQPage` w danych strukturalnych (Google przestał z nich
+robić rich results, ale sam markup jest poprawny i nic nie psuje), dwa `<h1>` w dwujęzycznej
+polityce prywatności (to jeden dokument z polską i angielską wersją, nie błąd) oraz jej
+przestarzały pasek nawigacji, który wymienia trzy linki zamiast pięciu.
+
+**Zmienione pliki.** `src/ia.mjs` (nowe `sitemapUrls()`), `scripts/build.mjs`
+(`buildSitemap()` przepisane, `previousLastmod()`, `fingerprint()`, `snapshotPages()`,
+kontrola sitemapy w `checkAgainstIA()`, `ORG_ID`/`SITE_ID`, `STAMP` → `20260820a`),
+`src/template.mjs` (`og:locale:alternate`, `twitter:image:alt`), `robots.txt`,
+`site.webmanifest`, `privacy-policy.html` (komplet Open Graph, krótszy opis, `?v=`),
+`404.html` (`?v=`), `assets/i18n-pages.js` (82 opisy + 10 wzorców + 4 ciągi z wycofaną
+marką), `assets/i18n-materials.js` (10 opisów `matpage_meta`), nowe `scripts/test-seo.mjs`,
+`CLAUDE.md`, `docs/ARCHITEKTURA.md` (§4), 373 przebudowane strony i `sitemap.xml`.
+
+**Testy.** **48 457 sprawdzeń logiki** w 17 zestawach — wszystkie przechodzą; nowy
+`scripts/test-seo.mjs` wnosi **36 119** i czyta 375 plików, które naprawdę shipują, a nie
+kod, który je napisał. Sprawdzony też sam test: przywrócenie `Disallow: /app/`, dopisanie
+`<priority>` do sitemapy i wydłużenie jednego opisu do 291 znaków — każde z nich wywala
+odpowiednią sekcję. `scripts/build.mjs --check`: **1149 kluczy × 10 języków**. Testy w
+Chromium pominięte z kodem 0 — Playwright nie jest w tej sesji zainstalowany; ta sesja
+zmienia wyłącznie `<head>` i teksty meta, więc nie ma w niej nic, co widać na ekranie.
+
+**Status: ukończone.**
+
+**Następne zadanie: Sesja 31 — SEO KALKULATORÓW.**
+
 ### Co zrobiła Sesja 29
 
 Rozdział XXXII, Sesja 29 w całości: **„Krótka, konkretna strona prezentująca Pro. Bez
@@ -338,7 +451,7 @@ te, które dotyczą kodu ruszonego w tej sesji; reszta jest opisana i **nie rusz
 
 **Status: ukończone.**
 
-**Następne zadanie: Sesja 30 — SEO TECHNICZNE.**
+**Następne zadanie: Sesja 30 — SEO TECHNICZNE.** *(wykonane 2026-08-20 — raport wyżej.)*
 
 ### Przywrócenie 10 języków — etap dodatkowy po Sesji 28
 
