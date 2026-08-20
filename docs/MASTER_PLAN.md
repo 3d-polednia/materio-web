@@ -58,7 +58,8 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 29 | Strona LiczMat Pro | **Zrobione** — 2026-08-20 |
 | 30 | SEO techniczne | **Zrobione** — 2026-08-20 |
 | 31 | SEO kalkulatorów | **Zrobione** — 2026-08-20 |
-| 32–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 32 | Mobile QA | **Zrobione** — 2026-08-20 |
+| 33–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -213,6 +214,123 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 32
+
+Rozdział XXXII, Sesja 32 w całości: **„MOBILE QA. Pełny test mobilny. Sprawdzenie:
+kalkulatorów, kont, projektów, materiałów, Pro, CRM, wyboru języka, wyboru waluty,
+przełącznika motywu."**
+
+Każdy moduł miał już swój test w Chromium i każdy sprawdzał **własny** ekran we **własnym**
+zestawie szerokości — najczęściej po polsku. Ta sesja pyta o to, o co pyta telefon, i pyta
+o to na całym serwisie naraz, w dziesięciu językach. Znalazła **sześć zastanych defektów
+układu** i **siedem czerwonych zestawów testów**: jeden oblewał uczciwie (nagłówek po
+rosyjsku, zostawiony przez Sesję 31), trzy **wywracały się wyjątkiem**, zanim doszły do
+wyniku, a trzy oblewały **fałszywie**. Siódmy defekt wyszedł dopiero po naprawie
+drugiego — i też jest naprawiony.
+
+**1. Nowy test: `scripts/test-mobile.mjs` (1152 sprawdzenia).** Osiem pytań, każde
+zadane każdej stronie: nic nie przewija się w bok, każde pole to 16px tekstu w pudełku
+44px, każdy cel dotykowy ma 44px, tabela przewija się we własnym pudełku, liczbę wpisuje
+się na klawiaturze numerycznej (`inputmode="decimal"`, nigdy `type="number"`), trzy
+przełączniki działają przy 320px, a kalkulację da się zrobić na najwęższym telefonie.
+Zakres: **wszystkie typy stron w dziesięciu językach przy 320px**, sześć szerokości
+rozdziału XXVIII (320/375/390/430/768/1280) po polsku i po rosyjsku, oraz **moduły
+z danymi w środku** — projekty, materiały, koszty, pomieszczenia, kosztorys, dashboard
+i cztery ekrany Pro. Pusty moduł mieści się na każdej szerokości; to nie jest test.
+
+**2. Etykieta przycisku wypychała stronę poza ekran.** `.btn` miało `white-space: nowrap`,
+a element siatki lub flexa nie potrafi zejść poniżej swojego najdłuższego zdania. Rumuńskie
+„Arată magazinele din apropiere (până la 20 km)" na `/ro/magazine/` przesuwało stronę
+o **103px** przy 320px; ten sam przycisk po rosyjsku o 37px, po niemiecku o 31px, po
+ukraińsku o 48px. Na `/aplikacja/` to samo robił link do katalogu materiałów — po
+rumuńsku i po rosyjsku. Teraz `.btn` ma `white-space: normal; overflow-wrap: anywhere` — etykieta zawija się
+dopiero wtedy, gdy się nie mieści, a `anywhere` jest tym, co w ogóle pozwala minimum
+zejść (`break-word` zostawia szerokość najdłuższego słowa).
+
+**3. Każda kontrolka dodana przez moduły Pro szła na produkcję jako tekst 13px w pudełku
+19–21px.** Status, termin i klient zlecenia, marża i wiersze robocizny wyceny, data
+w terminarzu, listy wyboru projektu. Powód: reguła pola formularza była
+**listą dziesięciu selektorów klasowych**, do której każdy nowy moduł musiał się dopisać,
+a Sesje 22–25 się nie dopisały. Poniżej 16px iOS Safari **przybliża stronę** w momencie
+dotknięcia pola, a 19px to mniej niż połowa celu dotykowego, który blok tokenów sam
+deklaruje. Reguła jest teraz pisana na elemencie (`input:not([type=checkbox]):not([type=radio]),
+select, textarea`), więc kontrolka nowego modułu jest poprawna, zanim ktokolwiek o niej
+pomyśli. `width: 100%` zostało listą klas — to decyzja układu, nie cecha pola.
+
+**4. Tabela kosztorysu ciągnęła stronę w bok.** `/kosztorys/` ma cztery kolumny i kwotę,
+która nie może się łamać w środku liczby; przy 320px wystawało od 15px (uk) do 61px (ru).
+Tabela siedzi teraz w `.ws-table-scroll` i przewija się we własnym pudełku — tak jak od
+Sesji 13 robią to tabele na `/cookies/`. Druk dostaje pełną szerokość z powrotem.
+
+**5. Wiersz nagłówka nie mieścił się po rosyjsku — i to jest ten defekt, który zostawiła
+Sesja 31.** Pięć linków, dwa selektory i przycisk konta potrzebują po rosyjsku **1033px**.
+Szuflada odpalała się przy 900px, zmierzone przy **czterech** językach; przy dziesięciu
+między 900 a ~1050px przełącznik motywu wychodził poza ekran (przy 1000px o 33px, przy
+901px o 92px) i **cała strona przesuwała się w poziomie**. Próg szuflady to teraz
+**1060px** — w `assets/styles.css` i w `assets/main.js` (`min-width: 1061px`), obie liczby
+muszą się zgadzać. `scripts/test-pages.mjs` mierzy rząd tam, gdzie rząd istnieje:
+1061 / 1100 / 1160 / 1280px, dziesięć języków, gość i zalogowany.
+
+**6. Cele dotykowe na telefonie miały 26–40px.** Oba przyciski ikonowe nagłówka po 36px,
+każdy `.btn-sm` (akcje wiersza, przyciski zgody, każde „Dodaj") 40px, czip materiału 30px,
+rozwijane „Dodaj pomieszczenie" / „Dodaj inny koszt" 26px. Poniżej 560px wszystkie rosną
+do 44px, czyli do liczby, którą blok tokenów nazywa celem dotykowym. Powyżej 560px
+rozmiary „dla myszy" zostają: 36px w wierszu nagłówka i 40px w gęstym wierszu tabeli mają
+swój powód, a telefon go nie ma — tam jest cała szerokość ekranu na wiersz. Dotyczy to
+także **obu selektorów w szufladzie**: przycisk języka miał 36px, a lista walut 36px
+i tekst 14px — czyli kontrolkę, przy której iOS Safari przybliża stronę, w miejscu, gdzie
+selektory stoją po jednym w wierszu.
+
+**7. Wybór pomieszczenia przy zapisanej pozycji — defekt, który wyszedł z naprawy
+punktu 3.** Etykieta i lista stały w jednym wierszu bez zawijania i mieściły się, dopóki
+lista była mała; gdy urosła do 44px, wiersz zaczął wystawać o 48px poza ekran przy 320px.
+Etykieta schodzi teraz nad listę, gdy nie ma z czym dzielić linii. Wyłapane przez ten sam
+test w tym samym przebiegu, nie po fakcie.
+
+**8. Sześć zestawów testów w przeglądarce było czerwonych, a nikt tego nie widział.**
+`test-projects-page.mjs`, `test-materials-page.mjs` i `test-costs-page.mjs` **wywracały
+się wyjątkiem** na piątym języku: tabela oczekiwanych słów ma cztery języki, a pętla po
+przywróceniu dziesięciu chodzi po dziesięciu. Pętla chodzi teraz po tym, co tabela nazywa
+(sekcja nadal nazywa się „four languages"); rozszerzenie tabeli do dziesięciu to przegląd
+tłumaczeń, nie sesja QA. `test-clients-page.mjs`, `test-jobs-page.mjs`
+i `test-calendar-page.mjs` **fałszywie oblewały** sekcję „stopka nie proponuje linku
+gościowi": ich `open()` od Sesji 28 domyślnie sadza konto na poziomie `pro`, więc „gość"
+w teście był kontem Pro. Trzy razy `pro: false` i sekcje mówią to, co miały mówić.
+
+**Czego ta sesja nie zrobiła.** Nie ruszała matematyki kalkulatorów, treści, slugów ani
+adresów (rozdział XIII i XXXIV). Nie zmieniała rozmiarów kontrolek powyżej 560px — to jest
+design system Sesji 4 i działa tam, gdzie działa mysz. Nie tłumaczyła tabel `WANT`
+w trzech testach na dziesięć języków. Nie sprawdziła `/app/` po zalogowaniu — Chromium
+w kontenerze nie dosięga `gstatic.com`, więc SDK Firebase nie odpowiada; ekran za
+logowaniem ma swój test z podstawionym SDK (`scripts/test-account-page.mjs`), a ta sesja
+sprawdza markup, który `/app/` wysyła i który widać, zanim SDK odpowie.
+
+**Zmienione pliki.** Nowy `scripts/test-mobile.mjs`; `assets/styles.css` (zawijanie
+etykiety przycisku, reguła pola na elemencie, `.ws-table-scroll`, wiersz pomieszczenia,
+blok szuflady wydzielony do `max-width: 1060px`, cele dotykowe poniżej 560px),
+`assets/main.js` (`min-width: 1061px`), `src/pages.mjs` (kosztorys w pudełku
+przewijanym), `src/ia.mjs` (komentarz o progu nagłówka), `scripts/build.mjs`
+(`STAMP` → `20260820c`), `scripts/test-pages.mjs` (szerokości nagłówka),
+`scripts/test-projects-page.mjs`, `scripts/test-materials-page.mjs`,
+`scripts/test-costs-page.mjs` (pętla po językach tabeli), `scripts/test-clients-page.mjs`,
+`scripts/test-jobs-page.mjs`, `scripts/test-calendar-page.mjs` (`pro: false` u gościa),
+`404.html` i `privacy-policy.html` (`?v=`), `CLAUDE.md`, `docs/DESIGN_SYSTEM.md`,
+`docs/ARCHITEKTURA.md`, `docs/DOKUMENTACJA.md`, `docs/MASTER_PLAN.md`, 373 przebudowane
+strony i dziesięć wygenerowanych słowników. `sitemap.xml` bez zmian: `lastmod` liczy się
+od treści, a wszystkie 370 adresów miały już dzisiejszą datę po Sesjach 30 i 31.
+
+**Testy.** **54 340 sprawdzeń logiki** w 18 zestawach — wszystkie przechodzą.
+`scripts/build.mjs --check`: 1147 kluczy × 10 języków. `scripts/check-contrast.mjs`:
+wszystkie pary przechodzą. W Chromium **3875 sprawdzeń w 15 zestawach, wszystkie
+zielone** — w tym nowy `scripts/test-mobile.mjs` (1152) oraz sześć zestawów, które przed
+tą sesją albo wywracały się wyjątkiem, albo oblewały fałszywie, i `test-pages.mjs`, który
+oblewał uczciwie na nagłówku po rosyjsku. Przed tą sesją zielonych zestawów w Chromium
+było osiem z czternastu.
+
+**Status: ukończone.**
+
+**Następne zadanie: Sesja 33 — PERFORMANCE.**
 
 ### Co zrobiła Sesja 31
 
@@ -2221,6 +2339,20 @@ komentarz nagłówka.
 ## Otwarte decyzje
 
 Rozstrzygnąć, zanim dotknie ich któraś z kolejnych sesji.
+
+### Trzy testy sprawdzają cztery języki z dziesięciu — z Sesji 32
+
+`test-projects-page.mjs`, `test-materials-page.mjs` i `test-costs-page.mjs` porównują to,
+co widać na ekranie, z **ręcznie zatwierdzoną** tabelą słów: „Wszystkie projekty",
+„Alle Projekte", „Усі проєкти", „All projects". Tabela ma cztery języki, bo powstała, gdy
+serwis miał cztery. Po przywróceniu dziesięciu pętla chodziła po dziesięciu i **wywracała
+się wyjątkiem** na piątym — Sesja 32 zawęziła pętlę do tego, co tabela nazywa, żeby test
+w ogóle coś sprawdzał.
+
+Zostaje decyzja właściciela: **czy dopisać pozostałe sześć języków**. To nie jest praca
+programistyczna — tabela jest drugim źródłem prawdy właśnie po to, żeby złe tłumaczenie
+w słowniku miało się o co rozbić, więc dopisanie jej z tego samego słownika nic nie da.
+Sześć języków × trzy tabele × 4–5 słów to **przegląd tłumaczeń**, nie sesja QA.
 
 ### Opis i notatki projektu wymagają zmiany kontraktu — z Sesji 15
 

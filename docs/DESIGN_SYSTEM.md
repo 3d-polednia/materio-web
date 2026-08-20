@@ -237,7 +237,13 @@ bywa linkiem. `.app-card.danger` to wariant dla operacji nieodwracalnej.
 Wszystkie pola serwisu — kalkulator, wyszukiwarka sklepów, dialog materiałów, pasek
 pomieszczeń, edycja pozycji kosztorysu, formularz logowania — to jedna reguła:
 44px wysokości, tekst 16px, tło `--field-bg`, krawędź `--outline-control`,
-`--radius-xs`. Stany: `:hover` przyciemnia krawędź, `:focus-visible` daje obwódkę
+`--radius-xs`. Reguła jest pisana **na elemencie** (`input`, `select`, `textarea`),
+a nie na klasach: do Sesji 32 była listą dziesięciu selektorów, do której każdy nowy
+moduł musiał się dopisać, i żadna z kontrolek dodanych przez moduły Pro (status, termin
+i klient zlecenia, marża i wiersze robocizny wyceny, data w terminarzu, listy wyboru
+projektu) się nie dopisała — szły na produkcję jako tekst 13px w pudełku 19–21px. Wyjątkiem są `checkbox`
+i `radio`, które zostają natywne. Szerokość (`width: 100%`) dalej jest listą klas, bo
+to decyzja układu, a nie cecha pola. Stany: `:hover` przyciemnia krawędź, `:focus-visible` daje obwódkę
 i limonkową krawędź, `[aria-invalid="true"]` czerwoną, `:disabled` przygasza.
 
 ### Komunikat `.result`
@@ -265,7 +271,8 @@ selektory, przycisk konta, przełącznik motywu, przycisk menu.
 
 ### Nawigacja mobilna `.nav-links.open` (Sesja 5)
 
-Poniżej 900px nawigacja to szuflada pod nagłówkiem, zachowująca się jak nakładka:
+Poniżej 1060px (do Sesji 32: 900px) nawigacja to szuflada pod nagłówkiem,
+zachowująca się jak nakładka:
 
 - przyciemnienie strony (`.nav-scrim`, `--overlay`) — kliknięcie zamyka,
 - `body.nav-open { overflow: hidden }` — pod szufladą nic się nie przewija,
@@ -325,21 +332,32 @@ w chwili kliknięcia z klawiatury robił się prostokątny.
 
 ## 7. Responsywność
 
-Mobile-first (rozdział XXVIII). **Cztery szerokości, ani jednej więcej:**
+Mobile-first (rozdział XXVIII). **Pięć szerokości, ani jednej więcej:**
 
 | Punkt | Co się zmienia |
 |---|---|
-| 560px | siatki schodzą do jednej kolumny, wiersz sklepu się rozkłada, `--gutter` → 16px |
+| 560px | siatki schodzą do jednej kolumny, wiersz sklepu się rozkłada, `--gutter` → 16px, wszystkie cele dotykowe rosną do 44px |
 | 760px | zrzuty aplikacji i wiersze katalogu w jednej kolumnie |
-| 900px | układ desktopowy: hero, kalkulator + „jak liczymy”, stopka, **nawigacja staje się szufladą** |
+| 900px | układ desktopowy: hero, kalkulator + „jak liczymy”, stopka |
+| 1060px | **nawigacja staje się szufladą** |
 | 1160px | `--maxw`, szerokość treści; pasek nagłówka ściska odstępy, żeby zmieścić się w jednym wierszu |
 
 Przed Sesją 4 breakpointów było siedem (420, 520, 560, 640, 760, 860, 900) — każdy
 dodany przy okazji jednego komponentu, żaden nieuzgodniony z resztą.
 
+Piąty, 1060px, dołożyła **Sesja 32** i jest zmierzony, nie okrągły: szufladę odpalało
+900px, zmierzone przy czterech językach. Przy dziesięciu wiersz nagłówka zalogowanego
+rosyjskiego gościa potrzebuje 1033px, więc przy 1000px przełącznik motywu wychodził
+33px poza ekran i **cała strona przesuwała się w poziomie**. Ta sama liczba stoi
+w `assets/main.js` (`min-width: 1061px`) — obie muszą się zgadzać.
+
 Cel dotykowy ma **44px** (`--control-h`) także na desktopie: drugi zestaw rozmiarów
 „dla myszy” to drugi projekt do utrzymania. Wyjątkiem są kontrolki w pasku nagłówka
-(`--control-h-sm`, 36px), gdzie 44px rozsadziłoby wiersz o wysokości 64px.
+(`--control-h-sm`, 36px), gdzie 44px rozsadziłoby wiersz o wysokości 64px, oraz
+`.btn-sm` (40px) w gęstych wierszach tabel i kart. **Poniżej 560px wyjątków nie ma** —
+Sesja 32 zmierzyła, że na telefonie 36px miały oba przyciski ikonowe nagłówka, 40px
+każdy `.btn-sm`, 30px czip materiału i 26px rozwijane „Dodaj pomieszczenie”. Wszystkie
+rosną tam do 44px; pilnuje tego `scripts/test-mobile.mjs`.
 
 ---
 
@@ -411,10 +429,11 @@ nie ma jak tego wywnioskować.
 
 - **Układ strony głównej, nagłówka i centrum kalkulatorów.** To Sesje 5, 6 i 7.
   Sesja 4 ustaliła materiał (tokeny, komponenty, stany), nie rozkład sekcji.
-- **Przycisk „Moje konto” w nagłówku łamie się na dwie linie między 900 a ~1010px**,
-  a między 900 a ~960px strona przesuwa się w poziomie. Defekt zastany; Sesja 4
-  zawęziła pas przesuwania (przed nią sięgał ~1010px), ale samo rozwiązanie należy do
-  przebudowy nagłówka w Sesji 5.
+- ~~**Przycisk „Moje konto” w nagłówku łamie się na dwie linie między 900 a ~1010px**,
+  a między 900 a ~960px strona przesuwa się w poziomie.~~ Zamknięte w **Sesji 32**:
+  szuflada odpala się teraz przy 1060px, więc wiersz nagłówka istnieje wyłącznie tam,
+  gdzie się mieści — sprawdzone w dziesięciu językach na 1061 / 1100 / 1160 / 1280px,
+  dla gościa i dla zalogowanego.
 - **Ikonografia.** Ikony są wklejone inline w `src/pages.mjs` jako SVG, każda ze swoim
   `stroke-width`. Ujednolicenie zestawu to osobna praca.
 - **Dostępność poza kontrastem i celem dotykowym** — Sesja 34.

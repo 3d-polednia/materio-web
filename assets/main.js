@@ -60,7 +60,11 @@ function buildMobileNav() {
   const links = document.getElementById("nav-links");
   if (!toggle || !links) return;
   const scrim = document.getElementById("nav-scrim");
-  const desktop = window.matchMedia("(min-width: 901px)");
+  // One number, and it lives in assets/styles.css: the drawer's breakpoint moved from
+  // 900 px to 1060 px in session 32, because ten languages have to fit the row and the
+  // Russian one needed 1033 px. Keep the two in step — a mismatch leaves the drawer open
+  // as a plain row, or shuts a menu the visitor can still see.
+  const desktop = window.matchMedia("(min-width: 1061px)");
 
   // The pages carry their copy in their own language, but /app/ and /p/ switch language
   // in place, so the label is asked for at the moment it changes.

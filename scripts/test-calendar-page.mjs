@@ -432,7 +432,11 @@ head("4. chapter XXV's paywall: the wall, the two rungs and the one door through
 head("4b. the footer offers the page to a Pro account and to a crawler");
 {
   const footLink = `footer.site a[href$="${urlCalendar("pl")}"]:not([data-lang])`;
-  const guest = await open(ctx, CAL, { workspace: workspace() });
+  /* `pro: false` is what makes this visitor a guest. open() plants "pro" by default —
+     session 28 made that the way to ask for the tool rather than the wall — so without it
+     the "guest" here was a Pro account and was offered the link it is supposed not to see.
+     The section had been failing since that default arrived (found in session 32). */
+  const guest = await open(ctx, CAL, { workspace: workspace(), pro: false });
   const shown = await guest.$$eval(footLink, (a) =>
     a.filter((n) => n.getBoundingClientRect().height > 0).length);
   eq("a guest is not offered the link", shown, 0);

@@ -526,7 +526,12 @@ head("12. four languages");
     de: ["Alle Projekte", "Berechnungen", "Archiv", "Dieses Projekt gibt es nicht"],
     uk: ["Усі проєкти", "Розрахунки", "Архів", "Такого проєкту немає"],
   };
-  for (const lang of LANGS) {
+  /* The table is the four languages somebody approved word for word. The ten-language
+     restore after session 28 widened LANGS and left the table standing, so this section
+     stopped checking anything and crashed on the fifth language instead (found in
+     session 32). Loop what the table names; widening it to ten is a translation review,
+     not a mobile sweep. */
+  for (const lang of LANGS.filter((l) => WANT[l])) {
     const url = urlProjects(lang);
     const page = await open(ctx, `${url}?id=p1`, { workspace: fixture(), active: "p1", lang });
     const body = await page.innerText("#ws-project");

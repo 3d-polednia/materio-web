@@ -359,7 +359,12 @@ section.block { padding: var(--section-y) 0; }
    comes from --control-h so a button and a field next to it line up. */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
-  white-space: nowrap;
+  /* A label wraps only when it cannot fit. `nowrap` made a button as wide as its longest
+     sentence, and a grid or flex item cannot shrink below that, so one Romanian label
+     ("Arată magazinele din apropiere (până la 20 km)") pushed the whole page 103 px
+     sideways on a 320 px phone. `anywhere` is what lets the minimum shrink at all —
+     `break-word` leaves the min-content width of the longest word standing. */
+  white-space: normal; overflow-wrap: anywhere;
   font: inherit; font-weight: var(--fw-bold); cursor: pointer; text-align: center;
   min-height: var(--control-h); padding: var(--sp-3) var(--sp-5);
   border-radius: var(--radius-pill); border: 1px solid transparent;
@@ -460,26 +465,37 @@ section.block { padding: var(--section-y) 0; }
 /* ---------- Form controls
    Every field on the site is this one rule: same height as a button, 16px text
    (anything smaller makes iOS Safari zoom the page on focus), a border strong
-   enough to see against the field, and one focus treatment. */
-.field input, .field select, .search-row input, .inline-form input,
-.mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input,
-.ws-save-row select, .ws-save-new input, .ws-mat-f textarea {
-  width: 100%; font: inherit; font-size: var(--fs-base); line-height: var(--lh-snug);
+   enough to see against the field, and one focus treatment.
+
+   It is written by element and not by class on purpose. It used to be a list of ten
+   selectors that every new module had to remember to join, and session 32 measured what
+   that costs: every control the Pro modules added — the job's status, its deadline and
+   its client, the quote's margin and its labour lines, the terminarz's date, the project
+   pickers — had never joined it, so they shipped at 13 px in a 19-to-21 px box. That is
+   half the
+   44 px tap target the token block declares, and under 16 px is exactly what makes iOS
+   Safari zoom the page the moment a finger lands in the field.
+
+   A checkbox and a radio keep their native box; nothing else on this site wants one. */
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  font: inherit; font-size: var(--fs-base); line-height: var(--lh-snug);
   min-height: var(--control-h); padding: var(--sp-2) var(--control-px);
   border-radius: var(--radius-xs); border: 1px solid var(--outline-control);
   background: var(--field-bg); color: var(--on-surface);
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
-.field input:hover, .field select:hover, .search-row input:hover, .inline-form input:hover,
-.mat-search:hover, .ws-bar-row select:hover, .ws-estimate-bar select:hover,
-.ws-save-row select:hover, .ws-save-new input:hover, .ws-mat-f textarea:hover {
+/* Which of them fill their line. This stayed a list when the rule above stopped being
+   one: a field in a form takes the width of the form, and a control in a row — the
+   currency select in the header, a quantity beside a unit — takes the width of what it
+   holds. The two are a layout decision per place, not a property of being a field. */
+.field input, .field select, .search-row input, .inline-form input,
+.mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input,
+.ws-save-row select, .ws-save-new input, .ws-mat-f textarea { width: 100%; }
+input:not([type="checkbox"]):not([type="radio"]):hover, select:hover, textarea:hover {
   border-color: var(--on-surface);
 }
-.field input:focus-visible, .field select:focus-visible, .search-row input:focus-visible,
-.inline-form input:focus-visible, .mat-search:focus-visible, .ws-bar-row select:focus-visible,
-.ws-estimate-bar select:focus-visible, .ws-editing input:focus-visible,
-.ws-save-row select:focus-visible, .ws-save-new input:focus-visible,
-.ws-mat-f textarea:focus-visible {
+input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+select:focus-visible, textarea:focus-visible {
   border-color: var(--accent);
 }
 /* A field the browser or the page has marked wrong. Colour is never the only
@@ -546,6 +562,10 @@ section.block { padding: var(--section-y) 0; }
   letter-spacing: var(--track-wide); color: var(--muted);
 }
 .ws-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* Four columns and a złoty amount do not fit across 320 px, and the amounts must not
+   wrap mid-number, so the table scrolls inside its own box instead of taking the page
+   with it (chapter XXVIII). Printing gets the whole width back, below. */
+.ws-table-scroll { overflow-x: auto; }
 
 /* The storage tables on /cookies/ are wide and the page is often read on a phone,
    so they scroll inside their own box rather than pushing the page sideways. */
@@ -1403,9 +1423,13 @@ a.chip:hover { text-decoration: none; }
 /* Which project a room belongs to, on the index where several projects' rooms meet. */
 .ws-room-of { font-size: var(--fs-sm); }
 /* Filing one calculation under one room. It takes a line of its own under the row for the
-   same reason the note does: the two things beside it are a name and a number. */
-.ws-line-room { flex-basis: 100%; display: flex; align-items: center; gap: var(--sp-2); }
-.ws-line-room select { max-width: 16rem; }
+   same reason the note does: the two things beside it are a name and a number.
+
+   The label and the picker share a line while there is one to share: at 320 px the picker
+   is a 44 px control with a room name in it, so the label goes above it rather than the
+   pair going off the side of the phone. */
+.ws-line-room { flex-basis: 100%; display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.ws-line-room select { max-width: 16rem; min-width: 0; flex: 1 1 10rem; }
 
 /* /app/: the rooms of one project, inside the project's own row. They take the whole width
    under the name and the actions, for the reason a material's note does — what is above
@@ -1565,14 +1589,16 @@ a.chip:hover { text-decoration: none; }
 .figure-line { font-size: var(--fs-base); font-weight: var(--fw-semi); }
 
 /* ========================================================== 8. RESPONSIVE
-   Four widths, no more: 560 (phone), 760 (large phone / small tablet), 900 (the
-   desktop layout), 1160 (the content width, held by --maxw). Mobile-first is the
+   Five widths, no more: 560 (phone), 760 (large phone / small tablet), 900 (the
+   desktop layout), 1060 (the header row, which needs more room than the layout does)
+   and 1160 (the content width, held by --maxw). Mobile-first is the
    rule — these blocks take things away above the phone layout only where a
    component genuinely needs a second arrangement. */
 
-/* Between the content width and the desktop layout the header row has no slack: the
-   links give up their side padding before anything is taken away. Measured in German,
-   which has the longest labels of the four. */
+/* Between the content width and the drawer the header row has no slack: the links give
+   up their side padding before anything is taken away. Measured in German when there
+   were four languages; with ten it is Russian that decides, and what it decided is the
+   breakpoint below. */
 @media (max-width: 1160px) {
   .nav, .nav-links { gap: var(--sp-2); }
   .nav-list { gap: 0; }
@@ -1580,23 +1606,13 @@ a.chip:hover { text-decoration: none; }
   .lang-btn, .cur-select { padding-left: var(--sp-2); padding-right: var(--sp-2); }
 }
 
-@media (max-width: 900px) {
-  .hero-grid { grid-template-columns: 1fr; }
-  .hero-media { order: -1; }
-  .features { grid-template-columns: 1fr 1fr; }
-  .stores-wrap { grid-template-columns: 1fr; }
-  .foot-grid { grid-template-columns: 1fr 1fr; }
-  .calc-tool .calc { grid-template-columns: 1fr; gap: var(--sp-6); padding: var(--sp-6); }
-  .calc-out { position: static; }
-  .calc-how-grid { grid-template-columns: 1fr; }
-  .stat-band { grid-template-columns: 1fr 1fr; gap: var(--sp-6) var(--sp-4); }
-  .doors { grid-template-columns: 1fr; }
-  .steps { grid-template-columns: 1fr 1fr; }
-  .doc .toc ul { grid-template-columns: 1fr; }
-  .cta-banner { grid-template-columns: 1fr; text-align: center; }
-  .cta-copy { display: flex; flex-direction: column; align-items: center; }
-  .cta-shots { display: none; }
-
+/* The header collapses into the drawer here, and the number is measured rather than
+   round: at 1000 px a signed-in Russian visitor had five links, two pickers and the
+   account button in a row that needed 1033 px, so the theme switch ended 33 px past the
+   edge and every page scrolled sideways (session 32). The row is widest in Russian and
+   Ukrainian; ten languages have to fit it, not four, so the breakpoint moved up from the
+   900 px that fitted the four it was measured against. */
+@media (max-width: 1060px) {
   /* The navigation becomes a drawer under the header. The theme switch and the menu
      button stay outside it, so both are reachable with the drawer shut. A drawer
      taller than the phone scrolls on its own; the page behind it does not. */
@@ -1631,6 +1647,24 @@ a.chip:hover { text-decoration: none; }
   .theme-toggle { margin-left: auto; }
 }
 
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-media { order: -1; }
+  .features { grid-template-columns: 1fr 1fr; }
+  .stores-wrap { grid-template-columns: 1fr; }
+  .foot-grid { grid-template-columns: 1fr 1fr; }
+  .calc-tool .calc { grid-template-columns: 1fr; gap: var(--sp-6); padding: var(--sp-6); }
+  .calc-out { position: static; }
+  .calc-how-grid { grid-template-columns: 1fr; }
+  .stat-band { grid-template-columns: 1fr 1fr; gap: var(--sp-6) var(--sp-4); }
+  .doors { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; }
+  .doc .toc ul { grid-template-columns: 1fr; }
+  .cta-banner { grid-template-columns: 1fr; text-align: center; }
+  .cta-copy { display: flex; flex-direction: column; align-items: center; }
+  .cta-shots { display: none; }
+}
+
 @media (max-width: 760px) {
   .shot-grid { grid-template-columns: 1fr; }
   .mat-page-list li { flex-direction: column; align-items: flex-start; }
@@ -1638,6 +1672,25 @@ a.chip:hover { text-decoration: none; }
 
 @media (max-width: 560px) {
   :root { --gutter: var(--sp-4); }
+
+  /* Chapter XXVIII, "duże przyciski": on a phone every control is a finger target, and
+     these three were not. 36 px (the header's two icon buttons) and 40 px (.btn-sm, which
+     is every row action, every consent button and every "Dodaj") are the sizes that let a
+     desktop header row and a desktop table row stay tight. A phone row is a whole screen
+     wide and has no such problem, so they grow to the 44 px the token block calls a tap
+     target. Session 32 measured them; nothing else on a phone was under 44 px. */
+  .btn-sm { min-height: var(--control-h); }
+  .theme-toggle, .menu-toggle { width: var(--control-h); height: var(--control-h); }
+  /* The same rule for the two controls that are not buttons: a chip (a material
+     suggestion, a store example) was 30 px tall and a disclosure ("Dodaj pomieszczenie",
+     "Dodaj inny koszt") 26 px. The FAQ's own summary is already taller than this and
+     keeps its padding. */
+  .chip { min-height: var(--control-h); display: inline-flex; align-items: center; }
+  summary { min-height: var(--control-h); padding-block: var(--sp-2); }
+  /* The two pickers are in the drawer at this width, one to a row, so the reason they are
+     36 px (a 64 px header row) does not apply. The select's 14 px is the other half of
+     the same problem: under 16 px iOS Safari zooms the page when the field is touched. */
+  .lang-btn, .cur-select { min-height: var(--control-h); font-size: var(--fs-base); }
   .features { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr; }
@@ -1661,5 +1714,6 @@ a.chip:hover { text-decoration: none; }
   .wrap { max-width: none; padding: 0; }
   .ws-estimate { border: 0; box-shadow: none; padding: 0; }
   .ws-table th, .ws-table td { border-bottom: 1px solid #ccc; }
+  .ws-table-scroll { overflow-x: visible; }
   @page { margin: 18mm 14mm; }
 }

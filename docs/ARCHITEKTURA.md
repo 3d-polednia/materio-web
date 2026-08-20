@@ -297,7 +297,7 @@ tłumaczyłaby to tym, którzy już wiedzą.
 Pod nimi **rząd języków**: te same adresy co w selektorze w nagłówku, ale jako zwykłe
 linki — działają bez skryptu i robot je przechodzi.
 
-**Nawigacja mobilna** (poniżej 900px) to szuflada pod nagłówkiem: przyciemnia stronę,
+**Nawigacja mobilna** (poniżej 1060px; do Sesji 32 — 900px) to szuflada pod nagłówkiem: przyciemnia stronę,
 blokuje przewijanie pod sobą, zamyka się Escapem, kliknięciem w tło i po wybraniu linku.
 Bez JavaScriptu szuflady nie ma i nawigacja zostaje na stronie — wcześniej CSS chował ją
 bezwarunkowo, więc przy wyłączonym skrypcie na telefonie nie dało się przejść nigdzie.
@@ -762,9 +762,11 @@ Rozdział X nadal zabrania **wypychania** aplikacji na stronie głównej i stron
 mówi o niej ani słowa więcej niż przedtem; link na końcu rzędu to nie to samo. Limit linków
 w nagłówku podniesiony z czterech na pięć — **zmierzony, nie założony**:
 `scripts/test-pages.mjs` sprawdza, że rząd zostaje jednolinijkowy w dziesięciu językach na
-900 / 1000 / 1160 / 1280 px, dla gościa (cztery widoczne) i dla zalogowanego (pięć).
-Poniżej 900 px nawigacja jest szufladą i zawinąć się nie może. Szósty link nadal wywala
-build, bo szóstego nikt nie mierzył.
+1061 / 1100 / 1160 / 1280 px, dla gościa (cztery widoczne) i dla zalogowanego (pięć).
+Poniżej 1061 px nawigacja jest szufladą i zawinąć się nie może. Ten próg wynosił 900 px do
+Sesji 32, która zmierzyła ten sam rząd po rosyjsku: potrzebował 1033 px, więc między 900
+a ~1050 px wypychał przełącznik motywu poza ekran. Szósty link nadal wywala build, bo
+szóstego nikt nie mierzył.
 
 ---
 

@@ -78,6 +78,9 @@ scripts/test-calculators.mjs  Testy silników (czysta logika, bez zależności)
 scripts/test-pages.mjs        Testy stron kalkulatorów w Chromium (Playwright spoza repo)
 scripts/test-account.mjs      Testy konta: poziomy, sesja, ?next=, słownik (bez zależności)
 scripts/test-account-page.mjs Testy /app/ w Chromium z podstawionym SDK Firebase
+scripts/test-mobile.mjs       Cały serwis na telefonie: szerokości rozdziału XXVIII,
+                              cele dotykowe, pola, tabele, klawiatura numeryczna,
+                              przełączniki języka/waluty/motywu (Sesja 32)
 privacy-policy.html      Polityka prywatności (PL + EN) — osobna podstrona (wymóg Google Play)
 404.html                 Strona błędu 404; przekierowuje też /p/<token> na /p/?t=<token>
 site.webmanifest         Manifest PWA (nazwa, ikony, kolory)

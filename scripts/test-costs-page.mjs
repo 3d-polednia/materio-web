@@ -450,7 +450,12 @@ head("5. four languages");
     de: ["Materialkosten", "Sonstige Kosten", "Projektsumme", "Einzelpreis", "Weitere Kosten hinzufügen"],
     uk: ["Вартість матеріалів", "Інші витрати", "Разом за проєктом", "Ціна за одиницю", "Додати іншу витрату"],
   };
-  for (const lang of LANGS) {
+  /* The table is the four languages somebody approved word for word. The ten-language
+     restore after session 28 widened LANGS and left the table standing, so this section
+     stopped checking anything and crashed on the fifth language instead (found in
+     session 32). Loop what the table names; widening it to ten is a translation review,
+     not a mobile sweep. */
+  for (const lang of LANGS.filter((l) => WANT[l])) {
     const page = await open(ctx, `${urlProjects(lang)}?id=p1`,
       { workspace: fixture(), active: "p1", lang });
     const body = await label(page, "#ws-project");

@@ -2176,18 +2176,20 @@ export function estimateMain(lang, t) {
             <span id="ws-estimate-count"></span>
           </div>
         </header>
-        <table class="ws-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>${esc(t("ws_col_name"))}</th>
-              <th class="num">${esc(t("ws_col_qty"))}</th>
-              <th class="num">${esc(t("ws_col_cost"))}</th>
-              <th class="no-print"></th>
-            </tr>
-          </thead>
-          <tbody id="ws-estimate-rows"></tbody>
-        </table>
+        <div class="ws-table-scroll">
+          <table class="ws-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>${esc(t("ws_col_name"))}</th>
+                <th class="num">${esc(t("ws_col_qty"))}</th>
+                <th class="num">${esc(t("ws_col_cost"))}</th>
+                <th class="no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="ws-estimate-rows"></tbody>
+          </table>
+        </div>
         <p class="ws-estimate-total"><span>${esc(t("share_total"))}</span> <b id="ws-estimate-total"></b></p>
         <p class="muted ws-estimate-mixed" id="ws-estimate-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
         <p class="muted ws-estimate-foot">${esc(t("est_foot"))}</p>

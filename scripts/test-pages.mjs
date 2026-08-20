@@ -376,11 +376,14 @@ head("nagłówek");
   // measurement that decides whether the fifth is allowed, in the language with the
   // longest labels and at every width where the row is still a row.
   //
-  // Below 900px the navigation is a drawer and cannot wrap. Above 1160px the tightening in
-  // assets/styles.css stops applying, so both sides of that breakpoint are checked. The
+  // Below 1061px the navigation is a drawer and cannot wrap, so measuring there measures
+  // nothing: session 32 moved that breakpoint up from 900px because the Russian row needed
+  // 1033px, and the two widths this list used to start with (900, 1000) had quietly become
+  // drawer widths. The row now starts one pixel above the breakpoint. Above 1160px the
+  // tightening in assets/styles.css stops applying, so both sides of that are checked. The
   // guest view is the honest one to measure at four visible links AND at five: the fifth,
   // "Projekty", comes back the moment somebody signs in.
-  for (const width of [900, 1000, 1160, 1280]) {
+  for (const width of [1061, 1100, 1160, 1280]) {
     const ctx = await context({ viewport: { width, height: 800 } });
     for (const lang of LANGS) {
       for (const signedIn of [false, true]) {

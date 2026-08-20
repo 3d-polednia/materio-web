@@ -887,10 +887,12 @@ export function validateIA() {
   // The header row holds the links, the pickers and the account button. Session 5 put the
   // ceiling at four after measuring German wrapping between 900px and 1080px; the fifth
   // ("Aplikacja", asked for after session 20) was measured the same way rather than
-  // assumed — scripts/test-pages.mjs checks the row stays on one line in all four
-  // languages at 900 / 1000 / 1160 / 1280 px, and the tightening at max-width: 1160px in
-  // assets/styles.css is what buys the room. Below 900px the navigation is a drawer and
-  // cannot wrap at all. A sixth link has not been measured, so it is still refused.
+  // assumed — scripts/test-pages.mjs checks the row stays on one line in ten languages
+  // at 1061 / 1100 / 1160 / 1280 px, and the tightening at max-width: 1160px in
+  // assets/styles.css is what buys the room. Below 1061px the navigation is a drawer and
+  // cannot wrap at all; that breakpoint was 900px until session 32 measured the same row
+  // in Russian, where it needed 1033px and pushed the theme switch off the screen.
+  // A sixth link has not been measured, so it is still refused.
   const inHeader = navRoutes("header").length;
   if (inHeader > 5) problems.push(`IA: ${inHeader} links in the header — the row fits five`);
 

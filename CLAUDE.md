@@ -105,6 +105,7 @@ node scripts/test-crm.mjs         # the chain: the walk, the derived history, on
 node scripts/test-propage.mjs     # /liczmat-pro/: the route, the price in the HTML, the copy
 node scripts/test-seo.mjs         # technical SEO: sitemap, robots, canonical, hreflang, OG
 node scripts/test-calc-seo.mjs    # the calculators as landing pages: title, description, FAQ
+node scripts/test-mobile.mjs      # the whole site on a phone: widths, tap targets, fields
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -359,6 +360,18 @@ scripts/test-calc-seo.mjs  What the 150 calculator pages SAY (session 31, chapte
                       that none of this copy reached the dictionary every page downloads.
                       Dependency-free — run it after touching src/calc-seo.mjs,
                       calcPageMain() or buildCalculatorPages()
+scripts/test-mobile.mjs  The whole site on a phone (session 32, chapter XXVIII): every
+                      page type in ten languages at 320 px and the six widths the chapter
+                      names by hand — 320/375/390/430/768/1280 — plus the modules with
+                      data in them (projects, materials, costs, rooms, the estimate, the
+                      dashboard and the four Pro screens). What it asks is what a phone
+                      asks: nothing scrolls sideways, every field is 16 px of text in a
+                      44 px box (under 16 px iOS Safari zooms the page on focus), every
+                      tap target is 44 px tall, a table scrolls inside its own box, a
+                      number is typed on a numeric keypad and never on a `type="number"`
+                      spinner, the three switches of chapter XXXII work at 320 px, and a
+                      calculation can be made on the narrowest phone there is. Needs the
+                      same outside-the-repo Playwright as test-pages.mjs
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -1115,6 +1128,27 @@ Kotlin side of it. Change one, change all three.
 
 ## Rules for editing the site
 
+- **A field is a field because it is an `<input>`, a `<select>` or a `<textarea>`** — the
+  rule in `assets/styles.css` is written on the element, not on a list of classes, so a
+  control a new module invents is 16 px of text in a 44 px box without anybody
+  remembering to add it. That list is what session 32 found every Pro control broken
+  behind: 13 px of text in a 19-to-21 px box, on the screens a tradesperson uses on site.
+  Only `width: 100%` is still a per-place decision and still a list of classes. A
+  `checkbox` and a `radio` keep their native box.
+- **Below 560 px every tap target is 44 px, and above it the design system's small sizes
+  stand.** 36 px (the header's two icon buttons) and 40 px (`.btn-sm`) exist so a desktop
+  header row and a dense table row stay tight; a phone row is a whole screen wide and has
+  no such problem. Chips and `<summary>` grow there too. `scripts/test-mobile.mjs` fails
+  the moment something on a phone is under 44 px.
+- **The header collapses into the drawer below 1060 px, and that number lives in two
+  files.** `assets/styles.css` and the `matchMedia("(min-width: 1061px)")` in
+  `assets/main.js` — a mismatch either leaves the drawer drawn as a plain row or shuts a
+  menu the visitor can still see. It was 900 px until session 32 measured the same row in
+  Russian, where five links, two pickers and the account button need 1033 px.
+- **A button label wraps rather than pushing the page sideways.** `.btn` is
+  `white-space: normal; overflow-wrap: anywhere`. With `nowrap` a grid or flex item could
+  not shrink below its longest sentence, and one Romanian label took the page 103 px off
+  the side of a 320 px phone.
 - **Bump `STAMP` in `scripts/build.mjs`** whenever a shipped asset changes, then rebuild.
   It is the single `?v=` value for every page. GitHub Pages serves assets with
   `max-age=600`, so without it a visitor can run new markup against a stale stylesheet.

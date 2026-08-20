@@ -70,7 +70,7 @@
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/smeta/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kosztorys/">
 <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/favicon.svg?v=20260820b" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon.svg?v=20260820c" type="image/svg+xml">
 <link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -98,7 +98,7 @@
 <meta name="twitter:description" content="Online building cost estimate: collect calculator results into one list with quantities and cost, then print it or save it as a PDF. No sign-up.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.css?v=20260820b">
+<link rel="stylesheet" href="/assets/styles.css?v=20260820c">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -218,18 +218,20 @@
             <span id="ws-estimate-count"></span>
           </div>
         </header>
-        <table class="ws-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Item</th>
-              <th class="num">Quantity</th>
-              <th class="num">Cost</th>
-              <th class="no-print"></th>
-            </tr>
-          </thead>
-          <tbody id="ws-estimate-rows"></tbody>
-        </table>
+        <div class="ws-table-scroll">
+          <table class="ws-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th class="num">Quantity</th>
+                <th class="num">Cost</th>
+                <th class="no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="ws-estimate-rows"></tbody>
+          </table>
+        </div>
         <p class="ws-estimate-total"><span>Total</span> <b id="ws-estimate-total"></b></p>
         <p class="muted ws-estimate-mixed" id="ws-estimate-mixed" hidden>These lines are in different currencies. The total adds them up but converts nothing — check the currency on each cost.</p>
         <p class="muted ws-estimate-foot">Estimate calculated in LiczMat. Quantities are rounded up to whole packages; the prices are the ones you entered.</p>
@@ -356,18 +358,18 @@
   "sr": "/sr/predracun/",
   "ru": "/ru/smeta/"
 };</script>
-<script src="/assets/i18n.en.js?v=20260820b"></script>
-<script src="/assets/i18n-runtime.js?v=20260820b"></script>
-<script src="/assets/currency.js?v=20260820b"></script>
+<script src="/assets/i18n.en.js?v=20260820c"></script>
+<script src="/assets/i18n-runtime.js?v=20260820c"></script>
+<script src="/assets/currency.js?v=20260820c"></script>
 <!-- The session, on every page: which of chapter II's three levels this browser was
      last told it is on. Two kilobytes, no network, and it is what lets a calculator
      page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=20260820b"></script>
+<script src="/assets/account.js?v=20260820c"></script>
 
-<script src="/assets/units.js?v=20260820b"></script>
-<script src="/assets/workspace.js?v=20260820b"></script>
-<script src="/assets/workspace-ui.js?v=20260820b"></script>
-<script src="/assets/main.js?v=20260820b"></script>
+<script src="/assets/units.js?v=20260820c"></script>
+<script src="/assets/workspace.js?v=20260820c"></script>
+<script src="/assets/workspace-ui.js?v=20260820c"></script>
+<script src="/assets/main.js?v=20260820c"></script>
 
 </body>
 </html>

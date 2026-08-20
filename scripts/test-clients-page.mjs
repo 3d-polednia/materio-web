@@ -491,7 +491,11 @@ head("5b. the footer offers the module to a Pro account only, and never to a cra
   // page point at /klienci/ and are supposed to: the breadcrumb (the trail of the page
   // being read) and the Polish entry in the language picker (this page, in this language).
   const footLink = 'footer.site a[href$="/klienci/"]:not([data-lang])';
-  const guest = await open(ctx, CLIENTS, { workspace: workspace() });
+  /* `pro: false` is what makes this visitor a guest. open() plants "pro" by default —
+     session 28 made that the way to ask for the tool rather than the wall — so without it
+     the "guest" here was a Pro account and was offered the link it is supposed not to see.
+     The section had been failing since that default arrived (found in session 32). */
+  const guest = await open(ctx, CLIENTS, { workspace: workspace(), pro: false });
   const shown = await guest.$$eval(footLink, (a) =>
     a.filter((n) => n.getBoundingClientRect().height > 0).length);
   eq("a guest is not offered the link", shown, 0);
