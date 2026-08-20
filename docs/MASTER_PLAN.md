@@ -62,7 +62,7 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 33 | Performance | **Zrobione** — 2026-08-20 |
 | 34 | Accessibility | **Zrobione** — 2026-08-20 |
 | 35 | Security | **Zrobione** — 2026-08-20 |
-| 36 | Finalny QA | Nie zaczęte |
+| 36 | Finalny QA | **Zrobione** — 2026-08-20 |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -217,6 +217,152 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 36
+
+Rozdział XXXII, Sesja 36 w całości: **„FINALNY QA. Pełna ścieżka: GOŚĆ → kalkulator →
+wynik → rejestracja → LICZMAT → projekt → kalkulacja → materiały → koszty → LICZMAT PRO
+→ klient → zlecenie → projekt → wycena → historia. Dodatkowo sprawdzić: polski,
+ukraiński, niemiecki, angielski, PLN, EUR, USD, UAH, tryb ciemny, tryb jasny, mobile,
+desktop. Naprawić wszystkie znalezione krytyczne problemy."**
+
+**WYKONANO**
+
+**`scripts/test-qa.mjs` — cała ścieżka przechodzona od początku do końca w prawdziwej
+przeglądarce, pięć razy.** Sesje 13–35 napisały test do każdego modułu z osobna, ale
+każdy z nich **podstawia** sklep w `localStorage` i otwiera jeden ekran. Tego, o co pyta
+rozdział XXXVI, żaden z nich odpowiedzieć nie może: czy ścieżka trzyma się kupy, kiedy
+nikt nic nie podstawia. Więc ten test startuje z **pustej przeglądarki** i po ustawieniu
+języka, waluty i motywu **nie zapisuje już do storage ani razu** — każdy wiersz, który
+później odczytuje, powstał z klikania w produkt. Piętnaście kroków rozdziału, po kolei:
+
+- **GOŚĆ** — strona główna pustej przeglądarki. Nic nie deklaruje poziomu (`data-lm-level`
+  nie ma wcale, bo gość to *brak* znacznika), przycisk konta bez kropki, link do projektów
+  nieoferowany.
+- **kalkulator** — znaleziony na `/kalkulatory/` i **kliknięty**, nie wpisany z ręki.
+- **wynik** — 24 m², 50 za opakowanie, `[data-result]` to `role="status"`, a koszt jest
+  w walucie, którą wybrał odwiedzający, nie w tej, którą sugeruje język.
+- **rejestracja** — przez zdanie pod wynikiem. Link musi być
+  `/app/?mode=signup&next=<ten kalkulator>` i musi otworzyć od razu formularz rejestracji.
+- **LICZMAT** — konto założone, poziom `liczmat`, powrót na kalkulator, z którego się
+  przyszło. Dopiero teraz nagłówek oferuje projekty (na telefonie — po otwarciu szuflady).
+- **projekt** — założony ręcznie na `/projekty/`.
+- **kalkulacja** — wynik zapisany **do tego** projektu z listy wyboru, ostemplowany
+  walutą odwiedzającego.
+- **materiały** — materiał wjechał na listę zakupową sam, z tego samego zapisu.
+- **koszty** — cena wpisana w wierszu materiału, koszt, którego nikt nie liczył, dopisany
+  ręcznie, trzy figury projektu policzone raz.
+- **LICZMAT PRO** — najpierw **ściana**, bo tak dziś wygląda produkt dla darmowego konta:
+  moduł schowany, szczebel „upgrade”, nigdzie linku do Stripe’a. Potem konto loguje się
+  do backendu, który już mówi `plan: premium` — plan jest server-only i nic w tym repo go
+  nie zapisuje, więc podstawienie **odpowiedzi serwera** to jedyny uczciwy sposób, żeby
+  zobaczyć drugą stronę ściany.
+- **klient** — dodany, projekt podpięty pod niego, a dokument projektu sprawdzony
+  **co do zestawu pól** (siedem, żadnego `clientId`).
+- **zlecenie** — z klientem, terminem i wartością; koszt czytany z projektu, a nie
+  kopiowany na zlecenie; różnica policzona tylko dlatego, że obie połowy są w jednej walucie.
+- **projekt** — otwarty **ze wstęgi łańcucha** na zleceniu, nie z adresu.
+- **wycena** — robocizna 24 × 80, marża 10%, pięć figur porównanych z groszem: materiał
+  i inne koszty pochodzą z projektu, robocizna z wyceny, marża liczy się od wszystkiego
+  powyżej, suma to te cztery dodane raz.
+- **historia** — na stronie klienta: jego zlecenie, jego wycena z tą samą sumą, i wiersze
+  za każdy dokument, który ten spacer zapisał.
+
+**Cztery przełączniki rozdziału rzucone w środku drogi, nie na pustej stronie.**
+Język zmieniony przy **otwartej wycenie** (link musi przenieść `?id=`, suma nie może się
+ruszyć, waluta nie może pójść za językiem); waluta zmieniona przy **wycenionym projekcie**
+(zapisana kwota zachowuje swoją walutę, suma stoi, żadna wielkość fizyczna się nie rusza —
+rozdział VI); motyw przełączony **przyciskiem**, nie podstawionym kluczem, i sprawdzony
+po nawigacji; przycisk Wstecz w górę łańcucha. Na końcu **wylogowanie**: ściana wraca,
+a liczenie zostaje — projekt, materiał i pieniądze są dokładnie tam, gdzie były
+(rozdział II i FIRESTORE_SYNC §1.2), klienci nietknięci, a gościowi pokazuje się szczebel
+„załóż konto”, nie „dokup plan”, bo nie ma konta, na którym plan mógłby usiąść.
+
+**Pięć spacerów, nie sześćdziesiąt cztery.** Rozdział wymienia cztery osie — cztery
+języki, cztery waluty, dwa motywy, dwie szerokości. Iloczyn to 64 przejścia i kilka godzin
+na nic; pięć konfiguracji pokrywa **każdą wartość każdej osi**:
+`pl/PLN/jasny/1280`, `uk/UAH/ciemny/390`, `de/EUR/ciemny/1280`, `en/USD/jasny/390`
+— i piąta, `de/PLN/jasny/1280`, która **celowo łamie parowanie**: w pozostałych czterech
+język i waluta się zgadzają, więc ekran czytający walutę z języka przeszedłby niezauważony.
+
+**`scripts/fake-firebase.mjs` — atrapa SDK wyjęta do własnego pliku.** `/app/` to jedyny
+ekran na tej ścieżce, którego nie da się dotknąć naprawdę: `assets/app.js` importuje SDK
+z `gstatic.com`, a proxy kontenera zrywa to połączenie. Atrapa istniała już
+w `scripts/test-account-page.mjs`; drugi jej egzemplarz w teście QA byłby drugą kopią
+czegoś, co musi odpowiadać zachowaniu prawdziwego SDK — czyli kopią wolną od pierwszej
+w dniu, w którym któraś zostanie poprawiona. Teraz jest jedna, importowana przez oba testy.
+`scripts/test-account-page.mjs` po tej zmianie: **204/204**, bez zmiany treści.
+
+**ZMIENIONE PLIKI**
+
+Dodane:
+- `scripts/test-qa.mjs` — finalny spacer QA (675 sprawdzeń, pięć konfiguracji).
+- `scripts/fake-firebase.mjs` — atrapa Firebase, wspólna dla dwóch testów.
+
+Zmienione:
+- `scripts/test-account-page.mjs` — importuje atrapę zamiast trzymać własną kopię.
+- `CLAUDE.md` — oba pliki w spisie i w liście poleceń.
+- `docs/MASTER_PLAN.md` — ten wpis i wiersz w tabeli postępu.
+
+Usunięte: nic.
+
+**Nic w produkcie nie zostało zmienione.** Żaden plik w `assets/`, `src/` ani żadna
+wygenerowana strona. Przebudowa po sesji: `git diff` pusty, 373 strony bez zmian, `STAMP`
+nietknięty — nie ma czego unieważniać w cache’u, skoro nic serwowanego się nie ruszyło.
+
+**TESTY**
+
+Cały zestaw, nie tylko nowy plik.
+
+- **Bez zależności (20 zestawów)**: calculators, account, dashboard, projects, save,
+  materials, costs, rooms, plan, pay, jobs, quotes, calendar, crm, propage, seo, calc-seo,
+  perf, a11y, security — wszystkie przechodzą. `node scripts/build.mjs --check`:
+  1157 kluczy × 10 języków, 15 kalkulatorów, 8 poradników, 150 stron copy SEO.
+- **`scripts/check-contrast.mjs`**: wszystkie pary przechodzą AA w obu motywach.
+- **W Chromium (16 zestawów)**: pages 759, mobile 1152, a11y 55, projects 177,
+  dashboard 90, save 70, materials 166, costs 134, rooms 195, clients 145, jobs 164,
+  quotes 188, calendar 162, crm 141, pro page 148, account 204 — i **finalny QA
+  675/675**.
+
+**PROBLEMY**
+
+**Nie znaleziono żadnego problemu krytycznego na ścieżce.** Pięć spacerów przez
+piętnaście kroków, w czterech językach, czterech walutach, obu motywach i obu
+szerokościach, przeszło bez ani jednego błędu w konsoli, bez poziomego przewijania na
+żadnym ekranie i bez rozjazdu w żadnej z liczb. Rzeczy, które trzeba było poprawić
+w trakcie pisania, były błędami **testu**, nie serwisu (selektory, porównywanie kwot bez
+groszy, `change` na polu marży, szuflada nawigacji na telefonie) — są opisane
+w komentarzach przy odpowiednich sprawdzeniach.
+
+To nie znaczy „produkt jest bez wad”. To znaczy: **na ścieżce, o którą pyta rozdział
+XXXVI, wad nie ma** — a to jest dokładnie to pytanie, które zadano.
+
+Nierozwiązane, bo są poza repo i czekają na właściciela (bez zmian od Sesji 35):
+
+- **Klucz przeglądarkowy w Google Cloud nadal nie zna `liczmat.com`.** Każde wywołanie
+  Identity Toolkit z nowej domeny wraca `403 API_KEY_HTTP_REFERRER_BLOCKED`, więc
+  **na żywej stronie nikt się dziś nie zarejestruje ani nie zaloguje**. W teście QA krok
+  „rejestracja” przechodzi, bo backend jest podstawiony — i to jest granica tego testu,
+  powiedziana wprost w jego nagłówku. Naprawa: Credentials → klucz przeglądarkowy →
+  Website restrictions → dopisać `https://liczmat.com/*` i `https://www.liczmat.com/*`,
+  **zachowując wszystkie dotychczasowe wpisy**.
+- **Firebase Auth → Authorized domains**: dopisać `liczmat.com` i `www.liczmat.com`.
+- **Nic nie nadaje planu Pro.** `users/{uid}.plan` jest server-only i nikt go nie
+  zapisuje (FIRESTORE_SYNC §9.2), a `assets/pay.js` nie ma Payment Linków. Czyli dziś
+  **żadne prawdziwe konto nie zobaczy modułu Pro** — stan znany i celowy od Sesji 28,
+  nie usterka. Kolejność wdrożenia jest w nocie ORDER na dole `assets/pay.js`.
+- **Bliźniak polityki prywatności** w repo `3d-polednia/Materio` nadal mówi
+  `materio-app.com`.
+
+**STATUS**
+
+Sesja 36 zamknięta. Master Plan ma 36 sesji i to była ostatnia — wszystkie 36 zrobione.
+
+**NASTĘPNE ZADANIE**
+
+Master Plan nie ma Sesji 37. Następny krok należy do właściciela: to trzy pozycje
+z „PROBLEMY” powyżej, które robi się w konsolach Google i Stripe’a, a nie w tym repo —
+i dopiero po nich rejestracja na `liczmat.com` oraz sprzedaż LiczMat Pro w ogóle ruszą.
 
 ### Co zrobiła Sesja 35
 

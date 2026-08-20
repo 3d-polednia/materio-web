@@ -110,6 +110,7 @@ node scripts/test-perf.mjs        # what a page weighs: bytes, requests, the ren
 node scripts/test-a11y.mjs        # names, headings, landmarks, live regions — in the markup
 node scripts/test-a11y-page.mjs   # focus, the keyboard, both themes — in Chromium
 node scripts/test-security.mjs    # authorization, data isolation, the API, the levels
+node scripts/test-qa.mjs          # the whole path, end to end, in a real browser
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -438,6 +439,26 @@ scripts/test-security.mjs  Security as a property of the code (session 35, chapt
                       what a name somebody else typed does in HTML, in a CSV and in a file
                       name. Dependency-free — run it after touching anything that reads a
                       URL, builds a Firestore path, writes storage or renders a stored row
+scripts/test-qa.mjs   The final QA walk (session 36, chapter XXXVI): the whole product
+                      from end to end, in a browser that starts empty and is never
+                      planted again — GOŚĆ → kalkulator → wynik → rejestracja → LICZMAT →
+                      projekt → kalkulacja → materiały → koszty → LICZMAT PRO → klient →
+                      zlecenie → projekt → wycena → historia, every row read back having
+                      been produced by clicking. Then the four switches the chapter names,
+                      thrown mid-journey rather than on an empty page: the language changed
+                      with a quote open, the currency changed with a priced project open,
+                      the theme changed by its button, the Back button up the chain — and
+                      the sign-out, after which the wall goes back up and the counting does
+                      not. Walked five times: pl/PLN, uk/UAH, de/EUR, en/USD and de/PLN, so
+                      every language, every currency, both themes and both viewports are
+                      covered, and the last one breaks the pairing on purpose (chapter VI —
+                      a currency is not a language). Only /app/ is stubbed, with
+                      scripts/fake-firebase.mjs, because the container cannot reach gstatic.
+                      Needs the same outside-the-repo Playwright as test-pages.mjs
+scripts/fake-firebase.mjs  Firebase, as much of it as /app/ actually touches: the three
+                      modules assets/app.js imports, served in Chromium instead of the CDN.
+                      Shared by test-account-page.mjs and test-qa.mjs — two copies of a
+                      stub that has to match a real SDK is two copies free to disagree
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
