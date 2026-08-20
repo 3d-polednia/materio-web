@@ -91,9 +91,13 @@ const GOOGLE_G = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="t
  * signed-out page and the profile tab render this: a guest is told what an account adds,
  * and somebody signed in is told which level they are on.
  *
- * The Pro card never carries a button. `/liczmat-pro/` is built in session 29, and the
- * `plan` field that would grant the level is server-side only with nothing to write it
- * yet (FIRESTORE_SYNC §9.2) — a "buy" button would be a promise the product cannot keep.
+ * The Pro card carries one link and never a button. Session 29 built `/liczmat-pro/`, so
+ * the card can now point at the page that explains what the level is — chapter XXV's
+ * "Poznaj LiczMat Pro", which was the words "in preparation" until that page existed. It
+ * still offers nothing to buy: the checkout lives one tab away, on the Pro tab, and the
+ * `plan` field that grants the level is server-side only (FIRESTORE_SYNC §9.2). /app/ has
+ * no language of its own, so the link carries DEFAULT_LANG's address plus
+ * `data-nav-route`; assets/i18n-runtime.js repoints it from window.LM_NAV on `langchange`.
  *
  * @param {(k:string)=>string} t
  * @param {string} current the level this copy of the list should mark, "" for none
@@ -103,8 +107,13 @@ function levelCards(t, current) {
     const bullets = entry.can
       .map((key) => `<li data-i18n="${key}">${esc(t(key))}</li>`).join("");
     const r = entry.route ? route(entry.route) : null;
-    const soon = r && r.status !== STATUS.LIVE
-      ? `<p class="lvl-soon" data-i18n="door_soon">${esc(t("door_soon"))}</p>` : "";
+    // The page that explains the level, when there is one and it has been built. A route
+    // still on the drawing board says so instead of linking into a 404 — the rule that
+    // kept this card silent until session 29.
+    const soon = !r ? ""
+      : r.status === STATUS.LIVE
+        ? `<p><a class="btn btn-ghost btn-sm" data-nav-route="${r.id}" href="${r.path(DEFAULT_LANG)}" data-i18n="pro_more">${esc(t("pro_more"))}</a></p>`
+        : `<p class="lvl-soon" data-i18n="door_soon">${esc(t("door_soon"))}</p>`;
 
     const here = entry.level === current;
     return `<article class="lvl-card" data-level="${entry.level}"${here ? ' data-current="1"' : ""}>

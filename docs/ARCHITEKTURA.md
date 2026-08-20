@@ -75,31 +75,33 @@ nie wymaga konta**.
 
 ## 2. Inwentarz stron — stan na dziś
 
-147 wygenerowanych stron: 36 stron logicznych × 4 języki, plus trzy bezjęzykowe.
-Adresy w kolumnie „URL (PL)”; pozostałe języki mają prefiks (`/en/…`, `/de/…`, `/uk/…`)
-i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
+373 wygenerowane strony: 37 stron logicznych × 10 języków, plus trzy bezjęzykowe.
+Adresy w kolumnie „URL (PL)”; pozostałe języki mają prefiks (`/en/…`, `/de/…`, `/uk/…`,
+`/cs/…`, `/sk/…`, `/ro/…`, `/hr/…`, `/sr/…`, `/ru/…`) i własne slugi z `SECTION`
+i `CALC_SLUG` w `src/site.mjs`.
 
 | Trasa (`id`) | URL (PL) | Poziom | Rodzic | Indeks | Sztuk |
 |---|---|---|---|---|---|
-| `home` | `/` | GUEST | — | tak | 4 |
-| `calculators` | `/kalkulatory/` | GUEST | `home` | tak | 4 |
-| `calculator` | `/kalkulatory/<slug>/` | GUEST | `calculators` | tak | 60 |
-| `materials` | `/materialy/` | GUEST | `home` | tak | 4 |
-| `guides` | `/poradniki/` | GUEST | `home` | tak | 4 |
-| `guide` | `/poradniki/<slug>/` | GUEST | `guides` | tak | 32 |
-| `stores` | `/sklepy/` | GUEST | `home` | tak | 4 |
-| `android` | `/aplikacja/` | GUEST | `home` | tak | 4 |
-| `projects` | `/projekty/` | GUEST | `home` | tak | 4 |
+| `home` | `/` | GUEST | — | tak | 10 |
+| `calculators` | `/kalkulatory/` | GUEST | `home` | tak | 10 |
+| `calculator` | `/kalkulatory/<slug>/` | GUEST | `calculators` | tak | 150 |
+| `materials` | `/materialy/` | GUEST | `home` | tak | 10 |
+| `guides` | `/poradniki/` | GUEST | `home` | tak | 10 |
+| `guide` | `/poradniki/<slug>/` | GUEST | `guides` | tak | 80 |
+| `stores` | `/sklepy/` | GUEST | `home` | tak | 10 |
+| `android` | `/aplikacja/` | GUEST | `home` | tak | 10 |
+| `projects` | `/projekty/` | GUEST | `home` | tak | 10 |
 | `project` | `/projekty/?id=…` | GUEST | `projects` | **nie** | 0 — widok |
-| `estimate` | `/kosztorys/` | GUEST | `projects` | tak | 4 |
-| `clients` | `/klienci/` | **PRO** | `home` | tak | 4 |
+| `estimate` | `/kosztorys/` | GUEST | `projects` | tak | 10 |
+| `clients` | `/klienci/` | **PRO** | `home` | tak | 10 |
 | `client` | `/klienci/?id=…` | **PRO** | `clients` | **nie** | 0 — widok |
-| `jobs` | `/zlecenia/` | **PRO** | `clients` | tak | 4 |
+| `jobs` | `/zlecenia/` | **PRO** | `clients` | tak | 10 |
 | `job` | `/zlecenia/?id=…` | **PRO** | `jobs` | **nie** | 0 — widok |
-| `quotes` | `/wyceny/` | **PRO** | `jobs` | tak | 4 |
+| `quotes` | `/wyceny/` | **PRO** | `jobs` | tak | 10 |
 | `quote` | `/wyceny/?id=…` | **PRO** | `quotes` | **nie** | 0 — widok |
-| `calendar` | `/terminarz/` | **PRO** | `jobs` | tak | 4 |
-| `cookies` | `/cookies/` | GUEST | `home` | tak | 4 |
+| `calendar` | `/terminarz/` | **PRO** | `jobs` | tak | 10 |
+| `liczmat-pro` | `/liczmat-pro/` | GUEST | `home` | tak | 10 |
+| `cookies` | `/cookies/` | GUEST | `home` | tak | 10 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
 | `dashboard` | `/app/dashboard/` | GUEST | `account` | **nie** | 1 |
 | `share` | `/p/` | GUEST | `estimate` | **nie** | 1 |
@@ -112,6 +114,10 @@ i własne slugi z `SECTION` i `CALC_SLUG` w `src/site.mjs`.
 drugą, `quotes` (Sesja 24) trzecią, `calendar` (Sesja 25) czwartą. To jedyne strony
 w inwentarzu, których link jest ukryty przed kimś poniżej Pro (`navLevel`, §5). Żadna
 z nich nie jest bramkowana — patrz §7.7, §7.8, §7.9 i §7.10.
+
+`liczmat-pro` (Sesja 29) jest jedyną trasą, która **opisuje** Pro, nie będąc Pro: poziom
+`GUEST`, indeksowana, w stopce dla każdego. Paywall stoi na narzędziu, nie na opisie
+narzędzia — opis tego, za co ktoś miałby zapłacić, schowany za tą zapłatą, to koło.
 
 `calendar` jest jedyną trasą `PRO` **bez** widoku obok siebie, i to nie z przeoczenia:
 terminarz nie zapisuje własnych wierszy, więc nie ma czego otwierać — wiersz prowadzi do
@@ -129,8 +135,9 @@ jej adres leży **wewnątrz** adresu rodzica — `livePaths()` pomija widoki, wi
 wskazujący gdzie indziej byłby stroną, której build nigdy nie napisze i której brak
 nigdy by nie zauważył.
 
-Czego w tym inwentarzu **nie ma**, a plan wymienia w rozdziale IX: `/liczmat-pro` i
-`/konto`. Są w §4 jako trasy planowane.
+Czego w tym inwentarzu **nie ma**, a plan wymienia w rozdziale IX: `/konto`. Rolę konta
+pełni `/app/` — jedna strona bezjęzykowa, `noindex`, bo pokazuje cudze dane.
+`/liczmat-pro` zbudowała Sesja 29 i jest wyżej w tabeli.
 
 Czego plan **nie wymienia**, a serwis ma: `/materialy/`, `/sklepy/`, `/aplikacja/`,
 `/cookies/`, `/kosztorys/`, `/p/`. Rozdział IX mówi wprost, że jego struktura nie jest
@@ -191,22 +198,22 @@ strona błędu, most `/p/<token>`, oraz przekierowanie sześciu wycofanych języ
 
 ## 4. Strony planowane
 
-Nic z tego nie jest zbudowane. Każda pozycja jest zadeklarowana w `src/ia.mjs` ze statusem
-`PLANNED` i numerem sesji, która ją realizuje; build pilnuje, żeby żadna nie zajęła
-adresu, który już działa, i żeby żadna nie trafiła do menu przed czasem.
+**Nie ma już żadnej.** Sesja 29 zbudowała `/liczmat-pro/` — ostatnią trasę ze statusem
+`PLANNED` — więc lista jest pusta, a maszyneria zostaje: `src/ia.mjs` nadal potrafi
+zadeklarować stronę, której jeszcze nie ma (status `PLANNED`, numer sesji, `plannedSlug`
+w dziesięciu językach), a build nadal pilnuje, żeby taka trasa nie zajęła adresu, który już
+działa, i żeby nie trafiła do menu przed czasem. Pusta lista to stan, nie usunięcie
+mechanizmu: następna strona, o którą poprosi plan, zaczyna dokładnie tak samo.
 
-| Trasa | URL (PL) | Poziom | Sesja | Po co |
-|---|---|---|---|---|
-| `liczmat-pro` | `/liczmat-pro/` | GUEST | 29 | publiczna strona Pro: co to, dla kogo, ile kosztuje |
-
-Slugi w pozostałych trzech językach są już ustalone w `src/ia.mjs` (`plannedSlug`) — po to,
-żeby sesja, która buduje stronę, nie wymyślała ich w pośpiechu. Przenoszą się do `SECTION`
-w `src/site.mjs` w chwili, gdy to się dzieje: Sesja 22 przeniosła w ten sposób `clients`
-(`klienci` / `kliyenty` / `kunden` / `clients`), Sesja 23 `jobs` (`zlecenia` /
-`zamovlennya` / `auftraege` / `jobs`), Sesja 24 `quotes` (`wyceny` / `koshtorysy-pro` /
-`angebote` / `quotes`), a Sesja 25 `calendar` (`terminarz` / `kalendar` / `termine` /
-`schedule`) — wszystkie cztery bez zmiany choćby jednej litery, bo slug jest trwały od
-momentu, w którym został zaplanowany.
+Slugi planowanej trasy przenoszą się do `SECTION` w `src/site.mjs` w chwili, gdy sesja ją
+buduje: Sesja 22 przeniosła w ten sposób `clients` (`klienci` / `kliyenty` / `kunden` /
+`clients`…), Sesja 23 `jobs` (`zlecenia` / `zamovlennya` / `auftraege` / `jobs`…),
+Sesja 24 `quotes` (`wyceny` / `koshtorysy-pro` / `angebote` / `quotes`…), Sesja 25
+`calendar` (`terminarz` / `kalendar` / `termine` / `schedule`…), a Sesja 29
+`liczmat-pro` — to samo słowo we wszystkich dziesięciu językach, bo to nazwa własna
+produktu, a przetłumaczony slug dałby jednemu produktowi dziesięć nazw. Żadna z tych
+pięciu nie zmieniła choćby jednej litery: slug jest trwały od momentu, w którym został
+zaplanowany.
 
 **`/liczmat-pro/` jest publiczna i indeksowana, moduły Pro też.** To nie jest sprzeczność:
 paywall stoi na *narzędziu*, nie na *opisie narzędzia*. Rozdział XXV wymaga, żeby darmowy
@@ -254,9 +261,14 @@ prefiks, więc `/kalkulatory/tapety/` podświetla „Kalkulatory”).
 | Kolumna | Skąd | Zawartość |
 |---|---|---|
 | znak | — | logo + tagline |
-| Produkt | `footer.group` domyślna | Kalkulatory · Materiały · Projekty · Kosztorys · Poradniki · Sklepy · FAQ |
+| Produkt | `footer.group` domyślna | Kalkulatory · Materiały · Projekty · Kosztorys · Poradniki · Sklepy · LiczMat Pro · Klienci · Zlecenia · Wyceny · Terminarz |
 | Konto | `footer.group: "account"` | Aplikacja Android · Moje konto · Google Play |
 | Prawne | ręcznie | Polityka prywatności · Cookies |
+
+Cztery ostatnie pozycje kolumny „Produkt" to moduły Pro i mają `navLevel: PRO` — widzi je
+konto Pro i robot bez JavaScriptu. `LiczMat Pro` (Sesja 29) stoi tuż przed nimi i
+`navLevel` nie ma: strona, która tłumaczy, czym jest Pro, schowana przed każdym bez Pro,
+tłumaczyłaby to tym, którzy już wiedzą.
 
 Pod nimi **rząd języków**: te same adresy co w selektorze w nagłówku, ale jako zwykłe
 linki — działają bez skryptu i robot je przechodzi.
@@ -279,14 +291,14 @@ je jako `HOME_DOORS` w `src/ia.mjs` — po jednym na poziom dostępu, w kolejno�
 |---|---|---|---|
 | Kalkulatory | `calculators` → `/kalkulatory/` | `GUEST` | „Co chcesz policzyć?” |
 | LiczMat | `projects` → `/projekty/` | `LICZMAT` | „Chcesz zachować i uporządkować swoją pracę?” |
-| LiczMat Pro | `liczmat-pro` (`PLANNED`, Sesja 29) | `PRO` | „Robisz to zawodowo?” |
+| LiczMat Pro | `liczmat-pro` → `/liczmat-pro/` | `PRO` | „Robisz to zawodowo?” |
 
 `level` w `HOME_DOORS` mówi, **dla kogo są te drzwi**, a nie jakiego poziomu wymaga
 strona za nimi: `/projekty/` jest trasą `GUEST` (działa w przeglądarce bez konta),
 a drzwi „LiczMat” opowiadają o tym, co dokłada konto. Drzwi na trasę `PLANNED` nie mają
 linku — zamiast przycisku dostają „W przygotowaniu”, bo adres jeszcze nie istnieje.
-Status czyta się z architektury, więc w dniu, w którym Sesja 29 zbuduje `/liczmat-pro/`,
-drzwi same staną się linkiem.
+Status czyta się z architektury, więc w dniu, w którym Sesja 29 zbudowała `/liczmat-pro/`,
+trzecie drzwi same stały się linkiem: w `src/pages.mjs` nie zmieniło się nic.
 
 `validateIA()` pilnuje, żeby drzwi zostały trzy, w kolejności poziomów i na istniejących
 trasach, a `scripts/build.mjs` — żeby każde miały komplet tekstów we wszystkich czterech
@@ -294,9 +306,10 @@ językach (bez tego `t()` wypisałby na stronie głównej sam klucz).
 
 **Czego w nawigacji nadal brakuje** wobec docelowej architektury:
 
-- **LiczMat Pro** ma wejście na stronie głównej (drzwi wyżej), ale nie ma go w menu —
-  trasa `liczmat-pro` powstaje w Sesji 29 i dopiero wtedy zajmie miejsce w pasku; przy
-  limicie czterech linków coś będzie musiało ustąpić;
+- **LiczMat Pro** ma wejście na stronie głównej (drzwi wyżej) i w stopce, ale nie ma go
+  w menu — pasek mieści pięć linków i pięć ich trzyma. Szósty wymaga pomiaru
+  (`scripts/test-pages.mjs`, dziesięć języków, 900–1280 px) albo wyrzucenia jednego
+  z obecnych, i jedno i drugie jest decyzją właściciela, nie sesji, która budowała stronę;
 - menu jest płaską listą i nie pokazuje, że `Kosztorys` należy do `Projektów`;
 - „Konto” jest przyciskiem po prawej i nic nie mówi o stanie zalogowania — pulpit
   zalogowanego to Sesja 14.
@@ -781,9 +794,11 @@ planu trzymać.
 Wyceny (24), Terminarz (25), Historia i CRM (26) — opisanych w całości i oznaczonych
 zdaniem z rozdziału XXV: „Dostępne w LiczMat Pro". Opis jest pełny, bo rozdział XXV chce,
 żeby darmowy użytkownik rozumiał, co jest Pro; wstrzymany jest sam moduł, którego zresztą
-jeszcze nie ma. **Żadnego martwego przycisku**: „Poznaj LiczMat Pro" jest zdaniem, a nie
-linkiem, dopóki `/liczmat-pro/` jest `PLANNED` (Sesja 29) — dokładnie tak, jak `HOME_DOORS`
-rysuje drzwi do strony, której nie ma. Nad modułami stoi karta planu tego konta, wypełniana
+jeszcze nie ma. **Żadnego martwego przycisku**: „Poznaj LiczMat Pro" było zdaniem, a nie
+linkiem, dopóki `/liczmat-pro/` było `PLANNED` — dokładnie tak, jak `HOME_DOORS` rysuje
+drzwi do strony, której nie ma. Sesja 29 tę stronę zbudowała, więc dziś to link;
+`proMoreLink()` czyta status trasy, więc żaden z tych dwóch stanów nie został napisany
+dwa razy. Nad modułami stoi karta planu tego konta, wypełniana
 przez `assets/app.js` z `users/{uid}`; przycisku „kup" nie ma, bo nic po stronie serwera
 by go nie obsłużyło (`FIRESTORE_SYNC` §9.2).
 
@@ -1183,7 +1198,7 @@ niesie:
 | pozostałe cztery moduły Pro, każdy z nazwą i opisem | *prezentacja funkcji Pro* |
 | jedno zdanie dobrane do poziomu: gość → załóż konto, darmowe konto → to jest Pro | *komunikaty* |
 | link do rejestracji z `?next=` na tę stronę, w jej języku | *przejście Free → Pro* |
-| „Poznaj LiczMat Pro" — zdanie, dopóki `/liczmat-pro/` jest `PLANNED` (Sesja 29) | *nigdy martwy przycisk* |
+| „Poznaj LiczMat Pro" — link do `/liczmat-pro/` w języku tej strony (Sesja 29) | *nigdy martwy przycisk* |
 | cena obu planów w walucie odwiedzającego i link do `/app/` (Sesja 28) | *przejście Free → Pro* |
 | „Subskrypcji jeszcze nie da się wykupić" — dopóki nie ma Payment Linku | uczciwość |
 
@@ -1235,7 +1250,7 @@ dokument tego nie mówi, jest tu jedynym błędem, który kosztuje klienta.
 
 **Czego ta sesja nie zrobiła:** nie założyła produktów w Stripe, nie zainstalowała
 rozszerzenia i nie zmieniła kontraktu synchronizacji (`planRenews` zostaje długiem wobec
-`3d-polednia/Materio`). Strona `/liczmat-pro/` to nadal Sesja 29.
+`3d-polednia/Materio`). Stronę `/liczmat-pro/` zbudowała Sesja 29 — §7.13.
 
 ---
 
@@ -1278,6 +1293,52 @@ Wrzucenie czeskiego do rodziny polskiej dałoby „22 položky", co jest po pros
 języka i krótkie napisy interfejsu wychodzą identycznie — poprawnie, a nie przez
 kopiowanie. Testy, które wymagały, żeby każdy język brzmiał inaczej, liczą te dwa jako
 jeden głos.
+
+---
+
+### 7.13. Strona LiczMat Pro — publiczny opis płatnego produktu (Sesja 29)
+
+Rozdział XXXII, Sesja 29 w całości: „Krótka, konkretna strona prezentująca Pro. Bez
+marketingowego przesytu." Adres `/liczmat-pro/` — ten sam segment we wszystkich dziesięciu
+językach, bo to nazwa własna — czekał w `src/ia.mjs` ze statusem `PLANNED` od Sesji 3.
+
+**Trasa jest `GUEST`, indeksowana i bez bramki, i to jest cała jej definicja.** Paywall
+Sesji 27 stoi przed *narzędziem*; opis tego, za co ktoś miałby zapłacić, schowany za tą
+zapłatą, byłby kołem. To zarazem jedyna treść o Pro, którą wyszukiwarka może zaindeksować,
+i jedyna strona Pro, na którą ktoś bez planu ma trafić.
+
+**Strona niczego nie pisze drugi raz.** Pięć modułów to `LM_FEATURES` z `assets/plan.js`
+(przez `proModules()`), więc produkt nie może być tu opisany jako cztery moduły albo sześć.
+Cena to `proPlansBlock()` z `src/pro.mjs` — ten sam blok, który niesie ściana — więc dwa
+miejsca nie zacytują dwóch cen. Adresy pochodzą z `src/site.mjs`. Napisane od zera jest
+tylko to, czego nie mówi nigdzie indziej: co zostaje darmowe, czego Pro **nie** robi
+(rozdział XXIV: „to nie jest ERP"; XXII: bez podatków i rabatów; XXIII: to nie drugi
+Kalendarz Google) i trzy kroki z rozdziału XXV — konto, subskrypcja, otwarte moduły.
+
+**Kwota jest w HTML-u, i to jest połowa tej sesji.** Na ścianie cena jest pusta i wypełnia
+ją skrypt, bo tam i tak trzeba mieć JavaScript. Tutaj nie: strona ma być *przeczytana*,
+także przez Googlebota i przez przeglądarkę bez skryptu. Build wypisuje więc kwotę
+w walucie domyślnej dla języka strony — hasło z `assets/pay.js`, jedna z czternastu
+wpisanych ręcznie, **nic nie jest przeliczane** — a `assets/paywall.js` nadpisuje ją walutą,
+którą odwiedzający naprawdę wybrał. Jedyne, czego obie strony nie mogą trzymać wspólnie, to
+*symbol*: Node i przeglądarka niosą własne dane ICU i dla `uk-UA` jedna pisze „₴", druga
+„грн". Kwota jest ta sama, więc testy porównują cyfry.
+
+**Kto już płaci, nie widzi ceny.** `pwPage()` czyta poziom z `liczmat-signed-in` i dla
+konta Pro chowa cały blok z ceną, zostawiając „Twój plan: LiczMat Pro" — proponowanie
+komuś kupna tego, co już opłaca, czyta się jak groźba. To ten sam argument, dla którego
+pasek nad otwartym modułem nie niesie ceny. Nic z tego niczego nie bramkuje: strona jest
+publiczna, a podpowiedź o sesji może być nieaktualna.
+
+**Trzy miejsca stały się linkiem same.** Trzecie drzwi strony głównej (`HOME_DOORS`),
+„Poznaj LiczMat Pro" na ścianie i w zakładce Pro (`proMoreLink()`), oraz karta poziomu Pro
+na `/app/` — wszystkie czytają status trasy, więc żadne nie wymagało edycji poza tą jedną
+w `src/ia.mjs`. `/app/` nie ma własnego języka, więc jego linki niosą `data-nav-route`,
+a `scripts/build.mjs` dokłada `liczmat-pro` do `window.LM_NAV`.
+
+**Czego ta sesja nie zrobiła:** nie ruszyła paska nawigacji (mieści pięć linków i pięć
+niesie), nie założyła produktów w Stripe i nie włączyła płatności — strona mówi wprost, że
+subskrypcji jeszcze nie da się wykupić, dokładnie tak jak ściana.
 
 ---
 

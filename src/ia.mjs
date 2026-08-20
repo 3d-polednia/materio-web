@@ -28,7 +28,7 @@ import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlClients, urlClient,
-  urlJobs, urlJob, urlQuotes, urlQuote, urlCalendar,
+  urlJobs, urlJob, urlQuotes, urlQuote, urlCalendar, urlLiczmatPro,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -233,14 +233,16 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlClients,
-    footer: { order: 7, key: "clipage_title" },
+    footer: { order: 8, key: "clipage_title" },
     navLevel: LEVEL.PRO,
     gate: "Chapter XXV, built in session 27: proGate() in src/pro.mjs stands in place " +
       "of the module — the module named and described, \"Dostępne w LiczMat Pro\", the " +
       "other four Pro modules listed so the wall shows the whole product, and one rung " +
       "of the Free → Pro path chosen from the visitor's level (a guest is sent to sign " +
       "up, a free account is told its plan). Never a dead button: \"Poznaj LiczMat Pro\" " +
-      "stays a sentence while /liczmat-pro/ is PLANNED. LM_PRO_LOCKED in assets/plan.js " +
+      "has been a link since session 29 built /liczmat-pro/, and was a sentence before " +
+      "that \u2014 proMoreLink() reads the route's status, so neither state was ever " +
+      "written twice. LM_PRO_LOCKED in assets/plan.js " +
       "is `true` from session 27 on. Session 28 removed the preview that stood beside it " +
       "and put the subscription there instead: the wall quotes both plans from " +
       "assets/pay.js and sends the visitor to /app/, which is the only page that knows " +
@@ -270,7 +272,7 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "clients", localized: true, indexable: true,
     path: urlJobs,
-    footer: { order: 8, key: "jobpage_title" },
+    footer: { order: 9, key: "jobpage_title" },
     navLevel: LEVEL.PRO,
     gate: "As clients — the same wall, from the same builder (proGate() in " +
       "src/pro.mjs) and behind the same switch.",
@@ -300,7 +302,7 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "jobs", localized: true, indexable: true,
     path: urlQuotes,
-    footer: { order: 9, key: "quopage_title" },
+    footer: { order: 10, key: "quopage_title" },
     navLevel: LEVEL.PRO,
     gate: "As clients and jobs — the same wall, from the same builder.",
     note: "Chapter XXII, and the third of the five Pro modules: materials, labour, " +
@@ -331,7 +333,7 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "jobs", localized: true, indexable: true,
     path: urlCalendar,
-    footer: { order: 10, key: "calpage_title" },
+    footer: { order: 11, key: "calpage_title" },
     navLevel: LEVEL.PRO,
     gate: "As clients, jobs and quotes — the same wall, from the same builder.",
     note: "Chapter XXIII, and the fourth of the five Pro modules: the deadlines of the " +
@@ -399,21 +401,21 @@ export const ROUTES = [
       "the app repo; change one, change both.",
   },
 
-  /* ---------------------------------------------------------------- planned */
   {
     id: "liczmat-pro",
-    level: LEVEL.GUEST, status: STATUS.PLANNED, session: 29,
+    level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
-    // A brand name, so it is the same segment in every language — including the six that
-    // came back after session 28.
-    plannedSlug: {
-      pl: "liczmat-pro", uk: "liczmat-pro", de: "liczmat-pro", en: "liczmat-pro",
-      cs: "liczmat-pro", sk: "liczmat-pro", ro: "liczmat-pro", hr: "liczmat-pro",
-      sr: "liczmat-pro", ru: "liczmat-pro",
-    },
+    path: urlLiczmatPro,
+    footer: { order: 7, key: "pro_t" },
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
-      "indexable — the paywall sits on the Pro modules, not on their description.",
+      "indexable — the paywall sits on the Pro modules, not on their description. " +
+      "Session 29 built it, and it is the page the whole product points at when it says " +
+      "\"Poznaj LiczMat Pro\": proMoreLink() in src/pro.mjs, the Pro card on /app/ and " +
+      "the third door of the home page all read this route's status, so all three became " +
+      "links the day it went LIVE. It carries no gate and never will — a description of " +
+      "what somebody would be paying for cannot be behind the thing they have not paid " +
+      "for.",
   },
 ];
 

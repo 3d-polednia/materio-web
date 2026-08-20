@@ -150,3 +150,47 @@ function pwMount(prefix, feature) {
   document.addEventListener("langchange", () => pwRender(prefix, feature));
   pwRender(prefix, feature);
 }
+
+/* ------------------------------------------------------------------ /liczmat-pro/ */
+
+/**
+ * The public Pro page (session 29), which is the one page here with no module on it.
+ *
+ * There is no wall to draw: /liczmat-pro/ is GUEST and describes what Pro is, so nothing
+ * on it is withheld from anybody. Two things still have to happen in the browser, and
+ * both are already written above:
+ *
+ *   the price   proPlansBlock() leaves the amount empty, because the build has no idea
+ *               which currency this visitor reads in and the page is cached for all of
+ *               them. pwPrices() fills it in, exactly as it does on a wall — one
+ *               function, so the public page and the wall cannot quote two prices.
+ *   the plan    somebody already paying for Pro is shown that, and no price at all.
+ *               Quoting the fee to a customer who is already paying it reads as a
+ *               threat, which is the same reason the strip above an open module never
+ *               carries one.
+ *
+ * The level is the `liczmat-signed-in` hint (assets/account.js), which can be stale — and
+ * that is fine here, because nothing is gated either way: the worst a stale hint can do
+ * is show a price to somebody who has already paid, and the page they are sent to is
+ * /app/, which asks Firebase and knows the truth.
+ */
+function pwPage() {
+  const pay = document.getElementById("pro-pay");
+  if (!pay) return;
+  const yours = document.getElementById("pro-yours");
+  const isPro = pwLevel() === "pro";
+  pay.hidden = isPro;
+  if (yours) yours.hidden = !isPro;
+  if (!isPro) pwPrices(pay);
+}
+
+/* Redrawn for the same three reasons a wall is: somebody signed in or out (in this tab or
+   another), the currency changed, or the language did — the period beside each amount is
+   a translated word. The page has no script of its own to call this, so it wires itself
+   and does nothing at all on the pages that carry no #pro-pay. */
+if (typeof document !== "undefined" && document.getElementById("pro-pay")) {
+  document.addEventListener("lm-session", pwPage);
+  document.addEventListener("currencychange", pwPage);
+  document.addEventListener("langchange", pwPage);
+  pwPage();
+}

@@ -114,16 +114,29 @@ export function proMoreLink(t, lang) {
  *   [data-pw-buy]   the subscription is open — the way to the checkout
  *   [data-pw-soon]  it is not — said plainly, rather than a button that cannot charge
  *
+ * One exception, and it is the public page: /liczmat-pro/ (session 29) hands in
+ * `prices` — this language's default currency, formatted by the build — so the amount is
+ * in the HTML a crawler and a visitor with no script both read. It is not a conversion
+ * and it is not a second price list: assets/pay.js holds a hand-typed amount for each of
+ * the seven currencies, `opts.prices` carries the one this page's language starts in, and
+ * assets/paywall.js overwrites it the moment it knows the currency the visitor actually
+ * chose. A plan with no price in that currency stays hidden, exactly as it does on a wall.
+ *
  * @param {object} opts { checkout } true on /app/, where the button is the real checkout;
  *   false on a wall, where it is a link to /app/ because only that page knows the uid.
+ *   { prices } optional { <planId>: "39,99 zł" } — see above.
  */
 export function proPlansBlock(t, opts) {
   const checkout = Boolean(opts && opts.checkout);
-  const plan = (id) => `<div class="pw-plan" data-pw-plan="${id}" hidden>
+  const prices = (opts && opts.prices) || null;
+  const plan = (id) => {
+    const price = prices ? prices[id] : "";
+    return `<div class="pw-plan" data-pw-plan="${id}"${price ? "" : " hidden"}>
             <h4 data-i18n="pay_${id}_t">${esc(t(`pay_${id}_t`))}</h4>
-            <p class="pw-price"><b data-pw-price></b>
+            <p class="pw-price"><b data-pw-price>${price ? esc(price) : ""}</b>
               <span class="muted" data-i18n="pay_${id}_per">${esc(t(`pay_${id}_per`))}</span></p>
           </div>`;
+  };
 
   /* On /app/ the button is the checkout itself and assets/app.js writes its href from
      lmCheckoutUrl() — it needs the uid, so the build cannot write it. On a wall it is a

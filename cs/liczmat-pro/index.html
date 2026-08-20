@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<!-- Google tag (gtag.js) with Consent Mode v2 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The analytics tag is the only third-party request a public page makes; opening the
+     connection alongside the HTML keeps it off the render path. -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>LiczMat Pro — LiczMat</title>
+<meta name="description" content="LiczMat Pro: klienti, zakázky, cenové nabídky, termíny a historie práce vedle kalkulaček. Co předplatné Pro obsahuje, kolik stojí a co v něm není.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/cs/liczmat-pro/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/liczmat-pro/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/liczmat-pro/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/liczmat-pro/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/liczmat-pro/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/liczmat-pro/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/liczmat-pro/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/liczmat-pro/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/liczmat-pro/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/liczmat-pro/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/liczmat-pro/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/liczmat-pro/">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/favicon.svg?v=20260819j" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="cs_CZ">
+<meta property="og:title" content="LiczMat Pro — LiczMat">
+<meta property="og:description" content="LiczMat Pro: klienti, zakázky, cenové nabídky, termíny a historie práce vedle kalkulaček. Co předplatné Pro obsahuje, kolik stojí a co v něm není.">
+<meta property="og:url" content="https://liczmat.com/cs/liczmat-pro/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LiczMat Pro — LiczMat">
+<meta name="twitter:description" content="LiczMat Pro: klienti, zakázky, cenové nabídky, termíny a historie práce vedle kalkulaček. Co předplatné Pro obsahuje, kolik stojí a co v něm není.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<link rel="stylesheet" href="/assets/styles.css?v=20260819j">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Domů",
+      "item": "https://liczmat.com/cs/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "LiczMat Pro",
+      "item": "https://liczmat.com/cs/liczmat-pro/"
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Přejít k obsahu</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/cs/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hlavní navigace">
+      <ul class="nav-list">
+        <li><a href="/cs/kalkulacky/">Kalkulačky</a></li>
+        <li><a href="/cs/materialy/">Materiály</a></li>
+        <li data-nav-level="liczmat"><a href="/cs/projekty/">Projekty</a></li>
+        <li><a href="/cs/navody/">Návody</a></li>
+        <li><a href="/cs/aplikace/">Aplikace</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Jazyk">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span class="lang-btn-name">undefined</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/liczmat-pro/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/liczmat-pro/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/liczmat-pro/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/liczmat-pro/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></span></li>
+      <li><a class="lang-item" href="/sk/liczmat-pro/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ro/liczmat-pro/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/hr/liczmat-pro/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/sr/liczmat-pro/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+      <li><a class="lang-item" href="/ru/liczmat-pro/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Měna" title="Měna"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK" selected>CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Můj účet</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Přepnout motiv" title="Přepnout motiv"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otevřít menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<!-- Outside <header>, because the header's backdrop-filter makes it the containing
+     block for anything position:fixed inside it — in there the scrim would be as tall
+     as the header bar and dim nothing. -->
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li aria-current="page">LiczMat Pro</li></ol></nav>
+      <span class="door-level">Pro řemeslníky</span>
+      <h1>LiczMat Pro</h1>
+      <p class="lead">LiczMat zvládá tvoje projekty. Pro zvládá tvoji práci: klienti, zakázky, cenové nabídky a termíny vedle toho, co už počítáš.</p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="promods-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="promods-h">Co obsahuje LiczMat Pro</h2>
+        <p class="muted">Pět modulů. Stojí vedle toho, co už počítáš — kalkulačky nenahrazují, jen k nim přidávají vedení práce.</p>
+      </div>
+      <div class="pro-mods">
+        <article class="pro-mod">
+          <h3>Klienti</h3>
+          <p class="muted">Seznam klientů s kontaktními údaji, poznámkami a historií spolupráce.</p>
+        </article>
+        <article class="pro-mod">
+          <h3>Zakázky</h3>
+          <p class="muted">Zakázka s klientem, popisem, stavem, termínem, hodnotou a připojeným projektem.</p>
+        </article>
+        <article class="pro-mod">
+          <h3>Cenové nabídky</h3>
+          <p class="muted">Materiál, práce, další náklady, marže a součet — z toho, co jsi už spočítal.</p>
+        </article>
+        <article class="pro-mod">
+          <h3>Termíny</h3>
+          <p class="muted">Termíny zakázek a základní informace o nich. Ne druhý Kalendář Google.</p>
+        </article>
+        <article class="pro-mod">
+          <h3>Historie a CRM</h3>
+          <p class="muted">Cesta celou prací: klient → zakázka → projekt → cenová nabídka → historie.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="profree-h">
+    <div class="wrap narrow">
+      <h2 id="profree-h">Co máš bez Pro</h2>
+      <p class="muted">Za tohle neplatíš. Počítání funguje bez účtu a tak to zůstane.</p>
+      <ul class="steps-list">
+        <li>Všechny kalkulačky s plným výsledkem a katalog materiálu.</li>
+        <li>Projekty, místnosti a uložené výpočty — v tomto prohlížeči, bez registrace.</li>
+        <li>Seznamy materiálu a náklady projektu. Účet zdarma přidává synchronizaci s telefonem a rozpočet ke sdílení odkazem.</li>
+      </ul>
+      <p class="ws-links">
+        <a class="btn btn-ghost btn-sm" href="/cs/kalkulacky/">Všechny kalkulačky</a>
+        <a class="btn btn-ghost btn-sm" href="/cs/projekty/">Projekty a místnosti</a>
+        <a class="btn btn-ghost btn-sm" href="/cs/rozpocet/">Rozpočet</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- What Pro is not. Chapter XXIV ends on "to nie jest ERP", chapter XXII rules the
+       accounting package out by name and chapter XXIII rules out a second calendar; a
+       page that sold Pro without saying any of it would be selling something else. -->
+  <section class="block" aria-labelledby="pronot-h">
+    <div class="wrap narrow">
+      <h2 id="pronot-h">Co LiczMat Pro nedělá</h2>
+      <ul class="steps-list">
+        <li>Není to ERP ani účetnictví: žádné faktury, daně, sklad ani mzdy.</li>
+        <li>Cenová nabídka je materiál, práce, další náklady, marže a součet. Bez slev, čísel a dat vystavení.</li>
+        <li>Termíny ukazují termíny zakázek. Není to druhý Kalendář Google a upozornění neposílá.</li>
+      </ul>
+      <p class="muted src-note">Data Pro — klienti, zakázky a cenové nabídky — zůstávají v paměti tohoto prohlížeče. V aplikaci pro Android nejsou: synchronizace zahrnuje projekty, místnosti, výpočty a seznamy materiálu.</p>
+    </div>
+  </section>
+
+  <!-- The price. The block is proPlansBlock() — the same markup the wall in front of a
+       module carries, so the two can never quote different prices — and the amounts in it
+       are empty: assets/pay.js knows them per currency and assets/paywall.js writes them
+       in once the visitor's currency is known. Somebody already on Pro is shown their
+       plan instead: pwMountPage() hides the whole block for them. -->
+  <section class="block alt" aria-labelledby="propay-h">
+    <div class="wrap narrow">
+      <h2 id="propay-h">Kolik to stojí</h2>
+      <div id="pro-pay">
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Předplatné LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Jeden tarif, všech pět modulů Pro. Platbu zajišťuje Stripe; zrušíš kdykoli a Pro běží do konce zaplaceného období.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly">
+            <h4 data-i18n="pay_monthly_t">Měsíčně</h4>
+            <p class="pw-price"><b data-pw-price>229,00 Kč</b>
+              <span class="muted" data-i18n="pay_monthly_per">/ měsíc</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly">
+            <h4 data-i18n="pay_yearly_t">Ročně</h4>
+            <p class="pw-price"><b data-pw-price>2 290,00 Kč</b>
+              <span class="muted" data-i18n="pay_yearly_per">/ rok — o dva měsíce levněji</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Přejít na svůj účet</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Předplatné si zatím koupit nelze. Ceny jsou konečné, platby spouštíme brzy.</p>
+        </div>
+      </div>
+      <p id="pro-yours" hidden><span class="chip on">Tvůj tarif: LiczMat Pro</span></p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="prohow-h">
+    <div class="wrap narrow">
+      <h2 id="prohow-h">Jak zapnout Pro</h2>
+      <ul class="steps-list">
+        <li>Založ si účet LiczMat zdarma — předplatné drží u účtu, ne u prohlížeče.</li>
+        <li>Předplatné kup na stránce svého účtu. Je to jediné místo, kde LiczMat bere peníze; platbu zajišťuje Stripe.</li>
+        <li>Pět modulů Pro se otevře samo, na stejném účtu.</li>
+      </ul>
+      <p class="ws-links">
+        <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fcs%2Fliczmat-pro%2F" rel="nofollow">Založit účet zdarma</a>
+        <a class="btn btn-ghost btn-sm" href="/app/" rel="nofollow">Přejít na svůj účet</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Stejný vzorec v aplikaci</b> LiczMat pro Android počítá stejným jádrem offline — s katalogem materiálů a uložením výsledku do projektu.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Stáhnout</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulačka stavebního materiálu. Spočítej. Naplánuj. Postav.</p>
+      </div>
+      <div>
+        <h4>Produkt</h4>
+        <ul>
+          <li><a href="/cs/kalkulacky/">Všechny kalkulačky</a></li>
+          <li><a href="/cs/materialy/">Materiály</a></li>
+          <li data-nav-level="liczmat"><a href="/cs/projekty/">Projekty</a></li>
+          <li><a href="/cs/rozpocet/">Rozpočet</a></li>
+          <li><a href="/cs/navody/">Návody</a></li>
+          <li><a href="/cs/obchody/">Obchody</a></li>
+          <li><a href="/cs/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/cs/klienti/">Klienti</a></li>
+          <li data-nav-level="pro"><a href="/cs/zakazky/">Zakázky</a></li>
+          <li data-nav-level="pro"><a href="/cs/cenove-nabidky/">Cenové nabídky</a></li>
+          <li data-nav-level="pro"><a href="/cs/terminy/">Termíny</a></li>
+          <li><a href="/cs/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Účet</h4>
+        <ul>
+          <li><a href="/cs/aplikace/">Aplikace</a></li>
+          <li><a href="/app/" rel="nofollow">Můj účet</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Přehled</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Právní informace</h4>
+        <ul>
+          <li><a href="/privacy-policy.html">Zásady ochrany soukromí</a></li>
+          <li><a href="/cs/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Jazyk">
+      <h4>Jazyk</h4>
+      <ul>
+        <li><a href="/liczmat-pro/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/liczmat-pro/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/liczmat-pro/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/liczmat-pro/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/liczmat-pro/" hreflang="cs" lang="cs" data-lang="cs" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sk/liczmat-pro/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ro/liczmat-pro/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/hr/liczmat-pro/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/sr/liczmat-pro/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>undefined</span></a></li>
+        <li><a href="/ru/liczmat-pro/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>undefined</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Všechna práva vyhrazena.</span>
+      <span>Výsledky jsou orientační. Před nákupem ověř.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-label="Souhlasím" hidden>
+  <p class="consent-text">Používáme Google Analytics, abychom anonymně počítali návštěvnost webu a kolik lidí přejde na Google Play. Souhlasíš?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Více v zásadách ochrany soukromí</a>
+    <a class="consent-more" href="/cs/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odmítnout</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Souhlasím</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/liczmat-pro/",
+  "uk": "/uk/liczmat-pro/",
+  "de": "/de/liczmat-pro/",
+  "en": "/en/liczmat-pro/",
+  "cs": "/cs/liczmat-pro/",
+  "sk": "/sk/liczmat-pro/",
+  "ro": "/ro/liczmat-pro/",
+  "hr": "/hr/liczmat-pro/",
+  "sr": "/sr/liczmat-pro/",
+  "ru": "/ru/liczmat-pro/"
+};</script>
+<script src="/assets/i18n.cs.js?v=20260819j"></script>
+<script src="/assets/i18n-runtime.js?v=20260819j"></script>
+<script src="/assets/currency.js?v=20260819j"></script>
+<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script src="/assets/account.js?v=20260819j"></script>
+
+<script src="/assets/pay.js?v=20260819j"></script>
+<script src="/assets/paywall.js?v=20260819j"></script>
+<script src="/assets/main.js?v=20260819j"></script>
+
+</body>
+</html>

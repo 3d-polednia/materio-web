@@ -433,9 +433,13 @@ head("6c2. the five states a subscription can be in (session 28)");
     sub({ plan: "premium", planValidUntil: NOW + 6 * 3600000 }).daysLeft, 0);
 }
 
-head("6d. the wall as it is built, in four languages");
+head("6d. the wall as it is built, in ten languages");
 {
-  for (const lang of SITE_LANGS.map((l) => l.code)) {
+  // SITE_LANGS is an array of codes, not of objects. It was read as `l.code` here until
+  // session 29, so every one of these checks ran ten times with `lang === undefined` —
+  // and passed, because both sides of each comparison were built from the same undefined
+  // language. The wall was never actually checked in any language until this line.
+  for (const lang of SITE_LANGS) {
     const t = tr(lang);
     const html = proGate(t, "clients", LM_FEATURES, lang, { id: "crm-gate" });
     const has = (needle, what) => check(`${lang}: ${what}`, html.includes(needle),
@@ -461,8 +465,14 @@ head("6d. the wall as it is built, in four languages");
     for (const f of proModules(LM_FEATURES).filter((x) => x.id !== "clients")) {
       has(t(`${f.key}_t`), `and ${f.id} is named on it`);
     }
-    check(`${lang}: the module behind this wall is not listed twice`,
-      (html.match(new RegExp(esc(t("feat_clients_t")), "g")) || []).length === 1);
+    // The module this wall stands in front of is named once, in the heading, and is not
+    // in the list of what else Pro contains. Counted as markup rather than as text: the
+    // German for "Klienci" is "Kunden" and its own description opens with
+    // "Eine Kundenliste", so a substring count says two and means one.
+    check(`${lang}: the module behind this wall is named in the heading`,
+      html.includes(`<h2>${esc(t("feat_clients_t"))}</h2>`));
+    check(`${lang}: and is not repeated in the list of what else Pro contains`,
+      !html.includes(`<li><b>${esc(t("feat_clients_t"))}</b>`));
 
     // Session 28: the wall quotes a price. The amounts are NOT in the markup — the build
     // has no idea which currency this visitor reads in — so what is checked is the frame
@@ -481,15 +491,17 @@ head("6d. the wall as it is built, in four languages");
     check(`${lang}: the wall's button leads to the account page`,
       html.includes(`href="/app/"`));
 
-    // Chapter XXV's rule, still: never a dead button. /liczmat-pro/ is PLANNED until
-    // session 29, so the phrase is text; the moment the route goes LIVE it is a link and
-    // this check flips to the other branch on its own.
+    // Chapter XXV's rule, still: never a dead button. The phrase was text while
+    // /liczmat-pro/ was PLANNED; session 29 built the page, so it is a link now — and it
+    // is a link to this language's own address, because a wall in German that sent
+    // somebody to the Polish page would be answering a question in the wrong language.
     const proPage = route("liczmat-pro");
     has(t("pro_more"), "the way to find out what Pro is, is offered");
-    check(`${lang}: and it is a sentence while /liczmat-pro/ is planned`,
+    check(`${lang}: and it is a link now that /liczmat-pro/ is built`,
       proPage.status === STATUS.LIVE
         ? html.includes(`href="${proPage.path(lang)}"`)
-        : html.includes(t("door_soon")));
+        : html.includes(t("door_soon")),
+      `no ${proPage.path(lang)} on the wall`);
   }
 
   // The wall is built from LM_FEATURES, so a module the table never heard of must not
@@ -590,14 +602,18 @@ head("9. /app/ carries the Pro tab");
   eq("each module is locked once",
     (html.match(/data-i18n="pro_locked"/g) || []).length, proModules(LM_FEATURES).length);
 
-  // Chapter XXV, the rule the whole tab exists to obey: never a dead button. Every Pro
-  // route is PLANNED, so the page may not link to one — and /liczmat-pro/ waits for
-  // session 29, so "Poznaj LiczMat Pro" is a sentence until then.
-  hasNot('href="/liczmat-pro/"', "nothing links to the Pro page before session 29 builds it");
+  // Chapter XXV, the rule the whole tab exists to obey: never a dead button — which now
+  // cuts the other way. Session 29 built /liczmat-pro/, so "Poznaj LiczMat Pro" is the
+  // link it always meant to be. /app/ has no language of its own, so it carries
+  // DEFAULT_LANG's address and `data-nav-route`, which assets/i18n-runtime.js repoints
+  // from window.LM_NAV — scripts/build.mjs puts this route into that map for exactly this.
+  has('href="/liczmat-pro/"', "the Pro page, which exists now, is reachable from the tab");
+  has('data-nav-route="liczmat-pro"', "and the link follows the language the page is in");
   // Klienci is built (session 22), so its card is the one module the tab can open. A
   // dead button is what chapter XXV forbids; a live one is what it asks for.
   has('href="/klienci/"', "and Klienci, which exists, is reachable from its card");
-  has('class="muted pro-more"', "so the way in is text, not a button");
+  hasNot('class="muted pro-more"',
+    "so the way in is a link, not the sentence it was before the page existed");
 
   // Everything the tab renders is swapped in place on `langchange` (the page has no
   // language of its own), so every string in it has to be reachable by key.

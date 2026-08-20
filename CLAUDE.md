@@ -79,9 +79,10 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now 363 pages: a home page, a calculator
-hub, one page per calculator, guides and a store finder — each in all ten languages, at
-its own URL, so search engines can index more than the Polish front page. Writing that by
+The site used to be one `index.html`. It is now 373 pages: a home page, a calculator
+hub, one page per calculator, guides, a store finder and the public page for LiczMat Pro —
+each in all ten languages, at its own URL, so search engines can index more than the
+Polish front page. Writing that by
 hand is not possible; a generator writes it from one template plus the dictionary.
 
 ```bash
@@ -101,6 +102,7 @@ node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadli
 node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
 node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
 node scripts/test-crm.mjs         # the chain: the walk, the derived history, one link map
+node scripts/test-propage.mjs     # /liczmat-pro/: the route, the price in the HTML, the copy
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -117,7 +119,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | Authored (edit these) | Generated (never edit — `build.mjs` overwrites) |
 |---|---|
 | `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
-| `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**`, `materialy/**` and their per-language twins |
+| `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**`, `materialy/**`, `liczmat-pro/**` and their per-language twins |
 | `assets/i18n-materials.js` — material names, 4 languages | `app/index.html`, `p/index.html` |
 | `assets/calculators.js` — engines, ported 1:1 from Kotlin, and `assets/units.js` next to it | `assets/i18n.<lang>.js`, `assets/i18n.all.js` |
 | `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `sitemap.xml` |
@@ -303,6 +305,23 @@ scripts/test-crm.mjs   The chain (session 26, chapter XXIV): that the session ad
                       the one `window.LM_LINKS` map that replaced four; and the copy in
                       ten languages. Dependency-free — run it after touching the chain
                       half of assets/crm.js, assets/crm-chain.js or a crm_* key
+scripts/test-propage.mjs  /liczmat-pro/, the public page for LiczMat Pro (session 29,
+                      chapter XXXII): the route — GUEST, indexable, one slug in ten
+                      languages, no gate — and the three places that point at it; the page
+                      itself in ten languages, including the five modules read out of
+                      LM_FEATURES and the modules it deliberately does not link into; the
+                      price, which is in the HTML and is the hand-typed amount for that
+                      language's currency rather than a conversion; that nothing on it
+                      offers to take money; and the ten files that actually shipped, with
+                      their canonical, their hreflang and their place in sitemap.xml.
+                      Dependency-free — run it after touching proPageMain(), the route in
+                      src/ia.mjs, buildProPage() or a propage_* key
+scripts/test-propage-page.mjs  The same page in Chromium, nothing stubbed: the price in the
+                      visitor's currency and the currency switched while the page is open,
+                      a Pro account shown their plan instead of a price, ten languages each
+                      linking inside their own, the widths of chapter XXVIII, the home
+                      page's third door — and the no-JavaScript variant, where the amount
+                      is still on the screen because the build wrote it into the markup
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -791,6 +810,38 @@ Kotlin side of it. Change one, change all three.
   `on`) or the module is behind the wall. When the wall is up the strip is hidden entirely:
   the wall says all of it, and twice is worse than once. A Pro account is never quoted a
   price either — offering to sell somebody what they already pay for reads as a threat.
+
+- **`/liczmat-pro/` is the one Pro address with no wall in front of it, and it cannot have
+  one.** Session 29 built the public page: GUEST, indexable, the same slug in all ten
+  languages (a brand name, so translating it would give one product ten names), in the
+  footer for everybody. The paywall stands in front of a *module*; a description of what
+  somebody would be paying for, put behind the payment, is a circle. It writes nothing
+  twice: the five modules are `LM_FEATURES` through `proModules()`, the price is
+  `proPlansBlock()` — the same block the wall carries — and the addresses come from
+  `src/site.mjs`. What is authored there is only what nothing else says: what stays free,
+  what Pro deliberately does not do, and chapter XXV's three steps from a free account to
+  a plan.
+- **The price on that page is in the HTML, and it is still not a conversion.** A wall can
+  leave the amount to a script, because a locked module needs JavaScript anyway; a page
+  whose whole job is to be *read* cannot — Googlebot and a visitor with no script would
+  see an empty slot where the price belongs. So `buildProPage()` prints the hand-typed
+  amount for the language's **default** currency out of `assets/pay.js` (`planPrices()`),
+  and `assets/paywall.js` overwrites it with the visitor's own the moment it knows one.
+  Nothing is converted at a rate, and a currency with no configured amount still shows no
+  price. The one thing the build and the browser cannot be held to is the *symbol*: their
+  ICU data differs, and for `uk-UA` Node writes "₴" where Chromium writes "грн" — the
+  amount is identical, so the tests compare digits.
+- **A Pro account visiting `/liczmat-pro/` is shown their plan, not a price.** `pwPage()` in
+  `assets/paywall.js` reads the level from `liczmat-signed-in` and hides the whole price
+  block for `pro`, leaving "Twój plan: LiczMat Pro" — the same argument that keeps a price
+  off the strip above an open module. Nothing there is gated: the page is public, the hint
+  can be stale, and the worst a stale one does is quote a price to somebody who has paid.
+- **Three links turned themselves on when the route went LIVE.** The home page's third door
+  (`HOME_DOORS`), "Poznaj LiczMat Pro" on every wall and in the Pro tab (`proMoreLink()`),
+  and the Pro level card on `/app/` all read the route's status, so session 29 edited none
+  of them. What it did have to add is `liczmat-pro` in the `LM_NAV` map in
+  `scripts/build.mjs`: `/app/` has no language of its own and repoints a `data-nav-route`
+  link from there.
 
 - **The chain is walked, never stored, and session 26 added no collection and no page.**
   Chapter XXIV's path — KLIENT → ZLECENIE → PROJEKT → WYCENA → HISTORIA — is made entirely

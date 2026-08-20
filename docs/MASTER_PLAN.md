@@ -55,7 +55,8 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 27 | Paywall Pro | **Zrobione** — 2026-08-19 |
 | 28 | Płatności | **Zrobione** — 2026-08-19 |
 | — | *Etap dodatkowy: przywrócenie 10 języków* | **Zrobione** — 2026-08-19 |
-| 29–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 29 | Strona LiczMat Pro | **Zrobione** — 2026-08-20 |
+| 30–36 | patrz rozdział XXXII planu | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -210,6 +211,134 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 29
+
+Rozdział XXXII, Sesja 29 w całości: **„Krótka, konkretna strona prezentująca Pro. Bez
+marketingowego przesytu."** Powstało `/liczmat-pro/` — dziesięć stron, po jednej na język,
+pod tym samym segmentem adresu we wszystkich, bo to nazwa własna produktu. Serwis ma
+**373 strony** zamiast 363.
+
+**1. Trasa jest `GUEST`, indeksowana i bez bramki.** To nie jest niedopatrzenie, tylko
+jedyna możliwa decyzja: paywall Sesji 27 stoi przed *narzędziem*, a opis tego, za co ktoś
+miałby zapłacić, schowany za tą zapłatą, byłby kołem. `/liczmat-pro/` czekało w
+`src/ia.mjs` ze statusem `PLANNED` od Sesji 3 — teraz jest `LIVE`, a **lista stron
+planowanych jest pusta**. Slug przeniósł się z `plannedSlug` do `SECTION` bez zmiany
+choćby jednej litery, tak samo jak cztery moduły Pro przed nim.
+
+**2. Strona nie pisze niczego drugi raz.** Pięć modułów pochodzi z `LM_FEATURES`
+(`proModules()`), więc produkt nie może być tu opisany jako cztery moduły albo sześć. Cena
+to `proPlansBlock()` — **ten sam blok, który niesie ściana** — więc dwa miejsca nie
+zacytują dwóch cen. Adresy pochodzą z `src/site.mjs`. Napisane od zera jest tylko to,
+czego nie mówi nigdzie indziej: **co zostaje darmowe** (wszystkie kalkulatory, katalog,
+projekty, pomieszczenia, listy materiałów i koszty — bez konta), **czego Pro nie robi**
+(rozdział XXIV: „to nie jest ERP"; XXII: bez podatków, rabatów i dat wystawienia; XXIII:
+to nie drugi Kalendarz Google) i **trzy kroki rozdziału XXV**: darmowe konto → subskrypcja
+na stronie konta → pięć modułów otwiera się samo.
+
+**3. Kwota jest w HTML-u — i to jest połowa tej sesji.** Na ścianie cena jest pusta i
+wypełnia ją skrypt, bo zamknięty moduł i tak wymaga JavaScriptu. Tutaj nie wolno tak zrobić:
+ta strona ma być *przeczytana*, także przez Googlebota i przez przeglądarkę bez skryptu, a
+pusty prostokąt w miejscu ceny to strona, która się nie wczytała. Build wypisuje więc kwotę
+w walucie domyślnej dla języka strony — jedną z czternastu wpisanych ręcznie w
+`assets/pay.js`, **nic nie jest przeliczane** — a `assets/paywall.js` nadpisuje ją walutą,
+którą odwiedzający naprawdę wybrał. Zmierzone w Chromium: 39,99 zł po polsku, 229,00 Kč po
+czesku, 1.099,00 RSD po serbsku, i zmiana w miejscu po przełączeniu waluty, bez
+przeładowania.
+
+**4. Kto już płaci, nie widzi ceny.** `pwPage()` czyta poziom z `liczmat-signed-in` i dla
+konta Pro chowa cały blok z ceną, zostawiając „Twój plan: LiczMat Pro". Proponowanie komuś
+kupna tego, co już opłaca, czyta się jak groźba — ten sam argument, dla którego pasek nad
+otwartym modułem nie niesie ceny. Nic z tego niczego nie bramkuje: strona jest publiczna, a
+podpowiedź o sesji może być nieaktualna.
+
+**5. Trzy linki włączyły się same.** Trzecie drzwi strony głównej, „Poznaj LiczMat Pro" na
+każdej ścianie i w zakładce Pro, oraz karta poziomu Pro na `/app/` — wszystkie czytały
+status trasy, więc w ich kodzie nie zmieniło się nic. Dopisać trzeba było jedno:
+`liczmat-pro` w mapie `window.LM_NAV` w `scripts/build.mjs`, bo `/app/` nie ma własnego
+języka. W stopce strona stoi tuż przed czterema modułami Pro i **nie** ma `navLevel`:
+strona tłumacząca, czym jest Pro, schowana przed każdym bez Pro, tłumaczyłaby to tym,
+którzy już wiedzą.
+
+**Czego ta sesja nie zrobiła.** Nie ruszyła paska nawigacji (mieści pięć linków i pięć
+niesie — szósty wymaga pomiaru albo wyrzucenia jednego z obecnych, i to jest decyzja
+właściciela). Nie założyła produktów w Stripe i nie włączyła płatności: strona mówi
+wprost, że subskrypcji jeszcze nie da się wykupić, dokładnie tak jak ściana. Nie dopisała
+`Offer` do structured data — reklamowanie w danych strukturalnych oferty, której nic nie
+umie sprzedać, byłoby nieprawdą wobec Google.
+
+**Zmienione pliki.** `src/site.mjs` (`SECTION.pro`, `urlLiczmatPro()`), `src/ia.mjs`
+(trasa `LIVE`, stopka, przenumerowane pozycje czterech modułów), `src/pages.mjs`
+(`proPageMain()`), `src/pro.mjs` (`proPlansBlock()` przyjmuje gotową kwotę),
+`src/app-pages.mjs` (karta poziomu Pro linkuje do strony), `src/currency.mjs`
+(`MONEY_LOCALE`), `scripts/build.mjs` (`buildProPage()`, `planPrices()`, `LM_NAV`,
+sitemap, `STAMP` → `20260819j`), `assets/paywall.js` (`pwPage()`), `assets/styles.css`
+(`.door-level` jako `inline-block`), `assets/i18n.js` (`door_pro_go` ×10),
+`assets/i18n-pages.js` (18 kluczy `propage_*` ×10 = 180 ciągów), nowe
+`scripts/test-propage.mjs` i `scripts/test-propage-page.mjs`, poprawione
+`scripts/test-plan.mjs`, `scripts/test-account.mjs` i `scripts/test-account-page.mjs`,
+`CLAUDE.md`, `docs/ARCHITEKTURA.md` (§2, §3, §4, §5, §5.1, §7.12, nowy §7.13),
+`privacy-policy.html` i `404.html` (`?v=`), 373 przebudowane strony.
+
+**Testy.** **12 338 sprawdzeń logiki** w 16 zestawach — wszystkie przechodzą; nowy
+`scripts/test-propage.mjs` wnosi 1079. W Chromium (Playwright zainstalowany poza repo,
+tym razem się udało): nowy `scripts/test-propage-page.mjs` — **148/148**, w tym wariant
+bez JavaScriptu i sześć szerokości rozdziału XXVIII; `scripts/test-account-page.mjs`
+184/184; `scripts/test-dashboard-page.mjs`, `test-save-page`, `test-rooms-page`,
+`test-quotes-page`, `test-crm-page` bez zmian. `scripts/build.mjs --check`: **1149 kluczy
+× 10 języków**.
+
+**Znalezione przy okazji — trzy defekty starsze niż ta sesja.** Naprawione zostały tylko
+te, które dotyczą kodu ruszonego w tej sesji; reszta jest opisana i **nie ruszona**
+(rozdział XXXV).
+
+- **Naprawione: `scripts/test-plan.mjs` §6d nigdy nie sprawdzał żadnego języka.** Pętla
+  szła po `SITE_LANGS.map((l) => l.code)`, a `LANGS` w `src/site.mjs` to tablica *napisów*,
+  nie obiektów — więc dziesięć przebiegów robiło się z `lang === undefined` i wszystkie
+  przechodziły, bo obie strony każdego porównania budowały się z tego samego `undefined`.
+  Po poprawce wyszedł prawdziwy błąd testu: „moduł nie jest wymieniony dwa razy" liczyło
+  wystąpienia *tekstu*, a niemieckie „Kunden" siedzi w środku własnego opisu
+  („Eine Kundenliste…"), więc test mówił „dwa" o jednym. Liczy teraz znaczniki.
+- **Naprawione: `scripts/test-account-page.mjs` §9b liczył pięć elementów tam, gdzie od
+  Sesji 28 jest ich sześć** (doszedł link do portalu Stripe) — i przechodził, bo nikt nie
+  patrzył. Zamiast liczby jest teraz lista adresów, więc następna zmiana powie, *co*
+  doszło.
+- **Nie ruszone: `scripts/test-projects-page.mjs`, `test-materials-page.mjs` i
+  `test-costs-page.mjs` wywalają się z `TypeError`** — mają tabele oczekiwanych słów dla
+  czterech języków, a chodzą po dziesięciu. To skutek przywrócenia sześciu języków po
+  Sesji 28 i dotyczy trzech zestawów, których ta sesja nie dotyka.
+- **Nie ruszone: `scripts/test-pages.mjs` — rosyjski nagłówek przy 1000 px wystaje o 33 px**
+  dla zalogowanego. Ten sam pomiar w pozostałych dziewięciu językach przechodzi. To dług po
+  przywróceniu języków; problem jest w pasku nagłówka, którego ta sesja nie ruszyła.
+- **Nie ruszone: `test-clients-page.mjs`, `test-jobs-page.mjs` i `test-calendar-page.mjs`
+  mają po jednym błędzie** — „gość nie dostaje linku w stopce" nie sprawdza gościa, bo
+  wspólne `open()` w tych plikach sadzi `liczmat-signed-in: "pro"`, kiedy test nie powie
+  inaczej. Sprawdzone: te same trzy błędy są na `origin/main` sprzed tej sesji.
+- **Nie ruszone: `freePrice()` w `src/pages.mjs` ma tabelę locale dla czterech języków**,
+  więc „0 zł" na sześciu przywróconych formatuje się polskim locale. Kwota jest zerowa,
+  więc widać to tylko w separatorze — ale to ta sama luka co wyżej.
+- **Numeracja w `docs/ARCHITEKTURA.md` ma dwa razy §7.7 i dwa razy §7.8** (Sesja 28 i etap
+  językowy nadały numery, które już były zajęte). Nowy rozdział dostał §7.13; przenumerowanie
+  całości to osobne zadanie.
+
+**Problemy.**
+
+- **Tłumaczeń nowej strony nie weryfikował native speaker** — 180 ciągów w dziesięciu
+  językach, to samo zastrzeżenie, co przy przywróceniu języków.
+- **Node i przeglądarka piszą hrywnę inaczej**: build wypisuje „479,00 ₴", Chromium
+  nadpisuje na „479,00 грн". Kwota jest ta sama, dane ICU są różne i żaden napis wypisany
+  przy budowaniu nie trafi w każdą przeglądarkę. Widać to wyłącznie po ukraińsku i tylko
+  jako zmiana symbolu przy pierwszym renderze.
+- **Cena stoi w dwóch miejscach naraz w sensie operacyjnym**: w `assets/pay.js` i na
+  produktach w Stripe. To zastrzeżenie Sesji 28 i ta sesja go nie zmienia — teraz jednak
+  kwota jest wypisana także w statycznym HTML-u, więc **przy zmianie ceny trzeba przebudować
+  serwis**, a nie tylko podmienić plik JS.
+- **Rozdział V planu wymienia cztery języki, rozdział VI cztery waluty** — nadal
+  nieaktualne wobec dziesięciu i siedmiu. `MASTER_PLAN.txt` jest plikiem właściciela.
+
+**Status: ukończone.**
+
+**Następne zadanie: Sesja 30 — SEO TECHNICZNE.**
 
 ### Przywrócenie 10 języków — etap dodatkowy po Sesji 28
 

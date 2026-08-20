@@ -13,11 +13,11 @@ import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
-  urlCalendar,
+  urlCalendar, urlLiczmatPro,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
-import { proGate } from "./pro.mjs";
+import { proGate, proModules, proPlansBlock } from "./pro.mjs";
 import { DEFAULT_CURRENCY } from "./currency.mjs";
 
 const LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
@@ -1256,6 +1256,141 @@ export function projectsMain(lang, t, aisles = []) {
 
   ${appNote(t)}
 </main>`;
+  return { main, ld: crumbs.ld };
+}
+
+/* ------------------------------------------------------------------ LiczMat Pro */
+
+/**
+ * /liczmat-pro/ — the public page for LiczMat Pro. Session 29, and the whole of it:
+ * "Krótka, konkretna strona prezentująca Pro. Bez marketingowego przesytu."
+ *
+ * It is the one Pro address that is not behind the paywall, and it cannot be: a
+ * description of what somebody would be paying for, put behind the thing they have not
+ * paid for, is a page nobody would ever read. So the route is GUEST and indexable while
+ * the five modules it describes stay locked — chapter XXVI asks for Pro to be described
+ * in public, and there is nothing private on this page: no rows, no figures, no account.
+ *
+ * Everything on it is already written down somewhere else, and it stays that way:
+ *
+ *   the five modules   `LM_FEATURES` in assets/plan.js, through proModules() — the same
+ *                      list the wall and the Pro tab of /app/ show, so the product cannot
+ *                      be described here as four modules or six.
+ *   the price          proPlansBlock() from src/pro.mjs, the same block the wall carries.
+ *                      The amounts are not in the markup: assets/pay.js has them per
+ *                      currency and assets/paywall.js fills them in at paint time.
+ *   the way in         /app/ — the only page that knows the uid a payment attaches to.
+ *
+ * What is authored here is the part that is this page's own job: what Pro does *not* do,
+ * what stays free, and the three steps between a visitor and a plan. Chapter XXV's
+ * "przejście Free → Pro" written out once, in full, instead of one rung at a time.
+ *
+ * The page loads assets/pay.js and assets/paywall.js and nothing else new. It has no
+ * gate, so it does not load assets/plan.js: the only thing it asks the session is whether
+ * this visitor already pays for Pro, and lmReadLevel() in assets/account.js — which every
+ * page carries — answers that. Somebody on Pro is shown their plan instead of a price;
+ * quoting a price to a customer who already pays it reads as a threat.
+ *
+ * @param {object[]} features LM_FEATURES from assets/plan.js
+ * @param {object} prices  what each plan costs in this language's default currency,
+ *   already formatted — scripts/build.mjs reads the amounts out of assets/pay.js. The
+ *   price is in the markup so that a crawler and a visitor with no script both see it;
+ *   assets/paywall.js replaces it with the visitor's own currency when there is one.
+ */
+export function proPageMain(lang, t, features, prices) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("pro_t"), path: urlLiczmatPro(lang) },
+  ]);
+
+  /* The five modules, named and described in full. No chip on any of them: the whole page
+     is about what Pro contains, so "Dostępne w LiczMat Pro" under each card would be the
+     same sentence five times. No link either — each module is behind the wall, and a link
+     onto a wall that describes this page is a circle. */
+  const mods = proModules(features).map((f) => `<article class="pro-mod">
+          <h3>${esc(t(`${f.key}_t`))}</h3>
+          <p class="muted">${esc(t(`${f.key}_d`))}</p>
+        </article>`).join("\n        ");
+
+  const list = (keys) => `<ul class="steps-list">
+        ${keys.map((k) => `<li>${esc(t(k))}</li>`).join("\n        ")}
+      </ul>`;
+
+  const main = `<main id="main">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <span class="door-level">${esc(t("lvl_pro"))}</span>
+      <h1>${esc(t("pro_t"))}</h1>
+      <p class="lead">${esc(t("pro_d"))}</p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="promods-h">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="promods-h">${esc(t("propage_h_mods"))}</h2>
+        <p class="muted">${esc(t("propage_mods_d"))}</p>
+      </div>
+      <div class="pro-mods">
+        ${mods}
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="profree-h">
+    <div class="wrap narrow">
+      <h2 id="profree-h">${esc(t("propage_h_free"))}</h2>
+      <p class="muted">${esc(t("propage_free_d"))}</p>
+      ${list(["propage_free_1", "propage_free_2", "propage_free_3"])}
+      <p class="ws-links">
+        <a class="btn btn-ghost btn-sm" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a class="btn btn-ghost btn-sm" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a class="btn btn-ghost btn-sm" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- What Pro is not. Chapter XXIV ends on "to nie jest ERP", chapter XXII rules the
+       accounting package out by name and chapter XXIII rules out a second calendar; a
+       page that sold Pro without saying any of it would be selling something else. -->
+  <section class="block" aria-labelledby="pronot-h">
+    <div class="wrap narrow">
+      <h2 id="pronot-h">${esc(t("propage_h_not"))}</h2>
+      ${list(["propage_not_1", "propage_not_2", "propage_not_3"])}
+      <p class="muted src-note">${esc(t("propage_local"))}</p>
+    </div>
+  </section>
+
+  <!-- The price. The block is proPlansBlock() — the same markup the wall in front of a
+       module carries, so the two can never quote different prices — and the amounts in it
+       are empty: assets/pay.js knows them per currency and assets/paywall.js writes them
+       in once the visitor's currency is known. Somebody already on Pro is shown their
+       plan instead: pwMountPage() hides the whole block for them. -->
+  <section class="block alt" aria-labelledby="propay-h">
+    <div class="wrap narrow">
+      <h2 id="propay-h">${esc(t("propage_h_pay"))}</h2>
+      <div id="pro-pay">
+        ${proPlansBlock(t, { checkout: false, prices })}
+      </div>
+      <p id="pro-yours" hidden><span class="chip on">${esc(t("cli_pro_yours"))}</span></p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="prohow-h">
+    <div class="wrap narrow">
+      <h2 id="prohow-h">${esc(t("propage_h_how"))}</h2>
+      ${list(["propage_how_1", "propage_how_2", "propage_how_3"])}
+      <p class="ws-links">
+        <a class="btn btn-primary btn-sm" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(urlLiczmatPro(lang))}" rel="nofollow">${esc(t("pro_signin"))}</a>
+        <a class="btn btn-ghost btn-sm" href="${URL_APP}" rel="nofollow">${esc(t("pay_go"))}</a>
+      </p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+
   return { main, ld: crumbs.ld };
 }
 

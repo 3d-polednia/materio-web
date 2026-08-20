@@ -117,6 +117,16 @@ quotes: {
     pl: "wyceny", uk: "koshtorysy-pro", de: "angebote", en: "quotes",
     cs: "cenove-nabidky", sk: "cenove-ponuky", ro: "oferte", hr: "ponude", sr: "ponude", ru: "kommercheskie-predlozheniya",
   },
+  /* Session 29, the public page for LiczMat Pro. Same rule once more, with one
+     difference the other four do not have: "liczmat-pro" is a brand name, so it is the
+     same segment in all ten languages — translating it would give one product ten names
+     and split the links that point at it. The segments are the ones the `liczmat-pro`
+     route has carried as `plannedSlug` in src/ia.mjs since session 3. */
+pro: {
+    pl: "liczmat-pro", uk: "liczmat-pro", de: "liczmat-pro", en: "liczmat-pro",
+    cs: "liczmat-pro", sk: "liczmat-pro", ro: "liczmat-pro", hr: "liczmat-pro",
+    sr: "liczmat-pro", ru: "liczmat-pro",
+  },
   /* Session 25, the fourth Pro module. Same rule once more: the segments are the ones the
      `calendar` route has carried as `plannedSlug` in src/ia.mjs since session 3. */
 calendar: {
@@ -305,6 +315,15 @@ export const urlQuote = (lang, id) => `${urlQuotes(lang)}?id=${encodeURIComponen
 /** The terminarz of LiczMat Pro — chapter XXIII. One screen: it has no `?id=` of its own,
  *  because a row on it opens the job it belongs to on /zlecenia/. */
 export const urlCalendar = (lang) => `${prefix(lang)}/${SECTION.calendar[lang]}/`;
+
+/**
+ * The public page for LiczMat Pro — what it is, what it costs, who it is for.
+ *
+ * Session 29, and the one Pro address a guest is meant to reach: chapter X makes it one
+ * of the three doors out of the home page, so it is GUEST and indexable while the five
+ * modules it describes stay behind the paywall.
+ */
+export const urlLiczmatPro = (lang) => `${prefix(lang)}/${SECTION.pro[lang]}/`;
 
 export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
 

@@ -28,7 +28,7 @@ import {
   URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
-  urlCalendar,
+  urlCalendar, urlLiczmatPro,
 } from "../src/site.mjs";
 import {
   livePaths, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS, CALC_CATEGORIES,
@@ -36,12 +36,12 @@ import {
 } from "../src/ia.mjs";
 import { validateTokens } from "../src/tokens.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
-import { DEFAULT_CURRENCY } from "../src/currency.mjs";
+import { DEFAULT_CURRENCY, MONEY_LOCALE } from "../src/currency.mjs";
 import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
   materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain, jobsMain,
-  quotesMain, calendarMain,
+  quotesMain, calendarMain, proPageMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
@@ -51,7 +51,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260819i";
+const STAMP = "20260819j";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -92,6 +92,13 @@ const { CALCS, ENGINES, localizeRow, unitLabel } = evalScript(
  */
 const { LM_FEATURES, LM_PLAN } = evalScript(
   ["assets/account.js", "assets/plan.js"], ["LM_FEATURES", "LM_PLAN"]);
+
+/**
+ * Session 28's price list, read rather than copied. /liczmat-pro/ prints an amount into
+ * the HTML, so the build needs the same fourteen numbers the browser has — and there is
+ * exactly one place they are written down.
+ */
+const { LM_PAY } = evalScript("assets/pay.js", ["LM_PAY"]);
 
 const CATALOG = evalScript("assets/materials.js", [
   "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "matName", "matNote", "primaryCalcFor",
@@ -288,7 +295,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang), urlCalendar(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang), urlCalendar(lang), urlLiczmatPro(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -813,6 +820,63 @@ function buildCalendarPages() {
   }
 }
 
+/**
+ * What the two plans cost in the currency this language starts in, formatted.
+ *
+ * The amounts come out of assets/pay.js, where they are typed in by hand per currency —
+ * nothing here converts anything, and a currency with no amount in it yields no price
+ * rather than a derived one (that plan is simply not shown). The formatting has to match
+ * lmMoneyMinor() in assets/currency.js exactly, options included: assets/paywall.js
+ * rewrites the same element as soon as it knows the visitor's own currency, and a build
+ * that rounded differently would make the price twitch on every load. What the two cannot
+ * be held to is the *symbol* — Node and a browser carry their own ICU data, and for uk-UA
+ * one spells the hryvnia "₴" and the other "грн". The amount is identical either way, and
+ * no build-time string could match every browser's, so the digits are what is checked.
+ *
+ * The visitor's currency is a browser choice and this page is cached for everybody, so
+ * the build can only print the language's default. That is the honest half of the answer
+ * and it is in the HTML, which is what a crawler and a visitor with no script get.
+ */
+function planPrices(lang) {
+  const code = DEFAULT_CURRENCY[lang];
+  const out = {};
+  for (const plan of LM_PAY.plans) {
+    const minor = plan.price && plan.price[code];
+    if (typeof minor !== "number" || !(minor > 0)) continue;
+    out[plan.id] = new Intl.NumberFormat(MONEY_LOCALE[lang] || MONEY_LOCALE.pl, {
+      style: "currency", currency: code, minimumFractionDigits: 2, maximumFractionDigits: 2,
+    }).format(minor / 100);
+  }
+  return out;
+}
+
+/**
+ * /liczmat-pro/ — the public page for LiczMat Pro. Session 29, chapter XXVI.
+ *
+ * The one Pro address that is not behind the paywall: it is the description of what
+ * somebody would be paying for, so putting it behind the payment would be a circle. Two
+ * scripts and nothing else — assets/pay.js carries the prices, assets/paywall.js writes
+ * today's into the block the build leaves empty (and hides it for an account that is
+ * already on Pro). No assets/plan.js: the page gates nothing, so it has nothing to ask
+ * the permission table.
+ */
+function buildProPage() {
+  const alt = alternatesFor(urlLiczmatPro);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = proPageMain(lang, t, LM_FEATURES, planPrices(lang));
+    write(join(urlLiczmatPro(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("pro_t")} \u2014 LiczMat`,
+      description: t("propage_meta"),
+      path: urlLiczmatPro(lang),
+      alternates: alt,
+      main, jsonld: [ld],
+      scripts: ["/assets/pay.js", "/assets/paywall.js"],
+    }));
+  }
+}
+
 function buildStores() {
   const alt = alternatesFor(urlStores);
   for (const lang of LANGS) {
@@ -851,6 +915,10 @@ function buildPrivatePages() {
       .filter((f) => f.level === LEVEL.PRO && f.route && route(f.route)
         && route(f.route).status === STATUS.LIVE)
       .map((f) => route(f.route)),
+    // /liczmat-pro/ (session 29). It is neither a header link nor a Pro module, and both
+    // the Pro tab and the Pro level card on /app/ point at it — src/pro.mjs says so at
+    // the line that used to render "Poznaj LiczMat Pro" as a sentence.
+    ...[route("liczmat-pro")].filter((r) => r.status === STATUS.LIVE),
   ]
     .filter((r) => r.localized)
     .map((r) => [r.id, alternatesFor(r.path)]));
@@ -952,6 +1020,9 @@ function buildSitemap() {
     add(urlJobs(lang), "0.5", "monthly", alternatesFor(urlJobs));
     add(urlQuotes(lang), "0.5", "monthly", alternatesFor(urlQuotes));
     add(urlCalendar(lang), "0.5", "monthly", alternatesFor(urlCalendar));
+    // The page that describes what Pro is. Higher than the modules it describes, because
+    // it is the one of them a visitor with no plan is meant to arrive on.
+    add(urlLiczmatPro(lang), "0.7", "monthly", alternatesFor(urlLiczmatPro));
     add(urlGuideIndex(lang), "0.7", "monthly", alternatesFor(urlGuideIndex));
     add(urlStores(lang), "0.7", "monthly", alternatesFor(urlStores));
     for (const c of CALCS) add(urlCalc(lang, c.id), "0.8", "monthly", alternatesFor((l) => urlCalc(l, c.id)));
@@ -1035,6 +1106,7 @@ buildClientsPages();
 buildJobsPages();
 buildQuotesPages();
 buildCalendarPages();
+buildProPage();
 buildStores();
 buildPrivatePages();
 buildSitemap();

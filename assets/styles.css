@@ -891,7 +891,10 @@ footer h4 {
 .door p { margin: 0; }
 .door-q { font-weight: var(--fw-semi); color: var(--accent-strong); }
 .door-level {
-  align-self: flex-start; border-radius: var(--radius-pill);
+  /* inline-block so the pill keeps its padding outside a flex container too: the same
+     badge stands alone at the top of /liczmat-pro/ (session 29), where nothing lays it
+     out. `align-self` is what places it inside a .door. */
+  display: inline-block; align-self: flex-start; border-radius: var(--radius-pill);
   background: var(--accent-soft); color: var(--on-accent-soft);
   padding: var(--sp-1) var(--sp-3); font-size: var(--fs-xs); font-weight: var(--fw-bold);
   letter-spacing: .02em; text-transform: uppercase;

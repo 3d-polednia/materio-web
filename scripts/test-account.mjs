@@ -108,8 +108,8 @@ head("1. chapter II — three levels, and only three");
   }
   eq("only the Pro level names a page of its own",
     ACCOUNT_LEVELS.filter((l) => l.route).map((l) => l.level).join(), LEVEL.PRO);
-  check("that page is /liczmat-pro/, and session 29 still has to build it",
-    route(accountLevel(LEVEL.PRO).route).status === STATUS.PLANNED);
+  check("that page is /liczmat-pro/, and session 29 built it",
+    route(accountLevel(LEVEL.PRO).route).status === STATUS.LIVE);
 }
 
 head("2. the level is derived from the profile, never asserted");
@@ -269,15 +269,22 @@ head("8. /app/ carries the account system in every language");
   }
   check("the guest card is the marked one while signed out",
     html.includes(`data-level="${LEVEL.GUEST}" data-current="1"`));
-  check("Pro says it is in preparation rather than offering a dead button",
-    html.includes('class="lvl-soon"'));
-  // /liczmat-pro/ does not exist until session 29, and nothing grants the plan yet
-  // (FIRESTORE_SYNC §9.2), so the card must not carry a link or a button of any kind.
+  check("nothing on the page is still waiting to be built",
+    !html.includes('class="lvl-soon"'));
+  // Session 29 built /liczmat-pro/, so the Pro card links to the page that explains the
+  // level — chapter XXV's "Poznaj LiczMat Pro", which was the words "in preparation"
+  // until that page existed. What it still must not carry is anything that takes money:
+  // nothing grants the plan (FIRESTORE_SYNC §9.2) and the checkout lives on the Pro tab.
   const proCards = html.split('data-level="pro"').slice(1)
     .map((rest) => rest.slice(0, rest.indexOf("</article>")));
   eq("both copies of the Pro card were found", proCards.length, 2);
   for (const card of proCards) {
-    check("the Pro card offers nothing to click", !/<a |<button/.test(card), card.trim().slice(0, 120));
+    check("the Pro card points at the page that explains the level",
+      card.includes('href="/liczmat-pro/"') && card.includes('data-nav-route="liczmat-pro"'),
+      card.trim().slice(0, 160));
+    check("and offers no button of its own", !/<button/.test(card), card.trim().slice(0, 160));
+    check("least of all one that takes money",
+      !/stripe|checkout/i.test(card), card.trim().slice(0, 160));
   }
 
   // Four tabs, each pointing at the panel it opens. "Pomieszczenia" was the fifth until

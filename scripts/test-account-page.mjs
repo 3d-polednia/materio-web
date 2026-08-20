@@ -637,8 +637,15 @@ head("9. the level comes from the profile the server owns");
   await pro.click('[data-tab="profile"]');
   eq("the profile marks the Pro card",
     await pro.locator("#panel-profile .lvl-card[data-current] h3").innerText(), "LiczMat Pro");
-  check("which still offers nothing to buy — nothing grants the plan yet",
-    (await pro.locator('#panel-profile .lvl-card[data-level="pro"] a, #panel-profile .lvl-card[data-level="pro"] button').count()) === 0);
+  /* Session 29 gave the card the one link chapter XXV asks for — "Poznaj LiczMat Pro",
+     pointing at the page that explains the level. What it must still not carry is a
+     button: nothing on this site grants the plan, and the checkout lives on the Pro tab,
+     which is the only place that knows the uid a payment attaches to. */
+  eq("the card points at the page that explains the level",
+    await pro.locator('#panel-profile .lvl-card[data-level="pro"] a').getAttribute("href"),
+    "/liczmat-pro/");
+  check("and still offers nothing to buy — nothing grants the plan yet",
+    (await pro.locator('#panel-profile .lvl-card[data-level="pro"] button').count()) === 0);
   eq("no console error", pro.lmErrors.join(" / "), "");
   await pro.close();
   await ctx.close();
@@ -679,8 +686,14 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
   // of session 26 is a path through them rather than a page and stays text. Session 28
   // removed the preview switch and put the checkout in its place — and the checkout is
   // hidden while assets/pay.js carries no Payment Link, which is what these guard.
-  eq("four module links, and the checkout button that is not offered yet",
-    await free.locator("#panel-pro a, #panel-pro button").count(), 5);
+  /* Checked as a list rather than as a number. The count said five, the panel has held
+     six since session 28 put the Stripe portal link in it, and nobody noticed because a
+     number does not say which element it lost — session 29 rewrote it into the set it
+     was always meant to be, and added its own "Poznaj LiczMat Pro" to it. */
+  eq("the panel offers exactly the four built modules, the way to the Pro page, the portal and the checkout",
+    (await free.$$eval("#panel-pro a, #panel-pro button",
+      (ns) => ns.map((n) => n.getAttribute("href") || n.id || "checkout").join(" "))),
+    "# /klienci/ /zlecenia/ /wyceny/ /terminarz/ /liczmat-pro/ checkout");
   eq("nothing visible in the panel offers to take money",
     await free.locator("#panel-pro [data-pw-checkout]:visible").count(), 0);
   eq("and the manage-subscription link is not there for a free account",
