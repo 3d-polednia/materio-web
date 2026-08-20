@@ -150,6 +150,7 @@ export const calcIcon = (id) =>
  * @param {object[]} [p.jsonld]    schema.org objects
  * @param {string[]} [p.scripts]   extra script srcs, appended after the shared ones
  * @param {boolean} [p.noindex]    emit robots noindex instead of index
+ * @param {boolean} [p.secret]     the URL itself is a credential: no analytics, no referrer
  * @param {string} [p.bodyClass]
  * @param {string} [p.headExtra]
  * @param {string} [p.bodyEnd]
@@ -165,6 +166,14 @@ export function page(p) {
   // `bare` pages (/app/, /p/) bring their own header and footer, have no per-language
   // URLs and therefore no hreflang; they load the full dictionary and translate in place.
   const bare = Boolean(p.bare);
+
+  // A page whose own address is the secret. /p/<token> is the only one: the token in the
+  // URL *is* the credential (FIRESTORE_SYNC §6), and GA4 sends `page_location` — the whole
+  // address, query and all — to Google on the first page_view. Until session 35 that
+  // handed every share link to a third party. So this page ships with no analytics block
+  // at all rather than with a scrubbed one, and with a referrer policy that keeps the
+  // address out of the Referer header of anything it loads or links to.
+  const secret = Boolean(p.secret);
 
   const hreflangs = bare ? "" : LANGS
     .filter((l) => alternates[l])
@@ -187,29 +196,9 @@ export function page(p) {
     .map((l) => `<meta property="og:locale:alternate" content="${OG_LOCALE[l]}">`)
     .join("\n");
 
-  return `<!DOCTYPE html>
-<html lang="${HREFLANG[lang]}">
-<head>
-<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
-     flash. No stored choice means "follow the system", which is also the CSS default. -->
-<script>
-  // "js" says the drawer, the pop-up menus and everything else that needs a script
-  // will work. Without it the navigation renders as a plain list instead of hiding
-  // behind a menu button nothing would answer.
-  document.documentElement.className += ' js';
-  try {
-    var m = localStorage.getItem('liczmat-theme');
-    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
-    // What this browser was last told about the session (assets/account.js writes the
-    // key). It is read here, before the first paint, because a navigation link hangs off
-    // it: doing it in account.js, which loads at the end of the document, would show the
-    // link and then take it away. Still a hint and still never a gate: it decides which
-    // links are offered, and nothing may gate saving, counting or reading on it.
-    var s = localStorage.getItem('liczmat-signed-in');
-    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
-  } catch (e) {}
-</script>
-<!-- Google tag (gtag.js) with Consent Mode v2.
+  // The analytics tag, and the name lookup that goes with it. Both are absent from a
+  // `secret` page — see above.
+  const analytics = secret ? "" : `<!-- Google tag (gtag.js) with Consent Mode v2.
 
      The library itself is fetched after the load event rather than alongside the page.
      It is the only third-party request a public page makes and it is by some distance
@@ -258,15 +247,38 @@ export function page(p) {
     if (document.readyState === 'complete') setTimeout(loadTag, 0);
     else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
   })();
-</script>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The analytics tag is the only third-party request a public page makes, and since
+</script>`;
+  const dnsPrefetch = secret ? "" : `<!-- The analytics tag is the only third-party request a public page makes, and since
      session 33 it is fetched after load. A preconnect would open a TLS connection during
      the render for a request that no longer happens then, and an idle connection is
      closed before it is used; the name lookup is worth keeping and costs nothing. -->
-<link rel="dns-prefetch" href="https://www.googletagmanager.com">
-<title>${esc(title)}</title>
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">`;
+
+  return `<!DOCTYPE html>
+<html lang="${HREFLANG[lang]}">
+<head>
+<!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
+     flash. No stored choice means "follow the system", which is also the CSS default. -->
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+${analytics ? analytics + "\n" : ""}<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+${secret ? '<meta name="referrer" content="no-referrer">\n' : ""}${dnsPrefetch ? dnsPrefetch + "\n" : ""}<title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="${p.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"}">

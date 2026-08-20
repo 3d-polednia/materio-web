@@ -286,6 +286,10 @@ export function appMain(t, features) {
           <h2 data-i18n="app_sync_title">${esc(t("app_sync_title"))}</h2>
           ${i("app_sync_d", "p", "muted")}
           <p id="app-sync-local" class="muted"></p>
+          <!-- Session 35: this browser is holding a copy of a different account. Both
+               buttons are refused until it is cleared — the text is written by the
+               script, because it is the script that knows. -->
+          <p id="app-sync-foreign" class="result show err" role="status" hidden></p>
           <p class="ws-links">
             <button type="button" id="app-sync-push" class="btn btn-primary btn-sm" data-i18n="app_sync_push">${esc(t("app_sync_push"))}</button>
             <button type="button" id="app-sync-pull" class="btn btn-ghost btn-sm" data-i18n="app_sync_pull">${esc(t("app_sync_pull"))}</button>
@@ -366,6 +370,16 @@ export function appMain(t, features) {
             <h3 data-i18n="app_export">${esc(t("app_export"))}</h3>
             ${i("app_export_d", "p", "muted")}
             <button type="button" id="app-export" class="btn btn-ghost btn-sm" data-i18n="app_export_btn">${esc(t("app_export_btn"))}</button>
+          </div>
+
+          <!-- Session 35. "Dane w tej przeglądarce zostają — wyczyść je osobno" has been
+               in the card below since /app/ was built, and until now there was nothing on
+               the site to clear them with. It is also the way out of a browser holding
+               another account's copy, which the sync tab now refuses to touch. -->
+          <div class="app-card">
+            <h3 data-i18n="app_wipe">${esc(t("app_wipe"))}</h3>
+            ${i("app_wipe_d", "p", "muted")}
+            <button type="button" id="app-wipe" class="btn btn-ghost btn-sm" data-i18n="app_wipe_btn">${esc(t("app_wipe_btn"))}</button>
           </div>
 
           <div class="app-card danger">

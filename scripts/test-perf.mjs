@@ -341,10 +341,21 @@ head("5. what stands between the visitor and the first paint");
     // third-party <script src> in the markup competing with the stylesheet.
     check(`${w.file} makes no third-party request while it parses`, w.external === 0,
       String(w.external));
-    check(`${w.file} still sets consent before anything can read a cookie`,
-      w.html.indexOf("gtag('consent', 'default'") < w.html.indexOf("googletagmanager.com/gtag/js"));
-    check(`${w.file} waits for load before fetching the tag`,
-      w.html.includes("window.addEventListener('load'"));
+    // /p/ is the exception, and it is the security decision of session 35 rather than a
+    // performance one: the token in its address is the credential, and GA4 reports
+    // `page_location`. A page with no tag has nothing to set consent for, so the two
+    // checks below are the ones it has to fail — what it must not do is carry half a tag.
+    const tagged = w.html.includes("googletagmanager.com/gtag/js");
+    if (!tagged) {
+      check(`${w.file} carries no analytics at all, not half of it`,
+        !w.html.includes("gtag(") && !w.html.includes("dataLayer")
+        && !w.html.includes("dns-prefetch"));
+    } else {
+      check(`${w.file} still sets consent before anything can read a cookie`,
+        w.html.indexOf("gtag('consent', 'default'") < w.html.indexOf("googletagmanager.com/gtag/js"));
+      check(`${w.file} waits for load before fetching the tag`,
+        w.html.includes("window.addEventListener('load'"));
+    }
     check(`${w.file} opens no connection it will not use during the render`,
       !w.html.includes('rel="preconnect"'));
   }

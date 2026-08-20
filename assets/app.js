@@ -55,6 +55,28 @@ function shareToken() {
 
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : shareToken());
 
+/**
+ * One path segment, checked before it becomes part of a Firestore address.
+ *
+ * The ids this page builds paths out of come from the browser workspace, which is a
+ * localStorage document anything on this device can have written, and Firestore joins
+ * the segments it is handed: `projectId = "x/estimations/y"` addresses a different
+ * document in a different collection, and `".."` or `"__x__"` are addresses Firestore
+ * refuses outright — with an exception that lands in the same catch as a network
+ * failure, so the sync would have reported "something went wrong" for a row it should
+ * simply have skipped. Session 35: the row is skipped, and the rest of the push runs.
+ *
+ * @returns {string} the id, or "" when it may not be used as a segment
+ */
+function pathId(raw) {
+  const id = String(raw == null ? "" : raw);
+  if (!id || id.length > 1500) return "";
+  if (id.indexOf("/") >= 0) return "";
+  if (id === "." || id === "..") return "";
+  if (/^__.*__$/.test(id)) return "";
+  return id;
+}
+
 /** Sync fields shared by every document under users/{uid}/**. */
 const syncFields = (createdAt, deletedAt = null) => ({
   createdAt,
@@ -673,7 +695,7 @@ function renderProjects() {
     list.innerHTML = `<li class="empty muted">${T("app_empty_projects")}</li>`;
     return;
   }
-  list.innerHTML = state.projects.map((p) => `<li data-id="${p.id}" class="app-project">
+  list.innerHTML = state.projects.map((p) => `<li data-id="${escapeHtml(p.id)}" class="app-project">
       <span class="row-name">${escapeHtml(p.name)}${p.archived ? ` <em class="muted">(${T("app_archived")})</em>` : ""}</span>
       <span class="row-actions">
         <button type="button" class="btn btn-ghost btn-sm" data-share>${T("app_share")}</button>
@@ -688,7 +710,7 @@ const numFmt = (v) => new Intl.NumberFormat(document.documentElement.lang || "pl
   { maximumFractionDigits: 2 }).format(Number(v) || 0);
 
 /** One room, as a row: the name, the three dimensions and the floor they come to. */
-const roomRow = (r) => `<li data-id="${r.id}">
+const roomRow = (r) => `<li data-id="${escapeHtml(r.id)}">
       <span class="row-name">${escapeHtml(r.name)}
         <em class="muted">${numFmt(r.lengthM)} × ${numFmt(r.widthM)} × ${numFmt(r.heightM)} m — ${numFmt(r.lengthM * r.widthM)} m²</em>
       </span>
@@ -859,15 +881,84 @@ const deleteRoom = (room) => tombstone(roomDoc(room.id), room, {
 
 /* ------------------------------------------------------------------ sync with the browser */
 
+/**
+ * Which account this browser's workspace copy was last synced with (session 35).
+ *
+ * The workspace is device-local and works signed out, which is the product — but "pull"
+ * copies an account's projects, rooms, estimate lines and material list *into this
+ * browser*, and nothing has ever recorded whose they are. On a shared computer that made
+ * two separate mistakes possible: the next person to open /projekty/ read somebody else's
+ * projects and prices, and the next person to sign in and press "push" uploaded them into
+ * their own account, where the owner of the data cannot reach them and cannot know.
+ *
+ * Neither is a hole in the rules — Firestore still refuses to let one account read
+ * another's documents — which is exactly why it had to be fixed here: the copy in the
+ * browser is outside everything the rules protect.
+ *
+ * One key, device-local, holding one uid. It is listed on /cookies/ with the rest.
+ */
+const SYNC_ACCOUNT_KEY = "liczmat-sync-account";
+
+function syncAccount() {
+  try { return localStorage.getItem(SYNC_ACCOUNT_KEY) || ""; } catch (e) { return ""; }
+}
+
+function setSyncAccount(uid) {
+  try {
+    if (uid) localStorage.setItem(SYNC_ACCOUNT_KEY, uid);
+    else localStorage.removeItem(SYNC_ACCOUNT_KEY);
+  } catch (e) {}
+}
+
+/** How many rows the browser workspace is holding, tombstones not counted. */
+function localCounts() {
+  const local = typeof wsExport === "function" ? wsExport() : null;
+  if (!local) return null;
+  const alive = (rows) => (rows || []).filter((r) => !r.deletedAt).length;
+  return {
+    projects: alive(local.projects), rooms: alive(local.rooms),
+    estimations: alive(local.estimations), shoppingItems: alive(local.shoppingItems),
+  };
+}
+
+/**
+ * Is what is in this browser somebody else's?
+ *
+ * Only when there is something here *and* it was last synced with another account. An
+ * empty workspace carries nobody's data, so a stale stamp on it is not worth a warning —
+ * it is re-stamped by the next sync.
+ */
+function foreignWorkspace() {
+  const stamp = syncAccount();
+  if (!stamp || !state.uid || stamp === state.uid) return false;
+  const counts = localCounts();
+  if (!counts) return false;
+  return counts.projects + counts.rooms + counts.estimations + counts.shoppingItems > 0;
+}
+
 /** How much is sitting in this browser's workspace, in one line. */
 function renderLocalSummary() {
   const box = $("app-sync-local");
-  if (!box || typeof wsExport !== "function") return;
-  const local = wsExport();
-  const alive = (rows) => rows.filter((r) => !r.deletedAt).length;
-  box.textContent = `${T("app_sync_local")}: ${alive(local.projects)} × ${T("app_projects")}, ` +
-    `${alive(local.rooms)} × ${T("app_rooms")}, ${alive(local.estimations)} × ${T("ws_lines")}, ` +
-    `${alive(local.shoppingItems)} × ${T("proj_mat_t")}`;
+  const counts = localCounts();
+  if (!box || !counts) return;
+  box.textContent = `${T("app_sync_local")}: ${counts.projects} × ${T("app_projects")}, ` +
+    `${counts.rooms} × ${T("app_rooms")}, ${counts.estimations} × ${T("ws_lines")}, ` +
+    `${counts.shoppingItems} × ${T("proj_mat_t")}`;
+
+  // Both directions are refused while another account's copy is sitting here: a pull
+  // would mix two people's rows into one store, and a push would file them under the
+  // wrong account. The way out is the button on the settings tab, which empties this
+  // browser — said in the warning rather than left to be guessed.
+  const foreign = foreignWorkspace();
+  const warning = $("app-sync-foreign");
+  if (warning) {
+    warning.textContent = foreign ? T("app_sync_foreign") : "";
+    warning.hidden = !foreign;
+  }
+  ["app-sync-push", "app-sync-pull"].forEach((id) => {
+    const button = $(id);
+    if (button) button.disabled = foreign;
+  });
 }
 
 function wireSyncPanel() {
@@ -884,10 +975,14 @@ function wireSyncPanel() {
   const MERGE = { merge: true };
 
   push.addEventListener("click", async () => {
+    // The button is disabled while this is true; the check is here as well because a
+    // disabled attribute is a hint to a mouse and nothing more.
+    if (foreignWorkspace()) { status(T("app_sync_foreign"), true); return; }
     push.disabled = true;
     try {
       const local = wsExport();
       for (const p of local.projects) {
+        if (!pathId(p.id)) continue;
         await fb.setDoc(projectDoc(p.id), {
           name: String(p.name).slice(0, 120),
           archived: !!p.archived,
@@ -895,6 +990,7 @@ function wireSyncPanel() {
         }, MERGE);
       }
       for (const r of local.rooms) {
+        if (!pathId(r.id)) continue;
         // `projectId` is chapter XVIII's "pomieszczenia są elementem projektu" and is not
         // in the contract: `RoomEntity` has no column, `roomToDoc()` no key, `validRoom()`
         // no check. It goes up anyway for the reason session 18 established and session 20
@@ -911,7 +1007,9 @@ function wireSyncPanel() {
       }
       for (const e of local.estimations) {
         // Estimates are a subcollection of their project, exactly as in Room.
-        const ref = fb.doc(db, "users", state.uid, "projects", e.projectId, "estimations", e.id);
+        const projectSeg = pathId(e.projectId), lineSeg = pathId(e.id);
+        if (!projectSeg || !lineSeg) continue;
+        const ref = fb.doc(db, "users", state.uid, "projects", projectSeg, "estimations", lineSeg);
         await fb.setDoc(ref, {
           name: String(e.name).slice(0, 120),
           calculationType: e.calculationType,
@@ -932,7 +1030,9 @@ function wireSyncPanel() {
         // sync tab was written — but nothing local ever produced one until session 17, so
         // the push had nothing to send. Every field is clamped to what the deployed rules
         // validate; `estimationId` is the remote id of the calculation, or null.
-        const ref = fb.doc(db, "users", state.uid, "projects", s.projectId, "shoppingItems", s.id);
+        const projectSeg = pathId(s.projectId), itemSeg = pathId(s.id);
+        if (!projectSeg || !itemSeg) continue;
+        const ref = fb.doc(db, "users", state.uid, "projects", projectSeg, "shoppingItems", itemSeg);
         await fb.setDoc(ref, {
           estimationId: s.estimationId ? String(s.estimationId).slice(0, 64) : null,
           name: String(s.name).slice(0, 120),
@@ -950,6 +1050,8 @@ function wireSyncPanel() {
           ...syncFields(s.createdAt, s.deletedAt),
         }, MERGE);
       }
+      setSyncAccount(state.uid);
+      renderLocalSummary();
       status(T("app_sync_pushed"));
     } catch (err) {
       status(T("app_err_unknown"), true);
@@ -959,10 +1061,12 @@ function wireSyncPanel() {
   });
 
   pull.addEventListener("click", async () => {
+    if (foreignWorkspace()) { status(T("app_sync_foreign"), true); return; }
     pull.disabled = true;
     try {
       const incoming = await downloadAccount();
       wsImport(incoming);
+      setSyncAccount(state.uid);
       renderLocalSummary();
       status(T("app_sync_pulled"));
     } catch (err) {
@@ -1038,6 +1142,45 @@ function wireAccountPanel() {
       $("password-new").value = "";
       status(T("app_password_changed"));
     } catch (err) { status(authMessage(err && err.code), true); }
+  });
+
+  /**
+   * Everything this device is keeping, and nothing it is only remembering (session 35).
+   *
+   * The four data stores go: the workspace (projects, rooms, saved calculations and the
+   * material list), which project was open, the list of calculators this browser has
+   * used, and the Pro workspace — clients, jobs and quotes, which is the one store here
+   * holding another person's name, telephone number and address. Each is named on
+   * /cookies/ with the file that writes it, and scripts/test-security.mjs checks this
+   * list against that one.
+   *
+   * The settings are deliberately left alone: the language, the currency, the theme, the
+   * consent answer and "keep me signed in" say nothing about anybody and clearing them
+   * would make the page reappear in the wrong language after somebody asked for their
+   * data to be cleared. Signing out is a separate button, and stays one.
+   */
+  const DEVICE_DATA_KEYS = [
+    "materio-workspace-v1",    // assets/workspace.js
+    "materio-active-project",  // assets/workspace.js
+    "liczmat-recent-calcs",    // assets/recent.js
+    "liczmat-crm-v1",          // assets/crm.js
+    SYNC_ACCOUNT_KEY,          // this file: whose copy it was
+  ];
+
+  $("app-wipe").addEventListener("click", () => {
+    if (!confirm(T("app_wipe_confirm"))) return;
+    try {
+      DEVICE_DATA_KEYS.forEach((key) => localStorage.removeItem(key));
+    } catch (e) {
+      status(T("app_err_unknown"), true);
+      return;
+    }
+    // The workspace is read fresh from localStorage on every call, so the lists redraw
+    // themselves once they are told. /app/ draws the account's rows, not the browser's,
+    // so the only thing on this page that changes is the sync tab's summary.
+    document.dispatchEvent(new CustomEvent("workspacechange"));
+    renderLocalSummary();
+    status(T("app_wipe_done"));
   });
 
   $("app-export").addEventListener("click", async () => {

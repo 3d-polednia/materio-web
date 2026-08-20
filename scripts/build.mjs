@@ -53,7 +53,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260820e";
+const STAMP = "20260820f";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -1248,6 +1248,12 @@ function buildPrivatePages() {
     path: URL_SHARE,
     main: shareMain(t),
     scripts: ["/assets/share.js"],
+    // The one page on the site whose address is a credential: /p/<token> is opened by
+    // somebody who was handed the link, and the token in it is the whole of the
+    // authorisation (FIRESTORE_SYNC §6). `secret` takes the analytics tag off it — GA4
+    // reports `page_location`, which is the address including the token — and adds a
+    // no-referrer policy, so the address does not travel in a Referer header either.
+    secret: true,
   }));
 }
 

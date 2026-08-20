@@ -69,8 +69,17 @@ function normalize(elements, lat, lon) {
   return out;
 }
 
+/**
+ * One row of the list. Everything in it comes from OpenStreetMap, which is to say from
+ * whoever last edited that map — so the name and the address have always been escaped.
+ * Session 35 does the same for the two numbers: they are put into an `href`, and a
+ * coordinate that is not a finite number has no business being in an address. The row is
+ * dropped rather than drawn with a broken link.
+ */
 function storeRow(s) {
-  const nav = "https://www.google.com/maps/dir/?api=1&destination=" + s.lat + "," + s.lon;
+  const lat = Number(s.lat), lon = Number(s.lon);
+  if (!isFinite(lat) || !isFinite(lon)) return "";
+  const nav = esc("https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon);
   return `<li class="store-item">
       <div class="store-info"><b>${esc(s.name)}</b><span class="store-meta">${t(s.typeKey)}${s.addr ? " · " + esc(s.addr) : ""}</span></div>
       <div class="store-actions"><span class="store-dist">${fmtDist(s.dist)}</span>

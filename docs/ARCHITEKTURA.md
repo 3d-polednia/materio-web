@@ -1411,6 +1411,85 @@ strony kalkulatorów, bo ich tytuły były tematem tej sesji; `TITLE_MAX` = 50 p
 
 ---
 
+### 7.15. Bezpieczeństwo: co ten serwis broni, a czego nie (Sesja 35)
+
+Rozdział XXXII, Sesja 35 w całości: „autoryzacja, izolacja danych, API, uprawnienia,
+poziomy dostępu. GOŚĆ → LICZMAT → LICZMAT PRO."
+
+**Granica jest jedna i nie leży w tym repozytorium.** Chronią dane wdrożone reguły
+Firestore — sprawdzają `request.auth.uid`, żyją w repo aplikacji
+(`config/firebase/firestore.rules`, FIRESTORE_SYNC §7) i żaden commit tutaj ich nie
+osłabi ani nie wzmocni. To, co jest robotą tej strony, to **nigdy nie zaadresować**
+cudzych danych, nie zostawiać kopii jednego konta na cudzym urządzeniu i nie wypuścić
+poświadczenia na zewnątrz. Wszystko poniżej jest o tym; nic poniżej nie jest zamkiem
+z JavaScriptu.
+
+**`?next=` przepuszczał tabulator, a przeglądarka go kasuje.** `lmSafeNext()` odrzucał
+`//evil.example`, ukośnik odwrotny i schemat — i przepuszczał `/⇥/evil.example`, bo
+pierwszym znakiem był ukośnik, a drugim tabulator. Parser URL-a **usuwa** tabulator,
+CR i LF, zanim przeczyta adres, więc to, co zostawało, to `//evil.example`: link „wróć
+tam, gdzie byłeś" po zalogowaniu prowadził na cudzą domenę. Cały zakres C0 plus DEL jest
+odrzucany. Test rozstrzyga to tak, jak rozstrzyga przeglądarka: `new URL(wynik, BASE)`
+musi mieć origin `liczmat.com`.
+
+**Token w `/p/<token>` jest poświadczeniem, więc strona nie wysyła swojego adresu.**
+GA4 raportuje `page_location` — cały adres, z tokenem włącznie — a `/p/` ładowało tag
+jak każda inna strona, czyli oddawało Google każdy link udostępniony klientowi. Ta jedna
+strona jedzie bez analityki (flaga `secret` w `src/template.mjs`) i z
+`<meta name="referrer" content="no-referrer">`. Reszta serwisu ma tag jak miała.
+
+**Kształt tokenu sprawdzany jest przed zapytaniem, bo Firestore skleja segmenty ścieżki.**
+`?t=a/b/c` adresowało `sharedProjects/a/b/c` — inny dokument w podkolekcji, o którą nikt
+tu nie prosił. `SHARE_TOKEN` w `assets/share.js` (`[A-Za-z0-9_-]{16,64}`) obowiązuje oba
+wejścia: parametr i ścieżkę, którą przekierowuje `404.html`.
+
+**Kopia konta w przeglądarce ma teraz właściciela.** „Pobierz z konta do przeglądarki"
+wgrywa projekty, pomieszczenia, kalkulacje i listy materiałów do `localStorage`, a nic
+nigdy nie zapisywało, **czyje** one są. Na wspólnym komputerze dawało to dwa osobne błędy:
+następna osoba otwierała `/projekty/` i czytała cudze projekty i ceny, a po zalogowaniu
+się i naciśnięciu „Wyślij" wgrywała je na **swoje** konto, gdzie właściciel danych już
+ich nie dosięgnie i nie dowie się o nich. Reguły Firestore nie mają z tym nic wspólnego —
+kopia w przeglądarce leży poza wszystkim, czego reguły pilnują.
+
+Jeden klucz, `liczmat-sync-account`, trzyma `uid` konta, z którym ta przeglądarka
+synchronizowała się ostatnio (stempluje go i wysyłka, i pobranie). Kiedy stempel wskazuje
+inne konto **i** w przeglądarce coś leży, `/app/` wstrzymuje synchronizację w obie strony
+i mówi dlaczego. Pusta przeglądarka nie jest niczyja, więc stary stempel na niej nikogo
+nie ostrzega. Sprawdzenie jest w obsłudze kliknięcia, nie tylko w atrybucie `disabled` —
+`disabled` to podpowiedź dla myszy.
+
+**Jest wreszcie czym wyczyścić urządzenie.** Karta „Usuń konto" od zawsze mówiła „Dane
+w tej przeglądarce zostają — wyczyść je osobno" i nie było czym. Przycisk na zakładce
+ustawień kasuje cztery magazyny danych: warsztat (`materio-workspace-v1`), otwarty projekt,
+historię użytych kalkulatorów i magazyn Pro (`liczmat-crm-v1` — jedyny, który trzyma
+cudze nazwisko, telefon i adres). Ustawienia zostają: język, waluta, motyw, zgoda na
+analitykę i „pamiętaj mnie" nic o nikim nie mówią, a wyczyszczenie ich pokazałoby stronę
+w obcym języku komuś, kto prosił o skasowanie danych. Wylogowanie to osobny przycisk
+i osobna decyzja.
+
+**Identyfikator z `localStorage` nie jest segmentem ścieżki, dopóki się go nie sprawdzi.**
+`pathId()` w `assets/app.js` odrzuca puste, ukośnik, `.`, `..`, `__x__` i przesadnie długie.
+Bez tego `projectId` z ukośnikiem adresował inny dokument, a `__x__` leciało wyjątkiem
+w ten sam `catch`, co awaria sieci — więc synchronizacja mówiła „coś poszło nie tak"
+zamiast pominąć jeden wiersz.
+
+**CSV jest plikiem oddawanym komuś innemu.** Arkusz czyta komórkę zaczynającą się od `=`,
+`+`, `-` lub `@` jako formułę, w cudzysłowie czy bez, a nazwy materiałów pisze człowiek.
+`wsCsvCell()` stawia przed taką komórką apostrof, `wsFileName()` sprząta nazwę pliku
+z nazwy projektu.
+
+**Czego ta sesja nie ruszyła, świadomie:** paywall nadal nie jest granicą i nie ma nim
+być (rozdział XXV chce, żeby darmowy użytkownik *rozumiał*, co jest Pro); `liczmat-crm-v1`
+nadal nie jest w kontrakcie i nadal nie wyjeżdża z urządzenia; `assets/firebase-config.js`
+nadal jest jawny, bo klucz Web Firebase nie jest sekretem i nie da się go ukryć
+w przeglądarce.
+
+`scripts/test-security.mjs` pilnuje wszystkich powyższych, a §17
+`scripts/test-account-page.mjs` przechodzi odmowę synchronizacji i czyszczenie
+przeglądarki klikaniem w Chromium.
+
+---
+
 ## 8. Otwarte decyzje
 
 Do rozstrzygnięcia przez właściciela, zanim dotknie ich któraś z kolejnych sesji.

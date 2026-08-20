@@ -1193,13 +1193,50 @@ function buildEstimatePage() {
     const body = rows.map((r, i) =>
       [i + 1, r.name, r.requiredUnits, r.unitLabel, (r.totalCostMinor / 100).toFixed(2), r.currencyCode]);
     const text = [head, ...body]
-      .map((line) => line.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";"))
+      .map((line) => line.map((cell) => `"${wsCsvCell(cell)}"`).join(";"))
       .join("\r\n");
-    wsDownload(`liczmat-${(project && project.name) || "kosztorys"}.csv`, "text/csv;charset=utf-8", "﻿" + text);
+    wsDownload(wsFileName(project && project.name, "kosztorys", "csv"),
+      "text/csv;charset=utf-8", "﻿" + text);
   });
 
   document.addEventListener("workspacechange", wsRenderEstimate);
   wsRenderEstimate();
+}
+
+/**
+ * One cell of the CSV, quoted — and never a formula (session 35).
+ *
+ * A spreadsheet reads a cell that starts with `=`, `+`, `-`, `@`, a tab or a carriage
+ * return as a formula, quotes or no quotes, and this file is written to be handed to
+ * somebody else: the material names in it were typed on a phone, or came down from the
+ * account, and "=HYPERLINK(...)" is a name a row can carry. An apostrophe in front is
+ * what every spreadsheet reads as "this is text"; it is one character, it is visible,
+ * and it beats the alternative, which is a file that runs.
+ */
+function wsCsvCell(cell) {
+  const value = String(cell == null ? "" : cell);
+  const armed = /^[=+\-@\t\r]/.test(value) ? "'" + value : value;
+  return armed.replace(/"/g, '""');
+}
+
+/**
+ * A file name built out of something the visitor typed.
+ *
+ * A project called `../../etc/passwd` or one carrying a newline is not a download the
+ * browser should be asked to name a file after: `a.download` is a *suggestion*, browsers
+ * sanitise it differently, and the one thing this side can do is not hand over a
+ * separator in the first place. Everything but a letter, a digit, a dash and a space
+ * becomes a dash; the result is trimmed, capped and falls back to the plain word.
+ */
+function wsFileName(name, fallback, extension) {
+  const clean = String(name || "")
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/[\\/:*?"<>|.]+/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60)
+    .replace(/^[-\s]+|[-\s]+$/g, "");
+  return `liczmat-${clean || fallback}.${extension}`;
 }
 
 /** Hand the browser a file without a server round trip. */

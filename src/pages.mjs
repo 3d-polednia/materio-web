@@ -788,7 +788,7 @@ export function materialsMain(lang, t, cat) {
  * is a dictionary key. Keeping the list here rather than in the dictionary means it can be
  * checked against the code: each row names the file that writes it.
  */
-const COOKIE_ROWS = [
+export const COOKIE_ROWS = [
   { name: "materio_consent", type: "ck_type_local", purpose: "ck_p_consent", life: "ck_life_until_cleared" },
   { name: "materio-lang", type: "ck_type_local", purpose: "ck_p_lang", life: "ck_life_until_cleared" },
   { name: "liczmat-currency", type: "ck_type_local", purpose: "ck_p_currency", life: "ck_life_until_cleared" },
@@ -800,6 +800,7 @@ const COOKIE_ROWS = [
   { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },
   { name: "liczmat-recent-calcs", type: "ck_type_local", purpose: "ck_p_recent", life: "ck_life_until_cleared" },
   { name: "liczmat-crm-v1", type: "ck_type_local", purpose: "ck_p_crm", life: "ck_life_until_cleared" },
+  { name: "liczmat-sync-account", type: "ck_type_local", purpose: "ck_p_sync_account", life: "ck_life_until_cleared" },
 ];
 
 const COOKIE_THIRD_ROWS = [

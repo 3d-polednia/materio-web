@@ -109,6 +109,7 @@ node scripts/test-mobile.mjs      # the whole site on a phone: widths, tap targe
 node scripts/test-perf.mjs        # what a page weighs: bytes, requests, the render path
 node scripts/test-a11y.mjs        # names, headings, landmarks, live regions — in the markup
 node scripts/test-a11y-page.mjs   # focus, the keyboard, both themes — in Chromium
+node scripts/test-security.mjs    # authorization, data isolation, the API, the levels
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -417,6 +418,26 @@ scripts/test-a11y-page.mjs  The same product driven by keyboard in Chromium, not
                       focus it gives back; the screenshots stopped and started from the
                       keyboard, and never started at all under prefers-reduced-motion.
                       Needs the same outside-the-repo Playwright as test-pages.mjs
+scripts/test-security.mjs  Security as a property of the code (session 35, chapter
+                      XXXII): the three levels, derived from Firebase and never from a
+                      value in storage; `?next=`, resolved with the browser's own URL
+                      parser rather than compared as a string, because the parser deletes
+                      tab, CR and LF and `/<tab>/evil.example` used to pass; `?mode=`;
+                      the share token — its shape, checked before it becomes a Firestore
+                      path, and the CSPRNG it comes from; /p/, the one page whose address
+                      is a credential, read back to prove it carries no analytics and no
+                      referrer while every other page still carries the tag; the stamp
+                      that says whose copy is in this browser and the refusal it makes
+                      possible; every Firestore address in assets/app.js, each one under
+                      this account or on the public share document; pathId(); the profile
+                      fields a browser may not write; the permission table against
+                      src/ia.mjs and the hint that gates nothing; every shipped page read
+                      for an inline handler, a javascript: URL, a window opened without
+                      noopener or a script from somebody else's origin; the device wipe
+                      against the list on /cookies/; the repo read for a private key; and
+                      what a name somebody else typed does in HTML, in a CSV and in a file
+                      name. Dependency-free — run it after touching anything that reads a
+                      URL, builds a Firestore path, writes storage or renders a stored row
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -1196,6 +1217,58 @@ Kotlin side of it. Change one, change all three.
 
 ## Rules for editing the site
 
+- **The one security boundary is the deployed Firestore rules, and it is not in this repo.**
+  They key on `request.auth.uid` and they live in `3d-polednia/Materio`
+  (`config/firebase/firestore.rules`, FIRESTORE_SYNC §7). What this repo owns is never
+  *addressing* another account's data, never leaving one account's copy where the next
+  person can use it, and never letting a credential out of the site. Session 35 audited
+  those three; `scripts/test-security.mjs` keeps them. Nothing in the browser is a lock:
+  the paywall, `liczmat-signed-in` and `lmCan()` decide what a page **shows**.
+- **`lmSafeNext()` refuses control characters, and that is load-bearing.** Every browser's
+  URL parser **deletes** tab, CR and LF before reading an address, so `/<tab>/evil.example`
+  passed the "no leading `//`" rule and then navigated to `https://evil.example/` — an open
+  redirect on the one page where a phishing link is worth having. The whole C0 range and
+  DEL are out. The test resolves each answer with `new URL(value, BASE)` instead of
+  comparing strings: the string is only evidence, and for three inputs it lied.
+- **`/p/<token>` ships without analytics and without a referrer.** GA4 reports
+  `page_location`, which is the whole address — and on that page the address *is* the
+  credential (FIRESTORE_SYNC §6), so every share link was being handed to a third party.
+  `secret: true` in the `page()` call (src/template.mjs) drops the tag and the
+  `dns-prefetch` and adds `<meta name="referrer" content="no-referrer">`. It is one page's
+  exception: `scripts/test-security.mjs` §5 fails if any other page loses the tag, and
+  `scripts/test-perf.mjs` §5 fails if a page carries *half* of one.
+- **A token's shape is checked before it becomes a Firestore path.** `doc(db,
+  "sharedProjects", token)` joins the segments it is handed, so `?t=a/b/c` addressed
+  `sharedProjects/a/b/c` — another document in a subcollection nothing on the page is
+  meant to read. `SHARE_TOKEN` in `assets/share.js` is `[A-Za-z0-9_-]{16,64}` and governs
+  both entry points, the query parameter and the path `404.html` forwards.
+- **The browser workspace now records which account it was last synced with, and the sync
+  refuses to mix two.** "Pull" copies an account's projects, rooms, saved calculations and
+  material list into `localStorage`, and nothing recorded whose they were: on a shared
+  computer the next person read them on `/projekty/`, and the next person to sign in and
+  press "push" uploaded them into *their* account, out of the owner's reach. One key,
+  `liczmat-sync-account`, holds the uid; both directions are refused while it names
+  somebody else **and** there are rows here. An empty workspace is nobody's, so a stale
+  stamp on one is not a warning. The check is inside both click handlers as well as on the
+  `disabled` attribute — `disabled` is a hint to a mouse.
+- **There is finally a way to empty a shared device.** The delete-account card has always
+  said "Dane w tej przeglądarce zostają — wyczyść je osobno" with nothing to click.
+  `app-wipe` on the settings tab clears the four data stores — `materio-workspace-v1`,
+  `materio-active-project`, `liczmat-recent-calcs` and `liczmat-crm-v1`, the last being
+  the only store on this site holding somebody else's name, telephone number and address —
+  plus the sync stamp. The **settings stay**: language, currency, theme, the consent answer
+  and "keep me signed in" say nothing about anybody, and clearing them would show the page
+  in a foreign language to somebody who asked for their data to be cleared. It signs
+  nobody out; that is a separate button. `DEVICE_DATA_KEYS` is checked against
+  `COOKIE_ROWS` on /cookies/, so a store nobody can clear fails the build's tests.
+- **An id out of storage is not a path segment until `pathId()` says so.** It refuses the
+  empty string, a `/`, `.`, `..`, `__x__` and anything over 1500 characters. Firestore
+  throws on those, and the throw landed in the same `catch` as a network failure — so a
+  push reported "coś poszło nie tak" instead of skipping one row and carrying on.
+- **The CSV is a file handed to somebody else.** A spreadsheet reads a cell starting `=`,
+  `+`, `-` or `@` as a formula, quoted or not, and material names are typed by people;
+  `wsCsvCell()` prefixes those with an apostrophe. `wsFileName()` builds the download name
+  out of the project name without a separator, a control character or a `..` in it.
 - **Every control carries its own name, and a placeholder is not one.** A placeholder is
   gone the moment somebody types, and a screen reader announces a nameless field as "edit,
   blank" — nine fields on this site had nothing else (the new project, the new room, the

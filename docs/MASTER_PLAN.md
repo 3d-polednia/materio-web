@@ -61,7 +61,8 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 32 | Mobile QA | **Zrobione** — 2026-08-20 |
 | 33 | Performance | **Zrobione** — 2026-08-20 |
 | 34 | Accessibility | **Zrobione** — 2026-08-20 |
-| 35–36 | patrz rozdział XXXII planu | Nie zaczęte |
+| 35 | Security | **Zrobione** — 2026-08-20 |
+| 36 | Finalny QA | Nie zaczęte |
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -216,6 +217,148 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 35
+
+Rozdział XXXII, Sesja 35 w całości: **„SECURITY. Autoryzacja, izolacja danych, API,
+uprawnienia, poziomy dostępu. GOŚĆ → LICZMAT → LICZMAT PRO."**
+
+**WYKONANO**
+
+Audyt całego produktu pod tymi pięcioma hasłami. Najpierw jedno zdanie, które porządkuje
+resztę: **granica jest jedna i nie leży w tym repozytorium** — chronią dane wdrożone
+reguły Firestore (`request.auth.uid`, repo aplikacji, FIRESTORE_SYNC §7). Robotą serwisu
+jest nigdy nie **zaadresować** cudzych danych, nie zostawiać kopii jednego konta na
+cudzym urządzeniu i nie wypuścić poświadczenia na zewnątrz. Znalezionych i naprawionych
+zostało osiem rzeczy; żadnej nie łapał żaden z dwudziestu wcześniejszych zestawów testów.
+
+**1. `?next=` po zalogowaniu prowadził na cudzą domenę — przez tabulator.**
+`lmSafeNext()` odrzucał `//evil.example`, ukośnik odwrotny i schemat, i **przepuszczał**
+`/⇥/evil.example`: pierwszy znak to ukośnik, drugi to tabulator, więc żadna z czterech
+reguł się nie odezwała. Parser URL-a w **każdej** przeglądarce usuwa tabulator, CR i LF,
+zanim przeczyta adres — zostawało `//evil.example`, czyli adres protokołowo-względny,
+czyli `https://evil.example/`. Zmierzone, nie wydedukowane:
+
+```
+lmSafeNext("/\t/evil.example") → "/\t/evil.example"
+new URL(to, "https://liczmat.com/app/") → https://evil.example/
+```
+
+Otwarte przekierowanie na stronie logowania to link phishingowy z prawdziwą domeną
+w pasku adresu. Cały zakres C0 plus DEL jest teraz odrzucany, a test rozstrzyga to tak,
+jak rozstrzyga przeglądarka: każdą przepuszczoną wartość przelicza przez `new URL()`
+i wymaga origin `liczmat.com`. Porównywanie napisów jest tym, co ten błąd przepuściło.
+
+**2. `/p/<token>` oddawał swój adres Google Analytics.** GA4 raportuje `page_location` —
+cały adres, z parametrami — a token w tym adresie **jest** poświadczeniem (FIRESTORE_SYNC
+§6: dokument jest publiczny, token to sekret, skasowanie dokumentu to odebranie dostępu).
+Każdy link wysłany klientowi trafiał więc do trzeciej strony. Ta jedna strona jedzie
+teraz bez tagu i bez `dns-prefetch`, z `<meta name="referrer" content="no-referrer">`.
+Flaga `secret` w `src/template.mjs`; reszta serwisu ma tag dokładnie jak miała,
+i test oblewa, jeśli którakolwiek inna strona go zgubi albo jeśli jakaś strona zostanie
+z **połową** tagu.
+
+**3. Kształt tokenu nie był sprawdzany przy wejściu przez `?t=`.** Firestore skleja
+segmenty ścieżki, więc `?t=a/b/c` adresowało `sharedProjects/a/b/c` — inny dokument
+w podkolekcji, o którą ta strona nigdy nie prosi. Ścieżka `/p/<token>` miała regułę od
+zawsze; parametr nie miał żadnej. Teraz oba wejścia (i przekierowanie w `404.html`) czytają
+jeden wzorzec: `[A-Za-z0-9_-]{16,64}`.
+
+**4. Kopia konta zostawała w przeglądarce bez śladu, czyja jest.** „Pobierz z konta do
+przeglądarki" wgrywa projekty, pomieszczenia, kalkulacje i listy materiałów do
+`localStorage` — i **nic nigdy nie zapisywało, do kogo należą**. Na wspólnym komputerze
+dawało to dwa osobne błędy: następna osoba otwierała `/projekty/` i czytała cudze projekty
+i ceny, a po zalogowaniu się i naciśnięciu „Wyślij z przeglądarki na konto" wgrywała cudze
+dane na **swoje** konto — gdzie ich właściciel już ich nie dosięgnie i nigdy się o tym nie
+dowie. Reguły Firestore nie mają z tym nic wspólnego: kopia w przeglądarce leży poza
+wszystkim, czego reguły pilnują. Jeden klucz, `liczmat-sync-account`, trzyma `uid` konta,
+z którym ta przeglądarka synchronizowała się ostatnio; kiedy wskazuje inne konto **i** coś
+w przeglądarce leży, synchronizacja w obie strony jest wstrzymana i strona mówi dlaczego.
+Pusta przeglądarka nie jest niczyja — stary stempel na niej nikogo nie ostrzega.
+
+**5. Nie było czym wyczyścić urządzenia.** Karta „Usuń konto" od zawsze mówi „Dane w tej
+przeglądarce zostają — wyczyść je osobno", a na całym serwisie nie było do tego przycisku.
+Jest, na zakładce ustawień: kasuje cztery magazyny danych — warsztat, otwarty projekt,
+historię użytych kalkulatorów i magazyn Pro (`liczmat-crm-v1`, jedyny, który trzyma
+**cudze** nazwisko, telefon i adres) — plus stempel z punktu 4. Ustawienia zostają: język,
+waluta, motyw, zgoda na analitykę i „pamiętaj mnie" nie mówią nic o nikim, a ich
+wyczyszczenie pokazałoby stronę w obcym języku komuś, kto prosił o skasowanie danych.
+Nikogo nie wylogowuje — to osobny przycisk i osobna decyzja. Lista kasowanych kluczy jest
+porównywana z tabelą na `/cookies/`, więc magazyn, którego nie da się wyczyścić, oblewa
+testy.
+
+**6. Identyfikator z `localStorage` szedł prosto w ścieżkę Firestore.** `projectId`
+z ukośnikiem adresuje inny dokument, a `.`, `..` i `__x__` Firestore odrzuca wyjątkiem —
+który lądował w tym samym `catch`, co awaria sieci, więc synchronizacja mówiła „coś poszło
+nie tak" zamiast pominąć jeden wiersz i policzyć resztę. `pathId()` sprawdza segment,
+zanim ten stanie się adresem.
+
+**7. CSV z kosztorysu mógł być formułą.** Arkusz czyta komórkę zaczynającą się od `=`,
+`+`, `-` lub `@` jako formułę — w cudzysłowie czy bez — a nazwy materiałów pisze człowiek
+i plik jest oddawany komuś innemu. Komórka dostaje apostrof, a nazwa pliku przestała być
+nazwą projektu wklejoną bez sprawdzenia (`../../etc/passwd`, znak nowej linii).
+
+**8. Trzy miejsca wstawiały cudze dane do markupu bez ucieczki.** `data-id` projektu
+i pomieszczenia w `/app/` (identyfikator z dokumentu, który przyszedł synchronizacją)
+oraz współrzędne sklepu w `href`, które pochodzą z OpenStreetMap, czyli od tego, kto
+ostatnio edytował mapę. Nazwa i adres sklepu były uciekane od zawsze; liczby nie —
+teraz są liczbami albo wiersza nie ma.
+
+**Czego ta sesja świadomie nie ruszyła.** Paywall nadal nie jest granicą i nie ma nim być
+(rozdział XXV chce, żeby darmowy użytkownik *rozumiał*, co jest Pro — zamek z JavaScriptu
+niczego nie broni, bo dane CRM są w tej samej przeglądarce). `liczmat-crm-v1` nadal nie
+jest w kontrakcie i nie wyjeżdża z urządzenia. `assets/firebase-config.js` nadal jest
+jawny, bo klucz Web Firebase nie jest sekretem i nie da się go w przeglądarce ukryć.
+
+**ZMIENIONE PLIKI**
+
+Nowe: `scripts/test-security.mjs`. Zmienione: `assets/account.js` (`lmSafeNext()`),
+`assets/share.js` (`SHARE_TOKEN`), `assets/app.js` (`pathId()`, stempel konta,
+`foreignWorkspace()`, przycisk czyszczenia, ucieczka `data-id`), `assets/stores.js`
+(współrzędne), `assets/workspace-ui.js` (`wsCsvCell()`, `wsFileName()`),
+`assets/i18n-pages.js` (7 kluczy × 10 języków), `src/template.mjs` (flaga `secret`),
+`src/app-pages.mjs` (karta czyszczenia, ostrzeżenie na zakładce synchronizacji),
+`src/pages.mjs` (wiersz `liczmat-sync-account` na `/cookies/`, eksport `COOKIE_ROWS`),
+`scripts/build.mjs` (`secret: true` dla `/p/`, `STAMP` → `20260820f`),
+`scripts/test-perf.mjs` (strona bez tagu), `scripts/test-account-page.mjs` (§17),
+`404.html`, `privacy-policy.html` (`?v=`), `CLAUDE.md`, `docs/ARCHITEKTURA.md` (§7.15),
+`docs/MASTER_PLAN.md`, 373 przebudowane strony i dziesięć wygenerowanych słowników.
+
+**TESTY**
+
+**76 549 sprawdzeń logiki w 21 zestawach** — wszystkie przechodzą, w tym nowy
+`scripts/test-security.mjs` (8 993). `scripts/build.mjs --check`: 1157 kluczy × 10 języków.
+W Chromium **3 950 sprawdzeń w 16 zestawach, wszystkie zielone** — cały zestaw
+przebiegnięty po zmianach, bo ta sesja ruszyła `/app/`, `/p/`, kalkulatory i kosztorys.
+`scripts/test-account-page.mjs` urósł ze 184 do 204: odmowa synchronizacji, kliknięcie
+w wyłączony przycisk (które nie wysyła nic), czyszczenie przeglądarki, ustawienia, które
+je przeżywają, i stempel odkładany przez pobranie — wszystko klikane, nic udawane.
+
+**PROBLEMY**
+
+Do decyzji właściciela, żadne z nich nie jest robotą tej sesji:
+
+- **Udostępnionego linku nie da się cofnąć inaczej niż kasując konto.** `/app/` tworzy
+  dokument `sharedProjects/{token}` i nigdy nie pokazuje listy tych, które już powstały.
+  Skasowanie konta kasuje wszystkie (`where("ownerId", "==", uid)`), więc uprawnienia
+  na to są; brakuje ekranu. Osobna sesja, bo to nowy widok w dziesięciu językach.
+- **`Content-Security-Policy` nie istnieje.** GitHub Pages nie ustawia nagłówków, ale
+  `<meta http-equiv>` działa. Zrobienie tego dobrze oznacza policzenie skrótów SHA-256
+  wszystkich skryptów wbudowanych na 373 stronach w buildzie — realne, ale to osobna
+  sesja, nie przypis do audytu.
+- **`<meta charset>` stoi po bloku analityki, czyli po ~2,5 kB.** Specyfikacja chce go
+  w pierwszym kilobajcie. Dziś ratuje to nagłówek `Content-Type` od GitHub Pages i to,
+  że żadna współczesna przeglądarka nie zgaduje UTF-7. Poprawka jest jednolinijkowa
+  i zmienia wszystkie 373 strony, więc nie wchodziła do sesji o czym innym.
+- **Ramka Google Maps nie ma `sandbox`.** Ma `referrerpolicy`, `loading="lazy"` i nic
+  z niej nie wraca do strony, ale `sandbox` byłby wzmocnieniem. Nie da się tego
+  sprawdzić z tego kontenera — Chromium tutaj nie sięga Google — więc nie zgadywałem.
+- **Reguły Firestore są w drugim repozytorium i tej sesji nie podlegają.** Ostatni pomiar
+  na żywym backendzie jest z 2026-08-13 i nadal obowiązuje.
+
+**STATUS: ukończone.**
+
+**Następne zadanie: Sesja 36 — FINALNY QA.**
 
 ### Co zrobiła Sesja 34
 

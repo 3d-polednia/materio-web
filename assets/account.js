@@ -136,11 +136,21 @@ function lmWriteRemember(on) {
  * anything carrying a scheme or a backslash — an open redirect on a sign-in page is how
  * a phishing link borrows a real domain.
  *
+ * A control character is refused too, and that is not tidiness (session 35). The URL
+ * parser in every browser **deletes** tab, CR and LF before it reads the address, so
+ * `/<tab>/evil.example` passed all four rules above and then navigated to
+ * `https://evil.example/` — the second character the parser sees is the slash this
+ * function thought it had refused. Everything below 0x20, plus DEL, is therefore out.
+ *
  * @returns {string} the path, or "" when there is nothing safe to go back to
  */
 function lmSafeNext(raw) {
   var value = String(raw || "");
   if (!value || value.charAt(0) !== "/") return "";
+  // Before anything else: a character the URL parser throws away changes what the rest
+  // of these rules are reading. \t, \n and \r are the ones that are actually deleted;
+  // the whole C0 range and DEL go with them, because none of them belongs in a path.
+  if (/[\u0000-\u001f\u007f]/.test(value)) return "";
   if (value.charAt(1) === "/" || value.charAt(1) === "\\") return "";
   if (value.indexOf("\\") >= 0) return "";
   if (/^\/[a-z0-9.+-]*:/i.test(value)) return "";

@@ -11,16 +11,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nie ma takiej strony — LiczMat</title>
 <meta name="robots" content="noindex, follow">
-<link rel="icon" href="/assets/favicon.svg?v=20260820e" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260820e" sizes="32x32" type="image/png">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260820e">
+<link rel="icon" href="/assets/favicon.svg?v=20260820f" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260820f" sizes="32x32" type="image/png">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260820f">
 <script>
   // GitHub Pages serves this file for every path it cannot resolve, and it has no
-  // rewrite rules. A shared estimate lives at /p/<token>, where the token is an
-  // unbounded random string and therefore cannot be a real directory — so catch it
-  // here and hand it to /p/, which reads the token from ?t=.
+  // rewrite rules. A shared estimate lives at /p/<token>, where the token is a random
+  // string and therefore cannot be a real directory — so catch it here and hand it to
+  // /p/, which reads the token from ?t=. The shape is the one assets/share.js accepts
+  // (session 35): a real token is 22 URL-safe base64 characters, and anything else is
+  // some other address that happens to start with /p/.
   (function () {
-    var m = location.pathname.match(/^\/p\/([A-Za-z0-9_-]{16,})\/?$/);
+    var m = location.pathname.match(/^\/p\/([A-Za-z0-9_-]{16,64})\/?$/);
     if (m) location.replace("/p/?t=" + encodeURIComponent(m[1]) + location.hash);
 
     // The six languages dropped on 2026-08-12 were brought back after session 28, at the

@@ -88,6 +88,10 @@ scripts/test-a11y.mjs         Dostępność w znacznikach: nazwy kontrolek, kons
                               (Sesja 34, bez zależności)
 scripts/test-a11y-page.mjs    To samo z klawiatury w Chromium: focus, Escape, drzewo
                               dostępności przeglądarki, oba motywy (Sesja 34)
+scripts/test-security.mjs     Bezpieczeństwo: poziomy dostępu, `?next=`, token /p/,
+                              stempel konta w przeglądarce, adresy Firestore, tabela
+                              uprawnień, znaczniki wszystkich stron, ucieczka danych
+                              (Sesja 35, bez zależności)
 privacy-policy.html      Polityka prywatności (PL + EN) — osobna podstrona (wymóg Google Play)
 404.html                 Strona błędu 404; przekierowuje też /p/<token> na /p/?t=<token>
 site.webmanifest         Manifest PWA (nazwa, ikony, kolory)
@@ -462,7 +466,17 @@ więc liczba na stronie nie może rozjechać się z kodem. Wzory żyją w
 - `/app/` — logowanie e-mailem (Firebase Auth), lista projektów i pomieszczeń,
   tworzenie i usuwanie (tombstone), przycisk „Udostępnij".
 - `/p/<token>` — kopia wyceny tylko do odczytu, bez logowania. GitHub Pages nie ma
-  przepisywania adresów, więc `404.html` przekierowuje na `/p/?t=<token>`.
+  przepisywania adresów, więc `404.html` przekierowuje na `/p/?t=<token>`. Token **jest**
+  poświadczeniem, więc od Sesji 35 ta jedna strona nie ładuje analityki (GA4 raportuje
+  cały adres jako `page_location`) i niesie `<meta name="referrer" content="no-referrer">`.
+  Kształt tokenu sprawdzany jest przed zapytaniem: `[A-Za-z0-9_-]{16,64}`, bo Firestore
+  sklejał `?t=a/b/c` w adres innego dokumentu.
+- **Kopia konta w przeglądarce ma właściciela (Sesja 35).** „Pobierz z konta" wgrywa dane
+  do `localStorage`; klucz `liczmat-sync-account` trzyma `uid`, z którym ta przeglądarka
+  synchronizowała się ostatnio. Gdy wskazuje inne konto, `/app/` wstrzymuje synchronizację
+  w obie strony — inaczej na wspólnym komputerze cudze projekty jechały na cudze konto.
+  Przycisk na zakładce ustawień czyści cztery magazyny danych tej przeglądarki
+  (warsztat, otwarty projekt, historia kalkulatorów, magazyn Pro) i zostawia ustawienia.
 - Schemat dokumentów jest **wspólny z aplikacją Androida** — kontrakt opisuje
   `docs/FIRESTORE_SYNC.md` w repo `3d-polednia/LiczMat`, a po stronie Kotlina
   `core/sync/SyncContract.kt`. Zmiana w jednym miejscu wymaga zmiany we wszystkich.

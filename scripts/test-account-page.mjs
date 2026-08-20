@@ -1209,6 +1209,95 @@ head("16. rooms stand inside the project they belong to");
   await ctx.close();
 }
 
+head("17. whose copy is in this browser, and how to empty it (session 35)");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+
+  // The four data stores of chapter II's local workspace, as this device would hold them
+  // after somebody else pulled their account into it. `liczmat-sync-account` is the stamp
+  // that says whose they are; "u2" is not the account signing in below.
+  const rows = JSON.stringify({
+    projects: [{ id: "p9", name: "Kowalski", archived: false, createdAt: 1, updatedAt: 1, deletedAt: null }],
+    rooms: [], estimations: [], shoppingItems: [],
+  });
+  const planted = {
+    "materio-workspace-v1": rows,
+    "materio-active-project": "p9",
+    "liczmat-recent-calcs": JSON.stringify([{ id: "waste", at: 1 }]),
+    "liczmat-crm-v1": JSON.stringify({ clients: [{ id: "c1", name: "Nowak" }], jobs: [], quotes: [] }),
+    "liczmat-sync-account": "u2",
+    // The settings, which the wipe must not touch.
+    "liczmat-theme": "dark",
+    "liczmat-currency": "EUR",
+    "liczmat-remember": "0",
+    "materio_consent": "granted",
+  };
+
+  const page = await openTab(ctx, "sync", { storage: planted });
+  page.on("dialog", (d) => d.accept());
+
+  await page.waitForSelector("#app-sync-foreign:not([hidden])", { timeout: 5000 });
+  const warning = await page.locator("#app-sync-foreign").innerText();
+  check("another account's copy is named out loud", warning.includes("innego konta"), warning);
+  eq("push is refused", await page.locator("#app-sync-push").isDisabled(), true);
+  eq("and so is pull", await page.locator("#app-sync-pull").isDisabled(), true);
+
+  // Pressing it anyway — the way a script would, past the disabled attribute — writes
+  // nothing to the account.
+  const before = await page.evaluate(() => window.__fbDocs.size);
+  await page.evaluate(() => document.getElementById("app-sync-push").click());
+  eq("clicking through the disabled button uploads nothing",
+    await page.evaluate(() => window.__fbDocs.size), before);
+
+  // The way out is on the settings tab, and it empties this browser.
+  await page.click('[data-tab="account"]');
+  await page.click("#app-wipe");
+  await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
+  const kept = await page.evaluate(() => {
+    const out = {};
+    for (const key of ["materio-workspace-v1", "materio-active-project", "liczmat-recent-calcs",
+      "liczmat-crm-v1", "liczmat-sync-account", "liczmat-theme", "liczmat-currency",
+      "liczmat-remember", "materio_consent", "liczmat-signed-in"]) {
+      out[key] = localStorage.getItem(key);
+    }
+    return out;
+  });
+  for (const gone of ["materio-workspace-v1", "materio-active-project", "liczmat-recent-calcs",
+    "liczmat-crm-v1", "liczmat-sync-account"]) {
+    eq(`${gone} is gone`, kept[gone], null);
+  }
+  eq("the theme stays", kept["liczmat-theme"], "dark");
+  eq("the currency stays", kept["liczmat-currency"], "EUR");
+  eq("the answer about the session stays", kept["liczmat-remember"], "0");
+  eq("the consent answer stays", kept["materio_consent"], "granted");
+  check("and nobody is signed out", kept["liczmat-signed-in"] !== null, kept["liczmat-signed-in"]);
+
+  // With the browser empty the sync tab opens again — the refusal was about the rows,
+  // not about the account.
+  await page.click('[data-tab="sync"]');
+  await page.waitForSelector("#app-sync-foreign", { state: "hidden", timeout: 5000 });
+  eq("push is offered again", await page.locator("#app-sync-push").isDisabled(), false);
+  eq("and pull", await page.locator("#app-sync-pull").isDisabled(), false);
+
+  // A pull stamps the browser with the account it came from, which is what makes the
+  // next person's refusal possible.
+  await page.click("#app-sync-pull");
+  await page.waitForFunction(() => localStorage.getItem("liczmat-sync-account") !== null,
+    null, { timeout: 5000 });
+  eq("the pull stamps this browser with the account",
+    await page.evaluate(() => localStorage.getItem("liczmat-sync-account")), "u1");
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+
+  // The visitor's own guest work, with no stamp on it, is never refused.
+  const guestWork = await openTab(ctx, "sync", { storage: { "materio-workspace-v1": rows } });
+  eq("an unstamped workspace is nobody else's",
+    await guestWork.locator("#app-sync-foreign").isHidden(), true);
+  eq("and it can still be pushed", await guestWork.locator("#app-sync-push").isDisabled(), false);
+  await guestWork.close();
+  await ctx.close();
+}
+
 /* ------------------------------------------------------------------ the verdict */
 
 await browser.close();

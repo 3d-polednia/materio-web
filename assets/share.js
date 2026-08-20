@@ -16,11 +16,24 @@ const T = (key) => (typeof t === "function" ? t(key) : key);
 const escapeHtml = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+/**
+ * The shape of a token, and the only shape this page will look up.
+ *
+ * `shareToken()` in assets/app.js writes 16 random bytes as URL-safe base64, so a real
+ * token is 22 characters out of that alphabet. The check matters because the token is
+ * handed straight to `doc(db, "sharedProjects", token)`, and Firestore joins path
+ * segments: until session 35 a `?t=a/b/c` addressed `sharedProjects/a/b/c` — some other
+ * document entirely, in a subcollection nothing here is meant to read. The rules would
+ * still answer, but a page that builds a data-API path out of an unchecked query
+ * parameter is a page that decides what it is asking for by accident.
+ */
+const SHARE_TOKEN = /^[A-Za-z0-9_-]{16,64}$/;
+
 /** The token, from ?t=… or from the path when the visitor landed on /p/<token> directly. */
 function readToken() {
-  const q = new URLSearchParams(location.search).get("t");
-  if (q) return q.trim();
-  const m = location.pathname.match(/\/p\/([A-Za-z0-9_-]{16,})\/?$/);
+  const q = (new URLSearchParams(location.search).get("t") || "").trim();
+  if (q) return SHARE_TOKEN.test(q) ? q : "";
+  const m = location.pathname.match(/\/p\/([A-Za-z0-9_-]{16,64})\/?$/);
   return m ? m[1] : "";
 }
 
