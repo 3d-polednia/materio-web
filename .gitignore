@@ -8,3 +8,6 @@ Thumbs.db
 .env.*
 *.jks
 local.properties
+
+# Cloud Functions build output — the source is committed, the install is not
+functions/node_modules/

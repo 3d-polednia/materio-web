@@ -76,7 +76,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | Sesja | Zakres | Status |
 |---|---|---|
 | 37 | Pro nadawane po e-mailu + `/app/` widzi plan na żywo | **Zrobione** — 2026-08-21 |
-| 38 | Stripe: webhook nadający plan (`functions/`) | Do zrobienia |
+| 38 | Stripe: webhook nadający plan (`functions/`) | **Zrobione** — 2026-08-21, czeka na wdrożenie |
 | 39 | Stripe: sprzedaż włączona | Do zrobienia |
 | 40 | „LiczMat Pro" w nagłówku (Poradniki → stopka) | Do zrobienia |
 | 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | Do zrobienia |
@@ -87,6 +87,14 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | Do zrobienia |
 | 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | Do zrobienia |
 | 48 | Prawda w dokumentacji i lista rzeczy w konsolach | Do zrobienia |
+| 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | Do zrobienia |
+
+Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
+kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
+sprawdzi, kto pyta — a ten serwer powstaje w Sesji 38, więc panel jest po nim tani.
+Właściciel wybrał kolejność: **najpierw sprzedaż, panel na końcu**. `scripts/pro-admin.mjs`
+zostaje niezależnie od panelu: narzędzie, które potrzebuje wyłącznie klucza, jest tym,
+czym się ratuje, gdy funkcja albo Firebase leżą.
 
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
@@ -247,6 +255,111 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 38 (plan naprawczy)
+
+Zadanie: **serwer, który po zapłacie wpisuje plan.** Krok 4 z noty ORDER na dole
+`assets/pay.js` — jedyny brakujący element sprzedaży.
+
+**WYKONANO**
+
+**Własna funkcja, nie rozszerzenie.** „Run Payments with Stripe" jest zbudowane wokół sesji
+Checkout tworzonych z Firestore przez zalogowaną przeglądarkę. `assets/pay.js` jest
+zbudowany wokół **Payment Linków** z `client_reference_id`, bo strona jest statyczna, nie
+ma serwera i to jedyny sposób, w jaki potrafi powiedzieć, czyje to konto. Zaginanie
+rozszerzenia do tego modelu byłoby dłuższe niż ta funkcja i dokładałoby trzy kolekcje,
+których kontrakt synchronizacji nie zna.
+
+**Podział na dwa pliki, i to jest sedno tej sesji.** `functions/stripe-map.mjs` **niczego
+nie importuje**: dostaje zdarzenie, oddaje decyzję. `functions/index.js` tę decyzję
+wykonuje. Dzięki temu `node scripts/test-webhook-map.mjs` sprawdza całą logikę **bez
+chmury, bez `npm install`, bez wdrożenia i bez konta Stripe** — 111 sprawdzeń. Pomyłka
+w mapowaniu statusu na plan to albo ktoś płacący bez dostępu, albo dostęp bez płacenia;
+jedno i drugie ma być sprawdzalne, zanim cokolwiek pojedzie do chmury.
+
+**Zapłata przychodzi w dwóch połówkach i żadne zdarzenie nie niesie obu.** Uid jest tylko
+w `checkout.session.completed`; status i daty tylko w `customer.subscription.*`. Więc
+pierwsze zdarzenie zapisuje `stripeCustomers/{customerId} = { uid }`, a drugie ustawia plan,
+czytając to powiązanie. **Stripe nie obiecuje kolejności**, więc zdarzenie subskrypcji,
+które wyprzedziło sesję, dostaje **503** i jest ponawiane przez kilka dni. Zapłata, której
+nie umiemy jeszcze przypisać, ma poczekać — nie zniknąć. Ta, której nie da się przypisać
+**nigdy** (`client_reference_id` nie wskazujący na konto i brak adresu), dostaje 200 i ląduje
+w logu jako błąd, bo ponawianie nie sprawi, że konto powstanie; właściciel nadaje ją wtedy
+ręcznie narzędziem z Sesji 37.
+
+**Anulowanie nie odbiera Pro od razu.** `cancel_at_period_end` przestawia `planRenews` na
+`false` i zostawia `planValidUntil` tam, gdzie było — moduły zostają otwarte do końca
+opłaconego okresu, a `lmPlanStatus()` zamyka je sam. `past_due` też zostawia plan i nie
+obiecuje odnowienia: opłacony okres trwa, nie udało się pobrać dopiero **następnej** raty,
+a Stripe ponawia przez kilka dni. Odebranie dostępu przy pierwszym odrzuceniu karty
+zabrałoby go komuś, kto zapłacił.
+
+**Jeden sekret, i funkcja nigdy nie dzwoni do Stripe'a.** `STRIPE_WEBHOOK_SECRET` w Secret
+Managerze. Klucza API Stripe'a tu nie ma i nie ma `stripe` w zależnościach: funkcja czyta
+wyłącznie to, co Stripe sam przysłał i podpisał. Podpis liczony z **surowego** ciała —
+`JSON.parse` i z powrotem daje inne bajty i podpis, który się nie zgadza; to najczęstszy
+sposób, w jaki taki webhook się psuje. Okno pięciu minut, więc przechwycone żądanie nie
+przejdzie miesiąc później. Porównanie podpisów w stałym czasie.
+
+**`client_reference_id` jest sprawdzany, nie brany na wiarę.** Przychodzi z adresu URL, więc
+funkcja szuka tego uida w Firebase Auth, zanim cokolwiek zapisze. Plan zapisany pod
+wymyślonym uidem zrobiłby dokument profilu dla konta, którego nie ma.
+
+**ZMIENIONE PLIKI**
+
+Dodane:
+- `functions/stripe-map.mjs` — czysta połowa: podpis, mapowanie, zapis.
+- `functions/index.js` — cienka połowa: sprawdź, zdecyduj, zapisz.
+- `functions/package.json` — dwie zależności (firebase-admin, firebase-functions), Node 22.
+- `firebase.json`, `.firebaserc` — konfiguracja wdrożenia.
+- `scripts/test-webhook-map.mjs` — 111 sprawdzeń bez zależności.
+
+Zmienione:
+- `.github/workflows/pages.yml` — `functions`, `firebase.json` i `.firebaserc` dopisane do
+  `rm -rf`. **Korzeń repozytorium jest korzeniem serwisu**: katalog, którego się nie skasuje,
+  leży pod publicznym adresem.
+- `.gitignore` — `functions/node_modules/`.
+- `scripts/test-security.mjs` §12 — wzorzec sekretu Stripe'a wymaga teraz prawdziwej
+  długości (`whsec_` + 24 znaki). Sam przedrostek to słowo, które to repozytorium musi umieć
+  zapisać: test webhooka sprawdza, że wdrażana funkcja go **nie** niesie.
+- `CLAUDE.md` — katalog `functions/`, trzy pliki i nowy test w spisie; pięć punktów o tym,
+  jak działa webhook.
+- `docs/MASTER_PLAN.md` — ten wpis, wiersz w tabeli i **nowa Sesja 49** (panel admina).
+
+**Nic w serwisie się nie zmieniło.** Żadna z 373 stron, żaden plik w `assets/`. Przebudowa
+po sesji: `git diff` na stronach pusty, `STAMP` nietknięty — nie ma czego unieważniać
+w cache'u, skoro przeglądarka nie dostaje ani jednego bajtu więcej.
+
+**TESTY**
+
+- Nowy `scripts/test-webhook-map.mjs`: **111/111**.
+- `scripts/test-security.mjs`: **9058/9058** (było 9023 — doszły sprawdzenia nowych plików).
+- Pozostałe 21 zestawów bez zależności: bez zmian, wszystkie przechodzą.
+- `node scripts/build.mjs --check`: 1157 kluczy × 10 języków.
+
+**PROBLEMY**
+
+- **Funkcja nie jest wdrożona.** Kod jest kompletny i sprawdzony, ale nikt go jeszcze nie
+  wysłał do chmury — `firebase deploy --only functions` robi właściciel, na planie Blaze
+  (który już ma: konsola pokazuje „Blaze | Free Trial, 54 dni, €263"). Do tego jeden sekret:
+  `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET`.
+- **Sekretu jeszcze nie ma**, bo nie ma konta Stripe — powstaje w Sesji 39. Kolejność jest
+  z noty ORDER i się nie zmienia: produkty → Payment Linki → wdrożenie tej funkcji →
+  **jedna prawdziwa płatność** → dopiero potem trzy adresy w `assets/pay.js`.
+- **`current_period_end` ma dwa domy.** Stripe trzymał je na subskrypcji, a od wersji API
+  z 2025 roku na jej **pozycji**. `periodEndMs()` czyta oba, bo o tym, którą wersję dostanie
+  konto właściciela, nie ma decydować przypadek.
+
+**STATUS**
+
+Sesja 38 zamknięta. Czeka na wdrożenie.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 39 — Stripe: sprzedaż włączona.** Konto Stripe od zera, dwa produkty z czternastoma
+kwotami w siedmiu walutach, Payment Linki z `client_reference_id`, Customer Portal,
+wdrożenie funkcji z tej sesji, jedna prawdziwa płatność testową kartą — i dopiero po niej
+trzy adresy wklejone do `LM_PAY`.
 
 ### Co zrobiła Sesja 37 (plan naprawczy)
 

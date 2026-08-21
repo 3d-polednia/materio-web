@@ -1,0 +1,12 @@
+{
+  "name": "liczmat-functions",
+  "description": "LiczMat — the Stripe webhook that grants users/{uid}.plan. Deployed separately from the site; scripts/build.mjs never reads this directory and .github/workflows/pages.yml drops it from the published artifact.",
+  "type": "module",
+  "private": true,
+  "main": "index.js",
+  "engines": { "node": "22" },
+  "dependencies": {
+    "firebase-admin": "^13.0.2",
+    "firebase-functions": "^6.3.0"
+  }
+}

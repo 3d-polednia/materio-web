@@ -612,7 +612,12 @@ head("12. API: what the repo does not carry");
     [/-----BEGIN [A-Z ]*PRIVATE KEY-----/, "a private key"],
     [/\bsk_live_[A-Za-z0-9]/, "a Stripe secret key"],
     [/\brk_live_[A-Za-z0-9]/, "a Stripe restricted key"],
-    [/\bwhsec_[A-Za-z0-9]/, "a Stripe webhook secret"],
+    /* A real Stripe webhook secret is `whsec_` and then some thirty base62 characters.
+       The prefix on its own is a word this repository has to be able to write down —
+       scripts/test-webhook-map.mjs checks the deployed function does not carry one, and
+       functions/index.js names the parameter that holds it. The length is what tells a
+       secret from a sentence about secrets. */
+    [/\bwhsec_[A-Za-z0-9]{24,}/, "a Stripe webhook secret"],
     [/"type"\s*:\s*"service_account"/, "a service account"],
     [/\bghp_[A-Za-z0-9]{20}/, "a GitHub token"],
     [/\bAIza[0-9A-Za-z_-]{35}/, "a Google API key"],

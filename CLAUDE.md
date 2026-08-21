@@ -99,6 +99,7 @@ node scripts/test-rooms.mjs       # rooms: the document, the project link, the a
 node scripts/test-plan.mjs        # the Free/Pro model: permissions, gating, plan status
 node scripts/test-pay.mjs         # the subscription: prices, the checkout URL, the Stripe hosts
 node scripts/test-pro-admin.mjs   # granting Pro by hand: the three fields, the mask, the key
+node scripts/test-webhook-map.mjs # the Stripe webhook: the signature, the status, the write
 node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadline, the links
 node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
 node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
@@ -456,6 +457,29 @@ scripts/test-qa.mjs   The final QA walk (session 36, chapter XXXVI): the whole p
                       a currency is not a language). Only /app/ is stubbed, with
                       scripts/fake-firebase.mjs, because the container cannot reach gstatic.
                       Needs the same outside-the-repo Playwright as test-pages.mjs
+functions/            The Cloud Functions codebase — deployed with `firebase deploy
+                      --only functions`, NEVER served by GitHub Pages. It is stripped from
+                      the artifact in `.github/workflows/pages.yml` alongside docs/, src/
+                      and scripts/, because the repo root is the site root. `firebase.json`
+                      and `.firebaserc` at the root are its deployment configuration
+functions/stripe-map.mjs  The whole decision half of the Stripe webhook, and it imports
+                      NOTHING: the signature check, the subscription status → plan mapping
+                      and the three fields to write. That is what lets
+                      scripts/test-webhook-map.mjs check it with plain `node`, without npm,
+                      without deploying and without a Stripe account. It holds the second
+                      copy of the two plan words and the three field names; §1 of that test
+                      is the only thing binding it to assets/plan.js and scripts/pro-admin.mjs
+functions/index.js    The thin half: verify, decide, write. Reads one secret
+                      (STRIPE_WEBHOOK_SECRET, in Secret Manager), calls Stripe never, and
+                      writes `plan`/`planValidUntil`/`planRenews` on users/{uid} with
+                      `{ merge: true }` plus one mapping document in `stripeCustomers`
+scripts/test-webhook-map.mjs  The webhook, checked without the cloud: the signature (real,
+                      forged, stale, replayed, rotated), the period end read from both
+                      places Stripe keeps it, every subscription status, the cancellation
+                      that does NOT take Pro away today, what a write puts in and takes out,
+                      the decision for all four handled events, and the deployment
+                      boundaries — that functions/ never reaches the published site and no
+                      Stripe secret is in the repository
 scripts/pro-admin.mjs  Granting and taking away LiczMat Pro, by e-mail (session 37 of the
                       repair plan). `plan` is server-only, so nothing in a browser can
                       write it and nothing did: this is the first thing that can. Reads a
@@ -960,6 +984,41 @@ Kotlin side of it. Change one, change all three.
   Stripe" extension → a function writing `plan`/`planValidUntil`/`planRenews` → **pay once
   and check the account turns Pro by itself** → only then paste the URLs. A checkout switched
   on before that last step takes money for nothing.
+- **The webhook is the only thing that can grant a plan after a payment, and it is our own
+  function rather than the Stripe extension.** Session 38 of the repair plan put
+  `functions/` in this repo: one HTTPS function in `europe-central2`, beside Firestore.
+  The extension "Run Payments with Stripe" is built around Checkout Sessions created from
+  Firestore by a signed-in browser; `assets/pay.js` is built around **Payment Links** with
+  `client_reference_id`, because a static site has no server and that is the only way it
+  can say whose account a payment belongs to. Bending the extension to that model is longer
+  than the function and adds three collections the sync contract has never heard of.
+- **A payment arrives in two halves, and neither event carries both.** The uid comes only
+  in `checkout.session.completed` (`client_reference_id`, else the address on the session);
+  the status and the dates come only in `customer.subscription.*`. So the first event
+  writes `stripeCustomers/{customerId} = { uid }` and the second sets the plan by looking
+  it up. **Stripe does not promise an order**, so a subscription event that arrives first
+  is answered with **503** and Stripe retries it for days — a payment we cannot attribute
+  *yet* has to wait, not vanish. One that can never be attributed (a `client_reference_id`
+  naming no account, no address either) is answered 200 and logged at error level, because
+  retrying will not make an account exist; the owner then grants it by hand with
+  `scripts/pro-admin.mjs`.
+- **Cancelling does not take Pro away today.** `cancel_at_period_end` moves `planRenews`
+  to `false` and leaves `planValidUntil` where it was, so the modules stay open until the
+  paid period ends and `lmPlanStatus()` closes them by itself. `past_due` keeps the plan
+  too and promises no renewal: the paid period is still running and only the *next* charge
+  failed, which Stripe retries for days. Only `customer.subscription.deleted` and the dead
+  statuses write `free` — and they write it by **deleting** `planValidUntil` and
+  `planRenews` rather than nulling them, the same choice `revoke` makes.
+- **`client_reference_id` is checked, never trusted.** It comes off a URL, so the function
+  looks the uid up in Firebase Auth before writing anything; a plan written under an
+  invented uid would create a profile document for an account that does not exist.
+- **One secret, and the function never calls Stripe.** `STRIPE_WEBHOOK_SECRET` lives in
+  Secret Manager (`firebase functions:secrets:set`). There is no Stripe API key here and no
+  Stripe SDK in `functions/package.json`: the function only reads what Stripe itself sent
+  and signed. The signature is verified against the **raw** body — `JSON.parse` and back
+  through `JSON.stringify` produces different bytes and a signature that never matches,
+  which is the usual way this endpoint breaks — with a five-minute window, so a captured
+  request cannot be replayed a month later.
 - **The prices are converted once, by hand, never in the browser.** The euro rate was applied
   when the file was written (rates and sources are in its header, all 2026-08-19), because
   Stripe charges the amount set on the *product*: a price computed from a live rate would

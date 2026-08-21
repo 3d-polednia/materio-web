@@ -33,7 +33,7 @@ jobs:
       # deletes from the runner's checkout only — the files stay in the repository.
       # (.github is excluded by Pages already; .claude and .gitignore are not.)
       - name: Drop internal files from the published site
-        run: rm -rf docs src scripts CLAUDE.md README.md .claude .gitignore
+        run: rm -rf docs src scripts functions firebase.json .firebaserc CLAUDE.md README.md .claude .gitignore
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
