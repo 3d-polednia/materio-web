@@ -291,6 +291,13 @@ head("9. the script writes to one place, and the repository is not it");
     check(`talks only to Google: ${host}`, allowed.includes(host), host);
   }
 
+  /* The CLI guard. `"file://" + process.argv[1]` is true on Linux and false on Windows,
+     where argv[1] is C:\Users\... and import.meta.url is file:///C:/Users/... — so the
+     command ran, matched nothing, printed NOTHING and exited 0. Found by the owner on the
+     first Windows run; the shape below is the fix and this check is why it cannot return. */
+  check("the CLI guard builds a file URL instead of gluing one together",
+    src.includes("pathToFileURL(process.argv[1]).href") && !src.includes("`file://${process.argv[1]}`"));
+
   check("the key never has a default path in the source",
     !/LM_SA_KEY[^\n]*\|\|\s*"[^"]+"/.test(src));
   check("and no key is committed beside it",

@@ -44,7 +44,7 @@
 import { createSign } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -378,8 +378,16 @@ async function main(argv) {
   return 0;
 }
 
-/* Uruchamiane jako polecenie; importowane przez scripts/test-pro-admin.mjs jako moduł. */
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+/* Uruchamiane jako polecenie; importowane przez scripts/test-pro-admin.mjs jako moduł.
+ *
+ * Adres pliku buduje `pathToFileURL()`, a nie sklejenie `"file://" + ścieżka`. Sklejenie
+ * działa na Linuksie i milczy na Windowsie: `process.argv[1]` to tam
+ * `C:\Users\ktos\...\pro-admin.mjs`, a `import.meta.url` —
+ * `file:///C:/Users/ktos/.../pro-admin.mjs`. Porównanie wychodzi fałszywe, `main()` się
+ * nie uruchamia, a polecenie **kończy się bez jednego znaku na ekranie** i z kodem 0.
+ * Zgłoszone przez właściciela przy pierwszym uruchomieniu na Windowsie.
+ */
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main(process.argv.slice(2))
     .then((code) => process.exit(code))
     .catch((err) => { console.error(err.message); process.exit(1); });
