@@ -138,6 +138,21 @@ export function planFromDoc(doc) {
   };
 }
 
+/**
+ * „1 konto", „2 konta", „5 kont".
+ *
+ * Ta sama odmiana, którą assets/units.js robi dla wyniku kalkulatora, i z tego samego
+ * powodu: „1 kont" to zdanie, którego nikt po polsku nie napisał. Reguła jest ostatniej
+ * cyfry, z wyjątkiem nastek — 22 konta, ale 12 kont.
+ */
+export function accountsText(n) {
+  const last = n % 10;
+  const teens = n % 100 >= 12 && n % 100 <= 14;
+  if (n === 1) return `${n} konto`;
+  if (last >= 2 && last <= 4 && !teens) return `${n} konta`;
+  return `${n} kont`;
+}
+
 /** Data jako „2027-08-21" albo kreska. Do wydruku w terminalu, nie dla odwiedzającego. */
 export function dayText(millis) {
   if (!millis) return "—";
@@ -343,7 +358,7 @@ async function main(argv) {
       const plan = planFromDoc(await readProfile(token, projectId, acc.uid));
       console.log(`${acc.email.padEnd(width)}  ${acc.uid.padEnd(28)}  ${planText(plan)}`);
     }
-    console.log(`\n${accounts.length} kont w projekcie ${projectId}.`);
+    console.log(`\n${accountsText(accounts.length)} w projekcie ${projectId}.`);
     return 0;
   }
 

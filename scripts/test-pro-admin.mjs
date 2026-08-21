@@ -32,7 +32,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   MAX_MONTHS, PLAN_FIELDS, PLAN_FREE, PLAN_PRO, SCOPES,
-  dayText, docUrl, jwtAssertion, keyProblem, looksLikeEmail, monthsFromNow,
+  accountsText, dayText, docUrl, jwtAssertion, keyProblem, looksLikeEmail, monthsFromNow,
   patchUrl, planFields, planFromDoc, planText, siteProjectId,
 } from "./pro-admin.mjs";
 
@@ -186,6 +186,12 @@ head("5. reading a plan out of a Firestore document");
   eq("a free plan is one word",
     planText({ plan: PLAN_FREE, validUntil: null, renews: false }, now), "free");
   eq("no date at all", dayText(null), "—");
+
+  /* "1 kont" is not a sentence anybody writes in Polish. Same rule as unitLabel() in
+     assets/units.js, and the same defect session 16 fixed on the projects screen. */
+  const counts = { 0: "0 kont", 1: "1 konto", 2: "2 konta", 4: "4 konta", 5: "5 kont",
+    12: "12 kont", 14: "14 kont", 22: "22 konta", 25: "25 kont", 111: "111 kont" };
+  for (const [n, want] of Object.entries(counts)) eq(`${n} accounts`, accountsText(Number(n)), want);
 }
 
 /* ================================================================== 6. the assertion */

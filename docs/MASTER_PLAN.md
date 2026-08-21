@@ -350,6 +350,59 @@ Zmienione:
 - Bez zmian: nic nie **sprzedaje** Pro. `assets/pay.js` nadal nie ma Payment Linków, a
   `lmPayBuyable()` jest `false` — to jest Sesja 39.
 
+**SPRAWDZONE NA ŻYWYM BACKENDZIE — 2026-08-21, przez właściciela**
+
+Raport wyżej mówił, że narzędzia nie uruchomiono na niczym żywym. Zostało uruchomione
+tego samego dnia i to jest wynik.
+
+- **Nasłuch planu działa.** Plan wpisany ręcznie w konsoli Firestore, przy **otwartej**
+  karcie `/app/`: plakietka zmieniła się na LICZMAT PRO bez przeładowania, `/klienci/`
+  się otworzyło, a po skasowaniu pola `plan` ściana wróciła sama. To jest krok 5 z noty
+  ORDER w `assets/pay.js` i warunek, bez którego płatność Stripe'em nie miałaby jak
+  zapalić Pro.
+- **Narzędzie działa w obie strony.** `status`, `list`, `revoke` i `grant 12` na koncie
+  właściciela, przez klucz konta serwisowego z jego komputera.
+- **Maska potwierdzona na prawdziwym dokumencie.** Po `revoke` i `grant`:
+  `createdAt: 1786678497261` i `lastSeenAt` **nietknięte**, `plan`/`planValidUntil`/
+  `planRenews` przestawione. Bez `updateMask` ten sam `PATCH` skasowałby datę założenia
+  konta — to była jedyna rzecz w tym narzędziu, która mogła zniszczyć coś nieodwracalnie.
+
+**Dwa błędy, które to wykryło, oba naprawione tego samego dnia:**
+
+1. **Na Windowsie polecenie nie robiło nic i nie mówiło nic.** Straż uruchomieniowa
+   porównywała `import.meta.url` ze sklejonym `"file://" + process.argv[1]`. Na Linuksie
+   to prawda, na Windowsie `argv[1]` to `C:\Users\...`, a `import.meta.url` —
+   `file:///C:/Users/...`, więc `main()` nie startowało, a proces kończył się z kodem 0
+   bez jednego znaku na ekranie. Teraz adres buduje `pathToFileURL()`, a
+   `test-pro-admin.mjs` §9 oblewa się o sklejoną postać.
+2. **„1 kont w projekcie".** `accountsText()` odmienia liczebnik trzema formami, tak samo
+   jak `unitLabel()` w `assets/units.js` — ten sam defekt, który Sesja 16 naprawiła na
+   ekranie projektów.
+
+**Posprzątane w konsolach przy okazji** (właściciel, ten sam dzień):
+
+- `liczmat.com` i `www.liczmat.com` dopisane do **Firebase Auth → Authorized domains**
+  (siedem wpisów, pięć starych nietkniętych). Odczytane z zewnątrz przez
+  `identitytoolkit/v1/projects` i potwierdzone.
+- **Cztery sieroty w `users`** skasowane — `anNltl…` z raportu Sesji 35 plus trzy, które
+  wyszły dopiero teraz, gdy `list` pokazał, że w Auth są dwa konta, a dokumentów jest
+  cztery. Jedna z nich (`0S8zS8…`) niosła podkolekcje `projects` i `rooms` po koncie,
+  którego już nie ma. Uid skasowanego konta Firebase nigdy nie wraca, więc nikt by ich
+  nie odczytał.
+- **Konto testowe `probe-1786600678@example.com`** skasowane z Firebase Auth. Zostało po
+  sprawdzaniu reguł w sierpniu.
+- **Nazwa projektu Firebase i „Public-facing name"**: obie już `LiczMat`, więc mail resetu
+  hasła nie mówi już o wycofanej marce. **App name** na ekranie zgody Google: `LiczMat`.
+  Do tego domena `liczmat.com` i linki do strony i polityki prywatności na tym samym
+  ekranie — wcześniej stała tam tylko martwa `materio-app.com`.
+
+**Zostało do zrobienia poza repo:** rotacja dwóch starych kluczy konta serwisowego. Wymaga
+uwagi, bo jeden z nich (`pracownik@`) służy do wysyłki aplikacji na Google Play —
+najpierw nowy klucz i podmiana tam, dopiero potem kasowanie starego.
+
+**Nieaktualne od dziś, do poprawienia w Sesji 48:** `CLAUDE.md` i raport Sesji 36 nadal
+piszą, że `liczmat.com` nie ma na liście autoryzowanych domen. Ma.
+
 **STATUS**
 
 Sesja 37 zamknięta.
