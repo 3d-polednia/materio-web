@@ -342,21 +342,23 @@ async function onSignedIn(user) {
   try {
     const snap = await fb.getDoc(profile);
     if (snap.exists()) {
-      state.profile = snap.data();
+      applyProfile(snap.data());
       await fb.updateDoc(profile, { lastSeenAt: now, appVersion: "web" });
     } else {
-      state.profile = { createdAt: now, lastSeenAt: now, appVersion: "web" };
+      applyProfile({ createdAt: now, lastSeenAt: now, appVersion: "web" });
       await fb.setDoc(profile, state.profile);
     }
   } catch (e) {
     // A profile write failing must never block the workspace. Without the document the
     // level falls back to LICZMAT, which is what a signed-in account without a plan is.
+    applyProfile(state.profile);
   }
 
-  // The level is chapter II's, derived from the profile the server owns — see
-  // lmLevelOf() in assets/account.js. Writing it is what tells the other 129 pages.
-  state.level = lmLevelOf(user, state.profile);
-  lmWriteLevel(state.level);
+  // And keep watching it. `plan` is written by the server — a subscription, or the
+  // owner's scripts/pro-admin.mjs — so the moment it changes is a moment this page has
+  // no other way of hearing about. Reading it once at sign-in meant somebody who had
+  // just paid stayed on the free plan until they signed out and back in.
+  listenProfile();
 
   renderIdentity();
   renderProfile();
@@ -382,6 +384,53 @@ function onSignedOut() {
 }
 
 /* ------------------------------------------------------------------ profile */
+
+/**
+ * Take a profile document as the truth: keep it, re-derive the level, redraw what says it.
+ *
+ * The level is chapter II's, derived from the profile the server owns — see lmLevelOf()
+ * in assets/account.js — and `lmWriteLevel()` is what tells the other 372 pages, which
+ * load no Firebase and read the hint instead.
+ *
+ * This runs on every snapshot of users/{uid} rather than once at sign-in, so a plan
+ * granted while the page is open lands on the screen by itself. That is what makes step 5
+ * of the ORDER note in assets/pay.js ("pay once and check the account turns Pro by
+ * itself") a thing anybody can check.
+ */
+function applyProfile(data) {
+  state.profile = data || null;
+  const level = lmLevelOf(state.user, state.profile);
+  const moved = level !== state.level;
+  state.level = level;
+  lmWriteLevel(level);
+  // The identity bar names the level, so it is redrawn only when the level actually
+  // moved; the two panels below read the plan's dates, which can change without it.
+  if (moved) renderIdentity();
+  renderProfile();
+  renderPlan();
+}
+
+/**
+ * Watch users/{uid} for the rest of the session.
+ *
+ * The rules already let an account read its own profile, so this needs no rules change,
+ * no contract change and nothing in the app repo. It writes nothing: `plan`,
+ * `planValidUntil` and `planRenews` are server-only, and a browser that could write them
+ * would be a browser that could grant itself Pro.
+ */
+function listenProfile() {
+  const unsub = fb.onSnapshot(
+    fb.doc(db, "users", state.uid),
+    (snap) => { if (snap.exists()) applyProfile(snap.data()); },
+    (err) => {
+      // Same straggler as listen(): signing out revokes the read mid-flight, and that is
+      // not something to put on the screen.
+      if (!state.uid || (err && err.code === "permission-denied")) return;
+      status(T("app_err_unknown"), true);
+    },
+  );
+  state.unsub.push(unsub);
+}
 
 /** The name to greet somebody by: what they chose, else the address they signed in with. */
 const displayName = (user) => (user && (user.displayName || user.email)) || "";
@@ -1217,10 +1266,12 @@ function wireAccountPanel() {
       // that cannot work. Say what happened and that their data is still there.
       status(code === "permission-denied" ? T("app_err_delete_denied") : authMessage(code), true);
       // The listeners were dropped a moment ago; a refused deletion means the account is
-      // still there and still wants its lists.
+      // still there and still wants its lists — and its plan, which is the one of the
+      // three that nothing else would ever re-attach.
       if (state.uid) {
         listen("projects", (rows) => { state.projects = rows; renderProjects(); });
         listen("rooms", (rows) => { state.rooms = rows; renderRooms(); renderProjects(); });
+        listenProfile();
       }
     } finally {
       button.disabled = false;

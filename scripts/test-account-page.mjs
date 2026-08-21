@@ -633,6 +633,65 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
   await ctx.close();
 }
 
+/* --- 9c. the plan changing under an open page ---------------------------------------- */
+
+/**
+ * Session 37: `plan` is written by the server — scripts/pro-admin.mjs, or the Stripe
+ * webhook that comes next — and until this session /app/ read the profile exactly once,
+ * at sign-in. Somebody who had just paid stayed on the free plan until they signed out
+ * and back in, and step 5 of the ORDER note in assets/pay.js ("pay once and check the
+ * account turns Pro by itself") could not be carried out at all.
+ *
+ * `window.__fbPushDoc` in scripts/fake-firebase.mjs plays the server: it writes the
+ * profile document the way the admin script does and lets the live listener deliver it.
+ * Nothing here reloads the page, and nothing signs in twice.
+ */
+head("9c. a plan granted while the page is open lands on the screen");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openApp(ctx, "/app/", {
+    accounts: ACCOUNT,
+    docs: { "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web" } },
+  });
+  await page.fill("#signin-email", "kto@example.com");
+  await page.fill("#signin-password", "sekret123");
+  await page.click("#signin-form button[type=submit]");
+  await signedIn(page);
+  await page.click('[data-tab="pro"]');
+  eq("it starts as a free account", await page.locator("#app-level").innerText(), "LiczMat");
+  eq("and the rest of the site is told so",
+    await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), "liczmat");
+
+  const until = Date.now() + 365 * 24 * 3600e3;
+  await page.evaluate((ms) => window.__fbPushDoc("users/u1",
+    { plan: "premium", planValidUntil: ms, planRenews: false }), until);
+  await page.waitForFunction(() => document.getElementById("app-level").textContent === "LiczMat Pro",
+    null, { timeout: 5000 });
+  eq("the level moves without a reload", await page.locator("#app-level").innerText(), "LiczMat Pro");
+  eq("the hint the other 372 pages read moves with it",
+    await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), "pro");
+  eq("the open Pro tab redraws itself",
+    await page.locator("#plan-name").innerText(), "LiczMat Pro");
+  /* A plan nobody is renewing is worded "Pro do <data>" rather than "Odnawia się" — the
+     copy session 28 wrote for a cancelled subscription is the true sentence for a plan
+     granted by hand, so this needed no new words. */
+  check("and says how long it lasts, without promising a renewal",
+    (await page.locator("#plan-until").innerText()).startsWith("Pro do"),
+    await page.locator("#plan-until").innerText());
+
+  await page.evaluate(() => window.__fbPushDoc("users/u1",
+    { plan: "free", planValidUntil: null, planRenews: null }));
+  await page.waitForFunction(() => document.getElementById("app-level").textContent === "LiczMat",
+    null, { timeout: 5000 });
+  eq("taking it away puts the level back",
+    await page.locator("#app-level").innerText(), "LiczMat");
+  eq("and the hint with it",
+    await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), "liczmat");
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
 /* --- 10. the tabs, the language switch, the phone ------------------------------------ */
 
 head("10. five tabs, reachable from the keyboard");
@@ -827,10 +886,10 @@ head("12c. deleting the account, against the rules as deployed today");
 
   // The listeners are dropped before the deletion starts. A refused deletion has to put
   // them back, or the visitor is left looking at a workspace that no longer updates.
-  // (The fake Firestore does not push changes, so this counts subscriptions rather than
-  // watching a row appear.)
-  eq("and both collection listeners were re-subscribed",
-    await page.evaluate(() => window.__fbListeners.length), 4);
+  // Three of them since session 37 — projects, rooms and the profile, which is the one
+  // nothing else would ever re-attach — so six subscriptions over the two rounds.
+  eq("and all three listeners were re-subscribed",
+    await page.evaluate(() => window.__fbListeners.length), 6);
   check("the projects are still on the page",
     (await page.locator("#project-list").innerText()).includes("Łazienka"));
   eq("no console error", page.lmErrors.join(" / "), "");

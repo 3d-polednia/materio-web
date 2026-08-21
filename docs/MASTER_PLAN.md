@@ -64,6 +64,36 @@ ZMIENIONE PLIKI, TESTY, PROBLEMY, STATUS, NASTĘPNE ZADANIE (sama nazwa, bez wyk
 | 35 | Security | **Zrobione** — 2026-08-20 |
 | 36 | Finalny QA | **Zrobione** — 2026-08-20 |
 
+## Plan naprawczy i sprzedażowy — sesje 37–48
+
+Master Plan skończył się na Sesji 36 i `MASTER_PLAN.txt` nie ma Sesji 37. To jest lista
+**po** planie: rzeczy zgłoszone przez właściciela, pozycje, które poprzednie sesje odłożyły
+„poza zakres", i defekty zmierzone w przeglądzie 2026-08-21. Kolejność jest sprzedażowa —
+najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
+
+`MASTER_PLAN.txt` zostaje nietknięty: należy do właściciela i żadna sesja go nie przepisuje.
+
+| Sesja | Zakres | Status |
+|---|---|---|
+| 37 | Pro nadawane po e-mailu + `/app/` widzi plan na żywo | **Zrobione** — 2026-08-21 |
+| 38 | Stripe: webhook nadający plan (`functions/`) | Do zrobienia |
+| 39 | Stripe: sprzedaż włączona | Do zrobienia |
+| 40 | „LiczMat Pro" w nagłówku (Poradniki → stopka) | Do zrobienia |
+| 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | Do zrobienia |
+| 42 | `/app/`: fałszywe „Brak sieci" | Do zrobienia |
+| 43 | Kalkulator na prawdziwym telefonie | Do zrobienia |
+| 44 | Stop slop: zasady, test, pl/uk/de/en | Do zrobienia |
+| 45 | Stop slop: cs/sk/ro/hr/sr/ru | Do zrobienia |
+| 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | Do zrobienia |
+| 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | Do zrobienia |
+| 48 | Prawda w dokumentacji i lista rzeczy w konsolach | Do zrobienia |
+
+Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
+(bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
+dotyczy **strony pojedynczego kalkulatora**, „stop slop" znaczy skrócić **plus test, który
+pilnuje**, w nagłówku ustępują **Poradniki**, Stripe idzie przez **Blaze + własną funkcję,
+którą wdraża właściciel**, a konta Stripe **jeszcze nie ma**.
+
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
 Zlecenie właściciela w całości: [`SESJA_REBRANDING_ANDROID_I_APLIKACJA.txt`](SESJA_REBRANDING_ANDROID_I_APLIKACJA.txt).
@@ -217,6 +247,119 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 37 (plan naprawczy)
+
+Zadanie: **nadawanie i odbieranie LiczMat Pro po adresie e-mail, i strona, która to widzi
+bez ponownego logowania.**
+
+**WYKONANO**
+
+**1. `scripts/pro-admin.mjs` — pierwsza rzecz w tym repozytorium, która potrafi nadać
+plan.** `users/{uid}.plan` jest polem serwerowym: wdrożone reguły pozwalają przeglądarce
+zapisać w profilu wyłącznie `lastSeenAt` i `appVersion`, więc poziom PRO był policzalny,
+przetestowany i **nieosiągalny dla kogokolwiek, łącznie z właścicielem**.
+
+Właściciel prosił o klikanie w konsoli Firestore — „wchodzę, klikam e-mail, wybieram, czy
+ma Pro". Konsola tego nie umie i nie z lenistwa: **dokument profilu nie niesie adresu
+e-mail** (ma `createdAt`, `lastSeenAt`, `appVersion`), więc w konsoli widać listę
+identyfikatorów i nie wiadomo, czyj jest który. Adres mieszka po drugiej stronie, w Firebase
+Auth. Narzędzie łączy jedno z drugim i robi dokładnie to, o co chodziło:
+
+    node scripts/pro-admin.mjs list                          # e-mail · uid · plan · do kiedy
+    node scripts/pro-admin.mjs status polednia@gmail.com
+    node scripts/pro-admin.mjs grant  polednia@gmail.com 12
+    node scripts/pro-admin.mjs revoke polednia@gmail.com
+
+Bez zależności — JWT RS256 podpisany `node:crypto`, wymieniony na token, potem Identity
+Toolkit (konto po adresie) i Firestore REST (dokument). Klucz konta serwisowego czytany ze
+ścieżki w `LM_SA_KEY`, nigdy z repozytorium.
+
+**Zapis idzie przez `PATCH` z `updateMask.fieldPaths` wyliczającą trzy pola planu i tylko
+je.** Bez maski to samo wywołanie **kasuje `createdAt` i `lastSeenAt`** — datę założenia
+konta, której już nikt nie odtworzy. `revoke` opiera się na drugiej połowie tej samej
+reguły: pole nazwane w masce i **nieobecne** w ciele żądania Firestore usuwa, więc konto
+zostaje z samym `plan: "free"` i bez resztek po planie.
+
+`planRenews` jest przy nadaniu ręcznym `false`, bo nic tego planu nie odnowi. Skrypt
+odmawia też pracy, gdy klucz należy do innego projektu niż ten, z którym rozmawia strona
+(`projectId` w `assets/firebase-config.js`) — pomyłka projektu to nadanie Pro w cudzej bazie,
+operacja, która przechodzi bez błędu.
+
+**2. `/app/` przestało czytać profil raz.** Do tej sesji poziom brał się z jednego `getDoc`
+przy logowaniu, więc konto, któremu właśnie nadano plan, zostawało darmowe **do wylogowania
+i zalogowania z powrotem**. To samo dotyczyłoby płatności: krok 5 z noty ORDER w
+`assets/pay.js` — „zapłać raz i sprawdź, czy konto samo staje się Pro" — nie był
+wykonalny. Teraz `listenProfile()` trzyma `onSnapshot` na `users/{uid}`, a `applyProfile()`
+jest jednym miejscem, które z dokumentu wyprowadza poziom: `lmLevelOf()`, `lmWriteLevel()`
+dla pozostałych 372 stron, pasek tożsamości (tylko gdy poziom naprawdę się ruszył), zakładka
+Profil i karta planu. Reguły już pozwalają czytać własny profil, więc **nie było zmiany
+reguł, kontraktu ani niczego w repo aplikacji**. Nasłuch tylko czyta.
+
+Przy okazji znalezione i naprawione: odrzucone usunięcie konta przywracało dwa nasłuchy
+kolekcji, więc trzeci — ten na profilu — zostałby martwy do końca wizyty.
+
+**Czego świadomie NIE dopisano: zdania „plan nadany ręcznie".** Strona nie ma jak sprawdzić,
+kto nadał plan, a `lmSubscription()` już dziś opisuje plan, który się nie odnawia, słowami
+„Pro do <data>" (stan `cancelled`, copy z Sesji 28). To jest zdanie prawdziwe dla planu
+nadanego ręcznie i dla anulowanej subskrypcji naraz, więc nowych słów w dziesięciu językach
+nie potrzeba.
+
+**ZMIENIONE PLIKI**
+
+Dodane:
+- `scripts/pro-admin.mjs` — narzędzie.
+- `scripts/test-pro-admin.mjs` — 99 sprawdzeń bez zależności.
+
+Zmienione:
+- `assets/app.js` — `applyProfile()`, `listenProfile()`, nasłuch zamiast jednorazowego
+  odczytu, trzeci nasłuch przywracany po odrzuconym usunięciu konta.
+- `scripts/fake-firebase.mjs` — nasłuchy na pojedynczym dokumencie i `window.__fbPushDoc()`,
+  którym test gra serwer nadający plan.
+- `scripts/test-account-page.mjs` — sekcja **9c**: plan nadany przy otwartej karcie i
+  zabrany z powrotem, bez przeładowania; liczba nasłuchów po odrzuconym usunięciu konta
+  z czterech na sześć.
+- `scripts/test-security.mjs` §8 — kotwice po zmianie w `app.js` plus nowe sprawdzenie, że
+  nasłuch profilu **tylko czyta**.
+- `CLAUDE.md` — oba skrypty w spisie i w liście poleceń; poprawione trzy punkty, które
+  mówiły, że planu nie nadaje nic i że nie ma sposobu, żeby zobaczyć moduł Pro.
+- `docs/MASTER_PLAN.md` — tabela planu naprawczego i ten wpis.
+- `STAMP` → `20260821a`, 373 strony przebudowane, `?v=` w `404.html`
+  i `privacy-policy.html` podbity ręcznie.
+
+**TESTY**
+
+- Nowy `scripts/test-pro-admin.mjs`: **99/99**.
+- `scripts/test-account-page.mjs` w Chromium: **213/213** (było 204).
+- `scripts/test-qa.mjs`: **675/675** — atrapa Firebase jest wspólna, więc zmiana w niej
+  musiała przejść oba testy.
+- `scripts/test-security.mjs`: **9023/9023**.
+- Reszta zestawów bez zależności bez zmian: account 148, plan 1114, pay 369, seo 36869,
+  perf 13157, dashboard 306, projects 878, save 1280, materials 383, costs 225, rooms 411.
+- `node scripts/build.mjs --check`: 1157 kluczy × 10 języków.
+
+**PROBLEMY**
+
+- **Narzędzie nie zostało uruchomione na żywej bazie.** Nie ma tu klucza konta serwisowego
+  i nie powinno być: dwa istniejące klucze czekają na rotację (patrz otwarte decyzje).
+  Kształt żądań jest sprawdzony testem, ale pierwsze prawdziwe `grant` robi właściciel —
+  i to jest zarazem sprawdzenie, czy `/app/` samo zapala Pro.
+- Kolejność dla właściciela: nowy klucz w Cloud Console → `LM_SA_KEY=… node
+  scripts/pro-admin.mjs status <swój e-mail>` → `grant` → otwarte `/app/` ma zmienić poziom
+  bez przeładowania → `/klienci/` ma się otworzyć → `revoke` → ściana wraca.
+- Bez zmian: nic nie **sprzedaje** Pro. `assets/pay.js` nadal nie ma Payment Linków, a
+  `lmPayBuyable()` jest `false` — to jest Sesja 39.
+
+**STATUS**
+
+Sesja 37 zamknięta.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 38 — Stripe: webhook nadający plan.** Katalog `functions/` poza buildem strony,
+jedna funkcja HTTP z weryfikacją podpisu Stripe'a, mapowanie subskrypcji na trzy pola
+kontraktu, `functions/` dopisane do `rm -rf` w `.github/workflows/pages.yml`. Wdraża
+właściciel, plan Blaze.
 
 ### Co zrobiła Sesja 36
 

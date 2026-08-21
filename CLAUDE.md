@@ -98,6 +98,7 @@ node scripts/test-costs.mjs       # costs: the unit price, the currency rule, th
 node scripts/test-rooms.mjs       # rooms: the document, the project link, the assignment
 node scripts/test-plan.mjs        # the Free/Pro model: permissions, gating, plan status
 node scripts/test-pay.mjs         # the subscription: prices, the checkout URL, the Stripe hosts
+node scripts/test-pro-admin.mjs   # granting Pro by hand: the three fields, the mask, the key
 node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadline, the links
 node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
 node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
@@ -455,10 +456,31 @@ scripts/test-qa.mjs   The final QA walk (session 36, chapter XXXVI): the whole p
                       a currency is not a language). Only /app/ is stubbed, with
                       scripts/fake-firebase.mjs, because the container cannot reach gstatic.
                       Needs the same outside-the-repo Playwright as test-pages.mjs
+scripts/pro-admin.mjs  Granting and taking away LiczMat Pro, by e-mail (session 37 of the
+                      repair plan). `plan` is server-only, so nothing in a browser can
+                      write it and nothing did: this is the first thing that can. Reads a
+                      service-account key from LM_SA_KEY (never from the repo), finds the
+                      account in Firebase Auth by its address — the profile document has
+                      no e-mail on it, which is why the Firestore console alone cannot do
+                      this — and writes `plan`, `planValidUntil` and `planRenews` through
+                      a PATCH whose updateMask names those three and nothing else. Without
+                      the mask the same call erases createdAt and lastSeenAt.
+                      Dependency-free. `list`, `status`, `grant <e-mail> [months]`, `revoke`
+scripts/test-pro-admin.mjs  The same tool, checked without a key: the contract (the two
+                      plan words and the three fields, against assets/account.js and
+                      assets/plan.js), the typed Firestore values, the mask, the revoke
+                      that deletes two fields by omitting them, the month arithmetic and
+                      what it refuses, the JWT — shape, hour of life and a signature
+                      verified against its public key — a key from another project, and
+                      what the script may never do: write in the repo, or send a PATCH
+                      anywhere but the masked address
 scripts/fake-firebase.mjs  Firebase, as much of it as /app/ actually touches: the three
                       modules assets/app.js imports, served in Chromium instead of the CDN.
                       Shared by test-account-page.mjs and test-qa.mjs — two copies of a
-                      stub that has to match a real SDK is two copies free to disagree
+                      stub that has to match a real SDK is two copies free to disagree.
+                      Since session 37 it also has listeners on a single document and
+                      window.__fbPushDoc(path, data), which is how a test plays the server
+                      granting a plan under an open page
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -744,10 +766,14 @@ Kotlin side of it. Change one, change all three.
   is a console setting (Firebase → Project settings → General → Project name), not a repo
   one. Separately, the Google security mail ("you signed in to …") takes its name from the
   OAuth consent screen's App name, a Google Cloud console setting. Both still say Materio.
-- **Nothing grants a plan, and no page may pretend otherwise.** `users/{uid}.plan` is
-  `"free"` or `"premium"` (the contract's word, older than the rebranding — do not rename
-  it), it is server-only, and nothing writes it: no Cloud Functions, no Play Billing
-  (FIRESTORE_SYNC §9.2). So the Pro tab on `/app/` describes the five modules in full,
+- **A plan is granted by the owner, by hand, and by nothing else yet.** `users/{uid}.plan`
+  is `"free"` or `"premium"` (the contract's word, older than the rebranding — do not
+  rename it) and it is server-only: no Cloud Functions, no Play Billing
+  (FIRESTORE_SYNC §9.2), and the deployed rules let a browser write nothing in the profile
+  but `lastSeenAt` and `appVersion`. What changed in session 37 of the repair plan is that
+  `scripts/pro-admin.mjs` can write it with a service-account key —
+  `grant <e-mail> [months]` and `revoke <e-mail>` — so LICZMAT PRO is reachable for the
+  first time. It is still not *buyable*: nothing takes money and nothing renews a plan. So the Pro tab on `/app/` describes the five modules in full,
   marks each "Dostępne w LiczMat Pro", and says out loud that nothing grants Pro yet —
   chapter XXV asks for a free user who understands what is Pro. `lmPlanStatus()` keeps the
   half `lmLevelOf()` throws away: a `premium` plan whose `planValidUntil` has passed is
@@ -763,9 +789,11 @@ Kotlin side of it. Change one, change all three.
   `users/{uid}.plan == "premium"` (still valid) → `pro`. `plan` and `planValidUntil` are
   **server-only** — the deployed rules let a client write nothing in the profile but
   `lastSeenAt` and `appVersion` — so a browser can read the level and can never grant
-  itself one. Nothing writes `plan` today (no Cloud Functions, no Play Billing:
-  FIRESTORE_SYNC §9.2), so every real account is `liczmat` and the Pro card says
-  "W przygotowaniu" with nothing to click. **Do not add a field to `users/{uid}`** — a
+  itself one. It is read live: `/app/` puts an `onSnapshot` on `users/{uid}`
+  (`listenProfile()`), so a plan granted while the page is open moves the level, the hint
+  in `liczmat-signed-in` and the Pro tab without a reload — reading it once at sign-in
+  meant somebody who had just been granted Pro stayed free until they signed out and back
+  in. **Do not add a field to `users/{uid}`** — a
   name, a currency, a preference — the rules reject it; a profile name goes to Firebase
   Auth (`updateProfile`) instead.
 - **The Free/Pro model is a table, and it records what ships.** `LM_FEATURES` in
@@ -914,11 +942,13 @@ Kotlin side of it. Change one, change all three.
   decision, taken with the consequence stated). The reason is that a price now stands on the
   wall: a local switch that opens the modules for free is the wall contradicting itself, and
   a second answer to "may I use this" when `lmLevelOf()` exists to give exactly one. So
-  until the Stripe extension actually writes `plan: premium` there is **no way for anybody
-  to see a Pro module**, and that is a known, deliberate state rather than a defect to
-  "fix" — do not reintroduce a local override. `scripts/test-plan.mjs` §6c plants four
-  hopeful keys and checks that not one answer moves; `scripts/test-pay.mjs` §6 checks
-  `assets/pay.js` never reads storage at all.
+  the only way through the wall is a `plan` written by the server: since session 37 of the
+  repair plan that is `scripts/pro-admin.mjs`, run by the owner, and later it will be the
+  Stripe webhook. There is still **no way for a browser to open a Pro module by itself**,
+  and that is a known, deliberate state rather than a defect to "fix" — do not reintroduce
+  a local override. `scripts/test-plan.mjs` §6c plants four hopeful keys and checks that
+  not one answer moves; `scripts/test-pay.mjs` §6 checks `assets/pay.js` never reads
+  storage at all.
 - **`assets/pay.js` is the subscription, and it ships priced but not buyable.** Two plans
   (monthly, yearly), seven currencies, fourteen amounts — all typed in by hand, and the same
   fourteen have to be set on the products in Stripe. **Two thresholds, not one**:

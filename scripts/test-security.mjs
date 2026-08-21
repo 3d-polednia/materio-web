@@ -431,11 +431,20 @@ head("8. API: the fields a browser may not write");
 {
   const app = read("assets/app.js");
   const profile = app.slice(app.indexOf('const profile = fb.doc(db, "users", user.uid)'),
-    app.indexOf("state.level = lmLevelOf"));
+    app.indexOf("listenProfile();"));
   check("the profile update writes lastSeenAt and appVersion, and nothing else",
     /updateDoc\(profile, \{ lastSeenAt: now, appVersion: "web" \}\)/.test(profile));
   check("the first-sign-in document is those two and a createdAt",
-    /state\.profile = \{ createdAt: now, lastSeenAt: now, appVersion: "web" \}/.test(profile));
+    /applyProfile\(\{ createdAt: now, lastSeenAt: now, appVersion: "web" \}\)/.test(profile)
+    && /setDoc\(profile, state\.profile\)/.test(profile));
+
+  /* Session 37 put a live listener on users/{uid} so a plan granted by the server lands
+     without a reload. It is a read and has to stay one: a browser that could write these
+     three fields would be a browser that could grant itself Pro. */
+  const watcher = app.slice(app.indexOf("function listenProfile()"),
+    app.indexOf("/** The name to greet somebody by"));
+  check("the profile listener only reads", /fb\.onSnapshot\(/.test(watcher)
+    && !/setDoc|updateDoc|deleteDoc/.test(watcher));
   const code = app.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
   for (const field of ["plan", "planValidUntil", "planRenews"]) {
     check(`nothing in /app/ writes ${field}`, !new RegExp(`\\b${field}\\s*:`).test(code));

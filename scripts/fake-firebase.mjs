@@ -137,6 +137,26 @@ export function signInWithPopup() {
 export const FAKE_STORE = `
 const DOCS = (window.__fbDocs = window.__fbDocs || new Map());
 const key = (parts) => parts.join("/");
+
+/* Live listeners on a single document, by path. The real SDK has them and /app/ now uses
+   one on users/{uid}, because \`plan\` is written by the server and the page has no other
+   way of hearing about it. window.__fbPushDoc() is how a test plays that server: it
+   writes the document the way scripts/pro-admin.mjs or the Stripe webhook would, and the
+   page has to notice without being reloaded. */
+const DOC_SUBS = (window.__fbDocSubs = window.__fbDocSubs || new Map());
+const docSnap = (path) => {
+  const data = DOCS.get(path);
+  return { exists: () => data !== undefined, data: () => data, metadata: { fromCache: false } };
+};
+function notifyDoc(path) {
+  const subs = DOC_SUBS.get(path);
+  if (subs) subs.forEach((fn) => fn(docSnap(path)));
+}
+window.__fbPushDoc = (path, data) => {
+  if (data === null) DOCS.delete(path);
+  else DOCS.set(path, { ...(DOCS.get(path) || {}), ...data });
+  notifyDoc(path);
+};
 export function getFirestore() { return { DOCS }; }
 export function enableIndexedDbPersistence() { return Promise.resolve(); }
 export function doc(db, ...parts) { return { path: key(parts), kind: "doc" }; }
@@ -148,9 +168,14 @@ export function getDoc(ref) {
   const data = DOCS.get(ref.path);
   return Promise.resolve({ exists: () => data !== undefined, data: () => data });
 }
-export function setDoc(ref, data) { DOCS.set(ref.path, { ...data }); return Promise.resolve(); }
+export function setDoc(ref, data) {
+  DOCS.set(ref.path, { ...data });
+  notifyDoc(ref.path);
+  return Promise.resolve();
+}
 export function updateDoc(ref, data) {
   DOCS.set(ref.path, { ...(DOCS.get(ref.path) || {}), ...data });
+  notifyDoc(ref.path);
   return Promise.resolve();
 }
 export function deleteDoc(ref) {
@@ -177,6 +202,16 @@ export function onSnapshot(ref, onNext, onError) {
   // Firestore pushes a permission-denied error into every live listener when the user
   // signs out or is deleted. window.__fbListeners lets the test fire that.
   (window.__fbListeners = window.__fbListeners || []).push(onError);
+
+  // A listener on one document, which is what /app/ puts on users/{uid}.
+  if (ref.kind === "doc") {
+    const subs = DOC_SUBS.get(ref.path) || new Set();
+    subs.add(onNext);
+    DOC_SUBS.set(ref.path, subs);
+    onNext(docSnap(ref.path));
+    return () => subs.delete(onNext);
+  }
+
   const rows = [];
   DOCS.forEach((value, path) => {
     const at = path.lastIndexOf("/");
