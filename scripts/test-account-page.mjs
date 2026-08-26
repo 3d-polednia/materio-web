@@ -147,6 +147,8 @@ async function context(options) {
  * @param {object} [opts.accounts] e-mail → { password, user }, planted before load
  * @param {object} [opts.docs]     Firestore path → document, planted before load
  * @param {object} [opts.storage]  localStorage entries to plant
+ * @param {boolean} [opts.fromCache] the first collection snapshot comes out of the local
+ *                                   cache, which is what a returning visitor meets
  * @param {string} [opts.lang]     the saved language choice; "pl" on /app/ by default
  */
 async function openApp(ctx, url, opts = {}) {
@@ -158,11 +160,14 @@ async function openApp(ctx, url, opts = {}) {
     if (m.type() === "error" && !/Failed to load resource|ERR_FAILED|net::/i.test(m.text())) errors.push(m.text());
   });
   page.on("pageerror", (e) => errors.push(String(e)));
-  await page.addInitScript(([accounts, docs, storage]) => {
+  await page.addInitScript(([accounts, docs, storage, fromCache]) => {
     window.__fbAccounts = accounts;
     window.__fbSeed = docs;
+    // The stub's answer to "did this snapshot come from the server". Off by default,
+    // because most of this file is about a browser that has never been here before.
+    window.__fbFromCache = fromCache;
     Object.entries(storage).forEach(([k, v]) => localStorage.setItem(k, v));
-  }, [opts.accounts || {}, opts.docs || {}, opts.storage || {}]);
+  }, [opts.accounts || {}, opts.docs || {}, opts.storage || {}, Boolean(opts.fromCache)]);
   await page.goto(base + url, { waitUntil: "domcontentloaded" });
   // /app/ boots asynchronously — it imports the SDK, then wires the forms — and sets
   // data-app-ready when it is done. Clicking before that clicks a button nothing is
@@ -1185,6 +1190,182 @@ head("17. whose copy is in this browser, and how to empty it (session 35)");
     await guestWork.locator("#app-sync-foreign").isHidden(), true);
   eq("and it can still be pushed", await guestWork.locator("#app-sync-push").isDisabled(), false);
   await guestWork.close();
+  await ctx.close();
+}
+
+/* --- 18. "Brak sieci", and when it is true (session 42) ------------------------------ */
+
+/**
+ * The notice that says the connection is gone, driven by the two things that can know.
+ *
+ * Until this session the page derived it from `snapshot.metadata.fromCache` and wrote it
+ * into the shared status line. Both halves were wrong, and the stub could not show it
+ * because it always claimed the server had answered. It now behaves the way the shipped
+ * SDK does — see the note above onSnapshot() in scripts/fake-firebase.mjs — so
+ * window.__fbSync(fromCache) is the connection going up and down under an open page, and
+ * a listener that did not ask for the metadata hears nothing at all.
+ */
+head("18. the offline notice: up when it is true, down when it is not");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openTab(ctx, "projects", {
+    docs: {
+      "users/u1/projects/p1": { name: "Łazienka", archived: false, updatedAt: 4, deletedAt: null },
+    },
+  });
+
+  eq("signed in, the notice is down", await page.locator("#app-offline").isHidden(), true);
+  eq("and the project is listed", await page.locator("#project-list .row-name").first().innerText(), "Łazienka");
+
+  // German is fetched now, while there is a connection: since session 33 /app/ ships one
+  // dictionary and goes and gets the others, and the switch below happens with the
+  // network cut. ensureLang() keeps what it has already loaded.
+  await page.click("#lang-toggle");
+  await pickLang(page, "de");
+  await page.click("#lang-toggle");
+  await pickLang(page, "pl");
+
+  // THE DEFECT. A returning visitor's first snapshot comes out of the local cache while
+  // the connection is perfectly good. Saying "Brak sieci" here was the false alarm — and
+  // because the server then answers with the same documents, the old code was never told
+  // anything again and the sentence stayed up for the rest of the session.
+  await page.evaluate(() => window.__fbSync(true));
+  await page.waitForTimeout(400);
+  eq("a snapshot out of the cache alone does not claim the network is gone",
+    await page.locator("#app-offline").isHidden(), true);
+
+  // And it does not redraw the list either: the caret stays where somebody is typing.
+  await page.fill('[data-room-form] [data-f="name"]', "Kuchnia");
+  await page.evaluate(() => window.__fbSync(true));
+  await page.waitForTimeout(200);
+  eq("a metadata-only snapshot does not wipe a field being typed in",
+    await page.inputValue('[data-room-form] [data-f="name"]'), "Kuchnia");
+
+  // A message somebody else put on the status line is not stamped on any more.
+  await page.click('[data-tab="profile"]');
+  await page.fill("#prof-name", "Jan");
+  await page.click("#name-form button[type=submit]");
+  await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
+  await ctx.setOffline(true);
+  await page.waitForSelector("#app-offline:not([hidden])", { timeout: 5000 });
+  eq("the browser saying it is offline puts the notice up at once",
+    await page.locator("#app-offline").isHidden(), false);
+  eq("and it says so", await page.locator("#app-offline").innerText(),
+    "Brak sieci — zmiany polecą po powrocie łącza.");
+  eq("without taking down the message that was already there",
+    await page.locator("#app-status").innerText(), "Nazwa zapisana.");
+  eq("and it is not styled as an error", await page.locator("#app-offline.err").count(), 0);
+
+  // Switching language while it is up. The sentence is a data-i18n key in the markup, so
+  // the switch rewrites it — and, unlike the old comparison against a translated string,
+  // nothing about taking it down again depends on which language it went up in.
+  await page.click("#lang-toggle");
+  await pickLang(page, "de");
+  eq("the notice follows the language picker", await page.locator("#app-offline").innerText(),
+    "Kein Netz — Änderungen gehen raus, sobald die Verbindung zurück ist.");
+
+  await ctx.setOffline(false);
+  await page.evaluate(() => window.__fbSync(false));
+  await page.waitForSelector("#app-offline", { state: "hidden", timeout: 5000 });
+  eq("the connection coming back takes it down",
+    await page.locator("#app-offline").isHidden(), true);
+  await page.click("#lang-toggle");
+  await pickLang(page, "pl");
+
+  // Signing out drops the listeners, so there is nothing left queued to promise about.
+  await ctx.setOffline(true);
+  await page.waitForSelector("#app-offline:not([hidden])", { timeout: 5000 });
+  await page.click("#app-signout");
+  await page.waitForSelector("#app-auth", { state: "visible", timeout: 5000 });
+  eq("signed out, the notice is down again", await page.locator("#app-offline").isHidden(), true);
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+/* --- 18c. the visitor who has been here before ---------------------------------------- */
+
+/**
+ * The defect as it was reported, reproduced.
+ *
+ * Firestore hands a listener whatever the local cache holds the moment it is attached,
+ * marked as not having come from the server, and only then goes and asks — so this is
+ * what a returning visitor meets on an ordinary, working connection. The page said "Brak
+ * sieci" on that first snapshot, and the server then answered with the same documents,
+ * which changes nothing but the metadata and reached a listener that had not asked for
+ * it: nothing arrived, nothing took the sentence back, and it stood there for the rest of
+ * the session. Run against the code as it was before this session, all four readings
+ * below come back "Brak sieci — zmiany polecą po powrocie łącza." — including the one
+ * after the language switch, in Polish on a German page, because the only way the old
+ * code could take it down was to compare the rendered text with the translation it had
+ * written it with.
+ */
+head("18c. a warm cache is not a dropped connection");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openTab(ctx, "projects", {
+    docs: {
+      "users/u1/projects/p1": { name: "Łazienka", archived: false, updatedAt: 4, deletedAt: null },
+    },
+    fromCache: true,
+  });
+
+  eq("the first snapshot comes out of the cache",
+    await page.evaluate(() => window.__fbFromCache), true);
+  eq("and the page does not call that a dropped connection",
+    await page.locator("#app-offline").isHidden(), true);
+  eq("nor does it put it on the status line",
+    await page.locator("#app-status").isHidden(), true);
+  eq("the project is on the screen all the same",
+    await page.locator("#project-list .row-name").first().innerText(), "Łazienka");
+
+  // The server answering with the documents it already has changes nothing but the
+  // metadata. This is the event the old listener was never sent.
+  await page.evaluate(() => window.__fbSync(false));
+  await page.waitForTimeout(300);
+  eq("and the server answering leaves it down",
+    await page.locator("#app-offline").isHidden(), true);
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+/* --- 18b. the delay, run out ---------------------------------------------------------- */
+
+/**
+ * The case navigator.onLine cannot see: a machine with a working network card and no
+ * internet behind it. Nothing but the listeners can notice, and they cannot tell "not
+ * synced yet" from "not synced any more" — so the page waits OFFLINE_AFTER_MS, which is
+ * the Firestore SDK's own patience with its backend, and then says it.
+ *
+ * The wait is real rather than a mocked clock: the point of the check is the constant
+ * that ships, not one a test installed.
+ */
+head("18b. a connection that is gone without the browser noticing");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openTab(ctx, "projects", {
+    docs: {
+      "users/u1/projects/p1": { name: "Łazienka", archived: false, updatedAt: 4, deletedAt: null },
+    },
+  });
+  eq("the browser still believes it is online", await page.evaluate(() => navigator.onLine), true);
+
+  await page.evaluate(() => window.__fbSync(true));
+  await page.waitForTimeout(2000);
+  eq("two seconds in, nothing is claimed", await page.locator("#app-offline").isHidden(), true);
+
+  await page.waitForSelector("#app-offline:not([hidden])", { timeout: 15000 });
+  eq("after the delay the page says the connection is down",
+    await page.locator("#app-offline").isHidden(), false);
+
+  // And a server snapshot takes it back down without waiting for anything.
+  await page.evaluate(() => window.__fbSync(false));
+  await page.waitForSelector("#app-offline", { state: "hidden", timeout: 5000 });
+  eq("a snapshot from the server takes it down again",
+    await page.locator("#app-offline").isHidden(), true);
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
   await ctx.close();
 }
 

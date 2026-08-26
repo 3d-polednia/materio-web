@@ -164,6 +164,11 @@ async function boot() {
   // The plan panel quotes a price, and a price is in the visitor's currency.
   document.addEventListener("currencychange", renderPlan);
 
+  // The one connectivity signal that needs no waiting. See connectionState() for why
+  // only `offline` is treated as evidence and `online` merely re-asks the question.
+  window.addEventListener("offline", renderConnection);
+  window.addEventListener("online", renderConnection);
+
   // Everything above renders its text through T(). The language picker on this page
   // swaps the DOM in place instead of navigating, so anything JavaScript wrote has to
   // be written again — before this, switching language left the identity bar, the
@@ -624,24 +629,109 @@ function wireProfilePanel() {
   });
 }
 
+/* ------------------------------------------------------- is there a connection */
+
+/**
+ * How long a listener may be reading from the cache before the page calls it "no network".
+ *
+ * `metadata.fromCache` answers "this snapshot did not come from the server", which is
+ * true in three different situations and only one of them is a dropped connection: the
+ * moment a listener is attached and has not synced yet, the moment after a local write
+ * and before the server acknowledges it, and an actual outage. Announcing the first two
+ * is the false "Brak sieci" this session exists to remove.
+ *
+ * The number is not invented: the Firestore SDK gives its own backend exactly this long
+ * before it logs "Backend didn't respond within 10 seconds" and switches the client to
+ * offline mode (`online_state_timeout`, firebase-firestore.js 10.14.1). Calling the
+ * connection down sooner than the library that owns it would be a guess.
+ */
+const OFFLINE_AFTER_MS = 10000;
+
+/**
+ * What each live listener last said about where its data came from, plus the delay.
+ *
+ * One line for the whole page rather than one per collection: projects and rooms sit on
+ * the same connection, so a listener that is reading from the server is proof the
+ * connection is up whatever the other one says.
+ */
+const conn = { synced: new Map(), timer: null, waited: false };
+
+/** "quiet" (nothing is listening), "offline", "unsynced" or "online". */
+function connectionState() {
+  // Signed out, or the listeners have been dropped: nothing is queued, so there is
+  // nothing to promise about a returning connection.
+  if (!conn.synced.size) return "quiet";
+  // The browser's own answer is trusted in one direction only. `false` means there is no
+  // connection at all and is worth saying at once; `true` is not evidence of anything —
+  // a laptop on a hotel Wi-Fi with no internet behind it also says `true`, which is what
+  // the delay below is for.
+  if (navigator.onLine === false) return "offline";
+  for (const synced of conn.synced.values()) if (synced) return "online";
+  return "unsynced";
+}
+
+/** Show the notice, or take it down. The wording is in the markup, keyed for langchange. */
+function renderConnection() {
+  const box = $("app-offline");
+  if (!box) return;
+  const now = connectionState();
+
+  if (now === "unsynced") {
+    // Armed once on the way into "unsynced" rather than on every snapshot: a listener
+    // that keeps reporting the cache must not keep pushing the deadline out.
+    if (!conn.waited && !conn.timer) {
+      conn.timer = setTimeout(() => {
+        conn.timer = null;
+        conn.waited = true;
+        renderConnection();
+      }, OFFLINE_AFTER_MS);
+    }
+  } else {
+    if (conn.timer) clearTimeout(conn.timer);
+    conn.timer = null;
+    conn.waited = false;
+  }
+
+  box.hidden = !(now === "offline" || (now === "unsynced" && conn.waited));
+}
+
+/** One listener reporting where its snapshot came from. */
+function connectionSaw(collectionName, snap) {
+  conn.synced.set(collectionName, !snap.metadata.fromCache);
+  renderConnection();
+}
+
 /** Live list of one collection, tombstones filtered out, newest change first. */
 function listen(collectionName, onRows) {
   const ref = fb.collection(db, "users", state.uid, collectionName);
+  let seen = false;
   const unsub = fb.onSnapshot(
     fb.query(ref, fb.orderBy("updatedAt", "desc")),
+    // Without this option the SDK delivers no event at all when the only thing that
+    // changed is where the data came from: `ia()` in firebase-firestore.js 10.14.1
+    // raises a snapshot carrying no document changes only when includeMetadataChanges
+    // is true. That is what made this page say "Brak sieci" and never take it back —
+    // the first snapshot comes out of the cache, and the server answering with the same
+    // documents changes nothing but the metadata. It is also why a connection that
+    // actually dropped was never announced. See connectionSaw().
+    { includeMetadataChanges: true },
     (snap) => {
-      const rows = [];
-      snap.forEach((d) => {
-        const data = d.data();
-        if (data.deletedAt) return;
-        rows.push({ id: d.id, ...data });
-      });
-      onRows(rows);
-      // A snapshot arrives whenever anything changes, including a moment after a save.
-      // It may report that the data came from the cache; it may not clear a message
-      // somebody else put there — "Nazwa zapisana." used to vanish this way.
-      if (snap.metadata.fromCache) status(T("app_offline"));
-      else if ($("app-status").textContent === T("app_offline")) status("");
+      connectionSaw(collectionName, snap);
+      // The option above also delivers snapshots whose documents did not change, and
+      // redrawing on one of those would take the caret out of the "add a room" field
+      // somebody is typing in. docChanges() with its own default drops the metadata-only
+      // entries, so this is "did a document really change" — plus the first snapshot,
+      // which has to draw the empty list even when there is nothing in it.
+      if (!seen || snap.docChanges().length) {
+        seen = true;
+        const rows = [];
+        snap.forEach((d) => {
+          const data = d.data();
+          if (data.deletedAt) return;
+          rows.push({ id: d.id, ...data });
+        });
+        onRows(rows);
+      }
     },
     (err) => {
       // Firestore pushes permission-denied into every live listener the moment the user
@@ -659,6 +749,10 @@ function listen(collectionName, onRows) {
 function stopListening() {
   state.unsub.forEach((fn) => fn());
   state.unsub = [];
+  // Nothing is listening any more, so nothing is waiting to go out: the notice comes
+  // down with the listeners rather than staying on the sign-in screen.
+  conn.synced.clear();
+  renderConnection();
 }
 
 /* ------------------------------------------------------------------ tabs */

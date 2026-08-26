@@ -12,36 +12,32 @@
  * already in place:
  *   - the security rules (config/firebase/firestore.rules in the app repo), which let
  *     only a document's owner read or write it, and
- *   - the authorized-domains list in Firebase Auth, which contains materio-app.com,
- *     www.materio-app.com and localhost — Auth refuses to work from anywhere else.
+ *   - the authorized-domains list in Firebase Auth, which Auth refuses to work from
+ *     anywhere outside. What is on it is read back in the next block rather than
+ *     repeated here: a list written down twice is a list free to go stale.
  *
- * ─── THE DOMAIN MOVED AND THESE TWO LISTS DID NOT (2026-08-14) ──────────────
- * The site is served from liczmat.com now; both controls below still name only the old
- * host, and both are console settings that no commit here can change. Until the owner
- * edits them, /app/ signs nobody in from the new domain. Which of the two is actually
- * blocking was measured against the live backend rather than guessed — the same
- * accounts:signInWithPassword call, sent three times with a different Referer:
- *     https://liczmat.com/app/       → 403 API_KEY_HTTP_REFERRER_BLOCKED
- *     https://www.liczmat.com/app/   → 403 API_KEY_HTTP_REFERRER_BLOCKED
+ * ─── THE DOMAIN MOVED, AND BOTH CONSOLE LISTS HAVE CAUGHT UP (2026-08-26) ───
+ * The site is served from liczmat.com. For twelve days after the move neither of the two
+ * Google console lists named it, and /app/ could sign nobody in from the new host; the
+ * owner has since fixed both, and this is the measurement rather than an assumption —
+ * the same accounts:signInWithPassword call, sent with three different Referer headers:
+ *     https://liczmat.com/app/       → 400 INVALID_LOGIN_CREDENTIALS
+ *     https://www.liczmat.com/app/   → 400 INVALID_LOGIN_CREDENTIALS
  *     https://materio-app.com/app/   → 400 INVALID_LOGIN_CREDENTIALS
- * The last line is the key passing and Auth reaching the password check. So:
- *   - Google Cloud console → Credentials → this browser key → Website restrictions is
- *     THE BLOCKER. Add `https://liczmat.com/*` and `https://www.liczmat.com/*`. It gates
- *     every Identity Toolkit call, so sign-up, e-mail sign-in and the password reset all
- *     fail together, and turning Google sign-in off does not help — the block sits below
- *     the provider. Keep `https://materio-502513.firebaseapp.com/*` and
- *     `https://materio-502513.web.app/*`, which is what made the Google popup work on
- *     2026-08-13. The referrer restriction does not protect the data (the rules do); it
- *     stops another site from running up quota on this project's bill.
- *   - Firebase console → Authentication → Settings → Authorized domains: add
- *     `liczmat.com` and `www.liczmat.com`. A separate control, and NOT the one returning
- *     the 403 above: it governs the OAuth popup and the continueUrl on an e-mail action
- *     link, which is why a reset mail's link needs it. Keep
- *     materio-502513.firebaseapp.com on the list — the Google popup runs its handler
- *     there. (The list could not be read back from here: getProjectConfig goes through
- *     the same restricted key and answers 403 for an empty Referer.)
- * Leaving the old entries in place costs nothing and keeps materio-app.com working if
- * it is ever pointed back at the site.
+ * 400 is the key passing and Auth reaching the password check; the 403
+ * API_KEY_HTTP_REFERRER_BLOCKED the first two used to answer is gone. A referrer that is
+ * on no list still answers 403, so the restriction is still doing its job. And the
+ * authorized-domains list, which could not be read at all while the key was restricted,
+ * now reads back through the same key:
+ *     materio-502513.firebaseapp.com, materio-502513.web.app, materio-app.com,
+ *     www.materio-app.com, localhost, liczmat.com, www.liczmat.com
+ * The two lists are separate controls and both matter: the browser key's Website
+ * restrictions gate every Identity Toolkit call (sign-up, e-mail sign-in, password
+ * reset), while Firebase Auth's authorized domains govern the OAuth popup and the
+ * continueUrl on an e-mail action link. Neither is in this repository, and no commit here
+ * can change either. If they are ever edited again, KEEP every entry above:
+ * materio-502513.firebaseapp.com is where the Google popup runs its handler (2026-08-13),
+ * and leaving the materio-app.com pair in place costs nothing.
  *
  * NOT wired up on purpose: the Web app also carries a `measurementId`
  * (G-E6QV42MJNQ) for Firebase Analytics. The site already loads GA4 as G-22PS16K79V

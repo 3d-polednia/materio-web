@@ -1397,6 +1397,59 @@ języka, w którym jest w tej chwili strona.
 
 ---
 
+### 7.16. „Brak sieci" na `/app/` — co to znaczy i skąd się o tym wie (Sesja 42)
+
+Zdanie „Brak sieci — zmiany polecą po powrocie łącza." jest **twierdzeniem o połączeniu**,
+a `snapshot.metadata.fromCache` nie jest jego dowodem. To pole odpowiada na inne pytanie:
+„czy te dane przyszły z serwera". Odpowiada „nie" w trzech różnych sytuacjach i tylko
+jedna z nich to zerwane łącze:
+
+1. **chwila po podpięciu nasłuchu** — Firestore oddaje od razu to, co ma w lokalnym cache,
+   i dopiero potem pyta serwer. To jest zwykły przypadek każdego, kto był tu wcześniej;
+2. **chwila po własnym zapisie** — dopóki serwer nie potwierdzi, migawka niesie zapis
+   lokalny (`hasPendingWrites`);
+3. **prawdziwa awaria łącza.**
+
+Do Sesji 42 strona ogłaszała wszystkie trzy — i **nie umiała tego odwołać**. Powód siedzi
+w SDK, nie w tym repozytorium: migawka, w której żaden dokument się nie zmienił, dociera
+**wyłącznie** do nasłuchu, który poprosił o metadane (`ia()` w `firebase-firestore.js`
+10.14.1 — `!(!e.syncStateChanged&&!i)&&!0===this.options.includeMetadataChanges`). Serwer
+odpowiadający tymi samymi dokumentami, które leżały w cache, jest dokładnie taką migawką.
+Więc: ktoś, kto otwierał `/app/` wcześniej, dostawał „Brak sieci" w chwili zalogowania i
+czytał je **do zamknięcia karty**, przy działającym łączu — a łącze, które naprawdę padło,
+nie było ogłaszane **wcale**, bo to też jest zmiana samych metadanych.
+
+**Jak jest teraz.** Nasłuchy proszą o metadane (`{ includeMetadataChanges: true }`), a stan
+połączenia liczy `connectionState()` w `assets/app.js` z dwóch źródeł, z których każde
+odpowiada na co innego:
+
+- **`navigator.onLine === false`** — przeglądarka mówi, że łącza nie ma w ogóle. Pewne
+  i natychmiastowe. `true` nie jest dowodem niczego (laptop w hotelowym Wi-Fi bez
+  internetu też odpowiada `true`), więc jest wierzone **tylko w jedną stronę**.
+- **każdy nasłuch czyta z cache dłużej niż `OFFLINE_AFTER_MS`** — to jest przypadek,
+  którego przeglądarka nie widzi. Stała wynosi 10 s, bo tyle sam SDK daje swojemu
+  backendowi, zanim zapisze „Backend didn't respond within 10 seconds" i przełączy
+  klienta w tryb offline (`online_state_timeout`). Ogłaszać zerwane łącze wcześniej niż
+  biblioteka, która to łącze trzyma, to zgadywanie.
+
+**Komunikat ma własny wiersz** (`#app-offline`), a nie wspólny pasek statusu. Wspólny
+kosztował dwa razy: deptał to, co ktoś inny tam postawił („Nazwa zapisana."), a zdjąć go
+dało się wyłącznie porównując **wyświetlony tekst** z tłumaczeniem, którym się go napisało
+— więc przełączenie języka przy podniesionym komunikacie przybijało go na stałe. Zdanie
+stoi w markupie z kluczem `data-i18n="app_offline"`, tak jak reszta tej strony, więc
+`langchange` przepisuje je za darmo, a `assets/app.js` przestawia tylko `hidden`. Ta sama
+zasada, co przy ścianie płatności: blok jest w stronie od pierwszego malowania i ukryty,
+bo element tworzony przez skrypt zdąży mignąć.
+
+**Czego `includeMetadataChanges` nie może zrobić: przerysować list.** `renderProjects()`
+buduje `#project-list` przez `innerHTML`, a w każdym wierszu projektu stoi formularz
+„dodaj pomieszczenie". Przerysowanie na potwierdzeniu zapisu wyjęłoby kursor z pola, w
+którym ktoś właśnie pisze — więc przerysowanie jest zawężone do `snap.docChanges().length`
+(czytane z własnym domyślnym ustawieniem, więc bez wpisów czysto metadanowych) plus
+pierwsza migawka, która musi narysować listę także wtedy, gdy jest pusta.
+
+---
+
 ### 7.13. Strona LiczMat Pro — publiczny opis płatnego produktu (Sesja 29)
 
 Rozdział XXXII, Sesja 29 w całości: „Krótka, konkretna strona prezentująca Pro. Bez

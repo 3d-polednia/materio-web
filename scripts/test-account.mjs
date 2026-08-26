@@ -355,6 +355,77 @@ head("10. the level names match what the rest of the site calls them");
   }
 }
 
+head("11. „Brak sieci” is said when it is true, and never otherwise (session 42)");
+{
+  /* The reported defect: /app/ told a returning visitor the connection was gone while it
+     was fine, and never took it back. Both halves came from `metadata.fromCache`, which
+     answers "this snapshot did not come from the server" — true during the moment after
+     a listener is attached, true during the moment after a local write, and true when the
+     connection really is down. Only the third is worth a sentence.
+
+     What made it permanent is a rule of the SDK rather than of this repo. From the
+     shipped bundle (firebase-firestore.js 10.14.1, __PRIVATE_QueryListener):
+
+         ia(e){ if(e.docChanges.length>0) return true;
+                const i=this.ra&&this.ra.hasPendingWrites!==e.hasPendingWrites;
+                return !(!e.syncStateChanged&&!i)&&!0===this.options.includeMetadataChanges }
+
+     — a snapshot whose documents did not change reaches a listener that did not ask for
+     the metadata never. The server answering with the documents the cache already held
+     is exactly such a snapshot, so nothing arrived to take the sentence down; and a
+     connection dropping mid-session is one too, so nothing arrived to put it up either.
+
+     The browser half of this — the notice going up and down under a driven page — is
+     §18, §18b and §18c of scripts/test-account-page.mjs. */
+  const app = readFileSync(p("assets/app.js"), "utf8");
+  const html = appMain(tr("pl"), LM_FEATURES);
+
+  const listenBody = (app.match(/function listen\(collectionName, onRows\) \{[^]*?\n\}/) || [""])[0];
+  check("the collection listener asks for the metadata changes",
+    listenBody.includes("{ includeMetadataChanges: true },"),
+    "onSnapshot() without it is never told the connection came back");
+
+  check("and the redraw is gated on a document really having changed",
+    listenBody.includes("snap.docChanges().length"),
+    "without this the list is rebuilt on a metadata event and the caret leaves the field");
+
+  check("the notice is no longer derived inside the snapshot handler",
+    !/if \(snap\.metadata\.fromCache\) status\(/.test(app),
+    "status(T(\"app_offline\")) is back in the snapshot callback");
+
+  check("nor taken down by comparing rendered text with a translation",
+    !app.includes('$("app-status").textContent === T("app_offline")'),
+    "that comparison stops matching the moment the visitor switches language");
+
+  check("it has an element of its own", html.includes('id="app-offline"'));
+  check("which ships hidden, from the first paint rather than made by a script",
+    /<p id="app-offline"[^>]*\shidden\b/.test(html));
+  check("is a live region", /<p id="app-offline"[^>]*role="status"/.test(html));
+  check("carries the sentence itself, keyed for langchange",
+    /<p id="app-offline"[^>]*data-i18n="app_offline"[^>]*>[^<]+</.test(html));
+  check("and is not dressed as an error",
+    !/<p id="app-offline"[^>]*class="[^"]*\berr\b/.test(html));
+
+  // The browser is believed when it says there is no connection and not when it says
+  // there is: a machine on a network with no internet behind it answers `true`.
+  check("navigator.onLine is trusted in one direction only",
+    app.includes("navigator.onLine === false")
+      && !/navigator\.onLine === true|if \(navigator\.onLine\)/.test(app));
+
+  // The delay is the Firestore SDK's own patience with its backend
+  // (`online_state_timeout`, 1e4 in firebase-firestore.js 10.14.1). Saying the connection
+  // is down before the library that owns it does would be a guess.
+  const delay = (app.match(/const OFFLINE_AFTER_MS = (\d+);/) || [])[1];
+  eq("the page waits as long as the SDK does before saying it", delay, "10000");
+
+  for (const lang of CODES) {
+    const text = DICT[lang].app_offline;
+    check(`${lang}: the sentence exists`, typeof text === "string" && text.length > 0);
+    check(`${lang}: and it promises the changes are kept, not lost`,
+      text !== "app_offline" && text.length > 12, text);
+  }
+}
+
 /* ------------------------------------------------------------------ report */
 
 console.log(`\naccount: ${passed}/${passed + failures.length} checks pass`);

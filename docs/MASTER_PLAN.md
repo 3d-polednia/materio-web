@@ -80,7 +80,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 39 | Stripe: sprzedaż włączona | **Repozytorium gotowe** — 2026-08-21, czeka na konto Stripe i trzy adresy (właściciel, `docs/STRIPE.md`) |
 | 40 | „LiczMat Pro" w nagłówku (Poradniki → stopka) | **Zrobione** — 2026-08-26 |
 | 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | **Zrobione** — 2026-08-26 |
-| 42 | `/app/`: fałszywe „Brak sieci" | Do zrobienia |
+| 42 | `/app/`: fałszywe „Brak sieci" | **Zrobione** — 2026-08-26 |
 | 43 | Kalkulator na prawdziwym telefonie | Do zrobienia |
 | 44 | Stop slop: zasady, test, pl/uk/de/en | Do zrobienia |
 | 45 | Stop slop: cs/sk/ro/hr/sr/ru | Do zrobienia |
@@ -152,29 +152,22 @@ skasowany, cztery AAAA GitHuba (`2606:50c0:800{0..3}::153`) dopisane. Zweryfikow
 
 ### Zostało do zrobienia poza repo
 
-- **Certyfikat.** W chwili commitu `https://liczmat.com` serwuje jeszcze `CN=*.github.io`.
-  GitHub → Settings → Pages → **Remove**, zapisać, wpisać `liczmat.com` ponownie, **Save**.
-  To wymusza ponowną próbę wystawienia.
-- **Google Cloud → Credentials → klucz przeglądarkowy → Website restrictions**: dopisać
-  `https://liczmat.com/*` i `https://www.liczmat.com/*`, zachowując wpisy
-  `materio-502513.firebaseapp.com/*` i `materio-502513.web.app/*`.
-  **To jest blokada, która wywraca zakładanie konta i logowanie** — zmierzone na żywym
-  backendzie, to samo wywołanie `accounts:signInWithPassword` z trzema nagłówkami
-  `Referer`:
-
-  | Referer | Odpowiedź |
-  |---|---|
-  | `https://liczmat.com/app/` | 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
-  | `https://www.liczmat.com/app/` | 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
-  | `https://materio-app.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` — klucz przepuścił, Auth doszedł do sprawdzenia hasła |
-
-  Ograniczenie klucza obejmuje **każde** wywołanie Identity Toolkit, więc rejestracja,
-  logowanie e-mailem i reset hasła padają razem. Wyłączenie logowania Google (2026-08-14)
-  niczego tu nie zmieniło — blokada siedzi poniżej dostawcy.
-- **Firebase Auth → Authorized domains**: dopisać `liczmat.com` i `www.liczmat.com`.
-  Osobna kontrola, **nie** ta, która zwraca 403 wyżej: odpowiada za popup OAuth i za
-  `continueUrl` w linku z maila akcyjnego, czyli za reset hasła. Listy nie dało się
-  odczytać zdalnie — `getProjectConfig` idzie przez ten sam ograniczony klucz.
+- ~~**Certyfikat.**~~ — **wystawiony, zmierzone 2026-08-26 (Sesja 42).**
+  `https://liczmat.com/` odpowiada 200 z certyfikatem `CN=liczmat.com` (Let's Encrypt),
+  a nie zastanym `CN=*.github.io`.
+- ~~**Google Cloud → Credentials → klucz przeglądarkowy → Website restrictions**~~ —
+  **zrobione przez właściciela, zmierzone 2026-08-26 (Sesja 42).** `https://liczmat.com/*`
+  i `https://www.liczmat.com/*` przepuszczają: to samo wywołanie
+  `accounts:signInWithPassword` odpowiada 400 `INVALID_LOGIN_CREDENTIALS` zamiast 403
+  `API_KEY_HTTP_REFERRER_BLOCKED`, czyli klucz przepuścił i Auth doszedł do sprawdzenia
+  hasła. Host spoza listy nadal dostaje 403, więc ograniczenie działa. Zakładanie konta,
+  logowanie e-mailem i reset hasła z nowej domeny są odblokowane.
+- ~~**Firebase Auth → Authorized domains**~~ — **zrobione przez właściciela, odczytane
+  2026-08-26 (Sesja 42).** Listy nie dało się dotąd przeczytać, bo `getProjectConfig` szedł
+  przez ten sam ograniczony klucz; teraz czyta się i zawiera
+  `materio-502513.firebaseapp.com`, `materio-502513.web.app`, `materio-app.com`,
+  `www.materio-app.com`, `localhost`, **`liczmat.com`**, **`www.liczmat.com`**. Przy każdej
+  kolejnej edycji obu list: **zachować wszystkie wpisy**.
 - **Google Search Console**: nowa własność dla `liczmat.com` i zgłoszenie sitemapy.
 - **Bliźniak polityki prywatności** — `docs/privacy-policy.html` w repo
   `3d-polednia/Materio` nadal mówi `materio-app.com`. Tamto repo nie jest podpięte do tej
@@ -255,6 +248,160 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 42 (plan naprawczy)
+
+Zadanie: **`/app/`: fałszywe „Brak sieci".**
+
+**WYKONANO**
+
+**1. Defekt odtworzony, zanim cokolwiek zostało zmienione.** Napęd testowy udający
+Firebase (`scripts/fake-firebase.mjs`) mówił dotąd o **każdej** migawce, że przyszła
+z serwera — dlatego 213 sprawdzeń w Chromium nie potrafiło tego zobaczyć. Po nauczeniu go
+jednej rzeczy, którą prawdziwe SDK robi, a on nie (migawka mówi, skąd przyszła, i migawka
+bez zmiany dokumentu **nie dociera** do nasłuchu, który nie poprosił o metadane), kod
+sprzed tej sesji odpowiada tak:
+
+```
+po zalogowaniu     : "Brak sieci — zmiany polecą po powrocie łącza."
+migawka z cache    : "Brak sieci — zmiany polecą po powrocie łącza."
+serwer odpowiedział: "Brak sieci — zmiany polecą po powrocie łącza."
+po zmianie języka  : "Brak sieci — zmiany polecą po powrocie łącza."   ← po polsku, na stronie niemieckiej
+```
+
+To jest zgłoszenie właściciela, co do słowa. Łącze działa przez cały ten czas.
+
+**2. Dlaczego to się nie dawało odwołać — i to jest sedno.** Strona liczyła stan łącza
+z `snapshot.metadata.fromCache`, które odpowiada na inne pytanie: „czy te dane przyszły
+z serwera". Odpowiada „nie" w trzech sytuacjach i tylko jedna to awaria (§7.16
+`docs/ARCHITEKTURA.md`). Ale drugą połowę robi reguła SDK, a nie tego repozytorium —
+z wysłanego pliku `firebase-firestore.js` 10.14.1, `__PRIVATE_QueryListener`:
+
+```js
+ia(e){ if(e.docChanges.length>0) return true;
+       const i=this.ra&&this.ra.hasPendingWrites!==e.hasPendingWrites;
+       return !(!e.syncStateChanged&&!i)&&!0===this.options.includeMetadataChanges }
+```
+
+Migawka, w której żaden dokument się nie zmienił, dociera **wyłącznie** do nasłuchu
+z `includeMetadataChanges: true`. Serwer odpowiadający tymi samymi dokumentami, które
+leżały w cache, jest dokładnie taką migawką — więc nic nie przychodziło i zdanie stało do
+zamknięcia karty. Symetrycznie: **łącze, które naprawdę padło, nie było ogłaszane wcale.**
+Komunikat mylił się w obie strony.
+
+**3. Naprawa: dwa źródła, każde odpowiada na co innego.** `connectionState()`
+w `assets/app.js`:
+
+- `navigator.onLine === false` — przeglądarka mówi, że łącza nie ma. Pewne
+  i natychmiastowe. `true` nie jest dowodem niczego (laptop w hotelowym Wi-Fi bez
+  internetu też odpowiada `true`), więc jest wierzone **tylko w jedną stronę**.
+- każdy nasłuch czyta z cache dłużej niż `OFFLINE_AFTER_MS` — przypadek, którego
+  przeglądarka nie widzi. **10 000 ms nie jest wymyślone**: tyle sam SDK daje swojemu
+  backendowi, zanim zapisze „Backend didn't respond within 10 seconds" i przełączy
+  klienta w tryb offline (`online_state_timeout` w tym samym pliku). Ogłaszać zerwane
+  łącze wcześniej niż biblioteka, która to łącze trzyma, to zgadywanie.
+
+**4. Komunikat dostał własny wiersz.** `#app-offline` zamiast wspólnego paska statusu.
+Wspólny kosztował dwa razy: deptał to, co ktoś inny tam postawił („Nazwa zapisana."),
+a zdjąć go dało się **wyłącznie** porównując wyświetlony tekst z tłumaczeniem, którym się
+go napisało — więc przełączenie języka przybijało go na stałe. Zdanie stoi w markupie
+z kluczem `data-i18n="app_offline"`, więc `langchange` przepisuje je za darmo, a skrypt
+przestawia tylko `hidden`. Ta sama zasada, co przy ścianie płatności: blok jest w stronie
+od pierwszego malowania i ukryty, bo element tworzony przez skrypt zdąży mignąć.
+**Zero nowych kluczy** — `app_offline` istniało w dziesięciu językach od Sesji 13.
+
+**5. Jedna rzecz, której `includeMetadataChanges` zrobić nie może: przerysować list.**
+`renderProjects()` buduje `#project-list` przez `innerHTML`, a w każdym wierszu projektu
+stoi formularz „dodaj pomieszczenie". Przerysowanie na potwierdzeniu zapisu wyjęłoby
+kursor z pola, w którym ktoś pisze. Przerysowanie jest więc zawężone do
+`snap.docChanges().length` plus pierwsza migawka, która musi narysować listę także pustą.
+
+**6. Zmierzone na żywym backendzie: właściciel poprawił obie listy w konsolach Google.**
+Nie było to zadaniem tej sesji, ale było w repozytorium zapisane jako stan bieżący i od
+dziś jest nieprawdą, więc zostało sprawdzone, a nie przyjęte. To samo wywołanie
+`accounts:signInWithPassword` z trzema nagłówkami `Referer`:
+
+| Referer | Odpowiedź |
+|---|---|
+| `https://liczmat.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` — klucz przepuścił, Auth doszedł do sprawdzenia hasła |
+| `https://www.liczmat.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` |
+| host spoza listy | 403 `API_KEY_HTTP_REFERRER_BLOCKED` — ograniczenie nadal działa |
+
+A lista autoryzowanych domen, której **w ogóle nie dało się odczytać**, dopóki klucz był
+ograniczony, czyta się teraz przez ten sam klucz: `materio-502513.firebaseapp.com`,
+`materio-502513.web.app`, `materio-app.com`, `www.materio-app.com`, `localhost`,
+**`liczmat.com`**, **`www.liczmat.com`**. Zakładanie konta i logowanie z nowej domeny
+działa. To także wyjaśnia, dlaczego fałszywe „Brak sieci" zgłoszono dopiero teraz: przez
+dwanaście dni po przeprowadzce nikt nie mógł dojść na `/app/` dalej niż do formularza.
+
+**ZMIENIONE PLIKI**
+
+Zmienione:
+- `assets/app.js` — `OFFLINE_AFTER_MS`, `connectionState()`, `renderConnection()`,
+  `connectionSaw()`; `listen()` prosi o metadane i zawęża przerysowanie;
+  `stopListening()` zdejmuje komunikat razem z nasłuchami; `boot()` słucha zdarzeń
+  `online`/`offline`.
+- `src/app-pages.mjs` — `#app-offline`, ukryty, `role="status"`, `data-i18n="app_offline"`.
+- `scripts/fake-firebase.mjs` — migawka kolekcji ma `metadata` i `docChanges()`,
+  `onSnapshot()` rozpoznaje wariant z opcjami, `window.__fbFromCache`
+  i `window.__fbSync(fromCache, changed)`.
+- `scripts/test-account.mjs` — §11, dwanaście sprawdzeń bez zależności.
+- `scripts/test-account-page.mjs` — §18, §18b i §18c w Chromium.
+- `scripts/test-a11y.mjs` — `#app-offline` na liście obszarów żywych.
+- `assets/firebase-config.js`, `CLAUDE.md`, `docs/ARCHITEKTURA.md` §7.16, ten plik.
+- `scripts/build.mjs` — `STAMP` na `20260826a`, plus `?v=` w ręcznie pisanych `404.html`
+  i `privacy-policy.html`.
+- 373 wygenerowane strony: 372 z nich **wyłącznie** przez `?v=`; `app/index.html` dodatkowo
+  o jeden wiersz komunikatu. `sitemap.xml` bez zmian — porównanie stojące za `lastmod`
+  pomija `?v=`, więc podbicie stempla nie przedatowuje serwisu.
+
+**TESTY**
+
+- `scripts/test-account.mjs`: **179/179** (przed sesją: 148/148). Nowe §11 uruchomione na
+  kodzie sprzed naprawy daje **11 błędów**, każdy nazywający jedną połowę defektu.
+- `scripts/test-account-page.mjs`: **236/236** (przed sesją: 213/213). §18c to zgłoszenie
+  właściciela odtworzone co do zdania.
+- `scripts/test-a11y.mjs`: **60/60** (było 59).
+- Chromium, reszta bez zmian: `test-pages` 759/759, `test-mobile` 1152/1152,
+  `test-a11y-page` 55/55, `test-propage-page` 148/148, `test-qa` 675/675,
+  `test-projects-page` 177/177, `test-dashboard-page` 90/90, `test-save-page` 70/70,
+  `test-materials-page` 166/166, `test-rooms-page` 195/195, `test-costs-page` 134/134,
+  `test-clients-page` 145/145, `test-jobs-page` 164/164, `test-quotes-page` 188/188,
+  `test-crm-page` 141/141, `test-calendar-page` 162/162.
+- Bez zależności, wszystkie przechodzą: seo 36869, perf 13157, security 9072,
+  calc-seo 5133, calculators 2113, save 1280, plan 1114, quotes 1096, propage 1083,
+  jobs 1032, projects 884, clients 851, schedule 634, crm 419, rooms 411, pay 398,
+  materials 383, dashboard 306, costs 225, webhook 111, pro-admin 110, langs 34.
+- `node scripts/build.mjs --check`: 1157 kluczy × 10 języków — tyle samo, co przed sesją.
+
+**PROBLEMY**
+
+- **Defekt żył, bo napęd testowy zaprzeczał SDK.** Migawka zawsze twierdziła, że przyszła
+  z serwera, więc gałąź `fromCache` nie była wykonana ani razu w 213 sprawdzeniach.
+  Zaślepka, która jest łagodniejsza od tego, co udaje, chowa dokładnie te defekty, dla
+  których się ją pisze. Naprawione dla tej jednej rzeczy; **`hasPendingWrites` zaślepka
+  nadal zawsze zwraca `false`** — `/app/` tego pola nie czyta, ale następna sesja, która
+  zechce coś zbudować na opóźnieniu zapisu, musi je najpierw domodelować.
+- **Wybudzenie po powrocie łącza to nadal odpowiedź SDK, a nie własny ponowny zapis.**
+  Kolejka offline Firestore wypycha zmiany sama i to się nie zmieniło; strona wyłącznie
+  o tym mówi. Nic tu nie ponawia niczego ręcznie i nie powinno.
+- **Nasłuch profilu (`users/{uid}`) nie liczy się do stanu łącza.** Świadomie: dwie
+  kolekcje wystarczą, żeby powiedzieć, czy serwer odpowiada, a nasłuch profilu jest
+  podpinany i odpinany w innych momentach niż tamte dwa. Gdyby kiedyś został jedynym
+  nasłuchem na stronie, trzeba go dołożyć do `conn.synced`.
+- **Nie ma w tym repozytorium jednej komendy uruchamiającej wszystkie 25 suit.** Problem
+  zgłoszony przez Sesję 41 i nadal nienaprawiony — ta sesja przeszła listę z `CLAUDE.md`
+  ręcznie. Osobne zadanie.
+
+**STATUS**
+
+Zrobione. `/app/` mówi „Brak sieci" wtedy i tylko wtedy, gdy sieci nie ma, zdejmuje
+komunikat, gdy łącze wraca, nie depcze paska statusu, przeżywa zmianę języka i nie wyjmuje
+kursora z pola, w którym ktoś pisze.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 43 — kalkulator na prawdziwym telefonie.**
 
 ### Co zrobiła Sesja 41 (plan naprawczy)
 

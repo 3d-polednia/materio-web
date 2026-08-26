@@ -343,6 +343,9 @@ head("6. what changes on its own says so");
     ["zlecenia/index.html", "job-undo"],
     ["wyceny/index.html", "quo-undo"],
     ["app/index.html", "app-status"],
+    // Session 42: the notice that says the connection is gone has its own line, and it
+    // appears without anything moving or taking focus — so it has to announce itself.
+    ["app/index.html", "app-offline"],
   ]) {
     const page = PAGES.find((x) => x.file === file);
     const tag = (page.body.match(new RegExp(`<[a-z]+[^>]*\\sid="${id}"[^>]*>`)) || [])[0] || "";

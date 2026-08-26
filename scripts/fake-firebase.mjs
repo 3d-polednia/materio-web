@@ -198,7 +198,65 @@ export function getDocs(ref) {
   });
   return Promise.resolve({ docs: rows, forEach: (fn) => rows.forEach(fn) });
 }
-export function onSnapshot(ref, onNext, onError) {
+/* Live listeners on a collection, and the one piece of the real SDK's behaviour that
+   /app/ depends on and no stub had: a snapshot says where it came from, and a snapshot
+   whose documents did not change is only delivered to a listener that asked for the
+   metadata.
+
+   Measured in the shipped SDK (firebase-firestore.js 10.14.1, __PRIVATE_QueryListener):
+
+       ia(e){ if(e.docChanges.length>0) return true;
+              const i = this.ra && this.ra.hasPendingWrites !== e.hasPendingWrites;
+              return !(!e.syncStateChanged && !i) && true === this.options.includeMetadataChanges }
+
+   — so an event carrying nothing but a fromCache flip reaches a default listener never.
+   That is what let /app/ hear "this came from the cache" once and never hear the answer,
+   and it is why a stub that always said fromCache:false could not see the defect.
+
+   window.__fbSync(fromCache) plays the connection: it re-delivers every collection
+   listener's rows with the metadata set, exactly as the SDK does when its online state
+   flips. */
+const COLL_SUBS = (window.__fbCollSubs = window.__fbCollSubs || new Set());
+
+function collRows(path) {
+  const rows = [];
+  DOCS.forEach((value, docPath) => {
+    const at = docPath.lastIndexOf("/");
+    if (docPath.slice(0, at) === path) rows.push({ id: docPath.slice(at + 1), data: () => value });
+  });
+  return rows;
+}
+
+/** A collection snapshot. The third argument is what docChanges() answers with. */
+function collSnap(path, fromCache, changes) {
+  const rows = collRows(path);
+  return {
+    forEach: (fn) => rows.forEach(fn),
+    docChanges: () => changes,
+    metadata: { fromCache: Boolean(fromCache), hasPendingWrites: false },
+  };
+}
+
+window.__fbSync = (fromCache, changed) => {
+  COLL_SUBS.forEach((sub) => {
+    const changes = changed
+      ? collRows(sub.path).map((doc) => ({ type: "added", doc }))
+      : [];
+    // ia() again: an event carrying no document change reaches only a listener that
+    // asked for the metadata; one that carries a change reaches every listener.
+    if (changes.length || sub.options.includeMetadataChanges) {
+      sub.onNext(collSnap(sub.path, fromCache, changes));
+    }
+  });
+};
+
+export function onSnapshot(ref, ...rest) {
+  // onSnapshot(ref, onNext, onError) and onSnapshot(ref, options, onNext, onError) are
+  // both real signatures; the SDK tells them apart the same way, by the type of the
+  // first argument after the reference.
+  const options = typeof rest[0] === "object" && rest[0] !== null ? rest.shift() : {};
+  const [onNext, onError] = rest;
+
   // Firestore pushes a permission-denied error into every live listener when the user
   // signs out or is deleted. window.__fbListeners lets the test fire that.
   (window.__fbListeners = window.__fbListeners || []).push(onError);
@@ -212,12 +270,15 @@ export function onSnapshot(ref, onNext, onError) {
     return () => subs.delete(onNext);
   }
 
-  const rows = [];
-  DOCS.forEach((value, path) => {
-    const at = path.lastIndexOf("/");
-    if (path.slice(0, at) === ref.path) rows.push({ id: path.slice(at + 1), data: () => value });
-  });
-  onNext({ forEach: (fn) => rows.forEach(fn), metadata: { fromCache: false } });
-  return () => {};
+  const sub = { path: ref.path, options, onNext };
+  COLL_SUBS.add(sub);
+  // The first snapshot lists every document as an addition, the way the real one does.
+  // window.__fbFromCache is the returning visitor: Firestore hands a listener whatever is
+  // in the local cache the moment it is attached, marked as not having come from the
+  // server, and only then goes and asks. That is the ordinary online case for anybody who
+  // has opened the page before, and the one the false "Brak sieci" was built on.
+  onNext(collSnap(ref.path, Boolean(window.__fbFromCache),
+    collRows(ref.path).map((doc) => ({ type: "added", doc }))));
+  return () => COLL_SUBS.delete(sub);
 }
 `;

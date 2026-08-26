@@ -184,11 +184,21 @@ scripts/test-pages.mjs  The same calculators in Chromium: 360/414/768/1280 px, t
                       header of the file
 scripts/test-account.mjs  The account system: which of the three levels a visitor is on,
                       what the other 134 pages are told about the session, where a
-                      ?next= link may point, and the copy in ten languages.
+                      ?next= link may point, the copy in ten languages — and, since
+                      session 42, what it takes for /app/ to say "Brak sieci" truthfully:
+                      the listener that asks for the metadata, the redraw gated on a real
+                      document change, the notice's own element, and the delay, which is
+                      the Firestore SDK's own patience with its backend.
                       Dependency-free — run it after touching assets/account.js,
                       assets/app.js, ACCOUNT_LEVELS or an acc_*/prof_* key
 scripts/test-account-page.mjs  /app/ in Chromium with the Firebase SDK stubbed: sign-up,
-                      sign-in, sign-out, the reset, the profile, the level, the tabs.
+                      sign-in, sign-out, the reset, the profile, the level, the tabs — and
+                      §18/§18b/§18c, session 42's offline notice: the warm cache that is
+                      not a dropped connection (the defect as it was reported, and all four
+                      readings come back "Brak sieci" against the code as it was), the
+                      browser going offline for real, the delay running out on a network
+                      card with no internet behind it, the status line that is no longer
+                      stamped on, and the language switched while the notice is up.
                       Same outside-the-repo Playwright as test-pages.mjs
 scripts/test-dashboard.mjs  The dashboard: the route, the "recently used tools" store,
                       the frame the build writes, the addresses it hands the page and the
@@ -519,7 +529,12 @@ scripts/fake-firebase.mjs  Firebase, as much of it as /app/ actually touches: th
                       stub that has to match a real SDK is two copies free to disagree.
                       Since session 37 it also has listeners on a single document and
                       window.__fbPushDoc(path, data), which is how a test plays the server
-                      granting a plan under an open page
+                      granting a plan under an open page. Session 42 added the one piece of
+                      SDK behaviour /app/ depends on and the stub used to contradict: a
+                      snapshot says where it came from, a snapshot whose documents did not
+                      change reaches only a listener that asked for the metadata, and
+                      window.__fbFromCache / window.__fbSync(fromCache, changed) are the
+                      connection going up and down under an open page
 scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing stubbed: the
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
@@ -752,32 +767,56 @@ Kotlin side of it. Change one, change all three.
   the only credential such an account has. The `app_google` copy stays in the dictionaries
   in all ten languages for the same reason. The two bullets below describe that machinery
   and stay true — they are what comes back on.
-- **The domain moved to `liczmat.com` and the two Google console lists did not (2026-08-14).**
-  Both name only the old host, both are console settings no commit can change, and until
-  the owner edits them `/app/` signs nobody in from the new domain. **The blocker is the
-  browser API key's referrer restriction, not the authorized-domains list** — measured
-  against the live backend by sending `accounts:signInWithPassword` three times with
-  different `Referer` headers:
+- **The domain moved to `liczmat.com`, and both Google console lists have caught up
+  (measured 2026-08-26).** For twelve days after the move neither list named the new host
+  and `/app/` signed nobody in from it; the owner has since edited both. Measured, not
+  assumed — the same `accounts:signInWithPassword` call with three different `Referer`
+  headers, and then the Auth config read back through the same key:
 
   | Referer | Answer |
   |---|---|
-  | `https://liczmat.com/app/` | 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
-  | `https://www.liczmat.com/app/` | 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
-  | `https://materio-app.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` — the key passed, Auth reached the password check |
+  | `https://liczmat.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` — the key passed, Auth reached the password check |
+  | `https://www.liczmat.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` |
+  | `https://materio-app.com/app/` | 400 `INVALID_LOGIN_CREDENTIALS` |
+  | a host on no list | 403 `API_KEY_HTTP_REFERRER_BLOCKED` — the restriction is still doing its job |
 
-  The restriction covers **every** Identity Toolkit call, so sign-up, e-mail sign-in and
-  the password reset all fail the same way; switching Google sign-in off changed nothing,
-  because the block sits a layer below the provider. An earlier version of this bullet
-  said the calls come back `auth/unauthorized-domain` — they do not, and the distinction
-  matters when reading the console: the fix is in Google Cloud, not Firebase.
-  Google Cloud console → Credentials → the browser key → Website restrictions: add
-  `https://liczmat.com/*` and `https://www.liczmat.com/*`. Firebase console →
-  Authentication → Settings → Authorized domains: add `liczmat.com` and `www.liczmat.com`
-  — a second, separate control, needed for the OAuth popup and for the `continueUrl` on an
-  e-mail action link. **Keep every existing entry**, including the two `materio-502513.*`
-  ones the bullets below explain. The same note sits in `assets/firebase-config.js`, next
-  to the config it applies to. The three bullets that follow are history and stay accurate
-  as history — they describe the old host.
+  `authorizedDomains` now reads `materio-502513.firebaseapp.com`,
+  `materio-502513.web.app`, `materio-app.com`, `www.materio-app.com`, `localhost`,
+  `liczmat.com`, `www.liczmat.com`. That list could not be read at all while the key was
+  restricted, which is why earlier sessions could only say what they had asked for.
+  The two are separate controls and both matter: the browser key's Website restrictions
+  gate **every** Identity Toolkit call (sign-up, e-mail sign-in, password reset), the
+  authorized domains govern the OAuth popup and the `continueUrl` on an e-mail action
+  link. Neither is in this repository. If they are edited again, **keep every entry** —
+  including the two `materio-502513.*` ones the bullets below explain. The same note, with
+  the same measurement, sits in `assets/firebase-config.js`. The three bullets that follow
+  are history and stay accurate as history: they describe the old host.
+- **"Brak sieci" is a claim about the connection, and `fromCache` is not evidence of one.**
+  `snapshot.metadata.fromCache` says "this did not come from the server", which is true in
+  three different situations and only one of them is an outage: the moment a listener is
+  attached, the moment after a local write, and a connection that is actually down. /app/
+  announced all three, and could not take the announcement back — the Firestore SDK
+  delivers a snapshot whose documents did not change **only** to a listener that passed
+  `{ includeMetadataChanges: true }` (`ia()` in `firebase-firestore.js` 10.14.1), so the
+  server answering with the documents the cache already held reached nobody. A returning
+  visitor therefore read "Brak sieci — zmiany polecą po powrocie łącza." from sign-in
+  until they closed the tab, on a perfect connection, and a connection that really dropped
+  was never announced at all. Session 42: the listeners ask for the metadata, the notice
+  is its own `#app-offline` line rather than the shared status bar (which it used to stamp
+  on, and which it could only be cleared from by comparing rendered text with the
+  translation it was written with — so a language switch nailed it up), and it goes up when
+  `navigator.onLine` says `false`, which is certain and immediate, or when every listener
+  has been reading the cache for `OFFLINE_AFTER_MS`. That constant is 10 s because it is
+  the SDK's own `online_state_timeout`: saying the connection is down sooner than the
+  library that owns it is guessing. `navigator.onLine` is believed in one direction only —
+  a machine on a network with no internet behind it answers `true`.
+- **A snapshot that changed no document does not redraw the lists.** `includeMetadataChanges`
+  delivers events the page did not use to get, and `renderProjects()` rebuilds
+  `#project-list` with `innerHTML` — including each project's "add a room" form. Redrawing
+  on the server's acknowledgement of a write would take the caret out of a field somebody
+  is typing in, so the redraw is gated on `snap.docChanges().length` (which, read with its
+  own default, drops the metadata-only entries) plus the first snapshot, which has to draw
+  the list even when it is empty.
 - **Google sign-in is switched on** (2026-08-07). The Google provider is enabled in
   Firebase Authentication → Sign-in method, so `/app/`'s `signInWithPopup` with
   `GoogleAuthProvider` has everything it needs — `materio-app.com`, `www.materio-app.com`

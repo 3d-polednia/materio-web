@@ -160,6 +160,14 @@ export function appMain(t, features) {
     <div class="wrap narrow">
       <p id="app-config-missing" class="result err show" hidden data-i18n="app_err_config">${esc(t("app_err_config"))}</p>
       <p id="app-status" class="result show" role="status" aria-live="polite" hidden></p>
+      <!-- "No network" has a line of its own, and the sentence is in the markup rather
+           than written by a script. It used to share #app-status, which cost twice: it
+           stamped on whatever else was standing there ("Nazwa zapisana."), and it could
+           only be taken down by comparing the rendered text against the translation it
+           was written with — so switching language while it showed left it up for good.
+           Keyed for langchange like everything else here; assets/app.js only toggles
+           its hidden attribute. See renderConnection() there for when it goes up. -->
+      <p id="app-offline" class="result show" role="status" hidden data-i18n="app_offline">${esc(t("app_offline"))}</p>
 
       <div id="app-auth">
         <div class="calc">
