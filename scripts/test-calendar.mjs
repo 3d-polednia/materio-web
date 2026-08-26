@@ -85,7 +85,7 @@ function loadCrm({ now = Date.parse("2026-08-19T09:00:00+02:00") } = {}) {
     removeItem: (k) => backing.delete(k),
   };
   const events = [];
-  const api = evalScript(["assets/workspace.js", "assets/crm.js"], [
+  const api = evalScript(["assets/workspace.js", "assets/crm-store.js", "assets/crm.js"], [
     "wsAddProject", "wsProject", "wsProjects", "wsExport",
     "crmAddClient", "crmClient",
     "crmAllJobs", "crmOpenJobs", "crmClosedJobs", "crmJob", "crmAddJob", "crmUpdateJob",
@@ -598,8 +598,14 @@ head("8. the copy, in four languages");
       DICT[lang].pay_monthly_t !== DICT[lang].pay_yearly_t);
     check(`${lang}: and says the subscription is not open yet`,
       DICT[lang].pay_soon.length > 40, DICT[lang].pay_soon);
-    check(`${lang}: the storage note names localStorage`,
-      DICT[lang].cal_local_note.includes("localStorage"), DICT[lang].cal_local_note);
+    // Session 46 changed what this sentence is FOR. Until then it warned that the rows were
+    // in this browser and nowhere else; they are in the sync contract now, so the note says
+    // where they go instead — and naming localStorage here would be the old claim wearing
+    // the new words. The storage detail is on /cookies/, which is the page for it.
+    check(`${lang}: the note says the rows reach the phone`,
+      DICT[lang].cal_local_note.includes("Android"), DICT[lang].cal_local_note);
+    check(`${lang}: and it no longer names localStorage`,
+      !DICT[lang].cal_local_note.includes("localStorage"), DICT[lang].cal_local_note);
     check(`${lang}: and it is a full sentence`, DICT[lang].cal_local_note.length > 100);
     // The sentence this session turns on: the module stores nothing of its own.
     check(`${lang}: the source note is a full sentence`, DICT[lang].cal_source_note.length > 60);

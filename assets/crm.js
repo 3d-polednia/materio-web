@@ -14,25 +14,32 @@
  * each is the thing that joins the next: splitting them would mean three files reading and
  * writing the same localStorage key, which is one race away from a lost write.
  *
- * **Local to this browser, and not part of the sync contract.** docs/FIRESTORE_SYNC.md in
- * `3d-polednia/Materio` defines five collections — projects, rooms, estimations,
- * shoppingItems and sharedProjects — and clients is not among them. There is no
- * `ClientEntity` on the phone, no `SyncContract.clientToDoc()` and no `validClient()` in
- * the deployed rules, so a client written to Firestore would be a document nothing reads
- * and the rules would refuse anyway. So nothing here is uploaded, /app/ does not push it,
- * and the page says so in plain words instead of implying a sync that does not exist.
- * Carrying clients to the phone is a change to the contract in the app repo, which is a
- * session of its own — see docs/ARCHITEKTURA.md §7.6.
+ * The store itself — the key, load/save, the ids and the export/import /app/ syncs with —
+ * is assets/crm-store.js, which every page loads BEFORE this one. That split is page
+ * weight and nothing else: /app/ needs two of those functions and none of this file.
  *
- * The document is still written in the *shape* the contract uses — an id, the fields, and
- * `createdAt / updatedAt / deletedAt / schemaVersion` — and deleting writes a tombstone
- * rather than dropping the row. That is not decoration: it is what makes the undo exact
- * (the same rule as a deleted project), and it is what a later contract addition would
- * need in order to upload the rows that are already here.
+ * **In the sync contract since session 46 (2026-08-26).** docs/FIRESTORE_SYNC.md in
+ * `3d-polednia/Materio` now defines eight collections, and `clients`, `jobs` and `quotes`
+ * are three of them: the phone has ClientEntity, JobEntity and QuoteEntity, Room migration
+ * 5 → 6, the three mappers in SyncContract, the three collections in CloudSync, and
+ * validClient()/validJob()/validQuote() in the rules. /app/ pushes and pulls this store
+ * next to the workspace, so a job whose status was set here is the job the tradesperson
+ * opens on site. See docs/ARCHITEKTURA.md §7.6.
  *
- * The store is its own key. The workspace store is "the documents the app also keeps", and
- * putting a collection the app has never heard of inside it would make that sentence false
- * — and would put clients into wsExport(), which /app/ uploads.
+ * That is exactly why the document was written in the *shape* of the contract from the
+ * first day — an id, the fields, and `createdAt / updatedAt / deletedAt / schemaVersion`,
+ * with a tombstone instead of a delete. It is what makes the undo exact (the same rule as
+ * a deleted project), and it is what let the rows already sitting in people's browsers
+ * travel the moment the contract had room for them: nothing had to be migrated.
+ *
+ * The store keeps its own key. The alternative — folding it into `materio-workspace-v1` —
+ * would put two files on one localStorage key, which is one race away from a lost write.
+ * /app/ uploads both stores; that does not make them one store.
+ *
+ * **A link to another collection travels as a document id.** `projectIds` on a client and
+ * `projectId` / `clientId` on a job and a quote hold the id of the row they point at, which
+ * is also its Firestore document id — the only identifier that means the same thing here
+ * and on the phone. Local ids are per device: two phones both call something "1".
  *
  * Money is never stored here. What a client is worth is the sum of their projects, and a
  * project's cost already has exactly one answer: wsProjectCosts() in assets/workspace.js,
@@ -40,18 +47,6 @@
  * disagree with it the moment a material was re-priced.
  */
 
-const CRM_KEY = "liczmat-crm-v1";
-const CRM_SCHEMA = 1;
-
-/* Field caps. A name and a project name are capped the same way (120), because they are
-   the same kind of thing on the same kind of row; the note is the long one — chapter XX
-   asks for notes, not for a document. */
-const CRM_MAX_NAME = 120;
-const CRM_MAX_CONTACT = 200;
-const CRM_MAX_NOTE = 2000;
-/* A unit is a word beside a number — "h", "m²", "dzień" — capped exactly as a material's
-   unit is in assets/workspace.js, because it is the same kind of thing. */
-const CRM_MAX_UNIT = 24;
 
 /**
  * Chapter XXI's statuses, in the order the chapter lists them: nowe, w toku, zakończone,
@@ -81,49 +76,9 @@ const CAL_BUCKETS = ["late", "today", "soon", "later", "none"];
 /** How far ahead "soon" reaches, in days. A week is what a tradesman plans in. */
 const CAL_SOON_DAYS = 7;
 
-/* ------------------------------------------------------------------ storage */
-
-const crmEmpty = () => ({ clients: [], jobs: [], quotes: [] });
-
-/** Read the whole Pro workspace. A corrupt or absent store reads as an empty one. */
-function crmLoad() {
-  try {
-    const raw = localStorage.getItem(CRM_KEY);
-    if (!raw) return crmEmpty();
-    const data = JSON.parse(raw);
-    return {
-      clients: Array.isArray(data.clients) ? data.clients : [],
-      // A store written before session 23 has no jobs array. Reading it as empty is the
-      // whole migration: nothing is rewritten until the visitor adds their first job.
-      jobs: Array.isArray(data.jobs) ? data.jobs : [],
-      // The same for the quotes of session 24.
-      quotes: Array.isArray(data.quotes) ? data.quotes : [],
-    };
-  } catch (e) {
-    return crmEmpty();
-  }
-}
-
-function crmSave(data) {
-  try {
-    localStorage.setItem(CRM_KEY, JSON.stringify(data));
-  } catch (e) {
-    // Private mode or a full quota: the page keeps working, nothing is written.
-    return false;
-  }
-  document.dispatchEvent(new CustomEvent("crmchange"));
-  return true;
-}
-
-const crmId = () => (crypto.randomUUID ? crypto.randomUUID()
-  : "id-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
-
-const crmText = (v, max) => String(v === undefined || v === null ? "" : v).trim().slice(0, max);
 
 /* ------------------------------------------------------------------ clients */
 
-/** Live rows only — a tombstone stays in storage so an undo has something to clear. */
-const crmAlive = (rows) => rows.filter((r) => !r.deletedAt);
 
 /** Every client that still exists, archived ones included, newest change first. */
 function crmAllClients() {

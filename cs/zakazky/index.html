@@ -60,7 +60,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Zakázky — LiczMat</title>
-<meta name="description" content="Zakázky v LiczMat Pro: seznam zakázek se stavem, termínem a dohodnutou hodnotou, propojení s klientem a projektem. Data zůstávají v tomto prohlížeči.">
+<meta name="description" content="Zakázky v LiczMat Pro: seznam zakázek se stavem, termínem a dohodnutou hodnotou, propojení s klientem a projektem. Synchronizuje se s účtem.">
 <meta name="author" content="LiczMat">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
@@ -79,9 +79,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/nalozi/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/zakazy/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/">
-<link rel="icon" href="/assets/favicon.svg?v=20260826d" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260826d" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260826d">
+<link rel="icon" href="/assets/favicon.svg?v=20260826e" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260826e" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260826e">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -96,7 +96,7 @@
 <meta property="og:locale:alternate" content="sr_RS">
 <meta property="og:locale:alternate" content="ru_RU">
 <meta property="og:title" content="Zakázky — LiczMat">
-<meta property="og:description" content="Zakázky v LiczMat Pro: seznam zakázek se stavem, termínem a dohodnutou hodnotou, propojení s klientem a projektem. Data zůstávají v tomto prohlížeči.">
+<meta property="og:description" content="Zakázky v LiczMat Pro: seznam zakázek se stavem, termínem a dohodnutou hodnotou, propojení s klientem a projektem. Synchronizuje se s účtem.">
 <meta property="og:url" content="https://liczmat.com/cs/zakazky/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -104,10 +104,10 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Zakázky — LiczMat">
-<meta name="twitter:description" content="Zakázky v LiczMat Pro: seznam zakázek se stavem, termínem a dohodnutou hodnotou, propojení s klientem a projektem. Data zůstávají v tomto prohlížeči.">
+<meta name="twitter:description" content="Zakázky v LiczMat Pro: seznam zakázek se stavem, termínem a dohodnutou hodnotou, propojení s klientem a projektem. Synchronizuje se s účtem.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260826d">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260826e">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -393,7 +393,7 @@
         <a class="btn btn-ghost" href="/cs/cenove-nabidky/">Cenové nabídky</a>
         <a class="btn btn-ghost" href="/cs/terminy/">Termíny</a>
       </p>
-      <p class="muted src-note">Zakázky držíme v paměti tohoto prohlížeče (localStorage). Nikam je neposíláme a v aplikaci pro Android nejsou. Vymazání dat webu zakázky smaže.</p>
+      <p class="muted src-note">Zakázky patří k účtu LiczMat. Bez přihlášení zůstávají v tomto prohlížeči; po přihlášení jsou i v aplikaci pro Android.</p>
     </div>
   </section>
 
@@ -488,19 +488,20 @@
   "ru": "/ru/zakazy/"
 };</script>
 
-<script src="/assets/i18n.cs.js?v=20260826d"></script>
-<script src="/assets/i18n-runtime.js?v=20260826d"></script>
-<script src="/assets/currency.js?v=20260826d"></script>
-<script src="/assets/account.js?v=20260826d"></script>
+<script src="/assets/i18n.cs.js?v=20260826e"></script>
+<script src="/assets/i18n-runtime.js?v=20260826e"></script>
+<script src="/assets/currency.js?v=20260826e"></script>
+<script src="/assets/account.js?v=20260826e"></script>
 
-<script src="/assets/workspace.js?v=20260826d"></script>
-<script src="/assets/plan.js?v=20260826d"></script>
-<script src="/assets/pay.js?v=20260826d"></script>
-<script src="/assets/paywall.js?v=20260826d"></script>
-<script src="/assets/crm.js?v=20260826d"></script>
-<script src="/assets/crm-chain.js?v=20260826d"></script>
-<script src="/assets/jobs-ui.js?v=20260826d"></script>
-<script src="/assets/main.js?v=20260826d"></script>
+<script src="/assets/workspace.js?v=20260826e"></script>
+<script src="/assets/plan.js?v=20260826e"></script>
+<script src="/assets/pay.js?v=20260826e"></script>
+<script src="/assets/paywall.js?v=20260826e"></script>
+<script src="/assets/crm-store.js?v=20260826e"></script>
+<script src="/assets/crm.js?v=20260826e"></script>
+<script src="/assets/crm-chain.js?v=20260826e"></script>
+<script src="/assets/jobs-ui.js?v=20260826e"></script>
+<script src="/assets/main.js?v=20260826e"></script>
 
 </body>
 </html>

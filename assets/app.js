@@ -1058,9 +1058,12 @@ function localCounts() {
   const local = typeof wsExport === "function" ? wsExport() : null;
   if (!local) return null;
   const alive = (rows) => (rows || []).filter((r) => !r.deletedAt).length;
+  const pro = typeof crmExport === "function" ? crmExport() : null;
   return {
     projects: alive(local.projects), rooms: alive(local.rooms),
     estimations: alive(local.estimations), shoppingItems: alive(local.shoppingItems),
+    clients: alive(pro && pro.clients), jobs: alive(pro && pro.jobs),
+    quotes: alive(pro && pro.quotes),
   };
 }
 
@@ -1076,7 +1079,11 @@ function foreignWorkspace() {
   if (!stamp || !state.uid || stamp === state.uid) return false;
   const counts = localCounts();
   if (!counts) return false;
-  return counts.projects + counts.rooms + counts.estimations + counts.shoppingItems > 0;
+  // The Pro store counts as well, and it is the one that holds another person's name,
+  // telephone number and address. A browser holding only somebody's clients is exactly the
+  // browser that must not push them into the next person's account.
+  return counts.projects + counts.rooms + counts.estimations + counts.shoppingItems
+    + counts.clients + counts.jobs + counts.quotes > 0;
 }
 
 /** How much is sitting in this browser's workspace, in one line. */
@@ -1193,6 +1200,7 @@ function wireSyncPanel() {
           ...syncFields(s.createdAt, s.deletedAt),
         }, MERGE);
       }
+      await pushProWorkspace();
       setSyncAccount(state.uid);
       renderLocalSummary();
       status(T("app_sync_pushed"));
@@ -1209,6 +1217,9 @@ function wireSyncPanel() {
     try {
       const incoming = await downloadAccount();
       wsImport(incoming);
+      // The Pro store is its own key and its own merge; both are last-write-wins on
+      // `updatedAt`, the same rule the phone uses.
+      if (typeof crmImport === "function") crmImport(incoming);
       setSyncAccount(state.uid);
       renderLocalSummary();
       status(T("app_sync_pulled"));
@@ -1220,17 +1231,116 @@ function wireSyncPanel() {
   });
 }
 
+/** One document in a flat collection of this account. */
+const proDoc = (collection, id) => fb.doc(db, "users", state.uid, collection, id);
+
+/** A calendar day, or "". The same ten-character rule crmDay() and the phone both apply. */
+function proDay(value) {
+  const day = String(value == null ? "" : value).trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : "";
+}
+
+/**
+ * Push LiczMat Pro's three collections (session 46).
+ *
+ * They joined the sync contract on 2026-08-26 — `users/{uid}/clients`, `/jobs`, `/quotes`,
+ * flat collections beside `rooms`, with `validClient()` / `validJob()` / `validQuote()` in
+ * the deployed rules. Every field is clamped here to exactly what those rules validate:
+ * the rules are the last gate, and a document they refuse fails the whole pass.
+ *
+ * The links travel as document ids — `projectIds` on a client, `projectId` and `clientId`
+ * on a job, `projectId` on a quote — which is what the row ids in this browser already are.
+ *
+ * A merge, like every other write on both platforms: a replace would delete a field this
+ * browser has never heard of, which is exactly how the phone's own extra fields survive.
+ */
+async function pushProWorkspace() {
+  if (typeof crmExport !== "function") return;
+  const MERGE = { merge: true };
+  const pro = crmExport();
+  const text = (value, max) => String(value == null ? "" : value).slice(0, max);
+  // The four statuses of chapter XXI are the whole set; an unknown word is refused rather
+  // than sent, because the rules would refuse it and take the whole pass down with it.
+  const jobStatus = (value) => (["new", "active", "done", "cancelled"].indexOf(value) >= 0 ? value : "new");
+
+  for (const c of pro.clients || []) {
+    const seg = pathId(c.id);
+    if (!seg) continue;
+    await fb.setDoc(proDoc("clients", seg), {
+      name: text(c.name, 120),
+      phone: text(c.phone, 200),
+      email: text(c.email, 200),
+      address: text(c.address, 200),
+      note: text(c.note, 2000),
+      projectIds: (Array.isArray(c.projectIds) ? c.projectIds : [])
+        .filter((id) => !!pathId(id)).slice(0, 200),
+      archived: !!c.archived,
+      ...syncFields(c.createdAt, c.deletedAt),
+    }, MERGE);
+  }
+
+  for (const j of pro.jobs || []) {
+    const seg = pathId(j.id);
+    if (!seg) continue;
+    const value = j.valueMinor == null ? null : Math.round(j.valueMinor);
+    await fb.setDoc(proDoc("jobs", seg), {
+      name: text(j.name, 120),
+      clientId: text(j.clientId, 64),
+      projectId: text(j.projectId, 64),
+      status: jobStatus(j.status),
+      description: text(j.description, 2000),
+      note: text(j.note, 2000),
+      dueDate: proDay(j.dueDate),
+      valueMinor: value,
+      currencyCode: value == null ? "" : text(j.currencyCode, 3),
+      ...syncFields(j.createdAt, j.deletedAt),
+    }, MERGE);
+  }
+
+  for (const q of pro.quotes || []) {
+    const seg = pathId(q.id);
+    if (!seg) continue;
+    const labour = (Array.isArray(q.labour) ? q.labour : []).slice(0, 60).map((line) => ({
+      id: text(line.id, 64),
+      name: text(line.name, 120),
+      // A blank quantity is a lump sum and stays null: a line nobody counted and a line
+      // counted once are different statements.
+      quantity: line.quantity == null ? null : Math.max(0, num(line.quantity)),
+      unit: text(line.unit, 24),
+      amountMinor: Math.round(line.amountMinor) || 0,
+    }));
+    const money = labour.reduce((sum, line) => sum + line.amountMinor, 0);
+    await fb.setDoc(proDoc("quotes", seg), {
+      name: text(q.name, 120),
+      projectId: text(q.projectId, 64),
+      labour: labour,
+      marginPct: Math.min(1000, Math.max(0, num(q.marginPct))),
+      note: text(q.note, 2000),
+      currencyCode: money === 0 ? "" : text(q.currencyCode, 3),
+      ...syncFields(q.createdAt, q.deletedAt),
+    }, MERGE);
+  }
+}
+
 /**
  * Everything under users/{uid}, in the shape assets/workspace.js stores locally —
  * used by the pull button and by the export button.
  */
 async function downloadAccount() {
-  const out = { projects: [], rooms: [], estimations: [], shoppingItems: [] };
+  const out = {
+    projects: [], rooms: [], estimations: [], shoppingItems: [],
+    clients: [], jobs: [], quotes: [],
+  };
   const rows = (snap) => { const list = []; snap.forEach((d) => list.push({ id: d.id, ...d.data() })); return list; };
 
   const projSnap = await fb.getDocs(fb.collection(db, "users", state.uid, "projects"));
   out.projects = rows(projSnap);
   out.rooms = rows(await fb.getDocs(fb.collection(db, "users", state.uid, "rooms")));
+  // The three Pro collections (session 46). Flat, beside rooms, and downloaded even when
+  // nothing on this page draws them: the export button hands back the whole account.
+  for (const name of ["clients", "jobs", "quotes"]) {
+    out[name] = rows(await fb.getDocs(fb.collection(db, "users", state.uid, name)));
+  }
 
   for (const project of out.projects) {
     const sub = (name) => fb.collection(db, "users", state.uid, "projects", project.id, name);

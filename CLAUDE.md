@@ -644,14 +644,20 @@ assets/crm-chain.js   Chapter XXIV's path, drawn: the strip of four steps, the q
                       the chain reads the same wherever it is standing. Every name in it
                       starts `chn` — these are plain scripts in one global scope. It reads
                       and never writes; the addresses come from window.LM_LINKS
+assets/crm-store.js   Where the Pro workspace lives, and the only file that writes it: the
+                      key (`liczmat-crm-v1`), crmLoad()/crmSave(), the ids, and the
+                      crmExport()/crmImport() /app/ syncs with. Split out of crm.js in
+                      session 46 for page weight — /app/ needs two of these functions and
+                      none of the screens. Every Pro page loads it BEFORE crm.js
 assets/crm.js         The Pro workspace: clients, jobs and quotes — plus the terminarz of
                       session 25, which is a reading of the jobs rather than a fourth
-                      collection. localStorage under its own key
-                      (`liczmat-crm-v1`), this browser only — `clients` is NOT in the sync
-                      contract, so nothing here is uploaded and nothing on the phone reads
-                      it. Written in the contract's shape anyway (id, fields, the sync
-                      block, a tombstone instead of a delete) so a later contract change
-                      can carry the rows that are already there
+                      collection. **In the sync contract since session 46**: the phone has
+                      ClientEntity/JobEntity/QuoteEntity, Room migration 5 → 6, the six
+                      mappers and the three collections in CloudSync, and the deployed
+                      rules validate them. It was written in the contract's shape from the
+                      first day (id, fields, the sync block, a tombstone instead of a
+                      delete), which is why nothing had to be migrated when the contract
+                      made room
 assets/jobs-ui.js     /zlecenia/ — the index (open jobs and closed ones) and one job at
                       ?id=<jobId>: its client, its project, chapter XXI's status and
                       deadline, what was agreed and what the work has cost
@@ -940,15 +946,15 @@ Kotlin side of it. Change one, change all three.
   `?id=<jobId>`, the same two-screens-in-one-file shape as `/klienci/`. The rows live in
   `assets/crm.js` beside the clients, under the same `liczmat-crm-v1` key, because it is
   one store: two files reading and writing one localStorage key is one race away from a
-  lost write. `jobs` is not in the sync contract either (no `JobEntity`, no
-  `SyncContract.jobToDoc()`, no `validJob()` in the deployed rules), so nothing here is
-  uploaded and the page says so. A store written before session 23 has no `jobs` array and
-  reads as an empty one — that is the whole migration.
+  lost write. `jobs` joined the sync contract in session 46 along with the other two —
+  `JobEntity`, `SyncContract.jobToDoc()` and `validJob()` all exist now — so a job does
+  reach the phone, and the page says that instead. A store written before session 23 has no
+  `jobs` array and reads as an empty one — that is the whole migration.
 - **A quote stores two of chapter XXII's five figures and derives the other three.**
   Session 24 built `/wyceny/` — the index plus one quote at `?id=<quoteId>`, the same
   two-screens-in-one-file shape as `/klienci/` and `/zlecenia/`, in the same
-  `liczmat-crm-v1` store and outside the same sync contract (no `QuoteEntity`, no
-  `SyncContract.quoteToDoc()`, no `validQuote()` in the deployed rules). The material and
+  `liczmat-crm-v1` store and, since session 46, inside the same sync contract
+  (`QuoteEntity`, `SyncContract.quoteToDoc()`, `validQuote()`). The material and
   the other costs are `wsProjectCosts()` over the quote's project; the labour and the
   margin are the quote's own; the total is computed. Copying the project's money onto the
   quote would give one amount two homes and let them disagree the moment a material was
@@ -1013,17 +1019,29 @@ Kotlin side of it. Change one, change all three.
   conversion at a rate and chapter VI forbids those. The currency is stamped once, at the
   first amount typed, and kept through corrections; clearing the amount clears it so the
   next one is stamped fresh.
-- **Clients are LiczMat Pro's first real module, and they are not in the sync contract.**
-  Session 22 built `/klienci/` — the index plus one client at `?id=<clientId>`, the same
-  two-screens-in-one-file shape as `/projekty/`. The store is `assets/crm.js` under its own
-  key (`liczmat-crm-v1`), because `docs/FIRESTORE_SYNC.md` in the app repo has five
-  collections and clients is not one of them: no `ClientEntity`, no
-  `SyncContract.clientToDoc()`, no `validClient()` in the deployed rules. So nothing here
-  is uploaded, `wsExport()` (what `/app/` pushes) does not carry it, and the page says so
-  rather than implying a sync that does not exist. **Do not put clients into
-  `materio-workspace-v1`** — that store is "the documents the app also keeps", and
-  `wsExport()` would start sending a collection Firestore has never heard of. Carrying
-  clients to the phone is a contract change in the app repo, which is a session of its own.
+- **Clients, jobs and quotes ARE in the sync contract, since session 46 (2026-08-26).**
+  Sessions 22–24 built `/klienci/`, `/zlecenia/` and `/wyceny/` against a contract with no
+  room for them, so they lived in `localStorage` alone; session 46 made the room, in
+  `3d-polednia/Materio`. `docs/FIRESTORE_SYNC.md` now has eight collections —
+  `users/{uid}/clients`, `/jobs` and `/quotes` beside `rooms` — and the phone has
+  `ClientEntity`, `JobEntity`, `QuoteEntity`, Room migration 5 → 6, the six mappers in
+  `SyncContract`, the three collections in `CloudSync` and `validClient()`/`validJob()`/
+  `validQuote()` in the deployed rules. **Those rules still need deploying**
+  (`firebase deploy --only firestore`); until then a write is refused and both sides work
+  locally exactly as before. `/app/` pushes and pulls the Pro store beside the workspace
+  (`pushProWorkspace()`, `crmImport()`), so a job whose status was set in a browser is the
+  job the tradesperson opens on site.
+  **The store keeps its own key.** `liczmat-crm-v1` is still separate from
+  `materio-workspace-v1`, and the reason has not changed: two files writing one
+  `localStorage` key is one race away from a lost write. `/app/` uploads both; that does
+  not make them one store. Nothing had to be migrated — the rows people already had carry
+  `id`, the fields, `createdAt`/`updatedAt`/`deletedAt`/`schemaVersion` and a tombstone
+  instead of a delete, which is exactly what the contract wanted.
+  **A link between collections travels as a document id.** `projectIds` on a client,
+  `projectId`/`clientId` on a job, `projectId` on a quote — these are row ids here and
+  Firestore document ids there, the only identifier that means the same thing on both. The
+  phone therefore stores `remoteId` in those four columns rather than its own `Long` id,
+  and hands one out when a row is created.
 - **The client → project link lives on the client, and a project document is never
   touched.** Chapter XX lets a client have projects; the project is contract (it syncs, the
   phone reads it, `/p/<token>` renders it) while the client travels nowhere, so a `clientId`

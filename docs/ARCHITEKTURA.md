@@ -897,7 +897,7 @@ synchronizacji (`docs/FIRESTORE_SYNC.md` w repo aplikacji) ma pięć kolekcji �
 regułach. Więc nic stąd nigdzie nie jedzie, `/app/` tego nie wysyła, `wsExport()` tego nie
 zawiera, a strona mówi to wprost, zamiast sugerować synchronizację, której nie ma.
 Przeniesienie klientów na telefon to zmiana kontraktu po stronie aplikacji — osobna sesja,
-nie doklejka do tej.
+nie doklejka do tej. **Nieaktualne od 2026-08-26: ta sesja to Sesja 46, patrz §7.17.**
 
 Dokument jest mimo to napisany w **kształcie** kontraktu (`id`, pola, `createdAt` /
 `updatedAt` / `deletedAt` / `schemaVersion`), a usunięcie zostawia nagrobek zamiast
@@ -974,7 +974,7 @@ obok `clients`. `jobs` też **nie ma w kontrakcie synchronizacji**: żadnego `Jo
 stąd nigdzie nie jedzie, `wsExport()` tego nie zawiera, a strona mówi to wprost. Jeden plik
 na dwie kolekcje, bo to jeden magazyn: dwa pliki czytające i piszące ten sam klucz
 `localStorage` to jeden wyścig od zgubionego zapisu. Magazyn zapisany przed Sesją 23 nie ma
-tablicy `jobs` i czyta się jako pusty — na tym polega cała migracja.
+tablicy `jobs` i czyta się jako pusty — na tym polega cała migracja. **Nieaktualne od 2026-08-26 — patrz §7.17.**
 
 **Cztery statusy rozdziału XXI i ani jednego więcej.** `nowe`, `w toku`, `zakończone`,
 `anulowane` — `JOB_STATUS` w `assets/crm.js`, w kolejności rozdziału. Wartość spoza tej
@@ -1045,7 +1045,7 @@ trzecia kolekcja obok `clients` i `jobs`, z tego samego powodu (jeden magazyn, j
 `quotes` też **nie ma w kontrakcie synchronizacji**: żadnego `QuoteEntity`, żadnego
 `SyncContract.quoteToDoc()`, żadnego `validQuote()` we wdrożonych regułach. Nic stąd nigdzie
 nie jedzie, `wsExport()` tego nie zawiera, a strona mówi to wprost. Magazyn zapisany przed
-Sesją 24 nie ma tablicy `quotes` i czyta się jako pusty.
+Sesją 24 nie ma tablicy `quotes` i czyta się jako pusty. **Nieaktualne od 2026-08-26 — patrz §7.17.**
 
 **Każda z pięciu liczb ma dokładnie jedno źródło, a tylko dwie z nich są zapisane.**
 
@@ -1617,6 +1617,63 @@ w przeglądarce.
 przeglądarki klikaniem w Chromium.
 
 ---
+
+### 7.17. Klienci, zlecenia i wyceny jadą na telefon (Sesja 46)
+
+**To jest ta jedna zmiana kontraktu, którą §7.7, §7.8 i §7.9 odkładały.** Trzy akapity
+„Magazyn: … tylko ta przeglądarka" w tych sekcjach opisują stan sprzed 2026-08-26 i
+zostają jako historia. Od tej sesji `docs/FIRESTORE_SYNC.md` w repo aplikacji ma osiem
+kolekcji: doszły `users/{uid}/clients`, `/jobs` i `/quotes`.
+
+Po stronie aplikacji: `ClientEntity`, `JobEntity`, `QuoteEntity`, migracja Room **5 → 6**
+(trzy nowe tabele, w starych ani jednej zmiany), sześć mapperów w `SyncContract`, trzy
+kolekcje w `CloudSync` — push, pull, nagrobek, czyszczenie i usunięcie konta — oraz
+`validClient()` / `validJob()` / `validQuote()` we `config/firebase/firestore.rules`.
+**Reguły wymagają wdrożenia** (`firebase deploy --only firestore`); do tego czasu zapis
+jest odrzucany i obie strony pracują lokalnie, tak jak dotąd.
+
+Po stronie serwisu zmieniło się mniej, niż mogłoby się wydawać, i to jest cała pointa
+kształtu, w którym te dokumenty były pisane od pierwszego dnia:
+
+- **Magazyn zostaje pod swoim kluczem.** `liczmat-crm-v1` dalej jest osobny od
+  `materio-workspace-v1`. Argument się nie zmienił: dwa pliki piszące do jednego klucza
+  `localStorage` to jeden wyścig od zgubionego zapisu. `/app/` wysyła teraz oba magazyny —
+  to nie czyni z nich jednego magazynu.
+- **Nic nie trzeba było migrować.** Wiersze, które ludzie mają dziś w przeglądarkach, mają
+  `id`, pola, `createdAt` / `updatedAt` / `deletedAt` / `schemaVersion` i nagrobek zamiast
+  kasowania — czyli dokładnie to, czego potrzebuje kontrakt. Pojechały w takiej postaci,
+  w jakiej leżą.
+- **`assets/crm-store.js` to nowy plik i jedyny nowy plik.** Magazyn — klucz, `crmLoad()` /
+  `crmSave()`, identyfikatory oraz `crmExport()` / `crmImport()` — wyszedł z `assets/crm.js`,
+  bo `/app/` potrzebuje dwóch funkcji, a nie 47 kB ekranów Pro. To ten sam argument, który
+  w Sesji 33 wydzielił `assets/workspace-calc.js` z `assets/workspace-ui.js`, i to samo
+  ograniczenie: `/app/` jest najcięższą stroną serwisu i ma budżet, którego test pilnuje.
+  Każda strona Pro ładuje `crm-store.js` **przed** `crm.js`.
+- **Powiązanie między kolekcjami jedzie jako identyfikator dokumentu.** `projectIds` na
+  kliencie, `projectId` i `clientId` na zleceniu, `projectId` na wycenie — to są `id`
+  wierszy, czyli jednocześnie identyfikatory dokumentów Firestore. Lokalne `id` w Room są
+  per urządzenie i dwa telefony nazwą „1" dwie różne rzeczy, więc telefon trzyma w tych
+  czterech polach `remoteId`, a nie swoje `id`. Konsekwencja, świadoma: klient, zlecenie
+  i wycena dostają tam `remoteId` **przy tworzeniu wiersza**, a projekt dostaje go w chwili,
+  gdy ktoś go do czegoś podpina. Druga konsekwencja: powiązanie **przeżywa** brak drugiej
+  strony i odnajduje ją, gdy dojdzie.
+- **Ostrzeżenie o cudzej kopii obejmuje teraz magazyn Pro.** `foreignWorkspace()` liczył
+  projekty, pokoje, kalkulacje i materiały; klienci, zlecenia i wyceny to jedyny magazyn
+  na tym urządzeniu, który trzyma czyjeś nazwisko, telefon i adres — czyli dokładnie ten,
+  którego nie wolno wysłać pod konto następnej osoby. `scripts/test-security.mjs` §6 sprawdza
+  to na przeglądarce, w której nie ma nic poza magazynem Pro.
+- **Copy przestało obiecywać coś innego, niż jest.** `cli_local_note`, `job_local_note`,
+  `quo_local_note`, `cal_local_note` i `propage_local` mówiły „trzymamy w pamięci tej
+  przeglądarki … i nie ma ich w aplikacji na Androida". Mówią teraz, gdzie te dane jadą.
+  Nazwa `localStorage` znika z tych pięciu zdań i zostaje na `/cookies/`, czyli na stronie,
+  która jest od tego — a testy czterech modułów pilnują obu połówek naraz.
+
+**Czego ta sesja nie ruszyła, świadomie:** reguły nie patrzą na plan. LiczMat Pro decyduje
+o tym, co produkt *pokazuje*, po obu stronach; reguła oparta o `plan` byłaby zamkiem, do
+którego klient trzyma klucz, bo `plan` czyta przeglądarka i telefon. To, czego klient nie
+może, to zapisać sobie `plan` — i tego reguły pilnują od pierwszego dnia. `BackupManager`
+w aplikacji nadal nie eksportuje ani tych trzech kolekcji, ani pokoi; to starsza dziura
+i osobne zadanie.
 
 ## 8. Otwarte decyzje
 

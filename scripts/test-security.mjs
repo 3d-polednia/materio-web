@@ -106,9 +106,12 @@ function loadApp(store) {
   };
   // assets/workspace.js is loaded before app.js on the page and app.js reads it through
   // its globals — wsExport() is what "how much is in this browser" is counted from, so
-  // without it every count here would be zero and §6 would pass by being empty.
+  // without it every count here would be zero and §6 would pass by being empty. Since
+  // session 46 the same holds for assets/crm-store.js: the Pro store is the one on this
+  // device holding another person's name, telephone number and address, so it is exactly
+  // the store that must not be pushed into the next person's account.
   return new Function("document", "localStorage", "window", "crypto", "CustomEvent",
-    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${src}\nreturn {
+    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${src}\nreturn {
        pathId, foreignWorkspace, syncAccount, setSyncAccount, state, SYNC_ACCOUNT_KEY,
        lmSafeNext, lmAuthMode, lmSignupUrl, lmReadLevel, lmLevelOf, LM_LEVEL,
      };`)(document, localStorage, {}, { getRandomValues: (a) => a }, function CustomEvent() {});
@@ -346,6 +349,17 @@ head("6. izolacja danych: one account's copy on a device two people use");
     signedIn({ "materio-workspace-v1": workspace(true), "liczmat-sync-account": UID_A },
       UID_B).foreignWorkspace(), true);
 
+  // Clients, jobs and quotes are a store of their own, and the only one here carrying
+  // somebody else's name, telephone number and address. A browser holding nothing but
+  // those is precisely the browser that must not push them under the next account.
+  const crm = (rows) => JSON.stringify({
+    clients: rows ? [{ id: "c-1", name: "Kowalski", updatedAt: 1 }] : [],
+    jobs: [], quotes: [],
+  });
+  eq("a Pro store alone is enough to refuse",
+    signedIn({ "liczmat-crm-v1": crm(true), "liczmat-sync-account": UID_A }, UID_B)
+      .foreignWorkspace(), true);
+
   eq("an empty workspace holds nobody's data",
     signedIn({ "materio-workspace-v1": workspace(false), "liczmat-sync-account": UID_A },
       UID_B).foreignWorkspace(), false);
@@ -357,7 +371,14 @@ head("6. izolacja danych: one account's copy on a device two people use");
   const app = read("assets/app.js");
   check("the stamp is written after a push",
     /setSyncAccount\(state\.uid\);\s*\n\s*renderLocalSummary\(\);\s*\n\s*status\(T\("app_sync_pushed"\)\)/.test(app));
-  check("and after a pull", /wsImport\(incoming\);\s*\n\s*setSyncAccount\(state\.uid\);/.test(app));
+  // The pull writes both stores before it stamps: the workspace and, since session 46, the
+  // Pro one. A stamp written between them would name an account only half the rows here
+  // came from.
+  check("and after a pull", /wsImport\(incoming\);[\s\S]{0,240}?setSyncAccount\(state\.uid\);/.test(app));
+  check("the Pro store is pulled by the same button",
+    /crmImport\(incoming\);\s*\n\s*setSyncAccount\(state\.uid\);/.test(app));
+  check("and pushed by the other one",
+    /await pushProWorkspace\(\);\s*\n\s*setSyncAccount\(state\.uid\);/.test(app));
   check("both buttons check it themselves, not only through `disabled`",
     (app.match(/if \(foreignWorkspace\(\)\) \{ status\(T\("app_sync_foreign"\), true\); return; \}/g) || []).length === 2);
   check("and the summary is what disables them",
@@ -388,7 +409,7 @@ head("7. API: every address this site builds");
   check("no query reaches across accounts",
     !/where\("ownerId", "==", (?!state\.uid)/.test(app));
   for (const file of ["assets/share.js", "assets/dashboard.js", "assets/workspace.js",
-    "assets/crm.js"]) {
+    "assets/crm.js", "assets/crm-store.js"]) {
     check(`${file} builds no path under users/`, !read(file).includes('"users"'));
   }
 
@@ -495,8 +516,8 @@ head("9. uprawnienia: the table, the routes, and the hint that gates nothing");
   }
 
   // The hint decides wording and a menu item. Nothing may read it to decide a write.
-  for (const file of ["assets/workspace.js", "assets/crm.js", "assets/recent.js",
-    "assets/calculators.js"]) {
+  for (const file of ["assets/workspace.js", "assets/crm.js", "assets/crm-store.js",
+    "assets/recent.js", "assets/calculators.js"]) {
     const src = read(file);
     check(`${file} never reads the session hint`,
       !src.includes("liczmat-signed-in") && !src.includes("lmReadLevel")

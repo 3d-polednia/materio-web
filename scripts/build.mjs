@@ -53,7 +53,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260826d";
+const STAMP = "20260826e";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -518,6 +518,7 @@ const WS_SCRIPTS = [
  */
 const CRM_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm-store.js",
   "/assets/crm.js",
   "/assets/crm-chain.js", "/assets/crm-ui.js",
 ];
@@ -531,6 +532,7 @@ const CRM_SCRIPTS = [
  */
 const JOBS_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm-store.js",
   "/assets/crm.js",
   "/assets/crm-chain.js", "/assets/jobs-ui.js",
 ];
@@ -544,6 +546,7 @@ const JOBS_SCRIPTS = [
  */
 const QUOTES_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm-store.js",
   "/assets/crm.js",
   "/assets/crm-chain.js", "/assets/quotes-ui.js",
 ];
@@ -556,6 +559,7 @@ const QUOTES_SCRIPTS = [
  */
 const CALENDAR_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm-store.js",
   "/assets/crm.js",
   "/assets/schedule-ui.js",
 ];
@@ -1221,7 +1225,12 @@ function buildPrivatePages() {
     // subscription is bought, so it is the one page that needs the prices AND the uid.
     // assets/paywall.js is deliberately absent — it draws a wall, and /app/ has none.
     // It was here until session 28 only to wire the preview switch, which is gone.
-    classicScripts: ["/assets/workspace.js", "/assets/plan.js", "/assets/pay.js"],
+    // crm-store.js since session 46: clients, jobs and quotes joined the sync contract, so
+    // the sync tab has a second store to push and pull. The STORE half only — /app/ draws no
+    // Pro screen, and assets/crm.js is 47 kB of screens this page would never use.
+    classicScripts: [
+      "/assets/workspace.js", "/assets/crm-store.js", "/assets/plan.js", "/assets/pay.js",
+    ],
     scripts: ["/assets/app.js"],
   }));
 

@@ -73,7 +73,7 @@ function loadCrm() {
     setItem: (k, v) => backing.set(k, String(v)),
     removeItem: (k) => backing.delete(k),
   };
-  const api = evalScript(["assets/workspace.js", "assets/crm.js"], [
+  const api = evalScript(["assets/workspace.js", "assets/crm-store.js", "assets/crm.js"], [
     "wsAddProject", "wsProject", "wsProjects", "wsDeleteProject", "wsRestoreProject",
     "wsAddEstimation", "wsAddManualEstimation", "wsEstimations", "wsProjectCosts", "wsExport",
     "crmAddClient", "crmClient", "crmDeleteClient", "crmRestoreClient", "crmLinkProject",

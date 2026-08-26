@@ -84,7 +84,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 43 | Kalkulator na prawdziwym telefonie | **Zrobione** — 2026-08-26 |
 | 44 | Stop slop: zasady, test, pl/uk/de/en | **Zrobione** — 2026-08-26 |
 | 45 | Stop slop: cs/sk/ro/hr/sr/ru | **Zrobione** — 2026-08-26 |
-| 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | Do zrobienia |
+| 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | **Zrobione** — 2026-08-26, czeka na wdrożenie reguł |
 | 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | Do zrobienia |
 | 48 | Prawda w dokumentacji i lista rzeczy w konsolach | Do zrobienia |
 | 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | Do zrobienia |
@@ -248,6 +248,129 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 46 (plan naprawczy)
+
+**Klienci, zlecenia i wyceny na telefon.** Dwa repozytoria: `3d-polednia/Materio` (kontrakt,
+baza, synchronizacja, ekrany) i `3d-polednia/materio-web` (wysyłka, copy, dokumentacja).
+
+Właściciel wybrał zakres na początku sesji: **kontrakt plus ekrany**, i **plan Pro także na
+telefonie**.
+
+**WYKONANO**
+
+**1. Kontrakt.** `docs/FIRESTORE_SYNC.md` ma osiem kolekcji zamiast pięciu: doszły
+`users/{uid}/clients`, `/jobs` i `/quotes`. Płaskie, obok `rooms`, nie podkolekcje projektu —
+klient istnieje przed pierwszym projektem i po ostatnim, zlecenie może nie mieć jeszcze
+projektu, a wycena bez projektu to cena za samą robotę. Wszystkie trzy przeżywają usunięcie
+projektu; podkolekcja by nie przeżyła. Reguły: `validClient()`, `validJob()`, `validQuote()`.
+
+**2. Powiązania jadą jako identyfikatory dokumentów.** `projectIds` na kliencie, `projectId`
+i `clientId` na zleceniu, `projectId` na wycenie. To jedyny identyfikator, który znaczy to
+samo w przeglądarce i na telefonie: lokalne `id` w Room są per urządzenie i dwa telefony
+nazwą „1" dwie różne rzeczy. Dlatego telefon trzyma w tych czterech kolumnach `remoteId`,
+a nie swoje `id` — i dlatego klient, zlecenie i wycena dostają `remoteId` **przy tworzeniu
+wiersza**, a projekt w chwili, gdy ktoś go podpina. Powiązanie przeżywa brak drugiej strony
+i odnajduje ją, kiedy dojdzie. To jedyne miejsce, w którym ten kontrakt robi coś innego niż
+`shopping_items.estimationId`, i różnica jest opisana w §3.
+
+**3. Aplikacja.** `ClientEntity`, `JobEntity`, `QuoteEntity`, migracja Room **5 → 6** (trzy
+nowe tabele, w starych ani jednej zmiany), trzy DAO, `CrmRepository`, sześć mapperów
+w `SyncContract`, trzy kolekcje w `CloudSync` — push, pull, nagrobek, czyszczenie
+i usunięcie konta. `ProjectRepository.costsOf()` to nowa i jedyna w aplikacji odpowiedź na
+„ile kosztuje ten projekt": lista zakupów plus każda kalkulacja, z której nic na tę listę nie
+weszło. Dodanie obu kolekcji do siebie liczyłoby rachunek dwa razy.
+
+**4. Ekrany.** `feature/crm/` — klienci, zlecenia, wyceny, plus `ProGate`, czyli ściana
+rozdziału XXV zbudowana **raz** dla trzech ekranów. Wchodzi się z pulpitu, nie z dolnego
+paska: pasek jest pełny przy pięciu zakładkach, a szósta zepchnęłaby najszerszy podpis poza
+wiersz. Sześćdziesiąt nowych stringów w dziesięciu językach.
+
+**5. Plan Pro na telefonie.** `PlanRepository` czyta `users/{uid}.plan` **na żywo**, więc plan
+nadany przy otwartej aplikacji przesuwa poziom bez restartu. Trzy poziomy wyprowadzone,
+nigdy zadeklarowane. `planRenews`, którego nie ma, znaczy „odnawia się" — każdy dokument
+zapisany przed powstaniem tego pola go nie ma, a powiedzenie komuś, że subskrypcja się kończy,
+kiedy dokument tego nie powiedział, to jedyny błąd tutaj, który kosztuje klienta. `ProGate`
+**otwiera** moduł, kiedy planu nie da się odczytać: schowanie komuś jego własnych klientów za
+zapytaniem, które nie odpowiedziało, jest gorszą awarią.
+
+**6. Reguły nie patrzą na plan, i to jest decyzja, nie przeoczenie.** LiczMat Pro decyduje
+o tym, co produkt *pokazuje* — po obu stronach. Reguła oparta o `plan` byłaby zamkiem, do
+którego klient trzyma klucz, bo `plan` czyta i przeglądarka, i telefon. To, czego klient nie
+może, to zapisać sobie `plan` — i tego reguły pilnują od pierwszego dnia.
+
+**7. Serwis wysyła.** `/app/` pushuje i pulluje magazyn Pro obok warsztatu
+(`pushProWorkspace()`, `crmImport()`). Każde pole jest przycięte dokładnie do tego, co
+walidują wdrożone reguły: reguły są ostatnią bramką, a dokument, który odrzucą, wywraca cały
+przebieg. Ostrzeżenie o cudzej kopii (`foreignWorkspace()`) liczy teraz także magazyn Pro —
+to jedyny magazyn na tym urządzeniu, który trzyma czyjeś nazwisko, telefon i adres.
+
+**8. `assets/crm-store.js` — jedyny nowy plik po stronie serwisu.** Magazyn wyszedł
+z `assets/crm.js`, bo `/app/` potrzebuje dwóch funkcji, a nie 47 kB ekranów Pro. Zmierzone:
+z całym `crm.js` `/app/` ważyło 401,7 kB przy budżecie 355 kB i 122,5 kB po gzipie przy
+budżecie 110 kB. Ten sam argument wydzielił `assets/workspace-calc.js` w Sesji 33. Budżetu
+nie podniesiono.
+
+**9. Copy przestało obiecywać coś innego, niż jest.** Pięć zdań — `cli_local_note`,
+`job_local_note`, `quo_local_note`, `cal_local_note`, `propage_local` — mówiło „trzymamy
+w pamięci tej przeglądarki … i nie ma ich w aplikacji na Androida". Mówią teraz, gdzie te
+dane jadą. Cztery opisy meta (`clipage_meta` i trzy siostrzane) kończyły się zdaniem „Dane
+zostają w tej przeglądarce."; kończą się teraz zdaniem o synchronizacji, krótszym, więc
+wszystkie zostały w limicie 160 znaków. Słowo `localStorage` znika z tych pięciu zdań
+i zostaje na `/cookies/`, czyli na stronie, która jest od tego — a testy czterech modułów
+pilnują obu połówek naraz.
+
+**ZMIENIONE PLIKI**
+
+Repo aplikacji (`3d-polednia/Materio`, commit `dbe1f36`): `docs/FIRESTORE_SYNC.md`,
+`config/firebase/firestore.rules`, `core/database/entity/Entities.kt`, `dao/Daos.kt`,
+`AppDatabase.kt`, `ProjectRepository.kt`, **`CrmRepository.kt`** (nowy),
+`core/sync/SyncContract.kt`, `CloudSync.kt`, **`core/account/PlanRepository.kt`** (nowy),
+`di/AppModule.kt`, `di/SyncModule.kt`, **`feature/crm/`** (pięć nowych plików),
+`feature/home/HomeScreen.kt`, `navigation/AppDestination.kt`, `AppNavigation.kt`,
+`res/values*/strings.xml` (dziesięć), **`test/CrmContractTest.kt`** (nowy), `CLAUDE.md`.
+
+Repo serwisu: **`assets/crm-store.js`** (nowy), `assets/crm.js`, `assets/app.js`,
+`assets/i18n-pages.js`, `scripts/build.mjs` (stamp `20260826e`, skrypty `/app/` i czterech
+stron Pro), `privacy-policy.html`, `404.html` (stamp ręcznie), siedem plików testowych,
+`docs/ARCHITEKTURA.md` (§7.17), `CLAUDE.md`, ten plik — plus 373 wygenerowane strony
+i `sitemap.xml`.
+
+**TESTY**
+
+- Aplikacja: **213/213 testów jednostkowych przechodzi**, w tym 18 nowych w
+  `CrmContractTest` — przejścia tam i z powrotem dla trzech dokumentów, nieznany status,
+  termin, który jest dniem kalendarza i nigdy pierwszymi dziesięcioma znakami pełnego ISO,
+  stawka robocizny jako dzielenie, cztery stany planu i wdrożone reguły przycinające te same
+  pola na tych samych liczbach, co kod.
+- Serwis: **25 suit bez zależności przechodzi** i **17 suit w Chromium** —
+  4 979 sprawdzeń w przeglądarce, z finalnym QA (675) włącznie.
+
+**PROBLEMY**
+
+- **Reguły Firestore wymagają wdrożenia przez właściciela** (`firebase deploy --only
+  firestore`) — plik jest w repo aplikacji, wdrożenie jest pracą w konsoli, dokładnie jak
+  przy usuwaniu konta w Sesji 13. Do tego czasu zapis klienta, zlecenia albo wyceny do
+  chmury jest odrzucany, a obie strony pracują lokalnie tak jak dotąd. Copy serwisu mówi już
+  o synchronizacji, więc **to jest jedyne zdanie na stronie, które czeka na jedną komendę.**
+- **`BackupManager` w aplikacji nie eksportuje tych trzech kolekcji — ani pokoi.** Druga
+  dziura jest starsza od tej sesji. Poza zakresem, zgłoszone.
+- **Ekranu terminarza na telefonie nie ma.** Zlecenia mają `dueDate` i jadą, więc dane są;
+  osobnym ekranem, który je czyta, są rozdział XXIII i osobna sesja.
+- **Nadal nie ma jednej komendy uruchamiającej wszystkie suity.** Zgłaszane przez Sesje 41–45;
+  lista w `CLAUDE.md` ma 28 pozycji, do tego 17 suit w Chromium, i ta sesja też przeszła je ręcznie.
+- **Kontener nie miał Android SDK.** Trzeba go było zainstalować, żeby cokolwiek
+  skompilować; `local.properties` jest w `.gitignore` i nie poszło do repo.
+
+**STATUS**
+
+Zrobione. Klienci, zlecenia i wyceny są w kontrakcie, w bazie telefonu, w synchronizacji
+w obie strony i na trzech ekranach za tą samą ścianą, co w przeglądarce. Czeka na jedną
+komendę właściciela.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 47 — błąd zaokrąglenia w silnikach Androida (repo aplikacji `3d-polednia/Materio`).**
 
 ### Co zrobiła Sesja 45 (plan naprawczy)
 
