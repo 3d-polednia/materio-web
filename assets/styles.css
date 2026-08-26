@@ -258,6 +258,11 @@
      clear and the top edge the mobile drawer hangs from. One number, three uses. */
   --header-h: 64px;
   --section-y: clamp(48px, 6vw, 68px);
+  /* Room kept at the bottom of the document for whatever floats over it — today the
+     consent banner. It is 0 until assets/main.js measures a banner that is actually on
+     the screen, so a page with no script, or one whose visitor has already answered,
+     keeps nothing back. */
+  --consent-h: 0px;
 }
 
 /* ================================================================== 2. BASE
@@ -288,6 +293,12 @@ body {
   color: var(--on-bg);
   line-height: var(--lh-base);
   -webkit-font-smoothing: antialiased;
+  /* Room for whatever floats at the bottom of the screen — today the consent banner,
+     which is fixed and would otherwise sit on the last thing in the document with no
+     scroll left to move it out from under. assets/main.js sets --consent-h while the
+     banner is up and clears it the moment it is answered; with no script the banner
+     never appears and this is 0. */
+  padding-bottom: var(--consent-h);
 }
 
 /* Type. Four heading levels, three of them fluid, all from the scale. h1 is the
@@ -327,7 +338,7 @@ img, svg { max-width: 100%; }
 .wrap.narrow { max-width: 760px; }
 section.block { padding: var(--section-y) 0; }
 /* A section that has to fill the window even with two lines in it: /404/. */
-.block-fill { min-height: 60vh; display: flex; align-items: center; }
+.block-fill { min-height: 60vh; min-height: 60dvh; display: flex; align-items: center; }
 .alt { background: var(--surface-alt); }
 
 .section-head { max-width: 62ch; margin: 0 auto var(--sp-10); text-align: center; }
@@ -615,8 +626,15 @@ pre.formula code {
 /* ---------- Dialog
    The catalogue is a modal because a calculator card is too small to hold ~160
    rows, and because picking a material is a detour from the form, not part of it. */
+/* dvh, and vh only as the fallback for a browser that has never heard of it: on a phone
+   100vh is the screen with the browser's own bars hidden, which is taller than what the
+   visitor can actually see. A dialog sized against it hangs its bottom — the scrolling
+   list and the row somebody is reaching for — off the screen. The mobile drawer was
+   given the same pair in session 32; this dialog was missed (session 43). */
 .mat-dialog {
-  width: min(680px, 94vw); max-height: 86vh; padding: 0; border: 1px solid var(--outline);
+  width: min(680px, 94vw); padding: 0; border: 1px solid var(--outline);
+  max-height: 86vh;
+  max-height: 86dvh;
   border-radius: var(--radius); background: var(--surface); color: var(--on-bg);
   box-shadow: var(--shadow-3); overflow: hidden;
 }
@@ -628,7 +646,7 @@ pre.formula code {
 .mat-dialog-head h2 { margin: 0; font-size: var(--fs-h3); }
 .mat-search { display: block; width: calc(100% - 2 * var(--sp-5)); margin: 0 var(--sp-5) var(--sp-3); }
 .mat-dialog .mat-cats { padding: 0 var(--sp-5); margin-bottom: var(--sp-2); max-height: 84px; overflow-y: auto; }
-.mat-list { overflow-y: auto; max-height: 52vh; padding: 0 var(--sp-3) var(--sp-4); }
+.mat-list { overflow-y: auto; max-height: 52vh; max-height: 52dvh; padding: 0 var(--sp-3) var(--sp-4); }
 .mat-group {
   position: sticky; top: 0; z-index: 1; margin: var(--sp-3) 0 var(--sp-1); padding: var(--sp-2);
   font-size: var(--fs-xs); font-weight: var(--fw-black); text-transform: uppercase;
@@ -827,7 +845,13 @@ footer h2 {
   justify-content: space-between; color: var(--muted); font-size: var(--fs-sm);
 }
 
-/* ---------- Consent banner (GDPR) ---------- */
+/* ---------- Consent banner (GDPR)
+   It floats over the page, so the page has to keep room for it or the last thing in the
+   document can never be scrolled out from under it. assets/main.js measures the banner
+   and writes --consent-h; the rule that spends it is on body, below. Session 43: on an
+   iPhone SE this banner is 200 px of a 568 px screen, and with nothing reserving that
+   room a tap on the middle of "Powierzchnia (m²)" landed on the banner and focused
+   nothing. */
 .consent-banner {
   position: fixed; left: var(--sp-4); right: var(--sp-4); bottom: var(--sp-4); z-index: 1000;
   max-width: 560px; margin: 0 auto; padding: var(--sp-4) var(--sp-5);
@@ -840,6 +864,7 @@ footer h2 {
 .consent-text { margin: 0; font-size: var(--fs-sm); line-height: var(--lh-snug); }
 .consent-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-3); }
 .consent-more { margin-right: auto; font-size: var(--fs-sm); color: var(--muted); text-decoration: underline; }
+
 
 /* ================================================================ 6. PAGES */
 
@@ -1700,27 +1725,43 @@ a.chip:hover { text-decoration: none; }
   .mat-page-list li { flex-direction: column; align-items: flex-start; }
 }
 
+/* Chapter XXVIII, "duże przyciski": on a phone every control is a finger target, and
+   these were not. 36 px (the header's two icon buttons) and 40 px (.btn-sm, which is
+   every row action, every consent button and every "Dodaj") are the sizes that let a
+   desktop header row and a desktop table row stay tight. A phone row is a whole screen
+   wide and has no such problem, so they grow to the 44 px the token block calls a tap
+   target.
+
+   The question is "is this a finger", and only the pointer can answer it. Session 32
+   asked the width instead — max-width: 560px — because it measured the site in a
+   narrowed desktop window, where the two are the same thing. On a real device they are
+   not: the same Galaxy S8 turned sideways is 740 px wide, so every one of these dropped
+   back to its desktop size while the finger stayed exactly as wide, and an iPad never
+   got a tap target at all (session 43, measured on device profiles). The width half
+   stays, because a narrow window is still how this is checked without a device. */
+@media (max-width: 560px), (pointer: coarse) {
+  .btn-sm { min-height: var(--control-h); }
+  /* A chip (a material suggestion, a store example) was 30 px tall and a disclosure
+     ("Dodaj pomieszczenie", "Dodaj inny koszt") 26 px. The FAQ's own summary is already
+     taller than this and keeps its padding. */
+  .chip { min-height: var(--control-h); display: inline-flex; align-items: center; }
+  summary { min-height: var(--control-h); padding-block: var(--sp-2); }
+  /* Under 16 px iOS Safari zooms the page the moment the field is touched. */
+  .lang-btn, .cur-select { min-height: var(--control-h); font-size: var(--fs-base); }
+}
+
+/* The header's two icon buttons are the one pair the pointer alone cannot decide: above
+   1060 px they stand in the row that sessions 32 and 40 measured to the pixel in Russian,
+   and 8 px each is 16 px the row does not have. Below it the row is a brand, a theme
+   switch and a menu button with the whole screen to itself, so a coarse pointer gets its
+   44 px there and a mouse on a wide touch screen keeps the row that fits. */
+@media (max-width: 560px), (max-width: 1060px) and (pointer: coarse) {
+  .theme-toggle, .menu-toggle { width: var(--control-h); height: var(--control-h); }
+}
+
 @media (max-width: 560px) {
   :root { --gutter: var(--sp-4); }
 
-  /* Chapter XXVIII, "duże przyciski": on a phone every control is a finger target, and
-     these three were not. 36 px (the header's two icon buttons) and 40 px (.btn-sm, which
-     is every row action, every consent button and every "Dodaj") are the sizes that let a
-     desktop header row and a desktop table row stay tight. A phone row is a whole screen
-     wide and has no such problem, so they grow to the 44 px the token block calls a tap
-     target. Session 32 measured them; nothing else on a phone was under 44 px. */
-  .btn-sm { min-height: var(--control-h); }
-  .theme-toggle, .menu-toggle { width: var(--control-h); height: var(--control-h); }
-  /* The same rule for the two controls that are not buttons: a chip (a material
-     suggestion, a store example) was 30 px tall and a disclosure ("Dodaj pomieszczenie",
-     "Dodaj inny koszt") 26 px. The FAQ's own summary is already taller than this and
-     keeps its padding. */
-  .chip { min-height: var(--control-h); display: inline-flex; align-items: center; }
-  summary { min-height: var(--control-h); padding-block: var(--sp-2); }
-  /* The two pickers are in the drawer at this width, one to a row, so the reason they are
-     36 px (a 64 px header row) does not apply. The select's 14 px is the other half of
-     the same problem: under 16 px iOS Safari zooms the page when the field is touched. */
-  .lang-btn, .cur-select { min-height: var(--control-h); font-size: var(--fs-base); }
   .features { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr; }

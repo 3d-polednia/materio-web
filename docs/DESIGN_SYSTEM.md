@@ -350,7 +350,7 @@ Mobile-first (rozdział XXVIII). **Pięć szerokości, ani jednej więcej:**
 
 | Punkt | Co się zmienia |
 |---|---|
-| 560px | siatki schodzą do jednej kolumny, wiersz sklepu się rozkłada, `--gutter` → 16px, wszystkie cele dotykowe rosną do 44px |
+| 560px | siatki schodzą do jednej kolumny, wiersz sklepu się rozkłada, `--gutter` → 16px |
 | 760px | zrzuty aplikacji i wiersze katalogu w jednej kolumnie |
 | 900px | układ desktopowy: hero, kalkulator + „jak liczymy”, stopka |
 | 1060px | **nawigacja staje się szufladą** |
@@ -365,13 +365,52 @@ rosyjskiego gościa potrzebuje 1033px, więc przy 1000px przełącznik motywu wy
 33px poza ekran i **cała strona przesuwała się w poziomie**. Ta sama liczba stoi
 w `assets/main.js` (`min-width: 1061px`) — obie muszą się zgadzać.
 
+### Cel dotykowy: pyta o palec, nie o szerokość
+
 Cel dotykowy ma **44px** (`--control-h`) także na desktopie: drugi zestaw rozmiarów
 „dla myszy” to drugi projekt do utrzymania. Wyjątkiem są kontrolki w pasku nagłówka
 (`--control-h-sm`, 36px), gdzie 44px rozsadziłoby wiersz o wysokości 64px, oraz
-`.btn-sm` (40px) w gęstych wierszach tabel i kart. **Poniżej 560px wyjątków nie ma** —
-Sesja 32 zmierzyła, że na telefonie 36px miały oba przyciski ikonowe nagłówka, 40px
-każdy `.btn-sm`, 30px czip materiału i 26px rozwijane „Dodaj pomieszczenie”. Wszystkie
-rosną tam do 44px; pilnuje tego `scripts/test-mobile.mjs`.
+`.btn-sm` (40px) w gęstych wierszach tabel i kart. Sesja 32 zmierzyła, że na telefonie
+36px miały oba przyciski ikonowe nagłówka, 40px każdy `.btn-sm`, 30px czip materiału
+i 26px rozwijane „Dodaj pomieszczenie”. Wszystkie rosną do 44px.
+
+**Decyduje o tym wskaźnik, a nie szerokość okna.** Reguła brzmi
+`@media (max-width: 560px), (pointer: coarse)`. Sesja 32 pytała wyłącznie o szerokość,
+bo mierzyła serwis w zwężonym oknie przeglądarki, gdzie jedno i drugie znaczy to samo.
+Na prawdziwym urządzeniu nie znaczy: **ten sam Galaxy S8 obrócony na bok ma 740px**, więc
+każda z tych kontrolek wracała do rozmiaru desktopowego, a palec zostawał ten sam —
+czip 30px, `.btn-sm` 40px, przyciski nagłówka 36px. Tablet nie dostawał celu dotykowego
+nigdy. Zmierzone na profilach urządzeń w **Sesji 43**.
+
+Jedyna para, o której sam wskaźnik nie decyduje, to `.theme-toggle` i `.menu-toggle`:
+powyżej 1060px stoją w wierszu, który Sesje 32 i 40 zmierzyły co do piksela po rosyjsku,
+a 8px każdy to 16px, których ten wiersz nie ma. Ich reguła to
+`(max-width: 560px), (max-width: 1060px) and (pointer: coarse)` — poniżej szuflady wiersz
+ma dla siebie cały ekran, więc palec dostaje tam swoje 44px, a mysz na szerokim ekranie
+dotykowym zachowuje wiersz, który się mieści.
+
+Pilnują tego `scripts/test-mobile.mjs` (szerokości) i `scripts/test-phone.mjs`
+(profile urządzeń, pion **i poziom**).
+
+### Miejsce dla baneru zgody
+
+Baner zgody jest `position: fixed` przy dolnej krawędzi ekranu, więc strona musi
+trzymać tyle miejsca u siebie na dole — inaczej ostatnia rzecz w dokumencie leży pod
+banerem i nie ma już czym jej spod niego wyprowadzić. `assets/main.js` mierzy baner
+i zapisuje `--consent-h`; wydaje go `body { padding-bottom }`. Wysokość jest **mierzona,
+nie zgadywana**: to jedno zdanie w dziesięciu językach na szerokość telefonu, a po
+niemiecku ma 256px tam, gdzie po polsku 200px. Sesja 43 zmierzyła, że bez tego na
+iPhone SE dotknięcie środka pola „Powierzchnia (m²)” nie ustawiało fokusu nigdzie.
+
+### `dvh`, nie `vh`
+
+Cokolwiek ma się zmieścić na ekranie, wymiaruje się w `dvh`, z `vh` zostawionym pod
+spodem jako zapas dla przeglądarki, która tej jednostki nie zna. Na telefonie `100vh`
+to ekran **ze schowanymi paskami przeglądarki**, czyli więcej, niż odwiedzający widzi;
+okno wymiarowane względem niej zwiesza swój dół — z listą, do której ktoś sięga — poza
+ekran. Szuflada nawigacji dostała tę parę w Sesji 32, dialog katalogu materiałów
+i `.block-fill` w Sesji 43. Pilnuje tego `scripts/test-phone.mjs` §9, bo Chromium
+w kontenerze nie rysuje pasków przeglądarki i żaden test w przeglądarce tego nie widzi.
 
 ---
 

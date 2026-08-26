@@ -108,6 +108,7 @@ node scripts/test-propage.mjs     # /liczmat-pro/: the route, the price in the H
 node scripts/test-seo.mjs         # technical SEO: sitemap, robots, canonical, hreflang, OG
 node scripts/test-calc-seo.mjs    # the calculators as landing pages: title, description, FAQ
 node scripts/test-mobile.mjs      # the whole site on a phone: widths, tap targets, fields
+node scripts/test-phone.mjs       # the calculator on a real phone: devices, both orientations
 node scripts/test-perf.mjs        # what a page weighs: bytes, requests, the render path
 node scripts/test-a11y.mjs        # names, headings, landmarks, live regions — in the markup
 node scripts/test-a11y-page.mjs   # focus, the keyboard, both themes — in Chromium
@@ -392,6 +393,26 @@ scripts/test-mobile.mjs  The whole site on a phone (session 32, chapter XXVIII):
                       spinner, the three switches of chapter XXXII work at 320 px, and a
                       calculation can be made on the narrowest phone there is. Needs the
                       same outside-the-repo Playwright as test-pages.mjs
+scripts/test-phone.mjs  The calculator on a real phone (session 43): the same site under
+                      Playwright's device profiles rather than a narrowed desktop window,
+                      which is the difference every earlier session missed. Two phones in
+                      BOTH orientations plus a tablet, each checked for a coarse pointer
+                      first, so the suite cannot quietly decay into another width sweep;
+                      every tap target at 44 px on all of them — the pair that matters is
+                      one Galaxy S8 twice, because until this session the site gave the
+                      same finger two different sets of sizes depending on which way the
+                      phone was held; every field at 16 px; the room the page keeps for the
+                      consent banner, and the last link in the document taking its own tap
+                      because of it; every control on a calculator page scrolled clear of
+                      the banner and asked with elementFromPoint, which is what Playwright's
+                      own click cannot see (it scrolls until the element receives the
+                      event); a calculation made by tapping on the narrowest phone with the
+                      banner still up; no sideways scroll on any profile in either
+                      orientation; the viewport meta, which must not take zoom away; and §9,
+                      the one thing only the stylesheet can be asked, because Chromium in a
+                      container draws no browser chrome — that anything sized to fit the
+                      screen is sized in dvh with vh behind it.
+                      Same outside-the-repo Playwright as test-pages.mjs
 scripts/test-perf.mjs  What a page weighs (session 33, chapter XXXII): every page read
                       back with the assets its markup asks for, raw and gzipped, against a
                       budget per page type plus a ceiling every one of the 375 has to
@@ -1515,11 +1536,39 @@ Kotlin side of it. Change one, change all three.
   behind: 13 px of text in a 19-to-21 px box, on the screens a tradesperson uses on site.
   Only `width: 100%` is still a per-place decision and still a list of classes. A
   `checkbox` and a `radio` keep their native box.
-- **Below 560 px every tap target is 44 px, and above it the design system's small sizes
-  stand.** 36 px (the header's two icon buttons) and 40 px (`.btn-sm`) exist so a desktop
-  header row and a dense table row stay tight; a phone row is a whole screen wide and has
-  no such problem. Chips and `<summary>` grow there too. `scripts/test-mobile.mjs` fails
-  the moment something on a phone is under 44 px.
+- **A tap target grows because the pointer is coarse, not because the window is narrow.**
+  36 px (the header's two icon buttons) and 40 px (`.btn-sm`) exist so a desktop header row
+  and a dense table row stay tight; a phone row is a whole screen wide and has no such
+  problem, so chips, `<summary>`, `.btn-sm` and the two pickers grow to 44 px. The rule is
+  `@media (max-width: 560px), (pointer: coarse)`. Session 32 asked the width alone, because
+  it measured the site in a narrowed desktop window where the two are the same thing; on a
+  device they are not — **the same Galaxy S8 turned sideways is 740 px wide**, so every one
+  of those controls dropped back to its desktop size with the finger unchanged, and a tablet
+  never got a tap target at all (session 43). The one pair the pointer does not decide alone
+  is `.theme-toggle` and `.menu-toggle`: above 1060 px they stand in the header row sessions
+  32 and 40 measured to the pixel in Russian, and 8 px each is 16 px that row does not have,
+  so their rule adds `and (max-width: 1060px)` to the pointer half. `scripts/test-mobile.mjs`
+  keeps the widths; `scripts/test-phone.mjs` keeps the devices, in both orientations.
+- **The page keeps room for the consent banner, and the height is measured rather than
+  guessed.** The banner is `position: fixed` at the bottom of the screen; with nothing
+  reserving that room the last thing in the document sits under it with no scroll left to
+  move it out, and a tap aimed at it lands on the banner instead. `assets/main.js` measures
+  the banner (a `ResizeObserver`, plus `langchange`, because it is one sentence over a
+  phone's width and German is 256 px where Polish is 200 px) and writes `--consent-h`;
+  `body { padding-bottom }` spends it, and answering the banner hands the room straight
+  back. Session 43 measured what it was worth: on an iPhone SE the banner is 200 px of a
+  568 px screen, and a tap on the middle of "Powierzchnia (m²)" focused nothing at all.
+  **What this does not do is stop a fixed banner covering the middle of a scrolled page** —
+  that is what a bottom banner is, and taking the calculator out from under it for good
+  means moving consent out of the overlay, which is a decision about how consent is
+  collected and belongs to the owner.
+- **Anything sized to fit the screen is sized in `dvh`, with `vh` left behind it.** On a
+  phone `100vh` is the screen with the browser's own bars hidden, so a box sized against it
+  hangs its bottom — the scrolling list, the row somebody is reaching for — off the screen.
+  The navigation drawer was given the pair in session 32; the material picker, the list
+  inside it and `.block-fill` in session 43. No test in a browser can see this (Chromium in
+  a container draws no chrome), so `scripts/test-phone.mjs` §9 reads the stylesheet instead
+  and fails on a lone `vh`.
 - **The header collapses into the drawer below 1060 px, and that number lives in two
   files.** `assets/styles.css` and the `matchMedia("(min-width: 1061px)")` in
   `assets/main.js` — a mismatch either leaves the drawer drawn as a plain row or shuts a

@@ -81,7 +81,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 40 | „LiczMat Pro" w nagłówku (Poradniki → stopka) | **Zrobione** — 2026-08-26 |
 | 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | **Zrobione** — 2026-08-26 |
 | 42 | `/app/`: fałszywe „Brak sieci" | **Zrobione** — 2026-08-26 |
-| 43 | Kalkulator na prawdziwym telefonie | Do zrobienia |
+| 43 | Kalkulator na prawdziwym telefonie | **Zrobione** — 2026-08-26 |
 | 44 | Stop slop: zasady, test, pl/uk/de/en | Do zrobienia |
 | 45 | Stop slop: cs/sk/ro/hr/sr/ru | Do zrobienia |
 | 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | Do zrobienia |
@@ -248,6 +248,179 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 43 (plan naprawczy)
+
+Zadanie: **kalkulator na prawdziwym telefonie.**
+
+Ustalenie właściciela z 2026-08-21: „rozjechany na telefonie" dotyczy **strony
+pojedynczego kalkulatora**.
+
+**WYKONANO**
+
+**0. Najpierw pytanie, dlaczego Sesja 32 tego nie widziała.** `scripts/test-mobile.mjs`
+przechodzi 1152/1152 i przechodziła przez cały czas. Powód jest jeden i dotyczy wszystkich
+suit w przeglądarce w tym repozytorium: **każda z nich otwiera zwykłe okno Chromium i zwęża
+je**, bez `isMobile`, bez `hasTouch`, bez profilu urządzenia. Zwężone okno na biurku i telefon
+to nie jest to samo — okno ma mysz, ma `hover`, ma wysokość 800px, której nie ma żaden
+telefon, i nie da się go obrócić. Ta sesja przepuściła serwis przez profile urządzeń
+Playwrighta i zmierzyła trzy rzeczy, których szerokość nie umie zapytać.
+
+**1. Baner zgody leżał na kalkulatorze i zjadał jego dotknięcia.** Zmierzone przed
+jakąkolwiek zmianą, na `/kalkulatory/plytki-panele-gres/`, iPhone SE (320×568):
+
+```
+document.elementFromPoint(środek pola „Powierzchnia (m²)")  → DIV.consent-banner
+touchscreen.tap(ten sam punkt)                              → document.activeElement = BODY
+```
+
+Baner jest `position: fixed` przy dolnej krawędzi i **nic nie trzymało dla niego miejsca**.
+Ma 200px na ekranie o wysokości 568px — 35% ekranu — i tyle samo na Pixelu 5. Skutki, oba
+zmierzone: dotknięcie pola formularza nie ustawiało fokusu nigdzie (a dotknięcie tego
+samego punktu potrafiło trafić w link banera i **wyprowadzić odwiedzającego na politykę
+prywatności**), a ostatni link w dokumencie nie dawał się spod banera wyprowadzić — nie
+było już czym przewinąć.
+
+To jest pierwsza wizyta, czyli jedyna, dla której baner istnieje, i dokładnie ta, którą
+produkuje wynik wyszukiwania na telefonie.
+
+Naprawione: `assets/main.js` mierzy baner i zapisuje `--consent-h`, a `body` wydaje to
+jako `padding-bottom`. Wysokość jest **mierzona, nie zgadywana** — to jedno zdanie
+w dziesięciu językach na szerokość telefonu i po niemiecku ma 256px tam, gdzie po polsku
+200px — więc pomiar chodzi za `ResizeObserver`, za obrotem ekranu i za `langchange`.
+Odpowiedź na baner oddaje miejsce z powrotem (zmierzone: `padding-bottom` wraca do 0).
+
+Po zmianie wszystkie 32 kontrolki strony kalkulatora dają się wyprowadzić spod banera
+i **każda przyjmuje własne dotknięcie**, na wszystkich siedmiu profilach; ostatni link
+w dokumencie też.
+
+**Czego to nie robi, i mówię to wprost:** baner nadal przykrywa środek przewiniętej
+strony, bo tym właśnie jest pasek przy dolnej krawędzi. Wyprowadzenie kalkulatora spod
+niego na stałe znaczy wyjęcie zgody z nakładki — a to jest decyzja o tym, **jak zbierana
+jest zgoda** (ile osób ją kliknie, czyli ile widzi Analytics), więc należy do właściciela.
+Próbowałem najpierw skrócić sam baner; nie da się uczciwie: z tych 200px 76 to samo zdanie,
+32 to padding, a reszta to jeden rząd linków i jeden rząd przycisków — układ, który już
+jest minimalny. Skrócenie znaczyłoby skrócenie **treści zgody**, a to nie jest zadanie tej
+sesji (i Sesje 44–45 mają copy w zakresie). Zmierzone i odrzucone, nie przeoczone.
+
+**2. Ten sam telefon obrócony na bok dostawał rozmiary kontrolek dla myszy.** Zmierzone:
+
+| Urządzenie | szerokość | czip | `.btn-sm` | przyciski nagłówka |
+|---|---|---|---|---|
+| Galaxy S8, pionowo | 360px | 44px | 44px | 44px |
+| **Galaxy S8, poziomo** | **740px** | **30px** | **40px** | **36px** |
+| iPhone 12, poziomo | 750px | 30px | 40px | 36px |
+| iPad (gen 7) | 810px | 30px | 40px | 36px |
+
+Jedno urządzenie, jeden palec, dwa zestawy rozmiarów. Powód: reguła z Sesji 32 brzmiała
+`@media (max-width: 560px)`, a 560px było wtedy dobrym przybliżeniem „to jest telefon",
+bo serwis mierzono w zwężonym oknie. Pytanie, które trzeba zadać, brzmi **„czy to jest
+palec"**, i odpowiada na nie tylko wskaźnik. Reguła to teraz
+`@media (max-width: 560px), (pointer: coarse)`. Połowa z szerokością zostaje — zwężone
+okno to nadal sposób, w jaki sprawdza się to bez urządzenia.
+
+Jeden wyjątek, i jest zmierzony: `.theme-toggle` i `.menu-toggle` powyżej 1060px stoją
+w wierszu, który Sesje 32 i 40 zmierzyły co do piksela po rosyjsku, a 8px każdy to 16px,
+których ten wiersz nie ma. Ich reguła to `(max-width: 560px), (max-width: 1060px) and
+(pointer: coarse)`: poniżej szuflady wiersz ma dla siebie cały ekran, więc palec dostaje
+tam 44px, a mysz na szerokim ekranie dotykowym zachowuje wiersz, który się mieści.
+
+**3. Dialog katalogu materiałów był wymiarowany w `vh`.** Na telefonie `100vh` to ekran
+**ze schowanymi paskami przeglądarki**, czyli więcej, niż odwiedzający widzi. Dialog ma
+`max-height: 86vh`, a przewijana lista w środku `52vh`, więc jej dół — czyli wiersz,
+po który ktoś sięga — zwiesza się poza ekran. Szuflada nawigacji dostała parę
+`vh` + `dvh` w Sesji 32 z komentarzem, dlaczego; dialog został pominięty. Dopisane obu,
+plus `.block-fill`. Tego **nie da się sprawdzić w przeglądarce w kontenerze** — Chromium
+nie rysuje pasków przeglądarki, więc `100vh === innerHeight` i test byłby zielony przy
+każdej wartości. Sprawdza to więc arkusz, nie strona: `scripts/test-phone.mjs` §9 czyta
+`assets/styles.css` i wywala się na samotnym `vh`.
+
+**4. Nowa suita: `scripts/test-phone.mjs`, 372 sprawdzenia.** Pyta o to, o co pyta
+urządzenie, a nie o to, o co pyta szerokość:
+
+- §1 profile **naprawdę są urządzeniami** — `(pointer: coarse)`, `(hover: none)`, powierzchnia
+  dotykowa. Bez tego suita mogłaby po cichu zdegradować się do kolejnego przeglądu szerokości
+  i świecić na zielono, kiedy serwis się psuje;
+- §1b **ten sam telefon, obrócony** — czip, `.btn-sm` i przełącznik motywu muszą mieć w obu
+  orientacjach ten sam rozmiar;
+- §2–3 cel dotykowy 44px i pole 16px na siedmiu profilach × pięciu typach stron;
+- §4 miejsce zarezerwowane dla banera, ostatni link w dokumencie przyjmujący własne
+  dotknięcie, i miejsce oddane po odpowiedzi;
+- §5 wszystkie kontrolki strony kalkulatora wyprowadzone spod banera, pytane
+  `elementFromPoint`-em. To jest istotne: **`click()` Playwrighta tego nie zobaczy**, bo
+  przewija element, aż ten zacznie dostawać zdarzenie — biblioteka sama obchodzi defekt,
+  dla którego się ją uruchamia. Człowiek nie obchodzi;
+- §6 kalkulacja zrobiona palcem na najwęższym telefonie, przy podniesionym banerze;
+- §7 brak przewijania w poziomie na każdym profilu, w obu orientacjach;
+- §8 `<meta name="viewport">`, który nie odbiera zoomu;
+- §9 `dvh` w arkuszu, patrz punkt 3.
+
+**Suita została sprawdzona na kodzie sprzed naprawy**: 336/372, 36 czerwonych — dokładnie
+punkty 1, 2 i 3. Test, którego nikt nie widział na czerwono, nie jest dowodem niczego.
+
+**ZMIENIONE PLIKI**
+
+- `assets/styles.css` — cel dotykowy na `(pointer: coarse)` (z wyjątkiem dla dwóch
+  przycisków nagłówka), token `--consent-h`, `body { padding-bottom }`, `dvh` w `.mat-dialog`,
+  `.mat-list` i `.block-fill`.
+- `assets/main.js` — pomiar banera (`ResizeObserver`, `langchange`), zapis i zerowanie
+  `--consent-h`.
+- `scripts/test-phone.mjs` — nowy plik, 372 sprawdzenia.
+- `scripts/build.mjs` — `STAMP` → `20260826b`.
+- `privacy-policy.html`, `404.html` — `?v=` podbite ręcznie, bo generator ich nie pisze.
+- 373 strony + `assets/styles.min.css` przebudowane.
+- `CLAUDE.md`, `docs/DESIGN_SYSTEM.md` — trzy nowe reguły i nowa suita.
+
+**TESTY**
+
+`node scripts/build.mjs --check` — 1157 kluczy × 10 języków. `check-contrast.mjs` — all
+pairs pass. **41 suit, wszystkie zielone.**
+
+Bez zależności (23): `calculators` 2113, `account` 179, `dashboard` 306, `projects` 884,
+`save` 1280, `materials` 383, `costs` 225, `rooms` 411, `plan` 1114, `pay` 398,
+`pro-admin` 110, `webhook` 111, `jobs` 1032, `quotes` 1096, `schedule` 634, `crm` 419,
+`propage` 1083, `seo` 36869, `calc-seo` 5133, `perf` 13157, `a11y` 60, `security` 9079,
+`langs` 34.
+
+W przeglądarce (18): **`phone` 372 — nowa**, `pages` 759, `mobile` 1152,
+`a11y (browser)` 55, `materials-page` 166, `costs-page` 134, `projects-page` 177,
+`dashboard-page` 90, `save-page` 70, `rooms-page` 195, `clients-page` 145,
+`jobs-page` 164, `quotes-page` 188, `schedule-page` 162, `crm-page` 141,
+`pro page` 148, `account-page` 236, `final QA` 675.
+
+Nowa suita sprawdzona **na kodzie sprzed naprawy**: 336/372, 36 czerwonych.
+
+**PROBLEMY**
+
+- **Baner nadal przykrywa środek przewiniętej strony.** Opisane w punkcie 1 — decyzja
+  właściciela, nie defekt do cichego naprawienia. Trzy możliwości: zostawić tak, wyjąć
+  baner z nakładki (ustawić go w toku strony u góry, pod nagłówkiem — nic już wtedy nie
+  zasłania, ale baner odjeżdża przy przewijaniu i mniej osób go kliknie), albo skrócić samo
+  zdanie zgody. Druga i trzecia zmieniają to, ile widzi Analytics.
+- **Pozostałe suity w przeglądarce nadal mierzą zwężone okno.** `test-pages`, `test-mobile`,
+  `test-a11y-page`, `test-qa` i osiem suit modułowych otwierają `newContext({ viewport })`
+  bez profilu urządzenia. Nowa suita pokrywa tym stronę kalkulatora, hub, stronę główną,
+  katalog i projekty; **ekrany Pro, kosztorys, `/app/` i `/p/` na profilach urządzeń nie
+  były sprawdzone**. Osobne zadanie.
+- **`hasPendingWrites` w `scripts/fake-firebase.mjs` nadal zawsze `false`** — zgłoszone
+  przez Sesję 42, nienaprawione, nie w zakresie tej sesji.
+- **Nadal nie ma jednej komendy uruchamiającej wszystkie suity.** Zgłoszone przez Sesję 41,
+  powtórzone przez Sesję 42, nadal aktualne — ta sesja też przeszła listę z `CLAUDE.md`
+  ręcznie, a lista ma teraz 26 pozycji. Osobne zadanie i coraz droższe.
+- **Klawiatura ekranowa nie została zmierzona.** Playwright nie otwiera klawiatury telefonu,
+  więc pytanie „co widać, kiedy ktoś pisze w polu" jest w tym kontenerze nie do zadania.
+  Do sprawdzenia na prawdziwym urządzeniu.
+
+**STATUS**
+
+Zrobione. Na profilach siedmiu urządzeń — dwóch telefonów w obu orientacjach i tabletu —
+każda kontrolka kalkulatora ma 44px i przyjmuje własne dotknięcie, strona trzyma miejsce
+dla banera, dialog katalogu mieści się na ekranie, a kalkulacja daje się zrobić palcem na
+najwęższym telefonie przy podniesionym banerze.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 44 — stop slop: zasady, test, pl/uk/de/en.**
 
 ### Co zrobiła Sesja 42 (plan naprawczy)
 

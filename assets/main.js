@@ -186,12 +186,30 @@ function buildConsent() {
   const banner = document.getElementById("consent-banner");
   if (!banner) return;
 
+  /* The banner is fixed at the bottom of the screen, so the page has to keep that much
+     room at its own bottom — otherwise the last thing in the document sits under the
+     banner with no scroll left to move it out, and a tap aimed at it lands on the
+     banner instead. Session 43 measured it on device profiles: on an iPhone SE the
+     banner is 200 px of a 568 px screen, and a tap on the middle of the calculator's
+     first field focused nothing at all.
+     The height is measured rather than guessed: it is a sentence in ten languages over
+     a phone's width, and German is 256 px where Polish is 200. It follows a language
+     switch, a rotation and a window resize for the same reason. */
+  const room = () => {
+    const h = banner.hidden ? 0 : banner.getBoundingClientRect().height;
+    // The banner's own bottom offset is part of the gap it needs; sp-3/sp-4 are what the
+    // stylesheet uses, and reading the computed value keeps the two from drifting.
+    const gap = banner.hidden ? 0 : parseFloat(getComputedStyle(banner).bottom) || 0;
+    document.documentElement.style.setProperty("--consent-h", h ? Math.ceil(h + gap) + "px" : "0px");
+  };
+
   const decide = (granted) => {
     try { localStorage.setItem(CONSENT_KEY, granted ? "granted" : "denied"); } catch (e) {}
     if (typeof gtag === "function") {
       gtag("consent", "update", { analytics_storage: granted ? "granted" : "denied" });
     }
     banner.hidden = true;
+    room();
     document.dispatchEvent(new CustomEvent("consentchange", { detail: { granted } }));
   };
 
@@ -205,9 +223,15 @@ function buildConsent() {
     try { localStorage.removeItem(CONSENT_KEY); } catch (e) {}
     if (typeof gtag === "function") gtag("consent", "update", { analytics_storage: "denied" });
     banner.hidden = false;
+    room();
     banner.scrollIntoView({ block: "nearest" });
     document.dispatchEvent(new CustomEvent("consentchange", { detail: { granted: null } }));
   };
+
+  room();
+  if (typeof ResizeObserver === "function") new ResizeObserver(room).observe(banner);
+  else window.addEventListener("resize", room);
+  document.addEventListener("langchange", room);
 }
 
 /** /cookies/: show the current decision and let the visitor take it back. */
