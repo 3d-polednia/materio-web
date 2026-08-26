@@ -147,8 +147,15 @@ head("1b. where the product points at it");
   check("and it stands in front of the modules it describes",
     product.indexOf("liczmat-pro") < product.indexOf("clients"), product.join(" → "));
 
-  // The header row fits five links and holds five. This page is not one of them.
-  check("it is not in the header, which is full", !r.header);
+  // The header row fits five links and holds five. Session 40 made this page one of them,
+  // in the slot "Poradniki" gave up: the page that has to be found before anybody pays was
+  // reachable only from the footer and from a wall somebody had already run into.
+  check("it is in the header", Boolean(r.header));
+  eq("in the slot the guides gave up", r.header.order, 4);
+  eq("under the same name the footer link carries", r.header.key, "pro_t");
+  const header = navRoutes("header").map((x) => x.id);
+  eq("and the row still holds five", header.length, 5);
+  check("with the guides no longer among them", !header.includes("guides"), header.join(" · "));
 }
 
 /* ================================================================== 2. the page */

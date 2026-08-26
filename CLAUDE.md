@@ -1210,8 +1210,17 @@ Kotlin side of it. Change one, change all three.
   `navRoutes("header")` is the whole list; `validateIA()` caps it at five and the fifth
   ("Aplikacja", asked for after session 20) was measured rather than assumed —
   `scripts/test-pages.mjs` checks the row stays on one line in ten languages at
-  900/1000/1160/1280 px, for a guest and for a signed-in visitor. A sixth still aborts the
-  build. `/app/`, `/app/dashboard/` and `/p/` have no language of their own, so the build
+  1061/1100/1160/1280 px, for a guest and for a signed-in visitor. A sixth still aborts the
+  build. **The five are Kalkulatory, Materiały, Projekty, LiczMat Pro and Aplikacja** —
+  session 40 put `/liczmat-pro/` in slot 4, which "Poradniki" gave up (the owner's
+  decision, in the repair plan). The guides did not move: the route is still LIVE, still
+  indexable, still in `sitemap.xml` and still in the footer. Swapping a label is a
+  measurement rather than a rename, so the same test re-ran at the same widths: the
+  widest row on the site is Russian, which set the 1061 px breakpoint in session 32, and
+  it got 10 px *narrower* — "Руководства" is longer than "LiczMat Pro". The header link
+  uses `pro_t`, the same key and the same string in all ten languages, because it is a
+  brand name, and it carries no `navLevel` on purpose: a sales page offered only to the
+  accounts already on Pro is a sales page nobody needs. `/app/`, `/app/dashboard/` and `/p/` have no language of their own, so the build
   renders `DEFAULT_LANG`'s addresses and hands them every language's in `window.LM_NAV`;
   `assets/i18n-runtime.js` repoints each `data-nav-route` link on `langchange`. Before
   that, `/app/` carried one hard-coded Polish link and signing in emptied the menu.

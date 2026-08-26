@@ -1176,9 +1176,12 @@ function buildPrivatePages() {
       .filter((f) => f.level === LEVEL.PRO && f.route && route(f.route)
         && route(f.route).status === STATUS.LIVE)
       .map((f) => route(f.route)),
-    // /liczmat-pro/ (session 29). It is neither a header link nor a Pro module, and both
-    // the Pro tab and the Pro level card on /app/ point at it — src/pro.mjs says so at
-    // the line that used to render "Poznaj LiczMat Pro" as a sentence.
+    // /liczmat-pro/ (session 29). Session 40 made it a header link, so navRoutes("header")
+    // above already carries it and Object.fromEntries below keeps one entry per id — this
+    // line stays because it is not the header that needs it: the Pro tab and the Pro level
+    // card on /app/ point at this page (src/pro.mjs, at the line that used to render
+    // "Poznaj LiczMat Pro" as a sentence), and they would go on needing the address if the
+    // route ever left the row again.
     ...[route("liczmat-pro")].filter((r) => r.status === STATUS.LIVE),
   ]
     .filter((r) => r.localized)

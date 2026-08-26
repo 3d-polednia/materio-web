@@ -146,10 +146,15 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlGuideIndex,
-    header: { order: 4, key: "nav_guides" },
     footer: { order: 5, key: "foot_guides" },
     note: "Chapter XI: the way into a calculator for somebody who does not yet know " +
-      "which one they need.",
+      "which one they need. It was header link 4 until session 40, and gave the slot up " +
+      "to /liczmat-pro/ — the owner's decision, taken when session 29 built that page and " +
+      "recorded in the master plan's open questions. Chapter X wants three directions out " +
+      "of the home page (Kalkulatory, LiczMat, LiczMat Pro) and the row fits five links; " +
+      "a guide is read once, on the way to a calculator, and the footer is where a page " +
+      "read once belongs. Nothing else changed: the route is still LIVE, still indexable, " +
+      "still in sitemap.xml, and the home page and the calculator pages still link to it.",
   },
   {
     id: "guide",
@@ -406,6 +411,7 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlLiczmatPro,
+    header: { order: 4, key: "pro_t" },
     footer: { order: 7, key: "pro_t" },
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
@@ -415,7 +421,13 @@ export const ROUTES = [
       "the third door of the home page all read this route's status, so all three became " +
       "links the day it went LIVE. It carries no gate and never will — a description of " +
       "what somebody would be paying for cannot be behind the thing they have not paid " +
-      "for.",
+      "for. Session 40 put it in the header, in the slot \"Poradniki\" gave up: the one " +
+      "page that has to be found before anybody pays for anything was reachable only from " +
+      "the footer and from a wall somebody had already run into. It carries no `navLevel` " +
+      "and must not grow one — a sales page offered only to the people who have already " +
+      "bought is a sales page nobody needs. The header key is `pro_t`, the same string the " +
+      "footer link uses and the same string in all ten languages, because it is a brand " +
+      "name: session 40 wrote no new copy.",
   },
 ];
 
@@ -892,7 +904,10 @@ export function validateIA() {
   // assets/styles.css is what buys the room. Below 1061px the navigation is a drawer and
   // cannot wrap at all; that breakpoint was 900px until session 32 measured the same row
   // in Russian, where it needed 1033px and pushed the theme switch off the screen.
-  // A sixth link has not been measured, so it is still refused.
+  // Session 40 swapped one label for a longer one — "Poradniki" out, "LiczMat Pro" in —
+  // which is a measurement, not a rename: the same test re-ran at the same four widths in
+  // the same ten languages, because a row that fits five short words does not necessarily
+  // fit five longer ones. A sixth link has not been measured, so it is still refused.
   const inHeader = navRoutes("header").length;
   if (inHeader > 5) problems.push(`IA: ${inHeader} links in the header — the row fits five`);
 

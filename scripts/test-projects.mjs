@@ -534,7 +534,22 @@ head("12. the header carries five links, and one of them is only offered with an
   const inHeader = navRoutes("header");
   eq("five links in the header", inHeader.length, 5);
   eq("and they are in the architecture's order",
-    inHeader.map((r) => r.id).join(","), "calculators,materials,projects,guides,android");
+    inHeader.map((r) => r.id).join(","),
+    "calculators,materials,projects,liczmat-pro,android");
+
+  // Session 40: "Poradniki" gave slot 4 up to /liczmat-pro/. The guides did not go
+  // anywhere — the route is still LIVE and still in the footer — so the test says both
+  // halves out loud, because a link that vanished from the header AND the footer would
+  // pass an assertion that only counted the header.
+  const guides = route("guides");
+  check("the guides are out of the header", !guides.header);
+  check("and still in the footer", Boolean(guides.footer));
+  eq("under the label they already had", guides.footer.key, "foot_guides");
+  const pro = route("liczmat-pro");
+  eq("LiczMat Pro took the slot", pro.header.order, 4);
+  eq("with the name it carries everywhere else", pro.header.key, "pro_t");
+  check("and it is offered to everybody, which is the point of a sales page",
+    !pro.navLevel);
 
   // The owner asked for "Aplikacja" in the menu after session 20. Chapter X still forbids
   // pushing the app on the home page; a link last in the row is not that.

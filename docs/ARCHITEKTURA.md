@@ -267,15 +267,55 @@ strony do architektury.
 **Menu główne** (kolejność z `header.order`):
 
 ```
-LiczMat   Kalkulatory · Materiały · Projekty · Poradniki
+LiczMat   Kalkulatory · Materiały · Projekty · LiczMat Pro · Aplikacja
           [ język ] [ waluta ] [ Konto ]        [ motyw ] [ menu ]
 ```
 
-**Cztery linki to maksimum** i `validateIA()` tego pilnuje. Sesja 5 zmierzyła pasek
-w przeglądarce: sześć linków plus selektory nie mieściło się w jednym wierszu poniżej
-1080px (po niemiecku „Die App” i „Mein Konto” łamały się na dwie linie). `Sklepy`
-i `Aplikacja` zeszły do stopki — pierwsze jest narzędziem, a nie krokiem żadnego
-przepływu, drugie rozdział X wprost każe trzymać z dala od pierwszego planu.
+**Pięć linków to maksimum** i `validateIA()` tego pilnuje. Sesja 5 zmierzyła pasek
+w przeglądarce i postawiła sufit na czterech: sześć linków plus selektory nie mieściło się
+w jednym wierszu poniżej 1080px (po niemiecku „Die App” i „Mein Konto” łamały się na dwie
+linie). `Sklepy` zeszły wtedy do stopki — to narzędzie, a nie krok żadnego przepływu.
+Piąty link, `Aplikacja`, właściciel dopisał po Sesji 20 i został **zmierzony**, a nie
+założony: `scripts/test-pages.mjs` §7 sprawdza, że wiersz zostaje jednolinijkowy
+w dziesięciu językach przy 1061 / 1100 / 1160 / 1280 px. Szósty nie był mierzony i build
+go odrzuca.
+
+**Sesja 40 zamieniła `Poradniki` na `LiczMat Pro`** — decyzja właściciela, zapisana
+w planie naprawczym („w nagłówku ustępują Poradniki”). Rozdział X chce, żeby ze strony
+głównej wychodziły trzy kierunki: Kalkulatory, LiczMat i LiczMat Pro; strona, którą trzeba
+znaleźć, **zanim** ktokolwiek zapłaci, była do tej pory dostępna wyłącznie ze stopki i ze
+ściany, na którą ktoś już wpadł. Poradniki nie zniknęły: trasa dalej jest `LIVE`,
+indeksowalna i w `sitemap.xml`, stoi w kolumnie „Produkt" w stopce i linkuje do niej strona
+główna oraz strony kalkulatorów.
+
+Zamiana etykiety to **pomiar**, nie zmiana nazwy — wiersz, który mieści pięć krótkich słów,
+nie musi zmieścić pięciu dłuższych — więc ten sam test przebiegł jeszcze raz przy tych
+samych czterech szerokościach i w tych samych dziesięciu językach. Zmierzone przy 1061px,
+konto zalogowane (pięć widocznych linków), szerokość `.nav-list`:
+
+| Język | przed | po | |
+|---|---|---|---|
+| pl | 397 px | 412 px | +15 |
+| uk | 439 px | 465 px | +26 |
+| de | 377 px | 395 px | +18 |
+| en | 373 px | 404 px | +31 |
+| cs | 377 px | 405 px | +28 |
+| sk | 381 px | 409 px | +28 |
+| ro | 388 px | 417 px | +29 |
+| hr | 371 px | 408 px | +37 |
+| sr | 383 px | 408 px | +25 |
+| **ru** | **498 px** | **488 px** | **−10** |
+
+Najszerszy wiersz na serwisie jest rosyjski i to on ustawił próg 1061px w Sesji 32 —
+a ten jako jedyny **zwęził się**, bo „Руководства” jest dłuższe niż „LiczMat Pro”.
+Chorwacki urósł najbardziej (+37px) i nadal jest o 80px węższy od rosyjskiego. Nic nie
+zrobiło się ciaśniejsze niż to, co już było zmierzone.
+
+`LiczMat Pro` w nagłówku **nie ma `navLevel`** i mieć nie może: link pokazywany tylko
+kontom, które już są na Pro, to strona sprzedażowa oglądana przez tych, którym nie jest
+już potrzebna. Etykieta to klucz `pro_t` — ten sam, którego używa link w stopce, i ten sam
+ciąg we wszystkich dziesięciu językach, bo to nazwa własna. Sesja 40 nie napisała ani
+jednego nowego słowa w słowniku.
 
 Strona, na której stoi odwiedzający, dostaje `aria-current="page"` (najdłuższy pasujący
 prefiks, więc `/kalkulatory/tapety/` podświetla „Kalkulatory”).
@@ -767,6 +807,10 @@ Poniżej 1061 px nawigacja jest szufladą i zawinąć się nie może. Ten próg 
 Sesji 32, która zmierzyła ten sam rząd po rosyjsku: potrzebował 1033 px, więc między 900
 a ~1050 px wypychał przełącznik motywu poza ekran. Szósty link nadal wywala build, bo
 szóstego nikt nie mierzył.
+
+Sesja 40 nie ruszyła tego limitu — pięć zostaje pięcioma — tylko **zamieniła czwarty
+link**: `Poradniki` na `LiczMat Pro`. Pomiar w §5 wyżej; najszerszy rząd na serwisie
+(rosyjski) po tej zamianie zwęził się o 10 px.
 
 ---
 

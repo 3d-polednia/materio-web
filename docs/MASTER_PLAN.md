@@ -78,7 +78,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 37 | Pro nadawane po e-mailu + `/app/` widzi plan na żywo | **Zrobione** — 2026-08-21 |
 | 38 | Stripe: webhook nadający plan (`functions/`) | **Zrobione** — 2026-08-21, czeka na wdrożenie |
 | 39 | Stripe: sprzedaż włączona | **Repozytorium gotowe** — 2026-08-21, czeka na konto Stripe i trzy adresy (właściciel, `docs/STRIPE.md`) |
-| 40 | „LiczMat Pro" w nagłówku (Poradniki → stopka) | Do zrobienia |
+| 40 | „LiczMat Pro" w nagłówku (Poradniki → stopka) | **Zrobione** — 2026-08-26 |
 | 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | Do zrobienia |
 | 42 | `/app/`: fałszywe „Brak sieci" | Do zrobienia |
 | 43 | Kalkulator na prawdziwym telefonie | Do zrobienia |
@@ -255,6 +255,135 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 40 (plan naprawczy)
+
+Zadanie: **„LiczMat Pro" w nagłówku; Poradniki schodzą do stopki.** Ustalenie właściciela
+z 2026-08-21: „w nagłówku ustępują **Poradniki**". Pytanie było otwarte od Sesji 7 — stoi
+w „Otwartych decyzjach" pod nagłówkiem „Miejsce dla »LiczMat Pro« w menu" i mówi wprost, że
+gdy powstanie `/liczmat-pro/`, coś z menu będzie musiało ustąpić.
+
+**WYKONANO**
+
+**1. Jedna zamiana w architekturze, i nic poza nią.** `src/ia.mjs`: trasa `guides` traci
+pole `header`, trasa `liczmat-pro` dostaje `header: { order: 4, key: "pro_t" }`. Menu i obie
+kolumny stopki powstają z tej jednej listy, więc 373 strony przestawiły się z przebudowy —
+po jednej linijce na stronę, dokładnie tej:
+
+```
+-        <li><a href="/poradniki/">Poradniki</a></li>
++        <li><a href="/liczmat-pro/">LiczMat Pro</a></li>
+```
+
+Rząd ma nadal pięć linków: Kalkulatory · Materiały · Projekty · LiczMat Pro · Aplikacja.
+`validateIA()` dalej odrzuca szósty.
+
+**2. Poradniki nigdzie nie zniknęły — i test mówi to na głos.** Trasa jest nadal `LIVE`,
+nadal `indexable`, nadal w `sitemap.xml`, nadal z `canonical` i `hreflang` w dziesięciu
+językach, nadal w kolumnie „Produkt" w stopce (pozycja 5, klucz `foot_guides`, bez zmian —
+stopka nie wymagała **żadnej** edycji, bo poradniki były w niej od początku) i nadal
+linkowana ze strony głównej oraz ze stron kalkulatorów. Nowe sprawdzenie w
+`scripts/test-projects.mjs` §12 sprawdza obie połówki, nie samą pierwszą: link, który
+wypadłby z nagłówka **i** ze stopki naraz, przeszedłby asercję liczącą wyłącznie nagłówek.
+
+**3. To jest pomiar, a nie zmiana nazwy — i tu jest sedno tej sesji.** Rząd, który mieści
+pięć krótkich słów, nie musi zmieścić pięciu dłuższych, a „LiczMat Pro" jest dłuższe od
+„Poradniki" w ośmiu językach na dziesięć. Sesja 5 postawiła sufit na czterech linkach
+mierząc; Sesja 20 podniosła go do pięciu mierząc; Sesja 32 przesunęła próg szuflady
+z 900px na 1061px, bo zmierzyła rosyjski rząd (1033px) wypychający przełącznik motywu poza
+ekran. Ta sesja przebiegła ten sam test przy tych samych czterech szerokościach
+(1061 / 1100 / 1160 / 1280 px) w tych samych dziesięciu językach, dla gościa i dla
+zalogowanego. Do tego osobny pomiar szerokości `.nav-list` przy 1061px, konto zalogowane
+(pięć widocznych linków), z etykietą podmienioną w miejscu na starą i z powrotem, żeby obie
+liczby padły w tej samej przeglądarce i przy tym samym foncie:
+
+| Język | przed | po | |
+|---|---|---|---|
+| pl | 397 px | 412 px | +15 |
+| uk | 439 px | 465 px | +26 |
+| de | 377 px | 395 px | +18 |
+| en | 373 px | 404 px | +31 |
+| cs | 377 px | 405 px | +28 |
+| sk | 381 px | 409 px | +28 |
+| ro | 388 px | 417 px | +29 |
+| hr | 371 px | 408 px | +37 |
+| sr | 383 px | 408 px | +25 |
+| **ru** | **498 px** | **488 px** | **−10** |
+
+**Najszerszy rząd na serwisie jest rosyjski i to on ustawił próg 1061px — i akurat on się
+zwęził**, bo „Руководства" jest dłuższe niż „LiczMat Pro". Chorwacki urósł najbardziej
+(+37px) i nadal jest o 80px węższy od rosyjskiego. Nic nie zrobiło się ciaśniejsze niż to,
+co już zostało zmierzone, więc próg szuflady zostaje tam, gdzie był.
+
+**4. Zero nowych słów w słowniku.** Etykieta w nagłówku to klucz `pro_t` — ten sam, którego
+używa link w stopce, i ten sam ciąg „LiczMat Pro" we wszystkich dziesięciu językach, bo to
+nazwa własna. `node scripts/build.mjs --check` liczy tyle samo kluczy, co przed sesją:
+1157 × 10.
+
+**5. `navLevel` nie doszedł i dojść nie może.** Link w nagłówku jest pokazywany wszystkim.
+Strona sprzedażowa oglądana wyłącznie przez konta, które już są na Pro, to strona pokazana
+tym, którym nie jest już potrzebna — ta sama zasada, która trzyma `/liczmat-pro/` przed
+ścianą płatności, a nie za nią. Sprawdzone w `scripts/test-propage.mjs` §1.
+
+**6. Dlaczego to w ogóle jest sesją, a nie kosmetyką.** `/liczmat-pro/` jest jedyną stroną,
+którą trzeba **znaleźć, zanim** ktokolwiek zapłaci — a dojść do niej dało się dotąd tylko ze
+stopki albo ze ściany, na którą ktoś już wpadł. Ściana jest odpowiedzią dla kogoś, kto
+próbował wejść do modułu; nagłówek jest zaproszeniem dla kogoś, kto jeszcze nie próbował.
+Rozdział X planu chce trzech kierunków ze strony głównej: Kalkulatory, LiczMat i LiczMat
+Pro — dwa z nich były w menu, trzeci nie.
+
+**ZMIENIONE PLIKI**
+
+- `src/ia.mjs` — `header` zdjęty z `guides`, dopisany do `liczmat-pro`; noty obu tras
+  i komentarz przy limicie pięciu linków w `validateIA()`.
+- `scripts/build.mjs` — komentarz przy `LM_NAV` (linia o `/liczmat-pro/` mówiła, że nie
+  jest to link w nagłówku; jest, a wpis zostaje, bo potrzebują go zakładka Pro i karta
+  poziomu na `/app/`). Kodu nie ruszono, `STAMP` **nie** podbity — żaden zasób się nie
+  zmienił, zmieniła się wyłącznie markup.
+- `scripts/test-projects.mjs` — §12: kolejność linków w nagłówku, plus nowe sprawdzenia,
+  że poradniki są poza nagłówkiem **i** nadal w stopce.
+- `scripts/test-propage.mjs` — §1: strona jest teraz w nagłówku, w pozycji 4, pod kluczem
+  `pro_t`, a rząd nadal ma pięć linków i nie ma wśród nich poradników.
+- 373 wygenerowane strony + `sitemap.xml` (`lastmod` przesunięty na 2026-08-26 na każdej
+  stronie, bo nagłówek zmienił się na każdej — to jest zmiana treści, nie przebudowa).
+- `docs/ARCHITEKTURA.md` §5 i §7.5, `CLAUDE.md`, ten plik.
+
+**TESTY**
+
+- `scripts/test-pages.mjs` (Chromium): **759/759** — w tym §7, czyli rząd nagłówka
+  w dziesięciu językach × 4 szerokości × gość/zalogowany.
+- `scripts/test-projects.mjs`: **884/884** (było 878).
+- `scripts/test-propage.mjs`: **1083/1083** (było 1079).
+- Chromium poza tym: `test-mobile` 1152/1152 (szuflada i cele dotykowe na sześciu
+  szerokościach), `test-a11y-page` 55/55, `test-propage-page` 148/148, `test-qa` 675/675.
+- Pozostałe zestawy bez zależności, wszystkie przechodzą: seo 36869, perf 13157, security
+  9065, calc-seo 5133, calculators 2113, save 1280, plan 1114, quotes 1096, jobs 1032,
+  clients 851, schedule 634, crm 419, rooms 411, pay 398, materials 383, dashboard 306,
+  costs 225, account 148, webhook 111, pro-admin 110, a11y 59.
+- `node scripts/build.mjs --check`: 1157 kluczy × 10 języków — tyle samo, co przed sesją.
+
+**PROBLEMY**
+
+- **Nic nie kieruje na `/liczmat-pro/` ze strony pojedynczego kalkulatora.** Nagłówek
+  owszem, ale zdanie pod wynikiem nadal wybiera tylko między „załóż darmowe konto"
+  a „Twoje konto to zsynchronizuje" (rozdział XII). To nie jest defekt tej sesji i nie
+  zostało ruszone — jedno zadanie, jedna sesja.
+- **Menu jest pełne.** Piąty link był mierzony, szósty nie i build go odrzuca. Kolejna
+  strona, która „powinna być w menu", wymaga albo pomiaru szóstego, albo oddania miejsca
+  przez którąś z pięciu. Zapisane tutaj, żeby następna sesja nie odkrywała tego przy okazji.
+- **`docs/ARCHITEKTURA.md` §5 mówiło „Cztery linki to maksimum"** od Sesji 5 — nieprawda od
+  Sesji 20, która dołożyła piąty. Poprawione przy okazji, bo ta sesja i tak przepisywała
+  ten akapit.
+
+**STATUS**
+
+Zrobione. Sprzedaż nadal czeka na właściciela (`docs/STRIPE.md`) — ta sesja niczego w tym
+nie zmieniła i zmienić nie miała; zmieniła to, że stronę, która o sprzedaży opowiada, widać
+z każdej z 373 stron serwisu.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 41 — sześć języków bez nazwy (`undefined` w wybieraku).**
 
 ### Co zrobiła Sesja 39 (plan naprawczy)
 
@@ -3947,13 +4076,19 @@ architektury, czyli do miejsca, z którego biorą się obie listy naraz.
 Kotwica nadal nie przechodzi przez `livePaths()` — to nie jest adres strony. Pilnuje jej
 teraz test w Chromium (patrz raport Sesji 7), nie build.
 
-### Miejsce dla „LiczMat Pro” w menu
+### ~~Miejsce dla „LiczMat Pro” w menu~~ — rozstrzygnięte w Sesji 40
 
-Menu mieści cztery linki i tyle ich dziś jest (Kalkulatory, Materiały, Projekty,
-Poradniki). Rozdział X chce, żeby ze strony głównej wychodziły trzy kierunki:
-Kalkulatory, LiczMat i LiczMat Pro. Kiedy Sesja 29 zbuduje `/liczmat-pro/`, coś z menu
-będzie musiało ustąpić — najpewniej „Poradniki”, które i tak są w stopce. Decyzja należy
-do tamtej sesji.
+Pytanie z Sesji 7: menu mieściło cztery linki (Kalkulatory, Materiały, Projekty,
+Poradniki), rozdział X chce trzech kierunków ze strony głównej — Kalkulatory, LiczMat
+i LiczMat Pro — więc gdy powstanie `/liczmat-pro/`, coś będzie musiało ustąpić.
+Przewidywanie („najpewniej Poradniki, które i tak są w stopce") okazało się trafne, ale
+decyzja nie zapadła w Sesji 29: tamta zbudowała stronę i zostawiła ją w stopce.
+
+Rozstrzygnął **właściciel** 2026-08-21 — „w nagłówku ustępują Poradniki" — i wykonała to
+**Sesja 40**. Rząd ma pięć linków, nie cztery (piąty, „Aplikacja", doszedł po Sesji 20),
+a zamiana została **zmierzona**: najszerszy rząd na serwisie, rosyjski, zwęził się o 10 px.
+Poradniki zostały w stopce, w `sitemap.xml` i w linkach ze strony głównej. Pomiar w całości
+w raporcie Sesji 40 i w `docs/ARCHITEKTURA.md` §5.
 
 ### Drobny błąd zastany — naprawiony
 
