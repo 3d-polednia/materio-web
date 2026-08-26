@@ -1366,6 +1366,35 @@ języka i krótkie napisy interfejsu wychodzą identycznie — poprawnie, a nie 
 kopiowanie. Testy, które wymagały, żeby każdy język brzmiał inaczej, liczą te dwa jako
 jeden głos.
 
+### 7.8a. Jak się nazywa język — jedna lista, dwa wybieraki (Sesja 41)
+
+Nazwa języka stoi w **jednym** miejscu: `LANGS` w `assets/i18n.js`. Czyta ją i przeglądarka
+(trzy strony bez własnego języka rysują wybierak w locie z wygenerowanego pakietu
+`assets/i18n.<lang>.js`), i generator — `LANG_NAME` w `src/flags.mjs` bierze ją stamtąd
+i wpisuje do markupu pozostałych 370 stron.
+
+**Do Sesji 41 to była jedna lista w dwóch kopiach, a krótsza z nich rysowała 370 stron.**
+`LANG_NAME` było wypisane ręcznie i miało **cztery** języki, kiedy serwis wysyłał dziesięć.
+Od powrotu sześciu języków (2026-08-19) każda wygenerowana strona pisała obok sześciu flag
+słowo **`undefined`** — raz w menu w nagłówku, drugi raz w rzędzie języków w stopce — we
+wszystkich dziesięciu językach. Nic tego nie zauważyło: żaden klucz nie brakował, żaden
+adres nie był zepsuty, `hreflang` i `canonical` zgadzały się co do jednego, wszystkie
+suity przechodziły, a połowa przeglądarkowa była **poprawna przez cały ten czas**, bo
+czytała słownik bezpośrednio. Defektem nie było przeoczone tłumaczenie, tylko druga kopia.
+
+Zamknięte z dwóch stron: `validate()` w `scripts/build.mjs` przerywa build na języku bez
+nazwy (build nie ma prawa wypisać na stronie słowa, którego nikt nie napisał — ta sama
+zasada, co przy `lmGate()` w Sesji 21), a `scripts/test-langs.mjs` czyta wysłane strony
+z powrotem: przycisk, menu, stopka, oba pakiety i sam wyraz „undefined" tam, gdzie ktoś
+może go przeczytać.
+
+**Nazwa języka, nigdy nazwa kraju** (ustalenie właściciela z 2026-08-21). Dziesięć języków
+to nie dziesięć krajów: niemiecki jest urzędowy w czterech, serbski zapisuje się dwoma
+alfabetami, a angielski nie należy do żadnego. Wybierak, który mówi „Deutschland", każe
+komuś w Wiedniu wybrać kraj, w którym nie mieszka. Każda nazwa jest też zapisana **we
+własnym języku** („Română", nie „rumuński"): wybierak czyta ktoś, kto właśnie **nie** rozumie
+języka, w którym jest w tej chwili strona.
+
 ---
 
 ### 7.13. Strona LiczMat Pro — publiczny opis płatnego produktu (Sesja 29)

@@ -69,7 +69,7 @@ function evalScript(file, returns) {
   return new Function(`${src}\nreturn {${returns.join(",")}};`)();
 }
 
-const { I18N, LANGS: LANG_META_RAW } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
+const { I18N } = evalScript("assets/i18n.js", ["I18N"]);
 
 /**
  * What the browser gets to know about the languages: the code and the name in that
@@ -80,11 +80,13 @@ const { I18N, LANGS: LANG_META_RAW } = evalScript("assets/i18n.js", ["I18N", "LA
  * that the generator had already written into the markup, flags included. Only the three
  * pages with no language of their own build their picker at runtime, so only they need
  * the shapes: they get assets/flags.js, which is the same ten and nothing else.
+ *
+ * The name comes from LANG_NAME, which src/flags.mjs reads out of assets/i18n.js. This
+ * line used to read that dictionary itself and fall back to LANG_NAME when it found
+ * nothing — so the runtime picker on /app/ and the one the generator writes into the
+ * markup were built from two different lists, and only one of them had ten names in it.
  */
-const LANG_META = LANGS.map((code) => ({
-  code,
-  label: (LANG_META_RAW.find((l) => l.code === code) || {}).label || LANG_NAME[code],
-}));
+const LANG_META = LANGS.map((code) => ({ code, label: LANG_NAME[code] }));
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
 const { CALCS, ENGINES, localizeRow, unitLabel } = evalScript(
@@ -142,6 +144,17 @@ const problems = [];
 
 function validate() {
   const reference = Object.keys(DICT[DEFAULT_LANG]);
+
+  // A language with no name. The picker writes LANG_NAME[lang] straight into the markup,
+  // so a missing entry is not an empty cell — it is the literal word "undefined" beside a
+  // flag, in the header menu and again in the footer, on every page in every language.
+  // That shipped for a week after the six languages came back, because the list the
+  // generator read had four names in it and nothing compared it with the ten it renders.
+  for (const lang of LANGS) {
+    if (!LANG_NAME[lang]) {
+      problems.push(`language "${lang}" has no name — add it to LANGS in assets/i18n.js`);
+    }
+  }
 
   for (const lang of LANGS) {
     if (!DICT[lang]) { problems.push(`language "${lang}" is missing entirely`); continue; }

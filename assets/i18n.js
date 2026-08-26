@@ -1,12 +1,16 @@
 /* LiczMat website — translations for the ten languages LiczMat ships:
    pl, uk, de, en, cs, sk, ro, hr, sr, ru.
-   Six more (cs, sk, ro, hr, sr, ru) were dropped on 2026-08-12 with the master plan's
-   chapter V; the Android app still carries them, the site does not.
+   Six of them (cs, sk, ro, hr, sr, ru) were dropped on 2026-08-12 with the master plan's
+   chapter V and brought back on 2026-08-19 at the owner's request, with their original
+   slugs recovered from git so every URL that was live before resolves again.
    Keys are referenced from the generated pages via data-i18n / data-i18n-ph and from JS.
    Missing keys fall back to English, then Polish.
 
    The order below is the order the language picker shows, and each entry gets its flag
-   added by scripts/build.mjs — see src/flags.mjs. */
+   added by scripts/build.mjs — see src/flags.mjs, which also reads the labels below: they
+   are the site's only list of what each language is called, and both pickers (the one the
+   generator writes into the markup and the one /app/ builds at runtime) are drawn from
+   it. A language whose label is missing here aborts the build. */
 
 const LANGS = [
   { code: "pl", label: "Polski" },

@@ -79,7 +79,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 38 | Stripe: webhook nadający plan (`functions/`) | **Zrobione** — 2026-08-21, czeka na wdrożenie |
 | 39 | Stripe: sprzedaż włączona | **Repozytorium gotowe** — 2026-08-21, czeka na konto Stripe i trzy adresy (właściciel, `docs/STRIPE.md`) |
 | 40 | „LiczMat Pro" w nagłówku (Poradniki → stopka) | **Zrobione** — 2026-08-26 |
-| 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | Do zrobienia |
+| 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | **Zrobione** — 2026-08-26 |
 | 42 | `/app/`: fałszywe „Brak sieci" | Do zrobienia |
 | 43 | Kalkulator na prawdziwym telefonie | Do zrobienia |
 | 44 | Stop slop: zasady, test, pl/uk/de/en | Do zrobienia |
@@ -255,6 +255,150 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 41 (plan naprawczy)
+
+Zadanie: **sześć języków bez nazwy — `undefined` w wybieraku.**
+
+**WYKONANO**
+
+**1. Defekt: jedna lista w dwóch kopiach, a rysowała ta krótsza.** Nazwa języka stała
+w dwóch miejscach — `LANGS` w `assets/i18n.js` (dziesięć nazw, poprawne od dnia, w którym
+sześć języków wróciło) i `LANG_NAME` w `src/flags.mjs`, wypisane ręcznie i mające
+**cztery**. Generator czyta tę drugą i wpisuje ją prosto w markup, więc od 2026-08-19 każda
+wygenerowana strona pisała obok sześciu flag słowo **`undefined`**: raz w menu w nagłówku,
+drugi raz w rzędzie języków w stopce, a na stronach tych sześciu języków jeszcze trzeci raz
+— na **przycisku wybieraka**, czyli w nazwie języka, który czytelnik ma właśnie przed sobą.
+
+Zmierzone na tym, co było wysłane: **4662 wystąpienia na 370 z 375 stron** (12 na stronę,
+13 w sześciu językach), w tym **222 strony**, na których „undefined" stało na samym
+przycisku (37 stron logicznych × 6 języków). Pięć stron bez wystąpień to `404.html`,
+`privacy-policy.html` i trzy bezjęzykowe (`/app/`, `/app/dashboard/`, `/p/`).
+
+**Połowa przeglądarkowa była poprawna przez cały ten czas.** `/app/`, `/app/dashboard/`
+i `/p/` rysują wybierak w locie z pakietu `assets/i18n.<lang>.js`, a ten powstaje
+z `assets/i18n.js` — więc miał wszystkie dziesięć nazw. Wybierak na stronie i wybierak
+w przeglądarce mówiły co innego, i to jest cała diagnoza: nie brakujące tłumaczenie,
+tylko druga kopia listy.
+
+**Dlaczego nic tego nie zauważyło przez tydzień.** `undefined` jest w JavaScripcie
+poprawnym łańcuchem, więc nic nie rzuciło wyjątkiem. Żaden klucz nie brakował
+(`build.mjs --check` liczy klucze słownika, a nazwa języka nie jest kluczem słownika),
+każdy adres się rozwiązywał, `hreflang`, `canonical` i `sitemap.xml` zgadzały się co do
+jednego wpisu, a wszystkie 23 suity przechodziły — bo żadna nie czytała **napisu** obok
+flagi. Sesje 30 (SEO), 32 (mobile), 33 (perf) i 34 (a11y) obeszły ten wybierak wzdłuż
+i wszerz: sprawdziły, czy działa, czy się mieści, czy ma nazwę dostępną i czy da się go
+otworzyć klawiaturą. Żadna nie sprawdziła, co jest w nim napisane.
+
+**2. Naprawa: jedna lista.** `LANG_NAME` w `src/flags.mjs` **czyta** teraz `LANGS`
+z `assets/i18n.js` — tym samym sposobem, którym `scripts/build.mjs` czyta każdy skrypt
+przeglądarki, z którego potrzebuje wartości. Ręcznie wypisana czwórka usunięta. Przy okazji
+zniknęła druga połowa tej samej niezgodności: `LANG_META` (to, co trafia do pakietów) było
+liczone z `assets/i18n.js` **z awaryjnym powrotem do `LANG_NAME`**, więc dwa wybieraki
+powstawały z dwóch list i tylko jedna z nich miała dziesięć pozycji. Teraz obie biorą się
+z `LANG_NAME`, a `LANG_NAME` z jednego miejsca.
+
+**3. Build przerywa się na języku bez nazwy.** `validate()` w `scripts/build.mjs` dokłada
+jedno sprawdzenie i mówi, gdzie brakuje wpisu. Sprawdzone przez wyjęcie etykiety `cs`:
+
+```
+Build aborted — the dictionaries or the site map are inconsistent:
+
+  - language "cs" has no name — add it to LANGS in assets/i18n.js
+```
+
+To jest ta sama zasada, którą Sesja 21 zapisała przy `lmGate()`: literówka ma zamykać
+drzwi, a nie wypisywać na stronie „undefined".
+
+**4. `scripts/test-langs.mjs` — 34 sprawdzenia, których nikt nie miał.** Czyta wysłane
+strony z powrotem: przycisk wybieraka nazywa język, w którym jest strona; menu w nagłówku
+wymienia dziesięć nazw w kolejności; stopka wymienia te same dziesięć; każdy link niesie
+`hreflang` języka, który nazywa. Do tego siatka bezpieczeństwa na sam defekt — **żadna
+wysłana strona nie zawiera słowa „undefined" tam, gdzie ktoś może je przeczytać** — oraz
+druga strona medalu: dziesięć pakietów `assets/i18n.<lang>.js` musi nieść tę samą dziesiątkę
+z tymi samymi nazwami, a trzy strony bez własnego języka mają wysyłać **pusty** pojemnik
+wybieraka, bo połowicznie wypisany nazwałby wszystkim `DEFAULT_LANG`.
+
+§2 zapisuje ustalenie właściciela z 2026-08-21: **nazwa języka, nigdy nazwa kraju**
+(lista dwudziestu czterech nazw krajów, żadna nie może być etykietą), każda nazwa **we
+własnym języku** („Română", nie „rumuński"), żadne dwie takie same, a ukraińska i rosyjska
+zapisane cyrylicą. §5 pilnuje rozdziału V planu: flaga to prawdziwy SVG, nigdy emoji.
+
+**5. Naprawiona zaschnięta asercja po Sesji 40.** `scripts/test-account-page.mjs` §15
+wymagał nagłówka `Kalkulatory, Materiały, Projekty, Poradniki, Aplikacja` — kolejności,
+którą Sesja 40 zmieniła na polecenie właściciela. Ta suita nie stoi w jej raporcie, więc
+zmiana wjechała z czterema czerwonymi sprawdzeniami. Poprawione tutaj, bo to jedna
+z suit, którymi ta sesja sprawdzała samą siebie, a czerwona suita odziedziczona przez
+Sesję 42 to defekt nie do odróżnienia od nowego. **Cztery łańcuchy w teście, zero zmian
+w kodzie serwisu.**
+
+**ZMIENIONE PLIKI**
+
+Dodane:
+- `scripts/test-langs.mjs` — dziesięć języków i to, jak je nazywa każdy wybierak.
+
+Zmienione:
+- `src/flags.mjs` — `LANG_NAME` czyta `LANGS` z `assets/i18n.js` zamiast powtarzać cztery
+  pozycje.
+- `scripts/build.mjs` — `LANG_META` z jednego źródła (bez awaryjnego powrotu), plus
+  sprawdzenie w `validate()`.
+- `assets/i18n.js` — wyłącznie komentarz nagłówkowy: mówił, że sześciu języków „serwis nie
+  ma", nieprawda od 2026-08-19, i nie mówił, że ta lista jest jedynym miejscem, z którego
+  bierze się nazwa języka.
+- `scripts/test-account-page.mjs` — §15, cztery zaschnięte łańcuchy po Sesji 40.
+- 370 wygenerowanych stron: **jedyna zmiana to nazwy sześciu języków** w menu, w stopce
+  i na przycisku. `sitemap.xml` bez zmian — Sesja 40 przesunęła `lastmod` na 2026-08-26
+  na każdej stronie i dziś jest ten sam dzień.
+- `docs/ARCHITEKTURA.md` §7.8a, `CLAUDE.md`, ten plik.
+
+**`STAMP` NIE podbity** i to jest celowe: żaden zasób wysyłany do przeglądarki się nie
+zmienił. `assets/i18n.js` jest **wejściem builda** — nie linkuje go żadna strona, do
+przeglądarki jedzie `assets/i18n.<lang>.js`, a te dziesięć plików wyszło co do bajtu takie
+samo, bo miały poprawne nazwy od początku. Zmieniła się wyłącznie markup, tak samo jak
+w Sesji 40.
+
+**TESTY**
+
+- `scripts/test-langs.mjs`: **34/34** (nowe). Uruchomione na stanie sprzed naprawy dały
+  4 błędy, każdy nazywający dokładnie ten defekt — 370 stron z „undefined", 222 przyciski.
+- `scripts/test-account-page.mjs`: **213/213** (przed sesją: 209/213).
+- Chromium, reszta bez zmian: `test-pages` 759/759, `test-mobile` 1152/1152,
+  `test-a11y-page` 55/55, `test-propage-page` 148/148, `test-qa` 675/675,
+  `test-projects-page` 177/177, `test-dashboard-page` 90/90, `test-save-page` 70/70,
+  `test-materials-page` 166/166, `test-rooms-page` 195/195, `test-costs-page` 134/134,
+  `test-clients-page` 145/145, `test-jobs-page` 164/164, `test-quotes-page` 188/188,
+  `test-crm-page` 141/141, `test-calendar-page` 162/162.
+- Bez zależności, wszystkie przechodzą: seo 36869, perf 13157, security **9072** (było
+  9065: skaner kluczy prywatnych czyta o jeden plik więcej — nowy test — razy siedem
+  wzorców), calc-seo 5133, calculators 2113, save 1280, plan 1114, quotes 1096, jobs 1032,
+  projects 884, clients 851, schedule 634, crm 419, rooms 411, pay 398, materials 383,
+  dashboard 306, costs 225, account 148, webhook 111, pro-admin 110, a11y 59, propage 1083.
+- `node scripts/build.mjs --check`: 1157 kluczy × 10 języków — tyle samo, co przed sesją.
+
+**PROBLEMY**
+
+- **Ten defekt żył tydzień, bo żadna suita nie czytała napisów w nawigacji.** `test-langs`
+  zamyka wybierak języka. Wybierak **waluty**, przełącznik motywu i etykiety w nagłówku są
+  sprawdzane pod kątem tego, czy działają i czy się mieszczą — nie pod kątem tego, co jest
+  w nich napisane. Nie ruszone: jedno zadanie, jedna sesja.
+- **Nazwy języków nie były tłumaczone i nie powinny być.** „Polski" stoi tak samo na
+  stronie niemieckiej i na rosyjskiej — celowo, bo wybierak czyta ktoś, kto nie rozumie
+  języka bieżącej strony. To nie jest brakujące tłumaczenie i Sesje 44–45 („stop slop")
+  nie powinny go dopisywać.
+- **Sesja 40 wysłała czerwoną suitę i nie zauważyła.** `test-account-page.mjs` nie stoi
+  w jej liście testów. Nie ma w tym repozytorium jednej komendy, która uruchamia wszystkie
+  25 suit, więc każda sesja wybiera z listy w `CLAUDE.md` i pomija to, o czym nie pomyśli.
+  Naprawione tutaj tylko to jedno zaschnięte sprawdzenie; runner zbiorczy to osobne zadanie
+  i **nie jest zrobiony**.
+
+**STATUS**
+
+Zrobione. Sześć języków ma nazwy na wszystkich 370 stronach, lista jest jedna, build
+przerywa się na języku bez nazwy, a test czyta wysłane strony z powrotem.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 42 — `/app/`: fałszywe „Brak sieci".**
 
 ### Co zrobiła Sesja 40 (plan naprawczy)
 

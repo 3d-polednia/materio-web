@@ -113,6 +113,7 @@ node scripts/test-a11y.mjs        # names, headings, landmarks, live regions —
 node scripts/test-a11y-page.mjs   # focus, the keyboard, both themes — in Chromium
 node scripts/test-security.mjs    # authorization, data isolation, the API, the levels
 node scripts/test-qa.mjs          # the whole path, end to end, in a real browser
+node scripts/test-langs.mjs       # the ten languages and what every picker calls them
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -457,6 +458,20 @@ scripts/test-qa.mjs   The final QA walk (session 36, chapter XXXVI): the whole p
                       a currency is not a language). Only /app/ is stubbed, with
                       scripts/fake-firebase.mjs, because the container cannot reach gstatic.
                       Needs the same outside-the-repo Playwright as test-pages.mjs
+scripts/test-langs.mjs  The ten languages and what every picker on the site calls them
+                      (session 41): that the list is in ONE place — assets/i18n.js — and
+                      that src/flags.mjs reads it rather than repeating it; that every
+                      language has a name, that the name is the language's own word for
+                      itself rather than a country's, and that no two are the same; the
+                      370 pages whose picker the generator filled in, read back — the
+                      button, the header menu and the footer's list, all ten in order —
+                      plus the net that catches the defect itself: the word "undefined"
+                      where a visitor can read it, on any shipped page; the three pages
+                      that translate in place, whose picker container ships empty and
+                      whose ten names come out of the dictionary bundle instead; and the
+                      flags, one real SVG each and never an emoji. Dependency-free — run
+                      it after touching LANGS in assets/i18n.js, LANG_NAME in
+                      src/flags.mjs, langPicker() or the footer's language nav
 functions/            The Cloud Functions codebase — deployed with `firebase deploy
                       --only functions`, NEVER served by GitHub Pages. It is stripped from
                       the artifact in `.github/workflows/pages.yml` alongside docs/, src/
@@ -1498,6 +1513,19 @@ Kotlin side of it. Change one, change all three.
   It is the single `?v=` value for every page. GitHub Pages serves assets with
   `max-age=600`, so without it a visitor can run new markup against a stale stylesheet.
   `privacy-policy.html` and `404.html` are hand-written — bump their `?v=` by hand too.
+- **A language's own name is written down once, in `LANGS` in `assets/i18n.js`.**
+  `LANG_NAME` in `src/flags.mjs` reads that list; it used to be typed out there a second
+  time and named four languages while the site shipped ten, so from the day the six came
+  back every generated page wrote the word **`undefined`** beside six flags — once in the
+  header menu, once again in the footer — on 370 of the 375 pages, in all ten languages.
+  Nothing else noticed: every key was present, every URL resolved, every suite passed, and
+  the browser half was right the whole time, because the three pages that build their
+  picker at runtime read the dictionary directly. One list with two copies is the whole
+  defect. `validate()` in `scripts/build.mjs` now aborts on a language with no name, and
+  `scripts/test-langs.mjs` reads the shipped pages back. **The name is the language's, never
+  a country's** (the owner's decision, 2026-08-21): German is spoken in four countries and
+  a picker that says "Deutschland" asks somebody in Vienna to pick a country they do not
+  live in.
 - **Ten languages, always.** `pl, uk, de, en, cs, sk, ro, hr, sr, ru`. Every key must
   exist in all ten, in **each** of `assets/i18n.js`, `assets/i18n-pages.js` and
   `assets/i18n-materials.js`. Check with `node scripts/build.mjs --check`, which fails and
