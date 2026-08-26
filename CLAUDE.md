@@ -627,8 +627,9 @@ assets/pay.js         The subscription: the two plans, their fourteen hand-typed
                       seven currencies, and the two Stripe addresses (Payment Link,
                       Customer Portal). Ships priced and NOT buyable — the links are empty
                       until the owner has verified that paying actually grants the plan;
-                      the ORDER note at the bottom of the file is that checklist. Reads no
-                      storage, fetches nothing, converts nothing
+                      the ORDER note at the bottom of the file is that checklist, and
+                      docs/STRIPE.md is the same six steps with every field in them. Reads
+                      no storage, fetches nothing, converts nothing
 assets/account.js     The user session and the three access levels of chapter II. Loaded
                       on every page: it is what lets a calculator word the sentence under
                       the result without loading Firebase. /app/ is its only writer
@@ -658,6 +659,13 @@ docs/DESIGN_SYSTEM.md Colour, type, spacing, radius, elevation, motion, componen
 docs/ARCHITEKTURA.md  Information architecture: pages, routing, navigation, the
                       three access levels, user flows, and the open decisions
 docs/DOKUMENTACJA.md  Full project documentation
+docs/STRIPE.md        Switching the sale on: the six steps that are console work rather
+                      than code — two products with the fourteen amounts, the Payment
+                      Links, the secret, the deploy, the webhook's four events, one real
+                      payment — and the two decisions Stripe leaves open (which currency
+                      the checkout presents, and VAT). Written for the owner, in Polish;
+                      `scripts/test-pay.mjs` §3b checks its prices and its event list
+                      against the code rather than trusting the prose
 ```
 
 **Run `node scripts/test-calculators.mjs` after touching a calculator.** It needs nothing
@@ -980,10 +988,32 @@ Kotlin side of it. Change one, change all three.
   a Payment Link → offer to charge). Today the first is true and the second is false, so the
   site says what Pro costs and says plainly that the subscription has not opened. Filling in
   the three URLs turns the buttons on with no other edit — and the ORDER note at the bottom
-  of that file says what must happen first: products → Payment Links → the "Run Payments with
-  Stripe" extension → a function writing `plan`/`planValidUntil`/`planRenews` → **pay once
-  and check the account turns Pro by itself** → only then paste the URLs. A checkout switched
-  on before that last step takes money for nothing.
+  of that file says what must happen first: products → Payment Links → **deploy `functions/`
+  and point a Stripe webhook at it** → **pay once and check the account turns Pro by
+  itself** → only then paste the URLs. A checkout switched on before that last step takes
+  money for nothing. Session 39 rewrote steps 3 and 4 of that note: session 38 replaced the
+  "Run Payments with Stripe" extension with our own function and left the checklist naming
+  the extension, so the one list the owner follows sent them to install the wrong server.
+  The clicking, field by field, is `docs/STRIPE.md`.
+- **Neither the test suite nor `/liczmat-pro/` may treat the sale opening as a regression.**
+  `scripts/test-pay.mjs` §3 and `scripts/test-propage.mjs` used to assert the state the site
+  ships in — links empty — so pasting the three URLs would have turned the suite red at the
+  moment it was supposed to go green. Both now read the state the file is in and check what
+  has to hold in it: closed, the honest "not open yet" page; open, **all of it or none** —
+  both plans buyable in all seven currencies, a portal to cancel in, no test-mode link
+  (`/test_` in the path: it charges nobody and its events are signed with the other mode's
+  secret). The built markup does not change either way — `proPlansBlock()` writes both the
+  price row and the "not open yet" sentence, and `assets/paywall.js` shows one.
+- **Stripe picks the checkout's currency from the buyer's IP, and a Payment Link cannot be
+  told otherwise.** Adaptive Pricing is always on for Payment Links and cannot be switched
+  off there; only a currency **typed by hand** into the price (`currency_options`) overrides
+  it, which is why the fourteen amounts go on two products as multi-currency prices rather
+  than as fourteen separate prices. So somebody in Poland who set the site to EUR is quoted
+  9,99 € on the page and shown 39,99 zł at Stripe: still one of the fourteen hand-typed
+  amounts and never a conversion, but not the number the page printed. A country outside the
+  seven (Hungary, say) does get a converted amount with Stripe's 2–4% fee in it. Whether to
+  say so on `/app/`, ship one Payment Link per currency, or leave it, is the owner's call —
+  the three options are in `docs/STRIPE.md`.
 - **The webhook is the only thing that can grant a plan after a payment, and it is our own
   function rather than the Stripe extension.** Session 38 of the repair plan put
   `functions/` in this repo: one HTTPS function in `europe-central2`, beside Firestore.

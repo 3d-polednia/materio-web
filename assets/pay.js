@@ -184,16 +184,21 @@ function lmPortalUrl() {
   return lmPayUrlOk(LM_PAY.portalUrl) ? LM_PAY.portalUrl : null;
 }
 
-/* ─── THE ORDER THE OWNER HAS TO WORK IN ─────────────────────────────────────
- * Nothing in this file makes a payment land. `users/{uid}.plan` is server-only and no
- * server writes it yet (FIRESTORE_SYNC §9.2), so the missing piece is not code here:
+/* ─── THE ORDER THE OWNER HAS TO WORK IN ────────────────────────
+ * Nothing in this file makes a payment land. `users/{uid}.plan` is server-only, and the
+ * one thing allowed to write it after a payment is `functions/` in this repo — our own
+ * webhook (session 38), and deliberately NOT the "Run Payments with Stripe" extension:
+ * that one is built around Checkout Sessions a signed-in browser creates in Firestore,
+ * and a static site has no way to create one. Every field to fill in, and what to look
+ * at after each step, is `docs/STRIPE.md`.
  *
  *   1. Stripe → two products with EXACTLY the fourteen amounts above, seven currencies each.
  *   2. Stripe → a Payment Link per product, and the Customer Portal switched on.
- *   3. Firebase console → install the "Run Payments with Stripe" extension. It is the
- *      server this site does not have: it takes the webhook and writes the subscription.
- *   4. A function mapping that subscription onto `users/{uid}.plan` ("premium"),
- *      `planValidUntil` (millis) and `planRenews` (boolean — see assets/plan.js).
+ *   3. `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET`, then
+ *      `firebase deploy --only functions`. The deploy prints the endpoint's address.
+ *   4. Stripe → a webhook endpoint at that address, subscribed to exactly the four events
+ *      `functions/stripe-map.mjs` handles: `checkout.session.completed` and
+ *      `customer.subscription.created` / `.updated` / `.deleted`.
  *   5. Pay once, on a real account, and check the account page turns Pro by itself.
  *   6. ONLY THEN paste the three URLs into LM_PAY above.
  *

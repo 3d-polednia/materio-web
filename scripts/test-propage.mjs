@@ -53,8 +53,8 @@ const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 
 /* The permission table and the price list, read exactly as the browser reads them. */
 const { LM_FEATURES } = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATURES"]);
-const { LM_PAY, lmPayPrice, lmPayOpen } = evalScript("assets/pay.js",
-  ["LM_PAY", "lmPayPrice", "lmPayOpen"]);
+const { LM_PAY, lmPayPrice, lmPayUrlOk } = evalScript("assets/pay.js",
+  ["LM_PAY", "lmPayPrice", "lmPayUrlOk"]);
 
 /**
  * What scripts/build.mjs prints as the price, recomputed here from the same two sources.
@@ -231,9 +231,11 @@ for (const lang of LANGS) {
   /* Nothing here takes money, and nothing here can. The checkout needs a uid, /app/ is
      the only page that has one, and the subscription has not opened at all yet. */
   hasNot("stripe.com", "no payment address stands on a public page");
-  has(t("pay_soon"), "the page says the subscription has not opened");
-  check(`${lang}: which is the state the site actually ships in`,
-    !lmPayOpen(DEFAULT_CURRENCY[lang]));
+  /* Both sentences are in the markup and assets/paywall.js shows one, so this page reads
+     correctly before and after the sale opens without being rebuilt for it. Asserting the
+     closed state here instead would make session 39 look like a regression. */
+  has(t("pay_soon"), "the subscription-not-open sentence is in the page");
+  has("data-pw-buy", "and so is the row that replaces it once there is a Payment Link");
   has(`href="${URL_APP}"`, "and the way in is the account page");
 
   /* Chapter XXV's Free → Pro path, written out: an account first, then the plan. The
@@ -316,10 +318,12 @@ head("4. the copy, in ten languages");
     check(`${key} is actually translated`, new Set(all).size >= 8, all.join(" | "));
   }
 
-  // No page may say Pro can be bought while assets/pay.js carries no Payment Link. The
-  // sentence that says otherwise is pay_soon, and it is checked in §2 per language.
+  /* This page never takes money and never will — it has no uid to attach a payment to.
+     What it must not do is point somewhere that is not Stripe, in either state: no link
+     while the sale is closed, and a checked one after session 39 opens it. */
   for (const plan of LM_PAY.plans) {
-    eq(`the ${plan.id} plan still has no Payment Link`, plan.link, "");
+    check(`the ${plan.id} plan's address is absent or Stripe's`,
+      plan.link === "" || lmPayUrlOk(plan.link), plan.link);
   }
 }
 

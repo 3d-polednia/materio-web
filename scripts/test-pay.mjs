@@ -60,7 +60,7 @@ function loadPay(over) {
   if (over) {
     if (over.portalUrl !== undefined) api.LM_PAY.portalUrl = over.portalUrl;
     if (over.plans) api.LM_PAY.plans = over.plans;
-    if (over.link) api.LM_PAY.plans.forEach((pl) => { pl.link = over.link; });
+    if (over.link !== undefined) api.LM_PAY.plans.forEach((pl) => { pl.link = over.link; });
   }
   return api;
 }
@@ -152,24 +152,56 @@ head("2. nothing is converted at a rate");
 
 /* ================================================================== 3. the two thresholds */
 
-head("3. priced is not the same as buyable — the state the site ships in");
+head("3. priced is not the same as buyable — whichever of the two states ships");
 {
   const shipped = loadPay();
-  for (const plan of shipped.LM_PAY.plans) {
-    eq(`${plan.id} ships with no Payment Link`, plan.link, "");
-    eq(`so ${plan.id} has a price`, shipped.lmPayPriced(plan.id, "PLN"), true);
-    eq(`and ${plan.id} still cannot be bought`, shipped.lmPayBuyable(plan.id, "PLN"), false);
+
+  /* Session 39 opens the sale, and it opens it by pasting three addresses into LM_PAY.
+     So this section reads the state the file is actually in instead of asserting the one
+     it shipped in on the day it was written — a suite that goes red the moment the owner
+     pastes the URLs is a suite that reports the sale as a defect.
+
+     What is refused in both states is the half-open one: one plan buyable and the other
+     only priced, a checkout with no portal to cancel in, or a test-mode link, which takes
+     nothing and produces events the live webhook secret rejects. */
+  const open = shipped.LM_PAY.plans.some((plan) => plan.link !== "");
+
+  if (!open) {
+    for (const plan of shipped.LM_PAY.plans) {
+      eq(`${plan.id} ships with no Payment Link`, plan.link, "");
+      eq(`so ${plan.id} has a price`, shipped.lmPayPriced(plan.id, "PLN"), true);
+      eq(`and ${plan.id} still cannot be bought`, shipped.lmPayBuyable(plan.id, "PLN"), false);
+    }
+    eq("the shipped site takes no money", shipped.lmPayOpen("PLN"), false);
+    eq("in any currency", CURRENCIES.some((c) => shipped.lmPayOpen(c)), false);
+    eq("the portal is not configured either", shipped.lmPortalUrl(), null);
+    // …and it still says what Pro costs, which is the whole reason for two thresholds.
+    eq("both plans are still listed with prices", shipped.lmPayPlans("PLN").length, 2);
+  } else {
+    for (const plan of shipped.LM_PAY.plans) {
+      check(`${plan.id} carries a link`, plan.link !== "", plan.id);
+      check(`${plan.id} points at Stripe`, shipped.lmPayUrlOk(plan.link), plan.link);
+      /* A Stripe test link says so in its path. It charges nobody and its events are
+         signed with the test secret, so a live deployment answers them 400. */
+      check(`${plan.id} is not a test-mode link`, !/\/test_/.test(plan.link), plan.link);
+      for (const code of CURRENCIES) {
+        eq(`${plan.id} can be bought in ${code}`, shipped.lmPayBuyable(plan.id, code), true);
+      }
+      check(`${plan.id} builds a checkout URL`,
+        typeof shipped.lmCheckoutUrl(plan.id, { uid: "abc123" }) === "string");
+    }
+    eq("the site takes money in every currency it prices",
+      CURRENCIES.every((c) => shipped.lmPayOpen(c)), true);
+    /* Cancelling is Stripe's own screen, and it is the only one there is: a subscription
+       nobody can get out of without writing to us is worse than one nobody can start. */
+    check("and there is a portal to cancel in", shipped.lmPortalUrl() !== null,
+      String(shipped.LM_PAY.portalUrl));
   }
-  eq("the shipped site takes no money", shipped.lmPayOpen("PLN"), false);
-  eq("in any currency", CURRENCIES.some((c) => shipped.lmPayOpen(c)), false);
-  eq("the portal is not configured either", shipped.lmPortalUrl(), null);
-  // …and it still says what Pro costs, which is the whole reason for two thresholds.
-  eq("both plans are still listed with prices", shipped.lmPayPlans("PLN").length, 2);
 
   // Fill in a link, and only then does anything offer to charge.
-  const open = loadPay({ link: "https://buy.stripe.com/test_123" });
-  eq("a configured link makes the plan buyable", open.lmPayBuyable("monthly", "PLN"), true);
-  eq("and the site open", open.lmPayOpen("PLN"), true);
+  const on = loadPay({ link: "https://buy.stripe.com/test_123" });
+  eq("a configured link makes the plan buyable", on.lmPayBuyable("monthly", "PLN"), true);
+  eq("and the site open", on.lmPayOpen("PLN"), true);
   // A link with no price in THIS currency is still not buyable in this currency.
   const partial = loadPay({ plans: [
     { id: "monthly", key: "pay_monthly", link: "https://buy.stripe.com/test_123", price: { PLN: 3999 } },
@@ -178,7 +210,54 @@ head("3. priced is not the same as buyable — the state the site ships in");
   eq("and not where it is not", partial.lmPayBuyable("monthly", "USD"), false);
 }
 
-/* ================================================================== 4. the addresses */
+head("3b. the checklist the owner works from is the one that is true");
+{
+  /* The note at the bottom of assets/pay.js is what the owner follows on the day the
+     sale opens, so it is code as far as this suite is concerned. Session 38 replaced the
+     Stripe extension with functions/ in this repo and left the note pointing at the
+     extension: six steps, one of which installed the wrong server. */
+  const src = read("assets/pay.js");
+  const order = src.slice(src.indexOf("THE ORDER THE OWNER HAS TO WORK IN"));
+  const guide = read("docs/STRIPE.md");
+
+  check("the note is still there", order.length > 400);
+  check("it names the webhook in this repo", order.includes("functions/"), order.slice(0, 120));
+  check("and does not send the owner to install the Stripe extension",
+    !/install the "Run Payments with Stripe"/.test(order));
+  check("it points at the step-by-step", order.includes("docs/STRIPE.md"));
+  check("which exists and is a document rather than a stub", guide.length > 2000);
+
+  /* One list of events, two files. A note naming five events would have the owner
+     subscribe to one the function answers by ignoring; naming three would have a
+     cancellation arrive nowhere. */
+  const map = read("functions/stripe-map.mjs");
+  const list = map.slice(map.indexOf("export const HANDLED"));
+  const handled = list.slice(list.indexOf("["), list.indexOf("]"))
+    .match(/"[a-z._]+"/g).map((s) => s.slice(1, -1));
+  eq("the function handles four events", handled.length, 4);
+  for (const ev of handled) {
+    const short = ev.slice(ev.lastIndexOf("."));
+    check(`the note names ${ev}`, order.includes(ev) || order.includes(short), ev);
+    check(`and docs/STRIPE.md names ${ev} in full`, guide.includes(ev), ev);
+  }
+
+  /* The fourteen amounts have to be typed into the Stripe dashboard by hand, so the guide
+     carries them as a table — and a table nobody checks is the second copy this file's
+     own header warns about. Every amount in it is derived from LM_PAY here. */
+  const pay = loadPay();
+  const printed = (minor) => {
+    const whole = Math.floor(minor / 100);
+    const cents = minor % 100;
+    return cents === 0 ? String(whole) : `${whole},${String(cents).padStart(2, "0")}`;
+  };
+  for (const plan of pay.LM_PAY.plans) {
+    for (const code of CURRENCIES) {
+      const want = printed(pay.lmPayPrice(plan.id, code));
+      check(`docs/STRIPE.md prices ${plan.id}/${code} at ${want}`, guide.includes(want), want);
+    }
+  }
+  check("and the guide names every currency", CURRENCIES.every((c) => guide.includes(c)));
+}
 
 head("4. a payment address may only ever be Stripe");
 {
@@ -243,7 +322,8 @@ head("5. the checkout URL carries who, never how much");
   eq("no uid means no reference", anon.searchParams.get("client_reference_id"), null);
 
   // A plan that cannot be bought has no URL, so no caller can render a dead button.
-  eq("an unconfigured plan has no checkout", loadPay().lmCheckoutUrl("monthly", { uid: "x" }), null);
+  eq("an unconfigured plan has no checkout",
+    loadPay({ link: "" }).lmCheckoutUrl("monthly", { uid: "x" }), null);
   eq("nor does an unknown plan", pay.lmCheckoutUrl("weekly", { uid: "x" }), null);
   // A link that is not Stripe's is refused here too, not only by lmPayUrlOk().
   eq("nor does a plan pointed somewhere else",

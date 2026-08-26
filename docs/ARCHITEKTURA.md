@@ -1253,9 +1253,11 @@ cenę; `lmPayBuyable()` — jest kwota **i** Payment Link, więc pokaż przycisk
 jest prawdą, drugie nie, więc serwis mówi, ile Pro kosztuje, i mówi wprost, że subskrypcji
 jeszcze nie da się wykupić. Wpisanie trzech adresów włącza przyciski bez żadnej innej
 edycji — ale dopiero po kolejności z noty ORDER na końcu `assets/pay.js`: produkty →
-Payment Linki → rozszerzenie „Run Payments with Stripe" → funkcja zapisująca
-`plan`/`planValidUntil`/`planRenews` → **zapłacić raz i sprawdzić, że konto samo staje się
-Pro** → dopiero wtedy adresy. Przycisk włączony wcześniej bierze pieniądze za nic.
+Payment Linki → wdrożenie **własnej funkcji z `functions/`** (Sesja 38 — nie rozszerzenia
+„Run Payments with Stripe", które jest zbudowane wokół sesji Checkout tworzonych przez
+zalogowaną przeglądarkę) → webhook w Stripe na cztery zdarzenia → **zapłacić raz
+i sprawdzić, że konto samo staje się Pro** → dopiero wtedy adresy. Przycisk włączony
+wcześniej bierze pieniądze za nic. Krok po kroku, do klikania: `docs/STRIPE.md`.
 
 **Ceny są wpisane ręcznie i nic ich nie przelicza.** Dwa plany, siedem walut, czternaście
 kwot — i te same czternaście musi stać na produktach w Stripe. Kurs euro zastosowano **raz,

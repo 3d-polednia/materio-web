@@ -77,7 +77,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 |---|---|---|
 | 37 | Pro nadawane po e-mailu + `/app/` widzi plan na żywo | **Zrobione** — 2026-08-21 |
 | 38 | Stripe: webhook nadający plan (`functions/`) | **Zrobione** — 2026-08-21, czeka na wdrożenie |
-| 39 | Stripe: sprzedaż włączona | Do zrobienia |
+| 39 | Stripe: sprzedaż włączona | **Repozytorium gotowe** — 2026-08-21, czeka na konto Stripe i trzy adresy (właściciel, `docs/STRIPE.md`) |
 | 40 | „LiczMat Pro" w nagłówku (Poradniki → stopka) | Do zrobienia |
 | 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | Do zrobienia |
 | 42 | `/app/`: fałszywe „Brak sieci" | Do zrobienia |
@@ -255,6 +255,123 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 39 (plan naprawczy)
+
+Zadanie: **Stripe — sprzedaż włączona.**
+
+**Czego ta sesja nie mogła zrobić i dlaczego to nie jest wymówka.** Sesja 39 w całości
+polega na czynnościach po stronie właściciela: konto Stripe, dwa produkty, Payment Linki,
+sekret webhooka, `firebase deploy` i **jedna prawdziwa płatność**. Konta Stripe nadal nie
+ma (ustalenie właściciela z 2026-08-21), a klucza wdrożeniowego nie ma i nie powinno być
+w tym repozytorium. Sesja zrobiła więc drugą połowę: **doprowadziła repozytorium do stanu,
+w którym wklejenie trzech adresów jest jedyną zmianą, jaką trzeba zrobić** — i naprawiła
+to, co by w tym przeszkodziło.
+
+**WYKONANO**
+
+**1. Lista, według której właściciel będzie pracował, wysyłała go po zły serwer.** Nota
+ORDER na dole `assets/pay.js` — sześć kroków, jedyna instrukcja w kodzie — w kroku 3 kazała
+zainstalować rozszerzenie „Run Payments with Stripe". Sesja 38 świadomie **odrzuciła** to
+rozszerzenie i napisała własną funkcję (`functions/`), ale noty nie poprawiła. Kroki 3 i 4
+są teraz tym, co naprawdę trzeba zrobić: sekret, wdrożenie, webhook i **dokładnie cztery
+zdarzenia**, które `functions/stripe-map.mjs` obsługuje. To samo zdanie stało w
+`docs/ARCHITEKTURA.md` §7.7 i też zostało poprawione.
+
+**2. `docs/STRIPE.md` — te same sześć kroków, ale z każdym polem do wypełnienia.** Nota
+w kodzie jest listą; to jest instrukcja: co kliknąć, co skopiować, czego się spodziewać
+w logu endpointu (200 / 400 / 503 i co każde znaczy) i co dokładnie sprawdzić po
+płatności — z osobnym krokiem 0, bo **tryb testowy i żywy mają osobne sekrety webhooka**,
+a funkcja czyta jeden, więc cały przebieg robi się dwa razy i drugi kończy się ponownym
+`firebase deploy`.
+
+**3. Waluta kasy bierze się z adresu IP kupującego, nie z wybieraka na stronie — i Payment
+Link nie da się przekonać inaczej.** To jest ustalenie tej sesji, sprawdzone w dokumentacji
+Stripe'a, i dotyczy rozdziału VI planu. Adaptive Pricing (automatyczne przeliczanie po
+kursie Stripe'a z prowizją 2–4% doliczaną kupującemu) jest **zawsze włączone dla Payment
+Linków i nie ma tam przełącznika**. Przebija je wyłącznie **kwota wpisana ręcznie w danej
+walucie** (`currency_options`) — dlatego czternaście kwot musi stanąć jako ceny
+wielowalutowe na dwóch produktach, a nie jako czternaście osobnych cen. Skutek, który
+zostaje mimo to: ktoś w Polsce, kto ustawił na stronie EUR, przeczyta 9,99 € na stronie
+i zobaczy 39,99 zł u Stripe'a. To wciąż jedna z czternastu kwot wpisanych ręcznie i **nic
+nie jest przeliczane kursem**, ale nie jest to liczba, którą pokazała strona. Kraj spoza
+siódemki walut (Węgry) dostanie kwotę przeliczoną z prowizją. Trzy wyjścia — jedno zdanie
+na `/app/`, czternaście linków, albo zostawić — stoją w `docs/STRIPE.md` i **są decyzją
+właściciela**, nie tej sesji.
+
+**4. Testy przestały traktować włączenie sprzedaży jak awarię.** `scripts/test-pay.mjs` §3
+i `scripts/test-propage.mjs` sprawdzały stan, w którym serwis jedzie („linki są puste"), a
+nie regułę. Wklejenie trzech adresów — czyli dokładnie to, po co jest ta sesja — zapaliłoby
+suite na czerwono w momencie, w którym miał zaświecić na zielono. Oba czytają teraz stan
+pliku i sprawdzają, co ma się zgadzać **w tym** stanie:
+
+- zamknięty: cena jest, kupić się nie da, portalu nie ma, strona mówi to wprost;
+- otwarty: **wszystko albo nic** — oba plany kupowalne we wszystkich siedmiu walutach,
+  portal do anulowania obecny, adresy na hoście Stripe'a i **żaden link testowy**
+  (`/test_` w ścieżce: nie pobiera niczego, a jego zdarzenia są podpisane sekretem
+  drugiego trybu, więc żywa funkcja odpowiada im 400).
+
+Markup się przy tym nie zmienia w żadną stronę: `proPlansBlock()` pisze i wiersz z ceną,
+i zdanie „subskrypcji jeszcze nie da się wykupić", a `assets/paywall.js` pokazuje jedno
+z nich. Doszło też §3b, które wiąże trzy pliki: nota ORDER, `docs/STRIPE.md`
+i `functions/stripe-map.mjs` muszą wymieniać **te same cztery zdarzenia**, a tabela cen
+w instrukcji jest wyliczana z `LM_PAY` — czternaście kwot wpisywanych ręcznie do Stripe'a
+nie może mieć w repozytorium dwóch niezgodnych kopii.
+
+**ZMIENIONE PLIKI**
+
+Dodane:
+- `docs/STRIPE.md` — instrukcja uruchomienia sprzedaży, dla właściciela.
+
+Zmienione:
+- `assets/pay.js` — nota ORDER: kroki 3 i 4 (własna funkcja, sekret, wdrożenie, webhook
+  i cztery zdarzenia) plus wskazanie na `docs/STRIPE.md`.
+- `scripts/test-pay.mjs` — §3 czyta stan zamiast go zakładać, §3b nowe; `loadPay()`
+  przyjmuje `link: ""` (do tej pory pusty łańcuch nie nadpisywał niczego).
+- `scripts/test-propage.mjs` — dwa sprawdzenia stanu zamienione na regułę, która trzyma
+  się w obu stanach.
+- `docs/ARCHITEKTURA.md` §7.7 — zdanie o kolejności.
+- `CLAUDE.md` — `docs/STRIPE.md` w spisie plików, poprawiony punkt o nocie ORDER i dwa
+  nowe: o testach, które nie mogą uznać sprzedaży za regres, i o walucie kasy.
+- `docs/MASTER_PLAN.md` — ten wpis i wiersz w tabeli.
+- `STAMP` → `20260821b`, 373 strony przebudowane (**diff stron to wyłącznie `?v=`**),
+  `?v=` w `404.html` i `privacy-policy.html` podbity ręcznie. Zmienił się jeden bajt
+  wysyłany do przeglądarki — komentarz w `assets/pay.js` — więc stempel idzie w górę.
+
+**TESTY**
+
+- `scripts/test-pay.mjs`: **398/398** (było 369).
+- `scripts/test-propage.mjs`: **1079/1079**.
+- Pozostałe 21 zestawów bez zależności: bez zmian, wszystkie przechodzą — m.in. seo 36869,
+  perf 13157, security 9065, calculators 2113, plan 1114, webhook 111, pro-admin 110.
+- `node scripts/build.mjs --check`: 1157 kluczy × 10 języków.
+- Sprawdzone **negatywnie**, bo nowe sprawdzenia dotyczą stanu, którego serwis jeszcze nie
+  ma: `assets/pay.js` ustawiony kolejno na stan **półotwarty** (jeden link, bez portalu),
+  **testowy** (dwa linki `test_`) i **w pełni otwarty** (dwa linki i portal). Pierwszy
+  i drugi przewracają suite dokładnie tam, gdzie powinny; trzeci przechodzi w komplecie —
+  412/412 w `test-pay` i 1079/1079 w `test-propage` — czyli dzień, w którym właściciel
+  wklei adresy, kończy się zielonym zestawem.
+
+**PROBLEMY**
+
+- **Sprzedaży nadal nie ma i ta sesja jej nie włączyła.** Konta Stripe nie ma, funkcja
+  z Sesji 38 nie jest wdrożona, `lmPayBuyable()` jest `false`. Wszystko, co zostało,
+  wymaga rąk właściciela i jest rozpisane w `docs/STRIPE.md`.
+- **Waluta prezentowana przy kasie** — opisana wyżej, czeka na decyzję właściciela.
+- **VAT.** Nic w tym repozytorium nie liczy podatku i `assets/pay.js` nie ma na niego pola.
+  Czy ceny są brutto, czy netto, i czy włączyć Stripe Tax, trzeba rozstrzygnąć **przed**
+  pierwszą prawdziwą płatnością, bo zmiana po fakcie dotyka wystawionych faktur.
+- Nie zmieniono niczego w `functions/` — kod z Sesji 38 jest kompletny, a wdrożenie to
+  krok 3 instrukcji, nie edycja.
+
+**STATUS**
+
+Repozytorium gotowe. Sesja 39 zamknięta po stronie kodu; **sprzedaż włączy właściciel**,
+wykonując `docs/STRIPE.md` i wklejając trzy adresy w `LM_PAY`.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 40 — „LiczMat Pro" w nagłówku (Poradniki → stopka).**
 
 ### Co zrobiła Sesja 38 (plan naprawczy)
 
