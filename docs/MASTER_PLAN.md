@@ -83,7 +83,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 42 | `/app/`: fałszywe „Brak sieci" | **Zrobione** — 2026-08-26 |
 | 43 | Kalkulator na prawdziwym telefonie | **Zrobione** — 2026-08-26 |
 | 44 | Stop slop: zasady, test, pl/uk/de/en | **Zrobione** — 2026-08-26 |
-| 45 | Stop slop: cs/sk/ro/hr/sr/ru | Do zrobienia |
+| 45 | Stop slop: cs/sk/ro/hr/sr/ru | **Zrobione** — 2026-08-26 |
 | 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | Do zrobienia |
 | 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | Do zrobienia |
 | 48 | Prawda w dokumentacji i lista rzeczy w konsolach | Do zrobienia |
@@ -248,6 +248,113 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 45 (plan naprawczy)
+
+Zadanie: **stop slop — cs/sk/ro/hr/sr/ru.**
+
+Druga połowa pary. Sesja 44 napisała `docs/COPY.md` i `scripts/test-copy.mjs` i przeprowadziła
+przez nie `pl, uk, de, en`; ta sesja nie dopisuje żadnej reguły — przeprowadza przez te same
+sześć zasad pozostałe sześć języków i domyka podział.
+
+**WYKONANO**
+
+**1. Wszystko, co test zgłaszał dla sześciu języków, zostało skrócone.** 83 poprawki:
+
+| Co | Ile | Gdzie |
+|---|---|---|
+| tekst dłuższy niż 240 znaków | 27 | `faq_a5` ×6, `ck_p_signed_in` ×6, `app_wipe_d` ×6, `cal_local_note` ×6, ro `cli/job/quo_local_note` |
+| zdanie dłuższe niż 25 słów | 5 | ro `ck_p_signed_in`, ro/hr/sr `g_klej_tip`, sr `g_rozkroj_tip` |
+| odpowiedź FAQ powtarzająca notę | 6 | ro `waste`, hr/sr `screed`, hr/sr `ceiling`, ru `masonry` |
+| obietnica bez daty | 6 | `pay_soon` ×6 |
+| wzmacniacz bez treści | 11 | `note_coverage` ×4, `coverage.faq2.a` ×4, `waste.desc` ×3 |
+
+**2. Trzy poprawki wykraczają poza to, co test zgłaszał, i tak być musiało.** Zasada §2
+patrzy na pojedynczy tekst, a copy tego serwisu to jedno zdanie w dziesięciu językach.
+Gdyby sześć języków zatrzymało akapit, który cztery straciły, serwis mówiłby co innego po
+czesku niż po polsku — i to nie z powodu tłumaczenia, tylko dlatego, że test akurat tam nie
+sięgnął progu. Więc razem z tym, co padło:
+
+- **`hwc_source` ×6** — pierwsze zdanie („Aplikace LiczMat pro Android počítá stejným
+  vzorcem") mówi to samo, co blok `appNote` na dole tej samej strony. Zostaje przypis do
+  wzoru, tak jak w czterech językach Sesji 44.
+- **Cztery `*_local_note` × 6 języków = 24 teksty** — wyliczenie „synchronizace zahrnuje
+  projekty, místnosti, výpočty a seznamy materiálu" stało cztery razy w każdym języku,
+  a jest już na `/liczmat-pro/` i na `/cookies/`. Tylko trzy z tych 24 przekraczały 240
+  znaków; pozostałe 21 poszły dlatego, że to jedna decyzja o jednym zdaniu, nie o jednym
+  progu.
+- **`g_klej_tip` ×6 i `g_rozkroj_tip` ×6** — średnik i myślnik rozdzielające dwa pełne
+  zdania rozdzielone kropką. Zgłoszone były cztery z dwunastu.
+
+**3. `CLEAN` w `scripts/test-copy.mjs` to teraz wszystkie dziesięć języków, i §1 tego
+pilnuje.** Sprawdzenie „każdy język, który serwis wysyła, przeszedł przez te zasady"
+zostało dopisane w tej sesji — w Sesji 44 nie mogło istnieć, bo padałoby za pracę tej.
+Test ma 14 sprawdzeń zamiast 13, run nie wypisuje już nic o pomijaniu.
+
+**4. Budżety §7 nie zeszły i to jest pomiar, a nie przeoczenie.** Sesja 44 zapisała w
+raporcie, że po wyczyszczeniu sześciu języków budżety powinny spaść. Nie spadły: **dla
+każdego z dwudziestu typów stron najszerszy jest język angielski**, a angielski przeszedł
+przez zasady w Sesji 44. Sześć języków skróciło swoje strony, nie dotykając ani jednego
+sufitu. Przewidywanie Sesji 44 było błędne i zostaje w jej raporcie takie, jakie było —
+poprawka jest tutaj.
+
+**ZMIENIONE PLIKI**
+
+- `assets/i18n-pages.js` — 64 teksty w sześciu językach.
+- `assets/i18n.js` — `faq_a5` ×6.
+- `src/calc-seo.mjs` — 6 odpowiedzi FAQ powtarzających notę, 7 wzmacniaczy.
+- `scripts/test-copy.mjs` — `CLEAN` na dziesięć języków, nowe sprawdzenie §1, poprawiony
+  komentarz przy tabeli budżetów.
+- `docs/COPY.md` — dopisany akapit o tym, czego reguła §3 nie robi (parafraza), oraz
+  poprawione dwie liczby z Sesji 44: powtórzeń FAQ było 17 na czternastu stronach
+  kalkulatorów, a wzmacniaczy 18 w ośmiu językach, nie w pięciu.
+- `scripts/build.mjs` — `STAMP` na `20260826d`.
+- `404.html`, `privacy-policy.html` — `?v=` podbite ręcznie.
+- 373 przebudowane strony + `sitemap.xml`.
+
+**TESTY**
+
+24 zestawy dependency-free przechodzą. `test-copy` **14/14 na wszystkich dziesięciu
+językach**: zero zdań ponad 25 słów, zero tekstów ponad 240 znaków, zero FAQ powtarzających
+notę, zero obietnic bez pokrycia, zero wykrzykników i słów wersalikami, zero wzmacniaczy,
+374 strony w dwudziestu budżetach. `test-perf` 13157/13157, `node scripts/build.mjs --check`
+czysty. Zestawy w Chromium nie były uruchamiane — nie ruszano skryptu ani stylu.
+
+Proza w `<main>` na 375 stronach, przez obie sesje: **125 965 → 125 161 → 124 217 słów**,
+czyli −1 748 (−1,4%) przy tej samej liczbie stron i bez usunięcia ani jednego faktu poza
+jednym: obietnicą „płatności uruchamiamy wkrótce", za którą nie stała żadna data.
+
+**PROBLEMY**
+
+- **Strony Pro nadal drukują „Dostępne w LiczMat Pro" dwa razy** — pasek nad modułem
+  (`#crm-pro`, w markupie `hidden`) i karta modułu na ścianie. Zgłoszone przez Sesję 44,
+  nienaprawione: to markup w `proGate()` i czterech stronach Pro, a nie słownik, więc jest
+  decyzją o tym, co widzi ktoś bez JavaScriptu. Osobne zadanie.
+- **`appNote` stoi także na stronach Pro**, gdzie moduł nie ma nic wspólnego ze wzorem.
+  Decyzja właściciela o tym, gdzie serwis proponuje aplikację.
+- **`/app/` ma 846 słów w `<main>`.** Najcięższa strona poza katalogiem i polityką
+  prywatności. Nie ruszana: to trzy karty poziomów konta i opis pięciu modułów Pro, a
+  skrócenie ich jest decyzją o tym, ile Pro tłumaczy o sobie przed zapłatą.
+- **Sześć zasad nie łapie parafrazy.** Odpowiedź FAQ, która mówi to samo, co nota nad nią,
+  ale innymi słowami, przechodzi — bo §3 porównuje zdania, a nie znaczenie. Widać to na
+  `linear`: nota mówi „rzaz odejmuje się przy każdym kolejnym cięciu", a FAQ pyta „czy rzaz
+  jest wliczony" i odpowiada tym samym. Maszyna tego nie zmierzy; człowiek czytający stronę
+  zmierzy. Zapisane w `docs/COPY.md` jako to, czego reguła nie robi.
+- **Nadal nie ma jednej komendy uruchamiającej wszystkie suity.** Zgłaszane przez Sesje 41,
+  42, 43 i 44; lista w `CLAUDE.md` ma 28 pozycji i ta sesja też przeszła ją ręcznie.
+- **`hasPendingWrites` w `scripts/fake-firebase.mjs` nadal zawsze `false`** — zgłoszone
+  przez Sesję 42, nienaprawione, poza zakresem.
+
+**STATUS**
+
+Zrobione. Dziesięć języków przeszło przez sześć zasad, `CLEAN` jest kompletne i §1 pilnuje,
+żeby nowy język nie wszedł na stronę bez przejścia przez nie. Zasady mają jedno miejsce
+(`docs/COPY.md`), jedno egzekwowanie (`scripts/test-copy.mjs`) i budżet prozy dla dwudziestu
+typów stron, którego nie da się przekroczyć po cichu.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 46 — klienci, zlecenia i wyceny na telefon (repo aplikacji `3d-polednia/Materio`).**
 
 ### Co zrobiła Sesja 44 (plan naprawczy)
 

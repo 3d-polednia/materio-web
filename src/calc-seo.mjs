@@ -84,7 +84,7 @@ export const CALC_SEO = {
         ["Kolik barvy je potřeba na 1 m²?",
          "Tolik, kolik říká vydatnost na etiketě, obvykle v m² z litru nebo z balení. Kalkulačka vydělí plochu touto vydatností, vynásobí počtem vrstev a zaokrouhlí nahoru na celá balení."],
         ["Mají se odečítat okna a dveře?",
-         "Jen tehdy, když je opravdu nemalujete. Plocha otvorů se zadává zvlášť a odečte se od plochy dřív, než se přepočítá na balení."],
+         "Jen tehdy, když je nemalujete. Plocha otvorů se zadává zvlášť a odečte se od plochy dřív, než se přepočítá na balení."],
       ],
     },
     sk: {
@@ -94,7 +94,7 @@ export const CALC_SEO = {
         ["Koľko farby treba na 1 m²?",
          "Toľko, koľko hovorí výdatnosť na etikete, zvyčajne v m² z litra alebo z balenia. Kalkulačka vydelí plochu touto výdatnosťou, vynásobí počtom vrstiev a zaokrúhli nahor na celé balenia."],
         ["Majú sa odpočítať okná a dvere?",
-         "Len vtedy, keď ich naozaj nemaľujete. Plocha otvorov sa zadáva zvlášť a odpočíta sa od plochy skôr, než sa prepočíta na balenia."],
+         "Len vtedy, keď ich nemaľujete. Plocha otvorov sa zadáva zvlášť a odpočíta sa od plochy skôr, než sa prepočíta na balenia."],
       ],
     },
     ro: {
@@ -124,7 +124,7 @@ export const CALC_SEO = {
         ["Koliko boje treba na 1 m²?",
          "Onoliko koliko piše u izdašnosti na etiketi, najčešće u m² po litru ili po pakovanju. Kalkulator deli površinu tom izdašnošću, množi brojem slojeva i zaokružuje naviše na cela pakovanja."],
         ["Da li se oduzimaju prozori i vrata?",
-         "Samo ako ih zaista ne bojite. Površina otvora unosi se posebno i oduzima se od površine pre preračuna u pakovanja."],
+         "Samo ako ih ne bojite. Površina otvora unosi se posebno i oduzima se od površine pre preračuna u pakovanja."],
       ],
     },
     ru: {
@@ -134,7 +134,7 @@ export const CALC_SEO = {
         ["Сколько краски нужно на 1 м²?",
          "Столько, сколько указано в расходе на этикетке, обычно в м² с литра или с упаковки. Калькулятор делит площадь на этот расход, умножает на число слоёв и округляет вверх до целых упаковок."],
         ["Вычитать ли окна и двери?",
-         "Вычитайте только тогда, когда вы их действительно не красите. Площадь проёмов вводится отдельно и вычитается из площади до пересчёта в упаковки."],
+         "Вычитайте только тогда, когда вы их не красите. Площадь проёмов вводится отдельно и вычитается из площади до пересчёта в упаковки."],
       ],
     },
   },
@@ -181,7 +181,7 @@ export const CALC_SEO = {
     },
     cs: {
       title: "Kalkulačka obkladů: kolik balení",
-      desc: "Plocha plus prořez přepočtené na celá balení obkladů, panelů nebo dlažby, včetně metrů, které nákupem opravdu dostanete.",
+      desc: "Plocha plus prořez přepočtené na celá balení obkladů, panelů nebo dlažby, včetně metrů, které nákupem dostanete.",
       faq: [
         ["Kolik obkladů je potřeba na 10 m²?",
          "K ploše přičtěte prořez a vydělte metráží jednoho balení. Kalkulačka zaokrouhlí nahoru na celé balení a ukáže, kolik metrů nákup vydá."],
@@ -191,7 +191,7 @@ export const CALC_SEO = {
     },
     sk: {
       title: "Kalkulačka obkladov: koľko balení",
-      desc: "Plocha plus prerez prepočítané na celé balenia obkladov, panelov alebo dlažby, aj s metrami, ktoré nákupom naozaj dostanete.",
+      desc: "Plocha plus prerez prepočítané na celé balenia obkladov, panelov alebo dlažby, aj s metrami, ktoré nákupom dostanete.",
       faq: [
         ["Koľko obkladov treba na 10 m²?",
          "K ploche pripočítajte prerez a vydeľte metrážou jedného balenia. Kalkulačka zaokrúhli nahor na celé balenie a ukáže, koľko metrov nákup vydá."],
@@ -206,7 +206,7 @@ export const CALC_SEO = {
         ["Câtă gresie trebuie pentru 10 m²?",
          "Adaugă pierderea la suprafață și împarte la metrii dintr-o cutie. Calculatorul rotunjește în sus la cutie întreagă și arată câți metri iese cumpărătura."],
         ["Cât adaos trebuie calculat?",
-         "5–7% ajung la o montare dreaptă. Formatul mare, montajul pe diagonală sau în șah cer 10–15%. Cumpără din același lot, pentru că următorul poate avea altă nuanță."],
+         "5–7% la montaj drept, 10–15% la format mare, diagonală sau șah. Calculatorul adaugă procentul la suprafață înainte de a o transforma în cutii."],
       ],
     },
     hr: {
@@ -221,7 +221,7 @@ export const CALC_SEO = {
     },
     sr: {
       title: "Kalkulator pločica: koliko kutija",
-      desc: "Površina plus otpad pri sečenju, preračunati u cele kutije pločica, panela ili gresa, sa kvadratima koje kupovinom zaista dobijate.",
+      desc: "Površina plus otpad pri sečenju, preračunati u cele kutije pločica, panela ili gresa, sa kvadratima koje kupovinom dobijate.",
       faq: [
         ["Koliko pločica treba za 10 m²?",
          "Površini dodajte otpad i podelite kvadraturom jedne kutije. Kalkulator zaokružuje naviše na celu kutiju i pokazuje koliko kvadrata daje kupovina."],
@@ -828,7 +828,7 @@ export const CALC_SEO = {
         ["Koliko vreća estriha ide po m²?",
          "Potrošnja se daje u kilogramima po kvadratnom metru i milimetru debljine. Kalkulator je množi površinom i debljinom, a zbroj dijeli težinom vreće."],
         ["Koju potrošnju upisati?",
-         "Preračun pretpostavlja gustoću oko 2,0 kg po litri morta. Anhidritni estrisi i laki estrisi imaju drugu gustoću, pa provjerite vrijednost na vreći."],
+         "Vrijednost s vreće, u kilogramima po m² i milimetru debljine. Zadanih 2,0 kg odgovara običnom cementnom mortu, a anhidritni i laki estrisi imaju drugu gustoću."],
       ],
     },
     sr: {
@@ -838,7 +838,7 @@ export const CALC_SEO = {
         ["Koliko vreća estriha ide po m²?",
          "Potrošnja se daje u kilogramima po kvadratnom metru i milimetru debljine. Kalkulator je množi površinom i debljinom, a zbir deli težinom vreće."],
         ["Koju potrošnju uneti?",
-         "Preračun pretpostavlja gustinu oko 2,0 kg po litru maltera. Anhidritni estrisi i laki estrisi imaju drugu gustinu, pa proverite vrednost na vreći."],
+         "Vrednost sa džaka, u kilogramima po m² i milimetru debljine. Podrazumevanih 2,0 kg odgovara običnom cementnom malteru, a anhidritni i laki estrisi imaju drugu gustinu."],
       ],
     },
     ru: {
@@ -1052,7 +1052,7 @@ export const CALC_SEO = {
         ["Сколько блоков на м² стены?",
          "Число штук на м² следует из размера блока вместе со швом. Впишите его, и калькулятор умножит его на площадь после вычитания окон и дверей."],
         ["Сколько запаса закладывать на кладку?",
-         "Запас 5% покрывает подрезку и бой при перевозке. При большом числе подрезок, скосов или узких простенков это значение стоит поднять."],
+         "5% хватает на подрезку и бой при перевозке. При большом числе подрезок, скосов или узких простенков это значение стоит поднять."],
       ],
     },
   },
@@ -1338,7 +1338,7 @@ export const CALC_SEO = {
         ["Koliko profila ide u spušteni strop?",
          "Nosivi profili CD idu na odabranom razmaku, a UD obilaze zidove. Kalkulator oboje računa iz dimenzija stropa i daje cijele profile."],
         ["Koji razmak vješalica uzeti?",
-         "CD na 40 cm i vješalice na 90 cm tipičan su strop pod ploču. Kod većeg opterećenja razmake treba zgusnuti."],
+         "Tipično 90 cm uzduž CD profila, uz razmak profila od 40 cm. Teža obloga ili ugradna rasvjeta traže gušću mrežu."],
       ],
     },
     sr: {
@@ -1348,7 +1348,7 @@ export const CALC_SEO = {
         ["Koliko profila ide u spušteni plafon?",
          "Noseći profili CD idu na izabranom razmaku, a UD obilaze zidove. Kalkulator oboje računa iz dimenzija plafona i daje cele profile."],
         ["Koji razmak vešalica uzeti?",
-         "CD na 40 cm i vešalice na 90 cm tipičan su plafon pod ploču. Kod većeg opterećenja razmake treba zgusnuti."],
+         "Tipično 90 cm duž CD profila, uz razmak profila od 40 cm. Teža obloga ili ugradna rasveta traže gušću mrežu."],
       ],
     },
     ru: {

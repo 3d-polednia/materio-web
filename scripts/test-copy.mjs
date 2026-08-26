@@ -31,8 +31,8 @@
  * THE LANGUAGE SPLIT. Session 44 cleaned pl, uk, de and en; session 45 cleaned cs, sk, ro,
  * hr, sr and ru. Between the two commits `CLEAN` named only the four and the six were
  * skipped — a test that fails for work nobody has done yet is a test the next session
- * learns to ignore. Once it is all ten, §1 fails if a language is ever added to the site
- * without its copy going through these rules.
+ * learns to ignore. It is all ten now, and §1 fails if a language is ever added to the
+ * site without its copy going through these rules.
  *
  * A NOTE ON WORD BOUNDARIES, because it is the trap this file lives inside of.
  * JavaScript's `\b` is defined against `\w`, which is ASCII: in `/\bbest\b/` the boundary
@@ -100,18 +100,19 @@ function checkMany(name, bad, describe, total) {
 head("§1 the copy the site ships");
 
 /**
- * Which languages the rules are enforced on. See "THE LANGUAGE SPLIT" above.
- *
- * Session 44 is the four; session 45 adds cs, sk, ro, hr, sr and ru and this becomes the
- * whole of LANGS, at which point §1 starts guarding it.
+ * Which languages the rules are enforced on. See "THE LANGUAGE SPLIT" above: this held
+ * four names for exactly one commit and holds all ten now, so §1 guards it.
  */
-const CLEAN = ["pl", "uk", "de", "en"];
+const CLEAN = ["pl", "uk", "de", "en", "cs", "sk", "ro", "hr", "sr", "ru"];
 
 const NOT_CLEAN = LANGS.filter((l) => !CLEAN.includes(l));
 
 check("every name in CLEAN is a language the site actually ships",
   CLEAN.length > 0 && CLEAN.every((l) => LANGS.includes(l)),
   `not a language: ${CLEAN.filter((l) => !LANGS.includes(l)).join(", ") || "none"}`);
+
+check("and every language the site ships has been through these rules",
+  NOT_CLEAN.length === 0, `not cleaned: ${NOT_CLEAN.join(", ")}`);
 
 /**
  * Every visitor-facing string, tagged with where it came from.
@@ -363,9 +364,10 @@ head("§7 how much prose a page carries");
  * here, raises the number and has to say why in its report. That is the whole mechanism
  * the owner asked for — "skrócić plus test, który pilnuje".
  *
- * They are session 44's numbers, so six of the ten languages have not been through §2–§6
- * yet and the widest page of a type is usually one of those six. Session 45 cuts them and
- * lowers these.
+ * They did not move between sessions 44 and 45, and that is a measurement rather than an
+ * oversight: the widest page of every one of the twenty types is the ENGLISH one, and
+ * English was cleaned in session 44. Cutting the other six languages made those pages
+ * shorter without touching a single ceiling.
  *
  * Two of them are lists rather than prose and are budgeted as lists: `materials` is the
  * 161-material catalogue and `privacy` is the privacy policy, which carries two complete

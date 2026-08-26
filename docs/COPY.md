@@ -49,9 +49,9 @@ opisuje §4.
 ### §3 — strona kalkulatora nie mówi dwa razy tego samego
 
 Strona kalkulatora niesie ostrzeżenie nad kalkulatorem (`note_<id>` w „Jak to liczymy")
-i FAQ pod nim (`src/calc-seo.mjs`). Pisała je ręka, w odstępie jednej sesji. Efekt: **25
-ze 150 stron kalkulatorów** drukowało zdanie z noty jeszcze raz, słowo w słowo, w
-odpowiedzi FAQ. Po polsku `wallpaper` powtarzał **całą** notę.
+i FAQ pod nim (`src/calc-seo.mjs`). Pisała je ręka, w odstępie jednej sesji. Efekt:
+**17 odpowiedzi FAQ** na czternastu stronach kalkulatorów drukowało zdanie z noty jeszcze
+raz, słowo w słowo. Po polsku `wallpaper` powtarzał **całą** notę.
 
 To nie jest kosmetyka. FAQ jedzie do wyniku wyszukiwania jako `FAQPage`, więc powtórzone
 zdanie jest powtórzone także w Google.
@@ -94,7 +94,7 @@ tutaj podejmuje.
 ### §6 — słowo, które nic nie niesie
 
 Wzmacniacz i chrząknięcie: „po prostu", „naprawdę", „warto pamiętać, że". Sprawdzian jest
-prosty: skreśl je i zobacz, czy zdanie mówi mniej. Osiemnaście trafień w pięciu językach,
+prosty: skreśl je i zobacz, czy zdanie mówi mniej. Osiemnaście trafień w ośmiu językach,
 każde czytało się lepiej bez tego słowa.
 
 Angielskiego „just" **nie ma na liście i być nie może**: znaczy też „dokładnie" i
@@ -128,6 +128,11 @@ bo Google Play wymaga jednego adresu.
 - **Nie liczą słów kluczowych.** „Nie upychaj słów kluczowych" (XXVI) mierzy się gęstością,
   a gęstość jest fałszywym alarmem na stronie, która z definicji powtarza słowo „płytki".
   Tego pilnuje `scripts/test-calc-seo.mjs` §6, po swojemu.
+- **Nie łapią parafrazy.** §3 porównuje zdania, nie znaczenie, więc odpowiedź FAQ mówiąca
+  to samo, co nota nad nią, ale innymi słowami, przechodzi. Widać to na `linear`: nota mówi
+  „rzaz odejmuje się przy każdym kolejnym cięciu w sztandze", a FAQ pyta „czy rzaz jest
+  wliczony" i odpowiada dokładnie tym samym. Maszyna tego nie zmierzy; człowiek czytający
+  gotową stronę zmierzy — i to jest właściwe miejsce na tę robotę.
 - **Nie są bezpieczeństwem ani dostępnością.** Nazwy kontrolek pilnuje
   `scripts/test-a11y.mjs`, długość `<title>` i `<meta description>` — `scripts/test-seo.mjs`.
 
