@@ -82,7 +82,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 41 | Sześć języków bez nazwy (`undefined` w wybieraku) | **Zrobione** — 2026-08-26 |
 | 42 | `/app/`: fałszywe „Brak sieci" | **Zrobione** — 2026-08-26 |
 | 43 | Kalkulator na prawdziwym telefonie | **Zrobione** — 2026-08-26 |
-| 44 | Stop slop: zasady, test, pl/uk/de/en | Do zrobienia |
+| 44 | Stop slop: zasady, test, pl/uk/de/en | **Zrobione** — 2026-08-26 |
 | 45 | Stop slop: cs/sk/ro/hr/sr/ru | Do zrobienia |
 | 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | Do zrobienia |
 | 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | Do zrobienia |
@@ -248,6 +248,174 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 44 (plan naprawczy)
+
+Zadanie: **stop slop — zasady, test, pl/uk/de/en.**
+
+Ustalenie właściciela z 2026-08-21: „stop slop" znaczy **skrócić plus test, który
+pilnuje**. Sesja 44 pisze zasady i test i czyści cztery języki; Sesja 45 czyści pozostałe
+sześć.
+
+**WYKONANO**
+
+**0. Najpierw pomiar, zanim cokolwiek zostało skreślone — i pomiar nie potwierdził
+zgłoszenia w takiej skali, w jakiej się go spodziewano.** 10 730 tekstów, które czyta
+odwiedzający (dwa słowniki, nazwy materiałów, copy SEO 150 stron kalkulatorów) plus 375
+wysłanych stron. Wykrzykników: **0**. Słów wersalikami poza skrótami produktu: **0**.
+Superlatywów: **0**. Serwis nie miał problemu z marketingowym krzykiem. Miał cztery inne,
+policzalne:
+
+| Co | Ile było (10 języków) | Ile w pl/uk/de/en |
+|---|---|---|
+| zdanie dłuższe niż 25 słów | 24 | 19 |
+| tekst dłuższy niż 240 znaków | 52 | 25 |
+| odpowiedź FAQ powtarzająca zdanie noty nad nią | 17 | 11 |
+| obietnica bez daty (`pay_soon`) | 10 | 4 |
+| wzmacniacz bez treści („naprawdę", „wirklich", „actually") | 18 | 7 |
+
+**1. Sześć zasad, każda wyprowadzona z planu, każda mierzalna.** Narracja jest w nowym
+`docs/COPY.md`, egzekwowanie w nowym `scripts/test-copy.mjs` — dokładnie ta sama para, co
+`docs/DESIGN_SYSTEM.md` i `src/tokens.mjs`. §2 długość (25 słów / 240 znaków), §3 strona
+kalkulatora nie mówi dwa razy tego samego, §4 nic, czego strona nie potrafi dotrzymać,
+§5 bez krzyku, §6 słowo, które nic nie niesie, §7 budżet prozy na typ strony.
+
+Żadna z nich nie jest cudzym przewodnikiem stylu: XXVII zabrania „ścian tekstu",
+„powtarzających się CTA" i „marketingowego «krzyku»", XXVI zabrania upychania słów
+kluczowych, XII nie pozwala treści SEO zasłonić kalkulatora, `CLAUDE.md` zabrania obietnic
+bez pokrycia. Progi 25 i 240 to pomiar tej strony z 2026-08-26, nie liczby z podręcznika —
+240 znaków to około czterech linijek na telefonie 320 px, tym samym, który mierzy
+`scripts/test-phone.mjs`.
+
+**2. §7 to jedyna zasada, która pilnuje strony, a nie akapitu — i to ona odpowiada na
+prośbę „skrócić".** `scripts/test-calc-seo.mjs` sprawdza już **kolejność** (rozdział XII:
+H1 → formularz → wynik → wyjaśnienie → FAQ), ale strona może zachować kolejność i dalej
+być ścianą, mówiąc w sześciu akapitach to, co mieści się w dwóch. Liczone są słowa w
+`<main>`, osobno dla dwudziestu typów stron, przeciwko tabeli **bez marginesu**. Sesja,
+która chce powiedzieć więcej, podnosi liczbę w tabeli i tłumaczy się w raporcie. Dwa typy
+są listą, nie prozą, i mają budżet listy: katalog 161 materiałów i polityka prywatności,
+która niesie dwie pełne wersje językowe w jednym pliku, bo Google Play wymaga jednego
+adresu.
+
+**3. Obietnica, której nie było czym pokryć.** `pay_soon` mówiło „płatności uruchamiamy
+wkrótce" / „payments open shortly" / „die Bezahlung schalten wir in Kürze frei" we
+wszystkich dziesięciu językach — w czasie, gdy konta Stripe nie ma, więc żadna data za tym
+nie stała. Skreślone, nie przeredagowane: zdanie przed nim („subskrypcji jeszcze nie da
+się wykupić") jest całą prawdą i nie potrzebuje ciągu dalszego. W tej sesji cztery języki,
+w Sesji 45 sześć pozostałych.
+
+**4. FAQ, które przepisywało notę stojącą nad nim.** Strona kalkulatora niesie ostrzeżenie
+w „Jak to liczymy" (`note_<id>` w `assets/i18n-pages.js`) i FAQ pod kalkulatorem
+(`src/calc-seo.mjs`) — pisane ręcznie, w odstępie jednej sesji. Po polsku `wallpaper`
+powtarzał **całą** notę, słowo w słowo, dwa akapity niżej. To nie jest kosmetyka: FAQ jedzie
+do wyniku wyszukiwania jako `FAQPage`, więc powtórzone zdanie jest powtórzone także w
+Google. Przepisane osiem odpowiedzi (`waste` pl+en, `wallpaper`, `screed`, `masonry`,
+`studwall`, `ceiling`, `sheathing` po polsku) tak, żeby odpowiadały na pytanie i dokładały
+to, czego nota nie mówi — najczęściej gdzie się tę wartość wpisuje. `docs/COPY.md` mówi
+wprost, że przepisanie „tak, żeby test przestał widzieć" jest złą naprawą.
+
+**5. `hwc_source` mówiło to, co blok na dole tej samej strony.** „Ten sam wzór liczy
+aplikacja LiczMat na Androida" w bloku „Wzór", a 200 pikseli niżej `appNote`: „Ten sam wzór
+w aplikacji — LiczMat na Androida liczy tym samym silnikiem". Jedno zdanie, dwa razy, na
+każdej ze 150 stron kalkulatorów. Zostaje przypis do wzoru („Silnik strony jest portem 1:1
+kodu z aplikacji na Androida"), bo mówi rzecz, której `appNote` nie mówi; powtórzona
+połowa poszła.
+
+**6. Cztery `*_local_note` (klienci, zlecenia, wyceny, terminarz) wyliczały synchronizację
+w każdym z czterech tekstów.** Zdanie „nie ma ich w aplikacji na Androida — synchronizacja
+obejmuje projekty, pomieszczenia, kalkulacje i listy materiałów" stało cztery razy w każdym
+języku. Wyliczenie jest już na `/liczmat-pro/` (`propage_local`) i na `/cookies/`, a notatka
+pod modułem ma powiedzieć trzy rzeczy: gdzie to leży, że nigdzie nie idzie, że wyczyszczenie
+danych witryny to kasuje. Tyle zostało.
+
+**7. Dwie zasady, których celowo NIE napisano, i to jest część roboty.** Pierwsza wersja
+testu liczyła **myślniki** — i wyszło, że kara spada na użycie *poprawne* (para myślników
+to nawias), a przepuszcza to, o które w `CLAUDE.md` chodzi (pojedyncza retoryczna pauza),
+bo oba wyglądają tak samo. W polskim i ukraińskim myślnik jest zwykłym znakiem
+interpunkcyjnym i zakaz byłby po prostu błędem. Druga: **gęstość słów kluczowych** (XXVI)
+jest fałszywym alarmem na stronie, która z definicji powtarza słowo „płytki" — tego pilnuje
+`scripts/test-calc-seo.mjs` §6, po swojemu. Reguła, która myli się w obie strony, jest
+gorsza niż jej brak; `docs/COPY.md` ma na to osobny rozdział.
+
+**8. Pułapka, w której ten test mieszka: `\b` w JavaScripcie jest ASCII.** `\w` to
+`[A-Za-z0-9_]`, więc granica słowa w `/\bbest\b/` trafia **w środek** niemieckiego
+„Bestätige" — „ä" nie jest znakiem `\w`. Pierwsza wersja §4 zgłosiła pięć superlatywów na
+tej stronie i wszystkie pięć było tym. `word()` w `scripts/test-copy.mjs` buduje granicę z
+`\p{L}\p{N}` i flagi `u`; copy w dziesięciu językach, sześć z diakrytykami i dwa cyrylicą,
+nie da się sprawdzać regułą ASCII. Zanotowane w `CLAUDE.md` jako zasada dla następnych
+testów, nie tylko dla tego.
+
+**9. Podział na dwie sesje nie może wywalać testu.** Między commitem Sesji 44 a commitem
+Sesji 45 stała `CLEAN` w `scripts/test-copy.mjs` wymienia cztery języki, a sześć jest
+pomijanych **bez błędu** — test, który pada za pracę, której jeszcze nikt nie zrobił, jest
+testem, którego następna sesja uczy się nie czytać. Run mówi na końcu, co pomija. §7 mierzy
+za to **wszystkie** strony we wszystkich dziesięciu językach od razu, bo budżet jest
+własnością strony, nie języka.
+
+**ZMIENIONE PLIKI**
+
+- `scripts/test-copy.mjs` — **nowy**, 13 sprawdzeń, dependency-free.
+- `docs/COPY.md` — **nowy**, narracja sześciu zasad i dwóch nienapisanych.
+- `assets/i18n.js` — `faq_a5` w czterech językach.
+- `assets/i18n-pages.js` — 47 tekstów w czterech językach: `pay_soon`, `ck_p_signed_in`,
+  `app_wipe_d`, cztery `*_local_note`, `hwc_source`, `guides_meta`, `dash_local_note`,
+  `note_coverage` i siedem `g_*` z poradników.
+- `src/calc-seo.mjs` — 18 tekstów: osiem odpowiedzi FAQ powtarzających notę, pięć zdań
+  dłuższych niż 25 słów, pięć wzmacniaczy.
+- `scripts/build.mjs` — `STAMP` na `20260826c`.
+- `404.html`, `privacy-policy.html` — `?v=` podbite ręcznie.
+- 373 przebudowane strony + `sitemap.xml`.
+- `CLAUDE.md` — test i `docs/COPY.md` na listach, zasada „no marketing slop" rozszerzona
+  o to, co jest teraz mierzone, plus dwie nowe: dlaczego myślnik zostaje prozą i dlaczego
+  `\b` nie nadaje się do tego słownika.
+
+**TESTY**
+
+24 zestawy dependency-free przechodzą, łącznie z nowym: `test-copy` 13/13, `test-perf`
+13157/13157, `test-seo`, `test-calc-seo`, `test-langs`, `test-security`, `test-a11y`,
+`test-calculators` i pozostałe bez zmian. `node scripts/build.mjs --check` czysty.
+Zestawy w Chromium (Playwright poza repo) nie były w tej sesji uruchamiane — nie ruszano
+w niej ani skryptu w przeglądarce, ani stylu.
+
+Efekt na wysłanych stronach: **125 965 → 125 161 słów w `<main>`** na 375 stronach, przy
+niezmienionej liczbie stron. To jest uczciwa miara tej sesji i celowo nie jest większa:
+copy tego serwisu było już krótkie, a tym, czego brakowało, była nie siekiera, tylko
+liczba, której nie da się przekroczyć po cichu.
+
+**PROBLEMY**
+
+- **Sześć języków czeka na Sesję 45.** `cs, sk, ro, hr, sr, ru` — 5 zdań ponad 25 słów, 27
+  tekstów ponad 240 znaków, 6 powtórzeń FAQ, 6 obietnic `pay_soon`, 11 wzmacniaczy.
+  Budżety §7 są dziś ustawione na najszerszy język każdego typu, a to zwykle jeden z tych
+  sześciu — po Sesji 45 mają zejść.
+- **Strony Pro nadal drukują „Dostępne w LiczMat Pro" dwa razy** — raz w pasku nad modułem
+  (`#crm-pro`, w markupie `hidden`, odsłaniany przez `assets/paywall.js`), raz w karcie
+  modułu na ścianie. Dla czytnika i dla wizyty bez JavaScriptu to jedno zdanie dwa razy na
+  jednej stronie, czyli dokładnie „powtarzające się CTA" z rozdziału XXVII. Naprawa jest w
+  markupie, nie w słowniku, i dotyka `proGate()` oraz czterech stron Pro — osobne zadanie,
+  bo to decyzja o tym, co widzi ktoś bez skryptu.
+- **`appNote` („Ten sam wzór w aplikacji" + Pobierz) stoi też na stronach Pro**, gdzie
+  moduł nie ma nic wspólnego ze wzorem. Zgłoszone, nienaprawione: to decyzja o tym, gdzie
+  serwis proponuje aplikację, i należy do właściciela.
+- **`/app/` ma 846 słów w `<main>`** i jest najcięższą stroną serwisu poza katalogiem i
+  polityką prywatności. Nie ruszane: to trzy karty poziomów konta plus opis pięciu modułów
+  Pro, a skracanie ich jest decyzją o tym, ile Pro tłumaczy o sobie przed zapłatą.
+- **Nadal nie ma jednej komendy uruchamiającej wszystkie suity.** Zgłaszane przez Sesje
+  41, 42 i 43; lista w `CLAUDE.md` ma teraz **28** pozycji i ta sesja też przeszła ją
+  ręcznie.
+- **`hasPendingWrites` w `scripts/fake-firebase.mjs` nadal zawsze `false`** — zgłoszone
+  przez Sesję 42, nienaprawione, poza zakresem.
+
+**STATUS**
+
+Zrobione. Zasady są zapisane w jednym miejscu, mierzy je 13 sprawdzeń, a cztery języki
+przez nie przeszły: zero zdań ponad 25 słów, zero tekstów ponad 240 znaków, zero FAQ
+powtarzających notę, zero obietnic bez daty, zero wzmacniaczy — i dwadzieścia typów stron
+z budżetem prozy, którego nie da się przekroczyć bez podniesienia liczby w tabeli.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 45 — stop slop: cs/sk/ro/hr/sr/ru.**
 
 ### Co zrobiła Sesja 43 (plan naprawczy)
 

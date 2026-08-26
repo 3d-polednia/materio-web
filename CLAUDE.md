@@ -115,6 +115,7 @@ node scripts/test-a11y-page.mjs   # focus, the keyboard, both themes — in Chro
 node scripts/test-security.mjs    # authorization, data isolation, the API, the levels
 node scripts/test-qa.mjs          # the whole path, end to end, in a real browser
 node scripts/test-langs.mjs       # the ten languages and what every picker calls them
+node scripts/test-copy.mjs        # stop slop: length, repetition, claims, the page budget
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -503,6 +504,17 @@ scripts/test-langs.mjs  The ten languages and what every picker on the site call
                       flags, one real SVG each and never an emoji. Dependency-free — run
                       it after touching LANGS in assets/i18n.js, LANG_NAME in
                       src/flags.mjs, langPicker() or the footer's language nav
+scripts/test-copy.mjs  Stop slop (sessions 44 and 45): six rules over every string a
+                      visitor can read — a sentence to 25 words and a string to 240
+                      characters; a calculator page that does not print a sentence of
+                      its own note again inside its FAQ; no promise and no superlative
+                      the site cannot back up; no exclamation mark and no shouted word;
+                      no intensifier and no throat-clearing; and a prose budget per page
+                      type, counted in <main> on the shipped HTML. Rules and their
+                      argument: docs/COPY.md. Dependency-free — run it after touching
+                      assets/i18n.js, assets/i18n-pages.js, assets/i18n-materials.js,
+                      src/calc-seo.mjs, or anything that changes how much prose a page
+                      carries
 functions/            The Cloud Functions codebase — deployed with `firebase deploy
                       --only functions`, NEVER served by GitHub Pages. It is stripped from
                       the artifact in `.github/workflows/pages.yml` alongside docs/, src/
@@ -710,6 +722,12 @@ docs/DESIGN_SYSTEM.md Colour, type, spacing, radius, elevation, motion, componen
 docs/ARCHITEKTURA.md  Information architecture: pages, routing, navigation, the
                       three access levels, user flows, and the open decisions
 docs/DOKUMENTACJA.md  Full project documentation
+docs/COPY.md          Stop slop: what the site is allowed to say and how much of it —
+                      the six rules, each traced to a chapter of the master plan, what
+                      each one caught, and the two rules deliberately NOT written (the
+                      em dash, and keyword density). Narrative half of
+                      scripts/test-copy.mjs, the way docs/DESIGN_SYSTEM.md is the
+                      narrative half of src/tokens.mjs
 docs/STRIPE.md        Switching the sale on: the six steps that are console work rather
                       than code — two products with the fourteen amounts, the Payment
                       Links, the secret, the deploy, the webhook's four events, one real
@@ -1654,11 +1672,29 @@ Kotlin side of it. Change one, change all three.
   does not re-date the site. `privacy-policy.html` goes out with no `lastmod` — the build
   does not generate it and cannot know. `<changefreq>` and `<priority>` are gone: nothing
   reads them, and every new page had to invent a number nobody could check.
-- **No marketing slop.** No hype headings that say nothing, no claims nobody can
-  verify ("in a minute", "the best"), no em dash used as a rhetorical pause. Every
-  number on the page must be traceable to the code: the calculator count comes
-  from `CALCS` in `calculators.js`, the material count from `MATERIALS` in
-  `assets/materials.js` (which is the port of `Catalog*.kt` in the app repo). If a claim cannot be checked, cut it.
+- **No marketing slop, and since session 44 it is measured rather than remembered.** No
+  hype headings that say nothing, no claims nobody can verify ("in a minute", "the best"),
+  no em dash used as a rhetorical pause. Every number on the page must be traceable to the
+  code: the calculator count comes from `CALCS` in `calculators.js`, the material count
+  from `MATERIALS` in `assets/materials.js` (which is the port of `Catalog*.kt` in the app
+  repo). If a claim cannot be checked, cut it. Six of those rules are now
+  `scripts/test-copy.mjs` and their argument is `docs/COPY.md` — a sentence to 25 words, a
+  string to 240 characters, no FAQ answer repeating the note above it, no promise or
+  superlative the site cannot back up, no exclamation mark or shouted word, no intensifier,
+  and a **prose budget per page type** with no margin in it. Raising a budget is allowed
+  and has to be argued for in the session's report; that is the point of there being a
+  number.
+- **The em dash rule stays prose and is deliberately not tested.** The first draft of
+  `scripts/test-copy.mjs` counted em dashes and got it wrong in both directions: a *pair*
+  of them is a parenthesis and perfectly good writing, while the single rhetorical pause
+  the rule is actually about looks identical to a legitimate one. In Polish and Ukrainian
+  the myślnik is ordinary punctuation, so a ban would simply be an error. A rule that
+  misfires in six languages out of ten is worse than no rule.
+- **`\b` is ASCII, and this site is not.** In JavaScript `\w` is `[A-Za-z0-9_]`, so
+  `/\bbest\b/` matches inside the German "Bestätige" — the first draft of the claims rule
+  reported five superlatives and all five were that. Any word-level check over this
+  dictionary has to build its boundary from `\p{L}\p{N}` with the `u` flag; `word()` in
+  `scripts/test-copy.mjs` is the one to copy.
 - **Truth over marketing.** The production app carries ads (Google AdMob) and uses
   Google Maps/location; the site says so plainly instead of claiming "no ads". The
   site itself loads Google Analytics (GA4, Consent Mode v2) which stays denied

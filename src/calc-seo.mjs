@@ -44,7 +44,7 @@ export const CALC_SEO = {
         ["Ile farby potrzeba na 1 m²?",
          "Tyle, ile mówi wydajność z etykiety, podawana jako m² z litra albo z opakowania. Kalkulator dzieli powierzchnię przez tę wydajność i mnoży przez liczbę warstw, a wynik zaokrągla w górę do całych opakowań."],
         ["Czy odejmować okna i drzwi od powierzchni?",
-         "Odejmij je tylko wtedy, gdy naprawdę ich nie malujesz. Pole otworów wpisuje się osobno i kalkulator odejmuje je od powierzchni, zanim przeliczy ją na opakowania."],
+         "Odejmij je tylko wtedy, gdy ich nie malujesz. Pole otworów wpisuje się osobno i kalkulator odejmuje je od powierzchni, zanim przeliczy ją na opakowania."],
       ],
     },
     uk: {
@@ -54,7 +54,7 @@ export const CALC_SEO = {
         ["Скільки фарби потрібно на 1 м²?",
          "Стільки, скільки вказує витрата на етикетці, у м² з літра або з упаковки. Калькулятор ділить площу на цю витрату, множить на кількість шарів і округлює вгору до цілих упаковок."],
         ["Чи віднімати вікна та двері?",
-         "Віднімайте лише тоді, коли ви їх справді не фарбуєте. Площу отворів вводять окремо, і калькулятор віднімає її від площі перед перерахунком на упаковки."],
+         "Віднімайте лише тоді, коли ви їх не фарбуєте. Площу отворів вводять окремо, і калькулятор віднімає її від площі перед перерахунком на упаковки."],
       ],
     },
     de: {
@@ -64,7 +64,7 @@ export const CALC_SEO = {
         ["Wie viel Farbe braucht man für 1 m²?",
          "So viel, wie die Ergiebigkeit auf dem Etikett angibt, meist in m² je Liter oder je Gebinde. Der Rechner teilt die Fläche durch diese Ergiebigkeit, multipliziert mit den Schichten und rundet auf ganze Gebinde auf."],
         ["Zieht man Fenster und Türen ab?",
-         "Nur wenn sie wirklich nicht gestrichen werden. Die Öffnungsfläche wird getrennt eingetragen und vor der Umrechnung in Gebinde von der Fläche abgezogen."],
+         "Nur wenn sie nicht gestrichen werden. Die Öffnungsfläche wird getrennt eingetragen und vor der Umrechnung in Gebinde von der Fläche abgezogen."],
       ],
     },
     en: {
@@ -146,12 +146,12 @@ export const CALC_SEO = {
         ["Ile płytek trzeba na 10 m²?",
          "Do pola dolicz zapas na docinkę i podziel wynik przez metraż z kartonu. Kalkulator zaokrągla w górę do całego kartonu i pokazuje, ile metrów wyjdzie z zakupu."],
         ["Ile zapasu doliczyć do płytek?",
-         "Zapas 5–7% wystarcza przy prostym układzie. Duży format, układ po skosie albo cegiełka wymagają 10–15%. Kupuj z jednej partii produkcyjnej, bo kolejna potrafi mieć inny odcień."],
+         "Przy prostym układzie 5–7%, przy dużym formacie, skosie albo cegiełce 10–15%. Kalkulator dolicza ten procent do powierzchni, zanim przeliczy ją na kartony."],
       ],
     },
     uk: {
       title: "Калькулятор плитки: скільки коробок",
-      desc: "Площа плюс запас на підрізку, переведені в цілі коробки плитки, панелей чи керамограніту, з метрами, які ви справді купуєте.",
+      desc: "Площа плюс запас на підрізку, переведені в цілі коробки плитки, панелей чи керамограніту, з метрами, які ви купуєте.",
       faq: [
         ["Скільки плитки треба на 10 м²?",
          "До площі додайте запас на підрізку і поділіть на метраж з коробки. Калькулятор округлює вгору до цілої коробки й показує, скільки метрів вийде з покупки."],
@@ -171,12 +171,12 @@ export const CALC_SEO = {
     },
     en: {
       title: "Tile calculator: how many boxes",
-      desc: "Area plus a waste allowance turned into whole boxes of tiles, panels or porcelain, with the square metres the purchase actually gives you.",
+      desc: "Area plus a waste allowance turned into whole boxes of tiles, panels or porcelain, with the square metres the purchase gives you.",
       faq: [
         ["How many tiles do you need for 10 m²?",
          "Add the waste allowance to the area and divide by the coverage of one box. The calculator rounds up to a whole box and shows how many square metres the purchase comes to."],
         ["How much waste should you allow for tiles?",
-         "5–7% is enough for a straight layout. Large format, diagonal or brick-bond layouts need 10–15%. Buy from a single batch, because the next one can differ in shade."],
+         "5–7% for a straight layout, 10–15% for large format, diagonal or brick-bond. The calculator adds that percentage to the area before turning it into boxes."],
       ],
     },
     cs: {
@@ -248,7 +248,7 @@ export const CALC_SEO = {
         ["Ile rolek tapety na pokój?",
          "Podziel szerokość ściany przez szerokość rolki, żeby poznać liczbę pasów, a długość rolki przez wysokość pasa, żeby wiedzieć, ile pasów wychodzi z rolki. Kalkulator robi obie te rzeczy i zaokrągla w górę."],
         ["Jak raport wzoru zmienia liczbę rolek?",
-         "Przy tapecie z raportem każdy pas wydłuża się do pełnej wielokrotności raportu, więc z jednej roli wychodzi mniej pasów. Raport 0 oznacza tapetę bez wzoru do dopasowania."],
+         "Każdy pas rośnie do pełnej wielokrotności raportu, więc z jednej roli wychodzi mniej pasów. Raport wpisujesz w centymetrach z etykiety, a 0 to tapeta bez dopasowania."],
       ],
     },
     uk: {
@@ -375,12 +375,12 @@ export const CALC_SEO = {
     },
     en: {
       title: "1D cutting calculator: how many bars",
-      desc: "A parts list, the stock length and the saw kerf give the number of bars to buy and a cutting plan with the waste in percent.",
+      desc: "A parts list, the stock length and the saw kerf give the number of bars to buy. The cutting plan comes with the waste in percent.",
       faq: [
         ["How many bars do you need for a parts list?",
          "The calculator sorts the parts longest first and puts each into the first bar it fits. The number of bars opened is what you buy, and the plan shows which part comes out of which bar."],
         ["Is the saw kerf included?",
-         "Yes. The kerf is taken off at every cut after the first one in a bar, because the first part starts at the end of the stock."],
+         "Yes. The kerf is taken off at every cut after the first one in a bar. The first part starts at the end of the stock, so it costs none."],
       ],
     },
     cs: {
@@ -758,7 +758,7 @@ export const CALC_SEO = {
         ["Ile worków wylewki na m²?",
          "Zużycie podaje się w kilogramach na metr kwadratowy i milimetr grubości. Kalkulator mnoży je przez powierzchnię i grubość, a sumę dzieli przez wagę worka."],
         ["Jakie zużycie wpisać?",
-         "Przelicznik zakłada gęstość około 2,0 kg na litr zaprawy. Wylewki anhydrytowe i lekkie jastrychy mają inną gęstość, więc sprawdź wartość na worku."],
+         "Wartość z worka, w kilogramach na m² i milimetr grubości. Domyślne 2,0 kg odpowiada zwykłej zaprawie cementowej, a anhydryt i lekkie jastrychy mają inną gęstość."],
       ],
     },
     uk: {
@@ -962,7 +962,7 @@ export const CALC_SEO = {
         ["Ile bloczków na m² ściany?",
          "Liczba sztuk na m² wynika z wymiaru bloczka razem ze spoiną. Wpisz ją do formularza, a kalkulator pomnoży ją przez powierzchnię po odjęciu okien i drzwi."],
         ["Ile zapasu doliczyć do muru?",
-         "Zapas 5% pokrywa docinkę i pęknięcia w transporcie. Przy dużej liczbie docinek, skosów albo filarków warto podnieść tę wartość."],
+         "5% wystarcza na docinkę i pęknięcia w transporcie. Przy dużej liczbie docinek, skosów albo filarków podnieś tę wartość."],
       ],
     },
     uk: {
@@ -1166,7 +1166,7 @@ export const CALC_SEO = {
         ["Ile profili na ścianę działową?",
          "Profile CW stoją co tyle, ile wynosi rozstaw, a UW biegną górą i dołem. Kalkulator przelicza jedno i drugie na całe profile o zadanej długości."],
         ["Jaki rozstaw profili wybrać?",
-         "Rozstaw 60 cm to standard pod płytę o szerokości 1,2 m. Pod cięższą okładzinę albo płytki zejdź do 40 cm. Płyty licz na obie strony ściany."],
+         "60 cm pod płytę o szerokości 1,2 m. Pod płytki albo cięższą okładzinę zejdź do 40 cm — profili wychodzi wtedy więcej."],
       ],
     },
     uk: {
@@ -1268,7 +1268,7 @@ export const CALC_SEO = {
         ["Ile profili na sufit podwieszany?",
          "Profile nośne CD idą co tyle, ile wynosi rozstaw, a UD obiegają ściany. Kalkulator liczy jedno i drugie z wymiarów sufitu i podaje w całych profilach."],
         ["Jaki rozstaw wieszaków przyjąć?",
-         "Rozstaw CD 40 cm i wieszaków 90 cm to typowy sufit pod płytę. Przy większym obciążeniu rozstawy trzeba zagęścić."],
+         "Typowo 90 cm wzdłuż profilu CD, przy rozstawie profili 40 cm. Cięższa okładzina albo oprawy w suficie wymagają gęstszej siatki."],
       ],
     },
     uk: {
@@ -1388,7 +1388,7 @@ export const CALC_SEO = {
       desc: "Wandfläche und Verbrauch an Ansetzgips ergeben die Anzahl der Gipskartonplatten und der Säcke Kleber für das Ansetzen auf Batzen.",
       faq: [
         ["Wie viele Platten braucht 1 m² Wand?",
-         "Der Rechner teilt die Fläche durch die Fläche einer Platte und rundet auf ganze Stück auf; den Kleber rechnet er getrennt aus dem Verbrauch je Quadratmeter."],
+         "Der Rechner teilt die Fläche durch die Fläche einer Platte und rundet auf ganze Stück auf. Den Kleber rechnet er getrennt aus dem Verbrauch je Quadratmeter."],
         ["Wann geht das Ansetzen auf Batzen nicht?",
          "Ansetzgips funktioniert nur auf ebenem, tragfähigem Untergrund. Bei größeren Unebenheiten braucht es eine Unterkonstruktion aus Profilen."],
       ],
@@ -1398,7 +1398,7 @@ export const CALC_SEO = {
       desc: "Wall area and the usage of gypsum adhesive give the number of plasterboards and the bags of adhesive for dot-and-dab fixing.",
       faq: [
         ["How many boards does 1 m² of wall take?",
-         "The calculator divides the area by the area of one board and rounds up to whole boards; the adhesive is worked out separately from the usage per square metre."],
+         "The calculator divides the area by the area of one board and rounds up to whole boards. The adhesive is worked out separately, from the usage per square metre."],
         ["When can boards not be dot-and-dabbed?",
          "Gypsum adhesive only works on a flat, sound background. Where the wall is badly out of true a metal frame is needed instead."],
       ],
@@ -1472,7 +1472,7 @@ export const CALC_SEO = {
         ["Ile płyt OSB na m² poszycia?",
          "Kalkulator dzieli powierzchnię powiększoną o zapas przez pole jednego arkusza i zaokrągla w górę do całych płyt."],
         ["Czy wynik zawiera plan rozkroju?",
-         "Nie, to liczba całych arkuszy bez planu cięcia. Gdy chcesz wiedzieć, jak je pociąć, użyj kalkulatora rozkroju płyt 2D."],
+         "Nie, to liczba całych arkuszy. Plan cięcia z rzazem piły daje kalkulator rozkroju płyt 2D."],
       ],
     },
     uk: {
@@ -1497,7 +1497,7 @@ export const CALC_SEO = {
     },
     en: {
       title: "OSB sheathing calculator: how many sheets",
-      desc: "The area to cover, the sheet size and a waste allowance give the number of whole OSB panels or boards for a wall or a roof.",
+      desc: "The area, the sheet size and a waste allowance give the number of whole OSB panels or boards for a wall or a roof.",
       faq: [
         ["How many OSB sheets per m² of sheathing?",
          "The calculator divides the area plus the waste allowance by the area of one sheet and rounds up to whole panels."],

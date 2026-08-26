@@ -1949,7 +1949,7 @@ const I18N_EXTRA = {
     faq_q1: "Czy LiczMat jest darmowy?", faq_a1: "Tak. Kalkulatory, projekty i kosztorysy w przeglądarce są darmowe, konto też nic nie kosztuje. Serwis nie ma reklam; aplikacja na Androida utrzymuje się z reklam Google AdMob.",
     faq_q2: "Gdzie liczy LiczMat?", faq_a2: "W Twojej przeglądarce. To, co wpiszesz w formularz, nie idzie na nasz serwer. Aplikacja na Androida liczy tym samym silnikiem i działa bez zasięgu.",
     faq_q3: "Czy muszę zakładać konto?", faq_a3: "Nie. Liczysz od razu, bez logowania — razem z projektami i kosztorysami, które zostają w Twojej przeglądarce. Konto dokłada te same dane na telefonie i link do pokazania kosztorysu.",
-    faq_q5: "Jakie dane zbiera LiczMat?", faq_a5: "Bez konta projekty, kosztorysy i ustawienia zostają w Twojej przeglądarce. Po zalogowaniu ich kopia leży w Google Firestore (region europe-central2, Warszawa) i widzi ją tylko Twoje konto. Strona wczytuje Google Analytics dopiero po Twojej zgodzie, a mapa sklepów korzysta z Google Maps. Wszystko opisuje",
+    faq_q5: "Jakie dane zbiera LiczMat?", faq_a5: "Bez konta projekty, kosztorysy i ustawienia zostają w przeglądarce. Po zalogowaniu kopia leży w Google Firestore (europe-central2, Warszawa) i widzi ją tylko Twoje konto. Google Analytics wczytuje się po zgodzie. Wszystko opisuje",
   },
   en: {
     nav_features: "Features", skip_main: "Skip to content", theme_toggle: "Toggle theme", gp_getit: "Get it on",
@@ -1965,7 +1965,7 @@ const I18N_EXTRA = {
     faq_q1: "Is LiczMat free?", faq_a1: "Yes. The calculators, projects and estimates in the browser are free, and the account costs nothing either. The site carries no ads; the Android app is funded by Google AdMob ads.",
     faq_q2: "Where does LiczMat calculate?", faq_a2: "In your browser. What you type into the form never reaches our server. The Android app uses the same engine and works with no signal.",
     faq_q3: "Do I need to create an account?", faq_a3: "No. You start counting straight away, projects and estimates included — they stay in your browser. An account adds the same data on your phone and a link for showing an estimate to somebody.",
-    faq_q5: "What data does LiczMat collect?", faq_a5: "Without an account your projects, estimates and settings stay in your browser. Once you sign in, a copy sits in Google Firestore (europe-central2, Warsaw) where only your account can see it. The site loads Google Analytics only after you agree to it, and the store map uses Google Maps. It is all described in the",
+    faq_q5: "What data does LiczMat collect?", faq_a5: "Without an account your projects, estimates and settings stay in your browser. Once you sign in, a copy sits in Google Firestore (europe-central2, Warsaw) and only your account sees it. Google Analytics loads after you agree. See the",
   },
   de: {
     nav_features: "Funktionen", skip_main: "Zum Inhalt springen", theme_toggle: "Design wechseln", gp_getit: "Erhältlich bei",
@@ -1981,7 +1981,7 @@ const I18N_EXTRA = {
     faq_q1: "Ist LiczMat kostenlos?", faq_a1: "Ja. Rechner, Projekte und Kalkulationen im Browser sind kostenlos, das Konto ebenfalls. Die Seite hat keine Werbung; die Android-App finanziert sich über Google-AdMob-Werbung.",
     faq_q2: "Wo rechnet LiczMat?", faq_a2: "In deinem Browser. Was du ins Formular eingibst, geht nicht an unseren Server. Die Android-App rechnet mit demselben Rechenkern und funktioniert ohne Empfang.",
     faq_q3: "Muss ich ein Konto anlegen?", faq_a3: "Nein. Du rechnest sofort los, samt Projekten und Kalkulationen — sie bleiben in deinem Browser. Ein Konto bringt dieselben Daten aufs Handy und einen Link, mit dem du eine Kalkulation zeigen kannst.",
-    faq_q5: "Welche Daten erfasst LiczMat?", faq_a5: "Ohne Konto bleiben Projekte, Kalkulationen und Einstellungen in deinem Browser. Nach der Anmeldung liegt eine Kopie in Google Firestore (europe-central2, Warschau), die nur dein Konto sieht. Die Seite lädt Google Analytics erst nach deiner Zustimmung, die Marktkarte nutzt Google Maps. Alles steht in der",
+    faq_q5: "Welche Daten erfasst LiczMat?", faq_a5: "Ohne Konto bleiben Projekte, Kalkulationen und Einstellungen im Browser. Nach der Anmeldung liegt eine Kopie in Google Firestore (europe-central2, Warschau), die nur dein Konto sieht. Google Analytics lädt nach Zustimmung. Mehr in der",
   },
   uk: {
     nav_features: "Функції", skip_main: "Перейти до вмісту", theme_toggle: "Змінити тему", gp_getit: "Завантажити в",
@@ -1997,7 +1997,7 @@ const I18N_EXTRA = {
     faq_q1: "LiczMat безкоштовний?", faq_a1: "Так. Калькулятори, проєкти й кошториси в браузері безкоштовні, акаунт теж нічого не коштує. На сайті немає реклами; застосунок на Android утримується з реклами Google AdMob.",
     faq_q2: "Де рахує LiczMat?", faq_a2: "У твоєму браузері. Те, що вводиш у форму, не йде на наш сервер. Застосунок на Android рахує тим самим ядром і працює без зв'язку.",
     faq_q3: "Чи потрібно створювати акаунт?", faq_a3: "Ні. Рахуєш одразу, разом із проєктами й кошторисами — вони лишаються у твоєму браузері. Акаунт додає ті самі дані на телефоні та посилання, яким покажеш кошторис.",
-    faq_q5: "Які дані збирає LiczMat?", faq_a5: "Без акаунта проєкти, кошториси й налаштування лишаються у твоєму браузері. Після входу копія лежить у Google Firestore (europe-central2, Варшава), і бачить її лише твій акаунт. Сайт вантажить Google Analytics лише після твоєї згоди, а карта магазинів використовує Google Maps. Усе описано в",
+    faq_q5: "Які дані збирає LiczMat?", faq_a5: "Без акаунта проєкти, кошториси й налаштування лишаються у твоєму браузері. Після входу копія лежить у Google Firestore (europe-central2, Варшава), і бачить її лише твій акаунт. Google Analytics вантажиться після згоди. Усе описано в",
   },
 };
 for (const lg in I18N_EXTRA) Object.assign(I18N[lg] || (I18N[lg] = {}), I18N_EXTRA[lg]);
