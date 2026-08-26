@@ -1338,8 +1338,20 @@ async function downloadAccount() {
   out.rooms = rows(await fb.getDocs(fb.collection(db, "users", state.uid, "rooms")));
   // The three Pro collections (session 46). Flat, beside rooms, and downloaded even when
   // nothing on this page draws them: the export button hands back the whole account.
+  //
+  // Each one is read on its own and a refusal leaves it empty rather than taking the pull
+  // down. Until the rules that validate them are deployed, `users/{uid}/clients` falls
+  // through to the catch-all `allow read, write: if false` — and one refusal inside this
+  // function used to mean nobody could pull their *projects* either. Losing the workspace
+  // because a collection somebody may never have used is unreadable is the worse failure,
+  // and it is the same argument the paywall follows when the plan cannot be read at all —
+  // fail open, in the direction of the visitor's own data.
   for (const name of ["clients", "jobs", "quotes"]) {
-    out[name] = rows(await fb.getDocs(fb.collection(db, "users", state.uid, name)));
+    try {
+      out[name] = rows(await fb.getDocs(fb.collection(db, "users", state.uid, name)));
+    } catch (err) {
+      out[name] = [];
+    }
   }
 
   for (const project of out.projects) {
