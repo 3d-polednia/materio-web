@@ -84,7 +84,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 43 | Kalkulator na prawdziwym telefonie | **Zrobione** — 2026-08-26 |
 | 44 | Stop slop: zasady, test, pl/uk/de/en | **Zrobione** — 2026-08-26 |
 | 45 | Stop slop: cs/sk/ro/hr/sr/ru | **Zrobione** — 2026-08-26 |
-| 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | **Zrobione** — 2026-08-26, czeka na wdrożenie reguł |
+| 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | **Zrobione** — 2026-08-26. Reguły czekają na wdrożenie: konsola, po planie (lista niżej) |
 | 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | Do zrobienia |
 | 48 | Prawda w dokumentacji i lista rzeczy w konsolach | Do zrobienia |
 | 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | Do zrobienia |
@@ -101,6 +101,49 @@ Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka
 dotyczy **strony pojedynczego kalkulatora**, „stop slop" znaczy skrócić **plus test, który
 pilnuje**, w nagłówku ustępują **Poradniki**, Stripe idzie przez **Blaze + własną funkcję,
 którą wdraża właściciel**, a konta Stripe **jeszcze nie ma**.
+
+
+## Do zrobienia w konsolach — po całym planie (decyzja właściciela, 2026-08-26)
+
+Rzeczy, których nie da się zrobić z tego repozytorium: wymagają konsoli Google, Firebase
+albo Play, albo hasła, którego żadna sesja nie ma prawa czytać. **Właściciel zdecydował, że
+robi je w jednej turze po zamknięciu planu**, zamiast przerywać sesje po drodze. Ta lista
+jest tym, co ta tura ma objąć; Sesja 48 ją domyka i sprawdza.
+
+| # | Co | Gdzie | Skutek, dopóki nie zrobione |
+|---|---|---|---|
+| 1 | `firebase deploy --only firestore` | konsola / CLI, repo `Materio` | **Klienci, zlecenia i wyceny nie jadą na telefon.** Reguły są w repo od Sesji 46 i nie są wdrożone. |
+| 2 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. |
+| 3 | Keystore i hasła w historii gita | repo `Materio`, Play App Signing | `materio-upload.jks` i `materio-keystore-creds.txt` są śledzone przez gita. `.gitignore` ma `*.jks`, ale nie działa wstecz. |
+| 4 | Konto serwisowe do Play (jeśli wydania mają być automatyczne) | Play Console → Użytkownicy i uprawnienia | Upload AAB jest ręczny. Klucz z punktu 2 jest z Google Cloud i do Play nie sięga. |
+| 5 | `%APP_NAME%` w mailach Firebase | Firebase → Project settings → Project name | Mail resetu hasła mówi „Materio" — nazwa wycofana 2026-08-12. |
+
+### Co kosztuje odłożenie punktu 1
+
+Trzeba to napisać wprost, bo inaczej za trzy sesje nikt nie będzie pamiętał, dlaczego coś
+nie działa:
+
+- **Serwis już obiecuje synchronizację.** Sesja 46 przepisała pięć zdań copy —
+  `cli_local_note`, `job_local_note`, `quo_local_note`, `cal_local_note`, `propage_local` —
+  z „zostają w tej przeglądarce" na „są częścią konta". To jest prawda o kontrakcie i o
+  kodzie, i nieprawda o wdrożeniu. Strona mówi coś, czego backend jeszcze nie robi, i mówi
+  to od 2026-08-26.
+- **Wysyłka do chmury kończy się błędem.** Kto naciśnie „wyślij" w `/app/`, wyśle warsztat,
+  a na kliencie dostanie `PERMISSION_DENIED` i komunikat o niepowodzeniu.
+- **Pobieranie działa i to nie jest przypadek.** Ta sama Sesja 46 najpierw je zepsuła —
+  odmowa na `users/{uid}/clients` leciała z wnętrza `downloadAccount()` i zabierała ze sobą
+  projekty, pomieszczenia i kalkulacje wszystkim. Naprawione tego samego dnia
+  (commit `dd12d82c`): każda z trzech kolekcji czytana osobno, odmowa zostawia pustą listę.
+  Bez tej poprawki odłożenie punktu 1 byłoby awarią całej synchronizacji, a nie brakiem
+  jednej funkcji.
+- **Aplikacji z Sesji 46 nie wolno wydać przed punktem 1.** `CloudSync.syncNow()` pcha po
+  kolei i `await`-uje każdy zapis: odmowa na pierwszym kliencie leci wyjątkiem w górę i
+  wywala **cały** przebieg, więc pull już się nie wykona. Kolejność jest sztywna:
+  **najpierw reguły, potem AAB.**
+
+Gdyby odłożenie miało trwać długo, uczciwiej byłoby cofnąć copy do wersji sprzed Sesji 46
+niż zostawić obietnicę bez pokrycia. To jest decyzja właściciela i tu jest zapisana jako
+otwarta.
 
 ### Etap dodatkowy — rebranding aplikacji Android (nie jest sesją Master Planu)
 
@@ -365,8 +408,12 @@ i `sitemap.xml`.
 **STATUS**
 
 Zrobione. Klienci, zlecenia i wyceny są w kontrakcie, w bazie telefonu, w synchronizacji
-w obie strony i na trzech ekranach za tą samą ścianą, co w przeglądarce. Czeka na jedną
-komendę właściciela.
+w obie strony i na trzech ekranach za tą samą ścianą, co w przeglądarce.
+
+**Czeka na `firebase deploy --only firestore`, i właściciel zdecydował 2026-08-26, że robi
+to razem z resztą pracy w konsolach — po zamknięciu planu, nie teraz.** Lista i koszt tej
+zwłoki: „Do zrobienia w konsolach" na początku tego pliku. Do tego czasu ta sesja jest
+zrobiona w kodzie i nieczynna w produkcie.
 
 **NASTĘPNE ZADANIE**
 

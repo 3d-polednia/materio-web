@@ -1027,8 +1027,17 @@ Kotlin side of it. Change one, change all three.
   `ClientEntity`, `JobEntity`, `QuoteEntity`, Room migration 5 → 6, the six mappers in
   `SyncContract`, the three collections in `CloudSync` and `validClient()`/`validJob()`/
   `validQuote()` in the deployed rules. **Those rules still need deploying**
-  (`firebase deploy --only firestore`); until then a write is refused and both sides work
-  locally exactly as before. `/app/` pushes and pulls the Pro store beside the workspace
+  (`firebase deploy --only firestore`), and the owner decided on 2026-08-26 to do it in one
+  pass with the rest of the console work **after the plan closes** — the list and what the
+  delay costs are under "Do zrobienia w konsolach" at the top of `docs/MASTER_PLAN.md`.
+  Two things follow while it waits. The five sentences of copy this session rewrote now
+  promise a sync the backend does not yet perform — true about the contract, not yet true
+  about production; if the wait turns long, cutting the copy back is more honest than
+  leaving the promise. And **the app must not be released before the rules are deployed**:
+  `CloudSync.syncNow()` awaits each write in order, so one refused client takes the whole
+  pass down and the pull never runs. Rules first, AAB second. Pulling on the web already
+  survives the refusal (each Pro collection is read on its own — commit `dd12d82c`), which
+  is the only reason the delay costs a feature rather than the whole sync. `/app/` pushes and pulls the Pro store beside the workspace
   (`pushProWorkspace()`, `crmImport()`), so a job whose status was set in a browser is the
   job the tradesperson opens on site.
   **The store keeps its own key.** `liczmat-crm-v1` is still separate from
