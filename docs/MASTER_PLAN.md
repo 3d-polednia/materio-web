@@ -90,6 +90,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | **Zrobione** — 2026-08-27. Czeka na `firebase deploy --only functions` i jedno nadanie uprawnienia (właściciel, `docs/ADMIN.md`) |
 | 50 | Aplikacja wygląda tak samo jak strona (repo aplikacji) | **Zrobione** — 2026-08-27. Czeka na wydanie AAB (właściciel) |
 | 51 | Audyt strona ↔ aplikacja + trzeci tryb motywu na stronie | **Zrobione** — 2026-08-27 |
+| 52 | Jeden kalkulator zamiast dwóch: ścianka działowa i zabudowa (repo aplikacji) | **Zrobione** — 2026-08-27, commit `61bb0c6`. Czeka na wydanie AAB (właściciel) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -115,6 +116,29 @@ Trzy zrzuty ekranu na `/aplikacja/` przerenderowane z nowej aplikacji tym samym 
 Roborazzi, który zrobił poprzednie. **Do zamknięcia zostaje wydanie AAB** — dopóki go nie
 ma, strona pokazuje aplikację, której nikt jeszcze nie zainstaluje (punkt 2 listy niżej).
 
+Sesja 52 to pierwsza pozycja kodowa z wieczornego planu właściciela (2026-08-27), a ten
+plan bierze się z audytu parytetu strona ↔ aplikacja z Sesji 51. Znalezisko **C4**: aplikacja
+miała w wybieraku `STUD_WALL` i `WALL_LINING` — ten sam rachunek profili i ścieżek z tych
+samych czterech pól, różniący się **wyłącznie** liczbą płytowanych stron, wpisaną w kod przy
+każdej z dwóch pozycji. Stąd 16 kalkulatorów w aplikacji przy 15 na stronie: nadwyżka nie była
+funkcją, której serwisowi brakuje, tylko jedną robotą policzoną dwa razy.
+
+Strona trzyma to jako **pole** `sides` od dnia, w którym powstała, i strona jest źródłem prawdy
+(`docs/DESIGN_SYSTEM.md`). Więc w aplikacji `WALL_LINING` znika, `STUD_WALL` dostaje pole
+(domyślnie 2, dwie odpowiedzi jako chipy — żadnej z nich się nie mierzy), a `FramingCalc.studWall`
+przyjmował `boardSides` już wcześniej, więc **arytmetyka nie drgnęła** i żadna oczekiwana liczba
+w `TradeCalcTest` się nie zmieniła.
+
+Jedyne miejsce, które wiedziało, którą z dwóch robót proponuje, to skrót z ekranu pomieszczenia:
+zabudowa własnych ścian pokoju jest jednostronna. Trasa `trade?` dostała więc argument `sides`,
+a skrót podaje `"1"` — bez tego lądowałby na ściance działowej i po cichu kupował dwa razy tyle
+płyt. Etykieta `framing_board_sides` to **słowo strony** we wszystkich dziesięciu językach
+(„Strony do płytowania", „Boarded sides", „Beplankte Seiten", …), przepisane, a nie wymyślone —
+jedno pole nie ma się nazywać na dwa sposoby w dwóch produktach. 221/221 testów przechodzi.
+
+Zostaje to samo, co przy Sesjach 46, 47 i 50: **dopóki nie ma wydania AAB, w sklepie stoi
+aplikacja z szesnastoma pozycjami.** To punkt 2 listy „Do zrobienia w konsolach".
+
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
 dotyczy **strony pojedynczego kalkulatora**, „stop slop" znaczy skrócić **plus test, który
@@ -139,7 +163,7 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 | # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
 |---|---|---|---|---|
 | 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia i wyceny nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
-| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47 i 50) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
+| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50 i 52) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
 | 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
 | 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
 | 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |
