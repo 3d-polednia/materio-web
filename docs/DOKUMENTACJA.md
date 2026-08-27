@@ -310,6 +310,11 @@ wartość leżącą bliżej niż jedna miliardowa część od liczby całkowitej
 gołych `Math.ceil` / `Math.floor` — sekcja „wartości graniczne" w teście pilnuje tego
 dziesięcioma przypadkami.
 
+**Aplikacja Android ma tę samą regułę od Sesji 47** (`snap()`, `ceilSnap()` i `floorSnap()`
+w `core/calculation/WasteMath.kt` w repo `3d-polednia/Materio`). Silniki serwisu są portem
+tamtych, więc dopóki poprawka stała tylko tutaj, dwa produkty odpowiadały na jedno pytanie
+dwa razy inaczej. Do użytkownika telefonu poprawka dociera z najbliższym wydaniem.
+
 ## 7b. Konto, sesja i poziomy dostępu
 
 Kod: `assets/account.js` (sesja, wspólna dla całego serwisu), `assets/app.js` (`/app/` —

@@ -85,7 +85,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 44 | Stop slop: zasady, test, pl/uk/de/en | **Zrobione** — 2026-08-26 |
 | 45 | Stop slop: cs/sk/ro/hr/sr/ru | **Zrobione** — 2026-08-26 |
 | 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | **Zrobione** — 2026-08-26. Reguły czekają na wdrożenie: konsola, po planie (lista niżej) |
-| 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | Do zrobienia |
+| 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | **Zrobione** — 2026-08-27, commit `b231bab`. Czeka na wydanie AAB (właściciel) |
 | 48 | Prawda w dokumentacji i lista rzeczy w konsolach | Do zrobienia |
 | 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | Do zrobienia |
 
@@ -291,6 +291,101 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 47 (plan naprawczy)
+
+Zadanie: **błąd zaokrąglenia w silnikach Androida** — repo `3d-polednia/Materio`. Serwis
+naprawiono w Sesji 12; telefon liczył źle dalej — przez dwa tygodnie po tamtej sesji i przez
+cały czas przed nią.
+
+**WYKONANO**
+
+**1. `snap()` jest w aplikacji.** `core/calculation/WasteMath.kt` — tam, gdzie stoi wspólny dla
+wszystkich silników raport finansowy — ma teraz `snap()`, `ceilSnap()` i `floorSnap()`. Reguła
+jest ta sama, co w `assets/calculators.js`: wartość leżąca bliżej niż **jedna miliardowa
+względem** liczby całkowitej zostaje do niej przyciągnięta, **zanim** zaokrąglenie podejmie
+decyzję. Tolerancja jest względna i **wyklucza zero**, więc kawałek metra kwadratowego nadal
+wymaga całego opakowania.
+
+**2. Wszystkie 22 zaokrąglenia w silnikach przechodzą przez nią.** `CoverageEngine`,
+`SurfaceWasteEngine`, całe `TradeCalc` (beton, zaprawa, wylewka, tapeta, murowanie, ocieplenie)
+i całe `FramingCalc` (`profilesAcross`, `boardsFor`, ściana działowa, sufit podwieszany, G-K na
+klej, poszycie). `kotlin.math.ceil` i `kotlin.math.floor` nie są już w tych plikach
+importowane — nie da się ich wywołać przez pomyłkę.
+
+**3. Plus jedno miejsce poza silnikami.** `CalculatorViewModel` dzieli ciągły odcinek (listwa,
+rura, pręt) na całe sztangi tym samym `⌊⌋`. **Nic tam nie liczyło źle** — odcinek jest
+w milimetrach, okruch ma rząd 1e-11 mm, a próg 1 µm linijkę niżej i tak go odrzuca. To jest
+reguła zastosowana wszędzie, nie naprawiony defekt, i tak jest opisane w komentarzu.
+
+**4. Co to znaczy dla użytkownika.** Dwa błędy, oba na wymiarach z domyślnych formularzy:
+
+| Wejście | Aplikacja liczyła | Jest | Skutek |
+|---|---|---|---|
+| 21,6 m² podłogi, karton 1,44 m² (gres 60×60) | 16 kartonów | 15 | kupiony zbędny karton |
+| 2,4 m sufitu, rozstaw 0,4 m | 6 profili CD | 7 | lista zakupów o profil za krótka |
+| 20 m² tarasu, preset `taras-60x60` (0,72 m²/opak., 8 %) | 31 opakowań | 30 | kupione zbędne opakowanie |
+
+Trzeci wiersz to **materiał z katalogu na okrągłej powierzchni** — nie liczba wymyślona do
+testu.
+
+**5. Test zgadzał się z błędem, bo wyprowadzał oczekiwanie tym samym `ceil`.**
+`MaterialCatalogCalculationTest` przepuszcza **każdy** materiał katalogu przez silnik, który go
+obsługuje, i porównywał wynik z `ceil(area * (1 + waste/100) / pkg)` — czyli z tą samą
+arytmetyką, która była zepsuta. Dlatego `taras-60x60` przechodził przez 219 testów przez cały
+ten czas. Oczekiwania liczą się teraz w `BigDecimal`, czyli w dziesiętnej arytmetyce dokładnej,
+której silnik nie ma jak powtórzyć. Pułapka po drodze, zapisana w komentarzu w teście: operator
+`/` na `BigDecimal` w Kotlinie **zachowuje skalę lewego argumentu**, więc `dec(5.0) / dec(100.0)`
+to `0.0` i cały 5-procentowy zapas znika — jest `movePointLeft(2)`.
+
+**6. Sześć nowych testów granicznych, wyprowadzonych ręcznie ze wzoru.** Obie strony reguły:
+wielokrotność wychodzi równo (21,6/1,44 = 15; 43,2/1,44 = 30; 8,64/1,44 = 6; 2,1 kg / 0,3 kg = 7
+worków; 0,0102 m³ / 0,3 l = 34 worki; 1,2 m i 4,8 m przy 0,4 m i 11,7 m przy 0,9 m), a prawdziwa
+reszta nadal idzie w górę (21,61 m² to 16 kartonów, 100,1 kg to 5 worków, 1,21 m przy 0,4 m to
+nadal 4 słupki) i ułamek metra nadal wymaga całego opakowania.
+
+**ZMIENIONE PLIKI**
+
+Repo aplikacji (`3d-polednia/Materio`, commit `b231bab`):
+`core/calculation/WasteMath.kt`, `surface/CoverageEngine.kt`, `surface/SurfaceWasteEngine.kt`,
+`trade/TradeCalculators.kt`, `feature/calculator/CalculatorViewModel.kt`,
+`test/MaterialCatalogCalculationTest.kt`, `test/SurfaceEnginesTest.kt`, `test/TradeCalcTest.kt`,
+`docs/ARCHITECTURE.md`, `docs/CALCULATOR_UNITS_LANGUAGE.md`, `CLAUDE.md`.
+
+Repo serwisu: `docs/DOKUMENTACJA.md` (§7a), ten plik. **Ani jednej zmiany w kodzie serwisu** —
+serwis liczy poprawnie od Sesji 12 i nie miał tu nic do poprawienia.
+
+**TESTY**
+
+- **219/219 testów jednostkowych aplikacji przechodzi** (było 213; sześć nowych to testy
+  graniczne). Uruchomione `gradle :app:testDebugUnitTest` po zainstalowaniu Android SDK
+  w kontenerze.
+- Pierwszy przebieg po poprawce padł na `MaterialCatalogCalculationTest` i **tak miało być** —
+  to jest ten test, który zgadzał się z błędem. Drugi padł na moim własnym oczekiwaniu
+  (`BigDecimal` i skala), trzeci przeszedł.
+- Serwis: nie uruchamiane, bo ta sesja nie dotknęła ani jednego pliku, który testy serwisu
+  czytają.
+
+**PROBLEMY**
+
+- **Poprawka nie dotarła jeszcze do nikogo.** Jest w `main`, nie w Google Play. Potrzebne
+  wydanie AAB, a AAB buduje właściciel (zasada z `CLAUDE.md` repo aplikacji). Do tego czasu
+  telefon liczy tak, jak liczył, a serwis liczy poprawnie — czyli **te dwa produkty odpowiadają
+  na jedno pytanie dwie różne odpowiedzi, dopóki nie wyjdzie wydanie**.
+- **Wydanie z Sesji 46 i to zaokrąglenie to jedno wydanie.** `main` niesie już ekrany Pro
+  i migrację Room 5 → 6, a te **nie mogą wyjść przed `firebase deploy --only firestore`**
+  („Co kosztuje odłożenie punktu 1" na początku tego pliku). Kolejność: reguły, potem AAB —
+  i ten AAB niesie także tę poprawkę.
+- **`BackupManager` nadal nie eksportuje pokoi, klientów, zleceń ani wycen.** Zgłoszone
+  w Sesji 46, dalej otwarte, dalej poza zakresem.
+
+**STATUS**
+
+Zrobione w kodzie i w testach, **nieczynne u użytkownika do czasu wydania**.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 48 — prawda w dokumentacji i lista rzeczy do zrobienia w konsolach.**
 
 ### Co zrobiła Sesja 46 (plan naprawczy)
 
@@ -4463,7 +4558,7 @@ Było: wiersz projektu mówił „1 pozycji”, bo `unitLabel()` mieszkał w pli
 którego `/projekty/`, `/kosztorys/` ani pulpit nie ładują. Sesja 16 wyjęła odmianę do
 `assets/units.js` i wszystkie trzy strony dostały tę samą formę co kalkulator.
 
-### Ten sam błąd zaokrąglenia w aplikacji Android — znalezione w Sesji 12
+### ~~Ten sam błąd zaokrąglenia w aplikacji Android~~ — naprawione w Sesji 47
 
 Silniki w `assets/calculators.js` są przeniesione 1:1 z `core/calculation/**`, a błąd
 opisany wyżej siedzi w samym dzieleniu, nie w porcie: `ceil(21.6 / 1.44)` daje 16 zamiast
@@ -4472,6 +4567,11 @@ Serwis został naprawiony, telefon nie. Zrównanie wymaga zmiany w repo
 `3d-polednia/Materio` (odpowiednik `snap()` przy każdym `ceil`/`floor` w silnikach)
 i osobnego wydania. **Poza zakresem prac nad webem** (rozdział VII) — **potrzebna decyzja
 właściciela**, czy zlecić to jako etap w tamtym repo.
+
+**Zlecone i zrobione: Sesja 47, 2026-08-27** (commit `b231bab` w repo aplikacji). `snap()`
+stoi w `core/calculation/WasteMath.kt`, a wszystkie 22 zaokrąglenia w silnikach przechodzą przez
+`ceilSnap`/`floorSnap`. Opis wyżej zostaje jako historia i jest dokładny co do samego błędu.
+**Do użytkownika poprawka dociera dopiero z wydaniem AAB**, którego jeszcze nie ma.
 
 ### ~~Reguły Firestore~~ — wdrożone przez właściciela 2026-08-13, usuwanie konta działa
 
