@@ -91,6 +91,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 50 | Aplikacja wygląda tak samo jak strona (repo aplikacji) | **Zrobione** — 2026-08-27. Czeka na wydanie AAB (właściciel) |
 | 51 | Audyt strona ↔ aplikacja + trzeci tryb motywu na stronie | **Zrobione** — 2026-08-27 |
 | 52 | Jeden kalkulator zamiast dwóch: ścianka działowa i zabudowa (repo aplikacji) | **Zrobione** — 2026-08-27, commit `61bb0c6`. Czeka na wydanie AAB (właściciel) |
+| 53 | Terminarz w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `24faead`. Czeka na wydanie AAB (właściciel) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -139,6 +140,35 @@ jedno pole nie ma się nazywać na dwa sposoby w dwóch produktach. 221/221 test
 Zostaje to samo, co przy Sesjach 46, 47 i 50: **dopóki nie ma wydania AAB, w sklepie stoi
 aplikacja z szesnastoma pozycjami.** To punkt 2 listy „Do zrobienia w konsolach".
 
+Sesja 53 to druga pozycja kodowa wieczornego planu i znalezisko **C2** audytu: terminarz był
+**tylko na stronie**, a to jest akurat ta połowa Pro, której fachowiec używa **na budowie** — czyli
+tam, gdzie ma telefon, a nie przeglądarkę. Zlecenie miało `dueDate` od Sesji 46 i nie było ekranu,
+który by tę datę zebrał. Po tej sesji Pro to **cztery moduły w aplikacji** przy pięciu na stronie;
+zostaje łańcuch i historia (C3).
+
+Moduł **nic nie zapisuje** i to jest cała sesja. Termin jest polem zlecenia, więc
+`feature/crm/Schedule.kt` to *czytanie* zleceń: pięć kubełków (po terminie, dziś, do 7 dni, później,
+bez daty), zlecenia zamknięte w żadnym z nich, a jedyny zapis to `updateJob(dueDate = …)` — to samo
+wywołanie, które robi ekran zleceń. Osobna tabela dałaby jednej dacie dwa domy. Trasa nie ma `?id=`
+z tego samego powodu: wiersz zastępuje zlecenie.
+
+`Schedule` to `crmSchedule()` z `assets/crm.js` kubełek w kubełek i sortowanie w sortowanie — ta
+sama granica (dzień 7 to jeszcze „do 7 dni"), ta sama kolejność, ta sama zasada, że zakończone
+zlecenie po terminie **nie jest** zaległe. Dwa produkty układające tydzień jednego fachowca na dwa
+sposoby byłyby gorsze niż jeden układający go źle.
+
+Dwie rzeczy mają w sobie strefę czasową i obie są zapisane: **„dziś" to dzień kalendarzowy
+urządzenia** (w UTC to wczoraj o 00:30 w Warszawie i jutro o 20:00 w Nowym Jorku), a **odległość
+dwóch dni liczy się o północy UTC** (lokalnie ma 23 albo 25 godzin dwa razy w roku). Wybierak daty
+Materiala oddaje północ UTC dnia, w który padł palec, więc czyta się go też w UTC.
+
+Dwadzieścia kluczy `cal_*` to **słowa strony**, przepisane z `assets/i18n-pages.js` w dziesięciu
+językach, a nie wymyślone. „za 3 dni" pisze Android (`DateUtils`), bo niesie wszystkie formy mnogie
+wszystkich dziesięciu języków; jedyne, co mówi źle, to zero — i tam wchodzi `cal_today_t`.
+
+232/232 testów przechodzi. **Strona nie zmieniła się o bajt** — ta sesja jest w całości po stronie
+telefonu i, jak 46, 47, 50 i 52, czeka na wydanie AAB.
+
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
 dotyczy **strony pojedynczego kalkulatora**, „stop slop" znaczy skrócić **plus test, który
@@ -163,7 +193,7 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 | # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
 |---|---|---|---|---|
 | 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia i wyceny nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
-| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50 i 52) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
+| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52 i 53) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Terminarza z Sesji 53 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły zamiast czterech. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
 | 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
 | 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
 | 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |
