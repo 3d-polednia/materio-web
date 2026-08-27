@@ -16,6 +16,14 @@ pierwsze malowanie każdej z 373 stron. Argument zostaje przy regule, którą t�
 odwiedzający dostaje regułę. `validateTokens()` czyta nadal `assets/styles.css`,
 a `scripts/test-perf.mjs` §2 pilnuje, że pod spodem to jeden i ten sam arkusz.
 
+**Od Sesji 50 ten sam blok tokenów wydaje też aplikację na Androida.**
+`core/designsystem/theme/Color.kt`, `Type.kt`, `Shape.kt` i `Dimens.kt` w repo
+`3d-polednia/Materio` to `assets/styles.css` przepisany do Kotlina — 1 rem to 16 sp/dp, więc
+liczby przechodzą bez przeliczania. Kierunek jest jednostronny: **kolor, rozmiar, promień
+i czas ustala się tutaj**, a tamto repo kopiuje. Token, który różni się o dwie cyfry, to dwa
+produkty. Kontrast pilnuje `scripts/check-contrast.mjs` — plik o tej samej nazwie jest po
+obu stronach i mierzy te same wartości.
+
 Zasada, na której stoi całość:
 
 > **Żadna reguła poza blokiem tokenów nie wymyśla własnego koloru, rozmiaru,

@@ -88,6 +88,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | **Zrobione** — 2026-08-27, commit `b231bab`. Czeka na wydanie AAB (właściciel) |
 | 48 | Prawda w dokumentacji i lista rzeczy w konsolach | **Zrobione** — 2026-08-27 |
 | 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | **Zrobione** — 2026-08-27. Czeka na `firebase deploy --only functions` i jedno nadanie uprawnienia (właściciel, `docs/ADMIN.md`) |
+| 50 | Aplikacja wygląda tak samo jak strona (repo aplikacji) | **Zrobione** — 2026-08-27. Czeka na wydanie AAB (właściciel) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -100,6 +101,18 @@ Zrobione 2026-08-27: zakładka **Admin** na `/app/` (szósta, tylko dla konta z 
 funkcja `adminPlan` w `functions/` obok webhooka, i `pro-admin.mjs admin <adres>` jako jedyna
 rzecz, która zostaje w terminalu — bo panel otwiera się na uprawnienie, a uprawnienie zapisze
 tylko coś z prawami administratora. Klikanie opisuje [`ADMIN.md`](ADMIN.md).
+
+Sesja 50 doszła 2026-08-27 na prośbę właściciela: „aplikacja ma wyglądać identycznie jak
+strona". Zrobione w repo aplikacji: tokeny ze `assets/styles.css` przepisane do
+`core/designsystem/theme/` (kolor w obu motywach, typografia, skala odstępów, promienie,
+wysokości kontrolek), wspólne komponenty ustawione na wzorce ze strony (karta, przycisk,
+pole, chip, pasek górny i dolny, kafelek ikony, pole wyniku) i tło okna, żeby zimny start nie
+błyskał białym. Aplikacja stała na oliwce Material 3 (`#626B38`) od początku, a strona jest na
+limonce i kremie od rebrandingu 2026-08-12 — to jest ta różnica.
+
+Trzy zrzuty ekranu na `/aplikacja/` przerenderowane z nowej aplikacji tym samym testem
+Roborazzi, który zrobił poprzednie. **Do zamknięcia zostaje wydanie AAB** — dopóki go nie
+ma, strona pokazuje aplikację, której nikt jeszcze nie zainstaluje (punkt 2 listy niżej).
 
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
@@ -125,7 +138,7 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 | # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
 |---|---|---|---|---|
 | 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia i wyceny nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
-| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma trzy niewydane commity (Sesje 46 i 47) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
+| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47 i 50) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
 | 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
 | 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
 | 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |
