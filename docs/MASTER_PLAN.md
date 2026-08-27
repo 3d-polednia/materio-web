@@ -87,7 +87,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | **Zrobione** — 2026-08-26. Reguły czekają na wdrożenie: konsola, po planie (lista niżej) |
 | 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | **Zrobione** — 2026-08-27, commit `b231bab`. Czeka na wydanie AAB (właściciel) |
 | 48 | Prawda w dokumentacji i lista rzeczy w konsolach | **Zrobione** — 2026-08-27 |
-| 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | Do zrobienia |
+| 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | **Zrobione** — 2026-08-27. Czeka na `firebase deploy --only functions` i jedno nadanie uprawnienia (właściciel, `docs/ADMIN.md`) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -95,6 +95,11 @@ sprawdzi, kto pyta — a ten serwer powstaje w Sesji 38, więc panel jest po nim
 Właściciel wybrał kolejność: **najpierw sprzedaż, panel na końcu**. `scripts/pro-admin.mjs`
 zostaje niezależnie od panelu: narzędzie, które potrzebuje wyłącznie klucza, jest tym,
 czym się ratuje, gdy funkcja albo Firebase leżą.
+
+Zrobione 2026-08-27: zakładka **Admin** na `/app/` (szósta, tylko dla konta z uprawnieniem),
+funkcja `adminPlan` w `functions/` obok webhooka, i `pro-admin.mjs admin <adres>` jako jedyna
+rzecz, która zostaje w terminalu — bo panel otwiera się na uprawnienie, a uprawnienie zapisze
+tylko coś z prawami administratora. Klikanie opisuje [`ADMIN.md`](ADMIN.md).
 
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
@@ -128,7 +133,8 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 | 7 | Konto serwisowe do Play (jeśli wydania mają być automatyczne) | Play Console → Użytkownicy i uprawnienia | Stan z Sesji 46, niesprawdzalny stąd | Upload AAB jest ręczny. Klucz z punktu 4 jest z Google Cloud i do Play nie sięga |
 | 8 | Google Search Console dla `liczmat.com` | Search Console | Niesprawdzalne stąd | Nowa domena bez własności i bez zgłoszonej sitemapy. `https://liczmat.com/sitemap.xml` działa i ma 371 adresów (zmierzone) |
 | 9 | Stripe: sześć kroków włączenia sprzedaży | Stripe + Firebase | Stan repo: `assets/pay.js` ma czternaście cen i **puste** trzy adresy | Subskrypcji nie da się kupić. Repozytorium jest gotowe od Sesji 39; klikanie opisuje `docs/STRIPE.md`. Kolejność w nocie ORDER w `assets/pay.js` jest sztywna: **najpierw działający webhook i jedna prawdziwa płatność, dopiero potem adresy** |
-| 10 | Skamielina `web/` w repo `Materio` | repo `Materio` | **Zmierzone:** siedem plików, jeden commit z lipca 2026, wycofany slogan „Policz. Kup. Nie marnuj.", zdanie „bez kont" | Nic tego nie wdraża i nic z tego nie czyta, ale jest to druga, sprzeczna kopia serwisu w repozytorium. Sesja 48 opisała ją w `docs/WEBSITE.md`; skasowanie siedmiu plików to decyzja właściciela |
+| 10 | **`firebase deploy --only functions`** — obie funkcje naraz | Firebase CLI, z katalogu głównego repo `materio-web` | Stan repo: `functions/` ma webhook Stripe'a (Sesja 38) i `adminPlan` (Sesja 49). Wdrożenia nie da się odczytać stąd — **niesprawdzone na żywo** | Panel administratora na `/app/` odpowiada „Funkcja nie odpowiedziała" na każde kliknięcie, a plan Pro nadaje się dalej wyłącznie z terminala. Wymaga planu **Blaze**. Po wdrożeniu jeszcze jedno polecenie: `pro-admin.mjs admin <adres>` — raz na osobę, patrz [`ADMIN.md`](ADMIN.md) |
+| 11 | Skamielina `web/` w repo `Materio` | repo `Materio` | **Zmierzone:** siedem plików, jeden commit z lipca 2026, wycofany slogan „Policz. Kup. Nie marnuj.", zdanie „bez kont" | Nic tego nie wdraża i nic z tego nie czyta, ale jest to druga, sprzeczna kopia serwisu w repozytorium. Sesja 48 opisała ją w `docs/WEBSITE.md`; skasowanie siedmiu plików to decyzja właściciela |
 
 ### Sprawdzone i zamknięte w Sesji 48
 

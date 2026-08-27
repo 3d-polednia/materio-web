@@ -5,8 +5,9 @@
  * `assets/app.js` imports the SDK from gstatic.com, which no test here may reach: the
  * agent container's egress proxy resets the connection, and a test that needed the real
  * network would be a test nobody could run. So three modules are served in its place —
- * firebase-app.js, firebase-auth.js and firebase-firestore.js, exactly the specifiers
- * the page imports — and a Playwright route hands them back instead of the CDN.
+ * firebase-app.js, firebase-auth.js and firebase-firestore.js, plus firebase-functions.js
+ * since session 49, exactly the specifiers the page imports — and a Playwright route hands
+ * them back instead of the CDN.
  *
  * It lives in its own file because two tests drive /app/: scripts/test-account-page.mjs,
  * which exercises the account screen itself, and scripts/test-qa.mjs, which walks the
@@ -39,7 +40,28 @@ const log = (name, arg) => S.calls.push([name, arg === undefined ? null : arg]);
 const fail = (code) => { const e = new Error(code); e.code = code; throw e; };
 
 function emit() { S.listeners.forEach((fn) => fn(S.user)); }
-function setUser(u) { S.user = u; emit(); }
+
+/**
+ * The two token methods, put onto a user object that was planted as plain JSON.
+ *
+ * A planted account cannot carry functions — it crosses into the page as JSON — so the
+ * claims are a plain \`claims\` field on it and this is what turns them into the shape the
+ * real SDK hands back. \`getIdTokenResult(true)\` is what /app/ calls before it decides
+ * whether to fetch the admin panel (session 49), and the \`true\` is recorded, because
+ * asking for a CACHED token there would mean a claim granted five minutes ago is invisible
+ * for another hour.
+ */
+function withToken(u) {
+  if (u && typeof u.getIdTokenResult !== "function") {
+    u.getIdTokenResult = (force) => {
+      log("idToken", Boolean(force));
+      return Promise.resolve({ claims: { ...(u.claims || {}) } });
+    };
+    u.getIdToken = () => Promise.resolve("fake-id-token");
+  }
+  return u;
+}
+function setUser(u) { S.user = withToken(u); emit(); }
 
 export function getAuth() {
   if (!S.auth) {
@@ -51,7 +73,11 @@ export function getAuth() {
   }
   return S.auth;
 }
-export function onAuthStateChanged(auth, fn) { S.listeners.push(fn); fn(S.user); return () => {}; }
+export function onAuthStateChanged(auth, fn) {
+  S.listeners.push(fn);
+  fn(withToken(S.user));
+  return () => {};
+}
 
 export const browserLocalPersistence = "local";
 export const browserSessionPersistence = "session";
@@ -280,5 +306,47 @@ export function onSnapshot(ref, ...rest) {
   onNext(collSnap(ref.path, Boolean(window.__fbFromCache),
     collRows(ref.path).map((doc) => ({ type: "added", doc }))));
   return () => COLL_SUBS.delete(sub);
+}
+`;
+
+/**
+ * firebase-functions.js — the callable SDK, as much of it as the admin panel touches.
+ *
+ * Session 49. `assets/admin.js` makes exactly one kind of call: `httpsCallable(fns,
+ * "adminPlan")(payload)`. What the function answers is not decided here — it is planted in
+ * `window.__fnAnswers` per action, and `<action>Error` plants a refusal instead. That is
+ * deliberate: the decision half already has its own suite (scripts/test-admin-map.mjs), and
+ * a stub that re-implemented it would be a second implementation free to disagree with the
+ * one that ships. What a browser test can ask, and this shape lets it ask, is what the
+ * panel SENT and what it DREW.
+ *
+ * The rejection is the callable SDK's own shape: `error.code` is `functions/<code>` and
+ * `error.message` is the message the server threw — which is why `assets/admin.js` reads
+ * the Polish sentence off the message rather than off the code.
+ */
+export const FAKE_FUNCTIONS = `
+const S = (window.__fn = window.__fn || { calls: [], region: null });
+window.__fnCalls = S.calls;
+
+export function getFunctions(app, region) { S.region = region; window.__fnRegion = region; return { app, region }; }
+
+export function httpsCallable(fns, name) {
+  return (data) => {
+    S.calls.push([name, data === undefined ? null : data]);
+    const answers = window.__fnAnswers || {};
+    const action = (data && data.action) || "";
+    const failure = answers[action + "Error"];
+    if (failure) {
+      const e = new Error(failure);
+      e.code = "functions/" + (failure === "not-admin" ? "permission-denied" : "invalid-argument");
+      return Promise.reject(e);
+    }
+    if (!(action in answers)) {
+      const e = new Error("not-admin");
+      e.code = "functions/permission-denied";
+      return Promise.reject(e);
+    }
+    return Promise.resolve({ data: answers[action] });
+  };
 }
 `;

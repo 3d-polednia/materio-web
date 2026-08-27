@@ -36,11 +36,17 @@
  *
  * Cała logika decyzyjna siedzi w functions/stripe-map.mjs i jest sprawdzana przez
  * `node scripts/test-webhook-map.mjs` — bez chmury, bez npm i bez konta Stripe.
+ *
+ * ─── DRUGA FUNKCJA W TYM PLIKU ──────────────────────────────────────────────
+ * Sesja 49 dołożyła `adminPlan` na dole: ten sam zapis trzech pól planu, tyle że zlecony
+ * ręcznie z panelu w przeglądarce, a nie przez zapłatę. Obie funkcje wdrażają się razem
+ * (`firebase deploy --only functions`) i obie piszą przez `{ merge: true }`. Jej czysta
+ * połowa to functions/admin-map.mjs, sprawdzana przez `node scripts/test-admin-map.mjs`.
  */
 
 import { createHmac } from "node:crypto";
 
-import { onRequest } from "firebase-functions/v2/https";
+import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
@@ -48,6 +54,9 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 
 import { DELETE_FIELD, decide, verifyStripeSignature } from "./stripe-map.mjs";
+import {
+  LIST_LIMIT, accountRow, grantWrite, isAdmin, parseRequest, planSummary, revokeWrite,
+} from "./admin-map.mjs";
 
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
 
@@ -179,4 +188,123 @@ async function resolveUid(intent) {
     }
   }
   return null;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Panel administratora — plan po adresie e-mail, z przeglądarki (sesja 49)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Nadanie i odebranie LiczMat Pro klikaniem, bez terminala i bez klucza na dysku.
+ *
+ * `users/{uid}.plan` jest polem serwerowym — wdrożone reguły pozwalają przeglądarce
+ * zapisać w profilu wyłącznie `lastSeenAt` i `appVersion` — więc panel w przeglądarce nie
+ * może zapisać planu i nie próbuje. Zapisuje to: kod, który biegnie po stronie Google,
+ * z prawami administratora, i sprawdza, kto pyta, zanim cokolwiek zrobi.
+ *
+ * ─── DLACZEGO `onCall`, A NIE `onRequest` ───────────────────────────────────
+ * Webhook wyżej musi być `onRequest`, bo to Stripe wybiera kształt żądania i sam je
+ * podpisuje. Tu po drugiej stronie jest nasza własna strona, więc `onCall` załatwia trzy
+ * rzeczy, które inaczej trzeba by napisać ręcznie i w każdej z nich się pomylić:
+ * weryfikację tokenu Firebase, CORS i kształt odpowiedzi. Token jest zweryfikowany
+ * **zanim** ta funkcja się zacznie — `request.auth` istnieje tylko wtedy, gdy podpis się
+ * zgadzał i token nie wygasł.
+ *
+ * ─── GRANICA BEZPIECZEŃSTWA JEST TUTAJ, NIE W PRZEGLĄDARCE ──────────────────
+ * `assets/admin.js` pokazuje panel, gdy w tokenie widzi `admin: true`. To jest wygoda,
+ * nie zamek: kto podmieni sobie tę wartość w przeglądarce, zobaczy panel i dostanie z
+ * niego `permission-denied` na każde kliknięcie. Jedynym sprawdzeniem, które cokolwiek
+ * znaczy, jest `isAdmin(request.auth.token)` niżej — claim jest częścią podpisanego
+ * tokenu, więc przeglądarka nie ma jak go sobie dopisać.
+ *
+ * ─── ŚLAD ───────────────────────────────────────────────────────────────────
+ * Każdy zapis idzie do logu z uidem tego, kto go zlecił, i tego, kogo dotyczył. Nie ma
+ * kolekcji „audyt" i nie ma jej celowo: byłby to drugi dom dla faktu, który już stoi w
+ * dokumencie profilu, a log w Cloud Logging jest miejscem, którego przeglądarka nie
+ * czyta i nie kasuje.
+ */
+export const adminPlan = onCall(
+  {
+    region: REGION,
+    maxInstances: 5,
+    // Tylko własna strona i lokalny podgląd. Callable domyślnie przepuszcza każdy adres;
+    // panel administratora nie ma powodu odpowiadać cudzej stronie.
+    cors: ["https://liczmat.com", "https://www.liczmat.com", /^http:\/\/localhost(:\d+)?$/],
+  },
+  async (request) => {
+    if (!request.auth || !isAdmin(request.auth.token)) {
+      // Ten sam błąd dla niezalogowanego i dla zalogowanego bez uprawnienia: odpowiedź,
+      // która je rozróżnia, mówi obcemu, że pod tym adresem jest coś do zdobycia.
+      logger.warn("admin: odmowa", { uid: (request.auth && request.auth.uid) || null });
+      throw new HttpsError("permission-denied", "not-admin");
+    }
+
+    const parsed = parseRequest(request.data);
+    if (parsed.error) throw new HttpsError("invalid-argument", parsed.error);
+
+    const auth = getAuth();
+    const db = getFirestore();
+    const now = Date.now();
+    const by = request.auth.uid;
+
+    if (parsed.action === "list") {
+      const page = await auth.listUsers(LIST_LIMIT);
+      const users = page.users.map((u) => ({
+        uid: u.uid, email: u.email || "", admin: isAdmin(u.customClaims),
+      }));
+      // Jedno zapytanie zamiast jednego na konto. `getAll()` rzuca, gdy nie dostanie ani
+      // jednej referencji, więc pusty projekt kończy się tutaj.
+      const profiles = users.length
+        ? await db.getAll(...users.map((u) => db.collection("users").doc(u.uid)))
+        : [];
+      const accounts = users.map((u, i) => accountRow(u, profiles[i] && profiles[i].data(), now));
+      accounts.sort((a, b) => a.email.localeCompare(b.email));
+      return { ok: true, action: "list", accounts, more: Boolean(page.pageToken) };
+    }
+
+    const user = await findUser(auth, parsed.email);
+    if (!user) throw new HttpsError("not-found", "no-account");
+
+    if (parsed.action === "status") {
+      const snap = await db.collection("users").doc(user.uid).get();
+      return {
+        ok: true, action: "status",
+        account: accountRow(user, snap.exists ? snap.data() : null, now),
+      };
+    }
+
+    const write = parsed.action === "grant" ? grantWrite(parsed.months, now) : revokeWrite();
+    if (!write) throw new HttpsError("invalid-argument", "bad-months");
+
+    /* `{ merge: true }` z tego samego powodu, dla którego scripts/pro-admin.mjs używa
+       maski: bez tego zapis zastąpiłby dokument w całości i skasował `createdAt` oraz
+       `lastSeenAt`, czyli datę założenia konta, której nikt już potem nie odtworzy. */
+    await db.collection("users").doc(user.uid).set(toFirestore(write), { merge: true });
+    logger.info("admin: plan zmieniony", {
+      by, uid: user.uid, action: parsed.action, months: parsed.months || null,
+    });
+
+    const snap = await db.collection("users").doc(user.uid).get();
+    return {
+      ok: true, action: parsed.action,
+      account: accountRow(user, snap.exists ? snap.data() : null, now),
+    };
+  },
+);
+
+/**
+ * Konto po adresie e-mail — razem z uprawnieniem, które przy nim stoi.
+ *
+ * `null`, gdy konta nie ma. Brak konta nie jest awarią: to najczęstsza pomyłka przy
+ * wpisywaniu adresu i panel ma o niej powiedzieć wprost, zamiast zakładać konto albo
+ * zapisać plan „na przyszłość" pod adresem, którego nikt nie potwierdził.
+ */
+async function findUser(auth, email) {
+  try {
+    const user = await auth.getUserByEmail(email);
+    return { uid: user.uid, email: user.email || email, admin: isAdmin(user.customClaims) };
+  } catch (e) {
+    if (e && e.code === "auth/user-not-found") return null;
+    throw e;
+  }
 }

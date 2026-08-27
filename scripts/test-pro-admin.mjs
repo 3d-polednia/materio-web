@@ -18,7 +18,10 @@
  *   6. asercja JWT — kształt, czas życia i podpis, zweryfikowany kluczem publicznym;
  *   7. klucz z innego projektu, który musi zostać odrzucony;
  *   8. i to, czego ten skrypt robić NIE może: pisać po repozytorium ani wysyłać zapisu
- *      pod inny adres niż ten z maską.
+ *      pod inny adres niż ten z maską;
+ *   9. uprawnienie administratora (sesja 49) — jedna rzecz, która musi zostać w terminalu,
+ *      bo panel w przeglądarce otwiera się na claim, a claim zapisuje tylko coś z prawami
+ *      administratora.
  *
  * Bez zależności, plain `node`, wyjście 1 przy błędzie — ten sam kształt, co pozostałe
  * zestawy logiczne. Uruchom po każdej zmianie w scripts/pro-admin.mjs albo w polach planu
@@ -31,9 +34,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  MAX_MONTHS, PLAN_FIELDS, PLAN_FREE, PLAN_PRO, SCOPES,
-  accountsText, dayText, docUrl, jwtAssertion, keyProblem, looksLikeEmail, monthsFromNow,
-  patchUrl, planFields, planFromDoc, planText, siteProjectId,
+  ADMIN_CLAIM, MAX_MONTHS, PLAN_FIELDS, PLAN_FREE, PLAN_PRO, SCOPES,
+  accountsText, adminAttributes, dayText, docUrl, isAdminAttributes, jwtAssertion,
+  keyProblem, looksLikeEmail, monthsFromNow, patchUrl, planFields, planFromDoc, planText,
+  siteProjectId,
 } from "./pro-admin.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -308,6 +312,41 @@ head("9. the script writes to one place, and the repository is not it");
     !/LM_SA_KEY[^\n]*\|\|\s*"[^"]+"/.test(src));
   check("and no key is committed beside it",
     !src.includes("BEGIN PRIVATE KEY") && !src.includes("BEGIN RSA PRIVATE KEY"));
+}
+
+/* ================================================================== 10. the claim */
+
+head("10. the administrator's claim: written here once, and nowhere else");
+{
+  const src = read("scripts/pro-admin.mjs");
+
+  /* Session 49 moved the day-to-day work into the browser. What could not move is this:
+     the panel opens for a claim, and only something with administrator rights can write
+     one. So the terminal keeps exactly one job, done once per person. */
+  eq("the claim is called admin", ADMIN_CLAIM, "admin");
+  eq("granting writes the whole attribute", adminAttributes(true), '{"admin":true}');
+  eq("revoking writes an empty one", adminAttributes(false), "{}");
+  check("a granted claim reads back", isAdminAttributes(adminAttributes(true)));
+  check("a cleared one does not", !isAdminAttributes(adminAttributes(false)));
+  check("and nothing that merely looks true does",
+    !isAdminAttributes('{"admin":"true"}') && !isAdminAttributes('{"admin":1}')
+    && !isAdminAttributes("nonsense"));
+
+  /* customAttributes is one JSON string and the write replaces it whole. A second claim
+     would have to be added to both halves of this at once. */
+  eq("one accounts:update call in the file",
+    (src.match(/IDENTITY\(projectId, "update"\)/g) || []).length, 1);
+  check("and it sends nothing but the account and its attributes",
+    /localId: uid, customAttributes: adminAttributes\(on\)/.test(src));
+  check("the plan write is untouched by it",
+    src.includes("customAttributes") && !/planFields\([^)]*customAttributes/.test(src));
+
+  /* Both commands are reachable, and both need an address like every other command. */
+  for (const command of ["admin", "unadmin"]) {
+    check(`${command} is a command the CLI accepts`,
+      new RegExp(`"${command}"`).test(src.match(/if \(!\[[^\]]+\]\.includes\(command\)/)[0]));
+  }
+  check("the usage names them", src.includes("pro-admin.mjs admin") && src.includes("unadmin"));
 }
 
 /* ------------------------------------------------------------------ the result */

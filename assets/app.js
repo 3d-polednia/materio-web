@@ -39,6 +39,8 @@ const T = (key) => (typeof t === "function" ? t(key) : key);
 
 const state = {
   uid: null, user: null, projects: [], rooms: [], unsub: [],
+  /** The initialized Firebase app. The admin panel needs it to reach the callable. */
+  fbApp: null,
   /** users/{uid} as last read. `plan` in it is what decides LICZMAT vs LICZMAT PRO. */
   profile: null,
   level: LM_LEVEL.GUEST,
@@ -134,6 +136,7 @@ async function boot() {
   fb = { ...authMod, ...storeMod };
 
   const app = appMod.initializeApp(FIREBASE_CONFIG);
+  state.fbApp = app;
   auth = authMod.getAuth(app);
   db = storeMod.getFirestore(app);
 
@@ -372,6 +375,11 @@ async function onSignedIn(user) {
   listen("projects", (rows) => { state.projects = rows; renderProjects(); });
   listen("rooms", (rows) => { state.rooms = rows; renderRooms(); renderProjects(); });
   renderLocalSummary();
+
+  // Last, and never awaited: an account with the admin claim gets a sixth tab, and the
+  // file that draws it is fetched only for that account. Everybody else's /app/ never
+  // asks for it. See maybeMountAdmin().
+  maybeMountAdmin(user);
 }
 
 function onSignedOut() {
@@ -385,6 +393,7 @@ function onSignedOut() {
   state.rooms = [];
   $("app-auth").hidden = false;
   $("app-workspace").hidden = true;
+  unmountAdmin();
   showAuthView("signin");
 }
 
@@ -758,17 +767,27 @@ function stopListening() {
 /* ------------------------------------------------------------------ tabs */
 
 /**
- * Five tabs, driven by the mouse and by the keyboard.
+ * The tabs, driven by the mouse and by the keyboard.
  *
  * `role="tablist"` promises arrow-key navigation and one stop in the tab order for the
  * whole strip; a screen reader announces it either way, so the promise has to be kept.
  * Only the selected tab is reachable with Tab, and the arrows move between them.
+ *
+ * Five of them are in the markup and a sixth can arrive later: assets/admin.js appends an
+ * "Admin" tab for an account whose token carries the claim, long after this ran. So the
+ * strip is wired **once, by delegation**, and the list of tabs is read at the moment a key
+ * or a click happens rather than captured here — a snapshot taken at boot would leave the
+ * new tab clickable and dead to the arrow keys, which is exactly the kind of half-working
+ * control `role="tablist"` promises not to be.
  */
 function wireTabs() {
-  const tabs = Array.from(document.querySelectorAll(".app-tab"));
+  const strip = document.querySelector(".app-tabs");
+  if (!strip) return;
+  const tabs = () => Array.from(strip.querySelectorAll(".app-tab"));
 
   const select = (btn, focus) => {
-    tabs.forEach((b) => {
+    if (!btn) return;
+    tabs().forEach((b) => {
       const on = b === btn;
       b.setAttribute("aria-selected", String(on));
       b.tabIndex = on ? 0 : -1;
@@ -782,17 +801,83 @@ function wireTabs() {
     if (btn.dataset.tab === "pro") renderPlan();
   };
 
-  tabs.forEach((btn, index) => {
-    btn.addEventListener("click", () => select(btn));
-    btn.addEventListener("keydown", (e) => {
-      const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-      if (step) select(tabs[(index + step + tabs.length) % tabs.length], true);
-      else if (e.key === "Home") select(tabs[0], true);
-      else if (e.key === "End") select(tabs[tabs.length - 1], true);
-      else return;
-      e.preventDefault();
-    });
+  strip.addEventListener("click", (e) => {
+    const btn = e.target.closest(".app-tab");
+    if (btn) select(btn);
   });
+
+  strip.addEventListener("keydown", (e) => {
+    const btn = e.target.closest(".app-tab");
+    if (!btn) return;
+    const all = tabs();
+    const index = all.indexOf(btn);
+    const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+    if (step) select(all[(index + step + all.length) % all.length], true);
+    else if (e.key === "Home") select(all[0], true);
+    else if (e.key === "End") select(all[all.length - 1], true);
+    else return;
+    e.preventDefault();
+  });
+}
+
+/* ------------------------------------------------------------------ the admin panel */
+
+/**
+ * The claim that opens the admin panel — session 49.
+ *
+ * Three copies of this word: here, `ADMIN_CLAIM` in functions/admin-map.mjs (which is what
+ * actually decides) and `ADMIN_CLAIM` in scripts/pro-admin.mjs (which is what writes it).
+ * scripts/test-admin-map.mjs §1 reads all three and compares them; a divergence here is a
+ * panel that never appears for anybody.
+ */
+const ADMIN_CLAIM = "admin";
+
+/**
+ * Fetch and mount the admin panel, for the one account that has the claim.
+ *
+ * The token is read fresh (`getIdTokenResult(true)`) rather than out of the cached one: a
+ * claim granted by `scripts/pro-admin.mjs` while the account was signed in is not in the
+ * token this browser is holding, and waiting for that token to expire is up to an hour of
+ * "the panel is not there" for something that did work.
+ *
+ * Nothing about this is a lock. The panel shows for whoever the token says, and every
+ * button in it goes to a function that checks the same claim on the server side, where the
+ * signature is verified. Editing this value in a debugger buys a form that answers
+ * `permission-denied`.
+ */
+/**
+ * Take the admin panel back out on sign-out.
+ *
+ * Signing in as somebody else in the same tab does not reload the page, so a tab left
+ * standing would offer the next account a panel their token does not open — a form that
+ * answers `permission-denied` to every click, and a claim about them that is not true.
+ * Removing it also means `mountAdmin()` runs cleanly for the next admin who signs in.
+ */
+function unmountAdmin() {
+  const tab = document.getElementById("tab-admin");
+  const panel = document.getElementById("panel-admin");
+  const wasOpen = Boolean(tab) && tab.getAttribute("aria-selected") === "true";
+  if (tab) tab.remove();
+  if (panel) panel.remove();
+  // Removing the selected tab would leave the strip with no selection and every panel
+  // hidden, so the next sign-in would show a workspace with nothing in it. The click goes
+  // through the strip's own handler, which is the only thing that knows how to select.
+  if (wasOpen) {
+    const first = document.querySelector(".app-tabs .app-tab");
+    if (first) first.click();
+  }
+}
+
+async function maybeMountAdmin(user) {
+  try {
+    const token = await user.getIdTokenResult(true);
+    if (!token || !token.claims || token.claims[ADMIN_CLAIM] !== true) return;
+    const mod = await import("./admin.js");
+    await mod.mountAdmin({ app: state.fbApp });
+  } catch (e) {
+    // No claim, no network, or the module failed to load: /app/ is unaffected. The panel
+    // is a tool for one person and must never be able to break the page for everybody.
+  }
 }
 
 /* ------------------------------------------------------------------ projects & rooms */

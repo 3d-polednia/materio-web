@@ -102,6 +102,8 @@ node scripts/test-plan.mjs        # the Free/Pro model: permissions, gating, pla
 node scripts/test-pay.mjs         # the subscription: prices, the checkout URL, the Stripe hosts
 node scripts/test-pro-admin.mjs   # granting Pro by hand: the three fields, the mask, the key
 node scripts/test-webhook-map.mjs # the Stripe webhook: the signature, the status, the write
+node scripts/test-admin-map.mjs   # the admin panel: the claim, the request, the write
+node scripts/test-admin-page.mjs  # the same panel clicked in Chromium (needs Playwright)
 node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadline, the links
 node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
 node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
@@ -144,6 +146,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
 | `assets/workspace-calc.js` — the room bar and the save box on a calculator page | |
 | `assets/plan.js` — the Free/Pro model and the permission table | |
+| `assets/admin.js` — the admin panel on `/app/`, fetched only for an account with the claim | |
 | `assets/crm.js` — the clients, jobs and quotes of LiczMat Pro, plus `crm-ui.js`, `jobs-ui.js`, `quotes-ui.js` and `crm-chain.js` | |
 | `assets/recent.js`, `assets/dashboard.js` | |
 | `src/*.mjs` — information architecture, site map, templates, page bodies, formulas, the calculators' SEO copy | |
@@ -529,10 +532,21 @@ functions/stripe-map.mjs  The whole decision half of the Stripe webhook, and it 
                       without deploying and without a Stripe account. It holds the second
                       copy of the two plan words and the three field names; §1 of that test
                       is the only thing binding it to assets/plan.js and scripts/pro-admin.mjs
-functions/index.js    The thin half: verify, decide, write. Reads one secret
-                      (STRIPE_WEBHOOK_SECRET, in Secret Manager), calls Stripe never, and
-                      writes `plan`/`planValidUntil`/`planRenews` on users/{uid} with
-                      `{ merge: true }` plus one mapping document in `stripeCustomers`
+functions/index.js    The thin half of BOTH functions: verify, decide, write. The Stripe
+                      webhook reads one secret (STRIPE_WEBHOOK_SECRET, in Secret Manager),
+                      calls Stripe never, and writes `plan`/`planValidUntil`/`planRenews`
+                      on users/{uid} with `{ merge: true }` plus one mapping document in
+                      `stripeCustomers`. `adminPlan` (session 49) is the same three fields
+                      written by hand from the browser: an `onCall`, so Firebase verifies
+                      the token before the code runs, and every write goes to the log with
+                      the uid that ordered it
+functions/admin-map.mjs  The decision half of the admin panel, and the only file in
+                      functions/ that imports another (stripe-map.mjs, for the plan words —
+                      a third copy of the contract inside one deployed directory would be
+                      one copy too many). Who may ask (`admin: true`, compared with `===`),
+                      what may be asked (four commands, every malformed request refused by
+                      code rather than by sentence) and what gets written. Checked by
+                      scripts/test-admin-map.mjs with plain `node`
 scripts/test-webhook-map.mjs  The webhook, checked without the cloud: the signature (real,
                       forged, stale, replayed, rotated), the period end read from both
                       places Stripe keeps it, every subscription status, the cancellation
@@ -550,6 +564,10 @@ scripts/pro-admin.mjs  Granting and taking away LiczMat Pro, by e-mail (session 
                       a PATCH whose updateMask names those three and nothing else. Without
                       the mask the same call erases createdAt and lastSeenAt.
                       Dependency-free. `list`, `status`, `grant <e-mail> [months]`, `revoke`
+                      — plus `admin`/`unadmin` since session 49, which write the custom
+                      claim that opens the browser panel. That pair is the ONE thing that
+                      has to stay in a terminal: the panel opens on a claim, and a claim
+                      can only be written by something with administrator rights
 scripts/test-pro-admin.mjs  The same tool, checked without a key: the contract (the two
                       plan words and the three fields, against assets/account.js and
                       assets/plan.js), the typed Firestore values, the mask, the revoke
@@ -558,8 +576,30 @@ scripts/test-pro-admin.mjs  The same tool, checked without a key: the contract (
                       verified against its public key — a key from another project, and
                       what the script may never do: write in the repo, or send a PATCH
                       anywhere but the masked address
-scripts/fake-firebase.mjs  Firebase, as much of it as /app/ actually touches: the three
-                      modules assets/app.js imports, served in Chromium instead of the CDN.
+scripts/test-admin-map.mjs  The admin panel without the cloud (session 49): the claim,
+                      written in three files that have to agree to the character; every
+                      value that merely looks like `true`; the order inside the function —
+                      the claim is checked before the request is read and long before an
+                      address is looked up; four commands and every malformed request;
+                      the months, compared answer-for-answer against scripts/pro-admin.mjs,
+                      because functions/ cannot import scripts/; the grant that never
+                      renews and the revoke that deletes two fields; the plan a panel shows,
+                      including the expired one that must not read as free; and the
+                      boundaries — the browser addresses no document, /app/ ships no admin
+                      markup, and functions/ is dropped from the published site
+scripts/test-admin-page.mjs  The same panel clicked in Chromium with Firebase stubbed: a
+                      plain account gets five tabs and never downloads assets/admin.js, an
+                      admin account gets six and downloads it once; the tab reached by mouse
+                      and by ArrowLeft/ArrowRight/End, which is what session 49's rewiring
+                      of the strip is for; what each button SENDS and what the panel DRAWS
+                      out of the answer; the confirm on the one destructive button, and that
+                      a dismissed one sends nothing; every refusal as a Polish sentence; the
+                      sign-out that takes the panel away so the next account does not inherit
+                      it; the widths of chapter XXVIII; and the language switched with the
+                      panel open — the page moves, the tool stays Polish
+scripts/fake-firebase.mjs  Firebase, as much of it as /app/ actually touches: the four
+                      modules assets/app.js and assets/admin.js import, served in Chromium
+                      instead of the CDN.
                       Shared by test-account-page.mjs and test-qa.mjs — two copies of a
                       stub that has to match a real SDK is two copies free to disagree.
                       Since session 37 it also has listeners on a single document and
@@ -739,6 +779,11 @@ docs/COPY.md          Stop slop: what the site is allowed to say and how much of
                       em dash, and keyword density). Narrative half of
                       scripts/test-copy.mjs, the way docs/DESIGN_SYSTEM.md is the
                       narrative half of src/tokens.mjs
+docs/ADMIN.md         The admin panel, for the owner: the two one-off steps that make it
+                      appear (deploy the functions, grant yourself the claim), what the
+                      four buttons do, what the panel deliberately cannot do — create an
+                      account, take money, keep a log in the database — and what to do when
+                      the tab does not show up. Written in Polish, like the panel itself
 docs/STRIPE.md        Switching the sale on: the six steps that are console work rather
                       than code — two products with the fourteen amounts, the Payment
                       Links, the secret, the deploy, the webhook's four events, one real
@@ -911,9 +956,10 @@ Kotlin side of it. Change one, change all three.
 - **A plan is granted by the owner, by hand, and by nothing else yet.** `users/{uid}.plan`
   is `"free"` or `"premium"` (the contract's word, older than the rebranding — do not
   rename it) and it is server-only: no Play Billing, and the deployed rules let a browser
-  write nothing in the profile but `lastSeenAt` and `appVersion`. There **is** a Cloud
-  Function that can write it — `functions/`, session 38 — but it is not deployed, so today
-  it grants nobody anything. (FIRESTORE_SYNC §9.2 in the app repo still says "brak Cloud
+  write nothing in the profile but `lastSeenAt` and `appVersion`. There **are** two Cloud
+  Functions that can write it — the Stripe webhook (session 38) and `adminPlan` behind the
+  browser panel (session 49) — but `functions/` is not deployed, so today neither of them
+  grants anybody anything. (FIRESTORE_SYNC §9.2 in the app repo still says "brak Cloud
   Functions"; that sentence predates session 38.) What changed in session 37 of the repair plan is that
   `scripts/pro-admin.mjs` can write it with a service-account key —
   `grant <e-mail> [months]` and `revoke <e-mail>` — so LICZMAT PRO is reachable for the
@@ -1330,7 +1376,29 @@ Kotlin side of it. Change one, change all three.
   middle of chapter XXIV's path, but its route is GUEST and it loads nothing from the CRM.
   A strip there would carry Pro data onto a guest page, so the link runs one way: from the
   strip into the project, never back.
-- **`/app/` has five tabs, and rooms are not one of them.** Chapter XVIII makes a room an
+- **The admin panel is a sixth tab that most accounts never see, and never download.**
+  Session 49 finished what session 37 started: a plan is granted by e-mail from the browser,
+  with no terminal and no service-account key on a disk. `assets/admin.js` draws the tab and
+  the panel; `assets/app.js` fetches that file only when the signed-in account's ID token
+  carries `admin: true`, so `/app/` — the heaviest page on the site — pays a dynamic
+  `import()` and nothing else. The panel is **Polish only** and is the one screen here that
+  is: its twenty labels would otherwise ride in the dictionary bundle every page on the site
+  downloads, in ten languages, for one reader. `scripts/pro-admin.mjs` prints Polish for the
+  same reason and stays as the rescue path when the function or Firebase is down.
+  The write is `adminPlan` in `functions/index.js` — the three plan fields, `{ merge: true }`,
+  a line in Cloud Logging naming who ordered it, and **no audit collection**, because the
+  fact already lives on the profile document. Nothing in the browser is a boundary: the tab
+  showing is a convenience, and `isAdmin(request.auth.token)` on the server is the only
+  check that means anything. The claim itself can only be written by
+  `scripts/pro-admin.mjs admin <e-mail>` — once per person, in a terminal, because a panel
+  that could grant itself the claim would not be closed. Clicking: `docs/ADMIN.md`.
+- **The tab strip is wired by delegation, and that is what makes a sixth tab possible.**
+  `wireTabs()` used to capture `.app-tab` in an array at boot, so a tab appended later was
+  clickable and invisible to the arrow keys — half of what `role="tablist"` promises. It now
+  listens on `.app-tabs` and reads the tabs at the moment of the click or the keypress.
+  Signing out removes the admin tab and, when it was the open one, selects the first: the
+  next person to sign in in that tab must not inherit a panel their token does not open.
+- **`/app/` has five tabs in its markup, and rooms are not one of them.** Chapter XVIII makes a room an
   element of a project, so `renderProjects()` draws each project's rooms inside its row
   with an add form of its own, and the rooms nobody assigned get one list at the bottom —
   that is every room made on the phone, because `SyncContract.roomToDoc()` has no

@@ -6,6 +6,8 @@
  *     LM_SA_KEY=…                          node scripts/pro-admin.mjs status ktos@example.com
  *     LM_SA_KEY=…                          node scripts/pro-admin.mjs grant  ktos@example.com 12
  *     LM_SA_KEY=…                          node scripts/pro-admin.mjs revoke ktos@example.com
+ *     LM_SA_KEY=…                          node scripts/pro-admin.mjs admin  ktos@example.com
+ *     LM_SA_KEY=…                          node scripts/pro-admin.mjs unadmin ktos@example.com
  *
  * Plan naprawczy, sesja 37. `users/{uid}.plan` jest polem serwerowym: wdrożone reguły
  * pozwalają przeglądarce zapisać w profilu wyłącznie `lastSeenAt` i `appVersion`, więc
@@ -27,6 +29,22 @@
  * jej nie odnowi, gdy minie `planValidUntil`, a `lmPlanStatus()` w assets/plan.js sam
  * wtedy zgasi Pro i strona powie, dlaczego. Wpisanie `true` byłoby obietnicą odnowienia,
  * której nikt nie dotrzyma.
+ *
+ * ─── `admin` I `unadmin`: JEDYNA RZECZ, KTÓRA MUSI ZOSTAĆ W TERMINALU ───────
+ * Sesja 49 przeniosła codzienne nadawanie planu do przeglądarki — panel na `/app/`, który
+ * woła funkcję `adminPlan` w chmurze. Funkcja przepuszcza tylko konto z uprawnieniem
+ * `admin: true` w tokenie, a takie uprawnienie może zapisać wyłącznie coś z prawami
+ * administratora, czyli to. Stąd podział: **uprawnienie nadaje się stąd raz**, a plany
+ * nadaje się potem klikaniem.
+ *
+ * Uprawnienie idzie w `customAttributes` konta w Firebase Auth, więc jedzie w podpisanym
+ * tokenie i funkcja sprawdza je bez odczytu z bazy. To pole jest zapisywane **w całości**,
+ * a nie łatane — dlatego `admin` wpisuje dokładnie `{"admin":true}`, a `unadmin` wpisuje
+ * puste `{}`. Gdyby kiedyś doszedł drugi claim, obie te funkcje trzeba zmienić razem.
+ *
+ * Token po zmianie żyje jeszcze do godziny. Panel pojawia się po wylogowaniu i zalogowaniu
+ * albo po odświeżeniu tokenu — `assets/admin.js` prosi o świeży przy każdym wejściu na
+ * `/app/`, więc w praktyce wystarczy przeładować stronę.
  *
  * ─── KLUCZ ──────────────────────────────────────────────────────────────────
  * Ścieżka do klucza konta serwisowego w `LM_SA_KEY` (albo `--key <ścieżka>`). Klucz
@@ -65,6 +83,35 @@ export const PLAN_FIELDS = ["plan", "planValidUntil", "planRenews"];
 
 /** Najdłuższy plan, jaki wolno nadać ręcznie. Dziesięć lat to już pomyłka, nie hojność. */
 export const MAX_MONTHS = 120;
+
+/**
+ * Nazwa uprawnienia, którego szuka `adminPlan` w functions/index.js.
+ *
+ * Trzecia kopia jednego słowa (tutaj, w functions/admin-map.mjs i w assets/admin.js) i tak
+ * samo jak przy polach planu wiąże je test: scripts/test-admin-map.mjs §1 czyta wszystkie
+ * trzy pliki i porównuje. Rozjazd tutaj to panel, który się nigdy nie pokazuje.
+ */
+export const ADMIN_CLAIM = "admin";
+
+/**
+ * Wartość pola `customAttributes` przy koncie: całe, nie łatane.
+ *
+ * Firebase Auth trzyma custom claims jako **jeden napis JSON** i zapis podmienia go w
+ * całości. Nie ma zapisu „dopisz jedno pole", więc odebranie uprawnienia to wpisanie
+ * pustego obiektu, a nie skasowanie klucza.
+ */
+export const adminAttributes = (on) => (on ? JSON.stringify({ [ADMIN_CLAIM]: true }) : "{}");
+
+/** Czy przy tym koncie stoi uprawnienie administratora. Nic poza dosłownym `true`. */
+export function isAdminAttributes(raw) {
+  if (typeof raw !== "string" || !raw) return false;
+  try {
+    const claims = JSON.parse(raw);
+    return Boolean(claims) && typeof claims === "object" && claims[ADMIN_CLAIM] === true;
+  } catch (e) {
+    return false;
+  }
+}
 
 /* ------------------------------------------------------------------ pure helpers */
 
@@ -238,7 +285,10 @@ async function accountByEmail(token, projectId, email) {
   });
   if (!r.ok) throw new Error(`Firebase Auth odmówił (${r.status}): ${JSON.stringify(r.data)}`);
   const user = (r.data.users || [])[0];
-  return user ? { uid: user.localId, email: user.email, createdAt: Number(user.createdAt) || null } : null;
+  return user ? {
+    uid: user.localId, email: user.email, createdAt: Number(user.createdAt) || null,
+    admin: isAdminAttributes(user.customAttributes),
+  } : null;
 }
 
 /** Wszystkie konta, stronami po 500 — tyle, ile oddaje to API za jednym razem. */
@@ -251,7 +301,10 @@ async function allAccounts(token, projectId) {
     const r = await api(token, url, { method: "GET" });
     if (!r.ok) throw new Error(`Firebase Auth odmówił (${r.status}): ${JSON.stringify(r.data)}`);
     for (const u of r.data.users || []) {
-      out.push({ uid: u.localId, email: u.email || "(bez adresu)", createdAt: Number(u.createdAt) || null });
+      out.push({
+        uid: u.localId, email: u.email || "(bez adresu)", createdAt: Number(u.createdAt) || null,
+        admin: isAdminAttributes(u.customAttributes),
+      });
     }
     pageToken = r.data.nextPageToken || "";
   } while (pageToken);
@@ -263,6 +316,21 @@ async function readProfile(token, projectId, uid) {
   const r = await api(token, docUrl(projectId, uid), { method: "GET" });
   if (r.status === 404) return null;
   if (!r.ok) throw new Error(`Firestore odmówił (${r.status}): ${JSON.stringify(r.data)}`);
+  return r.data;
+}
+
+/**
+ * Zapis uprawnienia administratora przy koncie.
+ *
+ * Osobne API i osobne pole: to nie jest plan i nie mieszka w Firestore. `accounts:update`
+ * podmienia `customAttributes` w całości — patrz `adminAttributes()`.
+ */
+async function writeClaim(token, projectId, uid, on) {
+  const r = await api(token, IDENTITY(projectId, "update"), {
+    method: "POST",
+    body: JSON.stringify({ localId: uid, customAttributes: adminAttributes(on) }),
+  });
+  if (!r.ok) throw new Error(`Firebase Auth odmówił zapisu (${r.status}): ${JSON.stringify(r.data)}`);
   return r.data;
 }
 
@@ -284,8 +352,13 @@ const USAGE = `LiczMat — plan Pro po adresie e-mail
   node scripts/pro-admin.mjs grant  <e-mail> [miesiące, domyślnie 12]
   node scripts/pro-admin.mjs revoke <e-mail>
 
+  node scripts/pro-admin.mjs admin   <e-mail>    uprawnienie do panelu w przeglądarce
+  node scripts/pro-admin.mjs unadmin <e-mail>    i jego odebranie
+
 Klucz konta serwisowego: LM_SA_KEY=<ścieżka> albo --key <ścieżka>.
-Zapisywane są wyłącznie pola plan, planValidUntil i planRenews.`;
+Z planu zapisywane są wyłącznie pola plan, planValidUntil i planRenews.
+Uprawnienie administratora nie jest planem: mieszka przy koncie w Firebase Auth
+(customAttributes) i otwiera panel na /app/ — patrz docs/ADMIN.md.`;
 
 /** `projectId`, z którym rozmawia strona. Klucz z innego projektu to pomyłka, nie opcja. */
 export function siteProjectId(source) {
@@ -336,7 +409,7 @@ async function main(argv) {
 
   const [command, email, monthsRaw] = args;
   if (!command || command === "--help" || command === "-h") { console.log(USAGE); return 0; }
-  if (!["list", "status", "grant", "revoke"].includes(command)) {
+  if (!["list", "status", "grant", "revoke", "admin", "unadmin"].includes(command)) {
     console.error(`Nieznane polecenie "${command}".\n\n${USAGE}`);
     return 2;
   }
@@ -356,7 +429,8 @@ async function main(argv) {
     console.log(`${"e-mail".padEnd(width)}  ${"uid".padEnd(28)}  plan`);
     for (const acc of accounts) {
       const plan = planFromDoc(await readProfile(token, projectId, acc.uid));
-      console.log(`${acc.email.padEnd(width)}  ${acc.uid.padEnd(28)}  ${planText(plan)}`);
+      const mark = acc.admin ? "  [admin]" : "";
+      console.log(`${acc.email.padEnd(width)}  ${acc.uid.padEnd(28)}  ${planText(plan)}${mark}`);
     }
     console.log(`\n${accountsText(accounts.length)} w projekcie ${projectId}.`);
     return 0;
@@ -371,6 +445,17 @@ async function main(argv) {
   if (command === "status") {
     const plan = planFromDoc(await readProfile(token, projectId, account.uid));
     console.log(`${account.email}\n  uid   ${account.uid}\n  plan  ${planText(plan)}`);
+    console.log(`  panel ${account.admin ? "tak — to konto ma panel administratora" : "nie"}`);
+    return 0;
+  }
+
+  if (command === "admin" || command === "unadmin") {
+    const on = command === "admin";
+    await writeClaim(token, projectId, account.uid, on);
+    console.log(on
+      ? `${account.email} ma teraz panel administratora na /app/.`
+      : `${account.email} traci panel administratora.`);
+    console.log("Token żyje jeszcze do godziny — na otwartej stronie zmiana widać po przeładowaniu.");
     return 0;
   }
 
