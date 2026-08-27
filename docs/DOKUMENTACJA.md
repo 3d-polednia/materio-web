@@ -8,8 +8,17 @@ sklepów, SEO oraz zarządzanie assetami.
   dostępu, branding, kolejność 36 sesji. Oryginał właściciela, źródło prawdy o zakresie.
   Status prac i otwarte decyzje: [`MASTER_PLAN.md`](MASTER_PLAN.md).
 - **Repozytorium:** `3d-polednia/materio-web`
-- **Adres docelowy:** `https://materio-app.com/`
+- **Adres docelowy:** `https://liczmat.com/` (od 2026-08-14; `materio-app.com` jest
+  wyłączona i odpowiada „Site not found")
 - **Aplikacja:** `pl.materio.app` (Google Play), Android 7.0+ (API 24)
+
+> **Czego ten plik NIE opisuje.** Powstał, gdy serwis był jedną stroną, i opisuje jego
+> szkielet: build, wdrożenie, języki, kalkulatory, SEO, assety. Modułów, które doszły
+> później — projekty, pomieszczenia, koszty, LiczMat Pro (klienci, zlecenia, wyceny,
+> terminarz), paywall i płatności — nie ma tutaj i nie ma po co ich tu dopisywać:
+> opisuje je `CLAUDE.md`, decyzję za decyzją, i to jest plik do czytania przed pracą.
+> Sprawdzone i poprawione w Sesji 48 (2026-08-27) — jeśli coś tu przeczytasz, powinno
+> być prawdą; jeśli nie jest, to jest defekt, nie „stary tekst".
 
 ---
 
@@ -38,7 +47,8 @@ sklepów, SEO oraz zarządzanie assetami.
 - **Statyczna strona, ale generowana.** W przeglądarce dalej czysty HTML/CSS/JS —
   bez frameworka, bundlera i zależności runtime. Strony powstają jednak z jednego
   szablonu: `node scripts/build.mjs` (Node bez `package.json` i bez `node_modules`)
-  zapisuje 135 plików `.html`. Wynik jest commitowany, bo GitHub Pages serwuje
+  zapisuje 373 pliki `.html` — plus `privacy-policy.html` i `404.html`, które są pisane
+  ręcznie, czyli 375 stron w repo. Wynik jest commitowany, bo GitHub Pages serwuje
   katalog repo bez własnego budowania. Pliki, które widzisz w repo, to pliki, które
   trafiają na serwer — część z nich pisze generator, nie człowiek.
 - **Prawda ponad marketing.** Aplikacja w wydaniu produkcyjnym zawiera reklamy
@@ -54,88 +64,119 @@ sklepów, SEO oraz zarządzanie assetami.
   `localStorage['materio_consent']`. Pozostałe wyjątki, tylko na żądanie
   użytkownika w sekcji „Sklepy": embed Google Maps oraz zapytanie do
   OpenStreetMap/Overpass.
-- **Treść indeksowalna w każdym z 4 języków.** Każdy język ma własny adres
+- **Treść indeksowalna w każdym z 10 języków.** Każdy język ma własny adres
   (`/kalkulatory/farby-tynki-grunty/`, `/en/calculators/paint-plaster-primer/`),
   a tekst jest zwykłym HTML-em wygenerowanym ze słownika. Przełącznik języka
   **nawiguje** do odpowiednika, zamiast podmieniać tekst — dopiero to sprawia, że
-  pozostałe trzy języki w ogóle da się zaindeksować. Strona ma sens bez JS.
+  pozostałych dziewięć języków w ogóle da się zaindeksować. Strona ma sens bez JS.
+  Wyjątkiem są trzy strony bez własnego adresu per język — `/app/`, `/app/dashboard/`
+  i `/p/` — które tłumaczą się w miejscu i są `noindex`.
 
 ## 2. Struktura plików
 
-Pliki pisane ręcznie:
+Pełny opis każdego pliku — po co istnieje i jaka decyzja za nim stoi — jest w `CLAUDE.md`.
+Tu jest sam spis.
+
+Pliki **pisane ręcznie**:
 
 ```
 scripts/build.mjs        Generator stron; `--check` waliduje bez zapisu
-src/site.mjs             Mapa serwisu: języki, slugi sekcji/kalkulatorów/poradników
+scripts/check-contrast.mjs  Kontrast tokenów w obu motywach (WCAG AA), poza buildem
+scripts/pro-admin.mjs    Nadawanie i odbieranie LiczMat Pro po adresie e-mail
+scripts/fake-firebase.mjs   SDK Firebase podstawiany testom w Chromium
+scripts/test-*.mjs       43 zestawy testów (patrz „Testy" w CLAUDE.md)
+src/ia.mjs               Architektura informacji: każda trasa, jej poziom dostępu,
+                         rodzic, miejsce w nawigacji. Build przerywa, jeśli napisał
+                         inne strony, niż deklaruje ten plik; sitemap.xml wynika z niego
+src/site.mjs             BASE (adres serwisu), języki, slugi sekcji/kalkulatorów/poradników
 src/template.mjs         Wspólny <head>, nagłówek, stopka, baner zgody, okruszki
 src/pages.mjs            Zawartość <main> każdego typu strony
+src/app-pages.mjs        /app/, /app/dashboard/ i /p/ (noindex)
+src/pro.mjs              Strona buildowa LiczMat Pro: lista modułów, blok paywalla
 src/calc-meta.mjs        Wzory „Jak to liczymy" + ich tłumaczenia
-src/tokens.mjs           Kontrola systemu projektowego (validateTokens) — czyta styles.css
-                         (plik autorski, nie wysyłany do przeglądarki)
-scripts/check-contrast.mjs  Pomiar kontrastu tokenów w obu motywach (WCAG AA)
-src/app-pages.mjs        /app/ i /p/ (noindex)
-src/ia.mjs               Architektura informacji: trasy, poziomy dostępu, ACCOUNT_LEVELS
-scripts/test-calculators.mjs  Testy silników (czysta logika, bez zależności)
-scripts/test-pages.mjs        Testy stron kalkulatorów w Chromium (Playwright spoza repo)
-scripts/test-account.mjs      Testy konta: poziomy, sesja, ?next=, słownik (bez zależności)
-scripts/test-account-page.mjs Testy /app/ w Chromium z podstawionym SDK Firebase
-scripts/test-mobile.mjs       Cały serwis na telefonie: szerokości rozdziału XXVIII,
-                              cele dotykowe, pola, tabele, klawiatura numeryczna,
-                              przełączniki języka/waluty/motywu (Sesja 32)
-scripts/test-a11y.mjs         Dostępność w znacznikach: nazwy kontrolek, konspekt
-                              nagłówków, punkty orientacyjne, cel linku pomijającego,
-                              unikalność id, regiony live, przycisk stopu karuzeli
-                              (Sesja 34, bez zależności)
-scripts/test-a11y-page.mjs    To samo z klawiatury w Chromium: focus, Escape, drzewo
-                              dostępności przeglądarki, oba motywy (Sesja 34)
-scripts/test-security.mjs     Bezpieczeństwo: poziomy dostępu, `?next=`, token /p/,
-                              stempel konta w przeglądarce, adresy Firestore, tabela
-                              uprawnień, znaczniki wszystkich stron, ucieczka danych
-                              (Sesja 35, bez zależności)
-privacy-policy.html      Polityka prywatności (PL + EN) — osobna podstrona (wymóg Google Play)
+src/calc-seo.mjs         Tytuł, opis i dwa pytania FAQ każdego kalkulatora, 10 języków
+src/flags.mjs            Nazwy języków przy flagach (czyta LANGS z assets/i18n.js)
+src/currency.mjs         Waluty po stronie builda
+src/tokens.mjs           validateTokens(): system projektowy sprawdzany w buildzie
+functions/               Cloud Function: webhook Stripe nadający plan. Wdrażana osobno
+                         (`firebase deploy --only functions`), NIGDY nie trafia na Pages;
+                         `firebase.json` i `.firebaserc` w korzeniu to jej konfiguracja
+privacy-policy.html      Polityka prywatności (PL + EN) — wymóg Google Play
 404.html                 Strona błędu 404; przekierowuje też /p/<token> na /p/?t=<token>
 site.webmanifest         Manifest PWA (nazwa, ikony, kolory)
 robots.txt               Reguły dla robotów + odnośnik do sitemap
+CNAME                    Domena własna (liczmat.com)
 .nojekyll                Wyłącza przetwarzanie Jekyll na GitHub Pages
 assets/
-  styles.css             System projektowy: tokeny + wszystkie komponenty (DESIGN_SYSTEM.md).
+  styles.css             System projektowy: tokeny + komponenty (DESIGN_SYSTEM.md).
                          To plik do edycji; strony linkują styles.min.css
-  styles.min.css         Generowany z powyższego: te same reguły, bez komentarzy (Sesja 33)
-  i18n.js                Słownik 4 języków (LANGS, I18N) — wejście builda
-  i18n-pages.js          Słownik podstron, te same 4 języki — wejście builda
-  i18n.<lang>.js         Generowany słownik jednego języka. Strona pobiera dokładnie jeden;
-                         /app/, /app/dashboard/ i /p/ dobierają drugi przy zmianie języka
-  flags.js               Generowane dziesięć flag — tylko dla trzech stron, które budują
-                         własny przełącznik języka
-  i18n-runtime.js        t(), przełącznik języka, tłumaczenie w miejscu dla /app/ i /p/,
-                         ensureLang() — dociąganie słownika innego języka
-  units.js               Odmiana liczebnika i podstawianie |tokenów| — wspólne dla
-                         kalkulatorów, projektów, kosztorysu i pulpitu
+  i18n.js                Słownik 10 języków (LANGS, I18N) — wejście builda
+  i18n-pages.js          Słownik podstron, te same 10 języków — wejście builda
+  i18n-materials.js      Nazwy i terminy materiałowe, te same 10 języków
+  i18n-runtime.js        t(), przełącznik języka, tłumaczenie w miejscu, ensureLang()
+  units.js               Odmiana liczebnika i podstawianie |tokenów|
   calculators.js         Silniki liczące + podpięcie formularzy (wireCalculator)
-  stores.js              Wyszukiwarka sklepów (buildStoreFinder): mapa + lista OSM
-  main.js                Wiązanie strony (pomieszczenia, menu mobilne, karuzela, zgoda)
-  account.js             Sesja i poziomy dostępu — ładowana na każdej stronie
+  materials.js           Katalog 161 materiałów (port z core/catalog/*.kt)
+  materials-ui.js        Okno „wybierz materiał" + filtr na /materialy/
+  calc-hub.js            Szukajka i filtr kategorii na /kalkulatory/
+  workspace.js           Projekty, pomieszczenia, kalkulacje, materiały, koszty
+  workspace-calc.js      Warsztat na stronie kalkulatora (pasek pokoju, zapis wyniku)
+  workspace-ui.js        Ekrany /projekty/ i /kosztorys/
+  crm-store.js           Sklep LiczMat Pro: klucz, zapis, odczyt, eksport/import
+  crm.js                 Klienci, zlecenia, wyceny, terminarz
+  crm-chain.js           Ścieżka klient → zlecenie → projekt → wycena → historia
+  crm-ui.js              /klienci/
+  jobs-ui.js             /zlecenia/
+  quotes-ui.js           /wyceny/
+  schedule-ui.js         /terminarz/
+  plan.js                Model Free/Pro: poziomy, uprawnienia, status planu
+  paywall.js             Paywall narysowany (decyduje plan.js)
+  pay.js                 Subskrypcja: dwa plany, 14 cen, adresy Stripe
+  account.js             Sesja i trzy poziomy dostępu — ładowana na każdej stronie
   app.js                 /app/ — Firebase Auth + synchronizacja Firestore
+  dashboard.js           /app/dashboard/ — pulpit, celowo bez Firebase
+  recent.js              Ostatnio używane kalkulatory (tylko to urządzenie)
   share.js               /p/<token> — udostępniona wycena, tylko do odczytu
-  firebase-config.js     Konfiguracja Firebase Web (placeholdery do uzupełnienia)
-  icon-192.png,          Ikona z Google Play w kilku rozmiarach (nagłówek, PWA, favicon)
-  icon-512.png,
-  apple-touch-icon.png,
-  favicon-32.png
-  og-image.jpg           Podgląd społecznościowy 1200×630 (z banera Google Play)
-  banner.jpg             Baner promocyjny (grafika z Google Play)
+  currency.js            Waluta, niezależna od języka
+  stores.js              Wyszukiwarka sklepów (mapa + lista z OpenStreetMap)
+  main.js                Wiązanie strony (menu, karuzela, baner zgody)
+  firebase-config.js     Konfiguracja Firebase Web — wartości produkcyjne, nie placeholdery
+  flags/<lang>.svg       Flagi przy nazwach języków (nigdy emoji)
+  icon-192.png · icon-512.png · apple-touch-icon.png · favicon-32.png
+  og-image.jpg           Podgląd społecznościowy 1200×630
+  banner.jpg             Baner promocyjny
 .github/workflows/
-  pages.yml              Automatyczne wdrożenie na GitHub Pages
+  pages.yml              Wdrożenie na GitHub Pages (tylko z gałęzi main)
 docs/
   DOKUMENTACJA.md        Ten plik
-  DESIGN_SYSTEM.md       System projektowy: tokeny, komponenty, stany, motywy
+  MASTER_PLAN.txt        Plan produktu — oryginał właściciela, źródło prawdy o zakresie
+  MASTER_PLAN.md         Status prac, otwarte decyzje, lista rzeczy do zrobienia w konsolach
   ARCHITEKTURA.md        Architektura informacji: strony, routing, poziomy dostępu
+  DESIGN_SYSTEM.md       System projektowy: tokeny, komponenty, stany, motywy
+  COPY.md                Zasady copy („stop slop") i ich uzasadnienie
+  STRIPE.md              Włączenie sprzedaży: sześć kroków w konsoli Stripe
 ```
 
-Kolejność ładowania skryptów na `index.html` (na końcu `<body>`):
-`i18n.js` → `calculators.js` → `stores.js` → `main.js`. `main.js` wywołuje funkcje
-budujące tylko wtedy, gdy dana sekcja istnieje na stronie (wszystko jest
-„zabezpieczone", więc bezpiecznie pominąć dowolny skrypt).
+Pliki **generowane** (`node scripts/build.mjs`, nie edytuj ręcznie):
+
+```
+index.html · <lang>/index.html            Strona główna, 10 języków
+kalkulatory/ · kalkulatory/<materiał>/    Hub + 150 stron kalkulatorów
+poradniki/ · sklepy/ · materialy/ · cookies/ · aplikacja/
+projekty/ · kosztorys/                    Warsztat (poziom GOŚĆ)
+klienci/ · zlecenia/ · wyceny/ · terminarz/   LiczMat Pro
+liczmat-pro/                              Publiczna strona LiczMat Pro
+<lang>/…                                  To samo w pozostałych 9 językach
+app/index.html · app/dashboard/index.html · p/index.html   noindex
+assets/i18n.<lang>.js · assets/flags.js · assets/styles.min.css
+sitemap.xml
+```
+
+Kolejność ładowania skryptów jest decyzją strony, nie konwencją: `assets/units.js` idzie
+przed `assets/calculators.js`, `assets/crm-store.js` przed `assets/crm.js`,
+`assets/workspace-calc.js` przed `assets/workspace-ui.js`, a `assets/account.js` przed
+`assets/plan.js`. Build wypisuje dla każdej strony dokładnie te skrypty, których ta strona
+używa — `node scripts/test-perf.mjs` przerywa, jeśli któryś stanie na niej dwa razy.
 
 ## 3. Uruchomienie lokalnie
 
@@ -148,7 +189,8 @@ python3 -m http.server 8080
 # → http://localhost:8080
 ```
 
-Sama strona (poza listą sklepów) działa też po zwykłym otwarciu `index.html`.
+Otwarcie `index.html` z dysku (`file://`) **nie** wystarczy: strony linkują się
+adresami bezwzględnymi (`/kalkulatory/…`), więc bez serwera nawigacja nie działa.
 
 ## 4. Wdrożenie na GitHub Pages
 
@@ -161,91 +203,122 @@ pushu pakuje katalog główny repo i publikuje go na Pages.
 2. W „Build and deployment" ustaw **Source: GitHub Actions**.
 3. Zrób dowolny push (albo w Actions uruchom workflow ręcznie — „Run workflow").
 
-Po tym strona jest pod `https://materio-app.com/`.
+Po tym strona jest pod `https://liczmat.com/`.
 
 > **Dlaczego trzeba kliknąć ręcznie?** Token GitHub Actions w tym repo nie ma
 > uprawnień, by samodzielnie *włączyć* Pages (zwraca „Resource not accessible by
 > integration"). Po jednorazowym włączeniu źródła na „GitHub Actions" kolejne
 > wdrożenia idą już automatycznie.
 
-Workflow reaguje na push do gałęzi `main` oraz
-`claude/cavemem-global-install-7z2q8u` (patrz `on: push: branches:` w `pages.yml`)
-— jeśli pracujesz na innej gałęzi, dopisz ją tam.
+Workflow reaguje **wyłącznie** na push do `main` (plus ręczne `workflow_dispatch`).
+Praca w tym repo i tak idzie na `main` — patrz „Repo policy" w `CLAUDE.md`.
+
+**Co NIE trafia na serwer.** Krok „Drop internal files from the published site" kasuje
+z artefaktu `docs/`, `src/`, `scripts/`, `functions/`, `firebase.json`, `.firebaserc`,
+`CLAUDE.md`, `README.md`, `.claude` i `.gitignore`. Korzeń repo jest korzeniem serwisu,
+więc wszystko, czego ten krok nie skasuje, jest publiczne. Dodając katalog, który ma
+zostać prywatny, dopisz go tam.
 
 ## 5. Własna domena i zmiana adresu bazowego
 
-**Stan aktualny:** stroną steruje własna domena **`materio-app.com`** — jej
-adres bazowy jest wpisany na sztywno w kilku miejscach (canonical, Open Graph,
-sitemap, dane strukturalne), a w korzeniu repo leży plik `CNAME`.
+**Stan aktualny:** serwisem steruje własna domena **`liczmat.com`** (od 2026-08-14).
+Poprzednia, `materio-app.com`, została **świadomie wyłączona** — jeden serwis GitHub
+Pages obsługuje jedną domenę własną i właściciel nie chciał przekierowania, więc stary
+host odpowiada dziś „Site not found".
 
-Poniższa instrukcja zostaje na wypadek **kolejnej** zmiany domeny — wtedy trzeba
-podmienić adres bazowy wszędzie.
+**Adres bazowy jest w jednym miejscu:** stała `BASE` w `src/site.mjs`. Z niej biorą się
+`canonical`, `hreflang`, `og:url`, dane strukturalne i `sitemap.xml` — build je wypisuje,
+nie człowiek. Wcześniejsza wersja tego rozdziału mówiła, że adres jest „wpisany na sztywno
+w kilku miejscach"; to było prawdą przed wprowadzeniem builda i przestało nią być.
 
-**Kroki dla nowej domeny (przykład `https://materio.pl`):**
+**Kroki dla kolejnej domeny (przykład `https://materio.pl`):**
 
-1. Dodaj plik `CNAME` w katalogu głównym repo z samą domeną:
+1. Plik `CNAME` w korzeniu repo z samą domeną:
    ```
    materio.pl
    ```
-2. Skonfiguruj DNS domeny zgodnie z instrukcją GitHub Pages (rekordy A/ALIAS lub
-   CNAME na `3d-polednia.github.io`).
-3. Podmień adres bazowy w plikach:
-   - `index.html` — `<link rel="canonical">`, `og:url`, `twitter:*`, `og:image`,
-     oraz trzy bloki `application/ld+json` (`url`, `image`, `logo`, `downloadUrl`
-     zostaje bez zmian bo to link do Play).
-   - `privacy-policy.html` — `canonical`, `og:url`, `og:image`.
-   - `sitemap.xml` — oba `<loc>`.
-   - `robots.txt` — linia `Sitemap:`.
+2. DNS zgodnie z instrukcją GitHub Pages. GitHub wystawi certyfikat dopiero, gdy
+   **wszystkie** rekordy A i AAAA wierzchołka wskazują na Pages — jeden obcy AAAA
+   blokuje HTTPS i to właśnie zatrzymało migrację na `liczmat.com`.
+3. `BASE` w `src/site.mjs` → `https://materio.pl`.
+4. `robots.txt` — linia `Sitemap:` (plik jest pisany ręcznie).
+5. `privacy-policy.html` — `canonical`, `og:url`, `og:image` (plik jest pisany ręcznie).
+6. Podbij `STAMP` w `scripts/build.mjs`, uruchom `node scripts/build.mjs` i zacommituj
+   wynik. Podbij też ręcznie `?v=` w `privacy-policy.html` i `404.html`.
+7. Poza repo, i bez tego logowanie przestanie działać z nowego hosta: **Firebase Auth →
+   Authorized domains** i **Google Cloud → Credentials → klucz przeglądarkowy → Website
+   restrictions**. Obie listy są opisane w `docs/MASTER_PLAN.md`; przy edycji
+   **zachować wszystkie dotychczasowe wpisy**.
+8. Bliźniak polityki prywatności w repo aplikacji (`docs/privacy-policy.html`) oraz
+   adres polityki wklejony w Google Play mówią o domenie wprost — poprawić oba.
 
-   Szybko można to zrobić globalnym find-and-replace:
-   `https://3d-polednia.github.io/materio-web` → `https://materio.pl`
-   (uwaga: nowa domena w korzeniu nie ma podkatalogu `/materio-web`).
-
-> Ścieżki do assetów są **względne** (`assets/...`), więc nie trzeba ich ruszać —
-> działają zarówno w podkatalogu, jak i w korzeniu domeny.
+> Ścieżki do assetów są **względne** (`assets/...`), więc nie trzeba ich ruszać.
 
 ## 6. Treści i tłumaczenia (i18n)
 
 ### Jak to działa
 
-- Każdy element do tłumaczenia ma atrybut `data-i18n="klucz"` (albo
-  `data-i18n-ph` dla `placeholder`).
-- W HTML wpisana jest **polska** treść domyślna (dla SEO i braku „mignięcia").
-- `assets/i18n.js` zawiera `LANGS` (lista języków) i `I18N` (słownik `kod → {klucz: tekst}`).
-- Po załadowaniu `main.js` wykrywa język (`initialLang()` — z `localStorage` lub
-  języka przeglądarki) i wywołuje `applyLang()`, które podmienia teksty wszystkich
-  elementów z `data-i18n`. Brakujący klucz spada do angielskiego, potem polskiego,
-  a na końcu pokazuje sam klucz (nigdy pusto).
+- **Strony powstają ze słownika w czasie builda.** `assets/i18n.js` trzyma `LANGS`
+  (lista języków) i `I18N` (słownik `kod → {klucz: tekst}`); `scripts/build.mjs` czyta
+  go tą samą sztuczką (`new Function`), co przeglądarka, i wypisuje gotowy HTML w każdym
+  języku. Polski HTML nie może się więc rozjechać ze słownikiem — jest z niego zrobiony.
+- **Przeglądarka pobiera dokładnie jeden słownik** — `assets/i18n.<lang>.js`,
+  wygenerowany. `assets/i18n.all.js` (dziesięć języków w jednym pliku, 703 kB) został
+  skasowany w Sesji 33.
+- **Trzy strony tłumaczą się w miejscu:** `/app/`, `/app/dashboard/` i `/p/`. Nie mają
+  adresu per język, więc build renderuje je w `DEFAULT_LANG`, a `ensureLang()`
+  w `assets/i18n-runtime.js` dociąga drugi słownik, gdy odwiedzający wybierze inny język.
+  Wszystko, co na nich rysuje JavaScript, **musi** się przerysować na zdarzeniu
+  `langchange` — inaczej lista wyrenderowana raz zostaje w starym języku.
+- **Brakujący klucz** spada do angielskiego, potem do polskiego, a na końcu pokazuje sam
+  klucz (nigdy pusto). W buildzie brak klucza w jakimkolwiek języku **przerywa** build.
 
 ### Edycja istniejącego tekstu
 
-- Tekst z `data-i18n` zmieniaj **w `assets/i18n.js`** (dla wszystkich języków) —
-  wartość z HTML i tak zostanie nadpisana przy starcie.
-- Tekst **bez** `data-i18n` (np. sekcje „Jak to działa", „FAQ", „Sklepy") jest
-  tylko po polsku — edytuj bezpośrednio w `index.html`.
+Zmieniaj tekst **w słowniku**, nie w HTML-u: `assets/i18n.js` (strona główna i wspólne
+elementy), `assets/i18n-pages.js` (podstrony), `assets/i18n-materials.js` (nazwy i terminy
+materiałowe). Copy SEO kalkulatorów — tytuł, opis i FAQ — jest osobno, w `src/calc-seo.mjs`,
+i **celowo nie jest słownikiem**: każda strona serwisu pobiera `assets/i18n.<lang>.js`,
+a tego tekstu nie potrzebuje żadna z nich. Potem `node scripts/build.mjs` i zacommituj
+wynik. **Nigdy nie edytuj wygenerowanego `.html`** — kolejny build to nadpisze.
+
+Ile tekstu wolno napisać i czego nie wolno w nim napisać, mówi `docs/COPY.md`; pilnuje
+tego `node scripts/test-copy.mjs`.
 
 ### Języki
 
-Obsługiwane: `pl, uk, de, en` — zestaw z rozdziału V Master Planu. Sześć języków
-(`cs, sk, ro, hr, sr, ru`) zostało usuniętych 12.08.2026; ich katalogi kasuje
-`clean()` w buildzie, a `404.html` przekierowuje stare adresy na stronę główną.
-Lista `RETIRED_LANGS` w `src/site.mjs` trzyma ich kody.
+Obsługiwane, zawsze wszystkie dziesięć: `pl, uk, de, en, cs, sk, ro, hr, sr, ru`.
 
-Dodanie języka wymaga decyzji właściciela (plan mówi: wyłącznie te cztery). Gdyby
-kiedyś doszedł kolejny, potrzebne są cztery rzeczy:
+Sześć z nich (`cs, sk, ro, hr, sr, ru`) zostało usuniętych 12.08.2026 i **przywrócone po
+Sesji 28** na prośbę właściciela. Ich slugi odzyskano z gita (`ab1fb26`), a nie wymyślono
+na nowo, więc wszystkie adresy działające przed usunięciem działają dalej. `RETIRED_LANGS`
+w `src/site.mjs` jest dziś **pustą listą** i przekierowania w `404.html` już nie ma.
+Rozdział V Master Planu wciąż wymienia cztery języki — ta zmiana należy do właściciela.
 
-1. Kod w `LANGS` w `src/site.mjs` oraz wpis `{ code, label }` w `assets/i18n.js`.
+Nazwa języka jest zapisana **w jednym miejscu**: `LANGS` w `assets/i18n.js`. `LANG_NAME`
+w `src/flags.mjs` tę listę czyta. Kiedyś była tam przepisana drugi raz i wymieniała cztery
+języki, przez co 370 stron pisało słowo `undefined` obok sześciu flag (naprawione
+w Sesji 41, pilnuje `node scripts/test-langs.mjs`). Nazwa jest nazwą **języka**, nigdy kraju.
+
+Dodanie języka wymaga decyzji właściciela. Gdyby doszedł kolejny, potrzebne są cztery rzeczy:
+
+1. Wpis `{ code, label }` w `LANGS` w `assets/i18n.js`.
 2. Slugi sekcji, kalkulatorów i poradników w `src/site.mjs` (slug jest na zawsze).
-3. Blok tłumaczeń w `assets/i18n.js`, `i18n-pages.js`, `i18n-materials.js`
-   i `src/calc-meta.mjs` — build przerywa i wypisuje brakujące klucze.
+3. Blok tłumaczeń w `assets/i18n.js`, `i18n-pages.js`, `i18n-materials.js`,
+   `src/calc-meta.mjs` i `src/calc-seo.mjs` — build przerywa i wypisuje brakujące klucze.
 4. Flaga jako `assets/flags/<kod>.svg` (nigdy emoji — rozdział V planu).
 
 ### Waluty
 
-`assets/currency.js`: `PLN, EUR, USD, UAH`. Waluta jest **niezależna od języka**
-(rozdział VI planu) — Deutsch + PLN to poprawne ustawienie. Wybór trzymany jest w
-`localStorage` pod kluczem `liczmat-currency`; bez wyboru obowiązuje domyślna dla
-języka (pl→PLN, uk→UAH, de→EUR, en→USD).
+`assets/currency.js`: `PLN, EUR, USD, UAH, CZK, RON, RSD`. Trzy ostatnie doszły w Sesji 28,
+żeby subskrypcję dało się wycenić tam, gdzie jest sprzedawana; **RUB celowo nie ma, bo
+Stripe nie działa w Rosji**. Rozdział VI planu wymienia cztery waluty — ta zmiana też
+należy do właściciela.
+
+Waluta jest **niezależna od języka** (rozdział VI) — Deutsch + PLN to poprawne ustawienie.
+Dziesięć języków dzieli siedem walut. Wybór trzymany jest w `localStorage` pod kluczem
+`liczmat-currency`; bez wyboru obowiązuje domyślna dla języka (pl→PLN, uk→UAH, de→EUR,
+en→USD, cs→CZK, sk→EUR, ro→RON, hr→EUR, sr→RSD, ru→EUR).
 
 Nic nie jest przeliczane po kursie — offline'owy kalkulator nie ma skąd wziąć kursu,
 a zmyślony kurs fałszowałby kosztorys. Zmiana waluty zmienia tylko to, w czym czytamy
@@ -258,20 +331,27 @@ zmianie waluty stara wycena nadal mówi prawdę; gdy pozycje mają różne walut
 
 - Kod: `assets/calculators.js`. Silniki są przeniesione 1:1 z aplikacji
   (`core/calculation/**`), liczą **wyłącznie w przeglądarce** — nic nie idzie na
-  serwer.
-- `buildCalculators()` renderuje karty do `#calc-grid`; zakładki (`.calc-tab`)
-  przełącza `buildTabs()` w `main.js`.
+  serwer. `CALCS` opisuje deklaratywnie pola, presety i wzór każdego z 15 kalkulatorów.
+- **Każdy kalkulator ma własną stronę w każdym języku** — 150 stron. `calcCard()`
+  w `src/pages.mjs` renderuje formularz w czasie builda, a `wireCalculator()`
+  w `assets/calculators.js` podpina go w przeglądarce. Hub `/kalkulatory/` też jest
+  wygenerowany w całości; `assets/calc-hub.js` tylko zawęża to, co już na nim stoi.
 - **Rozkrój 2D** (`ENGINES.sheet` + `tryPlaceGuillotine`) to port
   `GuillotinePackingEngine.kt`: wolne prostokąty, cięcie gilotynowe, dopasowanie
   best-area-fit, rzaz piły i obrót elementów o 90°. Strona liczy tę samą liczbę
   arkuszy co aplikacja.
-- Kalkulator pomieszczeń to osobny, prostszy blok obsługiwany przez
-  `buildRoomHelper()` (pola L×W×H → podłoga/ściany/obwód/kubatura).
-- Formatowanie liczb i walut zależy od aktywnego języka (`Intl.NumberFormat`,
-  mapa `CURRENCY`).
+- **Presety materiałowe** biorą się z `assets/materials.js` — 161 pozycji, port
+  `core/catalog/*.kt`. Okno wyboru materiału rysuje `assets/materials-ui.js`.
+- **Pasek pokoju i zapis wyniku do projektu** to `assets/workspace-calc.js`: wypełnienie
+  formularza z pomieszczenia, które ktoś zmierzył, i zapisanie wyniku w projekcie.
+- Formatowanie liczb i walut zależy od aktywnego języka (`Intl.NumberFormat`), a odmiana
+  liczebnika przy jednostce od `assets/units.js` — trzy rodziny reguł, bo „22 položky"
+  to zły czeski na to, co po polsku brzmi „22 pozycje".
 
-Dodanie nowego kalkulatora wymaga edycji `calculators.js` (definicja pól + wzór +
-render) — to najbardziej „aplikacyjna" część strony.
+Dodanie nowego kalkulatora dotyka `assets/calculators.js` (pola + wzór), `src/site.mjs`
+(slug w dziesięciu językach), `src/calc-meta.mjs` (wzór do „Jak to liczymy"),
+`src/calc-seo.mjs` (tytuł, opis, dwa pytania FAQ — w dziesięciu językach) i `src/ia.mjs`.
+Build przerywa, jeśli czegoś brakuje.
 
 ## 7a. Testy kalkulatorów
 
@@ -373,7 +453,7 @@ zniknie, a strona mówi „serwer odrzucił żądanie, Twoje dane są nietknięt
 ### Testy
 
 ```bash
-node scripts/test-account.mjs        # poziomy, sesja, ?next=, cztery języki
+node scripts/test-account.mjs        # poziomy, sesja, ?next=, dziesięć języków
 LM_PLAYWRIGHT=/tmp/lm-test/node_modules/playwright \
   node scripts/test-account-page.mjs # /app/ w Chromium, SDK Firebase podstawiony
 ```
@@ -466,10 +546,19 @@ liczy prawdziwy silnik** na wartościach domyślnych formularza, w trakcie build
 więc liczba na stronie nie może rozjechać się z kodem. Wzory żyją w
 `src/calc-meta.mjs`; zmieniając silnik w `assets/calculators.js`, popraw wzór obok.
 
-## 9a. Konto i synchronizacja (/app/, /p/)
+## 9a. Konto i synchronizacja (/app/, /app/dashboard/, /p/)
 
 - `/app/` — logowanie e-mailem (Firebase Auth), lista projektów i pomieszczeń,
-  tworzenie i usuwanie (tombstone), przycisk „Udostępnij".
+  tworzenie i usuwanie (tombstone), przycisk „Udostępnij", zakładka planu.
+  **Przycisk logowania Google jest ukryty od 2026-08-14** (decyzja właściciela): jeden
+  przełącznik `GOOGLE_SIGN_IN` w `src/app-pages.mjs`, drugi `GOOGLE_SIGN_IN_ENABLED`
+  w `AccountViewModel.kt` w repo aplikacji, oba `false`. Provider w Firebase pozostał
+  włączony, więc konta założone przez Google dalej istnieją i dalej są ich właścicieli.
+- `/app/dashboard/` — pulpit darmowego konta. **Nie ładuje Firebase w ogóle**: wszystko,
+  co pokazuje, leży już w `localStorage`.
+- Synchronizacja obejmuje dwa magazyny: warsztat (`materio-workspace-v1`) i magazyn
+  LiczMat Pro (`liczmat-crm-v1`). Osobne klucze zostają osobne — dwa pliki piszące do
+  jednego klucza to jeden wyścig od zgubionego zapisu.
 - `/p/<token>` — kopia wyceny tylko do odczytu, bez logowania. GitHub Pages nie ma
   przepisywania adresów, więc `404.html` przekierowuje na `/p/?t=<token>`. Token **jest**
   poświadczeniem, więc od Sesji 35 ta jedna strona nie ładuje analityki (GA4 raportuje
@@ -483,12 +572,16 @@ więc liczba na stronie nie może rozjechać się z kodem. Wzory żyją w
   Przycisk na zakładce ustawień czyści cztery magazyny danych tej przeglądarki
   (warsztat, otwarty projekt, historia kalkulatorów, magazyn Pro) i zostawia ustawienia.
 - Schemat dokumentów jest **wspólny z aplikacją Androida** — kontrakt opisuje
-  `docs/FIRESTORE_SYNC.md` w repo `3d-polednia/LiczMat`, a po stronie Kotlina
-  `core/sync/SyncContract.kt`. Zmiana w jednym miejscu wymaga zmiany we wszystkich.
-- `assets/firebase-config.js` ma **dwa placeholdery** (`apiKey`, `appId`) do
-  uzupełnienia z konsoli Firebase (Project settings → Web app → Config). Do tego
-  czasu `/app/` pokazuje komunikat o braku konfiguracji zamiast zepsutego formularza.
-  Klucz Web API Firebase **nie jest sekretem** — dane chronią reguły bezpieczeństwa
+  `docs/FIRESTORE_SYNC.md` w repo `3d-polednia/Materio` (repozytorium nazywa się nadal
+  Materio, mimo rebrandingu), a po stronie Kotlina `core/sync/SyncContract.kt`. Zmiana
+  w jednym miejscu wymaga zmiany we wszystkich. Od Sesji 46 kontrakt ma osiem kolekcji:
+  doszli klienci, zlecenia i wyceny. **Reguły dla tych trzech czekają na wdrożenie** —
+  patrz „Do zrobienia w konsolach" w `docs/MASTER_PLAN.md`.
+- `assets/firebase-config.js` trzyma **wartości produkcyjne** projektu `materio-502513`
+  (wpisane 2026-08-07), a nie placeholdery. Stała `FIREBASE_READY` nadal pilnuje
+  przypadku placeholderowego, więc fork albo niedokończona edycja kończą się czytelnym
+  komunikatem zamiast martwym formularzem. Klucz Web API Firebase **nie jest sekretem** —
+  nie da się go ukryć w aplikacji przeglądarkowej; dane chronią reguły bezpieczeństwa
   i lista autoryzowanych domen.
 
 Sprawdzenie po wdrożeniu: [Google Rich Results Test](https://search.google.com/test/rich-results),
@@ -542,16 +635,44 @@ przy udostępnianiu linku w social media.
 
 ## 12. Polityka prywatności
 
-- Plik: `privacy-policy.html` (osobna podstrona — **wymóg Google Play**, który
-  oczekuje publicznego URL polityki). Dwie wersje: **PL** (`#pl`) i **EN** (`#en`).
-- Treść jest **zgodna z rzeczywistością aplikacji**: offline-first, dane lokalnie na
-  urządzeniu, reklamy Google AdMob + zgoda UMP (RODO), Google Maps/Places +
-  lokalizacja, a dla strony — embed Google Maps i zapytanie do OpenStreetMap/Overpass
-  w sekcji „Sklepy".
-- **Do uzupełnienia przez właściciela:** administrator danych i e-mail kontaktowy.
-  Obecnie ustawione na `polednia@gmail.com` — podmień na adres firmowy, jeśli
-  wolisz (szukaj `polednia@gmail.com` w pliku). URL polityki podaj też w Google
-  Play Console.
+**Kanoniczna jest `privacy-policy.html` w korzeniu tego repo**, pod
+`https://liczmat.com/privacy-policy.html`. Plik pisany ręcznie (build go nie generuje),
+dwie wersje w jednym dokumencie: **PL** (`#pl`) i **EN** (`#en`). Osobna podstrona, bo
+Google Play wymaga publicznego URL polityki.
+
+Treść ma się zgadzać z tym, co produkt naprawdę robi: liczenie offline na urządzeniu,
+reklamy Google AdMob + zgoda UMP w aplikacji, Google Maps/Places i lokalizacja, na stronie
+GA4 z Consent Mode v2 i zapytanie do OpenStreetMap/Overpass w sekcji „Sklepy", **opcjonalne
+konto** z synchronizacją Firestore, **link udostępnienia** `/p/<token>` czytelny dla
+każdego, kto go ma, oraz **§7.1 o Stripe** — kto przetwarza dane płatnicze i co do nas
+wraca (status planu, data ważności, czy się odnowi).
+
+### Są trzy kopie tej polityki
+
+Stan zmierzony 2026-08-27 (adres w Play odczytany z żywej strony sklepu):
+
+| Kopia | Gdzie | Stan |
+|---|---|---|
+| Kanoniczna | `privacy-policy.html`, `https://liczmat.com/privacy-policy.html` | Aktualna (8.08.2026 + §7.1 o Stripe) |
+| Bliźniak w repo aplikacji | `docs/privacy-policy.html` w `3d-polednia/Materio` | Doprowadzony do zgodności w Sesji 48 i **generowany** z kanonicznej |
+| Trzecia, osierocona | `https://3d-polednia.github.io/Materio-polityka-prywatno-ci/` — osobne repozytorium | **Nieaktualna: 16.07.2026.** Marka „Materio", zero słowa o koncie, synchronizacji, linku udostępnienia i Stripe |
+
+**Google Play wskazuje na kanoniczną** — sklep podaje dziś
+`https://liczmat.com/privacy-policy.html`, więc użytkownik sklepu czyta aktualny tekst.
+`docs/GOOGLE_PLAY_DEPLOYMENT.md` w repo aplikacji twierdził inaczej (wpisywał adres
+`github.io` i stawiał przy nim „GOTOWE ✅"); poprawione w Sesji 48.
+
+Trzecia kopia nadal stoi pod publicznym adresem i nadal mówi nieprawdę o produkcie.
+Nikt jej już nie linkuje z produktu, ale nic jej też nie kasuje. Repozytorium
+`Materio-polityka-prywatno-ci` nie jest podpięte do żadnej z tych sesji, więc jest to
+pozycja z listy „Do zrobienia w konsolach" w `docs/MASTER_PLAN.md`.
+
+**Zmieniając cokolwiek w tym, co produkt zbiera, poprawiaj kanoniczną i bliźniaka w tej
+samej sesji.** Trzy kopie jednego tekstu to trzy teksty, które się rozjeżdżają — a ten
+akurat jest oświadczeniem prawnym.
+
+**Administrator danych i kontakt** to dziś `polednia@gmail.com` (szukaj w pliku). Podmiana
+na adres firmowy jest decyzją właściciela.
 
 ## 13. Częste zadania utrzymaniowe (przepisy)
 
@@ -573,7 +694,7 @@ nagłówek, sekcja „Twoje prawa", „Kontakt", w PL i EN).
 stoi na `/aplikacja/`). Nigdy w wygenerowanym `.html` — build to nadpisze.
 
 **Aktualizacja tekstu FAQ:**
-Klucze `faq_q*` / `faq_a*` w `assets/i18n.js`, we wszystkich czterech językach;
+Klucze `faq_q*` / `faq_a*` w `assets/i18n.js`, we wszystkich dziesięciu językach;
 które pytania trafiają na stronę główną, mówi `FAQ_KEYS` w `src/pages.mjs`. Widoczny
 blok `<details>` i JSON-LD `FAQPage` powstają z tej samej listy.
 

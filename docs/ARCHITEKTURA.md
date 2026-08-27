@@ -214,9 +214,11 @@ estetyczny — drugi wariant wymagałby przejścia przez `404.html` na każdym w
 kod odpowiedzi HTTP i historię przeglądarki. Strony z prywatnymi danymi i tak są `noindex`,
 więc ładniejszy adres nic by nie kupił.
 
-**`404.html` pełni trzy role naraz** i to jest jedyne miejsce, gdzie wolno je łączyć:
-strona błędu, most `/p/<token>`, oraz przekierowanie sześciu wycofanych języków
-(`RETIRED_LANGS`) na stronę główną.
+**`404.html` pełni dwie role naraz** i to jest jedyne miejsce, gdzie wolno je łączyć:
+strona błędu i most `/p/<token>` → `/p/?t=<token>`. Trzecia rola — przekierowanie sześciu
+wycofanych języków na stronę główną — **zniknęła**, gdy te sześć języków wróciło po
+Sesji 28: `RETIRED_LANGS` w `src/site.mjs` jest dziś pustą listą, a przekierowania
+w `404.html` nie ma.
 
 ---
 
@@ -365,18 +367,25 @@ Status czyta się z architektury, więc w dniu, w którym Sesja 29 zbudowała `/
 trzecie drzwi same stały się linkiem: w `src/pages.mjs` nie zmieniło się nic.
 
 `validateIA()` pilnuje, żeby drzwi zostały trzy, w kolejności poziomów i na istniejących
-trasach, a `scripts/build.mjs` — żeby każde miały komplet tekstów we wszystkich czterech
+trasach, a `scripts/build.mjs` — żeby każde miały komplet tekstów we wszystkich dziesięciu
 językach (bez tego `t()` wypisałby na stronie głównej sam klucz).
+
+**Nagłówek niesie pięć linków i pięć ich trzyma.** `validateIA()` przerywa build przy
+szóstym, bo wiersz nagłówka nie jest z gumy: najszerszy jest rosyjski i to on ustawił próg
+1061 px, poniżej którego menu zwija się w szufladę. Piątką są dziś **Kalkulatory,
+Materiały, Projekty, LiczMat Pro i Aplikacja**.
+
+**LiczMat Pro weszło do nagłówka w Sesji 40** (decyzja właściciela, plan naprawczy), na
+miejsce, które ustąpiły **Poradniki**. Poradniki nigdzie się nie podziały: trasa jest
+dalej `LIVE`, indeksowana, w `sitemap.xml` i w stopce. Podmiana była pomiarem, nie
+przemianowaniem — ten sam test (`scripts/test-pages.mjs`, dziesięć języków,
+1061/1100/1160/1280 px, dla gościa i dla zalogowanego) przeszedł ponownie, a wiersz
+zrobił się o 10 px **węższy**, bo „Руководства" jest dłuższe niż „LiczMat Pro".
 
 **Czego w nawigacji nadal brakuje** wobec docelowej architektury:
 
-- **LiczMat Pro** ma wejście na stronie głównej (drzwi wyżej) i w stopce, ale nie ma go
-  w menu — pasek mieści pięć linków i pięć ich trzyma. Szósty wymaga pomiaru
-  (`scripts/test-pages.mjs`, dziesięć języków, 900–1280 px) albo wyrzucenia jednego
-  z obecnych, i jedno i drugie jest decyzją właściciela, nie sesji, która budowała stronę;
 - menu jest płaską listą i nie pokazuje, że `Kosztorys` należy do `Projektów`;
-- „Konto” jest przyciskiem po prawej i nic nie mówi o stanie zalogowania — pulpit
-  zalogowanego to Sesja 14.
+- „Konto” jest przyciskiem po prawej; stan zalogowania niesie tylko kropka na nim.
 
 ### 5.2. Centrum kalkulatorów — pięć kategorii
 
@@ -1824,7 +1833,8 @@ wyłącznie webowy:
 - **przekierowanie ze starego adresu**, bo `/app/` jest w obiegu: linkuje do niego
   `docs/FIRESTORE_SYNC.md` w repo aplikacji, a `404.html` obsługuje obok niego `/p/<token>`;
 - lista **autoryzowanych domen** Firebase się nie zmienia — są w niej hosty
-  (`materio-app.com`), nie ścieżki. Wcześniejsza wersja tego akapitu twierdziła inaczej.
+  (dziś `liczmat.com` i `www.liczmat.com`), nie ścieżki. Wcześniejsza wersja tego
+  akapitu twierdziła inaczej.
 
 **Potrzebna decyzja właściciela.** Sama zmiana to jedna krótka sesja.
 

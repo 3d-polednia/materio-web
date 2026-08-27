@@ -86,7 +86,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 45 | Stop slop: cs/sk/ro/hr/sr/ru | **Zrobione** — 2026-08-26 |
 | 46 | Klienci, zlecenia i wyceny na telefon (repo aplikacji) | **Zrobione** — 2026-08-26. Reguły czekają na wdrożenie: konsola, po planie (lista niżej) |
 | 47 | Błąd zaokrąglenia w silnikach Androida (repo aplikacji) | **Zrobione** — 2026-08-27, commit `b231bab`. Czeka na wydanie AAB (właściciel) |
-| 48 | Prawda w dokumentacji i lista rzeczy w konsolach | Do zrobienia |
+| 48 | Prawda w dokumentacji i lista rzeczy w konsolach | **Zrobione** — 2026-08-27 |
 | 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | Do zrobienia |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
@@ -103,20 +103,48 @@ pilnuje**, w nagłówku ustępują **Poradniki**, Stripe idzie przez **Blaze + w
 którą wdraża właściciel**, a konta Stripe **jeszcze nie ma**.
 
 
-## Do zrobienia w konsolach — po całym planie (decyzja właściciela, 2026-08-26)
+## Do zrobienia w konsolach — lista sprawdzona w Sesji 48 (2026-08-27)
 
-Rzeczy, których nie da się zrobić z tego repozytorium: wymagają konsoli Google, Firebase
-albo Play, albo hasła, którego żadna sesja nie ma prawa czytać. **Właściciel zdecydował, że
-robi je w jednej turze po zamknięciu planu**, zamiast przerywać sesje po drodze. Ta lista
-jest tym, co ta tura ma objąć; Sesja 48 ją domyka i sprawdza.
+Rzeczy, których nie da się zrobić z tych repozytoriów: wymagają konsoli Google, Firebase,
+Play albo Stripe'a, albo hasła, którego żadna sesja nie ma prawa czytać. **Właściciel
+zdecydował 2026-08-26, że robi je w jednej turze po zamknięciu planu**, zamiast przerywać
+sesje po drodze.
 
-| # | Co | Gdzie | Skutek, dopóki nie zrobione |
-|---|---|---|---|
-| 1 | `firebase deploy --only firestore` | konsola / CLI, repo `Materio` | **Klienci, zlecenia i wyceny nie jadą na telefon.** Reguły są w repo od Sesji 46 i nie są wdrożone. |
-| 2 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. |
-| 3 | Keystore i hasła w historii gita | repo `Materio`, Play App Signing | `materio-upload.jks` i `materio-keystore-creds.txt` są śledzone przez gita. `.gitignore` ma `*.jks`, ale nie działa wstecz. |
-| 4 | Konto serwisowe do Play (jeśli wydania mają być automatyczne) | Play Console → Użytkownicy i uprawnienia | Upload AAB jest ręczny. Klucz z punktu 2 jest z Google Cloud i do Play nie sięga. |
-| 5 | `%APP_NAME%` w mailach Firebase | Firebase → Project settings → Project name | Mail resetu hasła mówi „Materio" — nazwa wycofana 2026-08-12. |
+**Sesja 48 tę listę sprawdziła punkt po punkcie i dopisała cztery pozycje, których na niej
+nie było.** Kolumna „Jak sprawdzone" mówi, czy to jest pomiar z tej sesji, czy tylko stan
+repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada kont w produkcji,
+żeby coś udowodnić.
+
+### Otwarte
+
+| # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
+|---|---|---|---|---|
+| 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia i wyceny nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
+| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma trzy niewydane commity (Sesje 46 i 47) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
+| 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
+| 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
+| 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |
+| 6 | Trzecia kopia polityki prywatności | repo `3d-polednia/Materio-polityka-prywatno-ci` | Zmierzone: `https://3d-polednia.github.io/Materio-polityka-prywatno-ci/` odpowiada **200**, tekst z **16.07.2026**, marka „Materio", zero słowa o koncie, synchronizacji, `/p/<token>` i Stripe | Publicznie stoi nieaktualne oświadczenie o prywatności. **Play już na nie nie wskazuje** (patrz „Sprawdzone i zamknięte"), więc to sprzątanie, nie pożar. Skasować albo zastąpić przekierowaniem na `https://liczmat.com/privacy-policy.html` |
+| 7 | Konto serwisowe do Play (jeśli wydania mają być automatyczne) | Play Console → Użytkownicy i uprawnienia | Stan z Sesji 46, niesprawdzalny stąd | Upload AAB jest ręczny. Klucz z punktu 4 jest z Google Cloud i do Play nie sięga |
+| 8 | Google Search Console dla `liczmat.com` | Search Console | Niesprawdzalne stąd | Nowa domena bez własności i bez zgłoszonej sitemapy. `https://liczmat.com/sitemap.xml` działa i ma 371 adresów (zmierzone) |
+| 9 | Stripe: sześć kroków włączenia sprzedaży | Stripe + Firebase | Stan repo: `assets/pay.js` ma czternaście cen i **puste** trzy adresy | Subskrypcji nie da się kupić. Repozytorium jest gotowe od Sesji 39; klikanie opisuje `docs/STRIPE.md`. Kolejność w nocie ORDER w `assets/pay.js` jest sztywna: **najpierw działający webhook i jedna prawdziwa płatność, dopiero potem adresy** |
+| 10 | Skamielina `web/` w repo `Materio` | repo `Materio` | **Zmierzone:** siedem plików, jeden commit z lipca 2026, wycofany slogan „Policz. Kup. Nie marnuj.", zdanie „bez kont" | Nic tego nie wdraża i nic z tego nie czyta, ale jest to druga, sprzeczna kopia serwisu w repozytorium. Sesja 48 opisała ją w `docs/WEBSITE.md`; skasowanie siedmiu plików to decyzja właściciela |
+
+### Sprawdzone i zamknięte w Sesji 48
+
+Te pozycje **nie wymagają już niczego** — zmierzone 2026-08-27, żeby kolejna sesja nie
+kazała właścicielowi robić ich drugi raz:
+
+| Co | Pomiar |
+|---|---|
+| Domeny autoryzowane Firebase Auth | Odczytane na żywo: **siedem** wpisów, w tym `liczmat.com` i `www.liczmat.com` |
+| Ograniczenia klucza przeglądarkowego | `accounts:signInWithPassword` z odsyłaczem `liczmat.com` dochodzi do sprawdzenia hasła; host spoza listy dostaje 403 `API_KEY_HTTP_REFERRER_BLOCKED` |
+| Certyfikat i domena | `https://liczmat.com/` → **200**, certyfikat waliduje się. `materio-app.com` → **404**, zgodnie z decyzją właściciela |
+| Sitemapa | `https://liczmat.com/sitemap.xml` → 371 adresów, tyle samo, co w repo |
+| Adres polityki prywatności w Play | Sklep podaje `https://liczmat.com/privacy-policy.html` — czyli kanoniczną. `docs/GOOGLE_PLAY_DEPLOYMENT.md` twierdził inaczej i stawiał przy tym „GOTOWE ✅"; poprawione |
+| Marka i wersja w Play | Listing mówi **LiczMat**, wersja **1.10.2** |
+| Ekran zgody Google | Link do polityki na nim to `https://liczmat.com/privacy-policy.html`. Nazwa, którą ekran pokazuje, to `materio-502513.firebaseapp.com` — tak Google wyświetla tego klienta niezależnie od pola „App name". Nikt tam dziś nie trafia: przycisk Google jest wyłączony w obu produktach |
+| `%APP_NAME%` w mailach Firebase | **Właściciel przestawił nazwę projektu na `LiczMat` 2026-08-21** (Sesja 37). Z sesji tego nie da się odczytać — jedyny sposób to wywołać reset hasła i przeczytać maila, a **nie wolno wysyłać maila na adres właściciela, żeby zaliczyć test**. Poprzednia wersja tej listy wciąż wymieniała ten punkt jako otwarty, sprzecznie z raportem Sesji 37 w tym samym pliku |
 
 ### Co kosztuje odłożenie punktu 1
 
@@ -291,6 +319,147 @@ i dobrym hasłem, usuwanie konta przy regułach **takich, jakie są dziś wdroż
 (nic nie ginie, konto zostaje, użytkownik Firebase nietknięty) oraz **takich, jakie będą
 po wdrożeniu** (znikają podkolekcje, projekty, pomieszczenia, linki i profil, użytkownik
 na końcu). Razem 1677/1677.
+
+### Co zrobiła Sesja 48 (plan naprawczy)
+
+Zadanie: **prawda w dokumentacji i lista rzeczy do zrobienia w konsolach.** Dwa
+repozytoria, żadnej zmiany w tym, co robi produkt — poza czterema komentarzami w kodzie
+aplikacji, które wskazywały martwą domenę.
+
+**WYKONANO**
+
+**1. Zmierzone, zamiast przepisane z pamięci.** Sesja nie ma klucza do żadnej konsoli
+i nie zakłada kont w produkcji, żeby coś udowodnić, więc sprawdziła to, co da się
+sprawdzić z zewnątrz — i przy każdym twierdzeniu w liście stoi teraz, **jak** zostało
+sprawdzone. Pomiary z 2026-08-27:
+
+| Pytanie | Odpowiedź |
+|---|---|
+| Czy `liczmat.com` żyje? | 200, certyfikat waliduje się, sitemapa ma 371 adresów — tyle samo, co repo |
+| Czy `materio-app.com` jest wyłączona? | 404, zgodnie z decyzją właściciela |
+| Domeny autoryzowane Firebase | Siedem wpisów, w tym `liczmat.com` i `www.liczmat.com` |
+| Ograniczenia klucza przeglądarkowego | Odsyłacz `liczmat.com` przechodzi do sprawdzenia hasła; host spoza listy → 403 |
+| Co stoi w Google Play | LiczMat, **1.10.2** |
+| Adres polityki prywatności w Play | `https://liczmat.com/privacy-policy.html` |
+| Ekran zgody Google | Link do polityki poprawny; nazwa, którą pokazuje, to `materio-502513.firebaseapp.com` |
+| Czy keystore jest w repo | **Tak, dziś, nie tylko w historii** — `git ls-files` wymienia `materio-upload.jks` i `materio-keystore-creds.txt` |
+| Liczby w dokumentacji serwisu | 375 plików HTML, 373 generowane, 371 w sitemapie, 150 stron kalkulatorów, 15 silników, 161 materiałów, 10 języków, 7 walut — wszystkie policzone z kodu |
+
+**2. Trzy defekty, o których nikt nie wiedział.**
+
+- **Opis w Google Play wysyła ludzi na martwą domenę.** W **każdym** sprawdzonym języku
+  (pl, en, de, uk, cs — czyli prawdopodobnie we wszystkich jedenastu) opis mówi
+  `materio-app.com` **dwa razy**. Drugie zdanie jest gorsze od pierwszego: „jeśli Twoje
+  konto powstało przez Google, użyj »Nie pamiętam hasła« na materio-app.com" kieruje
+  kogoś, kto **stracił dostęp do konta**, pod adres odpowiadający 404.
+- **Trzecia kopia polityki prywatności stoi publicznie i mówi nieprawdę.**
+  `https://3d-polednia.github.io/Materio-polityka-prywatno-ci/` — osobne repozytorium,
+  tekst z 16 lipca 2026, marka „Materio", ani słowa o opcjonalnym koncie, synchronizacji
+  Firestore, linku `/p/<token>` ani o Stripe. Play **już na nią nie wskazuje** (to
+  sprawdzono, zanim wpisano cokolwiek do listy — pierwsza wersja tego raportu twierdziła
+  inaczej i była błędna), więc to jest sprzątanie, nie awaria.
+- **`docs/GOOGLE_PLAY_DEPLOYMENT.md` stawiał „GOTOWE ✅" przy tym adresie `github.io`**
+  jako przy adresie wklejonym w Play. Zielony ptaszek przy nieprawdzie jest gorszy niż
+  brak wpisu, bo zamyka temat.
+
+**3. Skamielina.** `web/` w repo aplikacji to **pierwsza wersja serwisu z lipca 2026**:
+siedem plików, jeden commit, wycofany slogan „Policz. Kup. Nie marnuj." i zdanie „bez
+kont". Nic tego nie wdraża i nic z tego nie czyta, ale to jest druga, sprzeczna kopia
+produktu w repozytorium. `docs/WEBSITE.md` opisywał ją jako aktualny serwis — teraz
+mówi wprost, czym jest, i odsyła do `3d-polednia/materio-web`. **Skasowania nie zrobiono:
+siedem plików to decyzja właściciela**, i leży na liście.
+
+**4. Bliźniak polityki prywatności jest teraz generowany, a nie przepisywany.**
+`docs/privacy-policy.html` w repo aplikacji był o 133 linie krótszy od kanonicznego:
+wskazywał martwą domenę, nie wspominał o zapisywaniu waluty i motywu i **nie miał całego
+§7.1 o Stripe**. Sesja wygenerowała go z kanonicznej kopii — te same dwadzieścia nagłówków,
+co do jednego — zamieniając adresy względne na bezwzględne, bo ten plik nie jest serwowany
+z serwisu. Reguła „zmieniasz jedno, zmieniasz oba w tej samej sesji" zostaje; teraz jest
+tańsza do wykonania.
+
+**5. Lista rzeczy w konsolach: było pięć pozycji, jest dziesięć — i jedna zniknęła.**
+Punkt „`%APP_NAME%` mówi Materio" **stał na liście sprzecznie z raportem Sesji 37 w tym
+samym pliku**, gdzie napisano, że właściciel przestawił nazwę projektu na LiczMat
+2026-08-21. Wypadł z otwartych i został opisany w „Sprawdzone i zamknięte", razem
+z powodem, dla którego sesja nie może go zweryfikować: jedyny sposób to wywołać reset
+hasła, a maila nie wolno wysłać na adres właściciela po to, żeby zaliczyć test.
+Doszły: wydanie AAB w sztywnej kolejności po regułach, opis w sklepie, trzecia polityka,
+Search Console, Stripe i skamielina `web/`.
+
+**6. Wydanie: `main` jest przed produkcją o trzy commity przy tej samej wersji.**
+Sesje 46 i 47 wylądowały w `main` **po** tym, jak 1.10.2 poszło na produkcję, i nikt nie
+podbił numeru. Czyli następny AAB niesie oba naraz i **musi zacząć od podbicia
+`versionCode`/`versionName`** — Play odrzuca powtórzony. Kolejność zostaje sztywna:
+reguły, potem AAB. Zapisane w `CLAUDE.md` repo aplikacji, w miejscu, w którym stała
+nieaktualna nota „flagship build: 1.9.3".
+
+**ZMIENIONE PLIKI**
+
+Repo serwisu (`3d-polednia/materio-web`):
+`README.md` (przepisany — slogan, dziesięć języków, siedem walut, 373 strony, pełne spisy
+plików), `docs/DOKUMENTACJA.md` (§1, §2, §3, §4, §5, §6, §7, §9a, §12 — plus nota, czego
+ten plik nie opisuje), `docs/ARCHITEKTURA.md` (`404.html` pełni dwie role, nie trzy;
+nagłówek ma LiczMat Pro od Sesji 40), `CLAUDE.md` (dziewięć liczb i nazw, nota o
+`%APP_NAME%`, nota o Cloud Functions, wskaźnik handoffu), `docs/MASTER_PLAN.md` (ten
+raport, nowa lista konsolowa, poprawka dopisana do raportu Sesji 36).
+
+Repo aplikacji (`3d-polednia/Materio`):
+`docs/privacy-policy.html` (wygenerowany na nowo), `docs/WEBSITE.md` (przepisany),
+`docs/FIRESTORE_SYNC.md` (nagłówek, §7 — reguła usuwania konta **jest** wdrożona, §8 —
+domeny i klucz, §8b — nota historyczna, §9.1 i §9.2), `docs/GOOGLE_PLAY_DEPLOYMENT.md`
+(nagłówek, polityka prywatności, opis w sklepie), `CLAUDE.md` (co stoi w produkcji,
+kolejność wydania), oraz cztery komentarze wskazujące martwą domenę:
+`feature/account/AccountScreen.kt`, `core/sync/CloudSync.kt` i dwa
+`res/drawable/ic_liczmat_mark*.xml`.
+
+`CHANGELOG.md` w repo aplikacji **celowo nie został ruszony**: wpis opisuje wydanie
+z sierpnia, kiedy domena naprawdę nazywała się `materio-app.com`. Przepisywanie
+changeloga to psucie zapisu historii.
+
+**TESTY**
+
+- **Serwis: wszystkie 25 zestawów bezzależnościowych przechodzi.** Największe:
+  `test-seo` 36 869/36 869, `test-perf` 13 200/13 200, `test-security` 9148/9148,
+  `test-calc-seo` 5133/5133, `test-calculators` 2113/2113. `test-copy` liczy 14 sprawdzeń
+  nad 12 470 stringami w dziesięciu językach i 374 stronami. Pięć z nich uruchomiono także
+  **przed** zmianami, jako punkt odniesienia. Zestawów wymagających Playwrighta
+  (`*-page`, `test-mobile`, `test-phone`, `test-qa`) nie uruchamiano — nie ma go w tym
+  kontenerze, a ta sesja nie ruszyła niczego, co one czytają.
+- **`node scripts/build.mjs --check` przechodzi:** 1157 kluczy × 10 języków,
+  15 kalkulatorów, 8 poradników, 150 stron copy SEO.
+- **Ani jednego pliku, który build czyta, nie ruszono**, więc nie było czego przebudowywać
+  i `STAMP` nie wymagał podbicia. Zmiany są w dokumentacji i w komentarzach.
+- **Aplikacja: testy nie uruchamiane** — zmieniły się cztery komentarze i pliki `docs/`,
+  a `gradle` w świeżym kontenerze wymaga instalacji Android SDK, żeby nie sprawdzić niczego.
+
+**PROBLEMY**
+
+- **Punktu 1 listy — czy reguły Firestore są wdrożone — ta sesja NIE zweryfikowała.**
+  Da się to sprawdzić tylko kluczem konta serwisowego (nie ma go w środowisku) albo
+  zakładając konto w produkcji i próbując zapisu. Sesja świadomie nie zakłada kont
+  w cudzej produkcji, żeby zaliczyć punkt; Sesja 37 sprzątała cztery sieroty w `users`
+  po takich właśnie próbach. W liście stoi to wprost, w kolumnie „Jak sprawdzone".
+- **Punkty 4 i 7 (rotacja klucza, konto serwisowe do Play) są niesprawdzalne stąd**
+  z tego samego powodu i tak są opisane.
+- **`docs/DOKUMENTACJA.md` nadal nie opisuje modułów po Sesji 20** — projektów, kosztów,
+  LiczMat Pro, paywalla, płatności. Sesja tego nie dopisała i **napisała wprost, że tego
+  tam nie ma**, zamiast zostawić dokument, który wygląda na kompletny. Rozpisanie tych
+  modułów to osobne zadanie; `CLAUDE.md` opisuje je dziś decyzja za decyzją i jest plikiem
+  do czytania przed pracą.
+- **Trzy rzeczy zostały opisane, a nie naprawione, bo naprawa należy do właściciela:**
+  skasowanie `web/`, `git rm --cached` na keystore (przepis na wydanie w `CLAUDE.md`
+  czyta oba pliki z korzenia repo, więc samo usunięcie zepsuje budowanie AAB) i trzecia
+  kopia polityki w repozytorium, którego ta sesja nie widzi.
+
+**STATUS**
+
+Sesja 48 zamknięta. Dokumentacja obu repozytoriów mówi to, co jest — a tam, gdzie sesja
+nie mogła czegoś zmierzyć, mówi wprost, że nie mogła.
+
+**NASTĘPNE ZADANIE**
+
+**Sesja 49 — panel admina w przeglądarce: nadawanie planu po adresie e-mail, bez
+terminala.** Wymaga serwera, który sprawdzi, kto pyta; ten serwer powstał w Sesji 38.
 
 ### Co zrobiła Sesja 47 (plan naprawczy)
 
@@ -1765,6 +1934,9 @@ najpierw nowy klucz i podmiana tam, dopiero potem kasowanie starego.
 
 **Nieaktualne od dziś, do poprawienia w Sesji 48:** `CLAUDE.md` i raport Sesji 36 nadal
 piszą, że `liczmat.com` nie ma na liście autoryzowanych domen. Ma.
+→ **Zrobione w Sesji 48 (2026-08-27):** `CLAUDE.md` poprawiono już w Sesji 42 (razem
+z pomiarem obu list), a raport Sesji 36 dostał dopisaną poprawkę pod listą punktów
+nierozwiązanych.
 
 **STATUS**
 
@@ -1912,6 +2084,21 @@ Nierozwiązane, bo są poza repo i czekają na właściciela (bez zmian od Sesji
   nie usterka. Kolejność wdrożenia jest w nocie ORDER na dole `assets/pay.js`.
 - **Bliźniak polityki prywatności** w repo `3d-polednia/Materio` nadal mówi
   `materio-app.com`.
+
+> **Poprawka dopisana w Sesji 48 (2026-08-27). Trzy z tych czterech punktów są zamknięte;
+> raport zostaje jako raport, ale nie wolno go czytać jako stanu bieżącego.**
+>
+> - **Klucz przeglądarkowy zna `liczmat.com`** — właściciel dopisał oba wpisy, zmierzone
+>   2026-08-26 i ponownie 2026-08-27: `accounts:signInWithPassword` z tym odsyłaczem
+>   dochodzi do sprawdzenia hasła, a host spoza listy nadal dostaje 403.
+> - **Firebase Auth → Authorized domains** ma siedem wpisów, w tym `liczmat.com`
+>   i `www.liczmat.com` — odczytane na żywo.
+> - **Bliźniak polityki prywatności** został doprowadzony do zgodności w Sesji 48 i jest
+>   teraz **generowany** z kanonicznej kopii, więc nie ma jak się rozjechać.
+> - **Nadal otwarte:** nic nie nadaje planu Pro *automatycznie*. Od Sesji 37 jest
+>   `scripts/pro-admin.mjs` (ręcznie, po e-mailu), a od Sesji 38 funkcja w `functions/`,
+>   która czeka na wdrożenie. Zdanie „FIRESTORE_SYNC §9.2 — brak Cloud Functions"
+>   przestało być prawdą 2026-08-21 i zostało poprawione w tamtym pliku.
 
 **STATUS**
 

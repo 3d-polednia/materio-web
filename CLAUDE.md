@@ -39,9 +39,11 @@ root by `.github/workflows/pages.yml` on every push to `main` → <https://liczm
 
 ---
 
-> **Session handoff:** the most recent state, what is unverified and the recipes for the
-> build and the Google APIs live in `docs/SESSION_HANDOFF_2026-08-08_materials-workspace-account.md`
-> in the app repo (`3d-polednia/Materio`). Read it before starting new work here.
+> **Session handoff:** the current state of the work — which session did what, what is
+> still open and what is waiting on a console — is `docs/MASTER_PLAN.md` in this repo, and
+> that is the file to read before starting. `docs/SESSION_HANDOFF_2026-08-08_materials-workspace-account.md`
+> in the app repo (`3d-polednia/Materio`) is still the best write-up of the build and the
+> Google API recipes, but as a statement of *state* it stopped being current on 2026-08-08.
 
 ## Repo policy (read first)
 
@@ -133,7 +135,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 |---|---|
 | `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
 | `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**`, `materialy/**`, `liczmat-pro/**` and their per-language twins |
-| `assets/i18n-materials.js` — material names, 4 languages | `app/index.html`, `p/index.html` |
+| `assets/i18n-materials.js` — material names, ten languages | `app/index.html`, `p/index.html` |
 | `assets/calculators.js` — engines, ported 1:1 from Kotlin, and `assets/units.js` next to it | `assets/i18n.<lang>.js` — one per language, and the only kind there is since session 33 |
 | `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `assets/flags.js` — the ten flags, for the three pages that build their own picker |
 | `assets/styles.css` — **authored**; the build emits `assets/styles.min.css` from it, and that is what every page links | `assets/styles.min.css` — the same rules with the commentary stripped |
@@ -177,15 +179,15 @@ src/tokens.mjs        validateTokens(): the design system, checked. The two them
 scripts/check-contrast.mjs  Every text/background token pair, both themes, against
                       WCAG AA. Not part of the build — run it after touching a colour
 scripts/test-calculators.mjs  The 15 engines: the maths against the formula each one
-                      documents, the inputs, the units, the boundary values, the four
-                      languages and the currency. Dependency-free — run it after
+                      documents, the inputs, the units, the boundary values, every
+                      language in LANGS and the currency. Dependency-free — run it after
                       touching assets/calculators.js or a res_* key
 scripts/test-pages.mjs  The same calculators in Chromium: 360/414/768/1280 px, the
                       form, the result panel, the currency selector, the no-JavaScript
                       variant. Needs Playwright installed OUTSIDE the repo — see the
                       header of the file
 scripts/test-account.mjs  The account system: which of the three levels a visitor is on,
-                      what the other 134 pages are told about the session, where a
+                      what the other 129 pages are told about the session, where a
                       ?next= link may point, the copy in ten languages — and, since
                       session 42, what it takes for /app/ to say "Brak sieci" truthfully:
                       the listener that asks for the metadata, the redraw gated on a real
@@ -231,7 +233,7 @@ scripts/test-materials.mjs  The material list of a project: the `shoppingItems` 
                       against the contract it comes from (ShoppingItemEntity, shoppingItemToDoc()
                       and the deployed validShoppingItem() rule), the arrow that puts a
                       material on the list when a calculation is saved, the cascade when the
-                      project goes and the undo that brings it back, and the copy in four
+                      project goes and the undo that brings it back, and the copy in ten
                       languages, plus session 18: editing a material, typing one in by hand,
                       the unit list and the one field this repo keeps beside the contract
                       (`note`). Dependency-free — run it after touching the material half of
@@ -612,10 +614,11 @@ assets/styles.css     The design system: one token block, then the components th
                       spend it. Never write a literal colour/radius/duration below it.
                       Authored, and the file to edit; the build writes assets/styles.min.css
                       from it — same rules, commentary gone — and that is what pages link
-assets/i18n.js        4-language dictionary (build input)
-assets/i18n-pages.js  Sub-page dictionary, same 4 languages (build input)
-assets/i18n-materials.js  Material names/terms, same 4 languages (build input)
-assets/currency.js    PLN/EUR/USD/UAH — the currency, independent of the language
+assets/i18n.js        Ten-language dictionary (LANGS + I18N) — build input
+assets/i18n-pages.js  Sub-page dictionary, the same ten languages (build input)
+assets/i18n-materials.js  Material names/terms, the same ten languages (build input)
+assets/currency.js    PLN/EUR/USD/UAH/CZK/RON/RSD — the currency, independent of the
+                      language. The last three arrived with the subscription (session 28)
 assets/flags/*.svg    The flag next to each language name (never an emoji flag)
 assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
 assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
@@ -721,7 +724,9 @@ assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
 assets/main.js        Wiring: menu, hero carousel, consent banner
 assets/app.js         /app/ — Firebase Auth + Firestore sync, same schema as the app
 assets/share.js       /p/<token> — read-only shared estimate
-assets/firebase-config.js  Firebase Web config (see the placeholders inside)
+assets/firebase-config.js  Firebase Web config — the LIVE values for project
+                      materio-502513, not placeholders. FIREBASE_READY still guards the
+                      placeholder case so a fork fails with a readable message
 privacy-policy.html   Full privacy policy (PL + EN) — required by Google Play
 docs/DESIGN_SYSTEM.md Colour, type, spacing, radius, elevation, motion, components,
                       states, breakpoints, both themes — and what the build enforces
@@ -892,16 +897,24 @@ Kotlin side of it. Change one, change all three.
 - **Firebase mails go out in the visitor's language.** `auth.languageCode` is set in
   `boot()` and follows `langchange`. Without it Firebase defaults to English, so the page
   said "Wysłaliśmy link do zmiany hasła" and an English mail arrived.
-- **`%APP_NAME%` in those mails is the Firebase project's display name, still "Materio".**
-  The reset mail therefore says "Reset your password for Materio", the retired brand. That
-  is a console setting (Firebase → Project settings → General → Project name), not a repo
-  one. Separately, the Google security mail ("you signed in to …") takes its name from the
-  OAuth consent screen's App name, a Google Cloud console setting. Both still say Materio.
+- **`%APP_NAME%` in those mails is the Firebase project's display name, and the owner set
+  it to LiczMat on 2026-08-21** (session 37 of the repair plan, together with the
+  "Public-facing name" and the OAuth consent screen's App name). It is a console setting
+  (Firebase → Project settings → General → Project name), not a repo one, so nothing here
+  can read it back: the only way to check is to trigger one password reset and read the
+  mail. **Do not send one to the owner's address to satisfy a test.** What *is* readable
+  from here is the Google consent screen, and it was read on 2026-08-27: the privacy-policy
+  link on it is `https://liczmat.com/privacy-policy.html`, so that edit landed, while the
+  name the screen shows the visitor is the auth domain — `materio-502513.firebaseapp.com`,
+  which is what Google displays for this client regardless of the App name field. Nobody
+  reaches that screen today anyway: the Google button is off on both products.
 - **A plan is granted by the owner, by hand, and by nothing else yet.** `users/{uid}.plan`
   is `"free"` or `"premium"` (the contract's word, older than the rebranding — do not
-  rename it) and it is server-only: no Cloud Functions, no Play Billing
-  (FIRESTORE_SYNC §9.2), and the deployed rules let a browser write nothing in the profile
-  but `lastSeenAt` and `appVersion`. What changed in session 37 of the repair plan is that
+  rename it) and it is server-only: no Play Billing, and the deployed rules let a browser
+  write nothing in the profile but `lastSeenAt` and `appVersion`. There **is** a Cloud
+  Function that can write it — `functions/`, session 38 — but it is not deployed, so today
+  it grants nobody anything. (FIRESTORE_SYNC §9.2 in the app repo still says "brak Cloud
+  Functions"; that sentence predates session 38.) What changed in session 37 of the repair plan is that
   `scripts/pro-admin.mjs` can write it with a service-account key —
   `grant <e-mail> [months]` and `revoke <e-mail>` — so LICZMAT PRO is reachable for the
   first time. It is still not *buyable*: nothing takes money and nothing renews a plan. So the Pro tab on `/app/` describes the five modules in full,
