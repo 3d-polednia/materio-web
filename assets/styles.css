@@ -697,14 +697,23 @@ header.site {
 }
 .theme-toggle:hover { background: var(--surface-container); border-color: var(--outline-strong); }
 .theme-toggle svg { grid-area: 1 / 1; }
-/* Show the glyph for the theme you would switch *to*. */
-.theme-toggle .ico-sun { display: none; }
-:root[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
-:root[data-theme="dark"] .theme-toggle .ico-moon { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-toggle .ico-sun { display: block; }
-  :root:not([data-theme="light"]) .theme-toggle .ico-moon { display: none; }
-}
+/* Three states, one glyph at a time, and the glyph names the state the control is IN —
+   not the one a click would move to. A two-state toggle can get away with "you would
+   switch to this", because there is only one other place to go; with three, the same
+   picture would have to mean two different things depending on where the cycle is.
+
+   The state is `data-theme-mode` on <html>, written by the inline script in <head> before
+   the first paint and by assets/main.js on click. It is not `data-theme`: "system" is the
+   absence of a stored choice, and CSS has no way to ask about an absence. */
+.theme-toggle .ico-sun, .theme-toggle .ico-moon, .theme-toggle .ico-auto { display: none; }
+:root[data-theme-mode="light"] .theme-toggle .ico-sun { display: block; }
+:root[data-theme-mode="dark"] .theme-toggle .ico-moon { display: block; }
+:root[data-theme-mode="system"] .theme-toggle .ico-auto { display: block; }
+/* With no script nothing stamps the attribute, so the control would show no glyph at all.
+   A visitor in that state cannot click it either — but an empty 36px circle in the header
+   is worse than a wrong one, so the system glyph stands in, which is what a browser with
+   no stored choice is actually doing. */
+:root:not([data-theme-mode]) .theme-toggle .ico-auto { display: block; }
 
 /* A navigation item the visitor's level does not reach — `navLevel` in src/ia.mjs. Today
    that is "Projekty", which is offered to people with an account: a guest handed it in the

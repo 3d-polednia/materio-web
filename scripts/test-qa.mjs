@@ -729,17 +729,37 @@ async function walk(cfg) {
   await pickCurrency(cur);
 
   head(`${who} — 16c. the theme switched by the button, not by a planted key`);
-  const flipped = theme === "dark" ? "light" : "dark";
+  // Three states since session 51, cycled in one order: system -> light -> dark -> system.
+  // The walk starts on a planted light or dark, so one click lands on the next one along,
+  // and the whole cycle brings it home. What is checked is the same thing as before —
+  // that the button, and not a planted key, is what moves the page — plus the state that
+  // used to be unreachable: "system", where nothing is stored at all.
+  const CYCLE = ["system", "light", "dark"];
+  const nextMode = (m) => CYCLE[(CYCLE.indexOf(m) + 1) % CYCLE.length];
+  const waitMode = (m) => page.waitForFunction(
+    (x) => document.documentElement.getAttribute("data-theme-mode") === x, m, { timeout: 5000 });
+
+  eq("the planted theme reads back as a chosen mode",
+    await page.getAttribute("html", "data-theme-mode"), theme);
+  const stepped = nextMode(theme);
   await page.click("#theme-toggle");
-  await page.waitForFunction((m) => document.documentElement.getAttribute("data-theme") === m,
-    flipped, { timeout: 5000 });
+  await waitMode(stepped);
   eq("the choice is remembered",
-    await page.evaluate(() => localStorage.getItem("liczmat-theme")), flipped);
+    await page.evaluate(() => localStorage.getItem("liczmat-theme")),
+    stepped === "system" ? null : stepped);
+  if (stepped === "system") {
+    eq("and the system state stores nothing and stamps no theme",
+      await page.getAttribute("html", "data-theme"), null);
+  }
   await go(openProject);
-  eq("and it survives a navigation", await page.getAttribute("html", "data-theme"), flipped);
-  await page.click("#theme-toggle");
-  await page.waitForFunction((m) => document.documentElement.getAttribute("data-theme") === m,
-    theme, { timeout: 5000 });
+  eq("and it survives a navigation", await page.getAttribute("html", "data-theme-mode"), stepped);
+  // Round the rest of the cycle, back to where the walk planted it.
+  for (let m = nextMode(stepped); ; m = nextMode(m)) {
+    await page.click("#theme-toggle");
+    await waitMode(m);
+    if (m === theme) break;
+  }
+  eq("the cycle comes home", await page.getAttribute("html", "data-theme"), theme);
 
   head(`${who} — 16d. the Back button, walked back up chapter XXIV's chain`);
   await go(clientUrl);

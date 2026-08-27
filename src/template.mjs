@@ -47,6 +47,9 @@ const ICON = {
   // Both glyphs ship; CSS shows the one that matches the theme in force.
   sun: '<svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg>',
   chevron: '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
+  // The third state of the theme control: "follow the system". A screen with half of it
+  // filled says "whatever the device says" without borrowing an operating system's icon.
+  auto: '<svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg>',
   moon: '<svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg>',
 };
 
@@ -94,8 +97,28 @@ export function currencyPicker(lang, t, inPlace) {
   return `<select id="currency-select" class="cur-select" aria-label="${esc(t("cur_label"))}" title="${esc(t("cur_label"))}"${i18n}>${options}</select>`;
 }
 
+/**
+ * The theme control. **Three states, like the app's**: light, dark, and "follow the system".
+ *
+ * It used to be a two-state toggle with `aria-pressed`, and the third state was reachable
+ * only by never having touched it — one click and a visitor could not hand the choice back
+ * to their phone without clearing the site's storage. The phone has offered all three since
+ * it shipped (`ThemeMode.SYSTEM/LIGHT/DARK`), so the site was the odd one out.
+ *
+ * `aria-pressed` is gone with the two-state model: a button with three states is not
+ * pressed or unpressed. What replaces it is the label, which names the mode in force
+ * ("Zmień motyw: Systemowy") and is rewritten by assets/main.js on every click and on
+ * every language change. The static label is what a visitor with no script gets, and with
+ * no script there is no click either.
+ *
+ * The three names are `theme_light` / `theme_dark` / `theme_system`, and they are the very
+ * words the app's settings screen uses — copied out of its `values`/`values-xx` string
+ * resources so the two products cannot call one mode two things. They are NOT written onto
+ * the button: every page already downloads the dictionary, so assets/main.js reads them
+ * with t() and the markup carries four fewer attributes on all 375 pages.
+ */
 export const themeToggle = (t, inPlace) =>
-  `<button id="theme-toggle" class="theme-toggle" type="button" aria-label="${esc(t("theme_toggle"))}" title="${esc(t("theme_toggle"))}"${inPlace ? ' data-i18n-aria="theme_toggle"' : ""}>${ICON.sun}${ICON.moon}</button>`;
+  `<button id="theme-toggle" class="theme-toggle" type="button" aria-label="${esc(t("theme_toggle"))}" title="${esc(t("theme_toggle"))}"${inPlace ? ' data-i18n-aria="theme_toggle"' : ""}>${ICON.sun}${ICON.moon}${ICON.auto}</button>`;
 
 export const playBadge = (t, loc, cls = "gp-badge") => `
   <a class="${cls}" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="${loc}" aria-label="${esc(t("hero_download"))}">
@@ -258,7 +281,14 @@ export function page(p) {
 <html lang="${HREFLANG[lang]}">
 <head>
 <!-- Theme, applied before the first paint so a dark-mode visitor never sees a white
-     flash. No stored choice means "follow the system", which is also the CSS default. -->
+     flash. No stored choice means "follow the system", which is also the CSS default.
+
+     data-theme-mode beside it is which of the THREE the visitor chose, as opposed to
+     which of the two is on screen: "system" is the absence of a stored choice, CSS cannot
+     ask about an absence, and the control's glyph has to be right on the first frame.
+     Everything in this block is JavaScript, so its comments ship on all 375 pages —
+     write() strips HTML comments and steps over a <script> whole. That is why the argument
+     is up here and the block below says as little as it can. -->
 <script>
   // "js" says the drawer, the pop-up menus and everything else that needs a script
   // will work. Without it the navigation renders as a plain list instead of hiding
@@ -267,6 +297,7 @@ export function page(p) {
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
     // What this browser was last told about the session (assets/account.js writes the
     // key). It is read here, before the first paint, because a navigation link hangs off
     // it: doing it in account.js, which loads at the end of the document, would show the

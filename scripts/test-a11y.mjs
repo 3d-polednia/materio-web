@@ -388,14 +388,32 @@ head("7. the language picker, the currency selector, the theme toggle");
   const themed = PAGES.filter((page) => page.body.includes('id="theme-toggle"'));
   check("the theme toggle is on every page", themed.length === PAGES.length - 1,
     `${themed.length} of ${PAGES.length}`);
-  checkAll("it is named — its label is two icons", themed,
+  checkAll("it is named — its label is three icons", themed,
     (page) => Boolean(attr((page.body.match(/<button[^>]*id="theme-toggle"[^>]*>/) || [])[0] || "", "aria-label")),
     (page) => page.url);
 
-  // The state is written by script, because the theme in force is read from localStorage
-  // and from the system. Both places that draw the button have to do it.
-  check("and the script says which theme is in force (aria-pressed)",
-    /aria-pressed/.test(read("assets/main.js")) && /aria-pressed/.test(read("privacy-policy.html")));
+  // Session 51: three states, the same three the app offers. `aria-pressed` is gone with
+  // the two-state model — a button that cycles through three is neither pressed nor
+  // unpressed — and what a screen reader hears change is the name, which the script
+  // rewrites to say which mode is in force. The three names have to be ON the button,
+  // because the script that reads them is the same one on every page and has no
+  // dictionary of its own.
+  // The three names are not written onto the button: every page already downloads the
+  // dictionary, so assets/main.js reads them with t() and the markup stays as it was.
+  const DICT = new Function(`${read("assets/i18n.js")}\nreturn I18N;`)();
+  check("the three mode names exist in every language", LANGS.every(
+    (l) => ["theme_light", "theme_dark", "theme_system"].every((k) => Boolean(DICT[l] && DICT[l][k]))));
+  checkAll("and the button carries all three glyphs, one per state", themed, (page) => {
+    const tag = (page.body.match(/<button[^>]*id="theme-toggle"[\s\S]*?<\/button>/) || [])[0] || "";
+    return ["ico-sun", "ico-moon", "ico-auto"].every((c) => tag.includes(c));
+  }, (page) => page.url);
+  check("and the script names the mode in force, in both places that draw the button",
+    /data-theme-mode/.test(read("assets/main.js")) && /data-theme-mode/.test(read("privacy-policy.html")));
+  // The prose in both files still explains why aria-pressed went; what must not come back
+  // is the attribute being SET on a three-state control.
+  const setsPressed = (f) => /setAttribute\(\s*['"]aria-pressed['"]/.test(read(f));
+  check("nothing sets the two-state contract back (aria-pressed)",
+    !setsPressed("assets/main.js") && !setsPressed("privacy-policy.html"));
 }
 
 /* ------------------------------------------------------------------ 8. motion */

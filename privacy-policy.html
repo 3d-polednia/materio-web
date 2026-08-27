@@ -5,6 +5,7 @@
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
   } catch (e) {}
 </script>
 <meta charset="utf-8">
@@ -15,9 +16,9 @@
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://liczmat.com/privacy-policy.html">
-<link rel="icon" href="/assets/favicon.svg?v=20260827a" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260827a" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260827a">
+<link rel="icon" href="/assets/favicon.svg?v=20260827b" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260827b" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260827b">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="author" content="LiczMat">
 <meta property="og:type" content="article">
@@ -35,7 +36,7 @@
 <meta name="twitter:description" content="Jak LiczMat traktuje Twoje dane: liczy offline, konto opcjonalne, jawne zasady dot. synchronizacji, reklam i map.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260827a">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260827b">
 </head>
 <body>
 
@@ -48,7 +49,7 @@
 <header class="site">
   <div class="wrap nav">
     <a class="brand" href="/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Zmień motyw" title="Zmień motyw"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Zmień motyw" title="Zmień motyw" data-theme-label="Zmień motyw" data-theme-light="Jasny" data-theme-dark="Ciemny" data-theme-system="Systemowy"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4.2" width="18.8" height="13" rx="2.2"/><path d="M8.4 20.6h7.2M12 17.2v3.4"/><path d="M12 6.6v8.2a4.1 4.1 0 0 0 0-8.2Z" fill="currentColor" stroke="none"/></svg></button>
     <nav class="nav-links" aria-label="Główne">
       <a href="/kalkulatory/">Kalkulatory</a>
       <a href="/poradniki/">Poradniki</a>
@@ -463,20 +464,32 @@
   (function () {
     var b = document.getElementById('theme-toggle');
     if (!b) return;
-    var mq = window.matchMedia('(prefers-color-scheme: dark)');
-    var now = function () {
+    var MODES = ['system', 'light', 'dark'];
+    var mode = function () {
       try { var v = localStorage.getItem('liczmat-theme'); if (v === 'dark' || v === 'light') return v; } catch (e) {}
-      return mq.matches ? 'dark' : 'light';
+      return 'system';
     };
-    // The button says which theme is in force, the way it does on every generated page
-    // (buildThemeToggle() in assets/main.js). Without it the control announced nothing
-    // but its name, and pressing it changed nothing a screen reader could hear.
-    var mark = function (mode) { b.setAttribute('aria-pressed', mode === 'dark' ? 'true' : 'false'); };
-    mark(now());
+    // Three states, the same three the app offers and the same three every generated page
+    // offers (buildThemeToggle() in assets/main.js). aria-pressed is gone with the
+    // two-state model — a button with three states is not pressed or unpressed — and the
+    // label names the mode instead, which is what a screen reader now hears change.
+    var mark = function (m) {
+      var name = b.getAttribute('data-theme-' + m) || '';
+      var stem = b.getAttribute('data-theme-label') || '';
+      var label = name ? stem + ': ' + name : stem;
+      b.setAttribute('aria-label', label);
+      b.setAttribute('title', label);
+      document.documentElement.setAttribute('data-theme-mode', m);
+    };
+    mark(mode());
     b.addEventListener('click', function () {
-      var next = now() === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      try { localStorage.setItem('liczmat-theme', next); } catch (e) {}
+      var next = MODES[(MODES.indexOf(mode()) + 1) % MODES.length];
+      if (next === 'system') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', next);
+      try {
+        if (next === 'system') localStorage.removeItem('liczmat-theme');
+        else localStorage.setItem('liczmat-theme', next);
+      } catch (e) {}
       mark(next);
     });
   })();

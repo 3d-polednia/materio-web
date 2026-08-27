@@ -381,15 +381,39 @@ head("7. both themes, from the keyboard");
   const ctx = await context();
   const page = await open(ctx, "/");
   await page.focus("#theme-toggle");
-  const before = await page.getAttribute("#theme-toggle", "aria-pressed");
-  check("the toggle says which theme is in force", before === "true" || before === "false", before);
 
+  // Three states since session 51, the same three the app offers. A visitor who never
+  // chose starts on "system", and the label — not aria-pressed, which cannot describe
+  // three — is what says so and what a screen reader hears change.
+  const mode = () => page.getAttribute("html", "data-theme-mode");
+  const label = () => page.getAttribute("#theme-toggle", "aria-label");
+  eq("a visitor who never chose is on the system theme", await mode(), "system");
+  const first = await label();
+  check("the toggle's name says which mode is in force", /:/.test(first || ""), first);
+
+  const seen = [await mode()];
+  const labels = [first];
+  for (let i = 0; i < 3; i++) {
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(120);
+    seen.push(await mode());
+    labels.push(await label());
+  }
+  eq("three presses walk system → light → dark and back", seen.join(" → "),
+    "system → light → dark → system");
+  check("and the name moves with every one of them", new Set(labels.slice(0, 3)).size === 3,
+    labels.slice(0, 3).join(" | "));
+  eq("the last press hands the choice back to the device", 
+    await page.evaluate(() => { try { return localStorage.getItem("liczmat-theme"); } catch (e) { return "throw"; } }), null);
+  eq("and takes data-theme off the document with it", await page.getAttribute("html", "data-theme"), null);
+
+  // Land on dark for the ring check below: two more presses from "system".
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(60);
   await page.keyboard.press("Enter");
   await page.waitForTimeout(120);
-  const after = await page.getAttribute("#theme-toggle", "aria-pressed");
-  check("pressing it changes that answer", after !== before, `${before} → ${after}`);
   const theme = await page.getAttribute("html", "data-theme");
-  eq("and the page follows", theme, after === "true" ? "dark" : "light");
+  eq("the page follows the mode", theme, "dark");
 
   // The ring has to be visible in the theme that is now on: it is a token, and both
   // themes carry it (scripts/check-contrast.mjs measures the ratio).

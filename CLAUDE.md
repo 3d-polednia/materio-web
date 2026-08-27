@@ -1695,6 +1695,21 @@ Kotlin side of it. Change one, change all three.
   inside it and `.block-fill` in session 43. No test in a browser can see this (Chromium in
   a container draws no chrome), so `scripts/test-phone.mjs` §9 reads the stylesheet instead
   and fails on a lone `vh`.
+- **The theme control has three states, and all three are reachable.** Light, dark and
+  "follow the system" — the same three the Android app has offered since it shipped
+  (`ThemeMode.SYSTEM/LIGHT/DARK`). The mechanism always had three: "system" is the absence
+  of a stored `liczmat-theme`, which is what the CSS does on its own. What it did not have
+  was a way *back*: the toggle flipped between light and dark, so one click and a visitor
+  could not hand the choice to their phone again without clearing the site's storage. It
+  now cycles `system → light → dark → system`, and `system` **removes** the key rather than
+  writing one. `data-theme-mode` on `<html>` carries which of the three was chosen — CSS
+  cannot ask about the absence of a stored value, and the glyph has to be right on the
+  first frame, so the inline head script stamps it. `aria-pressed` is gone: a button with
+  three states is neither pressed nor unpressed, and what a screen reader hears change is
+  the name, which says the mode ("Zmień motyw: Systemowy"). The three words are
+  `theme_light`/`theme_dark`/`theme_system` and they are **the app's own strings**, copied
+  across so one mode is not called two things. `privacy-policy.html` is hand-written and
+  carries its own copy of all of it.
 - **The header collapses into the drawer below 1060 px, and that number lives in two
   files.** `assets/styles.css` and the `matchMedia("(min-width: 1061px)")` in
   `assets/main.js` — a mismatch either leaves the drawer drawn as a plain row or shuts a

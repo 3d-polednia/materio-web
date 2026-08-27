@@ -9,6 +9,7 @@
   try {
     var m = localStorage.getItem('liczmat-theme');
     if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
     // What this browser was last told about the session (assets/account.js writes the
     // key). It is read here, before the first paint, because a navigation link hangs off
     // it: doing it in account.js, which loads at the end of the document, would show the
@@ -79,9 +80,9 @@
 <link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/prodavnice/">
 <link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/magaziny/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/sklepy/">
-<link rel="icon" href="/assets/favicon.svg?v=20260827a" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260827a" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260827a">
+<link rel="icon" href="/assets/favicon.svg?v=20260827b" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260827b" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260827b">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -107,7 +108,7 @@
 <meta name="twitter:description" content="Nađi građevinsku prodavnicu u blizini: marketi, veleprodaje i stovarišta na mapi, s rutom do izabranog mesta.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260827a">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260827b">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -165,7 +166,7 @@
       </div>
       <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Moj nalog</a>
     </nav>
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Promeni temu" title="Promeni temu"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg></button>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Promeni temu" title="Promeni temu"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
     <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otvori meni"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
   </div>
 </header>
@@ -300,13 +301,13 @@
   "ru": "/ru/magaziny/"
 };</script>
 
-<script src="/assets/i18n.sr.js?v=20260827a"></script>
-<script src="/assets/i18n-runtime.js?v=20260827a"></script>
-<script src="/assets/currency.js?v=20260827a"></script>
-<script src="/assets/account.js?v=20260827a"></script>
+<script src="/assets/i18n.sr.js?v=20260827b"></script>
+<script src="/assets/i18n-runtime.js?v=20260827b"></script>
+<script src="/assets/currency.js?v=20260827b"></script>
+<script src="/assets/account.js?v=20260827b"></script>
 
-<script src="/assets/stores.js?v=20260827a"></script>
-<script src="/assets/main.js?v=20260827a"></script>
+<script src="/assets/stores.js?v=20260827b"></script>
+<script src="/assets/main.js?v=20260827b"></script>
 
 </body>
 </html>

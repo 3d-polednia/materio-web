@@ -89,6 +89,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 48 | Prawda w dokumentacji i lista rzeczy w konsolach | **Zrobione** — 2026-08-27 |
 | 49 | Panel admina w przeglądarce — plan po e-mailu, bez terminala | **Zrobione** — 2026-08-27. Czeka na `firebase deploy --only functions` i jedno nadanie uprawnienia (właściciel, `docs/ADMIN.md`) |
 | 50 | Aplikacja wygląda tak samo jak strona (repo aplikacji) | **Zrobione** — 2026-08-27. Czeka na wydanie AAB (właściciel) |
+| 51 | Audyt strona ↔ aplikacja + trzeci tryb motywu na stronie | **Zrobione** — 2026-08-27 |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który

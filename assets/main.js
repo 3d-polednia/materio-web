@@ -256,19 +256,37 @@ function buildCookiesPage() {
   render();
 }
 
-/* Theme switch. Three states, but only two of them are stored: no entry in
-   localStorage means "follow the system", which is what the CSS does on its own. A
-   click writes the opposite of whatever is on screen right now, so the first click
-   always visibly changes something, whichever way the system is set. */
-const THEME_KEY = "liczmat-theme";
+/* Theme switch. Three states, the same three the app offers: light, dark and "follow the
+   system". Only two of them are stored — no entry in localStorage means the system, which
+   is what the CSS does on its own — and until session 51 only two were REACHABLE: the
+   toggle flipped between light and dark, so a visitor who had clicked once could never
+   hand the choice back to their phone.
 
-function readTheme() {
-  try { const v = localStorage.getItem(THEME_KEY); return v === "dark" || v === "light" ? v : ""; }
-  catch (e) { return ""; }
+   The cycle starts from the state the visitor is in, not from what is on screen, which is
+   why "system" on a dark phone moves to light rather than back to dark. */
+const THEME_KEY = "liczmat-theme";
+const THEME_MODES = ["system", "light", "dark"];
+
+function readThemeMode() {
+  try { const v = localStorage.getItem(THEME_KEY); return v === "dark" || v === "light" ? v : "system"; }
+  catch (e) { return "system"; }
 }
 
 function effectiveTheme() {
-  return readTheme() || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const m = readThemeMode();
+  if (m !== "system") return m;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyThemeMode(mode) {
+  const root = document.documentElement;
+  if (mode === "system") root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", mode);
+  root.setAttribute("data-theme-mode", mode);
+  try {
+    if (mode === "system") localStorage.removeItem(THEME_KEY);
+    else localStorage.setItem(THEME_KEY, mode);
+  } catch (e) {}
 }
 
 function buildThemeToggle() {
@@ -276,12 +294,19 @@ function buildThemeToggle() {
   if (!button) return;
 
   const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+  /* The label names the mode in force, and it is what replaced aria-pressed: a button that
+     cycles through three states is neither pressed nor unpressed, and the name is what a
+     screen reader hears change. The words come from the dictionary this page already has,
+     so they follow a language switch on /app/, which translates in place. */
   const paint = () => {
-    const mode = effectiveTheme();
-    button.setAttribute("aria-pressed", mode === "dark" ? "true" : "false");
+    const mode = readThemeMode();
+    const name = typeof t === "function" ? t("theme_" + mode) : "";
+    const stem = typeof t === "function" ? t("theme_toggle") : button.getAttribute("aria-label");
+    const label = name && stem ? stem + ": " + name : stem || "";
+    if (label) { button.setAttribute("aria-label", label); button.setAttribute("title", label); }
     // The media-scoped theme-colors cannot answer a hand-picked theme, so an
     // unscoped one is added and kept in step with the choice.
-    const bar = mode === "dark" ? "#060c12" : "#faf7f0";
+    const bar = effectiveTheme() === "dark" ? "#060c12" : "#faf7f0";
     if (meta) meta.setAttribute("content", bar);
     else {
       const m = document.createElement("meta");
@@ -291,17 +316,17 @@ function buildThemeToggle() {
   };
 
   button.addEventListener("click", () => {
-    const next = effectiveTheme() === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    applyThemeMode(THEME_MODES[(THEME_MODES.indexOf(readThemeMode()) + 1) % THEME_MODES.length]);
     paint();
   });
 
   // A visitor who never chose still follows the OS when it flips mid-session.
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    if (!readTheme()) paint();
+    if (readThemeMode() === "system") paint();
   });
+  window.addEventListener("langchange", paint);
 
+  applyThemeMode(readThemeMode());
   paint();
 }
 
