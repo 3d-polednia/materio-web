@@ -94,6 +94,9 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 53 | Terminarz w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `24faead`. Czeka na wydanie AAB (właściciel) |
 | 54 | Łańcuch i historia w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `68c026a`. Czeka na wydanie AAB (właściciel) |
 | 55 | Kształt pola formularza ze strony + przepisanie testów (repo aplikacji) | **Zrobione** — 2026-08-28, commit `0e7c47d`. Czeka na wydanie AAB (właściciel) |
+| 56 | „Wybierz materiał” i presety, jeden kształt — B2 + B3 + B4 + B5 (repo aplikacji) | **Zaplanowane** — audyt parytetu, punkt 5 kolejności |
+| 57 | Konwerter jednostek na stronie — C1 (repo serwisu) | **Zaplanowane** |
+| 58 | Udostępnianie kosztorysu linkiem w aplikacji — C5 (repo aplikacji) | **Zaplanowane** |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -246,15 +249,86 @@ przekodowanie bez zmiany to śmieć w historii (zmierzone: 0,08 % pikseli, czyli
 kodera, przy 18,9 % na wyszukiwarce sklepów i 2,1 % na kalkulatorze). Jak 46, 47, 50, 52,
 53 i 54 — **czeka na wydanie AAB**.
 
-**NASTĘPNE ZADANIE.** Wieczorny plan właściciela ma pozycje **poza** M i **nie ma ich w
-żadnym z repozytoriów** — sesje 52–54 opisały tylko C4, C2 i C3, a listy C1–C5 nikt nie
-zapisał. Więc następne zadanie nazywa właściciel. Jeżeli lista jest wyczerpana, ta sesja
-proponuje jedno, zmierzone tu i teraz: **kopia zapasowa nie niesie pomieszczeń, klientów,
-zleceń ani wycen**. `BackupManager` zapisuje projekty, kalkulacje, listy zakupów,
-materiały własne i ustawienia; pomieszczenia nie były w niej nigdy, a trzy kolekcje Pro
-doszły w Sesji 46 i nikt kopii nie rozszerzył. Dopóki reguły Firestore nie są wdrożone
-(punkt 1 listy wyżej), **kopia jest jedyną drogą tych danych z telefonu** — kto zmienia
-sprzęt, zostawia na starym cały warsztat Pro.
+## Audyt parytetu strona ↔ aplikacja — 27.08.2026 (Sesja 51)
+
+To jest **lista, z której biorą się Sesje 52–58**. Do 2026-08-28 leżała wyłącznie
+w artefakcie właściciela („Parytet LiczMat",
+<https://claude.ai/code/artifact/5fc06c3a-6de0-492e-bc02-4d6e7131d15a>), przez co Sesja 55
+zaczęła się od zgadywania, co jest jej zadaniem. Tu jest zapisana, żeby to się nie
+powtórzyło. Zmierzone z `materio-web` @ `1dc2cb2f` i `Materio` @ `9ff4061` — katalog
+materiałów skryptem pozycja po pozycji, kalkulatory po identyfikatorach, języki, waluty
+i tryby motywu po enumach, wygląd po zrzutach Roborazzi i Playwright w obu motywach.
+
+Liczniki z dnia audytu: materiały **161 = 161**, kalkulatory **15 / 16**, tryby motywu
+**3 = 3**, języki **10 / 12**, waluty **7 / 27**, moduły Pro **5 / 3**.
+
+### A. Co się zgadza (zmierzone, żeby nikt nie sprawdzał drugi raz)
+
+Katalog materiałów (zero różnic na 161 pozycjach), silniki liczące po Sesji 47, tokeny
+wyglądu po Sesji 50, kontrakt synchronizacji (osiem kolekcji), trzy tryby motywu po
+Sesji 51 i zrzuty na `/aplikacja/`.
+
+### B. Wygląd — co zostało po Sesji 50
+
+| # | Co | Waga | Stan |
+|---|---|---|---|
+| B1 | **Pole formularza ma inny kształt.** Strona: etykieta nad polem, 44 px, `--field-bg`, promień 8. Aplikacja: etykieta pływająca w obramowaniu M3, 56 dp | Średnie | **Zrobione — Sesja 55** |
+| B2 | **„Wybierz materiał" to dwa różne obiekty.** Strona: przycisk poboczny + rząd chipów z presetami (Gres 60×60, Panel AC4, Glazura 30×60). Aplikacja: karta `--accent-soft` z kafelkiem ikony i strzałką, **bez presetów**. Rekomendacja audytu: kształt ze strony — presety skracają drogę do wyniku o dwa kliknięcia | Średnie | Otwarte — Sesja 56 |
+| B3 | **Chip i zakładka to na stronie dwa tła.** `.chip` na `--surface-alt`, `.calc-tab` na `--surface`; `SegmentedControl` używa bieli dla obu ról | Niskie | Otwarte — z B2 |
+| B4 | **Przycisk poboczny ma cięższą krawędź.** `.btn-ghost` bierze `--outline-strong` `#cbc4b4`; `OutlinedButton` bierze M3-owe `outline`, czyli `--outline-control` `#8b8577` — rola, która należy do pola formularza | Niskie | Otwarte — z B2 |
+| B5 | **Plakietka poziomu istnieje tylko na stronie.** Każde „drzwi" na stronie głównej mówią BEZ KONTA / LICZMAT / LICZMAT PRO (rozdział II); aplikacja nie ma odpowiednika — poziom widać dopiero po wejściu w moduł Pro, gdzie stoi ściana | Niskie | Otwarte — z B2 |
+| B6 | **Tytuł ekranu.** Strona: H1 w treści, ≈ 30 px, waga 800. Aplikacja: pasek górny, 19,2 sp, waga 700 | Do decyzji | **Pytanie do właściciela** |
+
+### C. Zakres — czego nie ma po drugiej stronie
+
+| # | Co | Waga | Stan |
+|---|---|---|---|
+| C1 | **Konwerter jednostek — tylko w aplikacji.** Jedenaście kategorii (długość, powierzchnia, objętość, masa, temperatura, prędkość, czas, ciśnienie, energia, moc, dane). Silnik jest w Kotlinie; port to ta sama robota, co przy piętnastu kalkulatorach — i najtańszy nowy adres do zaindeksowania | Duże | Otwarte — Sesja 57 |
+| C2 | Terminarz — tylko na stronie | Duże | **Zrobione — Sesja 53** |
+| C3 | Łańcuch i historia — tylko na stronie | Duże | **Zrobione — Sesja 54** |
+| C4 | Jeden kalkulator policzony dwa razy (`STUD_WALL` + `WALL_LINING`) | Średnie | **Zrobione — Sesja 52** |
+| C5 | **Udostępnianie kosztorysu linkiem — tylko na stronie.** `CloudSync` zna `sharedProjects`, ale interfejs aplikacji udostępnia **plik CSV**, nie link. Backend jest po obu stronach: brakuje przycisku i jednego zapisu | Średnie | Otwarte — Sesja 58 |
+| C6 | **Eksport PDF i własne materiały — tylko w aplikacji.** `PdfConfigScreen` i `CustomMaterialsScreen` z historią cen. Historia cen **nie jest w kontrakcie synchronizacji**, więc dziś nie dojedzie do przeglądarki, nawet gdyby strona umiała ją pokazać | Średnie | Otwarte — bez numeru |
+| C7 | **Poradniki (strona) i gazetki sieci (aplikacja) — asymetria zaprojektowana.** Zapisane, żeby następny audyt nie zgłosił tego jako defektu | Bez zmian | — |
+
+### D. Języki i waluty — najwięcej cichych rozjazdów
+
+| # | Co | Waga | Stan |
+|---|---|---|---|
+| D1 | **Siedem walut kontra dwadzieścia siedem.** Kosztorys wyceniony na telefonie w funtach dojeżdża do przeglądarki, która GBP nie ma w wybieraku — kwota się wyrenderuje, ale nikt nie przestawi na nią serwisu. Rekomendacja audytu: aplikacja schodzi do siedmiu, a kosztorys wyceniony wcześniej zachowuje swoją walutę | Średnie | **Pytanie do właściciela** |
+| D2 | **Rubel: aplikacja tak, strona nie.** Strona: RUB celowo nieobecny (Stripe nie działa w Rosji), `ru` startuje w EUR. Aplikacja: `RUSSIAN.defaultCurrency = RUB` | Średnie | **Pytanie do właściciela** (z D1) |
+| D3 | **Angielski policzony dwa razy.** Strona ma jeden `en`; aplikacja `ENGLISH_US` (USD) i `ENGLISH_UK` (GBP) — stąd licznik 10 / 12 | Niskie | **Pytanie do właściciela** |
+| D4 | **Nazwa języka i flaga w wybieraku.** Zasada „nazwa języka, nigdy kraju" (decyzja właściciela 21.08.2026, pilnowana przez `test-langs.mjs`) jest zapisana po jednej stronie i łamana po drugiej: „English (US)", „English (UK)". Do naprawy razem z D3 — to ta sama lista | Niskie | Otwarte — z D3 |
+| D5 | Trzeci tryb motywu | — | **Zrobione — Sesja 51** |
+
+### Kolejność, w której audyt kazał to robić
+
+Pierwsze pięć pozycji ma **sztywną kolejność**: 52 → 53 → 54 → 55 → 56. Reszta nie.
+
+1. ~~C4 — scalić `WALL_LINING` w `STUD_WALL` (S)~~ — **Sesja 52**
+2. ~~C2 — terminarz w aplikacji (M)~~ — **Sesja 53**
+3. ~~C3 — pasek łańcucha i historia w aplikacji (M)~~ — **Sesja 54**
+4. ~~B1 — kształt pola formularza + przepisanie testów (M)~~ — **Sesja 55**
+5. **B2 + B3 + B4 + B5 — „Wybierz materiał" i presety, jeden kształt (S)** — **Sesja 56**,
+   jeden przebieg po komponentach wspólnych, bo tokeny są już wspólne
+6. C1 — konwerter jednostek **na stronie** (L) — Sesja 57. Największa pozycja i jedyna,
+   która dokłada serwisowi nowy ruch, a nie tylko równa wygląd
+7. C5 — udostępnianie linkiem w aplikacji (S) — Sesja 58
+
+### Trzy rzeczy, których audyt nie ruszy bez decyzji właściciela
+
+- **Waluty (D1, D2)** — zwęzić aplikację do siedmiu walut strony, czy rozszerzyć stronę?
+- **Drugi angielski (D3, D4)** — `en-GB` z GBP zostaje osobną pozycją, czy schodzi do
+  jednego `English`? Zależy od tego, czy sprzedaż idzie na Wyspy.
+- **Tytuł ekranu (B6)** — ekrany aplikacji dostają nagłówek w treści, jak strona, czy
+  pasek górny Androida zostaje, jaki jest?
+
+### Jedna rzecz, która pogarsza się sama
+
+Punkty 1 i 2 listy konsolowej. Serwis od 26.08 obiecuje synchronizację klientów, zleceń
+i wycen — a od 27.08 `/aplikacja/` pokazuje zrzuty aplikacji, której w sklepie nie ma.
+**Każdy kolejny dzień to dwie obietnice bez pokrycia zamiast jednej.** Reszta tej listy
+może poczekać; te dwie pozycje nie.
 
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
