@@ -94,7 +94,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 53 | Terminarz w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `24faead`. Czeka na wydanie AAB (właściciel) |
 | 54 | Łańcuch i historia w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `68c026a`. Czeka na wydanie AAB (właściciel) |
 | 55 | Kształt pola formularza ze strony + przepisanie testów (repo aplikacji) | **Zrobione** — 2026-08-28, commit `0e7c47d`. Czeka na wydanie AAB (właściciel) |
-| 56 | „Wybierz materiał” i presety, jeden kształt — B2 + B3 + B4 + B5 (repo aplikacji) | **Zaplanowane** — audyt parytetu, punkt 5 kolejności |
+| 56 | „Wybierz materiał” i presety, jeden kształt — B2 + B3 + B4 + B5 (repo aplikacji) | **Zrobione** — 2026-08-28, commit `bed1926`. Czeka na wydanie AAB (właściciel) |
 | 57 | Konwerter jednostek na stronie — C1 (repo serwisu) | **Zaplanowane** |
 | 58 | Udostępnianie kosztorysu linkiem w aplikacji — C5 (repo aplikacji) | **Zaplanowane** |
 
@@ -249,6 +249,58 @@ przekodowanie bez zmiany to śmieć w historii (zmierzone: 0,08 % pikseli, czyli
 kodera, przy 18,9 % na wyszukiwarce sklepów i 2,1 % na kalkulatorze). Jak 46, 47, 50, 52,
 53 i 54 — **czeka na wydanie AAB**.
 
+Sesja 56 to piąta pozycja kolejności audytu i cztery znaleziska naraz — **B2, B3, B4 i B5** —
+bo wszystkie cztery to jeden przebieg po komponentach wspólnych. Tokeny są wspólne od
+Sesji 50; to, co zostało, to komponenty, które składały je inaczej.
+
+**B2.** Strona otwiera katalog **przyciskiem pobocznym** na całą szerokość, pod nim stawia
+jedną linię `--accent-soft` z tym, co wstawiła, a obok **rząd chipów z presetami**.
+Aplikacja rysowała kartę `--accent-soft` z limonkowym kaflem ikony i strzałką — głośniejszą
+niż akcja główna pod nią, w kształcie, którego strona nie ma nigdzie, i **bez presetów**.
+`MaterialShortcuts.kt` niesie trzy rzędy, które ma strona: cztery dla malarza, cztery
+formaty dla glazurnika i te same formaty **bez panelu** dla fugi, bo podłoga pływająca nie
+ma spoiny.
+
+**Chip nosi identyfikator z katalogu, nigdy kopię liczb.** `preset_gres1` na stronie wstawia
+1,44 m²/opak. i 7 % zapasu, a `gres-60x60` w `CatalogSurface.kt` **jest** tymi dwiema
+liczbami — rząd na stronie powstał z tego samego katalogu. Druga kopia byłaby wolna
+rozjechać się przy pierwszej poprawce formatu. Na ekranie fugi to, który chip jest wybrany,
+**wylicza się z dwóch pól**, a nie leży obok nich: `fields` to jest to, co dostaje
+`compute()`, a klucz, którego nic nie liczy, nie ma po co w tym jechać.
+
+**B3.** Chip i zakładka to ta sama pigułka z inną robotą, a strona rysuje je na **dwóch
+tłach**: `.chip` na `--surface-alt`, `.calc-tab` na `--surface`. Aplikacja miała zakładkę
+(`SegmentedControl`) i `FilterChip` z Materiala, który rysuje **trzecią** rzecz — przezroczyste
+tło za obramowaniem. `MaterioChip` to chip strony; przeszło na niego czternaście miejsc:
+filtry sklepów, presety układu, statusy zleceń, wybieraki projektu, rozstaw stelaża
+i podpowiedzi łańcucha. `SegmentedControl` **nietknięty** — wszystkie pięć jego użyć
+przełącza widok, czyli jest zakładką.
+
+**B4.** `OutlinedButton` z Materiala bierze `outline` ze schematu, czyli tutaj
+`--outline-control` (`#8b8577`) — obramowanie **pola formularza**, trzymane na 3:1, bo to
+jedyna rzecz mówiąca, gdzie dotknąć. Przycisk poboczny polem nie jest i strona daje mu
+lżejsze `--outline-strong` (`#cbc4b4`).
+
+**B5.** `LevelBadge` to `.door-level` ze strony, na każdym kaflu ekranu głównego: **BEZ
+KONTA** na czterech narzędziach, **DLA FACHOWCÓW** na czterech ekranach Pro. To etykieta,
+nigdy bramka. Do tej sesji jedynym miejscem, w którym darmowy użytkownik dowiadywał się, że
+Pro istnieje, była ściana **po** wejściu w moduł — odwrotna kolejność niż trzeba przy jedynej
+rzeczy w tym produkcie, którą się sprzedaje.
+
+Dwanaście stringów to **słowa strony** w dziesięciu językach, przepisane: osiem etykiet
+presetów, „Wstawiono z katalogu:" i trzy nazwy poziomów z rozdziału II.
+
+**259/259 testów przechodzi** (dwa nowe zestawy, osiem sprawdzeń).
+`MaterialShortcutsTest` pyta o właściwości, nie o liczby: każdy skrót istnieje w katalogu,
+każdy niesie to, o co poprosi jego kalkulator, fuga ma formaty płytek i nie ma panelu,
+a kliknięcie chipa wstawia pole opakowania **odczytane tym samym wyszukaniem** — test nie
+podaje własnej liczby, dokładnie z tego powodu, dla którego chip nie trzyma swojej.
+`LevelBadgeTest` liczy po cztery kafle każdego poziomu i mierzy chip jako cel dotyku.
+
+Po stronie serwisu: **trzy zrzuty na `/aplikacja/` przerenderowane** — tym razem zmieniły się
+wszystkie trzy ekrany (16,2 / 10,4 / 8,5 % pikseli). Jak 46, 47, 50, 52, 53, 54 i 55 —
+**czeka na wydanie AAB**.
+
 ## Audyt parytetu strona ↔ aplikacja — 27.08.2026 (Sesja 51)
 
 To jest **lista, z której biorą się Sesje 52–58**. Do 2026-08-28 leżała wyłącznie
@@ -273,10 +325,10 @@ Sesji 51 i zrzuty na `/aplikacja/`.
 | # | Co | Waga | Stan |
 |---|---|---|---|
 | B1 | **Pole formularza ma inny kształt.** Strona: etykieta nad polem, 44 px, `--field-bg`, promień 8. Aplikacja: etykieta pływająca w obramowaniu M3, 56 dp | Średnie | **Zrobione — Sesja 55** |
-| B2 | **„Wybierz materiał" to dwa różne obiekty.** Strona: przycisk poboczny + rząd chipów z presetami (Gres 60×60, Panel AC4, Glazura 30×60). Aplikacja: karta `--accent-soft` z kafelkiem ikony i strzałką, **bez presetów**. Rekomendacja audytu: kształt ze strony — presety skracają drogę do wyniku o dwa kliknięcia | Średnie | Otwarte — Sesja 56 |
-| B3 | **Chip i zakładka to na stronie dwa tła.** `.chip` na `--surface-alt`, `.calc-tab` na `--surface`; `SegmentedControl` używa bieli dla obu ról | Niskie | Otwarte — z B2 |
-| B4 | **Przycisk poboczny ma cięższą krawędź.** `.btn-ghost` bierze `--outline-strong` `#cbc4b4`; `OutlinedButton` bierze M3-owe `outline`, czyli `--outline-control` `#8b8577` — rola, która należy do pola formularza | Niskie | Otwarte — z B2 |
-| B5 | **Plakietka poziomu istnieje tylko na stronie.** Każde „drzwi" na stronie głównej mówią BEZ KONTA / LICZMAT / LICZMAT PRO (rozdział II); aplikacja nie ma odpowiednika — poziom widać dopiero po wejściu w moduł Pro, gdzie stoi ściana | Niskie | Otwarte — z B2 |
+| B2 | **„Wybierz materiał" to dwa różne obiekty.** Strona: przycisk poboczny + rząd chipów z presetami (Gres 60×60, Panel AC4, Glazura 30×60). Aplikacja: karta `--accent-soft` z kafelkiem ikony i strzałką, **bez presetów**. Rekomendacja audytu: kształt ze strony — presety skracają drogę do wyniku o dwa kliknięcia | Średnie | **Zrobione — Sesja 56** |
+| B3 | **Chip i zakładka to na stronie dwa tła.** `.chip` na `--surface-alt`, `.calc-tab` na `--surface`; `SegmentedControl` używa bieli dla obu ról | Niskie | **Zrobione — Sesja 56** |
+| B4 | **Przycisk poboczny ma cięższą krawędź.** `.btn-ghost` bierze `--outline-strong` `#cbc4b4`; `OutlinedButton` bierze M3-owe `outline`, czyli `--outline-control` `#8b8577` — rola, która należy do pola formularza | Niskie | **Zrobione — Sesja 56** |
+| B5 | **Plakietka poziomu istnieje tylko na stronie.** Każde „drzwi" na stronie głównej mówią BEZ KONTA / LICZMAT / LICZMAT PRO (rozdział II); aplikacja nie ma odpowiednika — poziom widać dopiero po wejściu w moduł Pro, gdzie stoi ściana | Niskie | **Zrobione — Sesja 56** |
 | B6 | **Tytuł ekranu.** Strona: H1 w treści, ≈ 30 px, waga 800. Aplikacja: pasek górny, 19,2 sp, waga 700 | Do decyzji | **Pytanie do właściciela** |
 
 ### C. Zakres — czego nie ma po drugiej stronie
@@ -309,8 +361,7 @@ Pierwsze pięć pozycji ma **sztywną kolejność**: 52 → 53 → 54 → 55 →
 2. ~~C2 — terminarz w aplikacji (M)~~ — **Sesja 53**
 3. ~~C3 — pasek łańcucha i historia w aplikacji (M)~~ — **Sesja 54**
 4. ~~B1 — kształt pola formularza + przepisanie testów (M)~~ — **Sesja 55**
-5. **B2 + B3 + B4 + B5 — „Wybierz materiał" i presety, jeden kształt (S)** — **Sesja 56**,
-   jeden przebieg po komponentach wspólnych, bo tokeny są już wspólne
+5. ~~B2 + B3 + B4 + B5 — „Wybierz materiał" i presety, jeden kształt (S)~~ — **Sesja 56**
 6. C1 — konwerter jednostek **na stronie** (L) — Sesja 57. Największa pozycja i jedyna,
    która dokłada serwisowi nowy ruch, a nie tylko równa wygląd
 7. C5 — udostępnianie linkiem w aplikacji (S) — Sesja 58
@@ -354,7 +405,7 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 | # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
 |---|---|---|---|---|
 | 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia i wyceny nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
-| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52, 53, 54 i 55) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Kształtu pola z Sesji 55 też nie: w sklepie formularz dalej ma etykietę wpuszczoną w ramkę i pudełko wyższe niż na stronie. Terminarza z Sesji 53 ani ścieżki i historii z Sesji 54 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły z pięciu, mimo że w `main` jest już pięć. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
+| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52, 53, 54, 55 i 56) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Kształtu pola z Sesji 55 ani wybieraka materiału z presetami z Sesji 56 też nie: w sklepie formularz dalej ma etykietę wpuszczoną w ramkę i pudełko wyższe niż na stronie. Terminarza z Sesji 53 ani ścieżki i historii z Sesji 54 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły z pięciu, mimo że w `main` jest już pięć. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
 | 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
 | 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
 | 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |
