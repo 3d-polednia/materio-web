@@ -92,6 +92,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 51 | Audyt strona ↔ aplikacja + trzeci tryb motywu na stronie | **Zrobione** — 2026-08-27 |
 | 52 | Jeden kalkulator zamiast dwóch: ścianka działowa i zabudowa (repo aplikacji) | **Zrobione** — 2026-08-27, commit `61bb0c6`. Czeka na wydanie AAB (właściciel) |
 | 53 | Terminarz w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `24faead`. Czeka na wydanie AAB (właściciel) |
+| 54 | Łańcuch i historia w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `68c026a`. Czeka na wydanie AAB (właściciel) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -169,6 +170,34 @@ wszystkich dziesięciu języków; jedyne, co mówi źle, to zero — i tam wchod
 232/232 testów przechodzi. **Strona nie zmieniła się o bajt** — ta sesja jest w całości po stronie
 telefonu i, jak 46, 47, 50 i 52, czeka na wydanie AAB.
 
+Sesja 54 to trzecia pozycja kodowa wieczornego planu i znalezisko **C3**: pasek ścieżki, lista
+wycen i wyprowadzona historia stały **tylko na stronie**. Linki w danych były od Sesji 46 — nikt po
+nich nie chodził. Razem z Sesją 53 to jest cały powód, dla którego licznik audytu mówił **5 / 3**:
+kto płacił za Pro i otwierał telefon, dostawał mniej, niż kupił. **Teraz jest 5 / 5.**
+
+Sesja **nie dodała tabeli ani ekranu**. `CrmChain.of()` chodzi po `projectIds` klienta oraz
+`clientId`/`projectId` zlecenia i wyceny, z każdego z czterech końców. Zapisany łańcuch byłby piątą
+kopią czterech linków, wolną rozjechać się z każdym z nich przy pierwszej zmianie właściciela
+projektu. W górę przejście jest **dokładne** (wycena ma jeden projekt, projekt najwyżej jedno
+zlecenie, zlecenie najwyżej jednego klienta), w dół oddaje **listę**, bo klient ma wiele zleceń.
+
+Brakujący krok to `null`, nigdy błąd: że zlecenie nie ma jeszcze klienta, to dokładnie ta rzecz,
+którą pasek ma pokazać. Jedna pułapka rozbita celowo w teście: każdy niepowiązany wiersz nosi `""`
+w tej samej kolumnie, więc nieostrożne porównanie wpisałoby **każdy projekt każdemu klientowi**.
+
+Historia wylicza się z dokumentów i dat, które już mają, i mówi wprost, czego przez to nie pokaże:
+tylko powstania. Zmiana statusu i przesunięty termin nie zostawiają nigdzie daty — wiersz ma jedno
+`updatedAt`, które mówi *kiedy*, nigdy *co*. Dziennik zdarzeń to ERP, którego rozdział XXIV zabrania
+w ostatnim zdaniu, i zacząłby kłamać przy pierwszym skasowanym wierszu.
+
+`ProjectRepository.entriesOf()` **czyta** flagę `manual` ze strony (rozdział XVII, „inne koszty"
+wpisywane ręcznie w przeglądarce, w `inputJson`) i sam żadnej nie zapisuje — dzięki temu koszt
+wpisany ręcznie nie ogłasza się na telefonie jako kalkulacja, której nikt nie policzył.
+
+Piętnaście kluczy to **słowa strony** w dziesięciu językach; `crm_quotes_empty` już w aplikacji było
+i zostało użyte ponownie, zamiast dorabiać synonim. 245/245 testów przechodzi. **Strona nie zmieniła
+się o bajt.**
+
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
 dotyczy **strony pojedynczego kalkulatora**, „stop slop" znaczy skrócić **plus test, który
@@ -193,7 +222,7 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 | # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
 |---|---|---|---|---|
 | 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia i wyceny nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
-| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52 i 53) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Terminarza z Sesji 53 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły zamiast czterech. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
+| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52, 53 i 54) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Terminarza z Sesji 53 ani ścieżki i historii z Sesji 54 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły z pięciu, mimo że w `main` jest już pięć. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
 | 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
 | 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
 | 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |
