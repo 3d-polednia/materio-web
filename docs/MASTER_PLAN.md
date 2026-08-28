@@ -93,6 +93,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 52 | Jeden kalkulator zamiast dwóch: ścianka działowa i zabudowa (repo aplikacji) | **Zrobione** — 2026-08-27, commit `61bb0c6`. Czeka na wydanie AAB (właściciel) |
 | 53 | Terminarz w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `24faead`. Czeka na wydanie AAB (właściciel) |
 | 54 | Łańcuch i historia w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `68c026a`. Czeka na wydanie AAB (właściciel) |
+| 55 | Kształt pola formularza ze strony + przepisanie testów (repo aplikacji) | **Zrobione** — 2026-08-28, commit `0e7c47d`. Czeka na wydanie AAB (właściciel) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -198,6 +199,63 @@ Piętnaście kluczy to **słowa strony** w dziesięciu językach; `crm_quotes_em
 i zostało użyte ponownie, zamiast dorabiać synonim. 245/245 testów przechodzi. **Strona nie zmieniła
 się o bajt.**
 
+Sesja 55 to czwarta pozycja kodowa wieczornego planu i znalezisko **M**: pole formularza.
+Sesja 50 przepisała ze strony kolory, typografię, odstępy i promienie, a **kształt jednej
+kontrolki, z której zrobiony jest kalkulator**, został M3-owy. To nie jest detal:
+`OutlinedTextField` wpuszcza etykietę **w obramowanie** i ma minimum 56 dp, a strona stawia
+etykietę w **osobnej linii nad** polem i daje pudełku 44 dp — tyle, ile ma przycisk obok —
+z `--field-bg` w środku, jednym włoskiem `--outline-control`, promieniem `--radius-xs`,
+tekstem 16 sp i `--accent` na focusie. Dwa produkty pytały o ten sam wymiar w dwóch
+kształtach.
+
+`MaterioField` w `core/designsystem/component/Fields.kt` to ta reguła przepisana, i
+**wszystkie pola w `feature/` przez nią przechodzą** — oba kalkulatory, pomieszczenie,
+konto, dialogi projektu i zapisu, formularz PDF, CRM i trzy wyszukiwarki. `NumericField`
+i `DropdownPicker` stoją na niej; `<select>` to to samo pudełko tylko do odczytu, z listą
+na końcu. Poza tym plikiem nikt już nie sięga po widżet M3.
+
+**Etykieta wychodząc z pudełka zabiera polu nazwę.** W M3 etykieta *była* nazwą dostępności;
+`Text` nad pudełkiem to rodzeństwo, więc TalkBack przeczytałby „pole edycji, puste".
+`MaterioField` wpisuje więc etykietę w `contentDescription` — to jest ten sam `aria-label`,
+który strona stawia na tych samych kontrolkach. Wyszukiwarka nazwę nosi i **nie rysuje**
+linii etykiety: lupa i podpowiedź mówią, czym jest, na ekranie — a podpowiedź znika, gdy
+ktoś zacznie pisać.
+
+Stąd druga połowa zadania: **testy trzeba było przepisać, nie poprawić**.
+`onNodeWithText(label)` trafiał w pole tylko dlatego, że etykieta była w środku. Teraz
+trafia w linię etykiety, a pisanie po linii tekstu kończy się błędem — 16 testów, dokładnie
+te, które wypełniają formularz. Chodzą przez **jeden** pomocnik, `field(label)` w
+`FieldFinders.kt`, więc kolejna zmiana mechanizmu to jedna edycja, a nie pięćdziesiąt.
+
+`FieldShapeTest` jest nowy i pyta **wyrenderowany ekran** o to, o co jest ta sesja: pudełko
+ma co najmniej 44 dp, etykieta stoi nad nim, pole nosi nazwę i przyjmuje tekst, a
+wyszukiwarka nie rysuje etykiety, ale nazwę ma. Dwa z nich puszczono na kodzie **z
+usuniętą poprawką**, żeby sprawdzić, że naprawdę potrafią nie przejść. Piąty pilnuje
+`fieldModifier`: `FocusRequester` podany do `modifier` ląduje na kolumnie i nic nie robi, a
+dialog zmiany nazwy połyka nieudane żądanie focusa z założenia — czyli nikt by nie zgłosił,
+że klawiatura przestała się otwierać.
+
+`scripts/check-contrast.mjs` w repo aplikacji dostał dwie pary, które pole teraz nosi:
+wpisana wartość i podpowiedź na tle `--field-bg`, w obu motywach. **Bliźniak na stronie miał
+obie od dawna** — to plik aplikacji nadrabia. 48 par, zero błędów.
+
+251/251 testów przechodzi. Po stronie serwisu zmieniły się **dwa pliki binarne**: zrzuty
+`pl_calc.webp` i `pl_stores.webp` na `/aplikacja/`, bo oba te ekrany rysują pola.
+`pl_home.webp` **został nietknięty** — na tym ekranie nie ma ani jednego pola, a
+przekodowanie bez zmiany to śmieć w historii (zmierzone: 0,08 % pikseli, czyli szum
+kodera, przy 18,9 % na wyszukiwarce sklepów i 2,1 % na kalkulatorze). Jak 46, 47, 50, 52,
+53 i 54 — **czeka na wydanie AAB**.
+
+**NASTĘPNE ZADANIE.** Wieczorny plan właściciela ma pozycje **poza** M i **nie ma ich w
+żadnym z repozytoriów** — sesje 52–54 opisały tylko C4, C2 i C3, a listy C1–C5 nikt nie
+zapisał. Więc następne zadanie nazywa właściciel. Jeżeli lista jest wyczerpana, ta sesja
+proponuje jedno, zmierzone tu i teraz: **kopia zapasowa nie niesie pomieszczeń, klientów,
+zleceń ani wycen**. `BackupManager` zapisuje projekty, kalkulacje, listy zakupów,
+materiały własne i ustawienia; pomieszczenia nie były w niej nigdy, a trzy kolekcje Pro
+doszły w Sesji 46 i nikt kopii nie rozszerzył. Dopóki reguły Firestore nie są wdrożone
+(punkt 1 listy wyżej), **kopia jest jedyną drogą tych danych z telefonu** — kto zmienia
+sprzęt, zostawia na starym cały warsztat Pro.
+
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
 dotyczy **strony pojedynczego kalkulatora**, „stop slop" znaczy skrócić **plus test, który
@@ -222,7 +280,7 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 | # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
 |---|---|---|---|---|
 | 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia i wyceny nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
-| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52, 53 i 54) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Terminarza z Sesji 53 ani ścieżki i historii z Sesji 54 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły z pięciu, mimo że w `main` jest już pięć. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
+| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52, 53, 54 i 55) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Kształtu pola z Sesji 55 też nie: w sklepie formularz dalej ma etykietę wpuszczoną w ramkę i pudełko wyższe niż na stronie. Terminarza z Sesji 53 ani ścieżki i historii z Sesji 54 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły z pięciu, mimo że w `main` jest już pięć. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
 | 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
 | 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
 | 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |
