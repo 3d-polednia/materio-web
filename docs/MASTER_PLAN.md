@@ -96,7 +96,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 55 | Kształt pola formularza ze strony + przepisanie testów (repo aplikacji) | **Zrobione** — 2026-08-28, commit `0e7c47d`. Czeka na wydanie AAB (właściciel) |
 | 56 | „Wybierz materiał” i presety, jeden kształt — B2 + B3 + B4 + B5 (repo aplikacji) | **Zrobione** — 2026-08-28, commit `bed1926`. Czeka na wydanie AAB (właściciel) |
 | 57 | Konwerter jednostek na stronie — C1 (repo serwisu) | **Zrobione** — 2026-08-29 |
-| 58 | Udostępnianie kosztorysu linkiem w aplikacji — C5 (repo aplikacji) | **Zaplanowane** |
+| 58 | Udostępnianie kosztorysu linkiem w aplikacji — C5 (repo aplikacji) | **Zrobione** — 2026-08-29, commit `68506a4`. Czeka na wydanie AAB (właściciel) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -407,6 +407,114 @@ jest statyczna, nie dotyka sieci, nie ma konta i niczego nie zapisuje. Wchodzi d
 **NASTĘPNE ZADANIE: Sesja 58 — udostępnianie kosztorysu linkiem w aplikacji (C5, repo
 aplikacji).** Nazwana, nie zaczęta.
 
+## Sesja 58 — udostępnianie kosztorysu linkiem w aplikacji (C5)
+
+**WYKONANO.** Fachowiec na budowie może wysłać klientowi **adres**, a nie plik CSV.
+Ekran projektu → zakładka „Podsumowanie" → blok **„Link do wyceny"**: „Udostępnij"
+zapisuje snapshot i podaje `https://liczmat.com/p/<token>` do Sharesheeta Androida,
+„Odśwież link" nadpisuje ten sam dokument, „Wyłącz link" go kasuje. To pozycja **C5**
+audytu parytetu i ostatnia z siedmiu pozycji kodowych jego kolejności.
+
+**Nie brakowało backendu — brakowało przycisku.** `sharedProjects/{token}` jest
+w `docs/FIRESTORE_SYNC.md` §6 od pierwszej wersji, `CloudSync.deleteAccount()` zbiera te
+dokumenty po `ownerId` od 2026-08-08, wdrożone reguły mają `validShare()`, a strona czyta
+`/p/<token>` od 2026-08-07. Aplikacja udostępniała **plik CSV**. Audyt wycenił to na (S)
+i wycenił dobrze: jeden zapis i jedno pole w bazie.
+
+**Decyzja siedzi osobno od Firebase.** `core/share/ShareLink.kt` nie importuje ani
+Firebase, ani Androida — token, adres i dokument to czysty Kotlin, więc `ShareLinkTest`
+sprawdza je zwykłym JUnitem. To ten sam podział, który sprawia, że `SyncContract` da się
+testować bez sieci, i ten sam, którym stoi `functions/stripe-map.mjs` w tym repozytorium.
+Zapisuje `ProjectShareRepository` i jest jedyną rzeczą w aplikacji, która dotyka tej
+kolekcji.
+
+**Wiersze snapshotu to dokumenty kontraktu**, `SyncContract.estimationToDoc()`
+i `shoppingItemToDoc()`, a nie drugi kształt wymyślony dla udostępniania: `/p/` czyta te
+nazwy pól, które pisze synchronizacja, więc drugie mapowanie byłoby drugą szansą na
+rozjazd. Limity (200 kalkulacji, 500 pozycji, nazwa 120 znaków) są te, których pilnuje
+`validShare()`, a test **czyta je z pliku reguł** zamiast powtarzać liczby.
+
+**Świeżość jest przyciskiem, bo dokument jest kopią.** „Odśwież link" pisze po **tym samym**
+tokenie — `createdAt` jest odczytywane z dokumentu i zachowane, rusza się tylko
+`refreshedAt` — bo drugie dotknięcie, które wybija drugi token, zostawia publiczną kopię,
+której nikt już nie znajdzie. „Wyłącz link" kasuje dokument i link przestaje działać
+natychmiast. Wariant „zawsze aktualny" wymagałby Cloud Functions i §6 odrzuca go od
+początku.
+
+**Token jest lokalny dla urządzenia i to jest decyzja z ceną.** Trzyma go kolumna
+`projects.shareToken` (migracja Room **6 → 7**, jedno pole `NULL`-owalne);
+`SyncContract.projectToDoc()` buduje dokument ze stałej mapy, więc token nigdzie nie
+jedzie. Powód: to **jest** sekret, a po drugiej stronie nie ma dla niego czytelnika —
+przeglądarka nie pamięta żadnego ze swoich linków (`assets/app.js` oddaje adres raz,
+przy kliknięciu, i nic go nie zapisuje). Cena jest wprost: link zrobiony na telefonie
+odświeża się i wyłącza **na tym telefonie**. Usunięcie konta i tak zbiera wszystkie po
+`ownerId`, a od tej sesji czyści też kolumnę, żeby projekt nie oferował adresu, który już
+nie istnieje.
+
+**Kształt tokena jest sprawdzany, zanim stanie się ścieżką.** Firestore skleja segmenty,
+więc `a/b/c` zaadresowałby inny dokument w innej podkolekcji; `ShareLink.TOKEN` to ten sam
+`[A-Za-z0-9_-]{16,64}`, którego pilnuje `assets/share.js` (Sesja 35). 128 bitów koduje się
+base64url **ręcznie**, bo `java.util.Base64` to API 26, a aplikacja ma minSdk 24 — i test
+sprawdza ten koder względem JDK-owego na każdej długości od 1 do 40 bajtów, a nie względem
+niego samego.
+
+**Dziewięć stringów, pięć z nich to słowa strony.** `app_share`, `app_share_refresh`,
+`app_share_revoke` i `app_share_hint` **już były** w `assets/i18n-pages.js` w dziesięciu
+językach — słowa istniały, zanim na którymkolwiek produkcie powstały przyciski. Cztery nowe
+biorą rzeczownik, którego strona `/p/` używa w danym języku na kosztorys (wycena /
+Kalkulation / кошторис / rozpočet / deviz / troškovnik / predmer / смета), żeby jedna rzecz
+nie nazywała się dwiema. Nieudany zapis mówi `account_err_unknown`, zamiast dorabiać
+dziesiąty klucz.
+
+**Publikowanie wymaga konta i blok mówi to wprost** — dokument zapisuje, czyj jest, więc bez
+uid nie ma czego napisać. To nie jest bramka na niczym: kosztorys jest własny, a eksport CSV
+działa dalej bez konta.
+
+**ZMIENIONE PLIKI** (wszystkie w `3d-polednia/Materio`):
+`core/share/ShareLink.kt` i `core/share/ProjectShareRepository.kt` (nowe),
+`core/database/entity/Entities.kt` (`ProjectEntity.shareToken`),
+`core/database/AppDatabase.kt` (wersja 7 + `MIGRATION_6_7`),
+`core/database/dao/Daos.kt` (`setShareToken`, `clearShareTokens`),
+`core/sync/CloudSync.kt` (czyszczenie kolumny przy usunięciu konta),
+`core/export/ProjectShareManager.kt` (`shareText`),
+`feature/projects/ProjectDetailViewModel.kt` i `ProjectDetailScreen.kt` (blok „Link do
+wyceny"), `di/AppModule.kt` i `di/SyncModule.kt`, dziesięć `values*/strings.xml`,
+`docs/FIRESTORE_SYNC.md` §6, `CLAUDE.md`, plus `ShareLinkTest.kt` i `ShareLinkScreenTest.kt`.
+
+**TESTY. 284/284 przechodzi** (było 259; 25 nowych sprawdzeń w dwóch zestawach).
+`ShareLinkTest` — 14: token względem `java.util.Base64`, 500 losowań bez powtórki i każde
+w kształcie, którego szuka strona, odmowa dla `a/b/c` i `../x`, adres rozebrany parserem
+URL, pola i limity odczytane z wdrożonych reguł, wiersze porównane z `SyncContract`, obcięcie
+250 → 200 i 600 → 500, waluta pierwszej kalkulacji i PLN gdy nie ma żadnej, `estimationId`
+jako identyfikator dokumentu albo `null`, `createdAt` przeżywający odświeżenie, i to, że
+token **nie jedzie** w `projectToDoc()`. `ShareLinkScreenTest` — 11 w Chromium-owym
+odpowiedniku, czyli Robolectric: trzy stany bloku wyklikane, trzy przyciski robiące trzy
+różne rzeczy (drugie „Udostępnij" **wysyła** istniejący link, nie wybija drugiego), blokada
+w trakcie zapisu, trzy komunikaty — i **migracja 6 → 7 puszczona na ręcznie zbudowanej
+tabeli v6 z danymi**, bo `exportSchema = false` znaczy, że `MigrationTestHelper` nie ma
+czego czytać, a to jedyna rzecz w tej sesji, która potrafi skasować czyjeś projekty.
+
+**PROBLEMY — żadnego nierozwiązanego.** Dwa do zapisania:
+
+- **Konto przełączone na jednym urządzeniu zostawia martwy token.** Kto się wyloguje
+  i zaloguje na inne konto, ma na projekcie token dokumentu należącego do poprzedniego —
+  „Odśwież"/„Wyłącz" dostaną wtedy odmowę z reguł i blok pokaże błąd. To odpowiednik
+  `liczmat-sync-account` ze strony (Sesja 35) i osobne zadanie; nic się przez to nie wycieka,
+  bo odmowa jest po stronie reguł.
+- **Strona nadal nie umie odświeżyć ani wyłączyć linku.** `assets/app.js` wybija nowy token
+  przy każdym kliknięciu i nie pamięta żadnego, więc linków zrobionych w przeglądarce nie da
+  się odwołać inaczej niż kasując konto. Słowa (`app_share_refresh`, `app_share_revoke`) są
+  w słowniku od dawna. Telefon jest pierwszą połową produktu, która to potrafi.
+
+**STATUS.** Zrobione, w repozytorium aplikacji, na `main`, commit `68506a4`. **Strona nie
+zmieniła się o bajt.** Jak Sesje 46, 47, 50, 52–56 — **czeka na wydanie AAB** (punkt 2 listy
+„Do zrobienia w konsolach"). Reguły `sharedProjects` są wdrożone od dawna, więc ta sesja
+niczego nowego do konsoli nie dokłada.
+
+**NASTĘPNE ZADANIE: C6 — eksport PDF i własne materiały na stronie** (bez numeru, repo
+serwisu; historia cen jest poza kontraktem synchronizacji, więc zakres jest do rozstrzygnięcia
+przez właściciela). Nazwane, nie zaczęte.
+
 ## Audyt parytetu strona ↔ aplikacja — 27.08.2026 (Sesja 51)
 
 To jest **lista, z której biorą się Sesje 52–58**. Do 2026-08-28 leżała wyłącznie
@@ -445,7 +553,7 @@ Sesji 51 i zrzuty na `/aplikacja/`.
 | C2 | Terminarz — tylko na stronie | Duże | **Zrobione — Sesja 53** |
 | C3 | Łańcuch i historia — tylko na stronie | Duże | **Zrobione — Sesja 54** |
 | C4 | Jeden kalkulator policzony dwa razy (`STUD_WALL` + `WALL_LINING`) | Średnie | **Zrobione — Sesja 52** |
-| C5 | **Udostępnianie kosztorysu linkiem — tylko na stronie.** `CloudSync` zna `sharedProjects`, ale interfejs aplikacji udostępnia **plik CSV**, nie link. Backend jest po obu stronach: brakuje przycisku i jednego zapisu | Średnie | Otwarte — Sesja 58 |
+| C5 | **Udostępnianie kosztorysu linkiem — tylko na stronie.** `CloudSync` zna `sharedProjects`, ale interfejs aplikacji udostępnia **plik CSV**, nie link. Backend jest po obu stronach: brakuje przycisku i jednego zapisu | Średnie | **Zrobione — Sesja 58** |
 | C6 | **Eksport PDF i własne materiały — tylko w aplikacji.** `PdfConfigScreen` i `CustomMaterialsScreen` z historią cen. Historia cen **nie jest w kontrakcie synchronizacji**, więc dziś nie dojedzie do przeglądarki, nawet gdyby strona umiała ją pokazać | Średnie | Otwarte — bez numeru |
 | C7 | **Poradniki (strona) i gazetki sieci (aplikacja) — asymetria zaprojektowana.** Zapisane, żeby następny audyt nie zgłosił tego jako defektu | Bez zmian | — |
 
@@ -470,7 +578,7 @@ Pierwsze pięć pozycji ma **sztywną kolejność**: 52 → 53 → 54 → 55 →
 5. ~~B2 + B3 + B4 + B5 — „Wybierz materiał" i presety, jeden kształt (S)~~ — **Sesja 56**
 6. ~~C1 — konwerter jednostek **na stronie** (L)~~ — **Sesja 57**. Największa pozycja
    i jedyna, która dokłada serwisowi nowy ruch, a nie tylko równa wygląd
-7. C5 — udostępnianie linkiem w aplikacji (S) — Sesja 58
+7. ~~C5 — udostępnianie linkiem w aplikacji (S)~~ — **Sesja 58**
 
 ### Trzy rzeczy, których audyt nie ruszy bez decyzji właściciela
 
