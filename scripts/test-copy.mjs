@@ -53,6 +53,7 @@ import { fileURLToPath } from "node:url";
 import { LANGS, GUIDES } from "../src/site.mjs";
 import { liveRoutes } from "../src/ia.mjs";
 import { CALC_SEO } from "../src/calc-seo.mjs";
+import { CONV_COPY } from "../src/conv-copy.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -134,6 +135,10 @@ const collect = (src, dict) => {
 collect("i18n", I18N);
 collect("i18n-pages", I18N_PAGES);
 collect("i18n-materials", I18N_MATERIALS);
+// Session 57's converter page. Its words live in src/ rather than in a dictionary — the
+// same page-weight argument src/calc-seo.mjs makes — and a rule that stopped at the
+// dictionaries would be a rule with a page-shaped hole in it.
+collect("conv-copy", CONV_COPY);
 
 for (const [id, byLang] of Object.entries(CALC_SEO)) {
   for (const [lang, o] of Object.entries(byLang)) {
@@ -372,9 +377,16 @@ head("§7 how much prose a page carries");
  * Two of them are lists rather than prose and are budgeted as lists: `materials` is the
  * 161-material catalogue and `privacy` is the privacy policy, which carries two complete
  * language versions in one file because Google Play requires one URL.
+ *
+ * Session 57 added `converter` at 280 (the English page, 274) and raised `calculators`
+ * from 350 to 370 (the English hub, 362), and both are list rather than prose. The converter page's <main> is
+ * eleven category names and the seventy-odd unit symbols under them — "Długość — mm, cm,
+ * dm, m, km, in, ft, yd, mi, nmi" is ten words and one fact — which is what the page is
+ * FOR, and it is also the only thing on it a reader with no JavaScript can use. Its prose
+ * proper is four sentences. The hub grew by the one card that points at it.
  */
 const BUDGET = {
-  home: 370, calculators: 350, calculator: 400, guides: 280, guide: 220,
+  home: 370, calculators: 370, calculator: 400, converter: 280, guides: 280, guide: 220,
   materials: 2280, stores: 150, android: 480, projects: 390, estimate: 190,
   clients: 500, jobs: 520, quotes: 460, calendar: 400, cookies: 540,
   "liczmat-pro": 450, account: 850, dashboard: 130, share: 40, privacy: 3800,

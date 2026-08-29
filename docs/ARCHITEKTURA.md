@@ -75,7 +75,7 @@ nie wymaga konta**.
 
 ## 2. Inwentarz stron — stan na dziś
 
-373 wygenerowane strony: 37 stron logicznych × 10 języków, plus trzy bezjęzykowe.
+383 wygenerowane strony: 38 stron logicznych × 10 języków, plus trzy bezjęzykowe.
 Adresy w kolumnie „URL (PL)”; pozostałe języki mają prefiks (`/en/…`, `/de/…`, `/uk/…`,
 `/cs/…`, `/sk/…`, `/ro/…`, `/hr/…`, `/sr/…`, `/ru/…`) i własne slugi z `SECTION`
 i `CALC_SLUG` w `src/site.mjs`.
@@ -85,6 +85,7 @@ i `CALC_SLUG` w `src/site.mjs`.
 | `home` | `/` | GUEST | — | tak | 10 |
 | `calculators` | `/kalkulatory/` | GUEST | `home` | tak | 10 |
 | `calculator` | `/kalkulatory/<slug>/` | GUEST | `calculators` | tak | 150 |
+| `converter` | `/konwerter-jednostek/` | GUEST | `calculators` | tak | 10 |
 | `materials` | `/materialy/` | GUEST | `home` | tak | 10 |
 | `guides` | `/poradniki/` | GUEST | `home` | tak | 10 |
 | `guide` | `/poradniki/<slug>/` | GUEST | `guides` | tak | 80 |
@@ -114,6 +115,16 @@ i `CALC_SLUG` w `src/site.mjs`.
 drugą, `quotes` (Sesja 24) trzecią, `calendar` (Sesja 25) czwartą. To jedyne strony
 w inwentarzu, których link jest ukryty przed kimś poniżej Pro (`navLevel`, §5). Żadna
 z nich nie jest bramkowana — patrz §7.7, §7.8, §7.9 i §7.10.
+
+`converter` (Sesja 57) jest jedyną trasą pod `calculators`, która nie jest kalkulatorem,
+i dlatego stoi na własnym segmencie zamiast pod `/kalkulatory/`: ten segment należy do
+piętnastu kalkulatorów i każdy z nich trzyma tam jeden slug z `CALC_SLUG`. Przelicznik nie
+ma materiału, zapasu ani wyniku do zapisania w projekcie — nie jest w żadnej kategorii
+`CALC_CATEGORIES` i hub linkuje do niego **obok** listy, nie w niej, bo licznik filtra
+mówi, ile z piętnastu kalkulatorów widać. Silnik jest portem 1:1
+`core/calculation/UnitConverter.kt` z repozytorium aplikacji (pozycja C1 audytu parytetu),
+a teksty strony siedzą w `src/conv-copy.mjs`, nie w słowniku — z tego samego powodu, co
+`src/calc-seo.mjs`: każda strona serwisu pobiera `assets/i18n.<lang>.js`.
 
 `liczmat-pro` (Sesja 29) jest jedyną trasą, która **opisuje** Pro, nie będąc Pro: poziom
 `GUEST`, indeksowana, w stopce dla każdego. Paywall stoi na narzędziu, nie na opisie

@@ -28,7 +28,7 @@ import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlClients, urlClient,
-  urlJobs, urlJob, urlQuotes, urlQuote, urlCalendar, urlLiczmatPro,
+  urlJobs, urlJob, urlQuotes, urlQuote, urlCalendar, urlLiczmatPro, urlConverter,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -130,6 +130,27 @@ export const ROUTES = [
       "save comes after the result, never before it.",
   },
 
+  {
+    id: "converter",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "calculators", localized: true, indexable: true,
+    path: urlConverter,
+    footer: { order: 2, key: "convpage_title" },
+    note: "The unit converter — session 57, item C1 of the parity audit in " +
+      "docs/MASTER_PLAN.md. Eleven categories, ported 1:1 from " +
+      "core/calculation/UnitConverter.kt in the app repo, which had it from the start " +
+      "while the site had nothing. GUEST for the reason every calculator is: it needs no " +
+      "account, saves nothing and asks for nothing. Parented under `calculators` because " +
+      "that is where somebody looks for a tool, and its URL is a top-level section " +
+      "because /kalkulatory/<slug>/ is the fifteen calculators' own namespace. It is not " +
+      "one of them: it has no material, no waste allowance and no result to file in a " +
+      "project, so it is in no CALC_CATEGORY and the hub links to it beside the list " +
+      "rather than inside it. Footer position 2, next to \"Wszystkie kalkulatory\" — " +
+      "the header row is full at five (see the check in validateIA) and the audit's " +
+      "point is that this is the cheapest indexable address the site can add, not that " +
+      "it outranks the four tools already in the menu.",
+  },
+
   /* ---------------------------------------------------------------- content */
   {
     id: "materials",
@@ -137,7 +158,7 @@ export const ROUTES = [
     parent: "home", localized: true, indexable: true,
     path: urlMaterials,
     header: { order: 2, key: "nav_materials" },
-    footer: { order: 2, key: "nav_materials" },
+    footer: { order: 3, key: "nav_materials" },
     note: "The catalogue as a way into a calculator, not a shop. Chapter I rules out " +
       "growing it into a large material directory.",
   },
@@ -146,7 +167,7 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlGuideIndex,
-    footer: { order: 5, key: "foot_guides" },
+    footer: { order: 6, key: "foot_guides" },
     note: "Chapter XI: the way into a calculator for somebody who does not yet know " +
       "which one they need. It was header link 4 until session 40, and gave the slot up " +
       "to /liczmat-pro/ — the owner's decision, taken when session 29 built that page and " +
@@ -168,7 +189,7 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlStores,
-    footer: { order: 6, key: "nav_stores" },
+    footer: { order: 7, key: "nav_stores" },
     note: "Footer only. It is a tool, not a step of any flow — session 5 took it out of " +
       "the header to get the row back under one line.",
   },
@@ -192,7 +213,7 @@ export const ROUTES = [
     parent: "home", localized: true, indexable: true,
     path: urlProjects,
     header: { order: 3, key: "nav_projects" },
-    footer: { order: 3, key: "nav_projects" },
+    footer: { order: 4, key: "nav_projects" },
     navLevel: LEVEL.LICZMAT,
     note: "Chapter XIV makes the project the centre of the free account. The page is " +
       "GUEST because assets/workspace.js keeps projects in localStorage in the " +
@@ -227,7 +248,7 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "projects", localized: true, indexable: true,
     path: urlEstimate,
-    footer: { order: 4, key: "estpage_title" },
+    footer: { order: 5, key: "estpage_title" },
     note: "Chapter XVI and XVII: the material list and its costs. Same local-first rule " +
       "as /projekty/.",
   },
@@ -238,7 +259,7 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlClients,
-    footer: { order: 8, key: "clipage_title" },
+    footer: { order: 9, key: "clipage_title" },
     navLevel: LEVEL.PRO,
     gate: "Chapter XXV, built in session 27: proGate() in src/pro.mjs stands in place " +
       "of the module — the module named and described, \"Dostępne w LiczMat Pro\", the " +
@@ -277,7 +298,7 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "clients", localized: true, indexable: true,
     path: urlJobs,
-    footer: { order: 9, key: "jobpage_title" },
+    footer: { order: 10, key: "jobpage_title" },
     navLevel: LEVEL.PRO,
     gate: "As clients — the same wall, from the same builder (proGate() in " +
       "src/pro.mjs) and behind the same switch.",
@@ -307,7 +328,7 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "jobs", localized: true, indexable: true,
     path: urlQuotes,
-    footer: { order: 10, key: "quopage_title" },
+    footer: { order: 11, key: "quopage_title" },
     navLevel: LEVEL.PRO,
     gate: "As clients and jobs — the same wall, from the same builder.",
     note: "Chapter XXII, and the third of the five Pro modules: materials, labour, " +
@@ -338,7 +359,7 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "jobs", localized: true, indexable: true,
     path: urlCalendar,
-    footer: { order: 11, key: "calpage_title" },
+    footer: { order: 12, key: "calpage_title" },
     navLevel: LEVEL.PRO,
     gate: "As clients, jobs and quotes — the same wall, from the same builder.",
     note: "Chapter XXIII, and the fourth of the five Pro modules: the deadlines of the " +
@@ -412,7 +433,7 @@ export const ROUTES = [
     parent: "home", localized: true, indexable: true,
     path: urlLiczmatPro,
     header: { order: 4, key: "pro_t" },
-    footer: { order: 7, key: "pro_t" },
+    footer: { order: 8, key: "pro_t" },
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
       "indexable — the paywall sits on the Pro modules, not on their description. " +

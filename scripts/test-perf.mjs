@@ -116,6 +116,7 @@ const BUDGET = {
   "index.html": [215, 62],
   "kalkulatory/index.html": [235, 66],
   "kalkulatory/plytki-panele-gres/index.html": [360, 112],
+  "konwerter-jednostek/index.html": [220, 62],
   "poradniki/ile-farby-na-pokoj/index.html": [212, 61],
   "sklepy/index.html": [220, 65],
   "materialy/index.html": [320, 81],

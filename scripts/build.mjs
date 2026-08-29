@@ -29,7 +29,7 @@ import {
   URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
-  urlCalendar, urlLiczmatPro,
+  urlCalendar, urlLiczmatPro, urlConverter,
 } from "../src/site.mjs";
 import {
   livePaths, sitemapUrls, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS,
@@ -42,18 +42,19 @@ import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
   materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain, jobsMain,
-  quotesMain, calendarMain, proPageMain,
+  quotesMain, calendarMain, proPageMain, converterMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
 import { CALC_SEO, TITLE_MAX } from "../src/calc-seo.mjs";
+import { CONV_COPY, CONV_COPY_KEYS } from "../src/conv-copy.mjs";
 import { appMain, shareMain, dashboardMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260827b";
+const STAMP = "20260829a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -106,6 +107,18 @@ const { LM_FEATURES, LM_PLAN } = evalScript(
  * exactly one place they are written down.
  */
 const { LM_PAY } = evalScript("assets/pay.js", ["LM_PAY"]);
+
+/**
+ * Session 57's converter, read rather than copied — the same rule the calculators follow.
+ *
+ * It is evaluated together with assets/currency.js because convFormat() asks that file for
+ * the language's number locale, exactly as the browser does: the answer the build writes
+ * into the markup has to be the string the script would have written, or the page would
+ * announce its own result to a screen reader the moment it loaded.
+ */
+const { CONV_CATS, convConvert, convFormat } = evalScript(
+  ["assets/currency.js", "assets/converter.js"],
+  ["CONV_CATS", "convConvert", "convFormat"]);
 
 const CATALOG = evalScript("assets/materials.js", [
   "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "matName", "matNote", "primaryCalcFor",
@@ -162,6 +175,29 @@ function validate() {
     const extra = Object.keys(DICT[lang]).filter((k) => !reference.includes(k));
     if (missing.length) problems.push(`${lang}: missing ${missing.length} key(s): ${missing.join(", ")}`);
     if (extra.length) problems.push(`${lang}: ${extra.length} key(s) absent from ${DEFAULT_LANG}: ${extra.join(", ")}`);
+  }
+
+  /* Session 57: the converter's own copy, which is build-time only and therefore not in
+     the loop above. A missing key here is not an empty page — the template would write
+     `undefined` into the markup, which is exactly what six languages shipped in the
+     picker before session 41 went looking for it. The title and the description are held
+     to the same limits a calculator page's are, and for the same two reasons: Google cuts
+     a title at roughly 60 characters and a snippet at about 160. */
+  for (const lang of LANGS) {
+    const copy = CONV_COPY[lang];
+    if (!copy) { problems.push(`converter: no ${lang} copy (src/conv-copy.mjs)`); continue; }
+    for (const key of CONV_COPY_KEYS) {
+      if (!copy[key] || !String(copy[key]).trim()) problems.push(`converter/${lang}: no ${key}`);
+    }
+    for (const cat of CONV_CATS) {
+      if (!copy[`conv_c_${cat.id}`]) problems.push(`converter/${lang}: category "${cat.id}" has no name`);
+    }
+    if (copy.convpage_title && copy.convpage_title.length > TITLE_MAX) {
+      problems.push(`converter/${lang}: the title is ${copy.convpage_title.length} characters, over ${TITLE_MAX}`);
+    }
+    if (copy.convpage_meta && (copy.convpage_meta.length < 50 || copy.convpage_meta.length > 160)) {
+      problems.push(`converter/${lang}: the description is ${copy.convpage_meta.length} characters, outside 50–160`);
+    }
   }
 
   // Every calculator needs a slug and a "how we calculate" entry in every language.
@@ -674,7 +710,7 @@ const calcLd = (calc, lang, t) => ({
  * breakpoint next to the rule it explains. That is 31 of its 90 kB — and because prose
  * compresses far better than selectors do, it is 13 of the 24 kB that actually cross the
  * wire. The stylesheet is the one render-blocking request every page makes, so those
- * 13 kB stand in front of the first paint of all 375 pages.
+ * 13 kB stand in front of the first paint of all 385 pages.
  *
  * So the comments are stripped here rather than deleted there. What ships is
  * assets/styles.min.css; assets/styles.css stays exactly as it is, keeps the comments,
@@ -794,7 +830,7 @@ function buildCalculatorPages() {
   const hubAlt = alternatesFor(urlCalcIndex);
   for (const lang of LANGS) {
     const t = translator(lang);
-    const { main, ld } = calcHubMain(lang, t, CALCS, GUIDES);
+    const { main, ld } = calcHubMain(lang, t, CALCS, GUIDES, CONV_COPY[lang]);
     write(join(urlCalcIndex(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("calchub_title")} — LiczMat`,
@@ -1155,6 +1191,37 @@ function buildProPage() {
   }
 }
 
+/**
+ * /konwerter-jednostek/ — the unit converter. Session 57, item C1 of the parity audit.
+ *
+ * The worked answer in the result box is computed here, by the same functions the page
+ * then loads, over the values the form opens with: 1 m in centimetres. A calculator page
+ * has shipped its example that way since session 8, and the reason is the same — a page
+ * whose only content is an empty form says nothing to a reader who runs no script.
+ */
+function buildConverterPage() {
+  const alt = alternatesFor(urlConverter);
+  const first = CONV_CATS[0];
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const [from, to] = first.def;
+    const example = {
+      value: convFormat(1, lang), from,
+      out: convFormat(convConvert(first.id, from, to, 1), lang), to,
+    };
+    const { main, ld } = converterMain(lang, t, CONV_CATS, example, CONV_COPY[lang]);
+    write(join(urlConverter(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("convpage_title")} \u2014 LiczMat`,
+      description: CONV_COPY[lang].convpage_meta,
+      path: urlConverter(lang),
+      alternates: alt,
+      main, jsonld: [ld],
+      scripts: ["/assets/converter.js"],
+    }));
+  }
+}
+
 function buildStores() {
   const alt = alternatesFor(urlStores);
   for (const lang of LANGS) {
@@ -1292,7 +1359,7 @@ function buildPrivatePages() {
  * is a field on the route, so `sitemapUrls()` reads the list off the architecture and the
  * check at the bottom of this file refuses a build where the two disagree.
  *
- * **`lastmod` is carried forward.** Writing today's date onto 371 URLs on every build is
+ * **`lastmod` is carried forward.** Writing today's date onto 381 URLs on every build is
  * the one thing that makes Google stop reading the field at all — it uses `lastmod` when
  * it is "consistently and verifiably accurate". So a page keeps the date the previous
  * sitemap gave it unless this build actually changed what it says; `fingerprint()` is
@@ -1417,6 +1484,7 @@ buildJobsPages();
 buildQuotesPages();
 buildCalendarPages();
 buildProPage();
+buildConverterPage();
 buildStores();
 buildPrivatePages();
 buildSitemap();

@@ -13,7 +13,7 @@ import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
-  urlCalendar, urlLiczmatPro,
+  urlCalendar, urlLiczmatPro, urlConverter,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -398,7 +398,7 @@ function ctaSection(t) {
  * than in the browser because the page is generated per language anyway, and doing it at
  * build time keeps the script down to comparing two strings.
  */
-export function calcHubMain(lang, t, calcs, guides) {
+export function calcHubMain(lang, t, calcs, guides, convCopy) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("calchub_title"), path: urlCalcIndex(lang) },
@@ -477,6 +477,28 @@ export function calcHubMain(lang, t, calcs, guides) {
       </div>
     </section>
   </div>
+
+  <!-- Session 57. The converter is a tool, so the page full of tools has to offer it —
+       but it is not one of the fifteen: it has no material, no allowance and no result to
+       file in a project, so it is outside #calc-hub and outside the filter, which counts
+       [data-calc-row] and says how many of the calculators are showing. Putting it in the
+       list would have made that number wrong by one. -->
+  <section class="block" aria-labelledby="hub-conv-h">
+    <div class="wrap">
+      <div class="section-head left">
+        <h2 id="hub-conv-h">${esc(t("convpage_title"))}</h2>
+      </div>
+      <ul class="calc-links">
+        <li><a class="calc-link" href="${urlConverter(lang)}">
+          <span class="calc-link-body">
+            <b>${esc(t("convpage_title"))}</b>
+            <span class="muted">${esc(convCopy.conv_hub_d)}</span>
+          </span>
+          <span class="calc-link-go">${esc(convCopy.conv_open)}</span>
+        </a></li>
+      </ul>
+    </div>
+  </section>
 
   ${appNote(t)}
 </main>`;
@@ -2279,6 +2301,126 @@ export function estimateMain(lang, t) {
       .map((s, i) => ({ "@type": "HowToStep", position: i + 1, text: s })),
   }];
   return { main, ld };
+}
+
+/* ------------------------------------------------------------------ converter */
+
+/**
+ * /przelicznik-jednostek/ — the unit converter, session 57 (item C1 of the parity audit).
+ *
+ * The eleven categories and their units come from assets/converter.js, which is the port
+ * of the app's engine, so nothing about what the tool converts is written here. What is
+ * written here is the page: chapter XII's order (H1 → form → result → explanation), the
+ * calculator pages' own card so the two tools do not look like two products, and the list
+ * of categories under it — which is the page's real content for anybody reading it
+ * without JavaScript, and the one place a crawler can see what the tool actually holds.
+ *
+ * The answer is in the markup, computed by the build over the values the form opens with,
+ * for the same reason a calculator page ships a worked example: a page whose only content
+ * is an empty form says nothing to a reader who runs no script.
+ *
+ * Four of the words on it were already written: `calc_form_h`, `calc_result_h`,
+ * `hwc_title` and `hwc_source` are the calculator pages' own, and "Jak to liczymy" over
+ * "Silnik strony jest portem 1:1 kodu z aplikacji na Androida" is not a sentence this
+ * page gets to phrase differently — it is the same claim about the same port.
+ *
+ * @param {object[]} cats CONV_CATS from assets/converter.js
+ * @param {object} example { value, from, out, to } — already formatted for this language
+ * @param {object} copy CONV_COPY[lang] from src/conv-copy.mjs — the page's own words,
+ *        which are build-time only and deliberately not in the dictionary every page
+ *        downloads. `t()` is still here for the four strings the calculator pages already
+ *        own and this page shares.
+ */
+export function converterMain(lang, t, cats, example, copy) {
+  const c = (key) => copy[key];
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("calchub_title"), path: urlCalcIndex(lang) },
+    { name: t("convpage_title"), path: urlConverter(lang) },
+  ]);
+
+  const first = cats[0];
+  const catOpts = cats
+    .map((cat) => `<option value="${esc(cat.id)}"${cat === first ? " selected" : ""}>${esc(c(`conv_c_${cat.id}`))}</option>`)
+    .join("");
+  const unitOpts = (chosen) => first.units
+    .map(([sym]) => `<option value="${esc(sym)}"${sym === chosen ? " selected" : ""}>${esc(sym)}</option>`)
+    .join("");
+
+  const inventory = cats.map((cat) =>
+    `<li><b>${esc(c(`conv_c_${cat.id}`))}</b> — ${esc(cat.units.map(([sym]) => sym).join(", "))}</li>`).join("");
+
+  const main = `<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("convpage_title"))}</h1>
+      <p class="lead">${esc(c("convpage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-converter>
+        <div class="calc-form">
+          <h2>${esc(t("calc_form_h"))}</h2>
+          <div class="field">
+            <label for="conv-cat">${esc(c("conv_cat"))}</label>
+            <select id="conv-cat" data-conv-cat>${catOpts}</select>
+          </div>
+          <div class="field">
+            <label for="conv-value">${esc(c("conv_value"))}</label>
+            <input id="conv-value" type="text" inputmode="decimal" value="1" data-conv-value>
+          </div>
+          <div class="field">
+            <label for="conv-from">${esc(c("conv_from"))}</label>
+            <select id="conv-from" data-conv-from>${unitOpts(first.def[0])}</select>
+          </div>
+          <div class="field">
+            <label for="conv-to">${esc(c("conv_to"))}</label>
+            <select id="conv-to" data-conv-to>${unitOpts(first.def[1])}</select>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" data-conv-swap>${esc(c("conv_swap"))}</button>
+        </div>
+        <div class="calc-out">
+          <h2>${esc(t("calc_result_h"))}</h2>
+          <!-- role="status", as on a calculator page and for the same reason: the answer
+               changes as the visitor types, nothing moves and no focus shifts, so without
+               it a screen reader is told nothing about the one thing they came for. The
+               box ships holding the answer for the values the form opens with, and
+               assets/converter.js writes into it only when the words differ, so nothing
+               is announced on load. -->
+          <div class="result show" data-conv-result role="status">
+            <div class="muted eyebrow">${esc(example.value)} ${esc(example.from)}</div>
+            <div class="big">${esc(example.out)} <span class="figure-line">${esc(example.to)}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="conv-how-h">
+    <div class="wrap calc-how">
+      <h2 id="conv-how-h">${esc(t("hwc_title"))}</h2>
+      <div class="calc-how-grid">
+        <div>
+          <p>${esc(c("conv_how_d"))}</p>
+          <p>${esc(c("conv_temp_d"))}</p>
+          <p class="muted src-note">${esc(t("hwc_source"))}</p>
+        </div>
+        <div>
+          <h3>${esc(c("conv_units_t"))}</h3>
+          <ul class="plain-list">${inventory}</ul>
+        </div>
+      </div>
+      <p class="mt-6"><a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a></p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+
+  return { main, ld: crumbs.ld };
 }
 
 /* ------------------------------------------------------------------ stores */

@@ -133,6 +133,22 @@ calendar: {
     pl: "terminarz", uk: "kalendar", de: "termine", en: "schedule",
     cs: "terminy", sk: "terminy", ro: "termene", hr: "rokovi", sr: "rokovi", ru: "sroki",
   },
+  /* Session 57, the unit converter — item C1 of the parity audit, and the first section
+     added to this map that was never a `plannedSlug`: src/ia.mjs was written in session 3
+     against the master plan, and the plan has no converter in it. The segment is the
+     page's own subject in each language rather than a transliteration of the Polish one,
+     because this is the phrase somebody types into a search box; "liczmat-pro" is a brand
+     name and is the exception, not the rule. Each segment is the language's own
+     `converter_title` from the app, spelled out in ASCII — the module has one name on the
+     two products, so it cannot have a second one in the address bar. It is a top-level section and not a child of
+     /kalkulatory/: the fifteen calculators live under that segment and each of them owns
+     one slug there, so a sixteenth address in the same namespace that is not a calculator
+     would be one CALC_SLUG collision away from a page nobody can explain. */
+converter: {
+    pl: "konwerter-jednostek", uk: "konverter-odynyts", de: "einheitenumrechner", en: "unit-converter",
+    cs: "prevodnik-jednotek", sk: "prevodnik-jednotiek", ro: "convertor-de-unitati",
+    hr: "pretvarac-jedinica", sr: "konvertor-jedinica", ru: "konverter-edinic",
+  },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
@@ -324,6 +340,16 @@ export const urlCalendar = (lang) => `${prefix(lang)}/${SECTION.calendar[lang]}/
  * modules it describes stay behind the paywall.
  */
 export const urlLiczmatPro = (lang) => `${prefix(lang)}/${SECTION.pro[lang]}/`;
+
+/**
+ * The unit converter — session 57, item C1 of the parity audit.
+ *
+ * A tool of its own rather than a sixteenth calculator: it has no material, no waste
+ * allowance and no result to file in a project, so it shares nothing with CALCS but the
+ * shape of the card it is drawn in. Its place in the tree is under `calculators` all the
+ * same (src/ia.mjs), because that is where somebody goes looking for it.
+ */
+export const urlConverter = (lang) => `${prefix(lang)}/${SECTION.converter[lang]}/`;
 
 export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
 

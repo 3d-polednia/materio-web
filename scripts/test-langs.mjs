@@ -184,7 +184,7 @@ checkAll("the three Cyrillic names are written in Cyrillic", ["uk", "ru"],
 
 head("§3 every shipped page, both pickers");
 
-check("370 of the 375 pages carry a picker the generator filled in",
+check("380 of the 385 pages carry a picker the generator filled in",
   WITH_PICKER.length === PAGES.length - 5,
   `${WITH_PICKER.length} of ${PAGES.length}`);
 

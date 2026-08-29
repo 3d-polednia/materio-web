@@ -81,8 +81,9 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now 373 pages: a home page, a calculator
-hub, one page per calculator, guides, a store finder and the public page for LiczMat Pro —
+The site used to be one `index.html`. It is now 383 pages: a home page, a calculator
+hub, one page per calculator, a unit converter, guides, a store finder and the public page
+for LiczMat Pro —
 each in all ten languages, at its own URL, so search engines can index more than the
 Polish front page. Writing that by
 hand is not possible; a generator writes it from one template plus the dictionary.
@@ -91,6 +92,7 @@ hand is not possible; a generator writes it from one template plus the dictionar
 node scripts/build.mjs            # regenerate every page + sitemap.xml
 node scripts/build.mjs --check    # validate dictionaries/slugs only, write nothing
 node scripts/test-calculators.mjs # the calculator maths, units and localization
+node scripts/test-converter.mjs   # the unit converter: the port, the maths, the page
 node scripts/test-account.mjs     # the account: levels, the session, the copy
 node scripts/test-dashboard.mjs   # the dashboard: the route, the tool list, the copy
 node scripts/test-projects.mjs    # projects: the route, the CRUD, the undo, the copy
@@ -136,9 +138,9 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | Authored (edit these) | Generated (never edit — `build.mjs` overwrites) |
 |---|---|
 | `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
-| `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `poradniki/**`, `sklepy/**`, `materialy/**`, `liczmat-pro/**` and their per-language twins |
+| `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `konwerter-jednostek/**`, `poradniki/**`, `sklepy/**`, `materialy/**`, `liczmat-pro/**` and their per-language twins |
 | `assets/i18n-materials.js` — material names, ten languages | `app/index.html`, `p/index.html` |
-| `assets/calculators.js` — engines, ported 1:1 from Kotlin, and `assets/units.js` next to it | `assets/i18n.<lang>.js` — one per language, and the only kind there is since session 33 |
+| `assets/calculators.js` — engines, ported 1:1 from Kotlin, and `assets/units.js` next to it, and `assets/converter.js` beside them | `assets/i18n.<lang>.js` — one per language, and the only kind there is since session 33 |
 | `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `assets/flags.js` — the ten flags, for the three pages that build their own picker |
 | `assets/styles.css` — **authored**; the build emits `assets/styles.min.css` from it, and that is what every page links | `assets/styles.min.css` — the same rules with the commentary stripped |
 | `assets/main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | `sitemap.xml` |
@@ -149,7 +151,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/admin.js` — the admin panel on `/app/`, fetched only for an account with the claim | |
 | `assets/crm.js` — the clients, jobs and quotes of LiczMat Pro, plus `crm-ui.js`, `jobs-ui.js`, `quotes-ui.js` and `crm-chain.js` | |
 | `assets/recent.js`, `assets/dashboard.js` | |
-| `src/*.mjs` — information architecture, site map, templates, page bodies, formulas, the calculators' SEO copy | |
+| `src/*.mjs` — information architecture, site map, templates, page bodies, formulas, the calculators' SEO copy, the converter's words | |
 | `privacy-policy.html`, `404.html`, `robots.txt` | |
 
 The build **fails loudly** rather than emitting a broken page: a key missing in one
@@ -170,6 +172,12 @@ src/site.mjs          Languages, URL slugs per section/calculator/guide — the 
 src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
 src/pages.mjs         The <main> of each page type
 src/calc-meta.mjs     Per-calculator formula lines + their translations
+src/conv-copy.mjs     The words on the converter page, ten languages. Build-time only,
+                      for the reason src/calc-seo.mjs is: every page on the site downloads
+                      assets/i18n.<lang>.js. The title and the eleven category names are
+                      the app's own strings — one module, one name on the two products.
+                      `convpage_title` is the one key that stayed in the dictionary,
+                      because the footer link's label comes from the route
 src/calc-seo.mjs      Per-calculator SEO copy, ten languages: the <title> stem (which is
                       also the H1), the meta description (which is also the paragraph
                       under it) and two questions with their answers. Build-time only —
@@ -181,6 +189,25 @@ src/tokens.mjs        validateTokens(): the design system, checked. The two them
                       a duration. Runs inside the build. Narrative: docs/DESIGN_SYSTEM.md
 scripts/check-contrast.mjs  Every text/background token pair, both themes, against
                       WCAG AA. Not part of the build — run it after touching a colour
+scripts/test-converter.mjs  The unit converter (session 57, item C1 of the parity audit):
+                      the table — eleven categories, eighty-two units, what a unit has to
+                      be and which pair each category opens on; the arithmetic, against
+                      relations this repository does not contain (an inch is 2.54 cm, an
+                      acre 4840 square yards, a nautical mile 1852 m), because an
+                      expectation read out of the table under test passes with every
+                      number in it wrong; temperature, which is a shift as well as a scale
+                      and would answer "0 °C is 0 °F" without its own branch; what the
+                      engine refuses, and that it refuses with `null` rather than with a
+                      zero; convFormat(), where a whole number stays whole and the language
+                      writes it; the route and the ten slugs; the ten pages read back; and
+                      the net that caught this session's own defect — a dictionary key
+                      printed on a page, anywhere on the site. Dependency-free
+scripts/test-converter-page.mjs  The same tool clicked in Chromium, nothing stubbed:
+                      converting as you type, a comma and a point, all eleven categories
+                      picked with both unit lists rebuilt under them, the swap, the empty
+                      field that says so instead of showing a zero, the live region that
+                      is NOT written on load, ten languages with their own grouping of
+                      digits, the widths of chapter XXVIII and the no-JavaScript variant
 scripts/test-calculators.mjs  The 15 engines: the maths against the formula each one
                       documents, the inputs, the units, the boundary values, every
                       language in LANGS and the currency. Dependency-free — run it after
@@ -662,6 +689,10 @@ assets/currency.js    PLN/EUR/USD/UAH/CZK/RON/RSD — the currency, independent 
 assets/flags/*.svg    The flag next to each language name (never an emoji flag)
 assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
 assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
+assets/converter.js   The unit converter: eleven categories and eighty-two units, ported
+                      1:1 from core/calculation/UnitConverter.kt in the app repo, plus the
+                      form on /konwerter-jednostek/. Symbols are language-neutral (mm, ha,
+                      °C) exactly as in the app, so only the category names are translated
 assets/calc-hub.js    The search + category filter on /kalkulatory/. The hub is fully
                       server-rendered; this only narrows what is already there
 assets/workspace.js   Projects, rooms, estimate lines and the material list in localStorage
@@ -1772,6 +1803,34 @@ Kotlin side of it. Change one, change all three.
 - **Polish HTML matching `I18N.pl` is now automatic** — the pages are generated *from* the
   dictionary, so they cannot drift. Edit the dictionary, rebuild, commit the output. Never
   hand-edit a generated `.html`: the next build silently reverts it.
+- **The unit converter is a port, and the port is the whole point of it.**
+  `assets/converter.js` is `core/calculation/UnitConverter.kt` from the app repo — the same
+  eleven categories in the same order, the same eighty-two units, the same factors to the
+  same digits, and the same affine branch for temperature, which is the one category a
+  factor cannot express. Two products answering "how many inches is a metre" differently is
+  the defect the parity audit was written to find, so **do not tune a factor here alone**.
+  Two of the app's numbers are rounded where a definition is exact (`fl oz` is 0.0295735296
+  rather than 0.0295735295625, and `mmHg` is the millimetre of mercury rather than the
+  torr); the port keeps them, and `scripts/test-converter.mjs` §2 says by how much they
+  miss and why that is invisible at six significant digits. One field is the website's
+  own — `def`, the pair each category opens on, because the app opens every category on
+  its first two units (mm → cm), which is what a list gives you rather than what anybody
+  came to convert.
+- **Unit symbols are not translated, and the eleven category names are.** mm, ha, km/h, °C
+  are the same in ten languages — the app's decision, inherited — so the dictionary carries
+  eleven strings instead of ninety. `scripts/test-converter.mjs` §1 fails on a symbol
+  outside `[A-Za-z°²³/ ]`.
+- **The converter page's words live in `src/conv-copy.mjs`, not in the dictionary.** Same
+  measurement as `src/calc-seo.mjs`: every page on the site downloads
+  `assets/i18n.<lang>.js`, and 23 keys per language that only the build and a reader of the
+  finished HTML ever see put `/app/` a kilobyte past its budget in
+  `scripts/test-perf.mjs` the moment they were in the bundle. Two keys are exceptions and
+  both are load-bearing: `conv_bad`, which `assets/converter.js` writes in the browser, and
+  `convpage_title`, which is the footer link's label on all 383 pages — `src/template.mjs`
+  takes that from the route's `footer.key`, so moving it printed the literal word
+  "convpage_title" in every footer, in every language, with every suite still green. That
+  is session 41's defect with a different key, and §7 of `scripts/test-converter.mjs` is
+  now the net for it: no `conv_*` key may appear in any shipped page.
 - **A slug is permanent.** Renaming one in `src/site.mjs` breaks every inbound link and the
   ranking that came with it. Add a redirect instead. This is why the six restored languages
   did **not** get freshly-invented slugs: theirs were recovered from git (`ab1fb26`), so

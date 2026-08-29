@@ -39,7 +39,7 @@ import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
-  LANGS, urlHome, urlCalc, urlCalcIndex, urlGuideIndex, urlStores, urlMaterials,
+  LANGS, urlHome, urlCalc, urlCalcIndex, urlConverter, urlGuideIndex, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlClients, urlJobs, urlQuotes, urlCalendar,
   urlLiczmatPro, urlCookies, urlAndroid, urlGuide, GUIDES,
 } from "../src/site.mjs";
@@ -342,6 +342,7 @@ head("1. the tightest width, in every language");
       ["the calculator hub", urlCalcIndex(lang)],
       ["a calculator", urlCalc(lang, "waste")],
       ["a cutting calculator", urlCalc(lang, "sheet")],
+      ["the converter", urlConverter(lang)],
       ["the guides", urlGuideIndex(lang)],
       ["a guide", urlGuide(lang, GUIDES[0])],
       ["the store finder", urlStores(lang)],
@@ -371,7 +372,7 @@ head("2. the six widths, phone to desktop");
     const ctx = await context(width, width >= 768 ? 900 : 780);
     for (const lang of ["pl", "ru"]) {
       for (const url of [urlHome(lang), urlCalcIndex(lang), urlCalc(lang, "waste"),
-        urlMaterials(lang), urlEstimate(lang), urlLiczmatPro(lang)]) {
+        urlConverter(lang), urlMaterials(lang), urlEstimate(lang), urlLiczmatPro(lang)]) {
         const page = await open(ctx, url, { lang });
         audit(`${lang} ${url} at ${width}px`, await page.evaluate(AUDIT, phone(page)));
         await page.close();

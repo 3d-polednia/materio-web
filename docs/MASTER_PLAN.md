@@ -95,7 +95,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 54 | Łańcuch i historia w aplikacji (repo aplikacji) | **Zrobione** — 2026-08-27, commit `68c026a`. Czeka na wydanie AAB (właściciel) |
 | 55 | Kształt pola formularza ze strony + przepisanie testów (repo aplikacji) | **Zrobione** — 2026-08-28, commit `0e7c47d`. Czeka na wydanie AAB (właściciel) |
 | 56 | „Wybierz materiał” i presety, jeden kształt — B2 + B3 + B4 + B5 (repo aplikacji) | **Zrobione** — 2026-08-28, commit `bed1926`. Czeka na wydanie AAB (właściciel) |
-| 57 | Konwerter jednostek na stronie — C1 (repo serwisu) | **Zaplanowane** |
+| 57 | Konwerter jednostek na stronie — C1 (repo serwisu) | **Zrobione** — 2026-08-29 |
 | 58 | Udostępnianie kosztorysu linkiem w aplikacji — C5 (repo aplikacji) | **Zaplanowane** |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
@@ -301,6 +301,112 @@ Po stronie serwisu: **trzy zrzuty na `/aplikacja/` przerenderowane** — tym raz
 wszystkie trzy ekrany (16,2 / 10,4 / 8,5 % pikseli). Jak 46, 47, 50, 52, 53, 54 i 55 —
 **czeka na wydanie AAB**.
 
+## Sesja 57 — konwerter jednostek na stronie (C1)
+
+**WYKONANO.** Serwis ma jedenaste narzędzie i dziesięć nowych adresów:
+`/konwerter-jednostek/` i jego dziewięć bliźniaków. To pozycja **C1** audytu parytetu —
+największa i jedyna, która dokłada ruchu, a nie tylko równa wygląd.
+
+**Silnik jest portem 1:1** `core/calculation/UnitConverter.kt` z repozytorium aplikacji:
+te same jedenaście kategorii w tej samej kolejności, te same **82 jednostki**, te same
+mnożniki co do cyfry i ta sama osobna gałąź dla temperatury. Dwa produkty odpowiadające
+różnie na „ile cali ma metr" to dokładnie ten defekt, którego audyt szukał, więc żadna
+liczba nie została tu „poprawiona". Dwie liczby aplikacji są zaokrągleniem definicji:
+`fl oz` to 0,0295735296 zamiast dokładnego 0,0295735295625, a `mmHg` to milimetr słupa rtęci,
+nie tor. Port je **zachowuje**, a §2 testu mówi, o ile chybiają (jedna część na 10⁷) i
+dlaczego to jest sześć miejsc poniżej czegokolwiek, co strona drukuje.
+
+**Jedno pole jest decyzją serwisu, nie aplikacji:** `def` — para, na której otwiera się
+każda kategoria. Aplikacja otwiera każdą na dwóch pierwszych jednostkach z listy (mm → cm),
+czyli na tym, co daje lista, a nie na tym, po co ktoś przyszedł. Strona otwiera długość na
+m → cm, temperaturę na °C → °F, ciśnienie na bar → psi, moc na kW → KM. To ta sama granica,
+którą `CALC_CATEGORIES` w `src/ia.mjs` trzyma dla kalkulatorów: jak **serwis** grupuje i
+otwiera swoje narzędzia, jest decyzją serwisu; silnik zostaje nietknięty (rozdział XIII).
+
+**Symbole jednostek nie są tłumaczone** — mm, ha, km/h, °C są te same w dziesięciu
+językach. To decyzja aplikacji, odziedziczona razem z tabelą, i kosztuje jedenaście
+przetłumaczonych stringów zamiast dziewięćdziesięciu. Nazwa modułu i nazwy jedenastu
+kategorii są **przepisane z aplikacji** (`converter_title`, `conv_cat_*`) — jeden moduł nie
+może się nazywać dwiema rzeczami na dwóch produktach, to zasada Sesji 53 puszczona w drugą
+stronę. Slug idzie za nazwą: `/konwerter-jednostek/`, `/en/unit-converter/`,
+`/de/einheitenumrechner/` — dziesięć razy ta sama nazwa, po ASCII.
+
+**Odpowiedź jest w HTML-u.** Build liczy 1 m → cm tymi samymi funkcjami, które strona potem
+pobiera, i wpisuje wynik do znacznika — tak samo jak strona kalkulatora niesie policzony
+przykład od Sesji 8. Bez tego strona bez JavaScriptu jest pustym formularzem. Pod
+narzędziem stoi **spis: jedenaście kategorii i wszystkie ich jednostki wypisane** — to jest
+treść tej strony dla robota i dla czytelnika bez skryptu.
+
+**Teksty strony siedzą w `src/conv-copy.mjs`, nie w słowniku**, i to nie jest porządek dla
+porządku. Pierwsza wersja włożyła 25 kluczy do `assets/i18n-pages.js`, a ten plik ląduje
+w pakiecie, który pobiera **każda** strona serwisu: `/app/` przekroczyło swój budżet
+w `scripts/test-perf.mjs` o kilobajt. Ten sam argument, który trzyma `src/calc-seo.mjs`
+poza słownikiem. Dwa klucze zostały w słowniku i oba mają powód: `conv_bad` pisze
+przeglądarka, a `convpage_title` jest etykietą linku w **stopce każdej z 383 stron** —
+`src/template.mjs` bierze ją z `footer.key` trasy.
+
+**PROBLEMY — jeden, znaleziony i naprawiony w tej sesji.** Przeniesienie `convpage_title`
+do `src/` sprawiło, że stopka **wszystkich 383 stron, we wszystkich dziesięciu językach**,
+wydrukowała dosłowne słowo `convpage_title`. Build nie protestował, wszystkie 26 zestawów
+było zielonych. To jest defekt Sesji 41 z innym kluczem: `t()` odpowiada nazwą klucza,
+kiedy klucza nie ma, i nic tego nie porównuje. §7 `scripts/test-converter.mjs` jest teraz
+siecią na to — **żaden klucz `conv_*` nie może pojawić się na żadnej wysłanej stronie**.
+Dziura ogólna zostaje otwarta i jest nazwana niżej.
+
+**ZMIENIONE PLIKI.**
+`assets/converter.js` (nowy — silnik i formularz), `src/conv-copy.mjs` (nowy — słowa strony
+w dziesięciu językach), `src/site.mjs` (`SECTION.converter`, `urlConverter`), `src/ia.mjs`
+(trasa `converter`, przenumerowana kolumna produktowa stopki), `src/pages.mjs`
+(`converterMain()`, kafel na hubie), `scripts/build.mjs` (`buildConverterPage()`,
+walidacja tekstów, STAMP `20260829a`), `assets/i18n-pages.js` (dwa klucze),
+`scripts/test-converter.mjs` i `scripts/test-converter-page.mjs` (nowe),
+`scripts/test-copy.mjs` (budżet), `scripts/test-perf.mjs` (budżet strony),
+`scripts/test-mobile.mjs` (konwerter w przemiataniu szerokości), `scripts/test-seo.mjs`,
+`scripts/test-a11y.mjs`, `scripts/test-langs.mjs` (liczniki stron 375 → 385),
+`privacy-policy.html` i `404.html` (stempel ręcznie), `CLAUDE.md`, `docs/ARCHITEKTURA.md`,
+plus 383 wygenerowane strony i `sitemap.xml`.
+
+**TESTY.** Wszystkie 28 zestawów logicznych przechodzą; nowy `test-converter.mjs` ma
+**1276 sprawdzeń**, nowy `test-converter-page.mjs` **192 w Chromium** (nic nie jest
+podstawiane). Przeglądarkowe: `test-pages` 759, `test-mobile` 1254, `test-phone` 372,
+`test-a11y-page` 59, `test-qa` 687 — wszystkie zielone.
+
+**Oczekiwania testu są wyprowadzone, nigdy przepisane z tabeli.** Odczytanie mnożnika
+z `assets/converter.js` i sprawdzenie tego samego mnożnika nie sprawdza niczego — przeszłoby
+z każdą liczbą w pliku zepsutą tak samo. §2 pracuje więc na zależnościach, których w tym
+repozytorium nie ma: cal to 2,54 cm, mila to 1760 jardów, akr to 4840 jardów kwadratowych,
+mila morska to 1852 m, galon to 4 kwarty i 128 uncji płynu. To lekcja, którą Sesja 47
+zapisała w repo aplikacji.
+
+**Dwa budżety podniesione, oba zmierzone.** `converter: 280` w `scripts/test-copy.mjs`
+(najszersza wersja, angielska, ma 274 słowa) i `calculators: 350 → 370` (hub urósł
+o jeden kafel; angielski ma 362). Oba to **listy, nie proza**: „Długość — mm, cm, dm, m,
+km, in, ft, yd, mi, nmi" to dziesięć słów i jeden fakt, a właściwej prozy strona ma cztery
+zdania. Strona konwertera dostała też własny budżet wagi w `scripts/test-perf.mjs`
+(207,0 kB / 60,9 kB gz przy 220 / 62).
+
+**STATUS.** Zrobione, w repozytorium serwisu, na `main`. Nic nie czeka na konsolę: strona
+jest statyczna, nie dotyka sieci, nie ma konta i niczego nie zapisuje. Wchodzi do
+`sitemap.xml` od razu.
+
+**Do zapisania na później, nie zrobione w tej sesji** (rozdział XXXV — jedno zadanie):
+
+- **`t()` milczy przy braku klucza.** Szablon, który wyda nieistniejący klucz, drukuje jego
+  nazwę i build nie protestuje. Sieć założona w tej sesji łapie tylko `conv_*`. Zestaw
+  kluczy, których naprawdę używają szablony, kontra słownik, to osobna sesja — i jest to ta
+  sama rodzina defektów, co Sesja 41.
+- **`/app/` stoi 100 bajtów pod swoim budżetem wagi** (354,9 kB przy 355). Następna sesja,
+  która dołoży klucz do słownika, zapali `test-perf`. To jest budżet działający zgodnie
+  z zamysłem, ale warto o tym wiedzieć zawczasu.
+- **Konwerter nie ma FAQ** ani danych strukturalnych `FAQPage`, które mają strony
+  kalkulatorów. Zdecydowanie świadome: to kolejne 40 zdań prozy w dziesięciu językach na
+  stronie, której treścią są liczby.
+- **Aplikacja nie wie o tym adresie.** Ekran konwertera w aplikacji nie linkuje do serwisu
+  i nie musi — ale gdyby parytet miał iść w drugą stronę, to jest jedno miejsce.
+
+**NASTĘPNE ZADANIE: Sesja 58 — udostępnianie kosztorysu linkiem w aplikacji (C5, repo
+aplikacji).** Nazwana, nie zaczęta.
+
 ## Audyt parytetu strona ↔ aplikacja — 27.08.2026 (Sesja 51)
 
 To jest **lista, z której biorą się Sesje 52–58**. Do 2026-08-28 leżała wyłącznie
@@ -335,7 +441,7 @@ Sesji 51 i zrzuty na `/aplikacja/`.
 
 | # | Co | Waga | Stan |
 |---|---|---|---|
-| C1 | **Konwerter jednostek — tylko w aplikacji.** Jedenaście kategorii (długość, powierzchnia, objętość, masa, temperatura, prędkość, czas, ciśnienie, energia, moc, dane). Silnik jest w Kotlinie; port to ta sama robota, co przy piętnastu kalkulatorach — i najtańszy nowy adres do zaindeksowania | Duże | Otwarte — Sesja 57 |
+| C1 | **Konwerter jednostek — tylko w aplikacji.** Jedenaście kategorii (długość, powierzchnia, objętość, masa, temperatura, prędkość, czas, ciśnienie, energia, moc, dane). Silnik jest w Kotlinie; port to ta sama robota, co przy piętnastu kalkulatorach — i najtańszy nowy adres do zaindeksowania | Duże | **Zrobione — Sesja 57** |
 | C2 | Terminarz — tylko na stronie | Duże | **Zrobione — Sesja 53** |
 | C3 | Łańcuch i historia — tylko na stronie | Duże | **Zrobione — Sesja 54** |
 | C4 | Jeden kalkulator policzony dwa razy (`STUD_WALL` + `WALL_LINING`) | Średnie | **Zrobione — Sesja 52** |
@@ -362,8 +468,8 @@ Pierwsze pięć pozycji ma **sztywną kolejność**: 52 → 53 → 54 → 55 →
 3. ~~C3 — pasek łańcucha i historia w aplikacji (M)~~ — **Sesja 54**
 4. ~~B1 — kształt pola formularza + przepisanie testów (M)~~ — **Sesja 55**
 5. ~~B2 + B3 + B4 + B5 — „Wybierz materiał" i presety, jeden kształt (S)~~ — **Sesja 56**
-6. C1 — konwerter jednostek **na stronie** (L) — Sesja 57. Największa pozycja i jedyna,
-   która dokłada serwisowi nowy ruch, a nie tylko równa wygląd
+6. ~~C1 — konwerter jednostek **na stronie** (L)~~ — **Sesja 57**. Największa pozycja
+   i jedyna, która dokłada serwisowi nowy ruch, a nie tylko równa wygląd
 7. C5 — udostępnianie linkiem w aplikacji (S) — Sesja 58
 
 ### Trzy rzeczy, których audyt nie ruszy bez decyzji właściciela

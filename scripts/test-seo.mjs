@@ -22,7 +22,7 @@
  * The second exception is gone. Session 30 let a calculator page's <title> run past 60
  * characters, because what those titles should say was session 31's subject and pinning
  * today's pattern down here would have been this session telling the next one it was
- * right. Session 31 wrote them, so the limit now applies to all 375 pages; what each one
+ * right. Session 31 wrote them, so the limit now applies to all 385 pages; what each one
  * says is checked in scripts/test-calc-seo.mjs.
  *
  * Dependency-free, plain `node`, exit 1 on failure — the same shape as the other logic
@@ -110,8 +110,10 @@ const INDEXED = PAGES.filter((page) => !isNoindex(page));
 head("0. the tree this suite is reading");
 {
   check("every page the build declares is on disk", PAGES.length > 0);
-  check("375 pages: 373 generated plus the two hand-written ones",
-    PAGES.length === 375, `found ${PAGES.length}`);
+  // 385 = 383 generated plus the two hand-written ones. It was 375 until session 57
+  // added the converter, which is one route in ten languages.
+  check("385 pages: 383 generated plus the two hand-written ones",
+    PAGES.length === 385, `found ${PAGES.length}`);
   check("every page has a <title>", PAGES.every((page) => page.title), 
     PAGES.filter((page) => !page.title).map((page) => page.url).join(", "));
   check("every page has a robots directive", PAGES.every((page) => page.robots),
@@ -196,8 +198,8 @@ head("2. sitemap.xml: the list, and where it comes from");
     declared.filter((u) => !listed.includes(u)).join(", "));
   check("and nothing else is", listed.every((u) => declared.includes(u)),
     listed.filter((u) => !declared.includes(u)).join(", "));
-  check("371 URLs: 370 in ten languages plus the privacy policy",
-    ENTRIES.length === 371, `found ${ENTRIES.length}`);
+  check("381 URLs: 380 in ten languages plus the privacy policy",
+    ENTRIES.length === 381, `found ${ENTRIES.length}`);
 
   for (const entry of ENTRIES) {
     check(`${entry.loc} is absolute and on the live domain`, entry.loc.startsWith(`${BASE}/`));
@@ -215,7 +217,7 @@ head("2. sitemap.xml: the list, and where it comes from");
 head("2b. sitemap.xml: lastmod, and the two elements that are not there");
 {
   // Google reads lastmod when it is "consistently and verifiably accurate" and ignores it
-  // otherwise, so a build that stamps today onto 371 URLs whether or not they changed
+  // otherwise, so a build that stamps today onto 381 URLs whether or not they changed
   // burns the field for the whole site. buildSitemap() carries the previous date forward
   // for a page whose content did not change, and the fingerprint behind that ignores the
   // ?v= stamp so bumping STAMP does not re-date everything.

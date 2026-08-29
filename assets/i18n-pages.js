@@ -57,7 +57,13 @@ const I18N_PAGES = {
     cc_cutting_d: "Ile sztang i płyt kupić, żeby wyszły wszystkie elementy.",
     cc_drywall: "Zabudowa G-K",
     cc_drywall_d: "Ściany działowe, sufity i poszycia: profile, płyty, wieszaki.",
-
+    /* Sesja 57 — konwerter jednostek (pozycja C1 audytu parytetu). To jest JEDYNY klucz
+       tej strony, który jest tutaj: reszta jej tekstów siedzi w src/conv-copy.mjs, bo
+       czyta je tylko build i czytelnik gotowego HTML-a, a ten plik ląduje w pakiecie,
+       który pobiera każda strona serwisu. Ten jeden jest wyjątkiem, bo pisze go
+       assets/converter.js w przeglądarce, kiedy w polu nie ma liczby. */
+    convpage_title: "Konwerter jednostek",
+    conv_bad: "Wpisz liczbę, żeby zobaczyć wynik.",
 
     hwc_title: "Jak to liczymy",
     hwc_inputs: "Co podajesz",
@@ -129,7 +135,6 @@ const I18N_PAGES = {
     note_ceiling: "Rozstaw profili nośnych CD 40 cm i wieszaków 90 cm to typowy sufit pod płytę. Przy większym obciążeniu rozstawy trzeba zagęścić.",
     note_drylining: "Metoda na kleju gipsowy działa tylko na równym, nośnym podłożu. Przy większych nierównościach potrzebny jest stelaż.",
     note_sheathing: "Wynik to liczba całych arkuszy bez planu rozkroju. Gdy chcesz wiedzieć, jak je pociąć, użyj kalkulatora rozkroju płyt 2D.",
-
 
     /* --- /app/dashboard/ — the dashboard of the free account (session 14) --- */
     nav_dashboard: "Pulpit",
@@ -682,7 +687,6 @@ const I18N_PAGES = {
     crm_ev_calc: "Zapisano kalkulację",
     crm_ev_cost: "Dopisano koszt",
 
-
     ck_p_crm: "Klienci, zlecenia i wyceny LiczMat Pro: nazwy, dane kontaktowe, notatki, statusy, terminy, przypisane projekty, pozycje robocizny i marża.",
     ck_p_sync_account: "Identyfikator konta, z którym ta przeglądarka synchronizowała się ostatnio. Dzięki niemu /app/ nie wyśle cudzych projektów na Twoje konto.",
 
@@ -829,7 +833,9 @@ const I18N_PAGES = {
     cc_cutting_d: "How many bars and sheets to buy so every piece comes out of them.",
     cc_drywall: "Drywall framing",
     cc_drywall_d: "Partitions, ceilings and sheathing: profiles, boards, hangers.",
-
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Unit converter",
+    conv_bad: "Type a number to see the result.",
 
     hwc_title: "How we calculate it",
     hwc_inputs: "What you enter",
@@ -900,7 +906,6 @@ const I18N_PAGES = {
     note_ceiling: "40 cm CD spacing and 90 cm hanger spacing is a typical ceiling under one board. Heavier loads need tighter spacing.",
     note_drylining: "The adhesive-dab method only works on a flat, sound substrate. Bigger deviations need a metal frame.",
     note_sheathing: "The result is a count of whole sheets with no cutting plan. If you need to know how to cut them, use the 2D sheet cutting calculator.",
-
 
     /* --- /app/dashboard/ — the dashboard of the free account (session 14) --- */
     nav_dashboard: "Dashboard",
@@ -1447,7 +1452,6 @@ const I18N_PAGES = {
     crm_ev_calc: "Calculation saved",
     crm_ev_cost: "Cost added",
 
-
     ck_p_crm: "LiczMat Pro clients, jobs and quotes: names, contact details, notes, statuses, dates, the projects filed under them, labour lines and the margin.",
     ck_p_sync_account: "The id of the account this browser last synced with, so that /app/ never sends somebody else's projects to your account.",
 
@@ -1593,7 +1597,9 @@ const I18N_PAGES = {
     cc_cutting_d: "Wie viele Stangen und Platten du brauchst, damit alle Teile herauskommen.",
     cc_drywall: "Trockenbau",
     cc_drywall_d: "Ständerwände, Decken und Beplankung: Profile, Platten, Abhänger.",
-
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Einheitenumrechner",
+    conv_bad: "Gib eine Zahl ein, um das Ergebnis zu sehen.",
 
     hwc_title: "So rechnen wir",
     hwc_inputs: "Was du eingibst",
@@ -1664,7 +1670,6 @@ const I18N_PAGES = {
     note_ceiling: "40 cm CD-Abstand und 90 cm Abhängerabstand sind typisch für eine einlagige Decke. Bei höherer Last müssen die Abstände enger werden.",
     note_drylining: "Die Ansetzbinder-Methode funktioniert nur auf ebenem, tragfähigem Untergrund. Größere Abweichungen brauchen eine Unterkonstruktion.",
     note_sheathing: "Das Ergebnis ist die Zahl ganzer Platten ohne Schnittplan. Wenn du wissen willst, wie du sie zuschneidest, nimm den 2D-Plattenzuschnitt.",
-
 
     /* --- /app/dashboard/ — the dashboard of the free account (session 14) --- */
     nav_dashboard: "Übersicht",
@@ -2211,7 +2216,6 @@ const I18N_PAGES = {
     crm_ev_calc: "Berechnung gespeichert",
     crm_ev_cost: "Kosten eingetragen",
 
-
     ck_p_crm: "Kunden, Aufträge und Angebote von LiczMat Pro: Namen, Kontaktdaten, Notizen, Status, Termine, zugeordnete Projekte, Positionen für Arbeitszeit und die Marge.",
     ck_p_sync_account: "Die Kennung des Kontos, mit dem dieser Browser zuletzt synchronisiert hat — damit /app/ keine fremden Projekte in dein Konto sendet.",
 
@@ -2357,7 +2361,9 @@ const I18N_PAGES = {
     cc_cutting_d: "Скільки штанг і плит купити, щоб вийшли всі деталі.",
     cc_drywall: "Гіпсокартон",
     cc_drywall_d: "Перегородки, стелі та обшивка: профілі, листи, підвіси.",
-
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Конвертер одиниць",
+    conv_bad: "Введіть число, щоб побачити результат.",
 
     hwc_title: "Як ми це рахуємо",
     hwc_inputs: "Що вводиш",
@@ -2428,7 +2434,6 @@ const I18N_PAGES = {
     note_ceiling: "Крок несучих CD 40 см і підвісів 90 см — типова стеля під один лист. При більшому навантаженні кроки треба згустити.",
     note_drylining: "Метод на клейові марки працює лише на рівній, міцній основі. Більші відхилення потребують каркаса.",
     note_sheathing: "Результат — кількість цілих аркушів без плану розкрою. Якщо треба знати, як їх різати, скористайся калькулятором розкрою плит 2D.",
-
 
     /* --- /app/dashboard/ — the dashboard of the free account (session 14) --- */
     nav_dashboard: "Панель",
@@ -2975,7 +2980,6 @@ const I18N_PAGES = {
     crm_ev_calc: "Збережено розрахунок",
     crm_ev_cost: "Дописано витрату",
 
-
     ck_p_crm: "Клієнти, замовлення та кошториси LiczMat Pro: назви, контактні дані, нотатки, статуси, терміни, прив'язані проєкти, позиції роботи та маржа.",
     ck_p_sync_account: "Ідентифікатор акаунта, з яким цей браузер синхронізувався востаннє, щоб /app/ не надіслав чужі проєкти до вашого акаунта.",
 
@@ -3123,6 +3127,9 @@ const I18N_PAGES = {
     cc_cutting_d: "Kolik tyčí a desek koupit, aby z nich vyšly všechny díly.",
     cc_drywall: "Sádrokarton",
     cc_drywall_d: "Příčky, podhledy a opláštění: profily, desky, závěsy.",
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Převodník jednotek",
+    conv_bad: "Zadejte číslo, ať uvidíte výsledek.",
     hwc_title: "Jak to počítáme",
     hwc_inputs: "Co zadáváš",
     hwc_formula: "Vzorec",
@@ -3849,6 +3856,9 @@ const I18N_PAGES = {
     cc_cutting_d: "Koľko tyčí a dosiek kúpiť, aby z nich vyšli všetky diely.",
     cc_drywall: "Sadrokartón",
     cc_drywall_d: "Priečky, podhľady a opláštenie: profily, dosky, závesy.",
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Prevodník jednotiek",
+    conv_bad: "Zadajte číslo, aby ste videli výsledok.",
     hwc_title: "Ako to počítame",
     hwc_inputs: "Čo zadávaš",
     hwc_formula: "Vzorec",
@@ -4575,6 +4585,9 @@ const I18N_PAGES = {
     cc_cutting_d: "Câte bare și plăci să cumperi ca să iasă toate piesele.",
     cc_drywall: "Rigips",
     cc_drywall_d: "Pereți despărțitori, tavane și placări: profile, plăci, tije.",
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Convertor de unități",
+    conv_bad: "Scrie un număr ca să vezi rezultatul.",
     hwc_title: "Cum calculăm",
     hwc_inputs: "Ce introduci",
     hwc_formula: "Formula",
@@ -5301,6 +5314,9 @@ const I18N_PAGES = {
     cc_cutting_d: "Koliko šipki i ploča kupiti da iz njih izađu svi dijelovi.",
     cc_drywall: "Gips-karton",
     cc_drywall_d: "Pregradni zidovi, stropovi i oplate: profili, ploče, vješalice.",
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Pretvarač jedinica",
+    conv_bad: "Upiši broj da vidiš rezultat.",
     hwc_title: "Kako računamo",
     hwc_inputs: "Što unosiš",
     hwc_formula: "Formula",
@@ -6027,6 +6043,9 @@ const I18N_PAGES = {
     cc_cutting_d: "Koliko šipki i ploča kupiti da iz njih izađu svi delovi.",
     cc_drywall: "Gips-karton",
     cc_drywall_d: "Pregradni zidovi, plafoni i oplate: profili, ploče, vešalice.",
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Konvertor jedinica",
+    conv_bad: "Upiši broj da vidiš rezultat.",
     hwc_title: "Kako računamo",
     hwc_inputs: "Šta unosiš",
     hwc_formula: "Formula",
@@ -6753,6 +6772,9 @@ const I18N_PAGES = {
     cc_cutting_d: "Сколько хлыстов и плит купить, чтобы вышли все детали.",
     cc_drywall: "Гипсокартон",
     cc_drywall_d: "Перегородки, потолки и обшивка: профили, листы, подвесы.",
+    /* Session 57 — the converter. Its other strings are in src/conv-copy.mjs. */
+    convpage_title: "Конвертер единиц",
+    conv_bad: "Введите число, чтобы увидеть результат.",
     hwc_title: "Как мы это считаем",
     hwc_inputs: "Что вводишь",
     hwc_formula: "Формула",

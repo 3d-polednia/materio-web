@@ -105,8 +105,9 @@ const ids = (page) => [...page.html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]
 
 head("0. the tree this suite is reading");
 {
-  check("375 pages: 373 generated plus the two hand-written ones",
-    PAGES.length === 375, `found ${PAGES.length}`);
+  // 385 since session 57 put the converter in ten languages beside the 373.
+  check("385 pages: 383 generated plus the two hand-written ones",
+    PAGES.length === 385, `found ${PAGES.length}`);
   check("every page declares a language",
     PAGES.every((page) => page.lang), PAGES.filter((page) => !page.lang).map((x) => x.url).join(", "));
   const codes = new Set(LANGS.map((l) => HREFLANG[l]));
@@ -199,7 +200,7 @@ head("2. the heading outline");
     (page) => `${page.url} opens with an h${outline(page)[0].level}`);
 
   // The footer's column headings were <h4> under a page full of <h2>s until session 34,
-  // so this one failed on all 375 pages.
+  // so this one failed on all 385 pages.
   checkAll("no level is skipped on the way down", PAGES, (page) => {
     let prev = 0;
     return outline(page).every((h) => { const ok = !prev || h.level <= prev + 1; prev = h.level; return ok; });
