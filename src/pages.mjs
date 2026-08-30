@@ -19,6 +19,7 @@ import {
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
 import { proGate, proModules, proPlansBlock } from "./pro.mjs";
 import { DEFAULT_CURRENCY } from "./currency.mjs";
+import { PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
 
 const LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
 
@@ -1069,6 +1070,182 @@ export function androidMain(lang, t, calcs, cat) {
  * from localStorage. Without a script the index is what stands, which is right: there is
  * nothing on either screen that does not come out of this browser's own storage.
  */
+/**
+ * The one string on the PDF block that is NOT the app's: printing works differently here.
+ *
+ * The app renders a PDF with `PdfDocument` and hands it to the Android share sheet. A
+ * static site has no renderer and may not fetch one — the whole product is dependency-free
+ * — so the document is markup and the browser's own print dialog is what turns it into a
+ * PDF. That is a real difference in how the button behaves, so it is said rather than
+ * hidden, and it is authored here because the app has no sentence for it.
+ */
+const PDF_WEB = {
+  pl: { hint: "Dokument otworzy się w oknie drukowania. Wybierz w nim zapis do PDF.", make: "Przygotuj PDF" },
+  en: { hint: "The document opens in the print dialog. Choose saving to PDF there.", make: "Prepare PDF" },
+  de: { hint: "Das Dokument öffnet sich im Druckdialog. Wählen Sie dort das Speichern als PDF.", make: "PDF vorbereiten" },
+  uk: { hint: "Документ відкриється у вікні друку. Виберіть у ньому збереження в PDF.", make: "Підготувати PDF" },
+  cs: { hint: "Dokument se otevře v dialogu tisku. Zvolte v něm uložení do PDF.", make: "Připravit PDF" },
+  sk: { hint: "Dokument sa otvorí v dialógu tlače. Zvoľte v ňom uloženie do PDF.", make: "Pripraviť PDF" },
+  ro: { hint: "Documentul se deschide în fereastra de tipărire. Alegeți acolo salvarea în PDF.", make: "Pregătește PDF" },
+  hr: { hint: "Dokument se otvara u dijalogu ispisa. Ondje odaberite spremanje u PDF.", make: "Pripremi PDF" },
+  sr: { hint: "Dokument se otvara u dijalogu štampe. Tamo izaberite čuvanje u PDF.", make: "Pripremi PDF" },
+  ru: { hint: "Документ откроется в окне печати. Выберите в нём сохранение в PDF.", make: "Подготовить PDF" },
+};
+
+/**
+ * The PDF export of one project — session 59, the second half of item C6.
+ *
+ * Two documents, exactly the two the app offers (`PdfExportType`): a technical report and
+ * an investor estimate. Every word is the app's own, out of src/pdf-copy.mjs.
+ *
+ * **The whole thing is markup, configurator and document both.** The document is in the
+ * page from the first paint, `hidden`, and assets/pdf-export.js fills in numbers and rows —
+ * the rule proGate() has followed since session 27, and the one that keeps the words out of
+ * the dictionary bundle every page on the site downloads. A document built by a script
+ * would also have to carry fifty translated strings to build it out of.
+ *
+ * Nothing here decides what the project costs. `wsProjectCosts()` does, and the PDF prints
+ * the same three figures the screen above it shows: a printed page that disagrees with the
+ * screen it was printed from is the defect worth avoiding, and it is why this does not copy
+ * the app's exporter, which totals the estimations alone.
+ */
+function pdfBlock(lang) {
+  const c = (key) => PDF_COPY[lang][key];
+  const web = PDF_WEB[lang];
+  const split = (key, slot) => {
+    const { before, after } = pdfSplit(c(key));
+    return `${esc(before)}<span data-pdf="${esc(slot)}"></span>${esc(after)}`;
+  };
+
+  // A checkbox with its label, in the shape .field-check already styles.
+  const opt = (name, key, on) =>
+    `<label class="field-check"><input type="checkbox" data-pdf-opt="${esc(name)}"${on ? " checked" : ""}> <span>${esc(c(key))}</span></label>`;
+
+  const field = (name, key, value = "") =>
+    `<label class="field ws-mat-f"><span class="fld-label">${esc(c(key))}</span>
+            <input type="text" data-pdf-in="${esc(name)}" value="${esc(value)}"></label>`;
+
+  const numField = (name, key, value = "") =>
+    `<label class="field ws-mat-f"><span class="fld-label">${esc(c(key))}</span>
+            <input type="text" inputmode="decimal" data-pdf-in="${esc(name)}" value="${esc(value)}"></label>`;
+
+  const configurator = `<form id="ws-pdf-form">
+            <fieldset class="pdf-types">
+              <legend class="fld-label">${esc(c("pdf_doc_type"))}</legend>
+              <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>${esc(c("pdf_technical"))}</span></label>
+              <label class="field-check"><input type="radio" name="pdf-type" value="investor"> <span>${esc(c("pdf_investor"))}</span></label>
+            </fieldset>
+
+            <details class="ws-mat-add">
+              <summary>${esc(c("pdf_scope"))}</summary>
+              ${opt("quantities", "pdf_quantities", true)}
+              ${opt("prices", "pdf_prices", true)}
+              ${opt("total", "pdf_total", true)}
+              ${opt("date", "pdf_date", true)}
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>${esc(c("pdf_contractor_data"))}</summary>
+              ${opt("contractor", "pdf_contractor_data", false)}
+              <p class="ws-mat-grid">
+                ${field("company", "pdf_company")}
+                ${field("phone", "pdf_phone")}
+                ${field("email", "pdf_email")}
+              </p>
+            </details>
+
+            <!-- Chapter §37's investor block. Hidden while the technical report is chosen:
+                 labour, margin and VAT are not part of a technical report, and a form that
+                 offers a field the document will not print is a form that lies. -->
+            <details class="ws-mat-add" data-pdf-investor hidden>
+              <summary>${esc(c("pdf_pricing"))}</summary>
+              ${opt("labor", "pdf_labor", false)}
+              <p class="ws-mat-grid">
+                ${numField("laborHours", "pdf_labor_hours")}
+                ${numField("laborRate", "pdf_labor_rate")}
+              </p>
+              ${opt("margin", "pdf_margin", false)}
+              <p class="ws-mat-grid">${numField("marginPercent", "pdf_margin_percent")}</p>
+              ${opt("vat", "pdf_vat", false)}
+              <p class="ws-mat-grid">${numField("vatPercent", "pdf_vat_percent", "23")}</p>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>${esc(c("pdf_optional"))}</summary>
+              ${opt("estimateNumber", "pdf_estimate_number", false)}
+              <p class="ws-mat-grid">${field("estimateNumber", "pdf_estimate_number")}</p>
+              ${opt("notes", "pdf_notes", false)}
+              <label class="field"><span class="fld-label">${esc(c("pdf_notes_hint"))}</span>
+                <textarea data-pdf-in="notesText" rows="3"></textarea></label>
+            </details>
+
+            <p><button type="submit" class="btn btn-primary">${esc(web.make)}</button></p>
+          </form>`;
+
+  // The document. Every heading and column header is here in this page's language; the
+  // script writes numbers, rows and the three split sentences, and nothing else.
+  const doc = `<article id="ws-pdf-doc" class="pdf-doc" hidden>
+            <header class="pdf-head">
+              <!-- Both names ship on the element and the script picks one: two words is cheaper
+                   than a dictionary key, and it keeps them out of the bundle every page loads. -->
+              <p class="pdf-sub" data-pdf="subtitle"
+                 data-technical="${esc(c("pdfdoc_subtitle_technical"))}"
+                 data-investor="${esc(c("pdfdoc_subtitle_investor"))}"></p>
+              <p class="pdf-line" data-pdf-row="project">${split("pdfdoc_project", "projectName")}</p>
+              <p class="pdf-line" data-pdf-row="date">${split("pdfdoc_date", "date")}</p>
+              <p class="pdf-line" data-pdf-row="estimateNo" hidden>${split("pdfdoc_estimate_no", "estimateNo")}</p>
+              <div class="pdf-contractor" data-pdf-row="contractor" hidden>
+                <p data-pdf="company"></p>
+                <p data-pdf="phone"></p>
+                <p data-pdf="email"></p>
+              </div>
+            </header>
+
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th scope="col">${esc(c("pdfdoc_col_material"))}</th>
+                  <th scope="col" data-pdf-col="qty">${esc(c("pdfdoc_col_qty"))}</th>
+                  <th scope="col" data-pdf-col="value">${esc(c("pdfdoc_col_value"))}</th>
+                </tr>
+              </thead>
+              <tbody data-pdf="rows"></tbody>
+            </table>
+            <p class="pdf-empty" data-pdf-row="empty" hidden>${esc(c("pdfdoc_no_estimations"))}</p>
+
+            <p class="pdf-total" data-pdf-row="total">
+              <span>${esc(c("pdfdoc_grand_total"))}</span> <b data-pdf="total"></b>
+            </p>
+            <p class="pdf-line" data-pdf-row="waste" hidden>${split("pdfdoc_waste_total", "waste")}</p>
+
+            <section class="pdf-pricing" data-pdf-row="pricing" hidden>
+              <h2>${esc(c("pdfdoc_pricing_header"))}</h2>
+              <dl>
+                <div><dt>${esc(c("pdfdoc_materials_net"))}</dt><dd data-pdf="materialsNet"></dd></div>
+                <div data-pdf-row="labor" hidden><dt>${esc(c("pdfdoc_labor"))}</dt><dd data-pdf="labor"></dd></div>
+                <div data-pdf-row="marginRow" hidden><dt>${esc(c("pdfdoc_margin"))}</dt><dd data-pdf="margin"></dd></div>
+                <div class="pdf-strong" data-pdf-row="net" hidden><dt>${esc(c("pdfdoc_net_total"))}</dt><dd data-pdf="net"></dd></div>
+                <div data-pdf-row="vatRow" hidden><dt>${esc(c("pdfdoc_vat"))}</dt><dd data-pdf="vat"></dd></div>
+                <div class="pdf-strong" data-pdf-row="gross" hidden><dt>${esc(c("pdfdoc_gross_total"))}</dt><dd data-pdf="gross"></dd></div>
+              </dl>
+            </section>
+
+            <section class="pdf-notes" data-pdf-row="notes" hidden>
+              <h2>${esc(c("pdfdoc_notes"))}</h2>
+              <p data-pdf="notes">${esc(c("pdfdoc_notes_default"))}</p>
+            </section>
+
+            <p class="pdf-foot">${esc(c("pdfdoc_footer"))}</p>
+          </article>`;
+
+  return `<section class="dash-sec ws-pdf" id="ws-pdf">
+            <div class="dash-head"><h2>${esc(c("pdf_title"))}</h2></div>
+            <p class="muted">${esc(web.hint)}</p>
+            ${configurator}
+            ${doc}
+          </section>`;
+}
+
 export function projectsMain(lang, t, aisles = []) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
@@ -1266,6 +1443,8 @@ export function projectsMain(lang, t, aisles = []) {
               </form>
             </details>
           </section>
+
+          ${pdfBlock(lang)}
         </div>
       </article>`;
 
@@ -2588,7 +2767,7 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
            state ships in the markup rather than being created later: a heading a script
            fills either ships with the text the script would use, or it is an empty
            heading somebody can reach. -->
-      <div data-omat-list></div>
+      <div data-omat-list data-hist-label="${esc(c("omat_hist_t"))}"></div>
       <p class="muted" data-omat-empty>${esc(t("omat_empty"))}</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">${esc(c("omat_use_note"))}</p>

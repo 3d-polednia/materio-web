@@ -49,6 +49,7 @@ import { CALC_META } from "../src/calc-meta.mjs";
 import { CALC_SEO, TITLE_MAX } from "../src/calc-seo.mjs";
 import { CONV_COPY, CONV_COPY_KEYS } from "../src/conv-copy.mjs";
 import { OMAT_COPY, OMAT_COPY_KEYS } from "../src/omat-copy.mjs";
+import { PDF_COPY, PDF_COPY_KEYS } from "../src/pdf-copy.mjs";
 import { appMain, shareMain, dashboardMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -213,6 +214,22 @@ function validate() {
     }
     if (copy.omatpage_meta && (copy.omatpage_meta.length < 50 || copy.omatpage_meta.length > 160)) {
       problems.push(`own-materials/${lang}: the description is ${copy.omatpage_meta.length} characters, outside 50–160`);
+    }
+  }
+
+  /* The PDF export's words (session 59, C6). They are the app's own strings, so a missing
+     one means an extraction that went wrong rather than a translation that was forgotten —
+     either way the document would print a blank heading, which is worse than not printing. */
+  for (const lang of LANGS) {
+    const copy = PDF_COPY[lang];
+    if (!copy) { problems.push(`pdf: no ${lang} copy (src/pdf-copy.mjs)`); continue; }
+    for (const key of PDF_COPY_KEYS) {
+      if (!copy[key] || !String(copy[key]).trim()) problems.push(`pdf/${lang}: no ${key}`);
+    }
+    // The three Android templates have to keep their hole, or pdfSplit() glues a label to
+    // a value and the sentence loses its word order.
+    for (const key of ["pdfdoc_project", "pdfdoc_date", "pdfdoc_estimate_no"]) {
+      if (!String(copy[key]).includes("%1$s")) problems.push(`pdf/${lang}: ${key} lost its %1$s`);
     }
   }
 
@@ -560,6 +577,9 @@ const WS_SCRIPTS = [
   // Both halves: these two pages draw the screens, and the screens speak the vocabulary
   // assets/workspace-calc.js defines. Order matters — plain scripts, one global scope.
   "/assets/workspace-calc.js", "/assets/workspace-ui.js",
+  // The PDF export of session 59 (C6). Last, because it reads the workspace through the
+  // globals above and writes into markup the build already put on the page.
+  "/assets/pdf-export.js",
 ];
 
 /**

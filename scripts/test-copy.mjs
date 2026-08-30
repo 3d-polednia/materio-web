@@ -392,7 +392,17 @@ head("§7 how much prose a page carries");
  * about the currency, and the two about where the rows live and how a calculator reaches
  * them. It is under the /projekty/ budget it most resembles.
  *
- * The same session raised `cookies` from 540 to 570 (the English page, 564). That page is a
+ * The same session raised `projects` from 390 to 480 (the English page, 480) for the PDF
+ * export it put on that screen, and `cookies` from 540 to 570 (the English page, 564).
+ * The PDF block is a configurator: a document type, four scope checkboxes, three contractor
+ * fields, five investor fields and two optional ones, each one label on one control, plus
+ * the fifty headings and column titles of the document itself, which ships in the markup
+ * so a reader with no JavaScript still has a page and the words stay out of the dictionary
+ * every page on the site downloads. Its prose proper is one sentence: what the button does.
+ * A budget that refused it would be asking for the document to be built by a script, which
+ * is the thing this repo has argued against since session 27.
+ *
+ * On `cookies`: That page is a
  * table of every store this site writes, one row each, and session 59 added a store: the
  * row names the key and says what is in it. A budget that refused the row would be asking
  * for a store nobody can look up, which is the opposite of what the page is for.
@@ -400,7 +410,7 @@ head("§7 how much prose a page carries");
 const BUDGET = {
   home: 370, calculators: 370, calculator: 400, converter: 280, guides: 280, guide: 220,
   "own-materials": 210,
-  materials: 2280, stores: 150, android: 480, projects: 390, estimate: 190,
+  materials: 2280, stores: 150, android: 480, projects: 480, estimate: 190,
   clients: 500, jobs: 520, quotes: 460, calendar: 400, cookies: 570,
   "liczmat-pro": 450, account: 850, dashboard: 130, share: 40, privacy: 3800,
 };

@@ -278,6 +278,21 @@ const MAT_PRIMARY_CALC = {
 const primaryCalcFor = (m) => MAT_PRIMARY_CALC[m.k];
 
 /** Every material a given calculator can be pre-filled from. */
+/**
+ * One material by the id a row carries, the visitor's own included.
+ *
+ * The picker lists both kinds and their ids cannot collide — an own material's is
+ * `own-<rowId>` — so anything that turns a chosen id back into a material has to ask both.
+ * Looking only in MATERIALS is how the dialog closed on an own material and picked nothing.
+ */
+function materialById(id) {
+  if (typeof id === "string" && id.startsWith("own-") && typeof omCatalogRows === "function") {
+    const own = omCatalogRows().find((m) => m.id === id);
+    if (own) return own;
+  }
+  return MATERIALS.find((m) => m.id === id) || null;
+}
+
 function materialsForCalc(calcId) {
   const kinds = MAT_KINDS_FOR_CALC[calcId];
   if (!kinds) return [];
@@ -396,6 +411,6 @@ const MAT_CATS_USED = MAT_CATS.filter((c) => MATERIALS.some((m) => m.c === c));
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     MATERIALS, MAT_CATS, MAT_CATS_USED, MAT_KINDS_FOR_CALC,
-    materialsForCalc, materialFill, matName, matNote, primaryCalcFor,
+    materialsForCalc, materialById, materialFill, matName, matNote, primaryCalcFor,
   };
 }

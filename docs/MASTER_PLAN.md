@@ -97,6 +97,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 56 | „Wybierz materiał” i presety, jeden kształt — B2 + B3 + B4 + B5 (repo aplikacji) | **Zrobione** — 2026-08-28, commit `bed1926`. Czeka na wydanie AAB (właściciel) |
 | 57 | Konwerter jednostek na stronie — C1 (repo serwisu) | **Zrobione** — 2026-08-29 |
 | 58 | Udostępnianie kosztorysu linkiem w aplikacji — C5 (repo aplikacji) | **Zrobione** — 2026-08-29, commit `68506a4`. Czeka na wydanie AAB (właściciel) |
+| 59 | Eksport PDF i własne materiały — C6 (oba repozytoria) | **Zrobione** — 2026-08-30. Reguły i AAB czekają (właściciel) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -511,9 +512,159 @@ zmieniła się o bajt.** Jak Sesje 46, 47, 50, 52–56 — **czeka na wydanie AA
 „Do zrobienia w konsolach"). Reguły `sharedProjects` są wdrożone od dawna, więc ta sesja
 niczego nowego do konsoli nie dokłada.
 
-**NASTĘPNE ZADANIE: C6 — eksport PDF i własne materiały na stronie** (bez numeru, repo
-serwisu; historia cen jest poza kontraktem synchronizacji, więc zakres jest do rozstrzygnięcia
-przez właściciela). Nazwane, nie zaczęte.
+**NASTĘPNE ZADANIE: C6 — eksport PDF i własne materiały** (bez numeru, repo serwisu;
+historia cen jest poza kontraktem synchronizacji, więc zakres jest do rozstrzygnięcia
+przez właściciela). Nazwane, nie zaczęte. *(Zrobione jako Sesja 59, 2026-08-30 —
+właściciel wybrał pełny zakres, więc kontrakt też się zmienił.)*
+
+## Sesja 59 — eksport PDF i własne materiały (C6)
+
+**WYKONANO.** Ostatnia pozycja kodowa audytu parytetu, w obu repozytoriach. Fachowiec
+zapisuje materiał, którego nie ma w katalogu, razem z ceną u swojego dostawcy i historią
+jej zmian — i drukuje projekt jako raport techniczny albo wycenę dla inwestora. Do tej
+sesji obie rzeczy były **tylko w telefonie**.
+
+**Zakres wybrał właściciel: pełne C6.** Audyt zapisał tę pozycję z zastrzeżeniem, że
+historia cen jest poza kontraktem synchronizacji, więc zakres jest do rozstrzygnięcia.
+Trzy drogi (sam PDF; PDF plus materiały bez historii; wszystko, z poszerzeniem kontraktu)
+zostały przedstawione i wybrana została trzecia. Dlatego sesja zaczyna się od kontraktu,
+a nie od ekranu.
+
+### Kontrakt — repo aplikacji
+
+**Zasada, która trzymała te wiersze poza kontem, była prawdziwa o innej tabeli.**
+`FIRESTORE_SYNC` §1.5 mówiła „katalog materiałów to nie dane użytkownika". To prawda
+o 161 pozycjach `Catalog*.kt`, które jadą razem z aplikacją i nie mają czego
+synchronizować. `CustomMaterialEntity` to co innego: nazwa, wymiary i **cena, którą ktoś
+płaci u swojego dostawcy** — i była jedyną rzeczą w telefonie, której nowe urządzenie nie
+dostawało inaczej niż przez odtworzenie kopii zapasowej. `users/{uid}/materials` to
+dziewiąta kolekcja.
+
+**Historia cen jedzie w środku dokumentu, w polu `prices[]`.** Punkt cenowy należy do
+jednego materiału, nic na niego nie wskazuje, nikt go po zapisaniu nie edytuje i ginie
+razem z materiałem — te same cztery fakty, przez które linie robocizny siedzą w wycenie.
+Podkolekcja wymagałaby własnych nagrobków i własnej kaskady, czyli maszynerii od
+`estimations`, dla wiersza z dwiema liczbami i datą. Lista jest **ograniczona do 60
+punktów, od najnowszego**, i czytający **sortuje**, zamiast ufać zapisującemu — dopiero to
+sprawia, że limit znaczy „sześćdziesiąt ostatnich" dla dokumentu z dowolnego wydania.
+Cena jest wprost: materiał przeceniany częściej niż 60 razy zachowuje po synchronizacji 60
+ostatnich cen. To pięć lat przeceniania co miesiąc.
+
+**Rozstrzyganie konfliktu obejmuje historię.** Dokument wygrywa albo przegrywa w całości,
+`prices[]` razem z nim. Scalanie dwóch historii dałoby przebieg cen, którego nie było na
+żadnym urządzeniu.
+
+**Migracja 7 → 8 zasila `updatedAt` z `createdAt`.** Nie zerem — wtedy każdy istniejący
+wiersz przegrywałby „ostatni zapis wygrywa" z każdym dokumentem, jaki spotka. I nie
+„teraz" — wtedy każdy wiersz na każdym urządzeniu twierdziłby, że jest najnowszy; to ten
+sam błąd odwrócony. Wiersz, którego nikt nie edytował, zmienił się wtedy, kiedy powstał.
+
+**`updatePrice()` rusza teraz `updatedAt`, nie tylko `priceUpdatedAt`.** Synchronizacja
+pyta każdy wiersz, czy zmienił się od ostatniego przebiegu, i pyta o `updatedAt` — bez tej
+poprawki przeceniony materiał **nigdy by nie pojechał**. To jedyny błąd w tej sesji, który
+byłby niewidoczny do chwili, gdy ktoś porówna dwa urządzenia.
+
+**`remoteId` nadaje się przy pierwszym wypchnięciu, nie przy tworzeniu wiersza** —
+odwrotnie niż u klienta, zlecenia i wyceny. Powód: nic nie wskazuje na materiał po
+identyfikatorze. Kalkulacja przepisuje jego liczby, nie linkuje do niego.
+
+### Strona — własne materiały
+
+**`/moje-materialy/` w dziesięciu językach, poziom GOŚĆ**, jak `/projekty/` i z tego samego
+powodu: `assets/own-materials.js` trzyma wiersze w `localStorage` w kształcie dokumentu,
+więc ekran działa bez logowania, a konto dokłada synchronizację, a nie możliwość zapisania
+materiału. `navLevel: LICZMAT` — gość w menu dostawałby link do listy, która jest pusta,
+dopóki czegoś nie wpisze. Trasa wisi pod `/materialy/`, bo to strona, na której ktoś
+odkrywa, że katalog nie ma płyty jego dostawcy.
+
+**Trend liczy się przy każdym odczycie i nie jest nigdzie zapisany.** Różnica trzymana
+obok dwóch cen, z których wynika, to trzecia liczba, która kiedyś się z nimi rozjedzie.
+Dwie ceny w różnych walutach **nie są odejmowane** — rozdział VI zabrania przeliczania po
+kursie, więc wiersz to mówi zamiast pokazać liczbę.
+
+**Własny materiał wypełnia kalkulator tą samą maszynerią, co katalogowy.**
+`omToCatalogRow()` oddaje wiersz w kształcie `assets/materials.js`, więc wybierak, filtr
+i `materialFill()` nie muszą wiedzieć, skąd wiersz pochodzi.
+
+**Copy strony jest build-time (`src/omat-copy.mjs`)**, z tego samego zmierzonego powodu, co
+konwerter: każda strona serwisu pobiera `assets/i18n.<lang>.js`. W słowniku zostaje
+szesnaście stringów, które JavaScript wybiera już po wysłaniu strony, i `omatpage_title` —
+etykieta stopki na wszystkich 393 stronach.
+
+### Strona — eksport PDF
+
+**Dokument jest markupem, a PDF pisze okno drukowania przeglądarki.** Aplikacja renderuje
+prawdziwy PDF przez `PdfDocument`; statyczna strona nie ma renderera i ten produkt nie ma
+zależności. Więc cały dokument jest wpisany w `/projekty/?id=<id>`, `hidden`, a
+`assets/pdf-export.js` wstawia liczby i wiersze. Strona **mówi o tym wprost** — to jedyne
+zdanie tutaj, którego aplikacja nie ma.
+
+**Wszystkie pozostałe słowa są aplikacji** — 29 kluczy `pdf_*` konfiguratora i 22 klucze
+`pdfdoc_*` dokumentu, przepisane z `values-<lang>/strings.xml` w dziesięciu językach. Nic
+nie było tłumaczone i nic wymyślone; §4 testu porównuje wszystkie 510 stringów z zasobami
+aplikacji, kiedy oba repozytoria stoją obok siebie.
+
+**Arytmetyka to `computeInvestorBreakdown()`, warstwa po warstwie**: materiał → +
+robocizna → + marża → netto → + VAT → brutto, każda zaokrąglona dokładnie tam, gdzie
+zaokrągla Kotlin, a warstwa wyłączona wnosi zero, żeby łańcuch pod nią dalej się zgadzał.
+
+**Sumą na dokumencie jest `wsProjectCosts()`, a nie suma samych kalkulacji, którą liczy
+aplikacja.** Serwis ma jedną odpowiedź na „ile kosztuje ten projekt", a wydruk nie może
+kłócić się z ekranem, z którego został zrobiony. Różnica jest świadoma i zapisana.
+
+**PROBLEMY — trzy defekty, wszystkie znalezione przez testy w przeglądarce, wszystkie
+naprawione:**
+
+- **Wybierak materiału nie umiał wybrać własnego.** Dialog szukał klikniętego
+  identyfikatora wyłącznie w `MATERIALS`, więc kliknięcie własnego materiału zamykało okno
+  i nie wybierało nic. `materialById()` pyta teraz oba zbiory.
+- **Formularz czytał pola z ukrytych grup.** Trzy z pięciu zastosowań mają szerokość, więc
+  ta sama nazwa `data-omat-in` jest w dokumencie kilka razy i wygrywała ostatnia w DOM,
+  a nie ta, w którą ktoś wpisał.
+- **Skrypt drukował klucz `omat_app_WALL_FLOOR_COVERING`** w akapicie, który czyta
+  gość — bo te etykiety są build-time i `t()` ich nie zna. To defekt Sesji 41 pod nowym
+  kluczem. Słowa są już na stronie w odpowiednim języku (opcje `<select>`, etykiety nad
+  polami), więc skrypt czyta je z DOM, zamiast dokładać drugą kopię do pakietu, który
+  pobiera każda strona.
+- **Raport techniczny gubił odpad każdego wycenionego materiału.** Kalkulacja, z której
+  powstał materiał, jest drukowana jako ten materiał, więc bez przepisania `wastePercentage`
+  i `wasteCostMinor` odpad znikał — a to jest ta rzecz, która czyni raport technicznym.
+
+**Trzy budżety podniesione, każdy zmierzony i uzasadniony w pliku, który go trzyma:**
+`/app/` do 405/126 kB (niesie teraz trzeci magazyn), `projekty` do 480 słów (konfigurator
+PDF i dokument w markupie) i `cookies` do 570 (jeden magazyn więcej w tabeli). Nowy typ
+strony `own-materials` dostał 210.
+
+**ZMIENIONE PLIKI.** W `3d-polednia/Materio`: `core/database/entity/Entities.kt`,
+`core/database/AppDatabase.kt` (wersja 8 + `MIGRATION_7_8`), `core/database/dao/Daos.kt`,
+`core/database/CustomMaterialRepository.kt`, `core/sync/SyncContract.kt` (`PricePoint`,
+`materialToDoc`/`materialFromDoc`/`pricesFromDoc`), `core/sync/CloudSync.kt`,
+`di/AppModule.kt`, `di/SyncModule.kt`, `config/firebase/firestore.rules` (`validMaterial()`),
+`docs/FIRESTORE_SYNC.md`, `CLAUDE.md`, plus `MaterialContractTest.kt`
+i `MaterialMigrationTest.kt`. W tym repozytorium: `assets/own-materials.js`,
+`assets/own-materials-ui.js`, `assets/pdf-export.js` (nowe), `src/omat-copy.mjs`,
+`src/pdf-copy.mjs` (nowe), `src/ia.mjs`, `src/site.mjs`, `src/pages.mjs`,
+`assets/materials.js`, `assets/materials-ui.js`, `assets/app.js`, `assets/styles.css`,
+`assets/i18n-pages.js`, `scripts/build.mjs`, cztery nowe zestawy testów, trzy budżety
+i przegenerowane strony.
+
+**TESTY. Aplikacja: 309/309 przechodzi** (było 284; 25 nowych, w tym migracja puszczona na
+ręcznie zbudowanej tabeli v7 z danymi). **Serwis: wszystkie 31 zestawów logicznych i 22
+zestawy w Chromium przechodzą**, w tym 905 nowych sprawdzeń własnych materiałów, 1184 PDF-a,
+159 klikanych na `/moje-materialy/` i 105 klikanych na eksporcie. Cztery nowe pliki:
+`scripts/test-own-materials.mjs`, `test-own-materials-page.mjs`, `test-pdf.mjs`,
+`test-pdf-page.mjs`.
+
+**STATUS.** Zrobione, w obu repozytoriach, na `main`. **Nic z tego nie dojedzie do chmury,
+dopóki nie wdrożone są reguły** — `validMaterial()` dołącza do trzech reguł Sesji 46
+czekających na `firebase deploy --only firestore` (punkt 1 listy konsolowej). Połowa
+w repo aplikacji czeka dodatkowo na wydanie AAB (punkt 2). Ekran i eksport działają bez
+tego, bo obie rzeczy są lokalne, dopóki ktoś się nie zaloguje.
+
+**NASTĘPNE ZADANIE: decyzje właściciela — B6, D1, D2, D3 i D4.** Audyt nie ma już żadnej
+pozycji kodowej; zostało pięć pozycji, które są pytaniami, nie robotą: tytuł ekranu
+w aplikacji, siedem walut kontra dwadzieścia siedem, rubel, drugi angielski i nazwa języka
+w wybieraku. Nazwane, nie zaczęte.
 
 ## Audyt parytetu strona ↔ aplikacja — 27.08.2026 (Sesja 51)
 
@@ -554,7 +705,7 @@ Sesji 51 i zrzuty na `/aplikacja/`.
 | C3 | Łańcuch i historia — tylko na stronie | Duże | **Zrobione — Sesja 54** |
 | C4 | Jeden kalkulator policzony dwa razy (`STUD_WALL` + `WALL_LINING`) | Średnie | **Zrobione — Sesja 52** |
 | C5 | **Udostępnianie kosztorysu linkiem — tylko na stronie.** `CloudSync` zna `sharedProjects`, ale interfejs aplikacji udostępnia **plik CSV**, nie link. Backend jest po obu stronach: brakuje przycisku i jednego zapisu | Średnie | **Zrobione — Sesja 58** |
-| C6 | **Eksport PDF i własne materiały — tylko w aplikacji.** `PdfConfigScreen` i `CustomMaterialsScreen` z historią cen. Historia cen **nie jest w kontrakcie synchronizacji**, więc dziś nie dojedzie do przeglądarki, nawet gdyby strona umiała ją pokazać | Średnie | Otwarte — bez numeru |
+| C6 | **Eksport PDF i własne materiały — tylko w aplikacji.** `PdfConfigScreen` i `CustomMaterialsScreen` z historią cen. Historia cen **nie była w kontrakcie synchronizacji** — Sesja 59 ją tam wstawiła | Średnie | **Zrobione — Sesja 59** |
 | C7 | **Poradniki (strona) i gazetki sieci (aplikacja) — asymetria zaprojektowana.** Zapisane, żeby następny audyt nie zgłosił tego jako defektu | Bez zmian | — |
 
 ### D. Języki i waluty — najwięcej cichych rozjazdów
@@ -579,6 +730,8 @@ Pierwsze pięć pozycji ma **sztywną kolejność**: 52 → 53 → 54 → 55 →
 6. ~~C1 — konwerter jednostek **na stronie** (L)~~ — **Sesja 57**. Największa pozycja
    i jedyna, która dokłada serwisowi nowy ruch, a nie tylko równa wygląd
 7. ~~C5 — udostępnianie linkiem w aplikacji (S)~~ — **Sesja 58**
+8. ~~C6 — eksport PDF i własne materiały (M)~~ — **Sesja 59**. Ostatnia pozycja kodowa
+   audytu; jedyna, która wymagała zmiany kontraktu synchronizacji przed napisaniem ekranu
 
 ### Trzy rzeczy, których audyt nie ruszy bez decyzji właściciela
 
@@ -618,8 +771,8 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 
 | # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
 |---|---|---|---|---|
-| 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia i wyceny nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
-| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52, 53, 54, 55 i 56) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Kształtu pola z Sesji 55 ani wybieraka materiału z presetami z Sesji 56 też nie: w sklepie formularz dalej ma etykietę wpuszczoną w ramkę i pudełko wyższe niż na stronie. Terminarza z Sesji 53 ani ścieżki i historii z Sesji 54 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły z pięciu, mimo że w `main` jest już pięć. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
+| 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46, a `validMaterial()` od Sesji 59. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia, wyceny i własne materiały nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
+| 2 | **Wydanie AAB — dopiero po punkcie 1** | Play Console | Zmierzone: w produkcji stoi **1.10.2 (`versionCode` 11002)**, a `main` ma niewydane commity (Sesje 46, 47, 50, 52–56, 58 i 59) przy **tej samej** wersji | Poprawka zaokrąglenia z Sesji 47 nie dotarła do nikogo: telefon liczy inaczej niż serwis. Ekrany Pro też nie. Wygląd z Sesji 50 też nie — w sklepie stoi aplikacja w starej oliwce, a `/aplikacja/` na stronie pokazuje już nową. Scalenie kalkulatora z Sesji 52 też nie: w sklepie wybierak dalej ma szesnaście pozycji zamiast piętnastu. Kształtu pola z Sesji 55 ani wybieraka materiału z presetami z Sesji 56 też nie: w sklepie formularz dalej ma etykietę wpuszczoną w ramkę i pudełko wyższe niż na stronie. Terminarza z Sesji 53 ani ścieżki i historii z Sesji 54 też nie — kto zapłaci za Pro i otworzy telefon, dostaje trzy moduły z pięciu, mimo że w `main` jest już pięć. **Trzeba podbić `versionCode`/`versionName`** — Play odrzuca powtórzony |
 | 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
 | 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
 | 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |

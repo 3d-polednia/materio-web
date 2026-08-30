@@ -1196,4 +1196,27 @@ body { background: #fff; color: #000; }
 .ws-table th, .ws-table td { border-bottom: 1px solid #ccc; }
 .ws-table-scroll { overflow-x: visible; }
 @page { margin: 18mm 14mm; }
+#ws-pdf-form, .ws-pdf > .dash-head, .ws-pdf > .muted { display: none !important; }
+body[data-pdf-print] * { visibility: hidden; }
+body[data-pdf-print] #ws-pdf-doc, body[data-pdf-print] #ws-pdf-doc * { visibility: visible; }
+body[data-pdf-print] #ws-pdf-doc { position: absolute; left: 0; top: 0; width: 100%; }
+#ws-pdf-doc { color: #000; }
+#ws-pdf-doc .pdf-table { width: 100%; border-collapse: collapse; }
+#ws-pdf-doc .pdf-table th, #ws-pdf-doc .pdf-table td {
+border-bottom: 1px solid #ccc; padding: 4px 0; text-align: left; vertical-align: top;
 }
+#ws-pdf-doc [hidden] { display: none !important; }
+}
+.ws-pdf .pdf-types { border: 0; padding: 0; margin: 0 0 var(--sp-3); }
+.pdf-doc { font-size: var(--fs-sm); }
+.pdf-doc .pdf-sub { font-weight: var(--fw-bold); letter-spacing: .06em; }
+.pdf-doc .pdf-line, .pdf-doc .pdf-total { margin: var(--sp-2) 0; }
+.pdf-doc .pdf-total { font-weight: var(--fw-bold); }
+.pdf-doc .pdf-waste { color: var(--muted); font-size: var(--fs-xs); }
+.pdf-doc .pdf-pricing dl { margin: var(--sp-3) 0 0; }
+.pdf-doc .pdf-pricing dl > div {
+display: flex; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-1) 0;
+}
+.pdf-doc .pdf-pricing dt, .pdf-doc .pdf-pricing dd { margin: 0; }
+.pdf-doc .pdf-strong { font-weight: var(--fw-bold); }
+.pdf-doc .pdf-foot { color: var(--muted); margin-top: var(--sp-5); }

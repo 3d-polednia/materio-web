@@ -55,10 +55,25 @@ function omuShowGroup(form, application) {
   });
 }
 
-/** Everything the form holds, as the store's own argument shape. */
+/**
+ * Everything the form holds, as the store's own argument shape.
+ *
+ * A field inside a hidden group is **not** read. Three of the five groups have a width and
+ * three have a length, so the same `data-omat-in` name appears more than once in the
+ * document — and reading them all means the last one in the DOM wins, which is whichever
+ * group happens to be furthest down rather than the one somebody typed into. A covering
+ * with a width of 600 would arrive at the store with the drywall group's empty one.
+ *
+ * `omMeasures()` in the store nulls the unused fields out a second time, on the way in.
+ * That is not this check being redundant: the store guards the shape of the row, and this
+ * guards which of two inputs the visitor meant.
+ */
 function omuFormFields(form) {
   const out = {};
-  form.querySelectorAll("[data-omat-in]").forEach((el) => { out[el.dataset.omatIn] = el.value; });
+  form.querySelectorAll("[data-omat-in]").forEach((el) => {
+    if (el.closest("[data-omat-group][hidden]")) return;
+    out[el.dataset.omatIn] = el.value;
+  });
   return out;
 }
 
@@ -110,12 +125,36 @@ function omuHistory(id) {
   ).join("")}</ol>`;
 }
 
+/**
+ * The words the BUILD wrote, read back out of the page.
+ *
+ * The five application names and the six measurement labels live in src/omat-copy.mjs and
+ * are therefore not in the dictionary bundle — that is the point of the module. A script
+ * that called t("omat_app_WALL_FLOOR_COVERING") prints the key, which is session 41's
+ * defect with a new name and is exactly what the first browser run of this screen showed.
+ *
+ * They are already on the page in this page's language: the five as the options of the
+ * form's own <select>, the six as the labels above the fields. Reading them from there
+ * keeps one source rather than adding a second copy to a bundle every page downloads.
+ */
+function omuAppLabel(id) {
+  const opt = document.querySelector(`[data-omat-in="application"] option[value="${id}"]`);
+  return opt ? opt.textContent.trim() : String(id || "");
+}
+
+/** A measurement's label, without the unit its own field spells out in brackets. */
+function omuFieldLabel(key) {
+  const el = document.querySelector(`[data-omat-f="${key}"] .fld-label`);
+  const text = el ? el.textContent.trim() : key;
+  return text.replace(/\s*\([^)]*\)\s*$/, "");
+}
+
 /** The one-line spec under the name, built from the numbers rather than stored beside them. */
 function omuSpec(m) {
   const bits = [];
   const add = (key, value, unit) => {
     if (value === null || value === undefined) return;
-    bits.push(`${omuT(`omat_f_${key}`).replace(/\s*\([^)]*\)\s*$/, "")}: ${omuNum(value)}${unit}`);
+    bits.push(`${omuFieldLabel(key)}: ${omuNum(value)}${unit}`);
   };
   add("widthMm", m.widthMm, " mm");
   add("lengthMm", m.lengthMm, " mm");
@@ -126,11 +165,17 @@ function omuSpec(m) {
   return bits.join(" · ");
 }
 
+/** "Historia cen" in this page's language — build-time copy, stamped on the list by it. */
+function omuHistLabel() {
+  const list = document.querySelector("[data-omat-list]");
+  return (list && list.dataset.histLabel) || "";
+}
+
 /** One material: what it is, what it costs, its history, and the two things you can do to it. */
 function omuRow(m) {
   return `<article class="card omat-row" data-omat-row="${omuEsc(m.id)}">
     <h3>${omuEsc(m.name)}</h3>
-    <p class="muted">${omuEsc(omuT(`omat_app_${m.application}`) || m.application)}</p>
+    <p class="muted">${omuEsc(omuAppLabel(m.application))}</p>
     <p class="muted omat-spec">${omuEsc(omuSpec(m))}</p>
     <p class="omat-price">${omuPriceLine(m)}</p>
     ${omuTrendLine(m.id)}
@@ -143,7 +188,7 @@ function omuRow(m) {
       <button type="button" class="btn btn-ghost btn-sm" data-omat-save-price>${omuEsc(omuT("omat_price_set"))}</button>
     </p>
     <details class="omat-hist-box">
-      <summary>${omuEsc(omuT("omat_hist_t") || "")}</summary>
+      <summary>${omuEsc(omuHistLabel())}</summary>
       ${omuHistory(m.id)}
     </details>
     <p class="omat-actions">
@@ -188,6 +233,10 @@ function omuInit() {
   const err = form.querySelector("[data-omat-err]");
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    // Cleared BEFORE the write, not after it. omSave() dispatches `ownmaterialschange`
+    // synchronously, so the redraw runs inside omAdd() — a token cleared afterwards leaves
+    // the strip offering to undo a delete that has already been drawn over.
+    omuUndone = null;
     const added = omAdd(omuFormFields(form));
     if (!added) {
       // A material with no name is a row nobody can tell apart. Said out loud rather than
@@ -211,11 +260,13 @@ function omuInit() {
       if (!row) return;
       const id = row.dataset.omatRow;
       if (e.target.closest("[data-omat-delete]")) {
-        const token = omDelete(id);
-        omuUndone = token || null;
+        // Set first, for the reason above: the redraw happens inside omDelete().
+        omuUndone = id;
+        if (!omDelete(id)) { omuUndone = null; omuRenderUndo(); }
         return;
       }
       if (e.target.closest("[data-omat-save-price]")) {
+        omuUndone = null;
         const field = row.querySelector("[data-omat-newprice]");
         omSetPrice(id, field ? field.value : "");
       }
@@ -226,8 +277,9 @@ function omuInit() {
   if (strip) {
     strip.addEventListener("click", (e) => {
       if (!e.target.closest("[data-omat-undo-go]")) return;
-      if (omuUndone) omRestore(omuUndone);
+      const token = omuUndone;
       omuUndone = null;
+      if (token) omRestore(token);
       omuRenderUndo();
     });
   }

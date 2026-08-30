@@ -71,7 +71,7 @@ function matBuildDialog() {
   dlg.querySelector("#mat-list").addEventListener("click", (e) => {
     const row = e.target.closest("[data-mat]");
     if (!row) return;
-    const m = MATERIALS.find((x) => x.id === row.dataset.mat);
+    const m = materialById(row.dataset.mat);
     dlg.close();
     if (m && matOnPick) matOnPick(m);
   });
@@ -160,7 +160,7 @@ function buildMaterialPickers() {
   // ?m=<id> — /materialy/ links straight into a pre-filled calculation.
   const wanted = new URLSearchParams(location.search).get("m");
   if (!wanted) return;
-  const m = MATERIALS.find((x) => x.id === wanted);
+  const m = materialById(wanted);
   if (!m) return;
   const card = Array.from(document.querySelectorAll(".calc[data-calc]"))
     .find((c) => materialsForCalc(c.dataset.calc).some((x) => x.id === wanted));

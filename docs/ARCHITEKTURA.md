@@ -1695,6 +1695,49 @@ może, to zapisać sobie `plan` — i tego reguły pilnują od pierwszego dnia. 
 w aplikacji nadal nie eksportuje ani tych trzech kolekcji, ani pokoi; to starsza dziura
 i osobne zadanie.
 
+### 7.18. Własne materiały i eksport PDF (Sesja 59, C6)
+
+Ostatnia pozycja kodowa audytu parytetu, i jedyna, która wymagała **zmiany kontraktu
+synchronizacji, zanim dało się napisać ekran**.
+
+**Nowa trasa: `/moje-materialy/`**, dziesięć adresów, poziom **GOŚĆ** z `navLevel: LICZMAT`
+— dokładnie jak `/projekty/` i z tego samego powodu. Wiersze leżą w `localStorage`
+w kształcie dokumentu Firestore, więc ekran działa bez logowania; konto dokłada
+synchronizację, a nie możliwość zapisania materiału. Link jest w stopce, bo rząd nagłówka
+jest pełny przy pięciu pozycjach. Rodzicem jest `/materialy/`: to strona, na której ktoś
+odkrywa, że katalog nie ma płyty jego dostawcy.
+
+**Dziewiąta kolekcja kontraktu: `users/{uid}/materials/{materialId}`.** Do tej sesji
+`FIRESTORE_SYNC` §5 trzymała te wiersze lokalnie, uzasadniając to zdaniem prawdziwym
+o katalogu wbudowanym (161 pozycji, jedzie z aplikacją) i fałszywym o tabeli obok niego
+(nazwa, wymiary i cena u konkretnego dostawcy). Historia cen jedzie **w polu `prices[]`**,
+ograniczonym do 60 najnowszych punktów — punkt należy do jednego materiału, nic na niego
+nie wskazuje, nic go nie edytuje i ginie razem z materiałem, czyli te same cztery fakty,
+przez które linie robocizny siedzą w wycenie.
+
+**Trzeci magazyn `localStorage`.** `liczmat-materials-v1` stoi obok
+`materio-workspace-v1` i `liczmat-crm-v1`, z tego samego powodu, co tamten: dwa pliki
+piszące jeden klucz to jeden wyścig od zgubionego zapisu. `/app/` wysyła i pobiera
+wszystkie trzy; to nie czyni z nich jednego magazynu. Klucz jest na `/cookies/` i na
+liście czyszczenia urządzenia.
+
+**Własny materiał wchodzi do kalkulatora tą samą drogą, co katalogowy.**
+`omToCatalogRow()` oddaje wiersz w kształcie `assets/materials.js`, więc `materialsForCalc()`,
+filtr wybieraka i `materialFill()` nie wiedzą, skąd wiersz pochodzi. `materialById()` jest
+tym, co zamienia kliknięty identyfikator z powrotem w materiał — musi pytać oba zbiory,
+bo identyfikator własnego zaczyna się od `own-`.
+
+**Eksport PDF stoi na ekranie projektu (`/projekty/?id=<id>`) i nie ma własnej trasy.**
+To eksport tego, co już jest na tej stronie, a nie osobne miejsce. Cały dokument jest
+w markupie, `hidden`, w języku tej strony; `assets/pdf-export.js` wstawia liczby i woła
+`window.print()`. Statyczna strona nie ma renderera PDF i ten produkt nie ma zależności,
+więc PDF pisze okno drukowania przeglądarki — i strona mówi o tym wprost.
+
+**Suma na wydruku to `wsProjectCosts()`, a nie suma samych kalkulacji, którą liczy
+eksporter w aplikacji.** Serwis ma jedną odpowiedź na „ile kosztuje ten projekt"; wydruk,
+który kłóci się z ekranem, z którego powstał, byłby gorszym defektem niż różnica wobec
+telefonu. Różnica jest świadoma.
+
 ## 8. Otwarte decyzje
 
 Do rozstrzygnięcia przez właściciela, zanim dotknie ich któraś z kolejnych sesji.

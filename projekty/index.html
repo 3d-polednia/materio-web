@@ -345,6 +345,121 @@
               </form>
             </details>
           </section>
+
+          <section class="dash-sec ws-pdf" id="ws-pdf">
+            <div class="dash-head"><h2>Eksport wyceny</h2></div>
+            <p class="muted">Dokument otworzy się w oknie drukowania. Wybierz w nim zapis do PDF.</p>
+            <form id="ws-pdf-form">
+            <fieldset class="pdf-types">
+              <legend class="fld-label">Typ dokumentu</legend>
+              <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Raport techniczny</span></label>
+              <label class="field-check"><input type="radio" name="pdf-type" value="investor"> <span>Wycena dla inwestora</span></label>
+            </fieldset>
+
+            <details class="ws-mat-add">
+              <summary>Zakres</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="quantities" checked> <span>Ilości</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="prices" checked> <span>Ceny</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="total" checked> <span>Łączny koszt</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="date" checked> <span>Data</span></label>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Dane wykonawcy</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="contractor"> <span>Dane wykonawcy</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Nazwa firmy</span>
+            <input type="text" data-pdf-in="company" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Telefon</span>
+            <input type="text" data-pdf-in="phone" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">E-mail</span>
+            <input type="text" data-pdf-in="email" value=""></label>
+              </p>
+            </details>
+
+            
+            <details class="ws-mat-add" data-pdf-investor hidden>
+              <summary>Wycena inwestorska</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="labor"> <span>Robocizna</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Liczba godzin</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborHours" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Stawka za godzinę</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborRate" value=""></label>
+              </p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="margin"> <span>Marża</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Marża (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="marginPercent" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="vat"> <span>VAT</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">VAT (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="vatPercent" value="23"></label></p>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Opcjonalne</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="estimateNumber"> <span>Numer wyceny</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Numer wyceny</span>
+            <input type="text" data-pdf-in="estimateNumber" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="notes"> <span>Uwagi</span></label>
+              <label class="field"><span class="fld-label">Treść uwag</span>
+                <textarea data-pdf-in="notesText" rows="3"></textarea></label>
+            </details>
+
+            <p><button type="submit" class="btn btn-primary">Przygotuj PDF</button></p>
+          </form>
+            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+            <header class="pdf-head">
+              
+              <p class="pdf-sub" data-pdf="subtitle"
+                 data-technical="RAPORT TECHNICZNY"
+                 data-investor="WYCENA MATERIAŁÓW"></p>
+              <p class="pdf-line" data-pdf-row="project">Projekt: <span data-pdf="projectName"></span></p>
+              <p class="pdf-line" data-pdf-row="date">Data: <span data-pdf="date"></span></p>
+              <p class="pdf-line" data-pdf-row="estimateNo" hidden>Wycena nr: <span data-pdf="estimateNo"></span></p>
+              <div class="pdf-contractor" data-pdf-row="contractor" hidden>
+                <p data-pdf="company"></p>
+                <p data-pdf="phone"></p>
+                <p data-pdf="email"></p>
+              </div>
+            </header>
+
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th scope="col">MATERIAŁ</th>
+                  <th scope="col" data-pdf-col="qty">ILOŚĆ</th>
+                  <th scope="col" data-pdf-col="value">WARTOŚĆ</th>
+                </tr>
+              </thead>
+              <tbody data-pdf="rows"></tbody>
+            </table>
+            <p class="pdf-empty" data-pdf-row="empty" hidden>Brak wyliczeń.</p>
+
+            <p class="pdf-total" data-pdf-row="total">
+              <span>ŁĄCZNY KOSZT MATERIAŁÓW</span> <b data-pdf="total"></b>
+            </p>
+            <p class="pdf-line" data-pdf-row="waste" hidden>Łączny koszt odpadu: <span data-pdf="waste"></span></p>
+
+            <section class="pdf-pricing" data-pdf-row="pricing" hidden>
+              <h2>WYCENA INWESTORSKA</h2>
+              <dl>
+                <div><dt>Materiały (netto)</dt><dd data-pdf="materialsNet"></dd></div>
+                <div data-pdf-row="labor" hidden><dt>Robocizna</dt><dd data-pdf="labor"></dd></div>
+                <div data-pdf-row="marginRow" hidden><dt>Marża</dt><dd data-pdf="margin"></dd></div>
+                <div class="pdf-strong" data-pdf-row="net" hidden><dt>Suma netto</dt><dd data-pdf="net"></dd></div>
+                <div data-pdf-row="vatRow" hidden><dt>VAT</dt><dd data-pdf="vat"></dd></div>
+                <div class="pdf-strong" data-pdf-row="gross" hidden><dt>Suma brutto</dt><dd data-pdf="gross"></dd></div>
+              </dl>
+            </section>
+
+            <section class="pdf-notes" data-pdf-row="notes" hidden>
+              <h2>Uwagi:</h2>
+              <p data-pdf="notes">Wycena obejmuje szacunkowe zapotrzebowanie na materiały.</p>
+            </section>
+
+            <p class="pdf-foot">LiczMat — Policz. Zaplanuj. Zrealizuj.</p>
+          </article>
+          </section>
         </div>
       </article>
 
@@ -493,6 +608,7 @@
 <script src="/assets/workspace.js?v=20260830a"></script>
 <script src="/assets/workspace-calc.js?v=20260830a"></script>
 <script src="/assets/workspace-ui.js?v=20260830a"></script>
+<script src="/assets/pdf-export.js?v=20260830a"></script>
 <script src="/assets/main.js?v=20260830a"></script>
 
 </body>

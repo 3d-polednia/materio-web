@@ -345,6 +345,121 @@
               </form>
             </details>
           </section>
+
+          <section class="dash-sec ws-pdf" id="ws-pdf">
+            <div class="dash-head"><h2>Экспортировать смету</h2></div>
+            <p class="muted">Документ откроется в окне печати. Выберите в нём сохранение в PDF.</p>
+            <form id="ws-pdf-form">
+            <fieldset class="pdf-types">
+              <legend class="fld-label">Тип документа</legend>
+              <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Технический отчёт</span></label>
+              <label class="field-check"><input type="radio" name="pdf-type" value="investor"> <span>Инвесторская смета</span></label>
+            </fieldset>
+
+            <details class="ws-mat-add">
+              <summary>Объём</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="quantities" checked> <span>Количества</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="prices" checked> <span>Цены</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="total" checked> <span>Общая стоимость</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="date" checked> <span>Дата</span></label>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Данные подрядчика</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="contractor"> <span>Данные подрядчика</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Название компании</span>
+            <input type="text" data-pdf-in="company" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Телефон</span>
+            <input type="text" data-pdf-in="phone" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Эл. почта</span>
+            <input type="text" data-pdf-in="email" value=""></label>
+              </p>
+            </details>
+
+            
+            <details class="ws-mat-add" data-pdf-investor hidden>
+              <summary>Инвесторские цены</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="labor"> <span>Работа</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Часы</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborHours" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Почасовая ставка</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborRate" value=""></label>
+              </p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="margin"> <span>Наценка</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Наценка (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="marginPercent" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="vat"> <span>НДС</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">НДС (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="vatPercent" value="23"></label></p>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Необязательно</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="estimateNumber"> <span>Номер сметы</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Номер сметы</span>
+            <input type="text" data-pdf-in="estimateNumber" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="notes"> <span>Примечания</span></label>
+              <label class="field"><span class="fld-label">Текст примечания</span>
+                <textarea data-pdf-in="notesText" rows="3"></textarea></label>
+            </details>
+
+            <p><button type="submit" class="btn btn-primary">Подготовить PDF</button></p>
+          </form>
+            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+            <header class="pdf-head">
+              
+              <p class="pdf-sub" data-pdf="subtitle"
+                 data-technical="ТЕХНИЧЕСКИЙ ОТЧЁТ"
+                 data-investor="СМЕТА МАТЕРИАЛОВ"></p>
+              <p class="pdf-line" data-pdf-row="project">Проект: <span data-pdf="projectName"></span></p>
+              <p class="pdf-line" data-pdf-row="date">Дата: <span data-pdf="date"></span></p>
+              <p class="pdf-line" data-pdf-row="estimateNo" hidden>№ сметы: <span data-pdf="estimateNo"></span></p>
+              <div class="pdf-contractor" data-pdf-row="contractor" hidden>
+                <p data-pdf="company"></p>
+                <p data-pdf="phone"></p>
+                <p data-pdf="email"></p>
+              </div>
+            </header>
+
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th scope="col">МАТЕРИАЛ</th>
+                  <th scope="col" data-pdf-col="qty">КОЛ-ВО</th>
+                  <th scope="col" data-pdf-col="value">СТОИМОСТЬ</th>
+                </tr>
+              </thead>
+              <tbody data-pdf="rows"></tbody>
+            </table>
+            <p class="pdf-empty" data-pdf-row="empty" hidden>Нет расчётов.</p>
+
+            <p class="pdf-total" data-pdf-row="total">
+              <span>ОБЩАЯ СТОИМОСТЬ МАТЕРИАЛОВ</span> <b data-pdf="total"></b>
+            </p>
+            <p class="pdf-line" data-pdf-row="waste" hidden>Общая стоимость отходов: <span data-pdf="waste"></span></p>
+
+            <section class="pdf-pricing" data-pdf-row="pricing" hidden>
+              <h2>ИНВЕСТОРСКИЕ ЦЕНЫ</h2>
+              <dl>
+                <div><dt>Материалы (без НДС)</dt><dd data-pdf="materialsNet"></dd></div>
+                <div data-pdf-row="labor" hidden><dt>Работа</dt><dd data-pdf="labor"></dd></div>
+                <div data-pdf-row="marginRow" hidden><dt>Наценка</dt><dd data-pdf="margin"></dd></div>
+                <div class="pdf-strong" data-pdf-row="net" hidden><dt>Итого без НДС</dt><dd data-pdf="net"></dd></div>
+                <div data-pdf-row="vatRow" hidden><dt>НДС</dt><dd data-pdf="vat"></dd></div>
+                <div class="pdf-strong" data-pdf-row="gross" hidden><dt>Итого с НДС</dt><dd data-pdf="gross"></dd></div>
+              </dl>
+            </section>
+
+            <section class="pdf-notes" data-pdf-row="notes" hidden>
+              <h2>Примечания:</h2>
+              <p data-pdf="notes">Смета покрывает приблизительную потребность в материале.</p>
+            </section>
+
+            <p class="pdf-foot">LiczMat — Посчитай. Спланируй. Сделай.</p>
+          </article>
+          </section>
         </div>
       </article>
 
@@ -493,6 +608,7 @@
 <script src="/assets/workspace.js?v=20260830a"></script>
 <script src="/assets/workspace-calc.js?v=20260830a"></script>
 <script src="/assets/workspace-ui.js?v=20260830a"></script>
+<script src="/assets/pdf-export.js?v=20260830a"></script>
 <script src="/assets/main.js?v=20260830a"></script>
 
 </body>

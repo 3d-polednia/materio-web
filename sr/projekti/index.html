@@ -345,6 +345,121 @@
               </form>
             </details>
           </section>
+
+          <section class="dash-sec ws-pdf" id="ws-pdf">
+            <div class="dash-head"><h2>Izvezi predračun</h2></div>
+            <p class="muted">Dokument se otvara u dijalogu štampe. Tamo izaberite čuvanje u PDF.</p>
+            <form id="ws-pdf-form">
+            <fieldset class="pdf-types">
+              <legend class="fld-label">Vrsta dokumenta</legend>
+              <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Tehnički izveštaj</span></label>
+              <label class="field-check"><input type="radio" name="pdf-type" value="investor"> <span>Investitorski predračun</span></label>
+            </fieldset>
+
+            <details class="ws-mat-add">
+              <summary>Obim</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="quantities" checked> <span>Količine</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="prices" checked> <span>Cene</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="total" checked> <span>Ukupni trošak</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="date" checked> <span>Datum</span></label>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Podaci o izvođaču</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="contractor"> <span>Podaci o izvođaču</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Naziv firme</span>
+            <input type="text" data-pdf-in="company" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Telefon</span>
+            <input type="text" data-pdf-in="phone" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">E-pošta</span>
+            <input type="text" data-pdf-in="email" value=""></label>
+              </p>
+            </details>
+
+            
+            <details class="ws-mat-add" data-pdf-investor hidden>
+              <summary>Investitorske cene</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="labor"> <span>Rad</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Sati</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborHours" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Satnica</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborRate" value=""></label>
+              </p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="margin"> <span>Marža</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Marža (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="marginPercent" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="vat"> <span>PDV</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">PDV (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="vatPercent" value="23"></label></p>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Opciono</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="estimateNumber"> <span>Broj predračuna</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Broj predračuna</span>
+            <input type="text" data-pdf-in="estimateNumber" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="notes"> <span>Napomene</span></label>
+              <label class="field"><span class="fld-label">Tekst napomene</span>
+                <textarea data-pdf-in="notesText" rows="3"></textarea></label>
+            </details>
+
+            <p><button type="submit" class="btn btn-primary">Pripremi PDF</button></p>
+          </form>
+            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+            <header class="pdf-head">
+              
+              <p class="pdf-sub" data-pdf="subtitle"
+                 data-technical="TEHNIČKI IZVEŠTAJ"
+                 data-investor="PREDRAČUN MATERIJALA"></p>
+              <p class="pdf-line" data-pdf-row="project">Projekat: <span data-pdf="projectName"></span></p>
+              <p class="pdf-line" data-pdf-row="date">Datum: <span data-pdf="date"></span></p>
+              <p class="pdf-line" data-pdf-row="estimateNo" hidden>Br. predračuna: <span data-pdf="estimateNo"></span></p>
+              <div class="pdf-contractor" data-pdf-row="contractor" hidden>
+                <p data-pdf="company"></p>
+                <p data-pdf="phone"></p>
+                <p data-pdf="email"></p>
+              </div>
+            </header>
+
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th scope="col">MATERIJAL</th>
+                  <th scope="col" data-pdf-col="qty">KOL.</th>
+                  <th scope="col" data-pdf-col="value">VREDNOST</th>
+                </tr>
+              </thead>
+              <tbody data-pdf="rows"></tbody>
+            </table>
+            <p class="pdf-empty" data-pdf-row="empty" hidden>Nema izračuna.</p>
+
+            <p class="pdf-total" data-pdf-row="total">
+              <span>UKUPNI TROŠAK MATERIJALA</span> <b data-pdf="total"></b>
+            </p>
+            <p class="pdf-line" data-pdf-row="waste" hidden>Ukupni trošak otpada: <span data-pdf="waste"></span></p>
+
+            <section class="pdf-pricing" data-pdf-row="pricing" hidden>
+              <h2>INVESTITORSKE CENE</h2>
+              <dl>
+                <div><dt>Materijali (bez PDV-a)</dt><dd data-pdf="materialsNet"></dd></div>
+                <div data-pdf-row="labor" hidden><dt>Rad</dt><dd data-pdf="labor"></dd></div>
+                <div data-pdf-row="marginRow" hidden><dt>Marža</dt><dd data-pdf="margin"></dd></div>
+                <div class="pdf-strong" data-pdf-row="net" hidden><dt>Ukupno bez PDV-a</dt><dd data-pdf="net"></dd></div>
+                <div data-pdf-row="vatRow" hidden><dt>PDV</dt><dd data-pdf="vat"></dd></div>
+                <div class="pdf-strong" data-pdf-row="gross" hidden><dt>Ukupno sa PDV-om</dt><dd data-pdf="gross"></dd></div>
+              </dl>
+            </section>
+
+            <section class="pdf-notes" data-pdf-row="notes" hidden>
+              <h2>Napomene:</h2>
+              <p data-pdf="notes">Predračun obuhvata približnu potrebu za materijalom.</p>
+            </section>
+
+            <p class="pdf-foot">LiczMat — Izračunaj. Isplaniraj. Izvedi.</p>
+          </article>
+          </section>
         </div>
       </article>
 
@@ -493,6 +608,7 @@
 <script src="/assets/workspace.js?v=20260830a"></script>
 <script src="/assets/workspace-calc.js?v=20260830a"></script>
 <script src="/assets/workspace-ui.js?v=20260830a"></script>
+<script src="/assets/pdf-export.js?v=20260830a"></script>
 <script src="/assets/main.js?v=20260830a"></script>
 
 </body>

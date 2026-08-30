@@ -81,8 +81,8 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now 383 pages: a home page, a calculator
-hub, one page per calculator, a unit converter, guides, a store finder and the public page
+The site used to be one `index.html`. It is now 393 pages: a home page, a calculator
+hub, one page per calculator, a unit converter, guides, a store finder, the visitor's own materials and the public page
 for LiczMat Pro —
 each in all ten languages, at its own URL, so search engines can index more than the
 Polish front page. Writing that by
@@ -93,6 +93,8 @@ node scripts/build.mjs            # regenerate every page + sitemap.xml
 node scripts/build.mjs --check    # validate dictionaries/slugs only, write nothing
 node scripts/test-calculators.mjs # the calculator maths, units and localization
 node scripts/test-converter.mjs   # the unit converter: the port, the maths, the page
+node scripts/test-own-materials.mjs # own materials: the document, the history, the trend
+node scripts/test-pdf.mjs         # the PDF export: the arithmetic, the document, the words
 node scripts/test-account.mjs     # the account: levels, the session, the copy
 node scripts/test-dashboard.mjs   # the dashboard: the route, the tool list, the copy
 node scripts/test-projects.mjs    # projects: the route, the CRUD, the undo, the copy
@@ -172,6 +174,14 @@ src/site.mjs          Languages, URL slugs per section/calculator/guide — the 
 src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
 src/pages.mjs         The <main> of each page type
 src/calc-meta.mjs     Per-calculator formula lines + their translations
+src/omat-copy.mjs     The words on /moje-materialy/, ten languages. Build-time only, for
+                      the reason src/conv-copy.mjs is. `omatpage_title` is the one key that
+                      stayed in the dictionary — it is the footer's label on all 393 pages
+src/pdf-copy.mjs      The words on the PDF export, ten languages, and EVERY ONE of them is
+                      the app's own: the `pdf_*` keys of PdfConfigScreen and the `pdfdoc_*`
+                      keys of AndroidProjectPdfExporter, copied out of the app repo rather
+                      than translated. Build-time only, and there is no runtime half at all
+                      — the whole document is server-rendered and the browser fills numbers
 src/conv-copy.mjs     The words on the converter page, ten languages. Build-time only,
                       for the reason src/calc-seo.mjs is: every page on the site downloads
                       assets/i18n.<lang>.js. The title and the eleven category names are
@@ -747,6 +757,22 @@ assets/crm-ui.js      /klienci/ — the index and one client at ?id=<clientId>. 
                       details, notes, the projects filed under a client and what they have
                       cost, and the history, which is derived from the saved calculations
                       rather than logged. Chapter XXV's notice sits at the top of it
+assets/own-materials.js  The visitor's own materials and their price history, and the only
+                      file that writes them: the key (`liczmat-materials-v1`), the CRUD, the
+                      history, the trend, the catalogue row a calculator is filled from, and
+                      the omExport()/omImport() /app/ syncs with. **In the sync contract
+                      since session 59** — a row here IS the document of
+                      `users/{uid}/materials`, field for field. Split from the screen for
+                      page weight, like assets/crm-store.js: /app/ and the 150 calculator
+                      pages need the store and none of the screen
+assets/own-materials-ui.js  /moje-materialy/ — the list, the form, the price history and the
+                      undo. Every name in it starts `omu`. It reads the five application
+                      names and the six field labels out of the DOM the build wrote, never
+                      through t(): that copy is build-time, so t() would print the key
+assets/pdf-export.js  The PDF export on /projekty/?id=<id>: the options, the investor
+                      arithmetic (computeInvestorBreakdown() in the app repo, layer for
+                      layer) and the document filled in. It writes numbers and rows; every
+                      heading is already in the markup, in that page's language
 assets/recent.js      Which calculators this browser used, and when. Device-local, never
                       synced, no inputs and no results — only a calculator id and a time.
                       It is what the dashboard's "ostatnio używane narzędzia" reads
@@ -1307,6 +1333,85 @@ Kotlin side of it. Change one, change all three.
   `on`) or the module is behind the wall. When the wall is up the strip is hidden entirely:
   the wall says all of it, and twice is worse than once. A Pro account is never quoted a
   price either — offering to sell somebody what they already pay for reads as a threat.
+
+- **The visitor's own materials are in the sync contract, and the site is the second half of
+  it.** Session 59, item **C6** of the parity audit. `docs/FIRESTORE_SYNC.md` §5 kept
+  `CustomMaterialEntity` out of the account on the grounds that a material is reference data
+  — true of the bundled 161 rows of `assets/materials.js`, false of a row somebody typed in
+  with the price their own supplier charges. The same session put
+  `users/{uid}/materials/{materialId}` in the contract (Room migration 7 → 8,
+  `SyncContract.materialToDoc()`, `validMaterial()` in the deployed rules) and built
+  `/moje-materialy/` here. **The rules need deploying with the rest**, so nothing reaches the
+  cloud until then; the screen works signed out either way, because the rows are
+  `localStorage` in the document's own shape.
+- **The price history is `prices[]` inside the row, capped at the newest sixty.** A point
+  belongs to one material, nothing links to it, nothing edits one once written, and it dies
+  with the material — the four facts that keep a quote's labour lines inside the quote. The
+  cap is `SyncContract.MAX_PRICE_POINTS` and `d.prices.size() <= 60` in the rules, so a
+  browser that kept more would have its writes refused. The reader **sorts** rather than
+  trusting the writer, which is what makes the cap mean "the most recent sixty" for a row
+  written by any build of either product. `omImport()` replaces a material whole, its history
+  with it: merging two histories builds a price trend that happened on neither device.
+- **The trend is derived on every read, never stored.** `omTrend()` divides the newest point
+  by the oldest; a difference kept beside the two prices it comes from is a third number free
+  to disagree with both — the argument that already keeps a unit price off a shopping item.
+  Two points in different currencies are **not** subtracted: chapter VI forbids converting at
+  a rate, so the row says so instead of printing a figure.
+- **An own material fills a calculator through the machinery a bundled one already uses.**
+  `omToCatalogRow()` hands back a row in `assets/materials.js`'s own shape, so
+  `materialsForCalc()`, the picker's filter and `materialFill()` need to know nothing about
+  where a row came from. Two things had to learn: `matName()` prefers `m.name` over a term
+  key that does not exist for an own material, and **`materialById()` is what turns a chosen
+  id back into a material** — the dialog used to look only in `MATERIALS`, so clicking an own
+  material closed the dialog and picked nothing. `scripts/test-own-materials-page.mjs` found
+  that, and the same file found the two below.
+- **A field inside a hidden group is not read.** Three of the five applications have a width
+  and three have a length, so the same `data-omat-in` name is in the document more than once;
+  reading them all means the last one in the DOM wins rather than the one somebody typed
+  into. `omuFormFields()` skips anything inside a `[data-omat-group][hidden]`.
+- **The undo token is set BEFORE the write, not after it.** `omSave()` dispatches
+  `ownmaterialschange` synchronously, so the redraw runs *inside* `omDelete()` — a token
+  assigned afterwards leaves the strip hidden with a delete to undo, and one cleared
+  afterwards leaves it up offering to undo something already drawn over.
+- **A script may not reach for build-time copy through `t()`.** The five application names
+  and the six measurement labels live in `src/omat-copy.mjs`, so they are deliberately not in
+  the dictionary bundle — and `omuRow()` printed `omat_app_WALL_FLOOR_COVERING` in a
+  paragraph a visitor reads until the browser test caught it. That is session 41's defect
+  with a new key. The words are already on the page in the right language (the `<select>`'s
+  options, the labels above the fields), so `omuAppLabel()` and `omuFieldLabel()` read them
+  out of the DOM instead of adding a second copy to a bundle every page downloads.
+
+- **The PDF export is markup and the browser's own print dialog.** Session 59's second half.
+  The app renders a real PDF with `PdfDocument`; a static site has no renderer and this
+  product has no dependency, so the document is server-rendered into `/projekty/?id=<id>`,
+  `hidden`, and `assets/pdf-export.js` fills in numbers and calls `window.print()`. The page
+  says so rather than letting the button surprise anybody — that one sentence is the only
+  string here the app does not already have.
+- **Every other word is the app's own**, copied out of `values-<lang>/strings.xml`: the 29
+  `pdf_*` keys of the configurator and the 22 `pdfdoc_*` keys of the document, all ten
+  languages, nothing translated and nothing invented. One module may not be called two things
+  on the two products. `scripts/test-pdf.mjs` §4 compares all 510 strings against the app's
+  resources when the two repos are side by side.
+- **The arithmetic is `computeInvestorBreakdown()`, layer for layer.** Materials → + labour →
+  + margin → net → + VAT → gross, each layer rounded exactly once where the Kotlin rounds
+  once, and a switched-off layer contributing zero so the chain under it still holds. A blank
+  field is zero, which is `toDecimalOrNull() ?: 0.0` on the phone. §1b of the test reads the
+  Kotlin itself.
+- **What the document totals is `wsProjectCosts()`, not the app's estimation-only sum.** The
+  app's exporter adds up the saved calculations; this site has one answer to "what does this
+  project cost" and the printed page must not disagree with the screen it was printed from.
+  So the table is that function's own three halves — the shopping list, the calculations
+  nothing on it came from, and the hand-typed costs — each amount counted once.
+- **A priced material carries its calculation's waste across.** The technical report is the
+  one that shows the waste behind a number, and a calculation that produced a material is
+  printed as that material — so without the lookup every material anybody had actually priced
+  came out with no waste at all, which is most of them. `wastePercentage` and `wasteCostMinor`
+  are the contract's own fields on the calculation; nothing recomputes them.
+- **`data-pdf-print` hides the page for the length of one print, and by visibility.** A
+  `display: none` ancestor takes the document down with it and the document is nested six
+  levels inside the project screen. The flag is cleared on `afterprint` **and** on a timer,
+  because some browsers never fire it and a page left with everything but the document hidden
+  is worse than a page that printed nothing.
 
 - **A calculator page's title, its H1 and its first paragraph are one piece of copy, written
   per calculator and per language.** Session 31 replaced `calc_meta_pattern` — one shape

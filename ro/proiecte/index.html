@@ -345,6 +345,121 @@
               </form>
             </details>
           </section>
+
+          <section class="dash-sec ws-pdf" id="ws-pdf">
+            <div class="dash-head"><h2>Exportă devizul</h2></div>
+            <p class="muted">Documentul se deschide în fereastra de tipărire. Alegeți acolo salvarea în PDF.</p>
+            <form id="ws-pdf-form">
+            <fieldset class="pdf-types">
+              <legend class="fld-label">Tip de document</legend>
+              <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Raport tehnic</span></label>
+              <label class="field-check"><input type="radio" name="pdf-type" value="investor"> <span>Deviz pentru investitor</span></label>
+            </fieldset>
+
+            <details class="ws-mat-add">
+              <summary>Domeniu</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="quantities" checked> <span>Cantități</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="prices" checked> <span>Prețuri</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="total" checked> <span>Cost total</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="date" checked> <span>Data</span></label>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Date despre executant</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="contractor"> <span>Date despre executant</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Numele firmei</span>
+            <input type="text" data-pdf-in="company" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Telefon</span>
+            <input type="text" data-pdf-in="phone" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">E-mail</span>
+            <input type="text" data-pdf-in="email" value=""></label>
+              </p>
+            </details>
+
+            
+            <details class="ws-mat-add" data-pdf-investor hidden>
+              <summary>Prețuri pentru investitor</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="labor"> <span>Manoperă</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Ore</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborHours" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Tarif orar</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborRate" value=""></label>
+              </p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="margin"> <span>Marjă</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Marjă (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="marginPercent" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="vat"> <span>TVA</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">TVA (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="vatPercent" value="23"></label></p>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Opțional</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="estimateNumber"> <span>Numărul devizului</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Numărul devizului</span>
+            <input type="text" data-pdf-in="estimateNumber" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="notes"> <span>Note</span></label>
+              <label class="field"><span class="fld-label">Textul notei</span>
+                <textarea data-pdf-in="notesText" rows="3"></textarea></label>
+            </details>
+
+            <p><button type="submit" class="btn btn-primary">Pregătește PDF</button></p>
+          </form>
+            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+            <header class="pdf-head">
+              
+              <p class="pdf-sub" data-pdf="subtitle"
+                 data-technical="RAPORT TEHNIC"
+                 data-investor="DEVIZ DE MATERIALE"></p>
+              <p class="pdf-line" data-pdf-row="project">Proiect: <span data-pdf="projectName"></span></p>
+              <p class="pdf-line" data-pdf-row="date">Data: <span data-pdf="date"></span></p>
+              <p class="pdf-line" data-pdf-row="estimateNo" hidden>Nr. deviz: <span data-pdf="estimateNo"></span></p>
+              <div class="pdf-contractor" data-pdf-row="contractor" hidden>
+                <p data-pdf="company"></p>
+                <p data-pdf="phone"></p>
+                <p data-pdf="email"></p>
+              </div>
+            </header>
+
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th scope="col">MATERIAL</th>
+                  <th scope="col" data-pdf-col="qty">CANT.</th>
+                  <th scope="col" data-pdf-col="value">VALOARE</th>
+                </tr>
+              </thead>
+              <tbody data-pdf="rows"></tbody>
+            </table>
+            <p class="pdf-empty" data-pdf-row="empty" hidden>Niciun calcul.</p>
+
+            <p class="pdf-total" data-pdf-row="total">
+              <span>COST TOTAL AL MATERIALELOR</span> <b data-pdf="total"></b>
+            </p>
+            <p class="pdf-line" data-pdf-row="waste" hidden>Cost total al pierderilor: <span data-pdf="waste"></span></p>
+
+            <section class="pdf-pricing" data-pdf-row="pricing" hidden>
+              <h2>PREȚURI PENTRU INVESTITOR</h2>
+              <dl>
+                <div><dt>Materiale (fără TVA)</dt><dd data-pdf="materialsNet"></dd></div>
+                <div data-pdf-row="labor" hidden><dt>Manoperă</dt><dd data-pdf="labor"></dd></div>
+                <div data-pdf-row="marginRow" hidden><dt>Marjă</dt><dd data-pdf="margin"></dd></div>
+                <div class="pdf-strong" data-pdf-row="net" hidden><dt>Total fără TVA</dt><dd data-pdf="net"></dd></div>
+                <div data-pdf-row="vatRow" hidden><dt>TVA</dt><dd data-pdf="vat"></dd></div>
+                <div class="pdf-strong" data-pdf-row="gross" hidden><dt>Total cu TVA</dt><dd data-pdf="gross"></dd></div>
+              </dl>
+            </section>
+
+            <section class="pdf-notes" data-pdf-row="notes" hidden>
+              <h2>Note:</h2>
+              <p data-pdf="notes">Devizul acoperă necesarul aproximativ de material.</p>
+            </section>
+
+            <p class="pdf-foot">LiczMat — Calculează. Planifică. Realizează.</p>
+          </article>
+          </section>
         </div>
       </article>
 
@@ -493,6 +608,7 @@
 <script src="/assets/workspace.js?v=20260830a"></script>
 <script src="/assets/workspace-calc.js?v=20260830a"></script>
 <script src="/assets/workspace-ui.js?v=20260830a"></script>
+<script src="/assets/pdf-export.js?v=20260830a"></script>
 <script src="/assets/main.js?v=20260830a"></script>
 
 </body>

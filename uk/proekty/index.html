@@ -345,6 +345,121 @@
               </form>
             </details>
           </section>
+
+          <section class="dash-sec ws-pdf" id="ws-pdf">
+            <div class="dash-head"><h2>Експортувати кошторис</h2></div>
+            <p class="muted">Документ відкриється у вікні друку. Виберіть у ньому збереження в PDF.</p>
+            <form id="ws-pdf-form">
+            <fieldset class="pdf-types">
+              <legend class="fld-label">Тип документа</legend>
+              <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Технічний звіт</span></label>
+              <label class="field-check"><input type="radio" name="pdf-type" value="investor"> <span>Інвесторський кошторис</span></label>
+            </fieldset>
+
+            <details class="ws-mat-add">
+              <summary>Обсяг</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="quantities" checked> <span>Кількості</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="prices" checked> <span>Ціни</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="total" checked> <span>Загальна вартість</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="date" checked> <span>Дата</span></label>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Дані підрядника</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="contractor"> <span>Дані підрядника</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Назва компанії</span>
+            <input type="text" data-pdf-in="company" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Телефон</span>
+            <input type="text" data-pdf-in="phone" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Ел. пошта</span>
+            <input type="text" data-pdf-in="email" value=""></label>
+              </p>
+            </details>
+
+            
+            <details class="ws-mat-add" data-pdf-investor hidden>
+              <summary>Інвесторські ціни</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="labor"> <span>Робота</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Години</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborHours" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Погодинна ставка</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborRate" value=""></label>
+              </p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="margin"> <span>Націнка</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Націнка (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="marginPercent" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="vat"> <span>ПДВ</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">ПДВ (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="vatPercent" value="23"></label></p>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Необов’язково</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="estimateNumber"> <span>Номер кошторису</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Номер кошторису</span>
+            <input type="text" data-pdf-in="estimateNumber" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="notes"> <span>Примітки</span></label>
+              <label class="field"><span class="fld-label">Текст примітки</span>
+                <textarea data-pdf-in="notesText" rows="3"></textarea></label>
+            </details>
+
+            <p><button type="submit" class="btn btn-primary">Підготувати PDF</button></p>
+          </form>
+            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+            <header class="pdf-head">
+              
+              <p class="pdf-sub" data-pdf="subtitle"
+                 data-technical="ТЕХНІЧНИЙ ЗВІТ"
+                 data-investor="КОШТОРИС МАТЕРІАЛІВ"></p>
+              <p class="pdf-line" data-pdf-row="project">Проєкт: <span data-pdf="projectName"></span></p>
+              <p class="pdf-line" data-pdf-row="date">Дата: <span data-pdf="date"></span></p>
+              <p class="pdf-line" data-pdf-row="estimateNo" hidden>№ кошторису: <span data-pdf="estimateNo"></span></p>
+              <div class="pdf-contractor" data-pdf-row="contractor" hidden>
+                <p data-pdf="company"></p>
+                <p data-pdf="phone"></p>
+                <p data-pdf="email"></p>
+              </div>
+            </header>
+
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th scope="col">МАТЕРІАЛ</th>
+                  <th scope="col" data-pdf-col="qty">К-СТЬ</th>
+                  <th scope="col" data-pdf-col="value">ВАРТІСТЬ</th>
+                </tr>
+              </thead>
+              <tbody data-pdf="rows"></tbody>
+            </table>
+            <p class="pdf-empty" data-pdf-row="empty" hidden>Немає обчислень.</p>
+
+            <p class="pdf-total" data-pdf-row="total">
+              <span>ЗАГАЛЬНА ВАРТІСТЬ МАТЕРІАЛІВ</span> <b data-pdf="total"></b>
+            </p>
+            <p class="pdf-line" data-pdf-row="waste" hidden>Загальна вартість відходів: <span data-pdf="waste"></span></p>
+
+            <section class="pdf-pricing" data-pdf-row="pricing" hidden>
+              <h2>ІНВЕСТОРСЬКІ ЦІНИ</h2>
+              <dl>
+                <div><dt>Матеріали (без ПДВ)</dt><dd data-pdf="materialsNet"></dd></div>
+                <div data-pdf-row="labor" hidden><dt>Робота</dt><dd data-pdf="labor"></dd></div>
+                <div data-pdf-row="marginRow" hidden><dt>Націнка</dt><dd data-pdf="margin"></dd></div>
+                <div class="pdf-strong" data-pdf-row="net" hidden><dt>Разом без ПДВ</dt><dd data-pdf="net"></dd></div>
+                <div data-pdf-row="vatRow" hidden><dt>ПДВ</dt><dd data-pdf="vat"></dd></div>
+                <div class="pdf-strong" data-pdf-row="gross" hidden><dt>Разом з ПДВ</dt><dd data-pdf="gross"></dd></div>
+              </dl>
+            </section>
+
+            <section class="pdf-notes" data-pdf-row="notes" hidden>
+              <h2>Примітки:</h2>
+              <p data-pdf="notes">Кошторис охоплює приблизну потребу в матеріалі.</p>
+            </section>
+
+            <p class="pdf-foot">LiczMat — Порахуй. Сплануй. Зроби.</p>
+          </article>
+          </section>
         </div>
       </article>
 
@@ -493,6 +608,7 @@
 <script src="/assets/workspace.js?v=20260830a"></script>
 <script src="/assets/workspace-calc.js?v=20260830a"></script>
 <script src="/assets/workspace-ui.js?v=20260830a"></script>
+<script src="/assets/pdf-export.js?v=20260830a"></script>
 <script src="/assets/main.js?v=20260830a"></script>
 
 </body>
