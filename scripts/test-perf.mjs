@@ -127,7 +127,14 @@ const BUDGET = {
   "zlecenia/index.html": [405, 126],
   "wyceny/index.html": [410, 128],
   "terminarz/index.html": [385, 118],
-  "app/index.html": [355, 110],
+  // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
+  // one page that carries every store the account syncs, and session 59 gave it a third:
+  // assets/own-materials.js, 16.8 kB raw and 6.0 kB gzipped, plus the sixteen runtime
+  // `omat_*` keys in the dictionary bundle. The page's own copy did not grow. The number
+  // is the CRM pages' budget, which leaves the same headroom they have and stays under the
+  // CEILING below — the store half only is already the cheap option: assets/crm.js is
+  // 47 kB of screens /app/ never draws, and assets/own-materials-ui.js is not here either.
+  "app/index.html": [405, 126],
   "app/dashboard/index.html": [290, 89],
   "p/index.html": [200, 62],
 };

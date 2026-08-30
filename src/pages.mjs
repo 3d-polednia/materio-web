@@ -13,7 +13,7 @@ import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
-  urlCalendar, urlLiczmatPro, urlConverter,
+  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials,
   CALC_SLUG, PLAY_URL, URL_APP,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -822,6 +822,7 @@ export const COOKIE_ROWS = [
   { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },
   { name: "liczmat-recent-calcs", type: "ck_type_local", purpose: "ck_p_recent", life: "ck_life_until_cleared" },
   { name: "liczmat-crm-v1", type: "ck_type_local", purpose: "ck_p_crm", life: "ck_life_until_cleared" },
+  { name: "liczmat-materials-v1", type: "ck_type_local", purpose: "ck_p_omat", life: "ck_life_until_cleared" },
   { name: "liczmat-sync-account", type: "ck_type_local", purpose: "ck_p_sync_account", life: "ck_life_until_cleared" },
 ];
 
@@ -2479,6 +2480,128 @@ export function storesMain(lang, t) {
     </div>
   </section>
   ${appNote(t)}
+</main>`;
+
+  return { main, ld: crumbs.ld };
+}
+
+/* ------------------------------------------------------------------ /moje-materialy/ */
+
+/**
+ * The visitor's own materials and what they pay for them (session 59, item C6 of the
+ * parity audit). The app has had this screen since before the site existed; the browser
+ * had nothing, and the rows were outside the sync contract until the same session put
+ * `users/{uid}/materials` in it.
+ *
+ * Everything a reader needs is in the markup, `hidden` where it does not apply, and
+ * assets/own-materials-ui.js unhides and fills it — the rule proGate() has followed since
+ * session 27: a form built by a script is a form that flashes into existence, and a page
+ * whose whole body is written at runtime says nothing to a crawler or to somebody with no
+ * JavaScript.
+ *
+ * The five field groups are all in the document at once and the script shows the one the
+ * chosen application uses. There are eleven inputs between them and only the six that
+ * apply are ever read: `omMeasures()` in the store nulls out the rest, so a covering
+ * turned into a profile cannot keep a package area nothing will read.
+ */
+export function ownMaterialsMain(lang, t, aisles, copy) {
+  const c = (key) => copy[key];
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("nav_materials"), path: urlMaterials(lang) },
+    { name: t("omatpage_title"), path: urlOwnMaterials(lang) },
+  ]);
+
+  // The five applications, their labels and the fields each one uses. The ids are the
+  // app's own MaterialApplication names — the wire carries the enum name, so a sixth
+  // invented here would reach the phone as whatever its fallback is.
+  const APPS = [
+    ["WALL_FLOOR_COVERING", ["widthMm", "lengthMm", "packageAreaM2", "wastePercent"]],
+    ["DRYWALL_BOARDING", ["widthMm", "lengthMm", "wastePercent"]],
+    ["COATING", ["coveragePerUnitM2"]],
+    ["PANEL_CUTTING", ["widthMm", "lengthMm", "kerfMm"]],
+    ["LINEAR_STOCK", ["lengthMm", "kerfMm"]],
+  ];
+
+  const appOpts = APPS
+    .map(([id], i) => `<option value="${esc(id)}"${i === 0 ? " selected" : ""}>${esc(c(`omat_app_${id}`))}</option>`)
+    .join("");
+
+  const measureField = (key) => `<label class="field omat-f" data-omat-f="${esc(key)}">
+              <span class="fld-label">${esc(c(`omat_f_${key}`))}</span>
+              <input type="text" inputmode="decimal" data-omat-in="${esc(key)}">
+            </label>`;
+
+  // One group per application, all in the document, all but the first hidden.
+  const groups = APPS.map(([id, fields], i) =>
+    `<div class="omat-fields" data-omat-group="${esc(id)}"${i === 0 ? "" : " hidden"}>
+            ${fields.map(measureField).join("\n            ")}
+          </div>`).join("\n          ");
+
+  const main = `<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("omatpage_title"))}</h1>
+      <p class="lead">${esc(c("omatpage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <form class="card omat-form" data-omat-form>
+        <h2>${esc(c("omat_add_t"))}</h2>
+        <label class="field">
+          <span class="fld-label">${esc(c("omat_name"))}</span>
+          <input type="text" maxlength="120" placeholder="${esc(c("omat_name_ph"))}" data-omat-in="name" required>
+        </label>
+        <div class="omat-row">
+          <label class="field">
+            <span class="fld-label">${esc(c("omat_app"))}</span>
+            <select data-omat-in="application">${appOpts}</select>
+          </label>
+          <label class="field">
+            <span class="fld-label">${esc(c("omat_cat"))}</span>
+            <select data-omat-in="category">${
+              aisles.map((a) => `<option value="${esc(a)}">${esc(t(`cat_${a}`))}</option>`).join("")
+            }</select>
+          </label>
+        </div>
+        ${groups}
+        <label class="field">
+          <span class="fld-label">${esc(c("omat_price"))}</span>
+          <input type="text" inputmode="decimal" data-omat-in="priceMajor">
+        </label>
+        <p class="muted">${esc(c("omat_cur_note"))}</p>
+        <button type="submit" class="btn btn-primary btn-block">${esc(c("omat_save"))}</button>
+        <!-- Written by the script when a name is missing; empty and announced, so a
+             refusal reaches somebody who cannot see the field turn red. -->
+        <p class="omat-err" data-omat-err role="alert" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap narrow">
+      <h2>${esc(c("omat_list_t"))}</h2>
+      <!-- The list is this browser's own rows, so it is written at runtime. The empty
+           state ships in the markup rather than being created later: a heading a script
+           fills either ships with the text the script would use, or it is an empty
+           heading somebody can reach. -->
+      <div data-omat-list></div>
+      <p class="muted" data-omat-empty>${esc(t("omat_empty"))}</p>
+      <p class="ws-undo" data-omat-undo role="status" hidden></p>
+      <p class="muted">${esc(c("omat_use_note"))}</p>
+      <p class="muted">${esc(c("omat_sync_note"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>${esc(c("omat_hist_t"))}</h2>
+      <p>${esc(c("omat_hist_note"))}</p>
+    </div>
+  </section>
 </main>`;
 
   return { main, ld: crumbs.ld };

@@ -1286,6 +1286,9 @@ function wireSyncPanel() {
         }, MERGE);
       }
       await pushProWorkspace();
+      // Called beside pushProWorkspace() rather than from inside it: that function returns
+      // early when the Pro store is not on the page, and the two stores are independent.
+      await pushOwnMaterials();
       setSyncAccount(state.uid);
       renderLocalSummary();
       status(T("app_sync_pushed"));
@@ -1305,6 +1308,10 @@ function wireSyncPanel() {
       // The Pro store is its own key and its own merge; both are last-write-wins on
       // `updatedAt`, the same rule the phone uses.
       if (typeof crmImport === "function") crmImport(incoming);
+      // The visitor's own materials are a third store with a third key, merged by the same
+      // rule. A material is replaced whole, its price history with it: merging two
+      // histories would build a price trend that happened on neither device.
+      if (typeof omImport === "function") omImport(incoming);
       setSyncAccount(state.uid);
       renderLocalSummary();
       status(T("app_sync_pulled"));
@@ -1408,13 +1415,73 @@ async function pushProWorkspace() {
 }
 
 /**
+ * Push the visitor's own materials (session 59, item C6 of the parity audit).
+ *
+ * `users/{uid}/materials`, the ninth collection, added to the contract on 2026-08-30 with
+ * `validMaterial()` in the deployed rules. The price history travels **inside** the
+ * document, in `prices[]` — a point belongs to one material, nothing links to it, nothing
+ * edits one once written, and it dies with the material.
+ *
+ * Every field is clamped here to exactly what the rules validate, the same discipline the
+ * three Pro collections follow: the rules are the last gate, and a document they refuse
+ * fails the whole pass. The cap on `prices` is the rules' own 60, and the newest are kept,
+ * because that is what the phone's `SyncContract.capPrices()` does with the same list.
+ */
+async function pushOwnMaterials() {
+  if (typeof omExport !== "function") return;
+  const MERGE = { merge: true };
+  const store = omExport();
+  const text = (value, max) => String(value == null ? "" : value).slice(0, max);
+  // A measurement is null or a number in range, never "present": a covering has an area
+  // per package and no kerf, a profile the other way round, and the rules check for that.
+  // A NaN out of a bad row would be sent as a number Firestore refuses.
+  const measure = (value, max) => {
+    if (value === null || value === undefined || value === "") return null;
+    const n = Number(value);
+    return Number.isFinite(n) && n >= 0 ? Math.min(n, max) : null;
+  };
+
+  for (const m of store.materials || []) {
+    const seg = pathId(m.id);
+    if (!seg) continue;
+    const priceMinor = m.priceMinor == null ? null : Math.round(m.priceMinor);
+    const prices = (Array.isArray(m.prices) ? m.prices : [])
+      .filter((p) => p && Number.isFinite(Number(p.priceMinor)) && Number.isFinite(Number(p.recordedAt)))
+      .sort((a, b) => Number(b.recordedAt) - Number(a.recordedAt))
+      .slice(0, 60)
+      .map((p) => ({
+        priceMinor: Math.round(Number(p.priceMinor)),
+        currencyCode: text(p.currencyCode, 3),
+        recordedAt: Math.round(Number(p.recordedAt)),
+      }));
+    await fb.setDoc(proDoc("materials", seg), {
+      name: text(m.name, 120),
+      category: text(m.category || "OTHER", 40),
+      application: text(m.application || "WALL_FLOOR_COVERING", 40),
+      widthMm: measure(m.widthMm, 100000),
+      lengthMm: measure(m.lengthMm, 100000),
+      kerfMm: measure(m.kerfMm, 1000),
+      coveragePerUnitM2: measure(m.coveragePerUnitM2, 10000),
+      packageAreaM2: measure(m.packageAreaM2, 10000),
+      wastePercent: measure(m.wastePercent, 100),
+      priceMinor: priceMinor,
+      // Chapter VI once more: a material nobody has priced carries no currency.
+      currencyCode: priceMinor == null ? "" : text(m.currencyCode, 3),
+      priceUpdatedAt: m.priceUpdatedAt == null ? null : Math.round(m.priceUpdatedAt),
+      prices: prices,
+      ...syncFields(m.createdAt, m.deletedAt),
+    }, MERGE);
+  }
+}
+
+/**
  * Everything under users/{uid}, in the shape assets/workspace.js stores locally —
  * used by the pull button and by the export button.
  */
 async function downloadAccount() {
   const out = {
     projects: [], rooms: [], estimations: [], shoppingItems: [],
-    clients: [], jobs: [], quotes: [],
+    clients: [], jobs: [], quotes: [], materials: [],
   };
   const rows = (snap) => { const list = []; snap.forEach((d) => list.push({ id: d.id, ...d.data() })); return list; };
 
@@ -1431,7 +1498,7 @@ async function downloadAccount() {
   // because a collection somebody may never have used is unreadable is the worse failure,
   // and it is the same argument the paywall follows when the plan cannot be read at all —
   // fail open, in the direction of the visitor's own data.
-  for (const name of ["clients", "jobs", "quotes"]) {
+  for (const name of ["clients", "jobs", "quotes", "materials"]) {
     try {
       out[name] = rows(await fb.getDocs(fb.collection(db, "users", state.uid, name)));
     } catch (err) {
@@ -1514,6 +1581,7 @@ function wireAccountPanel() {
     "materio-active-project",  // assets/workspace.js
     "liczmat-recent-calcs",    // assets/recent.js
     "liczmat-crm-v1",          // assets/crm.js
+    "liczmat-materials-v1",    // assets/own-materials.js
     SYNC_ACCOUNT_KEY,          // this file: whose copy it was
   ];
 

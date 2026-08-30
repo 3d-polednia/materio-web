@@ -109,9 +109,11 @@ function loadApp(store) {
   // without it every count here would be zero and §6 would pass by being empty. Since
   // session 46 the same holds for assets/crm-store.js: the Pro store is the one on this
   // device holding another person's name, telephone number and address, so it is exactly
-  // the store that must not be pushed into the next person's account.
+  // the store that must not be pushed into the next person's account. Since session 59
+  // assets/own-materials.js is the third — what somebody pays their own supplier is
+  // theirs, and it must not travel into the next person's account either.
   return new Function("document", "localStorage", "window", "crypto", "CustomEvent",
-    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${src}\nreturn {
+    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${read("assets/own-materials.js")}\n${src}\nreturn {
        pathId, foreignWorkspace, syncAccount, setSyncAccount, state, SYNC_ACCOUNT_KEY,
        lmSafeNext, lmAuthMode, lmSignupUrl, lmReadLevel, lmLevelOf, LM_LEVEL,
      };`)(document, localStorage, {}, { getRandomValues: (a) => a }, function CustomEvent() {});
@@ -371,14 +373,27 @@ head("6. izolacja danych: one account's copy on a device two people use");
   const app = read("assets/app.js");
   check("the stamp is written after a push",
     /setSyncAccount\(state\.uid\);\s*\n\s*renderLocalSummary\(\);\s*\n\s*status\(T\("app_sync_pushed"\)\)/.test(app));
-  // The pull writes both stores before it stamps: the workspace and, since session 46, the
-  // Pro one. A stamp written between them would name an account only half the rows here
-  // came from.
-  check("and after a pull", /wsImport\(incoming\);[\s\S]{0,240}?setSyncAccount\(state\.uid\);/.test(app));
-  check("the Pro store is pulled by the same button",
-    /crmImport\(incoming\);\s*\n\s*setSyncAccount\(state\.uid\);/.test(app));
-  check("and pushed by the other one",
-    /await pushProWorkspace\(\);\s*\n\s*setSyncAccount\(state\.uid\);/.test(app));
+  /* The pull writes EVERY store before it stamps, and the push sends every one before it:
+     the workspace, the Pro store (session 46) and the visitor's own materials (session 59).
+     A stamp written part-way through would name an account only some of the rows here came
+     from, which is the whole thing this key exists to prevent.
+
+     Asked as an order rather than as adjacency. Until session 59 these were three regexes
+     matching `crmImport(incoming);` immediately followed by the stamp, and adding a third
+     store broke all three without a single property changing — a test that fails when a
+     line is inserted between two it never cared about is a test about whitespace. */
+  const before = (call, anchor) => {
+    const i = app.indexOf(call);
+    const j = app.indexOf(anchor, i);
+    return i >= 0 && j > i && j - i < 600;
+  };
+  const PULL_STAMP = 'setSyncAccount(state.uid);\n      renderLocalSummary();\n      status(T("app_sync_pulled"));';
+  const PUSH_STAMP = 'setSyncAccount(state.uid);\n      renderLocalSummary();\n      status(T("app_sync_pushed"));';
+  check("and after a pull", before("wsImport(incoming);", PULL_STAMP));
+  check("the Pro store is pulled by the same button", before("crmImport(incoming);", PULL_STAMP));
+  check("the own materials are pulled by it too", before("omImport(incoming);", PULL_STAMP));
+  check("and all three are pushed by the other one",
+    before("await pushProWorkspace();", PUSH_STAMP) && before("await pushOwnMaterials();", PUSH_STAMP));
   check("both buttons check it themselves, not only through `disabled`",
     (app.match(/if \(foreignWorkspace\(\)\) \{ status\(T\("app_sync_foreign"\), true\); return; \}/g) || []).length === 2);
   check("and the summary is what disables them",
@@ -572,7 +587,7 @@ head("11. izolacja danych: the way to empty a shared device");
 {
   const app = read("assets/app.js");
   const wiped = [...app.matchAll(/^\s*"([a-z0-9-]+)",\s*\/\/ assets\//gm)].map((m) => m[1]);
-  check("the wipe names the four data stores", wiped.length === 4, wiped.join(", "));
+  check("the wipe names the five data stores", wiped.length === 5, wiped.join(", "));
   for (const key of wiped) {
     check(`${key} is named on /cookies/`, COOKIE_ROWS.some((r) => r.name === key));
   }

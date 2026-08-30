@@ -20,6 +20,27 @@
 
 const I18N_PAGES = {
   pl: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Moje materiały",
+    omat_empty: "Nie masz jeszcze własnych materiałów.",
+    omat_edit: "Popraw",
+    omat_delete: "Usuń",
+    omat_cancel: "Anuluj",
+    omat_deleted: "Materiał usunięty.",
+    omat_undo: "Cofnij",
+    omat_price_none: "bez ceny",
+    omat_price_set: "Zapisz cenę",
+    omat_hist_empty: "Jeszcze żadnej ceny.",
+    omat_trend_up: "w górę o",
+    omat_trend_down: "w dół o",
+    omat_trend_same: "bez zmiany",
+    omat_trend_mixed: "Ceny w różnych walutach — nie odejmujemy ich od siebie.",
+    omat_own_group: "Moje materiały",
+    omat_name_needed: "Materiał potrzebuje nazwy.",
     appnote_t: "Ten sam wzór w aplikacji",
     appnote_d: "LiczMat na Androida liczy tym samym silnikiem, offline — z katalogiem materiałów i zapisem wyniku do projektu.",
 
@@ -688,6 +709,7 @@ const I18N_PAGES = {
     crm_ev_cost: "Dopisano koszt",
 
     ck_p_crm: "Klienci, zlecenia i wyceny LiczMat Pro: nazwy, dane kontaktowe, notatki, statusy, terminy, przypisane projekty, pozycje robocizny i marża.",
+    ck_p_omat: "Twoje własne materiały: nazwa, kategoria, wymiary, wydajność, cena i historia wpisanych cen wraz z datami.",
     ck_p_sync_account: "Identyfikator konta, z którym ta przeglądarka synchronizowała się ostatnio. Dzięki niemu /app/ nie wyśle cudzych projektów na Twoje konto.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
@@ -798,6 +820,27 @@ const I18N_PAGES = {
   },
 
   en: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "My materials",
+    omat_empty: "You have no materials of your own yet.",
+    omat_edit: "Edit",
+    omat_delete: "Delete",
+    omat_cancel: "Cancel",
+    omat_deleted: "Material deleted.",
+    omat_undo: "Undo",
+    omat_price_none: "no price",
+    omat_price_set: "Save price",
+    omat_hist_empty: "No price yet.",
+    omat_trend_up: "up by",
+    omat_trend_down: "down by",
+    omat_trend_same: "unchanged",
+    omat_trend_mixed: "Prices in different currencies — we do not subtract one from the other.",
+    omat_own_group: "My materials",
+    omat_name_needed: "A material needs a name.",
     appnote_t: "The same formula in the app",
     appnote_d: "LiczMat for Android uses the same engine offline — with the material catalogue and results saved into a project.",
 
@@ -1453,6 +1496,7 @@ const I18N_PAGES = {
     crm_ev_cost: "Cost added",
 
     ck_p_crm: "LiczMat Pro clients, jobs and quotes: names, contact details, notes, statuses, dates, the projects filed under them, labour lines and the margin.",
+    ck_p_omat: "Your own materials: name, category, dimensions, coverage, price and the history of the prices you entered, with dates.",
     ck_p_sync_account: "The id of the account this browser last synced with, so that /app/ never sends somebody else's projects to your account.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
@@ -1562,6 +1606,27 @@ const I18N_PAGES = {
   },
 
   de: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Meine Materialien",
+    omat_empty: "Sie haben noch keine eigenen Materialien.",
+    omat_edit: "Bearbeiten",
+    omat_delete: "Löschen",
+    omat_cancel: "Abbrechen",
+    omat_deleted: "Material gelöscht.",
+    omat_undo: "Rückgängig",
+    omat_price_none: "ohne Preis",
+    omat_price_set: "Preis speichern",
+    omat_hist_empty: "Noch kein Preis.",
+    omat_trend_up: "höher um",
+    omat_trend_down: "niedriger um",
+    omat_trend_same: "unverändert",
+    omat_trend_mixed: "Preise in verschiedenen Währungen — wir ziehen sie nicht voneinander ab.",
+    omat_own_group: "Meine Materialien",
+    omat_name_needed: "Ein Material braucht einen Namen.",
     appnote_t: "Dieselbe Formel in der App",
     appnote_d: "LiczMat für Android rechnet offline mit demselben Kern — samt Materialkatalog und Speichern ins Projekt.",
 
@@ -2217,6 +2282,7 @@ const I18N_PAGES = {
     crm_ev_cost: "Kosten eingetragen",
 
     ck_p_crm: "Kunden, Aufträge und Angebote von LiczMat Pro: Namen, Kontaktdaten, Notizen, Status, Termine, zugeordnete Projekte, Positionen für Arbeitszeit und die Marge.",
+    ck_p_omat: "Ihre eigenen Materialien: Name, Kategorie, Maße, Ergiebigkeit, Preis und der Verlauf der eingetragenen Preise mit Datum.",
     ck_p_sync_account: "Die Kennung des Kontos, mit dem dieser Browser zuletzt synchronisiert hat — damit /app/ keine fremden Projekte in dein Konto sendet.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
@@ -2326,6 +2392,27 @@ const I18N_PAGES = {
   },
 
   uk: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Мої матеріали",
+    omat_empty: "Власних матеріалів ще немає.",
+    omat_edit: "Змінити",
+    omat_delete: "Видалити",
+    omat_cancel: "Скасувати",
+    omat_deleted: "Матеріал видалено.",
+    omat_undo: "Повернути",
+    omat_price_none: "без ціни",
+    omat_price_set: "Зберегти ціну",
+    omat_hist_empty: "Ціни ще немає.",
+    omat_trend_up: "більше на",
+    omat_trend_down: "менше на",
+    omat_trend_same: "без змін",
+    omat_trend_mixed: "Ціни в різних валютах — ми їх не віднімаємо одну від одної.",
+    omat_own_group: "Мої матеріали",
+    omat_name_needed: "Матеріалові потрібна назва.",
     appnote_t: "Та сама формула в застосунку",
     appnote_d: "LiczMat для Android рахує тим самим ядром офлайн — з каталогом матеріалів і збереженням результату в проєкт.",
 
@@ -2981,6 +3068,7 @@ const I18N_PAGES = {
     crm_ev_cost: "Дописано витрату",
 
     ck_p_crm: "Клієнти, замовлення та кошториси LiczMat Pro: назви, контактні дані, нотатки, статуси, терміни, прив'язані проєкти, позиції роботи та маржа.",
+    ck_p_omat: "Ваші власні матеріали: назва, категорія, розміри, витрата, ціна та історія внесених цін із датами.",
     ck_p_sync_account: "Ідентифікатор акаунта, з яким цей браузер синхронізувався востаннє, щоб /app/ не надіслав чужі проєкти до вашого акаунта.",
 
     /* Projects, rooms and the estimate, all kept in the browser. */
@@ -3090,6 +3178,27 @@ const I18N_PAGES = {
   },
 
   cs: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Moje materiály",
+    omat_empty: "Vlastní materiály zatím nemáte.",
+    omat_edit: "Upravit",
+    omat_delete: "Smazat",
+    omat_cancel: "Zrušit",
+    omat_deleted: "Materiál smazán.",
+    omat_undo: "Zpět",
+    omat_price_none: "bez ceny",
+    omat_price_set: "Uložit cenu",
+    omat_hist_empty: "Zatím žádná cena.",
+    omat_trend_up: "výš o",
+    omat_trend_down: "níž o",
+    omat_trend_same: "beze změny",
+    omat_trend_mixed: "Ceny v různých měnách — jednu od druhé neodečítáme.",
+    omat_own_group: "Moje materiály",
+    omat_name_needed: "Materiál potřebuje název.",
     appnote_t: "Stejný vzorec v aplikaci",
     appnote_d: "LiczMat pro Android počítá stejným jádrem offline — s katalogem materiálů a uložením výsledku do projektu.",
     meta_title: "LiczMat — kalkulačka stavebního materiálu",
@@ -3713,6 +3822,7 @@ const I18N_PAGES = {
     crm_ev_calc: "Uložen výpočet",
     crm_ev_cost: "Dopsán náklad",
     ck_p_crm: "Klienti, zakázky a cenové nabídky LiczMat Pro: názvy, kontaktní údaje, poznámky, stavy, termíny, přiřazené projekty, položky práce a marže.",
+    ck_p_omat: "Vaše vlastní materiály: název, kategorie, rozměry, vydatnost, cena a historie zadaných cen s daty.",
     ck_p_sync_account: "Identifikátor účtu, se kterým se tento prohlížeč naposledy synchronizoval, aby /app/ neposlalo cizí projekty na tvůj účet.",
     nav_projects: "Projekty",
     wspage_title: "Projekty a místnosti",
@@ -3819,6 +3929,27 @@ const I18N_PAGES = {
   },
 
   sk: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Moje materiály",
+    omat_empty: "Vlastné materiály zatiaľ nemáte.",
+    omat_edit: "Upraviť",
+    omat_delete: "Zmazať",
+    omat_cancel: "Zrušiť",
+    omat_deleted: "Materiál zmazaný.",
+    omat_undo: "Späť",
+    omat_price_none: "bez ceny",
+    omat_price_set: "Uložiť cenu",
+    omat_hist_empty: "Zatiaľ žiadna cena.",
+    omat_trend_up: "vyššie o",
+    omat_trend_down: "nižšie o",
+    omat_trend_same: "bez zmeny",
+    omat_trend_mixed: "Ceny v rôznych menách — jednu od druhej neodčítame.",
+    omat_own_group: "Moje materiály",
+    omat_name_needed: "Materiál potrebuje názov.",
     appnote_t: "Rovnaký vzorec v aplikácii",
     appnote_d: "LiczMat pre Android počíta rovnakým jadrom offline — s katalógom materiálov a uložením výsledku do projektu.",
     meta_title: "LiczMat — kalkulačka stavebného materiálu",
@@ -4442,6 +4573,7 @@ const I18N_PAGES = {
     crm_ev_calc: "Uložený výpočet",
     crm_ev_cost: "Dopísaný náklad",
     ck_p_crm: "Klienti, zákazky a cenové ponuky LiczMat Pro: názvy, kontaktné údaje, poznámky, stavy, termíny, priradené projekty, položky práce a marža.",
+    ck_p_omat: "Vaše vlastné materiály: názov, kategória, rozmery, výdatnosť, cena a história zadaných cien s dátumami.",
     ck_p_sync_account: "Identifikátor účtu, s ktorým sa tento prehliadač naposledy synchronizoval, aby /app/ neposlalo cudzie projekty na tvoj účet.",
     nav_projects: "Projekty",
     wspage_title: "Projekty a miestnosti",
@@ -4548,6 +4680,27 @@ const I18N_PAGES = {
   },
 
   ro: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Materialele mele",
+    omat_empty: "Încă nu aveți materiale proprii.",
+    omat_edit: "Modifică",
+    omat_delete: "Șterge",
+    omat_cancel: "Renunță",
+    omat_deleted: "Material șters.",
+    omat_undo: "Anulează",
+    omat_price_none: "fără preț",
+    omat_price_set: "Salvează prețul",
+    omat_hist_empty: "Niciun preț încă.",
+    omat_trend_up: "mai mult cu",
+    omat_trend_down: "mai puțin cu",
+    omat_trend_same: "neschimbat",
+    omat_trend_mixed: "Prețuri în monede diferite — nu le scădem una din alta.",
+    omat_own_group: "Materialele mele",
+    omat_name_needed: "Materialul are nevoie de o denumire.",
     appnote_t: "Aceeași formulă în aplicație",
     appnote_d: "LiczMat pentru Android calculează offline cu același motor — cu catalogul de materiale și salvarea rezultatului în proiect.",
     meta_title: "LiczMat — calculator de materiale de construcții",
@@ -5171,6 +5324,7 @@ const I18N_PAGES = {
     crm_ev_calc: "Calcul salvat",
     crm_ev_cost: "Cost adăugat",
     ck_p_crm: "Clienții, comenzile și ofertele LiczMat Pro: nume, date de contact, notițe, stări, termene, proiectele atribuite, pozițiile de manoperă și adaosul.",
+    ck_p_omat: "Materialele dumneavoastră: denumire, categorie, dimensiuni, randament, preț și istoricul prețurilor introduse, cu date.",
     ck_p_sync_account: "Identificatorul contului cu care s-a sincronizat ultima dată acest browser, ca /app/ să nu trimită proiectele altcuiva în contul tău.",
     nav_projects: "Proiecte",
     wspage_title: "Proiecte și încăperi",
@@ -5277,6 +5431,27 @@ const I18N_PAGES = {
   },
 
   hr: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Moji materijali",
+    omat_empty: "Vlastitih materijala još nemate.",
+    omat_edit: "Uredi",
+    omat_delete: "Obriši",
+    omat_cancel: "Odustani",
+    omat_deleted: "Materijal obrisan.",
+    omat_undo: "Poništi",
+    omat_price_none: "bez cijene",
+    omat_price_set: "Spremi cijenu",
+    omat_hist_empty: "Još nijedna cijena.",
+    omat_trend_up: "više za",
+    omat_trend_down: "manje za",
+    omat_trend_same: "bez promjene",
+    omat_trend_mixed: "Cijene u različitim valutama — ne oduzimamo ih jednu od druge.",
+    omat_own_group: "Moji materijali",
+    omat_name_needed: "Materijal treba naziv.",
     appnote_t: "Ista formula u aplikaciji",
     appnote_d: "LiczMat za Android računa istim motorom offline — s katalogom materijala i spremanjem rezultata u projekt.",
     meta_title: "LiczMat — kalkulator građevinskog materijala",
@@ -5900,6 +6075,7 @@ const I18N_PAGES = {
     crm_ev_calc: "Spremljen izračun",
     crm_ev_cost: "Dopisan trošak",
     ck_p_crm: "Klijenti, nalozi i ponude LiczMat Pro: nazivi, kontaktni podaci, bilješke, statusi, rokovi, dodijeljeni projekti, stavke rada i marža.",
+    ck_p_omat: "Vaši vlastiti materijali: naziv, kategorija, dimenzije, izdašnost, cijena i povijest unesenih cijena s datumima.",
     ck_p_sync_account: "Oznaka računa s kojim je ovaj preglednik zadnji put sinkroniziran, da /app/ ne pošalje tuđe projekte na tvoj račun.",
     nav_projects: "Projekti",
     wspage_title: "Projekti i prostorije",
@@ -6006,6 +6182,27 @@ const I18N_PAGES = {
   },
 
   sr: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Moji materijali",
+    omat_empty: "Sopstvenih materijala još nemate.",
+    omat_edit: "Izmeni",
+    omat_delete: "Obriši",
+    omat_cancel: "Odustani",
+    omat_deleted: "Materijal obrisan.",
+    omat_undo: "Poništi",
+    omat_price_none: "bez cene",
+    omat_price_set: "Sačuvaj cenu",
+    omat_hist_empty: "Još nijedna cena.",
+    omat_trend_up: "više za",
+    omat_trend_down: "manje za",
+    omat_trend_same: "bez promene",
+    omat_trend_mixed: "Cene u različitim valutama — ne oduzimamo ih jednu od druge.",
+    omat_own_group: "Moji materijali",
+    omat_name_needed: "Materijal treba naziv.",
     appnote_t: "Ista formula u aplikaciji",
     appnote_d: "LiczMat za Android računa istim motorom oflajn — s katalogom materijala i čuvanjem rezultata u projekat.",
     meta_title: "LiczMat — kalkulator građevinskog materijala",
@@ -6629,6 +6826,7 @@ const I18N_PAGES = {
     crm_ev_calc: "Sačuvan izračun",
     crm_ev_cost: "Dopisan trošak",
     ck_p_crm: "Klijenti, nalozi i ponude LiczMat Pro: nazivi, kontakt podaci, beleške, statusi, rokovi, dodeljeni projekti, stavke rada i marža.",
+    ck_p_omat: "Vaši sopstveni materijali: naziv, kategorija, dimenzije, izdašnost, cena i istorija unetih cena sa datumima.",
     ck_p_sync_account: "Oznaka naloga sa kojim je ovaj pregledač poslednji put sinhronizovan, da /app/ ne pošalje tuđe projekte na tvoj nalog.",
     nav_projects: "Projekti",
     wspage_title: "Projekti i prostorije",
@@ -6735,6 +6933,27 @@ const I18N_PAGES = {
   },
 
   ru: {
+
+    /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
+       build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
+       the page has been served, plus `omatpage_title`, which is the route's footer
+       label on all 393 pages and therefore has to be a dictionary key. */
+    omatpage_title: "Мои материалы",
+    omat_empty: "Своих материалов пока нет.",
+    omat_edit: "Изменить",
+    omat_delete: "Удалить",
+    omat_cancel: "Отмена",
+    omat_deleted: "Материал удалён.",
+    omat_undo: "Вернуть",
+    omat_price_none: "без цены",
+    omat_price_set: "Сохранить цену",
+    omat_hist_empty: "Цены пока нет.",
+    omat_trend_up: "выше на",
+    omat_trend_down: "ниже на",
+    omat_trend_same: "без изменений",
+    omat_trend_mixed: "Цены в разных валютах — мы их одну из другой не вычитаем.",
+    omat_own_group: "Мои материалы",
+    omat_name_needed: "Материалу нужно название.",
     appnote_t: "Та же формула в приложении",
     appnote_d: "LiczMat для Android считает тем же ядром офлайн — с каталогом материалов и сохранением результата в проект.",
     meta_title: "LiczMat — калькулятор строительных материалов",
@@ -7358,6 +7577,7 @@ const I18N_PAGES = {
     crm_ev_calc: "Сохранён расчёт",
     crm_ev_cost: "Дописан расход",
     ck_p_crm: "Клиенты, заказы и предложения LiczMat Pro: названия, контактные данные, заметки, статусы, сроки, закреплённые проекты, позиции работы и наценка.",
+    ck_p_omat: "Ваши собственные материалы: название, категория, размеры, расход, цена и история внесённых цен с датами.",
     ck_p_sync_account: "Идентификатор аккаунта, с которым этот браузер синхронизировался последний раз, чтобы /app/ не отправил чужие проекты в ваш аккаунт.",
     nav_projects: "Проекты",
     wspage_title: "Проекты и помещения",

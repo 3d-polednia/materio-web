@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Moji materijali — LiczMat</title>
+<meta name="description" content="Sopstveni građevinski materijali sa cenom i istorijom promena. Dimenzije i izdašnost unesete jednom, zatim njima računate. Bez naloga.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/sr/moji-materijali/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/moje-materialy/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/moyi-materialy/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/meine-materialien/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/my-materials/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/moje-materialy/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/moje-materialy/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/materialele-mele/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/moji-materijali/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/moji-materijali/">
+<link rel="alternate" hreflang="ru" href="https://liczmat.com/ru/moi-materialy/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/moje-materialy/">
+<link rel="icon" href="/assets/favicon.svg?v=20260830a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260830a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260830a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="sr_RS">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="ru_RU">
+<meta property="og:title" content="Moji materijali — LiczMat">
+<meta property="og:description" content="Sopstveni građevinski materijali sa cenom i istorijom promena. Dimenzije i izdašnost unesete jednom, zatim njima računate. Bez naloga.">
+<meta property="og:url" content="https://liczmat.com/sr/moji-materijali/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Moji materijali — LiczMat">
+<meta name="twitter:description" content="Sopstveni građevinski materijali sa cenom i istorijom promena. Dimenzije i izdašnost unesete jednom, zatim njima računate. Bez naloga.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260830a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Početna",
+      "item": "https://liczmat.com/sr/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Materijali",
+      "item": "https://liczmat.com/sr/materijali/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Moji materijali",
+      "item": "https://liczmat.com/sr/moji-materijali/"
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Pređi na sadržaj</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/sr/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Glavna navigacija">
+      <ul class="nav-list">
+        <li><a href="/sr/kalkulatori/">Kalkulatori</a></li>
+        <li><a href="/sr/materijali/">Materijali</a></li>
+        <li data-nav-level="liczmat"><a href="/sr/projekti/">Projekti</a></li>
+        <li><a href="/sr/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/sr/aplikacija/">Aplikacija</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Jezik">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span class="lang-btn-name">Srpski</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/moje-materialy/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/moyi-materialy/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/meine-materialien/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/my-materials/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/moje-materialy/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/moje-materialy/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/materialele-mele/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/moji-materijali/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></span></li>
+      <li><a class="lang-item" href="/ru/moi-materialy/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>Русский</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Valuta" title="Valuta"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD" selected>RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Moj nalog</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Promeni temu" title="Promeni temu"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otvori meni"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li><a href="/sr/materijali/">Materijali</a></li><li aria-current="page">Moji materijali</li></ol></nav>
+      <h1>Moji materijali</h1>
+      <p class="lead">Sačuvajte materijal kojeg nema u katalogu, zajedno sa cenom vašeg dobavljača. Svaka sledeća cena ostaje u istoriji.</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <form class="card omat-form" data-omat-form>
+        <h2>Novi materijal</h2>
+        <label class="field">
+          <span class="fld-label">Naziv</span>
+          <input type="text" maxlength="120" placeholder="npr. Gres 60×60 od dobavljača" data-omat-in="name" required>
+        </label>
+        <div class="omat-row">
+          <label class="field">
+            <span class="fld-label">Čemu služi</span>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Obloge zidova i podova</option><option value="DRYWALL_BOARDING">Gipsane konstrukcije</option><option value="COATING">Pokrivni materijali</option><option value="PANEL_CUTTING">Sečenje ploča i tabli</option><option value="LINEAR_STOCK">Profili, lajsne, cevi, šipke</option></select>
+          </label>
+          <label class="field">
+            <span class="fld-label">Kategorija</span>
+            <select data-omat-in="category"><option value="TILES">Pločice</option><option value="FLOORING">Podovi</option><option value="TRIM">Lajsne i završeci</option><option value="PAINT">Boje i lakovi</option><option value="CHEMICALS">Građevinska hemija</option><option value="BOARDS">Ploče</option><option value="WOOD">Drvo</option><option value="PROFILES">GK profili</option><option value="METAL">Metal i armatura</option><option value="GLASS">Staklo i plastika</option><option value="TEXTILES">Tkanine i tapaciranje</option><option value="INSULATION">Izolacija</option><option value="PLUMBING">Vodovod i ventilacija</option><option value="ELECTRICAL">Elektrika</option><option value="OTHER">Ostalo</option></select>
+          </label>
+        </div>
+        <div class="omat-fields" data-omat-group="WALL_FLOOR_COVERING">
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Širina (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Dužina (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="packageAreaM2">
+              <span class="fld-label">Površina pakovanja (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="packageAreaM2">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Rezerva (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="DRYWALL_BOARDING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Širina (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Dužina (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Rezerva (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="COATING" hidden>
+            <label class="field omat-f" data-omat-f="coveragePerUnitM2">
+              <span class="fld-label">Izdašnost pakovanja (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="coveragePerUnitM2">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="PANEL_CUTTING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Širina (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Dužina (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Širina reza (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="LINEAR_STOCK" hidden>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Dužina (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Širina reza (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+        <label class="field">
+          <span class="fld-label">Cena po pakovanju</span>
+          <input type="text" inputmode="decimal" data-omat-in="priceMajor">
+        </label>
+        <p class="muted">Cena zadržava valutu u kojoj je uneta. Ništa se ne preračunava po kursu.</p>
+        <button type="submit" class="btn btn-primary btn-block">Sačuvaj materijal</button>
+        
+        <p class="omat-err" data-omat-err role="alert" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap narrow">
+      <h2>Vaši materijali</h2>
+      
+      <div data-omat-list></div>
+      <p class="muted" data-omat-empty>Sopstvenih materijala još nemate.</p>
+      <p class="ws-undo" data-omat-undo role="status" hidden></p>
+      <p class="muted">Materijal sa ovog spiska bira se u kalkulatoru isto kao stavka iz kataloga.</p>
+      <p class="muted">Materijali ostaju u ovom pregledaču. Nakon prijave deo su naloga i vidi ih i aplikacija.</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>Istorija cena</h2>
+      <p>Svaku unetu cenu čuvamo sa datumom. Promenjen naziv ili dimenzija ne ostavlja trag — red nosi jedan datum promene.</p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulator građevinskog materijala. Izračunaj. Isplaniraj. Izvedi.</p>
+      </div>
+      <div>
+        <h2>Proizvod</h2>
+        <ul>
+          <li><a href="/sr/kalkulatori/">Svi kalkulatori</a></li>
+          <li><a href="/sr/konvertor-jedinica/">Konvertor jedinica</a></li>
+          <li><a href="/sr/materijali/">Materijali</a></li>
+          <li data-nav-level="liczmat"><a href="/sr/moji-materijali/">Moji materijali</a></li>
+          <li data-nav-level="liczmat"><a href="/sr/projekti/">Projekti</a></li>
+          <li><a href="/sr/predracun/">Predračun</a></li>
+          <li><a href="/sr/vodici/">Vodiči</a></li>
+          <li><a href="/sr/prodavnice/">Prodavnice</a></li>
+          <li><a href="/sr/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/sr/klijenti/">Klijenti</a></li>
+          <li data-nav-level="pro"><a href="/sr/nalozi/">Nalozi</a></li>
+          <li data-nav-level="pro"><a href="/sr/ponude/">Ponude</a></li>
+          <li data-nav-level="pro"><a href="/sr/rokovi/">Rokovi</a></li>
+          <li><a href="/sr/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Nalog</h2>
+        <ul>
+          <li><a href="/sr/aplikacija/">Aplikacija</a></li>
+          <li><a href="/app/" rel="nofollow">Moj nalog</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Kontrolna tabla</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Pravne informacije</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Politika privatnosti</a></li>
+          <li><a href="/sr/kolacici/">Kolačići</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Jezik">
+      <h2>Jezik</h2>
+      <ul>
+        <li><a href="/moje-materialy/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/moyi-materialy/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/meine-materialien/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/my-materials/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/moje-materialy/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/moje-materialy/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/materialele-mele/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/moji-materijali/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/moji-materijali/" hreflang="sr" lang="sr" data-lang="sr" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/ru/moi-materialy/" hreflang="ru" lang="ru" data-lang="ru"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0039a6"/><rect y="9.333" width="20" height="4.667" fill="#d52b1e"/></svg></span><span>Русский</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Sva prava zadržana.</span>
+      <span>Rezultati su procene. Proveri pre kupovine.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Koristimo Google Analytics da anonimno brojimo promet na sajtu i koliko ljudi ide na Google Play. Slažeš se?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Više u politici privatnosti</a>
+    <a class="consent-more" href="/sr/kolacici/">Kolačići</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Odbij</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Slažem se</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/moje-materialy/",
+  "uk": "/uk/moyi-materialy/",
+  "de": "/de/meine-materialien/",
+  "en": "/en/my-materials/",
+  "cs": "/cs/moje-materialy/",
+  "sk": "/sk/moje-materialy/",
+  "ro": "/ro/materialele-mele/",
+  "hr": "/hr/moji-materijali/",
+  "sr": "/sr/moji-materijali/",
+  "ru": "/ru/moi-materialy/"
+};</script>
+
+<script src="/assets/i18n.sr.js?v=20260830a"></script>
+<script src="/assets/i18n-runtime.js?v=20260830a"></script>
+<script src="/assets/currency.js?v=20260830a"></script>
+<script src="/assets/account.js?v=20260830a"></script>
+
+<script src="/assets/own-materials.js?v=20260830a"></script>
+<script src="/assets/own-materials-ui.js?v=20260830a"></script>
+<script src="/assets/main.js?v=20260830a"></script>
+
+</body>
+</html>

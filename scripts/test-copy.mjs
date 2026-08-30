@@ -384,11 +384,24 @@ head("§7 how much prose a page carries");
  * dm, m, km, in, ft, yd, mi, nmi" is ten words and one fact — which is what the page is
  * FOR, and it is also the only thing on it a reader with no JavaScript can use. Its prose
  * proper is four sentences. The hub grew by the one card that points at it.
+ *
+ * Session 59 added `own-materials` at 210 (the widest, English, is 204). Most of that is a
+ * form: eleven field labels, five application names and fifteen shop aisles are 60-odd
+ * words that are each one label on one control. The prose proper is six sentences — the
+ * lead, the two notes saying what the price history does and does not record, the one
+ * about the currency, and the two about where the rows live and how a calculator reaches
+ * them. It is under the /projekty/ budget it most resembles.
+ *
+ * The same session raised `cookies` from 540 to 570 (the English page, 564). That page is a
+ * table of every store this site writes, one row each, and session 59 added a store: the
+ * row names the key and says what is in it. A budget that refused the row would be asking
+ * for a store nobody can look up, which is the opposite of what the page is for.
  */
 const BUDGET = {
   home: 370, calculators: 370, calculator: 400, converter: 280, guides: 280, guide: 220,
+  "own-materials": 210,
   materials: 2280, stores: 150, android: 480, projects: 390, estimate: 190,
-  clients: 500, jobs: 520, quotes: 460, calendar: 400, cookies: 540,
+  clients: 500, jobs: 520, quotes: 460, calendar: 400, cookies: 570,
   "liczmat-pro": 450, account: 850, dashboard: 130, share: 40, privacy: 3800,
 };
 

@@ -149,6 +149,18 @@ converter: {
     cs: "prevodnik-jednotek", sk: "prevodnik-jednotiek", ro: "convertor-de-unitati",
     hr: "pretvarac-jedinica", sr: "konvertor-jedinica", ru: "konverter-edinic",
   },
+  /* Session 59, the visitor's own materials — item C6 of the parity audit, and the second
+     section here that was never a `plannedSlug`, for the same reason the converter was
+     not: src/ia.mjs was written in session 3 against a plan that has no such screen. The
+     segment says whose the materials are, because that is the whole distinction from
+     /materialy/ — one address is the bundled catalogue of 161 rows and the other is the
+     rows somebody typed in. Two sections may not claim one word, so none of these repeats
+     that language's `materials` segment. */
+ownMaterials: {
+    pl: "moje-materialy", uk: "moyi-materialy", de: "meine-materialien", en: "my-materials",
+    cs: "moje-materialy", sk: "moje-materialy", ro: "materialele-mele",
+    hr: "moji-materijali", sr: "moji-materijali", ru: "moi-materialy",
+  },
 };
 
 /** Calculator slugs, keyed by the id used in CALCS (assets/calculators.js). */
@@ -294,6 +306,9 @@ export const urlGuideIndex = (lang) => `${prefix(lang)}/${SECTION.guides[lang]}/
 export const urlGuide = (lang, guide) => `${urlGuideIndex(lang)}${guide.slug[lang]}/`;
 export const urlStores = (lang) => `${prefix(lang)}/${SECTION.stores[lang]}/`;
 export const urlMaterials = (lang) => `${prefix(lang)}/${SECTION.materials[lang]}/`;
+
+/** The visitor's own materials (session 59, C6). */
+export const urlOwnMaterials = (lang) => `${prefix(lang)}/${SECTION.ownMaterials[lang]}/`;
 export const urlProjects = (lang) => `${prefix(lang)}/${SECTION.projects[lang]}/`;
 export const urlEstimate = (lang) => `${prefix(lang)}/${SECTION.estimate[lang]}/`;
 

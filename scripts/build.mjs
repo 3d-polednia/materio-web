@@ -29,7 +29,7 @@ import {
   URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
-  urlCalendar, urlLiczmatPro, urlConverter,
+  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials,
 } from "../src/site.mjs";
 import {
   livePaths, sitemapUrls, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS,
@@ -42,19 +42,20 @@ import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
   materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain, jobsMain,
-  quotesMain, calendarMain, proPageMain, converterMain,
+  quotesMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
 import { CALC_SEO, TITLE_MAX } from "../src/calc-seo.mjs";
 import { CONV_COPY, CONV_COPY_KEYS } from "../src/conv-copy.mjs";
+import { OMAT_COPY, OMAT_COPY_KEYS } from "../src/omat-copy.mjs";
 import { appMain, shareMain, dashboardMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260829a";
+const STAMP = "20260830a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -197,6 +198,21 @@ function validate() {
     }
     if (copy.convpage_meta && (copy.convpage_meta.length < 50 || copy.convpage_meta.length > 160)) {
       problems.push(`converter/${lang}: the description is ${copy.convpage_meta.length} characters, outside 50–160`);
+    }
+  }
+
+  /* The same three checks over /moje-materialy/ (session 59, C6). Its copy is build-time
+     for the same measured reason the converter's is, so it needs the same net: a language
+     missing a key would otherwise print `undefined` where a field label belongs, and the
+     five application names have to exist because the form's <select> is built from them. */
+  for (const lang of LANGS) {
+    const copy = OMAT_COPY[lang];
+    if (!copy) { problems.push(`own-materials: no ${lang} copy (src/omat-copy.mjs)`); continue; }
+    for (const key of OMAT_COPY_KEYS) {
+      if (!copy[key] || !String(copy[key]).trim()) problems.push(`own-materials/${lang}: no ${key}`);
+    }
+    if (copy.omatpage_meta && (copy.omatpage_meta.length < 50 || copy.omatpage_meta.length > 160)) {
+      problems.push(`own-materials/${lang}: the description is ${copy.omatpage_meta.length} characters, outside 50–160`);
     }
   }
 
@@ -525,7 +541,12 @@ const sitemapFile = (loc) => `${loc.replace(/^\//, "")}${loc.endsWith("/") ? "in
  * dashboard's "ostatnio używane narzędzia" reads.
  */
 const CALC_SCRIPTS = [
-  "/assets/units.js", "/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js",
+  // The store of the visitor's own materials comes BEFORE the catalogue: materialsForCalc()
+  // calls omCatalogRows() so the picker offers what somebody typed in beside the bundled
+  // 161, and these are plain scripts in one global scope. Only the store, never the screen
+  // — /moje-materialy/ draws the list, a calculator page only reads it.
+  "/assets/units.js", "/assets/own-materials.js",
+  "/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js",
   "/assets/workspace.js", "/assets/workspace-calc.js", "/assets/recent.js",
 ];
 
@@ -1222,6 +1243,31 @@ function buildConverterPage() {
   }
 }
 
+/**
+ * /moje-materialy/ (session 59, item C6). The whole screen is in the markup and
+ * assets/own-materials-ui.js fills it — same rule as the wall of chapter XXV and the
+ * converter's form: a page whose body is written at runtime says nothing to a reader who
+ * runs no script, and a form built by a script is a form that flashes into existence.
+ */
+function buildOwnMaterialsPage() {
+  const alt = alternatesFor(urlOwnMaterials);
+  for (const lang of LANGS) {
+    const t = translator(lang);
+    const { main, ld } = ownMaterialsMain(lang, t, CATALOG.MAT_CATS_USED, OMAT_COPY[lang]);
+    write(join(urlOwnMaterials(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("omatpage_title")} \u2014 LiczMat`,
+      description: OMAT_COPY[lang].omatpage_meta,
+      path: urlOwnMaterials(lang),
+      alternates: alt,
+      main, jsonld: [ld],
+      // The store and the screen, in that order — plain scripts, one global scope. No
+      // engine and no catalogue: the page writes numbers down and calculates nothing.
+      scripts: ["/assets/own-materials.js", "/assets/own-materials-ui.js"],
+    }));
+  }
+}
+
 function buildStores() {
   const alt = alternatesFor(urlStores);
   for (const lang of LANGS) {
@@ -1295,8 +1341,12 @@ function buildPrivatePages() {
     // crm-store.js since session 46: clients, jobs and quotes joined the sync contract, so
     // the sync tab has a second store to push and pull. The STORE half only — /app/ draws no
     // Pro screen, and assets/crm.js is 47 kB of screens this page would never use.
+    // own-materials.js since session 59: the visitor's own materials joined the contract
+    // as a ninth collection, so the sync tab has a third store to push and pull. The STORE
+    // half only, for the same reason as crm-store.js — /app/ draws no material screen.
     classicScripts: [
-      "/assets/workspace.js", "/assets/crm-store.js", "/assets/plan.js", "/assets/pay.js",
+      "/assets/workspace.js", "/assets/crm-store.js", "/assets/own-materials.js",
+      "/assets/plan.js", "/assets/pay.js",
     ],
     scripts: ["/assets/app.js"],
   }));
@@ -1485,6 +1535,7 @@ buildQuotesPages();
 buildCalendarPages();
 buildProPage();
 buildConverterPage();
+buildOwnMaterialsPage();
 buildStores();
 buildPrivatePages();
 buildSitemap();

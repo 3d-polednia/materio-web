@@ -280,7 +280,14 @@ const primaryCalcFor = (m) => MAT_PRIMARY_CALC[m.k];
 /** Every material a given calculator can be pre-filled from. */
 function materialsForCalc(calcId) {
   const kinds = MAT_KINDS_FOR_CALC[calcId];
-  return kinds ? MATERIALS.filter((m) => kinds.includes(m.k)) : [];
+  if (!kinds) return [];
+  // The visitor's own materials stand beside the bundled ones and are filtered by exactly
+  // the same rule — omToCatalogRow() hands back a row in this shape, so the picker, the
+  // filter and materialFill() need to know nothing about where a row came from. The store
+  // is not on every page that loads this file, so its absence is a normal state and not
+  // an error: a page without it simply offers the catalogue.
+  const own = typeof omCatalogRows === "function" ? omCatalogRows() : [];
+  return own.filter((m) => kinds.includes(m.k)).concat(MATERIALS.filter((m) => kinds.includes(m.k)));
 }
 
 /**
@@ -334,6 +341,10 @@ function matNum(v, lang) {
 
 /** "Gres 60×60" — the term in the page's language plus the language-neutral size. */
 function matName(m, lang, tr) {
+  // A material somebody typed in carries its name, not a term key: it was never
+  // translated and there is nothing to look up. Without this it would print the empty
+  // string a catalogue row's `t` is, on every screen that names it.
+  if (m.own) return m.name;
   const term = tr ? tr(m.t, lang) : m.t;
   return m.s ? `${term} ${m.s}` : term;
 }
@@ -345,6 +356,18 @@ function matName(m, lang, tr) {
 function matNote(m, lang, tr) {
   const n = (v) => matNum(v, lang);
   const w = (key) => (tr ? tr(key, lang) : key);
+  // An own material has only the numbers somebody filled in, and which of them exist
+  // depends on what they said it was for — so the note is built from what is there
+  // rather than from a shape the row is assumed to have.
+  if (m.own) {
+    return [
+      m.w !== undefined && m.l !== undefined ? `${n(m.w)}×${n(m.l)} mm` : null,
+      m.pkg !== undefined ? `${n(m.pkg)} m²/${w("mu_pkg")}` : null,
+      m.cov !== undefined ? `${n(m.cov)} m²/${w("mu_pkg")}` : null,
+      m.kerf !== undefined ? `${w("mu_kerf")} ${n(m.kerf)} mm` : null,
+      m.waste !== undefined ? `${n(m.waste)} % ${w("mu_waste")}` : null,
+    ].filter(Boolean).join(" · ");
+  }
   switch (m.k) {
     case "tile":
       return `${m.s} cm · ${n(m.pkg)} m²/${w("mu_pkg")} · ${n(m.waste)} % ${w("mu_waste")}`;
