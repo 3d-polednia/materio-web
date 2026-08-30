@@ -98,6 +98,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 57 | Konwerter jednostek na stronie — C1 (repo serwisu) | **Zrobione** — 2026-08-29 |
 | 58 | Udostępnianie kosztorysu linkiem w aplikacji — C5 (repo aplikacji) | **Zrobione** — 2026-08-29, commit `68506a4`. Czeka na wydanie AAB (właściciel) |
 | 59 | Eksport PDF i własne materiały — C6 (oba repozytoria) | **Zrobione** — 2026-08-30. Reguły i AAB czekają (właściciel) |
+| 60 | Flagi w wybieraku języka na telefonie — połowa D4 (repo aplikacji) | **Zrobione** — 2026-08-30. Czeka na wydanie AAB (właściciel) |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -666,6 +667,96 @@ pozycji kodowej; zostało pięć pozycji, które są pytaniami, nie robotą: tyt
 w aplikacji, siedem walut kontra dwadzieścia siedem, rubel, drugi angielski i nazwa języka
 w wybieraku. Nazwane, nie zaczęte.
 
+## Sesja 60 — flagi w wybieraku języka na telefonie (połowa D4)
+
+**DECYZJE WŁAŚCICIELA, 30.08.2026.** Dwie z pięciu pozycji, które zostały po sesji 59,
+dostały odpowiedź: **B6 — zostaje jak jest**, i **flagi z D4 — przenosimy na telefon**.
+D1, D2 i D3 są dalej otwarte i nic w tej sesji ich nie przesądza.
+
+**D4 to były dwie rzeczy, a audyt scalił je w jedną — i pomylił się w opisie tej drugiej.**
+Audyt pisze „nazwa języka i flaga w wybieraku" i podaje jako dowód „English (US)" oraz
+„English (UK)". To jest zarzut o **nazwę**. Flag zarzut nie dotyczył wcale, bo aplikacja
+nie miała **żadnych** flag: `LanguageFirstRunDialog` rysował jedną ikonę globusa nad
+listą i jedenaście wierszy gołego tekstu, a wybierak w ustawieniach był zwykłym
+`DropdownPicker`-em. Więc to nie było „flaga łamie zasadę", tylko „obrazków nie ma".
+Ta sesja robi obrazki. **Nazwa zostaje otwarta razem z D3** — i znika sama, jeśli D3
+scali oba angielskie w jedno `English`.
+
+**Jedenaście plików, nie dziesięć.** `assets/flags/*.svg` to dziesięć wektorów; Android
+nie czyta SVG, więc każdy z nich jest przepisany na Vector Drawable
+(`app/src/main/res/drawable/flag_<kod>.xml`) — ten sam viewport 20×14, te same ścieżki,
+te same kolory co do cyfry. Jedenasty jest **własny aplikacji** i jest bezpośrednim
+skutkiem tego, że D3 stoi otwarte: strona ma jedno `en` i daje mu Union Jacka, a aplikacja
+ma dwa angielskie wiersze. Union Jack obok „English (US)" to obrazek mówiący coś innego
+niż podpis pół centymetra dalej, więc `flag_en_us.xml` jest narysowany w stylu strony
+(trzynaście pasów, kanton, gwiazdy jako kwadraty — dokładnie to uproszczenie, które chorwacki
+herb dostaje na stronie). **Jeśli D3 scali oba angielskie, ten plik znika razem z wierszem,
+dla którego powstał.** Nagłówek pliku to mówi.
+
+**Zasada „nazwa języka, nigdy kraju" nie jest zasadą o flagach, i to trzeba było
+rozstrzygnąć przed narysowaniem czegokolwiek.** Decyzja właściciela z 21.08.2026 dotyczy
+**nazw**: picker ma mówić „Deutsch", nie „Deutschland", bo niemiecki mówi się w czterech
+krajach. Flaga jest z definicji krajem i nie da się tego obejść — dlatego reguła strony
+brzmi „flaga nigdy nie stoi sama" (`assets/styles.css`), a nazwa jest tym, co identyfikuje
+wiersz. Flaga tylko skraca szukanie własnego alfabetu. Ta sama reguła jest przepisana do
+`LanguageFlag`, i to z niej wynika, że **„zgodnie z systemem" flagi nie dostaje** — to nie
+jest język i nie ma flagi nigdzie na świecie. Wiersz trzyma szerokość i nie rysuje nic:
+pusty prostokąt z obwódką czyta się jak flaga, która się nie wczytała.
+
+**Rozmiar jest tokenem strony, nie nową decyzją.** `.flag` w `assets/styles.css` to
+20×14 px, 2 px promienia i jedna obwódka na 22 % tuszu strony — obwódka jest tym, co nie
+pozwala białej fladze (Polska, Czechy) rozpłynąć się w białym wierszu, czyli tym samym
+problemem dwóch procent różnicy, dla którego istnieje `MaterioCard`. 2 dp nie ma tokenu:
+strona też pisze ten promień literałem w tej samej regule.
+
+**`DropdownPicker` dostał jeden slot, nie drugi wybierak.** `optionLeading` rysuje coś
+przed każdym wierszem menu i przed wybraną wartością w polu; dostaje **indeks**, a nie
+gotowy composable na wiersz, więc `DropdownPicker` dalej nie wie, czym jest język. Pole i
+menu pokazują ten sam obrazek — wybierak, który w zamkniętym stanie gubi flagę, jest
+gorszy niż wybierak bez flag.
+
+**TESTY. 316/316 przechodzi** (było 309; siedem nowych w `LanguageFlagTest.kt`). Cztery
+rzeczy, które ten plik pilnuje, i każda z nich to defekt, który nic innego by nie złapało:
+każdy język ma flagę i „zgodnie z systemem" jej nie ma; **żadne dwa języki nie wskazują
+jednego pliku** (pułapka z angielskim); każdy `flag_*.xml` to prawdziwy wektor 20×14 bez
+tintu, i żaden nie leży w repo bez wiersza, który go rysuje. Czwarta — §4 — jest jedyną,
+która widzi obie strony: **czyta `assets/flags/*.svg` z repo serwisu**, kiedy oba
+repozytoria stoją obok siebie, i porównuje zbiory kolorów. To jest odpowiednik
+`test-langs.mjs` po stronie Kotlina, i istnieje z tego samego powodu, z którego tamten
+powstał: jedna lista w dwóch kopiach przestaje być jedną listą. Sprawdzone, że gryzie —
+zmiana jednej cyfry w `flag_pl.xml` wywala właśnie ten test. Bez repo serwisu §4 się
+pomija; brak sąsiada to nie jest zepsuta aplikacja.
+
+**Geometrii test celowo NIE porównuje.** Strona pisze `<rect>`, Vector Drawable ma tylko
+ścieżki — ten sam kształt musi być zapisany inaczej, więc porównywanie kształtów dawałoby
+czerwone na poprawnym pliku. Kolory wystarczą: to one się rozjeżdżają, kiedy ktoś poprawi
+flagę po jednej stronie.
+
+**ZMIENIONE PLIKI.** W `3d-polednia/Materio`: jedenaście nowych
+`app/src/main/res/drawable/flag_*.xml`, nowy
+`core/designsystem/component/Flags.kt`, `core/designsystem/component/Fields.kt`
+(slot w `DropdownPicker`), `feature/settings/LanguageDialog.kt`,
+`feature/settings/SettingsScreen.kt`, nowy `app/src/test/.../LanguageFlagTest.kt`
+i `CLAUDE.md`. W tym repozytorium: tylko ten plik. **Serwis nie zmienił się ani o bajt** —
+flagi ma od pierwszego dnia i to on jest źródłem.
+
+**Zrzuty na `/aplikacja/` NIE są nieaktualne.** `WebHeroShotsTest` renderuje ekran główny,
+kalkulator i sklepy; żaden z nich nie pokazuje wybieraka języka ani ustawień. Sprawdzone
+uruchomieniem całego zestawu, nie pamięcią — reguła z sesji 55 i 56.
+
+**STATUS.** Zrobione, w repo aplikacji, na `main`. **Czeka na wydanie AAB** razem z
+sesjami 46, 47, 58 i 59 — punkt 2 listy konsolowej. Nikt tych flag nie zobaczy, dopóki
+właściciel nie zbuduje wydania.
+
+**NASTĘPNE ZADANIE: decyzje D1, D2 i D3 — dalej pytania, nie robota.** Zostały trzy
+z pięciu. Rozpis, z którego wynika kolejność, jest w sekcji audytu wyżej; jedna rzecz
+z tej trójki **nie czeka na żadną decyzję i jest defektem dzisiaj**:
+`Currency.fromCode()` w `core/model/Units.kt` zwraca `PLN` dla nieznanego kodu, a
+`CurrencyFormatter` bierze z tego symbol — więc kwota w walucie spoza enuma już rysuje
+się ze złotówkowym „zł" obok. Naprawa tego jest dobra przy każdej odpowiedzi na D1
+i **musi** poprzedzić opcję, w której enum się zwęża, bo inaczej zwężenie zamienia
+poprawne dziś funty w złotówki. To jest sesja 61, jeśli właściciel nie zdecyduje inaczej.
+
 ## Audyt parytetu strona ↔ aplikacja — 27.08.2026 (Sesja 51)
 
 To jest **lista, z której biorą się Sesje 52–58**. Do 2026-08-28 leżała wyłącznie
@@ -694,7 +785,7 @@ Sesji 51 i zrzuty na `/aplikacja/`.
 | B3 | **Chip i zakładka to na stronie dwa tła.** `.chip` na `--surface-alt`, `.calc-tab` na `--surface`; `SegmentedControl` używa bieli dla obu ról | Niskie | **Zrobione — Sesja 56** |
 | B4 | **Przycisk poboczny ma cięższą krawędź.** `.btn-ghost` bierze `--outline-strong` `#cbc4b4`; `OutlinedButton` bierze M3-owe `outline`, czyli `--outline-control` `#8b8577` — rola, która należy do pola formularza | Niskie | **Zrobione — Sesja 56** |
 | B5 | **Plakietka poziomu istnieje tylko na stronie.** Każde „drzwi" na stronie głównej mówią BEZ KONTA / LICZMAT / LICZMAT PRO (rozdział II); aplikacja nie ma odpowiednika — poziom widać dopiero po wejściu w moduł Pro, gdzie stoi ściana | Niskie | **Zrobione — Sesja 56** |
-| B6 | **Tytuł ekranu.** Strona: H1 w treści, ≈ 30 px, waga 800. Aplikacja: pasek górny, 19,2 sp, waga 700 | Do decyzji | **Pytanie do właściciela** |
+| B6 | **Tytuł ekranu.** Strona: H1 w treści, ≈ 30 px, waga 800. Aplikacja: pasek górny, 19,2 sp, waga 700 | Do decyzji | **Zamknięte — decyzja właściciela 30.08.2026: zostaje jak jest.** Świadoma asymetria, jak C7 |
 
 ### C. Zakres — czego nie ma po drugiej stronie
 
@@ -715,7 +806,7 @@ Sesji 51 i zrzuty na `/aplikacja/`.
 | D1 | **Siedem walut kontra dwadzieścia siedem.** Kosztorys wyceniony na telefonie w funtach dojeżdża do przeglądarki, która GBP nie ma w wybieraku — kwota się wyrenderuje, ale nikt nie przestawi na nią serwisu. Rekomendacja audytu: aplikacja schodzi do siedmiu, a kosztorys wyceniony wcześniej zachowuje swoją walutę | Średnie | **Pytanie do właściciela** |
 | D2 | **Rubel: aplikacja tak, strona nie.** Strona: RUB celowo nieobecny (Stripe nie działa w Rosji), `ru` startuje w EUR. Aplikacja: `RUSSIAN.defaultCurrency = RUB` | Średnie | **Pytanie do właściciela** (z D1) |
 | D3 | **Angielski policzony dwa razy.** Strona ma jeden `en`; aplikacja `ENGLISH_US` (USD) i `ENGLISH_UK` (GBP) — stąd licznik 10 / 12 | Niskie | **Pytanie do właściciela** |
-| D4 | **Nazwa języka i flaga w wybieraku.** Zasada „nazwa języka, nigdy kraju" (decyzja właściciela 21.08.2026, pilnowana przez `test-langs.mjs`) jest zapisana po jednej stronie i łamana po drugiej: „English (US)", „English (UK)". Do naprawy razem z D3 — to ta sama lista | Niskie | Otwarte — z D3 |
+| D4 | **Nazwa języka i flaga w wybieraku.** To były dwie rzeczy, nie jedna. **Flagi: zrobione — Sesja 60** (aplikacja nie miała ŻADNYCH flag, nie „złe"; dziesięć wektorów strony przepisanych na Vector Drawable). **Nazwa: otwarte, z D3** — zasada „nazwa języka, nigdy kraju" (decyzja właściciela 21.08.2026, pilnowana przez `test-langs.mjs`) jest łamana przez „English (US)" i „English (UK)", a to znika samo, jeśli D3 scali oba angielskie | Niskie | Flagi zrobione; nazwa otwarta z D3 |
 | D5 | Trzeci tryb motywu | — | **Zrobione — Sesja 51** |
 
 ### Kolejność, w której audyt kazał to robić
@@ -735,11 +826,24 @@ Pierwsze pięć pozycji ma **sztywną kolejność**: 52 → 53 → 54 → 55 →
 
 ### Trzy rzeczy, których audyt nie ruszy bez decyzji właściciela
 
-- **Waluty (D1, D2)** — zwęzić aplikację do siedmiu walut strony, czy rozszerzyć stronę?
-- **Drugi angielski (D3, D4)** — `en-GB` z GBP zostaje osobną pozycją, czy schodzi do
-  jednego `English`? Zależy od tego, czy sprzedaż idzie na Wyspy.
-- **Tytuł ekranu (B6)** — ekrany aplikacji dostają nagłówek w treści, jak strona, czy
-  pasek górny Androida zostaje, jaki jest?
+Dwie z trzech mają odpowiedź (30.08.2026); została jedna, i jest to ta, która ciągnie
+za sobą najwięcej kodu.
+
+- **Waluty (D1, D2)** — **OTWARTE.** Zwęzić aplikację do siedmiu walut strony, czy
+  rozszerzyć stronę? Rozpis obu opcji z kosztami jest w sesji 60 niżej. Jedna rzecz w tej
+  pozycji nie czeka na decyzję i jest defektem dzisiaj: `Currency.fromCode()` zwraca PLN
+  dla nieznanego kodu, więc kwota w walucie spoza enuma **już** rysuje się ze złotówkowym
+  symbolem.
+- **Drugi angielski (D3)** — **OTWARTE.** `en-GB` z GBP zostaje osobną pozycją, czy schodzi
+  do jednego `English`? Zależy od tego, czy sprzedaż idzie na Wyspy. Zależność jest
+  jednokierunkowa: jeśli D1 wyrzuci GBP, `ENGLISH_UK` traci swój jedyny powód istnienia.
+- ~~**Tytuł ekranu (B6)**~~ — **ODPOWIEDZIANE: zostaje jak jest.** Pasek górny to
+  konwencja Androida (trzyma wstecz, akcje i zwijanie przy scrollu), nagłówek w treści to
+  konwencja strony. Obie strony mają rację, więc to jedyna pozycja B, w której parytet był
+  złym celem. Zapisane jako świadoma asymetria obok C7 — następny audyt ma tego nie
+  zgłaszać drugi raz.
+- ~~**Flagi w wybieraku (połowa D4)**~~ — **ODPOWIEDZIANE: przenosimy flagi na telefon.**
+  Zrobione w sesji 60.
 
 ### Jedna rzecz, która pogarsza się sama
 
