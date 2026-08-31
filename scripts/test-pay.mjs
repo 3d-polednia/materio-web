@@ -8,7 +8,8 @@
  * obsługa anulowania, zabezpieczenie uprawnień". The plan states are checked in
  * scripts/test-plan.mjs, which owns lmSubscription(); this file is the money:
  *
- *   1. the configuration — fourteen amounts in seven currencies, and the shape they are in;
+ *   1. the configuration — the amounts, the currencies Pro is sold in, and the shape
+ *      they are in, including the two the site counts in and deliberately does not price;
  *   2. the two thresholds — a plan that can be PRICED is not a plan that can be BOUGHT,
  *      which is exactly the state this site ships in;
  *   3. that nothing is converted at a rate, anywhere;
@@ -82,30 +83,52 @@ const eq = (name, got, want) =>
 
 /* ================================================================== 1. the prices */
 
-head("1. fourteen amounts, seven currencies, and no gaps");
+head("1. the amounts, the currencies Pro is sold in, and no gaps in either list");
 {
   const pay = loadPay();
+  const SELLABLE = pay.LM_PAY.currencies;
   eq("two plans and no more", pay.LM_PAY.plans.length, 2);
   eq("the monthly one first", pay.LM_PAY.plans[0].id, "monthly");
   eq("then the yearly one", pay.LM_PAY.plans[1].id, "yearly");
 
-  /* Every currency the site offers has a price in both plans. A currency in the picker
-     with no price behind it is a visitor who switches to it and is told nothing. */
+  /* Two lists since session 61, and this is the section that keeps them honest.
+     COUNTING (`CURRENCIES`, from assets/currency.js) is what somebody may price a floor in.
+     SELLING (`LM_PAY.currencies`) is what Pro has an amount in. Selling must be a subset of
+     counting — an amount in a currency nobody can switch the site onto is an amount nobody
+     will ever be shown. The other direction is allowed and deliberate: Stripe does not
+     operate in Russia, and the pound is waiting for two numbers only the owner can type. */
+  check("every currency Pro is sold in is one the site counts in",
+    SELLABLE.every((c) => CURRENCIES.includes(c)),
+    SELLABLE.filter((c) => !CURRENCIES.includes(c)).join(",") || "ok");
+
   for (const plan of pay.LM_PAY.plans) {
-    for (const code of CURRENCIES) {
+    for (const code of SELLABLE) {
       const minor = pay.lmPayPrice(plan.id, code);
       check(`${plan.id} has a price in ${code}`, minor !== null, String(minor));
       check(`${plan.id}/${code} is a whole number of minor units`,
         Number.isInteger(minor), String(minor));
       check(`${plan.id}/${code} is a positive amount`, minor > 0, String(minor));
     }
-    eq(`${plan.id} prices exactly the currencies the site has`,
-      Object.keys(plan.price).sort().join(","), [...CURRENCIES].sort().join(","));
+    eq(`${plan.id} prices exactly the currencies Pro is sold in`,
+      Object.keys(plan.price).sort().join(","), [...SELLABLE].sort().join(","));
+  }
+
+  /* And the gap is a gap, not a half-configured price. A currency the site counts in but
+     does not sell in must show NOTHING — one amount typed into one plan by accident would
+     quote a monthly price with no yearly one beside it. */
+  for (const code of CURRENCIES.filter((c) => !SELLABLE.includes(c))) {
+    for (const plan of pay.LM_PAY.plans) {
+      eq(`${code} is counted in but not sold in, so ${plan.id} has no price`,
+        pay.lmPayPrice(plan.id, code), null);
+      eq(`and ${plan.id} is not offered in ${code}`, pay.lmPayPriced(plan.id, code), false);
+    }
+    eq(`so no plan is listed in ${code}`, pay.lmPayPlans(code).length, 0);
+    eq(`and nothing takes money in ${code}`, pay.lmPayOpen(code), false);
   }
 
   // The yearly plan is ten times the monthly one in every currency: ~10 months for 12.
   // A currency where that slipped would be one market quietly on a different offer.
-  for (const code of CURRENCIES) {
+  for (const code of SELLABLE) {
     const m = pay.lmPayPrice("monthly", code);
     const y = pay.lmPayPrice("yearly", code);
     check(`${code}: the year costs less than twelve months`, y < m * 12, `${y} vs ${m * 12}`);
@@ -120,7 +143,8 @@ head("1. fourteen amounts, seven currencies, and no gaps");
 
   // An unknown plan or currency is null, never a guess.
   eq("an unknown plan has no price", pay.lmPayPrice("weekly", "PLN"), null);
-  eq("an unknown currency has no price", pay.lmPayPrice("monthly", "GBP"), null);
+  // CHF: on neither list. GBP is no longer the example — the site counts in it now.
+  eq("an unknown currency has no price", pay.lmPayPrice("monthly", "CHF"), null);
   eq("and neither does a missing one", pay.lmPayPrice("monthly", undefined), null);
   eq("an unknown plan is not a plan", pay.lmPayPlan("weekly"), null);
 }
@@ -138,6 +162,9 @@ head("2. nothing is converted at a rate");
     eq(`${code} is not derived from the euro price`, pay.lmPayPrice("monthly", code), null);
     eq(`and ${code} is not shown at all`, pay.lmPayPriced("monthly", code), false);
   }
+  // Including the two the shipped file really does leave unpriced — same code path.
+  eq("GBP derives nothing either", pay.lmPayPrice("monthly", "GBP"), null);
+  eq("and neither does RUB", pay.lmPayPrice("monthly", "RUB"), null);
   eq("so only the priced currency lists the plan", pay.lmPayPlans("EUR").length, 1);
   eq("and the others list none", pay.lmPayPlans("USD").length, 0);
 
@@ -184,14 +211,14 @@ head("3. priced is not the same as buyable — whichever of the two states ships
       /* A Stripe test link says so in its path. It charges nobody and its events are
          signed with the test secret, so a live deployment answers them 400. */
       check(`${plan.id} is not a test-mode link`, !/\/test_/.test(plan.link), plan.link);
-      for (const code of CURRENCIES) {
+      for (const code of shipped.LM_PAY.currencies) {
         eq(`${plan.id} can be bought in ${code}`, shipped.lmPayBuyable(plan.id, code), true);
       }
       check(`${plan.id} builds a checkout URL`,
         typeof shipped.lmCheckoutUrl(plan.id, { uid: "abc123" }) === "string");
     }
     eq("the site takes money in every currency it prices",
-      CURRENCIES.every((c) => shipped.lmPayOpen(c)), true);
+      shipped.LM_PAY.currencies.every((c) => shipped.lmPayOpen(c)), true);
     /* Cancelling is Stripe's own screen, and it is the only one there is: a subscription
        nobody can get out of without writing to us is worse than one nobody can start. */
     check("and there is a portal to cancel in", shipped.lmPortalUrl() !== null,
@@ -251,12 +278,15 @@ head("3b. the checklist the owner works from is the one that is true");
     return cents === 0 ? String(whole) : `${whole},${String(cents).padStart(2, "0")}`;
   };
   for (const plan of pay.LM_PAY.plans) {
-    for (const code of CURRENCIES) {
+    for (const code of pay.LM_PAY.currencies) {
       const want = printed(pay.lmPayPrice(plan.id, code));
       check(`docs/STRIPE.md prices ${plan.id}/${code} at ${want}`, guide.includes(want), want);
     }
   }
-  check("and the guide names every currency", CURRENCIES.every((c) => guide.includes(c)));
+  /* The guide is the owner clicking through Stripe, so it names the currencies with amounts
+     — not the two the site merely counts in, which have no product to configure. */
+  check("and the guide names every currency Pro is sold in",
+    pay.LM_PAY.currencies.every((c) => guide.includes(c)));
 }
 
 head("4. a payment address may only ever be Stripe");

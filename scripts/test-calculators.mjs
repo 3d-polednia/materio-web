@@ -604,14 +604,19 @@ function currencyModule(lang, saved) {
   const c = currencyModule("pl");
   // Chapter VI's four, plus the three session 28 added so the subscription can be priced
   // where it is sold. RUB is deliberately absent — Stripe does not operate in Russia.
-  eq("seven currencies", c.LM_CURRENCIES.join(","), "PLN,EUR,USD,UAH,CZK,RON,RSD");
+  eq("nine currencies", c.LM_CURRENCIES.join(","), "PLN,EUR,USD,GBP,UAH,CZK,RON,RSD,RUB");
   eq("Polish starts in PLN", c.lmCurrency(), "PLN");
   eq("German starts in EUR", currencyModule("de").lmCurrency(), "EUR");
   eq("Ukrainian starts in UAH", currencyModule("uk").lmCurrency(), "UAH");
   eq("English starts in USD", currencyModule("en").lmCurrency(), "USD");
   // …but the choice is the visitor's, and it does not follow the language.
   eq("German + PLN is a valid setting", currencyModule("de", "PLN").lmCurrency(), "PLN");
-  eq("a currency the site does not offer is ignored", currencyModule("pl", "GBP").lmCurrency(), "PLN");
+  eq("Russian starts in RUB", currencyModule("ru").lmCurrency(), "RUB");
+  // CHF, not GBP: the site counts in the pound since session 61, so it is no longer an
+  // example of something unsupported. This is the guard that a stored code off the list
+  // falls back to the language's default instead of being trusted.
+  eq("a currency the site does not offer is ignored", currencyModule("pl", "CHF").lmCurrency(), "PLN");
+  eq("and the fallback is the language's own default", currencyModule("de", "CHF").lmCurrency(), "EUR");
 }
 {
   // The same amount in every currency: the digits never change, only the symbol.

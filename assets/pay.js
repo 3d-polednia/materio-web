@@ -61,7 +61,8 @@ var LM_PAY_HOSTS = ["buy.stripe.com", "billing.stripe.com"];
  *         that is the point: a button that takes money for a plan nothing grants is the
  *         one failure worse than a locked module.
  * `price` minor units per currency — the integer Stripe itself uses. Every one of the
- *         seven currencies is a two-decimal currency at Stripe, so this is always ×100.
+ *         currencies in `LM_PAY.currencies` is a two-decimal currency at Stripe, so this is
+ *         always ×100. A currency absent from that list has no amount here and shows none.
  * `key`   dictionary prefix: `<key>_t` names the plan, `<key>_per` the period.
  */
 var LM_PAY = {
@@ -69,6 +70,27 @@ var LM_PAY = {
      or cancels. Cancelling is Stripe's own screen on purpose: a "cancel" button here
      would have to write to Stripe, and this site has no server to write with. */
   portalUrl: "",
+
+  /* The currencies LiczMat Pro is SOLD in, which since session 61 is shorter than the list
+     of currencies somebody may COUNT in (`LM_CURRENCIES` in assets/currency.js — nine).
+     The two were accidentally the same set until the owner's decision of 2026-08-31 added
+     GBP and RUB to the counting list; they are two different questions and now look it.
+
+     Neither of the two is an omission:
+       RUB  Stripe does not operate in Russia. There is no amount to type, because there is
+            nothing that could charge it. This one is permanent until Stripe changes.
+       GBP  the owner intends to sell on the Isles, and the amount is theirs to decide.
+            Every figure below was converted from the euro ONCE, BY HAND, on 2026-08-19,
+            because Stripe charges what is set on the product — a price this file computed
+            would disagree with what leaves the card. So the pound waits for two typed
+            numbers rather than getting a guess. To open it: add "GBP" here and a GBP amount
+            to both plans. Nothing else changes; scripts/test-pay.mjs §1 checks the pair.
+
+     A currency on the counting list and not on this one shows NO price — `lmPayPrice()`
+     answers null and `proPlansBlock()` hides the plan row, leaving "the subscription has
+     not opened yet". That is the same path a currency has always taken when its amount was
+     missing; session 61 only made the gap deliberate and named it. */
+  currencies: ["PLN", "EUR", "USD", "UAH", "CZK", "RON", "RSD"],
 
   plans: [
     {

@@ -16,19 +16,19 @@
  */
 
 /**
- * The seven currencies LiczMat supports.
+ * The nine currencies LiczMat counts in — the same nine here and on the phone, which is
+ * what session 61 was for (audit D1/D2, the owner's decision of 2026-08-31: the app came
+ * down from twenty-six, GBP and RUB came up to meet it).
  *
- * Chapter VI names four — PLN, EUR, USD, UAH. Session 28 added CZK, RON and RSD because
- * the subscription has to be priced in them: LiczMat Pro is sold in Czechia, Romania and
- * Serbia, and a price shown in euro to somebody whose card is charged in koruna is a
- * price that changes at the checkout. Croatia is on the euro since 2023 and needs no
- * currency of its own; **RUB is deliberately absent** — Stripe does not operate in
- * Russia, so a rouble price would be one nothing could take money in.
+ * **Counting in a currency and being SOLD in one are two different lists.** This is the
+ * first; `LM_PAY.currencies` in assets/pay.js is the second, and it is shorter — GBP and
+ * RUB have no amount there, deliberately, and that file says why. A currency with no
+ * amount shows no price rather than a derived one.
  *
  * Adding a currency converts nothing. Every amount already stored keeps the
  * `currencyCode` it was saved with, and no existing number moves — see the header.
  */
-const LM_CURRENCIES = ["PLN", "EUR", "USD", "UAH", "CZK", "RON", "RSD"];
+const LM_CURRENCIES = ["PLN", "EUR", "USD", "GBP", "UAH", "CZK", "RON", "RSD", "RUB"];
 
 const LM_CURRENCY_KEY = "liczmat-currency";
 
@@ -37,13 +37,14 @@ const LM_CURRENCY_KEY = "liczmat-currency";
  * chapter VI is explicit that the two are independent (Deutsch + PLN is valid).
  *
  * Croatia is on the euro since 2023, so `hr` starts in EUR rather than in a kuna that no
- * longer exists. `ru` starts in EUR too: the rouble is deliberately not a supported
- * currency, because Stripe does not operate in Russia and a price nothing can charge is
- * worse than a price in a currency the reader has to convert themselves.
+ * longer exists. **`ru` starts in RUB since session 61**, which is what the phone has always
+ * done. It started in EUR here because the rouble buys no subscription — true, and still
+ * true, but that is an argument about the *price*, not about the currency somebody counts a
+ * floor in, which is what this table is. The Pro page quotes no price in RUB and says so.
  */
 const LM_LANG_CURRENCY = {
   pl: "PLN", uk: "UAH", de: "EUR", en: "USD",
-  cs: "CZK", sk: "EUR", ro: "RON", hr: "EUR", sr: "RSD", ru: "EUR",
+  cs: "CZK", sk: "EUR", ro: "RON", hr: "EUR", sr: "RSD", ru: "RUB",
 };
 
 /** Number formatting stays with the language: 1 234,56 in Polish, 1,234.56 in English. */

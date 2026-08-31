@@ -694,8 +694,11 @@ assets/styles.css     The design system: one token block, then the components th
 assets/i18n.js        Ten-language dictionary (LANGS + I18N) — build input
 assets/i18n-pages.js  Sub-page dictionary, the same ten languages (build input)
 assets/i18n-materials.js  Material names/terms, the same ten languages (build input)
-assets/currency.js    PLN/EUR/USD/UAH/CZK/RON/RSD — the currency, independent of the
-                      language. The last three arrived with the subscription (session 28)
+assets/currency.js    PLN/EUR/USD/GBP/UAH/CZK/RON/RSD/RUB — the currency, independent of the
+                      language, and the same nine the phone offers since session 61. CZK, RON
+                      and RSD arrived with the subscription (session 28); GBP and RUB with the
+                      one-list decision. Pro is SOLD in seven of the nine — that shorter list
+                      is LM_PAY.currencies in assets/pay.js
 assets/flags/*.svg    The flag next to each language name (never an emoji flag)
 assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
 assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
@@ -1900,12 +1903,32 @@ Kotlin side of it. Change one, change all three.
   `404.html` redirect that used to bounce them to the home page is gone. Master plan
   chapter V still names four — that edit is the owner's. Do not add or drop a language
   without the plan.
-- **Currency is not language.** `PLN, EUR, USD, UAH, CZK, RON, RSD` in
+- **Currency is not language.** `PLN, EUR, USD, GBP, UAH, CZK, RON, RSD, RUB` in
   `assets/currency.js`, chosen by the visitor and stored under `liczmat-currency`. Ten
-  languages share seven currencies, and a language's default is only a default —
+  languages share nine currencies, and a language's default is only a default —
   Deutsch + PLN is a valid setting (chapter VI). Nothing is ever converted at an
   exchange rate, and no physical quantity changes when the currency does. An estimate
   line keeps the `currencyCode` it was saved with.
+- **The nine are the phone's nine (session 61, audit D1 and D2).** The app offered
+  twenty-six and this site seven, so a kosztorys priced on a phone in Swiss francs
+  rendered here and could not be switched to. The owner's decision of 2026-08-31: the app
+  came down to this list, and this list came up by two. **GBP** because selling on the
+  Isles is intended, **RUB** because a tradesperson in Russia counts in roubles — the app
+  takes no money, so Stripe has no say in what somebody counts a floor in.
+  `CurrencyListTest` in `3d-polednia/Materio` reads `LM_CURRENCIES` out of this file when
+  the two repositories stand side by side, so the lists cannot drift apart quietly again.
+  **`ru` now starts in RUB here too**, which is what `AppLanguage.RUSSIAN` has always done.
+- **Counting in a currency and being SOLD in one are two lists, and since session 61 they
+  differ.** `LM_CURRENCIES` is what somebody may count in; `LM_PAY.currencies` in
+  `assets/pay.js` is the seven Pro is priced in. **GBP and RUB are deliberately unpriced**:
+  Stripe does not operate in Russia at all, and the pound is waiting for two amounts only
+  the owner can type, because every figure in that file was converted from the euro once,
+  by hand. A currency with no amount shows **no price** — `lmPayPrice()` answers null and
+  `proPlansBlock()` hides the plan row, leaving "the subscription has not opened yet". That
+  path has existed since session 28; this session only made the gap deliberate and named it.
+  **The consequence to know: `/liczmat-pro/` in Russian quotes no price at all.** Opening
+  the pound is one edit — add `"GBP"` to `LM_PAY.currencies` and a GBP amount to both plans;
+  `scripts/test-pay.mjs` §1 checks the pair and fails on half of it.
 - **Polish HTML matching `I18N.pl` is now automatic** — the pages are generated *from* the
   dictionary, so they cannot drift. Edit the dictionary, rebuild, commit the output. Never
   hand-edit a generated `.html`: the next build silently reverts it.

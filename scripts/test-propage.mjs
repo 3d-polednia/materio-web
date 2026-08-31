@@ -227,13 +227,30 @@ for (const lang of LANGS) {
      build can know. assets/paywall.js replaces it with the visitor's own. */
   has(t("propage_h_pay"), "the price has its own heading");
   has(t("pay_t"), "the subscription block is on the page");
+  /* Since session 61 a language's default currency is not necessarily one Pro is SOLD in:
+     `ru` starts in RUB, and Stripe does not operate in Russia, so there is no amount to
+     print. Both branches are checked, because both ship. */
+  const sold = LM_PAY.currencies.includes(DEFAULT_CURRENCY[lang]);
   for (const plan of LM_PAY.plans) {
     has(`data-pw-plan="${plan.id}"`, `the ${plan.id} plan is shown`);
     has(t(`pay_${plan.id}_per`), `and its period is named`);
-    has(`<b data-pw-price>${priceText(lang, plan.id)}</b>`,
-      `with the ${plan.id} amount in the HTML, in ${DEFAULT_CURRENCY[lang]}`);
+    if (sold) {
+      has(`<b data-pw-price>${priceText(lang, plan.id)}</b>`,
+        `with the ${plan.id} amount in the HTML, in ${DEFAULT_CURRENCY[lang]}`);
+    } else {
+      /* No amount, and above all no guess: the slot is empty and the row is hidden, so a
+         crawler and a reader with no script are told nothing rather than told a euro
+         price for a rouble. `pay_soon` below still says the subscription is not open. */
+      eq(`${lang}: ${DEFAULT_CURRENCY[lang]} is not a currency Pro is sold in`,
+        priceText(lang, plan.id), null);
+      has(`<b data-pw-price></b>`, `so the ${plan.id} price slot is empty`);
+      has(`data-pw-plan="${plan.id}" hidden`, `and the ${plan.id} row is hidden`);
+    }
   }
-  hasNot('data-pw-plan="monthly" hidden', "a priced plan is not hidden from a crawler");
+  if (sold) {
+    hasNot('data-pw-plan="monthly" hidden', "a priced plan is not hidden from a crawler");
+  }
+  has(t("pay_soon"), "and the page says the subscription has not opened");
 
   /* Nothing here takes money, and nothing here can. The checkout needs a uid, /app/ is
      the only page that has one, and the subscription has not opened at all yet. */
@@ -264,6 +281,13 @@ head("3. the amount is read, never converted");
     const code = DEFAULT_CURRENCY[lang];
     for (const plan of LM_PAY.plans) {
       const minor = lmPayPrice(plan.id, code);
+      if (!LM_PAY.currencies.includes(code)) {
+        // A currency the site counts in and does not sell in prints nothing at all.
+        eq(`${lang}: ${code} is counted in, not sold in, so ${plan.id} has no amount`,
+          minor, null);
+        eq(`${lang}: and nothing is printed for it`, priceText(lang, plan.id), null);
+        continue;
+      }
       check(`${lang}: the ${plan.id} plan has a hand-typed price in ${code}`, minor !== null);
       // The printed amount is that integer and nothing else: the same digits, formatted.
       const printed = priceText(lang, plan.id);
@@ -287,6 +311,7 @@ head("3. the amount is read, never converted");
   // runs: two decimals, always, in the language's own locale.
   for (const lang of LANGS) {
     const printed = priceText(lang, "monthly");
+    if (printed === null) continue;  // ru: counted in RUB, not sold in it — nothing to format
     check(`${lang}: the amount carries two decimals`, /[.,]\d\d(\D|$)/.test(printed), printed);
   }
 }
@@ -368,8 +393,16 @@ head("5. the ten pages that are actually in the repo");
     // The amount really is in the shipped bytes, which is the whole point of printing it
     // at build time rather than leaving it to a script.
     for (const plan of LM_PAY.plans) {
-      check(`${lang}: the ${plan.id} price is in the HTML`,
-        html.includes(priceText(lang, plan.id)), priceText(lang, plan.id));
+      const printed = priceText(lang, plan.id);
+      if (printed === null) {
+        /* The shipped file for a language whose currency Pro is not sold in carries an
+           empty slot — never a figure in some other currency, which is the one way this
+           could go wrong silently. */
+        check(`${lang}: the ${plan.id} slot ships empty, with no borrowed amount`,
+          html.includes("<b data-pw-price></b>"));
+        continue;
+      }
+      check(`${lang}: the ${plan.id} price is in the HTML`, html.includes(printed), printed);
     }
   }
 }
