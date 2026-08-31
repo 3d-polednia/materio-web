@@ -845,12 +845,19 @@ za sobą najwięcej kodu.
 - ~~**Flagi w wybieraku (połowa D4)**~~ — **ODPOWIEDZIANE: przenosimy flagi na telefon.**
   Zrobione w sesji 60.
 
-### Jedna rzecz, która pogarsza się sama
+### Jedna rzecz, która pogarszała się sama — zamknięta 31.08.2026
 
-Punkty 1 i 2 listy konsolowej. Serwis od 26.08 obiecuje synchronizację klientów, zleceń
-i wycen — a od 27.08 `/aplikacja/` pokazuje zrzuty aplikacji, której w sklepie nie ma.
-**Każdy kolejny dzień to dwie obietnice bez pokrycia zamiast jednej.** Reszta tej listy
-może poczekać; te dwie pozycje nie.
+Punkty 1 i 2 listy konsolowej. Serwis od 26.08 obiecywał synchronizację klientów, zleceń
+i wycen, a od 27.08 `/aplikacja/` pokazywało zrzuty aplikacji, której w sklepie nie było —
+dwie obietnice bez pokrycia, rosnące co dzień. **Obie mają pokrycie**: AAB 1.11.0 wgrany
+30.08, reguły opublikowane 31.08.
+
+Zostało po tym jedno zdanie warte zapamiętania, bo kolejność wyszła odwrotna niż plan
+kazał. Wgranie kodu przed regułami **nie zniszczyło niczego** — i to nie był fart, tylko
+własność kodu: `pushLocal()` wysyła stare kolekcje pierwsze, a `syncNow()` nie zapisuje
+`lastSyncAt`, kiedy przebieg poleci błędem, więc nic nie zostaje pominięte i następny
+przebieg nadrabia. **Zasada zostaje mimo to**: reguły przed kodem. Następnym razem
+kolekcja może wypaść w innym miejscu kolejki i wtedy koszt będzie inny.
 
 Ustalenia właściciela z 2026-08-21, na których stoi ten plan: nazwa **języka** przy fladze
 (bez nazw krajów), nadawanie Pro **narzędziem po e-mailu**, „rozjechany na telefonie"
@@ -875,8 +882,8 @@ repozytorium — bo sesja nie ma klucza do żadnej z tych konsol i nie zakłada 
 
 | # | Co | Gdzie | Jak sprawdzone | Skutek, dopóki nie zrobione |
 |---|---|---|---|---|
-| 1 | `firebase deploy --only firestore` | Firebase CLI, z katalogu głównego repo `Materio` | Stan repo: `validClient()`, `validJob()`, `validQuote()` są w `config/firebase/firestore.rules` od Sesji 46, a `validMaterial()` od Sesji 59. Wdrożenia nie da się odczytać bez klucza albo konta — **niesprawdzone na żywo** | **Klienci, zlecenia, wyceny i własne materiały nie jadą na telefon**, a „wyślij" w `/app/` kończy się `PERMISSION_DENIED`. Szczegóły niżej |
-| 2 | **Wgranie AAB do Play — dopiero po punkcie 1** | Play Console | **AAB zbudowany 2026-08-30: 1.11.0 (`versionCode` 11100), targetSdk 36, podpisany kluczem upload, `jarsigner -verify` → „jar verified", 20,5 MB.** Niesie jedenaście sesji naraz (46, 47, 50, 52–56, 58, 59, 60); testy 316/316 przed budowaniem. Notatki „Co nowego" w dziesięciu językach: `docs/RELEASE_NOTES_1.11.0.md` w repo aplikacji. **Plik jest u właściciela — sesja nie ma dostępu do Play i nie wie, czy został wgrany** | Dopóki leży niewgrany, w sklepie stoi **1.10.2** i wszystko z kolumny obok dalej nie dotarło do nikogo: poprawka zaokrąglenia (46 → telefon liczy inaczej niż serwis), pięć modułów Pro zamiast trzech, wygląd z Sesji 50 (w sklepie stara oliwka, a `/aplikacja/` pokazuje już nową), scalony kalkulator z Sesji 52, kształt pola z 55, wybierak materiału z 56, terminarz z 53, ścieżka i historia z 54, link do kosztorysu z 58, własne materiały w chmurze z 59 i flagi z 60. **A wgranie go do produkcji PRZED punktem 1 jest gorsze niż niewgranie**: cztery walidatory, których wdrożone reguły nie znają, odrzucą każdy zapis do nowych kolekcji, a `CloudSync.syncNow()` czeka na każdy zapis po kolei — jeden odrzucony klient wywraca cały przebieg i **projekty z pomieszczeniami przestają się synchronizować razem z nimi**. Kolejność jest sztywna: reguły, potem produkcja. Ścieżka zamknięta (closed testing) jest bezpieczna w każdej kolejności |
+| 1 | ~~`firebase deploy --only firestore`~~ | Firebase CLI **albo konsola** | **ZROBIONE 31.08.2026** — właściciel wkleił `config/firebase/firestore.rules` w Firebase → Firestore Database → Rules i opublikował, z telefonu. Zweryfikowane: odczytany z konsoli blok `validMaterial` zgadza się z repo **co do znaku**, a leży w linii 210 z 270, więc `validClient()`, `validJob()` i `validQuote()` weszły razem z nim | **Nic. Klienci, zlecenia, wyceny i własne materiały jadą na telefon.** Konsola okazała się prostsza niż CLI: plik wkleja się w całości, a niekompletny nie skompiluje się i nie zostanie przyjęty |
+| 2 | ~~**Wgranie AAB do Play**~~ | Play Console | **ZROBIONE 30.08.2026** — właściciel wgrał `app-release.aab` 1.11.0 (`versionCode` 11100), zbudowany tego samego dnia: targetSdk 36, podpisany kluczem upload, `jarsigner -verify` → „jar verified", 20,5 MB, testy 316/316 przed budowaniem. Notatki „Co nowego" w dziesięciu językach: `docs/RELEASE_NOTES_1.11.0.md`. **Czy jest już wdrożone do produkcji, wie tylko właściciel — sesja nie widzi Play** | Niesie jedenaście sesji naraz (46, 47, 50, 52–56, 58, 59, 60). **Kolejność wyszła odwrotna niż zaplanowana** — AAB 30.08, reguły 31.08 — i nie kosztowało to nic: `pushLocal()` wysyła najpierw projekty, kalkulacje, listy materiałów i pomieszczenia, więc te doszły, a `syncNow()` nie dochodzi do `setLastSyncAt`, więc nic nie zostało oznaczone jako zsynchronizowane i następny przebieg nadrobił wszystko sam. Kto nie miał ani jednego klienta, zlecenia, wyceny czy własnego materiału, nie zauważył niczego. **Zasada zostaje na przyszłość**: reguły przed kodem, bo jedna odmowa dalej wywraca cały przebieg synchronizacji na telefonie |
 | 3 | **Opis w sklepie wysyła ludzi na martwą domenę** | Play Console → Główna karta sklepu, **11 języków** | Zmierzone 2026-08-27 na żywych stronach sklepu (`hl=pl,en,de,uk,cs` — w każdej **dwa** wystąpienia) | Opis mówi „kalkulatory działają też na materio-app.com" i „użyj »Nie pamiętam hasła« na materio-app.com". Ten host odpowiada **404**. Drugie zdanie kieruje kogoś, kto stracił dostęp do konta, pod adres, którego nie ma. Podmienić na `liczmat.com` |
 | 4 | Rotacja klucza `pracownik@materio-502513` | Google Cloud → IAM → Konta serwisowe | Stan z Sesji 37, niesprawdzalny stąd | Prywatny klucz RSA przeszedł przez transkrypt sesji 2026-08-26. **Najpierw nowy klucz i podmiana tam, gdzie służy do wysyłki na Play, dopiero potem kasowanie starego** |
 | 5 | Keystore i hasła w historii gita | repo `Materio` | **Zmierzone 2026-08-27:** `git ls-files` wymienia `materio-upload.jks` **i** `materio-keystore-creds.txt` — są śledzone **dziś**, nie tylko w historii. `.gitignore` ma `*.jks`, ale **nie ma** pliku z hasłami, a `.gitignore` i tak nie działa wstecz | Klucz upload i jego hasła leżą w repozytorium. Uwaga: przepis na wydanie w `CLAUDE.md` **czyta oba te pliki z korzenia repo**, więc `git rm --cached` bez zmiany przepisu zepsuje budowanie AAB. To jest decyzja właściciela, nie sesji |

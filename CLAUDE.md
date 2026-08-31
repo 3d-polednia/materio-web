@@ -1142,18 +1142,19 @@ Kotlin side of it. Change one, change all three.
   `users/{uid}/clients`, `/jobs` and `/quotes` beside `rooms` — and the phone has
   `ClientEntity`, `JobEntity`, `QuoteEntity`, Room migration 5 → 6, the six mappers in
   `SyncContract`, the three collections in `CloudSync` and `validClient()`/`validJob()`/
-  `validQuote()` in the deployed rules. **Those rules still need deploying**
-  (`firebase deploy --only firestore`), and the owner decided on 2026-08-26 to do it in one
-  pass with the rest of the console work **after the plan closes** — the list and what the
-  delay costs are under "Do zrobienia w konsolach" at the top of `docs/MASTER_PLAN.md`.
-  Two things follow while it waits. The five sentences of copy this session rewrote now
-  promise a sync the backend does not yet perform — true about the contract, not yet true
-  about production; if the wait turns long, cutting the copy back is more honest than
-  leaving the promise. And **the app must not be released before the rules are deployed**:
-  `CloudSync.syncNow()` awaits each write in order, so one refused client takes the whole
-  pass down and the pull never runs. Rules first, AAB second. Pulling on the web already
-  survives the refusal (each Pro collection is read on its own — commit `dd12d82c`), which
-  is the only reason the delay costs a feature rather than the whole sync. `/app/` pushes and pulls the Pro store beside the workspace
+  `validQuote()` in the deployed rules. **Those rules went live on 2026-08-31**, published by
+  the owner from the Firebase console (the file pastes in whole; 270 lines that compile or are
+  refused). `validMaterial()` from session 59 went up in the same paste. So the five sentences
+  of copy session 46 rewrote — which promised a sync the backend did not yet perform — are
+  true about production now, and nothing needs cutting back.
+  **The ordering warning this bullet used to carry was real and it was tested by accident:**
+  the 1.11.0 AAB reached Play on 2026-08-30, the rules a day later. It cost nothing, because
+  `pushLocal()` sends projects, estimations, shopping items and rooms **first** and the throw
+  lands on the first client; `syncNow()` never reaches `setLastSyncAt`, so nothing was marked
+  synced and the next pass caught up. Pulling on the web survives a refusal anyway (each Pro
+  collection is read on its own — commit `dd12d82c`). **Keep the rule for next time**: a
+  session that adds a collection to the rules has to get the deploy in before that build
+  reaches production, because one refused write still takes a whole phone sync pass down. `/app/` pushes and pulls the Pro store beside the workspace
   (`pushProWorkspace()`, `crmImport()`), so a job whose status was set in a browser is the
   job the tradesperson opens on site.
   **The store keeps its own key.** `liczmat-crm-v1` is still separate from
@@ -1341,9 +1342,9 @@ Kotlin side of it. Change one, change all three.
   with the price their own supplier charges. The same session put
   `users/{uid}/materials/{materialId}` in the contract (Room migration 7 → 8,
   `SyncContract.materialToDoc()`, `validMaterial()` in the deployed rules) and built
-  `/moje-materialy/` here. **The rules need deploying with the rest**, so nothing reaches the
-  cloud until then; the screen works signed out either way, because the rows are
-  `localStorage` in the document's own shape.
+  `/moje-materialy/` here. **The rules went live on 2026-08-31** with session 46's three, so
+  own materials and their price history reach the cloud from that day; the screen works signed
+  out either way, because the rows are `localStorage` in the document's own shape.
 - **The price history is `prices[]` inside the row, capped at the newest sixty.** A point
   belongs to one material, nothing links to it, nothing edits one once written, and it dies
   with the material — the four facts that keep a quote's labour lines inside the quote. The
