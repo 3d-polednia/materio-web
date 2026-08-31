@@ -99,6 +99,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 58 | Udostępnianie kosztorysu linkiem w aplikacji — C5 (repo aplikacji) | **Zrobione** — 2026-08-29, commit `68506a4`. Czeka na wydanie AAB (właściciel) |
 | 59 | Eksport PDF i własne materiały — C6 (oba repozytoria) | **Zrobione** — 2026-08-30. Reguły i AAB czekają (właściciel) |
 | 60 | Flagi w wybieraku języka na telefonie — połowa D4 (repo aplikacji) | **Zrobione** — 2026-08-30. Czeka na wydanie AAB (właściciel) |
+| 61 | Jedna lista walut na obu produktach — D1 i D2 (oba repozytoria) | **Zrobione** — 2026-08-31. Strona jest na żywo po pushu; aplikacja czeka na kolejny AAB |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -757,6 +758,84 @@ się ze złotówkowym „zł" obok. Naprawa tego jest dobra przy każdej odpowie
 i **musi** poprzedzić opcję, w której enum się zwęża, bo inaczej zwężenie zamienia
 poprawne dziś funty w złotówki. To jest sesja 61, jeśli właściciel nie zdecyduje inaczej.
 
+## Sesja 61 — jedna lista walut na obu produktach (D1 i D2)
+
+**DECYZJE WŁAŚCICIELA, 31.08.2026.** Trzy pytania, trzy odpowiedzi: aplikacja schodzi do
+listy strony, **rubel zostaje na obu**, **funt zostaje**. Z tego wychodzi jedna lista
+dziewięciu walut: PLN, EUR, USD, GBP, UAH, CZK, RON, RSD, RUB. Strona urosła o dwie
+pozycje, aplikacja spadła o siedemnaście.
+
+**Audyt się przeliczył i to warto zapisać.** Pozycja D1 mówi „siedem kontra dwadzieścia
+siedem". Enum `Currency` miał **dwadzieścia sześć**. Nic z tego nie wynikało, ale liczba
+w audycie była pierwszą rzeczą, którą ta sesja sprawdziła, i nie zgadzała się.
+
+**Zwężenie listy wymagało najpierw naprawy wyświetlania — i ta naprawa była potrzebna sama
+z siebie.** `Currency.fromCode()` zwracał `PLN` dla kodu, którego nie znał, a
+`CurrencyFormatter` brał z tego symbol. Kwota w nieznanej walucie rysowała się więc ze
+złotówkowym „zł" obok. To **już było zepsute** przed tą sesją — `currencyCode` jedzie
+w kontrakcie jako wolny trzyznakowy string i wiersz może przyjechać z chmury w dowolnym
+kodzie — a wyrzucenie siedemnastu walut zamieniłoby każdego funta, jakiego ktokolwiek
+wpisał, w złotówkę na ekranie. Teraz jest `fromCodeOrNull()`, które **przyznaje się, że nie
+wie**, i nieznany kod **drukuje sam siebie**: „1 856,20 CHF". Brzydziej i prawdziwie.
+`fromCodeOrDefault()` odpowiada na drugie pytanie — co *wybrać*, kiedy coś wybrać trzeba —
+i rozdzielenie tych dwóch pytań jest właściwą treścią naprawy.
+
+**Żaden dokument nie był migrowany i nie musiał.** `currencyCode` to wolny string, a
+wdrożone reguły sprawdzają wyłącznie `text(d.currencyCode, 3)`. Zwężenie zmienia to, co
+można **wybrać**, i to, jak wyświetla się kod **nierozpoznany** — nic więcej. Decyzji
+wymagało za to zapisane *ustawienie*: waluta, której już nie ma, spada teraz na **domyślną
+walutę języka**, a nie na PLN. Odpowiedzieć Czechowi „złoty", kiedy zniknął mu frank, to
+drugie zgadywanie na wierzchu pierwszego.
+
+**Liczyć w walucie i sprzedawać w walucie to dwie różne listy, i od tej sesji się różnią.**
+`LM_CURRENCIES` to dziewięć walut, w których ktoś liczy podłogę. `LM_PAY.currencies`
+w `assets/pay.js` to siedem, w których LiczMat Pro ma cenę. **GBP i RUB celowo nie mają
+ceny**: Stripe nie działa w Rosji w ogóle, a funt czeka na dwie kwoty, które może wpisać
+wyłącznie właściciel — każda liczba w tym pliku była przeliczona z euro **raz, ręcznie**,
+bo Stripe pobiera to, co stoi na produkcie, więc cena policzona przez plik kłóciłaby się
+z tym, co schodzi z karty. Waluta bez kwoty pokazuje **brak ceny**, nie cenę wyprowadzoną —
+ta ścieżka istnieje od Sesji 28, ta sesja tylko nazwała lukę i uczyniła ją świadomą.
+
+**Konsekwencja, powiedziana teraz zamiast odkryta później: `/liczmat-pro/` po rosyjsku nie
+podaje żadnej kwoty.** `proPlansBlock()` chowa wiersz planu bez ceny, a `pay_soon` dalej
+mówi, że subskrypcja nie ruszyła — strona degraduje się do prawdy, a nie do pustego
+prostokąta ani do kwoty w euro z rublową etykietą. **Otwarcie funta to jedna edycja**:
+dopisać `"GBP"` do `LM_PAY.currencies` i kwotę GBP do obu planów.
+
+**TESTY.** Aplikacja: **328/328** (było 316; dwanaście nowych w `CurrencyListTest`).
+Strona: wszystkie zestawy logiczne przechodzą. `scripts/test-pay.mjs` §1 sprawdza teraz
+**obie** połowy — że sprzedaż jest podzbiorem liczenia, że każda sprzedawana waluta ma cenę
+w obu planach, i że każda liczona-ale-niesprzedawana nie pokazuje **nic**, więc jedna kwota
+wpisana przez pomyłkę nie zacytuje ceny miesięcznej bez rocznej obok.
+
+**Test parytetu czyta drugie repozytorium**, tak samo jak `LanguageFlagTest` §4 z Sesji 60:
+`CurrencyListTest` §4 wyjmuje `LM_CURRENCIES` z `assets/currency.js` serwisu, kiedy oba
+repozytoria stoją obok siebie. Sprawdzone przez zepsucie — usunięcie RUB po stronie serwisu
+zapala ten test na czerwono.
+
+**Budżet wagi strony trafił w moje własne komentarze.** Opis powodu, dla którego istnieją
+dwie listy, wrzucił `/konwerter-jednostek/` 200 bajtów ponad budżet gzip, bo
+`assets/currency.js` pobiera **każda strona**. Skrócone, a nie podniesione: długi argument
+należy do `CLAUDE.md` i do tego pliku, nie do bajtów na każdym wczytaniu strony.
+
+**ZMIENIONE PLIKI.** W `3d-polednia/Materio`: `core/model/Units.kt`,
+`core/common/CurrencyFormatter.kt`, `core/database/SettingsRepository.kt`, nowy
+`app/src/test/.../CurrencyListTest.kt`, `CLAUDE.md`. W tym repozytorium:
+`assets/currency.js`, `assets/pay.js`, `scripts/test-pay.mjs`,
+`scripts/test-calculators.mjs`, `scripts/test-propage.mjs`, `scripts/build.mjs` (STAMP),
+`privacy-policy.html` i `404.html` (stempel ręcznie), `CLAUDE.md` i przegenerowane strony.
+
+**STATUS.** Zrobione, oba repozytoria, na `main`. **Połowa serwisowa jest na żywo od razu**
+(GitHub Pages buduje z `main`). **Połowa aplikacji czeka na kolejny AAB** — 1.11.0 wyszedł
+30.08, przed tą sesją, więc dziewięć walut zobaczy dopiero następne wydanie.
+
+**NASTĘPNE ZADANIE: D3 — drugi angielski.** Ostatnia otwarta pozycja audytu, i decyzja
+o funcie zmieniła jej charakter. Do wczoraj D3 mogło rozwiązać się samo: gdyby GBP wypadło,
+`ENGLISH_UK` straciłoby jedyny powód istnienia. Funt został, więc oba wiersze zostają —
+a wtedy trzeba wymyślić dla nich podpisy, które je **rozróżniają nie nazywając kraju**,
+co jest trudne, bo różnicą między nimi jest dokładnie kraj. To jest pytanie do właściciela,
+nie robota. Nazwane, nie zaczęte.
+
 ## Audyt parytetu strona ↔ aplikacja — 27.08.2026 (Sesja 51)
 
 To jest **lista, z której biorą się Sesje 52–58**. Do 2026-08-28 leżała wyłącznie
@@ -803,10 +882,10 @@ Sesji 51 i zrzuty na `/aplikacja/`.
 
 | # | Co | Waga | Stan |
 |---|---|---|---|
-| D1 | **Siedem walut kontra dwadzieścia siedem.** Kosztorys wyceniony na telefonie w funtach dojeżdża do przeglądarki, która GBP nie ma w wybieraku — kwota się wyrenderuje, ale nikt nie przestawi na nią serwisu. Rekomendacja audytu: aplikacja schodzi do siedmiu, a kosztorys wyceniony wcześniej zachowuje swoją walutę | Średnie | **Pytanie do właściciela** |
-| D2 | **Rubel: aplikacja tak, strona nie.** Strona: RUB celowo nieobecny (Stripe nie działa w Rosji), `ru` startuje w EUR. Aplikacja: `RUSSIAN.defaultCurrency = RUB` | Średnie | **Pytanie do właściciela** (z D1) |
-| D3 | **Angielski policzony dwa razy.** Strona ma jeden `en`; aplikacja `ENGLISH_US` (USD) i `ENGLISH_UK` (GBP) — stąd licznik 10 / 12 | Niskie | **Pytanie do właściciela** |
-| D4 | **Nazwa języka i flaga w wybieraku.** To były dwie rzeczy, nie jedna. **Flagi: zrobione — Sesja 60** (aplikacja nie miała ŻADNYCH flag, nie „złe"; dziesięć wektorów strony przepisanych na Vector Drawable). **Nazwa: otwarte, z D3** — zasada „nazwa języka, nigdy kraju" (decyzja właściciela 21.08.2026, pilnowana przez `test-langs.mjs`) jest łamana przez „English (US)" i „English (UK)", a to znika samo, jeśli D3 scali oba angielskie | Niskie | Flagi zrobione; nazwa otwarta z D3 |
+| D1 | ~~**Siedem walut kontra dwadzieścia sześć**~~ (audyt napisał 27; enum miał 26) | Średnie | **Zrobione — Sesja 61.** Decyzja właściciela 31.08.2026: aplikacja schodzi do listy strony, strona rośnie o dwie pozycje. **Dziewięć walut na obu produktach**: PLN, EUR, USD, GBP, UAH, CZK, RON, RSD, RUB. Żaden dokument nie był migrowany — `currencyCode` jedzie w kontrakcie jako wolny trzyznakowy string |
+| D2 | ~~**Rubel: aplikacja tak, strona nie**~~ | Średnie | **Zrobione — Sesja 61.** Rubel zostaje na OBU (decyzja właściciela). Argument „Stripe nie działa w Rosji" dotyczy ceny, nie waluty liczenia — aplikacja nie bierze pieniędzy w ogóle. `ru` startuje w RUB po obu stronach. **Cena Pro w rublach nie istnieje i istnieć nie może**, więc `/liczmat-pro/` po rosyjsku nie podaje kwoty |
+| D3 | **Angielski policzony dwa razy.** Strona ma jeden `en`; aplikacja `ENGLISH_US` (USD) i `ENGLISH_UK` (GBP) | Niskie | **Otwarte — ale przestało samo się rozwiązywać.** Właściciel zdecydował 31.08.2026, że **funt zostaje** (Wyspy są w planach), więc `ENGLISH_UK` zachowuje swój jedyny powód istnienia. Gdyby GBP wypadło, ta pozycja i D4-nazwa zamknęłyby się same |
+| D4 | **Nazwa języka i flaga w wybieraku.** **Flagi: zrobione — Sesja 60.** **Nazwa: otwarta z D3** — „English (US)" i „English (UK)" łamią zasadę „nazwa języka, nigdy kraju", a różnicą MIĘDZY tymi wierszami jest właśnie kraj | Niskie | Flagi zrobione; nazwa otwarta. Trudniejsza, niż wyglądała: skoro funt zostaje, oba wiersze zostają i trzeba wymyślić podpisy, które rozróżniają je nie nazywając kraju |
 | D5 | Trzeci tryb motywu | — | **Zrobione — Sesja 51** |
 
 ### Kolejność, w której audyt kazał to robić
