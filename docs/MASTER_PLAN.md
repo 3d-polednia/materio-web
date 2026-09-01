@@ -100,6 +100,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 59 | Eksport PDF i własne materiały — C6 (oba repozytoria) | **Zrobione** — 2026-08-30. Reguły i AAB czekają (właściciel) |
 | 60 | Flagi w wybieraku języka na telefonie — połowa D4 (repo aplikacji) | **Zrobione** — 2026-08-30. Czeka na wydanie AAB (właściciel) |
 | 61 | Jedna lista walut na obu produktach — D1 i D2 (oba repozytoria) | **Zrobione** — 2026-08-31. Strona jest na żywo po pushu; aplikacja czeka na kolejny AAB |
+| 62 | Jeden angielski, waluta z regionu urządzenia — D3 i nazwa z D4 (repo aplikacji) | **Zrobione** — 2026-09-01. Czeka na wydanie AAB (właściciel). **Audyt parytetu zamknięty** |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -758,6 +759,92 @@ się ze złotówkowym „zł" obok. Naprawa tego jest dobra przy każdej odpowie
 i **musi** poprzedzić opcję, w której enum się zwęża, bo inaczej zwężenie zamienia
 poprawne dziś funty w złotówki. To jest sesja 61, jeśli właściciel nie zdecyduje inaczej.
 
+## Sesja 62 — jeden angielski, waluta z regionu (D3 i nazwa z D4)
+
+**DECYZJA WŁAŚCICIELA, 31.08.2026: opcja D.** Jeden `English` z `defaultCurrency = null`,
+czyli waluta czytana z regionu urządzenia. Aplikacja miała dwa wiersze — „English (US)"
+z USD i „English (UK)" z GBP — i ten podział miał **jedno** zadanie: żeby waluta startowa
+była jednoznaczna. Kosztował dwie rzeczy. Wybierak pytał anglojęzycznego użytkownika, w
+jakim jest kraju, czyli jedyny podpis na obu produktach nazywający kraj, wbrew zasadzie
+z 21.08.2026, że język nazywa się swoim własnym słowem. I stawiał na telefonie dwunasty
+wiersz, którego strona nigdy nie miała — dwa produkty nie zgadzały się co do tego, iloma
+językami mówi LiczMat.
+
+**Opcja D usuwa powód, nie podpis.** `null` to ten sam mechanizm, którego wiersz
+„zgodnie z systemem" używa od zawsze: telefon kupiony w Wielkiej Brytanii sam startuje
+w GBP, a nikt nie wybiera kraju. Zasada o nazwach **nie ma już ani jednego wyjątku** do
+zapisania, a `flag_en_us.xml` znika razem z wierszem, dla którego był narysowany — oba
+katalogi flag mają teraz te same dziesięć pozycji, jedna do jednej.
+
+**Opcja D zostawia jedno pytanie bez odpowiedzi i trzeba je było podjąć: co dostaje
+Anglik spoza dziewiątki.** `Currency.forCountryOrDefault()` odpowiadał **PLN** dla
+każdego regionu, którego nie zna — Australia, Indie, Kanada — więc przy jednym wierszu
+angielskim złotówka trafiłaby do kogoś w Sydney. Jest teraz `forCountryOrNull()`, czyli
+uczciwa połowa (dokładnie ta sama poprawka, którą Sesja 61 zrobiła na `fromCode()`), a
+**każdy język sam mówi, czego chce zamiast**: `regionFallback`, i wartością jest to,
+w czym ten język startuje **na stronie** (`LM_LANG_CURRENCY`) — USD dla angielskiego,
+PLN dla „zgodnie z systemem". `forCountryOrDefault()` jest skasowany: po tej zmianie nikt
+go już nie wołał, a publiczna funkcja trzymana wyłącznie po to, żeby test miał co sprawdzać,
+jest gorsza niż jej brak.
+
+**Właściwą treścią tej sesji jest migracja, i jest to awaria, która nie krzyczy.** Stara
+wartość leży w **dwóch** miejscach, w dwóch różnych zapisach: DataStore i plik kopii
+zapasowej trzymają **nazwę enuma** (`ENGLISH_UK`), a SharedPreferences `LocaleHelper`
+trzyma **tag BCP-47** (`en-GB`), bo czyta się go w `attachBaseContext`, zanim DataStore
+w ogóle istnieje. `valueOf` rzuca na nazwie, którą nowszy build usunął — i **każde miejsce
+wywołania łapało ten wyjątek i po cichu podstawiało `SYSTEM`**. Bez mapy `AppLanguage.LEGACY`
+telefon ustawiony na angielski wstałby po aktualizacji w trybie „zgodnie z systemem", co
+w Polsce znaczy: wstałby po polsku i nic by o tym nie powiedział. `fromNameOrNull()`
+zastępuje `valueOf` w `SettingsRepository` i `BackupManager`, `fromTag()` obsługuje
+`LocaleHelper`.
+
+**Zapisana waluta celowo NIE jest migrowana.** Kto był na `ENGLISH_UK`, ma GBP pod własnym
+kluczem, GBP dalej jest na liście dziewięciu — więc jego ustawienie jest już poprawne, a
+przeliczenie go z regionu byłoby nadpisaniem odpowiedzi, którą człowiek dał ręcznie. Region
+pyta się wtedy, kiedy ktoś **wybiera** język, i tak było zawsze.
+
+**TESTY.** Aplikacja: **342/342** (było 328). Nowy `LanguageListTest` — piętnaście testów:
+jeden wiersz angielski, dziesięć języków, żadna nazwa nie zawiera kraju, obie ścieżki
+migracji (nazwa i tag), odczyt regionu i jego fallback, oraz — czytane ze strony, kiedy
+oba repozytoria stoją obok siebie — **te same kody języków i te same nazwy** po obu
+stronach. `LanguageFlagTest` sprawdza teraz obie strony listy flag: nie tylko „strona ma
+flagę, której aplikacja nie ma", ale i „aplikacja wozi flagę, dla której strona nie ma
+języka" — to drugie złapałoby `flag_en_us.xml`, gdyby ktoś go zostawił.
+**Sprawdzone przez zepsucie**: zmiana nazwy `English` na `English (US)` w `assets/i18n.js`
+serwisu zapala `LanguageListTest` na czerwono.
+
+**STRONA NIE ZMIENIŁA SIĘ ANI O BAJT, i to jest poprawna odpowiedź.** Serwis od zawsze ma
+jeden `en` nazwany „English", z USD jako domyślną walutą. Cały defekt D3 był po stronie
+aplikacji; strona była tą połową, do której się równano. Zmieniona jest tu wyłącznie
+dokumentacja planu.
+
+**Zrzuty na `/aplikacja/` nie wymagały ponownego nagrania.** Trzy obrazki to ekran główny,
+kalkulator i sklepy — wybierak języka nie jest na żadnym z nich, a `SettingsContent`
+w testach zrzutowych rysuje listę **zwiniętą**, więc zmieniła się tylko zawartość rozwijanej
+listy. Zasadą jest pomiar, nie pamięć: cały zestaw zrzutów przeszedł bez różnicy.
+
+**ZMIENIONE PLIKI.** W `3d-polednia/Materio`: `core/model/AppLanguage.kt`,
+`core/model/Units.kt`, `core/common/LocaleHelper.kt`, `core/database/SettingsRepository.kt`,
+`core/database/BackupManager.kt`, `core/designsystem/component/Flags.kt`,
+`feature/settings/SettingsViewModel.kt`, skasowany `res/drawable/flag_en_us.xml`, nowy
+`app/src/test/.../LanguageListTest.kt`, `CurrencyListTest.kt`, `LanguageFlagTest.kt`,
+`CLAUDE.md`. W tym repozytorium: wyłącznie `docs/MASTER_PLAN.md`.
+
+**STATUS.** Zrobione, `main`, commit `2795974`. **Czeka na wydanie AAB** — 1.11.0 wyszedł
+30.08, więc jeden wiersz angielski zobaczy dopiero następne wydanie, razem z dziewięcioma
+walutami z Sesji 61.
+
+**AUDYT PARYTETU JEST ZAMKNIĘTY.** Wszystkie pozycje A–D mają stan: zrobione, albo świadoma
+asymetria (B6 i C7), albo — jak D5 — zamknięte wcześniej. To była ostatnia otwarta pozycja.
+
+**NASTĘPNE ZADANIE: nie ma go w żadnym planie — to pytanie do właściciela.** `MASTER_PLAN.txt`
+skończył się na Sesji 36, plan naprawczy i audyt parytetu są wyczerpane. Na liście zostają
+wyłącznie rzeczy **czekające na konsole i na właściciela**, nie na sesję: wydanie AAB
+(Sesje 47, 50, 52–56, 58–62), `firebase deploy --only functions` plus jedno nadanie
+uprawnienia (Sesja 49, `docs/ADMIN.md`), oraz sześć kroków Stripe'a i trzy adresy
+(Sesja 39, `docs/STRIPE.md`), do których dochodzą dwie kwoty w funtach, gdyby Pro miało być
+sprzedawane na Wyspy. Nazwane, nie zaczęte.
+
 ## Sesja 61 — jedna lista walut na obu produktach (D1 i D2)
 
 **DECYZJE WŁAŚCICIELA, 31.08.2026.** Trzy pytania, trzy odpowiedzi: aplikacja schodzi do
@@ -884,8 +971,8 @@ Sesji 51 i zrzuty na `/aplikacja/`.
 |---|---|---|---|
 | D1 | ~~**Siedem walut kontra dwadzieścia sześć**~~ (audyt napisał 27; enum miał 26) | Średnie | **Zrobione — Sesja 61.** Decyzja właściciela 31.08.2026: aplikacja schodzi do listy strony, strona rośnie o dwie pozycje. **Dziewięć walut na obu produktach**: PLN, EUR, USD, GBP, UAH, CZK, RON, RSD, RUB. Żaden dokument nie był migrowany — `currencyCode` jedzie w kontrakcie jako wolny trzyznakowy string |
 | D2 | ~~**Rubel: aplikacja tak, strona nie**~~ | Średnie | **Zrobione — Sesja 61.** Rubel zostaje na OBU (decyzja właściciela). Argument „Stripe nie działa w Rosji" dotyczy ceny, nie waluty liczenia — aplikacja nie bierze pieniędzy w ogóle. `ru` startuje w RUB po obu stronach. **Cena Pro w rublach nie istnieje i istnieć nie może**, więc `/liczmat-pro/` po rosyjsku nie podaje kwoty |
-| D3 | ~~**Angielski policzony dwa razy**~~ | Niskie | **ZDECYDOWANE 31.08.2026, do zrobienia w Sesji 62: opcja D.** Jeden `English` z `defaultCurrency = null`, czyli waluta z regionu urządzenia — telefon kupiony w UK dostaje GBP sam, bez drugiego wiersza i bez klikania. Mechanizm już istnieje i już działa dla wiersza „zgodnie z systemem" (`SettingsViewModel.currencyFor()`). Zamyka też **D4-nazwę** bez wyjątku od zasady i kasuje `flag_en_us.xml` |
-| D4 | **Nazwa języka i flaga w wybieraku.** **Flagi: zrobione — Sesja 60.** | Niskie | **Nazwa zamyka się razem z D3 w Sesji 62**: jeśli angielski jest jeden, nie ma podpisu „English (US)", więc nie ma czego łamać. Zasada zostaje **bez wyjątku** |
+| D3 | ~~**Angielski policzony dwa razy**~~ | Niskie | **Zrobione — Sesja 62**, opcja D (decyzja właściciela 31.08.2026). Jeden `English` z `defaultCurrency = null`, czyli waluta z regionu urządzenia — telefon kupiony w UK dostaje GBP sam, bez drugiego wiersza i bez klikania. `flag_en_us.xml` skasowany; oba katalogi flag mają teraz te same dziesięć plików. **Migracja jest właściwą treścią tej sesji** — patrz raport |
+| D4 | ~~**Nazwa języka i flaga w wybieraku**~~ | Niskie | **Zrobione — flagi w Sesji 60, nazwa w Sesji 62.** Angielski jest jeden, więc nie ma podpisu „English (US)" i nie ma czego łamać. Zasada „nazwa języka, nigdy kraju" zostaje **bez jednego wyjątku**, a `LanguageListTest` §2 i §5 pilnują jej po obu stronach |
 | D5 | Trzeci tryb motywu | — | **Zrobione — Sesja 51** |
 
 ### Kolejność, w której audyt kazał to robić
@@ -913,9 +1000,15 @@ za sobą najwięcej kodu.
   pozycji nie czeka na decyzję i jest defektem dzisiaj: `Currency.fromCode()` zwraca PLN
   dla nieznanego kodu, więc kwota w walucie spoza enuma **już** rysuje się ze złotówkowym
   symbolem.
-- **Drugi angielski (D3)** — **OTWARTE.** `en-GB` z GBP zostaje osobną pozycją, czy schodzi
-  do jednego `English`? Zależy od tego, czy sprzedaż idzie na Wyspy. Zależność jest
-  jednokierunkowa: jeśli D1 wyrzuci GBP, `ENGLISH_UK` traci swój jedyny powód istnienia.
+- **Drugi angielski (D3)** — **ZAMKNIĘTE, Sesja 62.** Zostaje jeden `English`; waluta idzie
+  z regionu urządzenia, więc funt nie potrzebuje własnego wiersza. Poniżej pytanie w brzmieniu,
+  w jakim stało otwarte:
+  > `en-GB` z GBP zostaje osobną pozycją, czy schodzi do jednego `English`? Zależy od tego,
+  > czy sprzedaż idzie na Wyspy. Zależność jest jednokierunkowa: jeśli D1 wyrzuci GBP,
+  > `ENGLISH_UK` traci swój jedyny powód istnienia.
+
+  Sesja 61 zostawiła funta, więc ta zależność **nie zadziałała** i wiersz musiał zostać
+  usunięty wprost. Opcja D usuwa jego *powód*, nie podpis.
 - ~~**Tytuł ekranu (B6)**~~ — **ODPOWIEDZIANE: zostaje jak jest.** Pasek górny to
   konwencja Androida (trzyma wstecz, akcje i zwijanie przy scrollu), nagłówek w treści to
   konwencja strony. Obie strony mają rację, więc to jedyna pozycja B, w której parytet był
