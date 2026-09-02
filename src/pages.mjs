@@ -1089,7 +1089,10 @@ const PDF_WEB = {
   ro: { hint: "Documentul se deschide în fereastra de tipărire. Alegeți acolo salvarea în PDF.", make: "Pregătește PDF" },
   hr: { hint: "Dokument se otvara u dijalogu ispisa. Ondje odaberite spremanje u PDF.", make: "Pripremi PDF" },
   sr: { hint: "Dokument se otvara u dijalogu štampe. Tamo izaberite čuvanje u PDF.", make: "Pripremi PDF" },
-  ru: { hint: "Документ откроется в окне печати. Выберите в нём сохранение в PDF.", make: "Подготовить PDF" },
+  it: { hint: "Il documento si apre nella finestra di stampa. Scegli lì il salvataggio in PDF.", make: "Prepara il PDF" },
+  nl: { hint: "Het document opent in het printvenster. Kies daar het opslaan als PDF.", make: "PDF voorbereiden" },
+  es: { hint: "El documento se abre en la ventana de impresión. Elige allí guardar en PDF.", make: "Preparar el PDF" },
+  fr: { hint: "Le document s'ouvre dans la fenêtre d'impression. Choisis-y l'enregistrement en PDF.", make: "Préparer le PDF" },
 };
 
 /**

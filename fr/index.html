@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>LiczMat — calculateur de matériaux de construction</title>
+<meta name="description" content="Calcule le matériau d'une rénovation : peinture, enduit, carrelage, lames, papier peint, béton, découpe 1D et 2D. Dans ton navigateur, sans compte.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/fr/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:title" content="LiczMat — calculateur de matériaux de construction">
+<meta property="og:description" content="Calcule le matériau d'une rénovation : peinture, enduit, carrelage, lames, papier peint, béton, découpe 1D et 2D. Dans ton navigateur, sans compte.">
+<meta property="og:url" content="https://liczmat.com/fr/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LiczMat — calculateur de matériaux de construction">
+<meta name="twitter:description" content="Calcule le matériau d'une rénovation : peinture, enduit, carrelage, lames, papier peint, béton, découpe 1D et 2D. Dans ton navigateur, sans compte.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://liczmat.com/#website",
+  "name": "LiczMat",
+  "url": "https://liczmat.com/",
+  "inLanguage": "fr",
+  "description": "Calcule le matériau d'une rénovation : peinture, enduit, carrelage, lames, papier peint, béton, découpe 1D et 2D. Dans ton navigateur, sans compte.",
+  "image": "https://liczmat.com/assets/og-image.jpg",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "@id": "https://liczmat.com/#organization",
+    "name": "LiczMat",
+    "url": "https://liczmat.com/"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://liczmat.com/#organization",
+  "name": "LiczMat",
+  "url": "https://liczmat.com/",
+  "logo": "https://liczmat.com/assets/icon-512.png"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "LiczMat est-il gratuit ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Les calculateurs, les projets et les devis dans le navigateur sont gratuits, et le compte ne coûte rien non plus. Le site ne porte pas de publicité ; l'application Android est financée par Google AdMob."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Où LiczMat calcule-t-il ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dans ton navigateur. Ce que tu saisis dans le formulaire n'atteint pas notre serveur. L'application Android utilise le même moteur et fonctionne sans réseau."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Dois-je créer un compte ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non. Tu commences à calculer tout de suite, projets et devis compris : ils restent dans ton navigateur. Le compte ajoute les mêmes données sur le téléphone et un lien pour montrer un devis."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelles données LiczMat collecte-t-il ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sans compte, tes projets, devis et réglages restent dans ton navigateur. Après la connexion, une copie est dans Google Firestore (Varsovie), vue de ton compte seul. Analytics se charge après ton accord. Vois la"
+      }
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/fr/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Navigation principale">
+      <ul class="nav-list">
+        <li><a href="/fr/calculateurs/">Calculateurs</a></li>
+        <li><a href="/fr/materiaux/">Matériaux</a></li>
+        <li data-nav-level="liczmat"><a href="/fr/projets/">Projets</a></li>
+        <li><a href="/fr/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/fr/application-android/">L'application</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Langue">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span class="lang-btn-name">Français</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><a class="lang-item" href="/it/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+      <li><a class="lang-item" href="/nl/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+      <li><a class="lang-item" href="/es/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></span></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Devise" title="Devise"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mon compte</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Changer de thème" title="Changer de thème"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Ouvrir le menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+<section class="hero" aria-labelledby="hero-h">
+  <div class="wrap">
+   <div class="hero-copy">
+    <h1 id="hero-h">Calcule les matériaux. Planifie ton chantier.</h1>
+    <p class="lead">LiczMat calcule le matériau pour une rénovation ou une construction, puis le garde dans le projet : pièces, liste de matériaux, coûts.</p>
+    <div class="trust">
+      <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg><span>Calcule dans ton navigateur</span></span>
+      <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>Compte facultatif</span></span>
+      <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg><span>13 langues, 8 devises</span></span>
+    </div>
+   </div>
+  </div>
+</section>
+<section class="block" aria-labelledby="doors-h">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 id="doors-h">Par où commences-tu ?</h2>
+    </div>
+    <div class="doors">
+      <article class="door" aria-labelledby="door-calculators">
+      <span class="door-level">Sans compte</span>
+      <h3 id="door-calculators">Calculateurs</h3>
+      <p class="door-q">Qu'est-ce que tu dois calculer ?</p>
+      <p class="muted">Saisis les dimensions, choisis le matériau, obtiens la quantité à acheter, le coût et les chutes. Sans connexion.</p>
+      <ul class="door-list"><li><a href="/fr/calculateurs/#g-tiling">Carrelage et finitions</a></li><li><a href="/fr/calculateurs/#g-painting">Peinture</a></li><li><a href="/fr/calculateurs/#g-building">Gros œuvre</a></li><li><a href="/fr/calculateurs/#g-cutting">Découpe</a></li><li><a href="/fr/calculateurs/#g-drywall">Ossature placo</a></li></ul>
+        <p class="door-meta">15 calculateurs · 161 matériaux au catalogue</p>
+      <a class="btn btn-primary" href="/fr/calculateurs/">Choisis un calculateur</a>
+    </article>
+      <article class="door" aria-labelledby="door-liczmat">
+      <span class="door-level">Compte gratuit</span>
+      <h3 id="door-liczmat">LiczMat</h3>
+      <p class="door-q">Tu veux garder et organiser ton travail ?</p>
+      <p class="muted">Le résultat entre dans un projet : pièces, liste de matériaux, coûts. Le compte garde les mêmes données dans le navigateur et sur le téléphone.</p>
+      
+      <a class="btn btn-ghost" href="/fr/projets/">Ouvrir les projets</a>
+    </article>
+      <article class="door" aria-labelledby="door-pro">
+      <span class="door-level">Pour les pros</span>
+      <h3 id="door-pro">LiczMat Pro</h3>
+      <p class="door-q">C'est ton métier ?</p>
+      <p class="muted">Clients, chantiers, devis et échéances à côté des projets et des matériaux. Un CRM léger pour une équipe, pas un ERP.</p>
+      
+      <a class="btn btn-ghost" href="/fr/liczmat-pro/">Découvre ce qu'est LiczMat Pro</a>
+    </article>
+    </div>
+  </div>
+</section>
+<section class="block alt" aria-labelledby="path-h">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 id="path-h">Calcule. Enregistre. Organise. Réalise.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Calcule</h3><p>Dimensions ou surface, un matériau du catalogue, le résultat sur place.</p></div>
+      <div class="step"><h3>Enregistre</h3><p>Le résultat reste dans le projet plutôt que sur un bout de papier.</p></div>
+      <div class="step"><h3>Organise</h3><p>Les pièces, la liste de matériaux et le coût au même endroit.</p></div>
+      <div class="step"><h3>Réalise</h3><p>Tu achètes ce qu'il faut et tu travailles avec une liste prête.</p></div>
+    </div>
+  </div>
+</section>
+<section id="faq" class="block" aria-labelledby="faq-h">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">FAQ</div>
+      <h2 id="faq-h">Questions fréquentes</h2>
+    </div>
+    <div class="faq">
+      <details open><summary>LiczMat est-il gratuit ?</summary><p>Oui. Les calculateurs, les projets et les devis dans le navigateur sont gratuits, et le compte ne coûte rien non plus. Le site ne porte pas de publicité ; l'application Android est financée par Google AdMob.</p></details>
+      <details><summary>Où LiczMat calcule-t-il ?</summary><p>Dans ton navigateur. Ce que tu saisis dans le formulaire n'atteint pas notre serveur. L'application Android utilise le même moteur et fonctionne sans réseau.</p></details>
+      <details><summary>Dois-je créer un compte ?</summary><p>Non. Tu commences à calculer tout de suite, projets et devis compris : ils restent dans ton navigateur. Le compte ajoute les mêmes données sur le téléphone et un lien pour montrer un devis.</p></details>
+      <details><summary>Quelles données LiczMat collecte-t-il ?</summary><p><span>Sans compte, tes projets, devis et réglages restent dans ton navigateur. Après la connexion, une copie est dans Google Firestore (Varsovie), vue de ton compte seul. Analytics se charge après ton accord. Vois la</span> <a href="/privacy-policy.html">Politique de confidentialité</a>.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Calculateur de matériaux de construction. Calcule. Planifie. Réalise.</p>
+      </div>
+      <div>
+        <h2>Produit</h2>
+        <ul>
+          <li><a href="/fr/calculateurs/">Tous les calculateurs</a></li>
+          <li><a href="/fr/convertisseur-d-unites/">Convertisseur d'unités</a></li>
+          <li><a href="/fr/materiaux/">Matériaux</a></li>
+          <li data-nav-level="liczmat"><a href="/fr/mes-materiaux/">Mes matériaux</a></li>
+          <li data-nav-level="liczmat"><a href="/fr/projets/">Projets</a></li>
+          <li><a href="/fr/devis/">Devis</a></li>
+          <li><a href="/fr/guides/">Guides</a></li>
+          <li><a href="/fr/magasins/">Magasins</a></li>
+          <li><a href="/fr/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/fr/clients/">Clients</a></li>
+          <li data-nav-level="pro"><a href="/fr/chantiers/">Chantiers</a></li>
+          <li data-nav-level="pro"><a href="/fr/devis-pro/">Devis Pro</a></li>
+          <li data-nav-level="pro"><a href="/fr/echeances/">Échéances</a></li>
+          <li><a href="/fr/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Compte</h2>
+        <ul>
+          <li><a href="/fr/application-android/">L'application</a></li>
+          <li><a href="/app/" rel="nofollow">Mon compte</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Tableau de bord</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Mentions légales</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Politique de confidentialité</a></li>
+          <li><a href="/fr/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Langue">
+      <h2>Langue</h2>
+      <ul>
+        <li><a href="/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/" hreflang="fr" lang="fr" data-lang="fr" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Tous droits réservés.</span>
+      <span>Les résultats sont des estimations. Vérifie-les toujours avant d'acheter.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Nous utilisons Google Analytics pour compter le trafic anonyme du site et le nombre de personnes qui passent sur Google Play. Tu es d'accord ?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Plus dans la politique de confidentialité</a>
+    <a class="consent-more" href="/fr/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Refuser</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">J'accepte</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/",
+  "uk": "/uk/",
+  "de": "/de/",
+  "en": "/en/",
+  "cs": "/cs/",
+  "sk": "/sk/",
+  "ro": "/ro/",
+  "hr": "/hr/",
+  "sr": "/sr/",
+  "it": "/it/",
+  "nl": "/nl/",
+  "es": "/es/",
+  "fr": "/fr/"
+};</script>
+
+<script src="/assets/i18n.fr.js?v=20260902a"></script>
+<script src="/assets/i18n-runtime.js?v=20260902a"></script>
+<script src="/assets/currency.js?v=20260902a"></script>
+<script src="/assets/account.js?v=20260902a"></script>
+
+
+<script src="/assets/main.js?v=20260902a"></script>
+
+</body>
+</html>

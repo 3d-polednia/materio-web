@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Piastrelle e colla per il bagno — LiczMat</title>
+<meta name="description" content="Pavimento e pareti in metri quadri, una scorta per i tagli, colla e stucco convertiti in sacchi.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/it/guide/piastrelle-e-colla-per-il-bagno/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/poradniki/plytki-i-klej-do-lazienki/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/porady/plytka-i-kliy-u-vannu/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/ratgeber/fliesen-und-kleber-fuers-bad/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/guides/tiles-and-adhesive-for-a-bathroom/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/navody/obklady-a-lepidlo-do-koupelny/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/navody/obklady-a-lepidlo-do-kupelne/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/ghiduri/gresie-si-adeziv-pentru-baie/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/vodici/plocice-i-ljepilo-za-kupaonicu/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/vodici/plocice-i-lepak-za-kupatilo/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/guide/piastrelle-e-colla-per-il-bagno/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/gidsen/tegels-en-lijm-voor-de-badkamer/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/guias/azulejos-y-adhesivo-para-el-bano/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/guides/carrelage-et-colle-pour-la-salle-de-bain/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/poradniki/plytki-i-klej-do-lazienki/">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="it_IT">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:title" content="Piastrelle e colla per il bagno — LiczMat">
+<meta property="og:description" content="Pavimento e pareti in metri quadri, una scorta per i tagli, colla e stucco convertiti in sacchi.">
+<meta property="og:url" content="https://liczmat.com/it/guide/piastrelle-e-colla-per-il-bagno/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Piastrelle e colla per il bagno — LiczMat">
+<meta name="twitter:description" content="Pavimento e pareti in metri quadri, una scorta per i tagli, colla e stucco convertiti in sacchi.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://liczmat.com/it/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Guide",
+      "item": "https://liczmat.com/it/guide/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Piastrelle e colla per il bagno",
+      "item": "https://liczmat.com/it/guide/piastrelle-e-colla-per-il-bagno/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Piastrelle e colla per il bagno",
+  "description": "Pavimento e pareti in metri quadri, una scorta per i tagli, colla e stucco convertiti in sacchi.",
+  "inLanguage": "it",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "text": "Misura il pavimento e le pareti separatamente. Per le pareti prendi il perimetro per l'altezza rivestita, poi sottrai porta e finestra."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "text": "Aggiungi una scorta per i tagli: 5–7% per una posa dritta, 10–15% per il grande formato o la posa diagonale."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "text": "Calcola la colla dalla resa per la tua spatola dentata e lo stucco dalla misura della piastrella e dalla larghezza della fuga."
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Vai al contenuto</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/it/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Navigazione principale">
+      <ul class="nav-list">
+        <li><a href="/it/calcolatori/">Calcolatori</a></li>
+        <li><a href="/it/materiali/">Materiali</a></li>
+        <li data-nav-level="liczmat"><a href="/it/progetti/">Progetti</a></li>
+        <li><a href="/it/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/it/app-android/">L'app</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Lingua">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span class="lang-btn-name">Italiano</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/poradniki/plytki-i-klej-do-lazienki/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/porady/plytka-i-kliy-u-vannu/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/ratgeber/fliesen-und-kleber-fuers-bad/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/guides/tiles-and-adhesive-for-a-bathroom/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/navody/obklady-a-lepidlo-do-koupelny/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/navody/obklady-a-lepidlo-do-kupelne/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/ghiduri/gresie-si-adeziv-pentru-baie/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/vodici/plocice-i-ljepilo-za-kupaonicu/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/vodici/plocice-i-lepak-za-kupatilo/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></span></li>
+      <li><a class="lang-item" href="/nl/gidsen/tegels-en-lijm-voor-de-badkamer/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+      <li><a class="lang-item" href="/es/guias/azulejos-y-adhesivo-para-el-bano/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+      <li><a class="lang-item" href="/fr/guides/carrelage-et-colle-pour-la-salle-de-bain/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Valuta" title="Valuta"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Il mio account</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambia tema" title="Cambia tema"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Apri il menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/it/">Home</a></li><li><a href="/it/guide/">Guide</a></li><li aria-current="page">Piastrelle e colla per il bagno</li></ol></nav>
+      <h1>Piastrelle e colla per il bagno</h1>
+      <p class="lead">Pavimento e pareti in metri quadri, una scorta per i tagli, colla e stucco convertiti in sacchi.</p>
+    </div>
+  </section>
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>Passo per passo</h2>
+      <ol class="steps-list"><li>Misura il pavimento e le pareti separatamente. Per le pareti prendi il perimetro per l'altezza rivestita, poi sottrai porta e finestra.</li><li>Aggiungi una scorta per i tagli: 5–7% per una posa dritta, 10–15% per il grande formato o la posa diagonale.</li><li>Calcola la colla dalla resa per la tua spatola dentata e lo stucco dalla misura della piastrella e dalla larghezza della fuga.</li></ol>
+
+      <h2>Calcolatori usati in questa guida</h2>
+      <div class="chips"><a class="chip" href="/it/calcolatori/piastrelle-pannelli-gres/">Piastrelle, pannelli, gres</a><a class="chip" href="/it/calcolatori/colla-malta/">Colla / malta</a><a class="chip" href="/it/calcolatori/stucco-per-fughe/">Stucco per fughe</a></div>
+
+      <div class="tip">
+        <b>Consiglio</b>
+        <p>Compra le piastrelle di un solo lotto di produzione. I lotti differiscono per tono e calibro, e un mese dopo quel lotto non sarà più in negozio.</p>
+      </div>
+
+      <p class="mt-6"><a class="btn btn-ghost" href="/it/guide/">Tutte le guide</a></p>
+    </div>
+  </section>
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">La stessa formula nell'app</b> LiczMat per Android usa lo stesso motore offline, con il catalogo materiali e i risultati salvati in un progetto.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Scarica</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Calcolatore di materiali edili. Calcola. Pianifica. Realizza.</p>
+      </div>
+      <div>
+        <h2>Prodotto</h2>
+        <ul>
+          <li><a href="/it/calcolatori/">Tutti i calcolatori</a></li>
+          <li><a href="/it/convertitore-di-unita/">Convertitore di unità</a></li>
+          <li><a href="/it/materiali/">Materiali</a></li>
+          <li data-nav-level="liczmat"><a href="/it/i-miei-materiali/">I miei materiali</a></li>
+          <li data-nav-level="liczmat"><a href="/it/progetti/">Progetti</a></li>
+          <li><a href="/it/preventivo/">Preventivo</a></li>
+          <li><a href="/it/guide/">Guide</a></li>
+          <li><a href="/it/negozi/">Negozi</a></li>
+          <li><a href="/it/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/it/clienti/">Clienti</a></li>
+          <li data-nav-level="pro"><a href="/it/commesse/">Commesse</a></li>
+          <li data-nav-level="pro"><a href="/it/preventivi-pro/">Preventivi</a></li>
+          <li data-nav-level="pro"><a href="/it/scadenze/">Scadenze</a></li>
+          <li><a href="/it/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Account</h2>
+        <ul>
+          <li><a href="/it/app-android/">L'app</a></li>
+          <li><a href="/app/" rel="nofollow">Il mio account</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Pannello</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Note legali</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Informativa sulla privacy</a></li>
+          <li><a href="/it/cookies/">Cookie</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Lingua">
+      <h2>Lingua</h2>
+      <ul>
+        <li><a href="/poradniki/plytki-i-klej-do-lazienki/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/porady/plytka-i-kliy-u-vannu/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/ratgeber/fliesen-und-kleber-fuers-bad/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/guides/tiles-and-adhesive-for-a-bathroom/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/navody/obklady-a-lepidlo-do-koupelny/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/navody/obklady-a-lepidlo-do-kupelne/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/ghiduri/gresie-si-adeziv-pentru-baie/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/vodici/plocice-i-ljepilo-za-kupaonicu/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/vodici/plocice-i-lepak-za-kupatilo/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/guide/piastrelle-e-colla-per-il-bagno/" hreflang="it" lang="it" data-lang="it" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/gidsen/tegels-en-lijm-voor-de-badkamer/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/guias/azulejos-y-adhesivo-para-el-bano/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/guides/carrelage-et-colle-pour-la-salle-de-bain/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Tutti i diritti riservati.</span>
+      <span>I risultati sono stime. Verifica sempre prima di comprare.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Usiamo Google Analytics per contare il traffico anonimo del sito e quante persone passano a Google Play. Sei d'accordo?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Altro nell'informativa sulla privacy</a>
+    <a class="consent-more" href="/it/cookies/">Cookie</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Rifiuta</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Accetto</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/poradniki/plytki-i-klej-do-lazienki/",
+  "uk": "/uk/porady/plytka-i-kliy-u-vannu/",
+  "de": "/de/ratgeber/fliesen-und-kleber-fuers-bad/",
+  "en": "/en/guides/tiles-and-adhesive-for-a-bathroom/",
+  "cs": "/cs/navody/obklady-a-lepidlo-do-koupelny/",
+  "sk": "/sk/navody/obklady-a-lepidlo-do-kupelne/",
+  "ro": "/ro/ghiduri/gresie-si-adeziv-pentru-baie/",
+  "hr": "/hr/vodici/plocice-i-ljepilo-za-kupaonicu/",
+  "sr": "/sr/vodici/plocice-i-lepak-za-kupatilo/",
+  "it": "/it/guide/piastrelle-e-colla-per-il-bagno/",
+  "nl": "/nl/gidsen/tegels-en-lijm-voor-de-badkamer/",
+  "es": "/es/guias/azulejos-y-adhesivo-para-el-bano/",
+  "fr": "/fr/guides/carrelage-et-colle-pour-la-salle-de-bain/"
+};</script>
+
+<script src="/assets/i18n.it.js?v=20260902a"></script>
+<script src="/assets/i18n-runtime.js?v=20260902a"></script>
+<script src="/assets/currency.js?v=20260902a"></script>
+<script src="/assets/account.js?v=20260902a"></script>
+
+
+<script src="/assets/main.js?v=20260902a"></script>
+
+</body>
+</html>

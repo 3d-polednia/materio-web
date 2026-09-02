@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Bouwrekenmachines online — LiczMat</title>
+<meta name="description" content="Gratis bouwrekenmachines online: verf, tegels, panelen, behang, beton, mortel, voegmiddel, isolatie, gipswanden en zagen in 1D/2D. Zonder registratie.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/nl/rekenmachines/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/kalkulatory/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kalkulyatory/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/rechner/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/calculators/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/kalkulacky/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/kalkulacky/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/calculatoare/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/kalkulatori/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/kalkulatori/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/calcolatori/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/rekenmachines/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/calculadoras/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/calculateurs/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:title" content="Bouwrekenmachines online — LiczMat">
+<meta property="og:description" content="Gratis bouwrekenmachines online: verf, tegels, panelen, behang, beton, mortel, voegmiddel, isolatie, gipswanden en zagen in 1D/2D. Zonder registratie.">
+<meta property="og:url" content="https://liczmat.com/nl/rekenmachines/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bouwrekenmachines online — LiczMat">
+<meta name="twitter:description" content="Gratis bouwrekenmachines online: verf, tegels, panelen, behang, beton, mortel, voegmiddel, isolatie, gipswanden en zagen in 1D/2D. Zonder registratie.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Start",
+      "item": "https://liczmat.com/nl/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Bouwrekenmachines online",
+      "item": "https://liczmat.com/nl/rekenmachines/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Bouwrekenmachines online",
+  "numberOfItems": 15,
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Verf, pleister, primer",
+      "url": "https://liczmat.com/nl/rekenmachines/verf-pleister-primer/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Tegels, panelen, keramiek",
+      "url": "https://liczmat.com/nl/rekenmachines/tegels-panelen-keramiek/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Behang",
+      "url": "https://liczmat.com/nl/rekenmachines/behang/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Lineair zagen (1D)",
+      "url": "https://liczmat.com/nl/rekenmachines/lineair-zagen-1d/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Platen zagen (2D)",
+      "url": "https://liczmat.com/nl/rekenmachines/platen-zagen-2d/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 6,
+      "name": "Beton uit een zak",
+      "url": "https://liczmat.com/nl/rekenmachines/beton-uit-zak/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 7,
+      "name": "Lijm / mortel",
+      "url": "https://liczmat.com/nl/rekenmachines/lijm-mortel/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 8,
+      "name": "Dekvloer / pleister",
+      "url": "https://liczmat.com/nl/rekenmachines/dekvloer-pleister/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 9,
+      "name": "Voegmiddel",
+      "url": "https://liczmat.com/nl/rekenmachines/voegmiddel/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 10,
+      "name": "Metselwerk",
+      "url": "https://liczmat.com/nl/rekenmachines/metselwerk/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 11,
+      "name": "Gevelisolatie (ETICS)",
+      "url": "https://liczmat.com/nl/rekenmachines/gevelisolatie-etics/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 12,
+      "name": "Gipswand",
+      "url": "https://liczmat.com/nl/rekenmachines/gipswand/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 13,
+      "name": "Verlaagd plafond",
+      "url": "https://liczmat.com/nl/rekenmachines/verlaagd-plafond/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 14,
+      "name": "Gipsplaat op lijm",
+      "url": "https://liczmat.com/nl/rekenmachines/gipsplaat-op-lijm/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 15,
+      "name": "Beplating (OSB/planken)",
+      "url": "https://liczmat.com/nl/rekenmachines/beplating-osb/"
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Ga naar de inhoud</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/nl/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hoofdnavigatie">
+      <ul class="nav-list">
+        <li><a href="/nl/rekenmachines/" aria-current="page">Rekenmachines</a></li>
+        <li><a href="/nl/materialen/">Materialen</a></li>
+        <li data-nav-level="liczmat"><a href="/nl/projecten/">Projecten</a></li>
+        <li><a href="/nl/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/nl/android-app/">De app</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Taal">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span class="lang-btn-name">Nederlands</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/kalkulatory/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/kalkulyatory/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/rechner/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/calculators/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/kalkulacky/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/kalkulacky/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/calculatoare/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/kalkulatori/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/kalkulatori/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><a class="lang-item" href="/it/calcolatori/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></span></li>
+      <li><a class="lang-item" href="/es/calculadoras/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+      <li><a class="lang-item" href="/fr/calculateurs/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Valuta" title="Valuta"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mijn account</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Thema wisselen" title="Thema wisselen"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu openen"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/nl/">Start</a></li><li aria-current="page">Bouwrekenmachines online</li></ol></nav>
+      <h1>Bouwrekenmachines online</h1>
+      <p class="lead">Ze gebruiken allemaal dezelfde formules als de LiczMat-app voor Android. Je browser doet het rekenwerk, er gaat niets naar een server.</p>
+    </div>
+  </section>
+
+  <div id="calc-hub" data-total="15">
+    <section class="block alt calc-filter" aria-label="Zoek een rekenmachine">
+      <div class="wrap">
+        <form class="calc-search js-only" role="search" data-calc-search>
+          <label class="fld-label" for="calc-search">Zoek in de rekenmachines</label>
+          <input id="calc-search" type="search" class="mat-search" autocomplete="off"
+                 placeholder="bv. tegels, verf, isolatie">
+        </form>
+        <div class="chips calc-cats">
+        <a class="chip on" href="#g-all" data-cat-chip="" aria-current="true">Alle</a>
+        <a class="chip" href="#g-tiling" data-cat-chip="tiling">Tegelen en afwerking</a>
+        <a class="chip" href="#g-painting" data-cat-chip="painting">Schilderen</a>
+        <a class="chip" href="#g-building" data-cat-chip="building">Bouwwerk</a>
+        <a class="chip" href="#g-cutting" data-cat-chip="cutting">Zagen</a>
+        <a class="chip" href="#g-drywall" data-cat-chip="drywall">Gipswandbouw</a>
+        </div>
+        <p class="muted calc-shown" role="status" data-calc-shown="{n} van {total} te zien">15 van 15 te zien</p>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="popular-h" data-hub-popular>
+      <div class="wrap">
+        <div class="section-head left">
+          <h2 id="popular-h">Waar te beginnen</h2>
+          <p class="muted">De rekenmachines waar de meeste van onze gidsen naartoe sturen.</p>
+        </div>
+        <ul class="calc-links"><li><a class="calc-link" href="/nl/rekenmachines/verf-pleister-primer/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="12" height="5" rx="1"/><path d="M15 6.5h4a2 2 0 0 1 2 2V11a2 2 0 0 1-2 2h-6v3"/><rect x="10.5" y="16" width="5" height="6" rx="1"/></svg></span>
+      <span class="calc-link-body">
+        <b>Verf, pleister, primer</b>
+        <span class="muted">Verpakkingen per oppervlak, met lagen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a></li><li><a class="calc-link" href="/nl/rekenmachines/tegels-panelen-keramiek/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span>
+      <span class="calc-link-body">
+        <b>Tegels, panelen, keramiek</b>
+        <span class="muted">Oppervlak + marge → hele dozen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a></li><li><a class="calc-link" href="/nl/rekenmachines/lijm-mortel/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3 21 10l-6 2-3-3Z"/><path d="m11 9-8 8 4 4 8-8"/></svg></span>
+      <span class="calc-link-body">
+        <b>Lijm / mortel</b>
+        <span class="muted">Verbruik kg/m² → zakken.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a></li><li><a class="calc-link" href="/nl/rekenmachines/voegmiddel/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18" stroke-dasharray="3 2"/></svg></span>
+      <span class="calc-link-body">
+        <b>Voegmiddel</b>
+        <span class="muted">Hoeveel kg voegmiddel om de tegels te voegen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a></li></ul>
+      </div>
+    </section>
+
+    <section class="block alt" id="g-all" aria-labelledby="all-h">
+      <div class="wrap">
+        <div class="section-head left">
+          <h2 id="all-h">Alle rekenmachines</h2>
+        </div>
+        <p class="muted" data-calc-empty hidden>Niets komt overeen. Wis de zoekopdracht of kies een andere categorie.</p>
+      <section class="calc-group-block" data-cat-block="tiling" aria-labelledby="g-tiling">
+        <h3 id="g-tiling" class="calc-group">Tegelen en afwerking</h3>
+        <p class="calc-group-d muted">Tegels, panelen, lijm en voegmiddel — wat op de wand en de vloer gaat.</p>
+        <ul class="calc-links"><li data-calc-row data-cat="tiling" data-find="tegels, panelen, keramiek oppervlak + marge → hele dozen. tegelen en afwerking">
+          <a class="calc-link" href="/nl/rekenmachines/tegels-panelen-keramiek/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></span>
+      <span class="calc-link-body">
+        <b>Tegels, panelen, keramiek</b>
+        <span class="muted">Oppervlak + marge → hele dozen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="tiling" data-find="lijm / mortel verbruik kg/m² → zakken. tegelen en afwerking">
+          <a class="calc-link" href="/nl/rekenmachines/lijm-mortel/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3 21 10l-6 2-3-3Z"/><path d="m11 9-8 8 4 4 8-8"/></svg></span>
+      <span class="calc-link-body">
+        <b>Lijm / mortel</b>
+        <span class="muted">Verbruik kg/m² → zakken.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="tiling" data-find="voegmiddel hoeveel kg voegmiddel om de tegels te voegen. tegelen en afwerking">
+          <a class="calc-link" href="/nl/rekenmachines/voegmiddel/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18" stroke-dasharray="3 2"/></svg></span>
+      <span class="calc-link-body">
+        <b>Voegmiddel</b>
+        <span class="muted">Hoeveel kg voegmiddel om de tegels te voegen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li></ul>
+      </section>
+      <section class="calc-group-block" data-cat-block="painting" aria-labelledby="g-painting">
+        <h3 id="g-painting" class="calc-group">Schilderen</h3>
+        <p class="calc-group-d muted">Verf, pleister, primer en behang, berekend uit het oppervlak.</p>
+        <ul class="calc-links"><li data-calc-row data-cat="painting" data-find="verf, pleister, primer verpakkingen per oppervlak, met lagen. schilderen">
+          <a class="calc-link" href="/nl/rekenmachines/verf-pleister-primer/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="12" height="5" rx="1"/><path d="M15 6.5h4a2 2 0 0 1 2 2V11a2 2 0 0 1-2 2h-6v3"/><rect x="10.5" y="16" width="5" height="6" rx="1"/></svg></span>
+      <span class="calc-link-body">
+        <b>Verf, pleister, primer</b>
+        <span class="muted">Verpakkingen per oppervlak, met lagen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="painting" data-find="behang hoeveel rollen, met rapport van het patroon. schilderen">
+          <a class="calc-link" href="/nl/rekenmachines/behang/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v16a3 3 0 0 1-3 3H6Z"/><path d="M6 22a3 3 0 0 1 0-6h9"/><path d="M10 7h4M10 11h4"/></svg></span>
+      <span class="calc-link-body">
+        <b>Behang</b>
+        <span class="muted">Hoeveel rollen, met rapport van het patroon.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li></ul>
+      </section>
+      <section class="calc-group-block" data-cat-block="building" aria-labelledby="g-building">
+        <h3 id="g-building" class="calc-group">Bouwwerk</h3>
+        <p class="calc-group-d muted">Beton, dekvloer, metselwerk en gevelisolatie.</p>
+        <ul class="calc-links"><li data-calc-row data-cat="building" data-find="beton uit een zak hoeveel zakken droogbeton en hoeveel water. bouwwerk">
+          <a class="calc-link" href="/nl/rekenmachines/beton-uit-zak/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8l2 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8Z"/><path d="M9 3c1 1.5 5 1.5 6 0"/><path d="M9 13h6"/></svg></span>
+      <span class="calc-link-body">
+        <b>Beton uit een zak</b>
+        <span class="muted">Hoeveel zakken droogbeton en hoeveel water.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="building" data-find="dekvloer / pleister oppervlak en dikte → zakken. bouwwerk">
+          <a class="calc-link" href="/nl/rekenmachines/dekvloer-pleister/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18"/><path d="M5 16V9l7-4 7 4v7"/><path d="M3 20h18"/></svg></span>
+      <span class="calc-link-body">
+        <b>Dekvloer / pleister</b>
+        <span class="muted">Oppervlak en dikte → zakken.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="building" data-find="metselwerk blokken/stenen en mortel voor de muur. bouwwerk">
+          <a class="calc-link" href="/nl/rekenmachines/metselwerk/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9.3h18M3 14.6h18M9 4v5.3M15 9.3v5.3M9 14.6V20"/></svg></span>
+      <span class="calc-link-body">
+        <b>Metselwerk</b>
+        <span class="muted">Blokken/stenen en mortel voor de muur.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="building" data-find="gevelisolatie (etics) eps, pluggen, lijm, wapeningsgaas. bouwwerk">
+          <a class="calc-link" href="/nl/rekenmachines/gevelisolatie-etics/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/><path d="M6 7v10M12 7v10M18 7v10" stroke-dasharray="2 3"/></svg></span>
+      <span class="calc-link-body">
+        <b>Gevelisolatie (ETICS)</b>
+        <span class="muted">EPS, pluggen, lijm, wapeningsgaas.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li></ul>
+      </section>
+      <section class="calc-group-block" data-cat-block="cutting" aria-labelledby="g-cutting">
+        <h3 id="g-cutting" class="calc-group">Zagen</h3>
+        <p class="calc-group-d muted">Hoeveel stangen en platen je koopt zodat elk stuk eruit komt.</p>
+        <ul class="calc-links"><li data-calc-row data-cat="cutting" data-find="lineair zagen (1d) stangen, latten, buizen: hoeveel kopen en hoe zagen. zagen">
+          <a class="calc-link" href="/nl/rekenmachines/lineair-zagen-1d/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>
+      <span class="calc-link-body">
+        <b>Lineair zagen (1D)</b>
+        <span class="muted">Stangen, latten, buizen: hoeveel kopen en hoe zagen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="cutting" data-find="platen zagen (2d) platen, bladen, multiplex: hoeveel platen. zagen">
+          <a class="calc-link" href="/nl/rekenmachines/platen-zagen-2d/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M11 4v16M3 12h8M11 8h10"/></svg></span>
+      <span class="calc-link-body">
+        <b>Platen zagen (2D)</b>
+        <span class="muted">Platen, bladen, multiplex: hoeveel platen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li></ul>
+      </section>
+      <section class="calc-group-block" data-cat-block="drywall" aria-labelledby="g-drywall">
+        <h3 id="g-drywall" class="calc-group">Gipswandbouw</h3>
+        <p class="calc-group-d muted">Wanden, plafonds en beplating: profielen, platen, hangers.</p>
+        <ul class="calc-links"><li data-calc-row data-cat="drywall" data-find="gipswand cw/uw-profielen, pluggen en platen. gipswandbouw">
+          <a class="calc-link" href="/nl/rekenmachines/gipswand/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M8 3v18M13 3v18M18 3v18"/></svg></span>
+      <span class="calc-link-body">
+        <b>Gipswand</b>
+        <span class="muted">CW/UW-profielen, pluggen en platen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="drywall" data-find="verlaagd plafond cd/ud-profielen, hangers en platen. gipswandbouw">
+          <a class="calc-link" href="/nl/rekenmachines/verlaagd-plafond/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M6 6v12M12 6v12M18 6v12"/><path d="M3 18h18"/></svg></span>
+      <span class="calc-link-body">
+        <b>Verlaagd plafond</b>
+        <span class="muted">CD/UD-profielen, hangers en platen.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="drywall" data-find="gipsplaat op lijm platen op lijmkoeken + gipslijm. gipswandbouw">
+          <a class="calc-link" href="/nl/rekenmachines/gipsplaat-op-lijm/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8" cy="8" r="1.4"/><circle cx="16" cy="8" r="1.4"/><circle cx="8" cy="16" r="1.4"/><circle cx="16" cy="16" r="1.4"/></svg></span>
+      <span class="calc-link-body">
+        <b>Gipsplaat op lijm</b>
+        <span class="muted">Platen op lijmkoeken + gipslijm.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li><li data-calc-row data-cat="drywall" data-find="beplating (osb/planken) hoeveel platen om te bedekken. gipswandbouw">
+          <a class="calc-link" href="/nl/rekenmachines/beplating-osb/">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="5" rx="1"/><rect x="2" y="13" width="20" height="5" rx="1"/><path d="M9 6v5M15 13v5"/></svg></span>
+      <span class="calc-link-body">
+        <b>Beplating (OSB/planken)</b>
+        <span class="muted">Hoeveel platen om te bedekken.</span>
+      </span>
+      <span class="calc-link-go">Open de rekenmachine</span>
+    </a>
+        </li></ul>
+      </section>
+      </div>
+    </section>
+  </div>
+
+  
+  <section class="block" aria-labelledby="hub-conv-h">
+    <div class="wrap">
+      <div class="section-head left">
+        <h2 id="hub-conv-h">Eenheden omrekenen</h2>
+      </div>
+      <ul class="calc-links">
+        <li><a class="calc-link" href="/nl/eenheden-omrekenen/">
+          <span class="calc-link-body">
+            <b>Eenheden omrekenen</b>
+            <span class="muted">Meters, inches, liters, kilo's, graden en meer — elf categorieën eenheden.</span>
+          </span>
+          <span class="calc-link-go">Open de omrekening</span>
+        </a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Dezelfde formule in de app</b> LiczMat voor Android gebruikt dezelfde motor offline, met de materiaalcatalogus en resultaten die in een project worden bewaard.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Downloaden</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Rekenmachine voor bouwmaterialen. Reken. Plan. Bouw.</p>
+      </div>
+      <div>
+        <h2>Product</h2>
+        <ul>
+          <li><a href="/nl/rekenmachines/">Alle rekenmachines</a></li>
+          <li><a href="/nl/eenheden-omrekenen/">Eenheden omrekenen</a></li>
+          <li><a href="/nl/materialen/">Materialen</a></li>
+          <li data-nav-level="liczmat"><a href="/nl/mijn-materialen/">Mijn materialen</a></li>
+          <li data-nav-level="liczmat"><a href="/nl/projecten/">Projecten</a></li>
+          <li><a href="/nl/kostenraming/">Kostenraming</a></li>
+          <li><a href="/nl/gidsen/">Gidsen</a></li>
+          <li><a href="/nl/bouwmarkten/">Winkels</a></li>
+          <li><a href="/nl/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/nl/klanten/">Klanten</a></li>
+          <li data-nav-level="pro"><a href="/nl/opdrachten/">Opdrachten</a></li>
+          <li data-nav-level="pro"><a href="/nl/offertes/">Offertes</a></li>
+          <li data-nav-level="pro"><a href="/nl/planning/">Planning</a></li>
+          <li><a href="/nl/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Account</h2>
+        <ul>
+          <li><a href="/nl/android-app/">De app</a></li>
+          <li><a href="/app/" rel="nofollow">Mijn account</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Overzicht</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Juridisch</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Privacybeleid</a></li>
+          <li><a href="/nl/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Taal">
+      <h2>Taal</h2>
+      <ul>
+        <li><a href="/kalkulatory/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/kalkulyatory/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/rechner/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/calculators/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/kalkulacky/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/kalkulacky/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/calculatoare/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/kalkulatori/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/kalkulatori/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/calcolatori/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/rekenmachines/" hreflang="nl" lang="nl" data-lang="nl" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/calculadoras/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/calculateurs/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Alle rechten voorbehouden.</span>
+      <span>De resultaten zijn schattingen. Controleer ze altijd voordat je koopt.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">We gebruiken Google Analytics om anoniem het verkeer op de site te tellen en hoeveel mensen naar Google Play gaan. Ga je akkoord?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Meer in het privacybeleid</a>
+    <a class="consent-more" href="/nl/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Weigeren</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Akkoord</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/kalkulatory/",
+  "uk": "/uk/kalkulyatory/",
+  "de": "/de/rechner/",
+  "en": "/en/calculators/",
+  "cs": "/cs/kalkulacky/",
+  "sk": "/sk/kalkulacky/",
+  "ro": "/ro/calculatoare/",
+  "hr": "/hr/kalkulatori/",
+  "sr": "/sr/kalkulatori/",
+  "it": "/it/calcolatori/",
+  "nl": "/nl/rekenmachines/",
+  "es": "/es/calculadoras/",
+  "fr": "/fr/calculateurs/"
+};</script>
+
+<script src="/assets/i18n.nl.js?v=20260902a"></script>
+<script src="/assets/i18n-runtime.js?v=20260902a"></script>
+<script src="/assets/currency.js?v=20260902a"></script>
+<script src="/assets/account.js?v=20260902a"></script>
+
+<script src="/assets/calc-hub.js?v=20260902a"></script>
+<script src="/assets/main.js?v=20260902a"></script>
+
+</body>
+</html>

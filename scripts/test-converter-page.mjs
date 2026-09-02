@@ -382,7 +382,7 @@ head("8. the six widths, phone to desktop");
 {
   for (const width of [320, 375, 390, 430, 768, 1280]) {
     const c = await context({ viewport: { width, height: width >= 768 ? 900 : 780 } });
-    for (const lang of ["pl", "ru"]) {
+    for (const lang of ["pl", "uk"]) {
       const page = await open(c, urlConverter(lang), { lang });
       const wide = await page.evaluate(() =>
         document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);

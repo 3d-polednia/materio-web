@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Klanten — LiczMat</title>
+<meta name="description" content="Klanten in LiczMat Pro: een klantenlijst met contactgegevens en notities, de projecten van de klant en de geschiedenis. Hoort bij het account.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/nl/klanten/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/klienci/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kliyenty/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/kunden/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/clients/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/klienti/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/klienti/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/clienti/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/klijenti/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/klijenti/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/clienti/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/klanten/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/clientes/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/clients/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/klienci/">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:title" content="Klanten — LiczMat">
+<meta property="og:description" content="Klanten in LiczMat Pro: een klantenlijst met contactgegevens en notities, de projecten van de klant en de geschiedenis. Hoort bij het account.">
+<meta property="og:url" content="https://liczmat.com/nl/klanten/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Klanten — LiczMat">
+<meta name="twitter:description" content="Klanten in LiczMat Pro: een klantenlijst met contactgegevens en notities, de projecten van de klant en de geschiedenis. Hoort bij het account.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Start",
+      "item": "https://liczmat.com/nl/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Klanten",
+      "item": "https://liczmat.com/nl/klanten/"
+    }
+  ]
+}
+</script>
+<script>window.LM_LINKS = {"clients":"/nl/klanten/","jobs":"/nl/opdrachten/","projects":"/nl/projecten/","quotes":"/nl/offertes/","calendar":"/nl/planning/"};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Ga naar de inhoud</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/nl/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Hoofdnavigatie">
+      <ul class="nav-list">
+        <li><a href="/nl/rekenmachines/">Rekenmachines</a></li>
+        <li><a href="/nl/materialen/">Materialen</a></li>
+        <li data-nav-level="liczmat"><a href="/nl/projecten/">Projecten</a></li>
+        <li><a href="/nl/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/nl/android-app/">De app</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Taal">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span class="lang-btn-name">Nederlands</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/klienci/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/kliyenty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/kunden/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/clients/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/klienti/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/klienti/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/clienti/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/klijenti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/klijenti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><a class="lang-item" href="/it/clienti/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></span></li>
+      <li><a class="lang-item" href="/es/clientes/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+      <li><a class="lang-item" href="/fr/clients/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Valuta" title="Valuta"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mijn account</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Thema wisselen" title="Thema wisselen"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu openen"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/nl/">Start</a></li><li aria-current="page">Klanten</li></ol></nav>
+      <h1 id="crm-title">Klanten</h1>
+      <p class="lead" id="crm-lead">De klantenlijst van LiczMat Pro: contactgegevens, notities en de projecten die je voor hen uitrekent.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="crm-page">
+    <div class="wrap narrow">
+      
+      <p class="crm-pro" id="crm-pro" hidden>
+        <span class="chip" id="crm-pro-chip">Beschikbaar in LiczMat Pro</span>
+      </p>
+
+      <div class="app-card crm-gate pw-gate" id="crm-gate" hidden>
+        <h2>Klanten</h2>
+        <p class="muted">Een lijst met klanten met contactgegevens, notities en de geschiedenis van het werk met hen.</p>
+        <p><span class="chip">Beschikbaar in LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro is een plan op een account. Maak eerst een gratis LiczMat-account of log in — Pro kan alleen voor een account worden aangezet.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fnl%2Fklanten%2F" rel="nofollow">Maak een gratis account</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Je account zit op het gratis plan. Deze module hoort bij LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Wat LiczMat Pro verder dekt</h3>
+          <ul class="pw-incl-list">
+            <li><b>Opdrachten</b> — <span class="muted">Een opdracht met haar klant, omschrijving, status, datum, waarde en het project waar ze bij hoort.</span></li>
+            <li><b>Offertes</b> — <span class="muted">Materiaal, arbeid, andere kosten, marge en het totaal, uit wat je al hebt uitgerekend.</span></li>
+            <li><b>Planning</b> — <span class="muted">De datums van de opdrachten en het belangrijkste erover. Geen tweede Google Agenda.</span></li>
+            <li><b>Geschiedenis en CRM</b> — <span class="muted">Het pad door de hele opdracht: klant → opdracht → project → offerte → geschiedenis.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/nl/liczmat-pro/" data-i18n="pro_more">Bekijk wat LiczMat Pro is</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">LiczMat Pro-abonnement</h3>
+          <p class="muted" data-i18n="pay_d">Eén plan, alle vijf Pro-modules. De betaling loopt via Stripe; zeg op wanneer je wilt en Pro loopt tot het einde van de betaalde periode.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Maandelijks</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ maand</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Jaarlijks</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ jaar — twee maanden goedkoper</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Ga naar je account</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Het abonnement is nog niet te koop. Deze prijzen zijn definitief.</p>
+        </div>
+      </div>
+
+      <div id="crm-tool">
+        <article id="crm-client" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/nl/klanten/" data-crm-back>← Alle klanten</a></p>
+
+        <div id="crm-client-missing" hidden>
+          <h2>Geen zo'n klant</h2>
+          <p class="muted">Deze klant is verwijderd, of het adres komt uit een andere browser.</p>
+        </div>
+
+        <div id="crm-client-body" hidden>
+          
+          <p class="crm-contact" id="crm-contact"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Projecten</span> <b id="crm-fig-projects"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Laatste wijziging</span> <b id="crm-fig-last"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Waarde van het werk</span> <b id="crm-fig-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="crm-mixed" hidden>Deze regels staan in verschillende valuta's. Het totaal telt ze op maar rekent niets om — controleer de valuta bij elke kostenpost.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-edit">Gegevens bewerken</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-archive">Archiveren</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="crm-client-delete">Verwijderen</button>
+          </div>
+
+          
+          <form id="crm-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Naam</span>
+                <input id="crm-edit-name" type="text" maxlength="120" required>
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">Telefoon</span>
+                <input id="crm-edit-phone" type="tel" maxlength="200" autocomplete="tel">
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">E-mail</span>
+                <input id="crm-edit-email" type="email" maxlength="200" autocomplete="email">
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Adres</span>
+                <input id="crm-edit-address" type="text" maxlength="200">
+              </label>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="crm-edit-note">Notities</label>
+              <textarea id="crm-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">Opslaan</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-crm-edit-cancel>Annuleren</button>
+            </p>
+          </form>
+
+          <div id="crm-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="crm-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="crm-delete-yes">Verwijder de klant</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="crm-delete-no">Annuleren</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Notities</h2>
+            </div>
+            <p id="crm-note" class="crm-note"></p>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Projecten</h2>
+              <a class="dash-more" href="/nl/projecten/">Projecten en ruimtes</a>
+            </div>
+            <p class="muted">De projecten die onder deze klant staan. Het zijn dezelfde projecten als op de projectenpagina; hier verandert niets eraan.</p>
+            <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-form" class="inline-form">
+              <select id="crm-project-pick" aria-label="Project toevoegen"></select>
+              <button type="submit" class="btn btn-primary btn-sm">Project toevoegen</button>
+            </form>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Opdrachten</h2>
+              <a class="dash-more" href="/nl/opdrachten/">Alle opdrachten</a>
+            </div>
+            <p class="muted">De opdrachten van deze klant. Een opdracht verbindt een klant met een project en houdt de status en de datum vast.</p>
+            <ul id="crm-client-jobs" class="data-list"></ul>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Offertes</h2>
+              <a class="dash-more" href="/nl/offertes/">Alle offertes</a>
+            </div>
+            <p class="muted">Offertes die uit het project zijn geprijsd. Het materiaal en de andere kosten komen uit het project, de arbeid en de marge uit de offerte.</p>
+            <ul id="crm-client-quotes" class="data-list"></ul>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Geschiedenis</h2>
+            </div>
+            <p class="muted">Wat er is gebeurd: de klant, de opdrachten, de offertes, de opgeslagen berekeningen en de met de hand ingevoerde kosten, nieuwste eerst.</p>
+            <ul id="crm-history" class="data-list"></ul>
+            <p class="muted field-note">De geschiedenis volgt uit de opgeslagen documenten en hun datums. Een status of een datum die is gewijzigd heeft geen eigen datum en staat dus niet in de lijst.</p>
+          </section>
+        </div>
+      </article>
+        <div id="crm-index">
+        <p class="ws-undo" id="crm-undo" role="status" hidden>
+          <span id="crm-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="crm-undo-go">Ongedaan maken</button>
+        </p>
+
+        <h2>Klanten</h2>
+        <p class="muted">Een klant is een naam en contactgegevens. Projecten worden onder een klant gezet zodra je die opent.</p>
+        <form id="crm-client-form" class="inline-form">
+          <input id="crm-client-name" type="text" maxlength="120" placeholder="Naam van de klant" required aria-label="Naam van de klant">
+          <input id="crm-client-phone" type="tel" maxlength="200" placeholder="Telefoon" autocomplete="off" aria-label="Telefoon">
+          <input id="crm-client-email" type="email" maxlength="200" placeholder="E-mail" autocomplete="off" aria-label="E-mail">
+          <button type="submit" class="btn btn-primary btn-sm">Toevoegen</button>
+        </form>
+        <ul id="crm-client-list" class="data-list"></ul>
+
+        <details id="crm-archive" class="ws-archive" hidden>
+          <summary id="crm-archive-summary">Archief</summary>
+          <p class="muted">Klanten waar je niet meer mee werkt. Er gaat niets verloren — je kunt ze terughalen.</p>
+          <ul id="crm-archive-list" class="data-list"></ul>
+        </details>
+      </div>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/nl/projecten/">Projecten en ruimtes</a>
+        <a class="btn btn-ghost" href="/app/" rel="nofollow">Mijn account</a>
+      </p>
+      <p class="muted src-note">Klanten horen bij het LiczMat-account. Uitgelogd blijven ze in deze browser; ingelogd staan ze ook in de Android-app.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">Dezelfde formule in de app</b> LiczMat voor Android gebruikt dezelfde motor offline, met de materiaalcatalogus en resultaten die in een project worden bewaard.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Downloaden</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Rekenmachine voor bouwmaterialen. Reken. Plan. Bouw.</p>
+      </div>
+      <div>
+        <h2>Product</h2>
+        <ul>
+          <li><a href="/nl/rekenmachines/">Alle rekenmachines</a></li>
+          <li><a href="/nl/eenheden-omrekenen/">Eenheden omrekenen</a></li>
+          <li><a href="/nl/materialen/">Materialen</a></li>
+          <li data-nav-level="liczmat"><a href="/nl/mijn-materialen/">Mijn materialen</a></li>
+          <li data-nav-level="liczmat"><a href="/nl/projecten/">Projecten</a></li>
+          <li><a href="/nl/kostenraming/">Kostenraming</a></li>
+          <li><a href="/nl/gidsen/">Gidsen</a></li>
+          <li><a href="/nl/bouwmarkten/">Winkels</a></li>
+          <li><a href="/nl/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/nl/klanten/">Klanten</a></li>
+          <li data-nav-level="pro"><a href="/nl/opdrachten/">Opdrachten</a></li>
+          <li data-nav-level="pro"><a href="/nl/offertes/">Offertes</a></li>
+          <li data-nav-level="pro"><a href="/nl/planning/">Planning</a></li>
+          <li><a href="/nl/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Account</h2>
+        <ul>
+          <li><a href="/nl/android-app/">De app</a></li>
+          <li><a href="/app/" rel="nofollow">Mijn account</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Overzicht</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Juridisch</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Privacybeleid</a></li>
+          <li><a href="/nl/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Taal">
+      <h2>Taal</h2>
+      <ul>
+        <li><a href="/klienci/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/kliyenty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/kunden/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/clients/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/klienti/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/klienti/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/clienti/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/klijenti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/klijenti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/clienti/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/klanten/" hreflang="nl" lang="nl" data-lang="nl" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/clientes/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/clients/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Alle rechten voorbehouden.</span>
+      <span>De resultaten zijn schattingen. Controleer ze altijd voordat je koopt.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">We gebruiken Google Analytics om anoniem het verkeer op de site te tellen en hoeveel mensen naar Google Play gaan. Ga je akkoord?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Meer in het privacybeleid</a>
+    <a class="consent-more" href="/nl/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Weigeren</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Akkoord</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/klienci/",
+  "uk": "/uk/kliyenty/",
+  "de": "/de/kunden/",
+  "en": "/en/clients/",
+  "cs": "/cs/klienti/",
+  "sk": "/sk/klienti/",
+  "ro": "/ro/clienti/",
+  "hr": "/hr/klijenti/",
+  "sr": "/sr/klijenti/",
+  "it": "/it/clienti/",
+  "nl": "/nl/klanten/",
+  "es": "/es/clientes/",
+  "fr": "/fr/clients/"
+};</script>
+
+<script src="/assets/i18n.nl.js?v=20260902a"></script>
+<script src="/assets/i18n-runtime.js?v=20260902a"></script>
+<script src="/assets/currency.js?v=20260902a"></script>
+<script src="/assets/account.js?v=20260902a"></script>
+
+<script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
+<script src="/assets/crm-store.js?v=20260902a"></script>
+<script src="/assets/crm.js?v=20260902a"></script>
+<script src="/assets/crm-chain.js?v=20260902a"></script>
+<script src="/assets/crm-ui.js?v=20260902a"></script>
+<script src="/assets/main.js?v=20260902a"></script>
+
+</body>
+</html>

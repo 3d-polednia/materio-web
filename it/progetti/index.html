@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Progetti e stanze — LiczMat</title>
+<meta name="description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto. Senza account.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/it/progetti/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/projekty/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/proekty/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/projekte/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/projects/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/projekty/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/projekty/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/proiecte/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/projekti/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/projekti/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/progetti/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/projecten/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/proyectos/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/projets/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/projekty/">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="it_IT">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:title" content="Progetti e stanze — LiczMat">
+<meta property="og:description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto. Senza account.">
+<meta property="og:url" content="https://liczmat.com/it/progetti/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Progetti e stanze — LiczMat">
+<meta name="twitter:description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto. Senza account.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://liczmat.com/it/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Progetti e stanze",
+      "item": "https://liczmat.com/it/progetti/"
+    }
+  ]
+}
+</script>
+<script>window.LM_PROJ = {"calcs":{"coverage":"/it/calcolatori/pittura-intonaco-primer/","waste":"/it/calcolatori/piastrelle-pannelli-gres/","wallpaper":"/it/calcolatori/carta-da-parati/","linear":"/it/calcolatori/taglio-lineare-1d/","sheet":"/it/calcolatori/taglio-pannelli-2d/","concrete":"/it/calcolatori/calcestruzzo-in-sacchi/","mortar":"/it/calcolatori/colla-malta/","screed":"/it/calcolatori/massetto-intonaco/","grout":"/it/calcolatori/stucco-per-fughe/","masonry":"/it/calcolatori/muratura/","insulation":"/it/calcolatori/cappotto-termico-etics/","studwall":"/it/calcolatori/parete-in-cartongesso/","ceiling":"/it/calcolatori/controsoffitto/","drylining":"/it/calcolatori/cartongesso-a-colla/","sheathing":"/it/calcolatori/rivestimento-osb/"},"aisles":["TILES","FLOORING","TRIM","PAINT","CHEMICALS","BOARDS","WOOD","PROFILES","METAL","GLASS","TEXTILES","INSULATION","PLUMBING","ELECTRICAL","OTHER"]};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Vai al contenuto</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/it/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Navigazione principale">
+      <ul class="nav-list">
+        <li><a href="/it/calcolatori/">Calcolatori</a></li>
+        <li><a href="/it/materiali/">Materiali</a></li>
+        <li data-nav-level="liczmat"><a href="/it/progetti/" aria-current="page">Progetti</a></li>
+        <li><a href="/it/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/it/app-android/">L'app</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Lingua">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span class="lang-btn-name">Italiano</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/projekty/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/proekty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/projekte/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/projects/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/projekty/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/projekty/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/proiecte/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/projekti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/projekti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></span></li>
+      <li><a class="lang-item" href="/nl/projecten/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+      <li><a class="lang-item" href="/es/proyectos/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+      <li><a class="lang-item" href="/fr/projets/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Valuta" title="Valuta"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Il mio account</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambia tema" title="Cambia tema"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Apri il menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/it/">Home</a></li><li aria-current="page">Progetti e stanze</li></ol></nav>
+      <h1 id="ws-title">Progetti e stanze</h1>
+      <p class="lead" id="ws-lead">Salva le stanze con le loro misure e raccogli i risultati in progetti. Tutto resta in questo browser; l'account serve solo a portarlo sul telefono.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="ws-page">
+    <div class="wrap narrow">
+      <article id="ws-project" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/it/progetti/" data-ws-back>Tutti i progetti</a></p>
+
+        <div id="ws-project-missing" hidden>
+          <h2>Nessun progetto così</h2>
+          <p class="muted">Questo indirizzo punta a un progetto che questo browser non ha. Può essere stato eliminato, oppure è stato fatto su un altro dispositivo.</p>
+        </div>
+
+        <div id="ws-project-body" hidden>
+          <p class="ws-project-hist muted" id="ws-project-hist"></p>
+
+          
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Voci</span> <b id="ws-project-count"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Costo dei materiali</span> <b id="ws-project-mat"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Altri costi</span> <b id="ws-project-other"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Totale del progetto</span> <b id="ws-project-total"></b></p>
+          </div>
+          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Queste voci sono in valute diverse. Il totale le somma ma non converte nulla: controlla la valuta di ogni costo.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Rendi attivo</button>
+            <span class="chip on" id="ws-project-active" hidden>Attivo</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">Rinomina</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive">Sposta nell'archivio</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">Elimina</button>
+          </div>
+
+          <form id="ws-rename-form" class="inline-form mt-4" hidden>
+            <input id="ws-rename-name" type="text" maxlength="120" aria-label="Nome del progetto" required>
+            <button type="submit" class="btn btn-primary btn-sm">Salva</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Annulla</button>
+          </form>
+
+          <div id="ws-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="ws-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="ws-delete-yes">Sì, eliminalo</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="ws-delete-no">Annulla</button>
+            </p>
+          </div>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Stanze</h2>
+            </div>
+            <p class="muted">Le stanze di questo progetto. Un calcolatore ne prende le misure e un calcolo si può archiviare sotto una di esse.</p>
+            <ul id="ws-project-rooms" class="data-list"></ul>
+
+            <details class="ws-mat-add" id="ws-room-add">
+              <summary>Aggiungi una stanza</summary>
+              <form id="ws-proj-room-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Voce</span>
+                    <input id="ws-proj-room-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Lunghezza (m)</span>
+                    <input id="ws-proj-room-length" type="text" inputmode="decimal" value="5" data-f="lengthM">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Larghezza (m)</span>
+                    <input id="ws-proj-room-width" type="text" inputmode="decimal" value="4" data-f="widthM">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Altezza (m)</span>
+                    <input id="ws-proj-room-height" type="text" inputmode="decimal" value="2.6" data-f="heightM">
+                  </label>
+                </p>
+                
+                <p class="ws-mat-sum" data-room-sum aria-live="polite"></p>
+                <p class="muted ws-mat-hint">A quale progetto appartiene una stanza si vede qui e in un browser su un altro dispositivo. L'app del telefono tiene le stanze in un unico elenco e non lo mostra ancora.</p>
+                <p><button type="submit" class="btn btn-primary btn-sm">Aggiungi</button></p>
+              </form>
+            </details>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Calcoli</h2>
+              <a class="dash-more" href="/it/preventivo/" id="ws-project-estimate">Apri il preventivo</a>
+            </div>
+            <p class="muted">I risultati tenuti in questo progetto con il pulsante «Aggiungi al progetto».</p>
+            <ul id="ws-project-lines" class="data-list"></ul>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Materiali</h2>
+              <span class="muted ws-mat-tally" id="ws-mat-tally"></span>
+            </div>
+            <p class="muted">La lista della spesa di questo progetto. Ogni risultato salvato le aggiunge una riga.</p>
+            <ul id="ws-project-materials" class="data-list"></ul>
+
+            
+            <details class="ws-mat-add" id="ws-mat-add">
+              <summary>Aggiungi un materiale tuo</summary>
+              <form id="ws-mat-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Voce</span>
+                    <input id="ws-mat-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Quantità</span>
+                    <input id="ws-mat-qty" type="text" inputmode="decimal" value="1" data-f="quantity">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Unità</span>
+                    <input id="ws-mat-unit" type="text" maxlength="24" list="ws-mat-units">
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Prezzo unitario</span>
+                    <input id="ws-mat-price" type="text" inputmode="decimal" data-f="priceMajor">
+                  </label>
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Reparto</span>
+                    <select id="ws-mat-cat"><option value="TILES">Piastrelle</option><option value="FLOORING">Pavimenti</option><option value="TRIM">Profili e finiture</option><option value="PAINT">Pitture e vernici</option><option value="CHEMICALS">Chimica per l'edilizia</option><option value="BOARDS">Pannelli</option><option value="WOOD">Legname</option><option value="PROFILES">Profili per cartongesso</option><option value="METAL">Metallo e tondino</option><option value="GLASS">Vetro e plastiche</option><option value="TEXTILES">Tessuti e tappezzeria</option><option value="INSULATION">Isolamento</option><option value="PLUMBING">Idraulica e ventilazione</option><option value="ELECTRICAL">Elettrico</option><option value="OTHER">Altro</option></select>
+                  </label>
+                </p>
+                
+                <p class="ws-mat-sum" data-mat-sum aria-live="polite"></p>
+                <label class="ws-mat-f">
+                  <span class="ws-bar-label">Nota</span>
+                  <input id="ws-mat-note" type="text" maxlength="500"
+                    placeholder="es. comprare nello stesso tono">
+                </label>
+                <p><button type="submit" class="btn btn-primary btn-sm">Aggiungi</button></p>
+              </form>
+            </details>
+
+            
+            <datalist id="ws-mat-units"><option value="confezione"></option><option value="pz"></option><option value="m²"></option><option value="m"></option><option value="kg"></option><option value="l"></option></datalist>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Altri costi</h2>
+            </div>
+            <p class="muted">Manodopera, consegna, noleggio: i costi che nessun calcolatore produce. Entrano nel totale del progetto accanto ai materiali.</p>
+            <ul id="ws-project-other-list" class="data-list"></ul>
+
+            <details class="ws-mat-add" id="ws-other-add">
+              <summary>Aggiungi un altro costo</summary>
+              <form id="ws-other-form">
+                <p class="ws-mat-grid">
+                  <label class="ws-mat-f">
+                    <span class="ws-bar-label">Voce</span>
+                    <input id="ws-other-name" type="text" maxlength="120" required>
+                  </label>
+                  <label class="ws-mat-f ws-mat-f-sm">
+                    <span class="ws-bar-label">Costo</span>
+                    <input id="ws-other-cost" type="text" inputmode="decimal">
+                  </label>
+                </p>
+                <p><button type="submit" class="btn btn-primary btn-sm">Aggiungi</button></p>
+              </form>
+            </details>
+          </section>
+
+          <section class="dash-sec ws-pdf" id="ws-pdf">
+            <div class="dash-head"><h2>Esporta il preventivo</h2></div>
+            <p class="muted">Il documento si apre nella finestra di stampa. Scegli lì il salvataggio in PDF.</p>
+            <form id="ws-pdf-form">
+            <fieldset class="pdf-types">
+              <legend class="fld-label">Tipo di documento</legend>
+              <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Relazione tecnica</span></label>
+              <label class="field-check"><input type="radio" name="pdf-type" value="investor"> <span>Preventivo per il committente</span></label>
+            </fieldset>
+
+            <details class="ws-mat-add">
+              <summary>Contenuto</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="quantities" checked> <span>Quantità</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="prices" checked> <span>Prezzi</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="total" checked> <span>Costo totale</span></label>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="date" checked> <span>Data</span></label>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Dati dell'impresa</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="contractor"> <span>Dati dell'impresa</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Nome dell'impresa</span>
+            <input type="text" data-pdf-in="company" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Telefono</span>
+            <input type="text" data-pdf-in="phone" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">E-mail</span>
+            <input type="text" data-pdf-in="email" value=""></label>
+              </p>
+            </details>
+
+            
+            <details class="ws-mat-add" data-pdf-investor hidden>
+              <summary>Calcolo per il committente</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="labor"> <span>Manodopera</span></label>
+              <p class="ws-mat-grid">
+                <label class="field ws-mat-f"><span class="fld-label">Ore</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborHours" value=""></label>
+                <label class="field ws-mat-f"><span class="fld-label">Tariffa oraria</span>
+            <input type="text" inputmode="decimal" data-pdf-in="laborRate" value=""></label>
+              </p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="margin"> <span>Margine</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Margine (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="marginPercent" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="vat"> <span>IVA</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">IVA (%)</span>
+            <input type="text" inputmode="decimal" data-pdf-in="vatPercent" value="23"></label></p>
+            </details>
+
+            <details class="ws-mat-add">
+              <summary>Facoltativo</summary>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="estimateNumber"> <span>Numero del preventivo</span></label>
+              <p class="ws-mat-grid"><label class="field ws-mat-f"><span class="fld-label">Numero del preventivo</span>
+            <input type="text" data-pdf-in="estimateNumber" value=""></label></p>
+              <label class="field-check"><input type="checkbox" data-pdf-opt="notes"> <span>Note</span></label>
+              <label class="field"><span class="fld-label">Testo della nota</span>
+                <textarea data-pdf-in="notesText" rows="3"></textarea></label>
+            </details>
+
+            <p><button type="submit" class="btn btn-primary">Prepara il PDF</button></p>
+          </form>
+            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+            <header class="pdf-head">
+              
+              <p class="pdf-sub" data-pdf="subtitle"
+                 data-technical="RELAZIONE TECNICA"
+                 data-investor="PREVENTIVO DEI MATERIALI"></p>
+              <p class="pdf-line" data-pdf-row="project">Progetto: <span data-pdf="projectName"></span></p>
+              <p class="pdf-line" data-pdf-row="date">Data: <span data-pdf="date"></span></p>
+              <p class="pdf-line" data-pdf-row="estimateNo" hidden>Preventivo n.: <span data-pdf="estimateNo"></span></p>
+              <div class="pdf-contractor" data-pdf-row="contractor" hidden>
+                <p data-pdf="company"></p>
+                <p data-pdf="phone"></p>
+                <p data-pdf="email"></p>
+              </div>
+            </header>
+
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th scope="col">MATERIALE</th>
+                  <th scope="col" data-pdf-col="qty">Q.TÀ</th>
+                  <th scope="col" data-pdf-col="value">IMPORTO</th>
+                </tr>
+              </thead>
+              <tbody data-pdf="rows"></tbody>
+            </table>
+            <p class="pdf-empty" data-pdf-row="empty" hidden>Nessun calcolo.</p>
+
+            <p class="pdf-total" data-pdf-row="total">
+              <span>COSTO TOTALE DEI MATERIALI</span> <b data-pdf="total"></b>
+            </p>
+            <p class="pdf-line" data-pdf-row="waste" hidden>Costo totale dello scarto: <span data-pdf="waste"></span></p>
+
+            <section class="pdf-pricing" data-pdf-row="pricing" hidden>
+              <h2>CALCOLO PER IL COMMITTENTE</h2>
+              <dl>
+                <div><dt>Materiali (netto)</dt><dd data-pdf="materialsNet"></dd></div>
+                <div data-pdf-row="labor" hidden><dt>Manodopera</dt><dd data-pdf="labor"></dd></div>
+                <div data-pdf-row="marginRow" hidden><dt>Margine</dt><dd data-pdf="margin"></dd></div>
+                <div class="pdf-strong" data-pdf-row="net" hidden><dt>Totale netto</dt><dd data-pdf="net"></dd></div>
+                <div data-pdf-row="vatRow" hidden><dt>IVA</dt><dd data-pdf="vat"></dd></div>
+                <div class="pdf-strong" data-pdf-row="gross" hidden><dt>Totale lordo</dt><dd data-pdf="gross"></dd></div>
+              </dl>
+            </section>
+
+            <section class="pdf-notes" data-pdf-row="notes" hidden>
+              <h2>Note:</h2>
+              <p data-pdf="notes">Il preventivo copre il fabbisogno approssimativo di materiale.</p>
+            </section>
+
+            <p class="pdf-foot">LiczMat — Calcola. Pianifica. Realizza.</p>
+          </article>
+          </section>
+        </div>
+      </article>
+
+      <div id="ws-index">
+        <p class="ws-undo" id="ws-undo" role="status" hidden>
+          <span id="ws-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="ws-undo-go">Annulla</button>
+        </p>
+
+        <h2>Progetti</h2>
+        <p class="muted">Un progetto raccoglie i risultati dei calcolatori in un unico preventivo. Ogni nuova voce finisce nel progetto attivo.</p>
+        <form id="ws-project-form" class="inline-form">
+          <input id="ws-project-name" type="text" maxlength="120" placeholder="Nome del progetto" required aria-label="Nome del progetto">
+          <button type="submit" class="btn btn-primary btn-sm">Aggiungi</button>
+        </form>
+        <ul id="ws-project-list" class="data-list"></ul>
+
+        <details id="ws-archive" class="ws-archive" hidden>
+          <summary id="ws-archive-summary">Archivio</summary>
+          <p class="muted">Progetti messi da parte. Nulla al loro interno si perde: non prendono nuove voci e restano fuori dall'elenco qui sopra e dal pannello.</p>
+          <ul id="ws-archive-list" class="data-list"></ul>
+        </details>
+
+        <h2 class="mt-8">Stanze</h2>
+        <p class="muted">Una stanza è un nome e tre misure. I calcolatori ne ricavano pavimento, pareti e soffitto.</p>
+        
+        <form id="ws-room-form" class="inline-form">
+          <input id="ws-room-name" type="text" maxlength="120" placeholder="Nome della stanza" required aria-label="Nome della stanza">
+          <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="Lunghezza (m)">
+          <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="Larghezza (m)">
+          <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="Altezza (m)">
+          <select id="ws-room-project" aria-label="Progetto"></select>
+          <button type="submit" class="btn btn-primary btn-sm">Aggiungi</button>
+        </form>
+        <ul id="ws-room-list" class="data-list"></ul>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/it/preventivo/">Preventivo</a>
+        <a class="btn btn-ghost" href="/it/calcolatori/">Tutti i calcolatori</a>
+        <a class="btn btn-ghost" href="/app/" rel="nofollow">Il mio account</a>
+      </p>
+      <p class="muted src-note">I dati stanno nella memoria di questo browser (localStorage). Svuotare i dati del sito li cancella. Accedi in «Il mio account» per averli anche sul telefono.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">La stessa formula nell'app</b> LiczMat per Android usa lo stesso motore offline, con il catalogo materiali e i risultati salvati in un progetto.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Scarica</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Calcolatore di materiali edili. Calcola. Pianifica. Realizza.</p>
+      </div>
+      <div>
+        <h2>Prodotto</h2>
+        <ul>
+          <li><a href="/it/calcolatori/">Tutti i calcolatori</a></li>
+          <li><a href="/it/convertitore-di-unita/">Convertitore di unità</a></li>
+          <li><a href="/it/materiali/">Materiali</a></li>
+          <li data-nav-level="liczmat"><a href="/it/i-miei-materiali/">I miei materiali</a></li>
+          <li data-nav-level="liczmat"><a href="/it/progetti/">Progetti</a></li>
+          <li><a href="/it/preventivo/">Preventivo</a></li>
+          <li><a href="/it/guide/">Guide</a></li>
+          <li><a href="/it/negozi/">Negozi</a></li>
+          <li><a href="/it/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/it/clienti/">Clienti</a></li>
+          <li data-nav-level="pro"><a href="/it/commesse/">Commesse</a></li>
+          <li data-nav-level="pro"><a href="/it/preventivi-pro/">Preventivi</a></li>
+          <li data-nav-level="pro"><a href="/it/scadenze/">Scadenze</a></li>
+          <li><a href="/it/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Account</h2>
+        <ul>
+          <li><a href="/it/app-android/">L'app</a></li>
+          <li><a href="/app/" rel="nofollow">Il mio account</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Pannello</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Note legali</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Informativa sulla privacy</a></li>
+          <li><a href="/it/cookies/">Cookie</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Lingua">
+      <h2>Lingua</h2>
+      <ul>
+        <li><a href="/projekty/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/proekty/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/projekte/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/projects/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/projekty/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/projekty/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/proiecte/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/projekti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/projekti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/progetti/" hreflang="it" lang="it" data-lang="it" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/projecten/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/proyectos/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/projets/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Tutti i diritti riservati.</span>
+      <span>I risultati sono stime. Verifica sempre prima di comprare.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Usiamo Google Analytics per contare il traffico anonimo del sito e quante persone passano a Google Play. Sei d'accordo?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Altro nell'informativa sulla privacy</a>
+    <a class="consent-more" href="/it/cookies/">Cookie</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Rifiuta</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Accetto</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/projekty/",
+  "uk": "/uk/proekty/",
+  "de": "/de/projekte/",
+  "en": "/en/projects/",
+  "cs": "/cs/projekty/",
+  "sk": "/sk/projekty/",
+  "ro": "/ro/proiecte/",
+  "hr": "/hr/projekti/",
+  "sr": "/sr/projekti/",
+  "it": "/it/progetti/",
+  "nl": "/nl/projecten/",
+  "es": "/es/proyectos/",
+  "fr": "/fr/projets/"
+};</script>
+
+<script src="/assets/i18n.it.js?v=20260902a"></script>
+<script src="/assets/i18n-runtime.js?v=20260902a"></script>
+<script src="/assets/currency.js?v=20260902a"></script>
+<script src="/assets/account.js?v=20260902a"></script>
+
+<script src="/assets/units.js?v=20260902a"></script>
+<script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/workspace-calc.js?v=20260902a"></script>
+<script src="/assets/workspace-ui.js?v=20260902a"></script>
+<script src="/assets/pdf-export.js?v=20260902a"></script>
+<script src="/assets/main.js?v=20260902a"></script>
+
+</body>
+</html>

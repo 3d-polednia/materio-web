@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Encargos — LiczMat</title>
+<meta name="description" content="Encargos en LiczMat Pro: una lista de encargos con estado, fecha y valor acordado, unidos a un cliente y a un proyecto. Sincronizado con la cuenta.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/es/encargos/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/zlecenia/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/zamovlennya/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/auftraege/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/jobs/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/zakazky/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/zakazky/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/comenzi/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/nalozi/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/nalozi/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/commesse/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/opdrachten/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/encargos/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/chantiers/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/zlecenia/">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:title" content="Encargos — LiczMat">
+<meta property="og:description" content="Encargos en LiczMat Pro: una lista de encargos con estado, fecha y valor acordado, unidos a un cliente y a un proyecto. Sincronizado con la cuenta.">
+<meta property="og:url" content="https://liczmat.com/es/encargos/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Encargos — LiczMat">
+<meta name="twitter:description" content="Encargos en LiczMat Pro: una lista de encargos con estado, fecha y valor acordado, unidos a un cliente y a un proyecto. Sincronizado con la cuenta.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://liczmat.com/es/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Clientes",
+      "item": "https://liczmat.com/es/clientes/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Encargos",
+      "item": "https://liczmat.com/es/encargos/"
+    }
+  ]
+}
+</script>
+<script>window.LM_LINKS = {"clients":"/es/clientes/","jobs":"/es/encargos/","projects":"/es/proyectos/","quotes":"/es/presupuestos-pro/","calendar":"/es/plazos/"};</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Ir al contenido</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/es/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Navegación principal">
+      <ul class="nav-list">
+        <li><a href="/es/calculadoras/">Calculadoras</a></li>
+        <li><a href="/es/materiales/">Materiales</a></li>
+        <li data-nav-level="liczmat"><a href="/es/proyectos/">Proyectos</a></li>
+        <li><a href="/es/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/es/app-android/">La app</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Idioma">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span class="lang-btn-name">Español</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/zlecenia/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/zamovlennya/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/auftraege/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/jobs/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/zakazky/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/zakazky/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/comenzi/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/nalozi/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/nalozi/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><a class="lang-item" href="/it/commesse/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+      <li><a class="lang-item" href="/nl/opdrachten/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></span></li>
+      <li><a class="lang-item" href="/fr/chantiers/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Moneda" title="Moneda"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mi cuenta</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar el tema" title="Cambiar el tema"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Abrir el menú"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/es/">Inicio</a></li><li><a href="/es/clientes/">Clientes</a></li><li aria-current="page">Encargos</li></ol></nav>
+      <h1 id="job-title">Encargos</h1>
+      <p class="lead" id="job-lead">Los encargos de LiczMat Pro: el cliente, el estado, la fecha, el valor acordado y el proyecto en el que calculas los materiales.</p>
+    </div>
+  </section>
+
+  <section class="block alt" id="job-page">
+    <div class="wrap narrow">
+      
+      <p class="crm-pro" id="job-pro" hidden>
+        <span class="chip" id="job-pro-chip">Disponible en LiczMat Pro</span>
+      </p>
+
+      <div class="app-card crm-gate pw-gate" id="job-gate" hidden>
+        <h2>Encargos</h2>
+        <p class="muted">Un encargo con su cliente, descripción, estado, fecha, valor y el proyecto al que pertenece.</p>
+        <p><span class="chip">Disponible en LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro es un plan sobre una cuenta. Crea antes una cuenta LiczMat gratuita o inicia sesión: Pro solo se puede activar sobre una cuenta.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fes%2Fencargos%2F" rel="nofollow">Crea una cuenta gratuita</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tu cuenta está en el plan gratuito. Este módulo pertenece a LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Qué más cubre LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Clientes</b> — <span class="muted">Una lista de clientes con datos de contacto, notas y el historial del trabajo con ellos.</span></li>
+            <li><b>Presupuestos</b> — <span class="muted">Material, mano de obra, otros costes, margen y total, a partir de lo que ya has calculado.</span></li>
+            <li><b>Plazos</b> — <span class="muted">Las fechas de los encargos y lo esencial sobre ellos. No un segundo Google Calendar.</span></li>
+            <li><b>Historial y CRM</b> — <span class="muted">El recorrido por todo el trabajo: cliente → encargo → proyecto → presupuesto → historial.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/es/liczmat-pro/" data-i18n="pro_more">Mira qué es LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Suscripción a LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Un plan, los cinco módulos Pro. El pago lo gestiona Stripe; cancela cuando quieras y Pro dura hasta el final del periodo pagado.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Mensual</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ mes</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Anual</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ año — dos meses más barato</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Ir a tu cuenta</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">La suscripción todavía no se puede comprar. Estos precios son definitivos.</p>
+        </div>
+      </div>
+
+      <div id="job-tool">
+        <article id="job-detail" class="ws-project" hidden>
+        <p class="ws-project-back"><a href="/es/encargos/" data-job-back>← Todos los encargos</a></p>
+
+        <div id="job-missing" hidden>
+          <h2>No hay tal encargo</h2>
+          <p class="muted">Este encargo se eliminó, o la dirección viene de otro navegador.</p>
+        </div>
+
+        <div id="job-body" hidden>
+          
+          <nav class="crm-chain" id="job-chain" aria-label="Recorrido"></nav>
+
+          
+          <p class="ws-mat-grid job-head-row">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label">Estado</span>
+              <select id="job-status"><option value="new">Nuevo</option><option value="active">En marcha</option><option value="done">Terminado</option><option value="cancelled">Cancelado</option></select>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label">Fecha</span>
+              <input id="job-due" type="date">
+            </label>
+          </p>
+
+          <p class="crm-contact" id="job-client-line"></p>
+
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">Valor acordado</span> <b id="job-fig-value"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Coste del proyecto</span> <b id="job-fig-cost"></b></p>
+            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Queda</span> <b id="job-fig-left"></b></p>
+          </div>
+          <p class="muted field-note">El valor acordado lo escribes tú; el coste sale de los materiales y los cálculos guardados en el proyecto. Son dos cifras distintas y nada las ata.</p>
+          <p class="muted ws-estimate-mixed" id="job-mixed" hidden>Estas partidas están en monedas distintas. El total las suma pero no convierte nada: comprueba la moneda de cada coste.</p>
+
+          <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="job-edit">Editar el encargo</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="job-delete">Eliminar</button>
+          </div>
+
+          
+          <form id="job-edit-form" class="mt-4" hidden>
+            <p class="ws-mat-grid">
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Nombre</span>
+                <input id="job-edit-name" type="text" maxlength="120" required>
+              </label>
+              <label class="ws-mat-f ws-mat-f-sm">
+                <span class="ws-bar-label">Valor acordado</span>
+                <input id="job-edit-value" type="text" inputmode="decimal">
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">Cliente</span>
+                <select id="job-edit-client"></select>
+              </label>
+            </p>
+            <p class="muted field-note">El importe que acordaste con el cliente. Lo escribes tú: nada lo calcula.</p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="job-edit-desc">Descripción</label>
+              <textarea id="job-edit-desc" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p class="ws-mat-f">
+              <label class="ws-bar-label" for="job-edit-note">Notas</label>
+              <textarea id="job-edit-note" rows="3" maxlength="2000"></textarea>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+              <button type="button" class="btn btn-ghost btn-sm" data-job-edit-cancel>Cancelar</button>
+            </p>
+          </form>
+
+          <div id="job-delete-ask" class="ws-ask mt-4" hidden>
+            <p id="job-delete-q"></p>
+            <p class="ws-ask-row">
+              <button type="button" class="btn btn-primary btn-sm" id="job-delete-yes">Eliminar el encargo</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="job-delete-no">Cancelar</button>
+            </p>
+          </div>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Descripción</h2>
+            </div>
+            <p id="job-desc" class="crm-note"></p>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Proyecto</h2>
+              <a class="dash-more" href="/es/proyectos/">Proyectos y estancias</a>
+            </div>
+            <ul id="job-project-list" class="data-list"></ul>
+            <form id="job-project-form" class="inline-form">
+              <select id="job-project-pick" aria-label="Unir un proyecto"></select>
+              <button type="submit" class="btn btn-primary btn-sm">Unir un proyecto</button>
+            </form>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Presupuestos</h2>
+              <a class="dash-more" href="/es/presupuestos-pro/">Todos los presupuestos</a>
+            </div>
+            <p class="muted">Presupuestos hechos a partir del proyecto. El material y los otros costes vienen del proyecto; la mano de obra y el margen, del presupuesto.</p>
+            <ul id="job-quotes" class="data-list"></ul>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Notas</h2>
+            </div>
+            <p id="job-note" class="crm-note"></p>
+          </section>
+
+          
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Historial</h2>
+            </div>
+            <p class="muted">Qué ha pasado: el cliente, los encargos, los presupuestos, los cálculos guardados y los costes escritos a mano, del más reciente al más antiguo.</p>
+            <ul id="job-history" class="data-list"></ul>
+            <p class="muted field-note">El historial sale de los documentos guardados y de sus fechas. Un estado o un plazo que se cambió no tiene fecha propia, así que no está en la lista.</p>
+          </section>
+        </div>
+      </article>
+        <div id="job-index">
+        <p class="ws-undo" id="job-undo" role="status" hidden>
+          <span id="job-undo-text"></span>
+          <button type="button" class="btn btn-ghost btn-sm" id="job-undo-go">Deshacer</button>
+        </p>
+
+        <h2>Encargos en marcha</h2>
+        <p class="muted">Los nuevos y los empezados. El cliente, el proyecto y la fecha se ponen dentro del encargo.</p>
+        <form id="job-form" class="inline-form">
+          <input id="job-name" type="text" maxlength="120" placeholder="Nombre del encargo" required aria-label="Nombre del encargo">
+          <select id="job-client" aria-label="Cliente"></select>
+          <input id="job-new-due" type="date" aria-label="Fecha">
+          <button type="submit" class="btn btn-primary btn-sm">Añadir</button>
+        </form>
+        <ul id="job-list" class="data-list"></ul>
+
+        <details id="job-closed" class="ws-archive" hidden>
+          <summary id="job-closed-summary">Cerrados</summary>
+          <p class="muted">Encargos terminados y cancelados. No se pierde nada: puedes volver a abrirlos.</p>
+          <ul id="job-closed-list" class="data-list"></ul>
+        </details>
+      </div>
+      </div>
+
+      <p class="ws-links">
+        <a class="btn btn-ghost" href="/es/clientes/">Clientes</a>
+        <a class="btn btn-ghost" href="/es/proyectos/">Proyectos y estancias</a>
+        <a class="btn btn-ghost" href="/es/presupuestos-pro/">Presupuestos</a>
+        <a class="btn btn-ghost" href="/es/plazos/">Plazos</a>
+      </p>
+      <p class="muted src-note">Los encargos forman parte de la cuenta LiczMat. Sin sesión se quedan en este navegador; con sesión están también en la app de Android.</p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">La misma fórmula en la app</b> LiczMat para Android usa el mismo motor sin conexión, con el catálogo de materiales y los resultados guardados en un proyecto.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Descargar</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Calculadora de materiales de construcción. Calcula. Planifica. Construye.</p>
+      </div>
+      <div>
+        <h2>Producto</h2>
+        <ul>
+          <li><a href="/es/calculadoras/">Todas las calculadoras</a></li>
+          <li><a href="/es/conversor-de-unidades/">Conversor de unidades</a></li>
+          <li><a href="/es/materiales/">Materiales</a></li>
+          <li data-nav-level="liczmat"><a href="/es/mis-materiales/">Mis materiales</a></li>
+          <li data-nav-level="liczmat"><a href="/es/proyectos/">Proyectos</a></li>
+          <li><a href="/es/presupuesto/">Presupuesto</a></li>
+          <li><a href="/es/guias/">Guías</a></li>
+          <li><a href="/es/tiendas/">Tiendas</a></li>
+          <li><a href="/es/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/es/clientes/">Clientes</a></li>
+          <li data-nav-level="pro"><a href="/es/encargos/">Encargos</a></li>
+          <li data-nav-level="pro"><a href="/es/presupuestos-pro/">Presupuestos</a></li>
+          <li data-nav-level="pro"><a href="/es/plazos/">Plazos</a></li>
+          <li><a href="/es/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Cuenta</h2>
+        <ul>
+          <li><a href="/es/app-android/">La app</a></li>
+          <li><a href="/app/" rel="nofollow">Mi cuenta</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Panel</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Política de privacidad</a></li>
+          <li><a href="/es/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Idioma">
+      <h2>Idioma</h2>
+      <ul>
+        <li><a href="/zlecenia/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/zamovlennya/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/auftraege/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/jobs/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/zakazky/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/zakazky/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/comenzi/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/nalozi/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/nalozi/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/commesse/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/opdrachten/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/encargos/" hreflang="es" lang="es" data-lang="es" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/chantiers/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Todos los derechos reservados.</span>
+      <span>Los resultados son estimaciones. Compruébalos siempre antes de comprar.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Usamos Google Analytics para contar el tráfico anónimo del sitio y cuánta gente pasa a Google Play. ¿Estás de acuerdo?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Más en la política de privacidad</a>
+    <a class="consent-more" href="/es/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Rechazar</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Acepto</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/zlecenia/",
+  "uk": "/uk/zamovlennya/",
+  "de": "/de/auftraege/",
+  "en": "/en/jobs/",
+  "cs": "/cs/zakazky/",
+  "sk": "/sk/zakazky/",
+  "ro": "/ro/comenzi/",
+  "hr": "/hr/nalozi/",
+  "sr": "/sr/nalozi/",
+  "it": "/it/commesse/",
+  "nl": "/nl/opdrachten/",
+  "es": "/es/encargos/",
+  "fr": "/fr/chantiers/"
+};</script>
+
+<script src="/assets/i18n.es.js?v=20260902a"></script>
+<script src="/assets/i18n-runtime.js?v=20260902a"></script>
+<script src="/assets/currency.js?v=20260902a"></script>
+<script src="/assets/account.js?v=20260902a"></script>
+
+<script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
+<script src="/assets/crm-store.js?v=20260902a"></script>
+<script src="/assets/crm.js?v=20260902a"></script>
+<script src="/assets/crm-chain.js?v=20260902a"></script>
+<script src="/assets/jobs-ui.js?v=20260902a"></script>
+<script src="/assets/main.js?v=20260902a"></script>
+
+</body>
+</html>

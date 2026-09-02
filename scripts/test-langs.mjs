@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * LiczMat — the ten languages, and what every picker on the site calls them.
+ * LiczMat — the thirteen languages, and what every picker on the site calls them.
  *
  *     node scripts/test-langs.mjs
  *
@@ -11,7 +11,7 @@
  * src/flags.mjs was typed by hand and still named four. The generator writes that second
  * copy straight into the markup, so 370 of the 375 shipped pages said the word
  * "undefined" beside six flags — once in the header menu, once again in the footer — in
- * every one of the ten languages. Nothing looked broken to the build: every key was
+ * every one of the languages. Nothing looked broken to the build: every key was
  * present, every URL resolved, every test passed.
  *
  * So this file measures the one property none of the other suites owned: that a language
@@ -148,7 +148,7 @@ check("the build refuses to generate a page for a language with no name",
 head("§2 the name is the language's own, and never a country's");
 
 // The owner's decision, 2026-08-21. Each of these is the country a picker would name if
-// it named countries — several of them belong to more than one of the ten languages, and
+// it named countries — several of them belong to more than one of the languages, and
 // none of them is a language.
 const COUNTRY = [
   "Polska", "Poland", "Україна", "Ukraine", "Deutschland", "Germany", "Österreich",
@@ -165,7 +165,8 @@ checkAll("no label is the name of a country", LANGS,
 // language the page is currently in, so each name has to be written in its own language.
 const OWN_NAME = {
   pl: "Polski", uk: "Українська", de: "Deutsch", en: "English", cs: "Čeština",
-  sk: "Slovenčina", ro: "Română", hr: "Hrvatski", sr: "Srpski", ru: "Русский",
+  sk: "Slovenčina", ro: "Română", hr: "Hrvatski", sr: "Srpski",
+  it: "Italiano", nl: "Nederlands", es: "Español", fr: "Français",
 };
 checkAll("each language is called what it calls itself", LANGS,
   (l) => LANG_NAME[l] === OWN_NAME[l],
@@ -177,7 +178,7 @@ check("and no two languages share a name",
 
 // A Cyrillic language written in Latin letters is a transliteration, which is a fifth
 // thing to keep in step with nothing to check it against.
-checkAll("the three Cyrillic names are written in Cyrillic", ["uk", "ru"],
+checkAll("the Cyrillic name is written in Cyrillic", ["uk"],
   (l) => /[Ѐ-ӿ]/.test(LANG_NAME[l]), (l) => `${l} → ${LANG_NAME[l]}`);
 
 /* ------------------------------------------------------------------ §3 the pages */
@@ -257,7 +258,7 @@ for (const lang of LANGS) {
   const file = `assets/i18n.${lang}.js`;
   const src = read(file);
   const meta = new Function(`${src}\nreturn LANGS;`)();
-  check(`${file} carries all ten languages with the same names`,
+  check(`${file} carries all ${LANGS.length} languages with the same names`,
     meta.length === LANGS.length
       && meta.every((m, i) => m.code === LANGS[i] && m.label === LANG_NAME[LANGS[i]]),
     meta.map((m) => `${m.code}=${m.label}`).join(" "));
@@ -298,5 +299,5 @@ if (failures.length) {
   console.error(`\n${passed} passed, ${failures.length} failed.\n`);
   process.exit(1);
 }
-console.log(`OK — ${passed} checks: ten languages, ${WITH_PICKER.length} pages with a picker, ` +
+console.log(`OK — ${passed} checks: ${LANGS.length} languages, ${WITH_PICKER.length} pages with a picker, ` +
   `${LANGS.length} dictionary bundles.`);

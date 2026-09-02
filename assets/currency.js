@@ -16,19 +16,30 @@
  */
 
 /**
- * The nine currencies LiczMat counts in — the same nine here and on the phone, which is
+ * The eight currencies LiczMat counts in — the same eight here and on the phone, which is
  * what session 61 was for (audit D1/D2, the owner's decision of 2026-08-31: the app came
  * down from twenty-six, GBP and RUB came up to meet it).
  *
+ * **RUB left on 2026-09-02**, with the Russian language, by the owner's decision. It is
+ * the one removal in this list that can be read by somebody who already used it, so it is
+ * worth being exact about what it does and does not do: a stored amount keeps the
+ * `currencyCode` it was saved with and is still displayed in it (`lmMoney()` honours an
+ * explicit code even when it is not one of the eight), and no number moves. What changes
+ * is that RUB can no longer be *picked* in the header selector.
+ *
+ * Italian, Dutch, Spanish and French arrived in the same change and needed no currency at
+ * all: Italy, the Netherlands, Spain and France are all on the euro, and EUR has been on
+ * this list since the site shipped.
+ *
  * **Counting in a currency and being SOLD in one are two different lists.** This is the
- * first; `LM_PAY.currencies` in assets/pay.js is the second, and it is shorter — GBP and
- * RUB have no amount there, deliberately, and that file says why. A currency with no
- * amount shows no price rather than a derived one.
+ * first; `LM_PAY.currencies` in assets/pay.js is the second, and it is shorter — GBP has
+ * no amount there, deliberately, and that file says why. A currency with no amount shows
+ * no price rather than a derived one.
  *
  * Adding a currency converts nothing. Every amount already stored keeps the
  * `currencyCode` it was saved with, and no existing number moves — see the header.
  */
-const LM_CURRENCIES = ["PLN", "EUR", "USD", "GBP", "UAH", "CZK", "RON", "RSD", "RUB"];
+const LM_CURRENCIES = ["PLN", "EUR", "USD", "GBP", "UAH", "CZK", "RON", "RSD"];
 
 const LM_CURRENCY_KEY = "liczmat-currency";
 
@@ -37,20 +48,21 @@ const LM_CURRENCY_KEY = "liczmat-currency";
  * chapter VI is explicit that the two are independent (Deutsch + PLN is valid).
  *
  * Croatia is on the euro since 2023, so `hr` starts in EUR rather than in a kuna that no
- * longer exists. **`ru` starts in RUB since session 61**, which is what the phone has always
- * done. It started in EUR here because the rouble buys no subscription — true, and still
- * true, but that is an argument about the *price*, not about the currency somebody counts a
- * floor in, which is what this table is. The Pro page quotes no price in RUB and says so.
+ * longer exists. Italy, the Netherlands, Spain and France are on it too, so the four
+ * languages added on 2026-09-02 all start in EUR — which is why that change added a
+ * language and no currency.
  */
 const LM_LANG_CURRENCY = {
   pl: "PLN", uk: "UAH", de: "EUR", en: "USD",
-  cs: "CZK", sk: "EUR", ro: "RON", hr: "EUR", sr: "RSD", ru: "RUB",
+  cs: "CZK", sk: "EUR", ro: "RON", hr: "EUR", sr: "RSD",
+  it: "EUR", nl: "EUR", es: "EUR", fr: "EUR",
 };
 
 /** Number formatting stays with the language: 1 234,56 in Polish, 1,234.56 in English. */
 const LM_LOCALE = {
   pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US", cs: "cs-CZ",
-  sk: "sk-SK", ro: "ro-RO", hr: "hr-HR", sr: "sr-RS", ru: "ru-RU",
+  sk: "sk-SK", ro: "ro-RO", hr: "hr-HR", sr: "sr-RS",
+  it: "it-IT", nl: "nl-NL", es: "es-ES", fr: "fr-FR",
 };
 
 /** The language this page is written in. */
@@ -83,9 +95,10 @@ function lmSetCurrency(code) {
 /**
  * An amount in major units ("12.5") as money, in the page's language and the currency.
  *
- * An explicit code wins even when it is not one of the seven: a line saved in HUF while
- * the site still offered Hungarian is displayed in HUF, because that is the currency its
- * price was typed in. Only an amount with no currency of its own gets the visitor's.
+ * An explicit code wins even when it is not one of the eight: a line saved in RUB before
+ * 2026-09-02, or in HUF while the site still offered Hungarian, is displayed in the code
+ * it was priced in, because that is the currency the amount was typed in. Only an amount
+ * with no currency of its own gets the visitor's.
  */
 function lmMoney(major, code, digits) {
   const amount = Number(major) || 0;

@@ -32,17 +32,21 @@ const PLURAL_UNITS = new Set([
  * gets real sentences wrong — this is not tidiness, it is "22 položky" being incorrect
  * Czech for something Polish spells "22 pozycje".
  *
- *   LAST_DIGIT  pl, uk, ru, hr, sr — "few" for a number ENDING in 2–4 (but not 12–14),
+ *   LAST_DIGIT  pl, uk, hr, sr — "few" for a number ENDING in 2–4 (but not 12–14),
  *               so 22 is few and 25 is many.
  *   SMALL_FEW   cs, sk — "few" for exactly 2, 3 and 4. Czech and Slovak do NOT repeat it
  *               at 22: that is "22 položek", the same form as 25.
  *   ROMANCE_FEW ro — Romanian's "few" covers 2–19 and everything ending 01–19 above that;
  *               20 and 21 take the other form ("20 de saci").
  *
- * Everything else (de, en) has one and other, which is what falling through to "many"
- * already gives.
+ * Everything else (de, en, and the four added on 2026-09-02 — it, nl, es, fr) has one and
+ * other, which is what falling through to "many" already gives. Romanian is the exception
+ * among the Romance languages here and Italian, Spanish and French are not: "20 de saci"
+ * is Romanian's own rule, and "20 sacchi", "20 sacos", "20 sacs" take the plain plural.
+ *
+ * `ru` left the first family on 2026-09-02 with the language itself.
  */
-const LAST_DIGIT_PLURAL = new Set(["pl", "uk", "ru", "hr", "sr"]);
+const LAST_DIGIT_PLURAL = new Set(["pl", "uk", "hr", "sr"]);
 const SMALL_FEW_PLURAL = new Set(["cs", "sk"]);
 const ROMANCE_FEW_PLURAL = new Set(["ro"]);
 

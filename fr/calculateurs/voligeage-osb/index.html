@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Calculateur OSB : combien de panneaux | LiczMat</title>
+<meta name="description" content="La surface, le format du panneau et une marge donnent le nombre de panneaux OSB ou de planches entiers pour un mur ou une toiture.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/fr/calculateurs/voligeage-osb/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/kalkulatory/poszycie-osb/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kalkulyatory/obshyvka-osb/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/rechner/beplankung-osb/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/calculators/sheathing-osb/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/kalkulacky/zaklop-osb/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/kalkulacky/zaklop-osb/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/calculatoare/astereala-osb/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/kalkulatori/oplata-osb/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/kalkulatori/oplata-osb/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/calcolatori/rivestimento-osb/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/rekenmachines/beplating-osb/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/calculadoras/entablado-osb/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/calculateurs/voligeage-osb/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/poszycie-osb/">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:title" content="Calculateur OSB : combien de panneaux | LiczMat">
+<meta property="og:description" content="La surface, le format du panneau et une marge donnent le nombre de panneaux OSB ou de planches entiers pour un mur ou une toiture.">
+<meta property="og:url" content="https://liczmat.com/fr/calculateurs/voligeage-osb/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Calculateur OSB : combien de panneaux | LiczMat">
+<meta name="twitter:description" content="La surface, le format du panneau et une marge donnent le nombre de panneaux OSB ou de planches entiers pour un mur ou une toiture.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Accueil",
+      "item": "https://liczmat.com/fr/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Calculateurs de construction en ligne",
+      "item": "https://liczmat.com/fr/calculateurs/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Voligeage (OSB/planches)",
+      "item": "https://liczmat.com/fr/calculateurs/voligeage-osb/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Voligeage (OSB/planches)",
+  "description": "Combien de panneaux pour couvrir.",
+  "url": "https://liczmat.com/fr/calculateurs/voligeage-osb/",
+  "applicationCategory": "UtilitiesApplication",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "fr",
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "https://liczmat.com/#website",
+    "name": "LiczMat",
+    "url": "https://liczmat.com/"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Combien de panneaux OSB au m² de voligeage ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le calculateur divise la surface plus la marge par la surface d'un panneau et arrondit au panneau entier supérieur."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Le résultat contient-il un plan de coupe ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non, c'est le nombre de panneaux entiers sans plan de coupe. Pour voir comment les couper, utilise le calculateur de découpe de panneaux 2D."
+      }
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/fr/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Navigation principale">
+      <ul class="nav-list">
+        <li><a href="/fr/calculateurs/" aria-current="page">Calculateurs</a></li>
+        <li><a href="/fr/materiaux/">Matériaux</a></li>
+        <li data-nav-level="liczmat"><a href="/fr/projets/">Projets</a></li>
+        <li><a href="/fr/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/fr/application-android/">L'application</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Langue">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span class="lang-btn-name">Français</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/kalkulatory/poszycie-osb/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/kalkulyatory/obshyvka-osb/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/rechner/beplankung-osb/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/calculators/sheathing-osb/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/kalkulacky/zaklop-osb/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/kalkulacky/zaklop-osb/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/calculatoare/astereala-osb/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/kalkulatori/oplata-osb/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/kalkulatori/oplata-osb/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><a class="lang-item" href="/it/calcolatori/rivestimento-osb/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+      <li><a class="lang-item" href="/nl/rekenmachines/beplating-osb/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+      <li><a class="lang-item" href="/es/calculadoras/entablado-osb/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></span></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Devise" title="Devise"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mon compte</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Changer de thème" title="Changer de thème"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Ouvrir le menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/fr/">Accueil</a></li><li><a href="/fr/calculateurs/">Calculateurs de construction en ligne</a></li><li aria-current="page">Voligeage (OSB/planches)</li></ol></nav>
+      <h1>Calculateur OSB : combien de panneaux</h1>
+      <p class="lead">La surface, le format du panneau et une marge donnent le nombre de panneaux OSB ou de planches entiers pour un mur ou une toiture.</p>
+    </div>
+  </section>
+
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="sheathing" data-tab="framing">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Tes données</h2>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Choisis un matériau</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-sheathing-area">Surface (m²)</label><input id="f-sheathing-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="30"></div><div class="field"><label for="f-sheathing-pieceW">Largeur du panneau (mm)</label><input id="f-sheathing-pieceW" type="text" inputmode="decimal" data-k="pieceW" data-lk="fld_sheet_w" value="1250"></div><div class="field"><label for="f-sheathing-pieceL">Longueur du panneau (mm)</label><input id="f-sheathing-pieceL" type="text" inputmode="decimal" data-k="pieceL" data-lk="fld_sheet_l" value="2500"></div><div class="field"><label for="f-sheathing-waste">Marge (%)</label><input id="f-sheathing-waste" type="text" inputmode="decimal" data-k="waste" data-lk="fld_waste" value="10"></div><div class="field"><label for="f-sheathing-price">Prix par panneau</label><input id="f-sheathing-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_sheet" value=""></div>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Calculer"
+          data-label-again="Calculer à nouveau">Calculer</button>
+      </div>
+      <div class="calc-out">
+        <h2 id="calc-result-h">Résultat</h2>
+        
+        <div class="result show" data-result role="status">
+          <div class="muted eyebrow">À acheter</div>
+          <div class="big">11 <span class="figure-line">panneaux</span></div>
+          <div class="rows"><div><span>Surface du panneau</span><b>3.13 m²</b></div><div><span>Avec la marge</span><b>33 m²</b></div><div><span>Tu achètes</span><b>34.38 m²</b></div></div>
+        </div>
+        <p class="calc-stale" data-calc-stale hidden>Les données ont changé. Appuie sur « Calculer à nouveau » pour voir le nouveau résultat.</p>
+        <div class="calc-actions" data-calc-actions data-projects-url="/fr/projets/"></div>
+      </div>
+    </div>
+      <p class="muted src-note"><a href="/fr/materiaux/">Catalogue des matériaux de construction</a> — 34 matériaux au catalogue</p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">Comment nous le calculons</h2>
+
+      <div class="calc-how-grid">
+        <div>
+          <h3>Ce que tu saisis</h3>
+          <ul class="plain-list"><li><b>Surface (m²)</b></li><li><b>Largeur du panneau (mm)</b></li><li><b>Longueur du panneau (mm)</b></li><li><b>Marge (%)</b></li></ul>
+
+          <h3>À quoi faire attention</h3>
+          <p>Le résultat est un nombre de panneaux entiers, sans plan de coupe. Si tu veux savoir comment les couper, utilise le calculateur de découpe de panneaux 2D.</p>
+        </div>
+        <div>
+          <h3>Formule</h3>
+          <pre class="formula"><code>pole arkusza = (Largeur du panneau ÷ 1000) × (Longueur du panneau ÷ 1000)
+z zapasem = Surface × (1 + Marge ÷ 100)
+arkusze = ⌈ z zapasem ÷ pole arkusza ⌉</code></pre>
+          <p class="muted src-note">Le moteur du site est une copie 1:1 du code de l'application Android.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Questions fréquentes</h2>
+      <div class="faq">
+        <details open><summary>Combien de panneaux OSB au m² de voligeage ?</summary><p>Le calculateur divise la surface plus la marge par la surface d'un panneau et arrondit au panneau entier supérieur.</p></details>
+        <details><summary>Le résultat contient-il un plan de coupe ?</summary><p>Non, c'est le nombre de panneaux entiers sans plan de coupe. Pour voir comment les couper, utilise le calculateur de découpe de panneaux 2D.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2>Autres calculateurs</h2>
+      <div class="chips"><a class="chip" href="/fr/calculateurs/decoupe-de-panneaux-2d/">Découpe de panneaux (2D)</a><a class="chip" href="/fr/calculateurs/decoupe-lineaire-1d/">Découpe linéaire (1D)</a><a class="chip" href="/fr/calculateurs/cloison-placo/">Cloison en placo</a></div>
+      <h2 class="mt-8">Guides qui utilisent ce calculateur</h2>
+      <div class="chips"><a class="chip" href="/fr/guides/cloison-placo-rails-et-plaques/">Cloison en placo : montants et plaques</a></div>
+      <p class="mt-6">
+        <a class="btn btn-ghost" href="/fr/calculateurs/">Tous les calculateurs</a>
+        <a class="btn btn-ghost" href="/fr/guides/">Tous les guides</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">La même formule dans l'application</b> LiczMat pour Android utilise le même moteur hors ligne, avec le catalogue de matériaux et les résultats enregistrés dans un projet.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Télécharger</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Calculateur de matériaux de construction. Calcule. Planifie. Réalise.</p>
+      </div>
+      <div>
+        <h2>Produit</h2>
+        <ul>
+          <li><a href="/fr/calculateurs/">Tous les calculateurs</a></li>
+          <li><a href="/fr/convertisseur-d-unites/">Convertisseur d'unités</a></li>
+          <li><a href="/fr/materiaux/">Matériaux</a></li>
+          <li data-nav-level="liczmat"><a href="/fr/mes-materiaux/">Mes matériaux</a></li>
+          <li data-nav-level="liczmat"><a href="/fr/projets/">Projets</a></li>
+          <li><a href="/fr/devis/">Devis</a></li>
+          <li><a href="/fr/guides/">Guides</a></li>
+          <li><a href="/fr/magasins/">Magasins</a></li>
+          <li><a href="/fr/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/fr/clients/">Clients</a></li>
+          <li data-nav-level="pro"><a href="/fr/chantiers/">Chantiers</a></li>
+          <li data-nav-level="pro"><a href="/fr/devis-pro/">Devis Pro</a></li>
+          <li data-nav-level="pro"><a href="/fr/echeances/">Échéances</a></li>
+          <li><a href="/fr/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Compte</h2>
+        <ul>
+          <li><a href="/fr/application-android/">L'application</a></li>
+          <li><a href="/app/" rel="nofollow">Mon compte</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Tableau de bord</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Mentions légales</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Politique de confidentialité</a></li>
+          <li><a href="/fr/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Langue">
+      <h2>Langue</h2>
+      <ul>
+        <li><a href="/kalkulatory/poszycie-osb/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/kalkulyatory/obshyvka-osb/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/rechner/beplankung-osb/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/calculators/sheathing-osb/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/kalkulacky/zaklop-osb/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/kalkulacky/zaklop-osb/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/calculatoare/astereala-osb/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/kalkulatori/oplata-osb/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/kalkulatori/oplata-osb/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/calcolatori/rivestimento-osb/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/rekenmachines/beplating-osb/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/calculadoras/entablado-osb/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/calculateurs/voligeage-osb/" hreflang="fr" lang="fr" data-lang="fr" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Tous droits réservés.</span>
+      <span>Les résultats sont des estimations. Vérifie-les toujours avant d'acheter.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Nous utilisons Google Analytics pour compter le trafic anonyme du site et le nombre de personnes qui passent sur Google Play. Tu es d'accord ?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Plus dans la politique de confidentialité</a>
+    <a class="consent-more" href="/fr/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Refuser</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">J'accepte</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/kalkulatory/poszycie-osb/",
+  "uk": "/uk/kalkulyatory/obshyvka-osb/",
+  "de": "/de/rechner/beplankung-osb/",
+  "en": "/en/calculators/sheathing-osb/",
+  "cs": "/cs/kalkulacky/zaklop-osb/",
+  "sk": "/sk/kalkulacky/zaklop-osb/",
+  "ro": "/ro/calculatoare/astereala-osb/",
+  "hr": "/hr/kalkulatori/oplata-osb/",
+  "sr": "/sr/kalkulatori/oplata-osb/",
+  "it": "/it/calcolatori/rivestimento-osb/",
+  "nl": "/nl/rekenmachines/beplating-osb/",
+  "es": "/es/calculadoras/entablado-osb/",
+  "fr": "/fr/calculateurs/voligeage-osb/"
+};</script>
+
+<script src="/assets/i18n.fr.js?v=20260902a"></script>
+<script src="/assets/i18n-runtime.js?v=20260902a"></script>
+<script src="/assets/currency.js?v=20260902a"></script>
+<script src="/assets/account.js?v=20260902a"></script>
+
+<script src="/assets/units.js?v=20260902a"></script>
+<script src="/assets/own-materials.js?v=20260902a"></script>
+<script src="/assets/calculators.js?v=20260902a"></script>
+<script src="/assets/materials.js?v=20260902a"></script>
+<script src="/assets/materials-ui.js?v=20260902a"></script>
+<script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/workspace-calc.js?v=20260902a"></script>
+<script src="/assets/recent.js?v=20260902a"></script>
+<script src="/assets/main.js?v=20260902a"></script>
+
+</body>
+</html>

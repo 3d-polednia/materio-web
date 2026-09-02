@@ -385,18 +385,24 @@ head("7. the copy, in four languages");
     uk: ["1 позиція", "2 позиції", "5 позицій", "12 позицій", "22 позиції"],
     de: ["1 Zeile", "2 Zeilen", "5 Zeilen", "12 Zeilen", "22 Zeilen"],
     en: ["1 line", "2 lines", "5 lines", "12 lines", "22 lines"],
-    /* The six languages brought back after session 28. Three different plural rules run
-       through this table, which is the whole reason it is written out by hand:
-       - hr, sr and ru follow the Polish rule, so 22 takes the "few" form;
+    /* The five languages brought back after session 28 that are still here, and the four
+       added on 2026-09-02. Four different plural rules run through this table, which is
+       the whole reason it is written out by hand:
+       - hr and sr follow the Polish rule, so 22 takes the "few" form;
        - cs and sk give "few" to 2, 3 and 4 only, so 22 reads like 25 — writing
          "22 položky" here would be the bug this row exists to catch;
-       - ro keeps "few" all the way to 19 and past it (101), and switches at 20. */
+       - ro keeps "few" all the way to 19 and past it (101), and switches at 20;
+       - it, nl, es and fr have one and other, like de and en, so every row but the
+         first is the same word. Romanian is the odd Romance language here, not the rule. */
     cs: ["1 položka", "2 položky", "5 položek", "12 položek", "22 položek"],
     sk: ["1 položka", "2 položky", "5 položiek", "12 položiek", "22 položiek"],
     ro: ["1 poziție", "2 poziții", "5 poziții", "12 poziții", "22 poziții"],
     hr: ["1 stavka", "2 stavke", "5 stavki", "12 stavki", "22 stavke"],
     sr: ["1 stavka", "2 stavke", "5 stavki", "12 stavki", "22 stavke"],
-    ru: ["1 позиция", "2 позиции", "5 позиций", "12 позиций", "22 позиции"],
+    it: ["1 voce", "2 voci", "5 voci", "12 voci", "22 voci"],
+    nl: ["1 regel", "2 regels", "5 regels", "12 regels", "22 regels"],
+    es: ["1 partida", "2 partidas", "5 partidas", "12 partidas", "22 partidas"],
+    fr: ["1 ligne", "2 lignes", "5 lignes", "12 lignes", "22 lignes"],
   };
   for (const lang of LANGS) {
     [1, 2, 5, 12, 22].forEach((n, i) => {

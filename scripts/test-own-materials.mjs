@@ -23,7 +23,7 @@
  *   6. the catalogue shape, which is what lets an own material fill a calculator through
  *      the machinery a bundled one already uses;
  *   7. the sync — export, import, last-write-wins, and the history that travels whole;
- *   8. the route and the ten slugs;
+ *   8. the route and the thirteen slugs;
  *   9. the frame the build writes, and the copy in ten languages;
  *  10. the net session 41 and session 57 both needed: no `omat_*` key printed on a page.
  *
@@ -465,7 +465,7 @@ head("7b. /app/ pushes and pulls this collection");
 
 /* ================================================================== 8. the route */
 
-head("8. the route and the ten slugs");
+head("8. the route and the thirteen slugs");
 {
   const r = route("own-materials");
   check("the route exists", Boolean(r));
@@ -478,12 +478,12 @@ head("8. the route and the ten slugs");
     Boolean(r.footer) && !r.header);
 
   const slugs = LANGS.map((l) => SECTION.ownMaterials[l]);
-  eq("ten slugs", slugs.filter(Boolean).length, 10);
+  eq("thirteen slugs", slugs.filter(Boolean).length, LANGS.length);
   check("every one is lower-case ASCII", slugs.every((s) => /^[a-z0-9-]+$/.test(s)), slugs.join(","));
   // Two languages MAY share a segment — /materialy/ is "materialy" in four of them — and
   // they still get ten addresses, because every language but the default carries its own
   // prefix. What must be unique is the URL.
-  eq("ten distinct addresses", new Set(LANGS.map(urlOwnMaterials)).size, 10);
+  eq("thirteen distinct addresses", new Set(LANGS.map(urlOwnMaterials)).size, LANGS.length);
   // Two sections may not claim one word: /materialy/ is the bundled catalogue and this is
   // not it, so no language may spell them the same.
   for (const lang of LANGS) {

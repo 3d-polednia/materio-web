@@ -47,6 +47,7 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { LEVEL, route } from "../src/ia.mjs";
+import { LANGS } from "../src/site.mjs";
 import { COOKIE_ROWS } from "../src/pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -613,12 +614,12 @@ head("11. izolacja danych: the way to empty a shared device");
   check("and the warning it is the answer to",
     read("app/index.html").includes('id="app-sync-foreign"'));
 
-  // The copy exists in all ten languages, or somebody is offered a key to click.
+  // The copy exists in all thirteen languages, or somebody is offered a key to click.
   const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
   const KEYS = ["app_wipe", "app_wipe_d", "app_wipe_btn", "app_wipe_confirm", "app_wipe_done",
     "app_sync_foreign", "ck_p_sync_account"];
   const codes = Object.keys(I18N_PAGES);
-  eq("ten languages", codes.length, 10);
+  eq("thirteen languages", codes.length, LANGS.length);
   for (const lang of codes) {
     for (const key of KEYS) {
       const value = I18N_PAGES[lang][key];

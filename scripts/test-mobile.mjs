@@ -366,11 +366,13 @@ head("1. the tightest width, in every language");
 
 head("2. the six widths, phone to desktop");
 {
-  // Polish is the language the site is written in and Russian is the widest of the ten;
-  // between them they bracket what the layout has to survive.
+  // Polish is the language the site is written in and Ukrainian is the widest of the
+  // thirteen; between them they bracket what the layout has to survive. It was Russian until
+  // 2026-09-02, when that language left — measured again rather than guessed: at 1280 px the
+  // header nav is 804 px in Ukrainian, 791 in Dutch and 720 in Polish.
   for (const width of [320, 375, 390, 430, 768, 1280]) {
     const ctx = await context(width, width >= 768 ? 900 : 780);
-    for (const lang of ["pl", "ru"]) {
+    for (const lang of ["pl", "uk"]) {
       for (const url of [urlHome(lang), urlCalcIndex(lang), urlCalc(lang, "waste"),
         urlConverter(lang), urlMaterials(lang), urlEstimate(lang), urlLiczmatPro(lang)]) {
         const page = await open(ctx, url, { lang });

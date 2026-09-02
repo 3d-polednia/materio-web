@@ -98,7 +98,10 @@ const seoOf = (page) => CALC_SEO[page.id][page.lang];
  */
 const TOOL_WORD = {
   pl: "kalkulator", uk: "калькулятор", de: "rechner", en: "calculator", cs: "kalkulačka",
-  sk: "kalkulačka", ro: "calculator", hr: "kalkulator", sr: "kalkulator", ru: "калькулятор",
+  sk: "kalkulačka", ro: "calculator", hr: "kalkulator", sr: "kalkulator",
+  // Dutch builds the compound the way German does ("verfrekenmachine"), and the verb is
+  // what somebody actually types ("verf berekenen"), so the stem covers both.
+  it: "calcolatore", nl: "reken", es: "calculadora", fr: "calculateur",
 };
 
 const countOf = (haystack, needle) => haystack.toLowerCase().split(needle).length - 1;

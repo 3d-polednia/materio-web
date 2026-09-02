@@ -81,10 +81,10 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now 393 pages: a home page, a calculator
+The site used to be one `index.html`. It is now 510 pages: a home page, a calculator
 hub, one page per calculator, a unit converter, guides, a store finder, the visitor's own materials and the public page
 for LiczMat Pro —
-each in all ten languages, at its own URL, so search engines can index more than the
+each in all thirteen languages, at its own URL, so search engines can index more than the
 Polish front page. Writing that by
 hand is not possible; a generator writes it from one template plus the dictionary.
 
@@ -122,7 +122,7 @@ node scripts/test-a11y.mjs        # names, headings, landmarks, live regions —
 node scripts/test-a11y-page.mjs   # focus, the keyboard, both themes — in Chromium
 node scripts/test-security.mjs    # authorization, data isolation, the API, the levels
 node scripts/test-qa.mjs          # the whole path, end to end, in a real browser
-node scripts/test-langs.mjs       # the ten languages and what every picker calls them
+node scripts/test-langs.mjs       # the thirteen languages and what every picker calls them
 node scripts/test-copy.mjs        # stop slop: length, repetition, claims, the page budget
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
@@ -141,9 +141,9 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 |---|---|
 | `assets/i18n.js` — the original dictionary | `index.html`, `<lang>/index.html` |
 | `assets/i18n-pages.js` — keys only sub-pages use | `kalkulatory/**`, `konwerter-jednostek/**`, `poradniki/**`, `sklepy/**`, `materialy/**`, `liczmat-pro/**` and their per-language twins |
-| `assets/i18n-materials.js` — material names, ten languages | `app/index.html`, `p/index.html` |
+| `assets/i18n-materials.js` — material names, thirteen languages | `app/index.html`, `p/index.html` |
 | `assets/calculators.js` — engines, ported 1:1 from Kotlin, and `assets/units.js` next to it, and `assets/converter.js` beside them | `assets/i18n.<lang>.js` — one per language, and the only kind there is since session 33 |
-| `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `assets/flags.js` — the ten flags, for the three pages that build their own picker |
+| `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `assets/flags.js` — the thirteen flags, for the three pages that build their own picker |
 | `assets/styles.css` — **authored**; the build emits `assets/styles.min.css` from it, and that is what every page links | `assets/styles.min.css` — the same rules with the commentary stripped |
 | `assets/main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | `sitemap.xml` |
 | `assets/flags/<lang>.svg` — the picker's flags | |
@@ -174,21 +174,21 @@ src/site.mjs          Languages, URL slugs per section/calculator/guide — the 
 src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
 src/pages.mjs         The <main> of each page type
 src/calc-meta.mjs     Per-calculator formula lines + their translations
-src/omat-copy.mjs     The words on /moje-materialy/, ten languages. Build-time only, for
+src/omat-copy.mjs     The words on /moje-materialy/, thirteen languages. Build-time only, for
                       the reason src/conv-copy.mjs is. `omatpage_title` is the one key that
-                      stayed in the dictionary — it is the footer's label on all 393 pages
-src/pdf-copy.mjs      The words on the PDF export, ten languages, and EVERY ONE of them is
+                      stayed in the dictionary — it is the footer's label on all 510 pages
+src/pdf-copy.mjs      The words on the PDF export, thirteen languages, and EVERY ONE of them is
                       the app's own: the `pdf_*` keys of PdfConfigScreen and the `pdfdoc_*`
                       keys of AndroidProjectPdfExporter, copied out of the app repo rather
                       than translated. Build-time only, and there is no runtime half at all
                       — the whole document is server-rendered and the browser fills numbers
-src/conv-copy.mjs     The words on the converter page, ten languages. Build-time only,
+src/conv-copy.mjs     The words on the converter page, thirteen languages. Build-time only,
                       for the reason src/calc-seo.mjs is: every page on the site downloads
                       assets/i18n.<lang>.js. The title and the eleven category names are
                       the app's own strings — one module, one name on the two products.
                       `convpage_title` is the one key that stayed in the dictionary,
                       because the footer link's label comes from the route
-src/calc-seo.mjs      Per-calculator SEO copy, ten languages: the <title> stem (which is
+src/calc-seo.mjs      Per-calculator SEO copy, thirteen languages: the <title> stem (which is
                       also the H1), the meta description (which is also the paragraph
                       under it) and two questions with their answers. Build-time only —
                       it is deliberately NOT a dictionary, because every page on the site
@@ -209,14 +209,14 @@ scripts/test-converter.mjs  The unit converter (session 57, item C1 of the parit
                       and would answer "0 °C is 0 °F" without its own branch; what the
                       engine refuses, and that it refuses with `null` rather than with a
                       zero; convFormat(), where a whole number stays whole and the language
-                      writes it; the route and the ten slugs; the ten pages read back; and
+                      writes it; the route and the thirteen slugs; the thirteen pages read back; and
                       the net that caught this session's own defect — a dictionary key
                       printed on a page, anywhere on the site. Dependency-free
 scripts/test-converter-page.mjs  The same tool clicked in Chromium, nothing stubbed:
                       converting as you type, a comma and a point, all eleven categories
                       picked with both unit lists rebuilt under them, the swap, the empty
                       field that says so instead of showing a zero, the live region that
-                      is NOT written on load, ten languages with their own grouping of
+                      is NOT written on load, thirteen languages with their own grouping of
                       digits, the widths of chapter XXVIII and the no-JavaScript variant
 scripts/test-calculators.mjs  The 15 engines: the maths against the formula each one
                       documents, the inputs, the units, the boundary values, every
@@ -228,7 +228,7 @@ scripts/test-pages.mjs  The same calculators in Chromium: 360/414/768/1280 px, t
                       header of the file
 scripts/test-account.mjs  The account system: which of the three levels a visitor is on,
                       what the other 129 pages are told about the session, where a
-                      ?next= link may point, the copy in ten languages — and, since
+                      ?next= link may point, the copy in thirteen languages — and, since
                       session 42, what it takes for /app/ to say "Brak sieci" truthfully:
                       the listener that asks for the metadata, the redraw gated on a real
                       document change, the notice's own element, and the delay, which is
@@ -246,18 +246,18 @@ scripts/test-account-page.mjs  /app/ in Chromium with the Firebase SDK stubbed: 
                       Same outside-the-repo Playwright as test-pages.mjs
 scripts/test-dashboard.mjs  The dashboard: the route, the "recently used tools" store,
                       the frame the build writes, the addresses it hands the page and the
-                      copy in ten languages. Dependency-free — run it after touching
+                      copy in thirteen languages. Dependency-free — run it after touching
                       assets/recent.js, assets/dashboard.js, dashboardMain() or a dash_* key
 scripts/test-projects.mjs  Projects: the `project` view declared in src/ia.mjs (and the
                       eight ways a view can lie, each broken on purpose), the four writes
                       in assets/workspace.js — create, read, rename, archive, delete —
                       the undo the tombstone makes possible, the frame the build writes
-                      for both screens and the copy in ten languages. Dependency-free —
+                      for both screens and the copy in thirteen languages. Dependency-free —
                       run it after touching assets/workspace.js, projectsMain() or a
                       proj_*/ws_* key
 scripts/test-projects-page.mjs  /projekty/ and /projekty/?id=<id> in Chromium, nothing
                       stubbed: the two screens, the CRUD done by clicking, the archive,
-                      the undo strip, the back button, ten languages, the currency
+                      the undo strip, the back button, thirteen languages, the currency
                       switch, the widths of chapter XXVIII and the no-JavaScript variant
 scripts/test-dashboard-page.mjs  /app/dashboard/ in Chromium, nothing stubbed (the page
                       loads no Firebase): the four lists from a planted localStorage, the
@@ -266,7 +266,7 @@ scripts/test-dashboard-page.mjs  /app/dashboard/ in Chromium, nothing stubbed (t
 scripts/test-save.mjs  Saving a calculation: the snapshot a saved line carries inside
                       `inputJson`, the contract's 20 000-character cap, which project the
                       line lands in, the `data-lk`/`data-ok` keys the build puts on every
-                      field, and the copy in ten languages. Dependency-free — run it
+                      field, and the copy in thirteen languages. Dependency-free — run it
                       after touching assets/workspace.js, the save box in
                       assets/workspace-ui.js, calcCard() or a proj_src_*/ws_saved_in key
 scripts/test-materials.mjs  The material list of a project: the `shoppingItems` document
@@ -281,7 +281,7 @@ scripts/test-materials.mjs  The material list of a project: the `shoppingItems` 
 scripts/test-materials-page.mjs  The same arrow clicked in Chromium, nothing stubbed: a real
                       calculator page, "Dodaj do projektu", and the material on the project
                       screen one navigation later; ticking it off, editing it in place,
-                      typing one in by hand, taking it off, ten languages, the currency
+                      typing one in by hand, taking it off, thirteen languages, the currency
                       switch and the widths of chapter XXVIII
 scripts/test-rooms.mjs  Rooms (session 20, chapter XVIII): the room document against the
                       contract it comes from (RoomEntity, roomToDoc(), the deployed
@@ -297,7 +297,7 @@ scripts/test-rooms-page.mjs  The same in Chromium, nothing stubbed: a room added
                       project and corrected in its own row, a calculator filled from it,
                       the result filed under it from the save box, the same line moved to
                       another room and taken out of all of them, the index naming each
-                      room's project, ten languages, the currency switch, the widths of
+                      room's project, thirteen languages, the currency switch, the widths of
                       chapter XXVIII and the no-JavaScript variant
 scripts/test-plan.mjs  The Free/Pro model and the paywall (sessions 21 and 27, chapters
                       II, XIX and XXV): the two plan values against the sync contract,
@@ -306,7 +306,7 @@ scripts/test-plan.mjs  The Free/Pro model and the paywall (sessions 21 and 27, c
                       feature at every level, the five Pro modules in session order — and
                       session 27's wall: that it stands in front of every PRO feature and
                       no other, the rung lmPaywall() puts each level on, the wall as
-                      proGate() builds it in ten languages, and that nothing in the Pro
+                      proGate() builds it in thirteen languages, and that nothing in the Pro
                       panel offers to take money. Session 28 added the five subscription
                       states and §6c, which plants four hopeful keys in localStorage and
                       checks that not one answer moves. Dependency-free — run
@@ -318,7 +318,7 @@ scripts/test-clients.mjs  Clients (session 22, chapter XX): the client document 
                       project, and the project document byte-for-byte untouched), the
                       derived costs and history, the route, chapter XXV's gate in both of
                       its states — including the one after LM_PRO_LOCKED is flipped — and
-                      the copy in ten languages. Dependency-free — run it after touching
+                      the copy in thirteen languages. Dependency-free — run it after touching
                       assets/crm.js, clientsMain() or a cli_*/clipage_* key
 scripts/test-jobs.mjs  Jobs (session 23, chapter XXI): the job document and chapter XXI's
                       eight fields, the four statuses and the one that is refused, the
@@ -327,14 +327,14 @@ scripts/test-jobs.mjs  Jobs (session 23, chapter XXI): the job document and chap
                       with the project document byte-for-byte untouched — the two amounts
                       (what was agreed, what wsProjectCosts() says it has run to) and the
                       currency rule between them, the route, chapter XXV's gate in both of
-                      its states and the copy in ten languages. Dependency-free — run it
+                      its states and the copy in thirteen languages. Dependency-free — run it
                       after touching the job half of assets/crm.js, jobsMain() or a
                       job_*/jobpage_*/cli_jobs_* key
 scripts/test-jobs-page.mjs  The same clicked through in Chromium, nothing stubbed: a job
                       added with a client and a date, opened, corrected, moved through the
                       statuses, its project attached and detached, deleted with its undo,
                       the client's own page reading the link back, the Pro notice for a
-                      guest and for a Pro account, ten languages, the currency switch, the
+                      guest and for a Pro account, thirteen languages, the currency switch, the
                       widths of chapter XXVIII and the no-JavaScript variant
 scripts/test-quotes.mjs  Quotes (session 24, chapter XXII): the document and the three
                       figures it deliberately does not store, the labour — quantity × rate
@@ -343,7 +343,7 @@ scripts/test-quotes.mjs  Quotes (session 24, chapter XXII): the document and the
                       five figures each traced to one source with the project document held
                       byte-for-byte, chapter VI's currency rule in both directions, chapter
                       XXIV's chain walked backwards from the quote, the route, chapter XXV's
-                      gate in both of its states and the copy in ten languages.
+                      gate in both of its states and the copy in thirteen languages.
                       Dependency-free — run it after touching the quote half of
                       assets/crm.js, quotesMain() or a quo_*/quopage_* key
 scripts/test-calendar.mjs  The terminarz (session 25, chapter XXIII): that the module stores
@@ -355,7 +355,7 @@ scripts/test-calendar.mjs  The terminarz (session 25, chapter XXIII): that the m
                       (yesterday / today / +1 / +7 / +8 / no date), and the closed jobs
                       that are in none of them; crmSchedule()'s order, counts and closed
                       half; the one write, which is crmUpdateJob(); the route, chapter
-                      XXV's gate in both of its states and the copy in ten languages.
+                      XXV's gate in both of its states and the copy in thirteen languages.
                       Dependency-free — run it after touching the terminarz half of
                       assets/crm.js, calendarMain() or a cal_* key
 scripts/test-calendar-page.mjs  The same clicked through in Chromium, nothing stubbed: seven
@@ -376,22 +376,22 @@ scripts/test-crm.mjs   The chain (session 26, chapter XXIV): that the session ad
                       status change that deliberately leaves no trace; the `crm` feature,
                       which is PRO with no route, and chapter XXV's gate in both states;
                       the one `window.LM_LINKS` map that replaced four; and the copy in
-                      ten languages. Dependency-free — run it after touching the chain
+                      thirteen languages. Dependency-free — run it after touching the chain
                       half of assets/crm.js, assets/crm-chain.js or a crm_* key
 scripts/test-propage.mjs  /liczmat-pro/, the public page for LiczMat Pro (session 29,
                       chapter XXXII): the route — GUEST, indexable, one slug in ten
                       languages, no gate — and the three places that point at it; the page
-                      itself in ten languages, including the five modules read out of
+                      itself in thirteen languages, including the five modules read out of
                       LM_FEATURES and the modules it deliberately does not link into; the
                       price, which is in the HTML and is the hand-typed amount for that
                       language's currency rather than a conversion; that nothing on it
-                      offers to take money; and the ten files that actually shipped, with
+                      offers to take money; and the thirteen files that actually shipped, with
                       their canonical, their hreflang and their place in sitemap.xml.
                       Dependency-free — run it after touching proPageMain(), the route in
                       src/ia.mjs, buildProPage() or a propage_* key
 scripts/test-propage-page.mjs  The same page in Chromium, nothing stubbed: the price in the
                       visitor's currency and the currency switched while the page is open,
-                      a Pro account shown their plan instead of a price, ten languages each
+                      a Pro account shown their plan instead of a price, thirteen languages each
                       linking inside their own, the widths of chapter XXVIII, the home
                       page's third door — and the no-JavaScript variant, where the amount
                       is still on the screen because the build wrote it into the markup
@@ -425,7 +425,7 @@ scripts/test-calc-seo.mjs  What the 150 calculator pages SAY (session 31, chapte
                       Dependency-free — run it after touching src/calc-seo.mjs,
                       calcPageMain() or buildCalculatorPages()
 scripts/test-mobile.mjs  The whole site on a phone (session 32, chapter XXVIII): every
-                      page type in ten languages at 320 px and the six widths the chapter
+                      page type in thirteen languages at 320 px and the six widths the chapter
                       names by hand — 320/375/390/430/768/1280 — plus the modules with
                       data in them (projects, materials, costs, rooms, the estimate, the
                       dashboard and the four Pro screens). What it asks is what a phone
@@ -532,13 +532,13 @@ scripts/test-qa.mjs   The final QA walk (session 36, chapter XXXVI): the whole p
                       a currency is not a language). Only /app/ is stubbed, with
                       scripts/fake-firebase.mjs, because the container cannot reach gstatic.
                       Needs the same outside-the-repo Playwright as test-pages.mjs
-scripts/test-langs.mjs  The ten languages and what every picker on the site calls them
+scripts/test-langs.mjs  The thirteen languages and what every picker on the site calls them
                       (session 41): that the list is in ONE place — assets/i18n.js — and
                       that src/flags.mjs reads it rather than repeating it; that every
                       language has a name, that the name is the language's own word for
                       itself rather than a country's, and that no two are the same; the
                       370 pages whose picker the generator filled in, read back — the
-                      button, the header menu and the footer's list, all ten in order —
+                      button, the header menu and the footer's list, all thirteen in order —
                       plus the net that catches the defect itself: the word "undefined"
                       where a visitor can read it, on any shipped page; the three pages
                       that translate in place, whose picker container ships empty and
@@ -651,7 +651,7 @@ scripts/test-crm-page.mjs  The same path clicked through in Chromium, nothing st
                       strip on a job, a step nobody filled in, the quotes and the history
                       on both the job and the client, the whole loop walked by clicking
                       (job → client → quote → job) with the Back button through it, the
-                      store byte-for-byte unchanged by all of it, ten languages with each
+                      store byte-for-byte unchanged by all of it, thirteen languages with each
                       language's own addresses, the currency, the widths of chapter XXVIII
                       and the no-JavaScript variant
 scripts/test-quotes-page.mjs  The same clicked through in Chromium, nothing stubbed: a quote
@@ -659,12 +659,12 @@ scripts/test-quotes-page.mjs  The same clicked through in Chromium, nothing stub
                       lump sum, a line corrected in its own row and removed, the margin
                       moved with the sum following it, the project detached and attached,
                       the quote deleted with its undo, the job and the client read back from
-                      the project, ten languages, the currency switch, the widths of
+                      the project, thirteen languages, the currency switch, the widths of
                       chapter XXVIII and the no-JavaScript variant
 scripts/test-clients-page.mjs  The same clicked through in Chromium, nothing stubbed: a
                       client added and corrected, a project filed under them and taken off,
                       the archive, the delete with its undo, the Pro notice for a guest and
-                      for a Pro account, ten languages, the currency switch, the widths of
+                      for a Pro account, thirteen languages, the currency switch, the widths of
                       chapter XXVIII and the no-JavaScript variant
 scripts/test-costs.mjs  What a project costs (session 19, chapter XVII): the unit price,
                       which is `estimatedCostMinor / quantity` and never a stored field;
@@ -677,7 +677,7 @@ scripts/test-costs.mjs  What a project costs (session 19, chapter XVII): the uni
 scripts/test-costs-page.mjs  The same in Chromium, nothing stubbed: a material priced in the
                       row it belongs to, the running "7 × 35 = 245" under the fields, a cost
                       nothing calculated typed onto the open project, the three figures
-                      moving with both, ten languages, the currency switch, the widths of
+                      moving with both, thirteen languages, the currency switch, the widths of
                       chapter XXVIII and the no-JavaScript variant
 scripts/test-save-page.mjs  The same arrow clicked through in Chromium, nothing stubbed:
                       result → project picker → saved line → the project screen reading it
@@ -691,14 +691,15 @@ assets/styles.css     The design system: one token block, then the components th
                       spend it. Never write a literal colour/radius/duration below it.
                       Authored, and the file to edit; the build writes assets/styles.min.css
                       from it — same rules, commentary gone — and that is what pages link
-assets/i18n.js        Ten-language dictionary (LANGS + I18N) — build input
-assets/i18n-pages.js  Sub-page dictionary, the same ten languages (build input)
-assets/i18n-materials.js  Material names/terms, the same ten languages (build input)
-assets/currency.js    PLN/EUR/USD/GBP/UAH/CZK/RON/RSD/RUB — the currency, independent of the
-                      language, and the same nine the phone offers since session 61. CZK, RON
-                      and RSD arrived with the subscription (session 28); GBP and RUB with the
-                      one-list decision. Pro is SOLD in seven of the nine — that shorter list
-                      is LM_PAY.currencies in assets/pay.js
+assets/i18n.js        Thirteen-language dictionary (LANGS + I18N) — build input
+assets/i18n-pages.js  Sub-page dictionary, the same thirteen languages (build input)
+assets/i18n-materials.js  Material names/terms, the same thirteen languages (build input)
+assets/currency.js    PLN/EUR/USD/GBP/UAH/CZK/RON/RSD — the currency, independent of the
+                      language, and the same eight the phone offers. CZK, RON and RSD arrived
+                      with the subscription (session 28); GBP with the one-list decision of
+                      session 61, which also brought RUB — and RUB left again on 2026-09-02
+                      with the Russian language. Pro is SOLD in seven of the eight — that
+                      shorter list is LM_PAY.currencies in assets/pay.js
 assets/flags/*.svg    The flag next to each language name (never an emoji flag)
 assets/materials.js   The 161-material catalogue, ported from core/catalog/*.kt
 assets/materials-ui.js  The "pick a material" dialog + the /materialy/ filter
@@ -718,7 +719,7 @@ assets/workspace-calc.js  The workspace on a calculator page: the room bar that 
                       form from a room somebody measured, the save box that files a result
                       in a project, and the vocabulary both halves speak (wsT, wsEsc,
                       wsNum, wsDecimal, wsPlain, wsUnit, wsLang). Split out of
-                      assets/workspace-ui.js in session 33 — 150 of the 373 pages are
+                      assets/workspace-ui.js in session 33 — 195 of the 510 pages are
                       calculator pages and none of them draws the projects screen
 assets/workspace-ui.js  The two workspace screens: /projekty/ and /kosztorys/. The projects
                       page holds two of them — the index and one project at
@@ -806,8 +807,9 @@ assets/account.js     The user session and the three access levels of chapter II
                       on every page: it is what lets a calculator word the sentence under
                       the result without loading Firebase. /app/ is its only writer
 assets/units.js       The word next to a number: the plural forms of a counted noun —
-                      three rule families since the restore (last-digit for pl/uk/ru/hr/sr,
-                      exactly-2-to-4 for cs/sk, 2-to-19 for ro), because "22 položky" is
+                      three rule families since the restore (last-digit for pl/uk/hr/sr,
+                      exactly-2-to-4 for cs/sk, 2-to-19 for ro; it/nl/es/fr fall through to
+                      one-and-other like de/en), because "22 položky" is
                       wrong Czech for what Polish spells "22 pozycje" — and
                       the |token| substitution in a result row. Split out of
                       assets/calculators.js in session 16 so /projekty/, /kosztorys/ and
@@ -818,7 +820,7 @@ assets/i18n-runtime.js  t(), the language switcher, in-place translation for /ap
                       language on /projekty/?id=<id> keeps the project. ensureLang() is
                       session 33's half: the three pages with no language of their own
                       fetch a second dictionary when somebody picks a language, instead of
-                      every page carrying all ten
+                      every page carrying all thirteen
 assets/calculators.js Calculation engines ported 1:1 from the Kotlin app + form wiring
 assets/stores.js      Store finder (Google Maps embed + OpenStreetMap/Overpass)
 assets/main.js        Wiring: menu, hero carousel, consent banner
@@ -920,7 +922,7 @@ Kotlin side of it. Change one, change all three.
   projects, `signInWithPopup`/`signInWithGoogle` still compile and run, and `/app/` still
   re-authenticates a Google account with a Google popup before deleting it, because that is
   the only credential such an account has. The `app_google` copy stays in the dictionaries
-  in all ten languages for the same reason. The two bullets below describe that machinery
+  in all thirteen languages for the same reason. The two bullets below describe that machinery
   and stay true — they are what comes back on.
 - **The domain moved to `liczmat.com`, and both Google console lists have caught up
   (measured 2026-08-26).** For twelve days after the move neither list named the new host
@@ -1392,9 +1394,9 @@ Kotlin side of it. Change one, change all three.
   says so rather than letting the button surprise anybody — that one sentence is the only
   string here the app does not already have.
 - **Every other word is the app's own**, copied out of `values-<lang>/strings.xml`: the 29
-  `pdf_*` keys of the configurator and the 22 `pdfdoc_*` keys of the document, all ten
+  `pdf_*` keys of the configurator and the 22 `pdfdoc_*` keys of the document, all thirteen
   languages, nothing translated and nothing invented. One module may not be called two things
-  on the two products. `scripts/test-pdf.mjs` §4 compares all 510 strings against the app's
+  on the two products. `scripts/test-pdf.mjs` §4 compares all 663 strings against the app's
   resources when the two repos are side by side.
 - **The arithmetic is `computeInvestorBreakdown()`, layer for layer.** Materials → + labour →
   + margin → net → + VAT → gross, each layer rounded exactly once where the Kotlin rounds
@@ -1452,7 +1454,7 @@ Kotlin side of it. Change one, change all three.
   stays what the hub cards, the related chips and the trail use.
 
 - **`/liczmat-pro/` is the one Pro address with no wall in front of it, and it cannot have
-  one.** Session 29 built the public page: GUEST, indexable, the same slug in all ten
+  one.** Session 29 built the public page: GUEST, indexable, the same slug in all thirteen
   languages (a brand name, so translating it would give one product ten names), in the
   footer for everybody. The paywall stands in front of a *module*; a description of what
   somebody would be paying for, put behind the payment, is a circle. It writes nothing
@@ -1523,7 +1525,7 @@ Kotlin side of it. Change one, change all three.
   carries `admin: true`, so `/app/` — the heaviest page on the site — pays a dynamic
   `import()` and nothing else. The panel is **Polish only** and is the one screen here that
   is: its twenty labels would otherwise ride in the dictionary bundle every page on the site
-  downloads, in ten languages, for one reader. `scripts/pro-admin.mjs` prints Polish for the
+  downloads, in thirteen languages, for one reader. `scripts/pro-admin.mjs` prints Polish for the
   same reason and stays as the rescue path when the function or Firebase is down.
   The write is `adminPlan` in `functions/index.js` — the three plan fields, `{ merge: true }`,
   a line in Cloud Logging naming who ordered it, and **no audit collection**, because the
@@ -1550,7 +1552,7 @@ Kotlin side of it. Change one, change all three.
 - **The header carries five links, and `/app/` carries the same ones as everywhere else.**
   `navRoutes("header")` is the whole list; `validateIA()` caps it at five and the fifth
   ("Aplikacja", asked for after session 20) was measured rather than assumed —
-  `scripts/test-pages.mjs` checks the row stays on one line in ten languages at
+  `scripts/test-pages.mjs` checks the row stays on one line in thirteen languages at
   1061/1100/1160/1280 px, for a guest and for a signed-in visitor. A sixth still aborts the
   build. **The five are Kalkulatory, Materiały, Projekty, LiczMat Pro and Aplikacja** —
   session 40 put `/liczmat-pro/` in slot 4, which "Poradniki" gave up (the owner's
@@ -1559,7 +1561,7 @@ Kotlin side of it. Change one, change all three.
   measurement rather than a rename, so the same test re-ran at the same widths: the
   widest row on the site is Russian, which set the 1061 px breakpoint in session 32, and
   it got 10 px *narrower* — "Руководства" is longer than "LiczMat Pro". The header link
-  uses `pro_t`, the same key and the same string in all ten languages, because it is a
+  uses `pro_t`, the same key and the same string in all thirteen languages, because it is a
   brand name, and it carries no `navLevel` on purpose: a sales page offered only to the
   accounts already on Pro is a sales page nobody needs. `/app/`, `/app/dashboard/` and `/p/` have no language of their own, so the build
   renders `DEFAULT_LANG`'s addresses and hands them every language's in `window.LM_NAV`;
@@ -1895,40 +1897,58 @@ Kotlin side of it. Change one, change all three.
   a country's** (the owner's decision, 2026-08-21): German is spoken in four countries and
   a picker that says "Deutschland" asks somebody in Vienna to pick a country they do not
   live in.
-- **Ten languages, always.** `pl, uk, de, en, cs, sk, ro, hr, sr, ru`. Every key must
-  exist in all ten, in **each** of `assets/i18n.js`, `assets/i18n-pages.js` and
-  `assets/i18n-materials.js`. Check with `node scripts/build.mjs --check`, which fails and
-  names the missing keys. The six dropped on 2026-08-12 were **brought back after session
-  28** at the owner's request; `RETIRED_LANGS` in `src/site.mjs` is now empty and the
-  `404.html` redirect that used to bounce them to the home page is gone. Master plan
-  chapter V still names four — that edit is the owner's. Do not add or drop a language
-  without the plan.
-- **Currency is not language.** `PLN, EUR, USD, GBP, UAH, CZK, RON, RSD, RUB` in
-  `assets/currency.js`, chosen by the visitor and stored under `liczmat-currency`. Ten
-  languages share nine currencies, and a language's default is only a default —
+- **Thirteen languages, always.** `pl, uk, de, en, cs, sk, ro, hr, sr, it, nl, es, fr`.
+  Every key must exist in all thirteen, in **each** of `assets/i18n.js`,
+  `assets/i18n-pages.js` and `assets/i18n-materials.js`, and in the five build modules
+  beside them (`src/calc-seo.mjs`, `src/conv-copy.mjs`, `src/omat-copy.mjs`,
+  `src/pdf-copy.mjs`, `PDF_WEB` in `src/pages.mjs`). Check with
+  `node scripts/build.mjs --check`, which fails and names what is missing.
+  The six dropped on 2026-08-12 were **brought back after session 28** at the owner's
+  request. **Russian left again on 2026-09-02** and Italian, Dutch, Spanish and French
+  arrived in the same change (the owner's decision), on both products at once — the app's
+  `AppLanguage` in `3d-polednia/Materio` is this list row for row, and `LanguageListTest`
+  §5 there reads `LANGS` out of `assets/i18n.js` when the two repositories stand side by
+  side. Master plan chapter V still names four — that edit is the owner's. Do not add or
+  drop a language without the plan.
+- **A withdrawn language leaves a redirect behind, and `ru` is the first one that has.**
+  `RETIRED_LANGS` in `src/site.mjs` was an empty, named list for exactly this moment: the
+  build deletes `/ru/` and `assets/i18n.ru.js` on every run, and `404.html` forwards
+  `/ru/…` to the Polish home page. Its twenty-nine pages were live and indexed, so simply
+  ceasing to write them would have left every inbound link on a 404 — which is what the
+  same mechanism spared the six while they were away.
+- **Currency is not language.** `PLN, EUR, USD, GBP, UAH, CZK, RON, RSD` in
+  `assets/currency.js`, chosen by the visitor and stored under `liczmat-currency`. Thirteen
+  languages share eight currencies, and a language's default is only a default —
   Deutsch + PLN is a valid setting (chapter VI). Nothing is ever converted at an
   exchange rate, and no physical quantity changes when the currency does. An estimate
   line keeps the `currencyCode` it was saved with.
-- **The nine are the phone's nine (session 61, audit D1 and D2).** The app offered
-  twenty-six and this site seven, so a kosztorys priced on a phone in Swiss francs
-  rendered here and could not be switched to. The owner's decision of 2026-08-31: the app
-  came down to this list, and this list came up by two. **GBP** because selling on the
-  Isles is intended, **RUB** because a tradesperson in Russia counts in roubles — the app
-  takes no money, so Stripe has no say in what somebody counts a floor in.
+- **The eight are the phone's eight (session 61, audit D1 and D2; RUB removed 2026-09-02).**
+  The app offered twenty-six and this site seven, so a kosztorys priced on a phone in Swiss
+  francs rendered here and could not be switched to. The owner's decision of 2026-08-31: the
+  app came down to this list, and this list came up by two — **GBP** because selling on the
+  Isles is intended, **RUB** because a tradesperson in Russia counts in roubles.
+  **RUB left again on 2026-09-02, with the Russian language**, and the pair is the point:
+  the rouble was on the list *because* somebody counting a floor in Russia does so in
+  roubles, and that reason goes when the language does. Adding Italian, Dutch, Spanish and
+  French added no currency at all — all four are on the euro.
+  **Nothing is converted and no stored amount moves.** An estimate line keeps the
+  `currencyCode` it was saved with and `lmMoney()` honours an explicit code even when it is
+  not one of the eight, so a line priced in RUB before 2026-09-02 still reads in RUB; what
+  it loses is a row in the header's picker.
   `CurrencyListTest` in `3d-polednia/Materio` reads `LM_CURRENCIES` out of this file when
   the two repositories stand side by side, so the lists cannot drift apart quietly again.
-  **`ru` now starts in RUB here too**, which is what `AppLanguage.RUSSIAN` has always done.
 - **Counting in a currency and being SOLD in one are two lists, and since session 61 they
   differ.** `LM_CURRENCIES` is what somebody may count in; `LM_PAY.currencies` in
-  `assets/pay.js` is the seven Pro is priced in. **GBP and RUB are deliberately unpriced**:
-  Stripe does not operate in Russia at all, and the pound is waiting for two amounts only
-  the owner can type, because every figure in that file was converted from the euro once,
-  by hand. A currency with no amount shows **no price** — `lmPayPrice()` answers null and
-  `proPlansBlock()` hides the plan row, leaving "the subscription has not opened yet". That
-  path has existed since session 28; this session only made the gap deliberate and named it.
-  **The consequence to know: `/liczmat-pro/` in Russian quotes no price at all.** Opening
-  the pound is one edit — add `"GBP"` to `LM_PAY.currencies` and a GBP amount to both plans;
-  `scripts/test-pay.mjs` §1 checks the pair and fails on half of it.
+  `assets/pay.js` is the seven Pro is priced in. **GBP is deliberately unpriced**: the pound
+  is waiting for two amounts only the owner can type, because every figure in that file was
+  converted from the euro once, by hand. A currency with no amount shows **no price** —
+  `lmPayPrice()` answers null and `proPlansBlock()` hides the plan row, leaving "the
+  subscription has not opened yet". That path has existed since session 28; session 61 made
+  the gap deliberate and named it.
+  **The four languages added on 2026-09-02 are all priced**, because they all start in EUR,
+  which is one of the seven. Opening the pound is one edit — add `"GBP"` to
+  `LM_PAY.currencies` and a GBP amount to both plans; `scripts/test-pay.mjs` §1 checks the
+  pair and fails on half of it.
 - **Polish HTML matching `I18N.pl` is now automatic** — the pages are generated *from* the
   dictionary, so they cannot drift. Edit the dictionary, rebuild, commit the output. Never
   hand-edit a generated `.html`: the next build silently reverts it.
@@ -1946,7 +1966,7 @@ Kotlin side of it. Change one, change all three.
   its first two units (mm → cm), which is what a list gives you rather than what anybody
   came to convert.
 - **Unit symbols are not translated, and the eleven category names are.** mm, ha, km/h, °C
-  are the same in ten languages — the app's decision, inherited — so the dictionary carries
+  are the same in thirteen languages — the app's decision, inherited — so the dictionary carries
   eleven strings instead of ninety. `scripts/test-converter.mjs` §1 fails on a symbol
   outside `[A-Za-z°²³/ ]`.
 - **The converter page's words live in `src/conv-copy.mjs`, not in the dictionary.** Same
@@ -1972,7 +1992,7 @@ Kotlin side of it. Change one, change all three.
   navigation link cannot point anywhere else. Turning a `PLANNED` route into a live one
   also means moving its `plannedSlug` into `SECTION` in `src/site.mjs`.
 - **`sitemap.xml` is read off `src/ia.mjs`, not written a second time.** `sitemapUrls()`
-  expands every `indexable` route across the ten languages; the build then compares the
+  expands every `indexable` route across the thirteen languages; the build then compares the
   file it wrote against the markup that shipped and aborts if a `noindex` page is
   advertised or a crawlable one is missing. Until session 30 the sitemap was fifteen
   hand-kept `add()` calls in `scripts/build.mjs` — a second copy of the site map that a

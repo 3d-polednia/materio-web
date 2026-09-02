@@ -102,9 +102,10 @@ head("§1 the copy the site ships");
 
 /**
  * Which languages the rules are enforced on. See "THE LANGUAGE SPLIT" above: this held
- * four names for exactly one commit and holds all ten now, so §1 guards it.
+ * four names for exactly one commit and holds every shipped language now, so §1 guards it.
+ * Russian left and Italian, Dutch, Spanish and French arrived on 2026-09-02.
  */
-const CLEAN = ["pl", "uk", "de", "en", "cs", "sk", "ro", "hr", "sr", "ru"];
+const CLEAN = ["pl", "uk", "de", "en", "cs", "sk", "ro", "hr", "sr", "it", "nl", "es", "fr"];
 
 const NOT_CLEAN = LANGS.filter((l) => !CLEAN.includes(l));
 
@@ -246,7 +247,7 @@ head("§4 nothing the site cannot back up");
  * CLAUDE.md: "no claims nobody can verify". Two families, and one of them was on the site.
  *
  * A DATE THE SITE DOES NOT HAVE. `pay_soon` said "płatności uruchamiamy wkrótce" in all
- * ten languages while there was no Stripe account — a promise with no date behind it, on
+ * the languages there were while there was no Stripe account — a promise with no date behind it, on
  * the one page that asks for money. Ten hits, one per language, and the fix was to delete
  * the promise rather than to reword it: the sentence before it ("the subscription cannot
  * be bought yet") is the whole truth and needs no follow-up.
@@ -256,7 +257,7 @@ head("§4 nothing the site cannot back up");
  *
  * The lists are deliberately literal and short. A stemmed pattern ("ideal*") matches the
  * Romanian and Croatian words for "the same", and half of German — a clever regular
- * expression over ten languages is a false alarm in six of them.
+ * expression over thirteen languages is a false alarm in half of them.
  */
 const UNVERIFIABLE = {
   pl: ["wkrótce", "niebawem", "najlepszy", "najlepsza", "najlepsze", "idealny", "idealna",
@@ -271,7 +272,13 @@ const UNVERIFIABLE = {
   ro: ["în curând", "cel mai bun", "cea mai bună", "fără efort", "revoluționar", "instantaneu"],
   hr: ["uskoro", "najbolji", "najbolja", "bez napora", "revolucionaran", "munjevito"],
   sr: ["uskoro", "najbolji", "najbolja", "bez napora", "revolucionaran", "munjevito"],
-  ru: ["скоро", "вскоре", "лучший", "лучшая", "без усилий", "революционный", "мгновенно"],
+  it: ["a breve", "presto", "il migliore", "la migliore", "senza sforzo", "rivoluzionario",
+       "in un attimo"],
+  nl: ["binnenkort", "de beste", "het beste", "moeiteloos", "revolutionair", "in een oogwenk"],
+  es: ["próximamente", "muy pronto", "el mejor", "la mejor", "sin esfuerzo", "revolucionario",
+       "al instante"],
+  fr: ["prochainement", "bientôt", "le meilleur", "la meilleure", "sans effort",
+       "révolutionnaire", "en un instant"],
 };
 
 check("every language has a list of words it may not use",
@@ -301,6 +308,9 @@ head("§5 no marketing shouting");
 const ACRONYMS = new Set([
   "OSB", "ETICS", "WDVS", "CSV", "PDF", "FAQ", "SEO", "CRM", "PLN", "EUR", "USD",
   "UAH", "CZK", "RON", "RSD", "JSON", "HTML", "SDK", "LICZMAT", "PRO",
+  // SATE is the Spanish name for the same external-insulation system ETICS names, and
+  // "ITE" in French is three letters, so it never reaches this rule.
+  "SATE",
   // Material designations out of assets/i18n-materials.js: what is printed on the
   // packaging, capitals for the same reason OSB is.
   "GKFI", "CETRIS", "PMMA",
@@ -341,7 +351,10 @@ const FILLER = {
   ro: ["pur și simplu", "cu adevărat", "desigur", "trebuie reținut"],
   hr: ["jednostavno rečeno", "zaista", "naravno", "valja zapamtiti"],
   sr: ["jednostavno rečeno", "zaista", "naravno", "valja zapamtiti"],
-  ru: ["попросту", "действительно", "конечно", "стоит помнить"],
+  it: ["semplicemente", "davvero", "ovviamente", "vale la pena ricordare"],
+  nl: ["gewoon even", "echt waar", "natuurlijk", "houd er rekening mee"],
+  es: ["simplemente", "realmente", "por supuesto", "conviene recordar"],
+  fr: ["tout simplement", "vraiment", "bien sûr", "il faut retenir"],
 };
 
 check("every language has a filler list", CLEAN.every((l) => Array.isArray(FILLER[l])),
@@ -408,11 +421,11 @@ head("§7 how much prose a page carries");
  * for a store nobody can look up, which is the opposite of what the page is for.
  */
 const BUDGET = {
-  home: 370, calculators: 370, calculator: 400, converter: 280, guides: 280, guide: 220,
-  "own-materials": 210,
-  materials: 2280, stores: 150, android: 480, projects: 480, estimate: 190,
-  clients: 500, jobs: 520, quotes: 460, calendar: 400, cookies: 570,
-  "liczmat-pro": 450, account: 850, dashboard: 130, share: 40, privacy: 3800,
+  home: 377, calculators: 416, calculator: 431, converter: 285, guides: 307, guide: 232,
+  "own-materials": 225,
+  materials: 2501, stores: 159, android: 519, projects: 544, estimate: 192,
+  clients: 524, jobs: 544, quotes: 470, calendar: 420, cookies: 637,
+  "liczmat-pro": 477, account: 850, dashboard: 130, share: 40, privacy: 3800,
 };
 
 /** Every shipped page, with the route that produced it. */

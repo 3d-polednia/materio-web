@@ -603,15 +603,23 @@ function currencyModule(lang, saved) {
 {
   const c = currencyModule("pl");
   // Chapter VI's four, plus the three session 28 added so the subscription can be priced
-  // where it is sold. RUB is deliberately absent — Stripe does not operate in Russia.
-  eq("nine currencies", c.LM_CURRENCIES.join(","), "PLN,EUR,USD,GBP,UAH,CZK,RON,RSD,RUB");
+  // where it is sold, plus GBP. RUB left on 2026-09-02 with the Russian language.
+  eq("eight currencies", c.LM_CURRENCIES.join(","), "PLN,EUR,USD,GBP,UAH,CZK,RON,RSD");
   eq("Polish starts in PLN", c.lmCurrency(), "PLN");
   eq("German starts in EUR", currencyModule("de").lmCurrency(), "EUR");
   eq("Ukrainian starts in UAH", currencyModule("uk").lmCurrency(), "UAH");
   eq("English starts in USD", currencyModule("en").lmCurrency(), "USD");
   // …but the choice is the visitor's, and it does not follow the language.
   eq("German + PLN is a valid setting", currencyModule("de", "PLN").lmCurrency(), "PLN");
-  eq("Russian starts in RUB", currencyModule("ru").lmCurrency(), "RUB");
+  // The four western-European languages added on 2026-09-02 are all on the euro, which is
+  // why that change added a language and no currency.
+  eq("Italian starts in EUR", currencyModule("it").lmCurrency(), "EUR");
+  eq("Dutch starts in EUR", currencyModule("nl").lmCurrency(), "EUR");
+  eq("Spanish starts in EUR", currencyModule("es").lmCurrency(), "EUR");
+  eq("French starts in EUR", currencyModule("fr").lmCurrency(), "EUR");
+  // RUB is off the list since the same change, so a line priced in it keeps its own code
+  // and the picker no longer offers it.
+  eq("a dropped currency is ignored when stored", currencyModule("pl", "RUB").lmCurrency(), "PLN");
   // CHF, not GBP: the site counts in the pound since session 61, so it is no longer an
   // example of something unsupported. This is the guard that a stored code off the list
   // falls back to the language's default instead of being trusted.

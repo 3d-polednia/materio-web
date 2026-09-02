@@ -116,7 +116,10 @@ const BUDGET = {
   "index.html": [215, 62],
   "kalkulatory/index.html": [235, 66],
   "kalkulatory/plytki-panele-gres/index.html": [360, 112],
-  "konwerter-jednostek/index.html": [220, 62],
+  // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
+  // (the header menu and the footer's list) and it went from ten rows to thirteen. That is
+  // three names and three inlined flags each time, and this page had the least slack.
+  "konwerter-jednostek/index.html": [220, 63],
   "poradniki/ile-farby-na-pokoj/index.html": [212, 61],
   "sklepy/index.html": [220, 65],
   "materialy/index.html": [320, 81],
@@ -139,15 +142,22 @@ const BUDGET = {
   "p/index.html": [200, 62],
 };
 
-/** No page on the site, in any language, may cross this. */
-const CEILING = [420, 130];
+/**
+ * No page on the site, in any language, may cross this.
+ *
+ * Raised from [420, 130] on 2026-09-02, measured at 420.4 kB raw on /uk/koshtorysy-pro/,
+ * which is the heaviest page there is: Ukrainian is two UTF-8 bytes a letter and the quote
+ * screen carries the whole Pro store. What pushed it over is the picker going from ten
+ * rows to thirteen, twice per page. Gzipped it is 121.9 kB, so that half did not move.
+ */
+const CEILING = [425, 130];
 
 /**
  * And no single asset may, either — one file is one thing a browser waits for.
  *
- * The number is set by the two biggest dictionaries, Russian and Ukrainian: Cyrillic is
- * two UTF-8 bytes a letter, so those two are half again the size of the Latin ones and
- * there is nothing to be done about it short of not shipping the language.
+ * The number is set by the biggest dictionary, Ukrainian: Cyrillic is two UTF-8 bytes a
+ * letter, so it is half again the size of the Latin ones and there is nothing to be done
+ * about it short of not shipping the language.
  */
 const ASSET_CEILING = [100, 28];
 
@@ -178,7 +188,7 @@ head("1b. every asset a page names is on disk");
   }
 }
 
-head("1c. the ceiling, on all 373 pages rather than on the samples");
+head("1c. the ceiling, on all 510 pages rather than on the samples");
 {
   for (const w of WEIGHED.values()) {
     check(`${w.file} is under the ceiling raw`, w.raw <= CEILING[0] * 1024, kb(w.raw));

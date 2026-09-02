@@ -75,9 +75,9 @@ nie wymaga konta**.
 
 ## 2. Inwentarz stron — stan na dziś
 
-383 wygenerowane strony: 38 stron logicznych × 10 języków, plus trzy bezjęzykowe.
+510 wygenerowanych stron: 39 stron logicznych × 13 języków, plus trzy bezjęzykowe.
 Adresy w kolumnie „URL (PL)”; pozostałe języki mają prefiks (`/en/…`, `/de/…`, `/uk/…`,
-`/cs/…`, `/sk/…`, `/ro/…`, `/hr/…`, `/sr/…`, `/ru/…`) i własne slugi z `SECTION`
+`/cs/…`, `/sk/…`, `/ro/…`, `/hr/…`, `/sr/…`, `/it/…`, `/nl/…`, `/es/…`, `/fr/…`) i własne slugi z `SECTION`
 i `CALC_SLUG` w `src/site.mjs`.
 
 | Trasa (`id`) | URL (PL) | Poziom | Rodzic | Indeks | Sztuk |
@@ -197,7 +197,7 @@ a `noindex` został: robot pobiera stronę, czyta zakaz i wyrzuca adres z indeks
 `scripts/test-seo.mjs` §1b pilnuje, żeby żaden `Disallow` nie zasłonił strony z `noindex`.
 
 **`sitemap.xml` bierze się z tego pliku, nie z drugiej listy.** `sitemapUrls()` w
-`src/ia.mjs` czyta pole `indexable` z tras i rozwija je na dziesięć języków; `scripts/build.mjs`
+`src/ia.mjs` czyta pole `indexable` z tras i rozwija je na trzynaście języków; `scripts/build.mjs`
 porównuje wynik z tym, co naprawdę zapisał, i przerywa build, gdy strona z `noindex` trafiła
 do sitemapy albo indeksowalna z niej wypadła. Wcześniej sitemapa była piętnastoma wywołaniami
 `add()` w buildzie — drugą kopią mapy serwisu, którą każda nowa sesja musiała pamiętać, żeby
@@ -238,7 +238,7 @@ w `404.html` nie ma.
 **Nie ma już żadnej.** Sesja 29 zbudowała `/liczmat-pro/` — ostatnią trasę ze statusem
 `PLANNED` — więc lista jest pusta, a maszyneria zostaje: `src/ia.mjs` nadal potrafi
 zadeklarować stronę, której jeszcze nie ma (status `PLANNED`, numer sesji, `plannedSlug`
-w dziesięciu językach), a build nadal pilnuje, żeby taka trasa nie zajęła adresu, który już
+w trzynastu językach), a build nadal pilnuje, żeby taka trasa nie zajęła adresu, który już
 działa, i żeby nie trafiła do menu przed czasem. Pusta lista to stan, nie usunięcie
 mechanizmu: następna strona, o którą poprosi plan, zaczyna dokładnie tak samo.
 
@@ -247,8 +247,8 @@ buduje: Sesja 22 przeniosła w ten sposób `clients` (`klienci` / `kliyenty` / `
 `clients`…), Sesja 23 `jobs` (`zlecenia` / `zamovlennya` / `auftraege` / `jobs`…),
 Sesja 24 `quotes` (`wyceny` / `koshtorysy-pro` / `angebote` / `quotes`…), Sesja 25
 `calendar` (`terminarz` / `kalendar` / `termine` / `schedule`…), a Sesja 29
-`liczmat-pro` — to samo słowo we wszystkich dziesięciu językach, bo to nazwa własna
-produktu, a przetłumaczony slug dałby jednemu produktowi dziesięć nazw. Żadna z tych
+`liczmat-pro` — to samo słowo we wszystkich trzynastu językach, bo to nazwa własna
+produktu, a przetłumaczony slug dałby jednemu produktowi trzynaście nazw. Żadna z tych
 pięciu nie zmieniła choćby jednej litery: slug jest trwały od momentu, w którym został
 zaplanowany.
 
@@ -290,7 +290,7 @@ w jednym wierszu poniżej 1080px (po niemiecku „Die App” i „Mein Konto” 
 linie). `Sklepy` zeszły wtedy do stopki — to narzędzie, a nie krok żadnego przepływu.
 Piąty link, `Aplikacja`, właściciel dopisał po Sesji 20 i został **zmierzony**, a nie
 założony: `scripts/test-pages.mjs` §7 sprawdza, że wiersz zostaje jednolinijkowy
-w dziesięciu językach przy 1061 / 1100 / 1160 / 1280 px. Szósty nie był mierzony i build
+w trzynastu językach przy 1061 / 1100 / 1160 / 1280 px. Szósty nie był mierzony i build
 go odrzuca.
 
 **Sesja 40 zamieniła `Poradniki` na `LiczMat Pro`** — decyzja właściciela, zapisana
@@ -303,7 +303,7 @@ główna oraz strony kalkulatorów.
 
 Zamiana etykiety to **pomiar**, nie zmiana nazwy — wiersz, który mieści pięć krótkich słów,
 nie musi zmieścić pięciu dłuższych — więc ten sam test przebiegł jeszcze raz przy tych
-samych czterech szerokościach i w tych samych dziesięciu językach. Zmierzone przy 1061px,
+samych czterech szerokościach i w tych samych trzynastu językach. Zmierzone przy 1061px,
 konto zalogowane (pięć widocznych linków), szerokość `.nav-list`:
 
 | Język | przed | po | |
@@ -319,15 +319,40 @@ konto zalogowane (pięć widocznych linków), szerokość `.nav-list`:
 | sr | 383 px | 408 px | +25 |
 | **ru** | **498 px** | **488 px** | **−10** |
 
-Najszerszy wiersz na serwisie jest rosyjski i to on ustawił próg 1061px w Sesji 32 —
+Najszerszy wiersz na serwisie był wtedy rosyjski i to on ustawił próg 1061px w Sesji 32 —
 a ten jako jedyny **zwęził się**, bo „Руководства” jest dłuższe niż „LiczMat Pro”.
-Chorwacki urósł najbardziej (+37px) i nadal jest o 80px węższy od rosyjskiego. Nic nie
+Chorwacki urósł najbardziej (+37px) i nadal był o 80px węższy od rosyjskiego. Nic nie
 zrobiło się ciaśniejsze niż to, co już było zmierzone.
+
+**2026-09-02: rosyjski odszedł, doszły włoski, holenderski, hiszpański i francuski**
+(decyzja właściciela). To znowu jest **pomiar**, a nie założenie — ten sam `.nav-list`,
+te same 1061px, konto zalogowane:
+
+| Język | szerokość |
+|---|---|
+| **uk** | **465 px** |
+| nl | 445 px |
+| fr | 441 px |
+| es | 428 px |
+| ro | 417 px |
+| pl | 412 px |
+| sk | 409 px |
+| hr / sr | 408 px |
+| cs | 405 px |
+| en | 404 px |
+| de | 395 px |
+| it | 377 px |
+
+Najszerszy jest teraz ukraiński — dokładnie te 465px, które miał w tabeli powyżej — więc
+próg 1061px ma **23px więcej luzu** niż przed tą zmianą, a nie mniej. Żaden z czterech
+nowych języków nie zbliża się do rosyjskiego: najszerszy z nich, holenderski, jest o 43px
+węższy od tego, co pasek już wytrzymywał. `scripts/test-pages.mjs` §7 przebiegł przy tych
+samych czterech szerokościach we wszystkich trzynastu językach.
 
 `LiczMat Pro` w nagłówku **nie ma `navLevel`** i mieć nie może: link pokazywany tylko
 kontom, które już są na Pro, to strona sprzedażowa oglądana przez tych, którym nie jest
 już potrzebna. Etykieta to klucz `pro_t` — ten sam, którego używa link w stopce, i ten sam
-ciąg we wszystkich dziesięciu językach, bo to nazwa własna. Sesja 40 nie napisała ani
+ciąg we wszystkich trzynastu językach, bo to nazwa własna. Sesja 40 nie napisała ani
 jednego nowego słowa w słowniku.
 
 Strona, na której stoi odwiedzający, dostaje `aria-current="page"` (najdłuższy pasujący
@@ -378,7 +403,7 @@ Status czyta się z architektury, więc w dniu, w którym Sesja 29 zbudowała `/
 trzecie drzwi same stały się linkiem: w `src/pages.mjs` nie zmieniło się nic.
 
 `validateIA()` pilnuje, żeby drzwi zostały trzy, w kolejności poziomów i na istniejących
-trasach, a `scripts/build.mjs` — żeby każde miały komplet tekstów we wszystkich dziesięciu
+trasach, a `scripts/build.mjs` — żeby każde miały komplet tekstów we wszystkich trzynastu
 językach (bez tego `t()` wypisałby na stronie głównej sam klucz).
 
 **Nagłówek niesie pięć linków i pięć ich trzyma.** `validateIA()` przerywa build przy
@@ -389,7 +414,7 @@ Materiały, Projekty, LiczMat Pro i Aplikacja**.
 **LiczMat Pro weszło do nagłówka w Sesji 40** (decyzja właściciela, plan naprawczy), na
 miejsce, które ustąpiły **Poradniki**. Poradniki nigdzie się nie podziały: trasa jest
 dalej `LIVE`, indeksowana, w `sitemap.xml` i w stopce. Podmiana była pomiarem, nie
-przemianowaniem — ten sam test (`scripts/test-pages.mjs`, dziesięć języków,
+przemianowaniem — ten sam test (`scripts/test-pages.mjs`, trzynaście języków,
 1061/1100/1160/1280 px, dla gościa i dla zalogowanego) przeszedł ponownie, a wiersz
 zrobił się o 10 px **węższy**, bo „Руководства" jest dłuższe niż „LiczMat Pro".
 
@@ -821,7 +846,7 @@ Do menu doszła też zakładka **„Aplikacja”** (`/aplikacja/`), o którą po
 Rozdział X nadal zabrania **wypychania** aplikacji na stronie głównej i strona główna nie
 mówi o niej ani słowa więcej niż przedtem; link na końcu rzędu to nie to samo. Limit linków
 w nagłówku podniesiony z czterech na pięć — **zmierzony, nie założony**:
-`scripts/test-pages.mjs` sprawdza, że rząd zostaje jednolinijkowy w dziesięciu językach na
+`scripts/test-pages.mjs` sprawdza, że rząd zostaje jednolinijkowy w trzynastu językach na
 1061 / 1100 / 1160 / 1280 px, dla gościa (cztery widoczne) i dla zalogowanego (pięć).
 Poniżej 1061 px nawigacja jest szufladą i zawinąć się nie może. Ten próg wynosił 900 px do
 Sesji 32, która zmierzyła ten sam rząd po rosyjsku: potrzebował 1033 px, więc między 900
@@ -904,7 +929,7 @@ dane kontaktowe, notatki, historię, zlecenia, projekty, wyceny. Zlecenia to Ses
 wyceny Sesja 24, a pełna droga „klient → zlecenie → projekt → wycena → historia" Sesja 26 —
 więc Sesja 22 buduje samego klienta i jedyne powiązanie, które **dziś istnieje**: projekt.
 
-**Strona.** `/klienci/` w dziesięciu językach, plus `/klienci/?id=<clientId>` jako `view` —
+**Strona.** `/klienci/` w trzynastu językach, plus `/klienci/?id=<clientId>` jako `view` —
 dokładnie z tego powodu, z którego `project` nim jest: identyfikator powstaje
 w przeglądarce, a GitHub Pages nie ma przepisywania adresów (§3). Indeks to lista klientów
 i archiwum; ekran klienta to dane kontaktowe, notatki, jego projekty razem z tym, ile już
@@ -982,7 +1007,7 @@ może mieć: klienta, nazwę, opis, status, termin, wartość, projekt, notatki 
 osiem są. Rozdział XXIV mówi, **po co** ono jest: KLIENT → ZLECENIE → PROJEKT → WYCENA →
 HISTORIA. Wycena to Sesja 24; Sesja 23 domyka środkowe ogniwo, w obie strony.
 
-**Strona.** `/zlecenia/` w dziesięciu językach, plus `/zlecenia/?id=<jobId>` jako `view` —
+**Strona.** `/zlecenia/` w trzynastu językach, plus `/zlecenia/?id=<jobId>` jako `view` —
 z tego samego powodu, z którego `client` nim jest (§3). Indeks ma dwie połowy: zlecenia
 w toku i zamknięte. Ekran zlecenia to status i termin na górze, klient, dwie kwoty,
 projekt, opis i notatki. W `src/ia.mjs` trasa siedzi pod `clients`, bo tam zaczyna się
@@ -1054,7 +1079,7 @@ buduj pełnego programu księgowego". Rozdział XXIV mówi, gdzie wycena stoi: K
 ZLECENIE → PROJEKT → **WYCENA** → HISTORIA — czwarty krok, więc pierwszy, który ma pod
 sobą policzone pieniądze.
 
-**Strona.** `/wyceny/` w dziesięciu językach, plus `/wyceny/?id=<quoteId>` jako `view` —
+**Strona.** `/wyceny/` w trzynastu językach, plus `/wyceny/?id=<quoteId>` jako `view` —
 z tego samego powodu, z którego `job` nim jest (§3). Indeks to lista wycen z sumą przy
 każdej; ekran wyceny to łańcuch (klient → zlecenie), sześć liczb, pole marży, pozycje
 robocizny, projekt i notatki. W `src/ia.mjs` trasa siedzi pod `jobs`, bo tam droga
@@ -1132,7 +1157,7 @@ dłużej i, jak przy wycenach, jednym zdaniem ustala zakres: „Prosty terminarz
 Powinien pozwolić zobaczyć: terminy, zlecenia, podstawowe informacje. **Nie buduj pełnego
 odpowiednika Google Calendar.**"
 
-**Strona.** `/terminarz/` w dziesięciu językach — i to wszystko: **nie ma widoku `?id=`**,
+**Strona.** `/terminarz/` w trzynastu językach — i to wszystko: **nie ma widoku `?id=`**,
 bo terminarz nie ma własnego wiersza do otwarcia. Nazwa w wierszu to zwykły link do
 `/zlecenia/?id=<jobId>`, czyli do strony, która to zlecenie posiada. W `src/ia.mjs` trasa
 siedzi pod `jobs`, bo pokazuje ich daty.
@@ -1353,7 +1378,7 @@ rozszerzenia i nie zmieniła kontraktu synchronizacji (`planRenews` zostaje dłu
 ## 7.8. Dziesięć języków — przywrócenie po Sesji 28
 
 Sześć języków wycofanych 2026-08-12 (**cs, sk, ro, hr, sr, ru**) wróciło na polecenie
-właściciela, zaraz po Sesji 28. Serwis ma znowu dziesięć języków i **363 strony** zamiast 147.
+właściciela, zaraz po Sesji 28. Serwis miał wtedy znowu dziesięć języków i **363 strony** zamiast 147.
 
 **Slugi zostały odzyskane z gita, nie wymyślone na nowo.** Commit `ab1fb26` — pierwotny
 upload — nosi kompletne tabele `SECTION`, `CALC_SLUG` i `GUIDES` dla wszystkich dziesięciu
@@ -1379,7 +1404,7 @@ Razem 6780 ciągów w sześciu językach.
 | romańska | ro | 2–19 i dalej po setkach; 20 przechodzi na „many" |
 
 Wrzucenie czeskiego do rodziny polskiej dałoby „22 položky", co jest po prostu błędem.
-`scripts/test-save.mjs` ma tabelę oczekiwanych form dla wszystkich dziesięciu języków.
+`scripts/test-save.mjs` ma tabelę oczekiwanych form dla wszystkich trzynastu języków.
 
 **Chorwacki i serbski zgadzają się dosłownie w 46% kluczy.** To dwa standardy jednego
 języka i krótkie napisy interfejsu wychodzą identycznie — poprawnie, a nie przez
@@ -1391,13 +1416,13 @@ jeden głos.
 Nazwa języka stoi w **jednym** miejscu: `LANGS` w `assets/i18n.js`. Czyta ją i przeglądarka
 (trzy strony bez własnego języka rysują wybierak w locie z wygenerowanego pakietu
 `assets/i18n.<lang>.js`), i generator — `LANG_NAME` w `src/flags.mjs` bierze ją stamtąd
-i wpisuje do markupu pozostałych 370 stron.
+i wpisuje do markupu pozostałych 507 stron.
 
 **Do Sesji 41 to była jedna lista w dwóch kopiach, a krótsza z nich rysowała 370 stron.**
 `LANG_NAME` było wypisane ręcznie i miało **cztery** języki, kiedy serwis wysyłał dziesięć.
 Od powrotu sześciu języków (2026-08-19) każda wygenerowana strona pisała obok sześciu flag
 słowo **`undefined`** — raz w menu w nagłówku, drugi raz w rzędzie języków w stopce — we
-wszystkich dziesięciu językach. Nic tego nie zauważyło: żaden klucz nie brakował, żaden
+wszystkich dziesięciu ówczesnych językach. Nic tego nie zauważyło: żaden klucz nie brakował, żaden
 adres nie był zepsuty, `hreflang` i `canonical` zgadzały się co do jednego, wszystkie
 suity przechodziły, a połowa przeglądarkowa była **poprawna przez cały ten czas**, bo
 czytała słownik bezpośrednio. Defektem nie było przeoczone tłumaczenie, tylko druga kopia.
@@ -1408,8 +1433,8 @@ zasada, co przy `lmGate()` w Sesji 21), a `scripts/test-langs.mjs` czyta wysłan
 z powrotem: przycisk, menu, stopka, oba pakiety i sam wyraz „undefined" tam, gdzie ktoś
 może go przeczytać.
 
-**Nazwa języka, nigdy nazwa kraju** (ustalenie właściciela z 2026-08-21). Dziesięć języków
-to nie dziesięć krajów: niemiecki jest urzędowy w czterech, serbski zapisuje się dwoma
+**Nazwa języka, nigdy nazwa kraju** (ustalenie właściciela z 2026-08-21). Trzynaście języków
+to nie trzynaście krajów: niemiecki jest urzędowy w czterech, serbski zapisuje się dwoma
 alfabetami, a angielski nie należy do żadnego. Wybierak, który mówi „Deutschland", każe
 komuś w Wiedniu wybrać kraj, w którym nie mieszka. Każda nazwa jest też zapisana **we
 własnym języku** („Română", nie „rumuński"): wybierak czyta ktoś, kto właśnie **nie** rozumie
@@ -1473,7 +1498,7 @@ pierwsza migawka, która musi narysować listę także wtedy, gdy jest pusta.
 ### 7.13. Strona LiczMat Pro — publiczny opis płatnego produktu (Sesja 29)
 
 Rozdział XXXII, Sesja 29 w całości: „Krótka, konkretna strona prezentująca Pro. Bez
-marketingowego przesytu." Adres `/liczmat-pro/` — ten sam segment we wszystkich dziesięciu
+marketingowego przesytu." Adres `/liczmat-pro/` — ten sam segment we wszystkich trzynastu
 językach, bo to nazwa własna — czekał w `src/ia.mjs` ze statusem `PLANNED` od Sesji 3.
 
 **Trasa jest `GUEST`, indeksowana i bez bramki, i to jest cała jej definicja.** Paywall
@@ -1700,7 +1725,7 @@ i osobne zadanie.
 Ostatnia pozycja kodowa audytu parytetu, i jedyna, która wymagała **zmiany kontraktu
 synchronizacji, zanim dało się napisać ekran**.
 
-**Nowa trasa: `/moje-materialy/`**, dziesięć adresów, poziom **GOŚĆ** z `navLevel: LICZMAT`
+**Nowa trasa: `/moje-materialy/`**, trzynaście adresów, poziom **GOŚĆ** z `navLevel: LICZMAT`
 — dokładnie jak `/projekty/` i z tego samego powodu. Wiersze leżą w `localStorage`
 w kształcie dokumentu Firestore, więc ekran działa bez logowania; konto dokłada
 synchronizację, a nie możliwość zapisania materiału. Link jest w stopce, bo rząd nagłówka
@@ -1938,11 +1963,11 @@ Dodane w Sesji 3, uruchamiane przez `node scripts/build.mjs` i `--check`:
 | przepływy | krok na nieistniejącą trasę; przepływ sięgający po wyższy poziom bez kroku, który go nadaje |
 | strona główna (Sesja 6) | inna liczba drzwi niż trzy albo inna kolejność poziomów; drzwi na nieistniejącą trasę; brak tekstu drzwi w słowniku |
 | centrum kalkulatorów (Sesja 7) | kalkulator w żadnej kategorii albo w dwóch naraz; kategoria z nieznanym kalkulatorem lub pusta; brak nazwy albo opisu kategorii w słowniku; skrót „Od czego zacząć”, którego nie potwierdza żaden poradnik |
-| poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z dziesięciu języków |
-| model Free / Pro (Sesja 21) | funkcja zadeklarowana dwa razy; funkcja z nieznanym poziomem albo na nieistniejącej trasie; funkcja `PRO` na trasie, która nie jest `PRO`; trasa `PRO`, której nie pokrywa żadna funkcja; funkcja `PRO` bez tekstu do bramki; `LM_PLAN` rozjeżdżające się z kontraktem; brak któregokolwiek klucza `pro_*` / `plan_*` / `feat_*` w którymkolwiek z dziesięciu języków |
-| paywall (Sesja 27) | ściana przed funkcją, której nie ma w `LM_FEATURES` (`proGate()` przerywa build); brak któregokolwiek klucza `pro_need_*` / `pro_incl_t` / `pro_signin` w którymkolwiek z dziesięciu języków |
-| subskrypcja (Sesja 28) | brak któregokolwiek klucza `pay_*` / `plan_renews` / `plan_cancelled` / `plan_active_d` / `plan_cancel_d` w którymkolwiek z dziesięciu języków |
-| SEO kalkulatorów (Sesja 31) | kalkulator bez kopii w `src/calc-seo.mjs` albo bez któregoś z dziesięciu języków; tytuł dłuższy niż `TITLE_MAX` (50); opis poza 50–160 znakami; FAQ, które nie jest dwiema parami pytanie/odpowiedź; pytanie bez znaku zapytania; dwa kalkulatory z tym samym tytułem w jednym języku albo z tym samym opisem gdziekolwiek |
+| poziomy konta (Sesja 13) | inna liczba poziomów niż trzy albo inna kolejność; dwa poziomy z tym samym kluczem; poziom, który nie mówi, co potrafi; poziom wskazujący nieistniejącą trasę; brak któregokolwiek klucza `acc_*` w którymkolwiek z trzynastu języków |
+| model Free / Pro (Sesja 21) | funkcja zadeklarowana dwa razy; funkcja z nieznanym poziomem albo na nieistniejącej trasie; funkcja `PRO` na trasie, która nie jest `PRO`; trasa `PRO`, której nie pokrywa żadna funkcja; funkcja `PRO` bez tekstu do bramki; `LM_PLAN` rozjeżdżające się z kontraktem; brak któregokolwiek klucza `pro_*` / `plan_*` / `feat_*` w którymkolwiek z trzynastu języków |
+| paywall (Sesja 27) | ściana przed funkcją, której nie ma w `LM_FEATURES` (`proGate()` przerywa build); brak któregokolwiek klucza `pro_need_*` / `pro_incl_t` / `pro_signin` w którymkolwiek z trzynastu języków |
+| subskrypcja (Sesja 28) | brak któregokolwiek klucza `pay_*` / `plan_renews` / `plan_cancelled` / `plan_active_d` / `plan_cancel_d` w którymkolwiek z trzynastu języków |
+| SEO kalkulatorów (Sesja 31) | kalkulator bez kopii w `src/calc-seo.mjs` albo bez któregoś z trzynastu języków; tytuł dłuższy niż `TITLE_MAX` (50); opis poza 50–160 znakami; FAQ, które nie jest dwiema parami pytanie/odpowiedź; pytanie bez znaku zapytania; dwa kalkulatory z tym samym tytułem w jednym języku albo z tym samym opisem gdziekolwiek |
 | widoki (Sesja 15) | widok bez rodzica, na trasie planowanej albo na innym widoku; widok indeksowany; widok w menu lub w stopce; widok wymagający wyższego poziomu niż rodzic; widok inaczej zlokalizowany niż rodzic; adres widoku poza adresem rodzica albo gubiący identyfikator; `view: true` na trasie, która nie jest `LIVE` |
 
 Wszystkie siedem zostało sprawdzone negatywnie — celowo zepsute i build faktycznie padł.

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Calculadora de pintura: botes por m² | LiczMat</title>
+<meta name="description" content="Superficie, el rendimiento de la etiqueta y el número de manos dan los envases enteros de pintura, revoco o imprimación y la merma en porcentaje.">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/es/calculadoras/pintura-revoco-imprimacion/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/kalkulatory/farby-tynki-grunty/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/kalkulyatory/farba-shtukaturka-hrunt/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/rechner/farbe-putz-grundierung/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/calculators/paint-plaster-primer/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/kalkulacky/barvy-omitky-penetrace/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/kalkulacky/farby-omietky-penetracie/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/calculatoare/vopsea-tencuiala-grund/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/kalkulatori/boje-zbuke-temeljni-premaz/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/kalkulatori/boje-malteri-prajmer/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/calcolatori/pittura-intonaco-primer/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/rekenmachines/verf-pleister-primer/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/calculadoras/pintura-revoco-imprimacion/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/calculateurs/peinture-enduit-primaire/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/farby-tynki-grunty/">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:title" content="Calculadora de pintura: botes por m² | LiczMat">
+<meta property="og:description" content="Superficie, el rendimiento de la etiqueta y el número de manos dan los envases enteros de pintura, revoco o imprimación y la merma en porcentaje.">
+<meta property="og:url" content="https://liczmat.com/es/calculadoras/pintura-revoco-imprimacion/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Calculadora de pintura: botes por m² | LiczMat">
+<meta name="twitter:description" content="Superficie, el rendimiento de la etiqueta y el número de manos dan los envases enteros de pintura, revoco o imprimación y la merma en porcentaje.">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://liczmat.com/es/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Calculadoras de obra en línea",
+      "item": "https://liczmat.com/es/calculadoras/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Pinturas, revocos, imprimaciones",
+      "item": "https://liczmat.com/es/calculadoras/pintura-revoco-imprimacion/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Pinturas, revocos, imprimaciones",
+  "description": "Envases por superficie, con las manos.",
+  "url": "https://liczmat.com/es/calculadoras/pintura-revoco-imprimacion/",
+  "applicationCategory": "UtilitiesApplication",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "es",
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "https://liczmat.com/#website",
+    "name": "LiczMat",
+    "url": "https://liczmat.com/"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuánta pintura hace falta por m²?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La que diga el rendimiento de la etiqueta, normalmente en m² por litro o por envase. La calculadora divide la superficie por ese rendimiento, multiplica por las manos y redondea a envases enteros."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Se descuentan ventanas y puertas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Solo si de verdad no las pintas. La superficie de los huecos se escribe aparte y se quita antes de pasar a envases."
+      }
+    }
+  ]
+}
+</script>
+
+</head>
+<body>
+<a class="skip-link" href="#main">Ir al contenido</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/es/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Navegación principal">
+      <ul class="nav-list">
+        <li><a href="/es/calculadoras/" aria-current="page">Calculadoras</a></li>
+        <li><a href="/es/materiales/">Materiales</a></li>
+        <li data-nav-level="liczmat"><a href="/es/proyectos/">Proyectos</a></li>
+        <li><a href="/es/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/es/app-android/">La app</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Idioma">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span class="lang-btn-name">Español</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/kalkulatory/farby-tynki-grunty/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/kalkulyatory/farba-shtukaturka-hrunt/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/rechner/farbe-putz-grundierung/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><a class="lang-item" href="/en/calculators/paint-plaster-primer/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+      <li><a class="lang-item" href="/cs/kalkulacky/barvy-omitky-penetrace/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/kalkulacky/farby-omietky-penetracie/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/calculatoare/vopsea-tencuiala-grund/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/kalkulatori/boje-zbuke-temeljni-premaz/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/kalkulatori/boje-malteri-prajmer/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><a class="lang-item" href="/it/calcolatori/pittura-intonaco-primer/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+      <li><a class="lang-item" href="/nl/rekenmachines/verf-pleister-primer/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></span></li>
+      <li><a class="lang-item" href="/fr/calculateurs/peinture-enduit-primaire/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+    </ul>
+  </div>
+        <select id="currency-select" class="cur-select" aria-label="Moneda" title="Moneda"><option value="PLN">PLN</option><option value="EUR" selected>EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>Mi cuenta</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar el tema" title="Cambiar el tema"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Abrir el menú"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/es/">Inicio</a></li><li><a href="/es/calculadoras/">Calculadoras de obra en línea</a></li><li aria-current="page">Pinturas, revocos, imprimaciones</li></ol></nav>
+      <h1>Calculadora de pintura: botes por m²</h1>
+      <p class="lead">Superficie, el rendimiento de la etiqueta y el número de manos dan los envases enteros de pintura, revoco o imprimación y la merma en porcentaje.</p>
+    </div>
+  </section>
+
+  <section class="block alt calc-tool">
+    <div class="wrap">
+      <div class="calc" data-calc="coverage" data-tab="surface">
+      <div class="calc-form">
+        <h2 id="calc-form-h">Tus datos</h2>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Elige un material</span></button>
+      <p class="mat-chosen" data-mat-chosen hidden></p><div class="chips"><button type="button" class="chip" data-preset="0">Pintura 10 l</button><button type="button" class="chip" data-preset="1">Imprimación 5 l</button><button type="button" class="chip" data-preset="2">Masilla 20 kg</button><button type="button" class="chip" data-preset="3">Adhesivo C2 25 kg</button></div><div class="field"><label for="f-coverage-area">Superficie (m²)</label><input id="f-coverage-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="25"></div><div class="field"><label for="f-coverage-cov">Rendimiento (m²/envase)</label><input id="f-coverage-cov" type="text" inputmode="decimal" data-k="cov" data-lk="fld_coverage_unit" value="40"></div><div class="field"><label for="f-coverage-coats">Número de manos</label><input id="f-coverage-coats" type="text" inputmode="decimal" data-k="coats" data-lk="fld_coats" value="2"></div><div class="field"><label for="f-coverage-openings">Huecos (m²)</label><input id="f-coverage-openings" type="text" inputmode="decimal" data-k="openings" data-lk="fld_openings" value="0"></div><div class="field"><label for="f-coverage-price">Precio por envase</label><input id="f-coverage-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_pkg" value=""></div>
+        <button type="button" class="btn btn-primary" data-run
+          data-label-run="Calcular"
+          data-label-again="Calcular de nuevo">Calcular</button>
+      </div>
+      <div class="calc-out">
+        <h2 id="calc-result-h">Resultado</h2>
+        
+        <div class="result show" data-result role="status">
+          <div class="muted eyebrow">Para comprar</div>
+          <div class="big">2 <span class="figure-line">env.</span></div>
+          <div class="rows"><div><span>Superficie a cubrir</span><b>50 m²</b></div><div><span>Compras</span><b>80 m²</b></div><div><span>Desperdicio</span><b>37.5%</b></div></div>
+        </div>
+        <p class="calc-stale" data-calc-stale hidden>Los datos han cambiado. Pulsa «Calcular de nuevo» para ver el resultado nuevo.</p>
+        <div class="calc-actions" data-calc-actions data-projects-url="/es/proyectos/"></div>
+      </div>
+    </div>
+      <p class="muted src-note"><a href="/es/materiales/">Catálogo de materiales de construcción</a> — 48 materiales en el catálogo</p>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="hwc-h">
+    <div class="wrap calc-how">
+      <h2 id="hwc-h">Cómo lo calculamos</h2>
+
+      <div class="calc-how-grid">
+        <div>
+          <h3>Lo que escribes</h3>
+          <ul class="plain-list"><li><b>Superficie (m²)</b></li><li><b>Rendimiento (m²/envase)</b></li><li><b>Número de manos</b></li><li><b>Huecos (m²)</b></li></ul>
+
+          <h3>A qué prestar atención</h3>
+          <p>El rendimiento de la etiqueta (m²/l o m²/envase) supone una superficie lisa e imprimada. Un revoco absorbente gasta más. Descuenta los huecos solo si de verdad no los pintas.</p>
+        </div>
+        <div>
+          <h3>Fórmula</h3>
+          <pre class="formula"><code>netto = Superficie − Huecos
+pole do pokrycia = netto × Número de manos
+opakowania = ⌈ pole do pokrycia ÷ Rendimiento ⌉
+odpad = (opakowania × Rendimiento − pole do pokrycia) ÷ (opakowania × Rendimiento) × 100%</code></pre>
+          <p class="muted src-note">El motor del sitio es una copia 1:1 del código de la app de Android.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="cfaq-h">
+    <div class="wrap narrow">
+      <h2 id="cfaq-h">Preguntas frecuentes</h2>
+      <div class="faq">
+        <details open><summary>¿Cuánta pintura hace falta por m²?</summary><p>La que diga el rendimiento de la etiqueta, normalmente en m² por litro o por envase. La calculadora divide la superficie por ese rendimiento, multiplica por las manos y redondea a envases enteros.</p></details>
+        <details><summary>¿Se descuentan ventanas y puertas?</summary><p>Solo si de verdad no las pintas. La superficie de los huecos se escribe aparte y se quita antes de pasar a envases.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2>Otras calculadoras</h2>
+      <div class="chips"><a class="chip" href="/es/calculadoras/azulejos-tarima-porcelanico/">Azulejos, tarima, porcelánico</a><a class="chip" href="/es/calculadoras/papel-pintado/">Papel pintado</a><a class="chip" href="/es/calculadoras/adhesivo-mortero/">Adhesivo / mortero</a></div>
+      <h2 class="mt-8">Guías que usan esta calculadora</h2>
+      <div class="chips"><a class="chip" href="/es/guias/cuanta-pintura-para-una-habitacion/">Cuánta pintura para una habitación</a><a class="chip" href="/es/guias/cuanta-masilla-para-una-pared/">Cuánta masilla para una pared</a><a class="chip" href="/es/guias/aislar-la-casa-con-eps/">Aislar la casa con poliestireno</a></div>
+      <p class="mt-6">
+        <a class="btn btn-ghost" href="/es/calculadoras/">Todas las calculadoras</a>
+        <a class="btn btn-ghost" href="/es/guias/">Todas las guías</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="block app-note" aria-labelledby="appnote-h">
+    <div class="wrap">
+      <p><b id="appnote-h">La misma fórmula en la app</b> LiczMat para Android usa el mismo motor sin conexión, con el catálogo de materiales y los resultados guardados en un proyecto.
+      <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Descargar</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></div>
+        <p class="muted">Calculadora de materiales de construcción. Calcula. Planifica. Construye.</p>
+      </div>
+      <div>
+        <h2>Producto</h2>
+        <ul>
+          <li><a href="/es/calculadoras/">Todas las calculadoras</a></li>
+          <li><a href="/es/conversor-de-unidades/">Conversor de unidades</a></li>
+          <li><a href="/es/materiales/">Materiales</a></li>
+          <li data-nav-level="liczmat"><a href="/es/mis-materiales/">Mis materiales</a></li>
+          <li data-nav-level="liczmat"><a href="/es/proyectos/">Proyectos</a></li>
+          <li><a href="/es/presupuesto/">Presupuesto</a></li>
+          <li><a href="/es/guias/">Guías</a></li>
+          <li><a href="/es/tiendas/">Tiendas</a></li>
+          <li><a href="/es/liczmat-pro/">LiczMat Pro</a></li>
+          <li data-nav-level="pro"><a href="/es/clientes/">Clientes</a></li>
+          <li data-nav-level="pro"><a href="/es/encargos/">Encargos</a></li>
+          <li data-nav-level="pro"><a href="/es/presupuestos-pro/">Presupuestos</a></li>
+          <li data-nav-level="pro"><a href="/es/plazos/">Plazos</a></li>
+          <li><a href="/es/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Cuenta</h2>
+        <ul>
+          <li><a href="/es/app-android/">La app</a></li>
+          <li><a href="/app/" rel="nofollow">Mi cuenta</a></li>
+          <li><a href="/app/dashboard/" rel="nofollow">Panel</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/privacy-policy.html">Política de privacidad</a></li>
+          <li><a href="/es/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Idioma">
+      <h2>Idioma</h2>
+      <ul>
+        <li><a href="/kalkulatory/farby-tynki-grunty/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/kalkulyatory/farba-shtukaturka-hrunt/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/rechner/farbe-putz-grundierung/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/calculators/paint-plaster-primer/" hreflang="en" lang="en" data-lang="en"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/kalkulacky/barvy-omitky-penetrace/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/kalkulacky/farby-omietky-penetracie/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/calculatoare/vopsea-tencuiala-grund/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/kalkulatori/boje-zbuke-temeljni-premaz/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/kalkulatori/boje-malteri-prajmer/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/calcolatori/pittura-intonaco-primer/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/rekenmachines/verf-pleister-primer/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/calculadoras/pintura-revoco-imprimacion/" hreflang="es" lang="es" data-lang="es" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/calculateurs/peinture-enduit-primaire/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. Todos los derechos reservados.</span>
+      <span>Los resultados son estimaciones. Compruébalos siempre antes de comprar.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">Usamos Google Analytics para contar el tráfico anónimo del sitio y cuánta gente pasa a Google Play. ¿Estás de acuerdo?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/privacy-policy.html">Más en la política de privacidad</a>
+    <a class="consent-more" href="/es/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Rechazar</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Acepto</button>
+  </div>
+</div>
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/kalkulatory/farby-tynki-grunty/",
+  "uk": "/uk/kalkulyatory/farba-shtukaturka-hrunt/",
+  "de": "/de/rechner/farbe-putz-grundierung/",
+  "en": "/en/calculators/paint-plaster-primer/",
+  "cs": "/cs/kalkulacky/barvy-omitky-penetrace/",
+  "sk": "/sk/kalkulacky/farby-omietky-penetracie/",
+  "ro": "/ro/calculatoare/vopsea-tencuiala-grund/",
+  "hr": "/hr/kalkulatori/boje-zbuke-temeljni-premaz/",
+  "sr": "/sr/kalkulatori/boje-malteri-prajmer/",
+  "it": "/it/calcolatori/pittura-intonaco-primer/",
+  "nl": "/nl/rekenmachines/verf-pleister-primer/",
+  "es": "/es/calculadoras/pintura-revoco-imprimacion/",
+  "fr": "/fr/calculateurs/peinture-enduit-primaire/"
+};</script>
+
+<script src="/assets/i18n.es.js?v=20260902a"></script>
+<script src="/assets/i18n-runtime.js?v=20260902a"></script>
+<script src="/assets/currency.js?v=20260902a"></script>
+<script src="/assets/account.js?v=20260902a"></script>
+
+<script src="/assets/units.js?v=20260902a"></script>
+<script src="/assets/own-materials.js?v=20260902a"></script>
+<script src="/assets/calculators.js?v=20260902a"></script>
+<script src="/assets/materials.js?v=20260902a"></script>
+<script src="/assets/materials-ui.js?v=20260902a"></script>
+<script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/workspace-calc.js?v=20260902a"></script>
+<script src="/assets/recent.js?v=20260902a"></script>
+<script src="/assets/main.js?v=20260902a"></script>
+
+</body>
+</html>

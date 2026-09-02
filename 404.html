@@ -11,9 +11,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nie ma takiej strony — LiczMat</title>
 <meta name="robots" content="noindex, follow">
-<link rel="icon" href="/assets/favicon.svg?v=20260831a" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260831a" sizes="32x32" type="image/png">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260831a">
+<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
 <script>
   // GitHub Pages serves this file for every path it cannot resolve, and it has no
   // rewrite rules. A shared estimate lives at /p/<token>, where the token is a random
@@ -25,11 +25,17 @@
     var m = location.pathname.match(/^\/p\/([A-Za-z0-9_-]{16,64})\/?$/);
     if (m) location.replace("/p/?t=" + encodeURIComponent(m[1]) + location.hash);
 
-    // The six languages dropped on 2026-08-12 were brought back after session 28, at the
-    // addresses they always had, so the redirect that used to send /cs/, /sk/, /ro/,
-    // /hr/, /sr/ and /ru/ to the home page is gone. Leaving it in would have bounced
-    // every restored page off itself — which is exactly why it had to go in the same
-    // change that restored them.
+    // Five of the six languages dropped on 2026-08-12 were brought back after session 28,
+    // at the addresses they always had, so nothing forwards /cs/, /sk/, /ro/, /hr/ or
+    // /sr/ any more: leaving that in would have bounced every restored page off itself.
+    //
+    // Russian is the one that left instead (2026-09-02, the owner's decision, in the same
+    // change that added Italian, Dutch, Spanish and French). Its twenty-nine pages were
+    // live and indexed, and a withdrawn language that simply stops answering keeps its
+    // inbound links pointed at a 404 — so /ru/… lands on the Polish home page, which is
+    // the same treatment the six had while they were away. RETIRED_LANGS in src/site.mjs
+    // is the other half: the build deletes /ru/ and its dictionary bundle.
+    if (/^\/ru(\/|$)/.test(location.pathname)) location.replace("/");
 
     // The dashboard shipped as /app/pulpit/ on 2026-08-13 and was renamed to
     // /app/dashboard/ the same day, before anything linked to it: /app/ and /p/ are

@@ -101,6 +101,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 60 | Flagi w wybieraku języka na telefonie — połowa D4 (repo aplikacji) | **Zrobione** — 2026-08-30. Czeka na wydanie AAB (właściciel) |
 | 61 | Jedna lista walut na obu produktach — D1 i D2 (oba repozytoria) | **Zrobione** — 2026-08-31. Strona jest na żywo po pushu; aplikacja czeka na kolejny AAB |
 | 62 | Jeden angielski, waluta z regionu urządzenia — D3 i nazwa z D4 (repo aplikacji) | **Zrobione** — 2026-09-01. Czeka na wydanie AAB (właściciel). **Audyt parytetu zamknięty** |
+| 63 | Rosyjski wychodzi, wchodzą włoski, holenderski, hiszpański i francuski (oba repozytoria) | **Zrobione** — 2026-09-02. Strona jest na żywo po pushu; aplikacja czeka na kolejny AAB |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -758,6 +759,104 @@ z tej trójki **nie czeka na żadną decyzję i jest defektem dzisiaj**:
 się ze złotówkowym „zł" obok. Naprawa tego jest dobra przy każdej odpowiedzi na D1
 i **musi** poprzedzić opcję, w której enum się zwęża, bo inaczej zwężenie zamienia
 poprawne dziś funty w złotówki. To jest sesja 61, jeśli właściciel nie zdecyduje inaczej.
+
+## Sesja 63 — rosyjski wychodzi, wchodzą IT / NL / ES / FR (oba repozytoria)
+
+**DECYZJA WŁAŚCICIELA, 02.09.2026:** „usuwamy Rosyjski język i walutę. wprowadzamy języki
+i waluty dla kraju (Włochy, Holandia, Hiszpania, Francja)". Wykonane **na obu produktach
+w jednej zmianie**, bo dwie listy języków, które rozjeżdżają się o jeden wiersz, są dokładnie
+tym, po co powstał cały ciąg D audytu parytetu.
+
+### WYKONANO
+
+**Języki: 10 → 13.** `pl, uk, de, en, cs, sk, ro, hr, sr, it, nl, es, fr`. Rosyjski zniknął
+z `LANGS` w `assets/i18n.js` i z `AppLanguage` w repozytorium aplikacji; doszły cztery nowe
+wiersze — `Italiano`, `Nederlands`, `Español`, `Français` — nazwane własnym słowem języka,
+zgodnie z zasadą z 21.08.2026.
+
+**Waluty: 9 → 8.** Odszedł **RUB**, i tylko on. Cztery nowe kraje są w strefie euro, więc ta
+sama zmiana dodała cztery języki i **zero** walut. Para „rubel odchodzi razem z rosyjskim"
+jest tu sednem: rubel wszedł na listę w Sesji 61 **dlatego**, że ktoś liczący podłogę
+w Rosji liczy w rublach — a ten powód znika razem z językiem.
+
+**Nic nie zostało przeliczone i żadna zapisana kwota się nie ruszyła.** Pozycja kosztorysu
+trzyma `currencyCode`, z którym została zapisana, `lmMoney()` honoruje jawny kod także spoza
+ósemki, a `Currency.fromCodeOrNull()` w aplikacji zwraca `null` i `CurrencyFormatter` pisze
+„1 856,20 RUB". Zniknął wyłącznie wiersz w wybieraku.
+
+**Strona (`3d-polednia/materio-web`).** 393 → **510 stron** (39 tras × 13 języków + trzy
+bezjęzykowe). Nowe komplety tekstów: 265 kluczy w `assets/i18n.js`, 740 w
+`assets/i18n-pages.js`, 174 w `assets/i18n-materials.js` — razem **1179 kluczy × 4 języki** —
+plus `src/calc-seo.mjs` (15 kalkulatorów), `src/conv-copy.mjs`, `src/omat-copy.mjs`,
+`src/pdf-copy.mjs` i `PDF_WEB` w `src/pages.mjs`. Slugi: 15 sekcji, 15 kalkulatorów i 8
+poradników w każdym z czterech nowych języków. Flagi `assets/flags/it|nl|es|fr.svg`;
+`ru.svg` usunięta.
+
+**`RETIRED_LANGS` w końcu do czegoś służy.** Pusta, nazwana lista czekała dokładnie na ten
+moment: build kasuje `/ru/` i `assets/i18n.ru.js` przy każdym przebiegu, a `404.html`
+przekierowuje `/ru/…` na polską stronę główną. Dwadzieścia dziewięć stron rosyjskich było
+żywych i zaindeksowanych — samo przestanie ich generować zostawiłoby każdy link
+przychodzący na 404.
+
+**Aplikacja (`3d-polednia/Materio`).** `res/values-it|nl|es|fr/strings.xml` — po **917
+łańcuchów** każdy, sprawdzone wobec `values-en` nazwa po nazwie i argument formatujący po
+argumencie; `values-ru` usunięte. `res/drawable/flag_it|nl|es|fr.xml` przepisane z SVG
+strony, kolor w kolor; `flag_ru.xml` odeszła ze swoim wierszem. `WITHDRAWN_TAGS` jest nowe
+i **celowo nie jest** mapą `LEGACY`: scalony wiersz ma dokąd trafić, wycofany nie ma, więc
+telefon zapisany jako `RUSSIAN` czyta się z powrotem jako `null`, a wywołujący podstawia
+`SYSTEM` — „za urządzeniem". Każda inna odpowiedź wsadziłaby kogoś w język, którego nie
+wybrał.
+
+### ZMIERZONE, NIE ZAŁOŻONE
+
+- **Najszerszy wiersz nagłówka to teraz ukraiński**, nie rosyjski: `.nav-list` przy 1061 px,
+  konto zalogowane — uk 465 px, nl 445, fr 441, es 428, pl 412, it 377. Próg 1061 px ma więc
+  **23 px więcej luzu** niż przed zmianą, a nie mniej; najszerszy z nowych języków jest o 43 px
+  węższy od tego, co pasek już wytrzymywał. `scripts/test-mobile.mjs` i
+  `scripts/test-converter-page.mjs` przemiatały szerokości parą „pl + ru" — obie wskazują
+  teraz „pl + uk", i to nie kosmetyka: strona `/ru/` przestała istnieć, więc test audytował
+  404, a nie stronę.
+- **Budżety tekstu i wagi stron podniesione o zmierzoną wartość, nie na zapas.** Języki
+  romańskie i niderlandzki liczą więcej słów na tę samą treść (rodzajniki, przyimki), więc
+  `BUDGET` w `scripts/test-copy.mjs` wzrósł do zmierzonych maksimów (np. `calculators`
+  370 → 416, `cookies` 570 → 637). W `scripts/test-perf.mjs` konwerter dostał 63 kB gzip
+  zamiast 62, a `CEILING` 425 kB raw zamiast 420 — wybierak języka rysuje się dwa razy na
+  każdej stronie i urósł z dziesięciu wierszy do trzynastu. Gzip nie drgnął: 121,9 kB przy
+  suficie 130.
+
+### TESTY
+
+Wszystkie 28 suit bezzależnościowych zielone (`build --check`, kalkulatory, konwerter,
+własne materiały, PDF, konto, dashboard, projekty, zapis, materiały, koszty, pomieszczenia,
+plan, płatności, pro-admin, webhook, admin, zlecenia, wyceny, terminarz, CRM, klienci,
+`/liczmat-pro/`, SEO, SEO kalkulatorów, wydajność, dostępność, bezpieczeństwo, języki, copy).
+Suity przeglądarkowe uruchomione z Playwrightem zainstalowanym poza repozytorium — również
+wszystkie zielone, łącznie z `test-qa.mjs` i `test-phone.mjs`.
+W aplikacji: `gradle :app:testDebugUnitTest` — **348 testów, wszystkie zielone**.
+
+### PROBLEMY
+
+- `LanguageListTest` w aplikacji („żaden język nie nazywa się krajem") szukał nazwy kraju
+  jako **podciągu**, a „Italiano" zaczyna się od „Italia", „Nederlands" od „Nederland" —
+  poprawne podpisy wyszły więc jako naruszenia. Sieć została zawężona, nie poszerzona:
+  znacznik regionu („(", „US", „UK") dalej jest sprawdzany jako podciąg, bo taki kształt miała
+  wada, przeciw której regułę napisano („English (US)"); nazwa kraju musi teraz **być** całym
+  podpisem, czyli dokładnie to, co znaczy „nazwany po kraju".
+- Maven Central odrzucał pobrania (429) przy pierwszych dwóch przebiegach Gradle'a przez
+  wspólne wyjście proxy. Trzeci przebieg przeszedł; nic w repozytorium nie wymagało zmiany.
+
+### STATUS
+
+Strona: **na żywo po pushu na `main`**. Aplikacja: skomitowana na `main`, **czeka na kolejny
+AAB** (buduje właściciel).
+
+Rozdział V planu (`MASTER_PLAN.txt`) nadal wymienia cztery języki, a rozdział VI cztery
+waluty. To edycja właściciela; kod idzie za jego decyzjami z 19.08, 31.08 i 02.09.2026.
+
+### NASTĘPNE ZADANIE
+
+Karta sklepu Google Play w czterech nowych językach (nazwa, krótki i pełny opis, notatki
+„Co nowego") — teksty aplikacji są przetłumaczone, listing nie.
 
 ## Sesja 62 — jeden angielski, waluta z regionu (D3 i nazwa z D4)
 

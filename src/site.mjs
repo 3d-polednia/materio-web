@@ -32,67 +32,76 @@
 export const BASE = "https://liczmat.com";
 
 /**
- * The ten languages LiczMat ships. Polish first — it is the default; the four that
- * never left come first, then the six the owner brought back after session 28.
+ * The thirteen languages LiczMat ships. Polish first — it is the default; the four that
+ * never left come first, then the five the owner brought back after session 28, then the
+ * four western-European ones added on 2026-09-02.
+ *
+ * **Russian left on 2026-09-02**, by the owner's decision, in the same session that added
+ * Italian, Dutch, Spanish and French. It had been live since the restore, so `ru` is the
+ * first entry `RETIRED_LANGS` has ever carried: its twenty-nine URLs were indexed and a
+ * page that simply stops answering is a page that keeps its ranking and returns a 404.
  *
  * Master plan chapter V still names four. That edit belongs to the owner.
  */
-export const LANGS = ["pl", "uk", "de", "en", "cs", "sk", "ro", "hr", "sr", "ru"];
+export const LANGS = ["pl", "uk", "de", "en", "cs", "sk", "ro", "hr", "sr", "it", "nl", "es", "fr"];
 
 export const DEFAULT_LANG = "pl";
 
 /**
- * Languages that were published and then withdrawn. Empty since the restore: all six
- * (cs, sk, ro, hr, sr, ru) are live again at the addresses they always had, so there is
- * nothing left for `404.html` to forward and nothing for the build to sweep. Kept as a
- * named, empty list because the mechanism is what makes withdrawing a language safe.
+ * Languages that were published and then withdrawn. `ru` since 2026-09-02: the other five
+ * of the six dropped in 2026-08 are live again at the addresses they always had, and
+ * Russian is the one the owner took off the list instead.
+ *
+ * The mechanism is what makes withdrawing a language safe: the build refuses to emit a
+ * page for a retired language, `404.html` forwards /ru/… to the home page, and nothing
+ * in a picker, a sitemap or an hreflang set names it.
  */
-export const RETIRED_LANGS = [];
+export const RETIRED_LANGS = ["ru"];
 
 /** BCP-47 tags for <html lang> and hreflang. */
 export const HREFLANG = {
-  pl: "pl", uk: "uk", de: "de", en: "en", cs: "cs", sk: "sk", ro: "ro", hr: "hr", sr: "sr", ru: "ru",
+  pl: "pl", uk: "uk", de: "de", en: "en", cs: "cs", sk: "sk", ro: "ro", hr: "hr", sr: "sr", it: "it", nl: "nl", es: "es", fr: "fr",
 };
 
 /** og:locale needs the territory, unlike hreflang. */
 export const OG_LOCALE = {
   pl: "pl_PL", uk: "uk_UA", de: "de_DE", en: "en_US", cs: "cs_CZ",
-  sk: "sk_SK", ro: "ro_RO", hr: "hr_HR", sr: "sr_RS", ru: "ru_RU",
+  sk: "sk_SK", ro: "ro_RO", hr: "hr_HR", sr: "sr_RS", it: "it_IT", nl: "nl_NL", es: "es_ES", fr: "fr_FR",
 };
 
 /** The path segment for each section, per language. */
 export const SECTION = {
 calculators: {
     pl: "kalkulatory", uk: "kalkulyatory", de: "rechner", en: "calculators",
-    cs: "kalkulacky", sk: "kalkulacky", ro: "calculatoare", hr: "kalkulatori", sr: "kalkulatori", ru: "kalkulyatory",
+    cs: "kalkulacky", sk: "kalkulacky", ro: "calculatoare", hr: "kalkulatori", sr: "kalkulatori", it: "calcolatori", nl: "rekenmachines", es: "calculadoras", fr: "calculateurs",
   },
 guides: {
     pl: "poradniki", uk: "porady", de: "ratgeber", en: "guides",
-    cs: "navody", sk: "navody", ro: "ghiduri", hr: "vodici", sr: "vodici", ru: "rukovodstva",
+    cs: "navody", sk: "navody", ro: "ghiduri", hr: "vodici", sr: "vodici", it: "guide", nl: "gidsen", es: "guias", fr: "guides",
   },
 stores: {
     pl: "sklepy", uk: "magazyny", de: "baumaerkte", en: "stores",
-    cs: "obchody", sk: "obchody", ro: "magazine", hr: "trgovine", sr: "prodavnice", ru: "magaziny",
+    cs: "obchody", sk: "obchody", ro: "magazine", hr: "trgovine", sr: "prodavnice", it: "negozi", nl: "bouwmarkten", es: "tiendas", fr: "magasins",
   },
 materials: {
     pl: "materialy", uk: "materialy", de: "materialien", en: "materials",
-    cs: "materialy", sk: "materialy", ro: "materiale", hr: "materijali", sr: "materijali", ru: "materialy",
+    cs: "materialy", sk: "materialy", ro: "materiale", hr: "materijali", sr: "materijali", it: "materiali", nl: "materialen", es: "materiales", fr: "materiaux",
   },
 projects: {
     pl: "projekty", uk: "proekty", de: "projekte", en: "projects",
-    cs: "projekty", sk: "projekty", ro: "proiecte", hr: "projekti", sr: "projekti", ru: "proekty",
+    cs: "projekty", sk: "projekty", ro: "proiecte", hr: "projekti", sr: "projekti", it: "progetti", nl: "projecten", es: "proyectos", fr: "projets",
   },
 app: {
     pl: "aplikacja", uk: "dodatok", de: "android-app", en: "android-app",
-    cs: "aplikace", sk: "aplikacia", ro: "aplicatie", hr: "aplikacija", sr: "aplikacija", ru: "prilozhenie",
+    cs: "aplikace", sk: "aplikacia", ro: "aplicatie", hr: "aplikacija", sr: "aplikacija", it: "app-android", nl: "android-app", es: "app-android", fr: "application-android",
   },
 cookies: {
     pl: "cookies", uk: "cookies", de: "cookies", en: "cookies",
-    cs: "cookies", sk: "cookies", ro: "cookies", hr: "kolacici", sr: "kolacici", ru: "cookies",
+    cs: "cookies", sk: "cookies", ro: "cookies", hr: "kolacici", sr: "kolacici", it: "cookies", nl: "cookies", es: "cookies", fr: "cookies",
   },
 estimate: {
     pl: "kosztorys", uk: "koshtorys", de: "kostenvoranschlag", en: "cost-estimate",
-    cs: "rozpocet", sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun", ru: "smeta",
+    cs: "rozpocet", sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun", it: "preventivo", nl: "kostenraming", es: "presupuesto", fr: "devis",
   },
   /* Session 22, the first LiczMat Pro module. The segments are the ones the `clients`
      route carried as `plannedSlug` in src/ia.mjs since session 3 — a slug is permanent
@@ -100,14 +109,14 @@ estimate: {
      it. Ukrainian is transliterated like every other one: "kliyenty". */
 clients: {
     pl: "klienci", uk: "kliyenty", de: "kunden", en: "clients",
-    cs: "klienti", sk: "klienti", ro: "clienti", hr: "klijenti", sr: "klijenti", ru: "klienty",
+    cs: "klienti", sk: "klienti", ro: "clienti", hr: "klijenti", sr: "klijenti", it: "clienti", nl: "klanten", es: "clientes", fr: "clients",
   },
   /* Session 23, the second Pro module. Same rule as `clients`: the segments are the ones
      the `jobs` route has carried as `plannedSlug` in src/ia.mjs since session 3, so
      turning the page on moves them, it does not rename them. */
 jobs: {
     pl: "zlecenia", uk: "zamovlennya", de: "auftraege", en: "jobs",
-    cs: "zakazky", sk: "zakazky", ro: "comenzi", hr: "nalozi", sr: "nalozi", ru: "zakazy",
+    cs: "zakazky", sk: "zakazky", ro: "comenzi", hr: "nalozi", sr: "nalozi", it: "commesse", nl: "opdrachten", es: "encargos", fr: "chantiers",
   },
   /* Session 24, the third Pro module. Same rule again: the segments are the ones the
      `quotes` route has carried as `plannedSlug` in src/ia.mjs since session 3. Ukrainian
@@ -115,23 +124,23 @@ jobs: {
      estimate page in Ukrainian, and two sections may not claim one word. */
 quotes: {
     pl: "wyceny", uk: "koshtorysy-pro", de: "angebote", en: "quotes",
-    cs: "cenove-nabidky", sk: "cenove-ponuky", ro: "oferte", hr: "ponude", sr: "ponude", ru: "kommercheskie-predlozheniya",
+    cs: "cenove-nabidky", sk: "cenove-ponuky", ro: "oferte", hr: "ponude", sr: "ponude", it: "preventivi-pro", nl: "offertes", es: "presupuestos-pro", fr: "devis-pro",
   },
   /* Session 29, the public page for LiczMat Pro. Same rule once more, with one
      difference the other four do not have: "liczmat-pro" is a brand name, so it is the
-     same segment in all ten languages — translating it would give one product ten names
+     same segment in all thirteen languages — translating it would give one product thirteen names
      and split the links that point at it. The segments are the ones the `liczmat-pro`
      route has carried as `plannedSlug` in src/ia.mjs since session 3. */
 pro: {
     pl: "liczmat-pro", uk: "liczmat-pro", de: "liczmat-pro", en: "liczmat-pro",
     cs: "liczmat-pro", sk: "liczmat-pro", ro: "liczmat-pro", hr: "liczmat-pro",
-    sr: "liczmat-pro", ru: "liczmat-pro",
+    sr: "liczmat-pro", it: "liczmat-pro", nl: "liczmat-pro", es: "liczmat-pro", fr: "liczmat-pro",
   },
   /* Session 25, the fourth Pro module. Same rule once more: the segments are the ones the
      `calendar` route has carried as `plannedSlug` in src/ia.mjs since session 3. */
 calendar: {
     pl: "terminarz", uk: "kalendar", de: "termine", en: "schedule",
-    cs: "terminy", sk: "terminy", ro: "termene", hr: "rokovi", sr: "rokovi", ru: "sroki",
+    cs: "terminy", sk: "terminy", ro: "termene", hr: "rokovi", sr: "rokovi", it: "scadenze", nl: "planning", es: "plazos", fr: "echeances",
   },
   /* Session 57, the unit converter — item C1 of the parity audit, and the first section
      added to this map that was never a `plannedSlug`: src/ia.mjs was written in session 3
@@ -147,7 +156,7 @@ calendar: {
 converter: {
     pl: "konwerter-jednostek", uk: "konverter-odynyts", de: "einheitenumrechner", en: "unit-converter",
     cs: "prevodnik-jednotek", sk: "prevodnik-jednotiek", ro: "convertor-de-unitati",
-    hr: "pretvarac-jedinica", sr: "konvertor-jedinica", ru: "konverter-edinic",
+    hr: "pretvarac-jedinica", sr: "konvertor-jedinica", it: "convertitore-di-unita", nl: "eenheden-omrekenen", es: "conversor-de-unidades", fr: "convertisseur-d-unites",
   },
   /* Session 59, the visitor's own materials — item C6 of the parity audit, and the second
      section here that was never a `plannedSlug`, for the same reason the converter was
@@ -159,7 +168,7 @@ converter: {
 ownMaterials: {
     pl: "moje-materialy", uk: "moyi-materialy", de: "meine-materialien", en: "my-materials",
     cs: "moje-materialy", sk: "moje-materialy", ro: "materialele-mele",
-    hr: "moji-materijali", sr: "moji-materijali", ru: "moi-materialy",
+    hr: "moji-materijali", sr: "moji-materijali", it: "i-miei-materiali", nl: "mijn-materialen", es: "mis-materiales", fr: "mes-materiaux",
   },
 };
 
@@ -167,63 +176,63 @@ ownMaterials: {
 export const CALC_SLUG = {
   coverage: {
     pl: "farby-tynki-grunty", uk: "farba-shtukaturka-hrunt", de: "farbe-putz-grundierung", en: "paint-plaster-primer",
-    cs: "barvy-omitky-penetrace", sk: "farby-omietky-penetracie", ro: "vopsea-tencuiala-grund", hr: "boje-zbuke-temeljni-premaz", sr: "boje-malteri-prajmer", ru: "kraska-shtukaturka-grunt",
+    cs: "barvy-omitky-penetrace", sk: "farby-omietky-penetracie", ro: "vopsea-tencuiala-grund", hr: "boje-zbuke-temeljni-premaz", sr: "boje-malteri-prajmer", it: "pittura-intonaco-primer", nl: "verf-pleister-primer", es: "pintura-revoco-imprimacion", fr: "peinture-enduit-primaire",
   },
   waste: {
     pl: "plytki-panele-gres", uk: "plytka-paneli-keramohranit", de: "fliesen-paneele-feinsteinzeug", en: "tiles-panels-porcelain",
-    cs: "obklady-panely-dlazba", sk: "obklady-panely-dlazba", ro: "gresie-faianta-parchet", hr: "plocice-paneli-gres", sr: "plocice-paneli-gres", ru: "plitka-paneli-keramogranit",
+    cs: "obklady-panely-dlazba", sk: "obklady-panely-dlazba", ro: "gresie-faianta-parchet", hr: "plocice-paneli-gres", sr: "plocice-paneli-gres", it: "piastrelle-pannelli-gres", nl: "tegels-panelen-keramiek", es: "azulejos-tarima-porcelanico", fr: "carrelage-lames-gres",
   },
   wallpaper: {
     pl: "tapety", uk: "shpalery", de: "tapete", en: "wallpaper",
-    cs: "tapety", sk: "tapety", ro: "tapet", hr: "tapete", sr: "tapete", ru: "oboi",
+    cs: "tapety", sk: "tapety", ro: "tapet", hr: "tapete", sr: "tapete", it: "carta-da-parati", nl: "behang", es: "papel-pintado", fr: "papier-peint",
   },
   linear: {
     pl: "rozkroj-liniowy-1d", uk: "rozkriy-liniynyi-1d", de: "linearer-zuschnitt-1d", en: "linear-cutting-1d",
-    cs: "linearni-narez-1d", sk: "linearny-rez-1d", ro: "debitare-liniara-1d", hr: "linearno-rezanje-1d", sr: "linearno-secenje-1d", ru: "raskroy-lineynyy-1d",
+    cs: "linearni-narez-1d", sk: "linearny-rez-1d", ro: "debitare-liniara-1d", hr: "linearno-rezanje-1d", sr: "linearno-secenje-1d", it: "taglio-lineare-1d", nl: "lineair-zagen-1d", es: "corte-lineal-1d", fr: "decoupe-lineaire-1d",
   },
   sheet: {
     pl: "rozkroj-plyt-2d", uk: "rozkriy-plyt-2d", de: "plattenzuschnitt-2d", en: "sheet-cutting-2d",
-    cs: "narez-desek-2d", sk: "rez-dosiek-2d", ro: "debitare-placi-2d", hr: "rezanje-ploca-2d", sr: "secenje-ploca-2d", ru: "raskroy-plit-2d",
+    cs: "narez-desek-2d", sk: "rez-dosiek-2d", ro: "debitare-placi-2d", hr: "rezanje-ploca-2d", sr: "secenje-ploca-2d", it: "taglio-pannelli-2d", nl: "platen-zagen-2d", es: "corte-de-tableros-2d", fr: "decoupe-de-panneaux-2d",
   },
   concrete: {
     pl: "beton-z-worka", uk: "beton-z-mishka", de: "sackbeton", en: "bagged-concrete",
-    cs: "beton-z-pytle", sk: "beton-z-vreca", ro: "beton-la-sac", hr: "beton-iz-vrece", sr: "beton-iz-dzaka", ru: "beton-iz-meshka",
+    cs: "beton-z-pytle", sk: "beton-z-vreca", ro: "beton-la-sac", hr: "beton-iz-vrece", sr: "beton-iz-dzaka", it: "calcestruzzo-in-sacchi", nl: "beton-uit-zak", es: "hormigon-en-saco", fr: "beton-en-sac",
   },
   mortar: {
     pl: "klej-zaprawa", uk: "kliy-rozchyn", de: "kleber-moertel", en: "adhesive-mortar",
-    cs: "lepidlo-malta", sk: "lepidlo-malta", ro: "adeziv-mortar", hr: "ljepilo-mort", sr: "lepak-malter", ru: "kley-rastvor",
+    cs: "lepidlo-malta", sk: "lepidlo-malta", ro: "adeziv-mortar", hr: "ljepilo-mort", sr: "lepak-malter", it: "colla-malta", nl: "lijm-mortel", es: "adhesivo-mortero", fr: "colle-mortier",
   },
   screed: {
     pl: "wylewka-tynk", uk: "styazhka-shtukaturka", de: "estrich-putz", en: "screed-plaster",
-    cs: "poter-omitka", sk: "poter-omietka", ro: "sapa-tencuiala", hr: "estrih-zbuka", sr: "estrih-malter", ru: "styazhka-shtukaturka",
+    cs: "poter-omitka", sk: "poter-omietka", ro: "sapa-tencuiala", hr: "estrih-zbuka", sr: "estrih-malter", it: "massetto-intonaco", nl: "dekvloer-pleister", es: "solera-revoco", fr: "chape-enduit",
   },
   grout: {
     pl: "fuga", uk: "zatyrka", de: "fugenmasse", en: "grout",
-    cs: "sparovaci-hmota", sk: "skarovacia-hmota", ro: "chit-de-rosturi", hr: "fugir-masa", sr: "fug-masa", ru: "zatirka",
+    cs: "sparovaci-hmota", sk: "skarovacia-hmota", ro: "chit-de-rosturi", hr: "fugir-masa", sr: "fug-masa", it: "stucco-per-fughe", nl: "voegmiddel", es: "lechada-de-juntas", fr: "joint-de-carrelage",
   },
   masonry: {
     pl: "murowanie", uk: "muruvannya", de: "mauerwerk", en: "masonry",
-    cs: "zdeni", sk: "murovanie", ro: "zidarie", hr: "zidanje", sr: "zidanje", ru: "kladka",
+    cs: "zdeni", sk: "murovanie", ro: "zidarie", hr: "zidanje", sr: "zidanje", it: "muratura", nl: "metselwerk", es: "albanileria", fr: "maconnerie",
   },
   insulation: {
     pl: "ocieplenie-etics", uk: "uteplennya-etics", de: "daemmung-wdvs", en: "insulation-etics",
-    cs: "zatepleni-etics", sk: "zateplenie-etics", ro: "termoizolatie-etics", hr: "izolacija-etics", sr: "izolacija-etics", ru: "uteplenie-etics",
+    cs: "zatepleni-etics", sk: "zateplenie-etics", ro: "termoizolatie-etics", hr: "izolacija-etics", sr: "izolacija-etics", it: "cappotto-termico-etics", nl: "gevelisolatie-etics", es: "aislamiento-sate-etics", fr: "isolation-ite-etics",
   },
   studwall: {
     pl: "sciana-dzialowa-gk", uk: "peregorodka-hk", de: "staenderwand", en: "stud-partition",
-    cs: "pricka-sdk", sk: "priecka-sdk", ro: "perete-gips-carton", hr: "gk-pregrada", sr: "gk-pregrada", ru: "peregorodka-gk",
+    cs: "pricka-sdk", sk: "priecka-sdk", ro: "perete-gips-carton", hr: "gk-pregrada", sr: "gk-pregrada", it: "parete-in-cartongesso", nl: "gipswand", es: "tabique-de-pladur", fr: "cloison-placo",
   },
   ceiling: {
     pl: "sufit-podwieszany", uk: "pidvisna-stelya", de: "abgehaengte-decke", en: "suspended-ceiling",
-    cs: "podhled", sk: "podhlad", ro: "tavan-suspendat", hr: "spusteni-strop", sr: "spusteni-plafon", ru: "podvesnoy-potolok",
+    cs: "podhled", sk: "podhlad", ro: "tavan-suspendat", hr: "spusteni-strop", sr: "spusteni-plafon", it: "controsoffitto", nl: "verlaagd-plafond", es: "techo-suspendido", fr: "plafond-suspendu",
   },
   drylining: {
     pl: "gk-na-klej", uk: "hk-na-kliy", de: "ansetzbinder-platten", en: "glued-plasterboard",
-    cs: "sdk-na-lepidlo", sk: "sdk-na-lepidlo", ro: "gips-carton-lipit", hr: "gk-na-ljepilo", sr: "gk-na-lepak", ru: "gk-na-kley",
+    cs: "sdk-na-lepidlo", sk: "sdk-na-lepidlo", ro: "gips-carton-lipit", hr: "gk-na-ljepilo", sr: "gk-na-lepak", it: "cartongesso-a-colla", nl: "gipsplaat-op-lijm", es: "pladur-pegado", fr: "placo-colle",
   },
   sheathing: {
     pl: "poszycie-osb", uk: "obshyvka-osb", de: "beplankung-osb", en: "sheathing-osb",
-    cs: "zaklop-osb", sk: "zaklop-osb", ro: "astereala-osb", hr: "oplata-osb", sr: "oplata-osb", ru: "obshivka-osb",
+    cs: "zaklop-osb", sk: "zaklop-osb", ro: "astereala-osb", hr: "oplata-osb", sr: "oplata-osb", it: "rivestimento-osb", nl: "beplating-osb", es: "entablado-osb", fr: "voligeage-osb",
   },
 };
 
@@ -234,7 +243,7 @@ export const GUIDES = [
     calcs: ["coverage"],
     slug: {
       pl: "ile-farby-na-pokoj", uk: "skilky-farby-na-kimnatu", de: "wie-viel-farbe-fuer-ein-zimmer", en: "how-much-paint-for-a-room",
-      cs: "kolik-barvy-na-pokoj", sk: "kolko-farby-na-izbu", ro: "cata-vopsea-pentru-o-camera", hr: "koliko-boje-za-sobu", sr: "koliko-boje-za-sobu", ru: "skolko-kraski-na-komnatu",
+      cs: "kolik-barvy-na-pokoj", sk: "kolko-farby-na-izbu", ro: "cata-vopsea-pentru-o-camera", hr: "koliko-boje-za-sobu", sr: "koliko-boje-za-sobu", it: "quanta-pittura-per-una-stanza", nl: "hoeveel-verf-voor-een-kamer", es: "cuanta-pintura-para-una-habitacion", fr: "combien-de-peinture-pour-une-piece",
     },
   },
   {
@@ -242,7 +251,7 @@ export const GUIDES = [
     calcs: ["waste", "mortar", "grout"],
     slug: {
       pl: "plytki-i-klej-do-lazienki", uk: "plytka-i-kliy-u-vannu", de: "fliesen-und-kleber-fuers-bad", en: "tiles-and-adhesive-for-a-bathroom",
-      cs: "obklady-a-lepidlo-do-koupelny", sk: "obklady-a-lepidlo-do-kupelne", ro: "gresie-si-adeziv-pentru-baie", hr: "plocice-i-ljepilo-za-kupaonicu", sr: "plocice-i-lepak-za-kupatilo", ru: "plitka-i-kley-v-vannuyu",
+      cs: "obklady-a-lepidlo-do-koupelny", sk: "obklady-a-lepidlo-do-kupelne", ro: "gresie-si-adeziv-pentru-baie", hr: "plocice-i-ljepilo-za-kupaonicu", sr: "plocice-i-lepak-za-kupatilo", it: "piastrelle-e-colla-per-il-bagno", nl: "tegels-en-lijm-voor-de-badkamer", es: "azulejos-y-adhesivo-para-el-bano", fr: "carrelage-et-colle-pour-la-salle-de-bain",
     },
   },
   {
@@ -250,7 +259,7 @@ export const GUIDES = [
     calcs: ["waste"],
     slug: {
       pl: "ile-paneli-na-podloge", uk: "skilky-paneley-na-pidlohu", de: "wie-viele-bodenpaneele", en: "how-many-floor-panels",
-      cs: "kolik-panelu-na-podlahu", sk: "kolko-panelov-na-podlahu", ro: "cate-placi-de-parchet", hr: "koliko-panela-za-pod", sr: "koliko-panela-za-pod", ru: "skolko-paneley-na-pol",
+      cs: "kolik-panelu-na-podlahu", sk: "kolko-panelov-na-podlahu", ro: "cate-placi-de-parchet", hr: "koliko-panela-za-pod", sr: "koliko-panela-za-pod", it: "quanti-pannelli-per-il-pavimento", nl: "hoeveel-vloerpanelen", es: "cuantas-lamas-para-el-suelo", fr: "combien-de-lames-de-parquet",
     },
   },
   {
@@ -258,7 +267,7 @@ export const GUIDES = [
     calcs: ["studwall", "sheathing"],
     slug: {
       pl: "sciana-dzialowa-gk-profile-i-plyty", uk: "hk-perehorodka-profili-ta-lysty", de: "staenderwand-profile-und-platten", en: "stud-partition-profiles-and-boards",
-      cs: "sdk-pricka-profily-a-desky", sk: "sdk-priecka-profily-a-dosky", ro: "perete-gips-carton-profile-si-placi", hr: "gk-pregrada-profili-i-ploce", sr: "gk-pregrada-profili-i-ploce", ru: "gk-peregorodka-profili-i-listy",
+      cs: "sdk-pricka-profily-a-desky", sk: "sdk-priecka-profily-a-dosky", ro: "perete-gips-carton-profile-si-placi", hr: "gk-pregrada-profili-i-ploce", sr: "gk-pregrada-profili-i-ploce", it: "parete-cartongesso-profili-e-lastre", nl: "gipswand-profielen-en-platen", es: "tabique-de-pladur-perfiles-y-placas", fr: "cloison-placo-rails-et-plaques",
     },
   },
   {
@@ -266,7 +275,7 @@ export const GUIDES = [
     calcs: ["mortar", "waste", "grout"],
     slug: {
       pl: "ile-kleju-do-plytek", uk: "skilky-kliyu-dlya-plytky", de: "wie-viel-fliesenkleber", en: "how-much-tile-adhesive",
-      cs: "kolik-lepidla-na-obklady", sk: "kolko-lepidla-na-obklady", ro: "cat-adeziv-pentru-gresie", hr: "koliko-ljepila-za-plocice", sr: "koliko-lepka-za-plocice", ru: "skolko-kleya-dlya-plitki",
+      cs: "kolik-lepidla-na-obklady", sk: "kolko-lepidla-na-obklady", ro: "cat-adeziv-pentru-gresie", hr: "koliko-ljepila-za-plocice", sr: "koliko-lepka-za-plocice", it: "quanta-colla-per-piastrelle", nl: "hoeveel-tegellijm", es: "cuanto-adhesivo-para-azulejos", fr: "combien-de-colle-a-carrelage",
     },
   },
   {
@@ -274,7 +283,7 @@ export const GUIDES = [
     calcs: ["coverage"],
     slug: {
       pl: "ile-gladzi-na-sciane", uk: "skilky-shpaklivky-na-stinu", de: "wie-viel-spachtelmasse", en: "how-much-skim-coat",
-      cs: "kolik-stuku-na-stenu", sk: "kolko-stuku-na-stenu", ro: "cat-glet-pentru-perete", hr: "koliko-gleta-za-zid", sr: "koliko-gleta-za-zid", ru: "skolko-shpaklevki-na-stenu",
+      cs: "kolik-stuku-na-stenu", sk: "kolko-stuku-na-stenu", ro: "cat-glet-pentru-perete", hr: "koliko-gleta-za-zid", sr: "koliko-gleta-za-zid", it: "quanto-stucco-per-una-parete", nl: "hoeveel-plamuur-voor-een-muur", es: "cuanta-masilla-para-una-pared", fr: "combien-d-enduit-de-lissage",
     },
   },
   {
@@ -282,7 +291,7 @@ export const GUIDES = [
     calcs: ["insulation", "coverage", "mortar"],
     slug: {
       pl: "ocieplenie-domu-styropianem", uk: "uteplennya-budynku-pinoplastom", de: "haus-mit-eps-daemmen", en: "insulating-a-house-with-eps",
-      cs: "zatepleni-domu-polystyrenem", sk: "zateplenie-domu-polystyrenom", ro: "termoizolarea-casei-cu-polistiren", hr: "izolacija-kuce-stiroporom", sr: "izolacija-kuce-stiroporom", ru: "uteplenie-doma-penoplastom",
+      cs: "zatepleni-domu-polystyrenem", sk: "zateplenie-domu-polystyrenom", ro: "termoizolarea-casei-cu-polistiren", hr: "izolacija-kuce-stiroporom", sr: "izolacija-kuce-stiroporom", it: "cappotto-termico-con-eps", nl: "huis-isoleren-met-eps", es: "aislar-la-casa-con-eps", fr: "isoler-une-maison-avec-du-pse",
     },
   },
   {
@@ -290,7 +299,7 @@ export const GUIDES = [
     calcs: ["sheet", "linear"],
     slug: {
       pl: "rozkroj-plyty-meblowej-bez-odpadu", uk: "rozkriy-mebleovoyi-plyty-bez-vidkhodiv", de: "moebelplatte-mit-wenig-verschnitt-zuschneiden", en: "cutting-a-furniture-board-with-less-waste",
-      cs: "narez-nabytkove-desky-s-malym-prorezem", sk: "rez-nabytkovej-dosky-s-malym-prierezom", ro: "debitarea-placii-de-mobila-cu-pierderi-mici", hr: "rezanje-namjestajne-ploce-s-manje-otpada", sr: "secenje-namestajne-ploce-sa-manje-otpada", ru: "raskroy-mebelnoy-plity-bez-otkhodov",
+      cs: "narez-nabytkove-desky-s-malym-prorezem", sk: "rez-nabytkovej-dosky-s-malym-prierezom", ro: "debitarea-placii-de-mobila-cu-pierderi-mici", hr: "rezanje-namjestajne-ploce-s-manje-otpada", sr: "secenje-namestajne-ploce-sa-manje-otpada", it: "taglio-del-pannello-con-meno-scarto", nl: "meubelplaat-zagen-met-minder-afval", es: "cortar-un-tablero-con-menos-desperdicio", fr: "decouper-un-panneau-avec-moins-de-chutes",
     },
   },
 ];

@@ -105,9 +105,10 @@ const ids = (page) => [...page.html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]
 
 head("0. the tree this suite is reading");
 {
-  // 385 since session 57 put the converter in ten languages beside the 373.
-  check("395 pages: 393 generated plus the two hand-written ones",
-    PAGES.length === 395, `found ${PAGES.length}`);
+  // 512 since 2026-09-02 swapped Russian for Italian, Dutch, Spanish and French: three
+  // languages more of every route, on top of the converter and /moje-materialy/.
+  check("512 pages: 510 generated plus the two hand-written ones",
+    PAGES.length === 512, `found ${PAGES.length}`);
   check("every page declares a language",
     PAGES.every((page) => page.lang), PAGES.filter((page) => !page.lang).map((x) => x.url).join(", "));
   const codes = new Set(LANGS.map((l) => HREFLANG[l]));
@@ -323,8 +324,8 @@ head("5. ids and the attributes that point at them");
 head("6. what changes on its own says so");
 {
   const calcPages = PAGES.filter((page) => page.body.includes("data-result"));
-  check("the 150 calculator pages are the ones with a result box",
-    calcPages.length === 150, `found ${calcPages.length}`);
+  check("the 195 calculator pages are the ones with a result box",
+    calcPages.length === 15 * LANGS.length, `found ${calcPages.length}`);
   checkAll("the result box is a live region", calcPages,
     (page) => /<div class="result show" data-result role="status">/.test(page.body),
     (page) => page.url);
@@ -426,9 +427,9 @@ head("7. the language picker, the currency selector, the theme toggle");
 head("8. the carousel can be stopped");
 {
   const carousel = PAGES.filter((page) => page.body.includes("data-carousel"));
-  // /aplikacja/ and its nine translations: the hero and the banner at the foot of it.
-  check("the mockup is on the ten pages that show the app",
-    carousel.length === 10, `${carousel.length} pages`);
+  // /aplikacja/ and its twelve translations: the hero and the banner at the foot of it.
+  check("the mockup is on the pages that show the app",
+    carousel.length === LANGS.length, `${carousel.length} pages`);
 
   checkAll("every track has a stop button beside it", carousel, (page) => {
     const tracks = (page.body.match(/data-carousel(?=[\s>])/g) || []).length;
