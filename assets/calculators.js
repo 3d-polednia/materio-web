@@ -85,7 +85,7 @@ function parsePieces(text) {
 const PACK_EPS = 1e-6;
 
 /** Best-Area-Fit within the sheet's free rectangles, then guillotine-split. */
-function tryPlaceGuillotine(sheet, w, h, canRotate, kerf) {
+function tryPlaceGuillotine(sheet, w, h, canRotate, kerf, type) {
   let bestIdx = -1, bestRotated = false, bestLeftover = Infinity;
   sheet.free.forEach((r, i) => {
     if (w <= r.w + PACK_EPS && h <= r.h + PACK_EPS) {
@@ -101,7 +101,7 @@ function tryPlaceGuillotine(sheet, w, h, canRotate, kerf) {
 
   const rect = sheet.free.splice(bestIdx, 1)[0];
   const pw = bestRotated ? h : w, ph = bestRotated ? w : h;
-  sheet.placements.push({ sheet: sheet.index, x: rect.x, y: rect.y, w: pw, h: ph, rotated: bestRotated });
+  sheet.placements.push({ sheet: sheet.index, x: rect.x, y: rect.y, w: pw, h: ph, rotated: bestRotated, type: type || 0 });
 
   // Guillotine split: a right offcut and a bottom offcut, each shrunk by kerf.
   const rightW = rect.w - pw - kerf;
@@ -208,12 +208,15 @@ const ENGINES = {
       (w <= SW + PACK_EPS && h <= SH + PACK_EPS) || (canRotate && h <= SW + PACK_EPS && w <= SH + PACK_EPS);
 
     const units = [];
+    let type = 0;
     for (const p of parsePieces(f.pieces)) {
       if (!(p.w > 0) || !(p.l > 0)) return { err: "err_positive" };
       if (p.q <= 0) continue;
       if (p.q > 100000) return { err: "err_toomany" };
       if (!fitsSheet(p.w, p.l)) return { err: "err_toobig" };
-      for (let i = 0; i < p.q; i++) units.push({ w: p.w, h: p.l });
+      // One colour per distinct piece row so the picture reads like the input list.
+      for (let i = 0; i < p.q; i++) units.push({ w: p.w, h: p.l, type });
+      type++;
     }
     if (!units.length) return { err: "err_positive" };
 
@@ -223,13 +226,13 @@ const ENGINES = {
     for (const u of sorted) {
       let placed = false;
       for (const sheet of sheets) {
-        if (tryPlaceGuillotine(sheet, u.w, u.h, canRotate, kerf)) { placed = true; break; }
+        if (tryPlaceGuillotine(sheet, u.w, u.h, canRotate, kerf, u.type)) { placed = true; break; }
       }
       if (!placed) {
         const sheet = { index: sheets.length + 1, free: [{ x: 0, y: 0, w: SW, h: SH }], placements: [] };
         sheets.push(sheet);
         // Guaranteed to fit an empty sheet (validated above), but guard anyway.
-        if (!tryPlaceGuillotine(sheet, u.w, u.h, canRotate, kerf)) return { err: "err_toobig" };
+        if (!tryPlaceGuillotine(sheet, u.w, u.h, canRotate, kerf, u.type)) return { err: "err_toobig" };
       }
     }
 
@@ -241,7 +244,12 @@ const ENGINES = {
       ["res_useful", qtyG(useful) + " m²"],
       ["res_purchased", qtyG(purchased) + " m²"],
       ["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"],
-    ] };
+    ], plan: {
+      // Geometry (mm) for the cut-plan picture; the renderer only scales it, so the
+      // drawing always matches the numbers above (CutPlanView.kt / SheetCutPlan).
+      sheetW: SW, sheetH: SH,
+      sheets: sheets.map((s) => s.placements),
+    } };
   },
   /**
    * Bagged concrete. TradeCalc.concrete takes the bag yield and the water per bag as
@@ -613,9 +621,52 @@ function renderResult(card, res, byHand) {
   if (res.cost && res.cost > 0) rows.unshift(`<div><span>${t("res_cost", lang)}</span><b>${money(res.cost, lang)}</b></div>`);
   writeResult(box, `<div class="muted eyebrow">${t("res_tobuy", lang)}</div>
     <div class="big">${qty(res.tobuy, lang)} <span class="figure-line">${unitLabel(res.unit, res.tobuy, lang, (k) => t(k, lang))}</span></div>
-    <div class="rows">${rows.join("")}</div>`);
+    <div class="rows">${rows.join("")}</div>${card.dataset.calc === "sheet" && res.plan ? renderSheetCutPlan(res.plan, lang) : ""}`);
 
   // The workspace (assets/workspace-ui.js) hangs the "save to the estimate" button off
   // this. Nothing else listens, and the calculators keep working when it is not loaded.
   document.dispatchEvent(new CustomEvent("calcresult", { detail: { card, result: res, byHand: Boolean(byHand) } }));
 }
+
+function renderSheetCutPlan(plan, lang) {
+  if (!plan.sheets || !plan.sheets.length) return '';
+  const sheetW = plan.sheetW || 1;
+  const sheetH = plan.sheetH || 1;
+  const shown = plan.sheets.slice(0, 4);
+
+  const colors = ['var(--accent)', 'var(--tertiary)', 'var(--success)', 'var(--warning)'];
+
+  let html = `<div class="cutplan">
+    <div class="cutplan-label">${t("res_cut_plan", lang) || "Plan cięcia"}</div>
+    <div class="cutplan-sheets">`;
+  shown.forEach((placements, index) => {
+    const sheetIdx = index + 1;
+    const svgW = 200;
+    const svgH = Math.round(svgW * (sheetH / sheetW));
+
+    html += `<div class="cutplan-sheet-box">
+      <div class="cutplan-label">${t("res_sheet", lang) || "Arkusz"} ${sheetIdx} (${placements.length})</div>
+      <svg viewBox="0 0 ${svgW} ${svgH}" class="cutplan-sheet" preserveAspectRatio="xMidYMid meet">
+        <rect width="${svgW}" height="${svgH}" fill="var(--surface-container)" stroke="var(--outline-strong)" stroke-width="2"/>`;
+
+    placements.forEach((p, i) => {
+      const x = (p.x / sheetW) * svgW;
+      const y = (p.y / sheetH) * svgH;
+      const w = (p.w / sheetW) * svgW;
+      const h = (p.h / sheetH) * svgH;
+      const fill = colors[p.type % colors.length];
+      html += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" fill-opacity="0.25" stroke="${fill}" stroke-width="1.5"/>`;
+    });
+
+    html += `</svg></div>`;
+  });
+
+  html += `</div>`;
+  if (plan.sheets.length > shown.length) {
+    html += `<div class="cutplan-more muted">+${plan.sheets.length - shown.length} ${t("res_plan_more_sheets", lang) || "więcej arkuszy"}</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+

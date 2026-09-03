@@ -540,6 +540,16 @@ select:focus-visible, textarea:focus-visible {
 .result .rows { margin-top: var(--sp-3); display: grid; gap: 3px; font-size: var(--fs-sm); }
 .result .rows div { display: flex; justify-content: space-between; gap: var(--sp-3); }
 
+/* The 2D cut-plan picture (assets/calculators.js renderResult): each sheet drawn to
+   scale so the visitor sees where the off-cut lands, not just the waste percentage.
+   Ported from the app's SheetCutPlan (feature/calculator/CutPlanView.kt). */
+.cutplan { margin-top: var(--sp-3); }
+.cutplan-sheets { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--sp-3); margin-top: var(--sp-1); }
+.cutplan-sheet-box { min-width: 0; }
+.cutplan-label { font-size: var(--fs-xs); font-weight: var(--fw-semi); margin-bottom: 2px; }
+.cutplan-sheet { display: block; width: 100%; height: auto; border-radius: 2px; background: var(--surface); }
+.cutplan-more { font-size: var(--fs-xs); margin-top: var(--sp-2); }
+
 /* A quiet aside inside body copy: the practical warning at the end of a guide. */
 .tip {
   margin-top: var(--sp-6); padding: var(--sp-4); border-radius: var(--radius);

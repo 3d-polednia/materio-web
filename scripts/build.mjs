@@ -531,6 +531,11 @@ function stripHtmlComments(html) {
 }
 
 function write(relPath, contents) {
+  // On Windows path.join() uses backslashes and may keep a leading backslash from a
+  // URL like "/aplikacja/".  Normalise to forward slashes without a leading slash so
+  // all internal path comparisons (livePaths, noindexed, sitemapFile) work on both
+  // platforms.
+  relPath = relPath.replace(/\\/g, "/").replace(/^\//, "");
   const full = p(relPath);
   if (relPath.endsWith(".html")) {
     contents = stripHtmlComments(contents);
@@ -1570,6 +1575,8 @@ buildSitemap();
  */
 function checkAgainstIA() {
   const declared = livePaths(CALCS, GUIDES);
+  // On Windows path.join() uses backslashes; livePaths() always uses forward slashes.
+  // Normalise before comparing so the check works on both platforms.
   const built = new Set(written.filter((f) => f.endsWith(".html")));
   const mismatches = [
     ...[...built].filter((f) => !declared.has(f)).map((f) => `built but not declared: ${f}`),
