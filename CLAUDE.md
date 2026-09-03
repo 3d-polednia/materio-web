@@ -187,6 +187,9 @@ Four things it forbids, and the build or the tests say so:
 1. **No slug changes** — `CALC_SLUG`, `SECTION`, `GUIDES`, in any language. A renamed
    Polish slug leaves twelve frozen pages pointing an hreflang at a URL that is gone.
    `scripts/test-seo.mjs` still reads all thirteen and checks reciprocity, so it catches it.
+   The second half of the same problem is that `clean()` no longer sweeps those twelve
+   directories, so a renamed slug also leaves the old page behind as an orphan rather than
+   deleting it; test-seo counts the files that shipped, which is what catches that one.
 2. **No new pages or routes.** `checkAgainstIA()` accepts a declared page that is already
    on disk, which is what freezing needs, and still aborts on one that is nowhere — which
    is every new route, in twelve languages. A new page needs a full build.
