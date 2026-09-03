@@ -1255,6 +1255,29 @@ function crmSchedule(today) {
   };
 }
 
+/**
+ * Every job that carries a deadline, grouped under it — "YYYY-MM-DD" -> [job, ...].
+ *
+ * 2026-09-03, owner's decision: /app/'s Terminarz tab gets a real month grid, reversing
+ * chapter XXIII's "nie buduj odpowiednika Google Calendar" (see the note at the top of
+ * assets/schedule-ui.js and docs/MASTER_PLAN.txt chapter XXIII for the original scope and
+ * why it stood). crmSchedule() still answers "kiedy" in words (late/today/soon/later) and
+ * stays exactly as it was; this is the second, day-indexed view the grid needs, built from
+ * the same crmAllJobs() so the two can never disagree about what a job's deadline is.
+ *
+ * Open and closed jobs both appear — a finished job due last Tuesday still belongs on last
+ * Tuesday's cell, dimmed by the caller, not erased from the month. A day with no jobs has
+ * no key here at all, so the caller's own lookup already tells it "empty" for free.
+ */
+function crmJobsByDay() {
+  const byDay = {};
+  crmAllJobs().forEach((job) => {
+    if (!job.dueDate) return;
+    (byDay[job.dueDate] || (byDay[job.dueDate] = [])).push(job);
+  });
+  return byDay;
+}
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     CRM_KEY, CRM_SCHEMA, CRM_MAX_NAME, CRM_MAX_NOTE,

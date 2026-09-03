@@ -1371,17 +1371,21 @@ function buildPrivatePages() {
     // through its globals, which a module's own scope would hide. pay.js next to it, for
     // the same reason and one page later in the story: the Pro tab is where a
     // subscription is bought, so it is the one page that needs the prices AND the uid.
-    // assets/paywall.js is deliberately absent — it draws a wall, and /app/ has none.
-    // It was here until session 28 only to wire the preview switch, which is gone.
+    // assets/paywall.js: was deliberately absent through 2026-09-03 — "it draws a wall,
+    // and /app/ has none". Klienci/Zlecenia/Wyceny/Terminarz drawing live, in-place walls
+    // as sidebar tabs (see src/app-pages.mjs) is exactly what changed that; loaded after
+    // plan.js/pay.js, which pwState()/pwPrices() read through their own globals.
     // crm-store.js since session 46: clients, jobs and quotes joined the sync contract, so
-    // the sync tab has a second store to push and pull. The STORE half only — /app/ draws no
-    // Pro screen, and assets/crm.js is 47 kB of screens this page would never use.
+    // the sync tab has a second store to push and pull.
+    // crm.js: was deliberately absent through 2026-09-03 ("47 kB of screens this page
+    // would never use") — /app/ now draws four of those screens itself, in the sidebar,
+    // so it needs the module the screens are built from, not only the store under it.
     // own-materials.js since session 59: the visitor's own materials joined the contract
-    // as a ninth collection, so the sync tab has a third store to push and pull. The STORE
-    // half only, for the same reason as crm-store.js — /app/ draws no material screen.
+    // as a ninth collection, so the sync tab has a third store to push and pull, and the
+    // Materiały tab reads its list through the same globals.
     classicScripts: [
-      "/assets/workspace.js", "/assets/crm-store.js", "/assets/own-materials.js",
-      "/assets/plan.js", "/assets/pay.js",
+      "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+      "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
     ],
     scripts: ["/assets/app.js"],
   }));

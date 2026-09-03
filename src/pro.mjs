@@ -234,17 +234,24 @@ export function proGate(t, featureId, features, lang, opts) {
 }
 
 /**
- * The whole Pro section of /app/: what Pro is, the modules, and where the plan stands.
+ * /app/'s "LiczMat Pro" tab: what Pro is, and where this account's plan stands.
  *
  * The plan status itself is filled in by assets/app.js from `users/{uid}` — the build
  * cannot know it, and the elements it writes into are empty on purpose rather than
  * carrying a guess that would be wrong for one visitor in every hundred.
+ *
+ * Until 2026-09-03 this also listed the five Pro modules as locked cards (proModuleCard()),
+ * chapter XXV's "użytkownik darmowy powinien rozumieć, które funkcje są Pro". That is still
+ * true for a visitor who has never been Pro — but it is `proGate()`, drawn live inside each
+ * of the Klienci/Zlecenia/Wyceny/Terminarz tabs themselves now that those tabs exist on
+ * /app/, that tells them so at the moment they open one, not a second, separate list here
+ * that could drift out of step with what those tabs actually show. `proModuleCard()` and
+ * `proModules()` stay exported — the wall (`proGate()`) still uses `proModules()` for its
+ * "everything else Pro contains" list.
  */
 export function proPanel(t, features) {
   const i = (key, tag = "p", cls = "") =>
     `<${tag}${cls ? ` class="${cls}"` : ""} data-i18n="${key}">${esc(t(key))}</${tag}>`;
-
-  const mods = proModules(features).map((f) => proModuleCard(t, f)).join("\n      ");
 
   // "Poznaj LiczMat Pro" (chapter XXV). It is a sentence and not a link while
   // /liczmat-pro/ is PLANNED: a button that goes nowhere is the one thing that chapter
@@ -278,10 +285,6 @@ export function proPanel(t, features) {
              target="_blank" data-i18n="pay_manage">${esc(t("pay_manage"))}</a>
           <span class="muted field-note" data-i18n="pay_manage_d">${esc(t("pay_manage_d"))}</span>
         </p>
-      </div>
-
-      <div class="pro-mods">
-      ${mods}
       </div>
 
       ${more}

@@ -587,7 +587,12 @@ head("9. /app/ carries the Pro tab");
   has('data-panel="pro"', "and a panel behind it");
   has('id="panel-pro"', "which the tab points at");
   has('aria-labelledby="tab-pro"', "and which points back");
-  eq("five tabs now, and the panels match", (html.match(/class="app-tab"/g) || []).length,
+  // 2026-09-03: the flat strip became a sidebar (.app-nav-item, not .app-tab — see
+  // src/app-pages.mjs), and it grew from five items to twelve: the new Przegląd/Klienci/
+  // Zlecenia/Wyceny/Terminarz/Materiały/Pomieszczenia tabs sit beside the five that were
+  // always here.
+  eq("twelve sidebar items now, and the panels match",
+    (html.match(/class="app-nav-item"/g) || []).length,
     (html.match(/data-panel="/g) || []).length);
 
   has('id="plan-card"', "the plan has a card of its own");
@@ -595,12 +600,29 @@ head("9. /app/ carries the Pro tab");
   has('id="plan-until"', "its end date");
   has('id="plan-note"', "and the reason it is what it is");
 
-  for (const m of proModules(LM_FEATURES)) {
-    has(`data-feature="${m.id}"`, `the "${m.id}" module is on the page`);
-    has(`data-i18n="${m.key}_d"`, `and says what it is, translatably`);
+  // Until 2026-09-03 the Pro tab also listed the five modules as locked cards
+  // (proModuleCard()) — chapter XXV's "a free user should understand which features are
+  // Pro". That understanding now happens live, at the moment a free account opens one of
+  // the four real tabs Klienci/Zlecenia/Wyceny/Terminarz have become: each embeds
+  // proGate() for its own feature id, which is what is checked here instead of a card on
+  // this one tab. See the note above proPanel() in src/pro.mjs.
+  // The id prefixes match assets/paywall.js's pwMount() calls in assets/app.js.
+  const gatePrefix = { clients: "acctclients", jobs: "acctjob", quotes: "acctquo", calendar: "acctcal" };
+  for (const feature of ["clients", "jobs", "quotes", "calendar"]) {
+    has(`id="${gatePrefix[feature]}-gate"`, `the "${feature}" tab carries its own live wall`);
   }
-  eq("each module is locked once",
-    (html.match(/data-i18n="pro_locked"/g) || []).length, proModules(LM_FEATURES).length);
+  // proGate() (src/pro.mjs) predates /app/'s in-place picker and carries no data-i18n of
+  // its own — it is built once per static, per-language page everywhere else it is used.
+  // See the note in the redesign's summary: that tab carrying a wall stays in Polish
+  // across a langchange, a disclosed gap rather than a silent one.
+  const lockedChip = `<span class="chip">${DICT.pl.pro_locked}</span>`;
+  eq("one pro_locked chip per walled tab, inside those four gates",
+    html.split(lockedChip).length - 1, 4);
+
+  // Materiały and Pomieszczenia carry no wall — Free-tier, like /moje-materialy/ and the
+  // rooms already on the Projekty panel.
+  hasNot('id="acctmat-gate"', "Materiały has no gate to carry");
+  hasNot('id="acctrooms-gate"', "nor does Pomieszczenia");
 
   // Chapter XXV, the rule the whole tab exists to obey: never a dead button — which now
   // cuts the other way. Session 29 built /liczmat-pro/, so "Poznaj LiczMat Pro" is the
@@ -609,9 +631,9 @@ head("9. /app/ carries the Pro tab");
   // from window.LM_NAV — scripts/build.mjs puts this route into that map for exactly this.
   has('href="/liczmat-pro/"', "the Pro page, which exists now, is reachable from the tab");
   has('data-nav-route="liczmat-pro"', "and the link follows the language the page is in");
-  // Klienci is built (session 22), so its card is the one module the tab can open. A
-  // dead button is what chapter XXV forbids; a live one is what it asks for.
-  has('href="/klienci/"', "and Klienci, which exists, is reachable from its card");
+  // Klienci used to be reachable only from a card on this tab that linked out to its own
+  // page; now it is a sidebar tab of /app/ itself, so the way in is data-tab, not href.
+  has('data-tab="clients"', "and Klienci, which exists, is a sidebar tab of its own");
   hasNot('class="muted pro-more"',
     "so the way in is a link, not the sentence it was before the page existed");
 

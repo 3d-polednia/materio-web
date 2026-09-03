@@ -1339,6 +1339,152 @@ a.chip:hover { text-decoration: none; }
 .pro-soon { margin: var(--sp-2) 0 0; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 .pro-more { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 
+/* ---------------------------------------------------------------- /app/ sidebar shell
+   2026-09-03. Replaces .app-tabs/.app-tab (left in the file — no other page uses them,
+   but nothing else needs them removed either) with a sidebar on /app/ itself. Mobile-first,
+   like the rest of this file: the base rules are the narrow layout (nav as one scrolling
+   row of pills above the content, matching .app-tab's own look so the two never fight for
+   which is "the" tab style); min-width: 900px turns it into the fixed sidebar — the same
+   breakpoint .split-2 already uses for its own two-column switch. */
+.app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+@media (min-width: 900px) {
+  .app-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
+}
+
+.app-side {
+  display: flex; flex-direction: column; gap: var(--sp-5);
+  padding: var(--sp-4) var(--gutter);
+  background: var(--surface); border-bottom: 1px solid var(--outline);
+}
+@media (min-width: 900px) {
+  .app-side {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    padding: var(--sp-5) var(--sp-4);
+    border-bottom: 0; border-right: 1px solid var(--outline);
+  }
+}
+
+.app-side-brand { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; padding: 0 var(--sp-2); }
+.app-side-brand span { font-weight: var(--fw-black); white-space: nowrap; }
+.app-plan-pill { margin-left: auto; cursor: default; }
+
+/* Narrow: one horizontally scrolling row of pill buttons, the same shape .app-tab already
+   has, so a visitor who has seen the old strip recognises the new one. Group labels make
+   no sense in a single scrolling row, so they are hidden rather than laid out sideways. */
+.app-nav { display: flex; gap: var(--sp-2); overflow-x: auto; padding-bottom: var(--sp-1); }
+.app-nav-group { display: contents; }
+.app-nav-label { display: none; }
+.app-nav-item {
+  display: flex; align-items: center; gap: var(--sp-2); flex: none;
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-pill); border: 1px solid transparent;
+  background: transparent; color: var(--muted); font: inherit; font-weight: var(--fw-semi);
+  font-size: var(--fs-sm); white-space: nowrap; cursor: pointer;
+}
+.app-nav-item svg { flex: none; color: inherit; }
+.app-nav-item:hover { background: var(--surface-alt); color: var(--on-bg); }
+.app-nav-item[aria-selected="true"] { background: var(--accent-soft); color: var(--on-accent-soft); }
+
+@media (min-width: 900px) {
+  .app-nav { flex-direction: column; overflow-x: visible; gap: var(--sp-5); padding-bottom: 0; }
+  .app-nav-group { display: flex; flex-direction: column; gap: var(--sp-1); }
+  .app-nav-label {
+    display: block; padding: 0 var(--sp-3); margin-bottom: var(--sp-1);
+    font-size: var(--fs-xs); font-weight: var(--fw-bold); letter-spacing: var(--track-wider);
+    text-transform: uppercase; color: var(--muted);
+  }
+  .app-nav-item { width: 100%; padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm); }
+}
+
+.app-side-foot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2);
+  padding-top: var(--sp-3); border-top: 1px solid var(--outline);
+}
+.app-side-who { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); min-width: 0; }
+.app-side-who b { font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; }
+.app-side-actions { display: flex; gap: var(--sp-2); margin-left: auto; }
+@media (min-width: 900px) {
+  .app-side-foot { flex-direction: column; align-items: stretch; }
+  .app-side-actions { margin-left: 0; }
+}
+
+.app-main { min-width: 0; flex: 1; padding: var(--sp-5) var(--gutter) var(--sp-10); }
+@media (min-width: 900px) { .app-main { padding: var(--sp-6) var(--sp-8) var(--sp-12); } }
+
+/* Przegląd's stat tiles — the site's one "big number" component, same tokens .dash-fig
+   already uses for a trailing figure so the two read as the same family. */
+.app-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin: var(--sp-4) 0 var(--sp-6); }
+@media (min-width: 760px) { .app-stats { grid-template-columns: repeat(4, 1fr); } }
+.app-stat-card {
+  padding: var(--sp-4); border: 1px solid var(--outline); border-radius: var(--radius);
+  background: var(--surface); box-shadow: var(--shadow-1);
+}
+.app-stat-card .lbl { font-size: var(--fs-sm); color: var(--muted); font-weight: var(--fw-semi); margin-bottom: var(--sp-1); }
+.app-stat-card .val { font-size: var(--fs-xl); font-weight: var(--fw-black); font-variant-numeric: tabular-nums; }
+
+.app-two-col { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 900px) { .app-two-col { grid-template-columns: 1.5fr 1fr; } }
+.app-stack { display: flex; flex-direction: column; gap: var(--sp-4); }
+
+/* The Terminarz month grid — the owner's explicit exception to chapter XXIII, see the
+   note in src/app-pages.mjs above the schedule panel. */
+.cal-wrap { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 760px) { .cal-wrap { grid-template-columns: minmax(0, 1fr) 280px; } }
+
+.cal-head { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+.cal-head h3 { margin: 0; font-size: var(--fs-md); text-transform: capitalize; }
+.cal-nav { display: flex; gap: var(--sp-1); margin-left: var(--sp-1); }
+.cal-nav button {
+  width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--outline);
+  background: var(--surface); color: var(--muted); cursor: pointer; font: inherit;
+}
+.cal-nav button:hover { background: var(--surface-alt); color: var(--on-bg); }
+.cal-today {
+  margin-left: auto; border: 0; cursor: pointer; font: inherit; font-weight: var(--fw-semi);
+  font-size: var(--fs-sm); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-pill);
+  background: var(--accent-soft); color: var(--on-accent-soft);
+}
+
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: var(--sp-1); }
+.cal-weekdays span {
+  text-align: center; font-size: var(--fs-xs); font-weight: var(--fw-bold);
+  letter-spacing: var(--track-wide); text-transform: uppercase; color: var(--muted);
+}
+
+.cal-grid7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--sp-1); }
+.cal-day {
+  min-height: 76px; padding: var(--sp-1) var(--sp-2); border: 1px solid var(--outline);
+  border-radius: var(--radius-sm); background: var(--surface);
+  display: flex; flex-direction: column; gap: var(--sp-1); cursor: pointer; text-align: left;
+  font: inherit; color: inherit;
+}
+.cal-day:hover { border-color: var(--outline-strong); }
+.cal-day.is-out { opacity: .45; }
+.cal-day.is-today { border-color: var(--accent-edge); background: var(--accent-soft); }
+.cal-day.is-selected { box-shadow: inset 0 0 0 2px var(--accent-edge); }
+.cal-day .num { font-size: var(--fs-sm); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; }
+.cal-day.is-today .num { color: var(--accent-strong); }
+
+.cal-ev {
+  font-size: var(--fs-xs); font-weight: var(--fw-semi); padding: 1px var(--sp-1);
+  border-radius: var(--radius-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  background: var(--accent-soft-2); color: var(--on-accent-soft);
+}
+.cal-ev.late { background: var(--error-soft); color: var(--on-error-soft); }
+.cal-ev.done { background: transparent; color: var(--muted); text-decoration: line-through; padding-left: 0; }
+.cal-ev.more { background: transparent; color: var(--muted); font-weight: var(--fw-bold); }
+
+.cal-day-panel { padding: var(--sp-4); }
+.cal-day-panel h3 { margin: 0 0 2px; font-size: var(--fs-base); }
+.cal-day-panel .muted { font-size: var(--fs-sm); }
+.cal-slot { display: flex; gap: var(--sp-3); padding: var(--sp-3) 0; border-top: 1px solid var(--outline); }
+.cal-slot:first-of-type { border-top: 0; }
+.cal-slot .t { font-weight: var(--fw-semi); font-size: var(--fs-sm); }
+.cal-slot .d { color: var(--muted); font-size: var(--fs-sm); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-nav-item, .cal-day { transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+}
+
 /* The profile's read-only facts: a label and a value, one pair per row. */
 .facts { margin: 0; display: grid; gap: var(--sp-2); }
 .fact { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: space-between; font-size: var(--fs-sm); }

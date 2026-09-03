@@ -4,6 +4,11 @@
  * because a terminarz has nothing of its own to open. A row is a job, and its name is a
  * real link to /zlecenia/?id=<jobId>, where the whole record lives.
  *
+ * 2026-09-03: this page still keeps to chapter XXIII exactly as it stood (no month grid
+ * here — see below). The grid the owner asked for lives on /app/'s Terminarz tab instead,
+ * built from the new crmJobsByDay() in assets/crm.js. That tab is a second, additional view
+ * of the same jobs, not a replacement for this one; /terminarz/ is untouched.
+ *
  * **The module stores nothing.** A deadline is chapter XXI's `termin`, a field of the job
  * — so this page reads crmSchedule() in assets/crm.js and its one write is
  * crmUpdateJob(id, { dueDate }), the same call /zlecenia/ makes. An `events` collection of

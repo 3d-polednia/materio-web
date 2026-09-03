@@ -1036,6 +1036,11 @@ Powinien pozwolić zobaczyć:
 
 Nie buduj pełnego odpowiednika Google Calendar.
 
+Dopisek, 2026-09-03: powyższe wciąż obowiązuje na /terminarz/ bez zmian. Właściciel
+poprosił jednak o siatkę miesiąca na zakładce Terminarz w /app/ — to świadome odejście od
+tej reguły w jednym, konkretnym miejscu, nie jej uchylenie. Zob. komentarz w
+assets/schedule-ui.js i crmJobsByDay() w assets/crm.js.
+
 ==================================================
 XXIV. CRM
 

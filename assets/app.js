@@ -163,6 +163,30 @@ async function boot() {
   wireProfilePanel();
   wireAccountPanel();
   wireSyncPanel();
+  wireClientsPanel();
+  wireJobsPanel();
+  wireQuotesPanel();
+  wireSchedulePanel();
+  wireMaterialsPanel();
+  wireRoomsPanel();
+  // assets/crm.js/assets/own-materials.js are plain localStorage, not Firestore — nothing
+  // here waits on a listener, so these four can draw as soon as the tabs exist rather than
+  // waiting for onSignedIn(). Przegląd/Pomieszczenia draw once state.projects/state.rooms
+  // arrive instead — see the note at the end of renderProjects()/renderRooms().
+  renderClients();
+  renderJobs();
+  renderQuotes();
+  renderSchedule();
+  renderMaterialsPanel();
+  // proGate()'s markup exists whether or not /app/ ever had a wall before — pwMount() is
+  // the same call /klienci/, /zlecenia/, /wyceny/ and /terminarz/ each make for themselves,
+  // one prefix per tab so the four cannot draw over each other's state.
+  if (typeof pwMount === "function") {
+    pwMount("acctclients", "clients");
+    pwMount("acctjob", "jobs");
+    pwMount("acctquo", "quotes");
+    pwMount("acctcal", "calendar");
+  }
 
   // The plan panel quotes a price, and a price is in the visitor's currency.
   document.addEventListener("currencychange", renderPlan);
@@ -177,6 +201,11 @@ async function boot() {
   // be written again — before this, switching language left the identity bar, the
   // level, the dates and both lists in the previous one.
   document.addEventListener("langchange", () => {
+    renderClients();
+    renderJobs();
+    renderQuotes();
+    renderSchedule();
+    renderMaterialsPanel();
     if (!state.user) return;
     renderIdentity();
     renderProfile();
@@ -781,9 +810,12 @@ function stopListening() {
  * control `role="tablist"` promises not to be.
  */
 function wireTabs() {
-  const strip = document.querySelector(".app-tabs");
+  // 2026-09-03: the strip became a sidebar (.app-nav/.app-nav-item), but it is still one
+  // tablist with one selected tab at a time — the click/arrow-key logic below is
+  // unchanged from the old .app-tabs/.app-tab strip, only the two selectors are.
+  const strip = document.querySelector(".app-nav");
   if (!strip) return;
-  const tabs = () => Array.from(strip.querySelectorAll(".app-tab"));
+  const tabs = () => Array.from(strip.querySelectorAll(".app-nav-item"));
 
   const select = (btn, focus) => {
     if (!btn) return;
@@ -796,18 +828,25 @@ function wireTabs() {
       panel.hidden = panel.dataset.panel !== btn.dataset.tab;
     });
     if (focus) btn.focus();
+    if (btn.dataset.tab === "overview") renderOverview();
+    if (btn.dataset.tab === "clients") renderClients();
+    if (btn.dataset.tab === "jobs") renderJobs();
+    if (btn.dataset.tab === "quotes") renderQuotes();
+    if (btn.dataset.tab === "schedule") renderSchedule();
+    if (btn.dataset.tab === "materials") renderMaterialsPanel();
+    if (btn.dataset.tab === "rooms") renderRoomsPanel();
     if (btn.dataset.tab === "sync") renderLocalSummary();
     if (btn.dataset.tab === "profile") renderProfile();
     if (btn.dataset.tab === "pro") renderPlan();
   };
 
   strip.addEventListener("click", (e) => {
-    const btn = e.target.closest(".app-tab");
+    const btn = e.target.closest(".app-nav-item");
     if (btn) select(btn);
   });
 
   strip.addEventListener("keydown", (e) => {
-    const btn = e.target.closest(".app-tab");
+    const btn = e.target.closest(".app-nav-item");
     if (!btn) return;
     const all = tabs();
     const index = all.indexOf(btn);
@@ -817,6 +856,15 @@ function wireTabs() {
     else if (e.key === "End") select(all[all.length - 1], true);
     else return;
     e.preventDefault();
+  });
+
+  // "See all" buttons on the Przegląd tab ([data-goto-tab]) just click the matching
+  // sidebar item — one place that knows how to switch tabs, not two.
+  document.addEventListener("click", (e) => {
+    const goto = e.target.closest("[data-goto-tab]");
+    if (!goto) return;
+    const target = document.getElementById(`tab-${goto.dataset.gotoTab}`);
+    if (target) select(target, true);
   });
 }
 
@@ -921,9 +969,8 @@ function renderProjects() {
   const list = $("project-list");
   if (!state.projects.length) {
     list.innerHTML = `<li class="empty muted">${T("app_empty_projects")}</li>`;
-    return;
-  }
-  list.innerHTML = state.projects.map((p) => `<li data-id="${escapeHtml(p.id)}" class="app-project">
+  } else {
+    list.innerHTML = state.projects.map((p) => `<li data-id="${escapeHtml(p.id)}" class="app-project">
       <span class="row-name">${escapeHtml(p.name)}${p.archived ? ` <em class="muted">(${T("app_archived")})</em>` : ""}</span>
       <span class="row-actions">
         <button type="button" class="btn btn-ghost btn-sm" data-share>${T("app_share")}</button>
@@ -931,6 +978,10 @@ function renderProjects() {
       </span>
       ${roomBlock(p.id)}
     </li>`).join("");
+  }
+  // Przegląd's project stats read state.projects, which only this function and
+  // renderRooms() ever change — see the note above renderOverview().
+  renderOverview();
 }
 
 /** A number in the visitor's notation. The dimensions are the only numbers on this page. */
@@ -982,11 +1033,14 @@ function roomBlock(projectId) {
  */
 function renderRooms() {
   const list = $("room-list");
-  if (!list) return;
-  const loose = state.rooms.filter((r) => !r.projectId);
-  list.innerHTML = loose.length
-    ? loose.map(roomRow).join("")
-    : `<li class="empty muted">${T("app_rooms_loose_none")}</li>`;
+  if (list) {
+    const loose = state.rooms.filter((r) => !r.projectId);
+    list.innerHTML = loose.length
+      ? loose.map(roomRow).join("")
+      : `<li class="empty muted">${T("app_rooms_loose_none")}</li>`;
+  }
+  renderRoomsPanel();
+  renderOverview();
 }
 
 /* ------------------------------------------------------------------ sharing */
@@ -1106,6 +1160,404 @@ function wireWorkspace() {
 const deleteRoom = (room) => tombstone(roomDoc(room.id), room, {
   name: room.name, lengthM: room.lengthM, widthM: room.widthM, heightM: room.heightM,
 });
+
+/* ------------------------------------------------------------------ Pro tabs, 2026-09-03
+ *
+ * Przegląd/Klienci/Zlecenia/Wyceny/Terminarz/Materiały/Pomieszczenia — the sidebar tabs
+ * added when /app/ gained a sidebar (src/app-pages.mjs). Klienci/Zlecenia/Wyceny/Terminarz
+ * read and write assets/crm.js's store exactly as /klienci/, /zlecenia/, /wyceny/ and
+ * /terminarz/ do (now loaded here too — see the classicScripts comment in
+ * scripts/build.mjs); those four standalone pages are untouched. Materiały reads
+ * assets/own-materials.js the same way, read-only, with a link to /moje-materialy/ for the
+ * full editor. Pomieszczenia reads state.rooms/state.projects — the SAME Firestore-synced
+ * rows the Projekty tab above already renders, not assets/workspace.js — because those are
+ * two different stores for a signed-in visitor (workspace.js only holds what a manual
+ * Synchronizacja pull last copied there) and showing two different room counts on two tabs
+ * of the same page would be worse than the extra join done here.
+ *
+ * Every crm.js/own-materials.js call below is guarded with typeof — the same defensive
+ * style assets/paywall.js already uses — because scripts/test-account-page.mjs and similar
+ * load app.js on its own for some tests, without the rest of the classicScripts list.
+ */
+
+/** The standalone page's own address for one row — "open the full record". */
+function proLink(routeId, id) {
+  const lang = document.documentElement.lang || "pl";
+  const nav = window.LM_NAV && window.LM_NAV[routeId];
+  const base = (nav && (nav[lang] || nav.pl)) || `/${routeId}/`;
+  return `${base}?id=${encodeURIComponent(id)}`;
+}
+
+/** A stored "YYYY-MM-DD" in the visitor's own wording — the same reckoning calDay() in
+ *  assets/schedule-ui.js uses, kept local here since that file is not loaded on /app/. */
+function fmtDay(day) {
+  if (!day) return "";
+  const d = new Date(`${day}T00:00:00`);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(document.documentElement.lang || "pl", { day: "numeric", month: "short" });
+}
+
+/** Przegląd: today's figures and the three short lists under them. */
+function renderOverview() {
+  const stats = $("overview-stats");
+  if (stats) {
+    const activeProjects = state.projects.filter((p) => !p.archived);
+    const sched = typeof crmSchedule === "function" ? crmSchedule() : null;
+    const dueSoon = sched ? sched.counts.late + sched.counts.today + sched.counts.soon : 0;
+    const clientsCount = typeof crmClients === "function" ? crmClients().length : 0;
+    stats.innerHTML = `
+      <div class="app-stat-card"><div class="lbl">${T("app_stat_projects")}</div><div class="val">${activeProjects.length}</div></div>
+      <div class="app-stat-card"><div class="lbl">${T("app_stat_clients")}</div><div class="val">${clientsCount}</div></div>
+      <div class="app-stat-card"><div class="lbl">${T("app_stat_schedule")}</div><div class="val">${dueSoon}</div></div>
+      <div class="app-stat-card"><div class="lbl">${T("app_rooms_title")}</div><div class="val">${state.rooms.length}</div></div>`;
+  }
+
+  const projList = $("overview-projects");
+  if (projList) {
+    const top = state.projects.filter((p) => !p.archived).slice(0, 5);
+    projList.innerHTML = top.length
+      ? top.map((p) => `<li><span class="row-name">${escapeHtml(p.name)}</span></li>`).join("")
+      : `<li class="empty muted">${T("app_empty_projects")}</li>`;
+  }
+
+  const schedList = $("overview-schedule");
+  if (schedList) {
+    const sched = typeof crmSchedule === "function" ? crmSchedule() : null;
+    const items = sched ? [...sched.buckets.late, ...sched.buckets.today, ...sched.buckets.soon].slice(0, 5) : [];
+    schedList.innerHTML = items.length
+      ? items.map((j) => `<li><span class="row-name">${escapeHtml(j.name)}<em class="muted"> — ${fmtDay(j.dueDate)}</em></span></li>`).join("")
+      : `<li class="empty muted">${T("app_schedule_empty_day")}</li>`;
+  }
+
+  const matList = $("overview-materials");
+  if (matList) {
+    const mats = typeof omMaterials === "function" ? omMaterials().slice(0, 5) : [];
+    matList.innerHTML = mats.length
+      ? mats.map((m) => `<li><span class="row-name">${escapeHtml(m.name)}</span></li>`).join("")
+      : `<li class="empty muted">${T("app_materials_empty")}</li>`;
+  }
+}
+
+/* ---------------------------------------------------------------------------- Klienci */
+
+function renderClients() {
+  const list = $("acctclients-list");
+  if (!list || typeof crmClients !== "function") return;
+  const rows = crmClients();
+  list.innerHTML = rows.length ? rows.map((c) => `<li data-id="${escapeHtml(c.id)}">
+      <span class="row-name">${escapeHtml(c.name)}${c.phone ? ` <em class="muted">${escapeHtml(c.phone)}</em>` : ""}</span>
+      <span class="row-actions">
+        <a class="btn btn-ghost btn-sm" href="${proLink("clients", c.id)}">${T("app_open_full")}</a>
+        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
+      </span>
+    </li>`).join("") : `<li class="empty muted">${T("app_clients_empty")}</li>`;
+}
+
+function wireClientsPanel() {
+  const form = $("acctclients-form");
+  if (!form) return;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nameInput = $("acctclients-name");
+    const phoneInput = $("acctclients-phone");
+    const name = nameInput.value.trim();
+    if (!name || typeof crmAddClient !== "function") return;
+    crmAddClient({ name, phone: phoneInput.value.trim() });
+    nameInput.value = "";
+    phoneInput.value = "";
+    renderClients();
+    renderOverview();
+  });
+  $("acctclients-list").addEventListener("click", (e) => {
+    const li = e.target.closest("li[data-id]");
+    if (!li || !e.target.closest("[data-del]") || typeof crmDeleteClient !== "function") return;
+    crmDeleteClient(li.dataset.id);
+    renderClients();
+    renderJobs();
+    renderOverview();
+  });
+}
+
+/* ----------------------------------------------------------------------------- Zlecenia */
+
+function fillClientSelect(select) {
+  if (!select || typeof crmClients !== "function") return;
+  const rows = crmClients();
+  select.innerHTML = `<option value="">${T("app_clients_title")}</option>` +
+    rows.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`).join("");
+}
+
+function renderJobs() {
+  fillClientSelect($("acctjob-client"));
+  const list = $("acctjob-list");
+  if (!list || typeof crmAllJobs !== "function") return;
+  const rows = crmAllJobs();
+  list.innerHTML = rows.length ? rows.map((j) => {
+    const client = j.clientId && typeof crmClient === "function" ? crmClient(j.clientId) : null;
+    const statuses = typeof JOB_STATUS !== "undefined" ? JOB_STATUS : [j.status];
+    return `<li data-id="${escapeHtml(j.id)}">
+      <span class="row-name">${escapeHtml(j.name)}${client ? ` <em class="muted">${escapeHtml(client.name)}</em>` : ""}${j.dueDate ? ` <em class="muted">${fmtDay(j.dueDate)}</em>` : ""}</span>
+      <span class="row-actions">
+        <select data-status aria-label="${T("job_st_" + j.status)}">${statuses.map((s) => `<option value="${s}"${s === j.status ? " selected" : ""}>${T("job_st_" + s)}</option>`).join("")}</select>
+        <a class="btn btn-ghost btn-sm" href="${proLink("jobs", j.id)}">${T("app_open_full")}</a>
+        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
+      </span>
+    </li>`;
+  }).join("") : `<li class="empty muted">${T("app_jobs_empty")}</li>`;
+}
+
+function wireJobsPanel() {
+  const form = $("acctjob-form");
+  if (!form) return;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nameInput = $("acctjob-name");
+    const name = nameInput.value.trim();
+    if (!name || typeof crmAddJob !== "function") return;
+    crmAddJob({ name, clientId: $("acctjob-client").value, dueDate: $("acctjob-due").value });
+    nameInput.value = "";
+    $("acctjob-due").value = "";
+    renderJobs();
+    renderOverview();
+    renderSchedule();
+  });
+  const list = $("acctjob-list");
+  list.addEventListener("click", (e) => {
+    const li = e.target.closest("li[data-id]");
+    if (!li || !e.target.closest("[data-del]") || typeof crmDeleteJob !== "function") return;
+    crmDeleteJob(li.dataset.id);
+    renderJobs();
+    renderOverview();
+    renderSchedule();
+  });
+  list.addEventListener("change", (e) => {
+    const sel = e.target.closest("[data-status]");
+    const li = e.target.closest("li[data-id]");
+    if (!sel || !li || typeof crmSetJobStatus !== "function") return;
+    crmSetJobStatus(li.dataset.id, sel.value);
+    renderJobs();
+    renderOverview();
+    renderSchedule();
+  });
+}
+
+/* ------------------------------------------------------------------------------ Wyceny */
+
+function renderQuotes() {
+  const list = $("acctquo-list");
+  if (!list || typeof crmQuotes !== "function") return;
+  const rows = crmQuotes();
+  list.innerHTML = rows.length ? rows.map((q) => `<li data-id="${escapeHtml(q.id)}">
+      <span class="row-name">${escapeHtml(q.name)}${q.note ? ` <em class="muted">${escapeHtml(q.note)}</em>` : ""}</span>
+      <span class="row-actions">
+        <a class="btn btn-ghost btn-sm" href="${proLink("quotes", q.id)}">${T("app_open_full")}</a>
+        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
+      </span>
+    </li>`).join("") : `<li class="empty muted">${T("app_quotes_empty")}</li>`;
+}
+
+function wireQuotesPanel() {
+  const form = $("acctquo-form");
+  if (!form) return;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nameInput = $("acctquo-name");
+    const noteInput = $("acctquo-note");
+    const name = nameInput.value.trim();
+    if (!name || typeof crmAddQuote !== "function") return;
+    crmAddQuote({ name, note: noteInput.value.trim() });
+    nameInput.value = "";
+    noteInput.value = "";
+    renderQuotes();
+  });
+  $("acctquo-list").addEventListener("click", (e) => {
+    const li = e.target.closest("li[data-id]");
+    if (!li || !e.target.closest("[data-del]") || typeof crmDeleteQuote !== "function") return;
+    crmDeleteQuote(li.dataset.id);
+    renderQuotes();
+  });
+}
+
+/* ----------------------------------------------------------------------------- Terminarz
+ *
+ * The one panel that goes beyond chapter XXIII on purpose — see the note above the
+ * "schedule" panel in src/app-pages.mjs. crmJobsByDay() (assets/crm.js) is the only new
+ * data function this needed; everything else here is calendar-grid arithmetic that has
+ * nowhere else to live, so it lives beside the render it serves.
+ */
+
+const calState = { year: 0, month: 0, day: "" };
+
+/** Every date cell a month's grid needs, Monday-first, in complete weeks. */
+function calCells(year, month) {
+  const first = new Date(year, month, 1);
+  const offset = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const totalCells = Math.ceil((offset + daysInMonth) / 7) * 7;
+  const cells = [];
+  for (let i = 0; i < totalCells; i++) cells.push(new Date(year, month, 1 - offset + i));
+  return cells;
+}
+
+const dayKey = (d) => {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+function renderCalDayPanel() {
+  const box = $("acctcal-daypanel");
+  if (!box) return;
+  const lang = document.documentElement.lang || "pl";
+  const day = calState.day;
+  const d = new Date(`${day}T00:00:00`);
+  const label = isNaN(d.getTime()) ? day
+    : d.toLocaleDateString(lang, { weekday: "long", day: "numeric", month: "long" });
+  const byDay = typeof crmJobsByDay === "function" ? crmJobsByDay() : {};
+  const jobs = byDay[day] || [];
+  const slots = jobs.map((j) => {
+    const client = j.clientId && typeof crmClient === "function" ? crmClient(j.clientId) : null;
+    return `<div class="cal-slot"><div>
+        <div class="t">${escapeHtml(j.name)}</div>
+        <div class="d">${client ? `${escapeHtml(client.name)} — ` : ""}${T("job_st_" + j.status)}</div>
+      </div></div>`;
+  }).join("");
+  box.innerHTML = `<h3>${escapeHtml(label)}</h3>${jobs.length ? slots : `<p class="muted">${T("app_schedule_empty_day")}</p>`}`;
+}
+
+function renderSchedule() {
+  const grid = $("acctcal-grid");
+  if (!grid) return;
+  const today = typeof crmToday === "function" ? crmToday() : dayKey(new Date());
+  if (!calState.year) {
+    const now = new Date();
+    calState.year = now.getFullYear();
+    calState.month = now.getMonth();
+    calState.day = today;
+  }
+  const lang = document.documentElement.lang || "pl";
+  const monthEl = $("acctcal-month");
+  if (monthEl) {
+    monthEl.textContent = new Date(calState.year, calState.month, 1)
+      .toLocaleDateString(lang, { month: "long", year: "numeric" });
+  }
+
+  const wk = $("acctcal-weekdays");
+  if (wk) {
+    const monday = new Date(2026, 0, 5); // any known Monday
+    wk.innerHTML = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+      return `<span>${escapeHtml(d.toLocaleDateString(lang, { weekday: "short" }))}</span>`;
+    }).join("");
+  }
+
+  const byDay = typeof crmJobsByDay === "function" ? crmJobsByDay() : {};
+  const openStatus = typeof JOB_OPEN_STATUS !== "undefined" ? JOB_OPEN_STATUS : [];
+  grid.innerHTML = calCells(calState.year, calState.month).map((d) => {
+    const key = dayKey(d);
+    const out = d.getMonth() !== calState.month;
+    const jobs = byDay[key] || [];
+    const shown = jobs.slice(0, 2).map((j) => {
+      const done = openStatus.indexOf(j.status) === -1;
+      const late = !done && key < today;
+      return `<span class="cal-ev${done ? " done" : late ? " late" : ""}">${escapeHtml(j.name)}</span>`;
+    }).join("");
+    const more = jobs.length > 2 ? `<span class="cal-ev more">+${jobs.length - 2}</span>` : "";
+    return `<button type="button" class="cal-day${out ? " is-out" : ""}${key === today ? " is-today" : ""}${key === calState.day ? " is-selected" : ""}" data-day="${key}">
+        <span class="num">${d.getDate()}</span>${shown}${more}
+      </button>`;
+  }).join("");
+
+  renderCalDayPanel();
+}
+
+function wireSchedulePanel() {
+  const grid = $("acctcal-grid");
+  if (!grid) return;
+  grid.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-day]");
+    if (!btn) return;
+    calState.day = btn.dataset.day;
+    renderSchedule();
+  });
+  // The day panel always shows calState.day, so switching month has to move it onto a day
+  // that is actually on screen — the 1st of the month just opened — or the panel would go
+  // on describing a day from the month that just scrolled away, with no cell to match it.
+  $("acctcal-prev").addEventListener("click", () => {
+    calState.month -= 1;
+    if (calState.month < 0) { calState.month = 11; calState.year -= 1; }
+    calState.day = dayKey(new Date(calState.year, calState.month, 1));
+    renderSchedule();
+  });
+  $("acctcal-next").addEventListener("click", () => {
+    calState.month += 1;
+    if (calState.month > 11) { calState.month = 0; calState.year += 1; }
+    calState.day = dayKey(new Date(calState.year, calState.month, 1));
+    renderSchedule();
+  });
+  $("acctcal-today").addEventListener("click", () => {
+    calState.year = 0; // renderSchedule() re-seeds from today when year is falsy
+    renderSchedule();
+  });
+}
+
+/* ----------------------------------------------------------------------------- Materiały */
+
+function renderMaterialsPanel() {
+  const list = $("acctmat-list");
+  if (!list || typeof omMaterials !== "function") return;
+  const rows = omMaterials();
+  list.innerHTML = rows.length ? rows.map((m) => `<li data-id="${escapeHtml(m.id)}">
+      <span class="row-name">${escapeHtml(m.name)}${m.priceMinor != null && typeof wsMoney === "function" ? ` <em class="muted">${wsMoney(m.priceMinor, m.currencyCode)}</em>` : ""}</span>
+      <span class="row-actions">
+        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
+      </span>
+    </li>`).join("") : `<li class="empty muted">${T("app_materials_empty")}</li>`;
+}
+
+function wireMaterialsPanel() {
+  const list = $("acctmat-list");
+  if (!list) return;
+  list.addEventListener("click", (e) => {
+    const li = e.target.closest("li[data-id]");
+    if (!li || !e.target.closest("[data-del]") || typeof omDelete !== "function") return;
+    omDelete(li.dataset.id);
+    renderMaterialsPanel();
+    renderOverview();
+  });
+}
+
+/* ------------------------------------------------------------------------ Pomieszczenia */
+
+function renderRoomsPanel() {
+  const box = $("acctrooms-list");
+  if (!box) return;
+  const byProject = {};
+  const loose = [];
+  state.rooms.forEach((r) => {
+    if (r.projectId) (byProject[r.projectId] || (byProject[r.projectId] = [])).push(r);
+    else loose.push(r);
+  });
+  const groups = state.projects
+    .filter((p) => byProject[p.id] && byProject[p.id].length)
+    .map((p) => `<div class="app-card"><h3>${escapeHtml(p.name)}</h3>
+        <ul class="data-list">${byProject[p.id].map(roomRow).join("")}</ul></div>`);
+  if (loose.length) {
+    groups.push(`<div class="app-card"><h3>${T("app_rooms_no_project")}</h3>
+        <ul class="data-list">${loose.map(roomRow).join("")}</ul></div>`);
+  }
+  box.innerHTML = groups.length ? groups.join("") : `<p class="muted">${T("app_rooms_empty")}</p>`;
+}
+
+function wireRoomsPanel() {
+  const box = $("acctrooms-list");
+  if (!box) return;
+  box.addEventListener("click", async (e) => {
+    const li = e.target.closest("li[data-id]");
+    if (!li || !e.target.closest("[data-del]")) return;
+    const room = state.rooms.find((r) => r.id === li.dataset.id);
+    if (room) { await deleteRoom(room); renderRoomsPanel(); }
+  });
+}
 
 /* ------------------------------------------------------------------ sync with the browser */
 
