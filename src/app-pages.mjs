@@ -269,9 +269,16 @@ export function appMain(t, features) {
           ${levelCards(t, LEVEL.GUEST)}
         </section>
       </div>
+      <!-- .wrap.narrow (760px) fits a sign-in form; it starved the sidebar dashboard
+           below it of room — see the note on #app-workspace's own class. -->
+    </div>
 
-      <div id="app-workspace" hidden>
-        <div class="app-shell">
+    <!-- The signed-in shell gets the site's normal content width (--maxw, 1160px), not
+         the 760px reading column above: a sidebar plus a month grid needs the room a
+         one-column sign-in form never did. 2026-09-03, after the owner reported the
+         sidebar redesign rendering squeezed into that narrow column. -->
+    <div id="app-workspace" class="wrap" hidden>
+      <div class="app-shell">
           <aside class="app-side">
             <div class="app-side-brand">
               <svg class="logo" viewBox="-1 -1 36 34" width="26" height="24" aria-hidden="true"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg>
@@ -614,9 +621,9 @@ export function appMain(t, features) {
           </div>
         </div>
       </div>
-    </div>
   </section>
 </main>`;
+
   return chrome(t, main);
 }
 
