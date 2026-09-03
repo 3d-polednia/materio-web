@@ -146,6 +146,7 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 | `assets/materials.js` — the catalogue, ported from `Catalog*.kt` | `assets/flags.js` — the thirteen flags, for the three pages that build their own picker |
 | `assets/styles.css` — **authored**; the build emits `assets/styles.min.css` from it, and that is what every page links | `assets/styles.min.css` — the same rules with the commentary stripped |
 | `assets/main.js`, `stores.js`, `i18n-runtime.js`, `currency.js` | `sitemap.xml` |
+| | `docs/TRANSLATIONS_TODO.md` — only while `PL_ONLY` is on, and deleted when the debt is zero |
 | `assets/flags/<lang>.svg` — the picker's flags | |
 | `assets/materials-ui.js`, `assets/app.js`, `share.js`, `firebase-config.js` | |
 | `assets/workspace-calc.js` — the room bar and the save box on a calculator page | |
@@ -158,7 +159,53 @@ is committed because GitHub Pages serves the repo root as-is — there is no CI 
 
 The build **fails loudly** rather than emitting a broken page: a key missing in one
 language, a calculator without a slug or a formula, two pages claiming the same URL, or a
-formula identifier that collides with a field label in some language all abort it.
+formula identifier that collides with a field label in some language all abort it. The one
+exception is a missing translation while the phase below is on.
+
+## Polish-first mode — `PL_ONLY` in `src/site.mjs`
+
+**It is on.** The build writes Polish and leaves the other twelve languages exactly as the
+last full build wrote them.
+
+The site is authored once and generated thirteen times, so a one-sentence correction used
+to mean writing that sentence in thirteen languages before the build would run at all.
+Through a run of corrections that is most of the work and none of the thinking. With the
+switch on, a key may exist in Polish alone: `defer()` in `scripts/build.mjs` records it in
+`docs/TRANSLATIONS_TODO.md` — the key, the Polish text and the languages that owe it —
+instead of aborting.
+
+**Freezing is not deleting, and it is not translating badly either.** All thirteen
+languages keep every file they have, GitHub Pages keeps serving them, and every URL that
+answered before still answers, in its own language, exactly as it read yesterday. Nothing
+Polish is ever written into a German page: the twelve simply stop moving while Polish does.
+The switch is `BUILD_LANGS`, which every loop that writes a file reads; `LANGS` is still
+thirteen everywhere else, because thirteen languages really are on disk — the hreflang
+sets, `sitemap.xml`, the pickers and `livePaths()` all describe what is being served.
+
+Four things it forbids, and the build or the tests say so:
+
+1. **No slug changes** — `CALC_SLUG`, `SECTION`, `GUIDES`, in any language. A renamed
+   Polish slug leaves twelve frozen pages pointing an hreflang at a URL that is gone.
+   `scripts/test-seo.mjs` still reads all thirteen and checks reciprocity, so it catches it.
+2. **No new pages or routes.** `checkAgainstIA()` accepts a declared page that is already
+   on disk, which is what freezing needs, and still aborts on one that is nowhere — which
+   is every new route, in twelve languages. A new page needs a full build.
+3. **A change to `src/template.mjs` or `assets/styles.css` reaches everybody.** Header,
+   footer and stylesheet are shared: new navigation would appear on Polish pages only, and
+   the regenerated `styles.min.css` would have to carry twelve languages' worth of older
+   markup. Keep layout and design work out of the phase, or thaw for it.
+4. **Deleting a key still needs all thirteen.** A key left in one language and taken out of
+   Polish aborts the build under either mode — that is a mistake, not a debt.
+
+Nothing in `scripts/` changed for the phase, deliberately. A frozen language's dictionary
+does not move either, so its pages still match it and every test still reads them. A test
+that fails only for the frozen twelve is telling you that you did one of the four things
+above, and the answer is a full build, not an edited test.
+
+**To thaw:** set `PL_ONLY = false`, run `node scripts/build.mjs --check` (it names every
+missing key), translate what `docs/TRANSLATIONS_TODO.md` lists, run `node scripts/build.mjs`
+for all 510 pages, run the suite. The ledger deletes itself and the build goes back to
+refusing a language with a hole in it.
 
 ## Files
 

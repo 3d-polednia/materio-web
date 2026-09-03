@@ -48,6 +48,37 @@ export const LANGS = ["pl", "uk", "de", "en", "cs", "sk", "ro", "hr", "sr", "it"
 export const DEFAULT_LANG = "pl";
 
 /**
+ * The Polish-first phase: the build regenerates Polish and leaves the other twelve
+ * languages exactly as the last full build wrote them.
+ *
+ * The site is authored once and generated thirteen times, so until now a one-sentence
+ * correction meant writing that sentence in thirteen languages before the build would
+ * run at all. During a run of corrections that is the bulk of the work and none of the
+ * thinking. With this switch on, a key may exist in Polish alone: the build records it
+ * in `docs/TRANSLATIONS_TODO.md` instead of aborting, and writes no page outside Polish.
+ *
+ * **Freezing is not deleting.** The twelve other languages keep every file they have,
+ * GitHub Pages keeps serving them, and every URL that answered before still answers —
+ * they simply stop moving while Polish does. What that costs, and the four things it
+ * forbids while it is on, is the "Polish-first mode" chapter of CLAUDE.md.
+ *
+ * To thaw: set this to false, translate what `docs/TRANSLATIONS_TODO.md` lists, and run
+ * the build. It goes back to refusing a language with a hole in it.
+ */
+export const PL_ONLY = true;
+
+/**
+ * The languages this build actually writes files for.
+ *
+ * `LANGS` stays all thirteen and every other reader of it — `livePaths()`,
+ * `sitemapUrls()`, the hreflang sets, the pickers — keeps seeing thirteen, because
+ * thirteen languages really are on disk and really are being served. Only the loops that
+ * emit pages read this one. Derived rather than hand-written, so `PL_ONLY = false` puts
+ * everything back with one edit.
+ */
+export const BUILD_LANGS = PL_ONLY ? [DEFAULT_LANG] : LANGS;
+
+/**
  * Languages that were published and then withdrawn. `ru` since 2026-09-02: the other five
  * of the six dropped in 2026-08 are live again at the addresses they always had, and
  * Russian is the one the owner took off the list instead.

@@ -25,8 +25,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  BASE, LANGS, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG, URL_APP, URL_SHARE,
-  URL_DASHBOARD, RETIRED_LANGS,
+  BASE, LANGS, BUILD_LANGS, PL_ONLY, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG,
+  URL_APP, URL_SHARE, URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
   urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials,
@@ -163,6 +163,36 @@ const CAT = {
 
 const problems = [];
 
+/**
+ * Translations that are missing on purpose — the ledger of the Polish-first phase.
+ *
+ * A key is authored in Polish, the twelve other languages do not have it yet, and under
+ * `PL_ONLY` that is a debt to settle rather than a build to abort. Every entry lands
+ * here and, at the end of the run, in `docs/TRANSLATIONS_TODO.md`, which is the whole
+ * worklist of the session that thaws the site. Nothing keeps this list by hand: it is
+ * derived from the dictionaries on every build, so it cannot drift from them.
+ *
+ * This is only ever about a key that does not exist yet. A Polish string that CHANGED
+ * needs no entry — the other twelve still have their own older wording, their pages are
+ * not rewritten, and they keep reading exactly as they did before.
+ */
+const pending = [];
+
+/**
+ * Record a hole and say whether it may be tolerated.
+ *
+ * Returns true when the caller should say nothing: the phase is on, the language is not
+ * the reference one, and the missing string has been written down. Returns false in
+ * every other case, and then the caller's own `problems.push(...)` aborts the build as
+ * it always did — Polish itself, a language with a hole while `PL_ONLY` is off, and
+ * anything that is not a translation (a slug, a level name, a route) stay fatal.
+ */
+function defer(source, lang, key, plText) {
+  if (!PL_ONLY || lang === DEFAULT_LANG) return false;
+  pending.push({ source, lang, key, pl: typeof plText === "string" ? plText : "" });
+  return true;
+}
+
 function validate() {
   const reference = Object.keys(DICT[DEFAULT_LANG]);
 
@@ -181,7 +211,12 @@ function validate() {
     if (!DICT[lang]) { problems.push(`language "${lang}" is missing entirely`); continue; }
     const missing = reference.filter((k) => !(k in DICT[lang]));
     const extra = Object.keys(DICT[lang]).filter((k) => !reference.includes(k));
-    if (missing.length) problems.push(`${lang}: missing ${missing.length} key(s): ${missing.join(", ")}`);
+    // A key Polish has and this language does not is the ordinary shape of the
+    // Polish-first phase; it goes to the ledger. A key this language has and Polish does
+    // not is the opposite — something was deleted in one place and left in another —
+    // and it aborts the build under either mode.
+    const unresolved = missing.filter((k) => !defer("assets/i18n*.js", lang, k, DICT[DEFAULT_LANG][k]));
+    if (unresolved.length) problems.push(`${lang}: missing ${unresolved.length} key(s): ${unresolved.join(", ")}`);
     if (extra.length) problems.push(`${lang}: ${extra.length} key(s) absent from ${DEFAULT_LANG}: ${extra.join(", ")}`);
   }
 
@@ -194,11 +229,17 @@ function validate() {
   for (const lang of LANGS) {
     const copy = CONV_COPY[lang];
     if (!copy) { problems.push(`converter: no ${lang} copy (src/conv-copy.mjs)`); continue; }
+    const plCopy = CONV_COPY[DEFAULT_LANG] || {};
     for (const key of CONV_COPY_KEYS) {
-      if (!copy[key] || !String(copy[key]).trim()) problems.push(`converter/${lang}: no ${key}`);
+      if (!copy[key] || !String(copy[key]).trim()) {
+        if (!defer("src/conv-copy.mjs", lang, key, plCopy[key])) problems.push(`converter/${lang}: no ${key}`);
+      }
     }
     for (const cat of CONV_CATS) {
-      if (!copy[`conv_c_${cat.id}`]) problems.push(`converter/${lang}: category "${cat.id}" has no name`);
+      const key = `conv_c_${cat.id}`;
+      if (!copy[key] && !defer("src/conv-copy.mjs", lang, key, plCopy[key])) {
+        problems.push(`converter/${lang}: category "${cat.id}" has no name`);
+      }
     }
     if (copy.convpage_title && copy.convpage_title.length > TITLE_MAX) {
       problems.push(`converter/${lang}: the title is ${copy.convpage_title.length} characters, over ${TITLE_MAX}`);
@@ -215,8 +256,11 @@ function validate() {
   for (const lang of LANGS) {
     const copy = OMAT_COPY[lang];
     if (!copy) { problems.push(`own-materials: no ${lang} copy (src/omat-copy.mjs)`); continue; }
+    const plCopy = OMAT_COPY[DEFAULT_LANG] || {};
     for (const key of OMAT_COPY_KEYS) {
-      if (!copy[key] || !String(copy[key]).trim()) problems.push(`own-materials/${lang}: no ${key}`);
+      if (!copy[key] || !String(copy[key]).trim()) {
+        if (!defer("src/omat-copy.mjs", lang, key, plCopy[key])) problems.push(`own-materials/${lang}: no ${key}`);
+      }
     }
     if (copy.omatpage_meta && (copy.omatpage_meta.length < 50 || copy.omatpage_meta.length > 160)) {
       problems.push(`own-materials/${lang}: the description is ${copy.omatpage_meta.length} characters, outside 50–160`);
@@ -229,13 +273,18 @@ function validate() {
   for (const lang of LANGS) {
     const copy = PDF_COPY[lang];
     if (!copy) { problems.push(`pdf: no ${lang} copy (src/pdf-copy.mjs)`); continue; }
+    const plCopy = PDF_COPY[DEFAULT_LANG] || {};
     for (const key of PDF_COPY_KEYS) {
-      if (!copy[key] || !String(copy[key]).trim()) problems.push(`pdf/${lang}: no ${key}`);
+      if (!copy[key] || !String(copy[key]).trim()) {
+        if (!defer("src/pdf-copy.mjs", lang, key, plCopy[key])) problems.push(`pdf/${lang}: no ${key}`);
+      }
     }
     // The three Android templates have to keep their hole, or pdfSplit() glues a label to
-    // a value and the sentence loses its word order.
+    // a value and the sentence loses its word order. A string that is not there yet is
+    // the line above's business, not this one's — asking it for its %1$s would report the
+    // same debt twice, in a sentence that says something else went wrong.
     for (const key of ["pdfdoc_project", "pdfdoc_date", "pdfdoc_estimate_no"]) {
-      if (!String(copy[key]).includes("%1$s")) problems.push(`pdf/${lang}: ${key} lost its %1$s`);
+      if (copy[key] && !String(copy[key]).includes("%1$s")) problems.push(`pdf/${lang}: ${key} lost its %1$s`);
     }
   }
 
@@ -352,7 +401,9 @@ function validate() {
   // would render as "acc_pro_3" on the account page in that one language.
   for (const key of accountLevelKeys()) {
     for (const lang of LANGS) {
-      if (!(key in DICT[lang])) problems.push(`account level key "${key}" is missing in ${lang}`);
+      if (!(key in DICT[lang]) && !defer("assets/i18n*.js", lang, key, DICT[DEFAULT_LANG][key])) {
+        problems.push(`account level key "${key}" is missing in ${lang}`);
+      }
     }
   }
 
@@ -361,7 +412,9 @@ function validate() {
   // "dash_recent_empty" on the page, in that one language only.
   for (const key of dashboardKeys()) {
     for (const lang of LANGS) {
-      if (!(key in DICT[lang])) problems.push(`dashboard key "${key}" is missing in ${lang}`);
+      if (!(key in DICT[lang]) && !defer("assets/i18n*.js", lang, key, DICT[DEFAULT_LANG][key])) {
+        problems.push(`dashboard key "${key}" is missing in ${lang}`);
+      }
     }
   }
 
@@ -405,7 +458,9 @@ function validate() {
     // wrote ships as the literal "feat_quotes_d" in that one language.
     for (const key of appProKeys(LM_FEATURES)) {
       for (const lang of LANGS) {
-        if (!(key in DICT[lang])) problems.push(`Pro key "${key}" is missing in ${lang}`);
+        if (!(key in DICT[lang]) && !defer("assets/i18n*.js", lang, key, DICT[DEFAULT_LANG][key])) {
+          problems.push(`Pro key "${key}" is missing in ${lang}`);
+        }
       }
     }
   }
@@ -840,7 +895,7 @@ function buildDictionaries() {
      `const I18N` already being declared; `LANGS` is the same list of ten in every bundle,
      so the picker offers every language before any second bundle is fetched. See
      ensureLang() in assets/i18n-runtime.js for the other half. */
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const body = `/* Generated by scripts/build.mjs — do not edit.
    Source: assets/i18n.js + assets/i18n-pages.js. Only the "${lang}" language is here;
    a per-language page navigates to switch, and the three pages that have no language of
@@ -856,7 +911,7 @@ I18N[${JSON.stringify(lang)}] = ${JSON.stringify(DICT[lang])};
 
 function buildHome() {
   const alt = alternatesFor(urlHome);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     write(join(urlHome(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
@@ -880,7 +935,7 @@ function buildHome() {
 
 function buildCalculatorPages() {
   const hubAlt = alternatesFor(urlCalcIndex);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = calcHubMain(lang, t, CALCS, GUIDES, CONV_COPY[lang]);
     write(join(urlCalcIndex(lang), "index.html").replace(/^\//, ""), page({
@@ -908,7 +963,7 @@ function buildCalculatorPages() {
 
   for (const calc of CALCS) {
     const alt = alternatesFor((l) => urlCalc(l, calc.id));
-    for (const lang of LANGS) {
+    for (const lang of BUILD_LANGS) {
       const t = translator(lang);
       // Session 31: this page's own words — the title, the paragraph under the H1 and
       // the two questions — rather than one pattern filled in 150 times.
@@ -936,7 +991,7 @@ function buildCalculatorPages() {
 
 function buildGuides() {
   const indexAlt = alternatesFor(urlGuideIndex);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = guideIndexMain(lang, t, GUIDES);
     write(join(urlGuideIndex(lang), "index.html").replace(/^\//, ""), page({
@@ -951,7 +1006,7 @@ function buildGuides() {
 
   for (const guide of GUIDES) {
     const alt = alternatesFor((l) => urlGuide(l, guide));
-    for (const lang of LANGS) {
+    for (const lang of BUILD_LANGS) {
       const t = translator(lang);
       const { main, ld } = guideMain(guide, lang, t);
       write(join(urlGuide(lang, guide), "index.html").replace(/^\//, ""), page({
@@ -968,7 +1023,7 @@ function buildGuides() {
 
 function buildMaterials() {
   const alt = alternatesFor(urlMaterials);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = materialsMain(lang, t, CAT, CATALOG.MAT_CATS_USED, OMAT_COPY[lang]);
     write(join(urlMaterials(lang), "index.html").replace(/^\//, ""), page({
@@ -989,7 +1044,7 @@ function buildMaterials() {
 
 function buildCookiesPage() {
   const alt = alternatesFor(urlCookies);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = cookiesMain(lang, t);
     write(join(urlCookies(lang), "index.html").replace(/^\//, ""), page({
@@ -1005,7 +1060,7 @@ function buildCookiesPage() {
 
 function buildAndroidPage() {
   const alt = alternatesFor(urlAndroid);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = androidMain(lang, t, CALCS, CAT);
     write(join(urlAndroid(lang), "index.html").replace(/^\//, ""), page({
@@ -1022,7 +1077,7 @@ function buildAndroidPage() {
 function buildWorkspacePages() {
   const projAlt = alternatesFor(urlProjects);
   const estAlt = alternatesFor(urlEstimate);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
 
     const projects = projectsMain(lang, t, CAT.categories);
@@ -1069,7 +1124,7 @@ function buildWorkspacePages() {
  */
 function buildClientsPages() {
   const alt = alternatesFor(urlClients);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = clientsMain(lang, t, LM_FEATURES);
     write(join(urlClients(lang), "index.html").replace(/^\//, ""), page({
@@ -1101,7 +1156,7 @@ function buildClientsPages() {
  */
 function buildJobsPages() {
   const alt = alternatesFor(urlJobs);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = jobsMain(lang, t, LM_FEATURES);
     write(join(urlJobs(lang), "index.html").replace(/^\//, ""), page({
@@ -1134,7 +1189,7 @@ function buildJobsPages() {
  */
 function buildQuotesPages() {
   const alt = alternatesFor(urlQuotes);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = quotesMain(lang, t, LM_FEATURES);
     write(join(urlQuotes(lang), "index.html").replace(/^\//, ""), page({
@@ -1167,7 +1222,7 @@ function buildQuotesPages() {
  */
 function buildCalendarPages() {
   const alt = alternatesFor(urlCalendar);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = calendarMain(lang, t, LM_FEATURES);
     write(join(urlCalendar(lang), "index.html").replace(/^\//, ""), page({
@@ -1232,7 +1287,7 @@ function planPrices(lang) {
  */
 function buildProPage() {
   const alt = alternatesFor(urlLiczmatPro);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = proPageMain(lang, t, LM_FEATURES, planPrices(lang));
     write(join(urlLiczmatPro(lang), "index.html").replace(/^\//, ""), page({
@@ -1258,7 +1313,7 @@ function buildProPage() {
 function buildConverterPage() {
   const alt = alternatesFor(urlConverter);
   const first = CONV_CATS[0];
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const [from, to] = first.def;
     const example = {
@@ -1286,7 +1341,7 @@ function buildConverterPage() {
  */
 function buildOwnMaterialsPage() {
   const alt = alternatesFor(urlOwnMaterials);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = ownMaterialsMain(lang, t, CATALOG.MAT_CATS_USED, OMAT_COPY[lang]);
     write(join(urlOwnMaterials(lang), "index.html").replace(/^\//, ""), page({
@@ -1305,7 +1360,7 @@ function buildOwnMaterialsPage() {
 
 function buildStores() {
   const alt = alternatesFor(urlStores);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     const t = translator(lang);
     const { main, ld } = storesMain(lang, t);
     write(join(urlStores(lang), "index.html").replace(/^\//, ""), page({
@@ -1517,10 +1572,15 @@ function previousLastmod() {
  * The six languages LiczMat dropped on 2026-08-12 are swept too: their pages were
  * generated into /cs/, /sk/ … and nothing else would ever delete them. 404.html sends
  * whatever still links to them to the home page.
+ *
+ * The loop walks BUILD_LANGS rather than LANGS, and that is what freezing a language
+ * actually is: under PL_ONLY the twelve directories are never added to the set, so they
+ * are never removed and never rewritten. A retired language is still swept — retiring is
+ * the opposite decision from freezing.
  */
 function clean() {
   const dirs = new Set(RETIRED_LANGS);
-  for (const lang of LANGS) {
+  for (const lang of BUILD_LANGS) {
     if (lang !== DEFAULT_LANG) { dirs.add(lang); continue; }
     for (const section of Object.values(SECTION)) dirs.add(section[lang]);
   }
@@ -1540,6 +1600,73 @@ function clean() {
   if (existsSync(all)) rmSync(all, { force: true });
 }
 
+/**
+ * Write down what the Polish-first phase still owes the other twelve languages.
+ *
+ * One row per string rather than per string per language: a key nobody has translated
+ * yet is missing in all twelve, and twelve rows saying so would be the same fact twelve
+ * times. The Polish text is on the row, so the session that settles this needs the
+ * ledger and the source file and nothing else.
+ *
+ * The file is generated on every build and deleted the moment the debt is zero, which is
+ * what makes it trustworthy: it cannot describe a state the dictionaries have left.
+ */
+function writeTranslationsTodo() {
+  const file = p("docs/TRANSLATIONS_TODO.md");
+  if (!PL_ONLY || !pending.length) {
+    if (existsSync(file)) rmSync(file, { force: true });
+    return 0;
+  }
+
+  // A pipe or a line break inside a translation would end the cell early and take the
+  // rest of the table with it.
+  const cell = (s) => String(s || "").replace(/\s+/g, " ").replace(/\|/g, "\\|").trim();
+
+  const bySource = new Map();
+  for (const entry of pending) {
+    if (!bySource.has(entry.source)) bySource.set(entry.source, new Map());
+    const keys = bySource.get(entry.source);
+    if (!keys.has(entry.key)) keys.set(entry.key, { pl: entry.pl, langs: new Set() });
+    const row = keys.get(entry.key);
+    row.langs.add(entry.lang);
+    if (!row.pl && entry.pl) row.pl = entry.pl;
+  }
+
+  const strings = [...bySource.values()].reduce((n, keys) => n + keys.size, 0);
+  const langs = new Set(pending.map((e) => e.lang));
+  const out = [
+    "# Translations owed",
+    "",
+    "Generated by `scripts/build.mjs` — do not edit, and do not keep a second copy of it.",
+    "",
+    "`PL_ONLY` in `src/site.mjs` is on: the build writes Polish and leaves the other twelve",
+    "languages frozen at the last full build. Every string below exists in Polish and in no",
+    "other language yet. Nothing on this list is live anywhere — a frozen page cannot show a",
+    "key that was never written into it.",
+    "",
+    `**${strings} string(s), owed to ${langs.size} language(s).**`,
+    "",
+    "To settle it: translate these into the files named below, set `PL_ONLY = false`, run",
+    "`node scripts/build.mjs`. The build goes back to refusing a language with a hole in it,",
+    "and this file disappears.",
+    "",
+  ];
+  for (const source of [...bySource.keys()].sort()) {
+    const keys = bySource.get(source);
+    out.push(`## ${source}`, "", "| key | Polish | missing in |", "|---|---|---|");
+    for (const key of [...keys.keys()].sort()) {
+      const row = keys.get(key);
+      const where = LANGS.filter((l) => row.langs.has(l)).join(", ");
+      out.push(`| \`${key}\` | ${cell(row.pl)} | ${where} |`);
+    }
+    out.push("");
+  }
+
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, out.join("\n"));
+  return strings;
+}
+
 /* ------------------------------------------------------------------ main */
 
 validate();
@@ -1547,6 +1674,16 @@ if (problems.length) {
   console.error("Build aborted — the dictionaries or the site map are inconsistent:\n");
   for (const problem of problems) console.error(`  - ${problem}`);
   process.exit(1);
+}
+
+const owed = writeTranslationsTodo();
+if (PL_ONLY) {
+  const frozen = LANGS.filter((l) => !BUILD_LANGS.includes(l));
+  console.log(`PL_ONLY: writing ${BUILD_LANGS.join(", ")}; ${frozen.length} language(s) frozen ` +
+    `(${frozen.join(", ")}) — their pages are left exactly as they are.`);
+  console.log(owed
+    ? `${owed} string(s) owed to them — docs/TRANSLATIONS_TODO.md.`
+    : "Nothing owed: every Polish key has its twelve translations.");
 }
 
 if (process.argv.includes("--check")) {
@@ -1592,9 +1729,16 @@ function checkAgainstIA() {
   // On Windows path.join() uses backslashes; livePaths() always uses forward slashes.
   // Normalise before comparing so the check works on both platforms.
   const built = new Set(written.filter((f) => f.endsWith(".html")));
+  /* Under PL_ONLY the run writes Polish only, so twelve declared pages out of thirteen
+     are not in `written` — they are on disk, frozen, exactly as the last full build left
+     them, and still served. A declared page is therefore satisfied by an existing file
+     as well as by a fresh one. What that still catches is the thing the phase forbids:
+     a NEW route, whose other twelve files were never written by anybody, is declared,
+     absent from disk and aborts the build with the same sentence it always did. */
+  const missing = [...declared].filter((f) => !built.has(f) && !(PL_ONLY && existsSync(p(f))));
   const mismatches = [
     ...[...built].filter((f) => !declared.has(f)).map((f) => `built but not declared: ${f}`),
-    ...[...declared].filter((f) => !built.has(f)).map((f) => `declared but not built: ${f}`),
+    ...missing.map((f) => `declared but not built: ${f}`),
   ];
   // The two hand-written pages are declared too; they are never overwritten, only checked.
   for (const f of ["privacy-policy.html", "404.html"]) {
@@ -1623,5 +1767,6 @@ function checkAgainstIA() {
 const declared = checkAgainstIA();
 const pages = written.filter((f) => f.endsWith(".html")).length;
 console.log(`Built ${pages} pages and ${written.length - pages} assets ` +
-  `(${LANGS.length} languages, ${CALCS.length} calculators, ${GUIDES.length} guides), stamp ${STAMP}.`);
+  `(${BUILD_LANGS.length} of ${LANGS.length} languages, ${CALCS.length} calculators, ` +
+  `${GUIDES.length} guides), stamp ${STAMP}.`);
 console.log(`Architecture: ${declared} pages declared in src/ia.mjs, all present.`);
