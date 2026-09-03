@@ -150,7 +150,13 @@ const CAT = {
   primary: (m) => CATALOG.primaryCalcFor(m),
   name: (m, lang, t) => CATALOG.matName(m, lang, (k) => t(k)),
   note: (m, lang, t) => CATALOG.matNote(m, lang, (k) => t(k)),
-  fold: (s) => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+  // Same rule as matFold() in assets/materials-ui.js: this page ships the haystack and
+  // the browser folds what somebody types with the other one, so the two are one rule.
+  // Polish ł is not an accented l in Unicode and survives NFD, so it is mapped by hand —
+  // "plytki" is what somebody types when they are looking for "płytki".
+  fold: (s) => String(s).toLowerCase().normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ł/g, "l"),
 };
 
 /* ------------------------------------------------------------------ validation */
@@ -964,7 +970,7 @@ function buildMaterials() {
   const alt = alternatesFor(urlMaterials);
   for (const lang of LANGS) {
     const t = translator(lang);
-    const { main, ld } = materialsMain(lang, t, CAT);
+    const { main, ld } = materialsMain(lang, t, CAT, CATALOG.MAT_CATS_USED, OMAT_COPY[lang]);
     write(join(urlMaterials(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("matpage_title")} — LiczMat`,
@@ -972,7 +978,11 @@ function buildMaterials() {
       path: urlMaterials(lang),
       alternates: alt,
       main, jsonld: ld,
-      scripts: ["/assets/materials.js", "/assets/materials-ui.js"],
+      // The store before the screen, and both after the catalogue: materialById() in
+      // assets/materials.js asks omCatalogRows() for a row somebody typed in, and the
+      // "your materials" block on this page is drawn by assets/own-materials-ui.js.
+      scripts: ["/assets/materials.js", "/assets/materials-ui.js",
+        "/assets/own-materials.js", "/assets/own-materials-ui.js"],
     }));
   }
 }

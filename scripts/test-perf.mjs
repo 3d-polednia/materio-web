@@ -122,7 +122,13 @@ const BUDGET = {
   "konwerter-jednostek/index.html": [220, 63],
   "poradniki/ile-farby-na-pokoj/index.html": [212, 61],
   "sklepy/index.html": [220, 65],
-  "materialy/index.html": [320, 81],
+  // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
+  // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
+  // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
+  // raw, 5.8 gz) and assets/own-materials-ui.js (12.7 / 4.5) — and the rest is the markup
+  // of the tree and of the form. The heaviest language, Ukrainian, weighs 411.1 kB raw,
+  // which is inside the CEILING below.
+  "materialy/index.html": [372, 95],
   "projekty/index.html": [355, 106],
   "kosztorys/index.html": [345, 104],
   "liczmat-pro/index.html": [235, 71],

@@ -1009,1067 +1009,1499 @@
       <div class="wrap">
         <label class="fld-label" for="matpage-search">Search materials…</label>
         <input id="matpage-search" type="search" class="mat-search" placeholder="Search materials…" autocomplete="off">
+        <p class="mat-tools">
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-expand>Expand all</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-collapse>Collapse all</button>
+        </p>
         <p class="muted mt-3">161 materials in the catalogue · The values are typical and vary between manufacturers. Every one can be edited after it lands in the calculator.</p>
+        <p class="muted" id="matpage-count" role="status" hidden></p>
         <p class="muted" id="matpage-empty" hidden>Nothing matches that search.</p>
       </div>
     </section>
     <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TILES">Tiles</h2>
-        <ul class="mat-page-list"><li id="gres-30x30" data-find="porcelain tile 30×30 gres-30x30">
-          <span class="mat-item">
-            <b>Porcelain tile 30×30</b>
-            <span class="muted">30×30 cm · 1 m²/pack · 5 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-30x30">Calculate</a>
-        </li><li id="gres-30x60" data-find="porcelain tile 30×60 gres-30x60">
-          <span class="mat-item">
-            <b>Porcelain tile 30×60</b>
-            <span class="muted">30×60 cm · 1.44 m²/pack · 5 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-30x60">Calculate</a>
-        </li><li id="gres-40x40" data-find="porcelain tile 40×40 gres-40x40">
-          <span class="mat-item">
-            <b>Porcelain tile 40×40</b>
-            <span class="muted">40×40 cm · 1.28 m²/pack · 6 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-40x40">Calculate</a>
-        </li><li id="gres-45x45" data-find="porcelain tile 45×45 gres-45x45">
-          <span class="mat-item">
-            <b>Porcelain tile 45×45</b>
-            <span class="muted">45×45 cm · 1.42 m²/pack · 7 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-45x45">Calculate</a>
-        </li><li id="gres-60x60" data-find="porcelain tile 60×60 gres-60x60">
-          <span class="mat-item">
-            <b>Porcelain tile 60×60</b>
-            <span class="muted">60×60 cm · 1.44 m²/pack · 7 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-60x60">Calculate</a>
-        </li><li id="gres-75x75" data-find="porcelain tile 75×75 gres-75x75">
-          <span class="mat-item">
-            <b>Porcelain tile 75×75</b>
-            <span class="muted">75×75 cm · 1.13 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-75x75">Calculate</a>
-        </li><li id="gres-80x80" data-find="porcelain tile 80×80 gres-80x80">
-          <span class="mat-item">
-            <b>Porcelain tile 80×80</b>
-            <span class="muted">80×80 cm · 1.28 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-80x80">Calculate</a>
-        </li><li id="gres-90x90" data-find="porcelain tile 90×90 gres-90x90">
-          <span class="mat-item">
-            <b>Porcelain tile 90×90</b>
-            <span class="muted">90×90 cm · 1.62 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-90x90">Calculate</a>
-        </li><li id="gres-60x120" data-find="porcelain tile 60×120 gres-60x120">
-          <span class="mat-item">
-            <b>Porcelain tile 60×120</b>
-            <span class="muted">60×120 cm · 1.44 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-60x120">Calculate</a>
-        </li><li id="gres-120x120" data-find="porcelain tile 120×120 gres-120x120">
-          <span class="mat-item">
-            <b>Porcelain tile 120×120</b>
-            <span class="muted">120×120 cm · 1.44 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-120x120">Calculate</a>
-        </li><li id="gres-120x278" data-find="large-format porcelain tile 120×278 gres-120x278">
-          <span class="mat-item">
-            <b>Large-format porcelain tile 120×278</b>
-            <span class="muted">120×278 cm · 3.34 m²/pack · 12 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-120x278">Calculate</a>
-        </li><li id="glaz-20x20" data-find="wall tile 20×20 glaz-20x20">
-          <span class="mat-item">
-            <b>Wall tile 20×20</b>
-            <span class="muted">20×20 cm · 1 m²/pack · 5 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=glaz-20x20">Calculate</a>
-        </li><li id="glaz-25x40" data-find="wall tile 25×40 glaz-25x40">
-          <span class="mat-item">
-            <b>Wall tile 25×40</b>
-            <span class="muted">25×40 cm · 1 m²/pack · 5 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=glaz-25x40">Calculate</a>
-        </li><li id="glaz-30x60" data-find="wall tile 30×60 glaz-30x60">
-          <span class="mat-item">
-            <b>Wall tile 30×60</b>
-            <span class="muted">30×60 cm · 1.44 m²/pack · 5 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=glaz-30x60">Calculate</a>
-        </li><li id="glaz-30x90" data-find="wall tile 30×90 glaz-30x90">
-          <span class="mat-item">
-            <b>Wall tile 30×90</b>
-            <span class="muted">30×90 cm · 1.62 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=glaz-30x90">Calculate</a>
-        </li><li id="terakota-33" data-find="quarry tile 33×33 terakota-33">
-          <span class="mat-item">
-            <b>Quarry tile 33×33</b>
-            <span class="muted">33×33 cm · 1 m²/pack · 5 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=terakota-33">Calculate</a>
-        </li><li id="metro-75x150" data-find="metro brick tile 7,5×15 metro-75x150">
-          <span class="mat-item">
-            <b>Metro brick tile 7,5×15</b>
-            <span class="muted">7,5×15 cm · 1 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=metro-75x150">Calculate</a>
-        </li><li id="metro-60x250" data-find="long-format tile 6×25 metro-60x250">
-          <span class="mat-item">
-            <b>Long-format tile 6×25</b>
-            <span class="muted">6×25 cm · 0.5 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=metro-60x250">Calculate</a>
-        </li><li id="mozaika-30x30" data-find="mesh-mounted mosaic 30×30 mozaika-30x30">
-          <span class="mat-item">
-            <b>Mesh-mounted mosaic 30×30</b>
-            <span class="muted">30×30 cm · 0.99 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=mozaika-30x30">Calculate</a>
-        </li><li id="heksagon" data-find="hexagon tile 20×23 heksagon">
-          <span class="mat-item">
-            <b>Hexagon tile 20×23</b>
-            <span class="muted">20×23 cm · 1 m²/pack · 12 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=heksagon">Calculate</a>
-        </li><li id="taras-60x60" data-find="terrace paver 2 cm · 60×60 taras-60x60">
-          <span class="mat-item">
-            <b>Terrace paver 2 cm · 60×60</b>
-            <span class="muted">2 cm · 60×60 cm · 0.72 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=taras-60x60">Calculate</a>
-        </li><li id="klinkier-25x6" data-find="clinker tile 24,5×6,5 klinkier-25x6">
-          <span class="mat-item">
-            <b>Clinker tile 24,5×6,5</b>
-            <span class="muted">24,5×6,5 cm · 0.5 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=klinkier-25x6">Calculate</a>
-        </li><li id="elew-plytka" data-find="facade tile 24,5×6,5 elew-plytka">
-          <span class="mat-item">
-            <b>Facade tile 24,5×6,5</b>
-            <span class="muted">24,5×6,5 cm · 0.5 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=elew-plytka">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Tiles</h2>
+            <span class="mat-count">23<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Porcelain tile</h3>
+              <span class="mat-count">10<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="gres-30x30" data-find="porcelain tile 30×30 gres-30x30 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 30×30</b>
+              <span class="muted">30×30 cm · 1 m²/pack · 5 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-30x30">Calculate</a>
+          </li><li id="gres-30x60" data-find="porcelain tile 30×60 gres-30x60 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 30×60</b>
+              <span class="muted">30×60 cm · 1.44 m²/pack · 5 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-30x60">Calculate</a>
+          </li><li id="gres-40x40" data-find="porcelain tile 40×40 gres-40x40 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 40×40</b>
+              <span class="muted">40×40 cm · 1.28 m²/pack · 6 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-40x40">Calculate</a>
+          </li><li id="gres-45x45" data-find="porcelain tile 45×45 gres-45x45 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 45×45</b>
+              <span class="muted">45×45 cm · 1.42 m²/pack · 7 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-45x45">Calculate</a>
+          </li><li id="gres-60x60" data-find="porcelain tile 60×60 gres-60x60 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 60×60</b>
+              <span class="muted">60×60 cm · 1.44 m²/pack · 7 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-60x60">Calculate</a>
+          </li><li id="gres-75x75" data-find="porcelain tile 75×75 gres-75x75 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 75×75</b>
+              <span class="muted">75×75 cm · 1.13 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-75x75">Calculate</a>
+          </li><li id="gres-80x80" data-find="porcelain tile 80×80 gres-80x80 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 80×80</b>
+              <span class="muted">80×80 cm · 1.28 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-80x80">Calculate</a>
+          </li><li id="gres-90x90" data-find="porcelain tile 90×90 gres-90x90 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 90×90</b>
+              <span class="muted">90×90 cm · 1.62 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-90x90">Calculate</a>
+          </li><li id="gres-60x120" data-find="porcelain tile 60×120 gres-60x120 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 60×120</b>
+              <span class="muted">60×120 cm · 1.44 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-60x120">Calculate</a>
+          </li><li id="gres-120x120" data-find="porcelain tile 120×120 gres-120x120 tiles">
+            <span class="mat-item">
+              <b>Porcelain tile 120×120</b>
+              <span class="muted">120×120 cm · 1.44 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-120x120">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="gres-120x278" data-find="large-format porcelain tile 120×278 gres-120x278 tiles">
+            <span class="mat-item">
+              <b>Large-format porcelain tile 120×278</b>
+              <span class="muted">120×278 cm · 3.34 m²/pack · 12 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-120x278">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Wall tile</h3>
+              <span class="mat-count">4<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="glaz-20x20" data-find="wall tile 20×20 glaz-20x20 tiles">
+            <span class="mat-item">
+              <b>Wall tile 20×20</b>
+              <span class="muted">20×20 cm · 1 m²/pack · 5 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=glaz-20x20">Calculate</a>
+          </li><li id="glaz-25x40" data-find="wall tile 25×40 glaz-25x40 tiles">
+            <span class="mat-item">
+              <b>Wall tile 25×40</b>
+              <span class="muted">25×40 cm · 1 m²/pack · 5 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=glaz-25x40">Calculate</a>
+          </li><li id="glaz-30x60" data-find="wall tile 30×60 glaz-30x60 tiles">
+            <span class="mat-item">
+              <b>Wall tile 30×60</b>
+              <span class="muted">30×60 cm · 1.44 m²/pack · 5 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=glaz-30x60">Calculate</a>
+          </li><li id="glaz-30x90" data-find="wall tile 30×90 glaz-30x90 tiles">
+            <span class="mat-item">
+              <b>Wall tile 30×90</b>
+              <span class="muted">30×90 cm · 1.62 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=glaz-30x90">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="terakota-33" data-find="quarry tile 33×33 terakota-33 tiles">
+            <span class="mat-item">
+              <b>Quarry tile 33×33</b>
+              <span class="muted">33×33 cm · 1 m²/pack · 5 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=terakota-33">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="metro-75x150" data-find="metro brick tile 7,5×15 metro-75x150 tiles">
+            <span class="mat-item">
+              <b>Metro brick tile 7,5×15</b>
+              <span class="muted">7,5×15 cm · 1 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=metro-75x150">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="metro-60x250" data-find="long-format tile 6×25 metro-60x250 tiles">
+            <span class="mat-item">
+              <b>Long-format tile 6×25</b>
+              <span class="muted">6×25 cm · 0.5 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=metro-60x250">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="mozaika-30x30" data-find="mesh-mounted mosaic 30×30 mozaika-30x30 tiles">
+            <span class="mat-item">
+              <b>Mesh-mounted mosaic 30×30</b>
+              <span class="muted">30×30 cm · 0.99 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=mozaika-30x30">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="heksagon" data-find="hexagon tile 20×23 heksagon tiles">
+            <span class="mat-item">
+              <b>Hexagon tile 20×23</b>
+              <span class="muted">20×23 cm · 1 m²/pack · 12 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=heksagon">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="taras-60x60" data-find="terrace paver 2 cm · 60×60 taras-60x60 tiles">
+            <span class="mat-item">
+              <b>Terrace paver 2 cm · 60×60</b>
+              <span class="muted">2 cm · 60×60 cm · 0.72 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=taras-60x60">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klinkier-25x6" data-find="clinker tile 24,5×6,5 klinkier-25x6 tiles">
+            <span class="mat-item">
+              <b>Clinker tile 24,5×6,5</b>
+              <span class="muted">24,5×6,5 cm · 0.5 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=klinkier-25x6">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="elew-plytka" data-find="facade tile 24,5×6,5 elew-plytka tiles">
+            <span class="mat-item">
+              <b>Facade tile 24,5×6,5</b>
+              <span class="muted">24,5×6,5 cm · 0.5 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=elew-plytka">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-FLOORING">Flooring</h2>
-        <ul class="mat-page-list"><li id="panel-ac3" data-find="laminate flooring ac3 · 128×19,2 panel-ac3">
-          <span class="mat-item">
-            <b>Laminate flooring AC3 · 128×19,2</b>
-            <span class="muted">AC3 · 128×19,2 cm · 2.22 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=panel-ac3">Calculate</a>
-        </li><li id="panel-ac4" data-find="laminate flooring ac4 · 138×19,3 panel-ac4">
-          <span class="mat-item">
-            <b>Laminate flooring AC4 · 138×19,3</b>
-            <span class="muted">AC4 · 138×19,3 cm · 2.22 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=panel-ac4">Calculate</a>
-        </li><li id="panel-ac5" data-find="laminate flooring ac5 · 129×19 panel-ac5">
-          <span class="mat-item">
-            <b>Laminate flooring AC5 · 129×19</b>
-            <span class="muted">AC5 · 129×19 cm · 2.22 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=panel-ac5">Calculate</a>
-        </li><li id="lvt" data-find="lvt vinyl plank 122×18 lvt">
-          <span class="mat-item">
-            <b>LVT vinyl plank 122×18</b>
-            <span class="muted">122×18 cm · 2.2 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=lvt">Calculate</a>
-        </li><li id="spc" data-find="spc plank 61×30,5 spc">
-          <span class="mat-item">
-            <b>SPC plank 61×30,5</b>
-            <span class="muted">61×30,5 cm · 2.23 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=spc">Calculate</a>
-        </li><li id="deska-barl" data-find="engineered wood plank 220×18,2 deska-barl">
-          <span class="mat-item">
-            <b>Engineered wood plank 220×18,2</b>
-            <span class="muted">220×18,2 cm · 3.18 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=deska-barl">Calculate</a>
-        </li><li id="deska-3warstw" data-find="three-layer plank 209×15 deska-3warstw">
-          <span class="mat-item">
-            <b>Three-layer plank 209×15</b>
-            <span class="muted">209×15 cm · 2.2 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=deska-3warstw">Calculate</a>
-        </li><li id="parkiet" data-find="classic parquet 45×7 parkiet">
-          <span class="mat-item">
-            <b>Classic parquet 45×7</b>
-            <span class="muted">45×7 cm · 1 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=parkiet">Calculate</a>
-        </li><li id="gres-deska-20x120" data-find="wood-effect porcelain 20×120 gres-deska-20x120">
-          <span class="mat-item">
-            <b>Wood-effect porcelain 20×120</b>
-            <span class="muted">20×120 cm · 0.96 m²/pack · 10 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-deska-20x120">Calculate</a>
-        </li><li id="korek" data-find="cork flooring 90×30 korek">
-          <span class="mat-item">
-            <b>Cork flooring 90×30</b>
-            <span class="muted">90×30 cm · 1.9 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=korek">Calculate</a>
-        </li><li id="panel-scienny" data-find="wall panel / slats 275×12 panel-scienny">
-          <span class="mat-item">
-            <b>Wall panel / slats 275×12</b>
-            <span class="muted">275×12 cm · 1.65 m²/pack · 8 % waste</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=panel-scienny">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-FLOORING" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Flooring</h2>
+            <span class="mat-count">11<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Laminate flooring</h3>
+              <span class="mat-count">3<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="panel-ac3" data-find="laminate flooring ac3 · 128×19,2 panel-ac3 flooring">
+            <span class="mat-item">
+              <b>Laminate flooring AC3 · 128×19,2</b>
+              <span class="muted">AC3 · 128×19,2 cm · 2.22 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=panel-ac3">Calculate</a>
+          </li><li id="panel-ac4" data-find="laminate flooring ac4 · 138×19,3 panel-ac4 flooring">
+            <span class="mat-item">
+              <b>Laminate flooring AC4 · 138×19,3</b>
+              <span class="muted">AC4 · 138×19,3 cm · 2.22 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=panel-ac4">Calculate</a>
+          </li><li id="panel-ac5" data-find="laminate flooring ac5 · 129×19 panel-ac5 flooring">
+            <span class="mat-item">
+              <b>Laminate flooring AC5 · 129×19</b>
+              <span class="muted">AC5 · 129×19 cm · 2.22 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=panel-ac5">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="lvt" data-find="lvt vinyl plank 122×18 lvt flooring">
+            <span class="mat-item">
+              <b>LVT vinyl plank 122×18</b>
+              <span class="muted">122×18 cm · 2.2 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=lvt">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="spc" data-find="spc plank 61×30,5 spc flooring">
+            <span class="mat-item">
+              <b>SPC plank 61×30,5</b>
+              <span class="muted">61×30,5 cm · 2.23 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=spc">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-barl" data-find="engineered wood plank 220×18,2 deska-barl flooring">
+            <span class="mat-item">
+              <b>Engineered wood plank 220×18,2</b>
+              <span class="muted">220×18,2 cm · 3.18 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=deska-barl">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-3warstw" data-find="three-layer plank 209×15 deska-3warstw flooring">
+            <span class="mat-item">
+              <b>Three-layer plank 209×15</b>
+              <span class="muted">209×15 cm · 2.2 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=deska-3warstw">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="parkiet" data-find="classic parquet 45×7 parkiet flooring">
+            <span class="mat-item">
+              <b>Classic parquet 45×7</b>
+              <span class="muted">45×7 cm · 1 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=parkiet">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gres-deska-20x120" data-find="wood-effect porcelain 20×120 gres-deska-20x120 flooring">
+            <span class="mat-item">
+              <b>Wood-effect porcelain 20×120</b>
+              <span class="muted">20×120 cm · 0.96 m²/pack · 10 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gres-deska-20x120">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="korek" data-find="cork flooring 90×30 korek flooring">
+            <span class="mat-item">
+              <b>Cork flooring 90×30</b>
+              <span class="muted">90×30 cm · 1.9 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=korek">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="panel-scienny" data-find="wall panel / slats 275×12 panel-scienny flooring">
+            <span class="mat-item">
+              <b>Wall panel / slats 275×12</b>
+              <span class="muted">275×12 cm · 1.65 m²/pack · 8 % waste</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=panel-scienny">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TRIM">Trim and finishing</h2>
-        <ul class="mat-page-list"><li id="parapet-wewn" data-find="internal window sill 4100×250 parapet-wewn">
-          <span class="mat-item">
-            <b>Internal window sill 4100×250</b>
-            <span class="muted">4100×250 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=parapet-wewn">Calculate</a>
-        </li><li id="listwa-mdf-2_5" data-find="mdf skirting board 2,5 m listwa-mdf-2_5">
-          <span class="mat-item">
-            <b>MDF skirting board 2,5 m</b>
-            <span class="muted">stock bar 2.5 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=listwa-mdf-2_5">Calculate</a>
-        </li><li id="cokol-pvc-2_5" data-find="pvc skirting 2,5 m cokol-pvc-2_5">
-          <span class="mat-item">
-            <b>PVC skirting 2,5 m</b>
-            <span class="muted">stock bar 2.5 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cokol-pvc-2_5">Calculate</a>
-        </li><li id="cwierc-2_5" data-find="quadrant / corner moulding 2,5 m cwierc-2_5">
-          <span class="mat-item">
-            <b>Quadrant / corner moulding 2,5 m</b>
-            <span class="muted">stock bar 2.5 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cwierc-2_5">Calculate</a>
-        </li><li id="listwa-prog-alu-0_9" data-find="aluminium threshold strip 0,9 m listwa-prog-alu-0_9">
-          <span class="mat-item">
-            <b>Aluminium threshold strip 0,9 m</b>
-            <span class="muted">stock bar 0.9 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=listwa-prog-alu-0_9">Calculate</a>
-        </li><li id="parapet-zewn-2" data-find="steel external sill 2 m parapet-zewn-2">
-          <span class="mat-item">
-            <b>Steel external sill 2 m</b>
-            <span class="muted">stock bar 2 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=parapet-zewn-2">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TRIM" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Trim and finishing</h2>
+            <span class="mat-count">6<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="parapet-wewn" data-find="internal window sill 4100×250 parapet-wewn trim and finishing">
+            <span class="mat-item">
+              <b>Internal window sill 4100×250</b>
+              <span class="muted">4100×250 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=parapet-wewn">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-mdf-2_5" data-find="mdf skirting board 2,5 m listwa-mdf-2_5 trim and finishing">
+            <span class="mat-item">
+              <b>MDF skirting board 2,5 m</b>
+              <span class="muted">stock bar 2.5 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=listwa-mdf-2_5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="cokol-pvc-2_5" data-find="pvc skirting 2,5 m cokol-pvc-2_5 trim and finishing">
+            <span class="mat-item">
+              <b>PVC skirting 2,5 m</b>
+              <span class="muted">stock bar 2.5 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cokol-pvc-2_5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="cwierc-2_5" data-find="quadrant / corner moulding 2,5 m cwierc-2_5 trim and finishing">
+            <span class="mat-item">
+              <b>Quadrant / corner moulding 2,5 m</b>
+              <span class="muted">stock bar 2.5 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cwierc-2_5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-prog-alu-0_9" data-find="aluminium threshold strip 0,9 m listwa-prog-alu-0_9 trim and finishing">
+            <span class="mat-item">
+              <b>Aluminium threshold strip 0,9 m</b>
+              <span class="muted">stock bar 0.9 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=listwa-prog-alu-0_9">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="parapet-zewn-2" data-find="steel external sill 2 m parapet-zewn-2 trim and finishing">
+            <span class="mat-item">
+              <b>Steel external sill 2 m</b>
+              <span class="muted">stock bar 2 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=parapet-zewn-2">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PAINT">Paints and varnishes</h2>
-        <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="wall paint 2,5 l farba-scienna-2_5">
-          <span class="mat-item">
-            <b>Wall paint 2,5 l</b>
-            <span class="muted">2.5 l · ~10 m²/l · 25 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-scienna-2_5">Calculate</a>
-        </li><li id="farba-scienna-5" data-find="wall paint 5 l farba-scienna-5">
-          <span class="mat-item">
-            <b>Wall paint 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-scienna-5">Calculate</a>
-        </li><li id="farba-scienna-10" data-find="wall paint 10 l farba-scienna-10">
-          <span class="mat-item">
-            <b>Wall paint 10 l</b>
-            <span class="muted">10 l · ~10 m²/l · 100 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-scienna-10">Calculate</a>
-        </li><li id="farba-lateks-5" data-find="latex paint 5 l farba-lateks-5">
-          <span class="mat-item">
-            <b>Latex paint 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-lateks-5">Calculate</a>
-        </li><li id="farba-sufitowa-10" data-find="ceiling paint 10 l farba-sufitowa-10">
-          <span class="mat-item">
-            <b>Ceiling paint 10 l</b>
-            <span class="muted">10 l · ~11 m²/l · 110 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-sufitowa-10">Calculate</a>
-        </li><li id="farba-kl-2_5" data-find="kitchen and bathroom paint 2,5 l farba-kl-2_5">
-          <span class="mat-item">
-            <b>Kitchen and bathroom paint 2,5 l</b>
-            <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-kl-2_5">Calculate</a>
-        </li><li id="farba-beton-5" data-find="concrete and floor paint 5 l farba-beton-5">
-          <span class="mat-item">
-            <b>Concrete and floor paint 5 l</b>
-            <span class="muted">5 l · ~8 m²/l · 40 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-beton-5">Calculate</a>
-        </li><li id="farba-elew-akr-10" data-find="acrylic facade paint 10 l farba-elew-akr-10">
-          <span class="mat-item">
-            <b>Acrylic facade paint 10 l</b>
-            <span class="muted">10 l · ~5 m²/l · 50 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-elew-akr-10">Calculate</a>
-        </li><li id="farba-elew-sil-10" data-find="silicone facade paint 10 l farba-elew-sil-10">
-          <span class="mat-item">
-            <b>Silicone facade paint 10 l</b>
-            <span class="muted">10 l · ~6 m²/l · 60 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-elew-sil-10">Calculate</a>
-        </li><li id="emalia-0_75" data-find="wood and metal enamel 0,75 l emalia-0_75">
-          <span class="mat-item">
-            <b>Wood and metal enamel 0,75 l</b>
-            <span class="muted">0.75 l · ~12 m²/l · 9 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=emalia-0_75">Calculate</a>
-        </li><li id="emalia-2_5" data-find="wood and metal enamel 2,5 l emalia-2_5">
-          <span class="mat-item">
-            <b>Wood and metal enamel 2,5 l</b>
-            <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=emalia-2_5">Calculate</a>
-        </li><li id="farba-antykor-0_75" data-find="anti-corrosion paint 3-in-1 0,75 l farba-antykor-0_75">
-          <span class="mat-item">
-            <b>Anti-corrosion paint 3-in-1 0,75 l</b>
-            <span class="muted">0.75 l · ~10 m²/l · 7.5 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-antykor-0_75">Calculate</a>
-        </li><li id="lakierobejca-2_5" data-find="stain varnish 2,5 l lakierobejca-2_5">
-          <span class="mat-item">
-            <b>Stain varnish 2,5 l</b>
-            <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=lakierobejca-2_5">Calculate</a>
-        </li><li id="lakier-bezb-2_5" data-find="clear varnish 2,5 l lakier-bezb-2_5">
-          <span class="mat-item">
-            <b>Clear varnish 2,5 l</b>
-            <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=lakier-bezb-2_5">Calculate</a>
-        </li><li id="impregnat-5" data-find="wood preservative 5 l impregnat-5">
-          <span class="mat-item">
-            <b>Wood preservative 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=impregnat-5">Calculate</a>
-        </li><li id="olej-taras-2_5" data-find="decking oil 2,5 l olej-taras-2_5">
-          <span class="mat-item">
-            <b>Decking oil 2,5 l</b>
-            <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=olej-taras-2_5">Calculate</a>
-        </li><li id="grunt-gleb-5" data-find="deep-penetrating primer 5 l grunt-gleb-5">
-          <span class="mat-item">
-            <b>Deep-penetrating primer 5 l</b>
-            <span class="muted">5 l · ~7 m²/l · 35 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=grunt-gleb-5">Calculate</a>
-        </li><li id="grunt-mleczko-5" data-find="primer under paint 5 l grunt-mleczko-5">
-          <span class="mat-item">
-            <b>Primer under paint 5 l</b>
-            <span class="muted">5 l · ~8 m²/l · 40 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=grunt-mleczko-5">Calculate</a>
-        </li><li id="grunt-kwarc-5" data-find="quartz primer under render 5 l grunt-kwarc-5">
-          <span class="mat-item">
-            <b>Quartz primer under render 5 l</b>
-            <span class="muted">5 l · ~4 m²/l · 20 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=grunt-kwarc-5">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PAINT" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Paints and varnishes</h2>
+            <span class="mat-count">19<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Wall paint</h3>
+              <span class="mat-count">3<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="wall paint 2,5 l farba-scienna-2_5 paints and varnishes">
+            <span class="mat-item">
+              <b>Wall paint 2,5 l</b>
+              <span class="muted">2.5 l · ~10 m²/l · 25 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-scienna-2_5">Calculate</a>
+          </li><li id="farba-scienna-5" data-find="wall paint 5 l farba-scienna-5 paints and varnishes">
+            <span class="mat-item">
+              <b>Wall paint 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-scienna-5">Calculate</a>
+          </li><li id="farba-scienna-10" data-find="wall paint 10 l farba-scienna-10 paints and varnishes">
+            <span class="mat-item">
+              <b>Wall paint 10 l</b>
+              <span class="muted">10 l · ~10 m²/l · 100 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-scienna-10">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="farba-lateks-5" data-find="latex paint 5 l farba-lateks-5 paints and varnishes">
+            <span class="mat-item">
+              <b>Latex paint 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-lateks-5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-sufitowa-10" data-find="ceiling paint 10 l farba-sufitowa-10 paints and varnishes">
+            <span class="mat-item">
+              <b>Ceiling paint 10 l</b>
+              <span class="muted">10 l · ~11 m²/l · 110 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-sufitowa-10">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-kl-2_5" data-find="kitchen and bathroom paint 2,5 l farba-kl-2_5 paints and varnishes">
+            <span class="mat-item">
+              <b>Kitchen and bathroom paint 2,5 l</b>
+              <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-kl-2_5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-beton-5" data-find="concrete and floor paint 5 l farba-beton-5 paints and varnishes">
+            <span class="mat-item">
+              <b>Concrete and floor paint 5 l</b>
+              <span class="muted">5 l · ~8 m²/l · 40 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-beton-5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-elew-akr-10" data-find="acrylic facade paint 10 l farba-elew-akr-10 paints and varnishes">
+            <span class="mat-item">
+              <b>Acrylic facade paint 10 l</b>
+              <span class="muted">10 l · ~5 m²/l · 50 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-elew-akr-10">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-elew-sil-10" data-find="silicone facade paint 10 l farba-elew-sil-10 paints and varnishes">
+            <span class="mat-item">
+              <b>Silicone facade paint 10 l</b>
+              <span class="muted">10 l · ~6 m²/l · 60 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-elew-sil-10">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Wood and metal enamel</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="emalia-0_75" data-find="wood and metal enamel 0,75 l emalia-0_75 paints and varnishes">
+            <span class="mat-item">
+              <b>Wood and metal enamel 0,75 l</b>
+              <span class="muted">0.75 l · ~12 m²/l · 9 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=emalia-0_75">Calculate</a>
+          </li><li id="emalia-2_5" data-find="wood and metal enamel 2,5 l emalia-2_5 paints and varnishes">
+            <span class="mat-item">
+              <b>Wood and metal enamel 2,5 l</b>
+              <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=emalia-2_5">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="farba-antykor-0_75" data-find="anti-corrosion paint 3-in-1 0,75 l farba-antykor-0_75 paints and varnishes">
+            <span class="mat-item">
+              <b>Anti-corrosion paint 3-in-1 0,75 l</b>
+              <span class="muted">0.75 l · ~10 m²/l · 7.5 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=farba-antykor-0_75">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lakierobejca-2_5" data-find="stain varnish 2,5 l lakierobejca-2_5 paints and varnishes">
+            <span class="mat-item">
+              <b>Stain varnish 2,5 l</b>
+              <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=lakierobejca-2_5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lakier-bezb-2_5" data-find="clear varnish 2,5 l lakier-bezb-2_5 paints and varnishes">
+            <span class="mat-item">
+              <b>Clear varnish 2,5 l</b>
+              <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=lakier-bezb-2_5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="impregnat-5" data-find="wood preservative 5 l impregnat-5 paints and varnishes">
+            <span class="mat-item">
+              <b>Wood preservative 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=impregnat-5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="olej-taras-2_5" data-find="decking oil 2,5 l olej-taras-2_5 paints and varnishes">
+            <span class="mat-item">
+              <b>Decking oil 2,5 l</b>
+              <span class="muted">2.5 l · ~12 m²/l · 30 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=olej-taras-2_5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-gleb-5" data-find="deep-penetrating primer 5 l grunt-gleb-5 paints and varnishes">
+            <span class="mat-item">
+              <b>Deep-penetrating primer 5 l</b>
+              <span class="muted">5 l · ~7 m²/l · 35 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=grunt-gleb-5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-mleczko-5" data-find="primer under paint 5 l grunt-mleczko-5 paints and varnishes">
+            <span class="mat-item">
+              <b>Primer under paint 5 l</b>
+              <span class="muted">5 l · ~8 m²/l · 40 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=grunt-mleczko-5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-kwarc-5" data-find="quartz primer under render 5 l grunt-kwarc-5 paints and varnishes">
+            <span class="mat-item">
+              <b>Quartz primer under render 5 l</b>
+              <span class="muted">5 l · ~4 m²/l · 20 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=grunt-kwarc-5">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-CHEMICALS">Building chemicals</h2>
-        <ul class="mat-page-list"><li id="gladz-gips-20" data-find="gypsum skim coat 20 kg gladz-gips-20">
-          <span class="mat-item">
-            <b>Gypsum skim coat 20 kg</b>
-            <span class="muted">20 kg · ~1 kg/m² (1 mm layer) · 20 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=gladz-gips-20">Calculate</a>
-        </li><li id="gladz-polim-20" data-find="polymer skim coat 20 kg gladz-polim-20">
-          <span class="mat-item">
-            <b>Polymer skim coat 20 kg</b>
-            <span class="muted">20 kg · ~1.2 kg/m² (1 mm layer) · 16.67 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=gladz-polim-20">Calculate</a>
-        </li><li id="gladz-gotowa-18" data-find="ready-mixed skim coat 18 kg gladz-gotowa-18">
-          <span class="mat-item">
-            <b>Ready-mixed skim coat 18 kg</b>
-            <span class="muted">18 kg · ~1.2 kg/m² (1 mm layer) · 15 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=gladz-gotowa-18">Calculate</a>
-        </li><li id="tynk-gips-30" data-find="gypsum plaster 30 kg tynk-gips-30">
-          <span class="mat-item">
-            <b>Gypsum plaster 30 kg</b>
-            <span class="muted">30 kg · ~8.5 kg/m² (10 mm layer) · 3.53 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-gips-30">Calculate</a>
-        </li><li id="tynk-cw-30" data-find="cement-lime plaster 30 kg tynk-cw-30">
-          <span class="mat-item">
-            <b>Cement-lime plaster 30 kg</b>
-            <span class="muted">30 kg · ~15 kg/m² (10 mm layer) · 2 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-cw-30">Calculate</a>
-        </li><li id="tynk-mozaik-25" data-find="mosaic render 25 kg tynk-mozaik-25">
-          <span class="mat-item">
-            <b>Mosaic render 25 kg</b>
-            <span class="muted">25 kg · ~5 kg/m² (one layer) · 5 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-mozaik-25">Calculate</a>
-        </li><li id="tynk-baranek-25" data-find="scratch render 1,5 mm · 25 kg tynk-baranek-25">
-          <span class="mat-item">
-            <b>Scratch render 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2.5 kg/m² (1.5 mm layer) · 10 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-baranek-25">Calculate</a>
-        </li><li id="tynk-silik-25" data-find="silicone render 1,5 mm · 25 kg tynk-silik-25">
-          <span class="mat-item">
-            <b>Silicone render 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2.5 kg/m² (1.5 mm layer) · 10 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-silik-25">Calculate</a>
-        </li><li id="tynk-akryl-25" data-find="acrylic render 1,5 mm · 25 kg tynk-akryl-25">
-          <span class="mat-item">
-            <b>Acrylic render 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2.5 kg/m² (1.5 mm layer) · 10 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-akryl-25">Calculate</a>
-        </li><li id="klej-c1-25" data-find="tile adhesive c1 25 kg klej-c1-25">
-          <span class="mat-item">
-            <b>Tile adhesive C1 25 kg</b>
-            <span class="muted">25 kg · ~4 kg/m² (6 mm notched trowel) · 6.25 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=klej-c1-25">Calculate</a>
-        </li><li id="klej-c2-25" data-find="flexible tile adhesive c2 25 kg klej-c2-25">
-          <span class="mat-item">
-            <b>Flexible tile adhesive C2 25 kg</b>
-            <span class="muted">25 kg · ~5 kg/m² (10 mm notched trowel) · 5 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=klej-c2-25">Calculate</a>
-        </li><li id="klej-styro-25" data-find="eps and mesh adhesive 25 kg klej-styro-25">
-          <span class="mat-item">
-            <b>EPS and mesh adhesive 25 kg</b>
-            <span class="muted">25 kg · ~4.5 kg/m² (reinforcing layer) · 5.56 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=klej-styro-25">Calculate</a>
-        </li><li id="zaprawa-mur-25" data-find="masonry mortar 25 kg zaprawa-mur-25">
-          <span class="mat-item">
-            <b>Masonry mortar 25 kg</b>
-            <span class="muted">25 kg · ~25 kg/m² (10 mm joint) · 1 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=zaprawa-mur-25">Calculate</a>
-        </li><li id="wylewka-samop-25" data-find="self-levelling compound 25 kg wylewka-samop-25">
-          <span class="mat-item">
-            <b>Self-levelling compound 25 kg</b>
-            <span class="muted">25 kg · ~1.6 kg/m² (1 mm layer) · 15.63 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=wylewka-samop-25">Calculate</a>
-        </li><li id="fuga-5" data-find="grout 5 kg fuga-5">
-          <span class="mat-item">
-            <b>Grout 5 kg</b>
-            <span class="muted">5 kg · ~0.5 kg/m² (3 mm joint) · 10 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=fuga-5">Calculate</a>
-        </li><li id="hydroizol-15" data-find="liquid waterproofing membrane 15 kg hydroizol-15">
-          <span class="mat-item">
-            <b>Liquid waterproofing membrane 15 kg</b>
-            <span class="muted">15 kg · ~3 kg/m² (2 coats) · 5 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=hydroizol-15">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-CHEMICALS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Building chemicals</h2>
+            <span class="mat-count">16<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="gladz-gips-20" data-find="gypsum skim coat 20 kg gladz-gips-20 building chemicals">
+            <span class="mat-item">
+              <b>Gypsum skim coat 20 kg</b>
+              <span class="muted">20 kg · ~1 kg/m² (1 mm layer) · 20 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=gladz-gips-20">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gladz-polim-20" data-find="polymer skim coat 20 kg gladz-polim-20 building chemicals">
+            <span class="mat-item">
+              <b>Polymer skim coat 20 kg</b>
+              <span class="muted">20 kg · ~1.2 kg/m² (1 mm layer) · 16.67 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=gladz-polim-20">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gladz-gotowa-18" data-find="ready-mixed skim coat 18 kg gladz-gotowa-18 building chemicals">
+            <span class="mat-item">
+              <b>Ready-mixed skim coat 18 kg</b>
+              <span class="muted">18 kg · ~1.2 kg/m² (1 mm layer) · 15 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=gladz-gotowa-18">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-gips-30" data-find="gypsum plaster 30 kg tynk-gips-30 building chemicals">
+            <span class="mat-item">
+              <b>Gypsum plaster 30 kg</b>
+              <span class="muted">30 kg · ~8.5 kg/m² (10 mm layer) · 3.53 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-gips-30">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-cw-30" data-find="cement-lime plaster 30 kg tynk-cw-30 building chemicals">
+            <span class="mat-item">
+              <b>Cement-lime plaster 30 kg</b>
+              <span class="muted">30 kg · ~15 kg/m² (10 mm layer) · 2 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-cw-30">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-mozaik-25" data-find="mosaic render 25 kg tynk-mozaik-25 building chemicals">
+            <span class="mat-item">
+              <b>Mosaic render 25 kg</b>
+              <span class="muted">25 kg · ~5 kg/m² (one layer) · 5 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-mozaik-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-baranek-25" data-find="scratch render 1,5 mm · 25 kg tynk-baranek-25 building chemicals">
+            <span class="mat-item">
+              <b>Scratch render 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2.5 kg/m² (1.5 mm layer) · 10 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-baranek-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-silik-25" data-find="silicone render 1,5 mm · 25 kg tynk-silik-25 building chemicals">
+            <span class="mat-item">
+              <b>Silicone render 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2.5 kg/m² (1.5 mm layer) · 10 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-silik-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-akryl-25" data-find="acrylic render 1,5 mm · 25 kg tynk-akryl-25 building chemicals">
+            <span class="mat-item">
+              <b>Acrylic render 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2.5 kg/m² (1.5 mm layer) · 10 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=tynk-akryl-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-c1-25" data-find="tile adhesive c1 25 kg klej-c1-25 building chemicals">
+            <span class="mat-item">
+              <b>Tile adhesive C1 25 kg</b>
+              <span class="muted">25 kg · ~4 kg/m² (6 mm notched trowel) · 6.25 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=klej-c1-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-c2-25" data-find="flexible tile adhesive c2 25 kg klej-c2-25 building chemicals">
+            <span class="mat-item">
+              <b>Flexible tile adhesive C2 25 kg</b>
+              <span class="muted">25 kg · ~5 kg/m² (10 mm notched trowel) · 5 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=klej-c2-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-styro-25" data-find="eps and mesh adhesive 25 kg klej-styro-25 building chemicals">
+            <span class="mat-item">
+              <b>EPS and mesh adhesive 25 kg</b>
+              <span class="muted">25 kg · ~4.5 kg/m² (reinforcing layer) · 5.56 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=klej-styro-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="zaprawa-mur-25" data-find="masonry mortar 25 kg zaprawa-mur-25 building chemicals">
+            <span class="mat-item">
+              <b>Masonry mortar 25 kg</b>
+              <span class="muted">25 kg · ~25 kg/m² (10 mm joint) · 1 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=zaprawa-mur-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="wylewka-samop-25" data-find="self-levelling compound 25 kg wylewka-samop-25 building chemicals">
+            <span class="mat-item">
+              <b>Self-levelling compound 25 kg</b>
+              <span class="muted">25 kg · ~1.6 kg/m² (1 mm layer) · 15.63 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=wylewka-samop-25">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="fuga-5" data-find="grout 5 kg fuga-5 building chemicals">
+            <span class="mat-item">
+              <b>Grout 5 kg</b>
+              <span class="muted">5 kg · ~0.5 kg/m² (3 mm joint) · 10 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=fuga-5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hydroizol-15" data-find="liquid waterproofing membrane 15 kg hydroizol-15 building chemicals">
+            <span class="mat-item">
+              <b>Liquid waterproofing membrane 15 kg</b>
+              <span class="muted">15 kg · ~3 kg/m² (2 coats) · 5 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=hydroizol-15">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-BOARDS">Boards</h2>
-        <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="plasterboard, standard 1200×2600 gk-zwykla-2600">
-          <span class="mat-item">
-            <b>Plasterboard, standard 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3.12 m²/pc</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-zwykla-2600">Calculate</a>
-        </li><li id="gk-zwykla-2000" data-find="plasterboard, standard 1200×2000 gk-zwykla-2000">
-          <span class="mat-item">
-            <b>Plasterboard, standard 1200×2000</b>
-            <span class="muted">1200×2000 mm · 2.4 m²/pc</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-zwykla-2000">Calculate</a>
-        </li><li id="gk-impreg-2600" data-find="plasterboard, moisture-resistant 1200×2600 gk-impreg-2600">
-          <span class="mat-item">
-            <b>Plasterboard, moisture-resistant 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3.12 m²/pc</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-impreg-2600">Calculate</a>
-        </li><li id="gk-ogniowa-2600" data-find="plasterboard, fire-resistant 1200×2600 gk-ogniowa-2600">
-          <span class="mat-item">
-            <b>Plasterboard, fire-resistant 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3.12 m²/pc</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-ogniowa-2600">Calculate</a>
-        </li><li id="gk-gksf-2600" data-find="plasterboard, fire + moisture (gkfi) 1200×2600 gk-gksf-2600">
-          <span class="mat-item">
-            <b>Plasterboard, fire + moisture (GKFI) 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3.12 m²/pc</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-gksf-2600">Calculate</a>
-        </li><li id="plyta-lam-2800" data-find="laminated furniture board 2800×2070 plyta-lam-2800">
-          <span class="mat-item">
-            <b>Laminated furniture board 2800×2070</b>
-            <span class="muted">2800×2070 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=plyta-lam-2800">Calculate</a>
-        </li><li id="plyta-lam-3660" data-find="laminated furniture board 3660×1830 plyta-lam-3660">
-          <span class="mat-item">
-            <b>Laminated furniture board 3660×1830</b>
-            <span class="muted">3660×1830 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=plyta-lam-3660">Calculate</a>
-        </li><li id="mdf-2800" data-find="raw mdf 2800×2070 mdf-2800">
-          <span class="mat-item">
-            <b>Raw MDF 2800×2070</b>
-            <span class="muted">2800×2070 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=mdf-2800">Calculate</a>
-        </li><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800">
-          <span class="mat-item">
-            <b>HDF 2800×2070</b>
-            <span class="muted">2800×2070 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=hdf-2800">Calculate</a>
-        </li><li id="wior-surowa" data-find="raw chipboard 2800×2070 wior-surowa">
-          <span class="mat-item">
-            <b>Raw chipboard 2800×2070</b>
-            <span class="muted">2800×2070 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=wior-surowa">Calculate</a>
-        </li><li id="mfp-2500" data-find="mfp board 2500×1250 mfp-2500">
-          <span class="mat-item">
-            <b>MFP board 2500×1250</b>
-            <span class="muted">2500×1250 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=mfp-2500">Calculate</a>
-        </li><li id="sklejka-lisc" data-find="hardwood plywood 2500×1250 sklejka-lisc">
-          <span class="mat-item">
-            <b>Hardwood plywood 2500×1250</b>
-            <span class="muted">2500×1250 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=sklejka-lisc">Calculate</a>
-        </li><li id="sklejka-brzoza" data-find="birch plywood 1525×1525 sklejka-brzoza">
-          <span class="mat-item">
-            <b>Birch plywood 1525×1525</b>
-            <span class="muted">1525×1525 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=sklejka-brzoza">Calculate</a>
-        </li><li id="sklejka-wodo" data-find="waterproof plywood 3000×1500 sklejka-wodo">
-          <span class="mat-item">
-            <b>Waterproof plywood 3000×1500</b>
-            <span class="muted">3000×1500 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=sklejka-wodo">Calculate</a>
-        </li><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500">
-          <span class="mat-item">
-            <b>OSB-3 2500×1250</b>
-            <span class="muted">2500×1250 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=osb3-2500">Calculate</a>
-        </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800">
-          <span class="mat-item">
-            <b>OSB-3 2800×1250</b>
-            <span class="muted">2800×1250 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=osb3-2800">Calculate</a>
-        </li><li id="cetris-3350" data-find="cement-bonded board 3350×1250 cetris-3350">
-          <span class="mat-item">
-            <b>Cement-bonded board 3350×1250</b>
-            <span class="muted">3350×1250 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=cetris-3350">Calculate</a>
-        </li><li id="fermacell-1500" data-find="fibre-gypsum board 1500×1000 fermacell-1500">
-          <span class="mat-item">
-            <b>Fibre-gypsum board 1500×1000</b>
-            <span class="muted">1500×1000 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=fermacell-1500">Calculate</a>
-        </li><li id="szalunek-2000" data-find="formwork plywood 2000×1000 szalunek-2000">
-          <span class="mat-item">
-            <b>Formwork plywood 2000×1000</b>
-            <span class="muted">2000×1000 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=szalunek-2000">Calculate</a>
-        </li><li id="blat-postform" data-find="postformed kitchen worktop 4100×600 blat-postform">
-          <span class="mat-item">
-            <b>Postformed kitchen worktop 4100×600</b>
-            <span class="muted">4100×600 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blat-postform">Calculate</a>
-        </li><li id="blat-38-4100" data-find="laminated worktop 38 mm · 4100×920 blat-38-4100">
-          <span class="mat-item">
-            <b>Laminated worktop 38 mm · 4100×920</b>
-            <span class="muted">4100×920 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blat-38-4100">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-BOARDS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Boards</h2>
+            <span class="mat-count">21<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Plasterboard, standard</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="plasterboard, standard 1200×2600 gk-zwykla-2600 boards">
+            <span class="mat-item">
+              <b>Plasterboard, standard 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3.12 m²/pc</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-zwykla-2600">Calculate</a>
+          </li><li id="gk-zwykla-2000" data-find="plasterboard, standard 1200×2000 gk-zwykla-2000 boards">
+            <span class="mat-item">
+              <b>Plasterboard, standard 1200×2000</b>
+              <span class="muted">1200×2000 mm · 2.4 m²/pc</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-zwykla-2000">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="gk-impreg-2600" data-find="plasterboard, moisture-resistant 1200×2600 gk-impreg-2600 boards">
+            <span class="mat-item">
+              <b>Plasterboard, moisture-resistant 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3.12 m²/pc</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-impreg-2600">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gk-ogniowa-2600" data-find="plasterboard, fire-resistant 1200×2600 gk-ogniowa-2600 boards">
+            <span class="mat-item">
+              <b>Plasterboard, fire-resistant 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3.12 m²/pc</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-ogniowa-2600">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gk-gksf-2600" data-find="plasterboard, fire + moisture (gkfi) 1200×2600 gk-gksf-2600 boards">
+            <span class="mat-item">
+              <b>Plasterboard, fire + moisture (GKFI) 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3.12 m²/pc</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/tiles-panels-porcelain/?m=gk-gksf-2600">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Laminated furniture board</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="plyta-lam-2800" data-find="laminated furniture board 2800×2070 plyta-lam-2800 boards">
+            <span class="mat-item">
+              <b>Laminated furniture board 2800×2070</b>
+              <span class="muted">2800×2070 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=plyta-lam-2800">Calculate</a>
+          </li><li id="plyta-lam-3660" data-find="laminated furniture board 3660×1830 plyta-lam-3660 boards">
+            <span class="mat-item">
+              <b>Laminated furniture board 3660×1830</b>
+              <span class="muted">3660×1830 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=plyta-lam-3660">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="mdf-2800" data-find="raw mdf 2800×2070 mdf-2800 boards">
+            <span class="mat-item">
+              <b>Raw MDF 2800×2070</b>
+              <span class="muted">2800×2070 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=mdf-2800">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800 boards">
+            <span class="mat-item">
+              <b>HDF 2800×2070</b>
+              <span class="muted">2800×2070 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=hdf-2800">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="wior-surowa" data-find="raw chipboard 2800×2070 wior-surowa boards">
+            <span class="mat-item">
+              <b>Raw chipboard 2800×2070</b>
+              <span class="muted">2800×2070 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=wior-surowa">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="mfp-2500" data-find="mfp board 2500×1250 mfp-2500 boards">
+            <span class="mat-item">
+              <b>MFP board 2500×1250</b>
+              <span class="muted">2500×1250 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=mfp-2500">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-lisc" data-find="hardwood plywood 2500×1250 sklejka-lisc boards">
+            <span class="mat-item">
+              <b>Hardwood plywood 2500×1250</b>
+              <span class="muted">2500×1250 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=sklejka-lisc">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-brzoza" data-find="birch plywood 1525×1525 sklejka-brzoza boards">
+            <span class="mat-item">
+              <b>Birch plywood 1525×1525</b>
+              <span class="muted">1525×1525 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=sklejka-brzoza">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-wodo" data-find="waterproof plywood 3000×1500 sklejka-wodo boards">
+            <span class="mat-item">
+              <b>Waterproof plywood 3000×1500</b>
+              <span class="muted">3000×1500 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=sklejka-wodo">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>OSB-3</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500 boards">
+            <span class="mat-item">
+              <b>OSB-3 2500×1250</b>
+              <span class="muted">2500×1250 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=osb3-2500">Calculate</a>
+          </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800 boards">
+            <span class="mat-item">
+              <b>OSB-3 2800×1250</b>
+              <span class="muted">2800×1250 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=osb3-2800">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="cetris-3350" data-find="cement-bonded board 3350×1250 cetris-3350 boards">
+            <span class="mat-item">
+              <b>Cement-bonded board 3350×1250</b>
+              <span class="muted">3350×1250 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=cetris-3350">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="fermacell-1500" data-find="fibre-gypsum board 1500×1000 fermacell-1500 boards">
+            <span class="mat-item">
+              <b>Fibre-gypsum board 1500×1000</b>
+              <span class="muted">1500×1000 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=fermacell-1500">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="szalunek-2000" data-find="formwork plywood 2000×1000 szalunek-2000 boards">
+            <span class="mat-item">
+              <b>Formwork plywood 2000×1000</b>
+              <span class="muted">2000×1000 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=szalunek-2000">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blat-postform" data-find="postformed kitchen worktop 4100×600 blat-postform boards">
+            <span class="mat-item">
+              <b>Postformed kitchen worktop 4100×600</b>
+              <span class="muted">4100×600 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blat-postform">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blat-38-4100" data-find="laminated worktop 38 mm · 4100×920 blat-38-4100 boards">
+            <span class="mat-item">
+              <b>Laminated worktop 38 mm · 4100×920</b>
+              <span class="muted">4100×920 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blat-38-4100">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-WOOD">Timber</h2>
-        <ul class="mat-page-list"><li id="kantowka-45-3" data-find="squared timber 45×45 · 3 m kantowka-45-3">
-          <span class="mat-item">
-            <b>Squared timber 45×45 · 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=kantowka-45-3">Calculate</a>
-        </li><li id="lata-4x5-4" data-find="batten 40×50 · 4 m lata-4x5-4">
-          <span class="mat-item">
-            <b>Batten 40×50 · 4 m</b>
-            <span class="muted">stock bar 4 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=lata-4x5-4">Calculate</a>
-        </li><li id="krokiew-2" data-find="rafter 70×140 · 6 m krokiew-2">
-          <span class="mat-item">
-            <b>Rafter 70×140 · 6 m</b>
-            <span class="muted">stock bar 6 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=krokiew-2">Calculate</a>
-        </li><li id="deska-taras-3" data-find="decking board 3 m deska-taras-3">
-          <span class="mat-item">
-            <b>Decking board 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=deska-taras-3">Calculate</a>
-        </li><li id="deska-wpc-4" data-find="wpc decking board 4 m deska-wpc-4">
-          <span class="mat-item">
-            <b>WPC decking board 4 m</b>
-            <span class="muted">stock bar 4 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=deska-wpc-4">Calculate</a>
-        </li><li id="deska-elew-3" data-find="cladding board 3 m deska-elew-3">
-          <span class="mat-item">
-            <b>Cladding board 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=deska-elew-3">Calculate</a>
-        </li><li id="sztacheta-1_5" data-find="fence picket 1,5 m sztacheta-1_5">
-          <span class="mat-item">
-            <b>Fence picket 1,5 m</b>
-            <span class="muted">stock bar 1.5 m · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=sztacheta-1_5">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-WOOD" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Timber</h2>
+            <span class="mat-count">7<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="kantowka-45-3" data-find="squared timber 45×45 · 3 m kantowka-45-3 timber">
+            <span class="mat-item">
+              <b>Squared timber 45×45 · 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=kantowka-45-3">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lata-4x5-4" data-find="batten 40×50 · 4 m lata-4x5-4 timber">
+            <span class="mat-item">
+              <b>Batten 40×50 · 4 m</b>
+              <span class="muted">stock bar 4 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=lata-4x5-4">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="krokiew-2" data-find="rafter 70×140 · 6 m krokiew-2 timber">
+            <span class="mat-item">
+              <b>Rafter 70×140 · 6 m</b>
+              <span class="muted">stock bar 6 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=krokiew-2">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-taras-3" data-find="decking board 3 m deska-taras-3 timber">
+            <span class="mat-item">
+              <b>Decking board 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=deska-taras-3">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-wpc-4" data-find="wpc decking board 4 m deska-wpc-4 timber">
+            <span class="mat-item">
+              <b>WPC decking board 4 m</b>
+              <span class="muted">stock bar 4 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=deska-wpc-4">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-elew-3" data-find="cladding board 3 m deska-elew-3 timber">
+            <span class="mat-item">
+              <b>Cladding board 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=deska-elew-3">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sztacheta-1_5" data-find="fence picket 1,5 m sztacheta-1_5 timber">
+            <span class="mat-item">
+              <b>Fence picket 1,5 m</b>
+              <span class="muted">stock bar 1.5 m · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=sztacheta-1_5">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PROFILES">Drywall profiles</h2>
-        <ul class="mat-page-list"><li id="cd60-3" data-find="ceiling profile cd60 3 m cd60-3">
-          <span class="mat-item">
-            <b>Ceiling profile CD60 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cd60-3">Calculate</a>
-        </li><li id="cd60-4" data-find="ceiling profile cd60 4 m cd60-4">
-          <span class="mat-item">
-            <b>Ceiling profile CD60 4 m</b>
-            <span class="muted">stock bar 4 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cd60-4">Calculate</a>
-        </li><li id="ud27-3" data-find="perimeter profile ud27 3 m ud27-3">
-          <span class="mat-item">
-            <b>Perimeter profile UD27 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=ud27-3">Calculate</a>
-        </li><li id="cw50-3" data-find="wall profile cw50 · 3 m cw50-3">
-          <span class="mat-item">
-            <b>Wall profile CW50 · 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cw50-3">Calculate</a>
-        </li><li id="uw50-3" data-find="wall profile uw50 · 3 m uw50-3">
-          <span class="mat-item">
-            <b>Wall profile UW50 · 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=uw50-3">Calculate</a>
-        </li><li id="cw75-3" data-find="wall profile cw75 · 3 m cw75-3">
-          <span class="mat-item">
-            <b>Wall profile CW75 · 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cw75-3">Calculate</a>
-        </li><li id="cw100-3" data-find="wall profile cw100 · 3 m cw100-3">
-          <span class="mat-item">
-            <b>Wall profile CW100 · 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cw100-3">Calculate</a>
-        </li><li id="ua50-3" data-find="reinforcing profile ua50 · 3 m ua50-3">
-          <span class="mat-item">
-            <b>Reinforcing profile UA50 · 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=ua50-3">Calculate</a>
-        </li><li id="ua75-3" data-find="reinforcing profile ua75 · 3 m ua75-3">
-          <span class="mat-item">
-            <b>Reinforcing profile UA75 · 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=ua75-3">Calculate</a>
-        </li><li id="narozny-alu-2_5" data-find="aluminium corner bead 2,5 m narozny-alu-2_5">
-          <span class="mat-item">
-            <b>Aluminium corner bead 2,5 m</b>
-            <span class="muted">stock bar 2.5 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=narozny-alu-2_5">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PROFILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Drywall profiles</h2>
+            <span class="mat-count">10<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Ceiling profile CD60</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="cd60-3" data-find="ceiling profile cd60 3 m cd60-3 drywall profiles">
+            <span class="mat-item">
+              <b>Ceiling profile CD60 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cd60-3">Calculate</a>
+          </li><li id="cd60-4" data-find="ceiling profile cd60 4 m cd60-4 drywall profiles">
+            <span class="mat-item">
+              <b>Ceiling profile CD60 4 m</b>
+              <span class="muted">stock bar 4 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cd60-4">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="ud27-3" data-find="perimeter profile ud27 3 m ud27-3 drywall profiles">
+            <span class="mat-item">
+              <b>Perimeter profile UD27 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=ud27-3">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Wall profile</h3>
+              <span class="mat-count">4<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="cw50-3" data-find="wall profile cw50 · 3 m cw50-3 drywall profiles">
+            <span class="mat-item">
+              <b>Wall profile CW50 · 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cw50-3">Calculate</a>
+          </li><li id="uw50-3" data-find="wall profile uw50 · 3 m uw50-3 drywall profiles">
+            <span class="mat-item">
+              <b>Wall profile UW50 · 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=uw50-3">Calculate</a>
+          </li><li id="cw75-3" data-find="wall profile cw75 · 3 m cw75-3 drywall profiles">
+            <span class="mat-item">
+              <b>Wall profile CW75 · 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cw75-3">Calculate</a>
+          </li><li id="cw100-3" data-find="wall profile cw100 · 3 m cw100-3 drywall profiles">
+            <span class="mat-item">
+              <b>Wall profile CW100 · 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=cw100-3">Calculate</a>
+          </li></ul>
+          </details>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Reinforcing profile</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="ua50-3" data-find="reinforcing profile ua50 · 3 m ua50-3 drywall profiles">
+            <span class="mat-item">
+              <b>Reinforcing profile UA50 · 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=ua50-3">Calculate</a>
+          </li><li id="ua75-3" data-find="reinforcing profile ua75 · 3 m ua75-3 drywall profiles">
+            <span class="mat-item">
+              <b>Reinforcing profile UA75 · 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=ua75-3">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="narozny-alu-2_5" data-find="aluminium corner bead 2,5 m narozny-alu-2_5 drywall profiles">
+            <span class="mat-item">
+              <b>Aluminium corner bead 2,5 m</b>
+              <span class="muted">stock bar 2.5 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=narozny-alu-2_5">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-METAL">Metal and rebar</h2>
-        <ul class="mat-page-list"><li id="blacha-stal" data-find="steel sheet 2000×1000 blacha-stal">
-          <span class="mat-item">
-            <b>Steel sheet 2000×1000</b>
-            <span class="muted">2000×1000 mm · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blacha-stal">Calculate</a>
-        </li><li id="blacha-alu" data-find="aluminium sheet 2500×1250 blacha-alu">
-          <span class="mat-item">
-            <b>Aluminium sheet 2500×1250</b>
-            <span class="muted">2500×1250 mm · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blacha-alu">Calculate</a>
-        </li><li id="blacha-ocynk" data-find="galvanised sheet 2000×1000 blacha-ocynk">
-          <span class="mat-item">
-            <b>Galvanised sheet 2000×1000</b>
-            <span class="muted">2000×1000 mm · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blacha-ocynk">Calculate</a>
-        </li><li id="katownik-alu-2" data-find="aluminium angle 2 m katownik-alu-2">
-          <span class="mat-item">
-            <b>Aluminium angle 2 m</b>
-            <span class="muted">stock bar 2 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=katownik-alu-2">Calculate</a>
-        </li><li id="ceownik-stal-3" data-find="steel channel 3 m ceownik-stal-3">
-          <span class="mat-item">
-            <b>Steel channel 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=ceownik-stal-3">Calculate</a>
-        </li><li id="profil-kwadr-3" data-find="box section 30×30 · 3 m profil-kwadr-3">
-          <span class="mat-item">
-            <b>Box section 30×30 · 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=profil-kwadr-3">Calculate</a>
-        </li><li id="pret-8-12" data-find="rebar ø8 · 12 m pret-8-12">
-          <span class="mat-item">
-            <b>Rebar Ø8 · 12 m</b>
-            <span class="muted">stock bar 12 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=pret-8-12">Calculate</a>
-        </li><li id="pret-10-12" data-find="rebar ø10 · 12 m pret-10-12">
-          <span class="mat-item">
-            <b>Rebar Ø10 · 12 m</b>
-            <span class="muted">stock bar 12 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=pret-10-12">Calculate</a>
-        </li><li id="pret-12-12" data-find="rebar ø12 · 12 m pret-12-12">
-          <span class="mat-item">
-            <b>Rebar Ø12 · 12 m</b>
-            <span class="muted">stock bar 12 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=pret-12-12">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-METAL" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Metal and rebar</h2>
+            <span class="mat-count">9<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="blacha-stal" data-find="steel sheet 2000×1000 blacha-stal metal and rebar">
+            <span class="mat-item">
+              <b>Steel sheet 2000×1000</b>
+              <span class="muted">2000×1000 mm · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blacha-stal">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blacha-alu" data-find="aluminium sheet 2500×1250 blacha-alu metal and rebar">
+            <span class="mat-item">
+              <b>Aluminium sheet 2500×1250</b>
+              <span class="muted">2500×1250 mm · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blacha-alu">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blacha-ocynk" data-find="galvanised sheet 2000×1000 blacha-ocynk metal and rebar">
+            <span class="mat-item">
+              <b>Galvanised sheet 2000×1000</b>
+              <span class="muted">2000×1000 mm · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=blacha-ocynk">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="katownik-alu-2" data-find="aluminium angle 2 m katownik-alu-2 metal and rebar">
+            <span class="mat-item">
+              <b>Aluminium angle 2 m</b>
+              <span class="muted">stock bar 2 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=katownik-alu-2">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="ceownik-stal-3" data-find="steel channel 3 m ceownik-stal-3 metal and rebar">
+            <span class="mat-item">
+              <b>Steel channel 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=ceownik-stal-3">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="profil-kwadr-3" data-find="box section 30×30 · 3 m profil-kwadr-3 metal and rebar">
+            <span class="mat-item">
+              <b>Box section 30×30 · 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=profil-kwadr-3">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Rebar</h3>
+              <span class="mat-count">3<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="pret-8-12" data-find="rebar ø8 · 12 m pret-8-12 metal and rebar">
+            <span class="mat-item">
+              <b>Rebar Ø8 · 12 m</b>
+              <span class="muted">stock bar 12 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=pret-8-12">Calculate</a>
+          </li><li id="pret-10-12" data-find="rebar ø10 · 12 m pret-10-12 metal and rebar">
+            <span class="mat-item">
+              <b>Rebar Ø10 · 12 m</b>
+              <span class="muted">stock bar 12 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=pret-10-12">Calculate</a>
+          </li><li id="pret-12-12" data-find="rebar ø12 · 12 m pret-12-12 metal and rebar">
+            <span class="mat-item">
+              <b>Rebar Ø12 · 12 m</b>
+              <span class="muted">stock bar 12 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=pret-12-12">Calculate</a>
+          </li></ul>
+          </details>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-GLASS">Glass and plastics</h2>
-        <ul class="mat-page-list"><li id="plexi-3050" data-find="acrylic (pmma) 3050×2050 plexi-3050">
-          <span class="mat-item">
-            <b>Acrylic (PMMA) 3050×2050</b>
-            <span class="muted">3050×2050 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=plexi-3050">Calculate</a>
-        </li><li id="poliweglan" data-find="solid polycarbonate 3050×2050 poliweglan">
-          <span class="mat-item">
-            <b>Solid polycarbonate 3050×2050</b>
-            <span class="muted">3050×2050 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=poliweglan">Calculate</a>
-        </li><li id="poliweglan-kom" data-find="multiwall polycarbonate 2100×6000 poliweglan-kom">
-          <span class="mat-item">
-            <b>Multiwall polycarbonate 2100×6000</b>
-            <span class="muted">2100×6000 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=poliweglan-kom">Calculate</a>
-        </li><li id="hpl" data-find="hpl compact board 3050×1300 hpl">
-          <span class="mat-item">
-            <b>HPL compact board 3050×1300</b>
-            <span class="muted">3050×1300 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=hpl">Calculate</a>
-        </li><li id="dibond" data-find="dibond 3050×1500 dibond">
-          <span class="mat-item">
-            <b>Dibond 3050×1500</b>
-            <span class="muted">3050×1500 mm · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=dibond">Calculate</a>
-        </li><li id="pcv-spienione" data-find="foamed pvc 3050×1560 pcv-spienione">
-          <span class="mat-item">
-            <b>Foamed PVC 3050×1560</b>
-            <span class="muted">3050×1560 mm · kerf 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=pcv-spienione">Calculate</a>
-        </li><li id="szklo-jumbo" data-find="float glass 3210×2250 szklo-jumbo">
-          <span class="mat-item">
-            <b>Float glass 3210×2250</b>
-            <span class="muted">3210×2250 mm · kerf 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=szklo-jumbo">Calculate</a>
-        </li><li id="szklo-2550" data-find="float glass 2550×1605 szklo-2550">
-          <span class="mat-item">
-            <b>Float glass 2550×1605</b>
-            <span class="muted">2550×1605 mm · kerf 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=szklo-2550">Calculate</a>
-        </li><li id="lustro-2550" data-find="mirror 2550×1605 lustro-2550">
-          <span class="mat-item">
-            <b>Mirror 2550×1605</b>
-            <span class="muted">2550×1605 mm · kerf 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=lustro-2550">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-GLASS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Glass and plastics</h2>
+            <span class="mat-count">9<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="plexi-3050" data-find="acrylic (pmma) 3050×2050 plexi-3050 glass and plastics">
+            <span class="mat-item">
+              <b>Acrylic (PMMA) 3050×2050</b>
+              <span class="muted">3050×2050 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=plexi-3050">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="poliweglan" data-find="solid polycarbonate 3050×2050 poliweglan glass and plastics">
+            <span class="mat-item">
+              <b>Solid polycarbonate 3050×2050</b>
+              <span class="muted">3050×2050 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=poliweglan">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="poliweglan-kom" data-find="multiwall polycarbonate 2100×6000 poliweglan-kom glass and plastics">
+            <span class="mat-item">
+              <b>Multiwall polycarbonate 2100×6000</b>
+              <span class="muted">2100×6000 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=poliweglan-kom">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hpl" data-find="hpl compact board 3050×1300 hpl glass and plastics">
+            <span class="mat-item">
+              <b>HPL compact board 3050×1300</b>
+              <span class="muted">3050×1300 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=hpl">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="dibond" data-find="dibond 3050×1500 dibond glass and plastics">
+            <span class="mat-item">
+              <b>Dibond 3050×1500</b>
+              <span class="muted">3050×1500 mm · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=dibond">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pcv-spienione" data-find="foamed pvc 3050×1560 pcv-spienione glass and plastics">
+            <span class="mat-item">
+              <b>Foamed PVC 3050×1560</b>
+              <span class="muted">3050×1560 mm · kerf 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=pcv-spienione">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Float glass</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="szklo-jumbo" data-find="float glass 3210×2250 szklo-jumbo glass and plastics">
+            <span class="mat-item">
+              <b>Float glass 3210×2250</b>
+              <span class="muted">3210×2250 mm · kerf 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=szklo-jumbo">Calculate</a>
+          </li><li id="szklo-2550" data-find="float glass 2550×1605 szklo-2550 glass and plastics">
+            <span class="mat-item">
+              <b>Float glass 2550×1605</b>
+              <span class="muted">2550×1605 mm · kerf 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=szklo-2550">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="lustro-2550" data-find="mirror 2550×1605 lustro-2550 glass and plastics">
+            <span class="mat-item">
+              <b>Mirror 2550×1605</b>
+              <span class="muted">2550×1605 mm · kerf 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=lustro-2550">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TEXTILES">Fabric and upholstery</h2>
-        <ul class="mat-page-list"><li id="tkanina-140" data-find="fabric from the bolt, width 140 cm tkanina-140">
-          <span class="mat-item">
-            <b>Fabric from the bolt, width 140 cm</b>
-            <span class="muted">1400×3000 mm · kerf 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=tkanina-140">Calculate</a>
-        </li><li id="tkanina-150" data-find="fabric from the bolt, width 150 cm tkanina-150">
-          <span class="mat-item">
-            <b>Fabric from the bolt, width 150 cm</b>
-            <span class="muted">1500×3000 mm · kerf 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=tkanina-150">Calculate</a>
-        </li><li id="ekoskora-140" data-find="faux leather from the roll, width 140 cm ekoskora-140">
-          <span class="mat-item">
-            <b>Faux leather from the roll, width 140 cm</b>
-            <span class="muted">1400×3000 mm · kerf 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=ekoskora-140">Calculate</a>
-        </li><li id="skora-nat" data-find="natural leather hide 2200×1200 skora-nat">
-          <span class="mat-item">
-            <b>Natural leather hide 2200×1200</b>
-            <span class="muted">2200×1200 mm · kerf 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=skora-nat">Calculate</a>
-        </li><li id="pianka-tap" data-find="upholstery foam block 2000×1200 pianka-tap">
-          <span class="mat-item">
-            <b>Upholstery foam block 2000×1200</b>
-            <span class="muted">2000×1200 mm · kerf 5 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=pianka-tap">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TEXTILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Fabric and upholstery</h2>
+            <span class="mat-count">5<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Fabric from the bolt, width</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="tkanina-140" data-find="fabric from the bolt, width 140 cm tkanina-140 fabric and upholstery">
+            <span class="mat-item">
+              <b>Fabric from the bolt, width 140 cm</b>
+              <span class="muted">1400×3000 mm · kerf 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=tkanina-140">Calculate</a>
+          </li><li id="tkanina-150" data-find="fabric from the bolt, width 150 cm tkanina-150 fabric and upholstery">
+            <span class="mat-item">
+              <b>Fabric from the bolt, width 150 cm</b>
+              <span class="muted">1500×3000 mm · kerf 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=tkanina-150">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="ekoskora-140" data-find="faux leather from the roll, width 140 cm ekoskora-140 fabric and upholstery">
+            <span class="mat-item">
+              <b>Faux leather from the roll, width 140 cm</b>
+              <span class="muted">1400×3000 mm · kerf 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=ekoskora-140">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="skora-nat" data-find="natural leather hide 2200×1200 skora-nat fabric and upholstery">
+            <span class="mat-item">
+              <b>Natural leather hide 2200×1200</b>
+              <span class="muted">2200×1200 mm · kerf 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=skora-nat">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pianka-tap" data-find="upholstery foam block 2000×1200 pianka-tap fabric and upholstery">
+            <span class="mat-item">
+              <b>Upholstery foam block 2000×1200</b>
+              <span class="muted">2000×1200 mm · kerf 5 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/sheet-cutting-2d/?m=pianka-tap">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-INSULATION">Insulation</h2>
-        <ul class="mat-page-list"><li id="welna-10" data-find="mineral wool 10 cm welna-10">
-          <span class="mat-item">
-            <b>Mineral wool 10 cm</b>
-            <span class="muted">bundle ≈ 6 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=welna-10">Calculate</a>
-        </li><li id="welna-15" data-find="mineral wool 15 cm welna-15">
-          <span class="mat-item">
-            <b>Mineral wool 15 cm</b>
-            <span class="muted">bundle ≈ 4.5 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=welna-15">Calculate</a>
-        </li><li id="welna-podd-20" data-find="loft wool 20 cm welna-podd-20">
-          <span class="mat-item">
-            <b>Loft wool 20 cm</b>
-            <span class="muted">bundle ≈ 3.5 m² · 20 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=welna-podd-20">Calculate</a>
-        </li><li id="welna-fasada-15" data-find="facade wool 15 cm welna-fasada-15">
-          <span class="mat-item">
-            <b>Facade wool 15 cm</b>
-            <span class="muted">bundle ≈ 2 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=welna-fasada-15">Calculate</a>
-        </li><li id="styropian-5" data-find="eps foam 5 cm styropian-5">
-          <span class="mat-item">
-            <b>EPS foam 5 cm</b>
-            <span class="muted">bundle ≈ 3 m² · 5 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=styropian-5">Calculate</a>
-        </li><li id="styropian-fasada-10" data-find="facade eps 10 cm styropian-fasada-10">
-          <span class="mat-item">
-            <b>Facade EPS 10 cm</b>
-            <span class="muted">bundle ≈ 3 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=styropian-fasada-10">Calculate</a>
-        </li><li id="styropian-fasada-15" data-find="facade eps 15 cm styropian-fasada-15">
-          <span class="mat-item">
-            <b>Facade EPS 15 cm</b>
-            <span class="muted">bundle ≈ 2 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=styropian-fasada-15">Calculate</a>
-        </li><li id="styropian-podloga-10" data-find="floor eps eps 100 · 10 cm styropian-podloga-10">
-          <span class="mat-item">
-            <b>Floor EPS EPS 100 · 10 cm</b>
-            <span class="muted">bundle ≈ 3 m² · EPS 100 · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=styropian-podloga-10">Calculate</a>
-        </li><li id="xps-5" data-find="xps board 5 cm xps-5">
-          <span class="mat-item">
-            <b>XPS board 5 cm</b>
-            <span class="muted">bundle ≈ 5.5 m² · 5 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=xps-5">Calculate</a>
-        </li><li id="pir-10" data-find="pir board 10 cm pir-10">
-          <span class="mat-item">
-            <b>PIR board 10 cm</b>
-            <span class="muted">bundle ≈ 5.7 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=pir-10">Calculate</a>
-        </li><li id="papa-rolka" data-find="underlay bitumen felt 20 m² papa-rolka">
-          <span class="mat-item">
-            <b>Underlay bitumen felt 20 m²</b>
-            <span class="muted">bundle ≈ 20 m² · 20 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=papa-rolka">Calculate</a>
-        </li><li id="folia-paro" data-find="vapour barrier 75 m² folia-paro">
-          <span class="mat-item">
-            <b>Vapour barrier 75 m²</b>
-            <span class="muted">bundle ≈ 75 m² · 75 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=folia-paro">Calculate</a>
-        </li><li id="membrana-dach" data-find="roofing membrane 75 m² membrana-dach">
-          <span class="mat-item">
-            <b>Roofing membrane 75 m²</b>
-            <span class="muted">bundle ≈ 75 m² · 75 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=membrana-dach">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-INSULATION" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Insulation</h2>
+            <span class="mat-count">13<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Mineral wool</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="welna-10" data-find="mineral wool 10 cm welna-10 insulation">
+            <span class="mat-item">
+              <b>Mineral wool 10 cm</b>
+              <span class="muted">bundle ≈ 6 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=welna-10">Calculate</a>
+          </li><li id="welna-15" data-find="mineral wool 15 cm welna-15 insulation">
+            <span class="mat-item">
+              <b>Mineral wool 15 cm</b>
+              <span class="muted">bundle ≈ 4.5 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=welna-15">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="welna-podd-20" data-find="loft wool 20 cm welna-podd-20 insulation">
+            <span class="mat-item">
+              <b>Loft wool 20 cm</b>
+              <span class="muted">bundle ≈ 3.5 m² · 20 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=welna-podd-20">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="welna-fasada-15" data-find="facade wool 15 cm welna-fasada-15 insulation">
+            <span class="mat-item">
+              <b>Facade wool 15 cm</b>
+              <span class="muted">bundle ≈ 2 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=welna-fasada-15">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="styropian-5" data-find="eps foam 5 cm styropian-5 insulation">
+            <span class="mat-item">
+              <b>EPS foam 5 cm</b>
+              <span class="muted">bundle ≈ 3 m² · 5 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=styropian-5">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Facade EPS</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="styropian-fasada-10" data-find="facade eps 10 cm styropian-fasada-10 insulation">
+            <span class="mat-item">
+              <b>Facade EPS 10 cm</b>
+              <span class="muted">bundle ≈ 3 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=styropian-fasada-10">Calculate</a>
+          </li><li id="styropian-fasada-15" data-find="facade eps 15 cm styropian-fasada-15 insulation">
+            <span class="mat-item">
+              <b>Facade EPS 15 cm</b>
+              <span class="muted">bundle ≈ 2 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=styropian-fasada-15">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="styropian-podloga-10" data-find="floor eps eps 100 · 10 cm styropian-podloga-10 insulation">
+            <span class="mat-item">
+              <b>Floor EPS EPS 100 · 10 cm</b>
+              <span class="muted">bundle ≈ 3 m² · EPS 100 · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=styropian-podloga-10">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="xps-5" data-find="xps board 5 cm xps-5 insulation">
+            <span class="mat-item">
+              <b>XPS board 5 cm</b>
+              <span class="muted">bundle ≈ 5.5 m² · 5 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=xps-5">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pir-10" data-find="pir board 10 cm pir-10 insulation">
+            <span class="mat-item">
+              <b>PIR board 10 cm</b>
+              <span class="muted">bundle ≈ 5.7 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=pir-10">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="papa-rolka" data-find="underlay bitumen felt 20 m² papa-rolka insulation">
+            <span class="mat-item">
+              <b>Underlay bitumen felt 20 m²</b>
+              <span class="muted">bundle ≈ 20 m² · 20 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=papa-rolka">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="folia-paro" data-find="vapour barrier 75 m² folia-paro insulation">
+            <span class="mat-item">
+              <b>Vapour barrier 75 m²</b>
+              <span class="muted">bundle ≈ 75 m² · 75 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=folia-paro">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="membrana-dach" data-find="roofing membrane 75 m² membrana-dach insulation">
+            <span class="mat-item">
+              <b>Roofing membrane 75 m²</b>
+              <span class="muted">bundle ≈ 75 m² · 75 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/paint-plaster-primer/?m=membrana-dach">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PLUMBING">Plumbing and ventilation</h2>
-        <ul class="mat-page-list"><li id="rura-pp-4" data-find="pp pipe 4 m rura-pp-4">
-          <span class="mat-item">
-            <b>PP pipe 4 m</b>
-            <span class="muted">stock bar 4 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-pp-4">Calculate</a>
-        </li><li id="rura-pex-3" data-find="pex pipe 3 m rura-pex-3">
-          <span class="mat-item">
-            <b>PEX pipe 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-pex-3">Calculate</a>
-        </li><li id="rura-cu-3" data-find="copper pipe 3 m rura-cu-3">
-          <span class="mat-item">
-            <b>Copper pipe 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-cu-3">Calculate</a>
-        </li><li id="rura-spust-3" data-find="downpipe 3 m rura-spust-3">
-          <span class="mat-item">
-            <b>Downpipe 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-spust-3">Calculate</a>
-        </li><li id="kanal-went-1" data-find="ventilation duct 1 m kanal-went-1">
-          <span class="mat-item">
-            <b>Ventilation duct 1 m</b>
-            <span class="muted">stock bar 1 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=kanal-went-1">Calculate</a>
-        </li><li id="rura-kanal-110-2" data-find="pvc waste pipe 110 · 2 m rura-kanal-110-2">
-          <span class="mat-item">
-            <b>PVC waste pipe 110 · 2 m</b>
-            <span class="muted">stock bar 2 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-kanal-110-2">Calculate</a>
-        </li><li id="rura-kanal-50-2" data-find="pvc waste pipe 50 · 2 m rura-kanal-50-2">
-          <span class="mat-item">
-            <b>PVC waste pipe 50 · 2 m</b>
-            <span class="muted">stock bar 2 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-kanal-50-2">Calculate</a>
-        </li><li id="rynna-3" data-find="roof gutter 3 m rynna-3">
-          <span class="mat-item">
-            <b>Roof gutter 3 m</b>
-            <span class="muted">stock bar 3 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rynna-3">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PLUMBING" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Plumbing and ventilation</h2>
+            <span class="mat-count">8<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="rura-pp-4" data-find="pp pipe 4 m rura-pp-4 plumbing and ventilation">
+            <span class="mat-item">
+              <b>PP pipe 4 m</b>
+              <span class="muted">stock bar 4 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-pp-4">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-pex-3" data-find="pex pipe 3 m rura-pex-3 plumbing and ventilation">
+            <span class="mat-item">
+              <b>PEX pipe 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-pex-3">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-cu-3" data-find="copper pipe 3 m rura-cu-3 plumbing and ventilation">
+            <span class="mat-item">
+              <b>Copper pipe 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-cu-3">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-spust-3" data-find="downpipe 3 m rura-spust-3 plumbing and ventilation">
+            <span class="mat-item">
+              <b>Downpipe 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-spust-3">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="kanal-went-1" data-find="ventilation duct 1 m kanal-went-1 plumbing and ventilation">
+            <span class="mat-item">
+              <b>Ventilation duct 1 m</b>
+              <span class="muted">stock bar 1 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=kanal-went-1">Calculate</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>PVC waste pipe</h3>
+              <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="rura-kanal-110-2" data-find="pvc waste pipe 110 · 2 m rura-kanal-110-2 plumbing and ventilation">
+            <span class="mat-item">
+              <b>PVC waste pipe 110 · 2 m</b>
+              <span class="muted">stock bar 2 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-kanal-110-2">Calculate</a>
+          </li><li id="rura-kanal-50-2" data-find="pvc waste pipe 50 · 2 m rura-kanal-50-2 plumbing and ventilation">
+            <span class="mat-item">
+              <b>PVC waste pipe 50 · 2 m</b>
+              <span class="muted">stock bar 2 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rura-kanal-50-2">Calculate</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="rynna-3" data-find="roof gutter 3 m rynna-3 plumbing and ventilation">
+            <span class="mat-item">
+              <b>Roof gutter 3 m</b>
+              <span class="muted">stock bar 3 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=rynna-3">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-ELECTRICAL">Electrical</h2>
-        <ul class="mat-page-list"><li id="korytko-2" data-find="cable tray 2 m korytko-2">
-          <span class="mat-item">
-            <b>Cable tray 2 m</b>
-            <span class="muted">stock bar 2 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=korytko-2">Calculate</a>
-        </li><li id="listwa-kabel-2" data-find="cable trunking 2 m listwa-kabel-2">
-          <span class="mat-item">
-            <b>Cable trunking 2 m</b>
-            <span class="muted">stock bar 2 m · kerf 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=listwa-kabel-2">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-ELECTRICAL" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Electrical</h2>
+            <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="korytko-2" data-find="cable tray 2 m korytko-2 electrical">
+            <span class="mat-item">
+              <b>Cable tray 2 m</b>
+              <span class="muted">stock bar 2 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=korytko-2">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-kabel-2" data-find="cable trunking 2 m listwa-kabel-2 electrical">
+            <span class="mat-item">
+              <b>Cable trunking 2 m</b>
+              <span class="muted">stock bar 2 m · kerf 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=listwa-kabel-2">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-OTHER">Other</h2>
-        <ul class="mat-page-list"><li id="tapeta-standard" data-find="wallpaper roll 0,53×10 m tapeta-standard">
-          <span class="mat-item">
-            <b>Wallpaper roll 0,53×10 m</b>
-            <span class="muted">0,53×10 m · 5.3 m²/pack</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/wallpaper/?m=tapeta-standard">Calculate</a>
-        </li><li id="karnisz-2_4" data-find="curtain rod / tube 2,4 m karnisz-2_4">
-          <span class="mat-item">
-            <b>Curtain rod / tube 2,4 m</b>
-            <span class="muted">stock bar 2.4 m · kerf 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=karnisz-2_4">Calculate</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-OTHER" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Other</h2>
+            <span class="mat-count">2<span class="mat-count-w"> items</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="tapeta-standard" data-find="wallpaper roll 0,53×10 m tapeta-standard other">
+            <span class="mat-item">
+              <b>Wallpaper roll 0,53×10 m</b>
+              <span class="muted">0,53×10 m · 5.3 m²/pack</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/wallpaper/?m=tapeta-standard">Calculate</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="karnisz-2_4" data-find="curtain rod / tube 2,4 m karnisz-2_4 other">
+            <span class="mat-item">
+              <b>Curtain rod / tube 2,4 m</b>
+              <span class="muted">stock bar 2.4 m · kerf 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/en/calculators/linear-cutting-1d/?m=karnisz-2_4">Calculate</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   </div>
+
+  <section class="block alt" id="matpage-own">
+    <div class="wrap narrow">
+      <h2>Your materials</h2>
+      <p class="muted" data-omat-guest>
+        Sign in to add your own materials and prices.
+        <a class="btn btn-ghost btn-sm" href="/app/">Sign in</a>
+      </p>
+      <div data-omat-mine hidden>
+        <details class="mat-add">
+          <summary>New material</summary>
+          <form class="card omat-form" data-omat-form>
+        
+        <label class="field">
+          <span class="fld-label">Name</span>
+          <input type="text" maxlength="120" placeholder="e.g. Porcelain tile 60×60 from my supplier" data-omat-in="name" required>
+        </label>
+        <div class="omat-row">
+          <label class="field">
+            <span class="fld-label">What it is for</span>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Wall and floor coverings</option><option value="DRYWALL_BOARDING">Plasterboard construction</option><option value="COATING">Coating materials</option><option value="PANEL_CUTTING">Cutting boards and sheets</option><option value="LINEAR_STOCK">Profiles, trims, pipes, rods</option></select>
+          </label>
+          <label class="field">
+            <span class="fld-label">Category</span>
+            <select data-omat-in="category"><option value="TILES">Tiles</option><option value="FLOORING">Flooring</option><option value="TRIM">Trim and finishing</option><option value="PAINT">Paints and varnishes</option><option value="CHEMICALS">Building chemicals</option><option value="BOARDS">Boards</option><option value="WOOD">Timber</option><option value="PROFILES">Drywall profiles</option><option value="METAL">Metal and rebar</option><option value="GLASS">Glass and plastics</option><option value="TEXTILES">Fabric and upholstery</option><option value="INSULATION">Insulation</option><option value="PLUMBING">Plumbing and ventilation</option><option value="ELECTRICAL">Electrical</option><option value="OTHER">Other</option></select>
+          </label>
+        </div>
+        <div class="omat-fields" data-omat-group="WALL_FLOOR_COVERING">
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Width (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Length (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="packageAreaM2">
+              <span class="fld-label">Area per package (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="packageAreaM2">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Allowance (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="DRYWALL_BOARDING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Width (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Length (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Allowance (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="COATING" hidden>
+            <label class="field omat-f" data-omat-f="coveragePerUnitM2">
+              <span class="fld-label">Coverage per package (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="coveragePerUnitM2">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="PANEL_CUTTING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Width (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Length (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Kerf (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="LINEAR_STOCK" hidden>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Length (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Kerf (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+        <label class="field">
+          <span class="fld-label">Price per package</span>
+          <input type="text" inputmode="decimal" data-omat-in="priceMajor">
+        </label>
+        <p class="muted">A price keeps the currency it was entered in. Nothing is converted at a rate.</p>
+        <button type="submit" class="btn btn-primary btn-block">Save material</button>
+        
+        <p class="omat-err" data-omat-err role="alert" hidden></p>
+      </form>
+        </details>
+        <div data-omat-list data-hist-label="Price history"></div>
+        <p class="muted" data-omat-empty>You have no materials of your own yet.</p>
+        <p class="ws-undo" data-omat-undo role="status" hidden></p>
+        <p class="muted">A material from this list is picked in a calculator exactly like a catalogue entry.</p>
+      </div>
+    </div>
+  </section>
 
   <section class="block app-note" aria-labelledby="appnote-h">
     <div class="wrap">
@@ -2177,6 +2609,8 @@
 
 <script src="/assets/materials.js?v=20260902a"></script>
 <script src="/assets/materials-ui.js?v=20260902a"></script>
+<script src="/assets/own-materials.js?v=20260902a"></script>
+<script src="/assets/own-materials-ui.js?v=20260902a"></script>
 <script src="/assets/main.js?v=20260902a"></script>
 
 </body>

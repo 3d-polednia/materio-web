@@ -59,6 +59,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Materiały zostają w tej przeglądarce. Po zalogowaniu są częścią konta i widzi je też aplikacja.",
     omat_use_note: "Materiał z tej listy wybierzesz w kalkulatorze tak samo jak pozycję z katalogu.",
     omat_cur_note: "Cena trzyma walutę, w której ją wpisano. Nic nie jest przeliczane po kursie.",
+    omat_guest_note: "Zaloguj się, żeby dodawać własne materiały i ceny.",
+    omat_signin: "Zaloguj się",
   },
   en: {
     omatpage_lead: "Save a material the catalogue does not have, with the price your own supplier charges. Every later price stays in the history.",
@@ -87,6 +89,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Materials stay in this browser. Once you sign in they are part of the account and the app sees them too.",
     omat_use_note: "A material from this list is picked in a calculator exactly like a catalogue entry.",
     omat_cur_note: "A price keeps the currency it was entered in. Nothing is converted at a rate.",
+    omat_guest_note: "Sign in to add your own materials and prices.",
+    omat_signin: "Sign in",
   },
   de: {
     omatpage_lead: "Speichern Sie ein Material, das der Katalog nicht hat, mit dem Preis Ihres Lieferanten. Jeder spätere Preis bleibt in der Historie.",
@@ -115,6 +119,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Die Materialien bleiben in diesem Browser. Nach der Anmeldung gehören sie zum Konto und die App sieht sie ebenfalls.",
     omat_use_note: "Ein Material aus dieser Liste wählen Sie im Rechner genauso wie einen Katalogeintrag.",
     omat_cur_note: "Ein Preis behält die Währung, in der er eingetragen wurde. Nichts wird zum Kurs umgerechnet.",
+    omat_guest_note: "Melde dich an, um eigene Materialien und Preise hinzuzufügen.",
+    omat_signin: "Anmelden",
   },
   uk: {
     omatpage_lead: "Збережіть матеріал, якого немає в каталозі, разом із ціною вашого постачальника. Кожна наступна ціна лишається в історії.",
@@ -143,6 +149,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Матеріали лишаються в цьому браузері. Після входу вони частина облікового запису, і застосунок їх теж бачить.",
     omat_use_note: "Матеріал із цього списку обирають у калькуляторі так само, як позицію з каталогу.",
     omat_cur_note: "Ціна тримає валюту, у якій її внесли. Нічого не перераховується за курсом.",
+    omat_guest_note: "Увійди, щоб додавати власні матеріали й ціни.",
+    omat_signin: "Увійти",
   },
   cs: {
     omatpage_lead: "Uložte materiál, který katalog nemá, i s cenou vašeho dodavatele. Každá další cena zůstane v historii.",
@@ -171,6 +179,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Materiály zůstávají v tomto prohlížeči. Po přihlášení patří k účtu a vidí je i aplikace.",
     omat_use_note: "Materiál z tohoto seznamu vyberete v kalkulačce stejně jako položku z katalogu.",
     omat_cur_note: "Cena si drží měnu, ve které byla zadána. Nic se nepřepočítává kurzem.",
+    omat_guest_note: "Přihlas se a přidávej vlastní materiály a ceny.",
+    omat_signin: "Přihlásit se",
   },
   sk: {
     omatpage_lead: "Uložte materiál, ktorý katalóg nemá, aj s cenou vášho dodávateľa. Každá ďalšia cena zostane v histórii.",
@@ -199,6 +209,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Materiály zostávajú v tomto prehliadači. Po prihlásení patria k účtu a vidí ich aj aplikácia.",
     omat_use_note: "Materiál z tohto zoznamu vyberiete v kalkulačke rovnako ako položku z katalógu.",
     omat_cur_note: "Cena si drží menu, v ktorej bola zadaná. Nič sa neprepočítava kurzom.",
+    omat_guest_note: "Prihlás sa a pridávaj vlastné materiály a ceny.",
+    omat_signin: "Prihlásiť sa",
   },
   ro: {
     omatpage_lead: "Salvați un material pe care catalogul nu îl are, cu prețul furnizorului dumneavoastră. Fiecare preț ulterior rămâne în istoric.",
@@ -227,6 +239,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Materialele rămân în acest browser. După autentificare fac parte din cont, iar aplicația le vede și ea.",
     omat_use_note: "Un material din această listă se alege în calculator exact ca o intrare din catalog.",
     omat_cur_note: "Un preț păstrează moneda în care a fost introdus. Nimic nu este convertit la cursul zilei.",
+    omat_guest_note: "Autentifică-te ca să adaugi propriile materiale și prețuri.",
+    omat_signin: "Autentifică-te",
   },
   hr: {
     omatpage_lead: "Spremite materijal kojega nema u katalogu, zajedno s cijenom vašeg dobavljača. Svaka sljedeća cijena ostaje u povijesti.",
@@ -255,6 +269,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Materijali ostaju u ovom pregledniku. Nakon prijave dio su računa i vidi ih i aplikacija.",
     omat_use_note: "Materijal s ovog popisa bira se u kalkulatoru jednako kao stavka iz kataloga.",
     omat_cur_note: "Cijena zadržava valutu u kojoj je unesena. Ništa se ne preračunava po tečaju.",
+    omat_guest_note: "Prijavi se da dodaješ vlastite materijale i cijene.",
+    omat_signin: "Prijavi se",
   },
   sr: {
     omatpage_lead: "Sačuvajte materijal kojeg nema u katalogu, zajedno sa cenom vašeg dobavljača. Svaka sledeća cena ostaje u istoriji.",
@@ -283,6 +299,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Materijali ostaju u ovom pregledaču. Nakon prijave deo su naloga i vidi ih i aplikacija.",
     omat_use_note: "Materijal sa ovog spiska bira se u kalkulatoru isto kao stavka iz kataloga.",
     omat_cur_note: "Cena zadržava valutu u kojoj je uneta. Ništa se ne preračunava po kursu.",
+    omat_guest_note: "Prijavi se da dodaješ sopstvene materijale i cene.",
+    omat_signin: "Prijavi se",
   },
   it: {
     omatpage_lead: "Salva un materiale che il catalogo non ha, con il prezzo che ti fa il tuo fornitore. Ogni prezzo successivo resta nella storia.",
@@ -311,6 +329,8 @@ export const OMAT_COPY = {
     omat_sync_note: "I materiali restano in questo browser. Dopo l'accesso fanno parte dell'account e li vede anche l'app.",
     omat_use_note: "Un materiale di questo elenco si sceglie in un calcolatore come una voce del catalogo.",
     omat_cur_note: "Un prezzo mantiene la valuta in cui è stato inserito. Nulla viene convertito a un cambio.",
+    omat_guest_note: "Accedi per aggiungere i tuoi materiali e prezzi.",
+    omat_signin: "Accedi",
   },
   nl: {
     omatpage_lead: "Bewaar een materiaal dat de catalogus niet heeft, met de prijs die jouw leverancier rekent. Elke latere prijs blijft in de geschiedenis staan.",
@@ -339,6 +359,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Materialen blijven in deze browser. Zodra je inlogt horen ze bij het account en ziet de app ze ook.",
     omat_use_note: "Een materiaal uit deze lijst kies je in een rekenmachine net als een regel uit de catalogus.",
     omat_cur_note: "Een prijs houdt de valuta waarin hij is ingevuld. Er wordt niets tegen een koers omgerekend.",
+    omat_guest_note: "Log in om je eigen materialen en prijzen toe te voegen.",
+    omat_signin: "Log in",
   },
   es: {
     omatpage_lead: "Guarda un material que el catálogo no tiene, con el precio que te hace tu proveedor. Cada precio posterior se queda en el historial.",
@@ -367,6 +389,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Los materiales se quedan en este navegador. Al iniciar sesión forman parte de la cuenta y la app también los ve.",
     omat_use_note: "Un material de esta lista se elige en una calculadora igual que una entrada del catálogo.",
     omat_cur_note: "Un precio mantiene la moneda en la que se escribió. No se convierte nada a ningún cambio.",
+    omat_guest_note: "Inicia sesión para añadir tus propios materiales y precios.",
+    omat_signin: "Inicia sesión",
   },
   fr: {
     omatpage_lead: "Enregistre un matériau que le catalogue n'a pas, au prix que pratique ton fournisseur. Chaque prix suivant reste dans l'historique.",
@@ -395,6 +419,8 @@ export const OMAT_COPY = {
     omat_sync_note: "Les matériaux restent dans ce navigateur. Une fois connecté, ils font partie du compte et l'application les voit aussi.",
     omat_use_note: "Un matériau de cette liste se choisit dans un calculateur comme une entrée du catalogue.",
     omat_cur_note: "Un prix garde la devise dans laquelle il a été saisi. Rien n'est converti à un taux.",
+    omat_guest_note: "Connecte-toi pour ajouter tes propres matériaux et prix.",
+    omat_signin: "Se connecter",
   },
 };
 

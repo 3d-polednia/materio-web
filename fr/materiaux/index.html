@@ -1009,1067 +1009,1499 @@
       <div class="wrap">
         <label class="fld-label" for="matpage-search">Rechercher des matériaux…</label>
         <input id="matpage-search" type="search" class="mat-search" placeholder="Rechercher des matériaux…" autocomplete="off">
+        <p class="mat-tools">
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-expand>Tout développer</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-collapse>Tout réduire</button>
+        </p>
         <p class="muted mt-3">161 matériaux au catalogue · Les valeurs sont courantes et varient selon le fabricant. Chacune reste modifiable une fois dans le calculateur.</p>
+        <p class="muted" id="matpage-count" role="status" hidden></p>
         <p class="muted" id="matpage-empty" hidden>Rien ne correspond à cette recherche.</p>
       </div>
     </section>
     <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TILES">Carrelage</h2>
-        <ul class="mat-page-list"><li id="gres-30x30" data-find="gres cerame 30×30 gres-30x30">
-          <span class="mat-item">
-            <b>Grès cérame 30×30</b>
-            <span class="muted">30×30 cm · 1 m²/emballage · 5 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-30x30">Calculer</a>
-        </li><li id="gres-30x60" data-find="gres cerame 30×60 gres-30x60">
-          <span class="mat-item">
-            <b>Grès cérame 30×60</b>
-            <span class="muted">30×60 cm · 1,44 m²/emballage · 5 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-30x60">Calculer</a>
-        </li><li id="gres-40x40" data-find="gres cerame 40×40 gres-40x40">
-          <span class="mat-item">
-            <b>Grès cérame 40×40</b>
-            <span class="muted">40×40 cm · 1,28 m²/emballage · 6 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-40x40">Calculer</a>
-        </li><li id="gres-45x45" data-find="gres cerame 45×45 gres-45x45">
-          <span class="mat-item">
-            <b>Grès cérame 45×45</b>
-            <span class="muted">45×45 cm · 1,42 m²/emballage · 7 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-45x45">Calculer</a>
-        </li><li id="gres-60x60" data-find="gres cerame 60×60 gres-60x60">
-          <span class="mat-item">
-            <b>Grès cérame 60×60</b>
-            <span class="muted">60×60 cm · 1,44 m²/emballage · 7 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-60x60">Calculer</a>
-        </li><li id="gres-75x75" data-find="gres cerame 75×75 gres-75x75">
-          <span class="mat-item">
-            <b>Grès cérame 75×75</b>
-            <span class="muted">75×75 cm · 1,13 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-75x75">Calculer</a>
-        </li><li id="gres-80x80" data-find="gres cerame 80×80 gres-80x80">
-          <span class="mat-item">
-            <b>Grès cérame 80×80</b>
-            <span class="muted">80×80 cm · 1,28 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-80x80">Calculer</a>
-        </li><li id="gres-90x90" data-find="gres cerame 90×90 gres-90x90">
-          <span class="mat-item">
-            <b>Grès cérame 90×90</b>
-            <span class="muted">90×90 cm · 1,62 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-90x90">Calculer</a>
-        </li><li id="gres-60x120" data-find="gres cerame 60×120 gres-60x120">
-          <span class="mat-item">
-            <b>Grès cérame 60×120</b>
-            <span class="muted">60×120 cm · 1,44 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-60x120">Calculer</a>
-        </li><li id="gres-120x120" data-find="gres cerame 120×120 gres-120x120">
-          <span class="mat-item">
-            <b>Grès cérame 120×120</b>
-            <span class="muted">120×120 cm · 1,44 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-120x120">Calculer</a>
-        </li><li id="gres-120x278" data-find="gres cerame grand format 120×278 gres-120x278">
-          <span class="mat-item">
-            <b>Grès cérame grand format 120×278</b>
-            <span class="muted">120×278 cm · 3,34 m²/emballage · 12 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-120x278">Calculer</a>
-        </li><li id="glaz-20x20" data-find="faience murale 20×20 glaz-20x20">
-          <span class="mat-item">
-            <b>Faïence murale 20×20</b>
-            <span class="muted">20×20 cm · 1 m²/emballage · 5 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=glaz-20x20">Calculer</a>
-        </li><li id="glaz-25x40" data-find="faience murale 25×40 glaz-25x40">
-          <span class="mat-item">
-            <b>Faïence murale 25×40</b>
-            <span class="muted">25×40 cm · 1 m²/emballage · 5 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=glaz-25x40">Calculer</a>
-        </li><li id="glaz-30x60" data-find="faience murale 30×60 glaz-30x60">
-          <span class="mat-item">
-            <b>Faïence murale 30×60</b>
-            <span class="muted">30×60 cm · 1,44 m²/emballage · 5 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=glaz-30x60">Calculer</a>
-        </li><li id="glaz-30x90" data-find="faience murale 30×90 glaz-30x90">
-          <span class="mat-item">
-            <b>Faïence murale 30×90</b>
-            <span class="muted">30×90 cm · 1,62 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=glaz-30x90">Calculer</a>
-        </li><li id="terakota-33" data-find="tomette de gres 33×33 terakota-33">
-          <span class="mat-item">
-            <b>Tomette de grès 33×33</b>
-            <span class="muted">33×33 cm · 1 m²/emballage · 5 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=terakota-33">Calculer</a>
-        </li><li id="metro-75x150" data-find="carreau metro 7,5×15 metro-75x150">
-          <span class="mat-item">
-            <b>Carreau métro 7,5×15</b>
-            <span class="muted">7,5×15 cm · 1 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=metro-75x150">Calculer</a>
-        </li><li id="metro-60x250" data-find="carreau format long 6×25 metro-60x250">
-          <span class="mat-item">
-            <b>Carreau format long 6×25</b>
-            <span class="muted">6×25 cm · 0,5 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=metro-60x250">Calculer</a>
-        </li><li id="mozaika-30x30" data-find="mosaique sur trame 30×30 mozaika-30x30">
-          <span class="mat-item">
-            <b>Mosaïque sur trame 30×30</b>
-            <span class="muted">30×30 cm · 0,99 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=mozaika-30x30">Calculer</a>
-        </li><li id="heksagon" data-find="carreau hexagonal 20×23 heksagon">
-          <span class="mat-item">
-            <b>Carreau hexagonal 20×23</b>
-            <span class="muted">20×23 cm · 1 m²/emballage · 12 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=heksagon">Calculer</a>
-        </li><li id="taras-60x60" data-find="dalle de terrasse 2 cm · 60×60 taras-60x60">
-          <span class="mat-item">
-            <b>Dalle de terrasse 2 cm · 60×60</b>
-            <span class="muted">2 cm · 60×60 cm · 0,72 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=taras-60x60">Calculer</a>
-        </li><li id="klinkier-25x6" data-find="carreau en klinker 24,5×6,5 klinkier-25x6">
-          <span class="mat-item">
-            <b>Carreau en klinker 24,5×6,5</b>
-            <span class="muted">24,5×6,5 cm · 0,5 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=klinkier-25x6">Calculer</a>
-        </li><li id="elew-plytka" data-find="plaquette de facade 24,5×6,5 elew-plytka">
-          <span class="mat-item">
-            <b>Plaquette de façade 24,5×6,5</b>
-            <span class="muted">24,5×6,5 cm · 0,5 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=elew-plytka">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Carrelage</h2>
+            <span class="mat-count">23<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Grès cérame</h3>
+              <span class="mat-count">10<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="gres-30x30" data-find="gres cerame 30×30 gres-30x30 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 30×30</b>
+              <span class="muted">30×30 cm · 1 m²/emballage · 5 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-30x30">Calculer</a>
+          </li><li id="gres-30x60" data-find="gres cerame 30×60 gres-30x60 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 30×60</b>
+              <span class="muted">30×60 cm · 1,44 m²/emballage · 5 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-30x60">Calculer</a>
+          </li><li id="gres-40x40" data-find="gres cerame 40×40 gres-40x40 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 40×40</b>
+              <span class="muted">40×40 cm · 1,28 m²/emballage · 6 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-40x40">Calculer</a>
+          </li><li id="gres-45x45" data-find="gres cerame 45×45 gres-45x45 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 45×45</b>
+              <span class="muted">45×45 cm · 1,42 m²/emballage · 7 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-45x45">Calculer</a>
+          </li><li id="gres-60x60" data-find="gres cerame 60×60 gres-60x60 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 60×60</b>
+              <span class="muted">60×60 cm · 1,44 m²/emballage · 7 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-60x60">Calculer</a>
+          </li><li id="gres-75x75" data-find="gres cerame 75×75 gres-75x75 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 75×75</b>
+              <span class="muted">75×75 cm · 1,13 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-75x75">Calculer</a>
+          </li><li id="gres-80x80" data-find="gres cerame 80×80 gres-80x80 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 80×80</b>
+              <span class="muted">80×80 cm · 1,28 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-80x80">Calculer</a>
+          </li><li id="gres-90x90" data-find="gres cerame 90×90 gres-90x90 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 90×90</b>
+              <span class="muted">90×90 cm · 1,62 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-90x90">Calculer</a>
+          </li><li id="gres-60x120" data-find="gres cerame 60×120 gres-60x120 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 60×120</b>
+              <span class="muted">60×120 cm · 1,44 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-60x120">Calculer</a>
+          </li><li id="gres-120x120" data-find="gres cerame 120×120 gres-120x120 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame 120×120</b>
+              <span class="muted">120×120 cm · 1,44 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-120x120">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="gres-120x278" data-find="gres cerame grand format 120×278 gres-120x278 carrelage">
+            <span class="mat-item">
+              <b>Grès cérame grand format 120×278</b>
+              <span class="muted">120×278 cm · 3,34 m²/emballage · 12 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-120x278">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Faïence murale</h3>
+              <span class="mat-count">4<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="glaz-20x20" data-find="faience murale 20×20 glaz-20x20 carrelage">
+            <span class="mat-item">
+              <b>Faïence murale 20×20</b>
+              <span class="muted">20×20 cm · 1 m²/emballage · 5 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=glaz-20x20">Calculer</a>
+          </li><li id="glaz-25x40" data-find="faience murale 25×40 glaz-25x40 carrelage">
+            <span class="mat-item">
+              <b>Faïence murale 25×40</b>
+              <span class="muted">25×40 cm · 1 m²/emballage · 5 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=glaz-25x40">Calculer</a>
+          </li><li id="glaz-30x60" data-find="faience murale 30×60 glaz-30x60 carrelage">
+            <span class="mat-item">
+              <b>Faïence murale 30×60</b>
+              <span class="muted">30×60 cm · 1,44 m²/emballage · 5 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=glaz-30x60">Calculer</a>
+          </li><li id="glaz-30x90" data-find="faience murale 30×90 glaz-30x90 carrelage">
+            <span class="mat-item">
+              <b>Faïence murale 30×90</b>
+              <span class="muted">30×90 cm · 1,62 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=glaz-30x90">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="terakota-33" data-find="tomette de gres 33×33 terakota-33 carrelage">
+            <span class="mat-item">
+              <b>Tomette de grès 33×33</b>
+              <span class="muted">33×33 cm · 1 m²/emballage · 5 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=terakota-33">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="metro-75x150" data-find="carreau metro 7,5×15 metro-75x150 carrelage">
+            <span class="mat-item">
+              <b>Carreau métro 7,5×15</b>
+              <span class="muted">7,5×15 cm · 1 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=metro-75x150">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="metro-60x250" data-find="carreau format long 6×25 metro-60x250 carrelage">
+            <span class="mat-item">
+              <b>Carreau format long 6×25</b>
+              <span class="muted">6×25 cm · 0,5 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=metro-60x250">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="mozaika-30x30" data-find="mosaique sur trame 30×30 mozaika-30x30 carrelage">
+            <span class="mat-item">
+              <b>Mosaïque sur trame 30×30</b>
+              <span class="muted">30×30 cm · 0,99 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=mozaika-30x30">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="heksagon" data-find="carreau hexagonal 20×23 heksagon carrelage">
+            <span class="mat-item">
+              <b>Carreau hexagonal 20×23</b>
+              <span class="muted">20×23 cm · 1 m²/emballage · 12 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=heksagon">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="taras-60x60" data-find="dalle de terrasse 2 cm · 60×60 taras-60x60 carrelage">
+            <span class="mat-item">
+              <b>Dalle de terrasse 2 cm · 60×60</b>
+              <span class="muted">2 cm · 60×60 cm · 0,72 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=taras-60x60">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klinkier-25x6" data-find="carreau en klinker 24,5×6,5 klinkier-25x6 carrelage">
+            <span class="mat-item">
+              <b>Carreau en klinker 24,5×6,5</b>
+              <span class="muted">24,5×6,5 cm · 0,5 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=klinkier-25x6">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="elew-plytka" data-find="plaquette de facade 24,5×6,5 elew-plytka carrelage">
+            <span class="mat-item">
+              <b>Plaquette de façade 24,5×6,5</b>
+              <span class="muted">24,5×6,5 cm · 0,5 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=elew-plytka">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-FLOORING">Revêtements de sol</h2>
-        <ul class="mat-page-list"><li id="panel-ac3" data-find="sol stratifie ac3 · 128×19,2 panel-ac3">
-          <span class="mat-item">
-            <b>Sol stratifié AC3 · 128×19,2</b>
-            <span class="muted">AC3 · 128×19,2 cm · 2,22 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=panel-ac3">Calculer</a>
-        </li><li id="panel-ac4" data-find="sol stratifie ac4 · 138×19,3 panel-ac4">
-          <span class="mat-item">
-            <b>Sol stratifié AC4 · 138×19,3</b>
-            <span class="muted">AC4 · 138×19,3 cm · 2,22 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=panel-ac4">Calculer</a>
-        </li><li id="panel-ac5" data-find="sol stratifie ac5 · 129×19 panel-ac5">
-          <span class="mat-item">
-            <b>Sol stratifié AC5 · 129×19</b>
-            <span class="muted">AC5 · 129×19 cm · 2,22 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=panel-ac5">Calculer</a>
-        </li><li id="lvt" data-find="lame vinyle lvt 122×18 lvt">
-          <span class="mat-item">
-            <b>Lame vinyle LVT 122×18</b>
-            <span class="muted">122×18 cm · 2,2 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=lvt">Calculer</a>
-        </li><li id="spc" data-find="lame spc 61×30,5 spc">
-          <span class="mat-item">
-            <b>Lame SPC 61×30,5</b>
-            <span class="muted">61×30,5 cm · 2,23 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=spc">Calculer</a>
-        </li><li id="deska-barl" data-find="parquet contrecolle 220×18,2 deska-barl">
-          <span class="mat-item">
-            <b>Parquet contrecollé 220×18,2</b>
-            <span class="muted">220×18,2 cm · 3,18 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=deska-barl">Calculer</a>
-        </li><li id="deska-3warstw" data-find="lame trois plis 209×15 deska-3warstw">
-          <span class="mat-item">
-            <b>Lame trois plis 209×15</b>
-            <span class="muted">209×15 cm · 2,2 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=deska-3warstw">Calculer</a>
-        </li><li id="parkiet" data-find="parquet massif 45×7 parkiet">
-          <span class="mat-item">
-            <b>Parquet massif 45×7</b>
-            <span class="muted">45×7 cm · 1 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=parkiet">Calculer</a>
-        </li><li id="gres-deska-20x120" data-find="gres effet bois 20×120 gres-deska-20x120">
-          <span class="mat-item">
-            <b>Grès effet bois 20×120</b>
-            <span class="muted">20×120 cm · 0,96 m²/emballage · 10 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-deska-20x120">Calculer</a>
-        </li><li id="korek" data-find="sol en liege 90×30 korek">
-          <span class="mat-item">
-            <b>Sol en liège 90×30</b>
-            <span class="muted">90×30 cm · 1,9 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=korek">Calculer</a>
-        </li><li id="panel-scienny" data-find="panneau mural / tasseaux 275×12 panel-scienny">
-          <span class="mat-item">
-            <b>Panneau mural / tasseaux 275×12</b>
-            <span class="muted">275×12 cm · 1,65 m²/emballage · 8 % chutes</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=panel-scienny">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-FLOORING" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Revêtements de sol</h2>
+            <span class="mat-count">11<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Sol stratifié</h3>
+              <span class="mat-count">3<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="panel-ac3" data-find="sol stratifie ac3 · 128×19,2 panel-ac3 revetements de sol">
+            <span class="mat-item">
+              <b>Sol stratifié AC3 · 128×19,2</b>
+              <span class="muted">AC3 · 128×19,2 cm · 2,22 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=panel-ac3">Calculer</a>
+          </li><li id="panel-ac4" data-find="sol stratifie ac4 · 138×19,3 panel-ac4 revetements de sol">
+            <span class="mat-item">
+              <b>Sol stratifié AC4 · 138×19,3</b>
+              <span class="muted">AC4 · 138×19,3 cm · 2,22 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=panel-ac4">Calculer</a>
+          </li><li id="panel-ac5" data-find="sol stratifie ac5 · 129×19 panel-ac5 revetements de sol">
+            <span class="mat-item">
+              <b>Sol stratifié AC5 · 129×19</b>
+              <span class="muted">AC5 · 129×19 cm · 2,22 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=panel-ac5">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="lvt" data-find="lame vinyle lvt 122×18 lvt revetements de sol">
+            <span class="mat-item">
+              <b>Lame vinyle LVT 122×18</b>
+              <span class="muted">122×18 cm · 2,2 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=lvt">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="spc" data-find="lame spc 61×30,5 spc revetements de sol">
+            <span class="mat-item">
+              <b>Lame SPC 61×30,5</b>
+              <span class="muted">61×30,5 cm · 2,23 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=spc">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-barl" data-find="parquet contrecolle 220×18,2 deska-barl revetements de sol">
+            <span class="mat-item">
+              <b>Parquet contrecollé 220×18,2</b>
+              <span class="muted">220×18,2 cm · 3,18 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=deska-barl">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-3warstw" data-find="lame trois plis 209×15 deska-3warstw revetements de sol">
+            <span class="mat-item">
+              <b>Lame trois plis 209×15</b>
+              <span class="muted">209×15 cm · 2,2 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=deska-3warstw">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="parkiet" data-find="parquet massif 45×7 parkiet revetements de sol">
+            <span class="mat-item">
+              <b>Parquet massif 45×7</b>
+              <span class="muted">45×7 cm · 1 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=parkiet">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gres-deska-20x120" data-find="gres effet bois 20×120 gres-deska-20x120 revetements de sol">
+            <span class="mat-item">
+              <b>Grès effet bois 20×120</b>
+              <span class="muted">20×120 cm · 0,96 m²/emballage · 10 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gres-deska-20x120">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="korek" data-find="sol en liege 90×30 korek revetements de sol">
+            <span class="mat-item">
+              <b>Sol en liège 90×30</b>
+              <span class="muted">90×30 cm · 1,9 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=korek">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="panel-scienny" data-find="panneau mural / tasseaux 275×12 panel-scienny revetements de sol">
+            <span class="mat-item">
+              <b>Panneau mural / tasseaux 275×12</b>
+              <span class="muted">275×12 cm · 1,65 m²/emballage · 8 % chutes</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=panel-scienny">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TRIM">Moulures et finitions</h2>
-        <ul class="mat-page-list"><li id="parapet-wewn" data-find="appui de fenetre interieur 4100×250 parapet-wewn">
-          <span class="mat-item">
-            <b>Appui de fenêtre intérieur 4100×250</b>
-            <span class="muted">4100×250 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=parapet-wewn">Calculer</a>
-        </li><li id="listwa-mdf-2_5" data-find="plinthe mdf 2,5 m listwa-mdf-2_5">
-          <span class="mat-item">
-            <b>Plinthe MDF 2,5 m</b>
-            <span class="muted">barre entière 2,5 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=listwa-mdf-2_5">Calculer</a>
-        </li><li id="cokol-pvc-2_5" data-find="plinthe pvc 2,5 m cokol-pvc-2_5">
-          <span class="mat-item">
-            <b>Plinthe PVC 2,5 m</b>
-            <span class="muted">barre entière 2,5 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cokol-pvc-2_5">Calculer</a>
-        </li><li id="cwierc-2_5" data-find="quart-de-rond / baguette d'angle 2,5 m cwierc-2_5">
-          <span class="mat-item">
-            <b>Quart-de-rond / baguette d'angle 2,5 m</b>
-            <span class="muted">barre entière 2,5 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cwierc-2_5">Calculer</a>
-        </li><li id="listwa-prog-alu-0_9" data-find="barre de seuil en aluminium 0,9 m listwa-prog-alu-0_9">
-          <span class="mat-item">
-            <b>Barre de seuil en aluminium 0,9 m</b>
-            <span class="muted">barre entière 0,9 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=listwa-prog-alu-0_9">Calculer</a>
-        </li><li id="parapet-zewn-2" data-find="appui de fenetre en acier 2 m parapet-zewn-2">
-          <span class="mat-item">
-            <b>Appui de fenêtre en acier 2 m</b>
-            <span class="muted">barre entière 2 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=parapet-zewn-2">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TRIM" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Moulures et finitions</h2>
+            <span class="mat-count">6<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="parapet-wewn" data-find="appui de fenetre interieur 4100×250 parapet-wewn moulures et finitions">
+            <span class="mat-item">
+              <b>Appui de fenêtre intérieur 4100×250</b>
+              <span class="muted">4100×250 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=parapet-wewn">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-mdf-2_5" data-find="plinthe mdf 2,5 m listwa-mdf-2_5 moulures et finitions">
+            <span class="mat-item">
+              <b>Plinthe MDF 2,5 m</b>
+              <span class="muted">barre entière 2,5 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=listwa-mdf-2_5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="cokol-pvc-2_5" data-find="plinthe pvc 2,5 m cokol-pvc-2_5 moulures et finitions">
+            <span class="mat-item">
+              <b>Plinthe PVC 2,5 m</b>
+              <span class="muted">barre entière 2,5 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cokol-pvc-2_5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="cwierc-2_5" data-find="quart-de-rond / baguette d'angle 2,5 m cwierc-2_5 moulures et finitions">
+            <span class="mat-item">
+              <b>Quart-de-rond / baguette d'angle 2,5 m</b>
+              <span class="muted">barre entière 2,5 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cwierc-2_5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-prog-alu-0_9" data-find="barre de seuil en aluminium 0,9 m listwa-prog-alu-0_9 moulures et finitions">
+            <span class="mat-item">
+              <b>Barre de seuil en aluminium 0,9 m</b>
+              <span class="muted">barre entière 0,9 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=listwa-prog-alu-0_9">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="parapet-zewn-2" data-find="appui de fenetre en acier 2 m parapet-zewn-2 moulures et finitions">
+            <span class="mat-item">
+              <b>Appui de fenêtre en acier 2 m</b>
+              <span class="muted">barre entière 2 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=parapet-zewn-2">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PAINT">Peintures et vernis</h2>
-        <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="peinture murale 2,5 l farba-scienna-2_5">
-          <span class="mat-item">
-            <b>Peinture murale 2,5 l</b>
-            <span class="muted">2,5 l · ~10 m²/l · 25 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-scienna-2_5">Calculer</a>
-        </li><li id="farba-scienna-5" data-find="peinture murale 5 l farba-scienna-5">
-          <span class="mat-item">
-            <b>Peinture murale 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-scienna-5">Calculer</a>
-        </li><li id="farba-scienna-10" data-find="peinture murale 10 l farba-scienna-10">
-          <span class="mat-item">
-            <b>Peinture murale 10 l</b>
-            <span class="muted">10 l · ~10 m²/l · 100 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-scienna-10">Calculer</a>
-        </li><li id="farba-lateks-5" data-find="peinture latex 5 l farba-lateks-5">
-          <span class="mat-item">
-            <b>Peinture latex 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-lateks-5">Calculer</a>
-        </li><li id="farba-sufitowa-10" data-find="peinture pour plafond 10 l farba-sufitowa-10">
-          <span class="mat-item">
-            <b>Peinture pour plafond 10 l</b>
-            <span class="muted">10 l · ~11 m²/l · 110 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-sufitowa-10">Calculer</a>
-        </li><li id="farba-kl-2_5" data-find="peinture cuisine et salle de bain 2,5 l farba-kl-2_5">
-          <span class="mat-item">
-            <b>Peinture cuisine et salle de bain 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-kl-2_5">Calculer</a>
-        </li><li id="farba-beton-5" data-find="peinture pour beton et sol 5 l farba-beton-5">
-          <span class="mat-item">
-            <b>Peinture pour béton et sol 5 l</b>
-            <span class="muted">5 l · ~8 m²/l · 40 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-beton-5">Calculer</a>
-        </li><li id="farba-elew-akr-10" data-find="peinture de facade acrylique 10 l farba-elew-akr-10">
-          <span class="mat-item">
-            <b>Peinture de façade acrylique 10 l</b>
-            <span class="muted">10 l · ~5 m²/l · 50 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-elew-akr-10">Calculer</a>
-        </li><li id="farba-elew-sil-10" data-find="peinture de facade siloxane 10 l farba-elew-sil-10">
-          <span class="mat-item">
-            <b>Peinture de façade siloxane 10 l</b>
-            <span class="muted">10 l · ~6 m²/l · 60 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-elew-sil-10">Calculer</a>
-        </li><li id="emalia-0_75" data-find="laque pour bois et metal 0,75 l emalia-0_75">
-          <span class="mat-item">
-            <b>Laque pour bois et métal 0,75 l</b>
-            <span class="muted">0,75 l · ~12 m²/l · 9 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=emalia-0_75">Calculer</a>
-        </li><li id="emalia-2_5" data-find="laque pour bois et metal 2,5 l emalia-2_5">
-          <span class="mat-item">
-            <b>Laque pour bois et métal 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=emalia-2_5">Calculer</a>
-        </li><li id="farba-antykor-0_75" data-find="peinture antirouille 3 en 1 0,75 l farba-antykor-0_75">
-          <span class="mat-item">
-            <b>Peinture antirouille 3 en 1 0,75 l</b>
-            <span class="muted">0,75 l · ~10 m²/l · 7,5 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-antykor-0_75">Calculer</a>
-        </li><li id="lakierobejca-2_5" data-find="lasure vernie 2,5 l lakierobejca-2_5">
-          <span class="mat-item">
-            <b>Lasure vernie 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=lakierobejca-2_5">Calculer</a>
-        </li><li id="lakier-bezb-2_5" data-find="vernis incolore 2,5 l lakier-bezb-2_5">
-          <span class="mat-item">
-            <b>Vernis incolore 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=lakier-bezb-2_5">Calculer</a>
-        </li><li id="impregnat-5" data-find="traitement du bois 5 l impregnat-5">
-          <span class="mat-item">
-            <b>Traitement du bois 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=impregnat-5">Calculer</a>
-        </li><li id="olej-taras-2_5" data-find="huile pour terrasse 2,5 l olej-taras-2_5">
-          <span class="mat-item">
-            <b>Huile pour terrasse 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=olej-taras-2_5">Calculer</a>
-        </li><li id="grunt-gleb-5" data-find="primaire d'accrochage penetrant 5 l grunt-gleb-5">
-          <span class="mat-item">
-            <b>Primaire d'accrochage pénétrant 5 l</b>
-            <span class="muted">5 l · ~7 m²/l · 35 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=grunt-gleb-5">Calculer</a>
-        </li><li id="grunt-mleczko-5" data-find="sous-couche avant peinture 5 l grunt-mleczko-5">
-          <span class="mat-item">
-            <b>Sous-couche avant peinture 5 l</b>
-            <span class="muted">5 l · ~8 m²/l · 40 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=grunt-mleczko-5">Calculer</a>
-        </li><li id="grunt-kwarc-5" data-find="primaire quartze sous enduit 5 l grunt-kwarc-5">
-          <span class="mat-item">
-            <b>Primaire quartzé sous enduit 5 l</b>
-            <span class="muted">5 l · ~4 m²/l · 20 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=grunt-kwarc-5">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PAINT" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Peintures et vernis</h2>
+            <span class="mat-count">19<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Peinture murale</h3>
+              <span class="mat-count">3<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="peinture murale 2,5 l farba-scienna-2_5 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture murale 2,5 l</b>
+              <span class="muted">2,5 l · ~10 m²/l · 25 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-scienna-2_5">Calculer</a>
+          </li><li id="farba-scienna-5" data-find="peinture murale 5 l farba-scienna-5 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture murale 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-scienna-5">Calculer</a>
+          </li><li id="farba-scienna-10" data-find="peinture murale 10 l farba-scienna-10 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture murale 10 l</b>
+              <span class="muted">10 l · ~10 m²/l · 100 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-scienna-10">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="farba-lateks-5" data-find="peinture latex 5 l farba-lateks-5 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture latex 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-lateks-5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-sufitowa-10" data-find="peinture pour plafond 10 l farba-sufitowa-10 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture pour plafond 10 l</b>
+              <span class="muted">10 l · ~11 m²/l · 110 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-sufitowa-10">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-kl-2_5" data-find="peinture cuisine et salle de bain 2,5 l farba-kl-2_5 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture cuisine et salle de bain 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-kl-2_5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-beton-5" data-find="peinture pour beton et sol 5 l farba-beton-5 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture pour béton et sol 5 l</b>
+              <span class="muted">5 l · ~8 m²/l · 40 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-beton-5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-elew-akr-10" data-find="peinture de facade acrylique 10 l farba-elew-akr-10 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture de façade acrylique 10 l</b>
+              <span class="muted">10 l · ~5 m²/l · 50 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-elew-akr-10">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-elew-sil-10" data-find="peinture de facade siloxane 10 l farba-elew-sil-10 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture de façade siloxane 10 l</b>
+              <span class="muted">10 l · ~6 m²/l · 60 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-elew-sil-10">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Laque pour bois et métal</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="emalia-0_75" data-find="laque pour bois et metal 0,75 l emalia-0_75 peintures et vernis">
+            <span class="mat-item">
+              <b>Laque pour bois et métal 0,75 l</b>
+              <span class="muted">0,75 l · ~12 m²/l · 9 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=emalia-0_75">Calculer</a>
+          </li><li id="emalia-2_5" data-find="laque pour bois et metal 2,5 l emalia-2_5 peintures et vernis">
+            <span class="mat-item">
+              <b>Laque pour bois et métal 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=emalia-2_5">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="farba-antykor-0_75" data-find="peinture antirouille 3 en 1 0,75 l farba-antykor-0_75 peintures et vernis">
+            <span class="mat-item">
+              <b>Peinture antirouille 3 en 1 0,75 l</b>
+              <span class="muted">0,75 l · ~10 m²/l · 7,5 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=farba-antykor-0_75">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lakierobejca-2_5" data-find="lasure vernie 2,5 l lakierobejca-2_5 peintures et vernis">
+            <span class="mat-item">
+              <b>Lasure vernie 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=lakierobejca-2_5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lakier-bezb-2_5" data-find="vernis incolore 2,5 l lakier-bezb-2_5 peintures et vernis">
+            <span class="mat-item">
+              <b>Vernis incolore 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=lakier-bezb-2_5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="impregnat-5" data-find="traitement du bois 5 l impregnat-5 peintures et vernis">
+            <span class="mat-item">
+              <b>Traitement du bois 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=impregnat-5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="olej-taras-2_5" data-find="huile pour terrasse 2,5 l olej-taras-2_5 peintures et vernis">
+            <span class="mat-item">
+              <b>Huile pour terrasse 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=olej-taras-2_5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-gleb-5" data-find="primaire d'accrochage penetrant 5 l grunt-gleb-5 peintures et vernis">
+            <span class="mat-item">
+              <b>Primaire d'accrochage pénétrant 5 l</b>
+              <span class="muted">5 l · ~7 m²/l · 35 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=grunt-gleb-5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-mleczko-5" data-find="sous-couche avant peinture 5 l grunt-mleczko-5 peintures et vernis">
+            <span class="mat-item">
+              <b>Sous-couche avant peinture 5 l</b>
+              <span class="muted">5 l · ~8 m²/l · 40 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=grunt-mleczko-5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-kwarc-5" data-find="primaire quartze sous enduit 5 l grunt-kwarc-5 peintures et vernis">
+            <span class="mat-item">
+              <b>Primaire quartzé sous enduit 5 l</b>
+              <span class="muted">5 l · ~4 m²/l · 20 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=grunt-kwarc-5">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-CHEMICALS">Chimie du bâtiment</h2>
-        <ul class="mat-page-list"><li id="gladz-gips-20" data-find="enduit de lissage au platre 20 kg gladz-gips-20">
-          <span class="mat-item">
-            <b>Enduit de lissage au plâtre 20 kg</b>
-            <span class="muted">20 kg · ~1 kg/m² (couche de 1 mm) · 20 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=gladz-gips-20">Calculer</a>
-        </li><li id="gladz-polim-20" data-find="enduit de lissage polymere 20 kg gladz-polim-20">
-          <span class="mat-item">
-            <b>Enduit de lissage polymère 20 kg</b>
-            <span class="muted">20 kg · ~1,2 kg/m² (couche de 1 mm) · 16,67 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=gladz-polim-20">Calculer</a>
-        </li><li id="gladz-gotowa-18" data-find="enduit de lissage pret a l'emploi 18 kg gladz-gotowa-18">
-          <span class="mat-item">
-            <b>Enduit de lissage prêt à l'emploi 18 kg</b>
-            <span class="muted">18 kg · ~1,2 kg/m² (couche de 1 mm) · 15 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=gladz-gotowa-18">Calculer</a>
-        </li><li id="tynk-gips-30" data-find="enduit platre 30 kg tynk-gips-30">
-          <span class="mat-item">
-            <b>Enduit plâtre 30 kg</b>
-            <span class="muted">30 kg · ~8,5 kg/m² (couche de 10 mm) · 3,53 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-gips-30">Calculer</a>
-        </li><li id="tynk-cw-30" data-find="enduit ciment-chaux 30 kg tynk-cw-30">
-          <span class="mat-item">
-            <b>Enduit ciment-chaux 30 kg</b>
-            <span class="muted">30 kg · ~15 kg/m² (couche de 10 mm) · 2 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-cw-30">Calculer</a>
-        </li><li id="tynk-mozaik-25" data-find="revetement mosaique 25 kg tynk-mozaik-25">
-          <span class="mat-item">
-            <b>Revêtement mosaïque 25 kg</b>
-            <span class="muted">25 kg · ~5 kg/m² (une couche) · 5 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-mozaik-25">Calculer</a>
-        </li><li id="tynk-baranek-25" data-find="enduit taloche 1,5 mm · 25 kg tynk-baranek-25">
-          <span class="mat-item">
-            <b>Enduit taloché 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (couche de 1,5 mm) · 10 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-baranek-25">Calculer</a>
-        </li><li id="tynk-silik-25" data-find="enduit siloxane 1,5 mm · 25 kg tynk-silik-25">
-          <span class="mat-item">
-            <b>Enduit siloxane 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (couche de 1,5 mm) · 10 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-silik-25">Calculer</a>
-        </li><li id="tynk-akryl-25" data-find="enduit acrylique 1,5 mm · 25 kg tynk-akryl-25">
-          <span class="mat-item">
-            <b>Enduit acrylique 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (couche de 1,5 mm) · 10 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-akryl-25">Calculer</a>
-        </li><li id="klej-c1-25" data-find="colle a carrelage c1 25 kg klej-c1-25">
-          <span class="mat-item">
-            <b>Colle à carrelage C1 25 kg</b>
-            <span class="muted">25 kg · ~4 kg/m² (peigne de 6 mm) · 6,25 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=klej-c1-25">Calculer</a>
-        </li><li id="klej-c2-25" data-find="colle a carrelage flexible c2 25 kg klej-c2-25">
-          <span class="mat-item">
-            <b>Colle à carrelage flexible C2 25 kg</b>
-            <span class="muted">25 kg · ~5 kg/m² (peigne de 10 mm) · 5 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=klej-c2-25">Calculer</a>
-        </li><li id="klej-styro-25" data-find="colle pour polystyrene et treillis 25 kg klej-styro-25">
-          <span class="mat-item">
-            <b>Colle pour polystyrène et treillis 25 kg</b>
-            <span class="muted">25 kg · ~4,5 kg/m² (couche de renfort) · 5,56 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=klej-styro-25">Calculer</a>
-        </li><li id="zaprawa-mur-25" data-find="mortier de montage 25 kg zaprawa-mur-25">
-          <span class="mat-item">
-            <b>Mortier de montage 25 kg</b>
-            <span class="muted">25 kg · ~25 kg/m² (joint de 10 mm) · 1 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=zaprawa-mur-25">Calculer</a>
-        </li><li id="wylewka-samop-25" data-find="ragreage autolissant 25 kg wylewka-samop-25">
-          <span class="mat-item">
-            <b>Ragréage autolissant 25 kg</b>
-            <span class="muted">25 kg · ~1,6 kg/m² (couche de 1 mm) · 15,63 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=wylewka-samop-25">Calculer</a>
-        </li><li id="fuga-5" data-find="joint de carrelage 5 kg fuga-5">
-          <span class="mat-item">
-            <b>Joint de carrelage 5 kg</b>
-            <span class="muted">5 kg · ~0,5 kg/m² (joint de 3 mm) · 10 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=fuga-5">Calculer</a>
-        </li><li id="hydroizol-15" data-find="membrane d'etancheite liquide 15 kg hydroizol-15">
-          <span class="mat-item">
-            <b>Membrane d'étanchéité liquide 15 kg</b>
-            <span class="muted">15 kg · ~3 kg/m² (2 couches) · 5 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=hydroizol-15">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-CHEMICALS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Chimie du bâtiment</h2>
+            <span class="mat-count">16<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="gladz-gips-20" data-find="enduit de lissage au platre 20 kg gladz-gips-20 chimie du batiment">
+            <span class="mat-item">
+              <b>Enduit de lissage au plâtre 20 kg</b>
+              <span class="muted">20 kg · ~1 kg/m² (couche de 1 mm) · 20 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=gladz-gips-20">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gladz-polim-20" data-find="enduit de lissage polymere 20 kg gladz-polim-20 chimie du batiment">
+            <span class="mat-item">
+              <b>Enduit de lissage polymère 20 kg</b>
+              <span class="muted">20 kg · ~1,2 kg/m² (couche de 1 mm) · 16,67 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=gladz-polim-20">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gladz-gotowa-18" data-find="enduit de lissage pret a l'emploi 18 kg gladz-gotowa-18 chimie du batiment">
+            <span class="mat-item">
+              <b>Enduit de lissage prêt à l'emploi 18 kg</b>
+              <span class="muted">18 kg · ~1,2 kg/m² (couche de 1 mm) · 15 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=gladz-gotowa-18">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-gips-30" data-find="enduit platre 30 kg tynk-gips-30 chimie du batiment">
+            <span class="mat-item">
+              <b>Enduit plâtre 30 kg</b>
+              <span class="muted">30 kg · ~8,5 kg/m² (couche de 10 mm) · 3,53 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-gips-30">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-cw-30" data-find="enduit ciment-chaux 30 kg tynk-cw-30 chimie du batiment">
+            <span class="mat-item">
+              <b>Enduit ciment-chaux 30 kg</b>
+              <span class="muted">30 kg · ~15 kg/m² (couche de 10 mm) · 2 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-cw-30">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-mozaik-25" data-find="revetement mosaique 25 kg tynk-mozaik-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Revêtement mosaïque 25 kg</b>
+              <span class="muted">25 kg · ~5 kg/m² (une couche) · 5 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-mozaik-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-baranek-25" data-find="enduit taloche 1,5 mm · 25 kg tynk-baranek-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Enduit taloché 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (couche de 1,5 mm) · 10 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-baranek-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-silik-25" data-find="enduit siloxane 1,5 mm · 25 kg tynk-silik-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Enduit siloxane 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (couche de 1,5 mm) · 10 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-silik-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-akryl-25" data-find="enduit acrylique 1,5 mm · 25 kg tynk-akryl-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Enduit acrylique 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (couche de 1,5 mm) · 10 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=tynk-akryl-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-c1-25" data-find="colle a carrelage c1 25 kg klej-c1-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Colle à carrelage C1 25 kg</b>
+              <span class="muted">25 kg · ~4 kg/m² (peigne de 6 mm) · 6,25 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=klej-c1-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-c2-25" data-find="colle a carrelage flexible c2 25 kg klej-c2-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Colle à carrelage flexible C2 25 kg</b>
+              <span class="muted">25 kg · ~5 kg/m² (peigne de 10 mm) · 5 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=klej-c2-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-styro-25" data-find="colle pour polystyrene et treillis 25 kg klej-styro-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Colle pour polystyrène et treillis 25 kg</b>
+              <span class="muted">25 kg · ~4,5 kg/m² (couche de renfort) · 5,56 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=klej-styro-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="zaprawa-mur-25" data-find="mortier de montage 25 kg zaprawa-mur-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Mortier de montage 25 kg</b>
+              <span class="muted">25 kg · ~25 kg/m² (joint de 10 mm) · 1 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=zaprawa-mur-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="wylewka-samop-25" data-find="ragreage autolissant 25 kg wylewka-samop-25 chimie du batiment">
+            <span class="mat-item">
+              <b>Ragréage autolissant 25 kg</b>
+              <span class="muted">25 kg · ~1,6 kg/m² (couche de 1 mm) · 15,63 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=wylewka-samop-25">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="fuga-5" data-find="joint de carrelage 5 kg fuga-5 chimie du batiment">
+            <span class="mat-item">
+              <b>Joint de carrelage 5 kg</b>
+              <span class="muted">5 kg · ~0,5 kg/m² (joint de 3 mm) · 10 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=fuga-5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hydroizol-15" data-find="membrane d'etancheite liquide 15 kg hydroizol-15 chimie du batiment">
+            <span class="mat-item">
+              <b>Membrane d'étanchéité liquide 15 kg</b>
+              <span class="muted">15 kg · ~3 kg/m² (2 couches) · 5 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=hydroizol-15">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-BOARDS">Panneaux</h2>
-        <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="plaque de platre standard 1200×2600 gk-zwykla-2600">
-          <span class="mat-item">
-            <b>Plaque de plâtre standard 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/pce</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-zwykla-2600">Calculer</a>
-        </li><li id="gk-zwykla-2000" data-find="plaque de platre standard 1200×2000 gk-zwykla-2000">
-          <span class="mat-item">
-            <b>Plaque de plâtre standard 1200×2000</b>
-            <span class="muted">1200×2000 mm · 2,4 m²/pce</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-zwykla-2000">Calculer</a>
-        </li><li id="gk-impreg-2600" data-find="plaque de platre hydrofuge 1200×2600 gk-impreg-2600">
-          <span class="mat-item">
-            <b>Plaque de plâtre hydrofuge 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/pce</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-impreg-2600">Calculer</a>
-        </li><li id="gk-ogniowa-2600" data-find="plaque de platre coupe-feu 1200×2600 gk-ogniowa-2600">
-          <span class="mat-item">
-            <b>Plaque de plâtre coupe-feu 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/pce</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-ogniowa-2600">Calculer</a>
-        </li><li id="gk-gksf-2600" data-find="plaque de platre coupe-feu et hydrofuge (gkfi) 1200×2600 gk-gksf-2600">
-          <span class="mat-item">
-            <b>Plaque de plâtre coupe-feu et hydrofuge (GKFI) 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/pce</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-gksf-2600">Calculer</a>
-        </li><li id="plyta-lam-2800" data-find="panneau melamine pour meuble 2800×2070 plyta-lam-2800">
-          <span class="mat-item">
-            <b>Panneau mélaminé pour meuble 2800×2070</b>
-            <span class="muted">2800×2070 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=plyta-lam-2800">Calculer</a>
-        </li><li id="plyta-lam-3660" data-find="panneau melamine pour meuble 3660×1830 plyta-lam-3660">
-          <span class="mat-item">
-            <b>Panneau mélaminé pour meuble 3660×1830</b>
-            <span class="muted">3660×1830 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=plyta-lam-3660">Calculer</a>
-        </li><li id="mdf-2800" data-find="mdf brut 2800×2070 mdf-2800">
-          <span class="mat-item">
-            <b>MDF brut 2800×2070</b>
-            <span class="muted">2800×2070 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=mdf-2800">Calculer</a>
-        </li><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800">
-          <span class="mat-item">
-            <b>HDF 2800×2070</b>
-            <span class="muted">2800×2070 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=hdf-2800">Calculer</a>
-        </li><li id="wior-surowa" data-find="agglomere brut 2800×2070 wior-surowa">
-          <span class="mat-item">
-            <b>Aggloméré brut 2800×2070</b>
-            <span class="muted">2800×2070 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=wior-surowa">Calculer</a>
-        </li><li id="mfp-2500" data-find="panneau mfp 2500×1250 mfp-2500">
-          <span class="mat-item">
-            <b>Panneau MFP 2500×1250</b>
-            <span class="muted">2500×1250 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=mfp-2500">Calculer</a>
-        </li><li id="sklejka-lisc" data-find="contreplaque de feuillu 2500×1250 sklejka-lisc">
-          <span class="mat-item">
-            <b>Contreplaqué de feuillu 2500×1250</b>
-            <span class="muted">2500×1250 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=sklejka-lisc">Calculer</a>
-        </li><li id="sklejka-brzoza" data-find="contreplaque de bouleau 1525×1525 sklejka-brzoza">
-          <span class="mat-item">
-            <b>Contreplaqué de bouleau 1525×1525</b>
-            <span class="muted">1525×1525 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=sklejka-brzoza">Calculer</a>
-        </li><li id="sklejka-wodo" data-find="contreplaque hydrofuge 3000×1500 sklejka-wodo">
-          <span class="mat-item">
-            <b>Contreplaqué hydrofuge 3000×1500</b>
-            <span class="muted">3000×1500 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=sklejka-wodo">Calculer</a>
-        </li><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500">
-          <span class="mat-item">
-            <b>OSB-3 2500×1250</b>
-            <span class="muted">2500×1250 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=osb3-2500">Calculer</a>
-        </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800">
-          <span class="mat-item">
-            <b>OSB-3 2800×1250</b>
-            <span class="muted">2800×1250 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=osb3-2800">Calculer</a>
-        </li><li id="cetris-3350" data-find="panneau ciment-bois 3350×1250 cetris-3350">
-          <span class="mat-item">
-            <b>Panneau ciment-bois 3350×1250</b>
-            <span class="muted">3350×1250 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=cetris-3350">Calculer</a>
-        </li><li id="fermacell-1500" data-find="plaque de fibres-gypse 1500×1000 fermacell-1500">
-          <span class="mat-item">
-            <b>Plaque de fibres-gypse 1500×1000</b>
-            <span class="muted">1500×1000 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=fermacell-1500">Calculer</a>
-        </li><li id="szalunek-2000" data-find="contreplaque de coffrage 2000×1000 szalunek-2000">
-          <span class="mat-item">
-            <b>Contreplaqué de coffrage 2000×1000</b>
-            <span class="muted">2000×1000 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=szalunek-2000">Calculer</a>
-        </li><li id="blat-postform" data-find="plan de travail postforme 4100×600 blat-postform">
-          <span class="mat-item">
-            <b>Plan de travail postformé 4100×600</b>
-            <span class="muted">4100×600 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blat-postform">Calculer</a>
-        </li><li id="blat-38-4100" data-find="plan de travail stratifie 38 mm · 4100×920 blat-38-4100">
-          <span class="mat-item">
-            <b>Plan de travail stratifié 38 mm · 4100×920</b>
-            <span class="muted">4100×920 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blat-38-4100">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-BOARDS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Panneaux</h2>
+            <span class="mat-count">21<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Plaque de plâtre standard</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="plaque de platre standard 1200×2600 gk-zwykla-2600 panneaux">
+            <span class="mat-item">
+              <b>Plaque de plâtre standard 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/pce</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-zwykla-2600">Calculer</a>
+          </li><li id="gk-zwykla-2000" data-find="plaque de platre standard 1200×2000 gk-zwykla-2000 panneaux">
+            <span class="mat-item">
+              <b>Plaque de plâtre standard 1200×2000</b>
+              <span class="muted">1200×2000 mm · 2,4 m²/pce</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-zwykla-2000">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="gk-impreg-2600" data-find="plaque de platre hydrofuge 1200×2600 gk-impreg-2600 panneaux">
+            <span class="mat-item">
+              <b>Plaque de plâtre hydrofuge 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/pce</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-impreg-2600">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gk-ogniowa-2600" data-find="plaque de platre coupe-feu 1200×2600 gk-ogniowa-2600 panneaux">
+            <span class="mat-item">
+              <b>Plaque de plâtre coupe-feu 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/pce</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-ogniowa-2600">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gk-gksf-2600" data-find="plaque de platre coupe-feu et hydrofuge (gkfi) 1200×2600 gk-gksf-2600 panneaux">
+            <span class="mat-item">
+              <b>Plaque de plâtre coupe-feu et hydrofuge (GKFI) 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/pce</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/carrelage-lames-gres/?m=gk-gksf-2600">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Panneau mélaminé pour meuble</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="plyta-lam-2800" data-find="panneau melamine pour meuble 2800×2070 plyta-lam-2800 panneaux">
+            <span class="mat-item">
+              <b>Panneau mélaminé pour meuble 2800×2070</b>
+              <span class="muted">2800×2070 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=plyta-lam-2800">Calculer</a>
+          </li><li id="plyta-lam-3660" data-find="panneau melamine pour meuble 3660×1830 plyta-lam-3660 panneaux">
+            <span class="mat-item">
+              <b>Panneau mélaminé pour meuble 3660×1830</b>
+              <span class="muted">3660×1830 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=plyta-lam-3660">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="mdf-2800" data-find="mdf brut 2800×2070 mdf-2800 panneaux">
+            <span class="mat-item">
+              <b>MDF brut 2800×2070</b>
+              <span class="muted">2800×2070 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=mdf-2800">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800 panneaux">
+            <span class="mat-item">
+              <b>HDF 2800×2070</b>
+              <span class="muted">2800×2070 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=hdf-2800">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="wior-surowa" data-find="agglomere brut 2800×2070 wior-surowa panneaux">
+            <span class="mat-item">
+              <b>Aggloméré brut 2800×2070</b>
+              <span class="muted">2800×2070 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=wior-surowa">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="mfp-2500" data-find="panneau mfp 2500×1250 mfp-2500 panneaux">
+            <span class="mat-item">
+              <b>Panneau MFP 2500×1250</b>
+              <span class="muted">2500×1250 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=mfp-2500">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-lisc" data-find="contreplaque de feuillu 2500×1250 sklejka-lisc panneaux">
+            <span class="mat-item">
+              <b>Contreplaqué de feuillu 2500×1250</b>
+              <span class="muted">2500×1250 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=sklejka-lisc">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-brzoza" data-find="contreplaque de bouleau 1525×1525 sklejka-brzoza panneaux">
+            <span class="mat-item">
+              <b>Contreplaqué de bouleau 1525×1525</b>
+              <span class="muted">1525×1525 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=sklejka-brzoza">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-wodo" data-find="contreplaque hydrofuge 3000×1500 sklejka-wodo panneaux">
+            <span class="mat-item">
+              <b>Contreplaqué hydrofuge 3000×1500</b>
+              <span class="muted">3000×1500 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=sklejka-wodo">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>OSB-3</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500 panneaux">
+            <span class="mat-item">
+              <b>OSB-3 2500×1250</b>
+              <span class="muted">2500×1250 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=osb3-2500">Calculer</a>
+          </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800 panneaux">
+            <span class="mat-item">
+              <b>OSB-3 2800×1250</b>
+              <span class="muted">2800×1250 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=osb3-2800">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="cetris-3350" data-find="panneau ciment-bois 3350×1250 cetris-3350 panneaux">
+            <span class="mat-item">
+              <b>Panneau ciment-bois 3350×1250</b>
+              <span class="muted">3350×1250 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=cetris-3350">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="fermacell-1500" data-find="plaque de fibres-gypse 1500×1000 fermacell-1500 panneaux">
+            <span class="mat-item">
+              <b>Plaque de fibres-gypse 1500×1000</b>
+              <span class="muted">1500×1000 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=fermacell-1500">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="szalunek-2000" data-find="contreplaque de coffrage 2000×1000 szalunek-2000 panneaux">
+            <span class="mat-item">
+              <b>Contreplaqué de coffrage 2000×1000</b>
+              <span class="muted">2000×1000 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=szalunek-2000">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blat-postform" data-find="plan de travail postforme 4100×600 blat-postform panneaux">
+            <span class="mat-item">
+              <b>Plan de travail postformé 4100×600</b>
+              <span class="muted">4100×600 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blat-postform">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blat-38-4100" data-find="plan de travail stratifie 38 mm · 4100×920 blat-38-4100 panneaux">
+            <span class="mat-item">
+              <b>Plan de travail stratifié 38 mm · 4100×920</b>
+              <span class="muted">4100×920 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blat-38-4100">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-WOOD">Bois</h2>
-        <ul class="mat-page-list"><li id="kantowka-45-3" data-find="bois equarri 45×45 · 3 m kantowka-45-3">
-          <span class="mat-item">
-            <b>Bois équarri 45×45 · 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=kantowka-45-3">Calculer</a>
-        </li><li id="lata-4x5-4" data-find="liteau 40×50 · 4 m lata-4x5-4">
-          <span class="mat-item">
-            <b>Liteau 40×50 · 4 m</b>
-            <span class="muted">barre entière 4 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=lata-4x5-4">Calculer</a>
-        </li><li id="krokiew-2" data-find="chevron 70×140 · 6 m krokiew-2">
-          <span class="mat-item">
-            <b>Chevron 70×140 · 6 m</b>
-            <span class="muted">barre entière 6 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=krokiew-2">Calculer</a>
-        </li><li id="deska-taras-3" data-find="lame de terrasse 3 m deska-taras-3">
-          <span class="mat-item">
-            <b>Lame de terrasse 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=deska-taras-3">Calculer</a>
-        </li><li id="deska-wpc-4" data-find="lame de terrasse en wpc 4 m deska-wpc-4">
-          <span class="mat-item">
-            <b>Lame de terrasse en WPC 4 m</b>
-            <span class="muted">barre entière 4 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=deska-wpc-4">Calculer</a>
-        </li><li id="deska-elew-3" data-find="lame de bardage 3 m deska-elew-3">
-          <span class="mat-item">
-            <b>Lame de bardage 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=deska-elew-3">Calculer</a>
-        </li><li id="sztacheta-1_5" data-find="latte de cloture 1,5 m sztacheta-1_5">
-          <span class="mat-item">
-            <b>Latte de clôture 1,5 m</b>
-            <span class="muted">barre entière 1,5 m · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=sztacheta-1_5">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-WOOD" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Bois</h2>
+            <span class="mat-count">7<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="kantowka-45-3" data-find="bois equarri 45×45 · 3 m kantowka-45-3 bois">
+            <span class="mat-item">
+              <b>Bois équarri 45×45 · 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=kantowka-45-3">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lata-4x5-4" data-find="liteau 40×50 · 4 m lata-4x5-4 bois">
+            <span class="mat-item">
+              <b>Liteau 40×50 · 4 m</b>
+              <span class="muted">barre entière 4 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=lata-4x5-4">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="krokiew-2" data-find="chevron 70×140 · 6 m krokiew-2 bois">
+            <span class="mat-item">
+              <b>Chevron 70×140 · 6 m</b>
+              <span class="muted">barre entière 6 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=krokiew-2">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-taras-3" data-find="lame de terrasse 3 m deska-taras-3 bois">
+            <span class="mat-item">
+              <b>Lame de terrasse 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=deska-taras-3">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-wpc-4" data-find="lame de terrasse en wpc 4 m deska-wpc-4 bois">
+            <span class="mat-item">
+              <b>Lame de terrasse en WPC 4 m</b>
+              <span class="muted">barre entière 4 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=deska-wpc-4">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-elew-3" data-find="lame de bardage 3 m deska-elew-3 bois">
+            <span class="mat-item">
+              <b>Lame de bardage 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=deska-elew-3">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sztacheta-1_5" data-find="latte de cloture 1,5 m sztacheta-1_5 bois">
+            <span class="mat-item">
+              <b>Latte de clôture 1,5 m</b>
+              <span class="muted">barre entière 1,5 m · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=sztacheta-1_5">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PROFILES">Ossature placo</h2>
-        <ul class="mat-page-list"><li id="cd60-3" data-find="fourrure de plafond cd60 3 m cd60-3">
-          <span class="mat-item">
-            <b>Fourrure de plafond CD60 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cd60-3">Calculer</a>
-        </li><li id="cd60-4" data-find="fourrure de plafond cd60 4 m cd60-4">
-          <span class="mat-item">
-            <b>Fourrure de plafond CD60 4 m</b>
-            <span class="muted">barre entière 4 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cd60-4">Calculer</a>
-        </li><li id="ud27-3" data-find="rail peripherique ud27 3 m ud27-3">
-          <span class="mat-item">
-            <b>Rail périphérique UD27 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=ud27-3">Calculer</a>
-        </li><li id="cw50-3" data-find="montant de cloison cw50 · 3 m cw50-3">
-          <span class="mat-item">
-            <b>Montant de cloison CW50 · 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cw50-3">Calculer</a>
-        </li><li id="uw50-3" data-find="montant de cloison uw50 · 3 m uw50-3">
-          <span class="mat-item">
-            <b>Montant de cloison UW50 · 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=uw50-3">Calculer</a>
-        </li><li id="cw75-3" data-find="montant de cloison cw75 · 3 m cw75-3">
-          <span class="mat-item">
-            <b>Montant de cloison CW75 · 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cw75-3">Calculer</a>
-        </li><li id="cw100-3" data-find="montant de cloison cw100 · 3 m cw100-3">
-          <span class="mat-item">
-            <b>Montant de cloison CW100 · 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cw100-3">Calculer</a>
-        </li><li id="ua50-3" data-find="montant de renfort ua50 · 3 m ua50-3">
-          <span class="mat-item">
-            <b>Montant de renfort UA50 · 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=ua50-3">Calculer</a>
-        </li><li id="ua75-3" data-find="montant de renfort ua75 · 3 m ua75-3">
-          <span class="mat-item">
-            <b>Montant de renfort UA75 · 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=ua75-3">Calculer</a>
-        </li><li id="narozny-alu-2_5" data-find="corniere d'angle en aluminium 2,5 m narozny-alu-2_5">
-          <span class="mat-item">
-            <b>Cornière d'angle en aluminium 2,5 m</b>
-            <span class="muted">barre entière 2,5 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=narozny-alu-2_5">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PROFILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Ossature placo</h2>
+            <span class="mat-count">10<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Fourrure de plafond CD60</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="cd60-3" data-find="fourrure de plafond cd60 3 m cd60-3 ossature placo">
+            <span class="mat-item">
+              <b>Fourrure de plafond CD60 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cd60-3">Calculer</a>
+          </li><li id="cd60-4" data-find="fourrure de plafond cd60 4 m cd60-4 ossature placo">
+            <span class="mat-item">
+              <b>Fourrure de plafond CD60 4 m</b>
+              <span class="muted">barre entière 4 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cd60-4">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="ud27-3" data-find="rail peripherique ud27 3 m ud27-3 ossature placo">
+            <span class="mat-item">
+              <b>Rail périphérique UD27 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=ud27-3">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Montant de cloison</h3>
+              <span class="mat-count">4<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="cw50-3" data-find="montant de cloison cw50 · 3 m cw50-3 ossature placo">
+            <span class="mat-item">
+              <b>Montant de cloison CW50 · 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cw50-3">Calculer</a>
+          </li><li id="uw50-3" data-find="montant de cloison uw50 · 3 m uw50-3 ossature placo">
+            <span class="mat-item">
+              <b>Montant de cloison UW50 · 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=uw50-3">Calculer</a>
+          </li><li id="cw75-3" data-find="montant de cloison cw75 · 3 m cw75-3 ossature placo">
+            <span class="mat-item">
+              <b>Montant de cloison CW75 · 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cw75-3">Calculer</a>
+          </li><li id="cw100-3" data-find="montant de cloison cw100 · 3 m cw100-3 ossature placo">
+            <span class="mat-item">
+              <b>Montant de cloison CW100 · 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=cw100-3">Calculer</a>
+          </li></ul>
+          </details>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Montant de renfort</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="ua50-3" data-find="montant de renfort ua50 · 3 m ua50-3 ossature placo">
+            <span class="mat-item">
+              <b>Montant de renfort UA50 · 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=ua50-3">Calculer</a>
+          </li><li id="ua75-3" data-find="montant de renfort ua75 · 3 m ua75-3 ossature placo">
+            <span class="mat-item">
+              <b>Montant de renfort UA75 · 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=ua75-3">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="narozny-alu-2_5" data-find="corniere d'angle en aluminium 2,5 m narozny-alu-2_5 ossature placo">
+            <span class="mat-item">
+              <b>Cornière d'angle en aluminium 2,5 m</b>
+              <span class="muted">barre entière 2,5 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=narozny-alu-2_5">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-METAL">Métal et fer à béton</h2>
-        <ul class="mat-page-list"><li id="blacha-stal" data-find="tole d'acier 2000×1000 blacha-stal">
-          <span class="mat-item">
-            <b>Tôle d'acier 2000×1000</b>
-            <span class="muted">2000×1000 mm · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blacha-stal">Calculer</a>
-        </li><li id="blacha-alu" data-find="tole d'aluminium 2500×1250 blacha-alu">
-          <span class="mat-item">
-            <b>Tôle d'aluminium 2500×1250</b>
-            <span class="muted">2500×1250 mm · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blacha-alu">Calculer</a>
-        </li><li id="blacha-ocynk" data-find="tole galvanisee 2000×1000 blacha-ocynk">
-          <span class="mat-item">
-            <b>Tôle galvanisée 2000×1000</b>
-            <span class="muted">2000×1000 mm · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blacha-ocynk">Calculer</a>
-        </li><li id="katownik-alu-2" data-find="corniere en aluminium 2 m katownik-alu-2">
-          <span class="mat-item">
-            <b>Cornière en aluminium 2 m</b>
-            <span class="muted">barre entière 2 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=katownik-alu-2">Calculer</a>
-        </li><li id="ceownik-stal-3" data-find="profile en u en acier 3 m ceownik-stal-3">
-          <span class="mat-item">
-            <b>Profilé en U en acier 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=ceownik-stal-3">Calculer</a>
-        </li><li id="profil-kwadr-3" data-find="tube carre 30×30 · 3 m profil-kwadr-3">
-          <span class="mat-item">
-            <b>Tube carré 30×30 · 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=profil-kwadr-3">Calculer</a>
-        </li><li id="pret-8-12" data-find="fer a beton ø8 · 12 m pret-8-12">
-          <span class="mat-item">
-            <b>Fer à béton Ø8 · 12 m</b>
-            <span class="muted">barre entière 12 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=pret-8-12">Calculer</a>
-        </li><li id="pret-10-12" data-find="fer a beton ø10 · 12 m pret-10-12">
-          <span class="mat-item">
-            <b>Fer à béton Ø10 · 12 m</b>
-            <span class="muted">barre entière 12 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=pret-10-12">Calculer</a>
-        </li><li id="pret-12-12" data-find="fer a beton ø12 · 12 m pret-12-12">
-          <span class="mat-item">
-            <b>Fer à béton Ø12 · 12 m</b>
-            <span class="muted">barre entière 12 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=pret-12-12">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-METAL" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Métal et fer à béton</h2>
+            <span class="mat-count">9<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="blacha-stal" data-find="tole d'acier 2000×1000 blacha-stal metal et fer a beton">
+            <span class="mat-item">
+              <b>Tôle d'acier 2000×1000</b>
+              <span class="muted">2000×1000 mm · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blacha-stal">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blacha-alu" data-find="tole d'aluminium 2500×1250 blacha-alu metal et fer a beton">
+            <span class="mat-item">
+              <b>Tôle d'aluminium 2500×1250</b>
+              <span class="muted">2500×1250 mm · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blacha-alu">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blacha-ocynk" data-find="tole galvanisee 2000×1000 blacha-ocynk metal et fer a beton">
+            <span class="mat-item">
+              <b>Tôle galvanisée 2000×1000</b>
+              <span class="muted">2000×1000 mm · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=blacha-ocynk">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="katownik-alu-2" data-find="corniere en aluminium 2 m katownik-alu-2 metal et fer a beton">
+            <span class="mat-item">
+              <b>Cornière en aluminium 2 m</b>
+              <span class="muted">barre entière 2 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=katownik-alu-2">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="ceownik-stal-3" data-find="profile en u en acier 3 m ceownik-stal-3 metal et fer a beton">
+            <span class="mat-item">
+              <b>Profilé en U en acier 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=ceownik-stal-3">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="profil-kwadr-3" data-find="tube carre 30×30 · 3 m profil-kwadr-3 metal et fer a beton">
+            <span class="mat-item">
+              <b>Tube carré 30×30 · 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=profil-kwadr-3">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Fer à béton</h3>
+              <span class="mat-count">3<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="pret-8-12" data-find="fer a beton ø8 · 12 m pret-8-12 metal et fer a beton">
+            <span class="mat-item">
+              <b>Fer à béton Ø8 · 12 m</b>
+              <span class="muted">barre entière 12 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=pret-8-12">Calculer</a>
+          </li><li id="pret-10-12" data-find="fer a beton ø10 · 12 m pret-10-12 metal et fer a beton">
+            <span class="mat-item">
+              <b>Fer à béton Ø10 · 12 m</b>
+              <span class="muted">barre entière 12 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=pret-10-12">Calculer</a>
+          </li><li id="pret-12-12" data-find="fer a beton ø12 · 12 m pret-12-12 metal et fer a beton">
+            <span class="mat-item">
+              <b>Fer à béton Ø12 · 12 m</b>
+              <span class="muted">barre entière 12 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=pret-12-12">Calculer</a>
+          </li></ul>
+          </details>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-GLASS">Verre et plastiques</h2>
-        <ul class="mat-page-list"><li id="plexi-3050" data-find="acrylique (pmma) 3050×2050 plexi-3050">
-          <span class="mat-item">
-            <b>Acrylique (PMMA) 3050×2050</b>
-            <span class="muted">3050×2050 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=plexi-3050">Calculer</a>
-        </li><li id="poliweglan" data-find="polycarbonate plein 3050×2050 poliweglan">
-          <span class="mat-item">
-            <b>Polycarbonate plein 3050×2050</b>
-            <span class="muted">3050×2050 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=poliweglan">Calculer</a>
-        </li><li id="poliweglan-kom" data-find="polycarbonate alveolaire 2100×6000 poliweglan-kom">
-          <span class="mat-item">
-            <b>Polycarbonate alvéolaire 2100×6000</b>
-            <span class="muted">2100×6000 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=poliweglan-kom">Calculer</a>
-        </li><li id="hpl" data-find="panneau compact hpl 3050×1300 hpl">
-          <span class="mat-item">
-            <b>Panneau compact HPL 3050×1300</b>
-            <span class="muted">3050×1300 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=hpl">Calculer</a>
-        </li><li id="dibond" data-find="dibond 3050×1500 dibond">
-          <span class="mat-item">
-            <b>Dibond 3050×1500</b>
-            <span class="muted">3050×1500 mm · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=dibond">Calculer</a>
-        </li><li id="pcv-spienione" data-find="pvc expanse 3050×1560 pcv-spienione">
-          <span class="mat-item">
-            <b>PVC expansé 3050×1560</b>
-            <span class="muted">3050×1560 mm · trait de scie 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=pcv-spienione">Calculer</a>
-        </li><li id="szklo-jumbo" data-find="verre float 3210×2250 szklo-jumbo">
-          <span class="mat-item">
-            <b>Verre float 3210×2250</b>
-            <span class="muted">3210×2250 mm · trait de scie 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=szklo-jumbo">Calculer</a>
-        </li><li id="szklo-2550" data-find="verre float 2550×1605 szklo-2550">
-          <span class="mat-item">
-            <b>Verre float 2550×1605</b>
-            <span class="muted">2550×1605 mm · trait de scie 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=szklo-2550">Calculer</a>
-        </li><li id="lustro-2550" data-find="miroir 2550×1605 lustro-2550">
-          <span class="mat-item">
-            <b>Miroir 2550×1605</b>
-            <span class="muted">2550×1605 mm · trait de scie 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=lustro-2550">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-GLASS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Verre et plastiques</h2>
+            <span class="mat-count">9<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="plexi-3050" data-find="acrylique (pmma) 3050×2050 plexi-3050 verre et plastiques">
+            <span class="mat-item">
+              <b>Acrylique (PMMA) 3050×2050</b>
+              <span class="muted">3050×2050 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=plexi-3050">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="poliweglan" data-find="polycarbonate plein 3050×2050 poliweglan verre et plastiques">
+            <span class="mat-item">
+              <b>Polycarbonate plein 3050×2050</b>
+              <span class="muted">3050×2050 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=poliweglan">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="poliweglan-kom" data-find="polycarbonate alveolaire 2100×6000 poliweglan-kom verre et plastiques">
+            <span class="mat-item">
+              <b>Polycarbonate alvéolaire 2100×6000</b>
+              <span class="muted">2100×6000 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=poliweglan-kom">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hpl" data-find="panneau compact hpl 3050×1300 hpl verre et plastiques">
+            <span class="mat-item">
+              <b>Panneau compact HPL 3050×1300</b>
+              <span class="muted">3050×1300 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=hpl">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="dibond" data-find="dibond 3050×1500 dibond verre et plastiques">
+            <span class="mat-item">
+              <b>Dibond 3050×1500</b>
+              <span class="muted">3050×1500 mm · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=dibond">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pcv-spienione" data-find="pvc expanse 3050×1560 pcv-spienione verre et plastiques">
+            <span class="mat-item">
+              <b>PVC expansé 3050×1560</b>
+              <span class="muted">3050×1560 mm · trait de scie 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=pcv-spienione">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Verre float</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="szklo-jumbo" data-find="verre float 3210×2250 szklo-jumbo verre et plastiques">
+            <span class="mat-item">
+              <b>Verre float 3210×2250</b>
+              <span class="muted">3210×2250 mm · trait de scie 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=szklo-jumbo">Calculer</a>
+          </li><li id="szklo-2550" data-find="verre float 2550×1605 szklo-2550 verre et plastiques">
+            <span class="mat-item">
+              <b>Verre float 2550×1605</b>
+              <span class="muted">2550×1605 mm · trait de scie 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=szklo-2550">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="lustro-2550" data-find="miroir 2550×1605 lustro-2550 verre et plastiques">
+            <span class="mat-item">
+              <b>Miroir 2550×1605</b>
+              <span class="muted">2550×1605 mm · trait de scie 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=lustro-2550">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TEXTILES">Tissu et tapisserie</h2>
-        <ul class="mat-page-list"><li id="tkanina-140" data-find="tissu au rouleau, laize 140 cm tkanina-140">
-          <span class="mat-item">
-            <b>Tissu au rouleau, laize 140 cm</b>
-            <span class="muted">1400×3000 mm · trait de scie 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=tkanina-140">Calculer</a>
-        </li><li id="tkanina-150" data-find="tissu au rouleau, laize 150 cm tkanina-150">
-          <span class="mat-item">
-            <b>Tissu au rouleau, laize 150 cm</b>
-            <span class="muted">1500×3000 mm · trait de scie 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=tkanina-150">Calculer</a>
-        </li><li id="ekoskora-140" data-find="simili cuir au rouleau, laize 140 cm ekoskora-140">
-          <span class="mat-item">
-            <b>Simili cuir au rouleau, laize 140 cm</b>
-            <span class="muted">1400×3000 mm · trait de scie 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=ekoskora-140">Calculer</a>
-        </li><li id="skora-nat" data-find="cuir naturel en peaux 2200×1200 skora-nat">
-          <span class="mat-item">
-            <b>Cuir naturel en peaux 2200×1200</b>
-            <span class="muted">2200×1200 mm · trait de scie 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=skora-nat">Calculer</a>
-        </li><li id="pianka-tap" data-find="bloc de mousse de tapisserie 2000×1200 pianka-tap">
-          <span class="mat-item">
-            <b>Bloc de mousse de tapisserie 2000×1200</b>
-            <span class="muted">2000×1200 mm · trait de scie 5 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=pianka-tap">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TEXTILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Tissu et tapisserie</h2>
+            <span class="mat-count">5<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Tissu au rouleau, laize</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="tkanina-140" data-find="tissu au rouleau, laize 140 cm tkanina-140 tissu et tapisserie">
+            <span class="mat-item">
+              <b>Tissu au rouleau, laize 140 cm</b>
+              <span class="muted">1400×3000 mm · trait de scie 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=tkanina-140">Calculer</a>
+          </li><li id="tkanina-150" data-find="tissu au rouleau, laize 150 cm tkanina-150 tissu et tapisserie">
+            <span class="mat-item">
+              <b>Tissu au rouleau, laize 150 cm</b>
+              <span class="muted">1500×3000 mm · trait de scie 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=tkanina-150">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="ekoskora-140" data-find="simili cuir au rouleau, laize 140 cm ekoskora-140 tissu et tapisserie">
+            <span class="mat-item">
+              <b>Simili cuir au rouleau, laize 140 cm</b>
+              <span class="muted">1400×3000 mm · trait de scie 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=ekoskora-140">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="skora-nat" data-find="cuir naturel en peaux 2200×1200 skora-nat tissu et tapisserie">
+            <span class="mat-item">
+              <b>Cuir naturel en peaux 2200×1200</b>
+              <span class="muted">2200×1200 mm · trait de scie 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=skora-nat">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pianka-tap" data-find="bloc de mousse de tapisserie 2000×1200 pianka-tap tissu et tapisserie">
+            <span class="mat-item">
+              <b>Bloc de mousse de tapisserie 2000×1200</b>
+              <span class="muted">2000×1200 mm · trait de scie 5 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-de-panneaux-2d/?m=pianka-tap">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-INSULATION">Isolation</h2>
-        <ul class="mat-page-list"><li id="welna-10" data-find="laine minerale 10 cm welna-10">
-          <span class="mat-item">
-            <b>Laine minérale 10 cm</b>
-            <span class="muted">botte ≈ 6 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=welna-10">Calculer</a>
-        </li><li id="welna-15" data-find="laine minerale 15 cm welna-15">
-          <span class="mat-item">
-            <b>Laine minérale 15 cm</b>
-            <span class="muted">botte ≈ 4,5 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=welna-15">Calculer</a>
-        </li><li id="welna-podd-20" data-find="laine pour combles 20 cm welna-podd-20">
-          <span class="mat-item">
-            <b>Laine pour combles 20 cm</b>
-            <span class="muted">botte ≈ 3,5 m² · 20 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=welna-podd-20">Calculer</a>
-        </li><li id="welna-fasada-15" data-find="laine pour facade 15 cm welna-fasada-15">
-          <span class="mat-item">
-            <b>Laine pour façade 15 cm</b>
-            <span class="muted">botte ≈ 2 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=welna-fasada-15">Calculer</a>
-        </li><li id="styropian-5" data-find="polystyrene expanse 5 cm styropian-5">
-          <span class="mat-item">
-            <b>Polystyrène expansé 5 cm</b>
-            <span class="muted">botte ≈ 3 m² · 5 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=styropian-5">Calculer</a>
-        </li><li id="styropian-fasada-10" data-find="pse de facade 10 cm styropian-fasada-10">
-          <span class="mat-item">
-            <b>PSE de façade 10 cm</b>
-            <span class="muted">botte ≈ 3 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=styropian-fasada-10">Calculer</a>
-        </li><li id="styropian-fasada-15" data-find="pse de facade 15 cm styropian-fasada-15">
-          <span class="mat-item">
-            <b>PSE de façade 15 cm</b>
-            <span class="muted">botte ≈ 2 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=styropian-fasada-15">Calculer</a>
-        </li><li id="styropian-podloga-10" data-find="pse de sol eps 100 · 10 cm styropian-podloga-10">
-          <span class="mat-item">
-            <b>PSE de sol EPS 100 · 10 cm</b>
-            <span class="muted">botte ≈ 3 m² · EPS 100 · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=styropian-podloga-10">Calculer</a>
-        </li><li id="xps-5" data-find="panneau xps 5 cm xps-5">
-          <span class="mat-item">
-            <b>Panneau XPS 5 cm</b>
-            <span class="muted">botte ≈ 5,5 m² · 5 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=xps-5">Calculer</a>
-        </li><li id="pir-10" data-find="panneau pir 10 cm pir-10">
-          <span class="mat-item">
-            <b>Panneau PIR 10 cm</b>
-            <span class="muted">botte ≈ 5,7 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=pir-10">Calculer</a>
-        </li><li id="papa-rolka" data-find="feutre bitumineux de sous-couche 20 m² papa-rolka">
-          <span class="mat-item">
-            <b>Feutre bitumineux de sous-couche 20 m²</b>
-            <span class="muted">botte ≈ 20 m² · 20 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=papa-rolka">Calculer</a>
-        </li><li id="folia-paro" data-find="pare-vapeur 75 m² folia-paro">
-          <span class="mat-item">
-            <b>Pare-vapeur 75 m²</b>
-            <span class="muted">botte ≈ 75 m² · 75 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=folia-paro">Calculer</a>
-        </li><li id="membrana-dach" data-find="ecran de sous-toiture 75 m² membrana-dach">
-          <span class="mat-item">
-            <b>Écran de sous-toiture 75 m²</b>
-            <span class="muted">botte ≈ 75 m² · 75 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=membrana-dach">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-INSULATION" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Isolation</h2>
+            <span class="mat-count">13<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Laine minérale</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="welna-10" data-find="laine minerale 10 cm welna-10 isolation">
+            <span class="mat-item">
+              <b>Laine minérale 10 cm</b>
+              <span class="muted">botte ≈ 6 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=welna-10">Calculer</a>
+          </li><li id="welna-15" data-find="laine minerale 15 cm welna-15 isolation">
+            <span class="mat-item">
+              <b>Laine minérale 15 cm</b>
+              <span class="muted">botte ≈ 4,5 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=welna-15">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="welna-podd-20" data-find="laine pour combles 20 cm welna-podd-20 isolation">
+            <span class="mat-item">
+              <b>Laine pour combles 20 cm</b>
+              <span class="muted">botte ≈ 3,5 m² · 20 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=welna-podd-20">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="welna-fasada-15" data-find="laine pour facade 15 cm welna-fasada-15 isolation">
+            <span class="mat-item">
+              <b>Laine pour façade 15 cm</b>
+              <span class="muted">botte ≈ 2 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=welna-fasada-15">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="styropian-5" data-find="polystyrene expanse 5 cm styropian-5 isolation">
+            <span class="mat-item">
+              <b>Polystyrène expansé 5 cm</b>
+              <span class="muted">botte ≈ 3 m² · 5 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=styropian-5">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>PSE de façade</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="styropian-fasada-10" data-find="pse de facade 10 cm styropian-fasada-10 isolation">
+            <span class="mat-item">
+              <b>PSE de façade 10 cm</b>
+              <span class="muted">botte ≈ 3 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=styropian-fasada-10">Calculer</a>
+          </li><li id="styropian-fasada-15" data-find="pse de facade 15 cm styropian-fasada-15 isolation">
+            <span class="mat-item">
+              <b>PSE de façade 15 cm</b>
+              <span class="muted">botte ≈ 2 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=styropian-fasada-15">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="styropian-podloga-10" data-find="pse de sol eps 100 · 10 cm styropian-podloga-10 isolation">
+            <span class="mat-item">
+              <b>PSE de sol EPS 100 · 10 cm</b>
+              <span class="muted">botte ≈ 3 m² · EPS 100 · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=styropian-podloga-10">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="xps-5" data-find="panneau xps 5 cm xps-5 isolation">
+            <span class="mat-item">
+              <b>Panneau XPS 5 cm</b>
+              <span class="muted">botte ≈ 5,5 m² · 5 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=xps-5">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pir-10" data-find="panneau pir 10 cm pir-10 isolation">
+            <span class="mat-item">
+              <b>Panneau PIR 10 cm</b>
+              <span class="muted">botte ≈ 5,7 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=pir-10">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="papa-rolka" data-find="feutre bitumineux de sous-couche 20 m² papa-rolka isolation">
+            <span class="mat-item">
+              <b>Feutre bitumineux de sous-couche 20 m²</b>
+              <span class="muted">botte ≈ 20 m² · 20 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=papa-rolka">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="folia-paro" data-find="pare-vapeur 75 m² folia-paro isolation">
+            <span class="mat-item">
+              <b>Pare-vapeur 75 m²</b>
+              <span class="muted">botte ≈ 75 m² · 75 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=folia-paro">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="membrana-dach" data-find="ecran de sous-toiture 75 m² membrana-dach isolation">
+            <span class="mat-item">
+              <b>Écran de sous-toiture 75 m²</b>
+              <span class="muted">botte ≈ 75 m² · 75 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/peinture-enduit-primaire/?m=membrana-dach">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PLUMBING">Plomberie et ventilation</h2>
-        <ul class="mat-page-list"><li id="rura-pp-4" data-find="tube pp 4 m rura-pp-4">
-          <span class="mat-item">
-            <b>Tube PP 4 m</b>
-            <span class="muted">barre entière 4 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-pp-4">Calculer</a>
-        </li><li id="rura-pex-3" data-find="tube per 3 m rura-pex-3">
-          <span class="mat-item">
-            <b>Tube PER 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-pex-3">Calculer</a>
-        </li><li id="rura-cu-3" data-find="tube de cuivre 3 m rura-cu-3">
-          <span class="mat-item">
-            <b>Tube de cuivre 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-cu-3">Calculer</a>
-        </li><li id="rura-spust-3" data-find="descente d'eau pluviale 3 m rura-spust-3">
-          <span class="mat-item">
-            <b>Descente d'eau pluviale 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-spust-3">Calculer</a>
-        </li><li id="kanal-went-1" data-find="gaine de ventilation 1 m kanal-went-1">
-          <span class="mat-item">
-            <b>Gaine de ventilation 1 m</b>
-            <span class="muted">barre entière 1 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=kanal-went-1">Calculer</a>
-        </li><li id="rura-kanal-110-2" data-find="tube d'evacuation pvc 110 · 2 m rura-kanal-110-2">
-          <span class="mat-item">
-            <b>Tube d'évacuation PVC 110 · 2 m</b>
-            <span class="muted">barre entière 2 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-kanal-110-2">Calculer</a>
-        </li><li id="rura-kanal-50-2" data-find="tube d'evacuation pvc 50 · 2 m rura-kanal-50-2">
-          <span class="mat-item">
-            <b>Tube d'évacuation PVC 50 · 2 m</b>
-            <span class="muted">barre entière 2 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-kanal-50-2">Calculer</a>
-        </li><li id="rynna-3" data-find="gouttiere 3 m rynna-3">
-          <span class="mat-item">
-            <b>Gouttière 3 m</b>
-            <span class="muted">barre entière 3 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rynna-3">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PLUMBING" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Plomberie et ventilation</h2>
+            <span class="mat-count">8<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="rura-pp-4" data-find="tube pp 4 m rura-pp-4 plomberie et ventilation">
+            <span class="mat-item">
+              <b>Tube PP 4 m</b>
+              <span class="muted">barre entière 4 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-pp-4">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-pex-3" data-find="tube per 3 m rura-pex-3 plomberie et ventilation">
+            <span class="mat-item">
+              <b>Tube PER 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-pex-3">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-cu-3" data-find="tube de cuivre 3 m rura-cu-3 plomberie et ventilation">
+            <span class="mat-item">
+              <b>Tube de cuivre 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-cu-3">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-spust-3" data-find="descente d'eau pluviale 3 m rura-spust-3 plomberie et ventilation">
+            <span class="mat-item">
+              <b>Descente d'eau pluviale 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-spust-3">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="kanal-went-1" data-find="gaine de ventilation 1 m kanal-went-1 plomberie et ventilation">
+            <span class="mat-item">
+              <b>Gaine de ventilation 1 m</b>
+              <span class="muted">barre entière 1 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=kanal-went-1">Calculer</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Tube d'évacuation PVC</h3>
+              <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="rura-kanal-110-2" data-find="tube d'evacuation pvc 110 · 2 m rura-kanal-110-2 plomberie et ventilation">
+            <span class="mat-item">
+              <b>Tube d'évacuation PVC 110 · 2 m</b>
+              <span class="muted">barre entière 2 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-kanal-110-2">Calculer</a>
+          </li><li id="rura-kanal-50-2" data-find="tube d'evacuation pvc 50 · 2 m rura-kanal-50-2 plomberie et ventilation">
+            <span class="mat-item">
+              <b>Tube d'évacuation PVC 50 · 2 m</b>
+              <span class="muted">barre entière 2 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rura-kanal-50-2">Calculer</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="rynna-3" data-find="gouttiere 3 m rynna-3 plomberie et ventilation">
+            <span class="mat-item">
+              <b>Gouttière 3 m</b>
+              <span class="muted">barre entière 3 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=rynna-3">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-ELECTRICAL">Électricité</h2>
-        <ul class="mat-page-list"><li id="korytko-2" data-find="chemin de cables 2 m korytko-2">
-          <span class="mat-item">
-            <b>Chemin de câbles 2 m</b>
-            <span class="muted">barre entière 2 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=korytko-2">Calculer</a>
-        </li><li id="listwa-kabel-2" data-find="goulotte de cables 2 m listwa-kabel-2">
-          <span class="mat-item">
-            <b>Goulotte de câbles 2 m</b>
-            <span class="muted">barre entière 2 m · trait de scie 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=listwa-kabel-2">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-ELECTRICAL" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Électricité</h2>
+            <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="korytko-2" data-find="chemin de cables 2 m korytko-2 electricite">
+            <span class="mat-item">
+              <b>Chemin de câbles 2 m</b>
+              <span class="muted">barre entière 2 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=korytko-2">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-kabel-2" data-find="goulotte de cables 2 m listwa-kabel-2 electricite">
+            <span class="mat-item">
+              <b>Goulotte de câbles 2 m</b>
+              <span class="muted">barre entière 2 m · trait de scie 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=listwa-kabel-2">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-OTHER">Autre</h2>
-        <ul class="mat-page-list"><li id="tapeta-standard" data-find="rouleau de papier peint 0,53×10 m tapeta-standard">
-          <span class="mat-item">
-            <b>Rouleau de papier peint 0,53×10 m</b>
-            <span class="muted">0,53×10 m · 5,3 m²/emballage</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/papier-peint/?m=tapeta-standard">Calculer</a>
-        </li><li id="karnisz-2_4" data-find="tringle / tube a rideaux 2,4 m karnisz-2_4">
-          <span class="mat-item">
-            <b>Tringle / tube à rideaux 2,4 m</b>
-            <span class="muted">barre entière 2,4 m · trait de scie 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=karnisz-2_4">Calculer</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-OTHER" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Autre</h2>
+            <span class="mat-count">2<span class="mat-count-w"> éléments</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="tapeta-standard" data-find="rouleau de papier peint 0,53×10 m tapeta-standard autre">
+            <span class="mat-item">
+              <b>Rouleau de papier peint 0,53×10 m</b>
+              <span class="muted">0,53×10 m · 5,3 m²/emballage</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/papier-peint/?m=tapeta-standard">Calculer</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="karnisz-2_4" data-find="tringle / tube a rideaux 2,4 m karnisz-2_4 autre">
+            <span class="mat-item">
+              <b>Tringle / tube à rideaux 2,4 m</b>
+              <span class="muted">barre entière 2,4 m · trait de scie 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/fr/calculateurs/decoupe-lineaire-1d/?m=karnisz-2_4">Calculer</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   </div>
+
+  <section class="block alt" id="matpage-own">
+    <div class="wrap narrow">
+      <h2>Tes matériaux</h2>
+      <p class="muted" data-omat-guest>
+        Connecte-toi pour ajouter tes propres matériaux et prix.
+        <a class="btn btn-ghost btn-sm" href="/app/">Se connecter</a>
+      </p>
+      <div data-omat-mine hidden>
+        <details class="mat-add">
+          <summary>Nouveau matériau</summary>
+          <form class="card omat-form" data-omat-form>
+        
+        <label class="field">
+          <span class="fld-label">Nom</span>
+          <input type="text" maxlength="120" placeholder="p. ex. Grès 60×60 de mon fournisseur" data-omat-in="name" required>
+        </label>
+        <div class="omat-row">
+          <label class="field">
+            <span class="fld-label">À quoi il sert</span>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Revêtements de murs et de sols</option><option value="DRYWALL_BOARDING">Construction en placo</option><option value="COATING">Matériaux que l'on applique</option><option value="PANEL_CUTTING">Découpe de panneaux et de plaques</option><option value="LINEAR_STOCK">Profilés, moulures, tubes, barres</option></select>
+          </label>
+          <label class="field">
+            <span class="fld-label">Catégorie</span>
+            <select data-omat-in="category"><option value="TILES">Carrelage</option><option value="FLOORING">Revêtements de sol</option><option value="TRIM">Moulures et finitions</option><option value="PAINT">Peintures et vernis</option><option value="CHEMICALS">Chimie du bâtiment</option><option value="BOARDS">Panneaux</option><option value="WOOD">Bois</option><option value="PROFILES">Ossature placo</option><option value="METAL">Métal et fer à béton</option><option value="GLASS">Verre et plastiques</option><option value="TEXTILES">Tissu et tapisserie</option><option value="INSULATION">Isolation</option><option value="PLUMBING">Plomberie et ventilation</option><option value="ELECTRICAL">Électricité</option><option value="OTHER">Autre</option></select>
+          </label>
+        </div>
+        <div class="omat-fields" data-omat-group="WALL_FLOOR_COVERING">
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Largeur (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Longueur (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="packageAreaM2">
+              <span class="fld-label">Surface par emballage (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="packageAreaM2">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Marge (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="DRYWALL_BOARDING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Largeur (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Longueur (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Marge (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="COATING" hidden>
+            <label class="field omat-f" data-omat-f="coveragePerUnitM2">
+              <span class="fld-label">Rendement par emballage (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="coveragePerUnitM2">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="PANEL_CUTTING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Largeur (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Longueur (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Trait de scie (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="LINEAR_STOCK" hidden>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Longueur (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Trait de scie (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+        <label class="field">
+          <span class="fld-label">Prix par emballage</span>
+          <input type="text" inputmode="decimal" data-omat-in="priceMajor">
+        </label>
+        <p class="muted">Un prix garde la devise dans laquelle il a été saisi. Rien n'est converti à un taux.</p>
+        <button type="submit" class="btn btn-primary btn-block">Enregistrer le matériau</button>
+        
+        <p class="omat-err" data-omat-err role="alert" hidden></p>
+      </form>
+        </details>
+        <div data-omat-list data-hist-label="Historique des prix"></div>
+        <p class="muted" data-omat-empty>Tu n'as pas encore de matériaux à toi.</p>
+        <p class="ws-undo" data-omat-undo role="status" hidden></p>
+        <p class="muted">Un matériau de cette liste se choisit dans un calculateur comme une entrée du catalogue.</p>
+      </div>
+    </div>
+  </section>
 
   <section class="block app-note" aria-labelledby="appnote-h">
     <div class="wrap">
@@ -2177,6 +2609,8 @@
 
 <script src="/assets/materials.js?v=20260902a"></script>
 <script src="/assets/materials-ui.js?v=20260902a"></script>
+<script src="/assets/own-materials.js?v=20260902a"></script>
+<script src="/assets/own-materials-ui.js?v=20260902a"></script>
 <script src="/assets/main.js?v=20260902a"></script>
 
 </body>

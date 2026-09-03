@@ -736,30 +736,77 @@ export function guideMain(guide, lang, t) {
  *
  * @param {object} cat  the catalogue bridge built in scripts/build.mjs
  */
-export function materialsMain(lang, t, cat) {
+export function materialsMain(lang, t, cat, aisles, copy) {
+  const c = (key) => copy[key];
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("matpage_title"), path: urlMaterials(lang) },
   ]);
 
-  const blocks = cat.categories.map((c) => {
-    const rows = cat.byCategory(c).map((m) => {
-      const name = cat.name(m, lang, t);
-      const calcId = cat.primary(m);
-      const href = calcId ? `${urlCalc(lang, calcId)}?m=${encodeURIComponent(m.id)}` : urlCalcIndex(lang);
-      return `<li id="${esc(m.id)}" data-find="${esc(cat.fold(`${name} ${m.id}`))}">
-          <span class="mat-item">
-            <b>${esc(name)}</b>
-            <span class="muted">${esc(cat.note(m, lang, t))}</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="${href}">${esc(t("mat_open_calc"))}</a>
-        </li>`;
-    }).join("");
+  /**
+   * One material, the row it has always been: the name, the spec line and the calculator.
+   *
+   * The haystack carries the aisle as well as the name. "Płytki" is the word somebody
+   * types when they want the tiles, and it is on no material: the catalogue calls them
+   * "Gres 60×60" and "Glazura 30×60", one term each, and the aisle is the only place the
+   * plural anybody searches for is written down.
+   */
+  const row = (m, aisleName) => {
+    const name = cat.name(m, lang, t);
+    const calcId = cat.primary(m);
+    const href = calcId ? `${urlCalc(lang, calcId)}?m=${encodeURIComponent(m.id)}` : urlCalcIndex(lang);
+    return `<li id="${esc(m.id)}" data-find="${esc(cat.fold(`${name} ${m.id} ${aisleName}`))}">
+            <span class="mat-item">
+              <b>${esc(name)}</b>
+              <span class="muted">${esc(cat.note(m, lang, t))}</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="${href}">${esc(t("mat_open_calc"))}</a>
+          </li>`;
+  };
+
+  // The number beside a heading. The word after it is for a screen reader — "Gres, 10"
+  // is a heading and a number, and only the word says what the number counts. The
+  // stylesheet takes the word off the screen, where the layout says it already.
+  const badge = (n) =>
+    `<span class="mat-count">${n}<span class="mat-count-w"> ${esc(t("mat_items_label"))}</span></span>`;
+
+  const blocks = cat.categories.map((aisle) => {
+    const aisleName = t(`cat_${aisle}`);
+    // Sizes of one thing belong together: eleven rows of porcelain tile are one entry a
+    // fitter opens, not eleven rows to scroll past. The order is the catalogue's own —
+    // the group takes the place of the first material that carries its term.
+    const groups = [];
+    const byTerm = new Map();
+    for (const m of cat.byCategory(aisle)) {
+      if (!byTerm.has(m.t)) { byTerm.set(m.t, { term: m.t, items: [] }); groups.push(byTerm.get(m.t)); }
+      byTerm.get(m.t).items.push(m);
+    }
+    const total = groups.reduce((n, g) => n + g.items.length, 0);
+
+    const body = groups.map((g) => {
+      // A term with one size behind it is a row, not a drawer. Wrapping it would cost a
+      // click to reach a single line and would say "1" beside every other heading.
+      if (g.items.length === 1) return `<ul class="mat-page-list mat-solo">${row(g.items[0], aisleName)}</ul>`;
+      return `<details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>${esc(t(g.term))}</h3>
+              ${badge(g.items.length)}
+            </summary>
+            <ul class="mat-page-list">${g.items.map((m) => row(m, aisleName)).join("")}</ul>
+          </details>`;
+    }).join("\n          ");
 
     return `<section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-${c}">${esc(t(`cat_${c}`))}</h2>
-        <ul class="mat-page-list">${rows}</ul>
+        <details class="mat-cat" id="cat-${aisle}" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>${esc(t(`cat_${aisle}`))}</h2>
+            ${badge(total)}
+          </summary>
+          <div class="mat-groups">
+          ${body}
+          </div>
+        </details>
       </div>
     </section>`;
   }).join("\n  ");
@@ -778,12 +825,19 @@ export function materialsMain(lang, t, cat) {
       <div class="wrap">
         <label class="fld-label" for="matpage-search">${esc(t("mat_search_ph"))}</label>
         <input id="matpage-search" type="search" class="mat-search" placeholder="${esc(t("mat_search_ph"))}" autocomplete="off">
+        <p class="mat-tools">
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-expand>${esc(t("matpage_expand"))}</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-collapse>${esc(t("matpage_collapse"))}</button>
+        </p>
         <p class="muted mt-3">${cat.total} ${esc(t("mat_count_label"))} · ${esc(t("matpage_note"))}</p>
+        <p class="muted" id="matpage-count" role="status" hidden></p>
         <p class="muted" id="matpage-empty" hidden>${esc(t("mat_none"))}</p>
       </div>
     </section>
     ${blocks}
   </div>
+
+  ${ownMaterialsBlock(t, aisles, c)}
 
   ${appNote(t)}
 </main>`;
@@ -800,6 +854,39 @@ export function materialsMain(lang, t, cat) {
     })),
   }];
   return { main, ld };
+}
+
+/**
+ * "Your materials" on the catalogue page: the same store as /moje-materialy/, behind
+ * the sign-in the owner asked for.
+ *
+ * The guest half is what the document ships with, and assets/materials-ui.js swaps the
+ * two on `lmSignedIn()` — so a visitor with no JavaScript is offered the sign-in rather
+ * than a form whose rows would live in one browser and nowhere else. That hint can be
+ * stale (assets/account.js says so), and it may be: nothing here is a gate on counting
+ * or on saving, only on which of two blocks the page shows. /moje-materialy/ stays open
+ * to everybody and is where the whole screen, the prices and the history live.
+ */
+function ownMaterialsBlock(t, aisles, c) {
+  return `<section class="block alt" id="matpage-own">
+    <div class="wrap narrow">
+      <h2>${esc(c("omat_list_t"))}</h2>
+      <p class="muted" data-omat-guest>
+        ${esc(c("omat_guest_note"))}
+        <a class="btn btn-ghost btn-sm" href="${URL_APP}">${esc(c("omat_signin"))}</a>
+      </p>
+      <div data-omat-mine hidden>
+        <details class="mat-add">
+          <summary>${esc(c("omat_add_t"))}</summary>
+          ${omatForm(t, aisles, c)}
+        </details>
+        <div data-omat-list data-hist-label="${esc(c("omat_hist_t"))}"></div>
+        <p class="muted" data-omat-empty>${esc(t("omat_empty"))}</p>
+        <p class="ws-undo" data-omat-undo role="status" hidden></p>
+        <p class="muted">${esc(c("omat_use_note"))}</p>
+      </div>
+    </div>
+  </section>`;
 }
 
 /* ------------------------------------------------------------------ cookies */
@@ -2670,42 +2757,31 @@ export function storesMain(lang, t) {
 /* ------------------------------------------------------------------ /moje-materialy/ */
 
 /**
- * The visitor's own materials and what they pay for them (session 59, item C6 of the
- * parity audit). The app has had this screen since before the site existed; the browser
- * had nothing, and the rows were outside the sync contract until the same session put
- * `users/{uid}/materials` in it.
- *
- * Everything a reader needs is in the markup, `hidden` where it does not apply, and
- * assets/own-materials-ui.js unhides and fills it — the rule proGate() has followed since
- * session 27: a form built by a script is a form that flashes into existence, and a page
- * whose whole body is written at runtime says nothing to a crawler or to somebody with no
- * JavaScript.
- *
- * The five field groups are all in the document at once and the script shows the one the
- * chosen application uses. There are eleven inputs between them and only the six that
- * apply are ever read: `omMeasures()` in the store nulls out the rest, so a covering
- * turned into a profile cannot keep a package area nothing will read.
+ * The five applications, their labels and the fields each one uses. The ids are the
+ * app's own MaterialApplication names — the wire carries the enum name, so a sixth
+ * invented here would reach the phone as whatever its fallback is.
  */
-export function ownMaterialsMain(lang, t, aisles, copy) {
-  const c = (key) => copy[key];
-  const crumbs = breadcrumbs([
-    { name: t("bc_home"), path: urlHome(lang) },
-    { name: t("nav_materials"), path: urlMaterials(lang) },
-    { name: t("omatpage_title"), path: urlOwnMaterials(lang) },
-  ]);
+const OMAT_APPS = [
+  ["WALL_FLOOR_COVERING", ["widthMm", "lengthMm", "packageAreaM2", "wastePercent"]],
+  ["DRYWALL_BOARDING", ["widthMm", "lengthMm", "wastePercent"]],
+  ["COATING", ["coveragePerUnitM2"]],
+  ["PANEL_CUTTING", ["widthMm", "lengthMm", "kerfMm"]],
+  ["LINEAR_STOCK", ["lengthMm", "kerfMm"]],
+];
 
-  // The five applications, their labels and the fields each one uses. The ids are the
-  // app's own MaterialApplication names — the wire carries the enum name, so a sixth
-  // invented here would reach the phone as whatever its fallback is.
-  const APPS = [
-    ["WALL_FLOOR_COVERING", ["widthMm", "lengthMm", "packageAreaM2", "wastePercent"]],
-    ["DRYWALL_BOARDING", ["widthMm", "lengthMm", "wastePercent"]],
-    ["COATING", ["coveragePerUnitM2"]],
-    ["PANEL_CUTTING", ["widthMm", "lengthMm", "kerfMm"]],
-    ["LINEAR_STOCK", ["lengthMm", "kerfMm"]],
-  ];
-
-  const appOpts = APPS
+/**
+ * The "new material" form, written once and rendered on both pages that offer it:
+ * /moje-materialy/ and the "your materials" block on the catalogue page.
+ *
+ * assets/own-materials-ui.js finds it by `data-omat-form` and knows nothing about which
+ * page it is on, so the two cannot drift apart — the defect a second copy of eleven
+ * inputs invites. `heading` is the only difference between them: the catalogue page puts
+ * the form inside a disclosure whose summary already carries the name.
+ *
+ * @param {(key: string) => string} c  the build-time copy of src/omat-copy.mjs
+ */
+function omatForm(t, aisles, c, heading = false) {
+  const appOpts = OMAT_APPS
     .map(([id], i) => `<option value="${esc(id)}"${i === 0 ? " selected" : ""}>${esc(c(`omat_app_${id}`))}</option>`)
     .join("");
 
@@ -2715,24 +2791,13 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
             </label>`;
 
   // One group per application, all in the document, all but the first hidden.
-  const groups = APPS.map(([id, fields], i) =>
+  const groups = OMAT_APPS.map(([id, fields], i) =>
     `<div class="omat-fields" data-omat-group="${esc(id)}"${i === 0 ? "" : " hidden"}>
             ${fields.map(measureField).join("\n            ")}
           </div>`).join("\n          ");
 
-  const main = `<main id="main" tabindex="-1">
-  <section class="block page-head">
-    <div class="wrap">
-      ${crumbs.nav}
-      <h1>${esc(t("omatpage_title"))}</h1>
-      <p class="lead">${esc(c("omatpage_lead"))}</p>
-    </div>
-  </section>
-
-  <section class="block alt">
-    <div class="wrap narrow">
-      <form class="card omat-form" data-omat-form>
-        <h2>${esc(c("omat_add_t"))}</h2>
+  return `<form class="card omat-form" data-omat-form>
+        ${heading ? `<h2>${esc(c("omat_add_t"))}</h2>` : ""}
         <label class="field">
           <span class="fld-label">${esc(c("omat_name"))}</span>
           <input type="text" maxlength="120" placeholder="${esc(c("omat_name_ph"))}" data-omat-in="name" required>
@@ -2759,7 +2824,46 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
         <!-- Written by the script when a name is missing; empty and announced, so a
              refusal reaches somebody who cannot see the field turn red. -->
         <p class="omat-err" data-omat-err role="alert" hidden></p>
-      </form>
+      </form>`;
+}
+
+/**
+ * The visitor's own materials and what they pay for them (session 59, item C6 of the
+ * parity audit). The app has had this screen since before the site existed; the browser
+ * had nothing, and the rows were outside the sync contract until the same session put
+ * `users/{uid}/materials` in it.
+ *
+ * Everything a reader needs is in the markup, `hidden` where it does not apply, and
+ * assets/own-materials-ui.js unhides and fills it — the rule proGate() has followed since
+ * session 27: a form built by a script is a form that flashes into existence, and a page
+ * whose whole body is written at runtime says nothing to a crawler or to somebody with no
+ * JavaScript.
+ *
+ * The five field groups are all in the document at once and the script shows the one the
+ * chosen application uses. There are eleven inputs between them and only the six that
+ * apply are ever read: `omMeasures()` in the store nulls out the rest, so a covering
+ * turned into a profile cannot keep a package area nothing will read.
+ */
+export function ownMaterialsMain(lang, t, aisles, copy) {
+  const c = (key) => copy[key];
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("nav_materials"), path: urlMaterials(lang) },
+    { name: t("omatpage_title"), path: urlOwnMaterials(lang) },
+  ]);
+
+  const main = `<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("omatpage_title"))}</h1>
+      <p class="lead">${esc(c("omatpage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      ${omatForm(t, aisles, c, true)}
     </div>
   </section>
 

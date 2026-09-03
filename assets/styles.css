@@ -1157,7 +1157,41 @@ a.chip:hover { text-decoration: none; }
   background: var(--accent-soft); border-radius: var(--radius-xs);
   padding: var(--sp-2) var(--sp-3); margin: 0 0 var(--sp-3);
 }
-/* The same catalogue as a page: one indexable row per material. */
+/* The same catalogue as a page: one indexable row per material, inside two disclosures.
+   The tree is what a shop aisle looks like — the aisle, then the kind of material, then
+   the sizes — and the page opens with all of it shut, so 160 rows are a list of fifteen
+   headings until somebody asks for one. */
+.mat-cat {
+  background: var(--surface); border: 1px solid var(--outline);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow-2); overflow: hidden;
+}
+.mat-cat-head, .mat-grp-head {
+  cursor: pointer; list-style: none; display: flex; align-items: center;
+  justify-content: space-between; gap: var(--sp-3);
+}
+.mat-cat-head::-webkit-details-marker, .mat-grp-head::-webkit-details-marker { display: none; }
+.mat-cat-head { padding: var(--sp-4) var(--sp-5); }
+.mat-cat-head h2 { margin: 0; font-size: var(--fs-lg); }
+.mat-cat-head::after, .mat-grp-head::after {
+  content: "+"; font-size: var(--fs-xl); color: var(--accent-strong);
+  font-weight: var(--fw-bold); line-height: 1; transition: transform var(--dur) var(--ease);
+}
+.mat-cat[open] > .mat-cat-head::after, .mat-grp[open] > .mat-grp-head::after { transform: rotate(45deg); }
+.mat-groups { display: grid; gap: var(--sp-2); padding: 0 var(--sp-5) var(--sp-4); }
+.mat-grp {
+  background: var(--surface-alt); border: 1px solid var(--outline);
+  border-radius: var(--radius-xs); overflow: hidden;
+}
+.mat-grp-head { padding: var(--sp-3) var(--sp-4); }
+.mat-grp-head h3 { margin: 0; font-size: var(--fs-base); }
+.mat-grp .mat-page-list { padding: 0 var(--sp-3) var(--sp-3); }
+/* The number beside a heading. The word after it is for a screen reader only: on the
+   screen the list under the heading says what is being counted. */
+.mat-count { flex: none; color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+.mat-count-w { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.mat-tools { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-3) 0 0; }
+.mat-add summary { cursor: pointer; font-weight: var(--fw-semi); }
+.mat-add { margin-bottom: var(--sp-4); }
 .mat-page-list { display: grid; gap: var(--sp-2); }
 .mat-page-list li { justify-content: space-between; gap: var(--sp-4); scroll-margin-top: calc(var(--header-h) + var(--sp-4)); }
 .mat-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }

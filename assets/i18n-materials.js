@@ -110,6 +110,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Wszystkie materiały, którymi LiczMat wypełnia kalkulatory: wymiary, wydajność opakowania i domyślny zapas. Wybierz materiał, żeby policzyć go w kalkulatorze.",
     matpage_meta: "Katalog materiałów budowlanych: płytki, panele, farby, tynki, kleje i izolacja. Wymiary, wydajność opakowania i zapas — dane, którymi LiczMat liczy.",
     matpage_note: "Wartości są typowe i różnią się między producentami. Po wstawieniu do kalkulatora każdą można poprawić.",
+    mat_items_label: "pozycji",
+    mat_found_label: "pasujących materiałów",
+    matpage_expand: "Rozwiń wszystko",
+    matpage_collapse: "Zwiń wszystko",
   },
 
   en: {
@@ -204,6 +208,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Every material LiczMat fills the calculators with: dimensions, coverage per package and the default waste allowance. Pick one to calculate it.",
     matpage_meta: "Building material catalogue: tiles, flooring, paints, renders, adhesives and insulation. Dimensions, coverage per package and waste — the data LiczMat fills in.",
     matpage_note: "The values are typical and vary between manufacturers. Every one can be edited after it lands in the calculator.",
+    mat_items_label: "items",
+    mat_found_label: "matching materials",
+    matpage_expand: "Expand all",
+    matpage_collapse: "Collapse all",
   },
 
   de: {
@@ -298,6 +306,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Alle Materialien, mit denen LiczMat die Rechner füllt: Maße, Ergiebigkeit je Gebinde und der voreingestellte Verschnitt. Material wählen und rechnen.",
     matpage_meta: "Baustoffkatalog: Fliesen, Bodenbeläge, Farben, Putze, Kleber und Dämmung. Maße, Ergiebigkeit je Gebinde und Verschnitt — die Daten, mit denen LiczMat rechnet.",
     matpage_note: "Die Werte sind typisch und je Hersteller verschieden. Nach dem Übernehmen lässt sich jeder Wert im Rechner ändern.",
+    mat_items_label: "Einträge",
+    mat_found_label: "passende Materialien",
+    matpage_expand: "Alle ausklappen",
+    matpage_collapse: "Alle einklappen",
   },
 
   uk: {
@@ -392,6 +404,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Усі матеріали, якими LiczMat заповнює калькулятори: розміри, витрата пакування і типовий запас. Вибери матеріал і порахуй його.",
     matpage_meta: "Каталог будівельних матеріалів: плитка, підлоги, фарби, штукатурки, клеї та ізоляція. Розміри, витрата пакування і запас — дані, якими LiczMat заповнює форму.",
     matpage_note: "Значення типові й відрізняються у різних виробників. Після підстановки в калькулятор кожне можна змінити.",
+    mat_items_label: "позицій",
+    mat_found_label: "відповідних матеріалів",
+    matpage_expand: "Розгорнути все",
+    matpage_collapse: "Згорнути все",
   },
 
   cs: {
@@ -569,6 +585,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Všechny materiály, kterými LiczMat vyplňuje kalkulačky: rozměry, vydatnost balení a výchozí prořez. Vyberte materiál a spočítejte ho.",
     matpage_meta: "Katalog stavebních materiálů: obklady, podlahy, barvy, omítky, lepidla a izolace. Rozměry, vydatnost balení a prořez — data, kterými LiczMat vyplňuje formulář.",
     matpage_note: "Hodnoty jsou typické a liší se podle výrobce. Po vložení do kalkulačky lze každou upravit.",
+    mat_items_label: "položek",
+    mat_found_label: "odpovídajících materiálů",
+    matpage_expand: "Rozbalit vše",
+    matpage_collapse: "Sbalit vše",
   },
 
   sk: {
@@ -746,6 +766,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Všetky materiály, ktorými LiczMat vypĺňa kalkulačky: rozmery, výdatnosť balenia a predvolený prierez. Vyberte materiál a spočítajte ho.",
     matpage_meta: "Katalóg stavebných materiálov: obklady, podlahy, farby, omietky, lepidlá a izolácie. Rozmery, výdatnosť balenia a prierez — dáta, ktorými LiczMat počíta.",
     matpage_note: "Hodnoty sú typické a líšia sa podľa výrobcu. Po vložení do kalkulačky sa dá každá upraviť.",
+    mat_items_label: "položiek",
+    mat_found_label: "zodpovedajúcich materiálov",
+    matpage_expand: "Rozbaliť všetko",
+    matpage_collapse: "Zbaliť všetko",
   },
 
   ro: {
@@ -923,6 +947,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Toate materialele cu care LiczMat completează calculatoarele: dimensiuni, randament pe ambalaj și pierderea implicită. Alege un material și calculează-l.",
     matpage_meta: "Catalog de materiale: gresie, parchet, vopsele, tencuieli, adezivi și izolații. Dimensiuni, randament pe ambalaj și pierderi — datele cu care LiczMat lucrează.",
     matpage_note: "Valorile sunt orientative și diferă de la un producător la altul. După completare, fiecare poate fi modificată în calculator.",
+    mat_items_label: "poziții",
+    mat_found_label: "materiale potrivite",
+    matpage_expand: "Extinde tot",
+    matpage_collapse: "Restrânge tot",
   },
 
   hr: {
@@ -1100,6 +1128,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Svi materijali kojima LiczMat popunjava kalkulatore: dimenzije, izdašnost pakiranja i zadani otpad. Odaberi materijal i izračunaj ga.",
     matpage_meta: "Katalog građevinskih materijala: pločice, podovi, boje, žbuke, ljepila i izolacija. Dimenzije, izdašnost pakiranja i otpad — podaci kojima LiczMat računa.",
     matpage_note: "Vrijednosti su tipične i razlikuju se ovisno o proizvođaču. Nakon unosa u kalkulator svaku se može promijeniti.",
+    mat_items_label: "stavki",
+    mat_found_label: "odgovarajućih materijala",
+    matpage_expand: "Proširi sve",
+    matpage_collapse: "Sažmi sve",
   },
 
   sr: {
@@ -1277,6 +1309,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Svi materijali kojima LiczMat popunjava kalkulatore: dimenzije, izdašnost pakovanja i podrazumevani otpad. Izaberi materijal i izračunaj ga.",
     matpage_meta: "Katalog građevinskih materijala: pločice, podovi, boje, malteri, lepkovi i izolacija. Dimenzije, izdašnost pakovanja i otpad — podaci kojima LiczMat računa.",
     matpage_note: "Vrednosti su tipične i razlikuju se po proizvođaču. Nakon unosa u kalkulator svaka se može izmeniti.",
+    mat_items_label: "stavki",
+    mat_found_label: "odgovarajućih materijala",
+    matpage_expand: "Proširi sve",
+    matpage_collapse: "Skupi sve",
   },
 
   it: {
@@ -1454,6 +1490,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Tutti i materiali con cui LiczMat riempie i calcolatori: misure, resa della confezione e scorta predefinita. Scegline uno per calcolarlo.",
     matpage_meta: "Catalogo dei materiali edili: piastrelle, pavimenti, pitture, intonaci, colle e isolamenti. Misure, resa e scorta — i dati che LiczMat inserisce.",
     matpage_note: "I valori sono indicativi e cambiano da un produttore all'altro. Ognuno si può modificare dopo essere finito nel calcolatore.",
+    mat_items_label: "elementi",
+    mat_found_label: "materiali corrispondenti",
+    matpage_expand: "Espandi tutto",
+    matpage_collapse: "Comprimi tutto",
   },
   nl: {
     m_gres: "Keramische tegel",
@@ -1630,6 +1670,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Elk materiaal waarmee LiczMat de rekenmachines vult: maten, rendement per verpakking en de standaardmarge. Kies er een om het uit te rekenen.",
     matpage_meta: "Catalogus van bouwmaterialen: tegels, vloeren, verf, pleister, lijm en isolatie. Maten, rendement per verpakking en marge — de gegevens die LiczMat invult.",
     matpage_note: "De waarden zijn gebruikelijk en verschillen per fabrikant. Elke waarde is aan te passen zodra ze in de rekenmachine staat.",
+    mat_items_label: "items",
+    mat_found_label: "passende materialen",
+    matpage_expand: "Alles uitklappen",
+    matpage_collapse: "Alles inklappen",
   },
   es: {
     m_gres: "Gres porcelánico",
@@ -1806,6 +1850,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Todos los materiales con los que LiczMat rellena las calculadoras: medidas, rendimiento por envase y merma por defecto. Elige uno para calcularlo.",
     matpage_meta: "Catálogo de materiales de obra: azulejos, suelos, pinturas, revocos, adhesivos y aislamiento. Medidas, rendimiento y merma — los datos de LiczMat.",
     matpage_note: "Los valores son los habituales y cambian según el fabricante. Cada uno se puede editar una vez está en la calculadora.",
+    mat_items_label: "elementos",
+    mat_found_label: "materiales coincidentes",
+    matpage_expand: "Expandir todo",
+    matpage_collapse: "Contraer todo",
   },
   fr: {
     m_gres: "Grès cérame",
@@ -1982,6 +2030,10 @@ const I18N_MATERIALS = {
     matpage_lead: "Tous les matériaux avec lesquels LiczMat remplit les calculateurs : dimensions, rendement par emballage et marge par défaut. Choisis-en un pour le calculer.",
     matpage_meta: "Catalogue des matériaux : carrelage, sols, peintures, enduits, colles et isolation. Dimensions, rendement et marge — les données que LiczMat remplit.",
     matpage_note: "Les valeurs sont courantes et varient selon le fabricant. Chacune reste modifiable une fois dans le calculateur.",
+    mat_items_label: "éléments",
+    mat_found_label: "matériaux correspondants",
+    matpage_expand: "Tout développer",
+    matpage_collapse: "Tout réduire",
   },
 };
 

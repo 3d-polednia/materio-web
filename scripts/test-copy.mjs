@@ -419,11 +419,22 @@ head("§7 how much prose a page carries");
  * table of every store this site writes, one row each, and session 59 added a store: the
  * row names the key and says what is in it. A budget that refused the row would be asking
  * for a store nobody can look up, which is the opposite of what the page is for.
+ *
+ * `materials` went from 2501 to 2820 when the catalogue page became a tree with the
+ * visitor's own materials on it. The catalogue rows are the same rows. What is new is a
+ * heading per kind of material (seventeen of them), the word beside each count that says
+ * what is being counted, two buttons that open and shut the whole thing, and the "your
+ * materials" block — the form of /moje-materialy/ rendered a second time by the same
+ * builder, plus one sentence offering an account to somebody who has not signed in. That
+ * form is 200-odd words of field labels, application names and shop aisles, each one
+ * label on one control, which is what the `own-materials` note below already says about
+ * it. The widest page is French, at 2775. Nothing on this page is prose: it is a
+ * catalogue, and its budget is the one number here that counts a list, not sentences.
  */
 const BUDGET = {
   home: 377, calculators: 416, calculator: 431, converter: 285, guides: 307, guide: 232,
   "own-materials": 225,
-  materials: 2501, stores: 159, android: 519, projects: 544, estimate: 192,
+  materials: 2820, stores: 159, android: 519, projects: 544, estimate: 192,
   clients: 524, jobs: 544, quotes: 470, calendar: 420, cookies: 637,
   "liczmat-pro": 477, account: 850, dashboard: 130, share: 40, privacy: 3800,
 };

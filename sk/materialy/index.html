@@ -1009,1067 +1009,1499 @@
       <div class="wrap">
         <label class="fld-label" for="matpage-search">Hľadať materiál…</label>
         <input id="matpage-search" type="search" class="mat-search" placeholder="Hľadať materiál…" autocomplete="off">
+        <p class="mat-tools">
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-expand>Rozbaliť všetko</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-collapse>Zbaliť všetko</button>
+        </p>
         <p class="muted mt-3">161 materiálov v katalógu · Hodnoty sú typické a líšia sa podľa výrobcu. Po vložení do kalkulačky sa dá každá upraviť.</p>
+        <p class="muted" id="matpage-count" role="status" hidden></p>
         <p class="muted" id="matpage-empty" hidden>Hľadanie nič nenašlo.</p>
       </div>
     </section>
     <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TILES">Obklady a dlažba</h2>
-        <ul class="mat-page-list"><li id="gres-30x30" data-find="dlazba 30×30 gres-30x30">
-          <span class="mat-item">
-            <b>Dlažba 30×30</b>
-            <span class="muted">30×30 cm · 1 m²/bal. · 5 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-30x30">Spočítať</a>
-        </li><li id="gres-30x60" data-find="dlazba 30×60 gres-30x60">
-          <span class="mat-item">
-            <b>Dlažba 30×60</b>
-            <span class="muted">30×60 cm · 1,44 m²/bal. · 5 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-30x60">Spočítať</a>
-        </li><li id="gres-40x40" data-find="dlazba 40×40 gres-40x40">
-          <span class="mat-item">
-            <b>Dlažba 40×40</b>
-            <span class="muted">40×40 cm · 1,28 m²/bal. · 6 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-40x40">Spočítať</a>
-        </li><li id="gres-45x45" data-find="dlazba 45×45 gres-45x45">
-          <span class="mat-item">
-            <b>Dlažba 45×45</b>
-            <span class="muted">45×45 cm · 1,42 m²/bal. · 7 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-45x45">Spočítať</a>
-        </li><li id="gres-60x60" data-find="dlazba 60×60 gres-60x60">
-          <span class="mat-item">
-            <b>Dlažba 60×60</b>
-            <span class="muted">60×60 cm · 1,44 m²/bal. · 7 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-60x60">Spočítať</a>
-        </li><li id="gres-75x75" data-find="dlazba 75×75 gres-75x75">
-          <span class="mat-item">
-            <b>Dlažba 75×75</b>
-            <span class="muted">75×75 cm · 1,13 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-75x75">Spočítať</a>
-        </li><li id="gres-80x80" data-find="dlazba 80×80 gres-80x80">
-          <span class="mat-item">
-            <b>Dlažba 80×80</b>
-            <span class="muted">80×80 cm · 1,28 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-80x80">Spočítať</a>
-        </li><li id="gres-90x90" data-find="dlazba 90×90 gres-90x90">
-          <span class="mat-item">
-            <b>Dlažba 90×90</b>
-            <span class="muted">90×90 cm · 1,62 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-90x90">Spočítať</a>
-        </li><li id="gres-60x120" data-find="dlazba 60×120 gres-60x120">
-          <span class="mat-item">
-            <b>Dlažba 60×120</b>
-            <span class="muted">60×120 cm · 1,44 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-60x120">Spočítať</a>
-        </li><li id="gres-120x120" data-find="dlazba 120×120 gres-120x120">
-          <span class="mat-item">
-            <b>Dlažba 120×120</b>
-            <span class="muted">120×120 cm · 1,44 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-120x120">Spočítať</a>
-        </li><li id="gres-120x278" data-find="velkoformatova dlazba 120×278 gres-120x278">
-          <span class="mat-item">
-            <b>Veľkoformátová dlažba 120×278</b>
-            <span class="muted">120×278 cm · 3,34 m²/bal. · 12 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-120x278">Spočítať</a>
-        </li><li id="glaz-20x20" data-find="obklad 20×20 glaz-20x20">
-          <span class="mat-item">
-            <b>Obklad 20×20</b>
-            <span class="muted">20×20 cm · 1 m²/bal. · 5 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=glaz-20x20">Spočítať</a>
-        </li><li id="glaz-25x40" data-find="obklad 25×40 glaz-25x40">
-          <span class="mat-item">
-            <b>Obklad 25×40</b>
-            <span class="muted">25×40 cm · 1 m²/bal. · 5 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=glaz-25x40">Spočítať</a>
-        </li><li id="glaz-30x60" data-find="obklad 30×60 glaz-30x60">
-          <span class="mat-item">
-            <b>Obklad 30×60</b>
-            <span class="muted">30×60 cm · 1,44 m²/bal. · 5 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=glaz-30x60">Spočítať</a>
-        </li><li id="glaz-30x90" data-find="obklad 30×90 glaz-30x90">
-          <span class="mat-item">
-            <b>Obklad 30×90</b>
-            <span class="muted">30×90 cm · 1,62 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=glaz-30x90">Spočítať</a>
-        </li><li id="terakota-33" data-find="terakota 33×33 terakota-33">
-          <span class="mat-item">
-            <b>Terakota 33×33</b>
-            <span class="muted">33×33 cm · 1 m²/bal. · 5 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=terakota-33">Spočítať</a>
-        </li><li id="metro-75x150" data-find="tehlicka metro 7,5×15 metro-75x150">
-          <span class="mat-item">
-            <b>Tehlička metro 7,5×15</b>
-            <span class="muted">7,5×15 cm · 1 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=metro-75x150">Spočítať</a>
-        </li><li id="metro-60x250" data-find="podlhovasty format 6×25 metro-60x250">
-          <span class="mat-item">
-            <b>Podlhovastý formát 6×25</b>
-            <span class="muted">6×25 cm · 0,5 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=metro-60x250">Spočítať</a>
-        </li><li id="mozaika-30x30" data-find="mozaika na sietke 30×30 mozaika-30x30">
-          <span class="mat-item">
-            <b>Mozaika na sieťke 30×30</b>
-            <span class="muted">30×30 cm · 0,99 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=mozaika-30x30">Spočítať</a>
-        </li><li id="heksagon" data-find="hexagon 20×23 heksagon">
-          <span class="mat-item">
-            <b>Hexagón 20×23</b>
-            <span class="muted">20×23 cm · 1 m²/bal. · 12 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=heksagon">Spočítať</a>
-        </li><li id="taras-60x60" data-find="terasova dlazdica 2 cm · 60×60 taras-60x60">
-          <span class="mat-item">
-            <b>Terasová dlaždica 2 cm · 60×60</b>
-            <span class="muted">2 cm · 60×60 cm · 0,72 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=taras-60x60">Spočítať</a>
-        </li><li id="klinkier-25x6" data-find="klinkerovy pasik 24,5×6,5 klinkier-25x6">
-          <span class="mat-item">
-            <b>Klinkerový pásik 24,5×6,5</b>
-            <span class="muted">24,5×6,5 cm · 0,5 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=klinkier-25x6">Spočítať</a>
-        </li><li id="elew-plytka" data-find="fasadny pasik 24,5×6,5 elew-plytka">
-          <span class="mat-item">
-            <b>Fasádny pásik 24,5×6,5</b>
-            <span class="muted">24,5×6,5 cm · 0,5 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=elew-plytka">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Obklady a dlažba</h2>
+            <span class="mat-count">23<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Dlažba</h3>
+              <span class="mat-count">10<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="gres-30x30" data-find="dlazba 30×30 gres-30x30 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 30×30</b>
+              <span class="muted">30×30 cm · 1 m²/bal. · 5 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-30x30">Spočítať</a>
+          </li><li id="gres-30x60" data-find="dlazba 30×60 gres-30x60 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 30×60</b>
+              <span class="muted">30×60 cm · 1,44 m²/bal. · 5 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-30x60">Spočítať</a>
+          </li><li id="gres-40x40" data-find="dlazba 40×40 gres-40x40 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 40×40</b>
+              <span class="muted">40×40 cm · 1,28 m²/bal. · 6 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-40x40">Spočítať</a>
+          </li><li id="gres-45x45" data-find="dlazba 45×45 gres-45x45 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 45×45</b>
+              <span class="muted">45×45 cm · 1,42 m²/bal. · 7 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-45x45">Spočítať</a>
+          </li><li id="gres-60x60" data-find="dlazba 60×60 gres-60x60 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 60×60</b>
+              <span class="muted">60×60 cm · 1,44 m²/bal. · 7 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-60x60">Spočítať</a>
+          </li><li id="gres-75x75" data-find="dlazba 75×75 gres-75x75 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 75×75</b>
+              <span class="muted">75×75 cm · 1,13 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-75x75">Spočítať</a>
+          </li><li id="gres-80x80" data-find="dlazba 80×80 gres-80x80 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 80×80</b>
+              <span class="muted">80×80 cm · 1,28 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-80x80">Spočítať</a>
+          </li><li id="gres-90x90" data-find="dlazba 90×90 gres-90x90 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 90×90</b>
+              <span class="muted">90×90 cm · 1,62 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-90x90">Spočítať</a>
+          </li><li id="gres-60x120" data-find="dlazba 60×120 gres-60x120 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 60×120</b>
+              <span class="muted">60×120 cm · 1,44 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-60x120">Spočítať</a>
+          </li><li id="gres-120x120" data-find="dlazba 120×120 gres-120x120 obklady a dlazba">
+            <span class="mat-item">
+              <b>Dlažba 120×120</b>
+              <span class="muted">120×120 cm · 1,44 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-120x120">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="gres-120x278" data-find="velkoformatova dlazba 120×278 gres-120x278 obklady a dlazba">
+            <span class="mat-item">
+              <b>Veľkoformátová dlažba 120×278</b>
+              <span class="muted">120×278 cm · 3,34 m²/bal. · 12 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-120x278">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Obklad</h3>
+              <span class="mat-count">4<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="glaz-20x20" data-find="obklad 20×20 glaz-20x20 obklady a dlazba">
+            <span class="mat-item">
+              <b>Obklad 20×20</b>
+              <span class="muted">20×20 cm · 1 m²/bal. · 5 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=glaz-20x20">Spočítať</a>
+          </li><li id="glaz-25x40" data-find="obklad 25×40 glaz-25x40 obklady a dlazba">
+            <span class="mat-item">
+              <b>Obklad 25×40</b>
+              <span class="muted">25×40 cm · 1 m²/bal. · 5 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=glaz-25x40">Spočítať</a>
+          </li><li id="glaz-30x60" data-find="obklad 30×60 glaz-30x60 obklady a dlazba">
+            <span class="mat-item">
+              <b>Obklad 30×60</b>
+              <span class="muted">30×60 cm · 1,44 m²/bal. · 5 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=glaz-30x60">Spočítať</a>
+          </li><li id="glaz-30x90" data-find="obklad 30×90 glaz-30x90 obklady a dlazba">
+            <span class="mat-item">
+              <b>Obklad 30×90</b>
+              <span class="muted">30×90 cm · 1,62 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=glaz-30x90">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="terakota-33" data-find="terakota 33×33 terakota-33 obklady a dlazba">
+            <span class="mat-item">
+              <b>Terakota 33×33</b>
+              <span class="muted">33×33 cm · 1 m²/bal. · 5 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=terakota-33">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="metro-75x150" data-find="tehlicka metro 7,5×15 metro-75x150 obklady a dlazba">
+            <span class="mat-item">
+              <b>Tehlička metro 7,5×15</b>
+              <span class="muted">7,5×15 cm · 1 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=metro-75x150">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="metro-60x250" data-find="podlhovasty format 6×25 metro-60x250 obklady a dlazba">
+            <span class="mat-item">
+              <b>Podlhovastý formát 6×25</b>
+              <span class="muted">6×25 cm · 0,5 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=metro-60x250">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="mozaika-30x30" data-find="mozaika na sietke 30×30 mozaika-30x30 obklady a dlazba">
+            <span class="mat-item">
+              <b>Mozaika na sieťke 30×30</b>
+              <span class="muted">30×30 cm · 0,99 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=mozaika-30x30">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="heksagon" data-find="hexagon 20×23 heksagon obklady a dlazba">
+            <span class="mat-item">
+              <b>Hexagón 20×23</b>
+              <span class="muted">20×23 cm · 1 m²/bal. · 12 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=heksagon">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="taras-60x60" data-find="terasova dlazdica 2 cm · 60×60 taras-60x60 obklady a dlazba">
+            <span class="mat-item">
+              <b>Terasová dlaždica 2 cm · 60×60</b>
+              <span class="muted">2 cm · 60×60 cm · 0,72 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=taras-60x60">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klinkier-25x6" data-find="klinkerovy pasik 24,5×6,5 klinkier-25x6 obklady a dlazba">
+            <span class="mat-item">
+              <b>Klinkerový pásik 24,5×6,5</b>
+              <span class="muted">24,5×6,5 cm · 0,5 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=klinkier-25x6">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="elew-plytka" data-find="fasadny pasik 24,5×6,5 elew-plytka obklady a dlazba">
+            <span class="mat-item">
+              <b>Fasádny pásik 24,5×6,5</b>
+              <span class="muted">24,5×6,5 cm · 0,5 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=elew-plytka">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-FLOORING">Podlahy</h2>
-        <ul class="mat-page-list"><li id="panel-ac3" data-find="laminatova podlaha ac3 · 128×19,2 panel-ac3">
-          <span class="mat-item">
-            <b>Laminátová podlaha AC3 · 128×19,2</b>
-            <span class="muted">AC3 · 128×19,2 cm · 2,22 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=panel-ac3">Spočítať</a>
-        </li><li id="panel-ac4" data-find="laminatova podlaha ac4 · 138×19,3 panel-ac4">
-          <span class="mat-item">
-            <b>Laminátová podlaha AC4 · 138×19,3</b>
-            <span class="muted">AC4 · 138×19,3 cm · 2,22 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=panel-ac4">Spočítať</a>
-        </li><li id="panel-ac5" data-find="laminatova podlaha ac5 · 129×19 panel-ac5">
-          <span class="mat-item">
-            <b>Laminátová podlaha AC5 · 129×19</b>
-            <span class="muted">AC5 · 129×19 cm · 2,22 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=panel-ac5">Spočítať</a>
-        </li><li id="lvt" data-find="vinylova doska lvt 122×18 lvt">
-          <span class="mat-item">
-            <b>Vinylová doska LVT 122×18</b>
-            <span class="muted">122×18 cm · 2,2 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=lvt">Spočítať</a>
-        </li><li id="spc" data-find="doska spc 61×30,5 spc">
-          <span class="mat-item">
-            <b>Doska SPC 61×30,5</b>
-            <span class="muted">61×30,5 cm · 2,23 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=spc">Spočítať</a>
-        </li><li id="deska-barl" data-find="vrstvena podlaha 220×18,2 deska-barl">
-          <span class="mat-item">
-            <b>Vrstvená podlaha 220×18,2</b>
-            <span class="muted">220×18,2 cm · 3,18 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=deska-barl">Spočítať</a>
-        </li><li id="deska-3warstw" data-find="trojvrstvova podlaha 209×15 deska-3warstw">
-          <span class="mat-item">
-            <b>Trojvrstvová podlaha 209×15</b>
-            <span class="muted">209×15 cm · 2,2 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=deska-3warstw">Spočítať</a>
-        </li><li id="parkiet" data-find="klasicke parkety 45×7 parkiet">
-          <span class="mat-item">
-            <b>Klasické parkety 45×7</b>
-            <span class="muted">45×7 cm · 1 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=parkiet">Spočítať</a>
-        </li><li id="gres-deska-20x120" data-find="dlazba v dekore dreva 20×120 gres-deska-20x120">
-          <span class="mat-item">
-            <b>Dlažba v dekore dreva 20×120</b>
-            <span class="muted">20×120 cm · 0,96 m²/bal. · 10 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-deska-20x120">Spočítať</a>
-        </li><li id="korek" data-find="korkova podlaha 90×30 korek">
-          <span class="mat-item">
-            <b>Korková podlaha 90×30</b>
-            <span class="muted">90×30 cm · 1,9 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=korek">Spočítať</a>
-        </li><li id="panel-scienny" data-find="stenovy panel / lamely 275×12 panel-scienny">
-          <span class="mat-item">
-            <b>Stenový panel / lamely 275×12</b>
-            <span class="muted">275×12 cm · 1,65 m²/bal. · 8 % prierezu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=panel-scienny">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-FLOORING" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Podlahy</h2>
+            <span class="mat-count">11<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Laminátová podlaha</h3>
+              <span class="mat-count">3<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="panel-ac3" data-find="laminatova podlaha ac3 · 128×19,2 panel-ac3 podlahy">
+            <span class="mat-item">
+              <b>Laminátová podlaha AC3 · 128×19,2</b>
+              <span class="muted">AC3 · 128×19,2 cm · 2,22 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=panel-ac3">Spočítať</a>
+          </li><li id="panel-ac4" data-find="laminatova podlaha ac4 · 138×19,3 panel-ac4 podlahy">
+            <span class="mat-item">
+              <b>Laminátová podlaha AC4 · 138×19,3</b>
+              <span class="muted">AC4 · 138×19,3 cm · 2,22 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=panel-ac4">Spočítať</a>
+          </li><li id="panel-ac5" data-find="laminatova podlaha ac5 · 129×19 panel-ac5 podlahy">
+            <span class="mat-item">
+              <b>Laminátová podlaha AC5 · 129×19</b>
+              <span class="muted">AC5 · 129×19 cm · 2,22 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=panel-ac5">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="lvt" data-find="vinylova doska lvt 122×18 lvt podlahy">
+            <span class="mat-item">
+              <b>Vinylová doska LVT 122×18</b>
+              <span class="muted">122×18 cm · 2,2 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=lvt">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="spc" data-find="doska spc 61×30,5 spc podlahy">
+            <span class="mat-item">
+              <b>Doska SPC 61×30,5</b>
+              <span class="muted">61×30,5 cm · 2,23 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=spc">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-barl" data-find="vrstvena podlaha 220×18,2 deska-barl podlahy">
+            <span class="mat-item">
+              <b>Vrstvená podlaha 220×18,2</b>
+              <span class="muted">220×18,2 cm · 3,18 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=deska-barl">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-3warstw" data-find="trojvrstvova podlaha 209×15 deska-3warstw podlahy">
+            <span class="mat-item">
+              <b>Trojvrstvová podlaha 209×15</b>
+              <span class="muted">209×15 cm · 2,2 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=deska-3warstw">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="parkiet" data-find="klasicke parkety 45×7 parkiet podlahy">
+            <span class="mat-item">
+              <b>Klasické parkety 45×7</b>
+              <span class="muted">45×7 cm · 1 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=parkiet">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gres-deska-20x120" data-find="dlazba v dekore dreva 20×120 gres-deska-20x120 podlahy">
+            <span class="mat-item">
+              <b>Dlažba v dekore dreva 20×120</b>
+              <span class="muted">20×120 cm · 0,96 m²/bal. · 10 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gres-deska-20x120">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="korek" data-find="korkova podlaha 90×30 korek podlahy">
+            <span class="mat-item">
+              <b>Korková podlaha 90×30</b>
+              <span class="muted">90×30 cm · 1,9 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=korek">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="panel-scienny" data-find="stenovy panel / lamely 275×12 panel-scienny podlahy">
+            <span class="mat-item">
+              <b>Stenový panel / lamely 275×12</b>
+              <span class="muted">275×12 cm · 1,65 m²/bal. · 8 % prierezu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=panel-scienny">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TRIM">Lišty a dokončenie</h2>
-        <ul class="mat-page-list"><li id="parapet-wewn" data-find="vnutorny parapet 4100×250 parapet-wewn">
-          <span class="mat-item">
-            <b>Vnútorný parapet 4100×250</b>
-            <span class="muted">4100×250 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=parapet-wewn">Spočítať</a>
-        </li><li id="listwa-mdf-2_5" data-find="mdf soklova lista 2,5 m listwa-mdf-2_5">
-          <span class="mat-item">
-            <b>MDF soklová lišta 2,5 m</b>
-            <span class="muted">tyč 2,5 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=listwa-mdf-2_5">Spočítať</a>
-        </li><li id="cokol-pvc-2_5" data-find="pvc sokel 2,5 m cokol-pvc-2_5">
-          <span class="mat-item">
-            <b>PVC sokel 2,5 m</b>
-            <span class="muted">tyč 2,5 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cokol-pvc-2_5">Spočítať</a>
-        </li><li id="cwierc-2_5" data-find="stvrtkruh / rohova lista 2,5 m cwierc-2_5">
-          <span class="mat-item">
-            <b>Štvrťkruh / rohová lišta 2,5 m</b>
-            <span class="muted">tyč 2,5 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cwierc-2_5">Spočítať</a>
-        </li><li id="listwa-prog-alu-0_9" data-find="hlinikova prechodova lista 0,9 m listwa-prog-alu-0_9">
-          <span class="mat-item">
-            <b>Hliníková prechodová lišta 0,9 m</b>
-            <span class="muted">tyč 0,9 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=listwa-prog-alu-0_9">Spočítať</a>
-        </li><li id="parapet-zewn-2" data-find="vonkajsi ocelovy parapet 2 m parapet-zewn-2">
-          <span class="mat-item">
-            <b>Vonkajší oceľový parapet 2 m</b>
-            <span class="muted">tyč 2 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=parapet-zewn-2">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TRIM" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Lišty a dokončenie</h2>
+            <span class="mat-count">6<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="parapet-wewn" data-find="vnutorny parapet 4100×250 parapet-wewn listy a dokoncenie">
+            <span class="mat-item">
+              <b>Vnútorný parapet 4100×250</b>
+              <span class="muted">4100×250 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=parapet-wewn">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-mdf-2_5" data-find="mdf soklova lista 2,5 m listwa-mdf-2_5 listy a dokoncenie">
+            <span class="mat-item">
+              <b>MDF soklová lišta 2,5 m</b>
+              <span class="muted">tyč 2,5 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=listwa-mdf-2_5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="cokol-pvc-2_5" data-find="pvc sokel 2,5 m cokol-pvc-2_5 listy a dokoncenie">
+            <span class="mat-item">
+              <b>PVC sokel 2,5 m</b>
+              <span class="muted">tyč 2,5 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cokol-pvc-2_5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="cwierc-2_5" data-find="stvrtkruh / rohova lista 2,5 m cwierc-2_5 listy a dokoncenie">
+            <span class="mat-item">
+              <b>Štvrťkruh / rohová lišta 2,5 m</b>
+              <span class="muted">tyč 2,5 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cwierc-2_5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-prog-alu-0_9" data-find="hlinikova prechodova lista 0,9 m listwa-prog-alu-0_9 listy a dokoncenie">
+            <span class="mat-item">
+              <b>Hliníková prechodová lišta 0,9 m</b>
+              <span class="muted">tyč 0,9 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=listwa-prog-alu-0_9">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="parapet-zewn-2" data-find="vonkajsi ocelovy parapet 2 m parapet-zewn-2 listy a dokoncenie">
+            <span class="mat-item">
+              <b>Vonkajší oceľový parapet 2 m</b>
+              <span class="muted">tyč 2 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=parapet-zewn-2">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PAINT">Farby a laky</h2>
-        <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="farba na steny 2,5 l farba-scienna-2_5">
-          <span class="mat-item">
-            <b>Farba na steny 2,5 l</b>
-            <span class="muted">2,5 l · ~10 m²/l · 25 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-scienna-2_5">Spočítať</a>
-        </li><li id="farba-scienna-5" data-find="farba na steny 5 l farba-scienna-5">
-          <span class="mat-item">
-            <b>Farba na steny 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-scienna-5">Spočítať</a>
-        </li><li id="farba-scienna-10" data-find="farba na steny 10 l farba-scienna-10">
-          <span class="mat-item">
-            <b>Farba na steny 10 l</b>
-            <span class="muted">10 l · ~10 m²/l · 100 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-scienna-10">Spočítať</a>
-        </li><li id="farba-lateks-5" data-find="latexova farba 5 l farba-lateks-5">
-          <span class="mat-item">
-            <b>Latexová farba 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-lateks-5">Spočítať</a>
-        </li><li id="farba-sufitowa-10" data-find="farba na stropy 10 l farba-sufitowa-10">
-          <span class="mat-item">
-            <b>Farba na stropy 10 l</b>
-            <span class="muted">10 l · ~11 m²/l · 110 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-sufitowa-10">Spočítať</a>
-        </li><li id="farba-kl-2_5" data-find="farba do kuchyne a kupelne 2,5 l farba-kl-2_5">
-          <span class="mat-item">
-            <b>Farba do kuchyne a kúpeľne 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-kl-2_5">Spočítať</a>
-        </li><li id="farba-beton-5" data-find="farba na beton a podlahy 5 l farba-beton-5">
-          <span class="mat-item">
-            <b>Farba na betón a podlahy 5 l</b>
-            <span class="muted">5 l · ~8 m²/l · 40 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-beton-5">Spočítať</a>
-        </li><li id="farba-elew-akr-10" data-find="akrylova fasadna farba 10 l farba-elew-akr-10">
-          <span class="mat-item">
-            <b>Akrylová fasádna farba 10 l</b>
-            <span class="muted">10 l · ~5 m²/l · 50 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-elew-akr-10">Spočítať</a>
-        </li><li id="farba-elew-sil-10" data-find="silikonova fasadna farba 10 l farba-elew-sil-10">
-          <span class="mat-item">
-            <b>Silikónová fasádna farba 10 l</b>
-            <span class="muted">10 l · ~6 m²/l · 60 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-elew-sil-10">Spočítať</a>
-        </li><li id="emalia-0_75" data-find="email na drevo a kov 0,75 l emalia-0_75">
-          <span class="mat-item">
-            <b>Email na drevo a kov 0,75 l</b>
-            <span class="muted">0,75 l · ~12 m²/l · 9 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=emalia-0_75">Spočítať</a>
-        </li><li id="emalia-2_5" data-find="email na drevo a kov 2,5 l emalia-2_5">
-          <span class="mat-item">
-            <b>Email na drevo a kov 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=emalia-2_5">Spočítať</a>
-        </li><li id="farba-antykor-0_75" data-find="antikorozna farba 3v1 0,75 l farba-antykor-0_75">
-          <span class="mat-item">
-            <b>Antikorózna farba 3v1 0,75 l</b>
-            <span class="muted">0,75 l · ~10 m²/l · 7,5 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-antykor-0_75">Spočítať</a>
-        </li><li id="lakierobejca-2_5" data-find="lazurovaci lak 2,5 l lakierobejca-2_5">
-          <span class="mat-item">
-            <b>Lazúrovací lak 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=lakierobejca-2_5">Spočítať</a>
-        </li><li id="lakier-bezb-2_5" data-find="bezfarebny lak 2,5 l lakier-bezb-2_5">
-          <span class="mat-item">
-            <b>Bezfarebný lak 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=lakier-bezb-2_5">Spočítať</a>
-        </li><li id="impregnat-5" data-find="impregnacia na drevo 5 l impregnat-5">
-          <span class="mat-item">
-            <b>Impregnácia na drevo 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=impregnat-5">Spočítať</a>
-        </li><li id="olej-taras-2_5" data-find="olej na terasy 2,5 l olej-taras-2_5">
-          <span class="mat-item">
-            <b>Olej na terasy 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=olej-taras-2_5">Spočítať</a>
-        </li><li id="grunt-gleb-5" data-find="hlbkova penetracia 5 l grunt-gleb-5">
-          <span class="mat-item">
-            <b>Hĺbková penetrácia 5 l</b>
-            <span class="muted">5 l · ~7 m²/l · 35 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=grunt-gleb-5">Spočítať</a>
-        </li><li id="grunt-mleczko-5" data-find="penetracia pod farbu 5 l grunt-mleczko-5">
-          <span class="mat-item">
-            <b>Penetrácia pod farbu 5 l</b>
-            <span class="muted">5 l · ~8 m²/l · 40 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=grunt-mleczko-5">Spočítať</a>
-        </li><li id="grunt-kwarc-5" data-find="kremicita penetracia pod omietku 5 l grunt-kwarc-5">
-          <span class="mat-item">
-            <b>Kremičitá penetrácia pod omietku 5 l</b>
-            <span class="muted">5 l · ~4 m²/l · 20 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=grunt-kwarc-5">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PAINT" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Farby a laky</h2>
+            <span class="mat-count">19<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Farba na steny</h3>
+              <span class="mat-count">3<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="farba na steny 2,5 l farba-scienna-2_5 farby a laky">
+            <span class="mat-item">
+              <b>Farba na steny 2,5 l</b>
+              <span class="muted">2,5 l · ~10 m²/l · 25 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-scienna-2_5">Spočítať</a>
+          </li><li id="farba-scienna-5" data-find="farba na steny 5 l farba-scienna-5 farby a laky">
+            <span class="mat-item">
+              <b>Farba na steny 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-scienna-5">Spočítať</a>
+          </li><li id="farba-scienna-10" data-find="farba na steny 10 l farba-scienna-10 farby a laky">
+            <span class="mat-item">
+              <b>Farba na steny 10 l</b>
+              <span class="muted">10 l · ~10 m²/l · 100 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-scienna-10">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="farba-lateks-5" data-find="latexova farba 5 l farba-lateks-5 farby a laky">
+            <span class="mat-item">
+              <b>Latexová farba 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-lateks-5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-sufitowa-10" data-find="farba na stropy 10 l farba-sufitowa-10 farby a laky">
+            <span class="mat-item">
+              <b>Farba na stropy 10 l</b>
+              <span class="muted">10 l · ~11 m²/l · 110 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-sufitowa-10">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-kl-2_5" data-find="farba do kuchyne a kupelne 2,5 l farba-kl-2_5 farby a laky">
+            <span class="mat-item">
+              <b>Farba do kuchyne a kúpeľne 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-kl-2_5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-beton-5" data-find="farba na beton a podlahy 5 l farba-beton-5 farby a laky">
+            <span class="mat-item">
+              <b>Farba na betón a podlahy 5 l</b>
+              <span class="muted">5 l · ~8 m²/l · 40 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-beton-5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-elew-akr-10" data-find="akrylova fasadna farba 10 l farba-elew-akr-10 farby a laky">
+            <span class="mat-item">
+              <b>Akrylová fasádna farba 10 l</b>
+              <span class="muted">10 l · ~5 m²/l · 50 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-elew-akr-10">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-elew-sil-10" data-find="silikonova fasadna farba 10 l farba-elew-sil-10 farby a laky">
+            <span class="mat-item">
+              <b>Silikónová fasádna farba 10 l</b>
+              <span class="muted">10 l · ~6 m²/l · 60 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-elew-sil-10">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Email na drevo a kov</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="emalia-0_75" data-find="email na drevo a kov 0,75 l emalia-0_75 farby a laky">
+            <span class="mat-item">
+              <b>Email na drevo a kov 0,75 l</b>
+              <span class="muted">0,75 l · ~12 m²/l · 9 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=emalia-0_75">Spočítať</a>
+          </li><li id="emalia-2_5" data-find="email na drevo a kov 2,5 l emalia-2_5 farby a laky">
+            <span class="mat-item">
+              <b>Email na drevo a kov 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=emalia-2_5">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="farba-antykor-0_75" data-find="antikorozna farba 3v1 0,75 l farba-antykor-0_75 farby a laky">
+            <span class="mat-item">
+              <b>Antikorózna farba 3v1 0,75 l</b>
+              <span class="muted">0,75 l · ~10 m²/l · 7,5 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=farba-antykor-0_75">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lakierobejca-2_5" data-find="lazurovaci lak 2,5 l lakierobejca-2_5 farby a laky">
+            <span class="mat-item">
+              <b>Lazúrovací lak 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=lakierobejca-2_5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lakier-bezb-2_5" data-find="bezfarebny lak 2,5 l lakier-bezb-2_5 farby a laky">
+            <span class="mat-item">
+              <b>Bezfarebný lak 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=lakier-bezb-2_5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="impregnat-5" data-find="impregnacia na drevo 5 l impregnat-5 farby a laky">
+            <span class="mat-item">
+              <b>Impregnácia na drevo 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=impregnat-5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="olej-taras-2_5" data-find="olej na terasy 2,5 l olej-taras-2_5 farby a laky">
+            <span class="mat-item">
+              <b>Olej na terasy 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=olej-taras-2_5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-gleb-5" data-find="hlbkova penetracia 5 l grunt-gleb-5 farby a laky">
+            <span class="mat-item">
+              <b>Hĺbková penetrácia 5 l</b>
+              <span class="muted">5 l · ~7 m²/l · 35 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=grunt-gleb-5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-mleczko-5" data-find="penetracia pod farbu 5 l grunt-mleczko-5 farby a laky">
+            <span class="mat-item">
+              <b>Penetrácia pod farbu 5 l</b>
+              <span class="muted">5 l · ~8 m²/l · 40 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=grunt-mleczko-5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-kwarc-5" data-find="kremicita penetracia pod omietku 5 l grunt-kwarc-5 farby a laky">
+            <span class="mat-item">
+              <b>Kremičitá penetrácia pod omietku 5 l</b>
+              <span class="muted">5 l · ~4 m²/l · 20 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=grunt-kwarc-5">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-CHEMICALS">Stavebná chémia</h2>
-        <ul class="mat-page-list"><li id="gladz-gips-20" data-find="sadrovy stuk 20 kg gladz-gips-20">
-          <span class="mat-item">
-            <b>Sadrový štuk 20 kg</b>
-            <span class="muted">20 kg · ~1 kg/m² (vrstva 1 mm) · 20 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=gladz-gips-20">Spočítať</a>
-        </li><li id="gladz-polim-20" data-find="polymerovy stuk 20 kg gladz-polim-20">
-          <span class="mat-item">
-            <b>Polymérový štuk 20 kg</b>
-            <span class="muted">20 kg · ~1,2 kg/m² (vrstva 1 mm) · 16,67 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=gladz-polim-20">Spočítať</a>
-        </li><li id="gladz-gotowa-18" data-find="hotovy stuk 18 kg gladz-gotowa-18">
-          <span class="mat-item">
-            <b>Hotový štuk 18 kg</b>
-            <span class="muted">18 kg · ~1,2 kg/m² (vrstva 1 mm) · 15 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=gladz-gotowa-18">Spočítať</a>
-        </li><li id="tynk-gips-30" data-find="sadrova omietka 30 kg tynk-gips-30">
-          <span class="mat-item">
-            <b>Sadrová omietka 30 kg</b>
-            <span class="muted">30 kg · ~8,5 kg/m² (vrstva 10 mm) · 3,53 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-gips-30">Spočítať</a>
-        </li><li id="tynk-cw-30" data-find="vapennocementova omietka 30 kg tynk-cw-30">
-          <span class="mat-item">
-            <b>Vápennocementová omietka 30 kg</b>
-            <span class="muted">30 kg · ~15 kg/m² (vrstva 10 mm) · 2 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-cw-30">Spočítať</a>
-        </li><li id="tynk-mozaik-25" data-find="mozaikova omietka 25 kg tynk-mozaik-25">
-          <span class="mat-item">
-            <b>Mozaiková omietka 25 kg</b>
-            <span class="muted">25 kg · ~5 kg/m² (vrstva) · 5 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-mozaik-25">Spočítať</a>
-        </li><li id="tynk-baranek-25" data-find="skrabana omietka 1,5 mm · 25 kg tynk-baranek-25">
-          <span class="mat-item">
-            <b>Škrabaná omietka 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (vrstva 1,5 mm) · 10 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-baranek-25">Spočítať</a>
-        </li><li id="tynk-silik-25" data-find="silikonova omietka 1,5 mm · 25 kg tynk-silik-25">
-          <span class="mat-item">
-            <b>Silikónová omietka 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (vrstva 1,5 mm) · 10 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-silik-25">Spočítať</a>
-        </li><li id="tynk-akryl-25" data-find="akrylova omietka 1,5 mm · 25 kg tynk-akryl-25">
-          <span class="mat-item">
-            <b>Akrylová omietka 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (vrstva 1,5 mm) · 10 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-akryl-25">Spočítať</a>
-        </li><li id="klej-c1-25" data-find="lepidlo na obklady c1 25 kg klej-c1-25">
-          <span class="mat-item">
-            <b>Lepidlo na obklady C1 25 kg</b>
-            <span class="muted">25 kg · ~4 kg/m² (hrebeň 6 mm) · 6,25 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=klej-c1-25">Spočítať</a>
-        </li><li id="klej-c2-25" data-find="flexibilne lepidlo c2 25 kg klej-c2-25">
-          <span class="mat-item">
-            <b>Flexibilné lepidlo C2 25 kg</b>
-            <span class="muted">25 kg · ~5 kg/m² (hrebeň 10 mm) · 5 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=klej-c2-25">Spočítať</a>
-        </li><li id="klej-styro-25" data-find="lepidlo na polystyren a sietku 25 kg klej-styro-25">
-          <span class="mat-item">
-            <b>Lepidlo na polystyrén a sieťku 25 kg</b>
-            <span class="muted">25 kg · ~4,5 kg/m² (výstužná vrstva) · 5,56 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=klej-styro-25">Spočítať</a>
-        </li><li id="zaprawa-mur-25" data-find="murovacia malta 25 kg zaprawa-mur-25">
-          <span class="mat-item">
-            <b>Murovacia malta 25 kg</b>
-            <span class="muted">25 kg · ~25 kg/m² (škára 10 mm) · 1 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=zaprawa-mur-25">Spočítať</a>
-        </li><li id="wylewka-samop-25" data-find="samonivelacna stierka 25 kg wylewka-samop-25">
-          <span class="mat-item">
-            <b>Samonivelačná stierka 25 kg</b>
-            <span class="muted">25 kg · ~1,6 kg/m² (vrstva 1 mm) · 15,63 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=wylewka-samop-25">Spočítať</a>
-        </li><li id="fuga-5" data-find="skarovacia hmota 5 kg fuga-5">
-          <span class="mat-item">
-            <b>Škárovacia hmota 5 kg</b>
-            <span class="muted">5 kg · ~0,5 kg/m² (škára 3 mm) · 10 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=fuga-5">Spočítať</a>
-        </li><li id="hydroizol-15" data-find="tekuta hydroizolacia 15 kg hydroizol-15">
-          <span class="mat-item">
-            <b>Tekutá hydroizolácia 15 kg</b>
-            <span class="muted">15 kg · ~3 kg/m² (2 vrstvy) · 5 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=hydroizol-15">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-CHEMICALS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Stavebná chémia</h2>
+            <span class="mat-count">16<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="gladz-gips-20" data-find="sadrovy stuk 20 kg gladz-gips-20 stavebna chemia">
+            <span class="mat-item">
+              <b>Sadrový štuk 20 kg</b>
+              <span class="muted">20 kg · ~1 kg/m² (vrstva 1 mm) · 20 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=gladz-gips-20">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gladz-polim-20" data-find="polymerovy stuk 20 kg gladz-polim-20 stavebna chemia">
+            <span class="mat-item">
+              <b>Polymérový štuk 20 kg</b>
+              <span class="muted">20 kg · ~1,2 kg/m² (vrstva 1 mm) · 16,67 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=gladz-polim-20">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gladz-gotowa-18" data-find="hotovy stuk 18 kg gladz-gotowa-18 stavebna chemia">
+            <span class="mat-item">
+              <b>Hotový štuk 18 kg</b>
+              <span class="muted">18 kg · ~1,2 kg/m² (vrstva 1 mm) · 15 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=gladz-gotowa-18">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-gips-30" data-find="sadrova omietka 30 kg tynk-gips-30 stavebna chemia">
+            <span class="mat-item">
+              <b>Sadrová omietka 30 kg</b>
+              <span class="muted">30 kg · ~8,5 kg/m² (vrstva 10 mm) · 3,53 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-gips-30">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-cw-30" data-find="vapennocementova omietka 30 kg tynk-cw-30 stavebna chemia">
+            <span class="mat-item">
+              <b>Vápennocementová omietka 30 kg</b>
+              <span class="muted">30 kg · ~15 kg/m² (vrstva 10 mm) · 2 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-cw-30">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-mozaik-25" data-find="mozaikova omietka 25 kg tynk-mozaik-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Mozaiková omietka 25 kg</b>
+              <span class="muted">25 kg · ~5 kg/m² (vrstva) · 5 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-mozaik-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-baranek-25" data-find="skrabana omietka 1,5 mm · 25 kg tynk-baranek-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Škrabaná omietka 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (vrstva 1,5 mm) · 10 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-baranek-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-silik-25" data-find="silikonova omietka 1,5 mm · 25 kg tynk-silik-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Silikónová omietka 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (vrstva 1,5 mm) · 10 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-silik-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-akryl-25" data-find="akrylova omietka 1,5 mm · 25 kg tynk-akryl-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Akrylová omietka 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (vrstva 1,5 mm) · 10 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=tynk-akryl-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-c1-25" data-find="lepidlo na obklady c1 25 kg klej-c1-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Lepidlo na obklady C1 25 kg</b>
+              <span class="muted">25 kg · ~4 kg/m² (hrebeň 6 mm) · 6,25 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=klej-c1-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-c2-25" data-find="flexibilne lepidlo c2 25 kg klej-c2-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Flexibilné lepidlo C2 25 kg</b>
+              <span class="muted">25 kg · ~5 kg/m² (hrebeň 10 mm) · 5 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=klej-c2-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-styro-25" data-find="lepidlo na polystyren a sietku 25 kg klej-styro-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Lepidlo na polystyrén a sieťku 25 kg</b>
+              <span class="muted">25 kg · ~4,5 kg/m² (výstužná vrstva) · 5,56 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=klej-styro-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="zaprawa-mur-25" data-find="murovacia malta 25 kg zaprawa-mur-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Murovacia malta 25 kg</b>
+              <span class="muted">25 kg · ~25 kg/m² (škára 10 mm) · 1 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=zaprawa-mur-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="wylewka-samop-25" data-find="samonivelacna stierka 25 kg wylewka-samop-25 stavebna chemia">
+            <span class="mat-item">
+              <b>Samonivelačná stierka 25 kg</b>
+              <span class="muted">25 kg · ~1,6 kg/m² (vrstva 1 mm) · 15,63 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=wylewka-samop-25">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="fuga-5" data-find="skarovacia hmota 5 kg fuga-5 stavebna chemia">
+            <span class="mat-item">
+              <b>Škárovacia hmota 5 kg</b>
+              <span class="muted">5 kg · ~0,5 kg/m² (škára 3 mm) · 10 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=fuga-5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hydroizol-15" data-find="tekuta hydroizolacia 15 kg hydroizol-15 stavebna chemia">
+            <span class="mat-item">
+              <b>Tekutá hydroizolácia 15 kg</b>
+              <span class="muted">15 kg · ~3 kg/m² (2 vrstvy) · 5 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=hydroizol-15">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-BOARDS">Dosky</h2>
-        <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="sdk doska bezna 1200×2600 gk-zwykla-2600">
-          <span class="mat-item">
-            <b>SDK doska bežná 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/ks</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-zwykla-2600">Spočítať</a>
-        </li><li id="gk-zwykla-2000" data-find="sdk doska bezna 1200×2000 gk-zwykla-2000">
-          <span class="mat-item">
-            <b>SDK doska bežná 1200×2000</b>
-            <span class="muted">1200×2000 mm · 2,4 m²/ks</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-zwykla-2000">Spočítať</a>
-        </li><li id="gk-impreg-2600" data-find="sdk doska impregnovana 1200×2600 gk-impreg-2600">
-          <span class="mat-item">
-            <b>SDK doska impregnovaná 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/ks</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-impreg-2600">Spočítať</a>
-        </li><li id="gk-ogniowa-2600" data-find="sdk doska protipoziarna 1200×2600 gk-ogniowa-2600">
-          <span class="mat-item">
-            <b>SDK doska protipožiarna 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/ks</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-ogniowa-2600">Spočítať</a>
-        </li><li id="gk-gksf-2600" data-find="sdk doska voda + ohen (gkfi) 1200×2600 gk-gksf-2600">
-          <span class="mat-item">
-            <b>SDK doska voda + oheň (GKFI) 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/ks</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-gksf-2600">Spočítať</a>
-        </li><li id="plyta-lam-2800" data-find="laminovana nabytkova doska 2800×2070 plyta-lam-2800">
-          <span class="mat-item">
-            <b>Laminovaná nábytková doska 2800×2070</b>
-            <span class="muted">2800×2070 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=plyta-lam-2800">Spočítať</a>
-        </li><li id="plyta-lam-3660" data-find="laminovana nabytkova doska 3660×1830 plyta-lam-3660">
-          <span class="mat-item">
-            <b>Laminovaná nábytková doska 3660×1830</b>
-            <span class="muted">3660×1830 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=plyta-lam-3660">Spočítať</a>
-        </li><li id="mdf-2800" data-find="mdf surove 2800×2070 mdf-2800">
-          <span class="mat-item">
-            <b>MDF surové 2800×2070</b>
-            <span class="muted">2800×2070 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=mdf-2800">Spočítať</a>
-        </li><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800">
-          <span class="mat-item">
-            <b>HDF 2800×2070</b>
-            <span class="muted">2800×2070 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=hdf-2800">Spočítať</a>
-        </li><li id="wior-surowa" data-find="drevotrieska surova 2800×2070 wior-surowa">
-          <span class="mat-item">
-            <b>Drevotrieska surová 2800×2070</b>
-            <span class="muted">2800×2070 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=wior-surowa">Spočítať</a>
-        </li><li id="mfp-2500" data-find="doska mfp 2500×1250 mfp-2500">
-          <span class="mat-item">
-            <b>Doska MFP 2500×1250</b>
-            <span class="muted">2500×1250 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=mfp-2500">Spočítať</a>
-        </li><li id="sklejka-lisc" data-find="preglejka z tvrdeho dreva 2500×1250 sklejka-lisc">
-          <span class="mat-item">
-            <b>Preglejka z tvrdého dreva 2500×1250</b>
-            <span class="muted">2500×1250 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=sklejka-lisc">Spočítať</a>
-        </li><li id="sklejka-brzoza" data-find="brezova preglejka 1525×1525 sklejka-brzoza">
-          <span class="mat-item">
-            <b>Brezová preglejka 1525×1525</b>
-            <span class="muted">1525×1525 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=sklejka-brzoza">Spočítať</a>
-        </li><li id="sklejka-wodo" data-find="vodovzdorna preglejka 3000×1500 sklejka-wodo">
-          <span class="mat-item">
-            <b>Vodovzdorná preglejka 3000×1500</b>
-            <span class="muted">3000×1500 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=sklejka-wodo">Spočítať</a>
-        </li><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500">
-          <span class="mat-item">
-            <b>OSB-3 2500×1250</b>
-            <span class="muted">2500×1250 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=osb3-2500">Spočítať</a>
-        </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800">
-          <span class="mat-item">
-            <b>OSB-3 2800×1250</b>
-            <span class="muted">2800×1250 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=osb3-2800">Spočítať</a>
-        </li><li id="cetris-3350" data-find="cementotrieskova doska 3350×1250 cetris-3350">
-          <span class="mat-item">
-            <b>Cementotriesková doska 3350×1250</b>
-            <span class="muted">3350×1250 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=cetris-3350">Spočítať</a>
-        </li><li id="fermacell-1500" data-find="sadrovlaknita doska 1500×1000 fermacell-1500">
-          <span class="mat-item">
-            <b>Sadrovláknitá doska 1500×1000</b>
-            <span class="muted">1500×1000 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=fermacell-1500">Spočítať</a>
-        </li><li id="szalunek-2000" data-find="debniaca preglejka 2000×1000 szalunek-2000">
-          <span class="mat-item">
-            <b>Debniaca preglejka 2000×1000</b>
-            <span class="muted">2000×1000 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=szalunek-2000">Spočítať</a>
-        </li><li id="blat-postform" data-find="kuchynska doska postforming 4100×600 blat-postform">
-          <span class="mat-item">
-            <b>Kuchynská doska postforming 4100×600</b>
-            <span class="muted">4100×600 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blat-postform">Spočítať</a>
-        </li><li id="blat-38-4100" data-find="laminovana pracovna doska 38 mm · 4100×920 blat-38-4100">
-          <span class="mat-item">
-            <b>Laminovaná pracovná doska 38 mm · 4100×920</b>
-            <span class="muted">4100×920 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blat-38-4100">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-BOARDS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Dosky</h2>
+            <span class="mat-count">21<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>SDK doska bežná</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="sdk doska bezna 1200×2600 gk-zwykla-2600 dosky">
+            <span class="mat-item">
+              <b>SDK doska bežná 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/ks</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-zwykla-2600">Spočítať</a>
+          </li><li id="gk-zwykla-2000" data-find="sdk doska bezna 1200×2000 gk-zwykla-2000 dosky">
+            <span class="mat-item">
+              <b>SDK doska bežná 1200×2000</b>
+              <span class="muted">1200×2000 mm · 2,4 m²/ks</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-zwykla-2000">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="gk-impreg-2600" data-find="sdk doska impregnovana 1200×2600 gk-impreg-2600 dosky">
+            <span class="mat-item">
+              <b>SDK doska impregnovaná 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/ks</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-impreg-2600">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gk-ogniowa-2600" data-find="sdk doska protipoziarna 1200×2600 gk-ogniowa-2600 dosky">
+            <span class="mat-item">
+              <b>SDK doska protipožiarna 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/ks</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-ogniowa-2600">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gk-gksf-2600" data-find="sdk doska voda + ohen (gkfi) 1200×2600 gk-gksf-2600 dosky">
+            <span class="mat-item">
+              <b>SDK doska voda + oheň (GKFI) 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/ks</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/obklady-panely-dlazba/?m=gk-gksf-2600">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Laminovaná nábytková doska</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="plyta-lam-2800" data-find="laminovana nabytkova doska 2800×2070 plyta-lam-2800 dosky">
+            <span class="mat-item">
+              <b>Laminovaná nábytková doska 2800×2070</b>
+              <span class="muted">2800×2070 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=plyta-lam-2800">Spočítať</a>
+          </li><li id="plyta-lam-3660" data-find="laminovana nabytkova doska 3660×1830 plyta-lam-3660 dosky">
+            <span class="mat-item">
+              <b>Laminovaná nábytková doska 3660×1830</b>
+              <span class="muted">3660×1830 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=plyta-lam-3660">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="mdf-2800" data-find="mdf surove 2800×2070 mdf-2800 dosky">
+            <span class="mat-item">
+              <b>MDF surové 2800×2070</b>
+              <span class="muted">2800×2070 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=mdf-2800">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800 dosky">
+            <span class="mat-item">
+              <b>HDF 2800×2070</b>
+              <span class="muted">2800×2070 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=hdf-2800">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="wior-surowa" data-find="drevotrieska surova 2800×2070 wior-surowa dosky">
+            <span class="mat-item">
+              <b>Drevotrieska surová 2800×2070</b>
+              <span class="muted">2800×2070 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=wior-surowa">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="mfp-2500" data-find="doska mfp 2500×1250 mfp-2500 dosky">
+            <span class="mat-item">
+              <b>Doska MFP 2500×1250</b>
+              <span class="muted">2500×1250 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=mfp-2500">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-lisc" data-find="preglejka z tvrdeho dreva 2500×1250 sklejka-lisc dosky">
+            <span class="mat-item">
+              <b>Preglejka z tvrdého dreva 2500×1250</b>
+              <span class="muted">2500×1250 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=sklejka-lisc">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-brzoza" data-find="brezova preglejka 1525×1525 sklejka-brzoza dosky">
+            <span class="mat-item">
+              <b>Brezová preglejka 1525×1525</b>
+              <span class="muted">1525×1525 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=sklejka-brzoza">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-wodo" data-find="vodovzdorna preglejka 3000×1500 sklejka-wodo dosky">
+            <span class="mat-item">
+              <b>Vodovzdorná preglejka 3000×1500</b>
+              <span class="muted">3000×1500 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=sklejka-wodo">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>OSB-3</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500 dosky">
+            <span class="mat-item">
+              <b>OSB-3 2500×1250</b>
+              <span class="muted">2500×1250 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=osb3-2500">Spočítať</a>
+          </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800 dosky">
+            <span class="mat-item">
+              <b>OSB-3 2800×1250</b>
+              <span class="muted">2800×1250 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=osb3-2800">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="cetris-3350" data-find="cementotrieskova doska 3350×1250 cetris-3350 dosky">
+            <span class="mat-item">
+              <b>Cementotriesková doska 3350×1250</b>
+              <span class="muted">3350×1250 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=cetris-3350">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="fermacell-1500" data-find="sadrovlaknita doska 1500×1000 fermacell-1500 dosky">
+            <span class="mat-item">
+              <b>Sadrovláknitá doska 1500×1000</b>
+              <span class="muted">1500×1000 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=fermacell-1500">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="szalunek-2000" data-find="debniaca preglejka 2000×1000 szalunek-2000 dosky">
+            <span class="mat-item">
+              <b>Debniaca preglejka 2000×1000</b>
+              <span class="muted">2000×1000 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=szalunek-2000">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blat-postform" data-find="kuchynska doska postforming 4100×600 blat-postform dosky">
+            <span class="mat-item">
+              <b>Kuchynská doska postforming 4100×600</b>
+              <span class="muted">4100×600 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blat-postform">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blat-38-4100" data-find="laminovana pracovna doska 38 mm · 4100×920 blat-38-4100 dosky">
+            <span class="mat-item">
+              <b>Laminovaná pracovná doska 38 mm · 4100×920</b>
+              <span class="muted">4100×920 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blat-38-4100">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-WOOD">Drevo</h2>
-        <ul class="mat-page-list"><li id="kantowka-45-3" data-find="hranol 45×45 · 3 m kantowka-45-3">
-          <span class="mat-item">
-            <b>Hranol 45×45 · 3 m</b>
-            <span class="muted">tyč 3 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=kantowka-45-3">Spočítať</a>
-        </li><li id="lata-4x5-4" data-find="lata 40×50 · 4 m lata-4x5-4">
-          <span class="mat-item">
-            <b>Lata 40×50 · 4 m</b>
-            <span class="muted">tyč 4 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=lata-4x5-4">Spočítať</a>
-        </li><li id="krokiew-2" data-find="krokva 70×140 · 6 m krokiew-2">
-          <span class="mat-item">
-            <b>Krokva 70×140 · 6 m</b>
-            <span class="muted">tyč 6 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=krokiew-2">Spočítať</a>
-        </li><li id="deska-taras-3" data-find="terasova doska 3 m deska-taras-3">
-          <span class="mat-item">
-            <b>Terasová doska 3 m</b>
-            <span class="muted">tyč 3 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=deska-taras-3">Spočítať</a>
-        </li><li id="deska-wpc-4" data-find="terasova doska wpc 4 m deska-wpc-4">
-          <span class="mat-item">
-            <b>Terasová doska WPC 4 m</b>
-            <span class="muted">tyč 4 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=deska-wpc-4">Spočítať</a>
-        </li><li id="deska-elew-3" data-find="fasadna doska 3 m deska-elew-3">
-          <span class="mat-item">
-            <b>Fasádna doska 3 m</b>
-            <span class="muted">tyč 3 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=deska-elew-3">Spočítať</a>
-        </li><li id="sztacheta-1_5" data-find="plotovka 1,5 m sztacheta-1_5">
-          <span class="mat-item">
-            <b>Plotovka 1,5 m</b>
-            <span class="muted">tyč 1,5 m · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=sztacheta-1_5">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-WOOD" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Drevo</h2>
+            <span class="mat-count">7<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="kantowka-45-3" data-find="hranol 45×45 · 3 m kantowka-45-3 drevo">
+            <span class="mat-item">
+              <b>Hranol 45×45 · 3 m</b>
+              <span class="muted">tyč 3 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=kantowka-45-3">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lata-4x5-4" data-find="lata 40×50 · 4 m lata-4x5-4 drevo">
+            <span class="mat-item">
+              <b>Lata 40×50 · 4 m</b>
+              <span class="muted">tyč 4 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=lata-4x5-4">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="krokiew-2" data-find="krokva 70×140 · 6 m krokiew-2 drevo">
+            <span class="mat-item">
+              <b>Krokva 70×140 · 6 m</b>
+              <span class="muted">tyč 6 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=krokiew-2">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-taras-3" data-find="terasova doska 3 m deska-taras-3 drevo">
+            <span class="mat-item">
+              <b>Terasová doska 3 m</b>
+              <span class="muted">tyč 3 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=deska-taras-3">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-wpc-4" data-find="terasova doska wpc 4 m deska-wpc-4 drevo">
+            <span class="mat-item">
+              <b>Terasová doska WPC 4 m</b>
+              <span class="muted">tyč 4 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=deska-wpc-4">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-elew-3" data-find="fasadna doska 3 m deska-elew-3 drevo">
+            <span class="mat-item">
+              <b>Fasádna doska 3 m</b>
+              <span class="muted">tyč 3 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=deska-elew-3">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sztacheta-1_5" data-find="plotovka 1,5 m sztacheta-1_5 drevo">
+            <span class="mat-item">
+              <b>Plotovka 1,5 m</b>
+              <span class="muted">tyč 1,5 m · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=sztacheta-1_5">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PROFILES">Profily SDK</h2>
-        <ul class="mat-page-list"><li id="cd60-3" data-find="stropny profil cd60 3 m cd60-3">
-          <span class="mat-item">
-            <b>Stropný profil CD60 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cd60-3">Spočítať</a>
-        </li><li id="cd60-4" data-find="stropny profil cd60 4 m cd60-4">
-          <span class="mat-item">
-            <b>Stropný profil CD60 4 m</b>
-            <span class="muted">tyč 4 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cd60-4">Spočítať</a>
-        </li><li id="ud27-3" data-find="obvodovy profil ud27 3 m ud27-3">
-          <span class="mat-item">
-            <b>Obvodový profil UD27 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=ud27-3">Spočítať</a>
-        </li><li id="cw50-3" data-find="stenovy profil cw50 · 3 m cw50-3">
-          <span class="mat-item">
-            <b>Stenový profil CW50 · 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cw50-3">Spočítať</a>
-        </li><li id="uw50-3" data-find="stenovy profil uw50 · 3 m uw50-3">
-          <span class="mat-item">
-            <b>Stenový profil UW50 · 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=uw50-3">Spočítať</a>
-        </li><li id="cw75-3" data-find="stenovy profil cw75 · 3 m cw75-3">
-          <span class="mat-item">
-            <b>Stenový profil CW75 · 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cw75-3">Spočítať</a>
-        </li><li id="cw100-3" data-find="stenovy profil cw100 · 3 m cw100-3">
-          <span class="mat-item">
-            <b>Stenový profil CW100 · 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cw100-3">Spočítať</a>
-        </li><li id="ua50-3" data-find="vystuzny profil ua50 · 3 m ua50-3">
-          <span class="mat-item">
-            <b>Výstužný profil UA50 · 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=ua50-3">Spočítať</a>
-        </li><li id="ua75-3" data-find="vystuzny profil ua75 · 3 m ua75-3">
-          <span class="mat-item">
-            <b>Výstužný profil UA75 · 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=ua75-3">Spočítať</a>
-        </li><li id="narozny-alu-2_5" data-find="hlinikovy rohovnik 2,5 m narozny-alu-2_5">
-          <span class="mat-item">
-            <b>Hliníkový rohovník 2,5 m</b>
-            <span class="muted">tyč 2,5 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=narozny-alu-2_5">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PROFILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Profily SDK</h2>
+            <span class="mat-count">10<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Stropný profil CD60</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="cd60-3" data-find="stropny profil cd60 3 m cd60-3 profily sdk">
+            <span class="mat-item">
+              <b>Stropný profil CD60 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cd60-3">Spočítať</a>
+          </li><li id="cd60-4" data-find="stropny profil cd60 4 m cd60-4 profily sdk">
+            <span class="mat-item">
+              <b>Stropný profil CD60 4 m</b>
+              <span class="muted">tyč 4 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cd60-4">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="ud27-3" data-find="obvodovy profil ud27 3 m ud27-3 profily sdk">
+            <span class="mat-item">
+              <b>Obvodový profil UD27 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=ud27-3">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Stenový profil</h3>
+              <span class="mat-count">4<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="cw50-3" data-find="stenovy profil cw50 · 3 m cw50-3 profily sdk">
+            <span class="mat-item">
+              <b>Stenový profil CW50 · 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cw50-3">Spočítať</a>
+          </li><li id="uw50-3" data-find="stenovy profil uw50 · 3 m uw50-3 profily sdk">
+            <span class="mat-item">
+              <b>Stenový profil UW50 · 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=uw50-3">Spočítať</a>
+          </li><li id="cw75-3" data-find="stenovy profil cw75 · 3 m cw75-3 profily sdk">
+            <span class="mat-item">
+              <b>Stenový profil CW75 · 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cw75-3">Spočítať</a>
+          </li><li id="cw100-3" data-find="stenovy profil cw100 · 3 m cw100-3 profily sdk">
+            <span class="mat-item">
+              <b>Stenový profil CW100 · 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=cw100-3">Spočítať</a>
+          </li></ul>
+          </details>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Výstužný profil</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="ua50-3" data-find="vystuzny profil ua50 · 3 m ua50-3 profily sdk">
+            <span class="mat-item">
+              <b>Výstužný profil UA50 · 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=ua50-3">Spočítať</a>
+          </li><li id="ua75-3" data-find="vystuzny profil ua75 · 3 m ua75-3 profily sdk">
+            <span class="mat-item">
+              <b>Výstužný profil UA75 · 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=ua75-3">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="narozny-alu-2_5" data-find="hlinikovy rohovnik 2,5 m narozny-alu-2_5 profily sdk">
+            <span class="mat-item">
+              <b>Hliníkový rohovník 2,5 m</b>
+              <span class="muted">tyč 2,5 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=narozny-alu-2_5">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-METAL">Kov a výstuž</h2>
-        <ul class="mat-page-list"><li id="blacha-stal" data-find="ocelovy plech 2000×1000 blacha-stal">
-          <span class="mat-item">
-            <b>Oceľový plech 2000×1000</b>
-            <span class="muted">2000×1000 mm · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blacha-stal">Spočítať</a>
-        </li><li id="blacha-alu" data-find="hlinikovy plech 2500×1250 blacha-alu">
-          <span class="mat-item">
-            <b>Hliníkový plech 2500×1250</b>
-            <span class="muted">2500×1250 mm · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blacha-alu">Spočítať</a>
-        </li><li id="blacha-ocynk" data-find="pozinkovany plech 2000×1000 blacha-ocynk">
-          <span class="mat-item">
-            <b>Pozinkovaný plech 2000×1000</b>
-            <span class="muted">2000×1000 mm · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blacha-ocynk">Spočítať</a>
-        </li><li id="katownik-alu-2" data-find="hlinikovy uholnik 2 m katownik-alu-2">
-          <span class="mat-item">
-            <b>Hliníkový uholník 2 m</b>
-            <span class="muted">tyč 2 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=katownik-alu-2">Spočítať</a>
-        </li><li id="ceownik-stal-3" data-find="ocelovy u-profil 3 m ceownik-stal-3">
-          <span class="mat-item">
-            <b>Oceľový U-profil 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=ceownik-stal-3">Spočítať</a>
-        </li><li id="profil-kwadr-3" data-find="uzavrety profil 30×30 · 3 m profil-kwadr-3">
-          <span class="mat-item">
-            <b>Uzavretý profil 30×30 · 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=profil-kwadr-3">Spočítať</a>
-        </li><li id="pret-8-12" data-find="betonarska vystuz ø8 · 12 m pret-8-12">
-          <span class="mat-item">
-            <b>Betonárska výstuž Ø8 · 12 m</b>
-            <span class="muted">tyč 12 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=pret-8-12">Spočítať</a>
-        </li><li id="pret-10-12" data-find="betonarska vystuz ø10 · 12 m pret-10-12">
-          <span class="mat-item">
-            <b>Betonárska výstuž Ø10 · 12 m</b>
-            <span class="muted">tyč 12 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=pret-10-12">Spočítať</a>
-        </li><li id="pret-12-12" data-find="betonarska vystuz ø12 · 12 m pret-12-12">
-          <span class="mat-item">
-            <b>Betonárska výstuž Ø12 · 12 m</b>
-            <span class="muted">tyč 12 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=pret-12-12">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-METAL" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Kov a výstuž</h2>
+            <span class="mat-count">9<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="blacha-stal" data-find="ocelovy plech 2000×1000 blacha-stal kov a vystuz">
+            <span class="mat-item">
+              <b>Oceľový plech 2000×1000</b>
+              <span class="muted">2000×1000 mm · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blacha-stal">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blacha-alu" data-find="hlinikovy plech 2500×1250 blacha-alu kov a vystuz">
+            <span class="mat-item">
+              <b>Hliníkový plech 2500×1250</b>
+              <span class="muted">2500×1250 mm · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blacha-alu">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blacha-ocynk" data-find="pozinkovany plech 2000×1000 blacha-ocynk kov a vystuz">
+            <span class="mat-item">
+              <b>Pozinkovaný plech 2000×1000</b>
+              <span class="muted">2000×1000 mm · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=blacha-ocynk">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="katownik-alu-2" data-find="hlinikovy uholnik 2 m katownik-alu-2 kov a vystuz">
+            <span class="mat-item">
+              <b>Hliníkový uholník 2 m</b>
+              <span class="muted">tyč 2 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=katownik-alu-2">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="ceownik-stal-3" data-find="ocelovy u-profil 3 m ceownik-stal-3 kov a vystuz">
+            <span class="mat-item">
+              <b>Oceľový U-profil 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=ceownik-stal-3">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="profil-kwadr-3" data-find="uzavrety profil 30×30 · 3 m profil-kwadr-3 kov a vystuz">
+            <span class="mat-item">
+              <b>Uzavretý profil 30×30 · 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=profil-kwadr-3">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Betonárska výstuž</h3>
+              <span class="mat-count">3<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="pret-8-12" data-find="betonarska vystuz ø8 · 12 m pret-8-12 kov a vystuz">
+            <span class="mat-item">
+              <b>Betonárska výstuž Ø8 · 12 m</b>
+              <span class="muted">tyč 12 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=pret-8-12">Spočítať</a>
+          </li><li id="pret-10-12" data-find="betonarska vystuz ø10 · 12 m pret-10-12 kov a vystuz">
+            <span class="mat-item">
+              <b>Betonárska výstuž Ø10 · 12 m</b>
+              <span class="muted">tyč 12 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=pret-10-12">Spočítať</a>
+          </li><li id="pret-12-12" data-find="betonarska vystuz ø12 · 12 m pret-12-12 kov a vystuz">
+            <span class="mat-item">
+              <b>Betonárska výstuž Ø12 · 12 m</b>
+              <span class="muted">tyč 12 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=pret-12-12">Spočítať</a>
+          </li></ul>
+          </details>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-GLASS">Sklo a plasty</h2>
-        <ul class="mat-page-list"><li id="plexi-3050" data-find="plexisklo (pmma) 3050×2050 plexi-3050">
-          <span class="mat-item">
-            <b>Plexisklo (PMMA) 3050×2050</b>
-            <span class="muted">3050×2050 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=plexi-3050">Spočítať</a>
-        </li><li id="poliweglan" data-find="plny polykarbonat 3050×2050 poliweglan">
-          <span class="mat-item">
-            <b>Plný polykarbonát 3050×2050</b>
-            <span class="muted">3050×2050 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=poliweglan">Spočítať</a>
-        </li><li id="poliweglan-kom" data-find="komorkovy polykarbonat 2100×6000 poliweglan-kom">
-          <span class="mat-item">
-            <b>Komôrkový polykarbonát 2100×6000</b>
-            <span class="muted">2100×6000 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=poliweglan-kom">Spočítať</a>
-        </li><li id="hpl" data-find="kompaktna doska hpl 3050×1300 hpl">
-          <span class="mat-item">
-            <b>Kompaktná doska HPL 3050×1300</b>
-            <span class="muted">3050×1300 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=hpl">Spočítať</a>
-        </li><li id="dibond" data-find="dibond 3050×1500 dibond">
-          <span class="mat-item">
-            <b>Dibond 3050×1500</b>
-            <span class="muted">3050×1500 mm · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=dibond">Spočítať</a>
-        </li><li id="pcv-spienione" data-find="lahcene pvc 3050×1560 pcv-spienione">
-          <span class="mat-item">
-            <b>Ľahčené PVC 3050×1560</b>
-            <span class="muted">3050×1560 mm · prierez 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=pcv-spienione">Spočítať</a>
-        </li><li id="szklo-jumbo" data-find="float sklo 3210×2250 szklo-jumbo">
-          <span class="mat-item">
-            <b>Float sklo 3210×2250</b>
-            <span class="muted">3210×2250 mm · prierez 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=szklo-jumbo">Spočítať</a>
-        </li><li id="szklo-2550" data-find="float sklo 2550×1605 szklo-2550">
-          <span class="mat-item">
-            <b>Float sklo 2550×1605</b>
-            <span class="muted">2550×1605 mm · prierez 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=szklo-2550">Spočítať</a>
-        </li><li id="lustro-2550" data-find="zrkadlo 2550×1605 lustro-2550">
-          <span class="mat-item">
-            <b>Zrkadlo 2550×1605</b>
-            <span class="muted">2550×1605 mm · prierez 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=lustro-2550">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-GLASS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Sklo a plasty</h2>
+            <span class="mat-count">9<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="plexi-3050" data-find="plexisklo (pmma) 3050×2050 plexi-3050 sklo a plasty">
+            <span class="mat-item">
+              <b>Plexisklo (PMMA) 3050×2050</b>
+              <span class="muted">3050×2050 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=plexi-3050">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="poliweglan" data-find="plny polykarbonat 3050×2050 poliweglan sklo a plasty">
+            <span class="mat-item">
+              <b>Plný polykarbonát 3050×2050</b>
+              <span class="muted">3050×2050 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=poliweglan">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="poliweglan-kom" data-find="komorkovy polykarbonat 2100×6000 poliweglan-kom sklo a plasty">
+            <span class="mat-item">
+              <b>Komôrkový polykarbonát 2100×6000</b>
+              <span class="muted">2100×6000 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=poliweglan-kom">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hpl" data-find="kompaktna doska hpl 3050×1300 hpl sklo a plasty">
+            <span class="mat-item">
+              <b>Kompaktná doska HPL 3050×1300</b>
+              <span class="muted">3050×1300 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=hpl">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="dibond" data-find="dibond 3050×1500 dibond sklo a plasty">
+            <span class="mat-item">
+              <b>Dibond 3050×1500</b>
+              <span class="muted">3050×1500 mm · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=dibond">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pcv-spienione" data-find="lahcene pvc 3050×1560 pcv-spienione sklo a plasty">
+            <span class="mat-item">
+              <b>Ľahčené PVC 3050×1560</b>
+              <span class="muted">3050×1560 mm · prierez 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=pcv-spienione">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Float sklo</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="szklo-jumbo" data-find="float sklo 3210×2250 szklo-jumbo sklo a plasty">
+            <span class="mat-item">
+              <b>Float sklo 3210×2250</b>
+              <span class="muted">3210×2250 mm · prierez 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=szklo-jumbo">Spočítať</a>
+          </li><li id="szklo-2550" data-find="float sklo 2550×1605 szklo-2550 sklo a plasty">
+            <span class="mat-item">
+              <b>Float sklo 2550×1605</b>
+              <span class="muted">2550×1605 mm · prierez 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=szklo-2550">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="lustro-2550" data-find="zrkadlo 2550×1605 lustro-2550 sklo a plasty">
+            <span class="mat-item">
+              <b>Zrkadlo 2550×1605</b>
+              <span class="muted">2550×1605 mm · prierez 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=lustro-2550">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TEXTILES">Textílie a čalúnenie</h2>
-        <ul class="mat-page-list"><li id="tkanina-140" data-find="latka z rolky, sirka 140 cm tkanina-140">
-          <span class="mat-item">
-            <b>Látka z rolky, šírka 140 cm</b>
-            <span class="muted">1400×3000 mm · prierez 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=tkanina-140">Spočítať</a>
-        </li><li id="tkanina-150" data-find="latka z rolky, sirka 150 cm tkanina-150">
-          <span class="mat-item">
-            <b>Látka z rolky, šírka 150 cm</b>
-            <span class="muted">1500×3000 mm · prierez 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=tkanina-150">Spočítať</a>
-        </li><li id="ekoskora-140" data-find="ekokoza z rolky, sirka 140 cm ekoskora-140">
-          <span class="mat-item">
-            <b>Ekokoža z rolky, šírka 140 cm</b>
-            <span class="muted">1400×3000 mm · prierez 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=ekoskora-140">Spočítať</a>
-        </li><li id="skora-nat" data-find="prirodna koza – kus 2200×1200 skora-nat">
-          <span class="mat-item">
-            <b>Prírodná koža – kus 2200×1200</b>
-            <span class="muted">2200×1200 mm · prierez 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=skora-nat">Spočítať</a>
-        </li><li id="pianka-tap" data-find="calunnicka pena – blok 2000×1200 pianka-tap">
-          <span class="mat-item">
-            <b>Čalúnnická pena – blok 2000×1200</b>
-            <span class="muted">2000×1200 mm · prierez 5 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=pianka-tap">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TEXTILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Textílie a čalúnenie</h2>
+            <span class="mat-count">5<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Látka z rolky, šírka</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="tkanina-140" data-find="latka z rolky, sirka 140 cm tkanina-140 textilie a calunenie">
+            <span class="mat-item">
+              <b>Látka z rolky, šírka 140 cm</b>
+              <span class="muted">1400×3000 mm · prierez 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=tkanina-140">Spočítať</a>
+          </li><li id="tkanina-150" data-find="latka z rolky, sirka 150 cm tkanina-150 textilie a calunenie">
+            <span class="mat-item">
+              <b>Látka z rolky, šírka 150 cm</b>
+              <span class="muted">1500×3000 mm · prierez 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=tkanina-150">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="ekoskora-140" data-find="ekokoza z rolky, sirka 140 cm ekoskora-140 textilie a calunenie">
+            <span class="mat-item">
+              <b>Ekokoža z rolky, šírka 140 cm</b>
+              <span class="muted">1400×3000 mm · prierez 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=ekoskora-140">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="skora-nat" data-find="prirodna koza – kus 2200×1200 skora-nat textilie a calunenie">
+            <span class="mat-item">
+              <b>Prírodná koža – kus 2200×1200</b>
+              <span class="muted">2200×1200 mm · prierez 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=skora-nat">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pianka-tap" data-find="calunnicka pena – blok 2000×1200 pianka-tap textilie a calunenie">
+            <span class="mat-item">
+              <b>Čalúnnická pena – blok 2000×1200</b>
+              <span class="muted">2000×1200 mm · prierez 5 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/rez-dosiek-2d/?m=pianka-tap">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-INSULATION">Izolácia</h2>
-        <ul class="mat-page-list"><li id="welna-10" data-find="mineralna vata 10 cm welna-10">
-          <span class="mat-item">
-            <b>Minerálna vata 10 cm</b>
-            <span class="muted">balík ≈ 6 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=welna-10">Spočítať</a>
-        </li><li id="welna-15" data-find="mineralna vata 15 cm welna-15">
-          <span class="mat-item">
-            <b>Minerálna vata 15 cm</b>
-            <span class="muted">balík ≈ 4,5 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=welna-15">Spočítať</a>
-        </li><li id="welna-podd-20" data-find="vata na podkrovie 20 cm welna-podd-20">
-          <span class="mat-item">
-            <b>Vata na podkrovie 20 cm</b>
-            <span class="muted">balík ≈ 3,5 m² · 20 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=welna-podd-20">Spočítať</a>
-        </li><li id="welna-fasada-15" data-find="fasadna vata 15 cm welna-fasada-15">
-          <span class="mat-item">
-            <b>Fasádna vata 15 cm</b>
-            <span class="muted">balík ≈ 2 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=welna-fasada-15">Spočítať</a>
-        </li><li id="styropian-5" data-find="polystyren eps 5 cm styropian-5">
-          <span class="mat-item">
-            <b>Polystyrén EPS 5 cm</b>
-            <span class="muted">balík ≈ 3 m² · 5 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=styropian-5">Spočítať</a>
-        </li><li id="styropian-fasada-10" data-find="fasadny eps 10 cm styropian-fasada-10">
-          <span class="mat-item">
-            <b>Fasádny EPS 10 cm</b>
-            <span class="muted">balík ≈ 3 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=styropian-fasada-10">Spočítať</a>
-        </li><li id="styropian-fasada-15" data-find="fasadny eps 15 cm styropian-fasada-15">
-          <span class="mat-item">
-            <b>Fasádny EPS 15 cm</b>
-            <span class="muted">balík ≈ 2 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=styropian-fasada-15">Spočítať</a>
-        </li><li id="styropian-podloga-10" data-find="podlahovy eps eps 100 · 10 cm styropian-podloga-10">
-          <span class="mat-item">
-            <b>Podlahový EPS EPS 100 · 10 cm</b>
-            <span class="muted">balík ≈ 3 m² · EPS 100 · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=styropian-podloga-10">Spočítať</a>
-        </li><li id="xps-5" data-find="doska xps 5 cm xps-5">
-          <span class="mat-item">
-            <b>Doska XPS 5 cm</b>
-            <span class="muted">balík ≈ 5,5 m² · 5 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=xps-5">Spočítať</a>
-        </li><li id="pir-10" data-find="doska pir 10 cm pir-10">
-          <span class="mat-item">
-            <b>Doska PIR 10 cm</b>
-            <span class="muted">balík ≈ 5,7 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=pir-10">Spočítať</a>
-        </li><li id="papa-rolka" data-find="podkladova lepenka 20 m² papa-rolka">
-          <span class="mat-item">
-            <b>Podkladová lepenka 20 m²</b>
-            <span class="muted">balík ≈ 20 m² · 20 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=papa-rolka">Spočítať</a>
-        </li><li id="folia-paro" data-find="parozabrana 75 m² folia-paro">
-          <span class="mat-item">
-            <b>Parozábrana 75 m²</b>
-            <span class="muted">balík ≈ 75 m² · 75 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=folia-paro">Spočítať</a>
-        </li><li id="membrana-dach" data-find="stresna membrana 75 m² membrana-dach">
-          <span class="mat-item">
-            <b>Strešná membrána 75 m²</b>
-            <span class="muted">balík ≈ 75 m² · 75 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=membrana-dach">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-INSULATION" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Izolácia</h2>
+            <span class="mat-count">13<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Minerálna vata</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="welna-10" data-find="mineralna vata 10 cm welna-10 izolacia">
+            <span class="mat-item">
+              <b>Minerálna vata 10 cm</b>
+              <span class="muted">balík ≈ 6 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=welna-10">Spočítať</a>
+          </li><li id="welna-15" data-find="mineralna vata 15 cm welna-15 izolacia">
+            <span class="mat-item">
+              <b>Minerálna vata 15 cm</b>
+              <span class="muted">balík ≈ 4,5 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=welna-15">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="welna-podd-20" data-find="vata na podkrovie 20 cm welna-podd-20 izolacia">
+            <span class="mat-item">
+              <b>Vata na podkrovie 20 cm</b>
+              <span class="muted">balík ≈ 3,5 m² · 20 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=welna-podd-20">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="welna-fasada-15" data-find="fasadna vata 15 cm welna-fasada-15 izolacia">
+            <span class="mat-item">
+              <b>Fasádna vata 15 cm</b>
+              <span class="muted">balík ≈ 2 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=welna-fasada-15">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="styropian-5" data-find="polystyren eps 5 cm styropian-5 izolacia">
+            <span class="mat-item">
+              <b>Polystyrén EPS 5 cm</b>
+              <span class="muted">balík ≈ 3 m² · 5 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=styropian-5">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Fasádny EPS</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="styropian-fasada-10" data-find="fasadny eps 10 cm styropian-fasada-10 izolacia">
+            <span class="mat-item">
+              <b>Fasádny EPS 10 cm</b>
+              <span class="muted">balík ≈ 3 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=styropian-fasada-10">Spočítať</a>
+          </li><li id="styropian-fasada-15" data-find="fasadny eps 15 cm styropian-fasada-15 izolacia">
+            <span class="mat-item">
+              <b>Fasádny EPS 15 cm</b>
+              <span class="muted">balík ≈ 2 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=styropian-fasada-15">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="styropian-podloga-10" data-find="podlahovy eps eps 100 · 10 cm styropian-podloga-10 izolacia">
+            <span class="mat-item">
+              <b>Podlahový EPS EPS 100 · 10 cm</b>
+              <span class="muted">balík ≈ 3 m² · EPS 100 · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=styropian-podloga-10">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="xps-5" data-find="doska xps 5 cm xps-5 izolacia">
+            <span class="mat-item">
+              <b>Doska XPS 5 cm</b>
+              <span class="muted">balík ≈ 5,5 m² · 5 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=xps-5">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pir-10" data-find="doska pir 10 cm pir-10 izolacia">
+            <span class="mat-item">
+              <b>Doska PIR 10 cm</b>
+              <span class="muted">balík ≈ 5,7 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=pir-10">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="papa-rolka" data-find="podkladova lepenka 20 m² papa-rolka izolacia">
+            <span class="mat-item">
+              <b>Podkladová lepenka 20 m²</b>
+              <span class="muted">balík ≈ 20 m² · 20 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=papa-rolka">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="folia-paro" data-find="parozabrana 75 m² folia-paro izolacia">
+            <span class="mat-item">
+              <b>Parozábrana 75 m²</b>
+              <span class="muted">balík ≈ 75 m² · 75 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=folia-paro">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="membrana-dach" data-find="stresna membrana 75 m² membrana-dach izolacia">
+            <span class="mat-item">
+              <b>Strešná membrána 75 m²</b>
+              <span class="muted">balík ≈ 75 m² · 75 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/farby-omietky-penetracie/?m=membrana-dach">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PLUMBING">Inštalácie a vetranie</h2>
-        <ul class="mat-page-list"><li id="rura-pp-4" data-find="rura pp 4 m rura-pp-4">
-          <span class="mat-item">
-            <b>Rúra PP 4 m</b>
-            <span class="muted">tyč 4 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-pp-4">Spočítať</a>
-        </li><li id="rura-pex-3" data-find="rura pex 3 m rura-pex-3">
-          <span class="mat-item">
-            <b>Rúra PEX 3 m</b>
-            <span class="muted">tyč 3 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-pex-3">Spočítať</a>
-        </li><li id="rura-cu-3" data-find="medena rura 3 m rura-cu-3">
-          <span class="mat-item">
-            <b>Medená rúra 3 m</b>
-            <span class="muted">tyč 3 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-cu-3">Spočítať</a>
-        </li><li id="rura-spust-3" data-find="zvodova rura 3 m rura-spust-3">
-          <span class="mat-item">
-            <b>Zvodová rúra 3 m</b>
-            <span class="muted">tyč 3 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-spust-3">Spočítať</a>
-        </li><li id="kanal-went-1" data-find="vzduchotechnicke potrubie 1 m kanal-went-1">
-          <span class="mat-item">
-            <b>Vzduchotechnické potrubie 1 m</b>
-            <span class="muted">tyč 1 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=kanal-went-1">Spočítať</a>
-        </li><li id="rura-kanal-110-2" data-find="kanalizacna rura pvc 110 · 2 m rura-kanal-110-2">
-          <span class="mat-item">
-            <b>Kanalizačná rúra PVC 110 · 2 m</b>
-            <span class="muted">tyč 2 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-kanal-110-2">Spočítať</a>
-        </li><li id="rura-kanal-50-2" data-find="kanalizacna rura pvc 50 · 2 m rura-kanal-50-2">
-          <span class="mat-item">
-            <b>Kanalizačná rúra PVC 50 · 2 m</b>
-            <span class="muted">tyč 2 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-kanal-50-2">Spočítať</a>
-        </li><li id="rynna-3" data-find="odkvapovy zlab 3 m rynna-3">
-          <span class="mat-item">
-            <b>Odkvapový žľab 3 m</b>
-            <span class="muted">tyč 3 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rynna-3">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PLUMBING" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Inštalácie a vetranie</h2>
+            <span class="mat-count">8<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="rura-pp-4" data-find="rura pp 4 m rura-pp-4 instalacie a vetranie">
+            <span class="mat-item">
+              <b>Rúra PP 4 m</b>
+              <span class="muted">tyč 4 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-pp-4">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-pex-3" data-find="rura pex 3 m rura-pex-3 instalacie a vetranie">
+            <span class="mat-item">
+              <b>Rúra PEX 3 m</b>
+              <span class="muted">tyč 3 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-pex-3">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-cu-3" data-find="medena rura 3 m rura-cu-3 instalacie a vetranie">
+            <span class="mat-item">
+              <b>Medená rúra 3 m</b>
+              <span class="muted">tyč 3 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-cu-3">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-spust-3" data-find="zvodova rura 3 m rura-spust-3 instalacie a vetranie">
+            <span class="mat-item">
+              <b>Zvodová rúra 3 m</b>
+              <span class="muted">tyč 3 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-spust-3">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="kanal-went-1" data-find="vzduchotechnicke potrubie 1 m kanal-went-1 instalacie a vetranie">
+            <span class="mat-item">
+              <b>Vzduchotechnické potrubie 1 m</b>
+              <span class="muted">tyč 1 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=kanal-went-1">Spočítať</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Kanalizačná rúra PVC</h3>
+              <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="rura-kanal-110-2" data-find="kanalizacna rura pvc 110 · 2 m rura-kanal-110-2 instalacie a vetranie">
+            <span class="mat-item">
+              <b>Kanalizačná rúra PVC 110 · 2 m</b>
+              <span class="muted">tyč 2 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-kanal-110-2">Spočítať</a>
+          </li><li id="rura-kanal-50-2" data-find="kanalizacna rura pvc 50 · 2 m rura-kanal-50-2 instalacie a vetranie">
+            <span class="mat-item">
+              <b>Kanalizačná rúra PVC 50 · 2 m</b>
+              <span class="muted">tyč 2 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rura-kanal-50-2">Spočítať</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="rynna-3" data-find="odkvapovy zlab 3 m rynna-3 instalacie a vetranie">
+            <span class="mat-item">
+              <b>Odkvapový žľab 3 m</b>
+              <span class="muted">tyč 3 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=rynna-3">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-ELECTRICAL">Elektro</h2>
-        <ul class="mat-page-list"><li id="korytko-2" data-find="kablovy zlab 2 m korytko-2">
-          <span class="mat-item">
-            <b>Káblový žľab 2 m</b>
-            <span class="muted">tyč 2 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=korytko-2">Spočítať</a>
-        </li><li id="listwa-kabel-2" data-find="kablova lista 2 m listwa-kabel-2">
-          <span class="mat-item">
-            <b>Káblová lišta 2 m</b>
-            <span class="muted">tyč 2 m · prierez 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=listwa-kabel-2">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-ELECTRICAL" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Elektro</h2>
+            <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="korytko-2" data-find="kablovy zlab 2 m korytko-2 elektro">
+            <span class="mat-item">
+              <b>Káblový žľab 2 m</b>
+              <span class="muted">tyč 2 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=korytko-2">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-kabel-2" data-find="kablova lista 2 m listwa-kabel-2 elektro">
+            <span class="mat-item">
+              <b>Káblová lišta 2 m</b>
+              <span class="muted">tyč 2 m · prierez 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=listwa-kabel-2">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-OTHER">Ostatné</h2>
-        <ul class="mat-page-list"><li id="tapeta-standard" data-find="tapeta – rolka 0,53×10 m tapeta-standard">
-          <span class="mat-item">
-            <b>Tapeta – rolka 0,53×10 m</b>
-            <span class="muted">0,53×10 m · 5,3 m²/bal.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/tapety/?m=tapeta-standard">Spočítať</a>
-        </li><li id="karnisz-2_4" data-find="garniza / tyc 2,4 m karnisz-2_4">
-          <span class="mat-item">
-            <b>Garniža / tyč 2,4 m</b>
-            <span class="muted">tyč 2,4 m · prierez 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=karnisz-2_4">Spočítať</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-OTHER" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Ostatné</h2>
+            <span class="mat-count">2<span class="mat-count-w"> položiek</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="tapeta-standard" data-find="tapeta – rolka 0,53×10 m tapeta-standard ostatne">
+            <span class="mat-item">
+              <b>Tapeta – rolka 0,53×10 m</b>
+              <span class="muted">0,53×10 m · 5,3 m²/bal.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/tapety/?m=tapeta-standard">Spočítať</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="karnisz-2_4" data-find="garniza / tyc 2,4 m karnisz-2_4 ostatne">
+            <span class="mat-item">
+              <b>Garniža / tyč 2,4 m</b>
+              <span class="muted">tyč 2,4 m · prierez 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/sk/kalkulacky/linearny-rez-1d/?m=karnisz-2_4">Spočítať</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   </div>
+
+  <section class="block alt" id="matpage-own">
+    <div class="wrap narrow">
+      <h2>Vaše materiály</h2>
+      <p class="muted" data-omat-guest>
+        Prihlás sa a pridávaj vlastné materiály a ceny.
+        <a class="btn btn-ghost btn-sm" href="/app/">Prihlásiť sa</a>
+      </p>
+      <div data-omat-mine hidden>
+        <details class="mat-add">
+          <summary>Nový materiál</summary>
+          <form class="card omat-form" data-omat-form>
+        
+        <label class="field">
+          <span class="fld-label">Názov</span>
+          <input type="text" maxlength="120" placeholder="napr. Dlažba 60×60 od dodávateľa" data-omat-in="name" required>
+        </label>
+        <div class="omat-row">
+          <label class="field">
+            <span class="fld-label">Na čo slúži</span>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Obklady stien a podláh</option><option value="DRYWALL_BOARDING">Sadrokartónové konštrukcie</option><option value="COATING">Krycie materiály</option><option value="PANEL_CUTTING">Rezanie dosiek a hárkov</option><option value="LINEAR_STOCK">Profily, lišty, rúrky, tyče</option></select>
+          </label>
+          <label class="field">
+            <span class="fld-label">Kategória</span>
+            <select data-omat-in="category"><option value="TILES">Obklady a dlažba</option><option value="FLOORING">Podlahy</option><option value="TRIM">Lišty a dokončenie</option><option value="PAINT">Farby a laky</option><option value="CHEMICALS">Stavebná chémia</option><option value="BOARDS">Dosky</option><option value="WOOD">Drevo</option><option value="PROFILES">Profily SDK</option><option value="METAL">Kov a výstuž</option><option value="GLASS">Sklo a plasty</option><option value="TEXTILES">Textílie a čalúnenie</option><option value="INSULATION">Izolácia</option><option value="PLUMBING">Inštalácie a vetranie</option><option value="ELECTRICAL">Elektro</option><option value="OTHER">Ostatné</option></select>
+          </label>
+        </div>
+        <div class="omat-fields" data-omat-group="WALL_FLOOR_COVERING">
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Šírka (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Dĺžka (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="packageAreaM2">
+              <span class="fld-label">Plocha balenia (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="packageAreaM2">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Rezerva (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="DRYWALL_BOARDING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Šírka (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Dĺžka (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Rezerva (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="COATING" hidden>
+            <label class="field omat-f" data-omat-f="coveragePerUnitM2">
+              <span class="fld-label">Výdatnosť balenia (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="coveragePerUnitM2">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="PANEL_CUTTING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Šírka (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Dĺžka (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Šírka rezu (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="LINEAR_STOCK" hidden>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Dĺžka (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Šírka rezu (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+        <label class="field">
+          <span class="fld-label">Cena za balenie</span>
+          <input type="text" inputmode="decimal" data-omat-in="priceMajor">
+        </label>
+        <p class="muted">Cena si drží menu, v ktorej bola zadaná. Nič sa neprepočítava kurzom.</p>
+        <button type="submit" class="btn btn-primary btn-block">Uložiť materiál</button>
+        
+        <p class="omat-err" data-omat-err role="alert" hidden></p>
+      </form>
+        </details>
+        <div data-omat-list data-hist-label="História cien"></div>
+        <p class="muted" data-omat-empty>Vlastné materiály zatiaľ nemáte.</p>
+        <p class="ws-undo" data-omat-undo role="status" hidden></p>
+        <p class="muted">Materiál z tohto zoznamu vyberiete v kalkulačke rovnako ako položku z katalógu.</p>
+      </div>
+    </div>
+  </section>
 
   <section class="block app-note" aria-labelledby="appnote-h">
     <div class="wrap">
@@ -2177,6 +2609,8 @@
 
 <script src="/assets/materials.js?v=20260902a"></script>
 <script src="/assets/materials-ui.js?v=20260902a"></script>
+<script src="/assets/own-materials.js?v=20260902a"></script>
+<script src="/assets/own-materials-ui.js?v=20260902a"></script>
 <script src="/assets/main.js?v=20260902a"></script>
 
 </body>

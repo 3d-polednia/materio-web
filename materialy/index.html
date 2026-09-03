@@ -1009,1067 +1009,1499 @@
       <div class="wrap">
         <label class="fld-label" for="matpage-search">Szukaj materiału…</label>
         <input id="matpage-search" type="search" class="mat-search" placeholder="Szukaj materiału…" autocomplete="off">
+        <p class="mat-tools">
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-expand>Rozwiń wszystko</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-mat-collapse>Zwiń wszystko</button>
+        </p>
         <p class="muted mt-3">161 materiałów w katalogu · Wartości są typowe i różnią się między producentami. Po wstawieniu do kalkulatora każdą można poprawić.</p>
+        <p class="muted" id="matpage-count" role="status" hidden></p>
         <p class="muted" id="matpage-empty" hidden>Nic nie pasuje do wyszukiwania.</p>
       </div>
     </section>
     <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TILES">Płytki i gres</h2>
-        <ul class="mat-page-list"><li id="gres-30x30" data-find="gres 30×30 gres-30x30">
-          <span class="mat-item">
-            <b>Gres 30×30</b>
-            <span class="muted">30×30 cm · 1 m²/opak. · 5 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-30x30">Policz</a>
-        </li><li id="gres-30x60" data-find="gres 30×60 gres-30x60">
-          <span class="mat-item">
-            <b>Gres 30×60</b>
-            <span class="muted">30×60 cm · 1,44 m²/opak. · 5 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-30x60">Policz</a>
-        </li><li id="gres-40x40" data-find="gres 40×40 gres-40x40">
-          <span class="mat-item">
-            <b>Gres 40×40</b>
-            <span class="muted">40×40 cm · 1,28 m²/opak. · 6 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-40x40">Policz</a>
-        </li><li id="gres-45x45" data-find="gres 45×45 gres-45x45">
-          <span class="mat-item">
-            <b>Gres 45×45</b>
-            <span class="muted">45×45 cm · 1,42 m²/opak. · 7 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-45x45">Policz</a>
-        </li><li id="gres-60x60" data-find="gres 60×60 gres-60x60">
-          <span class="mat-item">
-            <b>Gres 60×60</b>
-            <span class="muted">60×60 cm · 1,44 m²/opak. · 7 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-60x60">Policz</a>
-        </li><li id="gres-75x75" data-find="gres 75×75 gres-75x75">
-          <span class="mat-item">
-            <b>Gres 75×75</b>
-            <span class="muted">75×75 cm · 1,13 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-75x75">Policz</a>
-        </li><li id="gres-80x80" data-find="gres 80×80 gres-80x80">
-          <span class="mat-item">
-            <b>Gres 80×80</b>
-            <span class="muted">80×80 cm · 1,28 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-80x80">Policz</a>
-        </li><li id="gres-90x90" data-find="gres 90×90 gres-90x90">
-          <span class="mat-item">
-            <b>Gres 90×90</b>
-            <span class="muted">90×90 cm · 1,62 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-90x90">Policz</a>
-        </li><li id="gres-60x120" data-find="gres 60×120 gres-60x120">
-          <span class="mat-item">
-            <b>Gres 60×120</b>
-            <span class="muted">60×120 cm · 1,44 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-60x120">Policz</a>
-        </li><li id="gres-120x120" data-find="gres 120×120 gres-120x120">
-          <span class="mat-item">
-            <b>Gres 120×120</b>
-            <span class="muted">120×120 cm · 1,44 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-120x120">Policz</a>
-        </li><li id="gres-120x278" data-find="gres wielkoformatowy 120×278 gres-120x278">
-          <span class="mat-item">
-            <b>Gres wielkoformatowy 120×278</b>
-            <span class="muted">120×278 cm · 3,34 m²/opak. · 12 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-120x278">Policz</a>
-        </li><li id="glaz-20x20" data-find="glazura 20×20 glaz-20x20">
-          <span class="mat-item">
-            <b>Glazura 20×20</b>
-            <span class="muted">20×20 cm · 1 m²/opak. · 5 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=glaz-20x20">Policz</a>
-        </li><li id="glaz-25x40" data-find="glazura 25×40 glaz-25x40">
-          <span class="mat-item">
-            <b>Glazura 25×40</b>
-            <span class="muted">25×40 cm · 1 m²/opak. · 5 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=glaz-25x40">Policz</a>
-        </li><li id="glaz-30x60" data-find="glazura 30×60 glaz-30x60">
-          <span class="mat-item">
-            <b>Glazura 30×60</b>
-            <span class="muted">30×60 cm · 1,44 m²/opak. · 5 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=glaz-30x60">Policz</a>
-        </li><li id="glaz-30x90" data-find="glazura 30×90 glaz-30x90">
-          <span class="mat-item">
-            <b>Glazura 30×90</b>
-            <span class="muted">30×90 cm · 1,62 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=glaz-30x90">Policz</a>
-        </li><li id="terakota-33" data-find="terakota 33×33 terakota-33">
-          <span class="mat-item">
-            <b>Terakota 33×33</b>
-            <span class="muted">33×33 cm · 1 m²/opak. · 5 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=terakota-33">Policz</a>
-        </li><li id="metro-75x150" data-find="cegiełka metro 7,5×15 metro-75x150">
-          <span class="mat-item">
-            <b>Cegiełka metro 7,5×15</b>
-            <span class="muted">7,5×15 cm · 1 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=metro-75x150">Policz</a>
-        </li><li id="metro-60x250" data-find="płytka podłuzna 6×25 metro-60x250">
-          <span class="mat-item">
-            <b>Płytka podłużna 6×25</b>
-            <span class="muted">6×25 cm · 0,5 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=metro-60x250">Policz</a>
-        </li><li id="mozaika-30x30" data-find="mozaika na siatce 30×30 mozaika-30x30">
-          <span class="mat-item">
-            <b>Mozaika na siatce 30×30</b>
-            <span class="muted">30×30 cm · 0,99 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=mozaika-30x30">Policz</a>
-        </li><li id="heksagon" data-find="heksagon 20×23 heksagon">
-          <span class="mat-item">
-            <b>Heksagon 20×23</b>
-            <span class="muted">20×23 cm · 1 m²/opak. · 12 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=heksagon">Policz</a>
-        </li><li id="taras-60x60" data-find="płytka tarasowa 2 cm · 60×60 taras-60x60">
-          <span class="mat-item">
-            <b>Płytka tarasowa 2 cm · 60×60</b>
-            <span class="muted">2 cm · 60×60 cm · 0,72 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=taras-60x60">Policz</a>
-        </li><li id="klinkier-25x6" data-find="płytka klinkierowa 24,5×6,5 klinkier-25x6">
-          <span class="mat-item">
-            <b>Płytka klinkierowa 24,5×6,5</b>
-            <span class="muted">24,5×6,5 cm · 0,5 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=klinkier-25x6">Policz</a>
-        </li><li id="elew-plytka" data-find="płytka elewacyjna 24,5×6,5 elew-plytka">
-          <span class="mat-item">
-            <b>Płytka elewacyjna 24,5×6,5</b>
-            <span class="muted">24,5×6,5 cm · 0,5 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=elew-plytka">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Płytki i gres</h2>
+            <span class="mat-count">23<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Gres</h3>
+              <span class="mat-count">10<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="gres-30x30" data-find="gres 30×30 gres-30x30 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 30×30</b>
+              <span class="muted">30×30 cm · 1 m²/opak. · 5 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-30x30">Policz</a>
+          </li><li id="gres-30x60" data-find="gres 30×60 gres-30x60 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 30×60</b>
+              <span class="muted">30×60 cm · 1,44 m²/opak. · 5 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-30x60">Policz</a>
+          </li><li id="gres-40x40" data-find="gres 40×40 gres-40x40 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 40×40</b>
+              <span class="muted">40×40 cm · 1,28 m²/opak. · 6 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-40x40">Policz</a>
+          </li><li id="gres-45x45" data-find="gres 45×45 gres-45x45 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 45×45</b>
+              <span class="muted">45×45 cm · 1,42 m²/opak. · 7 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-45x45">Policz</a>
+          </li><li id="gres-60x60" data-find="gres 60×60 gres-60x60 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 60×60</b>
+              <span class="muted">60×60 cm · 1,44 m²/opak. · 7 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-60x60">Policz</a>
+          </li><li id="gres-75x75" data-find="gres 75×75 gres-75x75 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 75×75</b>
+              <span class="muted">75×75 cm · 1,13 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-75x75">Policz</a>
+          </li><li id="gres-80x80" data-find="gres 80×80 gres-80x80 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 80×80</b>
+              <span class="muted">80×80 cm · 1,28 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-80x80">Policz</a>
+          </li><li id="gres-90x90" data-find="gres 90×90 gres-90x90 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 90×90</b>
+              <span class="muted">90×90 cm · 1,62 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-90x90">Policz</a>
+          </li><li id="gres-60x120" data-find="gres 60×120 gres-60x120 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 60×120</b>
+              <span class="muted">60×120 cm · 1,44 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-60x120">Policz</a>
+          </li><li id="gres-120x120" data-find="gres 120×120 gres-120x120 plytki i gres">
+            <span class="mat-item">
+              <b>Gres 120×120</b>
+              <span class="muted">120×120 cm · 1,44 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-120x120">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="gres-120x278" data-find="gres wielkoformatowy 120×278 gres-120x278 plytki i gres">
+            <span class="mat-item">
+              <b>Gres wielkoformatowy 120×278</b>
+              <span class="muted">120×278 cm · 3,34 m²/opak. · 12 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-120x278">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Glazura</h3>
+              <span class="mat-count">4<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="glaz-20x20" data-find="glazura 20×20 glaz-20x20 plytki i gres">
+            <span class="mat-item">
+              <b>Glazura 20×20</b>
+              <span class="muted">20×20 cm · 1 m²/opak. · 5 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=glaz-20x20">Policz</a>
+          </li><li id="glaz-25x40" data-find="glazura 25×40 glaz-25x40 plytki i gres">
+            <span class="mat-item">
+              <b>Glazura 25×40</b>
+              <span class="muted">25×40 cm · 1 m²/opak. · 5 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=glaz-25x40">Policz</a>
+          </li><li id="glaz-30x60" data-find="glazura 30×60 glaz-30x60 plytki i gres">
+            <span class="mat-item">
+              <b>Glazura 30×60</b>
+              <span class="muted">30×60 cm · 1,44 m²/opak. · 5 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=glaz-30x60">Policz</a>
+          </li><li id="glaz-30x90" data-find="glazura 30×90 glaz-30x90 plytki i gres">
+            <span class="mat-item">
+              <b>Glazura 30×90</b>
+              <span class="muted">30×90 cm · 1,62 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=glaz-30x90">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="terakota-33" data-find="terakota 33×33 terakota-33 plytki i gres">
+            <span class="mat-item">
+              <b>Terakota 33×33</b>
+              <span class="muted">33×33 cm · 1 m²/opak. · 5 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=terakota-33">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="metro-75x150" data-find="cegielka metro 7,5×15 metro-75x150 plytki i gres">
+            <span class="mat-item">
+              <b>Cegiełka metro 7,5×15</b>
+              <span class="muted">7,5×15 cm · 1 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=metro-75x150">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="metro-60x250" data-find="plytka podluzna 6×25 metro-60x250 plytki i gres">
+            <span class="mat-item">
+              <b>Płytka podłużna 6×25</b>
+              <span class="muted">6×25 cm · 0,5 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=metro-60x250">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="mozaika-30x30" data-find="mozaika na siatce 30×30 mozaika-30x30 plytki i gres">
+            <span class="mat-item">
+              <b>Mozaika na siatce 30×30</b>
+              <span class="muted">30×30 cm · 0,99 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=mozaika-30x30">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="heksagon" data-find="heksagon 20×23 heksagon plytki i gres">
+            <span class="mat-item">
+              <b>Heksagon 20×23</b>
+              <span class="muted">20×23 cm · 1 m²/opak. · 12 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=heksagon">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="taras-60x60" data-find="plytka tarasowa 2 cm · 60×60 taras-60x60 plytki i gres">
+            <span class="mat-item">
+              <b>Płytka tarasowa 2 cm · 60×60</b>
+              <span class="muted">2 cm · 60×60 cm · 0,72 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=taras-60x60">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klinkier-25x6" data-find="plytka klinkierowa 24,5×6,5 klinkier-25x6 plytki i gres">
+            <span class="mat-item">
+              <b>Płytka klinkierowa 24,5×6,5</b>
+              <span class="muted">24,5×6,5 cm · 0,5 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=klinkier-25x6">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="elew-plytka" data-find="plytka elewacyjna 24,5×6,5 elew-plytka plytki i gres">
+            <span class="mat-item">
+              <b>Płytka elewacyjna 24,5×6,5</b>
+              <span class="muted">24,5×6,5 cm · 0,5 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=elew-plytka">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-FLOORING">Podłogi</h2>
-        <ul class="mat-page-list"><li id="panel-ac3" data-find="panel laminowany ac3 · 128×19,2 panel-ac3">
-          <span class="mat-item">
-            <b>Panel laminowany AC3 · 128×19,2</b>
-            <span class="muted">AC3 · 128×19,2 cm · 2,22 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=panel-ac3">Policz</a>
-        </li><li id="panel-ac4" data-find="panel laminowany ac4 · 138×19,3 panel-ac4">
-          <span class="mat-item">
-            <b>Panel laminowany AC4 · 138×19,3</b>
-            <span class="muted">AC4 · 138×19,3 cm · 2,22 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=panel-ac4">Policz</a>
-        </li><li id="panel-ac5" data-find="panel laminowany ac5 · 129×19 panel-ac5">
-          <span class="mat-item">
-            <b>Panel laminowany AC5 · 129×19</b>
-            <span class="muted">AC5 · 129×19 cm · 2,22 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=panel-ac5">Policz</a>
-        </li><li id="lvt" data-find="panel winylowy lvt 122×18 lvt">
-          <span class="mat-item">
-            <b>Panel winylowy LVT 122×18</b>
-            <span class="muted">122×18 cm · 2,2 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=lvt">Policz</a>
-        </li><li id="spc" data-find="panel spc 61×30,5 spc">
-          <span class="mat-item">
-            <b>Panel SPC 61×30,5</b>
-            <span class="muted">61×30,5 cm · 2,23 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=spc">Policz</a>
-        </li><li id="deska-barl" data-find="deska barlinecka 220×18,2 deska-barl">
-          <span class="mat-item">
-            <b>Deska barlinecka 220×18,2</b>
-            <span class="muted">220×18,2 cm · 3,18 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=deska-barl">Policz</a>
-        </li><li id="deska-3warstw" data-find="deska trojwarstwowa 209×15 deska-3warstw">
-          <span class="mat-item">
-            <b>Deska trójwarstwowa 209×15</b>
-            <span class="muted">209×15 cm · 2,2 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=deska-3warstw">Policz</a>
-        </li><li id="parkiet" data-find="parkiet klasyczny 45×7 parkiet">
-          <span class="mat-item">
-            <b>Parkiet klasyczny 45×7</b>
-            <span class="muted">45×7 cm · 1 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=parkiet">Policz</a>
-        </li><li id="gres-deska-20x120" data-find="gres drewnopodobny 20×120 gres-deska-20x120">
-          <span class="mat-item">
-            <b>Gres drewnopodobny 20×120</b>
-            <span class="muted">20×120 cm · 0,96 m²/opak. · 10 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-deska-20x120">Policz</a>
-        </li><li id="korek" data-find="korek podłogowy 90×30 korek">
-          <span class="mat-item">
-            <b>Korek podłogowy 90×30</b>
-            <span class="muted">90×30 cm · 1,9 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=korek">Policz</a>
-        </li><li id="panel-scienny" data-find="panel scienny / lamele 275×12 panel-scienny">
-          <span class="mat-item">
-            <b>Panel ścienny / lamele 275×12</b>
-            <span class="muted">275×12 cm · 1,65 m²/opak. · 8 % zapasu</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=panel-scienny">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-FLOORING" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Podłogi</h2>
+            <span class="mat-count">11<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Panel laminowany</h3>
+              <span class="mat-count">3<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="panel-ac3" data-find="panel laminowany ac3 · 128×19,2 panel-ac3 podlogi">
+            <span class="mat-item">
+              <b>Panel laminowany AC3 · 128×19,2</b>
+              <span class="muted">AC3 · 128×19,2 cm · 2,22 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=panel-ac3">Policz</a>
+          </li><li id="panel-ac4" data-find="panel laminowany ac4 · 138×19,3 panel-ac4 podlogi">
+            <span class="mat-item">
+              <b>Panel laminowany AC4 · 138×19,3</b>
+              <span class="muted">AC4 · 138×19,3 cm · 2,22 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=panel-ac4">Policz</a>
+          </li><li id="panel-ac5" data-find="panel laminowany ac5 · 129×19 panel-ac5 podlogi">
+            <span class="mat-item">
+              <b>Panel laminowany AC5 · 129×19</b>
+              <span class="muted">AC5 · 129×19 cm · 2,22 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=panel-ac5">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="lvt" data-find="panel winylowy lvt 122×18 lvt podlogi">
+            <span class="mat-item">
+              <b>Panel winylowy LVT 122×18</b>
+              <span class="muted">122×18 cm · 2,2 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=lvt">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="spc" data-find="panel spc 61×30,5 spc podlogi">
+            <span class="mat-item">
+              <b>Panel SPC 61×30,5</b>
+              <span class="muted">61×30,5 cm · 2,23 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=spc">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-barl" data-find="deska barlinecka 220×18,2 deska-barl podlogi">
+            <span class="mat-item">
+              <b>Deska barlinecka 220×18,2</b>
+              <span class="muted">220×18,2 cm · 3,18 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=deska-barl">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-3warstw" data-find="deska trojwarstwowa 209×15 deska-3warstw podlogi">
+            <span class="mat-item">
+              <b>Deska trójwarstwowa 209×15</b>
+              <span class="muted">209×15 cm · 2,2 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=deska-3warstw">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="parkiet" data-find="parkiet klasyczny 45×7 parkiet podlogi">
+            <span class="mat-item">
+              <b>Parkiet klasyczny 45×7</b>
+              <span class="muted">45×7 cm · 1 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=parkiet">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gres-deska-20x120" data-find="gres drewnopodobny 20×120 gres-deska-20x120 podlogi">
+            <span class="mat-item">
+              <b>Gres drewnopodobny 20×120</b>
+              <span class="muted">20×120 cm · 0,96 m²/opak. · 10 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gres-deska-20x120">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="korek" data-find="korek podlogowy 90×30 korek podlogi">
+            <span class="mat-item">
+              <b>Korek podłogowy 90×30</b>
+              <span class="muted">90×30 cm · 1,9 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=korek">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="panel-scienny" data-find="panel scienny / lamele 275×12 panel-scienny podlogi">
+            <span class="mat-item">
+              <b>Panel ścienny / lamele 275×12</b>
+              <span class="muted">275×12 cm · 1,65 m²/opak. · 8 % zapasu</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=panel-scienny">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TRIM">Listwy i wykończenia</h2>
-        <ul class="mat-page-list"><li id="parapet-wewn" data-find="parapet wewnetrzny 4100×250 parapet-wewn">
-          <span class="mat-item">
-            <b>Parapet wewnętrzny 4100×250</b>
-            <span class="muted">4100×250 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=parapet-wewn">Policz</a>
-        </li><li id="listwa-mdf-2_5" data-find="listwa przypodłogowa mdf 2,5 m listwa-mdf-2_5">
-          <span class="mat-item">
-            <b>Listwa przypodłogowa MDF 2,5 m</b>
-            <span class="muted">sztanga 2,5 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=listwa-mdf-2_5">Policz</a>
-        </li><li id="cokol-pvc-2_5" data-find="cokoł pvc 2,5 m cokol-pvc-2_5">
-          <span class="mat-item">
-            <b>Cokół PVC 2,5 m</b>
-            <span class="muted">sztanga 2,5 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cokol-pvc-2_5">Policz</a>
-        </li><li id="cwierc-2_5" data-find="cwiercwałek / naroznik 2,5 m cwierc-2_5">
-          <span class="mat-item">
-            <b>Ćwierćwałek / narożnik 2,5 m</b>
-            <span class="muted">sztanga 2,5 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cwierc-2_5">Policz</a>
-        </li><li id="listwa-prog-alu-0_9" data-find="listwa progowa alu 0,9 m listwa-prog-alu-0_9">
-          <span class="mat-item">
-            <b>Listwa progowa ALU 0,9 m</b>
-            <span class="muted">sztanga 0,9 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=listwa-prog-alu-0_9">Policz</a>
-        </li><li id="parapet-zewn-2" data-find="parapet zewnetrzny stalowy 2 m parapet-zewn-2">
-          <span class="mat-item">
-            <b>Parapet zewnętrzny stalowy 2 m</b>
-            <span class="muted">sztanga 2 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=parapet-zewn-2">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TRIM" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Listwy i wykończenia</h2>
+            <span class="mat-count">6<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="parapet-wewn" data-find="parapet wewnetrzny 4100×250 parapet-wewn listwy i wykonczenia">
+            <span class="mat-item">
+              <b>Parapet wewnętrzny 4100×250</b>
+              <span class="muted">4100×250 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=parapet-wewn">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-mdf-2_5" data-find="listwa przypodlogowa mdf 2,5 m listwa-mdf-2_5 listwy i wykonczenia">
+            <span class="mat-item">
+              <b>Listwa przypodłogowa MDF 2,5 m</b>
+              <span class="muted">sztanga 2,5 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=listwa-mdf-2_5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="cokol-pvc-2_5" data-find="cokol pvc 2,5 m cokol-pvc-2_5 listwy i wykonczenia">
+            <span class="mat-item">
+              <b>Cokół PVC 2,5 m</b>
+              <span class="muted">sztanga 2,5 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cokol-pvc-2_5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="cwierc-2_5" data-find="cwiercwalek / naroznik 2,5 m cwierc-2_5 listwy i wykonczenia">
+            <span class="mat-item">
+              <b>Ćwierćwałek / narożnik 2,5 m</b>
+              <span class="muted">sztanga 2,5 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cwierc-2_5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-prog-alu-0_9" data-find="listwa progowa alu 0,9 m listwa-prog-alu-0_9 listwy i wykonczenia">
+            <span class="mat-item">
+              <b>Listwa progowa ALU 0,9 m</b>
+              <span class="muted">sztanga 0,9 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=listwa-prog-alu-0_9">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="parapet-zewn-2" data-find="parapet zewnetrzny stalowy 2 m parapet-zewn-2 listwy i wykonczenia">
+            <span class="mat-item">
+              <b>Parapet zewnętrzny stalowy 2 m</b>
+              <span class="muted">sztanga 2 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=parapet-zewn-2">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PAINT">Farby i lakiery</h2>
-        <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="farba scienna 2,5 l farba-scienna-2_5">
-          <span class="mat-item">
-            <b>Farba ścienna 2,5 l</b>
-            <span class="muted">2,5 l · ~10 m²/l · 25 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-scienna-2_5">Policz</a>
-        </li><li id="farba-scienna-5" data-find="farba scienna 5 l farba-scienna-5">
-          <span class="mat-item">
-            <b>Farba ścienna 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-scienna-5">Policz</a>
-        </li><li id="farba-scienna-10" data-find="farba scienna 10 l farba-scienna-10">
-          <span class="mat-item">
-            <b>Farba ścienna 10 l</b>
-            <span class="muted">10 l · ~10 m²/l · 100 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-scienna-10">Policz</a>
-        </li><li id="farba-lateks-5" data-find="farba lateksowa 5 l farba-lateks-5">
-          <span class="mat-item">
-            <b>Farba lateksowa 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-lateks-5">Policz</a>
-        </li><li id="farba-sufitowa-10" data-find="farba sufitowa 10 l farba-sufitowa-10">
-          <span class="mat-item">
-            <b>Farba sufitowa 10 l</b>
-            <span class="muted">10 l · ~11 m²/l · 110 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-sufitowa-10">Policz</a>
-        </li><li id="farba-kl-2_5" data-find="farba do kuchni i łazienki 2,5 l farba-kl-2_5">
-          <span class="mat-item">
-            <b>Farba do kuchni i łazienki 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-kl-2_5">Policz</a>
-        </li><li id="farba-beton-5" data-find="farba do betonu i podłog 5 l farba-beton-5">
-          <span class="mat-item">
-            <b>Farba do betonu i podłóg 5 l</b>
-            <span class="muted">5 l · ~8 m²/l · 40 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-beton-5">Policz</a>
-        </li><li id="farba-elew-akr-10" data-find="farba elewacyjna akrylowa 10 l farba-elew-akr-10">
-          <span class="mat-item">
-            <b>Farba elewacyjna akrylowa 10 l</b>
-            <span class="muted">10 l · ~5 m²/l · 50 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-elew-akr-10">Policz</a>
-        </li><li id="farba-elew-sil-10" data-find="farba elewacyjna silikonowa 10 l farba-elew-sil-10">
-          <span class="mat-item">
-            <b>Farba elewacyjna silikonowa 10 l</b>
-            <span class="muted">10 l · ~6 m²/l · 60 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-elew-sil-10">Policz</a>
-        </li><li id="emalia-0_75" data-find="emalia do drewna i metalu 0,75 l emalia-0_75">
-          <span class="mat-item">
-            <b>Emalia do drewna i metalu 0,75 l</b>
-            <span class="muted">0,75 l · ~12 m²/l · 9 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=emalia-0_75">Policz</a>
-        </li><li id="emalia-2_5" data-find="emalia do drewna i metalu 2,5 l emalia-2_5">
-          <span class="mat-item">
-            <b>Emalia do drewna i metalu 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=emalia-2_5">Policz</a>
-        </li><li id="farba-antykor-0_75" data-find="farba antykorozyjna 3w1 0,75 l farba-antykor-0_75">
-          <span class="mat-item">
-            <b>Farba antykorozyjna 3w1 0,75 l</b>
-            <span class="muted">0,75 l · ~10 m²/l · 7,5 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-antykor-0_75">Policz</a>
-        </li><li id="lakierobejca-2_5" data-find="lakierobejca 2,5 l lakierobejca-2_5">
-          <span class="mat-item">
-            <b>Lakierobejca 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=lakierobejca-2_5">Policz</a>
-        </li><li id="lakier-bezb-2_5" data-find="lakier bezbarwny 2,5 l lakier-bezb-2_5">
-          <span class="mat-item">
-            <b>Lakier bezbarwny 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=lakier-bezb-2_5">Policz</a>
-        </li><li id="impregnat-5" data-find="impregnat do drewna 5 l impregnat-5">
-          <span class="mat-item">
-            <b>Impregnat do drewna 5 l</b>
-            <span class="muted">5 l · ~10 m²/l · 50 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=impregnat-5">Policz</a>
-        </li><li id="olej-taras-2_5" data-find="olej do tarasow 2,5 l olej-taras-2_5">
-          <span class="mat-item">
-            <b>Olej do tarasów 2,5 l</b>
-            <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=olej-taras-2_5">Policz</a>
-        </li><li id="grunt-gleb-5" data-find="grunt głeboko penetrujacy 5 l grunt-gleb-5">
-          <span class="mat-item">
-            <b>Grunt głęboko penetrujący 5 l</b>
-            <span class="muted">5 l · ~7 m²/l · 35 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=grunt-gleb-5">Policz</a>
-        </li><li id="grunt-mleczko-5" data-find="grunt (mleczko) pod farbe 5 l grunt-mleczko-5">
-          <span class="mat-item">
-            <b>Grunt (mleczko) pod farbę 5 l</b>
-            <span class="muted">5 l · ~8 m²/l · 40 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=grunt-mleczko-5">Policz</a>
-        </li><li id="grunt-kwarc-5" data-find="grunt kwarcowy pod tynk 5 l grunt-kwarc-5">
-          <span class="mat-item">
-            <b>Grunt kwarcowy pod tynk 5 l</b>
-            <span class="muted">5 l · ~4 m²/l · 20 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=grunt-kwarc-5">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PAINT" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Farby i lakiery</h2>
+            <span class="mat-count">19<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Farba ścienna</h3>
+              <span class="mat-count">3<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="farba-scienna-2_5" data-find="farba scienna 2,5 l farba-scienna-2_5 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba ścienna 2,5 l</b>
+              <span class="muted">2,5 l · ~10 m²/l · 25 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-scienna-2_5">Policz</a>
+          </li><li id="farba-scienna-5" data-find="farba scienna 5 l farba-scienna-5 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba ścienna 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-scienna-5">Policz</a>
+          </li><li id="farba-scienna-10" data-find="farba scienna 10 l farba-scienna-10 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba ścienna 10 l</b>
+              <span class="muted">10 l · ~10 m²/l · 100 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-scienna-10">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="farba-lateks-5" data-find="farba lateksowa 5 l farba-lateks-5 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba lateksowa 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-lateks-5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-sufitowa-10" data-find="farba sufitowa 10 l farba-sufitowa-10 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba sufitowa 10 l</b>
+              <span class="muted">10 l · ~11 m²/l · 110 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-sufitowa-10">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-kl-2_5" data-find="farba do kuchni i lazienki 2,5 l farba-kl-2_5 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba do kuchni i łazienki 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-kl-2_5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-beton-5" data-find="farba do betonu i podlog 5 l farba-beton-5 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba do betonu i podłóg 5 l</b>
+              <span class="muted">5 l · ~8 m²/l · 40 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-beton-5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-elew-akr-10" data-find="farba elewacyjna akrylowa 10 l farba-elew-akr-10 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba elewacyjna akrylowa 10 l</b>
+              <span class="muted">10 l · ~5 m²/l · 50 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-elew-akr-10">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="farba-elew-sil-10" data-find="farba elewacyjna silikonowa 10 l farba-elew-sil-10 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba elewacyjna silikonowa 10 l</b>
+              <span class="muted">10 l · ~6 m²/l · 60 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-elew-sil-10">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Emalia do drewna i metalu</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="emalia-0_75" data-find="emalia do drewna i metalu 0,75 l emalia-0_75 farby i lakiery">
+            <span class="mat-item">
+              <b>Emalia do drewna i metalu 0,75 l</b>
+              <span class="muted">0,75 l · ~12 m²/l · 9 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=emalia-0_75">Policz</a>
+          </li><li id="emalia-2_5" data-find="emalia do drewna i metalu 2,5 l emalia-2_5 farby i lakiery">
+            <span class="mat-item">
+              <b>Emalia do drewna i metalu 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=emalia-2_5">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="farba-antykor-0_75" data-find="farba antykorozyjna 3w1 0,75 l farba-antykor-0_75 farby i lakiery">
+            <span class="mat-item">
+              <b>Farba antykorozyjna 3w1 0,75 l</b>
+              <span class="muted">0,75 l · ~10 m²/l · 7,5 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=farba-antykor-0_75">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lakierobejca-2_5" data-find="lakierobejca 2,5 l lakierobejca-2_5 farby i lakiery">
+            <span class="mat-item">
+              <b>Lakierobejca 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=lakierobejca-2_5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lakier-bezb-2_5" data-find="lakier bezbarwny 2,5 l lakier-bezb-2_5 farby i lakiery">
+            <span class="mat-item">
+              <b>Lakier bezbarwny 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=lakier-bezb-2_5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="impregnat-5" data-find="impregnat do drewna 5 l impregnat-5 farby i lakiery">
+            <span class="mat-item">
+              <b>Impregnat do drewna 5 l</b>
+              <span class="muted">5 l · ~10 m²/l · 50 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=impregnat-5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="olej-taras-2_5" data-find="olej do tarasow 2,5 l olej-taras-2_5 farby i lakiery">
+            <span class="mat-item">
+              <b>Olej do tarasów 2,5 l</b>
+              <span class="muted">2,5 l · ~12 m²/l · 30 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=olej-taras-2_5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-gleb-5" data-find="grunt gleboko penetrujacy 5 l grunt-gleb-5 farby i lakiery">
+            <span class="mat-item">
+              <b>Grunt głęboko penetrujący 5 l</b>
+              <span class="muted">5 l · ~7 m²/l · 35 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=grunt-gleb-5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-mleczko-5" data-find="grunt (mleczko) pod farbe 5 l grunt-mleczko-5 farby i lakiery">
+            <span class="mat-item">
+              <b>Grunt (mleczko) pod farbę 5 l</b>
+              <span class="muted">5 l · ~8 m²/l · 40 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=grunt-mleczko-5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="grunt-kwarc-5" data-find="grunt kwarcowy pod tynk 5 l grunt-kwarc-5 farby i lakiery">
+            <span class="mat-item">
+              <b>Grunt kwarcowy pod tynk 5 l</b>
+              <span class="muted">5 l · ~4 m²/l · 20 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=grunt-kwarc-5">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-CHEMICALS">Chemia budowlana</h2>
-        <ul class="mat-page-list"><li id="gladz-gips-20" data-find="gładz gipsowa 20 kg gladz-gips-20">
-          <span class="mat-item">
-            <b>Gładź gipsowa 20 kg</b>
-            <span class="muted">20 kg · ~1 kg/m² (warstwa 1 mm) · 20 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=gladz-gips-20">Policz</a>
-        </li><li id="gladz-polim-20" data-find="gładz polimerowa 20 kg gladz-polim-20">
-          <span class="mat-item">
-            <b>Gładź polimerowa 20 kg</b>
-            <span class="muted">20 kg · ~1,2 kg/m² (warstwa 1 mm) · 16,67 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=gladz-polim-20">Policz</a>
-        </li><li id="gladz-gotowa-18" data-find="gładz gotowa 18 kg gladz-gotowa-18">
-          <span class="mat-item">
-            <b>Gładź gotowa 18 kg</b>
-            <span class="muted">18 kg · ~1,2 kg/m² (warstwa 1 mm) · 15 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=gladz-gotowa-18">Policz</a>
-        </li><li id="tynk-gips-30" data-find="tynk gipsowy 30 kg tynk-gips-30">
-          <span class="mat-item">
-            <b>Tynk gipsowy 30 kg</b>
-            <span class="muted">30 kg · ~8,5 kg/m² (warstwa 10 mm) · 3,53 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-gips-30">Policz</a>
-        </li><li id="tynk-cw-30" data-find="tynk cementowo-wapienny 30 kg tynk-cw-30">
-          <span class="mat-item">
-            <b>Tynk cementowo-wapienny 30 kg</b>
-            <span class="muted">30 kg · ~15 kg/m² (warstwa 10 mm) · 2 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-cw-30">Policz</a>
-        </li><li id="tynk-mozaik-25" data-find="tynk mozaikowy 25 kg tynk-mozaik-25">
-          <span class="mat-item">
-            <b>Tynk mozaikowy 25 kg</b>
-            <span class="muted">25 kg · ~5 kg/m² (warstwa) · 5 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-mozaik-25">Policz</a>
-        </li><li id="tynk-baranek-25" data-find="tynk baranek 1,5 mm · 25 kg tynk-baranek-25">
-          <span class="mat-item">
-            <b>Tynk baranek 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (warstwa 1,5 mm) · 10 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-baranek-25">Policz</a>
-        </li><li id="tynk-silik-25" data-find="tynk silikonowy 1,5 mm · 25 kg tynk-silik-25">
-          <span class="mat-item">
-            <b>Tynk silikonowy 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (warstwa 1,5 mm) · 10 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-silik-25">Policz</a>
-        </li><li id="tynk-akryl-25" data-find="tynk akrylowy 1,5 mm · 25 kg tynk-akryl-25">
-          <span class="mat-item">
-            <b>Tynk akrylowy 1,5 mm · 25 kg</b>
-            <span class="muted">25 kg · ~2,5 kg/m² (warstwa 1,5 mm) · 10 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-akryl-25">Policz</a>
-        </li><li id="klej-c1-25" data-find="klej do płytek c1 25 kg klej-c1-25">
-          <span class="mat-item">
-            <b>Klej do płytek C1 25 kg</b>
-            <span class="muted">25 kg · ~4 kg/m² (grzebień 6 mm) · 6,25 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=klej-c1-25">Policz</a>
-        </li><li id="klej-c2-25" data-find="klej elastyczny c2 25 kg klej-c2-25">
-          <span class="mat-item">
-            <b>Klej elastyczny C2 25 kg</b>
-            <span class="muted">25 kg · ~5 kg/m² (grzebień 10 mm) · 5 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=klej-c2-25">Policz</a>
-        </li><li id="klej-styro-25" data-find="klej do styropianu i siatki 25 kg klej-styro-25">
-          <span class="mat-item">
-            <b>Klej do styropianu i siatki 25 kg</b>
-            <span class="muted">25 kg · ~4,5 kg/m² (warstwa zbrojąca) · 5,56 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=klej-styro-25">Policz</a>
-        </li><li id="zaprawa-mur-25" data-find="zaprawa murarska 25 kg zaprawa-mur-25">
-          <span class="mat-item">
-            <b>Zaprawa murarska 25 kg</b>
-            <span class="muted">25 kg · ~25 kg/m² (spoina 10 mm) · 1 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=zaprawa-mur-25">Policz</a>
-        </li><li id="wylewka-samop-25" data-find="wylewka samopoziomujaca 25 kg wylewka-samop-25">
-          <span class="mat-item">
-            <b>Wylewka samopoziomująca 25 kg</b>
-            <span class="muted">25 kg · ~1,6 kg/m² (warstwa 1 mm) · 15,63 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=wylewka-samop-25">Policz</a>
-        </li><li id="fuga-5" data-find="fuga 5 kg fuga-5">
-          <span class="mat-item">
-            <b>Fuga 5 kg</b>
-            <span class="muted">5 kg · ~0,5 kg/m² (spoina 3 mm) · 10 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=fuga-5">Policz</a>
-        </li><li id="hydroizol-15" data-find="hydroizolacja (folia w płynie) 15 kg hydroizol-15">
-          <span class="mat-item">
-            <b>Hydroizolacja (folia w płynie) 15 kg</b>
-            <span class="muted">15 kg · ~3 kg/m² (2 warstwy) · 5 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=hydroizol-15">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-CHEMICALS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Chemia budowlana</h2>
+            <span class="mat-count">16<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="gladz-gips-20" data-find="gladz gipsowa 20 kg gladz-gips-20 chemia budowlana">
+            <span class="mat-item">
+              <b>Gładź gipsowa 20 kg</b>
+              <span class="muted">20 kg · ~1 kg/m² (warstwa 1 mm) · 20 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=gladz-gips-20">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gladz-polim-20" data-find="gladz polimerowa 20 kg gladz-polim-20 chemia budowlana">
+            <span class="mat-item">
+              <b>Gładź polimerowa 20 kg</b>
+              <span class="muted">20 kg · ~1,2 kg/m² (warstwa 1 mm) · 16,67 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=gladz-polim-20">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gladz-gotowa-18" data-find="gladz gotowa 18 kg gladz-gotowa-18 chemia budowlana">
+            <span class="mat-item">
+              <b>Gładź gotowa 18 kg</b>
+              <span class="muted">18 kg · ~1,2 kg/m² (warstwa 1 mm) · 15 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=gladz-gotowa-18">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-gips-30" data-find="tynk gipsowy 30 kg tynk-gips-30 chemia budowlana">
+            <span class="mat-item">
+              <b>Tynk gipsowy 30 kg</b>
+              <span class="muted">30 kg · ~8,5 kg/m² (warstwa 10 mm) · 3,53 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-gips-30">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-cw-30" data-find="tynk cementowo-wapienny 30 kg tynk-cw-30 chemia budowlana">
+            <span class="mat-item">
+              <b>Tynk cementowo-wapienny 30 kg</b>
+              <span class="muted">30 kg · ~15 kg/m² (warstwa 10 mm) · 2 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-cw-30">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-mozaik-25" data-find="tynk mozaikowy 25 kg tynk-mozaik-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Tynk mozaikowy 25 kg</b>
+              <span class="muted">25 kg · ~5 kg/m² (warstwa) · 5 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-mozaik-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-baranek-25" data-find="tynk baranek 1,5 mm · 25 kg tynk-baranek-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Tynk baranek 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (warstwa 1,5 mm) · 10 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-baranek-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-silik-25" data-find="tynk silikonowy 1,5 mm · 25 kg tynk-silik-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Tynk silikonowy 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (warstwa 1,5 mm) · 10 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-silik-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="tynk-akryl-25" data-find="tynk akrylowy 1,5 mm · 25 kg tynk-akryl-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Tynk akrylowy 1,5 mm · 25 kg</b>
+              <span class="muted">25 kg · ~2,5 kg/m² (warstwa 1,5 mm) · 10 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=tynk-akryl-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-c1-25" data-find="klej do plytek c1 25 kg klej-c1-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Klej do płytek C1 25 kg</b>
+              <span class="muted">25 kg · ~4 kg/m² (grzebień 6 mm) · 6,25 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=klej-c1-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-c2-25" data-find="klej elastyczny c2 25 kg klej-c2-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Klej elastyczny C2 25 kg</b>
+              <span class="muted">25 kg · ~5 kg/m² (grzebień 10 mm) · 5 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=klej-c2-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="klej-styro-25" data-find="klej do styropianu i siatki 25 kg klej-styro-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Klej do styropianu i siatki 25 kg</b>
+              <span class="muted">25 kg · ~4,5 kg/m² (warstwa zbrojąca) · 5,56 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=klej-styro-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="zaprawa-mur-25" data-find="zaprawa murarska 25 kg zaprawa-mur-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Zaprawa murarska 25 kg</b>
+              <span class="muted">25 kg · ~25 kg/m² (spoina 10 mm) · 1 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=zaprawa-mur-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="wylewka-samop-25" data-find="wylewka samopoziomujaca 25 kg wylewka-samop-25 chemia budowlana">
+            <span class="mat-item">
+              <b>Wylewka samopoziomująca 25 kg</b>
+              <span class="muted">25 kg · ~1,6 kg/m² (warstwa 1 mm) · 15,63 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=wylewka-samop-25">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="fuga-5" data-find="fuga 5 kg fuga-5 chemia budowlana">
+            <span class="mat-item">
+              <b>Fuga 5 kg</b>
+              <span class="muted">5 kg · ~0,5 kg/m² (spoina 3 mm) · 10 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=fuga-5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hydroizol-15" data-find="hydroizolacja (folia w plynie) 15 kg hydroizol-15 chemia budowlana">
+            <span class="mat-item">
+              <b>Hydroizolacja (folia w płynie) 15 kg</b>
+              <span class="muted">15 kg · ~3 kg/m² (2 warstwy) · 5 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=hydroizol-15">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-BOARDS">Płyty</h2>
-        <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="płyta g-k zwykła 1200×2600 gk-zwykla-2600">
-          <span class="mat-item">
-            <b>Płyta G-K zwykła 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/szt.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-zwykla-2600">Policz</a>
-        </li><li id="gk-zwykla-2000" data-find="płyta g-k zwykła 1200×2000 gk-zwykla-2000">
-          <span class="mat-item">
-            <b>Płyta G-K zwykła 1200×2000</b>
-            <span class="muted">1200×2000 mm · 2,4 m²/szt.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-zwykla-2000">Policz</a>
-        </li><li id="gk-impreg-2600" data-find="płyta g-k impregnowana 1200×2600 gk-impreg-2600">
-          <span class="mat-item">
-            <b>Płyta G-K impregnowana 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/szt.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-impreg-2600">Policz</a>
-        </li><li id="gk-ogniowa-2600" data-find="płyta g-k ogniowa 1200×2600 gk-ogniowa-2600">
-          <span class="mat-item">
-            <b>Płyta G-K ogniowa 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/szt.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-ogniowa-2600">Policz</a>
-        </li><li id="gk-gksf-2600" data-find="płyta g-k wodo-ognioodporna (gkfi) 1200×2600 gk-gksf-2600">
-          <span class="mat-item">
-            <b>Płyta G-K wodo-ognioodporna (GKFI) 1200×2600</b>
-            <span class="muted">1200×2600 mm · 3,12 m²/szt.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-gksf-2600">Policz</a>
-        </li><li id="plyta-lam-2800" data-find="płyta meblowa laminowana 2800×2070 plyta-lam-2800">
-          <span class="mat-item">
-            <b>Płyta meblowa laminowana 2800×2070</b>
-            <span class="muted">2800×2070 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=plyta-lam-2800">Policz</a>
-        </li><li id="plyta-lam-3660" data-find="płyta meblowa laminowana 3660×1830 plyta-lam-3660">
-          <span class="mat-item">
-            <b>Płyta meblowa laminowana 3660×1830</b>
-            <span class="muted">3660×1830 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=plyta-lam-3660">Policz</a>
-        </li><li id="mdf-2800" data-find="mdf surowe 2800×2070 mdf-2800">
-          <span class="mat-item">
-            <b>MDF surowe 2800×2070</b>
-            <span class="muted">2800×2070 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=mdf-2800">Policz</a>
-        </li><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800">
-          <span class="mat-item">
-            <b>HDF 2800×2070</b>
-            <span class="muted">2800×2070 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=hdf-2800">Policz</a>
-        </li><li id="wior-surowa" data-find="płyta wiorowa surowa 2800×2070 wior-surowa">
-          <span class="mat-item">
-            <b>Płyta wiórowa surowa 2800×2070</b>
-            <span class="muted">2800×2070 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=wior-surowa">Policz</a>
-        </li><li id="mfp-2500" data-find="płyta mfp 2500×1250 mfp-2500">
-          <span class="mat-item">
-            <b>Płyta MFP 2500×1250</b>
-            <span class="muted">2500×1250 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=mfp-2500">Policz</a>
-        </li><li id="sklejka-lisc" data-find="sklejka lisciasta 2500×1250 sklejka-lisc">
-          <span class="mat-item">
-            <b>Sklejka liściasta 2500×1250</b>
-            <span class="muted">2500×1250 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=sklejka-lisc">Policz</a>
-        </li><li id="sklejka-brzoza" data-find="sklejka brzozowa 1525×1525 sklejka-brzoza">
-          <span class="mat-item">
-            <b>Sklejka brzozowa 1525×1525</b>
-            <span class="muted">1525×1525 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=sklejka-brzoza">Policz</a>
-        </li><li id="sklejka-wodo" data-find="sklejka wodoodporna 3000×1500 sklejka-wodo">
-          <span class="mat-item">
-            <b>Sklejka wodoodporna 3000×1500</b>
-            <span class="muted">3000×1500 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=sklejka-wodo">Policz</a>
-        </li><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500">
-          <span class="mat-item">
-            <b>OSB-3 2500×1250</b>
-            <span class="muted">2500×1250 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=osb3-2500">Policz</a>
-        </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800">
-          <span class="mat-item">
-            <b>OSB-3 2800×1250</b>
-            <span class="muted">2800×1250 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=osb3-2800">Policz</a>
-        </li><li id="cetris-3350" data-find="płyta cementowa cetris 3350×1250 cetris-3350">
-          <span class="mat-item">
-            <b>Płyta cementowa CETRIS 3350×1250</b>
-            <span class="muted">3350×1250 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=cetris-3350">Policz</a>
-        </li><li id="fermacell-1500" data-find="płyta włokno-gipsowa 1500×1000 fermacell-1500">
-          <span class="mat-item">
-            <b>Płyta włókno-gipsowa 1500×1000</b>
-            <span class="muted">1500×1000 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=fermacell-1500">Policz</a>
-        </li><li id="szalunek-2000" data-find="sklejka szalunkowa 2000×1000 szalunek-2000">
-          <span class="mat-item">
-            <b>Sklejka szalunkowa 2000×1000</b>
-            <span class="muted">2000×1000 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=szalunek-2000">Policz</a>
-        </li><li id="blat-postform" data-find="blat kuchenny postforming 4100×600 blat-postform">
-          <span class="mat-item">
-            <b>Blat kuchenny postforming 4100×600</b>
-            <span class="muted">4100×600 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blat-postform">Policz</a>
-        </li><li id="blat-38-4100" data-find="blat laminowany 38 mm · 4100×920 blat-38-4100">
-          <span class="mat-item">
-            <b>Blat laminowany 38 mm · 4100×920</b>
-            <span class="muted">4100×920 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blat-38-4100">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-BOARDS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Płyty</h2>
+            <span class="mat-count">21<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Płyta G-K zwykła</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="gk-zwykla-2600" data-find="plyta g-k zwykla 1200×2600 gk-zwykla-2600 plyty">
+            <span class="mat-item">
+              <b>Płyta G-K zwykła 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/szt.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-zwykla-2600">Policz</a>
+          </li><li id="gk-zwykla-2000" data-find="plyta g-k zwykla 1200×2000 gk-zwykla-2000 plyty">
+            <span class="mat-item">
+              <b>Płyta G-K zwykła 1200×2000</b>
+              <span class="muted">1200×2000 mm · 2,4 m²/szt.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-zwykla-2000">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="gk-impreg-2600" data-find="plyta g-k impregnowana 1200×2600 gk-impreg-2600 plyty">
+            <span class="mat-item">
+              <b>Płyta G-K impregnowana 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/szt.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-impreg-2600">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gk-ogniowa-2600" data-find="plyta g-k ogniowa 1200×2600 gk-ogniowa-2600 plyty">
+            <span class="mat-item">
+              <b>Płyta G-K ogniowa 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/szt.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-ogniowa-2600">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="gk-gksf-2600" data-find="plyta g-k wodo-ognioodporna (gkfi) 1200×2600 gk-gksf-2600 plyty">
+            <span class="mat-item">
+              <b>Płyta G-K wodo-ognioodporna (GKFI) 1200×2600</b>
+              <span class="muted">1200×2600 mm · 3,12 m²/szt.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/plytki-panele-gres/?m=gk-gksf-2600">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Płyta meblowa laminowana</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="plyta-lam-2800" data-find="plyta meblowa laminowana 2800×2070 plyta-lam-2800 plyty">
+            <span class="mat-item">
+              <b>Płyta meblowa laminowana 2800×2070</b>
+              <span class="muted">2800×2070 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=plyta-lam-2800">Policz</a>
+          </li><li id="plyta-lam-3660" data-find="plyta meblowa laminowana 3660×1830 plyta-lam-3660 plyty">
+            <span class="mat-item">
+              <b>Płyta meblowa laminowana 3660×1830</b>
+              <span class="muted">3660×1830 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=plyta-lam-3660">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="mdf-2800" data-find="mdf surowe 2800×2070 mdf-2800 plyty">
+            <span class="mat-item">
+              <b>MDF surowe 2800×2070</b>
+              <span class="muted">2800×2070 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=mdf-2800">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hdf-2800" data-find="hdf 2800×2070 hdf-2800 plyty">
+            <span class="mat-item">
+              <b>HDF 2800×2070</b>
+              <span class="muted">2800×2070 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=hdf-2800">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="wior-surowa" data-find="plyta wiorowa surowa 2800×2070 wior-surowa plyty">
+            <span class="mat-item">
+              <b>Płyta wiórowa surowa 2800×2070</b>
+              <span class="muted">2800×2070 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=wior-surowa">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="mfp-2500" data-find="plyta mfp 2500×1250 mfp-2500 plyty">
+            <span class="mat-item">
+              <b>Płyta MFP 2500×1250</b>
+              <span class="muted">2500×1250 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=mfp-2500">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-lisc" data-find="sklejka lisciasta 2500×1250 sklejka-lisc plyty">
+            <span class="mat-item">
+              <b>Sklejka liściasta 2500×1250</b>
+              <span class="muted">2500×1250 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=sklejka-lisc">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-brzoza" data-find="sklejka brzozowa 1525×1525 sklejka-brzoza plyty">
+            <span class="mat-item">
+              <b>Sklejka brzozowa 1525×1525</b>
+              <span class="muted">1525×1525 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=sklejka-brzoza">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sklejka-wodo" data-find="sklejka wodoodporna 3000×1500 sklejka-wodo plyty">
+            <span class="mat-item">
+              <b>Sklejka wodoodporna 3000×1500</b>
+              <span class="muted">3000×1500 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=sklejka-wodo">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>OSB-3</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="osb3-2500" data-find="osb-3 2500×1250 osb3-2500 plyty">
+            <span class="mat-item">
+              <b>OSB-3 2500×1250</b>
+              <span class="muted">2500×1250 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=osb3-2500">Policz</a>
+          </li><li id="osb3-2800" data-find="osb-3 2800×1250 osb3-2800 plyty">
+            <span class="mat-item">
+              <b>OSB-3 2800×1250</b>
+              <span class="muted">2800×1250 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=osb3-2800">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="cetris-3350" data-find="plyta cementowa cetris 3350×1250 cetris-3350 plyty">
+            <span class="mat-item">
+              <b>Płyta cementowa CETRIS 3350×1250</b>
+              <span class="muted">3350×1250 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=cetris-3350">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="fermacell-1500" data-find="plyta wlokno-gipsowa 1500×1000 fermacell-1500 plyty">
+            <span class="mat-item">
+              <b>Płyta włókno-gipsowa 1500×1000</b>
+              <span class="muted">1500×1000 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=fermacell-1500">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="szalunek-2000" data-find="sklejka szalunkowa 2000×1000 szalunek-2000 plyty">
+            <span class="mat-item">
+              <b>Sklejka szalunkowa 2000×1000</b>
+              <span class="muted">2000×1000 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=szalunek-2000">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blat-postform" data-find="blat kuchenny postforming 4100×600 blat-postform plyty">
+            <span class="mat-item">
+              <b>Blat kuchenny postforming 4100×600</b>
+              <span class="muted">4100×600 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blat-postform">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blat-38-4100" data-find="blat laminowany 38 mm · 4100×920 blat-38-4100 plyty">
+            <span class="mat-item">
+              <b>Blat laminowany 38 mm · 4100×920</b>
+              <span class="muted">4100×920 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blat-38-4100">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-WOOD">Drewno</h2>
-        <ul class="mat-page-list"><li id="kantowka-45-3" data-find="kantowka 45×45 · 3 m kantowka-45-3">
-          <span class="mat-item">
-            <b>Kantówka 45×45 · 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=kantowka-45-3">Policz</a>
-        </li><li id="lata-4x5-4" data-find="łata 40×50 · 4 m lata-4x5-4">
-          <span class="mat-item">
-            <b>Łata 40×50 · 4 m</b>
-            <span class="muted">sztanga 4 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=lata-4x5-4">Policz</a>
-        </li><li id="krokiew-2" data-find="krokiew 70×140 · 6 m krokiew-2">
-          <span class="mat-item">
-            <b>Krokiew 70×140 · 6 m</b>
-            <span class="muted">sztanga 6 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=krokiew-2">Policz</a>
-        </li><li id="deska-taras-3" data-find="deska tarasowa 3 m deska-taras-3">
-          <span class="mat-item">
-            <b>Deska tarasowa 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=deska-taras-3">Policz</a>
-        </li><li id="deska-wpc-4" data-find="deska tarasowa wpc 4 m deska-wpc-4">
-          <span class="mat-item">
-            <b>Deska tarasowa WPC 4 m</b>
-            <span class="muted">sztanga 4 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=deska-wpc-4">Policz</a>
-        </li><li id="deska-elew-3" data-find="deska elewacyjna 3 m deska-elew-3">
-          <span class="mat-item">
-            <b>Deska elewacyjna 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=deska-elew-3">Policz</a>
-        </li><li id="sztacheta-1_5" data-find="sztacheta 1,5 m sztacheta-1_5">
-          <span class="mat-item">
-            <b>Sztacheta 1,5 m</b>
-            <span class="muted">sztanga 1,5 m · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=sztacheta-1_5">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-WOOD" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Drewno</h2>
+            <span class="mat-count">7<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="kantowka-45-3" data-find="kantowka 45×45 · 3 m kantowka-45-3 drewno">
+            <span class="mat-item">
+              <b>Kantówka 45×45 · 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=kantowka-45-3">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="lata-4x5-4" data-find="lata 40×50 · 4 m lata-4x5-4 drewno">
+            <span class="mat-item">
+              <b>Łata 40×50 · 4 m</b>
+              <span class="muted">sztanga 4 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=lata-4x5-4">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="krokiew-2" data-find="krokiew 70×140 · 6 m krokiew-2 drewno">
+            <span class="mat-item">
+              <b>Krokiew 70×140 · 6 m</b>
+              <span class="muted">sztanga 6 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=krokiew-2">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-taras-3" data-find="deska tarasowa 3 m deska-taras-3 drewno">
+            <span class="mat-item">
+              <b>Deska tarasowa 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=deska-taras-3">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-wpc-4" data-find="deska tarasowa wpc 4 m deska-wpc-4 drewno">
+            <span class="mat-item">
+              <b>Deska tarasowa WPC 4 m</b>
+              <span class="muted">sztanga 4 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=deska-wpc-4">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="deska-elew-3" data-find="deska elewacyjna 3 m deska-elew-3 drewno">
+            <span class="mat-item">
+              <b>Deska elewacyjna 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=deska-elew-3">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="sztacheta-1_5" data-find="sztacheta 1,5 m sztacheta-1_5 drewno">
+            <span class="mat-item">
+              <b>Sztacheta 1,5 m</b>
+              <span class="muted">sztanga 1,5 m · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=sztacheta-1_5">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PROFILES">Profile G-K</h2>
-        <ul class="mat-page-list"><li id="cd60-3" data-find="profil sufitowy cd60 3 m cd60-3">
-          <span class="mat-item">
-            <b>Profil sufitowy CD60 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cd60-3">Policz</a>
-        </li><li id="cd60-4" data-find="profil sufitowy cd60 4 m cd60-4">
-          <span class="mat-item">
-            <b>Profil sufitowy CD60 4 m</b>
-            <span class="muted">sztanga 4 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cd60-4">Policz</a>
-        </li><li id="ud27-3" data-find="profil przyscienny ud27 3 m ud27-3">
-          <span class="mat-item">
-            <b>Profil przyścienny UD27 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=ud27-3">Policz</a>
-        </li><li id="cw50-3" data-find="profil scienny cw50 · 3 m cw50-3">
-          <span class="mat-item">
-            <b>Profil ścienny CW50 · 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cw50-3">Policz</a>
-        </li><li id="uw50-3" data-find="profil scienny uw50 · 3 m uw50-3">
-          <span class="mat-item">
-            <b>Profil ścienny UW50 · 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=uw50-3">Policz</a>
-        </li><li id="cw75-3" data-find="profil scienny cw75 · 3 m cw75-3">
-          <span class="mat-item">
-            <b>Profil ścienny CW75 · 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cw75-3">Policz</a>
-        </li><li id="cw100-3" data-find="profil scienny cw100 · 3 m cw100-3">
-          <span class="mat-item">
-            <b>Profil ścienny CW100 · 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cw100-3">Policz</a>
-        </li><li id="ua50-3" data-find="profil wzmacniajacy ua50 · 3 m ua50-3">
-          <span class="mat-item">
-            <b>Profil wzmacniający UA50 · 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=ua50-3">Policz</a>
-        </li><li id="ua75-3" data-find="profil wzmacniajacy ua75 · 3 m ua75-3">
-          <span class="mat-item">
-            <b>Profil wzmacniający UA75 · 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=ua75-3">Policz</a>
-        </li><li id="narozny-alu-2_5" data-find="profil narozny alu 2,5 m narozny-alu-2_5">
-          <span class="mat-item">
-            <b>Profil narożny ALU 2,5 m</b>
-            <span class="muted">sztanga 2,5 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=narozny-alu-2_5">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PROFILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Profile G-K</h2>
+            <span class="mat-count">10<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Profil sufitowy CD60</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="cd60-3" data-find="profil sufitowy cd60 3 m cd60-3 profile g-k">
+            <span class="mat-item">
+              <b>Profil sufitowy CD60 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cd60-3">Policz</a>
+          </li><li id="cd60-4" data-find="profil sufitowy cd60 4 m cd60-4 profile g-k">
+            <span class="mat-item">
+              <b>Profil sufitowy CD60 4 m</b>
+              <span class="muted">sztanga 4 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cd60-4">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="ud27-3" data-find="profil przyscienny ud27 3 m ud27-3 profile g-k">
+            <span class="mat-item">
+              <b>Profil przyścienny UD27 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=ud27-3">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Profil ścienny</h3>
+              <span class="mat-count">4<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="cw50-3" data-find="profil scienny cw50 · 3 m cw50-3 profile g-k">
+            <span class="mat-item">
+              <b>Profil ścienny CW50 · 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cw50-3">Policz</a>
+          </li><li id="uw50-3" data-find="profil scienny uw50 · 3 m uw50-3 profile g-k">
+            <span class="mat-item">
+              <b>Profil ścienny UW50 · 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=uw50-3">Policz</a>
+          </li><li id="cw75-3" data-find="profil scienny cw75 · 3 m cw75-3 profile g-k">
+            <span class="mat-item">
+              <b>Profil ścienny CW75 · 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cw75-3">Policz</a>
+          </li><li id="cw100-3" data-find="profil scienny cw100 · 3 m cw100-3 profile g-k">
+            <span class="mat-item">
+              <b>Profil ścienny CW100 · 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=cw100-3">Policz</a>
+          </li></ul>
+          </details>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Profil wzmacniający</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="ua50-3" data-find="profil wzmacniajacy ua50 · 3 m ua50-3 profile g-k">
+            <span class="mat-item">
+              <b>Profil wzmacniający UA50 · 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=ua50-3">Policz</a>
+          </li><li id="ua75-3" data-find="profil wzmacniajacy ua75 · 3 m ua75-3 profile g-k">
+            <span class="mat-item">
+              <b>Profil wzmacniający UA75 · 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=ua75-3">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="narozny-alu-2_5" data-find="profil narozny alu 2,5 m narozny-alu-2_5 profile g-k">
+            <span class="mat-item">
+              <b>Profil narożny ALU 2,5 m</b>
+              <span class="muted">sztanga 2,5 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=narozny-alu-2_5">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-METAL">Metal i zbrojenie</h2>
-        <ul class="mat-page-list"><li id="blacha-stal" data-find="blacha stalowa 2000×1000 blacha-stal">
-          <span class="mat-item">
-            <b>Blacha stalowa 2000×1000</b>
-            <span class="muted">2000×1000 mm · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blacha-stal">Policz</a>
-        </li><li id="blacha-alu" data-find="blacha aluminiowa 2500×1250 blacha-alu">
-          <span class="mat-item">
-            <b>Blacha aluminiowa 2500×1250</b>
-            <span class="muted">2500×1250 mm · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blacha-alu">Policz</a>
-        </li><li id="blacha-ocynk" data-find="blacha ocynkowana 2000×1000 blacha-ocynk">
-          <span class="mat-item">
-            <b>Blacha ocynkowana 2000×1000</b>
-            <span class="muted">2000×1000 mm · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blacha-ocynk">Policz</a>
-        </li><li id="katownik-alu-2" data-find="katownik aluminiowy 2 m katownik-alu-2">
-          <span class="mat-item">
-            <b>Kątownik aluminiowy 2 m</b>
-            <span class="muted">sztanga 2 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=katownik-alu-2">Policz</a>
-        </li><li id="ceownik-stal-3" data-find="ceownik stalowy 3 m ceownik-stal-3">
-          <span class="mat-item">
-            <b>Ceownik stalowy 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=ceownik-stal-3">Policz</a>
-        </li><li id="profil-kwadr-3" data-find="profil zamkniety 30×30 · 3 m profil-kwadr-3">
-          <span class="mat-item">
-            <b>Profil zamknięty 30×30 · 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=profil-kwadr-3">Policz</a>
-        </li><li id="pret-8-12" data-find="pret zbrojeniowy ø8 · 12 m pret-8-12">
-          <span class="mat-item">
-            <b>Pręt zbrojeniowy Ø8 · 12 m</b>
-            <span class="muted">sztanga 12 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=pret-8-12">Policz</a>
-        </li><li id="pret-10-12" data-find="pret zbrojeniowy ø10 · 12 m pret-10-12">
-          <span class="mat-item">
-            <b>Pręt zbrojeniowy Ø10 · 12 m</b>
-            <span class="muted">sztanga 12 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=pret-10-12">Policz</a>
-        </li><li id="pret-12-12" data-find="pret zbrojeniowy ø12 · 12 m pret-12-12">
-          <span class="mat-item">
-            <b>Pręt zbrojeniowy Ø12 · 12 m</b>
-            <span class="muted">sztanga 12 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=pret-12-12">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-METAL" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Metal i zbrojenie</h2>
+            <span class="mat-count">9<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="blacha-stal" data-find="blacha stalowa 2000×1000 blacha-stal metal i zbrojenie">
+            <span class="mat-item">
+              <b>Blacha stalowa 2000×1000</b>
+              <span class="muted">2000×1000 mm · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blacha-stal">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blacha-alu" data-find="blacha aluminiowa 2500×1250 blacha-alu metal i zbrojenie">
+            <span class="mat-item">
+              <b>Blacha aluminiowa 2500×1250</b>
+              <span class="muted">2500×1250 mm · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blacha-alu">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="blacha-ocynk" data-find="blacha ocynkowana 2000×1000 blacha-ocynk metal i zbrojenie">
+            <span class="mat-item">
+              <b>Blacha ocynkowana 2000×1000</b>
+              <span class="muted">2000×1000 mm · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=blacha-ocynk">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="katownik-alu-2" data-find="katownik aluminiowy 2 m katownik-alu-2 metal i zbrojenie">
+            <span class="mat-item">
+              <b>Kątownik aluminiowy 2 m</b>
+              <span class="muted">sztanga 2 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=katownik-alu-2">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="ceownik-stal-3" data-find="ceownik stalowy 3 m ceownik-stal-3 metal i zbrojenie">
+            <span class="mat-item">
+              <b>Ceownik stalowy 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=ceownik-stal-3">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="profil-kwadr-3" data-find="profil zamkniety 30×30 · 3 m profil-kwadr-3 metal i zbrojenie">
+            <span class="mat-item">
+              <b>Profil zamknięty 30×30 · 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=profil-kwadr-3">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Pręt zbrojeniowy</h3>
+              <span class="mat-count">3<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="pret-8-12" data-find="pret zbrojeniowy ø8 · 12 m pret-8-12 metal i zbrojenie">
+            <span class="mat-item">
+              <b>Pręt zbrojeniowy Ø8 · 12 m</b>
+              <span class="muted">sztanga 12 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=pret-8-12">Policz</a>
+          </li><li id="pret-10-12" data-find="pret zbrojeniowy ø10 · 12 m pret-10-12 metal i zbrojenie">
+            <span class="mat-item">
+              <b>Pręt zbrojeniowy Ø10 · 12 m</b>
+              <span class="muted">sztanga 12 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=pret-10-12">Policz</a>
+          </li><li id="pret-12-12" data-find="pret zbrojeniowy ø12 · 12 m pret-12-12 metal i zbrojenie">
+            <span class="mat-item">
+              <b>Pręt zbrojeniowy Ø12 · 12 m</b>
+              <span class="muted">sztanga 12 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=pret-12-12">Policz</a>
+          </li></ul>
+          </details>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-GLASS">Szkło i tworzywa</h2>
-        <ul class="mat-page-list"><li id="plexi-3050" data-find="plexi (pmma) 3050×2050 plexi-3050">
-          <span class="mat-item">
-            <b>Plexi (PMMA) 3050×2050</b>
-            <span class="muted">3050×2050 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=plexi-3050">Policz</a>
-        </li><li id="poliweglan" data-find="poliweglan lity 3050×2050 poliweglan">
-          <span class="mat-item">
-            <b>Poliwęglan lity 3050×2050</b>
-            <span class="muted">3050×2050 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=poliweglan">Policz</a>
-        </li><li id="poliweglan-kom" data-find="poliweglan komorowy 2100×6000 poliweglan-kom">
-          <span class="mat-item">
-            <b>Poliwęglan komorowy 2100×6000</b>
-            <span class="muted">2100×6000 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=poliweglan-kom">Policz</a>
-        </li><li id="hpl" data-find="płyta hpl kompakt 3050×1300 hpl">
-          <span class="mat-item">
-            <b>Płyta HPL kompakt 3050×1300</b>
-            <span class="muted">3050×1300 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=hpl">Policz</a>
-        </li><li id="dibond" data-find="dibond 3050×1500 dibond">
-          <span class="mat-item">
-            <b>Dibond 3050×1500</b>
-            <span class="muted">3050×1500 mm · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=dibond">Policz</a>
-        </li><li id="pcv-spienione" data-find="pcv spienione 3050×1560 pcv-spienione">
-          <span class="mat-item">
-            <b>PCV spienione 3050×1560</b>
-            <span class="muted">3050×1560 mm · rzaz 3 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=pcv-spienione">Policz</a>
-        </li><li id="szklo-jumbo" data-find="szkło float 3210×2250 szklo-jumbo">
-          <span class="mat-item">
-            <b>Szkło float 3210×2250</b>
-            <span class="muted">3210×2250 mm · rzaz 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=szklo-jumbo">Policz</a>
-        </li><li id="szklo-2550" data-find="szkło float 2550×1605 szklo-2550">
-          <span class="mat-item">
-            <b>Szkło float 2550×1605</b>
-            <span class="muted">2550×1605 mm · rzaz 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=szklo-2550">Policz</a>
-        </li><li id="lustro-2550" data-find="lustro 2550×1605 lustro-2550">
-          <span class="mat-item">
-            <b>Lustro 2550×1605</b>
-            <span class="muted">2550×1605 mm · rzaz 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=lustro-2550">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-GLASS" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Szkło i tworzywa</h2>
+            <span class="mat-count">9<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="plexi-3050" data-find="plexi (pmma) 3050×2050 plexi-3050 szklo i tworzywa">
+            <span class="mat-item">
+              <b>Plexi (PMMA) 3050×2050</b>
+              <span class="muted">3050×2050 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=plexi-3050">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="poliweglan" data-find="poliweglan lity 3050×2050 poliweglan szklo i tworzywa">
+            <span class="mat-item">
+              <b>Poliwęglan lity 3050×2050</b>
+              <span class="muted">3050×2050 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=poliweglan">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="poliweglan-kom" data-find="poliweglan komorowy 2100×6000 poliweglan-kom szklo i tworzywa">
+            <span class="mat-item">
+              <b>Poliwęglan komorowy 2100×6000</b>
+              <span class="muted">2100×6000 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=poliweglan-kom">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="hpl" data-find="plyta hpl kompakt 3050×1300 hpl szklo i tworzywa">
+            <span class="mat-item">
+              <b>Płyta HPL kompakt 3050×1300</b>
+              <span class="muted">3050×1300 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=hpl">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="dibond" data-find="dibond 3050×1500 dibond szklo i tworzywa">
+            <span class="mat-item">
+              <b>Dibond 3050×1500</b>
+              <span class="muted">3050×1500 mm · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=dibond">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pcv-spienione" data-find="pcv spienione 3050×1560 pcv-spienione szklo i tworzywa">
+            <span class="mat-item">
+              <b>PCV spienione 3050×1560</b>
+              <span class="muted">3050×1560 mm · rzaz 3 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=pcv-spienione">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Szkło float</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="szklo-jumbo" data-find="szklo float 3210×2250 szklo-jumbo szklo i tworzywa">
+            <span class="mat-item">
+              <b>Szkło float 3210×2250</b>
+              <span class="muted">3210×2250 mm · rzaz 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=szklo-jumbo">Policz</a>
+          </li><li id="szklo-2550" data-find="szklo float 2550×1605 szklo-2550 szklo i tworzywa">
+            <span class="mat-item">
+              <b>Szkło float 2550×1605</b>
+              <span class="muted">2550×1605 mm · rzaz 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=szklo-2550">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="lustro-2550" data-find="lustro 2550×1605 lustro-2550 szklo i tworzywa">
+            <span class="mat-item">
+              <b>Lustro 2550×1605</b>
+              <span class="muted">2550×1605 mm · rzaz 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=lustro-2550">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-TEXTILES">Tkaniny i tapicerka</h2>
-        <ul class="mat-page-list"><li id="tkanina-140" data-find="tkanina z beli, szer. 140 cm tkanina-140">
-          <span class="mat-item">
-            <b>Tkanina z beli, szer. 140 cm</b>
-            <span class="muted">1400×3000 mm · rzaz 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=tkanina-140">Policz</a>
-        </li><li id="tkanina-150" data-find="tkanina z beli, szer. 150 cm tkanina-150">
-          <span class="mat-item">
-            <b>Tkanina z beli, szer. 150 cm</b>
-            <span class="muted">1500×3000 mm · rzaz 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=tkanina-150">Policz</a>
-        </li><li id="ekoskora-140" data-find="ekoskora z rolki, szer. 140 cm ekoskora-140">
-          <span class="mat-item">
-            <b>Ekoskóra z rolki, szer. 140 cm</b>
-            <span class="muted">1400×3000 mm · rzaz 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=ekoskora-140">Policz</a>
-        </li><li id="skora-nat" data-find="skora naturalna – arkusz 2200×1200 skora-nat">
-          <span class="mat-item">
-            <b>Skóra naturalna – arkusz 2200×1200</b>
-            <span class="muted">2200×1200 mm · rzaz 0 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=skora-nat">Policz</a>
-        </li><li id="pianka-tap" data-find="pianka tapicerska – blok 2000×1200 pianka-tap">
-          <span class="mat-item">
-            <b>Pianka tapicerska – blok 2000×1200</b>
-            <span class="muted">2000×1200 mm · rzaz 5 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=pianka-tap">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-TEXTILES" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Tkaniny i tapicerka</h2>
+            <span class="mat-count">5<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Tkanina z beli, szer.</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="tkanina-140" data-find="tkanina z beli, szer. 140 cm tkanina-140 tkaniny i tapicerka">
+            <span class="mat-item">
+              <b>Tkanina z beli, szer. 140 cm</b>
+              <span class="muted">1400×3000 mm · rzaz 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=tkanina-140">Policz</a>
+          </li><li id="tkanina-150" data-find="tkanina z beli, szer. 150 cm tkanina-150 tkaniny i tapicerka">
+            <span class="mat-item">
+              <b>Tkanina z beli, szer. 150 cm</b>
+              <span class="muted">1500×3000 mm · rzaz 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=tkanina-150">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="ekoskora-140" data-find="ekoskora z rolki, szer. 140 cm ekoskora-140 tkaniny i tapicerka">
+            <span class="mat-item">
+              <b>Ekoskóra z rolki, szer. 140 cm</b>
+              <span class="muted">1400×3000 mm · rzaz 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=ekoskora-140">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="skora-nat" data-find="skora naturalna – arkusz 2200×1200 skora-nat tkaniny i tapicerka">
+            <span class="mat-item">
+              <b>Skóra naturalna – arkusz 2200×1200</b>
+              <span class="muted">2200×1200 mm · rzaz 0 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=skora-nat">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pianka-tap" data-find="pianka tapicerska – blok 2000×1200 pianka-tap tkaniny i tapicerka">
+            <span class="mat-item">
+              <b>Pianka tapicerska – blok 2000×1200</b>
+              <span class="muted">2000×1200 mm · rzaz 5 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-plyt-2d/?m=pianka-tap">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-INSULATION">Izolacja</h2>
-        <ul class="mat-page-list"><li id="welna-10" data-find="wełna mineralna 10 cm welna-10">
-          <span class="mat-item">
-            <b>Wełna mineralna 10 cm</b>
-            <span class="muted">paczka ≈ 6 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=welna-10">Policz</a>
-        </li><li id="welna-15" data-find="wełna mineralna 15 cm welna-15">
-          <span class="mat-item">
-            <b>Wełna mineralna 15 cm</b>
-            <span class="muted">paczka ≈ 4,5 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=welna-15">Policz</a>
-        </li><li id="welna-podd-20" data-find="wełna na poddasze 20 cm welna-podd-20">
-          <span class="mat-item">
-            <b>Wełna na poddasze 20 cm</b>
-            <span class="muted">paczka ≈ 3,5 m² · 20 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=welna-podd-20">Policz</a>
-        </li><li id="welna-fasada-15" data-find="wełna fasadowa 15 cm welna-fasada-15">
-          <span class="mat-item">
-            <b>Wełna fasadowa 15 cm</b>
-            <span class="muted">paczka ≈ 2 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=welna-fasada-15">Policz</a>
-        </li><li id="styropian-5" data-find="styropian eps 5 cm styropian-5">
-          <span class="mat-item">
-            <b>Styropian EPS 5 cm</b>
-            <span class="muted">paczka ≈ 3 m² · 5 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=styropian-5">Policz</a>
-        </li><li id="styropian-fasada-10" data-find="styropian fasadowy eps 10 cm styropian-fasada-10">
-          <span class="mat-item">
-            <b>Styropian fasadowy EPS 10 cm</b>
-            <span class="muted">paczka ≈ 3 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=styropian-fasada-10">Policz</a>
-        </li><li id="styropian-fasada-15" data-find="styropian fasadowy eps 15 cm styropian-fasada-15">
-          <span class="mat-item">
-            <b>Styropian fasadowy EPS 15 cm</b>
-            <span class="muted">paczka ≈ 2 m² · 15 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=styropian-fasada-15">Policz</a>
-        </li><li id="styropian-podloga-10" data-find="styropian podłogowy eps 100 · 10 cm styropian-podloga-10">
-          <span class="mat-item">
-            <b>Styropian podłogowy EPS 100 · 10 cm</b>
-            <span class="muted">paczka ≈ 3 m² · EPS 100 · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=styropian-podloga-10">Policz</a>
-        </li><li id="xps-5" data-find="styrodur xps 5 cm xps-5">
-          <span class="mat-item">
-            <b>Styrodur XPS 5 cm</b>
-            <span class="muted">paczka ≈ 5,5 m² · 5 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=xps-5">Policz</a>
-        </li><li id="pir-10" data-find="płyta pir 10 cm pir-10">
-          <span class="mat-item">
-            <b>Płyta PIR 10 cm</b>
-            <span class="muted">paczka ≈ 5,7 m² · 10 cm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=pir-10">Policz</a>
-        </li><li id="papa-rolka" data-find="papa podkładowa 20 m² papa-rolka">
-          <span class="mat-item">
-            <b>Papa podkładowa 20 m²</b>
-            <span class="muted">paczka ≈ 20 m² · 20 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=papa-rolka">Policz</a>
-        </li><li id="folia-paro" data-find="folia paroizolacyjna 75 m² folia-paro">
-          <span class="mat-item">
-            <b>Folia paroizolacyjna 75 m²</b>
-            <span class="muted">paczka ≈ 75 m² · 75 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=folia-paro">Policz</a>
-        </li><li id="membrana-dach" data-find="membrana dachowa 75 m² membrana-dach">
-          <span class="mat-item">
-            <b>Membrana dachowa 75 m²</b>
-            <span class="muted">paczka ≈ 75 m² · 75 m²</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=membrana-dach">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-INSULATION" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Izolacja</h2>
+            <span class="mat-count">13<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Wełna mineralna</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="welna-10" data-find="welna mineralna 10 cm welna-10 izolacja">
+            <span class="mat-item">
+              <b>Wełna mineralna 10 cm</b>
+              <span class="muted">paczka ≈ 6 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=welna-10">Policz</a>
+          </li><li id="welna-15" data-find="welna mineralna 15 cm welna-15 izolacja">
+            <span class="mat-item">
+              <b>Wełna mineralna 15 cm</b>
+              <span class="muted">paczka ≈ 4,5 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=welna-15">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="welna-podd-20" data-find="welna na poddasze 20 cm welna-podd-20 izolacja">
+            <span class="mat-item">
+              <b>Wełna na poddasze 20 cm</b>
+              <span class="muted">paczka ≈ 3,5 m² · 20 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=welna-podd-20">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="welna-fasada-15" data-find="welna fasadowa 15 cm welna-fasada-15 izolacja">
+            <span class="mat-item">
+              <b>Wełna fasadowa 15 cm</b>
+              <span class="muted">paczka ≈ 2 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=welna-fasada-15">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="styropian-5" data-find="styropian eps 5 cm styropian-5 izolacja">
+            <span class="mat-item">
+              <b>Styropian EPS 5 cm</b>
+              <span class="muted">paczka ≈ 3 m² · 5 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=styropian-5">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Styropian fasadowy EPS</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="styropian-fasada-10" data-find="styropian fasadowy eps 10 cm styropian-fasada-10 izolacja">
+            <span class="mat-item">
+              <b>Styropian fasadowy EPS 10 cm</b>
+              <span class="muted">paczka ≈ 3 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=styropian-fasada-10">Policz</a>
+          </li><li id="styropian-fasada-15" data-find="styropian fasadowy eps 15 cm styropian-fasada-15 izolacja">
+            <span class="mat-item">
+              <b>Styropian fasadowy EPS 15 cm</b>
+              <span class="muted">paczka ≈ 2 m² · 15 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=styropian-fasada-15">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="styropian-podloga-10" data-find="styropian podlogowy eps 100 · 10 cm styropian-podloga-10 izolacja">
+            <span class="mat-item">
+              <b>Styropian podłogowy EPS 100 · 10 cm</b>
+              <span class="muted">paczka ≈ 3 m² · EPS 100 · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=styropian-podloga-10">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="xps-5" data-find="styrodur xps 5 cm xps-5 izolacja">
+            <span class="mat-item">
+              <b>Styrodur XPS 5 cm</b>
+              <span class="muted">paczka ≈ 5,5 m² · 5 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=xps-5">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="pir-10" data-find="plyta pir 10 cm pir-10 izolacja">
+            <span class="mat-item">
+              <b>Płyta PIR 10 cm</b>
+              <span class="muted">paczka ≈ 5,7 m² · 10 cm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=pir-10">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="papa-rolka" data-find="papa podkladowa 20 m² papa-rolka izolacja">
+            <span class="mat-item">
+              <b>Papa podkładowa 20 m²</b>
+              <span class="muted">paczka ≈ 20 m² · 20 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=papa-rolka">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="folia-paro" data-find="folia paroizolacyjna 75 m² folia-paro izolacja">
+            <span class="mat-item">
+              <b>Folia paroizolacyjna 75 m²</b>
+              <span class="muted">paczka ≈ 75 m² · 75 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=folia-paro">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="membrana-dach" data-find="membrana dachowa 75 m² membrana-dach izolacja">
+            <span class="mat-item">
+              <b>Membrana dachowa 75 m²</b>
+              <span class="muted">paczka ≈ 75 m² · 75 m²</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/farby-tynki-grunty/?m=membrana-dach">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-PLUMBING">Hydraulika i wentylacja</h2>
-        <ul class="mat-page-list"><li id="rura-pp-4" data-find="rura pp 4 m rura-pp-4">
-          <span class="mat-item">
-            <b>Rura PP 4 m</b>
-            <span class="muted">sztanga 4 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-pp-4">Policz</a>
-        </li><li id="rura-pex-3" data-find="rura pex 3 m rura-pex-3">
-          <span class="mat-item">
-            <b>Rura PEX 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-pex-3">Policz</a>
-        </li><li id="rura-cu-3" data-find="rura miedziana 3 m rura-cu-3">
-          <span class="mat-item">
-            <b>Rura miedziana 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-cu-3">Policz</a>
-        </li><li id="rura-spust-3" data-find="rura spustowa 3 m rura-spust-3">
-          <span class="mat-item">
-            <b>Rura spustowa 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-spust-3">Policz</a>
-        </li><li id="kanal-went-1" data-find="kanał wentylacyjny 1 m kanal-went-1">
-          <span class="mat-item">
-            <b>Kanał wentylacyjny 1 m</b>
-            <span class="muted">sztanga 1 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=kanal-went-1">Policz</a>
-        </li><li id="rura-kanal-110-2" data-find="rura kanalizacyjna pvc 110 · 2 m rura-kanal-110-2">
-          <span class="mat-item">
-            <b>Rura kanalizacyjna PVC 110 · 2 m</b>
-            <span class="muted">sztanga 2 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-kanal-110-2">Policz</a>
-        </li><li id="rura-kanal-50-2" data-find="rura kanalizacyjna pvc 50 · 2 m rura-kanal-50-2">
-          <span class="mat-item">
-            <b>Rura kanalizacyjna PVC 50 · 2 m</b>
-            <span class="muted">sztanga 2 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-kanal-50-2">Policz</a>
-        </li><li id="rynna-3" data-find="rynna dachowa 3 m rynna-3">
-          <span class="mat-item">
-            <b>Rynna dachowa 3 m</b>
-            <span class="muted">sztanga 3 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rynna-3">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-PLUMBING" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Hydraulika i wentylacja</h2>
+            <span class="mat-count">8<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="rura-pp-4" data-find="rura pp 4 m rura-pp-4 hydraulika i wentylacja">
+            <span class="mat-item">
+              <b>Rura PP 4 m</b>
+              <span class="muted">sztanga 4 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-pp-4">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-pex-3" data-find="rura pex 3 m rura-pex-3 hydraulika i wentylacja">
+            <span class="mat-item">
+              <b>Rura PEX 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-pex-3">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-cu-3" data-find="rura miedziana 3 m rura-cu-3 hydraulika i wentylacja">
+            <span class="mat-item">
+              <b>Rura miedziana 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-cu-3">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="rura-spust-3" data-find="rura spustowa 3 m rura-spust-3 hydraulika i wentylacja">
+            <span class="mat-item">
+              <b>Rura spustowa 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-spust-3">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="kanal-went-1" data-find="kanal wentylacyjny 1 m kanal-went-1 hydraulika i wentylacja">
+            <span class="mat-item">
+              <b>Kanał wentylacyjny 1 m</b>
+              <span class="muted">sztanga 1 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=kanal-went-1">Policz</a>
+          </li></ul>
+          <details class="mat-grp" data-grp>
+            <summary class="mat-grp-head">
+              <h3>Rura kanalizacyjna PVC</h3>
+              <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+            </summary>
+            <ul class="mat-page-list"><li id="rura-kanal-110-2" data-find="rura kanalizacyjna pvc 110 · 2 m rura-kanal-110-2 hydraulika i wentylacja">
+            <span class="mat-item">
+              <b>Rura kanalizacyjna PVC 110 · 2 m</b>
+              <span class="muted">sztanga 2 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-kanal-110-2">Policz</a>
+          </li><li id="rura-kanal-50-2" data-find="rura kanalizacyjna pvc 50 · 2 m rura-kanal-50-2 hydraulika i wentylacja">
+            <span class="mat-item">
+              <b>Rura kanalizacyjna PVC 50 · 2 m</b>
+              <span class="muted">sztanga 2 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rura-kanal-50-2">Policz</a>
+          </li></ul>
+          </details>
+          <ul class="mat-page-list mat-solo"><li id="rynna-3" data-find="rynna dachowa 3 m rynna-3 hydraulika i wentylacja">
+            <span class="mat-item">
+              <b>Rynna dachowa 3 m</b>
+              <span class="muted">sztanga 3 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=rynna-3">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-ELECTRICAL">Elektryka</h2>
-        <ul class="mat-page-list"><li id="korytko-2" data-find="korytko kablowe 2 m korytko-2">
-          <span class="mat-item">
-            <b>Korytko kablowe 2 m</b>
-            <span class="muted">sztanga 2 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=korytko-2">Policz</a>
-        </li><li id="listwa-kabel-2" data-find="listwa kablowa 2 m listwa-kabel-2">
-          <span class="mat-item">
-            <b>Listwa kablowa 2 m</b>
-            <span class="muted">sztanga 2 m · rzaz 2 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=listwa-kabel-2">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-ELECTRICAL" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Elektryka</h2>
+            <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="korytko-2" data-find="korytko kablowe 2 m korytko-2 elektryka">
+            <span class="mat-item">
+              <b>Korytko kablowe 2 m</b>
+              <span class="muted">sztanga 2 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=korytko-2">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="listwa-kabel-2" data-find="listwa kablowa 2 m listwa-kabel-2 elektryka">
+            <span class="mat-item">
+              <b>Listwa kablowa 2 m</b>
+              <span class="muted">sztanga 2 m · rzaz 2 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=listwa-kabel-2">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   <section class="block" data-cat-block>
       <div class="wrap">
-        <h2 id="cat-OTHER">Pozostałe</h2>
-        <ul class="mat-page-list"><li id="tapeta-standard" data-find="tapeta – rolka 0,53×10 m tapeta-standard">
-          <span class="mat-item">
-            <b>Tapeta – rolka 0,53×10 m</b>
-            <span class="muted">0,53×10 m · 5,3 m²/opak.</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/tapety/?m=tapeta-standard">Policz</a>
-        </li><li id="karnisz-2_4" data-find="karnisz / sztanga 2,4 m karnisz-2_4">
-          <span class="mat-item">
-            <b>Karnisz / sztanga 2,4 m</b>
-            <span class="muted">sztanga 2,4 m · rzaz 1 mm</span>
-          </span>
-          <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=karnisz-2_4">Policz</a>
-        </li></ul>
+        <details class="mat-cat" id="cat-OTHER" data-cat-details>
+          <summary class="mat-cat-head">
+            <h2>Pozostałe</h2>
+            <span class="mat-count">2<span class="mat-count-w"> pozycji</span></span>
+          </summary>
+          <div class="mat-groups">
+          <ul class="mat-page-list mat-solo"><li id="tapeta-standard" data-find="tapeta – rolka 0,53×10 m tapeta-standard pozostale">
+            <span class="mat-item">
+              <b>Tapeta – rolka 0,53×10 m</b>
+              <span class="muted">0,53×10 m · 5,3 m²/opak.</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/tapety/?m=tapeta-standard">Policz</a>
+          </li></ul>
+          <ul class="mat-page-list mat-solo"><li id="karnisz-2_4" data-find="karnisz / sztanga 2,4 m karnisz-2_4 pozostale">
+            <span class="mat-item">
+              <b>Karnisz / sztanga 2,4 m</b>
+              <span class="muted">sztanga 2,4 m · rzaz 1 mm</span>
+            </span>
+            <a class="btn btn-ghost btn-sm" href="/kalkulatory/rozkroj-liniowy-1d/?m=karnisz-2_4">Policz</a>
+          </li></ul>
+          </div>
+        </details>
       </div>
     </section>
   </div>
+
+  <section class="block alt" id="matpage-own">
+    <div class="wrap narrow">
+      <h2>Twoje materiały</h2>
+      <p class="muted" data-omat-guest>
+        Zaloguj się, żeby dodawać własne materiały i ceny.
+        <a class="btn btn-ghost btn-sm" href="/app/">Zaloguj się</a>
+      </p>
+      <div data-omat-mine hidden>
+        <details class="mat-add">
+          <summary>Nowy materiał</summary>
+          <form class="card omat-form" data-omat-form>
+        
+        <label class="field">
+          <span class="fld-label">Nazwa</span>
+          <input type="text" maxlength="120" placeholder="np. Gres od Kowalskiego 60×60" data-omat-in="name" required>
+        </label>
+        <div class="omat-row">
+          <label class="field">
+            <span class="fld-label">Do czego służy</span>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Okładziny ścian i podłóg</option><option value="DRYWALL_BOARDING">Zabudowa płytami G-K</option><option value="COATING">Materiały kryjące</option><option value="PANEL_CUTTING">Rozkrój płyt i arkuszy</option><option value="LINEAR_STOCK">Profile, listwy, rury, pręty</option></select>
+          </label>
+          <label class="field">
+            <span class="fld-label">Kategoria</span>
+            <select data-omat-in="category"><option value="TILES">Płytki i gres</option><option value="FLOORING">Podłogi</option><option value="TRIM">Listwy i wykończenia</option><option value="PAINT">Farby i lakiery</option><option value="CHEMICALS">Chemia budowlana</option><option value="BOARDS">Płyty</option><option value="WOOD">Drewno</option><option value="PROFILES">Profile G-K</option><option value="METAL">Metal i zbrojenie</option><option value="GLASS">Szkło i tworzywa</option><option value="TEXTILES">Tkaniny i tapicerka</option><option value="INSULATION">Izolacja</option><option value="PLUMBING">Hydraulika i wentylacja</option><option value="ELECTRICAL">Elektryka</option><option value="OTHER">Pozostałe</option></select>
+          </label>
+        </div>
+        <div class="omat-fields" data-omat-group="WALL_FLOOR_COVERING">
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Szerokość (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Długość (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="packageAreaM2">
+              <span class="fld-label">Powierzchnia opakowania (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="packageAreaM2">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Zapas (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="DRYWALL_BOARDING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Szerokość (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Długość (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="wastePercent">
+              <span class="fld-label">Zapas (%)</span>
+              <input type="text" inputmode="decimal" data-omat-in="wastePercent">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="COATING" hidden>
+            <label class="field omat-f" data-omat-f="coveragePerUnitM2">
+              <span class="fld-label">Wydajność opakowania (m²)</span>
+              <input type="text" inputmode="decimal" data-omat-in="coveragePerUnitM2">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="PANEL_CUTTING" hidden>
+            <label class="field omat-f" data-omat-f="widthMm">
+              <span class="fld-label">Szerokość (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="widthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Długość (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Szerokość cięcia (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+          <div class="omat-fields" data-omat-group="LINEAR_STOCK" hidden>
+            <label class="field omat-f" data-omat-f="lengthMm">
+              <span class="fld-label">Długość (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="lengthMm">
+            </label>
+            <label class="field omat-f" data-omat-f="kerfMm">
+              <span class="fld-label">Szerokość cięcia (mm)</span>
+              <input type="text" inputmode="decimal" data-omat-in="kerfMm">
+            </label>
+          </div>
+        <label class="field">
+          <span class="fld-label">Cena za opakowanie</span>
+          <input type="text" inputmode="decimal" data-omat-in="priceMajor">
+        </label>
+        <p class="muted">Cena trzyma walutę, w której ją wpisano. Nic nie jest przeliczane po kursie.</p>
+        <button type="submit" class="btn btn-primary btn-block">Zapisz materiał</button>
+        
+        <p class="omat-err" data-omat-err role="alert" hidden></p>
+      </form>
+        </details>
+        <div data-omat-list data-hist-label="Historia cen"></div>
+        <p class="muted" data-omat-empty>Nie masz jeszcze własnych materiałów.</p>
+        <p class="ws-undo" data-omat-undo role="status" hidden></p>
+        <p class="muted">Materiał z tej listy wybierzesz w kalkulatorze tak samo jak pozycję z katalogu.</p>
+      </div>
+    </div>
+  </section>
 
   <section class="block app-note" aria-labelledby="appnote-h">
     <div class="wrap">
@@ -2177,6 +2609,8 @@
 
 <script src="/assets/materials.js?v=20260902a"></script>
 <script src="/assets/materials-ui.js?v=20260902a"></script>
+<script src="/assets/own-materials.js?v=20260902a"></script>
+<script src="/assets/own-materials-ui.js?v=20260902a"></script>
 <script src="/assets/main.js?v=20260902a"></script>
 
 </body>
