@@ -71,6 +71,16 @@ for (const lang of LANGS) {
 const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 
 /**
+ * What pwAllows() answers inside the shipped store, for the length of one check.
+ *
+ * assets/workspace.js and assets/crm.js ask it before they store a typed amount or write
+ * a quote (the owner’s decision of 2026-09-03). True is the ordinary case and is what the
+ * arithmetic below is written against; a test that wants the refusal sets it to false and
+ * puts it back.
+ */
+let PW_ALLOW = true;
+
+/**
  * assets/workspace.js and assets/crm.js in Node, in one scope — which is how the browser
  * loads them: the job store reads the workspace's projects and their costs through its
  * globals, and a module's own scope would hide them.
@@ -106,6 +116,12 @@ function loadCrm() {
     },
     lmCurrency: () => clock.currency,
     lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    // What the paywall answers inside the store. `costs` and `quotes` became PRO on
+    // 2026-09-03 and the writes that take a typed amount ask before they store it, so the
+    // default here is an account that reaches them — otherwise every section below would be
+    // testing the refusal instead of the arithmetic. The section that IS about the refusal
+    // sets PW_ALLOW to false itself.
+    pwAllows: () => PW_ALLOW,
   });
   return {
     ...api,

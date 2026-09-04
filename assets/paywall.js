@@ -37,18 +37,51 @@ const pwT = (key) => (typeof t === "function" ? t(key) : key);
  * decision rather than a boundary. The boundary is the deployed Firestore rules, and they
  * are not asked here because nothing here writes to Firestore.
  */
-const pwLevel = () => (typeof lmReadLevel === "function" ? lmReadLevel() : "guest");
+const pwGuest = () => (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.GUEST : "guest");
+
+const pwLevel = () => (typeof lmReadLevel === "function" ? lmReadLevel() : pwGuest());
 
 /**
- * The paywall's answer for one module, with a working fallback.
+ * The paywall's answer for one module, with a fallback that **closes**.
  *
- * A page whose assets/plan.js failed to load shows the module rather than a wall: the
- * rows belong to whoever is sitting at this browser, and hiding somebody's own clients
- * behind a script that did not arrive is the worse of the two failures.
+ * Until 2026-09-03 the fallback opened: a page whose assets/plan.js failed to load showed
+ * the module rather than a wall, on the argument that the rows belong to whoever is
+ * sitting at this browser. That argument stopped holding when the owner put the PDF, the
+ * quote and every price behind Pro. "The script that decides did not arrive, so let it
+ * through" is a gate that anybody can open by making one file fail to load, and it is the
+ * one shape of failure this file must not have. A missing decision is now a locked
+ * module, and the visitor is told so by the same wall as everybody else.
+ *
+ * The rung is still the one the visitor is standing on where that is knowable:
+ * lmReadLevel() lives in assets/account.js, which is on every page, so a page missing
+ * only plan.js can still tell a guest from somebody signed in.
  */
 function pwState(feature) {
   if (typeof lmPaywall === "function") return lmPaywall(feature, pwLevel());
-  return { feature: null, open: true, locked: false, gated: false, step: "none" };
+  return {
+    feature: null,
+    open: false,
+    locked: true,
+    gated: true,
+    step: pwLevel() === pwGuest() ? "account" : "upgrade",
+  };
+}
+
+/**
+ * May this browser use one feature? The one question a script asks before it computes a
+ * price, builds a document or writes to a Pro store.
+ *
+ * It is the same decision the wall is drawn from, so a module can never be walled and
+ * working at the same time. Every caller checks `typeof pwAllows === "function"` first
+ * and treats a missing function as a refusal, for the reason pwState() closes: a gate
+ * that opens when its own code is absent is not a gate.
+ *
+ * **This is not a security boundary**, and neither is anything else in this file — see
+ * the note at the top of assets/plan.js. It decides what this page does, not what the
+ * backend accepts.
+ */
+function pwAllows(feature) {
+  return pwState(feature).open === true;
 }
 
 /**
@@ -178,7 +211,7 @@ function pwPage() {
   const pay = document.getElementById("pro-pay");
   if (!pay) return;
   const yours = document.getElementById("pro-yours");
-  const isPro = pwLevel() === "pro";
+  const isPro = pwLevel() === (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro");
   pay.hidden = isPro;
   if (yours) yours.hidden = !isPro;
   if (!isPro) pwPrices(pay);

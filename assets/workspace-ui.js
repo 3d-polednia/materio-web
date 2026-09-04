@@ -13,6 +13,52 @@ const wsUrlId = () => {
   try { return new URLSearchParams(location.search).get("id") || ""; } catch (e) { return ""; }
 };
 
+/**
+ * May this browser be shown money? — `costs` in LM_FEATURES, PRO since 2026-09-03.
+ *
+ * Every unit price, every line value, every waste cost and every total on these two
+ * screens is asked this before it is written, and not one of them is merely covered up:
+ * the amount is never put into the page at all. What a guest and a free account keep is
+ * the whole of the rest — the project, its rooms, its saved calculations and the material
+ * list, which is `shopping` and free.
+ *
+ * A missing pwAllows() is a refusal. The decision lives in assets/plan.js and
+ * assets/paywall.js, which the build loads ahead of this file; a page that reached this
+ * line without them has no answer, and no answer is "no".
+ */
+const wsCanCost = () => typeof pwAllows === "function" && pwAllows("costs");
+
+/** The same question for the export, which needs both halves — see pdfAllowed(). */
+const wsCanPdf = () => wsCanCost() && typeof pwAllows === "function" && pwAllows("pdf");
+
+/**
+ * The two money fields the build writes into a form that is otherwise free.
+ *
+ * `#ws-mat-price` types the price of a hand-added material and `#ws-line-cost` types what
+ * an "inne koszty" line comes to. Everything else on both forms is `shopping` — a name, a
+ * quantity, a unit — so the form stays, and the one field that asks for money goes.
+ *
+ * Each of the two goes with its caption where it has one: `#ws-mat-price` sits inside a
+ * `<label>` carrying the words "Cena (PLN)", and a field taken away leaving its caption
+ * behind reads as a page that failed to load. `#ws-line-cost` is a bare input in an inline
+ * form and names itself with `aria-label`, so there is nothing beside it to take. One
+ * expression covers both rather than two, which is how the two drifted apart once already.
+ *
+ * The blocks the build could wrap whole — the three project figures, the "inne koszty"
+ * section, the two export buttons — are `#cost-tool` and `#cost-other-tool`, and
+ * assets/paywall.js hides those from the same one decision. This is the leftover: two
+ * controls that sit in the middle of a form and cannot be wrapped without splitting it.
+ */
+function wsGateMoneyFields() {
+  const allowed = wsCanCost();
+  for (const id of ["ws-mat-price", "ws-line-cost"]) {
+    const field = document.getElementById(id);
+    if (!field) continue;
+    (field.closest("label") || field).hidden = !allowed;
+    if (!allowed) field.value = "";
+  }
+}
+
 /** The project the page is currently showing. Set once per render pass. */
 let wsOpenId = "";
 /** Whether the rename form and the delete question are open, so a redraw keeps them. */
@@ -43,10 +89,11 @@ function wsProjectRow(p, active) {
   // so the list, the dashboard and the project screen answer "what does this cost" with
   // one number. The count beside it stays the count of saved lines.
   const costs = wsProjectCosts(p.id);
-  const money = costs.total ? ` · ${wsEsc(wsMoney(costs.total, costs.currencyCode))}` : "";
+  const money = wsCanCost() && costs.total
+    ? ` · ${wsEsc(wsMoney(costs.total, costs.currencyCode))}` : "";
   // Lines saved in different currencies do not add up, and chapter VI forbids converting
   // them. The row has room for a chip; the whole sentence is its title.
-  const mixed = costs.mixed
+  const mixed = wsCanCost() && costs.mixed
     ? ` <span class="chip warn" title="${wsEsc(wsT("ws_mixed_currency"))}">${wsEsc(wsT("dash_mixed"))}</span>`
     : "";
   return `<li data-id="${wsEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
@@ -330,7 +377,7 @@ function wsRenderProjectLines(id) {
   // entry is "no room" is chapter XXV's control with nothing behind it.
   const rooms = wsRooms(id);
   list.innerHTML = rows.map((r) => {
-    const cost = r.totalCostMinor > 0
+    const cost = wsCanCost() && r.totalCostMinor > 0
       ? `<em class="muted">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</em>` : "";
     const room = rooms.length
       ? `<span class="ws-line-room">
@@ -401,10 +448,14 @@ function wsMaterialRow(r) {
   // Chapter XVII, in the chapter's own shape: "Klej | 7 × 35 PLN | = 245 PLN". The unit
   // price is the total divided by the quantity (wsUnitPriceMinor) — the contract keeps the
   // total and nothing else — so it can never contradict the money beside it.
-  const unit = wsUnitPriceMinor(r);
+  // The two amounts are `costs`, which is Pro; the name, the aisle and the quantity are
+  // `shopping`, which is not. A free account gets the row it shops from, without a price
+  // on it — and the price is not computed, not just left out of the markup.
+  const money = wsCanCost();
+  const unit = money ? wsUnitPriceMinor(r) : null;
   const price = unit !== null
     ? `<em class="muted ws-mat-price">× ${wsEsc(wsMoney(Math.round(unit), r.currencyCode))}</em>` : "";
-  const cost = r.estimatedCostMinor > 0
+  const cost = money && r.estimatedCostMinor > 0
     ? `<em class="muted">${unit !== null ? "= " : ""}${wsEsc(wsMoney(r.estimatedCostMinor, r.currencyCode))}</em>` : "";
   const aisle = r.materialCategory
     ? `<em class="muted">${wsEsc(wsT("cat_" + r.materialCategory))}</em>` : "";
@@ -473,11 +524,11 @@ function wsMaterialForm(r) {
             <span class="ws-bar-label">${wsEsc(wsT("ws_col_unit"))}</span>
             <input type="text" maxlength="24" data-f="unit" value="${wsEsc(r.unit)}" list="ws-mat-units">
           </label>
-          <label class="ws-mat-f ws-mat-f-sm">
+          ${wsCanCost() ? `<label class="ws-mat-f ws-mat-f-sm">
             <span class="ws-bar-label">${wsEsc(wsT("proj_mat_price"))} (${wsEsc(code)})</span>
             <input type="text" inputmode="decimal" data-f="priceMajor"
               value="${wsEsc(wsPriceValue(wsUnitPriceMinor(r)))}">
-          </label>
+          </label>` : ""}
           <label class="ws-mat-f">
             <span class="ws-bar-label">${wsEsc(wsT("proj_mat_aisle"))}</span>
             <select data-f="materialCategory">${options}</select>
@@ -510,6 +561,10 @@ function wsMaterialForm(r) {
 function wsMatSum(form) {
   const out = form.querySelector("[data-mat-sum]");
   if (!out) return;
+  // "7 × 35,00 zł = 245,00 zł" is a price, a line value and a total in one sentence, so
+  // it is `costs` from end to end. The field it reads is not on the form for a level that
+  // may not have it; this makes sure nothing is written even if it is.
+  if (!wsCanCost()) { out.textContent = ""; return; }
   const get = (f) => {
     const el = form.querySelector(`[data-f="${f}"]`);
     return el ? wsDecimal(el.value) : 0;
@@ -536,6 +591,9 @@ function wsMatSum(form) {
 function wsRenderOtherCosts(id) {
   const list = document.getElementById("ws-project-other-list");
   if (!list) return;
+  // The whole section is `costs`. assets/paywall.js hides it; this makes sure nothing was
+  // put inside it first, because a hidden element still holds every amount in it.
+  if (!wsCanCost()) { list.innerHTML = ""; return; }
   const rows = wsOtherCosts(id);
   if (!rows.length) {
     list.innerHTML = `<li class="empty muted">${wsEsc(wsT("proj_other_empty"))}</li>`;
@@ -590,12 +648,24 @@ function wsRenderProject(id) {
   // The three come out of one call so they cannot disagree, and the sum is the two above it
   // added — never the estimate lines added to the materials, which would count a calculated
   // line twice (it writes a material carrying the same money).
-  const costs = wsProjectCosts(project.id);
+  // The count is the project's own size and is free. The three amounts are `costs`, which
+  // is Pro: for a level that does not reach it they are not written at all — the elements
+  // are emptied and wsProjectCosts() is never asked. A figure computed and then covered up
+  // is a figure sitting in the page for anybody who opens the inspector.
   document.getElementById("ws-project-count").textContent = String(wsEstimations(project.id).length);
-  document.getElementById("ws-project-mat").textContent = wsMoney(costs.materials, costs.currencyCode);
-  document.getElementById("ws-project-other").textContent = wsMoney(costs.other, costs.currencyCode);
-  document.getElementById("ws-project-total").textContent = wsMoney(costs.total, costs.currencyCode);
-  document.getElementById("ws-project-mixed").hidden = !costs.mixed;
+  const fig = (id, text) => { document.getElementById(id).textContent = text; };
+  if (wsCanCost()) {
+    const costs = wsProjectCosts(project.id);
+    fig("ws-project-mat", wsMoney(costs.materials, costs.currencyCode));
+    fig("ws-project-other", wsMoney(costs.other, costs.currencyCode));
+    fig("ws-project-total", wsMoney(costs.total, costs.currencyCode));
+    document.getElementById("ws-project-mixed").hidden = !costs.mixed;
+  } else {
+    fig("ws-project-mat", "");
+    fig("ws-project-other", "");
+    fig("ws-project-total", "");
+    document.getElementById("ws-project-mixed").hidden = true;
+  }
 
   const isActive = wsActiveProjectId() === project.id;
   // An archived project takes no new lines, so it cannot be the active one either, and
@@ -736,6 +806,27 @@ function wsRenderRooms() {
 function buildProjectsPage() {
   const page = document.getElementById("ws-page");
   if (!page) return;
+
+  /* Chapter XXV's wall, from the same call every Pro page makes. Two prefixes for one
+     feature: `cost` is the three figures with the wall itself beside them, `cost-other`
+     is the "inne koszty" section, which has no wall of its own because one page says the
+     same thing once. Both blocks ship `hidden`, so a decision that never arrives leaves
+     them shut. */
+  if (typeof pwMount === "function") {
+    pwMount("cost", "costs");
+    pwMount("cost-other", "costs");
+  }
+  wsGateMoneyFields();
+  /* Signing in or out — in this tab or another — moves the level, and the rows on this
+     screen were built for the level before it. Hiding the blocks is not enough: a project
+     row, a saved calculation and a material row each carry an amount inside them, and an
+     account that has just stopped being Pro would be left looking at the last figures it
+     was allowed. The whole screen is drawn again, so what is on it is what this level may
+     have. */
+  document.addEventListener("lm-session", () => {
+    wsGateMoneyFields();
+    wsRenderWorkspace();
+  });
 
   document.getElementById("ws-project-form").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -926,18 +1017,26 @@ function wireProjectDetail() {
     };
     if (!String(get("name")).trim()) return; // a material with no name cannot be shopped for
     wsEditingItemId = "";
-    // The store fires `workspacechange`, which redraws the screen — so what appears is what
-    // was actually written, not what was typed at it.
-    if (!wsUpdateItem(li.dataset.id, {
+    const fields = {
       name: get("name"),
       quantity: wsDecimal(get("quantity")),
       unit: get("unit"),
       materialCategory: get("materialCategory"),
       note: get("note"),
+    };
+    /* The price is `costs`, which is Pro. A level that does not reach it gets no price
+       field, and this write must then leave the stored amount exactly where it is: a
+       missing field read as a zero would erase the price of every row a Pro account had
+       already put one on, the moment that account went back to free. Not passing the key
+       at all is what wsUpdateItem() reads as "unchanged". */
+    if (wsCanCost()) {
       // The quantity above is applied first, so the cost is this price times the quantity
       // the visitor is looking at — chapter XVII's "7 × 35 PLN = 245 PLN".
-      priceMajor: wsDecimal(get("priceMajor")),
-    })) wsRenderWorkspace();
+      fields.priceMajor = wsDecimal(get("priceMajor"));
+    }
+    // The store fires `workspacechange`, which redraws the screen — so what appears is what
+    // was actually written, not what was typed at it.
+    if (!wsUpdateItem(li.dataset.id, fields)) wsRenderWorkspace();
   });
 
   /* Chapter XVIII's rooms, on the project they belong to: add one, correct its dimensions,
@@ -1027,7 +1126,10 @@ function wireProjectDetail() {
       quantity: wsDecimal(el("ws-mat-qty").value),
       unit: el("ws-mat-unit").value.trim(),
       note: el("ws-mat-note").value.trim(),
-      priceMajor: wsDecimal(el("ws-mat-price").value),
+      // A hand-typed material is `shopping` and free; the price on it is `costs` and is
+      // not. A level that does not reach the price gets a row with none rather than a
+      // refusal to add the material at all.
+      priceMajor: wsCanCost() ? wsDecimal(el("ws-mat-price").value) : 0,
     });
     if (!made) return;
     // The name, the note and the price are about one material and go; the quantity, the
@@ -1051,7 +1153,10 @@ function wireProjectDetail() {
     e.preventDefault();
     const el = (id) => document.getElementById(id);
     const name = el("ws-other-name").value.trim();
-    if (!name || !wsOpenId) return;
+    // An "inne koszty" line is an amount and nothing else, so the whole write is `costs`.
+    // The section is behind the wall; this is the second guard, for the form reached
+    // some other way.
+    if (!name || !wsOpenId || !wsCanCost()) return;
     wsAddManualEstimation({
       projectId: wsOpenId,
       name,
@@ -1067,14 +1172,23 @@ function wireProjectDetail() {
 
 /* ------------------------------------------------------------------ /kosztorys/ */
 
-/** One estimate line, either as text or as the form that edits it. */
+/**
+ * One estimate line, either as text or as the form that edits it.
+ *
+ * The value column is `costs` and is Pro. For a level that does not reach it the column is
+ * taken out of the row entirely rather than left blank — the same rule the PDF follows for
+ * a column nobody asked for, and for the same reason: a header with nothing under it
+ * promises a figure the page is not going to print. wsRenderEstimate() takes the matching
+ * header and the colspan of the empty row with it.
+ */
 function wsEstimateRow(r, i) {
+  const money = wsCanCost();
   if (r.id !== wsEditingId) {
     return `<tr data-id="${wsEsc(r.id)}">
         <td>${i + 1}</td>
         <td>${wsEsc(r.name)}</td>
         <td class="num">${wsNum(r.requiredUnits)} ${wsEsc(r.unitLabel)}</td>
-        <td class="num">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</td>
+        ${money ? `<td class="num">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</td>` : ""}
         <td class="no-print ws-row-actions">
           <button type="button" class="btn btn-ghost btn-sm" data-edit>${wsEsc(wsT("ws_edit"))}</button>
           <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
@@ -1088,7 +1202,7 @@ function wsEstimateRow(r, i) {
         <input type="text" inputmode="decimal" class="ws-qty" data-f="qty" value="${r.requiredUnits}" aria-label="${wsEsc(wsT("ws_col_qty"))}">
         <input type="text" maxlength="24" class="ws-unit" data-f="unit" value="${wsEsc(r.unitLabel)}" aria-label="${wsEsc(wsT("ws_col_unit"))}">
       </td>
-      <td class="num"><input type="text" inputmode="decimal" class="ws-qty" data-f="cost" value="${(r.totalCostMinor / 100).toFixed(2)}" aria-label="${wsEsc(wsT("ws_col_cost"))}"></td>
+      ${money ? `<td class="num"><input type="text" inputmode="decimal" class="ws-qty" data-f="cost" value="${(r.totalCostMinor / 100).toFixed(2)}" aria-label="${wsEsc(wsT("ws_col_cost"))}"></td>` : ""}
       <td class="no-print ws-row-actions">
         <button type="button" class="btn btn-primary btn-sm" data-save>${wsEsc(wsT("app_save"))}</button>
         <button type="button" class="btn btn-ghost btn-sm" data-cancel>${wsEsc(wsT("action_cancel"))}</button>
@@ -1102,9 +1216,14 @@ let wsEditingId = "";
 function wsRenderEstimate() {
   const wrap = document.getElementById("ws-estimate");
   if (!wrap) return;
+  const money = wsCanCost();
   const project = wsActiveProject();
   const rows = project ? wsEstimations(project.id) : [];
-  const total = project ? wsProjectTotal(project.id) : { minor: 0, currencyCode: "", count: 0 };
+  // The total is not computed for a level that may not see it. wsProjectTotal() counts
+  // money and nothing else, so there is nothing in it worth having without the money.
+  const total = project && money
+    ? wsProjectTotal(project.id)
+    : { minor: 0, currencyCode: "", count: rows.length };
 
   const picker = document.getElementById("ws-estimate-project");
   if (picker) {
@@ -1118,23 +1237,39 @@ function wsRenderEstimate() {
   document.getElementById("ws-estimate-date").textContent =
     new Date().toLocaleDateString(wsLang(), { year: "numeric", month: "long", day: "numeric" });
 
+  // The value column goes with the values: header, cells and the width of the empty row.
+  const head = wrap.querySelector(`.ws-table thead th.num + th.num`);
+  if (head) head.hidden = !money;
   const body = document.getElementById("ws-estimate-rows");
   if (!rows.length) {
-    body.innerHTML = `<tr><td colspan="5" class="muted">${wsEsc(wsT("ws_empty_estimate"))}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="${money ? 5 : 4}" class="muted">${wsEsc(wsT("ws_empty_estimate"))}</td></tr>`;
   } else {
     body.innerHTML = rows.map((r, i) => wsEstimateRow(r, i)).join("");
   }
-  document.getElementById("ws-estimate-total").textContent = wsMoney(total.minor, total.currencyCode);
+  // The line and the total under it are two halves of one figure, so they are withheld
+  // together: no sum is printed, and the paragraph carrying it is taken off the page
+  // rather than left showing a currency with nothing in front of it.
+  const sum = wrap.querySelector(".ws-estimate-total");
+  if (sum) sum.hidden = !money;
+  document.getElementById("ws-estimate-total").textContent =
+    money ? wsMoney(total.minor, total.currencyCode) : "";
   document.getElementById("ws-estimate-count").textContent = `${total.count} ${wsUnit("ws_lines", total.count)}`;
 
   // Lines saved in different currencies do not add up, and the sum above says so.
   const mixed = document.getElementById("ws-estimate-mixed");
-  if (mixed) mixed.hidden = !total.mixed;
+  if (mixed) mixed.hidden = !money || !total.mixed;
 }
 
 function buildEstimatePage() {
   const wrap = document.getElementById("ws-estimate");
   if (!wrap) return;
+
+  /* Chapter XXV's wall stands where the two export buttons are: `#cost-tool` holds them
+     and `#cost-gate` is drawn instead. The page around it is untouched — the list of what
+     was counted is `shopping`, and it stays open to everybody. */
+  if (typeof pwMount === "function") pwMount("cost", "costs");
+  wsGateMoneyFields();
+  document.addEventListener("lm-session", () => { wsGateMoneyFields(); wsRenderEstimate(); });
 
   document.getElementById("ws-estimate-rows").addEventListener("click", (e) => {
     const tr = e.target.closest("tr[data-id]");
@@ -1150,14 +1285,20 @@ function buildEstimatePage() {
       wsEditingId = "";
       wsRenderEstimate();
     } else if (e.target.closest("[data-save]")) {
-      const get = (f) => tr.querySelector(`[data-f="${f}"]`).value;
+      const field = (f) => tr.querySelector(`[data-f="${f}"]`);
+      const get = (f) => { const el = field(f); return el ? el.value : ""; };
       wsEditingId = "";
-      wsUpdateEstimation(id, {
+      const fields = {
         name: get("name").trim(),
         requiredUnits: wsDecimal(get("qty")),
         unitLabel: get("unit").trim(),
-        costMajor: wsDecimal(get("cost")),
-      });
+      };
+      /* The cost field only exists for a level that reaches `costs`. Leaving the key out
+         is what wsUpdateEstimation() reads as "unchanged", so correcting a line's name on
+         a free account cannot quietly zero the amount somebody put on it while they had
+         Pro. */
+      if (wsCanCost()) fields.costMajor = wsDecimal(get("cost"));
+      wsUpdateEstimation(id, fields);
       wsRenderEstimate();
     }
   });
@@ -1171,7 +1312,10 @@ function buildEstimatePage() {
       name: name.value.trim(),
       requiredUnits: wsDecimal(document.getElementById("ws-line-qty").value),
       unitLabel: document.getElementById("ws-line-unit").value.trim(),
-      costMajor: wsDecimal(document.getElementById("ws-line-cost").value),
+      // The line itself is a name and a quantity, which is `shopping` and free. The
+      // amount on it is `costs`: a level that does not reach it writes a line with no
+      // money on it rather than being refused the line.
+      costMajor: wsCanCost() ? wsDecimal(document.getElementById("ws-line-cost").value) : 0,
     });
     name.value = "";
     document.getElementById("ws-line-cost").value = "";
@@ -1183,10 +1327,15 @@ function buildEstimatePage() {
   const print = document.getElementById("ws-estimate-print");
   // No PDF library: the browser's own "print to PDF" produces a smaller, selectable file
   // than a canvas render would, and @media print in styles.css is what shapes the page.
-  if (print) print.addEventListener("click", () => window.print());
+  // It is the second way to a PDF on this site, so it asks the same question the
+  // configurator on /projekty/ does, and it asks it here as well as behind the wall.
+  if (print) print.addEventListener("click", () => { if (wsCanPdf()) window.print(); });
 
   const csv = document.getElementById("ws-estimate-csv");
   if (csv) csv.addEventListener("click", () => {
+    // The file is a priced estimate with the prices in a column of their own, so it is
+    // `costs` exactly as the screen it comes from is.
+    if (!wsCanCost()) return;
     const project = wsActiveProject();
     const rows = project ? wsEstimations(project.id) : [];
     const head = ["#", wsT("ws_col_name"), wsT("ws_col_qty"), wsT("ws_col_unit"), wsT("ws_col_cost"), "currency"];

@@ -129,8 +129,18 @@ const BUDGET = {
   // of the tree and of the form. The heaviest language, Ukrainian, weighs 411.1 kB raw,
   // which is inside the CEILING below.
   "materialy/index.html": [372, 95],
-  "projekty/index.html": [355, 106],
-  "kosztorys/index.html": [345, 104],
+  /* Raised on 2026-09-04 from [355, 106] and [345, 104], measured at 432.8 kB / 129.2 kB gz
+     and 416.3 kB / 125.2 kB gz. Both numbers were already stale before this session — the
+     Polish pages stood at 365.5 and 350.1 — and what moved them the rest of the way is the
+     owner putting every price, the quote and the PDF behind LiczMat Pro. These two screens
+     now have to be able to ask which plan the account is on and to draw chapter XXV's wall,
+     so they load the three files the four Pro pages have always loaded: assets/plan.js
+     (20.7 kB raw, 7.5 gz), assets/pay.js (11.9 / 4.8) and assets/paywall.js (11.0 / 4.2).
+     That is 43.6 kB raw of the growth and 16.5 kB of it gzipped; the rest is the wall's own
+     markup. There is no cheaper arrangement: the permission table is the one place the
+     levels are written down, and a page that cannot read it cannot gate anything. */
+  "projekty/index.html": [440, 132],
+  "kosztorys/index.html": [425, 128],
   "liczmat-pro/index.html": [235, 71],
   "klienci/index.html": [405, 126],
   "zlecenia/index.html": [405, 126],
@@ -152,11 +162,23 @@ const BUDGET = {
  * No page on the site, in any language, may cross this.
  *
  * Raised from [420, 130] on 2026-09-02, measured at 420.4 kB raw on /uk/koshtorysy-pro/,
- * which is the heaviest page there is: Ukrainian is two UTF-8 bytes a letter and the quote
- * screen carries the whole Pro store. What pushed it over is the picker going from ten
- * rows to thirteen, twice per page. Gzipped it is 121.9 kB, so that half did not move.
+ * which was then the heaviest page there is: Ukrainian is two UTF-8 bytes a letter and the
+ * quote screen carries the whole Pro store. What pushed it over is the picker going from
+ * ten rows to thirteen, twice per page. Gzipped it is 121.9 kB, so that half did not move.
+ *
+ * Raised again on 2026-09-04, from [425, 130], for the session that put every price, the
+ * quote and the PDF behind LiczMat Pro. The heaviest generated page is now /uk/proekty/ at
+ * 469.1 kB raw and 133.6 kB gzipped: the same three files listed against the /projekty/
+ * budget above, plus chapter XXV's wall, on the language that costs two bytes a letter.
+ *
+ * **The account page is over this, and was over the old one too.** It weighs 518.2 kB raw
+ * and 151.4 kB gzipped, and it weighed 500.5 / 147.4 before this session touched anything:
+ * the four proGate walls it grew on 2026-09-03 were never budgeted for. That is a real
+ * finding and it is left failing on purpose rather than papered over by a ceiling written
+ * around it — the same page is over its prose budget in scripts/test-copy.mjs for the same
+ * reason, and both are waiting for the session that trims the account page.
  */
-const CEILING = [425, 130];
+const CEILING = [475, 136];
 
 /**
  * And no single asset may, either — one file is one thing a browser waits for.

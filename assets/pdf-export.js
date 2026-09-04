@@ -15,7 +15,27 @@
  * gross, each layer optional and contributing zero when it is off, so the arithmetic below
  * it still holds. Two products answering "what does this job come to" differently is the
  * defect the parity audit was written to find.
+ *
+ * **The whole export is LiczMat Pro since 2026-09-03.** `pdf` and `costs` are PRO in
+ * LM_FEATURES (assets/plan.js) and pdfAllowed() below is asked twice on the way to a
+ * document: once before anything is written into the markup, and once more before the
+ * print dialog is opened. Two checks for one button is deliberate — the first is the flow
+ * a visitor takes, the second is the function called directly from a console — and both
+ * refuse when the deciding script is not on the page at all. The wall a free account sees
+ * instead of the form is src/pro.mjs's, drawn by assets/paywall.js.
  */
+
+/**
+ * May this browser produce the document? Both halves of it have to be allowed: `pdf` is
+ * the export, `costs` is every amount printed inside it.
+ *
+ * A missing pwAllows() is a refusal rather than a pass. The deciding code is
+ * assets/plan.js and assets/paywall.js, which the build puts on this page ahead of this
+ * file; if either failed to arrive, the answer this function does not have is "no".
+ */
+function pdfAllowed() {
+  return typeof pwAllows === "function" && pwAllows("pdf") && pwAllows("costs");
+}
 
 /** Which figures the document prints. Read fresh on every click, never remembered. */
 function pdfOptions(form) {
@@ -135,11 +155,45 @@ function pdfRows(projectId) {
   ];
 }
 
-/** Fill the whole document for one project. Returns false when there is no project open. */
+/**
+ * Empty the document and hide it.
+ *
+ * Hiding it is not enough on its own. The document is markup that stays on the page
+ * between prints, so a document filled in while the account was Pro is still holding every
+ * row, every price and the investor breakdown after the plan lapses or somebody signs out
+ * in another tab. What a level may not have has to leave the page, not be covered over.
+ */
+function pdfClear() {
+  const doc = document.getElementById("ws-pdf-doc");
+  if (!doc) return;
+  doc.hidden = true;
+  const rows = pdfEl(doc, "rows");
+  if (rows) rows.innerHTML = "";
+  doc.querySelectorAll("[data-pdf]").forEach((el) => {
+    // The subtitle is the only slot the build did not leave empty — it carries both
+    // document names as data attributes and the script picks one, so emptying its text
+    // costs nothing and pdfFill() writes it again.
+    el.textContent = "";
+  });
+  doc.querySelectorAll("[data-pdf-row]").forEach((el) => { el.hidden = true; });
+}
+
+/**
+ * Fill the whole document for one project.
+ *
+ * Returns false when there is no project open — and when the plan on the account does not
+ * reach the export, in which case the document is emptied and hidden rather than built and
+ * withheld. Nothing below this line runs for a guest or a free account: no row, no price,
+ * no total and no investor breakdown is ever written into the page.
+ */
 function pdfFill(projectId, opt) {
   const doc = document.getElementById("ws-pdf-doc");
   const project = typeof wsProject === "function" ? wsProject(projectId) : null;
   if (!doc || !project) return false;
+  if (!pdfAllowed()) {
+    pdfClear();
+    return false;
+  }
 
   const t = (key) => (typeof window.t === "function" ? window.t(key) : key);
   const investor = opt.type === "investor";
@@ -222,6 +276,18 @@ function pdfFill(projectId, opt) {
 /* ------------------------------------------------------------------ wiring */
 
 function pdfInit() {
+  // The wall first, and by the same call every Pro page makes: #pdf-gate is shown or
+  // #pdf-tool is, and it is redrawn when somebody signs in or out in another tab. The
+  // configurator ships `hidden`, so a plan that never answers leaves it shut.
+  if (document.getElementById("pdf-tool") && typeof pwMount === "function") {
+    pwMount("pdf", "pdf");
+  }
+
+  /* Signing in or out — in this tab or another — moves the level. A document printed
+     while the account was Pro is still in the page, so the redraw that puts the wall back
+     up empties it as well. */
+  document.addEventListener("lm-session", () => { if (!pdfAllowed()) pdfClear(); });
+
   const form = document.getElementById("ws-pdf-form");
   const doc = document.getElementById("ws-pdf-doc");
   if (!form || !doc) return;
@@ -244,10 +310,15 @@ function pdfInit() {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    // Asked before the document is built and again before the dialog is opened. The wall
+    // normally means this listener is never reached at all; this is the case where the
+    // markup was reached anyway.
+    if (!pdfAllowed()) return;
     const id = typeof wsActiveProjectId === "function"
       ? (new URLSearchParams(location.search).get("id") || wsActiveProjectId())
       : null;
     if (!pdfFill(id, pdfOptions(form))) return;
+    if (!pdfAllowed()) return;
     // The document is on the page and the rest of it is not, for the length of one print.
     document.body.dataset.pdfPrint = "1";
     const done = () => {

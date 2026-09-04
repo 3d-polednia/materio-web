@@ -203,13 +203,63 @@
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
 
           
+          
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">Položek</span> <b id="ws-project-count"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Náklady na materiál</span> <b id="ws-project-mat"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Další náklady</span> <b id="ws-project-other"></b></p>
-            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Součet projektu</span> <b id="ws-project-total"></b></p>
           </div>
-          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Položky jsou v různých měnách. Součet je sečte, ale nic nepřepočítává kurzem — zkontroluj měny ve sloupci nákladů.</p>
+
+          <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Ceny a náklady</h2>
+        <p class="muted">Jednotkové ceny, hodnota položek, náklady na odpad a součet projektu. Seznam materiálů bez cen zůstává zdarma.</p>
+        <p><span class="chip">Dostupné v LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je tarif u účtu. Založ si nejdřív účet LiczMat zdarma nebo se přihlas — Pro jde zapnout jen na účtu.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fcs%2Fprojekty%2F" rel="nofollow">Založit účet zdarma</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tvůj účet je na tarifu zdarma. Tento modul patří do LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Co dál LiczMat Pro zahrnuje</h3>
+          <ul class="pw-incl-list">
+            <li><b>Klienti</b> — <span class="muted">Seznam klientů s kontaktními údaji, poznámkami a historií spolupráce.</span></li>
+            <li><b>Zakázky</b> — <span class="muted">Zakázka s klientem, popisem, stavem, termínem, hodnotou a připojeným projektem.</span></li>
+            <li><b>Cenové nabídky</b> — <span class="muted">Materiál, práce, další náklady, marže a součet — z toho, co jsi už spočítal.</span></li>
+            <li><b>Termíny</b> — <span class="muted">Termíny zakázek a základní informace o nich. Ne druhý Kalendář Google.</span></li>
+            <li><b>Historie a CRM</b> — <span class="muted">Cesta celou prací: klient → zakázka → projekt → cenová nabídka → historie.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/cs/liczmat-pro/" data-i18n="pro_more">Poznej LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Předplatné LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Jeden tarif, všech pět modulů Pro. Platbu zajišťuje Stripe; zrušíš kdykoli a Pro běží do konce zaplaceného období.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Měsíčně</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ měsíc</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Ročně</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ rok — o dva měsíce levněji</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Přejít na svůj účet</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Předplatné si zatím koupit nelze. Ceny jsou konečné.</p>
+        </div>
+      </div>
+          <div id="cost-tool" hidden>
+            <div class="ws-project-figs">
+              <p class="ws-project-fig"><span class="eyebrow muted">Náklady na materiál</span> <b id="ws-project-mat"></b></p>
+              <p class="ws-project-fig"><span class="eyebrow muted">Další náklady</span> <b id="ws-project-other"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Součet projektu</span> <b id="ws-project-total"></b></p>
+            </div>
+            <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Položky jsou v různých měnách. Součet je sečte, ale nic nepřepočítává kurzem — zkontroluj měny ve sloupci nákladů.</p>
+          </div>
 
           <div class="ws-project-actions">
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Nastavit jako aktivní</button>
@@ -330,7 +380,8 @@
           </section>
 
           
-          <section class="dash-sec">
+          
+          <section class="dash-sec" id="cost-other-tool" hidden>
             <div class="dash-head">
               <h2>Další náklady</h2>
             </div>
@@ -357,8 +408,27 @@
 
           <section class="dash-sec ws-pdf" id="ws-pdf">
             <div class="dash-head"><h2>Exportovat rozpočet</h2></div>
-            <p class="muted">Dokument se otevře v dialogu tisku. Zvolte v něm uložení do PDF.</p>
-            <form id="ws-pdf-form">
+            <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>
+        <h2>Export do PDF</h2>
+        <p class="muted">Technická zpráva a rozpočet pro investora: práce, marže, DPH a součet, připraveno k tisku.</p>
+        <p><span class="chip">Dostupné v LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je tarif u účtu. Založ si nejdřív účet LiczMat zdarma nebo se přihlas — Pro jde zapnout jen na účtu.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fcs%2Fprojekty%2F" rel="nofollow">Založit účet zdarma</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tvůj účet je na tarifu zdarma. Tento modul patří do LiczMat Pro.</p>
+
+        
+
+        <p><a class="btn btn-ghost btn-sm" href="/cs/liczmat-pro/" data-i18n="pro_more">Poznej LiczMat Pro</a></p>
+
+        
+      </div>
+            <div id="pdf-tool" hidden>
+              <p class="muted">Dokument se otevře v dialogu tisku. Zvolte v něm uložení do PDF.</p>
+              <form id="ws-pdf-form">
             <fieldset class="pdf-types">
               <legend class="fld-label">Typ dokumentu</legend>
               <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Technický protokol</span></label>
@@ -416,7 +486,7 @@
 
             <p><button type="submit" class="btn btn-primary">Připravit PDF</button></p>
           </form>
-            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+              <article id="ws-pdf-doc" class="pdf-doc" hidden>
             <header class="pdf-head">
               
               <p class="pdf-sub" data-pdf="subtitle"
@@ -468,6 +538,7 @@
 
             <p class="pdf-foot">LiczMat — Spočítej. Naplánuj. Realizuj.</p>
           </article>
+            </div>
           </section>
         </div>
       </article>
@@ -621,6 +692,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

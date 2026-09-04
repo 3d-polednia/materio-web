@@ -525,8 +525,14 @@ head("5. language, currency and theme, on a 320px screen");
 
     /* And what it must NOT change: an estimate line keeps the currency it was saved
        with (chapter VI). Switching the selector is a choice about what to quote next,
-       not a conversion of money that has already been written down. */
-    const proj = await open(ctx, `${urlProjects("pl")}?id=p1`, { workspace: true, currency: "EUR" });
+       not a conversion of money that has already been written down.
+
+       At the Pro level, because since 2026-09-03 there is no money on this screen at any
+       other one: `costs` is PRO, and a guest gets chapter XXV's wall where the figures
+       were. What is being asked here is what happens to an amount the page prints, so the
+       page has to be printing one. */
+    const proj = await open(ctx, `${urlProjects("pl")}?id=p1`,
+      { workspace: true, currency: "EUR", level: "pro" });
     const money = await proj.innerText("#ws-project");
     check("a line saved in złoty still reads in złoty under EUR",
       money.includes("zł") || /PLN/.test(money), money.slice(0, 200));

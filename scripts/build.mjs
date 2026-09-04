@@ -434,7 +434,13 @@ function validate() {
       if (f.route && !route(f.route)) {
         problems.push(`feature "${f.id}" points at route "${f.route}", which does not exist`);
       }
-      if (f.route && f.level === LEVEL.PRO && route(f.route).level !== LEVEL.PRO) {
+      // A PRO *module* is a screen, so the route it lives on has to be PRO too — a Pro
+      // module on an open page is a page that shows the module to everybody. A PRO
+      // *capability* (`module: false`, since 2026-09-03) is the opposite arrangement on
+      // purpose: `costs` and `pdf` are the priced half of /kosztorys/ and /projekty/,
+      // which stay GUEST because the counting and the material list on them are free.
+      if (f.route && f.level === LEVEL.PRO && f.module !== false
+          && route(f.route).level !== LEVEL.PRO) {
         problems.push(`feature "${f.id}" is PRO but route "${f.route}" is not`);
       }
       if (f.level === LEVEL.PRO && !f.key) {
@@ -640,6 +646,13 @@ const CALC_SCRIPTS = [
  */
 const WS_SCRIPTS = [
   "/assets/units.js", "/assets/workspace.js",
+  // The permission table and the wall it draws. Both pages print money and offer the PDF,
+  // and since 2026-09-03 both of those are PRO — so both pages have to be able to ask
+  // lmCan() and to put chapter XXV's wall where the amounts used to be. The order is the
+  // order the browser needs: assets/account.js is already on every page (src/template.mjs)
+  // and plan.js reads its globals; pay.js sits between plan.js and paywall.js because the
+  // wall quotes a price and the prices are in pay.js.
+  "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   // Both halves: these two pages draw the screens, and the screens speak the vocabulary
   // assets/workspace-calc.js defines. Order matters — plain scripts, one global scope.
   "/assets/workspace-calc.js", "/assets/workspace-ui.js",
@@ -1080,7 +1093,7 @@ function buildWorkspacePages() {
   for (const lang of BUILD_LANGS) {
     const t = translator(lang);
 
-    const projects = projectsMain(lang, t, CAT.categories);
+    const projects = projectsMain(lang, t, CAT.categories, LM_FEATURES);
     write(join(urlProjects(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("wspage_title")} \u2014 LiczMat`,
@@ -1102,7 +1115,7 @@ function buildWorkspacePages() {
       scripts: WS_SCRIPTS,
     }));
 
-    const estimate = estimateMain(lang, t);
+    const estimate = estimateMain(lang, t, LM_FEATURES);
     write(join(urlEstimate(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("estpage_title")} \u2014 LiczMat`,
@@ -1472,8 +1485,13 @@ function buildPrivatePages() {
     headExtra: `${navScript}\n<script>window.LM_DASH = ${JSON.stringify(dashData).replace(/</g, "\\u003c")};</script>`,
     // Classic scripts, in this order and not modules: the dashboard reads the workspace
     // and the recents through their globals, which a module's own scope would hide.
+    // plan.js since 2026-09-04: the page shows no Firebase-derived level (see the note at
+    // the top of assets/dashboard.js), so the money it prints is gated on lmCan("costs", …)
+    // over the same liczmat-signed-in hint /projekty/ and /kosztorys/ read — the same
+    // known limitation, not a new one (docs/MASTER_PLAN.md).
     classicScripts: [
-      "/assets/units.js", "/assets/workspace.js", "/assets/recent.js", "/assets/dashboard.js",
+      "/assets/units.js", "/assets/workspace.js", "/assets/recent.js", "/assets/plan.js",
+      "/assets/dashboard.js",
     ],
   }));
 

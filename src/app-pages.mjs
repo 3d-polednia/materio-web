@@ -817,7 +817,7 @@ export function shareMain(t) {
         <div id="share-estimations-block" hidden>
           <h3 data-i18n="share_estimations">${esc(t("share_estimations"))}</h3>
           <ul id="share-estimations" class="data-list"></ul>
-          <p class="share-total"><span data-i18n="share_total">${esc(t("share_total"))}</span> <b id="share-total"></b></p>
+          <p class="share-total" id="share-total-row"><span data-i18n="share_total">${esc(t("share_total"))}</span> <b id="share-total"></b></p>
         </div>
 
         <div id="share-shopping-block" hidden>

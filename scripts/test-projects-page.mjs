@@ -179,6 +179,15 @@ async function open(ctx, url, opts = {}) {
   if (opts.workspace) plant["materio-workspace-v1"] = JSON.stringify(opts.workspace);
   if (opts.active) plant["materio-active-project"] = opts.active;
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
+  if (opts.level) plant["liczmat-signed-in"] = opts.level;
+  /* Every price on these screens, and the PDF export, became LiczMat Pro on 2026-09-03:
+     `costs` and `pdf` are PRO in LM_FEATURES, so a guest gets chapter XXV’s wall where the
+     amounts used to be. A test that is about the priced behaviour has to say which level
+     it is testing, and it says it the way scripts/test-quotes-page.mjs already does:
+     `liczmat-signed-in` is what assets/paywall.js reads (lmReadLevel()) and "pro" is what
+     a real Pro account writes there. `pro: false` looks at the wall instead — and there is
+     a section below that does exactly that, so the free half stays covered too. */
+  if (opts.pro !== false && !opts.level) plant["liczmat-signed-in"] = "pro";
 
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
@@ -304,6 +313,12 @@ head("4. one project — chapter XIV");
   check("and totals them", (await text(page, "#ws-project-total")).replace(/ /g, " ").includes("959,85"),
     await text(page, "#ws-project-total"));
   eq("one currency, so no warning", await page.$eval("#ws-project-mixed", (n) => n.hidden), true);
+
+  // `open()` plants a Pro session by default (see the note above it) — section 9 below is
+  // the guest/free counterpart, and this is the half it mirrors: the wall down and the
+  // money on screen for the level that reaches it.
+  eq("a Pro session sees the figures, not a wall", await page.locator("#cost-tool").isHidden(), false);
+  eq("and no wall stands in front of them", await page.locator("#cost-gate").isHidden(), true);
 
   const lines = await rows(page, "#ws-project-lines");
   eq("the saved lines are listed", lines.length, 2);
@@ -618,6 +633,49 @@ head("15. with JavaScript off");
   check("the way on is real links, not buttons", hrefs.includes(urlEstimate("pl")), hrefs.join(", "));
   await page.close();
   await noJs.close();
+}
+
+/* ------------------------------------------- the project is free, its money is not */
+
+/**
+ * A project is `projects`, which is GUEST, and what it costs is `costs`, which became PRO
+ * on 2026-09-03. Every section above runs at the Pro level, which is what `open()` plants;
+ * this one runs without a plan and checks that the CRUD chapter XV is about is untouched
+ * while the money is gone from both screens.
+ */
+head("9. a guest keeps every project and sees none of the totals");
+{
+  const index = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1", pro: false });
+  const list = await rows(index, "#ws-project-list");
+  check("the index still lists the projects", list.length >= 2, String(list.length));
+  check("by name, with when they last moved",
+    list.join(" | ").includes("Łazienka"), list.join(" | "));
+  check("and no amount beside any of them",
+    !/\d[\d\s., ]*(zł|PLN)/i.test(list.join(" ")), list.join(" | "));
+  check("nor the mixed-currency chip, which is a fact about money",
+    !list.join(" ").includes("waluty"), list.join(" | "));
+  await index.close();
+
+  const page = await open(ctx, `${PROJECTS}?id=p1`,
+    { workspace: fixture(), active: "p1", pro: false });
+  eq("the three figures are behind the wall", await page.locator("#cost-tool").isHidden(), true);
+  eq("and the wall stands in their place", await page.locator("#cost-gate").isHidden(), false);
+  eq("the count of calculations is not money and is still there",
+    await text(page, "#ws-project-count"), "2");
+
+  /* Chapter XV's four writes are the project's own and are free. Renaming one is the
+     cheapest of them to walk and the one that proves nothing on this screen was gated by
+     accident. */
+  await page.click("#ws-project-rename");
+  await page.fill("#ws-rename-name", "Łazienka po zmianie");
+  await page.click("#ws-rename-form button[type=submit]");
+  await page.waitForFunction(() =>
+    (JSON.parse(localStorage.getItem("materio-workspace-v1") || "{}").projects || [])
+      .some((p) => p.name === "Łazienka po zmianie"));
+  eq("renaming a project still works without a plan",
+    (await store(page)).projects.filter((p) => p.name === "Łazienka po zmianie").length, 1);
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
 }
 
 /* ------------------------------------------------------------------ report */

@@ -56,6 +56,13 @@ function render(data) {
   const estimations = Array.isArray(data.estimations) ? data.estimations : [];
   const items = Array.isArray(data.shoppingItems) ? data.shoppingItems : [];
 
+  // `costs` turned PRO on 2026-09-04: a share is priced only when the account that made
+  // it could see prices at the moment it did. `creatorLevel` is stamped by shareProject()
+  // in assets/app.js from state.level, which /app/ reads from Firebase — a free account
+  // cannot use its own share link as a way around the wall. A share made before this field
+  // existed carries none, and is treated exactly like "not pro": unpriced, never a guess.
+  const priced = data.creatorLevel === "pro";
+
   $("share-project-name").textContent = data.projectName || "";
   $("share-updated").textContent = data.refreshedAt
     ? `${T("share_refreshed")}: ${new Date(data.refreshedAt).toLocaleDateString(lang)}`
@@ -69,25 +76,36 @@ function render(data) {
     return;
   }
 
-  const total = estimations.reduce((sum, e) => sum + (Number(e.totalCostMinor) || 0), 0);
-
   $("share-estimations-block").hidden = !estimations.length;
   $("share-estimations").innerHTML = estimations.map((e) => `<li>
       <span class="row-name">${escapeHtml(e.name || "")}
         <em class="muted">${escapeHtml(String(e.requiredUnits ?? ""))} ${escapeHtml(e.unitLabel || "")}</em>
       </span>
-      <b>${escapeHtml(money(e.totalCostMinor, e.currencyCode || currency, lang))}</b>
+      ${priced ? `<b>${escapeHtml(money(e.totalCostMinor, e.currencyCode || currency, lang))}</b>` : ""}
     </li>`).join("");
-  $("share-total").textContent = money(total, currency, lang);
+
+  // Unpriced: the total line names nothing to add up, so it is not drawn at all rather
+  // than left showing a stale or empty amount from a previous render.
+  const totalRow = document.getElementById("share-total-row");
+  if (priced) {
+    const total = estimations.reduce((sum, e) => sum + (Number(e.totalCostMinor) || 0), 0);
+    $("share-total").textContent = money(total, currency, lang);
+    if (totalRow) totalRow.hidden = false;
+  } else if (totalRow) {
+    totalRow.hidden = true;
+  }
 
   // The note of chapter XVI travels with the item, because the share is a copy of the
   // whole document (`shareProject()` stores `d.data()`), so a link handed to a client
-  // carries "buy in the same shade" along with what to buy.
+  // carries "buy in the same shade" along with what to buy — that is `shopping`, and it
+  // stays free regardless of `priced`.
   // Chapter XVII's unit price travels the same way: it is the total divided by the
   // quantity, so a client reading the link sees "7 × 35 PLN" rather than one lump sum with
   // no way to check it. Divided here rather than sent, because the document has no field
-  // for it — the contract keeps the total and nothing else.
+  // for it — the contract keeps the total and nothing else. PRO since 2026-09-04, so it is
+  // computed at all only when `priced` says so.
   const each = (i) => {
+    if (!priced) return "";
     const qty = Number(i.quantity) || 0;
     const cost = Number(i.estimatedCostMinor) || 0;
     if (qty <= 0 || cost <= 0) return "";
@@ -101,7 +119,7 @@ function render(data) {
         ${each(i)}
         ${i.note ? `<em class="muted">${escapeHtml(i.note)}</em>` : ""}
       </span>
-      <b>${escapeHtml(money(i.estimatedCostMinor, i.currencyCode || currency, lang))}</b>
+      ${priced ? `<b>${escapeHtml(money(i.estimatedCostMinor, i.currencyCode || currency, lang))}</b>` : ""}
     </li>`).join("");
 
   show("share-content");

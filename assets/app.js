@@ -1079,6 +1079,15 @@ async function shareProject(project) {
     currencyCode,
     estimations,
     shoppingItems,
+    // `costs` turned PRO on 2026-09-04 (assets/plan.js), and a public link must not be a
+    // way around that wall: a free account sharing its own project must not hand its
+    // client a priced document it could not produce itself. Stamped from state.level,
+    // which /app/ derives from Firebase (lmLevelOf()) rather than the copy hint, at the
+    // moment the link is made — a plan bought or lost afterwards does not move it, the
+    // same way the numbers themselves are a snapshot rather than a live reference. A
+    // share made before this field existed carries no `creatorLevel` at all, and
+    // assets/share.js treats that exactly as it treats "not pro": unpriced.
+    creatorLevel: state.level,
   });
   return `${location.origin}/p/${token}`;
 }
@@ -1343,9 +1352,23 @@ function wireJobsPanel() {
 
 /* ------------------------------------------------------------------------------ Wyceny */
 
+/**
+ * May this account use the quotes? — `quotes` in LM_FEATURES, PRO.
+ *
+ * /app/ is the one page that knows the answer for certain: `state.level` comes from
+ * lmLevelOf() over the profile the server owns, not from the copy hint in storage. The
+ * wall over this panel (pwMount("acctquo", "quotes")) reads the hint, which can be stale;
+ * this reads the plan. A missing lmCan() is a refusal, for the reason pwState() closes.
+ */
+const canQuotes = () => typeof lmCan === "function" && lmCan("quotes", state.level);
+
 function renderQuotes() {
   const list = $("acctquo-list");
   if (!list || typeof crmQuotes !== "function") return;
+  /* The wall hides this panel; that is not the same as not drawing it. Until 2026-09-03
+     the names and the count of a Pro store were written into the hidden element for every
+     account there is. Now nothing is: the list is emptied and crmQuotes() is not asked. */
+  if (!canQuotes()) { list.innerHTML = ""; return; }
   const rows = crmQuotes();
   list.innerHTML = rows.length ? rows.map((q) => `<li data-id="${escapeHtml(q.id)}">
       <span class="row-name">${escapeHtml(q.name)}${q.note ? ` <em class="muted">${escapeHtml(q.note)}</em>` : ""}</span>
@@ -1364,7 +1387,9 @@ function wireQuotesPanel() {
     const nameInput = $("acctquo-name");
     const noteInput = $("acctquo-note");
     const name = nameInput.value.trim();
-    if (!name || typeof crmAddQuote !== "function") return;
+    // Checked when the event arrives, not when the listener was bound: the panel is wired
+    // once and the plan can run out while /app/ is open.
+    if (!name || typeof crmAddQuote !== "function" || !canQuotes()) return;
     crmAddQuote({ name, note: noteInput.value.trim() });
     nameInput.value = "";
     noteInput.value = "";
@@ -1372,7 +1397,8 @@ function wireQuotesPanel() {
   });
   $("acctquo-list").addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-del]") || typeof crmDeleteQuote !== "function") return;
+    if (!li || !e.target.closest("[data-del]") || typeof crmDeleteQuote !== "function"
+      || !canQuotes()) return;
     crmDeleteQuote(li.dataset.id);
     renderQuotes();
   });
@@ -1502,12 +1528,23 @@ function wireSchedulePanel() {
 
 /* ----------------------------------------------------------------------------- Materiały */
 
+/**
+ * May this account see prices? — `costs` in LM_FEATURES, PRO since 2026-09-04.
+ *
+ * The same reasoning as canQuotes() just above: /app/ knows `state.level` for certain,
+ * from Firebase, so it is read directly rather than through the copy hint.
+ */
+const canCosts = () => typeof lmCan === "function" && lmCan("costs", state.level);
+
 function renderMaterialsPanel() {
   const list = $("acctmat-list");
   if (!list || typeof omMaterials !== "function") return;
   const rows = omMaterials();
+  // `shopping` (the list itself) is free; `costs` (the price on each row) is PRO. A level
+  // that does not reach `costs` never has m.priceMinor read into a template string.
+  const priced = canCosts();
   list.innerHTML = rows.length ? rows.map((m) => `<li data-id="${escapeHtml(m.id)}">
-      <span class="row-name">${escapeHtml(m.name)}${m.priceMinor != null && typeof wsMoney === "function" ? ` <em class="muted">${wsMoney(m.priceMinor, m.currencyCode)}</em>` : ""}</span>
+      <span class="row-name">${escapeHtml(m.name)}${priced && m.priceMinor != null && typeof wsMoney === "function" ? ` <em class="muted">${wsMoney(m.priceMinor, m.currencyCode)}</em>` : ""}</span>
       <span class="row-actions">
         <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
       </span>

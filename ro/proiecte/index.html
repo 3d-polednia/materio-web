@@ -203,13 +203,63 @@
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
 
           
+          
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">Poziții</span> <b id="ws-project-count"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Costul materialelor</span> <b id="ws-project-mat"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Alte costuri</span> <b id="ws-project-other"></b></p>
-            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Total proiect</span> <b id="ws-project-total"></b></p>
           </div>
-          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Pozițiile sunt în valute diferite. Totalul le adună, dar nu convertește nimic la curs — verifică valutele în coloana costului.</p>
+
+          <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Prețuri și costuri</h2>
+        <p class="muted">Prețuri unitare, valoarea poziției, costul deșeurilor și totalul proiectului. Lista de materiale fără prețuri rămâne gratuită.</p>
+        <p><span class="chip">Disponibil în LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro este un plan pe un cont. Fă-ți întâi un cont LiczMat gratuit sau autentifică-te — Pro se poate activa doar pe un cont.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fro%2Fproiecte%2F" rel="nofollow">Fă-ți un cont gratuit</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Contul tău este pe planul gratuit. Acest modul aparține LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Ce mai cuprinde LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Clienți</b> — <span class="muted">O listă de clienți cu date de contact, notițe și istoricul colaborării.</span></li>
+            <li><b>Comenzi</b> — <span class="muted">O comandă cu clientul, descrierea, starea, termenul, valoarea și proiectul legat de ea.</span></li>
+            <li><b>Oferte</b> — <span class="muted">Material, manoperă, costuri suplimentare, adaos și total — din ce ai calculat deja.</span></li>
+            <li><b>Termene</b> — <span class="muted">Termenele comenzilor și informațiile de bază despre ele. Nu un al doilea Google Calendar.</span></li>
+            <li><b>Istoric și CRM</b> — <span class="muted">Drumul prin toată lucrarea: client → comandă → proiect → ofertă → istoric.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/ro/liczmat-pro/" data-i18n="pro_more">Descoperă LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Abonamentul LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Un singur plan, toate cele cinci module Pro. Plata este gestionată de Stripe; anulezi oricând, iar Pro merge până la sfârșitul perioadei plătite.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Lunar</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ lună</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Anual</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ an — cu două luni mai ieftin</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Mergi la contul tău</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Abonamentul încă nu poate fi cumpărat. Prețurile sunt finale.</p>
+        </div>
+      </div>
+          <div id="cost-tool" hidden>
+            <div class="ws-project-figs">
+              <p class="ws-project-fig"><span class="eyebrow muted">Costul materialelor</span> <b id="ws-project-mat"></b></p>
+              <p class="ws-project-fig"><span class="eyebrow muted">Alte costuri</span> <b id="ws-project-other"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Total proiect</span> <b id="ws-project-total"></b></p>
+            </div>
+            <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Pozițiile sunt în valute diferite. Totalul le adună, dar nu convertește nimic la curs — verifică valutele în coloana costului.</p>
+          </div>
 
           <div class="ws-project-actions">
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Setează ca activ</button>
@@ -330,7 +380,8 @@
           </section>
 
           
-          <section class="dash-sec">
+          
+          <section class="dash-sec" id="cost-other-tool" hidden>
             <div class="dash-head">
               <h2>Alte costuri</h2>
             </div>
@@ -357,8 +408,27 @@
 
           <section class="dash-sec ws-pdf" id="ws-pdf">
             <div class="dash-head"><h2>Exportă devizul</h2></div>
-            <p class="muted">Documentul se deschide în fereastra de tipărire. Alegeți acolo salvarea în PDF.</p>
-            <form id="ws-pdf-form">
+            <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>
+        <h2>Export PDF</h2>
+        <p class="muted">Raport tehnic și deviz pentru investitor: manoperă, adaos, TVA și total, gata de tipărit.</p>
+        <p><span class="chip">Disponibil în LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro este un plan pe un cont. Fă-ți întâi un cont LiczMat gratuit sau autentifică-te — Pro se poate activa doar pe un cont.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fro%2Fproiecte%2F" rel="nofollow">Fă-ți un cont gratuit</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Contul tău este pe planul gratuit. Acest modul aparține LiczMat Pro.</p>
+
+        
+
+        <p><a class="btn btn-ghost btn-sm" href="/ro/liczmat-pro/" data-i18n="pro_more">Descoperă LiczMat Pro</a></p>
+
+        
+      </div>
+            <div id="pdf-tool" hidden>
+              <p class="muted">Documentul se deschide în fereastra de tipărire. Alegeți acolo salvarea în PDF.</p>
+              <form id="ws-pdf-form">
             <fieldset class="pdf-types">
               <legend class="fld-label">Tip de document</legend>
               <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Raport tehnic</span></label>
@@ -416,7 +486,7 @@
 
             <p><button type="submit" class="btn btn-primary">Pregătește PDF</button></p>
           </form>
-            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+              <article id="ws-pdf-doc" class="pdf-doc" hidden>
             <header class="pdf-head">
               
               <p class="pdf-sub" data-pdf="subtitle"
@@ -468,6 +538,7 @@
 
             <p class="pdf-foot">LiczMat — Calculează. Planifică. Realizează.</p>
           </article>
+            </div>
           </section>
         </div>
       </article>
@@ -621,6 +692,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

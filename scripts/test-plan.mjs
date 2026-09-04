@@ -206,14 +206,30 @@ head("4. the table and src/ia.mjs agree about what is Pro");
     check(`route "${r.id}" is covered by a feature`, !!f);
     if (f) eq(`and that feature is PRO too`, f.level, LEVEL.PRO);
   }
-  for (const f of LM_FEATURES.filter((x) => x.level === LEVEL.PRO)) {
+  /* A PRO *module* is a screen, so the page it lives on has to be PRO too, or the module
+     is on an open page. A PRO *capability* — `module: false`, which is `costs` and `pdf`
+     since 2026-09-03 — is deliberately the other way round: it is the priced half of
+     /kosztorys/ and /projekty/, and those two stay GUEST because the counting and the
+     material list on them are free. scripts/build.mjs makes the same distinction in the
+     same check. */
+  for (const f of LM_FEATURES.filter((x) => x.level === LEVEL.PRO && x.module !== false)) {
     if (!f.route) continue;
-    eq(`Pro feature "${f.id}" sits on a PRO route`, route(f.route).level, LEVEL.PRO);
+    eq(`Pro module "${f.id}" sits on a PRO route`, route(f.route).level, LEVEL.PRO);
   }
-  // Chapter XXIV is a path through the other four, not a page — the one Pro feature that
-  // is allowed to have no route. If a second one appears, somebody forgot a route.
-  eq("exactly one Pro feature has no page of its own",
-    LM_FEATURES.filter((f) => f.level === LEVEL.PRO && !f.route).length, 1);
+  for (const f of LM_FEATURES.filter((x) => x.level === LEVEL.PRO && x.module === false)) {
+    check(`Pro capability "${f.id}" is not one of the modules Pro is sold as`,
+      !proModules(LM_FEATURES).some((m) => m.id === f.id));
+    check(`and it still has a name and a line to put on a wall`, Boolean(f.key));
+  }
+  eq("the two of them are costs and pdf",
+    LM_FEATURES.filter((f) => f.level === LEVEL.PRO && f.module === false).map((f) => f.id).join(","),
+    "costs,pdf");
+  // Chapter XXIV is a path through the other four, not a page. `pdf` is the second: it is
+  // offered on /projekty/ and on /kosztorys/ and names neither, which is why proGate()
+  // takes a `back` route from the page that draws its wall.
+  eq("two Pro features have no page of their own",
+    LM_FEATURES.filter((f) => f.level === LEVEL.PRO && !f.route).map((f) => f.id).join(","),
+    "pdf,crm");
 }
 
 head("5. what the site actually enforces, feature by feature");
@@ -228,10 +244,23 @@ head("5. what the site actually enforces, feature by feature");
   // keeps them in localStorage in the Firestore shape, /projekty/ and /kosztorys/ are
   // GUEST routes, and FIRESTORE_SYNC §1.2 says counting never requires an account. The
   // table has to record what ships, or a later session gates something that works today.
-  for (const id of ["projects", "rooms", "saved", "shopping", "costs", "history"]) {
+  for (const id of ["projects", "rooms", "saved", "shopping", "history"]) {
     eq(`a guest may use "${id}" — it is this browser's own storage`,
       lmCan(id, LM_LEVEL.GUEST), true);
   }
+
+  /* The money is the exception, and it is the owner's decision of 2026-09-03: a guest and
+     a free account may count, keep a project and carry the material list out of it, and
+     may never produce a price, a quote or a PDF. `shopping` above is the list without the
+     money on it and stays free; `costs` and `pdf` are the money and the document, and
+     neither is. The routes did not move — the pages still open. */
+  for (const id of ["costs", "pdf"]) {
+    eq(`a guest may not use "${id}"`, lmCan(id, LM_LEVEL.GUEST), false);
+    eq(`nor may a free account use "${id}"`, lmCan(id, LM_LEVEL.LICZMAT), false);
+    eq(`Pro may use "${id}"`, lmCan(id, LM_LEVEL.PRO), true);
+  }
+  eq("the estimate route is still open to a guest", route("estimate").level, LEVEL.GUEST);
+  eq("and so is the projects route", route("projects").level, LEVEL.GUEST);
 
   // What the free account actually adds.
   eq("a guest may not sync", lmCan("sync", LM_LEVEL.GUEST), false);

@@ -217,10 +217,58 @@
 
   <section class="block alt">
     <div class="wrap narrow">
+      
       <div class="ws-estimate-bar no-print">
         <select id="ws-estimate-project" aria-label="Proiect" hidden></select>
-        <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Printează / salvează PDF</button>
-        <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Descarcă CSV</button>
+        <span id="cost-tool" hidden>
+          <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Printează / salvează PDF</button>
+          <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Descarcă CSV</button>
+        </span>
+      </div>
+
+      <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Prețuri și costuri</h2>
+        <p class="muted">Prețuri unitare, valoarea poziției, costul deșeurilor și totalul proiectului. Lista de materiale fără prețuri rămâne gratuită.</p>
+        <p><span class="chip">Disponibil în LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro este un plan pe un cont. Fă-ți întâi un cont LiczMat gratuit sau autentifică-te — Pro se poate activa doar pe un cont.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fro%2Fdeviz%2F" rel="nofollow">Fă-ți un cont gratuit</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Contul tău este pe planul gratuit. Acest modul aparține LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Ce mai cuprinde LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Clienți</b> — <span class="muted">O listă de clienți cu date de contact, notițe și istoricul colaborării.</span></li>
+            <li><b>Comenzi</b> — <span class="muted">O comandă cu clientul, descrierea, starea, termenul, valoarea și proiectul legat de ea.</span></li>
+            <li><b>Oferte</b> — <span class="muted">Material, manoperă, costuri suplimentare, adaos și total — din ce ai calculat deja.</span></li>
+            <li><b>Termene</b> — <span class="muted">Termenele comenzilor și informațiile de bază despre ele. Nu un al doilea Google Calendar.</span></li>
+            <li><b>Istoric și CRM</b> — <span class="muted">Drumul prin toată lucrarea: client → comandă → proiect → ofertă → istoric.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/ro/liczmat-pro/" data-i18n="pro_more">Descoperă LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Abonamentul LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Un singur plan, toate cele cinci module Pro. Plata este gestionată de Stripe; anulezi oricând, iar Pro merge până la sfârșitul perioadei plătite.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Lunar</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ lună</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Anual</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ an — cu două luni mai ieftin</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Mergi la contul tău</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Abonamentul încă nu poate fi cumpărat. Prețurile sunt finale.</p>
+        </div>
       </div>
 
       <article id="ws-estimate" class="ws-estimate">
@@ -391,6 +439,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

@@ -306,6 +306,176 @@ Po stronie serwisu: **trzy zrzuty na `/aplikacja/` przerenderowane** — tym raz
 wszystkie trzy ekrany (16,2 / 10,4 / 8,5 % pikseli). Jak 46, 47, 50, 52, 53, 54 i 55 —
 **czeka na wydanie AAB**.
 
+## Ceny, wyceny i PDF wyłącznie w LiczMat Pro (2026-09-04)
+
+**WYKONANO na stronie, `/app/`, `/app/dashboard/` i `/p/<token>` włącznie. Aplikacja
+Androida — do zrobienia w następnej sesji, patrz koniec tego rozdziału.**
+
+Decyzja właściciela: **darmowe konto LiczMat i gość nie mogą wygenerować PDF-u, wyceny ani
+wycenionego kosztorysu.** To są funkcje LiczMat Pro. Wcześniej strona pozwalała na
+wszystkie trzy: `costs` był w tabeli uprawnień na poziomie GUEST, eksportu PDF nie było w
+tabeli w ogóle, a brama przed wycenami była wyłącznie kosmetyczna — `pwRender()` ustawiał
+`hidden` na `#quo-tool`, a wszystkie liczby były do tego ukrytego elementu nadal wpisywane.
+
+### Co się zmieniło w tabeli uprawnień
+
+`LM_FEATURES` w `assets/plan.js` jest jedynym miejscem, w którym poziomy są zapisane, i
+całą decyzję widać tam:
+
+| Funkcja | Było | Jest |
+|---|---|---|
+| `shopping` — lista materiałów bez cen | GUEST | GUEST (bez zmian) |
+| `costs` — ceny jednostkowe, wartość pozycji, koszt odpadu, sumy | GUEST | **PRO** |
+| `pdf` — eksport PDF, konfigurator i dokument | *nie istniała* | **PRO** (nowy wpis) |
+| `quotes` — wyceny | PRO | PRO (bez zmian — zmieniło się egzekwowanie) |
+
+**Trasy się nie zmieniły.** `/kosztorys/` i `/projekty/` zostają na poziomie GUEST: strona
+się otwiera, liczenie jest darmowe (rozdział II), lista materiałów też. Pro jest **pieniądz
+na tej stronie i dokument z niej**, a nie sama strona. Tabela rozróżnia teraz dwie rzeczy:
+moduł Pro (ekran, na który sprzedajemy — pięć modułów) i **uprawnienie Pro** (`module:
+false`), czyli płatna połowa strony, którą każdy może otworzyć. `proModules()` filtruje po
+tym polu, więc `/liczmat-pro/` i każda ściana nadal wymieniają dokładnie pięć modułów.
+
+### Brama, która naprawdę zamyka
+
+Trzy warstwy, wszystkie **zamykają się przy braku odpowiedzi** (fail closed):
+
+1. **Tabela** — `lmCan()` / `lmPaywall()` w `assets/plan.js`.
+2. **Sklep** — `wsCanPrice()` w `assets/workspace.js` i `crmCanQuote()` w `assets/crm.js`.
+   Cztery zapisy, które przyjmują wpisaną kwotę, i siedem zapisów wyceny pytają **same z
+   siebie**, a nie tylko w miejscu wywołania: brama, która stoi wyłącznie przy wywołaniu,
+   to brama, którą obchodzi drugie wywołanie albo jedna linijka w konsoli.
+3. **Ekran** — `pdfAllowed()`, `wsCanCost()`, `quoAllowed()` i `canQuotes()` na `/app/`.
+   Żadna kwota nie jest liczona ani wpisywana do strony dla poziomu, który jej nie ma —
+   to nie jest zasłonięcie liczby, tylko jej niepowstanie.
+
+`pwState()` w `assets/paywall.js` też odwrócono: przy braku `assets/plan.js` odpowiadał
+„otwarte", teraz odpowiada „zamknięte". Brama, którą otwiera się przez doprowadzenie do
+niewczytania jednego pliku, nie jest bramą.
+
+**Odmowa nigdy nie kasuje cudzej pracy.** Kwota już zapisana przez konto Pro zostaje
+nietknięta, gdy plan wygaśnie — pole jest pomijane, a nie zerowane. Wynik kalkulatora
+zapisany do projektu (`wsAddEstimation()`, `wsAddItem()`) **nie jest bramkowany**: strony
+kalkulatorów nie wczytują paywalla, liczenie jest darmowe, a liczba jest silnika, nie
+formularza. Jest przechowywana i nigdy nie pokazywana.
+
+### Co widzi darmowy użytkownik
+
+Ścianę z `proGate()` — tę samą, którą od Sesji 27 mają `/klienci/`, `/zlecenia/`,
+`/wyceny/` i `/terminarz/` — a nie martwy przycisk i nie brakujący przycisk (CLAUDE.md:
+„never a dead button"). `/kosztorys/` zostaje czytelne: lista tego, co policzono, jest na
+miejscu, kolumna z wartością znika razem ze swoim nagłówkiem, sumy nie ma, a w miejscu
+dwóch przycisków eksportu stoi ściana. `/projekty/` ma dwie ściany, bo wstrzymuje dwie
+różne rzeczy: trzy kwoty to `costs`, eksport to `pdf`. Druga jest **skrócona** (`brief`) —
+nazwa, opis, znacznik i szczebel, bez listy modułów i bez ceny, którą pierwsza ściana na
+tej stronie już pokazała. Cena na jednym ekranie dwa razy to ściana kłócąca się ze sobą.
+
+Zmiana planu w innej karcie (`lm-session`) **przerysowuje ekran**, a nie tylko zasłania
+bloki: wiersze projektu, materiałów i wycen oraz gotowy dokument PDF są czyszczone.
+
+### Nowe klucze
+
+`feat_costs_t`, `feat_costs_d`, `feat_pdf_t`, `feat_pdf_d` w `assets/i18n-pages.js`, we
+wszystkich trzynastu językach. Budżety prozy `projects` (544 → 850) i `estimate`
+(192 → 425) w `scripts/test-copy.mjs` podniesiono o wielkość ściany; uzasadnienie i pomiar
+trzynastu języków są w komentarzu nad tabelą budżetów.
+
+### Ograniczenie, które zostaje
+
+**To nie jest granica bezpieczeństwa i nigdy nie będzie**, dopóki decyzja zapada w
+przeglądarce. Cały model to JavaScript, który odwiedzający ma u siebie: kto zmieni
+`assets/plan.js` w devtools, dostanie stronę mówiącą „Pro". Twarda gwarancja wymaga usługi
+po stronie serwera, która renderuje PDF i liczy wycenę — dziś nie ma jej ani w planie, ani
+w `functions/`. `assets/plan.js` mówi to od Sesji 21 i nadal mówi. Granicą pozostają
+wdrożone reguły Firestore: `plan` jest polem, które zapisuje wyłącznie serwer.
+
+Sklep CRM to `localStorage` na jednym urządzeniu i nie ma go w żadnym kontrakcie
+serwerowym, więc dla wycen nie istnieje nawet ta druga granica.
+
+### Dokończenie: `/app/`, `/app/dashboard/` i `/p/<token>` (ten sam dzień, ciąg dalszy)
+
+Trzy powierzchnie zostały pominięte pierwszego przejścia i zamknięte tego samego dnia,
+tą samą decyzją właściciela:
+
+- **`/app/`, zakładka Materiały.** `renderMaterialsPanel()` w `assets/app.js` wypisywał
+  `m.priceMinor` każdemu kontu. Teraz `canCosts()` — ten sam kształt co `canQuotes()` obok
+  (dodane pierwszym przejściem) — czyta `state.level`, czyli poziom z Firebase, nie
+  z podpowiedzi: `/app/` to jedyna strona, która zna go na pewno.
+- **`/app/dashboard/`.** Listy „Projekty" i „Ostatnie kalkulacje" liczyły i wypisywały
+  `wsProjectCosts()`/`totalCostMinor` każdemu. Ta strona **nie pyta Firebase o nic** (patrz
+  nagłówek `assets/dashboard.js`) — to jej cała konstrukcja, dla szybkości pierwszego
+  ekranu po zalogowaniu — więc `dashCanCost()` czyta ten sam znacznik
+  `liczmat-signed-in`, który już czytał pasek poziomu. `assets/plan.js` doszedł do jej
+  listy skryptów (`scripts/build.mjs`) tylko po to, żeby dać jej `lmCan()`. To samo
+  ograniczenie co `/projekty/` i `/kosztorys/` niżej — nie nowe, opisane w sekcji
+  poniżej.
+- **`/p/<token>`, migawka udostępnionego projektu.** Najtrudniejsza z trzech, bo dokument
+  jest publiczny z założenia (token w adresie to sekret, FIRESTORE_SYNC §6) i nie należy do
+  konta, które go czyta. Rozstrzygnięcie: **migawka jest wyceniona tylko wtedy, gdy konto,
+  które ją zrobiło, było Pro w chwili tworzenia linku** — darmowe konto nie może użyć
+  własnego udostępnienia jako furtki do wycenionego dokumentu, a ktoś czytający link
+  legalnie zrobiony przez konto Pro nie potrzebuje własnego planu, żeby go przeczytać.
+  Nowe pole `creatorLevel` (zapisywane przez `shareProject()` w `assets/app.js`, z
+  `state.level` w chwili udostępnienia — nie w chwili odczytu) niesie tę decyzję w samym
+  dokumencie; `assets/share.js` liczy `priced = data.creatorLevel === "pro"` i nie liczy
+  ani nie wypisuje żadnej kwoty, gdy to nieprawda — licznik pozycji i lista materiałów
+  (`shopping`, darmowe) zostają. Stary udostępniony link, sprzed tego pola, nie ma
+  `creatorLevel` wcale i czyta się dokładnie tak jak „nie pro" — nigdy jako domysł.
+
+Testy: `scripts/test-dashboard-page.mjs` (§2, §3, §8 — jedna z dwóch odsłon planted jako
+Pro, druga jako darmowa/gość, sprawdzone przez `innerHTML`, nie tylko `innerText`, żeby
+odróżnić „nigdy niezapisane" od „tylko ukryte"), `scripts/test-account-page.mjs` (§9d
+zakładka Materiały, §15b `/p/<token>` w trzech odsłonach — Pro, darmowe, bez pola w ogóle).
+`scripts/test-security.mjs` §4 nadal sprawdza, że dokument migawki nie niesie adresu
+e-mail ani nazwy wyświetlanej — `creatorLevel` to poziom planu, nie tożsamość, więc nie
+koliduje z tamtą regułą.
+
+### Do zrobienia w następnej sesji — bramka po stronie serwera
+
+**Brama przed cenami na `/projekty/`, `/kosztorys/` i `/app/dashboard/` czyta wyłącznie
+podpowiedź `liczmat-signed-in`.** `lmReadLevel()` w `assets/account.js` mówi to sam o
+sobie od zawsze: „a hint, never a gate" — i to zdanie było prawdziwe, dopóki podpowiedź
+decydowała tylko o słowach. Od 2026-09-04 decyduje też o cenie, wycenie i PDF-ie na tych
+trzech stronach, więc wpisanie w konsoli przeglądarki
+`localStorage.setItem("liczmat-signed-in", "pro")` i odświeżenie którejkolwiek z nich
+odblokowuje ceny, PDF i wyceny bez żadnego konta Pro. To jest dokładnie to samo
+ograniczenie, które sekcja „Ograniczenie, które zostaje" wyżej opisuje dla całego modelu
+Free/Pro — zapisane tu osobno, bo dotyczy konkretnie trzech stron, a nie zasady w ogóle.
+
+Utwardzenie wymaga jednego z dwóch:
+
+1. **Wyprowadzić poziom z Firebase na `/projekty/` i `/kosztorys/`, tak jak robi to
+   `/app/`** (`state.level` z `lmLevelOf()`, nie hint) — `/app/dashboard/` zostałoby przy
+   podpowiedzi celowo, bo cała jej konstrukcja to brak połączenia z Firebase dla szybkości
+   pierwszego ekranu; ta strona wymagałaby osobnej decyzji, czy szybkość wciąż wygrywa
+   z ceną na wyświetlonych projektach.
+2. **Przenieść generowanie PDF-u i liczenie wyceny na serwer** (Cloud Function wołana
+   z tokenem konta), żeby przeglądarka nigdy sama nie decydowała, czy wolno wyprodukować
+   dokument — wtedy podpowiedź w `localStorage` przestaje mieć znaczenie, bo produkt nie
+   powstaje po jej stronie.
+
+Żadne z dwóch nie jest zrobione ani zaplanowane na konkretną sesję numerowaną; ten akapit
+jest zapisem znanego ograniczenia do rozstrzygnięcia później, obok notatki o aplikacji
+Androida poniżej.
+
+### Do zrobienia w następnej sesji — aplikacja Androida
+
+**Ta sama restrykcja nie jest jeszcze zrobiona w `3d-polednia/Materio`.** Zakresem tej
+sesji było wyłącznie `materio-web`. Aplikacja czyta to samo pole `plan` z `users/{uid}`, ma
+własny eksport PDF (`AndroidProjectPdfExporter`, `PdfConfigScreen`) i własne ekrany z
+kwotami, i **dziś nie sprawdza planu w żadnym z tych miejsc**. Dopóki tego nie zrobi,
+darmowe konto zablokowane na stronie zrobi ten sam PDF na telefonie. Następna sesja: te
+same trzy warstwy po stronie Androida, na tym samym polu `plan`.
+
+### Czego ta sesja nie sprawdziła
+
+Zestawy w Chromium (`test-qa`, `test-costs-page`, `test-pdf-page`, `test-projects-page`,
+`test-materials-page`, `test-mobile`, `test-phone`, `test-a11y-page`) **nie zostały
+uruchomione** — Playwright nie jest zainstalowany na tej maszynie i te skrypty kończą się
+komunikatem „skipping". Jeden z nich wymaga uwagi w sesji, która może je uruchomić:
+`scripts/test-qa.mjs` przechodzi ścieżkę „LICZMAT → projekt → kalkulacja → materiały →
+koszty", czyli ogląda koszty na poziomie, który od tej sesji ich nie widzi.
+
 ## Sesja 57 — konwerter jednostek na stronie (C1)
 
 **WYKONANO.** Serwis ma jedenaste narzędzie i dziesięć nowych adresów:
@@ -4446,7 +4616,11 @@ Link jest w HTML dla każdego — chowa go arkusz stylów, i tylko wtedy, gdy do
 działa**: Googlebot i przeglądarka bez skryptu widzą link dalej. Poziom stemplowany jest
 w skrypcie w `<head>`, tym samym, który stosuje motyw — jeden odczyt `localStorage` więcej
 i zero mignięcia; `assets/account.js` ładuje się na końcu dokumentu i jest na to za późno.
-Znacznik `liczmat-signed-in` **nadal jest podpowiedzią i nadal niczego nie bramkuje**.
+Znacznik `liczmat-signed-in` **nadal jest podpowiedzią i nadal nie bramkuje ani linku, ani
+trasy** — to jedyne, co ten akapit kiedykolwiek twierdził. To zdanie nie jest już prawdą
+w ogólności: od 2026-09-04 ta sama podpowiedź bramkuje cenę i PDF **na tej samej stronie**
+(`costs`/`pdf` w `assets/plan.js`, sekcja „Ceny, wyceny i PDF wyłącznie w LiczMat Pro"
+wyżej w tym dokumencie) i to jest opisane tam jako znane ograniczenie, nie tutaj.
 
 - Sprawdzone: **224 nowe sprawdzenia — 4496/4496 przechodzi** (3100 logiki + 1396
   w Chromium), a wszystkie 4272 sprzed tej paczki nadal przechodzą. Żadnego nowego pliku
@@ -5056,8 +5230,14 @@ leży już w tej przeglądarce: projekty i pozycje kosztorysu w `assets/workspac
 To pierwszy ekran po zalogowaniu — kazać mu czekać na pobranie SDK i na odpowiedź
 serwera, zanim wypisze czyjeś własne, lokalne projekty, znaczyłoby zrobić pulpit
 wolniejszym od kalkulatora, z którego się na niego wchodzi. Poziom w pasku bierze się ze
-znacznika `liczmat-signed-in`, czyli z podpowiedzi — więc **decyduje o treści i nic nie
-bramkuje**.
+znacznika `liczmat-signed-in`, czyli z podpowiedzi — decyduje o treści paska i o tym, jak
+brzmi karta gościa. **Od 2026-09-04 to już nie jest zdanie bez wyjątku**: ta sama
+podpowiedź bramkuje też cenę w listach „Projekty" i „Ostatnie kalkulacje" niżej na tej
+stronie (`costs` w `assets/plan.js`, `dashCanCost()` w `assets/dashboard.js`) — zobacz
+sekcję „Ceny, wyceny i PDF wyłącznie w LiczMat Pro" na początku tego dokumentu, w tym
+akapit o ograniczeniu, które to bramkowanie ma: ten pulpit nie pyta Firebase o nic, więc
+czyta ten sam znacznik zamiast prawdziwego poziomu, dokładnie tak jak `/projekty/`
+i `/kosztorys/`.
 
 **Poziom trasy: `GUEST`, wbrew deklaracji z Sesji 3 (`LICZMAT`).** To jedyna decyzja
 architektoniczna tej sesji i jest opisana w `docs/ARCHITEKTURA.md` §8.1a. Pole `level`

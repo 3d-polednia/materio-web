@@ -160,19 +160,28 @@ async function openApp(ctx, url, opts = {}) {
     if (m.type() === "error" && !/Failed to load resource|ERR_FAILED|net::/i.test(m.text())) errors.push(m.text());
   });
   page.on("pageerror", (e) => errors.push(String(e)));
-  await page.addInitScript(([accounts, docs, storage, fromCache]) => {
+  const isAppPage = url.startsWith("/app/");
+  await page.addInitScript(([accounts, docs, storage, fromCache, isApp]) => {
     window.__fbAccounts = accounts;
     window.__fbSeed = docs;
     // The stub's answer to "did this snapshot come from the server". Off by default,
     // because most of this file is about a browser that has never been here before.
     window.__fbFromCache = fromCache;
     Object.entries(storage).forEach(([k, v]) => localStorage.setItem(k, v));
-  }, [opts.accounts || {}, opts.docs || {}, opts.storage || {}, Boolean(opts.fromCache)]);
+    // /app/ seeds its own documents below, after data-app-ready — a live listener is
+    // meant to receive them as its first snapshot. A page with no such listener (a
+    // one-shot getDoc(), as on /p/<token>) has no later moment to seed into: it is
+    // planted here instead, before the firestore stub's own
+    // `window.__fbDocs = window.__fbDocs || new Map()` line runs, so it keeps this.
+    if (!isApp && docs && Object.keys(docs).length) {
+      window.__fbDocs = new Map(Object.entries(docs));
+    }
+  }, [opts.accounts || {}, opts.docs || {}, opts.storage || {}, Boolean(opts.fromCache), isAppPage]);
   await page.goto(base + url, { waitUntil: "domcontentloaded" });
   // /app/ boots asynchronously — it imports the SDK, then wires the forms — and sets
   // data-app-ready when it is done. Clicking before that clicks a button nothing is
   // listening to, so every test would race the import.
-  if (url.startsWith("/app/")) {
+  if (isAppPage) {
     await page.waitForSelector("html[data-app-ready]", { state: "attached", timeout: 10000 });
     // The fake Firestore exists by then; seed it before anything asks for a document.
     await page.evaluate(() => {
@@ -697,6 +706,53 @@ head("9c. a plan granted while the page is open lands on the screen");
   await ctx.close();
 }
 
+head("9d. the Materiały tab: prices are PRO since 2026-09-04");
+{
+  // `costs` turned PRO on 2026-09-04 (assets/plan.js): the material list itself
+  // (`shopping`) stays free, but the price on a row is the same money /kosztorys/ walls
+  // off. /app/ knows state.level for certain, from Firebase, so the gate is canCosts() —
+  // not the liczmat-signed-in hint a page with no Firebase has to fall back on.
+  const material = JSON.stringify({
+    materials: [{
+      id: "m1", name: "Klej", priceMinor: 12345, currencyCode: "PLN",
+      createdAt: 1, updatedAt: 1, deletedAt: null, schemaVersion: 1, prices: [],
+    }],
+  });
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+
+  const free = await openApp(ctx, "/app/", {
+    accounts: ACCOUNT,
+    docs: { "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "free" } },
+    storage: { "liczmat-materials-v1": material },
+  });
+  await free.fill("#signin-email", "kto@example.com");
+  await free.fill("#signin-password", "sekret123");
+  await free.click("#signin-form button[type=submit]");
+  await signedIn(free);
+  await free.click('[data-tab="materials"]');
+  const freeHtml = await free.locator("#acctmat-list").innerHTML();
+  check("a free account still sees the material", freeHtml.includes("Klej"), freeHtml);
+  check("but never its price — not merely hidden, never written",
+    !/123,45/.test(freeHtml), freeHtml);
+  await free.close();
+
+  const pro = await openApp(ctx, "/app/", {
+    accounts: ACCOUNT,
+    docs: { "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "premium" } },
+    storage: { "liczmat-materials-v1": material },
+  });
+  await pro.fill("#signin-email", "kto@example.com");
+  await pro.fill("#signin-password", "sekret123");
+  await pro.click("#signin-form button[type=submit]");
+  await signedIn(pro);
+  await pro.click('[data-tab="materials"]');
+  const proHtml = await pro.locator("#acctmat-list").innerHTML();
+  check("a Pro account sees the price", /123,45/.test(proHtml), proHtml);
+  eq("no console error", pro.lmErrors.join(" / "), "");
+  await pro.close();
+  await ctx.close();
+}
+
 /* --- 10. the tabs, the language switch, the phone ------------------------------------ */
 
 head("10. five tabs, reachable from the keyboard");
@@ -1040,6 +1096,69 @@ head("15. /app/ carries the whole menu, in whatever language it is showing");
   eq("the shared estimate keeps one way back", await share.locator(".nav-list a").count(), 1);
   await share.close();
   await page.close();
+  await ctx.close();
+}
+
+head("15b. /p/<token> is priced only when the account that shared it was Pro");
+{
+  // `costs` turned PRO on 2026-09-04: a share is priced only when whoever made it could
+  // see prices at the moment they did. `creatorLevel` is the field shareProject() (in
+  // assets/app.js) stamps from state.level; a share document that lacks it — the shape
+  // every one of them had before this session — is treated as unpriced rather than
+  // trusted, exactly like a free account's own share.
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const doc = (creatorLevel) => ({
+    ownerId: "u1", projectName: "Łazienka", currencyCode: "PLN",
+    ...(creatorLevel === undefined ? {} : { creatorLevel }),
+    estimations: [{
+      name: "Gres 60×60", requiredUnits: 15, unitLabel: "opak.",
+      totalCostMinor: 74985, currencyCode: "PLN",
+    }],
+    shoppingItems: [{
+      name: "Klej C2", quantity: 6, unit: "worki", estimatedCostMinor: 21000,
+      currencyCode: "PLN",
+    }],
+  });
+
+  const pro = await openApp(ctx, "/p/?t=tokpro12345678901234", {
+    lang: "pl", docs: { "sharedProjects/tokpro12345678901234": doc("pro") },
+  });
+  await pro.locator("#share-content:not([hidden])").waitFor({ timeout: 5000 });
+  check("a share made by a Pro account shows the total",
+    (await pro.locator("#share-total-row").innerText()).includes("749,85"),
+    await pro.locator("#share-total-row").innerText());
+  check("and the price on each line",
+    (await pro.locator("#share-estimations").innerHTML()).includes("749,85"));
+  check("and on each material",
+    (await pro.locator("#share-shopping").innerHTML()).includes("210,00"));
+  eq("no console error", pro.lmErrors.join(" / "), "");
+  await pro.close();
+
+  const free = await openApp(ctx, "/p/?t=tokfree1234567890123", {
+    lang: "pl", docs: { "sharedProjects/tokfree1234567890123": doc("liczmat") },
+  });
+  await free.locator("#share-content:not([hidden])").waitFor({ timeout: 5000 });
+  eq("a share made by a free account keeps the total row hidden",
+    await free.locator("#share-total-row").isVisible(), false);
+  const freeEstHtml = await free.locator("#share-estimations").innerHTML();
+  const freeShopHtml = await free.locator("#share-shopping").innerHTML();
+  check("the material and calculation are still there",
+    freeEstHtml.includes("Gres") && freeShopHtml.includes("Klej"));
+  check("but never a price — not merely hidden, never written",
+    !/749,85/.test(freeEstHtml) && !/210,00/.test(freeShopHtml));
+  await free.close();
+
+  // A share made before 2026-09-04 carries no `creatorLevel` at all. Trusting an absent
+  // field as "was Pro" would quietly re-open every old link a free account ever made.
+  const old = await openApp(ctx, "/p/?t=tokold123456789012345", {
+    lang: "pl", docs: { "sharedProjects/tokold123456789012345": doc(undefined) },
+  });
+  await old.locator("#share-content:not([hidden])").waitFor({ timeout: 5000 });
+  eq("an old share with no creatorLevel is treated the same as unpriced",
+    await old.locator("#share-total-row").isVisible(), false);
+  check("no price leaks from before the field existed",
+    !/749,85/.test(await old.locator("#share-estimations").innerHTML()));
+  await old.close();
   await ctx.close();
 }
 

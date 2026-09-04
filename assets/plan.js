@@ -19,10 +19,11 @@
  * and the whole point of lmLevelOf() is that there is one.
  *
  * It is deliberately NOT loaded on every page. `assets/account.js` is, because 128 pages
- * need to word one sentence about the session; this one is loaded by the five pages that
- * offer a Pro feature — /klienci/, /zlecenia/, /wyceny/, /terminarz/ and /app/ — and by
- * nothing else. It loads after account.js and uses its LM_LEVEL and lmLevelOf(): the
- * level is derived in exactly one place and this file does not derive it a second time.
+ * need to word one sentence about the session; this one is loaded by the pages that offer
+ * a Pro feature — /klienci/, /zlecenia/, /wyceny/, /terminarz/ and /app/, and since the
+ * money session also /projekty/ and /kosztorys/, which show prices and offer the PDF —
+ * and by nothing else. It loads after account.js and uses its LM_LEVEL and lmLevelOf():
+ * the level is derived in exactly one place and this file does not derive it a second time.
  * Since session 28 removed the preview, nothing in this file derives one at all: every
  * answer below is a function of the `level` it is handed.
  *
@@ -174,13 +175,26 @@ function lmSubscription(user, profile, now) {
  *     `navLevel` in src/ia.mjs and it is about the menu, not about permission; a feature
  *     table that recorded it as a permission would be a lie a future session acts on.
  *
+ * A **page** and the **money on it** are two different permissions, and this table is
+ * where they come apart. The owner's decision of 2026-09-03: a guest and a free account
+ * may keep counting, keep a project and carry a material list out of it, and may never
+ * produce a price, a quote or a PDF. So /kosztorys/ and /projekty/ stay GUEST routes —
+ * the page opens, the list is there — while `costs` and `pdf` below are PRO. A route
+ * level that had to carry both would have had to shut the page to keep the money in.
+ *
  * Fields:
  *   id      stable key. Not a URL and not a dictionary key.
  *   level   LM_LEVEL.* — the lowest level that may use it.
  *   route   the id of the route in src/ia.mjs it lives on, when it has one.
  *   key     dictionary prefix (`<key>_t` the name, `<key>_d` one line) — only for the
- *           features a page names to the visitor, which today is the Pro modules.
+ *           features a page names to the visitor, which is the Pro modules and the two
+ *           Pro capabilities that put a wall on an otherwise open page.
  *           A feature the pages never name carries no copy nobody would read.
+ *   module  `false` for a PRO feature that is NOT one of the modules LiczMat Pro is sold
+ *           as. `costs` and `pdf` are the priced half of a page anybody may open, not a
+ *           screen of their own: they need a level, a name and a wall, and they do not
+ *           belong on /liczmat-pro/'s list of modules or in the "what else Pro contains"
+ *           list on a wall. Absent means true — every module carries no flag at all.
  *   session the master plan session that builds it, for what does not exist yet.
  *   note    why it is at that level, when the answer is not obvious.
  */
@@ -200,8 +214,9 @@ var LM_FEATURES = [
   { id: "rooms", level: LM_LEVEL.GUEST, route: "project" },
   { id: "saved", level: LM_LEVEL.GUEST, route: "project",
     note: "A calculation saved into a project. Chapter XV." },
-  { id: "shopping", level: LM_LEVEL.GUEST, route: "estimate", note: "Chapter XVI." },
-  { id: "costs", level: LM_LEVEL.GUEST, route: "estimate", note: "Chapter XVII." },
+  { id: "shopping", level: LM_LEVEL.GUEST, route: "estimate", note: "Chapter XVI. The " +
+      "material list without the money on it: what to carry out of the shop. It stays " +
+      "open to everybody, and it is the half of /kosztorys/ a free account keeps." },
   { id: "history", level: LM_LEVEL.GUEST, route: "dashboard",
     note: "The dashboard reads this browser's own storage; gating it would hide " +
       "somebody's own work from them after a token expired." },
@@ -214,7 +229,21 @@ var LM_FEATURES = [
     note: "Reading a shared estimate needs nothing (the route is GUEST). Making the " +
       "link writes a document under sharedProjects, so it needs an account." },
 
-  /* -------------------------------------------------- pro */
+  /* -------------------------------------------------- pro: the priced half of a page
+     anybody may open. Neither of these two is a module — see `module` above. */
+  { id: "costs", level: LM_LEVEL.PRO, route: "estimate", key: "feat_costs", module: false,
+    note: "Chapter XVII, and PRO since 2026-09-03. Every price on this site: the unit " +
+      "price of a material, what a line comes to, the cost of the waste, and the three " +
+      "figures a project adds up to. The route stays GUEST — the page opens and the " +
+      "material list on it is `shopping`, which is free — but nothing on it prints an " +
+      "amount for a level that does not reach this." },
+  { id: "pdf", level: LM_LEVEL.PRO, route: null, key: "feat_pdf", module: false,
+    note: "The PDF export, PRO since 2026-09-03: the configurator on /projekty/, the " +
+      "document it fills in, and the print button on /kosztorys/. It has no route of " +
+      "its own because it is offered on two pages that are both GUEST, which is the " +
+      "same reason `crm` carries none." },
+
+  /* -------------------------------------------------- pro: the five modules */
   { id: "clients", level: LM_LEVEL.PRO, route: "clients", key: "feat_clients", session: 22 },
   { id: "jobs", level: LM_LEVEL.PRO, route: "jobs", key: "feat_jobs", session: 23 },
   { id: "quotes", level: LM_LEVEL.PRO, route: "quotes", key: "feat_quotes", session: 24 },

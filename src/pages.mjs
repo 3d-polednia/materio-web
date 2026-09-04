@@ -1198,8 +1198,16 @@ const PDF_WEB = {
  * the same three figures the screen above it shows: a printed page that disagrees with the
  * screen it was printed from is the defect worth avoiding, and it is why this does not copy
  * the app's exporter, which totals the estimations alone.
+ *
+ * **The whole block is Pro since 2026-09-03.** The configurator and the document sit
+ * inside `#pdf-tool` and chapter XXV's wall (`proGate()`) stands beside them as
+ * `#pdf-gate`; assets/paywall.js shows one of the two from the level on the account. Both
+ * are in the markup from the first paint, so a free account never sees the form flash open
+ * before it closes — and never sees a dead button where the form was either.
+ *
+ * @param {object[]} features LM_FEATURES from assets/plan.js, for the wall
  */
-function pdfBlock(lang) {
+function pdfBlock(lang, t, features) {
   const c = (key) => PDF_COPY[lang][key];
   const web = PDF_WEB[lang];
   const split = (key, slot) => {
@@ -1328,19 +1336,34 @@ function pdfBlock(lang) {
             <p class="pdf-foot">${esc(c("pdfdoc_footer"))}</p>
           </article>`;
 
+  // Chapter XXV's wall, from the one builder every Pro page uses. `back` names the route
+  // a guest is returned to after signing up, because the PDF is offered on two pages and
+  // the feature itself names neither.
+  const gate = proGate(t, "pdf", features, lang,
+    { id: "pdf-gate", back: "projects", brief: true });
+
   return `<section class="dash-sec ws-pdf" id="ws-pdf">
             <div class="dash-head"><h2>${esc(c("pdf_title"))}</h2></div>
-            <p class="muted">${esc(web.hint)}</p>
-            ${configurator}
-            ${doc}
+            ${gate}
+            <div id="pdf-tool" hidden>
+              <p class="muted">${esc(web.hint)}</p>
+              ${configurator}
+              ${doc}
+            </div>
           </section>`;
 }
 
-export function projectsMain(lang, t, aisles = []) {
+export function projectsMain(lang, t, aisles = [], features = []) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("wspage_title"), path: urlProjects(lang) },
   ]);
+
+  /* Chapter XXV's wall in front of the money. `costs` became PRO on 2026-09-03, and a
+     project is still everybody's to keep: what the wall replaces is the three figures,
+     not the project. Everything else on this screen — the rooms, the saved calculations,
+     the material list — is `shopping` and the free workspace, and stays where it is. */
+  const costGate = proGate(t, "costs", features, lang, { id: "cost-gate", back: "projects" });
 
   /* The detail. Every figure in it is written by the script; what the build fixes is the
      shape, the headings and the labels, so nothing here has to be translated twice. */
@@ -1359,13 +1382,21 @@ export function projectsMain(lang, t, aisles = []) {
                projektu." The three are written by assets/workspace.js's wsProjectCosts(),
                which counts every amount in the project exactly once — a calculation and
                the material it put on the shopping list are the same money. -->
+          <!-- How many calculations the project holds is not money and is not gated: it
+               is the project's own size, and the visitor made every one of them. -->
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_count_l"))}</span> <b id="ws-project-count"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_cost_mat"))}</span> <b id="ws-project-mat"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_cost_other"))}</span> <b id="ws-project-other"></b></p>
-            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("proj_cost_sum"))}</span> <b id="ws-project-total"></b></p>
           </div>
-          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+
+          ${costGate}
+          <div id="cost-tool" hidden>
+            <div class="ws-project-figs">
+              <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_cost_mat"))}</span> <b id="ws-project-mat"></b></p>
+              <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_cost_other"))}</span> <b id="ws-project-other"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("proj_cost_sum"))}</span> <b id="ws-project-total"></b></p>
+            </div>
+            <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+          </div>
 
           <div class="ws-project-actions">
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">${esc(t("ws_activate"))}</button>
@@ -1509,7 +1540,11 @@ export function projectsMain(lang, t, aisles = []) {
                part of a project no calculator produces. They are the hand-typed estimate
                lines /kosztorys/ has always written, filed into the project that is open
                instead of the active one, so this is a second way into one store. -->
-          <section class="dash-sec">
+          <!-- "Inne koszty" is nothing but money, so the whole section belongs to the
+               costs feature. It carries no wall of its own: the one above says why the
+               figures are not there, and a page that draws the same wall twice is a page
+               shouting. assets/paywall.js hides this from the same one decision. -->
+          <section class="dash-sec" id="cost-other-tool" hidden>
             <div class="dash-head">
               <h2>${esc(t("proj_cost_other"))}</h2>
             </div>
@@ -1534,7 +1569,7 @@ export function projectsMain(lang, t, aisles = []) {
             </details>
           </section>
 
-          ${pdfBlock(lang)}
+          ${pdfBlock(lang, t, features)}
         </div>
       </article>`;
 
@@ -2470,12 +2505,26 @@ ${buckets}
   return { main, ld: crumbs.ld };
 }
 
-/** /kosztorys/ — the saved lines of the active project, priced, printable to PDF. */
-export function estimateMain(lang, t) {
+/**
+ * /kosztorys/ — the saved lines of the active project.
+ *
+ * The route is GUEST and stays GUEST: the list of what was counted and what has to be
+ * carried out of the shop is `shopping`, and chapter II keeps counting free. What is not
+ * free since 2026-09-03 is the money on it. `costs` and `pdf` are PRO, so for a guest and
+ * for a free account the value column is empty, the total is not printed, and chapter
+ * XXV's wall stands where the two export buttons are — assets/workspace-ui.js empties the
+ * figures and assets/paywall.js swaps the buttons for the wall, both from the one decision
+ * in lmPaywall().
+ *
+ * @param {object[]} features LM_FEATURES from assets/plan.js, for the wall
+ */
+export function estimateMain(lang, t, features = []) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("estpage_title"), path: urlEstimate(lang) },
   ]);
+
+  const gate = proGate(t, "costs", features, lang, { id: "cost-gate" });
 
   const main = `<main id="main" tabindex="-1">
   <section class="block page-head no-print">
@@ -2488,11 +2537,18 @@ export function estimateMain(lang, t) {
 
   <section class="block alt">
     <div class="wrap narrow">
+      <!-- The project picker is not money and is not gated: it says which project the
+           page is showing, and the list under it is free. The two exports are: both of
+           them write out what every line came to. -->
       <div class="ws-estimate-bar no-print">
         <select id="ws-estimate-project" aria-label="${esc(t("ws_project"))}" hidden></select>
-        <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">${esc(t("est_print"))}</button>
-        <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">${esc(t("est_csv"))}</button>
+        <span id="cost-tool" hidden>
+          <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">${esc(t("est_print"))}</button>
+          <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">${esc(t("est_csv"))}</button>
+        </span>
       </div>
+
+      ${gate}
 
       <article id="ws-estimate" class="ws-estimate">
         <header class="ws-estimate-head">

@@ -203,13 +203,63 @@
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
 
           
+          
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">Partidas</span> <b id="ws-project-count"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Coste de materiales</span> <b id="ws-project-mat"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Otros costes</span> <b id="ws-project-other"></b></p>
-            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Total del proyecto</span> <b id="ws-project-total"></b></p>
           </div>
-          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Estas partidas están en monedas distintas. El total las suma pero no convierte nada: comprueba la moneda de cada coste.</p>
+
+          <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Precios y costes</h2>
+        <p class="muted">Precios unitarios, valor de la partida, coste de desperdicio y total del proyecto. La lista de materiales sin precios sigue siendo gratuita.</p>
+        <p><span class="chip">Disponible en LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro es un plan sobre una cuenta. Crea antes una cuenta LiczMat gratuita o inicia sesión: Pro solo se puede activar sobre una cuenta.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fes%2Fproyectos%2F" rel="nofollow">Crea una cuenta gratuita</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tu cuenta está en el plan gratuito. Este módulo pertenece a LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Qué más cubre LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Clientes</b> — <span class="muted">Una lista de clientes con datos de contacto, notas y el historial del trabajo con ellos.</span></li>
+            <li><b>Encargos</b> — <span class="muted">Un encargo con su cliente, descripción, estado, fecha, valor y el proyecto al que pertenece.</span></li>
+            <li><b>Presupuestos</b> — <span class="muted">Material, mano de obra, otros costes, margen y total, a partir de lo que ya has calculado.</span></li>
+            <li><b>Plazos</b> — <span class="muted">Las fechas de los encargos y lo esencial sobre ellos. No un segundo Google Calendar.</span></li>
+            <li><b>Historial y CRM</b> — <span class="muted">El recorrido por todo el trabajo: cliente → encargo → proyecto → presupuesto → historial.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/es/liczmat-pro/" data-i18n="pro_more">Mira qué es LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Suscripción a LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Un plan, los cinco módulos Pro. El pago lo gestiona Stripe; cancela cuando quieras y Pro dura hasta el final del periodo pagado.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Mensual</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ mes</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Anual</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ año — dos meses más barato</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Ir a tu cuenta</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">La suscripción todavía no se puede comprar. Estos precios son definitivos.</p>
+        </div>
+      </div>
+          <div id="cost-tool" hidden>
+            <div class="ws-project-figs">
+              <p class="ws-project-fig"><span class="eyebrow muted">Coste de materiales</span> <b id="ws-project-mat"></b></p>
+              <p class="ws-project-fig"><span class="eyebrow muted">Otros costes</span> <b id="ws-project-other"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Total del proyecto</span> <b id="ws-project-total"></b></p>
+            </div>
+            <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Estas partidas están en monedas distintas. El total las suma pero no convierte nada: comprueba la moneda de cada coste.</p>
+          </div>
 
           <div class="ws-project-actions">
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Hacer activo</button>
@@ -330,7 +380,8 @@
           </section>
 
           
-          <section class="dash-sec">
+          
+          <section class="dash-sec" id="cost-other-tool" hidden>
             <div class="dash-head">
               <h2>Otros costes</h2>
             </div>
@@ -357,8 +408,27 @@
 
           <section class="dash-sec ws-pdf" id="ws-pdf">
             <div class="dash-head"><h2>Exportar el presupuesto</h2></div>
-            <p class="muted">El documento se abre en la ventana de impresión. Elige allí guardar en PDF.</p>
-            <form id="ws-pdf-form">
+            <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>
+        <h2>Exportar a PDF</h2>
+        <p class="muted">Informe técnico y presupuesto para el inversor: mano de obra, margen, IVA y total, listo para imprimir.</p>
+        <p><span class="chip">Disponible en LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro es un plan sobre una cuenta. Crea antes una cuenta LiczMat gratuita o inicia sesión: Pro solo se puede activar sobre una cuenta.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fes%2Fproyectos%2F" rel="nofollow">Crea una cuenta gratuita</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tu cuenta está en el plan gratuito. Este módulo pertenece a LiczMat Pro.</p>
+
+        
+
+        <p><a class="btn btn-ghost btn-sm" href="/es/liczmat-pro/" data-i18n="pro_more">Mira qué es LiczMat Pro</a></p>
+
+        
+      </div>
+            <div id="pdf-tool" hidden>
+              <p class="muted">El documento se abre en la ventana de impresión. Elige allí guardar en PDF.</p>
+              <form id="ws-pdf-form">
             <fieldset class="pdf-types">
               <legend class="fld-label">Tipo de documento</legend>
               <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Informe técnico</span></label>
@@ -416,7 +486,7 @@
 
             <p><button type="submit" class="btn btn-primary">Preparar el PDF</button></p>
           </form>
-            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+              <article id="ws-pdf-doc" class="pdf-doc" hidden>
             <header class="pdf-head">
               
               <p class="pdf-sub" data-pdf="subtitle"
@@ -468,6 +538,7 @@
 
             <p class="pdf-foot">LiczMat — Calcula. Planifica. Construye.</p>
           </article>
+            </div>
           </section>
         </div>
       </article>
@@ -621,6 +692,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

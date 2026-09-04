@@ -217,10 +217,58 @@
 
   <section class="block alt">
     <div class="wrap narrow">
+      
       <div class="ws-estimate-bar no-print">
         <select id="ws-estimate-project" aria-label="Projekt" hidden></select>
-        <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Tlač / uložiť PDF</button>
-        <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Stiahnuť CSV</button>
+        <span id="cost-tool" hidden>
+          <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Tlač / uložiť PDF</button>
+          <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Stiahnuť CSV</button>
+        </span>
+      </div>
+
+      <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Ceny a náklady</h2>
+        <p class="muted">Jednotkové ceny, hodnota položiek, náklady na odpad a súčet projektu. Zoznam materiálov bez cien zostáva zadarmo.</p>
+        <p><span class="chip">Dostupné v LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je tarif pri účte. Založ si najprv účet LiczMat zadarmo alebo sa prihlás — Pro sa dá zapnúť len na účte.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fsk%2Frozpocet%2F" rel="nofollow">Založiť účet zadarmo</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tvoj účet je na tarife zadarmo. Tento modul patrí do LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Čo ďalšie LiczMat Pro zahŕňa</h3>
+          <ul class="pw-incl-list">
+            <li><b>Klienti</b> — <span class="muted">Zoznam klientov s kontaktnými údajmi, poznámkami a históriou spolupráce.</span></li>
+            <li><b>Zákazky</b> — <span class="muted">Zákazka s klientom, popisom, stavom, termínom, hodnotou a pripojeným projektom.</span></li>
+            <li><b>Cenové ponuky</b> — <span class="muted">Materiál, práca, ďalšie náklady, marža a súčet — z toho, čo si už spočítal.</span></li>
+            <li><b>Termíny</b> — <span class="muted">Termíny zákaziek a základné informácie o nich. Nie druhý Kalendár Google.</span></li>
+            <li><b>História a CRM</b> — <span class="muted">Cesta celou prácou: klient → zákazka → projekt → cenová ponuka → história.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/sk/liczmat-pro/" data-i18n="pro_more">Spoznaj LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Predplatné LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Jeden tarif, všetkých päť modulov Pro. Platbu zabezpečuje Stripe; zrušíš kedykoľvek a Pro beží do konca zaplateného obdobia.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Mesačne</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ mesiac</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Ročne</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ rok — o dva mesiace lacnejšie</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Prejsť na svoj účet</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Predplatné sa zatiaľ kúpiť nedá. Ceny sú konečné.</p>
+        </div>
       </div>
 
       <article id="ws-estimate" class="ws-estimate">
@@ -391,6 +439,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

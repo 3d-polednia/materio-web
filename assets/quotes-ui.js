@@ -76,6 +76,42 @@ let quoUndone = null;
  */
 const quoRenderPro = () => pwRender("quo", "quotes");
 
+/**
+ * May this browser use the quotes at all? — `quotes` in LM_FEATURES, PRO since session 24.
+ *
+ * Until 2026-09-03 the wall was the whole of the answer: pwRender() set `hidden` on
+ * #quo-tool and every function below it went on drawing names, labour lines, margins and
+ * five totals into that hidden element, and every button below it went on writing to the
+ * store. A wall in front of a page that has already been built and is still working is a
+ * wall anybody can walk round with one line in a console.
+ *
+ * So this is asked twice: once in quoRender(), which stops the page being drawn at all,
+ * and once in each handler that writes, because a handler bound while the module was open
+ * outlives the moment the account stops being Pro. A missing pwAllows() is a refusal, for
+ * the reason pwState() closes.
+ *
+ * It is still not a security boundary — the store is `localStorage` on this device. It is
+ * the product decision, enforced in the one place a browser can enforce anything.
+ */
+const quoAllowed = () => typeof pwAllows === "function" && pwAllows("quotes");
+
+/**
+ * Take every quote off the screen.
+ *
+ * Called when the answer above is no, including the moment it *becomes* no: signing out
+ * in another tab fires `lm-session`, and a page that only put the wall up over the top of
+ * the previous account's figures would still be holding them.
+ */
+function quoClear() {
+  const ids = ["quo-list", "quo-labour-list", "quo-chain-line"];
+  for (let i = 0; i < ids.length; i++) {
+    const el = document.getElementById(ids[i]);
+    if (el) el.innerHTML = "";
+  }
+  const figures = document.querySelectorAll("#quo-detail [id^='quo-fig-']");
+  for (let i = 0; i < figures.length; i++) figures[i].textContent = "";
+}
+
 /* ------------------------------------------------------------------ the index */
 
 /**
@@ -385,6 +421,15 @@ function quoRender() {
 
   quoRenderPro();
 
+  /* The wall is up, so nothing below it gets built. This is the difference between a
+     module that is hidden and a module that is closed: no quote name, no labour line, no
+     margin and none of chapter XXII's five figures is computed or written into the page
+     for a level that may not have them. */
+  if (!quoAllowed()) {
+    quoClear();
+    return;
+  }
+
   // Opening and closing a quote changes the address without a reload, and the language
   // links carry that address so a switch of language keeps the quote on screen.
   if (typeof keepQueryOnLangLinks === "function") keepQueryOnLangLinks();
@@ -415,9 +460,14 @@ function quoBackToIndex() {
 /* ------------------------------------------------------------------ wiring */
 
 function wireQuoteDetail() {
+  /* Every listener on this screen goes through one guard, and it is checked when the
+     event arrives rather than when the listener is bound: the page is built once, and the
+     account can stop being Pro while it is open — a sign-out in another tab, or a plan
+     that ran out between two clicks. Binding nothing at all would leave the same
+     handlers behind for anybody who signed in and out again. */
   const on = (id, event, fn) => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener(event, fn);
+    if (el) el.addEventListener(event, (e) => { if (quoAllowed()) fn(e); });
   };
 
   // Chapter XXII's margin: one field on the page, because it is the number a tradesman
@@ -444,7 +494,11 @@ function wireQuoteDetail() {
   });
 
   const cancel = document.querySelector("[data-quo-edit-cancel]");
-  if (cancel) cancel.addEventListener("click", () => { quoEditing = false; quoRender(); });
+  if (cancel) cancel.addEventListener("click", () => {
+    if (!quoAllowed()) return;
+    quoEditing = false;
+    quoRender();
+  });
 
   on("quo-delete", "click", () => { quoAsking = true; quoEditing = false; quoRender(); });
   on("quo-delete-no", "click", () => { quoAsking = false; quoRender(); });
@@ -540,7 +594,9 @@ function buildQuotesPage() {
     e.preventDefault();
     const name = document.getElementById("quo-name");
     const project = document.getElementById("quo-project");
-    if (!name.value.trim()) return;
+    // The wall normally means this form is not on the screen. The check is here as well,
+    // because a form that is only hidden still submits.
+    if (!name.value.trim() || !quoAllowed()) return;
     quoUndone = null; // a new quote is a new subject; the old undo is stale
     crmAddQuote({ name: name.value, projectId: project.value });
     name.value = "";
@@ -548,7 +604,7 @@ function buildQuotesPage() {
   });
 
   document.getElementById("quo-undo-go").addEventListener("click", () => {
-    if (!quoUndone) return;
+    if (!quoUndone || !quoAllowed()) return;
     const back = crmRestoreQuote(quoUndone.token);
     quoUndone = back ? { token: quoUndone.token, name: back.name, restored: true } : null;
     quoRender();
@@ -565,6 +621,10 @@ function buildQuotesPage() {
   // Signing in or out on /app/ moves the level; the preview switch moves the wall. Both
   // are wired here, once, by assets/paywall.js.
   pwMount("quo", "quotes");
+  /* And the page is drawn again for the level it has just become. pwMount() puts the wall
+     back up, which hides #quo-tool; the figures written into it while the account was Pro
+     would still be inside it. quoRender() empties them — see quoClear(). */
+  document.addEventListener("lm-session", quoRender);
   // Back after opening a quote: the page never reloaded, so nothing else would notice.
   window.addEventListener("popstate", quoRender);
 

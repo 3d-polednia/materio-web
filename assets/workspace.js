@@ -414,6 +414,44 @@ function wsEstimations(projectId) {
 /** Minor units, rounded once, never carried as a float (the Money rule from the app). */
 const wsMinor = (major) => Math.round((Number(major) || 0) * 100);
 
+/**
+ * May this browser store an amount somebody typed? — `costs` in LM_FEATURES, PRO since
+ * the owner's decision of 2026-09-03.
+ *
+ * Four writes ask it, and they are the four that take a price out of a form: the "inne
+ * koszty" line, the correction of one, the hand-added material and the correction of one.
+ * The screens ask before they call; the store asks as well, because a gate that only
+ * exists at the call site is a gate that a second call site — or one line in a console —
+ * walks round.
+ *
+ * **What it does not gate, deliberately:**
+ *
+ *   wsAddEstimation() and wsAddItem()   the calculator's own result, saved into a project
+ *                                       from a calculator page. Chapter II keeps counting
+ *                                       free, those pages load no paywall at all, and the
+ *                                       amount is the calculator's rather than something
+ *                                       typed at a form. It is stored and never shown: the
+ *                                       screens refuse to print it, and a visitor who
+ *                                       later pays for Pro finds their own figures intact
+ *                                       rather than a project full of zeroes.
+ *   every read                          a store that answered two ways about rows already
+ *                                       on this device would be a second source of truth.
+ *
+ * A refusal is never a lost row: the caller gets the line, the material and the name it
+ * asked for, with the money left at zero on a new row and untouched on an existing one.
+ * Zeroing a price a Pro account had already stored, because the plan lapsed, would be this
+ * gate destroying somebody's work instead of withholding a feature.
+ *
+ * A missing pwAllows() is a refusal, for the reason pwState() in assets/paywall.js closes.
+ * The session hint is never read here: a hint that may be stale must not be what decides a
+ * write (scripts/test-security.mjs §9), and pwAllows() owns that reading.
+ *
+ * Nothing here is a security boundary — see the note at the top of assets/plan.js.
+ */
+function wsCanPrice() {
+  return typeof pwAllows === "function" && pwAllows("costs");
+}
+
 /** The contract's ceiling on `inputJson` (FIRESTORE_SYNC §2): a hard limit in the rules. */
 const WS_INPUT_MAX = 20000;
 
@@ -613,7 +651,10 @@ function wsAddManualEstimation({ name, requiredUnits, unitLabel, costMajor, proj
     name,
     requiredUnits,
     unitLabel,
-    costMajor,
+    // The line is `shopping` and free; the amount typed onto it is `costs` and is not.
+    // A level that does not reach the money gets the row with none on it rather than a
+    // refusal to add the row — see wsCanPrice() below.
+    costMajor: wsCanPrice() ? costMajor : 0,
     wastePercent: 0,
     manual: true,
     input: { manual: true },
@@ -654,7 +695,9 @@ function wsUpdateEstimation(id, fields) {
   if (fields.name !== undefined) row.name = String(fields.name).slice(0, 120);
   if (fields.requiredUnits !== undefined) row.requiredUnits = Math.max(0, Math.round(Number(fields.requiredUnits) || 0));
   if (fields.unitLabel !== undefined) row.unitLabel = String(fields.unitLabel).slice(0, 24);
-  if (fields.costMajor !== undefined) {
+  // `costs` is Pro: a level that does not reach it leaves the stored amount exactly where
+  // it is, rather than writing a new one or zeroing the old one — see wsCanPrice().
+  if (fields.costMajor !== undefined && wsCanPrice()) {
     row.totalCostMinor = Math.max(0, wsMinor(fields.costMajor));
     // The waste share is a percentage of the line, so it has to follow the new total.
     row.wasteCostMinor = Math.round(row.totalCostMinor * (Number(row.wastePercentage) || 0) / 100);
@@ -854,7 +897,9 @@ function wsUpdateItem(id, fields) {
   }
   if (fields.note !== undefined) row.note = String(fields.note).trim().slice(0, WS_NOTE_MAX);
   if (fields.isPurchased !== undefined) row.isPurchased = Boolean(fields.isPurchased);
-  if (fields.priceMajor !== undefined) {
+  // The same rule as the estimate line above: the price is Pro, and a level without it
+  // leaves whatever is already stored alone — see wsCanPrice().
+  if (fields.priceMajor !== undefined && wsCanPrice()) {
     const cost = wsItemCostMinor(fields.priceMajor, row.quantity);
     if (!row.estimatedCostMinor) row.currencyCode = wsCurrency();
     row.estimatedCostMinor = cost;
@@ -882,7 +927,9 @@ function wsAddOwnItem({ projectId, name, materialCategory, quantity, unit, note,
     materialCategory: materialCategory || "OTHER",
     quantity,
     unit,
-    costMinor: wsItemCostMinor(priceMajor, quantity),
+    // The material is `shopping` and free; the price typed beside it is `costs` and is
+    // not. A level without it gets the row with no money on it — see wsCanPrice().
+    costMinor: wsCanPrice() ? wsItemCostMinor(priceMajor, quantity) : 0,
     note,
   });
 }

@@ -37,11 +37,12 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { projectsMain } from "../src/pages.mjs";
+import { projectsMain, estimateMain } from "../src/pages.mjs";
 import { LANGS, DEFAULT_LANG } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
+const read = (file) => [].concat(file).map((f) => readFileSync(p(f), "utf8")).join("\n");
 
 function evalScript(file, returns, globals = {}) {
   const src = [].concat(file).map((f) => readFileSync(p(f), "utf8")).join("\n");
@@ -61,6 +62,22 @@ for (const lang of LANGS) {
 const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 
 const { MAT_CATS } = evalScript("assets/materials.js", ["MAT_CATS"], { module: undefined });
+/* The permission table as the browser has it. Since 2026-09-03 /projekty/ and
+   /kosztorys/ draw chapter XXV’s wall in front of the money on them, and proGate()
+   builds that wall out of LM_FEATURES — so a page builder called without it would be
+   checking a page the build never writes. */
+const FEATURES = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATURES"]).LM_FEATURES;
+
+
+/**
+ * What pwAllows() answers inside the shipped store, for the length of one check.
+ *
+ * assets/workspace.js and assets/crm.js ask it before they store a typed amount or write
+ * a quote (the owner’s decision of 2026-09-03). True is the ordinary case and is what the
+ * arithmetic below is written against; a test that wants the refusal sets it to false and
+ * puts it back.
+ */
+let PW_ALLOW = true;
 
 /** assets/workspace.js in Node, on a store that starts out however the test wants it. */
 function loadWorkspace(seed) {
@@ -75,8 +92,8 @@ function loadWorkspace(seed) {
   const api = evalScript("assets/workspace.js", [
     "wsLoad", "wsProjects", "wsProject", "wsAddProject", "wsArchiveProject",
     "wsDeleteProject", "wsRestoreProject", "wsActiveProjectId", "wsSetActiveProject",
-    "wsEstimations", "wsAddEstimation", "wsAddManualEstimation", "wsDeleteEstimation",
-    "wsIsManualLine", "wsOtherCosts", "wsCalcLines",
+    "wsEstimations", "wsAddEstimation", "wsAddManualEstimation", "wsUpdateEstimation",
+    "wsDeleteEstimation", "wsIsManualLine", "wsOtherCosts", "wsCalcLines", "wsCanPrice",
     "wsItems", "wsItem", "wsAddItem", "wsAddOwnItem", "wsUpdateItem", "wsDeleteItem",
     "wsUnitPriceMinor", "wsItemCostMinor", "wsItemsTotal", "wsProjectTotal", "wsProjectCosts",
     "wsMinor", "wsExport", "wsImport",
@@ -88,6 +105,12 @@ function loadWorkspace(seed) {
     Date: { now: () => clock.now },
     lmCurrency: () => clock.currency,
     lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    // What the paywall answers inside the store. `costs` and `quotes` became PRO on
+    // 2026-09-03 and the writes that take a typed amount ask before they store it, so the
+    // default here is an account that reaches them — otherwise every section below would be
+    // testing the refusal instead of the arithmetic. The section that IS about the refusal
+    // sets PW_ALLOW to false itself.
+    pwAllows: () => PW_ALLOW,
   });
   return {
     ...api,
@@ -477,7 +500,7 @@ head("4c. deleting the project takes its costs and materials with it, and the un
 
 head("5. the build writes the frame the figures and the costs are drawn into");
 {
-  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), MAT_CATS);
+  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), MAT_CATS, FEATURES);
   const needs = [
     // Chapter XVII's three figures, plus the count that was already there.
     "ws-project-count", "ws-project-mat", "ws-project-other", "ws-project-total",
@@ -505,7 +528,7 @@ head("5. the build writes the frame the figures and the costs are drawn into");
     main.indexOf("ws-project-other-list") > main.indexOf("ws-project-materials"));
 
   for (const lang of LANGS) {
-    const built = projectsMain(lang, tr(lang), MAT_CATS).main;
+    const built = projectsMain(lang, tr(lang), MAT_CATS, FEATURES).main;
     check(`${lang}: the figures are in the page`, built.includes('id="ws-project-mat"'));
     check(`${lang}: labelled in that language`, built.includes(tr(lang)("proj_cost_sum")));
     check(`${lang}: the other costs form is in that language`, built.includes(tr(lang)("proj_other_add")));
@@ -539,6 +562,204 @@ head("6. the copy exists in all four languages");
     const all = LANGS.map((l) => DICT[l][key]);
     check(`${key} is actually translated, not copied`, new Set(all).size > 1, all.join(" | "));
   }
+}
+
+/* ============================================ 7. the money belongs to LiczMat Pro */
+
+/**
+ * assets/workspace-ui.js in Node, with the paywall's answer handed in.
+ *
+ * The two screens are drawn by string builders, so the rows can be asked directly what
+ * they put on the page for a given level. `allow` is what pwAllows() answers; `undefined`
+ * leaves the function off the page, which is the case the screens have to close on.
+ */
+function loadUi(allow) {
+  const globals = {
+    document: { readyState: "complete", addEventListener() {}, getElementById: () => null,
+      documentElement: { lang: "pl" }, querySelector: () => null, querySelectorAll: () => [] },
+    window: { LM_PROJ: { aisles: ["TILES", "OTHER"] } },
+    location: { search: "", pathname: "/projekty/" },
+    URLSearchParams: class { get() { return null; } },
+    Intl,
+    lmCurrency: () => "PLN",
+    lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    t: (key) => key,
+  };
+  // Left off the page entirely when `allow` is undefined: that is the case the screens
+  // have to close on, and a stub always present would never let it be tested.
+  if (allow !== undefined) globals.pwAllows = (feature) => Boolean(allow[feature]);
+  return evalScript(["assets/workspace.js", "assets/workspace-calc.js", "assets/workspace-ui.js"],
+    ["wsCanCost", "wsCanPdf", "wsEstimateRow", "wsMaterialRow"], {
+      ...globals,
+      localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+      crypto: { randomUUID: () => "id-1" },
+      CustomEvent: class { constructor(type) { this.type = type; } },
+    });
+}
+
+head("7. a guest and a free account see the list and none of the money");
+{
+  const plan = evalScript(["assets/account.js", "assets/plan.js"],
+    ["LM_FEATURES", "lmCan", "LM_LEVEL"], { document: undefined, localStorage: undefined });
+
+  // The owner's decision of 2026-09-03, read out of the one place it is written down.
+  eq("costs is a Pro feature", plan.LM_FEATURES.find((f) => f.id === "costs").level, plan.LM_LEVEL.PRO);
+  eq("a guest may not see a price", plan.lmCan("costs", plan.LM_LEVEL.GUEST), false);
+  eq("nor may a free account", plan.lmCan("costs", plan.LM_LEVEL.LICZMAT), false);
+  eq("Pro may", plan.lmCan("costs", plan.LM_LEVEL.PRO), true);
+  // And the half that stays free is the half chapter XVI is about: what to carry out of
+  // the shop. A gate that took that away would be gating the product, not the price.
+  eq("the material list without prices is still free",
+    plan.lmCan("shopping", plan.LM_LEVEL.GUEST), true);
+
+  // No paywall on the page at all is a refusal, not a pass.
+  eq("with nothing to ask, the screens show no money", loadUi().wsCanCost(), false);
+  eq("and offer no PDF either", loadUi().wsCanPdf(), false);
+  eq("a level that reaches costs sees them", loadUi({ costs: true }).wsCanCost(), true);
+  eq("the PDF needs its own permission on top", loadUi({ costs: true }).wsCanPdf(), false);
+  eq("and with both, it is offered", loadUi({ costs: true, pdf: true }).wsCanPdf(), true);
+
+  /* The rows themselves. This is the assertion the whole session is for: not that the
+     amount is covered up, but that it was never written. */
+  const line = {
+    id: "e1", name: "Gres 60×60", requiredUnits: 12, unitLabel: "opak.",
+    totalCostMinor: 24500, currencyCode: "PLN",
+  };
+  const shut = loadUi({});
+  const open = loadUi({ costs: true, pdf: true });
+
+  const shutRow = shut.wsEstimateRow(line, 0);
+  check("an estimate row carries the name", shutRow.includes("Gres 60×60"));
+  check("and the quantity", shutRow.includes("opak."));
+  check("and no amount at all", !shutRow.includes("245.00") && !shutRow.includes("PLN"));
+  const openRow = open.wsEstimateRow(line, 0);
+  check("the same row priced for a Pro account", openRow.includes("245.00 PLN"));
+  // Four cells instead of five: the column goes with the values, so no header is left
+  // promising a figure that is not under it.
+  eq("the free row is one cell shorter", (shutRow.match(/<td/g) || []).length,
+    (openRow.match(/<td/g) || []).length - 1);
+
+  const item = {
+    id: "s1", name: "Klej", quantity: 7, unit: "opak.", estimatedCostMinor: 24500,
+    currencyCode: "PLN", materialCategory: "TILES", isPurchased: false, note: "",
+  };
+  const shutItem = shut.wsMaterialRow(item);
+  check("a material row is still the row somebody shops from", shutItem.includes("Klej"));
+  check("with the quantity on it", shutItem.includes("7 opak."));
+  check("and no unit price", !shutItem.includes("35.00"));
+  check("and no line value", !shutItem.includes("245.00"));
+  check("the same material priced for a Pro account",
+    open.wsMaterialRow(item).includes("245.00 PLN"));
+
+  /* The frame: the wall is in the markup from the first paint and the priced blocks ship
+     shut, on both pages. */
+  for (const lang of LANGS) {
+    const projects = projectsMain(lang, tr(lang), MAT_CATS, FEATURES).main;
+    check(`${lang}: /projekty/ carries the wall`, projects.includes('id="cost-gate"'));
+    check(`${lang}: its three figures ship shut`, projects.includes('<div id="cost-tool" hidden>'));
+    check(`${lang}: and so does "inne koszty"`,
+      projects.includes('<section class="dash-sec" id="cost-other-tool" hidden>'));
+    check(`${lang}: the count of calculations is not behind it`,
+      projects.indexOf('id="ws-project-count"') < projects.indexOf('id="cost-gate"'));
+
+    const estimate = estimateMain(lang, tr(lang), FEATURES).main;
+    check(`${lang}: /kosztorys/ carries the wall`, estimate.includes('id="cost-gate"'));
+    check(`${lang}: the two exports ship shut`, estimate.includes('<span id="cost-tool" hidden>'));
+    // The page itself is not gated: chapter II keeps counting free, and the list of what
+    // was counted is `shopping`.
+    check(`${lang}: the estimate itself is not hidden`,
+      estimate.includes('<article id="ws-estimate" class="ws-estimate">'));
+    check(`${lang}: and the project picker stays out of the wall`,
+      estimate.indexOf('id="ws-estimate-project"') < estimate.indexOf('id="cost-tool"'));
+  }
+
+  /* Every screen that writes an amount asks first. Named one by one, because a new
+     priced row added without the question is exactly the defect this section exists for. */
+  const ui = read("assets/workspace-ui.js");
+  for (const fn of ["wsProjectRow", "wsRenderProjectLines", "wsMaterialRow", "wsMatSum",
+    "wsRenderOtherCosts", "wsRenderProject", "wsEstimateRow", "wsRenderEstimate"]) {
+    const at = ui.indexOf(`function ${fn}(`);
+    check(`${fn}() is where it says it is`, at >= 0);
+    if (at < 0) continue;
+    check(`${fn}() asks whether it may print money`,
+      ui.slice(at, at + 2600).includes("wsCanCost()"));
+  }
+  check("the CSV of a priced estimate asks too", ui.includes("if (!wsCanCost()) return;"));
+  check("and an unpriced level cannot zero a price it cannot see",
+    ui.includes("if (wsCanCost()) fields.costMajor = wsDecimal(get(\"cost\"));"));
+}
+
+head("7b. the store refuses to write a price, not only the screen");
+{
+  /* A gate that lives at the call site is a gate a second call site walks round, and one
+     line typed into a console walks round faster than that. assets/workspace.js asks
+     wsCanPrice() itself, so the four writes that take a typed amount answer to the plan
+     wherever they are called from. */
+  const ws = loadWorkspace();
+  const project = ws.wsAddProject("Łazienka");
+  ws.wsSetActiveProject(project.id);
+
+  // While the account reaches `costs`, everything is as it always was.
+  const priced = ws.wsAddManualEstimation({
+    projectId: project.id, name: "Wywóz gruzu", requiredUnits: 1, unitLabel: "", costMajor: 400,
+  });
+  eq("a Pro account types an amount onto a line", priced.totalCostMinor, 40000);
+  const item = ws.wsAddOwnItem({
+    projectId: project.id, name: "Klej", quantity: 7, unit: "opak.", priceMajor: 35,
+  });
+  eq("and onto a material", item.estimatedCostMinor, 24500);
+
+  PW_ALLOW = false;
+  try {
+    const free = ws.wsAddManualEstimation({
+      projectId: project.id, name: "Wywóz gruzu", requiredUnits: 1, unitLabel: "", costMajor: 400,
+    });
+    check("a level without costs still gets the line", Boolean(free) && free.name === "Wywóz gruzu");
+    eq("with no money on it", free.totalCostMinor, 0);
+
+    const freeItem = ws.wsAddOwnItem({
+      projectId: project.id, name: "Fuga", quantity: 3, unit: "opak.", priceMajor: 29,
+    });
+    check("and still gets the material", Boolean(freeItem) && freeItem.name === "Fuga");
+    eq("with no price on it", freeItem.estimatedCostMinor, 0);
+
+    /* And a refusal never destroys what a Pro account already stored. A plan that lapses
+       must not empty somebody's project: the amount is withheld, not deleted. */
+    ws.wsUpdateEstimation(priced.id, { name: "Wywóz gruzu i kontener", costMajor: 999 });
+    const after = ws.wsEstimations(project.id).find((r) => r.id === priced.id);
+    eq("a correction still writes the name", after.name, "Wywóz gruzu i kontener");
+    eq("and leaves the stored amount exactly where it was", after.totalCostMinor, 40000);
+
+    ws.wsUpdateItem(item.id, { name: "Klej elastyczny", priceMajor: 999 });
+    const afterItem = ws.wsItem(item.id);
+    eq("the same for a material's name", afterItem.name, "Klej elastyczny");
+    eq("and for the price on it", afterItem.estimatedCostMinor, 24500);
+  } finally {
+    PW_ALLOW = true;
+  }
+
+  const store = read("assets/workspace.js");
+  check("the store has one place it asks", store.includes("function wsCanPrice()"));
+  check("and it fails closed when the deciding file is absent",
+    store.includes('typeof pwAllows === "function" && pwAllows("costs")'));
+  /* What is deliberately NOT gated: the calculator's own result, saved from a calculator
+     page. Those pages load no paywall at all, chapter II keeps counting free, and the
+     figure is the engine's rather than something typed at a form — it is stored and never
+     shown. A gate there would empty a project the visitor made before they paid. */
+  const add = store.slice(store.indexOf("function wsAddEstimation"),
+    store.indexOf("function wsAddManualEstimation"));
+  check("a saved calculation is not gated", !add.includes("wsCanPrice()"));
+  check("and the session hint is still never read in the store",
+    !store.includes("lmReadLevel") && !store.includes("liczmat-signed-in"));
+
+  /* The other half of a plan that moves: what is already on the screen. Hiding the blocks
+     leaves the amounts inside them, so the screen is drawn again for the level it has
+     just become. */
+  const ui = read("assets/workspace-ui.js");
+  check("signing in or out redraws the whole workspace",
+    /addEventListener\("lm-session", \(\) => \{\s*[\r\n]+\s*wsGateMoneyFields\(\);\s*[\r\n]+\s*wsRenderWorkspace\(\);/.test(ui));
+  check("and /kosztorys/ is drawn again too",
+    /addEventListener\("lm-session", \(\) => \{ wsGateMoneyFields\(\); wsRenderEstimate\(\); \}\)/.test(ui));
 }
 
 /* ------------------------------------------------------------------ report */

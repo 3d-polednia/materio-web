@@ -75,6 +75,22 @@ for (const lang of LANGS) {
 const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 
 const { MAT_CATS } = evalScript("assets/materials.js", ["MAT_CATS"], { module: undefined });
+/* The permission table as the browser has it. Since 2026-09-03 /projekty/ and
+   /kosztorys/ draw chapter XXV’s wall in front of the money on them, and proGate()
+   builds that wall out of LM_FEATURES — so a page builder called without it would be
+   checking a page the build never writes. */
+const FEATURES = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATURES"]).LM_FEATURES;
+
+
+/**
+ * What pwAllows() answers inside the shipped store, for the length of one check.
+ *
+ * assets/workspace.js and assets/crm.js ask it before they store a typed amount or write
+ * a quote (the owner’s decision of 2026-09-03). True is the ordinary case and is what the
+ * arithmetic below is written against; a test that wants the refusal sets it to false and
+ * puts it back.
+ */
+let PW_ALLOW = true;
 
 /** assets/workspace.js in Node, on a store that starts out however the test wants it. */
 function loadWorkspace(seed) {
@@ -102,6 +118,12 @@ function loadWorkspace(seed) {
     Date: { now: () => clock.now },
     lmCurrency: () => clock.currency,
     lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    // What the paywall answers inside the store. `costs` and `quotes` became PRO on
+    // 2026-09-03 and the writes that take a typed amount ask before they store it, so the
+    // default here is an account that reaches them — otherwise every section below would be
+    // testing the refusal instead of the arithmetic. The section that IS about the refusal
+    // sets PW_ALLOW to false itself.
+    pwAllows: () => PW_ALLOW,
   });
   return {
     ...api,
@@ -530,7 +552,7 @@ head("6. the link survives an export and an import");
 head("7. the frame the build writes");
 {
   const t = tr(DEFAULT_LANG);
-  const built = projectsMain(DEFAULT_LANG, t, MAT_CATS || []).main;
+  const built = projectsMain(DEFAULT_LANG, t, MAT_CATS || [], FEATURES).main;
 
   for (const id of ["ws-project-rooms", "ws-room-add", "ws-proj-room-form",
     "ws-proj-room-name", "ws-proj-room-length", "ws-proj-room-width", "ws-proj-room-height"]) {
@@ -564,7 +586,7 @@ head("7. the frame the build writes");
     !/\b(proj_room_[a-z]+|ws_room_no)\b/.test(built));
 
   for (const lang of LANGS) {
-    const page = projectsMain(lang, tr(lang), MAT_CATS || []).main;
+    const page = projectsMain(lang, tr(lang), MAT_CATS || [], FEATURES).main;
     check(`${lang}: the rooms section is in that language`, page.includes(tr(lang)("proj_room_add")));
     check(`${lang}: and so are the three dimension labels`,
       page.includes(tr(lang)("fld_length")) && page.includes(tr(lang)("fld_width"))

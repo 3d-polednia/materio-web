@@ -499,14 +499,21 @@ head("9. uprawnienia: the table, the routes, and the hint that gates nothing");
     ["LM_FEATURES", "lmCan", "lmFeatureState", "LM_LEVEL"],
     { document: undefined, localStorage: undefined });
 
-  // Every feature's level agrees with the route it lives on. Two answers to "is this
-  // Pro" is how a module ends up open on one page and walled on another.
+  /* Every Pro *module*'s level agrees with the route it lives on. Two answers to "is this
+     Pro" is how a module ends up open on one page and walled on another.
+
+     A Pro *capability* (`module: false`) is the deliberate exception, and it goes only
+     one way: `costs` and `pdf` are PRO while the route under them, /kosztorys/ and
+     /projekty/, is GUEST — the page opens, the counting and the material list on it are
+     free, and the money and the document on it are not. The reverse is still an error: a
+     PRO route with a non-PRO feature on it is a page nobody can reach offering something
+     everybody may use. */
   for (const feature of LM_FEATURES) {
     if (!feature.route) continue;
     const r = route(feature.route);
     check(`${feature.id} sits on a real route`, Boolean(r), feature.route);
     if (!r) continue;
-    if (feature.level === LM_LEVEL.PRO) {
+    if (feature.level === LM_LEVEL.PRO && feature.module !== false) {
       check(`${feature.id} is PRO on both sides`, r.level === LEVEL.PRO, r.level);
     }
     if (r.level === LEVEL.PRO) {
@@ -514,6 +521,22 @@ head("9. uprawnienia: the table, the routes, and the hint that gates nothing");
         feature.level);
     }
   }
+
+  /* The owner's decision of 2026-09-03, as an assertion rather than a note: a guest and a
+     free account cannot produce a PDF, cannot use a quote and get no price. The two open
+     routes are checked beside it, because the point of the decision is that the pages
+     stay reachable — a gate that shut /kosztorys/ would be a different product. */
+  for (const id of ["costs", "pdf", "quotes"]) {
+    for (const level of [LM_LEVEL.GUEST, LM_LEVEL.LICZMAT]) {
+      check(`${level} cannot use ${id}`, lmCan(id, level) === false);
+      check(`and is shown the wall instead`, lmFeatureState(id, level).locked === true);
+    }
+    check(`Pro can use ${id}`, lmCan(id, LM_LEVEL.PRO) === true);
+  }
+  check("and /kosztorys/ is still open to everybody", route("estimate").level === LEVEL.GUEST);
+  check("as is /projekty/", route("projects").level === LEVEL.GUEST);
+  check("the material list without prices stays free",
+    lmCan("shopping", LM_LEVEL.GUEST) === true);
 
   // A typo closes a door rather than opening one — including the three names every
   // JavaScript object answers to.

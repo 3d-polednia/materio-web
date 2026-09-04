@@ -175,6 +175,15 @@ async function open(ctx, url, opts = {}) {
   if (opts.workspace) plant["materio-workspace-v1"] = JSON.stringify(opts.workspace);
   if (opts.active) plant["materio-active-project"] = opts.active;
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
+  if (opts.level) plant["liczmat-signed-in"] = opts.level;
+  /* Every price on these screens, and the PDF export, became LiczMat Pro on 2026-09-03:
+     `costs` and `pdf` are PRO in LM_FEATURES, so a guest gets chapter XXV’s wall where the
+     amounts used to be. A test that is about the priced behaviour has to say which level
+     it is testing, and it says it the way scripts/test-quotes-page.mjs already does:
+     `liczmat-signed-in` is what assets/paywall.js reads (lmReadLevel()) and "pro" is what
+     a real Pro account writes there. `pro: false` looks at the wall instead — and there is
+     a section below that does exactly that, so the free half stays covered too. */
+  if (opts.pro !== false && !opts.level) plant["liczmat-signed-in"] = "pro";
 
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
@@ -220,6 +229,15 @@ head("1. chapter XVII's three figures stand at the top of the project");
   eq("and the project is the two added", amount(await text(page, "#ws-project-total")), "215985");
   eq("the count still counts the saved lines", await text(page, "#ws-project-count"), "3");
   eq("one currency, so no warning", await page.$eval("#ws-project-mixed", (n) => n.hidden), true);
+
+  // `open()` plants a Pro session by default (see the note above it) — section 9 below is
+  // the guest/free counterpart, so this is where the other half is proven: the wall is
+  // down and the figures are on screen for the level that reaches them, on both halves
+  // of this page — the money and the PDF export beside it.
+  eq("the figures sit in the open, not behind a wall", await page.locator("#cost-tool").isHidden(), false);
+  eq("and no wall is drawn over them", await page.locator("#cost-gate").isHidden(), true);
+  eq("the PDF configurator is unlocked too", await page.locator("#pdf-tool").isHidden(), false);
+  eq("with no wall over it either", await page.locator("#pdf-gate").isHidden(), true);
 
   // The calculation and the material it produced are the same money. If the summary added
   // the estimate to the shopping list, this project would come to 3 119,70 of materials.
@@ -581,6 +599,75 @@ head("8. with JavaScript off");
   eq("and no amount is drawn", await text(page, "#ws-project-total"), "");
   await page.close();
   await noJs.close();
+}
+
+/* --------------------------------------------------- the money belongs to Pro */
+
+/**
+ * The other half of every section above: what a guest and a free account get where the
+ * money used to be.
+ *
+ * The owner's decision of 2026-09-03 — `costs` is PRO — is a product decision about a page
+ * that stays open, so both halves have to be walked. Everything above this point runs at
+ * the Pro level, which is what `open()` plants by default; this runs at the two levels
+ * that do not reach it, and asks for the two things chapter XXV asks for: no amount
+ * anywhere, and never a dead control.
+ */
+head("9. a guest and a free account see the project, and none of its money");
+for (const level of [undefined, "liczmat"]) {
+  const who = level || "guest";
+  const page = await open(ctx, `${PROJECTS}?id=p1`,
+    { workspace: fixture(), active: "p1", pro: false, level });
+
+  eq(`${who}: the three figures are behind the wall`,
+    await page.locator("#cost-tool").isHidden(), true);
+  eq(`${who}: and the wall stands in their place`,
+    await page.locator("#cost-gate").isHidden(), false);
+  eq(`${who}: "inne koszty" is behind it too`,
+    await page.locator("#cost-other-tool").isHidden(), true);
+  eq(`${who}: and so is the PDF export`, await page.locator("#pdf-tool").isHidden(), true);
+  eq(`${who}: with its own wall in front of it`,
+    await page.locator("#pdf-gate").isHidden(), false);
+
+  /* Chapter XXV's two rungs, and exactly the one this visitor stands on: a guest has no
+     account for a plan to sit on, somebody signed in has. */
+  eq(`${who}: the rung offered is the right one`,
+    await page.locator(`#cost-gate [data-pw-step="${level ? "upgrade" : "account"}"]`)
+      .first().isHidden(), false);
+  eq(`${who}: and the other one is not offered`,
+    await page.locator(`#cost-gate [data-pw-step="${level ? "account" : "upgrade"}"]`)
+      .first().isHidden(), true);
+
+  /* What is NOT withheld: chapter XVI's list, which is `shopping` and free. The material
+     is on the screen with its name, its quantity and its aisle — everything but a price. */
+  const list = await rows(page, MATS);
+  eq(`${who}: every material is still on the list`, list.length, 3);
+  check(`${who}: with the names and the quantities on them`,
+    list.join(" | ").includes("Gres 60×60") && list.join(" | ").includes("15 opak."),
+    list.join(" | "));
+  check(`${who}: and not one amount among them`,
+    !/\d[\d\s., ]*(zł|PLN)/i.test(list.join(" ")), list.join(" | "));
+  eq(`${who}: the count of calculations is not money and is still shown`,
+    await text(page, "#ws-project-count"), "3");
+
+  /* Never a dead control. The price field is off the form rather than sitting there
+     taking a number nothing is going to store. */
+  await page.click(`${MATS} li[data-id="s3"] [data-edit]`);
+  await page.waitForSelector(`${MATS} form[data-mat-edit]`);
+  eq(`${who}: the row still opens for editing`,
+    await page.locator(`${MATS} [data-f="quantity"]`).count(), 1);
+  eq(`${who}: and carries no price field`,
+    await page.locator(`${MATS} [data-f="priceMajor"]`).count(), 0);
+
+  /* And the store is untouched by a level that may not price anything: correcting the
+     name of a row a Pro account had priced leaves the amount exactly where it was. */
+  await page.fill(`${MATS} [data-f="name"]`, "Fuga szara");
+  await page.click(`${MATS} form[data-mat-edit] button[type=submit]`);
+  await page.waitForSelector(`${MATS} form[data-mat-edit]`, { state: "detached" });
+  const saved = (await items(page)).find((s) => s.id === "s1");
+  eq(`${who}: a priced row keeps the amount it was given`, saved.estimatedCostMinor, 74985);
+  check(`${who}: no error in the console`, page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
 }
 
 /* ------------------------------------------------------------------ report */

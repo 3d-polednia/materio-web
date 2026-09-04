@@ -203,13 +203,63 @@
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
 
           
+          
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">Позицій</span> <b id="ws-project-count"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Вартість матеріалів</span> <b id="ws-project-mat"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Інші витрати</span> <b id="ws-project-other"></b></p>
-            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Разом за проєктом</span> <b id="ws-project-total"></b></p>
           </div>
-          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Позиції в різних валютах. Сума додає їх, але нічого не перераховує за курсом — перевір валюту в колонці вартості.</p>
+
+          <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Ціни та витрати</h2>
+        <p class="muted">Ціни за одиницю, вартість позицій, вартість відходів та сума проєкту. Список матеріалів без цін залишається безкоштовним.</p>
+        <p><span class="chip">Доступно в LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro — це план на акаунті. Спершу створіть безкоштовний акаунт LiczMat або увійдіть — Pro вмикається лише на акаунті.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fuk%2Fproekty%2F" rel="nofollow">Створити безкоштовний акаунт</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Ваш акаунт на безкоштовному плані. Цей модуль належить до LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Що ще охоплює LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Клієнти</b> — <span class="muted">Список клієнтів із контактами, нотатками та історією співпраці.</span></li>
+            <li><b>Замовлення</b> — <span class="muted">Замовлення з клієнтом, описом, статусом, терміном, вартістю та пов’язаним проєктом.</span></li>
+            <li><b>Кошториси</b> — <span class="muted">Матеріал, робота, додаткові витрати, маржа й сума — з того, що ти вже порахував.</span></li>
+            <li><b>Календар</b> — <span class="muted">Терміни замовлень і основне про них. Не другий Google Календар.</span></li>
+            <li><b>Історія і CRM</b> — <span class="muted">Шлях через усю роботу: клієнт → замовлення → проєкт → кошторис → історія.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/uk/liczmat-pro/" data-i18n="pro_more">Дізнатися про LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Передплата LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Один план, усі п'ять модулів Pro. Оплату опрацьовує Stripe; скасувати можна будь-коли, і Pro працює до кінця сплаченого періоду.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Щомісяця</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ місяць</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Щороку</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ рік — на два місяці дешевше</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Перейти до свого акаунта</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Передплату ще не можна оформити. Ціни остаточні.</p>
+        </div>
+      </div>
+          <div id="cost-tool" hidden>
+            <div class="ws-project-figs">
+              <p class="ws-project-fig"><span class="eyebrow muted">Вартість матеріалів</span> <b id="ws-project-mat"></b></p>
+              <p class="ws-project-fig"><span class="eyebrow muted">Інші витрати</span> <b id="ws-project-other"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Разом за проєктом</span> <b id="ws-project-total"></b></p>
+            </div>
+            <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Позиції в різних валютах. Сума додає їх, але нічого не перераховує за курсом — перевір валюту в колонці вартості.</p>
+          </div>
 
           <div class="ws-project-actions">
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Зробити активним</button>
@@ -330,7 +380,8 @@
           </section>
 
           
-          <section class="dash-sec">
+          
+          <section class="dash-sec" id="cost-other-tool" hidden>
             <div class="dash-head">
               <h2>Інші витрати</h2>
             </div>
@@ -357,8 +408,27 @@
 
           <section class="dash-sec ws-pdf" id="ws-pdf">
             <div class="dash-head"><h2>Експортувати кошторис</h2></div>
-            <p class="muted">Документ відкриється у вікні друку. Виберіть у ньому збереження в PDF.</p>
-            <form id="ws-pdf-form">
+            <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>
+        <h2>Експорт у PDF</h2>
+        <p class="muted">Технічний звіт та кошторис для інвестора: робота, маржа, ПДВ та сума, готові до друку.</p>
+        <p><span class="chip">Доступно в LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro — це план на акаунті. Спершу створіть безкоштовний акаунт LiczMat або увійдіть — Pro вмикається лише на акаунті.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fuk%2Fproekty%2F" rel="nofollow">Створити безкоштовний акаунт</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Ваш акаунт на безкоштовному плані. Цей модуль належить до LiczMat Pro.</p>
+
+        
+
+        <p><a class="btn btn-ghost btn-sm" href="/uk/liczmat-pro/" data-i18n="pro_more">Дізнатися про LiczMat Pro</a></p>
+
+        
+      </div>
+            <div id="pdf-tool" hidden>
+              <p class="muted">Документ відкриється у вікні друку. Виберіть у ньому збереження в PDF.</p>
+              <form id="ws-pdf-form">
             <fieldset class="pdf-types">
               <legend class="fld-label">Тип документа</legend>
               <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Технічний звіт</span></label>
@@ -416,7 +486,7 @@
 
             <p><button type="submit" class="btn btn-primary">Підготувати PDF</button></p>
           </form>
-            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+              <article id="ws-pdf-doc" class="pdf-doc" hidden>
             <header class="pdf-head">
               
               <p class="pdf-sub" data-pdf="subtitle"
@@ -468,6 +538,7 @@
 
             <p class="pdf-foot">LiczMat — Порахуй. Сплануй. Зроби.</p>
           </article>
+            </div>
           </section>
         </div>
       </article>
@@ -621,6 +692,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

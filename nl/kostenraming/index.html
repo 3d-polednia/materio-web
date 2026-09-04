@@ -217,10 +217,58 @@
 
   <section class="block alt">
     <div class="wrap narrow">
+      
       <div class="ws-estimate-bar no-print">
         <select id="ws-estimate-project" aria-label="Project" hidden></select>
-        <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Printen / opslaan als PDF</button>
-        <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Download CSV</button>
+        <span id="cost-tool" hidden>
+          <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Printen / opslaan als PDF</button>
+          <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Download CSV</button>
+        </span>
+      </div>
+
+      <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Prijzen en kosten</h2>
+        <p class="muted">Eenheidsprijzen, postwaarde, afvalkosten en projecttotaal. De materiaallijst zonder prijzen blijft gratis.</p>
+        <p><span class="chip">Beschikbaar in LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro is een plan op een account. Maak eerst een gratis LiczMat-account of log in — Pro kan alleen voor een account worden aangezet.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fnl%2Fkostenraming%2F" rel="nofollow">Maak een gratis account</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Je account zit op het gratis plan. Deze module hoort bij LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Wat LiczMat Pro verder dekt</h3>
+          <ul class="pw-incl-list">
+            <li><b>Klanten</b> — <span class="muted">Een lijst met klanten met contactgegevens, notities en de geschiedenis van het werk met hen.</span></li>
+            <li><b>Opdrachten</b> — <span class="muted">Een opdracht met haar klant, omschrijving, status, datum, waarde en het project waar ze bij hoort.</span></li>
+            <li><b>Offertes</b> — <span class="muted">Materiaal, arbeid, andere kosten, marge en het totaal, uit wat je al hebt uitgerekend.</span></li>
+            <li><b>Planning</b> — <span class="muted">De datums van de opdrachten en het belangrijkste erover. Geen tweede Google Agenda.</span></li>
+            <li><b>Geschiedenis en CRM</b> — <span class="muted">Het pad door de hele opdracht: klant → opdracht → project → offerte → geschiedenis.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/nl/liczmat-pro/" data-i18n="pro_more">Bekijk wat LiczMat Pro is</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">LiczMat Pro-abonnement</h3>
+          <p class="muted" data-i18n="pay_d">Eén plan, alle vijf Pro-modules. De betaling loopt via Stripe; zeg op wanneer je wilt en Pro loopt tot het einde van de betaalde periode.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Maandelijks</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ maand</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Jaarlijks</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ jaar — twee maanden goedkoper</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Ga naar je account</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Het abonnement is nog niet te koop. Deze prijzen zijn definitief.</p>
+        </div>
       </div>
 
       <article id="ws-estimate" class="ws-estimate">
@@ -391,6 +439,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

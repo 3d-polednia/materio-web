@@ -50,6 +50,16 @@ const { CALCS, ENGINES, unitLabel } = evalScript(
   ["assets/units.js", "assets/calculators.js"],
   ["CALCS", "ENGINES", "unitLabel"], { document: undefined, window: {} });
 
+/**
+ * What pwAllows() answers inside the shipped store, for the length of one check.
+ *
+ * assets/workspace.js and assets/crm.js ask it before they store a typed amount or write
+ * a quote (the owner’s decision of 2026-09-03). True is the ordinary case and is what the
+ * arithmetic below is written against; a test that wants the refusal sets it to false and
+ * puts it back.
+ */
+let PW_ALLOW = true;
+
 /** assets/workspace.js in Node, on a fresh store — the same stand-ins test-projects uses. */
 function loadWorkspace(seed) {
   const backing = new Map(Object.entries(seed || {}));
@@ -73,6 +83,12 @@ function loadWorkspace(seed) {
     Date: { now: () => clock.now },
     lmCurrency: () => "PLN",
     lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    // What the paywall answers inside the store. `costs` and `quotes` became PRO on
+    // 2026-09-03 and the writes that take a typed amount ask before they store it, so the
+    // default here is an account that reaches them — otherwise every section below would be
+    // testing the refusal instead of the arithmetic. The section that IS about the refusal
+    // sets PW_ALLOW to false itself.
+    pwAllows: () => PW_ALLOW,
   });
   return { ...api, tick: (ms) => { clock.now += ms || 1000; }, now: () => clock.now };
 }

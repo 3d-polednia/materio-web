@@ -131,6 +131,15 @@ async function open(ctx, url, opts = {}) {
   page.on("pageerror", (e) => errors.push(String(e)));
 
   const plant = { "materio-lang": opts.lang === undefined ? "pl" : opts.lang, ...(opts.storage || {}) };
+  if (opts.level) plant["liczmat-signed-in"] = opts.level;
+  /* Every price on these screens, and the PDF export, became LiczMat Pro on 2026-09-03:
+     `costs` and `pdf` are PRO in LM_FEATURES, so a guest gets chapter XXV’s wall where the
+     amounts used to be. A test that is about the priced behaviour has to say which level
+     it is testing, and it says it the way scripts/test-quotes-page.mjs already does:
+     `liczmat-signed-in` is what assets/paywall.js reads (lmReadLevel()) and "pro" is what
+     a real Pro account writes there. `pro: false` looks at the wall instead — and there is
+     a section below that does exactly that, so the free half stays covered too. */
+  if (opts.pro !== false && !opts.level) plant["liczmat-signed-in"] = "pro";
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
     localStorage.clear();
@@ -235,6 +244,11 @@ head("1. the configurator is on the project screen");
   check("the form is there", Boolean(await page.$("#ws-pdf-form")));
   check("and the document too", Boolean(await page.$("#ws-pdf-doc")));
   check("the document starts hidden", await page.$eval("#ws-pdf-doc", (e) => e.hidden));
+  // `open()` plants a Pro session by default (see the note above it) — section 9 below is
+  // the guest/free counterpart, and this is the half it mirrors: the configurator itself
+  // is what a Pro session sees, not the wall.
+  eq("the configurator is unlocked, not walled off", await page.locator("#pdf-tool").isHidden(), false);
+  eq("and no wall is drawn in front of it", await page.locator("#pdf-gate").isHidden(), true);
   check("the investor block is closed while a technical report is chosen",
     await page.$eval("[data-pdf-investor]", (e) => e.hidden));
   // Every disclosure ships closed: the form has twelve controls and a plain report needs
@@ -461,6 +475,58 @@ head("7. chapter XXVIII's widths");
         .map((e) => e.dataset.pdfIn || e.type));
     check(`${width} px: every field is 16 px of text in a 44 px box`, bad.length === 0, bad.join(", "));
   }
+  await page.close();
+}
+
+/* ------------------------------------------------- the export belongs to LiczMat Pro */
+
+/**
+ * The owner's decision of 2026-09-03: a guest and a free account never produce a PDF.
+ *
+ * Every section above runs at the Pro level, which is what `open()` plants. This one runs
+ * at the two levels that do not reach the export and asks three things: that the wall is
+ * what stands there (never a dead control), that the configurator cannot be reached, and
+ * that the document itself is empty — not built and hidden, but never built.
+ */
+head("9. a guest and a free account cannot produce the document");
+for (const level of [undefined, "liczmat"]) {
+  const who = level || "guest";
+  const page = await open(ctx, URL_PL, {
+    pro: false, level, storage: { "materio-workspace-v1": JSON.stringify(WORKSPACE) },
+  });
+  await page.evaluate(() => {
+    window.__printed = 0;
+    window.print = () => { window.__printed++; };
+  });
+  await page.waitForSelector("#pdf-gate");
+
+  eq(`${who}: the configurator is shut`, await page.locator("#pdf-tool").isHidden(), true);
+  eq(`${who}: and the wall is what stands there`,
+    await page.locator("#pdf-gate").isHidden(), false);
+  eq(`${who}: the wall names the export rather than leaving a bare heading`,
+    (await page.innerText("#pdf-gate")).length > 20, true);
+  eq(`${who}: the rung offered is the right one`,
+    await page.locator(`#pdf-gate [data-pw-step="${level ? "upgrade" : "account"}"]`)
+      .first().isHidden(), false);
+
+  /* The form is in the markup, hidden. Submitting it anyway — which is what a script, or
+     a devtools console, can still do — has to produce nothing: no document, no print. */
+  await page.evaluate(() => {
+    const form = document.getElementById("ws-pdf-form");
+    if (form) form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+  });
+  eq(`${who}: submitting the hidden form prints nothing`,
+    await page.evaluate(() => window.__printed), 0);
+  eq(`${who}: the document stays hidden`,
+    await page.locator("#ws-pdf-doc").isHidden(), true);
+  eq(`${who}: and empty — no row was ever written into it`,
+    await page.$eval('#ws-pdf-doc [data-pdf="rows"]', (n) => n.innerHTML.trim()), "");
+  eq(`${who}: no total either`,
+    await page.$eval('#ws-pdf-doc [data-pdf="total"]', (n) => n.textContent.trim()), "");
+  check(`${who}: and no amount anywhere inside it`,
+    !/\d[\d\s., ]*(zł|PLN)/i.test(await page.$eval("#ws-pdf-doc", (n) => n.textContent)),
+    await page.$eval("#ws-pdf-doc", (n) => n.textContent.replace(/\s+/g, " ").slice(0, 160)));
+  check(`${who}: no error in the console`, page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
 

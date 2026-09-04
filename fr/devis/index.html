@@ -217,10 +217,58 @@
 
   <section class="block alt">
     <div class="wrap narrow">
+      
       <div class="ws-estimate-bar no-print">
         <select id="ws-estimate-project" aria-label="Projet" hidden></select>
-        <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Imprimer / enregistrer en PDF</button>
-        <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Télécharger le CSV</button>
+        <span id="cost-tool" hidden>
+          <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Imprimer / enregistrer en PDF</button>
+          <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Télécharger le CSV</button>
+        </span>
+      </div>
+
+      <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Prix et coûts</h2>
+        <p class="muted">Prix unitaires, valeur du poste, coût des déchets et total du projet. La liste des matériaux sans prix reste gratuite.</p>
+        <p><span class="chip">Disponible dans LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro est un forfait posé sur un compte. Crée d'abord un compte LiczMat gratuit ou connecte-toi : Pro ne s'active que sur un compte.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Ffr%2Fdevis%2F" rel="nofollow">Crée un compte gratuit</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Ton compte est sur le forfait gratuit. Ce module appartient à LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Ce que LiczMat Pro couvre encore</h3>
+          <ul class="pw-incl-list">
+            <li><b>Clients</b> — <span class="muted">Une liste de clients avec leurs coordonnées, des notes et l'historique du travail avec eux.</span></li>
+            <li><b>Chantiers</b> — <span class="muted">Un chantier avec son client, sa description, son statut, sa date, son montant et le projet auquel il appartient.</span></li>
+            <li><b>Devis</b> — <span class="muted">Matériaux, main-d'œuvre, autres coûts, marge et total, à partir de ce que tu as déjà calculé.</span></li>
+            <li><b>Échéances</b> — <span class="muted">Les dates des chantiers et l'essentiel à leur sujet. Pas un second Google Agenda.</span></li>
+            <li><b>Historique et CRM</b> — <span class="muted">Le chemin à travers tout le chantier : client → chantier → projet → devis → historique.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/fr/liczmat-pro/" data-i18n="pro_more">Découvre ce qu'est LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Abonnement LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Un forfait, les cinq modules Pro. Le paiement passe par Stripe ; résilie quand tu veux et Pro court jusqu'à la fin de la période payée.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Mensuel</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ mois</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Annuel</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ an — deux mois de moins</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Aller à ton compte</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">L'abonnement n'est pas encore achetable. Ces prix sont définitifs.</p>
+        </div>
       </div>
 
       <article id="ws-estimate" class="ws-estimate">
@@ -391,6 +439,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

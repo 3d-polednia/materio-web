@@ -71,6 +71,16 @@ for (const lang of LANGS) {
 const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 
 /**
+ * What pwAllows() answers inside the shipped store, for the length of one check.
+ *
+ * assets/workspace.js and assets/crm.js ask it before they store a typed amount or write
+ * a quote (the owner’s decision of 2026-09-03). True is the ordinary case and is what the
+ * arithmetic below is written against; a test that wants the refusal sets it to false and
+ * puts it back.
+ */
+let PW_ALLOW = true;
+
+/**
  * assets/workspace.js and assets/crm.js in Node, in one scope — which is how the browser
  * loads them: a quote's three derived figures come out of wsProjectCosts(), and a module's
  * own scope would hide it.
@@ -107,6 +117,12 @@ function loadCrm() {
     },
     lmCurrency: () => clock.currency,
     lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    // What the paywall answers inside the store. `costs` and `quotes` became PRO on
+    // 2026-09-03 and the writes that take a typed amount ask before they store it, so the
+    // default here is an account that reaches them — otherwise every section below would be
+    // testing the refusal instead of the arithmetic. The section that IS about the refusal
+    // sets PW_ALLOW to false itself.
+    pwAllows: () => PW_ALLOW,
   });
   return {
     ...api,
@@ -647,6 +663,150 @@ head("8. the route, and chapter XXV's gate");
     shipped.lmPaywall("quotes", shipped.LM_LEVEL.GUEST).step, "account");
   eq("a free account is offered the upgrade",
     shipped.lmPaywall("quotes", shipped.LM_LEVEL.LICZMAT).step, "upgrade");
+}
+
+/* ========================================= 8b. the gate is a gate, not a `hidden` */
+
+/**
+ * assets/quotes-ui.js in Node, with the paywall's answer and the store handed in.
+ *
+ * A DOM only as large as quoRender() actually touches. `allow` is what pwAllows()
+ * answers; `undefined` leaves the function off the page, which is the case the module has
+ * to close on rather than open on.
+ */
+function loadQuotesUi(allow) {
+  const nodes = new Map();
+  const node = (id) => {
+    if (!nodes.has(id)) {
+      nodes.set(id, {
+        id, hidden: false, innerHTML: "", textContent: "", value: "",
+        querySelector: () => null, querySelectorAll: () => [],
+        addEventListener() {}, setAttribute() {}, getAttribute: () => null,
+        classList: { toggle() {}, remove() {}, add() {} },
+      });
+    }
+    return nodes.get(id);
+  };
+  const figures = ["quo-fig-materials", "quo-fig-sub", "quo-fig-total"].map(node);
+  const asked = { quotes: 0 };
+  const globals = {
+    document: {
+      readyState: "complete",
+      addEventListener() {},
+      getElementById: (id) => (nodes.has(id) || /^quo-/.test(id) ? node(id) : null),
+      querySelectorAll: () => figures,
+      querySelector: () => null,
+      documentElement: { lang: "pl", setAttribute() {} },
+    },
+    window: { addEventListener() {}, LM_LINKS: {} },
+    location: { search: "", pathname: "/wyceny/" },
+    history: { replaceState() {} },
+    URLSearchParams: class { get() { return null; } },
+    Intl,
+    pwRender() {},
+    pwMount() {},
+    crmQuotes: () => { asked.quotes++; return []; },
+    wsMoney: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    wsCurrency: () => "PLN",
+  };
+  if (allow !== undefined) globals.pwAllows = (feature) => Boolean(allow[feature]);
+  const api = evalScript("assets/quotes-ui.js", ["quoAllowed", "quoRender", "quoClear"], globals);
+  return { ...api, node, asked };
+}
+
+head("8b. a guest and a free account get no quote drawn, not a quote hidden");
+{
+  /* Until 2026-09-03 the wall was the whole answer: pwRender() set `hidden` on #quo-tool
+     and every renderer below it went on building names, labour lines and five figures
+     into that hidden element. This is the check that it does not. */
+  eq("with no paywall on the page, the module is shut", loadQuotesUi().quoAllowed(), false);
+  eq("a level that does not reach quotes is shut", loadQuotesUi({}).quoAllowed(), false);
+  eq("and one that does is not", loadQuotesUi({ quotes: true }).quoAllowed(), true);
+
+  const shut = loadQuotesUi({});
+  // What the previous account left on the screen, so the redraw has something to clear.
+  shut.node("quo-list").innerHTML = "<li>Wycena — 4 500,00 PLN</li>";
+  shut.node("quo-fig-total").textContent = "4 500,00 PLN";
+  shut.quoRender();
+  eq("the index is emptied", shut.node("quo-list").innerHTML, "");
+  eq("and so is every figure", shut.node("quo-fig-total").textContent, "");
+  eq("and the store was never asked for a quote", shut.asked.quotes, 0);
+
+  /* The writes. The store is assets/crm.js, which is forbidden to read the session hint
+     (scripts/test-security.mjs §9 — a stale hint must never decide a write), so the guard
+     lives in every handler here instead, and it is checked when the event arrives rather
+     than when the listener is bound: an account can stop being Pro while the page is open. */
+  const src = read("assets/quotes-ui.js");
+  check("every listener on the detail goes through one guard",
+    src.includes("el.addEventListener(event, (e) => { if (quoAllowed()) fn(e); })"));
+  check("the add form asks before it writes", /!name\.value\.trim\(\) \|\| !quoAllowed\(\)\) return;/.test(src));
+  check("so does the undo", /!quoUndone \|\| !quoAllowed\(\)\) return;/.test(src));
+  check("and the cancel button, which is the one listener outside the helper",
+    /if \(!quoAllowed\(\)\) return;\s*[\r\n]+\s*quoEditing = false;/.test(src));
+  check("nothing here calls a write before the question",
+    src.indexOf("const quoAllowed") < src.indexOf("crmAddQuote("));
+
+  // /app/'s own Wyceny panel is the second place a quote can be made, and it asks the
+  // level Firebase gave it rather than the copy hint in storage.
+  const app = read("assets/app.js");
+  check("/app/ asks the plan on the account", app.includes('lmCan("quotes", state.level)'));
+  check("and draws nothing for a level that may not have it",
+    app.includes("if (!canQuotes()) { list.innerHTML = \"\"; return; }"));
+  check("its add form asks too", app.includes("!canQuotes()) return;"));
+  check("and its delete button", app.includes("|| !canQuotes()) return;"));
+
+  /* And the page redraws itself for the level it has just become. pwMount() puts the wall
+     back up; without this the figures written while the account was Pro would still be
+     sitting inside the element the wall hides. */
+  check("signing in or out draws the page again",
+    src.includes('document.addEventListener("lm-session", quoRender)'));
+}
+
+head("8c. the store refuses to write a quote, not only the screen");
+{
+  /* Until 2026-09-04 all seven writes below took whatever they were handed: the check was
+     at the call sites in assets/quotes-ui.js and assets/app.js, and a third call site — or
+     one line in a console — wrote a quote for a free account. assets/crm.js asks
+     crmCanQuote() itself now, and these are the seven. */
+  const crm = loadCrm();
+  const quote = crm.crmAddQuote({ name: "Łazienka — wycena" });
+  check("a Pro account may make one", Boolean(quote));
+  const line = crm.crmAddLabour(quote.id, { name: "Układanie", quantity: 40, priceMajor: 60 });
+  check("and put labour on it", Boolean(line));
+
+  PW_ALLOW = false;
+  try {
+    eq("a level without quotes cannot make one", crm.crmAddQuote({ name: "Kuchnia" }), null);
+    eq("nor correct one", crm.crmUpdateQuote(quote.id, { name: "Zmienione" }), null);
+    eq("nor delete one", crm.crmDeleteQuote(quote.id), null);
+    eq("nor undo a delete", crm.crmRestoreQuote({ id: quote.id }), null);
+    eq("nor add a labour line", crm.crmAddLabour(quote.id, { name: "Fugowanie", quantity: 1 }), null);
+    eq("nor correct one", crm.crmUpdateLabour(quote.id, line.id, { name: "Zmienione" }), null);
+    eq("nor remove one", crm.crmDeleteLabour(quote.id, line.id), null);
+
+    // A refusal writes nothing at all: the store is what it was before any of that.
+    eq("the quote is untouched", crm.crmQuote(quote.id).name, "Łazienka — wycena");
+    eq("its labour line is still there", crm.crmLabour(quote.id).length, 1);
+    eq("and no second quote appeared", crm.crmQuotes().length, 1);
+
+    // The reads stay open on purpose: they are how the page draws a quote for somebody
+    // who may have one, and a store that answered two ways about rows already on this
+    // device would be a second source of truth.
+    check("reading is not gated", crm.crmQuoteTotals(quote.id).total > 0);
+  } finally {
+    PW_ALLOW = true;
+  }
+
+  const store = read("assets/crm.js");
+  check("the store has one place it asks", store.includes("function crmCanQuote()"));
+  check("and it fails closed when the deciding file is absent",
+    store.includes('typeof pwAllows === "function" && pwAllows("quotes")'));
+  check("every one of the seven writes answers to it",
+    (store.match(/if \(!crmCanQuote\(\)\) return null;/g) || []).length === 7);
+  // Chapter XXV's rule from scripts/test-security.mjs §9 still holds: a hint that may be
+  // stale is not what decides a write, so this file reads none of it — pwAllows() does.
+  check("and the session hint is still never read in the store",
+    !store.includes("lmReadLevel") && !store.includes("liczmat-signed-in"));
 }
 
 /* ================================================================== 9. the frame */

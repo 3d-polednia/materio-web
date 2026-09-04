@@ -46,23 +46,41 @@ const evalScript = (file, returns, globals) => evalSource(read(file), returns, g
 const { I18N } = evalScript("assets/i18n.js", ["I18N"]);
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
+
+/* The permission table as the browser has it. The export became Pro on 2026-09-03, so
+   pdfBlock() now draws chapter XXV's wall beside the configurator and proGate() builds it
+   out of LM_FEATURES — a builder called without it would be checking a page the build
+   never writes. */
+const FEATURES = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATURES"]).LM_FEATURES;
+
 const DICT = {};
 for (const lang of LANGS) {
   DICT[lang] = { ...(I18N[lang] || {}), ...(I18N_PAGES[lang] || {}), ...(I18N_MATERIALS[lang] || {}) };
 }
 const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 
-/** assets/pdf-export.js in Node — only the pure half; the DOM half is the page test. */
-function loadPdf() {
-  return evalScript("assets/pdf-export.js", ["pdfNum", "pdfBreakdown", "pdfHasPricing"], {
-    document: { readyState: "complete", addEventListener() {}, getElementById: () => null,
+/**
+ * assets/pdf-export.js in Node — only the pure half; the DOM half is the page test.
+ *
+ * `allow` is what pwAllows() answers, feature by feature: `null` leaves the function off
+ * the page entirely, which is the case the export has to close on rather than open on.
+ * `doc` is the one element pdfFill() writes into, so a refusal can be checked for what it
+ * did NOT do.
+ */
+function loadPdf({ allow = undefined, doc = null } = {}) {
+  const globals = {
+    document: { readyState: "complete", addEventListener() {}, getElementById: (id) => (id === "ws-pdf-doc" ? doc : null),
       documentElement: { lang: "pl" }, querySelector: () => null, querySelectorAll: () => [] },
     window: { addEventListener() {}, removeEventListener() {}, print() {} },
     location: { search: "" },
     setTimeout: () => 0,
     URLSearchParams: class { get() { return null; } },
     Intl,
-  });
+    wsProject: () => ({ id: "p1", name: "Łazienka" }),
+  };
+  if (allow !== undefined) globals.pwAllows = (feature) => Boolean(allow && allow[feature]);
+  return evalScript("assets/pdf-export.js",
+    ["pdfNum", "pdfBreakdown", "pdfHasPricing", "pdfAllowed", "pdfFill"], globals);
 }
 
 /* ------------------------------------------------------------------ the runner */
@@ -182,7 +200,7 @@ head("2. the rows are what wsProjectCosts() counts, and they add up to it");
 
 head("3. the document is markup, not a script's output");
 {
-  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), ["TILES", "OTHER"]);
+  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), ["TILES", "OTHER"], FEATURES);
   check("the block is on the project screen", main.includes('id="ws-pdf"'));
   check("the document ships in the page", main.includes('id="ws-pdf-doc"'));
   check("and starts hidden", /id="ws-pdf-doc"[^>]*hidden/.test(main));
@@ -264,7 +282,7 @@ head("5. the three templates keep their hole");
     }
     // Romanian and Ukrainian do not put the value where Polish does, which is the whole
     // reason the build writes a span between the halves rather than gluing a label on.
-    const { main } = projectsMain(lang, tr(lang), ["TILES"]);
+    const { main } = projectsMain(lang, tr(lang), ["TILES"], FEATURES);
     check(`${lang}: the project line has a slot rather than a glued label`,
       main.includes('<span data-pdf="projectName"></span>'));
   }
@@ -305,7 +323,7 @@ head("7. no key is printed where a visitor can read it");
   let dirty = 0;
   for (const lang of LANGS) {
     const file = lang === DEFAULT_LANG ? "projekty/index.html" : null;
-    const { main } = projectsMain(lang, tr(lang), ["TILES", "OTHER"]);
+    const { main } = projectsMain(lang, tr(lang), ["TILES", "OTHER"], FEATURES);
     const text = main.replace(/<script[\s\S]*?<\/script>/g, " ").replace(/<[^>]*>/g, " ");
     if (KEY.test(text)) { dirty++; check(`${lang} prints a key`, false, KEY.exec(text)[0]); }
     if (file && existsSync(p(file))) {
@@ -316,6 +334,99 @@ head("7. no key is printed where a visitor can read it");
     }
   }
   check("no language prints one", dirty === 0);
+}
+
+/* ============================================== 8. the export belongs to LiczMat Pro */
+
+head("8. a guest and a free account cannot produce a PDF");
+{
+  /* The owner's decision of 2026-09-03. The permission table is the one place it is
+     written down, so it is read here rather than restated: `pdf` and `costs` are both PRO
+     and the export needs both — the document is a list of amounts. */
+  const { LM_FEATURES: FEAT, lmCan, LM_LEVEL } = evalScript(
+    ["assets/account.js", "assets/plan.js"],
+    ["LM_FEATURES", "lmCan", "LM_LEVEL"], { document: undefined, localStorage: undefined });
+
+  const pdf = FEAT.find((f) => f.id === "pdf");
+  check("the table has a feature for the export", Boolean(pdf));
+  eq("and it is Pro", pdf.level, LM_LEVEL.PRO);
+  eq("with a name and a line for the wall it puts up", `${pdf.key}_t`, "feat_pdf_t");
+  eq("the money in the document is Pro too", FEAT.find((f) => f.id === "costs").level, LM_LEVEL.PRO);
+  for (const level of [LM_LEVEL.GUEST, LM_LEVEL.LICZMAT]) {
+    eq(`${level} may not export`, lmCan("pdf", level), false);
+    eq(`${level} may not be shown an amount`, lmCan("costs", level), false);
+  }
+  eq("Pro may do both", lmCan("pdf", LM_LEVEL.PRO) && lmCan("costs", LM_LEVEL.PRO), true);
+
+  /* pdfAllowed() is the browser's half of the same answer, and it fails closed: the file
+     that decides is assets/paywall.js, and a page that lost it gets a refusal rather than
+     a document. */
+  eq("with no paywall on the page at all, the answer is no",
+    loadPdf().pdfAllowed(), false);
+  eq("the export alone is not enough — the amounts in it are Pro too",
+    loadPdf({ allow: { pdf: true } }).pdfAllowed(), false);
+  eq("nor are the amounts alone",
+    loadPdf({ allow: { costs: true } }).pdfAllowed(), false);
+  eq("both, and only both", loadPdf({ allow: { pdf: true, costs: true } }).pdfAllowed(), true);
+
+  /* And the refusal is a document that was never built. pdfFill() is handed a real
+     project and a document element that starts visible; what comes back is `false` and an
+     element still hidden, with nothing written into it. */
+  const slot = (extra) => ({ textContent: "4 500,00 zł", innerHTML: "<tr><td>Klej</td></tr>",
+    hidden: false, ...extra });
+  const filled = { rows: slot(), total: slot(), gross: slot() };
+  const doc = {
+    hidden: false,
+    dataset: {},
+    querySelector: (sel) => (sel === '[data-pdf="rows"]' ? filled.rows : null),
+    querySelectorAll: (sel) => (sel === "[data-pdf]"
+      ? [filled.rows, filled.total, filled.gross] : [filled.total, filled.gross]),
+  };
+  const refused = loadPdf({ allow: { pdf: false, costs: false }, doc });
+  eq("pdfFill() refuses for a level that may not export", refused.pdfFill("p1", { type: "investor" }), false);
+  eq("and leaves the document hidden", doc.hidden, true);
+
+  /* Hiding it is not enough. The document is markup that stays on the page between
+     prints, so one filled in while the account was Pro is still holding every row and
+     every amount after the plan lapses or somebody signs out in another tab. */
+  eq("the table is emptied", filled.rows.innerHTML, "");
+  eq("so is the total", filled.total.textContent, "");
+  eq("and the investor gross", filled.gross.textContent, "");
+  eq("and every row of the document is taken off the page", filled.total.hidden, true);
+
+  check("the redraw on a session change empties it too",
+    read("assets/pdf-export.js")
+      .includes('document.addEventListener("lm-session", () => { if (!pdfAllowed()) pdfClear(); })'));
+
+  const src = read("assets/pdf-export.js");
+  check("the flow asks before it writes anything",
+    /if \(!pdfAllowed\(\)\) \{\s*[\r\n]+\s*pdfClear\(\);\s*[\r\n]+\s*return false;/.test(src));
+  // Two guards on one button on purpose: the first is the path a visitor takes, the
+  // second is the same function called from a console with the form already on screen.
+  check("the submit listener asks twice — once before the document, once before printing",
+    (src.match(/if \(!pdfAllowed\(\)\) return;/g) || []).length >= 2);
+  check("and the print dialog is never opened before the second one",
+    src.indexOf("if (!pdfAllowed()) return;") < src.indexOf("window.print()"));
+
+  /* The markup half: the configurator ships shut and the wall ships beside it, both from
+     the first paint. A form that is drawn open and then closed by a script is a form that
+     was on the screen. */
+  for (const lang of LANGS) {
+    const { main } = projectsMain(lang, tr(lang), ["TILES"], FEATURES);
+    check(`${lang}: the wall is in the page`, main.includes('id="pdf-gate"'));
+    check(`${lang}: the configurator is wrapped and hidden`,
+      main.includes('<div id="pdf-tool" hidden>'));
+    check(`${lang}: the wall names the export`, main.includes(tr(lang)("feat_pdf_t")));
+    check(`${lang}: and says what it is`, main.includes(tr(lang)("feat_pdf_d")));
+  }
+
+  /* /kosztorys/'s own print button is the second way to a PDF on this site, and it asks
+     the same question. */
+  const ui = read("assets/workspace-ui.js");
+  check("the print button on /kosztorys/ asks before it prints",
+    ui.includes("if (wsCanPdf()) window.print()"));
+  check("and wsCanPdf() needs both halves, like pdfAllowed()",
+    /const wsCanPdf = \(\) => wsCanCost\(\) &&[\s\S]{0,80}pwAllows\("pdf"\)/.test(ui));
 }
 
 /* ------------------------------------------------------------------ report */

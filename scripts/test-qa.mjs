@@ -430,47 +430,40 @@ async function walk(cfg) {
 
   /* ---------------------------------------------------------------- 9. koszty */
 
-  head(`${who} — 9. koszty: the material's price, a cost nothing calculated, three figures`);
+  /* The walk used to price the material here, on the free account, because until
+     2026-09-03 it could. The owner moved every price, the quote and the PDF into LiczMat
+     Pro, so this step is now the half of chapter XVII a free account keeps — the material
+     list, with no money on it — and the pricing itself is step 10b, after the plan that
+     opens it. The journey is the same journey; what changed is where the money starts. */
+  head(`${who} — 9. koszty: what a free account sees where the money used to be`);
   const MATS = "#ws-project-materials";
   const matId = shopping[0].id;
+  eq("the material is on the list, because the list is free",
+    await page.locator(`${MATS} li[data-id="${matId}"]`).count(), 1);
+  const freeRow = (await textOf(page, `${MATS} li[data-id="${matId}"]`)).replace(/\s+/g, " ");
+  check("and it carries no amount", !/\d[\d\s., ]*(zł|PLN|€|EUR|\$|USD|£|GBP|₴|UAH|Kč|CZK|lei|RON|RSD|дин)/i
+    .test(freeRow), freeRow);
+
+  eq("the three figures are behind chapter XXV's wall",
+    await page.locator("#cost-tool").isHidden(), true);
+  eq("and the wall is what stands there instead",
+    await page.locator("#cost-gate").isHidden(), false);
+  eq("the rung offered is the upgrade, because there is an account to put it on",
+    await page.locator('#cost-gate [data-pw-step="upgrade"]').first().isHidden(), false);
+  eq('"inne koszty" is behind it too, being nothing but money',
+    await page.locator("#cost-other-tool").isHidden(), true);
+  eq("the PDF export is walled as well", await page.locator("#pdf-tool").isHidden(), true);
+  eq("with its own wall in front of it", await page.locator("#pdf-gate").isHidden(), false);
+
+  /* Never a dead control: the price field is not on the form at all, rather than sitting
+     there taking a number nothing will store. */
   await page.click(`${MATS} li[data-id="${matId}"] [data-edit]`);
-  await page.waitForSelector(`${MATS} [data-f="priceMajor"]`);
-  check("the price field names the currency the row is priced in",
-    (await page.innerText(`${MATS} form[data-mat-edit]`)).includes(`(${cur})`),
-    await page.innerText(`${MATS} form[data-mat-edit]`));
-  await page.fill(`${MATS} [data-f="priceMajor"]`, "60");
-  await page.click(`${MATS} form[data-mat-edit] button[type=submit]`);
+  await page.waitForSelector(`${MATS} form[data-mat-edit]`);
+  eq("the row still opens for editing — the name and the quantity are free",
+    await page.locator(`${MATS} [data-f="quantity"]`).count(), 1);
+  eq("and there is no price field on it", await page.locator(`${MATS} [data-f="priceMajor"]`).count(), 0);
+  await page.click(`${MATS} form[data-mat-edit] [data-cancel]`);
   await page.waitForSelector(`${MATS} form[data-mat-edit]`, { state: "detached" });
-
-  await page.click("#ws-other-add summary");
-  await page.fill("#ws-other-name", "Wywóz gruzu");
-  await page.fill("#ws-other-cost", "400");
-  await page.click("#ws-other-form button[type=submit]");
-  await page.waitForFunction(() =>
-    document.querySelectorAll("#ws-project-other-list > li[data-id]").length > 0);
-
-  const priced = await store(page);
-  const item = priced.shoppingItems.find((s) => s.id === matId);
-  const qty = item.quantity;
-  const materialsMinor = Math.round(qty * 6000);
-  const OTHER_MINOR = 40000;
-  eq("the price typed on the row became the total for it",
-    item.estimatedCostMinor, Math.round(qty * 6000));
-  const other = priced.estimations.find((e) => (e.inputJson || "").includes("manual"));
-  eq("the hand-typed cost is a line of its own", other.totalCostMinor, OTHER_MINOR);
-  eq("in the visitor's currency", other.currencyCode, cur);
-
-  const figs = {
-    mat: await textOf(page, "#ws-project-mat"),
-    other: await textOf(page, "#ws-project-other"),
-    total: await textOf(page, "#ws-project-total"),
-  };
-  eq("the material figure is the priced list", minorOf(figs.mat), materialsMinor);
-  eq("the other-costs figure is the cost nobody calculated", minorOf(figs.other), OTHER_MINOR);
-  eq("and the sum is the two added once",
-    minorOf(figs.total), materialsMinor + OTHER_MINOR);
-  eq("one currency in the project, so no warning",
-    await page.locator("#ws-project-mixed").isHidden(), true);
   check("nothing scrolls sideways", (await overflow(page)) <= 1, `${await overflow(page)}px`);
 
   /* ---------------------------------------------------------------- 10. LICZMAT PRO */
@@ -525,6 +518,59 @@ async function walk(cfg) {
   eq("the level is derived from the plan, not asserted by the browser", await level(pro), "pro");
   check("no error on the account page", pro.lmErrors.length === 0, pro.lmErrors.join("\n      "));
   await pro.close();
+
+  /* ------------------------------------------------------------- 10b. koszty, opened */
+
+  /* Chapter XVII, now that the plan reaches it: the same three figures the walk has always
+     checked, in the same project, on the same material — moved down the journey rather
+     than dropped from it. The wall step above and this one are the two halves of the
+     owner's decision, and both are walked. */
+  head(`${who} — 10b. koszty: the wall is down, and the money is on the screen`);
+  await go(openProject);
+  eq("the three figures are on the page now", await page.locator("#cost-tool").isHidden(), false);
+  eq("and the wall is gone", await page.locator("#cost-gate").isHidden(), true);
+  eq('"inne koszty" is back', await page.locator("#cost-other-tool").isHidden(), false);
+  eq("and so is the PDF export", await page.locator("#pdf-tool").isHidden(), false);
+
+  await page.click(`${MATS} li[data-id="${matId}"] [data-edit]`);
+  await page.waitForSelector(`${MATS} [data-f="priceMajor"]`);
+  check("the price field names the currency the row is priced in",
+    (await page.innerText(`${MATS} form[data-mat-edit]`)).includes(`(${cur})`),
+    await page.innerText(`${MATS} form[data-mat-edit]`));
+  await page.fill(`${MATS} [data-f="priceMajor"]`, "60");
+  await page.click(`${MATS} form[data-mat-edit] button[type=submit]`);
+  await page.waitForSelector(`${MATS} form[data-mat-edit]`, { state: "detached" });
+
+  await page.click("#ws-other-add summary");
+  await page.fill("#ws-other-name", "Wywóz gruzu");
+  await page.fill("#ws-other-cost", "400");
+  await page.click("#ws-other-form button[type=submit]");
+  await page.waitForFunction(() =>
+    document.querySelectorAll("#ws-project-other-list > li[data-id]").length > 0);
+
+  const priced = await store(page);
+  const item = priced.shoppingItems.find((s) => s.id === matId);
+  const qty = item.quantity;
+  const materialsMinor = Math.round(qty * 6000);
+  const OTHER_MINOR = 40000;
+  eq("the price typed on the row became the total for it",
+    item.estimatedCostMinor, Math.round(qty * 6000));
+  const other = priced.estimations.find((e) => (e.inputJson || "").includes("manual"));
+  eq("the hand-typed cost is a line of its own", other.totalCostMinor, OTHER_MINOR);
+  eq("in the visitor's currency", other.currencyCode, cur);
+
+  const figs = {
+    mat: await textOf(page, "#ws-project-mat"),
+    other: await textOf(page, "#ws-project-other"),
+    total: await textOf(page, "#ws-project-total"),
+  };
+  eq("the material figure is the priced list", minorOf(figs.mat), materialsMinor);
+  eq("the other-costs figure is the cost nobody calculated", minorOf(figs.other), OTHER_MINOR);
+  eq("and the sum is the two added once",
+    minorOf(figs.total), materialsMinor + OTHER_MINOR);
+  eq("one currency in the project, so no warning",
+    await page.locator("#ws-project-mixed").isHidden(), true);
+  check("nothing scrolls sideways", (await overflow(page)) <= 1, `${await overflow(page)}px`);
 
   /* ---------------------------------------------------------------- 11. klient */
 
@@ -797,14 +843,29 @@ async function walk(cfg) {
   await out.close();
 
   /* Chapter II and FIRESTORE_SYNC §1.2: counting never requires an account, and the
-     workspace is this browser's. So the project, its material and its money have to be
-     exactly where they were — signing out is not a wipe. */
+     workspace is this browser's. So the project and its material have to be exactly where
+     they were — signing out is not a wipe.
+
+     What signing out DOES take away, since 2026-09-03, is the money: `costs` is Pro, and
+     the wall goes back up in front of the three figures. The two halves are checked apart
+     on purpose. The amount is still in the store, byte for byte — a lapsed plan withholds
+     a figure, it does not delete somebody's work — and it is no longer on the screen. */
   await go(openProject);
   eq("the project is still here", (await store(page)).projects.length, 1);
   eq("with its material still on the list",
     await page.locator(`${MATS} li[data-id="${matId}"]`).count(), 1);
-  eq("and the money it was priced at",
-    minorOf(await textOf(page, "#ws-project-total")), materialsMinor + OTHER_MINOR);
+  const kept = await store(page);
+  eq("the price it was given is still in the store",
+    kept.shoppingItems.find((s) => s.id === matId).estimatedCostMinor, materialsMinor);
+  eq("and so is the cost nobody calculated",
+    kept.estimations.find((e) => (e.inputJson || "").includes("manual")).totalCostMinor,
+    OTHER_MINOR);
+  eq("but the three figures are behind the wall again",
+    await page.locator("#cost-tool").isHidden(), true);
+  eq("with the wall in their place", await page.locator("#cost-gate").isHidden(), false);
+  eq("and the total is not printed anywhere on the screen",
+    await page.locator("#ws-project-total").isVisible(), false);
+  eq("the PDF export is shut too", await page.locator("#pdf-tool").isHidden(), true);
   eq("the header's account button drops its mark",
     await page.getAttribute(".nav-cta[data-account-cta]", "data-level"), null);
 

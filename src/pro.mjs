@@ -26,10 +26,18 @@ import { DEFAULT_LANG, URL_APP } from "./site.mjs";
 /**
  * The Pro modules, in the order the master plan builds them (chapter XXXII).
  *
+ * A module is a screen LiczMat Pro is sold as, and that is not the same thing as a PRO
+ * permission. Since 2026-09-03 the table also carries `costs` and `pdf` — the priced half
+ * of /projekty/ and /kosztorys/, which are pages anybody may open — and those two are
+ * marked `module: false` in assets/plan.js. They are gated, walled and named to the
+ * visitor like everything else Pro; they are simply not items on the list of modules the
+ * public page and every wall recite. Filtering them out here is what keeps that list the
+ * five screens it describes.
+ *
  * @param {object[]} features LM_FEATURES from assets/plan.js
  */
 export const proModules = (features) => features
-  .filter((f) => f.level === LEVEL.PRO)
+  .filter((f) => f.level === LEVEL.PRO && f.module !== false)
   .slice()
   .sort((a, b) => (a.session || 0) - (b.session || 0));
 
@@ -182,7 +190,18 @@ export function proPlansBlock(t, opts) {
  * @param {string} id          the LM_FEATURES id this wall stands in front of
  * @param {object[]} features LM_FEATURES, for the list of everything Pro contains
  * @param {string} lang       the page's language
- * @param {object} opts       { id } the element id, matching the page's prefix
+ * @param {object} opts       { id } the element id, matching the page's prefix.
+ *   { back } the id of the route the visitor should be returned to after signing up, for
+ *   a feature that carries no route of its own — `pdf` is offered on two pages and names
+ *   neither, so the page that draws the wall says which one it is.
+ *   { brief } the second wall on a page that already carries one. It keeps the name, the
+ *   line, the chip and the rung — everything that tells this visitor what they have run
+ *   into and what to do about it — and drops the two blocks the first wall on the page has
+ *   already shown them: the list of what else Pro contains, and the price of both plans.
+ *   Quoting the same fee twice on one screen is the wall arguing with itself, and the
+ *   money is never in two places on this site for the same reason two totals never are.
+ *   /projekty/ is the page that needs it: the three figures are `costs` and the export is
+ *   `pdf`, two permissions and therefore two walls, in one document.
  */
 export function proGate(t, featureId, features, lang, opts) {
   const feature = features.find((f) => f.id === featureId);
@@ -195,7 +214,8 @@ export function proGate(t, featureId, features, lang, opts) {
   // in assets/account.js, which accepts a path on this site and nothing else — the
   // address here is this page's own, in this page's language, so the way back lands on
   // the wall the visitor was stopped by rather than on the Polish front page.
-  const back = route(feature.route) ? route(feature.route).path(lang) : "/";
+  const home = route((opts && opts.back) || feature.route);
+  const back = home ? home.path(lang) : "/";
   const signup = `${URL_APP}?mode=signup&amp;next=${encodeURIComponent(back)}`;
 
   // Chapter XXV's "prezentacja funkcji Pro". The module this wall belongs to is described
@@ -206,6 +226,16 @@ export function proGate(t, featureId, features, lang, opts) {
     .filter((f) => f.id !== feature.id)
     .map((f) => `<li><b>${esc(t(`${f.key}_t`))}</b> — <span class="muted">${esc(t(`${f.key}_d`))}</span></li>`)
     .join("\n            ");
+
+  // The two blocks a second wall on the same page leaves to the first — see `brief`.
+  const brief = Boolean(opts && opts.brief);
+  const included = brief ? "" : `<div class="pw-incl">
+          <h3>${esc(t("pro_incl_t"))}</h3>
+          <ul class="pw-incl-list">
+            ${others}
+          </ul>
+        </div>`;
+  const plans = brief ? "" : proPlansBlock(t, { checkout: false });
 
   return `<div class="app-card crm-gate pw-gate" id="${id}" hidden>
         <h2>${esc(t(`${feature.key}_t`))}</h2>
@@ -220,16 +250,11 @@ export function proGate(t, featureId, features, lang, opts) {
         </p>
         <p class="pw-step" data-pw-step="upgrade" hidden>${esc(t("pro_need_pro"))}</p>
 
-        <div class="pw-incl">
-          <h3>${esc(t("pro_incl_t"))}</h3>
-          <ul class="pw-incl-list">
-            ${others}
-          </ul>
-        </div>
+        ${included}
 
         <p>${proMoreLink(t, lang)}</p>
 
-        ${proPlansBlock(t, { checkout: false })}
+        ${plans}
       </div>`;
 }
 

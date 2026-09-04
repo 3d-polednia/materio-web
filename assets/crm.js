@@ -654,6 +654,36 @@ function crmQty(v) {
   return n;
 }
 
+/**
+ * May this browser write a quote at all? — `quotes` in LM_FEATURES, PRO since session 24.
+ *
+ * The owner's decision of 2026-09-03 is that a guest and a free account never produce a
+ * quote, and until then the whole of the enforcement was in the pages: assets/quotes-ui.js
+ * and assets/app.js asked before they called, and this file wrote whatever it was handed.
+ * A gate that only exists at the call sites is a gate that a second call site, or one line
+ * typed into a console, walks straight round. So the store asks as well, and every one of
+ * the seven writes below answers to it.
+ *
+ * **The reads are deliberately not gated.** crmQuotes() and crmQuoteTotals() are how the
+ * page draws a quote for somebody who may have one, and refusing them here would mean the
+ * store answering two ways about rows that are already on this device.
+ *
+ * The question goes to pwAllows() in assets/paywall.js, which is loaded on every page that
+ * loads this file. A missing pwAllows() is a refusal: if the file that decides is not
+ * there, the answer this one does not have is "no". Note what is *not* asked — the session
+ * hint is never read here directly, because a hint that may be stale must not be what
+ * decides a write (scripts/test-security.mjs §9); pwAllows() owns that reading and this
+ * file owns none of it.
+ *
+ * Nothing here is a security boundary. The store is `localStorage` on one device, and a
+ * visitor editing this file in their own devtools writes what they like — the note at the
+ * top of assets/plan.js says the same thing about the whole model. It is the product
+ * decision, enforced in the one place a browser can enforce anything.
+ */
+function crmCanQuote() {
+  return typeof pwAllows === "function" && pwAllows("quotes");
+}
+
 /** A margin in percent: never negative, never past the cap, never more than two decimals. */
 function crmPct(v) {
   if (v === undefined || v === null || String(v).trim() === "") return 0;
@@ -684,6 +714,8 @@ const crmProjectQuotes = (projectId) =>
  * @returns {object|null} the stored quote, or null when there is no name
  */
 function crmAddQuote(fields) {
+  // The plan on the account, asked in the store as well as at the call site.
+  if (!crmCanQuote()) return null;
   const f = fields || {};
   const name = crmText(f.name, CRM_MAX_NAME);
   if (!name) return null;
@@ -713,6 +745,8 @@ function crmAddQuote(fields) {
 
 /** Correct a quote in place. Anything not passed keeps its current value. */
 function crmUpdateQuote(id, fields) {
+  // The plan on the account, asked in the store as well as at the call site.
+  if (!crmCanQuote()) return null;
   const f = fields || {};
   const data = crmLoad();
   const quote = data.quotes.find((q) => q.id === id && !q.deletedAt);
@@ -738,6 +772,8 @@ function crmUpdateQuote(id, fields) {
  * @returns {{id:string, at:number}|null} hand it to crmRestoreQuote()
  */
 function crmDeleteQuote(id) {
+  // The plan on the account, asked in the store as well as at the call site.
+  if (!crmCanQuote()) return null;
   const data = crmLoad();
   const quote = data.quotes.find((q) => q.id === id && !q.deletedAt);
   if (!quote) return null;
@@ -750,6 +786,8 @@ function crmDeleteQuote(id) {
 
 /** Undo one delete — the same tombstone-clearing as crmRestoreJob(). */
 function crmRestoreQuote(token) {
+  // The plan on the account, asked in the store as well as at the call site.
+  if (!crmCanQuote()) return null;
   const id = typeof token === "string" ? token : (token && token.id);
   if (!id) return null;
   const data = crmLoad();
@@ -820,6 +858,8 @@ function crmStampQuote(quote) {
  * @returns {object|null} the stored quote, or null when there is no name or no room left
  */
 function crmAddLabour(quoteId, fields) {
+  // The plan on the account, asked in the store as well as at the call site.
+  if (!crmCanQuote()) return null;
   const f = fields || {};
   const name = crmText(f.name, CRM_MAX_NAME);
   if (!name) return null; // a labour line with no name is a number nobody can explain
@@ -850,6 +890,8 @@ function crmAddLabour(quoteId, fields) {
  * numbers were on screen together when it was saved.
  */
 function crmUpdateLabour(quoteId, lineId, fields) {
+  // The plan on the account, asked in the store as well as at the call site.
+  if (!crmCanQuote()) return null;
   const f = fields || {};
   const data = crmLoad();
   const quote = data.quotes.find((q) => q.id === quoteId && !q.deletedAt);
@@ -872,6 +914,8 @@ function crmUpdateLabour(quoteId, lineId, fields) {
 
 /** Take one labour line off a quote. */
 function crmDeleteLabour(quoteId, lineId) {
+  // The plan on the account, asked in the store as well as at the call site.
+  if (!crmCanQuote()) return null;
   const data = crmLoad();
   const quote = data.quotes.find((q) => q.id === quoteId && !q.deletedAt);
   if (!quote || !Array.isArray(quote.labour)) return null;

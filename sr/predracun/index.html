@@ -217,10 +217,58 @@
 
   <section class="block alt">
     <div class="wrap narrow">
+      
       <div class="ws-estimate-bar no-print">
         <select id="ws-estimate-project" aria-label="Projekat" hidden></select>
-        <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Štampa / sačuvaj PDF</button>
-        <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Preuzmi CSV</button>
+        <span id="cost-tool" hidden>
+          <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">Štampa / sačuvaj PDF</button>
+          <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">Preuzmi CSV</button>
+        </span>
+      </div>
+
+      <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Cene i troškovi</h2>
+        <p class="muted">Jedinične cene, vrednost stavke, trošak otpada i zbir projekta. Spisak materijala bez cena ostaje besplatan.</p>
+        <p><span class="chip">Dostupno u LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je plan uz nalog. Otvori prvo besplatan LiczMat nalog ili se prijavi — Pro može da se uključi samo na nalogu.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fsr%2Fpredracun%2F" rel="nofollow">Otvori besplatan nalog</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tvoj nalog je na besplatnom planu. Ovaj modul pripada LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Šta još obuhvata LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Klijenti</b> — <span class="muted">Spisak klijenata sa kontakt podacima, beleškama i istorijom saradnje.</span></li>
+            <li><b>Nalozi</b> — <span class="muted">Nalog sa klijentom, opisom, statusom, rokom, vrednošću i pripadajućim projektom.</span></li>
+            <li><b>Ponude</b> — <span class="muted">Materijal, rad, dodatni troškovi, marža i zbir — iz onoga što si već izračunao.</span></li>
+            <li><b>Rokovi</b> — <span class="muted">Rokovi naloga i osnovni podaci o njima. Ne drugi Google kalendar.</span></li>
+            <li><b>Istorija i CRM</b> — <span class="muted">Put kroz ceo posao: klijent → nalog → projekat → ponuda → istorija.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/sr/liczmat-pro/" data-i18n="pro_more">Upoznaj LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Pretplata na LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Jedan plan, svih pet Pro modula. Plaćanje vodi Stripe; otkažeš kad god želiš, a Pro radi do kraja plaćenog perioda.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Mesečno</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ mesec</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Godišnje</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ godina — dva meseca jeftinije</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Idi na svoj nalog</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Pretplata još ne može da se kupi. Cene su konačne.</p>
+        </div>
       </div>
 
       <article id="ws-estimate" class="ws-estimate">
@@ -391,6 +439,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

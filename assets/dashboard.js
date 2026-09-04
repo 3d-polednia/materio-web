@@ -19,6 +19,12 @@
  * The page has no per-language URL (it is noindex and shows private data), so every
  * string here comes from t() and every list is redrawn on `langchange`. A row rendered
  * once would otherwise stay in the language it was drawn in.
+ *
+ * `costs` turned PRO on 2026-09-04 (assets/plan.js). This page still asks no server, so
+ * it cannot know the level for certain the way /app/ can — dashCanCost() below reads the
+ * same copy hint dashRenderLevel() already read for the identity chip. That is weaker than
+ * /app/'s answer and known to be (docs/MASTER_PLAN.md); it is not weaker than what
+ * /projekty/ and /kosztorys/ already ship with.
  */
 
 /** How many rows each section shows before the "see all" link takes over. */
@@ -54,6 +60,21 @@ function dashDate(ms) {
 
 /** One `<li class="empty">` — every section says what to do instead of showing nothing. */
 const dashEmpty = (key) => `<li class="empty muted" data-dash-empty>${dashEsc(dashT(key))}</li>`;
+
+/**
+ * May this browser show a price? — `costs` in LM_FEATURES, PRO since 2026-09-04.
+ *
+ * This page talks to no server (see the file header): it cannot ask Firebase for the
+ * real level the way `state.level` on /app/ can, so it reads the same `liczmat-signed-in`
+ * hint lmReadLevel() already reads for the identity chip — the same limitation
+ * /projekty/ and /kosztorys/ carry (docs/MASTER_PLAN.md), not a new one. A missing
+ * lmCan() — assets/plan.js failed to load — is a refusal, not a default of "show it":
+ * nothing here computes or prints an amount for a level that does not reach `costs`.
+ */
+function dashCanCost() {
+  const level = typeof lmReadLevel === "function" ? lmReadLevel() : "guest";
+  return typeof lmCan === "function" && lmCan("costs", level);
+}
 
 /* ------------------------------------------------------------------ the identity strip */
 
@@ -95,6 +116,7 @@ function dashRenderProjects() {
   if (!list) return;
   const projects = wsProjects();
   const active = wsActiveProjectId();
+  const canCost = dashCanCost();
 
   if (!projects.length) { list.innerHTML = dashEmpty("dash_projects_empty"); return; }
 
@@ -103,14 +125,20 @@ function dashRenderProjects() {
     // The money is chapter XVII's project total — the materials plus the costs nothing
     // calculated — so the dashboard, /projekty/ and the project screen give one answer to
     // "what does this cost". The count beside it is still the count of saved lines.
-    const costs = wsProjectCosts(p.id);
-    const money = costs.total ? ` · ${dashEsc(wsMoney(costs.total, costs.currencyCode))}` : "";
-    // Lines saved in different currencies do not add up. /kosztorys/ has room for the
-    // whole sentence; a row has room for two words and the sentence as its tooltip. What
-    // it must not do is print the sum as though it meant something.
-    const mixed = costs.mixed
-      ? ` <span class="chip warn" title="${dashEsc(dashT("ws_mixed_currency"))}">${dashEsc(dashT("dash_mixed"))}</span>`
-      : "";
+    // PRO since 2026-09-04 (dashCanCost()): a free account or a guest gets the count and
+    // the date and nothing else — wsProjectCosts() is not even asked.
+    let money = "";
+    let mixed = "";
+    if (canCost) {
+      const costs = wsProjectCosts(p.id);
+      money = costs.total ? ` · ${dashEsc(wsMoney(costs.total, costs.currencyCode))}` : "";
+      // Lines saved in different currencies do not add up. /kosztorys/ has room for the
+      // whole sentence; a row has room for two words and the sentence as its tooltip. What
+      // it must not do is print the sum as though it meant something.
+      mixed = costs.mixed
+        ? ` <span class="chip warn" title="${dashEsc(dashT("ws_mixed_currency"))}">${dashEsc(dashT("dash_mixed"))}</span>`
+        : "";
+    }
     return `<li data-id="${dashEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
         <span class="row-name">
           <b>${dashEsc(p.name)}</b>
@@ -151,9 +179,11 @@ function dashRenderRecent() {
 
   if (!rows.length) { list.innerHTML = dashEmpty("dash_recent_empty"); return; }
 
+  const canCost = dashCanCost();
   list.innerHTML = rows.map((r) => {
     const where = names[r.projectId] ? `${dashEsc(names[r.projectId])} · ` : "";
-    const cost = r.totalCostMinor > 0
+    // PRO since 2026-09-04: the same dashCanCost() the project list above reads.
+    const cost = canCost && r.totalCostMinor > 0
       ? `<em class="muted">${dashEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</em>` : "";
     return `<li>
         <span class="row-name">
@@ -232,7 +262,9 @@ function buildDashboard() {
 
   document.addEventListener("workspacechange", dashRender);
   document.addEventListener("lm-recent", dashRenderTools);
-  document.addEventListener("lm-session", dashRenderLevel);
+  // Since 2026-09-04 the identity chip is not the only thing this reads the hint for —
+  // dashCanCost() does too, so a level that moved has to redraw the money along with it.
+  document.addEventListener("lm-session", dashRender);
   // Saved lines keep the currency they were priced in; the totals still have to be
   // relabelled when the visitor switches, exactly as /projekty/ and /kosztorys/ do.
   document.addEventListener("currencychange", dashRender);

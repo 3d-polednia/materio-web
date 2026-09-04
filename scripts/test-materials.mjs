@@ -58,6 +58,22 @@ for (const lang of LANGS) {
 const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 
 const { MAT_CATS } = evalScript("assets/materials.js", ["MAT_CATS"], { module: undefined });
+/* The permission table as the browser has it. Since 2026-09-03 /projekty/ and
+   /kosztorys/ draw chapter XXV’s wall in front of the money on them, and proGate()
+   builds that wall out of LM_FEATURES — so a page builder called without it would be
+   checking a page the build never writes. */
+const FEATURES = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATURES"]).LM_FEATURES;
+
+
+/**
+ * What pwAllows() answers inside the shipped store, for the length of one check.
+ *
+ * assets/workspace.js and assets/crm.js ask it before they store a typed amount or write
+ * a quote (the owner’s decision of 2026-09-03). True is the ordinary case and is what the
+ * arithmetic below is written against; a test that wants the refusal sets it to false and
+ * puts it back.
+ */
+let PW_ALLOW = true;
 
 /** assets/workspace.js in Node, on a store that starts out however the test wants it. */
 function loadWorkspace(seed) {
@@ -86,6 +102,12 @@ function loadWorkspace(seed) {
     Date: { now: () => clock.now },
     lmCurrency: () => clock.currency || "PLN",
     lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    // What the paywall answers inside the store. `costs` and `quotes` became PRO on
+    // 2026-09-03 and the writes that take a typed amount ask before they store it, so the
+    // default here is an account that reaches them — otherwise every section below would be
+    // testing the refusal instead of the arithmetic. The section that IS about the refusal
+    // sets PW_ALLOW to false itself.
+    pwAllows: () => PW_ALLOW,
   });
   return {
     ...api,
@@ -540,7 +562,7 @@ head("3h. the units a hand-typed material is offered");
         DICT[lang][key]);
     }
   }
-  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), MAT_CATS);
+  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), MAT_CATS, FEATURES);
   check("the page carries the suggestion list", main.includes('id="ws-mat-units"'));
   for (const unit of ["m²", "kg", "l"]) {
     check(`it offers ${unit}`, main.includes(`value="${unit}"`), unit);
@@ -589,7 +611,7 @@ head("3d. the store carries materials in and out with everything else");
 
 head("4. the build writes the frame the list is drawn into");
 {
-  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), MAT_CATS);
+  const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), MAT_CATS, FEATURES);
   const needs = [
     "ws-project-materials", "ws-mat-tally",
     // Session 18: the form that types a material in by hand.
@@ -616,7 +638,7 @@ head("4. the build writes the frame the list is drawn into");
   // The frame is server-rendered in every language, so the section exists with the script
   // off; what is missing then is the rows, which come out of this browser's own storage.
   for (const lang of LANGS) {
-    const built = projectsMain(lang, tr(lang), MAT_CATS).main;
+    const built = projectsMain(lang, tr(lang), MAT_CATS, FEATURES).main;
     check(`${lang}: the section is in the page`, built.includes('id="ws-project-materials"'));
     check(`${lang}: with the heading in that language`, built.includes(tr(lang)("proj_mat_t")));
     check(`${lang}: and the add form in that language`, built.includes(tr(lang)("proj_mat_add")));

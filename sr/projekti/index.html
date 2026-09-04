@@ -203,13 +203,63 @@
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
 
           
+          
           <div class="ws-project-figs">
             <p class="ws-project-fig"><span class="eyebrow muted">Stavki</span> <b id="ws-project-count"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Trošak materijala</span> <b id="ws-project-mat"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">Ostali troškovi</span> <b id="ws-project-other"></b></p>
-            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Zbir projekta</span> <b id="ws-project-total"></b></p>
           </div>
-          <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Stavke su u različitim valutama. Zbir ih sabira, ali ništa ne preračunava po kursu — proveri valute u koloni troška.</p>
+
+          <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
+        <h2>Cene i troškovi</h2>
+        <p class="muted">Jedinične cene, vrednost stavke, trošak otpada i zbir projekta. Spisak materijala bez cena ostaje besplatan.</p>
+        <p><span class="chip">Dostupno u LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je plan uz nalog. Otvori prvo besplatan LiczMat nalog ili se prijavi — Pro može da se uključi samo na nalogu.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fsr%2Fprojekti%2F" rel="nofollow">Otvori besplatan nalog</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tvoj nalog je na besplatnom planu. Ovaj modul pripada LiczMat Pro.</p>
+
+        <div class="pw-incl">
+          <h3>Šta još obuhvata LiczMat Pro</h3>
+          <ul class="pw-incl-list">
+            <li><b>Klijenti</b> — <span class="muted">Spisak klijenata sa kontakt podacima, beleškama i istorijom saradnje.</span></li>
+            <li><b>Nalozi</b> — <span class="muted">Nalog sa klijentom, opisom, statusom, rokom, vrednošću i pripadajućim projektom.</span></li>
+            <li><b>Ponude</b> — <span class="muted">Materijal, rad, dodatni troškovi, marža i zbir — iz onoga što si već izračunao.</span></li>
+            <li><b>Rokovi</b> — <span class="muted">Rokovi naloga i osnovni podaci o njima. Ne drugi Google kalendar.</span></li>
+            <li><b>Istorija i CRM</b> — <span class="muted">Put kroz ceo posao: klijent → nalog → projekat → ponuda → istorija.</span></li>
+          </ul>
+        </div>
+
+        <p><a class="btn btn-ghost btn-sm" href="/sr/liczmat-pro/" data-i18n="pro_more">Upoznaj LiczMat Pro</a></p>
+
+        <div class="pw-plans">
+          <h3 data-i18n="pay_t">Pretplata na LiczMat Pro</h3>
+          <p class="muted" data-i18n="pay_d">Jedan plan, svih pet Pro modula. Plaćanje vodi Stripe; otkažeš kad god želiš, a Pro radi do kraja plaćenog perioda.</p>
+          <div class="pw-plan-row">
+            <div class="pw-plan" data-pw-plan="monthly" hidden>
+            <h4 data-i18n="pay_monthly_t">Mesečno</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_monthly_per">/ mesec</span></p>
+          </div>
+            <div class="pw-plan" data-pw-plan="yearly" hidden>
+            <h4 data-i18n="pay_yearly_t">Godišnje</h4>
+            <p class="pw-price"><b data-pw-price></b>
+              <span class="muted" data-i18n="pay_yearly_per">/ godina — dva meseca jeftinije</span></p>
+          </div>
+          </div>
+          <p data-pw-buy hidden><a class="btn btn-primary btn-sm" href="/app/" data-i18n="pay_go">Idi na svoj nalog</a></p>
+          <p class="muted" data-pw-soon data-i18n="pay_soon">Pretplata još ne može da se kupi. Cene su konačne.</p>
+        </div>
+      </div>
+          <div id="cost-tool" hidden>
+            <div class="ws-project-figs">
+              <p class="ws-project-fig"><span class="eyebrow muted">Trošak materijala</span> <b id="ws-project-mat"></b></p>
+              <p class="ws-project-fig"><span class="eyebrow muted">Ostali troškovi</span> <b id="ws-project-other"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Zbir projekta</span> <b id="ws-project-total"></b></p>
+            </div>
+            <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Stavke su u različitim valutama. Zbir ih sabira, ali ništa ne preračunava po kursu — proveri valute u koloni troška.</p>
+          </div>
 
           <div class="ws-project-actions">
             <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">Postavi kao aktivan</button>
@@ -330,7 +380,8 @@
           </section>
 
           
-          <section class="dash-sec">
+          
+          <section class="dash-sec" id="cost-other-tool" hidden>
             <div class="dash-head">
               <h2>Ostali troškovi</h2>
             </div>
@@ -357,8 +408,27 @@
 
           <section class="dash-sec ws-pdf" id="ws-pdf">
             <div class="dash-head"><h2>Izvezi predračun</h2></div>
-            <p class="muted">Dokument se otvara u dijalogu štampe. Tamo izaberite čuvanje u PDF.</p>
-            <form id="ws-pdf-form">
+            <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>
+        <h2>Izvoz u PDF</h2>
+        <p class="muted">Tehnički izveštaj i troškovnik za investitora: rad, marža, PDV i zbir, spremno za štampu.</p>
+        <p><span class="chip">Dostupno u LiczMat Pro</span></p>
+
+        
+        <p class="pw-step" data-pw-step="account" hidden>LiczMat Pro je plan uz nalog. Otvori prvo besplatan LiczMat nalog ili se prijavi — Pro može da se uključi samo na nalogu.</p>
+        <p class="pw-step" data-pw-step="account" hidden>
+          <a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fsr%2Fprojekti%2F" rel="nofollow">Otvori besplatan nalog</a>
+        </p>
+        <p class="pw-step" data-pw-step="upgrade" hidden>Tvoj nalog je na besplatnom planu. Ovaj modul pripada LiczMat Pro.</p>
+
+        
+
+        <p><a class="btn btn-ghost btn-sm" href="/sr/liczmat-pro/" data-i18n="pro_more">Upoznaj LiczMat Pro</a></p>
+
+        
+      </div>
+            <div id="pdf-tool" hidden>
+              <p class="muted">Dokument se otvara u dijalogu štampe. Tamo izaberite čuvanje u PDF.</p>
+              <form id="ws-pdf-form">
             <fieldset class="pdf-types">
               <legend class="fld-label">Vrsta dokumenta</legend>
               <label class="field-check"><input type="radio" name="pdf-type" value="technical" checked> <span>Tehnički izveštaj</span></label>
@@ -416,7 +486,7 @@
 
             <p><button type="submit" class="btn btn-primary">Pripremi PDF</button></p>
           </form>
-            <article id="ws-pdf-doc" class="pdf-doc" hidden>
+              <article id="ws-pdf-doc" class="pdf-doc" hidden>
             <header class="pdf-head">
               
               <p class="pdf-sub" data-pdf="subtitle"
@@ -468,6 +538,7 @@
 
             <p class="pdf-foot">LiczMat — Izračunaj. Isplaniraj. Izvedi.</p>
           </article>
+            </div>
           </section>
         </div>
       </article>
@@ -621,6 +692,9 @@
 
 <script src="/assets/units.js?v=20260902a"></script>
 <script src="/assets/workspace.js?v=20260902a"></script>
+<script src="/assets/plan.js?v=20260902a"></script>
+<script src="/assets/pay.js?v=20260902a"></script>
+<script src="/assets/paywall.js?v=20260902a"></script>
 <script src="/assets/workspace-calc.js?v=20260902a"></script>
 <script src="/assets/workspace-ui.js?v=20260902a"></script>
 <script src="/assets/pdf-export.js?v=20260902a"></script>

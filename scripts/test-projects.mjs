@@ -27,9 +27,9 @@ import { LANGS, DEFAULT_LANG, urlProject, urlProjects, urlEstimate, GUIDES } fro
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
-/** Evaluate a browser script that has no exports and hand back the globals we need. */
+/** Evaluate a browser script — or several, in one scope — and hand back the globals we need. */
 function evalScript(file, returns, globals = {}) {
-  const src = readFileSync(p(file), "utf8");
+  const src = [].concat(file).map((f) => readFileSync(p(f), "utf8")).join("\n");
   const names = Object.keys(globals);
   return new Function(...names, `${src}\nreturn {${returns.join(",")}};`)(...names.map((n) => globals[n]));
 }
@@ -41,6 +41,22 @@ for (const lang of LANGS) DICT[lang] = { ...(I18N[lang] || {}), ...(I18N_PAGES[l
 const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 
 const { CALCS } = evalScript("assets/calculators.js", ["CALCS"], { document: undefined, window: {} });
+/* The permission table as the browser has it. Since 2026-09-03 /projekty/ and
+   /kosztorys/ draw chapter XXV’s wall in front of the money on them, and proGate()
+   builds that wall out of LM_FEATURES — so a page builder called without it would be
+   checking a page the build never writes. */
+const FEATURES = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATURES"]).LM_FEATURES;
+
+
+/**
+ * What pwAllows() answers inside the shipped store, for the length of one check.
+ *
+ * assets/workspace.js and assets/crm.js ask it before they store a typed amount or write
+ * a quote (the owner’s decision of 2026-09-03). True is the ordinary case and is what the
+ * arithmetic below is written against; a test that wants the refusal sets it to false and
+ * puts it back.
+ */
+let PW_ALLOW = true;
 
 /**
  * assets/workspace.js in Node, on a fresh store.
@@ -82,6 +98,12 @@ function loadWorkspace(seed) {
     Date: { now: () => clock.now },
     lmCurrency: () => "PLN",
     lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
+    // What the paywall answers inside the store. `costs` and `quotes` became PRO on
+    // 2026-09-03 and the writes that take a typed amount ask before they store it, so the
+    // default here is an account that reaches them — otherwise every section below would be
+    // testing the refusal instead of the arithmetic. The section that IS about the refusal
+    // sets PW_ALLOW to false itself.
+    pwAllows: () => PW_ALLOW,
   });
   return {
     ...api,
@@ -429,7 +451,7 @@ head("9. the frame the build writes");
 {
   for (const lang of LANGS) {
     const t = tr(lang);
-    const { main } = projectsMain(lang, t);
+    const { main } = projectsMain(lang, t, [], FEATURES);
 
     // Both screens are in the file; the script shows one. A detail that only existed
     // after a fetch would be a screen the build could never check.
@@ -456,10 +478,10 @@ head("9. the frame the build writes");
   }
 
   const t = tr(DEFAULT_LANG);
-  const { main } = projectsMain(DEFAULT_LANG, t);
+  const { main } = projectsMain(DEFAULT_LANG, t, [], FEATURES);
   check("the index still offers the rooms of session 20", main.includes('id="ws-room-form"'));
   check("a name with a quote in it could not break out of an attribute",
-    !projectsMain(DEFAULT_LANG, (k) => (k === "wspage_title" ? '"><script>' : t(k))).main.includes("><script>"));
+    !projectsMain(DEFAULT_LANG, (k) => (k === "wspage_title" ? '"><script>' : t(k)), [], FEATURES).main.includes("><script>"));
 }
 
 head("10. the script the page runs");

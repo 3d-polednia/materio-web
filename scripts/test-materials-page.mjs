@@ -174,6 +174,15 @@ async function open(ctx, url, opts = {}) {
   if (opts.workspace) plant["materio-workspace-v1"] = JSON.stringify(opts.workspace);
   if (opts.active) plant["materio-active-project"] = opts.active;
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
+  if (opts.level) plant["liczmat-signed-in"] = opts.level;
+  /* Every price on these screens, and the PDF export, became LiczMat Pro on 2026-09-03:
+     `costs` and `pdf` are PRO in LM_FEATURES, so a guest gets chapter XXV’s wall where the
+     amounts used to be. A test that is about the priced behaviour has to say which level
+     it is testing, and it says it the way scripts/test-quotes-page.mjs already does:
+     `liczmat-signed-in` is what assets/paywall.js reads (lmReadLevel()) and "pro" is what
+     a real Pro account writes there. `pro: false` looks at the wall instead — and there is
+     a section below that does exactly that, so the free half stays covered too. */
+  if (opts.pro !== false && !opts.level) plant["liczmat-signed-in"] = "pro";
 
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
@@ -641,6 +650,63 @@ head("7. with JavaScript off");
     (await page.$$eval(`${MATS} > li`, (li) => li.length)) === 0);
   await page.close();
   await noJs.close();
+}
+
+/* ------------------------------------- the list is free, the price on it is not */
+
+/**
+ * Chapter XVI survives the owner's decision of 2026-09-03 intact, and this is the section
+ * that says so.
+ *
+ * `shopping` — the material list, what to carry out of the shop — stays GUEST. `costs` —
+ * the price on a row — became PRO. Every section above runs at the Pro level, which is
+ * what `open()` plants; this one runs without a plan and checks that the arrow, the list,
+ * the tick and the hand-typed row all still work, and that not one amount is on the page.
+ */
+head("9. a guest keeps the whole shopping list and gets none of the prices");
+{
+  const page = await open(ctx, `${PROJECTS}?id=p1`,
+    { workspace: fixture(), active: "p1", pro: false });
+
+  const list = await rows(page, MATS);
+  check("every material is on the list", list.length >= 2, String(list.length));
+  check("with its name and its quantity", list.join(" | ").includes("Gres 60×60"), list.join(" | "));
+  check("and not one amount among them",
+    !/\d[\d\s., ]*(zł|PLN)/i.test(list.join(" ")), list.join(" | "));
+
+  // Ticking a material off is the shopping itself, and it is free.
+  const first = (await items(page))[0];
+  await page.click(`${MATS} li[data-id="${first.id}"] [data-buy]`);
+  await page.waitForFunction((id) => {
+    const rows2 = JSON.parse(localStorage.getItem("materio-workspace-v1") || "{}").shoppingItems || [];
+    return (rows2.find((s) => s.id === id) || {}).isPurchased === true;
+  }, first.id);
+  eq("ticking one off still works without a plan",
+    (await items(page)).find((s) => s.id === first.id).isPurchased, true);
+
+  /* Typing a material in by hand is chapter XVI's "dodać własny materiał" and stays free.
+     The price field beside it is `costs`, so it is taken off the form with its caption
+     rather than left there taking a number nothing will store — never a dead control. */
+  await page.click("#ws-mat-add summary");
+  eq("the hand-typed row still has its name field",
+    await page.locator("#ws-mat-name").count(), 1);
+  eq("and its quantity", await page.locator("#ws-mat-qty").count(), 1);
+  eq("the price field is hidden", await page.locator("#ws-mat-price").isHidden(), true);
+  eq("and its caption goes with it",
+    await page.locator("#ws-mat-price").locator("xpath=ancestor::label[1]").isHidden(), true);
+
+  const before = (await items(page)).length;
+  await page.fill("#ws-mat-name", "Silikon sanitarny");
+  await page.fill("#ws-mat-qty", "2");
+  await page.click("#ws-mat-form button[type=submit]");
+  await page.waitForFunction((n) =>
+    (JSON.parse(localStorage.getItem("materio-workspace-v1") || "{}").shoppingItems || [])
+      .length > n, before);
+  const added = (await items(page)).find((s) => s.name === "Silikon sanitarny");
+  check("a material typed in by hand is still added", Boolean(added));
+  eq("with no money on it", added.estimatedCostMinor, 0);
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
 }
 
 /* ------------------------------------------------------------------ report */

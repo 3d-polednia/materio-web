@@ -420,6 +420,28 @@ head("§7 how much prose a page carries");
  * row names the key and says what is in it. A budget that refused the row would be asking
  * for a store nobody can look up, which is the opposite of what the page is for.
  *
+ * On 2026-09-04 `projects` went from 544 to 850 and `estimate` from 192 to 425, and both
+ * numbers are chapter XXV's paywall rather than new prose. The owner put every price, the
+ * quote and the PDF behind LiczMat Pro, so the two free workspace screens now carry the
+ * same wall the four Pro pages have carried since session 27 — the module's name, the line
+ * under it, the "Dostępne w LiczMat Pro" chip, the rung this visitor is on, what else Pro
+ * contains, and the price of both plans. That block is around 145 words and it is written
+ * once, in proGate(): the alternative to budgeting for it is a second, shorter wall on
+ * these two pages, which is the thing src/pro.mjs exists to prevent — four walls are four
+ * chances to describe one product four ways. /klienci/ (524), /zlecenia/ (544) and
+ * /wyceny/ (470) are the same page type with the same block already inside their budgets.
+ *
+ * /projekty/ carries two walls, because it withholds two different things: the three
+ * figures are `costs` and the export is `pdf`. The second one is drawn `brief` — the name,
+ * the line, the chip and the rung, without the list of modules and without the price,
+ * which the first wall on the page has already shown. That is what keeps the page at 840
+ * rather than 958.
+ *
+ * Both numbers are the widest of the thirteen languages, which is French — 840 and 418 —
+ * measured off the page builders rather than the shipped files, because `PL_ONLY` is on
+ * and the other twelve have not been written since the wall arrived. Polish, which is what
+ * ships today, is 684 and 337.
+ *
  * `materials` went from 2501 to 2820 when the catalogue page became a tree with the
  * visitor's own materials on it. The catalogue rows are the same rows. What is new is a
  * heading per kind of material (seventeen of them), the word beside each count that says
@@ -434,7 +456,7 @@ head("§7 how much prose a page carries");
 const BUDGET = {
   home: 377, calculators: 416, calculator: 431, converter: 285, guides: 307, guide: 232,
   "own-materials": 225,
-  materials: 2820, stores: 159, android: 519, projects: 544, estimate: 192,
+  materials: 2820, stores: 159, android: 519, projects: 850, estimate: 425,
   clients: 524, jobs: 544, quotes: 470, calendar: 420, cookies: 637,
   "liczmat-pro": 477, account: 850, dashboard: 130, share: 40, privacy: 3800,
 };

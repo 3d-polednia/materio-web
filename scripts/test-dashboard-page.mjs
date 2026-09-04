@@ -201,6 +201,10 @@ async function open(ctx, url, opts = {}) {
 
 const rows = (page, sel) => page.$$eval(`${sel} > li`, (li) => li.map((n) => n.innerText.trim()));
 const text = (page, sel) => page.$eval(sel, (n) => n.innerText.trim());
+// The markup itself, not the rendered text: a level that does not reach `costs` must not
+// have the amount written into the DOM at all, hidden by CSS or otherwise — innerText
+// alone cannot tell "never written" from "written and hidden".
+const rowsHtml = (page, sel) => page.$$eval(`${sel} > li`, (li) => li.map((n) => n.innerHTML));
 
 const DASH = "/app/dashboard/";
 const ctx = await context({ viewport: { width: 1280, height: 900 } });
@@ -229,7 +233,13 @@ head("1. a browser with nothing in it");
 
 head("2. projekty");
 {
-  const page = await open(ctx, DASH, { workspace: fixture(), recents: RECENTS });
+  // `costs` turned PRO on 2026-09-04 (assets/plan.js): the total on this row is priced,
+  // so only a Pro session — the same liczmat-signed-in hint /projekty/ and /kosztorys/
+  // read — sees it. Planted here rather than left to the default so this head keeps
+  // testing what it always tested: the shortlist, the ordering, the total.
+  const page = await open(ctx, DASH, {
+    workspace: fixture(), recents: RECENTS, storage: { "liczmat-signed-in": "pro" },
+  });
   const list = await rows(page, "#dash-projects");
   eq("a shortlist, not all five", list.length, 4);
   check("the most recently touched project is first", list[0].startsWith("Łazienka"), list[0]);
@@ -239,24 +249,56 @@ head("2. projekty");
 
   // The count and the total are the project's own, counted from its lines.
   check("Łazienka shows its two lines, inflected", /2 pozycje/.test(list[0]), list[0]);
-  check("and their total", /959,85/.test(list[0]), list[0]);
+  check("and their total, for a Pro account", /959,85/.test(list[0]), list[0]);
   eq("the link beside the heading goes to all of them",
     await page.$eval('#dash-projects-h ~ a, .dash-head [data-dash-url="projects"]', (a) => new URL(a.href).pathname),
     urlProjects("pl"));
   await page.close();
+
+  // PRO since 2026-09-04: a free account and a guest keep the count, never the price —
+  // `wsProjectCosts()` is not even asked (dashCanCost() in assets/dashboard.js), so the
+  // amount is not merely hidden, it is never written into the row's markup.
+  const free = await open(ctx, DASH, {
+    workspace: fixture(), recents: RECENTS, storage: { "liczmat-signed-in": "liczmat" },
+  });
+  const freeHtml = await rowsHtml(free, "#dash-projects");
+  const freeList = await rows(free, "#dash-projects");
+  check("a free account still sees the count", /2 pozycje/.test(freeList[0]), freeList[0]);
+  check("but never the total", !/959,85/.test(freeHtml[0]), freeHtml[0]);
+  await free.close();
+
+  const guest = await open(ctx, DASH, { workspace: fixture(), recents: RECENTS });
+  const guestHtml = await rowsHtml(guest, "#dash-projects");
+  check("neither does a guest", !/959,85/.test(guestHtml[0]), guestHtml[0]);
+  await guest.close();
 }
 
 head("3. ostatnie kalkulacje");
 {
-  const page = await open(ctx, DASH, { workspace: fixture(), recents: RECENTS });
+  // Same PRO gate as the projects list above — the cost figure on a recent line is
+  // `costs`, so it needs the same Pro session.
+  const page = await open(ctx, DASH, {
+    workspace: fixture(), recents: RECENTS, storage: { "liczmat-signed-in": "pro" },
+  });
   const list = await rows(page, "#dash-recent");
   eq("five lines at most", list.length, 5);
   check("newest first", list[0].startsWith("Styropian"), list[0]);
   check("each says which project it is in", /Poddasze/.test(list[0]), list[0]);
   check("with the quantity and its unit", /20 opak\./.test(list[0]), list[0]);
-  check("and what it cost", /600,00/.test(list[0]), list[0]);
+  check("and what it cost, for a Pro account", /600,00/.test(list[0]), list[0]);
   check("the oldest line is off the end", !list.join("\n").includes("Gres 60×60"));
   await page.close();
+
+  // PRO since 2026-09-04: a free account sees the same line, without its cost — never
+  // written into the markup, not merely hidden.
+  const free = await open(ctx, DASH, {
+    workspace: fixture(), recents: RECENTS, storage: { "liczmat-signed-in": "liczmat" },
+  });
+  const freeHtml = await rowsHtml(free, "#dash-recent");
+  const freeList = await rows(free, "#dash-recent");
+  check("still the quantity and its unit", /20 opak\./.test(freeList[0]), freeList[0]);
+  check("but never the cost", !/600,00/.test(freeHtml[0]), freeHtml[0]);
+  await free.close();
 }
 
 head("4. ostatnio używane narzędzia");
@@ -354,7 +396,11 @@ head("8. a saved line keeps the currency it was priced in");
   // Chapter VI: nothing is ever converted at an exchange rate. A line stamped PLN stays
   // PLN after the visitor switches to EUR — relabelling it would silently restate
   // 600 złotych as 600 euro, which is the one thing a saved quote must never do.
-  const page = await open(ctx, DASH, { workspace: fixture() });
+  // Planted as Pro: the amount this head is about is `costs`, PRO since 2026-09-04, and
+  // there is nothing to test the currency of on an account that is never shown one.
+  const page = await open(ctx, DASH, {
+    workspace: fixture(), storage: { "liczmat-signed-in": "pro" },
+  });
   const before = (await rows(page, "#dash-recent"))[0];
   check("the line opens in the złoty it was saved in", /zł|PLN/.test(before), before);
 
@@ -372,7 +418,9 @@ head("8. a saved line keeps the currency it was priced in");
   // so instead of printing a sum that means nothing.
   const ws = fixture();
   ws.estimations[1].currencyCode = "EUR";
-  const mixed = await open(ctx, DASH, { workspace: ws });
+  const mixed = await open(ctx, DASH, {
+    workspace: ws, storage: { "liczmat-signed-in": "pro" },
+  });
   const row = (await rows(mixed, "#dash-projects"))[0];
   check("the mixed project is marked", /różne waluty/.test(row), row);
   const plain = (await rows(mixed, "#dash-projects"))[1];
