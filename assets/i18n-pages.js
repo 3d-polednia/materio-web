@@ -785,7 +785,7 @@ const I18N_PAGES = {
     ws_confirm_delete: "Usunąć projekt razem z jego pozycjami?",
     ws_lines: "pozycji",
     ws_lines_one: "pozycja", ws_lines_few: "pozycje",
-    ws_mixed_currency: "Pozycje są w różnych walutach. Suma je dodaje, ale nic nie przelicza po kursie — sprawdź waluty w kolumnie kosztu.",
+    ws_mixed_currency: "Pozycje są w różnych walutach. Nic nie jest przeliczane po kursie, więc nie ma jednej sumy — każda waluta ma własną.",
     ws_project: "Projekt",
     ws_no_project: "Brak aktywnego projektu",
     ws_default_project: "Mój projekt",

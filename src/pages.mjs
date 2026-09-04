@@ -1315,6 +1315,7 @@ function pdfBlock(lang, t, features) {
               <span>${esc(c("pdfdoc_grand_total"))}</span> <b data-pdf="total"></b>
             </p>
             <p class="pdf-line" data-pdf-row="waste" hidden>${split("pdfdoc_waste_total", "waste")}</p>
+            <p class="pdf-line pdf-mixed" data-pdf-row="mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
 
             <section class="pdf-pricing" data-pdf-row="pricing" hidden>
               <h2>${esc(c("pdfdoc_pricing_header"))}</h2>

@@ -190,7 +190,8 @@ function jobRenderProject(j) {
   const project = j.projectId && typeof wsProject === "function" ? wsProject(j.projectId) : null;
   if (project) {
     const costs = wsProjectCosts(project.id);
-    const money = costs.total ? ` · ${jobEsc(jobMoney(costs.total, costs.currencyCode))}` : "";
+    const sums = wsSumsText(costs.byCurrency, "total", jobMoney);
+    const money = sums ? ` · ${jobEsc(sums)}` : "";
     const url = jobUrl("projects", "/projekty/");
     list.innerHTML = `<li data-id="${jobEsc(project.id)}">
         <span class="row-name">
@@ -274,8 +275,13 @@ function jobRenderDetail(id) {
   const money = crmJobCosts(id);
   document.getElementById("job-fig-value").textContent = money.value === null
     ? jobT("job_value_none") : jobMoney(money.value, money.currencyCode);
+  // A project in two currencies has no single cost, so `cost` is null and the figure is
+  // written per currency instead — never as jobMoney(null), which would read "0,00 zł".
   document.getElementById("job-fig-cost").textContent = money.hasProject
-    ? jobMoney(money.cost, money.costCurrencyCode) : jobT("job_cost_none");
+    ? (money.cost === null
+      ? (wsSumsText(money.costByCurrency, "total", jobMoney) || jobMoney(0, money.currencyCode))
+      : jobMoney(money.cost, money.costCurrencyCode))
+    : jobT("job_cost_none");
   document.getElementById("job-fig-left").textContent =
     money.left === null ? "—" : jobMoney(money.left, money.currencyCode);
   document.getElementById("job-mixed").hidden = !money.mixed;

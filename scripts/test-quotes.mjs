@@ -580,10 +580,34 @@ head("6b. a quote whose halves are in two currencies is told, never converted");
   crm.crmAddLabour(q.id, { name: "Praca", priceMajor: "1000" });
   const m = crm.crmQuoteTotals(q.id);
   eq("the two halves in two currencies are flagged", m.mixed, true);
-  eq("the amounts are still the amounts", m.subtotal, 74985 + 100000);
+  // H4 of the audit of 2026-09-04: the halves were added anyway and the quote came to
+  // "1749,85 €". A quote made of unlike money has no subtotal, no margin and no total.
+  eq("so there is no subtotal", m.subtotal, null);
+  eq("no margin computed on one", m.margin, null);
+  eq("and no total", m.total, null);
   eq("nothing was converted at a rate", m.materials, 74985);
+  eq("the labour is still its own amount", m.labour, 100000);
   eq("and the quote's own stamp wins for the label", m.currencyCode, "EUR");
   eq("with the project's carried beside it", m.projectCurrencyCode, "PLN");
+}
+
+head("6c. a quote on a project that is itself in two currencies has no figures either");
+{
+  const crm = loadCrm();
+  const project = crm.wsAddProject("Remont");
+  save(crm, { projectId: project.id });            // priced in PLN
+  crm.currency("EUR");
+  crm.wsAddManualEstimation({
+    projectId: project.id, name: "Dostawa", requiredUnits: 1, unitLabel: "", costMajor: 50,
+  });
+  const q = crm.crmAddQuote({ name: "Wycena", projectId: project.id });
+  const m = crm.crmQuoteTotals(q.id);
+  eq("the quote is told", m.mixed, true);
+  eq("the project's materials figure does not exist", m.materials, null);
+  eq("nor its other costs", m.other, null);
+  eq("nor a subtotal built out of them", m.subtotal, null);
+  eq("nor a total", m.total, null);
+  eq("but the project's own buckets are there to print", m.projectByCurrency.length, 2);
 }
 
 /* ================================================================== 7. the chain */

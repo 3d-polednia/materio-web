@@ -76,8 +76,11 @@ const crmRenderPro = () => pwRender("crm", "clients");
 
 /** One row of either list: the name opens the client, the meta says what is behind it. */
 function crmClientRow(c) {
+  // One sum per currency. A client with a project in złoty and one in euro has two
+  // answers, and crmClientCosts() no longer offers a single `total` for that case.
   const costs = crmClientCosts(c.id);
-  const money = costs.total ? ` · ${crmEsc(crmMoney(costs.total, costs.currencyCode))}` : "";
+  const sums = wsSumsText(costs.byCurrency, "total", crmMoney);
+  const money = sums ? ` · ${crmEsc(sums)}` : "";
   const mixed = costs.mixed
     ? ` <span class="chip warn" title="${crmEsc(crmT("ws_mixed_currency"))}">${crmEsc(crmT("dash_mixed"))}</span>`
     : "";
@@ -172,7 +175,8 @@ function crmRenderProjects(id) {
   const projects = crmClientProjects(id);
   list.innerHTML = projects.length ? projects.map((p) => {
     const costs = wsProjectCosts(p.id);
-    const money = costs.total ? ` · ${crmEsc(crmMoney(costs.total, costs.currencyCode))}` : "";
+    const sums = wsSumsText(costs.byCurrency, "total", crmMoney);
+    const money = sums ? ` · ${crmEsc(sums)}` : "";
     const url = crmUrl("projects", "/projekty/");
     return `<li data-id="${crmEsc(p.id)}">
         <span class="row-name">
@@ -286,7 +290,8 @@ function crmRenderClient(id) {
   const costs = crmClientCosts(id);
   document.getElementById("crm-fig-projects").textContent = String(costs.projects);
   document.getElementById("crm-fig-last").textContent = crmDate(crmClientLastAt(id));
-  document.getElementById("crm-fig-total").textContent = crmMoney(costs.total, costs.currencyCode);
+  document.getElementById("crm-fig-total").textContent =
+    wsSumsText(costs.byCurrency, "total", crmMoney) || crmMoney(0, costs.currencyCode);
   document.getElementById("crm-mixed").hidden = !costs.mixed;
 
   const note = document.getElementById("crm-note");

@@ -454,7 +454,15 @@ head("4b. two currencies are added but never converted — chapter VI");
 
   const costs = crm.crmClientCosts(jan.id);
   eq("the page is told the amounts are unlike", costs.mixed, true);
-  eq("and no exchange rate was applied", costs.total, 20000);
+  // H4 of the audit of 2026-09-04: a client with a project in złoty and one in euro used
+  // to come to "200,00 zł". There is no such figure — the two sums stand side by side.
+  eq("so there is no one total", costs.total, null);
+  eq("and no currency to label one with", costs.currencyCode, "");
+  eq("each currency keeps its own", costs.byCurrency.length, 2);
+  const pln = costs.byCurrency.find((b) => b.currencyCode === "PLN");
+  const eur = costs.byCurrency.find((b) => b.currencyCode === "EUR");
+  eq("the złoty half untouched", pln.total, 10000);
+  eq("and the euro half untouched", eur.total, 10000);
 }
 
 head("4c. the history is the saved calculations, newest first, and nothing is logged twice");

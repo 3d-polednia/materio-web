@@ -538,6 +538,20 @@ head("5. what was agreed, and what it has actually cost");
     !Object.prototype.hasOwnProperty.call(crm.crmJob(j.id), "costMinor"),
     Object.keys(crm.crmJob(j.id)).join());
 
+  /* H4 of the audit of 2026-09-04: a job on a project priced in two currencies showed one
+     number, and a difference computed against it. Neither exists — the cost comes back
+     null with the buckets beside it, and "what is left" is not a number at all. */
+  crm.currency("EUR");
+  crm.wsAddManualEstimation({
+    projectId: bathroom.id, name: "Dostawa", requiredUnits: 1, unitLabel: "", costMajor: 50,
+  });
+  const two = crm.crmJobCosts(j.id);
+  eq("two currencies in the project are flagged on the job", two.mixed, true);
+  eq("there is no single cost", two.cost, null);
+  eq("and nothing to subtract it from", two.left, null);
+  eq("but each currency is there to print", two.costByCurrency.length, 2);
+  eq("the agreed value is untouched", two.value, 1_250_000);
+
   const none = crm.crmAddJob({ name: "Bez projektu" });
   const bare = crm.crmJobCosts(none.id);
   eq("a job with no project has no cost to show", bare.hasProject, false);

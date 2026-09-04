@@ -130,8 +130,11 @@ function dashRenderProjects() {
     let money = "";
     let mixed = "";
     if (canCost) {
+      // Per currency: two currencies in a project are two sums, and wsProjectCosts()
+      // hands out no single `total` for one of those.
       const costs = wsProjectCosts(p.id);
-      money = costs.total ? ` · ${dashEsc(wsMoney(costs.total, costs.currencyCode))}` : "";
+      const sums = wsSumsText(costs.byCurrency, "total");
+      money = sums ? ` · ${dashEsc(sums)}` : "";
       // Lines saved in different currencies do not add up. /kosztorys/ has room for the
       // whole sentence; a row has room for two words and the sentence as its tooltip. What
       // it must not do is print the sum as though it meant something.

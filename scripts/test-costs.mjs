@@ -96,6 +96,7 @@ function loadWorkspace(seed) {
     "wsDeleteEstimation", "wsIsManualLine", "wsOtherCosts", "wsCalcLines", "wsCanPrice",
     "wsItems", "wsItem", "wsAddItem", "wsAddOwnItem", "wsUpdateItem", "wsDeleteItem",
     "wsUnitPriceMinor", "wsItemCostMinor", "wsItemsTotal", "wsProjectTotal", "wsProjectCosts",
+    "wsSumsText",
     "wsMinor", "wsExport", "wsImport",
   ], {
     localStorage,
@@ -393,12 +394,21 @@ head("3c. an empty project costs nothing and says so without a NaN");
   eq("and the currency is the visitor's", costs.currencyCode, "PLN");
 }
 
-head("3d. two currencies are flagged, never added at a rate");
+/* H4 of the audit of 2026-09-04: the flag was raised and the sum was handed out anyway, so
+   a project holding 749,85 zł and 50 € answered "what does this cost" with "799,85 zł".
+   There is now no single figure to print in that case at all — the three come back null
+   and the money lives in `byCurrency`, one bucket per currency, converted by nothing. */
+head("3d. two currencies are flagged, and there is no single sum to print");
 {
   const ws = loadWorkspace();
   const row = save(ws);
   const project = ws.wsProject(row.projectId);
-  eq("one currency is not mixed", ws.wsProjectCosts(project.id).mixed, false);
+  const one = ws.wsProjectCosts(project.id);
+  eq("one currency is not mixed", one.mixed, false);
+  eq("and it has its one total", one.total, 74985);
+  eq("in one bucket", one.byCurrency.length, 1);
+  eq("which is the same figure", one.byCurrency[0].total, 74985);
+  eq("in the currency it was saved in", one.byCurrency[0].currencyCode, "PLN");
 
   ws.setCurrency("EUR");
   ws.tick();
@@ -407,8 +417,41 @@ head("3d. two currencies are flagged, never added at a rate");
   });
   const costs = ws.wsProjectCosts(project.id);
   eq("a second currency is flagged", costs.mixed, true);
-  eq("the amounts are still the amounts", costs.total, 74985 + 5000);
-  check("and nothing was converted", costs.materials === 74985 && costs.other === 5000);
+  eq("there is no total", costs.total, null);
+  eq("no materials figure", costs.materials, null);
+  eq("no other figure", costs.other, null);
+  eq("and no currency to label one with", costs.currencyCode, "");
+  eq("the money is in two buckets", costs.byCurrency.length, 2);
+  const pln = costs.byCurrency.find((b) => b.currencyCode === "PLN");
+  const eur = costs.byCurrency.find((b) => b.currencyCode === "EUR");
+  check("and nothing was converted", pln.materials === 74985 && eur.other === 5000);
+  eq("each bucket sums only its own", pln.total, 74985);
+  eq("and so does the other", eur.total, 5000);
+
+  // What the interface prints: one figure per currency, never joined with a plus.
+  eq("the words are per currency",
+    ws.wsSumsText(costs.byCurrency, "total"), "749.85 PLN · 50.00 EUR");
+  check("and the sum of the two is nowhere in them",
+    !ws.wsSumsText(costs.byCurrency, "total").includes("799"));
+}
+
+head("3e. the estimate sheet's own total follows the same rule");
+{
+  const ws = loadWorkspace();
+  const row = save(ws);
+  const project = ws.wsProject(row.projectId);
+  eq("one currency has a total", ws.wsProjectTotal(project.id).minor, 74985);
+
+  ws.setCurrency("EUR");
+  ws.tick();
+  ws.wsAddManualEstimation({
+    projectId: project.id, name: "Dostawa", requiredUnits: 1, unitLabel: "", costMajor: 50,
+  });
+  const total = ws.wsProjectTotal(project.id);
+  eq("two currencies have none", total.minor, null);
+  eq("and no currency either", total.currencyCode, "");
+  eq("the lines are still counted", total.count, 2);
+  eq("and each currency keeps its own sum", total.byCurrency.length, 2);
 }
 
 /* ------------------------------------------------------- 4. what "other" means */

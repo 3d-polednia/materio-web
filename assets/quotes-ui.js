@@ -127,7 +127,7 @@ function quoRow(q) {
   return `<li data-id="${quoEsc(q.id)}">
       <span class="row-name">
         <a href="?id=${encodeURIComponent(q.id)}" data-open><b>${quoEsc(q.name)}</b></a>
-        <em class="muted">${where}${quoEsc(quoMoney(totals.total, totals.currencyCode))}</em>
+        <em class="muted">${where}${totals.total === null ? "—" : quoEsc(quoMoney(totals.total, totals.currencyCode))}</em>
       </span>
       <span class="row-actions"></span>
     </li>`;
@@ -295,7 +295,7 @@ function quoRenderProject(q) {
   const project = q.projectId && typeof wsProject === "function" ? wsProject(q.projectId) : null;
   if (project) {
     const costs = wsProjectCosts(project.id);
-    const money = costs.total ? quoEsc(quoMoney(costs.total, costs.currencyCode)) : "";
+    const money = quoEsc(wsSumsText(costs.byCurrency, "total", quoMoney));
     list.innerHTML = `<li data-id="${quoEsc(project.id)}">
         <span class="row-name">
           <a href="${quoEsc(quoUrl("projects", "/projekty/"))}?id=${encodeURIComponent(project.id)}"><b>${
@@ -360,12 +360,20 @@ function quoRenderDetail(id) {
   // wsProjectCosts() rather than copied, so this page and the project screen can never
   // disagree about what the work costs.
   const money = crmQuoteTotals(id);
-  const fig = (el, minor) => {
+  // A figure that does not exist is not printed as zero. A quote whose project mixes
+  // currencies has no materials figure, no subtotal and no total — an em dash says that,
+  // where "0,00 zł" would say something false. Materials and other costs do have an
+  // answer per currency, and that is what goes in their place.
+  const fig = (el, minor, instead) => {
     const node = document.getElementById(el);
-    if (node) node.textContent = quoMoney(minor, money.currencyCode);
+    if (!node) return;
+    node.textContent = minor === null
+      ? (instead || "—")
+      : quoMoney(minor, money.currencyCode);
   };
-  fig("quo-fig-materials", money.materials);
-  fig("quo-fig-other", money.other);
+  const per = (field) => wsSumsText(money.projectByCurrency, field, quoMoney);
+  fig("quo-fig-materials", money.materials, per("materials"));
+  fig("quo-fig-other", money.other, per("other"));
   fig("quo-fig-labour", money.labour);
   fig("quo-fig-sub", money.subtotal);
   fig("quo-fig-margin", money.margin);

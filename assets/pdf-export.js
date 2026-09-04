@@ -199,6 +199,12 @@ function pdfFill(projectId, opt) {
   const investor = opt.type === "investor";
   const costs = wsProjectCosts(projectId);
   const money = (minor) => wsMoney(minor, costs.currencyCode);
+  // A project saved in two currencies has no grand total, no waste total and no investor
+  // breakdown — each of those is a sum of unlike amounts, and this is the one document
+  // that gets printed and handed to somebody. The rows keep the currency each was saved
+  // in, the total line carries one figure per currency, and a note says nothing was
+  // converted at a rate.
+  const mixed = Boolean(costs.mixed);
 
   // The subtitle is the document's own name; the two are the app's two export types.
   pdfSet(doc, "subtitle", doc.dataset[investor ? "subInvestor" : "subTechnical"] || "");
@@ -241,13 +247,28 @@ function pdfFill(projectId, opt) {
   });
 
   pdfShow(doc, "total", opt.total !== false);
-  pdfSet(doc, "total", money(costs.total));
+  pdfSet(doc, "total", wsSumsText(costs.byCurrency, "total") || money(0));
+  // The note stands whenever the currencies are unlike, not only when the total is on:
+  // it is also the only thing on the page that explains the missing investor breakdown.
+  pdfShow(doc, "mixed", mixed);
 
-  const wasteMinor = rows.reduce((sum, r) => sum + (r.wasteCostMinor || 0), 0);
-  pdfShow(doc, "waste", !investor && wasteMinor > 0);
-  pdfSet(doc, "waste", money(wasteMinor));
+  // The waste is grouped the same way the total is: it is money, and money in two
+  // currencies is two figures.
+  const waste = [];
+  rows.forEach((r) => {
+    if (!r.wasteCostMinor) return;
+    const code = r.currencyCode || wsCurrency();
+    const at = waste.find((w) => w.currencyCode === code);
+    if (at) at.minor += r.wasteCostMinor;
+    else waste.push({ currencyCode: code, minor: r.wasteCostMinor });
+  });
+  pdfShow(doc, "waste", !investor && waste.length > 0);
+  pdfSet(doc, "waste", wsSumsText(waste, "minor"));
 
-  const pricing = pdfHasPricing(opt);
+  // Labour, margin and VAT are all computed on top of the material total, which a mixed
+  // project does not have. The block stays off rather than printing arithmetic done on
+  // amounts that were never in the same currency.
+  const pricing = pdfHasPricing(opt) && !mixed;
   pdfShow(doc, "pricing", pricing);
   if (pricing) {
     const b = pdfBreakdown(opt, costs.total);

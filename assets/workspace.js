@@ -988,9 +988,14 @@ function wsItemsTotal(projectId) {
  *   other     — the estimate lines nothing calculated: labour, delivery, a skip. They have
  *               no material and never will, which is exactly what makes them "other".
  *
- * `mixed` is the same rule as everywhere else: amounts saved in different currencies are
- * not summable and chapter VI forbids converting them, so the interface is told rather than
- * handed a number that means nothing.
+ * `byCurrency` is where the money actually is: one bucket per currency, each with its own
+ * three figures. Amounts saved in different currencies are not summable and chapter VI
+ * forbids converting them, so a project holding two currencies has no single materials,
+ * other or total figure at all — the three come back `null`, `currencyCode` comes back
+ * empty, and a caller that wants money has to reach into the buckets. That is the point:
+ * a figure that is not there cannot be printed by accident, and "100 PLN + 200 EUR =
+ * 300 PLN" on a document somebody shows a client is worse than no figure at all. `mixed`
+ * says which of the two cases this is.
  */
 function wsProjectCosts(projectId) {
   const items = wsItems(projectId);
@@ -998,20 +1003,32 @@ function wsProjectCosts(projectId) {
   const priced = new Set(items.map((r) => r.estimationId).filter(Boolean));
   const other = lines.filter(wsIsManualLine);
   const bare = lines.filter((r) => !wsIsManualLine(r) && !priced.has(r.id));
-  const codes = new Set([
-    ...items.map((r) => r.currencyCode || wsCurrency()),
-    ...bare.map((r) => r.currencyCode || wsCurrency()),
-    ...other.map((r) => r.currencyCode || wsCurrency()),
-  ]);
-  const materials = items.reduce((sum, r) => sum + (r.estimatedCostMinor || 0), 0)
-    + bare.reduce((sum, r) => sum + (r.totalCostMinor || 0), 0);
-  const otherMinor = other.reduce((sum, r) => sum + (r.totalCostMinor || 0), 0);
+
+  // One bucket per currency, opened in the order the currencies first turn up — so a
+  // project in one currency has one bucket, and it holds exactly the three figures the
+  // single total used to. A row worth nothing still opens its bucket: it was saved in that
+  // currency, and what makes a project mixed is two currencies in it, not two amounts.
+  const buckets = new Map();
+  const bucket = (code) => {
+    const key = code || wsCurrency();
+    if (!buckets.has(key)) buckets.set(key, { currencyCode: key, materials: 0, other: 0, total: 0 });
+    return buckets.get(key);
+  };
+  items.forEach((r) => { bucket(r.currencyCode).materials += r.estimatedCostMinor || 0; });
+  bare.forEach((r) => { bucket(r.currencyCode).materials += r.totalCostMinor || 0; });
+  other.forEach((r) => { bucket(r.currencyCode).other += r.totalCostMinor || 0; });
+
+  const byCurrency = [...buckets.values()];
+  byCurrency.forEach((b) => { b.total = b.materials + b.other; });
+  const mixed = byCurrency.length > 1;
+  const one = byCurrency[0] || { currencyCode: wsCurrency(), materials: 0, other: 0, total: 0 };
   return {
-    materials,
-    other: otherMinor,
-    total: materials + otherMinor,
-    currencyCode: (items[0] || bare[0] || other[0] || {}).currencyCode || wsCurrency(),
-    mixed: codes.size > 1,
+    materials: mixed ? null : one.materials,
+    other: mixed ? null : one.other,
+    total: mixed ? null : one.total,
+    currencyCode: mixed ? "" : one.currencyCode,
+    byCurrency,
+    mixed,
     items: items.length,
     others: other.length,
   };
@@ -1020,18 +1037,27 @@ function wsProjectCosts(projectId) {
 /**
  * Total of one project's lines.
  *
- * `mixed` is true when the lines were not all saved in the same currency — adding those
- * amounts up is arithmetic on unlike things, so the interface says so rather than
- * pretending the sum means something. The total is still shown in the first line's
- * currency, which is the one the project started in.
+ * The same rule as wsProjectCosts(), for the same reason: every currency gets its own sum
+ * in `byCurrency`, and when the lines were not all saved in one currency there is no
+ * `minor` to hand out — it is `null` and `currencyCode` is empty. Adding those amounts is
+ * arithmetic on unlike things and chapter VI forbids converting them, so the sum does not
+ * exist rather than existing and being wrong. `count` counts lines, not money, so it is
+ * always there.
  */
 function wsProjectTotal(projectId) {
   const rows = wsEstimations(projectId);
-  const codes = new Set(rows.map((r) => r.currencyCode || wsCurrency()));
+  const buckets = new Map();
+  rows.forEach((r) => {
+    const key = r.currencyCode || wsCurrency();
+    buckets.set(key, (buckets.get(key) || 0) + (r.totalCostMinor || 0));
+  });
+  const byCurrency = [...buckets.entries()].map(([currencyCode, minor]) => ({ currencyCode, minor }));
+  const mixed = byCurrency.length > 1;
   return {
-    minor: rows.reduce((sum, r) => sum + (r.totalCostMinor || 0), 0),
-    currencyCode: (rows[0] && rows[0].currencyCode) || wsCurrency(),
-    mixed: codes.size > 1,
+    minor: mixed ? null : (byCurrency.length ? byCurrency[0].minor : 0),
+    currencyCode: mixed ? "" : (byCurrency.length ? byCurrency[0].currencyCode : wsCurrency()),
+    byCurrency,
+    mixed,
     count: rows.length,
   };
 }
@@ -1040,6 +1066,28 @@ function wsProjectTotal(projectId) {
 function wsMoney(minor, currencyCode) {
   if (typeof lmMoneyMinor === "function") return lmMoneyMinor(minor, currencyCode || wsCurrency());
   return (Number(minor) / 100 || 0).toFixed(2);
+}
+
+/**
+ * A bucket list as words: every currency's own sum, side by side.
+ *
+ * The separator is a middle dot and never a plus, because the amounts were never added.
+ * "100,00 zł · 200,00 €" is two answers to "what does this cost", which is the honest
+ * number of answers a project in two currencies has. Buckets worth nothing are left out,
+ * so a project with no money in it comes back as the empty string and every caller's
+ * existing "print it only if there is something" test goes on working.
+ *
+ * `field` is the figure to read out of each bucket: "materials", "other" or "total" from
+ * wsProjectCosts(), "minor" from wsProjectTotal(). `money` is the caller's own formatter,
+ * because /klienci/, /zlecenia/ and /wyceny/ each have one of their own and none of them
+ * is this file's wsMoney().
+ */
+function wsSumsText(byCurrency, field, money) {
+  const fmt = typeof money === "function" ? money : wsMoney;
+  return (byCurrency || [])
+    .filter((b) => b && (b[field] || 0))
+    .map((b) => fmt(b[field], b.currencyCode))
+    .join(" · ");
 }
 
 /** Everything, tombstones included — what /app/ uploads and what the export button writes. */

@@ -526,22 +526,26 @@ function crmJobCosts(jobId) {
   const job = crmJob(jobId);
   const empty = {
     value: null, currencyCode: crmCurrency(), cost: 0, costCurrencyCode: crmCurrency(),
-    hasProject: false, mixed: false, left: null,
+    costByCurrency: [], hasProject: false, mixed: false, left: null,
   };
   if (!job) return empty;
   const costs = job.projectId && typeof wsProjectCosts === "function"
     ? wsProjectCosts(job.projectId) : null;
+  // `cost` is null when the project mixes currencies: wsProjectCosts() has no single total
+  // for it, and neither has this. `costByCurrency` is what the page prints in that case.
   const cost = costs ? costs.total : 0;
   const costCode = costs ? costs.currencyCode : crmCurrency();
   const valueCode = job.currencyCode || crmCurrency();
   // A difference between two amounts in different currencies is not a number, so it is
-  // not computed — the page says the currencies differ instead.
+  // not computed — the page says the currencies differ instead. A cost that is null is
+  // not comparable either: there is nothing to subtract from what was agreed.
   const comparable = job.valueMinor !== null && cost > 0 && valueCode === costCode;
   return {
     value: job.valueMinor,
     currencyCode: valueCode,
     cost: cost,
     costCurrencyCode: costCode,
+    costByCurrency: costs ? costs.byCurrency : [],
     hasProject: Boolean(job.projectId && costs),
     mixed: Boolean((costs && costs.mixed)
       || (job.valueMinor !== null && cost > 0 && valueCode !== costCode)),
@@ -570,33 +574,36 @@ function crmClientJobCounts(clientId) {
  * What a client's work is worth: their projects' costs, added up.
  *
  * Every project is counted through wsProjectCosts(), which is the one function that knows
- * a calculation and the material it produced are the same money. `mixed` carries the same
- * meaning as everywhere else — amounts saved in different currencies are added but never
- * converted (chapter VI), so the page can say so instead of showing a number that means
- * nothing.
+ * a calculation and the material it produced are the same money — and the one that keeps
+ * the currencies apart. Its buckets are merged here rather than its figures added, so a
+ * client whose projects were priced in two currencies comes back with two sums and no
+ * single `total` at all: chapter VI forbids converting them, and a client page is exactly
+ * the screen where one invented number would be read as what the work is worth.
  */
 function crmClientCosts(clientId) {
   const projects = crmClientProjects(clientId);
-  const codes = new Set();
-  let materials = 0;
-  let other = 0;
-  let mixed = false;
-  let currencyCode = "";
+  const buckets = new Map();
   projects.forEach((p) => {
-    const c = wsProjectCosts(p.id);
-    materials += c.materials;
-    other += c.other;
-    if (c.total || c.items || c.others) codes.add(c.currencyCode);
-    if (c.mixed) mixed = true;
-    if (!currencyCode) currencyCode = c.currencyCode;
+    (wsProjectCosts(p.id).byCurrency || []).forEach((b) => {
+      const at = buckets.get(b.currencyCode)
+        || { currencyCode: b.currencyCode, materials: 0, other: 0, total: 0 };
+      at.materials += b.materials;
+      at.other += b.other;
+      at.total += b.total;
+      buckets.set(b.currencyCode, at);
+    });
   });
-  if (codes.size > 1) mixed = true;
+  const byCurrency = [...buckets.values()];
+  const mixed = byCurrency.length > 1;
+  const one = byCurrency[0] || { currencyCode: "", materials: 0, other: 0, total: 0 };
+  const own = typeof wsCurrency === "function" ? wsCurrency() : "PLN";
   return {
     projects: projects.length,
-    materials,
-    other,
-    total: materials + other,
-    currencyCode: currencyCode || (typeof wsCurrency === "function" ? wsCurrency() : "PLN"),
+    materials: mixed ? null : one.materials,
+    other: mixed ? null : one.other,
+    total: mixed ? null : one.total,
+    currencyCode: mixed ? "" : (one.currencyCode || own),
+    byCurrency,
     mixed,
   };
 }
@@ -956,20 +963,30 @@ function crmQuoteTotals(quoteId) {
   if (!quote) {
     return {
       materials: 0, other: 0, labour: 0, subtotal: 0, marginPct: 0, margin: 0, total: 0,
-      currencyCode: own, projectCurrencyCode: "", hasProject: false, mixed: false, lines: 0,
+      currencyCode: own, projectCurrencyCode: "", projectByCurrency: [],
+      hasProject: false, mixed: false, lines: 0,
     };
   }
   const costs = quote.projectId && typeof wsProjectCosts === "function"
     ? wsProjectCosts(quote.projectId) : null;
+  // The project's two figures are null when the project mixes currencies — the quote
+  // inherits that rather than papering over it, because a subtotal built out of unlike
+  // amounts is exactly the number a client would be shown.
   const materials = costs ? costs.materials : 0;
   const other = costs ? costs.other : 0;
   const lines = Array.isArray(quote.labour) ? quote.labour : [];
   const labour = lines.reduce((sum, l) => sum + (l.amountMinor || 0), 0);
-  const subtotal = materials + other + labour;
   const marginPct = Number(quote.marginPct) || 0;
-  const margin = Math.round(subtotal * marginPct / 100);
-  const projectCode = costs && (costs.total || costs.items || costs.others)
+  const projectCode = costs && !costs.mixed && (costs.total || costs.items || costs.others)
     ? costs.currencyCode : "";
+  // Two ways for a quote to hold unlike money: the project itself is mixed, or labour was
+  // typed in one currency and the project priced in another. Either way the four summed
+  // figures do not exist, and the page prints what it has instead of a total.
+  const mixed = Boolean((costs && costs.mixed)
+    || (labour > 0 && projectCode && quote.currencyCode
+      && quote.currencyCode !== projectCode));
+  const subtotal = mixed ? null : materials + other + labour;
+  const margin = mixed ? null : Math.round(subtotal * marginPct / 100);
   return {
     materials,
     other,
@@ -977,16 +994,17 @@ function crmQuoteTotals(quoteId) {
     subtotal,
     marginPct,
     margin,
-    total: subtotal + margin,
-    // The quote's own stamp first: it is the currency somebody typed. The project's is
-    // the fallback for a quote that is nothing but material so far, and the visitor's
-    // own choice the fallback for one that holds no money at all.
-    currencyCode: quote.currencyCode || projectCode || own,
+    total: mixed ? null : subtotal + margin,
+    projectByCurrency: costs ? costs.byCurrency : [],
+    // The quote's own stamp is the currency somebody typed into a labour line, so it only
+    // speaks for the figures while there IS a labour line. With the labour deleted, every
+    // amount left is the project's, and the label has to be the project's too — otherwise
+    // a quote stamped EUR last week prints this month's złoty materials as euro. The
+    // visitor's own choice is the fallback for a quote holding no money at all.
+    currencyCode: (labour > 0 ? quote.currencyCode : "") || projectCode || quote.currencyCode || own,
     projectCurrencyCode: projectCode,
     hasProject: Boolean(costs),
-    mixed: Boolean((costs && costs.mixed)
-      || (labour > 0 && projectCode && quote.currencyCode
-        && quote.currencyCode !== projectCode)),
+    mixed,
     lines: lines.length,
   };
 }

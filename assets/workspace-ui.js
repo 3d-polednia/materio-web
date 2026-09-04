@@ -88,9 +88,11 @@ function wsProjectRow(p, active) {
   // The money is the project's whole cost — chapter XVII's sum, materials and the rest —
   // so the list, the dashboard and the project screen answer "what does this cost" with
   // one number. The count beside it stays the count of saved lines.
+  // Every currency's own sum, side by side. A project in two currencies has two figures
+  // and not one, so wsProjectCosts() hands out no single `total` for it to print.
   const costs = wsProjectCosts(p.id);
-  const money = wsCanCost() && costs.total
-    ? ` · ${wsEsc(wsMoney(costs.total, costs.currencyCode))}` : "";
+  const sums = wsCanCost() ? wsSumsText(costs.byCurrency, "total") : "";
+  const money = sums ? ` · ${wsEsc(sums)}` : "";
   // Lines saved in different currencies do not add up, and chapter VI forbids converting
   // them. The row has room for a chip; the whole sentence is its title.
   const mixed = wsCanCost() && costs.mixed
@@ -655,10 +657,15 @@ function wsRenderProject(id) {
   document.getElementById("ws-project-count").textContent = String(wsEstimations(project.id).length);
   const fig = (id, text) => { document.getElementById(id).textContent = text; };
   if (wsCanCost()) {
+    // The three figures are written per currency: in one currency each is the single
+    // amount it always was, and in two it is both amounts side by side instead of their
+    // meaningless sum. `costs.materials` is deliberately not read here — in a mixed
+    // project wsProjectCosts() leaves it null so it cannot be printed by accident.
     const costs = wsProjectCosts(project.id);
-    fig("ws-project-mat", wsMoney(costs.materials, costs.currencyCode));
-    fig("ws-project-other", wsMoney(costs.other, costs.currencyCode));
-    fig("ws-project-total", wsMoney(costs.total, costs.currencyCode));
+    const nothing = wsMoney(0);
+    fig("ws-project-mat", wsSumsText(costs.byCurrency, "materials") || nothing);
+    fig("ws-project-other", wsSumsText(costs.byCurrency, "other") || nothing);
+    fig("ws-project-total", wsSumsText(costs.byCurrency, "total") || nothing);
     document.getElementById("ws-project-mixed").hidden = !costs.mixed;
   } else {
     fig("ws-project-mat", "");
@@ -1223,7 +1230,7 @@ function wsRenderEstimate() {
   // money and nothing else, so there is nothing in it worth having without the money.
   const total = project && money
     ? wsProjectTotal(project.id)
-    : { minor: 0, currencyCode: "", count: rows.length };
+    : { minor: 0, currencyCode: "", byCurrency: [], count: rows.length };
 
   const picker = document.getElementById("ws-estimate-project");
   if (picker) {
@@ -1251,8 +1258,10 @@ function wsRenderEstimate() {
   // rather than left showing a currency with nothing in front of it.
   const sum = wrap.querySelector(".ws-estimate-total");
   if (sum) sum.hidden = !money;
+  // Per currency, for the reason the note under it gives: lines saved in two currencies
+  // have two sums, and wsProjectTotal() returns no `minor` at all for them.
   document.getElementById("ws-estimate-total").textContent =
-    money ? wsMoney(total.minor, total.currencyCode) : "";
+    money ? (wsSumsText(total.byCurrency, "minor") || wsMoney(0)) : "";
   document.getElementById("ws-estimate-count").textContent = `${total.count} ${wsUnit("ws_lines", total.count)}`;
 
   // Lines saved in different currencies do not add up, and the sum above says so.
