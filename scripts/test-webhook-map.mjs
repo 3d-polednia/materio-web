@@ -16,7 +16,9 @@
  *   4. status subskrypcji → plan, z anulowaniem, które NIE odbiera Pro od razu;
  *   5. co jest zapisywane, a co kasowane;
  *   6. decyzja dla każdego z czterech zdarzeń i dla tych, które mają być zignorowane;
- *   7. i granice wdrożenia: że katalog funkcji nie jedzie na stronę i że w repozytorium
+ *   7. czyja to subskrypcja, z którego trybu konta i w której kolejności — znaleziska
+ *      H1 i H2 audytu 2026-09;
+ *   8. i granice wdrożenia: że katalog funkcji nie jedzie na stronę i że w repozytorium
  *      nie ma żadnego sekretu Stripe'a.
  *
  * Bez zależności, plain `node`, wyjście 1 przy błędzie.
@@ -29,8 +31,9 @@ import { fileURLToPath } from "node:url";
 
 import {
   DELETE_FIELD, FREE_STATUSES, HANDLED, PLAN_FIELDS, PLAN_FREE, PLAN_PRO, PRO_STATUSES,
-  customerIdOf, decide, emailOf, parseStripeSignature, periodEndMs, planFromSubscription,
-  planWrite, signedPayload, timingSafeEqualHex, verifyStripeSignature,
+  acceptEvent, customerIdOf, decide, emailOf, eventStamp, livemodeOk, offerMatches,
+  parseOfferIds, parseStripeSignature, periodEndMs, planFromSubscription, planWrite,
+  signedPayload, timingSafeEqualHex, verifyStripeSignature,
 } from "../functions/stripe-map.mjs";
 
 import { PLAN_FIELDS as ADMIN_FIELDS, PLAN_FREE as ADMIN_FREE, PLAN_PRO as ADMIN_PRO }
@@ -213,34 +216,47 @@ head("5. what a write puts in the document, and what it takes out");
 
 head("6. one decision per event, and three possible answers");
 {
-  const session = (over) => ({
+  /* Every event now carries the two things decide() checks before anything else: the
+     account mode, and a product this deployment actually sells. Without them the answer
+     is "ignore" — that is sections H1 and H2, checked on their own in §7. */
+  const OFFERS = "price_pro_month,prod_pro";
+  const config = { allowedIds: OFFERS };
+  const ITEMS = { data: [{ price: { id: "price_pro_month", product: "prod_pro" } }] };
+
+  const session = (over) => decide({
+    id: "evt_session", created: 1814400000, livemode: true,
     type: "checkout.session.completed",
     data: { object: { mode: "subscription", customer: "cus_1",
       client_reference_id: "uid-1", customer_details: { email: "kto@example.com" }, ...over } },
-  });
+  }, config);
 
-  const link = decide(session());
+  const link = session();
   eq("a completed checkout links a customer to an account", link.action, "link");
   eq("by the id the Payment Link carried", link.uid, "uid-1");
   eq("with the address as the fallback", link.email, "kto@example.com");
   eq("and the customer it belongs to", link.customerId, "cus_1");
 
   eq("an expanded customer object is the same customer",
-    decide(session({ customer: { id: "cus_9" } })).customerId, "cus_9");
+    session({ customer: { id: "cus_9" } }).customerId, "cus_9");
   eq("a one-off payment is not a subscription and is ignored",
-    decide(session({ mode: "payment" })).action, "ignore");
+    session({ mode: "payment" }).action, "ignore");
   eq("a session with no customer is ignored",
-    decide(session({ customer: null })).action, "ignore");
+    session({ customer: null }).action, "ignore");
   eq("a session with neither an id nor an address is ignored",
-    decide(session({ client_reference_id: null, customer_details: {} })).action, "ignore");
+    session({ client_reference_id: null, customer_details: {} }).action, "ignore");
   eq("an address is enough on its own",
-    decide(session({ client_reference_id: null })).action, "link");
+    session({ client_reference_id: null }).action, "link");
 
-  const subEvent = (type, object) => decide({ type, data: { object } });
+  const subEvent = (type, object) => decide({
+    id: "evt_sub", created: 1814400000, livemode: true, type,
+    data: { object: { items: ITEMS, ...object } },
+  }, config);
+
   const running = subEvent("customer.subscription.updated",
-    { customer: "cus_1", status: "active", current_period_end: 1818806400 });
+    { id: "sub_1", customer: "cus_1", status: "active", current_period_end: 1818806400 });
   eq("a subscription event sets a plan", running.action, "plan");
   eq("on that customer", running.customerId, "cus_1");
+  eq("and on that subscription", running.subscriptionId, "sub_1");
   eq("and the plan is Pro", running.write.plan, PLAN_PRO);
 
   const gone = subEvent("customer.subscription.deleted", { customer: "cus_1", status: "canceled" });
@@ -252,9 +268,9 @@ head("6. one decision per event, and three possible answers");
       { customer: "cus_1", status: "active", current_period_end: 1818806400 }).action, "plan");
 
   for (const type of ["invoice.paid", "payment_intent.succeeded", "customer.created", ""]) {
-    eq(`${type || "(no type)"} is ignored`, decide({ type, data: { object: {} } }).action, "ignore");
+    eq(`${type || "(no type)"} is ignored`, decide({ type, data: { object: {} } }, config).action, "ignore");
   }
-  eq("and so is nothing at all", decide(null).action, "ignore");
+  eq("and so is nothing at all", decide(null, config).action, "ignore");
   eq("four event types are handled and no more", HANDLED.length, 4);
 
   eq("a customer id is read off a string", customerIdOf({ customer: "cus_2" }), "cus_2");
@@ -262,11 +278,105 @@ head("6. one decision per event, and three possible answers");
   eq("and is null when absent", customerIdOf({}), null);
   eq("an address needs an @", emailOf({ customer_details: { email: "nope" } }), null);
   eq("customer_email is read too", emailOf({ customer_email: "a@b.pl" }), "a@b.pl");
+
+  eq("every decision carries the event it came from", running.stamp.id, "evt_sub");
+  eq("and when it happened", running.stamp.created, 1814400000);
 }
 
-/* ================================================================== 7. the deployment */
+/* ============================================== 7. whose subscription, and in what order */
 
-head("7. the function is deployed, not published — and carries no secret");
+head("7. whose subscription it is, from which account, and in which order (H1, H2)");
+{
+  /* H1: decide() used to grant Pro to any recurring subscription on the account. Anything
+     else sold through the same Stripe account — now or in five years — was full Pro. */
+  const OFFERS = "price_month, prod_pro";
+  const items = (data) => ({ items: { data } });
+  const ours = items([{ price: { id: "price_month", product: "prod_month" } }]);
+  const theirs = items([{ price: { id: "price_other", product: "prod_other" } }]);
+
+  eq("a price on the list is ours", offerMatches(ours, OFFERS), true);
+  eq("a product on the list is ours too",
+    offerMatches(items([{ price: { id: "price_x", product: "prod_pro" } }]), OFFERS), true);
+  eq("an expanded product object is the same product",
+    offerMatches(items([{ price: { id: "price_x", product: { id: "prod_pro" } } }]), OFFERS), true);
+  eq("somebody else's subscription is not", offerMatches(theirs, OFFERS), false);
+  eq("and the second item is read as well as the first",
+    offerMatches(items([{ price: { id: "price_other" } }, { price: { id: "price_month" } }]), OFFERS), true);
+  eq("an empty list matches nothing at all", offerMatches(ours, ""), false);
+  eq("a subscription with no items is not an answer", offerMatches(items([]), OFFERS), null);
+  eq("the list is read off a comma-and-space string",
+    parseOfferIds("price_a, price_b\nprice_c").join("|"), "price_a|price_b|price_c");
+  eq("and off nothing at all", parseOfferIds(undefined).length, 0);
+
+  const ev = (type, object, over) => ({
+    id: "evt_1", created: 1814400000, livemode: true, type,
+    data: { object: { id: "sub_1", customer: "cus_1", status: "active",
+      current_period_end: 1818806400, ...object } },
+    ...over,
+  });
+  const seen = (type, object, over) => decide(ev(type, object, over), { allowedIds: OFFERS });
+
+  eq("our subscription grants Pro",
+    seen("customer.subscription.updated", ours).write.plan, PLAN_PRO);
+  eq("a foreign subscription never grants it",
+    seen("customer.subscription.updated", theirs).action, "ignore");
+  eq("for that reason and no other",
+    seen("customer.subscription.updated", theirs).reason, "offer");
+  eq("and cancelling a foreign one never takes ours away",
+    seen("customer.subscription.deleted", theirs).action, "ignore");
+  eq("an unconfigured deployment grants Pro to nobody",
+    decide(ev("customer.subscription.updated", ours), {}).action, "ignore");
+  eq("a cancelled subscription with no items has to ask the record",
+    seen("customer.subscription.deleted", items([])).match, "unknown");
+  eq("while ours knows on its own",
+    seen("customer.subscription.deleted", ours).match, "offer");
+
+  /* The signature does not tell the two Stripe modes apart: a test event is signed just
+     as correctly, with the other secret. Card 4242 4242 4242 4242 would be free Pro. */
+  eq("a test event is ignored on a live account",
+    seen("customer.subscription.updated", ours, { livemode: false }).reason, "livemode");
+  eq("a live event is ignored on a sandbox one",
+    decide(ev("customer.subscription.updated", ours), { allowedIds: OFFERS, liveMode: false }).reason,
+    "livemode");
+  eq("the flag on the object counts too",
+    seen("customer.subscription.updated", { ...ours, livemode: false }).reason, "livemode");
+  check("and a live event on a live account passes",
+    livemodeOk({ livemode: true, data: { object: { livemode: true } } }));
+  check("a missing flag never passes for live", !livemodeOk({ data: { object: {} } }));
+
+  /* H2: Stripe promises neither order nor exactly-once. A late 'updated' arriving after
+     'deleted' used to hand back the plan taken away with the refund. */
+  const stamp = (id, created, type = "customer.subscription.updated") =>
+    eventStamp({ id, created, type });
+
+  const first = acceptEvent(null, stamp("evt_1", 100));
+  check("the first event about a subscription is applied", first.ok);
+  eq("and the moment is remembered", first.next.lastEventCreated, 100);
+  eq("the same event twice is a duplicate", acceptEvent(first.next, stamp("evt_1", 100)).reason, "duplicate");
+  eq("an older event is stale", acceptEvent(first.next, stamp("evt_0", 50)).reason, "stale");
+  check("a newer one is applied", acceptEvent(first.next, stamp("evt_2", 101)).ok);
+
+  const second = acceptEvent(first.next, stamp("evt_2", 100));
+  check("so is another event from the same second", second.ok);
+  eq("and both ids are kept", second.next.lastEventIds.join(","), "evt_1,evt_2");
+  eq("only from that second", acceptEvent(second.next, stamp("evt_3", 101)).next.lastEventIds.length, 1);
+
+  const ended = acceptEvent(second.next, stamp("evt_4", 100, "customer.subscription.deleted"));
+  check("the end of the subscription is applied even inside the same second", ended.ok);
+  check("and is remembered as the end", ended.next.terminal === true);
+  eq("after which a late update changes nothing",
+    acceptEvent(ended.next, stamp("evt_5", 100)).reason, "terminated");
+  eq("and neither does a newer one",
+    acceptEvent(ended.next, stamp("evt_6", 999999)).reason, "terminated");
+  eq("an event with no id cannot be put in order", acceptEvent(null, stamp(null, 100)).reason, "no-stamp");
+  eq("nor one with no time", acceptEvent(null, stamp("evt_7", 0)).reason, "no-stamp");
+  eq("the stamp knows which event ends a subscription",
+    stamp("evt_8", 1, "customer.subscription.deleted").terminal, true);
+}
+
+/* ================================================================== 8. the deployment */
+
+head("8. the function is deployed, not published — and carries no secret");
 {
   const index = read("functions/index.js");
   const map = read("functions/stripe-map.mjs");
@@ -309,6 +419,26 @@ head("7. the function is deployed, not published — and carries no secret");
   /* Nothing in the deployed function may write a plan a browser could ask for. */
   check("the function never trusts client_reference_id without checking it",
     index.includes("auth.getUser(intent.uid)"));
+
+  /* H1 and H2 are half configuration and half a second collection; the pure half above
+     cannot see either, so this is where the wiring is checked. */
+  check("the offer list is deployment configuration, not a constant in the code",
+    index.includes('defineString("STRIPE_PRICE_IDS"'));
+  check("and it reaches the decision", index.includes("decide(event, stripeConfig())"));
+  check("the account mode is configuration too",
+    index.includes('defineString("STRIPE_LIVE_MODE"'));
+  check("the plan write and the record of it happen in one transaction",
+    index.includes("runTransaction") && index.includes("acceptEvent("));
+  check("that record has its own collection",
+    index.includes('collection("stripeSubscriptions")'));
+  check("and closing last month's subscription cannot undo the plan this month's paid for",
+    index.includes("activeSubscriptionId") && index.includes("superseded"));
+  check("a rejected event is a 200, because retrying it would change nothing",
+    /outcome\.skipped[\s\S]{0,400}status\(200\)/.test(index));
+  for (const guess of ["price_1", "prod_1"]) {
+    check(`no ${guess}… identifier is written down in the repo`,
+      !index.includes(guess) && !map.includes(guess));
+  }
 }
 
 /* ------------------------------------------------------------------ the result */

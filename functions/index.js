@@ -19,10 +19,17 @@
  * więc `createdAt` i `lastSeenAt` zostają nietknięte — ten sam powód, dla którego
  * `scripts/pro-admin.mjs` używa `updateMask`.
  *
- * `stripeCustomers/{customerId}`: `{ uid, email, updatedAt }`. To jedyna nowa kolekcja i
- * jest poza kontraktem synchronizacji — telefon jej nie czyta, `wsExport()` jej nie
- * niesie. Reguły Firestore nie mają dla niej dopasowania, a Firestore domyślnie odmawia,
- * więc żadna przeglądarka jej nie odczyta. Powód jej istnienia jest w komentarzu przy
+ * `stripeSubscriptions/{subscriptionId}`: `{ customerId, uid, ours, lastEventCreated,
+ * lastEventIds, terminal, updatedAt }` — pamięć tego, co już zastosowaliśmy. Bez niej
+ * spóźnione zdarzenie Stripe'a przywracało plan odebrany po zwrocie pieniędzy (znalezisko
+ * H2 audytu 2026-09), a ponowienie po naszym błędzie zapisu liczyło się drugi raz.
+ *
+ * `stripeCustomers/{customerId}`: `{ uid, email, activeSubscriptionId, updatedAt }`.
+ * `activeSubscriptionId` to ostatnia subskrypcja, która nadała temu klientowi plan — po
+ * to, żeby zamknięcie starej subskrypcji nie odebrało Pro opłaconego nową. Obie kolekcje są poza
+ * kontraktem synchronizacji — telefon ich nie czyta, `wsExport()` ich nie niesie. Reguły
+ * Firestore nie mają dla nich dopasowania, a Firestore domyślnie odmawia, więc żadna
+ * przeglądarka ich nie odczyta. Powód istnienia `stripeCustomers` jest w komentarzu przy
  * `decide()` w functions/stripe-map.mjs: adres konta przychodzi w jednym zdarzeniu, a
  * daty subskrypcji w innym.
  *
@@ -47,18 +54,40 @@
 import { createHmac } from "node:crypto";
 
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
-import { defineSecret } from "firebase-functions/params";
+import { defineSecret, defineString } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 
-import { DELETE_FIELD, decide, verifyStripeSignature } from "./stripe-map.mjs";
+import {
+  DELETE_FIELD, PLAN_FREE, acceptEvent, decide, verifyStripeSignature,
+} from "./stripe-map.mjs";
 import {
   LIST_LIMIT, accountRow, grantWrite, isAdmin, parseRequest, planSummary, revokeWrite,
 } from "./admin-map.mjs";
 
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
+
+/**
+ * Które subskrypcje są LiczMat Pro i z którego konta Stripe'a. Znaleziska H1 i H2.
+ *
+ * Nie sekrety — Price ID widać w adresie kasy — tylko konfiguracja wdrożenia, więc zwykłe
+ * parametry z `functions/.env`, a nie Secret Manager:
+ *
+ *     STRIPE_PRICE_IDS=price_…,price_…      # albo prod_…, jeśli ma objąć wszystkie ceny produktu
+ *     STRIPE_LIVE_MODE=true                 # false tylko na czas przebiegu w piaskownicy
+ *
+ * Domyślnie lista jest **pusta**, a pusta lista nie nadaje Pro nikomu. Funkcja wdrożona
+ * przed wpisaniem identyfikatorów nic nie zepsuje: pokwituje zdarzenia i nie tknie planu.
+ */
+const STRIPE_PRICE_IDS = defineString("STRIPE_PRICE_IDS", { default: "" });
+const STRIPE_LIVE_MODE = defineString("STRIPE_LIVE_MODE", { default: "true" });
+
+const stripeConfig = () => ({
+  allowedIds: STRIPE_PRICE_IDS.value(),
+  liveMode: STRIPE_LIVE_MODE.value() !== "false",
+});
 
 initializeApp();
 
@@ -106,11 +135,19 @@ export const stripeWebhook = onRequest(
       return;
     }
 
-    const intent = decide(event);
+    const intent = decide(event, stripeConfig());
     const db = getFirestore();
 
     try {
       if (intent.action === "ignore") {
+        /* Dwa powody wyglądają z zewnątrz jak awaria i mają zostawić ślad: zdarzenie z
+           cudzego produktu (H1) i zdarzenie z drugiego trybu konta. Reszta — obce typy
+           zdarzeń — jest szumem i milczy. */
+        if (intent.reason === "offer" || intent.reason === "livemode") {
+          logger.warn("stripe: zdarzenie spoza sprzedaży LiczMat Pro", {
+            type: intent.type, reason: intent.reason,
+          });
+        }
         res.status(200).send("ignored");
         return;
       }
@@ -135,10 +172,85 @@ export const stripeWebhook = onRequest(
         return;
       }
 
-      // intent.action === "plan"
-      const link = await db.collection("stripeCustomers").doc(intent.customerId).get();
-      const uid = link.exists ? link.get("uid") : null;
-      if (!uid) {
+      /* intent.action === "plan"
+
+         Wszystko w jednej transakcji, bo trzy odczyty i do trzech zapisów muszą widzieć
+         ten sam stan: czyj to klient, co już zastosowaliśmy, co konto ma teraz, i co z
+         tego wynika dla planu. Firestore wymaga wszystkich odczytów **przed** pierwszym
+         zapisem. */
+      const customerRef = db.collection("stripeCustomers").doc(intent.customerId);
+      const subRef = db.collection("stripeSubscriptions")
+        .doc(intent.subscriptionId || `cus_${intent.customerId}`);
+
+      const outcome = await db.runTransaction(async (tx) => {
+        const link = await tx.get(customerRef);
+        const seen = await tx.get(subRef);
+
+        const uid = link.exists ? link.get("uid") : null;
+        if (!uid) return { retry: true };
+
+        const userRef = db.collection("users").doc(uid);
+        const profile = await tx.get(userRef);
+        const known = seen.exists ? seen.data() : null;
+
+        /* Skasowana subskrypcja bez ani jednej pozycji: sam obiekt nie mówi, czy była
+           nasza, więc pyta się o to zapis, który ta funkcja sama wcześniej zrobiła.
+           Nieznana — nie nasza, a cudzy produkt nie odbiera Pro. */
+        if (intent.match === "unknown" && !(known && known.ours === true)) {
+          return { skipped: "unknown-offer" };
+        }
+
+        /* Kto przeszedł z miesięcznego na roczny, ma przez chwilę dwie subskrypcje: nową
+           czynną i starą, którą Stripe zamyka osobnym zdarzeniem. Kolejność pilnujemy per
+           subskrypcja — bo tylko subskrypcja ma własną oś czasu — a plan jest jeden na
+           konto. Bez tej bramki zdarzenie starszej subskrypcji przestawiałoby plan
+           opłacony nowszą: zamknięcie odbierałoby Pro, a spóźniona zmiana skracała datę
+           ważności do końca starego okresu.
+
+           Rozstrzyga data, nie kolejność dostarczenia: cudza subskrypcja przejmuje plan
+           tylko wtedy, gdy jest opłacony **dłużej** niż to, co konto już ma. Ostatnia,
+           która wygrała, stoi przy powiązaniu klienta. */
+        const takesAway = intent.write.plan === PLAN_FREE;
+        const granted = link.get("activeSubscriptionId") || null;
+        const another = Boolean(granted && intent.subscriptionId && granted !== intent.subscriptionId);
+        if (another) {
+          const hasUntil = Number(profile.exists ? profile.get("planValidUntil") : undefined);
+          const wantsUntil = Number(intent.write.planValidUntil);
+          if (takesAway || (Number.isFinite(hasUntil) && !(wantsUntil > hasUntil))) {
+            return { skipped: "superseded" };
+          }
+        }
+
+        const verdict = acceptEvent(known, intent.stamp);
+        if (!verdict.ok) return { skipped: verdict.reason };
+
+        const mark = {
+          ...verdict.next,
+          customerId: intent.customerId,
+          uid,
+          ours: true,
+          updatedAt: Date.now(),
+        };
+        /* Dokument skończonej subskrypcji nie jest już nikomu potrzebny — poza tym, żeby
+           spóźnione zdarzenie nie wskrzesiło planu. Czternaście miesięcy z zapasem nad
+           najdłuższym okresem rozliczeniowym (rok), kasowane samo przez politykę TTL
+           Firestore'a założoną na polu `expiresAt`; bez polityki zostaje na zawsze i
+           kosztuje tyle, co jeden dokument. */
+        if (intent.stamp.terminal) {
+          mark.expiresAt = new Date(Date.now() + 425 * 24 * 60 * 60 * 1000);
+        }
+
+        tx.set(subRef, mark, { merge: true });
+        if (!takesAway && intent.subscriptionId) {
+          tx.set(customerRef,
+            { activeSubscriptionId: intent.subscriptionId, updatedAt: Date.now() },
+            { merge: true });
+        }
+        tx.set(userRef, toFirestore(intent.write), { merge: true });
+        return { uid };
+      });
+
+      if (outcome.retry) {
         /* Zdarzenie subskrypcji wyprzedziło sesję Checkout — Stripe nie obiecuje
            kolejności. 503 każe mu ponowić; przez kilka dni, z rosnącą przerwą. Do tego
            czasu sesja zdąży dojść i powiązanie będzie istniało. */
@@ -149,9 +261,20 @@ export const stripeWebhook = onRequest(
         return;
       }
 
-      await db.collection("users").doc(uid).set(toFirestore(intent.write), { merge: true });
+      if (outcome.skipped) {
+        /* 200, nie 503: ponowienie nic tu nie zmieni. Duplikat, zdarzenie starsze niż
+           ostatnie zastosowane albo zdarzenie po końcu subskrypcji — każde z nich jest
+           obsłużone przez to, że nic nie zapisujemy (H2). */
+        logger.info("stripe: zdarzenie pominięte", {
+          type: intent.type, reason: outcome.skipped,
+          eventId: intent.stamp.id, subscriptionId: intent.subscriptionId,
+        });
+        res.status(200).send(outcome.skipped);
+        return;
+      }
+
       logger.info("stripe: plan zapisany", {
-        type: intent.type, uid, plan: intent.write.plan,
+        type: intent.type, uid: outcome.uid, plan: intent.write.plan,
       });
       res.status(200).send("ok");
     } catch (err) {

@@ -180,6 +180,159 @@ export function planWrite(mapped) {
   };
 }
 
+/* ------------------------------------------------------------------ the offer */
+
+/** Pole Stripe'a bywa identyfikatorem, bywa całym obiektem — zależy, co wywołanie rozwinęło. */
+export function idOf(value) {
+  if (typeof value === "string" && value) return value;
+  if (value && typeof value === "object" && typeof value.id === "string" && value.id) return value.id;
+  return null;
+}
+
+/**
+ * Lista identyfikatorów, którym wolno nadać Pro. Napis z konfiguracji → tablica.
+ *
+ * Znalezisko H1 audytu 2026-09: `decide()` sprawdzało tylko, że zdarzenie jest
+ * subskrypcją, więc **każda** subskrypcja na tym samym koncie Stripe'a — obecna i każda
+ * dołożona kiedykolwiek później — nadawała pełne LiczMat Pro.
+ *
+ * Lista jest konfiguracją wdrożenia, nie stałą w kodzie: Price ID i Product ID powstają
+ * dopiero w panelu Stripe'a, a piaskownica ma inne niż konto żywe. `functions/index.js`
+ * czyta ją z sekretu `STRIPE_PRICE_IDS` i podaje tutaj.
+ *
+ * Wolno wpisać jedno albo drugie: Product ID obejmuje wszystkie ceny tego produktu
+ * (siedem walut to nadal jeden produkt), Price ID zawęża do jednej ceny.
+ */
+export function parseOfferIds(raw) {
+  const list = Array.isArray(raw) ? raw : typeof raw === "string" ? raw.split(/[\s,;]+/) : [];
+  return list.filter((v) => typeof v === "string" && v.trim()).map((v) => v.trim());
+}
+
+/** Price ID i Product ID każdej pozycji subskrypcji — wszystkich, nie pierwszej. */
+export function offerIdsOf(sub) {
+  const items = sub && sub.items && Array.isArray(sub.items.data) ? sub.items.data : [];
+  const out = [];
+  for (const item of items) {
+    const price = item && item.price;
+    const priceId = idOf(price);
+    const productId = idOf(price && price.product);
+    if (priceId) out.push(priceId);
+    if (productId) out.push(productId);
+  }
+  return out;
+}
+
+/**
+ * Czy to jest subskrypcja LiczMat Pro.
+ *
+ * Trzy odpowiedzi, nie dwie. `null` znaczy „nie ma z czego wyczytać" — subskrypcja bez
+ * ani jednej pozycji. Przy `deleted` to jest różnica między „nie nasze, nie ruszaj planu"
+ * a „nie wiem, sprawdź w zapisie": `functions/index.js` dopytuje wtedy dokument
+ * subskrypcji, który sam wcześniej zapisał.
+ *
+ * Pusta lista nie dopasowuje **niczego**. To jest wybór: konto bez wpisanej listy nie
+ * nadaje Pro nikomu, zamiast nadawać je każdemu.
+ */
+export function offerMatches(sub, allowed) {
+  const ids = offerIdsOf(sub);
+  if (!ids.length) return null;
+  const list = parseOfferIds(allowed);
+  if (!list.length) return false;
+  return ids.some((id) => list.includes(id));
+}
+
+/**
+ * Tryb konta: żywe czy piaskownica.
+ *
+ * Podpis webhooka tego nie rozstrzyga — zdarzenie z trybu testowego jest podpisane tak
+ * samo poprawnie, tylko innym sekretem. Gdyby oba webhooki kiedykolwiek celowały w tę
+ * samą funkcję (a przy przenoszeniu z piaskownicy na żywe konto celują), płatność kartą
+ * `4242 4242 4242 4242` nadałaby prawdziwe Pro za zero złotych.
+ *
+ * `livemode` stoi na zdarzeniu i na obiekcie w środku; sprawdzamy oba, gdy oba są.
+ */
+export function livemodeOk(event, expectLive = true) {
+  const want = expectLive !== false;
+  if (!event || event.livemode !== want) return false;
+  const object = (event.data && event.data.object) || {};
+  return object.livemode === undefined || object.livemode === want;
+}
+
+/* ------------------------------------------------------------------ the order */
+
+/**
+ * Tożsamość zdarzenia i jego miejsce w czasie: `{ id, created, terminal }`.
+ *
+ * `created` zostaje w sekundach, tak jak przysyła Stripe — porównujemy je tylko ze sobą.
+ * `terminal` znaczy „subskrypcja skończona": po takim zdarzeniu żadne starsze nie ma już
+ * nic do powiedzenia.
+ */
+export function eventStamp(event) {
+  const id = typeof (event && event.id) === "string" && event.id ? event.id : null;
+  const created = Number(event && event.created);
+  return {
+    id,
+    created: Number.isFinite(created) && created > 0 ? Math.floor(created) : null,
+    terminal: (event && event.type) === "customer.subscription.deleted",
+  };
+}
+
+/**
+ * Czy to zdarzenie ma jeszcze cokolwiek do powiedzenia o tej subskrypcji.
+ *
+ * Znalezisko H2 audytu 2026-09: zapis planu leciał bezwarunkowo. Stripe nie obiecuje ani
+ * kolejności dostarczenia, ani jednokrotności — ponawia po każdym błędzie i po każdym
+ * przekroczeniu czasu. Gdy `deleted` doszło pierwsze, a starszy `updated` po nim, ktoś
+ * po zwrocie pieniędzy odzyskiwał `premium`.
+ *
+ * Cztery powody odrzucenia, w tej kolejności:
+ *
+ *   no-stamp   — zdarzenie bez identyfikatora albo bez czasu, więc nie da się ustawić w kolejce;
+ *   duplicate  — to samo zdarzenie drugi raz, czyli ponowienie po naszym błędzie zapisu;
+ *   terminated — subskrypcja już skończona, a to nie jest zdarzenie o jej końcu;
+ *   stale      — zdarzenie starsze niż ostatnie zastosowane.
+ *
+ * `terminated` jest tu dlatego, że `created` ma rozdzielczość jednej sekundy: anulowanie
+ * i ostatnia zmiana potrafią mieć ten sam znacznik i wtedy sama data nie ustawia ich w
+ * kolejce. Koniec subskrypcji jest stanem, z którego się nie wraca — za nową opłatę Stripe
+ * zakłada nową subskrypcję, z nowym identyfikatorem i własnym dokumentem.
+ *
+ * Identyfikatory pamiętamy tylko z jednej sekundy: starsze zdarzenie odsiewa już `stale`,
+ * więc lista nie ma jak rosnąć.
+ *
+ * Czego to **nie** rozstrzyga: dwóch różnych `updated` z tej samej sekundy, dostarczonych
+ * odwrotnie. Sekunda jest wszystkim, co Stripe daje — subskrypcja nie niesie ani numeru
+ * wersji, ani niczego rosnącego — więc starszy z takiej pary wygrywa. Skutek jest wtedy
+ * jedną datą albo jedną flagą odnowienia obok, nigdy planem nadanym bez zapłaty: koniec
+ * subskrypcji ma osobny typ zdarzenia i osobną, mocniejszą regułę wyżej.
+ *
+ * @returns {{ok: boolean, reason: string, next: object|null}}
+ */
+export function acceptEvent(seen, incoming) {
+  if (!incoming || !incoming.id || incoming.created === null) {
+    return { ok: false, reason: "no-stamp", next: null };
+  }
+  const lastCreated = Number(seen && seen.lastEventCreated);
+  const lastIds = Array.isArray(seen && seen.lastEventIds) ? seen.lastEventIds : [];
+  if (lastIds.includes(incoming.id)) return { ok: false, reason: "duplicate", next: null };
+  if (seen && seen.terminal === true && !incoming.terminal) {
+    return { ok: false, reason: "terminated", next: null };
+  }
+  if (Number.isFinite(lastCreated) && incoming.created < lastCreated) {
+    return { ok: false, reason: "stale", next: null };
+  }
+  const sameSecond = Number.isFinite(lastCreated) && incoming.created === lastCreated;
+  return {
+    ok: true,
+    reason: "",
+    next: {
+      lastEventCreated: incoming.created,
+      lastEventIds: sameSecond ? [...lastIds, incoming.id] : [incoming.id],
+      terminal: Boolean((seen && seen.terminal) || incoming.terminal),
+    },
+  };
+}
+
 /* ------------------------------------------------------------------ the event */
 
 /** Zdarzenia, na które ten webhook w ogóle reaguje. Reszta jest kwitowana i zapominana. */
@@ -193,9 +346,14 @@ export const HANDLED = [
 /**
  * Zdarzenie Stripe'a → co z nim zrobić. Trzy możliwe odpowiedzi i ani jednej więcej:
  *
- *   { action: "ignore" }                     — nie nasze zdarzenie
+ *   { action: "ignore", reason }             — nie nasze zdarzenie
  *   { action: "link", customerId, uid, email } — zapamiętaj, czyj to klient Stripe'a
- *   { action: "plan", customerId, write }      — przestaw plan tego klienta
+ *   { action: "plan", customerId, subscriptionId, match, write } — przestaw plan klienta
+ *
+ * `config` jest konfiguracją wdrożenia, nie stałą: `{ allowedIds, liveMode }`. Bez niej
+ * nic nie dostaje Pro — patrz `offerMatches()` i `livemodeOk()` wyżej. Każda decyzja
+ * niesie `stamp`, czyli tożsamość zdarzenia i jego czas; `functions/index.js` porównuje
+ * go z tym, co już zastosował, zanim cokolwiek zapisze.
  *
  * **Dlaczego zapłata i plan to dwa osobne kroki.** Adres konta (`client_reference_id`,
  * czyli uid) przychodzi wyłącznie w `checkout.session.completed`; daty i status
@@ -207,31 +365,51 @@ export const HANDLED = [
  * ponawia — przez kilka dni, z rosnącą przerwą. To jest właściwa reakcja: zapłata, której
  * nie umiemy jeszcze przypisać, ma poczekać, a nie zniknąć.
  */
-export function decide(event) {
+export function decide(event, config = {}) {
   const type = event && event.type;
-  if (!HANDLED.includes(type)) return { action: "ignore", type: type || "" };
+  if (!HANDLED.includes(type)) return { action: "ignore", type: type || "", reason: "type" };
+  if (!livemodeOk(event, config.liveMode)) return { action: "ignore", type, reason: "livemode" };
 
   const object = (event.data && event.data.object) || {};
+  const stamp = eventStamp(event);
 
   if (type === "checkout.session.completed") {
     // Subskrypcję zakłada Stripe; zapłata jednorazowa nie ustawia planu, bo nie ma czego odnawiać.
-    if (object.mode && object.mode !== "subscription") return { action: "ignore", type };
+    if (object.mode && object.mode !== "subscription") return { action: "ignore", type, reason: "mode" };
     const customerId = customerIdOf(object);
     const uid = typeof object.client_reference_id === "string" && object.client_reference_id
       ? object.client_reference_id : null;
     const email = emailOf(object);
-    if (!customerId || (!uid && !email)) return { action: "ignore", type };
-    return { action: "link", type, customerId, uid, email };
+    if (!customerId || (!uid && !email)) return { action: "ignore", type, reason: "unattributable" };
+    return { action: "link", type, customerId, uid, email, stamp };
   }
 
   const customerId = customerIdOf(object);
-  if (!customerId) return { action: "ignore", type };
-  const mapped = type === "customer.subscription.deleted"
-    // Subskrypcja skończona teraz: zwrot, obciążenie zwrotne albo koniec po anulowaniu.
-    // Data ważności i tak by już minęła, ale zapis wprost jest jednoznaczny.
-    ? { pro: false, validUntilMs: null, renews: false }
-    : planFromSubscription(object);
-  return { action: "plan", type, customerId, write: planWrite(mapped) };
+  if (!customerId) return { action: "ignore", type, reason: "no-customer" };
+
+  /* Czyj to produkt: nasz, cudzy, czy nie da się wyczytać. Sesja Checkout nie niesie
+     żadnej ceny bez `expand`, więc jedynym miejscem, gdzie to widać, jest subskrypcja. */
+  const ours = offerMatches(object, config.allowedIds);
+  const subscriptionId = idOf(object);
+
+  if (type === "customer.subscription.deleted") {
+    // Cudzy produkt nie ma prawa odebrać Pro, tak samo jak nie ma prawa go nadać.
+    if (ours === false) return { action: "ignore", type, reason: "offer" };
+    return {
+      action: "plan", type, customerId, subscriptionId, stamp,
+      // Subskrypcja skończona teraz: zwrot, obciążenie zwrotne albo koniec po anulowaniu.
+      // Data ważności i tak by już minęła, ale zapis wprost jest jednoznaczny.
+      match: ours === true ? "offer" : "unknown",
+      write: planWrite({ pro: false, validUntilMs: null, renews: false }),
+    };
+  }
+
+  if (ours !== true) return { action: "ignore", type, reason: "offer" };
+  return {
+    action: "plan", type, customerId, subscriptionId, stamp,
+    match: "offer",
+    write: planWrite(planFromSubscription(object)),
+  };
 }
 
 /** `customer` bywa identyfikatorem albo całym obiektem — Stripe rozwija je zależnie od wywołania. */

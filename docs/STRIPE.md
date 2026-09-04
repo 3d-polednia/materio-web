@@ -66,7 +66,40 @@ Stripe → **Settings → Billing → Customer portal** → włączyć i skopiow
 (`https://billing.stripe.com/p/login/...`). To jest jedyne miejsce, w którym ktoś
 anuluje subskrypcję — serwis nie ma serwera, który mógłby cokolwiek u Stripe'a zapisać.
 
-## 3. Sekret i wdrożenie funkcji
+## 3. Sekret, lista produktów i wdrożenie funkcji
+
+### 3a. Które subskrypcje są LiczMat Pro
+
+Webhook nadaje Pro **wyłącznie** subskrypcjom z wpisanej listy. Bez niej nie nadaje go
+nikomu — i to jest zachowanie zamierzone, a nie awaria. Do Sesji 62 listy nie było i
+każda subskrypcja na koncie Stripe'a, także dowolna dołożona w przyszłości, dawała pełny
+dostęp; tak samo każde zdarzenie z piaskownicy, gdyby trafiło w ten sam adres
+(znalezisko H1 audytu 2026-09).
+
+Plik `functions/.env`, obok `functions/index.js` — to **nie jest** sekret, Price ID widać
+w adresie kasy, więc nie idzie do Secret Managera:
+
+```
+STRIPE_PRICE_IDS=prod_XXXXXXXX,prod_YYYYYYYY
+STRIPE_LIVE_MODE=true
+```
+
+- **Product ID** (`prod_…`, dwa z kroku 1) obejmuje wszystkie ceny produktu, czyli
+  wszystkie siedem walut naraz — i dlatego jest wygodniejszy niż Price ID. **Price ID**
+  (`price_…`) zawęża do jednej ceny; wolno mieszać jedno z drugim.
+- Identyfikator kopiuje się w Stripe → Products → nazwa produktu, pole *Product ID*.
+- **`STRIPE_LIVE_MODE=false` na czas przebiegu w piaskownicy** z kroku 0, i z powrotem na
+  `true` przed pierwszym żywym linkiem. Identyfikatory produktów też są wtedy testowe:
+  piaskownica ma własne. Zdarzenie z drugiego trybu jest kwitowane i ignorowane.
+- Po każdej zmianie tego pliku: `firebase deploy --only functions`. Wartości wchodzą przy
+  wdrożeniu, nie w locie.
+- **`.gitignore` nie wpuszcza `.env` do repozytorium** — tak samo jak sekretu. Plik żyje
+  więc tylko na komputerze, z którego wdrażasz, i tam ma zostać. Wdrożenie ze świeżego
+  klona bez tego pliku nie zepsuje sprzedaży w sposób, którego nie widać: lista jest
+  wtedy pusta, więc żadna płatność nie nadaje Pro, a każde zdarzenie zostawia w logu
+  ostrzeżenie `zdarzenie spoza sprzedaży LiczMat Pro`.
+
+### 3b. Sekret i wdrożenie
 
 Na komputerze właściciela, w katalogu repozytorium:
 
@@ -103,7 +136,9 @@ Czego się spodziewać w logu endpointu:
 
 | odpowiedź | co znaczy |
 |---|---|
-| `200` | zdarzenie obsłużone albo świadomie zignorowane |
+| `200 ok` | plan zapisany |
+| `200 ignored` | nie nasze zdarzenie: obcy typ, obcy produkt albo drugi tryb konta. Obcy produkt i obcy tryb zostawiają ostrzeżenie w logu — jeśli widać je po **własnej** płatności, znaczy to, że `STRIPE_PRICE_IDS` albo `STRIPE_LIVE_MODE` z kroku 3a są nie te |
+| `200 duplicate` / `stale` / `terminated` | zdarzenie już zastosowane, starsze niż ostatnie, albo przyszłe po końcu subskrypcji. Ponowienie nic by nie zmieniło, więc Stripe dostaje 200 |
 | `400` | podpis się nie zgadza — zły sekret albo zły tryb (test vs żywy) |
 | `503` | zdarzenie subskrypcji przyszło **przed** sesją Checkout, więc uid jest jeszcze nieznany. Stripe ponawia przez kilka dni i to jest zachowanie zamierzone, nie awaria |
 
@@ -117,7 +152,18 @@ z `?client_reference_id=<uid>`) i zapłacić. Potem, **nie przeładowując `/app
 - `/klienci/` ma się otworzyć bez ściany;
 - Firestore → `users/{uid}` ma mieć `plan: "premium"`, `planValidUntil` (millisekundy)
   i `planRenews: true`, a `createdAt` i `lastSeenAt` **nietknięte**;
-- Firestore → `stripeCustomers/{customerId}` ma mieć `{ uid, email, updatedAt }`.
+- Firestore → `stripeCustomers/{customerId}` ma mieć `{ uid, email, activeSubscriptionId, updatedAt }`;
+- Firestore → `stripeSubscriptions/{subscriptionId}` ma mieć `{ uid, customerId, ours,
+  lastEventCreated, lastEventIds, terminal }`. To jest pamięć tego, które zdarzenia już
+  zastosowano: bez niej spóźnione zdarzenie Stripe'a przywracało plan odebrany po zwrocie
+  pieniędzy (znalezisko H2 audytu 2026-09). Kolekcji nie czyta żadna przeglądarka —
+  reguły Firestore nie mają dla niej dopasowania, a domyślną odpowiedzią jest odmowa.
+
+  Dokument skończonej subskrypcji dostaje pole `expiresAt` (425 dni, z zapasem nad
+  najdłuższym okresem rozliczeniowym). Żeby Firestore kasował je sam, trzeba raz założyć
+  politykę TTL: Firebase → Firestore → **TTL** → kolekcja `stripeSubscriptions`, pole
+  `expiresAt`. Bez polityki dokumenty zostają i kosztują tyle, co jeden dokument na
+  subskrypcję — nic się nie psuje.
 
 Potem anulowanie w portalu klienta: `planRenews` schodzi na `false`, `planValidUntil`
 **zostaje** i moduły są otwarte do końca opłaconego okresu. To jest zachowanie zamierzone.
