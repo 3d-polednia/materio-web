@@ -70,7 +70,7 @@ Tokeny są **rolami**, nie nazwami barw. Komponent prosi o „kolor drugorzędne
 | `--muted` | `#5c6570` | `#a4abb3` | tekst drugorzędny; nigdy dla treści, bez której strona traci sens |
 | `--outline` | `#e0dacd` | `#202932` | włos oddzielający rzeczy, które i tak widać |
 | `--outline-strong` | `#cbc4b4` | `#2d3236` | mocniejsza krawędź (hover przycisku pobocznego) |
-| `--outline-control` | `#8b8577` | `#5a636d` | **krawędź pola formularza** — jedyne, co mówi, gdzie kliknąć, więc trzymana na 3:1 |
+| `--outline-control` | `#898375` | `#707880` | **krawędź kontrolki** — pola, selecta, czipa, zakładki, przycisku pobocznego; jedyne, co mówi, gdzie kliknąć, więc trzymana na 3:1 wobec każdego tła, na którym ta kontrolka stoi |
 | `--field-bg` | `#fbf9f4` | `#080f16` | wnętrze pola: zawsze o krok „głębiej” niż pojemnik |
 | `--overlay` | `rgba(20,24,28,.45)` | `rgba(0,0,0,.62)` | tło pod dialogiem |
 
@@ -93,9 +93,9 @@ Kolor nigdy nie jest jedynym nośnikiem informacji — błędne pole ma czerwon�
 `node scripts/check-contrast.mjs` mierzy każdą parę w obu motywach i kończy się
 kodem 1, jeśli któraś nie trafia w próg (4,5:1 dla tekstu, 3:1 dla krawędzi pola,
 obwódki fokusu i krawędzi przycisku — WCAG 1.4.11). Stan na koniec Sesji 4:
-**30 par × 2 motywy, wszystkie przechodzą**, najsłabsze to `--outline-control`
-na `--surface` w trybie ciemnym (3,06:1) i `--muted` na `--surface-container`
-w jasnym (4,88:1).
+**37 par × 2 motywy, wszystkie przechodzą**, najsłabsze to `--outline-control`
+na `--accent-soft-2` (3,03:1 w obu motywach — czip pod kursorem) i `--muted`
+na `--surface-container` w jasnym (4,88:1).
 
 ---
 

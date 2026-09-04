@@ -89,6 +89,9 @@ const PAIRS = [
   // Not text: WCAG 1.4.11 wants 3:1 for the boundary of a control and for focus.
   ["--outline-control", "--field-bg", 3, "the border of an input (1.4.11)"],
   ["--outline-control", "--surface", 3, "that border against the card behind it"],
+  ["--outline-control", "--surface-alt", 3, "the border of a chip or a tab against its own fill (1.4.11)"],
+  ["--outline-control", "--bg", 3, "the border of a chip or a ghost button against the page"],
+  ["--outline-control", "--accent-soft-2", 3, "that border while the chip is hovered"],
   ["--focus", "--bg", 3, "the focus ring on the page"],
   ["--focus", "--surface", 3, "the focus ring on a card"],
   ["--accent-edge", "--bg", 3, "the edge of a primary button (1.4.11)"],

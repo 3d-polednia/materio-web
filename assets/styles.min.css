@@ -21,7 +21,7 @@
 --muted: #5c6570;
 --outline: #e0dacd;
 --outline-strong: #cbc4b4;
---outline-control: #8b8577;
+--outline-control: #898375;
 --field-bg: #fbf9f4;
 --error: #b3261e;
 --error-soft: #fbe7e5;
@@ -57,7 +57,7 @@
 --muted: #a4abb3;
 --outline: #202932;
 --outline-strong: #2d3236;
---outline-control: #5a636d;
+--outline-control: #707880;
 --field-bg: #080f16;
 --error: #ff8a80;
 --error-soft: #3a1512;
@@ -93,7 +93,7 @@
 --muted: #a4abb3;
 --outline: #202932;
 --outline-strong: #2d3236;
---outline-control: #5a636d;
+--outline-control: #707880;
 --field-bg: #080f16;
 --error: #ff8a80;
 --error-soft: #3a1512;
@@ -239,7 +239,7 @@ background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 .btn:disabled:active, .btn[aria-disabled="true"]:active { transform: none; }
 .btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2); }
 .btn-primary:hover { box-shadow: var(--shadow-3); }
-.btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline-strong); }
+.btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline-control); }
 .btn-ghost:hover { background: var(--surface-alt); }
 .btn-danger { background: var(--error); color: var(--surface); }
 .btn-danger:hover { opacity: .92; }
@@ -248,7 +248,7 @@ background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 .btn-block { width: 100%; }
 .chip, .calc-tab, .app-tab {
 font: inherit; cursor: pointer; text-align: center;
-border-radius: var(--radius-pill); border: 1px solid var(--outline);
+border-radius: var(--radius-pill); border: 1px solid var(--outline-control);
 background: var(--surface-alt); color: var(--on-bg);
 transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
@@ -257,7 +257,7 @@ transition: background var(--dur) var(--ease), border-color var(--dur) var(--eas
 .chip.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .chip.warn {
 background: var(--error-soft); color: var(--on-error-soft);
-border-color: color-mix(in srgb, var(--error) 34%, var(--outline));
+border-color: color-mix(in srgb, var(--error) 34%, var(--outline-control));
 }
 .calc-tab { font-weight: var(--fw-semi); font-size: var(--fs-sm); padding: var(--sp-2) var(--sp-4); background: var(--surface); }
 .calc-tab[aria-selected="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
