@@ -320,6 +320,9 @@ const ACRONYMS = new Set([
   // Spanish and French; REGON and ЄДРПОУ are the Polish and Ukrainian company registers.
   // Shouting is not what these are — they are how the law is spelled.
   "RODO", "GDPR", "DSGVO", "RGPD", "REGON", "ЄДРПОУ",
+  // And what a one-person business is called where it is registered: OSVČ in Czech, SZČO
+  // in Slovak. Both are the ordinary word for it, and both are spelled in capitals.
+  "OSVČ", "SZČO",
 ]);
 
 checkMany("no exclamation mark", COPY.filter((r) => r.text.includes("!")),
@@ -464,10 +467,13 @@ const BUDGET = {
   "own-materials": 225,
   materials: 2820, stores: 159, android: 519, projects: 850, estimate: 425,
   clients: 524, jobs: 544, quotes: 470, calendar: 420, cookies: 637,
-  // Session 62, audit item H7. The widest is French at 172 words, and the page is short
-  // on purpose: a name, an address to write to and two links. Everything that could be
-  // said at length here is already said on /privacy-policy.html, which has its own budget.
-  contact: 180,
+  /* Session 62, audit item H7, and 220 rather than the 180 it was measured at the same
+     day: the owner's Gewerbe is registered in Germany, so the page went from a name and
+     an address to the set §5 DDG asks for — postal address, telephone, USt-IdNr., the
+     person responsible for the editorial content and the consumer-dispute sentence. The
+     widest is French at 213 words. Six of those rows are one label and one value; the
+     prose proper is still four sentences. */
+  contact: 220,
   "liczmat-pro": 477, account: 850, dashboard: 130, share: 40, privacy: 3800,
 };
 

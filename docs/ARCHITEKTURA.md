@@ -103,7 +103,7 @@ i `CALC_SLUG` w `src/site.mjs`.
 | `calendar` | `/terminarz/` | **PRO** | `jobs` | tak | 10 |
 | `liczmat-pro` | `/liczmat-pro/` | GUEST | `home` | tak | 10 |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 10 |
-| `contact` | `/kontakt/` | GUEST | `home` | tak | 10 |
+| `contact` | `/kontakt/` (de: `/de/impressum/`) | GUEST | `home` | tak | 10 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
 | `dashboard` | `/app/dashboard/` | GUEST | `account` | **nie** | 1 |
 | `share` | `/p/` | GUEST | `estimate` | **nie** | 1 |
@@ -166,6 +166,11 @@ nie jest absolutna. Wszystkie zostają — każda ma powód:
   i zakładał konta, nie podając nigdzie, kto go prowadzi. Art. 13 RODO wymaga tożsamości
   administratora, dyrektywa o handlu elektronicznym — identyfikacji sprzedawcy. Dane są
   w jednym miejscu, `ENTITY` w `src/site.mjs`; czyta je stopka każdej strony i ta strona.
+  Właściciel prowadzi Gewerbe w Bawarii, więc strona niesie komplet z §5 DDG (adres,
+  telefon, USt-IdNr., odpowiedzialny za treści wg §18 ust. 2 MStV, zdanie o polubownym
+  rozstrzyganiu sporów), a niemiecki slug to `impressum`, bo tego słowa szuka niemiecki
+  czytelnik. Numerów WEEE i LUCID z drugiego Impressum właściciela tu nie ma — dotyczą
+  wysyłki towaru, a LiczMat sprzedaje abonament.
 - `/kosztorys/` — rozdziały XVI i XVII (lista materiałów + koszty). Dziecko `/projekty/`.
 - `/p/<token>` — kosztorys tylko do odczytu z linku. Poziom `GUEST` celowo: sens linku
   polega na tym, że odbiorca nie potrzebuje niczego.

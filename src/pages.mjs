@@ -1009,11 +1009,16 @@ export function contactMain(lang, t) {
 
   // .fact is the profile screen's label-and-value row (assets/styles.css): the same pair
   // of facts in the same shape, so this page adds no rule of its own to the stylesheet.
+  // The two rows somebody acts on are links: a phone on a phone dials, and an address in
+  // a mail client opens a draft. The rest are text, because a VAT number is not a control.
+  const value = (r) => {
+    if (r.key === "contact_l_email") return `<a href="mailto:${esc(r.value)}">${esc(r.value)}</a>`;
+    if (r.key === "contact_l_phone") return `<a href="tel:${esc(r.value.replace(/\s+/g, ""))}">${esc(r.value)}</a>`;
+    return esc(r.value);
+  };
   const rows = entityRows().map((r) => `<div class="fact">
           <dt>${esc(t(r.key))}</dt>
-          <dd>${r.key === "contact_l_email"
-            ? `<a href="mailto:${esc(r.value)}">${esc(r.value)}</a>`
-            : esc(r.value)}</dd>
+          <dd>${value(r)}</dd>
         </div>`).join("\n        ");
 
   const main = `<main id="main" tabindex="-1">
@@ -1043,6 +1048,7 @@ export function contactMain(lang, t) {
       <dl class="facts">
         ${rows}
       </dl>
+      <p class="muted">${esc(t("contactpage_dispute"))}</p>
     </div>
   </section>
 
@@ -1070,6 +1076,8 @@ export function contactMain(lang, t) {
       name: ENTITY.name,
       email: ENTITY.email,
       ...(ENTITY.address ? { address: ENTITY.address } : {}),
+      ...(ENTITY.phone ? { telephone: ENTITY.phone } : {}),
+      ...(ENTITY.taxId ? { vatID: ENTITY.taxId } : {}),
     },
   };
 

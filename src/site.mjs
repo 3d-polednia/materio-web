@@ -136,9 +136,16 @@ cookies: {
      directive for the identity of the seller, and a visitor about to pay asks the same
      question in plainer words. The segment is each language's own word rather than a
      transliteration of the Polish one, for the reason the converter gives above: this is
-     the word somebody types when they are looking for a way to reach a person. */
+     the word somebody types when they are looking for a way to reach a person.
+
+     German is "impressum" rather than "kontakt" because the operator's Gewerbe is
+     registered in Bavaria and §5 DDG asks for the details to be "leicht erkennbar" — in
+     German practice that is a link with that exact word on it, and a German reader looks
+     for it and nothing else. The page behind it is the same page; only the segment, the
+     heading and the footer label change, and they change through `contactpage_title` in
+     the German dictionary, so there is one word to keep in step, not three. */
 contact: {
-    pl: "kontakt", uk: "kontakty", de: "kontakt", en: "contact",
+    pl: "kontakt", uk: "kontakty", de: "impressum", en: "contact",
     cs: "kontakt", sk: "kontakt", ro: "contact", hr: "kontakt", sr: "kontakt", it: "contatti", nl: "contact", es: "contacto", fr: "contact",
   },
 estimate: {
@@ -434,27 +441,44 @@ export const urlContact = (lang) => `${prefix(lang)}/${SECTION.contact[lang]}/`;
  * details are authored once and cannot drift apart.
  *
  * These are legal identifiers, not copy. They are never translated, never abbreviated and
- * never guessed: the owner supplied them. `address`, `taxId` and `regId` are optional —
- * LiczMat is run by a natural person who does not publish a street address, so those stay
- * empty and every reader drops the row rather than print a label with nothing after it.
- * Filling one in later puts it on all 523 pages — which means a full build, so `PL_ONLY`
+ * never guessed: the owner supplied them from the Impressum of their own site. The
+ * Gewerbe is a one-person business registered in Bavaria, which is what decides the shape
+ * of this object — §5 DDG asks a German provider for the name, the postal address, a way
+ * to be reached quickly and the VAT identification number, and every one of those is here.
+ *
+ * `regId` is empty and is meant to be. The owner's other Impressum carries a WEEE
+ * registration and a LUCID packaging number; both are about shipping physical goods, and
+ * LiczMat ships a subscription. A register number that does not describe this business
+ * would be noise on 523 pages. Any field left empty is a row that is absent rather than a
+ * label with nothing after it, and filling one in later means a full build, so `PL_ONLY`
  * has to come off for that run the way it did for the one that added this.
  */
 export const ENTITY = {
   name: "Michał Polednia",
-  address: "",
-  taxId: "",
+  address: "Widderweg 17, 85570 Markt Schwaben, Deutschland",
+  phone: "+49 176 66621263",
+  taxId: "DE329791818",
   regId: "",
   email: "polednia@gmail.com",
 };
 
-/** The rows the footer and /kontakt/ print, in order, skipping whatever is not filled in. */
+/**
+ * The rows the footer and /kontakt/ print, in order, skipping whatever is not filled in.
+ *
+ * The order is the one a German Impressum is read in: who, where, how to reach them, then
+ * the tax and register numbers, then who answers for what is written. `contact_l_editor`
+ * repeats the name on purpose — §18 (2) MStV asks for a person responsible for the
+ * editorial content, the guides are editorial content, and on a one-person site that
+ * person is the same one at the top of the list.
+ */
 export const entityRows = () => [
   { key: "contact_l_entity", value: ENTITY.name },
   { key: "contact_l_address", value: ENTITY.address },
+  { key: "contact_l_phone", value: ENTITY.phone },
+  { key: "contact_l_email", value: ENTITY.email },
   { key: "contact_l_tax", value: ENTITY.taxId },
   { key: "contact_l_reg", value: ENTITY.regId },
-  { key: "contact_l_email", value: ENTITY.email },
+  { key: "contact_l_editor", value: ENTITY.name },
 ].filter((r) => r.value);
 
 /** The Android app's own page. Not the same thing as URL_APP, which is the account. */
