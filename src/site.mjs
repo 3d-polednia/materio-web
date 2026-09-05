@@ -459,7 +459,7 @@ export const ENTITY = {
   phone: "+49 176 66621263",
   taxId: "DE329791818",
   regId: "",
-  email: "polednia@gmail.com",
+  email: "contact@liczmat.com",
 };
 
 /**

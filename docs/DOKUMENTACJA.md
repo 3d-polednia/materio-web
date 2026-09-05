@@ -671,14 +671,22 @@ pozycja z listy „Do zrobienia w konsolach" w `docs/MASTER_PLAN.md`.
 samej sesji.** Trzy kopie jednego tekstu to trzy teksty, które się rozjeżdżają — a ten
 akurat jest oświadczeniem prawnym.
 
-**Administrator danych i kontakt** to dziś `polednia@gmail.com` (szukaj w pliku). Podmiana
-na adres firmowy jest decyzją właściciela.
+**Administrator danych i kontakt** to od 2026-09-05 `contact@liczmat.com` i imiennie
+Michał Polednia z adresem pocztowym — wcześniej „zespół LiczMat" i prywatny gmail, czyli
+znalezisko H7 audytu siedzące w dokumencie, który miał na nie odpowiadać. Skrzynka stoi
+na Zimbrze OVH przy `liczmat.com`, `kontakt@liczmat.com` jest przekierowaniem na nią.
 
 ## 13. Częste zadania utrzymaniowe (przepisy)
 
-**Zmiana e-maila w polityce prywatności:**
-Znajdź i zamień `polednia@gmail.com` w `privacy-policy.html` (występuje kilka razy:
-nagłówek, sekcja „Twoje prawa", „Kontakt", w PL i EN).
+**Zmiana e-maila — trzy miejsca, nie jedno:**
+1. `ENTITY.email` w `src/site.mjs` — stąd idzie stopka wszystkich 523 stron i `/kontakt/`
+   (po niemiecku `/de/impressum/`). Wymaga `PL_ONLY = false` na czas pełnego builda.
+2. `privacy-policy.html` — osiem wystąpień, ręcznie: nagłówek, „Twoje prawa", „Kontakt",
+   w PL i EN.
+3. `docs/privacy-policy.html` w repo `Materio` — bliźniak, ten sam tekst.
+
+Poza repo zostaje jeszcze Google Play Console (dane kontaktowe dewelopera i sekcja
+Bezpieczeństwo danych) — tego generator nie dotknie.
 
 **Zmiana promienia wyszukiwania sklepów (np. 30 km):**
 `assets/stores.js` → `const RADIUS_M = 30000;`.
