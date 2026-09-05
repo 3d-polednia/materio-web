@@ -107,8 +107,9 @@ head("0. the tree this suite is reading");
 {
   // 512 since 2026-09-02 swapped Russian for Italian, Dutch, Spanish and French: three
   // languages more of every route, on top of the converter and /moje-materialy/.
-  check("512 pages: 510 generated plus the two hand-written ones",
-    PAGES.length === 512, `found ${PAGES.length}`);
+  // 525 since session 62 added /kontakt/ for audit item H7: one route, thirteen languages.
+  check("525 pages: 523 generated plus the two hand-written ones",
+    PAGES.length === 525, `found ${PAGES.length}`);
   check("every page declares a language",
     PAGES.every((page) => page.lang), PAGES.filter((page) => !page.lang).map((x) => x.url).join(", "));
   const codes = new Set(LANGS.map((l) => HREFLANG[l]));

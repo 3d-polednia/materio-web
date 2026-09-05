@@ -234,6 +234,27 @@ const I18N_PAGES = {
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Kontakt",
+    contactpage_lead: "LiczMat prowadzi jedna osoba. Ten sam adres e-mail odpowiada na pytania o kalkulatory, konto, abonament Pro i dane osobowe.",
+    contactpage_meta: "Kto prowadzi LiczMat i jak się skontaktować: adres e-mail i dane administratora danych osobowych.",
+    contactpage_h_write: "Napisz do nas",
+    contactpage_write_d: "Nie ma tu formularza, jest adres, który skopiujesz do własnej poczty. Napisz, czego dotyczy sprawa i z jakiego konta korzystasz, jeśli je masz.",
+    contactpage_write_cta: "Napisz e-mail",
+    contactpage_reply: "Odpowiadamy zwykle w ciągu dwóch dni roboczych.",
+    contactpage_h_who: "Kto prowadzi LiczMat",
+    contactpage_who_d: "LiczMat prowadzi osoba fizyczna. Ta sama osoba jest administratorem danych osobowych w rozumieniu RODO i sprzedawcą abonamentu LiczMat Pro.",
+    contactpage_h_data: "Dane osobowe",
+    contactpage_data_d: "Wniosek o dostęp do danych, ich sprostowanie, usunięcie albo o wycofanie zgody wysyłasz na ten sam adres. Co dokładnie przetwarzamy, opisuje polityka prywatności.",
+    contact_l_entity: "Podmiot",
+    contact_l_address: "Adres",
+    contact_l_tax: "NIP",
+    contact_l_reg: "REGON",
+    contact_l_email: "E-mail",
     cookiepage_title: "Pliki cookie i pamięć przeglądarki",
     cookiepage_lead: "Co dokładnie strona zapisuje w Twojej przeglądarce, po co, i jak w każdej chwili zmienić zdanie.",
     cookiepage_meta: "LiczMat — lista plików cookie i danych zapisywanych w przeglądarce: analityka, wybór języka, projekty i kosztorysy. Zgodę można wycofać w każdej chwili.",
@@ -1080,6 +1101,27 @@ const I18N_PAGES = {
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Contact",
+    contactpage_lead: "One person runs LiczMat. The same email address answers questions about the calculators, the account, the Pro subscription and your personal data.",
+    contactpage_meta: "Who runs LiczMat and how to reach them: the email address and the identity of the data controller.",
+    contactpage_h_write: "Write to us",
+    contactpage_write_d: "There is no form here, there is an address you can copy into your own mail client. Say what it is about, and which account you use if you have one.",
+    contactpage_write_cta: "Send an email",
+    contactpage_reply: "We usually reply within two working days.",
+    contactpage_h_who: "Who runs LiczMat",
+    contactpage_who_d: "LiczMat is run by a private individual. The same person is the data controller under the GDPR and the seller of the LiczMat Pro subscription.",
+    contactpage_h_data: "Personal data",
+    contactpage_data_d: "A request to access, correct or erase your data, or to withdraw consent, goes to the same address. What exactly is processed is set out in the privacy policy.",
+    contact_l_entity: "Entity",
+    contact_l_address: "Address",
+    contact_l_tax: "VAT ID",
+    contact_l_reg: "Register no.",
+    contact_l_email: "Email",
     cookiepage_title: "Cookies and browser storage",
     cookiepage_lead: "Exactly what the site keeps in your browser, what for, and how to change your mind at any time.",
     cookiepage_meta: "LiczMat — the list of cookies and data kept in your browser: analytics, language choice, projects and estimates. Consent can be withdrawn at any time.",
@@ -1919,6 +1961,27 @@ const I18N_PAGES = {
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Kontakt",
+    contactpage_lead: "Eine Person leitet LiczMat. Dieselbe E-Mail beantwortet deine Fragen zu Rechnern, Konto, Pro-Abo und deinen Daten.",
+    contactpage_meta: "Wer LiczMat betreibt und wie man Kontakt aufnimmt: E-Mail-Adresse und Daten des Verantwortlichen.",
+    contactpage_h_write: "Schreib uns",
+    contactpage_write_d: "Es gibt hier kein Formular, sondern eine Adresse, die du in dein E-Mail-Programm kopieren kannst. Schreib, worum es geht, und welches Konto du benutzt, falls du eins hast.",
+    contactpage_write_cta: "E-Mail senden",
+    contactpage_reply: "Wir antworten in der Regel innerhalb von zwei Werktagen.",
+    contactpage_h_who: "Wer LiczMat betreibt",
+    contactpage_who_d: "LiczMat wird von einer Privatperson betrieben. Dieselbe Person ist der Verantwortliche für die Datenverarbeitung im Sinne der DSGVO und der Verkäufer des LiczMat Pro-Abos.",
+    contactpage_h_data: "Personenbezogene Daten",
+    contactpage_data_d: "Einen Antrag auf Auskunft, Berichtigung oder Löschung deiner Daten oder auf Widerruf der Einwilligung schickst du an dieselbe Adresse. Was genau wir verarbeiten, steht in der Datenschutzerklärung.",
+    contact_l_entity: "Rechtsträger",
+    contact_l_address: "Adresse",
+    contact_l_tax: "USt-IdNr.",
+    contact_l_reg: "Registernummer",
+    contact_l_email: "E-Mail",
     cookiepage_title: "Cookies und Browser-Speicher",
     cookiepage_lead: "Was die Website genau in deinem Browser ablegt, wofür, und wie du es jederzeit änderst.",
     cookiepage_meta: "LiczMat — die Liste der Cookies und Daten im Browser: Analytics, Sprachwahl, Projekte und Kalkulationen. Die Einwilligung ist jederzeit widerrufbar.",
@@ -2758,6 +2821,27 @@ const I18N_PAGES = {
 
     /* /cookies/ — what the site stores and how to take the consent back. */
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Контакти",
+    contactpage_lead: "LiczMat керує одна людина. Ця ж електронна адреса відповідає на твої запитання про калькулятори, акаунт, підписку Pro та особисті дані.",
+    contactpage_meta: "Хто веде LiczMat і як зв'язатися: адреса електронної пошти та дані адміністратора персональних даних.",
+    contactpage_h_write: "Напиши нам",
+    contactpage_write_d: "Тут немає форми, є адреса, яку ти можеш скопіювати у свій поштовий клієнт. Напиши, про що йдеться, і яким обліковим записом ти користуєшся, якщо він у тебе є.",
+    contactpage_write_cta: "Надіслати e-mail",
+    contactpage_reply: "Зазвичай ми відповідаємо протягом двох робочих днів.",
+    contactpage_h_who: "Хто керує LiczMat",
+    contactpage_who_d: "LiczMat керує фізична особа. Ця ж особа є контролером даних відповідно до GDPR і продавцем підписки LiczMat Pro.",
+    contactpage_h_data: "Персональні дані",
+    contactpage_data_d: "Запит на доступ до своїх даних, їх виправлення чи видалення, або на відкликання згоди надсилай на ту саму адресу. Що саме ми обробляємо, описано в політиці конфіденційності.",
+    contact_l_entity: "Суб'єкт",
+    contact_l_address: "Адреса",
+    contact_l_tax: "ІПН",
+    contact_l_reg: "ЄДРПОУ",
+    contact_l_email: "E-mail",
     cookiepage_title: "Файли cookie та сховище браузера",
     cookiepage_lead: "Що саме сайт зберігає у твоєму браузері, навіщо, і як будь-коли змінити рішення.",
     cookiepage_meta: "LiczMat — перелік файлів cookie та даних у браузері: аналітика, вибір мови, проєкти та кошториси. Згоду можна відкликати будь-коли.",
@@ -3596,6 +3680,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Práce, doprava, materiál koupený od oka — cokoli, co kalkulačka nepočítá.",
     ws_unit_default: "ks",
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Kontakt",
+    contactpage_lead: "LiczMat vede jedna osoba. Stejný e-mail odpovídá na tvé dotazy ohledně kalkulaček, účtu, předplatného Pro a tvých osobních údajů.",
+    contactpage_meta: "Kdo provozuje LiczMat a jak se spojit: e-mailová adresa a údaje správce osobních údajů.",
+    contactpage_h_write: "Napiš nám",
+    contactpage_write_d: "Není tu žádný formulář, je tu adresa, kterou si můžeš zkopírovat do vlastního e-mailu. Napiš, o co jde, a jaký účet používáš, pokud nějaký máš.",
+    contactpage_write_cta: "Poslat e-mail",
+    contactpage_reply: "Obvykle odpovídáme do dvou pracovních dnů.",
+    contactpage_h_who: "Kdo provozuje LiczMat",
+    contactpage_who_d: "LiczMat provozuje fyzická osoba. Ta samá osoba je správcem osobních údajů podle GDPR a prodejcem předplatného LiczMat Pro.",
+    contactpage_h_data: "Osobní údaje",
+    contactpage_data_d: "Žádost o přístup k údajům, jejich opravu, výmaz nebo o odvolání souhlasu pošli na stejnou adresu. Co přesně zpracováváme, je popsáno v zásadách ochrany osobních údajů.",
+    contact_l_entity: "Subjekt",
+    contact_l_address: "Adresa",
+    contact_l_tax: "DIČ",
+    contact_l_reg: "IČO",
+    contact_l_email: "E-mail",
     cookiepage_title: "Cookies a úložiště prohlížeče",
     cookiepage_lead: "Co přesně stránka ukládá ve tvém prohlížeči, k čemu, a jak to kdykoli změnit.",
     cookiepage_meta: "LiczMat — seznam cookies a dat v prohlížeči: analytika, volba jazyka, projekty a rozpočty. Souhlas lze kdykoli odvolat.",
@@ -4400,6 +4505,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Práca, doprava, materiál kúpený od oka — čokoľvek, čo kalkulačka nepočíta.",
     ws_unit_default: "ks",
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Kontakt",
+    contactpage_lead: "LiczMat vedie jedna osoba. Rovnaký e-mail odpovedá na tvoje otázky o kalkulačkách, účte, predplatnom Pro a tvojich osobných údajoch.",
+    contactpage_meta: "Kto prevádzkuje LiczMat a ako sa spojiť: e-mailová adresa a údaje správcu osobných údajov.",
+    contactpage_h_write: "Napíš nám",
+    contactpage_write_d: "Nie je tu žiadny formulár, je tu adresa, ktorú si môžeš skopírovať do vlastného e-mailu. Napíš, o čo ide, a aký účet používaš, ak nejaký máš.",
+    contactpage_write_cta: "Poslať e-mail",
+    contactpage_reply: "Zvyčajne odpovedáme do dvoch pracovných dní.",
+    contactpage_h_who: "Kto prevádzkuje LiczMat",
+    contactpage_who_d: "LiczMat prevádzkuje fyzická osoba. Tá istá osoba je prevádzkovateľom osobných údajov podľa GDPR a predajcom predplatného LiczMat Pro.",
+    contactpage_h_data: "Osobné údaje",
+    contactpage_data_d: "Žiadosť o prístup k údajom, ich opravu, vymazanie alebo o odvolanie súhlasu pošli na tú istú adresu. Čo presne spracúvame, je opísané v zásadách ochrany osobných údajov.",
+    contact_l_entity: "Subjekt",
+    contact_l_address: "Adresa",
+    contact_l_tax: "DIČ",
+    contact_l_reg: "IČO",
+    contact_l_email: "E-mail",
     cookiepage_title: "Cookies a úložisko prehliadača",
     cookiepage_lead: "Čo presne stránka ukladá v tvojom prehliadači, na čo, a ako to kedykoľvek zmeniť.",
     cookiepage_meta: "LiczMat — zoznam cookies a dát v prehliadači: analytika, voľba jazyka, projekty a rozpočty. Súhlas sa dá kedykoľvek odvolať.",
@@ -5204,6 +5330,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Manoperă, transport, ceva cumpărat din ochi — orice nu calculează un calculator.",
     ws_unit_default: "buc",
     foot_cookies: "Cookie-uri",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Contact",
+    contactpage_lead: "O singură persoană conduce LiczMat. Aceeași adresă de e-mail răspunde la întrebările tale despre calculatoare, cont, abonamentul Pro și datele personale.",
+    contactpage_meta: "Cine administrează LiczMat și cum se contactează: adresa de e-mail și datele operatorului de date.",
+    contactpage_h_write: "Scrie-ne",
+    contactpage_write_d: "Nu există un formular aici, este o adresă pe care o poți copia în propriul tău client de e-mail. Scrie despre ce este vorba și ce cont folosești, dacă ai unul.",
+    contactpage_write_cta: "Trimite un e-mail",
+    contactpage_reply: "De obicei răspundem în termen de două zile lucrătoare.",
+    contactpage_h_who: "Cine gestionează LiczMat",
+    contactpage_who_d: "LiczMat este gestionat de o persoană fizică. Aceeași persoană este operatorul de date conform RGPD și vânzătorul abonamentului LiczMat Pro.",
+    contactpage_h_data: "Date personale",
+    contactpage_data_d: "O cerere de acces, rectificare sau ștergere a datelor tale, sau de retragere a consimțământului, se trimite la aceeași adresă. Ce anume prelucrăm este descris în politica de confidențialitate.",
+    contact_l_entity: "Entitate",
+    contact_l_address: "Adresă",
+    contact_l_tax: "CUI",
+    contact_l_reg: "Nr. înreg.",
+    contact_l_email: "E-mail",
     cookiepage_title: "Cookie-uri și stocarea din browser",
     cookiepage_lead: "Ce anume păstrează site-ul în browserul tău, pentru ce, și cum te răzgândești oricând.",
     cookiepage_meta: "LiczMat — lista de cookie-uri și date păstrate în browser: analiză, alegerea limbii, proiecte și devize. Consimțământul poate fi retras oricând.",
@@ -6008,6 +6155,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Rad, dostava, materijal kupljen od oka — bilo što što kalkulator ne računa.",
     ws_unit_default: "kom",
     foot_cookies: "Kolačići",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Kontakt",
+    contactpage_lead: "LiczMat vodi jedna osoba. Ista e-mail adresa odgovara na tvoja pitanja o kalkulatorima, računu, Pro pretplati i osobnim podacima.",
+    contactpage_meta: "Tko vodi LiczMat i kako kontaktirati: e-mail adresa i podaci voditelja obrade podataka.",
+    contactpage_h_write: "Piši nam",
+    contactpage_write_d: "Ovdje nema obrasca, tu je adresa koju možeš kopirati u svoj e-mail klijent. Napiši o čemu se radi i koji račun koristiš, ako ga imaš.",
+    contactpage_write_cta: "Pošalji e-mail",
+    contactpage_reply: "Obično odgovaramo u roku od dva radna dana.",
+    contactpage_h_who: "Tko vodi LiczMat",
+    contactpage_who_d: "LiczMat vodi fizička osoba. Ista osoba je voditelj obrade podataka prema GDPR-u i prodavač LiczMat Pro pretplate.",
+    contactpage_h_data: "Osobni podaci",
+    contactpage_data_d: "Zahtjev za pristup tvojim podacima, njihov ispravak ili brisanje, ili za povlačenje privole šalješ na istu adresu. Što točno obrađujemo opisano je u politici privatnosti.",
+    contact_l_entity: "Subjekt",
+    contact_l_address: "Adresa",
+    contact_l_tax: "OIB",
+    contact_l_reg: "MBS",
+    contact_l_email: "E-mail",
     cookiepage_title: "Kolačići i pohrana u pregledniku",
     cookiepage_lead: "Što točno stranica sprema u tvom pregledniku, čemu služi, i kako se predomisliti u svakom trenutku.",
     cookiepage_meta: "LiczMat — popis kolačića i podataka u pregledniku: analitika, izbor jezika, projekti i troškovnici. Privolu možeš povući u svakom trenutku.",
@@ -6812,6 +6980,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Rad, dostava, materijal kupljen od oka — bilo šta što kalkulator ne računa.",
     ws_unit_default: "kom",
     foot_cookies: "Kolačići",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Kontakt",
+    contactpage_lead: "LiczMat vodi jedna osoba. Ista imejl adresa odgovara na tvoja pitanja o kalkulatorima, nalogu, Pro pretplati i ličnim podacima.",
+    contactpage_meta: "Ко води LiczMat и како контактирати: адреса е-поште и подаци руковаоца подацима.",
+    contactpage_h_write: "Piši nam",
+    contactpage_write_d: "Ovde nema formulara, tu je adresa koju možeš da kopiraš u svoj imejl program. Napiši o čemu se radi i koji nalog koristiš, ako ga imaš.",
+    contactpage_write_cta: "Pošalji imejl",
+    contactpage_reply: "Obično odgovaramo u roku od dva radna dana.",
+    contactpage_h_who: "Ko vodi LiczMat",
+    contactpage_who_d: "LiczMat vodi fizičko lice. Ista osoba je rukovalac podacima prema GDPR-u i prodavac LiczMat Pro pretplate.",
+    contactpage_h_data: "Lični podaci",
+    contactpage_data_d: "Zahtev za pristup tvojim podacima, njihovu ispravku ili brisanje, ili za povlačenje pristanka, šalješ na istu adresu. Šta tačno obrađujemo objašnjeno je u politici privatnosti.",
+    contact_l_entity: "Subjekt",
+    contact_l_address: "Adresa",
+    contact_l_tax: "PIB",
+    contact_l_reg: "Matični broj",
+    contact_l_email: "Imejl",
     cookiepage_title: "Kolačići i memorija pregledača",
     cookiepage_lead: "Šta tačno sajt čuva u tvom pregledaču, čemu služi, i kako se predomisliti u svakom trenutku.",
     cookiepage_meta: "LiczMat — spisak kolačića i podataka u pregledaču: analitika, izbor jezika, projekti i predračuni. Saglasnost možeš povući u svakom trenutku.",
@@ -7610,6 +7799,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Manodopera, consegna, qualcosa comprato a occhio: tutto ciò che nessun calcolatore calcola.",
     ws_unit_default: "pz",
     foot_cookies: "Cookie",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Contatti",
+    contactpage_lead: "Una sola persona gestisce LiczMat. La stessa email risponde alle tue domande su calcolatrici, account, abbonamento Pro e dati personali.",
+    contactpage_meta: "Chi gestisce LiczMat e come contattare: indirizzo e-mail e dettagli del titolare del trattamento dei dati.",
+    contactpage_h_write: "Scrivici",
+    contactpage_write_d: "Qui non c'è nessun modulo, c'è un indirizzo che puoi copiare nel tuo client di posta. Scrivi di cosa si tratta e quale account usi, se ne hai uno.",
+    contactpage_write_cta: "Invia un'e-mail",
+    contactpage_reply: "Di solito rispondiamo entro due giorni lavorativi.",
+    contactpage_h_who: "Chi gestisce LiczMat",
+    contactpage_who_d: "LiczMat è gestito da un privato. La stessa persona è il titolare del trattamento dei dati ai sensi del GDPR e il venditore dell'abbonamento LiczMat Pro.",
+    contactpage_h_data: "Dati personali",
+    contactpage_data_d: "Una richiesta per accedere, correggere o cancellare i tuoi dati, o per revocare il consenso, va inviata allo stesso indirizzo. Cosa trattiamo esattamente è spiegato nell'informativa sulla privacy.",
+    contact_l_entity: "Entità",
+    contact_l_address: "Indirizzo",
+    contact_l_tax: "P.IVA",
+    contact_l_reg: "N. registrazione",
+    contact_l_email: "E-mail",
     cookiepage_title: "Cookie e memoria del browser",
     cookiepage_lead: "Che cosa tiene il sito nel tuo browser, a che scopo e come cambiare idea in qualsiasi momento.",
     cookiepage_meta: "LiczMat — i cookie e i dati tenuti nel tuo browser: analitica, lingua, progetti e preventivi. Il consenso si può ritirare in qualsiasi momento.",
@@ -8405,6 +8615,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Arbeid, bezorging, iets op het oog gekocht — alles wat geen rekenmachine uitrekent.",
     ws_unit_default: "st.",
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Contact",
+    contactpage_lead: "Eén persoon beheert LiczMat. Hetzelfde e-mailadres beantwoordt je vragen over rekenmachines, je account, het Pro abonnement en je persoonsgegevens.",
+    contactpage_meta: "Wie LiczMat beheert en hoe contact op te nemen: e-mailadres en gegevens van de verwerkingsverantwoordelijke.",
+    contactpage_h_write: "Schrijf ons",
+    contactpage_write_d: "Er is hier geen formulier, maar een adres dat je naar je eigen e-mailprogramma kunt kopiëren. Schrijf waar het over gaat en welk account je gebruikt, als je er een hebt.",
+    contactpage_write_cta: "Stuur een e-mail",
+    contactpage_reply: "We antwoorden meestal binnen twee werkdagen.",
+    contactpage_h_who: "Wie beheert LiczMat",
+    contactpage_who_d: "LiczMat wordt beheerd door een particulier. Dezelfde persoon is de verwerkingsverantwoordelijke volgens de AVG en de verkoper van het LiczMat Pro-abonnement.",
+    contactpage_h_data: "Persoonsgegevens",
+    contactpage_data_d: "Een verzoek om je gegevens in te zien, te corrigeren of te wissen, of om je toestemming in te trekken, stuur je naar hetzelfde adres. Wat we precies verwerken, staat in het privacybeleid.",
+    contact_l_entity: "Entiteit",
+    contact_l_address: "Adres",
+    contact_l_tax: "btw-nummer",
+    contact_l_reg: "KVK-nummer",
+    contact_l_email: "E-mail",
     cookiepage_title: "Cookies en browseropslag",
     cookiepage_lead: "Precies wat de site in je browser bewaart, waarvoor, en hoe je je op elk moment kunt bedenken.",
     cookiepage_meta: "LiczMat — de lijst met cookies en gegevens in je browser: analyse, taalkeuze, projecten en ramingen. Toestemming is altijd in te trekken.",
@@ -9200,6 +9431,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Mano de obra, transporte, algo comprado a ojo: todo lo que ninguna calculadora calcula.",
     ws_unit_default: "ud.",
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Contacto",
+    contactpage_lead: "Una persona dirige LiczMat. El mismo correo responde a tus preguntas sobre calculadoras, cuenta, suscripción Pro y datos personales.",
+    contactpage_meta: "Quién gestiona LiczMat y cómo contactar: dirección de correo electrónico y datos del responsable del tratamiento.",
+    contactpage_h_write: "Escríbenos",
+    contactpage_write_d: "Aquí no hay formulario, hay una dirección que puedes copiar en tu programa de correo. Escribe de qué se trata y qué cuenta usas, si tienes una.",
+    contactpage_write_cta: "Enviar un correo",
+    contactpage_reply: "Solemos responder en un plazo de dos días laborables.",
+    contactpage_h_who: "Quién gestiona LiczMat",
+    contactpage_who_d: "LiczMat está gestionado por un particular. La misma persona es el responsable del tratamiento de datos según el RGPD y el vendedor de la suscripción LiczMat Pro.",
+    contactpage_h_data: "Datos personales",
+    contactpage_data_d: "Las solicitudes para acceder a tus datos, rectificarlos, borrarlos o retirar tu consentimiento se envían a la misma dirección. Lo que procesamos exactamente se explica en la política de privacidad.",
+    contact_l_entity: "Entidad",
+    contact_l_address: "Dirección",
+    contact_l_tax: "NIF",
+    contact_l_reg: "Nº de registro",
+    contact_l_email: "Email",
     cookiepage_title: "Cookies y almacenamiento del navegador",
     cookiepage_lead: "Exactamente qué guarda el sitio en tu navegador, para qué y cómo cambiar de idea en cualquier momento.",
     cookiepage_meta: "LiczMat — los cookies y datos guardados en tu navegador: analítica, idioma, proyectos y presupuestos. El consentimiento se retira cuando quieras.",
@@ -9995,6 +10247,27 @@ const I18N_PAGES = {
     ws_add_line_d: "Main-d'œuvre, livraison, quelque chose acheté à l'œil : tout ce qu'aucun calculateur ne calcule.",
     ws_unit_default: "pce",
     foot_cookies: "Cookies",
+
+    /* Session 62, audit item H7: the contact page and the identity line in the
+       footer. The labels are printed only for the details ENTITY in src/site.mjs
+       actually carries, so the two register numbers wait here unused until
+       there are any to print. */
+    contactpage_title: "Contact",
+    contactpage_lead: "Une seule personne gère LiczMat. Le même e-mail répond à tes questions sur les calculatrices, ton compte, l'abonnement Pro et tes données.",
+    contactpage_meta: "Qui gère LiczMat et comment contacter : adresse e-mail et coordonnées du responsable du traitement des données.",
+    contactpage_h_write: "Écris-nous",
+    contactpage_write_d: "Il n'y a pas de formulaire ici, il y a une adresse que tu peux copier dans ta boîte mail. Dis-nous de quoi il s'agit et quel compte tu utilises, si tu en as un.",
+    contactpage_write_cta: "Envoyer un e-mail",
+    contactpage_reply: "Nous répondons généralement sous deux jours ouvrables.",
+    contactpage_h_who: "Qui gère LiczMat",
+    contactpage_who_d: "LiczMat est géré par un particulier. La même personne est le responsable du traitement des données au sens du RGPD et le vendeur de l'abonnement LiczMat Pro.",
+    contactpage_h_data: "Données personnelles",
+    contactpage_data_d: "Les demandes d'accès à tes données, de rectification, d'effacement ou de retrait de consentement sont à envoyer à cette même adresse. Ce que nous traitons exactement est détaillé dans la politique de confidentialité.",
+    contact_l_entity: "Entité",
+    contact_l_address: "Adresse",
+    contact_l_tax: "N° TVA",
+    contact_l_reg: "N° de registre",
+    contact_l_email: "E-mail",
     cookiepage_title: "Cookies et stockage du navigateur",
     cookiepage_lead: "Exactement ce que le site garde dans ton navigateur, pourquoi, et comment changer d'avis à tout moment.",
     cookiepage_meta: "LiczMat — les cookies et les données gardées dans ton navigateur : analyse, langue, projets et devis. Le consentement se retire à tout moment.",

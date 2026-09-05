@@ -145,11 +145,17 @@ const BUDGET = {
      comment that says which half of the finding this closes and which it does not. That is
      2.4 kB of assets/workspace.js on the one page with no slack left. */
   "projekty/index.html": [442, 133],
-  "kosztorys/index.html": [425, 128],
+  /* Four gzip numbers went up by one on 2026-09-05, measured at 128.2, 126.1, 126.1 and
+     128.1 kB gz. Nothing on these pages changed: the audit's H7 put the contact page's
+     sixteen keys into the dictionary bundle every page loads, which is 1.3 kB raw and
+     about 0.3 kB gzipped on all 523 of them, and these four had less than that left. The
+     copy is as short as the finding allows — a name, an address to write to and the two
+     sentences that say who the controller is — so the number is what moved, not the page. */
+  "kosztorys/index.html": [425, 129],
   "liczmat-pro/index.html": [235, 71],
-  "klienci/index.html": [405, 126],
-  "zlecenia/index.html": [405, 126],
-  "wyceny/index.html": [410, 128],
+  "klienci/index.html": [405, 127],
+  "zlecenia/index.html": [405, 127],
+  "wyceny/index.html": [410, 129],
   "terminarz/index.html": [385, 118],
   // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
   // one page that carries every store the account syncs, and session 59 gave it a third:

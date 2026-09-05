@@ -29,7 +29,7 @@ import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlClients, urlClient,
   urlJobs, urlJob, urlQuotes, urlQuote, urlCalendar, urlLiczmatPro, urlConverter,
-  urlOwnMaterials,
+  urlOwnMaterials, urlContact,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -439,6 +439,22 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlCookies,
+  },
+  {
+    id: "contact",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "home", localized: true, indexable: true,
+    path: urlContact,
+    note: "Session 62, item H7 of the 2026-09 audit. The site named nobody: no company, " +
+      "no address, no mailto: anywhere in index.html, while the same pages sold a Pro " +
+      "subscription and opened Firebase accounts. This page carries the identity of the " +
+      "controller that article 13 of the GDPR asks for and the one address a visitor can " +
+      "write to, and src/site.mjs ENTITY is where both come from. GUEST and indexable " +
+      "on purpose — a way to reach the seller that only a paying customer can find is " +
+      "not a way to reach the seller. It is in the footer legal column, beside the " +
+      "privacy policy and the cookie page, not in the header: nobody navigates a site " +
+      "looking for its contact page first, and they all look at the foot of it when " +
+      "they do.",
   },
   {
     id: "privacy",

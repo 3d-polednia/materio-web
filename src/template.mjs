@@ -7,7 +7,7 @@
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, SECTION,
-  urlHome, urlAndroid, urlCookies,
+  urlHome, urlAndroid, urlCookies, urlContact, ENTITY,
   URL_PRIVACY, URL_APP, PLAY_URL,
 } from "./site.mjs";
 import { FLAG, LANG_NAME } from "./flags.mjs";
@@ -497,8 +497,17 @@ export function siteHeader(h) {
 export function siteFooter(f) {
   const { lang, t, alternates, minimal, inPlace } = f;
 
+  /* Audit item H7. Until session 62 this line read "© LiczMat" and stopped there, so every
+     page of a site that takes a subscription and opens accounts left the visitor with no
+     name to hold and no address to write to. The operator is named on every page now, the
+     minimal footer of /app/ and /p/ included: the account screen is exactly where somebody
+     asks who is holding their data. ENTITY in src/site.mjs is where the details come from,
+     and the address line is dropped when there is none rather than printed empty. */
+  const who = `<span class="foot-who">${esc(ENTITY.name)}${ENTITY.address ? ` · ${esc(ENTITY.address)}` : ""} · <a href="mailto:${esc(ENTITY.email)}">${esc(ENTITY.email)}</a></span>`;
+
   const bottom = `<div class="foot-bottom">
       <span>© <span data-year>2026</span> LiczMat.${minimal ? "" : ` ${esc(t("foot_rights"))}`}</span>
+      ${who}
       ${minimal
         ? `<span><a href="${URL_PRIVACY}"${inPlace ? ' data-i18n="foot_privacy"' : ""}>${esc(t("foot_privacy"))}</a></span>
       <span class="muted"${inPlace ? ' data-i18n="app_noindex_note"' : ""}>${esc(t("app_noindex_note"))}</span>`
@@ -543,6 +552,7 @@ export function siteFooter(f) {
       <div>
         <h2>${esc(t("foot_legal"))}</h2>
         <ul>
+          <li><a href="${urlContact(lang)}">${esc(t("contactpage_title"))}</a></li>
           <li><a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a></li>
           <li><a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a></li>
         </ul>

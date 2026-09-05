@@ -81,8 +81,8 @@ session only — the next one starts in caveman again.
 
 ## The build step
 
-The site used to be one `index.html`. It is now 510 pages: a home page, a calculator
-hub, one page per calculator, a unit converter, guides, a store finder, the visitor's own materials and the public page
+The site used to be one `index.html`. It is now 523 pages: a home page, a calculator
+hub, one page per calculator, a unit converter, guides, a store finder, the visitor's own materials, a contact page and the public page
 for LiczMat Pro —
 each in all thirteen languages, at its own URL, so search engines can index more than the
 Polish front page. Writing that by
@@ -207,8 +207,18 @@ above, and the answer is a full build, not an edited test.
 
 **To thaw:** set `PL_ONLY = false`, run `node scripts/build.mjs --check` (it names every
 missing key), translate what `docs/TRANSLATIONS_TODO.md` lists, run `node scripts/build.mjs`
-for all 510 pages, run the suite. The ledger deletes itself and the build goes back to
+for all 523 pages, run the suite. The ledger deletes itself and the build goes back to
 refusing a language with a hole in it.
+
+**Session 62 thawed once and froze again**, and it is the worked example of when that is
+the right move rather than a shortcut. Audit item H7 — no name, no address and no `mailto:`
+anywhere on a site that takes subscriptions — needed a new route and a change to
+`src/template.mjs`, which is two of the four things above. Doing it under the freeze would
+have put a contact link in the Polish footer and left twelve languages' footers naming
+nobody, which is the finding again in a smaller shape. So the sixteen keys were written in
+all thirteen languages first, the switch came off, the full build wrote 523 pages, the
+suite ran, and the switch went back on. Nothing was owed at either end: the debt ledger was
+empty going in and is empty now.
 
 ## Files
 
@@ -220,13 +230,16 @@ src/ia.mjs            The information architecture: every route, its access leve
                       The build fails if the pages it wrote are not exactly the
                       pages declared here, and sitemapUrls() reads sitemap.xml's whole
                       contents off the same list. Narrative: docs/ARCHITEKTURA.md
-src/site.mjs          Languages, URL slugs per section/calculator/guide — the site map
+src/site.mjs          Languages, URL slugs per section/calculator/guide — the site map,
+                      and ENTITY: who runs LiczMat, the one place the operator's name and
+                      contact address are written down (audit H7). The footer of every
+                      page and /kontakt/ in thirteen languages both read it
 src/template.mjs      <head>, header, footer, consent banner, breadcrumbs
 src/pages.mjs         The <main> of each page type
 src/calc-meta.mjs     Per-calculator formula lines + their translations
 src/omat-copy.mjs     The words on /moje-materialy/, thirteen languages. Build-time only, for
                       the reason src/conv-copy.mjs is. `omatpage_title` is the one key that
-                      stayed in the dictionary — it is the footer's label on all 510 pages
+                      stayed in the dictionary — it is the footer's label on all 523 pages
 src/pdf-copy.mjs      The words on the PDF export, thirteen languages, and EVERY ONE of them is
                       the app's own: the `pdf_*` keys of PdfConfigScreen and the `pdfdoc_*`
                       keys of AndroidProjectPdfExporter, copied out of the app repo rather
@@ -769,7 +782,7 @@ assets/workspace-calc.js  The workspace on a calculator page: the room bar that 
                       form from a room somebody measured, the save box that files a result
                       in a project, and the vocabulary both halves speak (wsT, wsEsc,
                       wsNum, wsDecimal, wsPlain, wsUnit, wsLang). Split out of
-                      assets/workspace-ui.js in session 33 — 195 of the 510 pages are
+                      assets/workspace-ui.js in session 33 — 195 of the 523 pages are
                       calculator pages and none of them draws the projects screen
 assets/workspace-ui.js  The two workspace screens: /projekty/ and /kosztorys/. The projects
                       page holds two of them — the index and one project at

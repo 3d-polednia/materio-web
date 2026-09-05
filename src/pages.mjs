@@ -13,8 +13,8 @@ import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
-  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials,
-  CALC_SLUG, PLAY_URL, URL_APP,
+  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
+  CALC_SLUG, PLAY_URL, URL_APP, URL_PRIVACY, ENTITY, entityRows,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
 import { proGate, proModules, proPlansBlock } from "./pro.mjs";
@@ -982,6 +982,98 @@ export function cookiesMain(lang, t) {
   ${appNote(t)}
 </main>`;
   return { main, ld: crumbs.ld };
+}
+
+/* ------------------------------------------------------------------ contact */
+
+/**
+ * /kontakt/ — who runs LiczMat and how to reach them. Audit item H7.
+ *
+ * The audit found no occurrence of the word "kontakt" and no `mailto:` anywhere in
+ * index.html, on a site that charges for Pro through Stripe and opens Firebase accounts.
+ * Article 13 of the GDPR wants the identity of the controller, the e-commerce directive
+ * wants the identity of the seller, and a visitor about to type a card number wants to
+ * know there is somebody on the other end. One page answers all three.
+ *
+ * There is no form. A form needs an endpoint, a spam defence and a place to put what it
+ * collects, and every one of those is a thing that can quietly stop working — an address
+ * anybody can copy into their own mail client cannot. The identity rows are ENTITY in
+ * src/site.mjs, printed by entityRows() so a detail the owner does not publish is a row
+ * that is absent rather than a label with nothing after it.
+ */
+export function contactMain(lang, t) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("contactpage_title"), path: urlContact(lang) },
+  ]);
+
+  // .fact is the profile screen's label-and-value row (assets/styles.css): the same pair
+  // of facts in the same shape, so this page adds no rule of its own to the stylesheet.
+  const rows = entityRows().map((r) => `<div class="fact">
+          <dt>${esc(t(r.key))}</dt>
+          <dd>${r.key === "contact_l_email"
+            ? `<a href="mailto:${esc(r.value)}">${esc(r.value)}</a>`
+            : esc(r.value)}</dd>
+        </div>`).join("\n        ");
+
+  const main = `<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      ${crumbs.nav}
+      <h1>${esc(t("contactpage_title"))}</h1>
+      <p class="lead">${esc(t("contactpage_lead"))}</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>${esc(t("contactpage_h_write"))}</h2>
+      <p class="muted">${esc(t("contactpage_write_d"))}</p>
+      <p class="ws-links">
+        <a class="btn btn-primary" href="mailto:${esc(ENTITY.email)}">${esc(t("contactpage_write_cta"))}</a>
+      </p>
+      <p class="muted">${esc(t("contactpage_reply"))}</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap narrow">
+      <h2>${esc(t("contactpage_h_who"))}</h2>
+      <p class="muted">${esc(t("contactpage_who_d"))}</p>
+      <dl class="facts">
+        ${rows}
+      </dl>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap narrow">
+      <h2>${esc(t("contactpage_h_data"))}</h2>
+      <p class="muted">${esc(t("contactpage_data_d"))}</p>
+      <p class="ws-links">
+        <a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a>
+        <a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a>
+      </p>
+    </div>
+  </section>
+
+  ${appNote(t)}
+</main>`;
+
+  const contactLd = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: t("contactpage_title"),
+    url: BASE_URL + urlContact(lang),
+    mainEntity: {
+      "@type": "Person",
+      name: ENTITY.name,
+      email: ENTITY.email,
+      ...(ENTITY.address ? { address: ENTITY.address } : {}),
+    },
+  };
+
+  return { main, ld: [crumbs.ld, contactLd] };
 }
 
 /* ------------------------------------------------------------------ the Android app */

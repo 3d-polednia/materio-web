@@ -130,6 +130,17 @@ cookies: {
     pl: "cookies", uk: "cookies", de: "cookies", en: "cookies",
     cs: "cookies", sk: "cookies", ro: "cookies", hr: "kolacici", sr: "kolacici", it: "cookies", nl: "cookies", es: "cookies", fr: "cookies",
   },
+  /* Session 62, item H7 of the 2026-09 audit: the site sold a subscription through Stripe
+     and stored personal data in Firebase without naming, anywhere, who was doing either.
+     Article 13 of the GDPR asks for the identity of the controller and the e-commerce
+     directive for the identity of the seller, and a visitor about to pay asks the same
+     question in plainer words. The segment is each language's own word rather than a
+     transliteration of the Polish one, for the reason the converter gives above: this is
+     the word somebody types when they are looking for a way to reach a person. */
+contact: {
+    pl: "kontakt", uk: "kontakty", de: "kontakt", en: "contact",
+    cs: "kontakt", sk: "kontakt", ro: "contact", hr: "kontakt", sr: "kontakt", it: "contatti", nl: "contact", es: "contacto", fr: "contact",
+  },
 estimate: {
     pl: "kosztorys", uk: "koshtorys", de: "kostenvoranschlag", en: "cost-estimate",
     cs: "rozpocet", sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun", it: "preventivo", nl: "kostenraming", es: "presupuesto", fr: "devis",
@@ -407,6 +418,44 @@ export const urlLiczmatPro = (lang) => `${prefix(lang)}/${SECTION.pro[lang]}/`;
 export const urlConverter = (lang) => `${prefix(lang)}/${SECTION.converter[lang]}/`;
 
 export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
+
+/**
+ * Contact — audit item H7. Localized like every other section: the page that says who the
+ * seller is has to be legible in the language the visitor is being sold in.
+ */
+export const urlContact = (lang) => `${prefix(lang)}/${SECTION.contact[lang]}/`;
+
+/**
+ * Who runs LiczMat. The one place the operator identity is written down.
+ *
+ * Audit item H7: index.html had no occurrence of the word "kontakt" and no mailto: at
+ * all, while the same page took subscriptions and opened Firebase accounts. The footer of
+ * every generated page and /kontakt/ in thirteen languages both read this object, so the
+ * details are authored once and cannot drift apart.
+ *
+ * These are legal identifiers, not copy. They are never translated, never abbreviated and
+ * never guessed: the owner supplied them. `address`, `taxId` and `regId` are optional —
+ * LiczMat is run by a natural person who does not publish a street address, so those stay
+ * empty and every reader drops the row rather than print a label with nothing after it.
+ * Filling one in later puts it on all 523 pages — which means a full build, so `PL_ONLY`
+ * has to come off for that run the way it did for the one that added this.
+ */
+export const ENTITY = {
+  name: "Michał Polednia",
+  address: "",
+  taxId: "",
+  regId: "",
+  email: "polednia@gmail.com",
+};
+
+/** The rows the footer and /kontakt/ print, in order, skipping whatever is not filled in. */
+export const entityRows = () => [
+  { key: "contact_l_entity", value: ENTITY.name },
+  { key: "contact_l_address", value: ENTITY.address },
+  { key: "contact_l_tax", value: ENTITY.taxId },
+  { key: "contact_l_reg", value: ENTITY.regId },
+  { key: "contact_l_email", value: ENTITY.email },
+].filter((r) => r.value);
 
 /** The Android app's own page. Not the same thing as URL_APP, which is the account. */
 export const urlAndroid = (lang) => `${prefix(lang)}/${SECTION.app[lang]}/`;

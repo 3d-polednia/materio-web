@@ -314,6 +314,12 @@ const ACRONYMS = new Set([
   // Material designations out of assets/i18n-materials.js: what is printed on the
   // packaging, capitals for the same reason OSB is.
   "GKFI", "CETRIS", "PMMA",
+  // Session 62, audit item H7: the contact page names the regulation it is complying with
+  // and the registers a business is identified by, and each of those has one spelling per
+  // language. RODO is the Polish name of the GDPR, DSGVO the German, RGPD the Romanian,
+  // Spanish and French; REGON and ЄДРПОУ are the Polish and Ukrainian company registers.
+  // Shouting is not what these are — they are how the law is spelled.
+  "RODO", "GDPR", "DSGVO", "RGPD", "REGON", "ЄДРПОУ",
 ]);
 
 checkMany("no exclamation mark", COPY.filter((r) => r.text.includes("!")),
@@ -458,6 +464,10 @@ const BUDGET = {
   "own-materials": 225,
   materials: 2820, stores: 159, android: 519, projects: 850, estimate: 425,
   clients: 524, jobs: 544, quotes: 470, calendar: 420, cookies: 637,
+  // Session 62, audit item H7. The widest is French at 172 words, and the page is short
+  // on purpose: a name, an address to write to and two links. Everything that could be
+  // said at length here is already said on /privacy-policy.html, which has its own budget.
+  contact: 180,
   "liczmat-pro": 477, account: 850, dashboard: 130, share: 40, privacy: 3800,
 };
 

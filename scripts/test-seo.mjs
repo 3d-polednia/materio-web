@@ -110,12 +110,13 @@ const INDEXED = PAGES.filter((page) => !isNoindex(page));
 head("0. the tree this suite is reading");
 {
   check("every page the build declares is on disk", PAGES.length > 0);
-  // 512 = 510 generated plus the two hand-written ones. It was 375 until session 57
+  // 525 = 523 generated plus the two hand-written ones. It was 375 until session 57
   // added the converter, 385 until session 59 added /moje-materialy/ — each of them one
-  // route in ten languages — and 395 until 2026-09-02 swapped Russian for Italian, Dutch,
-  // Spanish and French, which is three languages more of every route.
-  check("512 pages: 510 generated plus the two hand-written ones",
-    PAGES.length === 512, `found ${PAGES.length}`);
+  // route in ten languages — 395 until 2026-09-02 swapped Russian for Italian, Dutch,
+  // Spanish and French, which is three languages more of every route, and 512 until
+  // session 62 added /kontakt/ for audit item H7: one route in thirteen languages.
+  check("525 pages: 523 generated plus the two hand-written ones",
+    PAGES.length === 525, `found ${PAGES.length}`);
   check("every page has a <title>", PAGES.every((page) => page.title), 
     PAGES.filter((page) => !page.title).map((page) => page.url).join(", "));
   check("every page has a robots directive", PAGES.every((page) => page.robots),
@@ -200,8 +201,10 @@ head("2. sitemap.xml: the list, and where it comes from");
     declared.filter((u) => !listed.includes(u)).join(", "));
   check("and nothing else is", listed.every((u) => declared.includes(u)),
     listed.filter((u) => !declared.includes(u)).join(", "));
-  check("508 URLs: 507 in thirteen languages plus the privacy policy",
-    ENTRIES.length === 508, `found ${ENTRIES.length}`);
+  // 521 since session 62 added /kontakt/ for audit item H7 — one indexable route, so
+  // thirteen more URLs than the 508 the sitemap carried before it.
+  check("521 URLs: 520 in thirteen languages plus the privacy policy",
+    ENTRIES.length === 521, `found ${ENTRIES.length}`);
 
   for (const entry of ENTRIES) {
     check(`${entry.loc} is absolute and on the live domain`, entry.loc.startsWith(`${BASE}/`));

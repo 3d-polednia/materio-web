@@ -103,6 +103,7 @@ i `CALC_SLUG` w `src/site.mjs`.
 | `calendar` | `/terminarz/` | **PRO** | `jobs` | tak | 10 |
 | `liczmat-pro` | `/liczmat-pro/` | GUEST | `home` | tak | 10 |
 | `cookies` | `/cookies/` | GUEST | `home` | tak | 10 |
+| `contact` | `/kontakt/` | GUEST | `home` | tak | 10 |
 | `account` | `/app/` | GUEST | `home` | **nie** | 1 |
 | `dashboard` | `/app/dashboard/` | GUEST | `account` | **nie** | 1 |
 | `share` | `/p/` | GUEST | `estimate` | **nie** | 1 |
@@ -151,8 +152,8 @@ pełni `/app/` — jedna strona bezjęzykowa, `noindex`, bo pokazuje cudze dane.
 `/liczmat-pro` zbudowała Sesja 29 i jest wyżej w tabeli.
 
 Czego plan **nie wymienia**, a serwis ma: `/materialy/`, `/sklepy/`, `/aplikacja/`,
-`/cookies/`, `/kosztorys/`, `/p/`. Rozdział IX mówi wprost, że jego struktura nie jest
-absolutna. Wszystkie zostają — każda ma powód:
+`/cookies/`, `/kontakt/`, `/kosztorys/`, `/p/`. Rozdział IX mówi wprost, że jego struktura
+nie jest absolutna. Wszystkie zostają — każda ma powód:
 
 - `/materialy/` — katalog 161 materiałów jako droga do kalkulatora („mam gres 60×60,
   ile kleju”), nie sklep. Rozdział I zabrania rozbudowywania go w wielki katalog, nie
@@ -161,6 +162,10 @@ absolutna. Wszystkie zostają — każda ma powód:
 - `/aplikacja/` — jedna strona aplikacji Android. Rozdział X zabrania promować jej na
   stronie głównej; osobna strona jest właśnie sposobem, żeby jej tam nie promować.
 - `/cookies/` i `/privacy-policy.html` — wymóg prawny, nie decyzja produktowa.
+- `/kontakt/` — to samo, znalezisko H7 audytu 2026-09-04: serwis sprzedawał abonament
+  i zakładał konta, nie podając nigdzie, kto go prowadzi. Art. 13 RODO wymaga tożsamości
+  administratora, dyrektywa o handlu elektronicznym — identyfikacji sprzedawcy. Dane są
+  w jednym miejscu, `ENTITY` w `src/site.mjs`; czyta je stopka każdej strony i ta strona.
 - `/kosztorys/` — rozdziały XVI i XVII (lista materiałów + koszty). Dziecko `/projekty/`.
 - `/p/<token>` — kosztorys tylko do odczytu z linku. Poziom `GUEST` celowo: sens linku
   polega na tym, że odbiorca nie potrzebuje niczego.

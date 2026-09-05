@@ -29,7 +29,7 @@ import {
   URL_APP, URL_SHARE, URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
-  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials,
+  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
 } from "../src/site.mjs";
 import {
   livePaths, sitemapUrls, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS,
@@ -41,7 +41,7 @@ import { DEFAULT_CURRENCY, MONEY_LOCALE } from "../src/currency.mjs";
 import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, clientsMain, jobsMain,
+  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, contactMain, clientsMain, jobsMain,
   quotesMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
@@ -502,7 +502,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang), urlCalendar(lang), urlLiczmatPro(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlContact(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang), urlCalendar(lang), urlLiczmatPro(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -1067,6 +1067,26 @@ function buildCookiesPage() {
       path: urlCookies(lang),
       alternates: alt,
       main, jsonld: [ld],
+    }));
+  }
+}
+
+/* Audit item H7: the page that names the seller. Same shape as every other single page —
+   one file per language, the alternates of its own section, the crumbs and the contact
+   card in its JSON-LD. contactMain() returns two blocks of structured data rather than
+   one, because the ContactPage is the point of it and the breadcrumb is the wrapping. */
+function buildContactPage() {
+  const alt = alternatesFor(urlContact);
+  for (const lang of BUILD_LANGS) {
+    const t = translator(lang);
+    const { main, ld } = contactMain(lang, t);
+    write(join(urlContact(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${t("contactpage_title")} — LiczMat`,
+      description: t("contactpage_meta"),
+      path: urlContact(lang),
+      alternates: alt,
+      main, jsonld: ld,
     }));
   }
 }
@@ -1728,6 +1748,7 @@ buildGuides();
 buildMaterials();
 buildAndroidPage();
 buildCookiesPage();
+buildContactPage();
 buildWorkspacePages();
 buildClientsPages();
 buildJobsPages();
