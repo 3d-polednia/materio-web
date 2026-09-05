@@ -83,6 +83,11 @@ function parsePieces(text) {
 
 /* ---------- 2D guillotine packing helper (GuillotinePackingEngine.kt) ---------- */
 const PACK_EPS = 1e-6;
+// The packer is quadratic in the piece count: every rectangle walks every sheet and every
+// free area on it. The 100 000 ceiling used to be read one input row at a time, so a pasted
+// list of four rows of 100 000 passed the check and then put 400 000 rectangles through that
+// walk — the tab froze or ran out of memory. It is the whole list's ceiling now.
+const PACK_MAX_PIECES = 100000;
 
 /** Best-Area-Fit within the sheet's free rectangles, then guillotine-split. */
 function tryPlaceGuillotine(sheet, w, h, canRotate, kerf, type) {
@@ -207,12 +212,21 @@ const ENGINES = {
     const fitsSheet = (w, h) =>
       (w <= SW + PACK_EPS && h <= SH + PACK_EPS) || (canRotate && h <= SW + PACK_EPS && w <= SH + PACK_EPS);
 
-    const units = [];
-    let type = 0;
+    // Count the whole list first, expand it second: the row that breaks the ceiling can be
+    // the last one, and by then the earlier rows would already be rectangles in memory.
+    const rows = [];
+    let wanted = 0;
     for (const p of parsePieces(f.pieces)) {
       if (!(p.w > 0) || !(p.l > 0)) return { err: "err_positive" };
       if (p.q <= 0) continue;
-      if (p.q > 100000) return { err: "err_toomany" };
+      wanted += p.q;
+      rows.push(p);
+    }
+    if (wanted > PACK_MAX_PIECES) return { err: "err_toomany" };
+
+    const units = [];
+    let type = 0;
+    for (const p of rows) {
       if (!fitsSheet(p.w, p.l)) return { err: "err_toobig" };
       // One colour per distinct piece row so the picture reads like the input list.
       for (let i = 0; i < p.q; i++) units.push({ w: p.w, h: p.l, type });
