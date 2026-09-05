@@ -139,7 +139,12 @@ const BUDGET = {
      That is 43.6 kB raw of the growth and 16.5 kB of it gzipped; the rest is the wall's own
      markup. There is no cheaper arrangement: the permission table is the one place the
      levels are written down, and a page that cannot read it cannot gate anything. */
-  "projekty/index.html": [440, 132],
+  /* 442 rather than 440 since 2026-09-05, measured at 440.0 kB / 131.7 kB gz. The store
+     learned to hear a write made in another tab of the same browser (the audit's H5): a
+     `storage` listener, the redraw it defers while a field is being typed into, and the
+     comment that says which half of the finding this closes and which it does not. That is
+     2.4 kB of assets/workspace.js on the one page with no slack left. */
+  "projekty/index.html": [442, 133],
   "kosztorys/index.html": [425, 128],
   "liczmat-pro/index.html": [235, 71],
   "klienci/index.html": [405, 126],

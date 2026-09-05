@@ -68,6 +68,44 @@ function crmSave(data) {
   return true;
 }
 
+/* --------------------------------------------------- the other tab
+ *
+ * The answer assets/workspace.js gives, in the store that holds another person's telephone
+ * number, and with the same limit: the writes above read the store fresh, but nothing told
+ * the second tab that the first had written, so it drew the client list from before and a
+ * form opened on it put the old number back. The redraw waits while somebody is typing,
+ * because assets/crm-ui.js answers `crmchange` by rebuilding the screen.
+ */
+let crmRedrawPending = false;
+
+const crmTyping = () => {
+  const el = document.activeElement;
+  if (!el) return false;
+  const tag = String(el.tagName || "").toLowerCase();
+  return tag === "input" || tag === "textarea" || tag === "select" || el.isContentEditable === true;
+};
+
+function crmRedrawWhenIdle() {
+  if (crmTyping()) { setTimeout(crmRedrawWhenIdle, 800); return; }
+  crmRedrawPending = false;
+  document.dispatchEvent(new CustomEvent("crmchange"));
+}
+
+/** A write by another tab of this browser, brought into this one. */
+function crmForeignChange() {
+  if (crmRedrawPending) return;
+  crmRedrawPending = true;
+  crmRedrawWhenIdle();
+}
+
+if (typeof window !== "undefined" && window.addEventListener) {
+  window.addEventListener("storage", (e) => {
+    if (e.storageArea && e.storageArea !== localStorage) return;
+    if (e.key && e.key !== CRM_KEY) return; // a null key is localStorage.clear()
+    crmForeignChange();
+  });
+}
+
 const crmId = () => (crypto.randomUUID ? crypto.randomUUID()
   : "id-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
 

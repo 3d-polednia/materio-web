@@ -71,8 +71,8 @@ let PW_ALLOW = true;
  * anything a person can do — `tick()` moves time on so every assertion about "the newest
  * one" and "the lines that went with this delete" is about the code, not the schedule.
  */
-function loadWorkspace(seed) {
-  const backing = new Map(Object.entries(seed || {}));
+function loadWorkspace(seed, shared) {
+  const backing = shared || new Map(Object.entries(seed || {}));
   const clock = { now: 1_760_000_000_000 };
   const localStorage = {
     getItem: (k) => (backing.has(k) ? backing.get(k) : null),
@@ -80,7 +80,17 @@ function loadWorkspace(seed) {
     removeItem: (k) => backing.delete(k),
   };
   const events = [];
-  const document = { dispatchEvent: (e) => events.push(e.type) };
+  // What the browser gives the store beyond localStorage: the element the cursor is in
+  // (the redraw waits for it), the `storage` handler the store registers for writes made
+  // by another tab, and the timer that retries the redraw. Each is the smallest stand-in
+  // that lets the shipped file run, and each is drivable from a check below.
+  const dom = { activeElement: null };
+  const listeners = {};
+  const timers = [];
+  const document = {
+    dispatchEvent: (e) => events.push(e.type),
+    get activeElement() { return dom.activeElement; },
+  };
   const api = evalScript("assets/workspace.js", [
     "WS_KEY", "WS_ACTIVE_KEY", "WS_SCHEMA", "wsLoad", "wsSave", "wsAlive",
     "wsAllProjects", "wsProjects", "wsArchivedProjects", "wsProject",
@@ -93,6 +103,8 @@ function loadWorkspace(seed) {
   ], {
     localStorage,
     document,
+    window: { addEventListener: (type, fn) => { (listeners[type] = listeners[type] || []).push(fn); } },
+    setTimeout: (fn) => timers.push(fn),
     crypto: { randomUUID: () => `id-${backing.size}-${Math.random().toString(36).slice(2, 10)}` },
     CustomEvent: class { constructor(type) { this.type = type; } },
     Date: { now: () => clock.now },
@@ -111,8 +123,30 @@ function loadWorkspace(seed) {
     events,
     tick: (ms) => { clock.now += ms || 1000; },
     now: () => clock.now,
+    /**
+     * A write another tab has just made, as the browser announces it to this one.
+     * `area` stands in for the storage it was made in — sessionStorage fires the same
+     * event, with its own keys, and has nothing to do with the workspace.
+     */
+    storageEvent: (key, area) => (listeners.storage || []).forEach((fn) => fn({ key, storageArea: area })),
+    /** Put the cursor in a field, or take it out of one with null. */
+    focus: (tagName) => { dom.activeElement = tagName ? { tagName } : null; },
+    /** Let every pending retry run. A retry that has to wait again queues a new one. */
+    runTimers: () => { timers.splice(0).forEach((fn) => fn()); },
     raw: () => JSON.parse(backing.get("materio-workspace-v1") || "{}"),
   };
+}
+
+/**
+ * The same store opened twice: two tabs of one browser over one localStorage.
+ *
+ * The point of sharing the backing map rather than copying it is that this is what the
+ * browser does — localStorage is one store per origin, not one per tab — and the audit's
+ * H5 is entirely about what that means for two screens on one project.
+ */
+function twoTabs(seed) {
+  const backing = new Map(Object.entries(seed || {}));
+  return [loadWorkspace(null, backing), loadWorkspace(null, backing)];
 }
 
 /** One saved estimate line, as the "add to the project" button writes it. */
@@ -655,6 +689,69 @@ head("13. /projekty/ hides its link without gating its page");
   const themeAt = built.indexOf("liczmat-theme");
   check("in the same script the theme is applied in", themeAt > 0 && Math.abs(stamp - themeAt) < 800,
     `theme at ${themeAt}, level at ${stamp}`);
+}
+
+/* ------------------------------------------- 13. two tabs (audit 2026-09-04, H5) */
+
+head("13. two tabs of one browser on one project");
+{
+  // Half of the finding: does a write in one tab wipe the other's? It cannot, and this
+  // says why in the only way that matters — by doing it. Every mutator reads localStorage
+  // fresh and patches the row it just read, and the two happen in one synchronous block,
+  // so the second tab's write is applied on top of the first tab's, field by field.
+  const [a, b] = twoTabs();
+  const project = a.wsAddProject("Łazienka");
+  eq("what one tab writes, the other one reads", (b.wsProjects()[0] || {}).name, "Łazienka");
+
+  b.tick();
+  b.wsRenameProject(project.id, "Łazienka na piętrze");
+  a.tick();
+  a.wsArchiveProject(project.id, true);
+  const row = b.wsProject(project.id);
+  eq("a rename in one tab survives an archive in the other", row.name, "Łazienka na piętrze");
+  eq("and the archive survives the rename", row.archived, true);
+
+  a.wsArchiveProject(project.id, false);
+  a.tick();
+  addLine(a, "Płytki", 12, 480);
+  b.tick();
+  addLine(b, "Fuga", 3, 60);
+  const lines = a.wsEstimations(project.id).map((e) => e.name).sort();
+  eq("a line saved in each tab leaves two lines, not one", lines.join(","), "Fuga,Płytki");
+
+  // The other half, and the one that was missing: the second tab has to hear about it.
+  const [c, d] = twoTabs();
+  c.wsAddProject("Kuchnia");
+  check("the tab that writes redraws itself", c.events.includes("workspacechange"));
+  eq("the other tab hears nothing until the browser tells it", d.events.length, 0);
+
+  d.storageEvent("materio-workspace-v1");
+  eq("a workspace write in another tab redraws this one", d.events.length, 1);
+  d.storageEvent("liczmat-theme");
+  eq("a key that is not the workspace redraws nothing", d.events.length, 1);
+  d.storageEvent("materio-workspace-v1", { sessionStorage: true });
+  eq("and neither does the same key written into sessionStorage", d.events.length, 1);
+  d.storageEvent("materio-active-project");
+  eq("the open project is shared by every tab, so it redraws too", d.events.length, 2);
+  d.storageEvent(null);
+  eq("and so does clearing the whole storage — /app/ wiping the device", d.events.length, 3);
+
+  // The redraw waits for the cursor. Every screen answers `workspacechange` by rebuilding
+  // itself, and a form rebuilt mid-word loses the word — which is the loss this section is
+  // about, arriving by the door meant to close it.
+  const [, f] = twoTabs();
+  f.focus("INPUT");
+  f.storageEvent("materio-workspace-v1");
+  f.storageEvent("materio-workspace-v1");
+  eq("nothing is redrawn under a cursor", f.events.length, 0);
+  f.runTimers();
+  eq("and it keeps waiting for as long as the field is held", f.events.length, 0);
+  f.focus(null);
+  f.runTimers();
+  eq("then one redraw answers every write that arrived meanwhile", f.events.length, 1);
+
+  f.storageEvent("materio-workspace-v1");
+  eq("and the next write is not swallowed by the one before it", f.events.length, 2);
 }
 
 /* ------------------------------------------------------------------ report */

@@ -74,10 +74,14 @@ const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 let PW_ALLOW = true;
 
 /** assets/workspace.js and assets/crm.js in one scope, which is how the browser has them. */
-function loadCrm() {
-  const backing = new Map();
+function loadCrm(shared) {
+  const backing = shared || new Map();
   const clock = { now: 1_760_000_000_000, currency: "PLN" };
   let ids = 0;
+  const events = [];
+  const dom = { activeElement: null };
+  const listeners = {};
+  const timers = [];
   const localStorage = {
     getItem: (k) => (backing.has(k) ? backing.get(k) : null),
     setItem: (k, v) => backing.set(k, String(v)),
@@ -95,7 +99,14 @@ function loadCrm() {
     "crmChain", "crmHistory", "CRM_CHAIN", "CRM_HISTORY_KINDS", "CRM_KEY",
   ], {
     localStorage,
-    document: { dispatchEvent: () => {} },
+    document: {
+      dispatchEvent: (e) => events.push(e.type),
+      get activeElement() { return dom.activeElement; },
+    },
+    // The `storage` handler both stores register for writes made by another tab, and the
+    // timer that retries a redraw the cursor is standing in the way of.
+    window: { addEventListener: (type, fn) => { (listeners[type] = listeners[type] || []).push(fn); } },
+    setTimeout: (fn) => timers.push(fn),
     crypto: { randomUUID: () => `id-${++ids}` },
     CustomEvent: class { constructor(type) { this.type = type; } },
     // A real Date with a fixed "now": crmDay() parses a deadline, and a Date that is
@@ -119,6 +130,13 @@ function loadCrm() {
     raw: () => JSON.parse(backing.get("liczmat-crm-v1") || "{}"),
     workspaceRaw: () => JSON.parse(backing.get("materio-workspace-v1") || "{}"),
     keys: () => [...backing.keys()],
+    events,
+    /** A write another tab has just made, as the browser announces it to this one. */
+    storageEvent: (key) => (listeners.storage || []).forEach((fn) => fn({ key })),
+    /** Put the cursor in a field, or take it out of one with null. */
+    focus: (tagName) => { dom.activeElement = tagName ? { tagName } : null; },
+    /** Let every pending retry run. A retry that has to wait again queues a new one. */
+    runTimers: () => { timers.splice(0).forEach((fn) => fn()); },
     tick: (ms) => { clock.now += ms || 1000; },
     currency: (code) => { clock.currency = code; },
   };
@@ -595,6 +613,45 @@ head("7. the words, in four languages");
     ["client", "job", "project", "quote"].map((n) => DICT.pl[`crm_node_${n}`]).join(" → "),
     "Klient → Zlecenie → Projekt → Wycena");
   eq("and it ends in Historia", DICT.pl.crm_hist_t, "Historia");
+}
+
+/* --------------------------------------- 13. two tabs (audit 2026-09-04, H5) */
+
+head("13. two tabs of one browser on one Pro workspace");
+{
+  // The same finding as assets/workspace.js answers, in the store that holds another
+  // person's telephone number. Two tabs share one localStorage, and every write here reads
+  // it fresh, so neither tab can overwrite the other's row — what was missing was the
+  // second tab ever hearing that the first had written.
+  const backing = new Map();
+  const a = loadCrm(backing);
+  const b = loadCrm(backing);
+
+  const client = a.crmAddClient({ name: "Kowalski", phone: "600100200" });
+  eq("what one tab writes, the other one reads", (b.crmClient(client.id) || {}).name, "Kowalski");
+
+  b.tick();
+  b.crmAddJob({ clientId: client.id, name: "Łazienka" });
+  a.tick();
+  const second = a.crmAddJob({ clientId: client.id, name: "Kuchnia" });
+  check("a job added in each tab leaves two jobs, not one",
+    b.crmClientJobs(client.id).length === 2, JSON.stringify(b.crmClientJobs(client.id).map((j) => j.name)));
+  check("and the second tab can read the first tab's row back", Boolean(b.crmJob(second.id)));
+
+  b.events.length = 0;
+  b.storageEvent("liczmat-crm-v1");
+  check("a Pro write in another tab redraws this one", b.events.includes("crmchange"));
+  const drawn = b.events.length;
+  b.storageEvent("liczmat-theme");
+  eq("a key that is not the Pro store redraws nothing", b.events.length, drawn);
+
+  b.focus("INPUT");
+  b.storageEvent("liczmat-crm-v1");
+  eq("nothing is redrawn under a cursor — a form rebuilt mid-word loses the word",
+    b.events.length, drawn);
+  b.focus(null);
+  b.runTimers();
+  eq("the redraw arrives once the field is left", b.events.length, drawn + 1);
 }
 
 /* ------------------------------------------------------------------ report */

@@ -93,6 +93,55 @@ function wsSave(data) {
   return true;
 }
 
+/* --------------------------------------------------- the other tab
+ *
+ * The audit of 2026-09-04 read two tabs on one project as a lost workspace. What is true:
+ * localStorage is one store shared by every tab, and each mutator here reads it fresh and
+ * patches only the fields it was handed, so two tabs editing two rows — or two fields of
+ * one row — keep both. What stays true after this change: the read and the write are two
+ * operations, and another tab can land between them, so two saves made in the same instant
+ * can still drop one. Closing that needs a lock across tabs (navigator.locks), which is
+ * asynchronous where every write here is synchronous — its own change, on its own day.
+ *
+ * What this fixes is the loss anybody can reproduce. Nothing listened for `storage`, so a
+ * tab kept drawing the list from before, and an edit form opened on that stale list wrote
+ * the old values back deliberately. `storage` reaches only the tabs that did not write, so
+ * it cannot loop; `WS_ACTIVE_KEY` is watched with the workspace because which project is
+ * open is one value every tab shares. The redraw waits while somebody is typing — every
+ * screen answers `workspacechange` by rebuilding itself, and a form rebuilt under a cursor
+ * loses the half-typed name that is not in the store yet.
+ */
+let wsRedrawPending = false;
+
+const wsTyping = () => {
+  const el = document.activeElement;
+  if (!el) return false;
+  const tag = String(el.tagName || "").toLowerCase();
+  return tag === "input" || tag === "textarea" || tag === "select" || el.isContentEditable === true;
+};
+
+function wsRedrawWhenIdle() {
+  if (wsTyping()) { setTimeout(wsRedrawWhenIdle, 800); return; }
+  wsRedrawPending = false;
+  document.dispatchEvent(new CustomEvent("workspacechange"));
+}
+
+/** A write by another tab of this browser, brought into this one. */
+function wsForeignChange() {
+  if (wsRedrawPending) return; // one redraw answers every write that arrived meanwhile
+  wsRedrawPending = true;
+  wsRedrawWhenIdle();
+}
+
+if (typeof window !== "undefined" && window.addEventListener) {
+  window.addEventListener("storage", (e) => {
+    // sessionStorage fires the same event and has its own keys; a null key is clear().
+    if (e.storageArea && e.storageArea !== localStorage) return;
+    if (e.key && e.key !== WS_KEY && e.key !== WS_ACTIVE_KEY) return;
+    wsForeignChange();
+  });
+}
+
 const wsId = () => (crypto.randomUUID ? crypto.randomUUID()
   : "id-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
 
