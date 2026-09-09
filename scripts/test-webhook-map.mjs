@@ -416,9 +416,15 @@ head("8. the function is deployed, not published — and carries no secret");
   check("and an unattributable payment is logged rather than dropped",
     index.includes("zapłata bez konta"));
 
-  /* Nothing in the deployed function may write a plan a browser could ask for. */
-  check("the function never trusts client_reference_id without checking it",
-    index.includes("auth.getUser(intent.uid)"));
+  /* Nothing in the deployed function may write a plan a browser could ask for.
+     `client_reference_id` comes out of a URL, so since the 2026-09 audit's M1 the uid is
+     taken from the signature on it and from nowhere else — a bare uid, which is what a
+     tampered URL carries, resolves to nothing. functions/pay-ticket.mjs is the ticket
+     itself and scripts/test-pay-ticket.mjs is what proves it refuses the rest. */
+  check("the uid comes off a signed ticket, never off the URL as it stands",
+    index.includes("readTicket(intent.uid") && !index.includes("auth.getUser(intent.uid)"));
+  check("and the account behind the ticket still has to exist",
+    index.includes("auth.getUser(ticketUid)"));
 
   /* H1 and H2 are half configuration and half a second collection; the pure half above
      cannot see either, so this is where the wiring is checked. */

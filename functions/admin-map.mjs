@@ -111,17 +111,31 @@ export function parseRequest(data) {
 /**
  * Koniec planu nadanego na `months` miesięcy, w milisekundach.
  *
- * Liczone kalendarzowo (`setMonth`), a nie przez mnożenie 30 dni: „na rok" ma znaczyć ten
- * sam dzień w przyszłym roku, a nie 360 dni. To jest druga kopia `monthsFromNow()` ze
- * `scripts/pro-admin.mjs` — katalog funkcji jest wdrażany osobno i nie widzi `scripts/` —
- * a tym, co pilnuje, żeby obie liczyły tak samo, jest `scripts/test-admin-map.mjs` §4:
- * uruchamia jedną i drugą na tej samej liście wartości i porównuje wynik.
+ * Liczone kalendarzowo, a nie przez mnożenie 30 dni: „na rok" ma znaczyć ten sam dzień
+ * w przyszłym roku, a nie 360 dni.
+ *
+ * Dzień, którego w docelowym miesiącu nie ma, **przycinamy do ostatniego dnia tego
+ * miesiąca**: 31 stycznia plus miesiąc to koniec lutego. Sam `setMonth()` przelewa taką
+ * datę na 2 albo 3 marca, czyli nadaje dostęp dłuższy, niż ktokolwiek zamówił — znalezisko
+ * M2 audytu 2026-09. Dlatego dzień zdejmujemy z daty przed przesunięciem miesiąca
+ * (`setDate(1)`) i wkładamy z powrotem dopiero wtedy, gdy wiadomo, ile dni ma miesiąc
+ * docelowy. Godzina zostaje nietknięta.
+ *
+ * To jest druga kopia `monthsFromNow()` ze `scripts/pro-admin.mjs` — katalog funkcji jest
+ * wdrażany osobno i nie widzi `scripts/` — a tym, co pilnuje, żeby obie liczyły tak samo,
+ * jest `scripts/test-admin-map.mjs` §4. Sekcja sprawdza najpierw obie kopie wobec
+ * wypisanych dat, a dopiero potem jedną wobec drugiej: dwie kopie, które się zgadzają,
+ * nadal mogą się obie mylić, i przez jeden audyt myliły się.
  */
 export function monthsFromNow(months, now) {
   const n = Number(months);
   if (!Number.isInteger(n) || n < 1 || n > MAX_MONTHS) return null;
   const end = new Date(now === undefined ? Date.now() : now);
+  const day = end.getDate();
+  end.setDate(1);
   end.setMonth(end.getMonth() + n);
+  const lastDayOfMonth = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
+  end.setDate(Math.min(day, lastDayOfMonth));
   return end.getTime();
 }
 

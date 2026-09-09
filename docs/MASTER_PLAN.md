@@ -103,6 +103,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 62 | Jeden angielski, waluta z regionu urządzenia — D3 i nazwa z D4 (repo aplikacji) | **Zrobione** — 2026-09-01. Czeka na wydanie AAB (właściciel). **Audyt parytetu zamknięty** |
 | 63 | Rosyjski wychodzi, wchodzą włoski, holenderski, hiszpański i francuski (oba repozytoria) | **Zrobione** — 2026-09-02. Strona jest na żywo po pushu; aplikacja czeka na kolejny AAB |
 | 64 | Audyt 2026-09-04: sześć znalezisk niskich (L1–L6) + rozmrożenie dwunastu języków | **Zrobione** — 2026-09-09. Strona jest na żywo po pushu |
+| 65 | Audyt 2026-09-04, sesja A: pieniądze i backend (M1, M2) | **Zrobione** — 2026-09-09. **Czeka na właściciela: `firebase functions:secrets:set PAY_TICKET_SECRET` i `firebase deploy --only functions`** |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -476,6 +477,89 @@ uruchomione** — Playwright nie jest zainstalowany na tej maszynie i te skrypty
 komunikatem „skipping". Jeden z nich wymaga uwagi w sesji, która może je uruchomić:
 `scripts/test-qa.mjs` przechodzi ścieżkę „LICZMAT → projekt → kalkulacja → materiały →
 koszty", czyli ogląda koszty na poziomie, który od tej sesji ich nie widzi.
+
+## Sesja 65 — audyt, sesja A: pieniądze i backend (2026-09-09)
+
+Reszta audytu z 2026-09-04 to jedenaście znalezisk **średnich**. Rozpisane są na trzy
+sesje po tym, co je łączy, a nie po numerach: **A** to `functions/` i `scripts/` (M1, M2),
+**B** to logika w przeglądarce (M3–M7, pliki `workspace.js`, `crm-store.js`,
+`calculators.js`), **C** to generator i wygenerowany markup (M9, M10, M11, a na końcu M8).
+A idzie pierwsza, bo dotyczy pieniędzy. B przed C, bo obie ruszają `assets/calculators.js`,
+a C przepisuje w nim wyzwalacz liczenia, na którym B pisze walidację.
+
+Ta sesja robi A.
+
+- **M2 — ręczne nadanie Pro przeskakiwało na kolejny miesiąc.** `monthsFromNow()` liczyło
+  `end.setMonth(end.getMonth() + n)`, a `setMonth` przelewa zamiast przycinać: 31 stycznia
+  plus miesiąc to 2 albo 3 marca. Klient dostawał dostęp dłuższy, niż zamówił. Dzień jest
+  teraz zdejmowany przed przesunięciem miesiąca (`setDate(1)`) i wkładany z powrotem
+  przycięty do ostatniego dnia miesiąca docelowego — w obu kopiach, `functions/admin-map.mjs`
+  i `scripts/pro-admin.mjs`.
+
+  **To był świadomy wybór, który audyt odwrócił.** Komentarz w `scripts/pro-admin.mjs`
+  mówił wprost, że przelanie się na marzec jest do przyjęcia, bo to kilkadziesiąt godzin
+  i nie warto drugiej reguły. Audyt pokazał drugą stronę tej samej różnicy: to są godziny,
+  których nikt nie kupił. Zapisane tutaj, żeby dało się wrócić do poprzedniej decyzji
+  jednym cofnięciem, gdyby właściciel uznał inaczej.
+
+  **Test §4 w `scripts/test-admin-map.mjs` sprawdzał kopię z kopią, nie z wynikiem** — i to
+  była druga połowa znaleziska. Sekcja ma teraz tabelę wypisanych dat (31 stycznia + 1,
+  + 13, 31 sierpnia + 6, 29 lutego + 12, 31 marca + 1, 31 maja + 3) i sprawdza wobec niej
+  **obie** kopie, a porównanie jednej z drugą zostaje pod spodem, bo nadal pilnuje reszty
+  wartości.
+
+- **M1 — płatność można było podpiąć pod cudze konto.** `client_reference_id` w adresie
+  Payment Linka niósł goły uid, a `resolveUid()` sprawdzał wyłącznie, czy takie konto
+  istnieje w Firebase Auth. Podmiana parametru w URL-u nadawała Pro wybranemu cudzemu
+  kontu i wiązała z nim przyszłe zdarzenia Stripe'a.
+
+  Nowy `functions/pay-ticket.mjs`: **bilet** `v1.<uid>.<data>.<HMAC-SHA256>`, ważny dobę
+  (tyle Stripe trzyma otwartą sesję Checkout). Nowa funkcja `payTicket` (`onCall`) wystawia
+  go tylko zalogowanemu i tylko na `request.auth.uid` — czyli na uid z tokenu
+  zweryfikowanego przez Google, a nie z ciała żądania, którego ta funkcja w ogóle nie
+  czyta. Webhook bierze uid **wyłącznie** z podpisu; goły uid nie znaczy już nic.
+
+  **Dlaczego bilet, a nie sesja Checkout zakładana po stronie serwera.** Sesja z serwera
+  jest podręcznikową odpowiedzią, ale wymaga klucza API Stripe'a w `functions/`, a nagłówek
+  `functions/index.js` od Sesji 38 tłumaczy, że ta funkcja świadomie go nie ma: czyta
+  tylko to, co Stripe sam przysłał i podpisał. Bilet zamyka tę samą dziurę bez klucza
+  i bez porzucania Payment Linków, na których stoi cała sprzedaż.
+
+  **Płatność bez biletu nadal przechodzi** — przypisuje się adresem e-mail z zapłaconej
+  sesji, tak jak przypisywała się dotąd każda bez `client_reference_id`. To nie jest druga
+  furtka: adres bierze się ze Stripe'a, nie z URL-a, a jedyne, co można nim zrobić, to
+  kupić komuś Pro za swoje. Dzięki temu wdrożenie bez ustawionego sekretu albo
+  przeglądarka, której nie udało się wywołać funkcji, kończą się utratą przypisania po
+  uidzie, a nie sklepem, który nie przyjmuje pieniędzy. Z tego samego powodu sekret czyta
+  się przez `payTicketSecret()` z `try` — wyjątek w webhooku zamieniłby brak konfiguracji
+  w piątkę na **każdą** płatność.
+
+  Sprawdza to `scripts/test-pay-ticket.mjs` (34 sprawdzenia): bilet czyta się na ten sam
+  uid, a goły uid, cudzy podpis, podmieniony uid przy starym podpisie, rozciągnięta data,
+  obca wersja i bilet po terminie — nie. Osobna sekcja pilnuje, że przeglądarka nie zna
+  sekretu i nie podpisuje niczego sama.
+
+### Co musi zrobić właściciel, zanim to zacznie działać
+
+```bash
+firebase functions:secrets:set PAY_TICKET_SECRET     # dowolny długi losowy napis
+firebase deploy --only functions
+```
+
+**Wdrożenie bez tego sekretu nie przejdzie**, bo deklarują go obie funkcje. Do czasu
+wdrożenia strona chodzi jak dotąd: `/app/` prosi o bilet, nie dostaje go i idzie do kasy
+bez niego, a płatności przypisują się adresem e-mail. `docs/STRIPE.md` ma ten krok w 3b
+i poprawiony opis `client_reference_id` w sekcji 2 i 5.
+
+### Czego ta sesja nie sprawdziła
+
+Ośmiu zestawów w Chromium — Playwright nadal nie jest zainstalowany na tej maszynie.
+Wszystkie zestawy `node` przeszły; `test-copy` (1) i `test-security` (7) mają dokładnie te
+same błędy co przed sesją, sprawdzone przez `git stash`, więc nie są jej skutkiem.
+Rzeczywistej płatności przez Stripe nikt nie wykonał — to jest krok 5 z `docs/STRIPE.md`
+i wymaga wdrożonych funkcji.
+
+**NASTĘPNA SESJA: B** — M3–M7, logika w przeglądarce.
 
 ## Sesja 64 — sześć znalezisk niskich z audytu i rozmrożenie języków (2026-09-09)
 

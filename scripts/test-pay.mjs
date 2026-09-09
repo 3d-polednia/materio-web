@@ -215,7 +215,7 @@ head("3. priced is not the same as buyable — whichever of the two states ships
         eq(`${plan.id} can be bought in ${code}`, shipped.lmPayBuyable(plan.id, code), true);
       }
       check(`${plan.id} builds a checkout URL`,
-        typeof shipped.lmCheckoutUrl(plan.id, { uid: "abc123" }) === "string");
+        typeof shipped.lmCheckoutUrl(plan.id, { ref: "abc123" }) === "string");
     }
     eq("the site takes money in every currency it prices",
       shipped.LM_PAY.currencies.every((c) => shipped.lmPayOpen(c)), true);
@@ -329,12 +329,16 @@ head("4. a payment address may only ever be Stripe");
 head("5. the checkout URL carries who, never how much");
 {
   const pay = loadPay({ link: "https://buy.stripe.com/test_123" });
-  const url = pay.lmCheckoutUrl("monthly", { uid: "abc123", email: "jan@example.com" });
+  const url = pay.lmCheckoutUrl("monthly", { ref: "v1.YWJjMTIz.1788000000.sig", email: "jan@example.com" });
   const u = new URL(url);
 
   eq("it goes to Stripe", u.hostname, "buy.stripe.com");
-  eq("the account is named, so the webhook can find it",
-    u.searchParams.get("client_reference_id"), "abc123");
+  /* The signed ticket, not the bare uid it used to be: a uid in a URL is a uid anybody can
+     retype into somebody else's, which is the 2026-09 audit's M1. This file only carries
+     whatever the caller was given; minting and reading it are functions/pay-ticket.mjs. */
+  eq("the account is named by its ticket, so the webhook can find it",
+    u.searchParams.get("client_reference_id"), "v1.YWJjMTIz.1788000000.sig");
+  check("and the bare uid is not what travels", !url.includes("=abc123"));
   eq("and the e-mail is prefilled", u.searchParams.get("prefilled_email"), "jan@example.com");
 
   /* The heart of "zabezpieczenie uprawnień" on the money side: the price is set on the
@@ -346,18 +350,21 @@ head("5. the checkout URL carries who, never how much");
   check("and no price digits appear in it at all", !/3999|999|10990/.test(u.search), u.search);
   eq("exactly two parameters are added", [...u.searchParams.keys()].length, 2);
 
-  // Without a uid the payment would land on nobody — but that is the caller's problem to
-  // report, so the URL is still built and simply carries less.
+  // Without a ticket the payment is attributed by the address that paid it — see the note
+  // over goToCheckout() in assets/app.js — so the URL is still built and carries less.
   const anon = new URL(pay.lmCheckoutUrl("monthly", {}));
-  eq("no uid means no reference", anon.searchParams.get("client_reference_id"), null);
+  eq("no ticket means no reference", anon.searchParams.get("client_reference_id"), null);
+  const stale = new URL(pay.lmCheckoutUrl("monthly", { uid: "abc123" }));
+  eq("and a bare uid is not a ticket, so it does not travel either",
+    stale.searchParams.get("client_reference_id"), null);
 
   // A plan that cannot be bought has no URL, so no caller can render a dead button.
   eq("an unconfigured plan has no checkout",
-    loadPay({ link: "" }).lmCheckoutUrl("monthly", { uid: "x" }), null);
-  eq("nor does an unknown plan", pay.lmCheckoutUrl("weekly", { uid: "x" }), null);
+    loadPay({ link: "" }).lmCheckoutUrl("monthly", { ref: "x" }), null);
+  eq("nor does an unknown plan", pay.lmCheckoutUrl("weekly", { ref: "x" }), null);
   // A link that is not Stripe's is refused here too, not only by lmPayUrlOk().
   eq("nor does a plan pointed somewhere else",
-    loadPay({ link: "https://example.com/pay" }).lmCheckoutUrl("monthly", { uid: "x" }), null);
+    loadPay({ link: "https://example.com/pay" }).lmCheckoutUrl("monthly", { ref: "x" }), null);
 }
 
 /* ================================================================== 6. permissions */

@@ -624,18 +624,46 @@ function renderPlanPrices(sub) {
 /**
  * Leave for Stripe.
  *
- * The uid is what the webhook matches the payment back to the account with, so a checkout
- * without one is a payment that grants nobody anything — lmCheckoutUrl() returns null
- * rather than a half-built URL, and this refuses to navigate instead of sending somebody
- * to a page that cannot help them.
+ * The ticket is what the webhook matches the payment back to the account with. It is
+ * minted in the cloud, by `payTicket`, for whoever the ID token says is asking — the page
+ * cannot make one and does not know the secret, which is the whole point: the uid used to
+ * ride in the URL in plain sight, where anybody could retype it into somebody else's
+ * (the 2026-09 audit's M1).
+ *
+ * A checkout without a ticket still goes through. Stripe knows the address that paid, and
+ * the webhook falls back to it — that is how a payment has always been attributed when
+ * `client_reference_id` was missing. Refusing to sell over a missing ticket would turn a
+ * deploy without the secret into a shop that takes no money at all.
  */
-function goToCheckout(planId) {
+async function goToCheckout(planId) {
   const url = lmCheckoutUrl(planId, {
-    uid: state.user && state.user.uid,
+    ref: await payTicket(),
     email: state.user && state.user.email,
   });
   if (!url) { status(T("pay_soon"), true); return; }
   location.href = url;
+}
+
+/**
+ * The signed ticket for this account, or null when the cloud has none to give.
+ *
+ * Null on every failure — not signed in, secret not set on the deployment, the call did
+ * not go through — because every one of them ends the same way: check out without a
+ * ticket and let the address do the attributing. A payment page is the wrong place to
+ * explain a missing server secret.
+ */
+async function payTicket() {
+  if (!state.user || !state.fbApp) return null;
+  try {
+    const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
+    // The same region the functions are deployed to (assets/admin.js says it too, for the
+    // other callable). Firestore is in europe-central2 and so is everything beside it.
+    const res = await httpsCallable(getFunctions(state.fbApp, "europe-central2"), "payTicket")();
+    const ticket = res && res.data && res.data.ticket;
+    return typeof ticket === "string" && ticket ? ticket : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 /** The way back to wherever the sign-up prompt was clicked, if there was one. */

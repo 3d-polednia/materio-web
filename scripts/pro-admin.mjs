@@ -124,17 +124,25 @@ export function looksLikeEmail(value) {
 /**
  * Ile milisekund ma koniec planu nadanego na `months` miesięcy.
  *
- * Liczone kalendarzowo (`setMonth`), a nie przez mnożenie 30 dni: „na rok" ma znaczyć ten
- * sam dzień w przyszłym roku, a nie 360 dni. Dzień, którego w docelowym miesiącu nie ma
- * (31 stycznia + 1 miesiąc), przesuwa się tak, jak robi to JavaScript — na 2 lub 3 marca;
- * to jest kilkadziesiąt godzin różnicy w planie liczonym na miesiące i nie warto tego
- * poprawiać kosztem drugiej reguły, którą trzeba by potem pamiętać.
+ * Liczone kalendarzowo, a nie przez mnożenie 30 dni: „na rok" ma znaczyć ten sam dzień
+ * w przyszłym roku, a nie 360 dni.
+ *
+ * Dzień, którego w docelowym miesiącu nie ma (31 stycznia + 1 miesiąc), **przycinamy do
+ * ostatniego dnia tego miesiąca**. Do 2026-09-09 ten komentarz mówił, że przelanie się na
+ * 2 albo 3 marca jest do przyjęcia, bo to kilkadziesiąt godzin. Audyt (M2) wskazał drugą
+ * stronę tej samej różnicy: to są godziny, których nikt nie kupił, nadawane cudzą ręką
+ * z panelu. Przycięcie jest jedną regułą, nie drugą — „ten sam dzień, a jak go nie ma, to
+ * ostatni" — i taką samą regułę ma druga kopia w `functions/admin-map.mjs`.
  */
 export function monthsFromNow(months, now) {
   const n = Number(months);
   if (!Number.isInteger(n) || n < 1 || n > MAX_MONTHS) return null;
   const end = new Date(now === undefined ? Date.now() : now);
+  const day = end.getDate();
+  end.setDate(1);
   end.setMonth(end.getMonth() + n);
+  const lastDayOfMonth = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
+  end.setDate(Math.min(day, lastDayOfMonth));
   return end.getTime();
 }
 

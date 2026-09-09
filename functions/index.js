@@ -66,8 +66,23 @@ import {
 import {
   LIST_LIMIT, accountRow, grantWrite, isAdmin, parseRequest, planSummary, revokeWrite,
 } from "./admin-map.mjs";
+import { looksLikeTicket, mintTicket, readTicket } from "./pay-ticket.mjs";
 
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
+
+/**
+ * Sekret biletu do kasy — nasz własny, nie Stripe'a. Znalezisko M1 audytu 2026-09.
+ *
+ * Podpisuje `client_reference_id`, czyli jedyne miejsce, w którym przeglądarka mówi, czyja
+ * jest płatność. Dlaczego w ogóle jest podpisywane, opisuje `functions/pay-ticket.mjs`.
+ *
+ *     firebase functions:secrets:set PAY_TICKET_SECRET      # dowolny długi losowy napis
+ *
+ * Do czasu wpisania sekretu `payTicket` odmawia wystawienia biletu, a `/app/` idzie do
+ * kasy bez niego — płatność przypisuje się wtedy adresem e-mail z Stripe'a, tak jak
+ * przypisywała się dotąd każda płatność bez `client_reference_id`.
+ */
+const PAY_TICKET_SECRET = defineSecret("PAY_TICKET_SECRET");
 
 /**
  * Które subskrypcje są LiczMat Pro i z którego konta Stripe'a. Znaleziska H1 i H2.
@@ -97,6 +112,24 @@ const REGION = "europe-central2";
 const hmacSha256 = (secret, payload) =>
   createHmac("sha256", secret).update(payload, "utf8").digest("hex");
 
+/**
+ * Sekret biletu, a pusty napis, gdy go nie ma.
+ *
+ * `firebase deploy` odmawia wdrożenia funkcji, która wskazuje na nieistniejący sekret, więc
+ * tego stanu w produkcji być nie powinno. Ale gdyby był, to wywołanie stoi w webhooku:
+ * wyjątek tutaj zamieniłby brak konfiguracji w piątkę na **każdą** płatność, czyli sklep,
+ * który nie przyjmuje pieniędzy. Pusty sekret przechodzi przez `readTicket()` jako „żaden
+ * bilet nie jest ważny", a to znaczy tylko tyle, że płatność przypisze się adresem e-mail.
+ */
+const payTicketSecret = () => {
+  try {
+    return PAY_TICKET_SECRET.value() || "";
+  } catch (e) {
+    logger.warn("kasa: PAY_TICKET_SECRET nieczytelny, bilety nieważne");
+    return "";
+  }
+};
+
 /** `{ pole: DELETE_FIELD }` → skasowanie pola, resztę zostawiamy jak jest. */
 const toFirestore = (write) => {
   const out = {};
@@ -107,7 +140,12 @@ const toFirestore = (write) => {
 };
 
 export const stripeWebhook = onRequest(
-  { region: REGION, secrets: [STRIPE_WEBHOOK_SECRET], cors: false, maxInstances: 10 },
+  {
+    region: REGION,
+    secrets: [STRIPE_WEBHOOK_SECRET, PAY_TICKET_SECRET],
+    cors: false,
+    maxInstances: 10,
+  },
   async (req, res) => {
     if (req.method !== "POST") {
       res.status(405).send("POST only");
@@ -286,20 +324,36 @@ export const stripeWebhook = onRequest(
 );
 
 /**
- * Czyje to konto: najpierw `client_reference_id` z Payment Linka, potem adres z sesji.
+ * Czyje to konto: najpierw bilet z `client_reference_id`, potem adres z sesji.
  *
- * Uid sprawdzamy w Firebase Auth zamiast wierzyć mu na słowo — `client_reference_id`
- * przychodzi z adresu URL, więc jest wartością, którą ktoś mógł podmienić. Zapisanie planu
- * pod nieistniejącym uidem zrobiłoby dokument profilu dla konta, którego nie ma.
+ * `client_reference_id` przychodzi z adresu URL, więc **wpisać może tam każdy cokolwiek**.
+ * Do 2026-09-09 stał tam goły uid, a jedyną kontrolą było „czy takie konto istnieje" —
+ * czyli podmiana parametru nadawała Pro wybranemu cudzemu kontu i wiązała z nim przyszłe
+ * zdarzenia Stripe'a (znalezisko M1 audytu 2026-09). Dziś stoi tam bilet, który ta sama
+ * funkcja wystawiła zalogowanemu konciu na jego własny uid, i uid bierze się wyłącznie
+ * z podpisu — goły uid nie znaczy już nic.
+ *
+ * Konto z biletu i tak sprawdzamy w Firebase Auth: podpis mówi, że wartość jest nasza, ale
+ * nie mówi, że konto nadal istnieje. Zapisanie planu pod skasowanym uidem zrobiłoby
+ * dokument profilu dla konta, którego nie ma.
+ *
+ * Adres e-mail zostaje jako druga droga i nie jest luką: przychodzi z zapłaconej sesji
+ * Stripe'a, nie z URL-a, a jedyne, co można nim zrobić, to kupić komuś Pro za swoje.
  */
 async function resolveUid(intent) {
   const auth = getAuth();
-  if (intent.uid) {
+  const ticketUid = readTicket(intent.uid, payTicketSecret());
+  if (intent.uid && !ticketUid) {
+    logger.warn("stripe: client_reference_id bez ważnego biletu, idziemy adresem", {
+      shape: looksLikeTicket(intent.uid) ? "bilet-nieważny" : "goły-uid",
+    });
+  }
+  if (ticketUid) {
     try {
-      const user = await auth.getUser(intent.uid);
+      const user = await auth.getUser(ticketUid);
       return user.uid;
     } catch (e) {
-      logger.warn("stripe: client_reference_id nie wskazuje na konto", { uid: intent.uid });
+      logger.warn("stripe: bilet wskazuje na konto, którego już nie ma", { uid: ticketUid });
     }
   }
   if (intent.email) {
@@ -312,6 +366,46 @@ async function resolveUid(intent) {
   }
   return null;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Bilet do kasy — podpisany dowód, czyja jest płatność (znalezisko M1)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Bilet dla konta, które właśnie idzie do kasy.
+ *
+ * Wystawiany **wyłącznie zalogowanemu i wyłącznie na jego własny uid** — `request.auth.uid`
+ * przychodzi z tokenu, który zweryfikowało Google, a nie z ciała żądania, więc nie ma tu
+ * czego podmienić. Ciało żądania jest w ogóle nieczytane; ta funkcja nie przyjmuje żadnych
+ * danych wejściowych i to jest cała jej odporność.
+ *
+ * Po co, skoro uid i tak jest w przeglądarce: bo w URL-u Payment Linka uid jest tekstem,
+ * który każdy może przepisać na cudzy (M1). Bilet jest tym samym uidem, tyle że podpisanym
+ * — patrz `functions/pay-ticket.mjs`.
+ *
+ * `failed-precondition` zamiast `internal`, gdy sekretu nie ma: to nie awaria, tylko
+ * wdrożenie bez `PAY_TICKET_SECRET`, a `/app/` ma wtedy pójść do kasy bez biletu zamiast
+ * pokazać błąd. Płatność przypisze się adresem e-mail, jak każda bez `client_reference_id`.
+ */
+export const payTicket = onCall(
+  {
+    region: REGION,
+    maxInstances: 5,
+    secrets: [PAY_TICKET_SECRET],
+    cors: ["https://liczmat.com", "https://www.liczmat.com", /^http:\/\/localhost(:\d+)?$/],
+  },
+  async (request) => {
+    if (!request.auth || !request.auth.uid) {
+      throw new HttpsError("unauthenticated", "sign-in-required");
+    }
+    const ticket = mintTicket(request.auth.uid, payTicketSecret());
+    if (!ticket) {
+      logger.warn("kasa: brak PAY_TICKET_SECRET, bilet niewystawiony");
+      throw new HttpsError("failed-precondition", "no-ticket-secret");
+    }
+    return { ticket };
+  },
+);
 
 /* ══════════════════════════════════════════════════════════════════════════
    Panel administratora — plan po adresie e-mail, z przeglądarki (sesja 49)

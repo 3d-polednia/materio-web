@@ -178,8 +178,14 @@ function lmPayUrlOk(url) {
  *
  * The URL carries exactly two things beyond the link itself, and both are about *who*
  * rather than *what*:
- *   client_reference_id  the Firebase uid, so the webhook can find the account to grant
- *                        the plan to. Without it a payment arrives attached to nobody.
+ *   client_reference_id  a signed ticket the cloud minted for the signed-in account, so
+ *                        the webhook can find the account to grant the plan to. It used to
+ *                        be the bare uid, and a bare uid in a URL is a uid anybody can
+ *                        retype into somebody else's — the 2026-09 audit's M1. What the
+ *                        ticket is made of is functions/pay-ticket.mjs; this file never
+ *                        makes one and could not, because the secret is not here.
+ *                        Without it a payment is attributed by the address it was paid
+ *                        with, which is what happens for a signed-out checkout anyway.
  *   prefilled_email      one less thing to type. Stripe ignores it if the link forbids it.
  *
  * **No price, no plan, no currency.** All three live on the product in Stripe, so a
@@ -193,7 +199,7 @@ function lmCheckoutUrl(planId, opts) {
   var o = opts || {};
   if (!plan || !lmPayUrlOk(plan.link)) return null;
   var u = new URL(plan.link);
-  if (o.uid) u.searchParams.set("client_reference_id", String(o.uid));
+  if (o.ref) u.searchParams.set("client_reference_id", String(o.ref));
   if (o.email) u.searchParams.set("prefilled_email", String(o.email));
   return u.toString();
 }
@@ -216,7 +222,9 @@ function lmPortalUrl() {
  *
  *   1. Stripe → two products with EXACTLY the fourteen amounts above, seven currencies each.
  *   2. Stripe → a Payment Link per product, and the Customer Portal switched on.
- *   3. `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET`, then
+ *   3. `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET` and
+ *      `firebase functions:secrets:set PAY_TICKET_SECRET` (our own, any long random
+ *      string — it signs the ticket in the checkout URL), then
  *      `firebase deploy --only functions`. The deploy prints the endpoint's address.
  *   4. Stripe → a webhook endpoint at that address, subscribed to exactly the four events
  *      `functions/stripe-map.mjs` handles: `checkout.session.completed` and

@@ -188,8 +188,30 @@ head("4. months: calendar arithmetic, and the same answer as the terminal tool")
   eq("refuses a fraction", monthsFromNow(2.5, now), null);
   eq("refuses more than the ceiling", monthsFromNow(MAX_MONTHS + 1, now), null);
 
+  /* The day that the target month does not have is trimmed to that month's last day, not
+     spilled into the next one. `setMonth()` alone spills — 31 January plus a month lands
+     on 2 or 3 March — and a grant that runs past what was ordered is a grant nobody sold.
+     Asserted against dates written out here, not against the second copy: two copies that
+     agree can still both be wrong, which is what the 2026-09 audit found (M2). */
+  const at = (y, m, d) => Date.UTC(y, m, d, 12, 0, 0);
+  const ends = [
+    ["31 January plus a month is the end of February", at(2026, 0, 31), 1, "2026-02-28"],
+    ["and plus thirteen months, the end of February next year", at(2026, 0, 31), 13, "2027-02-28"],
+    ["31 August plus six months", at(2026, 7, 31), 6, "2027-02-28"],
+    ["29 February plus a year, in a year without one", at(2024, 1, 29), 12, "2025-02-28"],
+    ["31 March plus a month is 30 April", at(2026, 2, 31), 1, "2026-04-30"],
+    ["31 May plus three months keeps the 31st, because August has one",
+      at(2026, 4, 31), 3, "2026-08-31"],
+  ];
+  for (const [name, start, months, expected] of ends) {
+    eq(name, day(monthsFromNow(months, start)), expected);
+    eq(`${name} — and scripts/pro-admin.mjs says the same`,
+      day(cliMonthsFromNow(months, start)), expected);
+  }
+
   /* Two copies of one calculation: functions/ is deployed on its own and cannot import
-     scripts/. The only thing keeping them in step is this comparison. */
+     scripts/. Above them both is the table of expected dates; this loop is what keeps the
+     copies in step on every other value. */
   for (const months of [1, 2, 3, 6, 11, 12, 13, 24, 36, MAX_MONTHS]) {
     eq(`${months} months: the function agrees with scripts/pro-admin.mjs`,
       monthsFromNow(months, now), cliMonthsFromNow(months, now));

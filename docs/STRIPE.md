@@ -53,11 +53,14 @@ na stronie, a nie jej przeliczenie z doliczoną prowizją 2–4%.
 
 Stripe → **Payment Links** → jeden link na produkt. Do sprawdzenia przy każdym:
 
-- **`client_reference_id` musi przechodzić.** To jest uid konta i bez niego płatność nie
-  ma do kogo przypiąć planu. Stripe przyjmuje litery, cyfry, `-` i `_`, do 200 znaków
-  (uid Firebase ma 28 znaków), a **wartość niepoprawną po cichu wyrzuca**. Sprawdzenie:
-  otworzyć link z `?client_reference_id=test_123` i po zapłacie testowej zobaczyć tę
-  wartość na sesji w panelu Stripe'a.
+- **`client_reference_id` musi przechodzić.** Od 2026-09-09 jedzie tam **bilet**, a nie
+  goły uid: podpisany napis `v1.<uid>.<data>.<podpis>`, który `/app/` bierze z funkcji
+  `payTicket` (znalezisko M1 audytu — uid w adresie URL każdy mógł przepisać na cudzy).
+  Stripe przyjmuje litery, cyfry, `-`, `_` i `.`, do 200 znaków (bilet ma około 90),
+  a **wartość niepoprawną po cichu wyrzuca**. Sprawdzenie: otworzyć link
+  z `?client_reference_id=test_123` i po zapłacie testowej zobaczyć tę wartość na sesji
+  w panelu Stripe'a — sam webhook taką wartość odrzuci, bo nie jest podpisana, i przypnie
+  płatność adresem e-mail z sesji.
 - **Adres e-mail** — serwis dokleja `prefilled_email`; link nie może tego blokować.
 - **Subskrypcja, nie płatność jednorazowa.** Funkcja świadomie ignoruje sesję, która nie
   jest w trybie `subscription`: nie ma czego odnawiać.
@@ -105,8 +108,15 @@ Na komputerze właściciela, w katalogu repozytorium:
 
 ```bash
 firebase functions:secrets:set STRIPE_WEBHOOK_SECRET   # wartość z kroku 4, za pierwszym razem pusto — patrz niżej
+firebase functions:secrets:set PAY_TICKET_SECRET       # własny, dowolny długi losowy napis; ustawia się raz
 firebase deploy --only functions
 ```
+
+`PAY_TICKET_SECRET` nie pochodzi od nikogo z zewnątrz — to nasz własny klucz do podpisu
+biletu (`functions/pay-ticket.mjs`), więc wystarczy dowolny długi losowy napis, choćby
+z `openssl rand -base64 48`. **Wdrożenie bez niego nie przejdzie**, bo deklarują go obie
+funkcje. Wdrożenie z nim, ale ze stroną sprzed tej zmiany, działa dalej: płatność bez
+biletu przypina się adresem e-mail z sesji Stripe'a.
 
 Kolejność jest kurą i jajkiem: sekret pochodzi z webhooka, a adres webhooka z wdrożenia.
 Wyjście z tego jest takie: **wdrożyć raz z dowolną wartością** (funkcja odrzuci wtedy
@@ -145,7 +155,8 @@ Czego się spodziewać w logu endpointu:
 ## 5. Jedna płatność i sprawdzenie, że plan zapala się sam
 
 Na `/app/`, zalogowanym kontem, kliknąć kasę (albo otworzyć Payment Link ręcznie
-z `?client_reference_id=<uid>`) i zapłacić. Potem, **nie przeładowując `/app/`**:
+z `?client_reference_id=<bilet>`, gdzie bilet to odpowiedź funkcji `payTicket` — goły uid
+webhook odrzuci) i zapłacić. Potem, **nie przeładowując `/app/`**:
 
 - plakietka poziomu ma się zmienić na **LICZMAT PRO** sama — `/app/` trzyma `onSnapshot`
   na `users/{uid}` od Sesji 37;
