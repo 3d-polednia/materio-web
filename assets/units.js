@@ -26,6 +26,10 @@
    sentence one screen further on: a project row saying "1 pozycji". */
 const PLURAL_UNITS = new Set([
   "res_bags", "res_rolls", "res_boards", "res_stocks", "res_sheets", "ws_lines",
+  // Not a unit, but the same sentence: the home page counts calculators and the catalogue
+  // counts materials, and both used to print one genitive plural whatever the number was
+  // — "161 матеріалів" where Ukrainian wants "161 матеріал" after a number ending in 1.
+  "calc_count", "mat_count_label",
 ]);
 /**
  * Which plural rule each language follows. Three families, because lumping them together
@@ -47,6 +51,14 @@ const PLURAL_UNITS = new Set([
  * `ru` left the first family on 2026-09-02 with the language itself.
  */
 const LAST_DIGIT_PLURAL = new Set(["pl", "uk", "hr", "sr"]);
+/**
+ * …and the three of them that read the last digit for "one" as well. Polish does not: 21
+ * is "21 worków", the same form as 25, while Ukrainian, Croatian and Serbian take the
+ * singular for every number ending in 1 except the teens — "21 мішок", "161 матеріал".
+ * The audit of 2026-09-04 found the home page printing "161 матеріалів" because this
+ * distinction was not made.
+ */
+const LAST_DIGIT_ONE = new Set(["uk", "hr", "sr"]);
 const SMALL_FEW_PLURAL = new Set(["cs", "sk"]);
 const ROMANCE_FEW_PLURAL = new Set(["ro"]);
 
@@ -60,6 +72,7 @@ const ROMANCE_FEW_PLURAL = new Set(["ro"]);
 function pluralForm(n, lang) {
   if (!Number.isInteger(n)) return "many";
   if (n === 1) return "one";
+  if (LAST_DIGIT_ONE.has(lang) && n % 10 === 1 && n % 100 !== 11) return "one";
   if (SMALL_FEW_PLURAL.has(lang)) return n >= 2 && n <= 4 ? "few" : "many";
   if (ROMANCE_FEW_PLURAL.has(lang)) {
     const teens = n % 100;

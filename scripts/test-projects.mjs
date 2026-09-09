@@ -285,6 +285,16 @@ head("3. create");
   const long = ws.wsAddProject("x".repeat(400));
   eq("a name longer than the rules accept is cut to 120", long.name.length, 120);
 
+  // The same two rules wsUpdateProject() and wsAddRoom() already apply: a name is what is
+  // left after the spaces around it, and a row nobody can tell apart is not made at all.
+  const padded = ws.wsAddProject("  Poddasze  ");
+  eq("the spaces around a name are not part of it", padded.name, "Poddasze");
+  const before = ws.wsProjects().length;
+  eq("a name that is only spaces makes no project", ws.wsAddProject("   "), null);
+  eq("an empty name makes no project", ws.wsAddProject(""), null);
+  eq("and nothing was stored", ws.wsProjects().length, before);
+  eq("the active project did not move", ws.wsActiveProjectId(), padded.id);
+
   eq("saving told the page to redraw", ws.events.filter((e) => e === "workspacechange").length > 0, true);
 }
 
@@ -453,6 +463,23 @@ head("8. undo — the delete comes back");
   eq("the tombstone is cleared, not left behind", ws.raw().projects[0].deletedAt, null);
 
   eq("restoring twice does nothing the second time", ws.wsRestoreProject(token), null);
+
+  // A line deleted on its own after the project went is a second delete, and the newer one
+  // wins: its `deletedAt` no longer matches the stamp the token was cut with, so the undo
+  // of the project delete may not reach it.
+  const ws4 = loadWorkspace();
+  const p4 = ws4.wsAddProject("Poddasze");
+  addLine(ws4, "Płytki", 12, 749.85);
+  addLine(ws4, "Klej", 7, 245);
+  const kept = ws4.wsEstimations(p4.id)[0], gone = ws4.wsEstimations(p4.id)[1];
+  const token4 = ws4.wsDeleteProject(p4.id);
+  ws4.tick();
+  ws4.wsDeleteEstimation(gone.id);
+  check("the line carries its own, later stamp",
+    ws4.raw().estimations.find((e) => e.id === gone.id).deletedAt > token4.at);
+  ws4.wsRestoreProject(token4);
+  eq("the undo brings back only what that delete took", ws4.wsEstimations(p4.id).length, 1);
+  eq("and it is the line that was not deleted again", ws4.wsEstimations(p4.id)[0].id, kept.id);
   eq("restoring something that never was does nothing", ws.wsRestoreProject("nope"), null);
   eq("a token with no project does nothing", ws.wsRestoreProject(null), null);
 

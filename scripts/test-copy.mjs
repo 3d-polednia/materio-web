@@ -525,6 +525,31 @@ checkMany("every page type has a declared prose budget and stays inside it", ove
 
 check("the budgets were measured against real pages", counted > 300, `${counted} pages read`);
 
+/* ------------------------------------------------------------------ §8 the name in a sentence */
+
+head("§8 a name pulled into a sentence takes the sentence's form");
+
+/**
+ * The FAQ answer about data ends with a link to the privacy policy, and the link's text is
+ * `faq_a5_link` rather than `foot_privacy` precisely because the two are not the same
+ * words in every language: the footer prints the document's title, and the sentence around
+ * the link governs a case. Ukrainian's "в" takes the locative, so the sentence reads
+ * "Усе описано в Політиці конфіденційності" while the footer keeps "Політика
+ * конфіденційності". The audit of 2026-09-04 found the title form standing in the sentence.
+ */
+check("uk: the sentence form of the policy's name is not the title form",
+  I18N.uk.faq_a5_link !== I18N.uk.foot_privacy,
+  `both read "${I18N.uk.faq_a5_link}"`);
+check("uk: and it is the locative the preposition asks for",
+  I18N.uk.faq_a5_link === "Політиці конфіденційності", `it reads "${I18N.uk.faq_a5_link}"`);
+check("uk: the footer still prints the title",
+  I18N.uk.foot_privacy === "Політика конфіденційності", `it reads "${I18N.uk.foot_privacy}"`);
+
+// Every language has both keys, so nothing falls back to another language's word for it.
+checkMany("both keys exist in every language",
+  CLEAN.filter((l) => !I18N[l] || !I18N[l].faq_a5_link || !I18N[l].foot_privacy),
+  (l) => l, CLEAN.length);
+
 /* ------------------------------------------------------------------ the report */
 
 if (failures.length) {

@@ -31,7 +31,7 @@
  */
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -76,7 +76,8 @@ function collect(dir = ROOT, out = []) {
 
     const html = readFileSync(full, "utf8");
     const one = (re) => { const m = html.match(re); return m ? m[1] : null; };
-    const file = full.slice(ROOT.length + 1);
+    // Windows joins with a backslash; every path and URL in this file is written with "/".
+    const file = full.slice(ROOT.length + 1).split(sep).join("/");
     out.push({
       file,
       html,

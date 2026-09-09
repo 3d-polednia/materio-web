@@ -40,16 +40,23 @@ function evalScript(file, returns, args = {}) {
 
 const { I18N, LANGS } = evalScript("assets/i18n.js", ["I18N", "LANGS"]);
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
+// The catalogue count is a counted noun like a unit is, and its forms live with the rest
+// of the material copy — so the dictionary this file measures has to be the merged one
+// the build assembles, not the two base files alone.
+const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
 const {
   CALCS, ENGINES, localizeRow, unitLabel, pluralForm, num, orDefault, parseCuts, parsePieces,
+  invalidFields,
 } = evalScript(["assets/units.js", "assets/calculators.js"], [
   "CALCS", "ENGINES", "localizeRow", "unitLabel", "pluralForm", "num", "orDefault",
-  "parseCuts", "parsePieces",
+  "parseCuts", "parsePieces", "invalidFields",
 ]);
 
 const CODES = LANGS.map((l) => l.code);
 const DICT = {};
-for (const lang of CODES) DICT[lang] = { ...(I18N[lang] || {}), ...(I18N_PAGES[lang] || {}) };
+for (const lang of CODES) {
+  DICT[lang] = { ...(I18N[lang] || {}), ...(I18N_PAGES[lang] || {}), ...(I18N_MATERIALS[lang] || {}) };
+}
 const tr = (lang) => (key) => (DICT[lang] || {})[key];
 
 /* ------------------------------------------------------------------ the runner */
@@ -341,7 +348,7 @@ for (const c of CALCS) {
     rowKeys(r).forEach((k) => usedRowKeys.add(k));
   }
 }
-for (const key of [...usedUnits, ...usedRowKeys, "res_tobuy", "res_cost", "res_strip_too_long"]) {
+for (const key of [...usedUnits, ...usedRowKeys, "res_tobuy", "res_cost"]) {
   for (const lang of CODES) {
     check(`${key} exists in ${lang}`, typeof DICT[lang][key] === "string" && DICT[lang][key].length > 0);
   }
@@ -507,11 +514,15 @@ eq("grout: a hairline 0,1 mm joint is allowed", run("grout", { joint: "0.1" }).t
 
 // --- the engine's own upper bound ---------------------------------------------------------
 {
-  // A strip taller than the whole roll means one roll per strip, and the panel says so
-  // instead of printing "0 strips per roll".
-  const r = run("wallpaper", { wallH: "11" });
-  eq("wallpaper: a wall taller than the roll → one roll per strip", r.tobuy, 8);
-  eq("wallpaper: …and the row says so", r.rows.find((x) => x[0] === "res_strips_roll")[1], "|res_strip_too_long|");
+  // A strip taller than the whole roll is no number of rolls to buy: no roll on that shelf
+  // can yield the strip. The engine used to answer one roll per strip and print a row
+  // saying the strip was too long — a figure that still looked like an order. It is refused
+  // now, the way `linear` refuses a piece longer than the bar.
+  eq("wallpaper: a wall taller than the roll is refused", run("wallpaper", { wallH: "11" }).err, "err_toobig");
+  eq("wallpaper: a 2,6 m wall off a 2 m roll is refused",
+    run("wallpaper", { wallW: "4", wallH: "2.6", rollW: "0.53", rollL: "2" }).err, "err_toobig");
+  eq("wallpaper: a strip exactly as long as the roll still counts",
+    run("wallpaper", { wallW: "4", wallH: "2", rollW: "0.53", rollL: "2" }).tobuy, 8);
 }
 {
   // The cutting plan is printed for eight bars; a longer job says how many are missing
@@ -535,7 +546,17 @@ for (const [n, form] of [[1, "one"], [2, "few"], [3, "few"], [4, "few"], [5, "ma
   [12, "many"], [13, "many"], [14, "many"], [21, "many"], [22, "few"], [25, "many"],
   [101, "many"], [102, "few"], [112, "many"]]) {
   eq(`pl: ${n} takes the "${form}" form`, pluralForm(n, "pl"), form);
-  eq(`uk: ${n} takes the "${form}" form`, pluralForm(n, "uk"), form);
+}
+// Ukrainian, Croatian and Serbian part company with Polish at 21. Polish counts 21 with
+// the same form as 25 ("21 worków"); the other three take the singular for every number
+// ENDING in 1 except the teens — "21 мішок", "161 матеріал". That is the defect the
+// audit of 2026-09-04 found on the Ukrainian home page: "161 матеріалів".
+for (const [n, form] of [[1, "one"], [2, "few"], [3, "few"], [4, "few"], [5, "many"], [11, "many"],
+  [12, "many"], [13, "many"], [14, "many"], [21, "one"], [22, "few"], [25, "many"],
+  [101, "one"], [102, "few"], [111, "many"], [112, "many"], [161, "one"]]) {
+  for (const lang of ["uk", "hr", "sr"]) {
+    eq(`${lang}: ${n} takes the "${form}" form`, pluralForm(n, lang), form);
+  }
 }
 for (const n of [2, 3, 5, 22]) {
   eq(`en: ${n} takes the plain plural`, pluralForm(n, "en"), "many");
@@ -556,6 +577,65 @@ for (const key of ["res_bags", "res_rolls", "res_boards", "res_stocks", "res_she
   eq(`${key}: 2 in pl takes the "few" form`, unitLabel(key, 2, "pl", tr("pl")), DICT.pl[key + "_few"]);
   eq(`${key}: 2 in en takes the plain plural`, unitLabel(key, 2, "en", tr("en")), DICT.en[key]);
 }
+/* -------- which field an error is about --------
+   The message goes into the result box, which is a live region, so a screen reader does
+   hear "podaj dodatnie wartości" — and then has to guess which of five fields it is
+   about. invalidFields() answers that by asking the engine itself: a field is the
+   problem when the form is still refused with every OTHER field back at the value the
+   page opens with. No second copy of the rules, and nothing to keep in step when an
+   engine's validation changes. */
+{
+  const fields = (id, typed) => invalidFields(id, { ...defaults(id), ...typed }).sort().join(",");
+
+  eq("coverage: a form that calculates names no field", fields("coverage", {}), "");
+  eq("coverage: a negative area names the area", fields("coverage", { area: "-1" }), "area");
+  eq("coverage: an empty coverage names the coverage", fields("coverage", { cov: "" }), "cov");
+  eq("coverage: two bad fields are both named",
+    fields("coverage", { area: "0", cov: "abc" }), "area,cov");
+  eq("coverage: a negative price names the price", fields("coverage", { price: "-2" }), "price");
+  eq("wallpaper: a wall taller than the roll names the wall's height",
+    fields("wallpaper", { wallH: "11" }), "wallH");
+  eq("wallpaper: a roll shorter than the strip names the roll's length",
+    fields("wallpaper", { rollL: "2" }), "rollL");
+  eq("linear: a piece longer than the bar names the list it is in",
+    fields("linear", { cuts: "7000x1" }), "cuts");
+
+  // Every calculator, every field: making one field impossible names that field and no
+  // other. A blank is the one value every engine has to refuse, whatever the field means.
+  for (const c of CALCS) {
+    for (const f of c.fields) {
+      if (f.sel) continue; // a <select> cannot be typed into
+      const named = fields(c.id, { [f.k]: "" });
+      check(`${c.id}: an empty ${f.k} names ${f.k} or nothing`,
+        named === f.k || named === "", `named "${named}"`);
+    }
+  }
+}
+
+// The two counts the pages print outside a result panel — "15 kalkulatorów" on the home
+// page, "161 materiałów w katalogu" there and on the material list — are counted nouns
+// exactly like a unit is. They carried a single genitive plural for every number until
+// session 63, which is how the Ukrainian home page came to say "161 матеріалів" where the
+// language wants the plain singular after a number ending in 1: "161 матеріал".
+for (const key of ["calc_count", "mat_count_label"]) {
+  for (const lang of CODES) {
+    check(`${key} exists in ${lang}`, typeof DICT[lang][key] === "string" && DICT[lang][key].length > 0);
+    check(`${key}_one exists in ${lang}`, typeof DICT[lang][key + "_one"] === "string");
+    eq(`${key}: 1 in ${lang}`, unitLabel(key, 1, lang, tr(lang)), DICT[lang][key + "_one"]);
+    eq(`${key}: 25 in ${lang}`, unitLabel(key, 25, lang, tr(lang)), DICT[lang][key]);
+  }
+  // Every language that inflects a counted noun a third way says so in the dictionary.
+  for (const lang of ["pl", "uk", "cs", "sk", "hr", "sr", "ro"]) {
+    check(`${key}_few exists in ${lang}`, typeof DICT[lang][key + "_few"] === "string");
+    eq(`${key}: 3 in ${lang} takes the "few" form`,
+      unitLabel(key, 3, lang, tr(lang)), DICT[lang][key + "_few"]);
+  }
+  // The number the audit found: 161 ends in 1, so Ukrainian and Polish take the singular
+  // form of the noun, not the genitive plural they used to print.
+  eq(`${key}: 161 in uk takes the singular`, unitLabel(key, 161, "uk", tr("uk")), DICT.uk[key + "_one"]);
+  eq(`${key}: 161 in pl takes the many form`, unitLabel(key, 161, "pl", tr("pl")), DICT.pl[key]);
+}
+
 // An abbreviation must never be inflected.
 for (const key of ["res_pkgs", "res_pieces"]) {
   for (const n of [1, 2, 5]) {

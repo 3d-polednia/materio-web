@@ -30,7 +30,7 @@
  */
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { LANGS, HREFLANG, DEFAULT_LANG } from "../src/site.mjs";
@@ -76,7 +76,8 @@ function collect(dir = ROOT, out = []) {
     if (statSync(full).isDirectory()) { collect(full, out); continue; }
     if (!name.endsWith(".html")) continue;
     const html = readFileSync(full, "utf8");
-    out.push({ file: full.slice(ROOT.length + 1), html });
+    // Windows joins with a backslash; every path in this file is written with "/".
+    out.push({ file: full.slice(ROOT.length + 1).split(sep).join("/"), html });
   }
   return out;
 }
@@ -290,6 +291,42 @@ checkAll("and no page smuggles one in beside the picker", WITH_PICKER,
     return !/[\u{1F1E6}-\u{1F1FF}]/u.test(menu);
   },
   (x) => x.file);
+
+/* ------------------------------------------------------------------ §6 counted nouns */
+
+head("§6 the catalogue count takes the language's own form");
+
+/**
+ * Every home page prints "<n> calculators · <n> materials in the catalogue". The two
+ * nouns came out of the dictionary in one fixed form whatever the number was, so the
+ * Ukrainian page said "161 матеріалів у каталозі" where a number ending in 1 takes the
+ * plain singular — "161 матеріал". The forms themselves are measured by
+ * scripts/test-calculators.mjs; what this section owns is that the shipped page uses them.
+ */
+const HOME_META = PAGES
+  .filter((x) => x.html.includes('<p class="door-meta">'))
+  .map((x) => ({ file: x.file.split(sep).join("/"), meta: between(x.html, '<p class="door-meta">', "</p>") || "" }));
+
+check("every language's home page carries the count", HOME_META.length >= LANGS.length,
+  `${HOME_META.length} pages have a door-meta`);
+checkAll("no dictionary key is left showing through in pipes", HOME_META,
+  (x) => !x.meta.includes("|"), (x) => `${x.file}: ${x.meta}`);
+checkAll("both counts are a number followed by a word", HOME_META,
+  (x) => /^\d+\s+\S.*·\s*\d+\s+\S/.test(words(x.meta).join(" ")), (x) => `${x.file}: ${x.meta}`);
+
+{
+  const uk = HOME_META.find((x) => x.file === "uk/index.html");
+  if (check("the Ukrainian home page is there", Boolean(uk))) {
+    const m = words(uk.meta).join(" ").match(/(\d+)\s+(матеріал\S*)/);
+    if (check("it says how many materials are in the catalogue", Boolean(m), uk.meta)) {
+      const n = Number(m[1]), last = n % 10, teens = n % 100;
+      const want = last === 1 && teens !== 11 ? "матеріал"
+        : last >= 2 && last <= 4 && !(teens >= 12 && teens <= 14) ? "матеріали"
+        : "матеріалів";
+      check(`${n} materials is written "${n} ${want}"`, m[2] === want, `the page says "${m[2]}"`);
+    }
+  }
+}
 
 /* ------------------------------------------------------------------ the report */
 

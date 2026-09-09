@@ -132,7 +132,11 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
              read to end. The box is in the markup from the first paint holding the worked
              example, and a live region announces only what changes after it is live, so
              nothing is read out on load. -->
-        <div class="result show" data-result role="status">
+        <!-- The id is what a field points at with aria-describedby when the engine refuses
+             its value: the message lands here (assets/calculators.js), so the field that
+             caused it has to name this box or a screen reader hears "podaj dodatnie
+             wartości" with nothing tying it to any of the five fields. -->
+        <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">${esc(t("res_tobuy"))}</div>
           <div class="big">${esc(example.tobuy)} <span class="figure-line">${esc(example.unit)}</span></div>
           <div class="rows">${rows}</div>
@@ -230,7 +234,8 @@ function homeDoors(lang, t, calcs, cat) {
       ? `<ul class="door-list">${CALC_CATEGORIES.map((c) =>
           `<li><a href="${urlCalcIndex(lang)}#g-${c.id}">${esc(t(c.key))}</a></li>`).join("")}</ul>
         <p class="door-meta">${esc(t("door_calc_count")
-          .replace("{calc}", calcs.length).replace("{mat}", cat.total))}</p>`
+          .replace("{calc}", calcs.length).replace("{calcs}", t.plural("calc_count", calcs.length))
+          .replace("{mat}", cat.total).replace("{mats}", t.plural("mat_count_label", cat.total)))}</p>`
       : "";
 
     const action = href
@@ -589,7 +594,7 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
   <section class="block alt calc-tool">
     <div class="wrap">
       ${calcCard(calc, t, { materials, example, projectsUrl: urlProjects(lang) })}
-      ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a> — ${esc(materials)} ${esc(t("mat_count_label"))}</p>` : ""}
+      ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a> — ${esc(materials)} ${esc(t.plural("mat_count_label", materials))}</p>` : ""}
     </div>
   </section>
 
@@ -829,7 +834,7 @@ export function materialsMain(lang, t, cat, aisles, copy) {
           <button type="button" class="btn btn-ghost btn-sm" data-mat-expand>${esc(t("matpage_expand"))}</button>
           <button type="button" class="btn btn-ghost btn-sm" data-mat-collapse>${esc(t("matpage_collapse"))}</button>
         </p>
-        <p class="muted mt-3">${cat.total} ${esc(t("mat_count_label"))} · ${esc(t("matpage_note"))}</p>
+        <p class="muted mt-3">${cat.total} ${esc(t.plural("mat_count_label", cat.total))} · ${esc(t("matpage_note"))}</p>
         <p class="muted" id="matpage-count" role="status" hidden></p>
         <p class="muted" id="matpage-empty" hidden>${esc(t("mat_none"))}</p>
       </div>

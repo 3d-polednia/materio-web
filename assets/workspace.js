@@ -181,8 +181,12 @@ const wsArchivedProjects = () => wsAllProjects().filter((p) => p.archived);
 const wsProject = (id) => wsAllProjects().find((p) => p.id === id) || null;
 
 function wsAddProject(name) {
+  // The same two rules wsUpdateProject() and wsAddRoom() apply: the spaces around a name
+  // are not part of it, and a project with no name is a row nobody can tell apart.
+  const clean = String(name == null ? "" : name).trim().slice(0, 120);
+  if (!clean) return null;
   const data = wsLoad();
-  const project = { id: wsId(), name: String(name).slice(0, 120), archived: false, ...wsSyncFields(Date.now()) };
+  const project = { id: wsId(), name: clean, archived: false, ...wsSyncFields(Date.now()) };
   data.projects.push(project);
   wsSave(data);
   wsSetActiveProject(project.id);
@@ -288,9 +292,14 @@ function wsRestoreProject(token) {
   const now = Date.now();
   project.deletedAt = null;
   project.updatedAt = now;
+  // `at` is the stamp this delete wrote on everything it took. A child deleted again on its
+  // own afterwards carries a later one, and that delete was asked for separately — the same
+  // argument that keeps a line deleted by hand *before* the project out of the token. A bare
+  // id has no stamp, so it restores the project alone, which is what the docs above promise.
+  const at = typeof token === "string" ? null : token.at;
   const revive = (rows, ids) => {
     const wanted = new Set(ids);
-    rows.filter((r) => wanted.has(r.id) && r.projectId === id)
+    rows.filter((r) => wanted.has(r.id) && r.projectId === id && r.deletedAt === at)
       .forEach((r) => { r.deletedAt = null; r.updatedAt = now; });
   };
   revive(data.estimations, lines);

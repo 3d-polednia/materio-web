@@ -31,10 +31,10 @@
  */
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { LANGS, HREFLANG } from "../src/site.mjs";
+import { LANGS, HREFLANG, BUILD_LANGS } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -76,7 +76,9 @@ function collect(dir = ROOT, out = []) {
     if (statSync(full).isDirectory()) { collect(full, out); continue; }
     if (!name.endsWith(".html")) continue;
     const html = readFileSync(full, "utf8");
-    const file = full.slice(ROOT.length + 1);
+    // Windows joins with a backslash; every path in this file is written with "/", so the
+    // separator is normalised here rather than at each comparison.
+    const file = full.slice(ROOT.length + 1).split(sep).join("/");
     out.push({
       file,
       html,
@@ -328,8 +330,11 @@ head("6. what changes on its own says so");
   check("the 195 calculator pages are the ones with a result box",
     calcPages.length === 15 * LANGS.length, `found ${calcPages.length}`);
   checkAll("the result box is a live region", calcPages,
-    (page) => /<div class="result show" data-result role="status">/.test(page.body),
+    (page) => /<div class="result show" id="calc-result" data-result role="status">/.test(page.body)
+      || /<div class="result show" data-result role="status">/.test(page.body),
     (page) => page.url);
+
+
 
   // assets/calculators.js runs the engine once on load to turn the build's markup into a
   // live result. Writing that into a live region would read the answer out unasked, so
@@ -338,6 +343,21 @@ head("6. what changes on its own says so");
   check("and the run on load does not write into it when nothing changed",
     /function writeResult\(box, html\)/.test(engine) && !/\bbox\.innerHTML = /.test(engine.replace(/if \(words\(html\) !== words\(box\.innerHTML\)\) box\.innerHTML = html;/, "")),
     "renderResult() must go through writeResult()");
+
+  /* Session 63, audit item L3: the message is announced, but no field was tied to it, so a
+     screen reader heard "podaj dodatnie wartości" and had no way to reach the field that
+     caused it. assets/calculators.js now points the refused fields at the result box with
+     aria-describedby, which needs the box to have an id — and only pages the build has
+     written since carry it, so this follows BUILD_LANGS rather than failing on the twelve
+     languages PL_ONLY has frozen. */
+  const fresh = calcPages.filter((page) => BUILD_LANGS.includes(page.lang));
+  check("the calculator pages the build writes today are there",
+    fresh.length === 15 * BUILD_LANGS.length, `found ${fresh.length} for ${BUILD_LANGS.join(", ")}`);
+  checkAll("the result box can be pointed at by a field", fresh,
+    (page) => / id="calc-result"/.test(page.body), (page) => page.url);
+  check("and the script marks the fields the engine refused",
+    /aria-invalid/.test(engine) && /aria-describedby/.test(engine) && /invalidFields\(/.test(engine),
+    "assets/calculators.js must name the fields an error is about");
 
   for (const [file, id] of [
     ["sklepy/index.html", "store-status"],

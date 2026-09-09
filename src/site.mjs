@@ -65,7 +65,7 @@ export const DEFAULT_LANG = "pl";
  * To thaw: set this to false, translate what `docs/TRANSLATIONS_TODO.md` lists, and run
  * the build. It goes back to refusing a language with a hole in it.
  */
-export const PL_ONLY = true;
+export const PL_ONLY = false;
 
 /**
  * The languages this build actually writes files for.

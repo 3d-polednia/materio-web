@@ -160,15 +160,17 @@ const ENGINES = {
     if (!(ww > 0) || !(wh > 0) || !(rw > 0) || !(rl > 0) || rep < 0) return { err: "err_positive" };
     if (price < 0) return { err: "err_price" };
     const stripLen = rep > 0 ? ceil(wh / rep) * rep : wh;
+    // A strip longer than the roll cannot be cut from any roll on that shelf, so there is
+    // no number of rolls to buy. The engine used to answer one roll per strip and label the
+    // row "pas dłuższy niż rolka" — the row said the truth while `tobuy` still printed a
+    // figure that reads like an order. `linear` refuses a piece longer than the bar with
+    // err_toobig; a strip longer than the roll is the same refusal.
+    if (stripLen > rl) return { err: "err_toobig" };
     const stripsNeeded = ceil(ww / rw), stripsPerRoll = floor(rl / stripLen);
-    const rolls = stripsPerRoll <= 0 ? stripsNeeded : ceil(stripsNeeded / stripsPerRoll);
+    const rolls = ceil(stripsNeeded / stripsPerRoll);
     return { tobuy: rolls, unit: "res_rolls", cost: rolls * price, rows: [
       ["res_strips", qtyG(stripsNeeded) + " × " + qtyG(stripLen) + " m"],
-      // A strip taller than the whole roll is the engine's upper bound — one roll per
-      // strip — and it has always been silent about it. Say so rather than print "0".
-      stripsPerRoll > 0
-        ? ["res_strips_roll", qtyG(stripsPerRoll)]
-        : ["res_strips_roll", "|res_strip_too_long|"],
+      ["res_strips_roll", qtyG(stripsPerRoll)],
     ] };
   },
   linear(f) {
@@ -517,6 +519,34 @@ const CALCS = [
    translated, so a crawler and a visitor without JavaScript both see the real fields.
    All this file does in the browser is attach the handlers to what is already there. */
 
+/**
+ * The fields an engine's refusal is about.
+ *
+ * The message lands in the result box, which is a live region and therefore IS announced
+ * — but "podaj dodatnie wartości" says nothing about which of five fields is wrong, and a
+ * screen reader has no way to reach the offending one from the message. The answer has to
+ * come from the engine, because the engine owns the rules: a field is the problem when
+ * the form is STILL refused with every other field back at the value the page opens with.
+ * Those defaults are valid by construction — the build renders a worked example from them
+ * on every calculator page — so anything still refused is down to the one field left
+ * alone. A rule spanning two fields (a kerf wider than the sheet) may name neither, and
+ * that is honest: the message stays, and nothing false is pinned on a field.
+ *
+ * A <select> is left out: its options are the engine's own values and none of them can be
+ * typed wrong.
+ */
+function invalidFields(calcId, values) {
+  const def = CALCS.find((c) => c.id === calcId);
+  if (!def) return [];
+  const engine = ENGINES[def.engine];
+  if (!engine || !engine(values).err) return [];
+  const opens = {};
+  def.fields.forEach((f) => { opens[f.k] = f.def; });
+  return def.fields
+    .filter((f) => !f.sel && engine({ ...opens, [f.k]: values[f.k] }).err)
+    .map((f) => f.k);
+}
+
 /** Attach run / preset / Enter-key behaviour to one server-rendered `.calc` card. */
 function wireCalculator(card) {
   const def = CALCS.find((c) => c.id === card.dataset.calc);
@@ -616,11 +646,38 @@ function writeResult(box, html) {
  * somebody asked for the number, and the silent run on load (and the redraw after a
  * currency switch) must not count as using it.
  */
+/**
+ * Point the fields an error is about at the message that explains it.
+ *
+ * `aria-invalid` is what says the value is refused, and `aria-describedby` is what carries
+ * the sentence to the field: a screen reader reaching the field reads the message with it,
+ * instead of hearing "podaj dodatnie wartości" once, in the result box, with nothing
+ * connecting it to any field. Both come off again the moment the form calculates, and an
+ * `aria-describedby` this file did not write is left alone.
+ */
+function markInvalidFields(card, res) {
+  const box = card.querySelector("[data-result]");
+  const id = box && box.id;
+  const values = {};
+  card.querySelectorAll("[data-k]").forEach((el) => (values[el.dataset.k] = el.value));
+  const bad = new Set(res.err ? invalidFields(card.dataset.calc, values) : []);
+  card.querySelectorAll("[data-k]").forEach((el) => {
+    if (bad.has(el.dataset.k)) {
+      el.setAttribute("aria-invalid", "true");
+      if (id) el.setAttribute("aria-describedby", id);
+    } else {
+      el.removeAttribute("aria-invalid");
+      if (id && el.getAttribute("aria-describedby") === id) el.removeAttribute("aria-describedby");
+    }
+  });
+}
+
 function renderResult(card, res, byHand) {
   const box = card.querySelector("[data-result]");
   const lang = document.documentElement.lang || "pl";
   box.classList.add("show");
   card.lastResult = res.err ? null : res;
+  markInvalidFields(card, res);
   if (res.err) {
     box.classList.add("err");
     writeResult(box, `<div>${t(res.err, lang)}</div>`);

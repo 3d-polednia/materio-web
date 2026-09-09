@@ -102,6 +102,7 @@ najpierw to, co sprawia, że LiczMat Pro da się komuś sprzedać i odebrać.
 | 61 | Jedna lista walut na obu produktach — D1 i D2 (oba repozytoria) | **Zrobione** — 2026-08-31. Strona jest na żywo po pushu; aplikacja czeka na kolejny AAB |
 | 62 | Jeden angielski, waluta z regionu urządzenia — D3 i nazwa z D4 (repo aplikacji) | **Zrobione** — 2026-09-01. Czeka na wydanie AAB (właściciel). **Audyt parytetu zamknięty** |
 | 63 | Rosyjski wychodzi, wchodzą włoski, holenderski, hiszpański i francuski (oba repozytoria) | **Zrobione** — 2026-09-02. Strona jest na żywo po pushu; aplikacja czeka na kolejny AAB |
+| 64 | Audyt 2026-09-04: sześć znalezisk niskich (L1–L6) + rozmrożenie dwunastu języków | **Zrobione** — 2026-09-09. Strona jest na żywo po pushu |
 
 Sesja 49 doszła 2026-08-21 na prośbę właściciela: docelowo plan ma się przestawiać
 kliknięciem przy adresie e-mail, w przeglądarce, bez terminala. Wymaga serwera, który
@@ -475,6 +476,75 @@ uruchomione** — Playwright nie jest zainstalowany na tej maszynie i te skrypty
 komunikatem „skipping". Jeden z nich wymaga uwagi w sesji, która może je uruchomić:
 `scripts/test-qa.mjs` przechodzi ścieżkę „LICZMAT → projekt → kalkulacja → materiały →
 koszty", czyli ogląda koszty na poziomie, który od tej sesji ich nie widzi.
+
+## Sesja 64 — sześć znalezisk niskich z audytu i rozmrożenie języków (2026-09-09)
+
+Audyt zewnętrzny z 2026-09-04 (Codex CLI + Gemini 3.1 Pro, raport w skarbcu Obsidian)
+wypisał 24 znaleziska. Ta sesja robi wyłącznie sześć **niskich**; wysokie i średnie
+zostają na następne.
+
+- **L1 — liczebnik w złym przypadku.** `door_calc_count` i `mat_count_label` niosły jedną
+  formę dopełniacza na każdą liczbę, więc strona ukraińska pisała „161 матеріалів" tam,
+  gdzie liczba kończąca się na 1 wymaga mianownika: „161 матеріал". Mechanizm już istniał
+  — `pluralForm()` w `assets/units.js` odmienia jednostki wyniku — więc oba liczniki
+  dołączyły do `PLURAL_UNITS`, a nie dostały drugiej kopii reguł. Przy okazji wyszło, że
+  sama reguła myliła polski z ukraińskim: polski liczy 21 tak jak 25 („21 worków"),
+  a ukraiński, chorwacki i serbski biorą liczbę pojedynczą dla **każdej** liczby kończącej
+  się na 1 poza nastkami. To jest `LAST_DIGIT_ONE` obok `LAST_DIGIT_PLURAL`.
+  Formy dla siedmiu języków fleksyjnych dały dwa modele (Gemini 3.1 Pro i model
+  z lokalnego routera FreeLLMAPI); rozbieżne przypadki rozstrzygnięte ręcznie —
+  ukraińskie 2–4 to mianownik liczby mnogiej („2 матеріали"), nie dopełniacz liczby
+  pojedynczej, który podpowiadał drugi model.
+- **L2 — nazwa linku nie odmieniała się w zdaniu.** `faq_a5_link` istniał osobno od
+  `foot_privacy` dokładnie po to, żeby zdanie mogło mieć swoją formę, i trzymał formę
+  tytułową. Po ukraińsku „в" rządzi miejscownikiem: „Усе описано в Політиці
+  конфіденційності". Stopka dalej pisze „Політика конфіденційності". Pozostałych dwanaście
+  zdań sprawdzone — reszta jest gramatyczna, ale zobacz „Zostawione na później" niżej.
+- **L3 — błąd walidacji nie wskazywał pola.** Komunikat trafia do `[data-result]`, które ma
+  `role="status"`, więc **jest** ogłaszany; brakowało związania go z polem. Nowa
+  `invalidFields()` w `assets/calculators.js` pyta o to sam silnik: pole jest winne, jeśli
+  formularz nadal jest odrzucany, gdy wszystkie **inne** pola wrócą do wartości, z którymi
+  strona się otwiera (te są poprawne z definicji — build renderuje z nich przykład).
+  Żadnej drugiej kopii walidacji. Pola dostają `aria-invalid` i `aria-describedby`
+  wskazujące `#calc-result`, i tracą je, gdy formularz policzy.
+- **L4 — projekt bez nazwy.** `wsAddProject()` przycina teraz białe znaki i odrzuca pustą
+  nazwę, tak jak `wsAddRoom()` i `wsUpdateProject()` robiły od dawna.
+- **L5 — cofnięcie usunięcia wskrzeszało za dużo.** `wsRestoreProject()` przywraca dziecko
+  tylko wtedy, gdy jego `deletedAt` nadal równa się znacznikowi z tokenu. Pozycja skasowana
+  osobno **po** usunięciu projektu ma znacznik późniejszy i zostaje skasowana.
+- **L6 — tapeta: pas dłuższy niż rolka.** Silnik zwracał jedną rolkę na pas i wypisywał
+  wiersz „pas dłuższy niż rolka" — wiersz mówił prawdę, a `tobuy` dalej podawał liczbę
+  wyglądającą na zamówienie. Teraz `err_toobig`, tak samo jak `linear` odrzuca element
+  dłuższy niż sztanga. Klucz `res_strip_too_long` zniknął z trzynastu słowników razem
+  z gałęzią, która go używała.
+
+**Rozmrożenie.** `PL_ONLY` stało na `true` od sesji 57, więc build pisał wyłącznie polskie
+strony — a dwa z sześciu znalezisk siedziały na stronie ukraińskiej. Decyzja właściciela
+2026-09-09: rozmrozić. Zdejmowanie flagi było czyste, bo build nie miał już żadnego długu
+(`docs/TRANSLATIONS_TODO.md` zniknął sam). Przy okazji poprawiona sama księgowość długu:
+forma `_few` należy się tylko językowi, który ją ma — angielski, niemiecki, włoski,
+holenderski, hiszpański i francuski nie mają „few", więc `calculators_few` nie jest dziurą
+do przetłumaczenia. Rozstrzyga `pluralForm(3, lang)`, nie druga lista.
+
+**Testy** (nowe przypadki napisane przed poprawką, każdy oglądany jako czerwony):
+`test-calculators.mjs` — odmowa tapety, formy obu liczników w trzynastu językach, podział
+reguły „one" między polskim a ukraińskim/chorwackim/serbskim, `invalidFields()` na każdym
+polu każdego kalkulatora; `test-projects.mjs` — pusta nazwa i drugie usunięcie pozycji;
+`test-copy.mjs` §8 — forma zdaniowa nazwy dokumentu; `test-langs.mjs` §6 — licznik na
+wysłanej stronie; `test-a11y.mjs` — `#calc-result` i atrybuty, które go wskazują.
+
+**Zastane, nie z tej sesji.** `scripts/test-a11y.mjs`, `test-langs.mjs` i `test-seo.mjs`
+porównywały ścieżki z ukośnikiem z tym, co `join()` składa na Windowsie odwrotnym — a11y
+i seo wywracały się na tym z wyjątkiem, langs zgłaszał trzy fałszywe defekty. Ścieżka jest
+teraz normalizowana przy zbieraniu stron. Bez tego nie dało się zweryfikować tej sesji na
+tej maszynie. Nietknięte zostają: `test-copy.mjs` (`privacy-policy.html` ma 3813 słów przy
+budżecie 3800) i siedem porażek `test-security.mjs` — obie sprzed tej sesji.
+
+**Zostawione na później, do raportu, nie do zrobienia tutaj.** W czeskim, słowackim
+i chorwackim zdanie z linkiem ma niezgodność liczby czasownika z podmiotem: „Vše popisuje
+Zásady ochrany soukromí" (podmiot w liczbie mnogiej, czasownik w pojedynczej; podobnie
+`Všetko popisuje` i `Sve to opisuje`). To nie jest L2 — to osobne znalezisko i osobna
+sesja.
 
 ## Sesja 57 — konwerter jednostek na stronie (C1)
 

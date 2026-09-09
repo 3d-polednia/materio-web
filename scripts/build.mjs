@@ -92,9 +92,9 @@ const { I18N } = evalScript("assets/i18n.js", ["I18N"]);
 const LANG_META = LANGS.map((code) => ({ code, label: LANG_NAME[code] }));
 const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
-const { CALCS, ENGINES, localizeRow, unitLabel } = evalScript(
+const { CALCS, ENGINES, localizeRow, unitLabel, pluralForm } = evalScript(
   ["assets/units.js", "assets/calculators.js"],
-  ["CALCS", "ENGINES", "localizeRow", "unitLabel"]);
+  ["CALCS", "ENGINES", "localizeRow", "unitLabel", "pluralForm"]);
 /**
  * Session 21's permission table. assets/plan.js reads LM_LEVEL and lmAllows() from
  * assets/account.js, exactly as the browser does — the two are evaluated as one scope so
@@ -179,6 +179,17 @@ const problems = [];
 const pending = [];
 
 /**
+ * A `_few` form is owed only by a language that has one.
+ *
+ * pluralForm() in assets/units.js is the authority on that, and it says German, English,
+ * Italian, Dutch, Spanish and French inflect a counted noun in two forms, not three. The
+ * key is never asked for there, so its absence is not a hole a translator can fill: a
+ * "calculators_few" would be a second English plural nothing prints. Polish, which is the
+ * reference language, has all three — which is the only reason this is not simply symmetric.
+ */
+const noFewForm = (key, lang) => key.endsWith("_few") && pluralForm(3, lang) !== "few";
+
+/**
  * Record a hole and say whether it may be tolerated.
  *
  * Returns true when the caller should say nothing: the phase is on, the language is not
@@ -209,7 +220,7 @@ function validate() {
 
   for (const lang of LANGS) {
     if (!DICT[lang]) { problems.push(`language "${lang}" is missing entirely`); continue; }
-    const missing = reference.filter((k) => !(k in DICT[lang]));
+    const missing = reference.filter((k) => !(k in DICT[lang]) && !noFewForm(k, lang));
     const extra = Object.keys(DICT[lang]).filter((k) => !reference.includes(k));
     // A key Polish has and this language does not is the ordinary shape of the
     // Polish-first phase; it goes to the ledger. A key this language has and Polish does
@@ -514,9 +525,19 @@ function validate() {
 
 /* ------------------------------------------------------------------ helpers */
 
-/** Translator bound to one language; falls back en -> pl exactly like the browser does. */
-const translator = (lang) => (key) =>
-  (DICT[lang] && DICT[lang][key]) || DICT.en[key] || DICT[DEFAULT_LANG][key] || key;
+/**
+ * Translator bound to one language; falls back en -> pl exactly like the browser does.
+ *
+ * `t.plural(key, n)` is the same translator for a word standing next to a number, and it
+ * is unitLabel() from assets/units.js — the one place the plural rules live, so a page
+ * counting materials inflects them exactly as a result panel counts bags. A page function
+ * gets the translator and nothing else, which is why this hangs off it.
+ */
+const translator = (lang) => {
+  const t = (key) => (DICT[lang] && DICT[lang][key]) || DICT.en[key] || DICT[DEFAULT_LANG][key] || key;
+  t.plural = (key, n) => unitLabel(key, n, lang, t);
+  return t;
+};
 
 /** "Powierzchnia (m²)" -> "Powierzchnia" — the form a field label takes inside a formula. */
 const bareLabel = (label) => String(label).replace(/\s*\([^)]*\)\s*$/, "").trim();
