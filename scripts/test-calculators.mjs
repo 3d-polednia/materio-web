@@ -308,6 +308,16 @@ eq("linear: a 0 mm kerf is a real kerf", run("linear", { stock: "1000", kerf: "0
 for (const c of CALCS) {
   eq(`${c.id}: a negative price is refused`, run(c.id, { price: "-1" }).err, "err_price");
 }
+/* …and a price that is not a number is a mistake, not a free material. `num(f.price) || 0`
+   turned "abc" into 0 and `price < 0` let it through, so the answer was a full shopping list
+   costing nothing at all — audit 2026-09-04, M5. An empty field is the other thing entirely:
+   no price was offered, so there is no bill, and the quantity still has to come out. */
+for (const c of CALCS) {
+  eq(`${c.id}: a price of "abc" is refused`, run(c.id, { price: "abc" }).err, "err_price");
+  eq(`${c.id}: an empty price is not a mistake`, run(c.id, { price: "" }).err, undefined);
+  eq(`${c.id}: and an empty price costs nothing`, run(c.id, { price: "" }).cost, 0);
+  eq(`${c.id}: a price with a comma is a price`, run(c.id, { price: "1,50" }).err, undefined);
+}
 // Every calculator refuses a blank form rather than answering 0.
 for (const c of CALCS) {
   const blank = Object.fromEntries(c.fields.map((f) => [f.k, ""]));
@@ -447,6 +457,20 @@ eq("studwall: a 1,6 m wall at 0,4 m spacing has 5 uprights",
 eq("coverage: a 0 m² wall is refused", run("coverage", { area: "0" }).err, "err_positive");
 eq("coverage: a negative wall is refused", run("coverage", { area: "-5" }).err, "err_positive");
 eq("coverage: openings bigger than the wall are refused", run("coverage", { openings: "30" }).err, "err_positive");
+/* The same case in the other engine of the same calculator. `masonry` clamped the net area
+   to zero and answered "0 bloczków" as a valid result — audit 2026-09-04, M4. */
+eq("masonry: openings bigger than the wall are refused",
+  run("masonry", { area: "12", openings: "13" }).err, "err_positive");
+/* The boundary is drawn where `coverage` draws it: a wall entirely taken up by openings is
+   a net of nothing rather than bad data, in both engines, and neither invents an error. */
+eq("masonry: openings the size of the wall are a net of nothing",
+  run("masonry", { area: "12", openings: "12" }).tobuy, 0);
+eq("coverage: and the same in the engine masonry was matched to",
+  run("coverage", { area: "12", openings: "12" }).tobuy, 0);
+eq("masonry: negative openings are refused", run("masonry", { openings: "-1" }).err, "err_positive");
+check("masonry: openings smaller than the wall still count",
+  run("masonry", { area: "12", openings: "2" }).tobuy > 0,
+  `got ${JSON.stringify(run("masonry", { area: "12", openings: "2" }))}`);
 eq("coverage: openings equal to the wall are allowed", run("coverage", { openings: "25", cov: "40" }).tobuy, 0);
 eq("waste: a negative allowance is refused", run("waste", { waste: "-1" }).err, "err_positive");
 eq("wallpaper: a 0 m roll is refused", run("wallpaper", { rollW: "0" }).err, "err_positive");

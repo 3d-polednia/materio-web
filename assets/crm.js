@@ -123,7 +123,7 @@ function crmAddClient(fields) {
     schemaVersion: CRM_SCHEMA,
   };
   data.clients.push(client);
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return client;
 }
 
@@ -150,7 +150,7 @@ function crmUpdateClient(id, fields) {
   if (f.note !== undefined) client.note = crmText(f.note, CRM_MAX_NOTE);
   if (f.archived !== undefined) client.archived = Boolean(f.archived);
   client.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return client;
 }
 
@@ -176,7 +176,7 @@ function crmDeleteClient(id) {
   const now = Date.now();
   client.deletedAt = now;
   client.updatedAt = now;
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return { id, at: now };
 }
 
@@ -189,7 +189,7 @@ function crmRestoreClient(token) {
   if (!client || !client.deletedAt) return null;
   client.deletedAt = null;
   client.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return client;
 }
 
@@ -228,7 +228,7 @@ function crmLinkProject(clientId, projectId) {
   if (!Array.isArray(client.projectIds)) client.projectIds = [];
   if (!client.projectIds.includes(pid)) client.projectIds.push(pid);
   client.updatedAt = now;
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return client;
 }
 
@@ -241,7 +241,7 @@ function crmUnlinkProject(clientId, projectId) {
   if (!client.projectIds.includes(pid)) return client;
   client.projectIds = client.projectIds.filter((x) => x !== pid);
   client.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return client;
 }
 
@@ -390,7 +390,7 @@ function crmAddJob(fields) {
     schemaVersion: CRM_SCHEMA,
   };
   data.jobs.push(job);
-  crmSave(data);
+  if (!crmSave(data)) return null;
   // Chapter XXIV's path is one chain: a job that arrives with both a client and a project
   // files that project under that client too, so the client's own page tells the same
   // story as the job's. crmLinkProject() is the one write that knows a project has one
@@ -444,7 +444,7 @@ function crmUpdateJob(id, fields) {
   if (f.clientId !== undefined) job.clientId = crmClientId(f.clientId);
   if (f.projectId !== undefined) job.projectId = crmProjectId(f.projectId);
   job.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   if (job.clientId && job.projectId) crmLinkProject(job.clientId, job.projectId);
   return crmJob(id);
 }
@@ -471,7 +471,7 @@ function crmDeleteJob(id) {
   const now = Date.now();
   job.deletedAt = now;
   job.updatedAt = now;
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return { id: id, at: now };
 }
 
@@ -484,7 +484,7 @@ function crmRestoreJob(token) {
   if (!job || !job.deletedAt) return null;
   job.deletedAt = null;
   job.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return crmJob(id);
 }
 
@@ -746,7 +746,7 @@ function crmAddQuote(fields) {
     schemaVersion: CRM_SCHEMA,
   };
   data.quotes.push(quote);
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return crmQuote(quote.id);
 }
 
@@ -767,7 +767,7 @@ function crmUpdateQuote(id, fields) {
   if (f.marginMajor !== undefined) quote.marginPct = crmPct(f.marginMajor);
   if (f.projectId !== undefined) quote.projectId = crmProjectId(f.projectId);
   quote.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return crmQuote(id);
 }
 
@@ -787,7 +787,7 @@ function crmDeleteQuote(id) {
   const now = Date.now();
   quote.deletedAt = now;
   quote.updatedAt = now;
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return { id: id, at: now };
 }
 
@@ -802,7 +802,7 @@ function crmRestoreQuote(token) {
   if (!quote || !quote.deletedAt) return null;
   quote.deletedAt = null;
   quote.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return crmQuote(id);
 }
 
@@ -885,7 +885,7 @@ function crmAddLabour(quoteId, fields) {
   });
   crmStampQuote(quote);
   quote.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return crmQuote(quoteId);
 }
 
@@ -915,7 +915,7 @@ function crmUpdateLabour(quoteId, lineId, fields) {
   if (f.priceMajor !== undefined) line.amountMinor = crmLineAmount(f.priceMajor, line.quantity);
   crmStampQuote(quote);
   quote.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return crmQuote(quoteId);
 }
 
@@ -931,7 +931,7 @@ function crmDeleteLabour(quoteId, lineId) {
   if (quote.labour.length === before) return null;
   crmStampQuote(quote);
   quote.updatedAt = Date.now();
-  crmSave(data);
+  if (!crmSave(data)) return null;
   return crmQuote(quoteId);
 }
 

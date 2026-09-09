@@ -57,15 +57,47 @@ function crmLoad() {
   }
 }
 
+/**
+ * Write the whole Pro workspace. **False means nothing was written**, and since the audit of
+ * 2026-09-04 (M3) every mutator in assets/crm.js hands that answer on rather than reporting
+ * a client, a job or a quote it did not save. The same error was made twice, in two stores;
+ * this is the second half of the same fix — see wsSave() in assets/workspace.js.
+ */
 function crmSave(data) {
   try {
     localStorage.setItem(CRM_KEY, JSON.stringify(data));
   } catch (e) {
     // Private mode or a full quota: the page keeps working, nothing is written.
+    crmSaveRefused();
     return false;
   }
+  if (crmRefusedBanner) crmRefusedBanner.hidden = true;
   document.dispatchEvent(new CustomEvent("crmchange"));
   return true;
+}
+
+/* The banner is built here rather than in assets/crm-ui.js for the reason the store is its
+   own file at all: /app/ loads this one to push and pull the store and loads no interface
+   with it. It borrows the consent banner's class, so it needs no new CSS. */
+let crmRefusedBanner = null;
+
+/** Say that a write did not land: an event for the screens, a banner for the visitor. */
+function crmSaveRefused() {
+  if (typeof document === "undefined" || !document) return;
+  document.dispatchEvent(new CustomEvent("crmsavefailed"));
+  const text = typeof t === "function" ? t("ws_save_failed") : "";
+  if (!text || !document.body) return;
+  if (!crmRefusedBanner) {
+    crmRefusedBanner = document.createElement("div");
+    crmRefusedBanner.className = "consent-banner";
+    crmRefusedBanner.setAttribute("role", "alert");
+    const p = document.createElement("p");
+    p.className = "consent-text";
+    p.textContent = text;
+    crmRefusedBanner.appendChild(p);
+    document.body.appendChild(crmRefusedBanner);
+  }
+  crmRefusedBanner.hidden = false;
 }
 
 /* --------------------------------------------------- the other tab
@@ -133,7 +165,7 @@ function crmImport(incoming) {
       else if ((row.updatedAt || 0) >= (data[key][i].updatedAt || 0)) data[key][i] = row;
     });
   });
-  crmSave(data);
+  return crmSave(data);
 }
 
 if (typeof module !== "undefined" && module.exports) {

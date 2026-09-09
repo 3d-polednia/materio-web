@@ -289,7 +289,13 @@ function wsSaveResult(card, box) {
 
   let projectId = "";
   if (!sel.hidden && sel.value === WS_NEW_PROJECT) {
-    projectId = wsAddProject(nameField.value.trim() || wsT("ws_default_project")).id;
+    // A store that refused the write hands back nothing (audit 2026-09-04, M3), and it has
+    // already said so on screen. Filing the result into a project that was never written
+    // would be the second half of that lie, so the result stays where it is — on screen,
+    // still saveable once there is room for it.
+    const made = wsAddProject(nameField.value.trim() || wsT("ws_default_project"));
+    if (!made) return;
+    projectId = made.id;
     nameField.value = "";
   } else if (!sel.hidden) {
     projectId = sel.value;
@@ -319,6 +325,9 @@ function wsSaveResult(card, box) {
     projectName: wsT("ws_default_project"),
   });
 
+  // Nothing saved: either the browser refused the write (M3) or the amount on the result
+  // was not an amount (M7). Both are already on screen; what must not appear is "saved".
+  if (!row) return;
   const project = wsProject(row.projectId);
   sel.value = row.projectId;
   box.querySelector("[data-ws-new]").hidden = true;

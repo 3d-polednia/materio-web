@@ -84,15 +84,49 @@ function omLoad() {
   }
 }
 
+/**
+ * Write the whole catalogue of own materials. **False means nothing was written.**
+ *
+ * The audit of 2026-09-04 (M3) found this same unread `false` in two stores; this is the
+ * third, on the same key-per-store pattern, so it gets the same answer — every mutator hands
+ * the refusal on, and the visitor is told once instead of losing a material at the next
+ * refresh. See wsSave() in assets/workspace.js for the argument in full.
+ */
 function omSave(data) {
   try {
     localStorage.setItem(OM_KEY, JSON.stringify(data));
   } catch (e) {
     // Private mode or a full quota: the page keeps working, nothing is written.
+    omSaveRefused();
     return false;
   }
+  if (omRefusedBanner) omRefusedBanner.hidden = true;
   document.dispatchEvent(new CustomEvent("ownmaterialschange"));
   return true;
+}
+
+/* Built here rather than in assets/own-materials-ui.js, because /app/ loads this file to push
+   and pull the catalogue and loads no interface with it. It borrows the consent banner's
+   class, so it needs no new CSS. */
+let omRefusedBanner = null;
+
+/** Say that a write did not land: an event for the screens, a banner for the visitor. */
+function omSaveRefused() {
+  if (typeof document === "undefined" || !document) return;
+  document.dispatchEvent(new CustomEvent("ownmaterialssavefailed"));
+  const text = typeof t === "function" ? t("ws_save_failed") : "";
+  if (!text || !document.body) return;
+  if (!omRefusedBanner) {
+    omRefusedBanner = document.createElement("div");
+    omRefusedBanner.className = "consent-banner";
+    omRefusedBanner.setAttribute("role", "alert");
+    const p = document.createElement("p");
+    p.className = "consent-text";
+    p.textContent = text;
+    omRefusedBanner.appendChild(p);
+    document.body.appendChild(omRefusedBanner);
+  }
+  omRefusedBanner.hidden = false;
 }
 
 const omId = () => (crypto.randomUUID ? crypto.randomUUID()
@@ -238,7 +272,7 @@ function omAdd(fields) {
     ...omSyncFields(now),
   };
   data.materials.push(material);
-  omSave(data);
+  if (!omSave(data)) return null;
   return material;
 }
 
@@ -266,7 +300,7 @@ function omUpdate(id, fields) {
   m.application = application;
   Object.assign(m, measures);
   m.updatedAt = Date.now();
-  omSave(data);
+  if (!omSave(data)) return null;
   return m;
 }
 
@@ -291,7 +325,7 @@ function omSetPrice(id, priceMajor, currencyCode) {
     m.currencyCode = "";
     m.priceUpdatedAt = null;
     m.updatedAt = now;
-    omSave(data);
+    if (!omSave(data)) return null;
     return m;
   }
   const currency = m.currencyCode || omText(currencyCode, 3) || omCurrency();
@@ -306,7 +340,7 @@ function omSetPrice(id, priceMajor, currencyCode) {
     .sort((a, b) => (Number(b.recordedAt) || 0) - (Number(a.recordedAt) || 0))
     .slice(0, OM_MAX_PRICE_POINTS);
   m.updatedAt = now;
-  omSave(data);
+  if (!omSave(data)) return null;
   return m;
 }
 
@@ -317,7 +351,7 @@ function omDelete(id) {
   if (!m) return null;
   m.deletedAt = Date.now();
   m.updatedAt = m.deletedAt;
-  omSave(data);
+  if (!omSave(data)) return null;
   // The id is the undo token: an undo has to be exact rather than a guess from timestamps.
   return m.id;
 }
@@ -329,7 +363,7 @@ function omRestore(token) {
   if (!m) return null;
   m.deletedAt = null;
   m.updatedAt = Date.now();
-  omSave(data);
+  if (!omSave(data)) return null;
   return m;
 }
 
@@ -393,7 +427,7 @@ function omImport(incoming) {
     if (i < 0) data.materials.push(row);
     else if ((row.updatedAt || 0) >= (data.materials[i].updatedAt || 0)) data.materials[i] = row;
   });
-  omSave(data);
+  return omSave(data);
 }
 
 if (typeof module !== "undefined" && module.exports) {

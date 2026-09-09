@@ -82,15 +82,50 @@ function wsLoad() {
   }
 }
 
+/**
+ * Write the whole workspace. **False means nothing was written**, and since the audit of
+ * 2026-09-04 (M3) every mutator hands that answer on instead of reporting a row it did not
+ * save: a project somebody kept working in, that a refresh then took away, is worse than
+ * being told the browser refused it.
+ *
+ * The refusal reaches the screen from here as well — once, rather than at fifteen call
+ * sites — and the next write that lands takes the message back down.
+ */
 function wsSave(data) {
   try {
     localStorage.setItem(WS_KEY, JSON.stringify(data));
   } catch (e) {
     // Private mode or a full quota: the calculators keep working, nothing is saved.
+    wsSaveRefused();
     return false;
   }
+  if (wsRefusedBanner) wsRefusedBanner.hidden = true;
   document.dispatchEvent(new CustomEvent("workspacechange"));
   return true;
+}
+
+/* The one thing this file draws, and the reason it draws it: every page that can write the
+   workspace loads assets/workspace.js, and only some of them load assets/workspace-ui.js.
+   It borrows the consent banner's class, so it needs no new CSS and no rebuilt page. */
+let wsRefusedBanner = null;
+
+/** Say that a write did not land: an event for the screens, a banner for the visitor. */
+function wsSaveRefused() {
+  if (typeof document === "undefined" || !document) return;
+  document.dispatchEvent(new CustomEvent("workspacesavefailed"));
+  const text = typeof t === "function" ? t("ws_save_failed") : "";
+  if (!text || !document.body) return;
+  if (!wsRefusedBanner) {
+    wsRefusedBanner = document.createElement("div");
+    wsRefusedBanner.className = "consent-banner";
+    wsRefusedBanner.setAttribute("role", "alert");
+    const p = document.createElement("p");
+    p.className = "consent-text";
+    p.textContent = text;
+    wsRefusedBanner.appendChild(p);
+    document.body.appendChild(wsRefusedBanner);
+  }
+  wsRefusedBanner.hidden = false;
 }
 
 /* --------------------------------------------------- the other tab
@@ -188,7 +223,7 @@ function wsAddProject(name) {
   const data = wsLoad();
   const project = { id: wsId(), name: clean, archived: false, ...wsSyncFields(Date.now()) };
   data.projects.push(project);
-  wsSave(data);
+  if (!wsSave(data)) return null;
   wsSetActiveProject(project.id);
   return project;
 }
@@ -213,7 +248,7 @@ function wsUpdateProject(id, fields) {
   }
   if (fields.archived !== undefined) project.archived = Boolean(fields.archived);
   project.updatedAt = Date.now();
-  wsSave(data);
+  if (!wsSave(data)) return null;
   // The active project is the one every new estimate line lands in, so it can never be
   // one the visitor has just put away. wsActiveProjectId() resolves to a project that is
   // still in the working set, so writing that answer back is the whole handoff.
@@ -256,7 +291,7 @@ function wsDeleteProject(id) {
   lines.forEach((e) => { e.deletedAt = now; e.updatedAt = now; });
   const items = data.shoppingItems.filter((s) => s.projectId === id && !s.deletedAt);
   items.forEach((s) => { s.deletedAt = now; s.updatedAt = now; });
-  wsSave(data);
+  if (!wsSave(data)) return null;
   // The stored id is now a tombstone. wsActiveProjectId() already resolves past it, so
   // writing that answer back is the handoff — and it has to be unconditional: comparing
   // the stored id with the deleted one has just stopped matching, because the resolution
@@ -304,7 +339,7 @@ function wsRestoreProject(token) {
   };
   revive(data.estimations, lines);
   revive(data.shoppingItems, items);
-  wsSave(data);
+  if (!wsSave(data)) return null;
   return project;
 }
 
@@ -317,8 +352,11 @@ function wsActiveProjectId() {
 }
 
 function wsSetActiveProject(id) {
-  try { localStorage.setItem(WS_ACTIVE_KEY, id || ""); } catch (e) {}
+  // The same rule as wsSave(): a pointer that was not written is not a pointer, and the
+  // screens are told rather than left showing a project the next page load will not open.
+  try { localStorage.setItem(WS_ACTIVE_KEY, id || ""); } catch (e) { wsSaveRefused(); return false; }
   document.dispatchEvent(new CustomEvent("workspacechange"));
+  return true;
 }
 
 const wsActiveProject = () => wsProjects().find((p) => p.id === wsActiveProjectId()) || null;
@@ -395,7 +433,7 @@ function wsAddRoom(name, lengthM, widthM, heightM, projectId) {
     ...wsSyncFields(Date.now()),
   };
   data.rooms.push(room);
-  wsSave(data);
+  if (!wsSave(data)) return null;
   return room;
 }
 
@@ -414,7 +452,7 @@ function wsUpdateRoom(id, fields) {
   if (fields.heightM !== undefined) room.heightM = wsDim(fields.heightM, 100);
   if (fields.projectId !== undefined) room.projectId = fields.projectId || null;
   room.updatedAt = Date.now();
-  wsSave(data);
+  if (!wsSave(data)) return null;
   return room;
 }
 
@@ -425,7 +463,7 @@ function wsDeleteRoom(id) {
   if (!room) return null;
   room.deletedAt = Date.now();
   room.updatedAt = room.deletedAt;
-  wsSave(data);
+  if (!wsSave(data)) return null;
   return room;
 }
 
@@ -471,6 +509,34 @@ function wsEstimations(projectId) {
 
 /** Minor units, rounded once, never carried as a float (the Money rule from the app). */
 const wsMinor = (major) => Math.round((Number(major) || 0) * 100);
+
+/** The ceiling on one stored amount, in major units: a large estimate, not a typed mistake. */
+const WS_MONEY_MAX = 1e9;
+
+/**
+ * An amount somebody typed, in minor units — or null when it is not an amount.
+ *
+ * Empty is not a refusal: a line with no money on it is ordinary, and a free account writes
+ * one deliberately (see wsCanPrice()), so nothing typed is zero. What is refused is what
+ * cannot be money — text, a negative amount, or Infinity, which `Number()` carried through
+ * untouched and `JSON.stringify` then wrote as null, leaving the money field of a saved
+ * line unreadable (audit 2026-09-04, M7).
+ */
+function wsAmountMinor(major) {
+  const s = String(major === undefined || major === null ? "" : major).trim();
+  if (s === "") return 0;
+  const n = Number(s);
+  if (!Number.isFinite(n) || n < 0 || n > WS_MONEY_MAX) return null;
+  return Math.round(n * 100);
+}
+
+/** A waste share in percent — 0 to 100, nothing typed meaning none, or null for the rest. */
+function wsWastePercent(v) {
+  const s = String(v === undefined || v === null ? "" : v).trim();
+  if (s === "") return 0;
+  const n = Number(s);
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? n : null;
+}
 
 /**
  * May this browser store an amount somebody typed? — `costs` in LM_FEATURES, PRO since
@@ -601,7 +667,16 @@ function wsSetLineRoom(id, roomId) {
   let json;
   try { json = JSON.parse(String(row.inputJson || "{}")); } catch (e) { return null; }
   if (!json || typeof json !== "object") return null;
-  const room = roomId ? String(roomId).slice(0, 64) : "";
+  // A stale picker names a room that has been deleted, or one belonging to another project.
+  // Neither is an assignment: the line would drop out of its project's room view, or show up
+  // under somebody else's project (audit 2026-09-04, M6). This is the check
+  // wsAddEstimation() already makes when the room arrives with the result.
+  let room = "";
+  if (roomId) {
+    const target = data.rooms.find((r) => r.id === roomId && !r.deletedAt);
+    if (!target || target.projectId !== row.projectId) return null;
+    room = String(target.id).slice(0, 64);
+  }
   if (room) json._room = room;
   else delete json._room;
   const text = JSON.stringify(json);
@@ -610,7 +685,7 @@ function wsSetLineRoom(id, roomId) {
   if (text.length > WS_INPUT_MAX) return null;
   row.inputJson = text;
   row.updatedAt = Date.now();
-  wsSave(data);
+  if (!wsSave(data)) return null;
   return row;
 }
 
@@ -633,8 +708,12 @@ function wsAddEstimation(r) {
   if (!projectId) projectId = wsAddProject(r.projectName || "LiczMat").id;
 
   const currencyCode = wsCurrency();
-  const totalCostMinor = wsMinor(r.costMajor);
-  const waste = Number(r.wastePercent) || 0;
+  // The amount and the waste share are the two numbers that reach the store as whatever was
+  // typed, and the two the audit of 2026-09-04 found unbounded (M7). A line that cannot hold
+  // its own money is not saved at all rather than saved broken.
+  const totalCostMinor = wsAmountMinor(r.costMajor);
+  const waste = wsWastePercent(r.wastePercent);
+  if (totalCostMinor === null || waste === null) return null;
 
   // Chapter XVIII's assignment, made where the result is saved. A room the project does
   // not own is dropped rather than filed: the picker is rebuilt whenever the project
@@ -661,7 +740,7 @@ function wsAddEstimation(r) {
     ...wsSyncFields(Date.now()),
   };
   data.estimations.push(row);
-  wsSave(data);
+  if (!wsSave(data)) return null;
 
   // Chapter XVI's arrow: the result is in the project, so the material is on its list.
   // The app does exactly this and in this order — `CalculatorViewModel.save()` inserts the
@@ -756,12 +835,17 @@ function wsUpdateEstimation(id, fields) {
   // `costs` is Pro: a level that does not reach it leaves the stored amount exactly where
   // it is, rather than writing a new one or zeroing the old one — see wsCanPrice().
   if (fields.costMajor !== undefined && wsCanPrice()) {
-    row.totalCostMinor = Math.max(0, wsMinor(fields.costMajor));
+    // Refused rather than clamped, and refused before anything is written: `data` is a
+    // fresh copy, so returning here leaves the stored line exactly as it was (M7).
+    const minor = wsAmountMinor(fields.costMajor);
+    if (minor === null) return null;
+    row.totalCostMinor = minor;
     // The waste share is a percentage of the line, so it has to follow the new total.
     row.wasteCostMinor = Math.round(row.totalCostMinor * (Number(row.wastePercentage) || 0) / 100);
   }
   row.updatedAt = Date.now();
-  wsSave(data);
+  if (!wsSave(data)) return null;
+  return row;
 }
 
 function wsDeleteEstimation(id) {
@@ -770,7 +854,8 @@ function wsDeleteEstimation(id) {
   if (!row) return;
   row.deletedAt = Date.now();
   row.updatedAt = row.deletedAt;
-  wsSave(data);
+  if (!wsSave(data)) return null;
+  return row;
 }
 
 /* --------------------------------------------------------------- material list
@@ -861,8 +946,14 @@ function wsUnitPriceMinor(row) {
  * Rounded exactly once, at the end — the Money rule. `wsMinor()` turns the typed price into
  * whole minor units first, so 35 PLN × 7 is 24 500 and not 24 499.999999999996.
  */
-const wsItemCostMinor = (priceMajor, quantity) =>
-  Math.max(0, Math.round(wsMinor(priceMajor) * Math.max(0, Number(quantity) || 0)));
+const wsItemCostMinor = (priceMajor, quantity) => {
+  // The price goes through the same gate as an estimate line's amount (M7), and what the
+  // gate refuses is worth nothing on a material row: "a negative price is not a price" is
+  // scripts/test-costs.mjs §2, and Infinity — which used to reach the stored field intact —
+  // is no more of a price than -20 is.
+  const minor = wsAmountMinor(priceMajor);
+  return Math.round((minor === null ? 0 : minor) * Math.max(0, Number(quantity) || 0));
+};
 
 /** A material list, oldest first — the order the app reads it in (`ORDER BY id`). */
 function wsItems(projectId) {
@@ -892,6 +983,12 @@ const wsItem = (id) => wsItems().find((s) => s.id === id) || null;
 function wsAddItem(r) {
   const project = r.projectId ? wsProject(r.projectId) : null;
   if (!project || project.archived) return null;
+  // Bounded before it is stored, whichever way the money came in — see wsAmountMinor(), M7.
+  // An amount that is not an amount leaves the row unpriced rather than refusing the row:
+  // the material is what the visitor asked for, and the money is the part that was wrong.
+  const itemCost = r.costMinor !== undefined
+    ? Math.max(0, Number.isFinite(Number(r.costMinor)) ? Math.round(Number(r.costMinor)) : 0)
+    : (wsAmountMinor(r.costMajor) || 0);
 
   const data = wsLoad();
   const now = Date.now();
@@ -908,8 +1005,7 @@ function wsAddItem(r) {
     // `costMinor` is the way in for a price the visitor typed per unit (chapter XVII); the
     // arrow from a result still hands over the total the calculator produced, in major
     // units, because that is the number the result panel printed.
-    estimatedCostMinor: Math.max(0, r.costMinor !== undefined
-      ? Math.round(Number(r.costMinor) || 0) : wsMinor(r.costMajor)),
+    estimatedCostMinor: itemCost,
     currencyCode: r.currencyCode || wsCurrency(),
     isPurchased: false,
     // Always present, even empty: the push is a merge, so a note can only be *cleared*
@@ -918,7 +1014,7 @@ function wsAddItem(r) {
     ...wsSyncFields(now),
   };
   data.shoppingItems.push(row);
-  wsSave(data);
+  if (!wsSave(data)) return null;
   return row;
 }
 
@@ -963,7 +1059,7 @@ function wsUpdateItem(id, fields) {
     row.estimatedCostMinor = cost;
   }
   row.updatedAt = Date.now();
-  wsSave(data);
+  if (!wsSave(data)) return null;
   return row;
 }
 
@@ -1005,7 +1101,7 @@ function wsDeleteItem(id) {
   if (!row) return null;
   row.deletedAt = Date.now();
   row.updatedAt = row.deletedAt;
-  wsSave(data);
+  if (!wsSave(data)) return null;
   return row;
 }
 
@@ -1166,7 +1262,7 @@ function wsImport(incoming) {
       else if ((row.updatedAt || 0) >= (data[key][i].updatedAt || 0)) data[key][i] = row;
     });
   });
-  wsSave(data);
+  return wsSave(data);
 }
 
 if (typeof module !== "undefined" && module.exports) {

@@ -79,14 +79,24 @@ const FEATURES = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATUR
  */
 let PW_ALLOW = true;
 
-/** assets/workspace.js in Node, on a store that starts out however the test wants it. */
-function loadWorkspace(seed) {
+/**
+ * assets/workspace.js in Node, on a store that starts out however the test wants it.
+ *
+ * `opts.refuse` is the browser that will not write: a private window, or a quota already
+ * full. Every real localStorage throws from setItem() there, which is the case the audit of
+ * 2026-09-04 found nobody was reading (M3).
+ */
+function loadWorkspace(seed, opts = {}) {
   const backing = new Map(Object.entries(seed || {}));
   const clock = { now: 1_760_000_000_000, currency: "PLN" };
+  const events = [];
   let ids = 0;
   const localStorage = {
     getItem: (k) => (backing.has(k) ? backing.get(k) : null),
-    setItem: (k, v) => backing.set(k, String(v)),
+    setItem: (k, v) => {
+      if (opts.refuse) throw new Error("QuotaExceededError");
+      backing.set(k, String(v));
+    },
     removeItem: (k) => backing.delete(k),
   };
   const api = evalScript("assets/workspace.js", [
@@ -100,7 +110,7 @@ function loadWorkspace(seed) {
     "wsMinor", "wsExport", "wsImport",
   ], {
     localStorage,
-    document: { dispatchEvent: () => {} },
+    document: { dispatchEvent: (e) => events.push(e && e.type) },
     crypto: { randomUUID: () => `id-${++ids}` },
     CustomEvent: class { constructor(type) { this.type = type; } },
     Date: { now: () => clock.now },
@@ -116,6 +126,8 @@ function loadWorkspace(seed) {
   return {
     ...api,
     raw: () => JSON.parse(backing.get("materio-workspace-v1") || "{}"),
+    stored: () => backing.has("materio-workspace-v1"),
+    events: () => events,
     tick: (ms) => { clock.now += ms || 1000; },
     setCurrency: (c) => { clock.currency = c; },
   };
@@ -803,6 +815,88 @@ head("7b. the store refuses to write a price, not only the screen");
     /addEventListener\("lm-session", \(\) => \{\s*[\r\n]+\s*wsGateMoneyFields\(\);\s*[\r\n]+\s*wsRenderWorkspace\(\);/.test(ui));
   check("and /kosztorys/ is drawn again too",
     /addEventListener\("lm-session", \(\) => \{ wsGateMoneyFields\(\); wsRenderEstimate\(\); \}\)/.test(ui));
+}
+
+/* --------------------------------- a write the browser refused is not a write */
+
+head("9. a refused write is reported, not pretended (audit 2026-09-04, M3)");
+{
+  const ws = loadWorkspace(undefined, { refuse: true });
+
+  eq("a project the store could not write is no project", ws.wsAddProject("Łazienka"), null);
+  check("and nothing was left in storage", !ws.stored());
+  check("the screens are told once", ws.events().includes("workspacesavefailed"));
+  check("and no change event claims a workspace that is not there",
+    !ws.events().includes("workspacechange"), JSON.stringify(ws.events()));
+}
+{
+  /* A store that already holds a project, in a browser that has just run out of room: the
+     reads still work, so the estimate line has somewhere to go — and still cannot be saved. */
+  const ok = loadWorkspace();
+  const project = ok.wsAddProject("Łazienka");
+  const seeded = { "materio-workspace-v1": JSON.stringify(ok.raw()) };
+
+  const ws = loadWorkspace(seeded, { refuse: true });
+  eq("the project is readable", ws.wsProjects().length, 1);
+  eq("an estimate line that was not written is not a line",
+    save(ws, { projectId: project.id }), null);
+  eq("a hand-typed line either", ws.wsAddManualEstimation({
+    name: "Robocizna", requiredUnits: 1, unitLabel: "h", costMajor: 100, projectId: project.id,
+  }), null);
+  eq("a material either", ws.wsAddOwnItem({
+    projectId: project.id, name: "Silikon", materialCategory: "CHEMICALS", quantity: 2, unit: "szt.",
+  }), null);
+  eq("the store still holds only what it held", ws.wsEstimations(project.id).length, 0);
+  eq("and no material appeared", ws.wsItems(project.id).length, 0);
+}
+{
+  /* wsAddEstimation() writes two rows: the line and the material behind it. A refusal must
+     stop before the second one, or the material list would be the only half that survived. */
+  const ok = loadWorkspace();
+  const project = ok.wsAddProject("Łazienka");
+  eq("with room to write, the arrow lands", !!save(ok, { projectId: project.id }), true);
+  eq("and the material list has the material", ok.wsItems(project.id).length, 1);
+}
+
+head("10. an amount is finite, not negative, and inside a ceiling (M7)");
+{
+  const ws = loadWorkspace();
+  const project = ws.wsAddProject("Łazienka");
+  const line = (costMajor, over = {}) => ws.wsAddManualEstimation({
+    name: "Robocizna", requiredUnits: 1, unitLabel: "h", projectId: project.id, costMajor, ...over,
+  });
+
+  eq("a negative amount is refused", line(-10), null);
+  eq("Infinity is refused", line(Infinity), null);
+  eq("so is the text of one", line("abc"), null);
+  eq("and an amount past the ceiling", line(1e12), null);
+  eq("nothing of that was written", ws.wsEstimations(project.id).length, 0);
+
+  const none = line("");
+  check("an empty amount is a line with no money on it", !!none);
+  eq("and it is worth nothing", none.totalCostMinor, 0);
+  const real = line(120.5);
+  eq("a real amount is stored in minor units", real.totalCostMinor, 12050);
+
+  /* Infinity was the one that broke the field rather than the number: JSON.stringify writes
+     it as null, so the amount came back unreadable. */
+  for (const row of ws.wsEstimations(project.id)) {
+    check(`stored amounts stay numbers (${row.name})`, Number.isFinite(row.totalCostMinor));
+  }
+
+  const priced = save(ws, { projectId: project.id, costMajor: 749.85, wastePercent: 7 });
+  eq("a waste share inside the range is kept", priced.wastePercentage, 7);
+  eq("a waste share of 150 % is refused",
+    save(ws, { projectId: project.id, wastePercent: 150 }), null);
+  eq("a negative one too", save(ws, { projectId: project.id, wastePercent: -1 }), null);
+  eq("and an infinite one", save(ws, { projectId: project.id, wastePercent: Infinity }), null);
+
+  /* A correction is refused the same way, and refused before it touches the stored line. */
+  ws.tick();
+  eq("correcting a line to a negative amount is refused",
+    ws.wsUpdateEstimation(priced.id, { costMajor: -1 }), null);
+  eq("and the line keeps the amount it had",
+    ws.wsEstimations(project.id).find((e) => e.id === priced.id).totalCostMinor, 74985);
 }
 
 /* ------------------------------------------------------------------ report */

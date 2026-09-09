@@ -631,6 +631,38 @@ head("8. the copy exists in all four languages");
   }
 }
 
+/* ------------------- a room a line may not be filed under (audit 2026-09-04, M6) */
+
+head("a line is filed under a room of its own project, or under none");
+{
+  const ws = loadWorkspace();
+  const bath = ws.wsAddProject("Łazienka");
+  const kitchen = ws.wsAddProject("Kuchnia");
+  const bathRoom = ws.wsAddRoom("Łazienka", 2, 2, 2.6, bath.id);
+  const kitchenRoom = ws.wsAddRoom("Kuchnia", 3, 4, 2.6, kitchen.id);
+  const loose = ws.wsAddRoom("Piwnica", 3, 3, 2.2);
+  const line = save(ws, { projectId: bath.id });
+  /** Which room the STORED line names — wsLineRoomId() reads a row, not an id. */
+  const roomOf = (id) => ws.wsLineRoomId(ws.wsEstimations().find((e) => e.id === id));
+
+  eq("a room of another project is refused", ws.wsSetLineRoom(line.id, kitchenRoom.id), null);
+  eq("and the line stays where it was", roomOf(line.id), "");
+  eq("a room belonging to no project is refused too", ws.wsSetLineRoom(line.id, loose.id), null);
+  eq("a room id nobody ever made is refused", ws.wsSetLineRoom(line.id, "id-nope"), null);
+
+  const filed = ws.wsSetLineRoom(line.id, bathRoom.id);
+  check("a room of the line's own project is filed", !!filed);
+  eq("and reads back", roomOf(line.id), bathRoom.id);
+
+  /* A deleted room is not a room. The picker is rebuilt on every change, but a click that
+     arrives from a screen drawn a moment earlier must not resurrect the assignment. */
+  ws.wsDeleteRoom(bathRoom.id);
+  const relined = save(ws, { projectId: bath.id });
+  eq("a tombstoned room is refused", ws.wsSetLineRoom(relined.id, bathRoom.id), null);
+  eq("and taking a line out of a room needs no room at all",
+    ws.wsLineRoomId(ws.wsSetLineRoom(line.id, "")), "");
+}
+
 /* ------------------------------------------------------------------ report */
 
 console.log(`\nrooms: ${passed}/${passed + failures.length} checks pass`);

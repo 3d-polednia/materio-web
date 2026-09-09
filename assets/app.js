@@ -1821,16 +1821,21 @@ function wireSyncPanel() {
     pull.disabled = true;
     try {
       const incoming = await downloadAccount();
-      wsImport(incoming);
+      // Each of the three stores answers whether the merge is on this device now. A browser
+      // that refuses to write — a private window, a full quota — used to be told "pulled"
+      // and marked as synced with the account, so the next push sent back what it never
+      // received (audit 2026-09-04, M3).
+      const landed = [wsImport(incoming)];
       // The Pro store is its own key and its own merge; both are last-write-wins on
       // `updatedAt`, the same rule the phone uses.
-      if (typeof crmImport === "function") crmImport(incoming);
+      if (typeof crmImport === "function") landed.push(crmImport(incoming));
       // The visitor's own materials are a third store with a third key, merged by the same
       // rule. A material is replaced whole, its price history with it: merging two
       // histories would build a price trend that happened on neither device.
-      if (typeof omImport === "function") omImport(incoming);
-      setSyncAccount(state.uid);
+      if (typeof omImport === "function") landed.push(omImport(incoming));
       renderLocalSummary();
+      if (landed.some((ok) => ok === false)) { status(T("ws_save_failed"), true); return; }
+      setSyncAccount(state.uid);
       status(T("app_sync_pulled"));
     } catch (err) {
       status(T("app_err_unknown"), true);

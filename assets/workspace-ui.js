@@ -840,9 +840,11 @@ function buildProjectsPage() {
     const input = document.getElementById("ws-project-name");
     const name = input.value.trim();
     if (!name) return;
+    // The field is emptied only once the project is in the store. A write the browser
+    // refused used to take the typed name with it (audit 2026-09-04, M3).
+    if (!wsAddProject(name)) return;
     input.value = "";
     wsUndone = null; // a new project is a new subject; the old undo is stale
-    wsAddProject(name);
   });
 
   // The two lists behave the same, so one handler serves both. The name is a real link
@@ -879,13 +881,14 @@ function buildProjectsPage() {
     // and wsDim() reads a raw "3,5" as Number("3,5") — NaN, clamped to 0. The form on the
     // project screen has always parsed it; this one handed the string straight to the
     // store, so a room typed the way a Pole types it came out 3 × 0 × 2,6 m.
-    wsAddRoom(
+    const made = wsAddRoom(
       name.value.trim(),
       wsDecimal(document.getElementById("ws-room-length").value),
       wsDecimal(document.getElementById("ws-room-width").value),
       wsDecimal(document.getElementById("ws-room-height").value),
       projectId,
     );
+    if (!made) return; // the same rule as the project form above (M3)
     name.value = "";
     name.focus();
   });

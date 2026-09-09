@@ -26,6 +26,17 @@ const snap = (x) => {
 };
 const ceil = (x) => Math.ceil(snap(x)), floor = (x) => Math.floor(snap(x));
 const num = (v) => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
+/**
+ * A price field, told apart from an empty one.
+ *
+ * A blank price means "no price" and is worth 0; `abc` in the same field is a mistake and
+ * is worth nothing at all. `num()` answers NaN to both, and the old `num(f.price) || 0` turned
+ * that NaN into a free material — a quantity, a shopping list and no cost, which reads like
+ * a correct estimate rather than a typo (audit 2026-09-04, M5). The emptiness is decided on
+ * the raw text before it is parsed; anything else that is not a number leaves here as NaN,
+ * and every engine rejects it, because `price < 0` never did.
+ */
+const priceOf = (v) => (String(v === undefined || v === null ? "" : v).trim() === "" ? 0 : num(v));
 const profilesAcross = (span, spacing) => floor(span / spacing) + 1;
 /**
  * A field the engine has a default for: empty means "use the default", typed means typed.
@@ -119,9 +130,9 @@ function tryPlaceGuillotine(sheet, w, h, canRotate, kerf, type) {
 /* ---------- Engines (ports) ---------- */
 const ENGINES = {
   coverage(f) {
-    const gross = num(f.area), cov = num(f.cov), coats = Math.round(orDefault(f.coats, 1)), price = num(f.price) || 0, open = num(f.openings) || 0;
+    const gross = num(f.area), cov = num(f.cov), coats = Math.round(orDefault(f.coats, 1)), price = priceOf(f.price), open = num(f.openings) || 0;
     if (!(gross > 0) || !(cov > 0) || coats < 1 || open < 0 || open > gross) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const net = Math.max(gross - open, 0), covered = net * coats;
     const units = ceil(covered / cov), purchased = units * cov;
     const wastePct = purchased > 0 ? (purchased - covered) / purchased * 100 : 0;
@@ -136,9 +147,9 @@ const ENGINES = {
     ] };
   },
   waste(f) {
-    const area = num(f.area), cov = num(f.cov), w = num(f.waste) || 0, price = num(f.price) || 0;
+    const area = num(f.area), cov = num(f.cov), w = num(f.waste) || 0, price = priceOf(f.price);
     if (!(area > 0) || !(cov > 0) || w < 0) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const req = area * (1 + w / 100), pkgs = ceil(req / cov), purchased = pkgs * cov;
     const wastePct = purchased > 0 ? (purchased - area) / purchased * 100 : 0;
     // `purchased` is the m² those whole packs actually contain — the figure the waste
@@ -156,9 +167,9 @@ const ENGINES = {
    * them on the page. The arithmetic is unchanged.
    */
   wallpaper(f) {
-    const ww = num(f.wallW), wh = num(f.wallH), rw = orDefault(f.rollW, 0.53), rl = orDefault(f.rollL, 10.05), rep = num(f.pattern) || 0, price = num(f.price) || 0;
+    const ww = num(f.wallW), wh = num(f.wallH), rw = orDefault(f.rollW, 0.53), rl = orDefault(f.rollL, 10.05), rep = num(f.pattern) || 0, price = priceOf(f.price);
     if (!(ww > 0) || !(wh > 0) || !(rw > 0) || !(rl > 0) || rep < 0) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const stripLen = rep > 0 ? ceil(wh / rep) * rep : wh;
     // A strip longer than the roll cannot be cut from any roll on that shelf, so there is
     // no number of rolls to buy. The engine used to answer one roll per strip and label the
@@ -174,9 +185,9 @@ const ENGINES = {
     ] };
   },
   linear(f) {
-    const stock = num(f.stock), kerf = num(f.kerf) || 0, price = num(f.price) || 0, cuts = parseCuts(f.cuts);
+    const stock = num(f.stock), kerf = num(f.kerf) || 0, price = priceOf(f.price), cuts = parseCuts(f.cuts);
     if (!(stock > 0) || kerf < 0 || kerf >= stock) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const pieces = [];
     for (const c of cuts) { if (!(c.len > 0) || c.q <= 0) continue; for (let i = 0; i < Math.min(c.q, 100000); i++) pieces.push(c.len); }
     if (!pieces.length) return { err: "err_positive" };
@@ -205,10 +216,10 @@ const ENGINES = {
     // 2D guillotine bin-packing — ported 1:1 from GuillotinePackingEngine.kt.
     // Free-rectangle guillotine split: on each placement the used free rect is cut into a
     // right and a bottom offcut, both shrunk by the kerf. Placement is best-area-fit.
-    const SW = num(f.sheetW), SH = num(f.sheetL), kerf = num(f.kerf) || 0, price = num(f.price) || 0;
+    const SW = num(f.sheetW), SH = num(f.sheetL), kerf = num(f.kerf) || 0, price = priceOf(f.price);
     const canRotate = String(f.rotate === undefined ? "1" : f.rotate) !== "0";
     if (!(SW > 0) || !(SH > 0) || kerf < 0) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     if (kerf >= SW || kerf >= SH) return { err: "err_kerf" };
 
     const fitsSheet = (w, h) =>
@@ -275,9 +286,9 @@ const ENGINES = {
    * for the values the page opens with does not move.
    */
   concrete(f) {
-    const vol = num(f.vol), yield_ = orDefault(f.yield, 12.5), price = num(f.price) || 0;
+    const vol = num(f.vol), yield_ = orDefault(f.yield, 12.5), price = priceOf(f.price);
     if (!(vol > 0) || !(yield_ > 0)) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const litres = vol * 1000, bags = ceil(litres / yield_);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
       ["res_volume_l", qtyG(litres) + " |res_water_l|"],
@@ -285,9 +296,9 @@ const ENGINES = {
     ] };
   },
   mortar(f) {
-    const area = num(f.area), usage = num(f.usage), bag = orDefault(f.bag, 25), price = num(f.price) || 0;
+    const area = num(f.area), usage = num(f.usage), bag = orDefault(f.bag, 25), price = priceOf(f.price);
     if (!(area > 0) || !(usage > 0) || !(bag > 0)) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const kg = area * usage, bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [["res_kg_total", qtyG(kg) + " kg"]] };
   },
@@ -298,9 +309,9 @@ const ENGINES = {
    */
   screed(f) {
     const area = num(f.area), thk = num(f.thk), rate = orDefault(f.rate, 2.0);
-    const bag = orDefault(f.bag, 25), price = num(f.price) || 0;
+    const bag = orDefault(f.bag, 25), price = priceOf(f.price);
     if (!(area > 0) || !(thk > 0) || !(rate > 0) || !(bag > 0)) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const kg = area * thk * rate, bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
       ["res_kg_total", qtyG(kg) + " kg"],
@@ -317,9 +328,9 @@ const ENGINES = {
    */
   grout(f) {
     const area = num(f.area), L = num(f.tileL), W = num(f.tileW), thk = num(f.tileThk), joint = num(f.joint);
-    const bag = orDefault(f.bag, 5), price = num(f.price) || 0;
+    const bag = orDefault(f.bag, 5), price = priceOf(f.price);
     if (!(area > 0) || !(L > 0) || !(W > 0) || !(thk > 0) || !(joint > 0) || !(bag > 0)) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const kgPerM2 = (L + W) / (L * W) * thk * joint * 1.8, kg = kgPerM2 * area;
     const bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
@@ -329,9 +340,12 @@ const ENGINES = {
   },
   masonry(f) {
     // `|| 5` turned a typed 0 into 5 % waste, so asking for no allowance quietly added one.
-    const area = num(f.area), open = num(f.openings) || 0, pcs = num(f.pieces), binder = num(f.binder) || 0, w = orDefault(f.waste, 5), price = num(f.price) || 0;
-    if (!(area > 0) || !(pcs > 0) || binder < 0 || w < 0) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    const area = num(f.area), open = num(f.openings) || 0, pcs = num(f.pieces), binder = num(f.binder) || 0, w = orDefault(f.waste, 5), price = priceOf(f.price);
+    // `coverage` above rejects `open > gross`; this engine clamped the same case to a net of
+    // zero and answered "0 bloczków" as a valid result (audit 2026-09-04, M4). One calculator,
+    // one answer: more openings than wall is bad data in both.
+    if (!(area > 0) || !(pcs > 0) || binder < 0 || w < 0 || open < 0 || open > area) return { err: "err_positive" };
+    if (!(price >= 0)) return { err: "err_price" };
     const net = Math.max(area - Math.max(open, 0), 0), units = ceil(net * pcs * (1 + w / 100));
     return { tobuy: units, unit: "res_pieces", cost: units * price, rows: [
       ["res_net", qtyG(net) + " m²"],
@@ -339,9 +353,9 @@ const ENGINES = {
     ] };
   },
   insulation(f) {
-    const area = num(f.area), dow = orDefault(f.dowels, 6), adh = orDefault(f.adhesive, 5), thk = orDefault(f.foamThk, 15), price = num(f.price) || 0;
+    const area = num(f.area), dow = orDefault(f.dowels, 6), adh = orDefault(f.adhesive, 5), thk = orDefault(f.foamThk, 15), price = priceOf(f.price);
     if (!(area > 0) || !(dow > 0) || !(adh > 0) || !(thk > 0)) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const areaPerPkg = 0.30 * 100 / thk, foamPkgs = ceil(area / areaPerPkg);
     // The old first row read "80 m² · 15 cm" — the two values already in the fields above
     // it. TradeCalc.insulation returns the two figures that actually explain the pack
@@ -355,9 +369,9 @@ const ENGINES = {
     ] };
   },
   studwall(f) {
-    const width = num(f.width), height = num(f.height), sp = orDefault(f.studSp, 0.6), bar = orDefault(f.bar, 3), sides = Math.round(orDefault(f.sides, 2)), price = num(f.price) || 0;
+    const width = num(f.width), height = num(f.height), sp = orDefault(f.studSp, 0.6), bar = orDefault(f.bar, 3), sides = Math.round(orDefault(f.sides, 2)), price = priceOf(f.price);
     if (!(width > 0) || !(height > 0) || !(sp > 0) || !(bar > 0) || sides < 1) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const studCount = profilesAcross(width, sp), studBars = studCount * ceil(height / bar);
     const trackBars = ceil(2 * width / bar), anchors = 2 * profilesAcross(width, 0.6);
     const boards = boardsFor(width * height, sides);
@@ -372,9 +386,9 @@ const ENGINES = {
     ] };
   },
   ceiling(f) {
-    const width = num(f.width), length = num(f.length), mainSp = orDefault(f.mainSp, 0.4), hangSp = orDefault(f.hangSp, 0.9), price = num(f.price) || 0;
+    const width = num(f.width), length = num(f.length), mainSp = orDefault(f.mainSp, 0.4), hangSp = orDefault(f.hangSp, 0.9), price = priceOf(f.price);
     if (!(width > 0) || !(length > 0) || !(mainSp > 0) || !(hangSp > 0)) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const runs = profilesAcross(width, mainSp), mainTotal = runs * length, mainBars = ceil(mainTotal / 4);
     const perimeter = 2 * (width + length);
     const perimBars = ceil(perimeter / 3), hangers = runs * profilesAcross(length, hangSp);
@@ -390,9 +404,9 @@ const ENGINES = {
     ] };
   },
   drylining(f) {
-    const area = num(f.area), adh = orDefault(f.adhesive, 5), price = num(f.price) || 0;
+    const area = num(f.area), adh = orDefault(f.adhesive, 5), price = priceOf(f.price);
     if (!(area > 0) || !(adh > 0)) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const boards = boardsFor(area, 1), kg = area * adh, bags = ceil(kg / 25);
     return { tobuy: boards, unit: "res_boards", cost: boards * price, rows: [
       ["res_adhesive", qtyG(bags) + " × 25 kg (" + qtyG(kg) + " kg)"],
@@ -401,9 +415,9 @@ const ENGINES = {
   },
   sheathing(f) {
     // `|| 10` turned a typed 0 into a 10 % allowance nobody asked for.
-    const area = num(f.area), pw = num(f.pieceW), pl = num(f.pieceL), w = orDefault(f.waste, 10), price = num(f.price) || 0;
+    const area = num(f.area), pw = num(f.pieceW), pl = num(f.pieceL), w = orDefault(f.waste, 10), price = priceOf(f.price);
     if (!(area > 0) || !(pw > 0) || !(pl > 0) || w < 0) return { err: "err_positive" };
-    if (price < 0) return { err: "err_price" };
+    if (!(price >= 0)) return { err: "err_price" };
     const pieceArea = (pw / 1000) * (pl / 1000), withWaste = area * (1 + w / 100), pieces = ceil(withWaste / pieceArea);
     // The panel was the sheet count and nothing else. SheathingResult returns both of
     // these, and one sheet's area is the number that makes the count checkable.
