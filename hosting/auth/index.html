@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>auth.liczmat.com — LiczMat</title>
+<!--
+  This is the whole of the Firebase Hosting site behind auth.liczmat.com, and it is
+  deliberately one file with no assets.
+
+  The subdomain exists for one reason: Firebase Authentication will only put a custom
+  address in the From field of its account e-mails if the domain is a Hosting site in the
+  same project, because it serves the action link — /__/auth/action?mode=…&oobCode=… —
+  from that same host. liczmat.com itself is on GitHub Pages and cannot serve /__/auth/,
+  so the apex stays where it is and this subdomain carries the e-mail half alone.
+
+  /__/auth/* is Firebase's own reserved path and is not in this directory: Hosting answers
+  it before it ever reaches these files. What is here is only what somebody sees if they
+  type the bare subdomain into a browser, which is a thing that will happen, because the
+  address is printed in every password-reset mail.
+
+  Nothing else may be added here. The 523 pages of the site are published to GitHub Pages
+  from the repository root, and a second copy on Firebase Hosting would be a second site
+  at a second address competing with the first for the same search results.
+  scripts/test-hosting.mjs is what keeps that true.
+-->
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center;
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #0f1115; color: #e8eaed; padding: 24px;
+  }
+  main { max-width: 34rem; text-align: center; }
+  h1 { font-size: 1.25rem; margin: 0 0 1rem; }
+  p { margin: 0 0 1rem; color: #b6bcc6; }
+  a { color: #6fd6c4; }
+</style>
+</head>
+<body>
+<main>
+  <h1>auth.liczmat.com</h1>
+  <p lang="pl">Ten adres obsługuje wyłącznie linki z e-maili konta LiczMat: potwierdzenie
+  adresu, reset hasła i cofnięcie zmiany adresu. Nie ma tu nic do oglądania — serwis jest
+  pod <a href="https://liczmat.com/">liczmat.com</a>, a konto pod
+  <a href="https://liczmat.com/app/">liczmat.com/app/</a>.</p>
+  <p lang="en">This host only serves the links in LiczMat account e-mails — address
+  verification, password reset and e-mail change reversal. The site itself is at
+  <a href="https://liczmat.com/">liczmat.com</a>.</p>
+  <p lang="pl">Kontakt: <a href="mailto:contact@liczmat.com">contact@liczmat.com</a></p>
+</main>
+</body>
+</html>

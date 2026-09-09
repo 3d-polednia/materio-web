@@ -39,6 +39,19 @@
  * materio-502513.firebaseapp.com is where the Google popup runs its handler (2026-08-13),
  * and leaving the materio-app.com pair in place costs nothing.
  *
+ * ─── ONE ENTRY IS OWED TO BOTH LISTS: auth.liczmat.com (2026-09-09) ───
+ * The account e-mails are moving off noreply@materio-502513.firebaseapp.com and onto
+ * auth.liczmat.com, a Firebase Hosting site in this project — docs/AUTH-EMAIL.md is the
+ * whole procedure and hosting/auth/ is the site. The link in those mails becomes
+ * https://auth.liczmat.com/__/auth/action, and that page calls Identity Toolkit like any
+ * other, so the subdomain has to be on BOTH lists: the browser key's Website restrictions
+ * (https://auth.liczmat.com/*) and Auth's authorized domains. Miss the first and the mail
+ * arrives, the link opens and the page answers 403 API_KEY_HTTP_REFERRER_BLOCKED — the
+ * failure looks like a broken reset rather than a missing referrer.
+ * `authDomain` below does NOT move: it is the OAuth popup's handler, a different door.
+ * This is a requirement, not a measurement — the console cannot be read from here, and
+ * nothing in this repository can tell you whether the owner has done it.
+ *
  * NOT wired up on purpose: the Web app also carries a `measurementId`
  * (G-E6QV42MJNQ) for Firebase Analytics. The site already loads GA4 as G-22PS16K79V
  * behind the consent banner; adding a second tracker would mean a second stream and a

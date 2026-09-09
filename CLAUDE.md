@@ -124,6 +124,7 @@ node scripts/test-security.mjs    # authorization, data isolation, the API, the 
 node scripts/test-qa.mjs          # the whole path, end to end, in a real browser
 node scripts/test-langs.mjs       # the thirteen languages and what every picker calls them
 node scripts/test-copy.mjs        # stop slop: length, repetition, claims, the page budget
+node scripts/test-hosting.mjs     # what a Firebase deploy would upload, and what it may not
 python3 -m http.server 8080       # then open http://localhost:8080/
 ```
 
@@ -654,6 +655,17 @@ scripts/test-webhook-map.mjs  The webhook, checked without the cloud: the signat
                       the decision for all four handled events, and the deployment
                       boundaries — that functions/ never reaches the published site and no
                       Stripe secret is in the repository
+scripts/test-hosting.mjs  The other deployment boundary, added the day firebase.json
+                      gained a `hosting` block (2026-09-09). Until then a `firebase deploy`
+                      could publish nothing but Cloud Functions; now it can publish a
+                      directory, and the default in a file like that is `"public": "."` —
+                      which would put all 523 pages on a second address competing with
+                      GitHub Pages for the same search results. The test pins the site to
+                      `hosting/auth/`, insists the directory holds exactly its two files
+                      and that neither carries the site's footer, i18n hooks or stylesheet,
+                      checks the subdomain asks not to be indexed in both places it can,
+                      and that pages.yml drops `hosting/` from the artifact the way it
+                      drops `functions/`
 scripts/pro-admin.mjs  Granting and taking away LiczMat Pro, by e-mail (session 37 of the
                       repair plan). `plan` is server-only, so nothing in a browser can
                       write it and nothing did: this is the first thing that can. Reads a
@@ -916,6 +928,14 @@ docs/STRIPE.md        Switching the sale on: the six steps that are console work
                       the checkout presents, and VAT). Written for the owner, in Polish;
                       `scripts/test-pay.mjs` §3b checks its prices and its event list
                       against the code rather than trusting the prose
+docs/AUTH-EMAIL.md    Moving the account e-mails off noreply@materio-502513.firebaseapp.com
+                      and onto auth.liczmat.com: why it has to be a subdomain, the eight
+                      console and DNS steps in the order that breaks nothing, which three
+                      apex records must never be edited, where the SPF include belongs, how
+                      to read the headers of one real password reset, and how to undo it.
+                      Written for the owner, in Polish. The repository half of it is the
+                      `hosting` block in firebase.json plus `hosting/auth/`, guarded by
+                      `scripts/test-hosting.mjs`
 ```
 
 **Run `node scripts/test-calculators.mjs` after touching a calculator.** It needs nothing
@@ -1062,8 +1082,29 @@ Kotlin side of it. Change one, change all three.
   `https://materio-502513.firebaseapp.com/*` and `https://materio-502513.web.app/*` in the
   Google Cloud console. Verified after: the key answers 200 for that referrer and for
   `materio-app.com`, and both hosts are on the Auth authorized-domains list. A custom
-  `authDomain` was never an option — GitHub Pages cannot serve `/__/auth/`. **Keep those
-  two entries** if the key's restrictions are ever edited again.
+  `authDomain` **on the apex** was never an option — GitHub Pages cannot serve `/__/auth/`,
+  and `liczmat.com` is on GitHub Pages. That is a fact about the apex, not about the
+  project: a Firebase Hosting site serves `/__/auth/` natively, which is exactly what
+  `auth.liczmat.com` is for (next bullet). The SDK's `authDomain` in
+  `assets/firebase-config.js` stays `materio-502513.firebaseapp.com` all the same — moving
+  it would move the Google popup handler, and that is a different door from the one the
+  e-mails knock on. **Keep those two entries** if the key's restrictions are ever edited
+  again.
+- **The account e-mails are meant to come from `auth.liczmat.com`, and the repository half
+  of that is here (2026-09-09).** Firebase Authentication will only put a custom address in
+  the `From` field of the verification, password-reset and address-change mails if the
+  domain is a Hosting site in the same project, because it serves the action link
+  `/__/auth/action?mode=…&oobCode=…` from that same host. The apex cannot be that site
+  without abandoning GitHub Pages, so a subdomain carries the mail half alone: the
+  `hosting` block in `firebase.json` publishes `hosting/auth/` — two files, an explanation
+  page and a `robots.txt` — to the Hosting site `liczmat-auth`. **Deploy it with
+  `firebase deploy --only hosting:liczmat-auth`, never a bare `firebase deploy`**, and read
+  `docs/AUTH-EMAIL.md` before touching the console or the DNS zone: the apex `MX`, its
+  single `v=spf1` record and the GitHub Pages `A` records must not be edited, and Firebase's
+  own SPF include, if it asks for one, belongs on the subdomain. `scripts/test-hosting.mjs`
+  is what stops a later edit from publishing the 523 pages to Hosting as a second site.
+  **The console and DNS half is the owner's and cannot be read back from here** — until he
+  says otherwise, the mails still come from `noreply@materio-502513.firebaseapp.com`.
 - **Firebase mails go out in the visitor's language.** `auth.languageCode` is set in
   `boot()` and follows `langchange`. Without it Firebase defaults to English, so the page
   said "Wysłaliśmy link do zmiany hasła" and an English mail arrived.

@@ -71,7 +71,7 @@ function checkAll(name, list, ok, describe) {
  */
 function collect(dir = ROOT, out = []) {
   for (const name of readdirSync(dir)) {
-    if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions"].includes(name)) continue;
+    if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions", "hosting"].includes(name)) continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) { collect(full, out); continue; }
     if (!name.endsWith(".html")) continue;

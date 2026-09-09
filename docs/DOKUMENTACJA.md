@@ -155,6 +155,9 @@ docs/
   DESIGN_SYSTEM.md       System projektowy: tokeny, komponenty, stany, motywy
   COPY.md                Zasady copy („stop slop") i ich uzasadnienie
   STRIPE.md              Włączenie sprzedaży: sześć kroków w konsoli Stripe
+  ADMIN.md               Panel admina: dwa kroki jednorazowe, cztery przyciski
+  AUTH-EMAIL.md          Maile konta z własnej domeny: `auth.liczmat.com`, osiem kroków
+                         w konsoli i DNS, i czego w strefie nie wolno ruszyć
 ```
 
 Pliki **generowane** (`node scripts/build.mjs`, nie edytuj ręcznie):

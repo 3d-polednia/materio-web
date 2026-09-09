@@ -1,0 +1,6 @@
+# auth.liczmat.com carries no content of its own — it exists so Firebase Authentication
+# can put liczmat.com in the From field of its account e-mails and serve the action link
+# from the same domain. Nothing here is a page anybody should reach from a search result,
+# and an indexed /__/auth/action without an oobCode is an error message with a brand on it.
+User-agent: *
+Disallow: /

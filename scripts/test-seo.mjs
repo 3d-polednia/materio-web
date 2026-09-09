@@ -66,8 +66,10 @@ function check(name, cond, detail) {
 /** Every .html file in the published tree, parsed down to the tags this suite reads. */
 function collect(dir = ROOT, out = []) {
   for (const name of readdirSync(dir)) {
-    // The four directories the Pages workflow strips out, plus git's own.
-    if ([".git", "node_modules", "docs", "src", "scripts", "assets"].includes(name)) continue;
+    // The five directories the Pages workflow strips out, plus git's own. `hosting/` is
+    // the newest of them (2026-09-09): two files of a Firebase Hosting site that carries
+    // the account e-mails' domain and is not a page of this site — scripts/test-hosting.mjs.
+    if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions", "hosting"].includes(name)) continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) { collect(full, out); continue; }
     if (!name.endsWith(".html")) continue;

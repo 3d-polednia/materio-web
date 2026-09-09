@@ -24,6 +24,9 @@ firebase deploy --only functions
 ```
 
 Wdraża **obie** funkcje z `functions/`: webhook Stripe'a (sesja 38) i `adminPlan`.
+Flaga `--only` przestała być kosmetyką 2026-09-09: `firebase.json` ma od tego dnia także
+blok `hosting` (witryna `liczmat-auth` dla maili konta, `docs/AUTH-EMAIL.md`), więc samo
+`firebase deploy` ruszyłoby obie rzeczy naraz.
 Wymaga planu **Blaze** na projekcie `materio-502513` — Cloud Functions v2 nie działają na
 planie darmowym. Jeśli webhook był już wdrażany przy włączaniu sprzedaży
 (`docs/STRIPE.md`, krok 4), ten krok jest tylko powtórzeniem tego samego polecenia; nowa

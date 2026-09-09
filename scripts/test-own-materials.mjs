@@ -562,7 +562,7 @@ head("10. no key is printed where a visitor can read it");
   const files = [];
   (function walk(dir) {
     for (const name of readdirSync(dir)) {
-      if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions"].includes(name)) continue;
+      if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions", "hosting"].includes(name)) continue;
       const full = join(dir, name);
       if (statSync(full).isDirectory()) walk(full);
       else if (name.endsWith(".html")) files.push(full);

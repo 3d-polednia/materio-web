@@ -123,7 +123,7 @@ function loadApp(store) {
 /** Every shipped .html file: the generated ones and the two written by hand. */
 function shippedPages(dir = ROOT, out = []) {
   for (const name of readdirSync(dir)) {
-    if ([".git", "node_modules", "docs", "src", "scripts"].includes(name)) continue;
+    if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions", "hosting"].includes(name)) continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) shippedPages(full, out);
     else if (name.endsWith(".html")) out.push(relative(ROOT, full));

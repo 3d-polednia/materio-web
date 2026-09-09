@@ -88,7 +88,7 @@ Pliki **pisane ręcznie**:
 
 ```
 scripts/build.mjs       Generator stron (Node, bez zależności)
-scripts/test-*.mjs      Zestawy testów (42 pliki)
+scripts/test-*.mjs      Zestawy testów (52 pliki)
 scripts/pro-admin.mjs   Nadawanie i odbieranie LiczMat Pro po adresie e-mail
 src/
   ia.mjs                Architektura informacji: każda trasa, jej poziom dostępu,
@@ -138,6 +138,11 @@ assets/
 functions/              Cloud Function: webhook Stripe nadający plan. Wdrażana
                         osobno (`firebase deploy --only functions`), NIGDY nie
                         trafia na Pages
+hosting/auth/           Dwa pliki witryny `auth.liczmat.com` w Firebase Hosting —
+                        subdomena istnieje po to, żeby maile konta wychodziły
+                        z własnej domeny (`docs/AUTH-EMAIL.md`). Wdrażana osobno
+                        (`firebase deploy --only hosting:liczmat-auth`), tak samo
+                        jak `functions/` nie trafia na Pages
 privacy-policy.html · 404.html · robots.txt · site.webmanifest · .nojekyll
 .github/workflows/pages.yml   Wdrożenie na GitHub Pages (tylko z gałęzi main)
 docs/                   Dokumentacja i plan produktu
@@ -173,7 +178,8 @@ python3 -m http.server 8080   # potem wejdź na http://localhost:8080
 
 Workflow `.github/workflows/pages.yml` publikuje katalog główny repo przy każdym
 pushu **do `main`**, po wyrzuceniu z artefaktu `docs/`, `src/`, `scripts/`,
-`functions/`, `CLAUDE.md` i `README.md` — korzeń repo jest korzeniem serwisu, więc
+`functions/`, `hosting/`, `CLAUDE.md` i `README.md` — korzeń repo jest korzeniem
+serwisu, więc
 wszystko, co w nim zostanie, jest publiczne. Domena własna: `liczmat.com`
 (plik `CNAME` + `BASE` w `src/site.mjs`).
 

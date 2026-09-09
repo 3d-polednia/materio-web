@@ -61,10 +61,10 @@ const kb = (n) => `${(n / 1024).toFixed(1)} kB`;
 
 /* ------------------------------------------------------------------ the pages */
 
-/** Every .html file in the published tree. The four stripped directories are skipped. */
+/** Every .html file in the published tree. The five stripped directories are skipped. */
 function collect(dir = ROOT, out = []) {
   for (const name of readdirSync(dir)) {
-    if ([".git", "node_modules", "docs", "src", "scripts", "assets"].includes(name)) continue;
+    if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions", "hosting"].includes(name)) continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) { collect(full, out); continue; }
     if (name.endsWith(".html")) out.push(full.slice(ROOT.length + 1));

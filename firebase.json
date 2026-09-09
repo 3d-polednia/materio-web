@@ -3,5 +3,12 @@
     "source": "functions",
     "codebase": "default",
     "ignore": ["node_modules", ".git", "*.log"]
-  }
+  },
+  "hosting": [
+    {
+      "site": "liczmat-auth",
+      "public": "hosting/auth",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    }
+  ]
 }
