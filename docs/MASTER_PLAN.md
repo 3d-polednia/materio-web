@@ -559,6 +559,24 @@ same błędy co przed sesją, sprawdzone przez `git stash`, więc nie są jej sk
 Rzeczywistej płatności przez Stripe nikt nie wykonał — to jest krok 5 z `docs/STRIPE.md`
 i wymaga wdrożonych funkcji.
 
+### Dwie rzeczy zmierzone przy okazji, obie otwarte
+
+- **`scripts/test-perf.mjs` nie dochodzi do żadnego wyniku.** Przewraca się wyjątkiem
+  `TypeError: Cannot read properties of undefined (reading 'html')` w linii 488, zanim
+  cokolwiek wypisze, więc **budżety wagi stron nie bramkują dziś niczego**. Wcześniejsze
+  sesje notowały to jako „wywala się w linii 477" — linia się przesunęła, awaria nie.
+  Uwaga na przyszłość: pętla „uruchom wszystkie testy i pokaż błędy" szukająca `✗` **tego
+  nie widzi**, bo zestaw, który się przewraca, nie wypisuje ani jednego znaku porażki.
+  Liczyć kod wyjścia, nie znaczki.
+- **Rozkrój liniowy ma tę samą dziurę, którą H6 załatało w rozkroju płyt.**
+  `assets/calculators.js:181` sprawdza `Math.min(c.q, 100000)` **per wiersz**, a tablica
+  `pieces` zbiera wszystkie wiersze bez sufitu. Wklejona lista z kilkoma wierszami po
+  100 tys. sztuk zamraża kartę tak samo jak przed H6. Wagą to jest znalezisko wysokie
+  i nie należy do żadnej z sesji A/B/C — H6 opisywało wyłącznie `sheets`.
+
+Pełna lista otwartych wątków obu repozytoriów, przejrzana i zmierzona tego samego dnia,
+leży w skarbcu: `Obsidian/Liczmat/Meta/Otwarte watki.md`.
+
 **NASTĘPNA SESJA: B** — M3–M7, logika w przeglądarce.
 
 ## Sesja 64 — sześć znalezisk niskich z audytu i rozmrożenie języków (2026-09-09)
