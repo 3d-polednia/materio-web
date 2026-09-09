@@ -150,7 +150,9 @@ assets/
 docs/
   DOKUMENTACJA.md        Ten plik
   MASTER_PLAN.txt        Plan produktu — oryginał właściciela, źródło prawdy o zakresie
-  MASTER_PLAN.md         Status prac, otwarte decyzje, lista rzeczy do zrobienia w konsolach
+  MASTER_PLAN.md         Status prac, znane ograniczenia, otwarte decyzje, rzeczy do zrobienia
+                         w konsolach. Opisy zamkniętych sesji od 2026-09-09 leżą w skarbcu
+                         Obsidian (Liczmat/Historia/); ten plik wymienia, w której notatce
   ARCHITEKTURA.md        Architektura informacji: strony, routing, poziomy dostępu
   DESIGN_SYSTEM.md       System projektowy: tokeny, komponenty, stany, motywy
   COPY.md                Zasady copy („stop slop") i ich uzasadnienie

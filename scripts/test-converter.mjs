@@ -4,7 +4,8 @@
  *
  *     node scripts/test-converter.mjs
  *
- * Session 57, item C1 of the parity audit in docs/MASTER_PLAN.md: the converter was the
+ * Session 57, item C1 of the parity audit (written up in the vault,
+ * Obsidian/Liczmat/Historia/): the converter was the
  * largest thing the Android app had and the website did not. The engine is a port of
  * core/calculation/UnitConverter.kt, so this file asks it the two questions a port has to
  * answer — does it hold the same units, and does it give the same numbers — and then asks

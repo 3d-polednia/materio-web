@@ -11,7 +11,16 @@ construction-material calculator. *Policz. Zaplanuj. Zrealizuj.*
 > its contents anywhere; two copies drift.
 >
 > `docs/MASTER_PLAN.md` next to it is the short working document: which sessions are
-> done, and which decisions are still open. Update it at the end of a session.
+> done, what is waiting on a console, what limitations are known and which decisions are
+> still open. Update it at the end of a session.
+>
+> It used to be the session journal as well, and had grown to 6694 lines — twelve times
+> the plan it tracks. On 2026-09-09 the write-ups of closed sessions moved, verbatim, to
+> the Obsidian vault at `Obsidian/Liczmat/Historia/`, and the resolved decisions with
+> them; `docs/MASTER_PLAN.md` names the files. **Read the vault before calling something
+> in this code an oversight** — half of those write-ups explain why a thing looks odd,
+> and more than once it has turned out to be the owner's deliberate choice rather than a
+> bug. The vault's `Meta/Otwarte watki.md` is the one list that spans both repos.
 >
 > **One session = one task** is the plan's hardest rule (chapter XXXV). Do the session
 > you were asked for, write the report chapter XXXIII asks for, and stop — do not roll

@@ -137,8 +137,8 @@ export const ROUTES = [
     parent: "calculators", localized: true, indexable: true,
     path: urlConverter,
     footer: { order: 2, key: "convpage_title" },
-    note: "The unit converter — session 57, item C1 of the parity audit in " +
-      "docs/MASTER_PLAN.md. Eleven categories, ported 1:1 from " +
+    note: "The unit converter — session 57, item C1 of the parity audit, written up in " +
+      "the vault at Obsidian/Liczmat/Historia/. Eleven categories, ported 1:1 from " +
       "core/calculation/UnitConverter.kt in the app repo, which had it from the start " +
       "while the site had nothing. GUEST for the reason every calculator is: it needs no " +
       "account, saves nothing and asks for nothing. Parented under `calculators` because " +
