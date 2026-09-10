@@ -100,33 +100,14 @@ function omSave(data) {
     omSaveRefused();
     return false;
   }
-  if (omRefusedBanner) omRefusedBanner.hidden = true;
   document.dispatchEvent(new CustomEvent("ownmaterialschange"));
   return true;
 }
 
-/* Built here rather than in assets/own-materials-ui.js, because /app/ loads this file to push
-   and pull the catalogue and loads no interface with it. It borrows the consent banner's
-   class, so it needs no new CSS. */
-let omRefusedBanner = null;
-
-/** Say that a write did not land: an event for the screens, a banner for the visitor. */
+/** Say that a write did not land. What the screen does with that is assets/main.js. */
 function omSaveRefused() {
   if (typeof document === "undefined" || !document) return;
   document.dispatchEvent(new CustomEvent("ownmaterialssavefailed"));
-  const text = typeof t === "function" ? t("ws_save_failed") : "";
-  if (!text || !document.body) return;
-  if (!omRefusedBanner) {
-    omRefusedBanner = document.createElement("div");
-    omRefusedBanner.className = "consent-banner";
-    omRefusedBanner.setAttribute("role", "alert");
-    const p = document.createElement("p");
-    p.className = "consent-text";
-    p.textContent = text;
-    omRefusedBanner.appendChild(p);
-    document.body.appendChild(omRefusedBanner);
-  }
-  omRefusedBanner.hidden = false;
 }
 
 const omId = () => (crypto.randomUUID ? crypto.randomUUID()

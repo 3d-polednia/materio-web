@@ -330,7 +330,47 @@ function buildThemeToggle() {
   paint();
 }
 
+/**
+ * The banner for a write the browser refused — a private window, or a quota already full.
+ *
+ * The three stores (assets/workspace.js, assets/crm-store.js, assets/own-materials.js) know
+ * nothing about the page by design (scripts/test-projects.mjs §10): they say a write did not
+ * land and this answers for the screen. One banner serves all three, because a quota that
+ * stops one stops the next in the same click, and because the sentence is the same one.
+ *
+ * It is taken back down by the change event a landed write already fires — no second message
+ * is needed to say that saving works again. Built on the consent banner's class, so the audit
+ * of 2026-09-04 (M3) needed no new CSS and no rebuilt page.
+ */
+function buildSaveFailed() {
+  const FAILED = ["workspacesavefailed", "crmsavefailed", "ownmaterialssavefailed"];
+  const LANDED = ["workspacechange", "crmchange", "ownmaterialschange"];
+  let banner = null;
+
+  const show = () => {
+    const text = typeof t === "function" ? t("ws_save_failed") : "";
+    if (!text || !document.body) return;
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.className = "consent-banner";
+      banner.setAttribute("role", "alert");
+      const p = document.createElement("p");
+      p.className = "consent-text";
+      p.textContent = text;
+      banner.appendChild(p);
+      document.body.appendChild(banner);
+    }
+    banner.hidden = false;
+  };
+
+  FAILED.forEach((type) => document.addEventListener(type, show));
+  LANDED.forEach((type) => document.addEventListener(type, () => {
+    if (banner) banner.hidden = true;
+  }));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  buildSaveFailed();
   if (typeof buildCalculators === "function") buildCalculators();
   if (typeof buildStoreFinder === "function") buildStoreFinder();
   buildHeroCarousels();

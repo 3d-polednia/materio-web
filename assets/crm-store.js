@@ -71,33 +71,14 @@ function crmSave(data) {
     crmSaveRefused();
     return false;
   }
-  if (crmRefusedBanner) crmRefusedBanner.hidden = true;
   document.dispatchEvent(new CustomEvent("crmchange"));
   return true;
 }
 
-/* The banner is built here rather than in assets/crm-ui.js for the reason the store is its
-   own file at all: /app/ loads this one to push and pull the store and loads no interface
-   with it. It borrows the consent banner's class, so it needs no new CSS. */
-let crmRefusedBanner = null;
-
-/** Say that a write did not land: an event for the screens, a banner for the visitor. */
+/** Say that a write did not land. What the screen does with that is assets/main.js. */
 function crmSaveRefused() {
   if (typeof document === "undefined" || !document) return;
   document.dispatchEvent(new CustomEvent("crmsavefailed"));
-  const text = typeof t === "function" ? t("ws_save_failed") : "";
-  if (!text || !document.body) return;
-  if (!crmRefusedBanner) {
-    crmRefusedBanner = document.createElement("div");
-    crmRefusedBanner.className = "consent-banner";
-    crmRefusedBanner.setAttribute("role", "alert");
-    const p = document.createElement("p");
-    p.className = "consent-text";
-    p.textContent = text;
-    crmRefusedBanner.appendChild(p);
-    document.body.appendChild(crmRefusedBanner);
-  }
-  crmRefusedBanner.hidden = false;
 }
 
 /* --------------------------------------------------- the other tab

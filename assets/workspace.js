@@ -88,8 +88,9 @@ function wsLoad() {
  * save: a project somebody kept working in, that a refresh then took away, is worse than
  * being told the browser refused it.
  *
- * The refusal reaches the screen from here as well — once, rather than at fifteen call
- * sites — and the next write that lands takes the message back down.
+ * The refusal reaches the screen through one event rather than at fifteen call sites:
+ * `workspacesavefailed`, answered by assets/main.js, which is loaded by every page. The next
+ * write that lands fires `workspacechange`, and that is what takes the message back down.
  */
 function wsSave(data) {
   try {
@@ -99,33 +100,14 @@ function wsSave(data) {
     wsSaveRefused();
     return false;
   }
-  if (wsRefusedBanner) wsRefusedBanner.hidden = true;
   document.dispatchEvent(new CustomEvent("workspacechange"));
   return true;
 }
 
-/* The one thing this file draws, and the reason it draws it: every page that can write the
-   workspace loads assets/workspace.js, and only some of them load assets/workspace-ui.js.
-   It borrows the consent banner's class, so it needs no new CSS and no rebuilt page. */
-let wsRefusedBanner = null;
-
-/** Say that a write did not land: an event for the screens, a banner for the visitor. */
+/** Say that a write did not land. What the screen does with that is assets/main.js. */
 function wsSaveRefused() {
   if (typeof document === "undefined" || !document) return;
   document.dispatchEvent(new CustomEvent("workspacesavefailed"));
-  const text = typeof t === "function" ? t("ws_save_failed") : "";
-  if (!text || !document.body) return;
-  if (!wsRefusedBanner) {
-    wsRefusedBanner = document.createElement("div");
-    wsRefusedBanner.className = "consent-banner";
-    wsRefusedBanner.setAttribute("role", "alert");
-    const p = document.createElement("p");
-    p.className = "consent-text";
-    p.textContent = text;
-    wsRefusedBanner.appendChild(p);
-    document.body.appendChild(wsRefusedBanner);
-  }
-  wsRefusedBanner.hidden = false;
 }
 
 /* --------------------------------------------------- the other tab
