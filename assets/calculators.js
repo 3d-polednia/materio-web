@@ -188,8 +188,14 @@ const ENGINES = {
     const stock = num(f.stock), kerf = num(f.kerf) || 0, price = priceOf(f.price), cuts = parseCuts(f.cuts);
     if (!(stock > 0) || kerf < 0 || kerf >= stock) return { err: "err_positive" };
     if (!(price >= 0)) return { err: "err_price" };
+    // Count the whole list first, expand it second: the row that breaks the ceiling can be
+    // the last one, and by then the earlier rows would already be numbers in memory.
+    let wanted = 0;
+    for (const c of cuts) { if (!(c.len > 0) || c.q <= 0) continue; wanted += c.q; }
+    if (wanted > PACK_MAX_PIECES) return { err: "err_toomany" };
+
     const pieces = [];
-    for (const c of cuts) { if (!(c.len > 0) || c.q <= 0) continue; for (let i = 0; i < Math.min(c.q, 100000); i++) pieces.push(c.len); }
+    for (const c of cuts) { if (!(c.len > 0) || c.q <= 0) continue; for (let i = 0; i < c.q; i++) pieces.push(c.len); }
     if (!pieces.length) return { err: "err_positive" };
     if (Math.max(...pieces) > stock) return { err: "err_toobig" };
     pieces.sort((a, b) => b - a);

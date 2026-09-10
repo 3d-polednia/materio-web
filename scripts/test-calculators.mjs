@@ -531,6 +531,25 @@ eq("sheet: 100 001 pieces over two rows are one piece over the ceiling",
 // A row that cuts nothing is still skipped before the count, exactly as it was before.
 eq("sheet: a 0-piece row does not count towards the ceiling",
   run("sheet", { pieces: "600x400x0\n800x300x4" }).err, undefined);
+eq("linear: more than 100 000 of one piece is refused", run("linear", { cuts: "500x100001" }).err, "err_toomany");
+// The same ceiling, read one row at a time, let a pasted list through: three rows of 60 000
+// are 180 000 pieces for a packer that walks every bar for every one of them. The
+// refusal has to happen before the list is expanded, so it has to be instant as well.
+{
+  const t0 = Date.now();
+  const r = run("linear", { cuts: "500x60000\n500x60000\n500x60000" });
+  eq("linear: 180 000 pieces spread over three rows are refused too", r.err, "err_toomany");
+  check("linear: …and refused without packing anything", Date.now() - t0 < 1000);
+}
+// One piece over the ceiling, split across two rows, is still one piece over it.
+eq("linear: 100 001 pieces over two rows are one piece over the ceiling",
+  run("linear", { cuts: "500x50000\n500x50001" }).err, "err_toomany");
+// A row that cuts nothing is still skipped before the count, exactly as it was before.
+eq("linear: a 0-piece row does not count towards the ceiling",
+  run("linear", { cuts: "500x0\n500x4" }).err, undefined);
+// A total exactly AT the ceiling is still answered, not refused.
+eq("linear: exactly 100 000 pieces are answered, not refused",
+  run("linear", { cuts: "500x100000" }).err, undefined);
 
 // --- tiny but legitimate ----------------------------------------------------------------
 eq("coverage: 0,01 m² still needs a pack", run("coverage", { area: "0.01", cov: "40", coats: "1", openings: "0" }).tobuy, 1);
