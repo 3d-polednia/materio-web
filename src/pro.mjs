@@ -224,31 +224,34 @@ export function proGate(t, featureId, features, lang, opts) {
   // longer route.
   const others = proModules(features)
     .filter((f) => f.id !== feature.id)
-    .map((f) => `<li><b>${esc(t(`${f.key}_t`))}</b> — <span class="muted">${esc(t(`${f.key}_d`))}</span></li>`)
+    .map((f) => `<li><b data-i18n="${f.key}_t">${esc(t(`${f.key}_t`))}</b> — <span class="muted" data-i18n="${f.key}_d">${esc(t(`${f.key}_d`))}</span></li>`)
     .join("\n            ");
 
   // The two blocks a second wall on the same page leaves to the first — see `brief`.
   const brief = Boolean(opts && opts.brief);
   const included = brief ? "" : `<div class="pw-incl">
-          <h3>${esc(t("pro_incl_t"))}</h3>
+          <h3 data-i18n="pro_incl_t">${esc(t("pro_incl_t"))}</h3>
           <ul class="pw-incl-list">
             ${others}
           </ul>
         </div>`;
   const plans = brief ? "" : proPlansBlock(t, { checkout: false });
 
+  // The wall needs data-i18n on every string, even though the build writes it once per
+  // language: /app/ is a single page, so a visitor switching language repaints only
+  // elements carrying data-i18n, and anything without it stays in the language they left.
   return `<div class="app-card crm-gate pw-gate" id="${id}" hidden>
-        <h2>${esc(t(`${feature.key}_t`))}</h2>
-        <p class="muted">${esc(t(`${feature.key}_d`))}</p>
-        <p><span class="chip">${esc(t("pro_locked"))}</span></p>
+        <h2 data-i18n="${feature.key}_t">${esc(t(`${feature.key}_t`))}</h2>
+        <p class="muted" data-i18n="${feature.key}_d">${esc(t(`${feature.key}_d`))}</p>
+        <p><span class="chip" data-i18n="pro_locked">${esc(t("pro_locked"))}</span></p>
 
         <!-- One rung of the Free → Pro path, chosen by assets/paywall.js from the level.
              Both are in the markup; neither is shown until the script knows which. -->
-        <p class="pw-step" data-pw-step="account" hidden>${esc(t("pro_need_account"))}</p>
+        <p class="pw-step" data-pw-step="account" hidden data-i18n="pro_need_account">${esc(t("pro_need_account"))}</p>
         <p class="pw-step" data-pw-step="account" hidden>
-          <a class="btn btn-primary btn-sm" href="${signup}" rel="nofollow">${esc(t("pro_signin"))}</a>
+          <a class="btn btn-primary btn-sm" href="${signup}" rel="nofollow" data-i18n="pro_signin">${esc(t("pro_signin"))}</a>
         </p>
-        <p class="pw-step" data-pw-step="upgrade" hidden>${esc(t("pro_need_pro"))}</p>
+        <p class="pw-step" data-pw-step="upgrade" hidden data-i18n="pro_need_pro">${esc(t("pro_need_pro"))}</p>
 
         ${included}
 

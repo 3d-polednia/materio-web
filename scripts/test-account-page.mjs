@@ -531,36 +531,44 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
     "Nic jeszcze nie nadaje planu Pro — nie ma płatności, więc każde konto jest darmowe.");
 
   // Chapter XXV: understand what is Pro, and never meet a dead button.
-  eq("all five Pro modules are described", await free.locator(".pro-mod").count(), 5);
-  eq("each one marked as Pro", await free.locator(".pro-lock .chip").count(), 5);
-  eq("the first is Klienci", await free.locator(".pro-mod h3").first().innerText(), "Klienci");
-  eq("and it says so", await free.locator('.pro-mod[data-feature="clients"] .pro-lock').innerText(),
-    "Dostępne w LiczMat Pro");
-  // Chapter XXV's rule is "never a dead button", not "never a button". Sessions 22–25
-  // built Klienci, Zlecenia, Wyceny and Terminarz, so their cards open something; the CRM
-  // of session 26 is a path through them rather than a page and stays text. Session 28
-  // removed the preview switch and put the checkout in its place — and the checkout is
-  // hidden while assets/pay.js carries no Payment Link, which is what these guard.
-  /* Checked as a list rather than as a number. The count said five, the panel has held
-     six since session 28 put the Stripe portal link in it, and nobody noticed because a
-     number does not say which element it lost — session 29 rewrote it into the set it
-     was always meant to be, and added its own "Poznaj LiczMat Pro" to it. */
-  eq("the panel offers exactly the four built modules, the way to the Pro page, the portal and the checkout",
+  /* The Pro tab stopped being the place that describes Pro on 2026-09-03: the five locked
+     cards were taken out of it and the description moved into proGate(), the wall drawn
+     inside Klienci, Zlecenia, Wyceny and Terminarz themselves. So the same rule is checked
+     where it now lives. The wall names the other four modules and links to none of them on
+     purpose — they are behind the same wall, and a link to another locked page is the dead
+     button by a longer route. */
+  await free.click('[data-tab="clients"]');
+  const gate = free.locator("#acctclients-gate");
+  eq("the Klienci tab is gated and marked as Pro", 
+    await gate.locator('.chip').first().innerText(), "Dostępne w LiczMat Pro");
+  eq("the other four Pro modules are described in the wall", await gate.locator(".pw-incl-list li").count(), 4);
+  check("they are described as text without links, so no dead buttons", 
+    (await gate.locator(".pw-incl-list a").count()) === 0);
+
+  // Not a fixed list: what matters is that every way off the wall leads to the Pro page or
+  // to the account, and never to another module locked behind the same wall.
+  {
+    const offers = await free.$$eval("#acctclients-gate a",
+      (ns) => ns.map((n) => n.getAttribute("href")));
+    check("the wall offers a way out at all", offers.length > 0, String(offers.length));
+    check("and every one of them goes to the Pro page or to the account",
+      offers.every((h) => h === "/liczmat-pro/" || h.startsWith("/app/")), offers.join(" "));
+  }
+
+  await free.click('[data-tab="pro"]');
+  /* Checked as a list rather than as a number, the way session 29 rewrote it: the count
+     said five, the panel had six, and a number does not say which element it lost. Since
+     2026-09-03 the four module links are gone with the cards, and what is left is the
+     portal link (href="#", hidden for a free account), the way to the Pro page, and the
+     checkout. */
+  eq("the panel offers the portal, the way to the Pro page and the checkout",
     (await free.$$eval("#panel-pro a, #panel-pro button",
       (ns) => ns.map((n) => n.getAttribute("href") || n.id || "checkout").join(" "))),
-    "# /klienci/ /zlecenia/ /wyceny/ /terminarz/ /liczmat-pro/ checkout");
-  eq("nothing visible in the panel offers to take money",
+    "# /liczmat-pro/ checkout");
+  eq("nothing visible in the panel offers to take money directly",
     await free.locator("#panel-pro [data-pw-checkout]:visible").count(), 0);
   eq("and the manage-subscription link is not there for a free account",
     await free.locator("#plan-manage").isVisible(), false);
-  eq("the first opens Klienci",
-    await free.locator('.pro-mod[data-feature="clients"] a').getAttribute("href"), "/klienci/");
-  eq("the second Zlecenia",
-    await free.locator('.pro-mod[data-feature="jobs"] a').getAttribute("href"), "/zlecenia/");
-  eq("the third Wyceny",
-    await free.locator('.pro-mod[data-feature="quotes"] a').getAttribute("href"), "/wyceny/");
-  eq("and the fourth Terminarz",
-    await free.locator('.pro-mod[data-feature="calendar"] a').getAttribute("href"), "/terminarz/");
   /* Session 28: the Pro tab is the one place on the site that offers to take money,
      because it is the only page that knows the uid a payment has to be attached to. With
      no Payment Link configured it quotes the price and says the subscription has not
@@ -641,7 +649,7 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
   eq("and its note", await over.locator("#plan-note").innerText(),
     "Der Pro-Tarif ist abgelaufen. Das Konto läuft als kostenloses LiczMat weiter.");
   eq("and the module cards, which the build wrote",
-    await over.locator('.pro-mod[data-feature="clients"] h3').innerText(), "Kunden");
+    await over.locator('#acctclients-gate h2').innerText(), "Kunden");
   eq("no console error", over.lmErrors.join(" / "), "");
   await over.close();
   await ctx.close();
@@ -755,7 +763,7 @@ head("9d. the Materiały tab: prices are PRO since 2026-09-04");
 
 /* --- 10. the tabs, the language switch, the phone ------------------------------------ */
 
-head("10. five tabs, reachable from the keyboard");
+head("10. twelve tabs, reachable from the keyboard");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
   const page = await openApp(ctx, "/app/", { accounts: ACCOUNT });
@@ -764,25 +772,23 @@ head("10. five tabs, reachable from the keyboard");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
 
-  // Rooms are not one of them: the owner asked for "Pomieszczenia" to be folded into the
-  // project it belongs to, because a room is an element of a project (chapter XVIII), not
-  // a second subject. The fifth is LiczMat Pro, added by session 21 — the plan this
-  // account is on and the modules Pro is going to consist of.
-  eq("there are five", await page.locator(".app-tab").count(), 5);
+  // 2026-09-03: The workspace tab strip became a sidebar. Counting the navItem() calls
+  // in src/app-pages.mjs yields 12 entries (.app-nav-item).
+  eq("there are twelve", await page.locator(".app-nav-item").count(), 12);
   eq("only the selected one is in the tab order",
-    await page.locator('.app-tab[tabindex="0"]').count(), 1);
+    await page.locator('.app-nav-item[tabindex="0"]').count(), 1);
 
   await page.locator('[data-tab="projects"]').focus();
   await page.keyboard.press("ArrowRight");
   eq("the right arrow moves to the next tab",
-    await page.evaluate(() => document.activeElement.dataset.tab), "sync");
-  check("and opens its panel", await visible(page, '[data-panel="sync"]'));
+    await page.evaluate(() => document.activeElement.dataset.tab), "clients");
+  check("and opens its panel", await visible(page, '[data-panel="clients"]'));
   await page.keyboard.press("End");
   eq("End goes to the last one",
     await page.evaluate(() => document.activeElement.dataset.tab), "account");
   await page.keyboard.press("ArrowRight");
   eq("and the arrows wrap round",
-    await page.evaluate(() => document.activeElement.dataset.tab), "projects");
+    await page.evaluate(() => document.activeElement.dataset.tab), "overview");
   await page.keyboard.press("ArrowLeft");
   eq("in both directions",
     await page.evaluate(() => document.activeElement.dataset.tab), "account");
