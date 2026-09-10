@@ -87,7 +87,7 @@ Tutaj zostaje wyłącznie to, co żywe: tabela postępu, dwie ostatnie sesje, li
 zrobienia w konsolach, znane ograniczenia i otwarte decyzje. Pełna lista otwartych wątków
 obu repozytoriów, przeglądana razem z tym plikiem, jest w `Obsidian/Liczmat/Meta/Otwarte watki.md`.
 
-## Sesja 69 — sesja E: automatyczna synchronizacja i cztery zgłoszenia właściciela (2026-09-10)
+## Sesja 69 — automatyczna synchronizacja i cztery zgłoszenia właściciela (2026-09-10)
 
 Cztery rzeczy zgłoszone naraz po pracy na żywym `liczmat.com`, wszystkie zamknięte i wdrożone:
 commity `9a37e024`, `28194956`, `deaeedb5`. `STAMP` podbity na `20260910b`.
@@ -126,7 +126,7 @@ commity `9a37e024`, `28194956`, `deaeedb5`. `STAMP` podbity na `20260910b`.
 a **nie** kolejność `LANGS` z `assets/i18n.js` (`pl, uk, de, en, …`). Skrypt pozycyjny ufający
 tablicy wsadzi angielski do bloku ukraińskiego.
 
-Całość: `Obsidian/Liczmat/Historia/Sesja E - automatyczna synchronizacja i cztery zgloszenia wlasciciela.md`.
+Całość: `Obsidian/Liczmat/Historia/Sesja 69 - automatyczna synchronizacja i cztery zgloszenia wlasciciela.md`.
 
 ## Sesja 65 — audyt, sesja A: pieniądze i backend (2026-09-09)
 
