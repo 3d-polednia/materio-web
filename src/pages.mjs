@@ -2060,6 +2060,7 @@ export function clientsMain(lang, t, features) {
           <input id="crm-client-name" type="text" maxlength="120" placeholder="${esc(t("cli_new"))}" required aria-label="${esc(t("cli_new"))}">
           <input id="crm-client-phone" type="tel" maxlength="200" placeholder="${esc(t("cli_phone"))}" autocomplete="off" aria-label="${esc(t("cli_phone"))}">
           <input id="crm-client-email" type="email" maxlength="200" placeholder="${esc(t("cli_email"))}" autocomplete="off" aria-label="${esc(t("cli_email"))}">
+          <input id="crm-client-address" type="text" maxlength="200" placeholder="${esc(t("cli_address"))}" autocomplete="off" aria-label="${esc(t("cli_address"))}">
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="crm-client-list" class="data-list"></ul>

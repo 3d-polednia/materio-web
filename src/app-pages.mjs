@@ -404,7 +404,9 @@ export function appMain(t, features) {
               <div id="acctclients-tool">
                 <form id="acctclients-form" class="inline-form">
                   <input id="acctclients-name" type="text" maxlength="120" placeholder="${esc(t("app_clients_name_ph"))}" required aria-label="${esc(t("app_clients_name_ph"))}">
-                  <input id="acctclients-phone" type="tel" maxlength="60" placeholder="${esc(t("crm_phone"))}" aria-label="${esc(t("crm_phone"))}">
+                  <input id="acctclients-phone" type="tel" maxlength="200" placeholder="${esc(t("cli_phone"))}" aria-label="${esc(t("cli_phone"))}">
+                  <input id="acctclients-email" type="email" maxlength="200" placeholder="${esc(t("cli_email"))}" aria-label="${esc(t("cli_email"))}">
+                  <input id="acctclients-address" type="text" maxlength="200" placeholder="${esc(t("cli_address"))}" aria-label="${esc(t("cli_address"))}">
                   <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_clients_new">${esc(t("app_clients_new"))}</button>
                 </form>
                 <ul id="acctclients-list" class="data-list"></ul>

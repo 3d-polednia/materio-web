@@ -451,12 +451,19 @@ function buildClientsPage() {
     const name = document.getElementById("crm-client-name");
     const phone = document.getElementById("crm-client-phone");
     const email = document.getElementById("crm-client-email");
+    const address = document.getElementById("crm-client-address");
     if (!name.value.trim()) return;
     crmUndone = null; // a new client is a new subject; the old undo is stale
-    crmAddClient({ name: name.value, phone: phone.value, email: email.value });
+    crmAddClient({
+      name: name.value,
+      phone: phone ? phone.value : "",
+      email: email ? email.value : "",
+      address: address ? address.value : "",
+    });
     name.value = "";
-    phone.value = "";
-    email.value = "";
+    if (phone) phone.value = "";
+    if (email) email.value = "";
+    if (address) address.value = "";
     name.focus();
   });
 
