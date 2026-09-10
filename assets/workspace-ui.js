@@ -844,7 +844,11 @@ function buildProjectsPage() {
     // refused used to take the typed name with it (audit 2026-09-04, M3).
     if (!wsAddProject(name)) return;
     input.value = "";
-    wsUndone = null; // a new project is a new subject; the old undo is stale
+    // A new project is a new subject and the old undo is stale — but wsAddProject() has
+    // already redrawn by the time we get here, so clearing the state without redrawing
+    // again left the strip on screen offering a token nothing would restore.
+    wsUndone = null;
+    wsRenderUndo();
   });
 
   // The two lists behave the same, so one handler serves both. The name is a real link
