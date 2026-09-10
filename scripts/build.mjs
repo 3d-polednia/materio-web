@@ -679,12 +679,23 @@ const CSP_DIRECTIVES = [
   "manifest-src 'self'",
 ];
 
-/** Every inline script in the file, as CSP source expressions. */
+/**
+ * Every inline script in the file, as CSP source expressions.
+ *
+ * A script that this misses is a script the browser refuses, on every page that carries
+ * it, with nothing on screen to say why — so the two ways of missing one are closed here
+ * rather than trusted not to happen. `src` is decided after the quoted attribute values
+ * are taken out, so an attribute whose *value* contains "src=" cannot make an inline
+ * script look like a external one; and the closing tag is allowed the whitespace HTML
+ * allows it, so `</script >` still ends the script instead of swallowing the markup after
+ * it into the hash.
+ */
 function inlineScriptHashes(html) {
   const out = new Set();
-  const re = /<script(?![^>]*\ssrc=)[^>]*>([\s\S]*?)<\/script>/gi;
-  for (const m of html.matchAll(re)) {
-    out.add(`'sha256-${createHash("sha256").update(m[1], "utf8").digest("base64")}'`);
+  const re = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
+  for (const [, attrs, body] of html.matchAll(re)) {
+    if (/\bsrc\s*=/.test(attrs.replace(/"[^"]*"|'[^']*'/g, ""))) continue;
+    out.add(`'sha256-${createHash("sha256").update(body, "utf8").digest("base64")}'`);
   }
   return [...out];
 }
@@ -702,7 +713,13 @@ function withCsp(html) {
   const directives = CSP_DIRECTIVES.map((d) =>
     d === "script-src 'self'" && scriptSrc ? `${d} ${scriptSrc}` : d);
   const meta = `<meta http-equiv="Content-Security-Policy" content="${directives.join("; ")}">`;
-  return html.replace("<head>", `<head>\n${meta}`);
+  // A page that quietly came out without a policy is the failure this whole block exists
+  // to prevent, so a <head> that is not there stops the build instead of shipping 523
+  // pages with nothing in front of them. The replacement is a function because a string
+  // one reads `$&` and its family as substitutions — no hash or host contains a dollar
+  // today, and this is what keeps that from becoming a thing to remember.
+  if (!html.includes("<head>")) throw new Error("withCsp: no <head> to put the policy in");
+  return html.replace("<head>", () => `<head>\n${meta}`);
 }
 
 function write(relPath, contents) {
