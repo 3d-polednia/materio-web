@@ -83,9 +83,9 @@
 <link rel="alternate" hreflang="es" href="https://liczmat.com/es/calculadoras/corte-lineal-1d/">
 <link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/calculateurs/decoupe-lineaire-1d/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/rozkroj-liniowy-1d/">
-<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="icon" href="/assets/favicon.svg?v=20260910a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260910a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260910a">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -114,7 +114,7 @@
 <meta name="twitter:description" content="Un elenco di pezzi, la lunghezza della barra e lo spessore di taglio danno le barre da comprare. Il piano di taglio arriva con lo scarto in percentuale.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260910a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -189,6 +189,34 @@
 }
 </script>
 
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/kalkulatory/rozkroj-liniowy-1d/",
+  "uk": "/uk/kalkulyatory/rozkriy-liniynyi-1d/",
+  "de": "/de/rechner/linearer-zuschnitt-1d/",
+  "en": "/en/calculators/linear-cutting-1d/",
+  "cs": "/cs/kalkulacky/linearni-narez-1d/",
+  "sk": "/sk/kalkulacky/linearny-rez-1d/",
+  "ro": "/ro/calculatoare/debitare-liniara-1d/",
+  "hr": "/hr/kalkulatori/linearno-rezanje-1d/",
+  "sr": "/sr/kalkulatori/linearno-secenje-1d/",
+  "it": "/it/calcolatori/taglio-lineare-1d/",
+  "nl": "/nl/rekenmachines/lineair-zagen-1d/",
+  "es": "/es/calculadoras/corte-lineal-1d/",
+  "fr": "/fr/calculateurs/decoupe-lineaire-1d/"
+};</script>
+<script defer src="/assets/i18n.it.js?v=20260910a"></script>
+<script defer src="/assets/i18n-runtime.js?v=20260910a"></script>
+<script defer src="/assets/currency.js?v=20260910a"></script>
+<script defer src="/assets/account.js?v=20260910a"></script>
+<script defer src="/assets/units.js?v=20260910a"></script>
+<script defer src="/assets/own-materials.js?v=20260910a"></script>
+<script defer src="/assets/calculators.js?v=20260910a"></script>
+<script defer src="/assets/materials.js?v=20260910a"></script>
+<script defer src="/assets/materials-ui.js?v=20260910a"></script>
+<script defer src="/assets/workspace.js?v=20260910a"></script>
+<script defer src="/assets/workspace-calc.js?v=20260910a"></script>
+<script defer src="/assets/recent.js?v=20260910a"></script>
+<script defer src="/assets/main.js?v=20260910a"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Vai al contenuto</a>
@@ -197,7 +225,7 @@
     <a class="brand" href="/it/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
     <nav id="nav-links" class="nav-links" aria-label="Navigazione principale">
       <ul class="nav-list">
-        <li><a href="/it/calcolatori/" aria-current="page">Calcolatori</a></li>
+        <li><a href="/it/calcolatori/" aria-current="true">Calcolatori</a></li>
         <li><a href="/it/materiali/">Materiali</a></li>
         <li data-nav-level="liczmat"><a href="/it/progetti/">Progetti</a></li>
         <li><a href="/it/liczmat-pro/">LiczMat Pro</a></li>
@@ -245,16 +273,16 @@
   <section class="block alt calc-tool">
     <div class="wrap">
       <div class="calc" data-calc="linear" data-tab="cutting">
-      <div class="calc-form">
+      <form class="calc-form" novalidate>
         <h2 id="calc-form-h">I tuoi dati</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Scegli un materiale</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-linear-stock">Lunghezza della barra (mm)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" data-lk="fld_stock_len" value="6000"></div><div class="field"><label for="f-linear-kerf">Spessore di taglio (mm)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" data-lk="fld_kerf" value="3"></div><div class="field"><label for="f-linear-cuts">Pezzi: lunghezza×qtà (mm)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts" data-lk="fld_cuts">2400x4
 1800x6
 900x8</textarea></div><div class="field"><label for="f-linear-price">Prezzo per barra</label><input id="f-linear-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bar" value=""></div>
-        <button type="button" class="btn btn-primary" data-run
+        <button type="submit" class="btn btn-primary" data-run
           data-label-run="Calcola"
           data-label-again="Calcola di nuovo">Calcola</button>
-      </div>
+      </form>
       <div class="calc-out">
         <h2 id="calc-result-h">Risultato</h2>
         
@@ -405,36 +433,6 @@ odpad = (Lunghezza della barra × sztangi − Σ elementy) ÷ (Lunghezza della b
     <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Accetto</button>
   </div>
 </div>
-<script>window.LICZMAT_ALTERNATES = {
-  "pl": "/kalkulatory/rozkroj-liniowy-1d/",
-  "uk": "/uk/kalkulyatory/rozkriy-liniynyi-1d/",
-  "de": "/de/rechner/linearer-zuschnitt-1d/",
-  "en": "/en/calculators/linear-cutting-1d/",
-  "cs": "/cs/kalkulacky/linearni-narez-1d/",
-  "sk": "/sk/kalkulacky/linearny-rez-1d/",
-  "ro": "/ro/calculatoare/debitare-liniara-1d/",
-  "hr": "/hr/kalkulatori/linearno-rezanje-1d/",
-  "sr": "/sr/kalkulatori/linearno-secenje-1d/",
-  "it": "/it/calcolatori/taglio-lineare-1d/",
-  "nl": "/nl/rekenmachines/lineair-zagen-1d/",
-  "es": "/es/calculadoras/corte-lineal-1d/",
-  "fr": "/fr/calculateurs/decoupe-lineaire-1d/"
-};</script>
-
-<script src="/assets/i18n.it.js?v=20260902a"></script>
-<script src="/assets/i18n-runtime.js?v=20260902a"></script>
-<script src="/assets/currency.js?v=20260902a"></script>
-<script src="/assets/account.js?v=20260902a"></script>
-
-<script src="/assets/units.js?v=20260902a"></script>
-<script src="/assets/own-materials.js?v=20260902a"></script>
-<script src="/assets/calculators.js?v=20260902a"></script>
-<script src="/assets/materials.js?v=20260902a"></script>
-<script src="/assets/materials-ui.js?v=20260902a"></script>
-<script src="/assets/workspace.js?v=20260902a"></script>
-<script src="/assets/workspace-calc.js?v=20260902a"></script>
-<script src="/assets/recent.js?v=20260902a"></script>
-<script src="/assets/main.js?v=20260902a"></script>
 
 </body>
 </html>

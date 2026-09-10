@@ -526,6 +526,101 @@ head("10. focus and the rules under it");
     shipped.includes("::placeholder") && shipped.includes(":focus-visible"));
 }
 
+/* ---------- 11. the three findings of session 67
+   Audit 2026-09-04, items M9, M10 and M11. All three are properties of the template, so
+   all three are one broken line in src/ away from being back on 510 pages at once. */
+head("11. the calculator is a form, the navigation says where you are, the scripts wait");
+
+/* M9. A calculator card used to be a <div> holding fields and a type="button" button, so
+   it was a group of controls and not a form: no form boundary and no form mode for a
+   screen reader, and on a phone no working "Go" on the on-screen keyboard, because there
+   was nothing to submit. */
+{
+  const calcs = PAGES.filter((page) => /class="calc" data-calc=/.test(page.body));
+  check("the fifteen calculators are on the pages this section reads",
+    calcs.length >= 15 * BUILD_LANGS.length, `${calcs.length} pages carry a calculator card`);
+
+  checkAll("the card is a <form>, not a <div>", calcs,
+    (page) => /<form class="calc-form"/.test(page.body), (page) => page.url);
+
+  checkAll("and the button submits it", calcs, (page) => {
+    const btn = (page.body.match(/<button[^>]*data-run[^>]*>/) || [])[0] || "";
+    return attr(btn, "type") === "submit";
+  }, (page) => page.url);
+
+  // Every other button inside the form has to say type="button": a button with no type
+  // inside a form is a submit button, so a preset chip would run the calculation and a
+  // material picker would open its dialog and run it as well.
+  checkAll("every other button in the form stays type=\"button\"", calcs, (page) => {
+    const form = (page.body.match(/<form class="calc-form"[\s\S]*?<\/form>/) || [""])[0];
+    return (form.match(/<button[^>]*>/g) || [])
+      .every((b) => /data-run/.test(b) ? attr(b, "type") === "submit" : attr(b, "type") === "button");
+  }, (page) => page.url);
+
+  const js = read("assets/calculators.js");
+  check("and the script answers `submit`, which is the button, the Enter key and Go at once",
+    /addEventListener\("submit"/.test(js) && /preventDefault\(\)/.test(js));
+
+  // The converter is the other .calc-form on the site and is deliberately not a form: it
+  // converts as the visitor types and has no button to press, so a form would promise a
+  // submission that never happens.
+  const conv = PAGES.filter((page) => /data-converter/.test(page.body));
+  checkAll("the converter, which has nothing to submit, stays a <div>", conv,
+    (page) => !/<form class="calc-form"/.test(page.body), (page) => page.url);
+}
+
+/* M11. `currentNavRoute()` returns the deepest route the address falls under, so on a
+   calculator page that is `/kalkulatory/` — the section, not the page. Marking it
+   aria-current="page" told a screen reader it was on the hub on all 195 calculator pages. */
+{
+  const navOf = (page) => (page.body.match(/<ul class="nav-list">[\s\S]*?<\/ul>/) || [""])[0];
+  const withNav = PAGES.filter((page) => navOf(page));
+
+  checkAll('aria-current="page" only on a link to the address you are at', withNav, (page) => {
+    return [...navOf(page).matchAll(/<a[^>]*aria-current="page"[^>]*>/g)]
+      .every((m) => attr(m[0], "href") === page.url);
+  }, (page) => `${page.url} — ${(navOf(page).match(/<a[^>]*aria-current="page"[^>]*>/) || [])[0]}`);
+
+  checkAll("at most one link claims to be the page you are on", withNav,
+    (page) => (navOf(page).match(/aria-current="page"/g) || []).length <= 1, (page) => page.url);
+
+  const calcs = PAGES.filter((page) => /class="calc" data-calc=/.test(page.body));
+  checkAll("a calculator page marks its hub as the branch, not as the page", calcs,
+    (page) => /<a href="[^"]*" aria-current="true">/.test(navOf(page)), (page) => page.url);
+
+  // The lime mark hangs off the attribute now and not off one of its two values, so the
+  // section a visitor is inside is still lit up.
+  const css = read("assets/styles.css");
+  check("the mark is styled off the attribute, so both values keep it",
+    /\.nav-list a\[aria-current\] \{/.test(css) && !/\.nav-list a\[aria-current="page"\] \{/.test(css));
+}
+
+/* M10. Fourteen classic scripts at the end of <body> with no `defer`: fetched in parallel
+   by the preload scanner, then executed one after another, blocking the parser at the
+   point it reached them. */
+{
+  const tags = (page) => page.html.match(/<script[^>]*\ssrc="[^"]*"[^>]*>/g) || [];
+  const withScripts = PAGES.filter((page) => tags(page).length);
+
+  checkAll("every script with a src is deferred — `defer`, or a module, which defers itself",
+    withScripts, (page) => tags(page).every((s) => has(s, "defer") || attr(s, "type") === "module"),
+    (page) => `${page.url} — ${tags(page).find((s) => !has(s, "defer") && attr(s, "type") !== "module")}`);
+
+  checkAll("and they are asked for in <head>, not after the body", withScripts, (page) => {
+    const end = page.html.indexOf("</head>");
+    return tags(page).every((s) => page.html.indexOf(s) < end);
+  }, (page) => page.url);
+
+  // Deferred scripts run in document order, and this list depends on it: main.js reads the
+  // dictionary and the session that the two before it define.
+  checkAll("in the order they depend on", withScripts, (page) => {
+    const srcs = tags(page).map((s) => attr(s, "src") || "");
+    const at = (name) => srcs.findIndex((s) => s.includes(name));
+    const i18n = at("/assets/i18n."), main = at("/assets/main.js"), acc = at("/assets/account.js");
+    return i18n >= 0 && main > i18n && (acc < 0 || main > acc);
+  }, (page) => page.url);
+}
+
 /* ------------------------------------------------------------------ the result */
 
 if (failures.length) {

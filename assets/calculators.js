@@ -592,9 +592,23 @@ function wireCalculator(card) {
     if (box) box.scrollIntoView({ block: "nearest", behavior: "smooth" });
   };
 
-  if (runBtn) runBtn.addEventListener("click", () => run(true));
-  card.querySelectorAll("input").forEach((i) =>
-    i.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); run(true); } }));
+  /* Audit item M9. The card is a <form> with a submit button (calcCard() in
+     src/pages.mjs), so the one event to answer is `submit`: it is what the button, the
+     Enter key in a field and the phone keyboard's "Go" all produce. preventDefault()
+     because the answer is worked out here and nothing is sent anywhere — without it the
+     browser would reload the page and throw the result away.
+
+     The click branch below is the fallback for a card that is not inside a form, and
+     with it the Enter key has to be caught by hand: implicit submission is a form's
+     behaviour, and outside one Enter in a text field does nothing at all. */
+  const form = runBtn && runBtn.form;
+  if (form) {
+    form.addEventListener("submit", (e) => { e.preventDefault(); run(true); });
+  } else if (runBtn) {
+    runBtn.addEventListener("click", () => run(true));
+    card.querySelectorAll("input").forEach((i) =>
+      i.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); run(true); } }));
+  }
 
   // A number on screen next to fields that no longer produced it is worse than no number.
   // Editing anything says so until the next calculation clears it.

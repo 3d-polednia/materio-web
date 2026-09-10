@@ -210,6 +210,48 @@ export function page(p) {
   // so every language has a real, indexable address.
   const altJson = jsonLd(alternates);
 
+  /* Audit item M10. Every script the site ships is a classic one, and until session 67 all
+     fourteen of them sat at the end of <body> with no `defer`. The preload scanner found
+     them at once, so there was no download waterfall — the cost was execution: fourteen
+     files run one after another, synchronously, at the point the parser reaches them, and
+     the calculator is not interactive until the last one returns.
+
+     `defer` moves all of that behind the parse: the files are still fetched in parallel and
+     still run in document order — which is the one thing this list cannot lose, main.js
+     needs the dictionary and account.js before it — but nothing runs while the document is
+     still being built. They move into <head> at the same time, so the fetch is asked for
+     before the parser has walked the whole body rather than after.
+
+     Type="module" scripts are deferred by their nature and take no attribute; the spec puts
+     them in the same ordered list as deferred classic scripts, so mixing the two keeps the
+     order written here.
+
+     The one thing that must stay in front of them is the data they read. `LICZMAT_ALTERNATES`
+     is inline, so it runs while the document parses — that is, before anything deferred —
+     and `headExtra` (window.LM_NAV, window.LM_PROJ, window.LM_DASH) is emitted above this
+     block for the same reason. */
+  const pageScripts = [
+    bare ? "" : `<script>window.LICZMAT_ALTERNATES = ${altJson};</script>`,
+    bare
+      ? `<!-- The ten flags, for a picker this page builds itself. Every other page has
+     its picker in the markup already, so it does not download them a second time. -->
+<script defer src="/assets/flags.js?v=${stamp}"></script>`
+      : "",
+    `<script defer src="/assets/i18n.${bare ? DEFAULT_LANG : lang}.js?v=${stamp}"></script>`,
+    `<script defer src="/assets/i18n-runtime.js?v=${stamp}"></script>`,
+    `<script defer src="/assets/currency.js?v=${stamp}"></script>`,
+    `<!-- The session, on every page: which of chapter II's three levels this browser was
+     last told it is on. Two kilobytes, no network, and it is what lets a calculator
+     page word the sentence under the result without loading Firebase. -->
+<script defer src="/assets/account.js?v=${stamp}"></script>`,
+    (p.classicScripts || []).map((s) => `<script defer src="${s}?v=${stamp}"></script>`).join("\n"),
+    scripts.map((s) => {
+      const attrs = s.endsWith(".mjs") || p.moduleScripts ? ' type="module"' : " defer";
+      return `<script${attrs} src="${s}${s.includes("?") ? "" : `?v=${stamp}`}"></script>`;
+    }).join("\n"),
+    `<script defer src="/assets/main.js?v=${stamp}"></script>`,
+  ].filter(Boolean).join("\n");
+
   // Open Graph's own version of hreflang. og:locale says which language this page is in;
   // og:locale:alternate says the same page exists in the others, which is what lets a
   // sharing surface pick the reader's language instead of the one the link was copied in.
@@ -348,6 +390,7 @@ ${ogAlternates}
 <link rel="stylesheet" href="/assets/styles.min.css?v=${stamp}">
 ${jsonldBlocks}
 ${p.headExtra || ""}
+${pageScripts}
 </head>
 <body${p.bodyClass ? ` class="${p.bodyClass}"` : ""}>
 <!-- The skip link. Its target carries tabindex="-1" (every <main id="main"> in
@@ -356,23 +399,6 @@ ${p.headExtra || ""}
      the visitor just asked to skip. -->
 <a class="skip-link" href="#main">${esc(t("skip_main"))}</a>
 ${bare ? main : `${siteHeader({ lang, t, alternates, path })}\n${main}\n${siteFooter({ lang, t, alternates })}\n${consentBanner(lang, t)}`}
-${bare ? "" : `<script>window.LICZMAT_ALTERNATES = ${altJson};</script>`}
-${bare ? `<!-- The ten flags, for a picker this page builds itself. Every other page has
-     its picker in the markup already, so it does not download them a second time. -->
-<script src="/assets/flags.js?v=${stamp}"></script>` : ""}
-<script src="/assets/i18n.${bare ? DEFAULT_LANG : lang}.js?v=${stamp}"></script>
-<script src="/assets/i18n-runtime.js?v=${stamp}"></script>
-<script src="/assets/currency.js?v=${stamp}"></script>
-<!-- The session, on every page: which of chapter II's three levels this browser was
-     last told it is on. Two kilobytes, no network, and it is what lets a calculator
-     page word the sentence under the result without loading Firebase. -->
-<script src="/assets/account.js?v=${stamp}"></script>
-${(p.classicScripts || []).map((s) => `<script src="${s}?v=${stamp}"></script>`).join("\n")}
-${scripts.map((s) => {
-    const attrs = s.endsWith(".mjs") || p.moduleScripts ? ' type="module"' : "";
-    return `<script${attrs} src="${s}${s.includes("?") ? "" : `?v=${stamp}`}"></script>`;
-  }).join("\n")}
-<script src="/assets/main.js?v=${stamp}"></script>
 ${p.bodyEnd || ""}
 </body>
 </html>
@@ -387,10 +413,20 @@ ${p.bodyEnd || ""}
  *
  * `current` is the route the visitor is on (or null); its link gets aria-current, which
  * is both the accessible answer to "where am I" and what the lime mark hangs off.
+ *
+ * Audit item M11. Which of the two values it gets is the whole finding: `currentNavRoute()`
+ * returns the deepest route the address falls under, and on `/kalkulatory/tapety/` that is
+ * `/kalkulatory/` — an ancestor, not this page. Until session 67 that link was marked
+ * `aria-current="page"` anyway, so a screen reader on every one of the fifteen calculator
+ * pages, in all thirteen languages, was told it was on "Kalkulatory". So `page` is now only
+ * for the address the visitor is actually at, and an ancestor gets `aria-current="true"`,
+ * which says "this branch, not this page". The lime mark hangs off both (assets/styles.css
+ * matches the attribute rather than the value), so nothing changes on screen.
  */
-const navLink = (r, slot, lang, t, current, inPlace) => {
+const navLink = (r, slot, lang, t, current, inPlace, path) => {
   const href = r.localized ? r.path(lang) : r.path;
   const here = current && current.id === r.id;
+  const exact = here && path === href;
   // `/app/`, `/app/dashboard/` and `/p/` have no language of their own — they carry the
   // whole dictionary and swap text in place. So the label is marked for the runtime to
   // rewrite, and the route id lets it repoint the address too: the href written here is
@@ -398,7 +434,7 @@ const navLink = (r, slot, lang, t, current, inPlace) => {
   // on `langchange`. Without that, "Materiały" on a German /app/ would still go to the
   // Polish page.
   const marks = inPlace ? ` data-i18n="${r[slot].key}" data-nav-route="${r.id}"` : "";
-  return `<a href="${href}"${here ? ' aria-current="page"' : ""}${r.localized ? "" : ' rel="nofollow"'}${marks}>` +
+  return `<a href="${href}"${here ? ` aria-current="${exact ? "page" : "true"}"` : ""}${r.localized ? "" : ' rel="nofollow"'}${marks}>` +
     `${esc(t(r[slot].key))}</a>`;
 };
 
@@ -413,9 +449,9 @@ const navLink = (r, slot, lang, t, current, inPlace) => {
  * carries `data-lm-level` (stamped in the head, from the `liczmat-signed-in` hint) and
  * that level is not enough — so a browser with no script, and Googlebot, keep the link.
  */
-const navItem = (r, slot, lang, t, current, inPlace) =>
+const navItem = (r, slot, lang, t, current, inPlace, path) =>
   `<li${r.navLevel ? ` data-nav-level="${r.navLevel}"` : ""}>` +
-  `${navLink(r, slot, lang, t, current, inPlace)}</li>`;
+  `${navLink(r, slot, lang, t, current, inPlace, path)}</li>`;
 
 /**
  * The site header. Every page uses this one — the public pages, /app/ and /p/.
@@ -441,7 +477,7 @@ export function siteHeader(h) {
   const items = h.links
     ? h.links.map((l) => `<li><a href="${l.href}"${l.rel ? ` rel="${l.rel}"` : ""}` +
         `${inPlace ? ` data-i18n="${l.key}"` : ""}>${esc(t(l.key))}</a></li>`)
-    : navRoutes("header").map((r) => navItem(r, "header", lang, t, current, inPlace));
+    : navRoutes("header").map((r) => navItem(r, "header", lang, t, current, inPlace, h.path));
 
   const cta = h.cta || { href: URL_APP, key: "nav_app", rel: "nofollow" };
   const ctaAttrs = [

@@ -115,14 +115,28 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
 
   // The card carries both labels so the script can swap them without a dictionary of its
   // own: "Policz" until the visitor has asked for a number, "Oblicz ponownie" after.
+  //
+  /* Audit item M9. Until session 67 the fields and the button sat in a <div> and the
+     button was type="button", so the card was a group of controls and not a form. Two
+     things follow from that, and both are the mobile visitor's: the on-screen keyboard
+     offers no working "Go" key, because there is no form to submit, and a screen reader
+     gets no form boundary and no form mode. So it is a <form> with a submit button now,
+     and assets/calculators.js answers `submit` rather than a click — which is the same
+     event whether the visitor pressed the button, hit Enter in a field or used the
+     keyboard's Go key. `novalidate` because the fields are type="text" with
+     inputmode="decimal" (a comma is a decimal separator in most of the thirteen
+     languages, and type="number" rejects it), so the browser has nothing to check and
+     the engines in assets/calculators.js do all of the checking. The preset chips and
+     the material picker stay type="button": inside a form, a button with no type
+     submits it. */
   return `<div class="calc" data-calc="${calc.id}" data-tab="${calc.tab}">
-      <div class="calc-form">
+      <form class="calc-form" novalidate>
         <h2 id="calc-form-h">${esc(t("calc_form_h"))}</h2>
         ${picker}${chips}${fields}
-        <button type="button" class="btn btn-primary" data-run
+        <button type="submit" class="btn btn-primary" data-run
           data-label-run="${esc(t("act_calc"))}"
           data-label-again="${esc(t("act_recalc"))}">${esc(t("act_calc"))}</button>
-      </div>
+      </form>
       <div class="calc-out">
         <h2 id="calc-result-h">${esc(t("calc_result_h"))}</h2>
         <!-- role="status" (an implicit aria-live="polite"): pressing "Policz" replaces

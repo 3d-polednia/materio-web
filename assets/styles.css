@@ -749,7 +749,10 @@ html.js:not([data-lm-level="pro"]) [data-nav-level="pro"] { display: none; }
 .nav-links a:hover { background: var(--surface-alt); text-decoration: none; }
 /* Where you are. The tint alone would be a colour-only cue, so the section also keeps
    a lime rule under it (WCAG 1.4.1). */
-.nav-list a[aria-current="page"] {
+/* The attribute, not the value: audit item M11 splits it into "page" for the address the
+   visitor is at and "true" for the section it sits under, and the mark belongs on both —
+   a calculator page has to keep lighting "Kalkulatory" up. */
+.nav-list a[aria-current] {
   background: var(--accent-soft); color: var(--on-accent-soft);
   box-shadow: inset 0 -2px 0 var(--accent-edge);
 }
@@ -1117,7 +1120,9 @@ a.chip:hover { text-decoration: none; }
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--sp-7); align-items: start; padding: var(--sp-7);
 }
-.calc-tool .calc > div > h2 {
+/* Both children, because since audit item M9 the left one is a <form> on a calculator
+   page and stays a <div> on the converter, which has no button to submit. */
+.calc-tool .calc > div > h2, .calc-tool .calc > form > h2 {
   margin: 0 0 var(--sp-4); font-size: var(--fs-h3); letter-spacing: normal;
 }
 .calc-out { position: sticky; top: calc(var(--header-h) + var(--sp-5)); }

@@ -470,7 +470,7 @@ border-radius: var(--radius-pill); font-weight: var(--fw-semi); font-size: var(-
 transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .nav-links a:hover { background: var(--surface-alt); text-decoration: none; }
-.nav-list a[aria-current="page"] {
+.nav-list a[aria-current] {
 background: var(--accent-soft); color: var(--on-accent-soft);
 box-shadow: inset 0 -2px 0 var(--accent-edge);
 }
@@ -736,7 +736,7 @@ a.chip:hover { text-decoration: none; }
 display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 gap: var(--sp-7); align-items: start; padding: var(--sp-7);
 }
-.calc-tool .calc > div > h2 {
+.calc-tool .calc > div > h2, .calc-tool .calc > form > h2 {
 margin: 0 0 var(--sp-4); font-size: var(--fs-h3); letter-spacing: normal;
 }
 .calc-out { position: sticky; top: calc(var(--header-h) + var(--sp-5)); }

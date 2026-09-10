@@ -83,9 +83,9 @@
 <link rel="alternate" hreflang="es" href="https://liczmat.com/es/calculadoras/solera-revoco/">
 <link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/calculateurs/chape-enduit/">
 <link rel="alternate" hreflang="x-default" href="https://liczmat.com/kalkulatory/wylewka-tynk/">
-<link rel="icon" href="/assets/favicon.svg?v=20260902a" type="image/svg+xml">
-<link rel="icon" href="/assets/favicon-32.png?v=20260902a" sizes="32x32" type="image/png">
-<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260902a">
+<link rel="icon" href="/assets/favicon.svg?v=20260910a" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20260910a" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20260910a">
 <link rel="manifest" href="/site.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LiczMat">
@@ -114,7 +114,7 @@
 <meta name="twitter:description" content="Площа, товщина шару й витрата в кг на м² і мм дають кількість мішків стяжки, ровнителя або штукатурки.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
-<link rel="stylesheet" href="/assets/styles.min.css?v=20260902a">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20260910a">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -189,6 +189,34 @@
 }
 </script>
 
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/kalkulatory/wylewka-tynk/",
+  "uk": "/uk/kalkulyatory/styazhka-shtukaturka/",
+  "de": "/de/rechner/estrich-putz/",
+  "en": "/en/calculators/screed-plaster/",
+  "cs": "/cs/kalkulacky/poter-omitka/",
+  "sk": "/sk/kalkulacky/poter-omietka/",
+  "ro": "/ro/calculatoare/sapa-tencuiala/",
+  "hr": "/hr/kalkulatori/estrih-zbuka/",
+  "sr": "/sr/kalkulatori/estrih-malter/",
+  "it": "/it/calcolatori/massetto-intonaco/",
+  "nl": "/nl/rekenmachines/dekvloer-pleister/",
+  "es": "/es/calculadoras/solera-revoco/",
+  "fr": "/fr/calculateurs/chape-enduit/"
+};</script>
+<script defer src="/assets/i18n.uk.js?v=20260910a"></script>
+<script defer src="/assets/i18n-runtime.js?v=20260910a"></script>
+<script defer src="/assets/currency.js?v=20260910a"></script>
+<script defer src="/assets/account.js?v=20260910a"></script>
+<script defer src="/assets/units.js?v=20260910a"></script>
+<script defer src="/assets/own-materials.js?v=20260910a"></script>
+<script defer src="/assets/calculators.js?v=20260910a"></script>
+<script defer src="/assets/materials.js?v=20260910a"></script>
+<script defer src="/assets/materials-ui.js?v=20260910a"></script>
+<script defer src="/assets/workspace.js?v=20260910a"></script>
+<script defer src="/assets/workspace-calc.js?v=20260910a"></script>
+<script defer src="/assets/recent.js?v=20260910a"></script>
+<script defer src="/assets/main.js?v=20260910a"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Перейти до вмісту</a>
@@ -197,7 +225,7 @@
     <a class="brand" href="/uk/"><svg class="logo" viewBox="-1 -1 36 34" width="30" height="28" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg><span>LiczMat</span></a>
     <nav id="nav-links" class="nav-links" aria-label="Головна навігація">
       <ul class="nav-list">
-        <li><a href="/uk/kalkulyatory/" aria-current="page">Калькулятори</a></li>
+        <li><a href="/uk/kalkulyatory/" aria-current="true">Калькулятори</a></li>
         <li><a href="/uk/materialy/">Матеріали</a></li>
         <li data-nav-level="liczmat"><a href="/uk/proekty/">Проєкти</a></li>
         <li><a href="/uk/liczmat-pro/">LiczMat Pro</a></li>
@@ -245,14 +273,14 @@
   <section class="block alt calc-tool">
     <div class="wrap">
       <div class="calc" data-calc="screed" data-tab="trade">
-      <div class="calc-form">
+      <form class="calc-form" novalidate>
         <h2 id="calc-form-h">Твої дані</h2>
         <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Вибрати матеріал</span></button>
       <p class="mat-chosen" data-mat-chosen hidden></p><div class="field"><label for="f-screed-area">Площа (м²)</label><input id="f-screed-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="20"></div><div class="field"><label for="f-screed-thk">Товщина (мм)</label><input id="f-screed-thk" type="text" inputmode="decimal" data-k="thk" data-lk="fld_thickness" value="40"></div><div class="field"><label for="f-screed-rate">Витрата (кг/м²/мм)</label><input id="f-screed-rate" type="text" inputmode="decimal" data-k="rate" data-lk="fld_kg_m2_mm" value="2"></div><div class="field"><label for="f-screed-bag">Мішок (кг)</label><input id="f-screed-bag" type="text" inputmode="decimal" data-k="bag" data-lk="fld_bag_kg" value="25"></div><div class="field"><label for="f-screed-price">Ціна за мішок</label><input id="f-screed-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bag" value=""></div>
-        <button type="button" class="btn btn-primary" data-run
+        <button type="submit" class="btn btn-primary" data-run
           data-label-run="Порахувати"
           data-label-again="Порахувати знову">Порахувати</button>
-      </div>
+      </form>
       <div class="calc-out">
         <h2 id="calc-result-h">Результат</h2>
         
@@ -399,36 +427,6 @@
     <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Погоджуюсь</button>
   </div>
 </div>
-<script>window.LICZMAT_ALTERNATES = {
-  "pl": "/kalkulatory/wylewka-tynk/",
-  "uk": "/uk/kalkulyatory/styazhka-shtukaturka/",
-  "de": "/de/rechner/estrich-putz/",
-  "en": "/en/calculators/screed-plaster/",
-  "cs": "/cs/kalkulacky/poter-omitka/",
-  "sk": "/sk/kalkulacky/poter-omietka/",
-  "ro": "/ro/calculatoare/sapa-tencuiala/",
-  "hr": "/hr/kalkulatori/estrih-zbuka/",
-  "sr": "/sr/kalkulatori/estrih-malter/",
-  "it": "/it/calcolatori/massetto-intonaco/",
-  "nl": "/nl/rekenmachines/dekvloer-pleister/",
-  "es": "/es/calculadoras/solera-revoco/",
-  "fr": "/fr/calculateurs/chape-enduit/"
-};</script>
-
-<script src="/assets/i18n.uk.js?v=20260902a"></script>
-<script src="/assets/i18n-runtime.js?v=20260902a"></script>
-<script src="/assets/currency.js?v=20260902a"></script>
-<script src="/assets/account.js?v=20260902a"></script>
-
-<script src="/assets/units.js?v=20260902a"></script>
-<script src="/assets/own-materials.js?v=20260902a"></script>
-<script src="/assets/calculators.js?v=20260902a"></script>
-<script src="/assets/materials.js?v=20260902a"></script>
-<script src="/assets/materials-ui.js?v=20260902a"></script>
-<script src="/assets/workspace.js?v=20260902a"></script>
-<script src="/assets/workspace-calc.js?v=20260902a"></script>
-<script src="/assets/recent.js?v=20260902a"></script>
-<script src="/assets/main.js?v=20260902a"></script>
 
 </body>
 </html>
