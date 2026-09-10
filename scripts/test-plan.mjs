@@ -499,9 +499,9 @@ head("6d. the wall as it is built, in ten languages");
     // German for "Klienci" is "Kunden" and its own description opens with
     // "Eine Kundenliste", so a substring count says two and means one.
     check(`${lang}: the module behind this wall is named in the heading`,
-      html.includes(`<h2>${esc(t("feat_clients_t"))}</h2>`));
+      html.includes(`<h2 data-i18n="feat_clients_t">${esc(t("feat_clients_t"))}</h2>`));
     check(`${lang}: and is not repeated in the list of what else Pro contains`,
-      !html.includes(`<li><b>${esc(t("feat_clients_t"))}</b>`));
+      !html.includes(`<b data-i18n="feat_clients_t">${esc(t("feat_clients_t"))}</b>`));
 
     // Session 28: the wall quotes a price. The amounts are NOT in the markup — the build
     // has no idea which currency this visitor reads in — so what is checked is the frame
@@ -640,11 +640,12 @@ head("9. /app/ carries the Pro tab");
   for (const feature of ["clients", "jobs", "quotes", "calendar"]) {
     has(`id="${gatePrefix[feature]}-gate"`, `the "${feature}" tab carries its own live wall`);
   }
-  // proGate() (src/pro.mjs) predates /app/'s in-place picker and carries no data-i18n of
-  // its own — it is built once per static, per-language page everywhere else it is used.
-  // See the note in the redesign's summary: that tab carrying a wall stays in Polish
-  // across a langchange, a disclosed gap rather than a silent one.
-  const lockedChip = `<span class="chip">${DICT.pl.pro_locked}</span>`;
+  // proGate() (src/pro.mjs) predates /app/'s in-place picker: everywhere else it is used
+  // the build writes it once per static, per-language page, so it carried no data-i18n and
+  // a tab with a wall stayed in Polish across a langchange — a disclosed gap, closed
+  // 2026-09-10. Every string it prints is tagged now, which is why the chip is matched
+  // with its attribute.
+  const lockedChip = `<span class="chip" data-i18n="pro_locked">${DICT.pl.pro_locked}</span>`;
   eq("one pro_locked chip per walled tab, inside those four gates",
     html.split(lockedChip).length - 1, 4);
 
