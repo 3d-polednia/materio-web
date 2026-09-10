@@ -473,6 +473,21 @@ head("8. a real result, saved and read back");
   }
 }
 
+/* ------------------------------------------------------------------ 9. parsing numbers */
+
+head("9. wsParseTokenNumber parses localization tokens correctly");
+{
+  const { wsParseTokenNumber } = evalScript("assets/workspace-calc.js", ["wsParseTokenNumber"], {
+    document: { documentElement: { lang: "en" }, addEventListener: () => {} },
+    t: (k) => k
+  });
+
+  eq("the token form '|n:7|%' reads back as 7", wsParseTokenNumber("|n:7|%"), 7);
+  eq("a plain '7%' still reads back as 7", wsParseTokenNumber("7%"), 7);
+  eq("a decimal token '|n:7.5|%' reads back as 7.5", wsParseTokenNumber("|n:7.5|%"), 7.5);
+  eq("a value with no number in it reads back as 0, not NaN", wsParseTokenNumber("waste"), 0);
+}
+
 /* ------------------------------------------------------------------ report */
 
 console.log(`\nsave: ${passed}/${passed + failures.length} checks pass`);

@@ -29,6 +29,21 @@ const wsDecimal = (v) => {
 };
 const wsNum = (v) => new Intl.NumberFormat(wsLang(), { maximumFractionDigits: 2 }).format(v);
 
+/**
+ * A result row carries a localization token, not a number: `qtyG` in assets/calculators.js
+ * writes `|n:7.5|` and assets/units.js formats it for the page. Read straight with
+ * parseFloat it came back NaN, wsWastePercent refused it, wsAddEstimation returned null,
+ * and every calculator with a waste row saved nothing at all while the page said nothing
+ * either. A row with no number in it is worth zero, which is what it always meant.
+ */
+function wsParseTokenNumber(val) {
+  const s = String(val);
+  const m = s.match(/\|n:(-?[0-9.]+)\|/);
+  if (m) return parseFloat(m[1]);
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
 /* ------------------------------------------------------------------ calculator cards */
 
 /** Which surfaces make sense for a calculator, in the order they are offered. */
@@ -319,7 +334,7 @@ function wsSaveResult(card, box) {
     // line reading "1 worków" would be the same defect one screen further on.
     unitLabel: wsUnit(result.unit, result.tobuy),
     costMajor: result.cost || 0,
-    wastePercent: waste ? parseFloat(String(waste[1])) : 0,
+    wastePercent: waste ? wsParseTokenNumber(waste[1]) : 0,
     input,
     snapshot: wsSnapshotOf(card, result),
     projectName: wsT("ws_default_project"),
