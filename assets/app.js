@@ -1490,7 +1490,7 @@ function wireQuotesPanel() {
  * nowhere else to live, so it lives beside the render it serves.
  */
 
-const calState = { year: 0, month: 0, day: "" };
+const calState = { year: 0, month: 0, day: "", adding: false, picking: false };
 
 /** Every date cell a month's grid needs, Monday-first, in complete weeks. */
 function calCells(year, month) {
@@ -1508,6 +1508,22 @@ const dayKey = (d) => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 };
 
+/**
+ * Safely validate and resolve a job's color token against the CRM contract.
+ *
+ * Jobs read back from storage may carry no color at all, or an unknown token if written
+ * by an older or future schema. To guard the calendar grid and day panel from injecting
+ * unsanitized classes into the DOM, every token is verified against the published
+ * JOB_COLORS array or crmJobColor() helper before emitting class names.
+ */
+function calJobColor(value) {
+  if (typeof crmJobColor === "function") return crmJobColor(value);
+  if (typeof JOB_COLORS !== "undefined" && Array.isArray(JOB_COLORS)) {
+    return JOB_COLORS.indexOf(value) >= 0 ? value : "";
+  }
+  return "";
+}
+
 function renderCalDayPanel() {
   const box = $("acctcal-daypanel");
   if (!box) return;
@@ -1520,12 +1536,56 @@ function renderCalDayPanel() {
   const jobs = byDay[day] || [];
   const slots = jobs.map((j) => {
     const client = j.clientId && typeof crmClient === "function" ? crmClient(j.clientId) : null;
-    return `<div class="cal-slot"><div>
+    const color = calJobColor(j.color);
+    const colorClass = color ? ` cal-slot-${color}` : "";
+    const clientName = client ? `${escapeHtml(client.name)} — ` : "";
+    return `<div class="cal-slot${colorClass}"><div>
         <div class="t">${escapeHtml(j.name)}</div>
-        <div class="d">${client ? `${escapeHtml(client.name)} — ` : ""}${T("job_st_" + j.status)}</div>
+        <div class="d">${clientName}${T("job_st_" + j.status)}</div>
       </div></div>`;
   }).join("");
-  box.innerHTML = `<h3>${escapeHtml(label)}</h3>${jobs.length ? slots : `<p class="muted">${T("app_schedule_empty_day")}</p>`}`;
+
+  const clients = typeof crmClients === "function" ? crmClients() : [];
+  const clientOptions = [`<option value="">${T("cal_add_noclient")}</option>`]
+    .concat(clients.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`))
+    .join("");
+
+  const colors = typeof JOB_COLORS !== "undefined" && Array.isArray(JOB_COLORS) ? JOB_COLORS : [];
+  const colorOptions = [`<option value="">${T("job_color_none")}</option>`]
+    .concat(colors.map((token) => `<option value="${escapeHtml(token)}">${T("job_color_" + token)}</option>`))
+    .join("");
+
+  box.innerHTML = `<h3>${escapeHtml(label)}</h3>` +
+    (jobs.length ? slots : `<p class="muted">${T("app_schedule_empty_day")}</p>`) +
+    `<p><button type="button" class="btn btn-ghost btn-sm" id="acctcal-add-toggle">${T("app_cal_add")}</button></p>
+    <form id="acctcal-add-form" class="cal-add"${calState.adding ? "" : " hidden"}>
+      <p class="ws-mat-grid">
+        <label class="ws-mat-f">
+          <span class="ws-bar-label">${T("job_new")}</span>
+          <input type="text" id="acctcal-add-name" maxlength="120" required>
+        </label>
+        <label class="ws-mat-f">
+          <span class="ws-bar-label">${T("cal_add_date")}</span>
+          <input type="date" id="acctcal-add-date" value="${escapeHtml(calState.day || "")}" required>
+        </label>
+        <label class="ws-mat-f">
+          <span class="ws-bar-label">${T("job_client")}</span>
+          <select id="acctcal-add-client">${clientOptions}</select>
+        </label>
+        <label class="ws-mat-f">
+          <span class="ws-bar-label">${T("job_color")}</span>
+          <select id="acctcal-add-color">${colorOptions}</select>
+        </label>
+        <label class="ws-mat-f">
+          <span class="ws-bar-label">${T("job_desc")}</span>
+          <input type="text" id="acctcal-add-desc" maxlength="2000">
+        </label>
+      </p>
+      <p>
+        <button type="submit" class="btn btn-primary btn-sm">${T("cal_add_btn")}</button>
+        <button type="button" id="acctcal-add-cancel" class="btn btn-ghost btn-sm">${T("app_cancel")}</button>
+      </p>
+    </form>`;
 }
 
 function renderSchedule() {
@@ -1541,8 +1601,21 @@ function renderSchedule() {
   const lang = document.documentElement.lang || "pl";
   const monthEl = $("acctcal-month");
   if (monthEl) {
-    monthEl.textContent = new Date(calState.year, calState.month, 1)
-      .toLocaleDateString(lang, { month: "long", year: "numeric" });
+    if (!calState.picking) {
+      const label = new Date(calState.year, calState.month, 1)
+        .toLocaleDateString(lang, { month: "long", year: "numeric" });
+      monthEl.innerHTML = `<button type="button" id="acctcal-month-toggle" class="cal-month-btn" aria-expanded="false">${escapeHtml(label)}<span class="cal-month-caret" aria-hidden="true">▾</span></button>`;
+    } else {
+      const monthOptions = Array.from({ length: 12 }, (_, i) => {
+        const name = new Date(calState.year, i, 1).toLocaleDateString(lang, { month: "long" });
+        return `<option value="${i}"${i === calState.month ? " selected" : ""}>${escapeHtml(name)}</option>`;
+      }).join("");
+      const yearOptions = Array.from({ length: 11 }, (_, i) => {
+        const y = calState.year - 5 + i;
+        return `<option value="${y}"${y === calState.year ? " selected" : ""}>${y}</option>`;
+      }).join("");
+      monthEl.innerHTML = `<span class="cal-month-pick"><select id="acctcal-pick-month" aria-label="${escapeHtml(T("app_cal_month"))}">${monthOptions}</select><select id="acctcal-pick-year" aria-label="${escapeHtml(T("app_cal_year"))}">${yearOptions}</select></span>`;
+    }
   }
 
   const wk = $("acctcal-weekdays");
@@ -1563,7 +1636,9 @@ function renderSchedule() {
     const shown = jobs.slice(0, 2).map((j) => {
       const done = openStatus.indexOf(j.status) === -1;
       const late = !done && key < today;
-      return `<span class="cal-ev${done ? " done" : late ? " late" : ""}">${escapeHtml(j.name)}</span>`;
+      const color = calJobColor(j.color);
+      const colorClass = color ? ` cal-ev-${color}` : "";
+      return `<span class="cal-ev${done ? " done" : late ? " late" : ""}${colorClass}">${escapeHtml(j.name)}</span>`;
     }).join("");
     const more = jobs.length > 2 ? `<span class="cal-ev more">+${jobs.length - 2}</span>` : "";
     return `<button type="button" class="cal-day${out ? " is-out" : ""}${key === today ? " is-today" : ""}${key === calState.day ? " is-selected" : ""}" data-day="${key}">
@@ -1580,6 +1655,7 @@ function wireSchedulePanel() {
   grid.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-day]");
     if (!btn) return;
+    calState.picking = false;
     calState.day = btn.dataset.day;
     renderSchedule();
   });
@@ -1587,19 +1663,91 @@ function wireSchedulePanel() {
   // that is actually on screen — the 1st of the month just opened — or the panel would go
   // on describing a day from the month that just scrolled away, with no cell to match it.
   $("acctcal-prev").addEventListener("click", () => {
+    calState.picking = false;
     calState.month -= 1;
     if (calState.month < 0) { calState.month = 11; calState.year -= 1; }
     calState.day = dayKey(new Date(calState.year, calState.month, 1));
     renderSchedule();
   });
   $("acctcal-next").addEventListener("click", () => {
+    calState.picking = false;
     calState.month += 1;
     if (calState.month > 11) { calState.month = 0; calState.year += 1; }
     calState.day = dayKey(new Date(calState.year, calState.month, 1));
     renderSchedule();
   });
   $("acctcal-today").addEventListener("click", () => {
+    calState.picking = false;
     calState.year = 0; // renderSchedule() re-seeds from today when year is falsy
+    renderSchedule();
+  });
+
+  // Delegated from #acctcal-tool because renderSchedule() completely rebuilds the month
+  // heading on each toggle and change, which would destroy direct listeners. A click
+  // anywhere else within the calendar container closes the picker without side effects.
+  const tool = $("acctcal-tool");
+  if (tool) {
+    tool.addEventListener("click", (e) => {
+      if (e.target.closest("#acctcal-month-toggle")) {
+        calState.picking = true;
+        renderSchedule();
+        return;
+      }
+      if (calState.picking && !e.target.closest("#acctcal-month")) {
+        calState.picking = false;
+        renderSchedule();
+      }
+    });
+    tool.addEventListener("change", (e) => {
+      if (e.target.id === "acctcal-pick-month") {
+        calState.month = Number(e.target.value);
+        calState.picking = false;
+        calState.day = dayKey(new Date(calState.year, calState.month, 1));
+        renderSchedule();
+      } else if (e.target.id === "acctcal-pick-year") {
+        calState.year = Number(e.target.value);
+        calState.picking = false;
+        calState.day = dayKey(new Date(calState.year, calState.month, 1));
+        renderSchedule();
+      }
+    });
+  }
+
+  const panel = $("acctcal-daypanel");
+  if (!panel) return;
+  panel.addEventListener("click", (e) => {
+    if (e.target.closest("#acctcal-add-toggle")) {
+      calState.adding = true;
+      renderCalDayPanel();
+    } else if (e.target.closest("#acctcal-add-cancel")) {
+      calState.adding = false;
+      renderCalDayPanel();
+    }
+  });
+  panel.addEventListener("submit", (e) => {
+    const form = e.target.closest("#acctcal-add-form");
+    if (!form) return;
+    e.preventDefault();
+    const nameInput = form.querySelector("#acctcal-add-name");
+    const dateInput = form.querySelector("#acctcal-add-date");
+    const clientSelect = form.querySelector("#acctcal-add-client");
+    const colorSelect = form.querySelector("#acctcal-add-color");
+    const descInput = form.querySelector("#acctcal-add-desc");
+    const name = (nameInput ? nameInput.value : "").trim();
+    const dueDate = (dateInput ? dateInput.value : "").trim();
+    const clientId = (clientSelect ? clientSelect.value : "").trim();
+    const color = (colorSelect ? colorSelect.value : "").trim();
+    const description = (descInput ? descInput.value : "").trim();
+    if (!name || !dueDate || typeof crmAddJob !== "function") return;
+    const row = crmAddJob({ name, dueDate, clientId, color, description });
+    if (!row) return;
+    calState.adding = false;
+    calState.day = dueDate;
+    const d = new Date(`${dueDate}T00:00:00`);
+    if (!isNaN(d.getTime())) {
+      calState.year = d.getFullYear();
+      calState.month = d.getMonth();
+    }
     renderSchedule();
   });
 }
@@ -2084,6 +2232,7 @@ async function pushProWorkspace(since) {
       status: jobStatus(j.status),
       description: text(j.description, 2000),
       note: text(j.note, 2000),
+      color: text(j.color, 16),
       dueDate: proDay(j.dueDate),
       valueMinor: value,
       currencyCode: value == null ? "" : text(j.currencyCode, 3),

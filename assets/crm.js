@@ -63,6 +63,13 @@ const JOB_OPEN_STATUS = ["new", "active"];
 const JOB_DEFAULT_STATUS = "new";
 
 /**
+ * Five tokens for calendar events (session of 2026-09-10), not CSS colours: the
+ * stylesheet decides what each one looks like in each theme, and a raw hex stored in
+ * the document would be a colour that cannot follow a theme and cannot be re-themed later.
+ */
+const JOB_COLORS = ["lime", "blue", "amber", "red", "violet"];
+
+/**
  * The terminarz's buckets, in the order the page draws them — session 25, chapter XXIII.
  *
  * They are the answer to "kiedy", which is the only question a terminarz is opened with:
@@ -308,6 +315,12 @@ function crmFreeProjects() {
 /** Is this one of chapter XXI's four statuses? An unknown one is never stored. */
 const crmIsStatus = (v) => JOB_STATUS.indexOf(String(v)) !== -1;
 
+/**
+ * One of the five calendar tokens, or "" — an unknown or absent colour is "no colour".
+ * Matches the style of neighbouring clamps: empty string means no calendar accent.
+ */
+const crmJobColor = (v) => (JOB_COLORS.indexOf(String(v === undefined || v === null ? "" : v)) !== -1 ? String(v) : "");
+
 /** Chapter XXI's date: a calendar day, as "YYYY-MM-DD", or "" for a job with no deadline.
  *
  * Not millis, unlike every timestamp in the store. A deadline is a day in the visitor's
@@ -361,7 +374,7 @@ const crmJob = (id) => crmAllJobs().find((j) => j.id === id) || null;
  *
  * @param {{name:string, clientId?:string, projectId?:string, status?:string,
  *          description?:string, dueDate?:string, valueMajor?:string|number,
- *          note?:string}} fields
+ *          note?:string, color?:string}} fields
  * @returns {object|null} the stored job, or null when there is no name
  */
 function crmAddJob(fields) {
@@ -381,6 +394,11 @@ function crmAddJob(fields) {
     status: crmIsStatus(f.status) ? String(f.status) : JOB_DEFAULT_STATUS,
     description: crmText(f.description, CRM_MAX_NOTE),
     note: crmText(f.note, CRM_MAX_NOTE),
+    // Calendar event colour (session of 2026-09-10). Safe to store on the synced document:
+    // deployed Firestore rules validate a job with validJob(), which asserts the fields
+    // it knows and has no hasOnly() clause, so an extra key is accepted. Android's
+    // roomFromDoc()-style readers ignore unknown keys, so the phone's copy is unharmed.
+    color: crmJobColor(f.color),
     dueDate: crmDay(f.dueDate),
     valueMinor: value,
     currencyCode: value === null ? "" : crmCurrency(),
@@ -430,6 +448,7 @@ function crmUpdateJob(id, fields) {
   }
   if (f.description !== undefined) job.description = crmText(f.description, CRM_MAX_NOTE);
   if (f.note !== undefined) job.note = crmText(f.note, CRM_MAX_NOTE);
+  if (f.color !== undefined) job.color = crmJobColor(f.color);
   if (f.dueDate !== undefined) job.dueDate = crmDay(f.dueDate);
   if (f.status !== undefined && crmIsStatus(f.status)) job.status = String(f.status);
   if (f.valueMajor !== undefined) {
@@ -1343,7 +1362,7 @@ function crmJobsByDay() {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     CRM_KEY, CRM_SCHEMA, CRM_MAX_NAME, CRM_MAX_NOTE,
-    JOB_STATUS, JOB_OPEN_STATUS, JOB_DEFAULT_STATUS,
+    JOB_STATUS, JOB_OPEN_STATUS, JOB_DEFAULT_STATUS, JOB_COLORS,
     CAL_BUCKETS, CAL_SOON_DAYS,
     CRM_CHAIN, CRM_HISTORY_KINDS,
     QUO_MAX_LINES, QUO_MAX_MARGIN,

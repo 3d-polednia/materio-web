@@ -40,6 +40,9 @@
    --brand-lime    the logo's green. Fixed in both themes — it is the mark, not a
                    surface, and it must not drift with the theme.
    --*-soft        a tinted container; pair it only with the matching --on-*-soft.
+   --ev-*          the five calendar job categories (lime, blue, amber, red, violet).
+                   Held at >= 4.5:1 against the cell surface in both themes and paired
+                   with --on-ev-* so chip labels stay legible at small sizes.
    --outline       hairlines between things that are already distinguishable.
    --outline-control the border of a control the visitor acts on — an input, a
                    select, a chip, a tab, a ghost button — which is the only thing
@@ -81,6 +84,16 @@
   --warning: #8a5300;
   --warning-soft: #fbeed6;
   --on-warning-soft: #5c3700;
+  --ev-lime: #476c00;
+  --on-ev-lime: #ffffff;
+  --ev-blue: #185abc;
+  --on-ev-blue: #ffffff;
+  --ev-amber: #8a5300;
+  --on-ev-amber: #ffffff;
+  --ev-red: #b3261e;
+  --on-ev-red: #ffffff;
+  --ev-violet: #62369c;
+  --on-ev-violet: #ffffff;
   --overlay: rgba(20, 24, 28, .45);
   --shadow-1: 0 1px 2px rgba(20,24,28,.06);
   --shadow-2: 0 1px 2px rgba(20,24,28,.06), 0 6px 20px rgba(20,24,28,.05);
@@ -120,6 +133,16 @@
     --warning: #ffc46b;
     --warning-soft: #30230a;
     --on-warning-soft: #ffd79a;
+    --ev-lime: #a8e626;
+    --on-ev-lime: #0a0f04;
+    --ev-blue: #58a6ff;
+    --on-ev-blue: #06101e;
+    --ev-amber: #ffc46b;
+    --on-ev-amber: #190f00;
+    --ev-red: #ff8a80;
+    --on-ev-red: #200604;
+    --ev-violet: #bb86fc;
+    --on-ev-violet: #140526;
     --overlay: rgba(0, 0, 0, .62);
     --shadow-1: 0 1px 2px rgba(0,0,0,.5);
     --shadow-2: 0 1px 2px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.35);
@@ -157,6 +180,16 @@
   --warning: #ffc46b;
   --warning-soft: #30230a;
   --on-warning-soft: #ffd79a;
+  --ev-lime: #a8e626;
+  --on-ev-lime: #0a0f04;
+  --ev-blue: #58a6ff;
+  --on-ev-blue: #06101e;
+  --ev-amber: #ffc46b;
+  --on-ev-amber: #190f00;
+  --ev-red: #ff8a80;
+  --on-ev-red: #200604;
+  --ev-violet: #bb86fc;
+  --on-ev-violet: #140526;
   --overlay: rgba(0, 0, 0, .62);
   --shadow-1: 0 1px 2px rgba(0,0,0,.5);
   --shadow-2: 0 1px 2px rgba(0,0,0,.5), 0 6px 20px rgba(0,0,0,.35);
@@ -1444,6 +1477,24 @@ a.chip:hover { text-decoration: none; }
 
 .cal-head { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-3); }
 .cal-head h3 { margin: 0; font-size: var(--fs-md); text-transform: capitalize; }
+/* The month and year are the way into the picker, so the heading has to be pressable —
+   but it is still the heading. A .btn class in here would have put a bordered pill where
+   a title belongs, so this borrows the h3's own type and adds only what says "press me":
+   a caret, a pointer, and the underline on hover that the rest of the site uses for a
+   control that is really a link to somewhere else. The focus ring comes from the global
+   :focus-visible rule, which is why none is declared here. */
+.cal-month-btn {
+  display: inline-flex; align-items: baseline; gap: var(--sp-1);
+  font: inherit; color: inherit; text-transform: inherit;
+  background: none; border: 0; padding: 0; cursor: pointer;
+}
+.cal-month-btn:hover { text-decoration: underline; }
+.cal-month-caret { font-size: var(--fs-xs); color: var(--muted); }
+/* Two selects standing where the title was. They keep the head's own line height by
+   dropping the heading's capitalisation, which would otherwise fight each language's own
+   rule about whether a month name is capitalised at all. */
+.cal-month-pick { display: inline-flex; gap: var(--sp-2); text-transform: none; }
+.cal-month-pick select { font: inherit; font-weight: var(--fw-medium); }
 .cal-nav { display: flex; gap: var(--sp-1); margin-left: var(--sp-1); }
 .cal-nav button {
   width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--outline);
@@ -1481,6 +1532,14 @@ a.chip:hover { text-decoration: none; }
   border-radius: var(--radius-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   background: var(--accent-soft-2); color: var(--on-accent-soft);
 }
+/* Coloured chips for scheduled jobs. They precede .late and .done so an overdue
+   or completed job keeps its unmistakable warning or muted strike-through rather
+   than being masked by its category tint. */
+.cal-ev-lime { background: var(--ev-lime); color: var(--on-ev-lime); }
+.cal-ev-blue { background: var(--ev-blue); color: var(--on-ev-blue); }
+.cal-ev-amber { background: var(--ev-amber); color: var(--on-ev-amber); }
+.cal-ev-red { background: var(--ev-red); color: var(--on-ev-red); }
+.cal-ev-violet { background: var(--ev-violet); color: var(--on-ev-violet); }
 .cal-ev.late { background: var(--error-soft); color: var(--on-error-soft); }
 .cal-ev.done { background: transparent; color: var(--muted); text-decoration: line-through; padding-left: 0; }
 .cal-ev.more { background: transparent; color: var(--muted); font-weight: var(--fw-bold); }
@@ -1492,6 +1551,31 @@ a.chip:hover { text-decoration: none; }
 .cal-slot:first-of-type { border-top: 0; }
 .cal-slot .t { font-weight: var(--fw-semi); font-size: var(--fs-sm); }
 .cal-slot .d { color: var(--muted); font-size: var(--fs-sm); }
+/* The day-panel row marks its job category with a small round swatch. A swatch
+   becomes a second flex item beside the text column and lets .cal-slot's existing
+   gap separate them cleanly, whereas a left border would collide with the top
+   hairline and fight the zero side-padding on uncoloured rows. */
+.cal-slot-lime::before,
+.cal-slot-blue::before,
+.cal-slot-amber::before,
+.cal-slot-red::before,
+.cal-slot-violet::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 5px; flex: none;
+}
+.cal-slot-lime::before { background: var(--ev-lime); }
+.cal-slot-blue::before { background: var(--ev-blue); }
+.cal-slot-amber::before { background: var(--ev-amber); }
+.cal-slot-red::before { background: var(--ev-red); }
+.cal-slot-violet::before { background: var(--ev-violet); }
+
+/* The quick-add form expanding under the day panel. Spaced off the slots above it
+   with the standard card separation hairline, while its fields borrow the ws-mat
+   grid and input sizing rules so they wrap naturally within the 280px column. */
+.cal-add {
+  margin-top: var(--sp-4); padding-top: var(--sp-3);
+  border-top: 1px solid var(--outline);
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .app-nav-item, .cal-day { transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
