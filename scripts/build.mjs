@@ -618,6 +618,93 @@ function stripHtmlComments(html) {
   return out + html.slice(i);
 }
 
+/* ---------- Audit item M8: a Content-Security-Policy on every generated page
+
+   The finding: the string "Content-Security-Policy" appeared nowhere in the repository,
+   while the template ships inline scripts and the pages keep a whole workspace in
+   localStorage. Any HTML injection on a generated page could therefore run a script and
+   post that workspace anywhere.
+
+   Why a <meta> and not a header. The site is published by GitHub Pages, which serves
+   static files and sends no headers of ours — there is no configuration file that can add
+   one. A <meta http-equiv> is the only channel left. It costs two directives that only
+   work as a header (`frame-ancestors` and `report-uri`, both ignored in meta, so neither
+   is written here) and it must come before anything it governs, which is why it is the
+   first element in <head>.
+
+   Why hashes and not a nonce. A nonce has to differ per response; these files are written
+   once and served from a CDN, so a nonce in them would be a constant — that is, not a
+   nonce. Every inline script is hashed instead, this build step reading the exact text it
+   just wrote. That includes the JSON-LD blocks: they are not executable and Chrome does
+   not check them, but the specification counts them as script elements and hashing them
+   costs 71 bytes each.
+
+   What is deliberately loose. `connect-src` and `frame-src` are `https:` rather than a
+   list. Firebase Auth alone reaches identitytoolkit, securetoken, the project's
+   firebaseapp.com iframe and apis.google.com, Firestore opens its own channel, the stores
+   page asks two Overpass mirrors and embeds a Google map, and none of that can be
+   exercised from here — Playwright is not installed on this machine, so a wrong host
+   would be found by a visitor and not by a test. The directive that carries this finding
+   is `script-src`: with no 'unsafe-inline' and no 'unsafe-eval', injected markup cannot
+   execute, and an exfiltration that cannot start needs no destination to be blocked.
+   Tighten the two when there is a browser here to prove them with.
+
+   `style-src 'self'` holds because no generated page carries a style attribute or a
+   <style> block (assets/*.js writes through the CSSOM, which CSP does not govern), and
+   `form-action 'self'` because no form on the site names an action. */
+/* The third-party hosts, each named by the page that actually loads code from it. A page
+   that loads neither does not name either: /p/ ships without the analytics block, because
+   the token in its address is the credential and GA4 would send the whole address to
+   Google (§5 of scripts/test-security.mjs checks the host is absent from that file, which
+   is also why an unconditional list here would be a defect and not a precaution). */
+const CSP_ANALYTICS = "https://www.googletagmanager.com https://*.googletagmanager.com " +
+  "https://www.google-analytics.com https://*.google-analytics.com";
+const CSP_FIREBASE = "https://www.gstatic.com https://apis.google.com";
+
+const CSP_DIRECTIVES = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "form-action 'self'",
+  "script-src 'self'", // the hosts this page needs and its own hashes are appended below
+  "style-src 'self'",
+  "img-src 'self' data: https:",
+  "font-src 'self'",
+  // `wss:` is its own scheme and no https: wildcard covers it — Firestore's transport can
+  // fall back to a socket, and a policy that only names https would cut the live listener
+  // on /app/ with nothing on screen to say why. `blob:` is the export: a workspace is
+  // handed over as an object URL (assets/app.js, assets/workspace-ui.js).
+  "connect-src https: wss: blob:",
+  "frame-src https:",
+  "manifest-src 'self'",
+];
+
+/** Every inline script in the file, as CSP source expressions. */
+function inlineScriptHashes(html) {
+  const out = new Set();
+  const re = /<script(?![^>]*\ssrc=)[^>]*>([\s\S]*?)<\/script>/gi;
+  for (const m of html.matchAll(re)) {
+    out.add(`'sha256-${createHash("sha256").update(m[1], "utf8").digest("base64")}'`);
+  }
+  return [...out];
+}
+
+/** The policy for one page, as the first element inside its <head>. */
+function withCsp(html) {
+  // What this page loads, read off the page. gtag.js appends itself from the inline
+  // analytics block; the Firebase SDK is imported by the module scripts, which are on
+  // /app/ and /p/ and nowhere else.
+  const hosts = [
+    /googletagmanager\.com/.test(html) ? CSP_ANALYTICS : "",
+    /<script type="module"/.test(html) ? CSP_FIREBASE : "",
+  ].filter(Boolean);
+  const scriptSrc = [...hosts, ...inlineScriptHashes(html)].join(" ");
+  const directives = CSP_DIRECTIVES.map((d) =>
+    d === "script-src 'self'" && scriptSrc ? `${d} ${scriptSrc}` : d);
+  const meta = `<meta http-equiv="Content-Security-Policy" content="${directives.join("; ")}">`;
+  return html.replace("<head>", `<head>\n${meta}`);
+}
+
 function write(relPath, contents) {
   // On Windows path.join() uses backslashes and may keep a leading backslash from a
   // URL like "/aplikacja/".  Normalise to forward slashes without a leading slash so
@@ -626,7 +713,9 @@ function write(relPath, contents) {
   relPath = relPath.replace(/\\/g, "/").replace(/^\//, "");
   const full = p(relPath);
   if (relPath.endsWith(".html")) {
-    contents = stripHtmlComments(contents);
+    // Comments first: the policy is a hash of the script text that ships, and stripping
+    // runs over the file the hash would otherwise be taken from.
+    contents = withCsp(stripHtmlComments(contents));
     if (previous.get(relPath) !== fingerprint(contents)) changed.add(relPath);
     if (/<meta name="robots" content="noindex/.test(contents)) noindexed.add(relPath);
   }

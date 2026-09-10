@@ -45,6 +45,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 import { LEVEL, route } from "../src/ia.mjs";
 import { LANGS } from "../src/site.mjs";
@@ -754,6 +755,68 @@ head("13. what a name somebody else typed does once it reaches the page");
   eq("an empty name falls back", wsFileName("", "kosztorys", "csv"), "liczmat-kosztorys.csv");
   eq("and an ordinary one survives",
     wsFileName("Łazienka", "kosztorys", "csv"), "liczmat-Łazienka.csv");
+}
+
+/* ---------- 14. the policy every generated page carries
+   Audit 2026-09-04, item M8: the string "Content-Security-Policy" was in no file of this
+   repository, while the template ships inline scripts and the pages keep a workspace in
+   localStorage. GitHub Pages sends no headers of ours, so the policy is a <meta> written
+   by withCsp() in scripts/build.mjs, and every inline script on the page is hashed there.
+   These checks are what stands between that and a hash that silently stopped matching —
+   one changed character in an inline block, and the block is refused on 510 pages. */
+
+head("14. what the page tells the browser it is allowed to run");
+{
+  const CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
+  const generated = PAGES.filter((f) => f !== "privacy-policy.html" && f !== "404.html");
+
+  check("there are generated pages to read", generated.length > 370, String(generated.length));
+
+  let missing = 0, unhashed = 0, loose = null, late = null, firstBad = "";
+  for (const file of generated) {
+    const html = read(file);
+    const m = html.match(CSP);
+    if (!m) { missing++; if (!firstBad) firstBad = file; continue; }
+    const policy = m[1];
+
+    // Before anything it governs. The theme block is the very next element.
+    if (late === null && html.indexOf(m[0]) > html.indexOf("<script")) late = file;
+
+    // The finding's own directive. Neither keyword may come back: with either of them an
+    // injected <script> runs and the policy is decoration.
+    if (!loose && (/script-src[^;]*'unsafe-inline'/.test(policy)
+      || /script-src[^;]*'unsafe-eval'/.test(policy)
+      || !/(^|;\s*)object-src 'none'/.test(policy)
+      || !/(^|;\s*)base-uri 'self'/.test(policy))) loose = file;
+
+    // Every inline script on the page — the theme block, the analytics block, the
+    // window.LM_* data and the JSON-LD — has to be in the policy by hash, or the browser
+    // refuses it. Git checks this tree out with CRLF on Windows while the build writes LF
+    // and the Pages runner serves LF, so both endings count as the same script.
+    for (const s of html.matchAll(/<script(?![^>]*\ssrc=)[^>]*>([\s\S]*?)<\/script>/gi)) {
+      const forms = new Set([s[1], s[1].split(CR + LF).join(LF)]);
+      const ok = [...forms].some((text) =>
+        policy.includes(`'sha256-${createHash("sha256").update(text, "utf8").digest("base64")}'`));
+      if (!ok) { unhashed++; if (!firstBad) firstBad = `${file}: ${s[1].slice(0, 60).trim()}`; }
+    }
+  }
+
+  check("every generated page carries a policy", missing === 0, `${missing} without one, e.g. ${firstBad}`);
+  check("it stands before the first script it governs", late === null, String(late));
+  check("no page hands script-src back to inline or eval, and object-src and base-uri are shut",
+    loose === null, String(loose));
+  check("every inline script on every page is in its page's policy by hash",
+    unhashed === 0, `${unhashed} unhashed, e.g. ${firstBad}`);
+
+  // The hosts, stated once here so that adding one is a decision somebody made and not a
+  // line that arrived with a copied snippet.
+  const policy = (read(generated.find((f) => f.endsWith("kalkulatory/index.html")) || generated[0])
+    .match(CSP) || [])[1] || "";
+  const hosts = (policy.match(/script-src ([^;]*)/) || ["", ""])[1]
+    .split(" ").filter((s) => s.startsWith("https://"));
+  check("script-src names only the three third parties the site actually loads code from",
+    hosts.every((h) => /googletagmanager\.com$|google-analytics\.com$|^https:\/\/www\.gstatic\.com$|^https:\/\/apis\.google\.com$/.test(h)),
+    hosts.join(" "));
 }
 
 /* ------------------------------------------------------------------ report */
