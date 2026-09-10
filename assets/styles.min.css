@@ -878,6 +878,7 @@ color: var(--accent-strong); font-weight: var(--fw-semi); cursor: pointer;
 text-decoration: underline; text-underline-offset: var(--sp-1);
 }
 .linkish:hover { color: var(--on-bg); }
+.auth-links .linkish { min-height: var(--control-h); padding: 11px 0; margin: -11px 0; }
 .field-check { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-4); }
 .field-check input { width: var(--sp-5); height: var(--sp-5); flex: none; accent-color: var(--accent-strong); }
 .field-check label { font-size: var(--fs-sm); margin: 0; }
@@ -915,7 +916,7 @@ background: var(--surface);
 .pro-lock .chip { cursor: default; background: var(--accent-soft); color: var(--on-accent-soft); border-color: var(--accent-edge); }
 .pro-soon { margin: var(--sp-2) 0 0; font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 .pro-more { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
-.app-shell { display: flex; flex-direction: column; min-height: 100vh; }
+.app-shell { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
 @media (min-width: 900px) {
 .app-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
 }
@@ -926,7 +927,7 @@ background: var(--surface); border-bottom: 1px solid var(--outline);
 }
 @media (min-width: 900px) {
 .app-side {
-position: sticky; top: 0; height: 100vh; overflow-y: auto;
+position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto;
 padding: var(--sp-5) var(--sp-4);
 border-bottom: 0; border-right: 1px solid var(--outline);
 }
