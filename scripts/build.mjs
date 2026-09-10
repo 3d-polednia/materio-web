@@ -1912,9 +1912,20 @@ function checkAgainstIA() {
     ...[...built].filter((f) => !declared.has(f)).map((f) => `built but not declared: ${f}`),
     ...missing.map((f) => `declared but not built: ${f}`),
   ];
-  // The two hand-written pages are declared too; they are never overwritten, only checked.
+  // The two hand-written pages are declared too. They are not generated, but they link
+  // to generated assets. Re-stamping them in place keeps their cache-busters from drifting
+  // away from the rest of the site when a new stamp ships.
   for (const f of ["privacy-policy.html", "404.html"]) {
-    if (!existsSync(p(f))) mismatches.push(`hand-written page is missing: ${f}`);
+    if (!existsSync(p(f))) {
+      mismatches.push(`hand-written page is missing: ${f}`);
+      continue;
+    }
+    const html = readFileSync(p(f), "utf8");
+    const next = html.replace(/\?v=[A-Za-z0-9._-]+/g, `?v=${STAMP}`);
+    if (html !== next) {
+      writeFileSync(p(f), next);
+      written.push(f);
+    }
   }
 
   // sitemap.xml against the markup that shipped, not against the list it was built from.

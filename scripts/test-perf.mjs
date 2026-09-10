@@ -67,7 +67,7 @@ function collect(dir = ROOT, out = []) {
     if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions", "hosting"].includes(name)) continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) { collect(full, out); continue; }
-    if (name.endsWith(".html")) out.push(full.slice(ROOT.length + 1));
+    if (name.endsWith(".html")) out.push(full.slice(ROOT.length + 1).replace(/\\/g, "/"));
   }
   return out;
 }
