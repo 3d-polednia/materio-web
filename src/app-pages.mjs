@@ -281,7 +281,7 @@ export function appMain(t, features) {
       <div class="app-shell">
           <aside class="app-side">
             <div class="app-side-brand">
-              <svg class="logo" viewBox="-1 -1 36 34" width="26" height="24" aria-hidden="true"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter"><g stroke="currentColor" stroke-width="3.05"><path d="M1.6 0V7.5L17 25.2L32.4 7.5V0"/><path d="M4.5 0L17 16.4L29.5 0"/></g><g stroke="var(--brand-lime)"><path d="M1.75 12V30H17.4" stroke-width="3.5"/><path d="M32.3 12.4V31.6" stroke-width="2"/><g stroke-width="2"><path d="M28.8 16.6H32.3"/><path d="M30.8 20.2H32.3"/><path d="M28.8 23.8H32.3"/><path d="M30.8 27.4H32.3"/><path d="M28.8 31H32.3"/></g></g></g></svg>
+              <svg class="logo" viewBox="0 0 64 64" width="26" height="26" aria-hidden="true"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="14"><path d="M8 26V56H34" stroke="var(--brand-lime)" stroke-width="8"/><path d="M58 22V60" stroke="var(--brand-lime)" stroke-width="7"/><g stroke="currentColor"><path d="M13 0V15L32 48L51 15V0" stroke-width="8"/><path d="M22 0L32 30L42 0" stroke-width="5"/></g></g></svg>
               <span>LiczMat</span>
               <span id="app-level" class="chip app-plan-pill"></span>
             </div>
