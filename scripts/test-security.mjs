@@ -808,15 +808,58 @@ head("14. what the page tells the browser it is allowed to run");
   check("every inline script on every page is in its page's policy by hash",
     unhashed === 0, `${unhashed} unhashed, e.g. ${firstBad}`);
 
-  // The hosts, stated once here so that adding one is a decision somebody made and not a
-  // line that arrived with a copied snippet.
-  const policy = (read(generated.find((f) => f.endsWith("kalkulatory/index.html")) || generated[0])
-    .match(CSP) || [])[1] || "";
-  const hosts = (policy.match(/script-src ([^;]*)/) || ["", ""])[1]
-    .split(" ").filter((s) => s.startsWith("https://"));
-  check("script-src names only the three third parties the site actually loads code from",
-    hosts.every((h) => /googletagmanager\.com$|google-analytics\.com$|^https:\/\/www\.gstatic\.com$|^https:\/\/apis\.google\.com$/.test(h)),
-    hosts.join(" "));
+  let invalidScript = null, invalidConnect = null, invalidFrame = null;
+  let bareWildcard = null;
+  
+  for (const file of generated) {
+    const policy = (read(file).match(CSP) || [])[1] || "";
+    
+    const scriptHosts = (policy.match(/script-src ([^;]*)/) || ["", ""])[1]
+      .split(" ").filter((s) => s.startsWith("https://"));
+    for (const h of scriptHosts) {
+      if (!/googletagmanager\.com$|google-analytics\.com$|^https:\/\/www\.gstatic\.com$|^https:\/\/apis\.google\.com$/.test(h)) invalidScript = `${file}: ${h}`;
+    }
+
+    const connectHosts = (policy.match(/connect-src ([^;]*)/) || ["", ""])[1]
+      .split(" ").filter((s) => s.trim() !== "");
+    if (connectHosts.includes("https:")) bareWildcard = `${file}: connect-src`;
+    for (const h of connectHosts) {
+      if (!/^(?:'self'|https:\/\/\*\.googleapis\.com|wss:\/\/\*\.googleapis\.com|https:\/\/\*\.cloudfunctions\.net|https:\/\/www\.googletagmanager\.com|https:\/\/\*\.google-analytics\.com|https:\/\/\*\.analytics\.google\.com|https:\/\/stats\.g\.doubleclick\.net|https:\/\/www\.gstatic\.com|https:\/\/overpass-api\.de|https:\/\/overpass\.kumi\.systems|blob:)$/.test(h)) {
+        invalidConnect = `${file}: ${h}`;
+      }
+    }
+
+    const frameHosts = (policy.match(/frame-src ([^;]*)/) || ["", ""])[1]
+      .split(" ").filter((s) => s.trim() !== "");
+    if (frameHosts.includes("https:")) bareWildcard = `${file}: frame-src`;
+    for (const h of frameHosts) {
+      if (!/^(?:'self'|https:\/\/maps\.google\.com|https:\/\/www\.google\.com|https:\/\/\*\.firebaseapp\.com|https:\/\/auth\.liczmat\.com|https:\/\/apis\.google\.com|https:\/\/accounts\.google\.com)$/.test(h)) {
+        invalidFrame = `${file}: ${h}`;
+      }
+    }
+  }
+
+  check("script-src names only the explicitly allowed third parties, wherever a host appears",
+    invalidScript === null, String(invalidScript));
+  check("no directive is ever a bare scheme wildcard",
+    bareWildcard === null, String(bareWildcard));
+  check("every host connect-src names is one of the explicitly allowed ones",
+    invalidConnect === null, String(invalidConnect));
+  check("every host frame-src names is one of the explicitly allowed ones",
+    invalidFrame === null, String(invalidFrame));
+
+  /* Section 5's rule, read off the policy rather than off the markup. /p/ names the
+     Firebase hosts because it reads the shared estimate with the SDK, and that is the
+     page working; what it must never name is a measurement host, because the address
+     it would be measured against is the credential. The Overpass mirrors are checked
+     with them: the shops page asks those two, and /p/ has no business knowing they
+     exist. */
+  const pPolicy = (read("p/index.html").match(CSP) || [])[1] || "";
+  const pStrangers = pPolicy.split(";").join(" ").split(" ")
+    .filter((h) => h.startsWith("https://"))
+    .filter((h) => /analytics|googletagmanager|doubleclick|overpass/.test(h));
+  check("the shared page names no host that would measure it, and none it has no use for",
+    pStrangers.length === 0, pStrangers.join(" "));
 }
 
 /* ------------------------------------------------------------------ report */

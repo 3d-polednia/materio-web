@@ -639,27 +639,46 @@ function stripHtmlComments(html) {
    not check them, but the specification counts them as script elements and hashing them
    costs 71 bytes each.
 
-   What is deliberately loose. `connect-src` and `frame-src` are `https:` rather than a
-   list. Firebase Auth alone reaches identitytoolkit, securetoken, the project's
-   firebaseapp.com iframe and apis.google.com, Firestore opens its own channel, the stores
-   page asks two Overpass mirrors and embeds a Google map, and none of that can be
-   exercised from here — Playwright is not installed on this machine, so a wrong host
-   would be found by a visitor and not by a test. The directive that carries this finding
-   is `script-src`: with no 'unsafe-inline' and no 'unsafe-eval', injected markup cannot
-   execute, and an exfiltration that cannot start needs no destination to be blocked.
-   Tighten the two when there is a browser here to prove them with.
+   What is deliberately loose. `img-src` is `https:` rather than a list. The directive
+   that carries this finding is `script-src`: with no 'unsafe-inline' and no 'unsafe-eval',
+   injected markup cannot execute, and an exfiltration that cannot start needs no
+   destination to be blocked.
 
    `style-src 'self'` holds because no generated page carries a style attribute or a
    <style> block (assets/*.js writes through the CSSOM, which CSP does not govern), and
    `form-action 'self'` because no form on the site names an action. */
 /* The third-party hosts, each named by the page that actually loads code from it. A page
-   that loads neither does not name either: /p/ ships without the analytics block, because
-   the token in its address is the credential and GA4 would send the whole address to
-   Google (§5 of scripts/test-security.mjs checks the host is absent from that file, which
-   is also why an unconditional list here would be a defect and not a precaution). */
+   that loads nothing names no third party at all in any directive. The lists are per page
+   rather than unconditional so a page is granted only what it uses: /p/ ships without the
+   analytics block because the token in its address is the credential and GA4 would send
+   the whole address to Google (§5 of scripts/test-security.mjs checks the host is absent
+   from that file). */
 const CSP_ANALYTICS = "https://www.googletagmanager.com https://*.googletagmanager.com " +
   "https://www.google-analytics.com https://*.google-analytics.com";
 const CSP_FIREBASE = "https://www.gstatic.com https://apis.google.com";
+
+/* The third-party hosts the site opens connections to.
+   - GA4: sends its beacons to more than one of the analytics hosts depending on the visitor
+   - *.googleapis.com: Firebase Auth (identitytoolkit, securetoken), Cloud Firestore and firebase installations
+   - *.cloudfunctions.net: the two callables, payTicket and adminPlan, in europe-central2
+   - gstatic.com: the Firebase SDK is imported from there
+   - overpass-api.de, overpass.kumi.systems: the two Overpass endpoints assets/stores.js queries for the shops map (see OVERPASS) */
+const CSP_CONNECT_BASE = "'self' blob:";
+const CSP_CONNECT_STORES = "https://overpass-api.de https://overpass.kumi.systems";
+const CSP_CONNECT_ANALYTICS = "https://www.googletagmanager.com " +
+  "https://*.google-analytics.com https://*.analytics.google.com " +
+  "https://stats.g.doubleclick.net";
+const CSP_CONNECT_FIREBASE = "https://*.googleapis.com wss://*.googleapis.com " +
+  "https://*.cloudfunctions.net https://www.gstatic.com";
+
+/* The third-party iframes the site embeds.
+   - maps.google.com, www.google.com: the shops page embeds a map iframe (src/pages.mjs, id="store-map"); Google redirects between the two
+   - *.firebaseapp.com, auth.liczmat.com: Firebase Auth's own helper iframe, served from the configured authDomain
+   - apis.google.com, accounts.google.com: the Google sign-in flow assets/app.js starts with signInWithPopup */
+const CSP_FRAME_BASE = "'self'";
+const CSP_FRAME_MAP = "https://maps.google.com https://www.google.com";
+const CSP_FRAME_FIREBASE = "https://*.firebaseapp.com https://auth.liczmat.com " +
+  "https://apis.google.com https://accounts.google.com";
 
 const CSP_DIRECTIVES = [
   "default-src 'self'",
@@ -670,12 +689,11 @@ const CSP_DIRECTIVES = [
   "style-src 'self'",
   "img-src 'self' data: https:",
   "font-src 'self'",
-  // `wss:` is its own scheme and no https: wildcard covers it — Firestore's transport can
-  // fall back to a socket, and a policy that only names https would cut the live listener
-  // on /app/ with nothing on screen to say why. `blob:` is the export: a workspace is
-  // handed over as an object URL (assets/app.js, assets/workspace-ui.js).
-  "connect-src https: wss: blob:",
-  "frame-src https:",
+  // `wss:` is kept as insurance: the Firestore web SDK talks WebChannel over HTTPS, but the transport
+  // is Google's to change and a socket refused here would kill the live listener with nothing on screen.
+  // `blob:` is the export: a workspace is handed over as an object URL (assets/app.js, assets/workspace-ui.js).
+  "connect-src", // appended below
+  "frame-src",   // appended below
   "manifest-src 'self'",
 ];
 
@@ -704,14 +722,38 @@ function inlineScriptHashes(html) {
 function withCsp(html) {
   // What this page loads, read off the page. gtag.js appends itself from the inline
   // analytics block; the Firebase SDK is imported by the module scripts, which are on
-  // /app/ and /p/ and nowhere else.
-  const hosts = [
-    /googletagmanager\.com/.test(html) ? CSP_ANALYTICS : "",
-    /<script type="module"/.test(html) ? CSP_FIREBASE : "",
+  // /app/ and /p/ and nowhere else. The map iframe and the two Overpass mirrors are on
+  // /sklepy/, which is the only page that loads assets/stores.js.
+  const hasAnalytics = /googletagmanager\.com/.test(html);
+  const hasFirebase = /<script type="module"/.test(html);
+  const hasMap = /store-map/.test(html);
+  const hasStores = html.includes("/assets/stores.js");
+
+  const scriptHosts = [
+    hasAnalytics ? CSP_ANALYTICS : "",
+    hasFirebase ? CSP_FIREBASE : "",
   ].filter(Boolean);
-  const scriptSrc = [...hosts, ...inlineScriptHashes(html)].join(" ");
-  const directives = CSP_DIRECTIVES.map((d) =>
-    d === "script-src 'self'" && scriptSrc ? `${d} ${scriptSrc}` : d);
+  const scriptSrc = [...scriptHosts, ...inlineScriptHashes(html)].join(" ");
+
+  const connectSrc = [
+    CSP_CONNECT_BASE,
+    hasStores ? CSP_CONNECT_STORES : "",
+    hasAnalytics ? CSP_CONNECT_ANALYTICS : "",
+    hasFirebase ? CSP_CONNECT_FIREBASE : "",
+  ].filter(Boolean).join(" ");
+
+  const frameSrc = [
+    CSP_FRAME_BASE,
+    hasMap ? CSP_FRAME_MAP : "",
+    hasFirebase ? CSP_FRAME_FIREBASE : "",
+  ].filter(Boolean).join(" ");
+
+  const directives = CSP_DIRECTIVES.map((d) => {
+    if (d === "script-src 'self'" && scriptSrc) return `${d} ${scriptSrc}`;
+    if (d === "connect-src") return `${d} ${connectSrc}`;
+    if (d === "frame-src") return `${d} ${frameSrc}`;
+    return d;
+  });
   const meta = `<meta http-equiv="Content-Security-Policy" content="${directives.join("; ")}">`;
   // A page that quietly came out without a policy is the failure this whole block exists
   // to prevent, so a <head> that is not there stops the build instead of shipping 523
