@@ -30,7 +30,7 @@ const ICON_CUT_PATH = '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"
 /* The LiczMat mark, inline so the "M" can follow the text colour of whichever theme is
    on. The lime half is fixed: it is the brand colour, not a themed surface. The same
    geometry is in assets/logo-mark.svg, which is what the PNG icons are rendered from. */
-export const LOGO_MARK = `<svg class="logo" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" focusable="false"><g fill="none" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="14"><path d="M8 26V56H34" stroke="var(--brand-lime)" stroke-width="8"/><path d="M58 22V60" stroke="var(--brand-lime)" stroke-width="7"/><g stroke="currentColor"><path d="M13 0V15L32 48L51 15V0" stroke-width="8"/><path d="M22 0L32 30L42 0" stroke-width="5"/></g></g></svg>`;
+export const LOGO_MARK = `<svg class="logo" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" focusable="false"><g><path d="M12.81 25.25L16.5 30.19V47.81H32.38V51.25H12.81Z" fill="var(--brand-lime)"/><path d="M51.13 25.25V51.75H47.13V30.19Z" fill="var(--brand-lime)"/><path d="M12.81 11.69H19.19L31.94 29.81L44.75 11.69H51.13V22.88L31.94 45.69L12.81 22.94ZM16.88 15.06V22L31.94 40.44L47.13 22V15.06L31.94 35.38Z" fill="currentColor" fill-rule="evenodd"/></g></svg>`;
 
 /* What assets/og-image.jpg actually says, written out for anyone who cannot see it.
    The image has the wordmark and the slogan painted into the pixels, so this line has to
