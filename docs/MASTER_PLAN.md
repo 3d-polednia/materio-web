@@ -116,6 +116,25 @@ commity `9a37e024`, `28194956`, `deaeedb5`. `STAMP` podbity na `20260910b`.
    zleceniem. Rozdział XXIII dalej stoi: bez siatki miesiąca, powtarzania i przypomnień.
    `cal_local_note` i `cal_source_note` obiecywały, że strona nic nie zapisuje; przepisane.
 
+5. **Terminarz na koncie.** Punkt 4 trafił na `/terminarz/`, a właściciel patrzył na zakładkę
+   Terminarz w `/app/` — to dwa niezależne widoki, i ten na koncie nadal nie umiał niczego
+   zapisać. Doszedł przycisk „Dodaj wydarzenie" pod panelem dnia, rozwijający formularz w
+   miejscu (nazwa, data z wybranego dnia, klient, kolor, opis); po zapisie siatka i panel
+   przechodzą na dzień wydarzenia. Zdarzenie może nieść jeden z pięciu **kolorów**,
+   zapisanych jako tokeny (`lime`, `blue`, `amber`, `red`, `violet`), nie jako CSS — arkusz
+   decyduje, jak token wygląda w każdym motywie. Stany „po terminie" i „zrobione" wygrywają
+   nad kolorem. Kliknięcie w nagłówek miesiąca zamienia go na wybierak miesiąca i roku, pięć
+   lat w obie strony; nazwy miesięcy z `toLocaleDateString`, nie ze słownika.
+   Commit `a63f20e9`, `STAMP` `20260910c`.
+
+   **Sprawdzone, nie założone:** kolor jedzie na dokumencie zlecenia, a te waliduje
+   `validJob()` w `Materio/config/firebase/firestore.rules`. Ta funkcja **nie ma klauzuli
+   `hasOnly`**, więc dodatkowy klucz przechodzi. Gdyby ją miała, każdy zapis zlecenia
+   zacząłby padać. To jest pierwsza rzecz do sprawdzenia przy każdym kolejnym polu.
+
+   Kontrast pięciu kolorów zmierzony osobno — 6,15 : 1 w najgorszym przypadku przy progu
+   4,5 : 1 — bo lista par w `scripts/check-contrast.mjs` ich nie obejmuje. Warto je tam dopisać.
+
 **Testy:** cały zestaw przed i po — te same cztery czerwone (`test-copy`, `test-own-materials`,
 `test-perf`, `test-security`), wszystkie zastane, zero regresji.
 
