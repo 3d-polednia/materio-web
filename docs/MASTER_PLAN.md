@@ -87,6 +87,47 @@ Tutaj zostaje wyłącznie to, co żywe: tabela postępu, dwie ostatnie sesje, li
 zrobienia w konsolach, znane ograniczenia i otwarte decyzje. Pełna lista otwartych wątków
 obu repozytoriów, przeglądana razem z tym plikiem, jest w `Obsidian/Liczmat/Meta/Otwarte watki.md`.
 
+## Sesja 69 — sesja E: automatyczna synchronizacja i cztery zgłoszenia właściciela (2026-09-10)
+
+Cztery rzeczy zgłoszone naraz po pracy na żywym `liczmat.com`, wszystkie zamknięte i wdrożone:
+commity `9a37e024`, `28194956`, `deaeedb5`. `STAMP` podbity na `20260910b`.
+
+1. **Konto i przeglądarka trzymały dwa różne zestawy projektów.** `/app/` czytało i pisało
+   Firestore, `/projekty/` czytało `localStorage`, a mostem były dwa przyciski na zakładce
+   Synchronizacja. Do tego `listen()` odrzucało nagrobki, zanim wywołało `onRows()`, więc
+   kasowanie nie miało jak dojechać. Teraz: `listen()` oddaje drugą tablicę ze wszystkimi
+   dokumentami, `mirrorToLocal()` wlewa ją do `localStorage` na każdym snapshocie,
+   `autoReconcile()` godzi oba magazyny przy logowaniu, a debounce 1500 ms na
+   `workspacechange` / `crmchange` / `ownmaterialschange` zbroi wysyłkę. `syncBusy` przerywa
+   pętlę zwrotną. **Wysyłka automatyczna jest przyrostowa** (`syncPushAll(since)` pomija
+   wiersze nie nowsze od ostatniej), ręczna wysyła całość — pełna wysyłka przy każdej edycji
+   zjadałaby dzienny limit zapisów Firestore.
+2. **Wymiary pomieszczenia na `/app/`** miały etykiety wyłącznie w `aria-label`. Dostały
+   widoczne etykiety i zdanie, że 5 / 4 / 2,6 to metry i tylko przykład (`app_room_hint`,
+   trzynaście języków). Formularz używa `ws-mat-grid`, nie `inline-form`: `.inline-form input`
+   ma `flex: 1 1 160px`, co w kolumnie `.ws-mat-f` jest bazą na wysokości i daje pole wysokie
+   na 160 pikseli.
+3. **Klient bez pełnych danych.** Oba formularze tworzące klienta pytały o mniej, niż trzyma
+   rekord. Doszły e-mail i adres. Przy okazji: placeholder telefonu na `/app/` szedł z
+   `t("crm_phone")`, klucza nieistniejącego w żadnym słowniku, więc strona pokazywała
+   dosłowne „crm_phone"; jest `cli_phone`.
+4. **Terminarz umie dodać termin.** Nazwa, data, opcjonalny klient →
+   `crmAddJob({ name, dueDate, clientId })`. Bez osobnej kolekcji `events` — wpis **jest**
+   zleceniem. Rozdział XXIII dalej stoi: bez siatki miesiąca, powtarzania i przypomnień.
+   `cal_local_note` i `cal_source_note` obiecywały, że strona nic nie zapisuje; przepisane.
+
+**Testy:** cały zestaw przed i po — te same cztery czerwone (`test-copy`, `test-own-materials`,
+`test-perf`, `test-security`), wszystkie zastane, zero regresji.
+
+**Znane ograniczenie:** automat działa tylko przy otwartej karcie `/app/` — to jedyna strona
+ładująca SDK Firestore.
+
+**Pułapka do zapamiętania:** kolejność bloków w `assets/i18n-pages.js` to `pl, en, de, uk, …`,
+a **nie** kolejność `LANGS` z `assets/i18n.js` (`pl, uk, de, en, …`). Skrypt pozycyjny ufający
+tablicy wsadzi angielski do bloku ukraińskiego.
+
+Całość: `Obsidian/Liczmat/Historia/Sesja E - automatyczna synchronizacja i cztery zgloszenia wlasciciela.md`.
+
 ## Sesja 65 — audyt, sesja A: pieniądze i backend (2026-09-09)
 
 Reszta audytu z 2026-09-04 to jedenaście znalezisk **średnich**. Rozpisane są na trzy
