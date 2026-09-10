@@ -198,7 +198,8 @@ head("1. the panel is fetched for one account and for no other");
   const plain = await openApp(ctx, { accounts: PLAIN });
   await signIn(plain, "ktos@example.com");
   await plain.waitForTimeout(400);
-  eq("a plain account has five tabs", await plain.locator(".app-tab").count(), 5);
+  // The count is derived from the new sidebar (.app-nav-item calls in app-pages.mjs: 6 work, 2 resources, 4 account = 12 total).
+  eq("a plain account has twelve tabs", await plain.locator(".app-nav-item").count(), 12);
   eq("and no admin tab", await plain.locator("#tab-admin").count(), 0);
   eq("and never downloaded the panel", ctx.__adminFetches, 0);
   check("the token was asked for anyway, so a fresh claim would be seen",
@@ -209,8 +210,8 @@ head("1. the panel is fetched for one account and for no other");
 
   const boss = await openApp(ctx, { accounts: ADMIN });
   await signIn(boss, "szef@liczmat.com", { admin: true });
-  eq("an admin account has six", await boss.locator(".app-tab").count(), 6);
-  eq("the sixth is the admin tab", await boss.locator(".app-tab").last().innerText(), "Admin");
+  eq("an admin account has thirteen", await boss.locator(".app-nav-item").count(), 13);
+  eq("the thirteenth is the admin tab", await boss.locator(".app-nav-item").last().innerText(), "Admin");
   eq("and the file was fetched exactly once", ctx.__adminFetches, 1);
   eq("the panel is closed until it is asked for",
     await boss.locator("#panel-admin").isVisible(), false);
@@ -230,7 +231,7 @@ head("2. the tab opens by mouse and by keyboard, like the other five");
 
   await page.click("#tab-admin");
   eq("clicking it opens the panel", await page.locator("#panel-admin").isVisible(), true);
-  eq("and closes the one that was open", await page.locator("#panel-projects").isVisible(), false);
+  eq("and closes the one that was open", await page.locator("#panel-overview").isVisible(), false);
   eq("the tab says it is selected",
     await page.locator("#tab-admin").getAttribute("aria-selected"), "true");
   eq("and it points at the panel it opened",
@@ -247,7 +248,7 @@ head("2. the tab opens by mouse and by keyboard, like the other five");
   eq("and ArrowRight comes back", await page.evaluate(() => document.activeElement.dataset.tab), "admin");
   await page.keyboard.press("ArrowRight");
   eq("past the end it wraps to the first",
-    await page.evaluate(() => document.activeElement.dataset.tab), "projects");
+    await page.evaluate(() => document.activeElement.dataset.tab), "overview");
   await page.keyboard.press("End");
   eq("End reaches the new tab too",
     await page.evaluate(() => document.activeElement.dataset.tab), "admin");
@@ -426,8 +427,8 @@ head("6. the panel belongs to the account, not to the tab");
   await page.waitForTimeout(500);
   eq("the next account does not inherit it", await page.locator("#tab-admin").count(), 0);
   eq("and lands on a workspace with something in it",
-    await page.locator("#panel-projects").isVisible(), true);
-  eq("five tabs again", await page.locator(".app-tab").count(), 5);
+    await page.locator("#panel-overview").isVisible(), true);
+  eq("twelve tabs again", await page.locator(".app-nav-item").count(), 12);
   check("no error was logged on the way", page.__errors.length === 0, page.__errors.join(" | "));
   await page.close();
   await ctx.close();

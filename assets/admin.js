@@ -128,19 +128,22 @@ const PANEL = `
  *
  * Called once per sign-in, by assets/app.js, and only for an account whose token carries
  * the claim. It is idempotent: a second call finds the tab already there and returns, so a
- * token refresh cannot leave two panels in the strip.
+ * token refresh cannot leave two panels in the sidebar.
  *
  * @param {object} ctx.app  the initialized Firebase app, from assets/app.js
  */
 export async function mountAdmin({ app }) {
   if (document.getElementById("tab-admin")) return;
-  const strip = document.querySelector(".app-tabs");
+
+  // The sidebar nav. A wrong selector here is silent because mountAdmin() 
+  // returns on null, leaving the real admin without a panel.
+  const strip = document.querySelector(".app-nav");
   const workspace = document.getElementById("app-workspace");
   if (!strip || !workspace) return;
 
   const tab = document.createElement("button");
   tab.type = "button";
-  tab.className = "app-tab";
+  tab.className = "app-nav-item";
   tab.id = "tab-admin";
   tab.dataset.tab = "admin";
   tab.setAttribute("role", "tab");

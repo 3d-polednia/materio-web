@@ -935,11 +935,11 @@ function unmountAdmin() {
   const wasOpen = Boolean(tab) && tab.getAttribute("aria-selected") === "true";
   if (tab) tab.remove();
   if (panel) panel.remove();
-  // Removing the selected tab would leave the strip with no selection and every panel
+  // Removing the selected tab would leave the sidebar with no selection and every panel
   // hidden, so the next sign-in would show a workspace with nothing in it. The click goes
-  // through the strip's own handler, which is the only thing that knows how to select.
+  // through the sidebar's own handler, which is the only thing that knows how to select.
   if (wasOpen) {
-    const first = document.querySelector(".app-tabs .app-tab");
+    const first = document.querySelector(".app-nav .app-nav-item");
     if (first) first.click();
   }
 }
