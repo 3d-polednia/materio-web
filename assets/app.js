@@ -1040,7 +1040,7 @@ const numFmt = (v) => new Intl.NumberFormat(document.documentElement.lang || "pl
 /** One room, as a row: the name, the three dimensions and the floor they come to. */
 const roomRow = (r) => `<li data-id="${escapeHtml(r.id)}">
       <span class="row-name">${escapeHtml(r.name)}
-        <em class="muted">${numFmt(r.lengthM)} × ${numFmt(r.widthM)} × ${numFmt(r.heightM)} m — ${numFmt(r.lengthM * r.widthM)} m²</em>
+        <em class="muted">${numFmt(r.lengthM)} × ${numFmt(r.widthM)} × ${numFmt(r.heightM)} m — ${T("ws_surface_floor")} ${numFmt(r.lengthM * r.widthM)} m²</em>
       </span>
       <span class="row-actions">
         <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
@@ -1056,6 +1056,13 @@ const roomRow = (r) => `<li data-id="${escapeHtml(r.id)}">
  * sides is a merge and the deployed `validRoom()` validates by shape with no `hasOnly` —
  * see assets/workspace.js. The phone carries the link without being able to show it, which
  * is what the note under the form says.
+ *
+ * The form is the shape /projekty/ gives its own (src/pages.mjs, #ws-proj-room-form), and
+ * for the reason the owner gave on 2026-09-10: three numbers with nothing over them but an
+ * aria-label read as 5, 4 and 2.6 and say nothing about metres or about being an example to
+ * overwrite. The wrapper is ws-mat-grid rather than inline-form on purpose — inline-form
+ * gives its inputs a flex-basis of 160px, and inside a ws-mat-f column that is a basis on
+ * the height, which leaves a text field 160 pixels tall.
  */
 function roomBlock(projectId) {
   const rooms = state.rooms.filter((r) => r.projectId === projectId);
@@ -1064,13 +1071,28 @@ function roomBlock(projectId) {
         rooms.length ? rooms.map(roomRow).join("")
           : `<li class="empty muted">${T("app_empty_rooms")}</li>`
       }</ul>
-      <form class="inline-form" data-room-form>
-        <input type="text" maxlength="120" data-f="name" placeholder="${T("app_new_room")}" required
-          aria-label="${T("app_new_room")}">
-        <input type="text" inputmode="decimal" data-f="lengthM" value="5" aria-label="${T("fld_length")}">
-        <input type="text" inputmode="decimal" data-f="widthM" value="4" aria-label="${T("fld_width")}">
-        <input type="text" inputmode="decimal" data-f="heightM" value="2.6" aria-label="${T("fld_height")}">
-        <button type="submit" class="btn btn-ghost btn-sm">${T("app_add_room")}</button>
+      <form data-room-form>
+        <p class="ws-mat-grid">
+          <label class="ws-mat-f">
+            <span class="ws-bar-label">${T("ws_col_name")}</span>
+            <input type="text" maxlength="120" data-f="name" placeholder="${T("app_new_room")}" required
+              aria-label="${T("app_new_room")}">
+          </label>
+          <label class="ws-mat-f ws-mat-f-sm">
+            <span class="ws-bar-label">${T("fld_length")}</span>
+            <input type="text" inputmode="decimal" data-f="lengthM" value="5" aria-label="${T("fld_length")}">
+          </label>
+          <label class="ws-mat-f ws-mat-f-sm">
+            <span class="ws-bar-label">${T("fld_width")}</span>
+            <input type="text" inputmode="decimal" data-f="widthM" value="4" aria-label="${T("fld_width")}">
+          </label>
+          <label class="ws-mat-f ws-mat-f-sm">
+            <span class="ws-bar-label">${T("fld_height")}</span>
+            <input type="text" inputmode="decimal" data-f="heightM" value="2.6" aria-label="${T("fld_height")}">
+          </label>
+        </p>
+        <p><button type="submit" class="btn btn-ghost btn-sm">${T("app_add_room")}</button></p>
+        <p class="muted ws-mat-hint">${T("app_room_hint")}</p>
       </form>
     </div>`;
 }

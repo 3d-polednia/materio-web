@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">Within 7 days</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Appointment name</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Date</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Client</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Add appointment</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Saved as a job with this date.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>No jobs yet. The schedule shows the deadlines of jobs, so start by adding one.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/en/clients/">Clients</a>
         <a class="btn btn-ghost" href="/en/quotes/">Quotes</a>
       </p>
-      <p class="muted field-note">The schedule stores nothing of its own. A deadline is a field of the job, so a date changed here is the same date you see under “Jobs”.</p>
-      <p class="muted src-note">The schedule reads the jobs' deadlines and stores nothing of its own. Jobs are part of the account, so the dates are in the Android app too.</p>
+      <p class="muted field-note">The schedule has no database. This entry is a job and opens in “Jobs”.</p>
+      <p class="muted src-note">The schedule works on the jobs' deadlines: a new entry is saved as a job with that date. Jobs are part of the account, so the dates are in the Android app too.</p>
     </div>
   </section>
 

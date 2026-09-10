@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">En 7 días</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Nombre del plazo</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Fecha</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Cliente</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Añadir plazo</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Guardado como encargo con esta fecha.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>Todavía sin encargos. Los plazos muestran las fechas de los encargos, así que empieza por añadir uno.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/es/clientes/">Clientes</a>
         <a class="btn btn-ghost" href="/es/presupuestos-pro/">Presupuestos</a>
       </p>
-      <p class="muted field-note">Los plazos no guardan nada propio. Una fecha es un campo del encargo, así que una fecha cambiada aquí es la misma que ves en «Encargos».</p>
-      <p class="muted src-note">Los plazos leen las fechas de los encargos y no guardan nada propio. Los encargos forman parte de la cuenta, así que las fechas están también en la app de Android.</p>
+      <p class="muted field-note">Los plazos no tienen base propia. La entrada es un encargo y se abre en «Encargos».</p>
+      <p class="muted src-note">Los plazos funcionan con las fechas de los encargos: una nueva entrada se guarda como un encargo con esa fecha. Los encargos forman parte de la cuenta, así que las fechas están también en la app de Android.</p>
     </div>
   </section>
 

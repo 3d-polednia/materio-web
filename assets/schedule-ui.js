@@ -9,16 +9,20 @@
  * built from the new crmJobsByDay() in assets/crm.js. That tab is a second, additional view
  * of the same jobs, not a replacement for this one; /terminarz/ is untouched.
  *
- * **The module stores nothing.** A deadline is chapter XXI's `termin`, a field of the job
- * — so this page reads crmSchedule() in assets/crm.js and its one write is
- * crmUpdateJob(id, { dueDate }), the same call /zlecenia/ makes. An `events` collection of
- * its own would give one date two homes and let them disagree the first time somebody
- * changed a deadline on the job's own page.
+ * **The module has no store of its own.** A deadline is chapter XXI's `termin`, a field of
+ * the job — so this page reads crmSchedule() in assets/crm.js and writes through the same
+ * two calls /zlecenia/ makes: crmUpdateJob(id, { dueDate }) to move a date, and, since the
+ * owner asked on 2026-09-10 for dates to be enterable where they are agreed,
+ * crmAddJob({ name, dueDate, clientId }) to record a new one. An `events` collection of its
+ * own would give one date two homes and let them disagree the first time somebody changed a
+ * deadline on the job's own page; a row added here is a job, and /zlecenia/ opens it whole.
  *
  * Chapter XXIII also fixes the scope in one line: "Nie buduj pełnego odpowiednika Google
  * Calendar." So there is no month grid, no week view, no recurrence and no reminder — five
- * buckets that answer "kiedy", the basics of each job beside its date, and a date control
- * on the row so a missing deadline can be fixed where it is noticed.
+ * buckets that answer "kiedy", the basics of each job beside its date, a date control on
+ * the row so a missing deadline can be fixed where it is noticed, and one form that writes
+ * a job with a date. Adding a name and a day is not a calendar; it is the shortest way to
+ * stop somebody having to leave the page to record what they just agreed.
  *
  * Chapter XXV stands in front of the page exactly as on the other three modules — the
  * same wall, from the same builder (proGate() in src/pro.mjs, drawn by
@@ -76,6 +80,23 @@ const calUrl = (key, fallback) => ((window.LM_LINKS && window.LM_LINKS[key]) || 
  * name this file calls it by and the two arguments that make it this page's wall.
  */
 const calRenderPro = () => pwRender("cal", "calendar");
+
+/* ------------------------------------------------------------------ the client picker */
+
+/**
+ * The client picker on the "add an appointment" form: every active client, plus "no client".
+ * Redrawn whenever clients change or the language switches; preserves any current choice.
+ */
+function calFillClientPicker() {
+  const select = document.getElementById("cal-add-client");
+  if (!select) return;
+  const selected = select.value;
+  const clients = typeof crmClients === "function" ? crmClients() : [];
+  select.innerHTML = [`<option value="">${calEsc(calT("cal_add_noclient"))}</option>`]
+    .concat(clients.map((c) =>
+      `<option value="${calEsc(c.id)}">${calEsc(c.name)}</option>`)).join("");
+  select.value = selected || "";
+}
 
 /* ------------------------------------------------------------------ the rows */
 
@@ -139,6 +160,7 @@ function calRender() {
   const page = document.getElementById("cal-page");
   if (!page) return;
   calRenderPro();
+  calFillClientPicker();
 
   const sched = typeof crmSchedule === "function" ? crmSchedule() : null;
   if (!sched) return;
@@ -185,8 +207,38 @@ function buildSchedulePage() {
     const input = e.target.closest(".cal-due");
     if (!input) return;
     const row = input.closest("li[data-id]");
-    if (row) crmUpdateJob(row.dataset.id, { dueDate: input.value });
+    if (row && typeof crmUpdateJob === "function") crmUpdateJob(row.dataset.id, { dueDate: input.value });
   });
+
+  // Adding an appointment directly from the calendar: records a job with a deadline,
+  // client and name, matching what /zlecenia/ creates.
+  const addForm = document.getElementById("cal-add-form");
+  if (addForm) {
+    addForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById("cal-add-name");
+      const dateInput = document.getElementById("cal-add-date");
+      const clientSelect = document.getElementById("cal-add-client");
+      const name = (nameInput && nameInput.value || "").trim();
+      const dueDate = (dateInput && dateInput.value || "").trim();
+      const clientId = (clientSelect && clientSelect.value || "").trim();
+      if (!name || !dueDate || typeof crmAddJob !== "function") return;
+
+      // Nothing is said here when the row does not come back. crmAddJob() returns null for
+      // two reasons: a missing name, which the guard above has already refused, and a store
+      // that would not write — and that second one has already announced itself, because
+      // crmSave() fires `crmsavefailed` and assets/main.js answers it with the same banner
+      // every other screen gets. A message of this page's own would be the second one.
+      const row = crmAddJob({ name, dueDate, clientId });
+      if (!row) return;
+
+      if (nameInput) {
+        nameInput.value = "";
+        nameInput.focus();
+      }
+      calRender();
+    });
+  }
 
   document.addEventListener("crmchange", calRender);
   // A job's value is shown in the visitor's currency when it carries none of its own.

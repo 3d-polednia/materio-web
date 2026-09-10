@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">Binnen 7 dagen</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Naam afspraak</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Datum</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Klant</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Afspraak toevoegen</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Opgeslagen als opdracht met deze datum.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>Nog geen opdrachten. De planning toont de datums van opdrachten, dus begin met er een toe te voegen.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/nl/klanten/">Klanten</a>
         <a class="btn btn-ghost" href="/nl/offertes/">Offertes</a>
       </p>
-      <p class="muted field-note">De planning bewaart niets eigens. Een datum is een veld van de opdracht, dus een datum die je hier wijzigt is dezelfde die je onder „Opdrachten” ziet.</p>
-      <p class="muted src-note">De planning leest de datums van de opdrachten en bewaart niets eigens. Opdrachten horen bij het account, dus de datums staan ook in de Android-app.</p>
+      <p class="muted field-note">De planning heeft geen eigen database. De invoer is een opdracht en opent in „Opdrachten”.</p>
+      <p class="muted src-note">De planning werkt met de datums van de opdrachten: een nieuwe invoer wordt opgeslagen als een opdracht met die datum. Opdrachten horen bij het account, dus de datums staan ook in de Android-app.</p>
     </div>
   </section>
 

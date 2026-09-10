@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">In 7 Tagen</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Bezeichnung des Termins</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Datum</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Kunde</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Termin hinzufügen</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Als Auftrag mit diesem Datum gespeichert.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>Noch keine Aufträge. Die Termine kommen aus den Aufträgen, lege also zuerst einen an.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/de/kunden/">Kunden</a>
         <a class="btn btn-ghost" href="/de/angebote/">Angebote</a>
       </p>
-      <p class="muted field-note">Die Terminübersicht speichert nichts Eigenes. Ein Termin ist ein Feld des Auftrags, ein hier geändertes Datum ist also dasselbe, das unter „Aufträge“ steht.</p>
-      <p class="muted src-note">Der Terminplan liest die Termine der Aufträge und speichert selbst nichts. Aufträge gehören zum Konto, also stehen die Termine auch in der Android-App.</p>
+      <p class="muted field-note">Die Terminübersicht hat keine eigene Datenbank. Einträge sind Aufträge und öffnen sich in „Aufträge“.</p>
+      <p class="muted src-note">Der Terminplan arbeitet mit den Terminen der Aufträge: Ein neuer Eintrag wird als Auftrag mit diesem Datum gespeichert. Aufträge gehören zum Konto, also stehen die Termine auch in der Android-App.</p>
     </div>
   </section>
 

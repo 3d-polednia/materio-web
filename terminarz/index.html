@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">W ciągu 7 dni</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Nazwa terminu</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Data</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Klient</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Dodaj termin</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Zapisze się jako zlecenie z tą datą.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>Nie ma jeszcze żadnego zlecenia. Terminarz pokazuje terminy zleceń, więc zacznij od dodania zlecenia.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/klienci/">Klienci</a>
         <a class="btn btn-ghost" href="/wyceny/">Wyceny</a>
       </p>
-      <p class="muted field-note">Terminarz nie zapisuje niczego osobno. Termin jest polem zlecenia, więc data zmieniona tutaj to ta sama data, którą widać w „Zleceniach”.</p>
-      <p class="muted src-note">Terminarz czyta terminy zleceń i sam nic nie zapisuje. Zlecenia są częścią konta, więc te terminy widać też w aplikacji na Androida.</p>
+      <p class="muted field-note">Terminarz nie ma własnej bazy. Wpis dodany tutaj jest zleceniem i otwiera się w „Zleceniach”.</p>
+      <p class="muted src-note">Terminarz działa na terminach zleceń: nowy wpis jest zapisywany jako zlecenie z tą datą. Zlecenia są częścią konta, więc te terminy widać też w aplikacji na Androida.</p>
     </div>
   </section>
 

@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">Entro 7 giorni</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Nome del termine</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Data</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Cliente</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Aggiungi termine</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Salvato come commessa con questa data.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>Ancora nessuna commessa. Le scadenze mostrano i termini delle commesse, quindi comincia aggiungendone una.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/it/clienti/">Clienti</a>
         <a class="btn btn-ghost" href="/it/preventivi-pro/">Preventivi</a>
       </p>
-      <p class="muted field-note">Le scadenze non conservano nulla di proprio. Un termine è un campo della commessa, quindi una data cambiata qui è la stessa data che vedi in «Commesse».</p>
-      <p class="muted src-note">Le scadenze leggono i termini delle commesse e non conservano nulla di proprio. Le commesse fanno parte dell'account, quindi le date sono anche nell'app Android.</p>
+      <p class="muted field-note">Le scadenze non hanno database proprio. L'elemento è una commessa e si apre in «Commesse».</p>
+      <p class="muted src-note">Le scadenze lavorano sui termini delle commesse: un nuovo inserimento viene salvato come commessa con quella data. Le commesse fanno parte dell'account, quindi le date sono anche nell'app Android.</p>
     </div>
   </section>
 

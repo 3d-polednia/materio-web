@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">În 7 zile</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Nume termen</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Data</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Client</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Adaugă termen</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Salvat ca o comandă cu această dată.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>Încă nu există nicio comandă. Termenele arată termenele comenzilor, așa că începe prin a adăuga o comandă.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/ro/clienti/">Clienți</a>
         <a class="btn btn-ghost" href="/ro/oferte/">Oferte</a>
       </p>
-      <p class="muted field-note">Termenele nu salvează nimic separat. Termenul este un câmp al comenzii, deci o dată schimbată aici este aceeași dată pe care o vezi în „Comenzi”.</p>
-      <p class="muted src-note">Agenda citește termenele comenzilor și nu stochează nimic propriu. Comenzile fac parte din cont, deci datele sunt și în aplicația de Android.</p>
+      <p class="muted field-note">Agenda nu are bază proprie. Intrarea este o comandă și se deschide în „Comenzi”.</p>
+      <p class="muted src-note">Agenda funcționează pe baza termenelor comenzilor: o intrare nouă este salvată ca o comandă cu acea dată. Comenzile fac parte din cont, deci datele sunt și în aplicația de Android.</p>
     </div>
   </section>
 

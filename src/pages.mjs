@@ -2600,6 +2600,30 @@ export function calendarMain(lang, t, features) {
           <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_soon_t"))}</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        <!-- Adding an appointment directly from the schedule: creates a job with a
+             deadline and an optional client, so a tradesman can record dates as they are
+             agreed without leaving the calendar. -->
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">${esc(t("cal_add_name"))}</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">${esc(t("cal_add_date"))}</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">${esc(t("cal_add_client"))}</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">${esc(t("cal_add_btn"))}</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">${esc(t("cal_add_hint"))}</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>${esc(t("cal_empty"))}</p>
 ${buckets}
 

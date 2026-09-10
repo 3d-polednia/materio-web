@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">U 7 dana</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Naziv termina</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Datum</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Klijent</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Dodaj termin</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Sprema se kao nalog sa ovim datumom.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>Još nema nijednog naloga. Rokovi prikazuju rokove naloga, pa počni tako što ćeš dodati nalog.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/sr/klijenti/">Klijenti</a>
         <a class="btn btn-ghost" href="/sr/ponude/">Ponude</a>
       </p>
-      <p class="muted field-note">Rokovi ne čuvaju ništa zasebno. Rok je polje naloga, pa je datum promenjen ovde isti onaj datum koji vidiš u „Nalozima”.</p>
-      <p class="muted src-note">Raspored čita rokove naloga i sam ništa ne čuva. Nalozi su deo naloga, pa su ti datumi i u aplikaciji za Android.</p>
+      <p class="muted field-note">Raspored nema sopstvenu bazu. Unos je nalog i otvara se u „Nalozima”.</p>
+      <p class="muted src-note">Raspored radi na rokovima naloga: novi unos se čuva kao nalog sa tim datumom. Nalozi su deo korisničkog naloga, pa su ti datumi i u aplikaciji za Android.</p>
     </div>
   </section>
 

@@ -284,6 +284,28 @@
           <p class="ws-project-fig"><span class="eyebrow muted">Do 7 dnů</span> <b id="cal-fig-soon"></b></p>
         </div>
 
+        
+        <form id="cal-add-form">
+          <p class="ws-mat-grid">
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_name">Název termínu</span>
+              <input id="cal-add-name" type="text" maxlength="120" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_date">Datum</span>
+              <input id="cal-add-date" type="date" required>
+            </label>
+            <label class="ws-mat-f">
+              <span class="ws-bar-label" data-i18n="cal_add_client">Klient</span>
+              <select id="cal-add-client"></select>
+            </label>
+          </p>
+          <p>
+            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Přidat termín</button>
+          </p>
+          <p class="muted" data-i18n="cal_add_hint">Uloží se jako zakázka s tímto datem.</p>
+        </form>
+
         <p class="muted" id="cal-empty" hidden>Zatím tu není žádná zakázka. Termíny ukazují termíny zakázek, takže začni tím, že zakázku přidáš.</p>
 
           <section class="dash-sec cal-sec" id="cal-sec-late">
@@ -334,8 +356,8 @@
         <a class="btn btn-ghost" href="/cs/klienti/">Klienti</a>
         <a class="btn btn-ghost" href="/cs/cenove-nabidky/">Cenové nabídky</a>
       </p>
-      <p class="muted field-note">Termíny nic neukládají zvlášť. Termín je pole zakázky, takže datum změněné tady je totéž datum, které vidíš v „Zakázkách“.</p>
-      <p class="muted src-note">Kalendář čte termíny zakázek a sám nic neukládá. Zakázky patří k účtu, takže termíny jsou i v aplikaci pro Android.</p>
+      <p class="muted field-note">Kalendář nemá vlastní databázi. Záznam je zakázkou a otevírá se v „Zakázkách“.</p>
+      <p class="muted src-note">Kalendář pracuje s termíny zakázek: nový záznam se uloží jako zakázka s tímto datem. Zakázky patří k účtu, takže termíny jsou i v aplikaci pro Android.</p>
     </div>
   </section>
 
