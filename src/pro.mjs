@@ -149,9 +149,15 @@ export function proPlansBlock(t, opts) {
   /* On /app/ the button is the checkout itself and assets/app.js writes its href from
      lmCheckoutUrl() — it needs the uid, so the build cannot write it. On a wall it is a
      plain link to /app/, which is a real address the build does know. */
+  /* `btn-buy` zamiast `btn-primary`: limonkowy akcent nosi na tej stronie każdy zwykły
+     przycisk — „policz", „zapisz", „pokaż sklepy" — a jedyny przycisk, który bierze
+     pieniądze, nie powinien wyglądać tak samo jak ten, który otwiera kalkulator. Zielony
+     jest tylko tutaj i na ścianie prowadzącej do tego samego miejsca; założenie darmowego
+     konta zostaje limonkowe, bo nic nie kosztuje. Rozmiar domyślny zamiast `btn-sm`, żeby
+     to była najbardziej widoczna rzecz w kartce z cenami. */
   const go = checkout
-    ? `<button type="button" class="btn btn-primary btn-sm" data-pw-checkout hidden>${esc(t("pay_buy"))}</button>`
-    : `<a class="btn btn-primary btn-sm" href="${URL_APP}" data-i18n="pay_go">${esc(t("pay_go"))}</a>`;
+    ? `<button type="button" class="btn btn-buy" data-pw-checkout hidden>${esc(t("pay_buy"))}</button>`
+    : `<a class="btn btn-buy" href="${URL_APP}" data-i18n="pay_go">${esc(t("pay_go"))}</a>`;
 
   return `<div class="pw-plans">
           <h3 data-i18n="pay_t">${esc(t("pay_t"))}</h3>
@@ -308,6 +314,14 @@ export function proPanel(t, features) {
           <span id="plan-until" class="muted"></span>
         </p>
         <p id="plan-note" class="muted field-note"></p>
+        <!-- Sesja 71: zapłacono, planu jeszcze nie ma. Stripe nie obiecuje kolejności
+             zdarzeń — zmierzone 2026-09-11: customer.subscription.created przyszło
+             przed checkout.session.completed, więc webhook odmówił i poprosił o
+             ponowienie, a konto przez chwilę wyglądało na darmowe tuż po zapłacie.
+             Ten wiersz jest jedyną rzeczą, która o tym mówi; znika sam, gdy nasłuch
+             Firestore przyniesie plan. -->
+        <p id="plan-pending" class="plan-pending" hidden role="status"
+           data-i18n="plan_pending">${esc(t("plan_pending"))}</p>
         <p id="plan-manage" hidden>
           <a class="btn btn-ghost btn-sm" id="plan-manage-link" href="#" rel="noopener"
              target="_blank" data-i18n="pay_manage">${esc(t("pay_manage"))}</a>

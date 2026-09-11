@@ -424,6 +424,10 @@ export async function ensurePaymentLink(apiKey, planId, priceId, allLinks, dryRu
     return `https://buy.stripe.com/dryrun_${planId}`;
   }
 
+  /* Po zapłacie wracamy na stronę konta, a nie na stronę potwierdzenia Stripe'a.
+     Powód jest konkretny: plan bywa nadany z opóźnieniem (zdarzenia Stripe'a nie
+     przychodzą po kolei — zmierzone 2026-09-11), a tylko `/app/` potrafi powiedzieć
+     „płatność w toku" i sama zgasić ten komunikat, gdy webhook dopisze plan. */
   const created = await stripeRequest(apiKey, "POST", "/v1/payment_links", {
     line_items: [
       {
@@ -431,6 +435,10 @@ export async function ensurePaymentLink(apiKey, planId, priceId, allLinks, dryRu
         quantity: 1,
       },
     ],
+    after_completion: {
+      type: "redirect",
+      redirect: { url: "https://liczmat.com/app/" },
+    },
   });
 
   console.log(`[link] Utworzono: ${created.id} (${created.url}) dla ceny ${priceId}`);

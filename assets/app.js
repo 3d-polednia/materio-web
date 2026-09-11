@@ -596,6 +596,16 @@ function renderPlan() {
   $("plan-note").textContent = T(note);
   $("plan-note").classList.toggle("warn", sub.state === "expired");
 
+  /* Paid, and the plan has not arrived. The line goes away by itself: this runs again on
+     every profile snapshot (listenProfile), so the moment the webhook writes the plan the
+     account stops being pending. An account that already reads as Pro never sees it. */
+  const pending = $("plan-pending");
+  if (pending) {
+    const waiting = sub.level !== LM_LEVEL.PRO && payPendingActive();
+    pending.hidden = !waiting;
+    if (!waiting && sub.level === LM_LEVEL.PRO) payPendingClear();
+  }
+
   /* Managing and cancelling are Stripe's own screens. The link is only offered to an
      account that has something to manage — showing it to a free account would send them
      to a portal with no subscription in it. A trial is in that same position: Pro, and
@@ -672,7 +682,50 @@ async function goToCheckout(planId) {
     email: state.user && state.user.email,
   });
   if (!url) { status(T("pay_soon"), true); return; }
+  payPendingSet();
   location.href = url;
+}
+
+/* ------------------------------------------------------------------ payment in flight */
+
+/**
+ * "Paid, and the plan is not here yet" — remembered across the trip to Stripe and back.
+ *
+ * Stripe does not promise the order of its events, and on 2026-09-11 it proved it:
+ * `customer.subscription.created` arrived before `checkout.session.completed`, so the
+ * webhook had nothing to attach the payment to, answered 503 and asked to be retried.
+ * Correct, and invisible to the person who had just paid — their account looked free.
+ *
+ * The mark is set on the way out (not on the way back), because that is the only moment
+ * this page is certain about: Stripe's confirmation page is Stripe's, and nothing
+ * guarantees the visitor ever returns to /app/ through it.
+ *
+ * Thirty minutes, then it expires by itself. A payment that has not landed in half an
+ * hour has not landed, and a line saying "in progress" forever is worse than no line:
+ * the account page would be lying on every visit to somebody who never paid at all.
+ *
+ * localStorage, like the session hint in assets/account.js, and for the same reason: it
+ * is a note to the interface, never a permission. The plan still comes from Firestore.
+ */
+var PAY_PENDING_KEY = "liczmat-pay-pending";
+var PAY_PENDING_MS = 30 * 60 * 1000;
+
+function payPendingSet() {
+  try { localStorage.setItem(PAY_PENDING_KEY, String(Date.now())); } catch (e) { /* prywatne okno */ }
+}
+
+function payPendingClear() {
+  try { localStorage.removeItem(PAY_PENDING_KEY); } catch (e) { /* jw. */ }
+}
+
+/** Is a payment still worth waiting for? Expired and absent are the same answer: no. */
+function payPendingActive(now) {
+  let raw = null;
+  try { raw = localStorage.getItem(PAY_PENDING_KEY); } catch (e) { return false; }
+  const at = Number(raw);
+  if (!raw || !Number.isFinite(at)) return false;
+  if ((now === undefined ? Date.now() : now) - at > PAY_PENDING_MS) { payPendingClear(); return false; }
+  return true;
 }
 
 /**

@@ -62,6 +62,10 @@
   --on-accent-soft: #2b4000;
   --accent-soft-2: #dcedbb;
   --accent-edge: #476c00;
+  --buy: #1f7a3d;
+  --on-buy: #ffffff;
+  --buy-edge: #165c2e;
+  --buy-hover: #186331;
   --tertiary: #2c6a5e;
   --tertiary-container: #d3ebe4;
   --bg: #faf7f0;
@@ -111,6 +115,10 @@
     --on-accent-soft: #cbee85;
     --accent-soft-2: #22330b;
     --accent-edge: #91d206;
+    --buy: #22c55e;
+    --on-buy: #0a0f04;
+    --buy-edge: #22c55e;
+    --buy-hover: #2bd466;
     --tertiary: #7fd0c0;
     --tertiary-container: #113a33;
     --bg: #060c12;
@@ -158,6 +166,10 @@
   --on-accent-soft: #cbee85;
   --accent-soft-2: #22330b;
   --accent-edge: #91d206;
+  --buy: #22c55e;
+  --on-buy: #0a0f04;
+  --buy-edge: #22c55e;
+  --buy-hover: #2bd466;
   --tertiary: #7fd0c0;
   --tertiary-container: #113a33;
   --bg: #060c12;
@@ -424,6 +436,12 @@ section.block { padding: var(--section-y) 0; }
    theme the fill already clears 3:1 and --accent-edge is the fill itself. */
 .btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2); }
 .btn-primary:hover { box-shadow: var(--shadow-3); }
+/* The purchase button gets its own saturated green instead of reusing the lime
+   accent. The accent is the whole site's ordinary button colour, and the one
+   button that takes money should not look like the one that opens a calculator.
+   Heavier type and elevation make it unmistakably the primary action on the page. */
+.btn-buy { background: var(--buy); color: var(--on-buy); border-color: var(--buy-edge); font-weight: var(--fw-black); box-shadow: var(--shadow-3); }
+.btn-buy:hover { background: var(--buy-hover); box-shadow: var(--shadow-3), 0 6px 24px color-mix(in srgb, var(--buy-hover) 35%, transparent); }
 .btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline-control); }
 .btn-ghost:hover { background: var(--surface-alt); }
 .btn-danger { background: var(--error); color: var(--surface); }
@@ -1368,6 +1386,17 @@ a.chip:hover { text-decoration: none; }
 /* Session 21 — LiczMat Pro on /app/: where the plan stands, and the modules Pro is
    going to consist of. One card per module, described in full and marked as Pro, which
    is what chapter XXV asks for: understand what is Pro, never meet a dead button. */
+/* "Paid, and the plan is not here yet." Stripe does not promise the order of its events,
+   so an account can read as free for a minute after a real payment. The line is tinted
+   rather than plain muted text: somebody who has just spent money and sees nothing needs
+   to find this sentence without looking for it. It is not an error, so it is not --error. */
+.plan-pending {
+  margin: var(--sp-2) 0; padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-sm); font-size: var(--fs-sm);
+  background: var(--accent-soft); color: var(--on-accent-soft);
+  border: 1px solid var(--accent-edge);
+}
+
 .plan-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin: var(--sp-3) 0 var(--sp-2); }
 .plan-state .chip { cursor: default; }
 .plan-state .muted { font-size: var(--fs-sm); }

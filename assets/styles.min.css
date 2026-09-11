@@ -10,6 +10,10 @@
 --on-accent-soft: #2b4000;
 --accent-soft-2: #dcedbb;
 --accent-edge: #476c00;
+--buy: #1f7a3d;
+--on-buy: #ffffff;
+--buy-edge: #165c2e;
+--buy-hover: #186331;
 --tertiary: #2c6a5e;
 --tertiary-container: #d3ebe4;
 --bg: #faf7f0;
@@ -56,6 +60,10 @@
 --on-accent-soft: #cbee85;
 --accent-soft-2: #22330b;
 --accent-edge: #91d206;
+--buy: #22c55e;
+--on-buy: #0a0f04;
+--buy-edge: #22c55e;
+--buy-hover: #2bd466;
 --tertiary: #7fd0c0;
 --tertiary-container: #113a33;
 --bg: #060c12;
@@ -102,6 +110,10 @@
 --on-accent-soft: #cbee85;
 --accent-soft-2: #22330b;
 --accent-edge: #91d206;
+--buy: #22c55e;
+--on-buy: #0a0f04;
+--buy-edge: #22c55e;
+--buy-hover: #2bd466;
 --tertiary: #7fd0c0;
 --tertiary-container: #113a33;
 --bg: #060c12;
@@ -269,6 +281,8 @@ background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 .btn:disabled:active, .btn[aria-disabled="true"]:active { transform: none; }
 .btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2); }
 .btn-primary:hover { box-shadow: var(--shadow-3); }
+.btn-buy { background: var(--buy); color: var(--on-buy); border-color: var(--buy-edge); font-weight: var(--fw-black); box-shadow: var(--shadow-3); }
+.btn-buy:hover { background: var(--buy-hover); box-shadow: var(--shadow-3), 0 6px 24px color-mix(in srgb, var(--buy-hover) 35%, transparent); }
 .btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline-control); }
 .btn-ghost:hover { background: var(--surface-alt); }
 .btn-danger { background: var(--error); color: var(--surface); }
@@ -930,6 +944,12 @@ background: var(--surface);
 .lvl-can li::before { content: "✓"; position: absolute; left: 0; color: var(--accent-strong); }
 .lvl-soon {
 margin: var(--sp-3) 0 0; font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--muted);
+}
+.plan-pending {
+margin: var(--sp-2) 0; padding: var(--sp-2) var(--sp-4);
+border-radius: var(--radius-sm); font-size: var(--fs-sm);
+background: var(--accent-soft); color: var(--on-accent-soft);
+border: 1px solid var(--accent-edge);
 }
 .plan-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin: var(--sp-3) 0 var(--sp-2); }
 .plan-state .chip { cursor: default; }
