@@ -30,12 +30,56 @@ W strefie DNS `liczmat.com` w panelu OVH **zostają nietknięte**:
 |---|---|---|
 | `liczmat.com` A ×4 | `185.199.108.153`, `.109.153`, `.110.153`, `.111.153` | serwis na GitHub Pages |
 | `liczmat.com` MX ×3 | `mx1`, `mx2`, `mx3.mail.ovh.net` | skrzynka `contact@liczmat.com` |
-| `liczmat.com` TXT | `v=spf1 include:mx.ovh.com -all` | SPF poczty OVH |
+| `liczmat.com` TXT | `v=spf1 include:mx.ovh.com ~all` | SPF poczty OVH |
 
 **Jeden rekord SPF na domenę i ani jednego więcej.** Jeśli Firebase poprosi o swój
 `include:`, ma trafić na **`auth.liczmat.com`**, jako osobny rekord TXT tej subdomeny —
 nie dopisany do apeksu i nie jako drugi `v=spf1` obok istniejącego. Dwa rekordy SPF na
 jednej nazwie to SPF nieważny dla obu nadawców naraz.
+
+## Stan na 2026-09-11
+
+Zrobione z terminala (Firebase CLI + REST API, konto `polednia@gmail.com`):
+
+- **krok 1** — witryna Hostingu `liczmat-auth` istnieje, `https://liczmat-auth.web.app`;
+- **krok 3** — domena niestandardowa `auth.liczmat.com` dodana do tej witryny. Stan:
+  `ownershipState: OWNERSHIP_MISSING`, `hostState: HOST_UNHOSTED`, certyfikat
+  `CERT_VALIDATING` — czeka wyłącznie na rekordy w OVH (niżej);
+- **krok 5** — `auth.liczmat.com` dopisane do domen autoryzowanych Authentication,
+  siedem dotychczasowych wpisów nienaruszone.
+
+Zostało: krok 2 (wdrożenie), krok 6 (klucz API), rekordy DNS w OVH, krok 7 (szablony)
+i krok 8 (DMARC).
+
+### Rekordy do wpisania w OVH → Strefa DNS
+
+Firebase podał dokładnie te dwa. Nazwy w panelu OVH wpisuje się **bez** `liczmat.com` —
+panel dokleja domenę sam.
+
+| Nazwa | Typ | Wartość |
+|---|---|---|
+| `auth` | CNAME | `liczmat-auth.web.app` |
+| `_acme-challenge.auth` | TXT | `Gf2sFQL_YNm6LC_bQmDGW4k_DA1m9rW4Sf7J7sONzR8` |
+
+CNAME kieruje ruch i zarazem dowodzi własności. TXT jest wyzwaniem ACME dla certyfikatu;
+Firebase potrafi je zaliczyć także po HTTP, gdy CNAME już stoi i katalog `hosting/auth/`
+jest wdrożony, ale wpisanie TXT jest szybsze i niczego nie psuje. Po wystawieniu
+certyfikatu CNAME musi zostać na stałe, TXT można usunąć.
+
+Sprawdzenie stanu bez wchodzenia do konsoli:
+
+```bash
+nslookup -type=CNAME auth.liczmat.com 8.8.8.8
+curl -sI https://auth.liczmat.com | head -1
+```
+
+### Dwie rozbieżności wykryte przy okazji
+
+1. Apeks ma dziś `v=spf1 include:mx.ovh.com ~all` (softfail), nie `-all`, jak głosiła
+   tabela wyżej. Tabela poprawiona. Samego rekordu nie ruszamy — to poczta OVH.
+2. Klucz przeglądarki ma wśród `allowedReferrers` wpisy `https://liczmat.com`
+   i `https://www.liczmat.com` **bez** końcówki `/*`, w odróżnieniu od czterech
+   pozostałych. To osobna sprawa od tej roboty, ale warto ją kiedyś wyrównać.
 
 ## Kolejność
 
