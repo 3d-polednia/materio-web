@@ -930,13 +930,20 @@ docs/ADMIN.md         The admin panel, for the owner: the two one-off steps that
                       four buttons do, what the panel deliberately cannot do — create an
                       account, take money, keep a log in the database — and what to do when
                       the tab does not show up. Written in Polish, like the panel itself
-docs/STRIPE.md        Switching the sale on: the six steps that are console work rather
-                      than code — two products with the fourteen amounts, the Payment
-                      Links, the secret, the deploy, the webhook's four events, one real
-                      payment — and the two decisions Stripe leaves open (which currency
+docs/STRIPE.md        The sale as it now runs: what stands in Stripe and in the cloud,
+                      the path from the button to the plan, the trial, how to rebuild the
+                      catalogue, how to return to the sandbox and back, how a price is
+                      changed — and the two decisions Stripe leaves open (which currency
                       the checkout presents, and VAT). Written for the owner, in Polish;
                       `scripts/test-pay.mjs` §3b checks its prices and its event list
                       against the code rather than trusting the prose
+docs/PLATNOSCI-RUNBOOK.md
+                      The other half of the same subject, and the one to open under
+                      pressure: symptom, the command that checks it, what to do. A payment
+                      that did not become a plan, a double charge, a refund, a trial that
+                      did not fire, a webhook answering 400 or 503 to everything, a price
+                      change, and the way back to the sandbox. Also every message the
+                      webhook actually logs and what each response code means to Stripe
 docs/AUTH-EMAIL.md    Moving the account e-mails off noreply@materio-502513.firebaseapp.com
                       and onto auth.liczmat.com: why it has to be a subdomain, the eight
                       console and DNS steps in the order that breaks nothing, which three
@@ -1128,27 +1135,27 @@ Kotlin side of it. Change one, change all three.
   name the screen shows the visitor is the auth domain — `materio-502513.firebaseapp.com`,
   which is what Google displays for this client regardless of the App name field. Nobody
   reaches that screen today anyway: the Google button is off on both products.
-- **A plan is granted by the owner, by hand, and by nothing else yet.** `users/{uid}.plan`
-  is `"free"` or `"premium"` (the contract's word, older than the rebranding — do not
-  rename it) and it is server-only: no Play Billing, and the deployed rules let a browser
-  write nothing in the profile but `lastSeenAt` and `appVersion`. There **are** two Cloud
-  Functions that can write it — the Stripe webhook (session 38) and `adminPlan` behind the
-  browser panel (session 49) — but `functions/` is not deployed, so today neither of them
-  grants anybody anything. (FIRESTORE_SYNC §9.2 in the app repo still says "brak Cloud
-  Functions"; that sentence predates session 38.) What changed in session 37 of the repair plan is that
-  `scripts/pro-admin.mjs` can write it with a service-account key —
-  `grant <e-mail> [months]` and `revoke <e-mail>` — so LICZMAT PRO is reachable for the
-  first time. It is still not *buyable*: nothing takes money and nothing renews a plan. So the Pro tab on `/app/` describes the five modules in full,
-  marks each "Dostępne w LiczMat Pro", and says out loud that nothing grants Pro yet —
-  chapter XXV asks for a free user who understands what is Pro. `lmPlanStatus()` keeps the
-  half `lmLevelOf()` throws away: a `premium` plan whose `planValidUntil` has passed is
-  LICZMAT again, and `expired` is what lets the page say why instead of looking demoted
-  for no reason. **Session 28 put the checkout on that tab** — the one place on the site
-  that may take money, because it is the only page that knows the uid — and it is
-  `hidden` while `assets/pay.js` carries no Payment Link, which is the state the site
-  ships in. So the tab quotes the price, says the subscription has not opened, and still
-  has no live button; `scripts/test-pay.mjs` and `scripts/test-account-page.mjs` both
-  check there is not one.
+- **The shop is open, and four fields carry a plan.** `users/{uid}.plan` is `"free"` or
+  `"premium"` (the contract's word, older than the rebranding — do not rename it), beside
+  `planValidUntil`, `planRenews` and `planSource`. All four are server-only: the deployed
+  rules let a browser write nothing in the profile but `lastSeenAt` and `appVersion`.
+  Since 2026-09-11 `functions/` **is deployed** — `europe-central2`, Node 22, 2nd gen —
+  and four functions can write those fields: `stripeWebhook` (a real payment),
+  `grantTrial` (14 days for every new account), `adminPlan` (the browser panel) and
+  `scripts/pro-admin.mjs` with a service-account key (`grant`, `trial`, `revoke`).
+  Stripe runs in live mode; `assets/pay.js` carries both Payment Links and the customer
+  portal, so the checkout button on `/app/` is real and `scripts/test-pay.mjs` runs its
+  open-state branch (488 checks, not 474). **`docs/STRIPE.md` is how it works,
+  `docs/PLATNOSCI-RUNBOOK.md` is what to do when something goes wrong with a payment.**
+  `planSource` is the newest field and the only difference between a trial and a cancelled
+  subscription — both are Pro that does not renew. `planWrite()` in
+  `functions/stripe-map.mjs` deletes it unconditionally, so paying during a trial ends the
+  trial in the same write; only the trial writes it. `lmPlanStatus()` keeps the half
+  `lmLevelOf()` throws away: a `premium` plan whose `planValidUntil` has passed is LICZMAT
+  again, and `expired` is what lets the page say why instead of looking demoted for no
+  reason. One measured caveat lives on that tab: Stripe does not promise event order, so
+  the plan can arrive a minute after the payment — `plan_pending` says so rather than
+  showing a free account to somebody who has just paid.
 - **The visitor's level is derived, never asserted.** `lmLevelOf()` in
   `assets/account.js`: no Firebase user → `guest`; signed in → `liczmat`; signed in with
   `users/{uid}.plan == "premium"` (still valid) → `pro`. `plan` and `planValidUntil` are

@@ -15,8 +15,11 @@ sklepów, SEO oraz zarządzanie assetami.
 > **Czego ten plik NIE opisuje.** Powstał, gdy serwis był jedną stroną, i opisuje jego
 > szkielet: build, wdrożenie, języki, kalkulatory, SEO, assety. Modułów, które doszły
 > później — projekty, pomieszczenia, koszty, LiczMat Pro (klienci, zlecenia, wyceny,
-> terminarz), paywall i płatności — nie ma tutaj i nie ma po co ich tu dopisywać:
-> opisuje je `CLAUDE.md`, decyzję za decyzją, i to jest plik do czytania przed pracą.
+> terminarz) — nie ma tutaj i nie ma po co ich tu dopisywać: opisuje je `CLAUDE.md`,
+> decyzję za decyzją, i to jest plik do czytania przed pracą. Jeden wyjątek doszedł
+> 2026-09-11: płatności dostały tu sekcję [7c](#7c-płatności-plan-pro-i-okres-próbny),
+> bo pytanie „skąd konto bierze plan" pada wcześniej niż lektura `CLAUDE.md`. Konfigurację
+> Stripe'a opisuje `STRIPE.md`, a obsługę problemów z płatnością `PLATNOSCI-RUNBOOK.md`.
 > Sprawdzone i poprawione w Sesji 48 (2026-08-27) — jeśli coś tu przeczytasz, powinno
 > być prawdą; jeśli nie jest, to jest defekt, nie „stary tekst".
 
@@ -33,6 +36,7 @@ sklepów, SEO oraz zarządzanie assetami.
 7. [Kalkulatory](#7-kalkulatory)
    - [7a. Testy kalkulatorów](#7a-testy-kalkulatorów)
 7b. [Konto, sesja i poziomy dostępu](#7b-konto-sesja-i-poziomy-dostępu)
+7c. [Płatności, plan Pro i okres próbny](#7c-płatności-plan-pro-i-okres-próbny)
 8. [Wyszukiwarka sklepów](#8-wyszukiwarka-sklepów)
 9. [SEO](#9-seo)
 10. [System projektowy (CSS)](#10-system-projektowy-css)
@@ -412,9 +416,9 @@ w `src/ia.mjs` (trzy poziomy rozdziału II). Kontrakt danych:
 `lmLevelOf(user, profile)` zwraca `guest` bez użytkownika, `pro` gdy
 `users/{uid}.plan == "premium"` i jest ważny, w pozostałych przypadkach `liczmat`. `plan`
 i `planValidUntil` zapisuje **wyłącznie serwer** — reguły dopuszczają z profilu tylko
-`lastSeenAt` i `appVersion`, więc przeglądarka poziom czyta, ale nie nadaje. Dziś nikt
-`plan` nie zapisuje (brak Cloud Functions i Play Billing), więc realnie istnieją dwa
-poziomy: gość i LiczMat. Karta Pro mówi „W przygotowaniu” i nie ma przycisku zakupu.
+`lastSeenAt` i `appVersion`, więc przeglądarka poziom czyta, ale nie nadaje. Od 2026-09-11
+plan zapisują cztery drogi w chmurze i sprzedaż jest uruchomiona; wszystkie trzy poziomy
+istnieją realnie, a każde nowe konto zaczyna od 14 dni Pro. Szczegóły: [7c](#7c-płatności-plan-pro-i-okres-próbny).
 
 ### Sesja poza `/app/`
 
@@ -469,6 +473,120 @@ test dotyczy kodu tego repozytorium, a nie dostępności Google — i daje się 
 z kontenera, który do `gstatic.com` i tak nie dociera. Czego **nie** sprawdza: czy samo
 Firebase zachowuje się tak, jak zakłada `assets/app.js`; to weryfikacja na żywo,
 opisana w `FIRESTORE_SYNC.md` §8.
+
+## 7c. Płatności, plan Pro i okres próbny
+
+Kod: `assets/pay.js` (cennik i adresy), `assets/plan.js` (`lmSubscription()`, `LM_FEATURES`),
+`assets/paywall.js` (ściany), `src/pro.mjs` (widok kartki z cenami), `functions/` (webhook,
+bilet, panel, okres próbny). Operacje: `docs/PLATNOSCI-RUNBOOK.md`. Jak to skonfigurowano
+i jak odtworzyć katalog w Stripe: `docs/STRIPE.md`.
+
+Sprzedaż działa od 2026-09-11. Do tego dnia `plan` nadawało się wyłącznie z terminala.
+
+### Cztery pola planu
+
+Plan konta to cztery pola w `users/{uid}`, wszystkie **serwerowe** — reguły Firestore
+pozwalają przeglądarce zapisać w profilu tylko `lastSeenAt` i `appVersion`.
+
+| Pole | Wartości | Brak pola znaczy |
+|---|---|---|
+| `plan` | `free` / `premium` | konto darmowe |
+| `planValidUntil` | millis | plan bez daty końca |
+| `planRenews` | `true` / `false` | odnawia się |
+| `planSource` | `trial` | kupione albo nadane ręcznie |
+
+`planSource` jest najmłodsze i istnieje z jednego powodu: okres próbny i anulowana
+subskrypcja to **te same trzy pozostałe pola** — Pro z datą, które się nie odnawia. Bez
+czwartego pola strona nie umiałaby ich rozróżnić. `planWrite()` w
+`functions/stripe-map.mjs` kasuje je **bezwarunkowo**, więc zapłata w trakcie okresu
+próbnego kończy ten okres tym samym zapisem, który zapisuje subskrypcję.
+
+### Kto może zapisać plan
+
+| Droga | Kiedy |
+|---|---|
+| `stripeWebhook` | po prawdziwej zapłacie |
+| `grantTrial` | przy utworzeniu dokumentu `users/{uid}` |
+| `adminPlan` | z panelu administratora na `/app/` |
+| `scripts/pro-admin.mjs` | z terminala, kluczem konta serwisowego |
+
+### Okres próbny
+
+Każde nowo utworzone konto dostaje **14 dni Pro**: `planRenews: false`,
+`planSource: "trial"`. Wyzwalacz wisi na utworzeniu dokumentu `users/{uid}`, a ten dokument
+zakłada klient — przeglądarka w `assets/app.js` i aplikacja Android w `CloudSync.kt` — więc
+jeden kawałek kodu obsługuje obie drogi rejestracji, bez zmiany czegokolwiek po stronie
+aplikacji. Czysta decyzja siedzi w `functions/trial-map.mjs` i sprawdza ją
+`scripts/test-trial-map.mjs` bez chmury.
+
+Ślad zostaje w osobnej kolekcji `trialGrants/{uid}`: reguły nie mają dla niej dopasowania,
+a domyślnie odmawiają, więc żadna przeglądarka jej nie przeczyta ani nie skasuje. Kolekcja
+przeżywa skasowanie konta, więc ten sam `uid` nie dostanie drugiego okresu próbnego. Nowy
+adres e-mail to nowe konto i nowy okres próbny — świadomy kompromis, bo pilnowanie adresów
+kosztowałoby drugą kolekcję i tak nie zatrzymałoby nikogo zdeterminowanego.
+
+Konta założone przed wdrożeniem: `node scripts/pro-admin.mjs trial <e-mail>`.
+
+Pro **gaśnie samo**. Nic nie chodzi po kontach w tle: `planValidUntil` jest datą, a
+`lmLevelOf()` ją czyta i po terminie zwraca `liczmat`.
+
+### Zakup
+
+Jedyne miejsce na serwisie, które może wziąć pieniądze, to zakładka LiczMat Pro na `/app/` —
+bo tylko ta strona zna `uid` zalogowanego konta, a Payment Link bez `client_reference_id`
+kupuje plan dla nikogo. Ściany na modułach Pro i strona `/liczmat-pro/` prowadzą tam
+linkiem, zamiast powtarzać kasę u siebie.
+
+Przycisk woła funkcję `payTicket`, która wydaje podpisany bilet `v1.<uid>.<data>.<podpis>`.
+Bilet jedzie do Stripe'a jako `client_reference_id` i po nim webhook rozpoznaje, czyja to
+zapłata. Wcześniej jechał goły `uid` w adresie, co każdy mógł podmienić na cudzy —
+znalezisko M1 audytu 2026-09. Płatność bez biletu nadal przejdzie: webhook przypisze ją
+wtedy po adresie e-mail, bo sklep, który nie bierze pieniędzy przy nieustawionym sekrecie,
+byłby gorszy od tej słabszej ścieżki.
+
+### Okno między zapłatą a planem
+
+Stripe **nie obiecuje kolejności zdarzeń**. Zmierzony przypadek: `customer.subscription.created`
+dotarło przed `checkout.session.completed`, więc webhook nie miał jeszcze do czego przypiąć
+płatności, odpowiedział `503` i poprosił o ponowienie. Zachowanie poprawne, skutek dla
+człowieka — przez chwilę po zapłacie konto wygląda na darmowe.
+
+Dlatego na karcie planu stoi `plan_pending` („Płatność w toku… Nie płać drugi raz").
+Znacznik `liczmat-pay-pending` ustawiany jest w `localStorage` **w chwili wyjścia** na
+Stripe'a, bo tylko ten moment strona zna na pewno; wygasa po trzydziestu minutach i gaśnie
+sam, gdy nasłuch Firestore przyniesie plan.
+
+### Zielony przycisk
+
+Przycisk zakupu ma własną klasę `.btn-buy` i własne tokeny (`--buy`, `--on-buy`,
+`--buy-edge`, `--buy-hover`) w obu motywach. Jest zielony, a nie limonkowy jak reszta
+serwisu, bo limonka to kolor każdego zwykłego przycisku — „policz", „zapisz", „pokaż
+sklepy" — a jedyny przycisk pobierający pieniądze nie powinien wyglądać jak ten, który
+otwiera kalkulator. Założenie darmowego konta zostaje limonkowe: zielony znaczy „tu
+płacisz". Kontrasty zmierzone w obu motywach, ponad AA i ponad 1.4.11.
+
+### Waluty
+
+`LM_CURRENCIES` w `assets/currency.js` ma osiem walut do **liczenia**, `LM_PAY.currencies`
+siedem do **sprzedaży** — GBP jest na pierwszej liście, nie ma go na drugiej. Konto
+z wybraną walutą GBP nie zobaczy ani cen, ani przycisku, i tak zostanie, dopóki ktoś nie
+doda dwóch kwot po stronie Stripe'a.
+
+### Testy
+
+Bez chmury i bez konta Stripe, zwykłym `node`:
+
+```bash
+node scripts/test-pay.mjs          # cennik, adresy, hosty; 488 sprawdzeń w stanie otwartym
+node scripts/test-plan.mjs         # poziomy, uprawnienia, stany subskrypcji
+node scripts/test-webhook-map.mjs  # podpis, statusy, zapis planu
+node scripts/test-trial-map.mjs    # okres próbny
+node scripts/test-admin-map.mjs    # panel administratora
+node scripts/test-pro-admin.mjs    # narzędzie terminalowe
+```
+
+
+---
 
 ## 8. Wyszukiwarka sklepów
 
