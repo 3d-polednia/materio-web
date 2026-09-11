@@ -39,7 +39,7 @@ jednej nazwie to SPF nieważny dla obu nadawców naraz.
 
 ## Stan na 2026-09-11
 
-**Kroki 1–6 są zrobione.** Zostały dwa: **7** (szablony, punkt bez powrotu) i **8** (DMARC).
+**Kroki 1–6 i 8 są zrobione. Został krok 7** — szablony, punkt bez powrotu.
 
 Wszystko poszło z terminala — Firebase CLI i admin REST API na koncie
 `polednia@gmail.com` — poza rekordami DNS, które właściciel wpisał w panelu OVH.
@@ -55,7 +55,9 @@ Wszystko poszło z terminala — Firebase CLI i admin REST API na koncie
   dotychczasowych wpisów nienaruszonych;
 - **krok 6** — `https://auth.liczmat.com/*` dopisane do `allowedReferrers` klucza
   przeglądarki `47be1333-ef69-4501-aeb5-4b2e2778243f`. Sześć dotychczasowych referrerów
-  i wszystkie 25 `apiTargets` na miejscu.
+  i wszystkie 25 `apiTargets` na miejscu;
+- **krok 8** — `_dmarc.liczmat.com` TXT `v=DMARC1; p=none; rua=mailto:contact@liczmat.com`
+  wpisany w OVH i rozejrzany. Apeks ma nadal dokładnie jeden rekord SPF.
 
 Zmierzone po wdrożeniu:
 
@@ -105,6 +107,52 @@ oraz `apikeys.googleapis.com/v2/projects/630563506659/locations/global/keys/…`
 API wysyła się **cały** obiekt `restrictions` razem z `etag`, a nie samo pole referrerów —
 maska `updateMask=restrictions` zastępuje całość, więc pominięcie `apiTargets` skasowałoby
 wszystkie 25 wpisów i położyło serwis.
+
+### Czego przy kroku 7 nie da się zrobić z terminala
+
+Sprawdzone 2026-09-11 w dokumencie odkrywania API
+(`identitytoolkit.googleapis.com/$discovery/rest?version=v2`). W `DnsInfo` cztery pola
+z pięciu są **output only**:
+
+```
+customDomain                  Output only
+pendingCustomDomain           Output only
+customDomainState             Output only
+domainVerificationRequestTime Output only
+useCustomDomain               boolean   <- jedyne zapisywalne
+```
+
+Nie ma więc publicznego pola, którym dałoby się **zgłosić** domenę nadawcy i wyciągnąć
+rekordy DKIM. PATCH z `pendingCustomDomain` przechodzi jako no-op: odpowiedź jest 200,
+a konfiguracja nie zmienia się o bit (sprawdzone przez porównanie z kopią całego
+`config` sprzed wywołania). Rejestracja domeny i rekordy DKIM idą wyłącznie przez
+konsolę — krok 7 zostaje tam, gdzie go opisano.
+
+Zapisywalne są tylko dwie rzeczy i obie **są** punktem bez powrotu:
+`notification.sendEmail.callbackUri` (dziś
+`https://materio-502513.firebaseapp.com/__/auth/action`, czyli domena linku w mailu)
+oraz `dnsInfo.useCustomDomain` (przełącznik adresu Od).
+
+Jest za to bezpieczna część kroku 7, której opis wyżej nie wyróżniał. Schemat
+`EmailTemplate` ma pole `senderDisplayName` — w tym projekcie **puste** we wszystkich
+szablonach — a `replyTo` ma dziś wartość `noreply`, nie `contact@liczmat.com`. Te dwa
+pola nie ruszają ani linku, ani domeny nadawcy i cofa je jeden PATCH pod adres
+`admin/v2/projects/materio-502513/config` z maską:
+
+```
+updateMask=notification.sendEmail.resetPasswordTemplate,
+           notification.sendEmail.verifyEmailTemplate,
+           notification.sendEmail.changeEmailTemplate
+```
+
+(w wywołaniu bez spacji i łamania wiersza). W ciele idą **pełne** obiekty szablonów
+z zachowanym `body`, `subject` i `senderLocalPart`, ze zmienionym tylko
+`senderDisplayName` na `LiczMat` i `replyTo` na `contact@liczmat.com`, bez pola
+`customized` (output only). Maska na poziomie szablonu, nie pojedynczego pola — ta sama
+ostrożność co przy kluczu API.
+
+Czwartego szablonu, `revertSecondFactorAdditionTemplate`, nie ruszamy: 2FA nie jest
+włączone, więc ten mail nigdy nie leci.
 
 ### Dwie rozbieżności wykryte przy okazji
 
