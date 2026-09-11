@@ -39,32 +39,50 @@ jednej nazwie to SPF nieważny dla obu nadawców naraz.
 
 ## Stan na 2026-09-11
 
-Zrobione z terminala (Firebase CLI + REST API, konto `polednia@gmail.com`):
+**Kroki 1–6 są zrobione.** Zostały dwa: **7** (szablony, punkt bez powrotu) i **8** (DMARC).
 
-- **krok 1** — witryna Hostingu `liczmat-auth` istnieje, `https://liczmat-auth.web.app`;
-- **krok 3** — domena niestandardowa `auth.liczmat.com` dodana do tej witryny. Stan:
-  `ownershipState: OWNERSHIP_MISSING`, `hostState: HOST_UNHOSTED`, certyfikat
-  `CERT_VALIDATING` — czeka wyłącznie na rekordy w OVH (niżej);
-- **krok 5** — `auth.liczmat.com` dopisane do domen autoryzowanych Authentication,
-  siedem dotychczasowych wpisów nienaruszone.
+Wszystko poszło z terminala — Firebase CLI i admin REST API na koncie
+`polednia@gmail.com` — poza rekordami DNS, które właściciel wpisał w panelu OVH.
 
-Zostało: krok 2 (wdrożenie), krok 6 (klucz API), rekordy DNS w OVH, krok 7 (szablony)
-i krok 8 (DMARC).
+- **krok 1** — witryna Hostingu `liczmat-auth`, `https://liczmat-auth.web.app`;
+- **krok 2** — `hosting/auth/` wdrożone, dwa pliki, `functions/` nietknięte;
+- **krok 3** — domena niestandardowa `auth.liczmat.com` podpięta do tej witryny;
+- **DNS** — dwa rekordy w OVH, niżej;
+- **krok 4** — `hostState: HOST_ACTIVE`, `ownershipState: OWNERSHIP_ACTIVE`,
+  `issues: none`. Certyfikat tymczasowy w stanie `CERT_PROPAGATING`; Firebase podmieni go
+  potem na własny bez niczyjego udziału;
+- **krok 5** — `auth.liczmat.com` w domenach autoryzowanych Authentication, siedem
+  dotychczasowych wpisów nienaruszonych;
+- **krok 6** — `https://auth.liczmat.com/*` dopisane do `allowedReferrers` klucza
+  przeglądarki `47be1333-ef69-4501-aeb5-4b2e2778243f`. Sześć dotychczasowych referrerów
+  i wszystkie 25 `apiTargets` na miejscu.
 
-### Rekordy do wpisania w OVH → Strefa DNS
+Zmierzone po wdrożeniu:
 
-Firebase podał dokładnie te dwa. Nazwy w panelu OVH wpisuje się **bez** `liczmat.com` —
-panel dokleja domenę sam.
+```
+https://auth.liczmat.com/                              200, ssl_verify=0
+https://auth.liczmat.com/robots.txt                    200
+https://auth.liczmat.com/__/auth/action?mode=…         200
+https://auth.liczmat.com/__/firebase/init.json         200
+https://liczmat.com/app/                               200  (nie ruszone)
+```
+
+Ostatnia linia jest tam nieprzypadkowo: krok 6 pisze po kluczu, którego używa żywy
+serwis, więc sprawdzenie, że serwis dalej wstaje, należy do tej roboty.
+
+### Rekordy w OVH → Strefa DNS
+
+Firebase podał dokładnie te dwa; oba są już wpisane i rozeszły się. Nazwy w panelu OVH
+wpisuje się **bez** `liczmat.com` — panel dokleja domenę sam.
 
 | Nazwa | Typ | Wartość |
 |---|---|---|
 | `auth` | CNAME | `liczmat-auth.web.app` |
 | `_acme-challenge.auth` | TXT | `Gf2sFQL_YNm6LC_bQmDGW4k_DA1m9rW4Sf7J7sONzR8` |
 
-CNAME kieruje ruch i zarazem dowodzi własności. TXT jest wyzwaniem ACME dla certyfikatu;
-Firebase potrafi je zaliczyć także po HTTP, gdy CNAME już stoi i katalog `hosting/auth/`
-jest wdrożony, ale wpisanie TXT jest szybsze i niczego nie psuje. Po wystawieniu
-certyfikatu CNAME musi zostać na stałe, TXT można usunąć.
+CNAME kieruje ruch i zarazem dowodzi własności — **zostaje na stałe**. TXT jest wyzwaniem
+ACME; można go usunąć, gdy certyfikat dojdzie do `CERT_ACTIVE`, ale nic nie stoi na
+przeszkodzie, żeby został.
 
 Sprawdzenie stanu bez wchodzenia do konsoli:
 
@@ -72,6 +90,21 @@ Sprawdzenie stanu bez wchodzenia do konsoli:
 nslookup -type=CNAME auth.liczmat.com 8.8.8.8
 curl -sI https://auth.liczmat.com | head -1
 ```
+
+Stan domeny i certyfikatu czyta się z Hosting API — token `firebase-tools` ma zakres
+`cloud-platform`, więc wystarczy:
+
+```bash
+TOK=$(node -e "console.log(require(require('os').homedir()+'/.config/configstore/firebase-tools.json').tokens.access_token)")
+curl -s -H "Authorization: Bearer $TOK" \
+  https://firebasehosting.googleapis.com/v1beta1/projects/materio-502513/sites/liczmat-auth/customDomains/auth.liczmat.com
+```
+
+Tą samą drogą idą kroki 5 i 6: `identitytoolkit.googleapis.com/admin/v2/projects/…/config`
+oraz `apikeys.googleapis.com/v2/projects/630563506659/locations/global/keys/…`. Przy kluczu
+API wysyła się **cały** obiekt `restrictions` razem z `etag`, a nie samo pole referrerów —
+maska `updateMask=restrictions` zastępuje całość, więc pominięcie `apiTargets` skasowałoby
+wszystkie 25 wpisów i położyło serwis.
 
 ### Dwie rozbieżności wykryte przy okazji
 
