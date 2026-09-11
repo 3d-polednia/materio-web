@@ -23,7 +23,7 @@
  */
 export const PLAN_PRO = "premium";
 export const PLAN_FREE = "free";
-export const PLAN_FIELDS = ["plan", "planValidUntil", "planRenews"];
+export const PLAN_FIELDS = ["plan", "planValidUntil", "planRenews", "planSource"];
 
 /** Znacznik „skasuj to pole". `functions/index.js` zamienia go na `FieldValue.delete()`. */
 export const DELETE_FIELD = "__delete__";
@@ -162,21 +162,34 @@ export function planFromSubscription(sub) {
 }
 
 /**
- * Trzy pola do zapisania — albo do skasowania.
+ * Cztery pola do zapisania — albo do skasowania.
  *
  * Przy planie darmowym `planValidUntil` i `planRenews` **znikają**, zamiast dostać `null`.
  * Wartość `null` w `planValidUntil` czytałaby się jako plan, który skończył się w 1970
  * roku; brak pola czyta się jako „nigdy nie było planu", i to jest prawda. To ta sama
  * decyzja, co `revoke` w scripts/pro-admin.mjs.
+ *
+ * `planSource` znika **zawsze**, i to jest tu najważniejsze zdanie. Pole nadaje wyłącznie
+ * okres próbny (functions/trial-map.mjs), a assets/plan.js po nim rozpoznaje, że Pro jest
+ * próbne, a nie kupione. Konto, które zapłaciło w trakcie okresu próbnego, przechodzi przez
+ * ten zapis — gdyby `planSource` zostało, strona mówiłaby płacącemu klientowi, że ma wersję
+ * próbną, aż do końca subskrypcji. Kasowanie tutaj jest tańsze niż pamiętanie o nim w każdym
+ * miejscu, które nadaje plan: okres próbny dokłada je z powrotem u siebie, jawnie.
  */
 export function planWrite(mapped) {
   if (!mapped.pro) {
-    return { plan: PLAN_FREE, planValidUntil: DELETE_FIELD, planRenews: DELETE_FIELD };
+    return {
+      plan: PLAN_FREE,
+      planValidUntil: DELETE_FIELD,
+      planRenews: DELETE_FIELD,
+      planSource: DELETE_FIELD,
+    };
   }
   return {
     plan: PLAN_PRO,
     planValidUntil: mapped.validUntilMs,
     planRenews: Boolean(mapped.renews),
+    planSource: DELETE_FIELD,
   };
 }
 

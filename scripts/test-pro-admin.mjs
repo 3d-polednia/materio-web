@@ -63,7 +63,7 @@ const eq = (name, got, want) =>
 
 /* ================================================================== 1. the contract */
 
-head("1. the contract: the same two words and the same three fields as the product");
+head("1. the contract: the same two words and the same four fields as the product");
 {
   const { LM_PLAN_PRO } = evalScript("assets/account.js", ["LM_PLAN_PRO"]);
   eq("Pro is the contract's own word", PLAN_PRO, LM_PLAN_PRO);
@@ -76,9 +76,9 @@ head("1. the contract: the same two words and the same three fields as the produ
   for (const field of PLAN_FIELDS) {
     check(`assets/plan.js reads ${field}`, plan.includes(`.${field}`) || plan.includes(`"${field}"`));
   }
-  eq("three fields and no more", PLAN_FIELDS.length, 3);
+  eq("four fields and no more", PLAN_FIELDS.length, 4);
   eq("in the order plan.js reads them",
-    PLAN_FIELDS.join(","), "plan,planValidUntil,planRenews");
+    PLAN_FIELDS.join(","), "plan,planValidUntil,planRenews,planSource");
 
   /* The scopes are the two APIs this touches and nothing wider. cloud-platform would
      hand a leaked token the whole project. */
@@ -89,7 +89,7 @@ head("1. the contract: the same two words and the same three fields as the produ
 
 /* ================================================================== 2. what a grant writes */
 
-head("2. a grant writes three typed fields, and the mask names exactly those three");
+head("2. a grant writes the typed plan fields, and the mask names exactly those four");
 {
   const until = Date.UTC(2027, 7, 21, 12, 0, 0);
   const fields = planFields({ pro: true, validUntilMs: until, renews: false });
@@ -109,8 +109,8 @@ head("2. a grant writes three typed fields, and the mask names exactly those thr
   for (const field of PLAN_FIELDS) {
     check(`the mask names ${field}`, url.includes(`updateMask.fieldPaths=${field}`), url);
   }
-  eq("the mask names three fields and no more",
-    (url.match(/updateMask\.fieldPaths=/g) || []).length, 3);
+  eq("the mask names four fields and no more",
+    (url.match(/updateMask\.fieldPaths=/g) || []).length, 4);
   check("it points at the profile document",
     url.startsWith(docUrl("materio-502513", "uid-1") + "?"), url);
   check("the document address is the account's own profile",
@@ -289,7 +289,8 @@ head("9. the script writes to one place, and the repository is not it");
   for (const forbidden of ["writeFileSync", "appendFileSync", "createWriteStream", "mkdirSync", "rmSync", "unlinkSync"]) {
     check(`never calls ${forbidden}`, !src.includes(forbidden));
   }
-  eq("one PATCH in the whole file", (src.match(/method: "PATCH"/g) || []).length, 1);
+  eq("two PATCHes in the whole file", (src.match(/method: "PATCH"/g) || []).length, 2);
+  check("the second one writes the trial grant", src.includes("documents/trialGrants/"), "writeTrialGrant()");
   check("and it goes to the masked address", /patchUrl\(projectId, uid\), \{\s*method: "PATCH"/.test(src), "writePlan()");
   check("no DELETE anywhere", !src.includes('method: "DELETE"'));
 

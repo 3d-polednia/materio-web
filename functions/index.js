@@ -54,6 +54,7 @@
 import { createHmac } from "node:crypto";
 
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { defineSecret, defineString } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
@@ -67,6 +68,7 @@ import {
   LIST_LIMIT, accountRow, grantWrite, isAdmin, parseRequest, planSummary, revokeWrite,
 } from "./admin-map.mjs";
 import { looksLikeTicket, mintTicket, readTicket } from "./pay-ticket.mjs";
+import { TRIAL_DAYS, trialDecision, trialGrantDoc } from "./trial-map.mjs";
 
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
 
@@ -525,3 +527,71 @@ async function findUser(auth, email) {
     throw e;
   }
 }
+
+/* ------------------------------------------------------------------ okres próbny */
+
+/**
+ * Czternaście dni Pro dla każdego nowego konta.
+ *
+ * ─── DLACZEGO WYZWALACZ FIRESTORE, A NIE TRIGGER AUTH ───────────────────────
+ * Profil `users/{uid}` zakłada klient — `assets/app.js` w przeglądarce i `CloudSync.kt`
+ * w telefonie — i robi to raz, przy pierwszym zalogowaniu. Wyzwalacz na utworzeniu tego
+ * dokumentu obsługuje więc obie drogi rejestracji jednym kawałkiem kodu i bez zmiany
+ * czegokolwiek po stronie aplikacji. Blokująca funkcja `beforeUserCreated` wymagałaby
+ * podniesienia Firebase Auth do Identity Platform, a jej błąd wywracałby **rejestrację**;
+ * tutaj najgorsze, co się może stać, to konto bez okresu próbnego.
+ *
+ * `onDocumentCreated` nie odpala się przy aktualizacji, więc zapis, który ta funkcja sama
+ * robi w tym samym dokumencie, nie wywoła jej drugi raz.
+ *
+ * ─── DLACZEGO OSOBNA KOLEKCJA `trialGrants` ─────────────────────────────────
+ * `assets/app.js` pozwala skasować konto, a kasuje przy tym `users/{uid}`. Gdyby jedynym
+ * śladem okresu próbnego był plan w profilu, wystarczyłoby skasować profil i wejść jeszcze
+ * raz, żeby dostać kolejne czternaście dni — w kółko. `trialGrants/{uid}` zostaje po
+ * skasowanym koncie i to on odpowiada na pytanie „czy ten uid już to dostał".
+ * Reguły Firestore nie mają dla tej kolekcji dopasowania, a domyślnie odmawiają, więc
+ * żadna przeglądarka jej nie przeczyta ani nie skasuje. Nowy adres e-mail to nowe konto
+ * i nowy okres próbny — świadomie, bo pilnowanie adresów kosztowałoby drugą kolekcję
+ * z hasłowanymi adresami i i tak nie zatrzymałoby nikogo zdeterminowanego.
+ *
+ * ─── CZEGO TO NIE ROBI ──────────────────────────────────────────────────────
+ * Nie odbiera Pro po czternastu dniach i nie musi: `planValidUntil` jest datą, a
+ * `lmLevelOf()` w assets/plan.js sam gasi Pro, gdy ta data minie. Nic nie chodzi po
+ * kontach w tle.
+ */
+export const grantTrial = onDocumentCreated(
+  { document: "users/{uid}", region: REGION, maxInstances: 10 },
+  async (event) => {
+    const uid = event.params.uid;
+    const now = Date.now();
+
+    const db = getFirestore();
+    const userRef = db.collection("users").doc(uid);
+    const trialRef = db.collection("trialGrants").doc(uid);
+
+    const outcome = await db.runTransaction(async (tx) => {
+      /* Oba odczyty przed pierwszym zapisem — tego wymaga Firestore. Profil czytamy
+         jeszcze raz, mimo że zdarzenie niesie jego treść: między utworzeniem dokumentu
+         a tym wywołaniem webhook Stripe'a mógł już nadać plan opłacony, a okres próbny
+         nigdy nie ma prawa skrócić ważności planu, za który ktoś zapłacił. */
+      const [grant, profile] = await Promise.all([tx.get(trialRef), tx.get(userRef)]);
+
+      const verdict = trialDecision(
+        profile.exists ? profile.data() : null,
+        grant.exists ? grant.data() : null,
+        now,
+      );
+      if (!verdict.grant) return { skipped: verdict.reason };
+
+      tx.set(userRef, toFirestore(verdict.write), { merge: true });
+      tx.set(trialRef, trialGrantDoc(uid, now));
+      return { until: verdict.until };
+    });
+
+    if (outcome.skipped) {
+      logger.info("trial: pominięty", { uid, reason: outcome.skipped });
+      return;
+    }
+    logger.info("trial: nadany", { uid, days: TRIAL_DAYS, until: outcome.until });
+  },
+);

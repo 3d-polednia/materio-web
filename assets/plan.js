@@ -113,7 +113,27 @@ function lmPlanRenews(profile) {
 }
 
 /**
- * The five states a subscription can be in, as one word.
+ * Where this account's Pro came from, when the answer is not "somebody paid for it".
+ *
+ * `planSource` is the fourth plan field and the newest, added with the 14-day trial every
+ * new account gets. It is server-only like the other three — functions/trial-map.mjs writes
+ * it and functions/stripe-map.mjs's planWrite() deletes it, so a trial that turns into a
+ * paid subscription stops being a trial in the same write that takes the money.
+ *
+ * Absent means bought (or granted from the admin panel), which is what every document that
+ * predates the trial says, and the safer of the two readings: calling a paying customer's
+ * subscription a trial is the error that costs a customer.
+ */
+var LM_PLAN_SOURCE = { TRIAL: "trial" };
+
+/** Is this Pro a trial? The field exists for exactly this question. */
+function lmPlanIsTrial(profile) {
+  var p = profile || {};
+  return p.planSource === LM_PLAN_SOURCE.TRIAL;
+}
+
+/**
+ * The six states a subscription can be in, as one word.
  *
  * lmPlanStatus() reports the fields; this reports the *situation*, so that /app/ and the
  * paywall pick a sentence by name instead of each re-deriving it from four booleans and
@@ -122,28 +142,39 @@ function lmPlanRenews(profile) {
  *   "none"      no account. There is no plan to be in a state
  *   "free"      an account on the free plan
  *   "active"    Pro, paid up, renewing
+ *   "trial"     Pro, running, and nobody has paid for it — the 14 days a new account gets.
+ *               Fully Pro right now, and the one state that must NOT be offered Stripe's
+ *               customer portal: there is no subscription behind it to manage
  *   "cancelled" Pro, still valid, and it will NOT renew — Pro until validUntil, then free.
  *               The account is fully Pro right now: this is a date, not a demotion
- *   "expired"   Pro that ran out. LICZMAT again, and able to say why
+ *   "expired"   Pro that ran out. LICZMAT again, and able to say why. A trial that ended
+ *               lands here too: what the account lost is the same thing either way
+ *
+ * "trial" is checked before "cancelled" because a trial *is* a Pro plan that does not
+ * renew — the two are the same three fields, and `planSource` is the whole difference.
  *
  * @returns {{state:string, plan:string|null, level:string, validUntil:number|null,
- *            renews:boolean, daysLeft:number|null}}
+ *            renews:boolean, daysLeft:number|null, source:string|null}}
  *   daysLeft whole days from `now` to validUntil, floored, never negative. null when
  *            there is no end date to count to
+ *   source   `planSource` as stored, or null. "trial" is the only value today
  */
 function lmSubscription(user, profile, now) {
   var at = now === undefined ? Date.now() : now;
   var st = lmPlanStatus(user, profile, at);
+  var trial = lmPlanIsTrial(profile);
   var state;
   if (!st.signedIn) state = "none";
   else if (st.plan !== LM_PLAN.PRO) state = "free";
   else if (st.expired) state = "expired";
+  else if (trial) state = "trial";
   else state = st.renews ? "active" : "cancelled";
 
   var days = null;
   if (st.validUntil !== null) {
     days = Math.max(0, Math.floor((st.validUntil - at) / 86400000));
   }
+  var p = profile || {};
   return {
     state: state,
     plan: st.plan,
@@ -151,6 +182,7 @@ function lmSubscription(user, profile, now) {
     validUntil: st.validUntil,
     renews: st.renews,
     daysLeft: days,
+    source: typeof p.planSource === "string" && p.planSource ? p.planSource : null,
   };
 }
 

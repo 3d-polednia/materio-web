@@ -65,8 +65,9 @@ head("1. three copies of the contract, and they agree");
 {
   eq("Pro is the same word as in pro-admin.mjs", PLAN_PRO, ADMIN_PRO);
   eq("free is the same word", PLAN_FREE, ADMIN_FREE);
-  eq("the three fields are the same three", PLAN_FIELDS.join(","), ADMIN_FIELDS.join(","));
-  eq("and they are the contract's own", PLAN_FIELDS.join(","), "plan,planValidUntil,planRenews");
+  eq("the four fields are the same four", PLAN_FIELDS.join(","), ADMIN_FIELDS.join(","));
+  eq("and they are the contract's own", PLAN_FIELDS.join(","),
+    "plan,planValidUntil,planRenews,planSource");
 
   /* assets/plan.js is the third copy — the one the browser reads. */
   const plan = read("assets/plan.js");
@@ -194,7 +195,7 @@ head("4. the status, and the cancellation that does not take Pro away today");
 head("5. what a write puts in the document, and what it takes out");
 {
   const pro = planWrite({ pro: true, validUntilMs: 1818806400000, renews: true });
-  eq("three fields", Object.keys(pro).sort().join(","), "plan,planRenews,planValidUntil");
+  eq("four fields", Object.keys(pro).sort().join(","), "plan,planRenews,planSource,planValidUntil");
   eq("the plan", pro.plan, PLAN_PRO);
   eq("the date, in millis", pro.planValidUntil, 1818806400000);
   eq("the renewal", pro.planRenews, true);
@@ -203,7 +204,7 @@ head("5. what a write puts in the document, and what it takes out");
      reads as a plan that ended in 1970; an absent one reads as no plan, which is true.
      Same decision as `revoke` in scripts/pro-admin.mjs. */
   const free = planWrite({ pro: false, validUntilMs: null, renews: false });
-  eq("free still names three fields", Object.keys(free).sort().join(","), "plan,planRenews,planValidUntil");
+  eq("free still names four fields", Object.keys(free).sort().join(","), "plan,planRenews,planSource,planValidUntil");
   eq("the plan is free", free.plan, PLAN_FREE);
   eq("the date is deleted", free.planValidUntil, DELETE_FIELD);
   eq("the renewal flag is deleted", free.planRenews, DELETE_FIELD);

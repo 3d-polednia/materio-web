@@ -26,6 +26,33 @@ ma w adresie `test_` i pobrałby zero złotych od każdego odwiedzającego.
 
 ---
 
+## 0b. Produkty i ceny zakłada skrypt, nie ręka
+
+Od sesji 70 kroków 1 i 2 nie trzeba klikać: `scripts/stripe-setup.mjs` tworzy oba produkty,
+obie ceny cykliczne z czternastoma kwotami w siedmiu walutach i oba Payment Linki przez
+REST API Stripe'a. Kwoty czyta z `LM_PAY` w `assets/pay.js`, więc cennik ma jedno źródło
+prawdy i nie da się go rozjechać ze stroną.
+
+```bash
+STRIPE_SECRET_KEY=sk_test_... node scripts/stripe-setup.mjs --sandbox --dry-run   # nic nie tworzy
+STRIPE_SECRET_KEY=sk_test_... node scripts/stripe-setup.mjs --sandbox
+```
+
+Klucz idzie **wyłącznie** zmienną środowiskową — nigdy w argumencie i nigdy w repozytorium.
+`--sandbox` odmawia pracy z kluczem `sk_live_`, `--live` z kluczem `sk_test_`.
+Skrypt jest idempotentny (produkty po `metadata.lm_plan`, ceny po `lookup_key`, linki po
+identyfikatorze ceny), więc ponowne uruchomienie niczego nie mnoży. Ceny w Stripe są
+**niezmienne**: gdy kwota w `pay.js` różni się od tej, która już istnieje, skrypt odmawia
+i mówi wprost, że trzeba nowego `lookup_key` albo dezaktywacji starej ceny.
+
+Na koniec wypisuje gotową linijkę `STRIPE_PRICE_IDS=prod_...,prod_...` do `functions/.env`
+i oba adresy Payment Linków. Jednej rzeczy API nie zrobi: **adres portalu klienta**
+(`https://billing.stripe.com/p/login/...`) nadal kopiuje się ręcznie z panelu Stripe'a.
+
+Kroki 1 i 2 niżej zostają jako opis tego, co skrypt zakłada, i jako droga ręczna.
+
+---
+
 ## 1. Dwa produkty i czternaście kwot
 
 Stripe → **Products** → dwa produkty, oba z ceną **cykliczną** (recurring):
@@ -198,6 +225,41 @@ zapalają się same, a zdanie „subskrypcji jeszcze nie da się wykupić" znika
 node scripts/test-pay.mjs        # §3 sprawdza wtedy stan otwarty: wszystko albo nic
 node scripts/test-plan.mjs
 node scripts/build.mjs           # STAMP w scripts/build.mjs podbity, ?v= w 404.html i privacy-policy.html ręcznie
+```
+
+---
+
+## 7. Okres próbny — co to zmienia w tej procedurze
+
+Od sesji 70 każde nowo założone konto dostaje **14 dni LiczMat Pro**. Robi to wyzwalacz
+`grantTrial` w `functions/index.js`, odpalany przy utworzeniu dokumentu `users/{uid}` —
+a ten dokument zakłada tak samo przeglądarka, jak i aplikacja na Androidzie, więc obie
+drogi rejestracji są obsłużone jednym kawałkiem kodu.
+
+Co z tego wynika dla płatności:
+
+- Wyzwalacz jedzie tym samym `firebase deploy --only functions`, co webhook. Wymaga planu
+  Blaze i Eventarc — tak jak reszta funkcji.
+- Konto w okresie próbnym ma `plan: "premium"`, `planValidUntil` za czternaście dni,
+  `planRenews: false` i **`planSource: "trial"`**. To czwarte pole jest jedyną różnicą
+  między okresem próbnym a anulowaną subskrypcją — bez niego strona nie umiałaby ich
+  rozróżnić, bo pozostałe trzy pola wyglądają identycznie.
+- `planWrite()` w `functions/stripe-map.mjs` **zawsze kasuje `planSource`**. Konto, które
+  zapłaci w trakcie okresu próbnego, przestaje być kontem próbnym w tym samym zapisie,
+  który zapisuje subskrypcję. Przy płatności testowej z kroku 5 sprawdź to wprost:
+  po zapłacie w `users/{uid}` **nie ma już** pola `planSource`.
+- Portal klienta nie jest pokazywany kontu w okresie próbnym — nie ma tam czego zarządzać.
+  Ceny i przycisk kasy **są** pokazywane: te czternaście dni to całe okno na konwersję.
+- Drugiego okresu próbnego to samo konto nie dostanie: ślad zostaje w kolekcji
+  `trialGrants/{uid}`, której reguły Firestore nie udostępniają żadnej przeglądarce i która
+  zostaje po skasowaniu konta. Nowy adres e-mail to nowe konto i nowy okres próbny.
+- Nic nie chodzi po kontach w tle. Pro gaśnie samo, bo `planValidUntil` jest datą, a
+  `lmLevelOf()` w `assets/plan.js` ją czyta.
+
+Konta założone **przed** wdrożeniem wyzwalacza nie dostają nic automatycznie. Dla nich:
+
+```bash
+LM_SA_KEY=… node scripts/pro-admin.mjs trial ktos@example.com
 ```
 
 ---

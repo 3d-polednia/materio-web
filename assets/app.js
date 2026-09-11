@@ -567,20 +567,28 @@ function renderPlan() {
   const sub = lmSubscription(state.user, state.profile);
   const pro = sub.level === LM_LEVEL.PRO;
 
-  $("plan-name").textContent = T(pro ? "plan_pro" : "plan_free");
+  const planName = { trial: "plan_trial", free: "plan_free" }[sub.state] || (pro ? "plan_pro" : "plan_free");
+  $("plan-name").textContent = T(planName);
   $("plan-name").classList.toggle("warn", sub.state === "expired");
 
   /* The date, worded by what it means rather than by what it is. The same instant reads
      "renews on" for a running subscription and "Pro until" for a cancelled one, and
      saying "valid until" for both would hide the only difference that matters. */
-  const dateLabel = { active: "plan_renews", cancelled: "plan_cancelled", expired: "plan_until" };
+  const dateLabel = {
+    active: "plan_renews",
+    trial: "plan_trial_until",
+    cancelled: "plan_cancelled",
+    expired: "plan_until",
+  };
   $("plan-until").textContent = sub.validUntil && dateLabel[sub.state]
     ? `${T(dateLabel[sub.state])}: ${whenText(sub.validUntil)}` : "";
 
   // Why the account is on the plan it is on. A cancelled subscription is the one state
-  // that has to say what happens next, because nothing else on the page would.
+  // that has to say what happens next, because nothing else on the page would. A trial is
+  // the second: Pro that nobody paid for reads as a mistake unless the page says otherwise.
   const note = {
     active: "plan_active_d",
+    trial: "plan_trial_d",
     cancelled: "plan_cancel_d",
     expired: "plan_expired",
     free: "plan_none",
@@ -590,7 +598,8 @@ function renderPlan() {
 
   /* Managing and cancelling are Stripe's own screens. The link is only offered to an
      account that has something to manage — showing it to a free account would send them
-     to a portal with no subscription in it. */
+     to a portal with no subscription in it. A trial is in that same position: Pro, and
+     nothing behind it at Stripe, so "trial" is deliberately absent from this list. */
   const portal = typeof lmPortalUrl === "function" ? lmPortalUrl() : null;
   const manage = sub.state === "active" || sub.state === "cancelled";
   $("plan-manage").hidden = !(manage && portal);
@@ -604,7 +613,9 @@ function renderPlan() {
  *
  * Hidden entirely for somebody who already pays: quoting a price to an existing
  * subscriber is asking them to buy what they own. A cancelled subscription still sees it,
- * because re-subscribing is exactly what that account might want to do.
+ * because re-subscribing is exactly what that account might want to do. So does a trial,
+ * and for the stronger reason: the fourteen days are the whole window in which somebody
+ * who has seen what Pro does can decide to keep it.
  *
  * The amounts come from assets/pay.js in the visitor's currency and are never converted;
  * a currency with no configured amount hides that plan rather than guessing one.

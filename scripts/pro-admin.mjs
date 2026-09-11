@@ -73,13 +73,24 @@ export const PLAN_PRO = "premium";
 export const PLAN_FREE = "free";
 
 /**
- * Trzy pola planu — i maska zapisu.
+ * Cztery pola planu — i maska zapisu.
  *
  * Kolejność jest ta sama, w której czyta je assets/plan.js. Lista jest jedna, bo maska
  * i zapisywane pola muszą się zgadzać: pole w masce, którego nie ma w ciele żądania,
  * Firestore **kasuje** — i właśnie na tym opiera się `revoke`.
+ *
+ * `planSource` doszło z okresem próbnym (functions/trial-map.mjs) i jest tu głównie po to,
+ * żeby maska je **kasowała**: nadanie Pro z terminala koncie, które siedzi w okresie
+ * próbnym, ma zrobić z niego zwykłe Pro, a nie przedłużony trial. Jedyna akcja, która je
+ * wpisuje, to `trial` niżej.
  */
-export const PLAN_FIELDS = ["plan", "planValidUntil", "planRenews"];
+export const PLAN_FIELDS = ["plan", "planValidUntil", "planRenews", "planSource"];
+
+/** Wartość `planSource`, którą nadaje okres próbny. Ta sama, co TRIAL_SOURCE w functions/trial-map.mjs. */
+export const PLAN_SOURCE_TRIAL = "trial";
+
+/** Długość okresu próbnego w dniach. Ta sama, co TRIAL_DAYS w functions/trial-map.mjs. */
+export const TRIAL_DAYS = 14;
 
 /** Najdłuższy plan, jaki wolno nadać ręcznie. Dziesięć lat to już pomyłka, nie hojność. */
 export const MAX_MONTHS = 120;
@@ -154,11 +165,14 @@ export function monthsFromNow(months, now) {
  * Przy `pro: false` obiekt jest celowo niepełny — dwa brakujące pola są w masce, więc
  * Firestore je skasuje, a konto zostaje z samym `plan: "free"`.
  */
-export function planFields({ pro, validUntilMs, renews }) {
+export function planFields({ pro, validUntilMs, renews, source }) {
   const fields = { plan: { stringValue: pro ? PLAN_PRO : PLAN_FREE } };
   if (!pro) return fields;
   fields.planValidUntil = { integerValue: String(Math.round(validUntilMs)) };
   fields.planRenews = { booleanValue: Boolean(renews) };
+  /* Bez `source` pole zostaje poza ciałem żądania, a że jest w masce — Firestore je
+     kasuje. Tego właśnie chce `grant`: konto przestaje być kontem próbnym. */
+  if (source) fields.planSource = { stringValue: String(source) };
   return fields;
 }
 
@@ -342,12 +356,33 @@ async function writeClaim(token, projectId, uid, on) {
   return r.data;
 }
 
-/** Zapis trzech pól planu i tylko ich. */
+/** Zapis czterech pól planu i tylko ich. */
 async function writePlan(token, projectId, uid, fields) {
   const r = await api(token, patchUrl(projectId, uid), {
     method: "PATCH", body: JSON.stringify({ fields }),
   });
   if (!r.ok) throw new Error(`Firestore odmówił zapisu (${r.status}): ${JSON.stringify(r.data)}`);
+  return r.data;
+}
+
+/**
+ * Ślad okresu próbnego — ten sam dokument, który zakłada `grantTrial` w functions/index.js.
+ *
+ * Bez niego okres próbny nadany z terminala byłby niewidoczny dla chmury: wystarczyłoby
+ * skasować profil i wejść jeszcze raz, żeby wyzwalacz nadał kolejne czternaście dni.
+ */
+async function writeTrialGrant(token, projectId, uid, now, until) {
+  const url = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}`
+    + `/databases/(default)/documents/trialGrants/${encodeURIComponent(uid)}`;
+  const fields = {
+    uid: { stringValue: uid },
+    grantedAt: { integerValue: String(now) },
+    until: { integerValue: String(until) },
+    days: { integerValue: String(TRIAL_DAYS) },
+    source: { stringValue: "backfill" },
+  };
+  const r = await api(token, url, { method: "PATCH", body: JSON.stringify({ fields }) });
+  if (!r.ok) throw new Error(`Firestore odmówił zapisu trialGrants (${r.status}): ${JSON.stringify(r.data)}`);
   return r.data;
 }
 
@@ -358,13 +393,16 @@ const USAGE = `LiczMat — plan Pro po adresie e-mail
   node scripts/pro-admin.mjs list
   node scripts/pro-admin.mjs status <e-mail>
   node scripts/pro-admin.mjs grant  <e-mail> [miesiące, domyślnie 12]
+  node scripts/pro-admin.mjs trial  <e-mail>    14 dni okresu próbnego, jak przy rejestracji
   node scripts/pro-admin.mjs revoke <e-mail>
 
   node scripts/pro-admin.mjs admin   <e-mail>    uprawnienie do panelu w przeglądarce
   node scripts/pro-admin.mjs unadmin <e-mail>    i jego odebranie
 
 Klucz konta serwisowego: LM_SA_KEY=<ścieżka> albo --key <ścieżka>.
-Z planu zapisywane są wyłącznie pola plan, planValidUntil i planRenews.
+Z planu zapisywane są wyłącznie pola plan, planValidUntil, planRenews i planSource.
+Polecenie trial jest dla kont założonych, zanim wyzwalacz grantTrial zaczął działać —
+nowe konta dostają te czternaście dni same.
 Uprawnienie administratora nie jest planem: mieszka przy koncie w Firebase Auth
 (customAttributes) i otwiera panel na /app/ — patrz docs/ADMIN.md.`;
 
@@ -417,7 +455,7 @@ async function main(argv) {
 
   const [command, email, monthsRaw] = args;
   if (!command || command === "--help" || command === "-h") { console.log(USAGE); return 0; }
-  if (!["list", "status", "grant", "revoke", "admin", "unadmin"].includes(command)) {
+  if (!["list", "status", "grant", "trial", "revoke", "admin", "unadmin"].includes(command)) {
     console.error(`Nieznane polecenie "${command}".\n\n${USAGE}`);
     return 2;
   }
@@ -481,8 +519,19 @@ async function main(argv) {
     return 0;
   }
 
+  if (command === "trial") {
+    const now = Date.now();
+    const until = now + TRIAL_DAYS * 24 * 60 * 60 * 1000;
+    await writePlan(token, projectId, account.uid,
+      planFields({ pro: true, validUntilMs: until, renews: false, source: PLAN_SOURCE_TRIAL }));
+    await writeTrialGrant(token, projectId, account.uid, now, until);
+    console.log(`${account.email} ma okres próbny LiczMat Pro do ${dayText(until)} (${TRIAL_DAYS} dni).`);
+    console.log("Ślad w trialGrants zapisany — drugiego okresu próbnego to konto już nie dostanie.");
+    return 0;
+  }
+
   await writePlan(token, projectId, account.uid, planFields({ pro: false }));
-  console.log(`${account.email} wraca na plan darmowy. Pola planValidUntil i planRenews skasowane.`);
+  console.log(`${account.email} wraca na plan darmowy. Pola planValidUntil, planRenews i planSource skasowane.`);
   return 0;
 }
 

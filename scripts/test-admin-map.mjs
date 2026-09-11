@@ -88,8 +88,8 @@ head("1. the claim is one word, written in three files");
   /* The plan half is the contract every other copy already answers to. */
   eq("Pro is still the contract's word", PLAN_PRO, "premium");
   eq("and free is still free", PLAN_FREE, "free");
-  eq("three plan fields, in the contract's order", PLAN_FIELDS.join(","),
-    "plan,planValidUntil,planRenews");
+  eq("four plan fields, in the contract's order", PLAN_FIELDS.join(","),
+    "plan,planValidUntil,planRenews,planSource");
   const plan = read("assets/plan.js");
   check("assets/plan.js reads the same three", PLAN_FIELDS.every((f) => plan.includes(f)));
 
@@ -228,7 +228,7 @@ head("5. what a grant writes, and what a revoke deletes");
 {
   const now = Date.UTC(2026, 7, 27, 12, 0, 0);
   const grant = grantWrite(12, now);
-  eq("three fields, and only three", Object.keys(grant).sort().join(","),
+  eq("four fields, and only four", Object.keys(grant).sort().join(","),
     [...PLAN_FIELDS].sort().join(","));
   eq("the plan is Pro", grant.plan, PLAN_PRO);
   eq("valid until a year from now", new Date(grant.planValidUntil).toISOString().slice(0, 10),
@@ -239,7 +239,7 @@ head("5. what a grant writes, and what a revoke deletes");
   eq("months the parser would refuse write nothing", grantWrite(0, now), null);
 
   const revoke = revokeWrite();
-  eq("a revoke names the same three fields", Object.keys(revoke).sort().join(","),
+  eq("a revoke names the same four fields", Object.keys(revoke).sort().join(","),
     [...PLAN_FIELDS].sort().join(","));
   eq("the plan goes back to free", revoke.plan, PLAN_FREE);
   eq("the date is deleted, not nulled", revoke.planValidUntil, DELETE_FIELD);
