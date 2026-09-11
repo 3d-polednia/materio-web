@@ -69,7 +69,7 @@ var LM_PAY = {
   /* Stripe Customer Portal — where a subscriber changes their card, downloads an invoice
      or cancels. Cancelling is Stripe's own screen on purpose: a "cancel" button here
      would have to write to Stripe, and this site has no server to write with. */
-  portalUrl: "",
+  portalUrl: "https://billing.stripe.com/p/login/28E3cvfyY4QB9ZD4mI0oM00",
 
   /* The currencies LiczMat Pro is SOLD in, which since session 61 is shorter than the list
      of currencies somebody may COUNT in (`LM_CURRENCIES` in assets/currency.js — nine).
@@ -94,11 +94,11 @@ var LM_PAY = {
 
   plans: [
     {
-      id: "monthly", key: "pay_monthly", link: "",
+      id: "monthly", key: "pay_monthly", link: "https://buy.stripe.com/28E3cvfyY4QB9ZD4mI0oM00",
       price: { PLN: 3999, EUR: 999, USD: 1099, UAH: 47900, CZK: 22900, RON: 4999, RSD: 109900 },
     },
     {
-      id: "yearly", key: "pay_yearly", link: "",
+      id: "yearly", key: "pay_yearly", link: "https://buy.stripe.com/3cI3cvcmMcj33Bf3iE0oM01",
       price: { PLN: 39999, EUR: 9999, USD: 10999, UAH: 479900, CZK: 229000, RON: 49999, RSD: 1099000 },
     },
   ],
