@@ -11,3 +11,6 @@ local.properties
 
 # Cloud Functions build output — the source is committed, the install is not
 functions/node_modules/
+
+# Dziennik debugowania Firebase CLI — lokalny, zmienny, nikomu niepotrzebny w repo
+firebase-debug.log
