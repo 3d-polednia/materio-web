@@ -48,7 +48,10 @@ const LOGO_GEOMETRY = `<g transform="translate(0,1024) scale(0.5,-0.5)"><path fi
 export const LOGO_DEFS = `<svg class="logo-defs" aria-hidden="true" focusable="false"><symbol id="lm-mark" viewBox="67.75 577 372 372">${LOGO_GEOMETRY}</symbol></svg>`;
 
 /** What the header and the footer write where the mark goes. */
-export const LOGO_MARK = `<svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg>`;
+export const logoMark = (px) =>
+  `<svg class="logo" width="${px}" height="${px}" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg>`;
+
+export const LOGO_MARK = logoMark(30);
 
 /* What assets/og-image.jpg actually says, written out for anyone who cannot see it.
    The image has the wordmark and the slogan painted into the pixels, so this line has to
