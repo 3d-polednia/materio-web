@@ -53,9 +53,23 @@ function pdfOptions(form) {
  * Blank and invalid are both zero here, which is what `String.toDecimalOrNull() ?: 0.0`
  * does on the phone: a layer nobody filled in contributes nothing rather than refusing to
  * print the document.
+ *
+ * The fields are `type="text" inputmode="decimal"` (src/pages.mjs), so what arrives is
+ * whatever a person writes with their own keyboard, and in most of the thirteen languages
+ * that is a space or a dot for thousands and a comma for the decimal. The first draft did
+ * `parseFloat(v.replace(",", "."))`, which read the hourly rate "1 000" as 1 and the rate
+ * "1.000,50" as 1 — silently, on the one document that is printed and handed to a client.
+ * So: drop every space (a plain one, a no-break one and a narrow one — "1 000 zł" pasted
+ * out of a spreadsheet carries U+00A0), then let the LAST separator in the string be the
+ * decimal point and the earlier ones be grouping.
  */
 function pdfNum(value) {
-  const n = parseFloat(String(value == null ? "" : value).replace(",", "."));
+  const raw = [...String(value == null ? "" : value)].filter((ch) => ch.trim() !== "").join("");
+  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+  const clean = cut === -1
+    ? raw
+    : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+  const n = parseFloat(clean);
   return Number.isFinite(n) ? n : 0;
 }
 
@@ -100,7 +114,11 @@ function pdfToday() {
   try {
     return new Intl.DateTimeFormat(lang, { dateStyle: "long" }).format(new Date());
   } catch (e) {
-    return new Date().toISOString().slice(0, 10);
+    // Not toISOString(): that is UTC, and east of Greenwich the evening of the 12th is
+    // printed as the 11th on a document that states the day the estimate was made.
+    const d = new Date();
+    const pad = (v) => String(v).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 }
 
@@ -234,16 +252,21 @@ function pdfFill(projectId, opt) {
       const waste = !investor && r.wasteCostMinor
         ? `<br><span class="pdf-waste">${wsEsc(wsNum(r.wastePercentage))} % · ${wsEsc(wsMoney(r.wasteCostMinor, r.currencyCode))}</span>`
         : "";
-      return `<tr><td>${wsEsc(r.name)}${waste}</td><td>${wsEsc(qty)}</td><td>${wsEsc(value)}</td></tr>`;
+      // The cells carry the same marker as the headers, so the loop below takes the whole
+      // column out. Without it the header vanished and the empty cell did not, and the
+      // remaining figure stood one column to the right of the word describing it.
+      return `<tr><td>${wsEsc(r.name)}${waste}</td>` +
+        `<td data-pdf-col="qty">${wsEsc(qty)}</td>` +
+        `<td data-pdf-col="value">${wsEsc(value)}</td></tr>`;
     }).join("");
   }
   pdfShow(doc, "empty", rows.length === 0);
 
   // A column nobody asked for is taken out of the table rather than left blank, or the
   // header promises a figure that is not under it.
-  doc.querySelectorAll("[data-pdf-col]").forEach((th) => {
-    th.hidden = (th.dataset.pdfCol === "qty" && opt.quantities === false)
-      || (th.dataset.pdfCol === "value" && opt.prices === false);
+  doc.querySelectorAll("[data-pdf-col]").forEach((cell) => {
+    cell.hidden = (cell.dataset.pdfCol === "qty" && opt.quantities === false)
+      || (cell.dataset.pdfCol === "value" && opt.prices === false);
   });
 
   pdfShow(doc, "total", opt.total !== false);
@@ -286,9 +309,12 @@ function pdfFill(projectId, opt) {
     pdfSet(doc, "gross", money(b.gross));
   }
 
+  // The document is one element in the page, reused for every export, so an empty field
+  // has to overwrite rather than be skipped: asking for notes and typing none used to
+  // print the note from the previous export.
   const notes = String(opt.notesText || "").trim();
-  pdfShow(doc, "notes", Boolean(opt.notes));
-  if (opt.notes && notes) pdfSet(doc, "notes", notes);
+  pdfSet(doc, "notes", notes);
+  pdfShow(doc, "notes", Boolean(opt.notes && notes));
 
   doc.hidden = false;
   return true;
@@ -342,17 +368,19 @@ function pdfInit() {
     if (!pdfAllowed()) return;
     // The document is on the page and the rest of it is not, for the length of one print.
     document.body.dataset.pdfPrint = "1";
+    let fallbackHide = 0;
     const done = () => {
       delete document.body.dataset.pdfPrint;
       doc.hidden = true;
       window.removeEventListener("afterprint", done);
+      if (fallbackHide) { clearTimeout(fallbackHide); fallbackHide = 0; }
     };
     window.addEventListener("afterprint", done);
     window.print();
     // Some browsers never fire afterprint (and older ones fire it before the dialog is
     // dismissed). The page must not be left with everything but the document hidden, so
     // the cleanup also runs on its own.
-    setTimeout(done, 1000);
+    fallbackHide = setTimeout(done, 1000);
   });
 }
 

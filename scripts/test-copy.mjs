@@ -465,7 +465,13 @@ head("§7 how much prose a page carries");
 const BUDGET = {
   home: 377, calculators: 416, calculator: 431, converter: 285, guides: 307, guide: 232,
   "own-materials": 225,
-  materials: 2820, stores: 159, android: 519, projects: 850, estimate: 425,
+  /* Session H raised projects from 850 to 860, and the six words are not new copy: the
+     850 above was measured off the page builders in a repository where PL_ONLY was on and
+     the twelve other languages were unwritten, so the French number in it is an estimate
+     of a page that did not exist yet. It ships now and it is 856 — /fr/projets/, against
+     Polish at 706. The ceiling is the widest language of the type, so it is the measured
+     French page rather than the estimate that sets it. */
+  materials: 2820, stores: 159, android: 519, projects: 860, estimate: 425,
   clients: 524, jobs: 544, quotes: 470, calendar: 420, cookies: 637,
   /* Session 62, audit item H7, and 220 rather than the 180 it was measured at the same
      day: the owner's Gewerbe is registered in Germany, so the page went from a name and
@@ -474,8 +480,35 @@ const BUDGET = {
      widest is French at 213 words. Six of those rows are one label and one value; the
      prose proper is still four sentences. */
   contact: 220,
-  "liczmat-pro": 477, account: 850, dashboard: 130, share: 40, privacy: 3800,
+  /* privacy went from 3800 to 3820 in session H, and the fifteen words are the ones commit
+     b258a77e put into it: the controller's own postal identification, which is the same
+     §5 DDG set the contact page carries and the one part of a privacy policy that may not
+     be shortened to fit a test. The document has measured 3813 since that commit, and the
+     only reason nobody saw it is that this file left the CI gate on the same day.
+
+     account went the other way — from 850 to 470 — because of the tablist rule below:
+     /app/ is twelve panels behind one address, and what a reader meets is the chrome plus
+     ONE of them. The document is 1501 words and DOCUMENT is what holds that number down;
+     460 is the chrome (283) plus the widest panel (the profile, 176), rounded up. */
+  "liczmat-pro": 477, account: 460, dashboard: 130, share: 40, privacy: 3820,
 };
+
+/**
+ * The second ceiling, for a page whose <main> is a tablist.
+ *
+ * BUDGET caps what a reader sees at once, which on /app/ is one panel out of twelve. That
+ * alone would be a net with a hole in it: twelve panels growing by eighty words each is a
+ * document twice the size with every panel still inside its ceiling. So a tabbed page is
+ * measured twice — the visible page against BUDGET, the whole file against this.
+ *
+ * 1510 is the 1501 it measures today. Four of the twelve panels are Pro modules and each
+ * one carries chapter XXV's wall in full, which is some 145 words of module list and price
+ * written four times over. That is deliberate, and it is NOT the /projekty/ case: the two
+ * walls on /projekty/ stand on screen together, so the second is drawn brief, while on
+ * /app/ a visitor who opens Wyceny and nothing else has to be told the price there or not
+ * at all.
+ */
+const DOCUMENT = { account: 1510 };
 
 /** Every shipped page, with the route that produced it. */
 const PAGES = [];
@@ -493,11 +526,9 @@ for (const r of liveRoutes()) {
   }
 }
 
-/** What a reader sees inside <main>: tags, scripts and entities taken out. */
-function prose(html) {
-  const main = html.match(/<main[\s\S]*?<\/main>/);
-  if (!main) return null;
-  return main[0]
+/** What a reader can read in one element: tags, scripts and entities taken out. */
+function strip(markup) {
+  return markup
     .replace(/<script[\s\S]*?<\/script>/g, " ")
     .replace(/<style[\s\S]*?<\/style>/g, " ")
     .replace(/<[^>]+>/g, " ")
@@ -506,22 +537,103 @@ function prose(html) {
     .trim();
 }
 
+const wordCount = (text) => (text ? text.split(" ").filter(Boolean).length : 0);
+
+/**
+ * One element and everything inside it, found from a position in its opening tag.
+ *
+ * A regular expression cannot do this. A panel holds sections holding sections, and
+ * /<section[\s\S]*?<\/section>/ stops at the first close it meets, which is a
+ * grandchild's — so the count would be of a fragment.
+ */
+function element(markup, at) {
+  const open = markup.lastIndexOf("<", at);
+  const name = markup.slice(open + 1).match(/^[a-z]+/)[0];
+  const opener = "<" + name;
+  const closer = "</" + name;
+  let i = markup.indexOf(">", at) + 1;
+  let depth = 1;
+  while (depth > 0) {
+    let a = markup.indexOf(opener, i);
+    // "<section" must not match inside "<sections": a tag name ends where letters do.
+    while (a !== -1 && /[a-z]/.test(markup[a + opener.length] || "")) {
+      a = markup.indexOf(opener, a + 1);
+    }
+    const b = markup.indexOf(closer, i);
+    if (b === -1) return { start: open, end: markup.length };
+    if (a !== -1 && a < b) { depth += 1; i = a + opener.length; continue; }
+    depth -= 1;
+    i = markup.indexOf(">", b) + 1;
+  }
+  return { start: open, end: i };
+}
+
+/**
+ * What a reader sees at once, and what the file holds.
+ *
+ * On a page of prose the two are one number. On a tablist they are not: /app/ is twelve
+ * panels behind one address and eleven of them carry `hidden` at any moment, so counting
+ * the document reports a wall nobody can read — and it did, 1501 words against a budget
+ * of 850, from the day the Pro modules landed until session H.
+ *
+ * `role="tabpanel"` rather than a list of page ids, because the rule is about the shape of
+ * the page: one panel visible, the rest not. The chrome — everything outside the panels,
+ * the sign-in form and the sidebar included — is on screen whichever panel is open, so it
+ * is counted once and added to the widest of them.
+ */
+function measure(html) {
+  const main = html.match(/<main[\s\S]*?<\/main>/);
+  if (!main) return null;
+  let rest = main[0];
+  const panels = [];
+  for (;;) {
+    const at = rest.indexOf('role="tabpanel"');
+    if (at === -1) break;
+    const { start, end } = element(rest, at);
+    panels.push(wordCount(strip(rest.slice(start, end))));
+    rest = rest.slice(0, start) + rest.slice(end);
+  }
+  const whole = wordCount(strip(main[0]));
+  if (!panels.length) return { visible: whole, document: whole, panels: 0 };
+  return {
+    visible: wordCount(strip(rest)) + Math.max(...panels),
+    document: whole,
+    panels: panels.length,
+  };
+}
+
 const overBudget = [];
+const overDocument = [];
 let counted = 0;
+let tabbed = 0;
 for (const page of PAGES) {
   let html;
   try { html = read(page.file); } catch { continue; }
-  const text = prose(html);
-  if (text === null) continue;
+  const m = measure(html);
+  if (m === null) continue;
   counted++;
-  const n = text.split(" ").filter(Boolean).length;
+  if (m.panels) tabbed++;
   const cap = BUDGET[page.id];
-  if (cap === undefined) { overBudget.push({ ...page, n, cap: "no budget declared" }); continue; }
-  if (n > cap) overBudget.push({ ...page, n, cap });
+  if (cap === undefined) {
+    overBudget.push({ ...page, n: m.visible, cap: "no budget declared" });
+    continue;
+  }
+  if (m.visible > cap) overBudget.push({ ...page, n: m.visible, cap });
+  const ceiling = DOCUMENT[page.id];
+  if (ceiling !== undefined && m.document > ceiling) {
+    overDocument.push({ ...page, n: m.document, cap: ceiling });
+  }
 }
 
 checkMany("every page type has a declared prose budget and stays inside it", overBudget,
   (x) => `${x.file} (${x.id}): ${x.n} words, budget ${x.cap}`, counted);
+
+/* And a page of panels is measured a second time, whole. See DOCUMENT above. */
+checkMany("a page of panels stays inside its whole-document ceiling too", overDocument,
+  (x) => `${x.file} (${x.id}): ${x.n} words in the file, ceiling ${x.cap}`, counted);
+check("the tablist rule measured the page it was written for",
+  tabbed === Object.keys(DOCUMENT).length,
+  `${tabbed} tabbed page(s) read, ${Object.keys(DOCUMENT).length} with a document ceiling`);
 
 check("the budgets were measured against real pages", counted > 300, `${counted} pages read`);
 

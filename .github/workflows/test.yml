@@ -75,22 +75,11 @@ jobs:
             case "$f" in
               # The browser half, run by the other job.
               *-page.mjs|scripts/test-mobile.mjs|scripts/test-phone.mjs|scripts/test-qa.mjs|scripts/test-pages.mjs) continue ;;
-              # Deliberately not a gate: see the step below.
-              scripts/test-copy.mjs) continue ;;
             esac
             echo "--- $f"
             node "$f" || status=1
           done
           exit $status
-
-      # test-copy §7 holds three pages over their prose budget — /app/ at 1501 words
-      # against 850, fr/projets at 856, privacy-policy at 3813 against 3800. Those are a
-      # decision about copy that belongs to session H, not a regression, so the suite is
-      # reported and not allowed to hold the site back. When session H closes the budgets
-      # this step moves into the loop above and this comment goes with it.
-      - name: The prose budgets (reported, not gating until session H)
-        continue-on-error: true
-        run: node scripts/test-copy.mjs
 
   browser:
     name: the suites that drive Chromium

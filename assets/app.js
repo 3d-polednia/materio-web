@@ -350,8 +350,16 @@ function wireAuthForms() {
   }
 
   const signOut = async () => {
+    // The listeners go first, so a failure here leaves the page half out of the account:
+    // it has to say so. Without the catch the click handler rejected into nothing and the
+    // screen kept the workspace with no data behind it.
     stopListening();
-    await fb.signOut(auth);
+    try {
+      await fb.signOut(auth);
+    } catch (err) {
+      status(authMessage(err && err.code), true);
+      return;
+    }
     status(T("app_signed_out"));
   };
   $("app-signout").addEventListener("click", signOut);
@@ -676,12 +684,24 @@ function renderPlanPrices(sub) {
  * `client_reference_id` was missing. Refusing to sell over a missing ticket would turn a
  * deploy without the secret into a shop that takes no money at all.
  */
+/**
+ * True from the first click until the browser actually leaves for Stripe.
+ *
+ * Minting the ticket is a round trip to the cloud, and the button stays live for the whole
+ * of it: two clicks used to mean two payTicket() calls, and the second ticket could be the
+ * one the webhook never sees. The flag is let go again only when there is nothing to leave
+ * for, because after location.href this page is on its way out.
+ */
+var payLeaving = false;
+
 async function goToCheckout(planId) {
+  if (payLeaving) return;
+  payLeaving = true;
   const url = lmCheckoutUrl(planId, {
     ref: await payTicket(),
     email: state.user && state.user.email,
   });
-  if (!url) { status(T("pay_soon"), true); return; }
+  if (!url) { payLeaving = false; status(T("pay_soon"), true); return; }
   payPendingSet();
   location.href = url;
 }

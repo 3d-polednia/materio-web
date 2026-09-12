@@ -412,6 +412,28 @@ head("4. every option changes the document");
   // A column with nothing under it promises a figure that is not there.
   check("the value column is taken out of the header",
     await page.$eval('#ws-pdf-doc [data-pdf-col="value"]', (e) => e.hidden));
+  /* The header was the only half that went. The cells stayed in every row — empty, but
+     occupying the column — so on a document with the quantities switched off the figure
+     that was left stood one column to the right of the word describing it. The cells carry
+     the same marker now, which is what makes this count the whole column and not the th. */
+  check("and so is every cell under it",
+    await page.$$eval('#ws-pdf-doc [data-pdf-col="value"]',
+      (els) => els.length > 1 && els.every((e) => e.hidden)));
+  check("the quantity column, which was asked for, is still there",
+    await page.$$eval('#ws-pdf-doc [data-pdf-col="qty"]',
+      (els) => els.length > 1 && els.every((e) => !e.hidden)));
+
+  /* The document is one element reused for every export, and an empty field used to be
+     skipped rather than written: asking for notes and typing none printed the note from
+     the export before it. */
+  await page.fill('[data-pdf-in="notesText"]', "");
+  await page.click("#ws-pdf-form button[type=submit]");
+  await page.waitForTimeout(150);
+  const again = await docText(page);
+  check("a note typed and then cleared is not printed a second time",
+    !again.includes("Materiał kupuje inwestor."), again.slice(0, 200));
+  check("and the notes row is off the document rather than empty on it",
+    !(await shown(page, "notes")));
   await page.close();
 }
 

@@ -29,7 +29,7 @@
  * assets/i18n.js, LANG_NAME in src/flags.mjs, langPicker() or the footer's language nav.
  */
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -449,6 +449,56 @@ for (const file of ["src/pages.mjs", "scripts/build.mjs", "src/template.mjs", "s
   const shapes = new Set(LANGS.map(fmt));
   check("and the thirteen do not all format a number the same way", shapes.size > 1,
     [...shapes].join(" | "));
+}
+
+/* ------------------------------ §9 the verb that governs the privacy policy's name */
+
+head("§9 the FAQ's last sentence agrees with the document it points at");
+
+/**
+ * `src/pages.mjs` builds the last line of FAQ answer 5 out of two keys: the sentence
+ * `faq_a5`, then the document's own title as the link text `faq_a5_link`. In the Slavic
+ * languages that title is the sentence's SUBJECT and it stands after the verb, so the verb
+ * has to agree with a word that lives in another key — and three of them did not from the
+ * audit of 2026-09-09 (finding N1) until session H: Czech "Vše popisuje Zásady", Slovak
+ * "Všetko popisuje Zásady" and Croatian "Sve to opisuje Pravila" all put a singular verb in
+ * front of a plural subject.
+ *
+ * Serbian is the control, not an oversight: its document is called "Politika privatnosti",
+ * one word and singular, so "opisuje" is the correct form there. That is why this is a table
+ * of expected forms rather than a rule saying "always plural" — the number comes from the
+ * title each language gave the document, and the fix for a mismatch is the verb, never the
+ * title.
+ */
+const A5_VERB = {
+  cs: { verb: "popisují", subject: "Zásady" },      // plural: Zásady ochrany soukromí
+  sk: { verb: "popisujú", subject: "Zásady" },      // plural: Zásady ochrany súkromia
+  hr: { verb: "opisuju", subject: "Pravila" },      // plural: Pravila privatnosti
+  sr: { verb: "opisuje", subject: "Politika" },     // singular: Politika privatnosti
+};
+const VALUES = {};
+for (const lang of Object.keys(A5_VERB)) {
+  const src = readFileSync(join(ROOT, "assets", `i18n.${lang}.js`), "utf8");
+  const m = src.match(/I18N\["[a-z]{2}"\] = (\{[\s\S]*?\});\s*$/m);
+  VALUES[lang] = m ? JSON.parse(m[1]) : null;
+}
+for (const [lang, { verb, subject }] of Object.entries(A5_VERB)) {
+  const dict = VALUES[lang];
+  if (!check(`the ${lang} bundle is readable here too`, Boolean(dict))) continue;
+  check(`${lang}: faq_a5 ends with "${verb}", the form the title takes`,
+    (dict.faq_a5 || "").trimEnd().endsWith(verb),
+    `ends with: …${(dict.faq_a5 || "").trimEnd().slice(-24)}`);
+  check(`${lang}: and the title it agrees with still begins with "${subject}"`,
+    (dict.faq_a5_link || "").startsWith(subject),
+    `faq_a5_link: ${dict.faq_a5_link}`);
+}
+/* The shipped HTML, because the sentence and the title only meet after the build. */
+{
+  const page = join(ROOT, "cs", "index.html");
+  const html = existsSync(page) ? readFileSync(page, "utf8") : "";
+  check("and the built Czech page carries the agreeing pair, not the halves",
+    html.includes("Vše popisují") && !html.includes("Vše popisuje"),
+    html ? "cs/index.html still says \"Vše popisuje\"" : "cs/index.html is not built");
 }
 
 /* ------------------------------------------------------------------ the report */

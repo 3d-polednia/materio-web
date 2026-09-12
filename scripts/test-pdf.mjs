@@ -133,6 +133,22 @@ head("1. the investor breakdown is the app's, layer for layer");
   eq("a comma is a decimal point", pdfNum("1,5"), 1.5);
   eq("and a point still is", pdfNum("1.5"), 1.5);
 
+  /* The fields are type="text" inputmode="decimal" (src/pages.mjs), so the rate is
+     whatever somebody's own keyboard produced, and the second audit round found the first
+     draft reading a grouped thousand as a one: parseFloat("1 000") is 1, and that figure
+     goes onto the one document that is printed and handed to a client. The rule is the
+     LAST separator in the string, whatever it is, and no spaces of any width. */
+  eq("a grouped thousand is a thousand", pdfNum("1 000"), 1000);
+  eq("even when the space is the one a spreadsheet pastes",
+    pdfNum("1" + String.fromCharCode(0x00a0) + "000"), 1000);
+  eq("even when it is a narrow one",
+    pdfNum("1" + String.fromCharCode(0x202f) + "000,50"), 1000.5);
+  eq("a point groups where a comma decides", pdfNum("1.000,50"), 1000.5);
+  eq("and a comma groups where a point decides", pdfNum("1,000.50"), 1000.5);
+  eq("two groups still read as one number", pdfNum("1 234 567,89"), 1234567.89);
+  eq("a separator with nothing after it is the whole part", pdfNum("80,"), 80);
+  eq("and a word is still zero", pdfNum("nie wiem"), 0);
+
   const blank = pdfBreakdown({ ...all, laborHours: "", laborRate: "80", marginPercent: "", vatPercent: "" }, 500_000);
   eq("a labour line with no hours costs nothing", blank.labor, 0);
   eq("and the total is what it was", blank.gross, 500_000);
