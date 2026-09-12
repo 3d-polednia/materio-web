@@ -37,9 +37,11 @@ W strefie DNS `liczmat.com` w panelu OVH **zostają nietknięte**:
 nie dopisany do apeksu i nie jako drugi `v=spf1` obok istniejącego. Dwa rekordy SPF na
 jednej nazwie to SPF nieważny dla obu nadawców naraz.
 
-## Stan na 2026-09-11
+## Stan na 2026-09-12
 
-**Kroki 1–6 i 8 są zrobione. Został krok 7** — szablony, punkt bez powrotu.
+**Wszystkie rekordy są na miejscu. Zostało jedno: poczekać, aż Firebase zweryfikuje
+domenę nadawcy** (`customDomainState: IN_PROGRESS`, deklarowany limit 48 godzin), a potem
+w konsoli dokończyć przełączenie adresu Od. Kroki 1–6 i 8 zamknięte.
 
 Wszystko poszło z terminala — Firebase CLI i admin REST API na koncie
 `polednia@gmail.com` — poza rekordami DNS, które właściciel wpisał w panelu OVH.
@@ -47,7 +49,7 @@ Wszystko poszło z terminala — Firebase CLI i admin REST API na koncie
 - **krok 1** — witryna Hostingu `liczmat-auth`, `https://liczmat-auth.web.app`;
 - **krok 2** — `hosting/auth/` wdrożone, dwa pliki, `functions/` nietknięte;
 - **krok 3** — domena niestandardowa `auth.liczmat.com` podpięta do tej witryny;
-- **DNS** — dwa rekordy w OVH, niżej;
+- **DNS** — komplet rekordów w OVH, niżej;
 - **krok 4** — `hostState: HOST_ACTIVE`, `ownershipState: OWNERSHIP_ACTIVE`,
   `issues: none`. Certyfikat tymczasowy w stanie `CERT_PROPAGATING`; Firebase podmieni go
   potem na własny bez niczyjego udziału;
@@ -57,7 +59,13 @@ Wszystko poszło z terminala — Firebase CLI i admin REST API na koncie
   przeglądarki `47be1333-ef69-4501-aeb5-4b2e2778243f`. Sześć dotychczasowych referrerów
   i wszystkie 25 `apiTargets` na miejscu;
 - **krok 8** — `_dmarc.liczmat.com` TXT `v=DMARC1; p=none; rua=mailto:contact@liczmat.com`
-  wpisany w OVH i rozejrzany. Apeks ma nadal dokładnie jeden rekord SPF.
+  wpisany w OVH i rozejrzany. Apeks ma nadal dokładnie jeden rekord SPF;
+- **krok 7, część bezpieczna** — domena nadawcy zgłoszona w konsoli
+  (`pendingCustomDomain: auth.liczmat.com`, `customDomainState: IN_PROGRESS`), a w trzech
+  szablonach ustawione `senderLocalPart: noreply`, `senderDisplayName: LiczMat`,
+  `replyTo: contact@liczmat.com`. Rekordy SPF i DKIM, których Firebase zażądał, są
+  w strefie. **`callbackUri` wciąż wskazuje `materio-502513.firebaseapp.com`** — to znaczy,
+  że punkt bez powrotu nie został jeszcze przekroczony i maile chodzą po staremu.
 
 Zmierzone po wdrożeniu:
 
@@ -67,6 +75,7 @@ https://auth.liczmat.com/robots.txt                    200
 https://auth.liczmat.com/__/auth/action?mode=…         200
 https://auth.liczmat.com/__/firebase/init.json         200
 https://liczmat.com/app/                               200  (nie ruszone)
+Hosting customDomain: HOST_ACTIVE, OWNERSHIP_ACTIVE, CERT_ACTIVE, issues: none
 ```
 
 Ostatnia linia jest tam nieprzypadkowo: krok 6 pisze po kluczu, którego używa żywy
@@ -74,24 +83,59 @@ serwis, więc sprawdzenie, że serwis dalej wstaje, należy do tej roboty.
 
 ### Rekordy w OVH → Strefa DNS
 
-Firebase podał dokładnie te dwa; oba są już wpisane i rozeszły się. Nazwy w panelu OVH
-wpisuje się **bez** `liczmat.com` — panel dokleja domenę sam.
+Stan końcowy strefy `liczmat.com` w częściach, których dotyczy ta robota. Nazwy w panelu
+OVH wpisuje się **bez** `liczmat.com` — panel dokleja domenę sam.
 
 | Nazwa | Typ | Wartość |
 |---|---|---|
-| `auth` | CNAME | `liczmat-auth.web.app` |
+| `auth` | A | `199.36.158.100` |
+| `auth` | AAAA | `2620:0:890::100` |
+| `auth` | TXT | `v=spf1 include:_spf.firebasemail.com ~all` |
+| `auth` | TXT | `firebase=materio-502513` |
 | `_acme-challenge.auth` | TXT | `Gf2sFQL_YNm6LC_bQmDGW4k_DA1m9rW4Sf7J7sONzR8` |
+| `firebase1._domainkey.auth` | CNAME | `mail-auth-liczmat-com.dkim1._domainkey.firebasemail.com.` |
+| `firebase2._domainkey.auth` | CNAME | `mail-auth-liczmat-com.dkim2._domainkey.firebasemail.com.` |
 
-CNAME kieruje ruch i zarazem dowodzi własności — **zostaje na stałe**. TXT jest wyzwaniem
-ACME; można go usunąć, gdy certyfikat dojdzie do `CERT_ACTIVE`, ale nic nie stoi na
-przeszkodzie, żeby został.
+#### Dlaczego A i AAAA, a nie CNAME
 
-Sprawdzenie stanu bez wchodzenia do konsoli:
+Pierwsza wersja kierowała `auth` CNAME-em na `liczmat-auth.web.app` i to działało — ale
+poczta chce pod tą samą nazwą dwóch rekordów TXT, a reguła DNS (RFC 1034 §3.6.2) mówi, że
+nazwa z CNAME-em nie może nieść nic innego. Hosting obsługuje domenę niestandardową także
+na rekordach adresowych, więc CNAME ustąpił miejsca A i AAAA — te same adresy, na które
+rozwiązuje się `liczmat-auth.web.app`.
+
+Zamiana niczego nie zepsuła: po niej `hostState` to nadal `HOST_ACTIVE`,
+`ownershipState` `OWNERSHIP_ACTIVE`, `issues: none`, a certyfikat doszedł do
+`CERT_ACTIVE`. Dowód własności trzyma się domeny, nie typu rekordu.
+
+Między usunięciem CNAME a dodaniem A nazwa przez chwilę się nie rozwiązuje. Dziś to nic
+nie kosztuje, bo `callbackUri` wciąż wskazuje `materio-502513.firebaseapp.com`. Po kroku 7
+ta sama operacja byłaby przerwą w działających linkach z maili.
+
+#### Najczęstsza pomyłka: podwojona domena
+
+Panel OVH dokleja `liczmat.com` do tego, co wpiszesz w polu subdomeny. Wpisanie tam
+pełnej nazwy daje rekord pod `auth.liczmat.com.liczmat.com`, który wygląda w panelu
+poprawnie, a w DNS nie istnieje. Cztery rekordy poczty wylądowały tak za pierwszym razem
+i `nslookup` pokazywał `NXDOMAIN` mimo że panel je listował. W polu subdomeny idzie
+`auth`, `firebase1._domainkey.auth`, `_acme-challenge.auth` — nic więcej.
+
+#### Sprawdzenie
 
 ```bash
-nslookup -type=CNAME auth.liczmat.com 8.8.8.8
+nslookup -type=A auth.liczmat.com 8.8.8.8
+nslookup -type=TXT auth.liczmat.com 8.8.8.8
+nslookup -type=CNAME firebase1._domainkey.auth.liczmat.com 8.8.8.8
 curl -sI https://auth.liczmat.com | head -1
 ```
+
+Strefę da się też czytać i pisać z terminala przez API OVH — podpis to
+`$1$` plus SHA-1 z `secret+consumerKey+METHOD+URL+body+timestamp`, punkt wejścia
+`https://eu.api.ovh.com/1.0`. Token tworzy się na `https://eu.api.ovh.com/createToken/`
+z prawami ograniczonymi do `/domain/zone/liczmat.com/*`; po robocie należy go skasować.
+**W Git Bashu trzeba ustawić `MSYS_NO_PATHCONV=1`** — inaczej ścieżki API zaczynające się
+od `/` zamieniają się w ścieżki Windows i każde wywołanie wraca jako `405
+Client::MethodNotAllowed`, co wygląda jak brak uprawnień, a nim nie jest.
 
 Stan domeny i certyfikatu czyta się z Hosting API — token `firebase-tools` ma zakres
 `cloud-platform`, więc wystarczy:
