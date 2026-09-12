@@ -55,6 +55,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 const read = (...s) => readFileSync(p(...s), "utf8");
 
+/** A repo-relative path spelled the one way, so an allowlist written once holds on both platforms. */
+const posix = (rel) => rel.split("\\").join("/");
+
+/** A file's text with the line ending taken out of the question. */
+const lf = (...s) => read(...s).split("\r\n").join("\n");
+
 // The three characters a URL parser deletes and a spreadsheet reads as a new row.
 // Written as codes rather than as literals, so they survive being read and diffed.
 const TAB = String.fromCharCode(9);
@@ -127,7 +133,10 @@ function shippedPages(dir = ROOT, out = []) {
     if ([".git", "node_modules", "docs", "src", "scripts", "assets", "functions", "hosting"].includes(name)) continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) shippedPages(full, out);
-    else if (name.endsWith(".html")) out.push(relative(ROOT, full));
+    // Written with "/" whatever the platform hands back: every allowlist in this file
+    // names a page the way the markup does, and on Windows `relative()` answers
+    // "p\index.html", which matches none of them and quietly opens the exception.
+    else if (name.endsWith(".html")) out.push(posix(relative(ROOT, full)));
   }
   return out;
 }
@@ -372,7 +381,7 @@ head("6. izolacja danych: one account's copy on a device two people use");
     loadApp({ "materio-workspace-v1": workspace(true), "liczmat-sync-account": UID_A })
       .foreignWorkspace(), false);
 
-  const app = read("assets/app.js");
+  const app = lf("assets/app.js");
   check("the stamp is written after a push",
     /setSyncAccount\(state\.uid\);\s*\n\s*renderLocalSummary\(\);\s*\n\s*status\(T\("app_sync_pushed"\)\)/.test(app));
   /* The pull writes EVERY store before it stamps, and the push sends every one before it:
@@ -383,19 +392,55 @@ head("6. izolacja danych: one account's copy on a device two people use");
      Asked as an order rather than as adjacency. Until session 59 these were three regexes
      matching `crmImport(incoming);` immediately followed by the stamp, and adding a third
      store broke all three without a single property changing — a test that fails when a
-     line is inserted between two it never cared about is a test about whitespace. */
-  const before = (call, anchor) => {
-    const i = app.indexOf(call);
-    const j = app.indexOf(anchor, i);
-    return i >= 0 && j > i && j - i < 600;
+     line is inserted between two it never cared about is a test about whitespace.
+
+     Session G moved the question again, because the code moved: the three imports and the
+     three uploads now live in `syncPullAll()` and `syncPushAll()`, and the buttons call one
+     function each. Written against the old shape, these four checks looked for
+     `await pushProWorkspace();` beside the stamp — a call that is now three screens away,
+     inside the helper, and carries a `since` argument besides. They were red from the
+     refactor onwards and would have stayed red through any breakage of the property they
+     name. So the property is asked in two halves: each helper touches all three stores,
+     and each button reaches its stamp only through the helper. */
+  const region = (open, close, from = 0) => {
+    const i = app.indexOf(open, from);
+    if (i < 0) return "";
+    const j = app.indexOf(close, i);
+    return j > i ? app.slice(i, j) : "";
   };
-  const PULL_STAMP = 'setSyncAccount(state.uid);\n      renderLocalSummary();\n      status(T("app_sync_pulled"));';
+  const fn = (name) => region(`async function ${name}(`, "\n}");
+  const handler = (v) => region(`${v}.addEventListener("click"`, "\n  });");
+  const before = (call, anchor, src) => {
+    const i = src.indexOf(call);
+    const j = src.indexOf(anchor, i);
+    return i >= 0 && j > i;
+  };
+
+  // Half one: one call reaches all three stores, in each direction.
+  const pullAll = fn("syncPullAll"), pushAll = fn("syncPushAll");
+  check("the pull reaches the workspace", pullAll.includes("wsImport(incoming)"));
+  check("the Pro store is pulled by the same call", pullAll.includes("crmImport(incoming)"));
+  check("the own materials are pulled by it too", pullAll.includes("omImport(incoming)"));
+  check("the push reaches the workspace", pushAll.includes("wsExport()"));
+  check("the Pro store is pushed by the same call", pushAll.includes("await pushProWorkspace("));
+  check("the own materials are pushed by it too", pushAll.includes("await pushOwnMaterials("));
+
+  // Half two: the stamp is downstream of that one call, on both buttons and at sign-in.
+  const PULL_STAMP = 'setSyncAccount(state.uid);\n      status(T("app_sync_pulled"));';
   const PUSH_STAMP = 'setSyncAccount(state.uid);\n      renderLocalSummary();\n      status(T("app_sync_pushed"));';
-  check("and after a pull", before("wsImport(incoming);", PULL_STAMP));
-  check("the Pro store is pulled by the same button", before("crmImport(incoming);", PULL_STAMP));
-  check("the own materials are pulled by it too", before("omImport(incoming);", PULL_STAMP));
-  check("and all three are pushed by the other one",
-    before("await pushProWorkspace();", PUSH_STAMP) && before("await pushOwnMaterials();", PUSH_STAMP));
+  const pushClick = handler("push"), pullClick = handler("pull");
+  check("the push button stamps only after the push", before("await syncPushAll();", PUSH_STAMP, pushClick));
+  check("and the pull button only after the pull", before("await syncPullAll();", PULL_STAMP, pullClick));
+  /* A browser that refused the write — a private window, a full quota — is told so and is
+     NOT stamped: the account name would claim rows this device never received. */
+  check("a refused pull is not stamped",
+    before('if (!ok) { status(T("ws_save_failed"), true); return; }', PULL_STAMP, pullClick));
+  // The same order at sign-in, where nobody pressed anything.
+  const auto = fn("autoReconcile");
+  check("sign-in pulls, pushes, then stamps",
+    before("await syncPullAll();", "await syncPushAll();", auto)
+    && before("await syncPushAll();", "setSyncAccount(state.uid);", auto));
+  check("and a foreign workspace never reaches any of it", auto.includes("if (foreignWorkspace()) return;"));
   check("both buttons check it themselves, not only through `disabled`",
     (app.match(/if \(foreignWorkspace\(\)\) \{ status\(T\("app_sync_foreign"\), true\); return; \}/g) || []).length === 2);
   check("and the summary is what disables them",
@@ -567,8 +612,11 @@ head("9. uprawnienia: the table, the routes, and the hint that gates nothing");
     read("assets/plan.js").includes("Nothing here is a security boundary"));
   check("and that the rules are what decide a write",
     read("assets/plan.js").includes("rules decide what may be *written*"));
+  // Read through `lf()`: the sentence is asserted across a line break, the working tree
+  // is checked out with CRLF (`core.autocrlf=true`), and a test that passes on the CI
+  // runner and fails on the machine the code is written on guards nothing here.
   check("the paywall says the same about itself",
-    read("assets/paywall.js").includes("a product\n * decision rather than a boundary"));
+    lf("assets/paywall.js").includes("a product\n * decision rather than a boundary"));
 }
 
 /* ------------------------------------------------------------------ 10. the markup */
@@ -665,7 +713,10 @@ head("12. API: what the repo does not carry");
       if ([".git", "node_modules"].includes(name)) continue;
       const full = join(dir, name);
       if (statSync(full).isDirectory()) walk(full);
-      else if (/\.(js|mjs|json|html|txt|md|yml)$/.test(name)) files.push(relative(ROOT, full));
+      // Same "/" spelling as the page list, and for the same reason: the one exemption
+      // below names `assets/firebase-config.js`, and a backslash would exempt nothing
+      // while failing the file that is allowed to carry the key.
+      else if (/\.(js|mjs|json|html|txt|md|yml)$/.test(name)) files.push(posix(relative(ROOT, full)));
     }
   };
   walk(ROOT);

@@ -392,18 +392,21 @@ head("4. chapter XXV's paywall: the wall, the two rungs and the one door through
     await free.$eval('#cal-gate [data-pw-step="upgrade"]', (n) => n.hidden), false);
 
   /* Session 28: the wall quotes a price instead of offering a way round itself. The
-     amounts come from assets/pay.js in the visitor's currency, and no Payment Link is
-     configured, so the page says the subscription is not open yet — and offers no
-     button that would take money. */
+     amounts come from assets/pay.js in the visitor's currency. Sessions 70 and 71
+     configured the Payment Links, so the wall now names the way in instead of saying the
+     subscription has not opened — and that way in is /app/, never a payment address on
+     this page: the uid a payment attaches to is known there and only there. */
   eq("the monthly plan is priced", await free.$eval('#cal-gate [data-pw-plan="monthly"]', (n) => n.hidden), false);
   eq("and the yearly one", await free.$eval('#cal-gate [data-pw-plan="yearly"]', (n) => n.hidden), false);
   check("with a real amount in it",
     /[0-9]/.test(await free.$eval('#cal-gate [data-pw-plan="monthly"] [data-pw-price]', (n) => n.textContent)),
     await free.$eval('#cal-gate [data-pw-plan="monthly"] [data-pw-price]', (n) => n.textContent));
-  eq("the site says the subscription is not open yet",
-    await free.$eval("#cal-gate [data-pw-soon]", (n) => n.hidden), false);
-  eq("and offers nothing to click that would charge",
-    await free.$eval("#cal-gate [data-pw-buy]", (n) => n.hidden), true);
+  eq("the wall no longer says the subscription is waiting",
+    await free.$eval("#cal-gate [data-pw-soon]", (n) => n.hidden), true);
+  eq("and names the way in instead",
+    await free.$eval("#cal-gate [data-pw-buy]", (n) => n.hidden), false);
+  check("which is /app/, the one page that knows whose payment it is",
+    (await free.$eval("#cal-gate [data-pw-buy] a", (n) => n.getAttribute("href") || "")).includes("/app/"));
   check("no Stripe link stands on this page",
     (await free.content()).indexOf("stripe.com") === -1);
   /* The wall stays up. Nothing on this page can open it — the level is the only input,
@@ -463,8 +466,15 @@ head("5. the same deadlines read in four languages");
     const headings = await page.$$eval(".cal-sec:not([hidden]) h2",
       (h) => h.map((n) => n.textContent.trim()));
     eq(`${lang}: five buckets are drawn`, headings.length, 5);
-    check(`${lang}: nothing shows a raw dictionary key`,
-      !(await page.content()).includes("cal_") && !(await page.content()).includes("job_st_"), lang);
+    /* Read off the screen, not out of the markup. Until session G this asked whether the
+       HTML contained "cal_" anywhere, and every `data-i18n="cal_add_name"` answered yes —
+       so from the day the in-place translator was wired the check was red in all thirteen
+       languages while the page itself was perfectly translated. An attribute naming a key
+       is the mechanism working; a key in the text is the mechanism failing. */
+    const shown = await page.$eval("body", (n) => n.innerText);
+    const leaked = shown.match(/\b(?:cal|job_st|job_color|crm|ws|app|pay|nav|err|theme)_[a-z0-9_]+\b/g);
+    check(`${lang}: nothing shows a raw dictionary key`, leaked === null,
+      `${lang}: ${(leaked || []).slice(0, 3).join(", ")}`);
     const rel = (await page.textContent("#cal-list-soon .cal-rel")).trim();
     check(`${lang}: the distance to the deadline is in words`, rel.length > 0, rel);
     phrases.push(rel);
@@ -519,8 +529,12 @@ head("6. with JavaScript off the page is still an honest page");
     check(`the bucket "${word}" is readable without a script`, html.includes(word));
   }
   check("the honest note about the store is there", html.includes("localStorage"));
+  /* The sentence was "Termin jest polem zlecenia" when this was written and is now the
+     plainer "Terminarz nie ma własnej bazy" — the same claim, and the one that matters:
+     a reader with no script has to be told the module is a view of the jobs rather than
+     a second place their deadlines might be. */
   check("and the one saying the module stores nothing of its own",
-    html.includes("Termin jest polem zlecenia"));
+    html.includes("Terminarz nie ma własnej bazy"));
   eq("no row is drawn, because the jobs come out of storage",
     await page.$$eval("#cal-list-late > li", (li) => li.length), 0);
   check("the footer still names the page for a crawler",

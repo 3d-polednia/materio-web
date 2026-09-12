@@ -377,7 +377,12 @@ async function walk(cfg) {
 
   head(`${who} — 6. projekt: made by hand, on the projects screen`);
   await go(urlProjects(lang));
-  eq("a new account has no projects yet", (await store(page)).projects, undefined);
+  /* Asked as "how many", not as "is the key there". It used to expect `undefined`, which
+     said the store had never been written at all — and /projekty/ writes an empty
+     workspace the moment it opens, so the check has been failing on a screen that is
+     correctly empty. What matters to somebody who just made an account is that the list
+     shows nothing of anybody else's. */
+  eq("a new account has no projects yet", ((await store(page)).projects || []).length, 0);
   await page.fill("#ws-project-name", "Remont QA");
   await page.click("#ws-project-form button[type=submit]");
   await page.waitForSelector("#ws-project-list li");

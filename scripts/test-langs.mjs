@@ -328,6 +328,90 @@ checkAll("both counts are a number followed by a word", HOME_META,
   }
 }
 
+/* ------------------------------------------------------ §7 every key that reaches a screen */
+
+head("§7 every key handed to t() is a key somebody translated");
+
+/**
+ * `t()` falls back to the key itself (assets/i18n-runtime.js), which is the kindest thing
+ * it can do at runtime and the reason a missing key is invisible until a user reads
+ * "crm_phone" off the screen. That has now happened twice: `crm_phone` in src/app-pages.mjs,
+ * and `ws_save_failed`, which is the banner shown when the browser refuses to save — so the
+ * one message about work being lost was itself unreadable, in all thirteen languages, from
+ * the audit of 2026-09-04 until session G found it.
+ *
+ * Nothing asked the question until here. The dictionaries are checked against the calls
+ * rather than against each other, because the languages are NOT expected to hold the same
+ * keys: `calc_count_few` and `mat_count_label_few` exist for the seven languages with a
+ * "few" plural and for no others, and a parity test would demand they be invented.
+ */
+const BUNDLE = {};
+for (const lang of LANGS) {
+  const src = readFileSync(join(ROOT, "assets", `i18n.${lang}.js`), "utf8");
+  const m = src.match(/I18N\["[a-z]{2}"\] = (\{[\s\S]*?\});\s*$/m);
+  BUNDLE[lang] = m ? new Set(Object.keys(JSON.parse(m[1]))) : null;
+  check(`the ${lang} bundle is one object this can read`, Boolean(BUNDLE[lang]));
+}
+const KNOWN = LANGS.filter((l) => BUNDLE[l]);
+
+/** Every browser script and every generator module — the minified twins are copies. */
+function sources(dir, out = []) {
+  for (const name of readdirSync(join(ROOT, dir))) {
+    if (name.includes(".min.") || name.startsWith("i18n")) continue;
+    if (/\.(js|mjs)$/.test(name)) out.push(`${dir}/${name}`);
+  }
+  return out;
+}
+const SOURCES = sources("assets", sources("src"));
+
+/* Two shapes, and they are asked two different questions.
+
+   `t("app_sync_pulled")` names one key, and that key has to exist in all thirteen.
+
+   `t("job_st_" + j.status)` names a family — the statuses of a job, the colours of a
+   calendar entry, the two names of a theme. Which member is asked for is only known while
+   somebody is clicking, so what can be checked is that the family exists everywhere it is
+   drawn: a status translated into Polish alone is the same bug arriving in twelve
+   languages at once. */
+const literal = new Map(), family = new Map();
+const note = (map, key, file) => {
+  if (!map.has(key)) map.set(key, new Set());
+  map.get(key).add(file);
+};
+for (const file of SOURCES) {
+  const src = readFileSync(join(ROOT, file), "utf8");
+  for (const m of src.matchAll(/\b[tT]\(\s*(["'])([a-z0-9][a-z0-9_]*)\1(\s*\+)?/g)) {
+    note(m[3] ? family : literal, m[2], file);
+  }
+}
+// The markup asks for its own, through `data-i18n` and its sisters on title and aria-label.
+for (const page of PAGES) {
+  for (const m of page.html.matchAll(/data-i18n(?:-[a-z]+)?="([a-z0-9][a-z0-9_]*)"/g)) {
+    note(literal, m[1], "the markup");
+  }
+}
+
+check("there are calls to check", literal.size > 400, `${literal.size} keys named outright`);
+check("and families among them", family.size > 0, `${family.size} keys built by hand`);
+
+const absent = (key) => KNOWN.filter((l) => !BUNDLE[l].has(key));
+checkAll("every key named outright is in all thirteen dictionaries", [...literal.keys()],
+  (key) => absent(key).length === 0,
+  (key) => `${key} is missing from ${absent(key).join(", ")} — used in ${[...literal.get(key)].join(", ")}`);
+
+const familyGaps = (prefix) => {
+  const members = (lang) => [...BUNDLE[lang]].filter((k) => k.startsWith(prefix) && k !== prefix);
+  const inPl = new Set(members(DEFAULT_LANG));
+  return KNOWN.filter((l) => members(l).length !== inPl.size
+    || members(l).some((k) => !inPl.has(k)));
+};
+checkAll("and every family built by hand is the same family in all thirteen", [...family.keys()],
+  (prefix) => familyGaps(prefix).length === 0,
+  (prefix) => `${prefix}* differs in ${familyGaps(prefix).join(", ")} — used in ${[...family.get(prefix)].join(", ")}`);
+checkAll("no family is empty", [...family.keys()],
+  (prefix) => [...BUNDLE[DEFAULT_LANG]].some((k) => k.startsWith(prefix) && k !== prefix),
+  (prefix) => `${prefix}* names nothing — used in ${[...family.get(prefix)].join(", ")}`);
+
 /* ------------------------------------------------------------------ the report */
 
 if (failures.length) {

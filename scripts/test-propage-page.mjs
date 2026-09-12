@@ -190,10 +190,17 @@ head("1. what a visitor with no account sees");
     priceIn("PLN", "pl", "yearly"));
   eq("both plans are visible", await page.locator(".pw-plan:visible").count(), 2);
 
-  // The subscription has not opened, so the page says so and offers no way to pay.
-  eq("the page says the subscription is not open yet",
-    await page.locator("[data-pw-soon]").isVisible(), true);
-  eq("and offers no checkout", await page.locator("[data-pw-buy]").isVisible(), false);
+  /* Sessions 70 and 71 opened the subscription, so the page names the way in rather than
+     apologising for not having one. Exactly one of the two ever shows: a page carrying
+     both would say "not yet" above a button that charges. */
+  eq("the page no longer says the subscription is waiting",
+    await page.locator("[data-pw-soon]").isVisible(), false);
+  eq("and names the way in", await page.locator("[data-pw-buy]").isVisible(), true);
+  /* Which is /app/ and not Stripe: this page is public and cached for everybody, so it
+     cannot know whose payment a checkout here would be. The account page builds that
+     address at the click, out of the uid and a signed ticket. */
+  check("which is /app/, the one page that knows whose payment it is",
+    (await page.getAttribute("[data-pw-buy] a", "href")).includes("/app/"));
   check("no Stripe address anywhere on it",
     !(await page.content()).includes("stripe.com"));
 

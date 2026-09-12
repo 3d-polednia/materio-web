@@ -453,8 +453,17 @@ head("7b. /app/ pushes and pulls this collection");
   check("the push writes users/{uid}/materials", /proDoc\("materials",/.test(app));
   check("the pull reads it", /"clients", "jobs", "quotes", "materials"/.test(app));
   check("the pull merges it into this store", app.includes("omImport(incoming)"));
-  check("the push is called beside the Pro one, not from inside it",
-    /await pushProWorkspace\(\);[\s\S]{0,400}?await pushOwnMaterials\(\);/.test(app));
+  /* Written without the argument list until session G, so the day `since` was threaded
+     through for incremental pushes both halves stopped matching and the check went red
+     while the property it names never moved. */
+  check("the push is called beside the Pro one",
+    /await pushProWorkspace\([^)]*\);[\s\S]{0,400}?await pushOwnMaterials\([^)]*\);/.test(app));
+  /* And not from inside it: pushProWorkspace() returns early when the Pro store is not on
+     the page, and these two stores are independent — nesting them would make the visitor's
+     own materials stop syncing for everybody without a CRM. */
+  const proBody = app.slice(app.indexOf("async function pushProWorkspace("));
+  check("and not from inside it",
+    !proBody.slice(0, proBody.indexOf("\n}")).includes("pushOwnMaterials("));
   // The rules are the last gate and a document they refuse fails the whole pass, so the
   // push clamps every field rather than sending what the store happens to hold.
   check("the pushed history is capped at the rules' sixty", /\.slice\(0, 60\)/.test(app));

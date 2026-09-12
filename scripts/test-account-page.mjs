@@ -494,8 +494,9 @@ head("9. the level comes from the profile the server owns");
     await pro.locator("#panel-profile .lvl-card[data-current] h3").innerText(), "LiczMat Pro");
   /* Session 29 gave the card the one link chapter XXV asks for — "Poznaj LiczMat Pro",
      pointing at the page that explains the level. What it must still not carry is a
-     button: nothing on this site grants the plan, and the checkout lives on the Pro tab,
-     which is the only place that knows the uid a payment attaches to. */
+     button: the checkout lives on the Pro tab and only there, because that is the one
+     place that knows the uid a payment attaches to. A second button here would be a
+     second way to pay, and the two would have to be kept in step for ever. */
   eq("the card points at the page that explains the level",
     await pro.locator('#panel-profile .lvl-card[data-level="pro"] a').getAttribute("href"),
     "/liczmat-pro/");
@@ -506,7 +507,7 @@ head("9. the level comes from the profile the server owns");
   await ctx.close();
 }
 
-head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
+head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
   const hour = 3600e3;
@@ -526,9 +527,13 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
   eq("a free account is told it is on the free plan",
     await free.locator("#plan-name").innerText(), "Darmowy");
   eq("with no end date to print", await free.locator("#plan-until").innerText(), "");
-  // The true and duller sentence: there is no payment, so nothing grants Pro to anyone.
-  eq("and the honest reason it is not Pro", await free.locator("#plan-note").innerText(),
-    "Nic jeszcze nie nadaje planu Pro — nie ma płatności, więc każde konto jest darmowe.");
+  /* Until sessions 70 and 71 this sentence read "Nic jeszcze nie nadaje planu Pro — nie ma
+     płatności, więc każde konto jest darmowe", and it stopped being true on the day the
+     shop opened. The card now says what the free plan is and where Pro begins, which is
+     the only thing left for it to say. */
+  eq("and what the free plan is, beside what Pro opens",
+    await free.locator("#plan-note").innerText(),
+    "Konto działa na darmowym planie LiczMat. LiczMat Pro odblokowuje moduły poniżej.");
 
   // Chapter XXV: understand what is Pro, and never meet a dead button.
   /* The Pro tab stopped being the place that describes Pro on 2026-09-03: the five locked
@@ -565,28 +570,35 @@ head("9b. the LiczMat Pro tab: what the plan is, and no way to buy one");
     (await free.$$eval("#panel-pro a, #panel-pro button",
       (ns) => ns.map((n) => n.getAttribute("href") || n.id || "checkout").join(" "))),
     "# /liczmat-pro/ checkout");
-  eq("nothing visible in the panel offers to take money directly",
-    await free.locator("#panel-pro [data-pw-checkout]:visible").count(), 0);
+  /* One checkout on the tab, and it is visible now: the uid this payment attaches to is
+     known here and nowhere else, which is why every wall on the site sends people to this
+     page instead of carrying a button of its own. */
+  eq("exactly one checkout is offered, and it is this panel's",
+    await free.locator("#panel-pro [data-pw-checkout]:visible").count(), 1);
   eq("and the manage-subscription link is not there for a free account",
     await free.locator("#plan-manage").isVisible(), false);
   /* Session 28: the Pro tab is the one place on the site that offers to take money,
-     because it is the only page that knows the uid a payment has to be attached to. With
-     no Payment Link configured it quotes the price and says the subscription has not
-     opened — which is the state the site ships in. */
+     because it is the only page that knows the uid a payment has to be attached to.
+     Sessions 70 and 71 configured the Payment Links, so the pair below has swapped over:
+     the price is quoted and the button beside it is live. Exactly one of the two is ever
+     on screen — a page that shows both would be apologising and charging at once. */
   eq("the free account is shown what Pro costs",
     await free.locator('#plan-buy [data-pw-plan="monthly"]').isVisible(), true);
   check("with a real amount in it",
     /[0-9]/.test(await free.locator('#plan-buy [data-pw-plan="monthly"] [data-pw-price]').innerText()),
     await free.locator('#plan-buy [data-pw-plan="monthly"] [data-pw-price]').innerText());
-  eq("and told the subscription is not open yet",
-    await free.locator("#plan-buy [data-pw-soon]").isVisible(), true);
-  eq("with no button that would charge them",
-    await free.locator("#plan-buy [data-pw-checkout]").isVisible(), false);
+  eq("no longer told the subscription is waiting",
+    await free.locator("#plan-buy [data-pw-soon]").isVisible(), false);
+  eq("and offered the button that starts the payment",
+    await free.locator("#plan-buy [data-pw-checkout]").isVisible(), true);
   eq("the plan is still the free one", await free.locator("#plan-name").innerText(), "Darmowy");
-  eq("and the card says why in one plain sentence",
+  eq("and the card still says what the free plan is",
     await free.locator("#plan-note").innerText(),
-    "Nic jeszcze nie nadaje planu Pro — nie ma płatności, więc każde konto jest darmowe.");
-  check("no Stripe address is anywhere in the page yet",
+    "Konto działa na darmowym planie LiczMat. LiczMat Pro odblokowuje moduły poniżej.");
+  /* Still nothing: the address is built at the click out of `lmCheckoutUrl()`, which needs
+     the uid and the signed ticket from `payTicket`. A Stripe link standing in the shipped
+     markup would be one nobody's account is attached to. */
+  check("and no Stripe address stands in the markup — the click builds it",
     (await free.content()).indexOf("stripe.com") === -1);
 
   eq("no console error", free.lmErrors.join(" / "), "");

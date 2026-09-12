@@ -15,7 +15,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Nothing was asked before publishing until session G. The suites now run first and the
+  # deploy waits on them, so a red check stops the site instead of being discovered by
+  # somebody reading liczmat.com.
+  tests:
+    uses: ./.github/workflows/test.yml
+
   deploy:
+    needs: tests
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
