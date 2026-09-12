@@ -18,10 +18,15 @@ import {
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
 import { proGate, proModules, proPlansBlock } from "./pro.mjs";
-import { DEFAULT_CURRENCY } from "./currency.mjs";
+import { DEFAULT_CURRENCY, MONEY_LOCALE } from "./currency.mjs";
 import { PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
 
-const LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
+/* All thirteen, from assets/currency.js by way of src/currency.mjs — the same map the
+   browser formats money with. It used to be four, left over from the Polish-first phase,
+   and the other nine fell through to `undefined`, which is not "no locale" but "whatever
+   locale this machine runs in": the Czech pages were formatted in Polish here and would
+   have been formatted in American English on a build server. Session G, found by CI. */
+const LOCALE = MONEY_LOCALE;
 
 /**
  * Case- and accent-insensitive text for the hub's search haystack.

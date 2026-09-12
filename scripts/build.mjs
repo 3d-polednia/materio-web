@@ -905,7 +905,13 @@ function workedExample(calc, lang, t) {
   const res = ENGINES[calc.engine](input);
   if (res.err) throw new Error(`calculator "${calc.id}" fails on its own defaults: ${res.err}`);
 
-  const locale = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" }[lang];
+  /* All thirteen. This map held four until session G, so the worked example on a Czech,
+     Slovak, Romanian, Croatian, Serbian, Italian, Dutch, Spanish or French calculator page
+     was formatted with `undefined` — which does not mean "no locale", it means the locale
+     of whoever ran the build. Those nine pages were shipped in Polish grouping because the
+     build runs on a Polish machine, and CI building them on ubuntu produced a different
+     page from the same source, which is how this was found. */
+  const locale = MONEY_LOCALE[lang] || MONEY_LOCALE.pl;
   const number = (v) => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(v);
 
   // The engines emit numbers as |n:…| tokens; the language is only known here.

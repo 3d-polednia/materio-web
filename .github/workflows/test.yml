@@ -39,14 +39,15 @@ jobs:
       # page edited in place is a page the next build silently reverts. Building first and
       # asking git whether anything moved is what catches that — and it has to come before
       # the suites, because most of them read the shipped .html rather than the source.
-      # Reporting, not gating, and only until the first run says what it sees. On a clean
-      # LF checkout here the build came out identical under node 22 and node 24, in both
-      # time zones — and the runner still found a difference, so the difference is
-      # something this machine cannot reproduce and the log has to name it. Gating on a
-      # rule nobody has read the output of would have stopped the deploy on a question
-      # rather than on an answer.
-      - name: Build, and report any drift between the shipped files and their source
-        continue-on-error: true
+      # It gates, and it earned the right to on its first run. That run found nine pages
+      # the ubuntu runner built differently from this repo's copy, and the cause was a
+      # real defect rather than anything about the runner: the locale map behind the
+      # worked example on a calculator page held four languages, so the other nine were
+      # formatted with `undefined` — which is not "no locale", it is the locale of
+      # whoever runs the build. Czech pages shipped "0 CZK" and "1600 kg" because this
+      # machine is Polish. Fixed in src/pages.mjs and scripts/build.mjs; what the check
+      # is really for is a page edited in place, which the next build silently reverts.
+      - name: Build, and check the shipped files match their source
         run: |
           node scripts/build.mjs
           if git diff --quiet -- . ':(exclude).github'; then
@@ -63,7 +64,8 @@ jobs:
               echo "-- the first differing lines:"
               git diff -U0 -- . ':(exclude).github' | grep -E '^[+-][^+-]' | head -12 | cut -c1-200
             )
-            echo "::warning::The built files differ from what src/ produces.%0A${report//$'\n'/%0A}"
+            echo "::error::The built files differ from what src/ produces. Run node scripts/build.mjs and commit the result.%0A${report//$'\n'/%0A}"
+            exit 1
           fi
 
       - name: Run them

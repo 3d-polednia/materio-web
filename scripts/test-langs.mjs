@@ -35,6 +35,7 @@ import { fileURLToPath } from "node:url";
 
 import { LANGS, HREFLANG, DEFAULT_LANG } from "../src/site.mjs";
 import { FLAG, LANG_NAME } from "../src/flags.mjs";
+import { MONEY_LOCALE } from "../src/currency.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -411,6 +412,44 @@ checkAll("and every family built by hand is the same family in all thirteen", [.
 checkAll("no family is empty", [...family.keys()],
   (prefix) => [...BUNDLE[DEFAULT_LANG]].some((k) => k.startsWith(prefix) && k !== prefix),
   (prefix) => `${prefix}* names nothing — used in ${[...family.get(prefix)].join(", ")}`);
+
+/* --------------------------------------------- §8 a locale for every one of the thirteen */
+
+head("§8 no language is formatted in the build machine's locale");
+
+/**
+ * `new Intl.NumberFormat(undefined, …)` does not mean "no locale". It means the locale of
+ * whoever is running node, which for a generator is the laptop of whoever last built the
+ * site — so the Czech calculator pages shipped "0 CZK" and "1600 kg" because this machine
+ * is Polish, and the same source built on ubuntu produced "0 Kč" and "1 600 kg". Nine of
+ * the thirteen languages were in that state until session G, and what found it was CI
+ * building the pages somewhere else and asking git whether they matched.
+ *
+ * `LM_LOCALE` in assets/currency.js is the one map with all thirteen in it. The rule is
+ * that nothing keeps a second one.
+ */
+for (const lang of LANGS) {
+  check(`${lang} has a locale to format with`,
+    typeof MONEY_LOCALE[lang] === "string" && MONEY_LOCALE[lang].includes("-"),
+    String(MONEY_LOCALE[lang]));
+}
+for (const file of ["src/pages.mjs", "scripts/build.mjs", "src/template.mjs", "src/pro.mjs"]) {
+  const src = readFileSync(join(ROOT, file), "utf8");
+  /* A map from language code to BCP 47 tag written out by hand. The one in
+     assets/currency.js is the exception this rule exists to point at, and it is not in
+     this list. */
+  const own = src.match(/\{[^{}]*\bpl:\s*"pl-PL"[^{}]*\}/);
+  check(`${file} does not keep a locale map of its own`, own === null,
+    own ? own[0].slice(0, 120) : "");
+}
+/* And the formatting really does differ between them, so the map above is load-bearing
+   rather than thirteen names for one behaviour. */
+{
+  const fmt = (lang) => new Intl.NumberFormat(MONEY_LOCALE[lang], { maximumFractionDigits: 2 }).format(1600.5);
+  const shapes = new Set(LANGS.map(fmt));
+  check("and the thirteen do not all format a number the same way", shapes.size > 1,
+    [...shapes].join(" | "));
+}
 
 /* ------------------------------------------------------------------ the report */
 
