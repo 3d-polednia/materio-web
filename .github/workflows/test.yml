@@ -52,16 +52,18 @@ jobs:
           if git diff --quiet -- . ':(exclude).github'; then
             echo "the built files match src/"
           else
-            # One ::warning:: per line, not a plain echo: the step log needs a token to
-            # read and the annotations do not, and this has to be readable from the
-            # machine that has to act on it.
-            echo "::warning::The built files differ from what src/ produces."
-            git status --short -- . ':(exclude).github' | head -25 \
-              | while IFS= read -r line; do echo "::warning::moved: $line"; done
-            git diff --stat -- . ':(exclude).github' | tail -3 \
-              | while IFS= read -r line; do echo "::warning::stat: $line"; done
-            git diff -- . ':(exclude).github' | grep '^[+-]' | grep -v '^[+-][+-]' | head -6 \
-              | while IFS= read -r line; do echo "::warning::line: $line"; done
+            # One annotation carrying everything, not one per line. The step log needs a
+            # token to read and the annotations do not — but a step may raise only ten of
+            # them, and a per-line report spends all ten on file names and drops the diff
+            # that would say why. Newlines go in as %0A, which is how an annotation
+            # carries more than one line.
+            report=$(
+              echo "changed: $(git status --short -- . ':(exclude).github' | wc -l) files"
+              git diff --stat -- . ':(exclude).github' | tail -2
+              echo "-- the first differing lines:"
+              git diff -U0 -- . ':(exclude).github' | grep -E '^[+-][^+-]' | head -12 | cut -c1-200
+            )
+            echo "::warning::The built files differ from what src/ produces.%0A${report//$'\n'/%0A}"
           fi
 
       - name: Run them
