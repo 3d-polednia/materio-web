@@ -161,11 +161,24 @@ function convConvert(catId, from, to, value) {
 
 /* ------------------------------------------------------------------ the site's own half */
 
+/**
+ * The digits of a typed number, with the grouping taken out — `pdfNum()`'s rule, carried
+ * here in session K. Drop every space (plain, no-break and narrow, because a value pasted
+ * out of a spreadsheet carries U+00A0), then the LAST separator in the string is the
+ * decimal point and the earlier ones were grouping. `s.replace(",", ".")` swapped the first
+ * comma alone, so converting "1 000" millimetres converted one.
+ */
+function convDigits(s) {
+  const raw = [...s].filter((ch) => ch.trim() !== "").join("");
+  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+  return cut === -1 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+}
+
 /** What somebody typed, as a number. A comma is a decimal point here, as everywhere. */
 function convNum(v) {
   const s = String(v === undefined || v === null ? "" : v).trim();
   if (s === "") return NaN;
-  const n = parseFloat(s.replace(",", "."));
+  const n = parseFloat(convDigits(s));
   return isFinite(n) ? n : NaN;
 }
 

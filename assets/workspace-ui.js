@@ -195,8 +195,14 @@ function wsFieldValue(field, snapshot) {
   // A cutting list is several lines of free text; everything else is one number, which is
   // written back in this language's own notation rather than in whatever was typed.
   if (raw.includes("\n")) return raw.split("\n").map((s) => s.trim()).filter(Boolean).join(" · ");
-  const n = parseFloat(raw.replace(",", "."));
-  return isFinite(n) && String(n) === raw.replace(",", ".") ? wsNum(n) : raw;
+  /* The round-trip is what tells a number from free text: a value that survives being read
+     and written back is shown in this language's notation, anything else is shown as typed.
+     It is compared against wsDigits() rather than the keystrokes, so a grouped thousand
+     counts as the number the engine used — before session K "1 000" failed the comparison
+     and the row said "1 000" while the calculation had already read 1000. */
+  const digits = wsDigits(raw);
+  const n = parseFloat(digits);
+  return isFinite(n) && String(n) === digits ? wsNum(n) : raw;
 }
 
 /**

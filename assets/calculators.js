@@ -25,7 +25,30 @@ const snap = (x) => {
   return r !== 0 && Math.abs(x - r) <= 1e-9 * Math.abs(r) ? r : x;
 };
 const ceil = (x) => Math.ceil(snap(x)), floor = (x) => Math.floor(snap(x));
-const num = (v) => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
+/**
+ * The digits of a typed number, with the grouping taken out.
+ *
+ * Every input on this site is `type="text" inputmode="decimal"` (src/pages.mjs), so what
+ * arrives is whatever somebody's own keyboard produced, and in most of the thirteen
+ * languages that is a space or a point for thousands and a comma for the decimal. The old
+ * `String(v).replace(",", ".")` swapped the FIRST comma and nothing else, so `parseFloat`
+ * stopped at the first character it could not use: "1 000" was one, and a price of one
+ * złoty per square metre went into the shopping list without a word. The same defect was
+ * found in `pdfNum()` in the second audit round (session H) and fixed there alone.
+ *
+ * The rule is that reader's: drop every space — a plain one, a no-break one and a narrow
+ * one, because "1 000 zł" pasted out of a spreadsheet carries U+00A0 — and then let the
+ * LAST separator in the string be the decimal point and the earlier ones be grouping.
+ *
+ * It hands back a string rather than a number: what a non-number means is each reader's
+ * own answer, and the ones here are NaN.
+ */
+const typedDigits = (v) => {
+  const raw = [...String(v === undefined || v === null ? "" : v)].filter((ch) => ch.trim() !== "").join("");
+  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+  return cut === -1 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+};
+const num = (v) => { const n = parseFloat(typedDigits(v)); return isFinite(n) ? n : NaN; };
 /**
  * A price field, told apart from an empty one.
  *

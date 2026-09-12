@@ -129,9 +129,28 @@ const omAlive = (rows) => rows.filter((r) => !r.deletedAt);
  * that is not a finite number — a blank field, a word, a NaN out of a bad parse — is null,
  * never 0, because a 0 m² package divides.
  */
+/**
+ * The digits of a typed number, with the grouping taken out.
+ *
+ * `pdfNum()`'s rule, carried to every reader of a typed field in session K: drop every
+ * space — plain, no-break and narrow, since a figure pasted out of a spreadsheet carries
+ * U+00A0 — then the LAST separator in the string is the decimal point and the earlier ones
+ * were grouping. The draft was `String(v).replace(",", ".")`, which swaps the first comma
+ * alone; feeding `Number()`, that made a private material 1 000 mm wide null — the width
+ * refused with nothing said — while "1.000" was accepted as one millimetre.
+ *
+ * `Number()` stays, for the reason the two functions below already give: a catalogue that
+ * takes half a number keeps a measurement nobody typed.
+ */
+function omDigits(v) {
+  const raw = [...String(v)].filter((ch) => ch.trim() !== "").join("");
+  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+  return cut === -1 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+}
+
 function omMeasure(v, key) {
   if (v === null || v === undefined || v === "") return null;
-  const n = typeof v === "number" ? v : Number(String(v).replace(",", "."));
+  const n = typeof v === "number" ? v : Number(omDigits(v));
   if (!Number.isFinite(n) || n < 0) return null;
   return Math.min(n, OM_MEASURES[key] === undefined ? n : OM_MEASURES[key]);
 }
@@ -139,7 +158,7 @@ function omMeasure(v, key) {
 /** Minor units from what somebody typed. A blank price is no price, and is not zero. */
 function omMinor(major) {
   if (major === null || major === undefined || major === "") return null;
-  const n = typeof major === "number" ? major : Number(String(major).replace(",", "."));
+  const n = typeof major === "number" ? major : Number(omDigits(major));
   if (!Number.isFinite(n) || n < 0) return null;
   return Math.round(n * 100);
 }

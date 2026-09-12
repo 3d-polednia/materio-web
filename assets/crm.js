@@ -341,10 +341,30 @@ function crmDay(v) {
   return d.toISOString().slice(0, 10) === s ? s : "";
 }
 
+/**
+ * The digits of a typed number, with the grouping taken out.
+ *
+ * `pdfNum()`'s rule, carried to every reader of a typed field in session K: drop every
+ * space — plain, no-break and narrow, since a figure pasted out of a spreadsheet carries
+ * U+00A0 — then the LAST separator in the string is the decimal point and the earlier ones
+ * were grouping. The draft was `String(v).replace(",", ".")`, which swaps the first comma
+ * alone; here that fed `Number()`, which refuses a string with anything left in it, so a
+ * quote line typed "1 000" was not a wrong amount but no amount at all — null, the field
+ * silently emptied — while "1.000" went in as one.
+ *
+ * `Number()` and not `parseFloat()` stays: this is a store, and half a number is a typo
+ * that must be refused rather than written into a quote somebody sends a client.
+ */
+function crmDigits(v) {
+  const raw = [...String(v === undefined || v === null ? "" : v)].filter((ch) => ch.trim() !== "").join("");
+  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+  return cut === -1 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+}
+
 /** Minor units from a typed major amount, or null when nothing was typed. */
 function crmMinor(v) {
   if (v === undefined || v === null || String(v).trim() === "") return null;
-  const n = Number(String(v).replace(",", "."));
+  const n = Number(crmDigits(v));
   if (!isFinite(n) || n < 0) return null;
   return Math.round(n * 100);
 }
@@ -675,7 +695,7 @@ const QUO_MAX_MARGIN = 1000;
 /** A counted amount, or null when the visitor left the field blank — a lump-sum line. */
 function crmQty(v) {
   if (v === undefined || v === null || String(v).trim() === "") return null;
-  const n = Number(String(v).replace(",", "."));
+  const n = Number(crmDigits(v));
   if (!isFinite(n) || n < 0) return null;
   return n;
 }
@@ -713,7 +733,7 @@ function crmCanQuote() {
 /** A margin in percent: never negative, never past the cap, never more than two decimals. */
 function crmPct(v) {
   if (v === undefined || v === null || String(v).trim() === "") return 0;
-  const n = Number(String(v).replace(",", "."));
+  const n = Number(crmDigits(v));
   if (!isFinite(n) || n <= 0) return 0;
   return Math.round(Math.min(n, QUO_MAX_MARGIN) * 100) / 100;
 }

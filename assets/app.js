@@ -131,7 +131,25 @@ function status(message, isError) {
   box.hidden = !message;
 }
 
-const num = (v) => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : 0; };
+/**
+ * What somebody typed, as a number, or zero.
+ *
+ * `typedDigits()` is `pdfNum()`'s rule, carried to every reader of a typed field in session
+ * K: drop every space of every width, then the LAST separator decides the decimal point and
+ * the earlier ones were grouping. The draft this replaces was `String(v).replace(",", ".")`,
+ * which swaps the first comma only, so `parseFloat` gave up at the first space — a room
+ * 1 000 mm wide was one millimetre, and a quote line of "1 200,50" was worth 1,20.
+ *
+ * This file is a module, so the helper is private to it; the plain scripts each carry their
+ * own copy under their own prefix, and scripts/test-decimal.mjs runs one table through all
+ * of them so the copies cannot drift apart.
+ */
+const typedDigits = (v) => {
+  const raw = [...String(v === undefined || v === null ? "" : v)].filter((ch) => ch.trim() !== "").join("");
+  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+  return cut === -1 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+};
+const num = (v) => { const n = parseFloat(typedDigits(v)); return isFinite(n) ? n : 0; };
 
 const escapeHtml = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

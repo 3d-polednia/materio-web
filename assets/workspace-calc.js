@@ -22,9 +22,26 @@ const wsEsc = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const wsPlain = (v) => String(Math.round(Number(v) * 1000) / 1000);
 
+/**
+ * The digits of a typed number, with the grouping taken out.
+ *
+ * `pdfNum()`'s rule, carried to every reader of a typed field in session K: drop every
+ * space — plain, no-break and narrow, since a figure pasted out of a spreadsheet carries
+ * U+00A0 — then the LAST separator in the string is the decimal point and the earlier ones
+ * were grouping. The draft was `String(v).replace(",", ".")`, which swaps the first comma
+ * alone, so a cost of "1 200,50" booked against a project was worth 1,20.
+ *
+ * assets/workspace-ui.js reads it too, and never loads without this file.
+ */
+const wsDigits = (v) => {
+  const raw = [...String(v === undefined || v === null ? "" : v)].filter((ch) => ch.trim() !== "").join("");
+  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+  return cut === -1 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+};
+
 /** Read a number a person typed: a comma is a decimal point in most of these languages. */
 const wsDecimal = (v) => {
-  const n = parseFloat(String(v).replace(",", "."));
+  const n = parseFloat(wsDigits(v));
   return isFinite(n) ? n : 0;
 };
 const wsNum = (v) => new Intl.NumberFormat(wsLang(), { maximumFractionDigits: 2 }).format(v);
