@@ -52,13 +52,16 @@ jobs:
           if git diff --quiet -- . ':(exclude).github'; then
             echo "the built files match src/"
           else
+            # One ::warning:: per line, not a plain echo: the step log needs a token to
+            # read and the annotations do not, and this has to be readable from the
+            # machine that has to act on it.
             echo "::warning::The built files differ from what src/ produces."
-            echo "--- what moved:"
-            git status --short -- . ':(exclude).github' | head -40
-            echo "--- how much:"
-            git diff --stat -- . ':(exclude).github' | tail -20
-            echo "--- the first difference, in full:"
-            git diff -- . ':(exclude).github' | head -60
+            git status --short -- . ':(exclude).github' | head -25 \
+              | while IFS= read -r line; do echo "::warning::moved: $line"; done
+            git diff --stat -- . ':(exclude).github' | tail -3 \
+              | while IFS= read -r line; do echo "::warning::stat: $line"; done
+            git diff -- . ':(exclude).github' | grep '^[+-]' | grep -v '^[+-][+-]' | head -6 \
+              | while IFS= read -r line; do echo "::warning::line: $line"; done
           fi
 
       - name: Run them
