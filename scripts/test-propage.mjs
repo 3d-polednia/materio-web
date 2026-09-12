@@ -383,12 +383,12 @@ head("5. the ten pages that are actually in the repo");
     }
 
     // The two scripts the page needs, and the ones it deliberately does not load.
-    check(`${lang}: it loads the price list`, html.includes("/assets/pay.js"));
-    check(`${lang}: and the script that writes today's amount`, html.includes("/assets/paywall.js"));
+    check(`${lang}: it loads the price list`, html.includes("/assets/pay."));
+    check(`${lang}: and the script that writes today's amount`, html.includes("/assets/paywall."));
     check(`${lang}: it does not load the permission table — it gates nothing`,
-      !html.includes("/assets/plan.js"));
+      !html.includes("/assets/plan."));
     check(`${lang}: nor the CRM store, which holds somebody's rows`,
-      !html.includes("/assets/crm.js"));
+      !html.includes("/assets/crm."));
 
     // The amount really is in the shipped bytes, which is the whole point of printing it
     // at build time rather than leaving it to a script.

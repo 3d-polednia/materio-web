@@ -56,7 +56,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260911c";
+const STAMP = "20260912a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -772,6 +772,11 @@ function write(relPath, contents) {
   relPath = relPath.replace(/\\/g, "/").replace(/^\//, "");
   const full = p(relPath);
   if (relPath.endsWith(".html")) {
+    // The scripts ship without their prose too, so the markup has to ask for the file that
+    // actually ships. This runs before the policy below for the same reason the comment
+    // stripping does: the hash has to be taken over what leaves the door.
+    contents = contents.replace(/\/assets\/([A-Za-z0-9._-]+)\.js\?v=/g,
+      (whole, name) => (strippedTwin(name) ? `/assets/${name}.min.js?v=` : whole));
     // Comments first: the policy is a hash of the script text that ships, and stripping
     // runs over the file the hash would otherwise be taken from.
     contents = withCsp(stripHtmlComments(contents));
@@ -1034,6 +1039,155 @@ function stripCssComments(css) {
     i += 1;
   }
   return out;
+}
+
+/**
+ * The same door, for the scripts.
+ *
+ * Every file in assets/ explains itself the way the stylesheet does, and unlike the
+ * stylesheet nothing was taking that prose off at the door. Measured 2026-09-12: 348 kB
+ * raw and 140 kB gzipped of comments across the shipped scripts, of which assets/app.js
+ * alone is 47.6 kB raw and 18.6 kB gzipped — more than the account page's whole overrun.
+ * So assets/<name>.js stays authored and readable and assets/<name>.min.js is what the
+ * markup asks for, on the same terms buildStylesheet() gives the stylesheet: same
+ * statements, same order, same values, only the comments and the blank lines are gone.
+ *
+ * The scan is a tokenizer for the same reason the CSS one is, and it has three more
+ * things to get right than CSS does: a template literal nests substitutions that may hold
+ * further templates and comments of their own; a regular expression literal opens with
+ * the same character as a division and is told apart by what stands before it; and a
+ * character class inside one may carry an unescaped slash.
+ */
+/** The keywords a regular expression may follow: after these a slash cannot be a division. */
+const BEFORE_REGEX = /(?:^|[^A-Za-z0-9_$])(return|typeof|case|in|of|new|delete|void|instanceof|do|else|yield|await)\s*$/;
+
+function stripJsComments(src, file) {
+  let out = "";
+  // The last character that decides anything: it is what says whether a slash opens a
+  // regular expression or divides. Whitespace and comments never become it.
+  let prev = "";
+  // What we are inside of. "tpl" is the text of a template literal; "sub" is one of its
+  // substitutions, which is ordinary JavaScript again and has to count its own braces.
+  const stack = [];
+  const inTemplate = () => stack.length && stack[stack.length - 1].kind === "tpl";
+  const keep = (text) => {
+    out += text;
+    const sig = text.replace(/\s+$/, "");
+    if (sig) prev = sig[sig.length - 1];
+  };
+
+  for (let i = 0; i < src.length;) {
+    const ch = src[i];
+    const next = src[i + 1];
+
+    if (inTemplate()) {
+      if (ch === "\\") { keep(src.slice(i, i + 2)); i += 2; continue; }
+      if (ch === "`") { stack.pop(); keep(ch); i += 1; continue; }
+      if (ch === "$" && next === "{") { stack.push({ kind: "sub", depth: 0 }); keep(src.slice(i, i + 2)); i += 2; continue; }
+      keep(ch); i += 1; continue;
+    }
+
+    if (ch === "/" && next === "*") {
+      const end = src.indexOf("*/", i + 2);
+      if (end < 0) throw new Error(`${file}: unterminated /* comment`);
+      // A space, so that `a/* c */b` cannot become `ab`.
+      out += " ";
+      i = end + 2;
+      continue;
+    }
+    if (ch === "/" && next === "/") {
+      const nl = src.indexOf("\n", i);
+      i = nl < 0 ? src.length : nl;
+      continue;
+    }
+    if (ch === '"' || ch === "'") {
+      let j = i + 1;
+      while (j < src.length && src[j] !== ch) {
+        if (src[j] === "\n") throw new Error(`${file}: unterminated string`);
+        j += src[j] === "\\" ? 2 : 1;
+      }
+      if (j >= src.length) throw new Error(`${file}: unterminated string`);
+      keep(src.slice(i, j + 1));
+      i = j + 1;
+      continue;
+    }
+    if (ch === "`") { stack.push({ kind: "tpl" }); keep(ch); i += 1; continue; }
+    if (stack.length && stack[stack.length - 1].kind === "sub") {
+      const top = stack[stack.length - 1];
+      if (ch === "{") { top.depth += 1; keep(ch); i += 1; continue; }
+      if (ch === "}") {
+        if (top.depth === 0) { stack.pop(); keep(ch); i += 1; continue; }
+        top.depth -= 1;
+        keep(ch); i += 1; continue;
+      }
+    }
+    // A slash here opens a regular expression only if what stands before it cannot end an
+    // expression. After a name, a number or a closing bracket it is a division — except
+    // after a keyword that only ever stands in front of one: assets/app.js says
+    // `return /^\d{4}-\d{2}-\d{2}$/.test(day)`.
+    if (ch === "/" && (!/[A-Za-z0-9_$)\]}]/.test(prev) || BEFORE_REGEX.test(out.slice(-24)))) {
+      let j = i + 1;
+      let inClass = false;
+      while (j < src.length) {
+        const c = src[j];
+        if (c === "\\") { j += 2; continue; }
+        if (c === "\n") throw new Error(`${file}: unterminated regular expression`);
+        if (c === "[") inClass = true;
+        else if (c === "]") inClass = false;
+        else if (c === "/" && !inClass) break;
+        j += 1;
+      }
+      if (j >= src.length) throw new Error(`${file}: unterminated regular expression`);
+      j += 1;
+      while (j < src.length && /[a-z]/.test(src[j])) j += 1;
+      keep(src.slice(i, j));
+      i = j;
+      continue;
+    }
+    keep(ch);
+    i += 1;
+  }
+  if (stack.length) throw new Error(`${file}: unterminated template literal`);
+  return out;
+}
+
+/**
+ * Which scripts have a stripped twin, answered the first time a page asks for one.
+ *
+ * Only what a page actually loads is worth writing: assets/i18n.js and
+ * assets/i18n-pages.js are the dictionaries' source, compiled into assets/i18n.<lang>.js,
+ * and nothing downloads them by those names. A file whose first line says this script
+ * generated it is left alone — it carries no prose, and stripping it would only produce a
+ * second generated file.
+ */
+const STRIPPED = new Map();
+
+function strippedTwin(name) {
+  if (STRIPPED.has(name)) return STRIPPED.get(name);
+  const source = p(`assets/${name}.js`);
+  let answer = false;
+  if (existsSync(source)) {
+    const authored = readFileSync(source, "utf8");
+    if (!/^\/\* Generated by scripts\/build\.mjs/.test(authored)) {
+      // The line breaks stay, so the shipped file is still one statement per line and can
+      // be read in a browser's dev tools; only the trailing space and the gaps the prose
+      // left behind go.
+      const shipped = stripJsComments(authored, `assets/${name}.js`)
+        .split("\n")
+        .map((line) => line.replace(/\s+$/, ""))
+        .filter((line, at, all) => line !== "" || (at > 0 && all[at - 1] !== ""))
+        .join("\n")
+        .trim();
+      write(`assets/${name}.min.js`, `/* Generated by scripts/build.mjs from assets/${name}.js — do not edit.
+   Same statements, same order, same values; only the comments and the blank lines are
+   gone. Edit assets/${name}.js and rebuild. */
+${shipped}
+`);
+      answer = true;
+    }
+  }
+  STRIPPED.set(name, answer);
+  return answer;
 }
 
 function buildStylesheet() {
@@ -1796,6 +1950,12 @@ function clean() {
   for (const d of dirs) {
     const full = p(d);
     if (existsSync(full)) rmSync(full, { recursive: true, force: true });
+  }
+  // A stripped twin belongs to the source it was made from. If that source goes away the
+  // twin has to go with it: the repository is what GitHub Pages serves, so a leftover file
+  // would keep being published long after the script it came from was deleted.
+  for (const entry of readdirSync(p("assets"))) {
+    if (entry.endsWith(".min.js")) rmSync(p(`assets/${entry}`), { force: true });
   }
   for (const lang of RETIRED_LANGS) {
     const bundle = p(`assets/i18n.${lang}.js`);

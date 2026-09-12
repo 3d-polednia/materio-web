@@ -746,6 +746,9 @@ header.site {
 /* The mark's "M" is stroke="currentColor", so it inherits .brand's colour and flips
    with the theme; the lime stays lime. */
 .brand .logo { width: 30px; height: 30px; flex: none; }
+/* The <symbol> at the top of <body> is a definition the header and the footer point at,
+   never a picture of its own. display:none hides it without stopping <use> resolving it. */
+.logo-defs { display: none; }
 
 /* Theme switch. Sits next to the brand on desktop and stays out of the collapsing
    nav on mobile, so it is reachable whether or not the menu is open. */

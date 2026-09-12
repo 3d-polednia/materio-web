@@ -489,6 +489,7 @@ letter-spacing: var(--track-tight); color: var(--on-bg);
 }
 .brand:hover { text-decoration: none; }
 .brand .logo { width: 30px; height: 30px; flex: none; }
+.logo-defs { display: none; }
 .theme-toggle {
 display: inline-grid; place-items: center;
 width: var(--control-h-sm); height: var(--control-h-sm); flex: none;

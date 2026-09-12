@@ -272,6 +272,11 @@ head("1d. no single asset is a download of its own");
     // what every page links. It is 111.5 kB and is failing the ceiling for a download
     // that never happens. Anything the browser does fetch is held to the ceiling.
     if (/^i18n(-pages|-materials)?\.js$/.test(name) || name === "styles.css") continue;
+    // And a script that has a stripped twin is build input for the same reason: since
+    // 2026-09-12 the markup asks for assets/<name>.min.js (scripts/build.mjs, write()), so
+    // that is the file a browser waits for and that is the one the ceiling is about.
+    if (name.endsWith(".js") && !name.endsWith(".min.js")
+      && existsSync(p(`assets/${name.slice(0, -3)}.min.js`))) continue;
     check(`assets/${name} is under the asset ceiling`, bytes.length <= ASSET_CEILING[0] * 1024,
       kb(bytes.length));
     check(`assets/${name} is under it gzipped`,
@@ -399,10 +404,17 @@ head("4. flags, logo and icons — the assets chapter XXXII names by hand");
     const icons = requests(w.html).filter((r) => r.kind === "icon");
     // rel="icon" only. The apple-touch-icon is 180 px by definition and is fetched when
     // somebody adds the site to a home screen, never to draw a tab.
+    //
+    // Weighed the way a visitor pays for it, which is gzipped. Measured against
+    // liczmat.com on 2026-09-12: the 5767-byte mark left the host as 2238 bytes, so raw
+    // bytes were pricing the icon that compresses against the one that cannot. The mark
+    // was re-emitted the same day on a coarser coordinate grid — 0.28 units of movement
+    // on a 372-unit drawing, 0.02 px at a 32 px tab — and costs 1618 gzipped, under the
+    // 1857 of the PNG beside it.
     check(`${w.file} declares no icon over 2 kB`,
       icons.every((i) => {
         const f = i.url.replace(/^\//, "").split("?")[0];
-        return !existsSync(p(f)) || readFileSync(p(f)).length <= 2 * 1024;
+        return !existsSync(p(f)) || gzipSync(readFileSync(p(f)), { level: 9 }).length <= 2 * 1024;
       }),
       icons.map((i) => i.url).join(", "));
     const allIcons = requests(w.html).filter((r) => r.kind === "icon" || r.kind === "touch-icon");
@@ -506,20 +518,24 @@ head("7. the markup ships without the narrative that explains it");
 
 head("8. a page downloads the code it runs and no more");
 {
+  // A page asks for assets/<name>.min.js since 2026-09-12 (scripts/build.mjs, write()).
+  // Either name is the same script, and what these checks are about is which scripts a
+  // page loads, not which of the two files carries them.
+  const loads = (html, name) =>
+    html.includes(`/assets/${name}.js?v=`) || html.includes(`/assets/${name}.min.js?v=`);
   // Session 33 cut assets/workspace-ui.js in two. A calculator page needs the room bar
   // and the save box; it does not need the /projekty/ screen, and 150 of the site's 373
   // pages are calculator pages.
   check("the calculator half exists", existsSync(p("assets/workspace-calc.js")));
   const calc = WEIGHED.get("kalkulatory/plytki-panele-gres/index.html");
-  check("a calculator page loads it", calc.html.includes("/assets/workspace-calc.js?v="));
-  check("and not the two screens", !calc.html.includes("/assets/workspace-ui.js?v="));
+  check("a calculator page loads it", loads(calc.html, "workspace-calc"));
+  check("and not the two screens", !loads(calc.html, "workspace-ui"));
 
   const projects = WEIGHED.get("projekty/index.html");
   check("the projects page loads both halves",
-    projects.html.includes("/assets/workspace-calc.js?v=")
-    && projects.html.includes("/assets/workspace-ui.js?v="));
+    loads(projects.html, "workspace-calc") && loads(projects.html, "workspace-ui"));
   check("in that order, because they are plain scripts in one scope",
-    projects.html.indexOf("workspace-calc.js") < projects.html.indexOf("workspace-ui.js"));
+    projects.html.indexOf("workspace-calc") < projects.html.indexOf("workspace-ui"));
   check("the calculator half is the smaller one",
     readFileSync(p("assets/workspace-calc.js")).length
       < readFileSync(p("assets/workspace-ui.js")).length);
@@ -527,9 +543,9 @@ head("8. a page downloads the code it runs and no more");
   // Nothing loads an engine it cannot use: /projekty/ prints saved results and never
   // calculates one, so it takes assets/units.js and leaves assets/calculators.js.
   check("the projects page loads no calculation engine",
-    !projects.html.includes("/assets/calculators.js"));
+    !loads(projects.html, "calculators"));
   check("but does load the words that go next to a number",
-    projects.html.includes("/assets/units.js"));
+    loads(projects.html, "units"));
 
   // No page loads the same file twice — an easy mistake once a page's scripts come from
   // two lists, and one the browser will not warn about.

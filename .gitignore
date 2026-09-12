@@ -14,3 +14,6 @@ functions/node_modules/
 
 # Dziennik debugowania Firebase CLI — lokalny, zmienny, nikomu niepotrzebny w repo
 firebase-debug.log
+
+# Pamięć podręczna wdrożeń Firebase CLI — lokalna, odtwarzalna, nie należy do repo
+.firebase/

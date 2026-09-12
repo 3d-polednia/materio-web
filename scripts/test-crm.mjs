@@ -569,7 +569,7 @@ head("6. the frame the build writes, and the one link map behind it");
       html.includes(`"clients":"${urlClients(lang)}"`), urlClients(lang));
     check(`${lang}: and this language's quotes page`,
       html.includes(`"quotes":"${urlQuotes(lang)}"`), urlQuotes(lang));
-    check(`${lang}: the page loads assets/crm-chain.js`, html.includes("/assets/crm-chain.js"));
+    check(`${lang}: the page loads assets/crm-chain.js`, html.includes("/assets/crm-chain."));
   }
   check("the route the chapter has no page for still has no page", route("crm") === null
     || route("crm") === undefined, "there must be no `crm` route in src/ia.mjs");

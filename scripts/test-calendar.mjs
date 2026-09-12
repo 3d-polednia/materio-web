@@ -567,10 +567,10 @@ head("7. the page the build writes");
 
   // The script the page is served with, read out of the build rather than assumed.
   const build = readFileSync(p("scripts/build.mjs"), "utf8");
-  check("the page is served assets/schedule-ui.js", build.includes("/assets/schedule-ui.js"));
+  check("the page is served assets/schedule-ui.js", build.includes("/assets/schedule-ui."));
   const built = readFileSync(p(join(urlCalendar(DEFAULT_LANG), "index.html").replace(/^\//, "")), "utf8");
-  check("the written page loads it", built.includes("/assets/schedule-ui.js"));
-  check("and the store beside it", built.includes("/assets/crm.js"));
+  check("the written page loads it", built.includes("/assets/schedule-ui."));
+  check("and the store beside it", built.includes("/assets/crm."));
   check("the page is not noindex — it describes a Pro module in public",
     built.includes('name="robots" content="index, follow'), "robots");
 }

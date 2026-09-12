@@ -418,7 +418,7 @@ head("7. the ten pages the build wrote");
     check(`${lang}: the swap button says what it does`, html.includes(dict.conv_swap));
     check(`${lang}: the result box is a live region`,
       html.includes('data-conv-result role="status"'));
-    check(`${lang}: it loads the engine`, html.includes('src="/assets/converter.js'));
+    check(`${lang}: it loads the engine`, html.includes('src="/assets/converter.'));
 
     // The answer for the values the form opens with, computed by the same functions the
     // page then loads. Without it the page is an empty form to anybody running no script.

@@ -616,7 +616,9 @@ head("11. the calculator is a form, the navigation says where you are, the scrip
   checkAll("in the order they depend on", withScripts, (page) => {
     const srcs = tags(page).map((s) => attr(s, "src") || "");
     const at = (name) => srcs.findIndex((s) => s.includes(name));
-    const i18n = at("/assets/i18n."), main = at("/assets/main.js"), acc = at("/assets/account.js");
+    // The shipped names carry a .min before the extension since 2026-09-12, so the stem is
+    // what identifies a script here: /assets/main. matches both main.js and main.min.js.
+    const i18n = at("/assets/i18n."), main = at("/assets/main."), acc = at("/assets/account.");
     return i18n >= 0 && main > i18n && (acc < 0 || main > acc);
   }, (page) => page.url);
 }

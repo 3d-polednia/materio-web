@@ -417,8 +417,10 @@ head("6b. every selector the scripts query exists in the markup the build writes
   check("/app/ carries the checkout button", app.includes("data-pw-checkout"));
   check("and the plan slots it fills", app.includes('data-pw-plan="monthly"'));
   // The one file that may take money is the one that knows who is paying.
-  check("/app/ loads assets/pay.js", app.includes("assets/pay.js"));
-  check("the wall's page loads it too, for the price", wall.includes("assets/pay.js"));
+  // Either name: the build ships assets/pay.min.js and leaves assets/pay.js authored.
+  const loadsPay = (html) => html.includes("assets/pay.js") || html.includes("assets/pay.min.js");
+  check("/app/ loads assets/pay.js", loadsPay(app));
+  check("the wall's page loads it too, for the price", loadsPay(wall));
 
   /* The preview is gone from the shipped pages, not merely unused. A leftover switch
      would be a button wired to a function that no longer exists. */
