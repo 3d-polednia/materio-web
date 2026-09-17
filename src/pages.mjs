@@ -216,7 +216,7 @@ function homeHero(t) {
   const fact = (icon, text) =>
     `<span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${FACT_ICON[icon]}</svg><span>${esc(text)}</span></span>`;
 
-  return `<section class="hero" aria-labelledby="hero-h">
+  return `<section class="hero home-hero" aria-labelledby="hero-h">
   <div class="wrap">
    <div class="hero-copy">
     <h1 id="hero-h">${esc(t("hero_title"))}</h1>

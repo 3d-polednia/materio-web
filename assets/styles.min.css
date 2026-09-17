@@ -203,7 +203,7 @@
 --focus: var(--accent-strong);
 --focus-w: 2px;
 --focus-offset: 2px;
---maxw: 1160px;
+--maxw: 1600px;
 --gutter: var(--sp-5);
 --header-h: 64px;
 --section-y: clamp(48px, 6vw, 68px);
@@ -246,8 +246,15 @@ outline-offset: var(--focus-offset);
 }
 :disabled, [aria-disabled="true"] { cursor: not-allowed; opacity: .5; box-shadow: none; }
 [hidden] { display: none !important; }
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+.wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.wrap.full { max-width: none; padding-inline: 0; }
 .wrap.narrow { max-width: 760px; }
+.workspace-page header.site > .wrap,
+.workspace-page .page-head > .wrap,
+.workspace-page footer.site > .wrap {
+max-width: none; margin-inline: 0;
+}
+.workspace-page .page-head { text-align: left; }
 section.block { padding: var(--section-y) 0; }
 .block-fill { min-height: 60vh; min-height: 60dvh; display: flex; align-items: center; }
 .alt { background: var(--surface-alt); }
@@ -620,6 +627,8 @@ background: radial-gradient(70% 60% at 12% 0%, color-mix(in srgb, var(--accent-s
 .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: var(--sp-12); align-items: center; }
 .hero h1 { font-size: var(--fs-display); }
 .hero .hero-copy { max-width: 42rem; }
+.home-hero .hero-copy { margin-inline: auto; text-align: center; }
+.home-hero .trust { justify-content: center; }
 .hero p.lead { font-size: var(--fs-md); color: var(--muted); max-width: 44ch; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-7) 0 var(--sp-6); }
 .trust { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-7); margin-top: var(--sp-2); }
@@ -969,7 +978,7 @@ background: var(--surface);
 .pro-more { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 .app-shell { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
 @media (min-width: 900px) {
-.app-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
+.app-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: stretch; }
 }
 .app-side {
 display: flex; flex-direction: column; gap: var(--sp-5);
@@ -978,8 +987,9 @@ background: var(--surface); border-bottom: 1px solid var(--outline);
 }
 @media (min-width: 900px) {
 .app-side {
-position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto;
-padding: var(--sp-5) var(--sp-4);
+position: sticky; top: 0; align-self: stretch; min-height: 100vh; min-height: 100dvh;
+height: auto; overflow-y: auto;
+padding: var(--sp-5) var(--gutter);
 border-bottom: 0; border-right: 1px solid var(--outline);
 }
 }
@@ -1020,7 +1030,9 @@ padding-top: var(--sp-3); border-top: 1px solid var(--outline);
 .app-side-actions { margin-left: 0; }
 }
 .app-main { min-width: 0; flex: 1; padding: var(--sp-5) var(--gutter) var(--sp-10); }
-@media (min-width: 900px) { .app-main { padding: var(--sp-6) var(--sp-8) var(--sp-12); } }
+@media (min-width: 900px) {
+.app-main { padding-block: var(--sp-6) var(--sp-12); padding-inline: clamp(var(--sp-5), 2vw, var(--sp-10)); }
+}
 .app-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin: var(--sp-4) 0 var(--sp-6); }
 @media (min-width: 760px) { .app-stats { grid-template-columns: repeat(4, 1fr); } }
 .app-stat-card {
@@ -1350,6 +1362,14 @@ font-weight: var(--fw-semi); font-size: var(--fs-sm); background: var(--surface)
 .text-xs { font-size: var(--fs-xs); }
 .eyebrow { font-size: var(--fs-xs); font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: var(--track-wide); }
 .figure-line { font-size: var(--fs-base); font-weight: var(--fw-semi); }
+@media (min-width: 1280px) {
+.foot-product { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-5); }
+}
+@media (min-width: 1400px) {
+.dash-list-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-8); }
+.dash-list-grid .dash-sec { min-width: 0; }
+.app-main .data-list, .app-main .inline-form, .app-main .app-card { max-width: 1200px; }
+}
 @media (max-width: 1160px) {
 .nav, .nav-links { gap: var(--sp-2); }
 .nav-list { gap: 0; }

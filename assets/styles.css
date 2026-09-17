@@ -298,7 +298,9 @@
   --focus-w: 2px;
   --focus-offset: 2px;
 
-  --maxw: 1160px;
+  /* 1600px uses the useful middle of a 1920px screen while leaving the same page shell
+     recognisable on wider monitors; reading components keep their own measures below. */
+  --maxw: 1600px;
   --gutter: var(--sp-5);
   /* The header is sticky, so its height is also the offset an in-page anchor has to
      clear and the top edge the mobile drawer hangs from. One number, three uses. */
@@ -380,8 +382,20 @@ img, svg { max-width: 100%; }
    The page shell: one content width, one gutter, one vertical rhythm for a
    section. Everything else composes inside them. */
 
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+.wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+/* Workspaces already own their inner spacing, so this modifier lets their shell reach
+   both viewport edges without paying the public page gutter twice. */
+.wrap.full { max-width: none; padding-inline: 0; }
 .wrap.narrow { max-width: 760px; }
+/* The signed-in account is a full-bleed application canvas. Its surrounding chrome
+   follows that canvas instead of retaining the centred public-page measure, giving the
+   header, page title, sidebar and footer one viewport gutter down the whole page. */
+.workspace-page header.site > .wrap,
+.workspace-page .page-head > .wrap,
+.workspace-page footer.site > .wrap {
+  max-width: none; margin-inline: 0;
+}
+.workspace-page .page-head { text-align: left; }
 section.block { padding: var(--section-y) 0; }
 /* A section that has to fill the window even with two lines in it: /404/. */
 .block-fill { min-height: 60vh; min-height: 60dvh; display: flex; align-items: center; }
@@ -958,6 +972,8 @@ footer h2 {
 .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: var(--sp-12); align-items: center; }
 .hero h1 { font-size: var(--fs-display); }
 .hero .hero-copy { max-width: 42rem; }
+.home-hero .hero-copy { margin-inline: auto; text-align: center; }
+.home-hero .trust { justify-content: center; }
 .hero p.lead { font-size: var(--fs-md); color: var(--muted); max-width: 44ch; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-7) 0 var(--sp-6); }
 
@@ -1425,7 +1441,7 @@ a.chip:hover { text-decoration: none; }
    breakpoint .split-2 already uses for its own two-column switch. */
 .app-shell { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
 @media (min-width: 900px) {
-  .app-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: start; }
+  .app-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); align-items: stretch; }
 }
 
 .app-side {
@@ -1435,8 +1451,11 @@ a.chip:hover { text-decoration: none; }
 }
 @media (min-width: 900px) {
   .app-side {
-    position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto;
-    padding: var(--sp-5) var(--sp-4);
+    position: sticky; top: 0; align-self: stretch; min-height: 100vh; min-height: 100dvh;
+    height: auto; overflow-y: auto;
+    /* The full-width shell begins at the viewport edge; the shared gutter keeps the
+       26px logo and the navigation aligned with public-page chrome instead of the glass. */
+    padding: var(--sp-5) var(--gutter);
     border-bottom: 0; border-right: 1px solid var(--outline);
   }
 }
@@ -1485,7 +1504,11 @@ a.chip:hover { text-decoration: none; }
 }
 
 .app-main { min-width: 0; flex: 1; padding: var(--sp-5) var(--gutter) var(--sp-10); }
-@media (min-width: 900px) { .app-main { padding: var(--sp-6) var(--sp-8) var(--sp-12); } }
+@media (min-width: 900px) {
+  /* 2vw lets the canvas breathe as the monitor grows; --sp-5 and --sp-10 are the
+     measured floor and ceiling, so neither a compact laptop nor 4K wastes space. */
+  .app-main { padding-block: var(--sp-6) var(--sp-12); padding-inline: clamp(var(--sp-5), 2vw, var(--sp-10)); }
+}
 
 /* Przegląd's stat tiles — the site's one "big number" component, same tokens .dash-fig
    already uses for a trailing figure so the two read as the same family. */
@@ -2008,11 +2031,29 @@ a.chip:hover { text-decoration: none; }
 .figure-line { font-size: var(--fs-base); font-weight: var(--fw-semi); }
 
 /* ========================================================== 8. RESPONSIVE
-   Five widths, no more: 560 (phone), 760 (large phone / small tablet), 900 (the
-   desktop layout), 1060 (the header row, which needs more room than the layout does)
-   and 1160 (the content width, held by --maxw). Mobile-first is the
-   rule — these blocks take things away above the phone layout only where a
-   component genuinely needs a second arrangement. */
+   Eight measured widths, no more: 560 (phone), 760 (large phone / small tablet), 900
+   (the desktop layout), 1060 (the header row), 1160 (the last header-tightening step),
+   1280 (enough room for two useful product link columns), 1400 (two complete list
+   panels), and 1600 (the public content cap held by --maxw). Mobile-first is the rule —
+   these blocks add room or take things away only where a component genuinely needs a
+   second arrangement. */
+
+/* At 1280px the product list's thirteen links make one conspicuously tall footer column,
+   while two columns still leave roughly 160px per link column after the brand and the
+   other navigation groups have taken their share. */
+@media (min-width: 1280px) {
+  .foot-product { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-5); }
+}
+
+/* A 1400px viewport leaves about 1200px inside a public wrapper after gutters: enough
+   for two self-contained dashboard panels without turning a label and its action into
+   opposite ends of the screen. The account workspace is wider because its shell is
+   uncapped, so its row-based panels stop at that same 1200px working measure. */
+@media (min-width: 1400px) {
+  .dash-list-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-8); }
+  .dash-list-grid .dash-sec { min-width: 0; }
+  .app-main .data-list, .app-main .inline-form, .app-main .app-card { max-width: 1200px; }
+}
 
 /* Between the content width and the drawer the header row has no slack: the links give
    up their side padding before anything is taken away. Measured in German when there

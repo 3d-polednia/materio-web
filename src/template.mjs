@@ -595,7 +595,7 @@ export function siteFooter(f) {
       </div>
       <div>
         <h2>${esc(t("foot_product"))}</h2>
-        <ul>
+        <ul class="foot-product">
           ${column("product")}
           <li><a href="${urlHome(lang)}#faq">FAQ</a></li>
         </ul>

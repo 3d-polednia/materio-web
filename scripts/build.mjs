@@ -1777,6 +1777,7 @@ function buildPrivatePages() {
 
   write("app/index.html", page({
     ...common,
+    bodyClass: "workspace-page",
     title: `${t("app_title")} — LiczMat`,
     description: t("app_lead"),
     path: URL_APP,

@@ -272,11 +272,10 @@ export function appMain(t, features) {
            below it of room — see the note on #app-workspace's own class. -->
     </div>
 
-    <!-- The signed-in shell gets the site's normal content width (--maxw, 1160px), not
-         the 760px reading column above: a sidebar plus a month grid needs the room a
-         one-column sign-in form never did. 2026-09-03, after the owner reported the
-         sidebar redesign rendering squeezed into that narrow column. -->
-    <div id="app-workspace" class="wrap" hidden>
+    <!-- The signed-in shell reaches the viewport edges: it is an application canvas,
+         not a reading column. Its sidebar and main panel supply their own measured
+         padding, and row-based content keeps a separate working measure in CSS. -->
+    <div id="app-workspace" class="wrap full" hidden>
       <div class="app-shell">
           <aside class="app-side">
             <div class="app-side-brand">
@@ -764,9 +763,12 @@ export function dashboardMain(t) {
         </ul>
       </section>
 
-      ${section("projects", "dash_projects_t", "dash_projects_all", "projects", "data-list")}
-
-      ${section("recent", "dash_recent_t", "dash_recent_all", "estimate", "data-list")}
+      <!-- At wide-screen width these two equally weighted lists become columns instead
+           of stretching individual rows across the whole public content cap. -->
+      <div class="dash-list-grid">
+        ${section("projects", "dash_projects_t", "dash_projects_all", "projects", "data-list")}
+        ${section("recent", "dash_recent_t", "dash_recent_all", "estimate", "data-list")}
+      </div>
 
       <section class="dash-sec" aria-labelledby="dash-tools-h">
         <div class="dash-head">
