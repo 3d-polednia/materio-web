@@ -173,7 +173,7 @@ function omuHistLabel() {
 
 /** One material: what it is, what it costs, its history, and the two things you can do to it. */
 function omuRow(m) {
-  return `<article class="card omat-row" data-omat-row="${omuEsc(m.id)}">
+  return `<article class="card omat-row hierarchy-l1" data-omat-row="${omuEsc(m.id)}">
     <h3>${omuEsc(m.name)}</h3>
     <p class="muted">${omuEsc(omuAppLabel(m.application))}</p>
     <p class="muted omat-spec">${omuEsc(omuSpec(m))}</p>
@@ -187,7 +187,7 @@ function omuRow(m) {
       </label>
       <button type="button" class="btn btn-ghost btn-sm" data-omat-save-price>${omuEsc(omuT("omat_price_set"))}</button>
     </p>
-    <details class="omat-hist-box">
+    <details class="omat-hist-box hierarchy-l2">
       <summary>${omuEsc(omuHistLabel())}</summary>
       ${omuHistory(m.id)}
     </details>

@@ -810,17 +810,17 @@ export function materialsMain(lang, t, cat, aisles, copy) {
     const body = groups.map((g) => {
       // A term with one size behind it is a row, not a drawer. Wrapping it would cost a
       // click to reach a single line and would say "1" beside every other heading.
-      if (g.items.length === 1) return `<ul class="mat-page-list mat-solo">${row(g.items[0], aisleName)}</ul>`;
-      return `<details class="mat-grp" data-grp>
+      if (g.items.length === 1) return `<ul class="mat-page-list mat-solo hierarchy-leaves">${row(g.items[0], aisleName)}</ul>`;
+      return `<details class="mat-grp hierarchy-l2" data-grp>
             <summary class="mat-grp-head">
               <h3>${esc(t(g.term))}</h3>
               ${badge(g.items.length)}
             </summary>
-            <ul class="mat-page-list">${g.items.map((m) => row(m, aisleName)).join("")}</ul>
+            <ul class="mat-page-list hierarchy-leaves">${g.items.map((m) => row(m, aisleName)).join("")}</ul>
           </details>`;
     }).join("\n          ");
 
-    return `<details class="mat-cat" id="cat-${aisle}" data-cat-details data-cat-block>
+    return `<details class="mat-cat hierarchy-l1" id="cat-${aisle}" data-cat-details data-cat-block>
           <summary class="mat-cat-head">
             <h2>${esc(t(`cat_${aisle}`))}</h2>
             ${badge(total)}
@@ -2700,7 +2700,7 @@ export function estimateMain(lang, t, features = []) {
 
       ${gate}
 
-      <article id="ws-estimate" class="ws-estimate">
+      <article id="ws-estimate" class="ws-estimate hierarchy-l1">
         <header class="ws-estimate-head">
           <div>
             <p class="ws-estimate-brand">LiczMat</p>

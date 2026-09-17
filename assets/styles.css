@@ -1250,6 +1250,7 @@ a.chip:hover { text-decoration: none; }
 .mat-cat {
   background: var(--surface); border: 1px solid var(--outline);
   border-radius: var(--radius-sm); box-shadow: var(--shadow-2); overflow: hidden;
+  border-inline-start: 4px solid var(--accent);
 }
 .mat-cat-head, .mat-grp-head {
   cursor: pointer; list-style: none; display: flex; align-items: center;
@@ -1267,6 +1268,7 @@ a.chip:hover { text-decoration: none; }
 .mat-grp {
   background: var(--surface-alt); border: 1px solid var(--outline);
   border-radius: var(--radius-xs); overflow: hidden;
+  border-inline-start: 1px solid var(--outline);
 }
 .mat-grp-head { padding: var(--sp-3) var(--sp-4); }
 .mat-grp-head h3 { margin: 0; font-size: var(--fs-base); }
@@ -1278,9 +1280,15 @@ a.chip:hover { text-decoration: none; }
 .mat-tools { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-3) 0 0; }
 .mat-add summary { cursor: pointer; font-weight: var(--fw-semi); }
 .mat-add { margin-bottom: var(--sp-4); }
-.mat-page-list { display: grid; gap: var(--sp-2); }
+.mat-page-list { display: grid; gap: 0; }
 .mat-page-list li { justify-content: space-between; gap: var(--sp-4); scroll-margin-top: calc(var(--header-h) + var(--sp-4)); }
+.mat-page-list li {
+  background: none; border: 0; border-radius: 0; font-weight: 400;
+  padding-inline: var(--sp-3);
+}
+.mat-page-list li + li { border-top: 1px solid var(--outline); }
 .mat-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mat-item b { font-weight: 400; }
 .mat-item .muted { font-size: var(--fs-sm); }
 .mat-page-list .btn { flex: none; }
 #materials-page .mat-search { width: 100%; margin: 0; max-width: 460px; }
@@ -1752,6 +1760,56 @@ a.chip:hover { text-decoration: none; }
 .ws-estimate-total { display: flex; justify-content: space-between; gap: var(--sp-4); margin-top: var(--sp-4); font-size: var(--fs-md); font-weight: var(--fw-black); }
 .ws-estimate-foot { font-size: var(--fs-xs); margin-top: var(--sp-4); }
 
+/* ---------- Nested hierarchy
+   A parent owns the accent rail. Its section or form uses the quieter alternate surface.
+   Children are rows, not smaller copies of the parent card. Logical edges keep the same
+   reading order in every language, and the compact phone inset cannot force overflow. */
+.hierarchy-l1,
+.ws-project {
+  border-inline-start: 4px solid var(--accent);
+}
+.ws-project {
+  background: var(--surface); border-block: 1px solid var(--outline);
+  border-inline-end: 1px solid var(--outline); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2); padding: var(--sp-5);
+}
+.ws-project .dash-sec,
+.hierarchy-l2 {
+  background: var(--surface-alt); border: 1px solid var(--outline);
+  border-inline-start: 1px solid var(--outline); border-radius: var(--radius-xs);
+  padding: var(--sp-4);
+}
+.ws-project .dash-sec { margin-top: var(--sp-5); }
+.ws-project .dash-sec .data-list,
+.app-rooms .data-list { margin: 0; }
+.ws-project .dash-sec .data-list li:not(.empty),
+.app-rooms .data-list li:not(.empty) {
+  background: none; border: 0; border-radius: 0; font-weight: 400;
+  margin: 0; padding-inline: var(--sp-2);
+}
+.ws-project .dash-sec .data-list li:not(.empty) + li:not(.empty),
+.app-rooms .data-list li:not(.empty) + li:not(.empty) { border-top: 1px solid var(--outline); }
+.data-list li.app-project {
+  background: var(--surface); border: 1px solid var(--outline);
+  border-inline-start: 4px solid var(--accent); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2); padding: var(--sp-4);
+}
+.app-rooms { margin-top: var(--sp-3); }
+.app-rooms .hierarchy-child-form {
+  border-top: 1px solid var(--outline); margin-top: var(--sp-3); padding-top: var(--sp-3);
+}
+.omat-row.hierarchy-l1 { border-inline-start: 4px solid var(--accent); }
+.omat-row .omat-hist-box { margin-inline: 0; }
+.omat-row .omat-hist { margin-inline: 0; }
+.omat-row .omat-hist li { background: none; border: 0; border-radius: 0; }
+.omat-row .omat-hist li + li { border-top: 1px solid var(--outline); }
+.ws-estimate.hierarchy-l1 { border-inline-start: 4px solid var(--accent); }
+.ws-estimate .ws-table-scroll {
+  background: var(--surface-alt); border: 1px solid var(--outline);
+  border-inline-start: 1px solid var(--outline); border-radius: var(--radius-xs);
+  padding-inline: var(--sp-2);
+}
+
 /* An estimate line opened for correction: the cells become inputs in place, so the
    row keeps its position and the table keeps its column widths. */
 .ws-row-actions { display: flex; gap: var(--sp-2); justify-content: flex-end; }
@@ -2198,6 +2256,10 @@ a.chip:hover { text-decoration: none; }
 
 @media (max-width: 560px) {
   :root { --gutter: var(--sp-4); }
+
+  .ws-project { padding: var(--sp-3); }
+  .ws-project .dash-sec, .hierarchy-l2 { padding: var(--sp-3); }
+  .data-list li.app-project { padding: var(--sp-3); }
 
   .features { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr; }
