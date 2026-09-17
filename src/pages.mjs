@@ -820,9 +820,7 @@ export function materialsMain(lang, t, cat, aisles, copy) {
           </details>`;
     }).join("\n          ");
 
-    return `<section class="block" data-cat-block>
-      <div class="wrap">
-        <details class="mat-cat" id="cat-${aisle}" data-cat-details>
+    return `<details class="mat-cat" id="cat-${aisle}" data-cat-details data-cat-block>
           <summary class="mat-cat-head">
             <h2>${esc(t(`cat_${aisle}`))}</h2>
             ${badge(total)}
@@ -830,9 +828,7 @@ export function materialsMain(lang, t, cat, aisles, copy) {
           <div class="mat-groups">
           ${body}
           </div>
-        </details>
-      </div>
-    </section>`;
+        </details>`;
   }).join("\n  ");
 
   const main = `<main id="main" tabindex="-1">
@@ -858,7 +854,11 @@ export function materialsMain(lang, t, cat, aisles, copy) {
         <p class="muted" id="matpage-empty" hidden>${esc(t("mat_none"))}</p>
       </div>
     </section>
-    ${blocks}
+    <section class="block">
+      <div class="wrap mat-cat-list">
+        ${blocks}
+      </div>
+    </section>
   </div>
 
   ${ownMaterialsBlock(t, aisles, c)}

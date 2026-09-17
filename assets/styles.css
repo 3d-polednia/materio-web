@@ -1246,6 +1246,7 @@ a.chip:hover { text-decoration: none; }
    The tree is what a shop aisle looks like — the aisle, then the kind of material, then
    the sizes — and the page opens with all of it shut, so 160 rows are a list of fifteen
    headings until somebody asks for one. */
+.mat-cat-list { display: grid; gap: var(--sp-3); }
 .mat-cat {
   background: var(--surface); border: 1px solid var(--outline);
   border-radius: var(--radius-sm); box-shadow: var(--shadow-2); overflow: hidden;
@@ -2261,3 +2262,49 @@ a.chip:hover { text-decoration: none; }
 .pdf-doc .pdf-pricing dt, .pdf-doc .pdf-pricing dd { margin: 0; }
 .pdf-doc .pdf-strong { font-weight: var(--fw-bold); }
 .pdf-doc .pdf-foot { color: var(--muted); margin-top: var(--sp-5); }
+/* The navigation link weight is the smallest step that lets its primary button keep readable accent ink. */
+.nav-links a.btn-primary {
+  color: var(--on-accent);
+}
+
+/* The purchase button no longer has a colour of its own; the large control step marks the primary action. */
+.btn-buy {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent-edge);
+  /* min-height, not height: .btn sizes itself this way so a label that wraps — Romanian and
+     Ukrainian both do — grows the button instead of spilling out of it. */
+  min-height: var(--control-h-lg);
+}
+
+/* The stronger brand green preserves the one-green rule when the purchase action is hovered. */
+.btn-buy:hover {
+  background: var(--accent-strong);
+}
+
+/* Counts belong beside their headings, while the disclosure marker keeps the far edge to itself. */
+.mat-cat-head,
+.mat-grp-head {
+  justify-content: flex-start;
+}
+
+/* Auto inline space moves only the marker, so its open rotation remains untouched. */
+.mat-cat-head::after,
+.mat-grp-head::after {
+  margin-inline-start: auto;
+}
+
+/* The soft accent pill joins each tabular count to the name it measures without shouting over it. */
+.mat-count {
+  background: var(--accent-soft);
+  color: var(--on-accent-soft);
+  border-radius: var(--radius-pill);
+  padding-inline: calc(var(--fs-sm) / 2);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Account totals use the same accent as marketing totals because both answer “how many”. */
+.app-stat-card .val {
+  color: var(--accent);
+}

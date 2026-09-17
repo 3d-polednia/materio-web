@@ -829,6 +829,7 @@ font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--accent-strong
 background: var(--accent-soft); border-radius: var(--radius-xs);
 padding: var(--sp-2) var(--sp-3); margin: 0 0 var(--sp-3);
 }
+.mat-cat-list { display: grid; gap: var(--sp-3); }
 .mat-cat {
 background: var(--surface); border: 1px solid var(--outline);
 border-radius: var(--radius-sm); box-shadow: var(--shadow-2); overflow: hidden;
@@ -1501,3 +1502,34 @@ display: flex; justify-content: space-between; gap: var(--sp-3); padding: var(--
 .pdf-doc .pdf-pricing dt, .pdf-doc .pdf-pricing dd { margin: 0; }
 .pdf-doc .pdf-strong { font-weight: var(--fw-bold); }
 .pdf-doc .pdf-foot { color: var(--muted); margin-top: var(--sp-5); }
+.nav-links a.btn-primary {
+color: var(--on-accent);
+}
+.btn-buy {
+background: var(--accent);
+color: var(--on-accent);
+border-color: var(--accent-edge);
+min-height: var(--control-h-lg);
+}
+.btn-buy:hover {
+background: var(--accent-strong);
+}
+.mat-cat-head,
+.mat-grp-head {
+justify-content: flex-start;
+}
+.mat-cat-head::after,
+.mat-grp-head::after {
+margin-inline-start: auto;
+}
+.mat-count {
+background: var(--accent-soft);
+color: var(--on-accent-soft);
+border-radius: var(--radius-pill);
+padding-inline: calc(var(--fs-sm) / 2);
+font-size: var(--fs-sm);
+font-variant-numeric: tabular-nums;
+}
+.app-stat-card .val {
+color: var(--accent);
+}
