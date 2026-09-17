@@ -37,6 +37,39 @@ W strefie DNS `liczmat.com` w panelu OVH **zostają nietknięte**:
 nie dopisany do apeksu i nie jako drugi `v=spf1` obok istniejącego. Dwa rekordy SPF na
 jednej nazwie to SPF nieważny dla obu nadawców naraz.
 
+## Stan na 2026-09-17 — weryfikacja domeny nadawcy stoi
+
+Żona założyła konto 2026-09-16 wieczorem i dostała mail weryfikacyjny. Temat i nadawca
+były już poprawne („LiczMat"), ale **link prowadził na
+`https://materio-502513.firebaseapp.com/__/auth/action`** — bo `callbackUri` nigdy nie
+został przełączony.
+
+Odczyt `admin/v2/projects/materio-502513/config` z tego dnia:
+
+```
+callbackUri                   https://materio-502513.firebaseapp.com/__/auth/action
+pendingCustomDomain           auth.liczmat.com
+customDomainState             IN_PROGRESS
+domainVerificationRequestTime 2026-09-11T19:40:55Z
+```
+
+Sześć dni przy deklarowanym limicie 48 godzin. Po naszej stronie nie brakuje niczego —
+sprawdzone tego dnia przez `8.8.8.8`: `auth` A `199.36.158.100`, oba TXT (`v=spf1
+include:_spf.firebasemail.com ~all` i `firebase=materio-502513`), oba CNAME-y DKIM,
+a ich cele rozwiązują się do żywych kluczy `v=DKIM1`. `_dmarc.liczmat.com` na miejscu.
+`https://auth.liczmat.com/__/auth/action` i `/__/firebase/init.json` oddają 200,
+certyfikat waży się poprawnie. Blokuje sama weryfikacja po stronie Google.
+
+Wnioski, które wynikają z tego stanu:
+
+1. **Link i adres nadawcy to dwie osobne sprawy.** `callbackUri` nie zależy od
+   `customDomainState` — subdomena już obsługuje `/__/auth/action`, więc link można
+   przełączyć, zanim Firebase cokolwiek zweryfikuje. Kody `oobCode` wysłane spod starej
+   domeny dalej zadziałają: waliduje je serwer projektu, nie host strony.
+2. **Adresu Od nie da się ruszyć z terminala, dopóki stan nie jest `VERIFIED`** — patrz
+   niżej, cztery z pięciu pól `DnsInfo` są output only. Zawieszony przebieg resetuje się
+   tylko w konsoli: usunąć wiszącą domenę nadawcy i zgłosić ją ponownie.
+
 ## Stan na 2026-09-12
 
 **Wszystkie rekordy są na miejscu. Zostało jedno: poczekać, aż Firebase zweryfikuje
