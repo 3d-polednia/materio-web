@@ -428,6 +428,7 @@ async function onSignedIn(user) {
   state.user = user;
   $("app-auth").hidden = true;
   $("app-workspace").hidden = false;
+  document.body.classList.add("app-signed-in");
 
   // A Google account has no password to change, and its e-mail belongs to Google.
   const password = hasPasswordProvider(user);
@@ -497,6 +498,7 @@ function onSignedOut() {
   state.rooms = [];
   $("app-auth").hidden = false;
   $("app-workspace").hidden = true;
+  document.body.classList.remove("app-signed-in");
   unmountAdmin();
   showAuthView("signin");
 }

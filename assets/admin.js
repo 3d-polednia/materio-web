@@ -138,8 +138,8 @@ export async function mountAdmin({ app }) {
   // The sidebar nav. A wrong selector here is silent because mountAdmin() 
   // returns on null, leaving the real admin without a panel.
   const strip = document.querySelector(".app-nav");
-  const workspace = document.getElementById("app-workspace");
-  if (!strip || !workspace) return;
+  const main = document.querySelector("#app-workspace .app-main");
+  if (!strip || !main) return;
 
   const tab = document.createElement("button");
   tab.type = "button";
@@ -161,7 +161,7 @@ export async function mountAdmin({ app }) {
   panel.tabIndex = 0;
   panel.hidden = true;
   panel.innerHTML = PANEL;
-  workspace.appendChild(panel);
+  main.appendChild(panel);
 
   const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
   const callable = httpsCallable(getFunctions(app, REGION), "adminPlan");
