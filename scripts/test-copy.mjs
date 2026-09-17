@@ -489,8 +489,12 @@ const BUDGET = {
      account went the other way — from 850 to 470 — because of the tablist rule below:
      /app/ is twelve panels behind one address, and what a reader meets is the chrome plus
      ONE of them. The document is 1501 words and DOCUMENT is what holds that number down;
-     460 is the chrome (283) plus the widest panel (the profile, 176), rounded up. */
-  "liczmat-pro": 477, account: 460, dashboard: 130, share: 40, privacy: 3820,
+     460 was the chrome (283) plus the widest panel (the profile, 176), rounded up.
+
+     465 since 2026-09-17: the Google sign-in button is back on the sign-in card
+     (GOOGLE_SIGN_IN in src/app-pages.mjs), and the separator and the button label are
+     the words the budget did not carry while the button was hidden. */
+  "liczmat-pro": 477, account: 465, dashboard: 130, share: 40, privacy: 3820,
 };
 
 /**

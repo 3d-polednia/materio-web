@@ -239,11 +239,10 @@ head("8. /app/ carries the account system in every language");
   has('id="signup-form"', "sign-up is its own form");
   has('id="reset-form"', "resetting has its own form, and its own e-mail field");
   has('id="reset-email"', "which is where the address goes");
-  // Hidden on the owner's word (2026-08-14): GOOGLE_SIGN_IN in src/app-pages.mjs. The page
-  // must offer no way in through Google at all, so the button is absent rather than styled
-  // out of sight — an element that is only invisible is still clickable from a script.
-  hasNot('id="auth-google"', "Google sign-in is not offered");
-  hasNot('id="auth-google-box"', "and neither is the separator above it");
+  // Back on the owner's word (2026-09-17): GOOGLE_SIGN_IN in src/app-pages.mjs emits
+  // the Google sign-in markup into the page.
+  has('id="auth-google"', "Google sign-in is offered");
+  has('id="auth-google-box"', "and so is the separator above it");
   has('id="app-signout"', "signing out is still there");
   has('id="prof-signout"', "and again in the profile");
   has('data-panel="profile"', "the profile is a panel of its own");
