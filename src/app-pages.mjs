@@ -515,6 +515,13 @@ export function appMain(t, features) {
                    buttons are refused until it is cleared — the text is written by the
                    script, because it is the script that knows. -->
               <p id="app-sync-foreign" class="result show err" role="status" hidden></p>
+              <div id="app-sync-unclaimed" class="result show err" role="status" hidden>
+                ${i("app_sync_unclaimed", "p")}
+                <p class="ws-links">
+                  <button type="button" id="app-sync-claim-mine" class="btn btn-primary btn-sm" data-i18n="app_sync_claim_mine">${esc(t("app_sync_claim_mine"))}</button>
+                  <button type="button" id="app-sync-claim-empty" class="btn btn-ghost btn-sm" data-i18n="app_sync_claim_empty">${esc(t("app_sync_claim_empty"))}</button>
+                </p>
+              </div>
               <p class="ws-links">
                 <button type="button" id="app-sync-push" class="btn btn-primary btn-sm" data-i18n="app_sync_push">${esc(t("app_sync_push"))}</button>
                 <button type="button" id="app-sync-pull" class="btn btn-ghost btn-sm" data-i18n="app_sync_pull">${esc(t("app_sync_pull"))}</button>

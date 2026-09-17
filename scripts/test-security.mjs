@@ -122,7 +122,8 @@ function loadApp(store) {
   // theirs, and it must not travel into the next person's account either.
   return new Function("document", "localStorage", "window", "crypto", "CustomEvent",
     `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${read("assets/own-materials.js")}\n${src}\nreturn {
-       pathId, foreignWorkspace, syncAccount, setSyncAccount, state, SYNC_ACCOUNT_KEY,
+       pathId, foreignWorkspace, unclaimedWorkspace, localCounts, syncAccount, setSyncAccount,
+       state, SYNC_ACCOUNT_KEY,
        lmSafeNext, lmAuthMode, lmSignupUrl, lmReadLevel, lmLevelOf, LM_LEVEL,
      };`)(document, localStorage, {}, { getRandomValues: (a) => a }, function CustomEvent() {});
 }
@@ -347,10 +348,14 @@ head("6. izolacja danych: one account's copy on a device two people use");
     return app;
   };
 
-  // Nothing stamped: the rows are this visitor's own guest work, which is what the sync
-  // tab exists for. Both directions stay open.
+  // Nothing stamped: the rows may belong to anybody who used this browser. They are not
+  // called foreign, but form the third, unclaimed state and require an explicit choice.
   eq("an unstamped workspace is nobody else's",
     signedIn({ "materio-workspace-v1": workspace(true) }, UID_A).foreignWorkspace(), false);
+  eq("an unstamped non-empty workspace is unclaimed",
+    signedIn({ "materio-workspace-v1": workspace(true) }, UID_A).unclaimedWorkspace(), true);
+  eq("an unstamped empty workspace stays silent",
+    signedIn({ "materio-workspace-v1": workspace(false) }, UID_A).unclaimedWorkspace(), false);
 
   eq("a workspace stamped with this account is not foreign",
     signedIn({ "materio-workspace-v1": workspace(true), "liczmat-sync-account": UID_A },
@@ -373,6 +378,19 @@ head("6. izolacja danych: one account's copy on a device two people use");
     signedIn({ "liczmat-crm-v1": crm(true), "liczmat-sync-account": UID_A }, UID_B)
       .foreignWorkspace(), true);
 
+  const materials = JSON.stringify({ materials: [{ id: "m-1", name: "Cement", updatedAt: 1 }] });
+  eq("an own-materials store alone is enough to refuse",
+    signedIn({ "liczmat-materials-v1": materials, "liczmat-sync-account": UID_A }, UID_B)
+      .foreignWorkspace(), true);
+
+  const tombstones = JSON.stringify({
+    projects: [{ id: "p1", name: "", deletedAt: 2, updatedAt: 2 }],
+    rooms: [], estimations: [], shoppingItems: [],
+  });
+  const tombstoneApp = signedIn({ "materio-workspace-v1": tombstones, "liczmat-sync-account": UID_A }, UID_B);
+  eq("a tombstone alone is enough to refuse", tombstoneApp.foreignWorkspace(), true);
+  eq("but tombstones stay out of the visible count", tombstoneApp.localCounts().projects, 0);
+
   eq("an empty workspace holds nobody's data",
     signedIn({ "materio-workspace-v1": workspace(false), "liczmat-sync-account": UID_A },
       UID_B).foreignWorkspace(), false);
@@ -382,9 +400,11 @@ head("6. izolacja danych: one account's copy on a device two people use");
       .foreignWorkspace(), false);
 
   const app = lf("assets/app.js");
-  check("the stamp is written after a push",
-    /setSyncAccount\(state\.uid\);\s*\n\s*renderLocalSummary\(\);\s*\n\s*status\(T\("app_sync_pushed"\)\)/.test(app));
-  /* The pull writes EVERY store before it stamps, and the push sends every one before it:
+  check("the stamp write is verified by reading it back",
+    /return syncAccount\(\) === \(uid \|\| ""\)/.test(app));
+  /* The pull writes EVERY store before it stamps. A push stamps before its first write so
+     an interrupted upload cannot leave an apparently unclaimed browser. Both directions
+     still reach every store:
      the workspace, the Pro store (session 46) and the visitor's own materials (session 59).
      A stamp written part-way through would name an account only some of the rows here came
      from, which is the whole thing this key exists to prevent.
@@ -425,24 +445,24 @@ head("6. izolacja danych: one account's copy on a device two people use");
   check("the Pro store is pushed by the same call", pushAll.includes("await pushProWorkspace("));
   check("the own materials are pushed by it too", pushAll.includes("await pushOwnMaterials("));
 
-  // Half two: the stamp is downstream of that one call, on both buttons and at sign-in.
-  const PULL_STAMP = 'setSyncAccount(state.uid);\n      status(T("app_sync_pulled"));';
-  const PUSH_STAMP = 'setSyncAccount(state.uid);\n      renderLocalSummary();\n      status(T("app_sync_pushed"));';
+  // Half two: pulls stamp after all imports; pushes stamp before their first remote write.
+  const PULL_STAMP = 'if (!setSyncAccount(uid)) throw new Error("sync stamp failed");';
+  const PUSH_STAMP = 'if (!setSyncAccount(uid)) throw new Error("sync stamp failed");';
   const pushClick = handler("push"), pullClick = handler("pull");
-  check("the push button stamps only after the push", before("await syncPushAll();", PUSH_STAMP, pushClick));
-  check("and the pull button only after the pull", before("await syncPullAll();", PULL_STAMP, pullClick));
+  check("the push button stamps before the push", before(PUSH_STAMP, "await syncPushAll(uid);", pushClick));
+  check("and the pull button only after the pull", before("await syncPullAll(uid);", PULL_STAMP, pullClick));
   /* A browser that refused the write — a private window, a full quota — is told so and is
      NOT stamped: the account name would claim rows this device never received. */
   check("a refused pull is not stamped",
     before('if (!ok) { status(T("ws_save_failed"), true); return; }', PULL_STAMP, pullClick));
   // The same order at sign-in, where nobody pressed anything.
   const auto = fn("autoReconcile");
-  check("sign-in pulls, pushes, then stamps",
-    before("await syncPullAll();", "await syncPushAll();", auto)
-    && before("await syncPushAll();", "setSyncAccount(state.uid);", auto));
-  check("and a foreign workspace never reaches any of it", auto.includes("if (foreignWorkspace()) return;"));
+  check("sign-in pulls, stamps, then pushes",
+    before("await syncPullAll(uid);", "setSyncAccount(uid)", auto)
+    && before("setSyncAccount(uid)", "await syncPushAll(uid);", auto));
+  check("and a blocked workspace never reaches any of it", auto.includes("blockedWorkspace()) return;"));
   check("both buttons check it themselves, not only through `disabled`",
-    (app.match(/if \(foreignWorkspace\(\)\) \{ status\(T\("app_sync_foreign"\), true\); return; \}/g) || []).length === 2);
+    (app.match(/if \(blockedWorkspace\(\)\)/g) || []).length >= 2);
   check("and the summary is what disables them",
     /\["app-sync-push", "app-sync-pull"\]\.forEach/.test(app));
 
@@ -466,6 +486,7 @@ head("7. API: every address this site builds");
   for (const path of paths) {
     check(`${path} stays inside this account`,
       path.startsWith('"users", user.uid') || path.startsWith('"users", state.uid')
+      || path.startsWith('"users", uid')
       || path.startsWith('"sharedProjects"'));
   }
   check("no query reaches across accounts",
@@ -513,7 +534,7 @@ head("7. API: every address this site builds");
 head("8. API: the fields a browser may not write");
 {
   const app = read("assets/app.js");
-  const profile = app.slice(app.indexOf('const profile = fb.doc(db, "users", user.uid)'),
+  const profile = app.slice(app.indexOf('const profile = fb.doc(db, "users", uid)'),
     app.indexOf("listenProfile();"));
   check("the profile update writes lastSeenAt and appVersion, and nothing else",
     /updateDoc\(profile, \{ lastSeenAt: now, appVersion: "web" \}\)/.test(profile));
@@ -689,7 +710,8 @@ head("11. izolacja danych: the way to empty a shared device");
   // The copy exists in all thirteen languages, or somebody is offered a key to click.
   const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
   const KEYS = ["app_wipe", "app_wipe_d", "app_wipe_btn", "app_wipe_confirm", "app_wipe_done",
-    "app_sync_foreign", "ck_p_sync_account"];
+    "app_sync_foreign", "app_sync_unclaimed", "app_sync_claim_mine", "app_sync_claim_empty",
+    "ck_p_sync_account"];
   const codes = Object.keys(I18N_PAGES);
   eq("thirteen languages", codes.length, LANGS.length);
   for (const lang of codes) {

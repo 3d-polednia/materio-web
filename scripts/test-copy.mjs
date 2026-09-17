@@ -505,14 +505,15 @@ const BUDGET = {
  * document twice the size with every panel still inside its ceiling. So a tabbed page is
  * measured twice — the visible page against BUDGET, the whole file against this.
  *
- * 1510 is the 1501 it measures today. Four of the twelve panels are Pro modules and each
+ * 1534 is the 1501 it measured before the 33-word unclaimed-workspace security choice.
+ * Four of the twelve panels are Pro modules and each
  * one carries chapter XXV's wall in full, which is some 145 words of module list and price
  * written four times over. That is deliberate, and it is NOT the /projekty/ case: the two
  * walls on /projekty/ stand on screen together, so the second is drawn brief, while on
  * /app/ a visitor who opens Wyceny and nothing else has to be told the price there or not
  * at all.
  */
-const DOCUMENT = { account: 1510 };
+const DOCUMENT = { account: 1534 };
 
 /** Every shipped page, with the route that produced it. */
 const PAGES = [];
