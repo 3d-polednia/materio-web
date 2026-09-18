@@ -470,8 +470,14 @@ const BUDGET = {
      the twelve other languages were unwritten, so the French number in it is an estimate
      of a page that did not exist yet. It ships now and it is 856 — /fr/projets/, against
      Polish at 706. The ceiling is the widest language of the type, so it is the measured
-     French page rather than the estimate that sets it. */
-  materials: 2820, stores: 159, android: 519, projects: 860, estimate: 425,
+     French page rather than the estimate that sets it.
+
+     872 since 2026-09-18: the two forms on the page — a project, a room — had inputs that
+     carried a placeholder and nothing else, so the only thing naming a box vanished as
+     soon as the visitor typed in it. They have visible labels now, and a label is six
+     words this page did not use to count: /fr/projets/ measures 870 against Polish at
+     716. These are field names, not prose; the section still forbids a paragraph. */
+  materials: 2820, stores: 159, android: 519, projects: 872, estimate: 425,
   clients: 524, jobs: 544, quotes: 470, calendar: 420, cookies: 637,
   /* Session 62, audit item H7, and 220 rather than the 180 it was measured at the same
      day: the owner's Gewerbe is registered in Germany, so the page went from a name and
@@ -493,8 +499,13 @@ const BUDGET = {
 
      465 since 2026-09-17: the Google sign-in button is back on the sign-in card
      (GOOGLE_SIGN_IN in src/app-pages.mjs), and the separator and the button label are
-     the words the budget did not carry while the button was hidden. */
-  "liczmat-pro": 477, account: 465, dashboard: 130, share: 40, privacy: 3820,
+     the words the budget did not carry while the button was hidden.
+
+     470 since 2026-09-18: the "add a client", "add a job" and "add a quote" forms grew
+     visible labels, for the same reason /projekty/ did — a placeholder is not a label,
+     because it leaves when the typing starts. The widest single panel is still the
+     profile; Klienci with its four labelled fields is what moved the number. */
+  "liczmat-pro": 477, account: 470, dashboard: 130, share: 40, privacy: 3820,
 };
 
 /**
@@ -505,6 +516,10 @@ const BUDGET = {
  * document twice the size with every panel still inside its ceiling. So a tabbed page is
  * measured twice — the visible page against BUDGET, the whole file against this.
  *
+ * 1556 since 2026-09-18: the nine inputs across Klienci, Zlecenia and Wyceny each gained
+ * a visible label, which the placeholder they replaced was never counted as. Nineteen
+ * words across three of the twelve panels, and no new sentence anywhere.
+ *
  * 1534 is the 1501 it measured before the 33-word unclaimed-workspace security choice.
  * Four of the twelve panels are Pro modules and each
  * one carries chapter XXV's wall in full, which is some 145 words of module list and price
@@ -513,7 +528,7 @@ const BUDGET = {
  * /app/ a visitor who opens Wyceny and nothing else has to be told the price there or not
  * at all.
  */
-const DOCUMENT = { account: 1534 };
+const DOCUMENT = { account: 1556 };
 
 /** Every shipped page, with the route that produced it. */
 const PAGES = [];

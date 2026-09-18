@@ -1719,8 +1719,11 @@ export function projectsMain(lang, t, aisles = [], features = []) {
 
         <h2>${esc(t("ws_projects"))}</h2>
         <p class="muted">${esc(t("wspage_projects_d"))}</p>
+        <!-- Visible labels, not placeholders: a placeholder is the only thing naming
+             these boxes and it leaves the moment the visitor types (audit 2026-09-18). -->
         <form id="ws-project-form" class="inline-form">
-          <input id="ws-project-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_project"))}" required aria-label="${esc(t("ws_new_project"))}">
+          <label class="field" for="ws-project-name"><span class="fld-label">${esc(t("ws_new_project"))}</span>
+            <input id="ws-project-name" type="text" maxlength="120" required></label>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="ws-project-list" class="data-list"></ul>
@@ -1739,11 +1742,16 @@ export function projectsMain(lang, t, aisles = [], features = []) {
              assets/workspace-ui.js; "no project" is a real answer, because a room measured
              before there is a project is still a room. -->
         <form id="ws-room-form" class="inline-form">
-          <input id="ws-room-name" type="text" maxlength="120" placeholder="${esc(t("ws_new_room"))}" required aria-label="${esc(t("ws_new_room"))}">
-          <input id="ws-room-length" type="text" inputmode="decimal" value="5" aria-label="${esc(t("fld_length"))}">
-          <input id="ws-room-width" type="text" inputmode="decimal" value="4" aria-label="${esc(t("fld_width"))}">
-          <input id="ws-room-height" type="text" inputmode="decimal" value="2.6" aria-label="${esc(t("fld_height"))}">
-          <select id="ws-room-project" aria-label="${esc(t("ws_project"))}"></select>
+          <label class="field" for="ws-room-name"><span class="fld-label">${esc(t("ws_new_room"))}</span>
+            <input id="ws-room-name" type="text" maxlength="120" required></label>
+          <label class="field field-narrow" for="ws-room-length"><span class="fld-label">${esc(t("fld_length"))}</span>
+            <input id="ws-room-length" type="text" inputmode="decimal" value="5"></label>
+          <label class="field field-narrow" for="ws-room-width"><span class="fld-label">${esc(t("fld_width"))}</span>
+            <input id="ws-room-width" type="text" inputmode="decimal" value="4"></label>
+          <label class="field field-narrow" for="ws-room-height"><span class="fld-label">${esc(t("fld_height"))}</span>
+            <input id="ws-room-height" type="text" inputmode="decimal" value="2.6"></label>
+          <label class="field field-narrow" for="ws-room-project"><span class="fld-label">${esc(t("ws_project"))}</span>
+            <select id="ws-room-project"></select></label>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="ws-room-list" class="data-list"></ul>
@@ -2737,10 +2745,14 @@ export function estimateMain(lang, t, features = []) {
         <h3>${esc(t("ws_add_line"))}</h3>
         <p class="muted">${esc(t("ws_add_line_d"))}</p>
         <form id="ws-line-form" class="inline-form">
-          <input id="ws-line-name" type="text" maxlength="120" placeholder="${esc(t("ws_col_name"))}" required aria-label="${esc(t("ws_col_name"))}">
-          <input id="ws-line-qty" type="text" inputmode="decimal" value="1" aria-label="${esc(t("ws_col_qty"))}">
-          <input id="ws-line-unit" type="text" maxlength="24" value="${esc(t("ws_unit_default"))}" aria-label="${esc(t("ws_col_unit"))}">
-          <input id="ws-line-cost" type="text" inputmode="decimal" placeholder="${esc(t("ws_col_cost"))}" aria-label="${esc(t("ws_col_cost"))}">
+          <label class="field" for="ws-line-name"><span class="fld-label">${esc(t("ws_col_name"))}</span>
+            <input id="ws-line-name" type="text" maxlength="120" required></label>
+          <label class="field field-narrow" for="ws-line-qty"><span class="fld-label">${esc(t("ws_col_qty"))}</span>
+            <input id="ws-line-qty" type="text" inputmode="decimal" value="1"></label>
+          <label class="field field-narrow" for="ws-line-unit"><span class="fld-label">${esc(t("ws_col_unit"))}</span>
+            <input id="ws-line-unit" type="text" maxlength="24" value="${esc(t("ws_unit_default"))}"></label>
+          <label class="field field-narrow" for="ws-line-cost"><span class="fld-label">${esc(t("ws_col_cost"))}</span>
+            <input id="ws-line-cost" type="text" inputmode="decimal"></label>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
       </div>

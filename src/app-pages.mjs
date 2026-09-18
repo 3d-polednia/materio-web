@@ -48,14 +48,27 @@ ${siteFooter({ lang: DEFAULT_LANG, t, minimal: true, inPlace: true })}`;
 /** The short list /p/<token> keeps — one way back into the product, and no more. */
 const SHARE_LINKS = [{ href: urlCalcIndex(DEFAULT_LANG), key: "nav_calc" }];
 
-/** A label + input pair, written once because the account panel is mostly forms. */
+/**
+ * A label + input pair, written once because the account panel is mostly forms.
+ *
+ * `cls` exists for the inline "add a row" forms, which are the same field in a flex row
+ * rather than stacked down a card. They used to be bare inputs carrying a placeholder and
+ * an aria-label and no visible label at all — which reads fine until the visitor starts
+ * typing and the only thing naming the box disappears (audit 2026-09-18).
+ */
 const field = (id, labelKey, t, opts = {}) => {
-  const { type = "text", autocomplete, minlength, maxlength, required = true } = opts;
-  return `<div class="field">
+  const { type = "text", autocomplete, minlength, maxlength, required = true, cls = "" } = opts;
+  return `<div class="field${cls ? ` ${cls}` : ""}">
     <label for="${id}" data-i18n="${labelKey}">${esc(t(labelKey))}</label>
     <input id="${id}" type="${type}"${autocomplete ? ` autocomplete="${autocomplete}"` : ""}${minlength ? ` minlength="${minlength}"` : ""}${maxlength ? ` maxlength="${maxlength}"` : ""}${required ? " required" : ""}>
   </div>`;
 };
+
+/** The same pair for a <select>, whose options are filled in by assets/app.js. */
+const selectField = (id, labelKey, t, cls = "") => `<div class="field${cls ? ` ${cls}` : ""}">
+    <label for="${id}" data-i18n="${labelKey}">${esc(t(labelKey))}</label>
+    <select id="${id}"></select>
+  </div>`;
 
 /**
  * "Pamiętaj mnie na tym urządzeniu" — the one control that decides how long the session
@@ -401,10 +414,10 @@ export function appMain(t, features) {
               ${proGate(t, "clients", features, DEFAULT_LANG, { id: "acctclients-gate" })}
               <div id="acctclients-tool">
                 <form id="acctclients-form" class="inline-form">
-                  <input id="acctclients-name" type="text" maxlength="120" placeholder="${esc(t("app_clients_name_ph"))}" required aria-label="${esc(t("app_clients_name_ph"))}">
-                  <input id="acctclients-phone" type="tel" maxlength="200" placeholder="${esc(t("cli_phone"))}" aria-label="${esc(t("cli_phone"))}">
-                  <input id="acctclients-email" type="email" maxlength="200" placeholder="${esc(t("cli_email"))}" aria-label="${esc(t("cli_email"))}">
-                  <input id="acctclients-address" type="text" maxlength="200" placeholder="${esc(t("cli_address"))}" aria-label="${esc(t("cli_address"))}">
+                  ${field("acctclients-name", "app_clients_name_ph", t, { maxlength: 120 })}
+                  ${field("acctclients-phone", "cli_phone", t, { type: "tel", maxlength: 200, required: false })}
+                  ${field("acctclients-email", "cli_email", t, { type: "email", maxlength: 200, required: false })}
+                  ${field("acctclients-address", "cli_address", t, { maxlength: 200, required: false })}
                   <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_clients_new">${esc(t("app_clients_new"))}</button>
                 </form>
                 <ul id="acctclients-list" class="data-list"></ul>
@@ -423,9 +436,9 @@ export function appMain(t, features) {
               ${proGate(t, "jobs", features, DEFAULT_LANG, { id: "acctjob-gate" })}
               <div id="acctjob-tool">
                 <form id="acctjob-form" class="inline-form">
-                  <input id="acctjob-name" type="text" maxlength="120" placeholder="${esc(t("app_jobs_new"))}" required aria-label="${esc(t("app_jobs_new"))}">
-                  <select id="acctjob-client" aria-label="${esc(t("app_clients_title"))}"></select>
-                  <input id="acctjob-due" type="date" aria-label="${esc(t("app_tab_schedule"))}">
+                  ${field("acctjob-name", "app_jobs_new", t, { maxlength: 120 })}
+                  ${selectField("acctjob-client", "app_clients_title", t, "field-narrow")}
+                  ${field("acctjob-due", "app_tab_schedule", t, { type: "date", required: false, cls: "field-narrow" })}
                   <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_jobs_new">${esc(t("app_jobs_new"))}</button>
                 </form>
                 <ul id="acctjob-list" class="data-list"></ul>
@@ -443,8 +456,8 @@ export function appMain(t, features) {
               ${proGate(t, "quotes", features, DEFAULT_LANG, { id: "acctquo-gate" })}
               <div id="acctquo-tool">
                 <form id="acctquo-form" class="inline-form">
-                  <input id="acctquo-name" type="text" maxlength="120" placeholder="${esc(t("app_quotes_new"))}" required aria-label="${esc(t("app_quotes_new"))}">
-                  <input id="acctquo-note" type="text" maxlength="200" placeholder="${esc(t("app_quotes_lead"))}" aria-label="${esc(t("app_quotes_lead"))}">
+                  ${field("acctquo-name", "app_quotes_new", t, { maxlength: 120 })}
+                  ${field("acctquo-note", "app_quotes_lead", t, { maxlength: 200, required: false })}
                   <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_quotes_new">${esc(t("app_quotes_new"))}</button>
                 </form>
                 <ul id="acctquo-list" class="data-list"></ul>

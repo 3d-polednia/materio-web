@@ -722,8 +722,11 @@ head("7. a guest and a free account see the list and none of the money");
     check(`${lang}: the two exports ship shut`, estimate.includes('<span id="cost-tool" hidden>'));
     // The page itself is not gated: chapter II keeps counting free, and the list of what
     // was counted is `shopping`.
+    /* Matched on the tag and the absence of `hidden`, not on the exact class list: the
+       article gained `hierarchy-l1` and this assertion went on passing nowhere, which is
+       worse than failing — a genuinely gated estimate would have looked the same. */
     check(`${lang}: the estimate itself is not hidden`,
-      estimate.includes('<article id="ws-estimate" class="ws-estimate">'));
+      /<article id="ws-estimate" class="ws-estimate[^"]*"(?![^>]*\bhidden\b)/.test(estimate));
     check(`${lang}: and the project picker stays out of the wall`,
       estimate.indexOf('id="ws-estimate-project"') < estimate.indexOf('id="cost-tool"'));
   }

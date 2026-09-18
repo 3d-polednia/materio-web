@@ -999,6 +999,15 @@ function wireTabs() {
   if (!strip) return;
   const tabs = () => Array.from(strip.querySelectorAll(".app-nav-item"));
 
+  // A tablist is horizontal unless it says otherwise, and CSS flips this one at the same
+  // 900px where .app-shell becomes a sidebar layout. Without the attribute a screen
+  // reader announced a column of twelve items as a horizontal strip, and told the visitor
+  // to use the wrong arrow keys. The keydown handler accepts both axes either way.
+  const wide = window.matchMedia("(min-width: 900px)");
+  const setOrientation = () => strip.setAttribute("aria-orientation", wide.matches ? "vertical" : "horizontal");
+  setOrientation();
+  wide.addEventListener("change", setOrientation);
+
   const select = (btn, focus) => {
     if (!btn) return;
     tabs().forEach((b) => {
@@ -1006,6 +1015,15 @@ function wireTabs() {
       b.setAttribute("aria-selected", String(on));
       b.tabIndex = on ? 0 : -1;
     });
+    // Whichever way the strip scrolls, the selected tab has to be inside it. Below 900px
+    // it is two rows of pills that scroll sideways and the selected pill sat off-screen
+    // entirely — measured at x=696..830 inside a 358px strip with scrollLeft still 0.
+    // Above 900px the rail is its own vertical scroll area, taller than the window, so
+    // the same thing happens downwards. "nearest" on both axes moves the strip and never
+    // the page.
+    if (strip.scrollWidth > strip.clientWidth || strip.scrollHeight > strip.clientHeight) {
+      btn.scrollIntoView({ inline: "nearest", block: "nearest" });
+    }
     document.querySelectorAll("[data-panel]").forEach((panel) => {
       panel.hidden = panel.dataset.panel !== btn.dataset.tab;
     });
@@ -1032,7 +1050,8 @@ function wireTabs() {
     if (!btn) return;
     const all = tabs();
     const index = all.indexOf(btn);
-    const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+    const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1
+      : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
     if (step) select(all[(index + step + all.length) % all.length], true);
     else if (e.key === "Home") select(all[0], true);
     else if (e.key === "End") select(all[all.length - 1], true);
@@ -1337,13 +1356,19 @@ function wireWorkspace() {
     const roomLi = e.target.closest(".app-rooms li[data-id]");
     if (roomLi && e.target.closest("[data-del]")) {
       const room = state.rooms.find((r) => r.id === roomLi.dataset.id);
-      if (room) await deleteRoom(room);
+      if (room) {
+        if (!confirm(T("app_row_delete_confirm"))) return;
+        await deleteRoom(room);
+        status(T("app_row_deleted"));
+      }
       return;
     }
     if (!project) return;
 
     if (e.target.closest("[data-del]")) {
+      if (!confirm(T("app_row_delete_confirm"))) return;
       await tombstone(projectDoc(project.id), project, { name: project.name, archived: !!project.archived });
+      status(T("app_row_deleted"));
     } else if (e.target.closest("[data-share]")) {
       try {
         const url = await shareProject(project);
@@ -1359,7 +1384,11 @@ function wireWorkspace() {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-del]")) return;
     const room = state.rooms.find((r) => r.id === li.dataset.id);
-    if (room) await deleteRoom(room);
+    if (room) {
+      if (!confirm(T("app_row_delete_confirm"))) return;
+      await deleteRoom(room);
+      status(T("app_row_deleted"));
+    }
   });
 }
 
@@ -1491,10 +1520,12 @@ function wireClientsPanel() {
   $("acctclients-list").addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-del]") || typeof crmDeleteClient !== "function") return;
+    if (!confirm(T("app_row_delete_confirm"))) return;
     crmDeleteClient(li.dataset.id);
     renderClients();
     renderJobs();
     renderOverview();
+    status(T("app_row_deleted"));
   });
 }
 
@@ -1545,10 +1576,12 @@ function wireJobsPanel() {
   list.addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-del]") || typeof crmDeleteJob !== "function") return;
+    if (!confirm(T("app_row_delete_confirm"))) return;
     crmDeleteJob(li.dataset.id);
     renderJobs();
     renderOverview();
     renderSchedule();
+    status(T("app_row_deleted"));
   });
   list.addEventListener("change", (e) => {
     const sel = e.target.closest("[data-status]");
@@ -1610,8 +1643,10 @@ function wireQuotesPanel() {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-del]") || typeof crmDeleteQuote !== "function"
       || !canQuotes()) return;
+    if (!confirm(T("app_row_delete_confirm"))) return;
     crmDeleteQuote(li.dataset.id);
     renderQuotes();
+    status(T("app_row_deleted"));
   });
 }
 
@@ -1916,9 +1951,11 @@ function wireMaterialsPanel() {
   list.addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-del]") || typeof omDelete !== "function") return;
+    if (!confirm(T("app_row_delete_confirm"))) return;
     omDelete(li.dataset.id);
     renderMaterialsPanel();
     renderOverview();
+    status(T("app_row_deleted"));
   });
 }
 
@@ -1951,7 +1988,12 @@ function wireRoomsPanel() {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-del]")) return;
     const room = state.rooms.find((r) => r.id === li.dataset.id);
-    if (room) { await deleteRoom(room); renderRoomsPanel(); }
+    if (room) {
+      if (!confirm(T("app_row_delete_confirm"))) return;
+      await deleteRoom(room);
+      renderRoomsPanel();
+      status(T("app_row_deleted"));
+    }
   });
 }
 

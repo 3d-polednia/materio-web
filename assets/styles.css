@@ -37,6 +37,10 @@
    --accent        lime fills (buttons, indicators). Only ever carries --on-accent.
    --accent-strong readable lime/green for text, links and icons. It is NOT the
                    fill colour: #91d206 on cream is far below 4.5:1.
+   --on-accent-strong what sits on top when --accent-strong is used as a FILL, which
+                   is the hover of the purchase button and nothing else so far. It is
+                   not interchangeable with --on-accent: the light theme inverts
+                   (white on dark green) while the dark theme does not.
    --brand-lime    the logo's green. Fixed in both themes — it is the mark, not a
                    surface, and it must not drift with the theme.
    --*-soft        a tinted container; pair it only with the matching --on-*-soft.
@@ -58,6 +62,7 @@
   --accent: #91d206;
   --accent-strong: #476c00;
   --on-accent: #0d1117;
+  --on-accent-strong: #ffffff;
   --accent-soft: #e8f5c8;
   --on-accent-soft: #2b4000;
   --accent-soft-2: #dcedbb;
@@ -111,6 +116,7 @@
     --accent: #91d206;
     --accent-strong: #a8e626;
     --on-accent: #0a0f04;
+    --on-accent-strong: #0a0f04;
     --accent-soft: #1c2c06;
     --on-accent-soft: #cbee85;
     --accent-soft-2: #22330b;
@@ -162,6 +168,7 @@
   --accent: #91d206;
   --accent-strong: #a8e626;
   --on-accent: #0a0f04;
+  --on-accent-strong: #0a0f04;
   --accent-soft: #1c2c06;
   --on-accent-soft: #cbee85;
   --accent-soft-2: #22330b;
@@ -301,6 +308,11 @@
   /* 1600px uses the useful middle of a 1920px screen while leaving the same page shell
      recognisable on wider monitors; reading components keep their own measures below. */
   --maxw: 1600px;
+  /* How wide a line of reading text is allowed to get. --maxw is the page shell and is
+     far past a comfortable measure, so every block of prose caps itself here instead.
+     It was the literal 56ch repeated in seven places; one token means new prose cannot
+     quietly ship at 1600px because whoever added it did not know the convention. */
+  --measure: 56ch;
   --gutter: var(--sp-5);
   /* The header is sticky, so its height is also the offset an in-page anchor has to
      clear and the top edge the mobile drawer hangs from. One number, three uses. */
@@ -400,7 +412,7 @@ section.block { padding: var(--section-y) 0; }
 /* Reading copy keeps a readable line length even though public sections themselves may
    use the full 1600px canvas for grids, tools and tables. These are the paragraphs that
    sit directly in a section wrapper; component copy keeps its component's own measure. */
-section.block > .wrap > p { max-width: 56ch; }
+section.block > .wrap > p { max-width: var(--measure); }
 /* A section that has to fill the window even with two lines in it: /404/. */
 .block-fill { min-height: 60vh; min-height: 60dvh; display: flex; align-items: center; }
 .alt { background: var(--surface-alt); }
@@ -415,7 +427,7 @@ section.block > .wrap > p { max-width: 56ch; }
 /* The head of a generated sub-page: crumbs, title, one line of lead. */
 .page-head { padding-bottom: var(--sp-2); }
 .page-head h1 { margin: var(--sp-2) 0 var(--sp-2); }
-.page-head .lead { color: var(--muted); max-width: 56ch; margin: 0; }
+.page-head .lead { color: var(--muted); max-width: var(--measure); margin: 0; }
 
 .breadcrumbs { font-size: var(--fs-sm); color: var(--muted); }
 .breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: 0; padding: 0; }
@@ -454,12 +466,13 @@ section.block > .wrap > p { max-width: 56ch; }
    theme the fill already clears 3:1 and --accent-edge is the fill itself. */
 .btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2); }
 .btn-primary:hover { box-shadow: var(--shadow-3); }
-/* The purchase button gets its own saturated green instead of reusing the lime
-   accent. The accent is the whole site's ordinary button colour, and the one
-   button that takes money should not look like the one that opens a calculator.
-   Heavier type and elevation make it unmistakably the primary action on the page. */
-.btn-buy { background: var(--buy); color: var(--on-buy); border-color: var(--buy-edge); font-weight: var(--fw-black); box-shadow: var(--shadow-3); }
-.btn-buy:hover { background: var(--buy-hover); box-shadow: var(--shadow-3), 0 6px 24px color-mix(in srgb, var(--buy-hover) 35%, transparent); }
+/* The purchase button is heavier type and more elevation than an ordinary button, and
+   nothing else. It once had a saturated green of its own (--buy, --on-buy, --buy-edge,
+   --buy-hover) so the button that takes money would not look like the one that opens a
+   calculator; the one-green rule won instead, and the colours here are set further down
+   with the rest of the purchase block. Those four tokens are kept defined in case that
+   decision is revisited, but nothing spends them — do not add a fifth green here. */
+.btn-buy { font-weight: var(--fw-black); box-shadow: var(--shadow-3); }
 .btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline-control); }
 .btn-ghost:hover { background: var(--surface-alt); }
 .btn-danger { background: var(--error); color: var(--surface); }
@@ -527,7 +540,13 @@ section.block > .wrap > p { max-width: 56ch; }
 .card h3 { margin-bottom: var(--sp-2); }
 .card p { color: var(--muted); margin: 0; }
 .app-card h2, .app-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
+/* 14px is a density decision for a desktop card sitting beside three others. A phone
+   shows one card at a time and has no density problem, so the sentences inside it go
+   back to the 16px the rest of the page reads at. */
 .app-card p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
+@media (max-width: 560px) {
+  .app-card p { font-size: var(--fs-base); }
+}
 /* Account deletion is irreversible, so it is set apart rather than sitting in the
    same list as "change your password". */
 .app-card.danger {
@@ -595,6 +614,16 @@ select:focus-visible, textarea:focus-visible {
   display: block; font-weight: var(--fw-semi); font-size: var(--fs-sm); margin-bottom: var(--sp-1);
 }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+/* A field inside an "add a row" form. Same label + control pair as a stacked field, laid
+   out along the row instead of down the card, so the submit button lines up with the
+   controls rather than with the labels above them. */
+.inline-form { align-items: flex-end; }
+.inline-form .field { margin-bottom: 0; flex: 1 1 160px; min-width: 0; }
+.inline-form .field label, .inline-form .field .fld-label {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.inline-form .field input, .inline-form .field select { width: 100%; }
+.inline-form .field-narrow { flex: 0 1 12rem; }
 
 /* ---------- Message
    One box for "here is your answer" and "that did not work": the calculator's
@@ -686,7 +715,7 @@ select:focus-visible, textarea:focus-visible {
   font-weight: var(--fw-bold); line-height: 1; transition: transform var(--dur) var(--ease);
 }
 .faq details[open] summary::after { transform: rotate(45deg); }
-.faq details p { margin: 0; padding: 0 var(--sp-5) var(--sp-4); color: var(--muted); max-width: 56ch; }
+.faq details p { margin: 0; padding: 0 var(--sp-5) var(--sp-4); color: var(--muted); max-width: var(--measure); }
 
 /* ---------- Code and formulas
    A formula line can be longer than the column (the waste line on the coverage
@@ -774,7 +803,7 @@ header.site {
   display: inline-grid; place-items: center;
   width: var(--control-h-sm); height: var(--control-h-sm); flex: none;
   background: var(--surface-alt); color: var(--on-bg);
-  border: 1px solid var(--outline); border-radius: var(--radius-pill);
+  border: 1px solid var(--outline-control); border-radius: var(--radius-pill);
   cursor: pointer; padding: 0;
   transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
@@ -876,7 +905,7 @@ body.nav-open { overflow: hidden; }
 .lang-btn, .cur-select {
   font: inherit; font-weight: var(--fw-semi); font-size: var(--fs-sm);
   color: var(--on-bg); background: var(--surface-alt);
-  border: 1px solid var(--outline); border-radius: var(--radius-pill);
+  border: 1px solid var(--outline-control); border-radius: var(--radius-pill);
   min-height: var(--control-h-sm); padding: var(--sp-1) var(--sp-3); cursor: pointer;
   transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
@@ -884,6 +913,12 @@ body.nav-open { overflow: hidden; }
 .lang-btn:hover, .cur-select:hover { background: var(--surface-container); border-color: var(--outline-strong); }
 .lang-btn .chev { opacity: .6; }
 .lang-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+/* The currency select wears the language button's chevron instead of the operating
+   system's, so the header's two pickers read as one pair. The select keeps its own
+   keyboard and touch behaviour — only the arrow is ours. */
+.cur-picker { position: relative; display: inline-flex; align-items: center; }
+.cur-picker .chev { position: absolute; right: var(--sp-3); opacity: .6; pointer-events: none; }
+.cur-select { appearance: none; padding-right: var(--sp-8); }
 
 .lang-menu {
   position: absolute; right: 0; top: calc(100% + var(--sp-2)); z-index: 40;
@@ -956,9 +991,43 @@ footer h2 {
   display: flex; flex-direction: column; gap: var(--sp-3);
 }
 .consent-banner[hidden] { display: none; }
+/* On a phone this sheet was 200 px of an 844 px screen — a quarter of the viewport, on
+   top of whatever the visitor came for, until they answer. It cannot get shorter than
+   its own sentence, so it gives up its padding and its gaps instead, and sits against
+   the screen edges rather than inside a 16 px inset. */
+@media (max-width: 560px) {
+  .consent-banner {
+    left: var(--sp-2); right: var(--sp-2); bottom: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4); gap: var(--sp-2);
+  }
+}
 .consent-text { margin: 0; font-size: var(--fs-sm); line-height: var(--lh-snug); }
 .consent-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-3); }
-.consent-more { margin-right: auto; font-size: var(--fs-sm); color: var(--muted); text-decoration: underline; }
+/* The auto margin belongs to the LAST link, not to both: two elements in a wrapping row
+   each claiming the leftover space is a wrap waiting to happen the moment one of the
+   thirteen languages writes "Więcej w polityce prywatności" a little longer. */
+.consent-more {
+  display: inline-flex; align-items: center; min-height: var(--sp-6);
+  font-size: var(--fs-sm); color: var(--muted); text-decoration: underline;
+}
+.consent-more:last-of-type { margin-right: auto; }
+/* Below 560px the row holds the two links and "Odrzuć", and drops "Zgoda" onto a line of
+   its own — 358px fits 185 + 49 + 81 and not the 76 after it. Grid instead: the links
+   take the first row, both buttons the second. One row fewer, and the two answers end
+   up beside each other, which is where a pair of answers belongs. This block has to sit
+   after the flex rule above, not with the rest of the mobile sizing before it: same
+   specificity, so whichever comes last wins.
+
+   The floor is 360px, not 0. Below it the two links no longer fit side by side, the grid
+   makes the first one wrap to two lines, and the sheet comes out taller than the flex row
+   it replaced — 187px against 171px, measured at 320px. Flex keeps that width. */
+@media (min-width: 360px) and (max-width: 560px) {
+  .consent-actions {
+    display: grid; grid-template-columns: auto auto; justify-content: start;
+    column-gap: var(--sp-4); row-gap: var(--sp-2);
+  }
+  .consent-actions .btn { grid-row: 2; }
+}
 
 
 /* ================================================================ 6. PAGES */
@@ -1040,7 +1109,7 @@ footer h2 {
   width: var(--control-h); height: var(--control-h);
   display: inline-flex; align-items: center; justify-content: center;
   background: transparent; color: var(--muted);
-  border: 1px solid var(--outline); border-radius: var(--radius-pill);
+  border: 1px solid var(--outline-control); border-radius: var(--radius-pill);
   cursor: pointer;
 }
 .phone-pause:hover { color: var(--on-bg); border-color: var(--outline-strong); }
@@ -1048,11 +1117,15 @@ footer h2 {
 /* Both glyphs ship; this shows the one that matches whether the screenshots are moving. */
 .phone-pause .ico-play, .phone-pause.paused .ico-pause { display: none; }
 .phone-pause.paused .ico-play { display: block; }
+/* Every dot keeps a 20px layout box and only its transform changes, so the active one
+   growing does not relayout the row. It used to animate `width` from 7px to 20px, which
+   is layout work on every frame and moves its four neighbours while it runs. */
 .phone-dots i {
-  width: 7px; height: 7px; border-radius: var(--radius-pill); background: var(--outline-strong);
-  transition: width var(--dur-slow) var(--ease), background var(--dur-slow) var(--ease);
+  width: 20px; height: 7px; border-radius: var(--radius-pill); background: var(--outline-strong);
+  transform: scaleX(.35);
+  transition: transform var(--dur-slow) var(--ease), background var(--dur-slow) var(--ease);
 }
-.phone-dots i.on { width: 20px; background: var(--accent); }
+.phone-dots i.on { transform: scaleX(1); background: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .phone-track { transition: none; } }
 
 /* ---------- Home: the three doors, the four steps ----------
@@ -1077,7 +1150,7 @@ footer h2 {
 .door-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .door-list a {
   display: inline-block; border-radius: var(--radius-pill);
-  border: 1px solid var(--outline); background: var(--surface-alt);
+  border: 1px solid var(--outline-control); background: var(--surface-alt);
   padding: var(--sp-1) var(--sp-3); font-size: var(--fs-sm); font-weight: var(--fw-semi);
   color: var(--on-bg); transition: background var(--dur) var(--ease);
 }
@@ -1148,8 +1221,10 @@ footer h2 {
   margin: 0 0 var(--sp-3); font-size: var(--fs-base); text-transform: uppercase;
   letter-spacing: var(--track-wide); color: var(--muted);
 }
+/* min(300px, 100%), not a bare 300px: at a 320px viewport the gutters leave 288px and a
+   hard 300px track overflowed its own grid by 12px on the hub and on the guides index. */
 .calc-links {
-  display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: grid; gap: var(--sp-3); grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
   list-style: none; margin: 0; padding: 0;
 }
 /* The hub wraps each card in an <li> so the filter has something to hide that is not
@@ -1222,7 +1297,7 @@ a.chip:hover { text-decoration: none; }
   text-transform: uppercase; letter-spacing: var(--track-wide); color: var(--muted);
 }
 .calc-how .src-note { margin-top: var(--sp-6); font-size: var(--fs-xs); }
-.calc-how-grid p { max-width: 56ch; }
+.calc-how-grid p { max-width: var(--measure); }
 .calc-how > div > *:first-child, .calc-how-grid > div > h3:first-child { margin-top: 0; }
 
 .plain-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
@@ -1394,7 +1469,9 @@ a.chip:hover { text-decoration: none; }
 .auth-links .linkish { min-height: var(--control-h); padding: 11px 0; margin: -11px 0; }
 
 .field-check { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-4); }
-.field-check input { width: var(--sp-5); height: var(--sp-5); flex: none; accent-color: var(--accent-strong); }
+/* 24px, not 20: WCAG 2.2 AA puts the floor for a pointer target at 24 CSS px, and
+   "pamiętaj mnie" is the one box on the sign-in card. */
+.field-check input { width: var(--sp-6); height: var(--sp-6); flex: none; accent-color: var(--accent-strong); }
 .field-check label { font-size: var(--fs-sm); margin: 0; }
 .field-note { font-size: var(--fs-sm); margin: calc(-1 * var(--sp-2)) 0 var(--sp-4); }
 
@@ -1470,8 +1547,14 @@ a.chip:hover { text-decoration: none; }
 }
 @media (min-width: 900px) {
   .app-side {
-    position: sticky; top: 0; align-self: stretch; min-height: 100vh; min-height: 100dvh;
-    height: auto; overflow-y: auto;
+    /* max-height, not min-height. The rail holds twelve items plus its footer and
+       measured 1542 px against a 900 px window, so with `height: auto` the lower half —
+       including whichever item is selected — simply sat below the fold: opening the
+       Konto tab put its own nav item at y=1058. Capping the rail at the viewport turns
+       it into its own scroll area, and sticky then pins that area instead of a column
+       taller than the screen. */
+    position: sticky; top: 0; align-self: start;
+    max-height: 100vh; max-height: 100dvh; overflow-y: auto;
     /* The full-width shell begins at the viewport edge; the shared gutter keeps the
        26px logo and the navigation aligned with public-page chrome instead of the glass. */
     padding: var(--sp-5) var(--gutter);
@@ -1533,10 +1616,16 @@ a.chip:hover { text-decoration: none; }
 
 .app-main { min-width: 0; flex: 1; padding: var(--sp-5) var(--gutter) var(--sp-10); }
 .app-main > [data-panel], .app-main > .app-next { width: 100%; max-width: 1200px; }
-.app-main [data-panel] > p { max-width: 56ch; }
-.app-main .ws-mat-hint, .ws-estimate-foot { max-width: 56ch; }
-.app-card > p { max-width: 56ch; }
+.app-main [data-panel] > p { max-width: var(--measure); }
+.app-main .ws-mat-hint, .ws-estimate-foot { max-width: var(--measure); }
+.app-card > p { max-width: var(--measure); }
+/* A field in the account panel used to take the whole card — an e-mail box 1092px wide
+   on a 1440px screen, which reads as a layout bug rather than a field. 26rem is the
+   width .inline-form already settled on, so the two kinds of form agree. */
+.app-main .field input, .app-main .field select { max-width: 26rem; }
 .app-main .inline-form input { flex: 0 1 26rem; }
+.app-main .inline-form .field { flex: 0 1 26rem; }
+.app-main .inline-form .field-narrow { flex: 0 1 12rem; }
 .app-main .inline-form input[inputmode="decimal"],
 .app-main .inline-form input[type="date"] { flex-basis: 10rem; }
 @media (min-width: 900px) {
@@ -1546,11 +1635,28 @@ a.chip:hover { text-decoration: none; }
 }
 
 @media (max-width: 560px) {
-  .app-signed-in.workspace-page .page-head { display: none; }
+  /* The hero costs 384 px of a phone screen and the open panel repeats its title, so it
+     comes off the page. It used to be `display: none`, which also took the document's
+     only h1 with it — a signed-in phone had no heading at all. Clipped instead: out of
+     the layout, still in the accessibility tree and the document outline. */
+  .app-signed-in.workspace-page .page-head {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);
+  }
+
   .app-side-foot, .app-side-who, .app-side-actions {
     align-items: flex-start; margin-left: 0;
   }
   .app-side-foot, .app-side-who { flex-direction: column; }
+}
+
+/* Signed in, the hero has already done its job: the visitor is past the pitch and the
+   open panel names itself. Keeping the h1 but dropping the lead and the section rhythm
+   lifts the whole shell by about 150 px, which is what put the selected nav item back
+   above the fold. Signed out the hero stays full size — there it is the sales copy. */
+@media (min-width: 900px) {
+  .app-signed-in.workspace-page .page-head { padding-block: var(--sp-6) 0; }
+  .app-signed-in.workspace-page .page-head .lead { display: none; }
+  .app-signed-in.workspace-page .page-head + .block { padding-top: var(--sp-6); }
 }
 
 /* Przegląd's stat tiles — the site's one "big number" component, same tokens .dash-fig
@@ -1584,7 +1690,10 @@ a.chip:hover { text-decoration: none; }
 .cal-month-btn {
   display: inline-flex; align-items: baseline; gap: var(--sp-1);
   font: inherit; color: inherit; text-transform: inherit;
-  background: none; border: 0; padding: 0; cursor: pointer;
+  background: none; border: 0; cursor: pointer;
+  /* 21px of text is under the 24px pointer floor; the vertical padding is given back as
+     margin so the month keeps sitting on the heading's baseline. */
+  min-height: var(--sp-6); padding: var(--sp-1) 0; margin: calc(var(--sp-1) * -1) 0;
 }
 .cal-month-btn:hover { text-decoration: underline; }
 .cal-month-caret { font-size: var(--fs-xs); color: var(--muted); }
@@ -1594,9 +1703,16 @@ a.chip:hover { text-decoration: none; }
 .cal-month-pick { display: inline-flex; gap: var(--sp-2); text-transform: none; }
 .cal-month-pick select { font: inherit; font-weight: var(--fw-medium); }
 .cal-nav { display: flex; gap: var(--sp-1); margin-left: var(--sp-1); }
+/* The month steppers are the only way to reach another month, so they carry the control
+   outline, and on a touch screen they grow to the full control height — 30px is a mouse
+   size and these two sit 4px apart. */
 .cal-nav button {
-  width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--outline);
+  width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--outline-control);
   background: var(--surface); color: var(--muted); cursor: pointer; font: inherit;
+}
+@media (max-width: 560px), (pointer: coarse) {
+  .cal-nav { gap: var(--sp-2); }
+  .cal-nav button { width: var(--control-h); height: var(--control-h); }
 }
 .cal-nav button:hover { background: var(--surface-alt); color: var(--on-bg); }
 .cal-today {
@@ -1700,7 +1816,14 @@ a.chip:hover { text-decoration: none; }
   gap: var(--sp-2) var(--sp-4); margin-bottom: var(--sp-4);
 }
 .dash-head h2 { margin: 0; }
-.dash-more { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+/* The "see all" control beside a section heading measured 22px tall, under the 24px
+   pointer-target floor. Padding would push the heading's baseline off, so it grows the
+   same way .auth-links .linkish does: padding out, margin back in. */
+.dash-more {
+  display: inline-flex; align-items: center; min-height: var(--sp-6);
+  padding-block: var(--sp-1); margin-block: calc(var(--sp-1) * -1);
+  font-size: var(--fs-sm); font-weight: var(--fw-semi);
+}
 /* Both tile rows hold exactly four: the quick actions, and the four most recent tools.
    auto-fill would leave one orphan on its own row at desktop width, so the count is
    named instead — two abreast on a tablet, one row on a wide screen. */
@@ -2243,6 +2366,10 @@ a.chip:hover { text-decoration: none; }
   summary { min-height: var(--control-h); padding-block: var(--sp-2); }
   /* Under 16 px iOS Safari zooms the page the moment the field is touched. */
   .lang-btn, .cur-select { min-height: var(--control-h); font-size: var(--fs-base); }
+  /* The three tab families were left out of this rule and stayed at ~38 px while
+     everything around them grew: a calculator's own tabs, the workspace tabs, and the
+     account rail's pills, which below 900 px are the product's whole navigation. */
+  .calc-tab, .app-tab, .app-nav-item { min-height: var(--control-h); }
 }
 
 /* The header's two icon buttons are the one pair the pointer alone cannot decide: above
@@ -2339,9 +2466,14 @@ a.chip:hover { text-decoration: none; }
   min-height: var(--control-h-lg);
 }
 
-/* The stronger brand green preserves the one-green rule when the purchase action is hovered. */
+/* The stronger brand green preserves the one-green rule when the purchase action is hovered.
+   The label has to flip with it: --accent-strong is a dark green in the light theme, and
+   keeping --on-accent (#0d1117) on it measured 3.08:1 on a 16px bold label. */
 .btn-buy:hover {
   background: var(--accent-strong);
+  color: var(--on-accent-strong);
+  /* The glow used to be mixed from --buy-hover, a green the button no longer wears. */
+  box-shadow: var(--shadow-3), 0 6px 24px color-mix(in srgb, var(--accent-strong) 35%, transparent);
 }
 
 /* Counts belong beside their headings, while the disclosure marker keeps the far edge to itself. */
@@ -2366,7 +2498,9 @@ a.chip:hover { text-decoration: none; }
   font-variant-numeric: tabular-nums;
 }
 
-/* Account totals use the same accent as marketing totals because both answer “how many”. */
+/* Account totals use the same accent as marketing totals because both answer “how many”.
+   --accent-strong, not --accent: the fill lime measured 1.84:1 on the white card, and a
+   24px number is still held to 3:1. */
 .app-stat-card .val {
-  color: var(--accent);
+  color: var(--accent-strong);
 }

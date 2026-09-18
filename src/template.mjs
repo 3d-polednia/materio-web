@@ -115,7 +115,10 @@ export function currencyPicker(lang, t, inPlace) {
   const options = CURRENCIES
     .map((c) => `<option value="${c}"${c === current ? " selected" : ""}>${c}</option>`).join("");
   const i18n = inPlace ? ' data-i18n-aria="cur_label"' : "";
-  return `<select id="currency-select" class="cur-select" aria-label="${esc(t("cur_label"))}" title="${esc(t("cur_label"))}"${i18n}>${options}</select>`;
+  /* The wrapper exists only to carry the same chevron the language button draws. The two
+     controls stand 8px apart in the header, and a native select's own arrow made them
+     read as two unrelated widgets: one custom pill, one operating-system dropdown. */
+  return `<span class="cur-picker"><select id="currency-select" class="cur-select" aria-label="${esc(t("cur_label"))}" title="${esc(t("cur_label"))}"${i18n}>${options}</select>${ICON.chevron}</span>`;
 }
 
 /**
