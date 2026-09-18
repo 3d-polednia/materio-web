@@ -225,6 +225,7 @@ transition-duration: .01ms !important;
 }
 }
 html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + var(--sp-2)); }
+@media (min-width: 1160px) { html { font-size: 112.5%; } }
 body {
 margin: 0;
 font-family: var(--font);

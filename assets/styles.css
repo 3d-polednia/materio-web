@@ -345,6 +345,14 @@
 }
 
 html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + var(--sp-2)); }
+/* KAFEL-4, variant B: one step up on the type scale where there is screen for it.
+   Every --fs-* is a rem, so moving the root moves the whole scale together and nothing
+   has to be restated; spacing, radii and --control-h are px on purpose and stay put, so
+   a tap target is still 44px and the header is still 64px tall. It is a percentage, not
+   18px, so a visitor who has raised their browser's default font keeps the raise.
+   1160 is the existing wide breakpoint — chapter on breakpoints: there are four, and a
+   fifth is not to be invented for this. */
+@media (min-width: 1160px) { html { font-size: 112.5%; } }
 body {
   margin: 0;
   font-family: var(--font);
