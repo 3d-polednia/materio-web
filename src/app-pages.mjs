@@ -386,8 +386,7 @@ export function appMain(t, features) {
             <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0" hidden>
               <h2 data-i18n="app_projects">${esc(t("app_projects"))}</h2>
               <form id="project-form" class="inline-form">
-                <input id="project-name" type="text" maxlength="120" placeholder="${esc(t("app_new_project"))}" data-i18n-ph="app_new_project" required
-                  aria-label="${esc(t("app_new_project"))}" data-i18n-aria="app_new_project">
+                ${field("project-name", "app_new_project", t, { maxlength: 120 })}
                 <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">${esc(t("app_add"))}</button>
               </form>
               <ul id="project-list" class="data-list"></ul>

@@ -382,8 +382,10 @@
             <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0" hidden>
               <h2 data-i18n="app_projects">Projekty</h2>
               <form id="project-form" class="inline-form">
-                <input id="project-name" type="text" maxlength="120" placeholder="Nowy projekt" data-i18n-ph="app_new_project" required
-                  aria-label="Nowy projekt" data-i18n-aria="app_new_project">
+                <div class="field">
+    <label for="project-name" data-i18n="app_new_project">Nowy projekt</label>
+    <input id="project-name" type="text" maxlength="120" required>
+  </div>
                 <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">Dodaj</button>
               </form>
               <ul id="project-list" class="data-list"></ul>
