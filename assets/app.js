@@ -1439,6 +1439,27 @@ function fmtDay(day) {
   return d.toLocaleDateString(document.documentElement.lang || "pl", { day: "numeric", month: "short" });
 }
 
+/**
+ * The four stroke paths the Przegląd tiles need, on the same 24x24 grid as NAV_ICON in
+ * src/app-pages.mjs. They are copied rather than imported because this file is a plain
+ * browser script and that map is build-time: four short strings are cheaper than a new
+ * module boundary. Change a shape in the sidebar and it has to change here too.
+ */
+const STAT_ICON = {
+  projects: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+  clients: '<circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><path d="M16.2 4.6a3.4 3.4 0 0 1 0 6.6M20 20c0-3-1.9-5.3-4.6-6"/>',
+  schedule: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',
+  rooms: '<path d="M4 10 12 3l8 7"/><path d="M6 9v11h12V9"/><path d="M10 20v-6h4v6"/>',
+};
+
+/** One Przegląd tile: the icon, the figure, and what the figure counts, in a row. */
+function statCard(id, value, label) {
+  return `<div class="app-stat-card">
+      <svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${STAT_ICON[id] || ""}</svg>
+      <div class="app-stat-body"><div class="val">${value}</div><div class="lbl">${label}</div></div>
+    </div>`;
+}
+
 /** Przegląd: today's figures and the three short lists under them. */
 function renderOverview() {
   const stats = $("overview-stats");
@@ -1447,11 +1468,12 @@ function renderOverview() {
     const sched = typeof crmSchedule === "function" ? crmSchedule() : null;
     const dueSoon = sched ? sched.counts.late + sched.counts.today + sched.counts.soon : 0;
     const clientsCount = typeof crmClients === "function" ? crmClients().length : 0;
-    stats.innerHTML = `
-      <div class="app-stat-card"><div class="lbl">${T("app_stat_projects")}</div><div class="val">${activeProjects.length}</div></div>
-      <div class="app-stat-card"><div class="lbl">${T("app_stat_clients")}</div><div class="val">${clientsCount}</div></div>
-      <div class="app-stat-card"><div class="lbl">${T("app_stat_schedule")}</div><div class="val">${dueSoon}</div></div>
-      <div class="app-stat-card"><div class="lbl">${T("app_rooms_title")}</div><div class="val">${state.rooms.length}</div></div>`;
+    stats.innerHTML = [
+      statCard("projects", activeProjects.length, T("app_stat_projects")),
+      statCard("clients", clientsCount, T("app_stat_clients")),
+      statCard("schedule", dueSoon, T("app_stat_schedule")),
+      statCard("rooms", state.rooms.length, T("app_rooms_title")),
+    ].join("");
   }
 
   const projList = $("overview-projects");

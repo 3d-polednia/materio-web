@@ -1231,20 +1231,33 @@ footer h2 {
    the link itself; the row has to stretch or a short card would sit half-height. */
 .calc-links > li { display: flex; }
 .calc-links > li > .calc-link { flex: 1; }
+/* Two columns, two rows: the icon holds column one of row one, the text holds column two,
+   and the CTA sits under the text in row two. The description therefore gets the whole
+   card width instead of sharing a line with "Otwórz kalkulator", which was breaking it
+   mid-phrase, and the CTA lands on the same baseline in every card of a row.
+   The five markup sites differ — a card may have the icon, the CTA, both or neither — so
+   the placement is explicit and the column gap rides on .ico rather than on the grid:
+   a card without an icon would otherwise pay for an empty first column. The second row is
+   implicit for the same reason: declaring `1fr auto` would charge a card that has no CTA
+   for a row gap it never uses, so the CTA is pushed down by align-content instead. */
 .calc-link {
-  display: flex; align-items: flex-start; gap: var(--sp-3); padding: var(--sp-4);
+  display: grid; grid-template-columns: auto 1fr;
+  align-items: start; align-content: space-between; gap: var(--sp-2) 0; padding: var(--sp-4);
   background: var(--surface); border: 1px solid var(--outline); border-radius: var(--radius);
   color: inherit; text-decoration: none;
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 .calc-link:hover { border-color: var(--accent); box-shadow: var(--shadow-2); }
-.calc-link .ico { flex: none; color: var(--accent-strong); line-height: 0; margin-top: 2px; }
-.calc-link-body { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+.calc-link .ico {
+  grid-column: 1; grid-row: 1; color: var(--accent-strong); line-height: 0;
+  margin-top: 2px; margin-right: var(--sp-3);
+}
+.calc-link-body { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
 .calc-link-body b { font-size: var(--fs-base); }
 .calc-link-body .muted { font-size: var(--fs-sm); }
 .calc-link-go {
-  margin-left: auto; flex: none; align-self: center; font-size: var(--fs-xs);
-  font-weight: var(--fw-bold); color: var(--accent-strong); white-space: nowrap;
+  grid-column: 2; grid-row: 2; align-self: end; font-size: var(--fs-xs);
+  font-weight: var(--fw-bold); color: var(--accent-strong);
 }
 
 /* ---------- The calculator hub
@@ -1668,11 +1681,26 @@ a.chip:hover { text-decoration: none; }
 .app-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin: var(--sp-4) 0 var(--sp-6); }
 @media (min-width: 760px) { .app-stats { grid-template-columns: repeat(4, 1fr); } }
 .app-stat-card {
-  padding: var(--sp-4); border: 1px solid var(--outline); border-radius: var(--radius);
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); border: 1px solid var(--outline); border-radius: var(--radius);
   background: var(--surface); box-shadow: var(--shadow-1);
 }
-.app-stat-card .lbl { font-size: var(--fs-sm); color: var(--muted); font-weight: var(--fw-semi); margin-bottom: var(--sp-1); }
-.app-stat-card .val { font-size: var(--fs-xl); font-weight: var(--fw-black); font-variant-numeric: tabular-nums; }
+/* The icon sits on the same 24x24 stroke grid as the sidebar, so a tile and the nav item
+   it stands for read as one thing. It repeats what .lbl already says, so the markup marks
+   it aria-hidden and it stays decorative here. */
+.app-stat-card .ico { flex: none; color: var(--accent-strong); line-height: 0; }
+/* Below the four-up breakpoint the grid is two tiles wide, and there the icon costs more
+   than it gives: measured at 390px it took enough width off "Zaplanowane terminy" to wrap
+   the label and leave the row taller than it was before the icon existed (198px against
+   197px). Dropped, the same row is 153px. It is decoration -- the label carries the
+   meaning -- so nothing is lost by hiding it. */
+@media (max-width: 759px) { .app-stat-card .ico { display: none; } }
+.app-stat-body { display: flex; flex-direction: column; min-width: 0; }
+/* Figure first, label under it, both in one column beside the icon: the same four numbers
+   in about half the height. No nowrap on .lbl -- the German and Romanian labels run long
+   and have to stay free to wrap. */
+.app-stat-card .val { font-size: var(--fs-lg); line-height: 1.1; font-weight: var(--fw-black); font-variant-numeric: tabular-nums; }
+.app-stat-card .lbl { font-size: var(--fs-sm); color: var(--muted); font-weight: var(--fw-semi); margin: 0; }
 
 .app-two-col { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; align-items: start; }
 @media (min-width: 900px) { .app-two-col { grid-template-columns: 1.5fr 1fr; } }
