@@ -1640,7 +1640,11 @@ a.chip:hover { text-decoration: none; }
      only h1 with it — a signed-in phone had no heading at all. Clipped instead: out of
      the layout, still in the accessibility tree and the document outline. */
   .app-signed-in.workspace-page .page-head {
-    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);
+    /* padding: 0 as well as the 1px box — section.block carries --section-y top and
+       bottom, which would otherwise make this clipped element a 96px tall invisible
+       box sitting over the top of the shell. */
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    overflow: hidden; clip-path: inset(50%);
   }
 
   .app-side-foot, .app-side-who, .app-side-actions {
