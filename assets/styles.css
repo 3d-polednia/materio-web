@@ -318,8 +318,14 @@
   /* How wide a line of reading text is allowed to get. --maxw is the page shell and is
      far past a comfortable measure, so every block of prose caps itself here instead.
      It was the literal 56ch repeated in seven places; one token means new prose cannot
-     quietly ship at 1600px because whoever added it did not know the convention. */
-  --measure: 56ch;
+     quietly ship at 1600px because whoever added it did not know the convention.
+     KAFEL-6: 56 was tight for a 16px line and tighter still now the desktop base is 18px,
+     so prose reads at 62ch. --measure-tight holds the old 56 for the small print — the
+     material hint, the note under an estimate — which is --fs-xs and was only ever
+     sharing the prose token because there was one. Both are ch, so each is measured in
+     its own type size. */
+  --measure: 62ch;
+  --measure-tight: 56ch;
   --gutter: var(--sp-5);
   /* The header is sticky, so its height is also the offset an in-page anchor has to
      clear and the top edge the mobile drawer hangs from. One number, three uses. */
@@ -1649,7 +1655,7 @@ a.chip:hover { text-decoration: none; }
 .app-main { min-width: 0; flex: 1; padding: var(--sp-5) var(--gutter) var(--sp-10); }
 .app-main > [data-panel], .app-main > .app-next { width: 100%; max-width: 1200px; }
 .app-main [data-panel] > p { max-width: var(--measure); }
-.app-main .ws-mat-hint, .ws-estimate-foot { max-width: var(--measure); }
+.app-main .ws-mat-hint, .ws-estimate-foot { max-width: var(--measure-tight); }
 .app-card > p { max-width: var(--measure); }
 /* A field in the account panel used to take the whole card — an e-mail box 1092px wide
    on a 1440px screen, which reads as a layout bug rather than a field. 26rem is the

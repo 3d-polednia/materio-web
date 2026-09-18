@@ -207,7 +207,8 @@
 --focus-w: 2px;
 --focus-offset: 2px;
 --maxw: 1600px;
---measure: 56ch;
+--measure: 62ch;
+--measure-tight: 56ch;
 --gutter: var(--sp-5);
 --header-h: 64px;
 --section-y: clamp(48px, 6vw, 68px);
@@ -1095,7 +1096,7 @@ padding-top: var(--sp-3); border-top: 1px solid var(--outline);
 .app-main { min-width: 0; flex: 1; padding: var(--sp-5) var(--gutter) var(--sp-10); }
 .app-main > [data-panel], .app-main > .app-next { width: 100%; max-width: 1200px; }
 .app-main [data-panel] > p { max-width: var(--measure); }
-.app-main .ws-mat-hint, .ws-estimate-foot { max-width: var(--measure); }
+.app-main .ws-mat-hint, .ws-estimate-foot { max-width: var(--measure-tight); }
 .app-card > p { max-width: var(--measure); }
 .app-main .field input, .app-main .field select { max-width: 26rem; }
 .app-main .inline-form input { flex: 0 1 26rem; }
