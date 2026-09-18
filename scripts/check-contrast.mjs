@@ -83,6 +83,12 @@ const PAIRS = [
   ["--on-surface", "--field-bg", 4.5, "what somebody types into a field"],
   ["--muted", "--field-bg", 4.5, "the placeholder in a field"],
   ["--error", "--surface", 4.5, "error text on a card"],
+  // KAFEL-3: --ev-blue stopped being only a calendar category and became the colour of a
+  // figure being read — an estimate's quantities and costs, "dziś" in the terminarz. Both
+  // sit on cards, and the estimate prints onto the page background.
+  ["--ev-blue", "--surface", 4.5, "a figure in an estimate, on its card"],
+  ["--ev-blue", "--bg", 4.5, "that figure on the page"],
+  ["--ev-blue", "--surface-alt", 4.5, "that figure on an alternating section"],
   ["--surface", "--error", 4.5, "the label of a danger button"],
   ["--success", "--bg", 4.5, "success text on the page"],
   ["--warning", "--bg", 4.5, "warning text on the page"],

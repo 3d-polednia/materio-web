@@ -123,8 +123,11 @@ function calRow(job, editable, today) {
   const days = typeof crmDaysUntil === "function" ? crmDaysUntil(job.dueDate, today) : null;
   const rel = calRelative(days);
   const late = days !== null && days < 0 && editable;
-  const when = rel
-    ? `<em class="cal-rel ${late ? "job-due-late" : "muted"}">${calEsc(rel)}</em>` : "";
+  // Three states, three colours: late keeps the warning red, today takes the data colour
+  // (KAFEL-3 — it is the word the terminarz is scanned for), everything further out stays
+  // muted so one row at a time stands out.
+  const dueClass = late ? "job-due-late" : days === 0 ? "job-due-today" : "muted";
+  const when = rel ? `<em class="cal-rel ${dueClass}">${calEsc(rel)}</em>` : "";
 
   const date = editable
     ? `<input type="date" class="cal-due" value="${calEsc(job.dueDate || "")}"

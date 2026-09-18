@@ -437,6 +437,7 @@ font-size: var(--fs-xs); text-transform: uppercase;
 letter-spacing: var(--track-wide); color: var(--muted);
 }
 .ws-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ws-estimate .ws-table td.num { color: var(--ev-blue); font-weight: var(--fw-semi); }
 .ws-table-scroll { overflow-x: auto; }
 .table-scroll { overflow-x: auto; margin: var(--sp-2) 0 var(--sp-1); }
 .table-scroll table { min-width: 560px; }
@@ -1471,6 +1472,7 @@ margin: 0; padding: 0; list-style: none;
 .crm-chain-list li.on b { font-weight: var(--fw-semi); }
 .cal-when { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); }
 .cal-rel { font-size: var(--fs-xs); font-style: normal; }
+.cal-rel.job-due-today { color: var(--ev-blue); font-weight: var(--fw-semi); }
 .cal-when input[type="date"] { max-width: 11rem; }
 .data-list li.cal-row { flex-wrap: wrap; }
 .doc { max-width: 820px; margin: 0 auto; padding: var(--sp-10) var(--gutter) var(--sp-16); }

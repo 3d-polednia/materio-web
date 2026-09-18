@@ -93,6 +93,13 @@
   --warning: #8a5300;
   --warning-soft: #fbeed6;
   --on-warning-soft: #5c3700;
+  /* The five event colours. --ev-blue does one more job than the other four, and it is
+     not a calendar job: it is the site's colour for a figure the visitor is reading
+     rather than an action they can take — the quantities and costs in an estimate, the
+     "today" on a deadline. Everything meaningful used to be lime, so a number borrowed
+     the colour of a button. Nothing that can be clicked may take this colour, and it is
+     never a fill behind an action: two action colours would be worse than the problem.
+     Measured against every surface in check-contrast.mjs, both themes. */
   --ev-lime: #476c00;
   --on-ev-lime: #ffffff;
   --ev-blue: #185abc;
@@ -696,6 +703,10 @@ select:focus-visible, textarea:focus-visible {
   letter-spacing: var(--track-wide); color: var(--muted);
 }
 .ws-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* KAFEL-3: the figures an estimate exists to report carry the data colour, so a quantity
+   stops reading like a link. Only the cells — the editable estimate puts an <input> in
+   one of them and a field keeps its own colour. */
+.ws-estimate .ws-table td.num { color: var(--ev-blue); font-weight: var(--fw-semi); }
 /* Four columns and a złoty amount do not fit across 320 px, and the amounts must not
    wrap mid-number, so the table scrolls inside its own box instead of taking the page
    with it (chapter XXVIII). Printing gets the whole width back, below. */
@@ -2240,6 +2251,10 @@ a.chip:hover { text-decoration: none; }
    than squeezing it, which is chapter XXVIII's rule at 320 px. */
 .cal-when { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); }
 .cal-rel { font-size: var(--fs-xs); font-style: normal; }
+/* KAFEL-3: "dziś" is the one word in the terminarz a visitor scans for, and it was grey
+   like every other distance. It takes the data colour; late keeps its own warning red and
+   everything further out stays muted, so exactly one row shouts. */
+.cal-rel.job-due-today { color: var(--ev-blue); font-weight: var(--fw-semi); }
 .cal-when input[type="date"] { max-width: 11rem; }
 .data-list li.cal-row { flex-wrap: wrap; }
 

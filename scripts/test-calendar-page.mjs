@@ -261,6 +261,15 @@ head("1b. a row carries chapter XXIII's basic information and nothing more");
   check("a job that is not late is not marked as one",
     !(await page.$eval("#cal-list-soon .cal-rel", (n) => n.classList.contains("job-due-late"))),
     soonRel);
+  // KAFEL-3: three states, three markers. "Dziś" is the word this page is scanned for, so
+  // it carries the data colour; everything further out stays muted.
+  check("the job due today is marked as today's",
+    await page.$eval("#cal-list-today .cal-rel", (n) => n.classList.contains("job-due-today")));
+  check("and is neither late nor muted",
+    await page.$eval("#cal-list-today .cal-rel",
+      (n) => !n.classList.contains("job-due-late") && !n.classList.contains("muted")));
+  check("a job further out is not marked as today's",
+    !(await page.$eval("#cal-list-soon .cal-rel", (n) => n.classList.contains("job-due-today"))));
   await page.close();
 }
 
