@@ -146,6 +146,11 @@ export function reauthenticateWithCredential(user, credential) {
   return Promise.resolve();
 }
 export function reauthenticateWithPopup() { return Promise.resolve(); }
+// The page falls back to a redirect when the browser will not open a popup, and asks for the
+// result of that redirect on every load. Here nothing was ever redirected, so the answer is
+// "no pending sign-in" — which is what the real SDK returns too.
+export function signInWithRedirect() { log("googleRedirect"); return Promise.resolve(); }
+export function getRedirectResult() { return Promise.resolve(null); }
 export class GoogleAuthProvider {}
 export const EmailAuthProvider = { credential: (email, password) => ({ email, password }) };
 export function signInWithPopup() {

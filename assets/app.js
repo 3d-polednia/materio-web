@@ -117,6 +117,16 @@ const syncFields = (createdAt, deletedAt = null) => ({
   schemaVersion: SCHEMA_VERSION,
 });
 
+/**
+ * Popup failures that mean "this browser cannot show a popup", as opposed to "the visitor
+ * closed it". Only these are worth retrying as a redirect.
+ */
+const POPUP_UNAVAILABLE = [
+  "auth/popup-blocked",
+  "auth/operation-not-supported-in-this-environment",
+  "auth/web-storage-unsupported",
+];
+
 /** Firebase Auth error codes translated into the copy the page already carries. */
 function authMessage(code) {
   switch (code) {
@@ -206,6 +216,9 @@ async function boot() {
 
   authMod.onAuthStateChanged(auth, (user) => (user ? onSignedIn(user) : onSignedOut()));
   wireAuthForms();
+  // The browser may be arriving back from the Google redirect the button falls back to when a
+  // popup is blocked. Without this call the finished sign-in would be dropped without a word.
+  authMod.getRedirectResult(auth).catch((err) => status(authMessage(err && err.code), true));
   wireWorkspace();
   wireTabs();
   wireProfilePanel();
@@ -371,11 +384,26 @@ function wireAuthForms() {
   if (googleBtn) {
     googleBtn.addEventListener("click", async () => {
       status("");
+      const provider = new fb.GoogleAuthProvider();
       try {
         await applyPersistence(lmReadRemember());
-        await fb.signInWithPopup(auth, new fb.GoogleAuthProvider());
+        await fb.signInWithPopup(auth, provider);
       } catch (err) {
-        status(authMessage(err && err.code), true);
+        const code = err && err.code;
+        // A blocked popup is not a refused sign-in, it is a browser that will not open a second
+        // window — inside an in-app webview there is no second window at all. The redirect flow
+        // finishes the same sign-in in this page, and getRedirectResult below picks it up when
+        // the browser comes back. A popup the visitor closed themselves is left alone.
+        if (POPUP_UNAVAILABLE.includes(code)) {
+          try {
+            await fb.signInWithRedirect(auth, provider);
+            return;
+          } catch (redirectErr) {
+            status(authMessage(redirectErr && redirectErr.code), true);
+            return;
+          }
+        }
+        status(authMessage(code), true);
       }
     });
   }
