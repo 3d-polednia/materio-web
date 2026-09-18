@@ -320,6 +320,49 @@ function pdfFill(projectId, opt) {
   return true;
 }
 
+/** Fill the compact quote document from the same rows and money formatters as a project. */
+function pdfFillQuote(quoteId) {
+  const doc = document.getElementById("ws-pdf-doc");
+  const quote = typeof crmQuote === "function" ? crmQuote(quoteId) : null;
+  if (!doc || !quote) return false;
+  if (!pdfAllowed()) {
+    pdfClear();
+    return false;
+  }
+  const chain = crmChain("quote", quote.id);
+  const totals = crmQuoteTotals(quote.id);
+  const none = typeof t === "function" ? t("crm_node_none") : "";
+  pdfSet(doc, "subtitle", typeof t === "function" ? t("quopage_title") : "");
+  pdfSet(doc, "quoteName", quote.name);
+  pdfSet(doc, "clientName", chain.client ? chain.client.name : none);
+  pdfSet(doc, "jobName", chain.job ? chain.job.name : none);
+  pdfSet(doc, "projectName", chain.project ? chain.project.name : none);
+  pdfSet(doc, "date", pdfToday());
+
+  const projectRows = quote.projectId ? pdfRows(quote.projectId) : [];
+  const labour = Array.isArray(quote.labour) ? quote.labour : [];
+  const rows = projectRows.concat(labour.map((line) => ({
+    name: line.name,
+    qty: line.quantity === null ? "" : `${wsNum(line.quantity)} ${line.unit || ""}`.trim(),
+    minor: line.amountMinor || 0,
+    currencyCode: quote.currencyCode || totals.currencyCode || wsCurrency(),
+  })));
+  const body = pdfEl(doc, "rows");
+  if (body) body.innerHTML = rows.map((row) => `<tr><td>${wsEsc(row.name)}</td><td>${wsEsc(row.qty)}</td><td>${
+    wsEsc(wsMoney(row.minor, row.currencyCode))}</td></tr>`).join("");
+
+  const money = (minor) => minor === null ? "—" : wsMoney(minor, totals.currencyCode);
+  const per = (field) => wsSumsText(totals.projectByCurrency, field);
+  pdfSet(doc, "materials", totals.materials === null ? per("materials") : money(totals.materials));
+  pdfSet(doc, "other", totals.other === null ? per("other") : money(totals.other));
+  pdfSet(doc, "labour", money(totals.labour));
+  pdfSet(doc, "margin", money(totals.margin));
+  pdfSet(doc, "total", money(totals.total));
+  pdfShow(doc, "mixed", totals.mixed);
+  doc.hidden = false;
+  return true;
+}
+
 /* ------------------------------------------------------------------ wiring */
 
 function pdfInit() {
@@ -361,10 +404,11 @@ function pdfInit() {
     // normally means this listener is never reached at all; this is the case where the
     // markup was reached anyway.
     if (!pdfAllowed()) return;
-    const id = typeof wsActiveProjectId === "function"
-      ? (new URLSearchParams(location.search).get("id") || wsActiveProjectId())
-      : null;
-    if (!pdfFill(id, pdfOptions(form))) return;
+    const id = new URLSearchParams(location.search).get("id") ||
+      (typeof wsActiveProjectId === "function" ? wsActiveProjectId() : null);
+    const filled = form.hasAttribute("data-pdf-quote")
+      ? pdfFillQuote(id) : pdfFill(id, pdfOptions(form));
+    if (!filled) return;
     if (!pdfAllowed()) return;
     // The document is on the page and the rest of it is not, for the length of one print.
     document.body.dataset.pdfPrint = "1";

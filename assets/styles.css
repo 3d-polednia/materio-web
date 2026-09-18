@@ -450,6 +450,31 @@ section.block > .wrap > p { max-width: var(--measure); }
 .page-head h1 { margin: var(--sp-2) 0 var(--sp-2); }
 .page-head .lead { color: var(--muted); max-width: var(--measure); margin: 0; }
 
+/* The five Pro tool pages — /projekty/, /klienci/, /zlecenia/, /wyceny/, /terminarz/ —
+   put their head in .wrap (1600px) and the tool itself in .wrap.narrow (760px). On a
+   1920px window that reads as a title stranded against the left edge above a column
+   floating in the middle, with the right half of the screen empty. The two belong to one
+   another, so they share one width here instead of each keeping its own: 760px while the
+   window has nothing to spare, 1120px once it has. The reading measure is untouched —
+   .page-head .lead above is still capped at --measure, so a sentence never runs 1120px
+   wide. It is the lists, the forms and the money columns that get the room. */
+.tool-page { --tool-w: 760px; }
+@media (min-width: 1280px) { .tool-page { --tool-w: 1120px; } }
+.tool-page .page-head > .wrap,
+.tool-page .wrap.narrow { max-width: var(--tool-w); }
+
+/* A centred head on the pages that are read rather than worked in. The home hero has been
+   centred since the first session (.home-hero .hero-copy) while every other head was left
+   aligned — one site with two habits, which is what the owner saw. A tool page keeps its
+   left edge on purpose: a centred title above a left-aligned list of projects points at
+   nothing. /app/ keeps its own full-bleed rule above. Below 1160px there is no spare
+   width for centring to say anything, so it starts where the type scale already steps. */
+@media (min-width: 1160px) {
+  body:not(.tool-page):not(.workspace-page) .page-head > .wrap { text-align: center; }
+  body:not(.tool-page):not(.workspace-page) .page-head .lead { margin-inline: auto; }
+  body:not(.tool-page):not(.workspace-page) .page-head .breadcrumbs ol { justify-content: center; }
+}
+
 .breadcrumbs { font-size: var(--fs-sm); color: var(--muted); }
 .breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: 0; padding: 0; }
 .breadcrumbs li + li::before { content: "›"; margin-right: var(--sp-2); color: var(--outline-strong); }
@@ -1474,6 +1499,14 @@ a.chip:hover { text-decoration: none; }
 .inline-form input { flex: 1 1 160px; min-width: 0; width: auto; }
 .inline-form input[inputmode="decimal"] { flex: 0 1 84px; }
 .inline-form button { flex: none; }
+/* A field does not become easier to fill in by being wider. `flex: 1 1 160px` above lets
+   one input eat the whole row, which was invisible while a tool sat in a 760px column and
+   became a 1000px-wide box for a project name the moment the column grew. The cap is the
+   reading measure, the same one a paragraph gets, and it only applies where there is
+   width to waste — below 1160px the input still takes the row it is given. */
+@media (min-width: 1160px) {
+  .inline-form input, .inline-form select, .inline-form .field { max-width: var(--measure); }
+}
 
 .share-total {
   display: flex; justify-content: space-between; gap: var(--sp-3);

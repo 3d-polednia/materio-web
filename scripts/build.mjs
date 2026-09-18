@@ -56,7 +56,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260918e";
+const STAMP = "20260918f";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -878,7 +878,7 @@ const QUOTES_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
-  "/assets/crm-chain.js", "/assets/quotes-ui.js",
+  "/assets/crm-chain.js", "/assets/quotes-ui.js", "/assets/pdf-export.js",
 ];
 
 /**
@@ -1447,6 +1447,7 @@ function buildWorkspacePages() {
       lang, t, stamp: STAMP,
       title: `${t("wspage_title")} \u2014 LiczMat`,
       description: t("wspage_meta"),
+      bodyClass: "tool-page",
       path: urlProjects(lang),
       alternates: projAlt,
       main: projects.main, jsonld: [projects.ld],
@@ -1493,6 +1494,7 @@ function buildClientsPages() {
       lang, t, stamp: STAMP,
       title: `${t("clipage_title")} \u2014 LiczMat`,
       description: t("clipage_meta"),
+      bodyClass: "tool-page",
       path: urlClients(lang),
       alternates: alt,
       main, jsonld: [ld],
@@ -1525,6 +1527,7 @@ function buildJobsPages() {
       lang, t, stamp: STAMP,
       title: `${t("jobpage_title")} \u2014 LiczMat`,
       description: t("jobpage_meta"),
+      bodyClass: "tool-page",
       path: urlJobs(lang),
       alternates: alt,
       main, jsonld: [ld],
@@ -1558,6 +1561,7 @@ function buildQuotesPages() {
       lang, t, stamp: STAMP,
       title: `${t("quopage_title")} \u2014 LiczMat`,
       description: t("quopage_meta"),
+      bodyClass: "tool-page",
       path: urlQuotes(lang),
       alternates: alt,
       main, jsonld: [ld],
@@ -1591,6 +1595,7 @@ function buildCalendarPages() {
       lang, t, stamp: STAMP,
       title: `${t("calpage_title")} \u2014 LiczMat`,
       description: t("calpage_meta"),
+      bodyClass: "tool-page",
       path: urlCalendar(lang),
       alternates: alt,
       main, jsonld: [ld],

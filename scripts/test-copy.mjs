@@ -438,7 +438,7 @@ head("§7 how much prose a page carries");
  * once, in proGate(): the alternative to budgeting for it is a second, shorter wall on
  * these two pages, which is the thing src/pro.mjs exists to prevent — four walls are four
  * chances to describe one product four ways. /klienci/ (524), /zlecenia/ (544) and
- * /wyceny/ (470) are the same page type with the same block already inside their budgets.
+ * /wyceny/ (640) are the same page type with the same block already inside their budgets.
  *
  * /projekty/ carries two walls, because it withholds two different things: the three
  * figures are `costs` and the export is `pdf`. The second one is drawn `brief` — the name,
@@ -478,7 +478,9 @@ const BUDGET = {
      words this page did not use to count: /fr/projets/ measures 870 against Polish at
      716. These are field names, not prose; the section still forbids a paragraph. */
   materials: 2820, stores: 159, android: 519, projects: 872, estimate: 425,
-  clients: 524, jobs: 544, quotes: 470, calendar: 420, cookies: 637,
+  /* The widest /wyceny/ translation is Spanish at 638 words after the three add forms
+     received visible labels; 640 leaves a two-word regression margin. */
+  clients: 524, jobs: 544, quotes: 640, calendar: 420, cookies: 637,
   /* Session 62, audit item H7, and 220 rather than the 180 it was measured at the same
      day: the owner's Gewerbe is registered in Germany, so the page went from a name and
      an address to the set §5 DDG asks for — postal address, telephone, USt-IdNr., the

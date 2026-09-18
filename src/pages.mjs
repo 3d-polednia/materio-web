@@ -1478,6 +1478,53 @@ function pdfBlock(lang, t, features) {
           </section>`;
 }
 
+/** The quote reuses the project export's print lifecycle and document vocabulary. */
+function quotePdfBlock(lang, t, features) {
+  const c = (key) => PDF_COPY[lang][key];
+  // proGate() is indented for standalone insertion. Empty indentation becomes trailing
+  // whitespace inside this nested block, so remove it without changing any visible copy.
+  const gate = proGate(t, "pdf", features, lang,
+    { id: "pdf-gate", back: "quotes", brief: true }).split(/\r?\n/)
+    .map((line) => line.trimEnd()).join("\n").trim();
+  return `<section class="dash-sec ws-pdf" id="ws-pdf">
+            <div class="dash-head"><h2>${esc(c("pdf_title"))}</h2></div>
+            ${gate}
+            <div id="pdf-tool" hidden>
+              <p class="muted">${esc(PDF_WEB[lang].hint)}</p>
+              <form id="ws-pdf-form" data-pdf-quote>
+                <p><button type="submit" class="btn btn-primary">${esc(t("est_print"))}</button></p>
+              </form>
+              <article id="ws-pdf-doc" class="pdf-doc" hidden>
+                <header class="pdf-head">
+                  <p class="pdf-sub" data-pdf="subtitle">${esc(t("quopage_title"))}</p>
+                  <p class="pdf-line"><b data-pdf="quoteName"></b></p>
+                  <p class="pdf-line"><span>${esc(t("crm_node_client"))}:</span> <span data-pdf="clientName"></span></p>
+                  <p class="pdf-line"><span>${esc(t("crm_node_job"))}:</span> <span data-pdf="jobName"></span></p>
+                  <p class="pdf-line"><span>${esc(t("crm_node_project"))}:</span> <span data-pdf="projectName"></span></p>
+                  <p class="pdf-line"><span>${esc(c("pdf_date"))}:</span> <span data-pdf="date"></span></p>
+                </header>
+                <table class="pdf-table">
+                  <thead><tr>
+                    <th scope="col">${esc(c("pdfdoc_col_material"))}</th>
+                    <th scope="col">${esc(c("pdfdoc_col_qty"))}</th>
+                    <th scope="col">${esc(c("pdfdoc_col_value"))}</th>
+                  </tr></thead>
+                  <tbody data-pdf="rows"></tbody>
+                </table>
+                <dl class="pdf-pricing">
+                  <div><dt>${esc(t("quo_fig_materials"))}</dt><dd data-pdf="materials"></dd></div>
+                  <div><dt>${esc(t("quo_fig_other"))}</dt><dd data-pdf="other"></dd></div>
+                  <div><dt>${esc(t("quo_fig_labour"))}</dt><dd data-pdf="labour"></dd></div>
+                  <div><dt>${esc(t("quo_fig_margin"))}</dt><dd data-pdf="margin"></dd></div>
+                  <div class="pdf-strong"><dt>${esc(t("quo_fig_total"))}</dt><dd data-pdf="total"></dd></div>
+                </dl>
+                <p class="pdf-line pdf-mixed" data-pdf-row="mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+                <p class="pdf-foot">${esc(c("pdfdoc_footer"))}</p>
+              </article>
+            </div>
+          </section>`;
+}
+
 export function projectsMain(lang, t, aisles = [], features = []) {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
@@ -2386,6 +2433,45 @@ export function quotesMain(lang, t, features) {
                both ends. -->
           <nav class="crm-chain" id="quo-chain-line" aria-label="${esc(t("crm_chain_t"))}"></nav>
 
+          <section class="dash-sec">
+            <div class="dash-head"><h2>${esc(t("crm_chain_t"))}</h2></div>
+            <p class="muted">${esc(t("crm_chain_d"))}</p>
+            <div class="ws-mat-grid">
+              <form id="quo-client-form" class="ws-mat-f">
+                <label class="ws-bar-label" for="quo-client-pick">${esc(t("crm_node_client"))}</label>
+                <select id="quo-client-pick"></select>
+                <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+              </form>
+              <form id="quo-job-form" class="ws-mat-f">
+                <label class="ws-bar-label" for="quo-job-pick">${esc(t("crm_node_job"))}</label>
+                <select id="quo-job-pick"></select>
+                <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+              </form>
+              <form id="quo-project-form" class="ws-mat-f">
+                <label class="ws-bar-label" for="quo-project-pick">${esc(t("crm_node_project"))}</label>
+                <select id="quo-project-pick"></select>
+                <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+              </form>
+            </div>
+            <div class="ws-mat-grid">
+              <form id="quo-client-new-form" class="ws-mat-f">
+                <label class="ws-bar-label" for="quo-client-new">${esc(t("cli_new"))}</label>
+                <input id="quo-client-new" maxlength="120" placeholder="${esc(t("cli_new"))}" required>
+                <button type="submit" class="btn btn-ghost btn-sm">${esc(t("app_add"))}</button>
+              </form>
+              <form id="quo-job-new-form" class="ws-mat-f">
+                <label class="ws-bar-label" for="quo-job-new">${esc(t("job_new"))}</label>
+                <input id="quo-job-new" maxlength="120" placeholder="${esc(t("job_new"))}" required>
+                <button type="submit" class="btn btn-ghost btn-sm">${esc(t("app_add"))}</button>
+              </form>
+              <form id="quo-project-new-form" class="ws-mat-f">
+                <label class="ws-bar-label" for="quo-project-new">${esc(t("ws_new_project"))}</label>
+                <input id="quo-project-new" maxlength="120" placeholder="${esc(t("ws_new_project"))}" required>
+                <button type="submit" class="btn btn-ghost btn-sm">${esc(t("app_add"))}</button>
+              </form>
+            </div>
+          </section>
+
           <!-- Chapter XXII's five figures. Three of them are the project's own money,
                read through wsProjectCosts() and never copied onto the quote. -->
           <div class="ws-project-figs">
@@ -2482,11 +2568,18 @@ export function quotesMain(lang, t, features) {
               <a class="dash-more" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
             </div>
             <ul id="quo-project-list" class="data-list"></ul>
-            <form id="quo-project-form" class="inline-form">
-              <select id="quo-project-pick" aria-label="${esc(t("quo_project_add"))}"></select>
-              <button type="submit" class="btn btn-primary btn-sm">${esc(t("quo_project_add"))}</button>
-            </form>
             <p class="muted field-note">${esc(t("quo_project_d"))}</p>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head"><h2>${esc(t("ws_rooms"))}</h2></div>
+            <ul id="quo-room-list" class="data-list"></ul>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head"><h2>${esc(t("proj_mat_t"))}</h2></div>
+            <ul id="quo-material-list" class="data-list"></ul>
+            <p class="muted field-note" id="quo-material-sum"></p>
           </section>
 
           <section class="dash-sec">
@@ -2495,6 +2588,8 @@ export function quotesMain(lang, t, features) {
             </div>
             <p id="quo-note" class="crm-note"></p>
           </section>
+
+          ${quotePdfBlock(lang, t, features)}
         </div>
       </article>`;
 

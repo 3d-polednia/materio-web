@@ -87,6 +87,24 @@ Tutaj zostaje wyłącznie to, co żywe: tabela postępu, dwie ostatnie sesje, li
 zrobienia w konsolach, znane ograniczenia i otwarte decyzje. Pełna lista otwartych wątków
 obu repozytoriów, przeglądana razem z tym plikiem, jest w `Obsidian/Liczmat/Meta/Otwarte watki.md`.
 
+## Wyceny: wybór powiązań i eksport PDF (2026-09-18)
+
+Zgłoszenie właściciela zamknięte w drzewie roboczym. `/wyceny/?id=…` ma teraz selektory
+klienta, zlecenia i projektu oraz formularze tworzące każdy z tych rekordów bez opuszczania
+wyceny. Model nie dostał równoległych `clientId` ani `jobId`: wycena nadal zapisuje wyłącznie
+`projectId`, a brakujące zlecenie lub projekt powstaje jako zwykły rekord CRM. Dzięki temu
+`crmChain()` daje ten sam wynik na stronach klienta, zlecenia i wyceny.
+
+Wybrany projekt pokazuje na wycenie wszystkie swoje pomieszczenia i materiały wraz z sumą.
+To podgląd, nie wybór podzbioru: kontrakt wyceny i kontrakt synchronizacji nie mają pól na
+`roomIds` ani `itemIds`, więc ich dopisanie tylko po stronie WWW stworzyłoby dane, których
+aplikacja nie potrafi przenieść. Eksport PDF wyceny używa wspólnego `assets/pdf-export.js`,
+`PDF_COPY`, formatterów workspace i podwójnego `pdfAllowed()`.
+
+Budżet prozy strony `quotes` wzrósł z 470 do 640 słów. Nowe 170 słów to etykiety trzech
+selektorów, formularzy, podglądu projektu i ukrytego dokumentu PDF w trzynastu językach;
+budżet sieciowy nadal przechodzi `scripts/test-perf.mjs`.
+
 ## Sesja 69 — automatyczna synchronizacja i cztery zgłoszenia właściciela (2026-09-10)
 
 Cztery rzeczy zgłoszone naraz po pracy na żywym `liczmat.com`, wszystkie zamknięte i wdrożone:

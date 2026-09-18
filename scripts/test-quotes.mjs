@@ -843,6 +843,9 @@ head("9. the frame the build writes");
 
     for (const id of ["quo-page", "quo-index", "quo-detail", "quo-list", "quo-form",
       "quo-labour-list", "quo-labour-form", "quo-project-list", "quo-project-form",
+      "quo-client-form", "quo-client-pick", "quo-client-new-form", "quo-job-form",
+      "quo-job-pick", "quo-job-new-form", "quo-project-pick", "quo-project-new-form",
+      "quo-room-list", "quo-material-list", "quo-material-sum", "ws-pdf-form", "ws-pdf-doc",
       "quo-margin", "quo-fig-materials", "quo-fig-other", "quo-fig-labour",
       "quo-fig-sub", "quo-fig-margin", "quo-fig-total", "quo-mixed", "quo-chain-line",
       "quo-undo", "quo-gate", "quo-tool", "quo-pro-chip"]) {
@@ -862,6 +865,28 @@ head("9. the frame the build writes");
     const jobs = jobsMain(lang, t, FEATURES);
     check(`${lang}: the jobs page links to the quotes`, jobs.main.includes(urlQuotes(lang)));
   }
+}
+
+head("9a. the quote owns the chain controls and the PDF document");
+{
+  const ui = read("assets/quotes-ui.js");
+  const pdf = read("assets/pdf-export.js");
+  const build = read("scripts/build.mjs");
+  check("client choice is resolved through the quote's project link",
+    ui.includes("function quoChooseClient(clientId)") && ui.includes("crmLinkProject(client.id, project.id)"));
+  check("a job without a project gains one before the quote points at it",
+    ui.includes("function quoChooseJob(jobId)") && ui.includes("project = wsAddProject(job.name)"));
+  check("the quote still writes only projectId",
+    !/crmUpdateQuote\([^)]*,\s*\{\s*(clientId|jobId)/.test(ui));
+  check("rooms and materials are read from the selected project",
+    ui.includes("wsRooms(project.id)") && ui.includes("wsItems(project.id)"));
+  check("the quote page loads the shared PDF exporter", /QUOTES_SCRIPTS[\s\S]*pdf-export\.js/.test(build));
+  check("the quote export uses the shared permission check twice",
+    pdf.includes("function pdfFillQuote(quoteId)") &&
+      (pdf.match(/if \(!pdfAllowed\(\)\) return;/g) || []).length >= 2);
+  check("the quote PDF includes project rows and labour rows",
+    pdf.includes("const projectRows = quote.projectId ? pdfRows(quote.projectId) : []") &&
+      pdf.includes("projectRows.concat(labour.map"));
 }
 
 head("9b. the copy, in four languages");
