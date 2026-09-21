@@ -306,6 +306,11 @@
               <p class="ws-project-fig"><span class="eyebrow muted">Інші витрати</span> <b id="ws-project-other"></b></p>
               <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Разом за проєктом</span> <b id="ws-project-total"></b></p>
             </div>
+            
+            <div class="ws-project-figs" id="ws-biz-figs" hidden>
+              <p class="ws-project-fig"><span class="eyebrow muted">Погоджена вартість</span> <b id="ws-biz-agreed"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Залишається</span> <b id="ws-biz-left"></b></p>
+            </div>
             <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Позиції в різних валютах. Сума додає їх, але нічого не перераховує за курсом — перевір валюту в колонці вартості.</p>
           </div>
 
@@ -321,6 +326,23 @@
             <input id="ws-rename-name" type="text" maxlength="120" aria-label="Назва проєкту" required>
             <button type="submit" class="btn btn-primary btn-sm">Зберегти</button>
             <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Скасувати</button>
+          </form>
+
+          
+          <form id="ws-biz-form" class="inline-form mt-4">
+            <label class="field" for="ws-biz-client"><span class="fld-label">Клієнт</span>
+              <select id="ws-biz-client"></select></label>
+            <label class="field field-narrow" for="ws-biz-status"><span class="fld-label">Статус</span>
+              <select id="ws-biz-status"><option value="new">Нове</option><option value="active">У роботі</option><option value="done">Завершене</option><option value="cancelled">Скасоване</option></select></label>
+            <label class="field field-narrow" for="ws-biz-due"><span class="fld-label">Термін</span>
+              <input id="ws-biz-due" type="date"></label>
+            <label class="field field-narrow" for="ws-biz-value"><span class="fld-label">Погоджена вартість</span>
+              <input id="ws-biz-value" type="text" inputmode="decimal"></label>
+            <label class="field field-narrow" for="ws-biz-color"><span class="fld-label">Колір</span>
+              <select id="ws-biz-color"><option value="">Без кольору</option><option value="lime">Лаймовий</option><option value="blue">Синій</option><option value="amber">Бурштиновий</option><option value="red">Червоний</option><option value="violet">Фіолетовий</option></select></label>
+            <label class="field" for="ws-biz-note"><span class="fld-label">Нотатки</span>
+              <textarea id="ws-biz-note" maxlength="2000" rows="2"></textarea></label>
+            <button type="submit" class="btn btn-primary btn-sm">Зберегти</button>
           </form>
 
           <div id="ws-delete-ask" class="ws-ask mt-4" hidden>

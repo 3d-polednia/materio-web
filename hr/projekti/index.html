@@ -306,6 +306,11 @@
               <p class="ws-project-fig"><span class="eyebrow muted">Ostali troškovi</span> <b id="ws-project-other"></b></p>
               <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Zbroj projekta</span> <b id="ws-project-total"></b></p>
             </div>
+            
+            <div class="ws-project-figs" id="ws-biz-figs" hidden>
+              <p class="ws-project-fig"><span class="eyebrow muted">Dogovorena vrijednost</span> <b id="ws-biz-agreed"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Ostaje</span> <b id="ws-biz-left"></b></p>
+            </div>
             <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Stavke su u različitim valutama. Zbroj ih zbraja, ali ništa ne preračunava po tečaju — provjeri valute u stupcu troška.</p>
           </div>
 
@@ -321,6 +326,23 @@
             <input id="ws-rename-name" type="text" maxlength="120" aria-label="Naziv projekta" required>
             <button type="submit" class="btn btn-primary btn-sm">Spremi</button>
             <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Odustani</button>
+          </form>
+
+          
+          <form id="ws-biz-form" class="inline-form mt-4">
+            <label class="field" for="ws-biz-client"><span class="fld-label">Klijent</span>
+              <select id="ws-biz-client"></select></label>
+            <label class="field field-narrow" for="ws-biz-status"><span class="fld-label">Status</span>
+              <select id="ws-biz-status"><option value="new">Novi</option><option value="active">U tijeku</option><option value="done">Završen</option><option value="cancelled">Otkazan</option></select></label>
+            <label class="field field-narrow" for="ws-biz-due"><span class="fld-label">Rok</span>
+              <input id="ws-biz-due" type="date"></label>
+            <label class="field field-narrow" for="ws-biz-value"><span class="fld-label">Dogovorena vrijednost</span>
+              <input id="ws-biz-value" type="text" inputmode="decimal"></label>
+            <label class="field field-narrow" for="ws-biz-color"><span class="fld-label">Boja</span>
+              <select id="ws-biz-color"><option value="">Bez boje</option><option value="lime">Limeta</option><option value="blue">Plava</option><option value="amber">Jantarna</option><option value="red">Crvena</option><option value="violet">Ljubičasta</option></select></label>
+            <label class="field" for="ws-biz-note"><span class="fld-label">Bilješke</span>
+              <textarea id="ws-biz-note" maxlength="2000" rows="2"></textarea></label>
+            <button type="submit" class="btn btn-primary btn-sm">Spremi</button>
           </form>
 
           <div id="ws-delete-ask" class="ws-ask mt-4" hidden>

@@ -41,61 +41,76 @@ Jobs (Zlecenia) stop being their own independent entity and are merged into Proj
 
 ## Tasks
 
+> **Wszystkie sześć zadań wykonane 2026-09-21.** Trzy odstępstwa od planu, każde
+> opisane na miejscu w kodzie:
+>
+> 1. Plan wskazuje `src/app-pages.mjs` jako miejsce ciał stron. Ciała stron są
+>    w `src/pages.mjs`; `app-pages.mjs` to pulpit `/app/`.
+> 2. Trasy `quotes` i `calendar` były dziećmi `jobs`. Przepięte pod `projects` —
+>    inaczej dwa żywe moduły wisiałyby pod stroną, która przekierowuje gdzie indziej.
+> 3. `/zlecenia/` kanonikalizuje się **do siebie**, nie do `/projekty/`. Head mówiący
+>    naraz „nie indeksuj mnie" i „ta prawdziwa jest tam" to dwie sprzeczne instrukcje.
+>
+> Poza planem, bo scalenie by to usunęło po cichu: pasek ścieżki, wyceny projektu
+> i historia przeniosły się z `/zlecenia/` na `/projekty/`; kolor wydarzenia wrócił
+> jako pole projektu; sześć pól jest edytowalnych na otwartym projekcie, nie tylko
+> przy zakładaniu; wróciły dwie figury — uzgodniona kwota i ile z niej zostaje.
+
 ### 1. Data Model & Local Migration
 **Blocked by:** None (Can run in parallel with Task 3 & 6)
 **Files:** `assets/workspace.js`, `assets/crm-store.js`, `assets/crm.js`
 **Interfaces:** LocalStorage `materio-workspace-v1`, `liczmat-crm-v1`
 
-- [ ] Modify `assets/workspace.js` to initialize new projects with `clientId: ''`, `status: 'new'`, `dueDate: ''`, `valueMinor: null`, `currencyCode: ''`, and `note: ''`.
-- [ ] Modify `assets/crm-store.js` `crmLoad()` to detect legacy `jobs`.
-- [ ] Write migration logic in `crmLoad()`: iterate `jobs`, map each to a project payload (respecting `remoteId`, `YYYY-MM-DD` for due date, and minor units for amount), inject into `workspace.js` data, and overwrite `jobs` with `[]` in `liczmat-crm-v1`.
-- [ ] Delete all job-related CRUD functions from `assets/crm.js`.
+- [x] Modify `assets/workspace.js` to initialize new projects with `clientId: ''`, `status: 'new'`, `dueDate: ''`, `valueMinor: null`, `currencyCode: ''`, and `note: ''`.
+- [x] Modify `assets/crm-store.js` `crmLoad()` to detect legacy `jobs`.
+- [x] Write migration logic in `crmLoad()`: iterate `jobs`, map each to a project payload (respecting `remoteId`, `YYYY-MM-DD` for due date, and minor units for amount), inject into `workspace.js` data, and overwrite `jobs` with `[]` in `liczmat-crm-v1`.
+- [x] Delete all job-related CRUD functions from `assets/crm.js`.
 
 ### 2. Cloud Sync Adaptation
 **Blocked by:** Task 1
 **Files:** `assets/app.js`
 **Interfaces:** Firestore
 
-- [ ] Locate the push logic in `assets/app.js` and remove the path that uploads to the `jobs` collection.
-- [ ] Ensure the push logic for projects writes empty strings, never null or undefined, for `clientId`, `dueDate`, and `currencyCode`.
-- [ ] Locate the pull logic. Ensure it still queries the `jobs` collection.
-- [ ] Add conversion logic in the pull handler: incoming `jobs` documents must be mapped to local `projects` in `workspace.js`.
-- [ ] After processing a pulled job, write a tombstone back to Firestore for that job (`deletedAt: serverTimestamp()`) so it won't be pulled again. Ensure we do not overwrite or fight tombstones created by Android.
+- [x] Locate the push logic in `assets/app.js` and remove the path that uploads to the `jobs` collection.
+- [x] Ensure the push logic for projects writes empty strings, never null or undefined, for `clientId`, `dueDate`, and `currencyCode`.
+- [x] Locate the pull logic. Ensure it still queries the `jobs` collection.
+- [x] Add conversion logic in the pull handler: incoming `jobs` documents must be mapped to local `projects` in `workspace.js`.
+- [x] After processing a pulled job, write a tombstone back to Firestore for that job (`deletedAt: serverTimestamp()`) so it won't be pulled again. Ensure we do not overwrite or fight tombstones created by Android.
 
 ### 3. Routing & SEO Redirects
 **Blocked by:** None (Can run in parallel with 1, 4, 5, 6)
 **Files:** `src/ia.mjs`, `src/app-pages.mjs`, `src/pages.mjs`
 **Interfaces:** SSG Router
 
-- [ ] In `src/ia.mjs`, find routes related to `jobs` or `zlecenie`. Set `indexable: false`.
-- [ ] In `src/app-pages.mjs` (or wherever the template for the job route is defined), replace the page content with a `<meta http-equiv="refresh" content="0; url=/projekty/">` tag.
-- [ ] Ensure the redirect handles language prefixes correctly based on the SSG context.
+- [x] In `src/ia.mjs`, find routes related to `jobs` or `zlecenie`. Set `indexable: false`.
+- [x] In `src/app-pages.mjs` (or wherever the template for the job route is defined), replace the page content with a `<meta http-equiv="refresh" content="0; url=/projekty/">` tag.
+- [x] Ensure the redirect handles language prefixes correctly based on the SSG context.
 
 ### 4. UI Refactoring: CRM & Chain
 **Blocked by:** Task 1
 **Files:** `assets/crm-ui.js`, `assets/crm-chain.js`, `src/app-pages.mjs`
 **Interfaces:** DOM
 
-- [ ] In `src/app-pages.mjs`, locate the CRM Hub tile for Jobs and replace its target/icon/label to point to Projects.
-- [ ] In `assets/crm-chain.js`, remove the Job segment. The sequence `CHN_SECTION` should go `client -> project -> quote`. Add appropriate "next step" text (e.g., "Dodaj projekt").
-- [ ] In `assets/crm-ui.js`, strip out all rendering logic for Job lists, Job details, and Job forms.
-- [ ] Wire the Client detail view in `crm-ui.js` to list the Client's Projects (querying `workspace.js` by `clientId`).
+- [x] In `src/app-pages.mjs`, locate the CRM Hub tile for Jobs and replace its target/icon/label to point to Projects.
+- [x] In `assets/crm-chain.js`, remove the Job segment. The sequence `CHN_SECTION` should go `client -> project -> quote`. Add appropriate "next step" text (e.g., "Dodaj projekt").
+- [x] In `assets/crm-ui.js`, strip out all rendering logic for Job lists, Job details, and Job forms.
+- [x] Wire the Client detail view in `crm-ui.js` to list the Client's Projects (querying `workspace.js` by `clientId`).
 
 ### 5. UI Refactoring: Projects
 **Blocked by:** Task 1
 **Files:** `assets/workspace-ui.js` (GUESS), `src/app-pages.mjs`
 **Interfaces:** DOM
 
-- [ ] Locate the project creation/edit form (GUESS: `assets/workspace-ui.js` or within `app-pages.mjs`).
-- [ ] Add a dropdown/selector for Client (populated from `crm-store.js` via `remoteId`).
-- [ ] Add inputs for `status` (new, active, done, cancelled), `dueDate` (date picker returning `YYYY-MM-DD`), `valueMinor` (handling minor units formatting), `currencyCode`, and `note` (max 2000 chars).
-- [ ] Update the project list view to display the client name, status, and deadline.
+- [x] Locate the project creation/edit form (GUESS: `assets/workspace-ui.js` or within `app-pages.mjs`).
+- [x] Add a dropdown/selector for Client (populated from `crm-store.js` via `remoteId`).
+- [x] Add inputs for `status` (new, active, done, cancelled), `dueDate` (date picker returning `YYYY-MM-DD`), `valueMinor` (handling minor units formatting), `currencyCode`, and `note` (max 2000 chars).
+- [x] Update the project list view to display the client name, status, and deadline.
 
 ### 6. Translations Update
 **Blocked by:** None (Can run in parallel with everything)
 **Files:** `assets/i18n-pages.js`
 **Interfaces:** SSG i18n
 
-- [ ] Audit `assets/i18n-pages.js` for keys containing `job` or `zlecenie`.
-- [ ] Rename keys conceptually moving to projects (e.g., `crm_job_status` -> `crm_proj_status`) across all 13 languages.
-- [ ] Delete strictly orphaned keys (e.g., `crm_jobs_empty`) only after confirming they are not used elsewhere in `app-pages.mjs` or `crm-ui.js`.
+- [x] Audit `assets/i18n-pages.js` for keys containing `job` or `zlecenie`.
+- [x] Rename keys conceptually moving to projects (e.g., `crm_job_status` -> `crm_proj_status`) across all 13 languages.
+- [x] Delete strictly orphaned keys (e.g., `crm_jobs_empty`) only after confirming they are not used elsewhere in `app-pages.mjs` or `crm-ui.js`.

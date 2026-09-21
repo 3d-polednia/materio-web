@@ -306,6 +306,11 @@
               <p class="ws-project-fig"><span class="eyebrow muted">Inne koszty</span> <b id="ws-project-other"></b></p>
               <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Suma projektu</span> <b id="ws-project-total"></b></p>
             </div>
+            
+            <div class="ws-project-figs" id="ws-biz-figs" hidden>
+              <p class="ws-project-fig"><span class="eyebrow muted">Uzgodniona wartość</span> <b id="ws-biz-agreed"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Zostaje</span> <b id="ws-biz-left"></b></p>
+            </div>
             <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Pozycje są w różnych walutach. Nic nie jest przeliczane po kursie, więc nie ma jednej sumy — każda waluta ma własną.</p>
           </div>
 
@@ -321,6 +326,23 @@
             <input id="ws-rename-name" type="text" maxlength="120" aria-label="Nazwa projektu" required>
             <button type="submit" class="btn btn-primary btn-sm">Zapisz</button>
             <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Anuluj</button>
+          </form>
+
+          
+          <form id="ws-biz-form" class="inline-form mt-4">
+            <label class="field" for="ws-biz-client"><span class="fld-label">Klient</span>
+              <select id="ws-biz-client"></select></label>
+            <label class="field field-narrow" for="ws-biz-status"><span class="fld-label">Status</span>
+              <select id="ws-biz-status"><option value="new">Nowe</option><option value="active">W toku</option><option value="done">Zakończone</option><option value="cancelled">Anulowane</option></select></label>
+            <label class="field field-narrow" for="ws-biz-due"><span class="fld-label">Termin</span>
+              <input id="ws-biz-due" type="date"></label>
+            <label class="field field-narrow" for="ws-biz-value"><span class="fld-label">Uzgodniona wartość</span>
+              <input id="ws-biz-value" type="text" inputmode="decimal"></label>
+            <label class="field field-narrow" for="ws-biz-color"><span class="fld-label">Kolor</span>
+              <select id="ws-biz-color"><option value="">Bez koloru</option><option value="lime">Limonkowy</option><option value="blue">Niebieski</option><option value="amber">Bursztynowy</option><option value="red">Czerwony</option><option value="violet">Fioletowy</option></select></label>
+            <label class="field" for="ws-biz-note"><span class="fld-label">Notatki</span>
+              <textarea id="ws-biz-note" maxlength="2000" rows="2"></textarea></label>
+            <button type="submit" class="btn btn-primary btn-sm">Zapisz</button>
           </form>
 
           <div id="ws-delete-ask" class="ws-ask mt-4" hidden>

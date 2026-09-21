@@ -270,15 +270,19 @@ head("2. opening a client shows chapter XX's record");
     await page.getAttribute("#crm-client-projects a", "href"), `${urlProjects("pl")}?id=p1`);
 
   // Session 26 made the history chapter XXIV's, not only chapter XX's: the client's own
-  // row is in it beside the two saved lines, and a job or a quote would be too.
+  // row is in it beside the two saved lines, and a quote would be too. The merge of
+  // 2026-09-21 added a fourth — the project's own creation row, which took the place of
+  // the job row that used to sit there.
   const history = await rows(page, "#crm-history");
-  eq("both saved lines are in the history, and the client's own row with them",
-    history.length, 3);
-  check("newest first", history[0].includes("Jan Kowalski"), history.join(" | "));
+  eq("both saved lines, the client's own row and the project's",
+    history.length, 4);
+  check("newest first", history[0].includes("Remont łazienki"), history.join(" | "));
+  check("the client's own row is in it",
+    history[1].includes("Jan Kowalski"), history[1]);
   check("a saved line names the project it happened in",
-    history[1].includes("Remont łazienki"), history[1]);
+    history[2].includes("Remont łazienki"), history[2]);
   check("and says which of the two it was",
-    history[1].includes("Dopisano koszt") && history[2].includes("Zapisano kalkulację"),
+    history[2].includes("Dopisano koszt") && history[3].includes("Zapisano kalkulację"),
     history.join(" | "));
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
@@ -411,10 +415,18 @@ head("4. a project is filed under a client, and taken off again");
   check("which it says out loud",
     Boolean((await page.textContent("#crm-project-none")).trim()));
 
+  // Which row is last is not fixed any more: crmClientProjects() reads project.clientId
+  // first and falls back to the client's own list, so the order is the workspace's rather
+  // than the order the links were made in. The test asks which one it is about to remove
+  // instead of assuming, and then checks that this one — and only this one — went.
+  const doomed = await page.$eval("#crm-client-projects li:last-child [data-unlink]",
+    (n) => n.closest("li").getAttribute("data-id"));
   await page.click("#crm-client-projects li:last-child [data-unlink]");
   await page.waitForFunction(() =>
     document.querySelectorAll("#crm-client-projects > li").length === 1);
-  eq("taking one off leaves the other", (await liveClients(page))[0].projectIds.join(), "p1");
+  const left = (await liveClients(page))[0].projectIds;
+  eq("taking one off leaves exactly the other", left.length, 1);
+  check("and the one left is not the one taken off", left[0] !== doomed, `${left[0]} vs ${doomed}`);
   eq("and the project itself is untouched", await page.evaluate(() =>
     JSON.parse(localStorage.getItem("materio-workspace-v1")).projects.length), 2);
   await page.close();

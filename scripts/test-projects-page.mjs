@@ -389,10 +389,15 @@ head("6. update — renaming happens on the page, not in a browser dialog");
   eq("the form closes", await page.$eval("#ws-rename-form", (n) => n.hidden), true);
   eq("its lines are untouched", (await rows(page, "#ws-project-lines")).length, 2);
 
-  // The rename went into the document the phone reads, and into nothing else.
+  // The rename went into the document the phone reads, and into nothing else. The list is
+  // longer since the merge of 2026-09-21: a project carries what a job used to, so
+  // clientId, status, dueDate, valueMinor, currencyCode and note are contract fields now,
+  // and `color` rides along as the calendar's colour (not in validProject(), accepted
+  // because every write is a merge and the rules have no hasOnly()).
   const doc = (await store(page)).projects.find((p) => p.id === "p1");
   eq("the document still carries exactly the fields the contract knows",
-    Object.keys(doc).sort().join(","), "archived,createdAt,deletedAt,id,name,schemaVersion,updatedAt");
+    Object.keys(doc).sort().join(","),
+    "archived,clientId,color,createdAt,currencyCode,deletedAt,dueDate,id,name,note,schemaVersion,status,updatedAt,valueMinor");
 
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();

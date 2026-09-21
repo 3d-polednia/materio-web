@@ -35,7 +35,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LANGS, urlCalendar, urlJobs } from "../src/site.mjs";
+import { LANGS, urlCalendar, urlProjects } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const TZ = "Europe/Warsaw";
@@ -113,39 +113,42 @@ function day(offset) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-/** One project, so a job has something to be done in. */
+/**
+ * One project in each of chapter XXIII's five buckets, plus the two closed states: one
+ * that had a deadline and one that never did. The dates move with the day the test runs
+ * on, because the page measures against the day the visitor is on.
+ *
+ * These were jobs until the merge of 2026-09-21. The terminarz reads the same fields it
+ * always did — status and dueDate — off the row that carries them now.
+ */
 const workspace = () => ({
-  projects: [{ id: "p1", name: "Remont łazienki", archived: false, ...sync(T0) }],
+  projects: [
+    proj("j-late", "Zaległa hydraulika", day(-3), "active", 1_250_000),
+    proj("j-today", "Malowanie dziś", day(0), "new", null),
+    proj("j-soon", "Gres w tym tygodniu", day(3), "active", null),
+    proj("j-later", "Poddasze za miesiąc", day(30), "new", null),
+    proj("j-none", "Altana bez daty", "", "new", null),
+    proj("j-done", "Skończona łazienka", day(-10), "done", null),
+    proj("j-cancel", "Anulowana weranda", "", "cancelled", null),
+  ],
   rooms: [], estimations: [], shoppingItems: [],
 });
 
-/**
- * One job in each of chapter XXIII's five buckets, plus the two closed states: one that
- * had a deadline and one that never did. The dates move with the day the test runs on,
- * because the page measures against the day the visitor is on.
- */
+/** The client the seven are filed under; the terminarz itself never reads this store. */
 const crm = () => ({
   clients: [{
     id: "c1", name: "Jan Kowalski", phone: "600 100 200", email: "", address: "",
-    note: "", projectIds: ["p1"], archived: false, ...sync(T0),
+    note: "", projectIds: ["j-late"], archived: false, ...sync(T0),
   }],
-  jobs: [
-    job("j-late", "Zaległa hydraulika", day(-3), "active", 1_250_000),
-    job("j-today", "Malowanie dziś", day(0), "new", null),
-    job("j-soon", "Gres w tym tygodniu", day(3), "active", null),
-    job("j-later", "Poddasze za miesiąc", day(30), "new", null),
-    job("j-none", "Altana bez daty", "", "new", null),
-    job("j-done", "Skończona łazienka", day(-10), "done", null),
-    job("j-cancel", "Anulowana weranda", "", "cancelled", null),
-  ],
   quotes: [],
 });
 
-function job(id, name, dueDate, status, valueMinor) {
+function proj(id, name, dueDate, status, valueMinor) {
   return {
-    id, name, clientId: "c1", projectId: id === "j-late" ? "p1" : "",
-    status, description: "", note: "", dueDate,
+    id, name, archived: false,
+    clientId: "c1", status, dueDate,
     valueMinor, currencyCode: valueMinor === null ? "" : "PLN",
+    note: "", color: "",
     ...sync(T0 + 1 * DAY),
   };
 }
@@ -213,8 +216,8 @@ async function open(ctx, url, opts = {}) {
 const rows = (page, sel) =>
   page.$$eval(`${sel} > li`, (li) => li.map((n) => n.textContent.replace(/\s+/g, " ").trim()));
 const ids = (page, sel) => page.$$eval(`${sel} > li`, (li) => li.map((n) => n.dataset.id));
-const store = (page) => page.evaluate(() => JSON.parse(localStorage.getItem("liczmat-crm-v1") || "{}"));
-const jobById = async (page, id) => ((await store(page)).jobs || []).find((j) => j.id === id);
+const store = (page) => page.evaluate(() => JSON.parse(localStorage.getItem("materio-workspace-v1") || "{}"));
+const projectById = async (page, id) => ((await store(page)).projects || []).find((p) => p.id === id);
 
 const CAL = urlCalendar("pl");
 const ctx = await context({ viewport: { width: 1280, height: 900 } });
@@ -291,7 +294,10 @@ head("1c. the closed half holds the finished job that had a date, and only that"
 
 head("1d. an empty store says what it is waiting for");
 {
-  const page = await open(ctx, CAL, { workspace: workspace() });
+  // The rows the terminarz reads are projects since 2026-09-21, so "empty" is an empty
+  // workspace — it used to be an empty `jobs` array in the CRM store.
+  const page = await open(ctx, CAL,
+    { workspace: { projects: [], rooms: [], estimations: [], shoppingItems: [] }, crm: crm() });
   eq("the note is shown", await page.$eval("#cal-empty", (n) => n.hidden), false);
   for (const b of ["late", "today", "soon", "later", "none"]) {
     eq(`the "${b}" bucket is absent rather than empty`,
@@ -303,7 +309,7 @@ head("1d. an empty store says what it is waiting for");
 
 /* ---------------------------------------------------- 2. the one write */
 
-head("2. a deadline typed here is the job's own field");
+head("2. a deadline typed here is the project's own field");
 {
   const page = await open(ctx, CAL, { workspace: workspace(), crm: crm() });
   const target = day(2);
@@ -313,9 +319,9 @@ head("2. a deadline typed here is the job's own field");
     return el && [...el.children].some((li) => li.dataset.id === id);
   }, "j-none");
 
-  const stored = await jobById(page, "j-none");
-  eq("the date is on the job", stored.dueDate, target);
-  eq("the job's name is untouched", stored.name, "Altana bez daty");
+  const stored = await projectById(page, "j-none");
+  eq("the date is on the project", stored.dueDate, target);
+  eq("the project's name is untouched", stored.name, "Altana bez daty");
   eq("its status too", stored.status, "new");
   eq("and its client", stored.clientId, "c1");
   eq("the undated bucket is empty now", await page.$eval("#cal-sec-none", (n) => n.hidden), true);
@@ -331,7 +337,7 @@ head("2b. clearing a date puts the job back on the undated list");
     const el = document.querySelector("#cal-list-none");
     return el && [...el.children].some((li) => li.dataset.id === id);
   }, "j-later");
-  eq("the field is empty on the job too", (await jobById(page, "j-later")).dueDate, "");
+  eq("the field is empty on the project too", (await projectById(page, "j-later")).dueDate, "");
   eq("and the bucket it left is gone", await page.$eval("#cal-sec-later", (n) => n.hidden), true);
   await page.close();
 }
@@ -346,19 +352,21 @@ head("2c. the control shows the date it is holding");
   await page.close();
 }
 
-/* ---------------------------------------------------- 3. the row opens the job */
+/* ------------------------------------------------ 3. the row opens the project */
 
-head("3. a row is a job, and its name opens the page that owns it");
+head("3. a row is a project, and its name opens the page that owns it");
 {
   const page = await open(ctx, CAL, { workspace: workspace(), crm: crm() });
   const href = await page.$eval("#cal-list-late a", (a) => a.getAttribute("href"));
-  check("the link carries the job's id", href.includes("j-late"), href);
-  check("and points at the jobs page", href.includes(urlJobs("pl")), href);
+  check("the link carries the project's id", href.includes("j-late"), href);
+  // /zlecenia/ until the merge of 2026-09-21; a deadline is a field of a project now, so
+  // the row opens the page that owns the field.
+  check("and points at the projects page", href.includes(urlProjects("pl")), href);
 
   await page.click("#cal-list-late a");
-  await page.waitForSelector("#job-body:not([hidden])");
-  eq("which opens that job", (await page.textContent("#job-title")).trim(), "Zaległa hydraulika");
-  eq("with the same deadline on it", await page.inputValue("#job-due"), day(-3));
+  await page.waitForSelector("#ws-project-body:not([hidden])");
+  eq("which opens that project", (await page.textContent("#ws-title")).trim(), "Zaległa hydraulika");
+  eq("with the same deadline on it", await page.inputValue("#ws-biz-due"), day(-3));
   await page.close();
 }
 

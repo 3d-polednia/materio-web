@@ -306,6 +306,11 @@
               <p class="ws-project-fig"><span class="eyebrow muted">Andere kosten</span> <b id="ws-project-other"></b></p>
               <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Projecttotaal</span> <b id="ws-project-total"></b></p>
             </div>
+            
+            <div class="ws-project-figs" id="ws-biz-figs" hidden>
+              <p class="ws-project-fig"><span class="eyebrow muted">Afgesproken waarde</span> <b id="ws-biz-agreed"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Blijft over</span> <b id="ws-biz-left"></b></p>
+            </div>
             <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Deze regels staan in verschillende valuta's. Het totaal telt ze op maar rekent niets om — controleer de valuta bij elke kostenpost.</p>
           </div>
 
@@ -321,6 +326,23 @@
             <input id="ws-rename-name" type="text" maxlength="120" aria-label="Naam van het project" required>
             <button type="submit" class="btn btn-primary btn-sm">Opslaan</button>
             <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Annuleren</button>
+          </form>
+
+          
+          <form id="ws-biz-form" class="inline-form mt-4">
+            <label class="field" for="ws-biz-client"><span class="fld-label">Klant</span>
+              <select id="ws-biz-client"></select></label>
+            <label class="field field-narrow" for="ws-biz-status"><span class="fld-label">Status</span>
+              <select id="ws-biz-status"><option value="new">Nieuw</option><option value="active">Loopt</option><option value="done">Afgerond</option><option value="cancelled">Geannuleerd</option></select></label>
+            <label class="field field-narrow" for="ws-biz-due"><span class="fld-label">Datum</span>
+              <input id="ws-biz-due" type="date"></label>
+            <label class="field field-narrow" for="ws-biz-value"><span class="fld-label">Afgesproken waarde</span>
+              <input id="ws-biz-value" type="text" inputmode="decimal"></label>
+            <label class="field field-narrow" for="ws-biz-color"><span class="fld-label">Kleur</span>
+              <select id="ws-biz-color"><option value="">Geen kleur</option><option value="lime">Lime</option><option value="blue">Blauw</option><option value="amber">Amber</option><option value="red">Rood</option><option value="violet">Violet</option></select></label>
+            <label class="field" for="ws-biz-note"><span class="fld-label">Notities</span>
+              <textarea id="ws-biz-note" maxlength="2000" rows="2"></textarea></label>
+            <button type="submit" class="btn btn-primary btn-sm">Opslaan</button>
           </form>
 
           <div id="ws-delete-ask" class="ws-ask mt-4" hidden>

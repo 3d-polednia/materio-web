@@ -306,6 +306,11 @@
               <p class="ws-project-fig"><span class="eyebrow muted">Další náklady</span> <b id="ws-project-other"></b></p>
               <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Součet projektu</span> <b id="ws-project-total"></b></p>
             </div>
+            
+            <div class="ws-project-figs" id="ws-biz-figs" hidden>
+              <p class="ws-project-fig"><span class="eyebrow muted">Dohodnutá hodnota</span> <b id="ws-biz-agreed"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">Zbývá</span> <b id="ws-biz-left"></b></p>
+            </div>
             <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>Položky jsou v různých měnách. Součet je sečte, ale nic nepřepočítává kurzem — zkontroluj měny ve sloupci nákladů.</p>
           </div>
 
@@ -321,6 +326,23 @@
             <input id="ws-rename-name" type="text" maxlength="120" aria-label="Název projektu" required>
             <button type="submit" class="btn btn-primary btn-sm">Uložit</button>
             <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>Zrušit</button>
+          </form>
+
+          
+          <form id="ws-biz-form" class="inline-form mt-4">
+            <label class="field" for="ws-biz-client"><span class="fld-label">Klient</span>
+              <select id="ws-biz-client"></select></label>
+            <label class="field field-narrow" for="ws-biz-status"><span class="fld-label">Stav</span>
+              <select id="ws-biz-status"><option value="new">Nová</option><option value="active">V běhu</option><option value="done">Dokončená</option><option value="cancelled">Zrušená</option></select></label>
+            <label class="field field-narrow" for="ws-biz-due"><span class="fld-label">Termín</span>
+              <input id="ws-biz-due" type="date"></label>
+            <label class="field field-narrow" for="ws-biz-value"><span class="fld-label">Dohodnutá hodnota</span>
+              <input id="ws-biz-value" type="text" inputmode="decimal"></label>
+            <label class="field field-narrow" for="ws-biz-color"><span class="fld-label">Barva</span>
+              <select id="ws-biz-color"><option value="">Bez barvy</option><option value="lime">Limetková</option><option value="blue">Modrá</option><option value="amber">Jantarová</option><option value="red">Červená</option><option value="violet">Fialová</option></select></label>
+            <label class="field" for="ws-biz-note"><span class="fld-label">Poznámky</span>
+              <textarea id="ws-biz-note" maxlength="2000" rows="2"></textarea></label>
+            <button type="submit" class="btn btn-primary btn-sm">Uložit</button>
           </form>
 
           <div id="ws-delete-ask" class="ws-ask mt-4" hidden>

@@ -244,8 +244,14 @@ function buildSchedulePage() {
     });
   }
 
+  // Both stores, because since the merge of 2026-09-21 the rows this page draws are
+  // projects: the one write it makes is wsUpdateProject(), which fires `workspacechange`,
+  // and a page listening only for `crmchange` would take a typed date and never redraw —
+  // the row would stay in the bucket it was in until something else reloaded the screen.
+  // `crmchange` stays because the client picker above the list is still the CRM store's.
+  document.addEventListener("workspacechange", calRender);
   document.addEventListener("crmchange", calRender);
-  // A job's value is shown in the visitor's currency when it carries none of its own.
+  // A project's value is shown in the visitor's currency when it carries none of its own.
   document.addEventListener("currencychange", calRender);
   // Switching language re-renders every row: the status word, the date and the relative
   // phrase are all written by this script, so nothing on the page translates itself.

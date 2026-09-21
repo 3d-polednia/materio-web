@@ -1585,6 +1585,16 @@ export function projectsMain(lang, t, aisles = [], features = []) {
               <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("proj_cost_other"))}</span> <b id="ws-project-other"></b></p>
               <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("proj_cost_sum"))}</span> <b id="ws-project-total"></b></p>
             </div>
+            <!-- What was agreed against what the work has run to, and the difference. The
+                 job page carried these two until 2026-09-21; the project carries the
+                 agreed amount now, so it carries the comparison. The difference is shown
+                 only when both halves are in one currency — chapter VI forbids
+                 subtracting two currencies at a rate, so the page says nothing rather
+                 than saying something false. -->
+            <div class="ws-project-figs" id="ws-biz-figs" hidden>
+              <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("job_value"))}</span> <b id="ws-biz-agreed"></b></p>
+              <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("job_fig_left"))}</span> <b id="ws-biz-left"></b></p>
+            </div>
             <p class="muted ws-estimate-mixed" id="ws-project-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
           </div>
 
@@ -1600,6 +1610,28 @@ export function projectsMain(lang, t, aisles = [], features = []) {
             <input id="ws-rename-name" type="text" maxlength="120" aria-label="${esc(t("ws_new_project"))}" required>
             <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" data-ws-rename-cancel>${esc(t("action_cancel"))}</button>
+          </form>
+
+          <!-- What the job used to carry, on the row that carries it since 2026-09-21.
+               The add form above the list sets these when a project is made; a status
+               that could never move from "nowe" to "zakończone" afterwards would be a
+               field nobody could use, so the same six are editable here.
+               Visible labels, not placeholders — a placeholder is the only thing naming
+               a box and it leaves the moment the visitor types (audit 2026-09-18). -->
+          <form id="ws-biz-form" class="inline-form mt-4">
+            <label class="field" for="ws-biz-client"><span class="fld-label">${esc(t("job_client"))}</span>
+              <select id="ws-biz-client"></select></label>
+            <label class="field field-narrow" for="ws-biz-status"><span class="fld-label">${esc(t("job_status"))}</span>
+              <select id="ws-biz-status">${[["new", "job_st_new"], ["active", "job_st_active"], ["done", "job_st_done"], ["cancelled", "job_st_cancelled"]].map(([v, k]) => `<option value="${v}">${esc(t(k))}</option>`).join("")}</select></label>
+            <label class="field field-narrow" for="ws-biz-due"><span class="fld-label">${esc(t("job_due"))}</span>
+              <input id="ws-biz-due" type="date"></label>
+            <label class="field field-narrow" for="ws-biz-value"><span class="fld-label">${esc(t("job_value"))}</span>
+              <input id="ws-biz-value" type="text" inputmode="decimal"></label>
+            <label class="field field-narrow" for="ws-biz-color"><span class="fld-label">${esc(t("job_color"))}</span>
+              <select id="ws-biz-color"><option value="">${esc(t("job_color_none"))}</option>${["lime", "blue", "amber", "red", "violet"].map((v) => `<option value="${v}">${esc(t(`job_color_${v}`))}</option>`).join("")}</select></label>
+            <label class="field" for="ws-biz-note"><span class="fld-label">${esc(t("job_note"))}</span>
+              <textarea id="ws-biz-note" maxlength="2000" rows="2"></textarea></label>
+            <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
           </form>
 
           <div id="ws-delete-ask" class="ws-ask mt-4" hidden>

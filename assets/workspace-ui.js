@@ -671,17 +671,6 @@ function wsRenderProject(id) {
   document.getElementById("ws-project-hist").textContent =
     `${wsT("proj_created")} ${wsDate(project.createdAt)} · ${wsT("proj_updated")} ${wsDate(project.updatedAt)}`;
 
-  // Chapter XXIV's path, drawn where the middle step lives. Until 2026-09-21 that was the
-  // job and the strip was on /zlecenia/; a job is a project now, so it is here. All three
-  // are derived on every draw and none of them is stored — crmChain() walks the links the
-  // rows already carry, so a project that changed hands this morning reads correctly.
-  if (typeof chnRenderStrip === "function") {
-    chnRenderStrip(document.getElementById("ws-chain"), crmChain("project", project.id), "project");
-    chnRenderQuotes(document.getElementById("ws-chain-quotes"), crmProjectQuotes(project.id));
-    chnRenderHistory(document.getElementById("ws-chain-history"),
-      crmHistory({ projectId: project.id }, 8));
-  }
-
   // Chapter XVII: "Projekt może pokazywać: koszt materiałów, inne koszty, sumę projektu."
   // The three come out of one call so they cannot disagree, and the sum is the two above it
   // added — never the estimate lines added to the materials, which would count a calculated
@@ -708,6 +697,68 @@ function wsRenderProject(id) {
     fig("ws-project-other", "");
     fig("ws-project-total", "");
     document.getElementById("ws-project-mixed").hidden = true;
+  }
+
+  // What the job used to carry, filled from the row itself. The picker is rebuilt on every
+  // draw because a client added on another screen has to be offerable here without a
+  // reload; the value is set afterwards so the project's own client survives the rebuild.
+  const bizClient = document.getElementById("ws-biz-client");
+  if (bizClient && typeof crmClients === "function") {
+    bizClient.innerHTML = `<option value="">${wsEsc(wsT("crm_node_none"))}</option>` + crmClients()
+      .map((c) => `<option value="${wsEsc(c.id)}">${wsEsc(c.name)}</option>`).join("");
+    bizClient.value = project.clientId || "";
+  }
+  const setField = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value;
+  };
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  setField("ws-biz-status", project.status || "new");
+  setField("ws-biz-due", project.dueDate || "");
+  // Major units for a human to read and retype; the store keeps the integer. Written with
+  // integer arithmetic, never a division into a float, because money is minor units.
+  setField("ws-biz-value", project.valueMinor === null || project.valueMinor === undefined
+    ? "" : `${Math.trunc(project.valueMinor / 100)}.${String(Math.abs(project.valueMinor % 100)).padStart(2, "0")}`);
+  setField("ws-biz-color", project.color || "");
+  setField("ws-biz-note", project.note || "");
+
+  // Agreed against spent, and the difference — the two figures the job page carried until
+  // 2026-09-21. Both halves must be in one currency: chapter VI forbids subtracting two
+  // currencies at a rate, so a mixed project shows the agreed amount and no difference.
+  // The block is `costs`, which is Pro, and it is not drawn at all for a level that does
+  // not reach it — a figure computed and then hidden sits in the page for anyone with an
+  // inspector open.
+  const bizFigs = document.getElementById("ws-biz-figs");
+  if (bizFigs) {
+    const hasValue = project.valueMinor !== null && project.valueMinor !== undefined;
+    bizFigs.hidden = !(hasValue && wsCanCost());
+    if (!bizFigs.hidden) {
+      // `total` and not `totalMinor`: wsProjectCosts() leaves `total` null for a project
+      // priced in two currencies rather than adding them, which is the same null the
+      // three figures above read. Subtracting from null would print a wrong number
+      // confidently, so a mixed project gets the dash.
+      const costs = wsProjectCosts(project.id);
+      setText("ws-biz-agreed", wsMoney(project.valueMinor, project.currencyCode));
+      const comparable = !costs.mixed && costs.total !== null
+        && (!costs.currencyCode || !project.currencyCode || costs.currencyCode === project.currencyCode);
+      setText("ws-biz-left", comparable
+        ? wsMoney(project.valueMinor - costs.total, project.currencyCode)
+        : "—");
+    }
+  }
+
+  // Chapter XXIV's path, drawn where the middle step lives. Until 2026-09-21 that was the
+  // job and the strip was on /zlecenia/; a job is a project now, so it is here. All three
+  // are derived on every draw and none of them is stored — crmChain() walks the links the
+  // rows already carry, so a project that changed hands this morning reads correctly.
+  if (typeof chnRenderStrip === "function") {
+    chnRenderStrip(document.getElementById("ws-chain"), crmChain("project", project.id), "project");
+    chnRenderQuotes(document.getElementById("ws-chain-quotes"), crmProjectQuotes(project.id));
+    chnRenderHistory(document.getElementById("ws-chain-history"),
+      crmHistory({ projectId: project.id }, 8));
   }
 
   const isActive = wsActiveProjectId() === project.id;
@@ -1014,6 +1065,33 @@ function wireProjectDetail() {
     if (!e.target.closest("[data-ws-rename-cancel]")) return;
     wsRenaming = false;
     wsRenderWorkspace();
+  });
+
+  // The six fields a job used to carry, written back onto the project that carries them
+  // now. One submit, all six: they are one row and one decision — "this job is for Jan,
+  // it is under way, it is due Friday" is not three separate thoughts.
+  on("ws-biz-form", "submit", (e) => {
+    e.preventDefault();
+    const val = (id) => (document.getElementById(id) || {}).value || "";
+    const raw = val("ws-biz-value").trim();
+    const valueMinor = raw ? crmMinor(raw) : null;
+    const clientId = val("ws-biz-client");
+    // crmCurrency() stamps an amount that has never carried one; an amount cleared to
+    // nothing takes its currency with it, because "" with a number is not a price.
+    const saved = wsUpdateProject(wsOpenId, {
+      clientId,
+      status: val("ws-biz-status"),
+      dueDate: val("ws-biz-due"),
+      valueMinor,
+      currencyCode: valueMinor === null ? "" : crmCurrency(),
+      color: val("ws-biz-color"),
+      note: val("ws-biz-note"),
+    });
+    // Both ends of the link stay maintained: the project's own clientId is authoritative,
+    // and crmLinkProject() is the write that knows a project has exactly one client, so
+    // it is the one that moves it off whoever had it before.
+    if (saved && clientId && typeof crmLinkProject === "function") crmLinkProject(clientId, wsOpenId);
+    if (!saved) wsRenderWorkspace();
   });
 
   on("ws-project-archive", "click", () => {

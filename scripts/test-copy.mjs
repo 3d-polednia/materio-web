@@ -482,8 +482,12 @@ const BUDGET = {
      grew six labelled fields — client, status, deadline, agreed amount, note, colour —
      and chapter XXIV's strip moved onto this page with its two headings and the one
      sentence saying what the history leaves out. /fr/projets/ measures 922 against Polish
-     at 748; 925 leaves a three-word margin. Field names and headings again, not prose. */
-  materials: 2820, stores: 159, android: 519, projects: 925, estimate: 425,
+     at 748. Then the editor for those six on the project itself, because a status that
+     could never move from "nowe" to "zakończone" is a field nobody can use, and the two
+     figures the job page carried — what was agreed and what is left of it. /fr/projets/
+     measures 948 against Polish at 770; 952 leaves a four-word margin. Field names,
+     headings and two figure labels — the section still forbids a paragraph. */
+  materials: 2820, stores: 159, android: 519, projects: 952, estimate: 425,
   /* The widest /wyceny/ translation is Spanish at 638 words after the three add forms
      received visible labels; 640 leaves a two-word regression margin. */
   clients: 524, jobs: 544, quotes: 640, calendar: 420, cookies: 637,

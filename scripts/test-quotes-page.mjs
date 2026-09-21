@@ -30,7 +30,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LANGS, urlQuotes, urlJobs, urlClients } from "../src/site.mjs";
+import { LANGS, urlQuotes, urlProjects, urlClients } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -313,19 +313,20 @@ head("2b. chapter XXII's five figures, on the page");
 head("2c. chapter XXIV read backwards: the quote names its job and its client");
 {
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
-  // Session 26 draws the strip every CRM screen shares: chapter XXIV's four nodes in the
+  // Session 26 draws the strip every CRM screen shares: chapter XXIV's nodes in the
   // chapter's own order. The quote is the node the visitor is standing on, so it is a name
-  // and not a link — a link to this page is a dead click — which leaves three.
+  // and not a link — a link to this page is a dead click. Three nodes since the merge of
+  // 2026-09-21, so that leaves two links.
   const links = await page.$$eval("#quo-chain-line a",
     (a) => a.map((n) => `${n.getAttribute("href")}|${n.textContent.trim()}`));
-  eq("the three steps above this quote are there", links.length, 3);
+  eq("the two steps above this quote are there", links.length, 2);
   check("the client, linked to their own page",
     links[0].includes("c1") && links[0].includes("Jan Kowalski"), links[0]);
-  check("and the job, linked to its own", links[1].includes("j1") && links[1].includes("Łazienka na Pięknej"), links[1]);
-  check("and the project it is priced from", links[2].includes("p1"), links[2]);
+  check("and the project it is priced from, linked to its own",
+    links[1].includes("p1") && links[1].includes("Remont łazienki"), links[1]);
   check("the client link is this language's address",
     links[0].startsWith(urlClients("pl")), links[0]);
-  check("and so is the job's", links[1].startsWith(urlJobs("pl")), links[1]);
+  check("and so is the project's", links[1].startsWith(urlProjects("pl")), links[1]);
   eq("the quote itself is the step you are on, and links nowhere",
     await page.$eval("#quo-chain-line li.on b", (n) => n.textContent.trim()),
     "Łazienka — wycena");
@@ -493,8 +494,10 @@ head("5. the project is read, never written — and it can be detached and attac
   // is the way to make one: the section's own index, with no ?id= behind it.
   eq("no step of the chain resolves any more",
     await page.$$eval("#quo-chain-line a[href*='?id=']", (a) => a.length), 0);
+  // Two, not three: the client step and the project step. The job step went when a job
+  // became a project (2026-09-21), and the quote step is the one being stood on.
   eq("and each one offers the page that would fill it",
-    await page.$$eval("#quo-chain-line li.off a", (a) => a.length), 3);
+    await page.$$eval("#quo-chain-line li.off a", (a) => a.length), 2);
 
   await page.selectOption("#quo-project-pick", { label: "Remont łazienki" });
   await page.click("#quo-project-form button[type=submit]");
@@ -620,9 +623,9 @@ head("7b. the same quote reads in four languages");
       minor(await page.textContent("#quo-fig-total")), TOTAL);
     check(`${lang}: nothing shows a raw dictionary key`,
       !(await page.content()).includes("quo_fig_"), lang);
-    check(`${lang}: the job link is this language's address`,
+    check(`${lang}: the project link is this language's address`,
       (await page.$$eval("#quo-chain-line a", (a) => a.map((n) => n.getAttribute("href"))))
-        .some((h) => h.startsWith(urlJobs(lang))), lang);
+        .some((h) => h.startsWith(urlProjects(lang))), lang);
     check(`${lang}: no error in the console`, page.errors.length === 0,
       page.errors.join("\n      "));
     await page.close();

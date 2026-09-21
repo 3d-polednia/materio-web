@@ -52,7 +52,7 @@ import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
-  urlHome, urlCalcIndex, urlCalc, urlProjects, urlClients, urlJobs, urlQuotes,
+  urlHome, urlCalcIndex, urlCalc, urlProjects, urlClients, urlQuotes,
   URL_APP,
 } from "../src/site.mjs";
 import { FAKE_APP, FAKE_AUTH, FAKE_STORE } from "./fake-firebase.mjs";
@@ -164,7 +164,6 @@ function readyMark(lang, url) {
   const path = url.split("?")[0];
   if (path === urlProjects(lang)) return "html[data-ws-ready]";
   if (path === urlClients(lang)) return "html[data-crm-ready]";
-  if (path === urlJobs(lang)) return "html[data-jobs-ready]";
   if (path === urlQuotes(lang)) return "html[data-quotes-ready]";
   if (path.startsWith(urlCalcIndex(lang)) && path !== urlCalcIndex(lang)) {
     return '.calc[data-wired="1"]';
@@ -601,65 +600,66 @@ async function walk(cfg) {
   await page.waitForSelector("#crm-client-projects li[data-id]");
   eq("the project is filed under the client",
     (await crmStore(page)).clients[0].projectIds.join(), PROJECT);
+  /* Filing a project under a client writes `clientId` onto the project since the merge of
+     2026-09-21 — that side is authoritative now, and the client's own `projectIds` is the
+     fallback kept for rows written before it. What is checked here is that nothing BEYOND
+     the contract appeared: the fields are exactly the contract's, no more. */
   const projectDoc = (await store(page)).projects[0];
-  eq("and the project document is untouched by it",
+  eq("and the project document carries exactly the contract's fields, no more",
     JSON.stringify(Object.keys(projectDoc).sort()),
-    JSON.stringify(["archived", "createdAt", "deletedAt", "id", "name", "schemaVersion", "updatedAt"]));
+    JSON.stringify(["archived", "clientId", "color", "createdAt", "currencyCode", "deletedAt",
+      "dueDate", "id", "name", "note", "schemaVersion", "status", "updatedAt", "valueMinor"]));
+  eq("and the link went onto it", projectDoc.clientId, client.id);
   eq("what the client's work has cost is read from the project",
     minorOf(await textOf(page, "#crm-fig-total")), materialsMinor + OTHER_MINOR);
   check("nothing scrolls sideways", (await overflow(page)) <= 1, `${await overflow(page)}px`);
 
-  /* ---------------------------------------------------------------- 12. zlecenie */
+  /* ------------------------------------------------- 12. the job, now a project */
 
-  head(`${who} — 12. zlecenie: the client's job, with a deadline and a value`);
-  await go(urlJobs(lang));
-  await page.fill("#job-name", "Łazienka QA");
-  await page.selectOption("#job-client", { label: "Jan Kowalski" });
-  await page.fill("#job-new-due", "2026-10-15");
-  await page.click("#job-form button[type=submit]");
-  await page.waitForSelector("#job-list a[data-open]");
-  const job = (await crmStore(page)).jobs[0];
-  eq("the job carries the client it was given", job.clientId, client.id);
-  eq("and the deadline as a calendar day", job.dueDate, "2026-10-15");
-  eq("a new job starts at the first of chapter XXI's four statuses", job.status, "new");
-
-  const jobUrl = `${urlJobs(lang)}?id=${encodeURIComponent(job.id)}`;
-  await follow("#job-list a[data-open]", jobUrl);
-  await page.selectOption("#job-project-pick", { label: "Remont QA" });
-  await page.click("#job-project-form button[type=submit]");
-  await page.waitForSelector("#job-project-list li[data-id]");
-  await page.click("#job-edit");
-  await page.waitForSelector("#job-edit-form:not([hidden])");
-  await page.fill("#job-edit-value", "12000");
-  await page.click("#job-edit-form button[type=submit]");
-  await page.waitForSelector("#job-edit-form", { state: "hidden" });
-  const jobAfter = (await crmStore(page)).jobs[0];
-  eq("the job carries the project", jobAfter.projectId, PROJECT);
-  eq("what was agreed is the one figure typed by hand", jobAfter.valueMinor, 1200000);
-  eq("stamped once with the currency it was typed in", jobAfter.currencyCode, cur);
-  eq("and what it has cost is read from the project, not copied onto the job",
-    minorOf(await textOf(page, "#job-fig-cost")), materialsMinor + OTHER_MINOR);
-  eq("nothing added a cost field to the job", "costMinor" in jobAfter, false);
+  head(`${who} — 12. projekt: the client's work, with a deadline and a value`);
+  /* This was step 12 on /zlecenia/ until the merge of 2026-09-21. A job is a project now,
+     so the walk sets the same four things — client, deadline, status, agreed amount — on
+     the project it already saved its material into, instead of on a second row beside it. */
+  await go(openProject);
+  await page.selectOption("#ws-biz-client", { label: "Jan Kowalski" });
+  await page.fill("#ws-biz-due", "2026-10-15");
+  await page.fill("#ws-biz-value", "12000");
+  await page.click("#ws-biz-form button[type=submit]");
+  /* The write and the redraw are two steps: wsUpdateProject() stores the row and then
+     fires `workspacechange`, which is what draws the two figures below. Waiting on the
+     store alone would read the screen a frame too early. */
+  await page.waitForFunction(() => {
+    const el = document.getElementById("ws-biz-left");
+    return el && /\d/.test(el.textContent);
+  });
+  const project = (await store(page)).projects.find((p) => p.id === PROJECT);
+  eq("the project carries the client it was given", project.clientId, client.id);
+  eq("and the deadline as a calendar day", project.dueDate, "2026-10-15");
+  eq("a project starts at the first of chapter XXI's four statuses", project.status, "new");
+  eq("what was agreed is the one figure typed by hand", project.valueMinor, 1200000);
+  eq("stamped once with the currency it was typed in", project.currencyCode, cur);
+  eq("and what it has cost is read from its own lines, never copied onto it",
+    minorOf(await textOf(page, "#ws-project-total")), materialsMinor + OTHER_MINOR);
+  eq("nothing added a cost field to the project", "costMinor" in project, false);
   /* The difference is computed, and only because both halves are in one currency —
      chapter VI forbids subtracting two currencies at a rate, and the page says so
      instead of doing it. */
   eq("what is left is the agreed amount minus what the work has run to",
-    minorOf(await textOf(page, "#job-fig-left")), 1200000 - (materialsMinor + OTHER_MINOR));
+    minorOf(await textOf(page, "#ws-biz-left")), 1200000 - (materialsMinor + OTHER_MINOR));
   eq("with no currency warning, because there is nothing to convert",
-    await page.locator("#job-mixed").isHidden(), true);
+    await page.locator("#ws-project-mixed").isHidden(), true);
 
-  /* ---------------------------------------------------------------- 13. projekt */
+  /* ---------------------------------------------------------------- 13. the chain */
 
-  head(`${who} — 13. projekt: reached from the job, along chapter XXIV's chain`);
-  const steps = await page.$$eval("#job-chain li", (li) => li.map((n) => ({
+  head(`${who} — 13. the chain, read from the project it runs through`);
+  const steps = await page.$$eval("#ws-chain li", (li) => li.map((n) => ({
     node: n.getAttribute("data-node"),
     href: n.querySelector("a") ? n.querySelector("a").getAttribute("href") : "",
   })));
-  eq("the strip is the chapter's four steps in the chapter's order",
-    steps.map((s) => s.node).join(), "client,job,project,quote");
+  eq("the strip is the chapter's three steps in the chapter's order",
+    steps.map((s) => s.node).join(), "client,project,quote");
   eq("the client step resolved to the client this walk made", steps[0].href, clientUrl);
-  eq("and the project step to the project it saved into", steps[2].href, openProject);
-  await follow('#job-chain li[data-node="project"] a', openProject);
+  check("the project is the step being stood on, so it links nowhere", steps[1].href === "");
   check("the project opened is the one with the walk's material in it",
     (await textOf(page, "#ws-project-materials")).length > 3);
   eq("still in this walk's language", await page.getAttribute("html", "lang"), lang);
@@ -718,7 +718,7 @@ async function walk(cfg) {
   await go(clientUrl);
   const jobs = await page.$$eval("#crm-client-jobs > li", (li) =>
     li.map((n) => n.textContent.replace(/\s+/g, " ").trim()));
-  check("the client's job is listed", jobs.some((r) => r.includes("Łazienka QA")), jobs.join(" | "));
+  check("the client's project is listed", jobs.some((r) => r.includes("Remont QA")), jobs.join(" | "));
   const quotes = await page.$$eval("#crm-client-quotes > li", (li) =>
     li.map((n) => n.textContent.replace(/\s+/g, " ").trim()));
   check("the quote priced from their project is theirs",
@@ -814,10 +814,12 @@ async function walk(cfg) {
 
   head(`${who} — 16d. the Back button, walked back up chapter XXIV's chain`);
   await go(clientUrl);
-  await follow("#crm-client-jobs li a", jobUrl);
+  // The client's section lists their projects since 2026-09-21; it listed their jobs
+  // before, and the key it is drawn under is still cli_jobs_* for that reason.
+  await follow("#crm-client-jobs li a", openProject);
   await page.goBack({ waitUntil: "load" });
   await page.waitForSelector("html[data-crm-ready]");
-  eq("Back is the client the job was opened from",
+  eq("Back is the client the project was opened from",
     new URL(page.url()).pathname + new URL(page.url()).search, clientUrl);
   eq("with their name still on the screen",
     (await textOf(page, "#crm-client-body")).includes("Jan Kowalski"), true);

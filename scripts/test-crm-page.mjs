@@ -28,7 +28,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LANGS, urlQuotes, urlJobs, urlClients, urlProjects } from "../src/site.mjs";
+import { LANGS, urlQuotes, urlClients, urlProjects } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -113,8 +113,20 @@ function workspace() {
   });
   return {
     projects: [
-      { id: "p1", name: "Remont łazienki", archived: false, ...sync(T0 + 5 * DAY) },
-      { id: "p2", name: "Salon", archived: false, ...sync(T0 + 3 * DAY) },
+      // p1 is what the job used to be: since the merge of 2026-09-21 the client, the
+      // status, the deadline and the agreed amount are fields of the project itself.
+      {
+        id: "p1", name: "Remont łazienki", archived: false,
+        clientId: "c1", status: "active", dueDate: "2026-09-30",
+        valueMinor: 1250000, currencyCode: "PLN", note: "", color: "",
+        ...sync(T0 + 5 * DAY),
+      },
+      {
+        id: "p2", name: "Salon", archived: false,
+        clientId: "", status: "new", dueDate: "", valueMinor: null,
+        currencyCode: "", note: "", color: "",
+        ...sync(T0 + 3 * DAY),
+      },
     ],
     rooms: [],
     estimations: [
@@ -125,17 +137,12 @@ function workspace() {
   };
 }
 
-/** Chapter XXIV's chain, whole: one client, one job, one project, one quote. */
+/** Chapter XXIV's chain, whole: one client, one project, one quote. */
 const crm = (over = {}) => ({
   clients: [{
     id: "c1", name: "Jan Kowalski", phone: "600 100 200", email: "jan@example.com",
     address: "ul. Piękna 3", note: "", projectIds: ["p1"], archived: false,
     ...sync(T0 + 4 * DAY),
-  }],
-  jobs: [{
-    id: "j1", name: "Łazienka na Pięknej", clientId: "c1", projectId: "p1",
-    status: "active", description: "", note: "", dueDate: "2026-09-30",
-    valueMinor: 1250000, currencyCode: "PLN", ...sync(T0 + 4 * DAY),
   }],
   quotes: [{
     id: "q1", name: "Łazienka — wycena", projectId: "p1",
@@ -145,12 +152,18 @@ const crm = (over = {}) => ({
   ...over,
 });
 
-/** The same store with the middle of the chain missing: a job nobody gave a project. */
+/** The same store with the middle of the chain missing: a project nobody gave a client. */
 const crmBare = () => {
   const store = crm();
-  store.jobs = [{ ...store.jobs[0], projectId: "" }];
   store.clients = [{ ...store.clients[0], projectIds: [] }];
   return store;
+};
+
+/** The workspace with p1 unlinked, which is what "no client yet" looks like now. */
+const workspaceBare = () => {
+  const ws = workspace();
+  ws.projects = [{ ...ws.projects[0], clientId: "" }, ws.projects[1]];
+  return ws;
 };
 
 /* ------------------------------------------------------------------ the runner */
@@ -182,7 +195,11 @@ async function context(options) {
 
 /** Which page a URL belongs to, so open() knows which "ready" flag to wait for. */
 const readyFor = (url) => {
-  if (url.includes(urlJobs("pl").slice(0, -1)) || /zlecen|auftr|jobs|zamovlen/.test(url)) return "html[data-jobs-ready]";
+  // The project page is the middle of the chain since 2026-09-21, and it is the workspace
+  // page: its flag is the workspace's, not the CRM store's.
+  if (url.includes(urlProjects("pl").slice(0, -1)) || /projekt|proekt|proiect|progett|proyect|projet/.test(url)) {
+    return "html[data-ws-ready]";
+  }
   return "html[data-crm-ready]";
 };
 
@@ -231,31 +248,31 @@ const strip = (page, sel) => page.$$eval(`${sel} li`, (li) => li.map((n) => ({
 })));
 const digits = (s) => String(s).replace(/\D/g, "");
 
-const JOBS = urlJobs("pl");
+const PROJECTS = urlProjects("pl");
 const CLIENTS = urlClients("pl");
 const QUOTES = urlQuotes("pl");
 const ctx = await context({ viewport: { width: 1280, height: 900 } });
 
-/* ---------------------------------------------------- 1. the strip on a job */
+/* ------------------------------------------------ 1. the strip on a project */
 
-head("1. the strip on a job: chapter XXIV's four steps, in the chapter's order");
+head("1. the strip on a project: chapter XXIV's three steps, in the chapter's order");
 {
-  const page = await open(ctx, `${JOBS}?id=j1`, { workspace: workspace(), crm: crm() });
-  const steps = await strip(page, "#job-chain");
-  eq("four steps", steps.length, 4);
-  eq("in the chapter's order", steps.map((s) => s.node).join(), "client,job,project,quote");
+  const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: workspace(), crm: crm() });
+  const steps = await strip(page, "#ws-chain");
+  // Three since the merge of 2026-09-21: the job step and the project step were one row
+  // described twice, so they are one step now.
+  eq("three steps", steps.length, 3);
+  eq("in the chapter's order", steps.map((s) => s.node).join(), "client,project,quote");
 
   check("the client is a link to their own page",
     steps[0].href === `${CLIENTS}?id=c1`, steps[0].href);
   check("and carries their name", steps[0].text.includes("Jan Kowalski"), steps[0].text);
-  check("the job is the step you are standing on", steps[1].on, JSON.stringify(steps[1]));
+  check("the project is the step you are standing on", steps[1].on, JSON.stringify(steps[1]));
   eq("so it links nowhere", steps[1].href, "");
-  check("the project links to the project page",
-    steps[2].href === `${urlProjects("pl")}?id=p1`, steps[2].href);
-  // A job's walk resolves no single quote — a project may carry several, and the walker
-  // does not guess between them. The step is the way to the list instead.
-  check("the quote step is the way to the quotes", steps[3].off, JSON.stringify(steps[3]));
-  eq("which is the quotes page itself", steps[3].href, QUOTES);
+  // A project's walk resolves no single quote — a project may carry several, and the
+  // walker does not guess between them. The step is the way to the list instead.
+  check("the quote step is the way to the quotes", steps[2].off, JSON.stringify(steps[2]));
+  eq("which is the quotes page itself", steps[2].href, QUOTES);
   check("every step says which step it is",
     steps.every((s) => s.text.length > 2), JSON.stringify(steps.map((s) => s.text)));
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
@@ -264,47 +281,51 @@ head("1. the strip on a job: chapter XXIV's four steps, in the chapter's order")
 
 head("1b. a step nobody has filled in is the page that would fill it");
 {
-  const page = await open(ctx, `${JOBS}?id=j1`, { workspace: workspace(), crm: crmBare() });
-  const steps = await strip(page, "#job-chain");
-  eq("the client is still resolved", steps[0].href, `${CLIENTS}?id=c1`);
-  check("the project is not", steps[2].off, JSON.stringify(steps[2]));
-  eq("and offers the projects page", steps[2].href, urlProjects("pl"));
-  check("the quote neither", steps[3].off, JSON.stringify(steps[3]));
+  const page = await open(ctx, `${PROJECTS}?id=p1`,
+    { workspace: workspaceBare(), crm: crmBare() });
+  const steps = await strip(page, "#ws-chain");
+  check("the client is the step nobody filled in", steps[0].off, JSON.stringify(steps[0]));
+  eq("and offers the clients page", steps[0].href, CLIENTS);
+  check("the project is still the one you stand on", steps[1].on, JSON.stringify(steps[1]));
+  check("the quote is not resolved either", steps[2].off, JSON.stringify(steps[2]));
   eq("no step of the chain pretends to have an id",
-    await page.$$eval("#job-chain a[href*='?id=']", (a) => a.length), 1);
+    await page.$$eval("#ws-chain a[href*='?id=']", (a) => a.length), 0);
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
 
 /* ---------------------------------------------------- 2. the two lists */
 
-head("2. the quotes of a job, read from the project it carries");
+head("2. the quotes of a project, read off the link the quote carries");
 {
-  const page = await open(ctx, `${JOBS}?id=j1`, { workspace: workspace(), crm: crm() });
-  const quotes = await rows(page, "#job-quotes");
+  const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: workspace(), crm: crm() });
+  const quotes = await rows(page, "#ws-chain-quotes");
   eq("the quote is listed", quotes.length, 1);
   check("by name", quotes[0].includes("Łazienka — wycena"), quotes[0]);
   check("and with what it comes to, computed live",
     digits(quotes[0]).includes(String(TOTAL)), quotes[0]);
-  eq("its name opens it", await page.getAttribute("#job-quotes a", "href"), `${QUOTES}?id=q1`);
+  eq("its name opens it", await page.getAttribute("#ws-chain-quotes a", "href"), `${QUOTES}?id=q1`);
 
-  const history = await rows(page, "#job-history");
-  check("the history carries the job, the quote and what was saved into the project",
+  const history = await rows(page, "#ws-chain-history");
+  // Still four: the job's own row went with the job, and the project's own creation row
+  // took its place. Nothing here is logged — every row is a document that already carries
+  // the date it was written on.
+  check("the history carries the project, the quote and what was saved into the project",
     history.length === 4, history.join(" | "));
   check("newest first", history[0].includes("Łazienka — wycena"), history.join(" | "));
   check("a calculation is told apart from a cost",
     history.some((r) => r.includes("Zapisano kalkulację"))
     && history.some((r) => r.includes("Dopisano koszt")), history.join(" | "));
   check("and the note says what the history cannot know",
-    (await page.textContent("#job-body")).includes("Zmiana statusu"));
+    (await page.textContent("#ws-project-body")).includes("Zmiana statusu"));
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
 
-head("2b. a job with no project has no quotes, and says so");
+head("2b. a project nobody has priced has no quotes, and says so");
 {
-  const page = await open(ctx, `${JOBS}?id=j1`, { workspace: workspace(), crm: crmBare() });
-  const quotes = await rows(page, "#job-quotes");
+  const page = await open(ctx, `${PROJECTS}?id=p2`, { workspace: workspace(), crm: crm() });
+  const quotes = await rows(page, "#ws-chain-quotes");
   eq("one row, and it is the empty state", quotes.length, 1);
   check("which says there is no quote yet", /wyceny|Wycen/i.test(quotes[0]), quotes[0]);
   await page.close();
@@ -315,11 +336,11 @@ head("2c. the same two lists on the client, from the other end of the chain");
   const page = await open(ctx, `${CLIENTS}?id=c1`, { workspace: workspace(), crm: crm() });
   const quotes = await rows(page, "#crm-client-quotes");
   eq("the quote priced from their project is theirs", quotes.length, 1);
-  check("with the same total the job's page showed",
+  check("with the same total the project's page showed",
     digits(quotes[0]).includes(String(TOTAL)), quotes[0]);
 
   const history = await rows(page, "#crm-history");
-  check("the history has the client, the job, the quote and both saved lines",
+  check("the history has the client, the project, the quote and both saved lines",
     history.length === 5, history.join(" | "));
   check("it starts with the newest", history[0].includes("Łazienka — wycena"), history[0]);
   // The order is the dates on the documents, not the shape of the chain: the fixture's
@@ -337,17 +358,17 @@ head("2c. the same two lists on the client, from the other end of the chain");
 
 /* ---------------------------------------------------- 3. the walk, clicked */
 
-head("3. the whole path, clicked: job → client → quote → job");
+head("3. the whole path, clicked: project → client → quote → project");
 {
-  const page = await open(ctx, `${JOBS}?id=j1`, { workspace: workspace(), crm: crm() });
+  const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: workspace(), crm: crm() });
 
-  // ZLECENIE → KLIENT
-  await page.click("#job-chain li[data-node='client'] a");
+  // PROJEKT → KLIENT
+  await page.click("#ws-chain li[data-node='client'] a");
   await page.waitForSelector("html[data-crm-ready]");
   await page.waitForSelector("#crm-client-body:not([hidden])");
   eq("the client opens", (await page.textContent("#crm-title")).trim(), "Jan Kowalski");
-  check("and the job is listed under them",
-    (await rows(page, "#crm-client-jobs"))[0].includes("Łazienka na Pięknej"));
+  check("and the project is listed under them",
+    (await rows(page, "#crm-client-jobs"))[0].includes("Remont łazienki"));
 
   // KLIENT → WYCENA
   await page.click("#crm-client-quotes a");
@@ -355,17 +376,17 @@ head("3. the whole path, clicked: job → client → quote → job");
   await page.waitForSelector("#quo-body:not([hidden])");
   eq("the quote opens", (await page.textContent("#quo-title")).trim(), "Łazienka — wycena");
   const steps = await strip(page, "#quo-chain-line");
-  eq("its strip has the same four steps", steps.length, 4);
-  check("the quote is the one you are standing on", steps[3].on, JSON.stringify(steps[3]));
-  eq("and the job above it is the one we came from", steps[1].href, `${JOBS}?id=j1`);
+  eq("its strip has the same three steps", steps.length, 3);
+  check("the quote is the one you are standing on", steps[2].on, JSON.stringify(steps[2]));
+  eq("and the project above it is the one we came from", steps[1].href, `${PROJECTS}?id=p1`);
 
-  // WYCENA → ZLECENIE, which closes the loop chapter XXIV draws.
-  await page.click("#quo-chain-line li[data-node='job'] a");
-  await page.waitForSelector("html[data-jobs-ready]");
-  await page.waitForSelector("#job-body:not([hidden])");
-  eq("the job opens again", (await page.textContent("#job-title")).trim(), "Łazienka na Pięknej");
+  // WYCENA → PROJEKT, which closes the loop chapter XXIV draws.
+  await page.click("#quo-chain-line li[data-node='project'] a");
+  await page.waitForSelector("html[data-ws-ready]");
+  await page.waitForSelector("#ws-project-body:not([hidden])");
+  eq("the project opens again", (await page.textContent("#ws-title")).trim(), "Remont łazienki");
   check("the browser's Back button still works through all of it",
-    page.url().includes("?id=j1"), page.url());
+    page.url().includes("?id=p1"), page.url());
   await page.goBack();
   await page.waitForSelector("html[data-quotes-ready]");
   check("and lands back on the quote", page.url().includes("?id=q1"), page.url());
@@ -375,9 +396,9 @@ head("3. the whole path, clicked: job → client → quote → job");
 
 head("3b. nothing about the walk is written down");
 {
-  const page = await open(ctx, `${JOBS}?id=j1`, { workspace: workspace(), crm: crm() });
+  const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: workspace(), crm: crm() });
   const before = await page.evaluate(() => localStorage.getItem("liczmat-crm-v1"));
-  await page.click("#job-chain li[data-node='client'] a");
+  await page.click("#ws-chain li[data-node='client'] a");
   await page.waitForSelector("#crm-client-body:not([hidden])");
   await page.click("#crm-client-quotes a");
   await page.waitForSelector("#quo-body:not([hidden])");
@@ -391,19 +412,18 @@ head("3b. nothing about the walk is written down");
 head("4. the path reads the same in four languages, and links inside its own");
 {
   for (const lang of LANGS) {
-    const page = await open(ctx, `${urlJobs(lang)}?id=j1`,
-      { workspace: workspace(), crm: crm(), lang, ready: "html[data-jobs-ready]" });
-    const steps = await strip(page, "#job-chain");
-    eq(`${lang}: four steps`, steps.length, 4);
+    const page = await open(ctx, `${urlProjects(lang)}?id=p1`,
+      { workspace: workspace(), crm: crm(), lang, ready: "html[data-ws-ready]" });
+    const steps = await strip(page, "#ws-chain");
+    eq(`${lang}: three steps`, steps.length, 3);
     check(`${lang}: the client link is this language's address`,
       steps[0].href === `${urlClients(lang)}?id=c1`, steps[0].href);
-    check(`${lang}: and the project's`,
-      steps[2].href === `${urlProjects(lang)}?id=p1`, steps[2].href);
-    check(`${lang}: the quotes page too`, steps[3].href === urlQuotes(lang), steps[3].href);
+    check(`${lang}: the project is the step being stood on`, steps[1].on, steps[1].href);
+    check(`${lang}: the quotes page too`, steps[2].href === urlQuotes(lang), steps[2].href);
     check(`${lang}: nothing shows a raw dictionary key`,
       !(await page.content()).includes("crm_node_") && !(await page.content()).includes("crm_ev_"),
       lang);
-    const history = await rows(page, "#job-history");
+    const history = await rows(page, "#ws-chain-history");
     check(`${lang}: the history is written in it`, history.length === 4, history.join(" | "));
     check(`${lang}: no error in the console`, page.errors.length === 0,
       page.errors.join("\n      "));
@@ -413,11 +433,11 @@ head("4. the path reads the same in four languages, and links inside its own");
 
 head("4b. the currency the visitor chose is the one the derived figures speak");
 {
-  const page = await open(ctx, `${JOBS}?id=j1`,
+  const page = await open(ctx, `${PROJECTS}?id=p1`,
     { workspace: workspace(), crm: crm(), currency: "EUR" });
   // The quote was stamped PLN when its labour was typed, and chapter VI forbids converting
   // it — so it keeps its own currency here exactly as it does on its own page.
-  const quotes = await rows(page, "#job-quotes");
+  const quotes = await rows(page, "#ws-chain-quotes");
   check("a quote keeps the currency it was priced in", /zł|PLN/.test(quotes[0]), quotes[0]);
   await page.close();
 }
@@ -428,17 +448,17 @@ head("5. chapter XXVIII: the strip fits every width the chapter names");
 {
   for (const width of [320, 375, 390, 430, 768, 1280]) {
     const narrow = await context({ viewport: { width, height: 900 } });
-    const page = await open(narrow, `${JOBS}?id=j1`, { workspace: workspace(), crm: crm() });
+    const page = await open(narrow, `${PROJECTS}?id=p1`, { workspace: workspace(), crm: crm() });
     const overflow = await page.evaluate(() =>
       document.documentElement.scrollWidth - document.documentElement.clientWidth);
     check(`${width}px: the page does not scroll sideways`, overflow <= 1, `overflow ${overflow}px`);
-    const box = await page.$eval("#job-chain", (n) => {
+    const box = await page.$eval("#ws-chain", (n) => {
       const r = n.getBoundingClientRect();
       return { left: r.left, right: r.right };
     });
     check(`${width}px: the strip stays inside the viewport`,
       box.left >= -1 && box.right <= width + 1, JSON.stringify(box));
-    const tap = await page.$$eval("#job-chain a", (a) =>
+    const tap = await page.$$eval("#ws-chain a", (a) =>
       a.map((n) => Math.round(n.getBoundingClientRect().height)));
     check(`${width}px: every step is a real tap target`, tap.every((h) => h >= 14),
       JSON.stringify(tap));
@@ -453,14 +473,14 @@ head("6. without a script the chain is empty, and nothing is broken or half-said
 {
   const noJs = await context({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
   const page = await noJs.newPage();
-  await page.goto(`${base}${JOBS}?id=j1`, { waitUntil: "load" });
+  await page.goto(`${base}${PROJECTS}?id=p1`, { waitUntil: "load" });
   const html = await page.content();
   check("the heading of the history is still readable", html.includes("Historia"));
   check("and the heading of the quotes", html.includes("Wyceny"));
   eq("the strip is drawn empty rather than wrongly",
-    await page.$$eval("#job-chain li", (li) => li.length), 0);
-  eq("the detail is hidden, because a job comes out of storage",
-    await page.$eval("#job-detail", (n) => n.hidden), true);
+    await page.$$eval("#ws-chain li", (li) => li.length), 0);
+  eq("the detail is hidden, because a project comes out of storage",
+    await page.$eval("#ws-project", (n) => n.hidden), true);
   check("no dictionary key leaks into the markup", !html.includes("crm_hist_"));
   await page.close();
   await noJs.close();
