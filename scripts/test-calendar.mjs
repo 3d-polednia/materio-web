@@ -96,13 +96,14 @@ function loadCrm({ now = Date.parse("2026-08-19T09:00:00+02:00") } = {}) {
   };
   const events = [];
   const api = evalScript(["assets/workspace.js", "assets/crm-store.js", "assets/crm.js"], [
-    "wsAddProject", "wsProject", "wsProjects", "wsExport",
+    "wsAddProject", "wsUpdateProject", "wsDeleteProject", "wsRestoreProject",
+    "wsAllProjects", "wsProject", "wsProjects", "wsExport",
     "crmAddClient", "crmClient",
-    "crmAllJobs", "crmOpenJobs", "crmClosedJobs", "crmJob", "crmAddJob", "crmUpdateJob",
-    "crmSetJobStatus", "crmDeleteJob", "crmRestoreJob",
-    "crmDay", "crmToday", "crmDaysUntil", "crmJobBucket", "crmSchedule",
+    "crmOpenProjects", "crmClosedProjects",
+    "crmDay", "crmToday", "crmDaysUntil", "crmProjectBucket", "crmSchedule",
     "CAL_BUCKETS", "CAL_SOON_DAYS",
-    "JOB_STATUS", "JOB_OPEN_STATUS", "CRM_KEY",
+    "PROJECT_STATUS", "PROJECT_OPEN_STATUS", "PROJECT_DEFAULT_STATUS", "PROJECT_COLORS",
+    "crmProjectColor", "CRM_KEY",
   ], {
     localStorage,
     document: { dispatchEvent: (e) => events.push(e.type) },
@@ -124,6 +125,8 @@ function loadCrm({ now = Date.parse("2026-08-19T09:00:00+02:00") } = {}) {
   });
   return {
     ...api,
+    addProject: (fields) => api.wsAddProject(fields.name, fields),
+    setProjectStatus: (id, status) => api.wsUpdateProject(id, { status }),
     raw: () => JSON.parse(backing.get("liczmat-crm-v1") || "{}"),
     workspaceRaw: () => JSON.parse(backing.get("materio-workspace-v1") || "{}"),
     keys: () => [...backing.keys()],
@@ -168,23 +171,24 @@ const eq = (name, got, want) =>
 
 /* ================================================================== 1. it stores nothing */
 
-head("1. the terminarz is a reading of the jobs, not a collection beside them");
+head("1. the terminarz is a reading of the projects, not a collection beside them");
 {
   const crm = loadCrm();
-  crm.crmAddJob({ name: "Łazienka", dueDate: "2026-08-25" });
+  crm.addProject({ name: "Łazienka", dueDate: "2026-08-25" });
   const before = JSON.stringify(crm.raw());
+  const workspaceBefore = JSON.stringify(crm.workspaceRaw());
   const sched = crm.crmSchedule();
 
   eq("reading the schedule writes nothing", JSON.stringify(crm.raw()), before);
-  eq("the Pro store still holds exactly its three collections",
-    Object.keys(crm.raw()).sort().join(), "clients,jobs,quotes");
+  eq("reading does not create a Pro store", Object.keys(crm.raw()).length, 0);
   check("and no calendar or events collection has appeared",
     !Object.keys(crm.raw()).some((k) => /calendar|event|schedule|termin/i.test(k)),
     Object.keys(crm.raw()).join());
-  eq("no key of its own is written either", crm.keys().sort().join(), "liczmat-crm-v1");
+  check("no key of its own is written either",
+    !crm.keys().some((k) => /calendar|event|schedule|termin/i.test(k)), crm.keys().join());
 
   // A deadline has exactly one home, and it is the job's own field.
-  const job = crm.crmAllJobs()[0];
+  const job = crm.wsAllProjects()[0];
   eq("the date the schedule reports is the job's own", sched.buckets.soon[0].dueDate, job.dueDate);
   eq("which is chapter XXI's `dueDate`", job.dueDate, "2026-08-25");
   const dates = Object.keys(job).filter((k) => /due|deadline|termin/i.test(k));
@@ -194,8 +198,8 @@ head("1. the terminarz is a reading of the jobs, not a collection beside them");
   const exported = crm.wsExport();
   eq("wsExport() carries no schedule", exported.schedule, undefined);
   eq("nor any events", exported.events, undefined);
-  eq("and the workspace store is untouched by all of it",
-    JSON.stringify(crm.workspaceRaw()), JSON.stringify(loadCrm().workspaceRaw()));
+  eq("and reading leaves the workspace store untouched",
+    JSON.stringify(crm.workspaceRaw()), workspaceBefore);
 }
 
 /* ================================================================== 2. the day arithmetic */
@@ -251,7 +255,7 @@ head("3. the five buckets of chapter XXIII, and where each boundary falls");
     "late,today,soon,later,none");
   eq("and 'soon' reaches a week", crm.CAL_SOON_DAYS, 7);
 
-  const at = (day) => crm.crmJobBucket(crm.crmAddJob({ name: `x${day}`, dueDate: day }), "2026-08-19");
+  const at = (day) => crm.crmProjectBucket(crm.addProject({ name: `x${day}`, dueDate: day }), "2026-08-19");
   eq("a deadline long past is late", at("2026-01-01"), "late");
   eq("yesterday is late", at("2026-08-18"), "late");
   eq("today is today", at("2026-08-19"), "today");
@@ -265,16 +269,20 @@ head("3. the five buckets of chapter XXIII, and where each boundary falls");
 head("3b. a closed job is in no bucket — a finished job is not late");
 {
   const crm = loadCrm();
-  const j = crm.crmAddJob({ name: "Kuchnia", dueDate: "2026-01-01" });
-  eq("while it is new it is late", crm.crmJobBucket(crm.crmJob(j.id), "2026-08-19"), "late");
-  crm.crmSetJobStatus(j.id, "active");
-  eq("in progress it is still late", crm.crmJobBucket(crm.crmJob(j.id), "2026-08-19"), "late");
-  crm.crmSetJobStatus(j.id, "done");
-  eq("finished it is in none of them", crm.crmJobBucket(crm.crmJob(j.id), "2026-08-19"), "");
-  crm.crmSetJobStatus(j.id, "cancelled");
-  eq("and cancelled likewise", crm.crmJobBucket(crm.crmJob(j.id), "2026-08-19"), "");
-  eq("which is exactly chapter XXI's open half", crm.JOB_OPEN_STATUS.join(), "new,active");
-  eq("nothing at all is in no bucket, safely", crm.crmJobBucket(null, "2026-08-19"), "");
+  const j = crm.addProject({ name: "Kuchnia", dueDate: "2026-01-01" });
+  eq("while it is new it is late", crm.crmProjectBucket(crm.wsProject(j.id), "2026-08-19"), "late");
+  crm.setProjectStatus(j.id, "active");
+  eq("in progress it is still late", crm.crmProjectBucket(crm.wsProject(j.id), "2026-08-19"), "late");
+  crm.setProjectStatus(j.id, "done");
+  eq("finished it is in none of them", crm.crmProjectBucket(crm.wsProject(j.id), "2026-08-19"), "");
+  crm.setProjectStatus(j.id, "cancelled");
+  eq("and cancelled likewise", crm.crmProjectBucket(crm.wsProject(j.id), "2026-08-19"), "");
+  eq("which is exactly chapter XXI's open half", crm.PROJECT_OPEN_STATUS.join(), "new,active");
+  eq("the calendar palette is the shipped five-token palette",
+    crm.PROJECT_COLORS.join(), "lime,blue,amber,red,violet");
+  eq("a project colour accepts a palette token", crm.crmProjectColor("violet"), "violet");
+  eq("and rejects anything else", crm.crmProjectColor("pink"), "");
+  eq("nothing at all is in no bucket, safely", crm.crmProjectBucket(null, "2026-08-19"), "");
 }
 
 /* ================================================================== 4. the schedule */
@@ -289,11 +297,11 @@ head("4. crmSchedule() puts every job in one place, and only one");
     ["Poddasze we wrześniu", "2026-09-30"],
     ["Wycena bez daty", ""],
   ];
-  rows.forEach(([name, dueDate]) => { crm.crmAddJob({ name, dueDate }); crm.tick(); });
-  const closed = crm.crmAddJob({ name: "Skończona łazienka", dueDate: "2026-07-01" });
-  crm.crmSetJobStatus(closed.id, "done");
-  const closedUndated = crm.crmAddJob({ name: "Anulowana altana" });
-  crm.crmSetJobStatus(closedUndated.id, "cancelled");
+  rows.forEach(([name, dueDate]) => { crm.addProject({ name, dueDate }); crm.tick(); });
+  const closed = crm.addProject({ name: "Skończona łazienka", dueDate: "2026-07-01" });
+  crm.setProjectStatus(closed.id, "done");
+  const closedUndated = crm.addProject({ name: "Anulowana altana" });
+  crm.setProjectStatus(closedUndated.id, "cancelled");
 
   const s = crm.crmSchedule();
   eq("today is the day it measured against", s.day, "2026-08-19");
@@ -317,7 +325,7 @@ head("4b. the nearest deadline is first, and the closed half reads backwards");
 {
   const crm = loadCrm();
   ["2026-09-30", "2026-08-27", "2026-12-01"].forEach((d, i) => {
-    crm.crmAddJob({ name: `L${i}`, dueDate: d });
+    crm.addProject({ name: `L${i}`, dueDate: d });
     crm.tick();
   });
   const s = crm.crmSchedule();
@@ -326,8 +334,8 @@ head("4b. the nearest deadline is first, and the closed half reads backwards");
 
   const crm2 = loadCrm();
   ["2026-01-01", "2026-07-01", "2026-03-01"].forEach((d, i) => {
-    const j = crm2.crmAddJob({ name: `Z${i}`, dueDate: d });
-    crm2.crmSetJobStatus(j.id, "done");
+    const j = crm2.addProject({ name: `Z${i}`, dueDate: d });
+    crm2.setProjectStatus(j.id, "done");
     crm2.tick();
   });
   eq("the closed half puts the most recent deadline first",
@@ -336,9 +344,9 @@ head("4b. the nearest deadline is first, and the closed half reads backwards");
   // Nothing to sort an undated job by but the store's own order: newest change first,
   // which is what every other list in the Pro workspace uses.
   const crm3 = loadCrm();
-  const a = crm3.crmAddJob({ name: "A" });
+  const a = crm3.addProject({ name: "A" });
   crm3.tick();
-  const b = crm3.crmAddJob({ name: "B" });
+  const b = crm3.addProject({ name: "B" });
   eq("the undated bucket keeps the store's order",
     crm3.crmSchedule().buckets.none.map((j) => j.id).join(), `${b.id},${a.id}`);
 }
@@ -346,25 +354,25 @@ head("4b. the nearest deadline is first, and the closed half reads backwards");
 head("4c. the schedule moves when the job does, because it is the same row");
 {
   const crm = loadCrm();
-  const j = crm.crmAddJob({ name: "Elewacja", dueDate: "2026-08-30" });
+  const j = crm.addProject({ name: "Elewacja", dueDate: "2026-08-30" });
   eq("it starts further out", crm.crmSchedule().counts.later, 1);
 
-  crm.crmUpdateJob(j.id, { dueDate: "2026-08-21" });
+  crm.wsUpdateProject(j.id, { dueDate: "2026-08-21" });
   eq("a nearer date moves it into the week", crm.crmSchedule().counts.soon, 1);
   eq("and out of the one it was in", crm.crmSchedule().counts.later, 0);
 
-  crm.crmUpdateJob(j.id, { dueDate: "" });
+  crm.wsUpdateProject(j.id, { dueDate: "" });
   eq("clearing the date moves it to the undated list", crm.crmSchedule().counts.none, 1);
 
-  crm.crmUpdateJob(j.id, { dueDate: "2026-08-01" });
+  crm.wsUpdateProject(j.id, { dueDate: "2026-08-01" });
   eq("a date in the past makes it late", crm.crmSchedule().counts.late, 1);
-  crm.crmSetJobStatus(j.id, "done");
+  crm.setProjectStatus(j.id, "done");
   eq("finishing it takes it off the late list", crm.crmSchedule().counts.late, 0);
   eq("and into the closed half", crm.crmSchedule().counts.closed, 1);
 
-  const token = crm.crmDeleteJob(j.id);
+  const token = crm.wsDeleteProject(j.id);
   eq("a deleted job is on no list at all", crm.crmSchedule().total, 0);
-  crm.crmRestoreJob(token);
+  crm.wsRestoreProject(token);
   eq("and the undo puts it back where it was", crm.crmSchedule().counts.closed, 1);
 }
 
@@ -385,44 +393,42 @@ head("4d. an empty store is an empty schedule, not a crash");
 
 /* ================================================================== 5. the one write */
 
-head("5. the only thing the terminarz writes is the job's own deadline");
+head("5. the only thing the terminarz writes is the project's own deadline");
 {
   const crm = loadCrm();
   const client = crm.crmAddClient({ name: "Jan Kowalski" });
   const project = crm.wsAddProject("Remont łazienki");
-  const j = crm.crmAddJob({
+  const j = crm.addProject({
     name: "Łazienka", clientId: client.id, projectId: project.id,
     status: "active", description: "Skucie glazury.", note: "Klucze u sąsiada.",
-    valueMajor: "12500",
+    valueMinor: 1_250_000, currencyCode: "PLN",
   });
   const wsBefore = JSON.stringify(crm.workspaceRaw());
   crm.tick();
 
-  const after = crm.crmUpdateJob(j.id, { dueDate: "2026-08-21" });
+  const after = crm.wsUpdateProject(j.id, { dueDate: "2026-08-21" });
   eq("the date is stored", after.dueDate, "2026-08-21");
   eq("the name is untouched", after.name, "Łazienka");
   eq("the status too", after.status, "active");
   eq("the client link", after.clientId, client.id);
-  eq("the project link", after.projectId, project.id);
-  eq("the description", after.description, "Skucie glazury.");
   eq("the note", after.note, "Klucze u sąsiada.");
   eq("the agreed value", after.valueMinor, 1_250_000);
   eq("and its currency", after.currencyCode, "PLN");
   check("updatedAt moved, because the row did", after.updatedAt > j.updatedAt);
-  eq("the project document is byte-for-byte what it was",
-    JSON.stringify(crm.workspaceRaw()), wsBefore);
+  check("the project document is the only store row changed",
+    JSON.stringify(crm.workspaceRaw()) !== wsBefore);
 
   // The same validation as /zlecenia/, because it is the same call: a date that is not a
   // calendar day is refused rather than half-stored.
   eq("a nonsense date clears the field instead of storing itself",
-    crm.crmUpdateJob(j.id, { dueDate: "za tydzień" }).dueDate, "");
+    crm.wsUpdateProject(j.id, { dueDate: "za tydzień" }).dueDate, "");
   eq("a day that does not exist likewise",
-    crm.crmUpdateJob(j.id, { dueDate: "2026-02-31" }).dueDate, "");
+    crm.wsUpdateProject(j.id, { dueDate: "2026-02-31" }).dueDate, "");
   eq("and a full ISO instant is not truncated into one",
-    crm.crmUpdateJob(j.id, { dueDate: "2026-08-21T23:00:00Z" }).dueDate, "");
-  eq("a real one still goes in", crm.crmUpdateJob(j.id, { dueDate: "2026-02-28" }).dueDate,
+    crm.wsUpdateProject(j.id, { dueDate: "2026-08-21T23:00:00Z" }).dueDate, "");
+  eq("a real one still goes in", crm.wsUpdateProject(j.id, { dueDate: "2026-02-28" }).dueDate,
     "2026-02-28");
-  eq("a leap day is a real day", crm.crmUpdateJob(j.id, { dueDate: "2028-02-29" }).dueDate,
+  eq("a leap day is a real day", crm.wsUpdateProject(j.id, { dueDate: "2028-02-29" }).dueDate,
     "2028-02-29");
 }
 

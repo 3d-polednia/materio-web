@@ -2217,6 +2217,11 @@ async function syncPushAll(uid, since) {
       valueMinor: value,
       currencyCode: value == null ? "" : String(p.currencyCode == null ? "" : p.currencyCode).slice(0, 3),
       note: String(p.note == null ? "" : p.note).slice(0, 2000),
+      // `color` is newer than the phone's project contract, but it is safe for the same
+      // reason as the room link and shopping-item note below: every write on both sides
+      // uses set(..., merge true), validProject() has no hasOnly() clause, and the phone's
+      // readers ignore keys they do not know. Omitting it would lose the coloured deadline.
+      color: String(p.color == null ? "" : p.color).slice(0, 16),
       archived: !!p.archived,
       ...syncFields(p.createdAt, p.deletedAt),
     }, MERGE);

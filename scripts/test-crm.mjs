@@ -4,11 +4,11 @@
  *
  *     node scripts/test-crm.mjs
  *
- * Master plan, session 26: "CRM — Połączenie: klient → zlecenie → projekt → wycena →
+ * Master plan, session 26: "CRM — Połączenie: klient → projekt → wycena →
  * historia", and chapter XXIV under it:
  *
  *     CRM LiczMat Pro ma być lekki. Główna relacja:
- *     KLIENT → ZLECENIE → PROJEKT → WYCENA → HISTORIA
+ *     KLIENT → PROJEKT → WYCENA → HISTORIA
  *     Celem jest szybkie zarządzanie pracą fachowca. Nie tworzymy ogromnego systemu ERP.
  *
  * Sessions 22–25 built the four modules and each of the links between them. Session 26
@@ -16,10 +16,10 @@
  * derives the history the chapter ends on. So what this file checks is mostly what the
  * session did **not** do —
  *
- *   1. it stores nothing: the Pro store still holds exactly three collections, the
+ *   1. it stores nothing: the Pro store keeps its migration-safe collections, the
  *      workspace is byte-for-byte what it was, and reading a chain writes no key;
- *   2. the walk, from all four ends, and the same answer from each of them;
- *   3. the two lists that were missing — a client's quotes and a job's quotes — and the
+ *   2. the walk, from all three ends, and the same answer from each of them;
+ *   3. the two lists that were missing — a client's quotes and a project's quotes — and the
  *      one project that must not appear in either;
  *   4. the history: which documents make a row, the order, the scope, and the change that
  *      deliberately leaves no trace because nothing dates it;
@@ -88,12 +88,10 @@ function loadCrm(shared) {
     removeItem: (k) => backing.delete(k),
   };
   const api = evalScript(["assets/workspace.js", "assets/crm-store.js", "assets/crm.js"], [
-    "wsAddProject", "wsProject", "wsProjects", "wsDeleteProject", "wsRestoreProject",
+    "wsAddProject", "wsUpdateProject", "wsProject", "wsProjects", "wsDeleteProject", "wsRestoreProject",
     "wsAddEstimation", "wsAddManualEstimation", "wsEstimations", "wsProjectCosts", "wsExport",
     "crmAddClient", "crmClient", "crmDeleteClient", "crmRestoreClient", "crmLinkProject",
-    "crmClientProjects", "crmClientJobs", "crmClientQuotes", "crmClientCosts",
-    "crmAddJob", "crmJob", "crmUpdateJob", "crmSetJobStatus", "crmDeleteJob", "crmRestoreJob",
-    "crmJobOfProject", "crmJobQuotes",
+    "crmClientProjects", "crmClientQuotes", "crmClientCosts", "crmProjectQuotes",
     "crmAddQuote", "crmQuote", "crmQuotes", "crmDeleteQuote", "crmProjectQuotes",
     "crmQuoteTotals", "crmQuoteChain", "crmAddLabour",
     "crmChain", "crmHistory", "CRM_CHAIN", "CRM_HISTORY_KINDS", "CRM_KEY",
@@ -183,19 +181,18 @@ const save = (ws, over = {}) => ws.wsAddEstimation({
 
 /**
  * Chapter XXIV's whole path, built the way a tradesman builds it: the client first, then
- * the job, then the project the job is done in, then the price.
+ * the project filed under that client, then the price.
  */
 function buildChain(crm) {
   const client = crm.crmAddClient({ name: "Jan Kowalski", phone: "600 100 200" });
   crm.tick(60_000);
-  const project = crm.wsAddProject("Łazienka");
-  const job = crm.crmAddJob({
-    name: "Remont łazienki", clientId: client.id, projectId: project.id,
-    dueDate: "2026-09-01", valueMajor: 12_000,
+  const project = crm.wsAddProject("Remont łazienki", {
+    clientId: client.id, dueDate: "2026-09-01", valueMinor: 1_200_000,
+    currencyCode: "PLN",
   });
   crm.tick(60_000);
   const quote = crm.crmAddQuote({ name: "Wariant A", projectId: project.id });
-  return { client, project, job, quote };
+  return { client, project, quote };
 }
 
 /* ------------------------------------------------------------------ the runner */
@@ -218,21 +215,20 @@ const eq = (name, got, want) =>
 head("1. the chain is walked, never stored");
 {
   const crm = loadCrm();
-  const { client, job, project, quote } = buildChain(crm);
+  const { client, project, quote } = buildChain(crm);
   const before = JSON.stringify(crm.raw());
   const wsBefore = JSON.stringify(crm.workspaceRaw());
 
   crm.crmChain("client", client.id);
-  crm.crmChain("job", job.id);
   crm.crmChain("project", project.id);
   crm.crmChain("quote", quote.id);
   crm.crmHistory({ clientId: client.id });
   crm.crmClientQuotes(client.id);
-  crm.crmJobQuotes(job.id);
+  crm.crmProjectQuotes(project.id);
 
   eq("walking the whole chain writes nothing to the Pro store", JSON.stringify(crm.raw()), before);
   eq("and nothing to the workspace", JSON.stringify(crm.workspaceRaw()), wsBefore);
-  eq("the Pro store still holds exactly its three collections",
+  eq("the Pro store still holds exactly its three migration-safe collections",
     Object.keys(crm.raw()).sort().join(), "clients,jobs,quotes");
   check("no chain, link, graph or history collection has appeared",
     !Object.keys(crm.raw()).some((k) => /chain|link|graph|history|event|log/i.test(k)),
@@ -241,11 +237,10 @@ head("1. the chain is walked, never stored");
     // The third is the workspace's own "which project is active", written by wsAddProject().
     "liczmat-crm-v1,materio-active-project,materio-workspace-v1");
 
-  // The links themselves are still the four rows sessions 22–25 wrote, in their places.
+  // The links themselves are still the three rows sessions 22–25 wrote, in their places.
   const stored = crm.raw();
-  eq("the client keeps the project", stored.clients[0].projectIds.join(), project.id);
-  eq("the job keeps the client", stored.jobs[0].clientId, client.id);
-  eq("and the project", stored.jobs[0].projectId, project.id);
+  eq("the client does not copy the project's own client link", stored.clients[0].projectIds.join(), "");
+  eq("the project keeps the client", crm.wsProject(project.id).clientId, client.id);
   eq("the quote keeps the project and nothing else", stored.quotes[0].projectId, project.id);
   check("the quote carries no client or job of its own",
     stored.quotes[0].clientId === undefined && stored.quotes[0].jobId === undefined,
@@ -264,12 +259,11 @@ head("1. the chain is walked, never stored");
 head("2. the same path, whichever end it is walked from");
 {
   const crm = loadCrm();
-  const { client, project, job, quote } = buildChain(crm);
+  const { client, project, quote } = buildChain(crm);
 
-  for (const [kind, id] of [["job", job.id], ["project", project.id], ["quote", quote.id]]) {
+  for (const [kind, id] of [["project", project.id], ["quote", quote.id]]) {
     const chain = crm.crmChain(kind, id);
     eq(`from a ${kind}: the client`, chain.client && chain.client.id, client.id);
-    eq(`from a ${kind}: the job`, chain.job && chain.job.id, job.id);
     eq(`from a ${kind}: the project`, chain.project && chain.project.id, project.id);
     eq(`from a ${kind}: the quotes of that project`,
       chain.quotes.map((q) => q.id).join(), quote.id);
@@ -277,39 +271,37 @@ head("2. the same path, whichever end it is walked from");
   }
   eq("only a walk that started at a quote resolves one",
     crm.crmChain("quote", quote.id).quote.id, quote.id);
-  eq("a walk from a job resolves none", crm.crmChain("job", job.id).quote, null);
+  eq("a walk from a project resolves no single quote", crm.crmChain("project", project.id).quote, null);
 
   // Downwards the chain is not a single path, and the walker refuses to guess: one client
-  // has many jobs, so the client's own walk stops at them and the page lists them instead.
-  const second = crm.crmAddJob({ name: "Kuchnia", clientId: client.id });
+  // has many projects, so the client's own walk stops and the page lists them instead.
+  const second = crm.wsAddProject("Kuchnia", { clientId: client.id });
   const fromClient = crm.crmChain("client", client.id);
   eq("from a client: the client", fromClient.client.id, client.id);
-  eq("from a client: no job is guessed at", fromClient.job, null);
-  eq("nor a project", fromClient.project, null);
+  eq("from a client: no project is guessed at", fromClient.project, null);
   eq("but their quotes are all there", fromClient.quotes.map((q) => q.id).join(), quote.id);
-  eq("and the second job did not change that", crm.crmClientJobs(client.id).length, 2);
-  eq("the second job has no project, so its chain stops there",
-    crm.crmChain("job", second.id).project, null);
-  eq("and it still knows its client", crm.crmChain("job", second.id).client.id, client.id);
+  eq("and the second project did not change that", crm.crmClientProjects(client.id).length, 2);
+  eq("the second project's chain has no quotes", crm.crmChain("project", second.id).quotes.length, 0);
+  eq("and it still knows its client", crm.crmChain("project", second.id).client.id, client.id);
 
-  // The order of the nodes is the chapter's own, and the walker knows exactly four.
-  eq("the chain has chapter XXIV's four nodes in its order",
-    crm.CRM_CHAIN.join(), "client,job,project,quote");
+  // The order of the nodes is the chapter's own, and the walker knows exactly three.
+  eq("the chain has chapter XXIV's three nodes in its order",
+    crm.CRM_CHAIN.join(), "client,project,quote");
 }
 
 head("2b. a walk that cannot start answers empty rather than guessing");
 {
   const crm = loadCrm();
-  const { job } = buildChain(crm);
+  const { project } = buildChain(crm);
   for (const [kind, id, why] of [
-    ["job", "nope", "an id nobody has"],
+    ["project", "nope", "an id nobody has"],
     ["quote", "", "no id at all"],
     ["client", "nope", "a client who never existed"],
-    ["room", job.id, "a kind that is not on the path"],
+    ["room", project.id, "a kind that is not on the path"],
   ]) {
     const chain = crm.crmChain(kind, id);
     check(`${why}: every node is null`,
-      !chain.client && !chain.job && !chain.project && !chain.quote && chain.quotes.length === 0,
+      !chain.client && !chain.project && !chain.quote && chain.quotes.length === 0,
       JSON.stringify(chain));
   }
 
@@ -322,36 +314,34 @@ head("2b. a walk that cannot start answers empty rather than guessing");
   eq("and the undo puts them back", crm2.crmChain("quote", quote.id).client.id, client.id);
 }
 
-head("2c. crmQuoteChain() is the same walker, so /wyceny/ cannot disagree with /zlecenia/");
+head("2c. crmQuoteChain() is the same walker, so /wyceny/ cannot disagree with /projekty/");
 {
   const crm = loadCrm();
-  const { client, project, job, quote } = buildChain(crm);
+  const { client, project, quote } = buildChain(crm);
   const back = crm.crmQuoteChain(quote.id);
   eq("the client is the same row", back.client.id, client.id);
-  eq("the job is the same row", back.job.id, job.id);
   eq("the project is the same row", back.project.id, project.id);
   const walked = crm.crmChain("quote", quote.id);
   eq("and it is crmChain() underneath", JSON.stringify(back),
-    JSON.stringify({ project: walked.project, job: walked.job, client: walked.client }));
+    JSON.stringify({ project: walked.project, client: walked.client }));
 
-  // A job carries the client it was typed with; the project's own filing is the fallback,
-  // and the two agree because crmAddJob() files the project under that client.
-  eq("the project is filed under the client the job named",
+  // The project carries the client it was typed with.
+  eq("the project is filed under the client it names",
     crm.crmClientProjects(client.id).map((x) => x.id).join(), project.id);
 }
 
 /* ================================================================== 3. the two lists */
 
-head("3. a client's quotes and a job's quotes, neither of them stored");
+head("3. a client's quotes and a project's quotes, neither of them stored");
 {
   const crm = loadCrm();
-  const { client, project, job, quote } = buildChain(crm);
+  const { client, project, quote } = buildChain(crm);
   crm.tick(60_000);
   const second = crm.crmAddQuote({ name: "Wariant B", projectId: project.id });
 
   eq("both quotes of the project are the client's",
     crm.crmClientQuotes(client.id).map((q) => q.name).sort().join(), "Wariant A,Wariant B");
-  eq("and the job's", crm.crmJobQuotes(job.id).map((q) => q.name).sort().join(),
+  eq("and the project's", crm.crmProjectQuotes(project.id).map((q) => q.name).sort().join(),
     "Wariant A,Wariant B");
   eq("newest change first", crm.crmClientQuotes(client.id)[0].id, second.id);
 
@@ -360,20 +350,18 @@ head("3. a client's quotes and a job's quotes, neither of them stored");
   crm.crmAddQuote({ name: "Nie moja", projectId: other.id });
   eq("a quote on a project this client does not own is not theirs",
     crm.crmClientQuotes(client.id).length, 2);
-  eq("nor the job's", crm.crmJobQuotes(job.id).length, 2);
+  eq("nor the project's", crm.crmProjectQuotes(project.id).length, 2);
 
   // A quote with no project belongs to nobody's list — it is a price for work with no
   // material behind it, which session 24 allows on purpose.
   crm.crmAddQuote({ name: "Sama robocizna" });
   eq("a quote with no project is in no client's list", crm.crmClientQuotes(client.id).length, 2);
 
-  const bare = crm.crmAddJob({ name: "Bez projektu", clientId: client.id });
-  eq("a job with no project has no quotes", crm.crmJobQuotes(bare.id).length, 0);
-  eq("and an id nobody has, none either", crm.crmJobQuotes("nope").length, 0);
+  eq("an id nobody has answers an empty list", crm.crmProjectQuotes("nope").length, 0);
 
   eq("nothing about either list is stored on the client",
     Object.keys(crm.raw().clients[0]).filter((k) => /quote/i.test(k)).join(), "");
-  eq("nor on the job", Object.keys(crm.raw().jobs[0]).filter((k) => /quote/i.test(k)).join(), "");
+  eq("nor on the project", Object.keys(crm.wsProject(project.id)).filter((k) => /quote/i.test(k)).join(), "");
   eq("the quote is still the only end of the link", crm.raw().quotes[0].projectId, project.id);
 }
 
@@ -382,7 +370,7 @@ head("3. a client's quotes and a job's quotes, neither of them stored");
 head("4. the history is derived from the documents and their dates");
 {
   const crm = loadCrm();
-  const { client, project, job, quote } = buildChain(crm);
+  const { client, project, quote } = buildChain(crm);
   crm.tick(60_000);
   const line = save(crm, { projectId: project.id, name: "Gres" });
   crm.tick(60_000);
@@ -393,32 +381,29 @@ head("4. the history is derived from the documents and their dates");
 
   const rows = crm.crmHistory({ clientId: client.id });
   eq("every document is one row", rows.length, 5);
-  eq("newest first", rows.map((r) => r.kind).join(), "cost,calc,quote,job,client");
+  eq("newest first", rows.map((r) => r.kind).join(), "cost,calc,quote,project,client");
   eq("the client's own row is the oldest", rows[4].id, client.id);
   eq("a saved calculation names the project it happened in", rows[1].project.id, project.id);
   eq("a cost is told apart from a calculation", rows[0].kind, "cost");
   eq("and both carry the line itself", rows[0].line.id, cost.id);
-  eq("the job row carries the job", rows[3].job.id, job.id);
+  eq("the project row carries the project", rows[3].project.id, project.id);
   eq("the quote row carries the quote", rows[2].quote.id, quote.id);
   eq("every kind the history can carry is declared",
-    crm.CRM_HISTORY_KINDS.join(), "client,job,quote,calc,cost");
+    crm.CRM_HISTORY_KINDS.join(), "client,project,quote,calc,cost");
   check("every row has a date", rows.every((r) => r.at > 0), JSON.stringify(rows.map((r) => r.at)));
   eq("the limit is honoured", crm.crmHistory({ clientId: client.id }, 2).length, 2);
   eq("and it takes the newest", crm.crmHistory({ clientId: client.id }, 1)[0].id, cost.id);
 
-  // The scopes: one job, and one project.
-  const jobRows = crm.crmHistory({ jobId: job.id });
-  eq("a job's history is the job and what its project holds",
-    jobRows.map((r) => r.kind).join(), "cost,calc,quote,job");
-  check("and never the client's own row", !jobRows.some((r) => r.kind === "client"));
+  // The project scope contains only what was saved into that project.
   const projectRows = crm.crmHistory({ projectId: project.id });
-  eq("a project's history is what was saved into it, plus the job it is done under",
-    projectRows.map((r) => r.kind).join(), "cost,calc,quote,job");
+  eq("a project's history is what was saved into it",
+    projectRows.map((r) => r.kind).join(), "cost,calc,quote,project");
+  check("and never the client's own row", !projectRows.some((r) => r.kind === "client"));
 
   eq("an empty scope answers nothing", crm.crmHistory({}).length, 0);
   eq("an unknown client too", crm.crmHistory({ clientId: "nope" }).length, 0);
-  eq("an unknown job too", crm.crmHistory({ jobId: "nope" }).length, 0);
-  eq("reading it wrote nothing", crm.raw().jobs.length, 1);
+  eq("an unknown id too", crm.crmHistory({ projectId: "nope" }).length, 0);
+  eq("reading it wrote nothing", Object.keys(crm.raw()).sort().join(), "clients,jobs,quotes");
 
   // Somebody else's project is not this client's history, exactly as it is not their cost.
   const other = crm.wsAddProject("Cudzy projekt");
@@ -433,7 +418,7 @@ head("4. the history is derived from the documents and their dates");
 head("4b. what the history deliberately does not claim");
 {
   const crm = loadCrm();
-  const { client, job } = buildChain(crm);
+  const { client, project } = buildChain(crm);
   const before = crm.crmHistory({ clientId: client.id }).length;
 
   // A status moved and a deadline pushed are the two changes a tradesman makes most often,
@@ -441,26 +426,26 @@ head("4b. what the history deliberately does not claim");
   // which says when it last changed and never what changed. Claiming them would need an
   // event log, which is the ERP chapter XXIV forbids in its last line.
   crm.tick(60_000);
-  crm.crmSetJobStatus(job.id, "active");
-  crm.crmUpdateJob(job.id, { dueDate: "2026-10-01" });
+  crm.wsUpdateProject(project.id, { status: "active" });
+  crm.wsUpdateProject(project.id, { dueDate: "2026-10-01" });
   const after = crm.crmHistory({ clientId: client.id });
   eq("a status change adds no row", after.length, before);
-  eq("nor does a deadline moved", after.filter((r) => r.kind === "job").length, 1);
-  eq("the job's row still reads from the job", after.find((r) => r.kind === "job").job.status,
+  eq("nor does a moved deadline", after.filter((r) => r.kind === "project").length, 1);
+  eq("the project's row still reads from the project", after.find((r) => r.kind === "project").project.status,
     "active");
-  eq("and it is dated when the job was created, not when it changed",
-    after.find((r) => r.kind === "job").at, crm.crmJob(job.id).createdAt);
+  eq("and it is dated when the project was created, not when it changed",
+    after.find((r) => r.kind === "project").at, crm.wsProject(project.id).createdAt);
   check("which is earlier than its last change",
-    crm.crmJob(job.id).createdAt < crm.crmJob(job.id).updatedAt);
+    crm.wsProject(project.id).createdAt < crm.wsProject(project.id).updatedAt);
 
   // Deleting a row removes its history, because the history *is* the rows. A log would
   // have kept an entry for something nobody can open any more.
-  const token = crm.crmDeleteJob(job.id);
-  eq("a deleted job leaves no row behind",
-    crm.crmHistory({ clientId: client.id }).filter((r) => r.kind === "job").length, 0);
-  crm.crmRestoreJob(token);
+  const token = crm.wsDeleteProject(project.id);
+  eq("a deleted project leaves no row behind",
+    crm.crmHistory({ clientId: client.id }).filter((r) => r.kind === "project").length, 0);
+  crm.wsRestoreProject(token);
   eq("and the undo brings its row back",
-    crm.crmHistory({ clientId: client.id }).filter((r) => r.kind === "job").length, 1);
+    crm.crmHistory({ clientId: client.id }).filter((r) => r.kind === "project").length, 1);
 }
 
 /* ================================================================== 5. the feature */
@@ -503,6 +488,9 @@ head("6. the frame the build writes, and the one link map behind it");
   const job = jobsMain(DEFAULT_LANG, t, FEATURES).main;
   const quote = quotesMain(DEFAULT_LANG, t, FEATURES).main;
 
+  // TODO(web-task-3): point the project checks at /projekty/ after that page draws the strip.
+  // The generated site still draws the middle node on /zlecenia/, so these checks keep
+  // guarding what the build actually emits today instead of silently dropping coverage.
   for (const [where, html, ids] of [
     ["/klienci/", client, ["crm-client-quotes", "crm-history"]],
     ["/zlecenia/", job, ["job-chain", "job-quotes", "job-history"]],
@@ -547,11 +535,11 @@ head("6. the frame the build writes, and the one link map behind it");
   // Every page the map names is a page this site really has, in every language.
   const chain = loadChain();
   eq("the strip knows which section owns each node",
-    Object.keys(chain.CHN_SECTION).join(), "client,job,project,quote");
+    Object.keys(chain.CHN_SECTION).join(), "client,project,quote");
   eq("and the history knows it for every kind it can draw",
-    Object.keys(chain.CHN_HISTORY_SECTION).sort().join(), "calc,client,cost,job,quote");
+    Object.keys(chain.CHN_HISTORY_SECTION).sort().join(), "calc,client,cost,project,quote");
   const fallback = {
-    clients: urlClients(DEFAULT_LANG), jobs: urlJobs(DEFAULT_LANG),
+    clients: urlClients(DEFAULT_LANG),
     projects: urlProjects(DEFAULT_LANG), quotes: urlQuotes(DEFAULT_LANG),
     calendar: urlCalendar(DEFAULT_LANG),
   };
@@ -581,37 +569,36 @@ head("7. the words, in four languages");
 {
   const KEYS = [
     "crm_chain_t", "crm_chain_d",
-    "crm_node_client", "crm_node_job", "crm_node_project", "crm_node_quote", "crm_node_none",
+    "crm_node_client", "crm_node_project", "crm_node_quote", "crm_node_none",
     "crm_quotes_t", "crm_quotes_d", "crm_quotes_empty", "crm_quotes_all",
     "crm_hist_t", "crm_hist_d", "crm_hist_empty", "crm_hist_note",
-    "crm_ev_client", "crm_ev_job", "crm_ev_quote", "crm_ev_calc", "crm_ev_cost",
+    "crm_ev_client", "crm_ev_project", "crm_ev_quote", "crm_ev_calc", "crm_ev_cost",
   ];
   for (const lang of LANGS) {
     for (const key of KEYS) {
       check(`${lang}: ${key} is translated`,
         Boolean(DICT[lang][key]) && DICT[lang][key] !== key, key);
     }
-    // The four node labels are the four modules, and each one has to be its own word:
-    // a strip that said "Projekt → Projekt" would be unreadable.
-    const nodes = ["client", "job", "project", "quote"].map((n) => DICT[lang][`crm_node_${n}`]);
-    eq(`${lang}: the four nodes have four different words`, new Set(nodes).size, 4);
+    // The three node labels are the three modules, and each one has to be its own word.
+    const nodes = ["client", "project", "quote"].map((n) => DICT[lang][`crm_node_${n}`]);
+    eq(`${lang}: the three nodes have three different words`, new Set(nodes).size, 3);
     // And each is the word that page already uses for itself.
     eq(`${lang}: the client node is the clients page's own word`,
       DICT[lang].crm_node_client, DICT[lang].job_client);
     check(`${lang}: the history note explains what is missing`,
       DICT[lang].crm_hist_note.length > 80, DICT[lang].crm_hist_note);
     check(`${lang}: the five events are five different sentences`,
-      new Set(["client", "job", "quote", "calc", "cost"]
+      new Set(["client", "project", "quote", "calc", "cost"]
         .map((k) => DICT[lang][`crm_ev_${k}`])).size === 5);
   }
-  for (const key of ["crm_chain_t", "crm_node_job", "crm_hist_t", "crm_quotes_t"]) {
+  for (const key of ["crm_chain_t", "crm_node_project", "crm_hist_t", "crm_quotes_t"]) {
     const all = LANGS.map((l) => DICT[l][key]);
     check(`${key} is actually translated, not copied`, new Set(all).size > 1, all.join(" | "));
   }
   // Chapter XXIV's own vocabulary, in the language the plan is written in.
-  eq("the path is klient → zlecenie → projekt → wycena",
-    ["client", "job", "project", "quote"].map((n) => DICT.pl[`crm_node_${n}`]).join(" → "),
-    "Klient → Zlecenie → Projekt → Wycena");
+  eq("the path is klient → projekt → wycena",
+    ["client", "project", "quote"].map((n) => DICT.pl[`crm_node_${n}`]).join(" → "),
+    "Klient → Projekt → Wycena");
   eq("and it ends in Historia", DICT.pl.crm_hist_t, "Historia");
 }
 
@@ -631,22 +618,23 @@ head("13. two tabs of one browser on one Pro workspace");
   eq("what one tab writes, the other one reads", (b.crmClient(client.id) || {}).name, "Kowalski");
 
   b.tick();
-  b.crmAddJob({ clientId: client.id, name: "Łazienka" });
+  b.wsAddProject("Łazienka", { clientId: client.id });
   a.tick();
-  const second = a.crmAddJob({ clientId: client.id, name: "Kuchnia" });
-  check("a job added in each tab leaves two jobs, not one",
-    b.crmClientJobs(client.id).length === 2, JSON.stringify(b.crmClientJobs(client.id).map((j) => j.name)));
-  check("and the second tab can read the first tab's row back", Boolean(b.crmJob(second.id)));
+  const second = a.wsAddProject("Kuchnia", { clientId: client.id });
+  check("a project added in each tab leaves two projects, not one",
+    b.crmClientProjects(client.id).length === 2,
+    JSON.stringify(b.crmClientProjects(client.id).map((p) => p.name)));
+  check("and the second tab can read the first tab's row back", Boolean(b.wsProject(second.id)));
 
   b.events.length = 0;
-  b.storageEvent("liczmat-crm-v1");
-  check("a Pro write in another tab redraws this one", b.events.includes("crmchange"));
+  b.storageEvent("materio-workspace-v1");
+  check("a Pro write in another tab redraws this one", b.events.includes("workspacechange"));
   const drawn = b.events.length;
   b.storageEvent("liczmat-theme");
   eq("a key that is not the Pro store redraws nothing", b.events.length, drawn);
 
   b.focus("INPUT");
-  b.storageEvent("liczmat-crm-v1");
+  b.storageEvent("materio-workspace-v1");
   eq("nothing is redrawn under a cursor — a form rebuilt mid-word loses the word",
     b.events.length, drawn);
   b.focus(null);

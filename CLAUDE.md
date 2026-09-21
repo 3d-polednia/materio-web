@@ -117,7 +117,6 @@ node scripts/test-pro-admin.mjs   # granting Pro by hand: the three fields, the 
 node scripts/test-webhook-map.mjs # the Stripe webhook: the signature, the status, the write
 node scripts/test-admin-map.mjs   # the admin panel: the claim, the request, the write
 node scripts/test-admin-page.mjs  # the same panel clicked in Chromium (needs Playwright)
-node scripts/test-jobs.mjs        # jobs: the document, the statuses, the deadline, the links
 node scripts/test-quotes.mjs      # quotes: labour, the margin, the five figures
 node scripts/test-calendar.mjs    # the terminarz: the buckets, the day arithmetic, the one write
 node scripts/test-crm.mjs         # the chain: the walk, the derived history, one link map
@@ -393,16 +392,6 @@ scripts/test-clients.mjs  Clients (session 22, chapter XX): the client document 
                       its states — including the one after LM_PRO_LOCKED is flipped — and
                       the copy in thirteen languages. Dependency-free — run it after touching
                       assets/crm.js, clientsMain() or a cli_*/clipage_* key
-scripts/test-jobs.mjs  Jobs (session 23, chapter XXI): the job document and chapter XXI's
-                      eight fields, the four statuses and the one that is refused, the
-                      deadline that is a calendar day rather than an instant, the four
-                      writes plus the undo, chapter XXIV's chain — client → job → project,
-                      with the project document byte-for-byte untouched — the two amounts
-                      (what was agreed, what wsProjectCosts() says it has run to) and the
-                      currency rule between them, the route, chapter XXV's gate in both of
-                      its states and the copy in thirteen languages. Dependency-free — run it
-                      after touching the job half of assets/crm.js, jobsMain() or a
-                      job_*/jobpage_*/cli_jobs_* key
 scripts/test-jobs-page.mjs  The same clicked through in Chromium, nothing stubbed: a job
                       added with a client and a date, opened, corrected, moved through the
                       statuses, its project attached and detached, deleted with its undo,

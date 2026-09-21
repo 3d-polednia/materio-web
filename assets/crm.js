@@ -1,30 +1,26 @@
-/* LiczMat website — the Pro workspace: clients, jobs, quotes and the terminarz.
+/* LiczMat website — Pro clients, projects, quotes and the terminarz.
  *
  * Master plan, session 22 (KLIENCI): "CRM klientów", and chapter XX under it — a client
- * list where a client carries contact details, notes, a history, jobs, projects and
- * quotes. Session 23 (ZLECENIA) added the second half: a job with a client, a name, a
- * description, a status, a date, a value and a project (chapter XXI), which is chapter
- * XXIV's middle step — KLIENT → ZLECENIE → PROJEKT → WYCENA. Session 24 (WYCENY) added
+ * list where a client carries contact details, notes, a history, projects and quotes.
+ * The former job fields now live on the project, so chapter XXIV's path is the direct
+ * KLIENT → PROJEKT → WYCENA. Session 24 (WYCENY) added
  * the last of those, chapter XXII: material, labour, other costs, margin and a total.
  * Session 25 (TERMINARZ) added a *reading* rather than a fourth collection: chapter
- * XXIII's terminarz is the jobs sorted by their deadline, and it stores nothing — see the
+ * XXIII's terminarz is the projects sorted by their deadline, and it stores nothing — see the
  * block at the bottom of this file for why a date may only have one home.
  *
- * All three collections live in this one file because they live in one store, and because
- * each is the thing that joins the next: splitting them would mean three files reading and
- * writing the same localStorage key, which is one race away from a lost write.
+ * Clients and quotes live in the CRM store; projects live in the workspace store. This
+ * file joins them through their document ids and delegates every project write to
+ * wsUpdateProject(), so there is still only one writer for each store.
  *
  * The store itself — the key, load/save, the ids and the export/import /app/ syncs with —
  * is assets/crm-store.js, which every page loads BEFORE this one. That split is page
  * weight and nothing else: /app/ needs two of those functions and none of this file.
  *
- * **In the sync contract since session 46 (2026-08-26).** docs/FIRESTORE_SYNC.md in
- * `3d-polednia/Materio` now defines eight collections, and `clients`, `jobs` and `quotes`
- * are three of them: the phone has ClientEntity, JobEntity and QuoteEntity, Room migration
- * 5 → 6, the three mappers in SyncContract, the three collections in CloudSync, and
- * validClient()/validJob()/validQuote() in the rules. /app/ pushes and pulls this store
- * next to the workspace, so a job whose status was set here is the job the tradesperson
- * opens on site. See docs/ARCHITEKTURA.md §7.6.
+ * Projects, clients and quotes are in the deployed sync contract. The four status wire
+ * words stay identical to Android's JobStatus enum and the Firestore rules even though
+ * the browser no longer has a jobs collection. /app/ syncs the workspace beside CRM, so
+ * the project edited here is the project the tradesperson opens on site.
  *
  * That is exactly why the document was written in the *shape* of the contract from the
  * first day — an id, the fields, and `createdAt / updatedAt / deletedAt / schemaVersion`,
@@ -36,8 +32,8 @@
  * would put two files on one localStorage key, which is one race away from a lost write.
  * /app/ uploads both stores; that does not make them one store.
  *
- * **A link to another collection travels as a document id.** `projectIds` on a client and
- * `projectId` / `clientId` on a job and a quote hold the id of the row they point at, which
+ * **A link to another collection travels as a document id.** `projectIds` on a client,
+ * `clientId` on a project and `projectId` on a quote hold the id of the row they point at, which
  * is also its Firestore document id — the only identifier that means the same thing here
  * and on the phone. Local ids are per device: two phones both call something "1".
  *
@@ -54,20 +50,13 @@
  * visitor reads are `job_st_<id>` in the dictionary, in four languages.
  *
  * "open" is the half a tradesman is actually working on, and it is what the index shows
- * first — the other two are done with and fold away. That is also why a job has no
- * `archived` field the way a client does: chapter XXI already gives it two closed states,
- * and a third way to put a row out of sight would be one the page had to explain.
+ * first — the other two are done with and fold away. Projects retain their independent
+ * archive flag for the free workspace; status answers the Pro workflow question.
  */
-const JOB_STATUS = ["new", "active", "done", "cancelled"];
-const JOB_OPEN_STATUS = ["new", "active"];
-const JOB_DEFAULT_STATUS = "new";
-
-/**
- * Five tokens for calendar events (session of 2026-09-10), not CSS colours: the
- * stylesheet decides what each one looks like in each theme, and a raw hex stored in
- * the document would be a colour that cannot follow a theme and cannot be re-themed later.
- */
-const JOB_COLORS = ["lime", "blue", "amber", "red", "violet"];
+const PROJECT_STATUS = ["new", "active", "done", "cancelled"];
+const PROJECT_OPEN_STATUS = ["new", "active"];
+const PROJECT_DEFAULT_STATUS = "new";
+const PROJECT_COLORS = ["lime", "blue", "amber", "red", "violet"];
 
 /**
  * The terminarz's buckets, in the order the page draws them — session 25, chapter XXIII.
@@ -75,7 +64,7 @@ const JOB_COLORS = ["lime", "blue", "amber", "red", "violet"];
  * They are the answer to "kiedy", which is the only question a terminarz is opened with:
  * what is already late, what is due today, what is due within the week, what is further
  * out, and what still has no date at all. "none" is last and is not a filler bucket — a
- * job nobody has dated is the row a tradesman most often has to fix, and a terminarz that
+ * project nobody has dated is the row a tradesman most often has to fix, and a terminarz that
  * hid it would be a list of the deadlines that already exist rather than of the work.
  */
 const CAL_BUCKETS = ["late", "today", "soon", "later", "none"];
@@ -166,13 +155,10 @@ const crmArchiveClient = (id, on) => crmUpdateClient(id, { archived: on !== fals
 /**
  * Tombstone a client.
  *
- * **Their projects are not touched, and neither are their jobs.** A project is the
- * visitor's own work in the free workspace, it syncs to the phone, and it goes on existing
- * when the client it was done for is taken off the list — the same argument that keeps a
- * room alive when its project is deleted. A job outlives its client for the same reason
- * and one more: it keeps its `clientId`, so the undo puts the client back with every job
- * still filed under them. Until then the job's page says the client is gone rather than
- * drawing a link to a row nobody can open.
+ * **Their projects are not touched.** A project is the visitor's own work in the free
+ * workspace, it syncs to the phone, and it goes on existing when the client it was done
+ * for is taken off the list — the same argument that keeps a room alive when its project
+ * is deleted. It retains `clientId`, so undo reconnects the same chain.
  *
  * @returns {{id:string, at:number}|null} hand it to crmRestoreClient()
  */
@@ -202,21 +188,15 @@ function crmRestoreClient(token) {
 
 /* ------------------------------------------------------------------ client → project
  *
- * Chapter XX: "Klient może posiadać … projekty", and chapter XXIV's path starts
- * KLIENT → ZLECENIE → PROJEKT. The job is session 23; the project exists today, so the
- * link that exists today is client → project.
- *
- * It is stored on the **client**, not as a `clientId` on the project. A project document
- * is contract: it is pushed to Firestore, pulled by the phone and rendered on /p/<token>,
- * and a field only this browser understands would ride along on all three while the client
- * it points at was never uploaded at all — half a link, in the half that travels. Keeping
- * the whole relation inside the local-only client keeps it in one place, lets the delete
- * and the undo carry it, and leaves the synced document exactly as session 15 left it.
+ * Chapter XXIV is now the direct KLIENT → PROJEKT → WYCENA chain. `clientId` on the
+ * project is authoritative because the project is the work row shared with Android.
+ * `projectIds` remains on the client during the migration so older browser rows still
+ * resolve and so both sides of the established relation remain usable.
  */
 
 /**
  * File a project under a client. A project belongs to one client at a time, so this takes
- * it off any other client's list first — two clients both claiming the same job is a
+ * it off any other client's list first — two clients both claiming the same project is a
  * contradiction the interface would have no way to show.
  */
 function crmLinkProject(clientId, projectId) {
@@ -236,6 +216,7 @@ function crmLinkProject(clientId, projectId) {
   if (!client.projectIds.includes(pid)) client.projectIds.push(pid);
   client.updatedAt = now;
   if (!crmSave(data)) return null;
+  if (typeof wsUpdateProject === "function") wsUpdateProject(pid, { clientId: clientId });
   return client;
 }
 
@@ -249,6 +230,10 @@ function crmUnlinkProject(clientId, projectId) {
   client.projectIds = client.projectIds.filter((x) => x !== pid);
   client.updatedAt = Date.now();
   if (!crmSave(data)) return null;
+  if (typeof wsProject === "function" && typeof wsUpdateProject === "function") {
+    const project = wsProject(pid);
+    if (project && project.clientId === clientId) wsUpdateProject(pid, { clientId: "" });
+  }
   return client;
 }
 
@@ -256,6 +241,8 @@ function crmUnlinkProject(clientId, projectId) {
 function crmClientOfProject(projectId) {
   const pid = String(projectId || "");
   if (!pid) return null;
+  const project = typeof wsProject === "function" ? wsProject(pid) : null;
+  if (project && project.clientId) return crmClient(project.clientId);
   return crmAllClients()
     .find((c) => Array.isArray(c.projectIds) && c.projectIds.includes(pid)) || null;
 }
@@ -271,11 +258,12 @@ function crmClientOfProject(projectId) {
  */
 function crmClientProjects(clientId) {
   const client = crmClient(clientId);
-  if (!client || !Array.isArray(client.projectIds)) return [];
-  if (typeof wsProject !== "function") return [];
-  return client.projectIds
-    .map((id) => wsProject(id))
-    .filter(Boolean)
+  if (!client || typeof wsAllProjects !== "function") return [];
+  const legacy = new Set(Array.isArray(client.projectIds) ? client.projectIds : []);
+  return wsAllProjects()
+    .filter((project) => project.clientId
+      ? project.clientId === client.id
+      : legacy.has(project.id))
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
@@ -286,42 +274,17 @@ function crmFreeProjects() {
   crmAllClients().forEach((c) => {
     (Array.isArray(c.projectIds) ? c.projectIds : []).forEach((id) => taken.add(id));
   });
-  return wsProjects().filter((p) => !taken.has(p.id));
+  return wsProjects().filter((p) => !p.clientId && !taken.has(p.id));
 }
 
 
-/* ------------------------------------------------------------------ jobs
- *
- * Chapter XXI: "Zlecenie może mieć: klienta, nazwę, opis, status, termin, wartość,
- * projekt, notatki." All eight are here; the quote (chapter XXII) is session 24.
- *
- * **The client and the project are stored on the job**, which is the opposite direction
- * from client → project, and for a reason that is not symmetry: a *project* document is
- * contract — it is pushed to Firestore, pulled by the phone and rendered on /p/<token> —
- * so a `jobId` on it would be half a link in the half that travels. A *job* is local, like
- * a client, so a link kept on it travels nowhere and cannot mislead anything. Keeping both
- * ends of chapter XXIV's path (KLIENT → ZLECENIE → PROJEKT) on the local rows is what lets
- * the whole chain survive a delete and come back on an undo.
- *
- * Money: `valueMinor` is what was **agreed** with the client — chapter XXI's "wartość" —
- * and it is the one figure on this page that is typed rather than derived. It is not the
- * project's cost and must never be confused with it: wsProjectCosts() answers what the
- * work has actually run to so far, the two are different numbers on purpose, and the page
- * shows them side by side. The currency is stamped once, from the visitor's own choice at
- * the moment the value is first typed, and never re-stamped: re-labelling 4 000 zł as
- * 4 000 € is a conversion at a rate, and chapter VI forbids those.
- */
+/* ------------------------------------------------------------------ project fields */
 
-/** Is this one of chapter XXI's four statuses? An unknown one is never stored. */
-const crmIsStatus = (v) => JOB_STATUS.indexOf(String(v)) !== -1;
+/** Is this one of chapter XXI's four project statuses? */
+const crmIsStatus = (v) => PROJECT_STATUS.indexOf(String(v)) !== -1;
+const crmProjectColor = (v) => PROJECT_COLORS.indexOf(String(v)) !== -1 ? String(v) : "";
 
-/**
- * One of the five calendar tokens, or "" — an unknown or absent colour is "no colour".
- * Matches the style of neighbouring clamps: empty string means no calendar accent.
- */
-const crmJobColor = (v) => (JOB_COLORS.indexOf(String(v === undefined || v === null ? "" : v)) !== -1 ? String(v) : "");
-
-/** Chapter XXI's date: a calendar day, as "YYYY-MM-DD", or "" for a job with no deadline.
+/** Chapter XXI's date: a calendar day, as "YYYY-MM-DD", or "" for no deadline.
  *
  * Not millis, unlike every timestamp in the store. A deadline is a day in the visitor's
  * own calendar — "the 14th" — and an instant would move to the 13th or the 15th for a
@@ -373,236 +336,25 @@ function crmMinor(v) {
 const crmCurrency = () => (typeof wsCurrency === "function" ? wsCurrency()
   : (typeof lmCurrency === "function" ? lmCurrency() : "PLN"));
 
-/** Every job that still exists, newest change first. */
-function crmAllJobs() {
-  return crmAlive(crmLoad().jobs).sort((a, b) => b.updatedAt - a.updatedAt);
-}
-
-/** The jobs still being worked on — chapter XXI's "nowe" and "w toku". */
-const crmOpenJobs = () => crmAllJobs().filter((j) => JOB_OPEN_STATUS.indexOf(j.status) !== -1);
-
-/** The other two statuses: finished and cancelled. Folded away on the page, never lost. */
-const crmClosedJobs = () => crmAllJobs().filter((j) => JOB_OPEN_STATUS.indexOf(j.status) === -1);
-
-/** One job by id, whatever its status. Null when it never existed or was deleted. */
-const crmJob = (id) => crmAllJobs().find((j) => j.id === id) || null;
-
-/**
- * Add a job. Only the name is required, for the reason only a client's name is: chapter
- * XXI's other fields are things a tradesman fills in when they know them, and a job with
- * a name is already the row they wanted.
- *
- * @param {{name:string, clientId?:string, projectId?:string, status?:string,
- *          description?:string, dueDate?:string, valueMajor?:string|number,
- *          note?:string, color?:string}} fields
- * @returns {object|null} the stored job, or null when there is no name
- */
-function crmAddJob(fields) {
-  const f = fields || {};
-  const name = crmText(f.name, CRM_MAX_NAME);
-  if (!name) return null;
-  const data = crmLoad();
-  const now = Date.now();
-  const value = crmMinor(f.valueMajor);
-  const job = {
-    id: crmId(),
-    name,
-    // A client or a project that is not there is dropped rather than stored: a link to a
-    // row nobody can open is worse than no link, because the page would draw it.
-    clientId: crmClientId(f.clientId),
-    projectId: crmProjectId(f.projectId),
-    status: crmIsStatus(f.status) ? String(f.status) : JOB_DEFAULT_STATUS,
-    description: crmText(f.description, CRM_MAX_NOTE),
-    note: crmText(f.note, CRM_MAX_NOTE),
-    // Calendar event colour (session of 2026-09-10). Safe to store on the synced document:
-    // deployed Firestore rules validate a job with validJob(), which asserts the fields
-    // it knows and has no hasOnly() clause, so an extra key is accepted. Android's
-    // roomFromDoc()-style readers ignore unknown keys, so the phone's copy is unharmed.
-    color: crmJobColor(f.color),
-    dueDate: crmDay(f.dueDate),
-    valueMinor: value,
-    currencyCode: value === null ? "" : crmCurrency(),
-    createdAt: now,
-    updatedAt: now,
-    deletedAt: null,
-    schemaVersion: CRM_SCHEMA,
-  };
-  data.jobs.push(job);
-  if (!crmSave(data)) return null;
-  // Chapter XXIV's path is one chain: a job that arrives with both a client and a project
-  // files that project under that client too, so the client's own page tells the same
-  // story as the job's. crmLinkProject() is the one write that knows a project has one
-  // client, so it is the one that does it.
-  if (job.clientId && job.projectId) crmLinkProject(job.clientId, job.projectId);
-  return crmJob(job.id);
-}
-
-/** An existing client's id, or "" — never a dangling one. */
-function crmClientId(id) {
-  const v = String(id || "");
-  return v && crmClient(v) ? v : "";
-}
-
 /** An existing project's id, or "". The workspace is the authority on what exists. */
 function crmProjectId(id) {
-  const v = String(id || "");
-  if (!v || typeof wsProject !== "function") return "";
-  return wsProject(v) ? v : "";
+  const value = String(id || "");
+  return value && typeof wsProject === "function" && wsProject(value) ? value : "";
 }
 
-/**
- * Correct a job in place. Anything not passed keeps its current value.
- *
- * `valueMajor` is the typed amount: "" clears it (and the currency with it), a number
- * stamps the visitor's currency the first time and keeps the stamped one afterwards.
- */
-function crmUpdateJob(id, fields) {
-  const f = fields || {};
-  const data = crmLoad();
-  const job = data.jobs.find((j) => j.id === id && !j.deletedAt);
-  if (!job) return null;
-  if (f.name !== undefined) {
-    const name = crmText(f.name, CRM_MAX_NAME);
-    if (!name) return null;
-    job.name = name;
-  }
-  if (f.description !== undefined) job.description = crmText(f.description, CRM_MAX_NOTE);
-  if (f.note !== undefined) job.note = crmText(f.note, CRM_MAX_NOTE);
-  if (f.color !== undefined) job.color = crmJobColor(f.color);
-  if (f.dueDate !== undefined) job.dueDate = crmDay(f.dueDate);
-  if (f.status !== undefined && crmIsStatus(f.status)) job.status = String(f.status);
-  if (f.valueMajor !== undefined) {
-    const value = crmMinor(f.valueMajor);
-    job.valueMinor = value;
-    // An amount that already exists keeps the currency it was agreed in; a new one takes
-    // the visitor's. Clearing the amount clears the currency, so the next one is stamped
-    // fresh rather than inheriting a code from a figure nobody remembers.
-    if (value === null) job.currencyCode = "";
-    else if (!job.currencyCode) job.currencyCode = crmCurrency();
-  }
-  if (f.clientId !== undefined) job.clientId = crmClientId(f.clientId);
-  if (f.projectId !== undefined) job.projectId = crmProjectId(f.projectId);
-  job.updatedAt = Date.now();
-  if (!crmSave(data)) return null;
-  if (job.clientId && job.projectId) crmLinkProject(job.clientId, job.projectId);
-  return crmJob(id);
-}
+/** Every project, split by chapter XXI's status vocabulary. */
+const crmOpenProjects = () => (typeof wsAllProjects === "function" ? wsAllProjects() : [])
+  .filter((project) => PROJECT_OPEN_STATUS.indexOf(project.status) !== -1);
+const crmClosedProjects = () => (typeof wsAllProjects === "function" ? wsAllProjects() : [])
+  .filter((project) => PROJECT_OPEN_STATUS.indexOf(project.status) === -1);
 
-/** Move a job to one of chapter XXI's four statuses. An unknown one changes nothing. */
-function crmSetJobStatus(id, status) {
-  return crmIsStatus(status) ? crmUpdateJob(id, { status: status }) : null;
-}
-
-/**
- * Tombstone a job.
- *
- * Neither the client nor the project is touched: both exist without it — the project is
- * the visitor's own work and syncs to the phone, the client is a person who is still a
- * client. The links stay on the tombstone, which is what lets the undo put the job back
- * with its client and its project still attached.
- *
- * @returns {{id:string, at:number}|null} hand it to crmRestoreJob()
- */
-function crmDeleteJob(id) {
-  const data = crmLoad();
-  const job = data.jobs.find((j) => j.id === id && !j.deletedAt);
-  if (!job) return null;
-  const now = Date.now();
-  job.deletedAt = now;
-  job.updatedAt = now;
-  if (!crmSave(data)) return null;
-  return { id: id, at: now };
-}
-
-/** Undo one delete — the same tombstone-clearing as crmRestoreClient(). */
-function crmRestoreJob(token) {
-  const id = typeof token === "string" ? token : (token && token.id);
-  if (!id) return null;
-  const data = crmLoad();
-  const job = data.jobs.find((j) => j.id === id);
-  if (!job || !job.deletedAt) return null;
-  job.deletedAt = null;
-  job.updatedAt = Date.now();
-  if (!crmSave(data)) return null;
-  return crmJob(id);
-}
-
-/** The jobs of one client, newest change first. Chapter XX: "Klient może posiadać … zlecenia". */
-const crmClientJobs = (clientId) =>
-  crmAllJobs().filter((j) => j.clientId && j.clientId === String(clientId || ""));
-
-/** The job a project is being done under, or null. One project has at most one job. */
-function crmJobOfProject(projectId) {
-  const pid = String(projectId || "");
-  if (!pid) return null;
-  return crmAllJobs().find((j) => j.projectId === pid) || null;
-}
-
-/** The projects no job has taken yet — what a job's project picker offers. */
-function crmFreeJobProjects(exceptJobId) {
-  if (typeof wsProjects !== "function") return [];
-  const taken = {};
-  crmAllJobs().forEach((j) => {
-    if (j.projectId && j.id !== exceptJobId) taken[j.projectId] = true;
-  });
-  return wsProjects().filter((p) => !taken[p.id]);
-}
-
-/**
- * What one job comes to: what was agreed, and what the work has cost so far.
- *
- * Two different numbers, and the reason they are both here is that they answer two
- * different questions — "what did I quote" and "what has it run to". Neither is derived
- * from the other and neither is stored twice: the agreed value is the job's own field, the
- * cost is wsProjectCosts() over the one project the job carries, which is the function
- * that already knows a calculation and the material it produced are the same money.
- *
- * `mixed` is chapter VI's rule as everywhere else: the agreed value and the costs may be
- * in different currencies, they are never converted, and the page is told rather than
- * handed a difference that means nothing.
- */
-function crmJobCosts(jobId) {
-  const job = crmJob(jobId);
-  const empty = {
-    value: null, currencyCode: crmCurrency(), cost: 0, costCurrencyCode: crmCurrency(),
-    costByCurrency: [], hasProject: false, mixed: false, left: null,
-  };
-  if (!job) return empty;
-  const costs = job.projectId && typeof wsProjectCosts === "function"
-    ? wsProjectCosts(job.projectId) : null;
-  // `cost` is null when the project mixes currencies: wsProjectCosts() has no single total
-  // for it, and neither has this. `costByCurrency` is what the page prints in that case.
-  const cost = costs ? costs.total : 0;
-  const costCode = costs ? costs.currencyCode : crmCurrency();
-  const valueCode = job.currencyCode || crmCurrency();
-  // A difference between two amounts in different currencies is not a number, so it is
-  // not computed — the page says the currencies differ instead. A cost that is null is
-  // not comparable either: there is nothing to subtract from what was agreed.
-  const comparable = job.valueMinor !== null && cost > 0 && valueCode === costCode;
-  return {
-    value: job.valueMinor,
-    currencyCode: valueCode,
-    cost: cost,
-    costCurrencyCode: costCode,
-    costByCurrency: costs ? costs.byCurrency : [],
-    hasProject: Boolean(job.projectId && costs),
-    mixed: Boolean((costs && costs.mixed)
-      || (job.valueMinor !== null && cost > 0 && valueCode !== costCode)),
-    left: comparable ? job.valueMinor - cost : null,
-  };
-}
-
-/**
- * What a client's jobs are worth, by status — the count of each of chapter XXI's four.
- * Money is deliberately not summed here: two jobs agreed in two currencies do not add up,
- * and a client's money already has one answer (crmClientCosts()).
- */
-function crmClientJobCounts(clientId) {
+/** What a client's projects are worth, by status. */
+function crmClientProjectCounts(clientId) {
   const out = { total: 0 };
-  JOB_STATUS.forEach((s) => { out[s] = 0; });
-  crmClientJobs(clientId).forEach((j) => {
+  PROJECT_STATUS.forEach((s) => { out[s] = 0; });
+  crmClientProjects(clientId).forEach((project) => {
     out.total++;
-    if (Object.prototype.hasOwnProperty.call(out, j.status)) out[j.status]++;
+    if (Object.prototype.hasOwnProperty.call(out, project.status)) out[project.status]++;
   });
   return out;
 }
@@ -672,15 +424,14 @@ function crmClientLastAt(clientId) {
  *
  * Copying the project's money onto the quote would give the same amount two homes and let
  * them disagree the moment a material was re-priced — the argument that already keeps a
- * job's cost out of the job (crmJobCosts()) and a unit price out of a shopping item
+ * derived project cost out of the stored project fields and a unit price out of a shopping item
  * (wsUnitPriceMinor()). It also means a quote answers "what is this worth *now*", which is
  * what a tradesman opens it to see.
  *
  * **The one link the quote stores is `projectId`.** The materials are the project's, so
- * without it there is nothing to price; the job and the client are *already* reachable
- * from the project — crmJobOfProject() and crmClientOfProject() — so storing them again
- * would be two more links free to disagree with the first. crmQuoteChain() walks it, and
- * that walk is chapter XXIV's path read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT.
+ * without it there is nothing to price; the client is already reachable from the project
+ * through crmClientOfProject(), so storing it again would be another link free to disagree.
+ * crmQuoteChain() walks chapter XXIV's path backwards: WYCENA → PROJEKT → KLIENT.
  *
  * A quote with no project is allowed and is not a mistake: it is a price for work with no
  * material behind it, and it comes to the labour plus the margin. The page says so rather
@@ -747,12 +498,12 @@ function crmQuotes() {
 const crmQuote = (id) => crmQuotes().find((q) => q.id === id) || null;
 
 /** The quotes priced from one project, newest change first. A project may have several —
- *  two prices for one job is a variant, not a contradiction, and nothing here forbids it. */
+ *  two prices for one project is a variant, not a contradiction, and nothing here forbids it. */
 const crmProjectQuotes = (projectId) =>
   crmQuotes().filter((q) => q.projectId && q.projectId === String(projectId || ""));
 
 /**
- * Add a quote. Only the name is required, for the reason only a client's or a job's name
+ * Add a quote. Only the name is required, for the reason only a client's or project's name
  * is: everything else is filled in as it becomes known, and a named quote is already the
  * row the visitor wanted.
  *
@@ -770,7 +521,7 @@ function crmAddQuote(fields) {
   const quote = {
     id: crmId(),
     name,
-    // A project that is not there is dropped rather than stored — the same rule a job's
+    // A project that is not there is dropped rather than stored — the same rule a project's
     // links follow: a link to a row nobody can open is worse than no link.
     projectId: crmProjectId(f.projectId),
     labour: [],
@@ -830,7 +581,7 @@ function crmDeleteQuote(id) {
   return { id: id, at: now };
 }
 
-/** Undo one delete — the same tombstone-clearing as crmRestoreJob(). */
+/** Undo one delete — the same tombstone-clearing as crmRestoreClient(). */
 function crmRestoreQuote(token) {
   // The plan on the account, asked in the store as well as at the call site.
   if (!crmCanQuote()) return null;
@@ -1053,43 +804,43 @@ function crmQuoteTotals(quoteId) {
  * Master plan, session 26 (CRM), chapter XXIV:
  *
  *     CRM LiczMat Pro ma być lekki. Główna relacja:
- *     KLIENT → ZLECENIE → PROJEKT → WYCENA → HISTORIA
+ *     KLIENT → PROJEKT → WYCENA → HISTORIA
  *     Celem jest szybkie zarządzanie pracą fachowca. Nie tworzymy ogromnego systemu ERP.
  *
  * **Session 26 adds no collection and no page.** Every link the chapter names was stored
- * by the four sessions before it — the client keeps `projectIds`, the job keeps `clientId`
- * and `projectId`, the quote keeps `projectId` — and each of the four screens already
+ * by the sessions before it — the project keeps `clientId`, the legacy client keeps
+ * `projectIds`, and the quote keeps `projectId` — and each screen already
  * walked its own step. What was missing is the path itself: from a quote there was no way
  * back to the client without opening two pages, and from a client no way at all to the
  * quotes their work was priced in. So this section is one walker and one reading, both
  * derived, and `crm` is the one feature in LM_FEATURES with `route: null` for exactly that
  * reason.
  *
- * Nothing below writes. A chain that was stored would be a fifth copy of four links, free
+ * Nothing below writes. A chain that was stored would be another copy of three links, free
  * to disagree with all of them the first time a project changed hands — the argument that
- * already keeps a cost off a job, a unit price off a shopping item and a date out of the
+ * already keeps a cost off a project row, a unit price off a shopping item and a date out of the
  * terminarz.
  */
 
 /** The nodes of chapter XXIV's path, in the chapter's own order. */
-const CRM_CHAIN = ["client", "job", "project", "quote"];
+const CRM_CHAIN = ["client", "project", "quote"];
 
 /**
  * Chapter XXIV's path through one node, walked in both directions.
  *
- * Upwards it is exact: a quote is priced from one project, a project is done under at most
- * one job, a job is filed with at most one client. Downwards it is not — a client has many
- * jobs and a project may carry several quotes — so the walker fills in what it can prove
+ * Upwards it is exact: a quote is priced from one project and a project is filed under at
+ * most one client. Downwards a client has many projects and a project may carry several
+ * quotes, so the walker fills in what it can prove
  * and hands back the rest as a list rather than guessing. `quote` is therefore null for
  * everything except a walk that *started* at a quote; `quotes` is what the page lists.
  *
- * @param {"client"|"job"|"project"|"quote"} kind which node `id` names
+ * @param {"client"|"project"|"quote"} kind which node `id` names
  * @param {string} id
- * @returns {{from:string, client:object|null, job:object|null, project:object|null,
+ * @returns {{from:string, client:object|null, project:object|null,
  *            quote:object|null, quotes:object[]}}
  */
 function crmChain(kind, id) {
-  const out = { from: String(kind || ""), client: null, job: null, project: null, quote: null, quotes: [] };
+  const out = { from: String(kind || ""), client: null, project: null, quote: null, quotes: [] };
   const key = String(id || "");
   if (!key || CRM_CHAIN.indexOf(out.from) === -1) return out;
 
@@ -1103,11 +854,7 @@ function crmChain(kind, id) {
   let pid = "";
   if (out.from === "project") pid = key;
   else if (out.from === "quote") pid = out.quote.projectId || "";
-  else if (out.from === "job") {
-    out.job = crmJob(key);
-    if (!out.job) return out;
-    pid = out.job.projectId || "";
-  } else {
+  else {
     out.client = crmClient(key);
     if (!out.client) return out;
     out.quotes = crmClientQuotes(key);
@@ -1115,22 +862,13 @@ function crmChain(kind, id) {
   }
 
   if (pid && typeof wsProject === "function") out.project = wsProject(pid);
-  if (pid && !out.job) out.job = crmJobOfProject(pid);
-  // The client is the project's own, and the job's when the project has been filed under
-  // nobody directly: crmAddJob()/crmLinkProject() file it for them, so the two agree, and
-  // the fallback only matters for a link made before that write existed. A walk that
-  // started at a job trusts the job's own field first — the job is where it was typed.
-  if (out.from === "job" && out.job.clientId) out.client = crmClient(out.job.clientId);
-  if (!out.client && pid) {
-    out.client = crmClientOfProject(pid)
-      || (out.job && out.job.clientId ? crmClient(out.job.clientId) : null);
-  }
+  if (!out.client && pid) out.client = crmClientOfProject(pid);
   if (pid && out.from !== "quote") out.quotes = crmProjectQuotes(pid);
   return out;
 }
 
 /**
- * Chapter XXIV read backwards from a quote: WYCENA → PROJEKT → ZLECENIE → KLIENT.
+ * Chapter XXIV read backwards from a quote: WYCENA → PROJEKT → KLIENT.
  *
  * Kept as its own name because that is what /wyceny/ asks for and what session 24's test
  * checks; it is crmChain() underneath, so there is one walker rather than two that can
@@ -1138,13 +876,7 @@ function crmChain(kind, id) {
  */
 function crmQuoteChain(quoteId) {
   const chain = crmChain("quote", quoteId);
-  return { project: chain.project, job: chain.job, client: chain.client };
-}
-
-/** The quotes priced from one job's project. A job with no project has none. */
-function crmJobQuotes(jobId) {
-  const job = crmJob(jobId);
-  return job && job.projectId ? crmProjectQuotes(job.projectId) : [];
+  return { project: chain.project, client: chain.client };
 }
 
 /**
@@ -1165,7 +897,7 @@ function crmClientQuotes(clientId) {
  * Chapter XXIV's last step, and chapter XX's "historia".
  *
  * **It is derived and nothing logs it.** Every row below is a document that already exists
- * with the date it was written on: a client, a job, a quote, a calculation saved into a
+ * with the date it was written on: a client, a project, a quote, a calculation saved into a
  * project, a cost typed onto one. A log beside them would be a second copy of the same
  * facts, and it would start lying the first time a row was corrected or deleted — the row
  * would be gone and its entry would remain.
@@ -1178,16 +910,16 @@ function crmClientQuotes(clientId) {
  */
 
 /** The kinds of row a history can carry, newest-first when they share a millisecond. */
-const CRM_HISTORY_KINDS = ["client", "job", "quote", "calc", "cost"];
+const CRM_HISTORY_KINDS = ["client", "project", "quote", "calc", "cost"];
 
 /**
- * What has happened, for a client, a job or a project.
+ * What has happened, for a client or a project.
  *
- * @param {{clientId?:string, jobId?:string, projectId?:string}} scope exactly one of the
- *   three. An empty or unknown scope answers [].
+ * @param {{clientId?:string, projectId?:string}} scope exactly one of the two.
+ *   An empty or unknown scope answers [].
  * @param {number} [limit] how many rows to hand back, newest first
  * @returns {{at:number, kind:string, id:string, name:string, project:object|null,
- *            line:object|null, job:object|null, quote:object|null}[]}
+ *            line:object|null, quote:object|null}[]}
  */
 function crmHistory(scope, limit) {
   const s = scope || {};
@@ -1197,37 +929,26 @@ function crmHistory(scope, limit) {
     if (!isFinite(when) || when <= 0) return;
     rows.push(Object.assign({
       at: when, kind: kind, id: String(id || ""), name: String(name || ""),
-      project: null, line: null, job: null, quote: null,
+      project: null, line: null, quote: null,
     }, extra || {}));
   };
 
   let projects = [];
-  let jobs = [];
   if (s.clientId) {
     const client = crmClient(s.clientId);
     if (!client) return [];
     add(client.createdAt, "client", client.id, client.name);
     projects = crmClientProjects(s.clientId);
-    jobs = crmClientJobs(s.clientId);
-  } else if (s.jobId) {
-    const job = crmJob(s.jobId);
-    if (!job) return [];
-    jobs = [job];
-    const project = job.projectId && typeof wsProject === "function" ? wsProject(job.projectId) : null;
-    projects = project ? [project] : [];
   } else if (s.projectId) {
     const project = typeof wsProject === "function" ? wsProject(s.projectId) : null;
     if (!project) return [];
     projects = [project];
-    const job = crmJobOfProject(s.projectId);
-    if (job) jobs = [job];
   } else {
     return [];
   }
 
-  jobs.forEach((j) => add(j.createdAt, "job", j.id, j.name, { job: j }));
-
   projects.forEach((project) => {
+    add(project.createdAt, "project", project.id, project.name, { project: project });
     crmProjectQuotes(project.id).forEach((q) =>
       add(q.createdAt, "quote", q.id, q.name, { quote: q, project: project }));
     if (typeof wsEstimations !== "function") return;
@@ -1240,8 +961,8 @@ function crmHistory(scope, limit) {
     });
   });
 
-  // Newest first. Rows written in the same millisecond — a job and the project it was
-  // created with — are ordered by how far along the chain they are, latest step first, so
+  // Newest first. Rows written in the same millisecond are ordered by how far along the
+  // chain they are, latest step first, so
   // a tie reads the same way the list does rather than in whatever order the store held.
   rows.sort((a, b) => (b.at - a.at)
     || (CRM_HISTORY_KINDS.indexOf(b.kind) - CRM_HISTORY_KINDS.indexOf(a.kind)));
@@ -1254,13 +975,12 @@ function crmHistory(scope, limit) {
  * pozwolić zobaczyć: terminy, zlecenia, podstawowe informacje. Nie buduj pełnego
  * odpowiednika Google Calendar."
  *
- * **Nothing below stores anything.** A deadline is already a field of a job — chapter
- * XXI's `termin`, written by crmUpdateJob() and validated by crmDay() — so the terminarz
- * is a *reading* of the jobs, not a collection beside them. An `events` array of its own
+ * **Nothing below stores anything.** A deadline is already a field of a project — chapter
+ * XXI's `termin`, written by wsUpdateProject() — so the terminarz is a *reading* of the
+ * projects, not a collection beside them. An `events` array of its own
  * would give one date two homes and let them disagree the first time somebody changed a
- * deadline on the job's own page, which is the argument that already keeps a cost off a
- * job and a unit price off a shopping item. It is also why the module has no `?id=` view:
- * a row here opens the job it belongs to, on /zlecenia/.
+ * deadline on the project's own page, which is the argument that already keeps a unit
+ * price off a shopping item. A row here opens the project it belongs to.
  *
  * The comparisons are all between calendar days, never between instants. That is what
  * crmDay() is for, and it is why a deadline was stored as "YYYY-MM-DD" in session 23:
@@ -1271,7 +991,7 @@ function crmHistory(scope, limit) {
  * Today, in the visitor's own timezone, as "YYYY-MM-DD".
  *
  * Deliberately not `new Date().toISOString().slice(0, 10)`, which is today in UTC: at
- * 23:30 in Warsaw that string already says tomorrow, so a job due today would be filed
+ * 23:30 in Warsaw that string already says tomorrow, so a project due today would be filed
  * under "late" — the terminarz would be wrong every evening. The parts come from the
  * local getters instead, which is the same reckoning the visitor's own calendar uses.
  */
@@ -1297,15 +1017,15 @@ function crmDaysUntil(day, from) {
 }
 
 /**
- * Which of the terminarz's buckets a job belongs in, measured against `today`.
+ * Which of the terminarz's buckets a project belongs in, measured against `today`.
  *
- * A closed job — chapter XXI's "zakończone" and "anulowane" — is never in one: it is done
- * with, and a finished job whose date has passed is not late. crmSchedule() folds those
+ * A closed project — chapter XXI's "zakończone" and "anulowane" — is never in one: it is
+ * done with, and a finished project whose date has passed is not late. crmSchedule() folds those
  * away separately rather than dropping them, so nothing disappears from the page.
  */
-function crmJobBucket(job, today) {
-  if (!job || JOB_OPEN_STATUS.indexOf(job.status) === -1) return "";
-  const days = crmDaysUntil(job.dueDate, today);
+function crmProjectBucket(project, today) {
+  if (!project || PROJECT_OPEN_STATUS.indexOf(project.status) === -1) return "";
+  const days = crmDaysUntil(project.dueDate, today);
   if (days === null) return "none";
   if (days < 0) return "late";
   if (days === 0) return "today";
@@ -1313,12 +1033,12 @@ function crmJobBucket(job, today) {
 }
 
 /**
- * The whole terminarz: every job this browser holds, in the bucket its deadline puts it.
+ * The whole terminarz: every project this browser holds, in the bucket its deadline puts it.
  *
  * Within a bucket the nearest deadline comes first, because that is the order the work
  * has to be done in; the undated bucket keeps the store's own order (newest change
  * first), because there is nothing else to sort it by. The closed half carries only the
- * jobs that *had* a date — a finished job nobody ever dated has no place on a page about
+ * projects that *had* a date — a finished project nobody ever dated has no place on a page about
  * dates, and it is still one click away on /zlecenia/.
  *
  * @param {string} [today] the day to measure against. Passed in by the tests; the page
@@ -1331,10 +1051,11 @@ function crmSchedule(today) {
   CAL_BUCKETS.forEach((b) => { buckets[b] = []; });
   const closed = [];
 
-  crmAllJobs().forEach((job) => {
-    const bucket = crmJobBucket(job, day);
-    if (bucket) buckets[bucket].push(job);
-    else if (job.dueDate) closed.push(job);
+  const projects = typeof wsAllProjects === "function" ? wsAllProjects() : [];
+  projects.forEach((project) => {
+    const bucket = crmProjectBucket(project, day);
+    if (bucket) buckets[bucket].push(project);
+    else if (project.dueDate) closed.push(project);
   });
 
   const byDue = (a, b) => (a.dueDate < b.dueDate ? -1 : a.dueDate > b.dueDate ? 1
@@ -1357,24 +1078,25 @@ function crmSchedule(today) {
 }
 
 /**
- * Every job that carries a deadline, grouped under it — "YYYY-MM-DD" -> [job, ...].
+ * Every project that carries a deadline, grouped under it — "YYYY-MM-DD" -> [project, ...].
  *
  * 2026-09-03, owner's decision: /app/'s Terminarz tab gets a real month grid, reversing
  * chapter XXIII's "nie buduj odpowiednika Google Calendar" (see the note at the top of
  * assets/schedule-ui.js and docs/MASTER_PLAN.txt chapter XXIII for the original scope and
  * why it stood). crmSchedule() still answers "kiedy" in words (late/today/soon/later) and
  * stays exactly as it was; this is the second, day-indexed view the grid needs, built from
- * the same crmAllJobs() so the two can never disagree about what a job's deadline is.
+ * the same wsAllProjects() so the two can never disagree about a project's deadline.
  *
- * Open and closed jobs both appear — a finished job due last Tuesday still belongs on last
- * Tuesday's cell, dimmed by the caller, not erased from the month. A day with no jobs has
+ * Open and closed projects both appear — a finished project due last Tuesday still belongs
+ * on last Tuesday's cell, dimmed by the caller, not erased. A day with no projects has
  * no key here at all, so the caller's own lookup already tells it "empty" for free.
  */
-function crmJobsByDay() {
+function crmProjectsByDay() {
   const byDay = {};
-  crmAllJobs().forEach((job) => {
-    if (!job.dueDate) return;
-    (byDay[job.dueDate] || (byDay[job.dueDate] = [])).push(job);
+  const projects = typeof wsAllProjects === "function" ? wsAllProjects() : [];
+  projects.forEach((project) => {
+    if (!project.dueDate) return;
+    (byDay[project.dueDate] || (byDay[project.dueDate] = [])).push(project);
   });
   return byDay;
 }
@@ -1382,7 +1104,7 @@ function crmJobsByDay() {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     CRM_KEY, CRM_SCHEMA, CRM_MAX_NAME, CRM_MAX_NOTE,
-    JOB_STATUS, JOB_OPEN_STATUS, JOB_DEFAULT_STATUS, JOB_COLORS,
+    PROJECT_STATUS, PROJECT_OPEN_STATUS, PROJECT_DEFAULT_STATUS, PROJECT_COLORS,
     CAL_BUCKETS, CAL_SOON_DAYS,
     CRM_CHAIN, CRM_HISTORY_KINDS,
     QUO_MAX_LINES, QUO_MAX_MARGIN,

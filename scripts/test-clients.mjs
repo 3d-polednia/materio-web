@@ -337,7 +337,7 @@ head("2b. every write tells the page, so nothing is redrawn by guesswork");
 
 /* ================================================================== 3. the projects */
 
-head("3. a project belongs to one client, and the project itself is never touched");
+head("3. a project belongs to one client, and the project row is where that is written");
 {
   const crm = loadCrm();
   const jan = crm.crmAddClient({ name: "Jan Kowalski" });
@@ -348,9 +348,14 @@ head("3. a project belongs to one client, and the project itself is never touche
   crm.crmLinkProject(jan.id, bathroom.id);
   eq("the project is filed under the client", crm.crmClientProjects(jan.id)[0].id, bathroom.id);
   eq("and the client is found from the project", crm.crmClientOfProject(bathroom.id).id, jan.id);
-  eq("the project document is exactly as it was", JSON.stringify(crm.wsProject(bathroom.id)), before);
-  check("so no clientId was invented on it",
-    !Object.prototype.hasOwnProperty.call(crm.wsProject(bathroom.id), "clientId"));
+  // Until the merge of 2026-09-21 this asserted the opposite: the link lived only on the
+  // client, as `projectIds`, and the project document was byte-for-byte untouched. A project
+  // now carries its own `clientId`, and §1.2 of the design makes that side authoritative —
+  // the phone reads it first and falls back to `projectIds` only for rows written before the
+  // merge. Both ends are still maintained, so the old fallback keeps working.
+  eq("the link is written onto the project", crm.wsProject(bathroom.id).clientId, jan.id);
+  eq("and nothing else about the project moved",
+    JSON.stringify({ ...crm.wsProject(bathroom.id), clientId: "" }), before);
 
   // Two clients claiming the same job is a contradiction with no way to show it, so the
   // second link moves the project rather than copying it.

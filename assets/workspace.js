@@ -64,8 +64,9 @@ const WS_CALC_TYPE = {
 const wsEmpty = () => ({ projects: [], rooms: [], estimations: [], shoppingItems: [] });
 
 const WS_PROJECT_STATUS = ["new", "active", "done", "cancelled"];
+const WS_PROJECT_COLORS = ["lime", "blue", "amber", "red", "violet"];
 const wsProjectDefaults = () => ({
-  clientId: "", status: "new", dueDate: "", valueMinor: null, currencyCode: "", note: "",
+  clientId: "", status: "new", dueDate: "", valueMinor: null, currencyCode: "", note: "", color: "",
 });
 
 /** A project deadline is a calendar day, under the same rule as crmDay(). */
@@ -88,6 +89,7 @@ function wsProjectFields(fields) {
     valueMinor,
     currencyCode: valueMinor === null ? "" : String(f.currencyCode === undefined || f.currencyCode === null ? "" : f.currencyCode).trim(),
     note: String(f.note === undefined || f.note === null ? "" : f.note).trim().slice(0, 2000),
+    color: WS_PROJECT_COLORS.indexOf(String(f.color)) !== -1 ? String(f.color) : "",
   };
 }
 
@@ -98,7 +100,7 @@ function wsLoad() {
     if (!raw) return wsEmpty();
     const data = JSON.parse(raw);
     return {
-      // Older phones know none of the six fields. Defaults are supplied in memory so
+      // Older phones know none of the seven fields. Defaults are supplied in memory so
       // merely reading their document neither rejects it nor rewrites localStorage.
       projects: Array.isArray(data.projects)
         ? data.projects.map((p) => ({ ...wsProjectDefaults(), ...p })) : [],
@@ -248,8 +250,15 @@ function wsAddProject(name, fields) {
  * Correct a project in place. Anything not passed keeps its current value.
  *
  * Alongside `name` and `archived`, the contract as of this release carries `clientId`,
- * `status`, `dueDate`, `valueMinor`, `currencyCode` and `note`. Keeping validation here
- * means a browser row can be uploaded as-is without asking the sync layer to repair it.
+ * `status`, `dueDate`, `valueMinor`, `currencyCode` and `note` — the six a job used to hold.
+ * `color` is the odd one out: it is **not** in `validProject()` and not in the phone's
+ * `projectToDoc()`. It travels anyway, for the reason the shopping list's `note` travels —
+ * every write on both sides is a merge, the rules validate by shape with no `hasOnly()`, and
+ * the phone's readers ignore a key they do not know. It is the calendar's colour and nothing
+ * on the phone draws it.
+ *
+ * Keeping validation here means a browser row can be uploaded as-is without asking the sync
+ * layer to repair it.
  */
 function wsUpdateProject(id, fields) {
   const data = wsLoad();
@@ -269,6 +278,9 @@ function wsUpdateProject(id, fields) {
   if (fields.currencyCode !== undefined) project.currencyCode = String(fields.currencyCode == null ? "" : fields.currencyCode).trim();
   if (project.valueMinor === null) project.currencyCode = "";
   if (fields.note !== undefined) project.note = String(fields.note == null ? "" : fields.note).trim().slice(0, 2000);
+  if (fields.color !== undefined && (fields.color === "" || WS_PROJECT_COLORS.indexOf(String(fields.color)) !== -1)) {
+    project.color = String(fields.color);
+  }
   project.updatedAt = Date.now();
   if (!wsSave(data)) return null;
   // The active project is the one every new estimate line lands in, so it can never be

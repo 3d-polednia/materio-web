@@ -1,15 +1,14 @@
 /* LiczMat website — chapter XXIV's chain, drawn. Session 26 (CRM).
  *
- *     KLIENT → ZLECENIE → PROJEKT → WYCENA → HISTORIA
+ *     KLIENT → PROJEKT → WYCENA → HISTORIA
  *
- * The four Pro screens each own one end of that path: /klienci/ writes the client and the
- * project link, /zlecenia/ the job and its two links, /wyceny/ the quote, /terminarz/ the
- * deadline. What none of them owned is the path itself — so this file is loaded by all
- * four and draws the three things that are the same wherever they appear:
+ * The Pro screens each own one part of that path: /klienci/ writes the client link,
+ * /projekty/ owns the project, /wyceny/ the quote, and /terminarz/ reads the deadline.
+ * What none of them owned is the path itself, so this file draws the shared views:
  *
- *   the strip     the four nodes in the chapter's order, the resolved ones as links to the
+ *   the strip     the three nodes in the chapter's order, the resolved ones as links to the
  *                 page that owns them, the unfilled ones as the way to go and make one
- *   the quotes    the list a client and a job both need and neither wrote before
+ *   the quotes    the list a client and a project both need and neither wrote before
  *   the history   chapter XXIV's last step, derived by crmHistory() in assets/crm.js
  *
  * Three copies of this in three page scripts would drift on the first correction, which is
@@ -34,7 +33,7 @@ const chnLinks = () => (typeof window !== "undefined" && window.LM_LINKS) || {};
  * still link somewhere real, and Polish is DEFAULT_LANG.
  */
 const CHN_FALLBACK = {
-  clients: "/klienci/", jobs: "/zlecenia/", projects: "/projekty/",
+  clients: "/klienci/", projects: "/projekty/",
   quotes: "/wyceny/", calendar: "/terminarz/",
 };
 const chnUrl = (key) => chnLinks()[key] || CHN_FALLBACK[key] || "/";
@@ -59,7 +58,7 @@ const chnMoney = (minor, code) =>
 /* ------------------------------------------------------------------ the strip */
 
 /** Which section of the site owns each node of the chain. */
-const CHN_SECTION = { client: "clients", job: "jobs", project: "projects", quote: "quotes" };
+const CHN_SECTION = { client: "clients", project: "projects", quote: "quotes" };
 
 /**
  * Chapter XXIV's path, as one row of links.
@@ -69,19 +68,17 @@ const CHN_SECTION = { client: "clients", job: "jobs", project: "projects", quote
  * you are on is a dead click.
  *
  * A node the walk did **not** resolve is the section's own index instead of a name. Two
- * different things end up there and both are honest: a step nobody has filled in yet (a
- * project with no job), and a step that has more than one answer (a client's jobs, which
- * this browser will not guess between). Either way the way forward is the same page, so
- * the strip is a way to keep walking rather than a report.
+ * It means a step nobody has filled in yet. The way forward is the section's page, so the
+ * strip remains a way to keep walking rather than a report.
  *
  * @param {HTMLElement} el
  * @param {object} chain crmChain()
- * @param {string} [current] the node this page is showing: "client" | "job" | ...
+ * @param {string} [current] the node this page is showing: "client" | "project" | ...
  */
 function chnRenderStrip(el, chain, current) {
   if (!el) return;
   const at = String(current || (chain && chain.from) || "");
-  const nodes = (typeof CRM_CHAIN !== "undefined" ? CRM_CHAIN : ["client", "job", "project", "quote"]);
+  const nodes = (typeof CRM_CHAIN !== "undefined" ? CRM_CHAIN : ["client", "project", "quote"]);
   el.innerHTML = `<ol class="crm-chain-list">${nodes.map((node) => {
     const row = chain ? chain[node] : null;
     const label = `<span class="eyebrow muted">${chnEsc(chnT(`crm_node_${node}`))}</span>`;
@@ -100,10 +97,10 @@ function chnRenderStrip(el, chain, current) {
 /* ------------------------------------------------------------------ the quotes */
 
 /**
- * The quotes of a client or of a job — chapter XX's "wyceny", and the fourth step of the
+ * The quotes of a client or of a project — chapter XX's "wyceny", and the last step of the
  * path from either end.
  *
- * Read-only, for the reason a client's jobs are read-only on their page: a quote is
+ * Read-only: a quote is
  * written on /wyceny/, and one screen owning the writes is what keeps two rules for one
  * row from existing. The figure beside each name is crmQuoteTotals(), which reads the
  * project's money live — so a material re-priced this morning shows here without the
@@ -132,7 +129,7 @@ function chnRenderQuotes(el, quotes) {
 
 /** What a history row links to, by kind. A calculation and a cost open their project. */
 const CHN_HISTORY_SECTION = {
-  client: "clients", job: "jobs", quote: "quotes", calc: "projects", cost: "projects",
+  client: "clients", project: "projects", quote: "quotes", calc: "projects", cost: "projects",
 };
 
 /** The right-hand end of a row: what the thing that happened comes to, when it has a figure. */
@@ -145,9 +142,9 @@ function chnHistoryFigure(row) {
       ? `${chnEsc(chnMoney(line.totalCostMinor, line.currencyCode))}` : "";
     return [amount, money].filter(Boolean).join(" · ");
   }
-  if (row.kind === "job" && row.job && row.job.valueMinor !== null
-    && row.job.valueMinor !== undefined) {
-    return chnEsc(chnMoney(row.job.valueMinor, row.job.currencyCode));
+  if (row.kind === "project" && row.project && row.project.valueMinor !== null
+    && row.project.valueMinor !== undefined) {
+    return chnEsc(chnMoney(row.project.valueMinor, row.project.currencyCode));
   }
   if (row.kind === "quote" && typeof crmQuoteTotals === "function") {
     const totals = crmQuoteTotals(row.id);

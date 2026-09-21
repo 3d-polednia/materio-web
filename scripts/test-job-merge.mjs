@@ -57,6 +57,7 @@ const job = (over = {}) => ({
   id: "job-1", name: "Łazienka", projectId: "project-1", description: "Opis",
   note: "Notatka", clientId: "client-1", status: "active", dueDate: "2026-10-01",
   valueMinor: 12345, currencyCode: "PLN", createdAt: 10, updatedAt: 20, deletedAt: null,
+  color: "violet",
   ...over,
 });
 
@@ -78,6 +79,7 @@ head("merge rules");
   ws.wsMergeJobs(job());
   const row = ws.wsProject("project-1");
   eq("job fields merge", row.clientId, "client-1");
+  eq("job colour survives conversion", row.color, "violet");
   eq("notes fold", row.note, "Stara\n\nOpis\n\nNotatka");
   eq("updatedAt is max", row.updatedAt, 99);
 }

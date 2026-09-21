@@ -100,7 +100,6 @@ function loadCrm() {
     "wsAddEstimation", "wsAddManualEstimation", "wsEstimations", "wsProjectCosts",
     "wsExport", "wsItems", "wsUpdateItem",
     "crmAddClient", "crmClient", "crmLinkProject", "crmClientOfProject",
-    "crmAddJob", "crmJob", "crmJobOfProject",
     "crmQuotes", "crmQuote", "crmAddQuote", "crmUpdateQuote", "crmDeleteQuote",
     "crmRestoreQuote", "crmProjectQuotes", "crmQuoteTotals", "crmQuoteChain",
     "crmLabour", "crmAddLabour", "crmUpdateLabour", "crmDeleteLabour", "crmLabourRate",
@@ -612,20 +611,19 @@ head("6c. a quote on a project that is itself in two currencies has no figures e
 
 /* ================================================================== 7. the chain */
 
-head("7. chapter XXIV backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT, all derived");
+head("7. chapter XXIV backwards: WYCENA → PROJEKT → KLIENT, all derived");
 {
   const crm = loadCrm();
   const client = crm.crmAddClient({ name: "Jan Kowalski" });
-  const project = crm.wsAddProject("Remont łazienki");
-  const job = crm.crmAddJob({ name: "Łazienka na Pięknej", clientId: client.id, projectId: project.id });
+  const project = crm.wsAddProject("Łazienka na Pięknej", { clientId: client.id });
   const q = crm.crmAddQuote({ name: "Wycena", projectId: project.id });
 
   const chain = crm.crmQuoteChain(q.id);
   eq("the project is the quote's own link", chain.project.id, project.id);
-  eq("the job is found through the project", chain.job.id, job.id);
-  eq("and the client through the job's own link", chain.client.id, client.id);
+  eq("the project keeps the client link", crm.wsProject(project.id).clientId, client.id);
+  eq("and the client is found through that link", chain.client.id, client.id);
 
-  // Derived means derived: nothing about the job or the client is on the quote.
+  // Derived means derived: nothing about the client is copied onto the quote.
   const stored = crm.raw().quotes.find((x) => x.id === q.id);
   eq("no clientId is stored on the quote", stored.clientId, undefined);
   eq("and no jobId either", stored.jobId, undefined);
@@ -634,13 +632,13 @@ head("7. chapter XXIV backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT, all
   crm.crmAddClient({ name: "Ignore me" });
   eq("a quote with no project has no chain at all",
     JSON.stringify(crm.crmQuoteChain(crm.crmAddQuote({ name: "Luźna" }).id)),
-    JSON.stringify({ project: null, job: null, client: null }));
+    JSON.stringify({ project: null, client: null }));
 
-  const loose = crm.wsAddProject("Bez zlecenia");
+  const loose = crm.wsAddProject("Bez klienta");
   const q2 = crm.crmAddQuote({ name: "Wycena 2", projectId: loose.id });
   const chain2 = crm.crmQuoteChain(q2.id);
-  eq("a project under no job has a project and nothing else", chain2.project.id, loose.id);
-  eq("no job", chain2.job, null);
+  eq("an unfiled project still has the project", chain2.project.id, loose.id);
+  eq("its quote is found from the project", crm.crmProjectQuotes(loose.id)[0].id, q2.id);
   eq("no client", chain2.client, null);
 }
 

@@ -107,7 +107,10 @@ function loadWorkspace(seed, shared) {
     setTimeout: (fn) => timers.push(fn),
     crypto: { randomUUID: () => `id-${backing.size}-${Math.random().toString(36).slice(2, 10)}` },
     CustomEvent: class { constructor(type) { this.type = type; } },
-    Date: { now: () => clock.now },
+    Date: class extends Date {
+      constructor(...args) { super(...(args.length ? args : [clock.now])); }
+      static now() { return clock.now; }
+    },
     lmCurrency: () => "PLN",
     lmMoneyMinor: (minor, code) => `${(minor / 100).toFixed(2)} ${code}`,
     // What the paywall answers inside the store. `costs` and `quotes` became PRO on
@@ -273,7 +276,7 @@ head("3. create");
   // exactly these fields. A field invented here would be erased without a word.
   const fields = Object.keys(a).sort().join(",");
   eq("and nothing else — the document is the contract's",
-    fields, "archived,clientId,createdAt,currencyCode,deletedAt,dueDate,id,name,note,schemaVersion,status,updatedAt,valueMinor");
+    fields, "archived,clientId,color,createdAt,currencyCode,deletedAt,dueDate,id,name,note,schemaVersion,status,updatedAt,valueMinor");
 
   ws.tick();
   const b = ws.wsAddProject("Garaż");
@@ -779,6 +782,48 @@ head("13. two tabs of one browser on one project");
 
   f.storageEvent("materio-workspace-v1");
   eq("and the next write is not swallowed by the one before it", f.events.length, 2);
+}
+
+/* ------------------------------------------------------------------ merged job fields */
+
+head("9. a project is also the Pro work row");
+{
+  const ws = loadWorkspace();
+  const project = ws.wsAddProject("Remont łazienki", {
+    clientId: "client-7", status: "active", dueDate: "2026-09-30",
+    valueMinor: 1_250_000, currencyCode: "PLN", note: "Klucze u sąsiada",
+  });
+  eq("the client link is an id", project.clientId, "client-7");
+  eq("the colour defaults to none", project.color, "");
+  eq("status is stored on the project", project.status, "active");
+  eq("deadline is stored on the project", project.dueDate, "2026-09-30");
+  eq("agreed value uses integer minor units", project.valueMinor, 1_250_000);
+  eq("the value keeps its currency", project.currencyCode, "PLN");
+  eq("the work note is on the project", project.note, "Klucze u sąsiada");
+
+  ws.tick();
+  const changed = ws.wsUpdateProject(project.id, {
+    status: "done", dueDate: "2026-10-01", valueMinor: 1_300_000, note: "Gotowe",
+  });
+  eq("status updates in place", changed.status, "done");
+  eq("deadline updates in place", changed.dueDate, "2026-10-01");
+  eq("value updates in place", changed.valueMinor, 1_300_000);
+  eq("currency survives a value correction", changed.currencyCode, "PLN");
+  eq("note updates in place", changed.note, "Gotowe");
+  check("the update moves updatedAt", changed.updatedAt > project.updatedAt);
+
+  eq("an unknown status is refused", ws.wsUpdateProject(project.id, { status: "maybe" }).status, "done");
+  eq("an impossible date clears the deadline", ws.wsUpdateProject(project.id, { dueDate: "2026-02-31" }).dueDate, "");
+  eq("an ISO instant is not truncated", ws.wsUpdateProject(project.id, { dueDate: "2026-09-30T12:00:00Z" }).dueDate, "");
+  eq("a leap day is accepted", ws.wsUpdateProject(project.id, { dueDate: "2028-02-29" }).dueDate, "2028-02-29");
+  eq("clearing value stores null", ws.wsUpdateProject(project.id, { valueMinor: null }).valueMinor, null);
+  eq("clearing value also clears currency", ws.wsProject(project.id).currencyCode, "");
+  eq("a non-integer value is refused", ws.wsUpdateProject(project.id, { valueMinor: 12.5 }).valueMinor, null);
+  eq("a link is never a local index", ws.wsUpdateProject(project.id, { clientId: "client-document-id" }).clientId,
+    "client-document-id");
+  eq("a project accepts a calendar colour", ws.wsUpdateProject(project.id, { color: "amber" }).color, "amber");
+  eq("an unknown colour is refused", ws.wsUpdateProject(project.id, { color: "pink" }).color, "amber");
+  eq("the colour can be cleared", ws.wsUpdateProject(project.id, { color: "" }).color, "");
 }
 
 /* ------------------------------------------------------------------ report */
