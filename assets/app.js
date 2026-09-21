@@ -2206,9 +2206,17 @@ async function syncPushAll(uid, since) {
   for (const p of local.projects) {
     if (!pathId(p.id)) continue;
     if (skippable(p)) continue;
+    const value = p.valueMinor == null || !Number.isFinite(Number(p.valueMinor))
+      ? null : Math.round(Number(p.valueMinor));
     requireSyncUid(uid);
     await fb.setDoc(projectDoc(p.id, uid), {
       name: String(p.name).slice(0, 120),
+      clientId: String(p.clientId == null ? "" : p.clientId).slice(0, 64),
+      status: proStatus(p.status),
+      dueDate: proDay(p.dueDate),
+      valueMinor: value,
+      currencyCode: value == null ? "" : String(p.currencyCode == null ? "" : p.currencyCode).slice(0, 3),
+      note: String(p.note == null ? "" : p.note).slice(0, 2000),
       archived: !!p.archived,
       ...syncFields(p.createdAt, p.deletedAt),
     }, MERGE);
@@ -2304,9 +2312,29 @@ async function syncPullAll(uid) {
   // received (audit 2026-09-04, M3).
   requireSyncUid(uid);
   const landed = [wsImport(incoming)];
+  const liveJobs = (incoming.jobs || []).filter((job) => !job.deletedAt);
+  const jobsLanded = !liveJobs.length || (typeof wsMergeJobs === "function" && wsMergeJobs(liveJobs));
+  landed.push(jobsLanded);
+  if (jobsLanded) {
+    for (const job of liveJobs) {
+      const seg = pathId(job.id);
+      if (!seg) continue;
+      try {
+        requireSyncUid(uid);
+        const now = Date.now();
+        await fb.setDoc(proDoc("jobs", seg, uid), proJobDoc(job, now), { merge: true });
+      } catch (err) {
+        // Conversion has already landed locally. One refused burial must not discard the
+        // rest of the pull; the phone will bury this legacy document on its next pass.
+      }
+    }
+  }
   // The Pro store is its own key and its own merge; both are last-write-wins on
   // `updatedAt`, the same rule the phone uses.
   requireSyncUid(uid);
+  // Jobs have moved into the workspace above; importing them into the old store as well
+  // would recreate the legacy copy that this compatibility pull is meant to consume.
+  incoming.jobs = [];
   if (typeof crmImport === "function") landed.push(crmImport(incoming));
   // The visitor's own materials are a third store with a third key, merged by the same
   // rule. A material is replaced whole, its price history with it: merging two
@@ -2469,10 +2497,35 @@ function proDay(value) {
   return /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : "";
 }
 
+/** One of the four values accepted by validProject() and validJob(). */
+function proStatus(value) {
+  return ["new", "active", "done", "cancelled"].indexOf(value) >= 0 ? value : "new";
+}
+
+/** The complete legacy job shape: Firestore refuses a tombstone-only merge. */
+function proJobDoc(job, deletedAt) {
+  const text = (value, max) => String(value == null ? "" : value).slice(0, max);
+  const value = job.valueMinor == null || !Number.isFinite(Number(job.valueMinor))
+    ? null : Math.round(Number(job.valueMinor));
+  return {
+    name: text(job.name, 120),
+    clientId: text(job.clientId, 64),
+    projectId: text(job.projectId, 64),
+    status: proStatus(job.status),
+    description: text(job.description, 2000),
+    note: text(job.note, 2000),
+    color: text(job.color, 16),
+    dueDate: proDay(job.dueDate),
+    valueMinor: value,
+    currencyCode: value == null ? "" : text(job.currencyCode, 3),
+    ...syncFields(job.createdAt, deletedAt),
+  };
+}
+
 /**
- * Push LiczMat Pro's three collections (session 46).
+ * Push LiczMat Pro's surviving collections (session 46).
  *
- * They joined the sync contract on 2026-08-26 — `users/{uid}/clients`, `/jobs`, `/quotes`,
+ * They joined the sync contract on 2026-08-26 — `users/{uid}/clients` and `/quotes`,
  * flat collections beside `rooms`, with `validClient()` / `validJob()` / `validQuote()` in
  * the deployed rules. Every field is clamped here to exactly what those rules validate:
  * the rules are the last gate, and a document they refuse fails the whole pass.
@@ -2488,9 +2541,6 @@ async function pushProWorkspace(uid, since) {
   const MERGE = { merge: true };
   const pro = crmExport();
   const text = (value, max) => String(value == null ? "" : value).slice(0, max);
-  // The four statuses of chapter XXI are the whole set; an unknown word is refused rather
-  // than sent, because the rules would refuse it and take the whole pass down with it.
-  const jobStatus = (value) => (["new", "active", "done", "cancelled"].indexOf(value) >= 0 ? value : "new");
   const skippable = (row) => Number.isFinite(since) && Number.isFinite(row.updatedAt) && row.updatedAt <= since;
 
   for (const c of pro.clients || []) {
@@ -2508,27 +2558,6 @@ async function pushProWorkspace(uid, since) {
         .filter((id) => !!pathId(id)).slice(0, 200),
       archived: !!c.archived,
       ...syncFields(c.createdAt, c.deletedAt),
-    }, MERGE);
-  }
-
-  for (const j of pro.jobs || []) {
-    const seg = pathId(j.id);
-    if (!seg) continue;
-    if (skippable(j)) continue;
-    const value = j.valueMinor == null ? null : Math.round(j.valueMinor);
-    requireSyncUid(uid);
-    await fb.setDoc(proDoc("jobs", seg, uid), {
-      name: text(j.name, 120),
-      clientId: text(j.clientId, 64),
-      projectId: text(j.projectId, 64),
-      status: jobStatus(j.status),
-      description: text(j.description, 2000),
-      note: text(j.note, 2000),
-      color: text(j.color, 16),
-      dueDate: proDay(j.dueDate),
-      valueMinor: value,
-      currencyCode: value == null ? "" : text(j.currencyCode, 3),
-      ...syncFields(j.createdAt, j.deletedAt),
     }, MERGE);
   }
 
@@ -2638,7 +2667,7 @@ async function downloadAccount(uid = state.uid) {
   out.projects = rows(projSnap);
   requireSyncUid(uid);
   out.rooms = rows(await fb.getDocs(fb.collection(db, "users", uid, "rooms")));
-  // The three Pro collections (session 46). Flat, beside rooms, and downloaded even when
+  // The Pro collections (session 46). Flat, beside rooms, and downloaded even when
   // nothing on this page draws them: the export button hands back the whole account.
   //
   // Each one is read on its own and a refusal leaves it empty rather than taking the pull
@@ -2648,6 +2677,8 @@ async function downloadAccount(uid = state.uid) {
   // because a collection somebody may never have used is unreadable is the worse failure,
   // and it is the same argument the paywall follows when the plan cannot be read at all —
   // fail open, in the direction of the visitor's own data.
+  // Keep `jobs` for one release of tolerant reading. Remove it in the release after this
+  // one, together with the phone's database migration from schema 9 to 10.
   for (const name of ["clients", "jobs", "quotes", "materials"]) {
     try {
       requireSyncUid(uid);

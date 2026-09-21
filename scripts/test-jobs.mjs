@@ -440,8 +440,8 @@ head("4. chapter XXIV's path: KLIENT → ZLECENIE → PROJEKT");
   eq("the project document is exactly as it was", JSON.stringify(crm.wsProject(bathroom.id)), before);
   check("so no jobId was invented on it",
     !Object.prototype.hasOwnProperty.call(crm.wsProject(bathroom.id), "jobId"));
-  check("and no clientId either",
-    !Object.prototype.hasOwnProperty.call(crm.wsProject(bathroom.id), "clientId"));
+  eq("and its contract clientId starts unlinked",
+    crm.wsProject(bathroom.id).clientId, "");
 
   // The whole chain, in one write: a job that carries both ends files the project under
   // the client too, so the client's page tells the same story as the job's.

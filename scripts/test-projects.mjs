@@ -273,7 +273,7 @@ head("3. create");
   // exactly these fields. A field invented here would be erased without a word.
   const fields = Object.keys(a).sort().join(",");
   eq("and nothing else — the document is the contract's",
-    fields, "archived,createdAt,deletedAt,id,name,schemaVersion,updatedAt");
+    fields, "archived,clientId,createdAt,currencyCode,deletedAt,dueDate,id,name,note,schemaVersion,status,updatedAt,valueMinor");
 
   ws.tick();
   const b = ws.wsAddProject("Garaż");

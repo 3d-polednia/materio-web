@@ -1,6 +1,6 @@
 /* LiczMat website — where the Pro workspace lives, and the only file that writes it.
  *
- * Clients, jobs and quotes (master plan chapters XX–XXII) share one localStorage key,
+ * Clients and quotes (master plan chapters XX and XXII) share one localStorage key,
  * because they are one store: two files writing one key is one race away from a lost
  * write. What reads and interprets them is assets/crm.js; what *stores* them is here.
  *
@@ -37,21 +37,36 @@ const CRM_MAX_UNIT = 24;
 /* ------------------------------------------------------------------ storage */
 
 const crmEmpty = () => ({ clients: [], jobs: [], quotes: [] });
+let crmLegacyJobsChecked = false;
 
 /** Read the whole Pro workspace. A corrupt or absent store reads as an empty one. */
 function crmLoad() {
   try {
     const raw = localStorage.getItem(CRM_KEY);
-    if (!raw) return crmEmpty();
+    if (!raw) {
+      crmLegacyJobsChecked = true;
+      return crmEmpty();
+    }
     const data = JSON.parse(raw);
-    return {
+    const result = {
       clients: Array.isArray(data.clients) ? data.clients : [],
-      // A store written before session 23 has no jobs array. Reading it as empty is the
-      // whole migration: nothing is rewritten until the visitor adds their first job.
       jobs: Array.isArray(data.jobs) ? data.jobs : [],
       // The same for the quotes of session 24.
       quotes: Array.isArray(data.quotes) ? data.quotes : [],
     };
+    const migrateJobs = !crmLegacyJobsChecked;
+    if (migrateJobs && result.jobs.length && typeof wsMergeJobs === "function") {
+      // wsMergeJobs() saves and dispatches workspacechange. Its listener may read this store
+      // again before the first call returns, so claim the one-shot before making that write.
+      crmLegacyJobsChecked = true;
+      // The legacy rows are cleared only after the workspace accepted the whole batch.
+      // Otherwise private mode or a full quota would turn migration into data loss.
+      if (wsMergeJobs(result.jobs)) {
+        result.jobs = [];
+        try { localStorage.setItem(CRM_KEY, JSON.stringify(result)); } catch (e) { /* keep the source for a later attempt */ }
+      } else crmLegacyJobsChecked = false;
+    } else crmLegacyJobsChecked = true;
+    return result;
   } catch (e) {
     return crmEmpty();
   }
@@ -137,7 +152,7 @@ const crmExport = () => ({ ...crmLoad(), exportedAt: Date.now(), schemaVersion: 
  */
 function crmImport(incoming) {
   const data = crmLoad();
-  ["clients", "jobs", "quotes"].forEach((key) => {
+  ["clients", "quotes"].forEach((key) => {
     const rows = Array.isArray(incoming && incoming[key]) ? incoming[key] : [];
     rows.forEach((row) => {
       if (!row || !row.id) return;
@@ -146,6 +161,9 @@ function crmImport(incoming) {
       else if ((row.updatedAt || 0) >= (data[key][i].updatedAt || 0)) data[key][i] = row;
     });
   });
+  const jobs = Array.isArray(incoming && incoming.jobs) ? incoming.jobs.filter((row) => row && !row.deletedAt) : [];
+  if (jobs.length && typeof wsMergeJobs === "function" && !wsMergeJobs(jobs)) return false;
+  data.jobs = [];
   return crmSave(data);
 }
 

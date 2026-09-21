@@ -63,6 +63,34 @@ const WS_CALC_TYPE = {
 
 const wsEmpty = () => ({ projects: [], rooms: [], estimations: [], shoppingItems: [] });
 
+const WS_PROJECT_STATUS = ["new", "active", "done", "cancelled"];
+const wsProjectDefaults = () => ({
+  clientId: "", status: "new", dueDate: "", valueMinor: null, currencyCode: "", note: "",
+});
+
+/** A project deadline is a calendar day, under the same rule as crmDay(). */
+function wsProjectDay(v) {
+  const s = String(v === undefined || v === null ? "" : v).trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return "";
+  const d = new Date(`${s}T00:00:00Z`);
+  if (isNaN(d.getTime())) return "";
+  return d.toISOString().slice(0, 10) === s ? s : "";
+}
+
+function wsProjectFields(fields) {
+  const f = fields || {};
+  const valueMinor = f.valueMinor === null || f.valueMinor === undefined
+    ? null : (Number.isInteger(f.valueMinor) ? f.valueMinor : null);
+  return {
+    clientId: String(f.clientId === undefined || f.clientId === null ? "" : f.clientId).trim(),
+    status: WS_PROJECT_STATUS.indexOf(String(f.status)) !== -1 ? String(f.status) : "new",
+    dueDate: wsProjectDay(f.dueDate),
+    valueMinor,
+    currencyCode: valueMinor === null ? "" : String(f.currencyCode === undefined || f.currencyCode === null ? "" : f.currencyCode).trim(),
+    note: String(f.note === undefined || f.note === null ? "" : f.note).trim().slice(0, 2000),
+  };
+}
+
 /** Read the whole workspace. A corrupt or absent store reads as an empty one. */
 function wsLoad() {
   try {
@@ -70,7 +98,10 @@ function wsLoad() {
     if (!raw) return wsEmpty();
     const data = JSON.parse(raw);
     return {
-      projects: Array.isArray(data.projects) ? data.projects : [],
+      // Older phones know none of the six fields. Defaults are supplied in memory so
+      // merely reading their document neither rejects it nor rewrites localStorage.
+      projects: Array.isArray(data.projects)
+        ? data.projects.map((p) => ({ ...wsProjectDefaults(), ...p })) : [],
       rooms: Array.isArray(data.rooms) ? data.rooms : [],
       estimations: Array.isArray(data.estimations) ? data.estimations : [],
       // Absent in every workspace written before session 17, which is why it is read the
@@ -197,13 +228,16 @@ const wsArchivedProjects = () => wsAllProjects().filter((p) => p.archived);
 /** One project by id, archived or not. Null when it never existed or was deleted. */
 const wsProject = (id) => wsAllProjects().find((p) => p.id === id) || null;
 
-function wsAddProject(name) {
+function wsAddProject(name, fields) {
   // The same two rules wsUpdateProject() and wsAddRoom() apply: the spaces around a name
   // are not part of it, and a project with no name is a row nobody can tell apart.
   const clean = String(name == null ? "" : name).trim().slice(0, 120);
   if (!clean) return null;
   const data = wsLoad();
-  const project = { id: wsId(), name: clean, archived: false, ...wsSyncFields(Date.now()) };
+  const project = {
+    id: wsId(), name: clean, archived: false, ...wsProjectFields(fields),
+    ...wsSyncFields(Date.now()),
+  };
   data.projects.push(project);
   if (!wsSave(data)) return null;
   wsSetActiveProject(project.id);
@@ -213,11 +247,9 @@ function wsAddProject(name) {
 /**
  * Correct a project in place. Anything not passed keeps its current value.
  *
- * Only the two fields the sync contract carries — `name` and `archived`. A project also
- * has a description, notes and a history in chapter XIV; none of them is in
- * `SyncContract.projectToDoc()` in the app repo, and the phone rewrites the whole
- * document on its next push, so a field invented here would be erased without a word.
- * See the report for session 15: that is a change to the contract, not to this file.
+ * Alongside `name` and `archived`, the contract as of this release carries `clientId`,
+ * `status`, `dueDate`, `valueMinor`, `currencyCode` and `note`. Keeping validation here
+ * means a browser row can be uploaded as-is without asking the sync layer to repair it.
  */
 function wsUpdateProject(id, fields) {
   const data = wsLoad();
@@ -229,6 +261,14 @@ function wsUpdateProject(id, fields) {
     project.name = name;
   }
   if (fields.archived !== undefined) project.archived = Boolean(fields.archived);
+  if (fields.clientId !== undefined) project.clientId = String(fields.clientId == null ? "" : fields.clientId).trim();
+  if (fields.status !== undefined && WS_PROJECT_STATUS.indexOf(String(fields.status)) !== -1) project.status = String(fields.status);
+  if (fields.dueDate !== undefined) project.dueDate = wsProjectDay(fields.dueDate);
+  if (fields.valueMinor === null) project.valueMinor = null;
+  else if (fields.valueMinor !== undefined && Number.isInteger(fields.valueMinor)) project.valueMinor = fields.valueMinor;
+  if (fields.currencyCode !== undefined) project.currencyCode = String(fields.currencyCode == null ? "" : fields.currencyCode).trim();
+  if (project.valueMinor === null) project.currencyCode = "";
+  if (fields.note !== undefined) project.note = String(fields.note == null ? "" : fields.note).trim().slice(0, 2000);
   project.updatedAt = Date.now();
   if (!wsSave(data)) return null;
   // The active project is the one every new estimate line lands in, so it can never be
@@ -240,6 +280,62 @@ function wsUpdateProject(id, fields) {
 
 const wsRenameProject = (id, name) => wsUpdateProject(id, { name });
 const wsArchiveProject = (id, on) => wsUpdateProject(id, { archived: on !== false });
+
+/**
+ * Convert one job, or an oldest-first batch of jobs, into projects in one durable write.
+ * This is the browser copy of JobMerge.kt and MIGRATION_8_9 in the Android app.
+ */
+function wsMergeJobs(incoming) {
+  const jobs = (Array.isArray(incoming) ? incoming : [incoming]).filter((j) => j && !j.deletedAt);
+  if (!jobs.length) return true;
+  jobs.sort((a, b) => {
+    const byTime = (a.updatedAt || 0) - (b.updatedAt || 0);
+    if (byTime) return byTime;
+    return String(a.id || "") < String(b.id || "") ? -1 : (String(a.id || "") > String(b.id || "") ? 1 : 0);
+  });
+  const data = wsLoad();
+  const winners = {};
+  const foldNote = (existing, description, note) => [existing, description, note]
+    .filter((part) => String(part == null ? "" : part).trim()).join("\n\n").slice(0, 2000);
+  const loserNote = (existing, job) => {
+    const amount = job.valueMinor === null || job.valueMinor === undefined ? "" : `${job.valueMinor} ${job.currencyCode || ""}`;
+    const summary = `Z poprzedniego zlecenia: ${job.name || ""}; ${job.status || ""}; ${job.dueDate || ""}; ${amount}`;
+    if (!String(existing || "").trim()) return summary.slice(0, 2000);
+    const separator = "\n\n";
+    const existingLimit = Math.max(2000 - separator.length - summary.length, 0);
+    return String(existing).slice(0, existingLimit) + separator + summary.slice(0, 2000 - separator.length);
+  };
+  jobs.forEach((job) => {
+    const namedId = String(job.projectId || job.id || "").trim();
+    let project = namedId ? data.projects.find((p) => p.id === namedId) : null;
+    // A project tombstone is a deletion travelling to the other device. A legacy job that
+    // still points at it must neither resurrect that row nor create a second row with its id.
+    if (project && project.deletedAt) return;
+    const fields = wsProjectFields(job);
+    fields.updatedAt = Number(job.updatedAt) || 0;
+    if (!project) {
+      const id = namedId || wsId();
+      project = {
+        id, name: String(job.name == null ? "" : job.name).trim().slice(0, 120), archived: false,
+        ...fields, note: foldNote("", job.description, job.note),
+        ...wsSyncFields(Number(job.createdAt) || 0), updatedAt: fields.updatedAt,
+      };
+      data.projects.push(project);
+      winners[id] = { name: job.name || "", fields };
+      return;
+    }
+    const folded = foldNote(project.note, job.description, job.note);
+    const incumbent = winners[project.id];
+    if (!incumbent || fields.updatedAt > incumbent.fields.updatedAt) {
+      const note = incumbent ? loserNote(folded, { ...incumbent.fields, name: incumbent.name }) : folded;
+      Object.assign(project, fields, { note, updatedAt: Math.max(Number(project.updatedAt) || 0, fields.updatedAt) });
+      winners[project.id] = { name: job.name || "", fields };
+    } else {
+      project.note = loserNote(folded, job);
+    }
+  });
+  return wsSave(data);
+}
 
 /**
  * Tombstone the project, its estimate lines and its materials, exactly as the app cascades.
