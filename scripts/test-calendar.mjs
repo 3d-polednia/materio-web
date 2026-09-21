@@ -41,8 +41,8 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { calendarMain, jobsMain } from "../src/pages.mjs";
-import { LANGS, DEFAULT_LANG, SECTION, urlCalendar, urlJobs } from "../src/site.mjs";
+import { calendarMain, projectsMain } from "../src/pages.mjs";
+import { LANGS, DEFAULT_LANG, SECTION, urlCalendar, urlProjects } from "../src/site.mjs";
 import { LEVEL, STATUS, route, validateIA } from "../src/ia.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -445,7 +445,7 @@ head("6. the route says what the page is, and the architecture still validates")
   eq("the link is offered at Pro", r.navLevel, LEVEL.PRO);
   check("it is in the footer, so it is linked from every page", Boolean(r.footer));
   eq("and indexable — chapter XXVI", r.indexable, true);
-  eq("it sits under the jobs, whose dates it shows", r.parent, "jobs");
+  eq("it sits under the projects, whose dates it shows", r.parent, "projects");
 
   // The one shape difference from the other three Pro modules, and it follows from the
   // module storing nothing: there is no row of its own to open.
@@ -544,14 +544,14 @@ head("7. the page the build writes");
   const code = html.replace(/<!--[\s\S]*?-->/g, "");
   check("nothing on the page calls prompt() or confirm()",
     !code.includes("prompt(") && !code.includes("confirm("));
-  // Nothing about a job can be server-rendered: the rows are in one browser.
+  // Nothing about a project's deadline can be server-rendered: the rows are in one browser.
   check("the build writes no job data", !html.includes("liczmat-crm-v1"));
   check("and no date of its own — 'today' is the visitor's, computed in their browser",
     !/\d{4}-\d{2}-\d{2}/.test(code));
 
   for (const lang of LANGS) {
     const page = calendarMain(lang, tr(lang), FEATURES).main;
-    check(`${lang}: the trail leads back to this language's jobs`, page.includes(urlJobs(lang)));
+    check(`${lang}: the trail leads back to this language's projects`, page.includes(urlProjects(lang)));
     const file = readFileSync(p(join(urlCalendar(lang), "index.html").replace(/^\//, "")), "utf8");
     check(`${lang}: and the page claims its own address as canonical`,
       file.includes(`<link rel="canonical" href="https://liczmat.com${urlCalendar(lang)}">`),
@@ -567,9 +567,10 @@ head("7. the page the build writes");
       sitemap.includes(`<loc>https://liczmat.com${urlCalendar(lang)}</loc>`), urlCalendar(lang));
   }
 
-  // The page the deadlines belong to offers the one that shows them.
-  const jobs = jobsMain(DEFAULT_LANG, t, FEATURES).main;
-  check("the jobs page links to the terminarz", jobs.includes(urlCalendar(DEFAULT_LANG)));
+  // The page the deadlines belong to offers the one that shows them. That page was
+  // /zlecenia/ until the merge of 2026-09-21; a deadline is a field of a project now.
+  const projects = projectsMain(DEFAULT_LANG, t, [], FEATURES).main;
+  check("the projects page links to the terminarz", projects.includes(urlCalendar(DEFAULT_LANG)));
 
   // The script the page is served with, read out of the build rather than assumed.
   const build = readFileSync(p("scripts/build.mjs"), "utf8");

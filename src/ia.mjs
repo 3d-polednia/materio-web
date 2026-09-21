@@ -319,37 +319,40 @@ export const ROUTES = [
   {
     id: "jobs",
     level: LEVEL.PRO, status: STATUS.LIVE,
-    parent: "clients", localized: true, indexable: true,
+    parent: "clients", localized: true, indexable: false,
     path: urlJobs,
-    footer: { order: 11, key: "jobpage_title" },
-    navLevel: LEVEL.PRO,
-    gate: "As clients — the same wall, from the same builder (proGate() in " +
-      "src/pro.mjs) and behind the same switch.",
-    note: "Chapter XXI, and the second of the five Pro modules. A job is chapter XXIV's " +
-      "middle step — KLIENT → ZLECENIE → PROJEKT — so it carries a client, a project, a " +
-      "status, a date, an agreed value and notes. It lives in assets/crm.js beside the " +
-      "clients, in the same browser-only store and for the same reason: `jobs` is not in " +
-      "the sync contract either, so nothing here is pushed anywhere and the page says " +
-      "so. Parented under `clients` because that is where the path starts; `navLevel` " +
-      "keeps the footer link for a Pro account and for a crawler, which is what leaves " +
-      "the page indexable.",
+    gate: "None of its own — it holds nothing to gate. It is a redirect, and the page " +
+      "it sends the visitor to carries chapter XXV's wall.",
+    note: "The address chapter XXI's job list answered at, from session 23 until the " +
+      "merge of 2026-09-21. A job is a project now — the project carries the client, the " +
+      "status, the deadline and the agreed amount — so there is nothing here to list. " +
+      "The URL stays because one that answered yesterday has to answer today: it is in " +
+      "sitemaps a crawler has already read and in whatever somebody bookmarked. It " +
+      "answers with a meta refresh to /projekty/ in the visitor's own language, plus a " +
+      "heading and a real link for anyone whose browser ignores the refresh, since " +
+      "GitHub Pages serves files and cannot answer 301. `indexable: false`, and it " +
+      "canonicalises to itself rather than to /projekty/: a head saying both \"do not " +
+      "index me\" and \"the real one is over there\" is two instructions that contradict " +
+      "each other. It left the footer with the module — a redirect is not a place to " +
+      "send anybody on purpose. Goes for good in the release after the phone drops its " +
+      "`jobs` table in schema 9 → 10.",
   },
   {
     id: "job",
     level: LEVEL.PRO, status: STATUS.LIVE, view: true,
     parent: "jobs", localized: true, indexable: false,
     path: urlJob,
-    gate: "As jobs — it is the same file.",
-    note: "One job: its client, its project, the status and the date, what was agreed " +
-      "and what the work has actually cost so far. A `view` for the reason `client` is " +
-      "one — the id is made in this browser, so /zlecenia/?id=<jobId> is the only shape " +
-      "GitHub Pages can serve.",
+    gate: "As jobs — it is the same file, and it holds nothing to gate.",
+    note: "The address one job answered at. It redirects exactly as its index does, and " +
+      "for the same reason — it is the same file. A `view` rather than a route of its " +
+      "own because the id was made in this browser and could never be a directory on " +
+      "GitHub Pages; /projekty/?id= is where that id resolves now.",
   },
 
   {
     id: "quotes",
     level: LEVEL.PRO, status: STATUS.LIVE,
-    parent: "jobs", localized: true, indexable: true,
+    parent: "projects", localized: true, indexable: true,
     path: urlQuotes,
     footer: { order: 12, key: "quopage_title" },
     navLevel: LEVEL.PRO,
@@ -380,7 +383,7 @@ export const ROUTES = [
   {
     id: "calendar",
     level: LEVEL.PRO, status: STATUS.LIVE,
-    parent: "jobs", localized: true, indexable: true,
+    parent: "projects", localized: true, indexable: true,
     path: urlCalendar,
     footer: { order: 13, key: "calpage_title" },
     navLevel: LEVEL.PRO,

@@ -118,7 +118,7 @@ function calRow(job, editable, today) {
   const money = job.valueMinor !== null && job.valueMinor !== undefined
     ? ` · ${calEsc(calMoney(job.valueMinor, job.currencyCode))}` : "";
   const status = `<span class="chip job-chip">${calEsc(calT(`job_st_${job.status}`))}</span>`;
-  const jobs = calUrl("jobs", "/zlecenia/");
+  const jobs = calUrl("projects", "/projekty/");
 
   const days = typeof crmDaysUntil === "function" ? crmDaysUntil(job.dueDate, today) : null;
   const rel = calRelative(days);
@@ -210,7 +210,7 @@ function buildSchedulePage() {
     const input = e.target.closest(".cal-due");
     if (!input) return;
     const row = input.closest("li[data-id]");
-    if (row && typeof crmUpdateJob === "function") crmUpdateJob(row.dataset.id, { dueDate: input.value });
+    if (row && typeof wsUpdateProject === "function") wsUpdateProject(row.dataset.id, { dueDate: input.value });
   });
 
   // Adding an appointment directly from the calendar: records a job with a deadline,
@@ -225,14 +225,15 @@ function buildSchedulePage() {
       const name = (nameInput && nameInput.value || "").trim();
       const dueDate = (dateInput && dateInput.value || "").trim();
       const clientId = (clientSelect && clientSelect.value || "").trim();
-      if (!name || !dueDate || typeof crmAddJob !== "function") return;
+      if (!name || !dueDate || typeof wsAddProject !== "function") return;
 
       // Nothing is said here when the row does not come back. crmAddJob() returns null for
       // two reasons: a missing name, which the guard above has already refused, and a store
       // that would not write — and that second one has already announced itself, because
       // crmSave() fires `crmsavefailed` and assets/main.js answers it with the same banner
       // every other screen gets. A message of this page's own would be the second one.
-      const row = crmAddJob({ name, dueDate, clientId });
+      const row = wsAddProject(name, { dueDate, clientId });
+      if (row && clientId && typeof crmLinkProject === "function") crmLinkProject(clientId, row.id);
       if (!row) return;
 
       if (nameInput) {

@@ -476,8 +476,14 @@ const BUDGET = {
      carried a placeholder and nothing else, so the only thing naming a box vanished as
      soon as the visitor typed in it. They have visible labels now, and a label is six
      words this page did not use to count: /fr/projets/ measures 870 against Polish at
-     716. These are field names, not prose; the section still forbids a paragraph. */
-  materials: 2820, stores: 159, android: 519, projects: 872, estimate: 425,
+     716. These are field names, not prose; the section still forbids a paragraph.
+
+     925 since the merge of 2026-09-21. A project carries what a job used to, so the form
+     grew six labelled fields — client, status, deadline, agreed amount, note, colour —
+     and chapter XXIV's strip moved onto this page with its two headings and the one
+     sentence saying what the history leaves out. /fr/projets/ measures 922 against Polish
+     at 748; 925 leaves a three-word margin. Field names and headings again, not prose. */
+  materials: 2820, stores: 159, android: 519, projects: 925, estimate: 425,
   /* The widest /wyceny/ translation is Spanish at 638 words after the three add forms
      received visible labels; 640 leaves a two-word regression margin. */
   clients: 524, jobs: 544, quotes: 640, calendar: 420, cookies: 637,

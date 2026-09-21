@@ -41,7 +41,7 @@ import { DEFAULT_CURRENCY, MONEY_LOCALE } from "../src/currency.mjs";
 import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, contactMain, clientsMain, jobsMain,
+  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, contactMain, clientsMain,
   quotesMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
@@ -56,7 +56,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260918g";
+const STAMP = "20260921a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -819,7 +819,7 @@ const CALC_SCRIPTS = [
  * number (assets/units.js), which is the reason that file exists apart from the engines.
  */
 const WS_SCRIPTS = [
-  "/assets/units.js", "/assets/workspace.js",
+  "/assets/units.js", "/assets/workspace.js", "/assets/crm-store.js", "/assets/crm.js",
   // The permission table and the wall it draws. Both pages print money and offer the PDF,
   // and since 2026-09-03 both of those are PRO — so both pages have to be able to ask
   // lmCan() and to put chapter XXV's wall where the amounts used to be. The order is the
@@ -833,6 +833,13 @@ const WS_SCRIPTS = [
   // The PDF export of session 59 (C6). Last, because it reads the workspace through the
   // globals above and writes into markup the build already put on the page.
   "/assets/pdf-export.js",
+  // Chapter XXIV's strip. It used to load on /zlecenia/ only, because the job was the
+  // middle step of the path; the merge of 2026-09-21 made the project that step, so the
+  // page that owns a project draws it. It reads the one link map, which /projekty/ writes
+  // into its own head below. /szacunek/ shares this list and never calls the strip — the
+  // file does nothing until something asks it to draw, and a second script list holding
+  // nine tenths of this one is the kind of copy that drifts.
+  "/assets/crm-chain.js",
 ];
 
 /**
@@ -860,13 +867,6 @@ const CRM_SCRIPTS = [
  * screen does. No engine and no catalogue — the page prints saved figures and one typed
  * amount, and calculates nothing.
  */
-const JOBS_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
-  "/assets/crm-store.js",
-  "/assets/crm.js",
-  "/assets/crm-chain.js", "/assets/jobs-ui.js",
-];
-
 /**
  * /wyceny/ (session 24). The same four files again, with the quote page's own interface:
  * the store is shared (assets/crm.js holds all three collections), and three of chapter
@@ -1461,6 +1461,12 @@ function buildWorkspacePages() {
         // (session 18). The page does not load assets/materials.js — 12 kB of catalogue
         // to render a fifteen-item <select> — so the build hands it the list instead.
         aisles: CAT.categories,
+      })};</script>`
+      // The same one link map the other Pro screens get. assets/crm-chain.js draws the
+      // path from it, and since 2026-09-21 the project is the middle step of that path.
+      + `<script>window.LM_LINKS = ${JSON.stringify({
+        clients: urlClients(lang), projects: urlProjects(lang),
+        quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: WS_SCRIPTS,
     }));
@@ -1500,10 +1506,11 @@ function buildClientsPages() {
       main, jsonld: [ld],
       // Every address the CRM links to, in this page's language. src/site.mjs is the
       // only place a slug is decided; the script has no site map, so the build hands it
-      // the whole set — one map for all four Pro screens (session 26), because they now
-      // link to each other in every direction.
+      // the whole set — one map for the Pro screens (session 26), because they link to
+      // each other in every direction. `jobs` left the map on 2026-09-21: CHN_SECTION in
+      // assets/crm-chain.js is client, project, quote, and no node resolves to a job.
       headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
-        clients: urlClients(lang), jobs: urlJobs(lang), projects: urlProjects(lang),
+        clients: urlClients(lang), projects: urlProjects(lang),
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: CRM_SCRIPTS,
@@ -1512,34 +1519,41 @@ function buildClientsPages() {
 }
 
 /**
- * /zlecenia/ — the job list of LiczMat Pro. Session 23, chapter XXI.
+ * /zlecenia/ — the address the job list used to answer at. Session 23 wrote a page here;
+ * the merge of 2026-09-21 turned a job into a project, so there is nothing left to list.
  *
- * Two screens in one file again: the index, and one job at ?id=<jobId>. Only the frame is
- * written here; the client, the project, the status and the money all come out of the
- * browser's own store.
+ * The URL still answers, because one that answered yesterday has to answer today: it is in
+ * thirteen sitemaps a crawler has already read, in the footer of every page ever served,
+ * and in whatever somebody bookmarked. What it answers with is a redirect to /projekty/.
  */
 function buildJobsPages() {
-  const alt = alternatesFor(urlJobs);
   for (const lang of BUILD_LANGS) {
     const t = translator(lang);
-    const { main, ld } = jobsMain(lang, t, LM_FEATURES);
+    const target = urlProjects(lang);
+    // A heading and a real link, not just the refresh: a meta refresh is a dead end for
+    // anyone whose browser or screen reader ignores it, and a page whose first heading is
+    // an h2 fails scripts/test-a11y.mjs.
+    const main = `<main id="main" tabindex="-1"><section class="block page-head"><div class="wrap">`
+      + `<h1>${t("wspage_title")}</h1>`
+      + `<p><a class="btn btn-primary" href="${target}">${t("wspage_title")}</a></p>`
+      + `</div></section></main>`;
     write(join(urlJobs(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("jobpage_title")} \u2014 LiczMat`,
       description: t("jobpage_meta"),
       bodyClass: "tool-page",
+      // Self-canonical, NOT /projekty/. A head that says "do not index me" and "the real
+      // one is over there" in the same breath is two instructions contradicting each
+      // other, and scripts/test-seo.mjs is right to call a second page claiming
+      // /projekty/ a duplicate. `noindex` is the whole instruction to a crawler; the
+      // refresh and the link below are for the visitor.
       path: urlJobs(lang),
-      alternates: alt,
-      main, jsonld: [ld],
-      // Every address the CRM links to, in this page's language. src/site.mjs is the
-      // only place a slug is decided; the script has no site map, so the build hands it
-      // the whole set — one map for all four Pro screens (session 26), because they now
-      // link to each other in every direction.
-      headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
-        clients: urlClients(lang), jobs: urlJobs(lang), projects: urlProjects(lang),
-        quotes: urlQuotes(lang), calendar: urlCalendar(lang),
-      })};</script>`,
-      scripts: JOBS_SCRIPTS,
+      alternates: alternatesFor(urlJobs),
+      noindex: true,
+      main,
+      // GitHub Pages serves files and cannot answer 301, so the redirect is a refresh.
+      headExtra: `<meta http-equiv="refresh" content="0; url=${target}">`,
+      scripts: [],
     }));
   }
 }
@@ -1567,10 +1581,11 @@ function buildQuotesPages() {
       main, jsonld: [ld],
       // Every address the CRM links to, in this page's language. src/site.mjs is the
       // only place a slug is decided; the script has no site map, so the build hands it
-      // the whole set — one map for all four Pro screens (session 26), because they now
-      // link to each other in every direction.
+      // the whole set — one map for the Pro screens (session 26), because they link to
+      // each other in every direction. `jobs` left the map on 2026-09-21: CHN_SECTION in
+      // assets/crm-chain.js is client, project, quote, and no node resolves to a job.
       headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
-        clients: urlClients(lang), jobs: urlJobs(lang), projects: urlProjects(lang),
+        clients: urlClients(lang), projects: urlProjects(lang),
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: QUOTES_SCRIPTS,
@@ -1601,10 +1616,11 @@ function buildCalendarPages() {
       main, jsonld: [ld],
       // Every address the CRM links to, in this page's language. src/site.mjs is the
       // only place a slug is decided; the script has no site map, so the build hands it
-      // the whole set — one map for all four Pro screens (session 26), because they now
-      // link to each other in every direction.
+      // the whole set — one map for the Pro screens (session 26), because they link to
+      // each other in every direction. `jobs` left the map on 2026-09-21: CHN_SECTION in
+      // assets/crm-chain.js is client, project, quote, and no node resolves to a job.
       headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
-        clients: urlClients(lang), jobs: urlJobs(lang), projects: urlProjects(lang),
+        clients: urlClients(lang), projects: urlProjects(lang),
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: CALENDAR_SCRIPTS,

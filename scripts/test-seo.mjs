@@ -36,7 +36,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, GUIDES,
-  urlHome, urlCalc, URL_PRIVACY,
+  urlHome, urlCalc, urlJobs, URL_PRIVACY,
 } from "../src/site.mjs";
 import { sitemapUrls, liveRoutes, route } from "../src/ia.mjs";
 
@@ -133,9 +133,19 @@ head("1. indexing: which pages are open to a crawler at all");
   // The four are the account, the dashboard, a shared estimate and the 404 page. The
   // first three are somebody's own workspace; the fourth is not a page anybody searched
   // for. Everything else on this site exists to be found.
+  //
+  // Since the merge of 2026-09-21 there are thirteen more: /zlecenia/ and its twelve
+  // translations. A job is a project now, so that address has nothing to list — it stays
+  // reachable, because a URL that answered yesterday has to answer today, and it redirects
+  // to /projekty/. It is closed to crawlers because the page a crawler should have is
+  // /projekty/, and it canonicalises to itself rather than there, which is why it is
+  // `noindex` and not a duplicate.
+  const jobRedirects = LANGS.map((lang) => urlJobs(lang)).sort();
   const closed = PAGES.filter(isNoindex).map((page) => page.url).sort();
-  check("exactly four pages are closed to crawlers",
-    closed.join(" ") === "/404.html /app/ /app/dashboard/ /p/", closed.join(" "));
+  const expectedClosed = ["/404.html", "/app/", "/app/dashboard/", "/p/"]
+    .concat(jobRedirects).sort();
+  check("exactly four pages, plus the thirteen job redirects, are closed to crawlers",
+    closed.join(" ") === expectedClosed.join(" "), closed.join(" "));
 
   for (const page of INDEXED) {
     check(`${page.url} says index, follow`,
@@ -205,9 +215,12 @@ head("2. sitemap.xml: the list, and where it comes from");
   check("and nothing else is", listed.every((u) => declared.includes(u)),
     listed.filter((u) => !declared.includes(u)).join(", "));
   // 521 since session 62 added /kontakt/ for audit item H7 — one indexable route, so
-  // thirteen more URLs than the 508 the sitemap carried before it.
-  check("521 URLs: 520 in thirteen languages plus the privacy policy",
-    ENTRIES.length === 521, `found ${ENTRIES.length}`);
+  // thirteen more URLs than the 508 the sitemap carried before it. Back to 508 after the
+  // merge of 2026-09-21: /zlecenia/ and its twelve translations became redirects to
+  // /projekty/, and a sitemap that still offered a crawler thirteen redirects would be
+  // asking it to index a page that exists only to send it somewhere else.
+  check("508 URLs: 507 in thirteen languages plus the privacy policy",
+    ENTRIES.length === 508, `found ${ENTRIES.length}`);
 
   for (const entry of ENTRIES) {
     check(`${entry.loc} is absolute and on the live domain`, entry.loc.startsWith(`${BASE}/`));

@@ -363,7 +363,9 @@ head("6. what changes on its own says so");
     ["sklepy/index.html", "store-status"],
     ["projekty/index.html", "ws-undo"],
     ["klienci/index.html", "crm-undo"],
-    ["zlecenia/index.html", "job-undo"],
+    // /zlecenia/ had "#job-undo" here until the merge of 2026-09-21. There is no job to
+    // undo any more and no list on that address: it is a redirect to /projekty/, whose
+    // own "#ws-undo" is two lines up and now carries the projects that used to be jobs.
     ["wyceny/index.html", "quo-undo"],
     ["app/index.html", "app-status"],
     // Session 42: the notice that says the connection is gone has its own line, and it

@@ -36,7 +36,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { clientsMain, jobsMain, quotesMain } from "../src/pages.mjs";
+import { clientsMain, projectsMain, quotesMain } from "../src/pages.mjs";
 import {
   LANGS, DEFAULT_LANG, urlClients, urlJobs, urlQuotes, urlProjects, urlCalendar,
 } from "../src/site.mjs";
@@ -485,28 +485,28 @@ head("6. the frame the build writes, and the one link map behind it");
 {
   const t = tr(DEFAULT_LANG);
   const client = clientsMain(DEFAULT_LANG, t, FEATURES).main;
-  const job = jobsMain(DEFAULT_LANG, t, FEATURES).main;
+  // The middle node used to be drawn on /zlecenia/ by jobsMain(). The merge of 2026-09-21
+  // made the project the middle step, so the strip, the quotes and the history moved onto
+  // /projekty/ and that address became a redirect with no script of its own.
+  const project = projectsMain(DEFAULT_LANG, t, [], FEATURES).main;
   const quote = quotesMain(DEFAULT_LANG, t, FEATURES).main;
 
-  // TODO(web-task-3): point the project checks at /projekty/ after that page draws the strip.
-  // The generated site still draws the middle node on /zlecenia/, so these checks keep
-  // guarding what the build actually emits today instead of silently dropping coverage.
   for (const [where, html, ids] of [
     ["/klienci/", client, ["crm-client-quotes", "crm-history"]],
-    ["/zlecenia/", job, ["job-chain", "job-quotes", "job-history"]],
+    ["/projekty/", project, ["ws-chain", "ws-chain-quotes", "ws-chain-history"]],
     ["/wyceny/", quote, ["quo-chain-line"]],
   ]) {
     for (const id of ids) {
       check(`${where} carries #${id} for the script to fill`, html.includes(`id="${id}"`), id);
     }
   }
-  check("the strip is a <nav> on /zlecenia/", /<nav class="crm-chain" id="job-chain"/.test(job));
+  check("the strip is a <nav> on /projekty/", /<nav class="crm-chain" id="ws-chain"/.test(project));
   check("and on /wyceny/", /<nav class="crm-chain" id="quo-chain-line"/.test(quote));
   check("both label it for a screen reader",
-    job.includes(`aria-label="${t("crm_chain_t")}"`)
+    project.includes(`aria-label="${t("crm_chain_t")}"`)
     && quote.includes(`aria-label="${t("crm_chain_t")}"`));
   check("the history says out loud what it leaves out",
-    client.includes(t("crm_hist_note")) && job.includes(t("crm_hist_note")));
+    client.includes(t("crm_hist_note")) && project.includes(t("crm_hist_note")));
   check("the quotes block links to the whole list", client.includes(urlQuotes(DEFAULT_LANG)));
 
   // The four Pro pages share one link map — four maps each holding half the site map is
@@ -514,18 +514,21 @@ head("6. the frame the build writes, and the one link map behind it");
   const build = read("scripts/build.mjs");
   eq("no page writes a map of its own any more",
     /LM_CRM|LM_JOBS|LM_QUOTES|LM_CAL\b/.test(build), false);
+  // Four since 2026-09-21 as well, but a different four: /zlecenia/ stopped writing one
+  // when it became a redirect, and /projekty/ started, because that is where the middle
+  // node of the path is drawn now.
   eq("the build writes window.LM_LINKS four times",
     (build.match(/window\.LM_LINKS/g) || []).length, 4);
-  for (const file of ["assets/crm-ui.js", "assets/jobs-ui.js", "assets/quotes-ui.js",
+  for (const file of ["assets/crm-ui.js", "assets/quotes-ui.js",
     "assets/schedule-ui.js", "assets/crm-chain.js"]) {
     check(`${file} reads that one map`, read(file).includes("LM_LINKS"), file);
   }
 
   // The three screens that draw the chain load the file that draws it; the terminarz draws
   // none, so it does not download it.
-  for (const [page, wants] of [["buildClientsPages", true], ["buildJobsPages", true],
+  for (const [page, wants] of [["buildClientsPages", true], ["buildProjectsPages", true],
     ["buildQuotesPages", true], ["buildCalendarPages", false]]) {
-    const list = { buildClientsPages: "CRM_SCRIPTS", buildJobsPages: "JOBS_SCRIPTS",
+    const list = { buildClientsPages: "CRM_SCRIPTS", buildProjectsPages: "WS_SCRIPTS",
       buildQuotesPages: "QUOTES_SCRIPTS", buildCalendarPages: "CALENDAR_SCRIPTS" }[page];
     const decl = build.slice(build.indexOf(`const ${list} = [`));
     const has = decl.slice(0, decl.indexOf("];")).includes("crm-chain.js");
@@ -550,9 +553,11 @@ head("6. the frame the build writes, and the one link map behind it");
 
   // The built pages carry the map in their own language, so a German visitor's chain
   // links to /de/… and never back to the Polish slug.
+  // Read off /projekty/ since 2026-09-21: it is the page that draws the middle node now,
+  // and /zlecenia/ is a redirect that loads no script at all.
   for (const lang of LANGS) {
-    const html = read(join(urlJobs(lang).replace(/^\//, ""), "index.html"));
-    check(`${lang}: /zlecenia/ carries the map`, html.includes("window.LM_LINKS"));
+    const html = read(join(urlProjects(lang).replace(/^\//, ""), "index.html"));
+    check(`${lang}: /projekty/ carries the map`, html.includes("window.LM_LINKS"));
     check(`${lang}: and it names this language's clients page`,
       html.includes(`"clients":"${urlClients(lang)}"`), urlClients(lang));
     check(`${lang}: and this language's quotes page`,

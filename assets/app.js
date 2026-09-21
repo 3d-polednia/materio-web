@@ -1591,16 +1591,16 @@ function fillClientSelect(select) {
 function renderJobs() {
   fillClientSelect($("acctjob-client"));
   const list = $("acctjob-list");
-  if (!list || typeof crmAllJobs !== "function") return;
-  const rows = crmAllJobs();
+  if (!list || typeof wsAllProjects !== "function") return;
+  const rows = wsAllProjects();
   list.innerHTML = rows.length ? rows.map((j) => {
     const client = j.clientId && typeof crmClient === "function" ? crmClient(j.clientId) : null;
-    const statuses = typeof JOB_STATUS !== "undefined" ? JOB_STATUS : [j.status];
+    const statuses = typeof PROJECT_STATUS !== "undefined" ? PROJECT_STATUS : [j.status];
     return `<li data-id="${escapeHtml(j.id)}">
       <span class="row-name">${escapeHtml(j.name)}${client ? ` <em class="muted">${escapeHtml(client.name)}</em>` : ""}${j.dueDate ? ` <em class="muted">${fmtDay(j.dueDate)}</em>` : ""}</span>
       <span class="row-actions">
         <select data-status aria-label="${T("job_st_" + j.status)}">${statuses.map((s) => `<option value="${s}"${s === j.status ? " selected" : ""}>${T("job_st_" + s)}</option>`).join("")}</select>
-        <a class="btn btn-ghost btn-sm" href="${proLink("jobs", j.id)}">${T("app_open_full")}</a>
+        <a class="btn btn-ghost btn-sm" href="${proLink("projects", j.id)}">${T("app_open_full")}</a>
         <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
       </span>
     </li>`;
@@ -1614,8 +1614,9 @@ function wireJobsPanel() {
     e.preventDefault();
     const nameInput = $("acctjob-name");
     const name = nameInput.value.trim();
-    if (!name || typeof crmAddJob !== "function") return;
-    crmAddJob({ name, clientId: $("acctjob-client").value, dueDate: $("acctjob-due").value });
+    if (!name || typeof wsAddProject !== "function") return;
+    const project = wsAddProject(name, { clientId: $("acctjob-client").value, dueDate: $("acctjob-due").value });
+    if (project && project.clientId && typeof crmLinkProject === "function") crmLinkProject(project.clientId, project.id);
     nameInput.value = "";
     $("acctjob-due").value = "";
     renderJobs();
@@ -1625,9 +1626,9 @@ function wireJobsPanel() {
   const list = $("acctjob-list");
   list.addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-del]") || typeof crmDeleteJob !== "function") return;
+    if (!li || !e.target.closest("[data-del]") || typeof wsDeleteProject !== "function") return;
     if (!confirm(T("app_row_delete_confirm"))) return;
-    crmDeleteJob(li.dataset.id);
+    wsDeleteProject(li.dataset.id);
     renderJobs();
     renderOverview();
     renderSchedule();
@@ -1636,8 +1637,8 @@ function wireJobsPanel() {
   list.addEventListener("change", (e) => {
     const sel = e.target.closest("[data-status]");
     const li = e.target.closest("li[data-id]");
-    if (!sel || !li || typeof crmSetJobStatus !== "function") return;
-    crmSetJobStatus(li.dataset.id, sel.value);
+    if (!sel || !li || typeof wsUpdateProject !== "function") return;
+    wsUpdateProject(li.dataset.id, { status: sel.value });
     renderJobs();
     renderOverview();
     renderSchedule();
@@ -1735,9 +1736,9 @@ const dayKey = (d) => {
  * JOB_COLORS array or crmJobColor() helper before emitting class names.
  */
 function calJobColor(value) {
-  if (typeof crmJobColor === "function") return crmJobColor(value);
-  if (typeof JOB_COLORS !== "undefined" && Array.isArray(JOB_COLORS)) {
-    return JOB_COLORS.indexOf(value) >= 0 ? value : "";
+  if (typeof crmProjectColor === "function") return crmProjectColor(value);
+  if (typeof PROJECT_COLORS !== "undefined" && Array.isArray(PROJECT_COLORS)) {
+    return PROJECT_COLORS.indexOf(value) >= 0 ? value : "";
   }
   return "";
 }
@@ -1750,7 +1751,7 @@ function renderCalDayPanel() {
   const d = new Date(`${day}T00:00:00`);
   const label = isNaN(d.getTime()) ? day
     : d.toLocaleDateString(lang, { weekday: "long", day: "numeric", month: "long" });
-  const byDay = typeof crmJobsByDay === "function" ? crmJobsByDay() : {};
+  const byDay = typeof crmProjectsByDay === "function" ? crmProjectsByDay() : {};
   const jobs = byDay[day] || [];
   const slots = jobs.map((j) => {
     const client = j.clientId && typeof crmClient === "function" ? crmClient(j.clientId) : null;
@@ -1768,7 +1769,7 @@ function renderCalDayPanel() {
     .concat(clients.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`))
     .join("");
 
-  const colors = typeof JOB_COLORS !== "undefined" && Array.isArray(JOB_COLORS) ? JOB_COLORS : [];
+  const colors = typeof PROJECT_COLORS !== "undefined" && Array.isArray(PROJECT_COLORS) ? PROJECT_COLORS : [];
   const colorOptions = [`<option value="">${T("job_color_none")}</option>`]
     .concat(colors.map((token) => `<option value="${escapeHtml(token)}">${T("job_color_" + token)}</option>`))
     .join("");
@@ -1845,8 +1846,8 @@ function renderSchedule() {
     }).join("");
   }
 
-  const byDay = typeof crmJobsByDay === "function" ? crmJobsByDay() : {};
-  const openStatus = typeof JOB_OPEN_STATUS !== "undefined" ? JOB_OPEN_STATUS : [];
+  const byDay = typeof crmProjectsByDay === "function" ? crmProjectsByDay() : {};
+  const openStatus = typeof PROJECT_OPEN_STATUS !== "undefined" ? PROJECT_OPEN_STATUS : [];
   grid.innerHTML = calCells(calState.year, calState.month).map((d) => {
     const key = dayKey(d);
     const out = d.getMonth() !== calState.month;
@@ -1956,8 +1957,9 @@ function wireSchedulePanel() {
     const clientId = (clientSelect ? clientSelect.value : "").trim();
     const color = (colorSelect ? colorSelect.value : "").trim();
     const description = (descInput ? descInput.value : "").trim();
-    if (!name || !dueDate || typeof crmAddJob !== "function") return;
-    const row = crmAddJob({ name, dueDate, clientId, color, description });
+    if (!name || !dueDate || typeof wsAddProject !== "function") return;
+    const row = wsAddProject(name, { dueDate, clientId, color, note: description });
+    if (row && clientId && typeof crmLinkProject === "function") crmLinkProject(clientId, row.id);
     if (!row) return;
     calState.adding = false;
     calState.day = dueDate;

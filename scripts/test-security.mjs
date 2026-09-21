@@ -779,7 +779,10 @@ head("13. what a name somebody else typed does once it reaches the page");
   // three characters that end an element and the one that ends an attribute.
   const RENDERERS = {
     "assets/workspace-calc.js": "wsEsc", "assets/crm-ui.js": "crmEsc",
-    "assets/jobs-ui.js": "jobEsc", "assets/quotes-ui.js": "quoEsc",
+    // assets/jobs-ui.js and its jobEsc() went with the job itself on 2026-09-21. What it
+    // drew is drawn by workspace-ui.js now, which is checked for the single-quote rule
+    // below and escapes through the same helper the projects page always used.
+    "assets/quotes-ui.js": "quoEsc",
     "assets/schedule-ui.js": "calEsc", "assets/crm-chain.js": "chnEsc",
     "assets/dashboard.js": "dashEsc", "assets/materials-ui.js": "matEsc",
     "assets/stores.js": "esc", "assets/app.js": "escapeHtml", "assets/share.js": "escapeHtml",

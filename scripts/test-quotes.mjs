@@ -45,8 +45,8 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { quotesMain, jobsMain } from "../src/pages.mjs";
-import { LANGS, SECTION, urlQuotes, urlQuote, urlJobs, urlProjects } from "../src/site.mjs";
+import { quotesMain, projectsMain } from "../src/pages.mjs";
+import { LANGS, SECTION, urlQuotes, urlQuote, urlProjects } from "../src/site.mjs";
 import { LEVEL, STATUS, route, validateIA } from "../src/ia.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -650,7 +650,7 @@ head("8. the route, and chapter XXV's gate");
   const r = route("quotes");
   eq("quotes is live", r.status, STATUS.LIVE);
   eq("at the Pro level", r.level, LEVEL.PRO);
-  eq("under the jobs, where chapter XXIV puts it", r.parent, "jobs");
+  eq("under the projects, where chapter XXIV puts it since a job became one", r.parent, "projects");
   eq("indexable — chapter XXVI wants Pro described in public", r.indexable, true);
   eq("its link is offered to Pro only", r.navLevel, LEVEL.PRO);
 
@@ -841,8 +841,10 @@ head("9. the frame the build writes");
 
     for (const id of ["quo-page", "quo-index", "quo-detail", "quo-list", "quo-form",
       "quo-labour-list", "quo-labour-form", "quo-project-list", "quo-project-form",
-      "quo-client-form", "quo-client-pick", "quo-client-new-form", "quo-job-form",
-      "quo-job-pick", "quo-job-new-form", "quo-project-pick", "quo-project-new-form",
+      // The job picker and the project picker both chose a project once a job became
+      // one (2026-09-21), so the duplicate went and one picker is left.
+      "quo-client-form", "quo-client-pick", "quo-client-new-form",
+      "quo-project-pick", "quo-project-new-form",
       "quo-room-list", "quo-material-list", "quo-material-sum", "ws-pdf-form", "ws-pdf-doc",
       "quo-margin", "quo-fig-materials", "quo-fig-other", "quo-fig-labour",
       "quo-fig-sub", "quo-fig-margin", "quo-fig-total", "quo-mixed", "quo-chain-line",
@@ -853,15 +855,17 @@ head("9. the frame the build writes");
     check(`${lang}: the gate is written, hidden`, main.includes('id="quo-gate" hidden'));
     check(`${lang}: the module says it is Pro`, main.includes(t("pro_locked")));
     check(`${lang}: and describes itself`, main.includes(t("feat_quotes_t")));
-    check(`${lang}: the page names its own language's jobs page`, main.includes(urlJobs(lang)));
+    // It named its own language's /zlecenia/ as well until the merge of 2026-09-21. A job
+    // is a project now, so there is one page to name and it is this one.
     check(`${lang}: and its own language's projects page`, main.includes(urlProjects(lang)));
     check(`${lang}: the storage note is on the page`, main.includes(t("quo_local_note")));
     check(`${lang}: nothing is hard-coded to Polish`,
       lang === "pl" || !main.includes(`href="${urlQuotes("pl")}"`), urlQuotes("pl"));
 
-    // The way back: /zlecenia/ points at the quotes now, in its own language.
-    const jobs = jobsMain(lang, t, FEATURES);
-    check(`${lang}: the jobs page links to the quotes`, jobs.main.includes(urlQuotes(lang)));
+    // The way back: the page that owns the work points at the quotes, in its own
+    // language. That was /zlecenia/ until the merge of 2026-09-21.
+    const projects = projectsMain(lang, t, [], FEATURES);
+    check(`${lang}: the projects page links to the quotes`, projects.main.includes(urlQuotes(lang)));
   }
 }
 
@@ -872,8 +876,10 @@ head("9a. the quote owns the chain controls and the PDF document");
   const build = read("scripts/build.mjs");
   check("client choice is resolved through the quote's project link",
     ui.includes("function quoChooseClient(clientId)") && ui.includes("crmLinkProject(client.id, project.id)"));
-  check("a job without a project gains one before the quote points at it",
-    ui.includes("function quoChooseJob(jobId)") && ui.includes("project = wsAddProject(job.name)"));
+  check("choosing a client with no project makes one, because a quote can only point there",
+    ui.includes("function quoChooseClient(clientId)") && ui.includes("project = wsAddProject(q.name)"));
+  check("and there is no second picker choosing the same thing",
+    !ui.includes("quoChooseJob") && !ui.includes("quo-job-pick"));
   check("the quote still writes only projectId",
     !/crmUpdateQuote\([^)]*,\s*\{\s*(clientId|jobId)/.test(ui));
   check("rooms and materials are read from the selected project",

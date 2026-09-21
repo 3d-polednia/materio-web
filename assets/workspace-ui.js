@@ -77,6 +77,14 @@ const wsDate = (ms) => {
   return new Date(at).toLocaleDateString(wsLang(), { day: "numeric", month: "short", year: "numeric" });
 };
 
+const wsProjectDate = (day) => {
+  if (!day) return "";
+  const value = new Date(`${day}T00:00:00`);
+  return isNaN(value.getTime()) ? "" : value.toLocaleDateString(wsLang(), {
+    day: "numeric", month: "short", year: "numeric",
+  });
+};
+
 /** The index's own address, without the query that opens a project. */
 const wsIndexUrl = () => location.pathname;
 
@@ -98,9 +106,13 @@ function wsProjectRow(p, active) {
   const mixed = wsCanCost() && costs.mixed
     ? ` <span class="chip warn" title="${wsEsc(wsT("ws_mixed_currency"))}">${wsEsc(wsT("dash_mixed"))}</span>`
     : "";
+  const client = p.clientId && typeof crmClient === "function" ? crmClient(p.clientId) : null;
+  const workflow = [client && client.name, wsT(`job_st_${p.status || "new"}`), wsProjectDate(p.dueDate)]
+    .filter(Boolean).map(wsEsc).join(" Â· ");
   return `<li data-id="${wsEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
       <span class="row-name">
         <a href="?id=${encodeURIComponent(p.id)}" data-open><b>${wsEsc(p.name)}</b></a>
+        ${workflow ? `<em class="muted">${workflow}</em>` : ""}
         <em class="muted">${total.count} ${wsEsc(wsUnit("ws_lines", total.count))}${money} · ${wsEsc(wsDate(p.updatedAt))}${mixed}</em>
       </span>
       <span class="row-actions">
@@ -118,6 +130,13 @@ function wsRenderProjects() {
   if (!list) return;
   const projects = wsProjects();
   const active = wsActiveProjectId();
+  const clientPick = document.getElementById("ws-project-client");
+  if (clientPick && typeof crmClients === "function") {
+    const keep = clientPick.value;
+    clientPick.innerHTML = `<option value="">${wsEsc(wsT("crm_node_none"))}</option>` + crmClients()
+      .map((c) => `<option value="${wsEsc(c.id)}">${wsEsc(c.name)}</option>`).join("");
+    clientPick.value = keep;
+  }
   list.innerHTML = projects.length
     ? projects.map((p) => wsProjectRow(p, active)).join("")
     : `<li class="empty muted">${wsEsc(wsT("ws_empty_projects"))}</li>`;
@@ -652,6 +671,17 @@ function wsRenderProject(id) {
   document.getElementById("ws-project-hist").textContent =
     `${wsT("proj_created")} ${wsDate(project.createdAt)} · ${wsT("proj_updated")} ${wsDate(project.updatedAt)}`;
 
+  // Chapter XXIV's path, drawn where the middle step lives. Until 2026-09-21 that was the
+  // job and the strip was on /zlecenia/; a job is a project now, so it is here. All three
+  // are derived on every draw and none of them is stored — crmChain() walks the links the
+  // rows already carry, so a project that changed hands this morning reads correctly.
+  if (typeof chnRenderStrip === "function") {
+    chnRenderStrip(document.getElementById("ws-chain"), crmChain("project", project.id), "project");
+    chnRenderQuotes(document.getElementById("ws-chain-quotes"), crmProjectQuotes(project.id));
+    chnRenderHistory(document.getElementById("ws-chain-history"),
+      crmHistory({ projectId: project.id }, 8));
+  }
+
   // Chapter XVII: "Projekt może pokazywać: koszt materiałów, inne koszty, sumę projektu."
   // The three come out of one call so they cannot disagree, and the sum is the two above it
   // added — never the estimate lines added to the materials, which would count a calculated
@@ -848,8 +878,25 @@ function buildProjectsPage() {
     if (!name) return;
     // The field is emptied only once the project is in the store. A write the browser
     // refused used to take the typed name with it (audit 2026-09-04, M3).
-    if (!wsAddProject(name)) return;
+    const rawValue = document.getElementById("ws-project-value").value.trim();
+    const valueMinor = rawValue ? crmMinor(rawValue) : null;
+    const project = wsAddProject(name, {
+      clientId: document.getElementById("ws-project-client").value,
+      status: document.getElementById("ws-project-status").value,
+      dueDate: document.getElementById("ws-project-due").value,
+      valueMinor,
+      currencyCode: valueMinor === null ? "" : crmCurrency(),
+      note: document.getElementById("ws-project-note").value,
+      color: document.getElementById("ws-project-color").value,
+    });
+    if (!project) return;
+    if (project.clientId && typeof crmLinkProject === "function") crmLinkProject(project.clientId, project.id);
     input.value = "";
+    ["ws-project-due", "ws-project-value", "ws-project-note", "ws-project-color"].forEach((id) => {
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("ws-project-client").value = "";
+    document.getElementById("ws-project-status").value = "new";
     // A new project is a new subject and the old undo is stale — but wsAddProject() has
     // already redrawn by the time we get here, so clearing the state without redrawing
     // again left the strip on screen offering a token nothing would restore.
