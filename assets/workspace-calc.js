@@ -70,16 +70,48 @@ function wsSurfacesFor(calcId) {
   return ["floor", "walls", "ceiling"];
 }
 
+/**
+ * The rooms on offer, one group per project.
+ *
+ * One flat list, newest first, put every project's kitchen next to every other project's
+ * kitchen, and people took to writing the project into the room's name to tell them
+ * apart. So the list is cut by project: the active one first — it is the one being
+ * counted — then the other live projects, then archived ones, and last the rooms with no
+ * project, or with one that was deleted. A group with no rooms is not drawn. Each group
+ * is `{ label, rooms }`; the label of the loose rooms is the one /projekty/ uses.
+ */
+function wsRoomGroups() {
+  const rooms = wsRooms();
+  const active = wsActiveProjectId();
+  const live = wsProjects();
+  const order = [
+    ...live.filter((p) => p.id === active),
+    ...live.filter((p) => p.id !== active),
+    ...wsArchivedProjects(),
+  ];
+  const groups = order
+    .map((p) => ({ label: p.name, rooms: rooms.filter((r) => r.projectId === p.id) }))
+    .filter((g) => g.rooms.length);
+  const known = new Set(order.map((p) => p.id));
+  const loose = rooms.filter((r) => !known.has(r.projectId));
+  if (loose.length) groups.push({ label: wsT("app_rooms_no_project"), rooms: loose });
+  return groups;
+}
+
 /** Rebuild the room `<select>` on one card from whatever is in the store now. */
 function wsFillRoomSelect(card) {
   const sel = card.querySelector("[data-ws-room]");
   if (!sel) return;
   const rooms = wsRooms();
   const keep = sel.value;
-  sel.innerHTML = `<option value="">${wsEsc(wsT("ws_room_none"))}</option>` + rooms.map((r) => {
-    const a = wsRoomAreas(r);
-    return `<option value="${wsEsc(r.id)}">${wsEsc(r.name)} — ${wsNum(a.floor)} m²</option>`;
-  }).join("");
+  const option = (r) =>
+    `<option value="${wsEsc(r.id)}">${wsEsc(r.name)} — ${wsNum(wsRoomAreas(r).floor)} m²</option>`;
+  const groups = wsRoomGroups();
+  // A single group would be a heading over the whole list, saying nothing the list does not.
+  sel.innerHTML = `<option value="">${wsEsc(wsT("ws_room_none"))}</option>` + (groups.length > 1
+    ? groups.map((g) =>
+      `<optgroup label="${wsEsc(g.label)}">${g.rooms.map(option).join("")}</optgroup>`).join("")
+    : rooms.map(option).join(""));
   if (rooms.some((r) => r.id === keep)) sel.value = keep;
   const bar = card.querySelector("[data-ws-bar]");
   if (bar) bar.hidden = rooms.length === 0;
@@ -128,6 +160,17 @@ function wsWireCard(card) {
     // taking the dimensions from one room and filing the answer under another is theirs to
     // decide — but the common case needs no second choice.
     card.dataset.wsRoomId = room.id;
+    // And the project that room belongs to: filed under whatever project the box happened
+    // to show, the room was not in it and the result was saved with no room at all. A new
+    // "Wstaw" is a newer choice than a room picked by hand earlier, so that pick is let go.
+    // An archived project cannot take a result, so its room fills the form and no more.
+    const box = card.querySelector("[data-ws-save-box]");
+    const pick = box && box.querySelector("[data-ws-room-pick]");
+    if (pick) delete pick.dataset.touched;
+    if (wsProjects().some((p) => p.id === room.projectId)) {
+      if (box) box.querySelector("[data-ws-project]").value = room.projectId;
+      if (room.projectId !== wsActiveProjectId()) wsSetActiveProject(room.projectId);
+    }
     const run = card.querySelector("[data-run]");
     if (run) run.click();
   });

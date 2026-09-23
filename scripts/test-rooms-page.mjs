@@ -510,6 +510,73 @@ head("4c. a project with no rooms offers no picker at all");
   await page.close();
 }
 
+head("4d. the room bar is grouped by project, and a room brings its project along");
+{
+  const page = await open(ctx, urlCalc("pl", "waste"), {
+    workspace: fixture(), active: "p1", ready: ".calc[data-wired=\"1\"]",
+  });
+  await page.waitForSelector("[data-ws-room]");
+  const groups = () => page.$$eval("[data-ws-room] optgroup", (g) => g.map((e) => ({
+    label: e.label, rooms: [...e.children].map((o) => o.value),
+  })));
+  eq("one group per project, the active one first, the loose rooms last",
+    JSON.stringify(await groups()), JSON.stringify([
+      { label: "Remont łazienki", rooms: ["r2", "r1"] },
+      { label: "Salon", rooms: ["r3"] },
+      { label: "Bez projektu", rooms: ["r4"] },
+    ]));
+
+  // A room of the project that is not open: its result belongs in its own project.
+  await page.selectOption("[data-ws-room]", "r3");
+  await page.selectOption("[data-ws-surface]", "floor");
+  await page.click("[data-ws-apply]");
+  await page.waitForSelector("[data-ws-save-box]");
+  eq("the save box moved to the room's project", await page.inputValue("[data-ws-project]"), "p2");
+  eq("with the room already chosen", await page.inputValue("[data-ws-room-pick]"), "r3");
+  eq("and the room's project is the active one now",
+    await page.evaluate(() => wsActiveProjectId()), "p2");
+  eq("which puts its rooms at the top of the bar",
+    await page.$eval("[data-ws-room] optgroup", (g) => g.label), "Salon");
+
+  // Back to a room of the first project, after a room was picked by hand in between.
+  await page.selectOption("[data-ws-project]", "p1");
+  await page.selectOption("[data-ws-room-pick]", "r2");
+  await page.selectOption("[data-ws-room]", "r1");
+  await page.click("[data-ws-apply]");
+  await page.waitForFunction(() => document.querySelector("[data-ws-room-pick]").value === "r1");
+  eq("a new Wstaw overrides the earlier hand pick", await page.inputValue("[data-ws-room-pick]"), "r1");
+
+  await page.click("[data-ws-save]");
+  await page.waitForFunction(() =>
+    JSON.parse(localStorage.getItem("materio-workspace-v1")).estimations.length === 3);
+  const saved = (await store(page)).estimations[2];
+  eq("the line went into that room's project", saved.projectId, "p1");
+  eq("under that room", JSON.parse(saved.inputJson)._room, "r1");
+
+  // A room with no project fills the form and leaves the project alone.
+  await page.selectOption("[data-ws-room]", "r4");
+  await page.click("[data-ws-apply]");
+  eq("a loose room does not move the project", await page.inputValue("[data-ws-project]"), "p1");
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
+}
+
+head("4e. with one project and no loose rooms the bar stays a flat list");
+{
+  const ws = fixture();
+  ws.projects = ws.projects.filter((p) => p.id === "p1");
+  ws.rooms = ws.rooms.filter((r) => r.projectId === "p1");
+  const page = await open(ctx, urlCalc("pl", "waste"), {
+    workspace: ws, active: "p1", ready: ".calc[data-wired=\"1\"]",
+  });
+  await page.waitForSelector("[data-ws-room]");
+  eq("no heading over a single group",
+    await page.$$eval("[data-ws-room] optgroup", (g) => g.length), 0);
+  eq("and every room is still there",
+    await page.$$eval("[data-ws-room] option", (o) => o.length), 3);
+  await page.close();
+}
+
 /* ---------------------------------------------------- 5. the index */
 
 head("5. the index says which project each room belongs to");
