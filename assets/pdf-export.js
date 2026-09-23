@@ -329,36 +329,63 @@ function pdfFillQuote(quoteId) {
     pdfClear();
     return false;
   }
-  const chain = crmChain("quote", quote.id);
-  const totals = crmQuoteTotals(quote.id);
-  const none = typeof t === "function" ? t("crm_node_none") : "";
-  pdfSet(doc, "subtitle", typeof t === "function" ? t("quopage_title") : "");
+  const summary = typeof crmQuoteSummary === "function" ? crmQuoteSummary(quote.id) : null;
+  const chain = summary || crmChain("quote", quote.id);
+  const totals = summary ? summary.totals : crmQuoteTotals(quote.id);
+  const word = (key) => typeof t === "function" ? t(key) : key;
+  pdfSet(doc, "subtitle", word("quo_doc_t"));
   pdfSet(doc, "quoteName", quote.name);
-  pdfSet(doc, "clientName", chain.client ? chain.client.name : none);
-  pdfSet(doc, "jobName", chain.job ? chain.job.name : none);
-  pdfSet(doc, "projectName", chain.project ? chain.project.name : none);
   pdfSet(doc, "date", pdfToday());
+
+  const client = chain.client || null;
+  const project = chain.project || null;
+  const recipient = [client && client.name, client && client.phone, client && client.email,
+    client && client.address, project && project.name];
+  pdfShow(doc, "recipient", recipient.some((value) => String(value || "").trim()));
+  for (const [slot, value] of [
+    ["clientName", client && client.name], ["clientPhone", client && client.phone],
+    ["clientEmail", client && client.email], ["clientAddress", client && client.address],
+    ["projectName", project && project.name && `${word("crm_node_project")}: ${project.name}`],
+  ]) {
+    const clean = String(value || "").trim();
+    pdfSet(doc, slot, clean);
+    pdfShow(doc, slot, Boolean(clean));
+  }
 
   const projectRows = quote.projectId ? pdfRows(quote.projectId) : [];
   const labour = Array.isArray(quote.labour) ? quote.labour : [];
-  const rows = projectRows.concat(labour.map((line) => ({
-    name: line.name,
-    qty: line.quantity === null ? "" : `${wsNum(line.quantity)} ${line.unit || ""}`.trim(),
-    minor: line.amountMinor || 0,
-    currencyCode: quote.currencyCode || totals.currencyCode || wsCurrency(),
-  })));
-  const body = pdfEl(doc, "rows");
-  if (body) body.innerHTML = rows.map((row) => `<tr><td>${wsEsc(row.name)}</td><td>${wsEsc(row.qty)}</td><td>${
+  const materialBody = pdfEl(doc, "materialRows");
+  if (materialBody) materialBody.innerHTML = projectRows.map((row) => `<tr><td>${wsEsc(row.name)}</td><td>${wsEsc(row.qty)}</td><td>${
     wsEsc(wsMoney(row.minor, row.currencyCode))}</td></tr>`).join("");
+  pdfShow(doc, "materialsTable", projectRows.length > 0);
+
+  const labourBody = pdfEl(doc, "labourRows");
+  if (labourBody) labourBody.innerHTML = labour.map((line) => {
+    const code = quote.currencyCode || totals.currencyCode || wsCurrency();
+    const rate = typeof crmLabourRate === "function" ? crmLabourRate(line) : null;
+    const how = line.quantity === null ? word("quo_lump")
+      : `${wsNum(line.quantity)} ${line.unit || ""} × ${rate === null ? "—" : wsMoney(Math.round(rate), code)}`.trim();
+    return `<tr><td>${wsEsc(line.name)}</td><td>${wsEsc(how)}</td><td>${wsEsc(wsMoney(line.amountMinor || 0, code))}</td></tr>`;
+  }).join("");
+  pdfShow(doc, "labourTable", labour.length > 0);
 
   const money = (minor) => minor === null ? "—" : wsMoney(minor, totals.currencyCode);
   const per = (field) => wsSumsText(totals.projectByCurrency, field);
   pdfSet(doc, "materials", totals.materials === null ? per("materials") : money(totals.materials));
   pdfSet(doc, "other", totals.other === null ? per("other") : money(totals.other));
+  const hasOther = totals.other === null
+    ? totals.projectByCurrency.some((row) => row.other)
+    : totals.other !== 0;
+  pdfShow(doc, "other", hasOther);
   pdfSet(doc, "labour", money(totals.labour));
+  pdfSet(doc, "subtotal", money(totals.subtotal));
+  pdfSet(doc, "marginLabel", `${word("quo_fig_margin")} ${wsNum(totals.marginPct)} %`);
   pdfSet(doc, "margin", money(totals.margin));
   pdfSet(doc, "total", money(totals.total));
   pdfShow(doc, "mixed", totals.mixed);
+  const note = String(quote.note || "").trim();
+  pdfSet(doc, "quoteNotes", note);
+  pdfShow(doc, "quoteNotes", Boolean(note));
   doc.hidden = false;
   return true;
 }
@@ -410,11 +437,18 @@ function pdfInit() {
       ? pdfFillQuote(id) : pdfFill(id, pdfOptions(form));
     if (!filled) return;
     if (!pdfAllowed()) return;
-    // The document is on the page and the rest of it is not, for the length of one print.
+    // A direct body child can be the only layout box in print. Hiding the old page with
+    // visibility kept all of its height and made that invisible height into blank sheets.
+    const home = doc.parentNode;
+    const marker = document.createComment("pdf-document-home");
+    home.insertBefore(marker, doc);
+    document.body.appendChild(doc);
     document.body.dataset.pdfPrint = "1";
     let fallbackHide = 0;
     const done = () => {
       delete document.body.dataset.pdfPrint;
+      if (marker.parentNode) marker.parentNode.insertBefore(doc, marker);
+      marker.remove();
       doc.hidden = true;
       window.removeEventListener("afterprint", done);
       if (fallbackHide) { clearTimeout(fallbackHide); fallbackHide = 0; }

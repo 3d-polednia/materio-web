@@ -29,7 +29,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { projectsMain } from "../src/pages.mjs";
+import { projectsMain, quotesMain } from "../src/pages.mjs";
 import { PDF_COPY, PDF_COPY_KEYS, pdfSplit } from "../src/pdf-copy.mjs";
 import { LANGS, DEFAULT_LANG } from "../src/site.mjs";
 
@@ -287,6 +287,22 @@ head("4. every string is the app's own");
   }
 }
 
+head("4b. the quote document has client-facing words in every language");
+{
+  for (const lang of LANGS) {
+    for (const key of ["quo_doc_t", "quo_doc_for", "quo_doc_notes", "quo_doc_name"]) {
+      const value = DICT[lang][key];
+      check(`${lang}: ${key} is written`, Boolean(value) && value !== key, value);
+    }
+    const { main } = quotesMain(lang, tr(lang), FEATURES);
+    check(`${lang}: the quote template has its document title`, main.includes(DICT[lang].quo_doc_t));
+  }
+  const source = read("src/pages.mjs").slice(read("src/pages.mjs").indexOf("function quotePdfBlock"),
+    read("src/pages.mjs").indexOf("export function projectsMain"));
+  check("the quote template has no removed job label", !source.includes('t("crm_node_job")'));
+  check("the quote template has no UI action as a missing value", !source.includes('t("crm_node_none")'));
+}
+
 head("5. the three templates keep their hole");
 {
   for (const lang of LANGS) {
@@ -321,11 +337,13 @@ head("6. what printing does to the page, and what it undoes");
   check("and on a timer, because some browsers never fire it", /setTimeout\(done,/.test(script));
   check("the document is hidden again", /doc\.hidden = true/.test(script));
 
-  check("the print rules hide by visibility, not display",
-    css.includes("body[data-pdf-print] * { visibility: hidden; }"));
-  // A display:none ancestor takes the document down with it, and the document is nested
-  // six levels inside the project screen.
-  check("and show the document back", css.includes("body[data-pdf-print] #ws-pdf-doc, body[data-pdf-print] #ws-pdf-doc * { visibility: visible; }"));
+  check("the document is moved to a direct child of body",
+    script.includes("document.body.appendChild(doc)"));
+  check("and restored to its original place", script.includes("marker.parentNode.insertBefore(doc, marker)"));
+  check("the print rules remove every other body child from layout",
+    css.includes("body[data-pdf-print] > :not(#ws-pdf-doc) { display: none !important; }"));
+  check("and keep the direct document in layout",
+    css.includes("body[data-pdf-print] > #ws-pdf-doc { display: block !important; width: 100%; }"));
   check("the configurator is never part of the document", css.includes("#ws-pdf-form"));
   check("the block is inside the print media query",
     css.indexOf("body[data-pdf-print]") > css.indexOf("@media print"));

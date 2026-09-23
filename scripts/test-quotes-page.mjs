@@ -226,6 +226,7 @@ const digits = (s) => String(s).replace(/\D/g, "");
 /* A rendered amount back as minor units. "1 064,96 zł" is 106496 — and "0,00 zł" is 0,
    which a string comparison against "0" would miss. */
 const minor = (s) => Number(digits(s));
+const pdfPages = (bytes) => (Buffer.from(bytes).toString("latin1").match(/\/Type\s*\/Page\b/g) || []).length;
 
 const QUOTES = urlQuotes("pl");
 const ctx = await context({ viewport: { width: 1280, height: 900 } });
@@ -698,38 +699,34 @@ head("7e. chapter XXVIII: the page holds together at every width it names");
   }
 }
 
-head("7f. both quote shapes print a complete PDF without a browser error");
+head("7f. the client quote prints as one complete page");
 {
-  const page = await open(ctx, QUOTES, { workspace: workspace(), crm: crmNoQuotes() });
-  const ids = await page.evaluate(() => {
-    const project = wsAddProject("PDF project");
-    wsAddItem({ projectId: project.id, name: "Tiles", quantity: 8, unit: "m²", costMajor: 320, currencyCode: "PLN" });
-    wsAddItem({ projectId: project.id, name: "Grout", quantity: 2, unit: "bag", costMajor: 70, currencyCode: "PLN" });
-    const quote = crmAddQuote({ name: "PDF quote", projectId: project.id });
-    crmAddLabour(quote.id, { name: "Laying", quantity: 8, unit: "m²", priceMajor: 90 });
-    crmAddLabour(quote.id, { name: "Cleanup", priceMajor: 250 });
-    const lump = crmAddQuote({ name: "Lump-sum PDF quote" });
-    crmAddLabour(lump.id, { name: "Consultation", priceMajor: 400 });
-    return { project: quote.id, lump: lump.id };
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  await page.evaluate(() => crmAddLabour("q1", { name: "Sprzątanie", priceMajor: 250 }));
+  await page.evaluate(() => {
+    window.__printed = 0;
+    window.print = () => { window.__printed++; };
+    // Keep the synthetic print open while Chromium renders it. A real print() blocks
+    // until its dialog closes; the stub returns immediately and would arm the safety timer.
+    window.setTimeout = () => 0;
   });
-
-  await page.goto(`${base}${QUOTES}?id=${ids.project}`, { waitUntil: "load" });
-  await page.waitForSelector("html[data-quotes-ready]");
-  await page.evaluate(() => { window.__printed = 0; window.print = () => { window.__printed++; }; });
   await page.click("#ws-pdf-form button[type=submit]");
-  eq("a project quote raises no page error", page.errors.length, 0);
-  eq("a project quote calls print once", await page.evaluate(() => window.__printed), 1);
-  eq("two materials and two labour lines make four PDF rows",
-    await page.$$eval('#ws-pdf-doc tbody[data-pdf="rows"] tr', (rows) => rows.length), 4);
-  const total = await page.$eval('#ws-pdf-doc [data-pdf="total"]', (n) => n.textContent.trim());
-  check("the project quote has a real PDF total", total !== "" && total !== "—", total);
-
-  await page.goto(`${base}${QUOTES}?id=${ids.lump}`, { waitUntil: "load" });
-  await page.waitForSelector("html[data-quotes-ready]");
-  await page.evaluate(() => { window.__printed = 0; window.print = () => { window.__printed++; }; });
-  await page.click("#ws-pdf-form button[type=submit]");
-  eq("a projectless lump-sum quote raises no page error", page.errors.length, 0);
-  eq("a projectless lump-sum quote calls print once", await page.evaluate(() => window.__printed), 1);
+  eq("the quote calls print once", await page.evaluate(() => window.__printed), 1);
+  const text = await page.$eval("#ws-pdf-doc", (n) => n.textContent.replace(/\s+/g, " ").trim());
+  check("the client's phone is printed", text.includes("600 100 200"), text);
+  eq("the Materiały table has two project rows",
+    await page.$$eval('#ws-pdf-doc tbody[data-pdf="materialRows"] tr', (rows) => rows.length), 2);
+  eq("the Robocizna table has two labour rows",
+    await page.$$eval('#ws-pdf-doc tbody[data-pdf="labourRows"] tr', (rows) => rows.length), 2);
+  check("one labour row says ryczałt", /ryczałt/i.test(text), text);
+  eq("Suma ends the summary",
+    await page.$eval("#ws-pdf-doc .pdf-pricing tr:last-child th", (n) => n.textContent.trim()), "Suma");
+  check("the quote note is printed", text.includes("Materiał kupuje klient."), text);
+  check("the UI action wording is absent", !text.includes("Brak — dodaj"), text);
+  await page.emulateMedia({ media: "print" });
+  const bytes = await page.pdf({ format: "A4", printBackground: true });
+  eq("the quote PDF is exactly one page", pdfPages(bytes), 1);
+  eq("the quote raises no page error", page.errors.length, 0);
   await page.close();
 }
 

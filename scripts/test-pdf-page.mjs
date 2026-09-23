@@ -235,6 +235,7 @@ async function openAll(page) {
 
 const docText = (page) => page.$eval("#ws-pdf-doc", (e) => e.textContent.replace(/\s+/g, " ").trim());
 const shown = (page, row) => page.$eval(`#ws-pdf-doc [data-pdf-row="${row}"]`, (e) => !e.hidden);
+const pdfPages = (bytes) => (Buffer.from(bytes).toString("latin1").match(/\/Type\s*\/Page\b/g) || []).length;
 
 /* ================================================================== 1. the block */
 
@@ -325,6 +326,21 @@ head("2b. the total on the document is the total on the screen");
   eq("the same figure, to the character", onPaper, onScreen);
   check("and it is the fixture's own", onPaper.includes("1259,85"), onPaper);
   eq("which is what wsProjectCosts() says", TOTAL_MINOR, 125985);
+  await page.close();
+}
+
+head("2c. the project PDF has no trailing blank page");
+{
+  const page = await openProject();
+  await page.evaluate(() => {
+    // A real print() blocks until its dialog closes. The test stub returns immediately,
+    // so leave the synthetic print open until page.pdf() has read it.
+    window.setTimeout = () => 0;
+  });
+  await page.click("#ws-pdf-form button[type=submit]");
+  await page.emulateMedia({ media: "print" });
+  const bytes = await page.pdf({ format: "A4", printBackground: true });
+  eq("the project PDF is exactly one page", pdfPages(bytes), 1);
   await page.close();
 }
 

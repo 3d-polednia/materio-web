@@ -943,7 +943,7 @@ head("9a. the quote owns the chain controls and the PDF document");
       (pdf.match(/if \(!pdfAllowed\(\)\) return;/g) || []).length >= 2);
   check("the quote PDF includes project rows and labour rows",
     pdf.includes("const projectRows = quote.projectId ? pdfRows(quote.projectId) : []") &&
-      pdf.includes("projectRows.concat(labour.map"));
+      pdf.includes('pdfEl(doc, "materialRows")') && pdf.includes('pdfEl(doc, "labourRows")'));
 }
 
 head("9b. the copy, in four languages");

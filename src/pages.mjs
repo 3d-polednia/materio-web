@@ -1496,29 +1496,47 @@ function quotePdfBlock(lang, t, features) {
               </form>
               <article id="ws-pdf-doc" class="pdf-doc" hidden>
                 <header class="pdf-head">
-                  <p class="pdf-sub" data-pdf="subtitle">${esc(t("quopage_title"))}</p>
+                  <p class="pdf-sub" data-pdf="subtitle">${esc(t("quo_doc_t"))}</p>
                   <p class="pdf-line"><b data-pdf="quoteName"></b></p>
-                  <p class="pdf-line"><span>${esc(t("crm_node_client"))}:</span> <span data-pdf="clientName"></span></p>
-                  <p class="pdf-line"><span>${esc(t("crm_node_job"))}:</span> <span data-pdf="jobName"></span></p>
-                  <p class="pdf-line"><span>${esc(t("crm_node_project"))}:</span> <span data-pdf="projectName"></span></p>
                   <p class="pdf-line"><span>${esc(c("pdf_date"))}:</span> <span data-pdf="date"></span></p>
                 </header>
-                <table class="pdf-table">
-                  <thead><tr>
-                    <th scope="col">${esc(c("pdfdoc_col_material"))}</th>
-                    <th scope="col">${esc(c("pdfdoc_col_qty"))}</th>
-                    <th scope="col">${esc(c("pdfdoc_col_value"))}</th>
-                  </tr></thead>
-                  <tbody data-pdf="rows"></tbody>
+                <section class="pdf-recipient" data-pdf-row="recipient" hidden>
+                  <h2>${esc(t("quo_doc_for"))}</h2>
+                  <p class="pdf-line" data-pdf-row="clientName" hidden data-pdf="clientName"></p>
+                  <p class="pdf-line" data-pdf-row="clientPhone" hidden data-pdf="clientPhone"></p>
+                  <p class="pdf-line" data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></p>
+                  <p class="pdf-line" data-pdf-row="clientAddress" hidden data-pdf="clientAddress"></p>
+                  <p class="pdf-line" data-pdf-row="projectName" hidden data-pdf="projectName"></p>
+                </section>
+                <section class="pdf-table-block" data-pdf-row="materialsTable" hidden>
+                  <h2>${esc(t("proj_mat_t"))}</h2>
+                  <table class="pdf-table">
+                    <thead><tr><th scope="col">${esc(t("quo_doc_name"))}</th><th scope="col">${esc(c("pdfdoc_col_qty"))}</th><th scope="col">${esc(c("pdfdoc_col_value"))}</th></tr></thead>
+                    <tbody data-pdf="materialRows"></tbody>
+                  </table>
+                </section>
+                <section class="pdf-table-block" data-pdf-row="labourTable" hidden>
+                  <h2>${esc(t("quo_labour_t"))}</h2>
+                  <table class="pdf-table">
+                    <thead><tr><th scope="col">${esc(t("quo_doc_name"))}</th><th scope="col">${esc(t("quo_labour_qty"))} × ${esc(t("quo_labour_price"))}</th><th scope="col">${esc(c("pdfdoc_col_value"))}</th></tr></thead>
+                    <tbody data-pdf="labourRows"></tbody>
+                  </table>
+                </section>
+                <table class="pdf-pricing">
+                  <tbody>
+                    <tr><th scope="row">${esc(t("quo_fig_materials"))}</th><td data-pdf="materials"></td></tr>
+                    <tr data-pdf-row="other" hidden><th scope="row">${esc(t("quo_fig_other"))}</th><td data-pdf="other"></td></tr>
+                    <tr><th scope="row">${esc(t("quo_fig_labour"))}</th><td data-pdf="labour"></td></tr>
+                    <tr><th scope="row">${esc(t("quo_fig_sub"))}</th><td data-pdf="subtotal"></td></tr>
+                    <tr><th scope="row" data-pdf="marginLabel">${esc(t("quo_fig_margin"))}</th><td data-pdf="margin"></td></tr>
+                    <tr class="pdf-strong"><th scope="row">${esc(t("quo_fig_total"))}</th><td data-pdf="total"></td></tr>
+                  </tbody>
                 </table>
-                <dl class="pdf-pricing">
-                  <div><dt>${esc(t("quo_fig_materials"))}</dt><dd data-pdf="materials"></dd></div>
-                  <div><dt>${esc(t("quo_fig_other"))}</dt><dd data-pdf="other"></dd></div>
-                  <div><dt>${esc(t("quo_fig_labour"))}</dt><dd data-pdf="labour"></dd></div>
-                  <div><dt>${esc(t("quo_fig_margin"))}</dt><dd data-pdf="margin"></dd></div>
-                  <div class="pdf-strong"><dt>${esc(t("quo_fig_total"))}</dt><dd data-pdf="total"></dd></div>
-                </dl>
                 <p class="pdf-line pdf-mixed" data-pdf-row="mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+                <section class="pdf-notes" data-pdf-row="quoteNotes" hidden>
+                  <h2>${esc(t("quo_doc_notes"))}</h2>
+                  <p data-pdf="quoteNotes"></p>
+                </section>
                 <p class="pdf-foot">${esc(c("pdfdoc_footer"))}</p>
               </article>
             </div>
