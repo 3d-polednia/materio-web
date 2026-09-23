@@ -10,7 +10,7 @@
  *
  *   1. the route — GUEST, indexable, one slug in ten languages, and no gate. A page that
  *      describes what somebody would be paying for, put behind the payment, is a circle;
- *   2. one source per statement — the five modules come from LM_FEATURES, the price from
+ *   2. one source per statement — the four modules come from LM_FEATURES, the price from
  *      assets/pay.js, the addresses from src/site.mjs. Nothing on this page is a second
  *      copy of anything, because a second copy is what starts disagreeing.
  *
@@ -181,11 +181,11 @@ for (const lang of LANGS) {
   check(`${lang}: it declares itself as a page in the site's tree`,
     ld && ld["@type"] === "BreadcrumbList", JSON.stringify(ld && ld["@type"]));
 
-  /* The five modules: the same list the wall and the Pro tab show, because it is the
+  /* The four modules: the same list the wall and the Pro tab show, because it is the
      same table. A page describing four of them, or six, would be the product being
      described twice. */
   const mods = proModules(LM_FEATURES);
-  eq(`${lang}: LiczMat Pro is five modules`, mods.length, 5);
+  eq(`${lang}: LiczMat Pro is four modules`, mods.length, 4);
   for (const f of mods) {
     has(t(`${f.key}_t`), `${f.id} is named`);
     has(t(`${f.key}_d`), `and ${f.id} is described`);

@@ -302,7 +302,6 @@ export function appMain(t, features) {
                 navItem("overview", "app_tab_overview", true),
                 navItem("projects", "app_tab_projects"),
                 navItem("clients", "app_tab_clients"),
-                navItem("jobs", "app_tab_jobs"),
                 navItem("quotes", "app_tab_quotes"),
                 navItem("schedule", "app_tab_schedule"),
               ])}
@@ -387,6 +386,8 @@ export function appMain(t, features) {
               <h2 data-i18n="app_projects">${esc(t("app_projects"))}</h2>
               <form id="project-form" class="inline-form">
                 ${field("project-name", "app_new_project", t, { maxlength: 120 })}
+                ${selectField("project-client", "job_client", t, "field-narrow")}
+                ${field("project-due", "job_due", t, { type: "date", required: false, cls: "field-narrow" })}
                 <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">${esc(t("app_add"))}</button>
               </form>
               <ul id="project-list" class="data-list"></ul>
@@ -420,27 +421,6 @@ export function appMain(t, features) {
                   <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_clients_new">${esc(t("app_clients_new"))}</button>
                 </form>
                 <ul id="acctclients-list" class="data-list"></ul>
-              </div>
-            </section>
-
-            <!-- Session 23 (chapter XXI), same move as Klienci above. crmAddJob()/
-                 crmUpdateJob()/crmSetJobStatus() (assets/crm.js) are shared verbatim with
-                 /zlecenia/, which stays exactly as it is. -->
-            <section data-panel="jobs" id="panel-jobs" role="tabpanel" aria-labelledby="tab-jobs" tabindex="0" hidden>
-              <div class="dash-head">
-                <h2 data-i18n="app_jobs_title">${esc(t("app_jobs_title"))}</h2>
-                <span id="acctjob-pro" class="chip" hidden><span id="acctjob-pro-chip"></span></span>
-              </div>
-              ${i("app_jobs_lead", "p", "muted")}
-              ${proGate(t, "jobs", features, DEFAULT_LANG, { id: "acctjob-gate" })}
-              <div id="acctjob-tool">
-                <form id="acctjob-form" class="inline-form">
-                  ${field("acctjob-name", "app_jobs_new", t, { maxlength: 120 })}
-                  ${selectField("acctjob-client", "app_clients_title", t, "field-narrow")}
-                  ${field("acctjob-due", "app_tab_schedule", t, { type: "date", required: false, cls: "field-narrow" })}
-                  <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_jobs_new">${esc(t("app_jobs_new"))}</button>
-                </form>
-                <ul id="acctjob-list" class="data-list"></ul>
               </div>
             </section>
 

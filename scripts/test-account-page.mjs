@@ -536,17 +536,17 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
     "Konto działa na darmowym planie LiczMat. LiczMat Pro odblokowuje moduły poniżej.");
 
   // Chapter XXV: understand what is Pro, and never meet a dead button.
-  /* The Pro tab stopped being the place that describes Pro on 2026-09-03: the five locked
+  /* The Pro tab stopped being the place that describes Pro on 2026-09-03: the locked
      cards were taken out of it and the description moved into proGate(), the wall drawn
-     inside Klienci, Zlecenia, Wyceny and Terminarz themselves. So the same rule is checked
-     where it now lives. The wall names the other four modules and links to none of them on
-     purpose — they are behind the same wall, and a link to another locked page is the dead
-     button by a longer route. */
+     inside Klienci, Wyceny and Terminarz themselves. So the same rule is checked where it
+     now lives. The wall names the other modules and links to none of them on purpose —
+     they are behind the same wall, and a link to another locked page is the dead button by
+     a longer route. Three, not four, since Zlecenia became a project (2026-09-22). */
   await free.click('[data-tab="clients"]');
   const gate = free.locator("#acctclients-gate");
   eq("the Klienci tab is gated and marked as Pro", 
     await gate.locator('.chip').first().innerText(), "Dostępne w LiczMat Pro");
-  eq("the other four Pro modules are described in the wall", await gate.locator(".pw-incl-list li").count(), 4);
+  eq("the other three Pro modules are described in the wall", await gate.locator(".pw-incl-list li").count(), 3);
   check("they are described as text without links, so no dead buttons", 
     (await gate.locator(".pw-incl-list a").count()) === 0);
 
@@ -775,7 +775,7 @@ head("9d. the Materiały tab: prices are PRO since 2026-09-04");
 
 /* --- 10. the tabs, the language switch, the phone ------------------------------------ */
 
-head("10. twelve tabs, reachable from the keyboard");
+head("10. eleven tabs, reachable from the keyboard");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
   const page = await openApp(ctx, "/app/", { accounts: ACCOUNT });
@@ -786,7 +786,7 @@ head("10. twelve tabs, reachable from the keyboard");
 
   // 2026-09-03: The workspace tab strip became a sidebar. Counting the navItem() calls
   // in src/app-pages.mjs yields 12 entries (.app-nav-item).
-  eq("there are twelve", await page.locator(".app-nav-item").count(), 12);
+  eq("there are eleven", await page.locator(".app-nav-item").count(), 11);
   eq("only the selected one is in the tab order",
     await page.locator('.app-nav-item[tabindex="0"]').count(), 1);
 

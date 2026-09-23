@@ -368,7 +368,7 @@ head("3. the whole path, clicked: project → client → quote → project");
   await page.waitForSelector("#crm-client-body:not([hidden])");
   eq("the client opens", (await page.textContent("#crm-title")).trim(), "Jan Kowalski");
   check("and the project is listed under them",
-    (await rows(page, "#crm-client-jobs"))[0].includes("Remont łazienki"));
+    (await rows(page, "#crm-client-projects"))[0].includes("Remont łazienki"));
 
   // KLIENT → WYCENA
   await page.click("#crm-client-quotes a");

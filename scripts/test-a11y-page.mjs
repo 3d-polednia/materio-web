@@ -175,7 +175,6 @@ async function context(opts = {}) {
 function readyFor(url) {
   if (url.startsWith("/projekty/")) return "html[data-ws-ready]";
   if (url.startsWith("/klienci/")) return "html[data-crm-ready]";
-  if (url.startsWith("/zlecenia/")) return "html[data-jobs-ready]";
   if (url.startsWith("/wyceny/")) return "html[data-quotes-ready]";
   if (url.startsWith("/terminarz/")) return "html[data-schedule-ready]";
   return null;
@@ -223,6 +222,7 @@ const ring = (page) => page.evaluate(() => {
     width: px,
     style: s.outlineStyle,
     colour: s.outlineColor,
+    type: el.getAttribute("type"),
     // A field marks focus with its border as well; either one on its own is enough.
     border,
     ok: (px >= 2 && s.outlineStyle !== "none" && !/rgba\(0, 0, 0, 0\)/.test(s.outlineColor)),
@@ -278,7 +278,6 @@ head("2. every control the browser sees has a name");
     ["/sklepy/", {}],
     ["/app/dashboard/", { level: "liczmat" }],
     ["/klienci/", { crm: true, level: "pro" }],
-    ["/zlecenia/", { crm: true, level: "pro" }],
     ["/wyceny/", { crm: true, level: "pro" }],
     ["/terminarz/", { crm: true, level: "pro" }],
     ["/liczmat-pro/", {}],
@@ -307,13 +306,23 @@ head("3. the focus is visible, wherever it is");
     const page = await open(ctx, url);
     const seen = [];
     let missing = null;
+    // Chromium's <input type="date"> is FOUR tab stops inside one element: the day, the
+    // month and the year, and then a picker button it paints itself in the shadow DOM.
+    // document.activeElement is the host for all four, but on the last one the host stops
+    // matching :focus-visible — the ring the visitor sees is on a part no stylesheet can
+    // reach and no getComputedStyle on the host can read. So one such element is ringless
+    // only when none of its consecutive stops drew a ring.
+    let ringed = { what: null, ok: false };
     for (let i = 0; i < 45 && !missing; i++) {
       await page.keyboard.press("Tab");
       const what = await focused(page);
       if (what === "body" || what === "html") break;
       seen.push(what);
       const r = await ring(page);
-      if (r && !r.ok) missing = `${what}: outline ${r.width}px ${r.style} ${r.colour}`;
+      if (r && !r.ok && !(r.type === "date" && what === ringed.what && ringed.ok)) {
+        missing = `${what}: outline ${r.width}px ${r.style} ${r.colour}`;
+      }
+      ringed = { what, ok: r ? r.ok || (what === ringed.what && ringed.ok) : false };
     }
     check(`${url}: every stop on the way through has a ring`, !missing, missing);
     check(`${url}: and the walk got somewhere`, seen.length > 8, `${seen.length} stops`);

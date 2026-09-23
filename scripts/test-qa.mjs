@@ -716,7 +716,7 @@ async function walk(cfg) {
 
   head(`${who} — 15. historia: the whole walk, read back off the documents`);
   await go(clientUrl);
-  const jobs = await page.$$eval("#crm-client-jobs > li", (li) =>
+  const jobs = await page.$$eval("#crm-client-projects > li", (li) =>
     li.map((n) => n.textContent.replace(/\s+/g, " ").trim()));
   check("the client's project is listed", jobs.some((r) => r.includes("Remont QA")), jobs.join(" | "));
   const quotes = await page.$$eval("#crm-client-quotes > li", (li) =>
@@ -814,9 +814,9 @@ async function walk(cfg) {
 
   head(`${who} — 16d. the Back button, walked back up chapter XXIV's chain`);
   await go(clientUrl);
-  // The client's section lists their projects since 2026-09-21; it listed their jobs
-  // before, and the key it is drawn under is still cli_jobs_* for that reason.
-  await follow("#crm-client-jobs li a", openProject);
+  // The client's section lists their projects. It listed their jobs until 2026-09-21,
+  // and the second list that survived that merge went with the jobs vocabulary itself.
+  await follow("#crm-client-projects li a", openProject);
   await page.goBack({ waitUntil: "load" });
   await page.waitForSelector("html[data-crm-ready]");
   eq("Back is the client the project was opened from",

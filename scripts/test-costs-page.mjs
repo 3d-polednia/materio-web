@@ -557,15 +557,19 @@ head("7. the widths chapter XXVIII names");
       document.documentElement.scrollWidth - document.documentElement.clientWidth);
     check(`${width}px: nothing runs off the side`, over <= 1, `${over}px wider than the viewport`);
 
-    // The three figures are the answer to "what does this cost" and have to be readable
-    // without sideways scrolling on the narrowest phone the chapter names.
+    // The figures are the answer to "what does this cost" and have to be readable without
+    // sideways scrolling on the narrowest phone the chapter names. Since 2026-09-21 the
+    // project also carries an agreed amount and what is left of it (#ws-biz-figs), and that
+    // pair stays hidden until somebody types the amount in — a figure nobody can see is not
+    // a figure that has to fit, so the drawn ones are what is counted and measured.
     const figs = await page.$$eval(".ws-project-figs .ws-project-fig", (n) => n.map((e) => {
       const r = e.getBoundingClientRect();
       return { seen: r.width > 0 && r.height > 0, right: r.right };
     }));
-    eq(`${width}px: all four figures are drawn`, figs.length, 4);
+    const drawn = figs.filter((f) => f.seen);
+    eq(`${width}px: all four cost figures are drawn`, drawn.length, 4);
     check(`${width}px: and each is inside the viewport`,
-      figs.every((f) => f.seen && f.right <= width + 1), JSON.stringify(figs));
+      drawn.every((f) => f.right <= width + 1), JSON.stringify(figs));
 
     // The price field is typed into with a thumb, in a shop.
     await page.click(`${MATS} li[data-id="s3"] [data-edit]`);

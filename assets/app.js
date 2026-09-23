@@ -225,7 +225,6 @@ async function boot() {
   wireAccountPanel();
   wireSyncPanel();
   wireClientsPanel();
-  wireJobsPanel();
   wireQuotesPanel();
   wireSchedulePanel();
   wireMaterialsPanel();
@@ -235,7 +234,6 @@ async function boot() {
   // waiting for onSignedIn(). Przegląd/Pomieszczenia draw once state.projects/state.rooms
   // arrive instead — see the note at the end of renderProjects()/renderRooms().
   renderClients();
-  renderJobs();
   renderQuotes();
   renderSchedule();
   renderMaterialsPanel();
@@ -244,7 +242,6 @@ async function boot() {
   // one prefix per tab so the four cannot draw over each other's state.
   if (typeof pwMount === "function") {
     pwMount("acctclients", "clients");
-    pwMount("acctjob", "jobs");
     pwMount("acctquo", "quotes");
     pwMount("acctcal", "calendar");
   }
@@ -263,7 +260,6 @@ async function boot() {
   // level, the dates and both lists in the previous one.
   document.addEventListener("langchange", () => {
     renderClients();
-    renderJobs();
     renderQuotes();
     renderSchedule();
     renderMaterialsPanel();
@@ -1058,7 +1054,6 @@ function wireTabs() {
     if (focus) btn.focus();
     if (btn.dataset.tab === "overview") renderOverview();
     if (btn.dataset.tab === "clients") renderClients();
-    if (btn.dataset.tab === "jobs") renderJobs();
     if (btn.dataset.tab === "quotes") renderQuotes();
     if (btn.dataset.tab === "schedule") renderSchedule();
     if (btn.dataset.tab === "materials") renderMaterialsPanel();
@@ -1162,9 +1157,20 @@ async function maybeMountAdmin(user) {
 const projectDoc = (id, uid = state.uid) => fb.doc(db, "users", uid, "projects", id);
 const roomDoc = (id, uid = state.uid) => fb.doc(db, "users", uid, "rooms", id);
 
-async function addProject(name) {
+async function addProject(name, fields = {}) {
   const now = Date.now();
-  await fb.setDoc(projectDoc(newId()), { name, archived: false, ...syncFields(now) });
+  const id = newId();
+  const row = {
+    name,
+    archived: false,
+    clientId: fields.clientId || "",
+    status: "new",
+    dueDate: fields.dueDate || "",
+    valueMinor: 0,
+    ...syncFields(now),
+  };
+  await fb.setDoc(projectDoc(id), row);
+  return { id, ...row };
 }
 
 /**
@@ -1195,18 +1201,24 @@ async function tombstone(ref, row, fields) {
 }
 
 function renderProjects() {
+  fillClientSelect($("project-client"));
   const list = $("project-list");
   if (!state.projects.length) {
     list.innerHTML = `<li class="empty muted">${T("app_empty_projects")}</li>`;
   } else {
-    list.innerHTML = state.projects.map((p) => `<li data-id="${escapeHtml(p.id)}" class="app-project hierarchy-l1">
-      <span class="row-name">${escapeHtml(p.name)}${p.archived ? ` <em class="muted">(${T("app_archived")})</em>` : ""}</span>
+    list.innerHTML = state.projects.map((p) => {
+      const client = p.clientId && typeof crmClient === "function" ? crmClient(p.clientId) : null;
+      const statuses = typeof PROJECT_STATUS !== "undefined" ? PROJECT_STATUS : [p.status || "new"];
+      return `<li data-id="${escapeHtml(p.id)}" class="app-project hierarchy-l1">
+      <span class="row-name">${escapeHtml(p.name)}${client ? ` <em class="muted">${escapeHtml(client.name)}</em>` : ""}${p.dueDate ? ` <em class="muted">${fmtDay(p.dueDate)}</em>` : ""}${p.archived ? ` <em class="muted">(${T("app_archived")})</em>` : ""}</span>
       <span class="row-actions">
+        <select data-status aria-label="${T("job_status")}">${statuses.map((s) => `<option value="${s}"${s === (p.status || "new") ? " selected" : ""}>${T("job_st_" + s)}</option>`).join("")}</select>
         <button type="button" class="btn btn-ghost btn-sm" data-share>${T("app_share")}</button>
         <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
       </span>
       ${roomBlock(p.id)}
-    </li>`).join("");
+    </li>`;
+    }).join("");
   }
   // Przegląd's project stats read state.projects, which only this function and
   // renderRooms() ever change — see the note above renderOverview().
@@ -1351,8 +1363,14 @@ function wireWorkspace() {
     const input = $("project-name");
     const name = input.value.trim().slice(0, 120);
     if (!name) return;
+    const clientId = $("project-client").value;
+    const dueDate = $("project-due").value;
     input.value = "";
-    try { await addProject(name); } catch (err) { status(T("app_err_unknown"), true); }
+    $("project-due").value = "";
+    try {
+      const project = await addProject(name, { clientId, dueDate });
+      if (project.clientId && typeof crmLinkProject === "function") crmLinkProject(project.clientId, project.id);
+    } catch (err) { status(T("app_err_unknown"), true); }
   });
 
   // Chapter XVIII's room, added inside the project it belongs to. The form is redrawn with
@@ -1406,6 +1424,20 @@ function wireWorkspace() {
         status(T("app_err_unknown"), true);
       }
     }
+  });
+
+  $("project-list").addEventListener("change", async (e) => {
+    const statusSelect = e.target.closest("[data-status]");
+    const li = e.target.closest("li[data-id]");
+    if (!statusSelect || !li) return;
+    const project = state.projects.find((p) => p.id === li.dataset.id);
+    if (!project) return;
+    try {
+      await fb.setDoc(projectDoc(project.id), {
+        status: statusSelect.value,
+        updatedAt: Date.now(),
+      }, { merge: true });
+    } catch (err) { status(T("app_err_unknown"), true); }
   });
 
   $("room-list").addEventListener("click", async (e) => {
@@ -1573,76 +1605,19 @@ function wireClientsPanel() {
     if (!confirm(T("app_row_delete_confirm"))) return;
     crmDeleteClient(li.dataset.id);
     renderClients();
-    renderJobs();
+    renderProjects();
     renderOverview();
     status(T("app_row_deleted"));
   });
 }
 
-/* ----------------------------------------------------------------------------- Zlecenia */
+/* ----------------------------------------------------------------------------- Projekty: klient */
 
 function fillClientSelect(select) {
   if (!select || typeof crmClients !== "function") return;
   const rows = crmClients();
   select.innerHTML = `<option value="">${T("app_clients_title")}</option>` +
     rows.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`).join("");
-}
-
-function renderJobs() {
-  fillClientSelect($("acctjob-client"));
-  const list = $("acctjob-list");
-  if (!list || typeof wsAllProjects !== "function") return;
-  const rows = wsAllProjects();
-  list.innerHTML = rows.length ? rows.map((j) => {
-    const client = j.clientId && typeof crmClient === "function" ? crmClient(j.clientId) : null;
-    const statuses = typeof PROJECT_STATUS !== "undefined" ? PROJECT_STATUS : [j.status];
-    return `<li data-id="${escapeHtml(j.id)}">
-      <span class="row-name">${escapeHtml(j.name)}${client ? ` <em class="muted">${escapeHtml(client.name)}</em>` : ""}${j.dueDate ? ` <em class="muted">${fmtDay(j.dueDate)}</em>` : ""}</span>
-      <span class="row-actions">
-        <select data-status aria-label="${T("job_st_" + j.status)}">${statuses.map((s) => `<option value="${s}"${s === j.status ? " selected" : ""}>${T("job_st_" + s)}</option>`).join("")}</select>
-        <a class="btn btn-ghost btn-sm" href="${proLink("projects", j.id)}">${T("app_open_full")}</a>
-        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
-      </span>
-    </li>`;
-  }).join("") : `<li class="empty muted">${T("app_jobs_empty")}</li>`;
-}
-
-function wireJobsPanel() {
-  const form = $("acctjob-form");
-  if (!form) return;
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const nameInput = $("acctjob-name");
-    const name = nameInput.value.trim();
-    if (!name || typeof wsAddProject !== "function") return;
-    const project = wsAddProject(name, { clientId: $("acctjob-client").value, dueDate: $("acctjob-due").value });
-    if (project && project.clientId && typeof crmLinkProject === "function") crmLinkProject(project.clientId, project.id);
-    nameInput.value = "";
-    $("acctjob-due").value = "";
-    renderJobs();
-    renderOverview();
-    renderSchedule();
-  });
-  const list = $("acctjob-list");
-  list.addEventListener("click", (e) => {
-    const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-del]") || typeof wsDeleteProject !== "function") return;
-    if (!confirm(T("app_row_delete_confirm"))) return;
-    wsDeleteProject(li.dataset.id);
-    renderJobs();
-    renderOverview();
-    renderSchedule();
-    status(T("app_row_deleted"));
-  });
-  list.addEventListener("change", (e) => {
-    const sel = e.target.closest("[data-status]");
-    const li = e.target.closest("li[data-id]");
-    if (!sel || !li || typeof wsUpdateProject !== "function") return;
-    wsUpdateProject(li.dataset.id, { status: sel.value });
-    renderJobs();
-    renderOverview();
-    renderSchedule();
-  });
 }
 
 /* ------------------------------------------------------------------------------ Wyceny */

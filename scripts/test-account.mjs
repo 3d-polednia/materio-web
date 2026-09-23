@@ -289,11 +289,11 @@ head("8. /app/ carries the account system in every language");
   // Every sidebar tab, each pointing at the panel it opens. "Pomieszczenia" was folded
   // into the project it belongs to after chapter XVIII, and stayed folded for a long
   // time — session 20's own note on that lived here until 2026-09-03, when the owner
-  // asked for it back as a tab of its own alongside the new Klienci/Zlecenia/Wyceny/
+  // asked for it back as a tab of its own alongside the new Klienci/Wyceny/
   // Terminarz/Materiały tabs (see src/app-pages.mjs). It is back BESIDE the project-row
   // view, not instead of it — see the two checks below the loop.
   for (const id of [
-    "overview", "projects", "clients", "jobs", "quotes", "schedule",
+    "overview", "projects", "clients", "quotes", "schedule",
     "materials", "rooms", "profile", "sync", "pro", "account",
   ]) {
     check(`the "${id}" tab points at its panel`,

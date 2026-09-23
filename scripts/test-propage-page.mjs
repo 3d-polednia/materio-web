@@ -175,8 +175,8 @@ head("1. what a visitor with no account sees");
   const page = await open(ctx, PRO);
 
   eq("the page is the one about Pro", await page.textContent("h1"), "LiczMat Pro");
-  eq("the five modules are on it", await page.locator(".pro-mod").count(), 5);
-  for (const name of ["Klienci", "Zlecenia", "Wyceny", "Terminarz", "Historia i CRM"]) {
+  eq("the four modules are on it", await page.locator(".pro-mod").count(), 4);
+  for (const name of ["Klienci", "Wyceny", "Terminarz", "Historia i CRM"]) {
     check(`${name} is named`, (await page.textContent("main")).includes(name));
   }
 
@@ -260,7 +260,7 @@ head("3. a Pro account is shown their plan, not a price");
     await page.$eval("#pro-yours .chip", (n) => n.classList.contains("on")));
   // Everything else about the product is still readable: this is the page that describes
   // Pro, and a subscriber is allowed to read what they are paying for.
-  eq("the five modules are still described", await page.locator(".pro-mod").count(), 5);
+  eq("the four modules are still described", await page.locator(".pro-mod").count(), 4);
   await page.close();
 
   // A free account is quoted the price, exactly like a guest: they are the visitor the
@@ -341,7 +341,7 @@ head("6. with no script at all — the page still says what Pro is and what it c
   await page.goto(base + PRO, { waitUntil: "load" });
 
   eq("the page is there", await page.textContent("h1"), "LiczMat Pro");
-  eq("the five modules are there", await page.locator(".pro-mod").count(), 5);
+  eq("the four modules are there", await page.locator(".pro-mod").count(), 4);
   eq("the monthly price is in the markup and visible",
     (await page.textContent('[data-pw-plan="monthly"] [data-pw-price]')).trim(),
     priceIn("PLN", "pl", "monthly"));

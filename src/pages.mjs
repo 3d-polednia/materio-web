@@ -2137,15 +2137,6 @@ export function clientsMain(lang, t, features) {
           <!-- Chapter XX: "Klient może posiadać … zlecenia", and chapter XXIV's path runs
                through them. The job is written on /zlecenia/ — this is the client's end of
                the same link, read-only, so one screen owns the writes. -->
-          <section class="dash-sec">
-            <div class="dash-head">
-              <h2>${esc(t("cli_jobs_t"))}</h2>
-              <a class="dash-more" href="${urlProjects(lang)}">${esc(t("cli_jobs_all"))}</a>
-            </div>
-            <p class="muted">${esc(t("cli_jobs_d"))}</p>
-            <ul id="crm-client-jobs" class="data-list"></ul>
-          </section>
-
           <!-- Chapter XX: "Klient może posiadać … wyceny", and the fourth step of chapter
                XXIV's path seen from its first. Nothing about the link is stored on the
                client: a quote keeps its project, the client keeps their projects, and

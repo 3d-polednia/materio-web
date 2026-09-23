@@ -87,6 +87,38 @@ Tutaj zostaje wyłącznie to, co żywe: tabela postępu, dwie ostatnie sesje, li
 zrobienia w konsolach, znane ograniczenia i otwarte decyzje. Pełna lista otwartych wątków
 obu repozytoriów, przeglądana razem z tym plikiem, jest w `Obsidian/Liczmat/Meta/Otwarte watki.md`.
 
+## Usunięcie modułu zleceń po scaleniu z projektami (2026-09-23)
+
+Panel i marketingowa pozycja „Zlecenia” zniknęły. Klient, termin i status są teraz
+obsługiwane bezpośrednio w panelu projektów na `/app/`; strona klienta nie powtarza już
+listy tych samych projektów pod dawną nazwą. Wycena pokazuje tylko wybór klienta i projektu,
+a terminarz opisuje i otwiera projekty. Stare adresy `/zlecenia/` i ich wersje językowe
+pozostają przekierowaniami do projektów. Moduły Pro są cztery, nie pięć, i wszystkie
+trzynaście słowników mówi o tym tą samą liczbą.
+
+Martwe klucze interfejsu usunięto ze wszystkich słowników, a dwadzieścia siedem kluczy,
+których polska treść przestała mówić o zleceniu, przetłumaczono na pozostałych dwanaście
+języków — `PL_ONLY` jest wyłączone i zostaje wyłączone, więc zamrożenie nie było opcją.
+STAMP: `20260923a`.
+
+**Sześć zestawów testów prowadziło przez usunięty moduł i trzeba było je poprawić.**
+`test-crm-page`, `test-qa` i `test-a11y-page` szukały `#crm-client-jobs` albo czekały na
+`html[data-jobs-ready]` z `/zlecenia/`, którego przekierowanie nie stawia; `test-mobile`
+odwiedzało dwa adresy zleceń; `test-account-page` liczyło dwanaście zakładek `/app/` i
+cztery moduły w ścianie Pro. Dwa znaleziska nie miały ze zleceniami nic wspólnego:
+
+1. `test-costs-page` padało na wszystkich sześciu szerokościach od 2026-09-21 — commit
+   `5ab8a3334` dołożył dwie figury (uzgodniona kwota i ile zostało) w domyślnie ukrytym
+   `#ws-biz-figs`, a suita dalej żądała czterech i wymagała, żeby każda była widoczna.
+   Liczone i mierzone są teraz figury narysowane.
+2. `test-a11y-page` zgłaszało brak obwódki focusa na `input#ws-biz-due`. Sonda w Chromium:
+   pole daty to **cztery** przystanki Tab w jednym elemencie — dzień, miesiąc, rok i
+   przycisk kalendarza rysowany przez przeglądarkę w shadow DOM. Na trzech pierwszych
+   obwódka jest (`2px solid`), na czwartym host przestaje pasować do `:focus-visible`
+   i `getComputedStyle` widzi domyślne `3px none`. To ograniczenie pomiaru, nie brak
+   obwódki: element jest bez obwódki dopiero, gdy nie ma jej na żadnym ze swoich kolejnych
+   przystanków.
+
 ## Wyceny: wybór powiązań i eksport PDF (2026-09-18)
 
 Zgłoszenie właściciela zamknięte w drzewie roboczym. `/wyceny/?id=…` ma teraz selektory

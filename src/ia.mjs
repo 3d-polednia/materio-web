@@ -321,8 +321,7 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "clients", localized: true, indexable: false,
     path: urlJobs,
-    gate: "None of its own — it holds nothing to gate. It is a redirect, and the page " +
-      "it sends the visitor to carries chapter XXV's wall.",
+    gate: "None — it holds nothing and only redirects to the public projects page.",
     note: "The address chapter XXI's job list answered at, from session 23 until the " +
       "merge of 2026-09-21. A job is a project now — the project carries the client, the " +
       "status, the deadline and the agreed amount — so there is nothing here to list. " +
@@ -394,7 +393,7 @@ export const ROUTES = [
       "(chapter XXI's `termin`), so the page reads `jobs` through crmSchedule() and its " +
       "single write is crmUpdateJob(). A `calendar` collection of its own would give one " +
       "date two homes and let them disagree. It is also why the route has no `?id=` " +
-      "view: a row opens the job it belongs to, on /zlecenia/.",
+      "view: a row opens the project it belongs to, on /projekty/.",
   },
 
   /* ---------------------------------------------------------------- account */
@@ -760,8 +759,7 @@ export const FLOWS = [
     title: "LICZMAT PRO",
     steps: [
       { route: "clients" },
-      { route: "jobs", via: "status + termin" },
-      { route: "project", via: "zlecenie → projekt" },
+      { route: "project", via: "status + termin" },
       { route: "estimate", via: "materiały + koszty" },
       { route: "quotes", via: "robocizna + marża" },
       { route: "calendar", via: "termin" },

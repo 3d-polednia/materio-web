@@ -221,9 +221,9 @@ head("4. the table and src/ia.mjs agree about what is Pro");
       !proModules(LM_FEATURES).some((m) => m.id === f.id));
     check(`and it still has a name and a line to put on a wall`, Boolean(f.key));
   }
-  eq("the two of them are costs and pdf",
+  eq("the three of them are costs, pdf and the retired jobs redirect",
     LM_FEATURES.filter((f) => f.level === LEVEL.PRO && f.module === false).map((f) => f.id).join(","),
-    "costs,pdf");
+    "costs,pdf,jobs");
   // Chapter XXIV is a path through the other four, not a page. `pdf` is the second: it is
   // offered on /projekty/ and on /kosztorys/ and names neither, which is why proGate()
   // takes a `back` route from the page that draws its wall.
@@ -545,10 +545,10 @@ head("6d. the wall as it is built, in ten languages");
 head("7. the Pro modules, in the order the plan builds them");
 {
   const mods = proModules(LM_FEATURES);
-  eq("five of them", mods.length, 5);
+  eq("four of them", mods.length, 4);
   eq("in session order", mods.map((m) => m.id).join(),
-    "clients,jobs,quotes,calendar,crm");
-  eq("which is chapter XXXII's order", mods.map((m) => m.session).join(), "22,23,24,25,26");
+    "clients,quotes,calendar,crm");
+  eq("which is chapter XXXII's remaining order", mods.map((m) => m.session).join(), "22,24,25,26");
   for (const m of mods) {
     check(`"${m.id}" has a name and a line under it`, !!m.key);
   }
@@ -556,9 +556,9 @@ head("7. the Pro modules, in the order the plan builds them");
   // and the card has to follow the route rather than a hard-coded sentence. A module
   // whose page exists is offered; one whose session has not happened yet says so and
   // links nowhere, which is chapter XXV's "never a dead button" in both directions.
-  const BUILT = ["clients", "jobs", "quotes", "calendar"];
+  const BUILT = ["clients", "quotes", "calendar"];
   eq("clients is built — session 22", route("clients").status, STATUS.LIVE);
-  eq("and jobs — session 23", route("jobs").status, STATUS.LIVE);
+  eq("and the retired jobs URL still answers", route("jobs").status, STATUS.LIVE);
   eq("and quotes — session 24", route("quotes").status, STATUS.LIVE);
   eq("and the terminarz — session 25", route("calendar").status, STATUS.LIVE);
   // The fifth is chapter XXIV's CRM, and it has no route of its own on purpose: it is a
@@ -618,9 +618,9 @@ head("9. /app/ carries the Pro tab");
   has('aria-labelledby="tab-pro"', "and which points back");
   // 2026-09-03: the flat strip became a sidebar (.app-nav-item, not .app-tab — see
   // src/app-pages.mjs), and it grew from five items to twelve: the new Przegląd/Klienci/
-  // Zlecenia/Wyceny/Terminarz/Materiały/Pomieszczenia tabs sit beside the five that were
+  // Wyceny/Terminarz/Materiały/Pomieszczenia tabs sit beside the five that were
   // always here.
-  eq("twelve sidebar items now, and the panels match",
+  eq("eleven sidebar items now, and the panels match",
     (html.match(/class="app-nav-item"/g) || []).length,
     (html.match(/data-panel="/g) || []).length);
 
@@ -632,12 +632,12 @@ head("9. /app/ carries the Pro tab");
   // Until 2026-09-03 the Pro tab also listed the five modules as locked cards
   // (proModuleCard()) — chapter XXV's "a free user should understand which features are
   // Pro". That understanding now happens live, at the moment a free account opens one of
-  // the four real tabs Klienci/Zlecenia/Wyceny/Terminarz have become: each embeds
+  // the three real tabs Klienci/Wyceny/Terminarz have become: each embeds
   // proGate() for its own feature id, which is what is checked here instead of a card on
   // this one tab. See the note above proPanel() in src/pro.mjs.
   // The id prefixes match assets/paywall.js's pwMount() calls in assets/app.js.
-  const gatePrefix = { clients: "acctclients", jobs: "acctjob", quotes: "acctquo", calendar: "acctcal" };
-  for (const feature of ["clients", "jobs", "quotes", "calendar"]) {
+  const gatePrefix = { clients: "acctclients", quotes: "acctquo", calendar: "acctcal" };
+  for (const feature of ["clients", "quotes", "calendar"]) {
     has(`id="${gatePrefix[feature]}-gate"`, `the "${feature}" tab carries its own live wall`);
   }
   // proGate() (src/pro.mjs) predates /app/'s in-place picker: everywhere else it is used
@@ -646,8 +646,8 @@ head("9. /app/ carries the Pro tab");
   // 2026-09-10. Every string it prints is tagged now, which is why the chip is matched
   // with its attribute.
   const lockedChip = `<span class="chip" data-i18n="pro_locked">${DICT.pl.pro_locked}</span>`;
-  eq("one pro_locked chip per walled tab, inside those four gates",
-    html.split(lockedChip).length - 1, 4);
+  eq("one pro_locked chip per walled tab, inside those three gates",
+    html.split(lockedChip).length - 1, 3);
 
   // Materiały and Pomieszczenia carry no wall — Free-tier, like /moje-materialy/ and the
   // rooms already on the Projekty panel.

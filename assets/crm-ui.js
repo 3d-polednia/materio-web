@@ -218,25 +218,6 @@ function crmRenderProjects(id) {
  * says what the index of that page says — the status, the date and what was agreed — so a
  * client's page answers "where does this stand" without a navigation.
  */
-function crmRenderJobs(id) {
-  const list = document.getElementById("crm-client-jobs");
-  if (!list) return;
-  const jobs = crmClientProjects(id);
-  const url = crmUrl("projects", "/projekty/");
-  list.innerHTML = jobs.length ? jobs.map((j) => {
-    const money = j.valueMinor === null || j.valueMinor === undefined
-      ? "" : ` · ${crmEsc(crmMoney(j.valueMinor, j.currencyCode))}`;
-    const due = j.dueDate ? ` · ${crmEsc(crmDate(new Date(`${j.dueDate}T00:00:00`).getTime()))}` : "";
-    return `<li data-id="${crmEsc(j.id)}">
-        <span class="row-name">
-          <a href="${crmEsc(url)}?id=${encodeURIComponent(j.id)}"><b>${crmEsc(j.name)}</b></a>
-          <em class="muted"><span class="chip job-chip">${
-      crmEsc(crmT(`job_st_${j.status}`))}</span>${due}${money}</em>
-        </span>
-      </li>`;
-  }).join("") : `<li class="empty muted">${crmEsc(crmT("cli_jobs_empty"))}</li>`;
-}
-
 /**
  * Chapter XX's "wyceny", and chapter XXIV's fourth step seen from its first.
  *
@@ -322,7 +303,6 @@ function crmRenderClient(id) {
   document.getElementById("crm-delete-q").textContent = crmT("cli_delete_q");
 
   crmRenderProjects(id);
-  crmRenderJobs(id);
   crmRenderQuotes(id);
   crmRenderHistory(id);
 }

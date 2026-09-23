@@ -40,7 +40,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   LANGS, urlHome, urlCalc, urlCalcIndex, urlConverter, urlGuideIndex, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlClients, urlJobs, urlQuotes, urlCalendar,
+  urlProjects, urlEstimate, urlClients, urlQuotes, urlCalendar,
   urlLiczmatPro, urlCookies, urlAndroid, urlGuide, GUIDES,
 } from "../src/site.mjs";
 
@@ -200,7 +200,6 @@ async function context(width, height = 780) {
 function readyFor(url) {
   if (/\/(projekty|proekty|projekte|projects|proiecte|projekti)\//.test(url)) return "html[data-ws-ready]";
   if (/\/(klienci|kliienty|kunden|clients|klienti|clienti|klijenti|klijenty)\//.test(url)) return "html[data-crm-ready]";
-  if (/\/(zlecenia|zamovlennya|auftraege|jobs|zakazky|lucrari|poslovi|zakazy)\//.test(url)) return "html[data-jobs-ready]";
   if (/\/(wyceny|koshtorysy|angebote|quotes|nabidky|ponuky|oferte|ponude|smety)\//.test(url)) return "html[data-quotes-ready]";
   if (/\/(terminarz|hrafik|termine|schedule|kalendar|calendar|raspored|rozvrh)\//.test(url)) return "html[data-schedule-ready]";
   return null;
@@ -408,8 +407,6 @@ head("3. the modules a phone actually works in");
       ["the account", "/app/", { ready: null }],
       ["the clients", urlClients("pl"), pro],
       ["one client", `${urlClients("pl")}?id=c1`, pro],
-      ["the jobs", urlJobs("pl"), pro],
-      ["one job", `${urlJobs("pl")}?id=j1`, pro],
       ["the quotes", urlQuotes("pl"), pro],
       ["one quote", `${urlQuotes("pl")}?id=q1`, pro],
       ["the terminarz", urlCalendar("pl"), pro],

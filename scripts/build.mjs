@@ -56,7 +56,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260921a";
+const STAMP = "20260923a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -1776,7 +1776,7 @@ function buildPrivatePages() {
     // The Pro modules that have been built. Their cards on /app/ link to them
     // (src/pro.mjs), and /app/ has no language of its own to derive an address from.
     ...LM_FEATURES
-      .filter((f) => f.level === LEVEL.PRO && f.route && route(f.route)
+      .filter((f) => f.level === LEVEL.PRO && f.module !== false && f.route && route(f.route)
         && route(f.route).status === STATUS.LIVE)
       .map((f) => route(f.route)),
     // /liczmat-pro/ (session 29). Session 40 made it a header link, so navRoutes("header")
