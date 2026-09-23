@@ -956,7 +956,8 @@ function crmHistory(scope, limit) {
       // A line nothing calculated is chapter XVII's "inne koszty" — it happened too, and
       // saying which of the two it was is the difference between "policzono" and "dopisano".
       const manual = typeof wsIsManualLine === "function" && wsIsManualLine(line);
-      add(line.createdAt, manual ? "cost" : "calc", line.id, line.name,
+      const shown = !manual && typeof wsLineLabel === "function" ? wsLineLabel(line).name : line.name;
+      add(line.createdAt, manual ? "cost" : "calc", line.id, shown,
         { line: line, project: project });
     });
   });

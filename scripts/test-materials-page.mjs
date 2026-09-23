@@ -116,9 +116,11 @@ function fixture() {
       { id: "p1", name: "Łazienka", archived: false, ...sync(T0 + 5 * DAY) },
       { id: "p2", name: "Salon", archived: false, ...sync(T0 + 3 * DAY) },
     ],
-    rooms: [],
+    rooms: [{ id: "r1", projectId: "p1", name: "Łazienka", lengthM: 3, widthM: 2,
+      heightM: 2.5, ...sync(T0) }],
     estimations: [
-      line("e1", "p1", "Gres 60×60", 15, "opak.", 74985, T0 + 1 * DAY),
+      { ...line("e1", "p1", "Gres 60×60", 15, "opak.", 74985, T0 + 1 * DAY),
+        inputJson: JSON.stringify({ _room: "r1" }) },
       line("e2", "p1", "Klej C2 25 kg", 7, "worków", 21000, T0 + 2 * DAY),
     ],
     shoppingItems: [
@@ -226,6 +228,7 @@ head("1. the list is on the project screen, and it is that project's");
   // The shop aisle is stored as the enum name and drawn through cat_*, so it reads in the
   // page's language rather than in the language it was saved in.
   check("a row says which aisle it is bought in", list[0].includes("Płytki i gres"), list[0]);
+  check("a linked estimation's room is shown on the material row", list[0].includes("Łazienka"), list[0]);
   check("and the two chemicals say theirs",
     list[1].includes("Chemia budowlana") && list[2].includes("Chemia budowlana"), list.join(" | "));
   check("no row prints a raw enum name at the visitor",
@@ -251,6 +254,49 @@ head("1b. a project with no materials says so instead of showing nothing");
   eq("one row, and it is the empty state", list.length, 1);
   check("which says how a material gets here", list[0].includes("Zapisz wynik kalkulatora"), list[0]);
   eq("and the tally says nothing rather than 0 of 0", await text(page, "#ws-mat-tally"), "");
+  await page.close();
+}
+
+head("1c. a line saved under the calculator's name still says what it was");
+{
+  // Before 2026-09-23 a preset chip copied numbers and recorded no material, so these lines
+  // were stored as "Farby, tynki, grunty". The page must still tell them apart without
+  // rewriting what is stored.
+  const sync = (at) => ({ createdAt: at, updatedAt: at, deletedAt: null, schemaVersion: 1 });
+  const fields = [{ k: "area", l: "fld_area" }, { k: "cov", l: "fld_coverage_unit" },
+    { k: "coats", l: "fld_coats" }, { k: "price", l: "fld_price_pkg" }];
+  const legacy = (id, input, at) => ({
+    id, projectId: "p1", name: "Farby, tynki, grunty", calculationType: "SURFACE_COVERAGE",
+    materialCategory: "OTHER", requiredUnits: 1, unitLabel: "opak.", totalCostMinor: 0,
+    wastePercentage: 0, wasteCostMinor: 0, currencyCode: "PLN",
+    inputJson: JSON.stringify({ ...input, _lm: { v: 1, calc: "coverage", at, fields, rows: [],
+      unit: "res_pkgs", tobuy: 1 } }), ...sync(at),
+  });
+  const ws = fixture();
+  ws.estimations = [
+    legacy("L1", { area: "25", cov: "100", coats: "2", price: "80" }, T0 + DAY),
+    legacy("L2", { area: "37", cov: "17", coats: "3", price: "67" }, T0 + 2 * DAY),
+  ];
+  ws.shoppingItems = ws.estimations.map((e, i) => ({
+    id: `LS${i + 1}`, projectId: "p1", estimationId: e.id, name: e.name, materialCategory: "OTHER",
+    quantity: 1, unit: "opak.", estimatedCostMinor: 0, currencyCode: "PLN", isPurchased: false,
+    ...sync(e.createdAt),
+  }));
+  const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: ws, active: "p1" });
+  const list = await rows(page, MATS);
+  check("the line whose numbers are the paint chip reads as the paint", list[0].includes("Farba ścienna 10 l"), list[0]);
+  check("and is filed with the paints, not under Pozostałe", list[0].includes("Farby i lakiery"), list[0]);
+  check("the line matching no chip keeps the calculator's name", list[1].includes("Farby, tynki, grunty"), list[1]);
+  check("and says what was typed into it", list[1].includes("37") && list[1].includes("17"), list[1]);
+  check("the typed price is not the summary", !list[1].includes("67"), list[1]);
+  const lines = await rows(page, "#ws-project-lines");
+  check("the calculation above reads the same", lines[0].includes("Farba ścienna 10 l"), lines[0]);
+  // The folded "Skąd ta liczba" already held the numbers; the summary has to be on the row.
+  const meta = await page.$$eval("#ws-project-lines > li .row-name em", (n) => n.map((x) => x.textContent));
+  check("and the untitled one carries the same summary on its row", meta[1].includes("37"), meta[1]);
+  const stored = (await store(page)).estimations.map((e) => e.name);
+  eq("nothing stored was renamed", stored.join(","), "Farby, tynki, grunty,Farby, tynki, grunty");
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
 
@@ -290,7 +336,7 @@ head("2. chapter XVI's arrow, clicked from a real calculator");
   await page.waitForSelector("html[data-ws-ready]");
   const list = await rows(page, MATS);
   eq("the material is on the project's list one navigation later", list.length, 1);
-  check("and it is the one that was just calculated", list[0].includes(item.name), list[0]);
+  check("and a legacy default is displayed as its exact matching preset", list[0].includes("Gres 60×60"), list[0]);
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
@@ -334,6 +380,14 @@ head("3. ticking a material off, and taking it off the list");
     await page.$eval(`${MATS} li[data-id="s1"] input[data-buy]`, (n) => n.checked), true);
   check("and is marked as done on screen",
     await page.$eval(`${MATS} li[data-id="s1"]`, (n) => n.classList.contains("done")));
+  eq("the bought row moves behind the pending rows",
+    await page.$$eval(`${MATS} li[data-id]`, (n) => n.map((x) => x.dataset.id).join(",")), "s2,s3,s1");
+  eq("a bought separator labels the second group",
+    await text(page, `${MATS} .ws-mat-separator`), "Kupione");
+  check("the bought name is struck through",
+    (await page.$eval(`${MATS} li[data-id="s1"] .row-name`, (n) => getComputedStyle(n).textDecorationLine)).includes("line-through"));
+  eq("focus returns to the same checkbox",
+    await page.$eval(`${MATS} li[data-id="s1"] input[data-buy]`, (n) => document.activeElement === n), true);
   eq("the tally follows", await text(page, "#ws-mat-tally"), "kupione 1 z 3");
   eq("nothing else was ticked",
     await page.$$eval(`${MATS} input[data-buy]:checked`, (n) => n.length), 1);

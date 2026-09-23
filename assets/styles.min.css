@@ -1405,8 +1405,19 @@ margin-bottom: 2px;
 .ws-mat-tick-label { font-size: var(--fs-xs); color: var(--muted); }
 @media (max-width: 560px) { .ws-mat-tick-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } }
 .data-list li.ws-mat.done .dash-fig { opacity: .6; }
+.data-list li.ws-mat-separator { color: var(--muted); font-weight: 700; padding: var(--sp-3) 0 var(--sp-1); }
 .ws-mat-tally { font-size: var(--fs-sm); }
 .data-list li.ws-mat { flex-wrap: wrap; }
+@media (max-width: 560px) {
+.data-list li.ws-mat:not(.ws-editing) {
+display: grid; grid-template-columns: auto 1fr auto; column-gap: var(--sp-3); row-gap: var(--sp-2);
+}
+.ws-mat:not(.ws-editing) > .ws-mat-tick { grid-column: 1; grid-row: 1; }
+.ws-mat:not(.ws-editing) > .row-name { grid-column: 2 / -1; grid-row: 1; }
+.ws-mat:not(.ws-editing) > .dash-fig { grid-column: 2; grid-row: 2; align-items: flex-start; text-align: left; }
+.ws-mat:not(.ws-editing) > .row-actions { grid-column: 3; grid-row: 2; }
+.ws-mat:not(.ws-editing) > .ws-mat-note { grid-column: 2 / -1; }
+}
 .ws-mat-note { flex-basis: 100%; font-size: var(--fs-sm); }
 .data-list li.ws-mat.done .ws-mat-note { opacity: .6; }
 .ws-mat-edit, .ws-mat-add form { flex-basis: 100%; }

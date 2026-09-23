@@ -295,7 +295,19 @@ function wsRenderSave(card, result) {
   box.lmResult = result;
   // A new number makes the last confirmation stale — it was about a different result.
   box.querySelector("[data-ws-saved]").hidden = true;
+  const lineName = box.querySelector("[data-ws-line-name]");
+  if (lineName && !lineName.dataset.touched) lineName.value = card.dataset.matName ? wsResolvedLine(card).name : "";
   wsFillSaveProjects(box);
+}
+
+/** Resolve the saved material independently from the room that supplied dimensions. */
+function wsResolvedLine(card) {
+  const calc = card.dataset.calc;
+  if (!card.dataset.matName) return { name: wsT(`c_${calc}_t`), category: "OTHER" };
+  if (calc === "grout") return {
+    name: `${wsT("c_grout_t")} — ${card.dataset.matName}`, category: "CHEMICALS",
+  };
+  return { name: card.dataset.matName, category: card.dataset.matCat || "OTHER" };
 }
 
 function wsBuildSaveBox(card) {
@@ -319,6 +331,11 @@ function wsBuildSaveBox(card) {
         <a href="${wsEsc(lmSignupUrl(location.pathname))}">${wsEsc(wsT("calc_save_link"))}</a></p>`;
 
   box.innerHTML = `
+    <div class="ws-save-new ws-line-name">
+      <label class="ws-bar-label" for="ws-line-name-${wsEsc(card.dataset.calc)}">${wsEsc(wsT("ws_line_name"))}</label>
+      <input id="ws-line-name-${wsEsc(card.dataset.calc)}" type="text" maxlength="120"
+        data-ws-line-name placeholder="${wsEsc(wsT("ws_line_name_ph"))}">
+    </div>
     <div class="ws-save-row">
       <button type="button" class="btn btn-primary btn-sm" data-ws-save>${wsEsc(wsT("ws_add_to_project"))}</button>
       <select data-ws-project aria-label="${wsEsc(wsT("ws_project"))}" hidden></select>
@@ -351,6 +368,8 @@ function wsBuildSaveBox(card) {
   // form was filled from — the two are the same choice until they are not.
   box.querySelector("[data-ws-room-pick]")
     .addEventListener("change", (e) => { e.target.dataset.touched = "1"; });
+  box.querySelector("[data-ws-line-name]")
+    .addEventListener("input", (e) => { e.target.dataset.touched = "1"; });
   box.querySelector("[data-ws-save]").addEventListener("click", () => wsSaveResult(card, box));
   return box;
 }
@@ -382,13 +401,15 @@ function wsSaveResult(card, box) {
 
   const roomPick = box.querySelector("[data-ws-room-pick]");
   const roomId = roomPick && !roomPick.hidden ? roomPick.value : "";
+  const resolved = wsResolvedLine(card);
+  const lineName = box.querySelector("[data-ws-line-name]").value.trim();
 
   const row = wsAddEstimation({
     calcId: card.dataset.calc,
     projectId,
     roomId,
-    name: card.dataset.matName || card.dataset.wsRoomName || wsT(`c_${card.dataset.calc}_t`),
-    materialCategory: card.dataset.matCat || "OTHER",
+    name: lineName || resolved.name,
+    materialCategory: resolved.category,
     requiredUnits: result.tobuy,
     // Inflected for the count, exactly as the result panel above shows it — a saved
     // line reading "1 worków" would be the same defect one screen further on.

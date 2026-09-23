@@ -49,6 +49,12 @@ const tr = (lang) => (key) => (DICT[lang] || {})[key] || key;
 const { CALCS, ENGINES, unitLabel } = evalScript(
   ["assets/units.js", "assets/calculators.js"],
   ["CALCS", "ENGINES", "unitLabel"], { document: undefined, window: {} });
+const { MATERIALS, materialsForCalc, materialFill } = evalScript("assets/materials.js",
+  ["MATERIALS", "materialsForCalc", "materialFill"], { module: undefined });
+const { wsResolvedLine } = evalScript("assets/workspace-calc.js", ["wsResolvedLine"], {
+  document: { addEventListener: () => {}, documentElement: { lang: "pl" } },
+  window: {}, t: tr("pl"),
+});
 
 /**
  * What pwAllows() answers inside the shipped store, for the length of one check.
@@ -140,6 +146,36 @@ const eq = (name, got, want) =>
   check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
 
 /* ------------------------------------------------------------------ 1. the snapshot */
+
+head("0. presets are catalogue shortcuts");
+{
+  for (const calc of CALCS.filter((c) => c.presets)) {
+    for (const preset of calc.presets) {
+      check(`${calc.id}/${preset.k}: carries a catalogue id`, Boolean(preset.m), JSON.stringify(preset));
+      check(`${calc.id}/${preset.k}: carries no copied values`, !("v" in preset), JSON.stringify(preset));
+      const material = MATERIALS.find((m) => m.id === preset.m);
+      check(`${calc.id}/${preset.k}: id exists`, Boolean(material), preset.m);
+      check(`${calc.id}/${preset.k}: material is offered for the calculator`,
+        materialsForCalc(calc.id).some((m) => m.id === preset.m), preset.m);
+      check(`${calc.id}/${preset.k}: catalogue supplies values`,
+        Boolean(material) && Object.keys(materialFill(material, calc.id)).length > 0, preset.m);
+    }
+  }
+}
+
+head("0b. saved-line naming is material-aware, never room-aware");
+{
+  const card = (calc, data = {}) => ({ dataset: { calc, ...data } });
+  eq("a catalog material supplies the line name",
+    wsResolvedLine(card("coverage", { matName: "Gładź gipsowa 20 kg", matCat: "CHEMICALS" })).name,
+    "Gładź gipsowa 20 kg");
+  const grout = wsResolvedLine(card("grout", { matName: "Gres 60×60", matCat: "TILES" }));
+  eq("grout names the bought product and tile", grout.name, `${tr("pl")("c_grout_t")} — Gres 60×60`);
+  eq("grout is filed as chemicals", grout.category, "CHEMICALS");
+  const bare = wsResolvedLine(card("coverage", { wsRoomName: "Kuchnia Moryc" }));
+  eq("a missing material falls back to the calculator", bare.name, tr("pl")("c_coverage_t"));
+  check("the room never becomes the material name", bare.name !== "Kuchnia Moryc");
+}
 
 head("1. the saved line explains itself (chapter XV)");
 {
@@ -361,6 +397,15 @@ head("6. /projekty/ is handed one address per calculator, in its own language");
     for (const calc of CALCS) {
       eq(`${lang}: ${calc.id} points at this language's page`, data.calcs[calc.id],
         urlCalc(lang, calc.id));
+    }
+    for (const calc of CALCS.filter((c) => c.presets)) {
+      check(`${lang}: ${calc.id} has a preset display map`, Array.isArray(data.presets[calc.id]));
+      eq(`${lang}: ${calc.id} has one map row per shortcut`, data.presets[calc.id].length, calc.presets.length);
+      for (const preset of data.presets[calc.id]) {
+        check(`${lang}: preset has a localized name`, Boolean(preset.name));
+        check(`${lang}: preset has a category`, Boolean(preset.c));
+        check(`${lang}: preset has fill values`, preset.fill && Object.keys(preset.fill).length > 0);
+      }
     }
   }
 }

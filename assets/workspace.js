@@ -716,6 +716,27 @@ function wsLineSnapshot(row) {
   }
 }
 
+/** Resolve a legacy bare calculator title from one exact preset match, for display only. */
+function wsLineLabel(row, projectMap, translate) {
+  const snap = wsLineSnapshot(row);
+  const word = translate || (typeof wsT === "function" ? wsT : (k) => k);
+  const title = snap ? word(`c_${snap.calc}_t`) : "";
+  const fallback = { name: String((row && row.name) || ""), category: String((row && row.materialCategory) || "OTHER") };
+  if (!snap || fallback.name !== title) return fallback;
+  const presets = ((projectMap || ((typeof window !== "undefined" && window.LM_PROJ) || {})).presets || {})[snap.calc] || [];
+  const number = (v) => {
+    const raw = [...String(v === undefined || v === null ? "" : v)].filter((ch) => ch.trim() !== "").join("");
+    const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+    const normalized = cut < 0 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+    const n = Number(normalized);
+    return Number.isFinite(n) ? n : null;
+  };
+  const matches = presets.filter((preset) => Object.entries(preset.fill || {}).every(([key, value]) =>
+    Object.prototype.hasOwnProperty.call(snap.input, key) && number(snap.input[key]) === number(value)));
+  if (matches.length !== 1) return fallback;
+  return { name: matches[0].name, category: fallback.category === "OTHER" ? matches[0].c : fallback.category };
+}
+
 /**
  * Which room a saved calculation was made for — chapter XVIII: "Kalkulacje mogą być
  * przypisane do konkretnego pomieszczenia."
@@ -1356,5 +1377,5 @@ function wsImport(incoming) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { wsRoomAreas, wsRoomFill, wsMinor, WS_CALC_TYPE };
+  module.exports = { wsRoomAreas, wsRoomFill, wsMinor, WS_CALC_TYPE, wsLineLabel };
 }

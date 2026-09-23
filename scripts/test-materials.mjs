@@ -64,6 +64,18 @@ const { MAT_CATS } = evalScript("assets/materials.js", ["MAT_CATS"], { module: u
    checking a page the build never writes. */
 const FEATURES = evalScript(["assets/account.js", "assets/plan.js"], ["LM_FEATURES"]).LM_FEATURES;
 
+const uiLogic = evalScript(["assets/units.js", "assets/workspace.js", "assets/workspace-ui.js"],
+  ["wsLineLabel", "wsMaterialDisplay", "wsOrderedMaterials"], {
+    window: { LM_PROJ: { presets: {
+      coverage: [
+        { name: "Farba do ścian", c: "PAINT", fill: { cov: 100, coats: 2 } },
+        { name: "Druga farba", c: "PAINT", fill: { cov: 100, coats: 2 } },
+      ],
+    } } }, document: { addEventListener: () => {}, getElementById: () => null, querySelector: () => null }, localStorage: { getItem: () => null, setItem: () => {} },
+    CustomEvent: class {}, crypto: { randomUUID: () => "id" }, lmCurrency: () => "PLN",
+    lmMoneyMinor: () => "", pwAllows: () => true,
+  });
+
 
 /**
  * What pwAllows() answers inside the shipped store, for the length of one check.
@@ -150,6 +162,33 @@ const eq = (name, got, want) =>
 const at = (rows, i) => rows[i || 0] || {};
 
 /* ------------------------------------------------------- 1. the contract document */
+
+head("0. legacy display resolution and shopping order");
+{
+  const calcTitle = tr("pl")("c_coverage_t");
+  const uniqueMap = { presets: { coverage: [
+    { name: "Farba do ścian", c: "PAINT", fill: { cov: 100, coats: 2 } },
+  ] } };
+  const legacy = { name: calcTitle, materialCategory: "OTHER", inputJson: JSON.stringify({
+    cov: "100", coats: "2", _lm: { v: 1, calc: "coverage", fields: [], rows: [] },
+  }) };
+  const resolved = uiLogic.wsLineLabel(legacy, uniqueMap, tr("pl"));
+  eq("one exact preset resolves the legacy title", resolved.name, "Farba do ścian");
+  eq("OTHER resolves to the preset aisle", resolved.category, "PAINT");
+  eq("a renamed line is not inferred", uiLogic.wsLineLabel({ ...legacy, name: "Moja" }, uniqueMap, tr("pl")).name, "Moja");
+  const ambiguousMap = { presets: { coverage: [
+    { name: "Farba do ścian", c: "PAINT", fill: { cov: 100, coats: 2 } },
+    { name: "Druga farba", c: "PAINT", fill: { cov: 100, coats: 2 } },
+  ] } };
+  eq("two matches are not inferred", uiLogic.wsLineLabel(legacy, ambiguousMap, tr("pl")).name, calcTitle);
+  eq("zero matches are not inferred", uiLogic.wsLineLabel({ ...legacy, inputJson: "{}" }, uniqueMap, tr("pl")).name, calcTitle);
+  const ordered = uiLogic.wsOrderedMaterials([{ id: "a", isPurchased: true }, { id: "b", isPurchased: false }, { id: "c", isPurchased: true }]);
+  eq("unbought items come first and bought order stays stable", ordered.map((r) => r.id).join(","), "b,a,c");
+  const display = uiLogic.wsMaterialDisplay({ name: calcTitle, materialCategory: "OTHER", estimationId: "e" },
+    { ...legacy, id: "e", roomId: "r" }, uniqueMap, tr("pl"));
+  eq("linked unchanged material uses resolved title", display.name, "Farba do ścian");
+  eq("linked material uses resolved aisle", display.category, "PAINT");
+}
 
 head("1. the material is the contract's document and nothing else");
 {

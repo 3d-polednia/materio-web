@@ -140,6 +140,8 @@ function applyMaterial(card, m) {
   card.dataset.matId = m.id;
   card.dataset.matCat = m.c;
   card.dataset.matName = matName(m, matLang(), (k) => matT(k));
+  const lineName = card.querySelector("[data-ws-line-name]");
+  if (lineName) delete lineName.dataset.touched;
   const values = materialFill(m, calcId);
   Object.entries(values).forEach(([k, v]) => {
     const el = card.querySelector(`[data-k="${k}"]`);

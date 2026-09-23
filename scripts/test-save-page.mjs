@@ -430,6 +430,35 @@ head("7. with JavaScript off");
 
 /* ------------------------------------------------------------------ report */
 
+head("8. a catalogue shortcut names the saved line, and a typed name wins");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const coverage = urlCalc("pl", "coverage");
+  const page = await open(ctx, coverage, { plant: { "materio-lang": "pl" } });
+  await page.getByRole("button", { name: "Gładź 20 kg" }).click();
+  eq("the shortcut prefills the shopping-list name",
+    await page.inputValue("[data-ws-line-name]"), "Gładź gipsowa 20 kg");
+  check("the latest catalogue choice is named above the form",
+    (await text(page, "[data-mat-chosen]")).includes("Gładź gipsowa"));
+  await page.click("[data-ws-save]");
+  await page.fill("[data-ws-line-name]", "Gładź biała finiszowa");
+  await page.click("[data-ws-save]");
+  const ws = await page.evaluate(() => JSON.parse(localStorage.getItem("materio-workspace-v1")));
+  const id = ws.projects[0].id;
+  await page.goto(base + `${PROJECTS}?id=${encodeURIComponent(id)}`, { waitUntil: "load" });
+  await page.waitForSelector("html[data-ws-ready]");
+  const calculations = await page.innerText("#ws-project-lines");
+  const materials = await page.innerText("#ws-project-materials");
+  check("calculations use the catalogue and custom names",
+    calculations.includes("Gładź gipsowa") && calculations.includes("Gładź biała finiszowa"), calculations);
+  check("materials use the catalogue and custom names",
+    materials.includes("Gładź gipsowa") && materials.includes("Gładź biała finiszowa"), materials);
+  check("the aisle is not Other", materials.includes("Chemia budowlana") && !materials.includes("Pozostałe"), materials);
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
+  await ctx.close();
+}
+
 await browser.close();
 server.close();
 

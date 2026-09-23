@@ -56,7 +56,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260923b";
+const STAMP = "20260923c";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -123,7 +123,8 @@ const { CONV_CATS, convConvert, convFormat } = evalScript(
   ["CONV_CATS", "convConvert", "convFormat"]);
 
 const CATALOG = evalScript("assets/materials.js", [
-  "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "matName", "matNote", "primaryCalcFor",
+  "MATERIALS", "MAT_CATS_USED", "materialsForCalc", "materialById", "materialFill",
+  "matName", "matNote", "primaryCalcFor",
 ]);
 
 /** The merged dictionary: the base keys, the sub-page keys and the material names. */
@@ -1441,6 +1442,17 @@ function buildWorkspacePages() {
   const estAlt = alternatesFor(urlEstimate);
   for (const lang of BUILD_LANGS) {
     const t = translator(lang);
+    const presets = Object.fromEntries(CALCS.filter((c) => c.presets).map((calc) => [calc.id,
+      calc.presets.map((preset) => {
+        const material = CATALOG.materialById(preset.m);
+        const materialName = CAT.name(material, lang, t);
+        return {
+          name: calc.id === "grout" ? `${t("c_grout_t")} — ${materialName}` : materialName,
+          c: calc.id === "grout" ? "CHEMICALS" : material.c,
+          fill: CATALOG.materialFill(material, calc.id),
+        };
+      }),
+    ]));
 
     const projects = projectsMain(lang, t, CAT.categories, LM_FEATURES);
     write(join(urlProjects(lang), "index.html").replace(/^\//, ""), page({
@@ -1461,6 +1473,7 @@ function buildWorkspacePages() {
         // (session 18). The page does not load assets/materials.js — 12 kB of catalogue
         // to render a fifteen-item <select> — so the build hands it the list instead.
         aisles: CAT.categories,
+        presets,
       })};</script>`
       // The same one link map the other Pro screens get. assets/crm-chain.js draws the
       // path from it, and since 2026-09-21 the project is the middle step of that path.

@@ -432,6 +432,11 @@ function wsRenderProjectLines(id) {
   // entry is "no room" is chapter XXV's control with nothing behind it.
   const rooms = wsRooms(id);
   list.innerHTML = rows.map((r) => {
+    const label = wsLineLabel(r);
+    const snap = wsLineSnapshot(r);
+    const calcTitle = snap ? wsT(`c_${snap.calc}_t`) : r.name;
+    const meta = label.name !== calcTitle ? `${calcTitle} · ${wsDate(r.createdAt)}`
+      : [wsDate(r.createdAt), wsLineSummary(r, label.name)].filter(Boolean).join(" · ");
     const cost = wsCanCost() && r.totalCostMinor > 0
       ? `<em class="muted">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</em>` : "";
     const room = rooms.length
@@ -442,8 +447,8 @@ function wsRenderProjectLines(id) {
       : "";
     return `<li class="ws-line" data-id="${wsEsc(r.id)}">
         <span class="row-name">
-          <b>${wsEsc(r.name)}</b>
-          <em class="muted">${wsEsc(wsDate(r.createdAt))}</em>
+          <b>${wsEsc(label.name)}</b>
+          <em class="muted">${wsEsc(meta)}</em>
         </span>
         <span class="dash-fig">
           <b>${wsNum(r.requiredUnits)} ${wsEsc(r.unitLabel)}</b>
@@ -488,8 +493,49 @@ function wsRenderMaterials(id) {
       .replace("{bought}", wsNum(bought)).replace("{count}", wsNum(rows.length));
   }
 
-  list.innerHTML = rows.map((r) =>
-    (r.id === wsEditingItemId ? wsMaterialForm(r) : wsMaterialRow(r))).join("");
+  const ordered = wsOrderedMaterials(rows);
+  list.innerHTML = ordered.map((r, index) => {
+    const display = wsMaterialDisplay(r);
+    const separator = r.isPurchased && (index === 0 || !ordered[index - 1].isPurchased)
+      ? `<li class="ws-mat-separator" aria-hidden="true">${wsEsc(wsT("proj_mat_buy"))}</li>` : "";
+    return separator + (r.id === wsEditingItemId ? wsMaterialForm(r, display) : wsMaterialRow(r, display));
+  }).join("");
+}
+
+/**
+ * What was typed, for a line that still carries only its calculator's name: up to three
+ * fields, prices left out. Two untitled lines of one calculator differ here and nowhere
+ * else, so the summary is what tells them apart — on the calculation and on the list.
+ */
+function wsLineSummary(line, shownName, translate) {
+  const snap = wsLineSnapshot(line);
+  const word = translate || wsT;
+  if (!snap || shownName !== word(`c_${snap.calc}_t`)) return "";
+  return snap.fields
+    .filter((f) => !String(f.k).startsWith("price"))
+    .map((f) => [f.l ? word(f.l) : f.k, wsFieldValue(f, snap)])
+    .filter(([, value]) => value !== "").slice(0, 3)
+    .map(([name, value]) => `${name} ${value}`).join(" · ");
+}
+
+/** Stable shopping order: pending first, bought last. */
+function wsOrderedMaterials(rows) {
+  return rows.filter((r) => !r.isPurchased).concat(rows.filter((r) => r.isPurchased));
+}
+
+/** Display corrections inherited from a linked estimation, without changing storage. */
+function wsMaterialDisplay(item, estimation, projectMap, translate) {
+  const line = estimation || (item.estimationId ? wsEstimations(item.projectId).find((r) => r.id === item.estimationId) : null);
+  if (!line) return { name: item.name, category: item.materialCategory, room: "", summary: "" };
+  const resolved = wsLineLabel(line, projectMap, translate);
+  const room = wsRoom(wsLineRoomId(line));
+  const name = item.name === line.name ? resolved.name : item.name;
+  return {
+    name,
+    category: item.materialCategory === "OTHER" ? resolved.category : item.materialCategory,
+    room: room ? room.name : "",
+    summary: wsLineSummary(line, name, translate),
+  };
 }
 
 /**
@@ -499,7 +545,8 @@ function wsRenderMaterials(id) {
 const wsPriceValue = (minor) => (minor === null ? "" : String(Math.round(minor) / 100));
 
 /** One material as it reads: name, aisle, how much, what it costs, and the note under it. */
-function wsMaterialRow(r) {
+function wsMaterialRow(r, shown) {
+  const display = shown || wsMaterialDisplay(r);
   // Chapter XVII, in the chapter's own shape: "Klej | 7 × 35 PLN | = 245 PLN". The unit
   // price is the total divided by the quantity (wsUnitPriceMinor) — the contract keeps the
   // total and nothing else — so it can never contradict the money beside it.
@@ -512,8 +559,8 @@ function wsMaterialRow(r) {
     ? `<em class="muted ws-mat-price">× ${wsEsc(wsMoney(Math.round(unit), r.currencyCode))}</em>` : "";
   const cost = money && r.estimatedCostMinor > 0
     ? `<em class="muted">${unit !== null ? "= " : ""}${wsEsc(wsMoney(r.estimatedCostMinor, r.currencyCode))}</em>` : "";
-  const aisle = r.materialCategory
-    ? `<em class="muted">${wsEsc(wsT("cat_" + r.materialCategory))}</em>` : "";
+  const aisle = display.category
+    ? `<em class="muted">${[wsT("cat_" + display.category), display.room, display.summary].filter(Boolean).map(wsEsc).join(" · ")}</em>` : "";
   // Chapter XVI's note. It takes a line of its own rather than a column, because it is a
   // sentence and the two columns beside it are a name and a number; and it is absent
   // entirely when empty, so a list nobody annotated reads exactly as it did before.
@@ -526,7 +573,7 @@ function wsMaterialRow(r) {
         <span class="ws-mat-tick-label">${wsEsc(wsT("proj_mat_buy"))}</span>
       </label>
       <span class="row-name">
-        <b>${wsEsc(r.name)}</b>
+        <b>${wsEsc(display.name)}</b>
         ${aisle}
       </span>
       <span class="dash-fig">
@@ -558,10 +605,11 @@ function wsMaterialRow(r) {
  * The currency in the label is the row's own, and it is only the visitor's current one when
  * the row has never been priced — see wsUpdateItem(). Nothing here converts anything.
  */
-function wsMaterialForm(r) {
+function wsMaterialForm(r, shown) {
+  const display = shown || wsMaterialDisplay(r);
   const aisles = ((typeof window !== "undefined" && window.LM_PROJ) || {}).aisles || [];
-  const options = (aisles.length ? aisles : [r.materialCategory || "OTHER"])
-    .map((c) => `<option value="${wsEsc(c)}"${c === r.materialCategory ? " selected" : ""}>${wsEsc(wsT("cat_" + c))}</option>`)
+  const options = (aisles.length ? aisles : [display.category || "OTHER"])
+    .map((c) => `<option value="${wsEsc(c)}"${c === display.category ? " selected" : ""}>${wsEsc(wsT("cat_" + c))}</option>`)
     .join("");
   const code = r.estimatedCostMinor ? r.currencyCode : (typeof lmCurrency === "function" ? lmCurrency() : r.currencyCode);
   return `<li class="ws-mat ws-editing" data-id="${wsEsc(r.id)}">
@@ -569,7 +617,7 @@ function wsMaterialForm(r) {
         <p class="ws-mat-grid">
           <label class="ws-mat-f">
             <span class="ws-bar-label">${wsEsc(wsT("ws_col_name"))}</span>
-            <input type="text" maxlength="120" data-f="name" value="${wsEsc(r.name)}" required>
+            <input type="text" maxlength="120" data-f="name" value="${wsEsc(display.name)}" required>
           </label>
           <label class="ws-mat-f ws-mat-f-sm">
             <span class="ws-bar-label">${wsEsc(wsT("ws_col_qty"))}</span>
@@ -1193,7 +1241,14 @@ function wireProjectDetail() {
   on("ws-project-materials", "click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li) return;
-    if (e.target.closest("[data-buy]")) wsSetItemPurchased(li.dataset.id, e.target.checked);
+    if (e.target.closest("[data-buy]")) {
+      const id = li.dataset.id;
+      wsSetItemPurchased(id, e.target.checked);
+      setTimeout(() => {
+        const checkbox = document.querySelector(`#ws-project-materials li[data-id="${CSS.escape(id)}"] [data-buy]`);
+        if (checkbox) checkbox.focus();
+      }, 0);
+    }
     else if (e.target.closest("[data-del]")) wsDeleteItem(li.dataset.id);
     else if (e.target.closest("[data-edit]")) {
       wsEditingItemId = li.dataset.id;
