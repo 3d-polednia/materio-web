@@ -1599,8 +1599,6 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           </div>
 
           <div class="ws-project-actions">
-            <button type="button" class="btn btn-primary btn-sm" id="ws-project-activate">${esc(t("ws_activate"))}</button>
-            <span class="chip on" id="ws-project-active" hidden>${esc(t("ws_active"))}</span>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">${esc(t("ws_rename"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive">${esc(t("proj_archive_do"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">${esc(t("app_delete"))}</button>

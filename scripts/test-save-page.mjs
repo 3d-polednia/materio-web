@@ -167,7 +167,7 @@ head("1. a result goes into a project in one click, from a browser with nothing 
 
   eq("with no project yet, there is nothing to pick between",
     await shown(page, "[data-ws-project]"), false);
-  eq("and the page says so", await text(page, "[data-ws-note]"), "Brak aktywnego projektu");
+  eq("and the page says so", await text(page, "[data-ws-note]"), "Brak projektu");
   eq("nothing is claimed to be saved before anything is",
     await page.$eval("[data-ws-saved]", (n) => n.hidden), true);
 

@@ -93,7 +93,7 @@ const wsIndexUrl = () => location.pathname;
 /* ---------------------------------------------------------------- the index */
 
 /** One row of either list: the name links to the project, the meta says what is in it. */
-function wsProjectRow(p, active) {
+function wsProjectRow(p) {
   const total = wsProjectTotal(p.id);
   // The money is the project's whole cost — chapter XVII's sum, materials and the rest —
   // so the list, the dashboard and the project screen answer "what does this cost" with
@@ -104,14 +104,14 @@ function wsProjectRow(p, active) {
   const sums = wsCanCost() ? wsSumsText(costs.byCurrency, "total") : "";
   const money = sums ? ` · ${wsEsc(sums)}` : "";
   // Lines saved in different currencies do not add up, and chapter VI forbids converting
-  // them. The row has room for a chip; the whole sentence is its title.
+  // them. The whole sentence is available as the warning chip's title.
   const mixed = wsCanCost() && costs.mixed
     ? ` <span class="chip warn" title="${wsEsc(wsT("ws_mixed_currency"))}">${wsEsc(wsT("dash_mixed"))}</span>`
     : "";
   const client = p.clientId && typeof crmClient === "function" ? crmClient(p.clientId) : null;
   const workflow = [client && client.name, wsT(`job_st_${p.status || "new"}`), wsProjectDate(p.dueDate)]
     .filter(Boolean).map(wsEsc).join(" · ");
-  return `<li data-id="${wsEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
+  return `<li data-id="${wsEsc(p.id)}">
       <span class="row-name">
         <a href="?id=${encodeURIComponent(p.id)}" data-open><b>${wsEsc(p.name)}</b></a>
         ${workflow ? `<em class="muted">${workflow}</em>` : ""}
@@ -120,9 +120,7 @@ function wsProjectRow(p, active) {
       <span class="row-actions">
         ${p.archived
           ? `<button type="button" class="btn btn-ghost btn-sm" data-unarchive>${wsEsc(wsT("proj_archive_undo"))}</button>`
-          : p.id === active
-            ? `<span class="chip on">${wsEsc(wsT("ws_active"))}</span>`
-            : `<button type="button" class="btn btn-ghost btn-sm" data-activate>${wsEsc(wsT("ws_activate"))}</button>`}
+          : ""}
       </span>
     </li>`;
 }
@@ -131,7 +129,6 @@ function wsRenderProjects() {
   const list = document.getElementById("ws-project-list");
   if (!list) return;
   const projects = wsProjects();
-  const active = wsActiveProjectId();
   const clientPick = document.getElementById("ws-project-client");
   if (clientPick && typeof crmClients === "function") {
     const keep = clientPick.value;
@@ -140,7 +137,7 @@ function wsRenderProjects() {
     clientPick.value = keep;
   }
   list.innerHTML = projects.length
-    ? projects.map((p) => wsProjectRow(p, active)).join("")
+    ? projects.map((p) => wsProjectRow(p)).join("")
     : `<li class="empty muted">${wsEsc(wsT("ws_empty_projects"))}</li>`;
 
   // The archive is folded away and absent entirely while it is empty: a permanently
@@ -152,7 +149,7 @@ function wsRenderProjects() {
   if (!archived.length) return;
   document.getElementById("ws-archive-summary").textContent = `${wsT("proj_archive_t")} (${archived.length})`;
   document.getElementById("ws-archive-list").innerHTML =
-    archived.map((p) => wsProjectRow(p, active)).join("");
+    archived.map((p) => wsProjectRow(p)).join("");
 }
 
 /** The strip that offers the last delete back. Hidden the moment there is nothing to undo. */
@@ -763,11 +760,6 @@ function wsRenderProject(id) {
       crmHistory({ projectId: project.id }, 8));
   }
 
-  const isActive = wsActiveProjectId() === project.id;
-  // An archived project takes no new lines, so it cannot be the active one either, and
-  // offering the button would be offering something the store refuses to do.
-  document.getElementById("ws-project-activate").hidden = isActive || Boolean(project.archived);
-  document.getElementById("ws-project-active").hidden = !isActive;
   document.getElementById("ws-project-archive").textContent =
     wsT(project.archived ? "proj_archive_undo" : "proj_archive_do");
 
@@ -987,8 +979,7 @@ function buildProjectsPage() {
   const rowAction = (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li) return;
-    if (e.target.closest("[data-activate]")) wsSetActiveProject(li.dataset.id);
-    else if (e.target.closest("[data-unarchive]")) wsArchiveProject(li.dataset.id, false);
+    if (e.target.closest("[data-unarchive]")) wsArchiveProject(li.dataset.id, false);
   };
   document.getElementById("ws-project-list").addEventListener("click", rowAction);
   document.getElementById("ws-archive-list").addEventListener("click", rowAction);
@@ -1067,8 +1058,6 @@ function wireProjectDetail() {
     const el = document.getElementById(id);
     if (el) el.addEventListener(event, fn);
   };
-
-  on("ws-project-activate", "click", () => { wsSetActiveProject(wsOpenId); });
 
   on("ws-project-rename", "click", () => {
     wsRenaming = true;

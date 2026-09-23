@@ -246,7 +246,7 @@ head("2. the index, with projects in it");
   // the inflection lives in assets/units.js now, where /projekty/ can reach it.
   check("a row says how many lines it holds", /\b2 pozycje\b/.test(list[0]), list[0]);
   check("and what they come to", list[0].replace(/[\s\u00a0\u202f]/g, " ").includes("959,85"), list[0]);
-  check("the active project is marked", (await page.$$eval("#ws-project-list li.on b", (b) => b.map((n) => n.textContent)))[0] === "Łazienka");
+  eq("the last-used project is not highlighted", await page.locator("#ws-project-list li.on").count(), 0);
 
   // Lines in two currencies do not add up and chapter VI forbids converting them.
   check("a project priced in two currencies is flagged rather than summed",
@@ -327,8 +327,7 @@ head("4. one project — chapter XIV");
     lines[0].includes("Gres 60×60") && lines[0].includes("15 opak."), lines[0]);
   check("and no line of another project", !lines.join(" ").includes("Farba"));
 
-  eq("it is not the active project, so the button is offered",
-    await page.$eval("#ws-project-activate", (n) => n.hidden), false);
+  eq("the active-project control is absent", await page.locator("#ws-project-activate").count(), 0);
   eq("the archive button offers the archive", await text(page, "#ws-project-archive"), "Przenieś do archiwum");
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
@@ -338,16 +337,14 @@ head("5. one project — the empty and the mixed cases");
 {
   const page = await open(ctx, PROJECTS + "?id=p2", { workspace: fixture(), active: "p2" });
   eq("the project opens straight from the address", await text(page, "#ws-title"), "Salon");
-  eq("it is the active one, so there is nothing to press",
-    await page.$eval("#ws-project-activate", (n) => n.hidden), true);
-  eq("and it says so", await shown(page, "#ws-project-active"), true);
+  eq("the active-project chip is absent", await page.locator("#ws-project-active").count(), 0);
   eq("two currencies, so the total says it does not mean much",
     await page.$eval("#ws-project-mixed", (n) => n.hidden), false);
 
   const empty = await open(ctx, PROJECTS + "?id=p3", { workspace: fixture(), active: "p1" });
   eq("an archived project still opens", await text(empty, "#ws-title"), "Garaż");
   eq("and offers the way out of the archive", await text(empty, "#ws-project-archive"), "Przywróć z archiwum");
-  eq("an archived project cannot be made active", await empty.$eval("#ws-project-activate", (n) => n.hidden), true);
+  eq("an archived project has no active-project control", await empty.locator("#ws-project-activate").count(), 0);
 
   // An id nobody has is not an error page: the browser it was made in is the only one
   // that ever had it.
@@ -435,13 +432,13 @@ head("7. update — the archive");
   await page.close();
 }
 
-head("8. update — making a project the active one");
+head("8. index — last-used project stays silent");
 {
   const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
-  await page.click("#ws-project-list li[data-id='p2'] [data-activate]");
-  eq("the row asked for is the active one", await activeId(page), "p2");
-  eq("and it is marked", await page.$eval("#ws-project-list li[data-id='p2']", (n) => n.classList.contains("on")), true);
-  eq("the one before it is not", await page.$eval("#ws-project-list li[data-id='p1']", (n) => n.classList.contains("on")), false);
+  eq("there are no make-active controls", await page.locator("#ws-project-list [data-activate]").count(), 0);
+  eq("there are no active chips", await page.locator("#ws-project-list .chip.on").count(), 0);
+  eq("the last-used row is not highlighted", await page.$eval("#ws-project-list li[data-id='p1']", (n) => n.classList.contains("on")), false);
+  eq("rendering the index keeps the last-used pointer", await activeId(page), "p1");
   await page.close();
 }
 

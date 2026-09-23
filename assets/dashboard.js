@@ -115,7 +115,6 @@ function dashRenderProjects() {
   const list = document.getElementById("dash-projects");
   if (!list) return;
   const projects = wsProjects();
-  const active = wsActiveProjectId();
   const canCost = dashCanCost();
 
   if (!projects.length) { list.innerHTML = dashEmpty("dash_projects_empty"); return; }
@@ -142,13 +141,12 @@ function dashRenderProjects() {
         ? ` <span class="chip warn" title="${dashEsc(dashT("ws_mixed_currency"))}">${dashEsc(dashT("dash_mixed"))}</span>`
         : "";
     }
-    return `<li data-id="${dashEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
+    return `<li data-id="${dashEsc(p.id)}">
         <span class="row-name">
           <b>${dashEsc(p.name)}</b>
           <em class="muted">${total.count} ${dashEsc(dashUnit("ws_lines", total.count))}${money} · ${dashEsc(dashDate(p.updatedAt))}${mixed}</em>
         </span>
         <span class="row-actions">
-          ${p.id === active ? `<span class="chip on">${dashEsc(dashT("ws_active"))}</span>` : ""}
           <button type="button" class="btn btn-ghost btn-sm" data-open>${dashEsc(dashT("dash_open"))}</button>
         </span>
       </li>`;

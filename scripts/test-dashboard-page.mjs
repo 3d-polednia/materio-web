@@ -434,7 +434,7 @@ head("9. opening a project takes the visitor to it");
 {
   const page = await open(ctx, DASH, { workspace: fixture(), storage: { "materio-active-project": "p2" } });
   const list = await rows(page, "#dash-projects");
-  check("the active project is marked", list[1].includes("Aktywny"), list[1]);
+  check("the last-used project is not visibly marked", !list.join(" ").includes("Aktywny"), list.join(" | "));
 
   await Promise.all([
     page.waitForURL(`**${urlEstimate("pl")}`),
