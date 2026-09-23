@@ -1355,6 +1355,12 @@ background: var(--surface); padding: var(--sp-4);
 }
 .ws-ask p { margin: 0; }
 .ws-ask-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-3); }
+.data-list li.ws-proj-row { flex-wrap: wrap; }
+.ws-proj-row > .row-name { flex: 1 1 14rem; }
+.ws-proj-row > .row-actions { margin-left: auto; flex-wrap: wrap; }
+.ws-proj-row > .row-actions .btn { white-space: nowrap; }
+.ws-row-ask { flex: 1 0 100%; min-width: 0; }
+.ws-row-ask .btn { white-space: nowrap; }
 .ws-undo {
 display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3);
 border: 1px solid var(--accent); border-radius: var(--radius);

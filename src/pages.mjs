@@ -1634,6 +1634,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
 
           <div id="ws-delete-ask" class="ws-ask mt-4" hidden>
             <p id="ws-delete-q"></p>
+            <p class="muted">${esc(t("ws_delete_undo_hint"))}</p>
             <p class="ws-ask-row">
               <button type="button" class="btn btn-primary btn-sm" id="ws-delete-yes">${esc(t("proj_delete_yes"))}</button>
               <button type="button" class="btn btn-ghost btn-sm" id="ws-delete-no">${esc(t("action_cancel"))}</button>

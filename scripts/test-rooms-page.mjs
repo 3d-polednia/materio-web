@@ -582,20 +582,16 @@ head("4e. with one project and no loose rooms the bar stays a flat list");
 head("5. the index groups rooms under their projects");
 {
   const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
-  eq("every room is on the index, assigned or not",
-    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 4);
-  eq("one card per project plus the loose-room card",
-    await page.$$eval("#ws-room-list [data-project-id]", (cards) => cards.length), 3);
+  eq("only assigned rooms are on the index",
+    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 3);
+  eq("one card per project and no loose-room card",
+    await page.$$eval("#ws-room-list [data-project-id]", (cards) => cards.length), 2);
 
   const p1 = '#ws-room-list [data-project-id="p1"]';
-  const free = '#ws-room-list [data-project-id=""]';
   eq("the first project card has its two rooms",
     await page.$$eval(`${p1} li[data-id]`, (li) => li.map((n) => n.dataset.id).join(",")), "r2,r1");
-  eq("the unassigned room is in the no-project card",
-    await page.$$eval(`${free} li[data-id]`, (li) => li.map((n) => n.dataset.id).join(",")), "r4");
-  const garage = await page.$eval(`${free} li[data-id="r4"] .row-name`,
-    (n) => n.textContent.replace(/\s+/g, " ").trim());
-  check("and the dimensions are still on the row", /6\s*×\s*3\s*×\s*2,4\s*m/.test(garage), garage);
+  eq("the unassigned room is absent",
+    await page.$$eval('#ws-room-list li[data-id="r4"]', (li) => li.length), 0);
 
   const href = await page.$eval(`${p1} .ws-room-card-head a`,
     (a) => a.getAttribute("href"));
@@ -632,28 +628,8 @@ head("5c. a card adds to its project and rows can still be moved");
     await page.$eval('#ws-room-list [data-project-id="p2"] [name="name"]',
       (n) => `${n === document.activeElement}:${n.value}`), "true:");
 
-  const freeForm = '#ws-room-list [data-project-id=""] [data-room-add-form]';
-  await page.click('#ws-room-list [data-project-id=""] [data-room-add] > summary');
-  await page.fill(`${freeForm} [name="name"]`, "Strych");
-  await page.click(`${freeForm} button[type=submit]`);
-  await page.waitForFunction(() =>
-    JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms.some((r) => r.name === "Strych"));
-  eq("a room can be made with no project at all",
-    (await roomsOf(page)).find((r) => r.name === "Strych").projectId, null);
-
-  // And an existing room can be moved, from the row it is on.
-  await page.selectOption('#ws-room-list li[data-id="r4"] [data-room-project]', "p1");
-  await page.waitForFunction(() =>
-    (JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms
-      .find((r) => r.id === "r4") || {}).projectId === "p1");
-  saved = (await roomsOf(page)).find((r) => r.id === "r4");
-  eq("the unassigned room was adopted", saved.projectId, "p1");
-  await page.selectOption('#ws-room-list li[data-id="r4"] [data-room-project]', "");
-  await page.waitForFunction(() =>
-    !(JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms
-      .find((r) => r.id === "r4") || {}).projectId);
-  eq("and can be taken back out of every project",
-    (await roomsOf(page)).find((r) => r.id === "r4").projectId, null);
+  eq("move pickers do not offer no project",
+    await page.$$eval("#ws-room-list [data-room-project] option[value='']", (o) => o.length), 0);
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
@@ -664,18 +640,12 @@ head("5d. with no project at all, the form stops asking");
   ws.projects = [];
   ws.estimations = [];
   const page = await open(ctx, PROJECTS, { workspace: ws, active: "" });
-  eq("only the no-project card is offered",
-    await page.$$eval('#ws-room-list [data-project-id=""]', (n) => n.length), 1);
+  eq("no room card is offered",
+    await page.$$eval('#ws-room-list [data-project-id]', (n) => n.length), 0);
   eq("no move picker is offered",
     await page.$$eval("#ws-room-list [data-room-project]", (n) => n.length), 0);
-  // The form still works — a room with no project is still a room.
-  await page.click('#ws-room-list [data-project-id=""] [data-room-add] > summary');
-  await page.fill('#ws-room-list [data-project-id=""] [name="name"]', "Garaż 2");
-  await page.click('#ws-room-list [data-project-id=""] button[type=submit]');
-  await page.waitForFunction(() =>
-    JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms.some((r) => r.name === "Garaż 2"));
-  eq("and the room is saved with no project",
-    (await roomsOf(page)).find((r) => r.name === "Garaż 2").projectId, null);
+  check("the create-project hint is shown",
+    (await page.locator("#ws-room-list").innerText()).includes("Załóż projekt"));
   await page.close();
 }
 
@@ -750,11 +720,10 @@ head("5b. a room whose project was deleted keeps the room and drops the name");
   const ws = fixture();
   ws.projects[0].deletedAt = T0 + 6 * DAY;
   const page = await open(ctx, PROJECTS, { workspace: ws, active: "" });
-  eq("the rooms survived the project",
-    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 4);
-  eq("rooms of the deleted project moved to the loose card",
-    await page.$$eval('#ws-room-list [data-project-id=""] li[data-id]',
-      (li) => li.map((n) => n.dataset.id).sort().join(",")), "r1,r2,r4");
+  eq("rooms of the deleted project and loose rooms are hidden",
+    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 1);
+  eq("there is no loose card",
+    await page.$$eval('#ws-room-list [data-project-id=""]', (li) => li.length), 0);
   await page.close();
 }
 

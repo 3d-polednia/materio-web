@@ -444,6 +444,36 @@ head("8. index — last-used project stays silent");
 
 /* ------------------------------------------------------------------ 9. delete */
 
+head("8b. delete from a project row — warning, cancel and undo");
+{
+  const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
+  eq("every live and archived row has delete", await page.locator("[data-del-project]").count(), 3);
+  // The label once shipped as the raw key "proj_delete" because no dictionary had it.
+  eq("the button says what it does",
+    (await page.locator('#ws-project-list li[data-id="p1"] [data-del-project]').innerText()).trim(), "Usuń projekt");
+  await page.click('#ws-project-list li[data-id="p1"] [data-del-project]');
+  const ask = '#ws-project-list li[data-id="p1"] .ws-row-ask';
+  check("the row warning has counts and the room destination",
+    (await page.locator(ask).innerText()).includes("kalkulacje (2)")
+      && (await page.locator(ask).innerText()).includes("Pomieszczenia (1)"));
+  eq("focus moves to cancel", await page.locator(`${ask} [data-cancel-del-project]`).evaluate((n) => n === document.activeElement), true);
+  await page.click(`${ask} [data-cancel-del-project]`);
+  eq("cancel closes the warning", await page.locator(ask).count(), 0);
+  eq("cancel deletes nothing", (await store(page)).projects.find((p) => p.id === "p1").deletedAt, null);
+
+  await page.click('#ws-project-list li[data-id="p1"] [data-del-project]');
+  await page.click(`${ask} [data-confirm-del-project]`);
+  const after = await store(page);
+  eq("confirm removes the project row", await page.locator('#ws-project-list li[data-id="p1"]').count(), 0);
+  eq("its room keeps its link in storage", after.rooms.find((r) => r.id === "r1").projectId, "p1");
+  eq("loose rooms appear nowhere on projects", await page.locator('#ws-room-list [data-project-id=""]').count(), 0);
+  await page.click("#ws-undo-go");
+  const back = await store(page);
+  eq("undo restores the row", await page.locator('#ws-project-list li[data-id="p1"]').count(), 1);
+  eq("undo re-attaches the room", back.rooms.find((r) => r.id === "r1").projectId, "p1");
+  await page.close();
+}
+
 head("9. delete — asked on the page, and taken back");
 {
   const page = await open(ctx, PROJECTS + "?id=p1", { workspace: fixture(), active: "p1" });
@@ -452,7 +482,9 @@ head("9. delete — asked on the page, and taken back");
 
   await page.click("#ws-project-delete");
   eq("pressing delete asks", await page.$eval("#ws-delete-ask", (n) => n.hidden), false);
-  eq("in the visitor's own language", await text(page, "#ws-delete-q"), "Usunąć projekt razem z jego pozycjami?");
+  check("the warning names the lines and room move",
+    (await text(page, "#ws-delete-q")).includes("kalkulacje (2)")
+      && (await text(page, "#ws-delete-q")).includes("Pomieszczenia (1)"));
   await page.click("#ws-delete-no");
   eq("saying no closes the question", await page.$eval("#ws-delete-ask", (n) => n.hidden), true);
   eq("and deletes nothing", (await store(page)).projects.find((p) => p.id === "p1").deletedAt, null);
@@ -473,6 +505,7 @@ head("9. delete — asked on the page, and taken back");
     after.estimations.filter((e) => e.projectId === "p1" && e.deletedAt).length, 2);
   // A room is a physical place and outlives the project it was measured for.
   eq("the room survives the project", after.rooms.filter((r) => !r.deletedAt).length, 1);
+  eq("and keeps its link to the project", after.rooms.find((r) => r.id === "r1").projectId, "p1");
   eq("the active project moved on", await activeId(page), "p2");
 
   const strip = (await text(page, "#ws-undo")).replace(/\s+/g, " ");
@@ -483,6 +516,7 @@ head("9. delete — asked on the page, and taken back");
   const back = await store(page);
   eq("with its lines", back.estimations.filter((e) => e.projectId === "p1" && !e.deletedAt).length, 2);
   eq("the tombstone is cleared", back.projects.find((p) => p.id === "p1").deletedAt, null);
+  eq("and the room is re-attached", back.rooms.find((r) => r.id === "r1").projectId, "p1");
   check("and the strip says so instead of offering the same thing twice",
     (await text(page, "#ws-undo")).includes("Projekt przywrócony"));
   eq("there is nothing left to press", await page.$eval("#ws-undo-go", (n) => n.hidden), true);

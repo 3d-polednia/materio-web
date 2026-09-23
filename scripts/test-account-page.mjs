@@ -1261,6 +1261,28 @@ head("16. rooms stand inside the project they belong to");
     return null;
   });
   eq("adding from an account card writes that project id", roomCardDoc.projectId, "p3");
+
+  const assign = '#acctrooms-list [data-project-id=""] li[data-id="r2"] [data-assign-project]';
+  eq("a loose room offers project assignment", await page.locator(assign).count(), 1);
+  await page.selectOption(assign, "p2");
+  await page.waitForFunction(() => window.__fbDocs.get("users/u1/rooms/r2").projectId === "p2");
+  eq("choosing a project writes the room link",
+    await page.evaluate(() => window.__fbDocs.get("users/u1/rooms/r2").projectId), "p2");
+
+  await page.click("#tab-projects");
+  let deleteQuestion = "";
+  page.once("dialog", async (dialog) => { deleteQuestion = dialog.message(); await dialog.accept(); });
+  await page.click('#project-list li[data-id="p1"] > .row-actions [data-del]');
+  await page.waitForFunction(() => window.__fbDocs.get("users/u1/projects/p1").deletedAt !== null);
+  // The fake store delivers collection changes only when told to, as the server would.
+  await page.evaluate(() => window.__fbSync(false, true));
+  await page.click("#tab-rooms");
+  await page.waitForSelector('#acctrooms-list [data-project-id=""] li[data-id="r1"]');
+  eq("its room now shows under no project", await page.locator('#acctrooms-list [data-project-id=""] li[data-id="r1"]').count(), 1);
+  check("project delete warns that its rooms remain", deleteQuestion.includes("Pomieszczenia (1)"), deleteQuestion);
+  const detached = await page.evaluate(() => window.__fbDocs.get("users/u1/rooms/r1"));
+  eq("project delete leaves the room its link", detached.projectId, "p1");
+  eq("and does not delete the room", detached.deletedAt, null);
   eq("no console error", page.lmErrors.join(" / "), "");
   await page.close();
   await ctx.close();
