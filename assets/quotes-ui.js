@@ -121,15 +121,25 @@ function quoClear() {
  * module — a material re-priced on the project screen moves this number with no write.
  */
 function quoRow(q) {
-  const totals = crmQuoteTotals(q.id);
-  const project = q.projectId && typeof wsProject === "function" ? wsProject(q.projectId) : null;
-  const where = project ? `${quoEsc(project.name)} · ` : "";
-  return `<li data-id="${quoEsc(q.id)}">
+  const summary = crmQuoteSummary(q.id);
+  if (!summary) return "";
+  const names = [summary.client && summary.client.name, summary.project && summary.project.name]
+    .filter(Boolean).map(quoEsc);
+  // No "Bez projektu" here when there is none: the missing line under it says so.
+  const where = names.join(" · ");
+  const missing = summary.missing.map((part) => quoEsc(quoT(`quo_missing_${part}`))).join(" · ");
+  const total = summary.totals.total === null ? "—"
+    : quoEsc(quoMoney(summary.totals.total, summary.totals.currencyCode));
+  return `<li data-id="${quoEsc(q.id)}" class="quo-index-row">
       <span class="row-name">
         <a href="?id=${encodeURIComponent(q.id)}" data-open><b>${quoEsc(q.name)}</b></a>
-        <em class="muted">${where}${totals.total === null ? "—" : quoEsc(quoMoney(totals.total, totals.currencyCode))}</em>
+        <span class="muted">${where}</span>
+        ${missing ? `<span class="quo-index-missing muted">${missing}</span>` : ""}
       </span>
-      <span class="row-actions"></span>
+      <span class="quo-index-side">
+        <span class="chip">${quoEsc(quoT(`quo_st_${summary.status}`))}</span>
+        <strong class="dash-fig">${total}</strong>
+      </span>
     </li>`;
 }
 
@@ -236,8 +246,9 @@ function quoRenderProjectContent(q) {
   const project = q.projectId && wsProject(q.projectId);
   const rooms = project ? wsRooms(project.id) : [];
   const items = project ? wsItems(project.id) : [];
-  roomsEl.innerHTML = rooms.length ? rooms.map((room) => `<li data-id="${quoEsc(room.id)}"><span class="row-name"><b>${quoEsc(room.name)}</b></span></li>`).join("")
-    : `<li class="empty muted">${quoEsc(quoT("proj_room_empty"))}</li>`;
+  roomsEl.textContent = rooms.length
+    ? `${quoT("quo_rooms_label")}: ${rooms.map((room) => room.name).join(", ")}`
+    : `${quoT("quo_rooms_label")}: ${quoT("quo_rooms_none")}`;
   itemsEl.innerHTML = items.length ? items.map((item) => `<li data-id="${quoEsc(item.id)}">
       <span class="row-name"><b>${quoEsc(item.name)}</b></span>
       <span class="dash-fig">${quoEsc(`${quoNum(item.quantity)} ${item.unit || ""}`.trim())} · ${quoEsc(quoMoney(item.estimatedCostMinor || 0, item.currencyCode))}</span>
@@ -322,6 +333,9 @@ function quoRenderLabour(q) {
   const note = document.getElementById("quo-labour-full");
   if (form) form.hidden = full;
   if (note) note.hidden = !full;
+  const priceLabel = document.getElementById("quo-labour-price-label");
+  const code = q.currencyCode || (typeof wsCurrency === "function" ? wsCurrency() : "PLN");
+  if (priceLabel) priceLabel.textContent = `${quoT("quo_labour_price")} (${code})`;
   quoRunningTotal();
 }
 
@@ -391,6 +405,8 @@ function quoRenderDetail(id) {
   quoCrumb(q.name);
 
   quoRenderChain(q);
+  const status = document.getElementById("quo-status");
+  if (status) status.value = crmQuoteStatus(q);
 
   // Chapter XXII's five figures. Three of them are the project's own money, read through
   // wsProjectCosts() rather than copied, so this page and the project screen can never
@@ -517,6 +533,7 @@ function wireQuoteDetail() {
   // Chapter XXII's margin: one field on the page, because it is the number a tradesman
   // moves while watching the total.
   on("quo-margin", "change", (e) => { crmUpdateQuote(quoOpenId, { marginMajor: e.target.value }); });
+  on("quo-status", "change", (e) => { crmUpdateQuote(quoOpenId, { status: e.target.value }); });
 
   on("quo-edit", "click", () => {
     quoEditing = !quoEditing;
@@ -618,18 +635,8 @@ function wireQuoteDetail() {
       quoMoney(crmLineAmount(price, n), code)}`;
   });
 
-  on("quo-project-form", "submit", (e) => {
-    e.preventDefault();
-    const pick = document.getElementById("quo-project-pick");
-    if (!pick) return;
-    quoChooseProject(pick.value);
-  });
-
-  on("quo-client-form", "submit", (e) => {
-    e.preventDefault();
-    const pick = document.getElementById("quo-client-pick");
-    if (pick && pick.value) quoChooseClient(pick.value);
-  });
+  on("quo-project-pick", "change", (e) => { quoChooseProject(e.target.value); });
+  on("quo-client-pick", "change", (e) => { if (e.target.value) quoChooseClient(e.target.value); });
 
   on("quo-client-new-form", "submit", (e) => {
     e.preventDefault();

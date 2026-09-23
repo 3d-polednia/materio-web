@@ -113,7 +113,10 @@ function workspace() {
       { id: "p1", name: "Remont łazienki", archived: false, ...sync(T0 + 5 * DAY) },
       { id: "p2", name: "Salon", archived: false, ...sync(T0 + 3 * DAY) },
     ],
-    rooms: [],
+    rooms: [
+      { id: "r1", projectId: "p1", name: "Łazienka", lengthM: 3, widthM: 2, heightM: 2.5, ...sync(T0) },
+      { id: "r2", projectId: "p1", name: "Kuchnia", lengthM: 4, widthM: 3, heightM: 2.5, ...sync(T0) },
+    ],
     estimations: [
       line("e1", "p1", "Gres 60×60", 15, "opak.", 74985, T0 + 1 * DAY),
       line("e2", "p1", "Wywóz gruzu", 1, "usł.", 120000, T0 + 2 * DAY, true),
@@ -236,8 +239,14 @@ head("1. the quote list");
   eq("the quote is on the page", list.length, 1);
   check("with its name", list[0].includes("Łazienka — wycena"), list[0]);
   check("the project it prices", list[0].includes("Remont łazienki"), list[0]);
+  check("the status is visible in a chip", list[0].includes("Szkic"), list[0]);
   check("and what it comes to — computed, never stored",
     digits(list[0]).includes(String(TOTAL)), list[0]);
+  eq("the page heading is not repeated by an h2", await page.$$eval("#quo-index h2", (n) => n.length), 0);
+  eq("the name field has a visible label",
+    await page.$eval("label[for='quo-name']", (n) => n.textContent.trim()), "Nazwa wyceny");
+  eq("the project field has a visible label",
+    await page.$eval("label[for='quo-project']", (n) => n.textContent.trim()), "Projekt");
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
@@ -305,6 +314,8 @@ head("2b. chapter XXII's five figures, on the page");
   eq("and the suma is the two", await fig("#quo-fig-total"), TOTAL);
   eq("the margin field carries what is stored", await page.inputValue("#quo-margin"), "15");
   eq("with nothing to warn about", await page.$eval("#quo-mixed", (n) => n.hidden), true);
+  const summaryOrder = await page.$$eval(".quo-summary-list dd", (nodes) => nodes.map((n) => n.id));
+  eq("Suma is the last summary figure", summaryOrder.at(-1), "quo-fig-total");
   check("the note is on the page", (await page.textContent("#quo-note")).includes("klient"));
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
@@ -335,10 +346,25 @@ head("2c. chapter XXIV read backwards: the quote names its job and its client");
   const stored = (await liveQuotes(page))[0];
   eq("no clientId is stored on the quote", stored.clientId, undefined);
   eq("and no jobId either", stored.jobId, undefined);
+  eq("the new-client form starts closed", await page.$eval("#quo-client-new-form", (n) => n.checkVisibility()), false);
+  await page.click(".quo-new-grid details:first-child summary");
+  eq("its summary opens the add form", await page.$eval("#quo-client-new-form", (n) => n.checkVisibility()), true);
+  await page.click(".quo-new-grid details:nth-child(2) summary");
+  eq("the project summary opens its add form", await page.$eval("#quo-project-new-form", (n) => n.checkVisibility()), true);
   await page.close();
 }
 
-head("2d. the record is corrected in a form on the page");
+head("2d. the quote status is changed on the quote");
+{
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  eq("the status picker reads the stored status", await page.inputValue("#quo-status"), "draft");
+  await page.selectOption("#quo-status", "sent");
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("liczmat-crm-v1")).quotes[0].status === "sent");
+  eq("the changed status persists", (await liveQuotes(page))[0].status, "sent");
+  await page.close();
+}
+
+head("2e. the record is corrected in a form on the page");
 {
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
   await page.click("#quo-edit");
@@ -370,6 +396,8 @@ head("3. robocizna: quantity × rate, typed onto the quote");
   check("with its quantity and unit", first[0].includes("20 m²"), first[0]);
   check("the rate read back by dividing", digits(first[0]).includes("8000"), first[0]);
   check("and the amount", digits(first[0]).includes(String(LABOUR)), first[0]);
+  check("the rate label names the quote currency",
+    (await page.textContent("#quo-labour-price-label")).includes("PLN"));
 
   await page.fill("#quo-labour-name", "Fugowanie");
   await page.fill("#quo-labour-qty", "20");
@@ -483,6 +511,9 @@ head("5. the project is read, never written — and it can be detached and attac
   eq("the project is listed", project.length, 1);
   check("by name", project[0].includes("Remont łazienki"), project[0]);
   check("with what it has cost", digits(project[0]).includes(String(MATERIALS + OTHER)), project[0]);
+  const rooms = await page.textContent("#quo-room-list");
+  check("the rooms are one labelled line",
+    rooms.includes("Pomieszczenia: Łazienka, Kuchnia"), rooms);
 
   await page.click("#quo-project-list [data-unlink]");
   await page.waitForFunction(() =>
@@ -500,7 +531,7 @@ head("5. the project is read, never written — and it can be detached and attac
     await page.$$eval("#quo-chain-line li.off a", (a) => a.length), 2);
 
   await page.selectOption("#quo-project-pick", { label: "Remont łazienki" });
-  await page.click("#quo-project-form button[type=submit]");
+  await page.dispatchEvent("#quo-project-pick", "change");
   await page.waitForFunction((want) =>
     document.getElementById("quo-fig-materials").textContent.replace(/\D/g, "") === want,
   String(MATERIALS));

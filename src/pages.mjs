@@ -2243,90 +2243,57 @@ export function quotesMain(lang, t, features) {
                disagree with the job's own page. Session 26 draws it with the same strip
                /zlecenia/ uses — assets/crm-chain.js — so the path reads identically from
                both ends. -->
-          <nav class="crm-chain" id="quo-chain-line" aria-label="${esc(t("crm_chain_t"))}"></nav>
+          <div class="quo-top-row">
+            <nav class="crm-chain" id="quo-chain-line" aria-label="${esc(t("crm_chain_t"))}"></nav>
+            <label class="field quo-status-field" for="quo-status">
+              <span>${esc(t("quo_status"))}</span>
+              <select id="quo-status">
+                ${["draft", "sent", "accepted", "rejected"].map((status) =>
+                  `<option value="${status}">${esc(t(`quo_st_${status}`))}</option>`).join("")}
+              </select>
+            </label>
+          </div>
 
           <section class="dash-sec">
-            <div class="dash-head"><h2>${esc(t("crm_chain_t"))}</h2></div>
+            <div class="dash-head"><h2>${esc(t("quo_who_t"))}</h2></div>
             <p class="muted">${esc(t("crm_chain_d"))}</p>
             <div class="ws-mat-grid">
-              <form id="quo-client-form" class="ws-mat-f">
+              <div id="quo-client-form" class="ws-mat-f">
                 <label class="ws-bar-label" for="quo-client-pick">${esc(t("crm_node_client"))}</label>
                 <select id="quo-client-pick"></select>
-                <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
-              </form>
-              <form id="quo-project-form" class="ws-mat-f">
+              </div>
+              <div id="quo-project-form" class="ws-mat-f">
                 <label class="ws-bar-label" for="quo-project-pick">${esc(t("crm_node_project"))}</label>
                 <select id="quo-project-pick"></select>
-                <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
-              </form>
+              </div>
             </div>
-            <div class="ws-mat-grid">
-              <form id="quo-client-new-form" class="ws-mat-f">
-                <label class="ws-bar-label" for="quo-client-new">${esc(t("cli_new"))}</label>
-                <input id="quo-client-new" maxlength="120" placeholder="${esc(t("cli_new"))}" required>
-                <button type="submit" class="btn btn-ghost btn-sm">${esc(t("app_add"))}</button>
-              </form>
-              <form id="quo-project-new-form" class="ws-mat-f">
-                <label class="ws-bar-label" for="quo-project-new">${esc(t("ws_new_project"))}</label>
-                <input id="quo-project-new" maxlength="120" placeholder="${esc(t("ws_new_project"))}" required>
-                <button type="submit" class="btn btn-ghost btn-sm">${esc(t("app_add"))}</button>
-              </form>
+            <div class="quo-new-grid">
+              <details>
+                <summary>${esc(t("app_clients_new"))}</summary>
+                <form id="quo-client-new-form" class="ws-mat-f">
+                  <label class="ws-bar-label" for="quo-client-new">${esc(t("cli_new"))}</label>
+                  <input id="quo-client-new" maxlength="120" required>
+                  <button type="submit" class="btn btn-ghost btn-sm">${esc(t("app_add"))}</button>
+                </form>
+              </details>
+              <details>
+                <summary>${esc(t("quo_project_create"))}</summary>
+                <form id="quo-project-new-form" class="ws-mat-f">
+                  <label class="ws-bar-label" for="quo-project-new">${esc(t("ws_new_project"))}</label>
+                  <input id="quo-project-new" maxlength="120" required>
+                  <button type="submit" class="btn btn-ghost btn-sm">${esc(t("app_add"))}</button>
+                </form>
+              </details>
             </div>
           </section>
 
-          <!-- Chapter XXII's five figures. Three of them are the project's own money,
-               read through wsProjectCosts() and never copied onto the quote. -->
-          <div class="ws-project-figs">
-            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_materials"))}</span> <b id="quo-fig-materials"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_other"))}</span> <b id="quo-fig-other"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_labour"))}</span> <b id="quo-fig-labour"></b></p>
-          </div>
-          <div class="ws-project-figs">
-            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_sub"))}</span> <b id="quo-fig-sub"></b></p>
-            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("quo_fig_margin"))}</span> <b id="quo-fig-margin"></b></p>
-            <p class="ws-project-fig ws-project-sum"><span class="eyebrow muted">${esc(t("quo_fig_total"))}</span> <b id="quo-fig-total"></b></p>
-          </div>
-          <p class="muted ws-estimate-mixed" id="quo-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
-
-          <!-- The margin is one field on the page rather than a form to open: it is the
-               number a tradesman moves while looking at the total. -->
-          <p class="ws-mat-grid ws-mat-grid-one">
-            <label class="ws-mat-f ws-mat-f-sm">
-              <span class="ws-bar-label">${esc(t("quo_margin"))}</span>
-              <input id="quo-margin" type="text" inputmode="decimal">
-            </label>
-          </p>
-          <p class="muted field-note">${esc(t("quo_margin_d"))}</p>
-
-          <div class="ws-project-actions">
-            <button type="button" class="btn btn-ghost btn-sm" id="quo-edit">${esc(t("quo_edit"))}</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="quo-delete">${esc(t("app_delete"))}</button>
-          </div>
-
-          <form id="quo-edit-form" class="mt-4" hidden>
-            <p class="ws-mat-grid">
-              <label class="ws-mat-f">
-                <span class="ws-bar-label">${esc(t("quo_name"))}</span>
-                <input id="quo-edit-name" type="text" maxlength="120" required>
-              </label>
-            </p>
-            <p class="ws-mat-f">
-              <label class="ws-bar-label" for="quo-edit-note">${esc(t("quo_note"))}</label>
-              <textarea id="quo-edit-note" rows="3" maxlength="2000"></textarea>
-            </p>
-            <p>
-              <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
-              <button type="button" class="btn btn-ghost btn-sm" data-quo-edit-cancel>${esc(t("action_cancel"))}</button>
-            </p>
-          </form>
-
-          <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
-            <p id="quo-delete-q"></p>
-            <p class="ws-ask-row">
-              <button type="button" class="btn btn-primary btn-sm" id="quo-delete-yes">${esc(t("quo_delete_yes"))}</button>
-              <button type="button" class="btn btn-ghost btn-sm" id="quo-delete-no">${esc(t("action_cancel"))}</button>
-            </p>
-          </div>
+          <section class="dash-sec">
+            <div class="dash-head"><h2>${esc(t("quo_mat_t"))}</h2></div>
+            <ul id="quo-project-list" class="data-list"></ul>
+            <p id="quo-room-list" class="muted quo-rooms-line"></p>
+            <ul id="quo-material-list" class="data-list"></ul>
+            <p class="muted field-note" id="quo-material-sum"></p>
+          </section>
 
           <!-- Chapter XXII's "robocizna": the only part of a quote nothing else counts. -->
           <section class="dash-sec">
@@ -2339,19 +2306,19 @@ export function quotesMain(lang, t, features) {
               <p class="ws-mat-grid">
                 <label class="ws-mat-f">
                   <span class="ws-bar-label">${esc(t("quo_labour_name"))}</span>
-                  <input id="quo-labour-name" type="text" maxlength="120" required>
+                  <input id="quo-labour-name" type="text" maxlength="120" placeholder="${esc(t("quo_labour_name_ph"))}" required>
                 </label>
                 <label class="ws-mat-f ws-mat-f-sm">
                   <span class="ws-bar-label">${esc(t("quo_labour_qty"))}</span>
-                  <input id="quo-labour-qty" type="text" inputmode="decimal">
+                  <input id="quo-labour-qty" type="text" inputmode="decimal" placeholder="${esc(t("quo_labour_qty_ph"))}">
                 </label>
                 <label class="ws-mat-f ws-mat-f-sm">
                   <span class="ws-bar-label">${esc(t("quo_labour_unit"))}</span>
-                  <input id="quo-labour-unit" type="text" maxlength="24">
+                  <input id="quo-labour-unit" type="text" maxlength="24" placeholder="${esc(t("quo_labour_unit_ph"))}">
                 </label>
                 <label class="ws-mat-f ws-mat-f-sm">
-                  <span class="ws-bar-label">${esc(t("quo_labour_price"))}</span>
-                  <input id="quo-labour-price" type="text" inputmode="decimal">
+                  <span class="ws-bar-label" id="quo-labour-price-label">${esc(t("quo_labour_price"))}</span>
+                  <input id="quo-labour-price" type="text" inputmode="decimal" placeholder="${esc(t("quo_labour_price_ph"))}">
                 </label>
               </p>
               <p>
@@ -2362,26 +2329,22 @@ export function quotesMain(lang, t, features) {
             <p class="muted" id="quo-labour-full" hidden>${esc(t("quo_labour_full"))}</p>
           </section>
 
-          <!-- The one link the quote stores. The project is the free workspace's own row;
-               nothing here renames, archives or deletes it. -->
-          <section class="dash-sec">
-            <div class="dash-head">
-              <h2>${esc(t("quo_project"))}</h2>
-              <a class="dash-more" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-            </div>
-            <ul id="quo-project-list" class="data-list"></ul>
-            <p class="muted field-note">${esc(t("quo_project_d"))}</p>
-          </section>
-
-          <section class="dash-sec">
-            <div class="dash-head"><h2>${esc(t("ws_rooms"))}</h2></div>
-            <ul id="quo-room-list" class="data-list"></ul>
-          </section>
-
-          <section class="dash-sec">
-            <div class="dash-head"><h2>${esc(t("proj_mat_t"))}</h2></div>
-            <ul id="quo-material-list" class="data-list"></ul>
-            <p class="muted field-note" id="quo-material-sum"></p>
+          <section class="dash-sec quo-summary-card">
+            <div class="dash-head"><h2>${esc(t("quo_sum_t"))}</h2></div>
+            <label class="ws-mat-f ws-mat-f-sm quo-margin-field">
+              <span class="ws-bar-label">${esc(t("quo_margin"))}</span>
+              <input id="quo-margin" type="text" inputmode="decimal">
+            </label>
+            <p class="muted field-note">${esc(t("quo_margin_d"))}</p>
+            <dl class="quo-summary-list">
+              <div><dt>${esc(t("quo_fig_materials"))}</dt><dd id="quo-fig-materials"></dd></div>
+              <div><dt>${esc(t("quo_fig_other"))}</dt><dd id="quo-fig-other"></dd></div>
+              <div><dt>${esc(t("quo_fig_labour"))}</dt><dd id="quo-fig-labour"></dd></div>
+              <div><dt>${esc(t("quo_fig_sub"))}</dt><dd id="quo-fig-sub"></dd></div>
+              <div><dt>${esc(t("quo_fig_margin"))}</dt><dd id="quo-fig-margin"></dd></div>
+              <div class="quo-summary-total"><dt>${esc(t("quo_fig_total"))}</dt><dd id="quo-fig-total"></dd></div>
+            </dl>
+            <p class="muted ws-estimate-mixed" id="quo-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
           </section>
 
           <section class="dash-sec">
@@ -2389,9 +2352,37 @@ export function quotesMain(lang, t, features) {
               <h2>${esc(t("quo_note_t"))}</h2>
             </div>
             <p id="quo-note" class="crm-note"></p>
+            <p><button type="button" class="btn btn-ghost btn-sm" id="quo-edit">${esc(t("quo_edit"))}</button></p>
+            <form id="quo-edit-form" class="mt-4" hidden>
+              <p class="ws-mat-grid">
+                <label class="ws-mat-f">
+                  <span class="ws-bar-label">${esc(t("quo_name"))}</span>
+                  <input id="quo-edit-name" type="text" maxlength="120" required>
+                </label>
+              </p>
+              <p class="ws-mat-f">
+                <label class="ws-bar-label" for="quo-edit-note">${esc(t("quo_note"))}</label>
+                <textarea id="quo-edit-note" rows="3" maxlength="2000"></textarea>
+              </p>
+              <p>
+                <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-quo-edit-cancel>${esc(t("action_cancel"))}</button>
+              </p>
+            </form>
           </section>
 
           ${quotePdfBlock(lang, t, features)}
+
+          <section class="dash-sec quo-delete-zone">
+            <button type="button" class="btn btn-ghost btn-sm" id="quo-delete">${esc(t("quo_delete_yes"))}</button>
+            <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
+              <p id="quo-delete-q"></p>
+              <p class="ws-ask-row">
+                <button type="button" class="btn btn-primary btn-sm" id="quo-delete-yes">${esc(t("quo_delete_yes"))}</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="quo-delete-no">${esc(t("action_cancel"))}</button>
+              </p>
+            </div>
+          </section>
         </div>
       </article>`;
 
@@ -2401,11 +2392,10 @@ export function quotesMain(lang, t, features) {
           <button type="button" class="btn btn-ghost btn-sm" id="quo-undo-go">${esc(t("quo_undo"))}</button>
         </p>
 
-        <h2>${esc(t("quo_list_t"))}</h2>
-        <p class="muted">${esc(t("quo_list_d"))}</p>
+        <p class="lead">${esc(t("quo_list_d"))}</p>
         <form id="quo-form" class="inline-form">
-          <input id="quo-name" type="text" maxlength="120" placeholder="${esc(t("quo_new"))}" required aria-label="${esc(t("quo_new"))}">
-          <select id="quo-project" aria-label="${esc(t("quo_project"))}"></select>
+          <div class="field"><label for="quo-name">${esc(t("quo_new"))}</label><input id="quo-name" type="text" maxlength="120" required></div>
+          <div class="field field-narrow"><label for="quo-project">${esc(t("quo_project"))}</label><select id="quo-project"></select></div>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="quo-list" class="data-list"></ul>

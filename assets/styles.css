@@ -727,6 +727,7 @@ select:focus-visible, textarea:focus-visible {
 /* The account quote list is a compact hand-off to the full editor. Its total is the one
    figure that must stay easy to scan; the name and provenance take the flexible column. */
 #acctquo-list .acctquo-row { align-items: start; }
+#quo-page .quo-margin-field + .field-note { margin-top: var(--sp-2); }
 #acctquo-list .acctquo-main {
   display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0;
 }
@@ -2384,6 +2385,94 @@ a.chip:hover { text-decoration: none; }
 .cal-rel.job-due-today { color: var(--ev-blue); font-weight: var(--fw-semi); }
 .cal-when input[type="date"] { max-width: 11rem; }
 .data-list li.cal-row { flex-wrap: wrap; }
+
+/* The quote editor follows the document it produces: relation, project materials,
+   labour, then one financial summary. Keep every rule under the page root so the
+   denser account quote rows retain their own rhythm. */
+#quo-page .quo-top-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+#quo-page .quo-top-row .crm-chain { flex: 1 1 auto; min-width: 0; }
+#quo-page .quo-status-field { flex: 0 1 12rem; margin: 0; }
+#quo-page .quo-status-field select { width: 100%; min-height: 24px; }
+#quo-page .quo-new-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+#quo-page .quo-new-grid details {
+  min-width: 0;
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+}
+#quo-page .quo-new-grid summary {
+  min-height: 24px;
+  padding: var(--sp-2) var(--sp-3);
+  color: var(--accent-strong);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+}
+#quo-page .quo-new-grid form { padding: 0 var(--sp-3) var(--sp-3); }
+#quo-page .quo-new-grid .btn { align-self: flex-start; }
+#quo-page .quo-rooms-line { overflow-wrap: anywhere; }
+#quo-page .quo-summary-card {
+  padding: var(--sp-5);
+  border: 1px solid var(--outline-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+#quo-page .quo-margin-field { max-width: 12rem; }
+#quo-page .quo-summary-list { margin: var(--sp-5) 0 0; }
+#quo-page .quo-summary-list div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-4);
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--outline);
+}
+#quo-page .quo-summary-list dt,
+#quo-page .quo-summary-list dd { margin: 0; }
+#quo-page .quo-summary-list dd {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+#quo-page .quo-summary-list .quo-summary-total {
+  padding-top: var(--sp-3);
+  color: var(--on-surface);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-lg);
+  border-top-color: var(--outline-strong);
+}
+#quo-page .quo-delete-zone { padding-top: var(--sp-6); border-top: 1px solid var(--outline); }
+#quo-page .quo-index-row { align-items: flex-start; }
+#quo-page .quo-index-missing { color: var(--warning); }
+#quo-page .quo-index-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  #quo-page .quo-top-row { align-items: stretch; flex-direction: column; }
+  #quo-page .quo-status-field { flex-basis: auto; max-width: none; }
+  #quo-page .quo-status-field select { min-height: var(--control-h); }
+  #quo-page .quo-new-grid { grid-template-columns: minmax(0, 1fr); }
+  #quo-page .quo-new-grid summary { min-height: var(--control-h); display: flex; align-items: center; }
+  #quo-page .quo-summary-card { padding: var(--sp-3); }
+  #quo-page .quo-summary-list div { gap: var(--sp-2); }
+  #quo-page .quo-index-row { flex-wrap: wrap; }
+  #quo-page .quo-index-row .row-name { flex-basis: 100%; min-width: 0; }
+  #quo-page .quo-index-side { width: 100%; align-items: flex-start; }
+}
 
 /* ---------- Legal / document page ---------- */
 .doc { max-width: 820px; margin: 0 auto; padding: var(--sp-10) var(--gutter) var(--sp-16); }

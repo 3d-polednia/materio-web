@@ -895,7 +895,7 @@ head("9. the frame the build writes");
       "quo-client-form", "quo-client-pick", "quo-client-new-form",
       "quo-project-pick", "quo-project-new-form",
       "quo-room-list", "quo-material-list", "quo-material-sum", "ws-pdf-form", "ws-pdf-doc",
-      "quo-margin", "quo-fig-materials", "quo-fig-other", "quo-fig-labour",
+      "quo-margin", "quo-status", "quo-fig-materials", "quo-fig-other", "quo-fig-labour",
       "quo-fig-sub", "quo-fig-margin", "quo-fig-total", "quo-mixed", "quo-chain-line",
       "quo-undo", "quo-gate", "quo-tool", "quo-pro-chip"]) {
       check(`${lang}: the page carries #${id}`, main.includes(`id="${id}"`), id);
@@ -976,15 +976,13 @@ head("9b. the copy, in four languages");
       DICT[lang].pay_monthly_t !== DICT[lang].pay_yearly_t);
     check(`${lang}: and says the subscription is not open yet`,
       DICT[lang].pay_soon.length > 40, DICT[lang].pay_soon);
-    // Session 46 changed what this sentence is FOR. Until then it warned that the rows were
-    // in this browser and nowhere else; they are in the sync contract now, so the note says
-    // where they go instead — and naming localStorage here would be the old claim wearing
-    // the new words. The storage detail is on /cookies/, which is the page for it.
-    check(`${lang}: the note says the rows reach the phone`,
-      DICT[lang].quo_local_note.includes("Android"), DICT[lang].quo_local_note);
+    // The page itself does not sync. /app/ calls autoReconcile(), so the note names the
+    // next account visit instead of promising an immediate Android write from this page.
+    check(`${lang}: the note does not promise a direct phone write`,
+      !DICT[lang].quo_local_note.includes("Android"), DICT[lang].quo_local_note);
     check(`${lang}: and it no longer names localStorage`,
       !DICT[lang].quo_local_note.includes("localStorage"), DICT[lang].quo_local_note);
-    check(`${lang}: and it is a full sentence`, DICT[lang].quo_local_note.length > 100);
+    check(`${lang}: and it is a full sentence`, DICT[lang].quo_local_note.length > 60);
     check(`${lang}: the margin says what it is a percentage of`,
       DICT[lang].quo_margin_d.length > 40, DICT[lang].quo_margin_d);
     check(`${lang}: the project note says the money is read, not copied`,
@@ -996,6 +994,9 @@ head("9b. the copy, in four languages");
       .map((k) => DICT[lang][k]);
     check(`${lang}: the five figures are five different words`, new Set(figs).size === 5, figs.join(" | "));
   }
+  const account = read("assets/app.js");
+  check("the account visit is where local rows are reconciled",
+    account.includes("async function autoReconcile(uid)") && account.includes("autoReconcile(uid);"));
   // Chapter XXII's own vocabulary, in the language the plan is written in.
   eq("the page is called Wyceny in Polish", DICT.pl.quopage_title, "Wyceny");
   eq("materiały", DICT.pl.quo_fig_materials, "Materiał");
