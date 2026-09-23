@@ -87,6 +87,21 @@ Tutaj zostaje wyłącznie to, co żywe: tabela postępu, dwie ostatnie sesje, li
 zrobienia w konsolach, znane ograniczenia i otwarte decyzje. Pełna lista otwartych wątków
 obu repozytoriów, przeglądana razem z tym plikiem, jest w `Obsidian/Liczmat/Meta/Otwarte watki.md`.
 
+## Sesja T — panel admina: kto, gdzie, profil; luka okresu próbnego (2026-09-23)
+
+Commit `40727e21e`. Pełny opis: `Obsidian/Liczmat/Historia/Sesja T - panel admina i luka
+okresu probnego.md`, panel: `docs/ADMIN.md`.
+
+- Lista kont w panelu ma siedem kolumn: plan ze źródłem, profil jest/brak, logowanie
+  z potwierdzeniem adresu, ostatnia aktywność z platformą, pierwsze wejście, data założenia.
+  Kliknięcie adresu otwiera kartę szczegółów z liczbą dokumentów konta.
+- **Luka:** Android zakłada `users/{uid}` tylko w przebiegu synchronizacji, a bramka
+  właściciela go zatrzymuje, gdy telefon ma dane sprzed zalogowania. Takie konto nie
+  dostawało okresu próbnego. Naprawa: `ensureProfile`, wyzwalacz Auth v1, który po 15 s
+  zakłada brakujący profil. Wtedy `grantTrial` odpala sam.
+- **Czeka na właściciela:** `firebase deploy --only functions:ensureProfile,functions:grantTrial,functions:adminPlan`.
+  Sesja nie mogła wdrożyć funkcji sama.
+
 ## Sesja S — pomieszczenia pogrupowane po projektach, usuwanie projektu (2026-09-23)
 
 Cztery zgłoszenia właściciela ze zrzutów ekranu, cztery commity: `223ccd601`,
