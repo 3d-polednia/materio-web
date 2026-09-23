@@ -1845,25 +1845,10 @@ export function projectsMain(lang, t, aisles = [], features = []) {
 
         <h2 class="mt-8">${esc(t("ws_rooms"))}</h2>
         <p class="muted">${esc(t("wspage_rooms_d"))}</p>
-        <!-- Chapter XVIII: a room is an element of a project, so the form asks which one
-             instead of silently taking the active project — which is what it did until the
-             owner reported that a room could not be assigned at all. The list is filled by
-             assets/workspace-ui.js; "no project" is a real answer, because a room measured
-             before there is a project is still a room. -->
-        <form id="ws-room-form" class="inline-form">
-          <label class="field" for="ws-room-name"><span class="fld-label">${esc(t("ws_new_room"))}</span>
-            <input id="ws-room-name" type="text" maxlength="120" required></label>
-          <label class="field field-narrow" for="ws-room-length"><span class="fld-label">${esc(t("fld_length"))}</span>
-            <input id="ws-room-length" type="text" inputmode="decimal" value="5"></label>
-          <label class="field field-narrow" for="ws-room-width"><span class="fld-label">${esc(t("fld_width"))}</span>
-            <input id="ws-room-width" type="text" inputmode="decimal" value="4"></label>
-          <label class="field field-narrow" for="ws-room-height"><span class="fld-label">${esc(t("fld_height"))}</span>
-            <input id="ws-room-height" type="text" inputmode="decimal" value="2.6"></label>
-          <label class="field field-narrow" for="ws-room-project"><span class="fld-label">${esc(t("ws_project"))}</span>
-            <select id="ws-room-project"></select></label>
-          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
-        </form>
-        <ul id="ws-room-list" class="data-list"></ul>
+        <!-- Chapter XVIII: a room is an element of a project, so the script draws one card
+             per live project and puts its add form inside it. "No project" stays a real
+             group, because a room measured before there is a project is still a room. -->
+        <div id="ws-room-list" class="ws-room-cards"></div>
       </div>
 
       <p class="ws-links">

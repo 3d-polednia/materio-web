@@ -579,62 +579,59 @@ head("4e. with one project and no loose rooms the bar stays a flat list");
 
 /* ---------------------------------------------------- 5. the index */
 
-head("5. the index says which project each room belongs to");
+head("5. the index groups rooms under their projects");
 {
   const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
-  const list = await rows(page, "#ws-room-list");
-  eq("every room is on the index, assigned or not", list.length, 4);
+  eq("every room is on the index, assigned or not",
+    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 4);
+  eq("one card per project plus the loose-room card",
+    await page.$$eval("#ws-room-list [data-project-id]", (cards) => cards.length), 3);
 
-  // The name column, not the whole row: the row also carries the picker that moves the
-  // room, and every project's name is an option inside it.
-  const named = (id) => page.$eval(`#ws-room-list li[data-id="${id}"] .row-name`,
+  const p1 = '#ws-room-list [data-project-id="p1"]';
+  const free = '#ws-room-list [data-project-id=""]';
+  eq("the first project card has its two rooms",
+    await page.$$eval(`${p1} li[data-id]`, (li) => li.map((n) => n.dataset.id).join(",")), "r2,r1");
+  eq("the unassigned room is in the no-project card",
+    await page.$$eval(`${free} li[data-id]`, (li) => li.map((n) => n.dataset.id).join(",")), "r4");
+  const garage = await page.$eval(`${free} li[data-id="r4"] .row-name`,
     (n) => n.textContent.replace(/\s+/g, " ").trim());
-  const bath = await named("r1");
-  check("a room says the project it belongs to", bath.includes("Remont łazienki"), bath);
-  const garage = await named("r4");
-  check("a room with no project says nothing instead of guessing",
-    !garage.includes("Remont łazienki") && !garage.includes("Salon"), garage);
   check("and the dimensions are still on the row", /6\s*×\s*3\s*×\s*2,4\s*m/.test(garage), garage);
 
-  const href = await page.$eval('#ws-room-list li[data-id="r1"] a.ws-room-of',
+  const href = await page.$eval(`${p1} .ws-room-card-head a`,
     (a) => a.getAttribute("href"));
-  eq("the project on a room row opens that project", href, "?id=p1");
-  eq("and a room with no project has no such link",
-    await page.$$eval('#ws-room-list li[data-id="r4"] a.ws-room-of', (a) => a.length), 0);
+  eq("the project card heading opens that project", href, "?id=p1");
+  eq("project links are not repeated in room rows",
+    await page.$$eval("#ws-room-list li[data-id] a", (a) => a.length), 0);
   await page.close();
 }
 
 /* -------------------------------- 5c. picking the project (fixes after session 20) */
 
-head("5c. the project a room goes into is chosen, not guessed");
+head("5c. a card adds to its project and rows can still be moved");
 {
   const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
-
-  // Until the owner reported it, this form filed the room into whichever project happened
-  // to be active and said nothing about it — so it looked like a room could not be
-  // assigned at all.
-  const picker = "#ws-room-project";
-  eq("the form starts on the active project", await page.inputValue(picker), "p1");
-  const options = await page.$$eval(`${picker} option`, (o) => o.map((e) => e.textContent.trim()));
-  eq("it offers both projects and 'no project'", options.length, 3);
-  check("including a real 'no project' answer", options[0].includes("bez projektu"), options.join(" | "));
-
-  await page.selectOption(picker, "p2");
-  await page.fill("#ws-room-name", "Sypialnia");
-  await page.fill("#ws-room-length", "4");
-  await page.fill("#ws-room-width", "3,5");
-  await page.click("#ws-room-form button[type=submit]");
+  const p2form = '#ws-room-list [data-project-id="p2"] [data-room-add-form]';
+  await page.click('#ws-room-list [data-project-id="p2"] [data-room-add] > summary');
+  await page.fill(`${p2form} [name="name"]`, "Sypialnia");
+  await page.fill(`${p2form} [name="lengthM"]`, "4");
+  await page.fill(`${p2form} [name="widthM"]`, "3,5");
+  await page.click(`${p2form} button[type=submit]`);
   await page.waitForFunction(() =>
     JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms.some((r) => r.name === "Sypialnia"));
   let saved = (await roomsOf(page)).find((r) => r.name === "Sypialnia");
-  eq("the room went into the project that was picked", saved.projectId, "p2");
+  eq("the room went into the project whose card owns the form", saved.projectId, "p2");
   eq("not the active one", await page.evaluate(() => localStorage.getItem("materio-active-project")), "p1");
   eq("with a comma read as a decimal point", saved.widthM, 3.5);
+  eq("the same add form stays open after redraw",
+    await page.$eval('#ws-room-list [data-project-id="p2"] [data-room-add]', (n) => n.open), true);
+  eq("and focus returns to its cleared name",
+    await page.$eval('#ws-room-list [data-project-id="p2"] [name="name"]',
+      (n) => `${n === document.activeElement}:${n.value}`), "true:");
 
-  // "No project" is an answer, not a missing one.
-  await page.selectOption(picker, "");
-  await page.fill("#ws-room-name", "Strych");
-  await page.click("#ws-room-form button[type=submit]");
+  const freeForm = '#ws-room-list [data-project-id=""] [data-room-add-form]';
+  await page.click('#ws-room-list [data-project-id=""] [data-room-add] > summary');
+  await page.fill(`${freeForm} [name="name"]`, "Strych");
+  await page.click(`${freeForm} button[type=submit]`);
   await page.waitForFunction(() =>
     JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms.some((r) => r.name === "Strych"));
   eq("a room can be made with no project at all",
@@ -663,12 +660,14 @@ head("5d. with no project at all, the form stops asking");
   ws.projects = [];
   ws.estimations = [];
   const page = await open(ctx, PROJECTS, { workspace: ws, active: "" });
-  eq("the picker is not offered", await page.$eval("#ws-room-project", (n) => n.hidden), true);
-  eq("nor is one on any row",
+  eq("only the no-project card is offered",
+    await page.$$eval('#ws-room-list [data-project-id=""]', (n) => n.length), 1);
+  eq("no move picker is offered",
     await page.$$eval("#ws-room-list [data-room-project]", (n) => n.length), 0);
   // The form still works — a room with no project is still a room.
-  await page.fill("#ws-room-name", "Garaż 2");
-  await page.click("#ws-room-form button[type=submit]");
+  await page.click('#ws-room-list [data-project-id=""] [data-room-add] > summary');
+  await page.fill('#ws-room-list [data-project-id=""] [name="name"]', "Garaż 2");
+  await page.click('#ws-room-list [data-project-id=""] button[type=submit]');
   await page.waitForFunction(() =>
     JSON.parse(localStorage.getItem("materio-workspace-v1")).rooms.some((r) => r.name === "Garaż 2"));
   eq("and the room is saved with no project",
@@ -747,11 +746,11 @@ head("5b. a room whose project was deleted keeps the room and drops the name");
   const ws = fixture();
   ws.projects[0].deletedAt = T0 + 6 * DAY;
   const page = await open(ctx, PROJECTS, { workspace: ws, active: "" });
-  const list = await rows(page, "#ws-room-list");
-  eq("the rooms survived the project", list.length, 4);
-  const bath = list.find((r) => r.includes("Łazienka"));
-  check("but the project's name is not printed from a tombstone",
-    !bath.includes("Remont łazienki"), bath);
+  eq("the rooms survived the project",
+    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 4);
+  eq("rooms of the deleted project moved to the loose card",
+    await page.$$eval('#ws-room-list [data-project-id=""] li[data-id]',
+      (li) => li.map((n) => n.dataset.id).sort().join(",")), "r1,r2,r4");
   await page.close();
 }
 
@@ -859,7 +858,7 @@ head("9. with the script off, the frame is there and no room is invented");
   check("the rooms section is in the markup", html.includes('id="ws-project-rooms"'));
   check("with its add form", html.includes('id="ws-proj-room-form"'));
   check("and the three dimension fields", html.includes('id="ws-proj-room-height"'));
-  check("the index keeps its own rooms form", html.includes('id="ws-room-form"'));
+  check("the index keeps its room-card container", html.includes('id="ws-room-list"'));
   eq("but the detail is hidden, because the rooms come out of storage",
     await page.$eval("#ws-project", (n) => n.hidden), true);
   eq("and no room is drawn", (await page.$$eval("#ws-project-rooms > li", (li) => li.length)), 0);

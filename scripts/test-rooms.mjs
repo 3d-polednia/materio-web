@@ -571,14 +571,11 @@ head("7. the frame the build writes");
   check("and before the materials",
     built.indexOf('id="ws-project-rooms"') < built.indexOf('id="ws-project-materials"'));
 
-  // The index keeps its own rooms form: a room is a place, and a visitor with no project
-  // still has to be able to measure one.
-  check("the index still has its rooms form", built.includes('id="ws-room-form"'));
-  check("and its list", built.includes('id="ws-room-list"'));
-  // Fixes after session 20: the form asks which project instead of silently taking the
-  // active one, which is what made it look like a room could not be assigned at all.
-  check("and a project picker in that form", built.includes('id="ws-room-project"'));
-  check("labelled as the project it is", built.includes(t("ws_project")));
+  // The index keeps one script-filled container. Its project cards each own their add
+  // form, so repeated controls use data/name attributes rather than duplicate ids.
+  check("the index keeps its rooms container", built.includes('id="ws-room-list"'));
+  check("the old global room form is gone", !built.includes('id="ws-room-form"'));
+  check("and so is its global project picker", !built.includes('id="ws-room-project"'));
 
   // Chapter XVIII's last sentence: rooms are not a module to promote. The project screen
   // is where they live, and nothing about the frame turns them into a section of their own.

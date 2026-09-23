@@ -2168,8 +2168,24 @@ a.chip:hover { text-decoration: none; }
   display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4);
   font-size: var(--fs-sm); flex: 1 1 14rem;
 }
-/* Which project a room belongs to, on the index where several projects' rooms meet. */
-.ws-room-of { font-size: var(--fs-sm); }
+/* The rooms index is one compact card per project. A wrapping header and min-width: 0 on
+   the cards keep long project names and row controls inside a phone viewport. */
+.ws-room-cards { display: grid; gap: var(--sp-4); }
+.ws-room-card { margin: 0; min-width: 0; }
+.ws-room-card-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--sp-3); flex-wrap: wrap;
+}
+.ws-room-card-head h3 { min-width: 0; overflow-wrap: anywhere; }
+.ws-room-card .data-list { margin: 0; }
+/* The name claims a line of its own before it is squeezed: on a phone the picker and
+   the delete button wrap under it instead of pressing it into one word per line. */
+.ws-room-card .row-name { flex: 1 1 14rem; }
+.ws-room-card .row-actions {
+  min-width: 0; max-width: 100%; flex: 0 1 auto; flex-wrap: wrap;
+  justify-content: flex-end; margin-left: auto;
+}
+.ws-room-card [data-room-project] { max-width: 16rem; min-width: 0; }
 /* Filing one calculation under one room. It takes a line of its own under the row for the
    same reason the note does: the two things beside it are a name and a number.
 

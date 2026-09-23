@@ -70,6 +70,8 @@ let wsUndone = null;
 let wsEditingItemId = "";
 /** Which room is open for editing, or "" when none is. */
 let wsEditingRoomId = "";
+/** Which index-card room form stays open while its successful write redraws the cards. */
+let wsOpenRoomAddProjectId = null;
 
 const wsDate = (ms) => {
   const at = Number(ms);
@@ -108,7 +110,7 @@ function wsProjectRow(p, active) {
     : "";
   const client = p.clientId && typeof crmClient === "function" ? crmClient(p.clientId) : null;
   const workflow = [client && client.name, wsT(`job_st_${p.status || "new"}`), wsProjectDate(p.dueDate)]
-    .filter(Boolean).map(wsEsc).join(" Â· ");
+    .filter(Boolean).map(wsEsc).join(" · ");
   return `<li data-id="${wsEsc(p.id)}"${p.id === active ? ' class="on"' : ""}>
       <span class="row-name">
         <a href="?id=${encodeURIComponent(p.id)}" data-open><b>${wsEsc(p.name)}</b></a>
@@ -846,47 +848,26 @@ function wsProjectOptions(current) {
     .join("");
 }
 
-/** The picker in the "add a room" form, kept on whatever is selected. */
-function wsFillRoomProject() {
-  const sel = document.getElementById("ws-room-project");
-  if (!sel) return;
-  const projects = wsProjects();
-  const keep = sel.dataset.touched ? sel.value : wsActiveProjectId();
-  sel.innerHTML = wsProjectOptions("");
-  sel.value = projects.some((p) => p.id === keep) ? keep : "";
-  // With no project at all there is one option and it is "no project" — a control with a
-  // single dead choice. The form still works; it just stops pretending to ask.
-  sel.hidden = projects.length === 0;
-}
-
 function wsRenderRooms() {
   const list = document.getElementById("ws-room-list");
   if (!list) return;
-  wsFillRoomProject();
+  const projects = wsProjects();
   const rooms = wsRooms();
-  if (!rooms.length) {
-    list.innerHTML = `<li class="empty muted">${wsEsc(wsT("ws_empty_rooms"))}</li>`;
-    return;
-  }
-  list.innerHTML = rooms.map((r) => {
+  const liveIds = new Set(projects.map((p) => p.id));
+  const loose = rooms.filter((r) => !r.projectId || !liveIds.has(r.projectId));
+
+  const roomRow = (r) => {
     const a = wsRoomAreas(r);
-    // Chapter XVIII makes a room an element of a project, so the index says which one —
-    // otherwise the same three names appear in two flats and nothing tells them apart. A
-    // room with no project, or one whose project was deleted, simply says nothing: it is
-    // still a place, and it still fills a calculator.
-    const project = r.projectId ? wsProject(r.projectId) : null;
-    const where = project
-      ? ` <a class="ws-room-of" href="?id=${encodeURIComponent(project.id)}">${wsEsc(project.name)}</a>` : "";
     // The same control the calculation rows got in session 20, doing the same job one
     // level up: a room can be moved between projects, or taken out of all of them. Absent
     // while there is no project to move it into.
-    const move = wsProjects().length
+    const move = projects.length
       ? `<select data-room-project aria-label="${wsEsc(wsT("ws_project"))}">${
         wsProjectOptions(r.projectId || "")}</select>`
       : "";
-    return `<li data-id="${wsEsc(r.id)}">
+    return `<li class="ws-room" data-id="${wsEsc(r.id)}">
         <span class="row-name">
-          <b>${wsEsc(r.name)}</b>${where}
+          <b>${wsEsc(r.name)}</b>
           <em class="muted">${wsEsc(wsRoomDims(a))} · ${wsT("room_floor")} ${wsNum(a.floor)} m² · ${wsT("room_walls")} ${wsNum(a.walls)} m²</em>
         </span>
         <span class="row-actions">
@@ -894,7 +875,49 @@ function wsRenderRooms() {
           <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
         </span>
       </li>`;
-  }).join("");
+  };
+
+  const addForm = (projectId) => `<details class="ws-mat-add" data-room-add${
+    wsOpenRoomAddProjectId === projectId ? " open" : ""}>
+      <summary>${wsEsc(wsT("proj_room_add"))}</summary>
+      <form data-room-add-form>
+        <p class="ws-mat-grid">
+          <label class="ws-mat-f">
+            <span class="ws-bar-label">${wsEsc(wsT("ws_new_room"))}</span>
+            <input type="text" name="name" maxlength="120" required>
+          </label>
+          ${[["fld_length", "lengthM", "5"], ["fld_width", "widthM", "4"], ["fld_height", "heightM", "2.6"]]
+            .map(([label, name, value]) => `<label class="ws-mat-f ws-mat-f-sm">
+              <span class="ws-bar-label">${wsEsc(wsT(label))}</span>
+              <input type="text" inputmode="decimal" name="${name}" data-f="${name}" value="${value}">
+            </label>`).join("")}
+        </p>
+        <p class="ws-mat-sum" data-room-sum aria-live="polite"></p>
+        <p><button type="submit" class="btn btn-primary btn-sm">${wsEsc(wsT("app_add"))}</button></p>
+      </form>
+    </details>`;
+
+  const card = (project, groupedRooms) => {
+    const projectId = project ? project.id : "";
+    const title = project
+      ? `<a href="?id=${encodeURIComponent(project.id)}">${wsEsc(project.name)}</a>`
+      : wsEsc(wsT("app_rooms_loose"));
+    return `<section class="app-card ws-room-card" data-project-id="${wsEsc(projectId)}">
+      <div class="ws-room-card-head">
+        <h3>${title}</h3>
+        <span class="chip" data-room-count>${groupedRooms.length}</span>
+      </div>
+      <ul class="data-list">${groupedRooms.length
+        ? groupedRooms.map(roomRow).join("")
+        : `<li class="empty muted">${wsEsc(wsT("ws_empty_rooms"))}</li>`}</ul>
+      ${addForm(projectId)}
+    </section>`;
+  };
+
+  list.innerHTML = projects.map((p) => card(p, rooms.filter((r) => r.projectId === p.id))).join("")
+    + (loose.length || !projects.length ? card(null, loose) : "");
+  // The defaults already describe a room, so its areas are shown before anything is typed.
+  list.querySelectorAll("[data-room-add-form]").forEach(wsRoomSum);
 }
 
 function buildProjectsPage() {
@@ -976,48 +999,47 @@ function buildProjectsPage() {
 
   wireProjectDetail();
 
-  document.getElementById("ws-room-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = document.getElementById("ws-room-name");
-    if (!name.value.trim()) return;
-    const picker = document.getElementById("ws-room-project");
-    // The picker's answer, not the active project. Until the owner reported it, this form
-    // filed the room into whichever project happened to be active and said nothing about
-    // it — which is why it looked like a room could not be assigned at all.
-    const projectId = picker && !picker.hidden ? picker.value : wsActiveProjectId();
-    // Through wsDecimal(), because a comma is the decimal separator in all four languages
-    // and wsDim() reads a raw "3,5" as Number("3,5") — NaN, clamped to 0. The form on the
-    // project screen has always parsed it; this one handed the string straight to the
-    // store, so a room typed the way a Pole types it came out 3 × 0 × 2,6 m.
-    const made = wsAddRoom(
-      name.value.trim(),
-      wsDecimal(document.getElementById("ws-room-length").value),
-      wsDecimal(document.getElementById("ws-room-width").value),
-      wsDecimal(document.getElementById("ws-room-height").value),
-      projectId,
-    );
-    if (!made) return; // the same rule as the project form above (M3)
-    name.value = "";
-    name.focus();
-  });
-
-  // Once the visitor has named a project, a redraw stops moving them back to the active
-  // one — the same rule the room picker under a result follows.
-  document.getElementById("ws-room-project").addEventListener("change", (e) => {
-    e.target.dataset.touched = "1";
-  });
-
-  document.getElementById("ws-room-list").addEventListener("click", (e) => {
+  const roomList = document.getElementById("ws-room-list");
+  roomList.addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (li && e.target.closest("[data-del]")) wsDeleteRoom(li.dataset.id);
   });
 
   // Chapter XVIII, on a room that already exists: move it to another project, or take it
   // out of all of them. wsUpdateRoom() has taken `projectId` since session 20.
-  document.getElementById("ws-room-list").addEventListener("change", (e) => {
+  roomList.addEventListener("change", (e) => {
     const sel = e.target.closest("[data-room-project]");
     const li = e.target.closest("li[data-id]");
     if (sel && li) wsUpdateRoom(li.dataset.id, { projectId: sel.value });
+  });
+
+  roomList.addEventListener("input", (e) => {
+    const form = e.target.closest("[data-room-add-form]");
+    if (form) wsRoomSum(form);
+  });
+
+  roomList.addEventListener("submit", (e) => {
+    const form = e.target.closest("[data-room-add-form]");
+    if (!form) return;
+    e.preventDefault();
+    const card = form.closest("[data-project-id]");
+    const name = form.elements.name;
+    if (!card || !name.value.trim()) return;
+    // Set this before wsAddRoom(): its workspacechange is synchronous and rebuilds the
+    // card while the write is still on the stack.
+    wsOpenRoomAddProjectId = card.dataset.projectId;
+    const made = wsAddRoom(
+      name.value.trim(),
+      wsDecimal(form.elements.lengthM.value),
+      wsDecimal(form.elements.widthM.value),
+      wsDecimal(form.elements.heightM.value),
+      card.dataset.projectId,
+    );
+    if (!made) return;
+    const reopened = [...roomList.querySelectorAll("[data-project-id]")]
+      .find((node) => node.dataset.projectId === wsOpenRoomAddProjectId);
+    const freshName = reopened && reopened.querySelector('[data-room-add-form] [name="name"]');
+    if (freshName) { freshName.value = ""; freshName.focus(); }
   });
 
   document.addEventListener("workspacechange", wsRenderWorkspace);

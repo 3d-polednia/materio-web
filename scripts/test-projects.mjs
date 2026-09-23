@@ -543,7 +543,7 @@ head("9. the frame the build writes");
 
   const t = tr(DEFAULT_LANG);
   const { main } = projectsMain(DEFAULT_LANG, t, [], FEATURES);
-  check("the index still offers the rooms of session 20", main.includes('id="ws-room-form"'));
+  check("the index still offers the rooms of session 20", main.includes('id="ws-room-list"'));
   check("a name with a quote in it could not break out of an attribute",
     !projectsMain(DEFAULT_LANG, (k) => (k === "wspage_title" ? '"><script>' : t(k)), [], FEATURES).main.includes("><script>"));
 }

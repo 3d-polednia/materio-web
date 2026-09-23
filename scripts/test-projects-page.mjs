@@ -263,7 +263,8 @@ head("2. the index, with projects in it");
     (await page.$$eval("#ws-project-list .row-name a, #ws-archive-list .row-name a",
       (a) => a.map((n) => n.getAttribute("href")))).join(",") === "?id=p1,?id=p2,?id=p3");
 
-  check("the rooms of session 20 are still there", (await rows(page, "#ws-room-list")).length === 1);
+  check("the rooms of session 20 are still there",
+    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length) === 1);
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }

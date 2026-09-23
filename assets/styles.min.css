@@ -1423,7 +1423,20 @@ font-variant-numeric: tabular-nums; min-height: 1.2em;
 display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4);
 font-size: var(--fs-sm); flex: 1 1 14rem;
 }
-.ws-room-of { font-size: var(--fs-sm); }
+.ws-room-cards { display: grid; gap: var(--sp-4); }
+.ws-room-card { margin: 0; min-width: 0; }
+.ws-room-card-head {
+display: flex; align-items: baseline; justify-content: space-between;
+gap: var(--sp-3); flex-wrap: wrap;
+}
+.ws-room-card-head h3 { min-width: 0; overflow-wrap: anywhere; }
+.ws-room-card .data-list { margin: 0; }
+.ws-room-card .row-name { flex: 1 1 14rem; }
+.ws-room-card .row-actions {
+min-width: 0; max-width: 100%; flex: 0 1 auto; flex-wrap: wrap;
+justify-content: flex-end; margin-left: auto;
+}
+.ws-room-card [data-room-project] { max-width: 16rem; min-width: 0; }
 .ws-line-room { flex-basis: 100%; display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
 .ws-line-room select { max-width: 16rem; min-width: 0; flex: 1 1 10rem; }
 .data-list li.app-project { flex-wrap: wrap; }

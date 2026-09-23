@@ -650,20 +650,7 @@
         <h2 class="mt-8">Stanze</h2>
         <p class="muted">Una stanza è un nome e tre misure. I calcolatori ne ricavano pavimento, pareti e soffitto.</p>
         
-        <form id="ws-room-form" class="inline-form">
-          <label class="field" for="ws-room-name"><span class="fld-label">Nome della stanza</span>
-            <input id="ws-room-name" type="text" maxlength="120" required></label>
-          <label class="field field-narrow" for="ws-room-length"><span class="fld-label">Lunghezza (m)</span>
-            <input id="ws-room-length" type="text" inputmode="decimal" value="5"></label>
-          <label class="field field-narrow" for="ws-room-width"><span class="fld-label">Larghezza (m)</span>
-            <input id="ws-room-width" type="text" inputmode="decimal" value="4"></label>
-          <label class="field field-narrow" for="ws-room-height"><span class="fld-label">Altezza (m)</span>
-            <input id="ws-room-height" type="text" inputmode="decimal" value="2.6"></label>
-          <label class="field field-narrow" for="ws-room-project"><span class="fld-label">Progetto</span>
-            <select id="ws-room-project"></select></label>
-          <button type="submit" class="btn btn-primary btn-sm">Aggiungi</button>
-        </form>
-        <ul id="ws-room-list" class="data-list"></ul>
+        <div id="ws-room-list" class="ws-room-cards"></div>
       </div>
 
       <p class="ws-links">
