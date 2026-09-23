@@ -884,7 +884,11 @@ head("9a. the quote owns the chain controls and the PDF document");
     !/crmUpdateQuote\([^)]*,\s*\{\s*(clientId|jobId)/.test(ui));
   check("rooms and materials are read from the selected project",
     ui.includes("wsRooms(project.id)") && ui.includes("wsItems(project.id)"));
-  check("the quote page loads the shared PDF exporter", /QUOTES_SCRIPTS[\s\S]*pdf-export\.js/.test(build));
+  const quoteScripts = build.match(/const QUOTES_SCRIPTS = \[([\s\S]*?)\n\];/);
+  check("the quote page loads workspace-calc before the shared PDF exporter",
+    quoteScripts && quoteScripts[1].indexOf("workspace-calc.js") >= 0 &&
+      quoteScripts[1].indexOf("workspace-calc.js") < quoteScripts[1].indexOf("pdf-export.js"),
+    quoteScripts ? quoteScripts[1] : "QUOTES_SCRIPTS not found");
   check("the quote export uses the shared permission check twice",
     pdf.includes("function pdfFillQuote(quoteId)") &&
       (pdf.match(/if \(!pdfAllowed\(\)\) return;/g) || []).length >= 2);

@@ -667,6 +667,41 @@ head("7e. chapter XXVIII: the page holds together at every width it names");
   }
 }
 
+head("7f. both quote shapes print a complete PDF without a browser error");
+{
+  const page = await open(ctx, QUOTES, { workspace: workspace(), crm: crmNoQuotes() });
+  const ids = await page.evaluate(() => {
+    const project = wsAddProject("PDF project");
+    wsAddItem({ projectId: project.id, name: "Tiles", quantity: 8, unit: "m²", costMajor: 320, currencyCode: "PLN" });
+    wsAddItem({ projectId: project.id, name: "Grout", quantity: 2, unit: "bag", costMajor: 70, currencyCode: "PLN" });
+    const quote = crmAddQuote({ name: "PDF quote", projectId: project.id });
+    crmAddLabour(quote.id, { name: "Laying", quantity: 8, unit: "m²", priceMajor: 90 });
+    crmAddLabour(quote.id, { name: "Cleanup", priceMajor: 250 });
+    const lump = crmAddQuote({ name: "Lump-sum PDF quote" });
+    crmAddLabour(lump.id, { name: "Consultation", priceMajor: 400 });
+    return { project: quote.id, lump: lump.id };
+  });
+
+  await page.goto(`${base}${QUOTES}?id=${ids.project}`, { waitUntil: "load" });
+  await page.waitForSelector("html[data-quotes-ready]");
+  await page.evaluate(() => { window.__printed = 0; window.print = () => { window.__printed++; }; });
+  await page.click("#ws-pdf-form button[type=submit]");
+  eq("a project quote raises no page error", page.errors.length, 0);
+  eq("a project quote calls print once", await page.evaluate(() => window.__printed), 1);
+  eq("two materials and two labour lines make four PDF rows",
+    await page.$$eval('#ws-pdf-doc tbody[data-pdf="rows"] tr', (rows) => rows.length), 4);
+  const total = await page.$eval('#ws-pdf-doc [data-pdf="total"]', (n) => n.textContent.trim());
+  check("the project quote has a real PDF total", total !== "" && total !== "—", total);
+
+  await page.goto(`${base}${QUOTES}?id=${ids.lump}`, { waitUntil: "load" });
+  await page.waitForSelector("html[data-quotes-ready]");
+  await page.evaluate(() => { window.__printed = 0; window.print = () => { window.__printed++; }; });
+  await page.click("#ws-pdf-form button[type=submit]");
+  eq("a projectless lump-sum quote raises no page error", page.errors.length, 0);
+  eq("a projectless lump-sum quote calls print once", await page.evaluate(() => window.__printed), 1);
+  await page.close();
+}
+
 /* ---------------------------------------------------- 8. no JavaScript */
 
 head("8. with JavaScript off the page is still an honest page");

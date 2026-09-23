@@ -873,10 +873,11 @@ const CRM_SCRIPTS = [
  * the store is shared (assets/crm.js holds all three collections), and three of chapter
  * XXII's five figures are read out of a project through assets/workspace.js — the quote
  * copies none of them. No engine and no catalogue: the page multiplies a quantity by a
- * rate and adds a percentage, and calculates nothing else.
+ * rate and adds a percentage, and calculates nothing else. pdf-export.js reads the shared
+ * wsEsc/wsNum vocabulary from workspace-calc.js, so that file must load before the exporter.
  */
 const QUOTES_SCRIPTS = [
-  "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/workspace.js", "/assets/workspace-calc.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
   "/assets/crm-chain.js", "/assets/quotes-ui.js", "/assets/pdf-export.js",
