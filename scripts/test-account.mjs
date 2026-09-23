@@ -308,6 +308,13 @@ head("8. /app/ carries the account system in every language");
   check("and it says why a room lands there", html.includes(DICT.pl.app_rooms_loose_d));
   // The new Pomieszczenia tab groups every room (assigned and not) by project instead.
   check("the Pomieszczenia tab has its own list container", html.includes('id="acctrooms-list"'));
+  check("and that container uses the shared project-card layout",
+    html.includes('id="acctrooms-list" class="ws-room-cards"'));
+  const app = readFileSync(p("assets/app.js"), "utf8");
+  check("the account room view renders one shared card per live project",
+    app.includes('class="app-card ws-room-card ws-room-card-${color}"'));
+  check("and its card form uses the shared room parser",
+    app.includes("submitRoomForm(form, card.dataset.projectId)"));
 }
 
 head("9. the copy exists in all four languages");

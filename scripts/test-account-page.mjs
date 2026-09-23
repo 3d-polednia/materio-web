@@ -1189,12 +1189,15 @@ head("16. rooms stand inside the project they belong to");
   const page = await openTab(ctx, "projects", {
     docs: {
       "users/u1": { plan: "free" },
-      "users/u1/projects/p1": { name: "Remont łazienki", archived: false, ...sync },
+      "users/u1/projects/p1": { name: "Remont łazienki", color: "violet", archived: false, ...sync },
       "users/u1/projects/p2": { name: "Salon", archived: false, ...sync },
+      "users/u1/projects/p3": { name: "Pusty", archived: false, ...sync },
+      "users/u1/projects/p4": { name: "Archiwum", archived: true, ...sync },
       // Chapter XVIII's link, on a room this site pushed.
       "users/u1/rooms/r1": { name: "Łazienka", lengthM: 2.4, widthM: 3.2, heightM: 2.5, projectId: "p1", ...sync },
       // And a room the phone made: roomToDoc() has no projectId to send, so it has none.
       "users/u1/rooms/r2": { name: "Garaż", lengthM: 6, widthM: 3, heightM: 2.4, ...sync },
+      "users/u1/rooms/r3": { name: "Stary", lengthM: 2, widthM: 2, heightM: 2.4, projectId: "p4", ...sync },
     },
   });
   await page.waitForSelector('#project-list li[data-id="p1"] .app-rooms li[data-id="r1"]');
@@ -1236,6 +1239,28 @@ head("16. rooms stand inside the project they belong to");
   eq("and it names the project it was added inside", doc.data.projectId, "p1");
   eq("with a comma read as a decimal point", doc.data.lengthM, 1.4);
   eq("and the contract's own fields", `${doc.data.widthM}|${doc.data.heightM}`, "4|2.5");
+  await page.click("#tab-rooms");
+  await page.waitForSelector('#acctrooms-list [data-project-id="p1"]');
+  eq("the room tab has every live project card",
+    await page.locator("#acctrooms-list [data-project-id]").count(), 4);
+  eq("the empty project card has its add form",
+    await page.locator('#acctrooms-list [data-project-id="p3"] [data-room-form]').count(), 1);
+  eq("the stored project colour becomes a validated card class",
+    await page.locator('#acctrooms-list [data-project-id="p1"].ws-room-card-violet').count(), 1);
+  eq("a project without colour gets its position fallback",
+    await page.locator('#acctrooms-list [data-project-id="p2"].ws-room-card-blue').count(), 1);
+  const noProject = await page.locator('#acctrooms-list [data-project-id=""]').innerText();
+  check("an archived project's room moves to the neutral card", noProject.includes("Stary"), noProject);
+  const p3 = '#acctrooms-list [data-project-id="p3"]';
+  await page.locator(`${p3} summary`).click();
+  await page.fill(`${p3} [data-f="name"]`, "Gabinet");
+  await page.click(`${p3} button[type=submit]`);
+  await page.waitForFunction(() => [...window.__fbDocs.values()].some((d) => d.name === "Gabinet"));
+  const roomCardDoc = await page.evaluate(() => {
+    for (const data of window.__fbDocs.values()) if (data.name === "Gabinet") return data;
+    return null;
+  });
+  eq("adding from an account card writes that project id", roomCardDoc.projectId, "p3");
   eq("no console error", page.lmErrors.join(" / "), "");
   await page.close();
   await ctx.close();

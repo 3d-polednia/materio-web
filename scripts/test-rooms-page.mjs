@@ -114,7 +114,7 @@ function fixture() {
   });
   return {
     projects: [
-      { id: "p1", name: "Remont łazienki", archived: false, ...sync(T0 + 5 * DAY) },
+      { id: "p1", name: "Remont łazienki", color: "violet", archived: false, ...sync(T0 + 5 * DAY) },
       { id: "p2", name: "Salon", archived: false, ...sync(T0 + 3 * DAY) },
     ],
     rooms: [
@@ -600,6 +600,10 @@ head("5. the index groups rooms under their projects");
   const href = await page.$eval(`${p1} .ws-room-card-head a`,
     (a) => a.getAttribute("href"));
   eq("the project card heading opens that project", href, "?id=p1");
+  eq("a stored project colour becomes the card colour class",
+    await page.$$eval(`${p1}.ws-room-card-violet`, (cards) => cards.length), 1);
+  eq("a project without colour gets its position fallback",
+    await page.$$eval('#ws-room-list [data-project-id="p2"].ws-room-card-blue', (cards) => cards.length), 1);
   eq("project links are not repeated in room rows",
     await page.$$eval("#ws-room-list li[data-id] a", (a) => a.length), 0);
   await page.close();

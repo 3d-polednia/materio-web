@@ -495,7 +495,7 @@ export function appMain(t, features) {
             <section data-panel="rooms" id="panel-rooms" role="tabpanel" aria-labelledby="tab-rooms" tabindex="0" hidden>
               <h2 data-i18n="app_rooms_title">${esc(t("app_rooms_title"))}</h2>
               ${i("app_rooms_lead", "p", "muted")}
-              <div id="acctrooms-list"></div>
+              <div id="acctrooms-list" class="ws-room-cards"></div>
             </section>
 
             <section data-panel="sync" id="panel-sync" role="tabpanel" aria-labelledby="tab-sync" tabindex="0" hidden>

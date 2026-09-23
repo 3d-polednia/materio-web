@@ -1430,8 +1430,24 @@ display: flex; align-items: baseline; justify-content: space-between;
 gap: var(--sp-3); flex-wrap: wrap;
 }
 .ws-room-card-head h3 { min-width: 0; overflow-wrap: anywhere; }
+.ws-room-card-dot {
+display: inline-block; width: .65rem; height: .65rem; margin-right: var(--sp-2);
+border-radius: 50%; background: currentColor;
+}
+.ws-room-card-lime { border-left: 4px solid var(--ev-lime); }
+.ws-room-card-blue { border-left: 4px solid var(--ev-blue); }
+.ws-room-card-amber { border-left: 4px solid var(--ev-amber); }
+.ws-room-card-red { border-left: 4px solid var(--ev-red); }
+.ws-room-card-violet { border-left: 4px solid var(--ev-violet); }
+.ws-room-card-lime .ws-room-card-dot { color: var(--ev-lime); }
+.ws-room-card-blue .ws-room-card-dot { color: var(--ev-blue); }
+.ws-room-card-amber .ws-room-card-dot { color: var(--ev-amber); }
+.ws-room-card-red .ws-room-card-dot { color: var(--ev-red); }
+.ws-room-card-violet .ws-room-card-dot { color: var(--ev-violet); }
 .ws-room-card .data-list { margin: 0; }
 .ws-room-card .row-name { flex: 1 1 14rem; }
+.ws-room-card .data-list li { flex-wrap: wrap; }
+.ws-room-card .row-actions .btn { white-space: nowrap; }
 .ws-room-card .row-actions {
 min-width: 0; max-width: 100%; flex: 0 1 auto; flex-wrap: wrap;
 justify-content: flex-end; margin-left: auto;

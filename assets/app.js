@@ -46,6 +46,8 @@ const state = {
   level: LM_LEVEL.GUEST,
 };
 let db = null, auth = null, fb = null;
+/** The account room card whose successful add is being redrawn by Firestore. */
+let openAccountRoomProjectId = null;
 
 /**
  * Re-entrancy guard for synchronization between localStorage and Firestore.
@@ -1263,10 +1265,18 @@ function roomBlock(projectId) {
         rooms.length ? rooms.map(roomRow).join("")
           : `<li class="empty muted">${T("app_empty_rooms")}</li>`
       }</ul>
-      <form data-room-form class="hierarchy-child-form">
-        <p class="ws-mat-grid">
+      <form data-room-form class="hierarchy-child-form">${roomFormFields()}
+        <p><button type="submit" class="btn btn-ghost btn-sm">${T("app_add_room")}</button></p>
+        <p class="muted ws-mat-hint">${T("app_room_hint")}</p>
+      </form>
+    </div>`;
+}
+
+/** The shared room dimensions form used by both project and room views. */
+function roomFormFields() {
+  return `<p class="ws-mat-grid">
           <label class="ws-mat-f">
-            <span class="ws-bar-label">${T("ws_col_name")}</span>
+            <span class="ws-bar-label">${T("ws_new_room")}</span>
             <input type="text" maxlength="120" data-f="name" placeholder="${T("app_new_room")}" required
               aria-label="${T("app_new_room")}">
           </label>
@@ -1282,11 +1292,17 @@ function roomBlock(projectId) {
             <span class="ws-bar-label">${T("fld_height")}</span>
             <input type="text" inputmode="decimal" data-f="heightM" value="2.6" aria-label="${T("fld_height")}">
           </label>
-        </p>
-        <p><button type="submit" class="btn btn-ghost btn-sm">${T("app_add_room")}</button></p>
-        <p class="muted ws-mat-hint">${T("app_room_hint")}</p>
-      </form>
-    </div>`;
+        </p>`;
+}
+
+/** Parse and clamp either room form before handing it to the single Firestore writer. */
+async function submitRoomForm(form, projectId) {
+  const get = (f) => form.querySelector(`[data-f="${f}"]`).value;
+  const name = get("name").trim().slice(0, 120);
+  if (!name) return false;
+  await addRoom(name, Math.min(num(get("lengthM")), 1000),
+    Math.min(num(get("widthM")), 1000), Math.min(num(get("heightM")), 100), projectId);
+  return true;
 }
 
 /**
@@ -1381,15 +1397,10 @@ function wireWorkspace() {
     if (!form) return;
     e.preventDefault();
     const li = form.closest("li[data-id]");
-    const get = (f) => form.querySelector(`[data-f="${f}"]`).value;
-    const name = get("name").trim().slice(0, 120);
-    if (!name || !li) return;
+    if (!li) return;
     // The same clamps the deployed rules impose (FIRESTORE_SYNC §2, validRoom()).
-    const l = Math.min(num(get("lengthM")), 1000);
-    const w = Math.min(num(get("widthM")), 1000);
-    const h = Math.min(num(get("heightM")), 100);
     try {
-      await addRoom(name, l, w, h, li.dataset.id);
+      await submitRoomForm(form, li.dataset.id);
     } catch (err) { status(T("app_err_unknown"), true); }
   });
 
@@ -1991,26 +2002,65 @@ function wireMaterialsPanel() {
 function renderRoomsPanel() {
   const box = $("acctrooms-list");
   if (!box) return;
-  const byProject = {};
-  const loose = [];
-  state.rooms.forEach((r) => {
-    if (r.projectId) (byProject[r.projectId] || (byProject[r.projectId] = [])).push(r);
-    else loose.push(r);
+  const projects = state.projects.filter((p) => !p.archived);
+  const liveIds = new Set(projects.map((p) => p.id));
+  const loose = state.rooms.filter((r) => !r.projectId || !liveIds.has(r.projectId));
+  const roomColors = ["lime", "blue", "amber", "red", "violet"];
+  const groups = projects.map((p, i) => {
+    const rooms = state.rooms.filter((r) => r.projectId === p.id);
+    const color = roomColors.indexOf(p.color) >= 0 ? p.color : roomColors[i % roomColors.length];
+    return `<section class="app-card ws-room-card ws-room-card-${color}" data-project-id="${escapeHtml(p.id)}">
+      <div class="ws-room-card-head">
+        <h3><span class="ws-room-card-dot" aria-hidden="true"></span>${escapeHtml(p.name)}</h3>
+        <span class="chip" data-room-count>${rooms.length}</span>
+      </div>
+      <ul class="data-list">${rooms.length ? rooms.map(roomRow).join("")
+        : `<li class="empty muted">${T("app_empty_rooms")}</li>`}</ul>
+      <details class="ws-mat-add" data-room-add${openAccountRoomProjectId === p.id ? " open" : ""}>
+        <summary>${T("app_add_room")}</summary>
+        <form data-room-form>${roomFormFields()}
+          <p><button type="submit" class="btn btn-primary btn-sm">${T("app_add_room")}</button></p>
+        </form>
+      </details>
+    </section>`;
   });
-  const groups = state.projects
-    .filter((p) => byProject[p.id] && byProject[p.id].length)
-    .map((p) => `<div class="app-card"><h3>${escapeHtml(p.name)}</h3>
-        <ul class="data-list">${byProject[p.id].map(roomRow).join("")}</ul></div>`);
   if (loose.length) {
-    groups.push(`<div class="app-card"><h3>${T("app_rooms_no_project")}</h3>
-        <ul class="data-list">${loose.map(roomRow).join("")}</ul></div>`);
+    groups.push(`<section class="app-card ws-room-card" data-project-id=""><div class="ws-room-card-head">
+        <h3>${T("app_rooms_no_project")}</h3><span class="chip" data-room-count>${loose.length}</span>
+        </div><ul class="data-list">${loose.map(roomRow).join("")}</ul></section>`);
   }
   box.innerHTML = groups.length ? groups.join("") : `<p class="muted">${T("app_rooms_empty")}</p>`;
+  if (openAccountRoomProjectId !== null) {
+    const card = [...box.querySelectorAll("[data-project-id]")]
+      .find((node) => node.dataset.projectId === openAccountRoomProjectId);
+    const name = card && card.querySelector('[data-room-form] [data-f="name"]');
+    if (name) name.focus();
+    openAccountRoomProjectId = null;
+  }
 }
 
 function wireRoomsPanel() {
   const box = $("acctrooms-list");
   if (!box) return;
+  box.addEventListener("submit", async (e) => {
+    const form = e.target.closest("[data-room-form]");
+    if (!form) return;
+    e.preventDefault();
+    const card = form.closest("[data-project-id]");
+    if (!card) return;
+    openAccountRoomProjectId = card.dataset.projectId;
+    try {
+      if (!await submitRoomForm(form, card.dataset.projectId)) { openAccountRoomProjectId = null; return; }
+      // The snapshot normally redraws the card with an empty form before the write settles.
+      // If it has not (offline, or a store that answers late), the typed name must not stay
+      // in the field inviting a second, duplicate room.
+      const name = form.isConnected && form.querySelector('[data-f="name"]');
+      if (name) { name.value = ""; name.focus(); }
+    } catch (err) {
+      openAccountRoomProjectId = null;
+      status(T("app_err_unknown"), true);
+    }
+  });
   box.addEventListener("click", async (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-del]")) return;
