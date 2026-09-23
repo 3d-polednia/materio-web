@@ -748,7 +748,7 @@ select:focus-visible, textarea:focus-visible {
 }
 
 @media (max-width: 600px) {
-  #acctquo-list .acctquo-row { flex-wrap: wrap; }
+  #acctquo-list .acctquo-row { flex-wrap: wrap; align-items: center; }
   #acctquo-list .acctquo-main { flex-basis: 100%; }
   #acctquo-list .acctquo-total { flex: 1; min-width: 0; text-align: left; }
   #acctquo-list .acctquo-actions { flex-wrap: wrap; max-width: 100%; }

@@ -1706,7 +1706,7 @@ function renderQuotes() {
       <strong class="acctquo-total">${escapeHtml(total)}</strong>
       <span class="row-actions acctquo-actions">
         <select data-status aria-label="${T("quo_status")}">${statuses.map((s) => `<option value="${s}"${s === summary.status ? " selected" : ""}>${T("quo_st_" + s)}</option>`).join("")}</select>
-        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-del aria-label="${T("app_delete")}: ${escapeHtml(q.name)}">${T("app_delete")}</button>
       </span>
     </li>`;
   }).join("") : `<li class="empty muted"><p>${T("app_quotes_empty")}</p>
@@ -1747,8 +1747,13 @@ function wireQuotesPanel() {
     const select = e.target.closest("[data-status]");
     const li = e.target.closest("li[data-id]");
     if (!select || !li || typeof crmUpdateQuote !== "function" || !canQuotes()) return;
-    crmUpdateQuote(li.dataset.id, { status: select.value });
+    const id = li.dataset.id;
+    crmUpdateQuote(id, { status: select.value });
     renderQuotes();
+    const again = [...$("acctquo-list").querySelectorAll("li[data-id]")]
+      .find((row) => row.dataset.id === id);
+    const next = again && again.querySelector("[data-status]");
+    if (next) next.focus();
     status(T("app_quotes_status_saved"));
   });
 }

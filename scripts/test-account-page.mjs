@@ -1351,6 +1351,11 @@ head("16b. quotes start from a project and lead to the full editor");
   await row.selectOption("#acctquo-list [data-status]", "sent");
   eq("changing status stores it on the quote",
     await row.evaluate(() => JSON.parse(localStorage.getItem("liczmat-crm-v1")).quotes[0].status), "sent");
+  // The list is redrawn after the change; the keyboard must not be dropped back at <body>.
+  check("the status select keeps the focus after the redraw",
+    await row.evaluate(() => document.activeElement && document.activeElement.matches("#acctquo-list [data-status]")));
+  eq("the delete button names the quote it deletes",
+    await row.locator("#acctquo-list [data-del]").getAttribute("aria-label"), "Usuń: Łazienka Nowaka");
   eq("no console error", row.lmErrors.join(" / "), "");
   await row.close();
   await ctx.close();
