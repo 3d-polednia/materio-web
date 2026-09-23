@@ -44,6 +44,26 @@ export const TRIAL_SOURCE = "trial";
 /** Czas trwania okresu próbnego w milisekundach (14 dni). */
 export const TRIAL_MS = TRIAL_DAYS * 24 * 60 * 60 * 1000;
 
+/** Czas dla klienta na założenie profilu przed awaryjnym zapisem serwera. */
+export const SERVER_PROFILE_DELAY_MS = 15000;
+
+/** Znacznik profilu utworzonego awaryjnie przez serwer. */
+export const PROFILE_BY_SERVER = "server";
+
+/** Minimalny profil tworzony przez serwer, gdy klient nie zdążył go zapisać. */
+export function serverProfileDoc(now) {
+  return { createdAt: now, createdBy: PROFILE_BY_SERVER };
+}
+
+/** Pierwsza aplikacja klienta, zapisywana tylko z dokumentu, który utworzył klient. */
+export function firstAppWrite(created) {
+  if (!created || typeof created !== "object" || created.createdBy === PROFILE_BY_SERVER) return null;
+  const value = created.appVersion;
+  return typeof value === "string" && value.length > 0 && value.length <= 32
+    ? { firstAppVersion: value }
+    : null;
+}
+
 /**
  * Koniec okresu próbnego liczony od wskazanego momentu, w milisekundach.
  *

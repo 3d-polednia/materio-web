@@ -62,6 +62,12 @@ export const MAX_MONTHS = 120;
 /** Ile kont oddaje jedno `list`. Tyle, ile Identity Toolkit oddaje jedną stroną. */
 export const LIST_LIMIT = 500;
 
+/** Kolekcje liczone w szczegółach konta. */
+export const COUNTED = {
+  account: ["projects", "rooms", "clients", "quotes", "materials"],
+  project: ["estimations", "shoppingItems"],
+};
+
 /** `true` dla czegoś, co wygląda na adres e-mail. Ostateczną odpowiedź daje Firebase. */
 export function looksLikeEmail(value) {
   return typeof value === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -193,15 +199,36 @@ export function planSummary(profile, now) {
 /**
  * Jeden wiersz listy kont — dokładnie tyle, ile panel pokazuje, i ani pola więcej.
  *
- * Hasła, numeru telefonu ani danych logowania nie ma tu z rozmysłem: funkcja odpowiada
- * przeglądarce, a przeglądarka pokazuje to na ekranie. Wszystko, co tu włożone, jest
- * opublikowane osobie przy panelu.
+ * Hasła, tokeny, numer telefonu i identyfikatory dostawców nigdy tu nie trafiają. Funkcja
+ * odpowiada przeglądarce, więc przepuszcza wyłącznie pola widoczne w panelu.
  */
-export function accountRow(user, profile, now) {
+export function accountRow(user, profile, now, extra = {}) {
+  const doc = profile && typeof profile === "object" ? profile : null;
+  const summary = planSummary(doc, now);
+  const short = (value) => typeof value === "string" && value.length > 0 && value.length <= 32
+    ? value : null;
+  const positive = (value) => Number.isFinite(value) && value > 0 ? value : null;
+  const providers = Array.isArray(user && user.providers)
+    ? user.providers.filter((value) => typeof value === "string").slice(0, 5)
+    : [];
+  const source = summary.state === "free" ? null
+    : doc && doc.planSource === "trial" ? "trial"
+      : extra.stripe === true ? "stripe" : "manual";
   return {
     uid: String((user && user.uid) || ""),
     email: String((user && user.email) || ""),
     admin: Boolean(user && user.admin),
-    ...planSummary(profile, now),
+    ...summary,
+    emailVerified: Boolean(user && user.emailVerified),
+    providers,
+    createdAt: positive(user && user.createdMs),
+    lastSignInAt: positive(user && user.lastSignInMs),
+    disabled: Boolean(user && user.disabled),
+    hasProfile: doc !== null,
+    lastSeenAt: positive(doc && doc.lastSeenAt),
+    lastApp: short(doc && doc.appVersion),
+    firstApp: short(doc && doc.firstAppVersion),
+    profileByServer: Boolean(doc && doc.createdBy === "server"),
+    source,
   };
 }

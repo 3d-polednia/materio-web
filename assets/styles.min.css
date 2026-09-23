@@ -1001,6 +1001,7 @@ text-decoration: underline; text-underline-offset: var(--sp-1);
 }
 .linkish:hover { color: var(--on-bg); }
 .auth-links .linkish { min-height: var(--control-h); padding: 11px 0; margin: -11px 0; }
+.ws-table .btn.linkish { white-space: nowrap; overflow-wrap: normal; }
 .field-check { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-4); }
 .field-check input { width: var(--sp-6); height: var(--sp-6); flex: none; accent-color: var(--accent-strong); }
 .field-check label { font-size: var(--fs-sm); margin: 0; }

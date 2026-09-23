@@ -32,10 +32,18 @@
  * Bez zależności, plain `node`, wyjście 1 przy błędzie.
  */
 
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import {
+  PROFILE_BY_SERVER,
+  SERVER_PROFILE_DELAY_MS,
   TRIAL_DAYS,
   TRIAL_MS,
   TRIAL_SOURCE,
+  firstAppWrite,
+  serverProfileDoc,
   trialDecision,
   trialGrantDoc,
   trialUntil,
@@ -61,6 +69,42 @@ const eq = (name, got, want) =>
 
 /* Stały znacznik czasu: 11 września 2026, godz. 10:00:00 UTC */
 const FIXED_NOW = Date.UTC(2026, 8, 11, 10, 0, 0);
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const FUNCTION = readFileSync(join(ROOT, "functions/index.js"), "utf8");
+
+/* ================================================================== 0. server profile and first platform */
+
+head("0. server profile and first platform");
+{
+  eq("server waits 15 seconds", SERVER_PROFILE_DELAY_MS, 15000);
+  eq("server marker is exact", PROFILE_BY_SERVER, "server");
+  const doc = serverProfileDoc(FIXED_NOW);
+  eq("server profile has exact two keys", Object.keys(doc).sort().join(","), "createdAt,createdBy");
+  eq("server profile carries time", doc.createdAt, FIXED_NOW);
+  eq("server profile carries marker", doc.createdBy, "server");
+
+  eq("web is recorded", firstAppWrite({ appVersion: "web" }).firstAppVersion, "web");
+  eq("Android version is recorded", firstAppWrite({ appVersion: "1.16.0" }).firstAppVersion, "1.16.0");
+  eq("empty version is refused", firstAppWrite({ appVersion: "" }), null);
+  eq("non-string version is refused", firstAppWrite({ appVersion: 116 }), null);
+  eq("version over 32 characters is refused", firstAppWrite({ appVersion: "x".repeat(33) }), null);
+  eq("server-created profile is refused",
+    firstAppWrite({ appVersion: "web", createdBy: "server" }), null);
+
+  check("ensureProfile imports firebase-functions v1",
+    FUNCTION.includes('import * as functionsV1 from "firebase-functions/v1"'));
+  check("ensureProfile uses REGION and a 60 second timeout",
+    FUNCTION.includes("functionsV1.region(REGION).runWith({ timeoutSeconds: 60 })"));
+  const ensure = FUNCTION.slice(FUNCTION.indexOf("export const ensureProfile"),
+    FUNCTION.indexOf("export const grantTrial"));
+  check("ensureProfile waits before creating", ensure.indexOf("SERVER_PROFILE_DELAY_MS") < ensure.indexOf(".create("));
+  check("ensureProfile uses create, not set", ensure.includes(".create(serverProfileDoc(Date.now()))") && !ensure.includes(".set("));
+
+  const trial = FUNCTION.slice(FUNCTION.indexOf("export const grantTrial"));
+  const transaction = trial.slice(trial.indexOf("runTransaction"), trial.indexOf("if (outcome.skipped)"));
+  eq("grantTrial writes the profile once per transaction",
+    (transaction.match(/tx\.set\(userRef/g) || []).length, 1);
+}
 
 /* ================================================================== 1. fresh account gets premium, planRenews false, planSource trial */
 

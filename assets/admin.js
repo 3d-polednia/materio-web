@@ -43,6 +43,22 @@ const day = (ms) => {
   return isNaN(d.getTime()) ? "—" : d.toISOString().slice(0, 10);
 };
 
+/** Local date and time, or a dash. */
+const when = (ms) => {
+  const d = new Date(Number(ms));
+  if (!ms || isNaN(d.getTime())) return "—";
+  const two = (value) => String(value).padStart(2, "0");
+  return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())} ${two(d.getHours())}:${two(d.getMinutes())}`;
+};
+
+const platform = (value) => value === "web" ? "strona"
+  : typeof value === "string" && value ? `Android ${value}` : "—";
+
+const login = (providers) => Array.isArray(providers) && providers.length
+  ? providers.map((value) => value === "google.com" ? "Google"
+    : value === "password" ? "hasło" : value).join(" + ")
+  : "—";
+
 /**
  * One account's plan, in one line.
  *
@@ -51,9 +67,11 @@ const day = (ms) => {
  * identical in the `plan` field alone, and only one of them is worth a conversation.
  */
 function planLine(acc) {
-  if (acc.state === "expired") return `Pro — wygasł ${day(acc.validUntil)}`;
+  const sources = { trial: "okres próbny", stripe: "Stripe", manual: "ręcznie" };
+  const source = sources[acc.source] ? ` (${sources[acc.source]})` : "";
+  if (acc.state === "expired") return `Pro — wygasł ${day(acc.validUntil)}${source}`;
   if (acc.state === "pro") {
-    return `Pro do ${day(acc.validUntil)}${acc.renews ? ", odnawia się" : ""}`;
+    return `Pro do ${day(acc.validUntil)}${acc.renews ? ", odnawia się" : ""}${source}`;
   }
   return "Free";
 }
@@ -100,7 +118,7 @@ const PANEL = `
       <input id="admin-months" type="text" inputmode="numeric" maxlength="3" value="12">
     </div>
     <p class="ws-links">
-      <button type="button" id="admin-status" class="btn btn-ghost btn-sm">Sprawdź plan</button>
+      <button type="button" id="admin-status" class="btn btn-ghost btn-sm">Sprawdź konto</button>
       <button type="button" id="admin-grant" class="btn btn-primary btn-sm">Nadaj Pro</button>
       <button type="button" id="admin-revoke" class="btn btn-danger btn-sm">Cofnij Pro</button>
     </p>
@@ -110,15 +128,20 @@ const PANEL = `
 
   <p id="admin-result" class="result show" role="status" aria-live="polite" hidden></p>
 
+  <div class="app-card" id="admin-detail" hidden></div>
+
   <div class="app-card">
     <h3>Wszystkie konta</h3>
-    <p class="muted">Adres, plan i to, czy konto ma ten panel. Lista jest czytana na
-      żądanie — nic się nie odświeża samo.</p>
+    <p class="muted">Adres, logowanie, aktywność, profil i plan. Kliknij adres, żeby zobaczyć
+      szczegóły. Lista jest czytana na żądanie — nic się nie odświeża samo.</p>
     <p class="ws-links">
       <button type="button" id="admin-list" class="btn btn-ghost btn-sm">Wypisz konta</button>
     </p>
     <div class="table-scroll"><table id="admin-table" class="ws-table" hidden>
-      <thead><tr><th scope="col">E-mail</th><th scope="col">Plan</th><th scope="col">Panel</th></tr></thead>
+      <thead><tr><th scope="col">E-mail</th><th scope="col">Plan</th>
+        <th scope="col">Profil</th><th scope="col">Logowanie</th>
+        <th scope="col">Ostatnio</th><th scope="col">Pierwsze wejście</th>
+        <th scope="col">Założone</th></tr></thead>
       <tbody></tbody>
     </table></div>
   </div>`;
@@ -195,9 +218,53 @@ export async function mountAdmin({ app }) {
 
   const emailValue = () => $("admin-email").value.trim();
 
+  const firstEntry = (acc) => acc.firstApp ? platform(acc.firstApp)
+    : acc.profileByServer ? "serwer" : "—";
+  const verified = (acc) => acc.emailVerified === true ? "potwierdzony"
+    : acc.emailVerified === false ? "niepotwierdzony" : "";
+  let detailAccount = null;
+  const drawDetails = (acc, previousCounts) => {
+    if (!acc) return;
+    const detail = $("admin-detail");
+    const counts = Object.prototype.hasOwnProperty.call(acc, "counts") ? acc.counts : previousCounts;
+    const rows = [
+      ["UID", acc.uid || "—"],
+      ["E-mail potwierdzony", acc.emailVerified === true ? "tak" : acc.emailVerified === false ? "nie" : "—"],
+      ["Logowanie", login(acc.providers)],
+      ["Założone (Auth)", when(acc.createdAt)],
+      ["Ostatnie logowanie", when(acc.lastSignInAt)],
+      ["Ostatnio w LiczMat", acc.lastApp
+        ? `${when(acc.lastSeenAt)}, ${platform(acc.lastApp)}` : when(acc.lastSeenAt)],
+      ["Pierwsze wejście", firstEntry(acc)],
+      ["Profil w bazie", acc.hasProfile === true ? "jest" : acc.hasProfile === false ? "brak" : "—"],
+      ["Plan", planLine(acc)],
+      ["Panel admina", acc.admin ? "tak" : "nie"],
+    ];
+    const countLabels = [
+      ["projects", "Projekty"], ["rooms", "Pomieszczenia"],
+      ["estimations", "Kalkulacje"], ["shoppingItems", "Pozycje na listach zakupów"],
+      ["clients", "Klienci"], ["quotes", "Wyceny"], ["materials", "Własne materiały"],
+    ];
+    const list = rows.map(([label, value]) => `<div class="fact"><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join("");
+    const countList = counts && typeof counts === "object"
+      ? countLabels.map(([key, label]) => `<div class="fact"><dt>${esc(label)}</dt><dd>${esc(Number.isInteger(counts[key]) ? counts[key] : "—")}</dd></div>`).join("")
+      : "";
+    const unavailable = countList ? "" : "<p class=\"muted\">Liczby niedostępne.</p>";
+    const note = acc.hasProfile === false
+      ? "<p class=\"muted\">Brak profilu: konto nie dostało okresu próbnego. Zwykle to aplikacja, w której synchronizacja czeka na wybór użytkownika.</p>"
+      : "";
+    detail.innerHTML = `<h3 class="app-identity"><b>Konto: ${esc(acc.email || "—")}</b></h3><dl class="facts">${list}${countList}</dl>${unavailable}${note}`;
+    detail.hidden = false;
+    detailAccount = { ...acc, counts: counts || null };
+  };
+
   const showAccount = (data, prefix) => {
     if (!data || !data.account) return;
     say(`${prefix}${data.account.email}: ${planLine(data.account)}`);
+    if (data.action === "status") drawDetails(data.account, null);
+    else if (detailAccount && detailAccount.email === data.account.email) {
+      drawDetails(data.account, detailAccount.counts);
+    }
   };
 
   $("admin-status").addEventListener("click", async () => {
@@ -225,15 +292,30 @@ export async function mountAdmin({ app }) {
     const data = await call({ action: "list" });
     if (!data) return;
     const table = $("admin-table");
+    /* Seven columns, the plan second: nine did not fit beside the sidebar at 1280 px and the
+       plan was the one scrolled out of sight. Dates never break at their hyphens. */
     const rows = (data.accounts || []).map((acc) => `<tr>
-        <td>${esc(acc.email)}</td>
-        <td>${esc(planLine(acc))}</td>
-        <td>${acc.admin ? "tak" : "—"}</td>
+        <td><button type="button" class="btn linkish" data-admin-email="${esc(acc.email)}">${esc(acc.email)}${acc.admin ? " (admin)" : ""}${acc.disabled ? " (zablokowane)" : ""}</button></td>
+        <td>${esc(planLine(acc)).replace(/\d{4}-\d{2}-\d{2}/, '<span class="num">$&</span>')}</td>
+        <td>${acc.hasProfile === false ? "<strong>brak</strong>" : acc.hasProfile === true ? "jest" : "—"}</td>
+        <td>${esc(login(acc.providers))}${verified(acc) ? `<br><span class="muted">${verified(acc)}</span>` : ""}</td>
+        <td><span class="num">${esc(when(acc.lastSeenAt ?? acc.lastSignInAt))}</span>${acc.lastApp ? `, ${esc(platform(acc.lastApp))}` : ""}</td>
+        <td>${esc(firstEntry(acc))}</td>
+        <td><span class="num">${esc(when(acc.createdAt))}</span></td>
       </tr>`).join("");
     table.querySelector("tbody").innerHTML = rows
-      || '<tr><td colspan="3">Brak kont.</td></tr>';
+      || '<tr><td colspan="7">Brak kont.</td></tr>';
     table.hidden = false;
     const n = (data.accounts || []).length;
     say(`${n} ${n === 1 ? "konto" : "kont"}${data.more ? " (pierwsza strona)" : ""}.`);
+  });
+
+  $("admin-table").addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-admin-email]");
+    if (!button) return;
+    const email = button.dataset.adminEmail || "";
+    $("admin-email").value = email;
+    const data = await call({ action: "status", email });
+    showAccount(data, "");
   });
 }

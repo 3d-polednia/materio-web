@@ -29,7 +29,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  ACTIONS, ADMIN_CLAIM, DEFAULT_MONTHS, DELETE_FIELD, LIST_LIMIT, MAX_MONTHS,
+  ACTIONS, ADMIN_CLAIM, COUNTED, DEFAULT_MONTHS, DELETE_FIELD, LIST_LIMIT, MAX_MONTHS,
   PLAN_FIELDS, PLAN_FREE, PLAN_PRO,
   accountRow, grantWrite, isAdmin, looksLikeEmail, monthsFromNow, normalizeEmail,
   parseRequest, planSummary, revokeWrite,
@@ -282,12 +282,70 @@ head("6. the plan a panel shows, including the one that ran out");
 
   /* One row of the list is exactly what the panel prints, and nothing else about a
      person: whatever is in here has been published to whoever is holding the panel. */
-  const row = accountRow({ uid: "u1", email: "a@b.pl", admin: true }, { plan: PLAN_PRO }, now);
-  eq("a row carries six keys", Object.keys(row).sort().join(","),
-    "admin,email,plan,renews,state,uid,validUntil".split(",").sort().join(","));
-  check("no password, phone or provider leaks into it",
-    !("passwordHash" in row) && !("phoneNumber" in row) && !("providerData" in row));
+  const user = {
+    uid: "u1", email: "a@b.pl", admin: true, emailVerified: true,
+    providers: ["google.com", "password", 7, "one", "two", "three", "six"],
+    createdMs: now - 10, lastSignInMs: now - 5, disabled: true,
+    passwordHash: "secret", tokensValidAfterTime: "secret", providerData: [{ uid: "secret" }],
+  };
+  const profile = {
+    plan: PLAN_PRO, planSource: "trial", lastSeenAt: now - 1,
+    appVersion: "1.16.0", firstAppVersion: "web", createdBy: "server",
+  };
+  const row = accountRow(user, profile, now, { stripe: true });
+  eq("a row carries every public field", Object.keys(row).sort().join(","), [
+    "admin", "createdAt", "disabled", "email", "emailVerified", "firstApp", "hasProfile",
+    "lastApp", "lastSeenAt", "lastSignInAt", "plan", "profileByServer", "providers",
+    "renews", "source", "state", "uid", "validUntil",
+  ].sort().join(","));
+  eq("email verification is boolean", row.emailVerified, true);
+  eq("providers keep strings and at most five", row.providers.join(","),
+    "google.com,password,one,two,three");
+  eq("Auth creation time is copied", row.createdAt, now - 10);
+  eq("Auth last sign-in is copied", row.lastSignInAt, now - 5);
+  eq("disabled is copied", row.disabled, true);
+  eq("a real profile is reported", row.hasProfile, true);
+  eq("lastSeenAt is copied", row.lastSeenAt, now - 1);
+  eq("last app is copied", row.lastApp, "1.16.0");
+  eq("first app is copied", row.firstApp, "web");
+  eq("server profile is marked", row.profileByServer, true);
+  eq("trial beats Stripe as source", row.source, "trial");
+  check("no raw Auth fields leak into it",
+    !("passwordHash" in row) && !("tokensValidAfterTime" in row)
+    && !("phoneNumber" in row) && !("providerData" in row));
   eq("a missing address is an empty string, never undefined", accountRow({}, null, now).email, "");
+  const missing = accountRow({ createdMs: NaN, lastSignInMs: -1, providers: "google.com" }, null, now);
+  eq("null profile means no profile", missing.hasProfile, false);
+  eq("missing verification defaults false", missing.emailVerified, false);
+  eq("garbage providers become empty", missing.providers.length, 0);
+  eq("garbage dates become null", `${missing.createdAt},${missing.lastSignInAt}`, "null,null");
+  eq("missing profile values become null", `${missing.lastSeenAt},${missing.lastApp},${missing.firstApp}`,
+    "null,null,null");
+  eq("free has no source even with Stripe", accountRow({}, null, now, { stripe: true }).source, null);
+  eq("an empty object is still a profile", accountRow({}, {}, now).hasProfile, true);
+  eq("Stripe is the Pro source when trial is absent",
+    accountRow({}, { plan: PLAN_PRO }, now, { stripe: true }).source, "stripe");
+  eq("manual is the remaining Pro source",
+    accountRow({}, { plan: PLAN_PRO }, now).source, "manual");
+  eq("32 characters are accepted", accountRow({}, { appVersion: "x".repeat(32) }, now).lastApp,
+    "x".repeat(32));
+  eq("over 32 characters are rejected", accountRow({}, { appVersion: "x".repeat(33) }, now).lastApp,
+    null);
+  eq("empty and non-string app values are rejected",
+    `${accountRow({}, { appVersion: "" }, now).lastApp},${accountRow({}, { firstAppVersion: 7 }, now).firstApp}`,
+    "null,null");
+
+  eq("account-level counts name five live collections", COUNTED.account.join(","),
+    "projects,rooms,clients,quotes,materials");
+  eq("project-level counts name two live collections", COUNTED.project.join(","),
+    "estimations,shoppingItems");
+  check("retired jobs are not counted", !COUNTED.account.includes("jobs") && !COUNTED.project.includes("jobs"));
+
+  check("list reads Stripe customers once", /collection\("stripeCustomers"\)\.select\("uid"\)\.get\(\)/.test(FUNCTION));
+  check("one-account actions query Stripe by uid",
+    /collection\("stripeCustomers"\)\.where\("uid", "==", uid\)\.limit\(1\)\.get\(\)/.test(FUNCTION));
+  check("status counting failure keeps the call alive",
+    /try \{[\s\S]*accountCounts\(db, user\.uid\)[\s\S]*catch \(e\)[\s\S]*account:/.test(FUNCTION));
 }
 
 /* ================================================================== 7. the boundaries */

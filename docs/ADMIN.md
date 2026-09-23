@@ -20,10 +20,11 @@ Trzy kroki, w tej kolejności. Pierwszy i drugi są jednorazowe.
 
 ```bash
 cd <katalog repo materio-web>
-firebase deploy --only functions
+firebase deploy --only functions:ensureProfile,functions:grantTrial,functions:adminPlan
 ```
 
-Wdraża **obie** funkcje z `functions/`: webhook Stripe'a (sesja 38) i `adminPlan`.
+Te trzy funkcje trzeba wdrożyć razem: awaryjne założenie profilu uruchamia `grantTrial`,
+a `adminPlan` pokazuje wynik w panelu.
 Flaga `--only` przestała być kosmetyką 2026-09-09: `firebase.json` ma od tego dnia także
 blok `hosting` (witryna `liczmat-auth` dla maili konta, `docs/AUTH-EMAIL.md`), więc samo
 `firebase deploy` ruszyłoby obie rzeczy naraz.
@@ -67,10 +68,26 @@ Jedno pole na adres e-mail, jedno na liczbę miesięcy i trzy przyciski.
 
 | Przycisk | Co robi |
 |---|---|
-| **Sprawdź plan** | Mówi, na jakim planie stoi to konto i do kiedy. Niczego nie zmienia |
+| **Sprawdź konto** | Pokazuje plan, logowanie, profil i liczby zapisanych danych. Niczego nie zmienia |
 | **Nadaj Pro** | Zapisuje `plan: premium` i datę końca — dziś plus tyle miesięcy, ile jest w polu (domyślnie 12, najwięcej 120) |
 | **Cofnij Pro** | Wraca na plan darmowy. Pyta o potwierdzenie, bo odbiera dostęp, za który ktoś mógł zapłacić |
-| **Wypisz konta** | Lista wszystkich kont w projekcie: adres, plan i to, kto ma ten panel |
+| **Wypisz konta** | Lista kont w siedmiu kolumnach: adres, plan, profil, logowanie z potwierdzeniem adresu, ostatnia aktywność z platformą, pierwsze wejście i data założenia. Konto z panelem ma przy adresie „(admin)” |
+
+Plan stoi w drugiej kolumnie celowo: przy dziewięciu kolumnach tabela nie mieściła się obok
+paska bocznego na 1280 px i to właśnie plan wypadał poza ekran.
+
+Kliknięcie adresu w liście otwiera kartę szczegółów. Karta pokazuje UID, daty Auth,
+aktywność w LiczMat, źródło planu oraz liczby projektów, pomieszczeń, kalkulacji, pozycji
+zakupowych, klientów, wycen i własnych materiałów. Brak profilu jest wyróżniony.
+
+`firstAppVersion` zapisuje pierwszą platformę tylko raz, podczas tworzenia profilu przez
+klienta: `web` dla strony albo numer wersji Androida. Profil utworzony przez serwer nie
+udaje pierwszego wejścia z aplikacji.
+
+`ensureProfile` jest nieblokującym wyzwalaczem Auth. Czeka 15 sekund, aby zwykły zapis
+klienta wygrał, a potem tworzy minimalny profil tylko wtedy, gdy nadal go nie ma. Dzięki
+temu konto z zablokowaną synchronizacją Androida dostaje profil i okres próbny bez ryzyka,
+że błąd funkcji przerwie rejestrację.
 
 **Plan nadany ręcznie nigdy się nie odnawia.** `planRenews` jest zapisywane jako `false`,
 bo nic tego planu nie odnowi, gdy minie data — nie ma za nim subskrypcji. Konto samo wróci

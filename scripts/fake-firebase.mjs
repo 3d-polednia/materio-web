@@ -332,6 +332,10 @@ export function onSnapshot(ref, ...rest) {
 export const FAKE_FUNCTIONS = `
 const S = (window.__fn = window.__fn || { calls: [], region: null });
 window.__fnCalls = S.calls;
+window.__fnSetAnswer = (action, answer) => {
+  window.__fnAnswers = window.__fnAnswers || {};
+  window.__fnAnswers[action] = answer;
+};
 
 export function getFunctions(app, region) { S.region = region; window.__fnRegion = region; return { app, region }; }
 

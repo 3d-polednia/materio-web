@@ -53,6 +53,7 @@
 
 import { createHmac } from "node:crypto";
 
+import * as functionsV1 from "firebase-functions/v1";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { defineSecret, defineString } from "firebase-functions/params";
@@ -65,10 +66,13 @@ import {
   DELETE_FIELD, PLAN_FREE, acceptEvent, decide, verifyStripeSignature,
 } from "./stripe-map.mjs";
 import {
-  LIST_LIMIT, accountRow, grantWrite, isAdmin, parseRequest, planSummary, revokeWrite,
+  COUNTED, LIST_LIMIT, accountRow, grantWrite, isAdmin, parseRequest, planSummary, revokeWrite,
 } from "./admin-map.mjs";
 import { looksLikeTicket, mintTicket, readTicket } from "./pay-ticket.mjs";
-import { TRIAL_DAYS, trialDecision, trialGrantDoc } from "./trial-map.mjs";
+import {
+  SERVER_PROFILE_DELAY_MS, TRIAL_DAYS, firstAppWrite, serverProfileDoc,
+  trialDecision, trialGrantDoc,
+} from "./trial-map.mjs";
 
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
 
@@ -468,27 +472,43 @@ export const adminPlan = onCall(
 
     if (parsed.action === "list") {
       const page = await auth.listUsers(LIST_LIMIT);
-      const users = page.users.map((u) => ({
-        uid: u.uid, email: u.email || "", admin: isAdmin(u.customClaims),
-      }));
+      const users = page.users.map(authUserShape);
       // Jedno zapytanie zamiast jednego na konto. `getAll()` rzuca, gdy nie dostanie ani
       // jednej referencji, więc pusty projekt kończy się tutaj.
-      const profiles = users.length
-        ? await db.getAll(...users.map((u) => db.collection("users").doc(u.uid)))
-        : [];
-      const accounts = users.map((u, i) => accountRow(u, profiles[i] && profiles[i].data(), now));
+      const [profiles, stripeCustomers] = await Promise.all([
+        users.length
+          ? db.getAll(...users.map((u) => db.collection("users").doc(u.uid)))
+          : [],
+        db.collection("stripeCustomers").select("uid").get(),
+      ]);
+      const stripeUids = new Set(stripeCustomers.docs
+        .map((snap) => snap.get("uid")).filter((uid) => typeof uid === "string"));
+      const accounts = users.map((u, i) => accountRow(
+        u,
+        profiles[i] && profiles[i].exists ? profiles[i].data() : null,
+        now,
+        { stripe: stripeUids.has(u.uid) },
+      ));
       accounts.sort((a, b) => a.email.localeCompare(b.email));
       return { ok: true, action: "list", accounts, more: Boolean(page.pageToken) };
     }
 
     const user = await findUser(auth, parsed.email);
     if (!user) throw new HttpsError("not-found", "no-account");
+    const stripe = await hasStripeCustomer(db, user.uid);
 
     if (parsed.action === "status") {
       const snap = await db.collection("users").doc(user.uid).get();
+      let counts = null;
+      try {
+        counts = await accountCounts(db, user.uid);
+      } catch (e) {
+        // Liczby pomagają w diagnozie, ale ich awaria nie może ukryć samego konta.
+        logger.error("admin: liczenie nie przeszło", { uid: user.uid, message: e.message });
+      }
       return {
         ok: true, action: "status",
-        account: accountRow(user, snap.exists ? snap.data() : null, now),
+        account: { ...accountRow(user, snap.exists ? snap.data() : null, now, { stripe }), counts },
       };
     }
 
@@ -506,7 +526,7 @@ export const adminPlan = onCall(
     const snap = await db.collection("users").doc(user.uid).get();
     return {
       ok: true, action: parsed.action,
-      account: accountRow(user, snap.exists ? snap.data() : null, now),
+      account: accountRow(user, snap.exists ? snap.data() : null, now, { stripe }),
     };
   },
 );
@@ -521,14 +541,79 @@ export const adminPlan = onCall(
 async function findUser(auth, email) {
   try {
     const user = await auth.getUserByEmail(email);
-    return { uid: user.uid, email: user.email || email, admin: isAdmin(user.customClaims) };
+    return authUserShape(user, email);
   } catch (e) {
     if (e && e.code === "auth/user-not-found") return null;
     throw e;
   }
 }
 
+/** Bezpieczny podzbiór rekordu Auth przekazywany do mapowania panelu. */
+function authUserShape(user, fallbackEmail = "") {
+  const parsed = (value) => {
+    const ms = Date.parse(value || "");
+    return Number.isFinite(ms) ? ms : null;
+  };
+  return {
+    uid: user.uid,
+    email: user.email || fallbackEmail,
+    admin: isAdmin(user.customClaims),
+    emailVerified: Boolean(user.emailVerified),
+    providers: Array.isArray(user.providerData) ? user.providerData.map((p) => p.providerId) : [],
+    createdMs: parsed(user.metadata && user.metadata.creationTime),
+    lastSignInMs: parsed(user.metadata && user.metadata.lastSignInTime),
+    disabled: Boolean(user.disabled),
+  };
+}
+
+/** Czy konto ma klienta Stripe; zapytanie nie pobiera pozostałych dokumentów. */
+async function hasStripeCustomer(db, uid) {
+  const found = await db.collection("stripeCustomers").where("uid", "==", uid).limit(1).get();
+  return !found.empty;
+}
+
+/** Liczby dokumentów użytkownika, bez pobierania ich treści. */
+async function accountCounts(db, uid) {
+  const root = db.collection("users").doc(uid);
+  const [accountEntries, projects] = await Promise.all([
+    Promise.all(COUNTED.account.map(async (name) => {
+      const snap = await root.collection(name).count().get();
+      return [name, snap.data().count];
+    })),
+    root.collection("projects").listDocuments(),
+  ]);
+  const projectEntries = await Promise.all(COUNTED.project.map(async (name) => {
+    const values = await Promise.all(projects.map(async (project) => {
+      const snap = await project.collection(name).count().get();
+      return snap.data().count;
+    }));
+    return [name, values.reduce((sum, value) => sum + value, 0)];
+  }));
+  return Object.fromEntries([...accountEntries, ...projectEntries]);
+}
+
 /* ------------------------------------------------------------------ okres próbny */
+
+/**
+ * Auth v1 ma nieblokujący `onCreate`; v2 go nie ma, a `beforeUserCreated` wymaga Identity
+ * Platform i jego błąd przerwałby rejestrację. Czekamy, żeby zwykły zapis klienta wygrał
+ * wyścig z serwerem i nie został odrzucony przez reguły po zmianie `createdAt`.
+ */
+export const ensureProfile = functionsV1.region(REGION).runWith({ timeoutSeconds: 60 })
+  .auth.user().onCreate(async (user) => {
+    const uid = user.uid;
+    await new Promise((resolve) => setTimeout(resolve, SERVER_PROFILE_DELAY_MS));
+    try {
+      await getFirestore().collection("users").doc(uid).create(serverProfileDoc(Date.now()));
+      logger.info("profile: założony przez serwer", { uid });
+    } catch (e) {
+      if (e && (e.code === 6 || e.code === "already-exists")) {
+        logger.info("profile: klient był pierwszy", { uid });
+        return;
+      }
+      logger.error("profile: zapis nie przeszedł", { uid, message: e && e.message });
+    }
+  });
 
 /**
  * Czternaście dni Pro dla każdego nowego konta.
@@ -564,6 +649,7 @@ export const grantTrial = onDocumentCreated(
   async (event) => {
     const uid = event.params.uid;
     const now = Date.now();
+    const firstApp = firstAppWrite(event.data.data());
 
     const db = getFirestore();
     const userRef = db.collection("users").doc(uid);
@@ -581,17 +667,24 @@ export const grantTrial = onDocumentCreated(
         grant.exists ? grant.data() : null,
         now,
       );
-      if (!verdict.grant) return { skipped: verdict.reason };
+      const profileWrite = { ...(firstApp || {}), ...(verdict.grant ? verdict.write : {}) };
+      if (Object.keys(profileWrite).length) {
+        tx.set(userRef, toFirestore(profileWrite), { merge: true });
+      }
+      if (!verdict.grant) return { skipped: verdict.reason, firstAppVersion: firstApp?.firstAppVersion || null };
 
-      tx.set(userRef, toFirestore(verdict.write), { merge: true });
       tx.set(trialRef, trialGrantDoc(uid, now));
-      return { until: verdict.until };
+      return { until: verdict.until, firstAppVersion: firstApp?.firstAppVersion || null };
     });
 
     if (outcome.skipped) {
-      logger.info("trial: pominięty", { uid, reason: outcome.skipped });
+      logger.info("trial: pominięty", {
+        uid, reason: outcome.skipped, firstAppVersion: outcome.firstAppVersion,
+      });
       return;
     }
-    logger.info("trial: nadany", { uid, days: TRIAL_DAYS, until: outcome.until });
+    logger.info("trial: nadany", {
+      uid, days: TRIAL_DAYS, until: outcome.until, firstAppVersion: outcome.firstAppVersion,
+    });
   },
 );

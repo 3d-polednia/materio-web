@@ -198,8 +198,8 @@ head("1. the panel is fetched for one account and for no other");
   const plain = await openApp(ctx, { accounts: PLAIN });
   await signIn(plain, "ktos@example.com");
   await plain.waitForTimeout(400);
-  // The count is derived from the new sidebar (.app-nav-item calls in app-pages.mjs: 6 work, 2 resources, 4 account = 12 total).
-  eq("a plain account has twelve tabs", await plain.locator(".app-nav-item").count(), 12);
+  // The count follows the current sidebar; the admin tab is injected as one extra item.
+  eq("a plain account has eleven tabs", await plain.locator(".app-nav-item").count(), 11);
   eq("and no admin tab", await plain.locator("#tab-admin").count(), 0);
   eq("and never downloaded the panel", ctx.__adminFetches, 0);
   check("the token was asked for anyway, so a fresh claim would be seen",
@@ -210,8 +210,8 @@ head("1. the panel is fetched for one account and for no other");
 
   const boss = await openApp(ctx, { accounts: ADMIN });
   await signIn(boss, "szef@liczmat.com", { admin: true });
-  eq("an admin account has thirteen", await boss.locator(".app-nav-item").count(), 13);
-  eq("the thirteenth is the admin tab", await boss.locator(".app-nav-item").last().innerText(), "Admin");
+  eq("an admin account has twelve", await boss.locator(".app-nav-item").count(), 12);
+  eq("the twelfth is the admin tab", await boss.locator(".app-nav-item").last().innerText(), "Admin");
   eq("and the file was fetched exactly once", ctx.__adminFetches, 1);
   eq("the panel is closed until it is asked for",
     await boss.locator("#panel-admin").isVisible(), false);
@@ -325,40 +325,92 @@ head("4. what it draws, in Polish");
   const page = await openApp(ctx, {
     accounts: ADMIN,
     answers: {
-      status: { ok: true, account: { email: "a@b.pl", plan: "premium", state: "pro", validUntil: until, renews: false, admin: false } },
+      status: { ok: true, action: "status", account: {
+        uid: "u-missing", email: "brak@example.com", emailVerified: false,
+        providers: ["password"], createdAt: Date.UTC(2026, 0, 2, 10),
+        lastSignInAt: Date.UTC(2026, 8, 23, 12), disabled: false,
+        hasProfile: false, lastSeenAt: null, lastApp: null, firstApp: null,
+        profileByServer: false, plan: "free", state: "free", validUntil: null,
+        renews: false, source: null, admin: false,
+        counts: { projects: 2, rooms: 3, estimations: 4, shoppingItems: 5,
+          clients: 6, quotes: 7, materials: 8 },
+      } },
       list: { ok: true, more: false, accounts: [
-        { email: "jeden@example.com", plan: "premium", state: "pro", validUntil: until, renews: true, admin: false },
-        { email: "dwa@example.com", plan: "premium", state: "expired", validUntil: until, renews: false, admin: false },
-        { email: "<b>trzy</b>@example.com", plan: "free", state: "free", validUntil: null, renews: false, admin: true },
+        { email: "google@example.com", emailVerified: true, providers: ["google.com"],
+          createdAt: NOW - DAY, lastSignInAt: NOW, lastSeenAt: NOW, lastApp: "web",
+          firstApp: "web", hasProfile: true, profileByServer: false, disabled: false,
+          plan: "premium", state: "pro", validUntil: until, renews: false, source: "trial", admin: false },
+        { email: "haslo@example.com", emailVerified: false, providers: ["password"],
+          createdAt: NOW - DAY, lastSignInAt: NOW, lastSeenAt: null, lastApp: "1.16.0",
+          firstApp: "1.16.0", hasProfile: true, profileByServer: false, disabled: true,
+          plan: "premium", state: "pro", validUntil: until, renews: true, source: "stripe", admin: false },
+        { email: "brak@example.com", emailVerified: false, providers: [], createdAt: null,
+          lastSignInAt: null, lastSeenAt: null, lastApp: null, firstApp: null,
+          hasProfile: false, profileByServer: false, disabled: false,
+          plan: "free", state: "free", validUntil: null, renews: false, source: null, admin: true },
       ] },
     },
   });
   await signIn(page, "szef@liczmat.com", { admin: true });
   await page.click("#tab-admin");
 
-  await page.fill("#admin-email", "a@b.pl");
-  await page.click("#admin-status");
-  await page.waitForFunction(() => !document.getElementById("admin-result").hidden
-    && !/Czekam/.test(document.getElementById("admin-result").textContent));
-  const line = await result(page);
-  check("a valid plan is read out with its date", /a@b\.pl: Pro do 2027-03-14/.test(line), line);
-  check("and says it does not renew", !/odnawia/.test(line), line);
-  check("the answer is announced", await page.locator("#admin-result").getAttribute("role") === "status");
-
   await page.click("#admin-list");
   await page.waitForSelector("#admin-table:not([hidden])");
+  eq("the table has seven headers, the plan second", await page.locator("#admin-table th").allTextContents().then((x) => x.join("|")),
+    "E-mail|Plan|Profil|Logowanie|Ostatnio|Pierwsze wejście|Założone");
   const rows = await page.$$eval("#admin-table tbody tr", (trs) =>
-    trs.map((tr) => Array.from(tr.cells).map((td) => td.textContent.trim())));
+    trs.map((tr) => Array.from(tr.cells).map((td) => td.innerText.trim())));
   eq("three accounts, three rows", rows.length, 3);
-  check("a renewing plan says so", /odnawia się/.test(rows[0][1]), rows[0][1]);
-  check("an expired one says expired, not free", /wygasł 2027-03-14/.test(rows[1][1]), rows[1][1]);
-  eq("a free one says Free", rows[2][1], "Free");
-  eq("and an administrator is marked", rows[2][2], "tak");
-  eq("while the others are not", rows[0][2], "—");
-  eq("what came from the server is rendered as text, not as markup",
-    rows[2][0], "<b>trzy</b>@example.com");
-  eq("no element got built out of it", await page.locator("#admin-table b").count(), 0);
+  check("Google login is named", /^Google\npotwierdzony$/.test(rows[0][3]), rows[0][3]);
+  check("password login is named", /^hasło\b/.test(rows[1][3]), rows[1][3]);
+  check("an unverified address says so", /\nniepotwierdzony$/.test(rows[1][3]), rows[1][3]);
+  check("disabled state follows the address", /\(zablokowane\)/.test(rows[1][0]), rows[1][0]);
+  eq("web is named as the site", rows[0][5], "strona");
+  eq("Android version is named", rows[1][5], "Android 1.16.0");
+  check("trial source is shown", /\(okres próbny\)/.test(rows[0][1]), rows[0][1]);
+  check("Stripe source is shown", /\(Stripe\)/.test(rows[1][1]), rows[1][1]);
+  eq("a plan's date never breaks at its hyphens",
+    await page.locator("#admin-table tbody tr").nth(0).locator("td").nth(1).locator(".num").count(), 1);
+  eq("missing profile says brak", rows[2][2], "brak");
+  eq("missing profile stands out", await page.locator("#admin-table tbody tr").nth(2).locator("td").nth(2).locator("strong").count(), 1);
+  check("an administrator is marked", /\(admin\)/.test(rows[2][0]), rows[2][0]);
+  /* No aria-label: the name is the visible text, so "(zablokowane)" is read out too. */
+  eq("an e-mail button is named by its visible text",
+    await page.locator('[data-admin-email="haslo@example.com"]').getAttribute("aria-label"), null);
+  check("and that text starts with the address",
+    (await page.locator('[data-admin-email="haslo@example.com"]').innerText()).startsWith("haslo@example.com"));
   check("the count is said in Polish", /3 kont/.test(await result(page)), await result(page));
+
+  await page.locator('[data-admin-email="brak@example.com"]').click();
+  await page.waitForSelector("#admin-detail:not([hidden])");
+  const call = await lastCall(page);
+  eq("an e-mail button sends status", JSON.stringify(call[1]),
+    JSON.stringify({ action: "status", email: "brak@example.com" }));
+  eq("the button fills the field", await page.inputValue("#admin-email"), "brak@example.com");
+  check("details draw counts", /Projekty\s*2/.test(await page.locator("#admin-detail").innerText()));
+  check("details explain a missing profile", /Brak profilu: konto nie dostało okresu próbnego/.test(
+    await page.locator("#admin-detail").innerText()));
+  check("the answer is announced", await page.locator("#admin-result").getAttribute("role") === "status");
+
+  await page.evaluate(() => {
+    window.__fnSetAnswer("status", {
+      ...window.__fnAnswers.status,
+      account: { ...window.__fnAnswers.status.account, counts: null },
+    });
+  });
+  await page.click("#admin-status");
+  await page.waitForFunction(() => /Liczby niedostępne/.test(document.getElementById("admin-detail").textContent));
+  check("null counts are named", /Liczby niedostępne\./.test(await page.locator("#admin-detail").innerText()));
+
+  await page.evaluate(() => window.__fnSetAnswer("status", {
+    ok: true, action: "status",
+    account: { email: "stare@example.com", plan: "free", state: "free", validUntil: null, renews: false, admin: false },
+  }));
+  await page.fill("#admin-email", "stare@example.com");
+  await page.click("#admin-status");
+  await page.waitForFunction(() => /Konto: stare@example\.com/.test(document.getElementById("admin-detail").textContent));
+  check("old function fields render dashes", (await page.locator("#admin-detail").innerText()).includes("—"));
+  check("old function answer throws no browser error", page.__errors.length === 0, page.__errors.join(" | "));
 
   /* The table is wide and the panel is read on a phone like everything else here. */
   check("the table scrolls inside its own box",
@@ -428,7 +480,7 @@ head("6. the panel belongs to the account, not to the tab");
   eq("the next account does not inherit it", await page.locator("#tab-admin").count(), 0);
   eq("and lands on a workspace with something in it",
     await page.locator("#panel-overview").isVisible(), true);
-  eq("twelve tabs again", await page.locator(".app-nav-item").count(), 12);
+  eq("eleven tabs again", await page.locator(".app-nav-item").count(), 11);
   check("no error was logged on the way", page.__errors.length === 0, page.__errors.join(" | "));
   await page.close();
   await ctx.close();
@@ -441,14 +493,23 @@ head("7. chapter XXVIII: the panel on a phone");
   const ctx = await context();
   const page = await openApp(ctx, {
     accounts: ADMIN,
-    answers: { list: { ok: true, more: true, accounts: [
-      { email: "ktos@example.com", plan: "premium", state: "pro", validUntil: NOW + DAY, renews: true, admin: false },
-    ] } },
+    answers: {
+      list: { ok: true, more: true, accounts: [
+        { email: "ktos@example.com", plan: "premium", state: "pro", validUntil: NOW + DAY, renews: true, admin: false },
+      ] },
+      status: { ok: true, action: "status", account: {
+        uid: "u-width", email: "bardzo.dlugi.adres.konta@example.com",
+        plan: "free", state: "free", validUntil: null, renews: false, admin: false,
+        counts: null,
+      } },
+    },
   });
   await signIn(page, "szef@liczmat.com", { admin: true });
   await page.click("#tab-admin");
   await page.click("#admin-list");
   await page.waitForSelector("#admin-table:not([hidden])");
+  await page.locator('[data-admin-email="ktos@example.com"]').click();
+  await page.waitForSelector("#admin-detail:not([hidden])");
 
   for (const width of [320, 375, 390, 430, 768, 1280]) {
     await page.setViewportSize({ width, height: 800 });

@@ -638,7 +638,8 @@ functions/index.js    The thin half of BOTH functions: verify, decide, write. Th
                       `stripeCustomers`. `adminPlan` (session 49) is the same three fields
                       written by hand from the browser: an `onCall`, so Firebase verifies
                       the token before the code runs, and every write goes to the log with
-                      the uid that ordered it
+                      the uid that ordered it. `ensureProfile` creates the missing profile
+                      after 15 seconds when a newly registered client did not create it
 functions/admin-map.mjs  The decision half of the admin panel, and the only file in
                       functions/ that imports another (stripe-map.mjs, for the plan words —
                       a third copy of the contract inside one deployed directory would be
