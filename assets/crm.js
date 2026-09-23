@@ -411,8 +411,9 @@ function crmClientLastAt(clientId) {
  *
  * Chapter XXII: "Wycena może zawierać: materiały, robociznę, inne koszty, marżę, sumę.
  * Nie buduj pełnego programu księgowego." Session 24's six bullets are those five plus
- * the currency, and this is all of them — no tax, no discount, no invoice number, no
- * status: every one of those is the accounting package the chapter forbids in one line.
+ * the currency, and this is all of them — no tax, no discount and no invoice number.
+ * Status joined on 2026-09-23, the owner's decision: the life cycle of the document
+ * sent to a client (draft, sent, accepted, rejected), not a piece of accounting.
  *
  * **Each of the five figures has exactly one source, and only two of them are stored.**
  *
@@ -442,6 +443,14 @@ function crmClientLastAt(clientId) {
 const QUO_MAX_LINES = 60;
 /** The cap on a margin, in percent. A margin is a markup, not an exponent. */
 const QUO_MAX_MARGIN = 1000;
+/** The order is the order a quote lives through. `draft` is also what a row with no
+ *  status reads as: old web quotes and every Android quote do not know this field yet. */
+const QUOTE_STATUS = ["draft", "sent", "accepted", "rejected"];
+
+/** A stored quote status, with the backward-compatible state for rows that predate it. */
+function crmQuoteStatus(q) {
+  return q && QUOTE_STATUS.indexOf(q.status) !== -1 ? q.status : "draft";
+}
 
 /** A counted amount, or null when the visitor left the field blank — a lump-sum line. */
 function crmQty(v) {
@@ -526,6 +535,7 @@ function crmAddQuote(fields) {
     projectId: crmProjectId(f.projectId),
     labour: [],
     marginPct: crmPct(f.marginMajor),
+    status: "draft",
     note: crmText(f.note, CRM_MAX_NOTE),
     // Stamped by the first labour amount, not here: a quote with no money in it yet has
     // no currency to be wrong about.
@@ -556,6 +566,7 @@ function crmUpdateQuote(id, fields) {
   if (f.note !== undefined) quote.note = crmText(f.note, CRM_MAX_NOTE);
   if (f.marginMajor !== undefined) quote.marginPct = crmPct(f.marginMajor);
   if (f.projectId !== undefined) quote.projectId = crmProjectId(f.projectId);
+  if (f.status !== undefined && QUOTE_STATUS.indexOf(f.status) !== -1) quote.status = f.status;
   quote.updatedAt = Date.now();
   if (!crmSave(data)) return null;
   return crmQuote(id);
@@ -796,6 +807,30 @@ function crmQuoteTotals(quoteId) {
     hasProject: Boolean(costs),
     mixed,
     lines: lines.length,
+  };
+}
+
+/**
+ * Everything both quote lists need to describe one row, without changing the store.
+ * Reads follow crmQuoteTotals(): they stay available for rows already on this device even
+ * when the current account cannot write a quote (see crmCanQuote()).
+ */
+function crmQuoteSummary(id) {
+  const quote = crmQuote(id);
+  if (!quote) return null;
+  const chain = crmChain("quote", id);
+  const project = quote.projectId && typeof wsProject === "function"
+    ? wsProject(quote.projectId) : null;
+  const missing = [];
+  if (!project) missing.push("project");
+  if (!Array.isArray(quote.labour) || !quote.labour.length) missing.push("labour");
+  return {
+    quote,
+    status: crmQuoteStatus(quote),
+    client: chain.client || null,
+    project: project || null,
+    totals: crmQuoteTotals(id),
+    missing,
   };
 }
 
@@ -1108,6 +1143,7 @@ if (typeof module !== "undefined" && module.exports) {
     PROJECT_STATUS, PROJECT_OPEN_STATUS, PROJECT_DEFAULT_STATUS, PROJECT_COLORS,
     CAL_BUCKETS, CAL_SOON_DAYS,
     CRM_CHAIN, CRM_HISTORY_KINDS,
-    QUO_MAX_LINES, QUO_MAX_MARGIN,
+    QUO_MAX_LINES, QUO_MAX_MARGIN, QUOTE_STATUS,
+    crmQuoteStatus, crmQuoteSummary,
   };
 }

@@ -2603,6 +2603,10 @@ function proJobDoc(job, deletedAt) {
  *
  * A merge, like every other write on both platforms: a replace would delete a field this
  * browser has never heard of, which is exactly how the phone's own extra fields survive.
+ * Quote status can ship before the Android UI knows it: validQuote() validates the known
+ * shape without hasOnly(), the phone writes quotes with SetOptions.merge(), and crmImport()
+ * keeps the whole incoming document. A pull therefore brings the field back and a phone
+ * write leaves it alone. The phone not showing the status yet is the known remaining gap.
  */
 async function pushProWorkspace(uid, since) {
   if (typeof crmExport !== "function") return;
@@ -2649,6 +2653,7 @@ async function pushProWorkspace(uid, since) {
       projectId: text(q.projectId, 64),
       labour: labour,
       marginPct: Math.min(1000, Math.max(0, num(q.marginPct))),
+      status: typeof crmQuoteStatus === "function" ? crmQuoteStatus(q) : "draft",
       note: text(q.note, 2000),
       currencyCode: money === 0 ? "" : text(q.currencyCode, 3),
       ...syncFields(q.createdAt, q.deletedAt),

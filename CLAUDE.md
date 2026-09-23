@@ -1215,10 +1215,15 @@ Kotlin side of it. Change one, change all three.
   clearing the last amount clears the stamp. When the quote's half and the project's half
   are in different currencies the page says so — the amounts are still added, the same
   choice `wsProjectCosts()` makes, and nothing is converted at a rate.
-- **What a quote deliberately has no room for:** tax, a discount, a status, a number, an
-  issue date, or "other costs" typed on the quote itself. The first five are the accounting
-  package chapter XXII forbids in one line; the last is a second home for an amount chapter
-  XVII already keeps on the project, where `wsProjectCosts()` counts it once.
+- **A quote carries one of four statuses:** `draft`, `sent`, `accepted`, `rejected`, in the
+  order a quote lives through. A row without the field reads as `draft`, which covers quotes
+  saved before the field and quotes written by Android while the phone does not show status
+  yet. This is safe in the shared document: `validQuote()` has no `hasOnly()`, Android uses
+  `SetOptions.merge()`, and the web imports the whole document, so neither side erases it.
+- **What a quote deliberately has no room for:** tax, a discount, a number, an issue date,
+  or "other costs" typed on the quote itself. The first four are the accounting package
+  chapter XXII forbids in one line; the last is a second home for an amount chapter XVII
+  already keeps on the project, where `wsProjectCosts()` counts it once.
 - **Chapter XXI's four statuses are the whole set, and a job has no `archived` field.**
   `JOB_STATUS` is `new, active, done, cancelled`, in the chapter's own order; anything else
   is refused rather than stored, and a job created with an unknown status starts `new`. The

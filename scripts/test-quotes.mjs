@@ -102,10 +102,11 @@ function loadCrm() {
     "crmAddClient", "crmClient", "crmLinkProject", "crmClientOfProject",
     "crmQuotes", "crmQuote", "crmAddQuote", "crmUpdateQuote", "crmDeleteQuote",
     "crmRestoreQuote", "crmProjectQuotes", "crmQuoteTotals", "crmQuoteChain",
+    "crmQuoteStatus", "crmQuoteSummary",
     "crmLabour", "crmAddLabour", "crmUpdateLabour", "crmDeleteLabour", "crmLabourRate",
     "crmLineAmount", "crmQty", "crmPct",
     "CRM_KEY", "CRM_SCHEMA", "CRM_MAX_NAME", "CRM_MAX_NOTE",
-    "QUO_MAX_LINES", "QUO_MAX_MARGIN",
+    "QUO_MAX_LINES", "QUO_MAX_MARGIN", "QUOTE_STATUS",
   ], {
     localStorage,
     document: { dispatchEvent: (e) => events.push(e.type) },
@@ -126,6 +127,7 @@ function loadCrm() {
   return {
     ...api,
     raw: () => JSON.parse(backing.get("liczmat-crm-v1") || "{}"),
+    setRaw: (data) => backing.set("liczmat-crm-v1", JSON.stringify(data)),
     workspaceRaw: () => JSON.parse(backing.get("materio-workspace-v1") || "{}"),
     keys: () => [...backing.keys()],
     events,
@@ -214,8 +216,9 @@ head("1. a quote stores two of chapter XXII's five figures and derives the rest"
   const copied = Object.keys(q).filter((k) => /material|other|subtotal|sum|total|cost/i.test(k));
   eq("no material, cost or total is stored on a quote", copied.join(","), "");
 
-  // Chapter XXII in one line: not an accounting package. None of these is here.
-  for (const k of ["tax", "vat", "discount", "status", "number", "invoice", "issuedAt"]) {
+  // Chapter XXII in one line: not an accounting package. Status is the document's life
+  // cycle; none of the accounting fields around it belongs here.
+  for (const k of ["tax", "vat", "discount", "number", "invoice", "issuedAt"]) {
     check(`a quote has no ${k} — chapter XXII forbids the accounting package`,
       !Object.prototype.hasOwnProperty.call(q, k));
   }
@@ -279,6 +282,52 @@ head("1d. a store written before session 24 reads as one with no quotes");
   eq("and the quotes array is what an absent one reads as",
     Array.isArray(raw.quotes) ? "present" : "absent", "absent");
   eq("reading it does not throw", older.crmQuote("whatever"), null);
+}
+
+head("1e. status and the pure summary are one reading for both quote lists");
+{
+  const crm = loadCrm();
+  const bare = crm.crmAddQuote({ name: "Wycena bez zakresu" });
+  eq("a new quote starts as draft", bare.status, "draft");
+  eq("and its status helper reads draft", crm.crmQuoteStatus(bare), "draft");
+  eq("the four states keep their life-cycle order",
+    crm.QUOTE_STATUS.join(","), "draft,sent,accepted,rejected");
+
+  const beforeSent = bare.updatedAt;
+  crm.tick();
+  const sent = crm.crmUpdateQuote(bare.id, { status: "sent" });
+  eq("a valid status is stored", sent.status, "sent");
+  check("and moves updatedAt", sent.updatedAt > beforeSent,
+    `${sent.updatedAt} <= ${beforeSent}`);
+
+  const beforeBad = sent.updatedAt;
+  crm.tick();
+  const corrected = crm.crmUpdateQuote(bare.id, { status: "bogus", note: "Gotowa do wysłania" });
+  eq("an unknown status leaves the stored one alone", corrected.status, "sent");
+  eq("while another field in the same update still applies", corrected.note, "Gotowa do wysłania");
+  check("and that update still moves updatedAt", corrected.updatedAt > beforeBad,
+    `${corrected.updatedAt} <= ${beforeBad}`);
+
+  const oldStore = crm.raw();
+  delete oldStore.quotes[0].status;
+  crm.setRaw(oldStore);
+  eq("a stored row from before the field reads as draft",
+    crm.crmQuoteStatus(crm.crmQuote(bare.id)), "draft");
+
+  const missing = crm.crmQuoteSummary(bare.id);
+  eq("a bare quote names the missing pieces in display order",
+    missing.missing.join(","), "project,labour");
+  eq("an unknown quote has no summary", crm.crmQuoteSummary("id-nope"), null);
+
+  const client = crm.crmAddClient({ name: "Jan Kowalski" });
+  const project = crm.wsAddProject("Łazienka", { clientId: client.id });
+  const complete = crm.crmAddQuote({ name: "Pełna wycena", projectId: project.id });
+  crm.crmAddLabour(complete.id, { name: "Układanie", priceMajor: "1000" });
+  const summary = crm.crmQuoteSummary(complete.id);
+  eq("a project and a labour line leave nothing missing", summary.missing.length, 0);
+  eq("the summary carries the linked project", summary.project.id, project.id);
+  eq("and the client reached through the existing chain", summary.client.id, client.id);
+  eq("and the same totals reading", summary.totals.total, crm.crmQuoteTotals(complete.id).total);
 }
 
 /* ================================================================== 2. the four writes */

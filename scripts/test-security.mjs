@@ -445,6 +445,17 @@ head("6. izolacja danych: one account's copy on a device two people use");
   check("the Pro store is pushed by the same call", pushAll.includes("await pushProWorkspace("));
   check("the own materials are pushed by it too", pushAll.includes("await pushOwnMaterials("));
 
+  // A quote status is normalized at the last point before Firestore. The fallback keeps
+  // this module safe on an older page, while crmQuoteStatus() ensures an unknown stored
+  // value can never leave the browser when the current quote store is loaded.
+  const pushPro = fn("pushProWorkspace");
+  check("the quote payload carries status",
+    /status: typeof crmQuoteStatus === "function" \? crmQuoteStatus\(q\) : "draft"/.test(pushPro));
+  const crmStatusApi = evalScript(["assets/crm-store.js", "assets/crm.js"],
+    ["crmQuoteStatus"], { localStorage: { getItem: () => null } });
+  eq("a bad quote status is normalized before it can be sent",
+    crmStatusApi.crmQuoteStatus({ status: "bogus" }), "draft");
+
   // Half two: pulls stamp after all imports; pushes stamp before their first remote write.
   const PULL_STAMP = 'if (!setSyncAccount(uid)) throw new Error("sync stamp failed");';
   const PUSH_STAMP = 'if (!setSyncAccount(uid)) throw new Error("sync stamp failed");';
