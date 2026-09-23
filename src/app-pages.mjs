@@ -431,14 +431,18 @@ export function appMain(t, features) {
                 <h2 data-i18n="app_quotes_title">${esc(t("app_quotes_title"))}</h2>
                 <span id="acctquo-pro" class="chip" hidden><span id="acctquo-pro-chip"></span></span>
               </div>
-              ${i("app_quotes_lead", "p", "muted")}
+              ${i("quo_list_d", "p", "muted")}
               ${proGate(t, "quotes", features, DEFAULT_LANG, { id: "acctquo-gate" })}
               <div id="acctquo-tool">
                 <form id="acctquo-form" class="inline-form">
-                  ${field("acctquo-name", "app_quotes_new", t, { maxlength: 120 })}
-                  ${field("acctquo-note", "app_quotes_lead", t, { maxlength: 200, required: false })}
+                  ${field("acctquo-name", "quo_new", t, { maxlength: 120, required: false })}
+                  ${selectField("acctquo-project", "quo_project", t, "field-narrow")}
                   <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_quotes_new">${esc(t("app_quotes_new"))}</button>
                 </form>
+                <p id="acctquo-noproj" class="muted" hidden>
+                  <span data-i18n="app_quotes_noproj">${esc(t("app_quotes_noproj"))}</span>
+                  <button type="button" class="btn btn-ghost btn-sm" data-goto-tab="projects" data-i18n="app_new_project">${esc(t("app_new_project"))}</button>
+                </p>
                 <ul id="acctquo-list" class="data-list"></ul>
               </div>
             </section>

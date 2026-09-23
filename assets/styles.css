@@ -724,6 +724,36 @@ select:focus-visible, textarea:focus-visible {
 .row-name em { display: block; font-style: normal; font-size: var(--fs-sm); }
 .row-actions { display: flex; gap: var(--sp-2); flex: none; }
 
+/* The account quote list is a compact hand-off to the full editor. Its total is the one
+   figure that must stay easy to scan; the name and provenance take the flexible column. */
+#acctquo-list .acctquo-row { align-items: start; }
+#acctquo-list .acctquo-main {
+  display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0;
+}
+#acctquo-list .acctquo-name { font-weight: var(--fw-bold); overflow-wrap: anywhere; }
+#acctquo-list .acctquo-meta, #acctquo-list .acctquo-missing { font-size: var(--fs-sm); }
+#acctquo-list .acctquo-missing { color: var(--warning); }
+#acctquo-list .acctquo-total {
+  min-width: 8ch; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+#acctquo-list .acctquo-actions select,
+#acctquo-list .acctquo-actions .btn { min-height: 24px; }
+#acctquo-list .empty p { margin-top: 0; }
+#acctquo-list .empty ol { margin: 0; padding-inline-start: var(--sp-6); }
+/* The steps are prose, not rows: .data-list li would draw each one as a card. */
+#acctquo-list .empty ol li {
+  display: list-item; background: none; border: 0; border-radius: 0;
+  padding: 0; margin: 0 0 var(--sp-1);
+}
+
+@media (max-width: 600px) {
+  #acctquo-list .acctquo-row { flex-wrap: wrap; }
+  #acctquo-list .acctquo-main { flex-basis: 100%; }
+  #acctquo-list .acctquo-total { flex: 1; min-width: 0; text-align: left; }
+  #acctquo-list .acctquo-actions { flex-wrap: wrap; max-width: 100%; }
+  #acctquo-list .acctquo-actions select { min-width: 0; max-width: 100%; }
+}
+
 /* ---------- Table
    Used once, by the estimate, which is also the one thing on the site meant to
    be printed. Numbers are tabular so columns of złoty line up. */

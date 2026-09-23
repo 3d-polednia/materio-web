@@ -1225,6 +1225,7 @@ function renderProjects() {
   // Przegląd's project stats read state.projects, which only this function and
   // renderRooms() ever change — see the note above renderOverview().
   renderOverview();
+  renderQuotes();
 }
 
 /** A number in the visitor's notation. The dimensions are the only numbers on this page. */
@@ -1674,14 +1675,43 @@ function renderQuotes() {
      the names and the count of a Pro store were written into the hidden element for every
      account there is. Now nothing is: the list is emptied and crmQuotes() is not asked. */
   if (!canQuotes()) { list.innerHTML = ""; return; }
+  const projectSelect = $("acctquo-project");
+  const activeProjects = state.projects.filter((p) => !p.archived);
+  if (projectSelect) {
+    const selected = projectSelect.value;
+    projectSelect.innerHTML = `<option value="">${T("quo_no_project")}</option>` +
+      activeProjects.map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("");
+    if (activeProjects.some((p) => p.id === selected)) projectSelect.value = selected;
+  }
+  const noProject = $("acctquo-noproj");
+  if (noProject) noProject.hidden = activeProjects.length > 0;
   const rows = crmQuotes();
-  list.innerHTML = rows.length ? rows.map((q) => `<li data-id="${escapeHtml(q.id)}">
-      <span class="row-name">${escapeHtml(q.name)}${q.note ? ` <em class="muted">${escapeHtml(q.note)}</em>` : ""}</span>
-      <span class="row-actions">
-        <a class="btn btn-ghost btn-sm" href="${proLink("quotes", q.id)}">${T("app_open_full")}</a>
+  list.innerHTML = rows.length ? rows.map((q) => {
+    const summary = typeof crmQuoteSummary === "function" ? crmQuoteSummary(q.id) : null;
+    if (!summary) return "";
+    // No "Bez projektu" here: the missing line under it already says so.
+    const meta = [summary.client && summary.client.name, summary.project && summary.project.name]
+      .filter(Boolean).map(escapeHtml).join(" · ");
+    const changed = T("app_quotes_changed").replace("{date}", whenText(summary.quote.updatedAt));
+    const missing = summary.missing.map((part) => T(`quo_missing_${part}`)).join(" · ");
+    const total = summary.totals.total === null || typeof wsMoney !== "function" ? "—"
+      : wsMoney(summary.totals.total, summary.totals.currencyCode);
+    const statuses = typeof QUOTE_STATUS !== "undefined" ? QUOTE_STATUS : [summary.status];
+    return `<li data-id="${escapeHtml(q.id)}" class="acctquo-row">
+      <span class="acctquo-main">
+        <a class="acctquo-name" href="${proLink("quotes", q.id)}">${escapeHtml(q.name)}</a>
+        <span class="acctquo-meta muted">${meta ? `${meta} · ` : ""}${escapeHtml(changed)}</span>
+        ${missing ? `<span class="acctquo-missing muted">${escapeHtml(missing)}</span>` : ""}
+      </span>
+      <strong class="acctquo-total">${escapeHtml(total)}</strong>
+      <span class="row-actions acctquo-actions">
+        <select data-status aria-label="${T("quo_status")}">${statuses.map((s) => `<option value="${s}"${s === summary.status ? " selected" : ""}>${T("quo_st_" + s)}</option>`).join("")}</select>
         <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
       </span>
-    </li>`).join("") : `<li class="empty muted">${T("app_quotes_empty")}</li>`;
+    </li>`;
+  }).join("") : `<li class="empty muted"><p>${T("app_quotes_empty")}</p>
+      <ol><li>${T("app_quotes_step1")}</li><li>${T("app_quotes_step2")}</li><li>${T("app_quotes_step3")}</li></ol>
+    </li>`;
 }
 
 function wireQuotesPanel() {
@@ -1690,15 +1720,19 @@ function wireQuotesPanel() {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const nameInput = $("acctquo-name");
-    const noteInput = $("acctquo-note");
-    const name = nameInput.value.trim();
+    const projectInput = $("acctquo-project");
+    const project = state.projects.find((p) => p.id === projectInput.value && !p.archived);
+    const name = nameInput.value.trim() || (project && project.name) || "";
     // Checked when the event arrives, not when the listener was bound: the panel is wired
     // once and the plan can run out while /app/ is open.
-    if (!name || typeof crmAddQuote !== "function" || !canQuotes()) return;
-    crmAddQuote({ name, note: noteInput.value.trim() });
-    nameInput.value = "";
-    noteInput.value = "";
-    renderQuotes();
+    if (typeof crmAddQuote !== "function" || !canQuotes()) return;
+    if (!name) {
+      status(T("app_quotes_need_name"), true);
+      nameInput.focus();
+      return;
+    }
+    const quote = crmAddQuote({ name, projectId: project ? project.id : "" });
+    if (quote) location.assign(proLink("quotes", quote.id));
   });
   $("acctquo-list").addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
@@ -1708,6 +1742,14 @@ function wireQuotesPanel() {
     crmDeleteQuote(li.dataset.id);
     renderQuotes();
     status(T("app_row_deleted"));
+  });
+  $("acctquo-list").addEventListener("change", (e) => {
+    const select = e.target.closest("[data-status]");
+    const li = e.target.closest("li[data-id]");
+    if (!select || !li || typeof crmUpdateQuote !== "function" || !canQuotes()) return;
+    crmUpdateQuote(li.dataset.id, { status: select.value });
+    renderQuotes();
+    status(T("app_quotes_status_saved"));
   });
 }
 

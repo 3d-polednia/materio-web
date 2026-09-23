@@ -1288,6 +1288,74 @@ head("16. rooms stand inside the project they belong to");
   await ctx.close();
 }
 
+head("16b. quotes start from a project and lead to the full editor");
+{
+  const project = {
+    name: "Łazienka", clientId: "c1", archived: false,
+    createdAt: 1, updatedAt: 4, deletedAt: null, schemaVersion: 1,
+  };
+  const docs = {
+    "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "premium" },
+    "users/u1/projects/p1": project,
+  };
+
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const create = await openTab(ctx, "quotes", { docs });
+  eq("the project picker starts with no project and lists the account project",
+    (await create.locator("#acctquo-project option").allTextContents()).join(" | "),
+    "Bez projektu | Łazienka");
+  await create.selectOption("#acctquo-project", "p1");
+  await Promise.all([
+    create.waitForURL(/\/wyceny\/\?id=/, { timeout: 5000 }),
+    create.click('#acctquo-form button[type="submit"]'),
+  ]);
+  const made = await create.evaluate(() => JSON.parse(localStorage.getItem("liczmat-crm-v1")).quotes[0]);
+  eq("an empty name takes the selected project's name", made.name, "Łazienka");
+  eq("and the quote keeps that project", made.projectId, "p1");
+  check("the submit goes straight to the quote editor", /\/wyceny\/\?id=/.test(create.url()), create.url());
+  await create.close();
+
+  const blank = await openTab(ctx, "quotes", { docs });
+  await blank.evaluate(() => localStorage.removeItem("liczmat-crm-v1"));
+  await blank.click('#acctquo-form button[type="submit"]');
+  eq("a quote with neither name nor project is not stored",
+    await blank.evaluate(() => {
+      const raw = localStorage.getItem("liczmat-crm-v1");
+      return raw ? JSON.parse(raw).quotes.length : 0;
+    }), 0);
+  eq("and the status line explains what is needed",
+    await blank.locator("#app-status").innerText(), "Wpisz nazwę wyceny albo wybierz projekt.");
+  eq("the name field receives focus", await blank.evaluate(() => document.activeElement.id), "acctquo-name");
+  await blank.close();
+
+  const workspace = {
+    projects: [{ id: "p1", ...project }], rooms: [], shoppingItems: [],
+    estimations: [{ id: "e1", projectId: "p1", name: "Płytki", totalCostMinor: 12345,
+      currencyCode: "PLN", createdAt: 2, updatedAt: 2, deletedAt: null }],
+  };
+  const crm = {
+    clients: [{ id: "c1", name: "Nowak", projectIds: ["p1"], createdAt: 1, updatedAt: 1, deletedAt: null }],
+    jobs: [],
+    quotes: [{ id: "q1", name: "Łazienka Nowaka", projectId: "p1", labour: [], marginPct: 0,
+      status: "draft", note: "", currencyCode: "", createdAt: 2, updatedAt: 3, deletedAt: null }],
+  };
+  const row = await openTab(ctx, "quotes", { docs, storage: {
+    "materio-workspace-v1": JSON.stringify(workspace),
+    "liczmat-crm-v1": JSON.stringify(crm),
+  } });
+  check("a quote row shows the client and project",
+    (await row.locator("#acctquo-list .acctquo-meta").innerText()).includes("Nowak · Łazienka"));
+  check("and shows the calculated total",
+    (await row.locator("#acctquo-list .acctquo-total").innerText()).includes("123,45"));
+  eq("and carries the four status choices", await row.locator("#acctquo-list [data-status] option").count(), 4);
+  await row.selectOption("#acctquo-list [data-status]", "sent");
+  eq("changing status stores it on the quote",
+    await row.evaluate(() => JSON.parse(localStorage.getItem("liczmat-crm-v1")).quotes[0].status), "sent");
+  eq("no console error", row.lmErrors.join(" / "), "");
+  await row.close();
+  await ctx.close();
+}
+
 head("17. whose copy is in this browser, and how to empty it (session 35)");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
