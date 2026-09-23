@@ -87,6 +87,23 @@ Tutaj zostaje wyłącznie to, co żywe: tabela postępu, dwie ostatnie sesje, li
 zrobienia w konsolach, znane ograniczenia i otwarte decyzje. Pełna lista otwartych wątków
 obu repozytoriów, przeglądana razem z tym plikiem, jest w `Obsidian/Liczmat/Meta/Otwarte watki.md`.
 
+## Sesja U — projekt mówi, jaki materiał policzono (2026-09-23)
+
+Commit `ef077a7fd`. Pełny opis: `Obsidian/Liczmat/Historia/Sesja U - nazwy materialow w
+projekcie.md`.
+
+- Zgłoszenie: w szczegółach projektu każda kalkulacja i każda pozycja listy zakupów
+  nazywała się „Farby, tynki, grunty” w alejce „Pozostałe”. Przyczyna: nazwę materiału
+  zapisywał tylko dialog katalogu, a czipy presetów kopiowały same liczby.
+- Czipy niosą identyfikator z katalogu (jak `MaterialShortcuts.kt`), fuga nazywa się
+  „Fuga — <płytka>” w chemii budowlanej, nazwa pokoju nie jest już nazwą materiału,
+  a pole „Nazwa na liście zakupów” pozwala nazwać wynik wpisany ręcznie.
+- Stare linie z nazwą kalkulatora dostają nazwę materiału przy wyświetlaniu, gdy ich dane
+  to dokładnie jeden czip (`LM_PROJ.presets`); reszta pokazuje trzy wpisane wartości.
+  Magazyn nie jest przepisywany.
+- Lista zakupów: pokój przy pozycji, kupione na dole pod „Kupione”, na telefonie nazwa
+  ma całą linię.
+
 ## Sesja T — panel admina: kto, gdzie, profil; luka okresu próbnego (2026-09-23)
 
 Commit `40727e21e`. Pełny opis: `Obsidian/Liczmat/Historia/Sesja T - panel admina i luka
@@ -101,45 +118,6 @@ okresu probnego.md`, panel: `docs/ADMIN.md`.
   zakłada brakujący profil. Wtedy `grantTrial` odpala sam.
 - **Czeka na właściciela:** `firebase deploy --only functions:ensureProfile,functions:grantTrial,functions:adminPlan`.
   Sesja nie mogła wdrożyć funkcji sama.
-
-## Sesja S — pomieszczenia pogrupowane po projektach, usuwanie projektu (2026-09-23)
-
-Cztery zgłoszenia właściciela ze zrzutów ekranu, cztery commity: `223ccd601`,
-`d32d9dbfb`, `e8d636264`, `2bbb9c9bb`. Pełny opis: `Obsidian/Liczmat/Historia/Sesja S -
-pomieszczenia pogrupowane i usuwanie projektu.md`.
-
-1. **`/projekty/` — pomieszczenia w okienkach projektów.** Zamiast jednej płaskiej listy
-   i wspólnego formularza z wyborem projektu jest jedna karta na żywy projekt (nazwa,
-   licznik, pomieszczenia, zwinięte „Dodaj pomieszczenie” dodające do tego projektu).
-   Przy okazji: `" Â· "` w `wsProjectRow()` — mojibake w samym źródle, stąd „Staroń Â· Nowe”.
-2. **`/app/` → Pomieszczenia — to samo plus kolor.** Karta dla każdego żywego projektu,
-   także pustego, z formularzem dodawania (zapis do Firestore przez `addRoom()`). Karty na
-   obu stronach mają pasek i kropkę w kolorze projektu (`--ev-*`); projekt bez koloru
-   dostaje kolor z palety po pozycji (`index % 5`) — **tylko tutaj**, terminarz dalej
-   pokazuje go bez koloru.
-3. **„Aktywny projekt” zniknął z interfejsu.** Przycisk „Ustaw jako aktywny”, plakietka
-   i podświetlenie wiersza — z listy, ekranu projektu i pulpitu. Mechanizm
-   (`materio-active-project`) zostaje jako ciche „ostatnio użyty”: wybierak „Dodaj do
-   projektu” w kalkulatorze i wybierak kosztorysu dalej na nim startują i go przestawiają.
-   Copy w 13 językach (`wspage_projects_d`, `estpage_s1`, `ws_no_project`, `ck_p_active`).
-4. **„Usuń projekt” przy każdym wierszu listy.** Pytanie w wierszu (bez `confirm()`), z
-   liczbami: co znika (kalkulacje, materiały), że pomieszczenia zostają i przechodzą do
-   „Pomieszczenia bez projektu” w Moje konto → Pomieszczenia, i że można cofnąć. Ekran
-   projektu pyta tym samym tekstem (`wsDeleteQuestion()`).
-   **Decyzja właściciela:** pomieszczenia bez projektu widać **tylko** w `/app/` →
-   Pomieszczenia; `/projekty/` nie rysuje już tej karty, a wybierak przenoszenia nie ma
-   opcji „bez projektu”. W `/app/` pomieszczenie bez projektu ma „Przypisz do projektu”.
-
-**Pomieszczenie usuniętego projektu zachowuje `projectId`.** Worker nullował go i
-dopisywał identyfikatory do tokenu cofania; cofnięte, bo `wsDeleteProject()` ma opisaną
-świadomą decyzję z Sesji 20 (odpięcie wyrzucało jedyny fakt potrzebny do przywrócenia, a
-telefon też nie kaskaduje). Martwy link wystarcza, żeby `/app/` pokazało pokój w „bez
-projektu”, a „Cofnij” oddaje go projektowi bez żadnego zapisu.
-
-**Dwie usterki złapał zrzut ekranu, żaden zestaw testów:** na telefonie nazwy pomieszczeń
-i projektów łamały się po słowie, a wiersz z pytaniem przewijał stronę o 98 px w bok
-(`test-mobile` zielone); przycisk pokazywał surowy klucz `proj_delete`, bo `test-langs` §7
-widzi tylko `t(`/`T(`, a nie `wsT(` ani `dashT(` — zapisane w otwartych wątkach skarbca.
 
 ## Usunięcie modułu zleceń po scaleniu z projektami (2026-09-23)
 
