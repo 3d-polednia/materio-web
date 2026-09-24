@@ -138,10 +138,12 @@ const PANEL = `
       <button type="button" id="admin-list" class="btn btn-ghost btn-sm">Wypisz konta</button>
     </p>
     <div class="table-scroll"><table id="admin-table" class="ws-table" hidden>
-      <thead><tr><th scope="col">E-mail</th><th scope="col">Plan</th>
+      <thead><tr><th scope="col"><button type="button" data-admin-sort="email">E-mail</button></th>
+        <th scope="col"><button type="button" data-admin-sort="plan">Plan</button></th>
         <th scope="col">Profil</th><th scope="col">Logowanie</th>
-        <th scope="col">Ostatnio</th><th scope="col">Pierwsze wejście</th>
-        <th scope="col">Założone</th></tr></thead>
+        <th scope="col"><button type="button" data-admin-sort="lastSeen">Ostatnio</button></th>
+        <th scope="col"><button type="button" data-admin-sort="firstEntry">Pierwsze wejście</button></th>
+        <th scope="col"><button type="button" data-admin-sort="created">Założone</button></th></tr></thead>
       <tbody></tbody>
     </table></div>
   </div>`;
@@ -288,13 +290,54 @@ export async function mountAdmin({ app }) {
     showAccount(data, "Cofnięte. ");
   });
 
-  $("admin-list").addEventListener("click", async () => {
-    const data = await call({ action: "list" });
-    if (!data) return;
-    const table = $("admin-table");
+  const table = $("admin-table");
+  let listedAccounts = [];
+  let listSort = { key: "created", direction: "descending" };
+  const sortValues = {
+    email: (acc) => typeof acc.email === "string" && acc.email ? acc.email : null,
+    plan: (acc) => Number.isFinite(Number(acc.validUntil)) && Number(acc.validUntil) !== 0
+      ? Number(acc.validUntil) : null,
+    lastSeen: (acc) => {
+      const value = acc.lastSeenAt ?? acc.lastSignInAt;
+      return Number.isFinite(Number(value)) && Number(value) !== 0 ? Number(value) : null;
+    },
+    firstEntry: (acc) => {
+      const value = firstEntry(acc);
+      return value && value !== "—" ? value : null;
+    },
+    created: (acc) => Number.isFinite(Number(acc.createdAt)) && Number(acc.createdAt) !== 0
+      ? Number(acc.createdAt) : null,
+  };
+  const textKeys = new Set(["email", "firstEntry"]);
+  const emailOrder = (a, b) => String(a.email || "").localeCompare(
+    String(b.email || ""), "pl", { sensitivity: "base" },
+  );
+  const drawAccounts = () => {
+    const { key, direction } = listSort;
+    const accounts = listedAccounts.slice().sort((a, b) => {
+      const av = sortValues[key](a);
+      const bv = sortValues[key](b);
+      if (av == null || bv == null) {
+        if (av == null && bv == null) return emailOrder(a, b);
+        return av == null ? 1 : -1;
+      }
+      const order = textKeys.has(key)
+        ? av.localeCompare(bv, "pl", { sensitivity: "base" })
+        : av - bv;
+      if (order) return direction === "ascending" ? order : -order;
+      // One platform holds many accounts; inside it, newest first, like the default list.
+      if (key === "firstEntry") {
+        const ac = sortValues.created(a);
+        const bc = sortValues.created(b);
+        if (ac !== bc) return ac == null ? 1 : bc == null ? -1 : bc - ac;
+      }
+      return emailOrder(a, b);
+    });
+    table.querySelectorAll("th[aria-sort]").forEach((th) => th.removeAttribute("aria-sort"));
+    table.querySelector(`[data-admin-sort="${key}"]`).closest("th").setAttribute("aria-sort", direction);
     /* Seven columns, the plan second: nine did not fit beside the sidebar at 1280 px and the
        plan was the one scrolled out of sight. Dates never break at their hyphens. */
-    const rows = (data.accounts || []).map((acc) => `<tr>
+    const rows = accounts.map((acc) => `<tr>
         <td><button type="button" class="btn linkish" data-admin-email="${esc(acc.email)}">${esc(acc.email)}${acc.admin ? " (admin)" : ""}${acc.disabled ? " (zablokowane)" : ""}</button></td>
         <td>${esc(planLine(acc)).replace(/\d{4}-\d{2}-\d{2}/, '<span class="num">$&</span>')}</td>
         <td>${acc.hasProfile === false ? "<strong>brak</strong>" : acc.hasProfile === true ? "jest" : "—"}</td>
@@ -306,11 +349,32 @@ export async function mountAdmin({ app }) {
     table.querySelector("tbody").innerHTML = rows
       || '<tr><td colspan="7">Brak kont.</td></tr>';
     table.hidden = false;
-    const n = (data.accounts || []).length;
+  };
+
+  $("admin-list").addEventListener("click", async () => {
+    const data = await call({ action: "list" });
+    if (!data) return;
+    listedAccounts = data.accounts || [];
+    drawAccounts();
+    const n = listedAccounts.length;
     say(`${n} ${n === 1 ? "konto" : "kont"}${data.more ? " (pierwsza strona)" : ""}.`);
   });
 
-  $("admin-table").addEventListener("click", async (event) => {
+  table.addEventListener("click", async (event) => {
+    const sortButton = event.target.closest("[data-admin-sort]");
+    if (sortButton) {
+      const key = sortButton.dataset.adminSort;
+      if (listSort.key === key) {
+        listSort.direction = listSort.direction === "ascending" ? "descending" : "ascending";
+      } else {
+        listSort = {
+          key,
+          direction: key === "email" || key === "firstEntry" ? "ascending" : "descending",
+        };
+      }
+      drawAccounts();
+      return;
+    }
     const button = event.target.closest("[data-admin-email]");
     if (!button) return;
     const email = button.dataset.adminEmail || "";

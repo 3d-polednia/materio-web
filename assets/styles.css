@@ -867,6 +867,14 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
   font-size: var(--fs-xs); text-transform: uppercase;
   letter-spacing: var(--track-wide); color: var(--muted);
 }
+#admin-table [data-admin-sort] {
+  min-height: 40px; padding: 0; border: 0; background: none; cursor: pointer;
+  color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit;
+}
+@media (max-width: 560px) { #admin-table [data-admin-sort] { min-height: 44px; } }
+/* aria-sort already says the direction; the empty alt keeps the glyph out of speech. */
+#admin-table [aria-sort=ascending] button::after { content: " ▲" / ""; }
+#admin-table [aria-sort=descending] button::after { content: " ▼" / ""; }
 .ws-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 /* KAFEL-3: the figures an estimate exists to report carry the data colour, so a quantity
    stops reading like a link. Only the cells — the editable estimate puts an <input> in

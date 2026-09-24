@@ -382,6 +382,90 @@ head("4. what it draws, in Polish");
     (await page.locator('[data-admin-email="haslo@example.com"]').innerText()).startsWith("haslo@example.com"));
   check("the count is said in Polish", /3 kont/.test(await result(page)), await result(page));
 
+  const sortedAccounts = [
+    { email: "zulu@example.com", createdAt: NOW - DAY, validUntil: until + 3 * DAY,
+      lastSeenAt: NOW - 2 * DAY, firstApp: "web", providers: ["password"], state: "pro" },
+    { email: "alpha@example.com", createdAt: NOW - 4 * DAY, validUntil: until,
+      lastSeenAt: NOW, firstApp: "2.0.0", providers: ["password"], state: "pro" },
+    { email: "beta@example.com", createdAt: NOW - 2 * DAY, validUntil: until + DAY,
+      lastSeenAt: null, lastSignInAt: null, firstApp: "1.0.0", providers: ["password"], state: "pro" },
+    { email: "delta@example.com", createdAt: NOW - 3 * DAY, validUntil: null,
+      lastSeenAt: null, lastSignInAt: NOW - DAY, firstApp: null, profileByServer: true,
+      providers: ["password"], state: "free" },
+    { email: "gamma@example.com", createdAt: null, validUntil: null,
+      lastSeenAt: NOW - 5 * DAY, firstApp: null, profileByServer: false,
+      providers: ["password"], state: "free" },
+    { email: "brak@example.com", createdAt: 0, validUntil: 0, lastSeenAt: NaN,
+      firstApp: "", providers: [], state: "free", hasProfile: false, admin: true },
+  ];
+  await page.evaluate((accounts) => window.__fnSetAnswer("list", {
+    ok: true, more: false, accounts,
+  }), sortedAccounts);
+  await page.click("#admin-list");
+  const emails = () => page.$$eval("#admin-table [data-admin-email]", (buttons) =>
+    buttons.map((button) => button.dataset.adminEmail).join("|"));
+  const sortedHeader = (name) => page.locator("#admin-table th", { hasText: name })
+    .getAttribute("aria-sort");
+  eq("default sorting is newest account first, with missing dates last", await emails(),
+    "zulu@example.com|beta@example.com|delta@example.com|alpha@example.com|brak@example.com|gamma@example.com");
+  eq("the created header names the default descending sort", await sortedHeader("Założone"), "descending");
+  eq("no other header claims a direction",
+    await page.locator('#admin-table th[aria-sort="ascending"], #admin-table th[aria-sort="descending"]').count(), 1);
+
+  await page.click('[data-admin-sort="email"]');
+  eq("e-mail sorts A to Z first", await emails(),
+    "alpha@example.com|beta@example.com|brak@example.com|delta@example.com|gamma@example.com|zulu@example.com");
+  eq("aria-sort moves to e-mail", await sortedHeader("E-mail"), "ascending");
+  await page.click('[data-admin-sort="email"]');
+  eq("e-mail reverses to Z to A", await emails(),
+    "zulu@example.com|gamma@example.com|delta@example.com|brak@example.com|beta@example.com|alpha@example.com");
+  eq("e-mail announces the reversal", await sortedHeader("E-mail"), "descending");
+
+  await page.click('[data-admin-sort="plan"]');
+  eq("plan sorts latest expiry first and Free last", await emails(),
+    "zulu@example.com|beta@example.com|alpha@example.com|brak@example.com|delta@example.com|gamma@example.com");
+  await page.click('[data-admin-sort="plan"]');
+  eq("reversed plan sorts earliest expiry first and Free still last", await emails(),
+    "alpha@example.com|beta@example.com|zulu@example.com|brak@example.com|delta@example.com|gamma@example.com");
+
+  await page.click('[data-admin-sort="lastSeen"]');
+  eq("last activity uses the displayed fallback and leaves missing last", await emails(),
+    "alpha@example.com|delta@example.com|zulu@example.com|gamma@example.com|beta@example.com|brak@example.com");
+  await page.click('[data-admin-sort="firstEntry"]');
+  eq("first entry groups platform labels and leaves dashes last", await emails(),
+    "beta@example.com|alpha@example.com|delta@example.com|zulu@example.com|brak@example.com|gamma@example.com");
+  const callsBeforeSort = await page.evaluate(() => window.__fnCalls.length);
+  await page.click('[data-admin-sort="email"]');
+  eq("sorting makes no adminPlan call", await page.evaluate(() => window.__fnCalls.length), callsBeforeSort);
+  await page.click("#admin-list");
+  eq("a refreshed list keeps the chosen e-mail sort", await emails(),
+    "alpha@example.com|beta@example.com|brak@example.com|delta@example.com|gamma@example.com|zulu@example.com");
+
+  const createdButton = page.locator('[data-admin-sort="created"]');
+  await createdButton.focus();
+  await page.keyboard.press("Enter");
+  eq("Enter activates a sort header", await sortedHeader("Założone"), "descending");
+  await page.keyboard.press("Enter");
+  eq("Enter reverses the active sort header", await sortedHeader("Założone"), "ascending");
+  eq("sorting leaves all seven header texts unchanged",
+    await page.locator("#admin-table th").allTextContents().then((x) => x.join("|")),
+    "E-mail|Plan|Profil|Logowanie|Ostatnio|Pierwsze wejście|Założone");
+
+  // Two accounts on one platform: newest first, not alphabetical.
+  await page.evaluate(() => window.__fnSetAnswer("list", { ok: true, more: false, accounts: [
+    { email: "a-old@example.com", createdAt: Date.now() - 3 * 86400000, firstApp: "web", providers: [], state: "free" },
+    { email: "b-new@example.com", createdAt: Date.now() - 86400000, firstApp: "web", providers: [], state: "free" },
+    { email: "c-app@example.com", createdAt: Date.now() - 2 * 86400000, firstApp: "1.16.0", providers: [], state: "free" },
+  ] }));
+  await page.click("#admin-list");
+  await page.click('[data-admin-sort="firstEntry"]');
+  eq("inside one platform the newest account comes first", await emails(),
+    "c-app@example.com|b-new@example.com|a-old@example.com");
+  await page.evaluate((accounts) => window.__fnSetAnswer("list", {
+    ok: true, more: false, accounts,
+  }), sortedAccounts);
+  await page.click("#admin-list");
+
   await page.locator('[data-admin-email="brak@example.com"]').click();
   await page.waitForSelector("#admin-detail:not([hidden])");
   const call = await lastCall(page);

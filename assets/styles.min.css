@@ -528,6 +528,13 @@ padding: 0; margin: 0 0 var(--sp-1);
 font-size: var(--fs-xs); text-transform: uppercase;
 letter-spacing: var(--track-wide); color: var(--muted);
 }
+#admin-table [data-admin-sort] {
+min-height: 40px; padding: 0; border: 0; background: none; cursor: pointer;
+color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit;
+}
+@media (max-width: 560px) { #admin-table [data-admin-sort] { min-height: 44px; } }
+#admin-table [aria-sort=ascending] button::after { content: " ▲" / ""; }
+#admin-table [aria-sort=descending] button::after { content: " ▼" / ""; }
 .ws-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ws-estimate .ws-table td.num { color: var(--ev-blue); font-weight: var(--fw-semi); }
 .ws-table-scroll { overflow-x: auto; }
