@@ -88,6 +88,32 @@ session only — the next one starts in caveman again.
 
 ---
 
+## No AI slop on this site — a standing rule
+
+The owner, 2026-09-24, after seeing /aplikacja/: „zrobić stop slop na całej stronie web i
+zapamiętać, żeby nigdy nie robić slop AI na web". It applies to every change, not to one
+session. Before adding a section, ask whether a builder needs it to decide or to act; if
+not, leave it out.
+
+- **Look:** the accent is a lime *edge* or lime text (`--accent-edge`, `--accent-strong`),
+  never a lime-filled band. No pill with a dot above a heading, no icon chips, no glow or
+  radial gradient, no band of big numbers, no grid of identical icon
+  cards, no carousel, no decorative kicker, no emoji. A screenshot appears at most once per
+  page. Concrete facts are welcome — the owner asked for the hero facts on /aplikacja/
+  back (offline, 15 calculators and 161 materials as on the site, 13 languages and 8
+  currencies, automatic sync) — as plain text with a lime tick, said once per page, with
+  counts taken from the build. Store badges are the store's own artwork, unmodified (`assets/badges/`).
+- **Words:** labels, not slogans; no rhetorical-question headings, no „nie X, tylko Y",
+  „ten sam…", „w kieszeni", „w jednym miejscu", no jargon a builder does not use (ERP,
+  localStorage, port 1:1). Say a fact once per page. Never promise on a free level what
+  `LM_FEATURES` in `assets/plan.js` puts in Pro (prices, costs, PDF, quotes).
+- **App screenshots** come from the app's code — `WebHeroShotsTest` in the Materio repo,
+  converted by its `scripts/web-screens.py` — never from a mockup. Re-record them when the
+  app changes.
+- `scripts/test-copy.mjs` §8 (the look) and §10 (the phrases) enforce what a machine can
+  see; `docs/COPY.md` carries the argument. Screenshot every visible change at 1400 px and
+  390 px before committing — green tests have passed visible breakage here before.
+
 ## The build step
 
 The site used to be one `index.html`. It is now 523 pages: a home page, a calculator

@@ -723,6 +723,44 @@ checkMany("both keys exist in every language",
   CLEAN.filter((l) => !I18N[l] || !I18N[l].faq_a5_link || !I18N[l].foot_privacy),
   (l) => l, CLEAN.length);
 
+/* ------------------------------------------------------------------ §10 stop slop: phrases */
+
+head("§10 stop slop: phrases");
+
+const SLOP_PHRASES = [
+  "w kieszeni", "Ten sam wzór", "w jednym miejscu", "nie tylko", "szybko i łatwo",
+  "bez zbędnych", "intuicyjn", "kompleksow", "nowoczesn", "port 1:1", "localStorage",
+  "ERP", "Kalendarz Google",
+];
+const SLOP_STEMS = ["intuicyjn", "kompleksow", "nowoczesn"];
+const phraseSlop = [];
+const inspectPhrases = (where, value) => {
+  for (const phrase of SLOP_PHRASES) {
+    if (SLOP_STEMS.includes(phrase)) continue;
+    if (word(value, phrase)) phraseSlop.push(`${where} → "${phrase}"`);
+  }
+  for (const stem of SLOP_STEMS) {
+    if (word(value, `${stem}\\p{L}*`)) phraseSlop.push(`${where} → "${stem}…"`);
+  }
+};
+for (const [key, value] of Object.entries({ ...I18N.pl, ...I18N_PAGES.pl })) {
+  if (typeof value === "string") inspectPhrases(`dictionary:${key}`, value);
+}
+for (const page of PAGES.filter((x) => x.lang === "pl" || x.file === "index.html")) {
+  let html;
+  try { html = read(page.file); } catch { continue; }
+  const visible = strip(html);
+  inspectPhrases(page.file, visible);
+
+  const withoutFaq = html.replace(/<(section|div)[^>]*class="[^"]*faq[^"]*"[^>]*>[\s\S]*?<\/\1>/gi, "");
+  for (const match of withoutFaq.matchAll(/<h([123])\b[^>]*>([\s\S]*?)<\/h\1>/gi)) {
+    const heading = strip(match[2]);
+    if (heading.endsWith("?")) phraseSlop.push(`${page.file} → heading "${heading}"`);
+  }
+}
+checkMany("Polish copy contains no banned phrase or question heading outside FAQ", phraseSlop,
+  (x) => x);
+
 /* ------------------------------------------------------------------ the report */
 
 if (failures.length) {

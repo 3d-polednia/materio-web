@@ -10,7 +10,7 @@ import {
   HOME_DOORS, route as iaRoute, STATUS, CALC_CATEGORIES, calcCategory, popularCalcs,
 } from "./ia.mjs";
 import {
-  BASE as BASE_URL,
+  BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlQuotes,
   urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
@@ -19,6 +19,7 @@ import {
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
 import { proGate, proModules, proPlansBlock } from "./pro.mjs";
 import { PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
+import { CURRENCIES } from "./currency.mjs";
 
 /**
  * Case- and accent-insensitive text for the hub's search haystack.
@@ -222,7 +223,6 @@ function homeDoors(lang, t, calcs, cat) {
     return `<article class="door" aria-labelledby="door-${door.id}">
       <span class="door-level">${esc(t(`lvl_${door.level}`))}</span>
       <h3 id="door-${door.id}">${esc(t(`${door.key}_t`))}</h3>
-      <p class="door-q">${esc(t(`${door.key}_q`))}</p>
       <p class="muted">${esc(t(`${door.key}_d`))}</p>
       ${extra}
       ${action}
@@ -1027,7 +1027,17 @@ export function contactMain(lang, t) {
  * twice and a lime-filled closing banner. The download button is Google's own badge,
  * unmodified, because a home-made one imitating it is exactly what the owner objected to.
  */
-export function androidMain(lang, t) {
+export function androidMain(lang, t, calcs, cat) {
+  // The four facts the owner asked to keep under the buttons (2026-09-24): said once, as
+  // plain text. The counts come from the build, so they cannot drift from the site.
+  const facts = [
+    t("apppage_fact_offline"),
+    t("apppage_fact_same")
+      .replace("{calc}", calcs.length).replace("{calcs}", t.plural("calc_count", calcs.length))
+      .replace("{mat}", cat.total).replace("{mats}", t.plural("mat_count_label", cat.total)),
+    t("apppage_fact_langs").replace("{langs}", LANGS.length).replace("{cur}", CURRENCIES.length),
+    t("apppage_fact_sync"),
+  ];
   const main = `<main id="main" tabindex="-1">
   <section class="hero app-hero" aria-labelledby="app-h">
     <div class="wrap hero-grid">
@@ -1038,6 +1048,7 @@ export function androidMain(lang, t) {
           ${playBadge(lang, "apppage")}
           <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("apppage_web_link"))}</a>
         </div>
+        <ul class="app-facts">${facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
       </div>
       <figure class="app-shot"><img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" decoding="async"></figure>
     </div>

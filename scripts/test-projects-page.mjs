@@ -664,7 +664,7 @@ head("15. with JavaScript off");
   // nothing to show — and the page says where the data lives instead of pretending.
   eq("the page still has its heading", await text(page, "#ws-title"), "Projekty i pomieszczenia");
   check("and says where the data is kept",
-    (await page.innerText("main")).includes("localStorage"));
+    (await page.innerText("main")).includes("Dane są zapisane w tej przeglądarce"));
   eq("the detail is not shown to somebody who cannot fill it",
     await page.$eval("#ws-project", (n) => n.hidden), true);
 

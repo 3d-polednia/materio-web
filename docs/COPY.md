@@ -128,6 +128,17 @@ To zapis decyzji właściciela z 2026-09-24: „zrobić stop slop na całej stro
 zapamiętać, żeby nigdy nie robić slop AI na web”. Nowy ozdobnik nie jest neutralny. Musi
 nieść informację albo znika.
 
+### §10 — stop slop: słowa
+
+Reguła czyta polskie wartości obu słowników i widoczny tekst wygenerowanych polskich
+stron. Odrzuca slogany i techniczny żargon wskazany przez właściciela: między innymi
+„w kieszeni”, „w jednym miejscu”, „port 1:1”, `localStorage`, ERP i Kalendarz Google.
+Pilnuje też, żeby nagłówki h1–h3 nie kończyły się pytajnikiem poza blokiem FAQ.
+
+Lista jest dosłowna. Nie próbuje oceniać każdej konstrukcji „nie X, tylko Y”, bo bez
+rozumienia zdania łapałaby zwykłe instrukcje i przeczenia. Takie zdania nadal wymagają
+czytania gotowej strony przez człowieka.
+
 ---
 
 ## Czego te reguły **nie** robią

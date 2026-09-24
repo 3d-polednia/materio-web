@@ -56,7 +56,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260924f";
+const STAMP = "20260924g";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -495,12 +495,11 @@ function validate() {
     }
   }
 
-  // Each door of the home page needs its own strings. t() falls back to the key name, so
-  // without this a missing translation ships as the literal "door_pro_q" on the front
-  // page. Checking the reference language is enough — the loop above requires the other
-  // three to carry exactly the same keys.
+  // Each door of the home page needs its title, description and level label. Checking the
+  // reference language is enough — the loop above requires every language to carry the
+  // same keys.
   for (const door of HOME_DOORS) {
-    const keys = [`${door.key}_t`, `${door.key}_q`, `${door.key}_d`, `lvl_${door.level}`];
+    const keys = [`${door.key}_t`, `${door.key}_d`, `lvl_${door.level}`];
     if (route(door.route) && route(door.route).status === STATUS.LIVE) keys.push(`${door.key}_go`);
     for (const key of keys) {
       if (!(key in DICT[DEFAULT_LANG])) problems.push(`home door "${door.id}" has no "${key}" in the dictionary`);
