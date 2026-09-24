@@ -650,6 +650,32 @@ input:not([type="checkbox"]):not([type="radio"]):focus-visible,
 select:focus-visible, textarea:focus-visible {
   border-color: var(--accent);
 }
+/* A select's arrow is drawn by the page, not the operating system, so the field looks
+   the same on Windows, a Mac and a phone, and matches the chevron the header's pickers
+   already wear. Two gradients rather than an icon: a data: URI cannot hold a token, and
+   a wrapper element would have to be remembered at every one of the forty selects — the
+   list-of-classes mistake the rule above was written to end. The currency select keeps
+   its own SVG chevron. The arrow is --muted, the placeholder's colour on the same field,
+   so check-contrast.mjs already measures it. */
+select:not(.cur-select) {
+  --select-chev: var(--muted);
+  appearance: none;
+  padding-right: calc(var(--control-px) + var(--sp-6));
+  background-image:
+    linear-gradient(45deg, transparent calc(50% - 1.25px), var(--select-chev) calc(50% - .5px),
+      var(--select-chev) calc(50% + .5px), transparent calc(50% + 1.25px)),
+    linear-gradient(135deg, transparent calc(50% - 1.25px), var(--select-chev) calc(50% - .5px),
+      var(--select-chev) calc(50% + .5px), transparent calc(50% + 1.25px));
+  background-size: 7px 7px;
+  background-position: right calc(var(--control-px) + 6px) center, right var(--control-px) center;
+  background-repeat: no-repeat;
+}
+select:not(.cur-select):hover { --select-chev: var(--on-surface); }
+/* Forced colours drop background images, and a select with no arrow stops looking
+   like it opens. There the system's own arrow comes back. */
+@media (forced-colors: active) {
+  select:not(.cur-select) { appearance: auto; padding-right: var(--control-px); }
+}
 /* A field the browser or the page has marked wrong. Colour is never the only
    signal — the message under the form says what to fix. */
 [aria-invalid="true"] { border-color: var(--error) !important; }
@@ -1970,8 +1996,12 @@ a.chip:hover { text-decoration: none; }
    the field. The bar is inserted by assets/workspace-ui.js and stays hidden until
    there is at least one room to offer. */
 .ws-bar { margin-bottom: var(--sp-3); }
-.ws-bar-row { display: flex; gap: var(--sp-2); }
+/* The room's name is the part worth reading, so it asks for 14rem and on a phone takes
+   the whole first line; the surface and "Wstaw" wrap under it. On one line at 390px
+   the room read "— wybierz p" and the surface "Poc". */
+.ws-bar-row { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .ws-bar-row select { flex: 1 1 auto; min-width: 0; width: auto; }
+.ws-bar-row [data-ws-room] { flex-basis: 14rem; }
 .ws-bar-row .btn { flex: none; }
 .ws-bar-hint { font-size: var(--fs-sm); margin: 0; }
 .ws-save { margin-top: var(--sp-4); }
