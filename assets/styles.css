@@ -676,6 +676,53 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 @media (forced-colors: active) {
   select:not(.cur-select) { appearance: auto; padding-right: var(--control-px); }
 }
+/* The open list, where the browser lets the page draw it. appearance: base-select keeps a
+   real <select> — keyboard, forms and screen readers stay the browser's — but the list
+   is drawn in the page instead of by the operating system, which on Windows meant a
+   square black box and a system-blue highlight. It is dressed as the header's language
+   menu, the one list the site already drew itself. Chrome and Edge have it since 135; a
+   browser without it skips the block and keeps the arrow above with its own list.
+   Mouse only: on a touch screen the phone's own picker is made for a finger.
+
+   The three places left out size a select by its content rather than by the form.
+   base-select sizes a select by the option it shows, not the longest one, so there a
+   column of them went ragged — each room's project picker a different width — and a
+   picker changed width when used. They keep the system list; every other select fills
+   the width its form gives it, where the two sizings agree. Measured on 193 selects.
+   Nesting is safe here: every browser that reads this block reads nesting. */
+@media (pointer: fine) and (not (forced-colors: active)) {
+  @supports (appearance: base-select) {
+    select:not(.cur-select, .row-actions select, .cal-month-pick select, .inline-form > select) {
+      &, &::picker(select) { appearance: base-select; }
+      &::picker-icon { display: none; }
+      /* The browser's default opens the list toward the larger space, so a select in
+         the lower half opened upward with room to spare below. A list opens down unless
+         it does not fit. The height cap is what lets "does not fit" happen: a list
+         allowed to shrink to the space below always fits there, and opened four rows
+         tall under the room picker with the page free above it. 45vh keeps one side
+         big enough. */
+      &::picker(select) {
+        position-try-order: normal; max-block-size: min(24rem, 45vh);
+        margin-block: var(--sp-1); padding: var(--sp-2);
+        background: var(--surface); color: var(--on-surface);
+        border: 1px solid var(--outline); border-radius: var(--radius);
+        box-shadow: var(--shadow-3);
+      }
+      & option {
+        padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-xs);
+        font-size: var(--fs-base); font-weight: normal; color: var(--on-surface);
+      }
+      & option::checkmark { display: none; }
+      & option:hover { background: var(--surface-alt); }
+      & option:focus-visible { outline-offset: calc(var(--focus-w) * -1); }
+      & option:checked { background: var(--accent-soft); }
+      & optgroup {
+        padding-top: var(--sp-2);
+        font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--muted);
+      }
+    }
+  }
+}
 /* A field the browser or the page has marked wrong. Colour is never the only
    signal — the message under the form says what to fix. */
 [aria-invalid="true"] { border-color: var(--error) !important; }
