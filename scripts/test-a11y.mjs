@@ -272,7 +272,7 @@ head("4. every control says what it is");
     .map((m) => ({ tag: m[0], attrs: m[2], text: words(m[3]) }));
 
   const hasName = (c) => c.text.length > 0 || attr(c.attrs, "aria-label") || attr(c.attrs, "aria-labelledby")
-    || attr(c.attrs, "title");
+    || attr(c.attrs, "title") || [...c.tag.matchAll(/<img\b[^>]*>/g)].some((m) => attr(m[0], "alt"));
 
   checkAll("no nameless button or link", PAGES,
     (page) => controls(page).every(hasName),
@@ -441,51 +441,21 @@ head("7. the language picker, the currency selector, the theme toggle");
     !setsPressed("assets/main.js") && !setsPressed("privacy-policy.html"));
 }
 
-/* ------------------------------------------------------------------ 8. motion */
+/* ------------------------------------------------------------------ 8. static app screenshots */
 
-/* WCAG 2.2.2: something that starts moving by itself and goes on for more than five
-   seconds needs a way to stop it. The screenshots in the phone mockup advance every 3.5
-   seconds and did not have one — and there is no pausing them with the keyboard by
-   hovering, which is the answer a mouse gets by accident. */
-head("8. the carousel can be stopped");
+head("8. the app screenshots stay still");
 {
-  const carousel = PAGES.filter((page) => page.body.includes("data-carousel"));
-  // /aplikacja/ and its twelve translations: the hero and the banner at the foot of it.
-  check("the mockup is on the pages that show the app",
-    carousel.length === LANGS.length, `${carousel.length} pages`);
-
-  checkAll("every track has a stop button beside it", carousel, (page) => {
-    const tracks = (page.body.match(/data-carousel(?=[\s>])/g) || []).length;
-    const buttons = (page.body.match(/data-carousel-pause/g) || []).length;
-    return tracks > 0 && buttons === tracks;
-  }, (page) => `${page.url}: ${(page.body.match(/data-carousel(?=[\s>])/g) || []).length} tracks, ${(page.body.match(/data-carousel-pause/g) || []).length} buttons`);
-
-  checkAll("the button carries both of its labels, in this page's language", carousel,
-    (page) => [...page.body.matchAll(/<button[^>]*data-carousel-pause[\s\S]*?>/g)].every((m) =>
-      attr(m[0], "aria-label") && attr(m[0], "data-label-pause") && attr(m[0], "data-label-play")
-      && attr(m[0], "data-label-pause") !== attr(m[0], "data-label-play")),
+  const appPages = PAGES.filter((page) => /class="hero app-hero"/.test(page.body));
+  check("the app page exists in every language", appPages.length === LANGS.length, `${appPages.length} pages`);
+  checkAll("none starts an automatic carousel", appPages,
+    (page) => !page.body.includes("data-carousel") && !page.body.includes("data-carousel-pause"),
     (page) => page.url);
-
-  // It ships hidden and assets/main.js unhides it when it starts the timer: with no
-  // script, and under prefers-reduced-motion, nothing moves and a stop button would be a
-  // control that does nothing.
-  checkAll("and it ships hidden, for the pages where nothing will move", carousel,
-    (page) => [...page.body.matchAll(/<button[^>]*data-carousel-pause[\s\S]*?>/g)].every((m) => has(m[0], "hidden")),
+  checkAll("each has three static app screenshots", appPages,
+    (page) => (page.body.match(/<img src="\/assets\/screens\/pl_(?:home|calc|project)\.webp"/g) || []).length === 3,
     (page) => page.url);
-
   const main = read("assets/main.js");
-  check("the script unhides it and switches the label with the state",
-    /btn\.hidden = false/.test(main) && /labelPlay/.test(main) && /labelPause/.test(main));
-  check("a visitor's pause outranks the tab coming back into view",
-    /if \(!timer && !paused\)/.test(main));
-  check("and prefers-reduced-motion still stops the carousel starting at all",
-    /prefers-reduced-motion: reduce/.test(main));
-
-  // Every id in the mockup went in session 34: /aplikacja/ carries two of these and they
-  // shared one, so the second never moved and the page was invalid twice over.
-  checkAll("the tracks are wired per element, not by a shared id", carousel,
-    (page) => !page.body.includes('id="hero-shots"') && !page.body.includes('id="hero-dots"'),
-    (page) => page.url);
+  check("the shared script contains no carousel wiring",
+    !main.includes("data-carousel") && !main.includes("buildHeroCarousel"));
 }
 
 /* ------------------------------------------------------------------ 9. tables */

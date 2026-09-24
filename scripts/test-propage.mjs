@@ -8,7 +8,7 @@
  * Pro. Bez marketingowego przesytu." The page is short, so this suite is mostly about the
  * two things a page like it gets wrong:
  *
- *   1. the route — GUEST, indexable, one slug in ten languages, and no gate. A page that
+ *   1. the route — GUEST, indexable, one slug in thirteen languages, and no gate. A page that
  *      describes what somebody would be paying for, put behind the payment, is a circle;
  *   2. one source per statement — the four modules come from LM_FEATURES, the price from
  *      assets/pay.js, the addresses from src/site.mjs. Nothing on this page is a second
@@ -147,20 +147,20 @@ head("1b. where the product points at it");
   check("and it stands in front of the modules it describes",
     product.indexOf("liczmat-pro") < product.indexOf("clients"), product.join(" → "));
 
-  // The header row fits five links and holds five. Session 40 made this page one of them,
+  // The header row fits six links and holds six. Session 40 made this page one of them,
   // in the slot "Poradniki" gave up: the page that has to be found before anybody pays was
   // reachable only from the footer and from a wall somebody had already run into.
   check("it is in the header", Boolean(r.header));
-  eq("in the slot the guides gave up", r.header.order, 4);
+  eq("after the restored store link", r.header.order, 5);
   eq("under the same name the footer link carries", r.header.key, "pro_t");
   const header = navRoutes("header").map((x) => x.id);
-  eq("and the row still holds five", header.length, 5);
+  eq("and the row holds six", header.length, 6);
   check("with the guides no longer among them", !header.includes("guides"), header.join(" · "));
 }
 
 /* ================================================================== 2. the page */
 
-head("2. the page, as the build writes it, in ten languages");
+head("2. the page, as the build writes it, in thirteen languages");
 for (const lang of LANGS) {
   const t = tr(lang);
   const prices = {};
@@ -176,7 +176,7 @@ for (const lang of LANGS) {
 
   has(`<h1>${t("pro_t")}</h1>`, "the page is titled with the product's name");
   has(t("pro_d"), "and led by the one sentence that says what Pro is");
-  has(t("lvl_pro"), "the level it belongs to is named");
+  hasNot('class="door-level"', "the decorative tier pill is absent");
   has(`href="${urlHome(lang)}"`, "the breadcrumb goes back to the home page");
   check(`${lang}: it declares itself as a page in the site's tree`,
     ld && ld["@type"] === "BreadcrumbList", JSON.stringify(ld && ld["@type"]));
@@ -318,7 +318,7 @@ head("3. the amount is read, never converted");
 
 /* ================================================================== 4. the copy */
 
-head("4. the copy, in ten languages");
+head("4. the copy, in thirteen languages");
 {
   const KEYS = [
     "propage_meta", "propage_h_mods", "propage_mods_d",

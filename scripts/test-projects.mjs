@@ -615,13 +615,13 @@ head("11. the copy, in four languages");
 
 /* ------------------------------------------- 12. the navigation (fixes after session 20) */
 
-head("12. the header carries five links, and one of them is only offered with an account");
+head("12. the header carries six links, and one of them is only offered with an account");
 {
   const inHeader = navRoutes("header");
-  eq("five links in the header", inHeader.length, 5);
+  eq("six links in the header", inHeader.length, 6);
   eq("and they are in the architecture's order",
     inHeader.map((r) => r.id).join(","),
-    "calculators,materials,projects,liczmat-pro,android");
+    "calculators,materials,stores,projects,liczmat-pro,android");
 
   // Session 40: "Poradniki" gave slot 4 up to /liczmat-pro/. The guides did not go
   // anywhere — the route is still LIVE and still in the footer — so the test says both
@@ -632,7 +632,7 @@ head("12. the header carries five links, and one of them is only offered with an
   check("and still in the footer", Boolean(guides.footer));
   eq("under the label they already had", guides.footer.key, "foot_guides");
   const pro = route("liczmat-pro");
-  eq("LiczMat Pro took the slot", pro.header.order, 4);
+  eq("LiczMat Pro follows the restored store link", pro.header.order, 5);
   eq("with the name it carries everywhere else", pro.header.key, "pro_t");
   check("and it is offered to everybody, which is the point of a sales page",
     !pro.navLevel);
@@ -641,14 +641,14 @@ head("12. the header carries five links, and one of them is only offered with an
   // pushing the app on the home page; a link last in the row is not that.
   const android = route("android");
   check("the app page is in the header", Boolean(android.header));
-  eq("last, behind the four tools", android.header.order, 5);
+  eq("last, behind the five tools", android.header.order, 6);
   eq("with the label it already had in the footer", android.header.key, "nav_app_page");
 
-  // A sixth link has never been measured, so the build still refuses it.
-  const spare = ROUTES.find((r) => r.id === "stores");
+  // A seventh link has never been measured, so the build still refuses it.
+  const spare = ROUTES.find((r) => r.id === "guides");
   const was = spare.header;
-  spare.header = { order: 6, key: "nav_stores" };
-  check("a sixth link still aborts the build",
+  spare.header = { order: 7, key: "foot_guides" };
+  check("a seventh link still aborts the build",
     validateIA().some((p) => /links in the header/.test(p)), validateIA().join("\n      "));
   spare.header = was;
   check("and the architecture is happy once it is put back", validateIA().length === 0);

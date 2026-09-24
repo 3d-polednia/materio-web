@@ -61,7 +61,6 @@ export const OG_IMAGE_ALT = "LiczMat — Policz. Zaplanuj. Zrealizuj.";
 
 const ICON = {
   cut: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${ICON_CUT_PATH}</svg>`,
-  play: '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.4-.2-.6-.6-.6-1.1V3.4c0-.5.2-.9.6-1.1Zm11.3 11 2.6 2.6-3.2 1.8-2-2 2.6-2.4Zm0-2.6L12.3 8.3l3.2-1.8L18.1 8l-3.2 2.7ZM16 12l4 2.3c.7.4.7 1.4 0 1.8"/></svg>',
   // Both glyphs ship; CSS shows the one that matches the drawer's state.
   menu: '<svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',
   close: '<svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>',
@@ -144,10 +143,18 @@ export function currencyPicker(lang, t, inPlace) {
 export const themeToggle = (t, inPlace) =>
   `<button id="theme-toggle" class="theme-toggle" type="button" aria-label="${esc(t("theme_toggle"))}" title="${esc(t("theme_toggle"))}"${inPlace ? ' data-i18n-aria="theme_toggle"' : ""}>${ICON.sun}${ICON.moon}${ICON.auto}</button>`;
 
-export const playBadge = (t, loc, cls = "gp-badge") => `
-  <a class="${cls}" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="${loc}" aria-label="${esc(t("hero_download"))}">
-    ${ICON.play}
-    <span><small>${esc(t("gp_getit"))}</small><b>${esc(t("hero_download"))}</b></span>
+const PLAY_ALT = {
+  pl: "Pobierz z Google Play", en: "Get it on Google Play", de: "Jetzt bei Google Play",
+  cs: "Rozjeďte to na Google Play", sk: "Získajte to na Google Play",
+  uk: "Завантажити з Google Play", hr: "Preuzmite na Google Play",
+  sr: "Набавите на Google Play-у", ro: "Descarcă de pe Google Play",
+  it: "Disponibile su Google Play", nl: "Ontdek het op Google Play",
+  es: "Disponible en Google Play", fr: "Disponible sur Google Play",
+};
+
+export const playBadge = (lang, loc) => `
+  <a class="gp-official" href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="${loc}">
+    <img src="/assets/badges/google-play-${lang}.png" width="${lang === "en" ? 564 : 646}" height="${lang === "en" ? 168 : 192}" alt="${esc(PLAY_ALT[lang])}"${loc === "install" ? ' loading="lazy"' : ""} decoding="async">
   </a>`;
 
 /**

@@ -368,7 +368,7 @@ head("bez javascriptu");
   await ctx.close();
 }
 
-/* --- 7. the header row, with five links ----------------------------------------------- */
+/* --- 7. the header row, with six links ------------------------------------------------ */
 
 head("nagłówek");
 {
@@ -384,7 +384,7 @@ head("nagłówek");
   // tightening in assets/styles.css stops applying, so both sides of that are checked. The
   // guest view is the honest one to measure at four visible links AND at five: the fifth,
   // "Projekty", comes back the moment somebody signs in.
-  for (const width of [1061, 1100, 1160, 1280]) {
+  for (const width of [1061, 1100, 1160, 1200, 1240, 1280]) {
     const ctx = await context({ viewport: { width, height: 800 } });
     for (const lang of LANGS) {
       for (const signedIn of [false, true]) {
@@ -414,7 +414,7 @@ head("nagłówek");
           };
         });
 
-        eq(`${who}: the links a visitor sees`, row.shown, signedIn ? 5 : 4);
+        eq(`${who}: the links a visitor sees`, row.shown, signedIn ? 6 : 5);
         eq(`${who}: they are all on one line`, row.lines, 1);
         check(`${who}: the account button is inside the viewport`,
           row.ctaRight <= row.width, `button ends at ${row.ctaRight} of ${row.width}`);

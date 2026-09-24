@@ -546,15 +546,16 @@ const DOCUMENT = { account: 1556 };
 const PAGES = [];
 for (const r of liveRoutes()) {
   if (r.view) continue;
-  const add = (path) => PAGES.push({
+  const add = (path, lang = null) => PAGES.push({
     id: r.id,
+    lang,
     file: `${path.replace(/^\//, "")}${path.endsWith(".html") ? "" : "index.html"}`,
   });
   if (r.generated === false || !r.localized) { add(r.path); continue; }
   for (const lang of LANGS) {
-    if (r.each === "calculator") for (const c of CALCS) add(r.path(lang, c));
-    else if (r.each === "guide") for (const g of GUIDES) add(r.path(lang, g));
-    else add(r.path(lang));
+    if (r.each === "calculator") for (const c of CALCS) add(r.path(lang, c), lang);
+    else if (r.each === "guide") for (const g of GUIDES) add(r.path(lang, g), lang);
+    else add(r.path(lang), lang);
   }
 }
 
@@ -669,9 +670,37 @@ check("the tablist rule measured the page it was written for",
 
 check("the budgets were measured against real pages", counted > 300, `${counted} pages read`);
 
-/* ------------------------------------------------------------------ §8 the name in a sentence */
+/* ------------------------------------------------------------------ §8 stop slop: the look */
 
-head("§8 a name pulled into a sentence takes the sentence's form");
+head("§8 stop slop: the look");
+
+const visual = [];
+for (const page of PAGES) {
+  let html;
+  try { html = read(page.file); } catch { continue; }
+  if (/class="badge"[\s\S]*?class="dot"/.test(html)) visual.push(`${page.file}: badge with dot`);
+  for (const pattern of ["data-carousel", "cta-banner", "stat-band", "pl_stores.webp"]) {
+    if (html.includes(pattern)) visual.push(`${page.file}: ${pattern}`);
+  }
+  const images = [...html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g)].map((m) => m[1])
+    .filter((src) => !src.startsWith("/assets/badges/google-play-"));
+  const duplicate = images.find((src, i) => images.indexOf(src) !== i);
+  if (duplicate) visual.push(`${page.file}: duplicate image ${duplicate}`);
+  for (const match of html.matchAll(/<a\b[^>]*class="gp-official"[\s\S]*?<img\b[^>]*src="([^"]+)"/g)) {
+    const expected = `/assets/badges/google-play-${page.lang}.png`;
+    if (!page.lang || match[1] !== expected) visual.push(`${page.file}: badge ${match[1]}, expected ${expected}`);
+  }
+}
+// The token block ends where section 2 begins. If that heading is ever renamed, the split
+// finds nothing and the gradient check would pass on an empty string, so say so instead.
+const cssParts = read("assets/styles.css").split("/* ================================================================== 2. BASE");
+if (cssParts.length !== 2) visual.push("assets/styles.css: the '2. BASE' heading that ends the token block is gone");
+if ((cssParts[1] || "").includes("radial-gradient(")) visual.push("assets/styles.css: radial-gradient outside token block");
+checkMany("generated pages and styles contain no visual slop patterns", visual, (x) => x, PAGES.length);
+
+/* ------------------------------------------------------------------ §9 the name in a sentence */
+
+head("§9 a name pulled into a sentence takes the sentence's form");
 
 /**
  * The FAQ answer about data ends with a link to the privacy policy, and the link's text is

@@ -502,54 +502,16 @@ head("9. the material dialog");
   await ctx.close();
 }
 
-/* ------------------------------------------------------------------ 10. the carousel */
+/* ------------------------------------------------------------------ 10. static app screenshots */
 
-/* WCAG 2.2.2 — the whole reason the button exists. */
-head("10. the screenshots can be stopped");
+head("10. the app screenshots are static");
 {
   const ctx = await context();
   const page = await open(ctx, "/aplikacja/");
-
-  const buttons = await page.locator("[data-carousel-pause]").count();
-  eq("both mockups on this page have a stop button", buttons, 2);
-  check("it is on screen once the script is running",
-    await page.locator("[data-carousel-pause]").first().isVisible());
-
-  const at = () => page.evaluate(() => document.querySelector("[data-carousel]").style.transform || "none");
-  const first = await at();
-  await page.waitForTimeout(4200);
-  check("they move on their own", (await at()) !== first, `${first} → ${await at()}`);
-
-  const btn = page.locator("[data-carousel-pause]").first();
-  const labelBefore = await btn.getAttribute("aria-label");
-  await btn.focus();
-  await page.keyboard.press("Enter");
-  const stopped = await at();
-  await page.waitForTimeout(4200);
-  eq("pressing it stops them", await at(), stopped);
-
-  const labelAfter = await btn.getAttribute("aria-label");
-  check("and the label now says what it will do next", labelAfter && labelAfter !== labelBefore,
-    `${labelBefore} → ${labelAfter}`);
-
-  await page.keyboard.press("Enter");
-  await page.waitForTimeout(4200);
-  check("pressing it again lets them go", (await at()) !== stopped);
-  await ctx.close();
-}
-
-head("11. prefers-reduced-motion");
-{
-  const ctx = await context({ reducedMotion: "reduce" });
-  const page = await open(ctx, "/aplikacja/");
-  const first = await page.evaluate(() => document.querySelector("[data-carousel]").style.transform || "none");
-  await page.waitForTimeout(4200);
-  const later = await page.evaluate(() => document.querySelector("[data-carousel]").style.transform || "none");
-  eq("nothing moves", later, first);
-  // Nothing is moving, so a button offering to stop it would be a control that does
-  // nothing — chapter XXV's rule, arrived at from the other direction.
-  check("and there is no stop button to press",
-    !(await page.locator("[data-carousel-pause]").first().isVisible()));
+  eq("the page has three screenshots", await page.locator(".app-shot img").count(), 3);
+  eq("it has no carousel controls", await page.locator("[data-carousel], [data-carousel-pause]").count(), 0);
+  const sources = await page.locator(".app-shot img").evaluateAll((imgs) => imgs.map((img) => img.getAttribute("src")));
+  check("each screenshot appears once", new Set(sources).size === 3, sources.join(", "));
   await ctx.close();
 }
 

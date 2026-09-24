@@ -36,7 +36,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, GUIDES,
-  urlHome, urlCalc, urlJobs, URL_PRIVACY,
+  urlHome, urlCalc, urlJobs, urlAndroid, URL_PRIVACY,
 } from "../src/site.mjs";
 import { sitemapUrls, liveRoutes, route } from "../src/ia.mjs";
 
@@ -451,11 +451,12 @@ head("7. structured data: valid JSON, real types, one entity per thing");
       check(`${page.url}: no unclosed script inside it`, !block.includes("</script"));
     }
   }
-  // Every page below the home page shows a trail, and the trail is the one rich result
-  // Google still draws from this site's markup.
+  // Every page below the home page shows a trail, except /aplikacja/: its visual design
+  // deliberately has no breadcrumb, so structured data must not claim one is visible.
   for (const page of INDEXED) {
     const isHome = LANGS.some((l) => urlHome(l) === page.url);
-    if (isHome || page.url === URL_PRIVACY) continue;
+    const isAndroid = LANGS.some((l) => urlAndroid(l) === page.url);
+    if (isHome || isAndroid || page.url === URL_PRIVACY) continue;
     check(`${page.url}: carries a BreadcrumbList`,
       page.jsonld.some((b) => b.includes('"BreadcrumbList"')));
   }

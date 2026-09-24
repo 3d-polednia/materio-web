@@ -566,16 +566,6 @@ section.block > .wrap > p { max-width: var(--measure); }
 
 .chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-3); }
 
-/* A badge states a fact; it is not clickable, so it has no hover. */
-.badge {
-  display: inline-flex; align-items: center; gap: var(--sp-2);
-  background: var(--surface); border: 1px solid var(--outline);
-  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-pill);
-  font-weight: var(--fw-semi); font-size: var(--fs-sm);
-  box-shadow: var(--shadow-2); margin-bottom: var(--sp-5);
-}
-.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-
 /* ---------- Card
    The one raised surface of the site. Everything that looks like a card is this
    rule; what differs is padding and what sits inside. Only .card lifts on hover,
@@ -587,8 +577,8 @@ section.block > .wrap > p { max-width: var(--measure); }
 .card, .door, .ws-estimate { padding: var(--sp-7); }
 .calc { padding: var(--sp-6); }
 .app-card { padding: var(--sp-5); border-radius: var(--radius-sm); margin-bottom: var(--sp-4); }
-.card { transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
-.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
+.card:is(a, button), .card:has(a.card-link) { transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+.card:is(a, button):hover, .card:has(a.card-link):hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
 .card h3 { margin-bottom: var(--sp-2); }
 .card p { color: var(--muted); margin: 0; }
 .app-card h2, .app-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
@@ -1247,12 +1237,6 @@ footer h2 {
 
 /* ---------- Hero ---------- */
 .hero { position: relative; overflow: hidden; padding: var(--sp-16) 0 var(--sp-10); }
-/* A single, restrained wash behind the hero — enough to lift it off the page background,
-   short of the glow the brief rules out. */
-.hero::before {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: radial-gradient(70% 60% at 12% 0%, color-mix(in srgb, var(--accent-soft) 45%, transparent), transparent 72%);
-}
 /* Two arrangements: the home page's hero is one column of copy, /aplikacja/ puts the
    phone beside it. */
 .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: var(--sp-12); align-items: center; }
@@ -1260,86 +1244,16 @@ footer h2 {
 .hero .hero-copy { max-width: 42rem; }
 .home-hero .hero-copy { margin-inline: auto; text-align: center; }
 .home-hero .hero-copy > h1,
-.home-hero .hero-copy > .lead,
-.home-hero .hero-copy > .trust { margin-inline: auto; }
-.home-hero .trust { justify-content: center; }
+.home-hero .hero-copy > .lead { margin-inline: auto; }
 .hero p.lead { font-size: var(--fs-md); color: var(--muted); max-width: 44ch; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-7) 0 var(--sp-6); }
 
-.trust { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-7); margin-top: var(--sp-2); }
-.trust span {
-  display: inline-flex; align-items: center; gap: var(--sp-2);
-  font-weight: var(--fw-semi); font-size: var(--fs-sm); color: var(--muted);
-}
-.trust svg { color: var(--accent-strong); flex: none; }
-
-/* Store badges (Google Play) */
-.store-badges { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-7) 0 var(--sp-6); }
-.gp-badge, .badge-store {
-  display: inline-flex; align-items: center; gap: var(--sp-3);
-  background: #0d1117; color: #fff; border-radius: var(--radius-sm);
-  font-weight: var(--fw-semi); box-shadow: var(--shadow-2);
-  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease), opacity var(--dur) var(--ease);
-}
-.gp-badge { padding: var(--sp-3) var(--sp-5) var(--sp-3) var(--sp-4); }
-.badge-store { padding: var(--sp-3) var(--sp-4); }
-.gp-badge:hover, .badge-store:hover { text-decoration: none; box-shadow: var(--shadow-3); }
-.gp-badge:active, .badge-store:active { transform: translateY(1px); }
-.gp-badge svg { flex: none; }
-.gp-badge small, .badge-store small {
-  display: block; font-size: var(--fs-xs); opacity: .82;
-  font-weight: var(--fw-medium); letter-spacing: .02em;
-}
-.gp-badge b { font-size: var(--fs-md); line-height: var(--lh-tight); }
-.badge-store b { font-size: var(--fs-base); }
-
-/* Phone mockup — auto-playing carousel of real app screenshots.
-   Aspect ratio matches the captured frames (Pixel 5: 411 × 891 dp), so the
-   screenshots fill the screen area exactly, with no cropping. The 40px corner is
-   the device's, not the design system's — it is a picture of a phone. */
-.phone {
-  width: 300px; max-width: 82%; margin: 0 auto; aspect-ratio: 411/891;
-  background: #0d1117; border: 10px solid #0d1117;
-  border-radius: 40px; box-shadow: var(--shadow-3); overflow: hidden;
-  position: relative;
-}
-.phone-track { display: flex; height: 100%; transition: transform var(--dur-carousel) var(--ease); }
-.phone-track.instant { transition: none; }
-.phone-track img {
-  flex: 0 0 100%; width: 100%; height: 100%;
-  object-fit: cover; object-position: top center; display: block;
-}
-/* The row under the phone: the dots, and the button that stops them moving (WCAG 2.2.2,
-   session 34). The button is 44 px on every screen — it stands on its own under the
-   mockup rather than in a dense row, so the reasons the header's icon buttons are 36 px
-   do not apply here, and it needs no rule in the phone breakpoint. */
-.phone-controls {
-  display: flex; align-items: center; justify-content: center;
-  gap: var(--sp-3); margin: var(--sp-4) 0 0;
-}
-.phone-dots { display: flex; justify-content: center; gap: 7px; }
-.phone-pause {
-  width: var(--control-h); height: var(--control-h);
-  display: inline-flex; align-items: center; justify-content: center;
-  background: transparent; color: var(--muted);
-  border: 1px solid var(--outline-control); border-radius: var(--radius-pill);
-  cursor: pointer;
-}
-.phone-pause:hover { color: var(--on-bg); border-color: var(--outline-strong); }
-.phone-pause[hidden] { display: none; }
-/* Both glyphs ship; this shows the one that matches whether the screenshots are moving. */
-.phone-pause .ico-play, .phone-pause.paused .ico-pause { display: none; }
-.phone-pause.paused .ico-play { display: block; }
-/* Every dot keeps a 20px layout box and only its transform changes, so the active one
-   growing does not relayout the row. It used to animate `width` from 7px to 20px, which
-   is layout work on every frame and moves its four neighbours while it runs. */
-.phone-dots i {
-  width: 20px; height: 7px; border-radius: var(--radius-pill); background: var(--outline-strong);
-  transform: scaleX(.35);
-  transition: transform var(--dur-slow) var(--ease), background var(--dur-slow) var(--ease);
-}
-.phone-dots i.on { transform: scaleX(1); background: var(--accent); }
-@media (prefers-reduced-motion: reduce) { .phone-track { transition: none; } }
+/* Official Google Play artwork stays unmodified: no border, radius, shadow or hover
+   effect. Google asks for clear space of a quarter of the badge height around it, which
+   is 14px at 56px — the gap and the margins below never go under that. */
+.store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); margin: var(--sp-7) 0 var(--sp-6); }
+.gp-official { display: inline-block; line-height: 0; }
+.gp-official img { display: block; width: auto; height: 56px; }
 
 /* ---------- Home: the three doors, the four steps ----------
    Chapter X: the home page leads to three areas — calculators, LiczMat, LiczMat Pro.
@@ -1352,13 +1266,8 @@ footer h2 {
 .door p { margin: 0; }
 .door-q { font-weight: var(--fw-semi); color: var(--accent-strong); }
 .door-level {
-  /* inline-block so the pill keeps its padding outside a flex container too: the same
-     badge stands alone at the top of /liczmat-pro/ (session 29), where nothing lays it
-     out. `align-self` is what places it inside a .door. */
-  display: inline-block; align-self: flex-start; border-radius: var(--radius-pill);
-  background: var(--accent-soft); color: var(--on-accent-soft);
-  padding: var(--sp-1) var(--sp-3); font-size: var(--fs-xs); font-weight: var(--fw-bold);
-  letter-spacing: .02em; text-transform: uppercase;
+  display: inline-block; align-self: flex-start;
+  color: var(--muted); font-size: var(--fs-xs); font-weight: var(--fw-medium);
 }
 .door-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .door-list a {
@@ -1378,15 +1287,6 @@ footer h2 {
   font-size: var(--fs-sm); font-weight: var(--fw-semi);
 }
 
-.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
-
-.stat-band { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
-.stat { text-align: center; padding: var(--sp-2); }
-.stat .num {
-  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: var(--fw-black);
-  letter-spacing: -.03em; color: var(--accent-strong); line-height: 1;
-}
-.stat .lbl { color: var(--muted); font-weight: var(--fw-semi); font-size: var(--fs-sm); margin-top: var(--sp-2); }
 
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); counter-reset: step; }
 .step { position: relative; padding: var(--sp-7) var(--sp-6) var(--sp-6); }
@@ -1405,22 +1305,6 @@ footer h2 {
 .trust-list b { display: block; }
 .trust-list span.d { color: var(--muted); font-size: var(--fs-sm); }
 
-/* ---------- The app section: copy on the left, one phone on the right.
-   This is the only place on the home page where the Android app is the subject. */
-.cta-banner {
-  background: var(--accent); color: var(--on-accent);
-  border-radius: var(--radius-lg); padding: var(--sp-12) var(--sp-8);
-  box-shadow: var(--shadow-3);
-  display: grid; grid-template-columns: 1.2fr .8fr; gap: var(--sp-8); align-items: center;
-}
-.cta-banner h2 { color: var(--on-accent); }
-.cta-banner p { color: color-mix(in srgb, var(--on-accent) 85%, transparent); max-width: 50ch; margin: 0 auto var(--sp-6); }
-/* Inside the lime banner the primary button inverts: the dark fill needs the
-   lime itself, not the readable-on-cream green, which is far too dark on it. */
-.cta-banner .btn-primary { background: var(--on-accent); color: var(--accent); }
-.cta-copy h2 { margin-bottom: .4em; }
-.cta-shots { display: flex; flex-direction: column; align-items: center; }
-.cta-shots .phone { width: 230px; margin: 0; }
 
 /* ---------- Calculators ---------- */
 .calc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-5); }
@@ -1626,19 +1510,31 @@ a.chip:hover { text-decoration: none; }
 .store-empty { color: var(--muted); font-size: var(--fs-sm); padding: var(--sp-2) 2px; }
 .store-search-block { margin-top: var(--sp-6); padding-top: var(--sp-4); border-top: 1px solid var(--outline); }
 
-/* ---------- /aplikacja/ ----------
-   The one page whose subject is the Android app, so the phone mockup comes back —
-   here it is the product being described, not decoration around a calculator. */
+/* ---------- /aplikacja/ ---------- */
 .app-hero { padding-top: var(--sp-5); }
-.app-hero .hero-media { display: flex; flex-direction: column; align-items: center; }
-.app-hero .phone { margin: 0; }
-.shot-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-6); }
-.shot { margin: 0; text-align: center; }
-.shot img {
-  width: 100%; max-width: 300px; height: auto; border-radius: var(--radius-lg);
-  border: 1px solid var(--outline); box-shadow: var(--shadow-3);
+.app-shot { margin: 0; display: flex; justify-content: center; }
+.app-shot img {
+  display: block; width: 100%; max-width: 300px; height: auto;
+  border: 1px solid var(--outline); border-radius: var(--radius-lg);
 }
-.shot figcaption { margin-top: var(--sp-3); font-size: var(--fs-sm); }
+/* The screenshot and the words about it sit together in the middle, whichever comes
+   first in the markup; two equal halves left a gap as wide as the phone between them. */
+.app-feature {
+  display: grid; grid-template-columns: repeat(2, auto); justify-content: center;
+  gap: var(--sp-12); align-items: center;
+}
+.app-feature > div { max-width: var(--measure); }
+.app-feature .app-shot { width: min(300px, 100%); justify-self: center; }
+.app-list { margin: var(--sp-5) 0 0; padding-left: var(--sp-5); }
+.app-list li { margin-top: var(--sp-2); }
+.app-list li::marker { color: var(--accent-strong); }
+.app-install {
+  border: 1px solid var(--accent-edge); border-radius: var(--radius);
+  padding: var(--sp-8); background: var(--surface);
+}
+.app-install h2 { color: var(--accent-strong); }
+.app-install .gp-official { margin: var(--sp-6) 0 var(--sp-4); }
+.gp-tm { color: var(--muted); font-size: var(--fs-xs); }
 
 /* A sub-page closes with one quiet line about the app, not a download banner.
    The site is the product; the app is the offline companion. */
@@ -2682,8 +2578,10 @@ a.chip:hover { text-decoration: none; }
 /* Between the content width and the drawer the header row has no slack: the links give
    up their side padding before anything is taken away. Measured in German when there
    were four languages; with ten it is Russian that decides, and what it decided is the
-   breakpoint below. */
-@media (max-width: 1160px) {
+   breakpoint below. Session W (2026-09-24) added the sixth link, "Sklepy": above 1160px
+   the type steps up to 112.5%, and signed-in Ukrainian, Dutch and French then ran up to
+   52px past the edge between 1161px and 1279px, so the tightening now holds to 1279px. */
+@media (max-width: 1279px) {
   .nav, .nav-links { gap: var(--sp-2); }
   .nav-list { gap: 0; }
   .nav-list a { padding-left: var(--sp-2); padding-right: var(--sp-2); }
@@ -2733,24 +2631,19 @@ a.chip:hover { text-decoration: none; }
 
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; }
-  .hero-media { order: -1; }
-  .features { grid-template-columns: 1fr 1fr; }
+  .app-feature { grid-template-columns: 1fr; }
+  .app-feature .app-shot { order: 2; }
   .stores-wrap { grid-template-columns: 1fr; }
   .foot-grid { grid-template-columns: 1fr 1fr; }
   .calc-tool .calc { grid-template-columns: 1fr; gap: var(--sp-6); padding: var(--sp-6); }
   .calc-out { position: static; }
   .calc-how-grid { grid-template-columns: 1fr; }
-  .stat-band { grid-template-columns: 1fr 1fr; gap: var(--sp-6) var(--sp-4); }
   .doors { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr 1fr; }
   .doc .toc ul { grid-template-columns: 1fr; }
-  .cta-banner { grid-template-columns: 1fr; text-align: center; }
-  .cta-copy { display: flex; flex-direction: column; align-items: center; }
-  .cta-shots { display: none; }
 }
 
 @media (max-width: 760px) {
-  .shot-grid { grid-template-columns: 1fr; }
   .mat-page-list li { flex-direction: column; align-items: flex-start; }
 }
 
@@ -2799,7 +2692,8 @@ a.chip:hover { text-decoration: none; }
   .ws-project .dash-sec, .hierarchy-l2 { padding: var(--sp-3); }
   .data-list li.app-project { padding: var(--sp-3); }
 
-  .features { grid-template-columns: 1fr; }
+  .gp-official img { height: 48px; }
+  .app-install { padding: var(--sp-5); }
   .steps { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr; }
   .foot-grid { grid-template-columns: 1fr; }

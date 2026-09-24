@@ -10,7 +10,7 @@ import {
   HOME_DOORS, route as iaRoute, STATUS, CALC_CATEGORIES, calcCategory, popularCalcs,
 } from "./ia.mjs";
 import {
-  BASE as BASE_URL, LANGS,
+  BASE as BASE_URL,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlQuotes,
   urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
@@ -18,15 +18,7 @@ import {
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
 import { proGate, proModules, proPlansBlock } from "./pro.mjs";
-import { DEFAULT_CURRENCY, MONEY_LOCALE } from "./currency.mjs";
 import { PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
-
-/* All thirteen, from assets/currency.js by way of src/currency.mjs — the same map the
-   browser formats money with. It used to be four, left over from the Polish-first phase,
-   and the other nine fell through to `undefined`, which is not "no locale" but "whatever
-   locale this machine runs in": the Czech pages were formatted in Polish here and would
-   have been formatted in American English on a build server. Session G, found by CI. */
-const LOCALE = MONEY_LOCALE;
 
 /**
  * Case- and accent-insensitive text for the hub's search haystack.
@@ -42,28 +34,7 @@ const LOCALE = MONEY_LOCALE;
 const fold = (s) => String(s).toLowerCase().normalize("NFD")
   .replace(/[\u0300-\u036f]/g, "").replace(/\u0142/g, "l");
 
-/**
- * "It costs nothing", written as money.
- *
- * The page is generated in the language's default currency, and assets/currency.js
- * rewrites it from `data-lm-money` once the visitor's own choice is known — the price is
- * zero in every currency, so this is the one amount on the site that can be stated
- * without knowing which one is in force.
- */
-function freePrice(lang) {
-  const zero = new Intl.NumberFormat(LOCALE[lang] || LOCALE.pl, {
-    style: "currency", currency: DEFAULT_CURRENCY[lang], maximumFractionDigits: 0,
-  }).format(0);
-  return `<div class="num" data-lm-money="0">${esc(zero)}</div>`;
-}
-
 /* ------------------------------------------------------------------ calculator form */
-
-/* The two glyphs on the carousel's stop button. Both ship; the stylesheet shows the one
-   that matches whether the screenshots are moving, the same arrangement the theme toggle
-   and the menu button use. */
-const ICON_PAUSE = '<svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
-const ICON_PLAY = '<svg class="ico-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5 19 12 7 19.5Z"/></svg>';
 
 const PICK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>';
 
@@ -204,28 +175,15 @@ ${faqSection(t)}
 </main>`;
 }
 
-const FACT_ICON = {
-  browser: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>',
-  account: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',
-  langs: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/>',
-};
-
-/** Title, one sentence, and the three facts that decide whether to stay. No button:
-    the three doors below are the choice, and chapter X rules out repeating a CTA. */
+/** Title and one sentence. No button: the three doors below are the choice, and chapter X
+    rules out repeating a CTA. The row of icon-and-fact chips under the lead went in
+    session W (stop slop): it repeated what the doors and the FAQ already say. */
 function homeHero(t) {
-  const fact = (icon, text) =>
-    `<span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${FACT_ICON[icon]}</svg><span>${esc(text)}</span></span>`;
-
   return `<section class="hero home-hero" aria-labelledby="hero-h">
   <div class="wrap">
    <div class="hero-copy">
     <h1 id="hero-h">${esc(t("hero_title"))}</h1>
     <p class="lead">${esc(t("hero_lead"))}</p>
-    <div class="trust">
-      ${fact("browser", t("home_fact_browser"))}
-      ${fact("account", t("trust_noaccount"))}
-      ${fact("langs", t("trust_langs"))}
-    </div>
    </div>
   </div>
 </section>`;
@@ -298,13 +256,6 @@ function homePath(t) {
 </section>`;
 }
 
-/* The feature card and the ticked list belong to /aplikacja/ now — session 6 took the
-   six feature cards and the data chapter off the home page. */
-const featureCard = (path, title, desc) =>
-  `<div class="card"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${path}</svg></div><h3>${esc(title)}</h3><p>${esc(desc)}</p></div>`;
-
-const TICK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>';
-
 /**
  * The four questions the home page answers, and the only ones.
  *
@@ -320,7 +271,6 @@ function faqSection(t) {
   return `<section id="faq" class="block" aria-labelledby="faq-h">
   <div class="wrap">
     <div class="section-head">
-      <div class="kicker">FAQ</div>
       <h2 id="faq-h">${esc(t("faq_title"))}</h2>
     </div>
     <div class="faq">
@@ -350,53 +300,6 @@ function appNote(t) {
       <a href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="appnote">${esc(t("nav_download"))}</a></p>
     </div>
   </section>`;
-}
-
-/**
- * The dots under the phone mockup, and the control that stops it.
- *
- * WCAG 2.2.2: the screenshots start moving on their own and go on for longer than five
- * seconds, so there has to be a way to stop them. assets/main.js unhides the button when
- * it starts the timer — with no script nothing moves and there is nothing to stop, and
- * under prefers-reduced-motion the carousel never starts, so the button stays hidden
- * there too. Both labels travel in the markup, in this page's own language, which is why
- * main.js needs no dictionary of its own.
- *
- * The dots are aria-hidden: they say which of three frames is showing, which is the one
- * thing about this decoration a screen reader gains nothing from.
- */
-function carouselControls(t) {
-  return `<p class="phone-controls">
-          <span class="phone-dots" data-carousel-dots aria-hidden="true"></span>
-          <button type="button" class="phone-pause" data-carousel-pause hidden
-            aria-label="${esc(t("shot_pause"))}"
-            data-label-pause="${esc(t("shot_pause"))}"
-            data-label-play="${esc(t("shot_play"))}">${ICON_PAUSE}${ICON_PLAY}</button>
-        </p>`;
-}
-
-function ctaSection(t) {
-  return `<section class="block" aria-labelledby="cta-h">
-  <div class="wrap">
-    <div class="cta-banner">
-      <div class="cta-copy">
-        <h2 id="cta-h">${esc(t("cta_title"))}</h2>
-        <p>${esc(t("cta_lead"))}</p>
-        ${playBadge(t, "cta", "badge-store")}
-      </div>
-      <div class="cta-shots">
-        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
-          <div class="phone-track" data-carousel>
-            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" loading="lazy" decoding="async">
-            <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
-            <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="${esc(t("shot_stores"))}" loading="lazy" decoding="async">
-          </div>
-        </div>
-        ${carouselControls(t)}
-      </div>
-    </div>
-  </div>
-</section>`;
 }
 
 /* ------------------------------------------------------------------ calculator hub */
@@ -1114,135 +1017,83 @@ export function contactMain(lang, t) {
  * /aplikacja/ — the one page where the Android app is the subject.
  *
  * The rest of the site is the tool and mentions the app once, quietly, at the foot of a
- * page. This is where the download pitch belongs, so it carries the screenshots, the
- * whole feature list and the things a visitor has to know before installing: it is free,
- * it carries ads, and the store map asks for a location.
+ * page. This page shows the app: three screenshots rendered from the app's own code
+ * (WebHeroShotsTest in the Materio repo, then scripts/web-screens.py there), each once,
+ * each beside the words about it, and the things a visitor has to know before installing:
+ * it is free, it carries ads, and the store map asks for a location.
+ *
+ * Session W (2026-09-24) took out what the owner called slop: the breadcrumb band, the
+ * pill with a dot, the icon facts, the band of numbers, nine icon cards, a carousel shown
+ * twice and a lime-filled closing banner. The download button is Google's own badge,
+ * unmodified, because a home-made one imitating it is exactly what the owner objected to.
  */
-export function androidMain(lang, t, calcs, cat) {
-  const crumbs = breadcrumbs([
-    { name: t("bc_home"), path: urlHome(lang) },
-    { name: t("apppage_title"), path: urlAndroid(lang) },
-  ]);
-
-  const shot = (file, altKey) =>
-    `<figure class="shot">
-      <img src="/assets/screens/${file}" width="618" height="1340" alt="${esc(t(altKey))}" loading="lazy" decoding="async">
-      <figcaption class="muted">${esc(t(altKey))}</figcaption>
-    </figure>`;
-
+export function androidMain(lang, t) {
   const main = `<main id="main" tabindex="-1">
-  <section class="block page-head">
-    <div class="wrap">
-      ${crumbs.nav}
-    </div>
-  </section>
-
   <section class="hero app-hero" aria-labelledby="app-h">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <span class="badge"><span class="dot"></span><span>${esc(t("hero_badge"))}</span></span>
         <h1 id="app-h">${esc(t("apppage_title"))}</h1>
         <p class="lead">${esc(t("apppage_lead"))}</p>
         <div class="store-badges">
-          ${playBadge(t, "apppage")}
-          <a class="btn btn-ghost btn-lg" href="${urlCalcIndex(lang)}">${esc(t("hero_try"))}</a>
-        </div>
-        <div class="trust">
-          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>${esc(t("trust_offline"))}</span></span>
-          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg><span>${esc(t("trust_noaccount"))}</span></span>
-          <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20"/></svg><span>${esc(t("trust_langs"))}</span></span>
+          ${playBadge(lang, "apppage")}
+          <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("apppage_web_link"))}</a>
         </div>
       </div>
-      <div class="hero-media">
-        <div class="phone" aria-roledescription="carousel" aria-label="LiczMat">
-          <div class="phone-track" data-carousel>
-            <img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" decoding="async">
-            <img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async">
-            <img src="/assets/screens/pl_stores.webp" width="618" height="1340" alt="${esc(t("shot_stores"))}" loading="lazy" decoding="async">
-          </div>
-        </div>
-        ${carouselControls(t)}
+      <figure class="app-shot"><img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" decoding="async"></figure>
+    </div>
+  </section>
+
+  <section class="block alt" aria-labelledby="appresult-h">
+    <div class="wrap app-feature">
+      <figure class="app-shot"><img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async"></figure>
+      <div>
+        <h2 id="appresult-h">${esc(t("apppage_h_result"))}</h2>
+        <p>${esc(t("apppage_result_d"))}</p>
+        <ul class="app-list"><li>${esc(t("f_calc_t"))}</li><li>${esc(t("f_optim_t"))}</li><li>${esc(t("f_catalog_t"))}</li><li>${esc(t("af_converter_t"))}</li></ul>
       </div>
     </div>
   </section>
 
-  <section class="block pt-2">
-    <div class="wrap">
-      <div class="stat-band">
-        <div class="stat">${freePrice(lang)}<div class="lbl">${esc(t("stat_free_lbl"))}</div></div>
-        <div class="stat"><div class="num">${calcs.length}</div><div class="lbl">${esc(t("stat_calc_lbl"))}</div></div>
-        <div class="stat"><div class="num">${cat.total}</div><div class="lbl">${esc(t("stat_catalog_lbl"))}</div></div>
-        <div class="stat"><div class="num">${LANGS.length}</div><div class="lbl">${esc(t("stat_langs_lbl"))}</div></div>
+  <section class="block" aria-labelledby="appproject-h">
+    <div class="wrap app-feature">
+      <div>
+        <h2 id="appproject-h">${esc(t("apppage_h_project"))}</h2>
+        <p>${esc(t("apppage_project_d"))}</p>
+        <ul class="app-list"><li>${esc(t("f_rooms_t"))}</li><li>${esc(t("af_sync_t"))}</li><li>${esc(t("f_stores_t"))}</li><li><a href="${urlLiczmatPro(lang)}">${esc(t("apppage_pro_line"))}</a></li></ul>
       </div>
-    </div>
-  </section>
-
-  <section class="block alt" aria-labelledby="appfeat-h">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="appfeat-h">${esc(t("apppage_h_features"))}</h2>
-        <p class="muted">${esc(t("apppage_features_d"))}</p>
-      </div>
-      <div class="features">
-        ${featureCard('<path d="M19 3H5a2 2 0 0 0-2 2v6h18V5a2 2 0 0 0-2-2Z"/><path d="M3 11v3a4 4 0 0 0 4 4h1v3h2v-6H3Z"/>', t("f_calc_t"), t("f_calc_d"))}
-        ${featureCard('<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/>', t("f_optim_t"), t("f_optim_d"))}
-        ${featureCard('<path d="M4 4h16v16H4z"/><path d="M4 9h16M4 14h16M9 4v16M14 4v16"/>', t("f_catalog_t"), t("f_catalog_d"))}
-        ${featureCard('<path d="M3 21V8l9-5 9 5v13"/><path d="M3 21h18M9 21v-6h6v6"/>', t("f_rooms_t"), t("f_rooms_d"))}
-        ${featureCard('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>', t("f_projects_t"), t("f_projects_d"))}
-        ${featureCard('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 18h4"/>', t("af_pdf_t"), t("af_pdf_d"))}
-        ${featureCard('<path d="M3 7h13l-3-3M21 17H8l3 3"/>', t("af_converter_t"), t("af_converter_d"))}
-        ${featureCard('<path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/>', t("f_stores_t"), t("f_stores_d"))}
-        ${featureCard('<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>', t("af_sync_t"), t("af_sync_d"))}
-      </div>
-    </div>
-  </section>
-
-  <section class="block" aria-labelledby="appshots-h">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="appshots-h">${esc(t("apppage_h_shots"))}</h2>
-      </div>
-      <div class="shot-grid">
-        ${shot("pl_home.webp", "shot_home")}
-        ${shot("pl_calc.webp", "shot_calc")}
-        ${shot("pl_stores.webp", "shot_stores")}
-      </div>
+      <figure class="app-shot"><img src="/assets/screens/pl_project.webp" width="618" height="1340" alt="${esc(t("shot_project"))}" loading="lazy" decoding="async"></figure>
     </div>
   </section>
 
   <section class="block alt" aria-labelledby="appweb-h">
     <div class="wrap narrow">
       <h2 id="appweb-h">${esc(t("apppage_h_web"))}</h2>
-      <p class="muted">${esc(t("apppage_web_d"))}</p>
-      <ul class="trust-list">
-        ${[["apppage_web_1"], ["apppage_web_2"], ["apppage_web_3"]].map(([k]) =>
-          `<li><span class="tick">${TICK}</span><span><b>${esc(t(k))}</b></span></li>`).join("")}
-      </ul>
+      <p>${esc(t("apppage_web_d"))}</p>
       <p class="ws-links">
-        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-        <a class="btn btn-ghost" href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>
-        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>
       </p>
     </div>
   </section>
 
   <section class="block" aria-labelledby="appreq-h">
-    <div class="wrap narrow">
+    <div class="wrap narrow app-install">
       <h2 id="appreq-h">${esc(t("apppage_h_reqs"))}</h2>
-      <ul class="steps-list">
+      <ul class="app-list">
         <li>${esc(t("apppage_req_1"))}</li>
         <li>${esc(t("apppage_req_2"))}</li>
         <li>${esc(t("apppage_req_3"))}</li>
         <li>${esc(t("apppage_req_4"))}</li>
       </ul>
+      ${playBadge(lang, "install")}
+      <p class="gp-tm">${esc(t("gp_tm"))}</p>
       <p class="muted src-note"><a href="/privacy-policy.html">${esc(t("foot_privacy"))}</a></p>
     </div>
   </section>
-
-  ${ctaSection(t)}
 </main>`;
 
-  const ld = [crumbs.ld, {
+  // /aplikacja/ intentionally has no visible breadcrumb, so it has no BreadcrumbList JSON-LD.
+  const ld = [{
     "@context": "https://schema.org",
     "@type": "MobileApplication",
     name: "LiczMat",
@@ -1254,7 +1105,7 @@ export function androidMain(lang, t, calcs, cat) {
     installUrl: PLAY_URL,
     description: t("apppage_lead"),
     offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
-    screenshot: ["pl_home.webp", "pl_calc.webp", "pl_stores.webp"]
+    screenshot: ["pl_home.webp", "pl_calc.webp", "pl_project.webp"]
       .map((f) => `${BASE_URL}/assets/screens/${f}`),
   }];
   return { main, ld };
@@ -1947,7 +1798,6 @@ export function proPageMain(lang, t, features, prices) {
   <section class="block page-head">
     <div class="wrap">
       ${crumbs.nav}
-      <span class="door-level">${esc(t("lvl_pro"))}</span>
       <h1>${esc(t("pro_t"))}</h1>
       <p class="lead">${esc(t("pro_d"))}</p>
     </div>

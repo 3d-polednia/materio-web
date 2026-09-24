@@ -212,16 +212,19 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlStores,
+    header: { order: 3, key: "nav_stores" },
     footer: { order: 8, key: "nav_stores" },
-    note: "Footer only. It is a tool, not a step of any flow — session 5 took it out of " +
-      "the header to get the row back under one line.",
+    note: "Session 5 took it out of the header to get the row back under one line. The " +
+      "owner asked for it back on 2026-09-24 (session W): a builder looks for where to buy " +
+      "the material right after counting it, so it sits next to Materiały. The sixth link " +
+      "was measured, see the check in validateIA.",
   },
   {
     id: "android",
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlAndroid,
-    header: { order: 5, key: "nav_app_page" },
+    header: { order: 6, key: "nav_app_page" },
     footer: { order: 1, key: "nav_app_page", group: "account" },
     note: "One page for the Android app. Chapter X still holds — it must not be pushed on " +
       "the home page — but the owner asked for it in the navigation after session 20, and " +
@@ -235,7 +238,7 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlProjects,
-    header: { order: 3, key: "nav_projects" },
+    header: { order: 4, key: "nav_projects" },
     footer: { order: 5, key: "nav_projects" },
     navLevel: LEVEL.LICZMAT,
     note: "Chapter XIV makes the project the centre of the free account. The page is " +
@@ -473,7 +476,7 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlLiczmatPro,
-    header: { order: 4, key: "pro_t" },
+    header: { order: 5, key: "pro_t" },
     footer: { order: 9, key: "pro_t" },
     note: "The public page for Pro: what it is, what it costs, who it is for. Chapter X " +
       "makes it one of the three destinations of the home page, so it is GUEST and " +
@@ -968,9 +971,10 @@ export function validateIA() {
   // Session 40 swapped one label for a longer one — "Poradniki" out, "LiczMat Pro" in —
   // which is a measurement, not a rename: the same test re-ran at the same four widths in
   // the same ten languages, because a row that fits five short words does not necessarily
-  // fit five longer ones. A sixth link has not been measured, so it is still refused.
+  // fit five longer ones. Session W (2026-09-24) brought "Sklepy" back as the sixth, and
+  // measured it the same way; a seventh has not been measured, so it is refused.
   const inHeader = navRoutes("header").length;
-  if (inHeader > 5) problems.push(`IA: ${inHeader} links in the header — the row fits five`);
+  if (inHeader > 6) problems.push(`IA: ${inHeader} links in the header — the row fits six`);
 
   // A link nobody can be shown is a link nobody wrote on purpose. `navLevel` decides
   // whether the menu offers a route; it can never be *below* the level needed to use the

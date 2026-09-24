@@ -1,80 +1,10 @@
-/* LiczMat website — shared page wiring across all pages: mobile nav, the phone carousel,
+/* LiczMat website — shared page wiring across all pages: mobile nav,
    Play-Store click tracking and the consent banner. Everything is guarded, so each page
    runs only what it actually contains.
 
    The pages ship their copy as real HTML in their own language (scripts/build.mjs), so
    there is no text-swapping pass here any more — the language switcher lives in
    assets/i18n-runtime.js and navigates between per-language URLs. */
-
-// Hero phone mockup: real app screenshots that advance on their own and loop.
-// No prev/next controls by design — the screenshots are a picture of the app, not a
-// gallery somebody is meant to browse. What there is, since session 34, is a stop
-// button: WCAG 2.2.2 says movement that starts by itself and lasts more than five
-// seconds needs a way to stop it, and a keyboard user had none. It also honours
-// prefers-reduced-motion (first frame only, and then there is nothing to stop) and
-// stops while the tab is in the background.
-//
-// Wired per element rather than by id: /aplikacja/ carries two of these — the hero and
-// the banner at the foot of the page — and while they shared one id the second one never
-// moved and the markup was invalid twice over.
-function buildHeroCarousel(track) {
-  const slides = Array.from(track.children);
-  if (slides.length < 2) return;
-
-  const controls = track.closest(".hero-media, .cta-shots, .app-hero") || track.parentNode.parentNode;
-  const dots = controls ? controls.querySelector("[data-carousel-dots]") : null;
-  if (dots) dots.innerHTML = slides.map((_, i) => `<i class="${i ? "" : "on"}"></i>`).join("");
-  const marks = dots ? dots.querySelectorAll("i") : [];
-
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-  // A copy of the first frame placed after the last one turns the wrap-around
-  // into one more step forward instead of a visible rewind to the start.
-  track.appendChild(slides[0].cloneNode(true));
-
-  let i = 0;
-  const go = (n) => {
-    i = n;
-    track.style.transform = `translateX(-${i * 100}%)`;
-    marks.forEach((d, k) => d.classList.toggle("on", k === i % slides.length));
-  };
-  track.addEventListener("transitionend", () => {
-    if (i !== slides.length) return; // only when the clone is on screen
-    track.classList.add("instant");
-    track.style.transform = "translateX(0)";
-    void track.offsetWidth; // flush the jump so the next step animates again
-    track.classList.remove("instant");
-    i = 0;
-  });
-
-  let timer = null;
-  // `paused` is the visitor's decision and outranks everything else: a hidden tab stops
-  // the timer, but coming back must not restart what somebody switched off.
-  let paused = false;
-  const start = () => { if (!timer && !paused) timer = setInterval(() => go(i + 1), 3500); };
-  const stop = () => { clearInterval(timer); timer = null; };
-  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
-
-  const btn = controls ? controls.querySelector("[data-carousel-pause]") : null;
-  if (btn) {
-    btn.hidden = false;
-    btn.addEventListener("click", () => {
-      paused = !paused;
-      if (paused) stop(); else start();
-      btn.classList.toggle("paused", paused);
-      // The label says what pressing it does next, so it changes with the state. Both
-      // strings came from the build in this page's language (carouselControls() in
-      // src/pages.mjs); there is no dictionary in this file to get out of step.
-      btn.setAttribute("aria-label", btn.dataset[paused ? "labelPlay" : "labelPause"]);
-    });
-  }
-
-  start();
-}
-
-function buildHeroCarousels() {
-  document.querySelectorAll("[data-carousel]").forEach(buildHeroCarousel);
-}
 
 /**
  * The mobile navigation: a drawer under the header, on every page of the site.
@@ -90,7 +20,7 @@ function buildMobileNav() {
   if (!toggle || !links) return;
   const scrim = document.getElementById("nav-scrim");
   // One number, and it lives in assets/styles.css: the drawer's breakpoint moved from
-  // 900 px to 1060 px in session 32, because ten languages have to fit the row and the
+  // 900 px to 1060 px in session 32, because thirteen languages have to fit the row and the
   // Russian one needed 1033 px. Keep the two in step — a mismatch leaves the drawer open
   // as a plain row, or shuts a menu the visitor can still see.
   const desktop = window.matchMedia("(min-width: 1061px)");
@@ -192,7 +122,7 @@ function buildConsent() {
      banner instead. Session 43 measured it on device profiles: on an iPhone SE the
      banner is 200 px of a 568 px screen, and a tap on the middle of the calculator's
      first field focused nothing at all.
-     The height is measured rather than guessed: it is a sentence in ten languages over
+     The height is measured rather than guessed: it is a sentence in thirteen languages over
      a phone's width, and German is 256 px where Polish is 200. It follows a language
      switch, a rotation and a window resize for the same reason. */
   const room = () => {
@@ -373,7 +303,6 @@ document.addEventListener("DOMContentLoaded", () => {
   buildSaveFailed();
   if (typeof buildCalculators === "function") buildCalculators();
   if (typeof buildStoreFinder === "function") buildStoreFinder();
-  buildHeroCarousels();
   buildMobileNav();
   buildThemeToggle();
   trackStoreClicks();

@@ -1086,13 +1086,13 @@ head("15. /app/ carries the whole menu, in whatever language it is showing");
   // Until the owner reported it, this page had one link — "Kalkulatory", hard-coded in
   // Polish — so signing in emptied the menu.
   const labels = await page.$$eval(".nav-list a", (a) => a.map((e) => e.textContent.trim()));
-  eq("five links, the architecture's own", labels.length, 5);
+  eq("six links, the architecture's own", labels.length, 6);
   eq("in the architecture's order", labels.join(","),
-    "Kalkulatory,Materiały,Projekty,LiczMat Pro,Aplikacja");
+    "Kalkulatory,Materiały,Sklepy,Projekty,LiczMat Pro,Aplikacja");
 
   const hrefs = () => page.$$eval(".nav-list a", (a) => a.map((e) => e.getAttribute("href")));
   eq("and they point at the Polish pages", (await hrefs()).join(","),
-    "/kalkulatory/,/materialy/,/projekty/,/liczmat-pro/,/aplikacja/");
+    "/kalkulatory/,/materialy/,/sklepy/,/projekty/,/liczmat-pro/,/aplikacja/");
 
   // Translating the label is only half a menu: "Materialien" pointing at /materialy/ is a
   // link that lies. The build hands the page every language's address in window.LM_NAV.
@@ -1100,13 +1100,13 @@ head("15. /app/ carries the whole menu, in whatever language it is showing");
   await page.click('#lang-picker [data-lang="de"]');
   await page.waitForFunction(() => document.documentElement.lang === "de");
   const german = await page.$$eval(".nav-list a", (a) => a.map((e) => e.textContent.trim()));
-  // Four of the five translate; the fourth does not, because "LiczMat Pro" is a brand
+  // Five of the six translate; LiczMat Pro does not, because it is a brand
   // name and a product with ten names is ten products. Session 40 put it in this slot,
   // which "Poradniki" gave up — the guides are still LIVE and still in the footer.
   eq("the labels follow the language", german.join(","),
-    "Rechner,Materialien,Projekte,LiczMat Pro,Die App");
+    "Rechner,Materialien,Märkte,Projekte,LiczMat Pro,Die App");
   eq("and so do the addresses", (await hrefs()).join(","),
-    "/de/rechner/,/de/materialien/,/de/projekte/,/de/liczmat-pro/,/de/android-app/");
+    "/de/rechner/,/de/materialien/,/de/baumaerkte/,/de/projekte/,/de/liczmat-pro/,/de/android-app/");
   eq("no console error", page.lmErrors.join(" / "), "");
 
   // /p/<token> keeps the short list on purpose: it is a quote opened by somebody else's

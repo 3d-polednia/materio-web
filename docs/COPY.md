@@ -116,6 +116,18 @@ Dwa typy są listą, nie prozą, i mają budżet listy: `materials` to katalog 1
 `privacy` to polityka prywatności, która niesie dwie pełne wersje językowe w jednym pliku,
 bo Google Play wymaga jednego adresu.
 
+### §8 — stop slop: wygląd
+
+Reguła czyta wygenerowane strony we wszystkich trzynastu językach oraz arkusz stylów.
+Nie przepuszcza ozdobnych plakietek z kropką, karuzel, limonkowych banerów CTA, pasów
+statystyk ani poświaty `radial-gradient` poza blokiem tokenów. Pilnuje też, żeby obraz nie
+powtarzał się na jednej stronie, oficjalna plakietka Google Play odpowiadała językowi strony,
+a usunięty zrzut `pl_stores.webp` nie wrócił do publikowanego HTML.
+
+To zapis decyzji właściciela z 2026-09-24: „zrobić stop slop na całej stronie web i
+zapamiętać, żeby nigdy nie robić slop AI na web”. Nowy ozdobnik nie jest neutralny. Musi
+nieść informację albo znika.
+
 ---
 
 ## Czego te reguły **nie** robią

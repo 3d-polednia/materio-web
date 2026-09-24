@@ -487,17 +487,17 @@ head("6. images reserve their space and load when they are reached");
         /\bwidth="\d+"/.test(img) && /\bheight="\d+"/.test(img), img.slice(0, 90));
       check(`${w.file} image ${i + 1} decodes off the main thread`,
         img.includes('decoding="async"'), img.slice(0, 90));
-      // The first image on a page may be what the visitor came to see; the rest wait.
-      if (i > 0) {
+      // The first image and /aplikacja/'s hero screenshot are above the fold; the rest wait.
+      if (i > 0 && !img.includes('/assets/screens/pl_home.webp')) {
         check(`${w.file} image ${i + 1} waits to be scrolled to`, img.includes('loading="lazy"'),
           img.slice(0, 90));
       }
     });
   }
-  // Photographs are WebP; nothing on the site ships a JPEG or a PNG into a page body.
+  // Photographs are WebP. The official Google Play badges must remain Google's PNGs.
   for (const w of WEIGHED.values()) {
     check(`${w.file} shows no unconverted photograph`,
-      !/<img\b[^>]*src="[^"]+\.(jpe?g|png)"/.test(w.html));
+      !/<img\b[^>]*src="(?!\/assets\/badges\/google-play-[a-z]+\.png)[^"]+\.(jpe?g|png)"/.test(w.html));
   }
 }
 
