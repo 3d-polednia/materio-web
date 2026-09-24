@@ -608,6 +608,28 @@ head("6. a calculation on the narrowest phone there is");
   await ctx.close();
 }
 
+/* ------------------------------------------------------------------ 7. compact full footer */
+
+head("7. the full footer stays compact");
+for (const [width, ceiling] of [[390, 700], [1400, 260]]) {
+  const ctx = await context(width, 900);
+  const page = await open(ctx, urlHome("pl"));
+  const result = await page.evaluate(() => {
+    const footer = document.querySelector("footer.site");
+    const root = document.documentElement;
+    return {
+      height: Math.ceil(footer.getBoundingClientRect().height),
+      overflow: root.scrollWidth - root.clientWidth,
+    };
+  });
+  check(`footer at ${width}px is no taller than ${ceiling}px`, result.height <= ceiling,
+    `measured ${result.height}px`);
+  check(`footer at ${width}px does not cause horizontal overflow`, result.overflow <= 0,
+    `overflows by ${result.overflow}px`);
+  await page.close();
+  await ctx.close();
+}
+
 /* ------------------------------------------------------------------ the verdict */
 
 await browser.close();

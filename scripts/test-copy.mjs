@@ -490,7 +490,10 @@ const BUDGET = {
   materials: 2820, stores: 159, android: 519, projects: 952, estimate: 425,
   /* The widest /wyceny/ translation is Spanish at 638 words after the three add forms
      received visible labels; 640 leaves a two-word regression margin. */
-  clients: 524, jobs: 544, quotes: 640, calendar: 420, cookies: 637,
+  clients: 524, jobs: 544, quotes: 640, calendar: 420,
+  /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
+     printed the key name localStorage, which is three words in French; widest is French at 650. */
+  cookies: 650,
   /* Session 62, audit item H7, and 220 rather than the 180 it was measured at the same
      day: the owner's Gewerbe is registered in Germany, so the page went from a name and
      an address to the set §5 DDG asks for — postal address, telephone, USt-IdNr., the
@@ -733,6 +736,13 @@ const SLOP_PHRASES = [
   "ERP", "Kalendarz Google",
 ];
 const SLOP_STEMS = ["intuicyjn", "kompleksow", "nowoczesn"];
+const SLOP_BY_LANG = {
+  en: ["in your pocket", "all in one place", "not just", "ERP", "localStorage"],
+  de: ["in der Tasche", "alles an einem Ort", "nicht nur", "ERP", "localStorage"],
+  uk: ["у кишені", "в одному місці", "не лише", "ERP", "localStorage"],
+  cs: ["v kapse", "vše na jednom místě", "nejen", "ERP", "localStorage"],
+  fr: ["dans votre poche", "tout au même endroit", "pas seulement", "ERP", "localStorage"],
+};
 const phraseSlop = [];
 const inspectPhrases = (where, value) => {
   for (const phrase of SLOP_PHRASES) {
@@ -746,6 +756,14 @@ const inspectPhrases = (where, value) => {
 for (const [key, value] of Object.entries({ ...I18N.pl, ...I18N_PAGES.pl })) {
   if (typeof value === "string") inspectPhrases(`dictionary:${key}`, value);
 }
+for (const [lang, phrases] of Object.entries(SLOP_BY_LANG)) {
+  for (const [key, value] of Object.entries({ ...I18N[lang], ...I18N_PAGES[lang] })) {
+    if (typeof value !== "string") continue;
+    for (const phrase of phrases) {
+      if (word(value, phrase)) phraseSlop.push(`dictionary:${lang}.${key} → "${phrase}"`);
+    }
+  }
+}
 for (const page of PAGES.filter((x) => x.lang === "pl" || x.file === "index.html")) {
   let html;
   try { html = read(page.file); } catch { continue; }
@@ -758,7 +776,7 @@ for (const page of PAGES.filter((x) => x.lang === "pl" || x.file === "index.html
     if (heading.endsWith("?")) phraseSlop.push(`${page.file} → heading "${heading}"`);
   }
 }
-checkMany("Polish copy contains no banned phrase or question heading outside FAQ", phraseSlop,
+checkMany("copy contains no banned phrase or Polish question heading outside FAQ", phraseSlop,
   (x) => x);
 
 /* ------------------------------------------------------------------ the report */

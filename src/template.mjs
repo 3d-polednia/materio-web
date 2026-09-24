@@ -552,7 +552,7 @@ export function siteHeader(h) {
 }
 
 /**
- * The site footer. Four columns out of the same routes, then the language row and the
+ * The site footer. One compact row from the same routes, then the language row and the
  * legal line.
  *
  * The language row is the second half of the language selector: the header's picker is
@@ -599,25 +599,25 @@ export function siteFooter(f) {
   return `<footer class="site">
   <div class="wrap">
     <div class="foot-grid">
-      <div>
+      <div class="foot-brand">
         <div class="brand">${LOGO_MARK}<span>LiczMat</span></div>
         <p class="muted">${esc(t("foot_tagline"))}</p>
       </div>
-      <div>
+      <div class="foot-group">
         <h2>${esc(t("foot_product"))}</h2>
         <ul class="foot-product">
           ${column("product")}
           <li><a href="${urlHome(lang)}#faq">FAQ</a></li>
         </ul>
       </div>
-      <div>
+      <div class="foot-group">
         <h2>${esc(t("foot_account"))}</h2>
         <ul>
           ${column("account")}
           <li><a href="${PLAY_URL}" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
       </div>
-      <div>
+      <div class="foot-group foot-legal">
         <h2>${esc(t("foot_legal"))}</h2>
         <ul>
           <li><a href="${urlContact(lang)}">${esc(t("contactpage_title"))}</a></li>

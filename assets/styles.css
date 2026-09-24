@@ -1129,32 +1129,35 @@ a.lang-item:hover, button.lang-item:hover { background: var(--surface-alt); text
 /* ---------- Footer ---------- */
 footer.site {
   background: var(--surface-container); border-top: 1px solid var(--outline);
-  padding: var(--sp-12) 0 var(--sp-7); margin-top: var(--sp-5);
+  padding: var(--sp-4) 0 var(--sp-3); margin-top: var(--sp-5);
 }
-.foot-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: var(--sp-7); }
-footer .brand { margin-bottom: var(--sp-3); }
-footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--sp-2); }
+.foot-grid { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(0, 3fr) minmax(0, 1.2fr) minmax(0, 1.3fr); gap: var(--sp-4); align-items: start; }
+footer .brand { margin-bottom: var(--sp-2); }
+.foot-brand p { margin: 0; font-size: var(--fs-sm); }
+footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+footer li, footer a { min-height: var(--sp-6); }
+footer a { display: inline-flex; align-items: center; }
 footer a { color: var(--muted); }
 /* A column heading in the footer is an <h2> and looks like a label. It was an <h4>
    until session 34: the visual size was right and the level was not, so every page on
    the site went h2 → h4 and a screen reader's outline had a hole in it where the site
    map begins. Heading level is document structure; how big it looks is this rule. */
 footer h2 {
-  font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--track-wide);
-  color: var(--on-bg); margin: 0 0 var(--sp-3); font-weight: var(--fw-bold);
+  font-size: var(--fs-xs); color: var(--muted); margin: 0 0 var(--sp-2);
+  font-weight: var(--fw-semi);
 }
 /* The other half of the language selector. The header's picker is a menu somebody has
    to open; these are plain links, so they work with no script and a crawler follows them
    to the other three versions of this very page. */
-.foot-langs { margin-top: var(--sp-8); }
-.foot-langs ul { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-5); }
+.foot-langs { margin-top: var(--sp-3); }
+.foot-langs ul { gap: var(--sp-2) var(--sp-4); font-size: var(--fs-sm); }
 .foot-langs a { display: inline-flex; align-items: center; gap: var(--sp-2); }
 .foot-langs a[aria-current] { color: var(--on-bg); font-weight: var(--fw-semi); }
 
 .foot-bottom {
-  margin-top: var(--sp-5); padding-top: var(--sp-4); border-top: 1px solid var(--outline);
-  display: flex; flex-wrap: wrap; gap: var(--sp-3) var(--sp-5);
-  justify-content: space-between; color: var(--muted); font-size: var(--fs-sm);
+  margin-top: var(--sp-3); padding-top: var(--sp-3); border-top: 1px solid var(--outline);
+  display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4);
+  justify-content: space-between; color: var(--muted); font-size: var(--fs-xs);
 }
 
 /* ---------- Consent banner (GDPR)
@@ -2569,13 +2572,6 @@ a.chip:hover { text-decoration: none; }
    these blocks add room or take things away only where a component genuinely needs a
    second arrangement. */
 
-/* At 1280px the product list's thirteen links make one conspicuously tall footer column,
-   while two columns still leave roughly 160px per link column after the brand and the
-   other navigation groups have taken their share. */
-@media (min-width: 1280px) {
-  .foot-product { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-5); }
-}
-
 /* A 1400px viewport leaves about 1200px inside a public wrapper: enough for the
    dashboard's paired panels without stretching their rows excessively. */
 @media (min-width: 1400px) {
@@ -2642,7 +2638,7 @@ a.chip:hover { text-decoration: none; }
   .app-feature { grid-template-columns: 1fr; }
   .app-feature .app-shot { order: 2; }
   .stores-wrap { grid-template-columns: 1fr; }
-  .foot-grid { grid-template-columns: 1fr 1fr; }
+  .foot-grid { grid-template-columns: 1fr; }
   .calc-tool .calc { grid-template-columns: 1fr; gap: var(--sp-6); padding: var(--sp-6); }
   .calc-out { position: static; }
   .calc-how-grid { grid-template-columns: 1fr; }
@@ -2704,7 +2700,6 @@ a.chip:hover { text-decoration: none; }
   .app-install { padding: var(--sp-5); }
   .steps { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr; }
-  .foot-grid { grid-template-columns: 1fr; }
   .calc-link-go { display: none; }
   .search-row { flex-wrap: wrap; }
   .search-row .btn { width: 100%; }

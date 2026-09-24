@@ -34,7 +34,9 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { LANGS, HREFLANG, BUILD_LANGS } from "../src/site.mjs";
+import {
+  LANGS, HREFLANG, BUILD_LANGS, ENTITY, URL_PRIVACY, urlContact, urlCookies,
+} from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -117,6 +119,27 @@ head("0. the tree this suite is reading");
   const codes = new Set(LANGS.map((l) => HREFLANG[l]));
   checkAll("and it is one of the ten the site ships", PAGES,
     (page) => codes.has(page.lang), (page) => `${page.url} says lang="${page.lang}"`);
+}
+
+/* The full footer is also the site's legal route to the operator. Compact layout may
+   rearrange it, but it may not hide or drop any of the three legal destinations or the
+   operator identity required by audit H7. */
+head("0b. the full footer keeps its legal content");
+{
+  const full = PAGES.filter((page) => page.body.includes('class="foot-grid"'));
+  check("every generated full-footer page is covered", full.length === 520, `found ${full.length}`);
+  checkAll("contact, privacy and cookies stay linked in every full footer", full,
+    (page) => {
+      const lang = LANGS.find((code) => HREFLANG[code] === page.lang);
+      return lang && page.body.includes(`href="${urlContact(lang)}"`)
+        && page.body.includes(`href="${URL_PRIVACY}"`)
+        && page.body.includes(`href="${urlCookies(lang)}"`)
+        && /<div class="foot-group foot-legal">\s*<h2>[^<]+<\/h2>/.test(page.body);
+    }, (page) => page.url);
+  checkAll("operator name, address and e-mail stay in every full footer", full,
+    (page) => page.body.includes(ENTITY.name) && page.body.includes(ENTITY.address)
+      && page.body.includes(`mailto:${ENTITY.email}`) && page.body.includes(ENTITY.email),
+    (page) => page.url);
 }
 
 /* ------------------------------------------------------------------ 1. landmarks */
