@@ -466,15 +466,31 @@ head("7. the language picker, the currency selector, the theme toggle");
 
 /* ------------------------------------------------------------------ 8. static app screenshots */
 
-head("8. the app screenshots stay still");
+head("8. the app screenshots stay still, in the page's language and in both themes");
 {
-  const appPages = PAGES.filter((page) => /class="hero app-hero"/.test(page.body));
+  const appPages = PAGES.filter((page) => /class="app-hero-b"/.test(page.body));
   check("the app page exists in every language", appPages.length === LANGS.length, `${appPages.length} pages`);
   checkAll("none starts an automatic carousel", appPages,
     (page) => !page.body.includes("data-carousel") && !page.body.includes("data-carousel-pause"),
     (page) => page.url);
-  checkAll("each has three static app screenshots", appPages,
-    (page) => (page.body.match(/<img src="\/assets\/screens\/pl_(?:home|calc|project)\.webp"/g) || []).length === 3,
+  /* Session W, variant B: four phones, and every phone carries the screenshot for a light
+     page and the one for a dark page, so eight images, each once. The owner's rule: the
+     Polish page shows the Polish app, every other language the English one. */
+  const shotsOf = (page) => [...page.body.matchAll(
+    /<img class="for-(light|dark) app-([ld])" src="\/assets\/screens\/([a-z]{2})_([a-z]+)(_dark)?\.webp"/g)];
+  checkAll("four phones, each with a light and a dark screenshot, each once", appPages, (page) => {
+    const shots = shotsOf(page);
+    return shots.length === 8 && new Set(shots.map((m) => m[0])).size === 8
+      && (page.body.match(/<figure class="app-device /g) || []).length === 4;
+  }, (page) => `${page.url}: ${shotsOf(page).length} screenshots`);
+  checkAll("Polish screenshots on the Polish page, English ones everywhere else", appPages, (page) => {
+    const want = page.lang === "pl" ? "pl" : "en";
+    return shotsOf(page).every((m) => m[3] === want);
+  }, (page) => page.url);
+  checkAll("an image's class says which app theme it is", appPages,
+    (page) => shotsOf(page).every((m) => (m[2] === "d") === Boolean(m[5])), (page) => page.url);
+  checkAll("the hero's back phone shows the app in the page's opposite theme", appPages,
+    (page) => /app-device-back"><span class="app-screen"><img class="for-light app-d" src="[^"]+_dark\.webp"[^>]*><img class="for-dark app-l" src="(?![^"]*_dark)[^"]+\.webp"/.test(page.body),
     (page) => page.url);
   const main = read("assets/main.js");
   check("the shared script contains no carousel wiring",

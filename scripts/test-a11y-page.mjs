@@ -504,14 +504,28 @@ head("9. the material dialog");
 
 /* ------------------------------------------------------------------ 10. static app screenshots */
 
-head("10. the app screenshots are static");
+head("10. the app screenshots are static and follow the page's theme");
 {
   const ctx = await context();
   const page = await open(ctx, "/aplikacja/");
-  eq("the page has three screenshots", await page.locator(".app-shot img").count(), 3);
+  eq("the page has four phones", await page.locator(".app-device").count(), 4);
   eq("it has no carousel controls", await page.locator("[data-carousel], [data-carousel-pause]").count(), 0);
-  const sources = await page.locator(".app-shot img").evaluateAll((imgs) => imgs.map((img) => img.getAttribute("src")));
-  check("each screenshot appears once", new Set(sources).size === 3, sources.join(", "));
+  const shown = (sel) => page.locator(sel).evaluateAll((imgs) =>
+    imgs.filter((img) => getComputedStyle(img).display !== "none").map((img) => img.getAttribute("src")));
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
+    const all = await shown(".app-screen img");
+    eq(`${theme} page: one screenshot shows per phone`, all.length, 4);
+    const front = await shown(".app-device-front img");
+    const back = await shown(".app-device-back img");
+    check(`${theme} page: the front phone shows the app in the page's theme`,
+      front.length === 1 && /_dark\.webp$/.test(front[0]) === (theme === "dark"), front.join(", "));
+    check(`${theme} page: the back phone shows the other theme`,
+      back.length === 1 && /_dark\.webp$/.test(back[0]) === (theme === "light"), back.join(", "));
+    const lower = await shown(".app-device-work img, .app-device-shop img");
+    check(`${theme} page: the sections below the hero follow the page`,
+      lower.length === 2 && lower.every((src) => /_dark\.webp$/.test(src) === (theme === "dark")), lower.join(", "));
+  }
   await ctx.close();
 }
 

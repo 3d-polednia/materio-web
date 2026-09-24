@@ -1038,52 +1038,83 @@ export function androidMain(lang, t, calcs, cat) {
     t("apppage_fact_langs").replace("{langs}", LANGS.length).replace("{cur}", CURRENCIES.length),
     t("apppage_fact_sync"),
   ];
+
+  /* The screenshots are rendered from the app's own code (WebHeroShotsTest and
+     WebHeroShotsDarkTest in the Materio repo, converted by its scripts/web-screens.py).
+     The owner's rule of 2026-09-24: the Polish page shows the Polish app, every other
+     language shows the English one. */
+  const shotLang = lang === "pl" ? "pl" : "en";
+  const src = (name, dark) => `/assets/screens/${shotLang}_${name}${dark ? "_dark" : ""}.webp`;
+
+  /* One phone carries two screenshots: the one for a light page (.for-light) and the one
+     for a dark page (.for-dark), and the stylesheet shows the one that matches the page's
+     theme, script or no script. `swap` shows the app in the OPPOSITE theme — only the
+     hero's back phone does that, so the hero shows the app in both of its themes at once.
+     A hidden <img loading="lazy"> is never fetched. */
+  const device = (name, altKey, cls, swap = false) => {
+    const img = (dark, forCls) => `<img class="${forCls} ${dark ? "app-d" : "app-l"}" src="${src(name, dark)}" width="618" height="1340" alt="${esc(t(altKey))}" loading="lazy" decoding="async">`;
+    return `<figure class="app-device ${cls}"><span class="app-screen">${img(swap, "for-light")}${img(!swap, "for-dark")}</span></figure>`;
+  };
+  const dim = shotLang === "pl" ? "3,40 m" : "3.40 m";
+
   const main = `<main id="main" tabindex="-1">
-  <section class="hero app-hero" aria-labelledby="app-h">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <h1 id="app-h">${esc(t("apppage_title"))}</h1>
-        <p class="lead">${esc(t("apppage_lead"))}</p>
-        <div class="store-badges">
-          ${playBadge(lang, "apppage")}
-          <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("apppage_web_link"))}</a>
+  <section class="app-hero-b" aria-labelledby="app-h">
+    <div class="wrap">
+      <div class="app-stage">
+        <div class="app-stage-copy">
+          <h1 id="app-h">${esc(t("apppage_title"))}</h1>
+          <p class="lead">${esc(t("apppage_lead"))}</p>
+          <div class="store-badges">
+            ${playBadge(lang, "apppage")}
+            <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("apppage_web_link"))}</a>
+          </div>
+          <ul class="app-facts">${facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
         </div>
-        <ul class="app-facts">${facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
-      </div>
-      <figure class="app-shot"><img src="/assets/screens/pl_home.webp" width="618" height="1340" alt="${esc(t("shot_home"))}" decoding="async"></figure>
-    </div>
-  </section>
-
-  <section class="block alt" aria-labelledby="appresult-h">
-    <div class="wrap app-feature">
-      <figure class="app-shot"><img src="/assets/screens/pl_calc.webp" width="618" height="1340" alt="${esc(t("shot_calc"))}" loading="lazy" decoding="async"></figure>
-      <div>
-        <h2 id="appresult-h">${esc(t("apppage_h_result"))}</h2>
-        <p>${esc(t("apppage_result_d"))}</p>
-        <ul class="app-list"><li>${esc(t("f_calc_t"))}</li><li>${esc(t("f_optim_t"))}</li><li>${esc(t("f_catalog_t"))}</li><li>${esc(t("af_converter_t"))}</li></ul>
+        <div class="app-stage-media">
+          ${device("projects", "shot_projects", "app-device-back", true)}
+          ${device("home", "shot_home", "app-device-front")}
+          <p class="app-float app-float-hero"><span class="app-float-k">${esc(t("apppage_ex_k"))}</span><b>${esc(t("apppage_ex_v"))}</b><span class="app-float-a">${esc(t("apppage_ex_a"))}</span></p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="block" aria-labelledby="appproject-h">
-    <div class="wrap app-feature">
-      <div>
-        <h2 id="appproject-h">${esc(t("apppage_h_project"))}</h2>
-        <p>${esc(t("apppage_project_d"))}</p>
-        <ul class="app-list"><li>${esc(t("f_rooms_t"))}</li><li>${esc(t("af_sync_t"))}</li><li>${esc(t("f_stores_t"))}</li><li><a href="${urlLiczmatPro(lang)}">${esc(t("apppage_pro_line"))}</a></li></ul>
+  <div class="block app-steps-block">
+    <div class="wrap">
+      <ol class="app-steps">
+        ${[1, 2, 3, 4].map((n) => `<li><span class="app-step-n" aria-hidden="true">0${n}</span><b>${esc(t(`apppage_s${n}_t`))}</b><span>${esc(t(`apppage_s${n}_d`))}</span></li>`).join("\n        ")}
+      </ol>
+    </div>
+  </div>
+
+  <section class="block" aria-labelledby="appresult-h">
+    <div class="wrap">
+      <div class="app-pane app-calc">
+        <div class="app-calc-copy">
+          <h2 id="appresult-h">${esc(t("apppage_h_result"))}</h2>
+          <p>${esc(t("apppage_result_d"))}</p>
+          <ul class="app-list"><li>${esc(t("f_calc_t"))}</li><li>${esc(t("f_optim_t"))}</li><li>${esc(t("f_catalog_t"))}</li><li>${esc(t("af_converter_t"))}</li></ul>
+          <p class="app-buy"><span class="app-float-k">${esc(t("apppage_buy_k"))}</span> <b>${esc(t("apppage_buy_v"))}</b> <span class="app-float-a">${esc(t("apppage_buy_w"))}</span></p>
+        </div>
+        <div class="app-work">
+          <span class="app-dim" aria-hidden="true"><span>${dim}</span></span>
+          ${device("calcform", "shot_calcform", "app-device-work")}
+        </div>
       </div>
-      <figure class="app-shot"><img src="/assets/screens/pl_project.webp" width="618" height="1340" alt="${esc(t("shot_project"))}" loading="lazy" decoding="async"></figure>
     </div>
   </section>
 
-  <section class="block alt" aria-labelledby="appweb-h">
-    <div class="wrap narrow">
-      <h2 id="appweb-h">${esc(t("apppage_h_web"))}</h2>
-      <p>${esc(t("apppage_web_d"))}</p>
-      <p class="ws-links">
-        <a href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-        <a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>
-      </p>
+  <section class="block" aria-labelledby="appshop-h">
+    <div class="wrap app-shop">
+      <div class="app-shop-copy">
+        <h2 id="appshop-h">${esc(t("apppage_h_shop"))}</h2>
+        <p>${esc(t("apppage_shop_d"))}</p>
+        <ul class="app-list"><li>${esc(t("apppage_shop_1"))}</li><li>${esc(t("apppage_shop_2"))}</li><li>${esc(t("apppage_shop_3"))}</li><li><a href="${urlLiczmatPro(lang)}">${esc(t("apppage_shop_pro"))}</a></li></ul>
+      </div>
+      <div class="app-shop-media">
+        <div class="app-pane app-shop-card">${device("shopping", "shot_shopping", "app-device-shop")}</div>
+        <p class="app-float app-float-row"><span class="app-box" aria-hidden="true"></span><span><b>${esc(t("apppage_row_t"))}</b><span class="app-float-a">${esc(t("apppage_row_d"))}</span></span></p>
+      </div>
     </div>
   </section>
 
@@ -1116,8 +1147,8 @@ export function androidMain(lang, t, calcs, cat) {
     installUrl: PLAY_URL,
     description: t("apppage_lead"),
     offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
-    screenshot: ["pl_home.webp", "pl_calc.webp", "pl_project.webp"]
-      .map((f) => `${BASE_URL}/assets/screens/${f}`),
+    screenshot: ["home", "projects", "calcform", "shopping"]
+      .map((f) => `${BASE_URL}${src(f, false)}`),
   }];
   return { main, ld };
 }

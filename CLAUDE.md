@@ -107,9 +107,12 @@ not, leave it out.
   „ten sam…", „w kieszeni", „w jednym miejscu", no jargon a builder does not use (ERP,
   localStorage, port 1:1). Say a fact once per page. Never promise on a free level what
   `LM_FEATURES` in `assets/plan.js` puts in Pro (prices, costs, PDF, quotes).
-- **App screenshots** come from the app's code — `WebHeroShotsTest` in the Materio repo,
-  converted by its `scripts/web-screens.py` — never from a mockup. Re-record them when the
-  app changes.
+- **App screenshots** come from the app's code — `WebHeroShotsTest` and `WebHeroShotsDarkTest`
+  in the Materio repo, converted by its `scripts/web-screens.py` — never from a mockup.
+  Re-record them when the app changes. /aplikacja/ (variant B, owner's pick 2026-09-24) shows
+  them in a CSS Android frame (`.app-device`): every phone carries a light and a dark
+  screenshot and shows the one matching the page's theme, the hero's back phone the
+  opposite one; the Polish page uses `pl_*`, every other language `en_*`.
 - `scripts/test-copy.mjs` §8 (the look) and §10 (the phrases) enforce what a machine can
   see; `docs/COPY.md` carries the argument. Screenshot every visible change at 1400 px and
   390 px before committing — green tests have passed visible breakage here before.
