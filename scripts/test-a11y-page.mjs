@@ -165,6 +165,7 @@ async function context(opts = {}) {
     reducedMotion: opts.reducedMotion,
     colorScheme: opts.colorScheme,
   });
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {} });
   // Nothing on this site may reach the network.
   await ctx.route("**", (route) =>
     (route.request().url().startsWith(base) ? route.continue() : route.abort()));
@@ -192,6 +193,7 @@ async function open(ctx, url, opts = {}) {
   await page.goto(`${base}/404.html`, { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
     localStorage.clear();
+    localStorage.setItem("materio-lang-banner-dismissed", "1");
     Object.entries(entries).forEach(([k, v]) => { if (v) localStorage.setItem(k, v); });
   }, plant);
 

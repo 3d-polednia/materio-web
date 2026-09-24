@@ -501,6 +501,33 @@ for (const [lang, { verb, subject }] of Object.entries(A5_VERB)) {
     html ? "cs/index.html still says \"Vše popisuje\"" : "cs/index.html is not built");
 }
 
+/* ------------------------------------------------------------------ §10 language banner copy */
+
+head("§10 the language suggestion banner has complete local copy");
+{
+  const src = read("assets/i18n-runtime.js");
+  const match = src.match(/const LANG_BANNER = (\{[\s\S]*?\n\});/);
+  const banners = match ? new Function(`${match[0]}\nreturn LANG_BANNER;`)() : {};
+  check("LANG_BANNER carries all thirteen languages",
+    LANGS.every((lang) => Object.hasOwn(banners, lang)),
+    `missing: ${LANGS.filter((lang) => !Object.hasOwn(banners, lang)).join(", ") || "none"}`);
+  check("LANG_BANNER carries no extra languages",
+    Object.keys(banners).every((lang) => LANGS.includes(lang)),
+    `extra: ${Object.keys(banners).filter((lang) => !LANGS.includes(lang)).join(", ") || "none"}`);
+  checkAll("every banner has non-empty text, cta and close strings", LANGS,
+    (lang) => ["text", "cta", "close"].every((key) =>
+      banners[lang] && typeof banners[lang][key] === "string" && banners[lang][key].trim().length > 0),
+    (lang) => lang);
+  check("Polish banner copy is exact",
+    JSON.stringify(banners.pl) === JSON.stringify({
+      text: "Ta strona jest też dostępna po polsku.", cta: "Przejdź na polską wersję", close: "Zamknij",
+    }));
+  check("English banner copy is exact",
+    JSON.stringify(banners.en) === JSON.stringify({
+      text: "This page is also available in English.", cta: "Switch to English", close: "Close",
+    }));
+}
+
 /* ------------------------------------------------------------------ the report */
 
 if (failures.length) {

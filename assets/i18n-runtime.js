@@ -89,6 +89,98 @@ function chosenLang() {
   try { return localStorage.getItem("materio-lang") || ""; } catch (e) { return ""; }
 }
 
+function detectBrowserLang() {
+  const languages = navigator.languages && navigator.languages.length
+    ? navigator.languages : [navigator.language];
+  for (let i = 0; i < languages.length; i++) {
+    const code = String(languages[i] || "").slice(0, 2).toLowerCase();
+    if (langOffered(code)) return code;
+  }
+  return "";
+}
+
+const LANG_BANNER = {
+  pl: { text: "Ta strona jest też dostępna po polsku.", cta: "Przejdź na polską wersję", close: "Zamknij" },
+  uk: { text: "Ця сторінка також доступна українською мовою.", cta: "Перейти на українську версію", close: "Закрити" },
+  de: { text: "Diese Seite ist auch auf Deutsch verfügbar.", cta: "Zur deutschen Version wechseln", close: "Schließen" },
+  en: { text: "This page is also available in English.", cta: "Switch to English", close: "Close" },
+  cs: { text: "Tato stránka je k dispozici také v češtině.", cta: "Přejít na českou verzi", close: "Zavřít" },
+  sk: { text: "Táto stránka je dostupná aj v slovenčine.", cta: "Prejsť na slovenskú verziu", close: "Zavrieť" },
+  ro: { text: "Această pagină este disponibilă și în limba română.", cta: "Treci la versiunea în română", close: "Închide" },
+  hr: { text: "Ova je stranica dostupna i na hrvatskom jeziku.", cta: "Prijeđi na hrvatsku verziju", close: "Zatvori" },
+  sr: { text: "Ova stranica je dostupna i na srpskom jeziku.", cta: "Pređi na srpsku verziju", close: "Zatvori" },
+  it: { text: "Questa pagina è disponibile anche in italiano.", cta: "Passa alla versione italiana", close: "Chiudi" },
+  nl: { text: "Deze pagina is ook beschikbaar in het Nederlands.", cta: "Ga naar de Nederlandse versie", close: "Sluiten" },
+  es: { text: "Esta página también está disponible en español.", cta: "Cambiar a la versión en español", close: "Cerrar" },
+  fr: { text: "Cette page est également disponible en français.", cta: "Passer à la version française", close: "Fermer" },
+};
+
+function bannerDismissed() {
+  try { return localStorage.getItem("materio-lang-banner-dismissed") === "1"; } catch (e) { return true; }
+}
+
+function renderLangBanner(code, href) {
+  const copy = LANG_BANNER[code];
+  const banner = document.createElement("div");
+  banner.id = "lang-suggest";
+  banner.className = "lang-suggest-banner";
+  banner.setAttribute("role", "status");
+  banner.lang = code;
+
+  const message = document.createElement("p");
+  message.className = "lang-suggest-text";
+  message.textContent = copy.text;
+
+  const actions = document.createElement("div");
+  actions.className = "lang-suggest-actions";
+  const link = document.createElement("a");
+  link.className = "btn btn-primary btn-sm";
+  link.href = href;
+  link.hreflang = code;
+  link.lang = code;
+  link.textContent = copy.cta;
+  const close = document.createElement("button");
+  close.className = "lang-suggest-close";
+  close.type = "button";
+  close.setAttribute("aria-label", copy.close);
+  close.textContent = "×";
+  actions.appendChild(link);
+  actions.appendChild(close);
+  banner.appendChild(message);
+  banner.appendChild(actions);
+  document.body.appendChild(banner);
+
+  const room = () => {
+    const h = banner.isConnected ? banner.getBoundingClientRect().height : 0;
+    // bottom already includes --consent-h, which body padding counts on its own.
+    const consent = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--consent-h")) || 0;
+    const gap = h ? (parseFloat(getComputedStyle(banner).bottom) || 0) - consent : 0;
+    document.documentElement.style.setProperty("--langsuggest-h", h ? Math.ceil(h + gap) + "px" : "0px");
+  };
+  const dismiss = () => {
+    try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {}
+  };
+  close.addEventListener("click", () => {
+    dismiss();
+    banner.remove();
+    room();
+  });
+  link.addEventListener("click", () => {
+    dismiss();
+    try { localStorage.setItem("materio-lang", code); } catch (e) {}
+  });
+  room();
+  if (typeof ResizeObserver === "function") new ResizeObserver(room).observe(banner);
+  else window.addEventListener("resize", room);
+}
+
+function suggestBrowserLang(alternates, here) {
+  if (bannerDismissed()) return;
+  const code = detectBrowserLang();
+  if (!code || code === here || !alternates[code] || !LANG_BANNER[code]) return;
+  renderLangBanner(code, alternates[code] + langQuery());
+}
+
 /**
  * In-place translation, used only by the pages that have no per-language URLs: /app/,
  * /app/dashboard/ and /p/. They are noindex, so there is nothing for a crawler to miss.
@@ -321,7 +413,7 @@ function buildLangPicker() {
       sessionStorage.setItem("materio-redirected", "1");
     } catch (e) { redirected = "1"; }
     if (!redirected) window.location.replace(alternates[wanted] + langQuery());
-  }
+  } else if (!wanted) suggestBrowserLang(alternates, here);
 }
 
 document.addEventListener("DOMContentLoaded", buildLangPicker);

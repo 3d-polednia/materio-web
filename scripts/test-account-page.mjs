@@ -118,6 +118,7 @@ const browser = await chromium.launch(exe ? { executablePath: exe } : {});
 /** A context that cannot leave the machine, and answers the Firebase imports itself. */
 async function context(options) {
   const ctx = await browser.newContext(options);
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {} });
   await ctx.route("**", (route) => {
     const url = route.request().url();
     if (url.includes("/firebasejs/") && url.endsWith("firebase-app.js")) {

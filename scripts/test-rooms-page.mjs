@@ -157,6 +157,7 @@ const browser = await chromium.launch(exe ? { executablePath: exe } : {});
 
 async function context(options) {
   const ctx = await browser.newContext(options);
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {} });
   await ctx.route("**", (route) =>
     (route.request().url().startsWith(base) ? route.continue() : route.abort()));
   return ctx;
@@ -178,6 +179,7 @@ async function open(ctx, url, opts = {}) {
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
     localStorage.clear();
+    localStorage.setItem("materio-lang-banner-dismissed", "1");
     Object.entries(entries).forEach(([k, v]) => { if (v) localStorage.setItem(k, v); });
   }, plant);
 
@@ -669,6 +671,7 @@ head("5e. the Projekty link is offered to an account and shipped to everybody");
   await member.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await member.evaluate(() => {
     localStorage.clear();
+    localStorage.setItem("materio-lang-banner-dismissed", "1");
     localStorage.setItem("materio-lang", "pl");
     localStorage.setItem("liczmat-signed-in", "liczmat");
   });
@@ -694,6 +697,7 @@ head("5e. the Projekty link is offered to an account and shipped to everybody");
   await noAccountJs.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await noAccountJs.evaluate(() => {
     localStorage.clear();
+    localStorage.setItem("materio-lang-banner-dismissed", "1");
     localStorage.setItem("materio-lang", "pl");
     localStorage.setItem("liczmat-signed-in", "liczmat");
   });

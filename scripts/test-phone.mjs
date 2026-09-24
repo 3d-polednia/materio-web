@@ -154,6 +154,7 @@ async function device(name) {
   const d = devices[name];
   if (!d) throw new Error(`Playwright has no device profile "${name}"`);
   const ctx = await browser.newContext({ ...d });
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {} });
   await ctx.route("**", (route) =>
     (route.request().url().startsWith(base) ? route.continue() : route.abort()));
   return ctx;

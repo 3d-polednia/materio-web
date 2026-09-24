@@ -191,6 +191,7 @@ const phone = (page) => page.viewportSize().width <= 560;
 /** Nothing on this site may reach the network, and a phone test least of all. */
 async function context(width, height = 780) {
   const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 2 });
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {} });
   await ctx.route("**", (route) =>
     (route.request().url().startsWith(base) ? route.continue() : route.abort()));
   return ctx;
@@ -223,6 +224,7 @@ async function open(ctx, url, opts = {}) {
   await page.goto(`${base}/404.html`, { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
     localStorage.clear();
+    localStorage.setItem("materio-lang-banner-dismissed", "1");
     Object.entries(entries).forEach(([k, v]) => { if (v) localStorage.setItem(k, v); });
   }, plant);
 

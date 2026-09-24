@@ -132,6 +132,7 @@ const browser = await chromium.launch(exe ? { executablePath: exe } : {});
 
 async function context(options) {
   const ctx = await browser.newContext({ timezoneId: TZ, ...options });
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {} });
   await ctx.route("**", (route) =>
     (route.request().url().startsWith(base) ? route.continue() : route.abort()));
   return ctx;
@@ -158,6 +159,7 @@ async function open(ctx, url, opts = {}) {
   await page.goto(`${base}/404.html`, { waitUntil: "domcontentloaded" });
   await page.evaluate((lang) => {
     localStorage.clear();
+    localStorage.setItem("materio-lang-banner-dismissed", "1");
     if (lang) localStorage.setItem("materio-lang", lang);
   }, opts.lang === undefined ? "pl" : opts.lang);
 

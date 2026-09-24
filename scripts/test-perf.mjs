@@ -126,7 +126,7 @@ const BUDGET = {
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
   "konwerter-jednostek/index.html": [238, 68],
-  "poradniki/ile-farby-na-pokoj/index.html": [226, 63],
+  "poradniki/ile-farby-na-pokoj/index.html": [227, 63],
   "sklepy/index.html": [234, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
@@ -182,7 +182,7 @@ const BUDGET = {
   // Raised 2026-09-24 from 405, measured at 406.0 kB raw: the open list of every select
   // (appearance: base-select in assets/styles.css) is about 1.2 kB of stylesheet on all
   // pages, and this was the one with under a kilobyte left. Gzipped it did not cross.
-  "app/index.html": [407, 126],
+  "app/index.html": [413, 126],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.

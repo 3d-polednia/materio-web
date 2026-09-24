@@ -132,6 +132,7 @@ const PLAIN = account("ktos@example.com", null);
  */
 async function context(options) {
   const ctx = await browser.newContext(options);
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {} });
   ctx.__adminFetches = 0;
   await ctx.route("**", (route) => {
     const url = route.request().url();

@@ -128,6 +128,7 @@ const browser = await chromium.launch(exe ? { executablePath: exe } : {});
  */
 async function context(options) {
   const ctx = await browser.newContext(options);
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); } catch (e) {} });
   await ctx.route("**", (route) => {
     if (route.request().url().startsWith(base)) return route.continue();
     return route.abort();
@@ -391,6 +392,7 @@ head("nagłówek");
         await page.goto(`${base}/404.html`, { waitUntil: "domcontentloaded" });
         await page.evaluate((on) => {
           localStorage.clear();
+          localStorage.setItem("materio-lang-banner-dismissed", "1");
           if (on) localStorage.setItem("liczmat-signed-in", "liczmat");
         }, signedIn);
         await page.goto(base + urlHome(lang), { waitUntil: "load" });
