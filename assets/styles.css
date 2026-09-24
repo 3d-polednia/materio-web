@@ -83,7 +83,9 @@
   --outline: #e0dacd;
   --outline-strong: #cbc4b4;
   --outline-control: #898375;
-  --field-bg: #fbf9f4;
+  /* A field is filled a step off the card — --surface-alt's value in both themes. It
+     used to be a well darker than the card in the dark theme, which read as a hole. */
+  --field-bg: #f3efe5;
   --error: #b3261e;
   --error-soft: #fbe7e5;
   --on-error-soft: #7d1a14;
@@ -144,7 +146,7 @@
     --outline: #202932;
     --outline-strong: #2d3236;
     --outline-control: #707880;
-    --field-bg: #080f16;
+    --field-bg: #111a22;
     --error: #ff8a80;
     --error-soft: #3a1512;
     --on-error-soft: #ffb4ab;
@@ -196,7 +198,7 @@
   --outline: #202932;
   --outline-strong: #2d3236;
   --outline-control: #707880;
-  --field-bg: #080f16;
+  --field-bg: #111a22;
   --error: #ff8a80;
   --error-soft: #3a1512;
   --on-error-soft: #ffb4ab;
@@ -235,8 +237,9 @@
    --sp-3 is 12px, --sp-6 is 24px. Nothing on the site uses a gap that is not on
    this scale, which is what makes rhythm survive a new component.
 
-   RADIUS — xs for inputs and small rows, sm for chips and tiles, md (--radius)
-   for cards, lg for the big panels, pill for buttons and anything track-shaped.
+   RADIUS — xs for small rows and a field inside a table cell, sm for chips and
+   tiles, md (--radius) for cards and a textarea, lg for the big panels, pill for
+   buttons, fields and anything track-shaped.
 
    ELEVATION — three steps. 1 lifts a row off its background, 2 is the resting
    card, 3 is "floating above the page": menus, dialogs, hover on a card.
@@ -306,7 +309,9 @@
   --control-h: 44px;
   --control-h-sm: 36px;
   --control-h-lg: 52px;
-  --control-px: 14px;
+  /* A field's side padding. 20px because a field is a pill: at 14px the first letter
+     sat inside the rounded end. */
+  --control-px: 20px;
 
   --focus: var(--accent-strong);
   --focus-w: 2px;
@@ -622,14 +627,22 @@ section.block > .wrap > p { max-width: var(--measure); }
    44 px tap target the token block declares, and under 16 px is exactly what makes iOS
    Safari zoom the page the moment a finger lands in the field.
 
-   A checkbox and a radio keep their native box; nothing else on this site wants one. */
+   A checkbox and a radio keep their native box; nothing else on this site wants one.
+
+   A field is a pill, the shape of every button and chip beside it, so a form reads as
+   one set of controls rather than buttons next to boxes. A textarea holds several lines
+   and a pill cannot, so it takes the card's corner. */
 input:not([type="checkbox"]):not([type="radio"]), select, textarea {
   font: inherit; font-size: var(--fs-base); line-height: var(--lh-snug);
   min-height: var(--control-h); padding: var(--sp-2) var(--control-px);
-  border-radius: var(--radius-xs); border: 1px solid var(--outline-control);
+  border-radius: var(--radius-pill); border: 1px solid var(--outline-control);
   background: var(--field-bg); color: var(--on-surface);
   transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  /* A field with no width of its own is as wide as its cols or size attribute, and the
+     pill's wider padding pushed the project form's note 6px past a 430px screen. */
+  max-width: 100%;
 }
+textarea { border-radius: var(--radius); }
 /* Which of them fill their line. This stayed a list when the rule above stopped being
    one: a field in a form takes the width of the form, and a control in a row — the
    currency select in the header, a quantity beside a unit — takes the width of what it
@@ -646,9 +659,20 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea {
 input:not([type="checkbox"]):not([type="radio"]):hover, select:hover, textarea:hover {
   border-color: var(--on-surface);
 }
+/* A field in use wears the focus ring flush with its border and a soft halo beyond
+   it, instead of the ring a button gets 2px off: off a pill that read as a second
+   outline. The ring itself stays a real outline — the halo is a shadow, which forced
+   colours drops, and scripts/test-a11y-page.mjs asks every stop for a 2px ring. */
 input:not([type="checkbox"]):not([type="radio"]):focus-visible,
 select:focus-visible, textarea:focus-visible {
-  border-color: var(--accent);
+  outline: var(--focus-w) solid var(--focus); outline-offset: 0;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 calc(var(--focus-w) + 3px) color-mix(in srgb, var(--focus) 25%, transparent);
+}
+input:not([type="checkbox"]):not([type="radio"])[aria-invalid="true"]:focus-visible,
+select[aria-invalid="true"]:focus-visible, textarea[aria-invalid="true"]:focus-visible {
+  outline-color: var(--error);
+  box-shadow: 0 0 0 calc(var(--focus-w) + 3px) color-mix(in srgb, var(--error) 25%, transparent);
 }
 /* A select's arrow is drawn by the page, not the operating system, so the field looks
    the same on Windows, a Mac and a phone, and matches the chevron the header's pickers
@@ -716,10 +740,15 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
       & option:hover { background: var(--surface-alt); }
       & option:focus-visible { outline-offset: calc(var(--focus-w) * -1); }
       & option:checked { background: var(--accent-soft); }
+      /* A project's name heads its rooms the way the pages head a section — the
+         uppercase label of "KLIENT" and "DO KUPIENIA" — with a rule between projects and
+         the rooms set in under it. In muted grey at 14 px it read as one more row. */
       & optgroup {
-        padding-top: var(--sp-2);
-        font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--muted);
+        margin-top: var(--sp-2); padding-top: var(--sp-3); border-top: 1px solid var(--outline);
+        font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--accent-strong);
+        text-transform: uppercase; letter-spacing: var(--track-wide);
       }
+      & optgroup option { text-transform: none; letter-spacing: normal; padding-left: var(--sp-5); }
     }
   }
 }
@@ -2135,9 +2164,13 @@ a.chip:hover { text-decoration: none; }
 }
 
 /* An estimate line opened for correction: the cells become inputs in place, so the
-   row keeps its position and the table keeps its column widths. */
+   row keeps its position and the table keeps its column widths. A cell's field keeps a
+   box corner: a pill 5.5em wide spends its ends on rounding the digits need. */
 .ws-row-actions { display: flex; gap: var(--sp-2); justify-content: flex-end; }
-.ws-editing input { min-height: var(--control-h-sm); padding: var(--sp-1) var(--sp-2); font-size: var(--fs-sm); }
+.ws-editing input {
+  min-height: var(--control-h-sm); padding: var(--sp-1) var(--sp-2); font-size: var(--fs-sm);
+  border-radius: var(--radius-xs);
+}
 .ws-editing .ws-qty { width: 5.5em; text-align: right; display: inline-block; }
 .ws-editing .ws-unit { width: 4.5em; display: inline-block; margin-left: var(--sp-1); }
 .ws-add-line { margin-top: var(--sp-7); }
