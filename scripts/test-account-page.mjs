@@ -1724,6 +1724,20 @@ head("19. a delete made while the sign-in sync is running stays deleted");
   eq("this browser's copy learns the room is deleted",
     await page.evaluate(() => Boolean(JSON.parse(localStorage.getItem("materio-workspace-v1"))
       .rooms.find((row) => row.id === "r5").deletedAt)), true);
+
+  // The owner, 2026-09-26: deleting a project leaves its rooms, in the Pomieszczenia tab,
+  // under "Bez projektu". Checked here without __fbSync — only what the page hears by itself.
+  await page.click("#tab-rooms");
+  await page.waitForSelector("#acctrooms-list [data-project-id]", { timeout: 5000 });
+  eq("the deleted project's room is kept, under Bez projektu",
+    await page.locator('#acctrooms-list [data-project-id=""] li[data-id="r3"]').count(), 1);
+  eq("and the deleted project has no card of its own",
+    await page.locator('#acctrooms-list [data-project-id="p3"]').count(), 0);
+  eq("the room deleted on its own is not in the tab at all",
+    await page.locator('#acctrooms-list li[data-id="r5"]').count(), 0);
+  const kept = await page.evaluate(() => window.__fbDocs.get("users/u1/rooms/r3"));
+  eq("the kept room is not deleted in Firestore", kept.deletedAt, null);
+  eq("and still names its project, so an undo can take it back", kept.projectId, "p3");
   eq("no console error", page.lmErrors.join(" / "), "");
   await page.close();
   await ctx.close();
