@@ -916,6 +916,12 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .row-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .row-name em { display: block; font-style: normal; font-size: var(--fs-sm); }
 .row-actions { display: flex; gap: var(--sp-2); flex: none; }
+/* A row whose name and buttons do not fit side by side puts the buttons on a line of their
+   own, as .ws-proj-row already does. On a 320 px phone the client row's "Otwórz pełny
+   widok" and "Usuń" ran past the card and over the name, worse once the link got its arrow. */
+.data-list li { flex-wrap: wrap; }
+.data-list li > .row-name { flex: 1 1 14rem; }
+.data-list li > .row-actions { margin-left: auto; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
 
 /* The account quote list is a compact hand-off to the full editor. Its total is the one
    figure that must stay easy to scan; the name and provenance take the flexible column. */
@@ -1753,7 +1759,8 @@ a.chip:hover { text-decoration: none; }
    The signed-in workspace and the read-only shared estimate. Both are noindex and
    deliberately plain: lists of rows, not a marketing surface. */
 .app-bar {
-  display: flex; align-items: center; justify-content: space-between;
+  /* wrap: on a 320 px phone the level note squeezed the account link to "Kon to". */
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
   gap: var(--sp-3); margin-bottom: var(--sp-6); padding-bottom: var(--sp-3);
   border-bottom: 1px solid var(--outline);
 }
@@ -1944,7 +1951,12 @@ a.chip:hover { text-decoration: none; }
 }
 .app-side-who { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); min-width: 0; }
 .app-side-who b { font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; }
-.app-side-actions { display: flex; gap: var(--sp-2); margin-left: auto; }
+.app-side-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-left: auto; }
+/* The 248 px sidebar had 6 px to spare for "Pulpit" and "Wyloguj" side by side once the
+   dashboard link carried its arrow, so a browser with a larger default font broke both
+   labels mid-word ("Pulpi t", "Wylog uj", the owner, 2026-09-26). A pair that does not fit
+   takes a line each, full width, instead of squeezing. */
+.app-side-actions > .btn { flex: 1 1 auto; }
 @media (min-width: 900px) {
   .app-side-foot { flex-direction: column; align-items: stretch; }
   .app-side-actions { margin-left: 0; }

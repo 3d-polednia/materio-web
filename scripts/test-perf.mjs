@@ -117,10 +117,12 @@ const BUDGET = {
   // meta (about 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
   // Raised 2026-09-26 from 230, measured at 230.4 kB raw: the button style of the whole
-  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
+  // site (disc, corner, arrow links, rows that wrap; about 2.5 kB of assets/styles.css on
+  // every page).
   "index.html": [231, 62],
   // Raised 2026-09-26 from 248, measured at 248.2 kB raw: the button style of the whole
-  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
+  // site (disc, corner, arrow links, rows that wrap; about 2.5 kB of assets/styles.css on
+  // every page).
   "kalkulatory/index.html": [249, 66],
   "kalkulatory/plytki-panele-gres/index.html": [420, 128],
   // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
@@ -130,12 +132,14 @@ const BUDGET = {
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
   "konwerter-jednostek/index.html": [238, 68],
-  // Raised 2026-09-26 from 227, measured at 228.7 kB raw: the button style of the whole
-  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
-  "poradniki/ile-farby-na-pokoj/index.html": [229, 63],
-  // Raised 2026-09-26 from 234, measured at 234.9 kB raw: the button style of the whole
-  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
-  "sklepy/index.html": [235, 65],
+  // Raised 2026-09-26 from 227 to 230, measured at 229.0 kB raw: the button style of the whole
+  // site (disc, corner, arrow links, rows that wrap; about 2.5 kB of assets/styles.css on
+  // every page), with a kilobyte on top so the next honest change is not over at once.
+  "poradniki/ile-farby-na-pokoj/index.html": [230, 63],
+  // Raised 2026-09-26 from 234 to 236, measured at 235.2 kB raw: the button style of the whole
+  // site (disc, corner, arrow links, rows that wrap; about 2.5 kB of assets/styles.css on
+  // every page), with a kilobyte on top so the next honest change is not over at once.
+  "sklepy/index.html": [236, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
   // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
@@ -192,16 +196,18 @@ const BUDGET = {
   // pages, and this was the one with under a kilobyte left. Gzipped it did not cross.
   // Raised 2026-09-26 from 413, measured at 413.5 kB raw: 1.3 kB of assets/app.js that
   // stops the sign-in sync from pushing a deleted project or room back up (remoteStamps).
-  // Raised 2026-09-26 from 415, measured at 415.8 kB raw: the button style of the whole
-  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
-  "app/index.html": [416, 126],
+  // Raised 2026-09-26 from 415 to 417, measured at 416.0 kB raw: the button style of the whole
+  // site (disc, corner, arrow links, rows that wrap; about 2.5 kB of assets/styles.css on
+  // every page), with a kilobyte on top so the next honest change is not over at once.
+  "app/index.html": [417, 126],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
   "app/dashboard/index.html": [338, 102],
-  // Raised 2026-09-26 from 215, measured at 215.0 kB raw: the button style of the whole
-  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
-  "p/index.html": [216, 62],
+  // Raised 2026-09-26 from 215 to 217, measured at 216.2 kB raw: the button style of the whole
+  // site (disc, corner, arrow links, rows that wrap; about 2.5 kB of assets/styles.css on
+  // every page), with a kilobyte on top so the next honest change is not over at once.
+  "p/index.html": [217, 62],
 };
 
 /**
