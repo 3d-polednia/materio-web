@@ -492,8 +492,10 @@ const BUDGET = {
      received visible labels; 640 leaves a two-word regression margin. */
   clients: 524, jobs: 544, quotes: 640, calendar: 420,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
-     printed the key name localStorage, which is three words in French; widest is French at 650. */
-  cookies: 650,
+     printed the key name localStorage, which is three words in French; widest is French at 650.
+     2026-09-26: two more rows, the per-account sync clocks the account pages keep
+     (assets/account-sync.js); widest is French at 726. */
+  cookies: 730,
   /* Session 62, audit item H7, and 220 rather than the 180 it was measured at the same
      day: the owner's Gewerbe is registered in Germany, so the page went from a name and
      an address to the set §5 DDG asks for — postal address, telephone, USt-IdNr., the

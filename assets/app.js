@@ -33,6 +33,7 @@
  */
 
 import { FIREBASE_CONFIG, FIREBASE_READY, FIREBASE_SDK, SCHEMA_VERSION } from "./firebase-config.js";
+import { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, num, syncFields } from "./account-sync.js";
 
 const $ = (id) => document.getElementById(id);
 const T = (key) => (typeof t === "function" ? t(key) : key);
@@ -46,38 +47,9 @@ const state = {
   level: LM_LEVEL.GUEST,
 };
 let db = null, auth = null, fb = null;
+let accountSync = null;
 /** The account room card whose successful add is being redrawn by Firestore. */
 let openAccountRoomProjectId = null;
-
-/**
- * Re-entrancy guard for synchronization between localStorage and Firestore.
- *
- * Incremented during any active push, pull or mirror operation so that the synchronous
- * workspacechange event dispatched by wsSave() does not trigger an infinite feedback loop.
- */
-let syncBusy = 0;
-
-/**
- * Cut-off timestamp for debounced automatic up-syncs.
- *
- * Manual pushes and the initial post-signin reconciliation upload the complete account,
- * but background pushes triggered by workspacechange must stay incremental to conserve
- * write quota. Updated to the batch start time only after an automatic push succeeds.
- */
-let lastAutoPushAt = 0;
-
-/** Which account this browser's workspace copy was last synced with. */
-const SYNC_ACCOUNT_KEY = "liczmat-sync-account";
-
-/** Every device-local data key cleared by both the settings wipe and "start empty". */
-const DEVICE_DATA_KEYS = [
-  "materio-workspace-v1",    // assets/workspace.js
-  "materio-active-project",  // assets/workspace.js
-  "liczmat-recent-calcs",    // assets/recent.js
-  "liczmat-crm-v1",          // assets/crm.js
-  "liczmat-materials-v1",    // assets/own-materials.js
-  SYNC_ACCOUNT_KEY,           // this file: whose copy it was
-];
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -88,36 +60,6 @@ function shareToken() {
 }
 
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : shareToken());
-
-/**
- * One path segment, checked before it becomes part of a Firestore address.
- *
- * The ids this page builds paths out of come from the browser workspace, which is a
- * localStorage document anything on this device can have written, and Firestore joins
- * the segments it is handed: `projectId = "x/estimations/y"` addresses a different
- * document in a different collection, and `".."` or `"__x__"` are addresses Firestore
- * refuses outright — with an exception that lands in the same catch as a network
- * failure, so the sync would have reported "something went wrong" for a row it should
- * simply have skipped. Session 35: the row is skipped, and the rest of the push runs.
- *
- * @returns {string} the id, or "" when it may not be used as a segment
- */
-function pathId(raw) {
-  const id = String(raw == null ? "" : raw);
-  if (!id || id.length > 1500) return "";
-  if (id.indexOf("/") >= 0) return "";
-  if (id === "." || id === "..") return "";
-  if (/^__.*__$/.test(id)) return "";
-  return id;
-}
-
-/** Sync fields shared by every document under users/{uid}/**. */
-const syncFields = (createdAt, deletedAt = null) => ({
-  createdAt,
-  updatedAt: Date.now(),
-  deletedAt,
-  schemaVersion: SCHEMA_VERSION,
-});
 
 /**
  * Popup failures that mean "this browser cannot show a popup", as opposed to "the visitor
@@ -156,26 +98,6 @@ function status(message, isError) {
   box.hidden = !message;
 }
 
-/**
- * What somebody typed, as a number, or zero.
- *
- * `typedDigits()` is `pdfNum()`'s rule, carried to every reader of a typed field in session
- * K: drop every space of every width, then the LAST separator decides the decimal point and
- * the earlier ones were grouping. The draft this replaces was `String(v).replace(",", ".")`,
- * which swaps the first comma only, so `parseFloat` gave up at the first space — a room
- * 1 000 mm wide was one millimetre, and a quote line of "1 200,50" was worth 1,20.
- *
- * This file is a module, so the helper is private to it; the plain scripts each carry their
- * own copy under their own prefix, and scripts/test-decimal.mjs runs one table through all
- * of them so the copies cannot drift apart.
- */
-const typedDigits = (v) => {
-  const raw = [...String(v === undefined || v === null ? "" : v)].filter((ch) => ch.trim() !== "").join("");
-  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
-  return cut === -1 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
-};
-const num = (v) => { const n = parseFloat(typedDigits(v)); return isFinite(n) ? n : 0; };
-
 const escapeHtml = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -199,6 +121,10 @@ async function boot() {
   state.fbApp = app;
   auth = authMod.getAuth(app);
   db = storeMod.getFirestore(app);
+  accountSync = createAccountSync({ fb, db, auth, onChange: () => renderLocalSummary() });
+  ["workspacechange", "crmchange", "ownmaterialschange"].forEach((name) => {
+    document.addEventListener(name, accountSync.armUpSync);
+  });
 
   // Firebase sends the password-reset and address-verification mail in whatever language
   // this is set to, and defaults to English. The page says "Wysłaliśmy link do zmiany
@@ -445,12 +371,10 @@ async function onSignedIn(user) {
   }
 
   // A delayed upload belongs to the account that armed it, never the account arriving now.
-  if (upSyncTimer) clearTimeout(upSyncTimer);
-  upSyncTimer = null;
-  lastAutoPushAt = 0;
   stopListening();
 
   state.uid = uid;
+  accountSync.setUid(uid);
   state.user = user;
   $("app-auth").hidden = true;
   $("app-workspace").hidden = false;
@@ -468,24 +392,24 @@ async function onSignedIn(user) {
   const now = Date.now();
   try {
     const snap = await fb.getDoc(profile);
-    requireSyncUid(uid);
+    accountSync.requireSyncUid(uid);
     if (snap.exists()) {
       applyProfile(snap.data());
       await fb.updateDoc(profile, { lastSeenAt: now, appVersion: "web" });
-      requireSyncUid(uid);
+      accountSync.requireSyncUid(uid);
     } else {
       applyProfile({ createdAt: now, lastSeenAt: now, appVersion: "web" });
       await fb.setDoc(profile, state.profile);
-      requireSyncUid(uid);
+      accountSync.requireSyncUid(uid);
     }
   } catch (e) {
-    if (!syncUidActive(uid)) return;
+    if (!accountSync.syncUidActive(uid)) return;
     // A profile write failing must never block the workspace. Without the document the
     // level falls back to LICZMAT, which is what a signed-in account without a plan is.
     applyProfile(state.profile);
   }
 
-  if (!syncUidActive(uid)) return;
+  if (!accountSync.syncUidActive(uid)) return;
 
   // And keep watching it. `plan` is written by the server — a subscription, or the
   // owner's scripts/pro-admin.mjs — so the moment it changes is a moment this page has
@@ -497,25 +421,23 @@ async function onSignedIn(user) {
   renderProfile();
   renderNext();
 
-  listen("projects", (rows, all) => { state.projects = rows; renderProjects(); mirrorToLocal({ projects: all }); });
-  listen("rooms", (rows, all) => { state.rooms = rows; renderRooms(); renderProjects(); mirrorToLocal({ rooms: all }); });
+  listen("projects", (rows, all) => { state.projects = rows; renderProjects(); accountSync.mirrorToLocal({ projects: all }); });
+  listen("rooms", (rows, all) => { state.rooms = rows; renderRooms(); renderProjects(); accountSync.mirrorToLocal({ rooms: all }); });
   renderLocalSummary();
 
   // Reconcile Firestore and localStorage quietly on sign-in without blocking the interface.
-  autoReconcile(uid);
+  accountSync.autoReconcile(uid);
 
   // Last, and never awaited: an account with the admin claim gets a sixth tab, and the
   // file that draws it is fetched only for that account. Everybody else's /app/ never
   // asks for it. See maybeMountAdmin().
-  if (syncUidActive(uid)) maybeMountAdmin(user);
+  if (accountSync.syncUidActive(uid)) maybeMountAdmin(user);
 }
 
 function onSignedOut() {
-  if (upSyncTimer) clearTimeout(upSyncTimer);
-  upSyncTimer = null;
-  lastAutoPushAt = 0;
   stopListening();
   state.uid = null;
+  if (accountSync) accountSync.setUid(null);
   state.user = null;
   state.profile = null;
   state.level = LM_LEVEL.GUEST;
@@ -976,7 +898,7 @@ function listen(collectionName, onRows) {
           all.push(doc);
           if (!data.deletedAt) rows.push(doc);
         });
-        sawRemote(collectionName, all);
+        accountSync.sawRemote(collectionName, all);
         onRows(rows, all);
       }
     },
@@ -997,8 +919,7 @@ function stopListening() {
   state.unsub.forEach((fn) => fn());
   state.unsub = [];
   // What the listeners saw belongs to the account they were listening to.
-  remoteStamps.projects.clear();
-  remoteStamps.rooms.clear();
+  if (accountSync) accountSync.clearRemoteStamps();
   // Nothing is listening any more, so nothing is waiting to go out: the notice comes
   // down with the listeners rather than staying on the sign-in screen.
   conn.synced.clear();
@@ -1163,48 +1084,6 @@ async function maybeMountAdmin(user) {
 const projectDoc = (id, uid = state.uid) => fb.doc(db, "users", uid, "projects", id);
 const roomDoc = (id, uid = state.uid) => fb.doc(db, "users", uid, "rooms", id);
 
-/**
- * The `updatedAt` of every project and room as Firestore last showed it to this page,
- * tombstones included (2026-09-26).
- *
- * The sign-in sync uploads the browser's copy for seconds after the page opens, one
- * awaited write per row, and it used to send whatever that copy said. A project the
- * visitor deleted on the Projekty tab in those seconds got its tombstone and then the old
- * live copy on top of it, and was back on the screen ten seconds later; a status changed
- * there went back the same way. Last write wins on `updatedAt` is the contract's rule for
- * the pull, and syncPushAll() now keeps it on the way up: a row that Firestore holds at
- * this version or a newer one is not the browser's to send.
- *
- * Fed by the live listeners and, for this page's own writes, by the write itself — the
- * listener's echo arrives a moment later, and the push must not slip in between.
- */
-const remoteStamps = { projects: new Map(), rooms: new Map() };
-
-/**
- * A listener's snapshot is the whole collection, so it replaces what was known: a
- * document gone from Firestore must not keep a stamp that stops the push re-creating it.
- */
-function sawRemote(collectionName, rows) {
-  const seen = remoteStamps[collectionName];
-  if (!seen) return;
-  seen.clear();
-  rows.forEach((row) => seen.set(row.id, Number(row.updatedAt) || 0));
-}
-
-/** A write this page makes to a project or room, remembered before it is sent. */
-function sawOwnWrite(ref, updatedAt) {
-  const [, , collectionName, id, deeper] = String(ref.path || "").split("/");
-  const seen = remoteStamps[collectionName];
-  if (seen && id && deeper === undefined) seen.set(id, Number(updatedAt) || 0);
-}
-
-/** Firestore already holds this row at the browser's version, or a newer one. */
-function remoteHasRow(collectionName, row) {
-  const seen = remoteStamps[collectionName];
-  const at = seen ? seen.get(row.id) : undefined;
-  return at !== undefined && at >= (Number(row.updatedAt) || 0);
-}
-
 async function addProject(name, fields = {}) {
   const now = Date.now();
   const id = newId();
@@ -1245,7 +1124,7 @@ async function addRoom(name, lengthM, widthM, heightM, projectId) {
  */
 async function tombstone(ref, row, fields) {
   const data = { ...fields, ...syncFields(row.createdAt || Date.now(), Date.now()) };
-  sawOwnWrite(ref, data.updatedAt);
+  accountSync.sawOwnWrite(ref, data.updatedAt);
   await fb.setDoc(ref, data, { merge: true });
 }
 
@@ -1517,7 +1396,7 @@ function wireWorkspace() {
     if (!project) return;
     try {
       const updatedAt = Date.now();
-      sawOwnWrite(projectDoc(project.id), updatedAt);
+      accountSync.sawOwnWrite(projectDoc(project.id), updatedAt);
       await fb.setDoc(projectDoc(project.id), {
         status: statusSelect.value,
         updatedAt,
@@ -1929,7 +1808,7 @@ function wireRoomsPanel() {
     if (!room) return;
     try {
       const data = { projectId: select.value, ...syncFields(room.createdAt || Date.now()) };
-      sawOwnWrite(roomDoc(room.id), data.updatedAt);
+      accountSync.sawOwnWrite(roomDoc(room.id), data.updatedAt);
       await fb.setDoc(roomDoc(room.id), data, { merge: true });
     } catch (err) { status(T("app_err_unknown"), true); }
   });
@@ -1937,79 +1816,15 @@ function wireRoomsPanel() {
 
 /* ------------------------------------------------------------------ sync with the browser */
 
-/**
- * Which account this browser's workspace copy was last synced with (session 35).
- *
- * The workspace is device-local and works signed out, which is the product — but "pull"
- * copies an account's projects, rooms, estimate lines and material list *into this
- * browser*, and nothing has ever recorded whose they are. On a shared computer that made
- * two separate mistakes possible: the next person to open /projekty/ read somebody else's
- * projects and prices, and the next person to sign in and press "push" uploaded them into
- * their own account, where the owner of the data cannot reach them and cannot know.
- *
- * Neither is a hole in the rules — Firestore still refuses to let one account read
- * another's documents — which is exactly why it had to be fixed here: the copy in the
- * browser is outside everything the rules protect.
- *
- * One key, device-local, holding one uid. It is listed on /cookies/ with the rest.
- */
-function syncAccount() {
-  try { return localStorage.getItem(SYNC_ACCOUNT_KEY) || ""; } catch (e) { return ""; }
-}
-
-function setSyncAccount(uid) {
-  try {
-    if (uid) localStorage.setItem(SYNC_ACCOUNT_KEY, uid);
-    else localStorage.removeItem(SYNC_ACCOUNT_KEY);
-    return syncAccount() === (uid || "");
-  } catch (e) { return false; }
-}
-
-/** Live counts for the visible summary, plus every row a push would send for ownership. */
-function localCounts() {
-  const local = typeof wsExport === "function" ? wsExport() : null;
-  if (!local) return null;
-  const alive = (rows) => (rows || []).filter((r) => !r.deletedAt).length;
-  const pro = typeof crmExport === "function" ? crmExport() : null;
-  const own = typeof omExport === "function" ? omExport() : null;
-  const all = (rows) => (rows || []).length;
-  return {
-    projects: alive(local.projects), rooms: alive(local.rooms),
-    estimations: alive(local.estimations), shoppingItems: alive(local.shoppingItems),
-    clients: alive(pro && pro.clients), jobs: alive(pro && pro.jobs),
-    quotes: alive(pro && pro.quotes),
-    total: all(local.projects) + all(local.rooms) + all(local.estimations)
-      + all(local.shoppingItems) + all(pro && pro.clients) + all(pro && pro.jobs)
-      + all(pro && pro.quotes) + all(own && own.materials),
-  };
-}
-
-/**
- * Is what is in this browser somebody else's?
- *
- * Only when there is something here *and* it was last synced with another account. An
- * empty workspace carries nobody's data, so a stale stamp on it is not worth a warning —
- * it is re-stamped by the next sync.
- */
-function foreignWorkspace() {
-  const stamp = syncAccount();
-  if (!stamp || !state.uid || stamp === state.uid) return false;
-  const counts = localCounts();
-  return !!counts && counts.total > 0;
-}
-
-/** Non-empty local data whose owner has never been recorded requires an explicit choice. */
-function unclaimedWorkspace() {
-  if (syncAccount() || !state.uid) return false;
-  const counts = localCounts();
-  return !!counts && counts.total > 0;
-}
-
-const blockedWorkspace = () => foreignWorkspace() || unclaimedWorkspace();
+const blockedWorkspace = () => accountSync.blockedWorkspace();
 
 function clearDeviceData() {
   try {
     DEVICE_DATA_KEYS.forEach((key) => localStorage.removeItem(key));
+    if (state.uid) {
+      localStorage.removeItem(`${AUTO_PUSH_KEY_PREFIX}${state.uid}`);
+      localStorage.removeItem(`${FULL_PULL_KEY_PREFIX}${state.uid}`);
+    }
     return true;
   } catch (e) { return false; }
 }
@@ -2017,7 +1832,7 @@ function clearDeviceData() {
 /** How much is sitting in this browser's workspace, in one line. */
 function renderLocalSummary() {
   const box = $("app-sync-local");
-  const counts = localCounts();
+  const counts = accountSync.localCounts();
   if (!box || !counts) return;
   box.textContent = `${T("app_sync_local")}: ${counts.projects} × ${T("app_projects")}, ` +
     `${counts.rooms} × ${T("app_rooms")}, ${counts.estimations} × ${T("ws_lines")}, ` +
@@ -2027,8 +1842,8 @@ function renderLocalSummary() {
   // would mix two people's rows into one store, and a push would file them under the
   // wrong account. The way out is the button on the settings tab, which empties this
   // browser — said in the warning rather than left to be guessed.
-  const foreign = foreignWorkspace();
-  const unclaimed = unclaimedWorkspace();
+  const foreign = accountSync.foreignWorkspace();
+  const unclaimed = accountSync.unclaimedWorkspace();
   const warning = $("app-sync-foreign");
   if (warning) {
     warning.textContent = foreign ? T("app_sync_foreign") : "";
@@ -2053,16 +1868,7 @@ function renderLocalSummary() {
  * undo anything newer. syncBusy is still raised around it, so the wsSave() inside does not
  * start an automatic push back to Firestore.
  */
-function mirrorToLocal(incoming) {
-  if (blockedWorkspace() || typeof wsImport !== "function") return;
-  syncBusy++;
-  try {
-    wsImport(incoming);
-  } finally {
-    syncBusy--;
-  }
-  renderLocalSummary();
-}
+
 
 /**
  * Upload the browser workspace, the Pro store and own materials into Firestore.
@@ -2075,133 +1881,11 @@ function mirrorToLocal(incoming) {
  * and must stay cheap: on a quiet workspace an edit re-uploads one document instead of
  * walking every collection on every keystroke and burning through daily write quotas.
  */
-function syncUidActive(uid) {
-  return !!uid && state.uid === uid && !!auth.currentUser && auth.currentUser.uid === uid;
-}
 
-function requireSyncUid(uid) {
-  if (!syncUidActive(uid)) throw new Error("sync account changed");
-}
 
-async function syncPushAll(uid, since) {
-  if (typeof wsExport !== "function") return;
 
-  // Every push is a merge, exactly as `CloudSync.pushLocal()` on Android is
-  // (`set(..., SetOptions.merge())`). The browser always sends the complete contract
-  // document, so for the fields it knows about a merge and a replace are the same write —
-  // but a replace would also delete any field the browser has never heard of, which is
-  // precisely how the phone protects the note of chapter XVI and would have been how the
-  // browser destroyed it. Symmetry here is the point.
-  const MERGE = { merge: true };
-  const local = wsExport();
-  const skippable = (row) => Number.isFinite(since) && Number.isFinite(row.updatedAt) && row.updatedAt <= since;
-  // Projects and rooms are read again at the moment each one is sent, not taken from the
-  // list made when the push began: every write is awaited, and in those seconds the live
-  // listener can have brought a delete or an edit made on this page into the browser's
-  // copy. What Firestore already holds at this version or a newer one stays unsent — see
-  // remoteStamps.
-  const current = (key, id) => (wsExport()[key] || []).find((row) => row.id === id);
-  for (const listed of local.projects) {
-    const p = current("projects", listed.id);
-    if (!p) continue;
-    if (!pathId(p.id)) continue;
-    if (skippable(p) || remoteHasRow("projects", p)) continue;
-    const value = p.valueMinor == null || !Number.isFinite(Number(p.valueMinor))
-      ? null : Math.round(Number(p.valueMinor));
-    requireSyncUid(uid);
-    await fb.setDoc(projectDoc(p.id, uid), {
-      name: String(p.name).slice(0, 120),
-      clientId: String(p.clientId == null ? "" : p.clientId).slice(0, 64),
-      status: proStatus(p.status),
-      dueDate: proDay(p.dueDate),
-      valueMinor: value,
-      currencyCode: value == null ? "" : String(p.currencyCode == null ? "" : p.currencyCode).slice(0, 3),
-      note: String(p.note == null ? "" : p.note).slice(0, 2000),
-      // `color` is newer than the phone's project contract, but it is safe for the same
-      // reason as the room link and shopping-item note below: every write on both sides
-      // uses set(..., merge true), validProject() has no hasOnly() clause, and the phone's
-      // readers ignore keys they do not know. Omitting it would lose the coloured deadline.
-      color: String(p.color == null ? "" : p.color).slice(0, 16),
-      archived: !!p.archived,
-      ...syncFields(p.createdAt, p.deletedAt),
-    }, MERGE);
-  }
-  for (const listed of local.rooms) {
-    const r = current("rooms", listed.id);
-    if (!r) continue;
-    if (!pathId(r.id)) continue;
-    if (skippable(r) || remoteHasRow("rooms", r)) continue;
-    // `projectId` is chapter XVIII's "pomieszczenia są elementem projektu" and is not
-    // in the contract: `RoomEntity` has no column, `roomToDoc()` no key, `validRoom()`
-    // no check. It goes up anyway for the reason session 18 established and session 20
-    // re-checked for rooms — every write on both sides is a merge, the rules validate
-    // by shape with no `hasOnly`, and `roomFromDoc()` ignores keys it does not know —
-    // so the phone carries the link without being able to show it. Omitting it here is
-    // what made the link die at the browser's edge until now.
-    requireSyncUid(uid);
-    await fb.setDoc(roomDoc(r.id, uid), {
-      name: String(r.name).slice(0, 120),
-      lengthM: num(r.lengthM), widthM: num(r.widthM), heightM: num(r.heightM),
-      projectId: r.projectId || null,
-      ...syncFields(r.createdAt, r.deletedAt),
-    }, MERGE);
-  }
-  for (const e of local.estimations) {
-    // Estimates are a subcollection of their project, exactly as in Room.
-    const projectSeg = pathId(e.projectId), lineSeg = pathId(e.id);
-    if (!projectSeg || !lineSeg) continue;
-    if (skippable(e)) continue;
-    const ref = fb.doc(db, "users", uid, "projects", projectSeg, "estimations", lineSeg);
-    requireSyncUid(uid);
-    await fb.setDoc(ref, {
-      name: String(e.name).slice(0, 120),
-      calculationType: e.calculationType,
-      materialCategory: e.materialCategory,
-      requiredUnits: Math.round(e.requiredUnits) || 0,
-      unitLabel: String(e.unitLabel).slice(0, 24),
-      totalCostMinor: Math.round(e.totalCostMinor) || 0,
-      wastePercentage: Number(e.wastePercentage) || 0,
-      wasteCostMinor: Math.round(e.wasteCostMinor) || 0,
-      currencyCode: String(e.currencyCode).slice(0, 3),
-      inputJson: String(e.inputJson || "{}").slice(0, 20000),
-      ...syncFields(e.createdAt, e.deletedAt),
-    }, MERGE);
-  }
-  for (const s of local.shoppingItems) {
-    // The material list, the project's other subcollection (FIRESTORE_SYNC §2). The
-    // pull has always read it — downloadAccount() has returned shoppingItems since the
-    // sync tab was written — but nothing local ever produced one until session 17, so
-    // the push had nothing to send. Every field is clamped to what the deployed rules
-    // validate; `estimationId` is the remote id of the calculation, or null.
-    const projectSeg = pathId(s.projectId), itemSeg = pathId(s.id);
-    if (!projectSeg || !itemSeg) continue;
-    if (skippable(s)) continue;
-    const ref = fb.doc(db, "users", uid, "projects", projectSeg, "shoppingItems", itemSeg);
-    requireSyncUid(uid);
-    await fb.setDoc(ref, {
-      estimationId: s.estimationId ? String(s.estimationId).slice(0, 64) : null,
-      name: String(s.name).slice(0, 120),
-      materialCategory: String(s.materialCategory || "OTHER").slice(0, 40),
-      quantity: Math.max(0, num(s.quantity)),
-      unit: String(s.unit || "").slice(0, 24),
-      estimatedCostMinor: Math.round(s.estimatedCostMinor) || 0,
-      currencyCode: String(s.currencyCode || "PLN").slice(0, 3),
-      isPurchased: !!s.isPurchased,
-      // Chapter XVI's note (session 18). Not named in FIRESTORE_SYNC §2 and not read
-      // by the phone yet, but it survives there: every write in the app's CloudSync is
-      // `set(..., SetOptions.merge())`, and a merge leaves keys it was not given alone.
-      // Always sent, including empty — a merge can only clear what it is handed.
-      note: String(s.note || "").slice(0, 500),
-      ...syncFields(s.createdAt, s.deletedAt),
-    }, MERGE);
-  }
-  requireSyncUid(uid);
-  await pushProWorkspace(uid, since);
-  // Called beside pushProWorkspace() rather than from inside it: that function returns
-  // early when the Pro store is not on the page, and the two stores are independent.
-  requireSyncUid(uid);
-  await pushOwnMaterials(uid, since);
-}
+
+
 
 /**
  * Download the full account from Firestore and merge it into local stores.
@@ -2209,47 +1893,7 @@ async function syncPushAll(uid, since) {
  * Extracted from the manual "pull" button. Returns true when every store accepted
  * the write, and false when any store rejected it (e.g. quota exceeded or storage failure).
  */
-async function syncPullAll(uid) {
-  requireSyncUid(uid);
-  const incoming = await downloadAccount(uid);
-  requireSyncUid(uid);
-  // Each of the three stores answers whether the merge is on this device now. A browser
-  // that refuses to write — a private window, a full quota — used to be told "pulled"
-  // and marked as synced with the account, so the next push sent back what it never
-  // received (audit 2026-09-04, M3).
-  requireSyncUid(uid);
-  const landed = [wsImport(incoming)];
-  const liveJobs = (incoming.jobs || []).filter((job) => !job.deletedAt);
-  const jobsLanded = !liveJobs.length || (typeof wsMergeJobs === "function" && wsMergeJobs(liveJobs));
-  landed.push(jobsLanded);
-  if (jobsLanded) {
-    for (const job of liveJobs) {
-      const seg = pathId(job.id);
-      if (!seg) continue;
-      try {
-        requireSyncUid(uid);
-        const now = Date.now();
-        await fb.setDoc(proDoc("jobs", seg, uid), proJobDoc(job, now), { merge: true });
-      } catch (err) {
-        // Conversion has already landed locally. One refused burial must not discard the
-        // rest of the pull; the phone will bury this legacy document on its next pass.
-      }
-    }
-  }
-  // The Pro store is its own key and its own merge; both are last-write-wins on
-  // `updatedAt`, the same rule the phone uses.
-  requireSyncUid(uid);
-  // Jobs have moved into the workspace above; importing them into the old store as well
-  // would recreate the legacy copy that this compatibility pull is meant to consume.
-  incoming.jobs = [];
-  if (typeof crmImport === "function") landed.push(crmImport(incoming));
-  // The visitor's own materials are a third store with a third key, merged by the same
-  // rule. A material is replaced whole, its price history with it: merging two
-  // histories would build a price trend that happened on neither device.
-  requireSyncUid(uid);
-  if (typeof omImport === "function") landed.push(omImport(incoming));
-  return !landed.some((ok) => ok === false);
-}
+
 
 /**
  * Reconcile Firestore and localStorage once upon sign-in.
@@ -2258,27 +1902,7 @@ async function syncPullAll(uid) {
  * then pushes local work up to Firestore, and stamps the sync account. Foreign workspaces
  * are skipped silently to prevent accidental merges across accounts.
  */
-async function autoReconcile(uid) {
-  if (!syncUidActive(uid) || blockedWorkspace()) return;
-  syncBusy++;
-  try {
-    await syncPullAll(uid);
-    // Stamped before the push, not after it: a row saved while the upload is still running
-    // carries an `updatedAt` from that window, and a stamp taken afterwards would put it in
-    // the past of the next incremental push and skip it for good.
-    const startedAt = Date.now();
-    requireSyncUid(uid);
-    if (!setSyncAccount(uid)) return;
-    await syncPushAll(uid);
-    lastAutoPushAt = startedAt;
-    renderLocalSummary();
-  } catch (e) {
-    // Automatic reconciliation at sign-in runs without user initiation; failures are
-    // silent so the screen is not disrupted, leaving the manual buttons as fallback.
-  } finally {
-    syncBusy--;
-  }
-}
+
 
 function wireSyncPanel() {
   const push = $("app-sync-push");
@@ -2288,68 +1912,67 @@ function wireSyncPanel() {
   push.addEventListener("click", async () => {
     // The button is disabled while this is true; the check is here as well because a
     // disabled attribute is a hint to a mouse and nothing more.
-    if (blockedWorkspace()) { status(T(unclaimedWorkspace() ? "app_sync_unclaimed" : "app_sync_foreign"), true); return; }
+    if (accountSync.blockedWorkspace()) { status(T(accountSync.unclaimedWorkspace() ? "app_sync_unclaimed" : "app_sync_foreign"), true); return; }
     const uid = state.uid;
     push.disabled = true;
-    syncBusy++;
+    accountSync.state.syncBusy++;
     try {
-      requireSyncUid(uid);
-      if (!setSyncAccount(uid)) throw new Error("sync stamp failed");
-      await syncPushAll(uid);
+      accountSync.requireSyncUid(uid);
+      if (!accountSync.setSyncAccount(uid)) throw new Error("sync stamp failed");
+      await accountSync.syncPushAll(uid);
       renderLocalSummary();
       status(T("app_sync_pushed"));
     } catch (err) {
       status(T("app_err_unknown"), true);
     } finally {
-      syncBusy--;
+      accountSync.state.syncBusy--;
       renderLocalSummary();
     }
   });
 
   pull.addEventListener("click", async () => {
-    if (blockedWorkspace()) { status(T(unclaimedWorkspace() ? "app_sync_unclaimed" : "app_sync_foreign"), true); return; }
+    if (accountSync.blockedWorkspace()) { status(T(accountSync.unclaimedWorkspace() ? "app_sync_unclaimed" : "app_sync_foreign"), true); return; }
     const uid = state.uid;
     pull.disabled = true;
-    syncBusy++;
+    accountSync.state.syncBusy++;
     try {
-      const ok = await syncPullAll(uid);
+      const ok = await accountSync.syncPullAll(uid);
       renderLocalSummary();
       if (!ok) { status(T("ws_save_failed"), true); return; }
-      if (!setSyncAccount(uid)) throw new Error("sync stamp failed");
+      if (!accountSync.setSyncAccount(uid)) throw new Error("sync stamp failed");
       status(T("app_sync_pulled"));
     } catch (err) {
       status(T("app_err_unknown"), true);
     } finally {
-      syncBusy--;
+      accountSync.state.syncBusy--;
       renderLocalSummary();
     }
   });
 
   $("app-sync-claim-mine").addEventListener("click", async () => {
     const uid = state.uid;
-    if (!unclaimedWorkspace() || !setSyncAccount(uid)) {
+    if (!accountSync.unclaimedWorkspace() || !accountSync.setSyncAccount(uid)) {
       status(T("app_err_unknown"), true);
       return;
     }
     renderLocalSummary();
-    await autoReconcile(uid);
+    await accountSync.autoReconcile(uid);
   });
 
   $("app-sync-claim-empty").addEventListener("click", async () => {
     const uid = state.uid;
     // The same question the settings wipe asks, for the same reason: this button throws
     // away everything the browser is holding, and nobody gets it back by clicking again.
-    if (!unclaimedWorkspace() || !confirm(T("app_wipe_confirm"))) return;
+    if (!accountSync.unclaimedWorkspace() || !confirm(T("app_wipe_confirm"))) return;
     if (!clearDeviceData()) {
       status(T("app_err_unknown"), true);
       return;
     }
     renderLocalSummary();
-    await autoReconcile(uid);
+    await accountSync.autoReconcile(uid);
   });
 }
 
-let upSyncTimer = null;
 
 /**
  * Watch local changes and debounced-sync them up to Firestore when signed in.
@@ -2361,73 +1984,23 @@ let upSyncTimer = null;
  *
  * Three stores, three events, one handler: `workspacechange` is the projects-and-rooms
  * store of assets/workspace.js, `crmchange` the Pro store of assets/crm-store.js and
- * `ownmaterialschange` the visitor's own materials. syncPushAll() sends all three, so a
+ * `ownmaterialschange` the visitor's own materials. accountSync.syncPushAll() sends all three, so a
  * client typed on the Klienci tab has to arm the same timer a room does — listening only
  * for the first of them is what would have left the other two waiting for the next sign-in.
  */
-function armUpSync() {
-  if (syncBusy !== 0) return;
-  if (!state.uid || blockedWorkspace()) return;
-  if (upSyncTimer) {
-    clearTimeout(upSyncTimer);
-    upSyncTimer = null;
-  }
-  upSyncTimer = setTimeout(async () => {
-    upSyncTimer = null;
-    const uid = state.uid;
-    if (!syncUidActive(uid) || syncBusy !== 0 || blockedWorkspace()) return;
-    const startedAt = Date.now();
-    syncBusy++;
-    try {
-      if (!setSyncAccount(uid)) return;
-      await syncPushAll(uid, lastAutoPushAt);
-      lastAutoPushAt = startedAt;
-      renderLocalSummary();
-    } catch (e) {
-      // Background up-sync failures must be silent on screen.
-    } finally {
-      syncBusy--;
-    }
-  }, 1500);
-}
 
-["workspacechange", "crmchange", "ownmaterialschange"].forEach((name) => {
-  document.addEventListener(name, armUpSync);
-});
 
 /** One document in a flat collection of this account. */
 const proDoc = (collection, id, uid = state.uid) => fb.doc(db, "users", uid, collection, id);
 
 /** A calendar day, or "". The same ten-character rule crmDay() and the phone both apply. */
-function proDay(value) {
-  const day = String(value == null ? "" : value).trim();
-  return /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : "";
-}
+
 
 /** One of the four values accepted by validProject() and validJob(). */
-function proStatus(value) {
-  return ["new", "active", "done", "cancelled"].indexOf(value) >= 0 ? value : "new";
-}
+
 
 /** The complete legacy job shape: Firestore refuses a tombstone-only merge. */
-function proJobDoc(job, deletedAt) {
-  const text = (value, max) => String(value == null ? "" : value).slice(0, max);
-  const value = job.valueMinor == null || !Number.isFinite(Number(job.valueMinor))
-    ? null : Math.round(Number(job.valueMinor));
-  return {
-    name: text(job.name, 120),
-    clientId: text(job.clientId, 64),
-    projectId: text(job.projectId, 64),
-    status: proStatus(job.status),
-    description: text(job.description, 2000),
-    note: text(job.note, 2000),
-    color: text(job.color, 16),
-    dueDate: proDay(job.dueDate),
-    valueMinor: value,
-    currencyCode: value == null ? "" : text(job.currencyCode, 3),
-    ...syncFields(job.createdAt, deletedAt),
-  };
-}
+
 
 /**
  * Push LiczMat Pro's surviving collections (session 46).
@@ -2447,58 +2020,7 @@ function proJobDoc(job, deletedAt) {
  * keeps the whole incoming document. A pull therefore brings the field back and a phone
  * write leaves it alone. The phone not showing the status yet is the known remaining gap.
  */
-async function pushProWorkspace(uid, since) {
-  if (typeof crmExport !== "function") return;
-  const MERGE = { merge: true };
-  const pro = crmExport();
-  const text = (value, max) => String(value == null ? "" : value).slice(0, max);
-  const skippable = (row) => Number.isFinite(since) && Number.isFinite(row.updatedAt) && row.updatedAt <= since;
 
-  for (const c of pro.clients || []) {
-    const seg = pathId(c.id);
-    if (!seg) continue;
-    if (skippable(c)) continue;
-    requireSyncUid(uid);
-    await fb.setDoc(proDoc("clients", seg, uid), {
-      name: text(c.name, 120),
-      phone: text(c.phone, 200),
-      email: text(c.email, 200),
-      address: text(c.address, 200),
-      note: text(c.note, 2000),
-      projectIds: (Array.isArray(c.projectIds) ? c.projectIds : [])
-        .filter((id) => !!pathId(id)).slice(0, 200),
-      archived: !!c.archived,
-      ...syncFields(c.createdAt, c.deletedAt),
-    }, MERGE);
-  }
-
-  for (const q of pro.quotes || []) {
-    const seg = pathId(q.id);
-    if (!seg) continue;
-    if (skippable(q)) continue;
-    const labour = (Array.isArray(q.labour) ? q.labour : []).slice(0, 60).map((line) => ({
-      id: text(line.id, 64),
-      name: text(line.name, 120),
-      // A blank quantity is a lump sum and stays null: a line nobody counted and a line
-      // counted once are different statements.
-      quantity: line.quantity == null ? null : Math.max(0, num(line.quantity)),
-      unit: text(line.unit, 24),
-      amountMinor: Math.round(line.amountMinor) || 0,
-    }));
-    const money = labour.reduce((sum, line) => sum + line.amountMinor, 0);
-    requireSyncUid(uid);
-    await fb.setDoc(proDoc("quotes", seg, uid), {
-      name: text(q.name, 120),
-      projectId: text(q.projectId, 64),
-      labour: labour,
-      marginPct: Math.min(1000, Math.max(0, num(q.marginPct))),
-      status: typeof crmQuoteStatus === "function" ? crmQuoteStatus(q) : "draft",
-      note: text(q.note, 2000),
-      currencyCode: money === 0 ? "" : text(q.currencyCode, 3),
-      ...syncFields(q.createdAt, q.deletedAt),
-    }, MERGE);
-  }
-}
 
 /**
  * Push the visitor's own materials (session 59, item C6 of the parity audit).
@@ -2513,105 +2035,13 @@ async function pushProWorkspace(uid, since) {
  * fails the whole pass. The cap on `prices` is the rules' own 60, and the newest are kept,
  * because that is what the phone's `SyncContract.capPrices()` does with the same list.
  */
-async function pushOwnMaterials(uid, since) {
-  if (typeof omExport !== "function") return;
-  const MERGE = { merge: true };
-  const store = omExport();
-  const text = (value, max) => String(value == null ? "" : value).slice(0, max);
-  // A measurement is null or a number in range, never "present": a covering has an area
-  // per package and no kerf, a profile the other way round, and the rules check for that.
-  // A NaN out of a bad row would be sent as a number Firestore refuses.
-  const measure = (value, max) => {
-    if (value === null || value === undefined || value === "") return null;
-    const n = Number(value);
-    return Number.isFinite(n) && n >= 0 ? Math.min(n, max) : null;
-  };
-  const skippable = (row) => Number.isFinite(since) && Number.isFinite(row.updatedAt) && row.updatedAt <= since;
 
-  for (const m of store.materials || []) {
-    const seg = pathId(m.id);
-    if (!seg) continue;
-    if (skippable(m)) continue;
-    const priceMinor = m.priceMinor == null ? null : Math.round(m.priceMinor);
-    const prices = (Array.isArray(m.prices) ? m.prices : [])
-      .filter((p) => p && Number.isFinite(Number(p.priceMinor)) && Number.isFinite(Number(p.recordedAt)))
-      .sort((a, b) => Number(b.recordedAt) - Number(a.recordedAt))
-      .slice(0, 60)
-      .map((p) => ({
-        priceMinor: Math.round(Number(p.priceMinor)),
-        currencyCode: text(p.currencyCode, 3),
-        recordedAt: Math.round(Number(p.recordedAt)),
-      }));
-    requireSyncUid(uid);
-    await fb.setDoc(proDoc("materials", seg, uid), {
-      name: text(m.name, 120),
-      category: text(m.category || "OTHER", 40),
-      application: text(m.application || "WALL_FLOOR_COVERING", 40),
-      widthMm: measure(m.widthMm, 100000),
-      lengthMm: measure(m.lengthMm, 100000),
-      kerfMm: measure(m.kerfMm, 1000),
-      coveragePerUnitM2: measure(m.coveragePerUnitM2, 10000),
-      packageAreaM2: measure(m.packageAreaM2, 10000),
-      wastePercent: measure(m.wastePercent, 100),
-      priceMinor: priceMinor,
-      // Chapter VI once more: a material nobody has priced carries no currency.
-      currencyCode: priceMinor == null ? "" : text(m.currencyCode, 3),
-      priceUpdatedAt: m.priceUpdatedAt == null ? null : Math.round(m.priceUpdatedAt),
-      prices: prices,
-      ...syncFields(m.createdAt, m.deletedAt),
-    }, MERGE);
-  }
-}
 
 /**
  * Everything under users/{uid}, in the shape assets/workspace.js stores locally —
  * used by the pull button and by the export button.
  */
-async function downloadAccount(uid = state.uid) {
-  const out = {
-    projects: [], rooms: [], estimations: [], shoppingItems: [],
-    clients: [], jobs: [], quotes: [], materials: [],
-  };
-  const rows = (snap) => { const list = []; snap.forEach((d) => list.push({ id: d.id, ...d.data() })); return list; };
 
-  requireSyncUid(uid);
-  const projSnap = await fb.getDocs(fb.collection(db, "users", uid, "projects"));
-  out.projects = rows(projSnap);
-  requireSyncUid(uid);
-  out.rooms = rows(await fb.getDocs(fb.collection(db, "users", uid, "rooms")));
-  // The Pro collections (session 46). Flat, beside rooms, and downloaded even when
-  // nothing on this page draws them: the export button hands back the whole account.
-  //
-  // Each one is read on its own and a refusal leaves it empty rather than taking the pull
-  // down. Until the rules that validate them are deployed, `users/{uid}/clients` falls
-  // through to the catch-all `allow read, write: if false` — and one refusal inside this
-  // function used to mean nobody could pull their *projects* either. Losing the workspace
-  // because a collection somebody may never have used is unreadable is the worse failure,
-  // and it is the same argument the paywall follows when the plan cannot be read at all —
-  // fail open, in the direction of the visitor's own data.
-  // Keep `jobs` for one release of tolerant reading. Remove it in the release after this
-  // one, together with the phone's database migration from schema 9 to 10.
-  for (const name of ["clients", "jobs", "quotes", "materials"]) {
-    try {
-      requireSyncUid(uid);
-      out[name] = rows(await fb.getDocs(fb.collection(db, "users", uid, name)));
-    } catch (err) {
-      if (!syncUidActive(uid)) throw err;
-      out[name] = [];
-    }
-  }
-
-  for (const project of out.projects) {
-    const sub = (name) => fb.collection(db, "users", uid, "projects", project.id, name);
-    requireSyncUid(uid);
-    const est = rows(await fb.getDocs(sub("estimations"))).map((e) => ({ ...e, projectId: project.id }));
-    requireSyncUid(uid);
-    const shop = rows(await fb.getDocs(sub("shoppingItems"))).map((s) => ({ ...s, projectId: project.id }));
-    out.estimations.push(...est);
-    out.shoppingItems.push(...shop);
-  }
-  return out;
-}
 
 /* ------------------------------------------------------------------ account settings */
 
@@ -2690,7 +2120,7 @@ function wireAccountPanel() {
   $("app-export").addEventListener("click", async () => {
     try {
       const uid = state.uid;
-      const data = await downloadAccount(uid);
+      const data = await accountSync.downloadAccount(uid);
       const blob = new Blob([JSON.stringify({ ...data, exportedAt: Date.now(), uid }, null, 2)],
         { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -2708,10 +2138,16 @@ function wireAccountPanel() {
     if (!confirm(T("app_delete_confirm"))) return;
     const button = $("app-delete-account");
     button.disabled = true;
+    let stamp = "";
     try {
       await reauthenticate($("delete-password").value);
       // Nothing may be listening to documents that are about to stop existing.
       stopListening();
+      // Since 2026-09-26 the account pages sync by themselves, in other tabs too. Taking the
+      // stamp away stops them (assets/account-sync-page.js) and makes this browser's copy
+      // unclaimed, so no push from any tab writes into the account while it is being emptied.
+      stamp = accountSync.syncAccount();
+      accountSync.setSyncAccount("");
       await deleteEverything();
       await fb.deleteUser(auth.currentUser);
       status(T("app_deleted"));
@@ -2721,6 +2157,7 @@ function wireAccountPanel() {
       // "Coś poszło nie tak. Spróbuj ponownie." would ask them to keep trying something
       // that cannot work. Say what happened and that their data is still there.
       status(code === "permission-denied" ? T("app_err_delete_denied") : authMessage(code), true);
+      if (stamp) accountSync.setSyncAccount(stamp);
       // The listeners were dropped a moment ago; a refused deletion means the account is
       // still there and still wants its lists — and its plan, which is the one of the
       // three that nothing else would ever re-attach.

@@ -721,8 +721,8 @@ function inlineScriptHashes(html) {
 /** The policy for one page, as the first element inside its <head>. */
 function withCsp(html) {
   // What this page loads, read off the page. gtag.js appends itself from the inline
-  // analytics block; the Firebase SDK is imported by the module scripts, which are on
-  // /app/ and /p/ and nowhere else. The map iframe and the two Overpass mirrors are on
+  // analytics block; the Firebase SDK is imported by module scripts. Since 2026-09-26
+  // the six full account pages also sync in place. The map iframe and two Overpass mirrors are on
   // /sklepy/, which is the only page that loads assets/stores.js.
   const hasAnalytics = /googletagmanager\.com/.test(html);
   const hasFirebase = /<script type="module"/.test(html);
@@ -819,7 +819,7 @@ const CALC_SCRIPTS = [
  * number (assets/units.js), which is the reason that file exists apart from the engines.
  */
 const WS_SCRIPTS = [
-  "/assets/units.js", "/assets/workspace.js", "/assets/crm-store.js", "/assets/crm.js",
+  "/assets/units.js", "/assets/workspace.js", "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
   // The permission table and the wall it draws. Both pages print money and offer the PDF,
   // and since 2026-09-03 both of those are PRO — so both pages have to be able to ask
   // lmCan() and to put chapter XXV's wall where the amounts used to be. The order is the
@@ -857,6 +857,7 @@ const CRM_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
+  "/assets/own-materials.js",
   "/assets/crm-chain.js", "/assets/crm-ui.js",
 ];
 
@@ -879,6 +880,7 @@ const QUOTES_SCRIPTS = [
   "/assets/workspace.js", "/assets/workspace-calc.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
+  "/assets/own-materials.js",
   "/assets/crm-chain.js", "/assets/quotes-ui.js", "/assets/pdf-export.js",
 ];
 
@@ -892,6 +894,7 @@ const CALENDAR_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
+  "/assets/own-materials.js",
   "/assets/schedule-grid.js",
   "/assets/schedule-ui.js",
 ];
@@ -1483,6 +1486,7 @@ function buildWorkspacePages() {
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: WS_SCRIPTS,
+      modules: ["/assets/account-sync-page.js"],
     }));
 
     const estimate = estimateMain(lang, t, LM_FEATURES);
@@ -1494,6 +1498,7 @@ function buildWorkspacePages() {
       alternates: estAlt,
       main: estimate.main, jsonld: estimate.ld,
       scripts: WS_SCRIPTS,
+      modules: ["/assets/account-sync-page.js"],
     }));
   }
 }
@@ -1528,6 +1533,7 @@ function buildClientsPages() {
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: CRM_SCRIPTS,
+      modules: ["/assets/account-sync-page.js"],
     }));
   }
 }
@@ -1603,6 +1609,7 @@ function buildQuotesPages() {
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: QUOTES_SCRIPTS,
+      modules: ["/assets/account-sync-page.js"],
     }));
   }
 }
@@ -1638,6 +1645,7 @@ function buildCalendarPages() {
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,
       scripts: CALENDAR_SCRIPTS,
+      modules: ["/assets/account-sync-page.js"],
     }));
   }
 }
@@ -1750,7 +1758,9 @@ function buildOwnMaterialsPage() {
       main, jsonld: [ld],
       // The store and the screen, in that order — plain scripts, one global scope. No
       // engine and no catalogue: the page writes numbers down and calculates nothing.
-      scripts: ["/assets/own-materials.js", "/assets/own-materials-ui.js"],
+      scripts: ["/assets/workspace.js", "/assets/crm-store.js", "/assets/crm.js",
+        "/assets/own-materials.js", "/assets/own-materials-ui.js"],
+      modules: ["/assets/account-sync-page.js"],
     }));
   }
 }

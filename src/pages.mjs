@@ -840,6 +840,8 @@ export const COOKIE_ROWS = [
   { name: "liczmat-crm-v1", type: "ck_type_local", purpose: "ck_p_crm", life: "ck_life_until_cleared" },
   { name: "liczmat-materials-v1", type: "ck_type_local", purpose: "ck_p_omat", life: "ck_life_until_cleared" },
   { name: "liczmat-sync-account", type: "ck_type_local", purpose: "ck_p_sync_account", life: "ck_life_until_cleared" },
+  { name: "liczmat-sync-pushed-at:<uid>", type: "ck_type_local", purpose: "ck_p_sync_account", life: "ck_life_until_cleared" },
+  { name: "liczmat-sync-pulled-at:<uid>", type: "ck_type_local", purpose: "ck_p_sync_account", life: "ck_life_until_cleared" },
 ];
 
 const COOKIE_THIRD_ROWS = [

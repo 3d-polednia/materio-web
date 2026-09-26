@@ -32,7 +32,7 @@ export const FAKE_AUTH = `
 const S = (window.__fb = window.__fb || {
   accounts: window.__fbAccounts || {},
   calls: [],
-  user: null,
+  user: window.__fbSignedIn ? { uid: window.__fbSignedIn } : null,
   listeners: [],
 });
 window.__fbCalls = S.calls;

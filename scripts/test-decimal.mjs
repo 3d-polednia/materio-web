@@ -16,7 +16,7 @@
  * and a comma for the decimal. Nine more readers had the same one-comma parse:
  *
  *   - `num()`        assets/calculators.js — every dimension and every price in every engine
- *   - `num()`        assets/app.js         — rooms, shopping lists and quote lines on /app/
+ *   - `num()`        assets/account-sync.js — rooms, shopping lists and quote lines on /app/
  *   - `convNum()`    assets/converter.js   — the unit converter's own input
  *   - `wsDecimal()`  assets/workspace-calc.js — the cost a person books against a project
  *   - `crmMinor()`, `crmQty()`, `crmPct()`   assets/crm.js — quote money, counts and margin
@@ -88,14 +88,14 @@ const { pdfNum } = evalScript("assets/pdf-export.js", ["pdfNum"], {
  * deleted fails here loudly rather than dropping silently out of the table below.
  */
 function appNumFromSource() {
-  const src = read("assets/app.js");
+  const src = read("assets/account-sync.js");
   const from = src.indexOf("\nconst typedDigits = ");
-  const at = src.indexOf("\nconst num = ", from);
+  const at = src.indexOf("\nexport const num = ", from);
   if (from === -1 || at === -1) {
-    throw new Error("assets/app.js no longer declares `const typedDigits =` then `const num =`");
+    throw new Error("assets/account-sync.js no longer declares `const typedDigits =` then `export const num =`");
   }
   const block = src.slice(from + 1, src.indexOf("\n", at + 1));
-  return new Function(`${block}\nreturn num;`)();
+  return new Function(`${block.replace("export const num", "const num")}\nreturn num;`)();
 }
 const appNum = appNumFromSource();
 
@@ -128,7 +128,7 @@ const eq = (name, got, want) =>
 const READERS = [
   { label: "pdfNum (assets/pdf-export.js)", read: (v) => pdfNum(v), want: (x) => x },
   { label: "num (assets/calculators.js)", read: (v) => calcNum(v), want: (x) => x },
-  { label: "num (assets/app.js)", read: (v) => appNum(v), want: (x) => x },
+  { label: "num (assets/account-sync.js, /app/)", read: (v) => appNum(v), want: (x) => x },
   { label: "convNum (assets/converter.js)", read: (v) => convNum(v), want: (x) => x },
   { label: "wsDecimal (assets/workspace-calc.js)", read: (v) => wsDecimal(v), want: (x) => x },
   { label: "crmQty (assets/crm.js)", read: (v) => crmQty(v), want: (x) => x },

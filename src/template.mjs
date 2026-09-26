@@ -280,6 +280,9 @@ export function page(p) {
       const attrs = s.endsWith(".mjs") || p.moduleScripts ? ' type="module"' : " defer";
       return `<script${attrs} src="${s}${s.includes("?") ? "" : `?v=${stamp}`}"></script>`;
     }).join("\n"),
+    // Module entries next to a page's classic scripts — since 2026-09-26 the account sync
+    // (assets/account-sync-page.js) on the six account pages, which import the engine.
+    (p.modules || []).map((s) => `<script type="module" src="${s}${s.includes("?") ? "" : `?v=${stamp}`}"></script>`).join("\n"),
     `<script defer src="/assets/main.js?v=${stamp}"></script>`,
   ].filter(Boolean).join("\n");
 

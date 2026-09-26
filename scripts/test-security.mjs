@@ -100,8 +100,13 @@ function evalScript(file, returns, globals) {
  * is why a document stub is handed in. `store` is this browser's localStorage, planted.
  */
 function loadApp(store) {
-  const src = read("assets/app.js").replace(/^import .*$/m,
-    "const FIREBASE_CONFIG = {}, FIREBASE_READY = true, FIREBASE_SDK = '', SCHEMA_VERSION = 1;");
+  const syncSrc = read("assets/account-sync.js")
+    .replace(/^import .*firebase-config.*$/m, "const SCHEMA_VERSION = 1;")
+    .replaceAll("export ", "");
+  const src = read("assets/app.js")
+    .replace(/^import .*firebase-config.*$/m,
+      "const FIREBASE_CONFIG = {}, FIREBASE_READY = true, FIREBASE_SDK = '';")
+    .replace(/^import .*account-sync.*$/m, "");
   const document = {
     addEventListener() {}, dispatchEvent() {},
     documentElement: { lang: "pl", setAttribute() {}, removeAttribute() {} },
@@ -121,9 +126,10 @@ function loadApp(store) {
   // assets/own-materials.js is the third — what somebody pays their own supplier is
   // theirs, and it must not travel into the next person's account either.
   return new Function("document", "localStorage", "window", "crypto", "CustomEvent",
-    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${read("assets/own-materials.js")}\n${src}\nreturn {
-       pathId, foreignWorkspace, unclaimedWorkspace, localCounts, syncAccount, setSyncAccount,
-       state, SYNC_ACCOUNT_KEY,
+    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${read("assets/own-materials.js")}\nconst { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, pathId: syncPathId } = (() => {\n${syncSrc}\nreturn { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, pathId };\n})();\n${src}\nconst testSync = createAccountSync({ fb: {}, db: {}, auth: { currentUser: null } });\nreturn {
+       pathId: syncPathId, foreignWorkspace: testSync.foreignWorkspace, unclaimedWorkspace: testSync.unclaimedWorkspace,
+       localCounts: testSync.localCounts, syncAccount: testSync.syncAccount,
+       setSyncAccount: testSync.setSyncAccount, state: testSync.state, SYNC_ACCOUNT_KEY,
        lmSafeNext, lmAuthMode, lmSignupUrl, lmReadLevel, lmLevelOf, LM_LEVEL,
      };`)(document, localStorage, {}, { getRandomValues: (a) => a }, function CustomEvent() {});
 }
@@ -400,8 +406,9 @@ head("6. izolacja danych: one account's copy on a device two people use");
       .foreignWorkspace(), false);
 
   const app = lf("assets/app.js");
+  const sync = lf("assets/account-sync.js");
   check("the stamp write is verified by reading it back",
-    /return syncAccount\(\) === \(uid \|\| ""\)/.test(app));
+    /return syncAccount\(\) === \(uid \|\| ""\)/.test(sync));
   /* The pull writes EVERY store before it stamps. A push stamps before its first write so
      an interrupted upload cannot leave an apparently unclaimed browser. Both directions
      still reach every store:
@@ -422,14 +429,14 @@ head("6. izolacja danych: one account's copy on a device two people use");
      refactor onwards and would have stayed red through any breakage of the property they
      name. So the property is asked in two halves: each helper touches all three stores,
      and each button reaches its stamp only through the helper. */
-  const region = (open, close, from = 0) => {
-    const i = app.indexOf(open, from);
+  const region = (open, close, from = 0, source = sync) => {
+    const i = source.indexOf(open, from);
     if (i < 0) return "";
-    const j = app.indexOf(close, i);
-    return j > i ? app.slice(i, j) : "";
+    const j = source.indexOf(close, i);
+    return j > i ? source.slice(i, j) : "";
   };
   const fn = (name) => region(`async function ${name}(`, "\n}");
-  const handler = (v) => region(`${v}.addEventListener("click"`, "\n  });");
+  const handler = (v) => region(`${v}.addEventListener("click"`, "\n  });", 0, app);
   const before = (call, anchor, src) => {
     const i = src.indexOf(call);
     const j = src.indexOf(anchor, i);
@@ -457,11 +464,11 @@ head("6. izolacja danych: one account's copy on a device two people use");
     crmStatusApi.crmQuoteStatus({ status: "bogus" }), "draft");
 
   // Half two: pulls stamp after all imports; pushes stamp before their first remote write.
-  const PULL_STAMP = 'if (!setSyncAccount(uid)) throw new Error("sync stamp failed");';
-  const PUSH_STAMP = 'if (!setSyncAccount(uid)) throw new Error("sync stamp failed");';
+  const PULL_STAMP = 'if (!accountSync.setSyncAccount(uid)) throw new Error("sync stamp failed");';
+  const PUSH_STAMP = 'if (!accountSync.setSyncAccount(uid)) throw new Error("sync stamp failed");';
   const pushClick = handler("push"), pullClick = handler("pull");
-  check("the push button stamps before the push", before(PUSH_STAMP, "await syncPushAll(uid);", pushClick));
-  check("and the pull button only after the pull", before("await syncPullAll(uid);", PULL_STAMP, pullClick));
+  check("the push button stamps before the push", before(PUSH_STAMP, "await accountSync.syncPushAll(uid);", pushClick));
+  check("and the pull button only after the pull", before("await accountSync.syncPullAll(uid);", PULL_STAMP, pullClick));
   /* A browser that refused the write — a private window, a full quota — is told so and is
      NOT stamped: the account name would claim rows this device never received. */
   check("a refused pull is not stamped",
@@ -473,7 +480,7 @@ head("6. izolacja danych: one account's copy on a device two people use");
     && before("setSyncAccount(uid)", "await syncPushAll(uid);", auto));
   check("and a blocked workspace never reaches any of it", auto.includes("blockedWorkspace()) return;"));
   check("both buttons check it themselves, not only through `disabled`",
-    (app.match(/if \(blockedWorkspace\(\)\)/g) || []).length >= 2);
+    (app.match(/if \(accountSync\.blockedWorkspace\(\)\)/g) || []).length >= 2);
   check("and the summary is what disables them",
     /\["app-sync-push", "app-sync-pull"\]\.forEach/.test(app));
 
@@ -488,10 +495,11 @@ head("6. izolacja danych: one account's copy on a device two people use");
 head("7. API: every address this site builds");
 {
   const app = read("assets/app.js");
+  const sync = read("assets/account-sync.js");
 
   // Every path is under this account, or it is the share document, which is public by
   // design and keyed by the token. There is no third kind.
-  const paths = [...app.matchAll(/fb\.(?:doc|collection)\(db,\s*([^)]*)\)/g)]
+  const paths = [...`${app}\n${sync}`.matchAll(/fb\.(?:doc|collection)\(db,\s*([^)]*)\)/g)]
     .map((m) => m[1].replace(/\s+/g, " ").trim());
   check("there are addresses to check", paths.length >= 10, String(paths.length));
   for (const path of paths) {
@@ -520,9 +528,9 @@ head("7. API: every address this site builds");
   }
   eq("a dot inside an id is fine", pathId("a.b"), "a.b");
   check("the two subcollection writes go through it",
-    (app.match(/pathId\((?:e|s)\.projectId\)/g) || []).length === 2);
+    (sync.match(/pathId\((?:e|s)\.projectId\)/g) || []).length === 2);
   check("and so do the two top-level ones",
-    /if \(!pathId\(p\.id\)\) continue;/.test(app) && /if \(!pathId\(r\.id\)\) continue;/.test(app));
+    /if \(!pathId\(p\.id\)\) continue;/.test(sync) && /if \(!pathId\(r\.id\)\) continue;/.test(sync));
 
   // What else leaves the browser, and with what on it.
   const stores = read("assets/stores.js");
@@ -691,7 +699,8 @@ head("10. what the shipped files hand a browser");
 head("11. izolacja danych: the way to empty a shared device");
 {
   const app = read("assets/app.js");
-  const wiped = [...app.matchAll(/^\s*"([a-z0-9-]+)",\s*\/\/ assets\//gm)].map((m) => m[1]);
+  const sync = read("assets/account-sync.js");
+  const wiped = [...sync.matchAll(/^\s*"([a-z0-9-]+)",\s*\/\/ assets\//gm)].map((m) => m[1]);
   check("the wipe names the five data stores", wiped.length === 5, wiped.join(", "));
   for (const key of wiped) {
     check(`${key} is named on /cookies/`, COOKIE_ROWS.some((r) => r.name === key));
@@ -703,12 +712,14 @@ head("11. izolacja danych: the way to empty a shared device");
   const SETTINGS = ["materio_consent", "materio-lang", "liczmat-currency", "liczmat-theme",
     "liczmat-signed-in", "liczmat-remember", "materio-redirected"];
   for (const row of COOKIE_ROWS) {
+    // 2026-09-26: per-account sync clocks are cleared with that account's device data.
+    const syncClock = /^liczmat-sync-(?:pushed|pulled)-at:<uid>$/.test(row.name);
     check(`${row.name} is either wiped or a setting`,
       SETTINGS.includes(row.name) || wiped.includes(row.name)
-      || row.name === "liczmat-sync-account");
+      || row.name === "liczmat-sync-account" || syncClock);
   }
   check("the wipe asks first", /confirm\(T\("app_wipe_confirm"\)\)/.test(app));
-  check("it clears the stamp with the data", /SYNC_ACCOUNT_KEY,\s*\/\/ this file/.test(app));
+  check("it clears the stamp with the data", /SYNC_ACCOUNT_KEY,\s*\/\/ this file/.test(sync));
   const wipeBlock = app.slice(app.indexOf('$("app-wipe")'), app.indexOf('$("app-export")'));
   check("it signs nobody out",
     !wipeBlock.includes("signOut") && !wipeBlock.includes("lmWriteLevel"));
