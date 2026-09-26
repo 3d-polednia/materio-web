@@ -168,6 +168,7 @@
 <script defer src="/assets/paywall.min.js?v=20260926a"></script>
 <script defer src="/assets/crm-store.min.js?v=20260926a"></script>
 <script defer src="/assets/crm.min.js?v=20260926a"></script>
+<script defer src="/assets/schedule-grid.min.js?v=20260926a"></script>
 <script defer src="/assets/schedule-ui.min.js?v=20260926a"></script>
 <script defer src="/assets/main.min.js?v=20260926a"></script>
 </head>
@@ -276,36 +277,29 @@
       </div>
 
       <div id="cal-tool">
+        <div class="cal-wrap">
+    <div class="cal-panel app-card">
+      <div class="cal-head">
+        <h3 id="cal-month">Měsíc</h3>
+        <div class="cal-nav">
+          <button type="button" id="cal-prev" aria-label="Předchozí měsíc">‹</button>
+          <button type="button" id="cal-next" aria-label="Další měsíc">›</button>
+        </div>
+        <button type="button" id="cal-today" class="cal-today" data-i18n="app_schedule_today">Dnes</button>
+      </div>
+      <div class="cal-weekdays" id="cal-weekdays"></div>
+      <div class="cal-grid7" id="cal-grid"></div>
+    </div>
+    <aside class="cal-day-panel app-card" id="cal-daypanel"></aside>
+  </div>
         
-        <p class="crm-contact"><span class="eyebrow muted">Dnes</span> <b id="cal-today"></b></p>
+        <p class="crm-contact"><span class="eyebrow muted">Dnes</span> <b id="cal-today-date"></b></p>
 
         <div class="ws-project-figs">
           <p class="ws-project-fig"><span class="eyebrow muted">Po termínu</span> <b id="cal-fig-late"></b></p>
           <p class="ws-project-fig"><span class="eyebrow muted">Dnes</span> <b id="cal-fig-today"></b></p>
           <p class="ws-project-fig"><span class="eyebrow muted">Do 7 dnů</span> <b id="cal-fig-soon"></b></p>
         </div>
-
-        
-        <form id="cal-add-form">
-          <p class="ws-mat-grid">
-            <label class="ws-mat-f">
-              <span class="ws-bar-label" data-i18n="cal_add_name">Název termínu</span>
-              <input id="cal-add-name" type="text" maxlength="120" required>
-            </label>
-            <label class="ws-mat-f">
-              <span class="ws-bar-label" data-i18n="cal_add_date">Datum</span>
-              <input id="cal-add-date" type="date" required>
-            </label>
-            <label class="ws-mat-f">
-              <span class="ws-bar-label" data-i18n="cal_add_client">Klient</span>
-              <select id="cal-add-client"></select>
-            </label>
-          </p>
-          <p>
-            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">Přidat termín</button>
-          </p>
-          <p class="muted" data-i18n="cal_add_hint">Uloží se jako projekt s tímto datem.</p>
-        </form>
 
         <p class="muted" id="cal-empty" hidden>Zatím tu není žádná projekt. Termíny ukazují termíny projektů, takže začni tím, že projekt přidáš.</p>
 

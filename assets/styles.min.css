@@ -1374,6 +1374,7 @@ background: var(--surface); color: var(--muted); cursor: pointer; font: inherit;
 @media (max-width: 560px), (pointer: coarse) {
 .cal-nav { gap: var(--sp-2); }
 .cal-nav button { width: var(--control-h); height: var(--control-h); }
+.cal-month-btn, .cal-today { min-height: var(--control-h); }
 }
 .cal-nav button:hover { background: var(--surface-alt); color: var(--on-bg); }
 .cal-today {

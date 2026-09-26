@@ -892,6 +892,7 @@ const CALENDAR_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
+  "/assets/schedule-grid.js",
   "/assets/schedule-ui.js",
 ];
 
@@ -1837,7 +1838,7 @@ function buildPrivatePages() {
     // Materiały tab reads its list through the same globals.
     classicScripts: [
       "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
-      "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
+      "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js", "/assets/schedule-grid.js",
     ],
     scripts: ["/assets/app.js"],
   }));

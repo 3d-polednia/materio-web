@@ -517,7 +517,7 @@ head("7. the page the build writes");
   // silently stops filling in, and the browser test would be the only thing to notice.
   for (const id of [
     "cal-page", "cal-pro", "cal-pro-chip", "cal-gate", "cal-tool",
-    "cal-today", "cal-fig-late", "cal-fig-today", "cal-fig-soon", "cal-empty",
+    "cal-today-date", "cal-fig-late", "cal-fig-today", "cal-fig-soon", "cal-empty",
     "cal-closed", "cal-closed-summary", "cal-closed-list",
   ]) {
     has(`id="${id}"`, `the script's "${id}" is on the page`);

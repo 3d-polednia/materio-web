@@ -106,6 +106,7 @@
 <script defer src="/assets/crm-store.min.js?v=20260926a"></script>
 <script defer src="/assets/crm.min.js?v=20260926a"></script>
 <script defer src="/assets/own-materials.min.js?v=20260926a"></script>
+<script defer src="/assets/schedule-grid.min.js?v=20260926a"></script>
 <script type="module" src="/assets/app.min.js?v=20260926a"></script>
 <script defer src="/assets/main.min.js?v=20260926a"></script>
 </head>
@@ -594,20 +595,20 @@
       </div>
               <div id="acctcal-tool">
                 <div class="cal-wrap">
-                  <div class="cal-panel app-card">
-                    <div class="cal-head">
-                      <h3 id="acctcal-month"></h3>
-                      <div class="cal-nav">
-                        <button type="button" id="acctcal-prev" aria-label="Poprzedni miesiąc">‹</button>
-                        <button type="button" id="acctcal-next" aria-label="Następny miesiąc">›</button>
-                      </div>
-                      <button type="button" id="acctcal-today" class="cal-today" data-i18n="app_schedule_today">Dziś</button>
-                    </div>
-                    <div class="cal-weekdays" id="acctcal-weekdays"></div>
-                    <div class="cal-grid7" id="acctcal-grid"></div>
-                  </div>
-                  <aside class="cal-day-panel app-card" id="acctcal-daypanel"></aside>
-                </div>
+    <div class="cal-panel app-card">
+      <div class="cal-head">
+        <h3 id="acctcal-month">Miesiąc</h3>
+        <div class="cal-nav">
+          <button type="button" id="acctcal-prev" aria-label="Poprzedni miesiąc">‹</button>
+          <button type="button" id="acctcal-next" aria-label="Następny miesiąc">›</button>
+        </div>
+        <button type="button" id="acctcal-today" class="cal-today" data-i18n="app_schedule_today">Dziś</button>
+      </div>
+      <div class="cal-weekdays" id="acctcal-weekdays"></div>
+      <div class="cal-grid7" id="acctcal-grid"></div>
+    </div>
+    <aside class="cal-day-panel app-card" id="acctcal-daypanel"></aside>
+  </div>
               </div>
             </section>
 

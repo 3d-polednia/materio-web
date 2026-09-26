@@ -70,6 +70,25 @@ const selectField = (id, labelKey, t, cls = "") => `<div class="field${cls ? ` $
     <select id="${id}"></select>
   </div>`;
 
+/** 2026-09-26: one calendar block, shared by /app/ and /terminarz/. */
+export function calendarGrid(t, prefix) {
+  return `<div class="cal-wrap">
+    <div class="cal-panel app-card">
+      <div class="cal-head">
+        <h3 id="${prefix}-month">${esc(t("app_cal_month"))}</h3>
+        <div class="cal-nav">
+          <button type="button" id="${prefix}-prev" aria-label="${esc(t("app_schedule_prev"))}">‹</button>
+          <button type="button" id="${prefix}-next" aria-label="${esc(t("app_schedule_next"))}">›</button>
+        </div>
+        <button type="button" id="${prefix}-today" class="cal-today" data-i18n="app_schedule_today">${esc(t("app_schedule_today"))}</button>
+      </div>
+      <div class="cal-weekdays" id="${prefix}-weekdays"></div>
+      <div class="cal-grid7" id="${prefix}-grid"></div>
+    </div>
+    <aside class="cal-day-panel app-card" id="${prefix}-daypanel"></aside>
+  </div>`;
+}
+
 /**
  * "Pamiętaj mnie na tym urządzeniu" — the one control that decides how long the session
  * outlives the tab. Unchecked, /app/ asks Firebase for browserSessionPersistence, so
@@ -447,12 +466,7 @@ export function appMain(t, features) {
               </div>
             </section>
 
-            <!-- Session 25 (chapter XXIII), moved 2026-09-03 — and the one panel that goes
-                 beyond what /terminarz/ does. crmJobsByDay() (assets/crm.js) is new; the
-                 grid built from it is the owner's explicit, one-off reversal of chapter
-                 XXIII's "nie buduj odpowiednika Google Calendar" — see the note in
-                 assets/schedule-ui.js and docs/MASTER_PLAN.txt chapter XXIII. /terminarz/
-                 itself is unchanged and keeps to the original scope. -->
+            <!-- 2026-09-26: the owner's one terminarz uses assets/schedule-grid.js here and on /terminarz/. -->
             <section data-panel="schedule" id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule" tabindex="0" hidden>
               <div class="dash-head">
                 <h2 data-i18n="app_schedule_title">${esc(t("app_schedule_title"))}</h2>
@@ -461,21 +475,7 @@ export function appMain(t, features) {
               ${i("app_schedule_lead", "p", "muted")}
               ${proGate(t, "calendar", features, DEFAULT_LANG, { id: "acctcal-gate" })}
               <div id="acctcal-tool">
-                <div class="cal-wrap">
-                  <div class="cal-panel app-card">
-                    <div class="cal-head">
-                      <h3 id="acctcal-month"></h3>
-                      <div class="cal-nav">
-                        <button type="button" id="acctcal-prev" aria-label="${esc(t("app_schedule_prev"))}">‹</button>
-                        <button type="button" id="acctcal-next" aria-label="${esc(t("app_schedule_next"))}">›</button>
-                      </div>
-                      <button type="button" id="acctcal-today" class="cal-today" data-i18n="app_schedule_today">${esc(t("app_schedule_today"))}</button>
-                    </div>
-                    <div class="cal-weekdays" id="acctcal-weekdays"></div>
-                    <div class="cal-grid7" id="acctcal-grid"></div>
-                  </div>
-                  <aside class="cal-day-panel app-card" id="acctcal-daypanel"></aside>
-                </div>
+                ${calendarGrid(t, "acctcal")}
               </div>
             </section>
 

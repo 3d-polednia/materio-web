@@ -20,6 +20,7 @@ import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-me
 import { proGate, proModules, proPlansBlock } from "./pro.mjs";
 import { PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
 import { CURRENCIES } from "./currency.mjs";
+import { calendarGrid } from "./app-pages.mjs";
 
 /**
  * Case- and accent-insensitive text for the hub's search haystack.
@@ -2350,15 +2351,18 @@ export function quotesMain(lang, t, features) {
 /**
  * /terminarz/ — the schedule of LiczMat Pro. Session 25, chapter XXIII.
  *
- * One screen, unlike the other three Pro modules: there is no `?id=` view, because a row
- * here opens the job it belongs to on /zlecenia/. The module stores nothing of its own —
- * a deadline is chapter XXI's `termin`, a field of the job — so what is written here is
- * five empty lists and the words above them, and assets/schedule-ui.js fills them from
- * crmSchedule().
+ * One screen with no `?id=` view: a row opens the project it belongs to on /projekty/.
+ * The module stores nothing of its own — a deadline is a project's `dueDate` — so what is
+ * written here is the month grid's frame, five empty lists and the words above them;
+ * assets/schedule-grid.js and assets/schedule-ui.js fill them from assets/crm.js.
+ *
+ * 2026-09-26: the owner found two different terminarze — the month grid on /app/ and the
+ * buckets here — and asked for one. The grid (calendarGrid() in src/app-pages.mjs, drawn
+ * by assets/schedule-grid.js) now sits on top of this page too, and its day panel holds
+ * the page's only add form.
  *
  * The five headings and their lines are server-rendered rather than drawn by the script,
- * so a visitor with no JavaScript and a crawler both read what the module is: the page is
- * indexable, and chapter XXVI wants Pro described in public.
+ * so a visitor with no JavaScript and a crawler both read what the module is.
  */
 export function calendarMain(lang, t, features) {
   const crumbs = breadcrumbs([
@@ -2401,39 +2405,16 @@ export function calendarMain(lang, t, features) {
       ${gate}
 
       <div id="cal-tool">
+        ${calendarGrid(t, "cal")}
         <!-- What "late" and "today" are measured against, said out loud: the visitor's
              own calendar day, which is the only reckoning a deadline has. -->
-        <p class="crm-contact"><span class="eyebrow muted">${esc(t("cal_today_is"))}</span> <b id="cal-today"></b></p>
+        <p class="crm-contact"><span class="eyebrow muted">${esc(t("cal_today_is"))}</span> <b id="cal-today-date"></b></p>
 
         <div class="ws-project-figs">
           <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_late_t"))}</span> <b id="cal-fig-late"></b></p>
           <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_today_t"))}</span> <b id="cal-fig-today"></b></p>
           <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_soon_t"))}</span> <b id="cal-fig-soon"></b></p>
         </div>
-
-        <!-- Adding an appointment directly from the schedule: creates a job with a
-             deadline and an optional client, so a tradesman can record dates as they are
-             agreed without leaving the calendar. -->
-        <form id="cal-add-form">
-          <p class="ws-mat-grid">
-            <label class="ws-mat-f">
-              <span class="ws-bar-label" data-i18n="cal_add_name">${esc(t("cal_add_name"))}</span>
-              <input id="cal-add-name" type="text" maxlength="120" required>
-            </label>
-            <label class="ws-mat-f">
-              <span class="ws-bar-label" data-i18n="cal_add_date">${esc(t("cal_add_date"))}</span>
-              <input id="cal-add-date" type="date" required>
-            </label>
-            <label class="ws-mat-f">
-              <span class="ws-bar-label" data-i18n="cal_add_client">${esc(t("cal_add_client"))}</span>
-              <select id="cal-add-client"></select>
-            </label>
-          </p>
-          <p>
-            <button type="submit" class="btn btn-primary btn-sm" data-i18n="cal_add_btn">${esc(t("cal_add_btn"))}</button>
-          </p>
-          <p class="muted" data-i18n="cal_add_hint">${esc(t("cal_add_hint"))}</p>
-        </form>
 
         <p class="muted" id="cal-empty" hidden>${esc(t("cal_empty"))}</p>
 ${buckets}

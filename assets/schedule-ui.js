@@ -1,32 +1,20 @@
 /* LiczMat website — /terminarz/ in the browser. Session 25, chapter XXIII.
  *
- * One screen, unlike /klienci/, /zlecenia/ and /wyceny/: there is no `?id=` view here,
- * because a terminarz has nothing of its own to open. A row is a job, and its name is a
- * real link to /zlecenia/?id=<jobId>, where the whole record lives.
+ * One screen with no `?id=` view: a row is a project, and its name links to
+ * /projekty/?id=<projectId>, where the whole record lives.
  *
- * 2026-09-03: this page still keeps to chapter XXIII exactly as it stood (no month grid
- * here — see below). The grid the owner asked for lives on /app/'s Terminarz tab instead,
- * built from the new crmJobsByDay() in assets/crm.js. That tab is a second, additional view
- * of the same jobs, not a replacement for this one; /terminarz/ is untouched.
+ * **The module has no store of its own.** A deadline is a project's `dueDate` (since the
+ * merge of 2026-09-21), so this page reads crmSchedule() in assets/crm.js and its one write
+ * is wsUpdateProject(id, { dueDate }) from the date control on a row. An `events`
+ * collection of its own would give one date two homes and let them disagree.
  *
- * **The module has no store of its own.** A deadline is chapter XXI's `termin`, a field of
- * the job — so this page reads crmSchedule() in assets/crm.js and writes through the same
- * two calls /zlecenia/ makes: crmUpdateJob(id, { dueDate }) to move a date, and, since the
- * owner asked on 2026-09-10 for dates to be enterable where they are agreed,
- * crmAddJob({ name, dueDate, clientId }) to record a new one. An `events` collection of its
- * own would give one date two homes and let them disagree the first time somebody changed a
- * deadline on the job's own page; a row added here is a job, and /zlecenia/ opens it whole.
+ * 2026-09-26: the owner found two different terminarze — the month grid on /app/ and the
+ * buckets here — and asked for one. The grid, its day panel and the page's only add form
+ * now come from assets/schedule-grid.js, mounted below as prefix `cal`; this file keeps
+ * the figures, the five buckets and the closed archive under it.
  *
- * Chapter XXIII also fixes the scope in one line: "Nie buduj pełnego odpowiednika Google
- * Calendar." So there is no month grid, no week view, no recurrence and no reminder — five
- * buckets that answer "kiedy", the basics of each job beside its date, a date control on
- * the row so a missing deadline can be fixed where it is noticed, and one form that writes
- * a job with a date. Adding a name and a day is not a calendar; it is the shortest way to
- * stop somebody having to leave the page to record what they just agreed.
- *
- * Chapter XXV stands in front of the page exactly as on the other three modules — the
- * same wall, from the same builder (proGate() in src/pro.mjs, drawn by
- * assets/paywall.js), and the same one decision in lmPaywall().
+ * Chapter XXV stands in front of the page exactly as on the other Pro modules — the same
+ * wall, from the same builder (proGate() in src/pro.mjs, drawn by assets/paywall.js).
  */
 
 const calT = (key) => (typeof t === "function" ? t(key) : key);
@@ -80,23 +68,6 @@ const calUrl = (key, fallback) => ((window.LM_LINKS && window.LM_LINKS[key]) || 
  * name this file calls it by and the two arguments that make it this page's wall.
  */
 const calRenderPro = () => pwRender("cal", "calendar");
-
-/* ------------------------------------------------------------------ the client picker */
-
-/**
- * The client picker on the "add an appointment" form: every active client, plus "no client".
- * Redrawn whenever clients change or the language switches; preserves any current choice.
- */
-function calFillClientPicker() {
-  const select = document.getElementById("cal-add-client");
-  if (!select) return;
-  const selected = select.value;
-  const clients = typeof crmClients === "function" ? crmClients() : [];
-  select.innerHTML = [`<option value="">${calEsc(calT("cal_add_noclient"))}</option>`]
-    .concat(clients.map((c) =>
-      `<option value="${calEsc(c.id)}">${calEsc(c.name)}</option>`)).join("");
-  select.value = selected || "";
-}
 
 /* ------------------------------------------------------------------ the rows */
 
@@ -163,12 +134,11 @@ function calRender() {
   const page = document.getElementById("cal-page");
   if (!page) return;
   calRenderPro();
-  calFillClientPicker();
 
   const sched = typeof crmSchedule === "function" ? crmSchedule() : null;
   if (!sched) return;
 
-  const day = document.getElementById("cal-today");
+  const day = document.getElementById("cal-today-date");
   if (day) day.textContent = calDay(sched.day);
 
   document.getElementById("cal-fig-late").textContent = String(sched.counts.late);
@@ -213,37 +183,6 @@ function buildSchedulePage() {
     if (row && typeof wsUpdateProject === "function") wsUpdateProject(row.dataset.id, { dueDate: input.value });
   });
 
-  // Adding an appointment directly from the calendar: records a job with a deadline,
-  // client and name, matching what /zlecenia/ creates.
-  const addForm = document.getElementById("cal-add-form");
-  if (addForm) {
-    addForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nameInput = document.getElementById("cal-add-name");
-      const dateInput = document.getElementById("cal-add-date");
-      const clientSelect = document.getElementById("cal-add-client");
-      const name = (nameInput && nameInput.value || "").trim();
-      const dueDate = (dateInput && dateInput.value || "").trim();
-      const clientId = (clientSelect && clientSelect.value || "").trim();
-      if (!name || !dueDate || typeof wsAddProject !== "function") return;
-
-      // Nothing is said here when the row does not come back. crmAddJob() returns null for
-      // two reasons: a missing name, which the guard above has already refused, and a store
-      // that would not write — and that second one has already announced itself, because
-      // crmSave() fires `crmsavefailed` and assets/main.js answers it with the same banner
-      // every other screen gets. A message of this page's own would be the second one.
-      const row = wsAddProject(name, { dueDate, clientId });
-      if (row && clientId && typeof crmLinkProject === "function") crmLinkProject(clientId, row.id);
-      if (!row) return;
-
-      if (nameInput) {
-        nameInput.value = "";
-        nameInput.focus();
-      }
-      calRender();
-    });
-  }
-
   // Both stores, because since the merge of 2026-09-21 the rows this page draws are
   // projects: the one write it makes is wsUpdateProject(), which fires `workspacechange`,
   // and a page listening only for `crmchange` would take a typed date and never redraw —
@@ -260,6 +199,9 @@ function buildSchedulePage() {
   // are wired here, once, by assets/paywall.js.
   pwMount("cal", "calendar");
 
+  if (typeof sgMount === "function") {
+    sgMount({ prefix: "cal", projectUrl: (id) => `${calUrl("projects", "/projekty/")}?id=${encodeURIComponent(id)}` });
+  }
   calRender();
   document.documentElement.setAttribute("data-schedule-ready", "1");
 }

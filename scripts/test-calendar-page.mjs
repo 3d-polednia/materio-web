@@ -242,8 +242,8 @@ head("1. every job lands in the bucket its deadline puts it in");
     (await page.textContent("#cal-h-late")).includes("(1)"),
     await page.textContent("#cal-h-late"));
   check("today's date is said out loud",
-    (await page.textContent("#cal-today")).trim().length > 5,
-    await page.textContent("#cal-today"));
+    (await page.textContent("#cal-today-date")).trim().length > 5,
+    await page.textContent("#cal-today-date"));
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
@@ -369,6 +369,47 @@ head("3. a row is a project, and its name opens the page that owns it");
   await page.waitForSelector("#ws-project-body:not([hidden])");
   eq("which opens that project", (await page.textContent("#ws-title")).trim(), "Zaległa hydraulika");
   eq("with the same deadline on it", await page.inputValue("#ws-biz-due"), day(-3));
+  await page.close();
+}
+
+head("3a. the shared month grid and day-panel form are the same terminarz");
+{
+  const page = await open(ctx, CAL, { workspace: workspace(), crm: crm() });
+  const dayButtons = await page.$$("#cal-grid .cal-day");
+  check("the month grid renders complete weeks", dayButtons.length === 35 || dayButtons.length === 42,
+    String(dayButtons.length));
+  check("the grid has day buttons before they are inspected", dayButtons.length > 0);
+
+  // Three days ahead can fall past the trailing cells of this month's grid near its end.
+  if (!(await page.$(`#cal-grid .cal-day[data-day="${day(3)}"]`))) await page.click("#cal-next");
+  await page.click(`#cal-grid .cal-day[data-day="${day(3)}"]`);
+  check("clicking a day fills its panel",
+    (await page.textContent("#cal-daypanel")).includes("Gres w tym tygodniu"));
+  const existingLinks = await page.$$("#cal-daypanel a.cal-slot");
+  check("the panel has project links before they are inspected", existingLinks.length > 0);
+  eq("a day-panel project opens the localized projects page",
+    await page.$eval("#cal-daypanel a.cal-slot", (node) => node.getAttribute("href")),
+    `${urlProjects("pl")}?id=j-soon`);
+
+  await page.click("#cal-add-toggle");
+  await page.fill("#cal-add-name", "Nowy termin z panelu");
+  await page.fill("#cal-add-date", day(3));
+  await page.selectOption("#cal-add-color", "blue");
+  await page.fill("#cal-add-desc", "Opis z terminarza");
+  await page.click("#cal-add-form button[type=submit]");
+  await page.waitForFunction((name) => document.querySelector("#cal-grid")?.innerText.includes(name), "Nowy termin z panelu");
+  check("adding in the day panel shows the project in the grid",
+    (await page.textContent("#cal-grid")).includes("Nowy termin z panelu"));
+  check("and in the right bucket",
+    (await page.textContent("#cal-list-soon")).includes("Nowy termin z panelu"));
+
+  // 45 days ahead is past the trailing cells of whichever month the grid is showing.
+  await page.fill('#cal-list-soon > li[data-id="j-soon"] .cal-due', day(45));
+  await page.waitForFunction((name) => !document.querySelector("#cal-grid")?.innerText.includes(name), "Gres w tym tygodniu");
+  check("changing a bucket date moves the project out of the visible grid",
+    !(await page.textContent("#cal-grid")).includes("Gres w tym tygodniu"));
+  check("and into the later bucket",
+    (await page.textContent("#cal-list-later")).includes("Gres w tym tygodniu"));
   await page.close();
 }
 
@@ -498,7 +539,7 @@ head("5. the same deadlines read in four languages");
     check(`${lang}: the distance to the deadline is in words`, rel.length > 0, rel);
     phrases.push(rel);
     check(`${lang}: today's date is written the way this language writes one`,
-      (await page.textContent("#cal-today")).trim().length > 5);
+      (await page.textContent("#cal-today-date")).trim().length > 5);
     check(`${lang}: no error in the console`, page.errors.length === 0,
       page.errors.join("\n      "));
     await page.close();

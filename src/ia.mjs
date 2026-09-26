@@ -391,12 +391,14 @@ export const ROUTES = [
     navLevel: LEVEL.PRO,
     gate: "As clients, jobs and quotes — the same wall, from the same builder.",
     note: "Chapter XXIII, and the fourth of the five Pro modules: the deadlines of the " +
-      "jobs, grouped by how close they are, and the basics beside each one. It is the " +
-      "one Pro module that **stores nothing**: a deadline is a field of a job " +
-      "(chapter XXI's `termin`), so the page reads `jobs` through crmSchedule() and its " +
-      "single write is crmUpdateJob(). A `calendar` collection of its own would give one " +
+      "projects, grouped by how close they are, and the basics beside each one. It is the " +
+      "one Pro module that **stores nothing**: a deadline is a field of a project " +
+      "(`dueDate`, since the merge of 2026-09-21), so the page reads crmSchedule() and " +
+      "writes through wsUpdateProject(). A `calendar` collection of its own would give one " +
       "date two homes and let them disagree. It is also why the route has no `?id=` " +
-      "view: a row opens the project it belongs to, on /projekty/.",
+      "view: a row opens the project it belongs to, on /projekty/. Since 2026-09-26 the " +
+      "month grid lives here too (assets/schedule-grid.js, shared with /app/): the owner " +
+      "asked for one terminarz instead of two different screens.",
   },
 
   /* ---------------------------------------------------------------- account */
