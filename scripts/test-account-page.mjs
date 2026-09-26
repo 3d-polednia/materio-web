@@ -150,6 +150,7 @@ async function context(options) {
  * @param {object} [opts.storage]  localStorage entries to plant
  * @param {boolean} [opts.fromCache] the first collection snapshot comes out of the local
  *                                   cache, which is what a returning visitor meets
+ * @param {number} [opts.latencyMs] opt-in fake Firestore server round-trip delay
  * @param {string} [opts.lang]     the saved language choice; "pl" on /app/ by default
  */
 async function openApp(ctx, url, opts = {}) {
@@ -162,9 +163,10 @@ async function openApp(ctx, url, opts = {}) {
   });
   page.on("pageerror", (e) => errors.push(String(e)));
   const isAppPage = url.startsWith("/app/");
-  await page.addInitScript(([accounts, docs, storage, fromCache, isApp]) => {
+  await page.addInitScript(([accounts, docs, storage, fromCache, isApp, latencyMs]) => {
     window.__fbAccounts = accounts;
     window.__fbSeed = docs;
+    if (latencyMs !== undefined) window.__fbLatencyMs = latencyMs;
     // The stub's answer to "did this snapshot come from the server". Off by default,
     // because most of this file is about a browser that has never been here before.
     window.__fbFromCache = fromCache;
@@ -177,7 +179,8 @@ async function openApp(ctx, url, opts = {}) {
     if (!isApp && docs && Object.keys(docs).length) {
       window.__fbDocs = new Map(Object.entries(docs));
     }
-  }, [opts.accounts || {}, opts.docs || {}, opts.storage || {}, Boolean(opts.fromCache), isAppPage]);
+  }, [opts.accounts || {}, opts.docs || {}, opts.storage || {}, Boolean(opts.fromCache), isAppPage,
+    opts.latencyMs]);
   await page.goto(base + url, { waitUntil: "domcontentloaded" });
   // /app/ boots asynchronously — it imports the SDK, then wires the forms — and sets
   // data-app-ready when it is done. Clicking before that clicks a button nothing is
@@ -1622,6 +1625,105 @@ head("18b. a connection that is gone without the browser noticing");
   await page.waitForSelector("#app-offline", { state: "hidden", timeout: 5000 });
   eq("a snapshot from the server takes it down again",
     await page.locator("#app-offline").isHidden(), true);
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+/* Guards the 2026-09-26 report: deleted projects and rooms came back about 10 seconds
+   later. The stub needs latency so edits can land while the sign-in pull/push is active. */
+head("19. a delete made while the sign-in sync is running stays deleted");
+{
+  const projects = [];
+  const rooms = [];
+  const estimations = [];
+  const docs = { "users/u1": { plan: "free" } };
+  for (let n = 1; n <= 6; n++) {
+    const project = {
+      name: `Projekt ${n}`, archived: false, clientId: "", status: "new", dueDate: "",
+      valueMinor: null, currencyCode: "", note: "", color: "", createdAt: 1000,
+      updatedAt: 1000 + n, deletedAt: null, schemaVersion: 1,
+    };
+    const room = {
+      name: `Pokój ${n}`, lengthM: 4, widthM: 3, heightM: 2.5, projectId: `p${n}`,
+      createdAt: 1000, updatedAt: 1000, deletedAt: null, schemaVersion: 1,
+    };
+    docs[`users/u1/projects/p${n}`] = project;
+    docs[`users/u1/rooms/r${n}`] = room;
+    projects.push({ id: `p${n}`, ...project });
+    rooms.push({ id: `r${n}`, ...room });
+    for (const suffix of ["a", "b"]) {
+      const estimation = {
+        name: "Farba", calculationType: "PAINT", materialCategory: "PAINT",
+        requiredUnits: 2, unitLabel: "l", totalCostMinor: 5000, wastePercentage: 10,
+        wasteCostMinor: 500, currencyCode: "PLN", inputJson: "{}", createdAt: 1000,
+        updatedAt: 1000, deletedAt: null, schemaVersion: 1,
+      };
+      const id = `e${n}-${suffix}`;
+      docs[`users/u1/projects/p${n}/estimations/${id}`] = estimation;
+      estimations.push({ id, projectId: `p${n}`, ...estimation });
+    }
+  }
+  const workspace = { projects, rooms, estimations, shoppingItems: [] };
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openTab(ctx, "projects", {
+    latencyMs: 150,
+    docs,
+    storage: {
+      "materio-workspace-v1": JSON.stringify(workspace),
+      "liczmat-sync-account": "u1",
+    },
+  });
+
+  // The pull has read both lists and is still reading the estimates: from here on its copy
+  // of p3 and r5 is out of date, which is the window the visitor clicked in.
+  await page.waitForFunction(() => {
+    const reads = window.__fbReads || [];
+    return reads.includes("users/u1/projects") && reads.includes("users/u1/rooms");
+  }, null, { timeout: 10000, polling: 10 });
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.click('#project-list li[data-id="p3"] > .row-actions [data-del]');
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.click('#project-list li[data-id="p5"] .app-rooms li[data-id="r5"] [data-del]');
+  await page.selectOption('#project-list li[data-id="p4"] > .row-actions [data-status]', "done");
+
+  await page.waitForFunction(() => {
+    if (window.__fbInFlight !== 0) {
+      window.__fbIdleSince = 0;
+      return false;
+    }
+    if (!window.__fbIdleSince) window.__fbIdleSince = Date.now();
+    return Date.now() - window.__fbIdleSince >= 1000;
+  }, null, { timeout: 30000, polling: 50 });
+
+  const overlap = await page.evaluate(() => {
+    const writes = window.__fbWrites || [];
+    const deleted = writes.findIndex((row) =>
+      row.path === "users/u1/projects/p3" && row.deleted === true);
+    let lastEstimation = -1;
+    writes.forEach((row, index) => {
+      if (row.path.includes("/estimations/")) lastEstimation = index;
+    });
+    return { deleted, lastEstimation };
+  });
+  check("the delete was made while the sign-in sync was still running",
+    overlap.deleted >= 0 && overlap.deleted < overlap.lastEstimation, JSON.stringify(overlap));
+  eq("the deleted project stays deleted in Firestore",
+    await page.evaluate(() => Boolean(window.__fbDocs.get("users/u1/projects/p3").deletedAt)), true);
+  eq("the deleted room stays deleted in Firestore",
+    await page.evaluate(() => Boolean(window.__fbDocs.get("users/u1/rooms/r5").deletedAt)), true);
+  eq("the status chosen during the sync is kept",
+    await page.evaluate(() => window.__fbDocs.get("users/u1/projects/p4").status), "done");
+  eq("the deleted project does not come back on screen",
+    await page.locator('#project-list > li[data-id="p3"]').count(), 0);
+  eq("the deleted room does not come back on screen",
+    await page.locator('#project-list .app-rooms li[data-id="r5"]').count(), 0);
+  eq("this browser's copy learns the project is deleted",
+    await page.evaluate(() => Boolean(JSON.parse(localStorage.getItem("materio-workspace-v1"))
+      .projects.find((row) => row.id === "p3").deletedAt)), true);
+  eq("this browser's copy learns the room is deleted",
+    await page.evaluate(() => Boolean(JSON.parse(localStorage.getItem("materio-workspace-v1"))
+      .rooms.find((row) => row.id === "r5").deletedAt)), true);
   eq("no console error", page.lmErrors.join(" / "), "");
   await page.close();
   await ctx.close();

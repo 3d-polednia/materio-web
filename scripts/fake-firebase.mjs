@@ -169,6 +169,17 @@ export const FAKE_STORE = `
 const DOCS = (window.__fbDocs = window.__fbDocs || new Map());
 const key = (parts) => parts.join("/");
 
+/* Tests may opt into server round trips with window.__fbLatencyMs. Writes still apply
+   locally at once; only their acknowledgement, and reads, wait for the server. */
+const latency = () => Number(window.__fbLatencyMs) > 0 ? Number(window.__fbLatencyMs) : 0;
+function delayed(value) {
+  window.__fbInFlight = (window.__fbInFlight || 0) + 1;
+  return new Promise((resolve) => setTimeout(() => {
+    window.__fbInFlight--;
+    resolve(typeof value === "function" ? value() : value);
+  }, latency()));
+}
+
 /* Live listeners on a single document, by path. The real SDK has them and /app/ now uses
    one on users/{uid}, because \`plan\` is written by the server and the page has no other
    way of hearing about it. window.__fbPushDoc() is how a test plays that server: it
@@ -196,15 +207,44 @@ export function query(ref) { return ref; }
 export function orderBy() { return null; }
 export function where() { return null; }
 export function getDoc(ref) {
+  if (latency()) {
+    const data = DOCS.get(ref.path);
+    return delayed({ exists: () => data !== undefined, data: () => data });
+  }
   const data = DOCS.get(ref.path);
   return Promise.resolve({ exists: () => data !== undefined, data: () => data });
 }
-export function setDoc(ref, data) {
+export function setDoc(ref, data, options) {
+  if (latency()) {
+    const merged = options && options.merge
+      ? { ...(DOCS.get(ref.path) || {}), ...data }
+      : { ...data };
+    DOCS.set(ref.path, merged);
+    notifyDoc(ref.path);
+    window.__fbWrites = window.__fbWrites || [];
+    window.__fbWrites.push({
+      path: ref.path,
+      deleted: Boolean(merged.deletedAt),
+      status: merged.status ?? null,
+    });
+    const at = ref.path.lastIndexOf("/");
+    const parent = ref.path.slice(0, at);
+    const id = ref.path.slice(at + 1);
+    COLL_SUBS.forEach((sub) => {
+      if (sub.path === parent) {
+        sub.onNext(collSnap(sub.path, false, [{
+          type: "modified", doc: { id, data: () => DOCS.get(ref.path) },
+        }]));
+      }
+    });
+    return delayed();
+  }
   DOCS.set(ref.path, { ...data });
   notifyDoc(ref.path);
   return Promise.resolve();
 }
 export function updateDoc(ref, data) {
+  if (latency()) return setDoc(ref, data, { merge: true });
   DOCS.set(ref.path, { ...(DOCS.get(ref.path) || {}), ...data });
   notifyDoc(ref.path);
   return Promise.resolve();
@@ -222,6 +262,15 @@ export function deleteDoc(ref) {
   return Promise.resolve();
 }
 export function getDocs(ref) {
+  if (latency()) {
+    (window.__fbReads = window.__fbReads || []).push(ref.path);
+    const rows = [];
+    DOCS.forEach((value, path) => {
+      const at = path.lastIndexOf("/");
+      if (path.slice(0, at) === ref.path) rows.push({ id: path.slice(at + 1), ref: { path }, data: () => value });
+    });
+    return delayed({ docs: rows, forEach: (fn) => rows.forEach(fn) });
+  }
   const rows = [];
   DOCS.forEach((value, path) => {
     const at = path.lastIndexOf("/");

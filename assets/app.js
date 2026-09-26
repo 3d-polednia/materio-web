@@ -976,6 +976,7 @@ function listen(collectionName, onRows) {
           all.push(doc);
           if (!data.deletedAt) rows.push(doc);
         });
+        sawRemote(collectionName, all);
         onRows(rows, all);
       }
     },
@@ -995,6 +996,9 @@ function listen(collectionName, onRows) {
 function stopListening() {
   state.unsub.forEach((fn) => fn());
   state.unsub = [];
+  // What the listeners saw belongs to the account they were listening to.
+  remoteStamps.projects.clear();
+  remoteStamps.rooms.clear();
   // Nothing is listening any more, so nothing is waiting to go out: the notice comes
   // down with the listeners rather than staying on the sign-in screen.
   conn.synced.clear();
@@ -1159,6 +1163,48 @@ async function maybeMountAdmin(user) {
 const projectDoc = (id, uid = state.uid) => fb.doc(db, "users", uid, "projects", id);
 const roomDoc = (id, uid = state.uid) => fb.doc(db, "users", uid, "rooms", id);
 
+/**
+ * The `updatedAt` of every project and room as Firestore last showed it to this page,
+ * tombstones included (2026-09-26).
+ *
+ * The sign-in sync uploads the browser's copy for seconds after the page opens, one
+ * awaited write per row, and it used to send whatever that copy said. A project the
+ * visitor deleted on the Projekty tab in those seconds got its tombstone and then the old
+ * live copy on top of it, and was back on the screen ten seconds later; a status changed
+ * there went back the same way. Last write wins on `updatedAt` is the contract's rule for
+ * the pull, and syncPushAll() now keeps it on the way up: a row that Firestore holds at
+ * this version or a newer one is not the browser's to send.
+ *
+ * Fed by the live listeners and, for this page's own writes, by the write itself — the
+ * listener's echo arrives a moment later, and the push must not slip in between.
+ */
+const remoteStamps = { projects: new Map(), rooms: new Map() };
+
+/**
+ * A listener's snapshot is the whole collection, so it replaces what was known: a
+ * document gone from Firestore must not keep a stamp that stops the push re-creating it.
+ */
+function sawRemote(collectionName, rows) {
+  const seen = remoteStamps[collectionName];
+  if (!seen) return;
+  seen.clear();
+  rows.forEach((row) => seen.set(row.id, Number(row.updatedAt) || 0));
+}
+
+/** A write this page makes to a project or room, remembered before it is sent. */
+function sawOwnWrite(ref, updatedAt) {
+  const [, , collectionName, id, deeper] = String(ref.path || "").split("/");
+  const seen = remoteStamps[collectionName];
+  if (seen && id && deeper === undefined) seen.set(id, Number(updatedAt) || 0);
+}
+
+/** Firestore already holds this row at the browser's version, or a newer one. */
+function remoteHasRow(collectionName, row) {
+  const seen = remoteStamps[collectionName];
+  const at = seen ? seen.get(row.id) : undefined;
+  return at !== undefined && at >= (Number(row.updatedAt) || 0);
+}
+
 async function addProject(name, fields = {}) {
   const now = Date.now();
   const id = newId();
@@ -1198,8 +1244,9 @@ async function addRoom(name, lengthM, widthM, heightM, projectId) {
  * `CloudSync.kt` is a merge too.
  */
 async function tombstone(ref, row, fields) {
-  await fb.setDoc(ref, { ...fields, ...syncFields(row.createdAt || Date.now(), Date.now()) },
-    { merge: true });
+  const data = { ...fields, ...syncFields(row.createdAt || Date.now(), Date.now()) };
+  sawOwnWrite(ref, data.updatedAt);
+  await fb.setDoc(ref, data, { merge: true });
 }
 
 function renderProjects() {
@@ -1469,9 +1516,11 @@ function wireWorkspace() {
     const project = state.projects.find((p) => p.id === li.dataset.id);
     if (!project) return;
     try {
+      const updatedAt = Date.now();
+      sawOwnWrite(projectDoc(project.id), updatedAt);
       await fb.setDoc(projectDoc(project.id), {
         status: statusSelect.value,
-        updatedAt: Date.now(),
+        updatedAt,
       }, { merge: true });
     } catch (err) { status(T("app_err_unknown"), true); }
   });
@@ -2150,9 +2199,9 @@ function wireRoomsPanel() {
     const room = state.rooms.find((r) => r.id === li.dataset.id);
     if (!room) return;
     try {
-      await fb.setDoc(roomDoc(room.id), {
-        projectId: select.value, ...syncFields(room.createdAt || Date.now()),
-      }, { merge: true });
+      const data = { projectId: select.value, ...syncFields(room.createdAt || Date.now()) };
+      sawOwnWrite(roomDoc(room.id), data.updatedAt);
+      await fb.setDoc(roomDoc(room.id), data, { merge: true });
     } catch (err) { status(T("app_err_unknown"), true); }
   });
 }
@@ -2268,11 +2317,15 @@ function renderLocalSummary() {
  * Mirror incoming Firestore documents into localStorage without triggering an up-sync.
  *
  * Runs on live listener snapshots so deletions and remote additions reach localStorage
- * immediately. Guarded by syncBusy so the wsSave() called inside wsImport() does not
+ * immediately — including while a push or a pull is running (2026-09-26). It used to sit
+ * those out, and a project deleted on this page during the sign-in sync stayed alive in
+ * the browser's copy, where /projekty/ kept showing it and the push picked it up again.
+ * wsImport() is last-write-wins, so a snapshot landing in the middle of a pull cannot
+ * undo anything newer. syncBusy is still raised around it, so the wsSave() inside does not
  * start an automatic push back to Firestore.
  */
 function mirrorToLocal(incoming) {
-  if (syncBusy !== 0 || blockedWorkspace() || typeof wsImport !== "function") return;
+  if (blockedWorkspace() || typeof wsImport !== "function") return;
   syncBusy++;
   try {
     wsImport(incoming);
@@ -2313,9 +2366,17 @@ async function syncPushAll(uid, since) {
   const MERGE = { merge: true };
   const local = wsExport();
   const skippable = (row) => Number.isFinite(since) && Number.isFinite(row.updatedAt) && row.updatedAt <= since;
-  for (const p of local.projects) {
+  // Projects and rooms are read again at the moment each one is sent, not taken from the
+  // list made when the push began: every write is awaited, and in those seconds the live
+  // listener can have brought a delete or an edit made on this page into the browser's
+  // copy. What Firestore already holds at this version or a newer one stays unsent — see
+  // remoteStamps.
+  const current = (key, id) => (wsExport()[key] || []).find((row) => row.id === id);
+  for (const listed of local.projects) {
+    const p = current("projects", listed.id);
+    if (!p) continue;
     if (!pathId(p.id)) continue;
-    if (skippable(p)) continue;
+    if (skippable(p) || remoteHasRow("projects", p)) continue;
     const value = p.valueMinor == null || !Number.isFinite(Number(p.valueMinor))
       ? null : Math.round(Number(p.valueMinor));
     requireSyncUid(uid);
@@ -2336,9 +2397,11 @@ async function syncPushAll(uid, since) {
       ...syncFields(p.createdAt, p.deletedAt),
     }, MERGE);
   }
-  for (const r of local.rooms) {
+  for (const listed of local.rooms) {
+    const r = current("rooms", listed.id);
+    if (!r) continue;
     if (!pathId(r.id)) continue;
-    if (skippable(r)) continue;
+    if (skippable(r) || remoteHasRow("rooms", r)) continue;
     // `projectId` is chapter XVIII's "pomieszczenia są elementem projektu" and is not
     // in the contract: `RoomEntity` has no column, `roomToDoc()` no key, `validRoom()`
     // no check. It goes up anyway for the reason session 18 established and session 20

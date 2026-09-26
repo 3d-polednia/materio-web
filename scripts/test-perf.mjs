@@ -182,7 +182,9 @@ const BUDGET = {
   // Raised 2026-09-24 from 405, measured at 406.0 kB raw: the open list of every select
   // (appearance: base-select in assets/styles.css) is about 1.2 kB of stylesheet on all
   // pages, and this was the one with under a kilobyte left. Gzipped it did not cross.
-  "app/index.html": [413, 126],
+  // Raised 2026-09-26 from 413, measured at 413.5 kB raw: 1.3 kB of assets/app.js that
+  // stops the sign-in sync from pushing a deleted project or room back up (remoteStamps).
+  "app/index.html": [415, 126],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
