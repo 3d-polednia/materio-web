@@ -431,6 +431,11 @@ body {
 /* Type. Four heading levels, three of them fluid, all from the scale. h1 is the
    page title; --fs-display is bigger still and belongs to the hero alone. */
 h1, h2, h3, h4 { line-height: var(--lh-tight); margin: 0 0 .5em; letter-spacing: var(--track-tight); }
+/* One long word must not push a 320 px page sideways: "Einheitenumrechner" and
+   "Bouwrekenmachines" are wider than that screen in any font a little wider than Segoe UI
+   (Arial, Roboto, the Liberation Sans CI renders with). Hyphenated where the browser has
+   the language's dictionary, broken plainly where it has not. */
+h1, h2, h3 { overflow-wrap: break-word; hyphens: auto; }
 h1 { font-size: var(--fs-h1); font-weight: var(--fw-black); }
 h2 { font-size: var(--fs-h2); font-weight: var(--fw-bold); }
 h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); }
@@ -870,6 +875,8 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .result {
   margin-top: var(--sp-4); padding: var(--sp-4); border-radius: var(--radius-sm);
   background: var(--accent-soft); color: var(--on-accent-soft);
+  /* An e-mail address in the admin panel's status line ran 3 px past a 320 px screen. */
+  overflow-wrap: break-word;
   display: none;
 }
 .result.show { display: block; }
@@ -1132,10 +1139,15 @@ html.js:not([data-lm-level="pro"]) [data-nav-level="pro"] { display: none; }
 .nav-list { display: flex; gap: var(--sp-1); align-items: center; list-style: none; margin: 0; padding: 0; }
 .nav-links a {
   display: block; white-space: nowrap; color: var(--on-bg); padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--radius-pill); font-weight: var(--fw-semi); font-size: var(--fs-sm);
+  font-weight: var(--fw-semi); font-size: var(--fs-sm);
+}
+/* Not the account button: it is a .btn and moves like one. This rule used to give it a
+   cream background on hover under its growing disc, and a transition without the disc. */
+.nav-links a:not(.btn) {
+  border-radius: var(--radius-pill);
   transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-.nav-links a:hover { background: var(--surface-alt); text-decoration: none; }
+.nav-links a:not(.btn):hover { background: var(--surface-alt); text-decoration: none; }
 /* Where you are. The tint alone would be a colour-only cue, so the section also keeps
    a lime rule under it (WCAG 1.4.1). */
 /* The attribute, not the value: audit item M11 splits it into "page" for the address the
@@ -1237,7 +1249,10 @@ footer.site {
   background: var(--surface-container); border-top: 1px solid var(--outline);
   padding: var(--sp-4) 0 var(--sp-3); margin-top: var(--sp-5);
 }
-.foot-grid { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(0, 3fr) minmax(0, 1.2fr) minmax(0, 1.3fr); gap: var(--sp-4); align-items: start; }
+/* 1.3fr/2.8fr rather than 1fr/3fr: at 1fr the brand line took three lines at 1400 px and
+   set the height of the whole row (262 px in CI against the 260 px ceiling); the product
+   column had room to give. Measured in four languages at 1160–1600 px. */
+.foot-grid { display: grid; grid-template-columns: minmax(160px, 1.3fr) minmax(0, 2.8fr) minmax(0, 1.2fr) minmax(0, 1.3fr); gap: var(--sp-4); align-items: start; }
 footer .brand { margin-bottom: var(--sp-2); }
 .foot-brand p { margin: 0; font-size: var(--fs-sm); }
 footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
@@ -1338,7 +1353,10 @@ footer h2 {
     display: grid; grid-template-columns: auto auto; justify-content: start;
     column-gap: var(--sp-4); row-gap: var(--sp-2);
   }
-  .consent-actions .btn { grid-row: 2; }
+  /* A button keeps its word whole here: with .btn's `anywhere` the auto column gave
+     "Einverstanden" and "Погоджуюсь" less than one word, and the long link beside them
+     wraps instead. */
+  .consent-actions .btn { grid-row: 2; overflow-wrap: normal; }
 }
 
 
@@ -2043,10 +2061,12 @@ a.chip:hover { text-decoration: none; }
 
 /* The Terminarz month grid — the owner's explicit exception to chapter XXIII, see the
    note in src/app-pages.mjs above the schedule panel. */
-.cal-wrap { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; align-items: start; }
+/* minmax(0, …), not 1fr: a bare 1fr keeps the panel at least as wide as its header, and on a
+   320 px phone with larger text that header pushed the page 26 px sideways. */
+.cal-wrap { display: grid; gap: var(--sp-4); grid-template-columns: minmax(0, 1fr); align-items: start; }
 @media (min-width: 760px) { .cal-wrap { grid-template-columns: minmax(0, 1fr) 280px; } }
 
-.cal-head { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+.cal-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-3); }
 .cal-head h3 { margin: 0; font-size: var(--fs-md); text-transform: capitalize; }
 /* The month and year are the way into the picker, so the heading has to be pressable —
    but it is still the heading. A .btn class in here would have put a bordered pill where
@@ -2788,12 +2808,20 @@ a.chip:hover { text-decoration: none; }
    were four languages; with ten it is Russian that decides, and what it decided is the
    breakpoint below. Session W (2026-09-24) added the sixth link, "Sklepy": above 1160px
    the type steps up to 112.5%, and signed-in Ukrainian, Dutch and French then ran up to
-   52px past the edge between 1161px and 1279px, so the tightening now holds to 1279px. */
-@media (max-width: 1279px) {
+   52px past the edge between 1161px and 1279px, so the tightening now holds to 1279px.
+   2026-09-26: and to 1399px — signed-in Ukrainian at 1280px was 1px past the edge in CI
+   (Liberation Sans) and 15px in Arial, the width a Mac or Android font takes. */
+@media (max-width: 1399px) {
   .nav, .nav-links { gap: var(--sp-2); }
   .nav-list { gap: 0; }
   .nav-list a { padding-left: var(--sp-2); padding-right: var(--sp-2); }
   .lang-btn, .cur-select { padding-left: var(--sp-2); padding-right: var(--sp-2); }
+}
+/* Below 1160px the type is back to 100% and the row is at its tightest: signed-in Ukrainian
+   at 1061px was 9px past the edge in Arial. The account button gives up 12px. */
+@media (min-width: 1061px) and (max-width: 1159px) {
+  .nav-links a.nav-cta { padding-left: var(--sp-2); padding-right: var(--sp-2); }
+  .nav-cta[data-level]::after { margin-left: var(--sp-1); }
 }
 
 /* The header collapses into the drawer here, and the number is measured rather than
