@@ -368,7 +368,7 @@ head("bez javascriptu");
   await ctx.close();
 }
 
-/* --- 7. the header row, with six links ------------------------------------------------ */
+/* --- 7. the header row, with five links ----------------------------------------------- */
 
 head("nagłówek");
 {
@@ -382,8 +382,8 @@ head("nagłówek");
   // 1033px, and the two widths this list used to start with (900, 1000) had quietly become
   // drawer widths. The row now starts one pixel above the breakpoint. Above 1160px the
   // tightening in assets/styles.css stops applying, so both sides of that are checked. The
-  // guest view is the honest one to measure at four visible links AND at five: the fifth,
-  // "Projekty", comes back the moment somebody signs in.
+  // Since the owner's 2026-09-26 decision, Projekty lives only in the account sidebar;
+  // signed-in and guest headers both carry the same five public links.
   for (const width of [1061, 1100, 1160, 1200, 1240, 1280]) {
     const ctx = await context({ viewport: { width, height: 800 } });
     for (const lang of LANGS) {
@@ -414,7 +414,7 @@ head("nagłówek");
           };
         });
 
-        eq(`${who}: the links a visitor sees`, row.shown, signedIn ? 6 : 5);
+        eq(`${who}: the links a visitor sees`, row.shown, 5);
         eq(`${who}: they are all on one line`, row.lines, 1);
         check(`${who}: the account button is inside the viewport`,
           row.ctaRight <= row.width, `button ends at ${row.ctaRight} of ${row.width}`);

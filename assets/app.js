@@ -33,7 +33,7 @@
  */
 
 import { FIREBASE_CONFIG, FIREBASE_READY, FIREBASE_SDK } from "./firebase-config.js";
-import { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, num, syncFields, shareToken } from "./account-sync.js";
+import { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX } from "./account-sync.js";
 
 const $ = (id) => document.getElementById(id);
 const T = (key) => (typeof t === "function" ? t(key) : key);
@@ -52,8 +52,6 @@ let accountSync = null;
 let openAccountRoomProjectId = null;
 
 /* ------------------------------------------------------------------ helpers */
-
-const newId = () => (crypto.randomUUID ? crypto.randomUUID() : shareToken());
 
 /**
  * Popup failures that mean "this browser cannot show a popup", as opposed to "the visitor
@@ -141,32 +139,11 @@ async function boot() {
   // The browser may be arriving back from the Google redirect the button falls back to when a
   // popup is blocked. Without this call the finished sign-in would be dropped without a word.
   authMod.getRedirectResult(auth).catch((err) => status(authMessage(err && err.code), true));
-  wireWorkspace();
-  wireTabs();
+  wireHashPanels();
   wireProfilePanel();
   wireAccountPanel();
   wireSyncPanel();
-  wireClientsPanel();
-  wireQuotesPanel();
-  if (typeof sgMount === "function") sgMount({ prefix: "acctcal", projectUrl: (id) => proLink("projects", id) });
-  wireMaterialsPanel();
-  wireRoomsPanel();
-  // assets/crm.js/assets/own-materials.js are plain localStorage, not Firestore — nothing
-  // here waits on a listener, so these four can draw as soon as the tabs exist rather than
-  // waiting for onSignedIn(). Przegląd/Pomieszczenia draw once state.projects/state.rooms
-  // arrive instead — see the note at the end of renderProjects()/renderRooms().
-  renderClients();
-  renderQuotes();
-  if (typeof sgRender === "function") sgRender("acctcal");
-  renderMaterialsPanel();
-  // proGate()'s markup exists whether or not /app/ ever had a wall before — pwMount() is
-  // the same call /klienci/, /zlecenia/, /wyceny/ and /terminarz/ each make for themselves,
-  // one prefix per tab so the four cannot draw over each other's state.
-  if (typeof pwMount === "function") {
-    pwMount("acctclients", "clients");
-    pwMount("acctquo", "quotes");
-    pwMount("acctcal", "calendar");
-  }
+  renderOverview();
 
   // The plan panel quotes a price, and a price is in the visitor's currency.
   document.addEventListener("currencychange", renderPlan);
@@ -181,16 +158,11 @@ async function boot() {
   // be written again — before this, switching language left the identity bar, the
   // level, the dates and both lists in the previous one.
   document.addEventListener("langchange", () => {
-    renderClients();
-    renderQuotes();
-    if (typeof sgRender === "function") sgRender("acctcal");
-    renderMaterialsPanel();
     if (!state.user) return;
     renderIdentity();
     renderProfile();
     renderPlan();
-    renderProjects();
-    renderRooms();
+    renderOverview();
     renderLocalSummary();
   });
 
@@ -415,8 +387,8 @@ async function onSignedIn(user) {
   renderProfile();
   renderNext();
 
-  listen("projects", (rows, all) => { state.projects = rows; renderProjects(); accountSync.mirrorToLocal({ projects: all }); });
-  listen("rooms", (rows, all) => { state.rooms = rows; renderRooms(); renderProjects(); accountSync.mirrorToLocal({ rooms: all }); });
+  listen("projects", (rows, all) => { state.projects = rows; renderOverview(); accountSync.mirrorToLocal({ projects: all }); });
+  listen("rooms", (rows, all) => { state.rooms = rows; renderOverview(); accountSync.mirrorToLocal({ rooms: all }); });
   renderLocalSummary();
 
   // Reconcile Firestore and localStorage quietly on sign-in without blocking the interface.
@@ -920,97 +892,25 @@ function stopListening() {
   renderConnection();
 }
 
-/* ------------------------------------------------------------------ tabs */
+/* ------------------------------------------------------------------ hash panels */
 
-/**
- * The tabs, driven by the mouse and by the keyboard.
- *
- * `role="tablist"` promises arrow-key navigation and one stop in the tab order for the
- * whole strip; a screen reader announces it either way, so the promise has to be kept.
- * Only the selected tab is reachable with Tab, and the arrows move between them.
- *
- * Five of them are in the markup and a sixth can arrive later: assets/admin.js appends an
- * "Admin" tab for an account whose token carries the claim, long after this ran. So the
- * strip is wired **once, by delegation**, and the list of tabs is read at the moment a key
- * or a click happens rather than captured here — a snapshot taken at boot would leave the
- * new tab clickable and dead to the arrow keys, which is exactly the kind of half-working
- * control `role="tablist"` promises not to be.
- */
-function wireTabs() {
-  // 2026-09-03: the strip became a sidebar (.app-nav/.app-nav-item), but it is still one
-  // tablist with one selected tab at a time — the click/arrow-key logic below is
-  // unchanged from the old .app-tabs/.app-tab strip, only the two selectors are.
-  const strip = document.querySelector(".app-nav");
-  if (!strip) return;
-  const tabs = () => Array.from(strip.querySelectorAll(".app-nav-item"));
-
-  // A tablist is horizontal unless it says otherwise, and CSS flips this one at the same
-  // 900px where .app-shell becomes a sidebar layout. Without the attribute a screen
-  // reader announced a column of twelve items as a horizontal strip, and told the visitor
-  // to use the wrong arrow keys. The keydown handler accepts both axes either way.
-  const wide = window.matchMedia("(min-width: 900px)");
-  const setOrientation = () => strip.setAttribute("aria-orientation", wide.matches ? "vertical" : "horizontal");
-  setOrientation();
-  wide.addEventListener("change", setOrientation);
-
-  const select = (btn, focus) => {
-    if (!btn) return;
-    tabs().forEach((b) => {
-      const on = b === btn;
-      b.setAttribute("aria-selected", String(on));
-      b.tabIndex = on ? 0 : -1;
-    });
-    // Whichever way the strip scrolls, the selected tab has to be inside it. Below 900px
-    // it is two rows of pills that scroll sideways and the selected pill sat off-screen
-    // entirely — measured at x=696..830 inside a 358px strip with scrollLeft still 0.
-    // Above 900px the rail is its own vertical scroll area, taller than the window, so
-    // the same thing happens downwards. "nearest" on both axes moves the strip and never
-    // the page.
-    if (strip.scrollWidth > strip.clientWidth || strip.scrollHeight > strip.clientHeight) {
-      btn.scrollIntoView({ inline: "nearest", block: "nearest" });
-    }
-    document.querySelectorAll("[data-panel]").forEach((panel) => {
-      panel.hidden = panel.dataset.panel !== btn.dataset.tab;
-    });
-    if (focus) btn.focus();
-    if (btn.dataset.tab === "overview") renderOverview();
-    if (btn.dataset.tab === "clients") renderClients();
-    if (btn.dataset.tab === "quotes") renderQuotes();
-    if (btn.dataset.tab === "schedule" && typeof sgRender === "function") sgRender("acctcal");
-    if (btn.dataset.tab === "materials") renderMaterialsPanel();
-    if (btn.dataset.tab === "rooms") renderRoomsPanel();
-    if (btn.dataset.tab === "sync") renderLocalSummary();
-    if (btn.dataset.tab === "profile") renderProfile();
-    if (btn.dataset.tab === "pro") renderPlan();
+/** The account settings remain on /app/; every work tool is a normal page link. */
+function wireHashPanels() {
+  const routes = { "#profil": "profile", "#synchronizacja": "sync", "#pro": "pro", "#konto": "account" };
+  const show = () => {
+    const id = location.hash === "#admin" && document.getElementById("panel-admin") ? "admin" : (routes[location.hash] || "overview");
+    document.querySelectorAll("[data-panel]").forEach((panel) => { panel.hidden = panel.dataset.panel !== id; });
+    document.querySelectorAll(".app-nav-item[aria-current]").forEach((link) => link.removeAttribute("aria-current"));
+    const suffix = id === "overview" ? "#przeglad" : location.hash;
+    const link = Array.from(document.querySelectorAll(".app-nav-item")).find((item) => item.getAttribute("href").endsWith(suffix));
+    if (link) link.setAttribute("aria-current", "page");
+    if (id === "overview") renderOverview();
+    if (id === "sync") renderLocalSummary();
+    if (id === "profile") renderProfile();
+    if (id === "pro") renderPlan();
   };
-
-  strip.addEventListener("click", (e) => {
-    const btn = e.target.closest(".app-nav-item");
-    if (btn) select(btn);
-  });
-
-  strip.addEventListener("keydown", (e) => {
-    const btn = e.target.closest(".app-nav-item");
-    if (!btn) return;
-    const all = tabs();
-    const index = all.indexOf(btn);
-    const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1
-      : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
-    if (step) select(all[(index + step + all.length) % all.length], true);
-    else if (e.key === "Home") select(all[0], true);
-    else if (e.key === "End") select(all[all.length - 1], true);
-    else return;
-    e.preventDefault();
-  });
-
-  // "See all" buttons on the Przegląd tab ([data-goto-tab]) just click the matching
-  // sidebar item — one place that knows how to switch tabs, not two.
-  document.addEventListener("click", (e) => {
-    const goto = e.target.closest("[data-goto-tab]");
-    if (!goto) return;
-    const target = document.getElementById(`tab-${goto.dataset.gotoTab}`);
-    if (target) select(target, true);
-  });
+  window.addEventListener("hashchange", show);
+  show();
 }
 
 /* ------------------------------------------------------------------ the admin panel */
@@ -1049,16 +949,10 @@ const ADMIN_CLAIM = "admin";
 function unmountAdmin() {
   const tab = document.getElementById("tab-admin");
   const panel = document.getElementById("panel-admin");
-  const wasOpen = Boolean(tab) && tab.getAttribute("aria-selected") === "true";
+  const wasOpen = location.hash === "#admin";
   if (tab) tab.remove();
   if (panel) panel.remove();
-  // Removing the selected tab would leave the sidebar with no selection and every panel
-  // hidden, so the next sign-in would show a workspace with nothing in it. The click goes
-  // through the sidebar's own handler, which is the only thing that knows how to select.
-  if (wasOpen) {
-    const first = document.querySelector(".app-nav .app-nav-item");
-    if (first) first.click();
-  }
+  if (wasOpen) location.hash = "przeglad";
 }
 
 async function maybeMountAdmin(user) {
@@ -1073,331 +967,6 @@ async function maybeMountAdmin(user) {
   }
 }
 
-/* ------------------------------------------------------------------ projects & rooms */
-
-const projectDoc = (id, uid = state.uid) => fb.doc(db, "users", uid, "projects", id);
-const roomDoc = (id, uid = state.uid) => fb.doc(db, "users", uid, "rooms", id);
-
-async function addProject(name, fields = {}) {
-  const now = Date.now();
-  const id = newId();
-  const row = {
-    name,
-    archived: false,
-    clientId: fields.clientId || "",
-    status: "new",
-    dueDate: fields.dueDate || "",
-    valueMinor: 0,
-    ...syncFields(now),
-  };
-  await fb.setDoc(projectDoc(id), row);
-  return { id, ...row };
-}
-
-/**
- * `projectId` is chapter XVIII's link and is not in the contract — see the sync push and
- * assets/workspace.js for why it survives anyway. Until the owner reported it after
- * session 20, this function did not write it at all, so a room made on this page belonged
- * to nothing and could never be shown under a project.
- */
-async function addRoom(name, lengthM, widthM, heightM, projectId) {
-  const now = Date.now();
-  await fb.setDoc(roomDoc(newId()), {
-    name, lengthM, widthM, heightM, projectId: projectId || null, ...syncFields(now),
-  });
-}
-
-/**
- * Tombstone, not removal — the phone has to learn the row is gone (FIRESTORE_SYNC §4).
- *
- * Merged, for the same reason the sync push is: this browser writes the contract's fields
- * and a document may carry others it has never heard of — a material's note, a room's
- * project. A plain `setDoc` would erase them while marking the row deleted, and an undo on
- * another device would then bring back a row with its links stripped. Every tombstone in
- * `CloudSync.kt` is a merge too.
- */
-async function tombstone(ref, row, fields) {
-  const data = { ...fields, ...syncFields(row.createdAt || Date.now(), Date.now()) };
-  accountSync.sawOwnWrite(ref, data.updatedAt);
-  await fb.setDoc(ref, data, { merge: true });
-}
-
-function renderProjects() {
-  fillClientSelect($("project-client"));
-  const list = $("project-list");
-  if (!state.projects.length) {
-    list.innerHTML = `<li class="empty muted">${T("app_empty_projects")}</li>`;
-  } else {
-    list.innerHTML = state.projects.map((p) => {
-      const client = p.clientId && typeof crmClient === "function" ? crmClient(p.clientId) : null;
-      const statuses = typeof PROJECT_STATUS !== "undefined" ? PROJECT_STATUS : [p.status || "new"];
-      return `<li data-id="${escapeHtml(p.id)}" class="app-project hierarchy-l1">
-      <span class="row-name">${escapeHtml(p.name)}${client ? ` <em class="muted">${escapeHtml(client.name)}</em>` : ""}${p.dueDate ? ` <em class="muted">${fmtDay(p.dueDate)}</em>` : ""}${p.archived ? ` <em class="muted">(${T("app_archived")})</em>` : ""}</span>
-      <span class="row-actions">
-        <select data-status aria-label="${T("job_status")}">${statuses.map((s) => `<option value="${s}"${s === (p.status || "new") ? " selected" : ""}>${T("job_st_" + s)}</option>`).join("")}</select>
-        <button type="button" class="btn btn-ghost btn-sm" data-share>${T("app_share")}</button>
-        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
-      </span>
-      ${roomBlock(p.id)}
-    </li>`;
-    }).join("");
-  }
-  // Przegląd's project stats read state.projects, which only this function and
-  // renderRooms() ever change — see the note above renderOverview().
-  renderOverview();
-  renderQuotes();
-}
-
-/** A number in the visitor's notation. The dimensions are the only numbers on this page. */
-const numFmt = (v) => new Intl.NumberFormat(document.documentElement.lang || "pl",
-  { maximumFractionDigits: 2 }).format(Number(v) || 0);
-
-/** One room, as a row: the name, the three dimensions and the floor they come to. */
-const roomRow = (r) => `<li data-id="${escapeHtml(r.id)}">
-      <span class="row-name">${escapeHtml(r.name)}
-        <em class="muted">${numFmt(r.lengthM)} × ${numFmt(r.widthM)} × ${numFmt(r.heightM)} m — ${T("ws_surface_floor")} ${numFmt(r.lengthM * r.widthM)} m²</em>
-      </span>
-      <span class="row-actions">
-        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
-      </span>
-    </li>`;
-
-/** A detached room can be filed again only from the account's dedicated room tab. */
-const looseRoomRow = (r, projects) => `<li data-id="${escapeHtml(r.id)}">
-      <span class="row-name">${escapeHtml(r.name)}
-        <em class="muted">${numFmt(r.lengthM)} × ${numFmt(r.widthM)} × ${numFmt(r.heightM)} m — ${T("ws_surface_floor")} ${numFmt(r.lengthM * r.widthM)} m²</em>
-      </span>
-      <span class="row-actions">
-        ${projects.length ? `<select data-assign-project aria-label="${T("app_room_assign")}">
-          <option value="">${T("app_room_assign_placeholder")}</option>
-          ${projects.map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("")}
-        </select>` : ""}
-        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
-      </span>
-    </li>`;
-
-/**
- * The rooms of one project, plus the form that adds another — chapter XVIII's
- * "pomieszczenia są elementem projektu", inside the project it is about.
- *
- * `projectId` is not in the sync contract (`RoomEntity` has no column,
- * `SyncContract.roomToDoc()` no key) and survives anyway, because every write on both
- * sides is a merge and the deployed `validRoom()` validates by shape with no `hasOnly` —
- * see assets/workspace.js. The phone carries the link without being able to show it, which
- * is what the note under the form says.
- *
- * The form is the shape /projekty/ gives its own (src/pages.mjs, #ws-proj-room-form), and
- * for the reason the owner gave on 2026-09-10: three numbers with nothing over them but an
- * aria-label read as 5, 4 and 2.6 and say nothing about metres or about being an example to
- * overwrite. The wrapper is ws-mat-grid rather than inline-form on purpose — inline-form
- * gives its inputs a flex-basis of 160px, and inside a ws-mat-f column that is a basis on
- * the height, which leaves a text field 160 pixels tall.
- */
-function roomBlock(projectId) {
-  const rooms = state.rooms.filter((r) => r.projectId === projectId);
-  return `<div class="app-rooms hierarchy-l2">
-      <ul class="data-list hierarchy-leaves">${
-        rooms.length ? rooms.map(roomRow).join("")
-          : `<li class="empty muted">${T("app_empty_rooms")}</li>`
-      }</ul>
-      <form data-room-form class="hierarchy-child-form">${roomFormFields()}
-        <p><button type="submit" class="btn btn-ghost btn-sm">${T("app_add_room")}</button></p>
-        <p class="muted ws-mat-hint">${T("app_room_hint")}</p>
-      </form>
-    </div>`;
-}
-
-/** The shared room dimensions form used by both project and room views. */
-function roomFormFields() {
-  return `<p class="ws-mat-grid">
-          <label class="ws-mat-f">
-            <span class="ws-bar-label">${T("ws_new_room")}</span>
-            <input type="text" maxlength="120" data-f="name" placeholder="${T("app_new_room")}" required
-              aria-label="${T("app_new_room")}">
-          </label>
-          <label class="ws-mat-f ws-mat-f-sm">
-            <span class="ws-bar-label">${T("fld_length")}</span>
-            <input type="text" inputmode="decimal" data-f="lengthM" value="5" aria-label="${T("fld_length")}">
-          </label>
-          <label class="ws-mat-f ws-mat-f-sm">
-            <span class="ws-bar-label">${T("fld_width")}</span>
-            <input type="text" inputmode="decimal" data-f="widthM" value="4" aria-label="${T("fld_width")}">
-          </label>
-          <label class="ws-mat-f ws-mat-f-sm">
-            <span class="ws-bar-label">${T("fld_height")}</span>
-            <input type="text" inputmode="decimal" data-f="heightM" value="2.6" aria-label="${T("fld_height")}">
-          </label>
-        </p>`;
-}
-
-/** Parse and clamp either room form before handing it to the single Firestore writer. */
-async function submitRoomForm(form, projectId) {
-  const get = (f) => form.querySelector(`[data-f="${f}"]`).value;
-  const name = get("name").trim().slice(0, 120);
-  if (!name) return false;
-  await addRoom(name, Math.min(num(get("lengthM")), 1000),
-    Math.min(num(get("widthM")), 1000), Math.min(num(get("heightM")), 100), projectId);
-  return true;
-}
-
-/**
- * The rooms no project claims — the ones made on the phone, which cannot send a
- * `projectId` because the contract has no field for it. They are listed rather than hidden:
- * they are real rooms, and hiding them would look like losing them.
- */
-function renderRooms() {
-  const list = $("room-list");
-  if (list) {
-    const loose = state.rooms.filter((r) => !r.projectId);
-    list.innerHTML = loose.length
-      ? loose.map(roomRow).join("")
-      : `<li class="empty muted">${T("app_rooms_loose_none")}</li>`;
-  }
-  renderRoomsPanel();
-  renderOverview();
-}
-
-/* ------------------------------------------------------------------ wiring */
-
-function wireWorkspace() {
-  $("project-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const input = $("project-name");
-    const name = input.value.trim().slice(0, 120);
-    if (!name) return;
-    const clientId = $("project-client").value;
-    const dueDate = $("project-due").value;
-    input.value = "";
-    $("project-due").value = "";
-    try {
-      const project = await addProject(name, { clientId, dueDate });
-      if (project.clientId && typeof crmLinkProject === "function") crmLinkProject(project.clientId, project.id);
-    } catch (err) { status(T("app_err_unknown"), true); }
-  });
-
-  // Chapter XVIII's room, added inside the project it belongs to. The form is redrawn with
-  // its project on every write, so the listener is on the list and reads the row it fired
-  // in — one handler for however many projects there are.
-  $("project-list").addEventListener("submit", async (e) => {
-    const form = e.target.closest("[data-room-form]");
-    if (!form) return;
-    e.preventDefault();
-    const li = form.closest("li[data-id]");
-    if (!li) return;
-    // The same clamps the deployed rules impose (FIRESTORE_SYNC §2, validRoom()).
-    try {
-      await submitRoomForm(form, li.dataset.id);
-    } catch (err) { status(T("app_err_unknown"), true); }
-  });
-
-  $("project-list").addEventListener("click", async (e) => {
-    const li = e.target.closest("li[data-id]");
-    if (!li) return;
-    const project = state.projects.find((p) => p.id === li.dataset.id);
-    // A room's delete button lives inside the project row, so it has to be answered before
-    // the project's own actions — otherwise the closest `li[data-id]` above it wins.
-    const roomLi = e.target.closest(".app-rooms li[data-id]");
-    if (roomLi && e.target.closest("[data-del]")) {
-      const room = state.rooms.find((r) => r.id === roomLi.dataset.id);
-      if (room) {
-        if (!confirm(T("app_row_delete_confirm"))) return;
-        await deleteRoom(room);
-        status(T("app_row_deleted"));
-      }
-      return;
-    }
-    if (!project) return;
-
-    if (e.target.closest("[data-del]")) {
-      const rooms = state.rooms.filter((r) => r.projectId === project.id);
-      let question = T("app_project_delete_named").replace("{name}", project.name);
-      if (rooms.length) question += ` ${T("app_project_delete_rooms").replace("{count}", rooms.length)}`;
-      question += ` ${T("app_project_delete_final")}`;
-      if (!confirm(question)) return;
-      try {
-        // The rooms are left alone and keep their projectId, as assets/workspace.js
-        // wsDeleteProject() does: a link to a dead project already files them under "bez
-        // projektu" in the Pomieszczenia tab, and it is the one fact that lets a restored
-        // project take its rooms back.
-        await tombstone(projectDoc(project.id), project, { name: project.name, archived: !!project.archived });
-        status(T("app_row_deleted"));
-      } catch (err) { status(T("app_err_unknown"), true); }
-    } else if (e.target.closest("[data-share]")) {
-      try {
-        const url = await accountSync.shareProject(project.id, state.level);
-        await navigator.clipboard.writeText(url).catch(() => {});
-        status(`${T("app_share_copied")}: ${url}`);
-      } catch (err) {
-        status(T("app_err_unknown"), true);
-      }
-    }
-  });
-
-  $("project-list").addEventListener("change", async (e) => {
-    const statusSelect = e.target.closest("[data-status]");
-    const li = e.target.closest("li[data-id]");
-    if (!statusSelect || !li) return;
-    const project = state.projects.find((p) => p.id === li.dataset.id);
-    if (!project) return;
-    try {
-      const updatedAt = Date.now();
-      accountSync.sawOwnWrite(projectDoc(project.id), updatedAt);
-      await fb.setDoc(projectDoc(project.id), {
-        status: statusSelect.value,
-        updatedAt,
-      }, { merge: true });
-    } catch (err) { status(T("app_err_unknown"), true); }
-  });
-
-  $("room-list").addEventListener("click", async (e) => {
-    const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-del]")) return;
-    const room = state.rooms.find((r) => r.id === li.dataset.id);
-    if (room) {
-      if (!confirm(T("app_row_delete_confirm"))) return;
-      await deleteRoom(room);
-      status(T("app_row_deleted"));
-    }
-  });
-}
-
-/**
- * Tombstone one room, from either list.
- *
- * `projectId` is not repeated in the fields: `tombstone()` merges, so a key it is not
- * handed is left exactly as it was. That is the whole reason the link survives a delete
- * and an undo on another device.
- */
-const deleteRoom = (room) => tombstone(roomDoc(room.id), room, {
-  name: room.name, lengthM: room.lengthM, widthM: room.widthM, heightM: room.heightM,
-});
-
-/* ------------------------------------------------------------------ Pro tabs, 2026-09-03
- *
- * Przegląd/Klienci/Zlecenia/Wyceny/Terminarz/Materiały/Pomieszczenia — the sidebar tabs
- * added when /app/ gained a sidebar (src/app-pages.mjs). Klienci/Zlecenia/Wyceny/Terminarz
- * read and write assets/crm.js's store exactly as /klienci/, /zlecenia/, /wyceny/ and
- * /terminarz/ do (now loaded here too — see the classicScripts comment in
- * scripts/build.mjs); those four standalone pages are untouched. Materiały reads
- * assets/own-materials.js the same way, read-only, with a link to /moje-materialy/ for the
- * full editor. Pomieszczenia reads state.rooms/state.projects — the SAME Firestore-synced
- * rows the Projekty tab above already renders, not assets/workspace.js — because those are
- * two different stores for a signed-in visitor (workspace.js only holds what a manual
- * Synchronizacja pull last copied there) and showing two different room counts on two tabs
- * of the same page would be worse than the extra join done here.
- *
- * Every crm.js/own-materials.js call below is guarded with typeof — the same defensive
- * style assets/paywall.js already uses — because scripts/test-account-page.mjs and similar
- * load app.js on its own for some tests, without the rest of the classicScripts list.
- */
-
-/** The standalone page's own address for one row — "open the full record". */
-function proLink(routeId, id) {
-  const lang = document.documentElement.lang || "pl";
-  const nav = window.LM_NAV && window.LM_NAV[routeId];
-  const base = (nav && (nav[lang] || nav.pl)) || `/${routeId}/`;
-  return `${base}?id=${encodeURIComponent(id)}`;
-}
 
 /** A stored "YYYY-MM-DD" in the visitor's own wording — the same reckoning calDay() in
  *  assets/schedule-ui.js uses, kept local here since that file is not loaded on /app/. */
@@ -1471,294 +1040,6 @@ function renderOverview() {
   }
 }
 
-/* ---------------------------------------------------------------------------- Klienci */
-
-function renderClients() {
-  const list = $("acctclients-list");
-  if (!list || typeof crmClients !== "function") return;
-  const rows = crmClients();
-  list.innerHTML = rows.length ? rows.map((c) => `<li data-id="${escapeHtml(c.id)}">
-      <span class="row-name">${escapeHtml(c.name)}${c.phone ? ` <em class="muted">${escapeHtml(c.phone)}</em>` : ""}</span>
-      <span class="row-actions">
-        <a class="btn btn-ghost btn-sm btn-go" href="${proLink("clients", c.id)}">${T("app_open_full")}</a>
-        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
-      </span>
-    </li>`).join("") : `<li class="empty muted">${T("app_clients_empty")}</li>`;
-}
-
-function wireClientsPanel() {
-  const form = $("acctclients-form");
-  if (!form) return;
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const nameInput = $("acctclients-name");
-    const phoneInput = $("acctclients-phone");
-    const emailInput = $("acctclients-email");
-    const addressInput = $("acctclients-address");
-    const name = nameInput ? nameInput.value.trim() : "";
-    if (!name || typeof crmAddClient !== "function") return;
-    const phone = phoneInput ? phoneInput.value.trim() : "";
-    const email = emailInput ? emailInput.value.trim() : "";
-    const address = addressInput ? addressInput.value.trim() : "";
-    crmAddClient({ name, phone, email, address });
-    if (nameInput) nameInput.value = "";
-    if (phoneInput) phoneInput.value = "";
-    if (emailInput) emailInput.value = "";
-    if (addressInput) addressInput.value = "";
-    renderClients();
-    renderOverview();
-  });
-  $("acctclients-list").addEventListener("click", (e) => {
-    const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-del]") || typeof crmDeleteClient !== "function") return;
-    if (!confirm(T("app_row_delete_confirm"))) return;
-    crmDeleteClient(li.dataset.id);
-    renderClients();
-    renderProjects();
-    renderOverview();
-    status(T("app_row_deleted"));
-  });
-}
-
-/* ----------------------------------------------------------------------------- Projekty: klient */
-
-function fillClientSelect(select) {
-  if (!select || typeof crmClients !== "function") return;
-  const rows = crmClients();
-  select.innerHTML = `<option value="">${T("app_clients_title")}</option>` +
-    rows.map((c) => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name)}</option>`).join("");
-}
-
-/* ------------------------------------------------------------------------------ Wyceny */
-
-/**
- * May this account use the quotes? — `quotes` in LM_FEATURES, PRO.
- *
- * /app/ is the one page that knows the answer for certain: `state.level` comes from
- * lmLevelOf() over the profile the server owns, not from the copy hint in storage. The
- * wall over this panel (pwMount("acctquo", "quotes")) reads the hint, which can be stale;
- * this reads the plan. A missing lmCan() is a refusal, for the reason pwState() closes.
- */
-const canQuotes = () => typeof lmCan === "function" && lmCan("quotes", state.level);
-
-function renderQuotes() {
-  const list = $("acctquo-list");
-  if (!list || typeof crmQuotes !== "function") return;
-  /* The wall hides this panel; that is not the same as not drawing it. Until 2026-09-03
-     the names and the count of a Pro store were written into the hidden element for every
-     account there is. Now nothing is: the list is emptied and crmQuotes() is not asked. */
-  if (!canQuotes()) { list.innerHTML = ""; return; }
-  const projectSelect = $("acctquo-project");
-  const activeProjects = state.projects.filter((p) => !p.archived);
-  if (projectSelect) {
-    const selected = projectSelect.value;
-    projectSelect.innerHTML = `<option value="">${T("quo_no_project")}</option>` +
-      activeProjects.map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)}</option>`).join("");
-    if (activeProjects.some((p) => p.id === selected)) projectSelect.value = selected;
-  }
-  const noProject = $("acctquo-noproj");
-  if (noProject) noProject.hidden = activeProjects.length > 0;
-  const rows = crmQuotes();
-  list.innerHTML = rows.length ? rows.map((q) => {
-    const summary = typeof crmQuoteSummary === "function" ? crmQuoteSummary(q.id) : null;
-    if (!summary) return "";
-    // No "Bez projektu" here: the missing line under it already says so.
-    const meta = [summary.client && summary.client.name, summary.project && summary.project.name]
-      .filter(Boolean).map(escapeHtml).join(" · ");
-    const changed = T("app_quotes_changed").replace("{date}", whenText(summary.quote.updatedAt));
-    const missing = summary.missing.map((part) => T(`quo_missing_${part}`)).join(" · ");
-    const total = summary.totals.total === null || typeof wsMoney !== "function" ? "—"
-      : wsMoney(summary.totals.total, summary.totals.currencyCode);
-    const statuses = typeof QUOTE_STATUS !== "undefined" ? QUOTE_STATUS : [summary.status];
-    return `<li data-id="${escapeHtml(q.id)}" class="acctquo-row">
-      <span class="acctquo-main">
-        <a class="acctquo-name" href="${proLink("quotes", q.id)}">${escapeHtml(q.name)}</a>
-        <span class="acctquo-meta muted">${meta ? `${meta} · ` : ""}${escapeHtml(changed)}</span>
-        ${missing ? `<span class="acctquo-missing muted">${escapeHtml(missing)}</span>` : ""}
-      </span>
-      <strong class="acctquo-total">${escapeHtml(total)}</strong>
-      <span class="row-actions acctquo-actions">
-        <select data-status aria-label="${T("quo_status")}">${statuses.map((s) => `<option value="${s}"${s === summary.status ? " selected" : ""}>${T("quo_st_" + s)}</option>`).join("")}</select>
-        <button type="button" class="btn btn-ghost btn-sm" data-del aria-label="${T("app_delete")}: ${escapeHtml(q.name)}">${T("app_delete")}</button>
-      </span>
-    </li>`;
-  }).join("") : `<li class="empty muted"><p>${T("app_quotes_empty")}</p>
-      <ol><li>${T("app_quotes_step1")}</li><li>${T("app_quotes_step2")}</li><li>${T("app_quotes_step3")}</li></ol>
-    </li>`;
-}
-
-function wireQuotesPanel() {
-  const form = $("acctquo-form");
-  if (!form) return;
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const nameInput = $("acctquo-name");
-    const projectInput = $("acctquo-project");
-    const project = state.projects.find((p) => p.id === projectInput.value && !p.archived);
-    const name = nameInput.value.trim() || (project && project.name) || "";
-    // Checked when the event arrives, not when the listener was bound: the panel is wired
-    // once and the plan can run out while /app/ is open.
-    if (typeof crmAddQuote !== "function" || !canQuotes()) return;
-    if (!name) {
-      status(T("app_quotes_need_name"), true);
-      nameInput.focus();
-      return;
-    }
-    const quote = crmAddQuote({ name, projectId: project ? project.id : "" });
-    if (quote) location.assign(proLink("quotes", quote.id));
-  });
-  $("acctquo-list").addEventListener("click", (e) => {
-    const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-del]") || typeof crmDeleteQuote !== "function"
-      || !canQuotes()) return;
-    if (!confirm(T("app_row_delete_confirm"))) return;
-    crmDeleteQuote(li.dataset.id);
-    renderQuotes();
-    status(T("app_row_deleted"));
-  });
-  $("acctquo-list").addEventListener("change", (e) => {
-    const select = e.target.closest("[data-status]");
-    const li = e.target.closest("li[data-id]");
-    if (!select || !li || typeof crmUpdateQuote !== "function" || !canQuotes()) return;
-    const id = li.dataset.id;
-    crmUpdateQuote(id, { status: select.value });
-    renderQuotes();
-    const again = [...$("acctquo-list").querySelectorAll("li[data-id]")]
-      .find((row) => row.dataset.id === id);
-    const next = again && again.querySelector("[data-status]");
-    if (next) next.focus();
-    status(T("app_quotes_status_saved"));
-  });
-}
-
-/* ----------------------------------------------------------------------------- Materiały */
-
-/**
- * May this account see prices? — `costs` in LM_FEATURES, PRO since 2026-09-04.
- *
- * The same reasoning as canQuotes() just above: /app/ knows `state.level` for certain,
- * from Firebase, so it is read directly rather than through the copy hint.
- */
-const canCosts = () => typeof lmCan === "function" && lmCan("costs", state.level);
-
-function renderMaterialsPanel() {
-  const list = $("acctmat-list");
-  if (!list || typeof omMaterials !== "function") return;
-  const rows = omMaterials();
-  // `shopping` (the list itself) is free; `costs` (the price on each row) is PRO. A level
-  // that does not reach `costs` never has m.priceMinor read into a template string.
-  const priced = canCosts();
-  list.innerHTML = rows.length ? rows.map((m) => `<li data-id="${escapeHtml(m.id)}">
-      <span class="row-name">${escapeHtml(m.name)}${priced && m.priceMinor != null && typeof wsMoney === "function" ? ` <em class="muted">${wsMoney(m.priceMinor, m.currencyCode)}</em>` : ""}</span>
-      <span class="row-actions">
-        <button type="button" class="btn btn-ghost btn-sm" data-del>${T("app_delete")}</button>
-      </span>
-    </li>`).join("") : `<li class="empty muted">${T("app_materials_empty")}</li>`;
-}
-
-function wireMaterialsPanel() {
-  const list = $("acctmat-list");
-  if (!list) return;
-  list.addEventListener("click", (e) => {
-    const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-del]") || typeof omDelete !== "function") return;
-    if (!confirm(T("app_row_delete_confirm"))) return;
-    omDelete(li.dataset.id);
-    renderMaterialsPanel();
-    renderOverview();
-    status(T("app_row_deleted"));
-  });
-}
-
-/* ------------------------------------------------------------------------ Pomieszczenia */
-
-function renderRoomsPanel() {
-  const box = $("acctrooms-list");
-  if (!box) return;
-  const projects = state.projects.filter((p) => !p.archived);
-  const liveIds = new Set(projects.map((p) => p.id));
-  const loose = state.rooms.filter((r) => !r.projectId || !liveIds.has(r.projectId));
-  const roomColors = ["lime", "blue", "amber", "red", "violet"];
-  const groups = projects.map((p, i) => {
-    const rooms = state.rooms.filter((r) => r.projectId === p.id);
-    const color = roomColors.indexOf(p.color) >= 0 ? p.color : roomColors[i % roomColors.length];
-    return `<section class="app-card ws-room-card ws-room-card-${color}" data-project-id="${escapeHtml(p.id)}">
-      <div class="ws-room-card-head">
-        <h3><span class="ws-room-card-dot" aria-hidden="true"></span>${escapeHtml(p.name)}</h3>
-        <span class="chip" data-room-count>${rooms.length}</span>
-      </div>
-      <ul class="data-list">${rooms.length ? rooms.map(roomRow).join("")
-        : `<li class="empty muted">${T("app_empty_rooms")}</li>`}</ul>
-      <details class="ws-mat-add" data-room-add${openAccountRoomProjectId === p.id ? " open" : ""}>
-        <summary>${T("app_add_room")}</summary>
-        <form data-room-form>${roomFormFields()}
-          <p><button type="submit" class="btn btn-primary btn-sm">${T("app_add_room")}</button></p>
-        </form>
-      </details>
-    </section>`;
-  });
-  if (loose.length) {
-    groups.push(`<section class="app-card ws-room-card" data-project-id=""><div class="ws-room-card-head">
-        <h3>${T("app_rooms_no_project")}</h3><span class="chip" data-room-count>${loose.length}</span>
-        </div><ul class="data-list">${loose.map((r) => looseRoomRow(r, projects)).join("")}</ul></section>`);
-  }
-  box.innerHTML = groups.length ? groups.join("") : `<p class="muted">${T("app_rooms_empty")}</p>`;
-  if (openAccountRoomProjectId !== null) {
-    const card = [...box.querySelectorAll("[data-project-id]")]
-      .find((node) => node.dataset.projectId === openAccountRoomProjectId);
-    const name = card && card.querySelector('[data-room-form] [data-f="name"]');
-    if (name) name.focus();
-    openAccountRoomProjectId = null;
-  }
-}
-
-function wireRoomsPanel() {
-  const box = $("acctrooms-list");
-  if (!box) return;
-  box.addEventListener("submit", async (e) => {
-    const form = e.target.closest("[data-room-form]");
-    if (!form) return;
-    e.preventDefault();
-    const card = form.closest("[data-project-id]");
-    if (!card) return;
-    openAccountRoomProjectId = card.dataset.projectId;
-    try {
-      if (!await submitRoomForm(form, card.dataset.projectId)) { openAccountRoomProjectId = null; return; }
-      // The snapshot normally redraws the card with an empty form before the write settles.
-      // If it has not (offline, or a store that answers late), the typed name must not stay
-      // in the field inviting a second, duplicate room.
-      const name = form.isConnected && form.querySelector('[data-f="name"]');
-      if (name) { name.value = ""; name.focus(); }
-    } catch (err) {
-      openAccountRoomProjectId = null;
-      status(T("app_err_unknown"), true);
-    }
-  });
-  box.addEventListener("click", async (e) => {
-    const li = e.target.closest("li[data-id]");
-    if (!li || !e.target.closest("[data-del]")) return;
-    const room = state.rooms.find((r) => r.id === li.dataset.id);
-    if (room) {
-      if (!confirm(T("app_row_delete_confirm"))) return;
-      await deleteRoom(room);
-      renderRoomsPanel();
-      status(T("app_row_deleted"));
-    }
-  });
-  box.addEventListener("change", async (e) => {
-    const select = e.target.closest("[data-assign-project]");
-    const li = e.target.closest("li[data-id]");
-    if (!select || !li || !select.value) return;
-    const room = state.rooms.find((r) => r.id === li.dataset.id);
-    if (!room) return;
-    try {
-      const data = { projectId: select.value, ...syncFields(room.createdAt || Date.now()) };
-      accountSync.sawOwnWrite(roomDoc(room.id), data.updatedAt);
-      await fb.setDoc(roomDoc(room.id), data, { merge: true });
-    } catch (err) { status(T("app_err_unknown"), true); }
-  });
-}
-
 /* ------------------------------------------------------------------ sync with the browser */
 
 const blockedWorkspace = () => accountSync.blockedWorkspace();
@@ -1801,53 +1082,6 @@ function renderLocalSummary() {
     if (button) button.disabled = foreign || unclaimed;
   });
 }
-
-/**
- * Mirror incoming Firestore documents into localStorage without triggering an up-sync.
- *
- * Runs on live listener snapshots so deletions and remote additions reach localStorage
- * immediately — including while a push or a pull is running (2026-09-26). It used to sit
- * those out, and a project deleted on this page during the sign-in sync stayed alive in
- * the browser's copy, where /projekty/ kept showing it and the push picked it up again.
- * wsImport() is last-write-wins, so a snapshot landing in the middle of a pull cannot
- * undo anything newer. syncBusy is still raised around it, so the wsSave() inside does not
- * start an automatic push back to Firestore.
- */
-
-
-/**
- * Upload the browser workspace, the Pro store and own materials into Firestore.
- *
- * Extracted from the manual "push" button so the same reconciliation pipeline can run
- * automatically. Touches only data stores and ignores buttons, status messages and summaries.
- *
- * When `since` is a finite timestamp, only rows updated after that moment are sent.
- * A full push is what somebody asked for, an automatic push is what nobody asked for
- * and must stay cheap: on a quiet workspace an edit re-uploads one document instead of
- * walking every collection on every keystroke and burning through daily write quotas.
- */
-
-
-
-
-
-
-/**
- * Download the full account from Firestore and merge it into local stores.
- *
- * Extracted from the manual "pull" button. Returns true when every store accepted
- * the write, and false when any store rejected it (e.g. quota exceeded or storage failure).
- */
-
-
-/**
- * Reconcile Firestore and localStorage once upon sign-in.
- *
- * Pulls down the account first so remote updates and tombstones arrive in the local store,
- * then pushes local work up to Firestore, and stamps the sync account. Foreign workspaces
- * are skipped silently to prevent accidental merges across accounts.
- */
-
 
 function wireSyncPanel() {
   const push = $("app-sync-push");
@@ -1919,74 +1153,8 @@ function wireSyncPanel() {
 }
 
 
-/**
- * Watch local changes and debounced-sync them up to Firestore when signed in.
- *
- * The syncBusy guard breaks feedback loops when an incoming Firestore snapshot or pull
- * writes to localStorage via wsSave(). All guards run before touching the debounce timer
- * so an unauthenticated or busy workspace change never cancels an already-armed push
- * without replacing it.
- *
- * Three stores, three events, one handler: `workspacechange` is the projects-and-rooms
- * store of assets/workspace.js, `crmchange` the Pro store of assets/crm-store.js and
- * `ownmaterialschange` the visitor's own materials. accountSync.syncPushAll() sends all three, so a
- * client typed on the Klienci tab has to arm the same timer a room does — listening only
- * for the first of them is what would have left the other two waiting for the next sign-in.
- */
-
-
 /** One document in a flat collection of this account. */
 const proDoc = (collection, id, uid = state.uid) => fb.doc(db, "users", uid, collection, id);
-
-/** A calendar day, or "". The same ten-character rule crmDay() and the phone both apply. */
-
-
-/** One of the four values accepted by validProject() and validJob(). */
-
-
-/** The complete legacy job shape: Firestore refuses a tombstone-only merge. */
-
-
-/**
- * Push LiczMat Pro's surviving collections (session 46).
- *
- * They joined the sync contract on 2026-08-26 — `users/{uid}/clients` and `/quotes`,
- * flat collections beside `rooms`, with `validClient()` / `validJob()` / `validQuote()` in
- * the deployed rules. Every field is clamped here to exactly what those rules validate:
- * the rules are the last gate, and a document they refuse fails the whole pass.
- *
- * The links travel as document ids — `projectIds` on a client, `projectId` and `clientId`
- * on a job, `projectId` on a quote — which is what the row ids in this browser already are.
- *
- * A merge, like every other write on both platforms: a replace would delete a field this
- * browser has never heard of, which is exactly how the phone's own extra fields survive.
- * Quote status can ship before the Android UI knows it: validQuote() validates the known
- * shape without hasOnly(), the phone writes quotes with SetOptions.merge(), and crmImport()
- * keeps the whole incoming document. A pull therefore brings the field back and a phone
- * write leaves it alone. The phone not showing the status yet is the known remaining gap.
- */
-
-
-/**
- * Push the visitor's own materials (session 59, item C6 of the parity audit).
- *
- * `users/{uid}/materials`, the ninth collection, added to the contract on 2026-08-30 with
- * `validMaterial()` in the deployed rules. The price history travels **inside** the
- * document, in `prices[]` — a point belongs to one material, nothing links to it, nothing
- * edits one once written, and it dies with the material.
- *
- * Every field is clamped here to exactly what the rules validate, the same discipline the
- * three Pro collections follow: the rules are the last gate, and a document they refuse
- * fails the whole pass. The cap on `prices` is the rules' own 60, and the newest are kept,
- * because that is what the phone's `SyncContract.capPrices()` does with the same list.
- */
-
-
-/**
- * Everything under users/{uid}, in the shape assets/workspace.js stores locally —
- * used by the pull button and by the export button.
- */
-
 
 /* ------------------------------------------------------------------ account settings */
 
@@ -2107,8 +1275,8 @@ function wireAccountPanel() {
       // still there and still wants its lists — and its plan, which is the one of the
       // three that nothing else would ever re-attach.
       if (state.uid) {
-        listen("projects", (rows) => { state.projects = rows; renderProjects(); });
-        listen("rooms", (rows) => { state.rooms = rows; renderRooms(); renderProjects(); });
+        listen("projects", (rows) => { state.projects = rows; renderOverview(); });
+        listen("rooms", (rows) => { state.rooms = rows; renderOverview(); });
         listenProfile();
       }
     } finally {

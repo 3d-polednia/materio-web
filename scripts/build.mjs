@@ -1797,6 +1797,9 @@ function buildPrivatePages() {
   // have been right in German — the owner reported the result: signing in emptied the menu.
   const navData = Object.fromEntries([
     ...navRoutes("header"),
+    // The shared account sidebar links to every work page. /app/ has no language in its
+    // URL, so i18n-runtime repoints these seeded Polish addresses after langchange.
+    ...["projects", "estimate", "clients", "quotes", "calendar", "own-materials"].map(route),
     // The Pro modules that have been built. Their cards on /app/ link to them
     // (src/pro.mjs), and /app/ has no language of its own to derive an address from.
     ...LM_FEATURES
@@ -1860,7 +1863,7 @@ function buildPrivatePages() {
     // Materiały tab reads its list through the same globals.
     classicScripts: [
       "/assets/units.js", "/assets/workspace.js", "/assets/recent.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
-      "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js", "/assets/schedule-grid.js",
+      "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
       "/assets/dashboard.js",
     ],
     scripts: ["/assets/app.js"],

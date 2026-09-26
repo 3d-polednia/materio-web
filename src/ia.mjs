@@ -168,8 +168,6 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "materials", localized: true, indexable: true,
     path: urlOwnMaterials,
-    footer: { order: 4, key: "omatpage_title" },
-    navLevel: LEVEL.LICZMAT,
     note: "The visitor's own materials and what they pay for them — session 59, item C6 " +
       "of the parity audit. The app has had this screen and its price history since " +
       "before the site existed; the browser had nothing, and FIRESTORE_SYNC §5 kept the " +
@@ -238,10 +236,8 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlProjects,
-    header: { order: 4, key: "nav_projects" },
-    footer: { order: 5, key: "nav_projects" },
-    navLevel: LEVEL.LICZMAT,
-    note: "Chapter XIV makes the project the centre of the free account. The page is " +
+    note: "Chapter XIV makes the project the centre of the free account. On 2026-09-26 " +
+      "the owner removed it from the site header: Moje konto is the one way into work tools. The page is " +
       "GUEST because assets/workspace.js keeps projects in localStorage in the " +
       "Firestore document shape, so it works before anyone signs in; an account adds " +
       "sync across devices, not the ability to count. `navLevel` is the owner's decision " +
@@ -274,7 +270,6 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "projects", localized: true, indexable: true,
     path: urlEstimate,
-    footer: { order: 6, key: "estpage_title" },
     note: "Chapter XVI and XVII: the material list and its costs. Same local-first rule " +
       "as /projekty/.",
   },
@@ -285,8 +280,6 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "home", localized: true, indexable: true,
     path: urlClients,
-    footer: { order: 10, key: "clipage_title" },
-    navLevel: LEVEL.PRO,
     gate: "Chapter XXV, built in session 27: proGate() in src/pro.mjs stands in place " +
       "of the module — the module named and described, \"Dostępne w LiczMat Pro\", the " +
       "other four Pro modules listed so the wall shows the whole product, and one rung " +
@@ -356,8 +349,6 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "projects", localized: true, indexable: true,
     path: urlQuotes,
-    footer: { order: 12, key: "quopage_title" },
-    navLevel: LEVEL.PRO,
     gate: "As clients and jobs — the same wall, from the same builder.",
     note: "Chapter XXII, and the third of the five Pro modules: materials, labour, " +
       "other costs, margin, total — and no more, because the chapter says in one line " +
@@ -387,8 +378,6 @@ export const ROUTES = [
     level: LEVEL.PRO, status: STATUS.LIVE,
     parent: "projects", localized: true, indexable: true,
     path: urlCalendar,
-    footer: { order: 13, key: "calpage_title" },
-    navLevel: LEVEL.PRO,
     gate: "As clients, jobs and quotes — the same wall, from the same builder.",
     note: "Chapter XXIII, and the fourth of the five Pro modules: the deadlines of the " +
       "projects, grouped by how close they are, and the basics beside each one. It is the " +
@@ -970,7 +959,9 @@ export function validateIA() {
   // which is a measurement, not a rename: the same test re-ran at the same four widths in
   // the same ten languages, because a row that fits five short words does not necessarily
   // fit five longer ones. Session W (2026-09-24) brought "Sklepy" back as the sixth, and
-  // measured it the same way; a seventh has not been measured, so it is refused.
+  // measured it the same way; a seventh has not been measured, so it is refused. The
+  // owner's 2026-09-26 decision moved Projekty under Moje konto, so five are in use today;
+  // the measured room for six stays the limit.
   const inHeader = navRoutes("header").length;
   if (inHeader > 6) problems.push(`IA: ${inHeader} links in the header — the row fits six`);
 

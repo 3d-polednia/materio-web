@@ -208,7 +208,8 @@ const BUDGET = {
   // removed the duplicate guarded bodies; the rebuilt page measures 403.5 kB / 102.7 kB gz.
   // Raised 2026-09-26 from 404/103, measured at 428.2/109.1 kB: Przegląd now owns the
   // shared recent-calculation and recent-tool lists, including their workspace scripts.
-  "app/index.html": [429, 110],
+  // 2026-09-26: measured after the six shortened tool panels left /app/; rounded up.
+  "app/index.html": [377, 99],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.

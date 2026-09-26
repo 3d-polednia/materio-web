@@ -8,13 +8,14 @@
    text in place — see buildInPlacePicker() in assets/i18n-runtime.js. That is why the
    markup below uses data-i18n attributes while every generated page uses real text. */
 
-import { esc, logoMark, siteHeader, siteFooter } from "./template.mjs";
+import { esc, siteHeader, siteFooter } from "./template.mjs";
 import {
-  urlCalcIndex, urlHome, urlProjects, urlEstimate,
+  urlCalcIndex, urlHome, urlProjects, urlEstimate, urlCalendar, urlOwnMaterials,
   DEFAULT_LANG, PLAY_URL, URL_APP, URL_DASHBOARD,
 } from "./site.mjs";
 import { ACCOUNT_LEVELS, LEVEL, STATUS, route } from "./ia.mjs";
-import { proPanel, proGate, proKeys } from "./pro.mjs";
+import { proPanel, proKeys } from "./pro.mjs";
+import { accountSidebar } from "./account-sidebar.mjs";
 
 /**
  * The same header and footer as the rest of the site.
@@ -64,11 +65,6 @@ const field = (id, labelKey, t, opts = {}) => {
   </div>`;
 };
 
-/** The same pair for a <select>, whose options are filled in by assets/app.js. */
-const selectField = (id, labelKey, t, cls = "") => `<div class="field${cls ? ` ${cls}` : ""}">
-    <label for="${id}" data-i18n="${labelKey}">${esc(t(labelKey))}</label>
-    <select id="${id}"></select>
-  </div>`;
 
 /** 2026-09-26: one calendar block, shared by /app/ and /terminarz/. */
 export function calendarGrid(t, prefix) {
@@ -111,26 +107,6 @@ const rememberBox = (id, t) => `<div class="field-check">
 const GOOGLE_SIGN_IN = true;
 
 const GOOGLE_G = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.1Z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.4 46 24 46Z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.5A22 22 0 0 0 2 24c0 3.6.9 6.9 2.5 9.9l7.3-5.7Z"/><path fill="#EA4335" d="M24 10.4c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 3.9 29.9 2 24 2 15.4 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9.4 12.2-9.4Z"/></svg>';
-
-/**
- * One stroke-path per sidebar item, on the same 24×24 grid calcIcon() in src/template.mjs
- * uses everywhere else on the site — kept here rather than there because these nine are
- * specific to the account sidebar and nothing else references them.
- */
-const NAV_ICON = {
-  overview: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
-  projects: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
-  clients: '<circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><path d="M16.2 4.6a3.4 3.4 0 0 1 0 6.6M20 20c0-3-1.9-5.3-4.6-6"/>',
-  jobs: '<path d="M3 7l3-3h5l2 2h8v13H3z"/>',
-  quotes: '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
-  schedule: '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',
-  materials: '<path d="M12 2 3 6.8V17L12 22l9-5V6.8z"/><path d="M3 6.8 12 12l9-5.2M12 12v10"/>',
-  rooms: '<path d="M4 10 12 3l8 7"/><path d="M6 9v11h12V9"/><path d="M10 20v-6h4v6"/>',
-  profile: '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-4 4-6 7.5-6s6.1 2 7.5 6"/>',
-  sync: '<path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
-  pro: '<path d="m12 2 2.7 5.9 6.3.7-4.7 4.4 1.3 6.3L12 16.2 6.4 19.3l1.3-6.3-4.7-4.4 6.3-.7Z"/>',
-  account: '<path d="M12 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 19.5a7.7 7.7 0 0 1 15 0"/>',
-};
 
 /* ------------------------------------------------------------------ /app/ */
 
@@ -192,22 +168,6 @@ export function appMain(t, features) {
   const i = (key, tag = "span", cls = "") =>
     `<${tag}${cls ? ` class="${cls}"` : ""} data-i18n="${key}">${esc(t(key))}</${tag}>`;
 
-  /**
-   * One sidebar entry. Same role/aria-controls/aria-selected contract the old top-tab
-   * strip used (assets/app.js's wireTabs() drives both the same way — a sidebar item
-   * is still, semantically, one tab of one tablist), so the click/arrow-key wiring did
-   * not have to change shape, only its selector.
-   */
-  const navItem = (id, key, first) =>
-    `<button type="button" class="app-nav-item" role="tab" id="tab-${id}" aria-controls="panel-${id}" data-tab="${id}" aria-selected="${first ? "true" : "false"}" tabindex="${first ? "0" : "-1"}">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAV_ICON[id] || ""}</svg>
-        <span data-i18n="${key}">${esc(t(key))}</span>
-      </button>`;
-
-  const navGroup = (labelKey, items) => `<div class="app-nav-group">
-        <div class="app-nav-label" data-i18n="${labelKey}">${esc(t(labelKey))}</div>
-        ${items.join("\n        ")}
-      </div>`;
 
   /** One row of the profile's read-only facts. The value is filled in by assets/app.js. */
   const fact = (id, key) =>
@@ -309,34 +269,7 @@ export function appMain(t, features) {
          padding, and row-based content keeps a separate working measure in CSS. -->
     <div id="app-workspace" class="wrap full" hidden>
       <div class="app-shell">
-          <aside class="app-side">
-            <div class="app-side-brand">
-              ${logoMark(26)}
-              <span>LiczMat</span>
-              <span id="app-level" class="chip app-plan-pill"></span>
-            </div>
-
-            <nav class="app-nav" role="tablist" aria-label="${esc(t("app_tabs_label"))}" data-i18n-aria="app_tabs_label">
-              ${navGroup("app_nav_work", [
-                navItem("overview", "app_tab_overview", true),
-                navItem("projects", "app_tab_projects"),
-                navItem("clients", "app_tab_clients"),
-                navItem("quotes", "app_tab_quotes"),
-                navItem("schedule", "app_tab_schedule"),
-              ])}
-              ${navGroup("app_nav_resources", [
-                navItem("materials", "app_tab_materials"),
-                navItem("rooms", "app_tab_rooms"),
-              ])}
-              ${navGroup("app_nav_account", [
-                navItem("profile", "app_tab_profile"),
-                navItem("sync", "app_tab_sync"),
-                navItem("pro", "app_tab_pro"),
-                navItem("account", "app_tab_account"),
-              ])}
-            </nav>
-
-            <div class="app-side-foot">
+          ${accountSidebar(t, { inPlace: true, foot: `<div class="app-side-foot">
               <span class="app-side-who">
                 <b id="app-who"></b>
                 <span id="app-provider" class="chip"></span>
@@ -349,7 +282,7 @@ export function appMain(t, features) {
                 <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
               </span>
             </div>
-          </aside>
+          ` })}
 
           <div class="app-main">
             <!-- Where the visitor came from, when they arrived at a sign-up prompt under a
@@ -362,7 +295,7 @@ export function appMain(t, features) {
             <!-- 2026-09-03: the account gained a landing tab of its own — a free user's
                  projects and a Pro user's clients/jobs/schedule were previously spread
                  across a flat tab strip with no single "where do things stand" view. -->
-            <section data-panel="overview" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
+            <section data-panel="overview" id="panel-overview">
               <h2 data-i18n="app_overview_title">${esc(t("app_overview_title"))}</h2>
               ${i("app_overview_lead", "p", "muted")}
               <div class="app-stats" id="overview-stats"></div>
@@ -370,7 +303,7 @@ export function appMain(t, features) {
                 <section class="app-card">
                   <div class="dash-head">
                     <h3 data-i18n="app_overview_projects_t">${esc(t("app_overview_projects_t"))}</h3>
-                    <button type="button" class="linkish dash-more" data-goto-tab="projects" data-i18n="app_projects">${esc(t("app_projects"))}</button>
+                    <a class="linkish dash-more" href="${urlProjects(DEFAULT_LANG)}" data-nav-route="projects" data-i18n="app_projects">${esc(t("app_projects"))}</a>
                   </div>
                   <ul id="overview-projects" class="data-list"></ul>
                 </section>
@@ -378,14 +311,14 @@ export function appMain(t, features) {
                   <section class="app-card">
                     <div class="dash-head">
                       <h3 data-i18n="app_overview_schedule_t">${esc(t("app_overview_schedule_t"))}</h3>
-                      <button type="button" class="linkish dash-more" data-goto-tab="schedule" data-i18n="app_tab_schedule">${esc(t("app_tab_schedule"))}</button>
+                      <a class="linkish dash-more" href="${urlCalendar(DEFAULT_LANG)}" data-nav-route="calendar" data-i18n="app_tab_schedule">${esc(t("app_tab_schedule"))}</a>
                     </div>
                     <ul id="overview-schedule" class="data-list"></ul>
                   </section>
                   <section class="app-card">
                     <div class="dash-head">
                       <h3 data-i18n="app_overview_materials_t">${esc(t("app_overview_materials_t"))}</h3>
-                      <button type="button" class="linkish dash-more" data-goto-tab="materials" data-i18n="app_tab_materials">${esc(t("app_tab_materials"))}</button>
+                      <a class="linkish dash-more" href="${urlOwnMaterials(DEFAULT_LANG)}" data-nav-route="own-materials" data-i18n="app_tab_materials">${esc(t("app_tab_materials"))}</a>
                     </div>
                     <ul id="overview-materials" class="data-list"></ul>
                   </section>
@@ -410,115 +343,7 @@ export function appMain(t, features) {
               </div>
             </section>
 
-            <!-- Chapter XVIII: "Pomieszczenia są elementem projektu." Until the owner reported
-                 it after session 20, /app/ had two tabs and no link between them at all —
-                 addRoom() did not even write a projectId, so a room made here belonged to
-                 nothing. One tab now, rooms under the project they were measured for, and the
-                 rooms nobody assigned in a group of their own at the bottom: that is what a
-                 room pulled off the phone looks like, because SyncContract.roomToDoc() has no
-                 projectId to send. The lists are drawn by assets/app.js. -->
-            <section data-panel="projects" id="panel-projects" role="tabpanel" aria-labelledby="tab-projects" tabindex="0" hidden>
-              <h2 data-i18n="app_projects">${esc(t("app_projects"))}</h2>
-              <form id="project-form" class="inline-form">
-                ${field("project-name", "app_new_project", t, { maxlength: 120 })}
-                ${selectField("project-client", "job_client", t, "field-narrow")}
-                ${field("project-due", "job_due", t, { type: "date", required: false, cls: "field-narrow" })}
-                <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_add">${esc(t("app_add"))}</button>
-              </form>
-              <ul id="project-list" class="data-list"></ul>
-              ${i("app_share_hint", "p", "muted")}
-
-              <h3 class="mt-8" data-i18n="app_rooms_loose">${esc(t("app_rooms_loose"))}</h3>
-              ${i("app_rooms_loose_d", "p", "muted")}
-              <ul id="room-list" class="data-list"></ul>
-            </section>
-
-            <!-- Session 22 (chapter XX), moved from its own top-level tab into the sidebar
-                 2026-09-03. crmClients()/crmAddClient()/etc. (assets/crm.js) are unchanged —
-                 this panel is a second place that calls them, exactly as /klienci/ does,
-                 sharing the one localStorage store the account's Synchronizacja tab already
-                 pushes and pulls (assets/app.js, app-sync-push/app-sync-pull). /klienci/
-                 itself is untouched: chapter XXVI wants Pro publicly, indexably describable,
-                 which a noindex page like this one cannot be. -->
-            <section data-panel="clients" id="panel-clients" role="tabpanel" aria-labelledby="tab-clients" tabindex="0" hidden>
-              <div class="dash-head">
-                <h2 data-i18n="app_clients_title">${esc(t("app_clients_title"))}</h2>
-                <span id="acctclients-pro" class="chip" hidden><span id="acctclients-pro-chip"></span></span>
-              </div>
-              ${i("app_clients_lead", "p", "muted")}
-              ${proGate(t, "clients", features, DEFAULT_LANG, { id: "acctclients-gate" })}
-              <div id="acctclients-tool">
-                <form id="acctclients-form" class="inline-form">
-                  ${field("acctclients-name", "app_clients_name_ph", t, { maxlength: 120 })}
-                  ${field("acctclients-phone", "cli_phone", t, { type: "tel", maxlength: 200, required: false })}
-                  ${field("acctclients-email", "cli_email", t, { type: "email", maxlength: 200, required: false })}
-                  ${field("acctclients-address", "cli_address", t, { maxlength: 200, required: false })}
-                  <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_clients_new">${esc(t("app_clients_new"))}</button>
-                </form>
-                <ul id="acctclients-list" class="data-list"></ul>
-              </div>
-            </section>
-
-            <!-- Session 24 (chapter XXII), same move. crmAddQuote()/crmQuoteTotals()
-                 (assets/crm.js) shared verbatim with /wyceny/, which stays as it is. -->
-            <section data-panel="quotes" id="panel-quotes" role="tabpanel" aria-labelledby="tab-quotes" tabindex="0" hidden>
-              <div class="dash-head">
-                <h2 data-i18n="app_quotes_title">${esc(t("app_quotes_title"))}</h2>
-                <span id="acctquo-pro" class="chip" hidden><span id="acctquo-pro-chip"></span></span>
-              </div>
-              ${i("quo_list_d", "p", "muted")}
-              ${proGate(t, "quotes", features, DEFAULT_LANG, { id: "acctquo-gate" })}
-              <div id="acctquo-tool">
-                <form id="acctquo-form" class="inline-form">
-                  ${field("acctquo-name", "quo_new", t, { maxlength: 120, required: false })}
-                  ${selectField("acctquo-project", "quo_project", t, "field-narrow")}
-                  <button type="submit" class="btn btn-primary btn-sm" data-i18n="app_quotes_new">${esc(t("app_quotes_new"))}</button>
-                </form>
-                <p id="acctquo-noproj" class="muted" hidden>
-                  <span data-i18n="app_quotes_noproj">${esc(t("app_quotes_noproj"))}</span>
-                  <button type="button" class="btn btn-ghost btn-sm" data-goto-tab="projects" data-i18n="app_new_project">${esc(t("app_new_project"))}</button>
-                </p>
-                <ul id="acctquo-list" class="data-list"></ul>
-              </div>
-            </section>
-
-            <!-- 2026-09-26: the owner's one terminarz uses assets/schedule-grid.js here and on /terminarz/. -->
-            <section data-panel="schedule" id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule" tabindex="0" hidden>
-              <div class="dash-head">
-                <h2 data-i18n="app_schedule_title">${esc(t("app_schedule_title"))}</h2>
-                <span id="acctcal-pro" class="chip" hidden><span id="acctcal-pro-chip"></span></span>
-              </div>
-              ${i("app_schedule_lead", "p", "muted")}
-              ${proGate(t, "calendar", features, DEFAULT_LANG, { id: "acctcal-gate" })}
-              <div id="acctcal-tool">
-                ${calendarGrid(t, "acctcal")}
-              </div>
-            </section>
-
-            <!-- Materiały and Pomieszczenia carry no paywall — both are Free-tier (chapter
-                 II), matching /moje-materialy/ and the rooms already on the Projekty panel
-                 above. This tab reads the same assets/own-materials.js store /moje-materialy/
-                 does; full add/edit/price-history stays on that page rather than being
-                 reproduced here, since its form is specific to five material shapes and
-                 duplicating it would be a second place for that shape to drift. -->
-            <section data-panel="materials" id="panel-materials" role="tabpanel" aria-labelledby="tab-materials" tabindex="0" hidden>
-              <h2 data-i18n="app_materials_title">${esc(t("app_materials_title"))}</h2>
-              ${i("app_materials_lead", "p", "muted")}
-              <ul id="acctmat-list" class="data-list"></ul>
-              <p><a class="btn btn-ghost btn-sm btn-go" href="/moje-materialy/" data-i18n="app_materials_manage">${esc(t("app_materials_manage"))}</a></p>
-            </section>
-
-            <!-- Pomieszczenia reads the same live state.rooms/state.projects the Projekty
-                 panel above already renders (Firestore, not assets/workspace.js — signed in,
-                 this account's rooms live there) and only regroups it by project, so the
-                 two panels can never disagree about which rooms exist. -->
-            <section data-panel="rooms" id="panel-rooms" role="tabpanel" aria-labelledby="tab-rooms" tabindex="0" hidden>
-              <h2 data-i18n="app_rooms_title">${esc(t("app_rooms_title"))}</h2>
-              ${i("app_rooms_lead", "p", "muted")}
-              <div id="acctrooms-list" class="ws-room-cards"></div>
-            </section>
-
-            <section data-panel="sync" id="panel-sync" role="tabpanel" aria-labelledby="tab-sync" tabindex="0" hidden>
+            <section data-panel="sync" id="panel-sync" hidden>
               <h2 data-i18n="app_sync_title">${esc(t("app_sync_title"))}</h2>
               ${i("app_sync_d", "p", "muted")}
               <p id="app-sync-local" class="muted"></p>
@@ -540,7 +365,7 @@ export function appMain(t, features) {
               ${i("app_sync_note", "p", "muted src-note")}
             </section>
 
-            <section data-panel="profile" id="panel-profile" role="tabpanel" aria-labelledby="tab-profile" tabindex="0" hidden>
+            <section data-panel="profile" id="panel-profile" hidden>
               <h2 data-i18n="prof_title">${esc(t("prof_title"))}</h2>
 
               <div class="app-card">
@@ -585,11 +410,11 @@ export function appMain(t, features) {
                  second copy that could say something different from what those tabs show.
                  What is left is what chapter XXV actually asks this tab for: where the
                  account's own plan stands, and the way to change it. -->
-            <section data-panel="pro" id="panel-pro" role="tabpanel" aria-labelledby="tab-pro" tabindex="0" hidden>
+            <section data-panel="pro" id="panel-pro" hidden>
               ${proPanel(t, features)}
             </section>
 
-            <section data-panel="account" id="panel-account" role="tabpanel" aria-labelledby="tab-account" tabindex="0" hidden>
+            <section data-panel="account" id="panel-account" hidden>
               <h2 data-i18n="app_sec_title">${esc(t("app_sec_title"))}</h2>
 
               <div id="app-verify-row" class="app-card" hidden>

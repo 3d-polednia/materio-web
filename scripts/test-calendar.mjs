@@ -442,8 +442,8 @@ head("6. the route says what the page is, and the architecture still validates")
   eq("/terminarz/ is built", r.status, STATUS.LIVE);
   eq("it is a Pro page", r.level, LEVEL.PRO);
   check("and says what a free user sees instead", Boolean(r.gate) && r.gate.length > 40);
-  eq("the link is offered at Pro", r.navLevel, LEVEL.PRO);
-  check("it is in the footer, so it is linked from every page", Boolean(r.footer));
+  check("the 2026-09-26 account sidebar owns the link", !r.navLevel);
+  check("it is no longer duplicated in the footer", !r.footer);
   eq("and indexable — chapter XXVI", r.indexable, true);
   eq("it sits under the projects, whose dates it shows", r.parent, "projects");
 

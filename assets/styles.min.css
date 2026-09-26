@@ -1283,7 +1283,19 @@ font-size: var(--fs-sm); white-space: nowrap; cursor: pointer;
 }
 .app-nav-item svg { flex: none; color: inherit; }
 .app-nav-item:hover { background: var(--surface-alt); color: var(--on-bg); }
-.app-nav-item[aria-selected="true"] { background: var(--accent-soft); color: var(--on-accent-soft); }
+.app-nav-item[aria-current="page"] { background: var(--accent-soft); color: var(--on-accent-soft); }
+.account-page-shell { display: block; min-height: 0; }
+.account-page-main { min-width: 0; }
+.account-page-shell .app-side-brand { display: none; }
+.app-plan-pill:empty { display: none; }
+html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-main { width: 100%; }
+@media (min-width: 900px) {
+html.js[data-lm-level="liczmat"] .account-page-shell,
+html.js[data-lm-level="pro"] .account-page-shell {
+display: grid;
+grid-template-columns: 248px minmax(0, 1fr);
+}
+}
 @media (min-width: 900px) {
 .app-nav {
 display: flex; flex-direction: column; overflow-x: visible; gap: var(--sp-5); padding: 0;

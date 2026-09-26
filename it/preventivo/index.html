@@ -208,7 +208,6 @@
         <li><a href="/it/calcolatori/">Calcolatori</a></li>
         <li><a href="/it/materiali/">Materiali</a></li>
         <li><a href="/it/negozi/">Negozi</a></li>
-        <li data-nav-level="liczmat"><a href="/it/progetti/">Progetti</a></li>
         <li><a href="/it/liczmat-pro/">LiczMat Pro</a></li>
         <li><a href="/it/app-android/">L'app</a></li>
       </ul>
@@ -242,7 +241,50 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1">
+<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+    <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
+    <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
+    <nav class="app-nav" aria-label="Sezioni dell'account">
+      <div class="app-nav-group"><div class="app-nav-label">Lavoro</div><a class="app-nav-item" href="/app/#przeglad">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>Panoramica</span>
+      </a><a class="app-nav-item" href="/it/progetti/">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+        <span>Progetti</span>
+      </a><a class="app-nav-item" href="/it/preventivo/" aria-current="page">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        <span>Preventivo</span>
+      </a><a class="app-nav-item" href="/it/clienti/">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/><path d="M16.2 4.6a3.4 3.4 0 0 1 0 6.6M20 20c0-3-1.9-5.3-4.6-6"/></svg>
+        <span>Clienti</span>
+      </a><a class="app-nav-item" href="/it/preventivi-pro/">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+        <span>Preventivi</span>
+      </a><a class="app-nav-item" href="/it/scadenze/">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg>
+        <span>Scadenze</span>
+      </a></div><div class="app-nav-group"><div class="app-nav-label">Risorse</div><a class="app-nav-item" href="/it/i-miei-materiali/">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 6.8V17L12 22l9-5V6.8z"/><path d="M3 6.8 12 12l9-5.2M12 12v10"/></svg>
+        <span>Materiali</span>
+      </a><a class="app-nav-item" href="/it/progetti/#ws-rooms">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10 12 3l8 7"/><path d="M6 9v11h12V9"/><path d="M10 20v-6h4v6"/></svg>
+        <span>Stanze</span>
+      </a></div><div class="app-nav-group"><div class="app-nav-label">Account</div><a class="app-nav-item" href="/app/#profil">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-4 4-6 7.5-6s6.1 2 7.5 6"/></svg>
+        <span>Profilo</span>
+      </a><a class="app-nav-item" href="/app/#synchronizacja">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20v-4.5h4.5"/></svg>
+        <span>Sincronizzazione</span>
+      </a><a class="app-nav-item" href="/app/#pro">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 2.7 5.9 6.3.7-4.7 4.4 1.3 6.3L12 16.2 6.4 19.3l1.3-6.3-4.7-4.4 6.3-.7Z"/></svg>
+        <span>LiczMat Pro</span>
+      </a><a class="app-nav-item" href="/app/#konto">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 19.5a7.7 7.7 0 0 1 15 0"/></svg>
+        <span>Account</span>
+      </a></div>
+    </nav>
+  </aside>
+    <div class="app-main account-page-main">
   <section class="block page-head no-print">
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/it/">Home</a></li><li aria-current="page">Preventivo</li></ol></nav>
@@ -378,7 +420,8 @@
       <a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="appnote">Scarica</a></p>
     </div>
   </section>
-</main>
+</div>
+  </div></main>
 <footer class="site">
   <div class="wrap">
     <div class="foot-grid">
@@ -392,15 +435,9 @@
           <li><a href="/it/calcolatori/">Tutti i calcolatori</a></li>
           <li><a href="/it/convertitore-di-unita/">Convertitore di unità</a></li>
           <li><a href="/it/materiali/">Materiali</a></li>
-          <li data-nav-level="liczmat"><a href="/it/i-miei-materiali/">I miei materiali</a></li>
-          <li data-nav-level="liczmat"><a href="/it/progetti/">Progetti</a></li>
-          <li><a href="/it/preventivo/">Preventivo</a></li>
           <li><a href="/it/guide/">Guide</a></li>
           <li><a href="/it/negozi/">Negozi</a></li>
           <li><a href="/it/liczmat-pro/">LiczMat Pro</a></li>
-          <li data-nav-level="pro"><a href="/it/clienti/">Clienti</a></li>
-          <li data-nav-level="pro"><a href="/it/preventivi-pro/">Preventivi</a></li>
-          <li data-nav-level="pro"><a href="/it/scadenze/">Scadenze</a></li>
           <li><a href="/it/#faq">FAQ</a></li>
         </ul>
       </div>

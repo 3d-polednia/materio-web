@@ -502,7 +502,7 @@ head("5. chapter XXV's paywall: the wall, the two rungs and the one door through
   await pro.close();
 }
 
-head("5b. the footer offers the module to a Pro account only, and never to a crawler-less guest");
+head("5b. the footer no longer duplicates the account module");
 {
   // Only the footer's navigation link is in question here. Two other links on this very
   // page point at /klienci/ and are supposed to: the breadcrumb (the trail of the page
@@ -513,17 +513,22 @@ head("5b. the footer offers the module to a Pro account only, and never to a cra
      the "guest" here was a Pro account and was offered the link it is supposed not to see.
      The section had been failing since that default arrived (found in session 32). */
   const guest = await open(ctx, CLIENTS, { workspace: workspace(), pro: false });
+  eq("a guest does not see the account sidebar",
+    await guest.$eval("[data-account-sidebar]", (n) => getComputedStyle(n).display), "none");
   const shown = await guest.$$eval(footLink, (a) =>
     a.filter((n) => n.getBoundingClientRect().height > 0).length);
   eq("a guest is not offered the link", shown, 0);
-  check("though the markup still carries it, which is what a crawler reads",
-    (await guest.$$eval(footLink, (a) => a.length)) > 0);
+  eq("and the markup no longer carries it", await guest.$$eval(footLink, (a) => a.length), 0);
   await guest.close();
 
   const pro = await open(ctx, CLIENTS, { workspace: workspace(), level: "pro" });
+  check("a signed-in visitor sees the account sidebar",
+    (await pro.$eval("[data-account-sidebar]", (n) => getComputedStyle(n).display)) !== "none");
+  eq("Klienci is marked as the current page",
+    await pro.locator('[data-account-sidebar] a[href$="/klienci/"]').getAttribute("aria-current"), "page");
   const proShown = await pro.$$eval(footLink, (a) =>
     a.filter((n) => n.getBoundingClientRect().height > 0).length);
-  check("a Pro account is", proShown > 0, String(proShown));
+  eq("a Pro account does not get a duplicate either", proShown, 0);
   await pro.close();
 }
 

@@ -149,7 +149,7 @@ const PANEL = `
   </div>`;
 
 /**
- * Put the tab and the panel into the page, and wire them.
+ * Put the account link and the panel into the page, and wire them.
  *
  * Called once per sign-in, by assets/app.js, and only for an account whose token carries
  * the claim. It is idempotent: a second call finds the tab already there and returns, so a
@@ -166,27 +166,20 @@ export async function mountAdmin({ app }) {
   const main = document.querySelector("#app-workspace .app-main");
   if (!strip || !main) return;
 
-  const tab = document.createElement("button");
-  tab.type = "button";
+  const tab = document.createElement("a");
   tab.className = "app-nav-item";
   tab.id = "tab-admin";
-  tab.dataset.tab = "admin";
-  tab.setAttribute("role", "tab");
-  tab.setAttribute("aria-controls", "panel-admin");
-  tab.setAttribute("aria-selected", "false");
-  tab.tabIndex = -1;
+  tab.href = "#admin";
   tab.textContent = "Admin";
   strip.appendChild(tab);
 
   const panel = document.createElement("section");
   panel.id = "panel-admin";
   panel.dataset.panel = "admin";
-  panel.setAttribute("role", "tabpanel");
-  panel.setAttribute("aria-labelledby", "tab-admin");
-  panel.tabIndex = 0;
   panel.hidden = true;
   panel.innerHTML = PANEL;
   main.appendChild(panel);
+  if (location.hash === "#admin") window.dispatchEvent(new HashChangeEvent("hashchange"));
 
   const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
   const callable = httpsCallable(getFunctions(app, REGION), "adminPlan");

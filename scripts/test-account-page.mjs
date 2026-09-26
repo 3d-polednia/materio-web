@@ -387,7 +387,7 @@ head("6. how long the session lasts is asked once, per device");
   eq("and the answer is remembered on this device",
     await page.evaluate(() => localStorage.getItem("liczmat-remember")), "0");
 
-  await page.click('[data-tab="profile"]');
+  await page.click('.app-nav-item[href$="#profil"]');
   check("the profile shows the same answer", !(await page.locator("#prof-remember").isChecked()));
   eq("in words", await page.locator("#prof-session-state").innerText(),
     "Wylogujemy Cię, gdy zamkniesz przeglądarkę.");
@@ -434,7 +434,7 @@ head("8. the profile");
   await page.fill("#signin-password", "sekret123");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
-  await page.click('[data-tab="profile"]');
+  await page.click('.app-nav-item[href$="#profil"]');
 
   check("the profile panel opens", await visible(page, '[data-panel="profile"]'));
   check("and the projects panel closes", !(await visible(page, '[data-panel="projects"]')));
@@ -477,7 +477,7 @@ head("9. the level comes from the profile the server owns");
   await free.click("#signin-form button[type=submit]");
   await signedIn(free);
   eq("plan free is the LiczMat level", await free.locator("#app-level").innerText(), "LiczMat");
-  await free.click('[data-tab="profile"]');
+  await free.click('.app-nav-item[href$="#profil"]');
   eq("and the profile marks that card",
     await free.locator("#panel-profile .lvl-card[data-current] h3").innerText(), "LiczMat");
   await free.close();
@@ -493,7 +493,7 @@ head("9. the level comes from the profile the server owns");
   eq("plan premium is the Pro level", await pro.locator("#app-level").innerText(), "LiczMat Pro");
   eq("and the rest of the site is told so",
     await pro.evaluate(() => localStorage.getItem("liczmat-signed-in")), "pro");
-  await pro.click('[data-tab="profile"]');
+  await pro.click('.app-nav-item[href$="#profil"]');
   eq("the profile marks the Pro card",
     await pro.locator("#panel-profile .lvl-card[data-current] h3").innerText(), "LiczMat Pro");
   /* Session 29 gave the card the one link chapter XXV asks for — "Poznaj LiczMat Pro",
@@ -522,7 +522,7 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
     await page.fill("#signin-password", "sekret123");
     await page.click("#signin-form button[type=submit]");
     await signedIn(page);
-    await page.click('[data-tab="pro"]');
+    await page.click('.app-nav-item[href$="#pro"]');
     return page;
   };
 
@@ -539,32 +539,7 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
     await free.locator("#plan-note").innerText(),
     "Konto działa na darmowym planie LiczMat. LiczMat Pro odblokowuje moduły poniżej.");
 
-  // Chapter XXV: understand what is Pro, and never meet a dead button.
-  /* The Pro tab stopped being the place that describes Pro on 2026-09-03: the locked
-     cards were taken out of it and the description moved into proGate(), the wall drawn
-     inside Klienci, Wyceny and Terminarz themselves. So the same rule is checked where it
-     now lives. The wall names the other modules and links to none of them on purpose —
-     they are behind the same wall, and a link to another locked page is the dead button by
-     a longer route. Three, not four, since Zlecenia became a project (2026-09-22). */
-  await free.click('[data-tab="clients"]');
-  const gate = free.locator("#acctclients-gate");
-  eq("the Klienci tab is gated and marked as Pro", 
-    await gate.locator('.chip').first().innerText(), "Dostępne w LiczMat Pro");
-  eq("the other three Pro modules are described in the wall", await gate.locator(".pw-incl-list li").count(), 3);
-  check("they are described as text without links, so no dead buttons", 
-    (await gate.locator(".pw-incl-list a").count()) === 0);
-
-  // Not a fixed list: what matters is that every way off the wall leads to the Pro page or
-  // to the account, and never to another module locked behind the same wall.
-  {
-    const offers = await free.$$eval("#acctclients-gate a",
-      (ns) => ns.map((n) => n.getAttribute("href")));
-    check("the wall offers a way out at all", offers.length > 0, String(offers.length));
-    check("and every one of them goes to the Pro page or to the account",
-      offers.every((h) => h === "/liczmat-pro/" || h.startsWith("/app/")), offers.join(" "));
-  }
-
-  await free.click('[data-tab="pro"]');
+  await free.click('.app-nav-item[href$="#pro"]');
   /* Checked as a list rather than as a number, the way session 29 rewrote it: the count
      said five, the panel had six, and a number does not say which element it lost. Since
      2026-09-03 the four module links are gone with the cards, and what is left is the
@@ -664,8 +639,6 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
   eq("switching language redraws the plan", await over.locator("#plan-name").innerText(), "Kostenlos");
   eq("and its note", await over.locator("#plan-note").innerText(),
     "Der Pro-Tarif ist abgelaufen. Das Konto läuft als kostenloses LiczMat weiter.");
-  eq("and the module cards, which the build wrote",
-    await over.locator('#acctclients-gate h2').innerText(), "Kunden");
   eq("no console error", over.lmErrors.join(" / "), "");
   await over.close();
   await ctx.close();
@@ -695,7 +668,7 @@ head("9c. a plan granted while the page is open lands on the screen");
   await page.fill("#signin-password", "sekret123");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
-  await page.click('[data-tab="pro"]');
+  await page.click('.app-nav-item[href$="#pro"]');
   eq("it starts as a free account", await page.locator("#app-level").innerText(), "LiczMat");
   eq("and the rest of the site is told so",
     await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), "liczmat");
@@ -730,88 +703,26 @@ head("9c. a plan granted while the page is open lands on the screen");
   await ctx.close();
 }
 
-head("9d. the Materiały tab: prices are PRO since 2026-09-04");
-{
-  // `costs` turned PRO on 2026-09-04 (assets/plan.js): the material list itself
-  // (`shopping`) stays free, but the price on a row is the same money /kosztorys/ walls
-  // off. /app/ knows state.level for certain, from Firebase, so the gate is canCosts() —
-  // not the liczmat-signed-in hint a page with no Firebase has to fall back on.
-  const material = JSON.stringify({
-    materials: [{
-      id: "m1", name: "Klej", priceMinor: 12345, currencyCode: "PLN",
-      createdAt: 1, updatedAt: 1, deletedAt: null, schemaVersion: 1, prices: [],
-    }],
-  });
-  const ctx = await context({ viewport: { width: 1280, height: 900 } });
-
-  const free = await openApp(ctx, "/app/", {
-    accounts: ACCOUNT,
-    docs: { "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "free" } },
-    storage: { "liczmat-materials-v1": material },
-  });
-  await free.fill("#signin-email", "kto@example.com");
-  await free.fill("#signin-password", "sekret123");
-  await free.click("#signin-form button[type=submit]");
-  await signedIn(free);
-  await free.click('[data-tab="materials"]');
-  const freeHtml = await free.locator("#acctmat-list").innerHTML();
-  check("a free account still sees the material", freeHtml.includes("Klej"), freeHtml);
-  check("but never its price — not merely hidden, never written",
-    !/123,45/.test(freeHtml), freeHtml);
-  await free.close();
-
-  const pro = await openApp(ctx, "/app/", {
-    accounts: ACCOUNT,
-    docs: { "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "premium" } },
-    storage: { "liczmat-materials-v1": material },
-  });
-  await pro.fill("#signin-email", "kto@example.com");
-  await pro.fill("#signin-password", "sekret123");
-  await pro.click("#signin-form button[type=submit]");
-  await signedIn(pro);
-  await pro.click('[data-tab="materials"]');
-  const proHtml = await pro.locator("#acctmat-list").innerHTML();
-  check("a Pro account sees the price", /123,45/.test(proHtml), proHtml);
-  eq("no console error", pro.lmErrors.join(" / "), "");
-  await pro.close();
-  await ctx.close();
-}
-
 /* --- 10. the tabs, the language switch, the phone ------------------------------------ */
 
-head("10. eleven tabs, reachable from the keyboard");
+head("10. links and hash routing");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
-  const page = await openApp(ctx, "/app/", { accounts: ACCOUNT });
+  const page = await openApp(ctx, "/app/#profil", { accounts: ACCOUNT });
   await page.fill("#signin-email", "kto@example.com");
   await page.fill("#signin-password", "sekret123");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
-  check("Przegląd contains recent calculations", await page.locator("#panel-overview #dash-recent").count() > 0);
-  check("Przegląd contains recent tools", await page.locator("#panel-overview #dash-tools").count() > 0);
-  check("Przegląd contains the recent-tools clear action", await page.locator("#panel-overview #dash-tools-forget").count() > 0);
-
-  // 2026-09-03: The workspace tab strip became a sidebar. Counting the navItem() calls
-  // in src/app-pages.mjs yields 12 entries (.app-nav-item).
-  eq("there are eleven", await page.locator(".app-nav-item").count(), 11);
-  eq("only the selected one is in the tab order",
-    await page.locator('.app-nav-item[tabindex="0"]').count(), 1);
-
-  await page.locator('[data-tab="projects"]').focus();
-  await page.keyboard.press("ArrowRight");
-  eq("the right arrow moves to the next tab",
-    await page.evaluate(() => document.activeElement.dataset.tab), "clients");
-  check("and opens its panel", await visible(page, '[data-panel="clients"]'));
-  await page.keyboard.press("End");
-  eq("End goes to the last one",
-    await page.evaluate(() => document.activeElement.dataset.tab), "account");
-  await page.keyboard.press("ArrowRight");
-  eq("and the arrows wrap round",
-    await page.evaluate(() => document.activeElement.dataset.tab), "overview");
-  await page.keyboard.press("ArrowLeft");
-  eq("in both directions",
-    await page.evaluate(() => document.activeElement.dataset.tab), "account");
-  eq("no console error", page.lmErrors.join(" / "), "");
+  check("#profil opens the profile panel", await visible(page, "#panel-profile"));
+  await page.evaluate(() => { location.hash = "#synchronizacja"; });
+  await page.waitForFunction(() => !document.getElementById("panel-sync").hidden);
+  check("hashchange opens synchronization", await visible(page, "#panel-sync"));
+  await page.evaluate(() => { location.hash = "#nieznany"; });
+  await page.waitForFunction(() => !document.getElementById("panel-overview").hidden);
+  check("an unknown hash opens Przegląd", await visible(page, "#panel-overview"));
+  for (const id of ["projects", "clients", "quotes", "schedule", "materials", "rooms"]) {
+    eq("no shortened " + id + " panel", await page.locator("#panel-" + id).count(), 0);
+  }
   await page.close();
   await ctx.close();
 }
@@ -852,8 +763,8 @@ head("11. switching language redraws what JavaScript wrote");
   eq("and follows the picker into German",
     await page.locator("#app-provider").innerText(), "E-Mail und Passwort");
   eq("including the tab labels",
-    await page.locator('[data-tab="profile"]').innerText(), "Profil");
-  await page.click('[data-tab="profile"]');
+    await page.locator('.app-nav-item[href$="#profil"]').innerText(), "Profil");
+  await page.click('.app-nav-item[href$="#profil"]');
   eq("and the session sentence in the profile",
     await page.locator("#prof-session-state").innerText(),
     "Du bleibst angemeldet, auch wenn der Browser geschlossen wird.");
@@ -878,7 +789,7 @@ head("12. the account page on a phone");
     await page.fill("#signin-password", "sekret123");
     await page.click("#signin-form button[type=submit]");
     await signedIn(page);
-    await page.click('[data-tab="profile"]');
+    await page.click('.app-nav-item[href$="#profil"]');
     const overflow = await page.evaluate(() =>
       document.documentElement.scrollWidth - document.documentElement.clientWidth);
     check(`the profile at ${width}px does not scroll sideways`, overflow <= 0,
@@ -887,7 +798,7 @@ head("12. the account page on a phone");
     // Session 21 put a fifth tab on the row and a two-column grid of module cards behind
     // it. Both are the shapes chapter XXVIII catches: a tab row that will not wrap and a
     // grid that keeps two columns on a phone.
-    await page.click('[data-tab="pro"]');
+    await page.click('.app-nav-item[href$="#pro"]');
     const overflowPro = await page.evaluate(() =>
       document.documentElement.scrollWidth - document.documentElement.clientWidth);
     check(`the Pro tab at ${width}px does not scroll sideways`, overflowPro <= 0,
@@ -906,7 +817,8 @@ async function openTab(ctx, tab, opts = {}) {
   await page.fill("#signin-password", "sekret123");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
-  await page.click(`[data-tab="${tab}"]`);
+  const hashes = { profile: "profil", sync: "synchronizacja", pro: "pro", account: "konto" };
+  await page.click('.app-nav-item[href$="#' + hashes[tab] + '"]');
   return page;
 }
 
@@ -976,8 +888,8 @@ head("12c. deleting the account, against the rules as deployed today");
   // nothing else would ever re-attach — so six subscriptions over the two rounds.
   eq("and all three listeners were re-subscribed",
     await page.evaluate(() => window.__fbListeners.length), 6);
-  check("the projects are still on the page",
-    (await page.locator("#project-list").innerText()).includes("Łazienka"));
+  check("the projects are still on Przegląd",
+    (await page.locator("#overview-projects").innerText()).includes("Łazienka"));
   eq("no console error", page.lmErrors.join(" / "), "");
   await page.close();
   await ctx.close();
@@ -1098,13 +1010,13 @@ head("15. /app/ carries the whole menu, in whatever language it is showing");
   // Until the owner reported it, this page had one link — "Kalkulatory", hard-coded in
   // Polish — so signing in emptied the menu.
   const labels = await page.$$eval(".nav-list a", (a) => a.map((e) => e.textContent.trim()));
-  eq("six links, the architecture's own", labels.length, 6);
+  eq("five links, the architecture's own", labels.length, 5);
   eq("in the architecture's order", labels.join(","),
-    "Kalkulatory,Materiały,Sklepy,Projekty,LiczMat Pro,Aplikacja");
+    "Kalkulatory,Materiały,Sklepy,LiczMat Pro,Aplikacja");
 
   const hrefs = () => page.$$eval(".nav-list a", (a) => a.map((e) => e.getAttribute("href")));
   eq("and they point at the Polish pages", (await hrefs()).join(","),
-    "/kalkulatory/,/materialy/,/sklepy/,/projekty/,/liczmat-pro/,/aplikacja/");
+    "/kalkulatory/,/materialy/,/sklepy/,/liczmat-pro/,/aplikacja/");
 
   // Translating the label is only half a menu: "Materialien" pointing at /materialy/ is a
   // link that lies. The build hands the page every language's address in window.LM_NAV.
@@ -1112,13 +1024,13 @@ head("15. /app/ carries the whole menu, in whatever language it is showing");
   await page.click('#lang-picker [data-lang="de"]');
   await page.waitForFunction(() => document.documentElement.lang === "de");
   const german = await page.$$eval(".nav-list a", (a) => a.map((e) => e.textContent.trim()));
-  // Five of the six translate; LiczMat Pro does not, because it is a brand
+  // Four of the five translate; LiczMat Pro does not, because it is a brand
   // name and a product with ten names is ten products. Session 40 put it in this slot,
   // which "Poradniki" gave up — the guides are still LIVE and still in the footer.
   eq("the labels follow the language", german.join(","),
-    "Rechner,Materialien,Märkte,Projekte,LiczMat Pro,Die App");
+    "Rechner,Materialien,Märkte,LiczMat Pro,Die App");
   eq("and so do the addresses", (await hrefs()).join(","),
-    "/de/rechner/,/de/materialien/,/de/baumaerkte/,/de/projekte/,/de/liczmat-pro/,/de/android-app/");
+    "/de/rechner/,/de/materialien/,/de/baumaerkte/,/de/liczmat-pro/,/de/android-app/");
   eq("no console error", page.lmErrors.join(" / "), "");
 
   // /p/<token> keeps the short list on purpose: it is a quote opened by somebody else's
@@ -1193,187 +1105,6 @@ head("15b. /p/<token> is priced only when the account that shared it was Pro");
   await ctx.close();
 }
 
-head("16. rooms stand inside the project they belong to");
-{
-  const sync = { createdAt: 1, updatedAt: 1, deletedAt: null, schemaVersion: 1 };
-  const ctx = await context({ viewport: { width: 1280, height: 900 } });
-  // The fake Firestore does not push changes, so the lists are seeded rather than typed
-  // into — what is being measured here is the rendering and the document that is written.
-  const page = await openTab(ctx, "projects", {
-    docs: {
-      "users/u1": { plan: "free" },
-      "users/u1/projects/p1": { name: "Remont łazienki", color: "violet", archived: false, ...sync },
-      "users/u1/projects/p2": { name: "Salon", archived: false, ...sync },
-      "users/u1/projects/p3": { name: "Pusty", archived: false, ...sync },
-      "users/u1/projects/p4": { name: "Archiwum", archived: true, ...sync },
-      // Chapter XVIII's link, on a room this site pushed.
-      "users/u1/rooms/r1": { name: "Łazienka", lengthM: 2.4, widthM: 3.2, heightM: 2.5, projectId: "p1", ...sync },
-      // And a room the phone made: roomToDoc() has no projectId to send, so it has none.
-      "users/u1/rooms/r2": { name: "Garaż", lengthM: 6, widthM: 3, heightM: 2.4, ...sync },
-      "users/u1/rooms/r3": { name: "Stary", lengthM: 2, widthM: 2, heightM: 2.4, projectId: "p4", ...sync },
-    },
-  });
-  await page.waitForSelector('#project-list li[data-id="p1"] .app-rooms li[data-id="r1"]');
-
-  const p1 = '#project-list li[data-id="p1"]';
-  const text = await page.locator(`${p1} .app-rooms`).innerText();
-  check("the project draws its own room", text.includes("Łazienka"), text);
-  check("with the dimensions", /2,4\s*×\s*3,2\s*×\s*2,5\s*m/.test(text), text);
-  check("and the floor they come to", text.includes("7,68"), text);
-  check("another project's rooms are not in it", !text.includes("Garaż"), text);
-  eq("a project with no room says so",
-    await page.locator('#project-list li[data-id="p2"] .app-rooms .empty').count(), 1);
-
-  // The rooms nobody assigned are listed rather than hidden: they are real rooms, and
-  // hiding them would look like losing them.
-  const loose = await page.locator("#room-list").innerText();
-  check("the unassigned room has a list of its own", loose.includes("Garaż"), loose);
-  check("and the assigned one is not repeated in it", !loose.includes("Łazienka"), loose);
-
-  // Adding one, inside the project it belongs to. Until the owner reported it, addRoom()
-  // did not write a projectId at all, so a room made here belonged to nothing.
-  await page.fill(`${p1} [data-f="name"]`, "Przedpokój");
-  await page.fill(`${p1} [data-f="lengthM"]`, "1,4");
-  await page.fill(`${p1} [data-f="widthM"]`, "4");
-  await page.fill(`${p1} [data-f="heightM"]`, "2,5");
-  await page.click(`${p1} [data-room-form] button[type=submit]`);
-  await page.waitForFunction(() =>
-    [...window.__fbDocs.values()].some((d) => d.name === "Przedpokój"));
-
-  const doc = await page.evaluate(() => {
-    for (const [path, data] of window.__fbDocs) {
-      if (data.name === "Przedpokój") return { path, data };
-    }
-    return null;
-  });
-  check("the room reached the store", Boolean(doc), "no room document written");
-  check("beside the projects, as the contract says (FIRESTORE_SYNC §2)",
-    /^users\/u1\/rooms\//.test(doc.path), doc.path);
-  eq("and it names the project it was added inside", doc.data.projectId, "p1");
-  eq("with a comma read as a decimal point", doc.data.lengthM, 1.4);
-  eq("and the contract's own fields", `${doc.data.widthM}|${doc.data.heightM}`, "4|2.5");
-  await page.click("#tab-rooms");
-  await page.waitForSelector('#acctrooms-list [data-project-id="p1"]');
-  eq("the room tab has every live project card",
-    await page.locator("#acctrooms-list [data-project-id]").count(), 4);
-  eq("the empty project card has its add form",
-    await page.locator('#acctrooms-list [data-project-id="p3"] [data-room-form]').count(), 1);
-  eq("the stored project colour becomes a validated card class",
-    await page.locator('#acctrooms-list [data-project-id="p1"].ws-room-card-violet').count(), 1);
-  eq("a project without colour gets its position fallback",
-    await page.locator('#acctrooms-list [data-project-id="p2"].ws-room-card-blue').count(), 1);
-  const noProject = await page.locator('#acctrooms-list [data-project-id=""]').innerText();
-  check("an archived project's room moves to the neutral card", noProject.includes("Stary"), noProject);
-  const p3 = '#acctrooms-list [data-project-id="p3"]';
-  await page.locator(`${p3} summary`).click();
-  await page.fill(`${p3} [data-f="name"]`, "Gabinet");
-  await page.click(`${p3} button[type=submit]`);
-  await page.waitForFunction(() => [...window.__fbDocs.values()].some((d) => d.name === "Gabinet"));
-  const roomCardDoc = await page.evaluate(() => {
-    for (const data of window.__fbDocs.values()) if (data.name === "Gabinet") return data;
-    return null;
-  });
-  eq("adding from an account card writes that project id", roomCardDoc.projectId, "p3");
-
-  const assign = '#acctrooms-list [data-project-id=""] li[data-id="r2"] [data-assign-project]';
-  eq("a loose room offers project assignment", await page.locator(assign).count(), 1);
-  await page.selectOption(assign, "p2");
-  await page.waitForFunction(() => window.__fbDocs.get("users/u1/rooms/r2").projectId === "p2");
-  eq("choosing a project writes the room link",
-    await page.evaluate(() => window.__fbDocs.get("users/u1/rooms/r2").projectId), "p2");
-
-  await page.click("#tab-projects");
-  let deleteQuestion = "";
-  page.once("dialog", async (dialog) => { deleteQuestion = dialog.message(); await dialog.accept(); });
-  await page.click('#project-list li[data-id="p1"] > .row-actions [data-del]');
-  await page.waitForFunction(() => window.__fbDocs.get("users/u1/projects/p1").deletedAt !== null);
-  // The fake store delivers collection changes only when told to, as the server would.
-  await page.evaluate(() => window.__fbSync(false, true));
-  await page.click("#tab-rooms");
-  await page.waitForSelector('#acctrooms-list [data-project-id=""] li[data-id="r1"]');
-  eq("its room now shows under no project", await page.locator('#acctrooms-list [data-project-id=""] li[data-id="r1"]').count(), 1);
-  check("project delete warns that its rooms remain", deleteQuestion.includes("Pomieszczenia (1)"), deleteQuestion);
-  const detached = await page.evaluate(() => window.__fbDocs.get("users/u1/rooms/r1"));
-  eq("project delete leaves the room its link", detached.projectId, "p1");
-  eq("and does not delete the room", detached.deletedAt, null);
-  eq("no console error", page.lmErrors.join(" / "), "");
-  await page.close();
-  await ctx.close();
-}
-
-head("16b. quotes start from a project and lead to the full editor");
-{
-  const project = {
-    name: "Łazienka", clientId: "c1", archived: false,
-    createdAt: 1, updatedAt: 4, deletedAt: null, schemaVersion: 1,
-  };
-  const docs = {
-    "users/u1": { createdAt: 1, lastSeenAt: 1, appVersion: "web", plan: "premium" },
-    "users/u1/projects/p1": project,
-  };
-
-  const ctx = await context({ viewport: { width: 1280, height: 900 } });
-  const create = await openTab(ctx, "quotes", { docs });
-  eq("the project picker starts with no project and lists the account project",
-    (await create.locator("#acctquo-project option").allTextContents()).join(" | "),
-    "Bez projektu | Łazienka");
-  await create.selectOption("#acctquo-project", "p1");
-  await Promise.all([
-    create.waitForURL(/\/wyceny\/\?id=/, { timeout: 5000 }),
-    create.click('#acctquo-form button[type="submit"]'),
-  ]);
-  const made = await create.evaluate(() => JSON.parse(localStorage.getItem("liczmat-crm-v1")).quotes[0]);
-  eq("an empty name takes the selected project's name", made.name, "Łazienka");
-  eq("and the quote keeps that project", made.projectId, "p1");
-  check("the submit goes straight to the quote editor", /\/wyceny\/\?id=/.test(create.url()), create.url());
-  await create.close();
-
-  const blank = await openTab(ctx, "quotes", { docs });
-  await blank.evaluate(() => localStorage.removeItem("liczmat-crm-v1"));
-  await blank.click('#acctquo-form button[type="submit"]');
-  eq("a quote with neither name nor project is not stored",
-    await blank.evaluate(() => {
-      const raw = localStorage.getItem("liczmat-crm-v1");
-      return raw ? JSON.parse(raw).quotes.length : 0;
-    }), 0);
-  eq("and the status line explains what is needed",
-    await blank.locator("#app-status").innerText(), "Wpisz nazwę wyceny albo wybierz projekt.");
-  eq("the name field receives focus", await blank.evaluate(() => document.activeElement.id), "acctquo-name");
-  await blank.close();
-
-  const workspace = {
-    projects: [{ id: "p1", ...project }], rooms: [], shoppingItems: [],
-    estimations: [{ id: "e1", projectId: "p1", name: "Płytki", totalCostMinor: 12345,
-      currencyCode: "PLN", createdAt: 2, updatedAt: 2, deletedAt: null }],
-  };
-  const crm = {
-    clients: [{ id: "c1", name: "Nowak", projectIds: ["p1"], createdAt: 1, updatedAt: 1, deletedAt: null }],
-    jobs: [],
-    quotes: [{ id: "q1", name: "Łazienka Nowaka", projectId: "p1", labour: [], marginPct: 0,
-      status: "draft", note: "", currencyCode: "", createdAt: 2, updatedAt: 3, deletedAt: null }],
-  };
-  const row = await openTab(ctx, "quotes", { docs, storage: {
-    "materio-workspace-v1": JSON.stringify(workspace),
-    "liczmat-crm-v1": JSON.stringify(crm),
-  } });
-  check("a quote row shows the client and project",
-    (await row.locator("#acctquo-list .acctquo-meta").innerText()).includes("Nowak · Łazienka"));
-  check("and shows the calculated total",
-    (await row.locator("#acctquo-list .acctquo-total").innerText()).includes("123,45"));
-  eq("and carries the four status choices", await row.locator("#acctquo-list [data-status] option").count(), 4);
-  await row.selectOption("#acctquo-list [data-status]", "sent");
-  eq("changing status stores it on the quote",
-    await row.evaluate(() => JSON.parse(localStorage.getItem("liczmat-crm-v1")).quotes[0].status), "sent");
-  // The list is redrawn after the change; the keyboard must not be dropped back at <body>.
-  check("the status select keeps the focus after the redraw",
-    await row.evaluate(() => document.activeElement && document.activeElement.matches("#acctquo-list [data-status]")));
-  eq("the delete button names the quote it deletes",
-    await row.locator("#acctquo-list [data-del]").getAttribute("aria-label"), "Usuń: Łazienka Nowaka");
-  eq("no console error", row.lmErrors.join(" / "), "");
-  await row.close();
-  await ctx.close();
-}
-
 head("17. whose copy is in this browser, and how to empty it (session 35)");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
@@ -1415,7 +1146,7 @@ head("17. whose copy is in this browser, and how to empty it (session 35)");
     await page.evaluate(() => window.__fbDocs.size), before);
 
   // The way out is on the settings tab, and it empties this browser.
-  await page.click('[data-tab="account"]');
+  await page.click('.app-nav-item[href$="#konto"]');
   await page.click("#app-wipe");
   await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
   const kept = await page.evaluate(() => {
@@ -1439,7 +1170,7 @@ head("17. whose copy is in this browser, and how to empty it (session 35)");
 
   // With the browser empty the sync tab opens again — the refusal was about the rows,
   // not about the account.
-  await page.click('[data-tab="sync"]');
+  await page.click('.app-nav-item[href$="#synchronizacja"]');
   await page.waitForSelector("#app-sync-foreign", { state: "hidden", timeout: 5000 });
   eq("push is offered again", await page.locator("#app-sync-push").isDisabled(), false);
   eq("and pull", await page.locator("#app-sync-pull").isDisabled(), false);
@@ -1478,14 +1209,14 @@ head("17. whose copy is in this browser, and how to empty it (session 35)");
 head("18. the offline notice: up when it is true, down when it is not");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
-  const page = await openTab(ctx, "projects", {
+  const page = await openTab(ctx, "profile", {
     docs: {
       "users/u1/projects/p1": { name: "Łazienka", archived: false, updatedAt: 4, deletedAt: null },
     },
   });
 
   eq("signed in, the notice is down", await page.locator("#app-offline").isHidden(), true);
-  eq("and the project is listed", await page.locator("#project-list .row-name").first().innerText(), "Łazienka");
+  eq("and the project is listed", await page.locator("#overview-projects .row-name").first().innerText(), "Łazienka");
 
   // German is fetched now, while there is a connection: since session 33 /app/ ships one
   // dictionary and goes and gets the others, and the switch below happens with the
@@ -1504,15 +1235,8 @@ head("18. the offline notice: up when it is true, down when it is not");
   eq("a snapshot out of the cache alone does not claim the network is gone",
     await page.locator("#app-offline").isHidden(), true);
 
-  // And it does not redraw the list either: the caret stays where somebody is typing.
-  await page.fill('[data-room-form] [data-f="name"]', "Kuchnia");
-  await page.evaluate(() => window.__fbSync(true));
-  await page.waitForTimeout(200);
-  eq("a metadata-only snapshot does not wipe a field being typed in",
-    await page.inputValue('[data-room-form] [data-f="name"]'), "Kuchnia");
-
   // A message somebody else put on the status line is not stamped on any more.
-  await page.click('[data-tab="profile"]');
+  await page.click('.app-nav-item[href$="#profil"]');
   await page.fill("#prof-name", "Jan");
   await page.click("#name-form button[type=submit]");
   await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
@@ -1573,7 +1297,7 @@ head("18. the offline notice: up when it is true, down when it is not");
 head("18c. a warm cache is not a dropped connection");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
-  const page = await openTab(ctx, "projects", {
+  const page = await openTab(ctx, "profile", {
     docs: {
       "users/u1/projects/p1": { name: "Łazienka", archived: false, updatedAt: 4, deletedAt: null },
     },
@@ -1587,7 +1311,7 @@ head("18c. a warm cache is not a dropped connection");
   eq("nor does it put it on the status line",
     await page.locator("#app-status").isHidden(), true);
   eq("the project is on the screen all the same",
-    await page.locator("#project-list .row-name").first().innerText(), "Łazienka");
+    await page.locator("#overview-projects .row-name").first().innerText(), "Łazienka");
 
   // The server answering with the documents it already has changes nothing but the
   // metadata. This is the event the old listener was never sent.
@@ -1614,7 +1338,7 @@ head("18c. a warm cache is not a dropped connection");
 head("18b. a connection that is gone without the browser noticing");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
-  const page = await openTab(ctx, "projects", {
+  const page = await openTab(ctx, "profile", {
     docs: {
       "users/u1/projects/p1": { name: "Łazienka", archived: false, updatedAt: 4, deletedAt: null },
     },
@@ -1641,116 +1365,6 @@ head("18b. a connection that is gone without the browser noticing");
 
 /* Guards the 2026-09-26 report: deleted projects and rooms came back about 10 seconds
    later. The stub needs latency so edits can land while the sign-in pull/push is active. */
-head("19. a delete made while the sign-in sync is running stays deleted");
-{
-  const projects = [];
-  const rooms = [];
-  const estimations = [];
-  const docs = { "users/u1": { plan: "free" } };
-  for (let n = 1; n <= 6; n++) {
-    const project = {
-      name: `Projekt ${n}`, archived: false, clientId: "", status: "new", dueDate: "",
-      valueMinor: null, currencyCode: "", note: "", color: "", createdAt: 1000,
-      updatedAt: 1000 + n, deletedAt: null, schemaVersion: 1,
-    };
-    const room = {
-      name: `Pokój ${n}`, lengthM: 4, widthM: 3, heightM: 2.5, projectId: `p${n}`,
-      createdAt: 1000, updatedAt: 1000, deletedAt: null, schemaVersion: 1,
-    };
-    docs[`users/u1/projects/p${n}`] = project;
-    docs[`users/u1/rooms/r${n}`] = room;
-    projects.push({ id: `p${n}`, ...project });
-    rooms.push({ id: `r${n}`, ...room });
-    for (const suffix of ["a", "b"]) {
-      const estimation = {
-        name: "Farba", calculationType: "PAINT", materialCategory: "PAINT",
-        requiredUnits: 2, unitLabel: "l", totalCostMinor: 5000, wastePercentage: 10,
-        wasteCostMinor: 500, currencyCode: "PLN", inputJson: "{}", createdAt: 1000,
-        updatedAt: 1000, deletedAt: null, schemaVersion: 1,
-      };
-      const id = `e${n}-${suffix}`;
-      docs[`users/u1/projects/p${n}/estimations/${id}`] = estimation;
-      estimations.push({ id, projectId: `p${n}`, ...estimation });
-    }
-  }
-  const workspace = { projects, rooms, estimations, shoppingItems: [] };
-  const ctx = await context({ viewport: { width: 1280, height: 900 } });
-  const page = await openTab(ctx, "projects", {
-    latencyMs: 150,
-    docs,
-    storage: {
-      "materio-workspace-v1": JSON.stringify(workspace),
-      "liczmat-sync-account": "u1",
-    },
-  });
-
-  // The pull has read both lists and is still reading the estimates: from here on its copy
-  // of p3 and r5 is out of date, which is the window the visitor clicked in.
-  await page.waitForFunction(() => {
-    const reads = window.__fbReads || [];
-    return reads.includes("users/u1/projects") && reads.includes("users/u1/rooms");
-  }, null, { timeout: 10000, polling: 10 });
-  page.once("dialog", (dialog) => dialog.accept());
-  await page.click('#project-list li[data-id="p3"] > .row-actions [data-del]');
-  page.once("dialog", (dialog) => dialog.accept());
-  await page.click('#project-list li[data-id="p5"] .app-rooms li[data-id="r5"] [data-del]');
-  await page.selectOption('#project-list li[data-id="p4"] > .row-actions [data-status]', "done");
-
-  await page.waitForFunction(() => {
-    if (window.__fbInFlight !== 0) {
-      window.__fbIdleSince = 0;
-      return false;
-    }
-    if (!window.__fbIdleSince) window.__fbIdleSince = Date.now();
-    return Date.now() - window.__fbIdleSince >= 1000;
-  }, null, { timeout: 30000, polling: 50 });
-
-  const overlap = await page.evaluate(() => {
-    const writes = window.__fbWrites || [];
-    const deleted = writes.findIndex((row) =>
-      row.path === "users/u1/projects/p3" && row.deleted === true);
-    let lastEstimation = -1;
-    writes.forEach((row, index) => {
-      if (row.path.includes("/estimations/")) lastEstimation = index;
-    });
-    return { deleted, lastEstimation };
-  });
-  check("the delete was made while the sign-in sync was still running",
-    overlap.deleted >= 0 && overlap.deleted < overlap.lastEstimation, JSON.stringify(overlap));
-  eq("the deleted project stays deleted in Firestore",
-    await page.evaluate(() => Boolean(window.__fbDocs.get("users/u1/projects/p3").deletedAt)), true);
-  eq("the deleted room stays deleted in Firestore",
-    await page.evaluate(() => Boolean(window.__fbDocs.get("users/u1/rooms/r5").deletedAt)), true);
-  eq("the status chosen during the sync is kept",
-    await page.evaluate(() => window.__fbDocs.get("users/u1/projects/p4").status), "done");
-  eq("the deleted project does not come back on screen",
-    await page.locator('#project-list > li[data-id="p3"]').count(), 0);
-  eq("the deleted room does not come back on screen",
-    await page.locator('#project-list .app-rooms li[data-id="r5"]').count(), 0);
-  eq("this browser's copy learns the project is deleted",
-    await page.evaluate(() => Boolean(JSON.parse(localStorage.getItem("materio-workspace-v1"))
-      .projects.find((row) => row.id === "p3").deletedAt)), true);
-  eq("this browser's copy learns the room is deleted",
-    await page.evaluate(() => Boolean(JSON.parse(localStorage.getItem("materio-workspace-v1"))
-      .rooms.find((row) => row.id === "r5").deletedAt)), true);
-
-  // The owner, 2026-09-26: deleting a project leaves its rooms, in the Pomieszczenia tab,
-  // under "Bez projektu". Checked here without __fbSync — only what the page hears by itself.
-  await page.click("#tab-rooms");
-  await page.waitForSelector("#acctrooms-list [data-project-id]", { timeout: 5000 });
-  eq("the deleted project's room is kept, under Bez projektu",
-    await page.locator('#acctrooms-list [data-project-id=""] li[data-id="r3"]').count(), 1);
-  eq("and the deleted project has no card of its own",
-    await page.locator('#acctrooms-list [data-project-id="p3"]').count(), 0);
-  eq("the room deleted on its own is not in the tab at all",
-    await page.locator('#acctrooms-list li[data-id="r5"]').count(), 0);
-  const kept = await page.evaluate(() => window.__fbDocs.get("users/u1/rooms/r3"));
-  eq("the kept room is not deleted in Firestore", kept.deletedAt, null);
-  eq("and still names its project, so an undo can take it back", kept.projectId, "p3");
-  eq("no console error", page.lmErrors.join(" / "), "");
-  await page.close();
-  await ctx.close();
-}
 
 /* ------------------------------------------------------------------ the verdict */
 

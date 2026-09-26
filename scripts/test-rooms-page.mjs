@@ -654,13 +654,13 @@ head("5d. with no project at all, the form stops asking");
   await page.close();
 }
 
-/* ------------------------- 5e. the "Projekty" link (fixes after session 20) */
+/* ------------------------- 5e. the shared account sidebar */
 
-head("5e. the Projekty link is offered to an account and shipped to everybody");
+head("5e. the account sidebar is offered to an account and shipped to everybody");
 {
   const guest = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
-  const item = '.site .nav-list li[data-nav-level="liczmat"]';
-  eq("the item is in the markup for a guest too",
+  const item = '[data-account-sidebar]';
+  eq("the sidebar is in the markup for a guest too",
     await guest.$$eval(item, (n) => n.length), 1);
   eq("but it is not shown", await guest.$eval(item, (n) => getComputedStyle(n).display), "none");
   eq("and nothing stamped a level on the document",
@@ -682,13 +682,15 @@ head("5e. the Projekty link is offered to an account and shipped to everybody");
   await member.waitForSelector("html[data-ws-ready]");
   eq("a signed-in browser is stamped before the first paint",
     await member.evaluate(() => document.documentElement.getAttribute("data-lm-level")), "liczmat");
-  check("and the link is shown",
+  check("and the sidebar is shown",
     (await member.$eval(item, (n) => getComputedStyle(n).display)) !== "none");
+  eq("and Projekty is marked as the current page",
+    await member.locator('[data-account-sidebar] a[href$="/projekty/"]').getAttribute("aria-current"), "page");
   // The value the key held before session 13 still reads as signed in.
   await member.evaluate(() => localStorage.setItem("liczmat-signed-in", "1"));
   await member.reload({ waitUntil: "load" });
   await member.waitForSelector("html[data-ws-ready]");
-  check('the old "1" still counts as signed in',
+  check('the old "1" still shows the sidebar',
     (await member.$eval(item, (n) => getComputedStyle(n).display)) !== "none");
   await member.close();
 

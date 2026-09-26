@@ -492,7 +492,7 @@ head("4. chapter XXV's paywall: the wall, the two rungs and the one door through
   await pro.close();
 }
 
-head("4b. the footer offers the page to a Pro account and to a crawler");
+head("4b. the footer no longer duplicates the account page");
 {
   const footLink = `footer.site a[href$="${urlCalendar("pl")}"]:not([data-lang])`;
   /* `pro: false` is what makes this visitor a guest. open() plants "pro" by default —
@@ -503,14 +503,13 @@ head("4b. the footer offers the page to a Pro account and to a crawler");
   const shown = await guest.$$eval(footLink, (a) =>
     a.filter((n) => n.getBoundingClientRect().height > 0).length);
   eq("a guest is not offered the link", shown, 0);
-  check("though the markup still carries it, which is what a crawler reads",
-    (await guest.$$eval(footLink, (a) => a.length)) > 0);
+  eq("and the markup no longer carries it", await guest.$$eval(footLink, (a) => a.length), 0);
   await guest.close();
 
   const pro = await open(ctx, CAL, { workspace: workspace(), level: "pro" });
   const proShown = await pro.$$eval(footLink, (a) =>
     a.filter((n) => n.getBoundingClientRect().height > 0).length);
-  check("a Pro account is", proShown > 0, String(proShown));
+  eq("a Pro account does not get a duplicate either", proShown, 0);
   await pro.close();
 }
 

@@ -21,6 +21,7 @@ import { proGate, proModules, proPlansBlock } from "./pro.mjs";
 import { PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
 import { CURRENCIES } from "./currency.mjs";
 import { calendarGrid } from "./app-pages.mjs";
+import { accountPageMain } from "./account-sidebar.mjs";
 
 /**
  * Case- and accent-insensitive text for the hub's search haystack.
@@ -1763,7 +1764,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           <ul id="ws-archive-list" class="data-list"></ul>
         </details>
 
-        <h2 class="mt-8">${esc(t("ws_rooms"))}</h2>
+        <h2 class="mt-8" id="ws-rooms">${esc(t("ws_rooms"))}</h2>
         <p class="muted">${esc(t("wspage_rooms_d"))}</p>
         <!-- Chapter XVIII: a room is an element of a project, so the script draws one card
              per live project and puts its add form inside it. "No project" stays a real
@@ -1786,7 +1787,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
 
   ${appNote(t)}
 </main>`;
-  return { main, ld: crumbs.ld };
+  return { main: accountPageMain(main, t, lang, "projects"), ld: crumbs.ld };
 }
 
 /* ------------------------------------------------------------------ LiczMat Pro */
@@ -2128,7 +2129,7 @@ export function clientsMain(lang, t, features) {
 
   ${appNote(t)}
 </main>`;
-  return { main, ld: crumbs.ld };
+  return { main: accountPageMain(main, t, lang, "clients"), ld: crumbs.ld };
 }
 
 /**
@@ -2353,7 +2354,7 @@ export function quotesMain(lang, t, features) {
 
   ${appNote(t)}
 </main>`;
-  return { main, ld: crumbs.ld };
+  return { main: accountPageMain(main, t, lang, "quotes"), ld: crumbs.ld };
 }
 
 /**
@@ -2446,7 +2447,7 @@ ${buckets}
 
   ${appNote(t)}
 </main>`;
-  return { main, ld: crumbs.ld };
+  return { main: accountPageMain(main, t, lang, "schedule"), ld: crumbs.ld };
 }
 
 /**
@@ -2574,7 +2575,7 @@ export function estimateMain(lang, t, features = []) {
     step: [t("estpage_s1"), t("estpage_s2"), t("estpage_s3")]
       .map((s, i) => ({ "@type": "HowToStep", position: i + 1, text: s })),
   }];
-  return { main, ld };
+  return { main: accountPageMain(main, t, lang, "estimate"), ld };
 }
 
 /* ------------------------------------------------------------------ converter */
@@ -2894,5 +2895,5 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
   </section>
 </main>`;
 
-  return { main, ld: crumbs.ld };
+  return { main: accountPageMain(main, t, lang, "materials"), ld: crumbs.ld };
 }

@@ -371,8 +371,10 @@ async function walk(cfg) {
     await page.getAttribute(".nav-cta[data-account-cta]", "data-level"), "liczmat");
   eq("and the sentence under the result stops offering an account",
     await page.locator(".ws-save-account a").count(), 0);
-  eq("and the header now offers the projects, which the guest was not shown",
-    await navOffered(urlProjects(lang)), true);
+  // Owner decision 2026-09-26: work tools are reached through Moje konto, never the
+  // public site header, even after the account level is known.
+  eq("and the header still does not duplicate the projects link",
+    await navOffered(urlProjects(lang)), false);
 
   /* ---------------------------------------------------------------- 6. projekt */
 

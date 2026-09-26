@@ -826,11 +826,11 @@ head("13. what a name somebody else typed does once it reaches the page");
     check(`${file} writes no single-quoted attribute around a value`,
       !/=\s*'\$\{/.test(read(file)));
   }
-  // The two ids /app/ puts into an attribute come out of a synced document.
+  // 2026-09-26 removed the duplicated project and room renderers from /app/. Keep the
+  // injection coverage by proving those synced ids are no longer interpolated there.
   const app = read("assets/app.js");
-  check("/app/ escapes the project id it writes into data-id",
-    /data-id="\$\{escapeHtml\(p\.id\)\}"/.test(app));
-  check("and the room id", /data-id="\$\{escapeHtml\(r\.id\)\}"/.test(app));
+  check("/app/ no longer writes a project id into data-id", !/data-id=.*p\.id/.test(app));
+  check("and no longer writes a room id", !/data-id=.*r\.id/.test(app));
 
   // The store finder's coordinates come from whoever last edited OpenStreetMap.
   const stores = read("assets/stores.js");

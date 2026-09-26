@@ -286,35 +286,23 @@ head("8. /app/ carries the account system in every language");
       !/stripe|checkout/i.test(card), card.trim().slice(0, 160));
   }
 
-  // Every sidebar tab, each pointing at the panel it opens. "Pomieszczenia" was folded
-  // into the project it belongs to after chapter XVIII, and stayed folded for a long
-  // time — session 20's own note on that lived here until 2026-09-03, when the owner
-  // asked for it back as a tab of its own alongside the new Klienci/Wyceny/
-  // Terminarz/Materiały tabs (see src/app-pages.mjs). It is back BESIDE the project-row
-  // view, not instead of it — see the two checks below the loop.
-  for (const id of [
-    "overview", "projects", "clients", "quotes", "schedule",
-    "materials", "rooms", "profile", "sync", "pro", "account",
-  ]) {
-    check(`the "${id}" tab points at its panel`,
-      html.includes(`id="tab-${id}" aria-controls="panel-${id}"`));
-    check(`the "${id}" panel points back at its tab`,
-      html.includes(`id="panel-${id}" role="tabpanel" aria-labelledby="tab-${id}"`));
+  // 2026-09-26: work tools are links to their full pages; only account settings remain
+  // as hash-routed panels on /app/.
+  for (const [route, href] of [["projects", "/projekty/"], ["estimate", "/kosztorys/"],
+    ["clients", "/klienci/"], ["quotes", "/wyceny/"], ["calendar", "/terminarz/"],
+    ["own-materials", "/moje-materialy/"]]) {
+    check(`the sidebar links to ${route}`,
+      html.includes(`href="${href}" data-nav-route="${route}"`));
   }
-  // The rooms a project owns are still drawn inside its row by assets/app.js, and the
-  // ones nobody assigned — every room made on the phone, because SyncContract.roomToDoc()
-  // has no projectId to send — still get the list of their own on the Projekty panel.
-  check("the unassigned rooms have a list of their own", html.includes('id="room-list"'));
-  check("and it says why a room lands there", html.includes(DICT.pl.app_rooms_loose_d));
-  // The new Pomieszczenia tab groups every room (assigned and not) by project instead.
-  check("the Pomieszczenia tab has its own list container", html.includes('id="acctrooms-list"'));
-  check("and that container uses the shared project-card layout",
-    html.includes('id="acctrooms-list" class="ws-room-cards"'));
+  for (const id of ["overview", "profile", "sync", "pro", "account"]) {
+    check(`the "${id}" account panel remains`, html.includes(`id="panel-${id}"`));
+  }
+  for (const id of ["projects", "clients", "quotes", "schedule", "materials", "rooms"]) {
+    check(`the shortened "${id}" panel is gone`, !html.includes(`id="panel-${id}"`));
+  }
   const app = readFileSync(p("assets/app.js"), "utf8");
-  check("the account room view renders one shared card per live project",
-    app.includes('class="app-card ws-room-card ws-room-card-${color}"'));
-  check("and its card form uses the shared room parser",
-    app.includes("submitRoomForm(form, card.dataset.projectId)"));
+  check("hash routing owns the account panels", app.includes('window.addEventListener("hashchange", show)'));
+  check("an unknown hash falls back to overview", app.includes('routes[location.hash] || "overview"'));
 }
 
 head("9. the copy exists in all four languages");

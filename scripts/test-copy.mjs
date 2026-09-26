@@ -464,7 +464,8 @@ head("§7 how much prose a page carries");
  */
 const BUDGET = {
   home: 377, calculators: 416, calculator: 431, converter: 285, guides: 307, guide: 232,
-  "own-materials": 225,
+  // 2026-09-26: the authenticated account rail adds navigation labels; French is 242.
+  "own-materials": 245,
   /* Session H raised projects from 850 to 860, and the six words are not new copy: the
      850 above was measured off the page builders in a repository where PL_ONLY was on and
      the twelve other languages were unwritten, so the French number in it is an estimate
@@ -526,11 +527,11 @@ const BUDGET = {
 };
 
 /**
- * The second ceiling, for a page whose <main> is a tablist.
+ * The second ceiling, for a page whose <main> contains hash-routed panels.
  *
  * BUDGET caps what a reader sees at once, which on /app/ is one panel out of twelve. That
  * alone would be a net with a hole in it: twelve panels growing by eighty words each is a
- * document twice the size with every panel still inside its ceiling. So a tabbed page is
+ * document twice the size with every panel still inside its ceiling. So a panel page is
  * measured twice — the visible page against BUDGET, the whole file against this.
  *
  * 1556 since 2026-09-18: the nine inputs across Klienci, Zlecenia and Wyceny each gained
@@ -614,7 +615,7 @@ function element(markup, at) {
  * the document reports a wall nobody can read — and it did, 1501 words against a budget
  * of 850, from the day the Pro modules landed until session H.
  *
- * `role="tabpanel"` rather than a list of page ids, because the rule is about the shape of
+ * `data-panel` rather than a list of page ids, because the rule is about the shape of
  * the page: one panel visible, the rest not. The chrome — everything outside the panels,
  * the sign-in form and the sidebar included — is on screen whichever panel is open, so it
  * is counted once and added to the widest of them.
@@ -625,7 +626,7 @@ function measure(html) {
   let rest = main[0];
   const panels = [];
   for (;;) {
-    const at = rest.indexOf('role="tabpanel"');
+    const at = rest.indexOf('data-panel=');
     if (at === -1) break;
     const { start, end } = element(rest, at);
     panels.push(wordCount(strip(rest.slice(start, end))));
@@ -669,7 +670,7 @@ checkMany("every page type has a declared prose budget and stays inside it", ove
 /* And a page of panels is measured a second time, whole. See DOCUMENT above. */
 checkMany("a page of panels stays inside its whole-document ceiling too", overDocument,
   (x) => `${x.file} (${x.id}): ${x.n} words in the file, ceiling ${x.cap}`, counted);
-check("the tablist rule measured the page it was written for",
+check("the panel rule measured the page it was written for",
   tabbed === Object.keys(DOCUMENT).length,
   `${tabbed} tabbed page(s) read, ${Object.keys(DOCUMENT).length} with a document ceiling`);
 

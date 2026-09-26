@@ -1950,7 +1950,26 @@ a.chip:hover { text-decoration: none; }
 }
 .app-nav-item svg { flex: none; color: inherit; }
 .app-nav-item:hover { background: var(--surface-alt); color: var(--on-bg); }
-.app-nav-item[aria-selected="true"] { background: var(--accent-soft); color: var(--on-accent-soft); }
+.app-nav-item[aria-current="page"] { background: var(--accent-soft); color: var(--on-accent-soft); }
+
+/* 2026-09-26: the six account pages carry the same rail as /app/. A guest keeps the
+   full-width layout; once the account hint marks <html> with a signed-in level
+   (assets/account.js), the rail takes its column. */
+.account-page-shell { display: block; min-height: 0; }
+.account-page-main { min-width: 0; }
+/* The site header right above already carries the logo, and the plan pill is filled only
+   by /app/'s own script — on these pages the brand row would be a second logo and an
+   empty oval. */
+.account-page-shell .app-side-brand { display: none; }
+.app-plan-pill:empty { display: none; }
+html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-main { width: 100%; }
+@media (min-width: 900px) {
+  html.js[data-lm-level="liczmat"] .account-page-shell,
+  html.js[data-lm-level="pro"] .account-page-shell {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+  }
+}
 
 @media (min-width: 900px) {
   .app-nav {
