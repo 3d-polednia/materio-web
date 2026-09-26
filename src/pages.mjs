@@ -217,7 +217,7 @@ function homeDoors(lang, t, calcs, cat) {
       : "";
 
     const action = href
-      ? `<a class="btn ${door.id === "calculators" ? "btn-primary" : "btn-ghost"}" href="${href}">${esc(t(`${door.key}_go`))}</a>`
+      ? `<a class="btn ${door.id === "calculators" ? "btn-primary" : "btn-ghost"} btn-go" href="${href}">${esc(t(`${door.key}_go`))}</a>`
       : `<p class="door-soon">${esc(t("door_soon"))}</p>`;
 
     return `<article class="door" aria-labelledby="door-${door.id}">
@@ -557,8 +557,8 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
       ${guideLinks ? `<h2 class="mt-8">${esc(t("guide_calcs_back"))}</h2>
       <div class="chips">${guideLinks}</div>` : ""}
       <p class="mt-6">
-        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-        <a class="btn btn-ghost" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a>
       </p>
     </div>
   </section>
@@ -642,7 +642,7 @@ export function guideMain(guide, lang, t) {
         <p>${esc(t(`g_${guide.id}_tip`))}</p>
       </div>
 
-      <p class="mt-6"><a class="btn btn-ghost" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a></p>
+      <p class="mt-6"><a class="btn btn-ghost btn-go" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a></p>
     </div>
   </section>
   ${appNote(t)}
@@ -687,7 +687,7 @@ export function materialsMain(lang, t, cat, aisles, copy) {
               <b>${esc(name)}</b>
               <span class="muted">${esc(cat.note(m, lang, t))}</span>
             </span>
-            <a class="btn btn-ghost btn-sm" href="${href}">${esc(t("mat_open_calc"))}</a>
+            <a class="btn btn-ghost btn-sm btn-go" href="${href}">${esc(t("mat_open_calc"))}</a>
           </li>`;
   };
 
@@ -800,7 +800,7 @@ function ownMaterialsBlock(t, aisles, c) {
       <h2>${esc(c("omat_list_t"))}</h2>
       <p class="muted" data-omat-guest>
         ${esc(c("omat_guest_note"))}
-        <a class="btn btn-ghost btn-sm" href="${URL_APP}">${esc(c("omat_signin"))}</a>
+        <a class="btn btn-ghost btn-sm btn-go" href="${URL_APP}">${esc(c("omat_signin"))}</a>
       </p>
       <div data-omat-mine hidden>
         <details class="mat-add">
@@ -1013,12 +1013,6 @@ export function contactMain(lang, t) {
 
 /* ------------------------------------------------------------------ the Android app */
 
-const GO_ARROW = (cls) => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16M13 5l7 7-7 7"/></svg>`;
-
-/** The arrow link (`.btn-go` in styles.css), on trial on this page only. */
-const goLink = (href, label) =>
-  `<a class="btn btn-go" href="${href}">${GO_ARROW("go-in")}<span>${esc(label)}</span>${GO_ARROW("go-out")}</a>`;
-
 /**
  * /aplikacja/ — the one page where the Android app is the subject.
  *
@@ -1073,7 +1067,7 @@ export function androidMain(lang, t, calcs, cat) {
           <p class="lead">${esc(t("apppage_lead"))}</p>
           <div class="store-badges">
             ${playBadge(lang, "apppage")}
-            ${goLink(urlCalcIndex(lang), t("apppage_web_link"))}
+            <a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("apppage_web_link"))}</a>
           </div>
           <ul class="app-facts">${facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
         </div>
@@ -1769,13 +1763,13 @@ export function projectsMain(lang, t, aisles = [], features = []) {
       </div>
 
       <p class="ws-links">
-        <a class="btn btn-ghost" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
         <!-- A deadline is a field of a project since the merge of 2026-09-21, so the page
              that owns the deadline offers the page that shows them all. /zlecenia/ made
              this offer until then. -->
-        <a class="btn btn-ghost" href="${urlCalendar(lang)}">${esc(t("calpage_title"))}</a>
-        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-        <a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlCalendar(lang)}">${esc(t("calpage_title"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a class="btn btn-ghost btn-go" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
       </p>
       <p class="muted src-note">${esc(t("wspage_local_note"))}</p>
     </div>
@@ -1870,9 +1864,9 @@ export function proPageMain(lang, t, features, prices) {
       <p class="muted">${esc(t("propage_free_d"))}</p>
       ${list(["propage_free_1", "propage_free_2", "propage_free_3"])}
       <p class="ws-links">
-        <a class="btn btn-ghost btn-sm" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-        <a class="btn btn-ghost btn-sm" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-        <a class="btn btn-ghost btn-sm" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
+        <a class="btn btn-ghost btn-sm btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a class="btn btn-ghost btn-sm btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a class="btn btn-ghost btn-sm btn-go" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
       </p>
     </div>
   </section>
@@ -1908,8 +1902,8 @@ export function proPageMain(lang, t, features, prices) {
       <h2 id="prohow-h">${esc(t("propage_h_how"))}</h2>
       ${list(["propage_how_1", "propage_how_2", "propage_how_3"])}
       <p class="ws-links">
-        <a class="btn btn-primary btn-sm" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(urlLiczmatPro(lang))}" rel="nofollow">${esc(t("pro_signin"))}</a>
-        <a class="btn btn-ghost btn-sm" href="${URL_APP}" rel="nofollow">${esc(t("pay_go"))}</a>
+        <a class="btn btn-primary btn-sm btn-go" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(urlLiczmatPro(lang))}" rel="nofollow">${esc(t("pro_signin"))}</a>
+        <a class="btn btn-ghost btn-sm btn-go" href="${URL_APP}" rel="nofollow">${esc(t("pay_go"))}</a>
       </p>
     </div>
   </section>
@@ -2116,8 +2110,8 @@ export function clientsMain(lang, t, features) {
       </div>
 
       <p class="ws-links">
-        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-        <a class="btn btn-ghost" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a class="btn btn-ghost btn-go" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
       </p>
       <p class="muted src-note">${esc(t("cli_local_note"))}</p>
     </div>
@@ -2342,7 +2336,7 @@ export function quotesMain(lang, t, features) {
       </div>
 
       <p class="ws-links">
-        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
       </p>
       <p class="muted src-note">${esc(t("quo_local_note"))}</p>
     </div>
@@ -2452,9 +2446,9 @@ ${buckets}
       </div>
 
       <p class="ws-links">
-        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("cal_jobs_all"))}</a>
-        <a class="btn btn-ghost" href="${urlClients(lang)}">${esc(t("clipage_title"))}</a>
-        <a class="btn btn-ghost" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("cal_jobs_all"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlClients(lang)}">${esc(t("clipage_title"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
       </p>
       <p class="muted field-note">${esc(t("cal_source_note"))}</p>
       <p class="muted src-note">${esc(t("cal_local_note"))}</p>
@@ -2561,8 +2555,8 @@ export function estimateMain(lang, t, features = []) {
       </div>
 
       <p class="ws-links no-print">
-        <a class="btn btn-ghost" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-        <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
       </p>
       <p class="muted src-note no-print">${esc(t("estpage_how"))}</p>
     </div>
@@ -2704,7 +2698,7 @@ export function converterMain(lang, t, cats, example, copy) {
           <ul class="plain-list">${inventory}</ul>
         </div>
       </div>
-      <p class="mt-6"><a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a></p>
+      <p class="mt-6"><a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a></p>
     </div>
   </section>
 

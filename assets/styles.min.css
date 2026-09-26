@@ -222,6 +222,7 @@
 --radius-lg: 22px;
 --radius-stage: 32px;
 --radius-device: 40px;
+--radius-btn: 40px;
 --radius-screen: 31px;
 --radius-pill: 999px;
 --dur-fast: 100ms;
@@ -324,51 +325,70 @@ body:not(.tool-page):not(.workspace-page) .page-head .breadcrumbs ol { justify-c
 .split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-7); align-items: start; }
 @media (max-width: 900px) { .split-2 { grid-template-columns: 1fr; } }
 .btn {
+--btn-h: var(--control-h);
+--btn-px: var(--sp-5);
+position: relative; isolation: isolate; overflow: hidden;
 display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
 white-space: normal; overflow-wrap: anywhere;
 font: inherit; font-weight: var(--fw-bold); cursor: pointer; text-align: center;
-min-height: var(--control-h); padding: var(--sp-3) var(--sp-5);
-border-radius: var(--radius-pill); border: 1px solid transparent;
-transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease),
-background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+min-height: var(--btn-h); padding: var(--sp-3) var(--btn-px);
+border-radius: var(--radius-btn); border: 1px solid transparent;
+transition: var(--dur-go) var(--ease-go);
+transition-property: color, background-color, border-color, border-radius, box-shadow, padding, scale;
+&::before {
+content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+background: var(--btn-disc, transparent); clip-path: circle(10px); opacity: 0;
+transition: inherit; transition-property: clip-path, opacity;
 }
-.btn:hover { text-decoration: none; }
-.btn:active { transform: translateY(1px); }
-.btn:disabled:active, .btn[aria-disabled="true"]:active { transform: none; }
-.btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2); }
-.btn-primary:hover { box-shadow: var(--shadow-3); }
+&:hover { text-decoration: none; }
+&:not(:disabled, [aria-disabled="true"]) {
+&:is(:hover, :focus-visible) { border-radius: var(--radius-sm); }
+&:is(:hover, :focus-visible)::before { clip-path: circle(75%); opacity: 1; }
+&:active { scale: .96; }
+}
+}
+.btn-primary {
+--btn-disc: var(--accent-strong);
+background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2);
+&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) { color: var(--on-accent-strong); box-shadow: var(--shadow-3); }
+}
 .btn-buy { font-weight: var(--fw-black); box-shadow: var(--shadow-3); }
-.btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline-control); }
-.btn-ghost:hover { background: var(--surface-alt); }
-.btn-danger { background: var(--error); color: var(--surface); }
-.btn-danger:hover { opacity: .92; }
-.btn-sm { min-height: var(--control-h-sm); padding: var(--sp-2) var(--sp-4); font-size: var(--fs-sm); }
-.btn-lg { min-height: var(--control-h-lg); padding: var(--sp-3) var(--sp-6); font-size: var(--fs-md); }
+.btn-ghost {
+--btn-disc: var(--accent);
+background: none; color: var(--accent-strong); box-shadow: 0 0 0 2px;
+&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) { color: var(--on-accent); border-color: var(--accent-edge); box-shadow: 0 0 0 12px transparent; }
+}
+.btn-ghost.auth-google {
+--btn-disc: var(--surface-alt);
+color: var(--on-bg); box-shadow: 0 0 0 1px var(--outline-control);
+&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) { color: var(--on-bg); border-color: transparent; box-shadow: 0 0 0 1px var(--outline-control); }
+}
+.btn-danger {
+--btn-disc: var(--on-error-soft);
+background: var(--error); color: var(--surface);
+}
+.btn-sm { --btn-h: var(--control-h-sm); --btn-px: var(--sp-4); padding-block: var(--sp-2); font-size: var(--fs-sm); }
+.btn-lg { --btn-h: var(--control-h-lg); --btn-px: var(--sp-6); font-size: var(--fs-md); }
 .btn-block { width: 100%; }
 .btn-go {
---go-h: 56px;
---go-r: calc(var(--go-h) / 2);
-position: relative; isolation: isolate; overflow: hidden;
-min-height: var(--go-h); padding: var(--sp-2) var(--sp-8); border-radius: var(--go-r);
-background: none; color: var(--accent-strong); box-shadow: 0 0 0 2px;
-transition: var(--dur-go) var(--ease-go);
-transition-property: color, border-color, border-radius, box-shadow, clip-path, opacity, translate, scale;
-&::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--accent); clip-path: circle(10px); opacity: 0; }
-&::before, > * { transition: inherit; transition-property: clip-path, opacity, translate; }
-> span { translate: -12px; }
-> svg { position: absolute; width: 20px; height: 20px; }
-> .go-in { left: var(--sp-4); translate: -40px; }
-> .go-out { right: var(--sp-4); }
-&:is(:hover, :focus-visible) {
-color: var(--on-accent); border-color: var(--accent-edge); border-radius: var(--radius-sm);
-box-shadow: 0 0 0 12px transparent;
-&::before { clip-path: circle(75%); opacity: 1; }
-> span { translate: 12px; }
-> .go-in { translate: 0; }
-> .go-out { translate: 40px; }
+--go-a: 20px;
+--go-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h16M13 5l7 7-7 7'/%3E%3C/svg%3E");
+--go-in: calc(var(--btn-px) - var(--sp-1));
+--go-out: calc(-1 * var(--go-a) - var(--sp-1));
+padding-inline: var(--btn-px) calc(var(--btn-px) + var(--go-a) + var(--sp-1));
+&::after {
+content: ""; position: absolute; inset: 0; pointer-events: none;
+background: currentColor;
+mask: var(--go-arrow) no-repeat, var(--go-arrow) no-repeat; mask-size: var(--go-a);
+mask-position: calc(100% - var(--go-in)) 50%, var(--go-out) 50%;
+transition: inherit; transition-property: mask-position;
 }
-&:active { transform: none; scale: .96; }
+&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
+padding-inline: calc(var(--btn-px) + var(--go-a) + var(--sp-1)) var(--btn-px);
+&::after { mask-position: calc(100% - var(--go-out)) 50%, var(--go-in) 50%; }
 }
+}
+.btn-sm.btn-go { --go-a: 16px; }
 .chip, .calc-tab, .app-tab {
 font: inherit; cursor: pointer; text-align: center;
 border-radius: var(--radius-pill); border: 1px solid var(--outline-control);
@@ -837,6 +857,7 @@ column-gap: var(--sp-4); row-gap: var(--sp-2);
 .store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); margin: var(--sp-7) 0 var(--sp-6); }
 .gp-official { display: inline-block; line-height: 0; }
 .gp-official img { display: block; width: auto; height: 56px; }
+.store-badges .btn { --btn-h: 56px; padding-block: var(--sp-2); }
 .doors { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
 .door { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
 .door h3 { font-size: var(--fs-lg); margin: 0; }
@@ -1894,7 +1915,7 @@ html:not(.js) .nav-links { order: 1; flex-basis: 100%; flex-wrap: wrap; margin-l
 .mat-page-list li { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 560px), (pointer: coarse) {
-.btn-sm { min-height: var(--control-h); }
+.btn-sm { --btn-h: var(--control-h); }
 .chip { min-height: var(--control-h); display: inline-flex; align-items: center; }
 summary { min-height: var(--control-h); padding-block: var(--sp-2); }
 .lang-btn, .cur-select { min-height: var(--control-h); font-size: var(--fs-base); }
@@ -1909,7 +1930,7 @@ summary { min-height: var(--control-h); padding-block: var(--sp-2); }
 .ws-project .dash-sec, .hierarchy-l2 { padding: var(--sp-3); }
 .data-list li.app-project { padding: var(--sp-3); }
 .gp-official img { height: 48px; }
-.btn-go { --go-h: 48px; }
+.store-badges .btn { --btn-h: 48px; }
 .app-install { padding: var(--sp-5); }
 .steps { grid-template-columns: 1fr; }
 .field-row { grid-template-columns: 1fr; }
@@ -1965,10 +1986,10 @@ color: var(--on-accent);
 background: var(--accent);
 color: var(--on-accent);
 border-color: var(--accent-edge);
-min-height: var(--control-h-lg);
+--btn-disc: var(--accent-strong);
+--btn-h: var(--control-h-lg);
 }
-.btn-buy:hover {
-background: var(--accent-strong);
+.btn-buy:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
 color: var(--on-accent-strong);
 box-shadow: var(--shadow-3), 0 6px 24px color-mix(in srgb, var(--accent-strong) 35%, transparent);
 }

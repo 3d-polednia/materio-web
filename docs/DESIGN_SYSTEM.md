@@ -188,19 +188,28 @@ Każdy komponent to jedna reguła; różnią się wariantem, nie kopią kodu.
 
 ### Przycisk `.btn`
 
-Jeden kształt (pigułka), trzy intencje, trzy rozmiary.
+Jeden kształt (pigułka w spoczynku), trzy intencje, trzy rozmiary, jeden ruch. Ruch to wybór
+właściciela z 2026-09-26 (Uiverse „loud-chicken-53”, gharsh11032000): po najechaniu albo
+fokusie z klawiatury ze środka rośnie koło i wypełnia przycisk, pigułka osiada w rogu 12px
+(`--radius-sm`), wciśnięcie zmniejsza go do 96%. 600 ms, `--dur-go` i `--ease-go`.
 
 | Klasa | Znaczenie |
 |---|---|
-| `.btn-primary` | główna akcja ekranu — limonka + `--accent-edge` |
-| `.btn-ghost` | akcja poboczna — przezroczysty, obramowany |
-| `.btn-danger` | akcja nieodwracalna (usunięcie konta) |
-| `.btn-sm` / `.btn-lg` | 36px / 52px wysokości |
+| `.btn-primary` | główna akcja ekranu — limonka + `--accent-edge`; koło ciemnozielone (`--accent-strong`) |
+| `.btn-ghost` | akcja poboczna — limonkowa obwódka i tekst; obwódka rozchodzi się i gaśnie, koło limonkowe |
+| `.btn-danger` | akcja nieodwracalna (usunięcie konta); koło `--on-error-soft` |
+| `.btn-go` | dodatek do linku na inną stronę: strzałka z prawej wyjeżdża, druga wjeżdża z lewej |
+| `.btn-sm` / `.btn-lg` | 36px / 52px wysokości (przez `--btn-h`) |
 | `.btn-block` | przycisk zajmuje całą szerokość |
 
-Wysokość bierze się z `--control-h` (44px), więc przycisk i pole obok siebie
-stoją równo. Stany: `:hover` podnosi cień, `:active` wciska o 1px,
-`:focus-visible` daje obwódkę, `:disabled` przygasza do 50% i wyłącza wciśnięcie.
+Wysokość bierze się z `--btn-h` (domyślnie `--control-h`, 44px), więc przycisk i pole obok
+siebie stoją równo. Stany: `:hover` i `:focus-visible` wypełniają kołem, `:active` zmniejsza,
+`:focus-visible` daje też obwódkę, `:disabled` przygasza do 50% i nie reaguje.
+
+`.btn-go` nie dostają: przycisk konta w nagłówku (za mało miejsca), link „Wróć do…” (strzałka
+w prawo kłamałaby), `mailto:` i `href="#"`. Przycisk logowania Google zostaje neutralny
+(`.btn-ghost.auth-google`), bo tak każą zasady marki Google. Strzałki to dwie warstwy maski
+na `::after`, więc link nie potrzebuje własnych znaczników — wystarczy klasa.
 
 ### Chip i zakładka `.chip`, `.calc-tab`, `.app-tab`
 
@@ -338,8 +347,8 @@ Sześć stanów, wszędzie tak samo:
 
 | Stan | Jak wygląda | Gdzie zdefiniowany |
 |---|---|---|
-| hover | tło o stopień mocniejsze albo wyższy cień | przy komponencie |
-| active | `translateY(1px)` | `.btn` |
+| hover | tło o stopień mocniejsze albo wyższy cień; przycisk: koło ze środka | przy komponencie |
+| active | przycisk: `scale: .96` | `.btn` |
 | focus | obwódka `--focus` 2px, offset 2px | **jedna reguła** `:focus-visible` |
 | disabled | `opacity: .5`, `cursor: not-allowed`, bez cienia | **jedna reguła** `:disabled, [aria-disabled="true"]` |
 | wybrany | wypełnienie `--accent` + `--on-accent` | `.chip.on`, `[aria-selected="true"]` |

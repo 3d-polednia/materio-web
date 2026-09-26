@@ -144,7 +144,7 @@ function levelCards(t, current) {
     // kept this card silent until session 29.
     const soon = !r ? ""
       : r.status === STATUS.LIVE
-        ? `<p><a class="btn btn-ghost btn-sm" data-nav-route="${r.id}" href="${r.path(DEFAULT_LANG)}" data-i18n="pro_more">${esc(t("pro_more"))}</a></p>`
+        ? `<p><a class="btn btn-ghost btn-sm btn-go" data-nav-route="${r.id}" href="${r.path(DEFAULT_LANG)}" data-i18n="pro_more">${esc(t("pro_more"))}</a></p>`
         : `<p class="lvl-soon" data-i18n="door_soon">${esc(t("door_soon"))}</p>`;
 
     const here = entry.level === current;
@@ -327,7 +327,7 @@ export function appMain(t, features) {
                 <!-- Session 14: the dashboard is where somebody signed in actually starts —
                      projects, the last calculations and the tools they use. /app/ is the
                      settings, so it points at it rather than being it. -->
-                <a class="btn btn-ghost btn-sm" href="${URL_DASHBOARD}" data-i18n="nav_dashboard">${esc(t("nav_dashboard"))}</a>
+                <a class="btn btn-ghost btn-sm btn-go" href="${URL_DASHBOARD}" data-i18n="nav_dashboard">${esc(t("nav_dashboard"))}</a>
                 <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
               </span>
             </div>
@@ -489,7 +489,7 @@ export function appMain(t, features) {
               <h2 data-i18n="app_materials_title">${esc(t("app_materials_title"))}</h2>
               ${i("app_materials_lead", "p", "muted")}
               <ul id="acctmat-list" class="data-list"></ul>
-              <p><a class="btn btn-ghost btn-sm" href="/moje-materialy/" data-i18n="app_materials_manage">${esc(t("app_materials_manage"))}</a></p>
+              <p><a class="btn btn-ghost btn-sm btn-go" href="/moje-materialy/" data-i18n="app_materials_manage">${esc(t("app_materials_manage"))}</a></p>
             </section>
 
             <!-- Pomieszczenia reads the same live state.rooms/state.projects the Projekty
@@ -738,7 +738,7 @@ export function dashboardMain(t) {
           <span id="dash-level" class="chip">${esc(t("acc_guest_t"))}</span>
           <span class="muted" id="dash-level-note" data-dash-note>${esc(t("dash_level_guest"))}</span>
         </span>
-        <a class="btn btn-ghost btn-sm" href="${URL_APP}" data-i18n="dash_q_account">${esc(t("dash_q_account"))}</a>
+        <a class="btn btn-ghost btn-sm btn-go" href="${URL_APP}" data-i18n="dash_q_account">${esc(t("dash_q_account"))}</a>
       </div>
 
       <!-- Chapter II: registration is the next step after a result, never a barrier. The
@@ -749,7 +749,7 @@ export function dashboardMain(t) {
              so the level below it is the only one that leaves no hole in the outline. -->
         <h2 data-i18n="dash_guest_t">${esc(t("dash_guest_t"))}</h2>
         ${i("dash_guest_d", "p", "muted")}
-        <a class="btn btn-primary btn-sm" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_DASHBOARD)}" data-i18n="dash_guest_go">${esc(t("dash_guest_go"))}</a>
+        <a class="btn btn-primary btn-sm btn-go" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_DASHBOARD)}" data-i18n="dash_guest_go">${esc(t("dash_guest_go"))}</a>
       </div>
 
       <section class="dash-sec" aria-labelledby="dash-quick-h">
@@ -832,7 +832,7 @@ export function shareMain(t) {
         </div>
 
         <p class="muted mt-6" data-i18n="share_owner_note">${esc(t("share_owner_note"))}</p>
-        <p><a class="btn btn-ghost" href="${urlHome(DEFAULT_LANG)}" data-i18n="bc_home">${esc(t("bc_home"))}</a></p>
+        <p><a class="btn btn-ghost btn-go" href="${urlHome(DEFAULT_LANG)}" data-i18n="bc_home">${esc(t("bc_home"))}</a></p>
       </div>
     </div>
   </section>

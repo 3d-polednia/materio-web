@@ -75,7 +75,7 @@ export function proModuleCard(t, feature) {
   // and assets/i18n-runtime.js repoints it from window.LM_NAV on `langchange`;
   // scripts/build.mjs puts every live module route into that map for exactly this.
   const open = live && r.localized
-    ? `<p><a class="btn btn-ghost btn-sm" data-nav-route="${r.id}" href="${r.path(DEFAULT_LANG)}" data-i18n="pro_open">${esc(t("pro_open"))}</a></p>`
+    ? `<p><a class="btn btn-ghost btn-sm btn-go" data-nav-route="${r.id}" href="${r.path(DEFAULT_LANG)}" data-i18n="pro_open">${esc(t("pro_open"))}</a></p>`
     : "";
   return `<article class="pro-mod" data-feature="${feature.id}">
         <h3 data-i18n="${feature.key}_t">${esc(t(`${feature.key}_t`))}</h3>
@@ -100,7 +100,7 @@ export function proModuleCard(t, feature) {
 export function proMoreLink(t, lang) {
   const pro = route("liczmat-pro");
   if (pro && pro.status === STATUS.LIVE) {
-    return `<a class="btn btn-ghost btn-sm" href="${pro.path(lang || DEFAULT_LANG)}" data-i18n="pro_more">${esc(t("pro_more"))}</a>`;
+    return `<a class="btn btn-ghost btn-sm btn-go" href="${pro.path(lang || DEFAULT_LANG)}" data-i18n="pro_more">${esc(t("pro_more"))}</a>`;
   }
   return `<span class="muted"><span data-i18n="pro_more">${esc(t("pro_more"))}</span> — <span data-i18n="door_soon">${esc(t("door_soon"))}</span></span>`;
 }
@@ -157,7 +157,7 @@ export function proPlansBlock(t, opts) {
      to była najbardziej widoczna rzecz w kartce z cenami. */
   const go = checkout
     ? `<button type="button" class="btn btn-buy" data-pw-checkout hidden>${esc(t("pay_buy"))}</button>`
-    : `<a class="btn btn-buy" href="${URL_APP}" data-i18n="pay_go">${esc(t("pay_go"))}</a>`;
+    : `<a class="btn btn-buy btn-go" href="${URL_APP}" data-i18n="pay_go">${esc(t("pay_go"))}</a>`;
 
   return `<div class="pw-plans">
           <h3 data-i18n="pay_t">${esc(t("pay_t"))}</h3>
@@ -255,7 +255,7 @@ export function proGate(t, featureId, features, lang, opts) {
              Both are in the markup; neither is shown until the script knows which. -->
         <p class="pw-step" data-pw-step="account" hidden data-i18n="pro_need_account">${esc(t("pro_need_account"))}</p>
         <p class="pw-step" data-pw-step="account" hidden>
-          <a class="btn btn-primary btn-sm" href="${signup}" rel="nofollow" data-i18n="pro_signin">${esc(t("pro_signin"))}</a>
+          <a class="btn btn-primary btn-sm btn-go" href="${signup}" rel="nofollow" data-i18n="pro_signin">${esc(t("pro_signin"))}</a>
         </p>
         <p class="pw-step" data-pw-step="upgrade" hidden data-i18n="pro_need_pro">${esc(t("pro_need_pro"))}</p>
 
@@ -295,7 +295,7 @@ export function proPanel(t, features) {
   // repoints a data-nav-route link from there.
   const pro = route("liczmat-pro");
   const more = pro && pro.status === STATUS.LIVE
-    ? `<p><a class="btn btn-ghost btn-sm" data-nav-route="liczmat-pro" href="${pro.path("pl")}" data-i18n="pro_more">${esc(t("pro_more"))}</a></p>`
+    ? `<p><a class="btn btn-ghost btn-sm btn-go" data-nav-route="liczmat-pro" href="${pro.path("pl")}" data-i18n="pro_more">${esc(t("pro_more"))}</a></p>`
     : `<p class="muted pro-more"><span data-i18n="pro_more">${esc(t("pro_more"))}</span> — <span data-i18n="door_soon">${esc(t("door_soon"))}</span></p>`;
 
   return `<h2 data-i18n="pro_t">${esc(t("pro_t"))}</h2>

@@ -325,6 +325,10 @@
   --radius-lg: 22px;
   --radius-stage: 32px;   /* the /aplikacja/ stage and cards */
   --radius-device: 40px;  /* a phone's corner */
+  /* A button at rest: more than half of a one- or two-line button, so it reads as a pill,
+     and near enough to --radius-sm that the corner starts moving as soon as it is hovered
+     (from 999px it would sit still for half the animation, then snap). */
+  --radius-btn: 40px;
   --radius-screen: 31px;  /* the screen inside it: the corner minus the bezel */
   --radius-pill: 999px;
 
@@ -530,9 +534,22 @@ section.block > .wrap > p { max-width: var(--measure); }
 /* ============================================================ 4. COMPONENTS */
 
 /* ---------- Button
-   One shape (pill), three intents (primary, ghost, danger), three sizes. Height
-   comes from --control-h so a button and a field next to it line up. */
+   Three intents (primary, ghost, danger), three sizes, one movement. Height comes from
+   --btn-h (--control-h by default) so a button and a field next to it line up.
+
+   The movement is the owner's pick of 2026-09-26, after Uiverse "loud-chicken-53" by
+   gharsh11032000, tried on /aplikacja/ first: on hover or keyboard focus a disc grows
+   from the centre and fills the button, the pill settles into a tile's corner, and a
+   press shrinks it a little. The ghost button is the original — a lime ring and lime
+   text whose ring spreads out and fades as the lime disc fills it. The primary button
+   is already lime, so its disc is the dark green the purchase button always turned to.
+   A link that takes the visitor to another page adds .btn-go: an arrow on the right
+   that leaves as a second one comes in on the left. The original's greenyellow is 1.6:1
+   on the cream page, so every colour here is a token. */
 .btn {
+  --btn-h: var(--control-h);
+  --btn-px: var(--sp-5);
+  position: relative; isolation: isolate; overflow: hidden;
   display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
   /* A label wraps only when it cannot fit. `nowrap` made a button as wide as its longest
      sentence, and a grid or flex item cannot shrink below that, so one Romanian label
@@ -541,19 +558,31 @@ section.block > .wrap > p { max-width: var(--measure); }
      `break-word` leaves the min-content width of the longest word standing. */
   white-space: normal; overflow-wrap: anywhere;
   font: inherit; font-weight: var(--fw-bold); cursor: pointer; text-align: center;
-  min-height: var(--control-h); padding: var(--sp-3) var(--sp-5);
-  border-radius: var(--radius-pill); border: 1px solid transparent;
-  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease),
-              background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  min-height: var(--btn-h); padding: var(--sp-3) var(--btn-px);
+  border-radius: var(--radius-btn); border: 1px solid transparent;
+  transition: var(--dur-go) var(--ease-go);
+  transition-property: color, background-color, border-color, border-radius, box-shadow, padding, scale;
+  /* The disc. 75 % of the reference radius reaches the corners at any width. */
+  &::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: var(--btn-disc, transparent); clip-path: circle(10px); opacity: 0;
+    transition: inherit; transition-property: clip-path, opacity;
+  }
+  &:hover { text-decoration: none; }
+  &:not(:disabled, [aria-disabled="true"]) {
+    &:is(:hover, :focus-visible) { border-radius: var(--radius-sm); }
+    &:is(:hover, :focus-visible)::before { clip-path: circle(75%); opacity: 1; }
+    &:active { scale: .96; }
+  }
 }
-.btn:hover { text-decoration: none; }
-.btn:active { transform: translateY(1px); }
-.btn:disabled:active, .btn[aria-disabled="true"]:active { transform: none; }
 /* The lime fill is only 1.7:1 against the cream page, so on the light theme the
    button's own edge is what makes its shape visible (WCAG 1.4.11). On the dark
    theme the fill already clears 3:1 and --accent-edge is the fill itself. */
-.btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2); }
-.btn-primary:hover { box-shadow: var(--shadow-3); }
+.btn-primary {
+  --btn-disc: var(--accent-strong);
+  background: var(--accent); color: var(--on-accent); border-color: var(--accent-edge); box-shadow: var(--shadow-2);
+  &:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) { color: var(--on-accent-strong); box-shadow: var(--shadow-3); }
+}
 /* The purchase button is heavier type and more elevation than an ordinary button, and
    nothing else. It once had a saturated green of its own (--buy, --on-buy, --buy-edge,
    --buy-hover) so the button that takes money would not look like the one that opens a
@@ -561,49 +590,49 @@ section.block > .wrap > p { max-width: var(--measure); }
    with the rest of the purchase block. Those four tokens are kept defined in case that
    decision is revisited, but nothing spends them — do not add a fifth green here. */
 .btn-buy { font-weight: var(--fw-black); box-shadow: var(--shadow-3); }
-.btn-ghost { background: transparent; color: var(--on-bg); border-color: var(--outline-control); }
-.btn-ghost:hover { background: var(--surface-alt); }
-.btn-danger { background: var(--error); color: var(--surface); }
-.btn-danger:hover { opacity: .92; }
-.btn-sm { min-height: var(--control-h-sm); padding: var(--sp-2) var(--sp-4); font-size: var(--fs-sm); }
-.btn-lg { min-height: var(--control-h-lg); padding: var(--sp-3) var(--sp-6); font-size: var(--fs-md); }
+.btn-ghost {
+  --btn-disc: var(--accent);
+  background: none; color: var(--accent-strong); box-shadow: 0 0 0 2px;
+  &:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) { color: var(--on-accent); border-color: var(--accent-edge); box-shadow: 0 0 0 12px transparent; }
+}
+/* Google's sign-in button keeps the neutral look Google's branding rules ask for. */
+.btn-ghost.auth-google {
+  --btn-disc: var(--surface-alt);
+  color: var(--on-bg); box-shadow: 0 0 0 1px var(--outline-control);
+  &:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) { color: var(--on-bg); border-color: transparent; box-shadow: 0 0 0 1px var(--outline-control); }
+}
+.btn-danger {
+  --btn-disc: var(--on-error-soft);
+  background: var(--error); color: var(--surface);
+}
+.btn-sm { --btn-h: var(--control-h-sm); --btn-px: var(--sp-4); padding-block: var(--sp-2); font-size: var(--fs-sm); }
+.btn-lg { --btn-h: var(--control-h-lg); --btn-px: var(--sp-6); font-size: var(--fs-md); }
 /* A button that owns its line — the form's submit, the dialog opener. */
 .btn-block { width: 100%; }
-
-/* The arrow link — on trial, on /aplikacja/ only (owner, 2026-09-26, after Uiverse
-   "loud-chicken-53" by gharsh11032000). At rest: a lime ring, lime text, an arrow on the
-   right. On hover or keyboard focus a lime disc grows from the centre and fills it, the
-   ring spreads out and fades, the pill settles into a tile's corner, and the arrow leaves
-   on the right while a second one comes in on the left. The original's greenyellow is
-   1.6:1 on the cream page, so the colours are the tokens: --accent-strong for the ring
-   (currentColor) and the text, the primary button's fill and edge for the hover.
-   Geometry: 32 px padding, the label shifted 12 px away from the arrow, the 20 px arrow
-   16 px in from the side — so the rest and the hover are mirror images. */
+/* The arrow: one ::after carries both, as two layers of the same mask, so a link needs
+   no markup of its own. The label keeps 4 px + the arrow + its side padding clear on the
+   arrow's side, and the padding swaps sides on hover, which carries the label across. */
 .btn-go {
-  --go-h: 56px;                        /* the Google Play badge beside it */
-  --go-r: calc(var(--go-h) / 2);       /* a pill, as a number the corner can travel from */
-  position: relative; isolation: isolate; overflow: hidden;
-  min-height: var(--go-h); padding: var(--sp-2) var(--sp-8); border-radius: var(--go-r);
-  background: none; color: var(--accent-strong); box-shadow: 0 0 0 2px;
-  transition: var(--dur-go) var(--ease-go);
-  transition-property: color, border-color, border-radius, box-shadow, clip-path, opacity, translate, scale;
-  /* 75 % of the reference radius reaches the corners at any width. */
-  &::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--accent); clip-path: circle(10px); opacity: 0; }
-  &::before, > * { transition: inherit; transition-property: clip-path, opacity, translate; }
-  > span { translate: -12px; }
-  > svg { position: absolute; width: 20px; height: 20px; }
-  > .go-in { left: var(--sp-4); translate: -40px; }
-  > .go-out { right: var(--sp-4); }
-  &:is(:hover, :focus-visible) {
-    color: var(--on-accent); border-color: var(--accent-edge); border-radius: var(--radius-sm);
-    box-shadow: 0 0 0 12px transparent;
-    &::before { clip-path: circle(75%); opacity: 1; }
-    > span { translate: 12px; }
-    > .go-in { translate: 0; }
-    > .go-out { translate: 40px; }
+  --go-a: 20px;
+  --go-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h16M13 5l7 7-7 7'/%3E%3C/svg%3E");
+  --go-in: calc(var(--btn-px) - var(--sp-1));
+  --go-out: calc(-1 * var(--go-a) - var(--sp-1));
+  padding-inline: var(--btn-px) calc(var(--btn-px) + var(--go-a) + var(--sp-1));
+  &::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: currentColor;
+    mask: var(--go-arrow) no-repeat, var(--go-arrow) no-repeat; mask-size: var(--go-a);
+    /* Two-value positions: mask-position takes <position>, where `right 16px center` is not
+       valid, and through var() that fails at computed time and drops both arrows to the corner. */
+    mask-position: calc(100% - var(--go-in)) 50%, var(--go-out) 50%;
+    transition: inherit; transition-property: mask-position;
   }
-  &:active { transform: none; scale: .96; }
+  &:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
+    padding-inline: calc(var(--btn-px) + var(--go-a) + var(--sp-1)) var(--btn-px);
+    &::after { mask-position: calc(100% - var(--go-out)) 50%, var(--go-in) 50%; }
+  }
 }
+.btn-sm.btn-go { --go-a: 16px; }
 
 /* ---------- Chip
    A small, non-committal control: a filter, a shortcut, a tag. `.on` is the
@@ -1328,6 +1357,7 @@ footer h2 {
 .store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); margin: var(--sp-7) 0 var(--sp-6); }
 .gp-official { display: inline-block; line-height: 0; }
 .gp-official img { display: block; width: auto; height: 56px; }
+.store-badges .btn { --btn-h: 56px; padding-block: var(--sp-2); }   /* as tall as the badge */
 
 /* ---------- Home: the three doors, the four steps ----------
    Chapter X: the home page leads to three areas — calculators, LiczMat, LiczMat Pro.
@@ -2845,7 +2875,7 @@ a.chip:hover { text-decoration: none; }
    got a tap target at all (session 43, measured on device profiles). The width half
    stays, because a narrow window is still how this is checked without a device. */
 @media (max-width: 560px), (pointer: coarse) {
-  .btn-sm { min-height: var(--control-h); }
+  .btn-sm { --btn-h: var(--control-h); }
   /* A chip (a material suggestion, a store example) was 30 px tall and a disclosure
      ("Dodaj pomieszczenie", "Dodaj inny koszt") 26 px. The FAQ's own summary is already
      taller than this and keeps its padding. */
@@ -2876,7 +2906,7 @@ a.chip:hover { text-decoration: none; }
   .data-list li.app-project { padding: var(--sp-3); }
 
   .gp-official img { height: 48px; }
-  .btn-go { --go-h: 48px; }
+  .store-badges .btn { --btn-h: 48px; }
   .app-install { padding: var(--sp-5); }
   .steps { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr; }
@@ -2954,16 +2984,16 @@ a.chip:hover { text-decoration: none; }
   background: var(--accent);
   color: var(--on-accent);
   border-color: var(--accent-edge);
-  /* min-height, not height: .btn sizes itself this way so a label that wraps — Romanian and
-     Ukrainian both do — grows the button instead of spilling out of it. */
-  min-height: var(--control-h-lg);
+  --btn-disc: var(--accent-strong);
+  /* min-height (via --btn-h), not height: .btn sizes itself this way so a label that wraps —
+     Romanian and Ukrainian both do — grows the button instead of spilling out of it. */
+  --btn-h: var(--control-h-lg);
 }
 
 /* The stronger brand green preserves the one-green rule when the purchase action is hovered.
    The label has to flip with it: --accent-strong is a dark green in the light theme, and
-   keeping --on-accent (#0d1117) on it measured 3.08:1 on a 16px bold label. */
-.btn-buy:hover {
-  background: var(--accent-strong);
+   keeping --on-accent (#0d1117) on it measured 3.08:1 on a 16px bold label. The green itself arrives as the disc (--btn-disc above). */
+.btn-buy:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
   color: var(--on-accent-strong);
   /* The glow used to be mixed from --buy-hover, a green the button no longer wears. */
   box-shadow: var(--shadow-3), 0 6px 24px color-mix(in srgb, var(--accent-strong) 35%, transparent);

@@ -116,8 +116,12 @@ const BUDGET = {
   // Re-measured 2026-09-10 after the suite was repaired and the per-page Content-Security-Policy
   // meta (about 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
-  "index.html": [230, 62],
-  "kalkulatory/index.html": [248, 66],
+  // Raised 2026-09-26 from 230, measured at 230.4 kB raw: the button style of the whole
+  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
+  "index.html": [231, 62],
+  // Raised 2026-09-26 from 248, measured at 248.2 kB raw: the button style of the whole
+  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
+  "kalkulatory/index.html": [249, 66],
   "kalkulatory/plytki-panele-gres/index.html": [420, 128],
   // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
   // (the header menu and the footer's list) and it went from ten rows to thirteen. That is
@@ -126,11 +130,12 @@ const BUDGET = {
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
   "konwerter-jednostek/index.html": [238, 68],
-  // Raised 2026-09-26 from 227, measured at 227.8 kB raw: 1.2 kB of assets/styles.css for
-  // the arrow link (.btn-go) on trial on /aplikacja/. Every page loads the stylesheet and this
-  // one had under a kilobyte left. If the owner turns the trial down, both come back out.
-  "poradniki/ile-farby-na-pokoj/index.html": [228, 63],
-  "sklepy/index.html": [234, 65],
+  // Raised 2026-09-26 from 227, measured at 228.7 kB raw: the button style of the whole
+  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
+  "poradniki/ile-farby-na-pokoj/index.html": [229, 63],
+  // Raised 2026-09-26 from 234, measured at 234.9 kB raw: the button style of the whole
+  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
+  "sklepy/index.html": [235, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
   // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
@@ -187,14 +192,15 @@ const BUDGET = {
   // pages, and this was the one with under a kilobyte left. Gzipped it did not cross.
   // Raised 2026-09-26 from 413, measured at 413.5 kB raw: 1.3 kB of assets/app.js that
   // stops the sign-in sync from pushing a deleted project or room back up (remoteStamps).
-  "app/index.html": [415, 126],
+  // Raised 2026-09-26 from 415, measured at 415.8 kB raw: the button style of the whole
+  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
+  "app/index.html": [416, 126],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
   "app/dashboard/index.html": [338, 102],
-  // Raised 2026-09-26 from 215, measured at 215.0 kB raw: 1.2 kB of assets/styles.css for
-  // the arrow link (.btn-go) on trial on /aplikacja/. Every page loads the stylesheet and this
-  // one had under a kilobyte left. If the owner turns the trial down, both come back out.
+  // Raised 2026-09-26 from 215, measured at 215.0 kB raw: the button style of the whole
+  // site (disc, corner, arrow links; about 2.2 kB of assets/styles.css on every page).
   "p/index.html": [216, 62],
 };
 

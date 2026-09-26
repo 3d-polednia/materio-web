@@ -83,7 +83,7 @@ function storeRow(s) {
   return `<li class="store-item">
       <div class="store-info"><b>${esc(s.name)}</b><span class="store-meta">${t(s.typeKey)}${s.addr ? " · " + esc(s.addr) : ""}</span></div>
       <div class="store-actions"><span class="store-dist">${fmtDist(s.dist)}</span>
-        <a class="btn btn-primary btn-sm" href="${nav}" target="_blank" rel="noopener">${t("res_navigate")}</a></div>
+        <a class="btn btn-primary btn-sm btn-go" href="${nav}" target="_blank" rel="noopener">${t("res_navigate")}</a></div>
     </li>`;
 }
 

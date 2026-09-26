@@ -103,6 +103,11 @@ not, leave it out.
   back (offline, 15 calculators and 161 materials as on the site, 13 languages and 8
   currencies, automatic sync) — as plain text with a lime tick, said once per page, with
   counts taken from the build. Store badges are the store's own artwork, unmodified (`assets/badges/`).
+- **Buttons** (owner, 2026-09-26, after Uiverse "loud-chicken-53"): every `.btn` fills with a
+  disc from the centre on hover and keyboard focus while its pill settles into a 12 px corner;
+  `.btn-ghost` is a lime ring with lime text. A link to another page adds `.btn-go` (the arrow)
+  — not the header CTA, a "back to" link, `mailto:` or `href="#"`. Google's sign-in button stays
+  neutral. `docs/DESIGN_SYSTEM.md` §5 has the table.
 - **Words:** labels, not slogans; no rhetorical-question headings, no „nie X, tylko Y",
   „ten sam…", „w kieszeni", „w jednym miejscu", no jargon a builder does not use (ERP,
   localStorage, port 1:1). Say a fact once per page. Never promise on a free level what
