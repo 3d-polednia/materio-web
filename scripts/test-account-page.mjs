@@ -990,6 +990,12 @@ head("12d. deleting the account, once the rules are deployed");
       "users/u1/projects/p1/estimations/e1": { name: "Płytki", createdAt: 1, updatedAt: 1, schemaVersion: 1 },
       "users/u1/projects/p1/shoppingItems/s1": { name: "Klej", createdAt: 1, updatedAt: 1, schemaVersion: 1 },
       "users/u1/rooms/r1": { name: "Kuchnia", lengthM: 3, widthM: 2, heightM: 2.6, createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      // 2026-09-26: the Pro store and the own materials live in four more collections, and
+      // a client row is somebody else's name, telephone and address — they go too.
+      "users/u1/clients/c1": { name: "Jan Kowalski", phone: "600 100 200", createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      "users/u1/jobs/j1": { name: "Stare zlecenie", createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      "users/u1/quotes/q1": { name: "Wycena", projectId: "p1", createdAt: 1, updatedAt: 1, schemaVersion: 1 },
+      "users/u1/materials/m1": { name: "Płyta", createdAt: 1, updatedAt: 1, schemaVersion: 1 },
       "sharedProjects/tok1": { ownerId: "u1", projectName: "Łazienka" },
     },
   });

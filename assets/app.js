@@ -2206,6 +2206,15 @@ async function deleteEverything() {
   const roomSnap = await fb.getDocs(fb.collection(db, "users", state.uid, "rooms"));
   for (const d of roomSnap.docs) await del(d.ref);
 
+  // The Pro store (sessions 22–26, jobs until the merge of 2026-09-21) and the own materials
+  // (session 59) arrived after this function was written and were never added to it, so a
+  // deleted account left its clients — other people's names, telephones and addresses —
+  // its quotes and its supplier prices behind, unreachable by anyone. Found 2026-09-26.
+  for (const name of ["clients", "jobs", "quotes", "materials"]) {
+    const snap = await fb.getDocs(fb.collection(db, "users", state.uid, name));
+    for (const d of snap.docs) await del(d.ref);
+  }
+
   // Shared links are public documents keyed by token; they carry the owner's uid so
   // they can be found and revoked.
   const shared = await fb.getDocs(
