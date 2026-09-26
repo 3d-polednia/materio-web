@@ -1013,6 +1013,12 @@ export function contactMain(lang, t) {
 
 /* ------------------------------------------------------------------ the Android app */
 
+const GO_ARROW = (cls) => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16M13 5l7 7-7 7"/></svg>`;
+
+/** The arrow link (`.btn-go` in styles.css), on trial on this page only. */
+const goLink = (href, label) =>
+  `<a class="btn btn-go" href="${href}">${GO_ARROW("go-in")}<span>${esc(label)}</span>${GO_ARROW("go-out")}</a>`;
+
 /**
  * /aplikacja/ — the one page where the Android app is the subject.
  *
@@ -1067,7 +1073,7 @@ export function androidMain(lang, t, calcs, cat) {
           <p class="lead">${esc(t("apppage_lead"))}</p>
           <div class="store-badges">
             ${playBadge(lang, "apppage")}
-            <a class="btn btn-ghost" href="${urlCalcIndex(lang)}">${esc(t("apppage_web_link"))}</a>
+            ${goLink(urlCalcIndex(lang), t("apppage_web_link"))}
           </div>
           <ul class="app-facts">${facts.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
         </div>

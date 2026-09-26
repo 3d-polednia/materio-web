@@ -335,6 +335,9 @@
      answering a click, so it is slower than anything a visitor triggers. */
   --dur-carousel: 800ms;
   --ease: cubic-bezier(.2, .7, .3, 1);
+  /* The arrow link (.btn-go): a long ease-out, most of the movement in its first fifth. */
+  --dur-go: 600ms;
+  --ease-go: cubic-bezier(.23, 1, .32, 1);
 
   /* A tap target is 44px tall, on desktop as well — the plan is mobile-first and
      a second set of sizes for the mouse is a second design. --control-h-sm is for
@@ -566,6 +569,41 @@ section.block > .wrap > p { max-width: var(--measure); }
 .btn-lg { min-height: var(--control-h-lg); padding: var(--sp-3) var(--sp-6); font-size: var(--fs-md); }
 /* A button that owns its line — the form's submit, the dialog opener. */
 .btn-block { width: 100%; }
+
+/* The arrow link — on trial, on /aplikacja/ only (owner, 2026-09-26, after Uiverse
+   "loud-chicken-53" by gharsh11032000). At rest: a lime ring, lime text, an arrow on the
+   right. On hover or keyboard focus a lime disc grows from the centre and fills it, the
+   ring spreads out and fades, the pill settles into a tile's corner, and the arrow leaves
+   on the right while a second one comes in on the left. The original's greenyellow is
+   1.6:1 on the cream page, so the colours are the tokens: --accent-strong for the ring
+   (currentColor) and the text, the primary button's fill and edge for the hover.
+   Geometry: 32 px padding, the label shifted 12 px away from the arrow, the 20 px arrow
+   16 px in from the side — so the rest and the hover are mirror images. */
+.btn-go {
+  --go-h: 56px;                        /* the Google Play badge beside it */
+  --go-r: calc(var(--go-h) / 2);       /* a pill, as a number the corner can travel from */
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: var(--go-h); padding: var(--sp-2) var(--sp-8); border-radius: var(--go-r);
+  background: none; color: var(--accent-strong); box-shadow: 0 0 0 2px;
+  transition: var(--dur-go) var(--ease-go);
+  transition-property: color, border-color, border-radius, box-shadow, clip-path, opacity, translate, scale;
+  /* 75 % of the reference radius reaches the corners at any width. */
+  &::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--accent); clip-path: circle(10px); opacity: 0; }
+  &::before, > * { transition: inherit; transition-property: clip-path, opacity, translate; }
+  > span { translate: -12px; }
+  > svg { position: absolute; width: 20px; height: 20px; }
+  > .go-in { left: var(--sp-4); translate: -40px; }
+  > .go-out { right: var(--sp-4); }
+  &:is(:hover, :focus-visible) {
+    color: var(--on-accent); border-color: var(--accent-edge); border-radius: var(--radius-sm);
+    box-shadow: 0 0 0 12px transparent;
+    &::before { clip-path: circle(75%); opacity: 1; }
+    > span { translate: 12px; }
+    > .go-in { translate: 0; }
+    > .go-out { translate: 40px; }
+  }
+  &:active { transform: none; scale: .96; }
+}
 
 /* ---------- Chip
    A small, non-committal control: a filter, a shortcut, a tag. `.on` is the
@@ -2838,6 +2876,7 @@ a.chip:hover { text-decoration: none; }
   .data-list li.app-project { padding: var(--sp-3); }
 
   .gp-official img { height: 48px; }
+  .btn-go { --go-h: 48px; }
   .app-install { padding: var(--sp-5); }
   .steps { grid-template-columns: 1fr; }
   .field-row { grid-template-columns: 1fr; }

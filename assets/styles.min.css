@@ -229,6 +229,8 @@
 --dur-slow: 320ms;
 --dur-carousel: 800ms;
 --ease: cubic-bezier(.2, .7, .3, 1);
+--dur-go: 600ms;
+--ease-go: cubic-bezier(.23, 1, .32, 1);
 --control-h: 44px;
 --control-h-sm: 36px;
 --control-h-lg: 52px;
@@ -343,6 +345,30 @@ background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 .btn-sm { min-height: var(--control-h-sm); padding: var(--sp-2) var(--sp-4); font-size: var(--fs-sm); }
 .btn-lg { min-height: var(--control-h-lg); padding: var(--sp-3) var(--sp-6); font-size: var(--fs-md); }
 .btn-block { width: 100%; }
+.btn-go {
+--go-h: 56px;
+--go-r: calc(var(--go-h) / 2);
+position: relative; isolation: isolate; overflow: hidden;
+min-height: var(--go-h); padding: var(--sp-2) var(--sp-8); border-radius: var(--go-r);
+background: none; color: var(--accent-strong); box-shadow: 0 0 0 2px;
+transition: var(--dur-go) var(--ease-go);
+transition-property: color, border-color, border-radius, box-shadow, clip-path, opacity, translate, scale;
+&::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--accent); clip-path: circle(10px); opacity: 0; }
+&::before, > * { transition: inherit; transition-property: clip-path, opacity, translate; }
+> span { translate: -12px; }
+> svg { position: absolute; width: 20px; height: 20px; }
+> .go-in { left: var(--sp-4); translate: -40px; }
+> .go-out { right: var(--sp-4); }
+&:is(:hover, :focus-visible) {
+color: var(--on-accent); border-color: var(--accent-edge); border-radius: var(--radius-sm);
+box-shadow: 0 0 0 12px transparent;
+&::before { clip-path: circle(75%); opacity: 1; }
+> span { translate: 12px; }
+> .go-in { translate: 0; }
+> .go-out { translate: 40px; }
+}
+&:active { transform: none; scale: .96; }
+}
 .chip, .calc-tab, .app-tab {
 font: inherit; cursor: pointer; text-align: center;
 border-radius: var(--radius-pill); border: 1px solid var(--outline-control);
@@ -1883,6 +1909,7 @@ summary { min-height: var(--control-h); padding-block: var(--sp-2); }
 .ws-project .dash-sec, .hierarchy-l2 { padding: var(--sp-3); }
 .data-list li.app-project { padding: var(--sp-3); }
 .gp-official img { height: 48px; }
+.btn-go { --go-h: 48px; }
 .app-install { padding: var(--sp-5); }
 .steps { grid-template-columns: 1fr; }
 .field-row { grid-template-columns: 1fr; }

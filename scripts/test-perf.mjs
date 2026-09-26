@@ -126,7 +126,10 @@ const BUDGET = {
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
   "konwerter-jednostek/index.html": [238, 68],
-  "poradniki/ile-farby-na-pokoj/index.html": [227, 63],
+  // Raised 2026-09-26 from 227, measured at 227.8 kB raw: 1.2 kB of assets/styles.css for
+  // the arrow link (.btn-go) on trial on /aplikacja/. Every page loads the stylesheet and this
+  // one had under a kilobyte left. If the owner turns the trial down, both come back out.
+  "poradniki/ile-farby-na-pokoj/index.html": [228, 63],
   "sklepy/index.html": [234, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
@@ -189,7 +192,10 @@ const BUDGET = {
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
   "app/dashboard/index.html": [338, 102],
-  "p/index.html": [215, 62],
+  // Raised 2026-09-26 from 215, measured at 215.0 kB raw: 1.2 kB of assets/styles.css for
+  // the arrow link (.btn-go) on trial on /aplikacja/. Every page loads the stylesheet and this
+  // one had under a kilobyte left. If the owner turns the trial down, both come back out.
+  "p/index.html": [216, 62],
 };
 
 /**
