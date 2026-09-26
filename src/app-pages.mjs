@@ -1,6 +1,6 @@
 /* LiczMat website — the three pages that are not part of the public, indexable layer:
    /app/        the signed-in account: projects, rooms, sync and the account settings
-   /app/dashboard/ the dashboard: projects, recent calculations, quick actions, tools
+   /app/dashboard/ the retained redirect to /app/
    /p/          the read-only view of a shared estimate
 
    All three are noindex (robots.txt and a robots meta tag), so they have no per-language
@@ -346,7 +346,6 @@ export function appMain(t, features) {
                 <!-- Session 14: the dashboard is where somebody signed in actually starts —
                      projects, the last calculations and the tools they use. /app/ is the
                      settings, so it points at it rather than being it. -->
-                <a class="btn btn-ghost btn-sm btn-go" href="${URL_DASHBOARD}" data-i18n="nav_dashboard">${esc(t("nav_dashboard"))}</a>
                 <button type="button" id="app-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
               </span>
             </div>
@@ -391,6 +390,23 @@ export function appMain(t, features) {
                     <ul id="overview-materials" class="data-list"></ul>
                   </section>
                 </div>
+              </div>
+              <div class="app-two-col">
+                <section class="app-card" aria-labelledby="dash-recent-h">
+                  <div class="dash-head">
+                    <h3 id="dash-recent-h" data-i18n="dash_recent_t">${esc(t("dash_recent_t"))}</h3>
+                    <a class="linkish dash-more" href="${DASH_HREF.estimate}" data-dash-url="estimate" data-i18n="dash_recent_all">${esc(t("dash_recent_all"))}</a>
+                  </div>
+                  <ul id="dash-recent" class="data-list"></ul>
+                </section>
+                <section class="app-card" aria-labelledby="dash-tools-h">
+                  <div class="dash-head">
+                    <h3 id="dash-tools-h" data-i18n="dash_tools_t">${esc(t("dash_tools_t"))}</h3>
+                    <a class="linkish dash-more" href="${DASH_HREF.calculators}" data-dash-url="calculators" data-i18n="dash_tools_all">${esc(t("dash_tools_all"))}</a>
+                  </div>
+                  <ul class="calc-links dash-quad" id="dash-tools"></ul>
+                  <p><button type="button" class="linkish" id="dash-tools-forget" data-i18n="dash_tools_forget" hidden>${esc(t("dash_tools_forget"))}</button></p>
+                </section>
               </div>
             </section>
 
@@ -749,7 +765,7 @@ export function dashboardMain(t) {
              so the level below it is the only one that leaves no hole in the outline. -->
         <h2 data-i18n="dash_guest_t">${esc(t("dash_guest_t"))}</h2>
         ${i("dash_guest_d", "p", "muted")}
-        <a class="btn btn-primary btn-sm btn-go" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_DASHBOARD)}" data-i18n="dash_guest_go">${esc(t("dash_guest_go"))}</a>
+        <a class="btn btn-primary btn-sm btn-go" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_APP)}" data-i18n="dash_guest_go">${esc(t("dash_guest_go"))}</a>
       </div>
 
       <section class="dash-sec" aria-labelledby="dash-quick-h">
@@ -783,6 +799,16 @@ export function dashboardMain(t) {
   </section>
 </main>`;
   return chrome(t, main);
+}
+
+/** The retained dashboard URL now forwards to the account overview without losing a real link. */
+export function dashboardRedirectMain(t) {
+  return chrome(t, `<main id="main" tabindex="-1">
+    <section class="block page-head"><div class="wrap narrow">
+      <h1>${esc(t("nav_dashboard"))}</h1>
+      <p><a class="btn btn-primary btn-go" href="${URL_APP}">${esc(t("nav_app"))}</a></p>
+    </div></section>
+  </main>`);
 }
 
 /** Every dictionary key the Pro tab spends, in the four languages it is translated to. */

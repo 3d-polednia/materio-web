@@ -49,7 +49,7 @@ async function start() {
   ["workspacechange", "crmchange", "ownmaterialschange"].forEach((name) => document.addEventListener(name, sync.armUpSync));
   // Another tab signing out, deleting the account or emptying this browser removes the
   // hint or the sync stamp; an armed push here must not go on writing into that account.
-  const stop = () => { activeUid = ""; sync.setUid(null); };
+  const stop = () => { activeUid = ""; sync.setUid(null); delete window.lmAccount; };
   window.addEventListener("storage", (e) => {
     if (!activeUid) return;
     if (e.key === null) return stop();
@@ -62,8 +62,25 @@ async function start() {
   authMod.onAuthStateChanged(auth, (user) => {
     activeUid = user && user.uid || "";
     sync.setUid(activeUid);
+    delete window.lmAccount;
     if (!activeUid || sync.blockedWorkspace()) return;
-    reconcile(activeUid).catch(() => {});
+    const uid = activeUid;
+    reconcile(uid).catch(() => {});
+    // The page API (today: the share link on the project view) waits for the plan the
+    // account really has, read from users/{uid} — never the copy hint, because a share
+    // stamps it (see shareProject() in assets/account-sync.js). It pushes first, so a
+    // project made on this page a moment ago exists in Firestore before it is published.
+    storeMod.getDoc(storeMod.doc(db, "users", uid)).then((snap) => {
+      if (activeUid !== uid || sync.blockedWorkspace()) return;
+      const level = lmLevelOf(user, snap.exists() ? snap.data() : {});
+      window.lmAccount = {
+        shareProject: async (projectId) => {
+          await sync.incrementalPush(uid).catch(() => false);
+          return sync.shareProject(projectId, level);
+        },
+      };
+      document.dispatchEvent(new CustomEvent("lm-account-ready"));
+    }).catch(() => { /* no page API when the account's plan cannot be read */ });
   });
 }
 

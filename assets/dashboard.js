@@ -1,9 +1,14 @@
-/* LiczMat website — /app/dashboard/, the dashboard of the free account.
+/* LiczMat website — reusable account-overview lists.
  *
  * Master plan, session 14: "Dashboard darmowego użytkownika. Powinien pokazywać przede
  * wszystkim: projekty, ostatnie kalkulacje, szybkie akcje, ostatnio używane narzędzia."
  *
- * Four lists, four sources, all of them already in this browser:
+ * The former /app/dashboard/ renderer stays shared so /app/ can use the two lists that
+ * were unique to it without copying their logic. Its guarded project and identity
+ * renderers remain compatible with the original frame; the live overview uses the
+ * recent-calculation and recent-tool parts.
+ *
+ * Four sources, all of them already in this browser:
  *
  *   projekty              wsProjects()      assets/workspace.js
  *   ostatnie kalkulacje   wsEstimations()   assets/workspace.js — the saved estimate lines
@@ -16,7 +21,7 @@
  * calculator, so what it renders is the local workspace, which is the same data /app/
  * syncs and the same document shape the phone keeps.
  *
- * The page has no per-language URL (it is noindex and shows private data), so every
+ * /app/ has no per-language URL (it is noindex and shows private data), so every
  * string here comes from t() and every list is redrawn on `langchange`. A row rendered
  * once would otherwise stay in the language it was drawn in.
  *
@@ -244,12 +249,12 @@ function dashRender() {
 
 function buildDashboard() {
   const list = document.getElementById("dash-projects");
-  if (!list) return;
+  if (!list && !document.getElementById("dash-recent") && !document.getElementById("dash-tools")) return;
 
   // Opening a project means two things — make it the one the estimate page is about, and
   // go there. The dashboard is a way in, so it does both rather than leaving the visitor
   // to pick the project again one page later.
-  list.addEventListener("click", (e) => {
+  if (list) list.addEventListener("click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (!li || !e.target.closest("[data-open]")) return;
     wsSetActiveProject(li.dataset.id);

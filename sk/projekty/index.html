@@ -317,10 +317,16 @@
           </div>
 
           <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-share" hidden>Zdieľať</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">Premenovať</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive">Presunúť do archívu</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">Zmazať</button>
           </div>
+          <p id="ws-project-share-result" class="field mt-4" hidden>
+            <label for="ws-project-share-url">Odkaz skopírovaný</label>
+            <input id="ws-project-share-url" type="url" readonly>
+          </p>
+          <p id="ws-project-error" class="form-error" role="alert"></p>
 
           <form id="ws-rename-form" class="inline-form mt-4" hidden>
             <input id="ws-rename-name" type="text" maxlength="120" aria-label="Názov projektu" required>
@@ -703,7 +709,6 @@
         <ul>
           <li><a href="/sk/aplikacia/">Aplikácia</a></li>
           <li><a href="/app/" rel="nofollow">Môj účet</a></li>
-          <li><a href="/app/dashboard/" rel="nofollow">Prehľad</a></li>
           <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
         </ul>
       </div>

@@ -139,6 +139,32 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   await x.ctx.close();
 }
 
+{
+  const sync = { createdAt: 1, updatedAt: Date.now(), deletedAt: null, schemaVersion: 1 };
+  const remote = {
+    "users/u1": { plan: "premium", trialEndsAt: null },
+    "users/u1/projects/p-share": { name: "Projekt do udostępnienia", status: "active", ...sync },
+    "users/u1/projects/p-share/estimations/e1": { name: "Płytki", requiredUnits: 4, currencyCode: "PLN", ...sync },
+    "users/u1/projects/p-share/shoppingItems/s1": { name: "Klej", quantity: 2, ...sync },
+  };
+  const x = await open("/projekty/?id=p-share", { docs: remote });
+  await x.page.waitForFunction(() => { const b = document.getElementById("ws-project-share"); return window.lmAccount && b && !b.hidden && b.offsetParent !== null; }, null, { timeout: 8000 });
+  check("signed-in project view shows share", await x.page.locator("#ws-project-share").isVisible());
+  await x.page.click("#ws-project-share");
+  await x.page.waitForFunction(() => [...window.__fbDocs.keys()].some((k) => k.startsWith("sharedProjects/")));
+  const shared = await x.page.evaluate(() => [...window.__fbDocs.entries()].find(([k]) => k.startsWith("sharedProjects/"))[1]);
+  check("share writes the authenticated owner", shared.ownerId === "u1", JSON.stringify(shared));
+  check("share stamps the Firebase profile level", shared.creatorLevel === "pro", JSON.stringify(shared));
+  check("share writes a read-only URL", await x.page.inputValue("#ws-project-share-url").then((v) => /\/p\/[A-Za-z0-9_-]+$/.test(v)));
+  await x.ctx.close();
+
+  const guest = await open("/projekty/?id=p-share", { signed: false, storage: {
+    "materio-workspace-v1": JSON.stringify({ projects: [{ id: "p-share", name: "Lokalny", ...sync }], rooms: [], estimations: [], shoppingItems: [] }),
+  } });
+  check("guest project view has no visible share button", !(await guest.page.locator("#ws-project-share").isVisible()));
+  await guest.ctx.close();
+}
+
 await browser.close(); server.close();
 if (failures.length) { console.error(`test-account-sync-page: ${failures.length} failure(s)\n${failures.join("\n")}`); process.exit(1); }
 check("assertion count is nonzero", passed > 0);

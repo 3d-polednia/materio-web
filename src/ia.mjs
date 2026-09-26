@@ -417,18 +417,14 @@ export const ROUTES = [
     level: LEVEL.GUEST, status: STATUS.LIVE,
     parent: "account", localized: false, indexable: false,
     path: URL_DASHBOARD,
-    footer: { order: 3, key: "nav_dashboard", group: "account" },
-    note: "Chapter XIV of the sessions list (session 14): projects, recent calculations, " +
-      "quick actions and recently used tools. It is the free account's home screen, and " +
-      "session 3 declared it LICZMAT for that reason. Session 14 built it as GUEST, " +
-      "because `level` is what a page *needs*: everything on it comes from " +
-      "assets/workspace.js and assets/recent.js, which are localStorage in this browser " +
-      "and belong to whoever is sitting at it. The only thing that could lock a guest " +
-      "out is `liczmat-signed-in`, and that is a copy hint which may be stale — gating " +
-      "on it would hide somebody's own projects from them after a token expired. So a " +
-      "guest sees their own data and a card saying what an account adds; the same rule " +
-      "as /projekty/ (see docs/ARCHITEKTURA.md). Language-neutral and noindex, under " +
-      "/app/, because it shows private data.",
+    note: "Session 14 built this as the free account's home screen: projects, recent " +
+      "calculations, quick actions and recently used tools. On 2026-09-26 the owner found " +
+      "two home screens — this one and the Przegląd tab of /app/ — and decided that " +
+      "\"Moje konto\" is the one way in, so the two lists only this page had moved onto " +
+      "Przegląd and this address became a redirect to /app/, the way /zlecenia/ answers " +
+      "for /projekty/: a meta refresh plus a heading and a real link, noindex, out of the " +
+      "footer. The URL stays because one that answered yesterday has to answer today — " +
+      "it is in bookmarks and in sign-up links sent before the change.",
   },
   {
     id: "share",

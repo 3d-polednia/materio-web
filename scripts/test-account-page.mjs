@@ -787,6 +787,9 @@ head("10. eleven tabs, reachable from the keyboard");
   await page.fill("#signin-password", "sekret123");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
+  check("Przegląd contains recent calculations", await page.locator("#panel-overview #dash-recent").count() > 0);
+  check("Przegląd contains recent tools", await page.locator("#panel-overview #dash-tools").count() > 0);
+  check("Przegląd contains the recent-tools clear action", await page.locator("#panel-overview #dash-tools-forget").count() > 0);
 
   // 2026-09-03: The workspace tab strip became a sidebar. Counting the navItem() calls
   // in src/app-pages.mjs yields 12 entries (.app-nav-item).

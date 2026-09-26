@@ -437,6 +437,11 @@ head("7. update — the archive");
 head("8. index — last-used project stays silent");
 {
   const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
+  const statusSelects = page.locator("#ws-project-list [data-project-status]");
+  check("project rows have status controls", await statusSelects.count() > 0);
+  await page.selectOption('#ws-project-list li[data-id="p1"] [data-project-status]', "done");
+  eq("the status control updates the project", (await store(page)).projects.find((p) => p.id === "p1").status, "done");
+  eq("focus stays on the changed project status", await page.locator('#ws-project-list li[data-id="p1"] [data-project-status]').evaluate((n) => n === document.activeElement), true);
   eq("there are no make-active controls", await page.locator("#ws-project-list [data-activate]").count(), 0);
   eq("there are no active chips", await page.locator("#ws-project-list .chip.on").count(), 0);
   eq("the last-used row is not highlighted", await page.$eval("#ws-project-list li[data-id='p1']", (n) => n.classList.contains("on")), false);
@@ -468,11 +473,16 @@ head("8b. delete from a project row — warning, cancel and undo");
   const after = await store(page);
   eq("confirm removes the project row", await page.locator('#ws-project-list li[data-id="p1"]').count(), 0);
   eq("its room keeps its link in storage", after.rooms.find((r) => r.id === "r1").projectId, "p1");
-  eq("loose rooms appear nowhere on projects", await page.locator('#ws-room-list [data-project-id=""]').count(), 0);
+  eq("the deleted project's room moves under Bez projektu", await page.locator('#ws-room-list [data-project-id=""] li[data-id="r1"]').count(), 1);
+  const looseSelects = page.locator('#ws-room-list [data-project-id=""] [data-room-project]');
+  check("the loose room has an assignment control", await looseSelects.count() > 0);
+  await looseSelects.first().selectOption("p2");
+  eq("assigning it moves it into that project's card", await page.locator('#ws-room-list [data-project-id="p2"] li[data-id="r1"]').count(), 1);
+  eq("and the store carries the new project", (await store(page)).rooms.find((r) => r.id === "r1").projectId, "p2");
   await page.click("#ws-undo-go");
   const back = await store(page);
   eq("undo restores the row", await page.locator('#ws-project-list li[data-id="p1"]').count(), 1);
-  eq("undo re-attaches the room", back.rooms.find((r) => r.id === "r1").projectId, "p1");
+  eq("undo does not undo the later room assignment", back.rooms.find((r) => r.id === "r1").projectId, "p2");
   await page.close();
 }
 

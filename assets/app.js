@@ -32,8 +32,8 @@
  * Firebase and can therefore ask who is actually signed in.
  */
 
-import { FIREBASE_CONFIG, FIREBASE_READY, FIREBASE_SDK, SCHEMA_VERSION } from "./firebase-config.js";
-import { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, num, syncFields } from "./account-sync.js";
+import { FIREBASE_CONFIG, FIREBASE_READY, FIREBASE_SDK } from "./firebase-config.js";
+import { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, num, syncFields, shareToken } from "./account-sync.js";
 
 const $ = (id) => document.getElementById(id);
 const T = (key) => (typeof t === "function" ? t(key) : key);
@@ -52,12 +52,6 @@ let accountSync = null;
 let openAccountRoomProjectId = null;
 
 /* ------------------------------------------------------------------ helpers */
-
-/** A 128-bit URL-safe token. The token in a /p/ link *is* the secret (FIRESTORE_SYNC §6). */
-function shareToken() {
-  const bytes = crypto.getRandomValues(new Uint8Array(16));
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
 
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : shareToken());
 
@@ -1263,55 +1257,6 @@ function renderRooms() {
   renderOverview();
 }
 
-/* ------------------------------------------------------------------ sharing */
-
-/**
- * Publish a read-only snapshot of a project and hand back its /p/ URL.
- *
- * A snapshot, not a live reference: the client sees the numbers as they were when the
- * link was made or last refreshed. Keeping it live would need Cloud Functions, which
- * this project does not have (FIRESTORE_SYNC §6).
- */
-async function shareProject(project) {
-  const sub = (name) => fb.collection(db, "users", state.uid, "projects", project.id, name);
-  const [estSnap, shopSnap] = await Promise.all([
-    fb.getDocs(sub("estimations")),
-    fb.getDocs(sub("shoppingItems")),
-  ]);
-
-  const alive = (snap, limit) => {
-    const rows = [];
-    snap.forEach((d) => { if (!d.data().deletedAt && rows.length < limit) rows.push(d.data()); });
-    return rows;
-  };
-  const estimations = alive(estSnap, 200);
-  const shoppingItems = alive(shopSnap, 500);
-  const currencyCode = (estimations[0] && estimations[0].currencyCode) || "PLN";
-
-  const token = shareToken();
-  const now = Date.now();
-  await fb.setDoc(fb.doc(db, "sharedProjects", token), {
-    ownerId: state.uid,
-    schemaVersion: SCHEMA_VERSION,
-    createdAt: now,
-    refreshedAt: now,
-    projectName: project.name,
-    currencyCode,
-    estimations,
-    shoppingItems,
-    // `costs` turned PRO on 2026-09-04 (assets/plan.js), and a public link must not be a
-    // way around that wall: a free account sharing its own project must not hand its
-    // client a priced document it could not produce itself. Stamped from state.level,
-    // which /app/ derives from Firebase (lmLevelOf()) rather than the copy hint, at the
-    // moment the link is made — a plan bought or lost afterwards does not move it, the
-    // same way the numbers themselves are a snapshot rather than a live reference. A
-    // share made before this field existed carries no `creatorLevel` at all, and
-    // assets/share.js treats that exactly as it treats "not pro": unpriced.
-    creatorLevel: state.level,
-  });
-  return `${location.origin}/p/${token}`;
-}
-
 /* ------------------------------------------------------------------ wiring */
 
 function wireWorkspace() {
@@ -1379,7 +1324,7 @@ function wireWorkspace() {
       } catch (err) { status(T("app_err_unknown"), true); }
     } else if (e.target.closest("[data-share]")) {
       try {
-        const url = await shareProject(project);
+        const url = await accountSync.shareProject(project.id, state.level);
         await navigator.clipboard.writeText(url).catch(() => {});
         status(`${T("app_share_copied")}: ${url}`);
       } catch (err) {

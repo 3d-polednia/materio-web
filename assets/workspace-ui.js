@@ -120,6 +120,11 @@ function wsProjectRow(p) {
         <em class="muted">${total.count} ${wsEsc(wsUnit("ws_lines", total.count))}${money} · ${wsEsc(wsDate(p.updatedAt))}${mixed}</em>
       </span>
       <span class="row-actions">
+        <label class="field field-narrow">
+          <span class="fld-label">${wsEsc(wsT("job_status"))}</span>
+          <select data-project-status>${PROJECT_STATUS.map((status) =>
+            `<option value="${status}"${status === (p.status || "new") ? " selected" : ""}>${wsEsc(wsT(`job_st_${status}`))}</option>`).join("")}</select>
+        </label>
         ${p.archived
           ? `<button type="button" class="btn btn-ghost btn-sm" data-unarchive>${wsEsc(wsT("proj_archive_undo"))}</button>`
           : ""}
@@ -932,9 +937,13 @@ function wsRenderRooms() {
     // The same control the calculation rows got in session 20, doing the same job one
     // level up: a room can be moved between projects, or taken out of all of them. Absent
     // while there is no project to move it into.
+    // A room with no live project — never given one, or its project deleted — offers
+    // "— bez projektu —" first, so the picker does not look as if it already sat in the
+    // first project on the list.
+    const loose = !r.projectId || !projects.some((p) => p.id === r.projectId);
     const move = projects.length
       ? `<select data-room-project aria-label="${wsEsc(wsT("ws_project"))}">${
-        wsProjectOptions(r.projectId || "", false)}</select>`
+        wsProjectOptions(loose ? "" : r.projectId, loose)}</select>`
       : "";
     return `<li class="ws-room" data-id="${wsEsc(r.id)}">
         <span class="row-name">
@@ -986,7 +995,14 @@ function wsRenderRooms() {
     </section>`;
   };
 
-  list.innerHTML = projects.map((p, i) => card(p, rooms.filter((r) => r.projectId === p.id), i)).join("");
+  const projectIds = new Set(projects.map((p) => p.id));
+  const loose = rooms.filter((r) => !r.projectId || !projectIds.has(r.projectId));
+  const looseGroup = loose.length ? `<section class="app-card ws-room-loose" data-project-id="">
+      <h3>${wsEsc(wsT("app_rooms_loose"))}</h3>
+      <p class="muted">${wsEsc(wsT("app_rooms_loose_d"))}</p>
+      <ul class="data-list">${loose.map(roomRow).join("")}</ul>
+    </section>` : "";
+  list.innerHTML = projects.map((p, i) => card(p, rooms.filter((r) => r.projectId === p.id), i)).join("") + looseGroup;
   // The defaults already describe a room, so its areas are shown before anything is typed.
   list.querySelectorAll("[data-room-add-form]").forEach(wsRoomSum);
 }
@@ -1077,6 +1093,17 @@ function buildProjectsPage() {
   };
   document.getElementById("ws-project-list").addEventListener("click", rowAction);
   document.getElementById("ws-archive-list").addEventListener("click", rowAction);
+  const statusChange = (e) => {
+    const select = e.target.closest("[data-project-status]");
+    const row = e.target.closest("li[data-id]");
+    if (!select || !row) return;
+    const id = row.dataset.id;
+    wsUpdateProject(id, { status: select.value });
+    const fresh = document.querySelector(`li[data-id="${CSS.escape(id)}"] [data-project-status]`);
+    if (fresh) fresh.focus();
+  };
+  document.getElementById("ws-project-list").addEventListener("change", statusChange);
+  document.getElementById("ws-archive-list").addEventListener("change", statusChange);
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape" || !wsAskingRowId) return;
     wsAskingRowId = "";
@@ -1157,6 +1184,23 @@ function wireProjectDetail() {
     const el = document.getElementById(id);
     if (el) el.addEventListener(event, fn);
   };
+
+  const showShare = () => {
+    const button = document.getElementById("ws-project-share");
+    if (button) button.hidden = !(window.lmAccount && typeof window.lmAccount.shareProject === "function");
+  };
+  showShare();
+  document.addEventListener("lm-account-ready", showShare);
+  on("ws-project-share", "click", async () => {
+    const error = document.getElementById("ws-project-error");
+    try {
+      const url = await window.lmAccount.shareProject(wsOpenId);
+      await navigator.clipboard.writeText(url).catch(() => {});
+      document.getElementById("ws-project-share-url").value = url;
+      document.getElementById("ws-project-share-result").hidden = false;
+      if (error) error.textContent = "";
+    } catch (e) { if (error) error.textContent = wsT("app_err_unknown"); }
+  });
 
   on("ws-project-rename", "click", () => {
     wsRenaming = true;

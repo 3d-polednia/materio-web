@@ -50,7 +50,7 @@ import { CALC_SEO, TITLE_MAX } from "../src/calc-seo.mjs";
 import { CONV_COPY, CONV_COPY_KEYS } from "../src/conv-copy.mjs";
 import { OMAT_COPY, OMAT_COPY_KEYS } from "../src/omat-copy.mjs";
 import { PDF_COPY, PDF_COPY_KEYS } from "../src/pdf-copy.mjs";
-import { appMain, shareMain, dashboardMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
+import { appMain, shareMain, dashboardMain, dashboardRedirectMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -1820,6 +1820,18 @@ function buildPrivatePages() {
     alternates: {}, moduleScripts: true,
   };
 
+  const dashData = {
+    urls: {
+      calculators: alternatesFor(urlCalcIndex),
+      projects: alternatesFor(urlProjects),
+      estimate: alternatesFor(urlEstimate),
+    },
+    calcs: Object.fromEntries(CALCS.map((c) => [c.id, {
+      url: alternatesFor((l) => urlCalc(l, c.id)),
+      icon: calcIcon(c.id),
+    }])),
+  };
+
   write("app/index.html", page({
     ...common,
     bodyClass: "workspace-page",
@@ -1827,7 +1839,7 @@ function buildPrivatePages() {
     description: t("app_lead"),
     path: URL_APP,
     main: appMain(t, LM_FEATURES),
-    headExtra: navScript,
+    headExtra: `${navScript}\n<script>window.LM_DASH = ${JSON.stringify(dashData).replace(/</g, "\\u003c")};</script>`,
     // workspace.js is a classic script on purpose: /app/ reads the browser workspace
     // through its globals, which a module's own scope would hide.
     // plan.js before app.js: the Pro tab reads the permission table and the plan status
@@ -1847,47 +1859,31 @@ function buildPrivatePages() {
     // as a ninth collection, so the sync tab has a third store to push and pull, and the
     // Materiały tab reads its list through the same globals.
     classicScripts: [
-      "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+      "/assets/units.js", "/assets/workspace.js", "/assets/recent.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
       "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js", "/assets/schedule-grid.js",
+      "/assets/dashboard.js",
     ],
     scripts: ["/assets/app.js"],
   }));
 
-  // The dashboard has no per-language URL either, so it cannot render a link to
-  // /kalkulatory/ as HTML and be right in German. The build hands it every address it
-  // might need, per language, plus the icon of each calculator — the same calcIcon() the
-  // hub uses, so a tile on the dashboard cannot drift from the tile on /kalkulatory/.
-  const dashData = {
-    urls: {
-      calculators: alternatesFor(urlCalcIndex),
-      projects: alternatesFor(urlProjects),
-      estimate: alternatesFor(urlEstimate),
-    },
-    calcs: Object.fromEntries(CALCS.map((c) => [c.id, {
-      url: alternatesFor((l) => urlCalc(l, c.id)),
-      icon: calcIcon(c.id),
-    }])),
-  };
-
+  // The retained route has no language of its own and redirects immediately. Its only
+  // rendered link is /app/, while the calculator map above belongs to /app/'s overview.
   write("app/dashboard/index.html", page({
     ...common,
     title: `${t("dash_title")} — LiczMat`,
     description: t("dash_lead"),
     path: URL_DASHBOARD,
-    main: dashboardMain(t),
+    main: dashboardRedirectMain(t),
     // A page's own data, before any script that reads it. JSON.stringify cannot emit a
     // literal "</script>"; the icons are SVG markup, so the escape is not optional.
-    headExtra: `${navScript}\n<script>window.LM_DASH = ${JSON.stringify(dashData).replace(/</g, "\\u003c")};</script>`,
+    headExtra: `<meta http-equiv="refresh" content="0; url=${URL_APP}">`,
     // Classic scripts, in this order and not modules: the dashboard reads the workspace
     // and the recents through their globals, which a module's own scope would hide.
     // plan.js since 2026-09-04: the page shows no Firebase-derived level (see the note at
     // the top of assets/dashboard.js), so the money it prints is gated on lmCan("costs", …)
     // over the same liczmat-signed-in hint /projekty/ and /kosztorys/ read — the same
     // known limitation, not a new one (docs/MASTER_PLAN.md).
-    classicScripts: [
-      "/assets/units.js", "/assets/workspace.js", "/assets/recent.js", "/assets/plan.js",
-      "/assets/dashboard.js",
-    ],
+    classicScripts: [],
   }));
 
   write("p/index.html", page({

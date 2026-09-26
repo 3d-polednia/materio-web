@@ -126,7 +126,7 @@ function loadApp(store) {
   // assets/own-materials.js is the third — what somebody pays their own supplier is
   // theirs, and it must not travel into the next person's account either.
   return new Function("document", "localStorage", "window", "crypto", "CustomEvent",
-    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${read("assets/own-materials.js")}\nconst { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, pathId: syncPathId } = (() => {\n${syncSrc}\nreturn { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, pathId };\n})();\n${src}\nconst testSync = createAccountSync({ fb: {}, db: {}, auth: { currentUser: null } });\nreturn {
+    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${read("assets/own-materials.js")}\nconst { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, shareToken, pathId: syncPathId } = (() => {\n${syncSrc}\nreturn { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, shareToken, pathId };\n})();\n${src}\nconst testSync = createAccountSync({ fb: {}, db: {}, auth: { currentUser: null } });\nreturn {
        pathId: syncPathId, foreignWorkspace: testSync.foreignWorkspace, unclaimedWorkspace: testSync.unclaimedWorkspace,
        localCounts: testSync.localCounts, syncAccount: testSync.syncAccount,
        setSyncAccount: testSync.setSyncAccount, state: testSync.state, SYNC_ACCOUNT_KEY,
@@ -277,10 +277,14 @@ head("4. autoryzacja: the token in a /p/ link is the whole of it");
 
   // 16 bytes from the CSPRNG. Not Math.random(), not a counter, not the project id: the
   // token is the only thing between a link and somebody's prices.
+  // shareToken() moved into the sync engine on 2026-09-26, beside shareProject(), so the
+  // project view on /projekty/ makes its links with the same function /app/ does.
+  const engine = read("assets/account-sync.js");
   check("the token is 16 bytes of crypto.getRandomValues",
-    /crypto\.getRandomValues\(new Uint8Array\(16\)\)/.test(app));
+    /crypto\.getRandomValues\(new Uint8Array\(16\)\)/.test(engine)
+    && /const token = shareToken\(\);/.test(engine));
   check("and nothing here derives one from Math.random()",
-    !/Math\.random\(\)/.test(app) && !/Math\.random\(\)/.test(share));
+    !/Math\.random\(\)/.test(app) && !/Math\.random\(\)/.test(engine) && !/Math\.random\(\)/.test(share));
 
   // The shape is checked before the token becomes a Firestore path: Firestore joins the
   // segments it is handed, so `?t=a/b/c` addressed sharedProjects/a/b/c until session 35.
@@ -306,9 +310,8 @@ head("4. autoryzacja: the token in a /p/ link is the whole of it");
 
   // The document is world-readable by design, so it carries the estimate and the uid the
   // owner needs to find it again — and nothing about the person who made it.
-  const sharing = app.slice(app.indexOf("async function shareProject"),
-    app.indexOf("/* ------------------------------------------------------------------ wiring */"));
-  check("a share carries the owner's uid so it can be revoked", /ownerId: state\.uid/.test(sharing));
+  const sharing = engine.slice(engine.indexOf("async function shareProject"), engine.indexOf("function syncAccount"));
+  check("a share carries the owner's uid so it can be revoked", /ownerId: uid/.test(sharing));
   check("and no e-mail, no display name", !/email/i.test(sharing) && !/displayName/.test(sharing));
   check("deleting the account revokes every link it made",
     /collection\(db, "sharedProjects"\), fb\.where\("ownerId", "==", state\.uid\)/.test(app));

@@ -122,8 +122,7 @@ head("1. the dashboard is a declared page, not a page that just appeared");
   // it is this browser's own localStorage, and the only thing that could lock a guest
   // out is the session hint, which may be stale — see the note on the route.
   eq("a guest may open it", r.level, LEVEL.GUEST);
-  check("it is in the footer's account column",
-    r.footer && r.footer.group === "account" && r.footer.key === "nav_dashboard");
+  check("the compatibility route is out of the footer", !r.footer);
 
   const liczmat = FLOWS.find((f) => f.id === "liczmat");
   check("the LiczMat flow's last step is the dashboard",
@@ -216,7 +215,7 @@ head("5. the four things chapter XIV asks the dashboard to show");
   has('id="dash-tools"', "ostatnio używane narzędzia — the list is there");
   has('id="dash-level"', "and the strip says which level this browser is on");
   has('id="dash-signup"', "a guest is offered an account rather than a locked door");
-  has(`href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_DASHBOARD)}"`,
+  has(`href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(URL_APP)}"`,
     "and the offer opens the sign-up form and comes back here");
   has('id="dash-tools-forget"', "the visitor can delete their own history of tools");
 
@@ -246,7 +245,7 @@ head("6. the addresses the build hands the page");
   // The page has no per-language URL, so it cannot render /kalkulatory/ and be right in
   // German. window.LM_DASH is what assets/dashboard.js re-points the links from, and it
   // is written by the build — so it is read back out of the built page.
-  const file = p("app/dashboard/index.html");
+  const file = p("app/index.html");
   if (!check("the page has been built", existsSync(file), "run: node scripts/build.mjs")) {
     // Nothing below can say anything useful without it.
   } else {
@@ -277,6 +276,17 @@ head("6. the addresses the build hands the page");
       check("the blob cannot close its own <script>", !m[1].includes("</"));
     }
   }
+}
+
+head("6b. the old dashboard redirects and the overview owns its unique lists");
+{
+  const old = readFileSync(p("app/dashboard/index.html"), "utf8");
+  const app = readFileSync(p("app/index.html"), "utf8");
+  check("the old route redirects to /app/", old.includes('<meta http-equiv="refresh" content="0; url=/app/">'));
+  check("the redirect has a real /app/ link", old.includes('href="/app/"'));
+  check("PrzeglÄ…d contains recent saved calculations", app.includes('id="dash-recent"'));
+  check("PrzeglÄ…d contains recently used tools", app.includes('id="dash-tools"'));
+  check("PrzeglÄ…d contains the clear action", app.includes('id="dash-tools-forget"'));
 }
 
 /* ------------------------------------------------------------------ 7. the copy */

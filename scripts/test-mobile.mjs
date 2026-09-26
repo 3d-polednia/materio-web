@@ -400,7 +400,7 @@ head("3. the modules a phone actually works in");
       // The estimate raises no ready flag of its own — its rows are what says it drew.
       ["the estimate", urlEstimate("pl"),
         { workspace: true, active: "p1", ready: "#ws-estimate-rows tr" }],
-      ["the dashboard", "/app/dashboard/", { workspace: true, ready: "#dash-projects" }],
+      ["the account overview", "/app/", { workspace: true, ready: null }],
       /* /app/ is audited as the markup it ships with, not as the signed-in screen: the
          Chromium in the agent container cannot reach gstatic.com, so the Firebase SDK
          never answers and `data-app-ready` never appears (CLAUDE.md). That markup is

@@ -242,7 +242,12 @@ head("1. the quote list");
   eq("the quote is on the page", list.length, 1);
   check("with its name", list[0].includes("Łazienka — wycena"), list[0]);
   check("the project it prices", list[0].includes("Remont łazienki"), list[0]);
-  check("the status is visible in a chip", list[0].includes("Szkic"), list[0]);
+  check("the status is visible in a labelled control", list[0].includes("Szkic"), list[0]);
+  const statusSelects = page.locator("#quo-list [data-quote-status]");
+  check("quote rows have status controls", await statusSelects.count() > 0);
+  await statusSelects.first().selectOption("sent");
+  eq("the status control updates the quote", (await liveQuotes(page))[0].status, "sent");
+  eq("focus stays on the changed quote status", await page.locator('#quo-list li[data-id="q1"] [data-quote-status]').evaluate((n) => n === document.activeElement), true);
   check("and what it comes to — computed, never stored",
     digits(list[0]).includes(String(TOTAL)), list[0]);
   eq("the page heading is not repeated by an h2", await page.$$eval("#quo-index h2", (n) => n.length), 0);

@@ -1514,10 +1514,16 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           </div>
 
           <div class="ws-project-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="ws-project-share" hidden>${esc(t("app_share"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-rename">${esc(t("ws_rename"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-archive">${esc(t("proj_archive_do"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="ws-project-delete">${esc(t("app_delete"))}</button>
           </div>
+          <p id="ws-project-share-result" class="field mt-4" hidden>
+            <label for="ws-project-share-url">${esc(t("app_share_copied"))}</label>
+            <input id="ws-project-share-url" type="url" readonly>
+          </p>
+          <p id="ws-project-error" class="form-error" role="alert"></p>
 
           <form id="ws-rename-form" class="inline-form mt-4" hidden>
             <input id="ws-rename-name" type="text" maxlength="120" aria-label="${esc(t("ws_new_project"))}" required>

@@ -584,16 +584,16 @@ head("4e. with one project and no loose rooms the bar stays a flat list");
 head("5. the index groups rooms under their projects");
 {
   const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
-  eq("only assigned rooms are on the index",
-    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 3);
-  eq("one card per project and no loose-room card",
-    await page.$$eval("#ws-room-list [data-project-id]", (cards) => cards.length), 2);
+  eq("assigned and loose rooms are on the index",
+    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 4);
+  eq("one card per project plus the loose-room card",
+    await page.$$eval("#ws-room-list [data-project-id]", (cards) => cards.length), 3);
 
   const p1 = '#ws-room-list [data-project-id="p1"]';
   eq("the first project card has its two rooms",
     await page.$$eval(`${p1} li[data-id]`, (li) => li.map((n) => n.dataset.id).join(",")), "r2,r1");
-  eq("the unassigned room is absent",
-    await page.$$eval('#ws-room-list li[data-id="r4"]', (li) => li.length), 0);
+  eq("the unassigned room is under Bez projektu",
+    await page.$$eval('#ws-room-list [data-project-id=""] li[data-id="r4"]', (li) => li.length), 1);
 
   const href = await page.$eval(`${p1} .ws-room-card-head a`,
     (a) => a.getAttribute("href"));
@@ -630,8 +630,11 @@ head("5c. a card adds to its project and rows can still be moved");
     await page.$eval('#ws-room-list [data-project-id="p2"] [name="name"]',
       (n) => `${n === document.activeElement}:${n.value}`), "true:");
 
-  eq("move pickers do not offer no project",
-    await page.$$eval("#ws-room-list [data-room-project] option[value='']", (o) => o.length), 0);
+  // A project card's pickers move a room between projects only. The "Bez projektu" group
+  // (2026-09-26) is the one place a picker starts on "— bez projektu —", because that is
+  // where its room is.
+  eq("move pickers in a project card do not offer no project",
+    await page.$$eval("#ws-room-list [data-project-id]:not([data-project-id='']) [data-room-project] option[value='']", (o) => o.length), 0);
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
@@ -724,10 +727,10 @@ head("5b. a room whose project was deleted keeps the room and drops the name");
   const ws = fixture();
   ws.projects[0].deletedAt = T0 + 6 * DAY;
   const page = await open(ctx, PROJECTS, { workspace: ws, active: "" });
-  eq("rooms of the deleted project and loose rooms are hidden",
-    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 1);
-  eq("there is no loose card",
-    await page.$$eval('#ws-room-list [data-project-id=""]', (li) => li.length), 0);
+  eq("rooms of the deleted project join the existing loose room",
+    await page.$$eval("#ws-room-list li[data-id]", (li) => li.length), 4);
+  eq("the loose card is shown",
+    await page.$$eval('#ws-room-list [data-project-id=""]', (li) => li.length), 1);
   await page.close();
 }
 
