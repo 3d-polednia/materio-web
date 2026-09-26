@@ -1039,11 +1039,11 @@ export function androidMain(lang, t, calcs, cat) {
     t("apppage_fact_sync"),
   ];
 
-  /* The screenshots are rendered from the app's own code (WebHeroShotsTest and
-     WebHeroShotsDarkTest in the Materio repo, converted by its scripts/web-screens.py).
-     The owner's rule of 2026-09-24: the Polish page shows the Polish app, every other
-     language shows the English one. */
-  const shotLang = lang === "pl" ? "pl" : "en";
+  /* The screenshots are rendered from the app's own code (WebHeroShotsTest,
+     WebHeroShotsDarkTest and WebHeroShotsI18nTest in the Materio repo, converted by its
+     scripts/web-screens.py). Every page shows the app in its own language — the app speaks
+     the same thirteen as the site (owner, 2026-09-24). */
+  const shotLang = lang;
   const src = (name, dark) => `/assets/screens/${shotLang}_${name}${dark ? "_dark" : ""}.webp`;
 
   /* One phone carries two screenshots: the one for a light page (.for-light) and the one
@@ -1055,7 +1055,8 @@ export function androidMain(lang, t, calcs, cat) {
     const img = (dark, forCls) => `<img class="${forCls} ${dark ? "app-d" : "app-l"}" src="${src(name, dark)}" width="618" height="1340" alt="${esc(t(altKey))}" loading="lazy" decoding="async">`;
     return `<figure class="app-device ${cls}"><span class="app-screen">${img(swap, "for-light")}${img(!swap, "for-dark")}</span></figure>`;
   };
-  const dim = shotLang === "pl" ? "3,40 m" : "3.40 m";
+  // As the calculator form on the screenshot writes it: a decimal point only in English.
+  const dim = lang === "en" ? "3.40 m" : "3,40 m";
 
   const main = `<main id="main" tabindex="-1">
   <section class="app-hero-b" aria-labelledby="app-h">

@@ -483,10 +483,11 @@ head("8. the app screenshots stay still, in the page's language and in both them
     return shots.length === 8 && new Set(shots.map((m) => m[0])).size === 8
       && (page.body.match(/<figure class="app-device /g) || []).length === 4;
   }, (page) => `${page.url}: ${shotsOf(page).length} screenshots`);
-  checkAll("Polish screenshots on the Polish page, English ones everywhere else", appPages, (page) => {
-    const want = page.lang === "pl" ? "pl" : "en";
-    return shotsOf(page).every((m) => m[3] === want);
-  }, (page) => page.url);
+  // The owner, later the same day: every page shows the app in its own language.
+  checkAll("every page shows the app in its own language", appPages, (page) => {
+    const want = LANGS.find((code) => HREFLANG[code] === page.lang);
+    return Boolean(want) && shotsOf(page).every((m) => m[3] === want);
+  }, (page) => `${page.url} (${page.lang})`);
   checkAll("an image's class says which app theme it is", appPages,
     (page) => shotsOf(page).every((m) => (m[2] === "d") === Boolean(m[5])), (page) => page.url);
   checkAll("the hero's back phone shows the app in the page's opposite theme", appPages,

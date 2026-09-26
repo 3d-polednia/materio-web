@@ -112,7 +112,8 @@ not, leave it out.
   Re-record them when the app changes. /aplikacja/ (variant B, owner's pick 2026-09-24) shows
   them in a CSS Android frame (`.app-device`): every phone carries a light and a dark
   screenshot and shows the one matching the page's theme, the hero's back phone the
-  opposite one; the Polish page uses `pl_*`, every other language `en_*`.
+  opposite one; every language page shows the app in its own language (`<lang>_*`, 104
+  files; `WebHeroShotsI18nTest` renders the eleven beyond pl/en).
 - `scripts/test-copy.mjs` §8 (the look) and §10 (the phrases) enforce what a machine can
   see; `docs/COPY.md` carries the argument. Screenshot every visible change at 1400 px and
   390 px before committing — green tests have passed visible breakage here before.
