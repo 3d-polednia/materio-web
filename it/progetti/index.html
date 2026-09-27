@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Progetti e stanze — LiczMat</title>
-<meta name="description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto. Senza account.">
+<meta name="description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Progetti e stanze — LiczMat">
-<meta property="og:description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto. Senza account.">
+<meta property="og:description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto.">
 <meta property="og:url" content="https://liczmat.com/it/progetti/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Progetti e stanze — LiczMat">
-<meta name="twitter:description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto. Senza account.">
+<meta name="twitter:description" content="Progetti e stanze in LiczMat: salva una volta le misure e i calcolatori riempiono la superficie di pavimento, pareti o soffitto.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/it/">Home</a></li><li aria-current="page">Progetti e stanze</li></ol></nav>
+      <h1 id="ws-title">Progetti e stanze</h1>
+      <p class="lead" id="ws-lead">Salva le stanze con le loro misure e raccogli i risultati dei calcolatori nei progetti. I progetti fanno parte del tuo account, quindi li vedi anche sul telefono.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Per usare questa pagina ti serve un account gratuito.</p>
+      <p class="muted" data-account-local hidden>Dopo l'accesso ti chiederemo se vuoi collegare al tuo account i dati salvati in precedenza in questo browser.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fit%2Fprogetti%2F" rel="nofollow">Crea un account gratuito</a>
+        <a href="/app/?next=%2Fit%2Fprogetti%2F" rel="nofollow">Accedi</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Sezioni dell'account">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/it/">Home</a></li><li aria-current="page">Progetti e stanze</li></ol></nav>
-      <h1 id="ws-title">Progetti e stanze</h1>
-      <p class="lead" id="ws-lead">Salva le stanze con le loro misure e raccogli i risultati in progetti. Tutto resta in questo browser; l'account serve solo a portarlo sul telefono.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>Nessun progetto così</h2>
-          <p class="muted">Questo indirizzo punta a un progetto che questo browser non ha. Può essere stato eliminato, oppure è stato fatto su un altro dispositivo.</p>
+          <p class="muted">Questo progetto non è nel tuo account. Potrebbe essere stato eliminato o non ancora sincronizzato.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/it/calcolatori/">Tutti i calcolatori</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Il mio account</a>
       </p>
-      <p class="muted src-note">I dati sono salvati in questo browser. Cancellare i dati del sito li elimina. Accedi a «Il mio account» per averli anche sul telefono.</p>
+      <p class="muted src-note">I progetti si salvano sul tuo account e si sincronizzano da soli con l'app sul telefono.</p>
     </div>
   </section>
 

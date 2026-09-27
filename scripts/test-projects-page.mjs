@@ -10,10 +10,12 @@
  * chapter XXVIII names by hand, and the variant with JavaScript off. The pure-logic half
  * is scripts/test-projects.mjs and needs nothing installed.
  *
- * **Nothing is stubbed.** /projekty/ loads no Firebase: it reads and writes localStorage,
- * which is what lets it work without an account at all (FIRESTORE_SYNC §1.2). So the test
- * plants the store, opens the page, clicks what a visitor clicks and reads both what was
- * drawn and what ended up back in storage.
+ * **Nothing is stubbed.** The page reads and writes localStorage; since 2026-09-26 it also
+ * syncs that store with the account (assets/account-sync-page.js), but only for a visitor
+ * the hint calls signed in, and no section here plants a Firebase session — the sync half
+ * is scripts/test-account-sync-page.mjs. So the test plants the store and the level,
+ * opens the page, clicks what a visitor clicks and reads both what was drawn and what
+ * ended up back in storage.
  *
  * Playwright lives OUTSIDE this repository, same as scripts/test-pages.mjs:
  *
@@ -670,11 +672,10 @@ head("15. with JavaScript off");
   const page = await noJs.newPage();
   await page.goto(base + PROJECTS, { waitUntil: "load" });
 
-  // Everything on both screens comes out of localStorage, so without a script there is
-  // nothing to show — and the page says where the data lives instead of pretending.
+  // The server-rendered frame remains readable without script.
   eq("the page still has its heading", await text(page, "#ws-title"), "Projekty i pomieszczenia");
-  check("and says where the data is kept",
-    (await page.innerText("main")).includes("Dane są zapisane w tej przeglądarce"));
+  check("and says the data belongs to the account",
+    (await page.innerText("main")).includes("Projekty zapisują się na Twoim koncie"));
   eq("the detail is not shown to somebody who cannot fill it",
     await page.$eval("#ws-project", (n) => n.hidden), true);
 
@@ -684,17 +685,33 @@ head("15. with JavaScript off");
   await noJs.close();
 }
 
-/* ------------------------------------------- the project is free, its money is not */
+/* ------------------------------------------- account gate */
 
 /**
- * A project is `projects`, which is GUEST, and what it costs is `costs`, which became PRO
- * on 2026-09-03. Every section above runs at the Pro level, which is what `open()` plants;
- * this one runs without a plan and checks that the CRUD chapter XV is about is untouched
- * while the money is gone from both screens.
+ * Owner decision 2026-09-26: a project requires a free account. Every section above
+ * runs at the Pro level; this one removes the hint and checks the server-rendered gate.
  */
-head("9. a guest keeps every project and sees none of the totals");
+head("9. a guest sees the account card and keeps local data untouched");
 {
-  const index = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1", pro: false });
+  const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1", pro: false });
+  eq("the account card is visible", await page.locator("[data-account-guest]").isVisible(), true);
+  eq("the project tool is not visible", await page.locator("[data-account-tool]").isHidden(), true);
+  eq("old local data adds the attachment sentence", await page.locator("[data-account-local]").isVisible(), true);
+  eq("the old projects were not deleted", (await store(page)).projects.length, fixture().projects.length);
+  check("the card offers sign-up", (await page.getAttribute("[data-account-guest] .btn-primary", "href")).includes("mode=signup"));
+  eq("the card offers one plain sign-in link", await page.locator("[data-account-guest] a:not(.btn-primary)").count(), 1);
+  check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
+  await page.close();
+}
+
+/* A free account keeps every project and sees none of the totals. Until 2026-09-26 this ran
+   as a guest; since the owner's decision a guest gets the card above, so the free half is
+   the signed-in account without a plan. `costs` became PRO on 2026-09-03. */
+head("9b. a free account keeps every project and sees none of the totals");
+{
+  const index = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1", level: "liczmat" });
+  eq("a free account gets the tool, not the account card",
+    await index.locator("[data-account-guest]").isHidden(), true);
   const list = await rows(index, "#ws-project-list");
   check("the index still lists the projects", list.length >= 2, String(list.length));
   check("by name, with when they last moved",
@@ -706,7 +723,7 @@ head("9. a guest keeps every project and sees none of the totals");
   await index.close();
 
   const page = await open(ctx, `${PROJECTS}?id=p1`,
-    { workspace: fixture(), active: "p1", pro: false });
+    { workspace: fixture(), active: "p1", level: "liczmat" });
   eq("the three figures are behind the wall", await page.locator("#cost-tool").isHidden(), true);
   eq("and the wall stands in their place", await page.locator("#cost-gate").isHidden(), false);
   eq("the count of calculations is not money and is still there",

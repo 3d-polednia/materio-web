@@ -38,7 +38,7 @@ import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, GUIDES,
   urlHome, urlCalc, urlJobs, urlAndroid, URL_PRIVACY,
 } from "../src/site.mjs";
-import { sitemapUrls, liveRoutes, route } from "../src/ia.mjs";
+import { ROUTES, sitemapUrls, liveRoutes, route } from "../src/ia.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -142,9 +142,12 @@ head("1. indexing: which pages are open to a crawler at all");
   // `noindex` and not a duplicate.
   const jobRedirects = LANGS.map((lang) => urlJobs(lang)).sort();
   const closed = PAGES.filter(isNoindex).map((page) => page.url).sort();
+  const accountRoutes = ROUTES.filter((r) => r.localized && !r.indexable &&
+    ["projects", "estimate", "own-materials", "clients", "quotes", "calendar"].includes(r.id))
+    .flatMap((r) => LANGS.map((lang) => r.path(lang)));
   const expectedClosed = ["/404.html", "/app/", "/app/dashboard/", "/p/"]
-    .concat(jobRedirects).sort();
-  check("exactly four pages, plus the thirteen job redirects, are closed to crawlers",
+    .concat(jobRedirects, accountRoutes).sort();
+  check("account work pages, redirects and private utility pages are closed to crawlers",
     closed.join(" ") === expectedClosed.join(" "), closed.join(" "));
 
   for (const page of INDEXED) {
@@ -219,8 +222,8 @@ head("2. sitemap.xml: the list, and where it comes from");
   // merge of 2026-09-21: /zlecenia/ and its twelve translations became redirects to
   // /projekty/, and a sitemap that still offered a crawler thirteen redirects would be
   // asking it to index a page that exists only to send it somewhere else.
-  check("508 URLs: 507 in thirteen languages plus the privacy policy",
-    ENTRIES.length === 508, `found ${ENTRIES.length}`);
+  check("430 indexable URLs remain after account work pages leave the sitemap",
+    ENTRIES.length === 430, `found ${ENTRIES.length}`);
 
   for (const entry of ENTRIES) {
     check(`${entry.loc} is absolute and on the live domain`, entry.loc.startsWith(`${BASE}/`));

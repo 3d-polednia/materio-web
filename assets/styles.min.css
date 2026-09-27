@@ -1286,6 +1286,10 @@ font-size: var(--fs-sm); white-space: nowrap; cursor: pointer;
 .app-nav-item[aria-current="page"] { background: var(--accent-soft); color: var(--on-accent-soft); }
 .account-page-shell { display: block; min-height: 0; }
 .account-page-main { min-width: 0; }
+html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) [data-account-tool] { display: none; }
+html.js[data-lm-level="liczmat"] [data-account-guest],
+html.js[data-lm-level="pro"] [data-account-guest] { display: none; }
+.account-guest-card .card { padding: var(--sp-7); }
 .account-page-shell .app-side-brand { display: none; }
 .app-plan-pill:empty { display: none; }
 html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-main { width: 100%; }
@@ -1496,7 +1500,7 @@ flex: none; text-align: right; font-variant-numeric: tabular-nums;
 .ws-saved { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); }
 .ws-saved a { margin-left: var(--sp-2); }
 .ws-save-account { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); line-height: var(--lh-snug); }
-.ws-links { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-7); }
+.ws-links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-top: var(--sp-7); }
 .ws-estimate-bar { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-bottom: var(--sp-4); align-items: center; }
 .ws-estimate-bar select { width: auto; }
 .ws-estimate-head {

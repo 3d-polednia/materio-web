@@ -327,16 +327,19 @@ async function walk(cfg) {
     .formatToParts(1234.5).filter((p) => p.type === "currency").map((p) => p.value).join(""), cur);
   check("in the currency the visitor picked, not the one their language defaults to",
     money.includes(curMark), `${money} — expected ${curMark}`);
-  eq("the save box is offered under the result", await visible(page, "[data-ws-save]"), true);
-  eq("with no project to save into yet", await visible(page, "[data-ws-project]"), false);
+  eq("a guest gets no save button under the result", await page.locator("[data-ws-save]").count(), 0);
+  eq("and no project picker", await page.locator("[data-ws-project]").count(), 0);
+  eq("but gets both account links", await page.locator("[data-ws-save-box] a").count(), 2);
   check("nothing scrolls sideways", (await overflow(page)) <= 1, `${await overflow(page)}px`);
 
   /* ---------------------------------------------------------------- 4. rejestracja */
 
   head(`${who} — 4. rejestracja: the way in is the sentence under the result`);
-  const signupHref = await page.getAttribute(".ws-save-account a", "href");
+  await page.waitForSelector("[data-ws-save-box] .btn-primary");
+  const signupHref = await page.getAttribute("[data-ws-save-box] .btn-primary", "href");
   eq("the link opens the sign-up form and comes back here", signupHref,
     `${URL_APP}?mode=signup&next=${encodeURIComponent(CALC)}`);
+  await page.evaluate(() => lmWriteLevel("liczmat"));
 
   /* /app/ is the one page in the walk with a stub behind it, so it gets its own page —
      the fake SDK keeps its accounts on `window`, and a fresh window is a fresh backend. */
@@ -853,27 +856,20 @@ async function walk(cfg) {
   eq("signing out clears the session hint", await level(out), null);
   await out.close();
 
-  /* Chapter II and FIRESTORE_SYNC §1.2: counting never requires an account, and the
-     workspace is this browser's. So the project and its material have to be exactly where
-     they were — signing out is not a wipe.
-
-     What signing out DOES take away, since 2026-09-03, is the money: `costs` is Pro, and
-     the wall goes back up in front of the three figures. The two halves are checked apart
-     on purpose. The amount is still in the store, byte for byte — a lapsed plan withholds
-     a figure, it does not delete somebody's work — and it is no longer on the screen. */
+  /* Owner decision 2026-09-26: signing out hides account work but never wipes the local
+     hand-off copy. Counting remains public. */
   await go(openProject);
   eq("the project is still here", (await store(page)).projects.length, 1);
-  eq("with its material still on the list",
-    await page.locator(`${MATS} li[data-id="${matId}"]`).count(), 1);
+  eq("the account card replaces the project tool",
+    await page.locator("[data-account-guest]").isVisible(), true);
   const kept = await store(page);
   eq("the price it was given is still in the store",
     kept.shoppingItems.find((s) => s.id === matId).estimatedCostMinor, materialsMinor);
   eq("and so is the cost nobody calculated",
     kept.estimations.find((e) => (e.inputJson || "").includes("manual")).totalCostMinor,
     OTHER_MINOR);
-  eq("but the three figures are behind the wall again",
-    await page.locator("#cost-tool").isHidden(), true);
-  eq("with the wall in their place", await page.locator("#cost-gate").isHidden(), false);
+  eq("the whole project tool is hidden", await page.locator("[data-account-tool]").isHidden(), true);
+  eq("the Pro wall does not precede the account card", await page.locator("#cost-gate").isVisible(), false);
   eq("and the total is not printed anywhere on the screen",
     await page.locator("#ws-project-total").isVisible(), false);
   eq("the PDF export is shut too", await page.locator("#pdf-tool").isHidden(), true);
@@ -881,14 +877,10 @@ async function walk(cfg) {
     await page.getAttribute(".nav-cta[data-account-cta]", "data-level"), null);
 
   await go(urlClients(lang));
-  eq("the Pro module is behind the wall again",
-    await page.locator("#crm-gate").isHidden(), false);
-  /* Chapter XXV's path has two rungs and one visitor stands on one of them. A guest is
-     offered the account, never the upgrade: there is no account for a plan to sit on. */
-  eq("a guest is offered the account rung",
-    await page.locator('#crm-gate [data-pw-step="account"]').first().isHidden(), false);
-  eq("and not the upgrade, which they have nowhere to put",
-    await page.locator('#crm-gate [data-pw-step="upgrade"]').first().isHidden(), true);
+  eq("the Pro page shows the account card before its Pro wall",
+    await page.locator("[data-account-guest]").isVisible(), true);
+  eq("the Pro wall stays inside the hidden account tool",
+    await page.locator("#crm-gate").isVisible(), false);
   eq("the client rows were not deleted by any of it",
     (await crmStore(page)).clients.length, 1);
 

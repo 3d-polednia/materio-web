@@ -64,7 +64,7 @@
 <title>Planning — LiczMat</title>
 <meta name="description" content="De planning van projecten in LiczMat Pro: datums van te laat tot later, met de klant, de status en de waarde ernaast. Hoort bij het account.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -218,7 +218,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/nl/">Start</a></li><li><a href="/nl/projecten/">Projecten en ruimtes</a></li><li aria-current="page">Planning</li></ol></nav>
+      <h1>Planning</h1>
+      <p class="lead">De datums van de LiczMat Pro-projecten: wat te laat is, wat vandaag of deze week valt, en wat nog geen datum heeft.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Voor deze pagina heb je een gratis account nodig.</p>
+      <p class="muted" data-account-local hidden>Na het inloggen vragen we of je eerder in deze browser opgeslagen gegevens aan je account wilt koppelen.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fnl%2Fplanning%2F" rel="nofollow">Maak een gratis account</a>
+        <a href="/app/?next=%2Fnl%2Fplanning%2F" rel="nofollow">Inloggen</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Onderdelen van het account">
@@ -262,13 +276,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/nl/">Start</a></li><li><a href="/nl/projecten/">Projecten en ruimtes</a></li><li aria-current="page">Planning</li></ol></nav>
-      <h1>Planning</h1>
-      <p class="lead">De datums van de LiczMat Pro-projecten: wat te laat is, wat vandaag of deze week valt, en wat nog geen datum heeft.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="cal-page">
     <div class="wrap narrow">

@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projekte und Räume — LiczMat</title>
-<meta name="description" content="Projekte und Räume in LiczMat: Raummaße einmal speichern, und die Rechner setzen Boden-, Wand- oder Deckenfläche ein. Ohne Anmeldung.">
+<meta name="description" content="Projekte und Räume in LiczMat: Raummaße einmal speichern, und die Rechner setzen Boden-, Wand- oder Deckenfläche ein.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Projekte und Räume — LiczMat">
-<meta property="og:description" content="Projekte und Räume in LiczMat: Raummaße einmal speichern, und die Rechner setzen Boden-, Wand- oder Deckenfläche ein. Ohne Anmeldung.">
+<meta property="og:description" content="Projekte und Räume in LiczMat: Raummaße einmal speichern, und die Rechner setzen Boden-, Wand- oder Deckenfläche ein.">
 <meta property="og:url" content="https://liczmat.com/de/projekte/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Projekte und Räume — LiczMat">
-<meta name="twitter:description" content="Projekte und Räume in LiczMat: Raummaße einmal speichern, und die Rechner setzen Boden-, Wand- oder Deckenfläche ein. Ohne Anmeldung.">
+<meta name="twitter:description" content="Projekte und Räume in LiczMat: Raummaße einmal speichern, und die Rechner setzen Boden-, Wand- oder Deckenfläche ein.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li aria-current="page">Projekte und Räume</li></ol></nav>
+      <h1 id="ws-title">Projekte und Räume</h1>
+      <p class="lead" id="ws-lead">Speichere Räume mit ihren Maßen und sammle Rechnerergebnisse in Projekten. Projekte sind Teil deines Kontos, deshalb siehst du sie auch auf dem Handy.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Für diese Seite brauchst du ein kostenloses Konto.</p>
+      <p class="muted" data-account-local hidden>Nach der Anmeldung fragen wir dich, ob früher in diesem Browser gespeicherte Daten deinem Konto hinzugefügt werden sollen.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fde%2Fprojekte%2F" rel="nofollow">Kostenloses Konto anlegen</a>
+        <a href="/app/?next=%2Fde%2Fprojekte%2F" rel="nofollow">Anmelden</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Bereiche des Kontos">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li aria-current="page">Projekte und Räume</li></ol></nav>
-      <h1 id="ws-title">Projekte und Räume</h1>
-      <p class="lead" id="ws-lead">Speichere Räume mit ihren Maßen und sammle Ergebnisse in Projekten. Alles bleibt in diesem Browser; ein Konto braucht es erst, um es aufs Handy zu holen.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>Dieses Projekt gibt es nicht</h2>
-          <p class="muted">Diese Adresse zeigt auf ein Projekt, das dieser Browser nicht hat. Es wurde gelöscht oder auf einem anderen Gerät angelegt.</p>
+          <p class="muted">Dieses Projekt ist nicht in deinem Konto. Es wurde vielleicht gelöscht oder noch nicht synchronisiert.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/de/rechner/">Alle Rechner</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Mein Konto</a>
       </p>
-      <p class="muted src-note">Die Daten sind in diesem Browser gespeichert. Das Löschen der Websitedaten entfernt sie. Melde dich bei „Mein Konto“ an, um sie auch auf dem Telefon zu haben.</p>
+      <p class="muted src-note">Projekte werden in deinem Konto gespeichert und synchronisieren sich automatisch mit der App auf deinem Handy.</p>
     </div>
   </section>
 

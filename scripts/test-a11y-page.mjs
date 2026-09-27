@@ -187,7 +187,7 @@ async function open(ctx, url, opts = {}) {
   const plant = { "materio-lang": opts.lang || "pl" };
   if (opts.workspace !== false) plant["materio-workspace-v1"] = JSON.stringify(workspace());
   if (opts.crm) plant["liczmat-crm-v1"] = JSON.stringify(crm());
-  if (opts.level) plant["liczmat-signed-in"] = opts.level;
+  plant["liczmat-signed-in"] = opts.level || "liczmat";
   if (opts.theme) plant["liczmat-theme"] = opts.theme;
 
   await page.goto(`${base}/404.html`, { waitUntil: "domcontentloaded" });

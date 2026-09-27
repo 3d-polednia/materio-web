@@ -171,7 +171,9 @@ async function open(ctx, url, opts = {}) {
   });
   page.on("pageerror", (e) => errors.push(String(e)));
 
-  const plant = { "materio-lang": opts.lang === undefined ? "pl" : opts.lang };
+  const plant = { "materio-lang": opts.lang === undefined ? "pl" : opts.lang,
+    "liczmat-signed-in": "liczmat" };
+  if (opts.guest) delete plant["liczmat-signed-in"];
   if (opts.workspace) plant["materio-workspace-v1"] = JSON.stringify(opts.workspace);
   if (opts.active) plant["materio-active-project"] = opts.active;
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
@@ -658,16 +660,15 @@ head("5d. with no project at all, the form stops asking");
 
 head("5e. the account sidebar is offered to an account and shipped to everybody");
 {
-  const guest = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1" });
+  const guest = await open(ctx, PROJECTS, { workspace: fixture(), active: "p1", guest: true });
   const item = '[data-account-sidebar]';
   eq("the sidebar is in the markup for a guest too",
     await guest.$$eval(item, (n) => n.length), 1);
   eq("but it is not shown", await guest.$eval(item, (n) => getComputedStyle(n).display), "none");
   eq("and nothing stamped a level on the document",
     await guest.evaluate(() => document.documentElement.hasAttribute("data-lm-level")), false);
-  // The page itself is not gated by any of this — that is the whole point of the split.
-  check("the projects are on screen all the same",
-    (await rows(guest, "#ws-project-list")).join(" ").includes("Remont łazienki"));
+  eq("the account card is shown instead of the project tool",
+    await guest.locator("[data-account-guest]").isVisible(), true);
   await guest.close();
 
   const member = await ctx.newPage();

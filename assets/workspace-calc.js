@@ -183,10 +183,10 @@ function wsWireCard(card) {
  *
  * The calculator pages do not load Firebase — it would be a network dependency on every
  * page that only exists to word one sentence — so /app/ leaves the level behind when the
- * auth state changes and assets/account.js reads it here. It decides copy and nothing
- * else: at worst (signed out in another tab, an expired token) the visitor is offered an
- * account they already have, or told about sync they already get. Saving does not consult
- * it, and must not — FIRESTORE_SYNC §1.2: counting never requires an account.
+ * auth state changes and assets/account.js reads it here. Owner decision 2026-09-26:
+ * counting still never requires an account, but saving to a project does, so this hint
+ * chooses between the account prompt and the project controls. Firebase remains the
+ * authority when /app/ actually signs the visitor in.
  */
 function wsHasAccount() {
   return typeof lmSignedIn === "function" ? lmSignedIn() : false;
@@ -289,15 +289,20 @@ function wsFillSaveRooms(box) {
 function wsRenderSave(card, result) {
   let box = card.querySelector("[data-ws-save-box]");
   if (!result) { if (box) box.remove(); return; }
+  if (box && box.dataset.wsAccount !== String(wsHasAccount())) {
+    box.remove();
+    box = null;
+  }
   if (!box) box = wsBuildSaveBox(card);
   // The click reads this rather than a captured argument: the box outlives the result it
   // was first drawn for, and saving the previous number would be worse than not saving.
   box.lmResult = result;
   // A new number makes the last confirmation stale — it was about a different result.
-  box.querySelector("[data-ws-saved]").hidden = true;
+  const saved = box.querySelector("[data-ws-saved]");
+  if (saved) saved.hidden = true;
   const lineName = box.querySelector("[data-ws-line-name]");
   if (lineName && !lineName.dataset.touched) lineName.value = card.dataset.matName ? wsResolvedLine(card).name : "";
-  wsFillSaveProjects(box);
+  if (wsHasAccount()) wsFillSaveProjects(box);
 }
 
 /** Resolve the saved material independently from the room that supplied dimensions. */
@@ -314,21 +319,28 @@ function wsBuildSaveBox(card) {
   const box = document.createElement("div");
   box.className = "ws-save";
   box.setAttribute("data-ws-save-box", "");
+  box.dataset.wsAccount = String(wsHasAccount());
   const slot = card.querySelector("[data-calc-actions]");
   if (slot) slot.appendChild(box);
   else card.querySelector("[data-result]").after(box);
 
-  // Chapter XII asks for "Zaloguj się lub załóż darmowe konto, aby zapisać wynik". The
-  // result is already saved by the button next to it, in this browser and without an
-  // account, so the sentence says what the account actually adds instead of pretending
-  // the button needs one.
-  // The link opens the sign-up form itself, not the sign-in form with a toggle to find,
-  // and remembers the page to come back to — chapter II wants registration to be the
-  // next step after a result rather than a detour away from it.
-  const account = wsHasAccount()
-    ? `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_in"))}</p>`
-    : `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_out"))}
-        <a href="${wsEsc(lmSignupUrl(location.pathname))}">${wsEsc(wsT("calc_save_link"))}</a></p>`;
+  // Chapter XII asks for "Zaloguj się lub załóż darmowe konto, aby zapisać wynik", and
+  // since the owner's decision of 2026-09-26 that is literally the rule: the result stays
+  // on screen for anybody, but filing it into a project needs a free account, so a
+  // visitor the hint calls a guest gets the two ways in instead of the save controls.
+  // The primary link opens the sign-up form itself, not the sign-in form with a toggle to
+  // find, and both remember the page to come back to — chapter II wants registration to
+  // be the next step after a result rather than a detour away from it.
+  if (!wsHasAccount()) {
+    const next = typeof lmSafeNext === "function" ? lmSafeNext(location.pathname) : location.pathname;
+    const signin = "/app/" + (next ? "?next=" + encodeURIComponent(next) : "");
+    box.innerHTML = `<p class="muted ws-save-account">${wsEsc(wsT("calc_save_out"))}</p>
+      <p class="ws-links">
+        <a class="btn btn-primary btn-sm" href="${wsEsc(lmSignupUrl(next))}">${wsEsc(wsT("calc_save_link"))}</a>
+        <a href="${wsEsc(signin)}">${wsEsc(wsT("app_signin"))}</a>
+      </p>`;
+    return box;
+  }
 
   box.innerHTML = `
     <div class="ws-save-new ws-line-name">
@@ -348,7 +360,7 @@ function wsBuildSaveBox(card) {
         data-ws-new-name placeholder="${wsEsc(wsT("ws_default_project"))}">
     </div>
     <p class="ws-saved" data-ws-saved role="status" hidden></p>
-    ${account}`;
+    <p class="muted ws-save-account">${wsEsc(wsT("calc_save_in"))}</p>`;
 
   const sel = box.querySelector("[data-ws-project]");
   sel.addEventListener("change", () => {
@@ -373,6 +385,15 @@ function wsBuildSaveBox(card) {
   box.querySelector("[data-ws-save]").addEventListener("click", () => wsSaveResult(card, box));
   return box;
 }
+
+// Owner decision, 2026-09-26: counting stays public, but saving into a project requires
+// an account. Rebuild a visible result's action box whenever the session hint changes.
+if (typeof document !== "undefined") document.addEventListener("lm-session", () => {
+  document.querySelectorAll(".calc").forEach((card) => {
+    const box = card.querySelector("[data-ws-save-box]");
+    if (box && box.lmResult) wsRenderSave(card, box.lmResult);
+  });
+});
 
 /** Put the result on screen into the project the picker names. */
 function wsSaveResult(card, box) {

@@ -131,10 +131,10 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   const other = await x.ctx.newPage();
   await other.goto(base + "/kosztorys/", { waitUntil: "domcontentloaded" });
   await other.evaluate(() => localStorage.removeItem("liczmat-signed-in"));
-  await x.page.fill("#ws-project-name", "Po wylogowaniu"); await x.page.click("#ws-project-form button[type=submit]");
   await x.page.waitForTimeout(2500);
   const names = await x.page.evaluate(() => [...window.__fbDocs.values()].map((v) => v.name));
-  check("the edit is on this page", (await x.page.textContent("body")).includes("Po wylogowaniu"));
+  check("another-tab sign-out hides the account tool", await x.page.locator("[data-account-tool]").isHidden());
+  check("and shows the account card", await x.page.locator("[data-account-guest]").isVisible());
   check("a page stops pushing once another tab signs out", !names.includes("Po wylogowaniu"), names.join(", "));
   await x.ctx.close();
 }

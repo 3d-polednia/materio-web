@@ -1957,6 +1957,10 @@ a.chip:hover { text-decoration: none; }
    (assets/account.js), the rail takes its column. */
 .account-page-shell { display: block; min-height: 0; }
 .account-page-main { min-width: 0; }
+html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) [data-account-tool] { display: none; }
+html.js[data-lm-level="liczmat"] [data-account-guest],
+html.js[data-lm-level="pro"] [data-account-guest] { display: none; }
+.account-guest-card .card { padding: var(--sp-7); }
 /* The site header right above already carries the logo, and the plan pill is filled only
    by /app/'s own script — on these pages the brand row would be a second logo and an
    empty oval. */
@@ -2283,7 +2287,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 /* Chapter XII's line about the account. It sits under the action it explains, quiet
    enough not to compete with the answer above it. */
 .ws-save-account { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); line-height: var(--lh-snug); }
-.ws-links { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-7); }
+.ws-links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-top: var(--sp-7); }
 
 /* The estimate is the one thing on the site meant to leave the screen on paper, so it
    is laid out as a document rather than as a page section. */

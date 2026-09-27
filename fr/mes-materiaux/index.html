@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Mes matériaux — LiczMat</title>
-<meta name="description" content="Tes propres matériaux de construction avec un prix et un historique. Saisis une fois les dimensions et le rendement, puis calcule avec. Sans compte.">
+<meta name="description" content="Tes matériaux et l'historique des prix dans ton compte LiczMat.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="nl_NL">
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:title" content="Mes matériaux — LiczMat">
-<meta property="og:description" content="Tes propres matériaux de construction avec un prix et un historique. Saisis une fois les dimensions et le rendement, puis calcule avec. Sans compte.">
+<meta property="og:description" content="Tes matériaux et l'historique des prix dans ton compte LiczMat.">
 <meta property="og:url" content="https://liczmat.com/fr/mes-materiaux/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Mes matériaux — LiczMat">
-<meta name="twitter:description" content="Tes propres matériaux de construction avec un prix et un historique. Saisis une fois les dimensions et le rendement, puis calcule avec. Sans compte.">
+<meta name="twitter:description" content="Tes matériaux et l'historique des prix dans ton compte LiczMat.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -214,7 +214,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/fr/">Accueil</a></li><li><a href="/fr/materiaux/">Matériaux</a></li><li aria-current="page">Mes matériaux</li></ol></nav>
+      <h1>Mes matériaux</h1>
+      <p class="lead">Enregistre un matériau que le catalogue n'a pas, au prix que pratique ton fournisseur. Chaque prix suivant reste dans l'historique.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Tu as besoin d'un compte gratuit pour utiliser cette page.</p>
+      <p class="muted" data-account-local hidden>Après ta connexion, nous te demanderons si tu veux rattacher à ton compte les données enregistrées auparavant dans ce navigateur.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Ffr%2Fmes-materiaux%2F" rel="nofollow">Crée un compte gratuit</a>
+        <a href="/app/?next=%2Ffr%2Fmes-materiaux%2F" rel="nofollow">Se connecter</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Sections du compte">
@@ -258,13 +272,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/fr/">Accueil</a></li><li><a href="/fr/materiaux/">Matériaux</a></li><li aria-current="page">Mes matériaux</li></ol></nav>
-      <h1>Mes matériaux</h1>
-      <p class="lead">Enregistre un matériau que le catalogue n'a pas, au prix que pratique ton fournisseur. Chaque prix suivant reste dans l'historique.</p>
-    </div>
-  </section>
 
   <section class="block alt">
     <div class="wrap narrow">
@@ -366,7 +373,7 @@
       <p class="muted" data-omat-empty>Tu n'as pas encore de matériaux à toi.</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">Un matériau de cette liste se choisit dans un calculateur comme une entrée du catalogue.</p>
-      <p class="muted">Les matériaux restent dans ce navigateur. Une fois connecté, ils font partie du compte et l'application les voit aussi.</p>
+      <p class="muted">Les matériaux font partie du compte et se synchronisent après ta connexion.</p>
     </div>
   </section>
 

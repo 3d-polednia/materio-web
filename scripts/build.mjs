@@ -1466,6 +1466,7 @@ function buildWorkspacePages() {
       bodyClass: "tool-page",
       path: urlProjects(lang),
       alternates: projAlt,
+      noindex: true,
       main: projects.main, jsonld: [projects.ld],
       // A saved line names the calculator it came from (session 16, chapter XV) and links
       // back to it. The script draws that line and has no site map, so the build hands it
@@ -1496,6 +1497,7 @@ function buildWorkspacePages() {
       description: t("estpage_meta"),
       path: urlEstimate(lang),
       alternates: estAlt,
+      noindex: true,
       main: estimate.main, jsonld: estimate.ld,
       scripts: WS_SCRIPTS,
       modules: ["/assets/account-sync-page.js"],
@@ -1522,6 +1524,7 @@ function buildClientsPages() {
       bodyClass: "tool-page",
       path: urlClients(lang),
       alternates: alt,
+      noindex: true,
       main, jsonld: [ld],
       // Every address the CRM links to, in this page's language. src/site.mjs is the
       // only place a slug is decided; the script has no site map, so the build hands it
@@ -1598,6 +1601,7 @@ function buildQuotesPages() {
       bodyClass: "tool-page",
       path: urlQuotes(lang),
       alternates: alt,
+      noindex: true,
       main, jsonld: [ld],
       // Every address the CRM links to, in this page's language. src/site.mjs is the
       // only place a slug is decided; the script has no site map, so the build hands it
@@ -1634,6 +1638,7 @@ function buildCalendarPages() {
       bodyClass: "tool-page",
       path: urlCalendar(lang),
       alternates: alt,
+      noindex: true,
       main, jsonld: [ld],
       // Every address the CRM links to, in this page's language. src/site.mjs is the
       // only place a slug is decided; the script has no site map, so the build hands it
@@ -1755,6 +1760,7 @@ function buildOwnMaterialsPage() {
       description: OMAT_COPY[lang].omatpage_meta,
       path: urlOwnMaterials(lang),
       alternates: alt,
+      noindex: true,
       main, jsonld: [ld],
       // The store and the screen, in that order — plain scripts, one global scope. No
       // engine and no catalogue: the page writes numbers down and calculates nothing.

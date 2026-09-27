@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Проєкти та приміщення — LiczMat</title>
-<meta name="description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі. Без реєстрації.">
+<meta name="description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Проєкти та приміщення — LiczMat">
-<meta property="og:description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі. Без реєстрації.">
+<meta property="og:description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі.">
 <meta property="og:url" content="https://liczmat.com/uk/proekty/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Проєкти та приміщення — LiczMat">
-<meta name="twitter:description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі. Без реєстрації.">
+<meta name="twitter:description" content="Проєкти та приміщення в LiczMat: збережи розміри кімнати один раз, і калькулятори підставлять площу підлоги, стін або стелі.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li aria-current="page">Проєкти та приміщення</li></ol></nav>
+      <h1 id="ws-title">Проєкти та приміщення</h1>
+      <p class="lead" id="ws-lead">Зберігай кімнати з розмірами й збирай результати калькуляторів у проєктах. Проєкти є частиною твого акаунта, тож ти бачиш їх і на телефоні.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Для цієї сторінки потрібен безкоштовний акаунт.</p>
+      <p class="muted" data-account-local hidden>Після входу ми запитаємо, чи додати до твого акаунта дані, раніше збережені в цьому браузері.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fuk%2Fproekty%2F" rel="nofollow">Створити безкоштовний акаунт</a>
+        <a href="/app/?next=%2Fuk%2Fproekty%2F" rel="nofollow">Увійти</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Розділи акаунта">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li aria-current="page">Проєкти та приміщення</li></ol></nav>
-      <h1 id="ws-title">Проєкти та приміщення</h1>
-      <p class="lead" id="ws-lead">Збережи приміщення з розмірами й збирай результати в проєкти. Усе залишається в цьому браузері; акаунт потрібен лише для перенесення на телефон.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>Такого проєкту немає</h2>
-          <p class="muted">Ця адреса вказує на проєкт, якого немає в цьому браузері. Його могли видалити або він виник на іншому пристрої.</p>
+          <p class="muted">Цього проєкту немає у твоєму акаунті. Його могли видалити або він ще не синхронізувався.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/uk/kalkulyatory/">Усі калькулятори</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Мій акаунт</a>
       </p>
-      <p class="muted src-note">Дані збережені в цьому браузері. Очищення даних сайту видаляє їх. Увійди в «Мій акаунт», щоб мати їх і на телефоні.</p>
+      <p class="muted src-note">Проєкти зберігаються у твоєму акаунті й самі синхронізуються із застосунком на телефоні.</p>
     </div>
   </section>
 

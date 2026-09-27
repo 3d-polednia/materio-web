@@ -64,7 +64,7 @@
 <title>Preventivi — LiczMat</title>
 <meta name="description" content="Preventivi in LiczMat Pro: materiale e altri costi dal progetto, manodopera come quantità per tariffa, un margine e il totale. Sull'account.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -220,7 +220,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/it/">Home</a></li><li><a href="/it/progetti/">Progetti e stanze</a></li><li aria-current="page">Preventivi</li></ol></nav>
+      <h1 id="quo-title">Preventivi</h1>
+      <p class="lead" id="quo-lead">Un preventivo LiczMat Pro: materiale e altri costi dal progetto, manodopera scritta a mano, il margine e il totale.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Per usare questa pagina ti serve un account gratuito.</p>
+      <p class="muted" data-account-local hidden>Dopo l'accesso ti chiederemo se vuoi collegare al tuo account i dati salvati in precedenza in questo browser.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fit%2Fpreventivi-pro%2F" rel="nofollow">Crea un account gratuito</a>
+        <a href="/app/?next=%2Fit%2Fpreventivi-pro%2F" rel="nofollow">Accedi</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Sezioni dell'account">
@@ -264,13 +278,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/it/">Home</a></li><li><a href="/it/progetti/">Progetti e stanze</a></li><li aria-current="page">Preventivi</li></ol></nav>
-      <h1 id="quo-title">Preventivi</h1>
-      <p class="lead" id="quo-lead">Un preventivo LiczMat Pro: materiale e altri costi dal progetto, manodopera scritta a mano, il margine e il totale.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="quo-page">
     <div class="wrap narrow">
@@ -564,7 +571,7 @@
       <p class="ws-links">
         <a class="btn btn-ghost btn-go" href="/it/progetti/">Progetti e stanze</a>
       </p>
-      <p class="muted src-note">I preventivi vengono salvati in questo browser e aggiunti all'account alla successiva apertura di “Il mio account”.</p>
+      <p class="muted src-note">I preventivi fanno parte dell'account LiczMat e si sincronizzano da soli mentre lavori sul sito.</p>
     </div>
   </section>
 

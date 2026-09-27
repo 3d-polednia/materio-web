@@ -132,7 +132,8 @@ async function open(ctx, url, opts = {}) {
   });
   page.on("pageerror", (e) => errors.push(String(e)));
 
-  const plant = { "materio-lang": opts.lang === undefined ? "pl" : opts.lang, ...(opts.storage || {}) };
+  const plant = { "materio-lang": opts.lang === undefined ? "pl" : opts.lang,
+    "liczmat-signed-in": "liczmat", ...(opts.storage || {}) };
   await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
   await page.evaluate((entries) => {
     localStorage.clear();

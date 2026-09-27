@@ -70,8 +70,31 @@ export function accountPageMain(main, t, lang, current) {
   const open = main.indexOf(">");
   const close = main.lastIndexOf("</main>");
   if (!main.startsWith("<main") || open < 0 || close < 0) throw new Error("Account page needs one outer <main>");
-  return `${main.slice(0, open + 1)}<div class="app-shell account-page-shell">
+  // The page head (breadcrumbs, the one <h1>, the lead) stays outside the gated part, so a
+  // guest and a signed-in visitor read the same title and the document keeps one <h1>. It
+  // sits above the rail, the way "Moje konto" sits above it on /app/.
+  const body = main.slice(open + 1, close);
+  const headAt = body.search(/<section class="block page-head[^"]*">/);
+  const headEnd = headAt < 0 ? -1 : body.indexOf("</section>", headAt);
+  if (headAt < 0 || headEnd < 0) throw new Error(`Account page "${current}" needs a page head`);
+  const head = body.slice(0, headEnd + "</section>".length);
+  const tool = body.slice(headEnd + "</section>".length);
+  const next = {
+    projects: urlProjects, estimate: urlEstimate, clients: urlClients, quotes: urlQuotes,
+    schedule: urlCalendar, materials: urlOwnMaterials,
+  }[current](lang);
+  const signup = `${URL_APP}?mode=signup&amp;next=${encodeURIComponent(next)}`;
+  const signin = `${URL_APP}?next=${encodeURIComponent(next)}`;
+  const guest = `<section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>${esc(t("account_gate_d"))}</p>
+      <p class="muted" data-account-local hidden>${esc(t("account_gate_local"))}</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="${signup}" rel="nofollow">${esc(t("app_signup_t"))}</a>
+        <a href="${signin}" rel="nofollow">${esc(t("app_signin"))}</a></p>
+    </div></div>
+  </section>`;
+  return `${main.slice(0, open + 1)}${head}${guest}<div class="app-shell account-page-shell" data-account-tool>
     ${accountSidebar(t, { lang, current })}
-    <div class="app-main account-page-main">${main.slice(open + 1, close)}</div>
+    <div class="app-main account-page-main">${tool}</div>
   </div></main>`;
 }

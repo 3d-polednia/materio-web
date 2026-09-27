@@ -219,6 +219,7 @@ async function open(ctx, url, opts = {}) {
   if (opts.crm) plant["liczmat-crm-v1"] = JSON.stringify(crm());
   if (opts.active) plant["materio-active-project"] = opts.active;
   if (opts.level) plant["liczmat-signed-in"] = opts.level;
+  else if (opts.workspace && !opts.guest) plant["liczmat-signed-in"] = "liczmat";
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
 
   await page.goto(`${base}/404.html`, { waitUntil: "domcontentloaded" });
@@ -412,7 +413,7 @@ head("3. the modules a phone actually works in");
       ["the quotes", urlQuotes("pl"), pro],
       ["one quote", `${urlQuotes("pl")}?id=q1`, pro],
       ["the terminarz", urlCalendar("pl"), pro],
-      ["the wall a guest meets", urlClients("pl"), { workspace: true, crm: true }],
+      ["the account card a guest meets", urlClients("pl"), { workspace: true, crm: true, guest: true }],
     ];
     for (const [what, url, opts] of screens) {
       const page = await open(ctx, url, opts);

@@ -64,7 +64,7 @@
 <title>Termine — LiczMat</title>
 <meta name="description" content="Projektstermine in LiczMat Pro: von überfällig bis später gruppiert, neben jedem Projekt Kunde, Status und Wert. Mit dem Konto synchronisiert.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -218,7 +218,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li><a href="/de/projekte/">Projekte und Räume</a></li><li aria-current="page">Termine</li></ol></nav>
+      <h1>Termine</h1>
+      <p class="lead">Die Termine der Projekte in LiczMat Pro: was überfällig ist, was heute ansteht, was in dieser Woche kommt und was noch kein Datum hat.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Für diese Seite brauchst du ein kostenloses Konto.</p>
+      <p class="muted" data-account-local hidden>Nach der Anmeldung fragen wir dich, ob früher in diesem Browser gespeicherte Daten deinem Konto hinzugefügt werden sollen.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fde%2Ftermine%2F" rel="nofollow">Kostenloses Konto anlegen</a>
+        <a href="/app/?next=%2Fde%2Ftermine%2F" rel="nofollow">Anmelden</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Bereiche des Kontos">
@@ -262,13 +276,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/de/">Start</a></li><li><a href="/de/projekte/">Projekte und Räume</a></li><li aria-current="page">Termine</li></ol></nav>
-      <h1>Termine</h1>
-      <p class="lead">Die Termine der Projekte in LiczMat Pro: was überfällig ist, was heute ansteht, was in dieser Woche kommt und was noch kein Datum hat.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="cal-page">
     <div class="wrap narrow">

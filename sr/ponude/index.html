@@ -64,7 +64,7 @@
 <title>Ponude — LiczMat</title>
 <meta name="description" content="Ponude u LiczMat Pro: materijal i dodatni troškovi učitani iz projekta, rad kao količina puta cena, procentualna marža i zbir. Sinhronizuje se s nalogom.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -220,7 +220,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li><a href="/sr/projekti/">Projekti i prostorije</a></li><li aria-current="page">Ponude</li></ol></nav>
+      <h1 id="quo-title">Ponude</h1>
+      <p class="lead" id="quo-lead">Ponuda LiczMat Pro: materijal i dodatni troškovi iz projekta, rad upisan ručno, marža i zbir.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Za ovu stranicu treba ti besplatan nalog.</p>
+      <p class="muted" data-account-local hidden>Posle prijave pitaćemo te da li želiš da podatke ranije sačuvane u ovom pregledaču povežeš sa svojim nalogom.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fsr%2Fponude%2F" rel="nofollow">Otvori besplatan nalog</a>
+        <a href="/app/?next=%2Fsr%2Fponude%2F" rel="nofollow">Prijava</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Odeljci naloga">
@@ -264,13 +278,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li><a href="/sr/projekti/">Projekti i prostorije</a></li><li aria-current="page">Ponude</li></ol></nav>
-      <h1 id="quo-title">Ponude</h1>
-      <p class="lead" id="quo-lead">Ponuda LiczMat Pro: materijal i dodatni troškovi iz projekta, rad upisan ručno, marža i zbir.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="quo-page">
     <div class="wrap narrow">
@@ -564,7 +571,7 @@
       <p class="ws-links">
         <a class="btn btn-ghost btn-go" href="/sr/projekti/">Projekti i prostorije</a>
       </p>
-      <p class="muted src-note">Ponude se čuvaju u ovom pregledaču i prenose na nalog pri sledećem otvaranju stranice „Moj nalog“.</p>
+      <p class="muted src-note">Ponude su deo LiczMat naloga i sinhronizuju se same dok radiš na sajtu.</p>
     </div>
   </section>
 

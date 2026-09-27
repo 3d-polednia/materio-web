@@ -438,19 +438,15 @@ head("4. a project is filed under a client, and taken off again");
 
 head("5. chapter XXV's paywall: the wall, the two rungs and the one door through it");
 {
-  /* The wall, with nothing planted: a guest gets the paywall instead of the tool. */
+  /* A guest first needs an account; the Pro wall belongs to a signed-in free account. */
   const guest = await open(ctx, CLIENTS, { workspace: workspace(), clients: clients(), pro: false });
-  eq("the module is replaced by the wall", await guest.$eval("#crm-tool", (n) => n.hidden), true);
-  eq("and the wall is on screen", await guest.$eval("#crm-gate", (n) => n.hidden), false);
-  eq("the strip above it is gone — the wall says all of it",
-    await guest.$eval("#crm-pro", (n) => n.hidden), true);
-  // Chapter XXV's Free → Pro path, one rung: a guest has no account for a plan to sit on.
-  eq("a guest is sent to make an account",
-    await guest.$eval('#crm-gate [data-pw-step="account"]', (n) => n.hidden), false);
-  eq("and is not offered an upgrade they cannot put anywhere",
-    await guest.$eval('#crm-gate [data-pw-step="upgrade"]', (n) => n.hidden), true);
+  eq("the account card is on screen", await guest.locator("[data-account-guest]").isVisible(), true);
+  eq("the Pro tool and its wall are both inside the hidden account area",
+    await guest.locator("[data-account-tool]").isHidden(), true);
+  eq("old local data adds the attachment sentence",
+    await guest.locator("[data-account-local]").isVisible(), true);
   check("the sign-up link comes back to this page",
-    await guest.$eval('#crm-gate [data-pw-step="account"] a', (n) => n.getAttribute("href"))
+    await guest.getAttribute("[data-account-guest] .btn-primary", "href")
       === `/app/?mode=signup&next=${encodeURIComponent(CLIENTS)}`);
   await guest.close();
 

@@ -135,6 +135,7 @@ async function open(ctx, url, opts = {}) {
   page.on("pageerror", (e) => errors.push(String(e)));
 
   if (opts.plant) {
+    if (!opts.guest) opts.plant["liczmat-signed-in"] = "liczmat";
     await page.goto(base + "/404.html", { waitUntil: "domcontentloaded" });
     await page.evaluate((entries) => {
       localStorage.clear();
@@ -159,6 +160,25 @@ const snapshotOf = (row) => {
 };
 const text = (page, sel) => page.$eval(sel, (n) => n.innerText.trim());
 const shown = (page, sel) => page.$eval(sel, (n) => !n.hidden && n.offsetParent !== null);
+
+head("0. a guest gets account links, and the session hint swaps the box");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await open(ctx, TILES, { plant: { "materio-lang": "pl" }, guest: true });
+  eq("there is no save button for a guest", await page.locator("[data-ws-save]").count(), 0);
+  eq("there is no project picker for a guest", await page.locator("[data-ws-project]").count(), 0);
+  eq("the primary link opens sign-up with this calculator as next",
+    await page.getAttribute("[data-ws-save-box] .btn-primary", "href"),
+    `/app/?mode=signup&next=${encodeURIComponent(TILES)}`);
+  eq("the plain link opens sign-in with the same next",
+    await page.getAttribute("[data-ws-save-box] a:not(.btn-primary)", "href"),
+    `/app/?next=${encodeURIComponent(TILES)}`);
+  await page.evaluate(() => lmWriteLevel("liczmat"));
+  await page.waitForSelector("[data-ws-save]");
+  eq("lm-session replaces the prompt with the save button", await shown(page, "[data-ws-save]"), true);
+  await page.close();
+  await ctx.close();
+}
 
 /* ------------------------------------------------------------------ 1. one click */
 

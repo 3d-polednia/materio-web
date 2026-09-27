@@ -960,10 +960,10 @@ head("13. the session, as the other pages see it");
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
 
   const guest = await openApp(ctx, "/kalkulatory/plytki-panele-gres/");
-  check("a calculator page offers an account under the result",
-    (await guest.locator(".ws-save-account a").count()) === 1);
+  check("a calculator page offers sign-up and sign-in under the result",
+    (await guest.locator("[data-ws-save-box] a").count()) === 2);
   eq("and the link opens the sign-up form, with the way back",
-    await guest.locator(".ws-save-account a").getAttribute("href"),
+    await guest.locator("[data-ws-save-box] .btn-primary").getAttribute("href"),
     "/app/?mode=signup&next=%2Fkalkulatory%2Fplytki-panele-gres%2F");
   check("the header's account button carries no mark",
     (await guest.locator(".nav-cta[data-level]").count()) === 0);

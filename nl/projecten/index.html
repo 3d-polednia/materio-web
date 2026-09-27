@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projecten en ruimtes — LiczMat</title>
-<meta name="description" content="Projecten en ruimtes in LiczMat: sla de maten één keer op en de rekenmachines vullen het oppervlak van vloer, wand of plafond in. Zonder account.">
+<meta name="description" content="Projecten en ruimtes in LiczMat: sla de maten één keer op en de rekenmachines vullen het oppervlak van vloer, wand of plafond in.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Projecten en ruimtes — LiczMat">
-<meta property="og:description" content="Projecten en ruimtes in LiczMat: sla de maten één keer op en de rekenmachines vullen het oppervlak van vloer, wand of plafond in. Zonder account.">
+<meta property="og:description" content="Projecten en ruimtes in LiczMat: sla de maten één keer op en de rekenmachines vullen het oppervlak van vloer, wand of plafond in.">
 <meta property="og:url" content="https://liczmat.com/nl/projecten/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Projecten en ruimtes — LiczMat">
-<meta name="twitter:description" content="Projecten en ruimtes in LiczMat: sla de maten één keer op en de rekenmachines vullen het oppervlak van vloer, wand of plafond in. Zonder account.">
+<meta name="twitter:description" content="Projecten en ruimtes in LiczMat: sla de maten één keer op en de rekenmachines vullen het oppervlak van vloer, wand of plafond in.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/nl/">Start</a></li><li aria-current="page">Projecten en ruimtes</li></ol></nav>
+      <h1 id="ws-title">Projecten en ruimtes</h1>
+      <p class="lead" id="ws-lead">Sla ruimtes op met hun afmetingen en verzamel calculatorresultaten in projecten. Projecten horen bij je account, dus je ziet ze ook op je telefoon.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Voor deze pagina heb je een gratis account nodig.</p>
+      <p class="muted" data-account-local hidden>Na het inloggen vragen we of je eerder in deze browser opgeslagen gegevens aan je account wilt koppelen.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fnl%2Fprojecten%2F" rel="nofollow">Maak een gratis account</a>
+        <a href="/app/?next=%2Fnl%2Fprojecten%2F" rel="nofollow">Inloggen</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Onderdelen van het account">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/nl/">Start</a></li><li aria-current="page">Projecten en ruimtes</li></ol></nav>
-      <h1 id="ws-title">Projecten en ruimtes</h1>
-      <p class="lead" id="ws-lead">Bewaar ruimtes met hun maten en verzamel resultaten in projecten. Alles blijft in deze browser; een account is alleen nodig om het naar de telefoon te dragen.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>Geen zo'n project</h2>
-          <p class="muted">Dit adres wijst naar een project dat deze browser niet heeft. Het is misschien verwijderd, of het is op een ander apparaat gemaakt.</p>
+          <p class="muted">Dit project staat niet in je account. Het is mogelijk verwijderd of nog niet gesynchroniseerd.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/nl/rekenmachines/">Alle rekenmachines</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Mijn account</a>
       </p>
-      <p class="muted src-note">De gegevens zijn opgeslagen in deze browser. Het wissen van sitegegevens verwijdert ze. Log in bij ‘Mijn account’ om ze ook op je telefoon te hebben.</p>
+      <p class="muted src-note">Projecten worden op je account opgeslagen en synchroniseren vanzelf met de app op je telefoon.</p>
     </div>
   </section>
 

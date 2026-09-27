@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projekty i pomieszczenia — LiczMat</title>
-<meta name="description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu. Bez rejestracji.">
+<meta name="description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Projekty i pomieszczenia — LiczMat">
-<meta property="og:description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu. Bez rejestracji.">
+<meta property="og:description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu.">
 <meta property="og:url" content="https://liczmat.com/projekty/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Projekty i pomieszczenia — LiczMat">
-<meta name="twitter:description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu. Bez rejestracji.">
+<meta name="twitter:description" content="Projekty i pomieszczenia w LiczMat: zapisz wymiary pokoju raz, a kalkulatory podstawią powierzchnię podłogi, ścian albo sufitu.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Start</a></li><li aria-current="page">Projekty i pomieszczenia</li></ol></nav>
+      <h1 id="ws-title">Projekty i pomieszczenia</h1>
+      <p class="lead" id="ws-lead">Zapisz pomieszczenia z wymiarami i zbieraj wyniki kalkulatorów w projektach. Projekty są częścią Twojego konta, więc widzisz je też na telefonie.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Ta strona wymaga darmowego konta.</p>
+      <p class="muted" data-account-local hidden>Po zalogowaniu zapytamy, czy dołączyć dane zapisane wcześniej w tej przeglądarce do twojego konta.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fprojekty%2F" rel="nofollow">Załóż darmowe konto</a>
+        <a href="/app/?next=%2Fprojekty%2F" rel="nofollow">Zaloguj się</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Sekcje konta">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/">Start</a></li><li aria-current="page">Projekty i pomieszczenia</li></ol></nav>
-      <h1 id="ws-title">Projekty i pomieszczenia</h1>
-      <p class="lead" id="ws-lead">Zapisz pomieszczenia z wymiarami i zbieraj wyniki w projektach. Wszystko zostaje w tej przeglądarce; konto jest potrzebne dopiero, żeby przenieść to na telefon.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>Nie ma takiego projektu</h2>
-          <p class="muted">Ten adres wskazuje projekt, którego nie ma w tej przeglądarce. Mógł zostać usunięty albo powstał na innym urządzeniu.</p>
+          <p class="muted">Tego projektu nie ma na twoim koncie. Mógł zostać usunięty albo jeszcze się nie zsynchronizować.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/kalkulatory/">Wszystkie kalkulatory</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Moje konto</a>
       </p>
-      <p class="muted src-note">Dane są zapisane w tej przeglądarce. Wyczyszczenie danych witryny je usuwa. Zaloguj się w „Moje konto”, żeby mieć je też w telefonie.</p>
+      <p class="muted src-note">Projekty zapisują się na Twoim koncie i same synchronizują się z aplikacją na telefonie.</p>
     </div>
   </section>
 

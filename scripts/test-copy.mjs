@@ -465,7 +465,7 @@ head("§7 how much prose a page carries");
 const BUDGET = {
   home: 377, calculators: 416, calculator: 431, converter: 285, guides: 307, guide: 232,
   // 2026-09-26: the authenticated account rail adds navigation labels; French is 242.
-  "own-materials": 245,
+  "own-materials": 300,
   /* Session H raised projects from 850 to 860, and the six words are not new copy: the
      850 above was measured off the page builders in a repository where PL_ONLY was on and
      the twelve other languages were unwritten, so the French number in it is an estimate
@@ -488,15 +488,15 @@ const BUDGET = {
      figures the job page carried — what was agreed and what is left of it. /fr/projets/
      measures 948 against Polish at 770; 952 leaves a four-word margin. Field names,
      headings and two figure labels — the section still forbids a paragraph. */
-  materials: 2820, stores: 159, android: 519, projects: 952, estimate: 425,
+  materials: 2820, stores: 159, android: 519, projects: 980, estimate: 460,
   /* The widest /wyceny/ translation is Spanish at 638 words after the three add forms
      received visible labels; 640 leaves a two-word regression margin. */
-  clients: 524, jobs: 544, quotes: 640, calendar: 420,
+  clients: 550, jobs: 544, quotes: 670, calendar: 450,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
      printed the key name localStorage, which is three words in French; widest is French at 650.
      2026-09-26: two more rows, the per-account sync clocks the account pages keep
      (assets/account-sync.js); widest is French at 726. */
-  cookies: 730,
+  cookies: 740,
   /* Session 62, audit item H7, and 220 rather than the 180 it was measured at the same
      day: the owner's Gewerbe is registered in Germany, so the page went from a name and
      an address to the set §5 DDG asks for — postal address, telephone, USt-IdNr., the

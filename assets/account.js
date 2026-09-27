@@ -61,10 +61,10 @@ function lmLevelOf(user, profile, now) {
  * What this browser was last told about the session, for the pages that do not load
  * Firebase — that is 128 of the 130.
  *
- * **A hint, never a gate.** It can be stale: signed out in another tab, an expired
- * token, a second browser profile. Nothing may gate saving, counting or reading on it
- * (FIRESTORE_SYNC §1.2 — counting never requires an account); it decides wording, and
- * the mark in the header. Firebase itself is the only authority, and only /app/ asks it.
+ * **A hint, not authorization.** It can be stale: signed out in another tab, an expired
+ * token, a second browser profile. Owner decision 2026-09-26: it switches account-only
+ * tools and project-saving controls, while counting and public reading remain open.
+ * Firebase is still the authority, and only /app/ asks it.
  */
 function lmReadLevel() {
   var raw;
@@ -197,8 +197,27 @@ function lmMarkHeader() {
   }
 }
 
+/** Show the hand-off note when this browser contains work made before sign-in. */
+function lmMarkAccountLocalData() {
+  if (typeof document === "undefined") return;
+  var has = false;
+  ["materio-workspace-v1", "liczmat-crm-v1", "liczmat-materials-v1"].forEach(function (key) {
+    if (has) return;
+    try {
+      var value = JSON.parse(localStorage.getItem(key) || "null") || {};
+      has = Object.keys(value).some(function (name) {
+        return Array.isArray(value[name]) && value[name].length > 0;
+      });
+    } catch (e) {}
+  });
+  document.querySelectorAll("[data-account-local]").forEach(function (node) {
+    node.hidden = !has;
+  });
+}
+
 if (typeof document !== "undefined") {
   document.addEventListener("DOMContentLoaded", lmMarkHeader);
+  document.addEventListener("DOMContentLoaded", lmMarkAccountLocalData);
   document.addEventListener("lm-session", lmMarkHeader);
   // The head script already stamped the level from this key. Re-stamping on load catches
   // the one case it cannot: a page cached before the visitor signed in on another tab.
@@ -206,4 +225,13 @@ if (typeof document !== "undefined") {
   // The header's title comes out of the dictionary, so it has to be redrawn when /app/
   // switches language in place.
   document.addEventListener("langchange", lmMarkHeader);
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") window.addEventListener("storage", function (event) {
+    if (event.key === LM_SESSION_KEY) {
+      lmMarkLevel();
+      document.dispatchEvent(new CustomEvent("lm-session", { detail: { level: lmReadLevel() } }));
+    }
+    if (["materio-workspace-v1", "liczmat-crm-v1", "liczmat-materials-v1"].indexOf(event.key) >= 0) {
+      lmMarkAccountLocalData();
+    }
+  });
 }

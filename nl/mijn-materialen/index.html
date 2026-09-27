@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Mijn materialen — LiczMat</title>
-<meta name="description" content="Je eigen bouwmaterialen met een prijs en een wijzigingsgeschiedenis. Vul de maten en het rendement één keer in en reken er daarna mee. Zonder account.">
+<meta name="description" content="Je eigen materialen en prijsgeschiedenis in je LiczMat-account.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Mijn materialen — LiczMat">
-<meta property="og:description" content="Je eigen bouwmaterialen met een prijs en een wijzigingsgeschiedenis. Vul de maten en het rendement één keer in en reken er daarna mee. Zonder account.">
+<meta property="og:description" content="Je eigen materialen en prijsgeschiedenis in je LiczMat-account.">
 <meta property="og:url" content="https://liczmat.com/nl/mijn-materialen/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Mijn materialen — LiczMat">
-<meta name="twitter:description" content="Je eigen bouwmaterialen met een prijs en een wijzigingsgeschiedenis. Vul de maten en het rendement één keer in en reken er daarna mee. Zonder account.">
+<meta name="twitter:description" content="Je eigen materialen en prijsgeschiedenis in je LiczMat-account.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -214,7 +214,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/nl/">Start</a></li><li><a href="/nl/materialen/">Materialen</a></li><li aria-current="page">Mijn materialen</li></ol></nav>
+      <h1>Mijn materialen</h1>
+      <p class="lead">Bewaar een materiaal dat de catalogus niet heeft, met de prijs die jouw leverancier rekent. Elke latere prijs blijft in de geschiedenis staan.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Voor deze pagina heb je een gratis account nodig.</p>
+      <p class="muted" data-account-local hidden>Na het inloggen vragen we of je eerder in deze browser opgeslagen gegevens aan je account wilt koppelen.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fnl%2Fmijn-materialen%2F" rel="nofollow">Maak een gratis account</a>
+        <a href="/app/?next=%2Fnl%2Fmijn-materialen%2F" rel="nofollow">Inloggen</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Onderdelen van het account">
@@ -258,13 +272,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/nl/">Start</a></li><li><a href="/nl/materialen/">Materialen</a></li><li aria-current="page">Mijn materialen</li></ol></nav>
-      <h1>Mijn materialen</h1>
-      <p class="lead">Bewaar een materiaal dat de catalogus niet heeft, met de prijs die jouw leverancier rekent. Elke latere prijs blijft in de geschiedenis staan.</p>
-    </div>
-  </section>
 
   <section class="block alt">
     <div class="wrap narrow">
@@ -366,7 +373,7 @@
       <p class="muted" data-omat-empty>Je hebt nog geen eigen materialen.</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">Een materiaal uit deze lijst kies je in een rekenmachine net als een regel uit de catalogus.</p>
-      <p class="muted">Materialen blijven in deze browser. Zodra je inlogt horen ze bij het account en ziet de app ze ook.</p>
+      <p class="muted">Materialen horen bij je account en synchroniseren nadat je inlogt.</p>
     </div>
   </section>
 

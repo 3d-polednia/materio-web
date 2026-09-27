@@ -622,8 +622,8 @@ head("9. uprawnienia: the table, the routes, and the hint that gates nothing");
     }
     check(`Pro can use ${id}`, lmCan(id, LM_LEVEL.PRO) === true);
   }
-  check("and /kosztorys/ is still open to everybody", route("estimate").level === LEVEL.GUEST);
-  check("as is /projekty/", route("projects").level === LEVEL.GUEST);
+  check("and /kosztorys/ requires a free account", route("estimate").level === LEVEL.LICZMAT);
+  check("as does /projekty/", route("projects").level === LEVEL.LICZMAT);
   check("the material list without prices stays free",
     lmCan("shopping", LM_LEVEL.GUEST) === true);
 

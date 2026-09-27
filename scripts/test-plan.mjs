@@ -259,8 +259,8 @@ head("5. what the site actually enforces, feature by feature");
     eq(`nor may a free account use "${id}"`, lmCan(id, LM_LEVEL.LICZMAT), false);
     eq(`Pro may use "${id}"`, lmCan(id, LM_LEVEL.PRO), true);
   }
-  eq("the estimate route is still open to a guest", route("estimate").level, LEVEL.GUEST);
-  eq("and so is the projects route", route("projects").level, LEVEL.GUEST);
+  eq("the estimate route requires a free account", route("estimate").level, LEVEL.LICZMAT);
+  eq("and so does the projects route", route("projects").level, LEVEL.LICZMAT);
 
   // What the free account actually adds.
   eq("a guest may not sync", lmCan("sync", LM_LEVEL.GUEST), false);
@@ -612,17 +612,15 @@ head("9. /app/ carries the Pro tab");
   const has = (needle, what) => check(what, html.includes(needle), `not in the page: ${needle}`);
   const hasNot = (needle, what) => check(what, !html.includes(needle), `still in the page: ${needle}`);
 
-  has('data-tab="pro"', "there is a tab for it");
+  has('href="/app/#pro"', "the sidebar links to the Pro view");
   has('data-panel="pro"', "and a panel behind it");
   has('id="panel-pro"', "which the tab points at");
-  has('aria-labelledby="tab-pro"', "and which points back");
   // 2026-09-03: the flat strip became a sidebar (.app-nav-item, not .app-tab — see
   // src/app-pages.mjs), and it grew from five items to twelve: the new Przegląd/Klienci/
   // Wyceny/Terminarz/Materiały/Pomieszczenia tabs sit beside the five that were
   // always here.
-  eq("eleven sidebar items now, and the panels match",
-    (html.match(/class="app-nav-item"/g) || []).length,
-    (html.match(/data-panel="/g) || []).length);
+  eq("the shared account sidebar has twelve labelled destinations",
+    (html.match(/class="app-nav-item"/g) || []).length, 12);
 
   has('id="plan-card"', "the plan has a card of its own");
   has('id="plan-name"', "with room for the plan's name");
@@ -636,9 +634,8 @@ head("9. /app/ carries the Pro tab");
   // proGate() for its own feature id, which is what is checked here instead of a card on
   // this one tab. See the note above proPanel() in src/pro.mjs.
   // The id prefixes match assets/paywall.js's pwMount() calls in assets/app.js.
-  const gatePrefix = { clients: "acctclients", quotes: "acctquo", calendar: "acctcal" };
-  for (const feature of ["clients", "quotes", "calendar"]) {
-    has(`id="${gatePrefix[feature]}-gate"`, `the "${feature}" tab carries its own live wall`);
+  for (const routeId of ["clients", "quotes", "calendar"]) {
+    has(`data-nav-route="${routeId}"`, `the sidebar links to the full ${routeId} page`);
   }
   // proGate() (src/pro.mjs) predates /app/'s in-place picker: everywhere else it is used
   // the build writes it once per static, per-language page, so it carried no data-i18n and
@@ -646,8 +643,8 @@ head("9. /app/ carries the Pro tab");
   // 2026-09-10. Every string it prints is tagged now, which is why the chip is matched
   // with its attribute.
   const lockedChip = `<span class="chip" data-i18n="pro_locked">${DICT.pl.pro_locked}</span>`;
-  eq("one pro_locked chip per walled tab, inside those three gates",
-    html.split(lockedChip).length - 1, 3);
+  eq("the account page no longer duplicates the three full-page Pro walls",
+    html.split(lockedChip).length - 1, 0);
 
   // Materiały and Pomieszczenia carry no wall — Free-tier, like /moje-materialy/ and the
   // rooms already on the Projekty panel.
@@ -663,7 +660,7 @@ head("9. /app/ carries the Pro tab");
   has('data-nav-route="liczmat-pro"', "and the link follows the language the page is in");
   // Klienci used to be reachable only from a card on this tab that linked out to its own
   // page; now it is a sidebar tab of /app/ itself, so the way in is data-tab, not href.
-  has('data-tab="clients"', "and Klienci, which exists, is a sidebar tab of its own");
+  has('data-nav-route="clients"', "and Klienci is a sidebar destination of its own");
   hasNot('class="muted pro-more"',
     "so the way in is a link, not the sentence it was before the page existed");
 

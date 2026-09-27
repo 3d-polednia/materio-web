@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projekty a místnosti — LiczMat</title>
-<meta name="description" content="Projekty a místnosti v LiczMat: ulož rozměry místnosti jednou a kalkulačky doplní plochu podlahy, stěn nebo stropu. Bez registrace, data zůstávají v prohlížeči.">
+<meta name="description" content="Projekty a místnosti v LiczMat: ulož rozměry místnosti jednou a kalkulačky doplní plochu podlahy, stěn nebo stropu.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Projekty a místnosti — LiczMat">
-<meta property="og:description" content="Projekty a místnosti v LiczMat: ulož rozměry místnosti jednou a kalkulačky doplní plochu podlahy, stěn nebo stropu. Bez registrace, data zůstávají v prohlížeči.">
+<meta property="og:description" content="Projekty a místnosti v LiczMat: ulož rozměry místnosti jednou a kalkulačky doplní plochu podlahy, stěn nebo stropu.">
 <meta property="og:url" content="https://liczmat.com/cs/projekty/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Projekty a místnosti — LiczMat">
-<meta name="twitter:description" content="Projekty a místnosti v LiczMat: ulož rozměry místnosti jednou a kalkulačky doplní plochu podlahy, stěn nebo stropu. Bez registrace, data zůstávají v prohlížeči.">
+<meta name="twitter:description" content="Projekty a místnosti v LiczMat: ulož rozměry místnosti jednou a kalkulačky doplní plochu podlahy, stěn nebo stropu.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li aria-current="page">Projekty a místnosti</li></ol></nav>
+      <h1 id="ws-title">Projekty a místnosti</h1>
+      <p class="lead" id="ws-lead">Ukládej místnosti s rozměry a sbírej výsledky kalkulaček v projektech. Projekty jsou součástí tvého účtu, takže je vidíš i v telefonu.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Pro tuto stránku potřebuješ bezplatný účet.</p>
+      <p class="muted" data-account-local hidden>Po přihlášení se tě zeptáme, zda chceš dříve uložená data v tomto prohlížeči připojit ke svému účtu.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fcs%2Fprojekty%2F" rel="nofollow">Založit účet zdarma</a>
+        <a href="/app/?next=%2Fcs%2Fprojekty%2F" rel="nofollow">Přihlásit se</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Sekce účtu">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/cs/">Domů</a></li><li aria-current="page">Projekty a místnosti</li></ol></nav>
-      <h1 id="ws-title">Projekty a místnosti</h1>
-      <p class="lead" id="ws-lead">Ulož místnosti s rozměry a sbírej výsledky do projektů. Vše zůstává v tomto prohlížeči; účet je potřeba až pro přenos do telefonu.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>Takový projekt neexistuje</h2>
-          <p class="muted">Tato adresa ukazuje na projekt, který v tomto prohlížeči není. Mohl být smazán, nebo vznikl na jiném zařízení.</p>
+          <p class="muted">Tento projekt není ve tvém účtu. Mohl být smazán nebo ještě není synchronizovaný.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/cs/kalkulacky/">Všechny kalkulačky</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Můj účet</a>
       </p>
-      <p class="muted src-note">Data jsou uložena v tomto prohlížeči. Vymazání dat webu je smaže. Přihlas se do „Můj účet“, abys je měl i v telefonu.</p>
+      <p class="muted src-note">Projekty se ukládají na tvůj účet a samy se synchronizují s aplikací v telefonu.</p>
     </div>
   </section>
 

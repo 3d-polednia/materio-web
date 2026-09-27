@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projets et pièces — LiczMat</title>
-<meta name="description" content="Projets et pièces dans LiczMat : enregistre une fois les dimensions et les calculateurs remplissent la surface du sol ou des murs. Sans inscription.">
+<meta name="description" content="Projets et pièces dans LiczMat : enregistre une fois les dimensions et les calculateurs remplissent la surface du sol ou des murs.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="nl_NL">
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:title" content="Projets et pièces — LiczMat">
-<meta property="og:description" content="Projets et pièces dans LiczMat : enregistre une fois les dimensions et les calculateurs remplissent la surface du sol ou des murs. Sans inscription.">
+<meta property="og:description" content="Projets et pièces dans LiczMat : enregistre une fois les dimensions et les calculateurs remplissent la surface du sol ou des murs.">
 <meta property="og:url" content="https://liczmat.com/fr/projets/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Projets et pièces — LiczMat">
-<meta name="twitter:description" content="Projets et pièces dans LiczMat : enregistre une fois les dimensions et les calculateurs remplissent la surface du sol ou des murs. Sans inscription.">
+<meta name="twitter:description" content="Projets et pièces dans LiczMat : enregistre une fois les dimensions et les calculateurs remplissent la surface du sol ou des murs.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/fr/">Accueil</a></li><li aria-current="page">Projets et pièces</li></ol></nav>
+      <h1 id="ws-title">Projets et pièces</h1>
+      <p class="lead" id="ws-lead">Enregistre des pièces avec leurs dimensions et rassemble les résultats des calculateurs dans des projets. Les projets font partie de ton compte, tu les vois donc aussi sur ton téléphone.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Tu as besoin d'un compte gratuit pour utiliser cette page.</p>
+      <p class="muted" data-account-local hidden>Après ta connexion, nous te demanderons si tu veux rattacher à ton compte les données enregistrées auparavant dans ce navigateur.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Ffr%2Fprojets%2F" rel="nofollow">Crée un compte gratuit</a>
+        <a href="/app/?next=%2Ffr%2Fprojets%2F" rel="nofollow">Se connecter</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Sections du compte">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/fr/">Accueil</a></li><li aria-current="page">Projets et pièces</li></ol></nav>
-      <h1 id="ws-title">Projets et pièces</h1>
-      <p class="lead" id="ws-lead">Enregistre des pièces avec leurs dimensions et réunis les résultats dans des projets. Tout reste dans ce navigateur ; le compte ne sert qu'à l'emporter sur le téléphone.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>Pas de projet de ce genre</h2>
-          <p class="muted">Cette adresse pointe vers un projet que ce navigateur n'a pas. Il a peut-être été supprimé, ou il a été fait sur un autre appareil.</p>
+          <p class="muted">Ce projet n'est pas dans ton compte. Il a peut-être été supprimé ou n'est pas encore synchronisé.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/fr/calculateurs/">Tous les calculateurs</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Mon compte</a>
       </p>
-      <p class="muted src-note">Les données sont enregistrées dans ce navigateur. Effacer les données du site les supprime. Connecte-toi à « Mon compte » pour les avoir aussi sur ton téléphone.</p>
+      <p class="muted src-note">Les projets s'enregistrent sur ton compte et se synchronisent tout seuls avec l'application de ton téléphone.</p>
     </div>
   </section>
 

@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projekti i prostorije — LiczMat</title>
-<meta name="description" content="Projekti i prostorije u LiczMatu: sačuvaj dimenzije sobe jednom, a kalkulatori popune površinu poda, zidova ili plafona. Bez registracije.">
+<meta name="description" content="Projekti i prostorije u LiczMatu: sačuvaj dimenzije sobe jednom, a kalkulatori popune površinu poda, zidova ili plafona.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Projekti i prostorije — LiczMat">
-<meta property="og:description" content="Projekti i prostorije u LiczMatu: sačuvaj dimenzije sobe jednom, a kalkulatori popune površinu poda, zidova ili plafona. Bez registracije.">
+<meta property="og:description" content="Projekti i prostorije u LiczMatu: sačuvaj dimenzije sobe jednom, a kalkulatori popune površinu poda, zidova ili plafona.">
 <meta property="og:url" content="https://liczmat.com/sr/projekti/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Projekti i prostorije — LiczMat">
-<meta name="twitter:description" content="Projekti i prostorije u LiczMatu: sačuvaj dimenzije sobe jednom, a kalkulatori popune površinu poda, zidova ili plafona. Bez registracije.">
+<meta name="twitter:description" content="Projekti i prostorije u LiczMatu: sačuvaj dimenzije sobe jednom, a kalkulatori popune površinu poda, zidova ili plafona.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li aria-current="page">Projekti i prostorije</li></ol></nav>
+      <h1 id="ws-title">Projekti i prostorije</h1>
+      <p class="lead" id="ws-lead">Sačuvaj prostorije sa dimenzijama i skupljaj rezultate kalkulatora u projekte. Projekti su deo tvog naloga, pa ih vidiš i na telefonu.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Za ovu stranicu treba ti besplatan nalog.</p>
+      <p class="muted" data-account-local hidden>Posle prijave pitaćemo te da li želiš da podatke ranije sačuvane u ovom pregledaču povežeš sa svojim nalogom.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fsr%2Fprojekti%2F" rel="nofollow">Otvori besplatan nalog</a>
+        <a href="/app/?next=%2Fsr%2Fprojekti%2F" rel="nofollow">Prijava</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Odeljci naloga">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sr/">Početna</a></li><li aria-current="page">Projekti i prostorije</li></ol></nav>
-      <h1 id="ws-title">Projekti i prostorije</h1>
-      <p class="lead" id="ws-lead">Sačuvaj prostorije s dimenzijama i skupljaj rezultate u projekte. Sve ostaje u ovom pregledaču; nalog treba tek za prenos na telefon.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>Takav projekat ne postoji</h2>
-          <p class="muted">Ova adresa pokazuje na projekat koji ovaj pregledač nema. Možda je obrisan ili je nastao na drugom uređaju.</p>
+          <p class="muted">Ovaj projekat nije na tvom nalogu. Možda je obrisan ili još nije sinhronizovan.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/sr/kalkulatori/">Svi kalkulatori</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Moj nalog</a>
       </p>
-      <p class="muted src-note">Podaci su sačuvani u ovom pregledaču. Brisanje podataka sajta ih uklanja. Prijavi se u „Moj nalog” da ih imaš i na telefonu.</p>
+      <p class="muted src-note">Projekti se čuvaju na tvom nalogu i sami se sinhronizuju sa aplikacijom na telefonu.</p>
     </div>
   </section>
 

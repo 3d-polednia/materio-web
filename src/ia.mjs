@@ -39,8 +39,9 @@ import {
  * The three levels of the master plan, chapter II. There is no fourth one, and no
  * "team", "firma" or "admin" — chapter II forbids inventing them now.
  *
- * A level is what the page *needs*, not what it *offers*: `/projekty/` is GUEST because
- * a visitor with no account can open it and use it, even though signing in adds sync.
+ * A level is what the page *needs*, not what it *offers*. Owner decision 2026-09-26:
+ * calculators remain GUEST, while saving, projects and the account work pages are
+ * LICZMAT. Existing local data is preserved for the choice shown after sign-in.
  */
 export const LEVEL = {
   /** No account. Reads content, uses every calculator, gets a real answer. */
@@ -165,8 +166,8 @@ export const ROUTES = [
   },
   {
     id: "own-materials",
-    level: LEVEL.GUEST, status: STATUS.LIVE,
-    parent: "materials", localized: true, indexable: true,
+    level: LEVEL.LICZMAT, status: STATUS.LIVE,
+    parent: "materials", localized: true, indexable: false,
     path: urlOwnMaterials,
     note: "The visitor's own materials and what they pay for them — session 59, item C6 " +
       "of the parity audit. The app has had this screen and its price history since " +
@@ -174,11 +175,9 @@ export const ROUTES = [
       "rows off the account on the grounds that a material is reference data. True of the " +
       "bundled 161, false of a row somebody typed in with the price their own supplier " +
       "charges, so the same session put `users/{uid}/materials` in the contract. " +
-      "GUEST for the reason /projekty/ is: assets/own-materials.js keeps the rows in " +
-      "localStorage in the Firestore document shape, so the screen works before anybody " +
-      "signs in and an account adds sync, not the ability to write one down. `navLevel` " +
-      "follows /projekty/ too — a guest offered 'Moje materiały' in a menu is being " +
-      "offered a list that is empty until they have typed something into it. Parented " +
+      "LICZMAT and noindex since the owner's 2026-09-26 decision that saving is account " +
+      "work. Existing local rows are preserved and offered for attachment after sign-in. " +
+      "Parented " +
       "under `materials` because that is the page somebody is on when they find the " +
       "catalogue does not have their supplier's board on it, and it is footer-only for " +
       "the same reason the guides are: the header row is full at five.",
@@ -233,25 +232,18 @@ export const ROUTES = [
   /* ---------------------------------------------------------------- the workspace */
   {
     id: "projects",
-    level: LEVEL.GUEST, status: STATUS.LIVE,
-    parent: "home", localized: true, indexable: true,
+    level: LEVEL.LICZMAT, status: STATUS.LIVE,
+    parent: "home", localized: true, indexable: false,
     path: urlProjects,
-    note: "Chapter XIV makes the project the centre of the free account. On 2026-09-26 " +
-      "the owner removed it from the site header: Moje konto is the one way into work tools. The page is " +
-      "GUEST because assets/workspace.js keeps projects in localStorage in the " +
-      "Firestore document shape, so it works before anyone signs in; an account adds " +
-      "sync across devices, not the ability to count. `navLevel` is the owner's decision " +
-      "after session 20 and settles docs/ARCHITEKTURA.md §8.1: the *link* is for people " +
-      "with an account, because a guest offered 'Projekty' in the menu is being offered a " +
-      "list that is empty until they have counted something. The page itself is not " +
-      "gated and cannot be — it is a static file over rows in this browser's own storage, " +
-      "and FIRESTORE_SYNC §1.2 says counting never requires an account. It stays " +
-      "indexable, stays in sitemap.xml, and stays reachable from 'Otwórz projekt' under " +
-      "a saved result.",
+    note: "Chapter XIV makes the project the centre of the free account. Owner decision " +
+      "2026-09-26: Moje konto is the one way into work tools and saving requires an " +
+      "account. Calculators still count for guests, while /projekty/ is LICZMAT and " +
+      "noindex. Existing local rows are preserved for the post-sign-in unclaimed-workspace " +
+      "choice instead of being shown as an account page to a guest.",
   },
   {
     id: "project",
-    level: LEVEL.GUEST, status: STATUS.LIVE, view: true,
+    level: LEVEL.LICZMAT, status: STATUS.LIVE, view: true,
     parent: "projects", localized: true, indexable: false,
     path: urlProject,
     note: "One project. Chapter XIV: „Projekt jest centralnym elementem darmowego konta " +
@@ -259,26 +251,26 @@ export const ROUTES = [
       "the browser and is unbounded, and GitHub Pages serves files with no rewrites, " +
       "which is the same wall /p/<token> hits. That makes it a `view`: a screen of its " +
       "own with no file of its own, rendered into /projekty/ by assets/workspace-ui.js. " +
-      "GUEST for the reason /projekty/ and the dashboard are — the project is a row in " +
-      "this browser's localStorage and belongs to whoever is sitting at it; an account " +
-      "adds sync, not the right to read your own work. Session 15 built the C, R, U and " +
+      "LICZMAT since the owner's 2026-09-26 decision that project saving requires an " +
+      "account. Existing local rows remain for the post-sign-in attachment choice. " +
+      "Session 15 built the C, R, U and " +
       "D of it; the sections chapter XIV also names arrive with their own sessions " +
       "(materials 17, notes 18, costs 19, rooms 20).",
   },
   {
     id: "estimate",
-    level: LEVEL.GUEST, status: STATUS.LIVE,
-    parent: "projects", localized: true, indexable: true,
+    level: LEVEL.LICZMAT, status: STATUS.LIVE,
+    parent: "projects", localized: true, indexable: false,
     path: urlEstimate,
-    note: "Chapter XVI and XVII: the material list and its costs. Same local-first rule " +
-      "as /projekty/.",
+    note: "Chapter XVI and XVII: the material list and its costs. LICZMAT and noindex " +
+      "since the owner's 2026-09-26 decision: counting is public, saving is account work.",
   },
 
   /* ---------------------------------------------------------------- liczmat pro */
   {
     id: "clients",
     level: LEVEL.PRO, status: STATUS.LIVE,
-    parent: "home", localized: true, indexable: true,
+    parent: "home", localized: true, indexable: false,
     path: urlClients,
     gate: "Chapter XXV, built in session 27: proGate() in src/pro.mjs stands in place " +
       "of the module — the module named and described, \"Dostępne w LiczMat Pro\", the " +
@@ -347,7 +339,7 @@ export const ROUTES = [
   {
     id: "quotes",
     level: LEVEL.PRO, status: STATUS.LIVE,
-    parent: "projects", localized: true, indexable: true,
+    parent: "projects", localized: true, indexable: false,
     path: urlQuotes,
     gate: "As clients and jobs — the same wall, from the same builder.",
     note: "Chapter XXII, and the third of the five Pro modules: materials, labour, " +
@@ -376,7 +368,7 @@ export const ROUTES = [
   {
     id: "calendar",
     level: LEVEL.PRO, status: STATUS.LIVE,
-    parent: "projects", localized: true, indexable: true,
+    parent: "projects", localized: true, indexable: false,
     path: urlCalendar,
     gate: "As clients, jobs and quotes — the same wall, from the same builder.",
     note: "Chapter XXIII, and the fourth of the five Pro modules: the deadlines of the " +

@@ -1821,24 +1821,21 @@ przeglądarki, udostępnianie kosztorysu linkiem. To zgadza się z własnym zdan
 („rejestracja ma być naturalnym kolejnym krokiem, a nie barierą”) i nie odbiera darmowemu
 kontu żadnej wartości.
 
-Alternatywa — przenieść projekty za logowanie — jest zgodna z literą rozdziału II, ale
-łamie `FIRESTORE_SYNC` §1.2 i zabiera gościowi to, co dziś działa. Właściciel jej **nie**
-wybrał: schowana została zakładka, nie strona.
+**Decyzja właściciela z 2026-09-26:** projekty i zapisywanie są dostępne po zalogowaniu.
+Nie zmienia to §1.2: kalkulatory nadal liczą bez konta. Istniejących danych lokalnych nie
+usuwamy; po zalogowaniu działa dotychczasowy wybór dołączenia ich do konta.
 
 **Sesja 8 uderzyła w to samo.** Rozdział XII każe pokazać niezalogowanemu zdanie
-„Zaloguj się lub załóż darmowe konto, aby zapisać wynik” — czyli zakłada, że bez konta
-wyniku zapisać się nie da. Serwis zapisuje go dziś bez konta, do `localStorage`. Sesja 8
-zachowała stan faktyczny tak samo jak Sesja 3: przycisk „Dodaj do projektu” działa od
-razu, a zdanie obok mówi, co dokłada konto (telefon, przetrwanie wyczyszczenia
-przeglądarki), zamiast udawać, że przycisk go potrzebuje. Jeżeli właściciel rozstrzygnie
-spór po stronie rozdziału II, to zdanie i ten przycisk zmieniają się razem — treść jest
-w kluczach `calc_save_out` / `calc_save_in`, a nie wpisana w kod.
+„Zaloguj się lub załóż darmowe konto, aby zapisać wynik”. Od decyzji właściciela z
+2026-09-26 jest to obowiązująca reguła: gość widzi wynik, ale zamiast pól projektu i
+przycisku zapisu dostaje linki do rejestracji i logowania.
 
 Żeby to zdanie mogło w ogóle rozróżnić zalogowanego od niezalogowanego, `/app/` zostawia
 w `localStorage` znacznik `liczmat-signed-in` (Sesja 8). Strony kalkulatorów nie ładują
 Firebase — byłoby to zapytanie sieciowe na każdej z sześćdziesięciu stron dla jednego
-zdania. Znacznik **decyduje wyłącznie o treści**: nic nie wolno na nim bramkować, bo
-`FIRESTORE_SYNC` §1.2 zabrania wymagać konta do liczenia, a znacznik bywa nieaktualny
+zdania. Od 2026-09-26 znacznik przełącza też widoczność kontrolek zapisu i stron konta;
+nie jest uprawnieniem po stronie serwera. `FIRESTORE_SYNC` §1.2 nadal zabrania wymagać
+konta do liczenia, a znacznik bywa nieaktualny
 (wylogowanie w innej karcie, wygasły token). Jest wypisany na `/cookies/`.
 
 ### 8.1a. ~~Poziom `/app/dashboard/`~~ — rozstrzygnięte po Sesji 14

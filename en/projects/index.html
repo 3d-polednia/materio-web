@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Projects and rooms — LiczMat</title>
-<meta name="description" content="Projects and rooms in LiczMat: save a room's dimensions once and the calculators fill in the floor, wall or ceiling area. No sign-up needed.">
+<meta name="description" content="Projects and rooms in LiczMat: save a room's dimensions once and the calculators fill in the floor, wall or ceiling area.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Projects and rooms — LiczMat">
-<meta property="og:description" content="Projects and rooms in LiczMat: save a room's dimensions once and the calculators fill in the floor, wall or ceiling area. No sign-up needed.">
+<meta property="og:description" content="Projects and rooms in LiczMat: save a room's dimensions once and the calculators fill in the floor, wall or ceiling area.">
 <meta property="og:url" content="https://liczmat.com/en/projects/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Projects and rooms — LiczMat">
-<meta name="twitter:description" content="Projects and rooms in LiczMat: save a room's dimensions once and the calculators fill in the floor, wall or ceiling area. No sign-up needed.">
+<meta name="twitter:description" content="Projects and rooms in LiczMat: save a room's dimensions once and the calculators fill in the floor, wall or ceiling area.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -215,7 +215,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li aria-current="page">Projects and rooms</li></ol></nav>
+      <h1 id="ws-title">Projects and rooms</h1>
+      <p class="lead" id="ws-lead">Save rooms with their dimensions and collect calculator results in projects. Projects are part of your account, so you see them on your phone too.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>You need a free account to use this page.</p>
+      <p class="muted" data-account-local hidden>After you sign in, we will ask whether to attach data saved earlier in this browser to your account.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fen%2Fprojects%2F" rel="nofollow">Create a free account</a>
+        <a href="/app/?next=%2Fen%2Fprojects%2F" rel="nofollow">Sign in</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Account sections">
@@ -259,13 +273,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li aria-current="page">Projects and rooms</li></ol></nav>
-      <h1 id="ws-title">Projects and rooms</h1>
-      <p class="lead" id="ws-lead">Save rooms with their dimensions and collect results into projects. Everything stays in this browser; an account is only needed to carry it to the phone.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="ws-page">
     <div class="wrap narrow">
@@ -274,7 +281,7 @@
 
         <div id="ws-project-missing" hidden>
           <h2>No such project</h2>
-          <p class="muted">This address points at a project this browser does not have. It may have been deleted, or it was made on another device.</p>
+          <p class="muted">This project is not in your account. It may have been deleted or not synced yet.</p>
         </div>
 
         <div id="ws-project-body" hidden>
@@ -710,7 +717,7 @@
         <a class="btn btn-ghost btn-go" href="/en/calculators/">All calculators</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">My account</a>
       </p>
-      <p class="muted src-note">The data is saved in this browser. Clearing site data deletes it. Log in to “My account” to have it on your phone too.</p>
+      <p class="muted src-note">Projects are saved to your account and sync with the app on your phone by themselves.</p>
     </div>
   </section>
 

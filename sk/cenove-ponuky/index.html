@@ -64,7 +64,7 @@
 <title>Cenové ponuky — LiczMat</title>
 <meta name="description" content="Cenové ponuky v LiczMat Pro: materiál a ďalšie náklady z projektu, práca ako množstvo krát sadzba, marža a súčet. Synchronizuje sa s účtom.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -220,7 +220,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sk/">Domov</a></li><li><a href="/sk/projekty/">Projekty a miestnosti</a></li><li aria-current="page">Cenové ponuky</li></ol></nav>
+      <h1 id="quo-title">Cenové ponuky</h1>
+      <p class="lead" id="quo-lead">Cenová ponuka LiczMat Pro: materiál a ďalšie náklady z projektu, práca zadaná ručne, marža a súčet.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Na túto stránku potrebuješ bezplatný účet.</p>
+      <p class="muted" data-account-local hidden>Po prihlásení sa ťa spýtame, či chceš údaje uložené skôr v tomto prehliadači pripojiť k svojmu účtu.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fsk%2Fcenove-ponuky%2F" rel="nofollow">Založiť účet zadarmo</a>
+        <a href="/app/?next=%2Fsk%2Fcenove-ponuky%2F" rel="nofollow">Prihlásiť sa</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Sekcie účtu">
@@ -264,13 +278,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/sk/">Domov</a></li><li><a href="/sk/projekty/">Projekty a miestnosti</a></li><li aria-current="page">Cenové ponuky</li></ol></nav>
-      <h1 id="quo-title">Cenové ponuky</h1>
-      <p class="lead" id="quo-lead">Cenová ponuka LiczMat Pro: materiál a ďalšie náklady z projektu, práca zadaná ručne, marža a súčet.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="quo-page">
     <div class="wrap narrow">
@@ -564,7 +571,7 @@
       <p class="ws-links">
         <a class="btn btn-ghost btn-go" href="/sk/projekty/">Projekty a miestnosti</a>
       </p>
-      <p class="muted src-note">Cenové ponuky sa ukladajú v tomto prehliadači a pri ďalšom otvorení „Môjho účtu“ sa pridajú do účtu.</p>
+      <p class="muted src-note">Cenové ponuky sú súčasťou účtu LiczMat a synchronizujú sa samy, keď pracuješ na webe.</p>
     </div>
   </section>
 

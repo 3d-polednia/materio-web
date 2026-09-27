@@ -444,7 +444,7 @@ head("6. the route says what the page is, and the architecture still validates")
   check("and says what a free user sees instead", Boolean(r.gate) && r.gate.length > 40);
   check("the 2026-09-26 account sidebar owns the link", !r.navLevel);
   check("it is no longer duplicated in the footer", !r.footer);
-  eq("and indexable — chapter XXVI", r.indexable, true);
+  eq("and noindex; the public Pro description is /liczmat-pro/", r.indexable, false);
   eq("it sits under the projects, whose dates it shows", r.parent, "projects");
 
   // The one shape difference from the other three Pro modules, and it follows from the
@@ -558,13 +558,12 @@ head("7. the page the build writes");
       urlCalendar(lang));
   }
 
-  // Indexable means listed: a page that claims to be indexable and is missing from
-  // sitemap.xml is a claim nothing backs. The file is generated, so this reads the
-  // committed output rather than the intention.
+  // Account pages are not public descriptions of Pro; /liczmat-pro/ is. They stay out
+  // of the sitemap and carry noindex.
   const sitemap = readFileSync(p("sitemap.xml"), "utf8");
   for (const lang of LANGS) {
-    check(`${lang}: the page is in sitemap.xml`,
-      sitemap.includes(`<loc>https://liczmat.com${urlCalendar(lang)}</loc>`), urlCalendar(lang));
+    check(`${lang}: the page is out of sitemap.xml`,
+      !sitemap.includes(`<loc>https://liczmat.com${urlCalendar(lang)}</loc>`), urlCalendar(lang));
   }
 
   // The page the deadlines belong to offers the one that shows them. That page was
@@ -578,8 +577,8 @@ head("7. the page the build writes");
   const built = readFileSync(p(join(urlCalendar(DEFAULT_LANG), "index.html").replace(/^\//, "")), "utf8");
   check("the written page loads it", built.includes("/assets/schedule-ui."));
   check("and the store beside it", built.includes("/assets/crm."));
-  check("the page is not noindex — it describes a Pro module in public",
-    built.includes('name="robots" content="index, follow'), "robots");
+  check("the page is noindex; /liczmat-pro/ is the public description",
+    built.includes('name="robots" content="noindex, nofollow'), "robots");
 }
 
 /* ================================================================== 8. the copy */

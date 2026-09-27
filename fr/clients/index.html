@@ -64,7 +64,7 @@
 <title>Clients — LiczMat</title>
 <meta name="description" content="Clients dans LiczMat Pro : une liste de clients avec coordonnées et notes, les projets du client et l'historique des calculs. Synchronisé avec le compte.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -212,7 +212,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/fr/">Accueil</a></li><li aria-current="page">Clients</li></ol></nav>
+      <h1 id="crm-title">Clients</h1>
+      <p class="lead" id="crm-lead">La liste des clients de LiczMat Pro : coordonnées, notes et les projets que tu calcules pour eux.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Tu as besoin d'un compte gratuit pour utiliser cette page.</p>
+      <p class="muted" data-account-local hidden>Après ta connexion, nous te demanderons si tu veux rattacher à ton compte les données enregistrées auparavant dans ce navigateur.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Ffr%2Fclients%2F" rel="nofollow">Crée un compte gratuit</a>
+        <a href="/app/?next=%2Ffr%2Fclients%2F" rel="nofollow">Se connecter</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Sections du compte">
@@ -256,13 +270,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/fr/">Accueil</a></li><li aria-current="page">Clients</li></ol></nav>
-      <h1 id="crm-title">Clients</h1>
-      <p class="lead" id="crm-lead">La liste des clients de LiczMat Pro : coordonnées, notes et les projets que tu calcules pour eux.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="crm-page">
     <div class="wrap narrow">
@@ -450,7 +457,7 @@
         <a class="btn btn-ghost btn-go" href="/fr/projets/">Projets et pièces</a>
         <a class="btn btn-ghost btn-go" href="/app/" rel="nofollow">Mon compte</a>
       </p>
-      <p class="muted src-note">Les clients font partie du compte LiczMat. Déconnecté, ils restent dans ce navigateur ; connecté, ils sont aussi dans l'application Android.</p>
+      <p class="muted src-note">Les clients font partie du compte LiczMat, et tu les vois aussi dans l'application Android.</p>
     </div>
   </section>
 

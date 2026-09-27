@@ -619,8 +619,16 @@ head("8. with JavaScript off");
  * that do not reach it, and asks for the two things chapter XXV asks for: no amount
  * anywhere, and never a dead control.
  */
-head("9. a guest and a free account see the project, and none of its money");
-for (const level of [undefined, "liczmat"]) {
+head("9. a guest gets the account card; a free account sees the project without its money");
+{
+  const guest = await open(ctx, `${PROJECTS}?id=p1`,
+    { workspace: fixture(), active: "p1", pro: false });
+  eq("guest: the account card is visible", await guest.locator("[data-account-guest]").isVisible(), true);
+  eq("guest: the project tool is hidden", await guest.locator("[data-account-tool]").isHidden(), true);
+  eq("guest: old data adds the attachment note", await guest.locator("[data-account-local]").isVisible(), true);
+  await guest.close();
+}
+for (const level of ["liczmat"]) {
   const who = level || "guest";
   const page = await open(ctx, `${PROJECTS}?id=p1`,
     { workspace: fixture(), active: "p1", pro: false, level });

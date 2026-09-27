@@ -64,7 +64,7 @@
 <title>Кошториси — LiczMat</title>
 <meta name="description" content="Кошториси в LiczMat Pro: матеріал і додаткові витрати з проєкту, робота як кількість на ставку, маржа у відсотках і сума. Синхронізація з акаунтом.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -220,7 +220,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li><a href="/uk/proekty/">Проєкти та приміщення</a></li><li aria-current="page">Кошториси</li></ol></nav>
+      <h1 id="quo-title">Кошториси</h1>
+      <p class="lead" id="quo-lead">Кошторис LiczMat Pro: матеріал і додаткові витрати з проєкту, робота вписана вручну, маржа й сума.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Для цієї сторінки потрібен безкоштовний акаунт.</p>
+      <p class="muted" data-account-local hidden>Після входу ми запитаємо, чи додати до твого акаунта дані, раніше збережені в цьому браузері.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fuk%2Fkoshtorysy-pro%2F" rel="nofollow">Створити безкоштовний акаунт</a>
+        <a href="/app/?next=%2Fuk%2Fkoshtorysy-pro%2F" rel="nofollow">Увійти</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Розділи акаунта">
@@ -264,13 +278,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/uk/">Головна</a></li><li><a href="/uk/proekty/">Проєкти та приміщення</a></li><li aria-current="page">Кошториси</li></ol></nav>
-      <h1 id="quo-title">Кошториси</h1>
-      <p class="lead" id="quo-lead">Кошторис LiczMat Pro: матеріал і додаткові витрати з проєкту, робота вписана вручну, маржа й сума.</p>
-    </div>
-  </section>
 
   <section class="block alt" id="quo-page">
     <div class="wrap narrow">
@@ -564,7 +571,7 @@
       <p class="ws-links">
         <a class="btn btn-ghost btn-go" href="/uk/proekty/">Проєкти та приміщення</a>
       </p>
-      <p class="muted src-note">Кошториси зберігаються в цьому браузері й потрапляють в акаунт під час наступного відкриття «Мого акаунта».</p>
+      <p class="muted src-note">Кошториси є частиною акаунта LiczMat і синхронізуються самі, коли ти працюєш на сайті.</p>
     </div>
   </section>
 

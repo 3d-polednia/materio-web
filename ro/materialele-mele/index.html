@@ -62,9 +62,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 <title>Materialele mele — LiczMat</title>
-<meta name="description" content="Materiale de construcții proprii, cu preț și istoric de modificări. Introduceți dimensiunile și randamentul o dată, apoi calculați cu ele.">
+<meta name="description" content="Materialele tale și istoricul prețurilor în contul LiczMat.">
 <meta name="author" content="LiczMat">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="LiczMat">
@@ -104,7 +104,7 @@
 <meta property="og:locale:alternate" content="es_ES">
 <meta property="og:locale:alternate" content="fr_FR">
 <meta property="og:title" content="Materialele mele — LiczMat">
-<meta property="og:description" content="Materiale de construcții proprii, cu preț și istoric de modificări. Introduceți dimensiunile și randamentul o dată, apoi calculați cu ele.">
+<meta property="og:description" content="Materialele tale și istoricul prețurilor în contul LiczMat.">
 <meta property="og:url" content="https://liczmat.com/ro/materialele-mele/">
 <meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -112,7 +112,7 @@
 <meta property="og:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Materialele mele — LiczMat">
-<meta name="twitter:description" content="Materiale de construcții proprii, cu preț și istoric de modificări. Introduceți dimensiunile și randamentul o dată, apoi calculați cu ele.">
+<meta name="twitter:description" content="Materialele tale și istoricul prețurilor în contul LiczMat.">
 <meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
 <meta name="twitter:image:alt" content="LiczMat — Policz. Zaplanuj. Zrealizuj.">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20260926a">
@@ -214,7 +214,21 @@
   </div>
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
-<main id="main" tabindex="-1"><div class="app-shell account-page-shell">
+<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ro/">Acasă</a></li><li><a href="/ro/materiale/">Materiale</a></li><li aria-current="page">Materialele mele</li></ol></nav>
+      <h1>Materialele mele</h1>
+      <p class="lead">Salvați un material pe care catalogul nu îl are, cu prețul furnizorului dumneavoastră. Fiecare preț ulterior rămâne în istoric.</p>
+    </div>
+  </section><section class="block account-guest-card" data-account-guest>
+    <div class="wrap narrow"><div class="card">
+      <p>Ai nevoie de un cont gratuit pentru această pagină.</p>
+      <p class="muted" data-account-local hidden>După autentificare, te vom întreba dacă vrei să atașezi contului datele salvate anterior în acest browser.</p>
+      <p class="ws-links"><a class="btn btn-primary btn-sm" href="/app/?mode=signup&amp;next=%2Fro%2Fmaterialele-mele%2F" rel="nofollow">Fă-ți un cont gratuit</a>
+        <a href="/app/?next=%2Fro%2Fmaterialele-mele%2F" rel="nofollow">Autentificare</a></p>
+    </div></div>
+  </section><div class="app-shell account-page-shell" data-account-tool>
     <aside class="app-side" data-account-sidebar data-nav-level="liczmat">
     <div class="app-side-brand"><svg class="logo" width="26" height="26" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span><span id="app-level" class="chip app-plan-pill"></span></div>
     <nav class="app-nav" aria-label="Secțiunile contului">
@@ -258,13 +272,6 @@
     </nav>
   </aside>
     <div class="app-main account-page-main">
-  <section class="block page-head">
-    <div class="wrap">
-      <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/ro/">Acasă</a></li><li><a href="/ro/materiale/">Materiale</a></li><li aria-current="page">Materialele mele</li></ol></nav>
-      <h1>Materialele mele</h1>
-      <p class="lead">Salvați un material pe care catalogul nu îl are, cu prețul furnizorului dumneavoastră. Fiecare preț ulterior rămâne în istoric.</p>
-    </div>
-  </section>
 
   <section class="block alt">
     <div class="wrap narrow">
@@ -366,7 +373,7 @@
       <p class="muted" data-omat-empty>Încă nu aveți materiale proprii.</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">Un material din această listă se alege în calculator exact ca o intrare din catalog.</p>
-      <p class="muted">Materialele rămân în acest browser. După autentificare fac parte din cont, iar aplicația le vede și ea.</p>
+      <p class="muted">Materialele fac parte din cont și se sincronizează după autentificare.</p>
     </div>
   </section>
 
