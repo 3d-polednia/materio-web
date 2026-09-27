@@ -165,6 +165,32 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   await guest.ctx.close();
 }
 
+{
+  // 2026-09-27: a calculator page syncs too. A guest downloads nothing; a signed-in save
+  // reaches the account without visiting an account page; and because that page has no
+  // Pro store, the persisted cut-off stays where it was (see incrementalPush()).
+  const guest = await open("/kalkulatory/fuga/", { signed: false });
+  await guest.page.waitForSelector("[data-ws-save-box]", { timeout: 8000 });
+  await guest.page.waitForTimeout(300);
+  check("a guest calculator page requests no Firebase SDK", guest.firebaseRequests() === 0, String(guest.firebaseRequests()));
+  await guest.ctx.close();
+
+  const cutoff = String(Date.now() - 3600e3);
+  const x = await open("/kalkulatory/fuga/", { storage: { "liczmat-sync-pushed-at:u1": cutoff, "liczmat-sync-account": "u1" } });
+  await x.page.waitForSelector("[data-ws-save]", { timeout: 8000 });
+  await x.page.click("[data-ws-save]");
+  await x.page.waitForSelector("[data-ws-saved]:not([hidden])", { timeout: 8000 });
+  await x.page.waitForFunction(() => [...window.__fbDocs.keys()].some((k) => /\/estimations\//.test(k)), null, { timeout: 6000 })
+    .catch(() => {});
+  const keys = await x.page.evaluate(() => [...window.__fbDocs.keys()]);
+  check("a signed-in save on a calculator page reaches the account (the calculation)",
+    keys.some((k) => /^users\/u1\/projects\/[^/]+\/estimations\//.test(k)), keys.join(", "));
+  check("and its project", keys.some((k) => /^users\/u1\/projects\/[^/]+$/.test(k)), keys.join(", "));
+  check("without the Pro store the persisted cut-off does not move",
+    await x.page.evaluate(() => localStorage.getItem("liczmat-sync-pushed-at:u1")) === cutoff);
+  await x.ctx.close();
+}
+
 await browser.close(); server.close();
 if (failures.length) { console.error(`test-account-sync-page: ${failures.length} failure(s)\n${failures.join("\n")}`); process.exit(1); }
 check("assertion count is nonzero", passed > 0);

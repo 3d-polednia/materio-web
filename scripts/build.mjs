@@ -1331,6 +1331,10 @@ function buildCalculatorPages() {
         main,
         jsonld: [ld, calcLd(calc, lang, t), calcFaqLd(seo)],
         scripts: CALC_SCRIPTS,
+        // 2026-09-27: saving a result needs an account since 2026-09-26, so a signed-in
+        // visitor's save goes up from here instead of waiting for the next account page.
+        // A guest downloads nothing more — the module stops at the session hint.
+        modules: ["/assets/account-sync-page.js"],
       }));
     }
   }

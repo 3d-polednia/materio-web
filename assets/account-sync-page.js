@@ -1,7 +1,8 @@
 /* LiczMat website — automatic account sync on the full account pages (2026-09-26).
  *
  * Loaded as a module by /projekty/, /kosztorys/, /moje-materialy/, /klienci/, /wyceny/ and
- * /terminarz/ in every language. It does nothing for a visitor the account hint says is
+ * /terminarz/ in every language, and since 2026-09-27 by every calculator page, where a
+ * signed-in visitor saves results (that page lacks the Pro store; see incrementalPush()). It does nothing for a visitor the account hint says is
  * not signed in — no SDK download, no network — and otherwise picks up the session /app/
  * left behind and runs assets/account-sync.js in its page mode (see the head of that file).
  * A workspace that is somebody else's copy, or has never been claimed, is left alone: that

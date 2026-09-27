@@ -8,8 +8,8 @@
  *
  *   /app/                  live listeners, the full pull-and-push at sign-in and the sync
  *                          tab's buttons — assets/app.js, exactly as before;
- *   the six account pages  assets/account-sync-page.js: a full pull at most every five
- *                          minutes per account, then an incremental push, then the same
+ *   account pages and      assets/account-sync-page.js: a full pull at most every five
+ *   calculator pages       minutes per account, then an incremental push, then the same
  *                          debounced push on every change. No listeners (read quota) —
  *                          the rule the Android app has followed since session M.
  *
@@ -88,6 +88,10 @@ export const syncFields = (createdAt, deletedAt = null) => ({
   deletedAt,
   schemaVersion: SCHEMA_VERSION,
 });
+
+/** Are all three stores a push sends on this page? /app/ and the account pages: yes. */
+const allStoresHere = () => typeof wsExport === "function"
+  && typeof crmExport === "function" && typeof omExport === "function";
 
 export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
   /**
@@ -563,7 +567,14 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     try {
       if (!setSyncAccount(uid)) return false;
       await syncPushAll(uid, state.lastAutoPushAt);
-      writeAutoPushAt(uid, startedAt);
+      // A page without every store — a calculator page holds the workspace and the own
+      // materials, not the Pro store — pushed only what it has. Its cut-off moves for this
+      // page, so the next save here stays incremental, but it is not written down: the next
+      // page that carries all three stores sends from the old cut-off and so picks up any
+      // Pro row still waiting. The rows this page already sent go up once more — a handful
+      // of writes, never a lost edit. (2026-09-27)
+      if (allStoresHere()) writeAutoPushAt(uid, startedAt);
+      else state.lastAutoPushAt = startedAt;
       onChange("push");
       return true;
     } finally {
@@ -601,8 +612,10 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
       try {
         if (!setSyncAccount(uid)) return;
         await syncPushAll(uid, state.lastAutoPushAt);
-        // Persist after success: a failed batch must be retried from the old cut-off.
-        writeAutoPushAt(uid, startedAt);
+        // Persist after success: a failed batch must be retried from the old cut-off. On a
+        // page without every store, only for this page — see incrementalPush().
+        if (allStoresHere()) writeAutoPushAt(uid, startedAt);
+        else state.lastAutoPushAt = startedAt;
         onChange();
       } catch (e) {
         // Background up-sync failures must be silent on screen.
