@@ -39,7 +39,7 @@ const CRM_MAX_NOTE = 2000;
 const CRM_MAX_UNIT = 24;
 /* ------------------------------------------------------------------ storage */
 
-const crmEmpty = () => ({ clients: [], jobs: [], quotes: [] });
+const crmEmpty = () => ({ companies: [], clients: [], jobs: [], quotes: [] });
 let crmLegacyJobsChecked = false;
 
 /** Read the whole Pro workspace. A corrupt or absent store reads as an empty one. */
@@ -52,6 +52,7 @@ function crmLoad() {
     }
     const data = JSON.parse(raw);
     const result = {
+      companies: Array.isArray(data.companies) ? data.companies : [],
       clients: Array.isArray(data.clients) ? data.clients : [],
       jobs: Array.isArray(data.jobs) ? data.jobs : [],
       // The same for the quotes of session 24.
@@ -155,7 +156,7 @@ const crmExport = () => ({ ...crmLoad(), exportedAt: Date.now(), schemaVersion: 
  */
 function crmImport(incoming) {
   const data = crmLoad();
-  ["clients", "quotes"].forEach((key) => {
+  ["companies", "clients", "quotes"].forEach((key) => {
     const rows = Array.isArray(incoming && incoming[key]) ? incoming[key] : [];
     rows.forEach((row) => {
       if (!row || !row.id) return;
@@ -164,6 +165,10 @@ function crmImport(incoming) {
       else if ((row.updatedAt || 0) >= (data[key][i].updatedAt || 0)) data[key][i] = row;
     });
   });
+  const liveCompanies = data.companies.filter((row) => row && !row.deletedAt)
+    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+  const chosen = liveCompanies.find((row) => row.isDefault) || liveCompanies[0];
+  liveCompanies.forEach((row) => { row.isDefault = row === chosen; });
   const jobs = Array.isArray(incoming && incoming.jobs) ? incoming.jobs.filter((row) => row && !row.deletedAt) : [];
   if (jobs.length && typeof wsMergeJobs === "function" && !wsMergeJobs(jobs)) return false;
   data.jobs = [];

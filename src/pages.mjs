@@ -12,7 +12,7 @@ import {
 import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlQuotes,
+  urlProjects, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlQuotes,
   urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
   CALC_SLUG, PLAY_URL, URL_APP, URL_PRIVACY, ENTITY, entityRows,
 } from "./site.mjs";
@@ -1922,6 +1922,76 @@ export function proPageMain(lang, t, features, prices) {
 </main>`;
 
   return { main, ld: crumbs.ld };
+}
+
+/**
+ * /moja-firma/ — the seller details kept for later use on quote documents.
+ *
+ * The build owns the form and the Pro wall; assets/company-ui.js owns the rows and logo
+ * preview because those depend on this browser's local CRM store.
+ */
+export function companyMain(lang, t, features) {
+  const crumbs = breadcrumbs([
+    { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("companypage_title"), path: urlCompany(lang) },
+  ]);
+  const gate = proGate(t, "company", features, lang, { id: "company-gate" });
+  const fields = [
+    ["name", "company_name", "text", "120", "organization"],
+    ["nip", "company_nip", "text", "20", "off"],
+    ["street", "company_street", "text", "200", "street-address"],
+    ["postalCode", "company_postal", "text", "12", "postal-code"],
+    ["city", "company_city", "text", "120", "address-level2"],
+    ["phone", "company_phone", "tel", "200", "tel"],
+    ["email", "company_email", "email", "200", "email"],
+    ["www", "company_www", "url", "200", "url"],
+    ["bankAccount", "company_bank", "text", "40", "off"],
+  ];
+  const main = `<main id="main" tabindex="-1">
+  <section class="block page-head">
+    <div class="wrap narrow">
+      ${crumbs.nav}
+      <h1>${esc(t("companypage_title"))}</h1>
+      <p>${esc(t("companypage_lead"))}</p>
+    </div>
+  </section>
+
+  ${gate}
+
+  <section class="block" id="company-tool">
+    <div class="wrap narrow">
+      <ul id="company-list" class="data-list"></ul>
+      <p id="company-empty" class="muted">${esc(t("company_empty"))}</p>
+      <div id="company-undo" class="ws-undo" hidden></div>
+
+      <form id="company-form" class="card mt-4">
+        <h2 id="company-form-title">${esc(t("company_add"))}</h2>
+        <div class="ws-mat-grid">
+          ${fields.map(([id, key, type, max, autocomplete]) => `<label class="ws-mat-f">
+            <span class="ws-bar-label">${esc(t(key))}${id === "name" ? "*" : ""}</span>
+            <input id="company-${id}" name="${id}" type="${type}" maxlength="${max}" autocomplete="${autocomplete}"${id === "name" ? " required" : ""}>
+          </label>`).join("\n")}
+        </div>
+        ${/* The browser's own file control prints "Choose File / No file chosen" in the
+             browser's language, not the page's, and cannot be styled: the label is the button. */ ""}
+        <div class="ws-mat-f company-logo-field">
+          <span class="ws-bar-label" id="company-logo-label">${esc(t("company_logo"))}</span>
+          <label class="btn btn-ghost btn-sm company-logo-pick" for="company-logo-file">${esc(t("company_logo_pick"))}</label>
+          <input id="company-logo-file" class="company-logo-input" type="file" aria-labelledby="company-logo-label"
+            accept="image/png,image/jpeg,image/webp,image/svg+xml">
+        </div>
+        <div id="company-logo-preview" class="company-logo-preview" hidden></div>
+        <p><button id="company-logo-remove" type="button" class="btn btn-ghost btn-sm" hidden>${esc(t("company_logo_remove"))}</button></p>
+        <p id="company-logo-error" class="field-error" role="alert" hidden></p>
+        <p>
+          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
+          <button id="company-cancel" type="button" class="btn btn-ghost btn-sm" hidden>${esc(t("action_cancel"))}</button>
+        </p>
+      </form>
+    </div>
+  </section>
+</main>`;
+  return { main: accountPageMain(main, t, lang, "company"), ld: crumbs.ld };
 }
 
 /**

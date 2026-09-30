@@ -572,6 +572,15 @@ border-radius: var(--radius-sm); padding: var(--sp-3) var(--sp-4);
 .data-list li { flex-wrap: wrap; }
 .data-list li > .row-name { flex: 1 1 14rem; }
 .data-list li > .row-actions { margin-left: auto; flex: 0 1 auto; flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
+.company-logo-thumb { width: 120px; height: 60px; display: grid; place-items: center; flex: none; background: var(--surface-alt); }
+.company-logo-thumb img { max-width: 120px; max-height: 60px; object-fit: contain; }
+#company-form h2 { font-size: var(--fs-h3); margin: 0 0 var(--sp-4); }
+.company-logo-field { position: relative; align-items: flex-start; margin: var(--sp-3) 0; }
+.company-logo-field .company-logo-input { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; min-height: 0; padding: 0; border: 0; opacity: 0; overflow: hidden; }
+.company-logo-field:focus-within .company-logo-pick { outline: 2px solid var(--focus); outline-offset: 2px; }
+.company-logo-preview { max-width: 300px; height: 150px; display: grid; place-items: center; background: var(--surface-alt); }
+.company-logo-preview img { max-width: 300px; max-height: 150px; object-fit: contain; }
+.row-name small { display: block; color: var(--muted); }
 #acctquo-list .acctquo-row { align-items: start; }
 #quo-page .quo-margin-field + .field-note { margin-top: var(--sp-2); }
 #acctquo-list .acctquo-main {

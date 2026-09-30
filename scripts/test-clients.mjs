@@ -267,7 +267,8 @@ head("1c. the client store is its own, and the phone's workspace is untouched");
   // contract; what this guards is that none of them has leaked into the workspace store,
   // and that a fourth is never added here without a decision.
   eq("the Pro store holds exactly the three local collections",
-    Object.keys(store).sort().join(), "clients,jobs,quotes");
+    // Since 2026-09-30 the Pro store has four local collections.
+    Object.keys(store).sort().join(), "clients,companies,jobs,quotes");
 }
 
 /* ================================================================== 2. the writes */

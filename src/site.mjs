@@ -160,6 +160,10 @@ clients: {
     pl: "klienci", uk: "kliyenty", de: "kunden", en: "clients",
     cs: "klienti", sk: "klienti", ro: "clienti", hr: "klijenti", sr: "klijenti", it: "clienti", nl: "klanten", es: "clientes", fr: "clients",
   },
+company: {
+    pl: "moja-firma", uk: "moya-kompaniya", de: "mein-unternehmen", en: "my-company",
+    cs: "moje-firma", sk: "moja-firma", ro: "firma-mea", hr: "moja-tvrtka", sr: "moja-firma", it: "la-mia-azienda", nl: "mijn-bedrijf", es: "mi-empresa", fr: "mon-entreprise",
+  },
   /* Session 23, the second Pro module. Same rule as `clients`: the segments are the ones
      the `jobs` route has carried as `plannedSlug` in src/ia.mjs since session 3, so
      turning the page on moves them, it does not rename them. */
@@ -382,6 +386,9 @@ export const urlProject = (lang, id) => `${urlProjects(lang)}?id=${encodeURIComp
 
 /** The client list of LiczMat Pro — chapter XX. */
 export const urlClients = (lang) => `${prefix(lang)}/${SECTION.clients[lang]}/`;
+
+/** The seller's company details used by future quote documents. */
+export const urlCompany = (lang) => `${prefix(lang)}/${SECTION.company[lang]}/`;
 
 /**
  * One client, as a query string on /klienci/ — the same wall urlProject() hits, for the

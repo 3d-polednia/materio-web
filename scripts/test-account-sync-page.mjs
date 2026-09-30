@@ -107,6 +107,14 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   check("and a new client keeps the legacy address empty", pushed[1].address === ""); await x.ctx.close();
 }
 {
+  const logo = "data:image/png;base64,iVBORw0KGgo=";
+  const company = { companies: [{ id: "co-sync", name: "Firma Test", nip: "123", street: "", postalCode: "", city: "", phone: "", email: "", www: "", bankAccount: "", logo, isDefault: true, createdAt: 1, updatedAt: Date.now(), deletedAt: null, schemaVersion: 1 }], clients: [], jobs: [], quotes: [] };
+  const x = await open("/projekty/", { storage: { "liczmat-crm-v1": JSON.stringify(company), "liczmat-sync-account": "u1" } }); await waitSync(x.page);
+  await x.page.waitForFunction(() => [...window.__fbDocs.keys()].some((k) => k.includes("/companies/")), null, { timeout: 4000 });
+  const pushed = await doc(x.page, "users/u1/companies/");
+  check("company with its logo is pushed", Boolean(pushed) && pushed[1].logo === logo); await x.ctx.close();
+}
+{
   const x = await open("/moje-materialy/"); await waitSync(x.page); await x.page.fill('[data-omat-in="name"]', "Płyta testowa"); await x.page.click('[data-omat-form] button[type="submit"]');
   await x.page.waitForFunction(() => [...window.__fbDocs.keys()].some((k) => k.includes("/materials/")), null, { timeout: 4000 });
   check("own material is pushed", Boolean(await doc(x.page, "users/u1/materials/"))); await x.ctx.close();
@@ -119,6 +127,7 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   const remote = {
     "users/u1/projects/p-echo": { name: "Z telefonu", updatedAt: now - 1000, ...sync },
     "users/u1/clients/c-echo": { name: "Klient z telefonu", phone: "", email: "", address: "", note: "", projectIds: [], archived: false, updatedAt: now - 1000, ...sync },
+    "users/u1/companies/co-echo": { name: "Firma z telefonu", nip: "", street: "", postalCode: "", city: "", phone: "", email: "", www: "", bankAccount: "", logo: "data:image/png;base64,AA", isDefault: true, updatedAt: now - 1000, ...sync },
   };
   const x = await open("/projekty/", { docs: remote, storage: { "liczmat-sync-pushed-at:u1": String(now - 60000) } });
   await waitSync(x.page);
@@ -127,6 +136,7 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   check("the pulled rows reached this browser", await x.page.evaluate(() => (localStorage.getItem("materio-workspace-v1") || "").includes("Z telefonu")));
   check("a pulled project is not pushed back", !writes.some((p) => p.includes("p-echo")), writes.join(", "));
   check("a pulled client is not pushed back", !writes.some((p) => p.includes("c-echo")), writes.join(", "));
+  check("a pulled company and logo reach the CRM store", await x.page.evaluate(() => (localStorage.getItem("liczmat-crm-v1") || "").includes("data:image/png;base64,AA")));
   await x.ctx.close();
 }
 

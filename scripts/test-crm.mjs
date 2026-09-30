@@ -228,8 +228,8 @@ head("1. the chain is walked, never stored");
 
   eq("walking the whole chain writes nothing to the Pro store", JSON.stringify(crm.raw()), before);
   eq("and nothing to the workspace", JSON.stringify(crm.workspaceRaw()), wsBefore);
-  eq("the Pro store still holds exactly its three migration-safe collections",
-    Object.keys(crm.raw()).sort().join(), "clients,jobs,quotes");
+  eq("the Pro store still holds exactly its migration-safe collections",
+    Object.keys(crm.raw()).sort().join(), "clients,companies,jobs,quotes");
   check("no chain, link, graph or history collection has appeared",
     !Object.keys(crm.raw()).some((k) => /chain|link|graph|history|event|log/i.test(k)),
     Object.keys(crm.raw()).join());
@@ -403,7 +403,7 @@ head("4. the history is derived from the documents and their dates");
   eq("an empty scope answers nothing", crm.crmHistory({}).length, 0);
   eq("an unknown client too", crm.crmHistory({ clientId: "nope" }).length, 0);
   eq("an unknown id too", crm.crmHistory({ projectId: "nope" }).length, 0);
-  eq("reading it wrote nothing", Object.keys(crm.raw()).sort().join(), "clients,jobs,quotes");
+  eq("reading it wrote nothing", Object.keys(crm.raw()).sort().join(), "clients,companies,jobs,quotes");
 
   // Somebody else's project is not this client's history, exactly as it is not their cost.
   const other = crm.wsAddProject("Cudzy projekt");

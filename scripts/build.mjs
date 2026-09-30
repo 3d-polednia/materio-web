@@ -28,7 +28,7 @@ import {
   BASE, LANGS, BUILD_LANGS, PL_ONLY, DEFAULT_LANG, HREFLANG, SECTION, GUIDES, CALC_SLUG,
   URL_APP, URL_SHARE, URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies, urlClients, urlJobs, urlQuotes,
+  urlProjects, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlJobs, urlQuotes,
   urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
 } from "../src/site.mjs";
 import {
@@ -41,7 +41,7 @@ import { DEFAULT_CURRENCY, MONEY_LOCALE } from "../src/currency.mjs";
 import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, contactMain, clientsMain,
+  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, contactMain, companyMain, clientsMain,
   quotesMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
@@ -56,7 +56,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260930a";
+const STAMP = "20260930b";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -861,6 +861,12 @@ const CRM_SCRIPTS = [
   "/assets/crm-chain.js", "/assets/crm-ui.js",
 ];
 
+const COMPANY_SCRIPTS = [
+  "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
+  "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
+  "/assets/company-logo.js", "/assets/company-ui.js",
+];
+
 /**
  * /zlecenia/ (session 23). The same four files with the job page's own interface in place
  * of the client one: the store is shared (assets/crm.js holds both collections), and the
@@ -1510,6 +1516,25 @@ function buildWorkspacePages() {
 }
 
 /**
+ * /moja-firma/ and its localized twins: the seller's companies, which a quote names as
+ * the one who issues it. The same frame as the client pages below; every row on it comes
+ * out of the browser's own Pro store.
+ */
+function buildCompanyPages() {
+  const alt = alternatesFor(urlCompany);
+  for (const lang of BUILD_LANGS) {
+    const t = translator(lang);
+    const { main, ld } = companyMain(lang, t, LM_FEATURES);
+    write(join(urlCompany(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP, title: `${t("companypage_title")} — LiczMat`,
+      description: t("companypage_meta"), bodyClass: "tool-page", path: urlCompany(lang),
+      alternates: alt, noindex: true, main, jsonld: [ld], scripts: COMPANY_SCRIPTS,
+      modules: ["/assets/account-sync-page.js"],
+    }));
+  }
+}
+
+/**
  * /klienci/ — the client list of LiczMat Pro. Session 22, chapter XX.
  *
  * The page has two screens in one file, exactly like /projekty/: the index, and one
@@ -2140,6 +2165,7 @@ buildAndroidPage();
 buildCookiesPage();
 buildContactPage();
 buildWorkspacePages();
+buildCompanyPages();
 buildClientsPages();
 buildJobsPages();
 buildQuotesPages();

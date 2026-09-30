@@ -118,8 +118,8 @@ head("0. the tree this suite is reading");
   // route in ten languages — 395 until 2026-09-02 swapped Russian for Italian, Dutch,
   // Spanish and French, which is three languages more of every route, and 512 until
   // session 62 added /kontakt/ for audit item H7: one route in thirteen languages.
-  check("525 pages: 523 generated plus the two hand-written ones",
-    PAGES.length === 525, `found ${PAGES.length}`);
+  check("538 pages: 536 generated plus the two hand-written ones",
+    PAGES.length === 538, `found ${PAGES.length}`);
   check("every page has a <title>", PAGES.every((page) => page.title), 
     PAGES.filter((page) => !page.title).map((page) => page.url).join(", "));
   check("every page has a robots directive", PAGES.every((page) => page.robots),
@@ -143,7 +143,7 @@ head("1. indexing: which pages are open to a crawler at all");
   const jobRedirects = LANGS.map((lang) => urlJobs(lang)).sort();
   const closed = PAGES.filter(isNoindex).map((page) => page.url).sort();
   const accountRoutes = ROUTES.filter((r) => r.localized && !r.indexable &&
-    ["projects", "estimate", "own-materials", "clients", "quotes", "calendar"].includes(r.id))
+    ["projects", "estimate", "own-materials", "company", "clients", "quotes", "calendar"].includes(r.id))
     .flatMap((r) => LANGS.map((lang) => r.path(lang)));
   const expectedClosed = ["/404.html", "/app/", "/app/dashboard/", "/p/"]
     .concat(jobRedirects, accountRoutes).sort();

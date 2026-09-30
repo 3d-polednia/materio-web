@@ -27,7 +27,7 @@
 import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlClients, urlClient,
+  urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlClient,
   urlJobs, urlJob, urlQuotes, urlQuote, urlCalendar, urlLiczmatPro, urlConverter,
   urlOwnMaterials, urlContact,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
@@ -267,6 +267,12 @@ export const ROUTES = [
   },
 
   /* ---------------------------------------------------------------- liczmat pro */
+  {
+    id: "company", level: LEVEL.PRO, status: STATUS.LIVE,
+    parent: "home", localized: true, indexable: false, path: urlCompany,
+    gate: "As clients — proGate() shows the same LiczMat Pro wall.",
+    note: "The seller's company records and logos. Quotes consume them in a later stage.",
+  },
   {
     id: "clients",
     level: LEVEL.PRO, status: STATUS.LIVE,

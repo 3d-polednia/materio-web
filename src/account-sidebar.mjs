@@ -1,11 +1,12 @@
 import { esc, logoMark } from "./template.mjs";
 import {
-  DEFAULT_LANG, URL_APP, urlProjects, urlEstimate, urlClients, urlQuotes,
+  DEFAULT_LANG, URL_APP, urlProjects, urlEstimate, urlCompany, urlClients, urlQuotes,
   urlCalendar, urlOwnMaterials,
 } from "./site.mjs";
 
 /** Icons shared by the account shell on /app/ and the six localized work pages. */
 export const NAV_ICON = {
+  company: '<path d="M4 21V7l8-4 8 4v14"/><path d="M8 10h2M14 10h2M8 14h2M14 14h2M9 21v-3h6v3"/>',
   overview: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
   projects: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
   estimate: '<path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
@@ -47,6 +48,7 @@ export function accountSidebar(t, { lang = DEFAULT_LANG, current = "overview", i
       { id: "rooms", key: "app_tab_rooms", href: `${urlProjects(lang)}#ws-rooms`, route: inPlace ? "projects" : "", inPlace },
     ]],
     ["app_nav_account", [
+      routeLink("company", "app_tab_company", "company", urlCompany(lang)),
       appLink("profile", "app_tab_profile", "#profil"),
       appLink("sync", "app_tab_sync", "#synchronizacja"),
       appLink("pro", "app_tab_pro", "#pro"),
@@ -80,7 +82,7 @@ export function accountPageMain(main, t, lang, current) {
   const head = body.slice(0, headEnd + "</section>".length);
   const tool = body.slice(headEnd + "</section>".length);
   const next = {
-    projects: urlProjects, estimate: urlEstimate, clients: urlClients, quotes: urlQuotes,
+    projects: urlProjects, estimate: urlEstimate, company: urlCompany, clients: urlClients, quotes: urlQuotes,
     schedule: urlCalendar, materials: urlOwnMaterials,
   }[current](lang);
   const signup = `${URL_APP}?mode=signup&amp;next=${encodeURIComponent(next)}`;

@@ -113,7 +113,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     uid: null, fb, db, auth, syncBusy: 0, lastAutoPushAt: 0,
     remoteStamps: {
       projects: new Map(), rooms: new Map(), estimations: new Map(), shoppingItems: new Map(),
-      clients: new Map(), quotes: new Map(), materials: new Map(),
+      companies: new Map(), clients: new Map(), quotes: new Map(), materials: new Map(),
     },
     upSyncTimer: null,
   };
@@ -224,10 +224,10 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     return {
       projects: alive(local.projects), rooms: alive(local.rooms),
       estimations: alive(local.estimations), shoppingItems: alive(local.shoppingItems),
-      clients: alive(pro && pro.clients), jobs: alive(pro && pro.jobs),
+      companies: alive(pro && pro.companies), clients: alive(pro && pro.clients), jobs: alive(pro && pro.jobs),
       quotes: alive(pro && pro.quotes),
       total: all(local.projects) + all(local.rooms) + all(local.estimations)
-        + all(local.shoppingItems) + all(pro && pro.clients) + all(pro && pro.jobs)
+        + all(local.shoppingItems) + all(pro && pro.companies) + all(pro && pro.clients) + all(pro && pro.jobs)
         + all(pro && pro.quotes) + all(own && own.materials),
     };
   }
@@ -683,6 +683,22 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     const text = (value, max) => String(value == null ? "" : value).slice(0, max);
     const skippable = (row) => Number.isFinite(since) && Number.isFinite(row.updatedAt) && row.updatedAt <= since;
 
+    for (const company of pro.companies || []) {
+      const seg = pathId(company.id);
+      if (!seg) continue;
+      if (skippable(company) || (Number.isFinite(since) && remoteIsRow("companies", company))) continue;
+      requireSyncUid(uid);
+      await fb.setDoc(proDoc("companies", seg, uid), {
+        name: text(company.name, 120), nip: text(company.nip, 20),
+        street: text(company.street, 200), postalCode: text(company.postalCode, 12),
+        city: text(company.city, 120), phone: text(company.phone, 200),
+        email: text(company.email, 200), www: text(company.www, 200),
+        bankAccount: text(company.bankAccount, 40), logo: text(company.logo, 300000),
+        isDefault: !!company.isDefault,
+        ...syncFields(company.createdAt, company.deletedAt),
+      }, MERGE);
+    }
+
     for (const c of pro.clients || []) {
       const seg = pathId(c.id);
       if (!seg) continue;
@@ -802,7 +818,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
   async function downloadAccount(uid = state.uid) {
     const out = {
       projects: [], rooms: [], estimations: [], shoppingItems: [],
-      clients: [], jobs: [], quotes: [], materials: [],
+      companies: [], clients: [], jobs: [], quotes: [], materials: [],
     };
     const rows = (snap) => { const list = []; snap.forEach((d) => list.push({ id: d.id, ...d.data() })); return list; };
 
@@ -823,7 +839,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     // fail open, in the direction of the visitor's own data.
     // Keep `jobs` for one release of tolerant reading. Remove it in the release after this
     // one, together with the phone's database migration from schema 9 to 10.
-    for (const name of ["clients", "jobs", "quotes", "materials"]) {
+    for (const name of ["companies", "clients", "jobs", "quotes", "materials"]) {
       try {
         requireSyncUid(uid);
         out[name] = rows(await fb.getDocs(fb.collection(db, "users", uid, name)));

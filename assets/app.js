@@ -1388,7 +1388,7 @@ async function deleteEverything() {
   // (session 59) arrived after this function was written and were never added to it, so a
   // deleted account left its clients — other people's names, telephones and addresses —
   // its quotes and its supplier prices behind, unreachable by anyone. Found 2026-09-26.
-  for (const name of ["clients", "jobs", "quotes", "materials"]) {
+  for (const name of ["companies", "clients", "jobs", "quotes", "materials"]) {
     const snap = await fb.getDocs(fb.collection(db, "users", state.uid, name));
     for (const d of snap.docs) await del(d.ref);
   }

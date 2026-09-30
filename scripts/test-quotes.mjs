@@ -259,7 +259,8 @@ head("1c. quotes live beside the clients and the jobs, and the workspace is unto
   eq("the Pro store is its own key", crm.keys().includes(crm.CRM_KEY), true);
   eq("which is not the workspace's", crm.CRM_KEY === "materio-workspace-v1", false);
   eq("the Pro store holds exactly the three local collections",
-    Object.keys(crm.raw()).sort().join(), "clients,jobs,quotes");
+    // Since 2026-09-30 the Pro store has four local collections.
+    Object.keys(crm.raw()).sort().join(), "clients,companies,jobs,quotes");
 
   const exported = crm.wsExport();
   eq("wsExport() carries no quotes", exported.quotes, undefined);
