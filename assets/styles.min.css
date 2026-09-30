@@ -1831,6 +1831,14 @@ text-align: right;
 font-variant-numeric: tabular-nums;
 white-space: nowrap;
 }
+#quo-page #quo-vat-custom { width: 6em; }
+#quo-page .quo-summary-list .quo-vat-row dd {
+display: flex;
+flex-wrap: wrap;
+justify-content: flex-end;
+align-items: center;
+gap: var(--sp-2);
+}
 #quo-page .quo-summary-list .quo-summary-total {
 padding-top: var(--sp-3);
 color: var(--on-surface);

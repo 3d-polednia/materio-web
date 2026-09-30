@@ -10,7 +10,7 @@
 
 import { esc, siteHeader, siteFooter } from "./template.mjs";
 import {
-  urlCalcIndex, urlHome, urlProjects, urlEstimate, urlCalendar, urlOwnMaterials,
+  urlCalcIndex, urlHome, urlProjects, urlQuotes, urlCalendar, urlOwnMaterials,
   DEFAULT_LANG, PLAY_URL, URL_APP, URL_DASHBOARD,
 } from "./site.mjs";
 import { ACCOUNT_LEVELS, LEVEL, STATUS, route } from "./ia.mjs";
@@ -496,7 +496,7 @@ export function appMain(t, features) {
 const DASH_HREF = {
   calculators: urlCalcIndex(DEFAULT_LANG),
   projects: urlProjects(DEFAULT_LANG),
-  estimate: urlEstimate(DEFAULT_LANG),
+  estimate: urlQuotes(DEFAULT_LANG),
 };
 
 const QUICK_ACTIONS = [

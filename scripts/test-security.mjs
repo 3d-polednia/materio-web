@@ -840,22 +840,22 @@ head("13. what a name somebody else typed does once it reaches the page");
 
   // The CSV is a file handed to somebody else, and a spreadsheet reads =, +, - and @ at
   // the start of a cell as a formula — quoted or not.
-  const ws = read("assets/workspace-ui.js");
-  const { wsCsvCell, wsFileName } = new Function(
-    `${ws.slice(ws.indexOf("function wsCsvCell"), ws.indexOf("/** Hand the browser a file"))}
-     return { wsCsvCell, wsFileName };`)();
+  const quotes = read("assets/quotes-ui.js");
+  const { quoCsvCell, quoFileName } = new Function(
+    `${quotes.slice(quotes.indexOf("function quoCsvCell"), quotes.indexOf("/** Hand the browser a file"))}
+     return { quoCsvCell, quoFileName };`)();
   for (const value of ["=1+1", "+1", "-1", "@SUM(A1)", TAB + "x", CR + "x"]) {
     check(`a cell starting ${JSON.stringify(value[0])} is text`,
-      wsCsvCell(value).startsWith("'"), wsCsvCell(value));
+      quoCsvCell(value).startsWith("'"), quoCsvCell(value));
   }
-  eq("an ordinary cell is untouched", wsCsvCell("Klej"), "Klej");
-  eq("a quote is doubled, the way CSV wants", wsCsvCell('Klej "mocny"'), 'Klej ""mocny""');
+  eq("an ordinary cell is untouched", quoCsvCell("Klej"), "Klej");
+  eq("a quote is doubled, the way CSV wants", quoCsvCell('Klej "mocny"'), 'Klej ""mocny""');
   eq("a project name cannot walk out of the download folder",
-    wsFileName("../../etc/passwd", "kosztorys", "csv"), "liczmat-etc-passwd.csv");
-  eq("nor carry a newline", wsFileName("a" + LF + "b", "kosztorys", "csv"), "liczmat-a b.csv");
-  eq("an empty name falls back", wsFileName("", "kosztorys", "csv"), "liczmat-kosztorys.csv");
+    quoFileName("../../etc/passwd", "wycena", "csv"), "liczmat-etc-passwd.csv");
+  eq("nor carry a newline", quoFileName("a" + LF + "b", "wycena", "csv"), "liczmat-a b.csv");
+  eq("an empty name falls back", quoFileName("", "wycena", "csv"), "liczmat-wycena.csv");
   eq("and an ordinary one survives",
-    wsFileName("Łazienka", "kosztorys", "csv"), "liczmat-Łazienka.csv");
+    quoFileName("Łazienka", "wycena", "csv"), "liczmat-Łazienka.csv");
 }
 
 /* ---------- 14. the policy every generated page carries

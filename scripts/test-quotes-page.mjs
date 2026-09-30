@@ -782,6 +782,122 @@ head("7f. the client quote prints as one complete page");
   await page.close();
 }
 
+head("7g. quote-owned materials, project rows, saving and CSV work end to end");
+{
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  await page.fill("#quo-materials-name", "Taśma narożnikowa");
+  await page.fill("#quo-materials-qty", "2");
+  await page.fill("#quo-materials-unit", "rol.");
+  await page.fill("#quo-materials-price", "25");
+  await page.click("#quo-materials-form button[type=submit]");
+  check("an own material is added", (await page.textContent("#quo-own-material-list")).includes("Taśma narożnikowa"));
+  await page.click("#quo-own-material-list [data-line-edit]");
+  await page.fill('#quo-own-material-list [data-f="name"]', "Taśma uszczelniająca");
+  await page.click("#quo-own-material-list [data-line-form] button[type=submit]");
+  check("the own material is edited in place", (await page.textContent("#quo-own-material-list")).includes("Taśma uszczelniająca"));
+
+  const projectRow = page.locator("#quo-material-list li[data-key]").first();
+  const projectKey = await projectRow.getAttribute("data-key");
+  await projectRow.locator("[data-hide-row]").click();
+  check("a project row moves to the hidden list",
+    await page.locator(`#quo-hidden-list li[data-key="${projectKey}"]`).count() === 1);
+  await page.click("#quo-hidden-summary");
+  await page.locator(`#quo-hidden-list li[data-key="${projectKey}"] [data-restore-row]`).click();
+  check("the hidden project row is restored",
+    await page.locator(`#quo-material-list li[data-key="${projectKey}"]`).count() === 1);
+
+  const downloadReady = page.waitForEvent("download");
+  await page.click("#quo-csv");
+  const download = await downloadReady;
+  const csv = readFileSync(await download.path(), "utf8");
+  check("the CSV contains the own material", csv.includes("Taśma uszczelniająca"), csv);
+
+  await page.fill("#quo-margin", "17");
+  await Promise.all([
+    page.waitForURL("**/wyceny/?saved=q1"),
+    page.click("#quo-save-draft"),
+  ]);
+  eq("save stores a focused margin without waiting for blur", (await liveQuotes(page))[0].marginPct, 17);
+  check("save returns to the list with its marker", await page.locator('#quo-list li[data-id="q1"].quo-saved-row').count() === 1);
+
+  await page.goto(base + `${QUOTES}?id=q1`, { waitUntil: "load" });
+  await page.waitForSelector("html[data-quotes-ready]");
+  await page.click("#quo-own-material-list [data-line-del]");
+  check("the own material is removed", !(await page.textContent("#quo-own-material-list")).includes("Taśma uszczelniająca"));
+  await page.selectOption("#quo-status", "sent");
+  await Promise.all([
+    page.waitForURL("**/wyceny/?saved=q1"),
+    page.click("#quo-save-draft"),
+  ]);
+  eq("saving a sent quote keeps it sent", (await liveQuotes(page))[0].status, "sent");
+  await page.close();
+}
+
+head("7h. PDF requires a company and carries the same total as the editor");
+{
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  await page.evaluate(() => { window.__printed = 0; window.print = () => { window.__printed++; }; window.setTimeout = () => 0; });
+  await page.click("#ws-pdf-form button[type=submit]");
+  check("without a company the PDF message is shown", await page.locator("#quo-pdf-company").isVisible());
+  eq("without a company nothing prints", await page.evaluate(() => window.__printed), 0);
+  await page.evaluate(() => {
+    const company = crmAddCompany({ name: "Firma testowa" });
+    crmUpdateQuote("q1", { companyId: company.id });
+  });
+  const editorTotal = minor(await page.textContent("#quo-fig-total"));
+  await page.click("#ws-pdf-form button[type=submit]");
+  eq("with a company the quote prints", await page.evaluate(() => window.__printed), 1);
+  eq("the editor total equals the PDF total",
+    minor(await page.textContent('#ws-pdf-doc [data-pdf="total"]')), editorTotal);
+  await page.close();
+
+  const old = await open(ctx, "/kosztorys/", { ready: false });
+  await old.waitForURL(`**${QUOTES}`);
+  eq("the permanent estimate URL lands on quotes", new URL(old.url()).pathname, QUOTES);
+  await old.close();
+}
+
+head("7i. VAT rates follow the page language and preserve custom or foreign rates");
+{
+  const expected = {
+    pl: ["", "23", "8", "5", "0", "custom"],
+    de: ["", "19", "7", "0", "custom"],
+    fr: ["", "20", "10", "5.5", "2.1", "0", "custom"],
+  };
+  for (const [lang, values] of Object.entries(expected)) {
+    const page = await open(ctx, `${urlQuotes(lang)}?id=q1`, { workspace: workspace(), crm: crm(), lang });
+    eq(`${lang}: VAT options match the country table`,
+      JSON.stringify(await page.$$eval("#quo-vat option", (options) => options.map((o) => o.value))), JSON.stringify(values));
+    await page.close();
+  }
+
+  const customCrm = crm();
+  customCrm.companies = [{ id: "co1", name: "Firma testowa", ...sync(T0) }];
+  customCrm.quotes[0] = { ...customCrm.quotes[0], projectId: "", companyId: "co1", marginPct: 0, labour: [] };
+  const emptyWorkspace = { ...workspace(), estimations: [], shoppingItems: [] };
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: emptyWorkspace, crm: customCrm });
+  await page.evaluate(() => crmAddMaterial("q1", { name: "Materiał", quantity: 1, unit: "szt.", priceMajor: 550 }));
+  await page.selectOption("#quo-vat", "custom");
+  check("choosing another rate reveals the custom input", await page.locator("#quo-vat-custom").isVisible());
+  await page.fill("#quo-vat-custom", "8.1");
+  await page.locator("#quo-vat-custom").blur();
+  eq("the decimal custom VAT is stored", (await liveQuotes(page))[0].vatPct, 8.1);
+  await page.evaluate(() => pdfFillQuote("q1"));
+  eq("the PDF prints the decimal VAT label",
+    await page.textContent('#ws-pdf-doc [data-pdf="vatLabel"]'), "VAT 8,1 %");
+  await page.selectOption("#quo-vat", "8");
+  eq("8% VAT on 550 net is 44", minor(await page.textContent("#quo-fig-vat")), 4400);
+  eq("8% VAT on 550 net is 594 gross", minor(await page.textContent("#quo-fig-total")), 59400);
+  await page.close();
+
+  const foreign = crm();
+  foreign.quotes[0] = { ...foreign.quotes[0], vatPct: 23 };
+  const de = await open(ctx, `${urlQuotes("de")}?id=q1`, { workspace: workspace(), crm: foreign, lang: "de" });
+  eq("a Polish 23% rate is selected on the German page", await de.inputValue("#quo-vat"), "23");
+  eq("opening it in German does not change the stored rate", (await liveQuotes(de))[0].vatPct, 23);
+  await de.close();
+}
+
 /* ---------------------------------------------------- 8. no JavaScript */
 
 head("8. with JavaScript off the page is still an honest page");

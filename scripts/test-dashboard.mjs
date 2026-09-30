@@ -23,7 +23,7 @@ import { LEVEL, STATUS, route, validateIA, FLOWS } from "../src/ia.mjs";
 import { dashboardMain, dashboardKeys } from "../src/app-pages.mjs";
 import {
   LANGS, DEFAULT_LANG, URL_DASHBOARD, URL_APP,
-  urlCalcIndex, urlProjects, urlEstimate, urlCalc, CALC_SLUG,
+  urlCalcIndex, urlProjects, urlQuotes, urlCalc, CALC_SLUG,
 } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -232,7 +232,7 @@ head("5. the four things chapter XIV asks the dashboard to show");
   const want = {
     calculators: urlCalcIndex(DEFAULT_LANG),
     projects: urlProjects(DEFAULT_LANG),
-    estimate: urlEstimate(DEFAULT_LANG),
+    estimate: urlQuotes(DEFAULT_LANG),
   };
   for (const [, href, key] of hrefs) {
     eq(`the "${key}" link points at ${want[key]} before any script runs`, href, want[key]);

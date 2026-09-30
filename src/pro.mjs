@@ -28,8 +28,8 @@ import { DEFAULT_LANG, URL_APP } from "./site.mjs";
  *
  * A module is a screen LiczMat Pro is sold as, and that is not the same thing as a PRO
  * permission. Since 2026-09-03 the table also carries `costs` and `pdf` — the priced half
- * of /projekty/ and /kosztorys/, which are pages anybody may open — and those two are
- * marked `module: false` in assets/plan.js. They are gated, walled and named to the
+ * of /projekty/, which is a page an account may open. Both capabilities are marked
+ * `module: false` in assets/plan.js. They are gated, walled and named to the
  * visitor like everything else Pro; they are simply not items on the list of modules the
  * public page and every wall recite. Filtering them out here is what keeps that list the
  * five screens it describes.

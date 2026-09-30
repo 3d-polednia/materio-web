@@ -742,8 +742,9 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
       const companyId = String(q.companyId || "");
       const number = String(q.number || "");
       const validUntil = String(q.validUntil || "");
-      const vatPct = q.vatPct === null || [0, 5, 8, 23].indexOf(Number(q.vatPct)) !== -1
-        ? (q.vatPct === null ? null : Number(q.vatPct)) : null;
+      const vatNumber = Number(q.vatPct);
+      const vatPct = q.vatPct === null ? null
+        : (Number.isFinite(vatNumber) && vatNumber >= 0 && vatNumber <= 100 ? vatNumber : null);
       const hiddenRows = (Array.isArray(q.hiddenRows) ? q.hiddenRows : [])
         .map((key) => text(key, 200)).filter(Boolean).slice(0, 500);
       requireSyncUid(uid);

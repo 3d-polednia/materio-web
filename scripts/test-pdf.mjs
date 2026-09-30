@@ -466,11 +466,11 @@ head("8. a guest and a free account cannot produce a PDF");
     check(`${lang}: and says what it is`, main.includes(tr(lang)("feat_pdf_d")));
   }
 
-  /* /kosztorys/'s own print button is the second way to a PDF on this site, and it asks
-     the same question. */
+  /* The quote PDF is the second way to print on this site, and it goes through the same
+     guarded export listener. */
   const ui = read("assets/workspace-ui.js");
-  check("the print button on /kosztorys/ asks before it prints",
-    ui.includes("if (wsCanPdf()) window.print()"));
+  check("the quote PDF refuses to print before its required company exists",
+    src.indexOf("if (!company) return;") < src.indexOf("window.print()"));
   check("and wsCanPdf() needs both halves, like pdfAllowed()",
     /const wsCanPdf = \(\) => wsCanCost\(\) &&[\s\S]{0,80}pwAllows\("pdf"\)/.test(ui));
 }

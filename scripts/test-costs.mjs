@@ -37,7 +37,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { projectsMain, estimateMain } from "../src/pages.mjs";
+import { projectsMain, quotesMain } from "../src/pages.mjs";
 import { LANGS, DEFAULT_LANG } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -644,7 +644,7 @@ function loadUi(allow) {
   // have to close on, and a stub always present would never let it be tested.
   if (allow !== undefined) globals.pwAllows = (feature) => Boolean(allow[feature]);
   return evalScript(["assets/workspace.js", "assets/workspace-calc.js", "assets/workspace-ui.js"],
-    ["wsCanCost", "wsCanPdf", "wsEstimateRow", "wsMaterialRow"], {
+    ["wsCanCost", "wsCanPdf", "wsMaterialRow"], {
       ...globals,
       localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
       crypto: { randomUUID: () => "id-1" },
@@ -674,25 +674,8 @@ head("7. a guest and a free account see the list and none of the money");
   eq("the PDF needs its own permission on top", loadUi({ costs: true }).wsCanPdf(), false);
   eq("and with both, it is offered", loadUi({ costs: true, pdf: true }).wsCanPdf(), true);
 
-  /* The rows themselves. This is the assertion the whole session is for: not that the
-     amount is covered up, but that it was never written. */
-  const line = {
-    id: "e1", name: "Gres 60×60", requiredUnits: 12, unitLabel: "opak.",
-    totalCostMinor: 24500, currencyCode: "PLN",
-  };
   const shut = loadUi({});
   const open = loadUi({ costs: true, pdf: true });
-
-  const shutRow = shut.wsEstimateRow(line, 0);
-  check("an estimate row carries the name", shutRow.includes("Gres 60×60"));
-  check("and the quantity", shutRow.includes("opak."));
-  check("and no amount at all", !shutRow.includes("245.00") && !shutRow.includes("PLN"));
-  const openRow = open.wsEstimateRow(line, 0);
-  check("the same row priced for a Pro account", openRow.includes("245.00 PLN"));
-  // Four cells instead of five: the column goes with the values, so no header is left
-  // promising a figure that is not under it.
-  eq("the free row is one cell shorter", (shutRow.match(/<td/g) || []).length,
-    (openRow.match(/<td/g) || []).length - 1);
 
   const item = {
     id: "s1", name: "Klej", quantity: 7, unit: "opak.", estimatedCostMinor: 24500,
@@ -706,8 +689,8 @@ head("7. a guest and a free account see the list and none of the money");
   check("the same material priced for a Pro account",
     open.wsMaterialRow(item).includes("245.00 PLN"));
 
-  /* The frame: the wall is in the markup from the first paint and the priced blocks ship
-     shut, on both pages. */
+  /* The frame: project costs and the quote editor both ship behind their server-rendered
+     walls. The old standalone estimate screen no longer exists. */
   for (const lang of LANGS) {
     const projects = projectsMain(lang, tr(lang), MAT_CATS, FEATURES).main;
     check(`${lang}: /projekty/ carries the wall`, projects.includes('id="cost-gate"'));
@@ -717,34 +700,22 @@ head("7. a guest and a free account see the list and none of the money");
     check(`${lang}: the count of calculations is not behind it`,
       projects.indexOf('id="ws-project-count"') < projects.indexOf('id="cost-gate"'));
 
-    const estimate = estimateMain(lang, tr(lang), FEATURES).main;
-    check(`${lang}: /kosztorys/ carries the wall`, estimate.includes('id="cost-gate"'));
-    check(`${lang}: the two exports ship shut`, estimate.includes('<span id="cost-tool" hidden>'));
-    // The page itself is not gated: chapter II keeps counting free, and the list of what
-    // was counted is `shopping`.
-    /* Matched on the tag and the absence of `hidden`, not on the exact class list: the
-       article gained `hierarchy-l1` and this assertion went on passing nowhere, which is
-       worse than failing — a genuinely gated estimate would have looked the same. */
-    check(`${lang}: the estimate itself is not hidden`,
-      /<article id="ws-estimate" class="ws-estimate[^"]*"(?![^>]*\bhidden\b)/.test(estimate));
-    check(`${lang}: and the project picker stays out of the wall`,
-      estimate.indexOf('id="ws-estimate-project"') < estimate.indexOf('id="cost-tool"'));
+    const quote = quotesMain(lang, tr(lang), FEATURES).main;
+    check(`${lang}: /wyceny/ carries the quote wall`, quote.includes('id="quo-gate"'));
+    check(`${lang}: the quote editor is paired with that wall`, quote.includes('<div id="quo-tool">'));
   }
 
   /* Every screen that writes an amount asks first. Named one by one, because a new
      priced row added without the question is exactly the defect this section exists for. */
   const ui = read("assets/workspace-ui.js");
   for (const fn of ["wsProjectRow", "wsRenderProjectLines", "wsMaterialRow", "wsMatSum",
-    "wsRenderOtherCosts", "wsRenderProject", "wsEstimateRow", "wsRenderEstimate"]) {
+    "wsRenderOtherCosts", "wsRenderProject"]) {
     const at = ui.indexOf(`function ${fn}(`);
     check(`${fn}() is where it says it is`, at >= 0);
     if (at < 0) continue;
     check(`${fn}() asks whether it may print money`,
       ui.slice(at, at + 2600).includes("wsCanCost()"));
   }
-  check("the CSV of a priced estimate asks too", ui.includes("if (!wsCanCost()) return;"));
-  check("and an unpriced level cannot zero a price it cannot see",
-    ui.includes("if (wsCanCost()) fields.costMajor = wsDecimal(get(\"cost\"));"));
 }
 
 head("7b. the store refuses to write a price, not only the screen");
@@ -816,8 +787,6 @@ head("7b. the store refuses to write a price, not only the screen");
   const ui = read("assets/workspace-ui.js");
   check("signing in or out redraws the whole workspace",
     /addEventListener\("lm-session", \(\) => \{\s*[\r\n]+\s*wsGateMoneyFields\(\);\s*[\r\n]+\s*wsRenderWorkspace\(\);/.test(ui));
-  check("and /kosztorys/ is drawn again too",
-    /addEventListener\("lm-session", \(\) => \{ wsGateMoneyFields\(\); wsRenderEstimate\(\); \}\)/.test(ui));
 }
 
 /* --------------------------------- a write the browser refused is not a write */

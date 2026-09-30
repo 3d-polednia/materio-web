@@ -12,7 +12,7 @@ import {
 import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
-  urlProjects, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlQuotes,
+  urlProjects, urlAndroid, urlCookies, urlCompany, urlClients, urlQuotes,
   urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
   CALC_SLUG, PLAY_URL, URL_APP, URL_PRIVACY, ENTITY, entityRows,
 } from "./site.mjs";
@@ -1479,7 +1479,8 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           <section class="dash-sec">
             <div class="dash-head">
               <h2>${esc(t("crm_quotes_t"))}</h2>
-              <a class="dash-more" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
+              <span><a class="dash-more" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
+              <button type="button" class="btn btn-primary btn-sm" id="ws-project-new-quote" hidden>${esc(t("proj_new_quote"))}</button></span>
             </div>
             <ul id="ws-chain-quotes" class="data-list"></ul>
           </section>
@@ -1685,9 +1686,8 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           </section>
 
           <!-- Chapter XVII's second figure: "inne koszty". Labour, delivery, a skip — the
-               part of a project no calculator produces. They are the hand-typed estimate
-               lines /kosztorys/ has always written, filed into the project that is open
-               instead of the active one, so this is a second way into one store. -->
+               part of a project no calculator produces. They are hand-typed estimate
+               lines filed into the project that is open instead of the active one. -->
           <!-- "Inne koszty" is nothing but money, so the whole section belongs to the
                costs feature. It carries no wall of its own: the one above says why the
                figures are not there, and a page that draws the same wall twice is a page
@@ -1778,7 +1778,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
       </div>
 
       <p class="ws-links">
-        <a class="btn btn-ghost btn-go" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
+        <a class="btn btn-ghost btn-go" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
         <!-- A deadline is a field of a project since the merge of 2026-09-21, so the page
              that owns the deadline offers the page that shows them all. /zlecenia/ made
              this offer until then. -->
@@ -1881,7 +1881,6 @@ export function proPageMain(lang, t, features, prices) {
       <p class="ws-links">
         <a class="btn btn-ghost btn-sm btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
         <a class="btn btn-ghost btn-sm btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-        <a class="btn btn-ghost btn-sm btn-go" href="${urlEstimate(lang)}">${esc(t("estpage_title"))}</a>
       </p>
     </div>
   </section>
@@ -2361,7 +2360,7 @@ export function quotesMain(lang, t, features, stamp = "") {
               <div><dt>${esc(t("quo_fig_sub"))}</dt><dd id="quo-fig-sub"></dd></div>
               <div><dt>${esc(t("quo_fig_margin"))}</dt><dd id="quo-fig-margin"></dd></div>
               <div><dt>${esc(t("quo_net"))}</dt><dd id="quo-fig-net"></dd></div>
-              <div><dt>VAT</dt><dd><select id="quo-vat" aria-label="VAT"><option value="">${esc(t("quo_vat_none"))}</option><option value="0">0 %</option><option value="5">5 %</option><option value="8">8 %</option><option value="23">23 %</option></select> <span id="quo-fig-vat"></span></dd></div>
+              <div class="quo-vat-row"><dt>VAT</dt><dd><select id="quo-vat" aria-label="VAT"></select> <input id="quo-vat-custom" type="text" inputmode="decimal" aria-label="${esc(t("quo_vat_custom"))}" hidden> <span id="quo-fig-vat"></span></dd></div>
               <div class="quo-summary-total"><dt>${esc(t("quo_fig_total"))}</dt><dd id="quo-fig-total"></dd></div>
             </dl>
             <p class="muted ws-estimate-mixed" id="quo-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
@@ -2559,134 +2558,6 @@ ${buckets}
   ${appNote(t)}
 </main>`;
   return { main: accountPageMain(main, t, lang, "schedule"), ld: crumbs.ld };
-}
-
-/**
- * /kosztorys/ — the saved lines of the active project.
- *
- * The route is GUEST and stays GUEST: the list of what was counted and what has to be
- * carried out of the shop is `shopping`, and chapter II keeps counting free. What is not
- * free since 2026-09-03 is the money on it. `costs` and `pdf` are PRO, so for a guest and
- * for a free account the value column is empty, the total is not printed, and chapter
- * XXV's wall stands where the two export buttons are — assets/workspace-ui.js empties the
- * figures and assets/paywall.js swaps the buttons for the wall, both from the one decision
- * in lmPaywall().
- *
- * @param {object[]} features LM_FEATURES from assets/plan.js, for the wall
- */
-export function estimateMain(lang, t, features = []) {
-  const crumbs = breadcrumbs([
-    { name: t("bc_home"), path: urlHome(lang) },
-    { name: t("estpage_title"), path: urlEstimate(lang) },
-  ]);
-
-  const gate = proGate(t, "costs", features, lang, { id: "cost-gate" });
-
-  const main = `<main id="main" tabindex="-1">
-  <section class="block page-head no-print">
-    <div class="wrap">
-      ${crumbs.nav}
-      <h1>${esc(t("estpage_title"))}</h1>
-      <p class="lead">${esc(t("estpage_lead"))}</p>
-    </div>
-  </section>
-
-  <section class="block alt">
-    <div class="wrap narrow">
-      <!-- The project picker is not money and is not gated: it says which project the
-           page is showing, and the list under it is free. The two exports are: both of
-           them write out what every line came to. -->
-      <div class="ws-estimate-bar no-print">
-        <select id="ws-estimate-project" aria-label="${esc(t("ws_project"))}" hidden></select>
-        <span id="cost-tool" hidden>
-          <button type="button" id="ws-estimate-print" class="btn btn-primary btn-sm">${esc(t("est_print"))}</button>
-          <button type="button" id="ws-estimate-csv" class="btn btn-ghost btn-sm">${esc(t("est_csv"))}</button>
-        </span>
-      </div>
-
-      ${gate}
-
-      <article id="ws-estimate" class="ws-estimate hierarchy-l1">
-        <header class="ws-estimate-head">
-          <div>
-            <p class="ws-estimate-brand">LiczMat</p>
-            <!-- The project's name, or — until one is picked, and with no script at
-                 all — the same "no project" sentence assets/workspace-ui.js falls back
-                 to. An empty heading is a hole in the page's outline. -->
-            <h2 id="ws-estimate-title">${esc(t("ws_no_project"))}</h2>
-          </div>
-          <div class="ws-estimate-meta">
-            <span id="ws-estimate-date"></span>
-            <span id="ws-estimate-count"></span>
-          </div>
-        </header>
-        <div class="ws-table-scroll">
-          <table class="ws-table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">${esc(t("ws_col_name"))}</th>
-                <th scope="col" class="num">${esc(t("ws_col_qty"))}</th>
-                <th scope="col" class="num">${esc(t("ws_col_cost"))}</th>
-                <th scope="col" class="no-print"></th>
-              </tr>
-            </thead>
-            <tbody id="ws-estimate-rows"></tbody>
-          </table>
-        </div>
-        <p class="ws-estimate-total"><span>${esc(t("share_total"))}</span> <b id="ws-estimate-total"></b></p>
-        <p class="muted ws-estimate-mixed" id="ws-estimate-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
-        <p class="muted ws-estimate-foot">${esc(t("est_foot"))}</p>
-      </article>
-
-      <div class="no-print ws-add-line">
-        <h3>${esc(t("ws_add_line"))}</h3>
-        <p class="muted">${esc(t("ws_add_line_d"))}</p>
-        <form id="ws-line-form" class="inline-form">
-          <label class="field" for="ws-line-name"><span class="fld-label">${esc(t("ws_col_name"))}</span>
-            <input id="ws-line-name" type="text" maxlength="120" required></label>
-          <label class="field field-narrow" for="ws-line-qty"><span class="fld-label">${esc(t("ws_col_qty"))}</span>
-            <input id="ws-line-qty" type="text" inputmode="decimal" value="1"></label>
-          <label class="field field-narrow" for="ws-line-unit"><span class="fld-label">${esc(t("ws_col_unit"))}</span>
-            <input id="ws-line-unit" type="text" maxlength="24" value="${esc(t("ws_unit_default"))}"></label>
-          <label class="field field-narrow" for="ws-line-cost"><span class="fld-label">${esc(t("ws_col_cost"))}</span>
-            <input id="ws-line-cost" type="text" inputmode="decimal"></label>
-          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
-        </form>
-      </div>
-
-      <p class="ws-links no-print">
-        <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-        <a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-      </p>
-      <p class="muted src-note no-print">${esc(t("estpage_how"))}</p>
-    </div>
-  </section>
-
-  <section class="block no-print">
-    <div class="wrap narrow">
-      <h2>${esc(t("estpage_h2"))}</h2>
-      <ol class="steps-list">
-        <li>${esc(t("estpage_s1"))}</li>
-        <li>${esc(t("estpage_s2"))}</li>
-        <li>${esc(t("estpage_s3"))}</li>
-      </ol>
-    </div>
-  </section>
-
-  ${appNote(t)}
-</main>`;
-
-  const ld = [crumbs.ld, {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: t("estpage_h2"),
-    description: t("estpage_lead"),
-    inLanguage: lang,
-    step: [t("estpage_s1"), t("estpage_s2"), t("estpage_s3")]
-      .map((s, i) => ({ "@type": "HowToStep", position: i + 1, text: s })),
-  }];
-  return { main: accountPageMain(main, t, lang, "estimate"), ld };
 }
 
 /* ------------------------------------------------------------------ converter */

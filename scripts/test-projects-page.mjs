@@ -30,7 +30,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LANGS, urlProjects, urlEstimate, urlQuotes } from "../src/site.mjs";
+import { LANGS, urlProjects, urlQuotes } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -575,12 +575,23 @@ head("11. the two screens are addresses, not tabs");
   await page.waitForSelector("#ws-project-body:not([hidden])");
   eq("forward opens it again", await text(page, "#ws-title"), "Łazienka");
 
+  check("a Pro project shows the new quote action", await page.locator("#ws-project-new-quote").isVisible());
+  await page.click("#ws-project-new-quote");
+  await page.waitForURL(`**${urlQuotes("pl")}?id=*`);
+  const made = await page.evaluate(() => JSON.parse(localStorage.getItem("liczmat-crm-v1") || "{}").quotes || []);
+  eq("the action creates one quote", made.length, 1);
+  eq("the quote belongs to the open project", made[0].projectId, "p1");
+  eq("the quote takes the project name", made[0].name, "Łazienka");
+  eq("the action lands in that quote's editor", new URL(page.url()).searchParams.get("id"), made[0].id);
+  await page.close();
+
   // The quotes list offers the active project first in its form, so the link does both
   // things (it led to /kosztorys/ until that page went into Wyceny, 2026-09-30).
-  await page.click("#ws-project-estimate");
-  await page.waitForURL(`**${urlQuotes("pl")}`);
-  eq("opening the quotes makes this the project they start from", await activeId(page), "p1");
-  await page.close();
+  const link = await open(ctx, `${PROJECTS}?id=p1`, { workspace: fixture(), active: "p2" });
+  await link.click("#ws-project-estimate");
+  await link.waitForURL(`**${urlQuotes("pl")}`);
+  eq("opening the quotes makes this the project they start from", await activeId(link), "p1");
+  await link.close();
 }
 
 /* ------------------------------------------------------------------ 12. languages */
@@ -681,7 +692,7 @@ head("15. with JavaScript off");
     await page.$eval("#ws-project", (n) => n.hidden), true);
 
   const hrefs = await page.$$eval(".ws-links a", (a) => a.map((n) => new URL(n.href).pathname));
-  check("the way on is real links, not buttons", hrefs.includes(urlEstimate("pl")), hrefs.join(", "));
+  check("the way on is real links, not buttons", hrefs.includes(urlQuotes("pl")), hrefs.join(", "));
   await page.close();
   await noJs.close();
 }
@@ -729,6 +740,8 @@ head("9b. a free account keeps every project and sees none of the totals");
   eq("and the wall stands in their place", await page.locator("#cost-gate").isHidden(), false);
   eq("the count of calculations is not money and is still there",
     await text(page, "#ws-project-count"), "2");
+  eq("a free account does not see the new quote action",
+    await page.locator("#ws-project-new-quote").isVisible(), false);
 
   /* Chapter XV's four writes are the project's own and are free. Renaming one is the
      cheapest of them to walk and the one that proves nothing on this screen was gated by

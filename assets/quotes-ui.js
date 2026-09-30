@@ -25,6 +25,37 @@ const quoLang = () => document.documentElement.lang || "pl";
 const quoEsc = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+/** CSV cells are quoted and never handed to a spreadsheet as formulas. */
+function quoCsvCell(cell) {
+  const value = String(cell == null ? "" : cell);
+  const armed = /^[=+\-@\t\r]/.test(value) ? "'" + value : value;
+  return armed.replace(/"/g, '""');
+}
+
+/** Build a safe download name out of text supplied by the visitor. */
+function quoFileName(name, fallback, extension) {
+  const clean = String(name || "")
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/[\\/:*?"<>|.]+/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 60)
+    .replace(/^[-\s]+|[-\s]+$/g, "");
+  return `liczmat-${clean || fallback}.${extension}`;
+}
+
+/** Hand the browser a file without a server round trip. */
+function quoDownload(filename, mime, text) {
+  const url = URL.createObjectURL(new Blob([text], { type: mime }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 /** A quantity as the visitor's language writes it — "40", "12,5". */
 function quoNum(n) {
   const v = Number(n);
@@ -488,7 +519,17 @@ function quoRenderDetail(id) {
   fig("quo-fig-net", money.net);
   fig("quo-fig-vat", money.vat);
   fig("quo-fig-total", money.gross);
-  document.getElementById("quo-vat").value = money.vatPct === null ? "" : String(money.vatPct);
+  const vat = document.getElementById("quo-vat");
+  const vatCustom = document.getElementById("quo-vat-custom");
+  const rates = QUOTE_VAT_RATES[quoLang()] || QUOTE_VAT_RATES.en;
+  const stored = money.vatPct === null ? "" : String(money.vatPct);
+  const foreign = stored !== "" && rates.indexOf(Number(stored)) === -1;
+  vat.innerHTML = `<option value="">${quoEsc(quoT("quo_vat_none"))}</option>`
+    + rates.map((rate) => `<option value="${rate}">${quoEsc(String(rate).replace(".", ","))} %</option>`).join("")
+    + (foreign ? `<option value="${quoEsc(stored)}">${quoEsc(stored.replace(".", ","))} %</option>` : "")
+    + `<option value="custom">${quoEsc(quoT("quo_vat_custom"))}</option>`;
+  vat.value = stored;
+  vatCustom.hidden = true;
   document.getElementById("quo-mixed").hidden = !money.mixed;
 
   const margin = document.getElementById("quo-margin");
@@ -601,7 +642,15 @@ function wireQuoteDetail() {
   on("quo-company", "change", (e) => { crmUpdateQuote(quoOpenId, { companyId: e.target.value }); });
   on("quo-number", "change", (e) => { crmUpdateQuote(quoOpenId, { number: e.target.value }); });
   on("quo-valid-until", "change", (e) => { crmUpdateQuote(quoOpenId, { validUntil: e.target.value }); });
-  on("quo-vat", "change", (e) => { crmUpdateQuote(quoOpenId, { vatPct: e.target.value }); });
+  on("quo-vat", "change", (e) => {
+    const custom = document.getElementById("quo-vat-custom");
+    custom.hidden = e.target.value !== "custom";
+    if (e.target.value === "custom") { custom.value = ""; custom.focus(); return; }
+    crmUpdateQuote(quoOpenId, { vatPct: e.target.value });
+  });
+  on("quo-vat-custom", "change", (e) => {
+    crmUpdateQuote(quoOpenId, { vatPct: e.target.value });
+  });
 
   on("quo-material-list", "click", (e) => {
     const row = e.target.closest("[data-key]");
@@ -745,8 +794,9 @@ function wireQuoteDetail() {
       name: line.name, quantity: line.quantity, unit: line.unit, minor: line.amountMinor,
     })), ...lines.labour.map((line) => ({ name: line.name, quantity: line.quantity, unit: line.unit, minor: line.amountMinor }))];
     const csv = [quoT("quo_csv_head").split("|"), ...rows.map((row, i) => [i + 1, row.name, row.quantity == null ? "" : row.quantity, row.unit || "", row.quantity ? (row.minor / row.quantity / 100) : row.minor / 100, row.minor / 100])]
-      .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(";")).join("\r\n");
-    wsDownload(`${quote.number || quote.name}.csv`, `\ufeff${csv}`, "text/csv;charset=utf-8");
+      .map((row) => row.map((value) => `"${quoCsvCell(value)}"`).join(";")).join("\r\n");
+    quoDownload(quoFileName(quote.number || quote.name, "wycena", "csv"),
+      "text/csv;charset=utf-8", `\ufeff${csv}`);
   });
 }
 

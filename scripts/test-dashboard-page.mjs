@@ -27,7 +27,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { urlCalc, urlCalcIndex, urlEstimate, urlProjects } from "../src/site.mjs";
+import { urlCalc, urlCalcIndex, urlProjects, urlQuotes } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -439,22 +439,9 @@ head("8. a saved line keeps the currency it was priced in");
 
 head("9. opening a project takes the visitor to it");
 {
+  // /app/dashboard/ is a permanent redirect to /app/. The live overview project action
+  // is exercised by test-account-page; this suite only owns the redirect and fallback links.
   check("opening overview projects remains covered by test-account-page", true);
-  if (false) {
-  const page = await open(ctx, DASH, { workspace: fixture(), storage: { "materio-active-project": "p2" } });
-  const list = await rows(page, "#dash-projects");
-  check("the last-used project is not visibly marked", !list.join(" ").includes("Aktywny"), list.join(" | "));
-
-  await Promise.all([
-    page.waitForURL(`**${urlEstimate("pl")}`),
-    page.click('#dash-projects li[data-id="p1"] [data-open]'),
-  ]);
-  eq("opening another one lands on the estimate", new URL(page.url()).pathname, urlEstimate("pl"));
-  eq("and that project is the one the estimate is about",
-    await page.evaluate(() => localStorage.getItem("materio-active-project")), "p1");
-  eq("which is what the page shows", await text(page, "#ws-estimate-title"), "Łazienka");
-  await page.close();
-  }
 }
 
 head("10. there are ways in that are not the address bar");
@@ -529,7 +516,7 @@ head("13. with JavaScript off the page is still a way somewhere");
   const hrefs = await page.$$eval("[data-dash-url]", (a) => a.map((n) => new URL(n.href).pathname));
   eq("both merged-list links are real addresses", hrefs.length, 2);
   check("the calculator hub among them", hrefs.includes(urlCalcIndex("pl")));
-  check("and the estimate", hrefs.includes(urlEstimate("pl")));
+  check("and quotes", hrefs.includes(urlQuotes("pl")));
   await page.close();
   await noJs.close();
 }

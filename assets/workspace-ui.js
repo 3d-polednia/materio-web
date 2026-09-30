@@ -1,8 +1,8 @@
-/* LiczMat website — the two workspace screens: /projekty/ and /kosztorys/.
+/* LiczMat website — the /projekty/ workspace screens.
 
-   The projects page holds two of them in one file — the index and one project at
+   The projects page holds two screens in one file — the index and one project at
    ?id=<projectId> — with that project's rooms, its saved calculations, its material list
-   and its costs. /kosztorys/ is the document of what was calculated.
+   and its costs.
 
    assets/workspace-calc.js is the other half, and it is loaded first: it defines the
    shared vocabulary (wsT, wsEsc, wsNum, wsDecimal, wsPlain, wsUnit, wsLang) that both
@@ -267,7 +267,7 @@ function wsFieldValue(field, snapshot) {
  *
  * A line saved before session 16 has no snapshot and gets no disclosure — an empty
  * "where from" is worse than none, and chapter XXV forbids a control with nothing behind
- * it. So does a line typed by hand on /kosztorys/: it was never calculated.
+ * it. So does an "other cost" typed by hand on the project: it was never calculated.
  */
 function wsLineSource(row) {
   const snap = wsLineSnapshot(row);
@@ -690,9 +690,8 @@ function wsMatSum(form) {
  * The other costs of a project — chapter XVII's "inne koszty": the estimate lines nothing
  * calculated. Labour, delivery, a skip, the tool that had to be hired.
  *
- * They are ordinary estimate lines with `manual` in their `inputJson`, which is how
- * /kosztorys/ has written them since it existed — so this section is a second way into the
- * same store, not a second store. They are shown apart from the calculations above for the
+ * They are ordinary estimate lines with `manual` in their `inputJson`. They are shown
+ * apart from the calculations above for the
  * reason the summary needs them apart: a calculation has a material on the shopping list
  * carrying its money, and one of these does not.
  */
@@ -746,6 +745,8 @@ function wsRenderProject(id) {
 
   title.textContent = project.name;
   wsCrumb(project.name);
+  const newQuote = document.getElementById("ws-project-new-quote");
+  if (newQuote) newQuote.hidden = !(typeof crmCanQuote === "function" && crmCanQuote());
 
   // Chapter XIV asks a project to carry its history. The two stamps the sync contract
   // already keeps are the whole of it today: when it was made and when it last moved.
@@ -1273,10 +1274,16 @@ function wireProjectDetail() {
     wsBackToIndex();
   });
 
-  // /kosztorys/ is about the active project, so the link does what the dashboard's
-  // "Otwórz" does: makes this the one, then goes. It stays a real <a href>, so it also
-  // works with the script off.
+  // The quotes form offers the active project first, so the link makes this the one before
+  // it goes. It stays a real <a href>, so it also works with the script off.
   on("ws-project-estimate", "click", () => { if (wsOpenId) wsSetActiveProject(wsOpenId); });
+
+  on("ws-project-new-quote", "click", () => {
+    const project = wsProject(wsOpenId);
+    if (!project || typeof crmAddQuote !== "function") return;
+    const quote = crmAddQuote({ name: project.name, projectId: project.id });
+    if (quote) location.href = `${window.LM_LINKS.quotes}?id=${encodeURIComponent(quote.id)}`;
+  });
 
   // The material list: tick one off, or take it off the list. Both write through the store,
   // which fires `workspacechange` and redraws the screen — so the checkbox reflects what was
@@ -1450,9 +1457,8 @@ function wireProjectDetail() {
     el("ws-mat-name").focus();
   });
 
-  /* Chapter XVII's "inne koszty": the costs of a project that no calculator produces.
-     Same store as /kosztorys/'s hand-typed line — one writer, two ways in — but filed into
-     the project that is open rather than into whichever one is active. */
+  /* Chapter XVII's "inne koszty": the costs of a project that no calculator produces,
+     filed into the project that is open rather than into whichever one is active. */
   on("ws-project-other-list", "click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (li && e.target.closest("[data-del]")) wsDeleteEstimation(li.dataset.id);
@@ -1479,246 +1485,12 @@ function wireProjectDetail() {
   });
 }
 
-/* ------------------------------------------------------------------ /kosztorys/ */
-
-/**
- * One estimate line, either as text or as the form that edits it.
- *
- * The value column is `costs` and is Pro. For a level that does not reach it the column is
- * taken out of the row entirely rather than left blank — the same rule the PDF follows for
- * a column nobody asked for, and for the same reason: a header with nothing under it
- * promises a figure the page is not going to print. wsRenderEstimate() takes the matching
- * header and the colspan of the empty row with it.
- */
-function wsEstimateRow(r, i) {
-  const money = wsCanCost();
-  if (r.id !== wsEditingId) {
-    return `<tr data-id="${wsEsc(r.id)}">
-        <td>${i + 1}</td>
-        <td>${wsEsc(r.name)}</td>
-        <td class="num">${wsNum(r.requiredUnits)} ${wsEsc(r.unitLabel)}</td>
-        ${money ? `<td class="num">${wsEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</td>` : ""}
-        <td class="no-print ws-row-actions">
-          <button type="button" class="btn btn-ghost btn-sm" data-edit>${wsEsc(wsT("ws_edit"))}</button>
-          <button type="button" class="btn btn-ghost btn-sm" data-del>${wsEsc(wsT("app_delete"))}</button>
-        </td>
-      </tr>`;
-  }
-  return `<tr data-id="${wsEsc(r.id)}" class="ws-editing">
-      <td>${i + 1}</td>
-      <td><input type="text" maxlength="120" data-f="name" value="${wsEsc(r.name)}" aria-label="${wsEsc(wsT("ws_col_name"))}"></td>
-      <td class="num">
-        <input type="text" inputmode="decimal" class="ws-qty" data-f="qty" value="${r.requiredUnits}" aria-label="${wsEsc(wsT("ws_col_qty"))}">
-        <input type="text" maxlength="24" class="ws-unit" data-f="unit" value="${wsEsc(r.unitLabel)}" aria-label="${wsEsc(wsT("ws_col_unit"))}">
-      </td>
-      ${money ? `<td class="num"><input type="text" inputmode="decimal" class="ws-qty" data-f="cost" value="${(r.totalCostMinor / 100).toFixed(2)}" aria-label="${wsEsc(wsT("ws_col_cost"))}"></td>` : ""}
-      <td class="no-print ws-row-actions">
-        <button type="button" class="btn btn-primary btn-sm" data-save>${wsEsc(wsT("app_save"))}</button>
-        <button type="button" class="btn btn-ghost btn-sm" data-cancel>${wsEsc(wsT("action_cancel"))}</button>
-      </td>
-    </tr>`;
-}
-
-/** Which line is open for editing, or "" when none is. */
-let wsEditingId = "";
-
-function wsRenderEstimate() {
-  const wrap = document.getElementById("ws-estimate");
-  if (!wrap) return;
-  const money = wsCanCost();
-  const project = wsActiveProject();
-  const rows = project ? wsEstimations(project.id) : [];
-  // The total is not computed for a level that may not see it. wsProjectTotal() counts
-  // money and nothing else, so there is nothing in it worth having without the money.
-  const total = project && money
-    ? wsProjectTotal(project.id)
-    : { minor: 0, currencyCode: "", byCurrency: [], count: rows.length };
-
-  const picker = document.getElementById("ws-estimate-project");
-  if (picker) {
-    const projects = wsProjects();
-    picker.innerHTML = projects.map((p) =>
-      `<option value="${wsEsc(p.id)}"${p.id === (project || {}).id ? " selected" : ""}>${wsEsc(p.name)}</option>`).join("");
-    picker.hidden = projects.length < 2;
-  }
-
-  document.getElementById("ws-estimate-title").textContent = project ? project.name : wsT("ws_no_project");
-  document.getElementById("ws-estimate-date").textContent =
-    new Date().toLocaleDateString(wsLang(), { year: "numeric", month: "long", day: "numeric" });
-
-  // The value column goes with the values: header, cells and the width of the empty row.
-  const head = wrap.querySelector(`.ws-table thead th.num + th.num`);
-  if (head) head.hidden = !money;
-  const body = document.getElementById("ws-estimate-rows");
-  if (!rows.length) {
-    body.innerHTML = `<tr><td colspan="${money ? 5 : 4}" class="muted">${wsEsc(wsT("ws_empty_estimate"))}</td></tr>`;
-  } else {
-    body.innerHTML = rows.map((r, i) => wsEstimateRow(r, i)).join("");
-  }
-  // The line and the total under it are two halves of one figure, so they are withheld
-  // together: no sum is printed, and the paragraph carrying it is taken off the page
-  // rather than left showing a currency with nothing in front of it.
-  const sum = wrap.querySelector(".ws-estimate-total");
-  if (sum) sum.hidden = !money;
-  // Per currency, for the reason the note under it gives: lines saved in two currencies
-  // have two sums, and wsProjectTotal() returns no `minor` at all for them.
-  document.getElementById("ws-estimate-total").textContent =
-    money ? (wsSumsText(total.byCurrency, "minor") || wsMoney(0)) : "";
-  document.getElementById("ws-estimate-count").textContent = `${total.count} ${wsUnit("ws_lines", total.count)}`;
-
-  // Lines saved in different currencies do not add up, and the sum above says so.
-  const mixed = document.getElementById("ws-estimate-mixed");
-  if (mixed) mixed.hidden = !money || !total.mixed;
-}
-
-function buildEstimatePage() {
-  const wrap = document.getElementById("ws-estimate");
-  if (!wrap) return;
-
-  /* Chapter XXV's wall stands where the two export buttons are: `#cost-tool` holds them
-     and `#cost-gate` is drawn instead. The page around it is untouched — the list of what
-     was counted is `shopping`, and it stays open to everybody. */
-  if (typeof pwMount === "function") pwMount("cost", "costs");
-  wsGateMoneyFields();
-  document.addEventListener("lm-session", () => { wsGateMoneyFields(); wsRenderEstimate(); });
-
-  document.getElementById("ws-estimate-rows").addEventListener("click", (e) => {
-    const tr = e.target.closest("tr[data-id]");
-    if (!tr) return;
-    const id = tr.dataset.id;
-
-    if (e.target.closest("[data-del]")) {
-      wsDeleteEstimation(id);
-    } else if (e.target.closest("[data-edit]")) {
-      wsEditingId = id;
-      wsRenderEstimate();
-    } else if (e.target.closest("[data-cancel]")) {
-      wsEditingId = "";
-      wsRenderEstimate();
-    } else if (e.target.closest("[data-save]")) {
-      const field = (f) => tr.querySelector(`[data-f="${f}"]`);
-      const get = (f) => { const el = field(f); return el ? el.value : ""; };
-      wsEditingId = "";
-      const fields = {
-        name: get("name").trim(),
-        requiredUnits: wsDecimal(get("qty")),
-        unitLabel: get("unit").trim(),
-      };
-      /* The cost field only exists for a level that reaches `costs`. Leaving the key out
-         is what wsUpdateEstimation() reads as "unchanged", so correcting a line's name on
-         a free account cannot quietly zero the amount somebody put on it while they had
-         Pro. */
-      if (wsCanCost()) fields.costMajor = wsDecimal(get("cost"));
-      wsUpdateEstimation(id, fields);
-      wsRenderEstimate();
-    }
-  });
-
-  const addForm = document.getElementById("ws-line-form");
-  if (addForm) addForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = document.getElementById("ws-line-name");
-    if (!name.value.trim()) return;
-    wsAddManualEstimation({
-      name: name.value.trim(),
-      requiredUnits: wsDecimal(document.getElementById("ws-line-qty").value),
-      unitLabel: document.getElementById("ws-line-unit").value.trim(),
-      // The line itself is a name and a quantity, which is `shopping` and free. The
-      // amount on it is `costs`: a level that does not reach it writes a line with no
-      // money on it rather than being refused the line.
-      costMajor: wsCanCost() ? wsDecimal(document.getElementById("ws-line-cost").value) : 0,
-    });
-    name.value = "";
-    document.getElementById("ws-line-cost").value = "";
-  });
-
-  const picker = document.getElementById("ws-estimate-project");
-  if (picker) picker.addEventListener("change", () => wsSetActiveProject(picker.value));
-
-  const print = document.getElementById("ws-estimate-print");
-  // No PDF library: the browser's own "print to PDF" produces a smaller, selectable file
-  // than a canvas render would, and @media print in styles.css is what shapes the page.
-  // It is the second way to a PDF on this site, so it asks the same question the
-  // configurator on /projekty/ does, and it asks it here as well as behind the wall.
-  if (print) print.addEventListener("click", () => { if (wsCanPdf()) window.print(); });
-
-  const csv = document.getElementById("ws-estimate-csv");
-  if (csv) csv.addEventListener("click", () => {
-    // The file is a priced estimate with the prices in a column of their own, so it is
-    // `costs` exactly as the screen it comes from is.
-    if (!wsCanCost()) return;
-    const project = wsActiveProject();
-    const rows = project ? wsEstimations(project.id) : [];
-    const head = ["#", wsT("ws_col_name"), wsT("ws_col_qty"), wsT("ws_col_unit"), wsT("ws_col_cost"), "currency"];
-    const body = rows.map((r, i) =>
-      [i + 1, r.name, r.requiredUnits, r.unitLabel, (r.totalCostMinor / 100).toFixed(2), r.currencyCode]);
-    const text = [head, ...body]
-      .map((line) => line.map((cell) => `"${wsCsvCell(cell)}"`).join(";"))
-      .join("\r\n");
-    wsDownload(wsFileName(project && project.name, "kosztorys", "csv"),
-      "text/csv;charset=utf-8", "﻿" + text);
-  });
-
-  document.addEventListener("workspacechange", wsRenderEstimate);
-  wsRenderEstimate();
-}
-
-/**
- * One cell of the CSV, quoted — and never a formula (session 35).
- *
- * A spreadsheet reads a cell that starts with `=`, `+`, `-`, `@`, a tab or a carriage
- * return as a formula, quotes or no quotes, and this file is written to be handed to
- * somebody else: the material names in it were typed on a phone, or came down from the
- * account, and "=HYPERLINK(...)" is a name a row can carry. An apostrophe in front is
- * what every spreadsheet reads as "this is text"; it is one character, it is visible,
- * and it beats the alternative, which is a file that runs.
- */
-function wsCsvCell(cell) {
-  const value = String(cell == null ? "" : cell);
-  const armed = /^[=+\-@\t\r]/.test(value) ? "'" + value : value;
-  return armed.replace(/"/g, '""');
-}
-
-/**
- * A file name built out of something the visitor typed.
- *
- * A project called `../../etc/passwd` or one carrying a newline is not a download the
- * browser should be asked to name a file after: `a.download` is a *suggestion*, browsers
- * sanitise it differently, and the one thing this side can do is not hand over a
- * separator in the first place. Everything but a letter, a digit, a dash and a space
- * becomes a dash; the result is trimmed, capped and falls back to the plain word.
- */
-function wsFileName(name, fallback, extension) {
-  const clean = String(name || "")
-    .replace(/[\u0000-\u001f\u007f]/g, " ")
-    .replace(/[\\/:*?"<>|.]+/g, "-")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 60)
-    .replace(/^[-\s]+|[-\s]+$/g, "");
-  return `liczmat-${clean || fallback}.${extension}`;
-}
-
-/** Hand the browser a file without a server round trip. */
-function wsDownload(filename, mime, text) {
-  const url = URL.createObjectURL(new Blob([text], { type: mime }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   buildProjectsPage();
-  buildEstimatePage();
 });
 
 /* Saved lines keep the currency they were priced in, but a new line is stamped with the
    one in force — so every list that prints money is redrawn when the visitor switches. */
 document.addEventListener("currencychange", () => {
   wsRenderWorkspace();
-  wsRenderEstimate();
 });

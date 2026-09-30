@@ -901,7 +901,7 @@ head("9. the frame the build writes");
       // one (2026-09-21), so the duplicate went and one picker is left.
       "quo-client-form", "quo-client-pick", "quo-client-new-form",
       "quo-project-pick", "quo-project-new-form",
-      "quo-room-list", "quo-material-list", "quo-material-sum", "ws-pdf-form", "ws-pdf-doc",
+      "quo-room-list", "quo-material-list", "ws-pdf-form", "ws-pdf-doc",
       "quo-margin", "quo-status", "quo-fig-materials", "quo-fig-other", "quo-fig-labour",
       "quo-fig-sub", "quo-fig-margin", "quo-fig-total", "quo-mixed", "quo-chain-line",
       "quo-undo", "quo-gate", "quo-tool", "quo-pro-chip"]) {
@@ -939,7 +939,7 @@ head("9a. the quote owns the chain controls and the PDF document");
   check("the quote still writes only projectId",
     !/crmUpdateQuote\([^)]*,\s*\{\s*(clientId|jobId)/.test(ui));
   check("rooms and materials are read from the selected project",
-    ui.includes("wsRooms(project.id)") && ui.includes("wsItems(project.id)"));
+    ui.includes("wsRooms(project.id)") && ui.includes("crmQuoteLines(q)"));
   const quoteScripts = build.match(/const QUOTES_SCRIPTS = \[([\s\S]*?)\n\];/);
   check("the quote page loads workspace-calc before the shared PDF exporter",
     quoteScripts && quoteScripts[1].indexOf("workspace-calc.js") >= 0 &&

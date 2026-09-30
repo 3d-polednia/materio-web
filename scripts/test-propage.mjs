@@ -31,7 +31,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   LANGS, DEFAULT_LANG, SECTION, urlHome, urlLiczmatPro, urlCalcIndex, urlProjects,
-  urlEstimate, URL_APP,
+  urlQuotes, URL_APP,
 } from "../src/site.mjs";
 import {
   LEVEL, STATUS, route, validateIA, livePaths, HOME_DOORS, ACCOUNT_LEVELS, navRoutes,
@@ -209,7 +209,6 @@ for (const lang of LANGS) {
   has(t("propage_h_free"), "the free half of the product has its own heading");
   has(`href="${urlCalcIndex(lang)}"`, "the calculators are linked");
   has(`href="${urlProjects(lang)}"`, "the projects are linked");
-  has(`href="${urlEstimate(lang)}"`, "and the cost estimate is linked");
   for (const key of ["propage_free_1", "propage_free_2", "propage_free_3"]) {
     has(t(key), `${key} is on the page`);
   }

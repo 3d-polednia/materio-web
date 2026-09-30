@@ -1,6 +1,6 @@
 import { esc, logoMark } from "./template.mjs";
 import {
-  DEFAULT_LANG, URL_APP, urlProjects, urlEstimate, urlCompany, urlClients, urlQuotes,
+  DEFAULT_LANG, URL_APP, urlProjects, urlCompany, urlClients, urlQuotes,
   urlCalendar, urlOwnMaterials,
 } from "./site.mjs";
 
@@ -81,7 +81,7 @@ export function accountPageMain(main, t, lang, current) {
   const head = body.slice(0, headEnd + "</section>".length);
   const tool = body.slice(headEnd + "</section>".length);
   const next = {
-    projects: urlProjects, estimate: urlEstimate, company: urlCompany, clients: urlClients, quotes: urlQuotes,
+    projects: urlProjects, estimate: urlQuotes, company: urlCompany, clients: urlClients, quotes: urlQuotes,
     schedule: urlCalendar, materials: urlOwnMaterials,
   }[current](lang);
   const signup = `${URL_APP}?mode=signup&amp;next=${encodeURIComponent(next)}`;

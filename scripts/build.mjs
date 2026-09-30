@@ -449,8 +449,8 @@ function validate() {
       // A PRO *module* is a screen, so the route it lives on has to be PRO too — a Pro
       // module on an open page is a page that shows the module to everybody. A PRO
       // *capability* (`module: false`, since 2026-09-03) is the opposite arrangement on
-      // purpose: `costs` and `pdf` are the priced half of /kosztorys/ and /projekty/,
-      // which stay GUEST because the counting and the material list on them are free.
+      // purpose: `costs` and `pdf` are capabilities inside larger account screens rather
+      // than standalone Pro modules.
       if (f.route && f.level === LEVEL.PRO && f.module !== false
           && route(f.route).level !== LEVEL.PRO) {
         problems.push(`feature "${f.id}" is PRO but route "${f.route}" is not`);
@@ -1866,7 +1866,7 @@ function buildPrivatePages() {
     urls: {
       calculators: alternatesFor(urlCalcIndex),
       projects: alternatesFor(urlProjects),
-      estimate: alternatesFor(urlEstimate),
+      estimate: alternatesFor(urlQuotes),
     },
     calcs: Object.fromEntries(CALCS.map((c) => [c.id, {
       url: alternatesFor((l) => urlCalc(l, c.id)),
@@ -1923,7 +1923,7 @@ function buildPrivatePages() {
     // and the recents through their globals, which a module's own scope would hide.
     // plan.js since 2026-09-04: the page shows no Firebase-derived level (see the note at
     // the top of assets/dashboard.js), so the money it prints is gated on lmCan("costs", …)
-    // over the same liczmat-signed-in hint /projekty/ and /kosztorys/ read — the same
+    // over the same liczmat-signed-in hint /projekty/ reads — the same
     // known limitation, not a new one (docs/MASTER_PLAN.md).
     classicScripts: [],
   }));

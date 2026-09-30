@@ -2766,6 +2766,18 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+/* A rate is at most "100" or "8.1"; at the full field width it pushed the VAT figure off a
+   phone screen. */
+#quo-page #quo-vat-custom { width: 6em; }
+/* The VAT row carries a select, the custom field and the figure; on a phone they wrap
+   under the label instead of running over it. */
+#quo-page .quo-summary-list .quo-vat-row dd {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--sp-2);
+}
 #quo-page .quo-summary-list .quo-summary-total {
   padding-top: var(--sp-3);
   color: var(--on-surface);

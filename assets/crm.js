@@ -656,6 +656,15 @@ const crmQuote = (id) => crmQuotes().find((q) => q.id === id) || null;
 const crmProjectQuotes = (projectId) =>
   crmQuotes().filter((q) => q.projectId && q.projectId === String(projectId || ""));
 
+/* Checked 2026-09-30. Re-check these rates whenever a country changes its VAT law.
+   The contractor's country is not stored, so the page language is the closest signal. */
+const QUOTE_VAT_RATES = {
+  pl: [23, 8, 5, 0], de: [19, 7, 0], en: [20, 5, 0], uk: [20, 14, 7, 0],
+  cs: [21, 12, 0], sk: [23, 19, 5, 0], ro: [21, 11, 0], hr: [25, 13, 5, 0],
+  sr: [20, 10, 0], it: [22, 10, 5, 4, 0], nl: [21, 9, 0], es: [21, 10, 4, 0],
+  fr: [20, 10, 5.5, 2.1, 0],
+};
+
 /**
  * Add a quote. Only the name is required, for the reason only a client's or project's name
  * is: everything else is filled in as it becomes known, and a named quote is already the
@@ -731,7 +740,7 @@ function crmUpdateQuote(id, fields) {
   if (f.validUntil !== undefined) quote.validUntil = crmDay(f.validUntil);
   if (f.vatPct !== undefined) {
     const vat = f.vatPct === null || f.vatPct === "" ? null : Number(f.vatPct);
-    if (vat === null || [0, 5, 8, 23].indexOf(vat) !== -1) quote.vatPct = vat;
+    if (vat === null || (Number.isFinite(vat) && vat >= 0 && vat <= 100)) quote.vatPct = vat;
   }
   if (f.hiddenRows !== undefined && Array.isArray(f.hiddenRows)) {
     quote.hiddenRows = [...new Set(f.hiddenRows.map((key) => crmText(key, 200)).filter(Boolean))].slice(0, 500);
@@ -1363,7 +1372,7 @@ if (typeof module !== "undefined" && module.exports) {
     PROJECT_STATUS, PROJECT_OPEN_STATUS, PROJECT_DEFAULT_STATUS, PROJECT_COLORS,
     CAL_BUCKETS, CAL_SOON_DAYS,
     CRM_CHAIN, CRM_HISTORY_KINDS,
-    QUO_MAX_LINES, QUO_MAX_MARGIN, QUOTE_STATUS,
+    QUO_MAX_LINES, QUO_MAX_MARGIN, QUOTE_STATUS, QUOTE_VAT_RATES,
     crmQuoteStatus, crmQuoteSummary,
   };
 }
