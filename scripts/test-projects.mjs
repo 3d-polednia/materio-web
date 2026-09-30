@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { LEVEL, STATUS, route, validateIA, livePaths, FLOWS, navRoutes, ROUTES } from "../src/ia.mjs";
 import { projectsMain } from "../src/pages.mjs";
 import { siteHeader, siteFooter } from "../src/template.mjs";
-import { LANGS, DEFAULT_LANG, urlProject, urlProjects, urlEstimate, GUIDES } from "../src/site.mjs";
+import { LANGS, DEFAULT_LANG, urlProject, urlProjects, urlEstimate, urlQuotes, GUIDES } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -533,8 +533,9 @@ head("9. the frame the build writes");
 
     check(`${lang}: the back link goes to the index`,
       main.includes(`href="${urlProjects(lang)}" data-ws-back`));
-    check(`${lang}: the estimate link is a real address`,
-      main.includes(`href="${urlEstimate(lang)}" id="ws-project-estimate"`));
+    // Kosztorys went into Wyceny on 2026-09-30; the project's link leads to the quotes.
+    check(`${lang}: the quotes link is a real address`,
+      main.includes(`href="${urlQuotes(lang)}" id="ws-project-estimate"`));
 
     // The title is swapped for the project's name, so it has to be findable.
     check(`${lang}: the heading can be retitled`, main.includes('id="ws-title"'));

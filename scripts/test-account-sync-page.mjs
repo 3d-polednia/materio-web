@@ -144,7 +144,8 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   // Another tab signing out (or deleting the account) stops this page's pushes.
   const x = await open("/projekty/"); await waitSync(x.page);
   const other = await x.ctx.newPage();
-  await other.goto(base + "/kosztorys/", { waitUntil: "domcontentloaded" });
+  // Any other page of the site will do; /kosztorys/ served until it became a redirect (2026-09-30).
+  await other.goto(base + "/klienci/", { waitUntil: "domcontentloaded" });
   await other.evaluate(() => localStorage.removeItem("liczmat-signed-in"));
   await x.page.waitForTimeout(2500);
   const names = await x.page.evaluate(() => [...window.__fbDocs.values()].map((v) => v.name));

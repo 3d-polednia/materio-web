@@ -38,7 +38,6 @@ export function accountSidebar(t, { lang = DEFAULT_LANG, current = "overview", i
     ["app_nav_work", [
       appLink("overview", "app_tab_overview", "#przeglad"),
       routeLink("projects", "app_tab_projects", "projects", urlProjects(lang)),
-      routeLink("estimate", "estpage_title", "estimate", urlEstimate(lang)),
       routeLink("clients", "app_tab_clients", "clients", urlClients(lang)),
       routeLink("quotes", "app_tab_quotes", "quotes", urlQuotes(lang)),
       routeLink("schedule", "app_tab_schedule", "calendar", urlCalendar(lang)),

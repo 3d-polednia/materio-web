@@ -41,7 +41,7 @@ import { DEFAULT_CURRENCY, MONEY_LOCALE } from "../src/currency.mjs";
 import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
-  materialsMain, projectsMain, estimateMain, androidMain, cookiesMain, contactMain, companyMain, clientsMain,
+  materialsMain, projectsMain, androidMain, cookiesMain, contactMain, companyMain, clientsMain,
   quotesMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
@@ -56,7 +56,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20260930b";
+const STAMP = "20260930c";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -1500,7 +1500,10 @@ function buildWorkspacePages() {
       modules: ["/assets/account-sync-page.js"],
     }));
 
-    const estimate = estimateMain(lang, t, LM_FEATURES);
+    const estimateTarget = urlQuotes(lang);
+    const estimateMain = `<main id="main" tabindex="-1"><section class="block page-head"><div class="wrap">`
+      + `<h1>${t("quopage_title")}</h1><p><a class="btn btn-primary" href="${estimateTarget}">${t("quopage_title")}</a></p>`
+      + `</div></section></main>`;
     write(join(urlEstimate(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("estpage_title")} \u2014 LiczMat`,
@@ -1508,9 +1511,9 @@ function buildWorkspacePages() {
       path: urlEstimate(lang),
       alternates: estAlt,
       noindex: true,
-      main: estimate.main, jsonld: estimate.ld,
-      scripts: WS_SCRIPTS,
-      modules: ["/assets/account-sync-page.js"],
+      main: estimateMain,
+      headExtra: `<meta http-equiv="refresh" content="0; url=${estimateTarget}">`,
+      scripts: [],
     }));
   }
 }

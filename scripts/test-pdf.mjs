@@ -198,10 +198,16 @@ head("2. the rows are what wsProjectCosts() counts, and they add up to it");
   // built out of the same two halves the project's own total is: the material list, plus
   // the calculations nothing on that list came from, plus the hand-typed costs.
   const src = read("assets/pdf-export.js");
-  check("the material list is one half", /wsItems\(projectId\)/.test(src));
+  // Since 2026-09-30 the rows are built once, in wsProjectRows() in assets/workspace.js,
+  // because the quote editor, its totals and its CSV read the same rows as this document.
+  const wsSrc = read("assets/workspace.js");
+  const at = wsSrc.indexOf("function wsProjectRows(projectId)");
+  const rows = at < 0 ? "" : wsSrc.slice(at, wsSrc.indexOf("\n}", at));
+  check("the document's rows are the one shared builder's", /return wsProjectRows\(projectId\);/.test(src));
+  check("the material list is one half", /wsItems\(projectId\)/.test(rows));
   check("the calculations nothing priced are the other",
-    /!wsIsManualLine\(r\) && !priced\.has\(r\.id\)/.test(src));
-  check("and the hand-typed costs are counted once", /lines\.filter\(wsIsManualLine\)/.test(src));
+    /!wsIsManualLine\(r\) && !priced\.has\(r\.id\)/.test(rows));
+  check("and the hand-typed costs are counted once", /lines\.filter\(wsIsManualLine\)/.test(rows));
   check("the printed total is wsProjectCosts()'s own", /wsProjectCosts\(projectId\)/.test(src));
   check("and nothing here re-adds the two collections whole",
     !/items\.concat\(lines\)/.test(src));

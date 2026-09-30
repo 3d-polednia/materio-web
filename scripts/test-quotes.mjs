@@ -213,12 +213,18 @@ head("1. a quote stores two of chapter XXII's five figures and derives the rest"
   // The three figures that belong to the project are never copied onto the quote: a copy
   // is free to disagree the moment a material is re-priced, which is exactly what the
   // module exists to prevent.
-  const copied = Object.keys(q).filter((k) => /material|other|subtotal|sum|total|cost/i.test(k));
-  eq("no material, cost or total is stored on a quote", copied.join(","), "");
+  // `materials` is not such a copy: since 2026-09-30 it holds the quote's OWN lines, typed
+  // into the quote the way labour is (the owner: "Dodaj materiał, wpisz nazwę i cenę").
+  const copied = Object.keys(q).filter((k) => k !== "materials"
+    && /material|other|subtotal|sum|total|cost/i.test(k));
+  eq("no project material, cost or total is copied onto a quote", copied.join(","), "");
+  eq("its own material lines start empty", JSON.stringify(q.materials), "[]");
 
   // Chapter XXII in one line: not an accounting package. Status is the document's life
-  // cycle; none of the accounting fields around it belongs here.
-  for (const k of ["tax", "vat", "discount", "number", "invoice", "issuedAt"]) {
+  // cycle; none of the accounting fields around it belongs here. The owner moved two of
+  // them in on 2026-09-30, from the sample quote he sent: a quote number and a VAT rate
+  // (`vatPct`) — a quote a client signs needs both. Invoicing stays out.
+  for (const k of ["tax", "vat", "discount", "invoice", "issuedAt"]) {
     check(`a quote has no ${k} — chapter XXII forbids the accounting package`,
       !Object.prototype.hasOwnProperty.call(q, k));
   }
@@ -943,7 +949,7 @@ head("9a. the quote owns the chain controls and the PDF document");
     pdf.includes("function pdfFillQuote(quoteId)") &&
       (pdf.match(/if \(!pdfAllowed\(\)\) return;/g) || []).length >= 2);
   check("the quote PDF includes project rows and labour rows",
-    pdf.includes("const projectRows = quote.projectId ? pdfRows(quote.projectId) : []") &&
+    pdf.includes("const lines = crmQuoteLines(quote);") &&
       pdf.includes('pdfEl(doc, "materialRows")') && pdf.includes('pdfEl(doc, "labourRows")'));
 }
 

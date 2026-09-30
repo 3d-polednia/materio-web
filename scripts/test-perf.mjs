@@ -124,14 +124,18 @@ const BUDGET = {
   // field and the postal-code field (about 0.1 kB minified), and this page had less left.
   // +2 kB on 2026-09-30: the Moja firma keys in every page's dictionary bundle (1.1 kB)
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
-  "index.html": [235, 62],
+  // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
+  // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
+  "index.html": [236, 62],
   // Raised 2026-09-26 from 248, measured at 248.8 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
   // about a kilobyte on top.
   // +2 kB on 2026-09-30: the Moja firma keys in every page's dictionary bundle (1.1 kB)
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
-  "kalkulatory/index.html": [252, 66],
+  // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
+  // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
+  "kalkulatory/index.html": [254, 66],
   "kalkulatory/plytki-panele-gres/index.html": [420, 128],
   // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
   // (the header menu and the footer's list) and it went from ten rows to thirteen. That is
@@ -144,21 +148,27 @@ const BUDGET = {
   // dictionary bundle, and this one had under a tenth of a kilobyte left.
   // +2 kB on 2026-09-30: the Moja firma keys in every page's dictionary bundle (1.1 kB)
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
-  "konwerter-jednostek/index.html": [241, 68],
+  // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
+  // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
+  "konwerter-jednostek/index.html": [242, 68],
   // Raised 2026-09-26 from 227, measured at 229.4 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
   // about a kilobyte on top.
   // +2 kB on 2026-09-30: the Moja firma keys in every page's dictionary bundle (1.1 kB)
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
-  "poradniki/ile-farby-na-pokoj/index.html": [233, 63],
+  // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
+  // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
+  "poradniki/ile-farby-na-pokoj/index.html": [234, 63],
   // Raised 2026-09-26 from 234, measured at 235.6 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
   // about a kilobyte on top.
   // +2 kB on 2026-09-30: the Moja firma keys in every page's dictionary bundle (1.1 kB)
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
-  "sklepy/index.html": [239, 65],
+  // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
+  // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
+  "sklepy/index.html": [240, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
   // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
@@ -234,7 +244,12 @@ const BUDGET = {
   // 2026-09-30, 380 -> 388, measured 387.3 kB: Moja firma. The company store in
   // assets/crm.js (+4.5 kB, /app/ loads it for the sync), its keys in the dictionary bundle
   // (+1.1 kB) and the form's rules in the stylesheet (+0.9 kB).
-  "app/index.html": [388, 102],
+  // 2026-09-30, 388/102 -> 392/103, measured 391.8/102.2 kB: shared quote rows,
+  // materials, VAT and company fields grew the CRM runtime also used by the account page.
+  // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
+  // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
+  // /app/ measured 394.0 kB: the same keys plus the quote totals and line store in crm.js.
+  "app/index.html": [395, 103],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
@@ -247,7 +262,9 @@ const BUDGET = {
   // field and the postal-code field (about 0.1 kB minified), and this page had less left.
   // +2 kB on 2026-09-30: the Moja firma keys in every page's dictionary bundle (1.1 kB)
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
-  "p/index.html": [221, 62],
+  // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
+  // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
+  "p/index.html": [222, 62],
 };
 
 /**

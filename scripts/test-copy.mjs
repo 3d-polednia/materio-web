@@ -491,7 +491,8 @@ const BUDGET = {
   materials: 2820, stores: 159, android: 519, projects: 980, estimate: 460,
   /* The widest /wyceny/ translation is Spanish at 638 words after the three add forms
      received visible labels; 640 leaves a two-word regression margin. */
-  company: 330, clients: 550, jobs: 544, quotes: 670, calendar: 450,
+  // 2026-09-30, 670 -> 705, measured 701 words: issuer, dates, own materials and VAT grew the quote editor.
+  company: 330, clients: 550, jobs: 544, quotes: 705, calendar: 450,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
      printed the key name localStorage, which is three words in French; widest is French at 650.
      2026-09-26: two more rows, the per-account sync clocks the account pages keep

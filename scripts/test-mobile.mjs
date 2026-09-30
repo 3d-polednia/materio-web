@@ -398,9 +398,8 @@ head("3. the modules a phone actually works in");
     const screens = [
       ["the projects index", urlProjects("pl"), { workspace: true }],
       ["one project", `${urlProjects("pl")}?id=p1`, { workspace: true }],
-      // The estimate raises no ready flag of its own — its rows are what says it drew.
-      ["the estimate", urlEstimate("pl"),
-        { workspace: true, active: "p1", ready: "#ws-estimate-rows tr" }],
+      // The estimate (/kosztorys/) went into the quote on 2026-09-30 and is a redirect now;
+      // its material rows are audited below, in "one quote", at the same widths.
       ["the account overview", "/app/", { workspace: true, ready: null }],
       /* /app/ is audited as the markup it ships with, not as the signed-in screen: the
          Chromium in the agent container cannot reach gstatic.com, so the Firebase SDK

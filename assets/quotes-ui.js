@@ -45,6 +45,7 @@ const quoMoney = (minor, code) =>
 
 /** A rate as a field value: whole minor units, which is the smallest money there is. */
 const quoRateValue = (minor) => (minor === null ? "" : String(Math.round(minor) / 100));
+let quoMarginTimer = 0;
 
 /** The quote the address bar is asking for, or "" for the index. */
 const quoUrlId = () => {
@@ -59,8 +60,9 @@ let quoOpenId = "";
 /** Whether the edit form and the delete question are open, so a redraw keeps them. */
 let quoEditing = false;
 let quoAsking = false;
-/** Which labour line is open for correction, if any. */
+/** Which quote-owned line is open for correction, and in which shared list. */
 let quoEditingLine = "";
+let quoEditingList = "";
 /** The last delete, until the visitor undoes it or moves on. */
 let quoUndone = null;
 
@@ -130,7 +132,9 @@ function quoRow(q) {
   const missing = summary.missing.map((part) => quoEsc(quoT(`quo_missing_${part}`))).join(" · ");
   const total = summary.totals.total === null ? "—"
     : quoEsc(quoMoney(summary.totals.total, summary.totals.currencyCode));
-  return `<li data-id="${quoEsc(q.id)}" class="quo-index-row">
+  let saved = "";
+  try { saved = new URLSearchParams(location.search).get("saved") || ""; } catch (e) {}
+  return `<li data-id="${quoEsc(q.id)}" class="quo-index-row${saved === q.id ? " quo-saved-row" : ""}">
       <span class="row-name">
         <a href="?id=${encodeURIComponent(q.id)}" data-open><b>${quoEsc(q.name)}</b></a>
         <span class="muted">${where}</span>
@@ -241,28 +245,48 @@ function quoChooseClient(clientId) {
 /** Selecting a project keeps the quote's single link and lets crmChain() derive the rest. */
 const quoChooseProject = (projectId) => crmUpdateQuote(quoOpenId, { projectId });
 
-/** The project content is intentionally read-only: the quote model has no subset fields. */
+/** The project's rooms, as one line. Its rows are drawn by quoRenderMaterials(), which can leave one out. */
 function quoRenderProjectContent(q) {
   const roomsEl = document.getElementById("quo-room-list");
-  const itemsEl = document.getElementById("quo-material-list");
-  const sumEl = document.getElementById("quo-material-sum");
-  if (!roomsEl || !itemsEl || !sumEl) return;
+  if (!roomsEl) return;
   const project = q.projectId && wsProject(q.projectId);
   const rooms = project ? wsRooms(project.id) : [];
-  const items = project ? wsItems(project.id) : [];
   roomsEl.textContent = rooms.length
     ? `${quoT("quo_rooms_label")}: ${rooms.map((room) => room.name).join(", ")}`
     : `${quoT("quo_rooms_label")}: ${quoT("quo_rooms_none")}`;
-  itemsEl.innerHTML = items.length ? items.map((item) => `<li data-id="${quoEsc(item.id)}">
-      <span class="row-name"><b>${quoEsc(item.name)}</b></span>
-      <span class="dash-fig">${quoEsc(`${quoNum(item.quantity)} ${item.unit || ""}`.trim())} · ${quoEsc(quoMoney(item.estimatedCostMinor || 0, item.currencyCode))}</span>
-    </li>`).join("") : `<li class="empty muted">${quoEsc(quoT("proj_mat_empty"))}</li>`;
-  const costs = project ? wsProjectCosts(project.id) : null;
-  sumEl.textContent = costs ? `${quoT("proj_cost_mat")}: ${wsSumsText(costs.byCurrency, "materials", quoMoney)}` : "";
 }
 
-/** One labour line as it reads: the work, how much of it, at what rate, and the amount. */
-function quoLabourRow(line) {
+/** Quote materials use the shared project-row builder, including the rows hidden here. */
+function quoRenderMaterials(q) {
+  const lines = crmQuoteLines(q);
+  const visible = lines.projectRows.filter((row) => !row.hidden);
+  const hidden = lines.projectRows.filter((row) => row.hidden);
+  const list = document.getElementById("quo-material-list");
+  list.innerHTML = visible.length ? visible.map((row) => `<li data-key="${quoEsc(row.key)}">
+      <span class="row-name"><b>${quoEsc(row.name)}</b></span>
+      <span class="dash-fig">${quoEsc(row.qty)} · ${quoEsc(quoMoney(row.minor, row.currencyCode))}</span>
+      <button type="button" class="btn btn-ghost btn-sm" data-hide-row>${quoEsc(quoT("quo_hide_row"))}</button>
+    </li>`).join("") : `<li class="empty muted">${quoEsc(quoT("proj_mat_empty"))}</li>`;
+  const wrap = document.getElementById("quo-hidden-wrap");
+  wrap.hidden = hidden.length === 0;
+  document.getElementById("quo-hidden-summary").textContent = `${quoT("quo_hidden_rows")} (${hidden.length})`;
+  document.getElementById("quo-hidden-list").innerHTML = hidden.map((row) => `<li data-key="${quoEsc(row.key)}">
+      <span class="row-name"><b>${quoEsc(row.name)}</b></span>
+      <button type="button" class="btn btn-ghost btn-sm" data-restore-row>${quoEsc(quoT("quo_restore_row"))}</button>
+    </li>`).join("");
+  const own = document.getElementById("quo-own-material-list");
+  own.innerHTML = lines.ownMaterials.length
+    ? lines.ownMaterials.map((line) => quoEditingList === "materials" && line.id === quoEditingLine
+      ? quoLineForm("materials", line) : quoLineRow("materials", line)).join("")
+    : `<li class="empty muted">${quoEsc(quoT("quo_material_empty"))}</li>`;
+  const priceLabel = document.getElementById("quo-materials-price-label");
+  const code = q.currencyCode || (typeof wsCurrency === "function" ? wsCurrency() : "PLN");
+  if (priceLabel) priceLabel.textContent = `${quoT("quo_mat_line_price")} (${code})`;
+  quoRunningTotal("materials");
+}
+
+/** One quote-owned line as it reads, shared by own materials and labour. */
+function quoLineRow(list, line) {
   // The rate is the amount divided by the quantity — the same rule a material's unit price
   // follows, and for the same reason: one stored figure cannot contradict another.
   const rate = crmLabourRate(line);
@@ -274,7 +298,7 @@ function quoLabourRow(line) {
     ? `<em class="muted ws-mat-price">× ${quoEsc(quoMoney(Math.round(rate), code))}</em>` : "";
   const amount = line.amountMinor > 0
     ? `<em class="muted">${rate !== null ? "= " : ""}${quoEsc(quoMoney(line.amountMinor, code))}</em>` : "";
-  return `<li class="ws-mat" data-line="${quoEsc(line.id)}">
+  return `<li class="ws-mat" data-line="${quoEsc(line.id)}" data-list="${list}">
       <span class="row-name"><b>${quoEsc(line.name)}</b></span>
       <span class="dash-fig">${how} ${at} ${amount}</span>
       <span class="row-actions">
@@ -290,10 +314,10 @@ function quoLabourRow(line) {
  * be reached by the page's own translation once it is open, and on a phone covers the
  * thing being changed.
  */
-function quoLabourForm(line) {
+function quoLineForm(list, line) {
   const q = crmQuote(quoOpenId);
   const code = (q && q.currencyCode) || (typeof wsCurrency === "function" ? wsCurrency() : "PLN");
-  return `<li class="ws-mat ws-editing" data-line="${quoEsc(line.id)}">
+  return `<li class="ws-mat ws-editing" data-line="${quoEsc(line.id)}" data-list="${list}">
       <form class="ws-mat-edit" data-line-form>
         <p class="ws-mat-grid">
           <label class="ws-mat-f">
@@ -327,7 +351,8 @@ function quoRenderLabour(q) {
   if (!list) return;
   const lines = Array.isArray(q.labour) ? q.labour : [];
   list.innerHTML = lines.length
-    ? lines.map((l) => (l.id === quoEditingLine ? quoLabourForm(l) : quoLabourRow(l))).join("")
+    ? lines.map((line) => (quoEditingList === "labour" && line.id === quoEditingLine
+      ? quoLineForm("labour", line) : quoLineRow("labour", line))).join("")
     : `<li class="empty muted">${quoEsc(quoT("quo_labour_empty"))}</li>`;
 
   // The add form goes away when the quote is full rather than refusing a submit nobody
@@ -344,17 +369,31 @@ function quoRenderLabour(q) {
 }
 
 /** "40 × 80 = 3200" under the add form, as the fields are typed. */
-function quoRunningTotal() {
-  const out = document.getElementById("quo-labour-run");
+function quoRunningTotal(list = "labour") {
+  const out = document.getElementById(`quo-${list}-run`);
   if (!out) return;
-  const qty = document.getElementById("quo-labour-qty");
-  const price = document.getElementById("quo-labour-price");
+  const qty = document.getElementById(`quo-${list}-qty`);
+  const price = document.getElementById(`quo-${list}-price`);
   if (!qty || !price || !price.value.trim()) { out.textContent = ""; return; }
   const q = crmQuote(quoOpenId);
   const code = (q && q.currencyCode) || (typeof wsCurrency === "function" ? wsCurrency() : "PLN");
   const n = crmQty(qty.value);
   const amount = crmLineAmount(price.value, n);
   out.textContent = `${n === null ? "1" : quoNum(n)} × ${quoMoney(crmMinor(price.value) || 0, code)} = ${quoMoney(amount, code)}`;
+}
+
+/** The same quantity × rate preview inside either kind of open line. */
+function quoLineRunningTotal(e) {
+  const form = e.target.closest("[data-line-form]");
+  if (!form) return;
+  const out = form.querySelector("[data-line-sum]");
+  const price = form.querySelector('[data-f="priceMajor"]').value;
+  if (!out || !String(price).trim()) { if (out) out.textContent = ""; return; }
+  const q = crmQuote(quoOpenId);
+  const code = (q && q.currencyCode) || (typeof wsCurrency === "function" ? wsCurrency() : "PLN");
+  const n = crmQty(form.querySelector('[data-f="quantity"]').value);
+  out.textContent = `${n === null ? "1" : quoNum(n)} × ${quoMoney(crmMinor(price) || 0, code)} = ${
+    quoMoney(crmLineAmount(price, n), code)}`;
 }
 
 /** The one link the quote stores, and the picker that sets it. */
@@ -412,6 +451,19 @@ function quoRenderDetail(id) {
   const status = document.getElementById("quo-status");
   if (status) status.value = crmQuoteStatus(q);
 
+  const companies = typeof crmCompanies === "function" ? crmCompanies() : [];
+  const fallback = typeof crmDefaultCompany === "function" ? crmDefaultCompany() : null;
+  const companyId = q.companyId === undefined ? (fallback && fallback.id) || "" : q.companyId;
+  quoFillPicker("quo-company", companies, companyId, "quo_no_project");
+  const company = companies.find((row) => row.id === companyId) || null;
+  document.getElementById("quo-company-preview").textContent = company
+    ? [company.name, company.nip && `NIP ${company.nip}`, company.city].filter(Boolean).join(" · ") : "";
+  document.getElementById("quo-company-empty").hidden = companies.length > 0;
+  document.getElementById("quo-company-logo-hint").hidden = !company || Boolean(company.logo);
+  document.getElementById("quo-number").value = q.number || "";
+  document.getElementById("quo-created").value = new Date(q.createdAt).toLocaleDateString(quoLang());
+  document.getElementById("quo-valid-until").value = q.validUntil || "";
+
   // Chapter XXII's five figures. Three of them are the project's own money, read through
   // wsProjectCosts() rather than copied, so this page and the project screen can never
   // disagree about what the work costs.
@@ -433,7 +485,10 @@ function quoRenderDetail(id) {
   fig("quo-fig-labour", money.labour);
   fig("quo-fig-sub", money.subtotal);
   fig("quo-fig-margin", money.margin);
-  fig("quo-fig-total", money.total);
+  fig("quo-fig-net", money.net);
+  fig("quo-fig-vat", money.vat);
+  fig("quo-fig-total", money.gross);
+  document.getElementById("quo-vat").value = money.vatPct === null ? "" : String(money.vatPct);
   document.getElementById("quo-mixed").hidden = !money.mixed;
 
   const margin = document.getElementById("quo-margin");
@@ -466,6 +521,7 @@ function quoRenderDetail(id) {
 
   quoRenderLabour(q);
   quoRenderProject(q);
+  quoRenderMaterials(q);
 }
 
 /* ------------------------------------------------------------------ the switch */
@@ -477,7 +533,7 @@ function quoRender() {
   const was = quoOpenId;
   quoOpenId = quoUrlId();
   // A half-finished edit belongs to the quote it was opened on. Leaving ends it.
-  if (quoOpenId !== was) { quoEditing = false; quoAsking = false; quoEditingLine = ""; }
+  if (quoOpenId !== was) { quoEditing = false; quoAsking = false; quoEditingLine = ""; quoEditingList = ""; }
   const index = document.getElementById("quo-index");
 
   detail.hidden = !quoOpenId;
@@ -537,7 +593,72 @@ function wireQuoteDetail() {
   // Chapter XXII's margin: one field on the page, because it is the number a tradesman
   // moves while watching the total.
   on("quo-margin", "change", (e) => { crmUpdateQuote(quoOpenId, { marginMajor: e.target.value }); });
+  on("quo-margin", "input", (e) => {
+    clearTimeout(quoMarginTimer);
+    quoMarginTimer = setTimeout(() => crmUpdateQuote(quoOpenId, { marginMajor: e.target.value }), 400);
+  });
   on("quo-status", "change", (e) => { crmUpdateQuote(quoOpenId, { status: e.target.value }); });
+  on("quo-company", "change", (e) => { crmUpdateQuote(quoOpenId, { companyId: e.target.value }); });
+  on("quo-number", "change", (e) => { crmUpdateQuote(quoOpenId, { number: e.target.value }); });
+  on("quo-valid-until", "change", (e) => { crmUpdateQuote(quoOpenId, { validUntil: e.target.value }); });
+  on("quo-vat", "change", (e) => { crmUpdateQuote(quoOpenId, { vatPct: e.target.value }); });
+
+  on("quo-material-list", "click", (e) => {
+    const row = e.target.closest("[data-key]");
+    const quote = crmQuote(quoOpenId);
+    if (!row || !quote || !e.target.closest("[data-hide-row]")) return;
+    crmUpdateQuote(quoOpenId, { hiddenRows: [...(quote.hiddenRows || []), row.dataset.key] });
+  });
+  on("quo-hidden-list", "click", (e) => {
+    const row = e.target.closest("[data-key]");
+    const quote = crmQuote(quoOpenId);
+    if (!row || !quote || !e.target.closest("[data-restore-row]")) return;
+    crmUpdateQuote(quoOpenId, { hiddenRows: (quote.hiddenRows || []).filter((key) => key !== row.dataset.key) });
+  });
+  /* Both lists go through the one line store in assets/crm.js, named by the list, so a
+     material line and a labour line cannot drift apart in what they accept. */
+  const wireLineList = (list) => {
+    const formId = `quo-${list}-form`;
+    const listId = list === "materials" ? "quo-own-material-list" : "quo-labour-list";
+    on(formId, "submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById(`quo-${list}-name`);
+      if (!name.value.trim()) return;
+      crmAddQuoteLine(quoOpenId, list, {
+        name: name.value,
+        quantity: document.getElementById(`quo-${list}-qty`).value,
+        unit: document.getElementById(`quo-${list}-unit`).value,
+        priceMajor: document.getElementById(`quo-${list}-price`).value,
+      });
+      e.target.reset();
+      name.focus();
+    });
+    on(formId, "input", () => quoRunningTotal(list));
+    on(listId, "click", (e) => {
+      const row = e.target.closest("[data-line]");
+      if (!row) return;
+      const lineId = row.dataset.line;
+      if (e.target.closest("[data-line-edit]")) { quoEditingList = list; quoEditingLine = lineId; quoRender(); return; }
+      if (e.target.closest("[data-line-cancel]")) { quoEditingList = ""; quoEditingLine = ""; quoRender(); return; }
+      if (e.target.closest("[data-line-del]")) crmDeleteQuoteLine(quoOpenId, list, lineId);
+    });
+    on(listId, "submit", (e) => {
+      const form = e.target.closest("[data-line-form]");
+      if (!form) return;
+      e.preventDefault();
+      const value = (field) => form.querySelector(`[data-f="${field}"]`).value;
+      if (!value("name").trim()) return;
+      crmUpdateQuoteLine(quoOpenId, list, form.closest("[data-line]").dataset.line, {
+        name: value("name"), quantity: value("quantity"), unit: value("unit"), priceMajor: value("priceMajor"),
+      });
+      quoEditingList = "";
+      quoEditingLine = "";
+      quoRender();
+    });
+    on(listId, "input", quoLineRunningTotal);
+  };
+  wireLineList("materials");
+  wireLineList("labour");
 
   on("quo-edit", "click", () => {
     quoEditing = !quoEditing;
@@ -579,66 +700,6 @@ function wireQuoteDetail() {
     quoBackToIndex();
   });
 
-  on("quo-labour-form", "submit", (e) => {
-    e.preventDefault();
-    const name = document.getElementById("quo-labour-name");
-    if (!name.value.trim()) return;
-    crmAddLabour(quoOpenId, {
-      name: name.value,
-      quantity: document.getElementById("quo-labour-qty").value,
-      unit: document.getElementById("quo-labour-unit").value,
-      priceMajor: document.getElementById("quo-labour-price").value,
-    });
-    name.value = "";
-    document.getElementById("quo-labour-qty").value = "";
-    document.getElementById("quo-labour-unit").value = "";
-    document.getElementById("quo-labour-price").value = "";
-    name.focus();
-  });
-
-  on("quo-labour-form", "input", quoRunningTotal);
-
-  on("quo-labour-list", "click", (e) => {
-    const row = e.target.closest("[data-line]");
-    if (!row) return;
-    const lineId = row.getAttribute("data-line");
-    if (e.target.closest("[data-line-edit]")) { quoEditingLine = lineId; quoRender(); return; }
-    if (e.target.closest("[data-line-cancel]")) { quoEditingLine = ""; quoRender(); return; }
-    if (e.target.closest("[data-line-del]")) { crmDeleteLabour(quoOpenId, lineId); }
-  });
-
-  on("quo-labour-list", "submit", (e) => {
-    const form = e.target.closest("[data-line-form]");
-    if (!form) return;
-    e.preventDefault();
-    const row = form.closest("[data-line]");
-    const value = (f) => form.querySelector(`[data-f="${f}"]`).value;
-    if (!value("name").trim()) return;
-    crmUpdateLabour(quoOpenId, row.getAttribute("data-line"), {
-      name: value("name"),
-      quantity: value("quantity"),
-      unit: value("unit"),
-      priceMajor: value("priceMajor"),
-    });
-    quoEditingLine = "";
-    quoRender();
-  });
-
-  // The same "quantity × rate = amount" line inside an open row, as it is typed.
-  on("quo-labour-list", "input", (e) => {
-    const form = e.target.closest("[data-line-form]");
-    if (!form) return;
-    const out = form.querySelector("[data-line-sum]");
-    if (!out) return;
-    const q = crmQuote(quoOpenId);
-    const code = (q && q.currencyCode) || (typeof wsCurrency === "function" ? wsCurrency() : "PLN");
-    const price = form.querySelector('[data-f="priceMajor"]').value;
-    if (!String(price).trim()) { out.textContent = ""; return; }
-    const n = crmQty(form.querySelector('[data-f="quantity"]').value);
-    out.textContent = `${n === null ? "1" : quoNum(n)} × ${quoMoney(crmMinor(price) || 0, code)} = ${
-      quoMoney(crmLineAmount(price, n), code)}`;
-  });
-
   on("quo-project-pick", "change", (e) => { quoChooseProject(e.target.value); });
   on("quo-client-pick", "change", (e) => { if (e.target.value) quoChooseClient(e.target.value); });
 
@@ -664,6 +725,29 @@ function wireQuoteDetail() {
   on("quo-project-list", "click", (e) => {
     if (e.target.closest("[data-unlink]")) crmUpdateQuote(quoOpenId, { projectId: "" });
   });
+
+  on("quo-save-draft", "click", () => {
+    clearTimeout(quoMarginTimer);
+    const margin = document.getElementById("quo-margin");
+    const quote = crmQuote(quoOpenId);
+    if (margin) crmUpdateQuote(quoOpenId, { marginMajor: margin.value });
+    if (quoEditing) document.getElementById("quo-edit-form").requestSubmit();
+    if (quote && !quote.status) crmUpdateQuote(quoOpenId, { status: "draft" });
+    document.getElementById("quo-saved").textContent = `${quoT("quo_saved")} ${new Date().toLocaleTimeString(quoLang(), { hour: "2-digit", minute: "2-digit" })}`;
+    const id = quoOpenId;
+    setTimeout(() => { location.href = `${location.pathname}?saved=${encodeURIComponent(id)}`; }, 50);
+  });
+
+  on("quo-csv", "click", () => {
+    const quote = crmQuote(quoOpenId);
+    const lines = crmQuoteLines(quote);
+    const rows = [...lines.projectRows.filter((row) => !row.hidden), ...lines.ownMaterials.map((line) => ({
+      name: line.name, quantity: line.quantity, unit: line.unit, minor: line.amountMinor,
+    })), ...lines.labour.map((line) => ({ name: line.name, quantity: line.quantity, unit: line.unit, minor: line.amountMinor }))];
+    const csv = [quoT("quo_csv_head").split("|"), ...rows.map((row, i) => [i + 1, row.name, row.quantity == null ? "" : row.quantity, row.unit || "", row.quantity ? (row.minor / row.quantity / 100) : row.minor / 100, row.minor / 100])]
+      .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+    wsDownload(`${quote.number || quote.name}.csv`, `\ufeff${csv}`, "text/csv;charset=utf-8");
+  });
 }
 
 function buildQuotesPage() {
@@ -678,9 +762,9 @@ function buildQuotesPage() {
     // because a form that is only hidden still submits.
     if (!name.value.trim() || !quoAllowed()) return;
     quoUndone = null; // a new quote is a new subject; the old undo is stale
-    crmAddQuote({ name: name.value, projectId: project.value });
-    name.value = "";
-    name.focus();
+    const quote = crmAddQuote({ name: name.value, projectId: project.value });
+    if (quote) location.href = `${location.pathname}?id=${encodeURIComponent(quote.id)}`;
+    else document.getElementById("quo-add-message").textContent = quoT("quo_save_failed");
   });
 
   document.getElementById("quo-list").addEventListener("change", (e) => {

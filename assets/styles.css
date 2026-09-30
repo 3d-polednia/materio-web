@@ -2364,6 +2364,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .omat-row .omat-hist li { background: none; border: 0; border-radius: 0; }
 .omat-row .omat-hist li + li { border-top: 1px solid var(--outline); }
 .ws-estimate.hierarchy-l1 { border-inline-start: 4px solid var(--accent); }
+.quo-saved-row { border-inline-start: 4px solid var(--accent-edge); }
 .ws-estimate .ws-table-scroll {
   background: var(--surface-alt); border: 1px solid var(--outline);
   border-inline-start: 1px solid var(--outline); border-radius: var(--radius-xs);
@@ -2772,7 +2773,15 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
   font-size: var(--fs-lg);
   border-top-color: var(--outline-strong);
 }
-#quo-page .quo-delete-zone { padding-top: var(--sp-6); border-top: 1px solid var(--outline); }
+/* The editor ends in one row of what can be done with the quote: its status, the save,
+   the two exports, and — set apart at the far end — the delete, which asks first. */
+#quo-page .quo-action-bar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sp-2) var(--sp-3); }
+#quo-page .quo-action-bar form { margin: 0; }
+#quo-page .quo-action-bar #quo-saved { align-self: center; }
+#quo-page .quo-action-bar .quo-delete-zone { margin-left: auto; }
+#quo-page .quo-action-bar .ws-ask { flex-basis: 100%; }
+#quo-page .quo-issuer-field { margin: 0 0 var(--sp-2); max-width: 26rem; }
+#quo-page .quo-issuer-field select { width: 100%; }
 #quo-page .quo-index-row { align-items: flex-start; }
 #quo-page .quo-index-missing { color: var(--warning); }
 #quo-page .quo-index-side {

@@ -30,7 +30,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LANGS, urlProjects, urlEstimate } from "../src/site.mjs";
+import { LANGS, urlProjects, urlEstimate, urlQuotes } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -575,10 +575,11 @@ head("11. the two screens are addresses, not tabs");
   await page.waitForSelector("#ws-project-body:not([hidden])");
   eq("forward opens it again", await text(page, "#ws-title"), "Łazienka");
 
-  // /kosztorys/ is about the active project, so the link does both things.
+  // The quotes list offers the active project first in its form, so the link does both
+  // things (it led to /kosztorys/ until that page went into Wyceny, 2026-09-30).
   await page.click("#ws-project-estimate");
-  await page.waitForURL(`**${urlEstimate("pl")}`);
-  eq("opening the estimate makes this the project it is about", await activeId(page), "p1");
+  await page.waitForURL(`**${urlQuotes("pl")}`);
+  eq("opening the quotes makes this the project they start from", await activeId(page), "p1");
   await page.close();
 }
 

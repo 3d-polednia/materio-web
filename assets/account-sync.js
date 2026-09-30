@@ -733,11 +733,29 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
         unit: text(line.unit, 24),
         amountMinor: Math.round(line.amountMinor) || 0,
       }));
-      const money = labour.reduce((sum, line) => sum + line.amountMinor, 0);
+      const materials = (Array.isArray(q.materials) ? q.materials : []).slice(0, 60).map((line) => ({
+        id: text(line.id, 64), name: text(line.name, 120),
+        quantity: line.quantity == null ? null : Math.max(0, num(line.quantity)),
+        unit: text(line.unit, 24), amountMinor: Math.round(line.amountMinor) || 0,
+      }));
+      const money = [...labour, ...materials].reduce((sum, line) => sum + line.amountMinor, 0);
+      const companyId = String(q.companyId || "");
+      const number = String(q.number || "");
+      const validUntil = String(q.validUntil || "");
+      const vatPct = q.vatPct === null || [0, 5, 8, 23].indexOf(Number(q.vatPct)) !== -1
+        ? (q.vatPct === null ? null : Number(q.vatPct)) : null;
+      const hiddenRows = (Array.isArray(q.hiddenRows) ? q.hiddenRows : [])
+        .map((key) => text(key, 200)).filter(Boolean).slice(0, 500);
       requireSyncUid(uid);
       await fb.setDoc(proDoc("quotes", seg, uid), {
         name: text(q.name, 120),
         projectId: text(q.projectId, 64),
+        ...(companyId.length <= 64 ? { companyId } : {}),
+        ...(number.length <= 40 ? { number } : {}),
+        ...(!validUntil || /^\d{4}-\d{2}-\d{2}$/.test(validUntil) ? { validUntil } : {}),
+        vatPct,
+        materials,
+        hiddenRows,
         labour: labour,
         marginPct: Math.min(1000, Math.max(0, num(q.marginPct))),
         status: typeof crmQuoteStatus === "function" ? crmQuoteStatus(q) : "draft",

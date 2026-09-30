@@ -262,8 +262,7 @@ export const ROUTES = [
     level: LEVEL.LICZMAT, status: STATUS.LIVE,
     parent: "projects", localized: true, indexable: false,
     path: urlEstimate,
-    note: "Chapter XVI and XVII: the material list and its costs. LICZMAT and noindex " +
-      "since the owner's 2026-09-26 decision: counting is public, saving is account work.",
+    note: "Permanent legacy address. It redirects to the localized quote list.",
   },
 
   /* ---------------------------------------------------------------- liczmat pro */

@@ -1217,6 +1217,64 @@ function wsDeleteItem(id) {
 }
 
 /**
+ * The rows a project's money is made of, in the order a document prints them: the priced
+ * materials, then the calculations nobody priced as a material, then the hand-typed "inne
+ * koszty". One builder for the project PDF, the quote editor, the quote's totals, its CSV
+ * and its PDF (2026-09-30) — before that the quote editor listed only the materials while
+ * its PDF listed all three, so the page and the paper disagreed.
+ *
+ * A priced material is printed instead of the calculation it came from, never beside it,
+ * so the rows add up to what wsProjectCosts() says. `key` names the row for a quote that
+ * leaves it out (`hiddenRows`): the kind and the id of what it came from.
+ */
+function wsProjectRows(projectId) {
+  const num = (v) => (typeof wsNum === "function" ? wsNum(v) : String(v));
+  const items = wsItems(projectId);
+  const lines = wsEstimations(projectId);
+  const priced = new Set(items.map((r) => r.estimationId).filter(Boolean));
+  const bare = lines.filter((r) => !wsIsManualLine(r) && !priced.has(r.id));
+  const other = lines.filter(wsIsManualLine);
+  const lineById = new Map(lines.map((r) => [r.id, r]));
+  return [
+    ...items.map((r) => {
+      // The waste belongs to the calculation, and a priced material is printed instead of
+      // the calculation it came from — so the row has to carry it across, or the technical
+      // report loses the waste of every material anybody actually priced, which is most of
+      // them. `wastePercentage` and `wasteCostMinor` are the contract's own fields on the
+      // saved calculation; nothing here recomputes them.
+      const from = r.estimationId ? lineById.get(r.estimationId) : null;
+      return {
+        key: `item:${r.id}`, source: "item",
+        name: r.name, quantity: r.quantity, unit: r.unit || "",
+        qty: `${num(r.quantity)} ${r.unit || ""}`.trim(),
+        minor: r.estimatedCostMinor || 0,
+        currencyCode: r.currencyCode,
+        wastePercentage: (from && from.wastePercentage) || 0,
+        wasteCostMinor: (from && from.wasteCostMinor) || 0,
+      };
+    }),
+    ...bare.map((r) => ({
+      key: `calc:${r.id}`, source: "calculation",
+      name: r.name, quantity: r.requiredUnits, unit: r.unitLabel || "",
+      qty: `${num(r.requiredUnits)} ${r.unitLabel || ""}`.trim(),
+      minor: r.totalCostMinor || 0,
+      currencyCode: r.currencyCode,
+      wastePercentage: r.wastePercentage || 0,
+      wasteCostMinor: r.wasteCostMinor || 0,
+    })),
+    ...other.map((r) => ({
+      key: `other:${r.id}`, source: "other",
+      name: r.name, quantity: null, unit: "",
+      qty: "",
+      minor: r.totalCostMinor || 0,
+      currencyCode: r.currencyCode,
+      wastePercentage: 0,
+      wasteCostMinor: 0,
+    })),
+  ];
+}
+
+/**
  * What a project's material list adds up to.
  *
  * Same shape and the same `mixed` rule as wsProjectTotal(): amounts saved in different

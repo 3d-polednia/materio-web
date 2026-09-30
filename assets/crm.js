@@ -672,12 +672,24 @@ function crmAddQuote(fields) {
   if (!name) return null;
   const data = crmLoad();
   const now = Date.now();
+  const made = new Date(now);
+  const year = made.getFullYear();
+  const sequence = data.quotes.filter((row) => new Date(Number(row.createdAt) || 0).getFullYear() === year).length + 1;
+  const localDay = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  const until = new Date(made.getFullYear(), made.getMonth(), made.getDate() + 30);
+  const defaultCompany = typeof crmDefaultCompany === "function" ? crmDefaultCompany() : null;
   const quote = {
     id: crmId(),
     name,
     // A project that is not there is dropped rather than stored — the same rule a project's
     // links follow: a link to a row nobody can open is worse than no link.
     projectId: crmProjectId(f.projectId),
+    companyId: defaultCompany ? defaultCompany.id : "",
+    number: `W/${year}/${String(sequence).padStart(3, "0")}`,
+    validUntil: localDay(until),
+    vatPct: null,
+    materials: [],
+    hiddenRows: [],
     labour: [],
     marginPct: crmPct(f.marginMajor),
     status: "draft",
@@ -711,6 +723,19 @@ function crmUpdateQuote(id, fields) {
   if (f.note !== undefined) quote.note = crmText(f.note, CRM_MAX_NOTE);
   if (f.marginMajor !== undefined) quote.marginPct = crmPct(f.marginMajor);
   if (f.projectId !== undefined) quote.projectId = crmProjectId(f.projectId);
+  if (f.companyId !== undefined) {
+    const companyId = crmText(f.companyId, 64);
+    quote.companyId = crmCompanies().some((row) => row.id === companyId) ? companyId : "";
+  }
+  if (f.number !== undefined) quote.number = crmText(f.number, 40);
+  if (f.validUntil !== undefined) quote.validUntil = crmDay(f.validUntil);
+  if (f.vatPct !== undefined) {
+    const vat = f.vatPct === null || f.vatPct === "" ? null : Number(f.vatPct);
+    if (vat === null || [0, 5, 8, 23].indexOf(vat) !== -1) quote.vatPct = vat;
+  }
+  if (f.hiddenRows !== undefined && Array.isArray(f.hiddenRows)) {
+    quote.hiddenRows = [...new Set(f.hiddenRows.map((key) => crmText(key, 200)).filter(Boolean))].slice(0, 500);
+  }
   if (f.status !== undefined && QUOTE_STATUS.indexOf(f.status) !== -1) quote.status = f.status;
   quote.updatedAt = Date.now();
   if (!crmSave(data)) return null;
@@ -798,7 +823,8 @@ const crmLabour = (quoteId) => {
  * the stamp is taken from the visitor's own choice the first time money appears.
  */
 function crmStampQuote(quote) {
-  const money = (quote.labour || []).reduce((sum, l) => sum + (l.amountMinor || 0), 0);
+  const money = ["labour", "materials"].reduce((total, list) => total
+    + (Array.isArray(quote[list]) ? quote[list] : []).reduce((sum, line) => sum + (line.amountMinor || 0), 0), 0);
   if (!money) quote.currencyCode = "";
   else if (!quote.currencyCode) quote.currencyCode = crmCurrency();
 }
@@ -810,7 +836,7 @@ function crmStampQuote(quote) {
  * @param {{name:string, quantity?:string|number, unit?:string, priceMajor?:string|number}} fields
  * @returns {object|null} the stored quote, or null when there is no name or no room left
  */
-function crmAddLabour(quoteId, fields) {
+function crmAddQuoteLine(quoteId, listName, fields) {
   // The plan on the account, asked in the store as well as at the call site.
   if (!crmCanQuote()) return null;
   const f = fields || {};
@@ -819,10 +845,11 @@ function crmAddLabour(quoteId, fields) {
   const data = crmLoad();
   const quote = data.quotes.find((q) => q.id === quoteId && !q.deletedAt);
   if (!quote) return null;
-  if (!Array.isArray(quote.labour)) quote.labour = [];
-  if (quote.labour.length >= QUO_MAX_LINES) return null;
+  if (["labour", "materials"].indexOf(listName) === -1) return null;
+  if (!Array.isArray(quote[listName])) quote[listName] = [];
+  if (quote[listName].length >= QUO_MAX_LINES) return null;
   const qty = crmQty(f.quantity);
-  quote.labour.push({
+  quote[listName].push({
     id: crmId(),
     name,
     quantity: qty,
@@ -842,14 +869,15 @@ function crmAddLabour(quoteId, fields) {
  * way the form reads: change 40 to 45 at 80 and the line comes to 3600, because both
  * numbers were on screen together when it was saved.
  */
-function crmUpdateLabour(quoteId, lineId, fields) {
+function crmUpdateQuoteLine(quoteId, listName, lineId, fields) {
   // The plan on the account, asked in the store as well as at the call site.
   if (!crmCanQuote()) return null;
   const f = fields || {};
   const data = crmLoad();
   const quote = data.quotes.find((q) => q.id === quoteId && !q.deletedAt);
-  if (!quote || !Array.isArray(quote.labour)) return null;
-  const line = quote.labour.find((l) => l.id === lineId);
+  if (["labour", "materials"].indexOf(listName) === -1) return null;
+  if (!quote || !Array.isArray(quote[listName])) return null;
+  const line = quote[listName].find((l) => l.id === lineId);
   if (!line) return null;
   if (f.name !== undefined) {
     const name = crmText(f.name, CRM_MAX_NAME);
@@ -866,19 +894,40 @@ function crmUpdateLabour(quoteId, lineId, fields) {
 }
 
 /** Take one labour line off a quote. */
-function crmDeleteLabour(quoteId, lineId) {
+function crmDeleteQuoteLine(quoteId, listName, lineId) {
   // The plan on the account, asked in the store as well as at the call site.
   if (!crmCanQuote()) return null;
   const data = crmLoad();
   const quote = data.quotes.find((q) => q.id === quoteId && !q.deletedAt);
-  if (!quote || !Array.isArray(quote.labour)) return null;
-  const before = quote.labour.length;
-  quote.labour = quote.labour.filter((l) => l.id !== lineId);
-  if (quote.labour.length === before) return null;
+  if (["labour", "materials"].indexOf(listName) === -1) return null;
+  if (!quote || !Array.isArray(quote[listName])) return null;
+  const before = quote[listName].length;
+  quote[listName] = quote[listName].filter((l) => l.id !== lineId);
+  if (quote[listName].length === before) return null;
   crmStampQuote(quote);
   quote.updatedAt = Date.now();
   if (!crmSave(data)) return null;
   return crmQuote(quoteId);
+}
+
+const crmAddLabour = (quoteId, fields) => crmAddQuoteLine(quoteId, "labour", fields);
+const crmUpdateLabour = (quoteId, lineId, fields) => crmUpdateQuoteLine(quoteId, "labour", lineId, fields);
+const crmDeleteLabour = (quoteId, lineId) => crmDeleteQuoteLine(quoteId, "labour", lineId);
+const crmAddMaterial = (quoteId, fields) => crmAddQuoteLine(quoteId, "materials", fields);
+const crmUpdateMaterial = (quoteId, lineId, fields) => crmUpdateQuoteLine(quoteId, "materials", lineId, fields);
+const crmDeleteMaterial = (quoteId, lineId) => crmDeleteQuoteLine(quoteId, "materials", lineId);
+
+/** One quote's rows: the project's (wsProjectRows(), marked when left out) and its own two lists. */
+function crmQuoteLines(value) {
+  const quote = typeof value === "string" ? crmQuote(value) : value;
+  if (!quote) return { projectRows: [], ownMaterials: [], labour: [] };
+  const hidden = new Set(Array.isArray(quote.hiddenRows) ? quote.hiddenRows : []);
+  const rows = quote.projectId && typeof wsProjectRows === "function" ? wsProjectRows(quote.projectId) : [];
+  return {
+    projectRows: rows.map((row) => ({ ...row, hidden: hidden.has(row.key) })),
+    ownMaterials: Array.isArray(quote.materials) ? quote.materials.slice() : [],
+    labour: Array.isArray(quote.labour) ? quote.labour.slice() : [],
+  };
 }
 
 /* ------------------------------------------------------------------ what it comes to */
@@ -903,36 +952,61 @@ function crmDeleteLabour(quoteId, lineId) {
  *            marginPct:number, margin:number, total:number, currencyCode:string,
  *            projectCurrencyCode:string, hasProject:boolean, mixed:boolean, lines:number}}
  */
-function crmQuoteTotals(quoteId) {
-  const quote = crmQuote(quoteId);
+function crmQuoteTotals(value) {
+  const quote = typeof value === "string" ? crmQuote(value) : value;
   const own = crmCurrency();
   if (!quote) {
     return {
-      materials: 0, other: 0, labour: 0, subtotal: 0, marginPct: 0, margin: 0, total: 0,
+      materials: 0, other: 0, labour: 0, subtotal: 0, marginPct: 0, margin: 0,
+      net: 0, vatPct: null, vat: 0, gross: 0, total: 0,
       currencyCode: own, projectCurrencyCode: "", projectByCurrency: [],
       hasProject: false, mixed: false, lines: 0,
     };
   }
-  const costs = quote.projectId && typeof wsProjectCosts === "function"
-    ? wsProjectCosts(quote.projectId) : null;
+  const quoteLines = crmQuoteLines(quote);
+  const visible = quoteLines.projectRows.filter((row) => !row.hidden);
+  const ownMaterials = quoteLines.ownMaterials.reduce((sum, line) => sum + (line.amountMinor || 0), 0);
+  const lines = quoteLines.labour;
   // The project's two figures are null when the project mixes currencies — the quote
   // inherits that rather than papering over it, because a subtotal built out of unlike
   // amounts is exactly the number a client would be shown.
-  const materials = costs ? costs.materials : 0;
-  const other = costs ? costs.other : 0;
-  const lines = Array.isArray(quote.labour) ? quote.labour : [];
+  const buckets = new Map();
+  visible.forEach((row) => {
+    const code = row.currencyCode || own;
+    buckets.set(code, (buckets.get(code) || 0) + row.minor);
+  });
+  const projectByCurrency = [...buckets].map(([currencyCode, total]) => {
+    const inCode = visible.filter((row) => (row.currencyCode || own) === currencyCode);
+    const otherHere = inCode.filter((row) => row.source === "other")
+      .reduce((sum, row) => sum + row.minor, 0);
+    return { currencyCode, materials: total - otherHere, other: otherHere, total };
+  });
+  // Material and the hand-typed "inne koszty" stay two figures, as wsProjectCosts() keeps
+  // them, and both stop existing when the project itself mixes currencies (H4): a sum of
+  // unlike amounts is exactly the number a client must never be shown.
+  const projectMixed = projectByCurrency.length > 1;
+  const projectMaterials = projectMixed ? null
+    : projectByCurrency.reduce((sum, bucket) => sum + bucket.materials, 0);
+  const materials = projectMixed ? null : projectMaterials + ownMaterials;
+  const other = projectMixed ? null
+    : projectByCurrency.reduce((sum, bucket) => sum + bucket.other, 0);
+
   const labour = lines.reduce((sum, l) => sum + (l.amountMinor || 0), 0);
   const marginPct = Number(quote.marginPct) || 0;
-  const projectCode = costs && !costs.mixed && (costs.total || costs.items || costs.others)
-    ? costs.currencyCode : "";
+  const projectCode = projectByCurrency.length === 1 ? projectByCurrency[0].currencyCode : "";
   // Two ways for a quote to hold unlike money: the project itself is mixed, or labour was
   // typed in one currency and the project priced in another. Either way the four summed
   // figures do not exist, and the page prints what it has instead of a total.
-  const mixed = Boolean((costs && costs.mixed)
-    || (labour > 0 && projectCode && quote.currencyCode
+  const ownMoney = ownMaterials + labour;
+  const mixed = Boolean(projectByCurrency.length > 1
+    || (ownMoney > 0 && projectCode && quote.currencyCode
       && quote.currencyCode !== projectCode));
   const subtotal = mixed ? null : materials + other + labour;
   const margin = mixed ? null : Math.round(subtotal * marginPct / 100);
+  const net = mixed ? null : subtotal + margin;
+  const vatPct = quote.vatPct === undefined || quote.vatPct === null ? null : Number(quote.vatPct);
+  const vat = mixed ? null : (vatPct === null ? 0 : Math.round(net * vatPct / 100));
+  const gross = mixed ? null : net + vat;
   return {
     materials,
     other,
@@ -940,18 +1014,19 @@ function crmQuoteTotals(quoteId) {
     subtotal,
     marginPct,
     margin,
-    total: mixed ? null : subtotal + margin,
-    projectByCurrency: costs ? costs.byCurrency : [],
+    net, vatPct, vat, gross, total: gross,
+    projectByCurrency,
     // The quote's own stamp is the currency somebody typed into a labour line, so it only
     // speaks for the figures while there IS a labour line. With the labour deleted, every
     // amount left is the project's, and the label has to be the project's too — otherwise
     // a quote stamped EUR last week prints this month's złoty materials as euro. The
     // visitor's own choice is the fallback for a quote holding no money at all.
-    currencyCode: (labour > 0 ? quote.currencyCode : "") || projectCode || quote.currencyCode || own,
+    currencyCode: (ownMoney > 0 ? quote.currencyCode : "") || projectCode || quote.currencyCode || own,
     projectCurrencyCode: projectCode,
-    hasProject: Boolean(costs),
+    hasProject: Boolean(quote.projectId),
     mixed,
     lines: lines.length,
+    rows: visible.length + quoteLines.ownMaterials.length,
   };
 }
 

@@ -278,7 +278,8 @@ head("1c. a quote is added from the form, with the project beside the name");
   await page.fill("#quo-name", "Wariant z gresem premium");
   await page.selectOption("#quo-project", { label: "Remont łazienki" });
   await page.click("#quo-form button[type=submit]");
-  await page.waitForFunction(() => document.querySelectorAll("#quo-list > li").length === 1);
+  await page.waitForURL(/\?id=/);
+  await page.waitForSelector("#quo-body:not([hidden])");
 
   const stored = await liveQuotes(page);
   eq("one quote is stored", stored.length, 1);
@@ -287,7 +288,7 @@ head("1c. a quote is added from the form, with the project beside the name");
   eq("no labour yet", stored[0].labour.length, 0);
   eq("no margin yet", stored[0].marginPct, 0);
   eq("and no currency, because there is no money on it yet", stored[0].currencyCode, "");
-  eq("the form is emptied for the next one", await page.inputValue("#quo-name"), "");
+  eq("creation opens the new quote", (await page.textContent("#quo-title")).trim(), "Wariant z gresem premium");
   await page.close();
 }
 
@@ -709,6 +710,10 @@ head("7e. chapter XXVIII: the page holds together at every width it names");
 head("7f. the client quote prints as one complete page");
 {
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  await page.evaluate(() => {
+    const company = crmAddCompany({ name: "Firma testowa", isDefault: true });
+    crmUpdateQuote("q1", { companyId: company.id });
+  });
   await page.evaluate(() => crmAddLabour("q1", { name: "Sprzątanie", priceMajor: 250 }));
   await page.evaluate(() => {
     window.__printed = 0;

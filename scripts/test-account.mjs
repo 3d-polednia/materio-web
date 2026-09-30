@@ -288,12 +288,14 @@ head("8. /app/ carries the account system in every language");
 
   // 2026-09-26: work tools are links to their full pages; only account settings remain
   // as hash-routed panels on /app/.
-  for (const [route, href] of [["projects", "/projekty/"], ["estimate", "/kosztorys/"],
+  // 2026-09-30: Kosztorys went into Wyceny and left the sidebar; Moja firma joined it.
+  for (const [route, href] of [["projects", "/projekty/"], ["company", "/moja-firma/"],
     ["clients", "/klienci/"], ["quotes", "/wyceny/"], ["calendar", "/terminarz/"],
     ["own-materials", "/moje-materialy/"]]) {
     check(`the sidebar links to ${route}`,
       html.includes(`href="${href}" data-nav-route="${route}"`));
   }
+  check("and no longer to the estimate", !html.includes('data-nav-route="estimate"'));
   for (const id of ["overview", "profile", "sync", "pro", "account"]) {
     check(`the "${id}" account panel remains`, html.includes(`id="panel-${id}"`));
   }
