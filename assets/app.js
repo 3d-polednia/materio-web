@@ -51,6 +51,21 @@ let accountSync = null;
 /** The account room card whose successful add is being redrawn by Firestore. */
 let openAccountRoomProjectId = null;
 
+/*
+ * A sign-in, sign-up or reset form submitted before boot() has wired it — the Firebase SDK
+ * is still on its way from gstatic — used to be a plain GET: the page reloaded as "/app/?",
+ * the `?next=` it came with was gone, and nothing said why. Found 2026-09-30 in a live
+ * walkthrough, where typing fast enough beat the import. The submission is held here, from
+ * the moment this module runs, and replayed by boot() once the handlers are there.
+ */
+let authWired = false;
+let heldSubmit = null;
+document.addEventListener("submit", (e) => {
+  if (authWired || !e.target.closest("#app-auth")) return;
+  e.preventDefault();
+  heldSubmit = e.target;
+}, true);
+
 /* ------------------------------------------------------------------ helpers */
 
 /**
@@ -136,6 +151,12 @@ async function boot() {
 
   authMod.onAuthStateChanged(auth, (user) => (user ? onSignedIn(user) : onSignedOut()));
   wireAuthForms();
+  authWired = true;
+  if (heldSubmit) {
+    const form = heldSubmit;
+    heldSubmit = null;
+    form.requestSubmit();
+  }
   // The browser may be arriving back from the Google redirect the button falls back to when a
   // popup is blocked. Without this call the finished sign-in would be dropped without a word.
   authMod.getRedirectResult(auth).catch((err) => status(authMessage(err && err.code), true));

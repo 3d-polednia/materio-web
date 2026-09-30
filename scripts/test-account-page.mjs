@@ -316,6 +316,43 @@ head("3b. signing up from a calculator goes back to it");
   await ctx.close();
 }
 
+head("3d. a form sent before the SDK has arrived is held, not lost");
+{
+  // The auth SDK answers 1.5 s late, so the form is filled and sent while boot() is still
+  // importing it. Before 2026-09-30 that was a plain GET to "/app/?" and `next` was gone.
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  await ctx.addInitScript(() => { try { localStorage.setItem("materio-lang-banner-dismissed", "1"); localStorage.setItem("materio-lang", "pl"); } catch (e) {} });
+  await ctx.route("**", async (route) => {
+    const url = route.request().url();
+    if (url.includes("/firebasejs/") && url.endsWith("firebase-app.js")) return route.fulfill({ status: 200, contentType: "text/javascript", body: FAKE_APP });
+    if (url.includes("/firebasejs/") && url.endsWith("firebase-auth.js")) {
+      await new Promise((r) => setTimeout(r, 1500));
+      return route.fulfill({ status: 200, contentType: "text/javascript", body: FAKE_AUTH });
+    }
+    if (url.includes("/firebasejs/") && url.endsWith("firebase-firestore.js")) return route.fulfill({ status: 200, contentType: "text/javascript", body: FAKE_STORE });
+    if (url.startsWith(base)) return route.continue();
+    return route.abort();
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => {
+    window.__fbAccounts = { "kto@example.com": { password: "sekret123", user: { uid: "u1", email: "kto@example.com",
+      emailVerified: true, displayName: "", providerData: [{ providerId: "password" }] } } };
+  });
+  await page.goto(base + "/app/?next=%2Fprojekty%2F", { waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#signin-email", { state: "visible" });
+  await page.fill("#signin-email", "kto@example.com");
+  await page.fill("#signin-password", "sekret123");
+  const early = await page.evaluate(() => !document.documentElement.hasAttribute("data-app-ready"));
+  await page.click("#signin-form button[type=submit]");
+  check("the form was sent before the page was ready", early);
+  eq("the address kept its way back while waiting", new URL(page.url()).search, "?next=%2Fprojekty%2F");
+  await page.waitForURL((u) => u.pathname === "/projekty/", { timeout: 10000 }).catch(() => {});
+  eq("once the SDK arrived, the held sign-in went through and returned",
+    new URL(page.url()).pathname, "/projekty/");
+  await page.close();
+  await ctx.close();
+}
+
 head("3c. with work saved before signing in, the question comes first");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
