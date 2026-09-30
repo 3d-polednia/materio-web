@@ -97,9 +97,14 @@ const doc = (page, prefix) => page.evaluate((p) => [...window.__fbDocs.entries()
   check("next page pushes edit left before debounce", true); await ctx.close();
 }
 {
-  const x = await open("/klienci/"); await waitSync(x.page); await x.page.fill("#crm-client-name", "Anna Test"); await x.page.click("#crm-client-form button[type=submit]");
+  const x = await open("/klienci/"); await waitSync(x.page); await x.page.fill("#crm-client-name", "Anna Test");
+  await x.page.fill("#crm-client-street", "Długa 7"); await x.page.fill("#crm-client-postal-code", "00-001");
+  await x.page.fill("#crm-client-city", "Warszawa"); await x.page.click("#crm-client-form button[type=submit]");
   await x.page.waitForFunction(() => [...window.__fbDocs.keys()].some((k) => k.includes("/clients/")), null, { timeout: 4000 });
-  check("client is pushed", Boolean(await doc(x.page, "users/u1/clients/"))); await x.ctx.close();
+  const pushed = await doc(x.page, "users/u1/clients/");
+  check("client is pushed", Boolean(pushed));
+  check("the split address is pushed", pushed[1].street === "Długa 7" && pushed[1].postalCode === "00-001" && pushed[1].city === "Warszawa");
+  check("and a new client keeps the legacy address empty", pushed[1].address === ""); await x.ctx.close();
 }
 {
   const x = await open("/moje-materialy/"); await waitSync(x.page); await x.page.fill('[data-omat-in="name"]', "Płyta testowa"); await x.page.click('[data-omat-form] button[type="submit"]');

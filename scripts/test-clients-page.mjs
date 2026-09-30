@@ -230,6 +230,9 @@ head("1c. a client is added from the form, with the details typed beside the nam
   await page.fill("#crm-client-name", "Biuro Nowak");
   await page.fill("#crm-client-phone", "500 400 300");
   await page.fill("#crm-client-email", "biuro@example.com");
+  await page.fill("#crm-client-street", "Długa 7");
+  await page.fill("#crm-client-postal-code", "00-001");
+  await page.fill("#crm-client-city", "Warszawa");
   await page.click("#crm-client-form button[type=submit]");
   await page.waitForFunction(() =>
     document.querySelectorAll("#crm-client-list > li[data-id]").length === 1);
@@ -238,6 +241,10 @@ head("1c. a client is added from the form, with the details typed beside the nam
   eq("the name went in", saved.name, "Biuro Nowak");
   eq("so did the phone", saved.phone, "500 400 300");
   eq("and the e-mail", saved.email, "biuro@example.com");
+  eq("and the street", saved.street, "Długa 7");
+  eq("the postal code", saved.postalCode, "00-001");
+  eq("and the city", saved.city, "Warszawa");
+  eq("a new client keeps the legacy address empty", saved.address, "");
   eq("the form is cleared for the next one", await page.inputValue("#crm-client-name"), "");
   await page.close();
 }
@@ -255,6 +262,7 @@ head("2. opening a client shows chapter XX's record");
   check("the contact details are drawn", contact.includes("600 100 200"), contact);
   check("with the e-mail", contact.includes("jan@example.com"), contact);
   check("and the address", contact.includes("ul. Piękna 3"), contact);
+  check("the legacy address is the fallback", !contact.includes("undefined"), contact);
   eq("the phone dials", await page.getAttribute("#crm-contact a[href^='tel:']", "href"), "tel:600100200");
   eq("the e-mail opens a mail", await page.getAttribute("#crm-contact a[href^='mailto:']", "href"),
     "mailto:jan@example.com");
@@ -328,6 +336,9 @@ head("3. the record is corrected in the form on the page");
 
   await page.fill("#crm-edit-name", "Jan Kowalski — dom");
   await page.fill("#crm-edit-phone", "600 100 999");
+  await page.fill("#crm-edit-street", "Piękna 3");
+  await page.fill("#crm-edit-postal-code", "50-001");
+  await page.fill("#crm-edit-city", "Wrocław");
   await page.fill("#crm-edit-note", "Klucze u sąsiada.\nWjazd od podwórza.");
   await page.click("#crm-edit-form button[type=submit]");
   await page.waitForSelector("#crm-edit-form", { state: "hidden" });
@@ -335,9 +346,12 @@ head("3. the record is corrected in the form on the page");
   const saved = (await liveClients(page))[0];
   eq("the name is corrected", saved.name, "Jan Kowalski — dom");
   eq("the phone with it", saved.phone, "600 100 999");
+  eq("the split address survives the edit", `${saved.street}, ${saved.postalCode} ${saved.city}`,
+    "Piękna 3, 50-001 Wrocław");
   check("and the note keeps the line the visitor typed", saved.note.includes("\n"), saved.note);
   eq("the heading follows", (await page.textContent("#crm-title")).trim(), "Jan Kowalski — dom");
   check("the note is redrawn", (await page.textContent("#crm-note")).includes("podwórza"));
+  check("the split address is displayed", (await page.textContent("#crm-contact")).includes("Piękna 3, 50-001 Wrocław"));
   check("the projects are untouched by an edit",
     (await page.evaluate(() => JSON.parse(localStorage.getItem("materio-workspace-v1")).projects
       .map((p) => p.name).join())) === "Remont łazienki,Salon");

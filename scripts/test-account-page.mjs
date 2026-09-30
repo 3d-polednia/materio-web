@@ -635,12 +635,12 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
   eq("the panel offers the portal, the way to the Pro page and the checkout",
     (await free.$$eval("#panel-pro a, #panel-pro button",
       (ns) => ns.map((n) => n.getAttribute("href") || n.id || "checkout").join(" "))),
-    "# /liczmat-pro/ checkout");
+    "# /liczmat-pro/ checkout checkout");
   /* One checkout on the tab, and it is visible now: the uid this payment attaches to is
      known here and nowhere else, which is why every wall on the site sends people to this
      page instead of carrying a button of its own. */
-  eq("exactly one checkout is offered, and it is this panel's",
-    await free.locator("#panel-pro [data-pw-checkout]:visible").count(), 1);
+  eq("exactly two checkouts are offered, and they are this panel's",
+    await free.locator("#panel-pro [data-pw-checkout]:visible").count(), 2);
   eq("and the manage-subscription link is not there for a free account",
     await free.locator("#plan-manage").isVisible(), false);
   /* Session 28: the Pro tab is the one place on the site that offers to take money,
@@ -655,8 +655,10 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
     await free.locator('#plan-buy [data-pw-plan="monthly"] [data-pw-price]').innerText());
   eq("no longer told the subscription is waiting",
     await free.locator("#plan-buy [data-pw-soon]").isVisible(), false);
-  eq("and offered the button that starts the payment",
-    await free.locator("#plan-buy [data-pw-checkout]").isVisible(), true);
+  eq("and offered the monthly button that starts the payment",
+    await free.locator('#plan-buy [data-pw-checkout="monthly"]').isVisible(), true);
+  eq("and offered the yearly button that starts the payment",
+    await free.locator('#plan-buy [data-pw-checkout="yearly"]').isVisible(), true);
   eq("the plan is still the free one", await free.locator("#plan-name").innerText(), "Darmowy");
   eq("and the card still says what the free plan is",
     await free.locator("#plan-note").innerText(),

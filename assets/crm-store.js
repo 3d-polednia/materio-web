@@ -30,6 +30,9 @@ const CRM_SCHEMA = 1;
    asks for notes, not for a document. */
 const CRM_MAX_NAME = 120;
 const CRM_MAX_CONTACT = 200;
+const CRM_MAX_STREET = 200;
+const CRM_MAX_POSTAL_CODE = 12;
+const CRM_MAX_CITY = 120;
 const CRM_MAX_NOTE = 2000;
 /* A unit is a word beside a number — "h", "m²", "dzień" — capped exactly as a material's
    unit is in assets/workspace.js, because it is the same kind of thing. */

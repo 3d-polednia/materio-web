@@ -339,12 +339,13 @@ function pdfFillQuote(quoteId) {
 
   const client = chain.client || null;
   const project = chain.project || null;
+  const clientAddress = client && crmClientAddress(client);
   const recipient = [client && client.name, client && client.phone, client && client.email,
-    client && client.address, project && project.name];
+    clientAddress, project && project.name];
   pdfShow(doc, "recipient", recipient.some((value) => String(value || "").trim()));
   for (const [slot, value] of [
     ["clientName", client && client.name], ["clientPhone", client && client.phone],
-    ["clientEmail", client && client.email], ["clientAddress", client && client.address],
+    ["clientEmail", client && client.email], ["clientAddress", clientAddress],
     ["projectName", project && project.name && `${word("crm_node_project")}: ${project.name}`],
   ]) {
     const clean = String(value || "").trim();

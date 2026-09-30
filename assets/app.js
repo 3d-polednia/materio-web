@@ -628,15 +628,21 @@ function renderPlanPrices(sub) {
   box.hidden = sub.state === "active";
 
   const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
-  let chosen = null;
+  let chosen = false;
   box.querySelectorAll("[data-pw-plan]").forEach((card) => {
     const id = card.getAttribute("data-pw-plan");
     const minor = lmPayPrice(id, code);
     card.hidden = minor === null;
     if (minor === null) return;
-    if (!chosen && lmPayBuyable(id, code)) chosen = id;
+    const buyable = lmPayBuyable(id, code);
+    if (buyable) chosen = true;
     const out = card.querySelector("[data-pw-price]");
     if (out) out.textContent = lmMoneyMinor(minor, code);
+    const btn = card.querySelector("[data-pw-checkout]");
+    if (btn) {
+      btn.hidden = !buyable;
+      btn.onclick = buyable ? () => goToCheckout(id) : null;
+    }
   });
 
   /* One of two endings, never both: the checkout, or the sentence that there is not one
@@ -644,14 +650,8 @@ function renderPlanPrices(sub) {
      site ships in — see the ORDER note in assets/pay.js. */
   const buy = box.querySelector("[data-pw-buy]");
   const soon = box.querySelector("[data-pw-soon]");
-  const btn = box.querySelector("[data-pw-checkout]");
   if (buy) buy.hidden = !chosen;
   if (soon) soon.hidden = Boolean(chosen);
-  if (btn) {
-    btn.hidden = !chosen;
-    btn.textContent = T("pay_buy");
-    btn.onclick = chosen ? () => goToCheckout(chosen) : null;
-  }
 }
 
 /**
@@ -681,14 +681,29 @@ var payLeaving = false;
 async function goToCheckout(planId) {
   if (payLeaving) return;
   payLeaving = true;
+  document.querySelectorAll("[data-pw-checkout]").forEach((button) => { button.disabled = true; });
   const url = lmCheckoutUrl(planId, {
     ref: await payTicket(),
     email: state.user && state.user.email,
   });
-  if (!url) { payLeaving = false; status(T("pay_soon"), true); return; }
+  if (!url) {
+    payLeaving = false;
+    document.querySelectorAll("[data-pw-checkout]").forEach((button) => { button.disabled = false; });
+    status(T("pay_soon"), true);
+    return;
+  }
   payPendingSet();
   location.href = url;
 }
+
+/* Back from Stripe's page can bring this one back from the browser's page cache, frozen
+   the way it was left: the flag up and both buttons disabled, so nothing could be bought
+   without a reload. A page restored that way is a page somebody is looking at again. */
+if (typeof window !== "undefined" && typeof window.addEventListener === "function") window.addEventListener("pageshow", (event) => {
+  if (!event.persisted) return;
+  payLeaving = false;
+  document.querySelectorAll("[data-pw-checkout]").forEach((button) => { button.disabled = false; });
+});
 
 /* ------------------------------------------------------------------ payment in flight */
 

@@ -162,7 +162,8 @@ function crmRenderContact(c) {
     parts.push(`<a href="tel:${crmEsc(c.phone.replace(/[^+0-9]/g, ""))}">${crmEsc(c.phone)}</a>`);
   }
   if (c.email) parts.push(`<a href="mailto:${crmEsc(c.email)}">${crmEsc(c.email)}</a>`);
-  if (c.address) parts.push(`<span>${crmEsc(c.address)}</span>`);
+  const address = crmClientAddress(c);
+  if (address) parts.push(`<span>${crmEsc(address)}</span>`);
   box.innerHTML = parts.length
     ? parts.join(' <span class="muted">·</span> ')
     : `<span class="muted">${crmEsc(crmT("cli_contact_none"))}</span>`;
@@ -290,6 +291,11 @@ function crmRenderClient(id) {
       document.getElementById("crm-edit-name").value = client.name;
       document.getElementById("crm-edit-phone").value = client.phone || "";
       document.getElementById("crm-edit-email").value = client.email || "";
+      document.getElementById("crm-edit-street").value = client.street || "";
+      document.getElementById("crm-edit-postal-code").value = client.postalCode || "";
+      document.getElementById("crm-edit-city").value = client.city || "";
+      const legacy = document.getElementById("crm-edit-address-field");
+      legacy.hidden = !(client.address && !client.street && !client.postalCode && !client.city);
       document.getElementById("crm-edit-address").value = client.address || "";
       document.getElementById("crm-edit-note").value = client.note || "";
       form.dataset.filled = "1";
@@ -373,6 +379,9 @@ function wireClientDetail() {
       phone: document.getElementById("crm-edit-phone").value,
       email: document.getElementById("crm-edit-email").value,
       address: document.getElementById("crm-edit-address").value,
+      street: document.getElementById("crm-edit-street").value,
+      postalCode: document.getElementById("crm-edit-postal-code").value,
+      city: document.getElementById("crm-edit-city").value,
       note: document.getElementById("crm-edit-note").value,
     });
     crmEditing = false;
@@ -430,19 +439,26 @@ function buildClientsPage() {
     const name = document.getElementById("crm-client-name");
     const phone = document.getElementById("crm-client-phone");
     const email = document.getElementById("crm-client-email");
-    const address = document.getElementById("crm-client-address");
+    const street = document.getElementById("crm-client-street");
+    const postalCode = document.getElementById("crm-client-postal-code");
+    const city = document.getElementById("crm-client-city");
     if (!name.value.trim()) return;
     crmUndone = null; // a new client is a new subject; the old undo is stale
     crmAddClient({
       name: name.value,
       phone: phone ? phone.value : "",
       email: email ? email.value : "",
-      address: address ? address.value : "",
+      address: "",
+      street: street ? street.value : "",
+      postalCode: postalCode ? postalCode.value : "",
+      city: city ? city.value : "",
     });
     name.value = "";
     if (phone) phone.value = "";
     if (email) email.value = "";
-    if (address) address.value = "";
+    if (street) street.value = "";
+    if (postalCode) postalCode.value = "";
+    if (city) city.value = "";
     name.focus();
   });
 

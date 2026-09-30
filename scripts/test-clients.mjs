@@ -102,7 +102,7 @@ function loadCrm() {
     "crmAddClient", "crmUpdateClient", "crmArchiveClient", "crmDeleteClient",
     "crmRestoreClient", "crmLinkProject", "crmUnlinkProject", "crmClientOfProject",
     "crmClientProjects", "crmFreeProjects", "crmClientCosts", "crmHistory",
-    "crmClientLastAt", "CRM_KEY", "CRM_SCHEMA", "CRM_MAX_NAME", "CRM_MAX_NOTE",
+    "crmClientLastAt", "crmClientAddress", "CRM_KEY", "CRM_SCHEMA", "CRM_MAX_NAME", "CRM_MAX_NOTE",
   ], {
     localStorage,
     document: { dispatchEvent: (e) => events.push(e.type) },
@@ -189,12 +189,15 @@ head("1. a client is chapter XX's record, and nothing the contract would refuse"
     phone: "600 100 200",
     email: "jan@example.com",
     address: "ul. Piękna 3, Wrocław",
+    street: "Piękna 3",
+    postalCode: "50-001",
+    city: "Wrocław",
     note: "Klucze u sąsiada.",
   });
 
   // Chapter XX: "dane kontaktowe, notatki" — plus the archive and the projects, which are
   // the other two things the module has to be able to say about a client today.
-  for (const key of ["name", "phone", "email", "address", "note", "archived", "projectIds"]) {
+  for (const key of ["name", "phone", "email", "address", "street", "postalCode", "city", "note", "archived", "projectIds"]) {
     check(`the client carries ${key}`, Object.prototype.hasOwnProperty.call(c, key));
   }
   // Written in the contract's shape even though it is not in the contract: it is what
@@ -218,6 +221,7 @@ head("1. a client is chapter XX's record, and nothing the contract would refuse"
   eq("the phone", c.phone, "600 100 200");
   eq("the e-mail", c.email, "jan@example.com");
   eq("the address", c.address, "ul. Piękna 3, Wrocław");
+  eq("the split address is formatted without guessing", crm.crmClientAddress(c), "Piękna 3, 50-001 Wrocław");
   eq("the note", c.note, "Klucze u sąsiada.");
 }
 
@@ -235,6 +239,7 @@ head("1b. only the name is required, and the caps are the ones the store declare
   eq("the name is trimmed", bare.name, "Anna");
   eq("an absent phone is an empty string, never undefined", bare.phone, "");
   eq("an absent note likewise", bare.note, "");
+  eq("a legacy address remains the fallback", crm.crmClientAddress({ address: "Stary adres 4" }), "Stary adres 4");
 }
 
 head("1c. the client store is its own, and the phone's workspace is untouched");
@@ -597,11 +602,13 @@ head("6. the page the build writes");
     "crm-page", "crm-index", "crm-client", "crm-client-missing", "crm-client-body",
     "crm-title", "crm-lead", "crm-pro", "crm-pro-chip", "crm-gate",
     "crm-tool", "crm-client-form", "crm-client-name", "crm-client-phone",
-    "crm-client-email", "crm-client-list", "crm-archive", "crm-archive-summary",
+    "crm-client-email", "crm-client-street", "crm-client-postal-code", "crm-client-city",
+    "crm-client-list", "crm-archive", "crm-archive-summary",
     "crm-archive-list", "crm-undo", "crm-undo-text", "crm-undo-go", "crm-contact",
     "crm-fig-projects", "crm-fig-last", "crm-fig-total", "crm-mixed", "crm-client-edit",
     "crm-client-archive", "crm-client-delete", "crm-edit-form", "crm-edit-name",
-    "crm-edit-phone", "crm-edit-email", "crm-edit-address", "crm-edit-note",
+    "crm-edit-phone", "crm-edit-email", "crm-edit-street", "crm-edit-postal-code",
+    "crm-edit-city", "crm-edit-address", "crm-edit-note",
     "crm-delete-ask", "crm-delete-q", "crm-delete-yes", "crm-delete-no", "crm-note",
     "crm-client-projects", "crm-project-form", "crm-project-pick", "crm-history",
   ]) {
@@ -650,7 +657,7 @@ head("7. the copy, in four languages");
     "clipage_title", "clipage_lead", "clipage_meta",
     "cli_pro_yours", "cli_local_note",
     "cli_list_t", "cli_list_d", "cli_new", "cli_name", "cli_phone", "cli_email",
-    "cli_address", "cli_note", "cli_empty",
+    "cli_address", "cli_street", "cli_postal_code", "cli_city", "cli_note", "cli_empty",
     "cli_archive_t", "cli_archive_d", "cli_archive_do", "cli_archive_undo",
     "cli_none_t", "cli_none_d", "cli_back", "cli_edit",
     "cli_delete_q", "cli_delete_yes", "cli_deleted", "cli_restored", "cli_undo",

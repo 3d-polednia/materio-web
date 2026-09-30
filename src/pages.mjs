@@ -1549,8 +1549,8 @@ export function projectsMain(lang, t, aisles = [], features = []) {
               <input id="ws-biz-value" type="text" inputmode="decimal"></label>
             <label class="field field-narrow" for="ws-biz-color"><span class="fld-label">${esc(t("job_color"))}</span>
               <select id="ws-biz-color"><option value="">${esc(t("job_color_none"))}</option>${["lime", "blue", "amber", "red", "violet"].map((v) => `<option value="${v}">${esc(t(`job_color_${v}`))}</option>`).join("")}</select></label>
-            <label class="field" for="ws-biz-note"><span class="fld-label">${esc(t("job_note"))}</span>
-              <textarea id="ws-biz-note" maxlength="2000" rows="2"></textarea></label>
+            <label class="field field-wide" for="ws-biz-note"><span class="fld-label">${esc(t("job_note"))}</span>
+              <textarea id="ws-biz-note" maxlength="2000" rows="6"></textarea></label>
             <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
           </form>
 
@@ -1750,8 +1750,8 @@ export function projectsMain(lang, t, aisles = [], features = []) {
             <input id="ws-project-due" type="date"></label>
           <label class="field field-narrow" for="ws-project-value"><span class="fld-label">${esc(t("job_value"))}</span>
             <input id="ws-project-value" type="text" inputmode="decimal"></label>
-          <label class="field" for="ws-project-note"><span class="fld-label">${esc(t("job_note"))}</span>
-            <textarea id="ws-project-note" maxlength="2000" rows="2"></textarea></label>
+          <label class="field field-wide" for="ws-project-note"><span class="fld-label">${esc(t("job_note"))}</span>
+            <textarea id="ws-project-note" maxlength="2000" rows="6"></textarea></label>
           <label class="field field-narrow" for="ws-project-color"><span class="fld-label">${esc(t("job_color"))}</span>
             <select id="ws-project-color"><option value="">${esc(t("job_color_none"))}</option>${["lime", "blue", "amber", "red", "violet"].map((v) => `<option value="${v}">${esc(t(`job_color_${v}`))}</option>`).join("")}</select></label>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
@@ -1993,13 +1993,25 @@ export function clientsMain(lang, t, features) {
                 <input id="crm-edit-email" type="email" maxlength="200" autocomplete="email">
               </label>
               <label class="ws-mat-f">
+                <span class="ws-bar-label">${esc(t("cli_street"))}</span>
+                <input id="crm-edit-street" type="text" maxlength="200" autocomplete="off">
+              </label>
+              <label class="ws-mat-f ws-mat-f-postal">
+                <span class="ws-bar-label">${esc(t("cli_postal_code"))}</span>
+                <input id="crm-edit-postal-code" type="text" maxlength="12" autocomplete="off">
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">${esc(t("cli_city"))}</span>
+                <input id="crm-edit-city" type="text" maxlength="120" autocomplete="off">
+              </label>
+              <label class="ws-mat-f" id="crm-edit-address-field" hidden>
                 <span class="ws-bar-label">${esc(t("cli_address"))}</span>
                 <input id="crm-edit-address" type="text" maxlength="200">
               </label>
             </p>
             <p class="ws-mat-f">
               <label class="ws-bar-label" for="crm-edit-note">${esc(t("cli_note"))}</label>
-              <textarea id="crm-edit-note" rows="3" maxlength="2000"></textarea>
+              <textarea id="crm-edit-note" rows="5" maxlength="2000"></textarea>
             </p>
             <p>
               <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
@@ -2079,10 +2091,18 @@ export function clientsMain(lang, t, features) {
         <h2>${esc(t("cli_list_t"))}</h2>
         <p class="muted">${esc(t("cli_list_d"))}</p>
         <form id="crm-client-form" class="inline-form">
-          <input id="crm-client-name" type="text" maxlength="120" placeholder="${esc(t("cli_new"))}" required aria-label="${esc(t("cli_new"))}">
-          <input id="crm-client-phone" type="tel" maxlength="200" placeholder="${esc(t("cli_phone"))}" autocomplete="off" aria-label="${esc(t("cli_phone"))}">
-          <input id="crm-client-email" type="email" maxlength="200" placeholder="${esc(t("cli_email"))}" autocomplete="off" aria-label="${esc(t("cli_email"))}">
-          <input id="crm-client-address" type="text" maxlength="200" placeholder="${esc(t("cli_address"))}" autocomplete="off" aria-label="${esc(t("cli_address"))}">
+          <label class="field" for="crm-client-name"><span class="fld-label">${esc(t("cli_new"))}</span>
+            <input id="crm-client-name" type="text" maxlength="120" required></label>
+          <label class="field" for="crm-client-phone"><span class="fld-label">${esc(t("cli_phone"))}</span>
+            <input id="crm-client-phone" type="tel" maxlength="200" autocomplete="off"></label>
+          <label class="field" for="crm-client-email"><span class="fld-label">${esc(t("cli_email"))}</span>
+            <input id="crm-client-email" type="email" maxlength="200" autocomplete="off"></label>
+          <label class="field" for="crm-client-street"><span class="fld-label">${esc(t("cli_street"))}</span>
+            <input id="crm-client-street" type="text" maxlength="200" autocomplete="off"></label>
+          <label class="field field-narrow" for="crm-client-postal-code"><span class="fld-label">${esc(t("cli_postal_code"))}</span>
+            <input id="crm-client-postal-code" type="text" maxlength="12" autocomplete="off"></label>
+          <label class="field" for="crm-client-city"><span class="fld-label">${esc(t("cli_city"))}</span>
+            <input id="crm-client-city" type="text" maxlength="120" autocomplete="off"></label>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
         <ul id="crm-client-list" class="data-list"></ul>

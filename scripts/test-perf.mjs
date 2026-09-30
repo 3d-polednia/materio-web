@@ -120,7 +120,9 @@ const BUDGET = {
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
   // about a kilobyte on top.
-  "index.html": [232, 62],
+  // Raised 2026-09-30 by 1 kB: the stylesheet every page loads grew by the full-width note
+  // field and the postal-code field (about 0.1 kB minified), and this page had less left.
+  "index.html": [233, 62],
   // Raised 2026-09-26 from 248, measured at 248.8 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -133,7 +135,10 @@ const BUDGET = {
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
-  "konwerter-jednostek/index.html": [238, 68],
+  // Raised 2026-09-30 from 238, measured at 238.0 kB: the five new runtime keys (the two
+  // per-plan buy buttons and the client's street, postal code and city) reach every page's
+  // dictionary bundle, and this one had under a tenth of a kilobyte left.
+  "konwerter-jednostek/index.html": [239, 68],
   // Raised 2026-09-26 from 227, measured at 229.4 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -211,7 +216,9 @@ const BUDGET = {
   // 2026-09-26: measured after the six shortened tool panels left /app/; rounded up.
   // 2026-09-30: 377.4 / 99.1 kB — renderNext() now returns to the page the sign-in came
   // from by itself, and keeps the visitor on Synchronizacja while the data question is open.
-  "app/index.html": [378, 100],
+  // Raised 2026-09-30 from 378, measured at 379.2 kB: the yearly plan got its own buy
+  // button (until then only the monthly one could be bought), plus the same five keys.
+  "app/index.html": [380, 100],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
@@ -220,7 +227,9 @@ const BUDGET = {
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
   // about a kilobyte on top.
-  "p/index.html": [218, 62],
+  // Raised 2026-09-30 by 1 kB: the stylesheet every page loads grew by the full-width note
+  // field and the postal-code field (about 0.1 kB minified), and this page had less left.
+  "p/index.html": [219, 62],
 };
 
 /**

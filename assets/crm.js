@@ -95,7 +95,7 @@ const crmClient = (id) => crmAllClients().find((c) => c.id === id) || null;
  * tradesman fills in when they have them, and a client with a name and nothing else is
  * still the row they wanted.
  *
- * @param {{name:string, phone?:string, email?:string, address?:string, note?:string}} fields
+ * @param {{name:string, phone?:string, email?:string, address?:string, street?:string, postalCode?:string, city?:string, note?:string}} fields
  * @returns {object|null} the stored client, or null when there is no name
  */
 function crmAddClient(fields) {
@@ -110,6 +110,9 @@ function crmAddClient(fields) {
     phone: crmText(f.phone, CRM_MAX_CONTACT),
     email: crmText(f.email, CRM_MAX_CONTACT),
     address: crmText(f.address, CRM_MAX_CONTACT),
+    street: crmText(f.street, CRM_MAX_STREET),
+    postalCode: crmText(f.postalCode, CRM_MAX_POSTAL_CODE),
+    city: crmText(f.city, CRM_MAX_CITY),
     note: crmText(f.note, CRM_MAX_NOTE),
     projectIds: [],
     archived: false,
@@ -143,6 +146,9 @@ function crmUpdateClient(id, fields) {
   if (f.phone !== undefined) client.phone = crmText(f.phone, CRM_MAX_CONTACT);
   if (f.email !== undefined) client.email = crmText(f.email, CRM_MAX_CONTACT);
   if (f.address !== undefined) client.address = crmText(f.address, CRM_MAX_CONTACT);
+  if (f.street !== undefined) client.street = crmText(f.street, CRM_MAX_STREET);
+  if (f.postalCode !== undefined) client.postalCode = crmText(f.postalCode, CRM_MAX_POSTAL_CODE);
+  if (f.city !== undefined) client.city = crmText(f.city, CRM_MAX_CITY);
   if (f.note !== undefined) client.note = crmText(f.note, CRM_MAX_NOTE);
   if (f.archived !== undefined) client.archived = Boolean(f.archived);
   client.updatedAt = Date.now();
@@ -151,6 +157,15 @@ function crmUpdateClient(id, fields) {
 }
 
 const crmArchiveClient = (id, on) => crmUpdateClient(id, { archived: on !== false });
+
+/** The Android address shape, with the untouched legacy field as its only fallback. */
+function crmClientAddress(client) {
+  const c = client || {};
+  const street = crmText(c.street, CRM_MAX_STREET);
+  const postalCity = [crmText(c.postalCode, CRM_MAX_POSTAL_CODE), crmText(c.city, CRM_MAX_CITY)]
+    .filter(Boolean).join(" ");
+  return [street, postalCity].filter(Boolean).join(", ") || crmText(c.address, CRM_MAX_CONTACT);
+}
 
 /**
  * Tombstone a client.

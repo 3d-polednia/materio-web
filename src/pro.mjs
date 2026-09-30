@@ -51,7 +51,7 @@ export const proKeys = (features) => [
   "pro_need_account", "pro_need_pro", "pro_signin", "pro_incl_t",
   // Session 28, the subscription: the two plans, the way to the checkout, and the four
   // sentences the account page needs for the states a plan can be in.
-  "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_go", "pay_monthly_t", "pay_monthly_per",
+  "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_buy_monthly", "pay_buy_yearly", "pay_go", "pay_monthly_t", "pay_monthly_per",
   "pay_yearly_t", "pay_yearly_per", "pay_manage", "pay_manage_d",
   "plan_renews", "plan_cancelled", "plan_cancel_d", "plan_active_d",
   ...proModules(features).flatMap((f) => [`${f.key}_t`, `${f.key}_d`]),
@@ -139,10 +139,14 @@ export function proPlansBlock(t, opts) {
   const prices = (opts && opts.prices) || null;
   const plan = (id) => {
     const price = prices ? prices[id] : "";
+    const buy = checkout
+      ? `<button type="button" class="btn btn-buy" data-pw-checkout="${id}" data-i18n="pay_buy_${id}" hidden>${esc(t(`pay_buy_${id}`))}</button>`
+      : "";
     return `<div class="pw-plan" data-pw-plan="${id}"${price ? "" : " hidden"}>
             <h4 data-i18n="pay_${id}_t">${esc(t(`pay_${id}_t`))}</h4>
             <p class="pw-price"><b data-pw-price>${price ? esc(price) : ""}</b>
-              <span class="muted" data-i18n="pay_${id}_per">${esc(t(`pay_${id}_per`))}</span></p>
+              <span class="muted" data-i18n="pay_${id}_per">${esc(t(`pay_${id}_per`))}</span></p>${buy ? `
+            ${buy}` : ""}
           </div>`;
   };
 
@@ -156,7 +160,7 @@ export function proPlansBlock(t, opts) {
      konta zostaje limonkowe, bo nic nie kosztuje. Rozmiar domyślny zamiast `btn-sm`, żeby
      to była najbardziej widoczna rzecz w kartce z cenami. */
   const go = checkout
-    ? `<button type="button" class="btn btn-buy" data-pw-checkout hidden>${esc(t("pay_buy"))}</button>`
+    ? ""
     : `<a class="btn btn-buy btn-go" href="${URL_APP}" data-i18n="pay_go">${esc(t("pay_go"))}</a>`;
 
   return `<div class="pw-plans">

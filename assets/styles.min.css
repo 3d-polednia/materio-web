@@ -448,7 +448,7 @@ transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--eas
 max-width: 100%;
 }
 textarea { border-radius: var(--radius); }
-.field input, .field select, .search-row input, .inline-form input,
+.field input, .field select, .field textarea, .search-row input, .inline-form input,
 .mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input,
 .ws-save-row select, .ws-save-new input, .ws-mat-f textarea { width: 100%; }
 ::placeholder { color: var(--muted); opacity: 1; }
@@ -521,11 +521,13 @@ display: block; font-weight: var(--fw-semi); font-size: var(--fs-sm); margin-bot
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
 .inline-form { align-items: flex-end; }
 .inline-form .field { margin-bottom: 0; flex: 1 1 160px; min-width: 0; }
+.inline-form .field-wide { flex-basis: 100%; }
 .inline-form .field label, .inline-form .field .fld-label {
 white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.inline-form .field input, .inline-form .field select { width: 100%; }
+.inline-form .field input, .inline-form .field select, .inline-form .field textarea { width: 100%; }
 .inline-form .field-narrow { flex: 0 1 12rem; }
+.field textarea { min-height: var(--control-h-lg); resize: vertical; }
 .result {
 margin-top: var(--sp-4); padding: var(--sp-4); border-radius: var(--radius-sm);
 background: var(--accent-soft); color: var(--on-accent-soft);
@@ -1334,6 +1336,7 @@ padding-top: var(--sp-3); border-top: 1px solid var(--outline);
 .app-main .inline-form input { flex: 0 1 26rem; }
 .app-main .inline-form .field { flex: 0 1 26rem; }
 .app-main .inline-form .field-narrow { flex: 0 1 12rem; }
+.app-main .inline-form .field-wide { flex: 1 1 100%; max-width: none; }
 .app-main .inline-form input[inputmode="decimal"],
 .app-main .inline-form input[type="date"] { flex-basis: 10rem; }
 @media (min-width: 900px) {
@@ -1650,6 +1653,8 @@ display: grid; grid-template-columns: auto 1fr auto; column-gap: var(--sp-3); ro
 .ws-mat-grid { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: 0 0 var(--sp-3); }
 .ws-mat-f { display: flex; flex-direction: column; gap: 2px; flex: 1 1 12rem; min-width: 0; }
 .ws-mat-f-sm { flex: 1 1 5.5rem; }
+.ws-mat-f-postal { flex: 0 1 9rem; }
+.ws-mat-f-postal .ws-bar-label { white-space: nowrap; }
 .ws-mat-grid-one .ws-mat-f { flex-grow: 0; }
 .ws-mat-f input, .ws-mat-f select { width: 100%; }
 .ws-mat-hint { font-size: var(--fs-xs); margin: var(--sp-3) 0 0; }
@@ -1726,6 +1731,7 @@ border-top: 1px solid var(--outline);
 .pw-plans h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-base); }
 .pw-plans p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
 .pw-plan-row { display: grid; gap: var(--sp-3); grid-template-columns: 1fr; margin: var(--sp-4) 0; }
+.pw-plan .btn { max-width: 100%; overflow-wrap: normal; word-break: normal; }
 @media (min-width: 480px) { .pw-plan-row { grid-template-columns: repeat(2, 1fr); } }
 .pw-plan {
 padding: var(--sp-4);

@@ -693,6 +693,9 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
         phone: text(c.phone, 200),
         email: text(c.email, 200),
         address: text(c.address, 200),
+        street: text(c.street, 200),
+        postalCode: text(c.postalCode, 12),
+        city: text(c.city, 120),
         note: text(c.note, 2000),
         projectIds: (Array.isArray(c.projectIds) ? c.projectIds : [])
           .filter((id) => !!pathId(id)).slice(0, 200),

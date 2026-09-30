@@ -90,6 +90,10 @@ head("1. the amounts, the currencies Pro is sold in, and no gaps in either list"
   eq("two plans and no more", pay.LM_PAY.plans.length, 2);
   eq("the monthly one first", pay.LM_PAY.plans[0].id, "monthly");
   eq("then the yearly one", pay.LM_PAY.plans[1].id, "yearly");
+  eq("the monthly plan leads to its live link", pay.LM_PAY.plans[0].link,
+    "https://buy.stripe.com/28E3cvfyY4QB9ZD4mI0oM00");
+  eq("the yearly plan leads to its live link", pay.LM_PAY.plans[1].link,
+    "https://buy.stripe.com/3cI3cvcmMcj33Bf3iE0oM01");
 
   /* Two lists since session 61, and this is the section that keeps them honest.
      COUNTING (`CURRENCIES`, from assets/currency.js) is what somebody may price a floor in.
@@ -414,8 +418,9 @@ head("6b. every selector the scripts query exists in the markup the build writes
                     "plan-note"]) {
     check(`/app/ carries #${id}`, app.includes(`id="${id}"`), id);
   }
-  check("/app/ carries the checkout button", app.includes("data-pw-checkout"));
-  check("and the plan slots it fills", app.includes('data-pw-plan="monthly"'));
+  eq("/app/ carries two checkout buttons", (app.match(/data-pw-checkout=/g) || []).length, 2);
+  check("the monthly card owns its checkout", /data-pw-plan="monthly"[\s\S]*?data-pw-checkout="monthly"/.test(app));
+  check("the yearly card owns its checkout", /data-pw-plan="yearly"[\s\S]*?data-pw-checkout="yearly"/.test(app));
   // The one file that may take money is the one that knows who is paying.
   // Either name: the build ships assets/pay.min.js and leaves assets/pay.js authored.
   const loadsPay = (html) => html.includes("assets/pay.js") || html.includes("assets/pay.min.js");
@@ -434,7 +439,7 @@ head("6b. every selector the scripts query exists in the markup the build writes
 head("7. the subscription, said in four languages");
 {
   const keys = [
-    "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_go", "pay_manage", "pay_manage_d",
+    "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_buy_monthly", "pay_buy_yearly", "pay_go", "pay_manage", "pay_manage_d",
     "pay_monthly_t", "pay_monthly_per", "pay_yearly_t", "pay_yearly_per",
     "plan_renews", "plan_cancelled", "plan_active_d", "plan_cancel_d",
   ];

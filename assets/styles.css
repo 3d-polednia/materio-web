@@ -743,7 +743,7 @@ textarea { border-radius: var(--radius); }
    one: a field in a form takes the width of the form, and a control in a row — the
    currency select in the header, a quantity beside a unit — takes the width of what it
    holds. The two are a layout decision per place, not a property of being a field. */
-.field input, .field select, .search-row input, .inline-form input,
+.field input, .field select, .field textarea, .search-row input, .inline-form input,
 .mat-search, .ws-bar-row select, .ws-estimate-bar select, .ws-editing input,
 .ws-save-row select, .ws-save-new input, .ws-mat-f textarea { width: 100%; }
 /* Placeholder text was whatever the browser made of the field's colour — around 3:1 in
@@ -863,11 +863,13 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
    controls rather than with the labels above them. */
 .inline-form { align-items: flex-end; }
 .inline-form .field { margin-bottom: 0; flex: 1 1 160px; min-width: 0; }
+.inline-form .field-wide { flex-basis: 100%; }
 .inline-form .field label, .inline-form .field .fld-label {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.inline-form .field input, .inline-form .field select { width: 100%; }
+.inline-form .field input, .inline-form .field select, .inline-form .field textarea { width: 100%; }
 .inline-form .field-narrow { flex: 0 1 12rem; }
+.field textarea { min-height: var(--control-h-lg); resize: vertical; }
 
 /* ---------- Message
    One box for "here is your answer" and "that did not work": the calculator's
@@ -2018,6 +2020,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .app-main .inline-form input { flex: 0 1 26rem; }
 .app-main .inline-form .field { flex: 0 1 26rem; }
 .app-main .inline-form .field-narrow { flex: 0 1 12rem; }
+.app-main .inline-form .field-wide { flex: 1 1 100%; max-width: none; }
 .app-main .inline-form input[inputmode="decimal"],
 .app-main .inline-form input[type="date"] { flex-basis: 10rem; }
 @media (min-width: 900px) {
@@ -2497,6 +2500,10 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .ws-mat-grid { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: 0 0 var(--sp-3); }
 .ws-mat-f { display: flex; flex-direction: column; gap: 2px; flex: 1 1 12rem; min-width: 0; }
 .ws-mat-f-sm { flex: 1 1 5.5rem; }
+/* A postal code is short, its label is not: "Kod pocztowy" broke onto two lines at 5.5rem
+   and dropped the field below its neighbours. The label keeps one line, the box its width. */
+.ws-mat-f-postal { flex: 0 1 9rem; }
+.ws-mat-f-postal .ws-bar-label { white-space: nowrap; }
 /* A row with one field in it — the margin on /wyceny/. Without this the single field
    grows to the full width of the card, which reads as a text box rather than a percentage. */
 .ws-mat-grid-one .ws-mat-f { flex-grow: 0; }
@@ -2622,6 +2629,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 /* Two plans side by side from the width where two fit; stacked below it, because a price
    squeezed onto two lines is a price that is hard to compare (chapter XXVIII). */
 .pw-plan-row { display: grid; gap: var(--sp-3); grid-template-columns: 1fr; margin: var(--sp-4) 0; }
+.pw-plan .btn { max-width: 100%; overflow-wrap: normal; word-break: normal; }
 @media (min-width: 480px) { .pw-plan-row { grid-template-columns: repeat(2, 1fr); } }
 .pw-plan {
   padding: var(--sp-4);
