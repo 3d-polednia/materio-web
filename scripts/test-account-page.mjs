@@ -268,7 +268,7 @@ head("2. a link from a calculator opens the sign-up form directly");
 head("3. registration");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
-  const page = await openApp(ctx, "/app/?mode=signup&next=%2Fkalkulatory%2Fplytki-panele-gres%2F");
+  const page = await openApp(ctx, "/app/?mode=signup");
 
   await page.fill("#signup-email", "nowy@example.com");
   await page.fill("#signup-password", "sekret123");
@@ -292,10 +292,57 @@ head("3. registration");
     profile && Object.keys(profile).sort().join() === "appVersion,createdAt,lastSeenAt",
     JSON.stringify(profile));
 
-  check("the way back to the calculator is offered", await visible(page, "#app-next"));
-  eq("and points at the page the visitor came from",
-    await page.locator("#app-next-link").getAttribute("href"), "/kalkulatory/plytki-panele-gres/");
   eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+/* 2026-09-30: the way back is taken by itself — renderNext() in assets/app.js. */
+head("3b. signing up from a calculator goes back to it");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openApp(ctx, "/app/?mode=signup&next=%2Fkalkulatory%2Fplytki-panele-gres%2F");
+  await page.fill("#signup-email", "wraca@example.com");
+  await page.fill("#signup-password", "sekret123");
+  await page.click("#signup-form button[type=submit]");
+  await page.waitForURL((u) => u.pathname === "/kalkulatory/plytki-panele-gres/", { timeout: 10000 });
+  eq("the page returns to the calculator",
+    new URL(page.url()).pathname, "/kalkulatory/plytki-panele-gres/");
+  eq("and the level it switches on was written before leaving",
+    await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), "liczmat");
+  eq("so the save box offers saving, not an account",
+    await page.locator("[data-ws-save]").count() > 0, true);
+  await page.close();
+  await ctx.close();
+}
+
+head("3c. with work saved before signing in, the question comes first");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const T = Date.UTC(2026, 6, 1);
+  const workspace = JSON.stringify({
+    projects: [{ id: "old-p", name: "Sprzed logowania", archived: false, createdAt: T, updatedAt: T, deletedAt: null, schemaVersion: 1 }],
+    rooms: [], estimations: [], shoppingItems: [],
+  });
+  const page = await openApp(ctx, "/app/?next=%2Fprojekty%2F",
+    // ACCOUNT is declared further down; the same one account, written out here.
+    { accounts: { "kto@example.com": { password: "sekret123", user: { uid: "u1", email: "kto@example.com",
+      emailVerified: true, displayName: "", providerData: [{ providerId: "password" }] } } },
+      storage: { "materio-workspace-v1": workspace } });
+  await page.fill("#signin-email", "kto@example.com");
+  await page.fill("#signin-password", "sekret123");
+  await page.click("#signin-form button[type=submit]");
+  await signedIn(page);
+  await page.waitForTimeout(500);
+  eq("the visitor stays on the account page", new URL(page.url()).pathname, "/app/");
+  eq("with Synchronizacja open", new URL(page.url()).hash, "#synchronizacja");
+  check("and the choice in front of them", await visible(page, "#app-sync-unclaimed"));
+  check("the way back is still offered", await visible(page, "#app-next"));
+  await page.click("#app-sync-claim-mine");
+  await page.waitForURL((u) => u.pathname === "/projekty/", { timeout: 10000 });
+  eq("answering takes them back", new URL(page.url()).pathname, "/projekty/");
+  eq("and the work is still in the browser",
+    await page.evaluate(() => (localStorage.getItem("materio-workspace-v1") || "").includes("Sprzed logowania")), true);
   await page.close();
   await ctx.close();
 }
@@ -435,6 +482,8 @@ head("8. the profile");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
   await page.click('.app-nav-item[href$="#profil"]');
+  // The panel switches on `hashchange`, which fires after the click has resolved.
+  await page.waitForSelector('[data-panel="profile"]:not([hidden])', { timeout: 3000 }).catch(() => {});
 
   check("the profile panel opens", await visible(page, '[data-panel="profile"]'));
   check("and the projects panel closes", !(await visible(page, '[data-panel="projects"]')));
@@ -523,6 +572,7 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
     await page.click("#signin-form button[type=submit]");
     await signedIn(page);
     await page.click('.app-nav-item[href$="#pro"]');
+    await page.waitForSelector('[data-panel="pro"]:not([hidden])', { timeout: 3000 }).catch(() => {});
     return page;
   };
 
@@ -819,6 +869,7 @@ async function openTab(ctx, tab, opts = {}) {
   await signedIn(page);
   const hashes = { profile: "profil", sync: "synchronizacja", pro: "pro", account: "konto" };
   await page.click('.app-nav-item[href$="#' + hashes[tab] + '"]');
+  await page.waitForSelector(`[data-panel="${tab}"]:not([hidden])`, { timeout: 3000 }).catch(() => {});
   return page;
 }
 

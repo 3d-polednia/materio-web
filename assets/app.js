@@ -385,7 +385,7 @@ async function onSignedIn(user) {
 
   renderIdentity();
   renderProfile();
-  renderNext();
+  if (renderNext()) return;
 
   listen("projects", (rows, all) => { state.projects = rows; renderOverview(); accountSync.mirrorToLocal({ projects: all }); });
   listen("rooms", (rows, all) => { state.rooms = rows; renderOverview(); accountSync.mirrorToLocal({ rooms: all }); });
@@ -733,12 +733,38 @@ async function payTicket() {
   }
 }
 
-/** The way back to wherever the sign-up prompt was clicked, if there was one. */
-function renderNext() {
+/** The page the sign-in or sign-up prompt was clicked on, if it is not this one. */
+function nextTarget() {
   const next = lmSafeNext(new URLSearchParams(location.search).get("next"));
-  if (!next) return;
+  if (!next) return "";
+  return new URL(next, location.origin).pathname === location.pathname ? "" : next;
+}
+
+/**
+ * The way back to wherever the sign-up prompt was clicked, if there was one.
+ *
+ * 2026-09-30: it is taken by itself. Signing in from "Zaloguj się" on a calculator or an
+ * account page used to leave the visitor on Moje konto with a button to click; now the
+ * page goes back as soon as the account's level is known — the pages switch on the hint
+ * applyProfile() has just written. Returns true when it is leaving, so the caller starts
+ * nothing that the navigation would cut off; the page it returns to syncs by itself.
+ *
+ * Except when this browser holds data whose owner has to be decided — another account's
+ * copy, or work saved before signing in. The guest card promised that question, so the
+ * visitor stays here with Synchronizacja open and the choice in front of them, the button
+ * still offers the way back, and answering takes them back (see wireSyncPanel()).
+ */
+function renderNext() {
+  const next = nextTarget();
+  if (!next) return false;
   $("app-next-link").href = next;
   $("app-next").hidden = false;
+  if (accountSync.blockedWorkspace()) {
+    if (location.hash !== "#synchronizacja") location.hash = "#synchronizacja";
+    return false;
+  }
+  location.replace(next);
+  return true;
 }
 
 function wireProfilePanel() {
@@ -1136,6 +1162,8 @@ function wireSyncPanel() {
     }
     renderLocalSummary();
     await accountSync.autoReconcile(uid);
+    // The question renderNext() kept the visitor here for is answered.
+    if (nextTarget()) location.replace(nextTarget());
   });
 
   $("app-sync-claim-empty").addEventListener("click", async () => {
@@ -1149,6 +1177,7 @@ function wireSyncPanel() {
     }
     renderLocalSummary();
     await accountSync.autoReconcile(uid);
+    if (nextTarget()) location.replace(nextTarget());
   });
 }
 

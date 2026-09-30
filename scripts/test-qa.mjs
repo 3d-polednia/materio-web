@@ -354,17 +354,17 @@ async function walk(cfg) {
   await app.fill("#signup-email", EMAIL);
   await app.fill("#signup-password", PASSWORD);
   await app.click("#signup-form button[type=submit]");
-  await app.locator("#app-workspace").waitFor({ state: "visible", timeout: 10000 });
+  // 2026-09-30: signing up from the calculator's link goes back to it by itself
+  // (renderNext() in assets/app.js); who the account belongs to is test-account-page §3.
+  await app.waitForURL((u) => u.pathname === CALC, { timeout: 10000 });
 
   /* ---------------------------------------------------------------- 5. LICZMAT */
 
   head(`${who} — 5. LICZMAT: the free account, and the way back to the calculation`);
-  eq("the account is at the free level", await level(app), "liczmat");
-  eq("the page says whose account it is", (await textOf(app, "#app-who")).trim(), EMAIL);
-  eq("the way back is offered", await visible(app, "#app-next"), true);
-  eq("and it points at the calculator the visitor came from",
-    await app.getAttribute("#app-next-link", "href"), CALC);
-  check("no error on the account page", app.lmErrors.length === 0, app.lmErrors.join("\n      "));
+  eq("the account is at the free level",
+    await app.evaluate(() => localStorage.getItem("liczmat-signed-in")), "liczmat");
+  eq("and the visitor is back on the calculator they came from", new URL(app.url()).pathname, CALC);
+  check("no error on the way", app.lmErrors.length === 0, app.lmErrors.join("\n      "));
   await app.close();
 
   await go(CALC);
