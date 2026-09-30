@@ -142,6 +142,7 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="/assets/quote-doc.css?v=20260930c">
 <script>window.LM_LINKS = {"clients":"/cs/klienti/","projects":"/cs/projekty/","quotes":"/cs/cenove-nabidky/","calendar":"/cs/terminy/"};</script>
 <script>window.LICZMAT_ALTERNATES = {
   "pl": "/wyceny/",
@@ -474,8 +475,7 @@
             </form>
           </section>
 
-          <section class="dash-sec ws-pdf" id="ws-pdf">
-            <div class="dash-head"><h2>Exportovat rozpočet</h2></div>
+          <section class="ws-pdf" id="ws-pdf">
             <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>
         <h2 data-i18n="feat_pdf_t">Export do PDF</h2>
         <p class="muted" data-i18n="feat_pdf_d">Technická zpráva a rozpočet pro investora: práce, marže, DPH a součet, připraveno k tisku.</p>
@@ -495,54 +495,64 @@
 
       </div>
             <div id="pdf-tool" hidden>
-              <p class="muted">Dokument se otevře v dialogu tisku. Zvolte v něm uložení do PDF.</p>
               <p id="quo-pdf-company" class="muted" hidden>Vyber firmu, která nabídku vystavuje. <a href="/cs/moje-firma/">Moje firma</a></p>
-              <article id="ws-pdf-doc" class="pdf-doc" hidden>
-                <header class="pdf-head">
-                  <p class="pdf-sub" data-pdf="subtitle">Cenová nabídka</p>
-                  <p class="pdf-line"><b data-pdf="quoteName"></b></p>
-                  <p class="pdf-line"><span>Datum:</span> <span data-pdf="date"></span></p>
-                </header>
-                <section class="pdf-recipient" data-pdf-row="recipient" hidden>
-                  <h2>Pro</h2>
-                  <p class="pdf-line" data-pdf-row="clientName" hidden data-pdf="clientName"></p>
-                  <p class="pdf-line" data-pdf-row="clientPhone" hidden data-pdf="clientPhone"></p>
-                  <p class="pdf-line" data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></p>
-                  <p class="pdf-line" data-pdf-row="clientAddress" hidden data-pdf="clientAddress"></p>
-                  <p class="pdf-line" data-pdf-row="projectName" hidden data-pdf="projectName"></p>
-                </section>
-                <section class="pdf-table-block" data-pdf-row="materialsTable" hidden>
-                  <h2>Materiály</h2>
-                  <table class="pdf-table">
-                    <thead><tr><th scope="col">Název</th><th scope="col">MNOŽ.</th><th scope="col">HODNOTA</th></tr></thead>
-                    <tbody data-pdf="materialRows"></tbody>
-                  </table>
-                </section>
-                <section class="pdf-table-block" data-pdf-row="labourTable" hidden>
-                  <h2>Práce</h2>
-                  <table class="pdf-table">
-                    <thead><tr><th scope="col">Název</th><th scope="col">Množství × Sazba</th><th scope="col">HODNOTA</th></tr></thead>
-                    <tbody data-pdf="labourRows"></tbody>
-                  </table>
-                </section>
-                <table class="pdf-pricing">
-                  <tbody>
-                    <tr><th scope="row">Materiál</th><td data-pdf="materials"></td></tr>
-                    <tr data-pdf-row="other" hidden><th scope="row">Další náklady</th><td data-pdf="other"></td></tr>
-                    <tr><th scope="row">Práce</th><td data-pdf="labour"></td></tr>
-                    <tr><th scope="row">Celkem bez marže</th><td data-pdf="subtotal"></td></tr>
-                    <tr><th scope="row" data-pdf="marginLabel">Marže</th><td data-pdf="margin"></td></tr>
-                    <tr><th scope="row">Netto</th><td data-pdf="net"></td></tr>
-                    <tr><th scope="row">VAT</th><td data-pdf="vat"></td></tr>
-                    <tr class="pdf-strong"><th scope="row">Součet</th><td data-pdf="total"></td></tr>
-                  </tbody>
-                </table>
-                <p class="pdf-line pdf-mixed" data-pdf-row="mixed" hidden>Položky jsou v různých měnách. Součet je sečte, ale nic nepřepočítává kurzem — zkontroluj měny ve sloupci nákladů.</p>
-                <section class="pdf-notes" data-pdf-row="quoteNotes" hidden>
-                  <h2>Poznámky</h2>
-                  <p data-pdf="quoteNotes"></p>
-                </section>
-                <p class="pdf-foot">LiczMat — Spočítej. Naplánuj. Realizuj.</p>
+              <article id="ws-pdf-doc" class="qdoc qdoc--no-logo" hidden>
+                <table class="qdoc-print-wrap"><thead><tr><th scope="col" class="qdoc-head-space"></th></tr></thead><tbody><tr><td><div class="qdoc-main">
+                  <header class="qdoc-head"><div class="qdoc-seller">
+                    <div class="qdoc-company-name" data-pdf="companyName"></div>
+                    <div data-pdf-row="companyStreet" hidden data-pdf="companyStreet"></div>
+                    <div data-pdf-row="companyPostalCity" hidden data-pdf="companyPostalCity"></div>
+                    <div data-pdf-row="companyNip" hidden><span class="qdoc-label">DIČ</span> <span data-pdf="companyNip"></span></div>
+                    <div data-pdf-row="companyPhone" hidden><span class="qdoc-label">tel.</span> <span data-pdf="companyPhone"></span></div>
+                    <div data-pdf-row="companyEmail" hidden><span class="qdoc-label">e-mail</span> <span data-pdf="companyEmail"></span></div>
+                    <div data-pdf-row="companyWww" hidden data-pdf="companyWww"></div>
+                  </div><div class="qdoc-head-right"><div class="qdoc-logo-box">
+                    <img class="qdoc-logo" data-pdf="companyLogo" alt="Logo firmy" width="227" height="83" decoding="async" loading="eager">
+                    <div class="qdoc-logo-name" data-pdf="logoCompanyName"></div>
+                  </div><div class="qdoc-title">CENOVÁ NABÍDKA</div></div></header>
+                  <div class="qdoc-meta"><div class="qdoc-for"><div class="qdoc-meta-label">Pro</div>
+                    <div class="qdoc-for-name" data-pdf-row="clientName" hidden data-pdf="clientName"></div>
+                    <div data-pdf-row="clientStreet" hidden data-pdf="clientStreet"></div>
+                    <div data-pdf-row="clientPostalCity" hidden data-pdf="clientPostalCity"></div>
+                    <div data-pdf-row="clientPhone" hidden><span class="qdoc-label">tel.</span> <span data-pdf="clientPhone"></span></div>
+                    <div data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></div>
+                    <div class="qdoc-project-name" data-pdf-row="projectName" hidden><span class="qdoc-label">Projekt:</span> <span data-pdf="projectName"></span></div>
+                  </div><div class="qdoc-details"><dl class="qdoc-details-list">
+                    <div class="qdoc-details-row"><dt>Č. nabídky</dt><dd data-pdf="quoteNumber"></dd></div>
+                    <div class="qdoc-details-row"><dt>Datum</dt><dd data-pdf="date"></dd></div>
+                    <div class="qdoc-details-row" data-pdf-row="validUntil" hidden><dt>Platí do</dt><dd data-pdf="validUntil"></dd></div>
+                  </dl></div></div>
+                  <section data-pdf-row="materialsTable" hidden><div class="qdoc-caption">Materiály</div><table class="qdoc-table"><thead><tr>
+                  <th scope="col" class="qdoc-col-lp">Č.</th>
+                  <th scope="col" class="qdoc-col-desc">Popis</th>
+                  <th scope="col" class="qdoc-col-qty">Množství</th>
+                  <th scope="col" class="qdoc-col-price" data-pdf="unitPriceHead" data-label="Jedn. cena">Jedn. cena</th>
+                  <th scope="col" class="qdoc-col-val" data-pdf="valueHead" data-label="Hodnota">Hodnota</th>
+                </tr></thead><tbody data-pdf="materialRows"></tbody></table></section>
+                  <section data-pdf-row="labourTable" hidden><div class="qdoc-caption">Práce</div><table class="qdoc-table"><thead><tr>
+                  <th scope="col" class="qdoc-col-lp">Č.</th>
+                  <th scope="col" class="qdoc-col-desc">Popis</th>
+                  <th scope="col" class="qdoc-col-qty">Množství</th>
+                  <th scope="col" class="qdoc-col-price" data-pdf="unitPriceHead" data-label="Jedn. cena">Jedn. cena</th>
+                  <th scope="col" class="qdoc-col-val" data-pdf="valueHead" data-label="Hodnota">Hodnota</th>
+                </tr></thead><tbody data-pdf="labourRows"></tbody></table></section>
+                  <p class="qdoc-notes-text" data-pdf-row="mixed" hidden>Položky jsou v různých měnách. Součet je sečte, ale nic nepřepočítává kurzem — zkontroluj měny ve sloupci nákladů.</p>
+                  <div class="qdoc-sum-container"><div class="qdoc-notes" data-pdf-row="notesBlock" hidden><div class="qdoc-notes-label">Poznámky</div>
+                    <div class="qdoc-notes-text" data-pdf-row="quoteNotes" hidden data-pdf="quoteNotes"></div>
+                    <div class="qdoc-notes-payment" data-pdf-row="bankAccount" hidden>Platba převodem na účet: <strong data-pdf="bankAccount"></strong></div>
+                  </div><table class="qdoc-sum"><tbody>
+                    <tr><th scope="row">Materiály</th><td class="qdoc-num" data-pdf="materials"></td></tr>
+                    <tr data-pdf-row="other" hidden><th scope="row">Ostatní náklady</th><td class="qdoc-num" data-pdf="other"></td></tr>
+                    <tr><th scope="row">Práce</th><td class="qdoc-num" data-pdf="labour"></td></tr>
+                    <tr><th scope="row">Součet</th><td class="qdoc-num" data-pdf="subtotal"></td></tr>
+                    <tr data-pdf-row="marginRow" hidden><th scope="row" data-pdf="marginLabel"></th><td class="qdoc-num" data-pdf="margin"></td></tr>
+                    <tr><th scope="row">Bez DPH</th><td class="qdoc-num" data-pdf="net"></td></tr>
+                    <tr data-pdf-row="vatRow" hidden><th scope="row" data-pdf="vatLabel"></th><td class="qdoc-num" data-pdf="vat"></td></tr>
+                    <tr class="qdoc-total"><th scope="row" data-pdf="totalLabel" data-label="Celkem">Celkem</th><td class="qdoc-num" data-pdf="total"></td></tr>
+                  </tbody></table></div>
+                  <div class="qdoc-sign"><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">Dodavatel</div></div><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">Objednatel</div></div></div>
+                </div></td></tr></tbody><tfoot><tr><td><div class="qdoc-foot-space"></div></td></tr></tfoot></table>
+                <footer class="qdoc-foot"><div class="qdoc-foot-left"><img src="/assets/logo-mark.svg?v=20260930c" alt="LiczMat" class="qdoc-foot-mark" width="24" height="24" decoding="async" loading="eager"><div class="qdoc-foot-text"><div class="qdoc-foot-primary">Nabídka připravena v LiczMat · liczmat.com</div><div class="qdoc-foot-secondary">Aplikace LiczMat pro Android na Google Play</div></div></div><div class="qdoc-foot-right"><img src="/assets/qr-liczmat.svg?v=20260930c" alt="QR kód na liczmat.com" class="qdoc-qr" width="60" height="60" decoding="async" loading="eager"><div class="qdoc-qr-caption">liczmat.com</div></div></footer>
               </article>
             </div>
           </section>

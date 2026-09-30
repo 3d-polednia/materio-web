@@ -1,0 +1,615 @@
+/* Quote document.
+   ============================================================================
+   This file builds the printable A4 quote. Why a separate file? It is loaded
+   only on the quote page to avoid pushing print layouts, tables, and signature
+   boxes down to the other 500 pages where they are useless weight.
+   
+   Why local --qdoc-* colours? A physical piece of paper is always white and
+   its ink is always dark, no matter what theme the visitor currently uses on
+   the site. The root block here defines its own custom properties copied from
+   the light theme, isolating the document from dark mode inversions. A lime
+   fill never appears on paper; it is reserved for lines.
+   
+   Why is the footer fixed in print? In the print media query, position: fixed
+   keeps the footer nailed to the bottom of the viewport, which makes the
+   browser print the LiczMat branding line and QR code on every single page
+   of a multi-page quote. */
+
+.qdoc {
+  /* Local color tokens derived from the light theme in styles.css */
+  --qdoc-ink: #14181c;          
+  --qdoc-muted: #5c6570;        
+  --qdoc-accent: #91d206;       
+  --qdoc-accent-strong: #476c00;
+  --qdoc-line: #e0dacd;         
+  --qdoc-surface: #ffffff;      
+
+  color-scheme: light;
+  background: var(--qdoc-surface);
+  color: var(--qdoc-ink);
+  font-family: var(--font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  /* The approved standalone sheet uses the browser's normal leading. The site shell is
+     deliberately roomier (1.6), which otherwise adds a second A4 page to the same rows. */
+  line-height: normal;
+  
+  width: 210mm;
+  max-width: 100%;
+  min-height: 297mm;
+  box-sizing: border-box;
+  padding: 14mm 14mm 16mm;
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  outline: 1px solid var(--qdoc-line);
+  position: relative;
+}
+
+.qdoc *, .qdoc *::before, .qdoc *::after {
+  box-sizing: border-box;
+}
+
+.qdoc [hidden] {
+  display: none !important;
+}
+
+/* Print Container to reserve footer space */
+.qdoc-print-wrap {
+  width: 100%;
+  border-collapse: collapse;
+  border: none;
+}
+
+.qdoc-print-wrap > tbody > tr > td {
+  padding: 0;
+}
+
+.qdoc-foot-space {
+  height: 22mm;
+}
+
+/* Header Section */
+.qdoc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12pt;
+}
+
+.qdoc-seller {
+  font-size: 9.5pt;
+  line-height: 1.4;
+}
+
+.qdoc-company-name {
+  font-size: 14pt;
+  font-weight: 700;
+  margin-bottom: 2pt;
+}
+
+.qdoc-label {
+  color: var(--qdoc-muted);
+}
+
+.qdoc-head-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.qdoc-logo-box {
+  width: 60mm;
+  height: 22mm;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.qdoc-logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.qdoc-logo-name {
+  display: none;
+  font-size: 16pt;
+  font-weight: 700;
+  color: var(--qdoc-ink);
+}
+
+.qdoc.qdoc--no-logo .qdoc-logo {
+  display: none;
+}
+
+.qdoc.qdoc--no-logo .qdoc-logo-name {
+  display: block;
+}
+
+/* Title Section */
+.qdoc-title {
+  text-align: right;
+  font-size: 26pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--qdoc-accent-strong);
+  margin-top: 6pt;
+  text-transform: uppercase;
+}
+
+/* Meta Data Section */
+.qdoc-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12pt;
+}
+
+.qdoc-for {
+  font-size: 10pt;
+  line-height: 1.4;
+}
+
+.qdoc-meta-label {
+  font-size: 9pt;
+  font-weight: 700;
+  color: var(--qdoc-accent-strong);
+  margin-bottom: 2pt;
+  text-transform: uppercase;
+}
+
+.qdoc-for-name {
+  font-size: 12pt;
+  font-weight: 700;
+  margin-bottom: 2pt;
+}
+
+.qdoc-project-name {
+  margin-top: 4pt;
+}
+
+.qdoc-details {
+  text-align: right;
+}
+
+.qdoc-details-list {
+  display: table;
+  margin: 0 0 0 auto;
+}
+
+.qdoc-details-row {
+  display: table-row;
+}
+
+.qdoc-details-row dt,
+.qdoc-details-row dd {
+  display: table-cell;
+  padding: 2pt 0;
+  font-size: 10pt;
+}
+
+.qdoc-details-row dt {
+  font-weight: 700;
+  color: var(--qdoc-accent-strong);
+  padding-right: 10pt;
+}
+
+.qdoc-details-row dd {
+  color: var(--qdoc-ink);
+  margin: 0;
+}
+
+/* Tables Section */
+.qdoc-caption {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--qdoc-accent-strong);
+  margin-top: 10pt;
+  margin-bottom: 4pt;
+}
+
+.qdoc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12pt;
+  font-size: 10pt;
+}
+
+.qdoc-table thead {
+  display: table-header-group;
+}
+
+.qdoc-table tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.qdoc-table th {
+  font-weight: 700;
+  color: var(--qdoc-accent-strong);
+  text-align: left;
+  border-bottom: 2px solid var(--qdoc-accent);
+  padding: 4pt;
+}
+
+.qdoc-table td {
+  padding: 3pt 4pt;
+  border-bottom: 1px solid var(--qdoc-line);
+}
+
+.qdoc-col-lp { width: 6%; }
+.qdoc-col-desc { width: 44%; }
+.qdoc-col-qty { width: 16%; text-align: right; }
+.qdoc-col-price { width: 16%; text-align: right; }
+.qdoc-col-val { width: 18%; text-align: right; }
+
+.qdoc-table th.qdoc-col-qty,
+.qdoc-table th.qdoc-col-price,
+.qdoc-table th.qdoc-col-val {
+  text-align: right;
+}
+
+.qdoc-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Summary Section */
+.qdoc-sum-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10mm;
+  margin-top: 4pt;
+  margin-bottom: 10pt;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.qdoc-sum {
+  width: 85mm;
+  flex: none;
+  border-collapse: collapse;
+  font-size: 10pt;
+}
+
+.qdoc-sum td {
+  padding: 2pt 4pt;
+}
+
+.qdoc-sum th {
+  padding: 2pt 4pt;
+  text-align: left;
+  font-weight: 400;
+}
+
+.qdoc-total th,
+.qdoc-total td {
+  font-weight: 700;
+  color: var(--qdoc-accent-strong);
+  border-top: 2px solid var(--qdoc-accent);
+  border-bottom: 2px solid var(--qdoc-accent);
+  padding: 4pt;
+  font-size: 11pt;
+}
+
+/* Notes Section */
+.qdoc-notes {
+  flex: 1;
+  margin-top: 2pt;
+  margin-bottom: 0;
+  font-size: 10pt;
+  line-height: 1.4;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.qdoc-notes-label {
+  font-weight: 700;
+  color: var(--qdoc-accent-strong);
+  margin-bottom: 4pt;
+}
+
+.qdoc-notes-text {
+  margin-bottom: 8pt;
+}
+
+/* Signatures Section */
+.qdoc-sign {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8pt;
+  padding: 0 10mm;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.qdoc-sign-box {
+  width: 50mm;
+  text-align: center;
+}
+
+.qdoc-sign-line {
+  border-bottom: 1px solid var(--qdoc-accent);
+  margin-bottom: 3pt;
+  height: 22pt;
+}
+
+.qdoc-sign-caption {
+  font-size: 9pt;
+  color: var(--qdoc-muted);
+}
+
+/* Footer Section */
+.qdoc-foot {
+  border-top: 1px solid var(--qdoc-accent);
+  /* The footer must stay shorter than .qdoc-foot-space (22mm), the room the page keeps
+     free for it. At 4mm + a 16mm QR it measured 24mm and sat on the signature captions
+     of a 5 + 3 line quote with VAT (2026-09-30); 3mm + 14mm leaves it about 20mm. */
+  padding-top: 3mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+
+.qdoc-foot-left {
+  display: flex;
+  align-items: flex-start;
+}
+
+.qdoc-foot-mark {
+  height: 6mm;
+  width: auto;
+  margin-right: 8pt;
+  margin-top: 1pt;
+}
+
+.qdoc-foot-primary {
+  font-size: 9pt;
+  color: var(--qdoc-ink);
+}
+
+.qdoc-foot-secondary {
+  font-size: 8pt;
+  color: var(--qdoc-muted);
+  margin-top: 2pt;
+}
+
+.qdoc-foot-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.qdoc-qr {
+  width: 14mm;
+  height: 14mm;
+}
+
+.qdoc-qr-caption {
+  font-size: 7pt;
+  color: var(--qdoc-ink);
+  margin-top: 2pt;
+}
+
+@media screen {
+  .qdoc-foot {
+    position: absolute;
+    bottom: 16mm;
+    left: 14mm;
+    right: 14mm;
+  }
+}
+
+/* Narrow screens logic for maximum 390px (and generally below 600px) */
+@media screen and (max-width: 600px) {
+  .qdoc {
+    padding: 16px;
+  }
+  .qdoc-head {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .qdoc-head-right {
+    align-items: flex-start;
+  }
+  .qdoc-logo-box {
+    justify-content: flex-start;
+  }
+  .qdoc-meta {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .qdoc-details-list {
+    margin: 0;
+  }
+  .qdoc-table {
+    font-size: 8.5pt;
+    table-layout: fixed;
+  }
+  .qdoc-table th,
+  .qdoc-table td {
+    padding: 3pt 2pt;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    min-width: 0;
+  }
+  .qdoc-col-lp { width: 8%; }
+  .qdoc-col-desc { width: 34%; }
+  .qdoc-col-qty { width: 16%; }
+  .qdoc-col-price { width: 20%; }
+  .qdoc-col-val { width: 22%; }
+  .qdoc-sum-container {
+    flex-direction: column;
+  }
+  .qdoc-sum {
+    width: 100%;
+  }
+  .qdoc-sign {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 0;
+  }
+  .qdoc-foot {
+    position: static;
+    margin-top: 24px;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .qdoc-foot-right {
+    align-items: flex-start;
+  }
+  .qdoc-foot-space {
+    display: none;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 14mm 16mm;
+  }
+  .qdoc {
+    width: auto;
+    min-height: auto;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    outline: none;
+    background: none;
+    display: block;
+  }
+  .qdoc-foot {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+/*
+=============================================================================
+MARKUP SKELETON
+=============================================================================
+<article class="qdoc">
+  <table class="qdoc-print-wrap">
+    <thead>
+      <tr><td><div class="qdoc-head-space"></div></td></tr>
+    </thead>
+    <tbody>
+      <tr><td>
+        <div class="qdoc-main">
+          
+          <header class="qdoc-head">
+            <div class="qdoc-seller">
+              <div class="qdoc-company-name">Remonty Kowalczyk</div>
+              <div>ul. Lipowa 12/3</div>
+              <div>31-000 Kraków</div>
+              <div><span class="qdoc-label">NIP</span> 677-123-45-67</div>
+              <div><span class="qdoc-label">tel.</span> 600 100 200</div>
+              <div><span class="qdoc-label">e-mail</span> biuro@remonty-kowalczyk.pl</div>
+              <div>remonty-kowalczyk.pl</div>
+            </div>
+            <div class="qdoc-head-right">
+              <div class="qdoc-logo-box">
+                <img class="qdoc-logo" src="logo.png" alt="Logo firmy">
+                <div class="qdoc-logo-name">Remonty Kowalczyk</div>
+              </div>
+              <div class="qdoc-title">WYCENA</div>
+            </div>
+          </header>
+
+          <div class="qdoc-meta">
+            <div class="qdoc-for">
+              <div class="qdoc-meta-label">Dla</div>
+              <div class="qdoc-for-name">Anna Nowak</div>
+              <div>ul. Słoneczna 5</div>
+              <div>30-300 Kraków</div>
+              <div>tel. 501 222 333</div>
+              <div>anna.nowak@example.pl</div>
+              <div class="qdoc-project-name"><span class="qdoc-label">Projekt:</span> Łazienka — ul. Słoneczna</div>
+            </div>
+            <div class="qdoc-details">
+              <dl class="qdoc-details-list">
+                <div class="qdoc-details-row"><dt>Nr wyceny</dt><dd>W/2026/007</dd></div>
+                <div class="qdoc-details-row"><dt>Data</dt><dd>30.09.2026</dd></div>
+                <div class="qdoc-details-row"><dt>Ważna do</dt><dd>30.10.2026</dd></div>
+              </dl>
+            </div>
+          </div>
+
+          <div class="qdoc-caption">Materiały</div>
+          <table class="qdoc-table">
+            <thead>
+              <tr>
+                <th class="qdoc-col-lp">Lp.</th>
+                <th class="qdoc-col-desc">Opis</th>
+                <th class="qdoc-col-qty">Ilość</th>
+                <th class="qdoc-col-price">Cena jedn. (zł)</th>
+                <th class="qdoc-col-val">Wartość (zł)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Płytki gresowe 60×60</td>
+                <td class="qdoc-num">12,5 m²</td>
+                <td class="qdoc-num">89,00</td>
+                <td class="qdoc-num">1 112,50</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="qdoc-sum-container">
+            <div class="qdoc-notes">
+              <div class="qdoc-notes-label">Uwagi</div>
+              <div class="qdoc-notes-text">Cena obejmuje transport materiałów. Termin realizacji: 5 dni roboczych od akceptacji wyceny.</div>
+              <div class="qdoc-notes-payment">Płatność przelewem na konto: <strong style="white-space:nowrap">PL 12 3456 7890 1234 5678 9012 3456</strong></div>
+            </div>
+            <table class="qdoc-sum">
+              <tbody>
+                <tr><td>Materiały</td><td class="qdoc-num">1 951,50 zł</td></tr>
+                <tr><td>Robocizna</td><td class="qdoc-num">2 380,00 zł</td></tr>
+                <tr><td>Suma</td><td class="qdoc-num">4 331,50 zł</td></tr>
+                <tr><td>Marża 10 %</td><td class="qdoc-num">433,15 zł</td></tr>
+                <tr><td>Netto</td><td class="qdoc-num">4 764,65 zł</td></tr>
+                <tr><td>VAT 8 %</td><td class="qdoc-num">381,17 zł</td></tr>
+                <tr class="qdoc-total"><td>Razem (PLN)</td><td class="qdoc-num">5 145,82 zł</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="qdoc-sign">
+            <div class="qdoc-sign-box">
+              <div class="qdoc-sign-line"></div>
+              <div class="qdoc-sign-caption">Wykonawca</div>
+            </div>
+            <div class="qdoc-sign-box">
+              <div class="qdoc-sign-line"></div>
+              <div class="qdoc-sign-caption">Zleceniodawca</div>
+            </div>
+          </div>
+
+        </div>
+      </td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td><div class="qdoc-foot-space"></div></td></tr>
+    </tfoot>
+  </table>
+
+  <footer class="qdoc-foot">
+    <div class="qdoc-foot-left">
+      <img src="logo-mark.svg" alt="LiczMat" class="qdoc-foot-mark">
+      <div class="qdoc-foot-text">
+        <div class="qdoc-foot-primary">Wycena przygotowana w LiczMat · liczmat.com</div>
+        <div class="qdoc-foot-secondary">Aplikacja LiczMat na Androida w Google Play</div>
+      </div>
+    </div>
+    <div class="qdoc-foot-right">
+      <img src="qr-liczmat.svg" alt="QR code" class="qdoc-qr">
+      <div class="qdoc-qr-caption">liczmat.com</div>
+    </div>
+  </footer>
+</article>
+*/

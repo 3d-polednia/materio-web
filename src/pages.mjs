@@ -18,7 +18,7 @@ import {
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
 import { proGate, proModules, proPlansBlock } from "./pro.mjs";
-import { PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
+import { PDF_COPY, QUOTE_PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
 import { CURRENCIES } from "./currency.mjs";
 import { calendarGrid } from "./app-pages.mjs";
 import { accountPageMain } from "./account-sidebar.mjs";
@@ -1377,65 +1377,70 @@ function pdfBlock(lang, t, features) {
 }
 
 /** The quote reuses the project export's print lifecycle and document vocabulary. */
-function quotePdfBlock(lang, t, features) {
-  const c = (key) => PDF_COPY[lang][key];
+function quotePdfBlock(lang, t, features, stamp = "") {
+  const c = (key) => QUOTE_PDF_COPY[lang][key];
+  const asset = (name) => `/assets/${name}${stamp ? `?v=${stamp}` : ""}`;
   // proGate() is indented for standalone insertion. Empty indentation becomes trailing
   // whitespace inside this nested block, so remove it without changing any visible copy.
   const gate = proGate(t, "pdf", features, lang,
     { id: "pdf-gate", back: "quotes", brief: true }).split(/\r?\n/)
     .map((line) => line.trimEnd()).join("\n").trim();
-  return `<section class="dash-sec ws-pdf" id="ws-pdf">
-            <div class="dash-head"><h2>${esc(c("pdf_title"))}</h2></div>
+  const tableHead = `<thead><tr>
+                  <th scope="col" class="qdoc-col-lp">${esc(c("qdoc_no"))}</th>
+                  <th scope="col" class="qdoc-col-desc">${esc(c("qdoc_description"))}</th>
+                  <th scope="col" class="qdoc-col-qty">${esc(c("qdoc_quantity"))}</th>
+                  <th scope="col" class="qdoc-col-price" data-pdf="unitPriceHead" data-label="${esc(c("qdoc_unit_price"))}">${esc(c("qdoc_unit_price"))}</th>
+                  <th scope="col" class="qdoc-col-val" data-pdf="valueHead" data-label="${esc(c("qdoc_value"))}">${esc(c("qdoc_value"))}</th>
+                </tr></thead>`;
+  return `<section class="ws-pdf" id="ws-pdf">
             ${gate}
             <div id="pdf-tool" hidden>
-              <p class="muted">${esc(PDF_WEB[lang].hint)}</p>
               <p id="quo-pdf-company" class="muted" hidden>${esc(t("quo_pdf_company"))} <a href="${urlCompany(lang)}">${esc(t("companypage_title"))}</a></p>
-              <article id="ws-pdf-doc" class="pdf-doc" hidden>
-                <header class="pdf-head">
-                  <p class="pdf-sub" data-pdf="subtitle">${esc(t("quo_doc_t"))}</p>
-                  <p class="pdf-line"><b data-pdf="quoteName"></b></p>
-                  <p class="pdf-line"><span>${esc(c("pdf_date"))}:</span> <span data-pdf="date"></span></p>
-                </header>
-                <section class="pdf-recipient" data-pdf-row="recipient" hidden>
-                  <h2>${esc(t("quo_doc_for"))}</h2>
-                  <p class="pdf-line" data-pdf-row="clientName" hidden data-pdf="clientName"></p>
-                  <p class="pdf-line" data-pdf-row="clientPhone" hidden data-pdf="clientPhone"></p>
-                  <p class="pdf-line" data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></p>
-                  <p class="pdf-line" data-pdf-row="clientAddress" hidden data-pdf="clientAddress"></p>
-                  <p class="pdf-line" data-pdf-row="projectName" hidden data-pdf="projectName"></p>
-                </section>
-                <section class="pdf-table-block" data-pdf-row="materialsTable" hidden>
-                  <h2>${esc(t("proj_mat_t"))}</h2>
-                  <table class="pdf-table">
-                    <thead><tr><th scope="col">${esc(t("quo_doc_name"))}</th><th scope="col">${esc(c("pdfdoc_col_qty"))}</th><th scope="col">${esc(c("pdfdoc_col_value"))}</th></tr></thead>
-                    <tbody data-pdf="materialRows"></tbody>
-                  </table>
-                </section>
-                <section class="pdf-table-block" data-pdf-row="labourTable" hidden>
-                  <h2>${esc(t("quo_labour_t"))}</h2>
-                  <table class="pdf-table">
-                    <thead><tr><th scope="col">${esc(t("quo_doc_name"))}</th><th scope="col">${esc(t("quo_labour_qty"))} × ${esc(t("quo_labour_price"))}</th><th scope="col">${esc(c("pdfdoc_col_value"))}</th></tr></thead>
-                    <tbody data-pdf="labourRows"></tbody>
-                  </table>
-                </section>
-                <table class="pdf-pricing">
-                  <tbody>
-                    <tr><th scope="row">${esc(t("quo_fig_materials"))}</th><td data-pdf="materials"></td></tr>
-                    <tr data-pdf-row="other" hidden><th scope="row">${esc(t("quo_fig_other"))}</th><td data-pdf="other"></td></tr>
-                    <tr><th scope="row">${esc(t("quo_fig_labour"))}</th><td data-pdf="labour"></td></tr>
-                    <tr><th scope="row">${esc(t("quo_fig_sub"))}</th><td data-pdf="subtotal"></td></tr>
-                    <tr><th scope="row" data-pdf="marginLabel">${esc(t("quo_fig_margin"))}</th><td data-pdf="margin"></td></tr>
-                    <tr><th scope="row">Netto</th><td data-pdf="net"></td></tr>
-                    <tr><th scope="row">VAT</th><td data-pdf="vat"></td></tr>
-                    <tr class="pdf-strong"><th scope="row">${esc(t("quo_fig_total"))}</th><td data-pdf="total"></td></tr>
-                  </tbody>
-                </table>
-                <p class="pdf-line pdf-mixed" data-pdf-row="mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
-                <section class="pdf-notes" data-pdf-row="quoteNotes" hidden>
-                  <h2>${esc(t("quo_doc_notes"))}</h2>
-                  <p data-pdf="quoteNotes"></p>
-                </section>
-                <p class="pdf-foot">${esc(c("pdfdoc_footer"))}</p>
+              <article id="ws-pdf-doc" class="qdoc qdoc--no-logo" hidden>
+                <table class="qdoc-print-wrap"><thead><tr><th scope="col" class="qdoc-head-space"></th></tr></thead><tbody><tr><td><div class="qdoc-main">
+                  <header class="qdoc-head"><div class="qdoc-seller">
+                    <div class="qdoc-company-name" data-pdf="companyName"></div>
+                    <div data-pdf-row="companyStreet" hidden data-pdf="companyStreet"></div>
+                    <div data-pdf-row="companyPostalCity" hidden data-pdf="companyPostalCity"></div>
+                    <div data-pdf-row="companyNip" hidden><span class="qdoc-label">${esc(t("company_nip"))}</span> <span data-pdf="companyNip"></span></div>
+                    <div data-pdf-row="companyPhone" hidden><span class="qdoc-label">${esc(c("qdoc_phone"))}</span> <span data-pdf="companyPhone"></span></div>
+                    <div data-pdf-row="companyEmail" hidden><span class="qdoc-label">${esc(c("qdoc_email"))}</span> <span data-pdf="companyEmail"></span></div>
+                    <div data-pdf-row="companyWww" hidden data-pdf="companyWww"></div>
+                  </div><div class="qdoc-head-right"><div class="qdoc-logo-box">
+                    <img class="qdoc-logo" data-pdf="companyLogo" alt="${esc(c("qdoc_company_logo"))}" width="227" height="83" decoding="async" loading="eager">
+                    <div class="qdoc-logo-name" data-pdf="logoCompanyName"></div>
+                  </div><div class="qdoc-title">${esc(c("qdoc_title"))}</div></div></header>
+                  <div class="qdoc-meta"><div class="qdoc-for"><div class="qdoc-meta-label">${esc(c("qdoc_for"))}</div>
+                    <div class="qdoc-for-name" data-pdf-row="clientName" hidden data-pdf="clientName"></div>
+                    <div data-pdf-row="clientStreet" hidden data-pdf="clientStreet"></div>
+                    <div data-pdf-row="clientPostalCity" hidden data-pdf="clientPostalCity"></div>
+                    <div data-pdf-row="clientPhone" hidden><span class="qdoc-label">${esc(c("qdoc_phone"))}</span> <span data-pdf="clientPhone"></span></div>
+                    <div data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></div>
+                    <div class="qdoc-project-name" data-pdf-row="projectName" hidden><span class="qdoc-label">${esc(c("qdoc_project"))}</span> <span data-pdf="projectName"></span></div>
+                  </div><div class="qdoc-details"><dl class="qdoc-details-list">
+                    <div class="qdoc-details-row"><dt>${esc(c("qdoc_quote_no"))}</dt><dd data-pdf="quoteNumber"></dd></div>
+                    <div class="qdoc-details-row"><dt>${esc(c("qdoc_date"))}</dt><dd data-pdf="date"></dd></div>
+                    <div class="qdoc-details-row" data-pdf-row="validUntil" hidden><dt>${esc(c("qdoc_valid_until"))}</dt><dd data-pdf="validUntil"></dd></div>
+                  </dl></div></div>
+                  <section data-pdf-row="materialsTable" hidden><div class="qdoc-caption">${esc(c("qdoc_materials"))}</div><table class="qdoc-table">${tableHead}<tbody data-pdf="materialRows"></tbody></table></section>
+                  <section data-pdf-row="labourTable" hidden><div class="qdoc-caption">${esc(c("qdoc_labour"))}</div><table class="qdoc-table">${tableHead}<tbody data-pdf="labourRows"></tbody></table></section>
+                  <p class="qdoc-notes-text" data-pdf-row="mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
+                  <div class="qdoc-sum-container"><div class="qdoc-notes" data-pdf-row="notesBlock" hidden><div class="qdoc-notes-label">${esc(c("qdoc_notes"))}</div>
+                    <div class="qdoc-notes-text" data-pdf-row="quoteNotes" hidden data-pdf="quoteNotes"></div>
+                    <div class="qdoc-notes-payment" data-pdf-row="bankAccount" hidden>${esc(c("qdoc_payment"))} <strong data-pdf="bankAccount"></strong></div>
+                  </div><table class="qdoc-sum"><tbody>
+                    <tr><th scope="row">${esc(c("qdoc_materials"))}</th><td class="qdoc-num" data-pdf="materials"></td></tr>
+                    <tr data-pdf-row="other" hidden><th scope="row">${esc(c("qdoc_other"))}</th><td class="qdoc-num" data-pdf="other"></td></tr>
+                    <tr><th scope="row">${esc(c("qdoc_labour"))}</th><td class="qdoc-num" data-pdf="labour"></td></tr>
+                    <tr><th scope="row">${esc(c("qdoc_sum"))}</th><td class="qdoc-num" data-pdf="subtotal"></td></tr>
+                    <tr data-pdf-row="marginRow" hidden><th scope="row" data-pdf="marginLabel"></th><td class="qdoc-num" data-pdf="margin"></td></tr>
+                    <tr><th scope="row">${esc(c("qdoc_net"))}</th><td class="qdoc-num" data-pdf="net"></td></tr>
+                    <tr data-pdf-row="vatRow" hidden><th scope="row" data-pdf="vatLabel"></th><td class="qdoc-num" data-pdf="vat"></td></tr>
+                    <tr class="qdoc-total"><th scope="row" data-pdf="totalLabel" data-label="${esc(c("qdoc_total"))}">${esc(c("qdoc_total"))}</th><td class="qdoc-num" data-pdf="total"></td></tr>
+                  </tbody></table></div>
+                  <div class="qdoc-sign"><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">${esc(c("qdoc_contractor"))}</div></div><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">${esc(c("qdoc_customer"))}</div></div></div>
+                </div></td></tr></tbody><tfoot><tr><td><div class="qdoc-foot-space"></div></td></tr></tfoot></table>
+                <footer class="qdoc-foot"><div class="qdoc-foot-left"><img src="${asset("logo-mark.svg")}" alt="LiczMat" class="qdoc-foot-mark" width="24" height="24" decoding="async" loading="eager"><div class="qdoc-foot-text"><div class="qdoc-foot-primary">${esc(c("qdoc_footer_primary"))}</div><div class="qdoc-foot-secondary">${esc(c("qdoc_footer_secondary"))}</div></div></div><div class="qdoc-foot-right"><img src="${asset("qr-liczmat.svg")}" alt="${esc(c("qdoc_qr_alt"))}" class="qdoc-qr" width="60" height="60" decoding="async" loading="eager"><div class="qdoc-qr-caption">liczmat.com</div></div></footer>
               </article>
             </div>
           </section>`;
@@ -2230,7 +2235,7 @@ export function clientsMain(lang, t, features) {
  * in the browser, and three of the five come out of the project rather than out of the
  * quote (crmQuoteTotals() in assets/crm.js says why).
  */
-export function quotesMain(lang, t, features) {
+export function quotesMain(lang, t, features, stamp = "") {
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("wspage_title"), path: urlProjects(lang) },
@@ -2386,7 +2391,7 @@ export function quotesMain(lang, t, features) {
             </form>
           </section>
 
-          ${quotePdfBlock(lang, t, features)}
+          ${quotePdfBlock(lang, t, features, stamp)}
 
           <section class="dash-sec quo-action-bar">
             <label class="field quo-status-field" for="quo-status">

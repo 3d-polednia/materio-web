@@ -3045,13 +3045,13 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
   #ws-pdf-form, .ws-pdf > .dash-head, .ws-pdf > .muted { display: none !important; }
   body[data-pdf-print] > :not(#ws-pdf-doc) { display: none !important; }
   body[data-pdf-print] > #ws-pdf-doc { display: block !important; width: 100%; }
-  #ws-pdf-doc, #ws-pdf-doc * { color: #000 !important; background: #fff !important; }
-  #ws-pdf-doc .pdf-table { width: 100%; border-collapse: collapse; }
-  #ws-pdf-doc .pdf-table th, #ws-pdf-doc .pdf-table td {
+  #ws-pdf-doc.pdf-doc, #ws-pdf-doc.pdf-doc * { color: #000 !important; background: #fff !important; }
+  #ws-pdf-doc.pdf-doc .pdf-table { width: 100%; border-collapse: collapse; }
+  #ws-pdf-doc.pdf-doc .pdf-table th, #ws-pdf-doc.pdf-doc .pdf-table td {
     border-bottom: 1px solid #ccc; padding: 4px 0; text-align: left; vertical-align: top;
   }
-  #ws-pdf-doc .pdf-table th:nth-child(n+2), #ws-pdf-doc .pdf-table td:nth-child(n+2),
-  #ws-pdf-doc .pdf-pricing td { text-align: right; font-variant-numeric: tabular-nums; }
+  #ws-pdf-doc.pdf-doc .pdf-table th:nth-child(n+2), #ws-pdf-doc.pdf-doc .pdf-table td:nth-child(n+2),
+  #ws-pdf-doc.pdf-doc .pdf-pricing td { text-align: right; font-variant-numeric: tabular-nums; }
   #ws-pdf-doc [hidden] { display: none !important; }
 }
 

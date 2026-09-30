@@ -1625,7 +1625,7 @@ function buildQuotesPages() {
   const alt = alternatesFor(urlQuotes);
   for (const lang of BUILD_LANGS) {
     const t = translator(lang);
-    const { main, ld } = quotesMain(lang, t, LM_FEATURES);
+    const { main, ld } = quotesMain(lang, t, LM_FEATURES, STAMP);
     write(join(urlQuotes(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
       title: `${t("quopage_title")} \u2014 LiczMat`,
@@ -1640,7 +1640,8 @@ function buildQuotesPages() {
       // the whole set — one map for the Pro screens (session 26), because they link to
       // each other in every direction. `jobs` left the map on 2026-09-21: CHN_SECTION in
       // assets/crm-chain.js is client, project, quote, and no node resolves to a job.
-      headExtra: `<script>window.LM_LINKS = ${JSON.stringify({
+      headExtra: `<link rel="stylesheet" href="/assets/quote-doc.css?v=${STAMP}">
+<script>window.LM_LINKS = ${JSON.stringify({
         clients: urlClients(lang), projects: urlProjects(lang),
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
       })};</script>`,

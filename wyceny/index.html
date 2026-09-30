@@ -142,6 +142,7 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="/assets/quote-doc.css?v=20260930c">
 <script>window.LM_LINKS = {"clients":"/klienci/","projects":"/projekty/","quotes":"/wyceny/","calendar":"/terminarz/"};</script>
 <script>window.LICZMAT_ALTERNATES = {
   "pl": "/wyceny/",
@@ -474,8 +475,7 @@
             </form>
           </section>
 
-          <section class="dash-sec ws-pdf" id="ws-pdf">
-            <div class="dash-head"><h2>Eksport wyceny</h2></div>
+          <section class="ws-pdf" id="ws-pdf">
             <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>
         <h2 data-i18n="feat_pdf_t">Eksport PDF</h2>
         <p class="muted" data-i18n="feat_pdf_d">Raport techniczny i kosztorys dla inwestora: robocizna, marża, VAT i suma, gotowe do druku.</p>
@@ -495,54 +495,64 @@
 
       </div>
             <div id="pdf-tool" hidden>
-              <p class="muted">Dokument otworzy się w oknie drukowania. Wybierz w nim zapis do PDF.</p>
               <p id="quo-pdf-company" class="muted" hidden>Wybierz firmę, która wystawia wycenę. <a href="/moja-firma/">Moja firma</a></p>
-              <article id="ws-pdf-doc" class="pdf-doc" hidden>
-                <header class="pdf-head">
-                  <p class="pdf-sub" data-pdf="subtitle">Wycena</p>
-                  <p class="pdf-line"><b data-pdf="quoteName"></b></p>
-                  <p class="pdf-line"><span>Data:</span> <span data-pdf="date"></span></p>
-                </header>
-                <section class="pdf-recipient" data-pdf-row="recipient" hidden>
-                  <h2>Dla</h2>
-                  <p class="pdf-line" data-pdf-row="clientName" hidden data-pdf="clientName"></p>
-                  <p class="pdf-line" data-pdf-row="clientPhone" hidden data-pdf="clientPhone"></p>
-                  <p class="pdf-line" data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></p>
-                  <p class="pdf-line" data-pdf-row="clientAddress" hidden data-pdf="clientAddress"></p>
-                  <p class="pdf-line" data-pdf-row="projectName" hidden data-pdf="projectName"></p>
-                </section>
-                <section class="pdf-table-block" data-pdf-row="materialsTable" hidden>
-                  <h2>Materiały</h2>
-                  <table class="pdf-table">
-                    <thead><tr><th scope="col">Nazwa</th><th scope="col">ILOŚĆ</th><th scope="col">WARTOŚĆ</th></tr></thead>
-                    <tbody data-pdf="materialRows"></tbody>
-                  </table>
-                </section>
-                <section class="pdf-table-block" data-pdf-row="labourTable" hidden>
-                  <h2>Robocizna</h2>
-                  <table class="pdf-table">
-                    <thead><tr><th scope="col">Nazwa</th><th scope="col">Ilość × Stawka</th><th scope="col">WARTOŚĆ</th></tr></thead>
-                    <tbody data-pdf="labourRows"></tbody>
-                  </table>
-                </section>
-                <table class="pdf-pricing">
-                  <tbody>
-                    <tr><th scope="row">Materiał</th><td data-pdf="materials"></td></tr>
-                    <tr data-pdf-row="other" hidden><th scope="row">Dodatkowe koszty</th><td data-pdf="other"></td></tr>
-                    <tr><th scope="row">Robocizna</th><td data-pdf="labour"></td></tr>
-                    <tr><th scope="row">Razem bez marży</th><td data-pdf="subtotal"></td></tr>
-                    <tr><th scope="row" data-pdf="marginLabel">Marża</th><td data-pdf="margin"></td></tr>
-                    <tr><th scope="row">Netto</th><td data-pdf="net"></td></tr>
-                    <tr><th scope="row">VAT</th><td data-pdf="vat"></td></tr>
-                    <tr class="pdf-strong"><th scope="row">Suma</th><td data-pdf="total"></td></tr>
-                  </tbody>
-                </table>
-                <p class="pdf-line pdf-mixed" data-pdf-row="mixed" hidden>Pozycje są w różnych walutach. Nic nie jest przeliczane po kursie, więc nie ma jednej sumy — każda waluta ma własną.</p>
-                <section class="pdf-notes" data-pdf-row="quoteNotes" hidden>
-                  <h2>Uwagi</h2>
-                  <p data-pdf="quoteNotes"></p>
-                </section>
-                <p class="pdf-foot">LiczMat — Policz. Zaplanuj. Zrealizuj.</p>
+              <article id="ws-pdf-doc" class="qdoc qdoc--no-logo" hidden>
+                <table class="qdoc-print-wrap"><thead><tr><th scope="col" class="qdoc-head-space"></th></tr></thead><tbody><tr><td><div class="qdoc-main">
+                  <header class="qdoc-head"><div class="qdoc-seller">
+                    <div class="qdoc-company-name" data-pdf="companyName"></div>
+                    <div data-pdf-row="companyStreet" hidden data-pdf="companyStreet"></div>
+                    <div data-pdf-row="companyPostalCity" hidden data-pdf="companyPostalCity"></div>
+                    <div data-pdf-row="companyNip" hidden><span class="qdoc-label">NIP</span> <span data-pdf="companyNip"></span></div>
+                    <div data-pdf-row="companyPhone" hidden><span class="qdoc-label">tel.</span> <span data-pdf="companyPhone"></span></div>
+                    <div data-pdf-row="companyEmail" hidden><span class="qdoc-label">e-mail</span> <span data-pdf="companyEmail"></span></div>
+                    <div data-pdf-row="companyWww" hidden data-pdf="companyWww"></div>
+                  </div><div class="qdoc-head-right"><div class="qdoc-logo-box">
+                    <img class="qdoc-logo" data-pdf="companyLogo" alt="Logo firmy" width="227" height="83" decoding="async" loading="eager">
+                    <div class="qdoc-logo-name" data-pdf="logoCompanyName"></div>
+                  </div><div class="qdoc-title">WYCENA</div></div></header>
+                  <div class="qdoc-meta"><div class="qdoc-for"><div class="qdoc-meta-label">Dla</div>
+                    <div class="qdoc-for-name" data-pdf-row="clientName" hidden data-pdf="clientName"></div>
+                    <div data-pdf-row="clientStreet" hidden data-pdf="clientStreet"></div>
+                    <div data-pdf-row="clientPostalCity" hidden data-pdf="clientPostalCity"></div>
+                    <div data-pdf-row="clientPhone" hidden><span class="qdoc-label">tel.</span> <span data-pdf="clientPhone"></span></div>
+                    <div data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></div>
+                    <div class="qdoc-project-name" data-pdf-row="projectName" hidden><span class="qdoc-label">Projekt:</span> <span data-pdf="projectName"></span></div>
+                  </div><div class="qdoc-details"><dl class="qdoc-details-list">
+                    <div class="qdoc-details-row"><dt>Nr wyceny</dt><dd data-pdf="quoteNumber"></dd></div>
+                    <div class="qdoc-details-row"><dt>Data</dt><dd data-pdf="date"></dd></div>
+                    <div class="qdoc-details-row" data-pdf-row="validUntil" hidden><dt>Ważna do</dt><dd data-pdf="validUntil"></dd></div>
+                  </dl></div></div>
+                  <section data-pdf-row="materialsTable" hidden><div class="qdoc-caption">Materiały</div><table class="qdoc-table"><thead><tr>
+                  <th scope="col" class="qdoc-col-lp">Lp.</th>
+                  <th scope="col" class="qdoc-col-desc">Opis</th>
+                  <th scope="col" class="qdoc-col-qty">Ilość</th>
+                  <th scope="col" class="qdoc-col-price" data-pdf="unitPriceHead" data-label="Cena jedn.">Cena jedn.</th>
+                  <th scope="col" class="qdoc-col-val" data-pdf="valueHead" data-label="Wartość">Wartość</th>
+                </tr></thead><tbody data-pdf="materialRows"></tbody></table></section>
+                  <section data-pdf-row="labourTable" hidden><div class="qdoc-caption">Robocizna</div><table class="qdoc-table"><thead><tr>
+                  <th scope="col" class="qdoc-col-lp">Lp.</th>
+                  <th scope="col" class="qdoc-col-desc">Opis</th>
+                  <th scope="col" class="qdoc-col-qty">Ilość</th>
+                  <th scope="col" class="qdoc-col-price" data-pdf="unitPriceHead" data-label="Cena jedn.">Cena jedn.</th>
+                  <th scope="col" class="qdoc-col-val" data-pdf="valueHead" data-label="Wartość">Wartość</th>
+                </tr></thead><tbody data-pdf="labourRows"></tbody></table></section>
+                  <p class="qdoc-notes-text" data-pdf-row="mixed" hidden>Pozycje są w różnych walutach. Nic nie jest przeliczane po kursie, więc nie ma jednej sumy — każda waluta ma własną.</p>
+                  <div class="qdoc-sum-container"><div class="qdoc-notes" data-pdf-row="notesBlock" hidden><div class="qdoc-notes-label">Uwagi</div>
+                    <div class="qdoc-notes-text" data-pdf-row="quoteNotes" hidden data-pdf="quoteNotes"></div>
+                    <div class="qdoc-notes-payment" data-pdf-row="bankAccount" hidden>Płatność przelewem na konto: <strong data-pdf="bankAccount"></strong></div>
+                  </div><table class="qdoc-sum"><tbody>
+                    <tr><th scope="row">Materiały</th><td class="qdoc-num" data-pdf="materials"></td></tr>
+                    <tr data-pdf-row="other" hidden><th scope="row">Inne koszty</th><td class="qdoc-num" data-pdf="other"></td></tr>
+                    <tr><th scope="row">Robocizna</th><td class="qdoc-num" data-pdf="labour"></td></tr>
+                    <tr><th scope="row">Suma</th><td class="qdoc-num" data-pdf="subtotal"></td></tr>
+                    <tr data-pdf-row="marginRow" hidden><th scope="row" data-pdf="marginLabel"></th><td class="qdoc-num" data-pdf="margin"></td></tr>
+                    <tr><th scope="row">Netto</th><td class="qdoc-num" data-pdf="net"></td></tr>
+                    <tr data-pdf-row="vatRow" hidden><th scope="row" data-pdf="vatLabel"></th><td class="qdoc-num" data-pdf="vat"></td></tr>
+                    <tr class="qdoc-total"><th scope="row" data-pdf="totalLabel" data-label="Razem">Razem</th><td class="qdoc-num" data-pdf="total"></td></tr>
+                  </tbody></table></div>
+                  <div class="qdoc-sign"><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">Wykonawca</div></div><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">Zleceniodawca</div></div></div>
+                </div></td></tr></tbody><tfoot><tr><td><div class="qdoc-foot-space"></div></td></tr></tfoot></table>
+                <footer class="qdoc-foot"><div class="qdoc-foot-left"><img src="/assets/logo-mark.svg?v=20260930c" alt="LiczMat" class="qdoc-foot-mark" width="24" height="24" decoding="async" loading="eager"><div class="qdoc-foot-text"><div class="qdoc-foot-primary">Wycena przygotowana w LiczMat · liczmat.com</div><div class="qdoc-foot-secondary">Aplikacja LiczMat na Androida w Google Play</div></div></div><div class="qdoc-foot-right"><img src="/assets/qr-liczmat.svg?v=20260930c" alt="Kod QR do liczmat.com" class="qdoc-qr" width="60" height="60" decoding="async" loading="eager"><div class="qdoc-qr-caption">liczmat.com</div></div></footer>
               </article>
             </div>
           </section>

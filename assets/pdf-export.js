@@ -281,7 +281,41 @@ function pdfFill(projectId, opt) {
   return true;
 }
 
-/** Fill the compact quote document from the same rows and money formatters as a project. */
+/** A stored quote date in the page language, without letting UTC move it by a day. */
+function pdfQuoteDate(value) {
+  const date = typeof value === "number" ? new Date(value) : new Date(`${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return "";
+  try {
+    return new Intl.DateTimeFormat(document.documentElement.lang || "pl").format(date);
+  } catch (e) {
+    return String(value || "");
+  }
+}
+
+/** The compact symbol belongs in the table header, leaving each numeric cell uncluttered. */
+function pdfCurrencySymbol(code) {
+  try {
+    const parts = new Intl.NumberFormat(document.documentElement.lang || "pl", {
+      style: "currency", currency: code, currencyDisplay: "narrowSymbol",
+    }).formatToParts(0);
+    return (parts.find((part) => part.type === "currency") || {}).value || code;
+  } catch (e) {
+    return code;
+  }
+}
+
+/** A table cell carries only the number; its currency is stated once in the header. */
+function pdfMinorNumber(minor) {
+  try {
+    return new Intl.NumberFormat(document.documentElement.lang || "pl", {
+      minimumFractionDigits: 2, maximumFractionDigits: 2,
+    }).format((Number(minor) || 0) / 100);
+  } catch (e) {
+    return ((Number(minor) || 0) / 100).toFixed(2);
+  }
+}
+
+/** Fill the approved A4 quote from the same rows and totals as the editor. */
 function pdfFillQuote(quoteId) {
   const doc = document.getElementById("ws-pdf-doc");
   const quote = typeof crmQuote === "function" ? crmQuote(quoteId) : null;
@@ -294,20 +328,39 @@ function pdfFillQuote(quoteId) {
   const chain = summary || crmChain("quote", quote.id);
   const totals = summary ? summary.totals : crmQuoteTotals(quote.id);
   const word = (key) => typeof t === "function" ? t(key) : key;
-  pdfSet(doc, "subtitle", word("quo_doc_t"));
-  pdfSet(doc, "quoteName", quote.name);
-  pdfSet(doc, "date", pdfToday());
+  const company = typeof crmCompanies === "function"
+    ? crmCompanies().find((row) => row.id === quote.companyId) : null;
+  if (!company) return false;
+  pdfSet(doc, "companyName", company.name);
+  pdfSet(doc, "logoCompanyName", company.name);
+  for (const [slot, value] of [
+    ["companyStreet", company.street],
+    ["companyPostalCity", [company.postalCode, company.city].filter(Boolean).join(" ")],
+    ["companyNip", company.nip], ["companyPhone", company.phone],
+    ["companyEmail", company.email], ["companyWww", company.www],
+  ]) {
+    const clean = String(value || "").trim();
+    pdfSet(doc, slot, clean);
+    pdfShow(doc, slot, Boolean(clean));
+  }
+  const logo = pdfEl(doc, "companyLogo");
+  const hasLogo = Boolean(logo && company.logo);
+  if (logo) logo.src = hasLogo ? company.logo : "";
+  doc.classList.toggle("qdoc--no-logo", !hasLogo);
+  pdfSet(doc, "quoteNumber", quote.number || quote.name);
+  pdfSet(doc, "date", pdfQuoteDate(Number(quote.createdAt)));
+  pdfSet(doc, "validUntil", pdfQuoteDate(quote.validUntil));
+  pdfShow(doc, "validUntil", Boolean(quote.validUntil));
 
   const client = chain.client || null;
   const project = chain.project || null;
-  const clientAddress = client && crmClientAddress(client);
-  const recipient = [client && client.name, client && client.phone, client && client.email,
-    clientAddress, project && project.name];
-  pdfShow(doc, "recipient", recipient.some((value) => String(value || "").trim()));
+  const legacyAddress = client && !client.street && !client.postalCode && !client.city
+    ? crmClientAddress(client) : "";
   for (const [slot, value] of [
     ["clientName", client && client.name], ["clientPhone", client && client.phone],
-    ["clientEmail", client && client.email], ["clientAddress", clientAddress],
-    ["projectName", project && project.name && `${word("crm_node_project")}: ${project.name}`],
+    ["clientEmail", client && client.email], ["clientStreet", client && (client.street || legacyAddress)],
+    ["clientPostalCity", client && [client.postalCode, client.city].filter(Boolean).join(" ")],
+    ["projectName", project && project.name],
   ]) {
     const clean = String(value || "").trim();
     pdfSet(doc, slot, clean);
@@ -319,22 +372,25 @@ function pdfFillQuote(quoteId) {
   const ownMaterials = lines.ownMaterials;
   const labour = lines.labour;
   const materialBody = pdfEl(doc, "materialRows");
-  if (materialBody) materialBody.innerHTML = [...projectRows, ...ownMaterials.map((line) => ({
-    name: line.name,
+  const materialRows = [...projectRows, ...ownMaterials.map((line) => ({
+    name: line.name, quantity: line.quantity, unit: line.unit || "",
     qty: line.quantity === null ? word("quo_lump") : `${wsNum(line.quantity)} ${line.unit || ""}`.trim(),
-    minor: line.amountMinor || 0,
-    currencyCode: quote.currencyCode || totals.currencyCode,
-  }))].map((row) => `<tr><td>${wsEsc(row.name)}</td><td>${wsEsc(row.qty)}</td><td>${
-    wsEsc(wsMoney(row.minor, row.currencyCode))}</td></tr>`).join("");
+    minor: line.amountMinor || 0, currencyCode: quote.currencyCode || totals.currencyCode,
+  }))];
+  if (materialBody) materialBody.innerHTML = materialRows.map((row, index) => {
+    const qty = row.quantity === null ? (row.qty || word("quo_lump")) : row.qty;
+    const price = row.quantity > 0 ? pdfMinorNumber(Math.round(row.minor / row.quantity)) : "—";
+    return `<tr><td>${index + 1}</td><td>${wsEsc(row.name)}</td><td class="qdoc-num">${wsEsc(qty)}</td><td class="qdoc-num">${wsEsc(price)}</td><td class="qdoc-num">${wsEsc(pdfMinorNumber(row.minor))}</td></tr>`;
+  }).join("");
   pdfShow(doc, "materialsTable", projectRows.length + ownMaterials.length > 0);
 
   const labourBody = pdfEl(doc, "labourRows");
-  if (labourBody) labourBody.innerHTML = labour.map((line) => {
+  if (labourBody) labourBody.innerHTML = labour.map((line, index) => {
     const code = quote.currencyCode || totals.currencyCode || wsCurrency();
     const rate = typeof crmLabourRate === "function" ? crmLabourRate(line) : null;
-    const how = line.quantity === null ? word("quo_lump")
-      : `${wsNum(line.quantity)} ${line.unit || ""} × ${rate === null ? "—" : wsMoney(Math.round(rate), code)}`.trim();
-    return `<tr><td>${wsEsc(line.name)}</td><td>${wsEsc(how)}</td><td>${wsEsc(wsMoney(line.amountMinor || 0, code))}</td></tr>`;
+    const qty = line.quantity === null ? word("quo_lump")
+      : `${wsNum(line.quantity)} ${line.unit || ""}`.trim();
+    return `<tr><td>${index + 1}</td><td>${wsEsc(line.name)}</td><td class="qdoc-num">${wsEsc(qty)}</td><td class="qdoc-num">${rate === null ? "—" : wsEsc(pdfMinorNumber(Math.round(rate)))}</td><td class="qdoc-num">${wsEsc(pdfMinorNumber(line.amountMinor || 0))}</td></tr>`;
   }).join("");
   pdfShow(doc, "labourTable", labour.length > 0);
 
@@ -350,13 +406,25 @@ function pdfFillQuote(quoteId) {
   pdfSet(doc, "subtotal", money(totals.subtotal));
   pdfSet(doc, "marginLabel", `${word("quo_fig_margin")} ${wsNum(totals.marginPct)} %`);
   pdfSet(doc, "margin", money(totals.margin));
+  pdfShow(doc, "marginRow", totals.marginPct > 0);
   pdfSet(doc, "net", money(totals.net));
+  pdfSet(doc, "vatLabel", `VAT ${totals.vatPct === null ? "" : `${wsNum(totals.vatPct)} %`}`.trim());
   pdfSet(doc, "vat", money(totals.vat));
+  pdfShow(doc, "vatRow", totals.vatPct !== null);
+  doc.querySelectorAll('[data-pdf="totalLabel"]')
+    .forEach((head) => { head.textContent = `${head.dataset.label} (${totals.currencyCode})`; });
   pdfSet(doc, "total", money(totals.gross));
+  const symbol = pdfCurrencySymbol(totals.currencyCode);
+  for (const slot of ["unitPriceHead", "valueHead"]) doc.querySelectorAll(`[data-pdf="${slot}"]`)
+    .forEach((head) => { head.textContent = `${head.dataset.label} (${symbol})`; });
   pdfShow(doc, "mixed", totals.mixed);
   const note = String(quote.note || "").trim();
   pdfSet(doc, "quoteNotes", note);
   pdfShow(doc, "quoteNotes", Boolean(note));
+  const bank = String(company.bankAccount || "").trim();
+  pdfSet(doc, "bankAccount", bank);
+  pdfShow(doc, "bankAccount", Boolean(bank));
+  pdfShow(doc, "notesBlock", Boolean(note || bank));
   doc.hidden = false;
   return true;
 }

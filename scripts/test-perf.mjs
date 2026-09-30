@@ -395,7 +395,9 @@ head("2. the stylesheet ships without its own documentation");
     check(`${w.file} links the shipped stylesheet`, w.html.includes("/assets/styles.min.css?v="));
     check(`${w.file} does not link the authored one`, !/href="\/assets\/styles\.css/.test(w.html));
     const sheets = requests(w.html).filter((r) => r.kind === "style");
-    check(`${w.file} has exactly one stylesheet`, sheets.length === 1,
+    const quoteSheet = sheets.some((sheet) => sheet.url.startsWith("/assets/quote-doc.css?v="));
+    check(`${w.file} has only its shared stylesheet and optional quote print sheet`,
+      sheets.length === (quoteSheet ? 2 : 1),
       sheets.map((s) => s.url).join(", "));
   }
 }
@@ -564,8 +566,9 @@ head("6. images reserve their space and load when they are reached");
         /\bwidth="\d+"/.test(img) && /\bheight="\d+"/.test(img), img.slice(0, 90));
       check(`${w.file} image ${i + 1} decodes off the main thread`,
         img.includes('decoding="async"'), img.slice(0, 90));
-      // The first image and /aplikacja/'s hero screenshot are above the fold; the rest wait.
-      if (i > 0 && !img.includes('/assets/screens/pl_home.webp')) {
+      // The first image and /aplikacja/'s hero screenshot are above the fold. Quote images
+      // are eager because the hidden document is printed immediately after it is filled.
+      if (i > 0 && !img.includes('/assets/screens/pl_home.webp') && !img.includes('class="qdoc-')) {
         check(`${w.file} image ${i + 1} waits to be scrolled to`, img.includes('loading="lazy"'),
           img.slice(0, 90));
       }

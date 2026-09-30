@@ -30,7 +30,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { projectsMain, quotesMain } from "../src/pages.mjs";
-import { PDF_COPY, PDF_COPY_KEYS, pdfSplit } from "../src/pdf-copy.mjs";
+import { PDF_COPY, PDF_COPY_KEYS, QUOTE_PDF_COPY, pdfSplit } from "../src/pdf-copy.mjs";
 import { LANGS, DEFAULT_LANG } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -296,15 +296,21 @@ head("4. every string is the app's own");
 head("4b. the quote document has client-facing words in every language");
 {
   for (const lang of LANGS) {
-    for (const key of ["quo_doc_t", "quo_doc_for", "quo_doc_notes", "quo_doc_name"]) {
-      const value = DICT[lang][key];
+    for (const key of Object.keys(QUOTE_PDF_COPY.pl)) {
+      const value = QUOTE_PDF_COPY[lang][key];
       check(`${lang}: ${key} is written`, Boolean(value) && value !== key, value);
     }
     const { main } = quotesMain(lang, tr(lang), FEATURES);
-    check(`${lang}: the quote template has its document title`, main.includes(DICT[lang].quo_doc_t));
+    check(`${lang}: the quote template has its document title`,
+      main.includes(QUOTE_PDF_COPY[lang].qdoc_title));
+    check(`${lang}: the footer advertises LiczMat`,
+      main.includes(QUOTE_PDF_COPY[lang].qdoc_footer_primary));
   }
   const source = read("src/pages.mjs").slice(read("src/pages.mjs").indexOf("function quotePdfBlock"),
     read("src/pages.mjs").indexOf("export function projectsMain"));
+  check("the quote uses the approved document classes", source.includes('class="qdoc qdoc--no-logo"'));
+  check("the quote carries the LiczMat mark and QR", source.includes('asset("logo-mark.svg")')
+    && source.includes('asset("qr-liczmat.svg")'));
   check("the quote template has no removed job label", !source.includes('t("crm_node_job")'));
   check("the quote template has no UI action as a missing value", !source.includes('t("crm_node_none")'));
 }

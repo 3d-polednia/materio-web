@@ -709,12 +709,25 @@ head("7e. chapter XXVIII: the page holds together at every width it names");
 
 head("7f. the client quote prints as one complete page");
 {
-  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  const filled = crm();
+  filled.clients[0] = { ...filled.clients[0], address: "", street: "ul. Piękna 3",
+    postalCode: "30-001", city: "Kraków" };
+  filled.quotes[0] = { ...filled.quotes[0], number: "W/2026/007",
+    validUntil: "2026-10-30", vatPct: 8 };
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: filled });
   await page.evaluate(() => {
-    const company = crmAddCompany({ name: "Firma testowa", isDefault: true });
+    const company = crmAddCompany({ name: "Firma testowa", street: "ul. Lipowa 12/3",
+      postalCode: "31-000", city: "Kraków", nip: "677-123-45-67", phone: "600 700 800",
+      email: "biuro@example.com", www: "example.com", bankAccount: "PL 12 3456 7890",
+      logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=" });
     crmUpdateQuote("q1", { companyId: company.id });
   });
-  await page.evaluate(() => crmAddLabour("q1", { name: "Sprzątanie", priceMajor: 250 }));
+  await page.evaluate(() => {
+    ["Klej", "Fuga", "Listwy"].forEach((name, index) =>
+      crmAddMaterial("q1", { name, quantity: index + 1, unit: "szt.", priceMajor: 20 + index }));
+    crmAddLabour("q1", { name: "Sprzątanie", priceMajor: 250 });
+    crmAddLabour("q1", { name: "Hydroizolacja", quantity: 8, unit: "m²", priceMajor: 35 });
+  });
   await page.evaluate(() => {
     window.__printed = 0;
     window.print = () => { window.__printed++; };
@@ -725,18 +738,45 @@ head("7f. the client quote prints as one complete page");
   await page.click("#ws-pdf-form button[type=submit]");
   eq("the quote calls print once", await page.evaluate(() => window.__printed), 1);
   const text = await page.$eval("#ws-pdf-doc", (n) => n.textContent.replace(/\s+/g, " ").trim());
+  check("the contractor's company name is printed", text.includes("Firma testowa"), text);
+  check("the company logo image is filled", await page.$eval('[data-pdf="companyLogo"]',
+    (image) => image.getAttribute("src").startsWith("data:image/png;base64,")));
   check("the client's phone is printed", text.includes("600 100 200"), text);
-  eq("the Materiały table has two project rows",
-    await page.$$eval('#ws-pdf-doc tbody[data-pdf="materialRows"] tr', (rows) => rows.length), 2);
-  eq("the Robocizna table has two labour rows",
-    await page.$$eval('#ws-pdf-doc tbody[data-pdf="labourRows"] tr', (rows) => rows.length), 2);
+  check("the client's split address is printed", text.includes("ul. Piękna 3")
+    && text.includes("30-001 Kraków"), text);
+  check("the quote number, date and validity are printed", text.includes("W/2026/007")
+    && text.includes("30.10.2026") && text.includes("7.07.2026"), text);
+  eq("the Materiały table has five rows",
+    await page.$$eval('#ws-pdf-doc tbody[data-pdf="materialRows"] tr', (rows) => rows.length), 5);
+  eq("the Robocizna table has three rows",
+    await page.$$eval('#ws-pdf-doc tbody[data-pdf="labourRows"] tr', (rows) => rows.length), 3);
   check("one labour row says ryczałt", /ryczałt/i.test(text), text);
-  eq("Suma ends the summary",
-    await page.$eval("#ws-pdf-doc .pdf-pricing tr:last-child th", (n) => n.textContent.trim()), "Suma");
+  check("the VAT row is printed when VAT is set",
+    !(await page.$eval('[data-pdf-row="vatRow"]', (row) => row.hidden)));
+  eq("the last summary row reads Razem, not the Suma of the row above it",
+    await page.$eval('#ws-pdf-doc [data-pdf="totalLabel"]', (th) => th.textContent), "Razem (PLN)");
   check("the quote note is printed", text.includes("Materiał kupuje klient."), text);
+  check("the footer text and QR image are printed", text.includes("Wycena przygotowana w LiczMat")
+    && Boolean(await page.$('#ws-pdf-doc img[src^="/assets/qr-liczmat.svg"]')));
   check("the UI action wording is absent", !text.includes("Brak — dodaj"), text);
+  await page.evaluate(() => {
+    const company = crmCompanies()[0];
+    crmUpdateCompany(company.id, { logo: "" });
+    pdfFillQuote("q1");
+  });
+  check("without a logo the company name stands in its place",
+    await page.$eval("#ws-pdf-doc", (doc) => doc.classList.contains("qdoc--no-logo")
+      && doc.querySelector('[data-pdf="logoCompanyName"]').textContent === "Firma testowa"));
+  await page.evaluate(() => crmUpdateQuote("q1", { vatPct: null }));
+  await page.evaluate(() => pdfFillQuote("q1"));
+  check("the VAT row is hidden when VAT is unset",
+    await page.$eval('[data-pdf-row="vatRow"]', (row) => row.hidden));
   await page.emulateMedia({ media: "print" });
-  const bytes = await page.pdf({ format: "A4", printBackground: true });
+  // The footer is fixed to the bottom of every sheet; the room kept free for it has to be
+  // taller, or it is printed over the signatures.
+  check("the printed footer is shorter than the room kept for it", await page.$eval("#ws-pdf-doc",
+    (doc) => doc.querySelector(".qdoc-foot").offsetHeight < doc.querySelector(".qdoc-foot-space").offsetHeight));
+  const bytes = await page.pdf({ format: "A4", preferCSSPageSize: true, printBackground: true });
   eq("the quote PDF is exactly one page", pdfPages(bytes), 1);
   eq("the quote raises no page error", page.errors.length, 0);
   await page.close();
