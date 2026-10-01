@@ -1396,7 +1396,7 @@ function quotePdfBlock(lang, t, features, stamp = "") {
             ${gate}
             <div id="pdf-tool" hidden>
               <p id="quo-pdf-company" class="muted" hidden>${esc(t("quo_pdf_company"))} <a href="${urlCompany(lang)}">${esc(t("companypage_title"))}</a></p>
-              <article id="ws-pdf-doc" class="qdoc qdoc--no-logo" hidden>
+              <article id="ws-pdf-doc" class="qdoc qdoc--no-logo" data-quote-title="${esc(c("qdoc_title").toLocaleLowerCase(lang).replace(/^./u, (letter) => letter.toLocaleUpperCase(lang)))}" hidden>
                 <table class="qdoc-print-wrap"><thead><tr><th scope="col" class="qdoc-head-space"></th></tr></thead><tbody><tr><td><div class="qdoc-main">
                   <header class="qdoc-head"><div class="qdoc-seller">
                     <div class="qdoc-company-name" data-pdf="companyName"></div>
@@ -1418,23 +1418,24 @@ function quotePdfBlock(lang, t, features, stamp = "") {
                     <div data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></div>
                     <div class="qdoc-project-name" data-pdf-row="projectName" hidden><span class="qdoc-label">${esc(c("qdoc_project"))}</span> <span data-pdf="projectName"></span></div>
                   </div><div class="qdoc-details"><dl class="qdoc-details-list">
-                    <div class="qdoc-details-row"><dt>${esc(c("qdoc_quote_no"))}</dt><dd data-pdf="quoteNumber"></dd></div>
+                    <div class="qdoc-details-row" data-pdf-row="quoteNumber"><dt>${esc(c("qdoc_quote_no"))}</dt><dd data-pdf="quoteNumber"></dd></div>
                     <div class="qdoc-details-row"><dt>${esc(c("qdoc_date"))}</dt><dd data-pdf="date"></dd></div>
                     <div class="qdoc-details-row" data-pdf-row="validUntil" hidden><dt>${esc(c("qdoc_valid_until"))}</dt><dd data-pdf="validUntil"></dd></div>
                   </dl></div></div>
                   <section data-pdf-row="materialsTable" hidden><div class="qdoc-caption">${esc(c("qdoc_materials"))}</div><table class="qdoc-table">${tableHead}<tbody data-pdf="materialRows"></tbody></table></section>
+                  <section data-pdf-row="otherTable" hidden><div class="qdoc-caption">${esc(c("qdoc_other"))}</div><table class="qdoc-table">${tableHead}<tbody data-pdf="otherRows"></tbody></table></section>
                   <section data-pdf-row="labourTable" hidden><div class="qdoc-caption">${esc(c("qdoc_labour"))}</div><table class="qdoc-table">${tableHead}<tbody data-pdf="labourRows"></tbody></table></section>
                   <p class="qdoc-notes-text" data-pdf-row="mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
                   <div class="qdoc-sum-container"><div class="qdoc-notes" data-pdf-row="notesBlock" hidden><div class="qdoc-notes-label">${esc(c("qdoc_notes"))}</div>
                     <div class="qdoc-notes-text" data-pdf-row="quoteNotes" hidden data-pdf="quoteNotes"></div>
                     <div class="qdoc-notes-payment" data-pdf-row="bankAccount" hidden>${esc(c("qdoc_payment"))} <strong data-pdf="bankAccount"></strong></div>
                   </div><table class="qdoc-sum"><tbody>
-                    <tr><th scope="row">${esc(c("qdoc_materials"))}</th><td class="qdoc-num" data-pdf="materials"></td></tr>
+                    <tr data-pdf-row="materials"><th scope="row">${esc(c("qdoc_materials"))}</th><td class="qdoc-num" data-pdf="materials"></td></tr>
                     <tr data-pdf-row="other" hidden><th scope="row">${esc(c("qdoc_other"))}</th><td class="qdoc-num" data-pdf="other"></td></tr>
-                    <tr><th scope="row">${esc(c("qdoc_labour"))}</th><td class="qdoc-num" data-pdf="labour"></td></tr>
-                    <tr><th scope="row">${esc(c("qdoc_sum"))}</th><td class="qdoc-num" data-pdf="subtotal"></td></tr>
+                    <tr data-pdf-row="labour"><th scope="row">${esc(c("qdoc_labour"))}</th><td class="qdoc-num" data-pdf="labour"></td></tr>
+                    <tr data-pdf-row="subtotal"><th scope="row">${esc(c("qdoc_sum"))}</th><td class="qdoc-num" data-pdf="subtotal"></td></tr>
                     <tr data-pdf-row="marginRow" hidden><th scope="row" data-pdf="marginLabel"></th><td class="qdoc-num" data-pdf="margin"></td></tr>
-                    <tr><th scope="row">${esc(c("qdoc_net"))}</th><td class="qdoc-num" data-pdf="net"></td></tr>
+                    <tr data-pdf-row="net"><th scope="row">${esc(c("qdoc_net"))}</th><td class="qdoc-num" data-pdf="net"></td></tr>
                     <tr data-pdf-row="vatRow" hidden><th scope="row" data-pdf="vatLabel"></th><td class="qdoc-num" data-pdf="vat"></td></tr>
                     <tr class="qdoc-total"><th scope="row" data-pdf="totalLabel" data-label="${esc(c("qdoc_total"))}">${esc(c("qdoc_total"))}</th><td class="qdoc-num" data-pdf="total"></td></tr>
                   </tbody></table></div>

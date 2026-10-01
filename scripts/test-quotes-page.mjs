@@ -735,7 +735,7 @@ head("7f. the client quote prints as one complete page");
     // until its dialog closes; the stub returns immediately and would arm the safety timer.
     window.setTimeout = () => 0;
   });
-  await page.click("#ws-pdf-form button[type=submit]");
+  await page.evaluate(() => document.getElementById("ws-pdf-form").requestSubmit());
   eq("the quote calls print once", await page.evaluate(() => window.__printed), 1);
   const text = await page.$eval("#ws-pdf-doc", (n) => n.textContent.replace(/\s+/g, " ").trim());
   check("the contractor's company name is printed", text.includes("Firma testowa"), text);
@@ -747,12 +747,30 @@ head("7f. the client quote prints as one complete page");
   check("the quote number, date and validity are printed", text.includes("W/2026/007")
     && text.includes("30.10.2026") && text.includes("7.07.2026"), text);
   eq("the Materiały table has five rows",
-    await page.$$eval('#ws-pdf-doc tbody[data-pdf="materialRows"] tr', (rows) => rows.length), 5);
+    await page.$$eval('#ws-pdf-doc tbody[data-pdf="materialRows"] tr', (rows) => rows.length), 4);
+  eq("the other-cost table has its own row",
+    await page.$$eval('#ws-pdf-doc tbody[data-pdf="otherRows"] tr', (rows) => rows.length), 1);
+  check("the other cost is absent from materials",
+    !(await page.textContent('#ws-pdf-doc tbody[data-pdf="materialRows"]')).includes("Wywóz gruzu"));
+  check("the other cost is present under other costs",
+    (await page.textContent('#ws-pdf-doc tbody[data-pdf="otherRows"]')).includes("Wywóz gruzu"));
   eq("the Robocizna table has three rows",
     await page.$$eval('#ws-pdf-doc tbody[data-pdf="labourRows"] tr', (rows) => rows.length), 3);
   check("one labour row says ryczałt", /ryczałt/i.test(text), text);
   check("the VAT row is printed when VAT is set",
     !(await page.$eval('[data-pdf-row="vatRow"]', (row) => row.hidden)));
+  // The fullest case of the fixture — logo, four materials, an other cost, three labour lines,
+  // margin and VAT — is the one that has to fit; the later print below has had rows taken out.
+  await page.emulateMedia({ media: "print" });
+  eq("the full quote with VAT and margin is exactly one page",
+    pdfPages(await page.pdf({ format: "A4", preferCSSPageSize: true, printBackground: true })), 1);
+  await page.emulateMedia({ media: "screen" });
+  await page.evaluate(() => document.getElementById("ws-pdf-form").requestSubmit());
+  eq("the print title uses the translated quote word and a safe number",
+    await page.title(), "Wycena W-2026-007");
+  await page.evaluate(() => window.dispatchEvent(new Event("afterprint")));
+  eq("the page title is restored after printing", await page.title(), "Wyceny — LiczMat");
+  await page.evaluate(() => pdfFillQuote("q1"));
   eq("the last summary row reads Razem, not the Suma of the row above it",
     await page.$eval('#ws-pdf-doc [data-pdf="totalLabel"]', (th) => th.textContent), "Razem (PLN)");
   check("the quote note is printed", text.includes("Materiał kupuje klient."), text);
@@ -771,11 +789,39 @@ head("7f. the client quote prints as one complete page");
   await page.evaluate(() => pdfFillQuote("q1"));
   check("the VAT row is hidden when VAT is unset",
     await page.$eval('[data-pdf-row="vatRow"]', (row) => row.hidden));
+  check("Netto is hidden when VAT is unset",
+    await page.$eval('[data-pdf-row="net"]', (row) => row.hidden));
+  await page.fill("#quo-margin", "0");
+  await page.locator("#quo-margin").blur();
+  await page.fill("#quo-number", "");
+  await page.locator("#quo-number").blur();
+  await page.evaluate(() => pdfFillQuote("q1"));
+  check("zero margin hides its row and the pre-margin total",
+    await page.$eval('[data-pdf-row="marginRow"]', (row) => row.hidden)
+      && await page.$eval('[data-pdf-row="subtotal"]', (row) => row.hidden));
+  check("an empty number hides its row and does not substitute the quote name",
+    await page.$eval('[data-pdf-row="quoteNumber"]', (row) => row.hidden)
+      && !(await page.textContent('[data-pdf="quoteNumber"]')).includes("Łazienka"));
   await page.emulateMedia({ media: "print" });
   // The footer is fixed to the bottom of every sheet; the room kept free for it has to be
   // taller, or it is printed over the signatures.
+  // The footer sits 12mm above the sheet's edge, so the room is its height plus those 12mm.
   check("the printed footer is shorter than the room kept for it", await page.$eval("#ws-pdf-doc",
-    (doc) => doc.querySelector(".qdoc-foot").offsetHeight < doc.querySelector(".qdoc-foot-space").offsetHeight));
+    (doc) => doc.querySelector(".qdoc-foot").offsetHeight + 12 * 96 / 25.4
+      < doc.querySelector(".qdoc-foot-space").offsetHeight));
+  // With no @page margin the side margins are the document's own padding; on the collapsed
+  // print table they were silently dropped and the text ran to the paper's edge.
+  eq("the document keeps 14mm side margins in print", await page.$eval("#ws-pdf-doc",
+    (doc) => Math.round(parseFloat(getComputedStyle(doc).paddingLeft) * 25.4 / 96)), 14);
+  check("print CSS removes browser margins and recreates every document margin", await page.evaluate(async () => {
+    const all = await (await fetch("/assets/quote-doc.css")).text();
+    const css = all.slice(all.indexOf("@media print"));
+    return /@page\s*{[^}]*margin:\s*0\s*;/s.test(css)
+      && /\.qdoc-head-space\s*{\s*height:\s*12mm/s.test(css)
+      && /\.qdoc-foot-space\s*{\s*height:\s*34mm/s.test(css)
+      && /\.qdoc-foot\s*{[^}]*bottom:\s*12mm[^}]*left:\s*14mm[^}]*right:\s*14mm/s.test(css);
+  }));
+  await page.evaluate(() => document.getElementById("ws-pdf-form").requestSubmit());
   const bytes = await page.pdf({ format: "A4", preferCSSPageSize: true, printBackground: true });
   eq("the quote PDF is exactly one page", pdfPages(bytes), 1);
   eq("the quote raises no page error", page.errors.length, 0);

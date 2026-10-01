@@ -85,6 +85,45 @@ async function companyLogoFromFile(file) {
       h = 300;
     }
 
+    // The owner's logo printed small and down-left on 2026-10-01 because its source file
+    // had wide empty margins. Crop transparent and paper-white pixels before fitting it.
+    const trimCanvas = document.createElement("canvas");
+    trimCanvas.width = w;
+    trimCanvas.height = h;
+    const trimCtx = trimCanvas.getContext("2d", { willReadFrequently: true });
+    if (!trimCtx) throw err("Could not create the image canvas", "read");
+    trimCtx.drawImage(img, 0, 0, w, h);
+    const pixels = trimCtx.getImageData(0, 0, w, h).data;
+    let left = w;
+    let top = h;
+    let right = -1;
+    let bottom = -1;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const at = (y * w + x) * 4;
+        if (pixels[at + 3] !== 0 && (pixels[at] < 245 || pixels[at + 1] < 245 || pixels[at + 2] < 245)) {
+          left = Math.min(left, x);
+          top = Math.min(top, y);
+          right = Math.max(right, x);
+          bottom = Math.max(bottom, y);
+        }
+      }
+    }
+    let source = img;
+    let sourceX = 0;
+    let sourceY = 0;
+    if (right >= left && bottom >= top) {
+      const padX = Math.max(1, Math.round((right - left + 1) * 0.02));
+      const padY = Math.max(1, Math.round((bottom - top + 1) * 0.02));
+      sourceX = Math.max(0, left - padX);
+      sourceY = Math.max(0, top - padY);
+      const sourceRight = Math.min(w - 1, right + padX);
+      const sourceBottom = Math.min(h - 1, bottom + padY);
+      w = sourceRight - sourceX + 1;
+      h = sourceBottom - sourceY + 1;
+      source = trimCanvas;
+    }
+
     const fit = companyLogoFit(w, h);
     let targetW = fit.w;
     let targetH = fit.h;
@@ -100,7 +139,7 @@ async function companyLogoFromFile(file) {
 
       // Try PNG first
       ctx.clearRect(0, 0, targetW, targetH);
-      ctx.drawImage(img, 0, 0, targetW, targetH);
+      ctx.drawImage(source, sourceX, sourceY, w, h, 0, 0, targetW, targetH);
       const pngData = canvas.toDataURL("image/png");
       if (pngData.length <= LOGO_MAX_CHARS) {
         return pngData;
@@ -109,7 +148,7 @@ async function companyLogoFromFile(file) {
       // Try JPEG on white fallback
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, targetW, targetH);
-      ctx.drawImage(img, 0, 0, targetW, targetH);
+      ctx.drawImage(source, sourceX, sourceY, w, h, 0, 0, targetW, targetH);
       const jpegData = canvas.toDataURL("image/jpeg", 0.85);
       if (jpegData.length <= LOGO_MAX_CHARS) {
         return jpegData;

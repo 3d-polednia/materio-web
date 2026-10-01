@@ -467,23 +467,48 @@
 @media print {
   @page {
     size: A4;
-    margin: 14mm 14mm 16mm;
+    margin: 0;
   }
   .qdoc {
-    width: auto;
+    width: 210mm;
     min-height: auto;
-    padding: 0;
+    /* The page margin is 0 so the browser has nowhere to print its own date, title and URL
+       (2026-10-01: they landed on the owner's quote). The side margins live here instead —
+       not on .qdoc-print-wrap, whose collapsed borders make its padding a no-op. */
+    padding: 0 14mm;
     margin: 0;
     box-shadow: none;
     outline: none;
     background: none;
     display: block;
   }
+  /* 12mm top and bottom, not the 14/16mm of the old @page margins: the Inne koszty table
+     (2026-10-01) made a 5 + 1 + 3 line quote with VAT and margin 4mm too tall for one sheet. */
+  .qdoc-head-space {
+    height: 12mm;
+  }
+  .qdoc-foot-space {
+    height: 34mm;
+  }
+  .qdoc-caption {
+    margin-top: 6pt;
+  }
+  .qdoc-table {
+    margin-bottom: 7pt;
+  }
+  .qdoc-table th {
+    padding-top: 3pt;
+    padding-bottom: 3pt;
+  }
+  .qdoc-table td {
+    padding-top: 2pt;
+    padding-bottom: 2pt;
+  }
   .qdoc-foot {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 12mm;
+    left: 14mm;
+    right: 14mm;
   }
 }
 

@@ -347,7 +347,9 @@ function pdfFillQuote(quoteId) {
   const hasLogo = Boolean(logo && company.logo);
   if (logo) logo.src = hasLogo ? company.logo : "";
   doc.classList.toggle("qdoc--no-logo", !hasLogo);
-  pdfSet(doc, "quoteNumber", quote.number || quote.name);
+  const quoteNumber = String(quote.number || "").trim();
+  pdfSet(doc, "quoteNumber", quoteNumber);
+  pdfShow(doc, "quoteNumber", Boolean(quoteNumber));
   pdfSet(doc, "date", pdfQuoteDate(Number(quote.createdAt)));
   pdfSet(doc, "validUntil", pdfQuoteDate(quote.validUntil));
   pdfShow(doc, "validUntil", Boolean(quote.validUntil));
@@ -369,10 +371,12 @@ function pdfFillQuote(quoteId) {
 
   const lines = crmQuoteLines(quote);
   const projectRows = lines.projectRows.filter((row) => !row.hidden);
+  const projectMaterials = projectRows.filter((row) => row.source !== "other");
+  const otherRows = projectRows.filter((row) => row.source === "other");
   const ownMaterials = lines.ownMaterials;
   const labour = lines.labour;
   const materialBody = pdfEl(doc, "materialRows");
-  const materialRows = [...projectRows, ...ownMaterials.map((line) => ({
+  const materialRows = [...projectMaterials, ...ownMaterials.map((line) => ({
     name: line.name, quantity: line.quantity, unit: line.unit || "",
     qty: line.quantity === null ? word("quo_lump") : `${wsNum(line.quantity)} ${line.unit || ""}`.trim(),
     minor: line.amountMinor || 0, currencyCode: quote.currencyCode || totals.currencyCode,
@@ -382,7 +386,15 @@ function pdfFillQuote(quoteId) {
     const price = row.quantity > 0 ? pdfMinorNumber(Math.round(row.minor / row.quantity)) : "—";
     return `<tr><td>${index + 1}</td><td>${wsEsc(row.name)}</td><td class="qdoc-num">${wsEsc(qty)}</td><td class="qdoc-num">${wsEsc(price)}</td><td class="qdoc-num">${wsEsc(pdfMinorNumber(row.minor))}</td></tr>`;
   }).join("");
-  pdfShow(doc, "materialsTable", projectRows.length + ownMaterials.length > 0);
+  pdfShow(doc, "materialsTable", materialRows.length > 0);
+
+  const otherBody = pdfEl(doc, "otherRows");
+  if (otherBody) otherBody.innerHTML = otherRows.map((row, index) => {
+    const qty = row.quantity === null ? (row.qty || word("quo_lump")) : row.qty;
+    const price = row.quantity > 0 ? pdfMinorNumber(Math.round(row.minor / row.quantity)) : "—";
+    return `<tr><td>${index + 1}</td><td>${wsEsc(row.name)}</td><td class="qdoc-num">${wsEsc(qty)}</td><td class="qdoc-num">${wsEsc(price)}</td><td class="qdoc-num">${wsEsc(pdfMinorNumber(row.minor))}</td></tr>`;
+  }).join("");
+  pdfShow(doc, "otherTable", otherRows.length > 0);
 
   const labourBody = pdfEl(doc, "labourRows");
   if (labourBody) labourBody.innerHTML = labour.map((line, index) => {
@@ -397,17 +409,21 @@ function pdfFillQuote(quoteId) {
   const money = (minor) => minor === null ? "—" : wsMoney(minor, totals.currencyCode);
   const per = (field) => wsSumsText(totals.projectByCurrency, field);
   pdfSet(doc, "materials", totals.materials === null ? per("materials") : money(totals.materials));
+  pdfShow(doc, "materials", materialRows.length > 0 || totals.materials !== 0);
   pdfSet(doc, "other", totals.other === null ? per("other") : money(totals.other));
   const hasOther = totals.other === null
     ? totals.projectByCurrency.some((row) => row.other)
     : totals.other !== 0;
   pdfShow(doc, "other", hasOther);
   pdfSet(doc, "labour", money(totals.labour));
+  pdfShow(doc, "labour", labour.length > 0);
   pdfSet(doc, "subtotal", money(totals.subtotal));
   pdfSet(doc, "marginLabel", `${word("quo_fig_margin")} ${wsNum(totals.marginPct)} %`);
   pdfSet(doc, "margin", money(totals.margin));
   pdfShow(doc, "marginRow", totals.marginPct > 0);
+  pdfShow(doc, "subtotal", totals.marginPct > 0);
   pdfSet(doc, "net", money(totals.net));
+  pdfShow(doc, "net", totals.vatPct !== null);
   pdfSet(doc, "vatLabel", `VAT ${totals.vatPct === null ? "" : `${wsNum(totals.vatPct)} %`}`.trim());
   pdfSet(doc, "vat", money(totals.vat));
   pdfShow(doc, "vatRow", totals.vatPct !== null);
@@ -472,6 +488,7 @@ function pdfInit() {
     if (!pdfAllowed()) return;
     const id = new URLSearchParams(location.search).get("id") ||
       (typeof wsActiveProjectId === "function" ? wsActiveProjectId() : null);
+    let quotePrintTitle = "";
     if (form.hasAttribute("data-pdf-quote")) {
       const quote = typeof crmQuote === "function" ? crmQuote(id) : null;
       const companies = typeof crmCompanies === "function" ? crmCompanies() : [];
@@ -481,6 +498,10 @@ function pdfInit() {
       const message = document.getElementById("quo-pdf-company");
       if (message) message.hidden = Boolean(company);
       if (!company) return;
+      const titleWord = String(doc.dataset.quoteTitle || "").trim();
+      const titleName = String((quote && (quote.number || quote.name)) || "").trim();
+      quotePrintTitle = `${titleWord} ${titleName}`.trim()
+        .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-");
     }
     const filled = form.hasAttribute("data-pdf-quote")
       ? pdfFillQuote(id) : pdfFill(id, pdfOptions(form));
@@ -493,12 +514,15 @@ function pdfInit() {
     home.insertBefore(marker, doc);
     document.body.appendChild(doc);
     document.body.dataset.pdfPrint = "1";
+    const oldTitle = document.title;
+    if (quotePrintTitle) document.title = quotePrintTitle;
     let fallbackHide = 0;
     const done = () => {
       delete document.body.dataset.pdfPrint;
       if (marker.parentNode) marker.parentNode.insertBefore(doc, marker);
       marker.remove();
       doc.hidden = true;
+      document.title = oldTitle;
       window.removeEventListener("afterprint", done);
       if (fallbackHide) { clearTimeout(fallbackHide); fallbackHide = 0; }
     };

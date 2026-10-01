@@ -132,13 +132,45 @@ head("2. Pro company workflow");
   const { ctx, page, errors } = await open("pro");
   await page.locator("#company-form").waitFor({ state: "visible" });
   await page.fill("#company-name", "Pierwsza Firma");
-  await page.setInputFiles("#company-logo-file", { name: "logo.png", mimeType: "image/png", buffer: png });
+  const paddedLogo = Buffer.from(await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 400;
+    canvas.height = 200;
+    const context = canvas.getContext("2d");
+    context.fillStyle = "#000";
+    context.fillRect(0, 160, 40, 40);
+    return canvas.toDataURL("image/png").split(",")[1];
+  }), "base64");
+  await page.setInputFiles("#company-logo-file", {
+    name: "padded-logo.png", mimeType: "image/png", buffer: paddedLogo,
+  });
   await page.waitForFunction(() => !document.getElementById("company-logo-preview").hidden
     || !document.getElementById("company-logo-error").hidden);
   check("the PNG has a preview", await page.locator("#company-logo-preview img").isVisible(),
     await page.locator("#company-logo-error").innerText());
   await page.click('#company-form button[type="submit"]');
   await page.locator("#company-list > li").waitFor();
+  check("empty logo margins are trimmed before storage", await page.evaluate(async () => {
+    const image = new Image();
+    image.src = crmCompanies()[0].logo;
+    await image.decode();
+    const canvas = document.createElement("canvas");
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const context = canvas.getContext("2d", { willReadFrequently: true });
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let left = canvas.width, top = canvas.height, right = -1, bottom = -1;
+    for (let y = 0; y < canvas.height; y++) for (let x = 0; x < canvas.width; x++) {
+      const at = (y * canvas.width + x) * 4;
+      if (pixels[at + 3] && (pixels[at] < 245 || pixels[at + 1] < 245 || pixels[at + 2] < 245)) {
+        left = Math.min(left, x); top = Math.min(top, y);
+        right = Math.max(right, x); bottom = Math.max(bottom, y);
+      }
+    }
+    return (right - left + 1) / canvas.width >= 0.9
+      && (bottom - top + 1) / canvas.height >= 0.9;
+  }));
   eq("first company is listed", await page.locator("#company-list > li").count(), 1);
   eq("its logo is a thumbnail", await page.locator("#company-list .company-logo-thumb img").count(), 1);
   check("the first company is default", (await page.locator("#company-list > li").innerText()).includes("Domyślna"));

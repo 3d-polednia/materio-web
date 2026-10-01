@@ -496,7 +496,7 @@
       </div>
             <div id="pdf-tool" hidden>
               <p id="quo-pdf-company" class="muted" hidden>Izaberi firmu koja izdaje ponudu. <a href="/sr/moja-firma/">Moja firma</a></p>
-              <article id="ws-pdf-doc" class="qdoc qdoc--no-logo" hidden>
+              <article id="ws-pdf-doc" class="qdoc qdoc--no-logo" data-quote-title="Ponuda" hidden>
                 <table class="qdoc-print-wrap"><thead><tr><th scope="col" class="qdoc-head-space"></th></tr></thead><tbody><tr><td><div class="qdoc-main">
                   <header class="qdoc-head"><div class="qdoc-seller">
                     <div class="qdoc-company-name" data-pdf="companyName"></div>
@@ -518,7 +518,7 @@
                     <div data-pdf-row="clientEmail" hidden data-pdf="clientEmail"></div>
                     <div class="qdoc-project-name" data-pdf-row="projectName" hidden><span class="qdoc-label">Projekat:</span> <span data-pdf="projectName"></span></div>
                   </div><div class="qdoc-details"><dl class="qdoc-details-list">
-                    <div class="qdoc-details-row"><dt>Br. ponude</dt><dd data-pdf="quoteNumber"></dd></div>
+                    <div class="qdoc-details-row" data-pdf-row="quoteNumber"><dt>Br. ponude</dt><dd data-pdf="quoteNumber"></dd></div>
                     <div class="qdoc-details-row"><dt>Datum</dt><dd data-pdf="date"></dd></div>
                     <div class="qdoc-details-row" data-pdf-row="validUntil" hidden><dt>Važi do</dt><dd data-pdf="validUntil"></dd></div>
                   </dl></div></div>
@@ -529,6 +529,13 @@
                   <th scope="col" class="qdoc-col-price" data-pdf="unitPriceHead" data-label="Jed. cena">Jed. cena</th>
                   <th scope="col" class="qdoc-col-val" data-pdf="valueHead" data-label="Vrednost">Vrednost</th>
                 </tr></thead><tbody data-pdf="materialRows"></tbody></table></section>
+                  <section data-pdf-row="otherTable" hidden><div class="qdoc-caption">Ostali troškovi</div><table class="qdoc-table"><thead><tr>
+                  <th scope="col" class="qdoc-col-lp">Br.</th>
+                  <th scope="col" class="qdoc-col-desc">Opis</th>
+                  <th scope="col" class="qdoc-col-qty">Količina</th>
+                  <th scope="col" class="qdoc-col-price" data-pdf="unitPriceHead" data-label="Jed. cena">Jed. cena</th>
+                  <th scope="col" class="qdoc-col-val" data-pdf="valueHead" data-label="Vrednost">Vrednost</th>
+                </tr></thead><tbody data-pdf="otherRows"></tbody></table></section>
                   <section data-pdf-row="labourTable" hidden><div class="qdoc-caption">Rad</div><table class="qdoc-table"><thead><tr>
                   <th scope="col" class="qdoc-col-lp">Br.</th>
                   <th scope="col" class="qdoc-col-desc">Opis</th>
@@ -541,12 +548,12 @@
                     <div class="qdoc-notes-text" data-pdf-row="quoteNotes" hidden data-pdf="quoteNotes"></div>
                     <div class="qdoc-notes-payment" data-pdf-row="bankAccount" hidden>Plaćanje prenosom na račun: <strong data-pdf="bankAccount"></strong></div>
                   </div><table class="qdoc-sum"><tbody>
-                    <tr><th scope="row">Materijali</th><td class="qdoc-num" data-pdf="materials"></td></tr>
+                    <tr data-pdf-row="materials"><th scope="row">Materijali</th><td class="qdoc-num" data-pdf="materials"></td></tr>
                     <tr data-pdf-row="other" hidden><th scope="row">Ostali troškovi</th><td class="qdoc-num" data-pdf="other"></td></tr>
-                    <tr><th scope="row">Rad</th><td class="qdoc-num" data-pdf="labour"></td></tr>
-                    <tr><th scope="row">Ukupno bez marže</th><td class="qdoc-num" data-pdf="subtotal"></td></tr>
+                    <tr data-pdf-row="labour"><th scope="row">Rad</th><td class="qdoc-num" data-pdf="labour"></td></tr>
+                    <tr data-pdf-row="subtotal"><th scope="row">Ukupno bez marže</th><td class="qdoc-num" data-pdf="subtotal"></td></tr>
                     <tr data-pdf-row="marginRow" hidden><th scope="row" data-pdf="marginLabel"></th><td class="qdoc-num" data-pdf="margin"></td></tr>
-                    <tr><th scope="row">Neto</th><td class="qdoc-num" data-pdf="net"></td></tr>
+                    <tr data-pdf-row="net"><th scope="row">Neto</th><td class="qdoc-num" data-pdf="net"></td></tr>
                     <tr data-pdf-row="vatRow" hidden><th scope="row" data-pdf="vatLabel"></th><td class="qdoc-num" data-pdf="vat"></td></tr>
                     <tr class="qdoc-total"><th scope="row" data-pdf="totalLabel" data-label="Ukupno">Ukupno</th><td class="qdoc-num" data-pdf="total"></td></tr>
                   </tbody></table></div>
