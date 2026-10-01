@@ -598,7 +598,8 @@
             </div>
             <div id="quo-share-panel" class="quo-share-panel mt-4" hidden>
               <p class="quo-share-link"><input id="quo-share-url" readonly aria-label="URL"> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-copy">Copier le lien</button></p>
-              <p class="quo-share-actions"><a class="btn btn-ghost btn-sm" id="quo-share-email">E-mail</a> <a class="btn btn-ghost btn-sm" id="quo-share-wa" target="_blank" rel="noopener">WhatsApp</a> <a class="btn btn-ghost btn-sm" id="quo-share-sms">SMS</a> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-system" hidden>Partager…</button> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-off">Désactiver le lien</button></p>
+              <p class="quo-share-actions"><a class="btn btn-ghost btn-sm" id="quo-share-email" aria-expanded="false" aria-controls="quo-share-mail">E-mail</a> <a class="btn btn-ghost btn-sm" id="quo-share-wa" target="_blank" rel="noopener">WhatsApp</a> <a class="btn btn-ghost btn-sm" id="quo-share-sms">SMS</a> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-system" hidden>Partager…</button> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-off">Désactiver le lien</button></p>
+              <p class="quo-share-actions" id="quo-share-mail" hidden><a class="btn btn-ghost btn-sm" id="quo-share-gmail" target="_blank" rel="noopener">Gmail</a> <a class="btn btn-ghost btn-sm" id="quo-share-outlook" target="_blank" rel="noopener">Outlook</a> <a class="btn btn-ghost btn-sm" id="quo-share-mailto">Logiciel de messagerie</a> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-copy-msg">Copier le message</button></p>
               <p class="muted" id="quo-share-note"></p>
             </div>
             <p class="muted" id="quo-share-account" hidden>Le partage nécessite un compte connecté. <a href="/app/">nav_account</a></p>

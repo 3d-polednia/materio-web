@@ -128,7 +128,9 @@ const BUDGET = {
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
   // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
   // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
-  "index.html": [237, 62],
+  // 2026-10-01, measured 237.1 kB: the e-mail chooser of the share panel (Gmail, Outlook, mail
+  // program, copy the message) and the share strings translated in ten languages that had shipped English.
+  "index.html": [238, 62],
   // Raised 2026-09-26 from 248, measured at 248.8 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -227,7 +229,9 @@ const BUDGET = {
   "klienci/index.html": [442, 133],
   "zlecenia/index.html": [442, 133],
   // 2026-10-01: measured 455.4 kB raw; quote sharing adds its panel and account API.
-  "wyceny/index.html": [456, 135],
+  // 2026-10-01, measured 457.6 kB: the e-mail chooser of the share panel (Gmail, Outlook, mail
+  // program, copy the message) and the share strings translated in ten languages that had shipped English.
+  "wyceny/index.html": [458, 135],
   "terminarz/index.html": [418, 126],
   // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
   // one page that carries every store the account syncs, and session 59 gave it a third:

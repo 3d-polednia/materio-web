@@ -106,6 +106,14 @@ const quoShareEmail = (value) => {
 };
 const quoShareMailto = (to, subject, message) =>
   `mailto:${quoShareEmail(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+/* A desktop browser often has no mail program behind mailto: — Chrome on Windows can own
+   the protocol with no handler registered, and the click then does nothing at all (owner,
+   2026-10-01). So on a desktop "E-mail" offers the two webmails by their compose URLs, the
+   mail program, and the message to paste anywhere; on a phone mailto: opens the mail app. */
+const quoShareGmail = (to, subject, message) =>
+  `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(quoShareEmail(to))}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+const quoShareOutlook = (to, subject, message) =>
+  `https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(quoShareEmail(to))}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
 const quoShareWhatsApp = (phone, message) =>
   `https://wa.me/${phone ? encodeURIComponent(phone) : ""}?text=${encodeURIComponent(message)}`;
 const quoShareSms = (phone, message) =>
@@ -1018,8 +1026,15 @@ function wireQuoteDetail() {
       const message = quoShareFormat(quoT("quo_share_msg"), values);
       const phone = quoSharePhone(snap.client && snap.client.phone);
       document.getElementById("quo-share-url").value = url;
-      document.getElementById("quo-share-email").href = quoShareMailto(
-        snap.client && snap.client.email, subject, message);
+      const to = snap.client && snap.client.email;
+      const mailto = quoShareMailto(to, subject, message);
+      document.getElementById("quo-share-email").href = mailto;
+      document.getElementById("quo-share-mailto").href = mailto;
+      document.getElementById("quo-share-gmail").href = quoShareGmail(to, subject, message);
+      document.getElementById("quo-share-outlook").href = quoShareOutlook(to, subject, message);
+      document.getElementById("quo-share-copy-msg").dataset.message = message;
+      document.getElementById("quo-share-mail").hidden = true;
+      document.getElementById("quo-share-email").setAttribute("aria-expanded", "false");
       document.getElementById("quo-share-wa").href = quoShareWhatsApp(phone, message);
       document.getElementById("quo-share-sms").href = quoShareSms(phone, message);
       const system = document.getElementById("quo-share-system");
@@ -1043,6 +1058,23 @@ function wireQuoteDetail() {
     }
   });
 
+  on("quo-share-email", "click", (e) => {
+    // A phone has a mail app behind mailto:, so the link simply opens it there.
+    if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
+    e.preventDefault();
+    const row = document.getElementById("quo-share-mail");
+    row.hidden = !row.hidden;
+    e.currentTarget.setAttribute("aria-expanded", String(!row.hidden));
+  });
+
+  on("quo-share-copy-msg", "click", async (e) => {
+    const button = e.currentTarget;
+    const label = quoT("quo_share_copy_msg");
+    try { await navigator.clipboard.writeText(button.dataset.message || ""); } catch (err) { return; }
+    button.textContent = quoT("quo_share_copied");
+    setTimeout(() => { button.textContent = label; }, 2000);
+  });
+
   on("quo-share-copy", "click", async () => {
     const input = document.getElementById("quo-share-url");
     const button = document.getElementById("quo-share-copy");
@@ -1060,6 +1092,7 @@ function wireQuoteDetail() {
       document.getElementById("quo-share-url").value = "";
       document.querySelector("#quo-share-panel .quo-share-link").hidden = true;
       document.querySelector("#quo-share-panel .quo-share-actions").hidden = true;
+      document.getElementById("quo-share-mail").hidden = true;
       document.getElementById("quo-share-note").textContent = quoT("quo_share_off_done");
     } catch (e) {
       document.getElementById("quo-share-note").textContent = quoT("quo_share_failed");

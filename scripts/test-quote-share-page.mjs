@@ -130,6 +130,16 @@ head("editor sharing");
   const body = decodeURIComponent(new URL(mail).searchParams.get("body"));
   check("mail body contains the URL", body.includes(url), body);
   check("mail body contains the formatted total", /zł|PLN/.test(body) && /1[,.\s]?75/.test(body), body);
+  // Desktop: "E-mail" opens a chooser instead of relying on a mailto handler (owner,
+  // 2026-10-01: Chrome on Windows owned mailto: with nothing behind it, the click did nothing).
+  await page.click("#quo-share-email");
+  eq("desktop E-mail opens the chooser", await page.$eval("#quo-share-mail", (n) => n.hidden), false);
+  const gmail = await page.getAttribute("#quo-share-gmail", "href");
+  check("Gmail compose targets the client", gmail.startsWith("https://mail.google.com/mail/?view=cm&fs=1&to=jan%40firma.pl&su="), gmail);
+  check("Gmail body carries the URL", decodeURIComponent(new URL(gmail).searchParams.get("body")).includes(url), gmail);
+  const outlook = await page.getAttribute("#quo-share-outlook", "href");
+  check("Outlook compose targets the client", outlook.startsWith("https://outlook.live.com/mail/0/deeplink/compose?to=jan%40firma.pl&subject="), outlook);
+  eq("the mail program link is the same mailto", await page.getAttribute("#quo-share-mailto", "href"), mail);
   const wa = await page.getAttribute("#quo-share-wa", "href");
   check("WhatsApp uses the Polish calling code", wa.startsWith("https://wa.me/48600123456?text="), wa);
   await page.click("#quo-share-off");

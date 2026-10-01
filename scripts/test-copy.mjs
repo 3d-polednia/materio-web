@@ -497,7 +497,8 @@ const BUDGET = {
   // 2026-10-01, 742 -> 750, measured 745 words (fr): the "save in my materials" checkbox and the
   // one-line link to Moje materiały under the quote's material form.
   // 2026-10-01: the share panel makes French widest at 771; four words remain for drift.
-  company: 330, clients: 550, jobs: 544, quotes: 775, calendar: 450,
+  // 2026-10-01, 775 -> 780, measured 776 words (fr): the share panel's e-mail chooser.
+  company: 330, clients: 550, jobs: 544, quotes: 780, calendar: 450,
   // 2026-10-01: public quote markup is widest in French at 176; four words remain for drift.
   "quote-share": 180,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
