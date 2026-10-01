@@ -2386,7 +2386,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">Čemu služi</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Obloge zidova i podova</option><option value="DRYWALL_BOARDING">Gipsane konstrukcije</option><option value="COATING">Pokrivni materijali</option><option value="PANEL_CUTTING">Sečenje ploča i tabli</option><option value="LINEAR_STOCK">Profili, lajsne, cevi, šipke</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Obloge zidova i podova</option><option value="DRYWALL_BOARDING">Gipsane konstrukcije</option><option value="COATING">Pokrivni materijali</option><option value="PANEL_CUTTING">Sečenje ploča i tabli</option><option value="LINEAR_STOCK">Profili, lajsne, cevi, šipke</option><option value="OTHER">Ostalo</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Kategorija</span>
@@ -2455,8 +2455,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">Čemu služi — opis</span>
+              <input type="text" maxlength="80" placeholder="npr. unutrašnja vrata, kuhinjski nameštaj" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Jedinica</span>
+              <select data-omat-in="unit"><option selected>kom.</option><option>m²</option><option>duž. m</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pak.</option><option>set</option><option>džak</option><option>h</option><option>dan</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Cena po pakovanju</span>
+          <span class="fld-label" data-omat-price-label="pack">Cena po pakovanju</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Cena po jedinici</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Cena zadržava valutu u kojoj je uneta. Ništa se ne preračunava po kursu.</p>

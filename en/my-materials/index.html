@@ -284,7 +284,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">What it is for</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Wall and floor coverings</option><option value="DRYWALL_BOARDING">Plasterboard construction</option><option value="COATING">Coating materials</option><option value="PANEL_CUTTING">Cutting boards and sheets</option><option value="LINEAR_STOCK">Profiles, trims, pipes, rods</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Wall and floor coverings</option><option value="DRYWALL_BOARDING">Plasterboard construction</option><option value="COATING">Coating materials</option><option value="PANEL_CUTTING">Cutting boards and sheets</option><option value="LINEAR_STOCK">Profiles, trims, pipes, rods</option><option value="OTHER">Other</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Category</span>
@@ -353,8 +353,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">What it is for — description</span>
+              <input type="text" maxlength="80" placeholder="e.g. interior doors, kitchen furniture" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Unit</span>
+              <select data-omat-in="unit"><option selected>pcs</option><option>m²</option><option>lin. m</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pack</option><option>set</option><option>bag</option><option>h</option><option>day</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Price per package</span>
+          <span class="fld-label" data-omat-price-label="pack">Price per package</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Price per unit</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">A price keeps the currency it was entered in. Nothing is converted at a rate.</p>
@@ -368,9 +379,14 @@
   <section class="block">
     <div class="wrap narrow">
       <h2>Your materials</h2>
+      <label class="field" data-omat-search-wrap hidden>
+        <span class="fld-label">Search your materials</span>
+        <input type="search" data-omat-search aria-label="Search your materials">
+      </label>
       
       <div data-omat-list data-hist-label="Price history"></div>
       <p class="muted" data-omat-empty>You have no materials of your own yet.</p>
+      <p class="muted" data-omat-search-none hidden>No matching materials found.</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">A material from this list is picked in a calculator exactly like a catalogue entry.</p>
       <p class="muted">Materials belong to your account and sync after you sign in.</p>

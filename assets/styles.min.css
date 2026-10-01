@@ -1608,6 +1608,7 @@ background: var(--accent-soft); color: var(--on-accent-soft);
 padding: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-5);
 }
 .omat-row { margin-bottom: var(--sp-4); }
+[data-omat-search-wrap] { display: block; max-width: 28rem; margin-bottom: var(--sp-4); }
 .omat-row h3 { margin-bottom: var(--sp-1); }
 .omat-spec, .omat-trend { font-size: var(--fs-sm); margin: var(--sp-1) 0; }
 .omat-price { margin: var(--sp-2) 0; }

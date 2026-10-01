@@ -249,7 +249,10 @@ const BUDGET = {
   // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
   // /app/ measured 394.0 kB: the same keys plus the quote totals and line store in crm.js.
-  "app/index.html": [395, 103],
+  // 2026-10-01, 395/103 -> 396/103.5, measured 395.3/103.0 kB: "Pozostałe" own materials
+  // (application OTHER with purpose and unit) in the store /app/ syncs, and the three quote
+  // keys for picking an own material in a quote, in every dictionary bundle.
+  "app/index.html": [396, 103.5],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.

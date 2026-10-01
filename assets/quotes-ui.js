@@ -306,6 +306,63 @@ function quoRenderProjectContent(q) {
 /** One language's closed list of units, stored as their visible labels on quote lines. */
 const quoUnits = () => quoT("quo_units").split("|").filter(Boolean);
 
+/** An own material's quote unit: its explicit unit, or the localized package unit. */
+function quoOwnMaterialUnit(material) {
+  return String(material && material.unit || quoUnits()[7] || "");
+}
+
+const quoOwnMaterials = () => (typeof omMaterials === "function" ? omMaterials() : []);
+
+function quoOwnMaterialMatch(value) {
+  const needle = String(value || "").trim().toLocaleLowerCase(quoLang());
+  return needle ? quoOwnMaterials().find((m) => String(m.name || "").trim()
+    .toLocaleLowerCase(quoLang()) === needle) || null : null;
+}
+
+/** Refresh the suggestions and the no-material hint whenever either store redraws. */
+function quoFillOwnMaterials() {
+  const rows = quoOwnMaterials();
+  const list = document.getElementById("quo-own-mats");
+  if (list) list.innerHTML = rows.map((m) => {
+    const price = m.priceMinor === null || m.priceMinor === undefined
+      ? quoT("omat_price_none") : quoMoney(m.priceMinor, m.currencyCode);
+    const detail = [m.purpose, `${price} / ${quoOwnMaterialUnit(m)}`].filter(Boolean).join(" · ");
+    return `<option value="${quoEsc(m.name)}" label="${quoEsc(detail)}"></option>`;
+  }).join("");
+  const link = document.getElementById("quo-materials-own-link");
+  if (link) link.hidden = rows.length > 0;
+}
+
+/** Apply an exact own-material match to the add-material form. */
+function quoApplyOwnMaterial() {
+  const name = document.getElementById("quo-materials-name");
+  const unit = document.getElementById("quo-materials-unit");
+  const price = document.getElementById("quo-materials-price");
+  const save = document.getElementById("quo-materials-save-own");
+  const note = document.getElementById("quo-materials-cur-note");
+  if (!name || !unit || !price) return;
+  const material = quoOwnMaterialMatch(name.value);
+  if (save) save.closest("p").hidden = Boolean(material);
+  if (note) { note.hidden = true; note.textContent = ""; }
+  if (!material) return;
+  const value = quoOwnMaterialUnit(material);
+  if (![...unit.options].some((option) => option.value === value)) unit.add(new Option(value, value));
+  unit.value = value;
+  // Chapter VI: a price is copied only into the currency it was recorded in. A quote with no
+  // money yet is stamped with the visitor's currency on its first line (crmStampQuote), so
+  // that is the currency to compare against — not "anything goes".
+  const quote = crmQuote(quoOpenId);
+  const quoteCurrency = (quote && quote.currencyCode) || crmCurrency();
+  const compatible = material.priceMinor !== null && material.priceMinor !== undefined
+    && material.currencyCode === quoteCurrency;
+  price.value = compatible ? quoRateValue(material.priceMinor) : "";
+  if (material.priceMinor !== null && material.priceMinor !== undefined && !compatible && note) {
+    note.textContent = quoT("quo_mat_cur_differs").replace("{cur}", material.currencyCode || "");
+    note.hidden = false;
+  }
+  quoRunningTotal("materials");
+}
+
 /** A closed unit picker that still preserves a label saved by an older version or project. */
 function quoUnitSelect(value, attr = "") {
   const stored = String(value || "");
@@ -335,6 +392,7 @@ function quoProjectRow(row) {
 
 /** Quote materials use the shared project-row builder, including the rows hidden here. */
 function quoRenderMaterials(q) {
+  quoFillOwnMaterials();
   const lines = crmQuoteLines(q);
   const visible = lines.projectRows.filter((row) => !row.hidden);
   const hidden = lines.projectRows.filter((row) => row.hidden);
@@ -753,16 +811,32 @@ function wireQuoteDetail() {
       e.preventDefault();
       const name = document.getElementById(`quo-${list}-name`);
       if (!name.value.trim()) return;
-      crmAddQuoteLine(quoOpenId, list, {
+      const unit = document.getElementById(`quo-${list}-unit`).value;
+      const priceMajor = document.getElementById(`quo-${list}-price`).value;
+      const added = crmAddQuoteLine(quoOpenId, list, {
         name: name.value,
         quantity: document.getElementById(`quo-${list}-qty`).value,
-        unit: document.getElementById(`quo-${list}-unit`).value,
-        priceMajor: document.getElementById(`quo-${list}-price`).value,
+        unit,
+        priceMajor,
       });
+      if (!added) return;
+      const save = list === "materials" && document.getElementById("quo-materials-save-own");
+      if (save && save.checked && !quoOwnMaterialMatch(name.value) && typeof omAdd === "function") {
+        const quote = crmQuote(quoOpenId);
+        omAdd({ name: name.value, application: "OTHER", category: "OTHER", unit,
+          priceMajor, currencyCode: quote && quote.currencyCode });
+      }
       e.target.reset();
+      if (list === "materials") quoApplyOwnMaterial();
+      // The running total under the form described the line just added; an empty form says nothing.
+      quoRunningTotal(list);
       name.focus();
     });
     on(formId, "input", () => quoRunningTotal(list));
+    if (list === "materials") {
+      on("quo-materials-name", "input", quoApplyOwnMaterial);
+      on("quo-materials-name", "change", quoApplyOwnMaterial);
+    }
     on(listId, "click", (e) => {
       const row = e.target.closest("[data-line]");
       if (!row) return;
@@ -932,6 +1006,7 @@ function buildQuotesPage() {
   document.addEventListener("crmchange", quoRender);
   // A material re-priced or a project renamed on another page moves the figures here.
   document.addEventListener("workspacechange", quoRender);
+  document.addEventListener("ownmaterialschange", () => { quoFillOwnMaterials(); quoApplyOwnMaterial(); });
   // A quote with no money of its own falls back to the visitor's currency, so a switch
   // has to redraw.
   document.addEventListener("currencychange", quoRender);

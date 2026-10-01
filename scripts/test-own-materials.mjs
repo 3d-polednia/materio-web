@@ -65,7 +65,7 @@ function loadStore({ now = Date.parse("2026-08-30T09:00:00+02:00"), currency = "
   let ids = 0;
   const events = [];
   const api = evalScript("assets/own-materials.js", [
-    "OM_KEY", "OM_SCHEMA", "OM_MAX_NAME", "OM_MAX_PRICE_POINTS", "OM_APPLICATIONS", "OM_MEASURES",
+    "OM_KEY", "OM_SCHEMA", "OM_MAX_NAME", "OM_MAX_PURPOSE", "OM_MAX_UNIT", "OM_MAX_PRICE_POINTS", "OM_APPLICATIONS", "OM_MEASURES",
     "omMaterials", "omMaterial", "omHistory", "omTrend",
     "omAdd", "omUpdate", "omSetPrice", "omDelete", "omRestore",
     "omToCatalogRow", "omCatalogRows", "omExport", "omImport", "omApplication",
@@ -128,7 +128,7 @@ head("1. a row IS the contract's document");
   // The exact field names of docs/FIRESTORE_SYNC.md §2, `materials/{materialId}`. A name
   // that differs by a character is a field the phone silently never reads.
   const FIELDS = [
-    "id", "name", "category", "application",
+    "id", "name", "category", "application", "purpose", "unit",
     "widthMm", "lengthMm", "kerfMm", "coveragePerUnitM2", "packageAreaM2", "wastePercent",
     "priceMinor", "currencyCode", "priceUpdatedAt", "prices",
     "createdAt", "updatedAt", "deletedAt", "schemaVersion",
@@ -361,17 +361,38 @@ head("5. a measurement is null or a number, never `present`");
   eq("the length it shares stays", turned.lengthMm, 600);
 }
 
-head("5b. the five applications are the app's own, and no sixth is invented");
+head("5b. the five app applications and the web-only OTHER application");
 {
   const om = loadStore();
-  eq("five", om.OM_APPLICATIONS.length, 5);
-  eq("the app's enum names", om.OM_APPLICATIONS.map((a) => a.id).join(","),
-    "WALL_FLOOR_COVERING,DRYWALL_BOARDING,COATING,PANEL_CUTTING,LINEAR_STOCK");
+  eq("six", om.OM_APPLICATIONS.length, 6);
+  eq("the application names", om.OM_APPLICATIONS.map((a) => a.id).join(","),
+    "WALL_FLOOR_COVERING,DRYWALL_BOARDING,COATING,PANEL_CUTTING,LINEAR_STOCK,OTHER");
   // An unknown name is not an error: the row is worth keeping, and this is the same
   // tolerance SyncContract.applicationOf() has on the phone.
   eq("an unknown one falls back rather than throwing",
     om.omApplication("SOMETHING_ELSE").id, "WALL_FLOOR_COVERING");
   eq("and so does an absent one", om.omApplication(undefined).id, "WALL_FLOOR_COVERING");
+}
+
+head("5c. OTHER stores a purpose and unit but no measurements");
+{
+  const om = loadStore();
+  const other = om.omAdd({ name: "Drzwi", application: "OTHER",
+    purpose: `  ${"p".repeat(90)}  `, unit: `  ${"s".repeat(20)}  `,
+    widthMm: 1, lengthMm: 2, kerfMm: 3, coveragePerUnitM2: 4,
+    packageAreaM2: 5, wastePercent: 6 });
+  eq("purpose is trimmed and capped", other.purpose, "p".repeat(om.OM_MAX_PURPOSE));
+  eq("unit is trimmed and capped", other.unit, "s".repeat(om.OM_MAX_UNIT));
+  Object.keys(om.OM_MEASURES).forEach((key) => eq(`${key} is null`, other[key], null));
+  const row = om.omToCatalogRow(other);
+  eq("OTHER has the non-calculator kind", row.k, "other");
+  const changed = om.omUpdate(other.id, { application: "COATING" });
+  eq("changing away clears purpose", changed.purpose, "");
+  eq("changing away clears unit", changed.unit, "");
+
+  const { MAT_KINDS_FOR_CALC } = evalScript("assets/materials.js", ["MAT_KINDS_FOR_CALC"], { module: undefined });
+  check("no calculator accepts the other kind",
+    Object.values(MAT_KINDS_FOR_CALC).every((kinds) => !kinds.includes("other")));
 }
 
 /* ================================================================== 6. the catalogue shape */
@@ -518,9 +539,9 @@ head("9. the frame the build writes, in ten languages");
       main.includes('id="main" tabindex="-1"'));
     check(`${lang}: the form is in the markup rather than built by a script`,
       main.includes("data-omat-form"));
-    check(`${lang}: all five field groups ship`,
-      (main.match(/data-omat-group=/g) || []).length === 5);
-    check(`${lang}: four of them hidden`, (main.match(/data-omat-group="[A-Z_]+" hidden/g) || []).length === 4);
+    check(`${lang}: all six field groups ship`,
+      (main.match(/data-omat-group=/g) || []).length === 6);
+    check(`${lang}: five of them hidden`, (main.match(/data-omat-group="[A-Z_]+" hidden/g) || []).length === 5);
     check(`${lang}: the empty state ships with its text`, main.includes(t("omat_empty")));
     check(`${lang}: the undo strip is a live region`, main.includes('data-omat-undo role="status"'));
     check(`${lang}: the refusal is announced`, main.includes('data-omat-err role="alert"'));
@@ -528,8 +549,8 @@ head("9. the frame the build writes, in ten languages");
       !/<input(?![^>]*aria-label)(?![^>]*data-omat-in)[^>]*>/.test(main));
     check(`${lang}: a number is typed on a numeric keypad, never a spinner`,
       !main.includes('type="number"') && main.includes('inputmode="decimal"'));
-    check(`${lang}: the five applications are named`,
-      ["WALL_FLOOR_COVERING", "DRYWALL_BOARDING", "COATING", "PANEL_CUTTING", "LINEAR_STOCK"]
+    check(`${lang}: the six applications are named`,
+      ["WALL_FLOOR_COVERING", "DRYWALL_BOARDING", "COATING", "PANEL_CUTTING", "LINEAR_STOCK", "OTHER"]
         .every((id) => main.includes(OMAT_COPY[lang][`omat_app_${id}`])));
     check(`${lang}: it says what the history does not record`,
       main.includes(OMAT_COPY[lang].omat_hist_note));

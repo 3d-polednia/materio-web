@@ -2386,7 +2386,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">Do czego służy</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Okładziny ścian i podłóg</option><option value="DRYWALL_BOARDING">Zabudowa płytami G-K</option><option value="COATING">Materiały kryjące</option><option value="PANEL_CUTTING">Rozkrój płyt i arkuszy</option><option value="LINEAR_STOCK">Profile, listwy, rury, pręty</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Okładziny ścian i podłóg</option><option value="DRYWALL_BOARDING">Zabudowa płytami G-K</option><option value="COATING">Materiały kryjące</option><option value="PANEL_CUTTING">Rozkrój płyt i arkuszy</option><option value="LINEAR_STOCK">Profile, listwy, rury, pręty</option><option value="OTHER">Pozostałe</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Kategoria</span>
@@ -2455,8 +2455,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">Do czego służy — opis</span>
+              <input type="text" maxlength="80" placeholder="np. drzwi wewnętrzne, meble kuchenne" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Jednostka</span>
+              <select data-omat-in="unit"><option selected>szt.</option><option>m²</option><option>mb</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>opak.</option><option>kpl.</option><option>worek</option><option>godz.</option><option>dzień</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Cena za opakowanie</span>
+          <span class="fld-label" data-omat-price-label="pack">Cena za opakowanie</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Cena za jednostkę</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Cena trzyma walutę, w której ją wpisano. Nic nie jest przeliczane po kursie.</p>

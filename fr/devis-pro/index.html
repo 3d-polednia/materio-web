@@ -408,11 +408,14 @@
             <ul id="quo-own-material-list" class="data-list"></ul>
             <form id="quo-materials-form" data-quote-list="materials">
               <p class="ws-mat-grid">
-                <label class="ws-mat-f"><span class="ws-bar-label">Désignation</span><input id="quo-materials-name" type="text" maxlength="120" required></label>
+                <label class="ws-mat-f"><span class="ws-bar-label">Désignation</span><input id="quo-materials-name" type="text" maxlength="120" list="quo-own-mats" autocomplete="off" required><datalist id="quo-own-mats"></datalist></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Quantité</span><input id="quo-materials-qty" type="text" inputmode="decimal"></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Unité</span><select id="quo-materials-unit"><option selected>pce</option><option>m²</option><option>ml</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>paquet</option><option>lot</option><option>sac</option><option>h</option><option>jour</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-materials-price-label">Prix unitaire</span><input id="quo-materials-price" type="text" inputmode="decimal"></label>
               </p>
+              <p class="muted" id="quo-materials-cur-note" hidden></p>
+              <p><label><input type="checkbox" id="quo-materials-save-own"> Sauvegarder</label></p>
+              <p class="muted" id="quo-materials-own-link" hidden><a href="/fr/mes-materiaux/">Mes matériaux</a>.</p>
               <p><button type="submit" class="btn btn-primary btn-sm">Ajouter un matériau</button><span class="muted" id="quo-materials-run"></span></p>
             </form>
           </section>
@@ -431,6 +434,7 @@
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Unité</span><select id="quo-labour-unit"><option>pce</option><option selected>m²</option><option>ml</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>paquet</option><option>lot</option><option>sac</option><option>h</option><option>jour</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-labour-price-label">Taux</span><input id="quo-labour-price" type="text" inputmode="decimal"></label>
               </p>
+              
               <p><button type="submit" class="btn btn-primary btn-sm">Ajouter de la main-d'œuvre</button><span class="muted" id="quo-labour-run"></span></p>
             </form>
             <p class="muted" id="quo-labour-full" hidden>Ce devis contient déjà toutes les lignes de main-d'œuvre possibles.</p>

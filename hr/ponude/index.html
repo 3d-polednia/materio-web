@@ -408,11 +408,14 @@
             <ul id="quo-own-material-list" class="data-list"></ul>
             <form id="quo-materials-form" data-quote-list="materials">
               <p class="ws-mat-grid">
-                <label class="ws-mat-f"><span class="ws-bar-label">Naziv</span><input id="quo-materials-name" type="text" maxlength="120" required></label>
+                <label class="ws-mat-f"><span class="ws-bar-label">Naziv</span><input id="quo-materials-name" type="text" maxlength="120" list="quo-own-mats" autocomplete="off" required><datalist id="quo-own-mats"></datalist></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Količina</span><input id="quo-materials-qty" type="text" inputmode="decimal"></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Jedinica</span><select id="quo-materials-unit"><option selected>kom.</option><option>m²</option><option>duž. m</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pak.</option><option>set</option><option>vreća</option><option>h</option><option>dan</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-materials-price-label">Jed. cijena</span><input id="quo-materials-price" type="text" inputmode="decimal"></label>
               </p>
+              <p class="muted" id="quo-materials-cur-note" hidden></p>
+              <p><label><input type="checkbox" id="quo-materials-save-own"> Spremi u moje materijale</label></p>
+              <p class="muted" id="quo-materials-own-link" hidden>Vlastite materijale dodajte u <a href="/hr/moji-materijali/">Moji materijali</a>.</p>
               <p><button type="submit" class="btn btn-primary btn-sm">Dodaj materijal</button><span class="muted" id="quo-materials-run"></span></p>
             </form>
           </section>
@@ -431,6 +434,7 @@
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Jedinica</span><select id="quo-labour-unit"><option>kom.</option><option selected>m²</option><option>duž. m</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pak.</option><option>set</option><option>vreća</option><option>h</option><option>dan</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-labour-price-label">Cijena</span><input id="quo-labour-price" type="text" inputmode="decimal"></label>
               </p>
+              
               <p><button type="submit" class="btn btn-primary btn-sm">Dodaj rad</button><span class="muted" id="quo-labour-run"></span></p>
             </form>
             <p class="muted" id="quo-labour-full" hidden>Ponuda već ima puni broj stavki rada.</p>

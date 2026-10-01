@@ -284,7 +284,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">Para qué sirve</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Revestimientos de paredes y suelos</option><option value="DRYWALL_BOARDING">Construcción con pladur</option><option value="COATING">Materiales que se aplican</option><option value="PANEL_CUTTING">Corte de tableros y planchas</option><option value="LINEAR_STOCK">Perfiles, molduras, tubos, barras</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Revestimientos de paredes y suelos</option><option value="DRYWALL_BOARDING">Construcción con pladur</option><option value="COATING">Materiales que se aplican</option><option value="PANEL_CUTTING">Corte de tableros y planchas</option><option value="LINEAR_STOCK">Perfiles, molduras, tubos, barras</option><option value="OTHER">Otros</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Categoría</span>
@@ -353,8 +353,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">Para qué sirve — descripción</span>
+              <input type="text" maxlength="80" placeholder="p. ej. puertas interiores, muebles de cocina" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Unidad</span>
+              <select data-omat-in="unit"><option selected>ud.</option><option>m²</option><option>m lineal</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>paq.</option><option>juego</option><option>saco</option><option>h</option><option>día</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Precio por envase</span>
+          <span class="fld-label" data-omat-price-label="pack">Precio por envase</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Precio por unidad</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Un precio mantiene la moneda en la que se escribió. No se convierte nada a ningún cambio.</p>
@@ -368,9 +379,14 @@
   <section class="block">
     <div class="wrap narrow">
       <h2>Tus materiales</h2>
+      <label class="field" data-omat-search-wrap hidden>
+        <span class="fld-label">Buscar en materiales</span>
+        <input type="search" data-omat-search aria-label="Buscar en materiales">
+      </label>
       
       <div data-omat-list data-hist-label="Historial de precios"></div>
       <p class="muted" data-omat-empty>Todavía no tienes materiales propios.</p>
+      <p class="muted" data-omat-search-none hidden>No se encontraron materiales coincidentes.</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">Un material de esta lista se elige en una calculadora igual que una entrada del catálogo.</p>
       <p class="muted">Los materiales forman parte de la cuenta y se sincronizan después de iniciar sesión.</p>

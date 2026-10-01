@@ -394,9 +394,33 @@ head("7. ten languages, with a row on the screen in each");
   }
 }
 
-/* ================================================================== 8. the widths */
+/* ================================================================== 8. OTHER and search */
 
-head("8. chapter XXVIII's widths");
+head("8. a general material and the live search");
+{
+  const page = await open(ctx, PL);
+  await page.selectOption('[data-omat-in="application"]', "OTHER");
+  check("OTHER shows its purpose", await page.locator('[data-omat-group="OTHER"] [data-omat-in="purpose"]').isVisible());
+  check("OTHER shows its unit", await page.locator('[data-omat-group="OTHER"] [data-omat-in="unit"]').isVisible());
+  check("OTHER hides measurements", !(await page.locator('[data-omat-group="WALL_FLOOR_COVERING"]').isVisible()));
+  check("OTHER uses the unit price label", await page.locator('[data-omat-price-label="unit"]').isVisible());
+  await addMaterial(page, { name: "Drzwi dębowe", application: "OTHER",
+    purpose: "Drzwi wewnętrzne", unit: "szt.", priceMajor: "1200" });
+  const first = await page.$eval("[data-omat-row]", (e) => e.textContent.replace(/\s+/g, " "));
+  check("the row shows the purpose", first.includes("Drzwi wewnętrzne"));
+  check("the row shows the price unit", first.includes("/ szt."));
+  for (let i = 0; i < 5; i++) await addMaterial(page, { name: `Materiał ${i}` });
+  check("search appears for six materials", await page.locator("[data-omat-search]").isVisible());
+  await page.fill("[data-omat-search]", "dębowe");
+  eq("search filters by name", (await names(page)).join(","), "Drzwi dębowe");
+  await page.fill("[data-omat-search]", "wewnętrzne");
+  eq("search filters by purpose", (await names(page)).join(","), "Drzwi dębowe");
+  await page.close();
+}
+
+/* ================================================================== 9. the widths */
+
+head("9. chapter XXVIII's widths");
 {
   const page = await open(ctx, PL);
   await addMaterial(page, { name: "Gres 60×60", packageAreaM2: "1,44", wastePercent: "7", priceMajor: "45,99" });

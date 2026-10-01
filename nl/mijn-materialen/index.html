@@ -284,7 +284,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">Waar het voor is</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Wand- en vloerbekleding</option><option value="DRYWALL_BOARDING">Gipswandbouw</option><option value="COATING">Materiaal dat je aanbrengt</option><option value="PANEL_CUTTING">Platen en panelen zagen</option><option value="LINEAR_STOCK">Profielen, lijsten, buizen, staven</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Wand- en vloerbekleding</option><option value="DRYWALL_BOARDING">Gipswandbouw</option><option value="COATING">Materiaal dat je aanbrengt</option><option value="PANEL_CUTTING">Platen en panelen zagen</option><option value="LINEAR_STOCK">Profielen, lijsten, buizen, staven</option><option value="OTHER">Overig</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Categorie</span>
@@ -353,8 +353,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">Waarvoor het dient — beschrijving</span>
+              <input type="text" maxlength="80" placeholder="bijv. binnendeuren, keukenmeubels" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Eenheid</span>
+              <select data-omat-in="unit"><option selected>st.</option><option>m²</option><option>lm</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pak</option><option>set</option><option>zak</option><option>uur</option><option>dag</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Prijs per verpakking</span>
+          <span class="fld-label" data-omat-price-label="pack">Prijs per verpakking</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Prijs per eenheid</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Een prijs houdt de valuta waarin hij is ingevuld. Er wordt niets tegen een koers omgerekend.</p>
@@ -368,9 +379,14 @@
   <section class="block">
     <div class="wrap narrow">
       <h2>Jouw materialen</h2>
+      <label class="field" data-omat-search-wrap hidden>
+        <span class="fld-label">Zoek in materialen</span>
+        <input type="search" data-omat-search aria-label="Zoek in materialen">
+      </label>
       
       <div data-omat-list data-hist-label="Prijsgeschiedenis"></div>
       <p class="muted" data-omat-empty>Je hebt nog geen eigen materialen.</p>
+      <p class="muted" data-omat-search-none hidden>Geen overeenkomende materialen gevonden.</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">Een materiaal uit deze lijst kies je in een rekenmachine net als een regel uit de catalogus.</p>
       <p class="muted">Materialen horen bij je account en synchroniseren nadat je inlogt.</p>

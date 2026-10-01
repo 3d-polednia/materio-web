@@ -2386,7 +2386,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">K čemu slouží</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Obklady stěn a podlah</option><option value="DRYWALL_BOARDING">Sádrokartonové konstrukce</option><option value="COATING">Krycí materiály</option><option value="PANEL_CUTTING">Nářez desek a archů</option><option value="LINEAR_STOCK">Profily, lišty, trubky, tyče</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Obklady stěn a podlah</option><option value="DRYWALL_BOARDING">Sádrokartonové konstrukce</option><option value="COATING">Krycí materiály</option><option value="PANEL_CUTTING">Nářez desek a archů</option><option value="LINEAR_STOCK">Profily, lišty, trubky, tyče</option><option value="OTHER">Ostatní</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Kategorie</span>
@@ -2455,8 +2455,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">K čemu slouží — popis</span>
+              <input type="text" maxlength="80" placeholder="např. interiérové dveře, kuchyňský nábytek" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Jednotka</span>
+              <select data-omat-in="unit"><option selected>ks</option><option>m²</option><option>bm</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>bal.</option><option>sada</option><option>pytel</option><option>hod.</option><option>den</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Cena za balení</span>
+          <span class="fld-label" data-omat-price-label="pack">Cena za balení</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Cena za jednotku</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Cena si drží měnu, ve které byla zadána. Nic se nepřepočítává kurzem.</p>

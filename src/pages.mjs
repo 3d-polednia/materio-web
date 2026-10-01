@@ -2249,13 +2249,17 @@ export function quotesMain(lang, t, features, stamp = "") {
   // One form for both lists; only the two words that differ between a material and a
   // piece of work are chosen by the list ("Nazwa"/"Praca", "Cena jedn."/"Stawka").
   const quoteUnits = t("quo_units").split("|").filter(Boolean);
+  const quoteOwnLink = t("quo_mat_own_link").split("{link}");
   const quoteLineForm = (kind, title) => `<form id="quo-${kind}-form" data-quote-list="${kind}">
               <p class="ws-mat-grid">
-                <label class="ws-mat-f"><span class="ws-bar-label">${esc(t(kind === "materials" ? "quo_mat_line_name" : "quo_labour_name"))}</span><input id="quo-${kind}-name" type="text" maxlength="120" required></label>
+                <label class="ws-mat-f"><span class="ws-bar-label">${esc(t(kind === "materials" ? "quo_mat_line_name" : "quo_labour_name"))}</span><input id="quo-${kind}-name" type="text" maxlength="120"${kind === "materials" ? ' list="quo-own-mats" autocomplete="off"' : ""} required>${kind === "materials" ? '<datalist id="quo-own-mats"></datalist>' : ""}</label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">${esc(t("quo_labour_qty"))}</span><input id="quo-${kind}-qty" type="text" inputmode="decimal"></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">${esc(t("quo_labour_unit"))}</span><select id="quo-${kind}-unit">${quoteUnits.map((unit, index) => `<option${index === (kind === "labour" ? 1 : 0) ? " selected" : ""}>${esc(unit)}</option>`).join("")}</select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-${kind}-price-label">${esc(t(kind === "materials" ? "quo_mat_line_price" : "quo_labour_price"))}</span><input id="quo-${kind}-price" type="text" inputmode="decimal"></label>
               </p>
+              ${kind === "materials" ? `<p class="muted" id="quo-materials-cur-note" hidden></p>
+              <p><label><input type="checkbox" id="quo-materials-save-own"> ${esc(t("quo_mat_save_own"))}</label></p>
+              <p class="muted" id="quo-materials-own-link" hidden>${esc(quoteOwnLink[0] || "")}<a href="${urlOwnMaterials(lang)}">${esc(t("omatpage_title"))}</a>${esc(quoteOwnLink[1] || "")}</p>` : ""}
               <p><button type="submit" class="btn btn-primary btn-sm">${esc(title)}</button><span class="muted" id="quo-${kind}-run"></span></p>
             </form>`;
 
@@ -2750,9 +2754,8 @@ export function storesMain(lang, t) {
 /* ------------------------------------------------------------------ /moje-materialy/ */
 
 /**
- * The five applications, their labels and the fields each one uses. The ids are the
- * app's own MaterialApplication names — the wire carries the enum name, so a sixth
- * invented here would reach the phone as whatever its fallback is.
+ * Six applications. Android currently reads the web-only OTHER value as
+ * WALL_FLOOR_COVERING; that is accepted while this capability remains web-only.
  */
 const OMAT_APPS = [
   ["WALL_FLOOR_COVERING", ["widthMm", "lengthMm", "packageAreaM2", "wastePercent"]],
@@ -2760,6 +2763,7 @@ const OMAT_APPS = [
   ["COATING", ["coveragePerUnitM2"]],
   ["PANEL_CUTTING", ["widthMm", "lengthMm", "kerfMm"]],
   ["LINEAR_STOCK", ["lengthMm", "kerfMm"]],
+  ["OTHER", []],
 ];
 
 /**
@@ -2786,7 +2790,14 @@ function omatForm(t, aisles, c, heading = false) {
   // One group per application, all in the document, all but the first hidden.
   const groups = OMAT_APPS.map(([id, fields], i) =>
     `<div class="omat-fields" data-omat-group="${esc(id)}"${i === 0 ? "" : " hidden"}>
-            ${fields.map(measureField).join("\n            ")}
+            ${id === "OTHER" ? `<label class="field omat-f">
+              <span class="fld-label">${esc(c("omat_purpose"))}</span>
+              <input type="text" maxlength="80" placeholder="${esc(c("omat_purpose_ph"))}" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">${esc(c("omat_unit"))}</span>
+              <select data-omat-in="unit">${t("quo_units").split("|").filter(Boolean).map((unit, index) => `<option${index === 0 ? " selected" : ""}>${esc(unit)}</option>`).join("")}</select>
+            </label>` : fields.map(measureField).join("\n            ")}
           </div>`).join("\n          ");
 
   return `<form class="card omat-form" data-omat-form>
@@ -2809,7 +2820,8 @@ function omatForm(t, aisles, c, heading = false) {
         </div>
         ${groups}
         <label class="field">
-          <span class="fld-label">${esc(c("omat_price"))}</span>
+          <span class="fld-label" data-omat-price-label="pack">${esc(c("omat_price"))}</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>${esc(c("omat_price_unit"))}</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">${esc(c("omat_cur_note"))}</p>
@@ -2832,7 +2844,7 @@ function omatForm(t, aisles, c, heading = false) {
  * whose whole body is written at runtime says nothing to a crawler or to somebody with no
  * JavaScript.
  *
- * The five field groups are all in the document at once and the script shows the one the
+ * The six field groups are all in the document at once and the script shows the one the
  * chosen application uses. There are eleven inputs between them and only the six that
  * apply are ever read: `omMeasures()` in the store nulls out the rest, so a covering
  * turned into a profile cannot keep a package area nothing will read.
@@ -2863,12 +2875,17 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
   <section class="block">
     <div class="wrap narrow">
       <h2>${esc(c("omat_list_t"))}</h2>
+      <label class="field" data-omat-search-wrap hidden>
+        <span class="fld-label">${esc(c("omat_search"))}</span>
+        <input type="search" data-omat-search aria-label="${esc(c("omat_search"))}">
+      </label>
       <!-- The list is this browser's own rows, so it is written at runtime. The empty
            state ships in the markup rather than being created later: a heading a script
            fills either ships with the text the script would use, or it is an empty
            heading somebody can reach. -->
       <div data-omat-list data-hist-label="${esc(c("omat_hist_t"))}"></div>
       <p class="muted" data-omat-empty>${esc(t("omat_empty"))}</p>
+      <p class="muted" data-omat-search-none hidden>${esc(c("omat_search_none"))}</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">${esc(c("omat_use_note"))}</p>
       <p class="muted">${esc(c("omat_sync_note"))}</p>

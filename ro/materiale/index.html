@@ -2386,7 +2386,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">La ce folosește</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Placări de pereți și pardoseli</option><option value="DRYWALL_BOARDING">Construcții din gips-carton</option><option value="COATING">Materiale de acoperire</option><option value="PANEL_CUTTING">Debitare de plăci și coli</option><option value="LINEAR_STOCK">Profile, baghete, țevi, bare</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Placări de pereți și pardoseli</option><option value="DRYWALL_BOARDING">Construcții din gips-carton</option><option value="COATING">Materiale de acoperire</option><option value="PANEL_CUTTING">Debitare de plăci și coli</option><option value="LINEAR_STOCK">Profile, baghete, țevi, bare</option><option value="OTHER">Altele</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Categorie</span>
@@ -2455,8 +2455,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">La ce se folosește — descriere</span>
+              <input type="text" maxlength="80" placeholder="de ex. uși de interior, mobilier de bucătărie" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Unitate</span>
+              <select data-omat-in="unit"><option selected>buc.</option><option>m²</option><option>ml</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pachet</option><option>set</option><option>sac</option><option>h</option><option>zi</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Preț pe ambalaj</span>
+          <span class="fld-label" data-omat-price-label="pack">Preț pe ambalaj</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Preț pe unitate</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Un preț păstrează moneda în care a fost introdus. Nimic nu este convertit la cursul zilei.</p>

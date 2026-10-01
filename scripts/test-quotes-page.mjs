@@ -197,6 +197,7 @@ async function open(ctx, url, opts = {}) {
   const plant = { "materio-lang": opts.lang === undefined ? "pl" : opts.lang };
   if (opts.workspace) plant["materio-workspace-v1"] = JSON.stringify(opts.workspace);
   if (opts.crm) plant["liczmat-crm-v1"] = JSON.stringify(opts.crm);
+  if (opts.materials) plant["liczmat-materials-v1"] = JSON.stringify(opts.materials);
   if (opts.currency) plant["liczmat-currency"] = opts.currency;
   if (opts.level) plant["liczmat-signed-in"] = opts.level;
   /* Session 27 put a paywall in front of the Pro modules, and session 28 removed the
@@ -1111,9 +1112,57 @@ head("7i. VAT rates follow the page language and preserve custom or foreign rate
   await de.close();
 }
 
-/* ---------------------------------------------------- 8. no JavaScript */
+/* ---------------------------------------------------- 8. own materials */
 
-head("8. with JavaScript off the page is still an honest page");
+head("8. own materials in a quote");
+{
+  const own = { materials: [{
+    id: "m1", name: "Drzwi dębowe", category: "OTHER", application: "OTHER",
+    purpose: "Drzwi wewnętrzne", unit: "szt.", widthMm: null, lengthMm: null,
+    kerfMm: null, coveragePerUnitM2: null, packageAreaM2: null, wastePercent: null,
+    priceMinor: 120000, currencyCode: "PLN", priceUpdatedAt: T0, prices: [], ...sync(T0),
+  }] };
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm(), materials: own });
+  eq("the datalist contains the own material", await page.$eval("#quo-own-mats option", (o) => o.value), "Drzwi dębowe");
+  await page.fill("#quo-materials-name", "Drzwi dębowe");
+  eq("an exact match fills the unit", await page.inputValue("#quo-materials-unit"), "szt.");
+  eq("an exact match fills the price", await page.inputValue("#quo-materials-price"), "1200");
+  check("an exact match hides save-own", !(await page.locator("#quo-materials-save-own").isVisible()));
+  await page.close();
+
+  const foreign = crm();
+  foreign.quotes[0] = { ...foreign.quotes[0], currencyCode: "EUR" };
+  const euro = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: foreign, materials: own });
+  await euro.fill("#quo-materials-name", "Drzwi dębowe");
+  eq("a different currency leaves price empty", await euro.inputValue("#quo-materials-price"), "");
+  check("a different currency shows its code", (await euro.textContent("#quo-materials-cur-note")).includes("PLN"));
+  await euro.close();
+
+  // A quote with no money yet takes the visitor's currency on its first line, so a złoty
+  // price must not be copied into it while the visitor works in euro.
+  const blank = crm();
+  blank.quotes[0] = { ...blank.quotes[0], currencyCode: "" };
+  const fresh = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: blank, materials: own, currency: "EUR" });
+  await fresh.fill("#quo-materials-name", "Drzwi dębowe");
+  eq("an unpriced quote in EUR does not take a PLN price", await fresh.inputValue("#quo-materials-price"), "");
+  await fresh.close();
+
+  const add =await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  await add.fill("#quo-materials-name", "Klamka");
+  await add.selectOption("#quo-materials-unit", "szt.");
+  await add.fill("#quo-materials-price", "55,50");
+  await add.check("#quo-materials-save-own");
+  await add.click("#quo-materials-form button[type=submit]");
+  const saved = await add.evaluate(() => JSON.parse(localStorage.getItem("liczmat-materials-v1")).materials[0]);
+  eq("the checkbox saves an OTHER material", saved.application, "OTHER");
+  eq("the saved material keeps the quote unit", saved.unit, "szt.");
+  eq("the saved material keeps the price", saved.priceMinor, 5550);
+  await add.close();
+}
+
+/* ---------------------------------------------------- 9. no JavaScript */
+
+head("9. with JavaScript off the page is still an honest page");
 {
   const noJs = await context({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
   const page = await noJs.newPage();

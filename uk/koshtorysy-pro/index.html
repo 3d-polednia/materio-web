@@ -408,11 +408,14 @@
             <ul id="quo-own-material-list" class="data-list"></ul>
             <form id="quo-materials-form" data-quote-list="materials">
               <p class="ws-mat-grid">
-                <label class="ws-mat-f"><span class="ws-bar-label">Назва</span><input id="quo-materials-name" type="text" maxlength="120" required></label>
+                <label class="ws-mat-f"><span class="ws-bar-label">Назва</span><input id="quo-materials-name" type="text" maxlength="120" list="quo-own-mats" autocomplete="off" required><datalist id="quo-own-mats"></datalist></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Кількість</span><input id="quo-materials-qty" type="text" inputmode="decimal"></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Одиниця</span><select id="quo-materials-unit"><option selected>шт.</option><option>м²</option><option>пог. м</option><option>м³</option><option>кг</option><option>т</option><option>л</option><option>упак.</option><option>компл.</option><option>мішок</option><option>год.</option><option>день</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-materials-price-label">Ціна за од.</span><input id="quo-materials-price" type="text" inputmode="decimal"></label>
               </p>
+              <p class="muted" id="quo-materials-cur-note" hidden></p>
+              <p><label><input type="checkbox" id="quo-materials-save-own"> Зберегти в моїх матеріалах</label></p>
+              <p class="muted" id="quo-materials-own-link" hidden>Додайте свої матеріали в розділі <a href="/uk/moyi-materialy/">Мої матеріали</a>.</p>
               <p><button type="submit" class="btn btn-primary btn-sm">Додати матеріал</button><span class="muted" id="quo-materials-run"></span></p>
             </form>
           </section>
@@ -431,6 +434,7 @@
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Одиниця</span><select id="quo-labour-unit"><option>шт.</option><option selected>м²</option><option>пог. м</option><option>м³</option><option>кг</option><option>т</option><option>л</option><option>упак.</option><option>компл.</option><option>мішок</option><option>год.</option><option>день</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-labour-price-label">Ставка</span><input id="quo-labour-price" type="text" inputmode="decimal"></label>
               </p>
+              
               <p><button type="submit" class="btn btn-primary btn-sm">Додати роботу</button><span class="muted" id="quo-labour-run"></span></p>
             </form>
             <p class="muted" id="quo-labour-full" hidden>Кошторис уже має повний набір позицій роботи.</p>

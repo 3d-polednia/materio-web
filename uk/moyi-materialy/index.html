@@ -284,7 +284,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">Для чого він</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Покриття стін і підлог</option><option value="DRYWALL_BOARDING">Зашивка гіпсокартоном</option><option value="COATING">Покривні матеріали</option><option value="PANEL_CUTTING">Розкрій плит і аркушів</option><option value="LINEAR_STOCK">Профілі, планки, труби, прути</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Покриття стін і підлог</option><option value="DRYWALL_BOARDING">Зашивка гіпсокартоном</option><option value="COATING">Покривні матеріали</option><option value="PANEL_CUTTING">Розкрій плит і аркушів</option><option value="LINEAR_STOCK">Профілі, планки, труби, прути</option><option value="OTHER">Інше</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Категорія</span>
@@ -353,8 +353,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">Для чого призначено — опис</span>
+              <input type="text" maxlength="80" placeholder="напр. міжкімнатні двері, кухонні меблі" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Одиниця</span>
+              <select data-omat-in="unit"><option selected>шт.</option><option>м²</option><option>пог. м</option><option>м³</option><option>кг</option><option>т</option><option>л</option><option>упак.</option><option>компл.</option><option>мішок</option><option>год.</option><option>день</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Ціна за упаковку</span>
+          <span class="fld-label" data-omat-price-label="pack">Ціна за упаковку</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Ціна за одиницю</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Ціна тримає валюту, у якій її внесли. Нічого не перераховується за курсом.</p>
@@ -368,9 +379,14 @@
   <section class="block">
     <div class="wrap narrow">
       <h2>Ваші матеріали</h2>
+      <label class="field" data-omat-search-wrap hidden>
+        <span class="fld-label">Пошук у матеріалах</span>
+        <input type="search" data-omat-search aria-label="Пошук у матеріалах">
+      </label>
       
       <div data-omat-list data-hist-label="Історія цін"></div>
       <p class="muted" data-omat-empty>Власних матеріалів ще немає.</p>
+      <p class="muted" data-omat-search-none hidden>Відповідних матеріалів не знайдено.</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">Матеріал із цього списку обирають у калькуляторі так само, як позицію з каталогу.</p>
       <p class="muted">Матеріали є частиною акаунта й синхронізуються після входу.</p>

@@ -3,7 +3,7 @@
  * The store is assets/own-materials.js and is loaded before this file; every name here
  * starts `omu`, because these are plain scripts in one global scope.
  *
- * The whole frame — the form, its five field groups, the headings, the two notes — is in
+ * The whole frame — the form, its six field groups, the headings, the two notes — is in
  * the markup the build wrote, in that page's own language. This file unhides, fills and
  * wires. It creates one kind of element, the list row, because a list of this browser's
  * own rows cannot be server-rendered by a static site.
@@ -42,9 +42,9 @@ let omuUndone = null;
 /* ------------------------------------------------------------------ the form */
 
 /**
- * Show the field group the chosen application uses and hide the other four.
+ * Show the field group the chosen application uses and hide the other five.
  *
- * All five are in the document, so nothing is created and nothing flashes; what changes is
+ * All six are in the document, so nothing is created and nothing flashes; what changes is
  * `hidden`, which also takes the fields out of the accessibility tree and out of the tab
  * order. The inputs of a hidden group keep whatever was typed in them and the store
  * ignores it — `omMeasures()` reads only the fields the application declares.
@@ -52,6 +52,9 @@ let omuUndone = null;
 function omuShowGroup(form, application) {
   form.querySelectorAll("[data-omat-group]").forEach((g) => {
     g.hidden = g.dataset.omatGroup !== application;
+  });
+  form.querySelectorAll("[data-omat-price-label]").forEach((label) => {
+    label.hidden = label.dataset.omatPriceLabel !== (application === "OTHER" ? "unit" : "pack");
   });
 }
 
@@ -92,7 +95,8 @@ function omuPriceLine(m) {
     return `<span class="muted">${omuEsc(omuT("omat_price_none"))}</span>`;
   }
   const when = m.priceUpdatedAt ? ` <span class="muted">· ${omuEsc(omuDate(m.priceUpdatedAt))}</span>` : "";
-  return `<b>${omuEsc(omuMoney(m.priceMinor, m.currencyCode))}</b>${when}`;
+  const unit = m.unit ? ` / ${omuEsc(m.unit)}` : "";
+  return `<b>${omuEsc(omuMoney(m.priceMinor, m.currencyCode))}${unit}</b>${when}`;
 }
 
 /**
@@ -128,12 +132,12 @@ function omuHistory(id) {
 /**
  * The words the BUILD wrote, read back out of the page.
  *
- * The five application names and the six measurement labels live in src/omat-copy.mjs and
+ * The six application names and the six measurement labels live in src/omat-copy.mjs and
  * are therefore not in the dictionary bundle — that is the point of the module. A script
  * that called t("omat_app_WALL_FLOOR_COVERING") prints the key, which is session 41's
  * defect with a new name and is exactly what the first browser run of this screen showed.
  *
- * They are already on the page in this page's language: the five as the options of the
+ * They are already on the page in this page's language: the six as the options of the
  * form's own <select>, the six as the labels above the fields. Reading them from there
  * keeps one source rather than adding a second copy to a bundle every page downloads.
  */
@@ -173,9 +177,10 @@ function omuHistLabel() {
 
 /** One material: what it is, what it costs, its history, and the two things you can do to it. */
 function omuRow(m) {
+  const description = m.application === "OTHER" ? (m.purpose || omuAppLabel("OTHER")) : omuAppLabel(m.application);
   return `<article class="card omat-row hierarchy-l1" data-omat-row="${omuEsc(m.id)}">
     <h3>${omuEsc(m.name)}</h3>
-    <p class="muted">${omuEsc(omuAppLabel(m.application))}</p>
+    <p class="muted">${omuEsc(description)}</p>
     <p class="muted omat-spec">${omuEsc(omuSpec(m))}</p>
     <p class="omat-price">${omuPriceLine(m)}</p>
     ${omuTrendLine(m.id)}
@@ -202,9 +207,19 @@ function omuRender() {
   const list = document.querySelector("[data-omat-list]");
   if (!list) return;
   const rows = omMaterials();
-  list.innerHTML = rows.map(omuRow).join("");
+  const search = document.querySelector("[data-omat-search]");
+  // The box only shows from six rows up; below that a leftover query must not hide rows
+  // behind a field nobody can see.
+  const query = search && rows.length >= 6 ? search.value.trim().toLocaleLowerCase(omuLang()) : "";
+  const shown = query ? rows.filter((m) => `${m.name || ""} ${m.purpose || ""}`
+    .toLocaleLowerCase(omuLang()).includes(query)) : rows;
+  list.innerHTML = shown.map(omuRow).join("");
   const empty = document.querySelector("[data-omat-empty]");
   if (empty) empty.hidden = rows.length > 0;
+  const searchWrap = document.querySelector("[data-omat-search-wrap]");
+  if (searchWrap) searchWrap.hidden = rows.length < 6;
+  const noMatch = document.querySelector("[data-omat-search-none]");
+  if (noMatch) noMatch.hidden = !query || shown.length > 0 || rows.length === 0;
   omuRenderUndo();
 }
 
@@ -227,8 +242,17 @@ function omuInit() {
   const appSelect = form.querySelector('[data-omat-in="application"]');
   if (appSelect) {
     omuShowGroup(form, appSelect.value);
-    appSelect.addEventListener("change", () => omuShowGroup(form, appSelect.value));
+    appSelect.addEventListener("change", () => {
+      omuShowGroup(form, appSelect.value);
+      // Doors or a kitchen cabinet are not "Płytki i gres": "Pozostałe" lands in the
+      // catalogue's own OTHER aisle unless somebody picks another one afterwards.
+      const cat = form.querySelector('[data-omat-in="category"]');
+      if (appSelect.value === "OTHER" && cat && cat.querySelector('option[value="OTHER"]')) cat.value = "OTHER";
+    });
   }
+
+  const search = document.querySelector("[data-omat-search]");
+  if (search) search.addEventListener("input", omuRender);
 
   const err = form.querySelector("[data-omat-err]");
   form.addEventListener("submit", (e) => {

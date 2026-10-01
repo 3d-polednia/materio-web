@@ -32,6 +32,8 @@ const OM_SCHEMA = 1;
 
 /** The contract's caps, and the ones `validMaterial()` enforces. */
 const OM_MAX_NAME = 120;
+const OM_MAX_PURPOSE = 80;
+const OM_MAX_UNIT = 16;
 /**
  * How many price points one material keeps. `SyncContract.MAX_PRICE_POINTS` on the phone and
  * `d.prices.size() <= 60` in the deployed rules — a browser that kept more would have its
@@ -40,9 +42,9 @@ const OM_MAX_NAME = 120;
 const OM_MAX_PRICE_POINTS = 60;
 
 /**
- * The five things a material can be, and they are the app's own `MaterialApplication` names
- * — the wire carries the enum name, so inventing a sixth here would reach the phone as
- * whatever its fallback is. Each one names the fields it uses and the site-side `kind` the
+ * Six applications. The first five are the app's own `MaterialApplication` names. Android
+ * currently reads the web-only OTHER value as WALL_FLOOR_COVERING; that is accepted while
+ * this capability remains web-only. Each one names the fields it uses and the site-side `kind` the
  * catalogue already speaks, which is what lets an own material fill a calculator through
  * exactly the machinery a bundled one does.
  */
@@ -52,6 +54,7 @@ const OM_APPLICATIONS = [
   { id: "COATING", kind: "pack", fields: ["coveragePerUnitM2"] },
   { id: "PANEL_CUTTING", kind: "sheet", fields: ["widthMm", "lengthMm", "kerfMm"] },
   { id: "LINEAR_STOCK", kind: "bar", fields: ["lengthMm", "kerfMm"] },
+  { id: "OTHER", kind: "other", fields: [] },
 ];
 
 /** The application a name stands for, or the commonest of the five — never null. */
@@ -258,6 +261,8 @@ function omAdd(fields) {
     name,
     category: omText(fields.category, 40) || "OTHER",
     application,
+    purpose: application === "OTHER" ? omText(fields.purpose, OM_MAX_PURPOSE) : "",
+    unit: application === "OTHER" ? omText(fields.unit, OM_MAX_UNIT) : "",
     ...omMeasures(application, fields),
     priceMinor,
     // Chapter VI: an amount keeps the currency it was priced in, and a material nobody has
@@ -298,6 +303,10 @@ function omUpdate(id, fields) {
   const application = fields.application !== undefined ? omApplication(fields.application).id : m.application;
   const measures = omMeasures(application, { ...m, ...fields });
   m.application = application;
+  m.purpose = application === "OTHER"
+    ? omText(fields.purpose !== undefined ? fields.purpose : m.purpose, OM_MAX_PURPOSE) : "";
+  m.unit = application === "OTHER"
+    ? omText(fields.unit !== undefined ? fields.unit : m.unit, OM_MAX_UNIT) : "";
   Object.assign(m, measures);
   m.updatedAt = Date.now();
   if (!omSave(data)) return null;
@@ -432,6 +441,7 @@ function omImport(incoming) {
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
-    OM_KEY, OM_SCHEMA, OM_MAX_NAME, OM_MAX_PRICE_POINTS, OM_APPLICATIONS, OM_MEASURES,
+    OM_KEY, OM_SCHEMA, OM_MAX_NAME, OM_MAX_PURPOSE, OM_MAX_UNIT, OM_MAX_PRICE_POINTS,
+    OM_APPLICATIONS, OM_MEASURES,
   };
 }

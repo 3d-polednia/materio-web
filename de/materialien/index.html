@@ -2386,7 +2386,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">Wofür es ist</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Wand- und Bodenbeläge</option><option value="DRYWALL_BOARDING">Trockenbau mit Gipsplatten</option><option value="COATING">Deckende Materialien</option><option value="PANEL_CUTTING">Zuschnitt von Platten</option><option value="LINEAR_STOCK">Profile, Leisten, Rohre, Stäbe</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Wand- und Bodenbeläge</option><option value="DRYWALL_BOARDING">Trockenbau mit Gipsplatten</option><option value="COATING">Deckende Materialien</option><option value="PANEL_CUTTING">Zuschnitt von Platten</option><option value="LINEAR_STOCK">Profile, Leisten, Rohre, Stäbe</option><option value="OTHER">Sonstiges</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Kategorie</span>
@@ -2455,8 +2455,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">Verwendungszweck — Beschreibung</span>
+              <input type="text" maxlength="80" placeholder="z. B. Innentüren, Küchenmöbel" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Einheit</span>
+              <select data-omat-in="unit"><option selected>Stk.</option><option>m²</option><option>lfm</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>Pck.</option><option>Set</option><option>Sack</option><option>Std.</option><option>Tag</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Preis je Gebinde</span>
+          <span class="fld-label" data-omat-price-label="pack">Preis je Gebinde</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Preis je Einheit</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Ein Preis behält die Währung, in der er eingetragen wurde. Nichts wird zum Kurs umgerechnet.</p>

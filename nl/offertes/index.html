@@ -408,11 +408,14 @@
             <ul id="quo-own-material-list" class="data-list"></ul>
             <form id="quo-materials-form" data-quote-list="materials">
               <p class="ws-mat-grid">
-                <label class="ws-mat-f"><span class="ws-bar-label">Naam</span><input id="quo-materials-name" type="text" maxlength="120" required></label>
+                <label class="ws-mat-f"><span class="ws-bar-label">Naam</span><input id="quo-materials-name" type="text" maxlength="120" list="quo-own-mats" autocomplete="off" required><datalist id="quo-own-mats"></datalist></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Aantal</span><input id="quo-materials-qty" type="text" inputmode="decimal"></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Eenheid</span><select id="quo-materials-unit"><option selected>st.</option><option>m²</option><option>lm</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pak</option><option>set</option><option>zak</option><option>uur</option><option>dag</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-materials-price-label">Stukprijs</span><input id="quo-materials-price" type="text" inputmode="decimal"></label>
               </p>
+              <p class="muted" id="quo-materials-cur-note" hidden></p>
+              <p><label><input type="checkbox" id="quo-materials-save-own"> Opslaan in mijn materialen</label></p>
+              <p class="muted" id="quo-materials-own-link" hidden>Voeg je eigen materialen toe in <a href="/nl/mijn-materialen/">Mijn materialen</a>.</p>
               <p><button type="submit" class="btn btn-primary btn-sm">Materiaal toevoegen</button><span class="muted" id="quo-materials-run"></span></p>
             </form>
           </section>
@@ -431,6 +434,7 @@
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Eenheid</span><select id="quo-labour-unit"><option>st.</option><option selected>m²</option><option>lm</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pak</option><option>set</option><option>zak</option><option>uur</option><option>dag</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-labour-price-label">Tarief</span><input id="quo-labour-price" type="text" inputmode="decimal"></label>
               </p>
+              
               <p><button type="submit" class="btn btn-primary btn-sm">Arbeid toevoegen</button><span class="muted" id="quo-labour-run"></span></p>
             </form>
             <p class="muted" id="quo-labour-full" hidden>Deze offerte bevat al het volledige aantal arbeidsregels.</p>

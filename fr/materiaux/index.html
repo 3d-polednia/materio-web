@@ -2386,7 +2386,7 @@
         <div class="omat-row">
           <label class="field">
             <span class="fld-label">À quoi il sert</span>
-            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Revêtements de murs et de sols</option><option value="DRYWALL_BOARDING">Construction en placo</option><option value="COATING">Matériaux que l'on applique</option><option value="PANEL_CUTTING">Découpe de panneaux et de plaques</option><option value="LINEAR_STOCK">Profilés, moulures, tubes, barres</option></select>
+            <select data-omat-in="application"><option value="WALL_FLOOR_COVERING" selected>Revêtements de murs et de sols</option><option value="DRYWALL_BOARDING">Construction en placo</option><option value="COATING">Matériaux que l'on applique</option><option value="PANEL_CUTTING">Découpe de panneaux et de plaques</option><option value="LINEAR_STOCK">Profilés, moulures, tubes, barres</option><option value="OTHER">Autres</option></select>
           </label>
           <label class="field">
             <span class="fld-label">Catégorie</span>
@@ -2455,8 +2455,19 @@
               <input type="text" inputmode="decimal" data-omat-in="kerfMm">
             </label>
           </div>
+          <div class="omat-fields" data-omat-group="OTHER" hidden>
+            <label class="field omat-f">
+              <span class="fld-label">À quoi il sert — description</span>
+              <input type="text" maxlength="80" placeholder="p. ex. portes intérieures, meubles de cuisine" data-omat-in="purpose">
+            </label>
+            <label class="field omat-f">
+              <span class="fld-label">Unité</span>
+              <select data-omat-in="unit"><option selected>pce</option><option>m²</option><option>ml</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>paquet</option><option>lot</option><option>sac</option><option>h</option><option>jour</option></select>
+            </label>
+          </div>
         <label class="field">
-          <span class="fld-label">Prix par emballage</span>
+          <span class="fld-label" data-omat-price-label="pack">Prix par emballage</span>
+          <span class="fld-label" data-omat-price-label="unit" hidden>Prix par unité</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
         <p class="muted">Un prix garde la devise dans laquelle il a été saisi. Rien n'est converti à un taux.</p>
