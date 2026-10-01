@@ -10,10 +10,10 @@
    the light theme, isolating the document from dark mode inversions. A lime
    fill never appears on paper; it is reserved for lines.
    
-   Why is the footer fixed in print? In the print media query, position: fixed
-   keeps the footer nailed to the bottom of the viewport, which makes the
-   browser print the LiczMat branding line and QR code on every single page
-   of a multi-page quote. */
+   Why is the footer the table's <tfoot>? A table footer is repeated by the
+   browser on every printed sheet, so the LiczMat line and QR close every page
+   of a multi-page quote. It was position: fixed until 2026-10-01, when the
+   owner's Chrome print preview dropped it. */
 
 .qdoc {
   /* Local color tokens derived from the light theme in styles.css */
@@ -60,10 +60,6 @@
 
 .qdoc-print-wrap > tbody > tr > td {
   padding: 0;
-}
-
-.qdoc-foot-space {
-  height: 22mm;
 }
 
 /* Header Section */
@@ -341,9 +337,8 @@
 /* Footer Section */
 .qdoc-foot {
   border-top: 1px solid var(--qdoc-accent);
-  /* The footer must stay shorter than .qdoc-foot-space (22mm), the room the page keeps
-     free for it. At 4mm + a 16mm QR it measured 24mm and sat on the signature captions
-     of a 5 + 3 line quote with VAT (2026-09-30); 3mm + 14mm leaves it about 20mm. */
+  /* 3mm + a 14mm QR: at 4mm + 16mm (2026-09-30) a 5 + 3 line quote with VAT no longer
+     fitted one sheet. */
   padding-top: 3mm;
   display: flex;
   justify-content: space-between;
@@ -391,14 +386,6 @@
   margin-top: 2pt;
 }
 
-@media screen {
-  .qdoc-foot {
-    position: absolute;
-    bottom: 16mm;
-    left: 14mm;
-    right: 14mm;
-  }
-}
 
 /* Narrow screens logic for maximum 390px (and generally below 600px) */
 @media screen and (max-width: 600px) {
@@ -459,9 +446,6 @@
   .qdoc-foot-right {
     align-items: flex-start;
   }
-  .qdoc-foot-space {
-    display: none;
-  }
 }
 
 @media print {
@@ -487,9 +471,6 @@
   .qdoc-head-space {
     height: 12mm;
   }
-  .qdoc-foot-space {
-    height: 34mm;
-  }
   .qdoc-caption {
     margin-top: 6pt;
   }
@@ -504,11 +485,20 @@
     padding-top: 2pt;
     padding-bottom: 2pt;
   }
-  .qdoc-foot {
-    position: fixed;
-    bottom: 12mm;
-    left: 14mm;
-    right: 14mm;
+  /* Why the footer is the table's <tfoot> and not position: fixed (2026-10-01): in the
+     owner's Chrome print preview the fixed footer was simply not there, though every
+     headless print had it. A table footer is repeated on every sheet by the browser
+     itself. The table is one sheet tall, so on a one-page quote the footer sits at the
+     bottom of the paper; on a longer one it closes every sheet and follows the last row. */
+  .qdoc-print-wrap {
+    height: 296mm;
+  }
+  .qdoc-print-wrap > tbody > tr > td {
+    vertical-align: top;
+  }
+  .qdoc-foot-cell {
+    vertical-align: bottom;
+    padding: 3mm 0 10mm;
   }
 }
 
@@ -619,10 +609,7 @@ MARKUP SKELETON
       </td></tr>
     </tbody>
     <tfoot>
-      <tr><td><div class="qdoc-foot-space"></div></td></tr>
-    </tfoot>
-  </table>
-
+      <tr><td class="qdoc-foot-cell">
   <footer class="qdoc-foot">
     <div class="qdoc-foot-left">
       <img src="logo-mark.svg" alt="LiczMat" class="qdoc-foot-mark">
@@ -636,5 +623,8 @@ MARKUP SKELETON
       <div class="qdoc-qr-caption">liczmat.com</div>
     </div>
   </footer>
+      </td></tr>
+    </tfoot>
+  </table>
 </article>
 */

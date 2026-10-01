@@ -527,7 +527,20 @@ function pdfInit() {
       if (fallbackHide) { clearTimeout(fallbackHide); fallbackHide = 0; }
     };
     window.addEventListener("afterprint", done);
-    window.print();
+    // The owner's quote (2026-10-01) printed an empty logo box: the logo's data URL is set a
+    // moment before print() and the dialog took its picture before it was decoded. A quote
+    // waits for its images (at most 1.5 s), then two frames, then asks for the dialog.
+    if (!form.hasAttribute("data-pdf-quote")) { window.print(); } else {
+      const images = [...doc.querySelectorAll("img")].filter((img) => img.getAttribute("src"));
+      const ready = Promise.all(images.map((img) => (img.decode ? img.decode() : Promise.resolve()).catch(() => {})));
+      const cap = new Promise((resolve) => window.setTimeout(resolve, 1500));
+      const frame = () => new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
+      Promise.race([ready, cap]).then(frame).then(frame).then(() => {
+        window.print();
+        fallbackHide = window.setTimeout(done, 1000);
+      });
+      return;
+    }
     // Some browsers never fire afterprint (and older ones fire it before the dialog is
     // dismissed). The page must not be left with everything but the document hidden, so
     // the cleanup also runs on its own.

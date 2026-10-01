@@ -1440,8 +1440,7 @@ function quotePdfBlock(lang, t, features, stamp = "") {
                     <tr class="qdoc-total"><th scope="row" data-pdf="totalLabel" data-label="${esc(c("qdoc_total"))}">${esc(c("qdoc_total"))}</th><td class="qdoc-num" data-pdf="total"></td></tr>
                   </tbody></table></div>
                   <div class="qdoc-sign"><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">${esc(c("qdoc_contractor"))}</div></div><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">${esc(c("qdoc_customer"))}</div></div></div>
-                </div></td></tr></tbody><tfoot><tr><td><div class="qdoc-foot-space"></div></td></tr></tfoot></table>
-                <footer class="qdoc-foot"><div class="qdoc-foot-left"><img src="${asset("logo-mark.svg")}" alt="LiczMat" class="qdoc-foot-mark" width="24" height="24" decoding="async" loading="eager"><div class="qdoc-foot-text"><div class="qdoc-foot-primary">${esc(c("qdoc_footer_primary"))}</div><div class="qdoc-foot-secondary">${esc(c("qdoc_footer_secondary"))}</div></div></div><div class="qdoc-foot-right"><img src="${asset("qr-liczmat.svg")}" alt="${esc(c("qdoc_qr_alt"))}" class="qdoc-qr" width="60" height="60" decoding="async" loading="eager"><div class="qdoc-qr-caption">liczmat.com</div></div></footer>
+                </div></td></tr></tbody><tfoot><tr><td class="qdoc-foot-cell"><footer class="qdoc-foot"><div class="qdoc-foot-left"><img src="${asset("logo-mark.svg")}" alt="LiczMat" class="qdoc-foot-mark" width="24" height="24" decoding="async" loading="eager"><div class="qdoc-foot-text"><div class="qdoc-foot-primary">${esc(c("qdoc_footer_primary"))}</div><div class="qdoc-foot-secondary">${esc(c("qdoc_footer_secondary"))}</div></div></div><div class="qdoc-foot-right"><img src="${asset("qr-liczmat.svg")}" alt="${esc(c("qdoc_qr_alt"))}" class="qdoc-qr" width="60" height="60" decoding="async" loading="eager"><div class="qdoc-qr-caption">liczmat.com</div></div></footer></td></tr></tfoot></table>
               </article>
             </div>
           </section>`;
@@ -1949,7 +1948,7 @@ export function companyMain(lang, t, features) {
     ["city", "company_city", "text", "120", "address-level2"],
     ["phone", "company_phone", "tel", "200", "tel"],
     ["email", "company_email", "email", "200", "email"],
-    ["www", "company_www", "url", "200", "url"],
+    ["www", "company_www", "text", "200", "url"],
     ["bankAccount", "company_bank", "text", "40", "off"],
   ];
   const main = `<main id="main" tabindex="-1">

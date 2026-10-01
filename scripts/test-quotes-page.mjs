@@ -770,13 +770,21 @@ head("7f. the client quote prints as one complete page");
   });
   await page.evaluate(() => {
     window.__printed = 0;
-    window.print = () => { window.__printed++; };
+    window.print = () => {
+      window.__printed++;
+      // What the dialog would take its picture of: every image of the document decoded.
+      window.__imagesReady = [...document.querySelectorAll("#ws-pdf-doc img")]
+        .filter((img) => img.getAttribute("src")).every((img) => img.complete && img.naturalWidth > 0);
+    };
     // Keep the synthetic print open while Chromium renders it. A real print() blocks
     // until its dialog closes; the stub returns immediately and would arm the safety timer.
     window.setTimeout = () => 0;
   });
   await page.evaluate(() => document.getElementById("ws-pdf-form").requestSubmit());
+  // The quote waits for its images and two frames before it asks for the dialog.
+  await page.waitForFunction(() => window.__printed > 0, null, { timeout: 5000 }).catch(() => {});
   eq("the quote calls print once", await page.evaluate(() => window.__printed), 1);
+  eq("the logo, mark and QR are decoded before the dialog opens", await page.evaluate(() => window.__imagesReady), true);
   const text = await page.$eval("#ws-pdf-doc", (n) => n.textContent.replace(/\s+/g, " ").trim());
   check("the contractor's company name is printed", text.includes("Firma testowa"), text);
   check("the company logo image is filled", await page.$eval('[data-pdf="companyLogo"]',
@@ -843,23 +851,25 @@ head("7f. the client quote prints as one complete page");
     await page.$eval('[data-pdf-row="quoteNumber"]', (row) => row.hidden)
       && !(await page.textContent('[data-pdf="quoteNumber"]')).includes("Łazienka"));
   await page.emulateMedia({ media: "print" });
-  // The footer is fixed to the bottom of every sheet; the room kept free for it has to be
-  // taller, or it is printed over the signatures.
-  // The footer sits 12mm above the sheet's edge, so the room is its height plus those 12mm.
-  check("the printed footer is shorter than the room kept for it", await page.$eval("#ws-pdf-doc",
-    (doc) => doc.querySelector(".qdoc-foot").offsetHeight + 12 * 96 / 25.4
-      < doc.querySelector(".qdoc-foot-space").offsetHeight));
+  // The footer is the print table's <tfoot>, which the browser repeats on every sheet. As
+  // position: fixed it vanished from the owner's Chrome print preview (2026-10-01).
+  check("the printed footer is the table footer, repeated on every sheet, not a fixed box",
+    await page.$eval("#ws-pdf-doc", (doc) => Boolean(doc.querySelector(".qdoc-print-wrap > tfoot .qdoc-foot"))
+      && getComputedStyle(doc.querySelector(".qdoc-foot")).position === "static"
+      && getComputedStyle(doc.querySelector(".qdoc-print-wrap > tfoot")).display === "table-footer-group"));
   // With no @page margin the side margins are the document's own padding; on the collapsed
   // print table they were silently dropped and the text ran to the paper's edge.
   eq("the document keeps 14mm side margins in print", await page.$eval("#ws-pdf-doc",
     (doc) => Math.round(parseFloat(getComputedStyle(doc).paddingLeft) * 25.4 / 96)), 14);
   check("print CSS removes browser margins and recreates every document margin", await page.evaluate(async () => {
     const all = await (await fetch("/assets/quote-doc.css")).text();
-    const css = all.slice(all.indexOf("@media print"));
+    const bare = all.replace(/\/\*[\s\S]*?\*\//g, "");
+    const css = bare.slice(bare.indexOf("@media print"));
     return /@page\s*{[^}]*margin:\s*0\s*;/s.test(css)
       && /\.qdoc-head-space\s*{\s*height:\s*12mm/s.test(css)
-      && /\.qdoc-foot-space\s*{\s*height:\s*34mm/s.test(css)
-      && /\.qdoc-foot\s*{[^}]*bottom:\s*12mm[^}]*left:\s*14mm[^}]*right:\s*14mm/s.test(css);
+      && /\.qdoc-print-wrap\s*{\s*height:\s*296mm/s.test(css)
+      && /\.qdoc-foot-cell\s*{[^}]*padding:\s*3mm 0 10mm/s.test(css)
+      && !/position:\s*fixed/.test(css);
   }));
   await page.evaluate(() => document.getElementById("ws-pdf-form").requestSubmit());
   const bytes = await page.pdf({ format: "A4", preferCSSPageSize: true, printBackground: true });
@@ -974,6 +984,7 @@ head("7h. PDF requires a company and carries the same total as the editor");
   });
   const editorTotal = minor(await page.textContent("#quo-fig-total"));
   await page.click("#ws-pdf-form button[type=submit]");
+  await page.waitForFunction(() => window.__printed > 0, null, { timeout: 5000 }).catch(() => {});
   eq("with a company the quote prints", await page.evaluate(() => window.__printed), 1);
   eq("the editor total equals the PDF total",
     minor(await page.textContent('#ws-pdf-doc [data-pdf="total"]')), editorTotal);

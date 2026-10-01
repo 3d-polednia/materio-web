@@ -132,6 +132,9 @@ head("2. Pro company workflow");
   const { ctx, page, errors } = await open("pro");
   await page.locator("#company-form").waitFor({ state: "visible" });
   await page.fill("#company-name", "Pierwsza Firma");
+  // The owner (2026-10-01) could not save "www.stronainternetowa.pl": a type=url field wants
+  // the https:// a tradesman never types. Whatever is typed is kept as typed.
+  await page.fill("#company-www", "www.stronainternetowa.pl");
   const paddedLogo = Buffer.from(await page.evaluate(() => {
     const canvas = document.createElement("canvas");
     canvas.width = 400;
@@ -150,6 +153,7 @@ head("2. Pro company workflow");
     await page.locator("#company-logo-error").innerText());
   await page.click('#company-form button[type="submit"]');
   await page.locator("#company-list > li").waitFor();
+  eq("a website typed without https:// is saved as typed", await page.evaluate(() => crmCompanies()[0].www), "www.stronainternetowa.pl");
   check("empty logo margins are trimmed before storage", await page.evaluate(async () => {
     const image = new Image();
     image.src = crmCompanies()[0].logo;
