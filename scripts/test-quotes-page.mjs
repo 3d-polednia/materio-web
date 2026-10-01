@@ -878,6 +878,35 @@ head("7f. the client quote prints as one complete page");
   await page.close();
 }
 
+head("7h0. a quote keeps its client without a project");
+{
+  // Owner, 2026-10-01: with a client chosen, "Bez projektu" took the client away, and
+  // choosing a client on a quote with no project made a project out of the quote's name.
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  eq("the client comes through the project at first",
+    await page.$eval("#quo-client-pick", (s) => s.value), "c1");
+  await page.selectOption("#quo-project-pick", "");
+  eq("leaving the project keeps the client on screen",
+    await page.$eval("#quo-client-pick", (s) => s.value), "c1");
+  const left = (await liveQuotes(page))[0];
+  eq("the quote has no project now", left.projectId, "");
+  eq("and keeps the client itself", left.clientId, "c1");
+  const projectsBefore = await page.evaluate(() => wsProjects().length);
+  await page.selectOption("#quo-client-pick", "");
+  await page.selectOption("#quo-client-pick", "c1");
+  eq("choosing a client makes no project", await page.evaluate(() => wsProjects().length), projectsBefore);
+  eq("and stays with no project", (await liveQuotes(page))[0].projectId, "");
+  await page.evaluate(() => {
+    const company = crmAddCompany({ name: "Firma testowa" });
+    crmUpdateQuote("q1", { companyId: company.id });
+    pdfFillQuote("q1");
+  });
+  eq("the PDF of a quote with no project names its client",
+    await page.textContent('#ws-pdf-doc [data-pdf="clientName"]'), "Jan Kowalski");
+  eq("no page error", page.errors.length, 0);
+  await page.close();
+}
+
 head("7g. quote-owned materials, project rows, saving and CSV work end to end");
 {
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });

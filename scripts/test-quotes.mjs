@@ -101,7 +101,7 @@ function loadCrm() {
     "wsExport", "wsItems", "wsUpdateItem",
     "crmAddClient", "crmClient", "crmLinkProject", "crmClientOfProject",
     "crmQuotes", "crmQuote", "crmAddQuote", "crmUpdateQuote", "crmDeleteQuote",
-    "crmRestoreQuote", "crmProjectQuotes", "crmQuoteTotals", "crmQuoteChain",
+    "crmRestoreQuote", "crmProjectQuotes", "crmClientQuotes", "crmQuoteTotals", "crmQuoteChain",
     "crmQuoteStatus", "crmQuoteSummary",
     "crmLabour", "crmAddLabour", "crmUpdateLabour", "crmDeleteLabour", "crmLabourRate",
     "crmLineAmount", "crmQty", "crmPct",
@@ -679,10 +679,23 @@ head("7. chapter XXIV backwards: WYCENA → PROJEKT → KLIENT, all derived");
   eq("the project keeps the client link", crm.wsProject(project.id).clientId, client.id);
   eq("and the client is found through that link", chain.client.id, client.id);
 
-  // Derived means derived: nothing about the client is copied onto the quote.
+  // Derived means derived: with a project, nothing about the client is copied onto the
+  // quote. Its own clientId (2026-10-01) is only for a quote with no project.
   const stored = crm.raw().quotes.find((x) => x.id === q.id);
-  eq("no clientId is stored on the quote", stored.clientId, undefined);
+  eq("a quote with a project stores no client of its own", stored.clientId, "");
   eq("and no jobId either", stored.jobId, undefined);
+  {
+    // Owner, 2026-10-01: a quote for labour alone, or with typed materials, needs no project.
+    const loose = crm.crmAddQuote({ name: "Bez projektu", clientId: client.id });
+    eq("a quote with no project keeps the client it was written for",
+      crm.crmQuoteChain(loose.id).client.id, client.id);
+    check("and is listed among that client's quotes",
+      crm.crmClientQuotes(client.id).some((x) => x.id === loose.id));
+    const nobody = crm.crmAddQuote({ name: "Nikt", clientId: "missing" });
+    eq("a client nobody can open is stored as no client", nobody.clientId, "");
+    crm.crmDeleteQuote(loose.id);
+    crm.crmDeleteQuote(nobody.id);
+  }
 
   // Which is what makes a rename read correctly with nothing to keep in step.
   crm.crmAddClient({ name: "Ignore me" });
@@ -932,12 +945,17 @@ head("9a. the quote owns the chain controls and the PDF document");
   const build = read("scripts/build.mjs");
   check("client choice is resolved through the quote's project link",
     ui.includes("function quoChooseClient(clientId)") && ui.includes("crmLinkProject(client.id, project.id)"));
-  check("choosing a client with no project makes one, because a quote can only point there",
-    ui.includes("function quoChooseClient(clientId)") && ui.includes("project = wsAddProject(q.name)"));
+  // Owner, 2026-10-01: choosing a client used to make a project out of the quote's name,
+  // and "Bez projektu" then took the client away. A quote now keeps its own client.
+  check("choosing a client never makes a project",
+    ui.includes("function quoChooseClient(clientId)") && !ui.includes("wsAddProject(q.name)"));
+  check("the client is stored on the quote", /crmUpdateQuote\(q\.id, \{ clientId:/.test(ui));
+  check("leaving a project keeps the client that came through it",
+    ui.includes("function quoChooseProject(projectId)") && ui.includes("clientId: chain.client.id"));
   check("and there is no second picker choosing the same thing",
     !ui.includes("quoChooseJob") && !ui.includes("quo-job-pick"));
-  check("the quote still writes only projectId",
-    !/crmUpdateQuote\([^)]*,\s*\{\s*(clientId|jobId)/.test(ui));
+  check("the quote never writes a jobId",
+    !/crmUpdateQuote\([^)]*,\s*\{[^}]*jobId/.test(ui));
   check("rooms and materials are read from the selected project",
     ui.includes("wsRooms(project.id)") && ui.includes("crmQuoteLines(q)"));
   const quoteScripts = build.match(/const QUOTES_SCRIPTS = \[([\s\S]*?)\n\];/);

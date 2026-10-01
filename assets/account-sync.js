@@ -739,6 +739,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
         unit: text(line.unit, 24), amountMinor: Math.round(line.amountMinor) || 0,
       }));
       const money = [...labour, ...materials].reduce((sum, line) => sum + line.amountMinor, 0);
+      const clientId = String(q.clientId || "");
       const companyId = String(q.companyId || "");
       const number = String(q.number || "");
       const validUntil = String(q.validUntil || "");
@@ -751,6 +752,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
       await fb.setDoc(proDoc("quotes", seg, uid), {
         name: text(q.name, 120),
         projectId: text(q.projectId, 64),
+        ...(clientId.length <= 64 ? { clientId } : {}),
         ...(companyId.length <= 64 ? { companyId } : {}),
         ...(number.length <= 40 ? { number } : {}),
         ...(!validUntil || /^\d{4}-\d{2}-\d{2}$/.test(validUntil) ? { validUntil } : {}),

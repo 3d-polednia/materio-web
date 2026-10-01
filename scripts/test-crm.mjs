@@ -242,8 +242,10 @@ head("1. the chain is walked, never stored");
   eq("the client does not copy the project's own client link", stored.clients[0].projectIds.join(), "");
   eq("the project keeps the client", crm.wsProject(project.id).clientId, client.id);
   eq("the quote keeps the project and nothing else", stored.quotes[0].projectId, project.id);
-  check("the quote carries no client or job of its own",
-    stored.quotes[0].clientId === undefined && stored.quotes[0].jobId === undefined,
+  // A quote's own clientId (2026-10-01) is for a quote with no project; through a project
+  // it stays empty and the client is derived.
+  check("the quote carries no job and no client of its own",
+    stored.quotes[0].clientId === "" && stored.quotes[0].jobId === undefined,
     Object.keys(stored.quotes[0]).join());
 
   // wsExport() is what /app/ uploads. Nothing about the chain may reach it.

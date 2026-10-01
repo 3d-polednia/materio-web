@@ -487,6 +487,12 @@ function crmProjectId(id) {
   return value && typeof wsProject === "function" && wsProject(value) ? value : "";
 }
 
+/** The same rule for a quote's client: a client nobody can open is stored as no client. */
+function crmClientId(id) {
+  const value = String(id || "");
+  return value && crmClient(value) ? value : "";
+}
+
 /** Every project, split by chapter XXI's status vocabulary. */
 const crmOpenProjects = () => (typeof wsAllProjects === "function" ? wsAllProjects() : [])
   .filter((project) => PROJECT_OPEN_STATUS.indexOf(project.status) !== -1);
@@ -693,6 +699,10 @@ function crmAddQuote(fields) {
     // A project that is not there is dropped rather than stored — the same rule a project's
     // links follow: a link to a row nobody can open is worse than no link.
     projectId: crmProjectId(f.projectId),
+    // The client a quote is written for when it has no project (owner, 2026-10-01: a quote
+    // for labour alone, or with typed materials, needs no project). With a project, the
+    // project's own client still answers first — see crmChain().
+    clientId: crmClientId(f.clientId),
     companyId: defaultCompany ? defaultCompany.id : "",
     number: `W/${year}/${String(sequence).padStart(3, "0")}`,
     validUntil: localDay(until),
@@ -732,6 +742,7 @@ function crmUpdateQuote(id, fields) {
   if (f.note !== undefined) quote.note = crmText(f.note, CRM_MAX_NOTE);
   if (f.marginMajor !== undefined) quote.marginPct = crmPct(f.marginMajor);
   if (f.projectId !== undefined) quote.projectId = crmProjectId(f.projectId);
+  if (f.clientId !== undefined) quote.clientId = crmClientId(f.clientId);
   if (f.companyId !== undefined) {
     const companyId = crmText(f.companyId, 64);
     quote.companyId = crmCompanies().some((row) => row.id === companyId) ? companyId : "";
@@ -1051,7 +1062,8 @@ function crmQuoteSummary(id) {
   const project = quote.projectId && typeof wsProject === "function"
     ? wsProject(quote.projectId) : null;
   const missing = [];
-  if (!project) missing.push("project");
+  // No project is fine once the quote carries its own materials (owner, 2026-10-01).
+  if (!project && !(Array.isArray(quote.materials) && quote.materials.length)) missing.push("project");
   if (!Array.isArray(quote.labour) || !quote.labour.length) missing.push("labour");
   return {
     quote,
@@ -1127,6 +1139,9 @@ function crmChain(kind, id) {
 
   if (pid && typeof wsProject === "function") out.project = wsProject(pid);
   if (!out.client && pid) out.client = crmClientOfProject(pid);
+  // A quote with no project (or a project with no client) still reaches the client it was
+  // written for.
+  if (!out.client && out.quote && out.quote.clientId) out.client = crmClient(out.quote.clientId);
   if (pid && out.from !== "quote") out.quotes = crmProjectQuotes(pid);
   return out;
 }
@@ -1153,7 +1168,7 @@ function crmQuoteChain(quoteId) {
 function crmClientQuotes(clientId) {
   const ids = {};
   crmClientProjects(clientId).forEach((p) => { ids[p.id] = true; });
-  return crmQuotes().filter((q) => q.projectId && ids[q.projectId]);
+  return crmQuotes().filter((q) => (q.projectId && ids[q.projectId]) || (q.clientId && q.clientId === clientId));
 }
 
 /* ------------------------------------------------------------------ the history

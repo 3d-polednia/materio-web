@@ -261,27 +261,35 @@ function quoFillPicker(id, rows, selected, emptyKey) {
 }
 
 /**
- * Make the quote reach a client through its one stored project link.
+ * The client a quote is written for.
  *
- * A client cannot be stored on a quote without duplicating the relation. When the quote
- * has no project, the quote name becomes a minimal project and job name; both rows remain
- * ordinary editable records on their own screens. With a project already present, its job
- * is reused or a missing one is added, and crmLinkProject() moves the project away from a
- * previous client so both ends keep telling the same story.
+ * Stored on the quote itself since 2026-10-01: until then a client reached a quote only
+ * through its project, so choosing a client made a project out of the quote's name, and
+ * choosing "Bez projektu" afterwards took the client away. With a project attached, the
+ * project is linked to the client too (crmLinkProject() moves it from a previous one), so
+ * both ends keep telling the same story. "" clears the quote's own client.
  */
 function quoChooseClient(clientId) {
   const q = crmQuote(quoOpenId);
-  const client = crmClient(clientId);
-  if (!q || !client) return null;
-  let project = q.projectId && wsProject(q.projectId);
-  if (!project) project = wsAddProject(q.name);
-  if (!project) return null;
-  crmLinkProject(client.id, project.id);
-  return crmUpdateQuote(q.id, { projectId: project.id });
+  if (!q) return null;
+  const client = clientId ? crmClient(clientId) : null;
+  if (clientId && !client) return null;
+  const project = q.projectId && wsProject(q.projectId);
+  if (client && project) crmLinkProject(client.id, project.id);
+  return crmUpdateQuote(q.id, { clientId: client ? client.id : "" });
 }
 
-/** Selecting a project keeps the quote's single link and lets crmChain() derive the rest. */
-const quoChooseProject = (projectId) => crmUpdateQuote(quoOpenId, { projectId });
+/**
+ * Selecting a project keeps the quote's link and lets crmChain() derive the rest. A client
+ * that reached the quote only through the project it is leaving stays on the quote.
+ */
+function quoChooseProject(projectId) {
+  const q = crmQuote(quoOpenId);
+  if (!q) return null;
+  const chain = crmChain("quote", q.id);
+  const keep = !q.clientId && chain.client ? { clientId: chain.client.id } : {};
+  return crmUpdateQuote(quoOpenId, { projectId, ...keep });
+}
 
 /** The project's rooms, as one line. Its rows are drawn by quoRenderMaterials(), which can leave one out. */
 function quoRenderProjectContent(q) {
@@ -814,7 +822,7 @@ function wireQuoteDetail() {
   });
 
   on("quo-project-pick", "change", (e) => { quoChooseProject(e.target.value); });
-  on("quo-client-pick", "change", (e) => { if (e.target.value) quoChooseClient(e.target.value); });
+  on("quo-client-pick", "change", (e) => { quoChooseClient(e.target.value); });
 
   on("quo-client-new-form", "submit", (e) => {
     e.preventDefault();
