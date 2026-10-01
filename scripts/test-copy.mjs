@@ -496,7 +496,10 @@ const BUDGET = {
   // 2026-10-01, 715 -> 742, measured 740 words: localized unit options and the project-row detach note grew the quote editor.
   // 2026-10-01, 742 -> 750, measured 745 words (fr): the "save in my materials" checkbox and the
   // one-line link to Moje materiały under the quote's material form.
-  company: 330, clients: 550, jobs: 544, quotes: 750, calendar: 450,
+  // 2026-10-01: the share panel makes French widest at 771; four words remain for drift.
+  company: 330, clients: 550, jobs: 544, quotes: 775, calendar: 450,
+  // 2026-10-01: public quote markup is widest in French at 176; four words remain for drift.
+  "quote-share": 180,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
      printed the key name localStorage, which is three words in French; widest is French at 650.
      2026-09-26: two more rows, the per-account sync clocks the account pages keep

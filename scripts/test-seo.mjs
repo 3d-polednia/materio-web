@@ -36,7 +36,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, GUIDES,
-  urlHome, urlCalc, urlJobs, urlAndroid, URL_PRIVACY,
+  urlHome, urlCalc, urlJobs, urlQuoteView, urlAndroid, URL_PRIVACY,
 } from "../src/site.mjs";
 import { ROUTES, sitemapUrls, liveRoutes, route } from "../src/ia.mjs";
 
@@ -118,8 +118,9 @@ head("0. the tree this suite is reading");
   // route in ten languages — 395 until 2026-09-02 swapped Russian for Italian, Dutch,
   // Spanish and French, which is three languages more of every route, and 512 until
   // session 62 added /kontakt/ for audit item H7: one route in thirteen languages.
-  check("538 pages: 536 generated plus the two hand-written ones",
-    PAGES.length === 538, `found ${PAGES.length}`);
+  // 2026-10-01: thirteen noindex public quote pages, one per language, raise 538 to 551.
+  check("551 pages: 549 generated plus the two hand-written ones",
+    PAGES.length === 551, `found ${PAGES.length}`);
   check("every page has a <title>", PAGES.every((page) => page.title), 
     PAGES.filter((page) => !page.title).map((page) => page.url).join(", "));
   check("every page has a robots directive", PAGES.every((page) => page.robots),
@@ -145,8 +146,10 @@ head("1. indexing: which pages are open to a crawler at all");
   const accountRoutes = ROUTES.filter((r) => r.localized && !r.indexable &&
     ["projects", "estimate", "own-materials", "company", "clients", "quotes", "calendar"].includes(r.id))
     .flatMap((r) => LANGS.map((lang) => r.path(lang)));
+  // 2026-10-01: token-addressed quote views are public utilities, never sitemap entries.
+  const quoteViews = LANGS.map((lang) => urlQuoteView(lang));
   const expectedClosed = ["/404.html", "/app/", "/app/dashboard/", "/p/"]
-    .concat(jobRedirects, accountRoutes).sort();
+    .concat(jobRedirects, accountRoutes, quoteViews).sort();
   check("account work pages, redirects and private utility pages are closed to crawlers",
     closed.join(" ") === expectedClosed.join(" "), closed.join(" "));
 

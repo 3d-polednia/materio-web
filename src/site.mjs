@@ -175,9 +175,14 @@ jobs: {
      `quotes` route has carried as `plannedSlug` in src/ia.mjs since session 3. Ukrainian
      is "koshtorysy-pro" rather than "koshtorysy" because /koshtorys/ is already the free
      estimate page in Ukrainian, and two sections may not claim one word. */
-quotes: {
+  quotes: {
     pl: "wyceny", uk: "koshtorysy-pro", de: "angebote", en: "quotes",
     cs: "cenove-nabidky", sk: "cenove-ponuky", ro: "oferte", hr: "ponude", sr: "ponude", it: "preventivi-pro", nl: "offertes", es: "presupuestos-pro", fr: "devis-pro",
+  },
+  quoteView: {
+    pl: "wycena", uk: "propozytsiya", de: "angebot", en: "quote",
+    cs: "cenova-nabidka", sk: "cenova-ponuka", ro: "oferta", hr: "ponuda",
+    sr: "ponuda", it: "offerta", nl: "offerte", es: "oferta", fr: "offre",
   },
   /* Session 29, the public page for LiczMat Pro. Same rule once more, with one
      difference the other four do not have: "liczmat-pro" is a brand name, so it is the
@@ -404,6 +409,9 @@ export const urlJob = (lang, id) => `${urlJobs(lang)}?id=${encodeURIComponent(id
 
 /** The quotes of LiczMat Pro — chapter XXII. */
 export const urlQuotes = (lang) => `${prefix(lang)}/${SECTION.quotes[lang]}/`;
+
+/** A public, token-addressed quote snapshot in the document's language. */
+export const urlQuoteView = (lang) => `${prefix(lang)}/${SECTION.quoteView[lang]}/`;
 
 /** One quote, as a query string on /wyceny/ — the same wall urlJob() hits. */
 export const urlQuote = (lang, id) => `${urlQuotes(lang)}?id=${encodeURIComponent(id)}`;

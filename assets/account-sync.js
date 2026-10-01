@@ -185,6 +185,44 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     return `${location.origin}/p/${token}`;
   }
 
+  /** Publish or refresh the one public snapshot belonging to this quote. */
+  async function shareQuote(quoteId, snapshot, creatorLevel) {
+    const uid = state.uid;
+    const seg = pathId(quoteId);
+    if (!uid || !seg || creatorLevel !== "pro" || !snapshot || typeof snapshot !== "object")
+      throw new Error("share-quote");
+    requireSyncUid(uid);
+    const found = await fb.getDocs(fb.query(fb.collection(db, "sharedQuotes"),
+      fb.where("ownerId", "==", uid), fb.where("quoteId", "==", seg), fb.limit(1)));
+    let token = "";
+    let createdAt = Date.now();
+    found.forEach((row) => { if (!token) { token = row.id; createdAt = Number(row.data().createdAt) || createdAt; } });
+    if (!token) token = shareToken();
+    const refreshedAt = Date.now();
+    requireSyncUid(uid);
+    await fb.setDoc(fb.doc(db, "sharedQuotes", token), {
+      ownerId: uid, schemaVersion: SCHEMA_VERSION, createdAt, refreshedAt,
+      quoteId: seg, lang: String(snapshot.lang || "pl").slice(0, 5), quote: snapshot,
+    });
+    const routes = window.LM_QUOTE_VIEW_ROUTES || {};
+    const route = routes[String(snapshot.lang || "pl")] || routes.pl || "/wycena/";
+    return { url: `${location.origin}${route}?t=${token}`, refreshedAt };
+  }
+
+  /** Revoke every (normally one) public snapshot belonging to this quote. */
+  async function unshareQuote(quoteId) {
+    const uid = state.uid;
+    const seg = pathId(quoteId);
+    if (!uid || !seg) throw new Error("unshare-quote");
+    requireSyncUid(uid);
+    const found = await fb.getDocs(fb.query(fb.collection(db, "sharedQuotes"),
+      fb.where("ownerId", "==", uid), fb.where("quoteId", "==", seg)));
+    const jobs = [];
+    found.forEach((row) => jobs.push(fb.deleteDoc(row.ref)));
+    await Promise.all(jobs);
+    return true;
+  }
+
   /**
    * Which account this browser's workspace copy was last synced with (session 35).
    *
@@ -886,5 +924,6 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
   return { state, setUid, syncAccount, setSyncAccount, localCounts, foreignWorkspace,
     unclaimedWorkspace, blockedWorkspace, syncUidActive, requireSyncUid, sawRemote,
     sawOwnWrite, clearRemoteStamps, mirrorToLocal, syncPushAll, syncPullAll,
-    autoReconcile, incrementalPush, armUpSync, downloadAccount, shareProject, projectDoc, roomDoc };
+    autoReconcile, incrementalPush, armUpSync, downloadAccount, shareProject, shareQuote, unshareQuote,
+    projectDoc, roomDoc };
 }

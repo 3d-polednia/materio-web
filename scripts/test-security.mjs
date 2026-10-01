@@ -509,7 +509,9 @@ head("7. API: every address this site builds");
     check(`${path} stays inside this account`,
       path.startsWith('"users", user.uid') || path.startsWith('"users", state.uid')
       || path.startsWith('"users", uid')
-      || path.startsWith('"sharedProjects"'));
+      || path.startsWith('"sharedProjects"')
+      // 2026-10-01: shared quotes mirror projects: token document or owner-filtered collection.
+      || path === '"sharedQuotes"' || path.startsWith('"sharedQuotes", token'));
   }
   check("no query reaches across accounts",
     !/where\("ownerId", "==", (?!state\.uid)/.test(app));

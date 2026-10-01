@@ -996,7 +996,8 @@ head("9a. the quote owns the chain controls and the PDF document");
       (pdf.match(/if \(!pdfAllowed\(\)\) return;/g) || []).length >= 2);
   check("the quote PDF includes project rows and labour rows",
     pdf.includes("const lines = crmQuoteLines(quote);") &&
-      pdf.includes('pdfEl(doc, "materialRows")') && pdf.includes('pdfEl(doc, "labourRows")'));
+      pdf.includes('renderRows("materialRows", snap.materialRows)') &&
+      pdf.includes('renderRows("labourRows", snap.labourRows)'));
 }
 
 head("9b. the copy, in four languages");

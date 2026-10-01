@@ -631,3 +631,21 @@ MARKUP SKELETON
   </table>
 </article>
 */
+/* Public quote: fit the A4 sheet to a phone without horizontal page scrolling. */
+.quo-share-panel { width: 100%; padding: 1rem; border: 1px solid var(--outline); border-radius: var(--radius); }
+.quo-share-link { display: flex; gap: .5rem; }
+.quo-share-link input { flex: 1; min-width: 0; }
+.quo-share-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.quote-view-wrap { max-width: 1100px; padding-block: 2rem; }
+.quote-view-toolbar { margin: 0 0 1rem; }
+.quote-view-page #ws-pdf { margin: 0; }
+.quote-view-page #pdf-tool { overflow: visible; }
+.quote-view-page .qdoc { margin-inline: auto; }
+@media (max-width: 800px) {
+  .quote-view-page .qdoc { transform: scale(calc((100vw - 24px) / 794)); transform-origin: top left; margin: 0; }
+  .quote-view-page #pdf-tool { width: calc(794px * ((100vw - 24px) / 794)); }
+}
+@media print {
+  .quote-view-toolbar, .quote-view-main > .wrap > h1, #quote-view-state { display: none !important; }
+  .quote-view-page .qdoc { transform: none !important; }
+}

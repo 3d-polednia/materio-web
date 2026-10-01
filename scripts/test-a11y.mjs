@@ -112,8 +112,9 @@ head("0. the tree this suite is reading");
   // 512 since 2026-09-02 swapped Russian for Italian, Dutch, Spanish and French: three
   // languages more of every route, on top of the converter and /moje-materialy/.
   // 525 since session 62 added /kontakt/ for audit item H7: one route, thirteen languages.
-  check("538 pages: 536 generated plus the two hand-written ones",
-    PAGES.length === 538, `found ${PAGES.length}`);
+  // 2026-10-01: thirteen noindex public quote pages, one per language, raise 538 to 551.
+  check("551 pages: 549 generated plus the two hand-written ones",
+    PAGES.length === 551, `found ${PAGES.length}`);
   check("every page declares a language",
     PAGES.every((page) => page.lang), PAGES.filter((page) => !page.lang).map((x) => x.url).join(", "));
   const codes = new Set(LANGS.map((l) => HREFLANG[l]));
@@ -127,7 +128,8 @@ head("0. the tree this suite is reading");
 head("0b. the full footer keeps its legal content");
 {
   const full = PAGES.filter((page) => page.body.includes('class="foot-grid"'));
-  check("every generated full-footer page is covered", full.length === 533, `found ${full.length}`);
+  // 2026-10-01: all thirteen public quote pages use the full legal footer.
+  check("every generated full-footer page is covered", full.length === 546, `found ${full.length}`);
   checkAll("contact, privacy and cookies stay linked in every full footer", full,
     (page) => {
       const lang = LANGS.find((code) => HREFLANG[code] === page.lang);

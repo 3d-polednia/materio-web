@@ -29,7 +29,7 @@ import {
   URL_APP, URL_SHARE, URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlJobs, urlQuotes,
-  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
+  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact, urlQuoteView,
 } from "../src/site.mjs";
 import {
   livePaths, sitemapUrls, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS,
@@ -42,13 +42,14 @@ import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
   materialsMain, projectsMain, androidMain, cookiesMain, contactMain, companyMain, clientsMain,
-  quotesMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
+  quotesMain, quoteViewMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
 import { CALC_SEO, TITLE_MAX } from "../src/calc-seo.mjs";
 import { CONV_COPY, CONV_COPY_KEYS } from "../src/conv-copy.mjs";
 import { OMAT_COPY, OMAT_COPY_KEYS } from "../src/omat-copy.mjs";
+import { QUOTE_VIEW_COPY, QUOTE_VIEW_COPY_KEYS } from "../src/quote-view-copy.mjs";
 import { PDF_COPY, PDF_COPY_KEYS } from "../src/pdf-copy.mjs";
 import { appMain, shareMain, dashboardMain, dashboardRedirectMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 
@@ -216,6 +217,15 @@ function validate() {
   for (const lang of LANGS) {
     if (!LANG_NAME[lang]) {
       problems.push(`language "${lang}" has no name — add it to LANGS in assets/i18n.js`);
+    }
+  }
+
+  // Public quote copy is build-time only, so missing text must fail before markup ships.
+  for (const lang of LANGS) {
+    const copy = QUOTE_VIEW_COPY[lang];
+    if (!copy) { problems.push(`quote-view: no ${lang} copy (src/quote-view-copy.mjs)`); continue; }
+    for (const key of QUOTE_VIEW_COPY_KEYS) {
+      if (!copy[key] || !String(copy[key]).trim()) problems.push(`quote-view/${lang}: no ${key}`);
     }
   }
 
@@ -1644,9 +1654,25 @@ function buildQuotesPages() {
 <script>window.LM_LINKS = ${JSON.stringify({
         clients: urlClients(lang), projects: urlProjects(lang),
         quotes: urlQuotes(lang), calendar: urlCalendar(lang),
-      })};</script>`,
+      })}; window.LM_QUOTE_VIEW_ROUTES = ${JSON.stringify(alternatesFor(urlQuoteView))};</script>`,
       scripts: QUOTES_SCRIPTS,
       modules: ["/assets/account-sync-page.js"],
+    }));
+  }
+}
+
+function buildQuoteViewPages() {
+  for (const lang of BUILD_LANGS) {
+    const t = translator(lang);
+    write(join(urlQuoteView(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${QUOTE_VIEW_COPY[lang].title} — LiczMat`,
+      description: QUOTE_VIEW_COPY[lang].title, bodyClass: "tool-page quote-view-page",
+      path: urlQuoteView(lang), alternates: {}, noindex: true,
+      main: quoteViewMain(lang, t, LM_FEATURES, STAMP, QUOTE_VIEW_COPY[lang]),
+      headExtra: `<link rel="stylesheet" href="/assets/quote-doc.css?v=${STAMP}">
+<script>window.LM_QUOTE_VIEW_LANG=${JSON.stringify(lang)};</script>`,
+      scripts: ["/assets/pdf-export.js"], modules: ["/assets/quote-view.js"],
     }));
   }
 }
@@ -2173,6 +2199,7 @@ buildCompanyPages();
 buildClientsPages();
 buildJobsPages();
 buildQuotesPages();
+buildQuoteViewPages();
 buildCalendarPages();
 buildProPage();
 buildConverterPage();

@@ -79,6 +79,9 @@ async function start() {
           await sync.incrementalPush(uid).catch(() => false);
           return sync.shareProject(projectId, level);
         },
+        shareQuote: (quoteId, snapshot) => sync.shareQuote(quoteId, snapshot, level),
+        unshareQuote: (quoteId) => sync.unshareQuote(quoteId),
+        uid,
       };
       document.dispatchEvent(new CustomEvent("lm-account-ready"));
     }).catch(() => { /* no page API when the account's plan cannot be read */ });

@@ -83,6 +83,36 @@ const quoMoney = (minor, code) =>
 const quoRateValue = (minor) => (minor === null ? "" : String(Math.round(minor) / 100).replace(".", quoDecimal()));
 let quoMarginTimer = 0;
 
+const QUO_CALLING_CODES = { pl: "48", de: "49", uk: "380", cs: "420", sk: "421", ro: "40",
+  hr: "385", sr: "381", it: "39", nl: "31", es: "34", fr: "33" };
+
+/** WhatsApp accepts international digits only. English deliberately opens its contact picker. */
+function quoSharePhone(value, lang = quoLang()) {
+  const raw = String(value || "").trim();
+  if (!raw || (lang === "en" && !/^\+|^00/.test(raw))) return "";
+  let digits = raw.replace(/[^\d+]/g, "");
+  if (digits.startsWith("+")) return digits.slice(1).replace(/\D/g, "");
+  if (digits.startsWith("00")) return digits.slice(2).replace(/\D/g, "");
+  const code = QUO_CALLING_CODES[lang];
+  if (!code) return "";
+  digits = digits.replace(/\D/g, "");
+  if (lang !== "it") digits = digits.replace(/^0/, "");
+  return `${code}${digits}`;
+}
+
+const quoShareEmail = (value) => {
+  const email = String(value || "").trim();
+  return email.includes("@") && !/[\s?&]/.test(email) ? email : "";
+};
+const quoShareMailto = (to, subject, message) =>
+  `mailto:${quoShareEmail(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+const quoShareWhatsApp = (phone, message) =>
+  `https://wa.me/${phone ? encodeURIComponent(phone) : ""}?text=${encodeURIComponent(message)}`;
+const quoShareSms = (phone, message) =>
+  `sms:${encodeURIComponent(phone || "")}?&body=${encodeURIComponent(message)}`;
+const quoShareFormat = (template, values) => String(template || "").replace(/\{(\w+)\}/g,
+  (_, key) => String(values[key] == null ? "" : values[key]));
+
 /** The quote the address bar is asking for, or "" for the index. */
 const quoUrlId = () => {
   try { return new URLSearchParams(location.search).get("id") || ""; } catch (e) { return ""; }
@@ -581,6 +611,10 @@ function quoRenderDetail(id) {
   const companyId = q.companyId === undefined ? (fallback && fallback.id) || "" : q.companyId;
   quoFillPicker("quo-company", companies, companyId, "quo_no_project");
   const company = companies.find((row) => row.id === companyId) || null;
+  const share = document.getElementById("quo-share");
+  if (share) { share.disabled = !company; share.title = company ? "" : quoT("quo_pdf_company"); }
+  const accountNote = document.getElementById("quo-share-account");
+  if (accountNote) accountNote.hidden = Boolean(window.lmAccount && window.lmAccount.uid && window.lmAccount.shareQuote);
   document.getElementById("quo-company-preview").textContent = company
     ? [company.name, company.nip && `NIP ${company.nip}`, company.city].filter(Boolean).join(" · ") : "";
   document.getElementById("quo-company-empty").hidden = companies.length > 0;
@@ -952,6 +986,86 @@ function wireQuoteDetail() {
     setTimeout(() => { location.href = `${location.pathname}?saved=${encodeURIComponent(id)}`; }, 50);
   });
 
+  on("quo-share", "click", async () => {
+    const q = crmQuote(quoOpenId);
+    const api = window.lmAccount;
+    const button = document.getElementById("quo-share");
+    const panel = document.getElementById("quo-share-panel");
+    const account = document.getElementById("quo-share-account");
+    if (!q || !api || !api.uid || typeof api.shareQuote !== "function") {
+      if (account) account.hidden = false;
+      return;
+    }
+    const snap = typeof pdfQuoteSnapshot === "function" ? pdfQuoteSnapshot(q.id) : null;
+    if (!snap) return;
+    const label = button.textContent;
+    button.disabled = true;
+    button.textContent = quoT("quo_share_busy");
+    try {
+      const result = await api.shareQuote(q.id, snap);
+      const url = typeof result === "string" ? result : result.url;
+      const refreshedAt = Number(result && result.refreshedAt) || Date.now();
+      const values = {
+        number: snap.quote.number,
+        company: snap.company.name,
+        total: quoMoney(snap.totals.gross, snap.totals.currencyCode),
+        link: url,
+        valid: snap.quote.validUntil ? quoShareFormat(quoT("quo_share_valid"), {
+          date: new Date(`${snap.quote.validUntil}T12:00:00`).toLocaleDateString(quoLang()),
+        }) : "",
+      };
+      const subject = quoShareFormat(quoT("quo_share_subject"), values);
+      const message = quoShareFormat(quoT("quo_share_msg"), values);
+      const phone = quoSharePhone(snap.client && snap.client.phone);
+      document.getElementById("quo-share-url").value = url;
+      document.getElementById("quo-share-email").href = quoShareMailto(
+        snap.client && snap.client.email, subject, message);
+      document.getElementById("quo-share-wa").href = quoShareWhatsApp(phone, message);
+      document.getElementById("quo-share-sms").href = quoShareSms(phone, message);
+      const system = document.getElementById("quo-share-system");
+      system.hidden = typeof navigator.share !== "function";
+      system.onclick = () => navigator.share({
+        title: subject,
+        text: message.replace(url, "").trim(),
+        url,
+      }).catch(() => {});
+      document.querySelector("#quo-share-panel .quo-share-link").hidden = false;
+      document.querySelector("#quo-share-panel .quo-share-actions").hidden = false;
+      document.getElementById("quo-share-note").textContent = quoShareFormat(
+        quoT("quo_share_stamp"), { date: new Date(refreshedAt).toLocaleString(quoLang()) });
+      panel.hidden = false;
+    } catch (e) {
+      document.getElementById("quo-share-note").textContent = quoT("quo_share_failed");
+      panel.hidden = false;
+    } finally {
+      button.disabled = false;
+      button.textContent = label;
+    }
+  });
+
+  on("quo-share-copy", "click", async () => {
+    const input = document.getElementById("quo-share-url");
+    const button = document.getElementById("quo-share-copy");
+    const label = button.textContent;
+    try { await navigator.clipboard.writeText(input.value); }
+    catch (e) { input.select(); document.execCommand("copy"); }
+    button.textContent = quoT("quo_share_copied");
+    setTimeout(() => { button.textContent = label; }, 2000);
+  });
+
+  on("quo-share-off", "click", async () => {
+    if (!window.lmAccount || typeof window.lmAccount.unshareQuote !== "function") return;
+    try {
+      await window.lmAccount.unshareQuote(quoOpenId);
+      document.getElementById("quo-share-url").value = "";
+      document.querySelector("#quo-share-panel .quo-share-link").hidden = true;
+      document.querySelector("#quo-share-panel .quo-share-actions").hidden = true;
+      document.getElementById("quo-share-note").textContent = quoT("quo_share_off_done");
+    } catch (e) {
+      document.getElementById("quo-share-note").textContent = quoT("quo_share_failed");
+    }
+  });
+
   on("quo-csv", "click", () => {
     const quote = crmQuote(quoOpenId);
     const lines = crmQuoteLines(quote);
@@ -1028,6 +1142,7 @@ function buildQuotesPage() {
      back up, which hides #quo-tool; the figures written into it while the account was Pro
      would still be inside it. quoRender() empties them — see quoClear(). */
   document.addEventListener("lm-session", quoRender);
+  document.addEventListener("lm-account-ready", quoRender);
   // Back after opening a quote: the page never reloaded, so nothing else would notice.
   window.addEventListener("popstate", quoRender);
 

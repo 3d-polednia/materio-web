@@ -1377,7 +1377,7 @@ function pdfBlock(lang, t, features) {
 }
 
 /** The quote reuses the project export's print lifecycle and document vocabulary. */
-function quotePdfBlock(lang, t, features, stamp = "") {
+export function quotePdfBlock(lang, t, features, stamp = "") {
   const c = (key) => QUOTE_PDF_COPY[lang][key];
   const asset = (name) => `/assets/${name}${stamp ? `?v=${stamp}` : ""}`;
   // proGate() is indented for standalone insertion. Empty indentation becomes trailing
@@ -1444,6 +1444,20 @@ function quotePdfBlock(lang, t, features, stamp = "") {
               </article>
             </div>
           </section>`;
+}
+
+/** Public shell around the exact same quote-document builder used by the owner page. */
+export function quoteViewMain(lang, t, features, stamp = "", copy) {
+  return `<main id="main" tabindex="-1" class="quote-view-main">
+    <div class="wrap quote-view-wrap" data-title="${esc(copy.title)}" data-missing="${esc(copy.missing)}" data-config="${esc(copy.config)}">
+      <h1 id="quote-view-title">${esc(copy.loading)}</h1>
+      <p id="quote-view-state" class="muted" role="status">${esc(copy.loading)}</p>
+      <div id="quote-view-toolbar" class="quote-view-toolbar" hidden>
+        <button type="button" class="btn btn-primary" id="quote-view-print">${esc(copy.print)}</button>
+      </div>
+      ${quotePdfBlock(lang, t, features, stamp)}
+    </div>
+  </main>`;
 }
 
 export function projectsMain(lang, t, aisles = [], features = []) {
@@ -2417,6 +2431,7 @@ export function quotesMain(lang, t, features, stamp = "") {
             <button type="button" class="btn btn-primary btn-sm" id="quo-save-draft">${esc(t("quo_save_draft"))}</button>
             <span class="muted" id="quo-saved" aria-live="polite"></span>
             <form id="ws-pdf-form" data-pdf-quote><button type="submit" class="btn btn-ghost btn-sm">PDF</button></form>
+            <button type="button" class="btn btn-ghost btn-sm" id="quo-share">${esc(t("quo_share"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-csv">CSV</button>
             <button type="button" class="btn btn-ghost btn-sm quo-delete-zone" id="quo-delete">${esc(t("quo_delete_yes"))}</button>
             <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
@@ -2426,6 +2441,12 @@ export function quotesMain(lang, t, features, stamp = "") {
                 <button type="button" class="btn btn-ghost btn-sm" id="quo-delete-no">${esc(t("action_cancel"))}</button>
               </p>
             </div>
+            <div id="quo-share-panel" class="quo-share-panel mt-4" hidden>
+              <p class="quo-share-link"><input id="quo-share-url" readonly aria-label="URL"> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-copy">${esc(t("quo_share_copy"))}</button></p>
+              <p class="quo-share-actions"><a class="btn btn-ghost btn-sm" id="quo-share-email">${esc(t("quo_share_email"))}</a> <a class="btn btn-ghost btn-sm" id="quo-share-wa" target="_blank" rel="noopener">${esc(t("quo_share_whatsapp"))}</a> <a class="btn btn-ghost btn-sm" id="quo-share-sms">${esc(t("quo_share_sms"))}</a> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-system" hidden>${esc(t("quo_share_system"))}</button> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-off">${esc(t("quo_share_off"))}</button></p>
+              <p class="muted" id="quo-share-note"></p>
+            </div>
+            <p class="muted" id="quo-share-account" hidden>${esc(t("quo_share_account"))} <a href="${URL_APP}">${esc(t("nav_account"))}</a></p>
           </section>
         </div>
       </article>`;

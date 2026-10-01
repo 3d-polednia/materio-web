@@ -28,7 +28,7 @@ import {
   LANGS, SECTION,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlClient,
-  urlJobs, urlJob, urlQuotes, urlQuote, urlCalendar, urlLiczmatPro, urlConverter,
+  urlJobs, urlJob, urlQuotes, urlQuote, urlQuoteView, urlCalendar, urlLiczmatPro, urlConverter,
   urlOwnMaterials, urlContact,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
@@ -420,6 +420,13 @@ export const ROUTES = [
     note: "/p/<token>, a read-only estimate. GUEST on purpose — the point of a share " +
       "link is that the recipient needs nothing. 404.html forwards /p/<token> to " +
       "/p/?t=<token> because GitHub Pages has no rewrites.",
+  },
+  {
+    id: "quote-share",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "quotes", localized: true, indexable: false,
+    path: urlQuoteView,
+    note: "A token-addressed, read-only quote snapshot. It is deliberately GUEST and noindex; recipients do not need an account.",
   },
 
   /* ---------------------------------------------------------------- legal */
