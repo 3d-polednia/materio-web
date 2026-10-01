@@ -1050,7 +1050,9 @@ head("7h. PDF requires a company and carries the same total as the editor");
 {
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
   await page.evaluate(() => { window.__printed = 0; window.print = () => { window.__printed++; }; window.setTimeout = () => 0; });
-  await page.click("#ws-pdf-form button[type=submit]");
+  eq("Polish download label", (await page.textContent('[data-pdf-action="download"]')).trim(), "Pobierz PDF");
+  eq("Polish print label", (await page.textContent('[data-pdf-action="print"]')).trim(), "Drukuj");
+  await page.click('[data-pdf-action="print"]');
   check("without a company the PDF message is shown", await page.locator("#quo-pdf-company").isVisible());
   eq("without a company nothing prints", await page.evaluate(() => window.__printed), 0);
   await page.evaluate(() => {
@@ -1058,7 +1060,18 @@ head("7h. PDF requires a company and carries the same total as the editor");
     crmUpdateQuote("q1", { companyId: company.id });
   });
   const editorTotal = minor(await page.textContent("#quo-fig-total"));
-  await page.click("#ws-pdf-form button[type=submit]");
+  const downloadReady = page.waitForEvent("download");
+  await page.click('[data-pdf-action="download"]');
+  const download = await downloadReady;
+  const filename = download.suggestedFilename();
+  const downloadedBytes = readFileSync(await download.path());
+  check("the editor download has a PDF filename", filename.endsWith(".pdf"), filename);
+  eq("the editor download starts with the PDF signature", downloadedBytes.subarray(0, 4).toString(), "%PDF");
+  check("the editor download is larger than 20 kB", downloadedBytes.length > 20 * 1024,
+    `${downloadedBytes.length} bytes`);
+  eq("downloading does not print", await page.evaluate(() => window.__printed), 0);
+  eq("the document is hidden again after downloading", await page.$eval("#ws-pdf-doc", (doc) => doc.hidden), true);
+  await page.click('[data-pdf-action="print"]');
   await page.waitForFunction(() => window.__printed > 0, null, { timeout: 5000 }).catch(() => {});
   eq("with a company the quote prints", await page.evaluate(() => window.__printed), 1);
   eq("the editor total equals the PDF total",
@@ -1069,6 +1082,33 @@ head("7h. PDF requires a company and carries the same total as the editor");
   await old.waitForURL(`**${QUOTES}`);
   eq("the permanent estimate URL lands on quotes", new URL(old.url()).pathname, QUOTES);
   await old.close();
+}
+
+head("7h1. quote PDF actions stay translated and fit a phone");
+{
+  const de = await open(ctx, `${urlQuotes("de")}?id=q1`, { workspace: workspace(), crm: crm(), lang: "de" });
+  eq("German download label", (await de.textContent('[data-pdf-action="download"]')).trim(), "PDF herunterladen");
+  eq("German print label", (await de.textContent('[data-pdf-action="print"]')).trim(), "Drucken");
+  await de.close();
+
+  const phone = await context({ viewport: { width: 390, height: 844 } });
+  const page = await open(phone, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  await page.evaluate(() => {
+    const company = crmAddCompany({ name: "Firma testowa" });
+    crmUpdateQuote("q1", { companyId: company.id });
+  });
+  const downloadReady = page.waitForEvent("download");
+  await page.click('[data-pdf-action="download"]');
+  const bytes = readFileSync(await (await downloadReady).path());
+  eq("the phone download starts with the PDF signature", bytes.subarray(0, 4).toString(), "%PDF");
+  eq("a normal editor quote is one PDF page", pdfPages(bytes), 1);
+  check("the editor does not leave horizontal phone overflow",
+    await page.evaluate(() => document.documentElement.scrollWidth <= 390),
+    await page.evaluate(() => `${document.documentElement.scrollWidth}px`));
+  eq("the phone document is hidden again after downloading",
+    await page.$eval("#ws-pdf-doc", (doc) => doc.hidden), true);
+  await page.close();
+  await phone.close();
 }
 
 head("7i. VAT rates follow the page language and preserve custom or foreign rates");

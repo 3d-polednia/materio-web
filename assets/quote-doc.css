@@ -51,6 +51,19 @@
   display: none !important;
 }
 
+.qdoc.pdf-download-stage {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 794px;
+  max-width: none;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: none;
+  z-index: -1;
+}
+
 /* Print Container to reserve footer space */
 .qdoc-print-wrap {
   width: 100%;

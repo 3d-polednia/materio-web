@@ -22,6 +22,7 @@ import { PDF_COPY, QUOTE_PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
 import { CURRENCIES } from "./currency.mjs";
 import { calendarGrid } from "./app-pages.mjs";
 import { accountPageMain } from "./account-sidebar.mjs";
+import { QUOTE_VIEW_COPY } from "./quote-view-copy.mjs";
 
 /**
  * Case- and accent-insensitive text for the hub's search haystack.
@@ -2251,6 +2252,7 @@ export function clientsMain(lang, t, features) {
  * quote (crmQuoteTotals() in assets/crm.js says why).
  */
 export function quotesMain(lang, t, features, stamp = "") {
+  const quoteViewCopy = QUOTE_VIEW_COPY[lang];
   const crumbs = breadcrumbs([
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("wspage_title"), path: urlProjects(lang) },
@@ -2432,7 +2434,7 @@ export function quotesMain(lang, t, features, stamp = "") {
             </label>
             <button type="button" class="btn btn-primary btn-sm" id="quo-save-draft">${esc(t("quo_save_draft"))}</button>
             <span class="muted" id="quo-saved" aria-live="polite"></span>
-            <form id="ws-pdf-form" data-pdf-quote><button type="submit" class="btn btn-ghost btn-sm">PDF</button></form>
+            <form id="ws-pdf-form" data-pdf-quote data-downloading="${esc(quoteViewCopy.downloading)}" data-download-failed="${esc(quoteViewCopy.downloadFailed)}"><button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="download">${esc(quoteViewCopy.download)}</button> <button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="print">${esc(quoteViewCopy.print)}</button> <span class="quo-pdf-download-status" role="status"></span></form>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-share">${esc(t("quo_share"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-csv">CSV</button>
             <button type="button" class="btn btn-ghost btn-sm quo-delete-zone" id="quo-delete">${esc(t("quo_delete_yes"))}</button>
@@ -2449,7 +2451,7 @@ export function quotesMain(lang, t, features, stamp = "") {
               <p class="quo-share-actions" id="quo-share-mail" hidden><a class="btn btn-ghost btn-sm" id="quo-share-gmail" target="_blank" rel="noopener">Gmail</a> <a class="btn btn-ghost btn-sm" id="quo-share-outlook" target="_blank" rel="noopener">Outlook</a> <a class="btn btn-ghost btn-sm" id="quo-share-mailto">${esc(t("quo_share_mailapp"))}</a> <button type="button" class="btn btn-ghost btn-sm" id="quo-share-copy-msg">${esc(t("quo_share_copy_msg"))}</button></p>
               <p class="muted" id="quo-share-note"></p>
             </div>
-            <p class="muted" id="quo-share-account" hidden>${esc(t("quo_share_account"))} <a href="${URL_APP}">${esc(t("nav_account"))}</a></p>
+            <p class="muted" id="quo-share-account" hidden>${esc(t("quo_share_account"))} <a href="${URL_APP}">${esc(t("nav_app"))}</a></p>
           </section>
         </div>
       </article>`;

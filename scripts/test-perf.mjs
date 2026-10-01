@@ -140,7 +140,8 @@ const BUDGET = {
   // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
   // 2026-10-01: measured 254.8 kB raw after the quote editor's two runtime status keys.
-  "kalkulatory/index.html": [255, 66],
+  // 2026-10-01: measured 255.1 kB raw after the quote editor's "Pobierz PDF" / "Drukuj" pair in styles.css.
+  "kalkulatory/index.html": [256, 66],
   "kalkulatory/plytki-panele-gres/index.html": [420, 128],
   // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
   // (the header menu and the footer's list) and it went from ten rows to thirteen. That is
@@ -231,7 +232,7 @@ const BUDGET = {
   // 2026-10-01: measured 455.4 kB raw; quote sharing adds its panel and account API.
   // 2026-10-01, measured 457.6 kB: the e-mail chooser of the share panel (Gmail, Outlook, mail
   // program, copy the message) and the share strings translated in ten languages that had shipped English.
-  "wyceny/index.html": [458, 135],
+  "wyceny/index.html": [464, 135],
   "terminarz/index.html": [418, 126],
   // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
   // one page that carries every store the account syncs, and session 59 gave it a third:

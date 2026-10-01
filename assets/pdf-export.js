@@ -522,6 +522,123 @@ function pdfFillQuote(quoteId) {
 
 /* ------------------------------------------------------------------ wiring */
 
+const pdfVendorScripts = new Map();
+
+function pdfLoadScript(src) {
+  if (pdfVendorScripts.has(src)) return pdfVendorScripts.get(src);
+  const promise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error(`Could not load ${src}`));
+    document.head.append(script);
+  });
+  pdfVendorScripts.set(src, promise);
+  return promise;
+}
+
+async function pdfWaitForDocumentImages(doc) {
+  const images = [...doc.querySelectorAll("img")].filter((img) => img.src);
+  await Promise.race([
+    Promise.all(images.map((img) => img.decode ? img.decode().catch(() => {}) : Promise.resolve())),
+    new Promise((resolve) => setTimeout(resolve, 1500)),
+  ]);
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+}
+
+function pdfSafeFileName(value) {
+  return value.replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-").replace(/[. ]+$/g, "");
+}
+
+/**
+ * How far down the capture anything was painted. html2canvas sizes the canvas from the
+ * on-screen element, which on a phone is the tall one-column layout, while the clone is
+ * drawn at desktop width — so the bottom of the canvas is blank and would become a blank
+ * second page. Read upward one row at a time until a pixel is not white.
+ */
+function pdfPaintedHeight(canvas) {
+  const ctx = canvas.getContext("2d");
+  for (let y = canvas.height - 1; y > 0; y -= 1) {
+    const row = ctx.getImageData(0, y, canvas.width, 1).data;
+    for (let i = 0; i < row.length; i += 4) {
+      if (row[i] < 250 || row[i + 1] < 250 || row[i + 2] < 250) return Math.min(canvas.height, y + 40);
+    }
+  }
+  return 0;
+}
+
+/** 210 mm at the CSS 96 dpi the document is designed in. */
+const pdfA4Px = 794;
+
+async function pdfDownloadQuote(doc, stage = false) {
+  await Promise.all([
+    pdfLoadScript("/assets/vendor/jspdf.umd.min.js"),
+    pdfLoadScript("/assets/vendor/html2canvas-pro.min.js"),
+  ]);
+  const wasHidden = doc.hidden;
+  try {
+    // The editor keeps the document hidden inside its tool. Stage it outside the viewport
+    // without widening a phone page; the cloned sheet is made visible only for capture.
+    if (stage || wasHidden) {
+      doc.hidden = false;
+      doc.classList.add("pdf-download-stage");
+    }
+    await pdfWaitForDocumentImages(doc);
+    // The file is an A4 sheet, so it is drawn from the desktop layout whatever the screen:
+    // on a phone the sheet reflows into one narrow column (quote-doc.css, max-width 600px)
+    // and a capture of that came out as three pages of oversized text. html2canvas lays the
+    // clone out in its own window, which is given a desktop width and A4 sheet width here.
+    const canvas = await window.html2canvas(doc, {
+      scale: 2,
+      backgroundColor: "#ffffff",
+      useCORS: false,
+      windowWidth: 1200,
+      width: pdfA4Px,
+      onclone: (clone) => {
+        const sheet = clone.getElementById("ws-pdf-doc");
+        sheet.classList.remove("pdf-download-stage");
+        sheet.style.width = `${pdfA4Px}px`;
+        sheet.style.transform = "none";
+        sheet.style.margin = "0";
+        sheet.style.opacity = "1";
+        sheet.style.position = "static";
+        sheet.style.zIndex = "auto";
+      },
+    });
+    const usedHeight = pdfPaintedHeight(canvas);
+    if (!usedHeight) throw new Error("The PDF capture is blank");
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const sliceHeight = Math.floor(canvas.width * pageHeight / pageWidth);
+    for (let top = 0, page = 0; top < usedHeight; top += sliceHeight, page += 1) {
+      const height = Math.min(sliceHeight, usedHeight - top);
+      const slice = document.createElement("canvas");
+      slice.width = canvas.width;
+      slice.height = height;
+      slice.getContext("2d").drawImage(canvas, 0, top, canvas.width, height, 0, 0, canvas.width, height);
+      if (page) pdf.addPage();
+      pdf.addImage(slice.toDataURL("image/jpeg", .92), "JPEG", 0, 0,
+        pageWidth, height * pageWidth / canvas.width, undefined, "FAST");
+    }
+    const number = doc.querySelector('[data-pdf="quoteNumber"]')?.textContent.trim() || "";
+    const company = doc.querySelector('[data-pdf="companyName"]')?.textContent.trim() || "";
+    const filename = `${pdfSafeFileName([doc.dataset.quoteTitle, number, company].filter(Boolean).join(" "))}.pdf`;
+    const url = URL.createObjectURL(pdf.output("blob"));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } finally {
+    doc.hidden = stage || wasHidden;
+    doc.classList.remove("pdf-download-stage");
+  }
+}
+
 function pdfInit() {
   // The wall first, and by the same call every Pro page makes: #pdf-gate is shown or
   // #pdf-tool is, and it is redrawn when somebody signs in or out in another tab. The
@@ -555,7 +672,7 @@ function pdfInit() {
   form.querySelectorAll('input[name="pdf-type"]').forEach((el) => el.addEventListener("change", syncType));
   syncType();
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     // Asked before the document is built and again before the dialog is opened. The wall
     // normally means this listener is never reached at all; this is the case where the
@@ -582,6 +699,24 @@ function pdfInit() {
       ? pdfFillQuote(id) : pdfFill(id, pdfOptions(form));
     if (!filled) return;
     if (!pdfAllowed()) return;
+    const action = e.submitter && e.submitter.dataset.pdfAction || "print";
+    if (form.hasAttribute("data-pdf-quote") && action === "download") {
+      const button = e.submitter;
+      const status = form.querySelector(".quo-pdf-download-status");
+      const label = button.textContent;
+      button.disabled = true;
+      button.textContent = form.dataset.downloading || label;
+      if (status) status.textContent = "";
+      try {
+        await pdfDownloadQuote(doc, true);
+      } catch {
+        if (status) status.textContent = form.dataset.downloadFailed || "";
+      } finally {
+        button.textContent = label;
+        button.disabled = false;
+      }
+      return;
+    }
     // A direct body child can be the only layout box in print. Hiding the old page with
     // visibility kept all of its height and made that invisible height into blank sheets.
     const home = doc.parentNode;
