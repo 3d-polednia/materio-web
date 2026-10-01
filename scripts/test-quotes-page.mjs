@@ -910,7 +910,7 @@ head("8. with JavaScript off the page is still an honest page");
   check("and said to be LiczMat Pro — chapter XXV", html.includes("LiczMat Pro"));
   check("the list is in the markup", html.includes('id="quo-list"'));
   check("with its form", html.includes('id="quo-form"'));
-  for (const word of ["Materiał", "Robocizna", "Marża", "Suma"]) {
+  for (const word of ["Materiał", "Robocizna", "Marża", "Razem"]) {
     check(`chapter XXII's "${word}" is readable without a script`, html.includes(word));
   }
   eq("the detail is hidden, because a quote comes out of storage",

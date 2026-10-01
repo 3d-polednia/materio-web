@@ -1010,7 +1010,7 @@ head("9b. the copy, in four languages");
   eq("robocizna", DICT.pl.quo_fig_labour, "Robocizna");
   eq("inne koszty", DICT.pl.quo_fig_other, "Dodatkowe koszty");
   eq("marża", DICT.pl.quo_fig_margin, "Marża");
-  eq("suma", DICT.pl.quo_fig_total, "Suma");
+  eq("razem", DICT.pl.quo_fig_total, "Razem");
 }
 
 /* ------------------------------------------------------------------ report */
