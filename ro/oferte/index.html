@@ -398,6 +398,10 @@
             <ul id="quo-project-list" class="data-list"></ul>
             <p id="quo-room-list" class="muted quo-rooms-line"></p>
             <ul id="quo-material-list" class="data-list"></ul>
+            <div id="quo-other-wrap" hidden>
+              <h3>Costuri suplimentare</h3>
+              <ul id="quo-other-list" class="data-list"></ul>
+            </div>
             <details id="quo-hidden-wrap" hidden><summary id="quo-hidden-summary"></summary><ul id="quo-hidden-list" class="data-list"></ul></details>
             <p class="muted">Aceste poziții provin din proiect și se modifică odată cu el.</p>
             <ul id="quo-own-material-list" class="data-list"></ul>
@@ -405,7 +409,7 @@
               <p class="ws-mat-grid">
                 <label class="ws-mat-f"><span class="ws-bar-label">Denumire</span><input id="quo-materials-name" type="text" maxlength="120" required></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Cantitate</span><input id="quo-materials-qty" type="text" inputmode="decimal"></label>
-                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Unitate</span><input id="quo-materials-unit" type="text" maxlength="24"></label>
+                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Unitate</span><select id="quo-materials-unit"><option selected>buc.</option><option>m²</option><option>ml</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pachet</option><option>set</option><option>sac</option><option>h</option><option>zi</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-materials-price-label">Preț unitar</span><input id="quo-materials-price" type="text" inputmode="decimal"></label>
               </p>
               <p><button type="submit" class="btn btn-primary btn-sm">Adaugă material</button><span class="muted" id="quo-materials-run"></span></p>
@@ -423,7 +427,7 @@
               <p class="ws-mat-grid">
                 <label class="ws-mat-f"><span class="ws-bar-label">Lucrare</span><input id="quo-labour-name" type="text" maxlength="120" required></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Cantitate</span><input id="quo-labour-qty" type="text" inputmode="decimal"></label>
-                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Unitate</span><input id="quo-labour-unit" type="text" maxlength="24"></label>
+                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Unitate</span><select id="quo-labour-unit"><option>buc.</option><option selected>m²</option><option>ml</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pachet</option><option>set</option><option>sac</option><option>h</option><option>zi</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-labour-price-label">Tarif</span><input id="quo-labour-price" type="text" inputmode="decimal"></label>
               </p>
               <p><button type="submit" class="btn btn-primary btn-sm">Adaugă manoperă</button><span class="muted" id="quo-labour-run"></span></p>

@@ -493,7 +493,8 @@ const BUDGET = {
      received visible labels; 640 leaves a two-word regression margin. */
   // 2026-09-30, 670 -> 705, measured 701 words: issuer, dates, own materials and VAT grew the quote editor.
   // 2026-09-30, 705 -> 715, measured 713 words: translated print footer and document labels grew the quote page.
-  company: 330, clients: 550, jobs: 544, quotes: 715, calendar: 450,
+  // 2026-10-01, 715 -> 742, measured 740 words: localized unit options and the project-row detach note grew the quote editor.
+  company: 330, clients: 550, jobs: 544, quotes: 742, calendar: 450,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
      printed the key name localStorage, which is three words in French; widest is French at 650.
      2026-09-26: two more rows, the per-account sync clocks the account pages keep

@@ -398,6 +398,10 @@
             <ul id="quo-project-list" class="data-list"></ul>
             <p id="quo-room-list" class="muted quo-rooms-line"></p>
             <ul id="quo-material-list" class="data-list"></ul>
+            <div id="quo-other-wrap" hidden>
+              <h3>Dodatni troškovi</h3>
+              <ul id="quo-other-list" class="data-list"></ul>
+            </div>
             <details id="quo-hidden-wrap" hidden><summary id="quo-hidden-summary"></summary><ul id="quo-hidden-list" class="data-list"></ul></details>
             <p class="muted">Ove stavke dolaze iz projekta i menjaju se zajedno s njim.</p>
             <ul id="quo-own-material-list" class="data-list"></ul>
@@ -405,7 +409,7 @@
               <p class="ws-mat-grid">
                 <label class="ws-mat-f"><span class="ws-bar-label">Naziv</span><input id="quo-materials-name" type="text" maxlength="120" required></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Količina</span><input id="quo-materials-qty" type="text" inputmode="decimal"></label>
-                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Jedinica</span><input id="quo-materials-unit" type="text" maxlength="24"></label>
+                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Jedinica</span><select id="quo-materials-unit"><option selected>kom.</option><option>m²</option><option>duž. m</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pak.</option><option>set</option><option>džak</option><option>h</option><option>dan</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-materials-price-label">Jed. cena</span><input id="quo-materials-price" type="text" inputmode="decimal"></label>
               </p>
               <p><button type="submit" class="btn btn-primary btn-sm">Dodaj materijal</button><span class="muted" id="quo-materials-run"></span></p>
@@ -423,7 +427,7 @@
               <p class="ws-mat-grid">
                 <label class="ws-mat-f"><span class="ws-bar-label">Rad</span><input id="quo-labour-name" type="text" maxlength="120" required></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Količina</span><input id="quo-labour-qty" type="text" inputmode="decimal"></label>
-                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Jedinica</span><input id="quo-labour-unit" type="text" maxlength="24"></label>
+                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Jedinica</span><select id="quo-labour-unit"><option>kom.</option><option selected>m²</option><option>duž. m</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pak.</option><option>set</option><option>džak</option><option>h</option><option>dan</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-labour-price-label">Cena</span><input id="quo-labour-price" type="text" inputmode="decimal"></label>
               </p>
               <p><button type="submit" class="btn btn-primary btn-sm">Dodaj rad</button><span class="muted" id="quo-labour-run"></span></p>

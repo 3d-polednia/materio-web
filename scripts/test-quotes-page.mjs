@@ -396,6 +396,46 @@ head("2e. the record is corrected in a form on the page");
 
 /* ---------------------------------------------------- 3. the labour */
 
+head("3. units are chosen in the visitor's language and old labels survive");
+{
+  const legacy = crm();
+  legacy.quotes[0].materials = [{
+    id: "m-old", name: "Drzwi stare", quantity: 1, unit: "2", amountMinor: 10000,
+  }];
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: legacy });
+  eq("a material starts with the first Polish unit", await page.inputValue("#quo-materials-unit"), "szt.");
+  eq("labour starts with square metres", await page.inputValue("#quo-labour-unit"), "m²");
+  eq("the material picker offers the complete Polish list",
+    (await page.locator("#quo-materials-unit option").allTextContents()).join("|"),
+    "szt.|m²|mb|m³|kg|t|l|opak.|kpl.|worek|godz.|dzień");
+  await page.click('#quo-own-material-list [data-line="m-old"] [data-line-edit]');
+  eq("an old free-text unit is its own selected option",
+    await page.inputValue('#quo-own-material-list [data-f="unit"]'), "2");
+  await page.click('#quo-own-material-list [data-line-form] button[type="submit"]');
+  eq("saving the line keeps that old unit", (await liveQuotes(page))[0].materials[0].unit, "2");
+
+  await page.fill("#quo-materials-name", "Drzwi");
+  await page.fill("#quo-materials-qty", "1");
+  await page.selectOption("#quo-materials-unit", "szt.");
+  await page.fill("#quo-materials-price", "4300");
+  await page.click("#quo-materials-form button[type=submit]");
+  await page.evaluate(() => {
+    const company = crmAddCompany({ name: "Firma testowa" });
+    crmUpdateQuote("q1", { companyId: company.id });
+    pdfFillQuote("q1");
+  });
+  const doorPdf = (await page.textContent('#ws-pdf-doc tbody[data-pdf="materialRows"]')).replace(/\s/g, " ");
+  check("the PDF quantity column prints the chosen unit",
+    doorPdf.includes("1 szt."), JSON.stringify(doorPdf));
+  await page.close();
+
+  const de = await open(ctx, `${urlQuotes("de")}?id=q1`, { workspace: workspace(), crm: crm(), lang: "de" });
+  eq("German offers its own trade abbreviations",
+    (await de.locator("#quo-materials-unit option").allTextContents()).join("|"),
+    "Stk.|m²|lfm|m³|kg|t|l|Pck.|Set|Sack|Std.|Tag");
+  await de.close();
+}
+
 head("3. robocizna: quantity × rate, typed onto the quote");
 {
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
@@ -410,7 +450,7 @@ head("3. robocizna: quantity × rate, typed onto the quote");
 
   await page.fill("#quo-labour-name", "Fugowanie");
   await page.fill("#quo-labour-qty", "20");
-  await page.fill("#quo-labour-unit", "m²");
+  await page.selectOption("#quo-labour-unit", "m²");
   await page.fill("#quo-labour-price", "25");
   // Chapter XVII's running line, in a quote: the number that will be saved is on screen
   // before it is saved.
@@ -833,7 +873,7 @@ head("7g. quote-owned materials, project rows, saving and CSV work end to end");
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
   await page.fill("#quo-materials-name", "Taśma narożnikowa");
   await page.fill("#quo-materials-qty", "2");
-  await page.fill("#quo-materials-unit", "rol.");
+  await page.selectOption("#quo-materials-unit", "opak.");
   await page.fill("#quo-materials-price", "25");
   await page.click("#quo-materials-form button[type=submit]");
   check("an own material is added", (await page.textContent("#quo-own-material-list")).includes("Taśma narożnikowa"));
@@ -842,15 +882,57 @@ head("7g. quote-owned materials, project rows, saving and CSV work end to end");
   await page.click("#quo-own-material-list [data-line-form] button[type=submit]");
   check("the own material is edited in place", (await page.textContent("#quo-own-material-list")).includes("Taśma uszczelniająca"));
 
+  eq("other costs have their own heading", await page.locator("#quo-other-wrap h3").textContent(), "Dodatkowe koszty");
+  check("the other-cost row sits below that heading",
+    (await page.textContent("#quo-other-list")).includes("Wywóz gruzu"));
+  check("and is no longer mixed into materials",
+    !(await page.textContent("#quo-material-list")).includes("Wywóz gruzu"));
+
   const projectRow = page.locator("#quo-material-list li[data-key]").first();
   const projectKey = await projectRow.getAttribute("data-key");
-  await projectRow.locator("[data-hide-row]").click();
-  check("a project row moves to the hidden list",
-    await page.locator(`#quo-hidden-list li[data-key="${projectKey}"]`).count() === 1);
+  const beforeCancel = await page.evaluate(() => localStorage.getItem("liczmat-crm-v1"));
+  await projectRow.locator("[data-project-row-edit]").click();
+  eq("the project form starts with its name",
+    await page.inputValue('#quo-material-list [data-f="name"]'), "Gres 60×60");
+  eq("and its quantity", await page.inputValue('#quo-material-list [data-f="quantity"]'), "15");
+  eq("and its stored package unit", await page.inputValue('#quo-material-list [data-f="unit"]'), "opak.");
+  eq("and its unit price, with the page's decimal comma", await page.inputValue('#quo-material-list [data-f="priceMajor"]'), "49,99");
+  await page.click("#quo-material-list [data-line-cancel]");
+  eq("cancelling a project-row edit changes no storage byte",
+    await page.evaluate(() => localStorage.getItem("liczmat-crm-v1")), beforeCancel);
+
+  await page.locator(`#quo-material-list li[data-key="${projectKey}"] [data-project-row-edit]`).click();
+  await page.fill('#quo-material-list [data-f="name"]', "Gres 30×60 — łazienka");
+  await page.fill('#quo-material-list [data-f="quantity"]', "21,6");
+  await page.selectOption('#quo-material-list [data-f="unit"]', "m²");
+  await page.fill('#quo-material-list [data-f="priceMajor"]', "64,44");
+  await page.click('#quo-material-list [data-project-row-form] button[type="submit"]');
+  const detached = (await liveQuotes(page))[0];
+  eq("changing a project row creates one more own material", detached.materials.length, 2);
+  eq("the detached name is exact", detached.materials[1].name, "Gres 30×60 — łazienka");
+  eq("the detached quantity is exact", detached.materials[1].quantity, 21.6);
+  eq("the detached unit is exact", detached.materials[1].unit, "m²");
+  eq("the detached amount is quantity times price", detached.materials[1].amountMinor, 139190);
+  check("the source project key is hidden", detached.hiddenRows.includes(projectKey));
+  check("the editor shows the changed line and quantity",
+    (await page.textContent("#quo-own-material-list")).includes("Gres 30×60 — łazienka")
+      && (await page.textContent("#quo-own-material-list")).includes("21,6 m²"));
+  eq("the material total replaces the project row with the detached one",
+    minor(await page.textContent("#quo-fig-materials")), 144190);
+  await page.evaluate(() => {
+    const company = crmAddCompany({ name: "Firma testowa" });
+    crmUpdateQuote("q1", { companyId: company.id });
+    pdfFillQuote("q1");
+  });
+  const pdfMaterials = (await page.textContent('#ws-pdf-doc tbody[data-pdf="materialRows"]')).replace(/\s/g, " ");
+  check("the PDF shows the detached name and quantity",
+    pdfMaterials.includes("Gres 30×60 — łazienka") && pdfMaterials.includes("21,6 m²"), JSON.stringify(pdfMaterials));
+
   await page.click("#quo-hidden-summary");
   await page.locator(`#quo-hidden-list li[data-key="${projectKey}"] [data-restore-row]`).click();
-  check("the hidden project row is restored",
+  check("the hidden project row remains restorable",
     await page.locator(`#quo-material-list li[data-key="${projectKey}"]`).count() === 1);
+  eq("restoring does not remove the detached own line", (await liveQuotes(page))[0].materials.length, 2);
 
   const downloadReady = page.waitForEvent("download");
   await page.click("#quo-csv");

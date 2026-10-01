@@ -398,6 +398,10 @@
             <ul id="quo-project-list" class="data-list"></ul>
             <p id="quo-room-list" class="muted quo-rooms-line"></p>
             <ul id="quo-material-list" class="data-list"></ul>
+            <div id="quo-other-wrap" hidden>
+              <h3>Weitere Kosten</h3>
+              <ul id="quo-other-list" class="data-list"></ul>
+            </div>
             <details id="quo-hidden-wrap" hidden><summary id="quo-hidden-summary"></summary><ul id="quo-hidden-list" class="data-list"></ul></details>
             <p class="muted">Diese Positionen stammen aus dem Projekt und ändern sich mit ihm.</p>
             <ul id="quo-own-material-list" class="data-list"></ul>
@@ -405,7 +409,7 @@
               <p class="ws-mat-grid">
                 <label class="ws-mat-f"><span class="ws-bar-label">Bezeichnung</span><input id="quo-materials-name" type="text" maxlength="120" required></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Menge</span><input id="quo-materials-qty" type="text" inputmode="decimal"></label>
-                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Einheit</span><input id="quo-materials-unit" type="text" maxlength="24"></label>
+                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Einheit</span><select id="quo-materials-unit"><option selected>Stk.</option><option>m²</option><option>lfm</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>Pck.</option><option>Set</option><option>Sack</option><option>Std.</option><option>Tag</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-materials-price-label">Einzelpreis</span><input id="quo-materials-price" type="text" inputmode="decimal"></label>
               </p>
               <p><button type="submit" class="btn btn-primary btn-sm">Material hinzufügen</button><span class="muted" id="quo-materials-run"></span></p>
@@ -423,7 +427,7 @@
               <p class="ws-mat-grid">
                 <label class="ws-mat-f"><span class="ws-bar-label">Arbeit</span><input id="quo-labour-name" type="text" maxlength="120" required></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Menge</span><input id="quo-labour-qty" type="text" inputmode="decimal"></label>
-                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Einheit</span><input id="quo-labour-unit" type="text" maxlength="24"></label>
+                <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Einheit</span><select id="quo-labour-unit"><option>Stk.</option><option selected>m²</option><option>lfm</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>Pck.</option><option>Set</option><option>Sack</option><option>Std.</option><option>Tag</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-labour-price-label">Satz</span><input id="quo-labour-price" type="text" inputmode="decimal"></label>
               </p>
               <p><button type="submit" class="btn btn-primary btn-sm">Arbeitszeit hinzufügen</button><span class="muted" id="quo-labour-run"></span></p>
