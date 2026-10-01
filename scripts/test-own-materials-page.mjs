@@ -204,7 +204,7 @@ head("2. a material typed in by hand");
   eq("and the first price seeded the history", saved.prices.length, 1);
 
   check("the amount is on the screen in that currency",
-    /45,99/.test(await page.$eval("[data-omat-row] .omat-price", (e) => e.textContent)));
+    /45,99/.test(await page.$eval("[data-omat-row] .mrow-price", (e) => e.textContent)));
 
   // The form empties itself, or the next material is typed on top of the last one.
   eq("the name field is empty again",
@@ -272,6 +272,11 @@ head("4. a price typed onto a row lands in the history");
   const page = await open(ctx, PL);
   await addMaterial(page, { name: "Klej C2", application: "COATING", coveragePerUnitM2: "5", priceMajor: "39,99" });
 
+  check("the set-price panel is closed by default",
+    await page.$eval("[data-omat-price-panel]", (e) => e.hidden));
+  await page.click("[data-omat-price-toggle]");
+  check("Change price opens the inline panel",
+    await page.$eval("[data-omat-price-panel]", (e) => !e.hidden));
   await page.fill("[data-omat-row] [data-omat-newprice]", "45,99");
   await page.click("[data-omat-row] [data-omat-save-price]");
   await page.waitForTimeout(60);
@@ -374,6 +379,8 @@ head("7. ten languages, with a row on the screen in each");
       lang, storage: { "liczmat-materials-v1": planted },
     });
     eq(`${lang}: the row is drawn`, (await rows(page)).length, 1);
+    // The dimensions moved into the row's closed panel when the list went compact; they
+    // are still written, in words, and textContent reads them while the panel is shut.
     const spec = await page.$eval("[data-omat-row] .omat-spec", (e) => e.textContent.trim());
     check(`${lang}: the spec is words, not keys`, spec.length > 0 && !/omat_/.test(spec), spec);
     const app = await page.$eval("[data-omat-row] p.muted", (e) => e.textContent.trim());
@@ -399,6 +406,7 @@ head("7. ten languages, with a row on the screen in each");
 head("8. a general material and the live search");
 {
   const page = await open(ctx, PL);
+  await page.setViewportSize({ width: 1400, height: 900 });
   await page.selectOption('[data-omat-in="application"]', "OTHER");
   check("OTHER shows its purpose", await page.locator('[data-omat-group="OTHER"] [data-omat-in="purpose"]').isVisible());
   check("OTHER shows its unit", await page.locator('[data-omat-group="OTHER"] [data-omat-in="unit"]').isVisible());
@@ -409,6 +417,8 @@ head("8. a general material and the live search");
   const first = await page.$eval("[data-omat-row]", (e) => e.textContent.replace(/\s+/g, " "));
   check("the row shows the purpose", first.includes("Drzwi wewnętrzne"));
   check("the row shows the price unit", first.includes("/ szt."));
+  const closedHeight = (await page.locator("[data-omat-row]").boundingBox()).height;
+  check("a closed desktop row is at most 110 px tall", closedHeight <= 110, String(closedHeight));
   for (let i = 0; i < 5; i++) await addMaterial(page, { name: `Materiał ${i}` });
   check("search appears for six materials", await page.locator("[data-omat-search]").isVisible());
   await page.fill("[data-omat-search]", "dębowe");

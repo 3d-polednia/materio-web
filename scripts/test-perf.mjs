@@ -126,7 +126,9 @@ const BUDGET = {
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
   // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
-  "index.html": [236, 62],
+  // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
+  // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
+  "index.html": [237, 62],
   // Raised 2026-09-26 from 248, measured at 248.8 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -150,7 +152,9 @@ const BUDGET = {
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
   // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
-  "konwerter-jednostek/index.html": [242, 68],
+  // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
+  // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
+  "konwerter-jednostek/index.html": [243, 68],
   // Raised 2026-09-26 from 227, measured at 229.4 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -159,7 +163,9 @@ const BUDGET = {
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
   // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
-  "poradniki/ile-farby-na-pokoj/index.html": [234, 63],
+  // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
+  // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
+  "poradniki/ile-farby-na-pokoj/index.html": [235, 63],
   // Raised 2026-09-26 from 234, measured at 235.6 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -168,7 +174,9 @@ const BUDGET = {
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
   // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
-  "sklepy/index.html": [240, 65],
+  // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
+  // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
+  "sklepy/index.html": [241, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
   // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
@@ -252,7 +260,9 @@ const BUDGET = {
   // 2026-10-01, 395/103 -> 396/103.5, measured 395.3/103.0 kB: "Pozostałe" own materials
   // (application OTHER with purpose and unit) in the store /app/ syncs, and the three quote
   // keys for picking an own material in a quote, in every dictionary bundle.
-  "app/index.html": [396, 103.5],
+  // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
+  // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
+  "app/index.html": [397, 103.5],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
@@ -267,7 +277,9 @@ const BUDGET = {
   // and its rules in the shared stylesheet (0.9 kB); this page had less than that left.
   // Raised again 2026-09-30 (Wyceny = kosztorys): the quote editor's keys (issuer, number,
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
-  "p/index.html": [222, 62],
+  // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
+  // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
+  "p/index.html": [223, 62],
 };
 
 /**

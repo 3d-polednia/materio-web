@@ -2252,14 +2252,12 @@ export function quotesMain(lang, t, features, stamp = "") {
   const quoteOwnLink = t("quo_mat_own_link").split("{link}");
   const quoteLineForm = (kind, title) => `<form id="quo-${kind}-form" data-quote-list="${kind}">
               <p class="ws-mat-grid">
-                <label class="ws-mat-f"><span class="ws-bar-label">${esc(t(kind === "materials" ? "quo_mat_line_name" : "quo_labour_name"))}</span><input id="quo-${kind}-name" type="text" maxlength="120"${kind === "materials" ? ' list="quo-own-mats" autocomplete="off"' : ""} required>${kind === "materials" ? '<datalist id="quo-own-mats"></datalist>' : ""}</label>
+                <label class="ws-mat-f"><span class="ws-bar-label">${esc(t(kind === "materials" ? "quo_mat_line_name" : "quo_labour_name"))}</span><input id="quo-${kind}-name" type="text" maxlength="120" required></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">${esc(t("quo_labour_qty"))}</span><input id="quo-${kind}-qty" type="text" inputmode="decimal"></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">${esc(t("quo_labour_unit"))}</span><select id="quo-${kind}-unit">${quoteUnits.map((unit, index) => `<option${index === (kind === "labour" ? 1 : 0) ? " selected" : ""}>${esc(unit)}</option>`).join("")}</select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-${kind}-price-label">${esc(t(kind === "materials" ? "quo_mat_line_price" : "quo_labour_price"))}</span><input id="quo-${kind}-price" type="text" inputmode="decimal"></label>
               </p>
-              ${kind === "materials" ? `<p class="muted" id="quo-materials-cur-note" hidden></p>
-              <p><label><input type="checkbox" id="quo-materials-save-own"> ${esc(t("quo_mat_save_own"))}</label></p>
-              <p class="muted" id="quo-materials-own-link" hidden>${esc(quoteOwnLink[0] || "")}<a href="${urlOwnMaterials(lang)}">${esc(t("omatpage_title"))}</a>${esc(quoteOwnLink[1] || "")}</p>` : ""}
+              ${kind === "materials" ? `<p><label><input type="checkbox" id="quo-materials-save-own"> ${esc(t("quo_mat_save_own"))}</label></p>` : ""}
               <p><button type="submit" class="btn btn-primary btn-sm">${esc(title)}</button><span class="muted" id="quo-${kind}-run"></span></p>
             </form>`;
 
@@ -2342,6 +2340,12 @@ export function quotesMain(lang, t, features, stamp = "") {
             <details id="quo-hidden-wrap" hidden><summary id="quo-hidden-summary"></summary><ul id="quo-hidden-list" class="data-list"></ul></details>
             <p class="muted">${esc(t("quo_project_rows_note"))}</p>
             <ul id="quo-own-material-list" class="data-list"></ul>
+            <div class="quo-own-picker">
+              <h3>${esc(t("quo_own_t"))}</h3>
+              <label class="ws-mat-f quo-own-search" id="quo-own-search-wrap" hidden><input type="search" id="quo-own-search" aria-label="${esc(t("quo_own_search"))}"></label>
+              <div id="quo-own-picker-list" class="mlist"></div>
+              <p class="muted" id="quo-own-picker-empty">${esc(quoteOwnLink[0] || "")}<a href="${urlOwnMaterials(lang)}">${esc(t("omatpage_title"))}</a>${esc(quoteOwnLink[1] || "")}</p>
+            </div>
             ${quoteLineForm("materials", t("quo_material_add"))}
           </section>
 

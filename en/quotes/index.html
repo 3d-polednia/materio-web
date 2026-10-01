@@ -406,16 +406,20 @@
             <details id="quo-hidden-wrap" hidden><summary id="quo-hidden-summary"></summary><ul id="quo-hidden-list" class="data-list"></ul></details>
             <p class="muted">These items come from the project and change with it.</p>
             <ul id="quo-own-material-list" class="data-list"></ul>
+            <div class="quo-own-picker">
+              <h3>Your materials</h3>
+              <label class="ws-mat-f quo-own-search" id="quo-own-search-wrap" hidden><input type="search" id="quo-own-search" aria-label="Search your materials"></label>
+              <div id="quo-own-picker-list" class="mlist"></div>
+              <p class="muted" id="quo-own-picker-empty">Add your materials in <a href="/en/my-materials/">My materials</a>.</p>
+            </div>
             <form id="quo-materials-form" data-quote-list="materials">
               <p class="ws-mat-grid">
-                <label class="ws-mat-f"><span class="ws-bar-label">Name</span><input id="quo-materials-name" type="text" maxlength="120" list="quo-own-mats" autocomplete="off" required><datalist id="quo-own-mats"></datalist></label>
+                <label class="ws-mat-f"><span class="ws-bar-label">Name</span><input id="quo-materials-name" type="text" maxlength="120" required></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Quantity</span><input id="quo-materials-qty" type="text" inputmode="decimal"></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label">Unit</span><select id="quo-materials-unit"><option selected>pcs</option><option>m²</option><option>lin. m</option><option>m³</option><option>kg</option><option>t</option><option>l</option><option>pack</option><option>set</option><option>bag</option><option>h</option><option>day</option></select></label>
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-materials-price-label">Unit price</span><input id="quo-materials-price" type="text" inputmode="decimal"></label>
               </p>
-              <p class="muted" id="quo-materials-cur-note" hidden></p>
               <p><label><input type="checkbox" id="quo-materials-save-own"> Save in my materials</label></p>
-              <p class="muted" id="quo-materials-own-link" hidden>Add your materials in <a href="/en/my-materials/">My materials</a>.</p>
               <p><button type="submit" class="btn btn-primary btn-sm">Add material</button><span class="muted" id="quo-materials-run"></span></p>
             </form>
           </section>

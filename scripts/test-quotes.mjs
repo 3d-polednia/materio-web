@@ -104,6 +104,7 @@ function loadCrm() {
     "crmRestoreQuote", "crmProjectQuotes", "crmClientQuotes", "crmQuoteTotals", "crmQuoteChain",
     "crmQuoteStatus", "crmQuoteSummary",
     "crmLabour", "crmAddLabour", "crmUpdateLabour", "crmDeleteLabour", "crmLabourRate",
+    "crmAddQuoteLine", "crmUpdateQuoteLine",
     "crmLineAmount", "crmQty", "crmPct",
     "CRM_KEY", "CRM_SCHEMA", "CRM_MAX_NAME", "CRM_MAX_NOTE",
     "QUO_MAX_LINES", "QUO_MAX_MARGIN", "QUOTE_STATUS",
@@ -723,6 +724,19 @@ head("7. chapter XXIV backwards: WYCENA → PROJEKT → KLIENT, all derived");
   eq("an unfiled project still has the project", chain2.project.id, loose.id);
   eq("its quote is found from the project", crm.crmProjectQuotes(loose.id)[0].id, q2.id);
   eq("no client", chain2.client, null);
+}
+
+head("7d. own-material links are stored only when supplied");
+{
+  const crm = loadCrm();
+  const q = crm.crmAddQuote({ name: "Wycena" });
+  crm.crmAddQuoteLine(q.id, "materials", { name: "Drzwi", quantity: "2", unit: "szt.", priceMajor: "300", ownId: "own-doors" });
+  crm.crmAddQuoteLine(q.id, "materials", { name: "Klej", quantity: "1", unit: "opak.", priceMajor: "40" });
+  const lines = crm.crmQuote(q.id).materials;
+  eq("a picker line stores its own-material id", lines[0].ownId, "own-doors");
+  eq("a typed line does not grow an empty own-material field", Object.hasOwn(lines[1], "ownId"), false);
+  crm.crmUpdateQuoteLine(q.id, "materials", lines[0].id, { name: "Drzwi dębowe" });
+  eq("editing a picker line keeps its source link", crm.crmQuote(q.id).materials[0].ownId, "own-doors");
 }
 
 /* ================================================================== 8. the route */

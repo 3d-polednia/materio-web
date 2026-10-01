@@ -860,7 +860,7 @@ function crmStampQuote(quote) {
  * Add one labour line to a quote.
  *
  * @param {string} quoteId
- * @param {{name:string, quantity?:string|number, unit?:string, priceMajor?:string|number}} fields
+ * @param {{name:string, quantity?:string|number, unit?:string, priceMajor?:string|number, ownId?:string}} fields
  * @returns {object|null} the stored quote, or null when there is no name or no room left
  */
 function crmAddQuoteLine(quoteId, listName, fields) {
@@ -876,13 +876,18 @@ function crmAddQuoteLine(quoteId, listName, fields) {
   if (!Array.isArray(quote[listName])) quote[listName] = [];
   if (quote[listName].length >= QUO_MAX_LINES) return null;
   const qty = crmQty(f.quantity);
-  quote[listName].push({
+  const line = {
     id: crmId(),
     name,
     quantity: qty,
     unit: crmText(f.unit, CRM_MAX_UNIT),
     amountMinor: crmLineAmount(f.priceMajor, qty),
-  });
+  };
+  // Only picker-created material lines carry the source link. Typed lines and labour keep
+  // their existing shape, while edits deliberately leave the link intact.
+  const ownId = crmText(f.ownId, 64);
+  if (ownId) line.ownId = ownId;
+  quote[listName].push(line);
   crmStampQuote(quote);
   quote.updatedAt = Date.now();
   if (!crmSave(data)) return null;

@@ -1123,19 +1123,28 @@ head("8. own materials in a quote");
     priceMinor: 120000, currencyCode: "PLN", priceUpdatedAt: T0, prices: [], ...sync(T0),
   }] };
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm(), materials: own });
-  eq("the datalist contains the own material", await page.$eval("#quo-own-mats option", (o) => o.value), "Drzwi dębowe");
-  await page.fill("#quo-materials-name", "Drzwi dębowe");
-  eq("an exact match fills the unit", await page.inputValue("#quo-materials-unit"), "szt.");
-  eq("an exact match fills the price", await page.inputValue("#quo-materials-price"), "1200");
-  check("an exact match hides save-own", !(await page.locator("#quo-materials-save-own").isVisible()));
+  check("the picker lists the own material", (await page.textContent("#quo-own-picker-list")).includes("Drzwi dębowe"));
+  await page.fill("[data-quo-own-qty]", "3");
+  await page.click("[data-quo-own-add]");
+  const picked = (await liveQuotes(page))[0].materials[0];
+  eq("Dodaj copies the quantity", picked.quantity, 3);
+  eq("Dodaj copies the unit", picked.unit, "szt.");
+  eq("Dodaj copies the compatible price", picked.amountMinor, 360000);
+  eq("Dodaj stores the own-material link", picked.ownId, "m1");
+  check("the linked row says it is in the quote", (await page.textContent("[data-quo-own-id=m1]")).includes("W wycenie"));
+  check("the linked row offers removal", await page.locator("[data-quo-own-id=m1] [data-quo-own-remove]").isVisible());
+  await page.click("[data-quo-own-id=m1] [data-quo-own-remove]");
+  eq("Usuń removes the linked quote line", (await liveQuotes(page))[0].materials.length, 0);
+  check("an empty typed-line list prints no misleading own-material message",
+    !(await page.textContent("#quo-own-material-list")).includes("Nie ma jeszcze własnych materiałów"));
   await page.close();
 
   const foreign = crm();
   foreign.quotes[0] = { ...foreign.quotes[0], currencyCode: "EUR" };
   const euro = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: foreign, materials: own });
-  await euro.fill("#quo-materials-name", "Drzwi dębowe");
-  eq("a different currency leaves price empty", await euro.inputValue("#quo-materials-price"), "");
-  check("a different currency shows its code", (await euro.textContent("#quo-materials-cur-note")).includes("PLN"));
+  check("a different currency shows its code", (await euro.textContent("[data-quo-own-id=m1]")).includes("PLN"));
+  await euro.click("[data-quo-own-add]");
+  eq("a different currency adds the line without a price", (await liveQuotes(euro))[0].materials[0].amountMinor, 0);
   await euro.close();
 
   // A quote with no money yet takes the visitor's currency on its first line, so a złoty
@@ -1143,11 +1152,32 @@ head("8. own materials in a quote");
   const blank = crm();
   blank.quotes[0] = { ...blank.quotes[0], currencyCode: "" };
   const fresh = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: blank, materials: own, currency: "EUR" });
-  await fresh.fill("#quo-materials-name", "Drzwi dębowe");
-  eq("an unpriced quote in EUR does not take a PLN price", await fresh.inputValue("#quo-materials-price"), "");
+  await fresh.click("[data-quo-own-add]");
+  eq("an unpriced quote in EUR does not take a PLN price", (await liveQuotes(fresh))[0].materials[0].amountMinor, 0);
   await fresh.close();
 
-  const add =await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
+  const six = { materials: Array.from({ length: 6 }, (_, i) => ({
+    ...own.materials[0], id: `m${i + 1}`, name: i === 5 ? "Klej specjalny" : `Drzwi ${i + 1}`,
+    purpose: i === 5 ? "Łazienka" : "Drzwi wewnętrzne",
+  })) };
+  const search = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm(), materials: six });
+  check("search appears from six own materials", await search.locator("#quo-own-search").isVisible());
+  await search.fill("#quo-own-search", "łazienka");
+  eq("search filters by purpose", await search.locator("[data-quo-own-id]").count(), 1);
+  check("the matching row remains", (await search.textContent("#quo-own-picker-list")).includes("Klej specjalny"));
+  await search.close();
+
+  const none = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm(), materials: { materials: [] } });
+  check("no own materials shows a link to My materials", await none.locator("#quo-own-picker-empty a").isVisible());
+  eq("the empty link points to My materials", await none.getAttribute("#quo-own-picker-empty a", "href"), "/moje-materialy/");
+  await none.close();
+
+  const mobile = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm(), materials: own });
+  await mobile.setViewportSize({ width: 390, height: 844 });
+  check("the picker has no horizontal overflow at 390 px", await mobile.evaluate(() => document.documentElement.scrollWidth <= 390));
+  await mobile.close();
+
+  const add = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
   await add.fill("#quo-materials-name", "Klamka");
   await add.selectOption("#quo-materials-unit", "szt.");
   await add.fill("#quo-materials-price", "55,50");
@@ -1157,6 +1187,10 @@ head("8. own materials in a quote");
   eq("the checkbox saves an OTHER material", saved.application, "OTHER");
   eq("the saved material keeps the quote unit", saved.unit, "szt.");
   eq("the saved material keeps the price", saved.priceMinor, 5550);
+  const line = (await liveQuotes(add))[0].materials.find((l) => l.name === "Klamka");
+  eq("the typed line is linked to the material it created", line && line.ownId, saved.id);
+  check("so the picker shows it as already in the quote",
+    await add.locator(`[data-quo-own-id="${saved.id}"] [data-quo-own-remove]`).count() === 1);
   await add.close();
 }
 
