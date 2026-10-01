@@ -518,7 +518,8 @@ head("3c. a line is corrected in the row it belongs to, and removed from it");
     document.querySelectorAll("#quo-labour-list > li.ws-mat").length === 0);
   stored = (await liveQuotes(page))[0];
   eq("removing the line takes it off the quote", stored.labour.length, 0);
-  eq("and with the last amount gone the currency stamp goes too", stored.currencyCode, "");
+  // Since 2026-10-01 the quote keeps its currency: it can be chosen before anything is typed.
+  eq("and with the last amount gone the quote keeps its currency", stored.currencyCode, "PLN");
   eq("the labour figure is zero", minor(await page.textContent("#quo-fig-labour")), 0);
   await page.close();
 }
@@ -903,6 +904,50 @@ head("7h0. a quote keeps its client without a project");
   });
   eq("the PDF of a quote with no project names its client",
     await page.textContent('#ws-pdf-doc [data-pdf="clientName"]'), "Jan Kowalski");
+  eq("no page error", page.errors.length, 0);
+  await page.close();
+}
+
+head("7h1. the quote's own currency, and deleting from the list");
+{
+  // Owner, 2026-10-01: a firm working in Poland and in Germany quotes in either currency,
+  // whatever the page language; and a quote can be deleted from the list.
+  const loose = crm({ quotes: [{ ...crm().quotes[0], projectId: "" }] });
+  const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: loose });
+  eq("the currency picker shows the quote's currency", await page.$eval("#quo-currency", (s) => s.value), "PLN");
+  check("and offers EUR", await page.$eval("#quo-currency", (s) => [...s.options].some((o) => o.value === "EUR")));
+  const amount = (await liveQuotes(page))[0].labour[0].amountMinor;
+  await page.selectOption("#quo-currency", "EUR");
+  eq("choosing EUR stores it on the quote", (await liveQuotes(page))[0].currencyCode, "EUR");
+  eq("nothing is converted", (await liveQuotes(page))[0].labour[0].amountMinor, amount);
+  check("the editor reads the total in euro", (await page.textContent("#quo-fig-total")).includes("€"),
+    await page.textContent("#quo-fig-total"));
+  await page.evaluate(() => {
+    const company = crmAddCompany({ name: "Firma testowa" });
+    crmUpdateQuote("q1", { companyId: company.id });
+    pdfFillQuote("q1");
+  });
+  eq("the PDF total is labelled in EUR",
+    await page.textContent('#ws-pdf-doc [data-pdf="totalLabel"]'), "Razem (EUR)");
+  await page.evaluate(() => { crmUpdateQuote("q1", { note: "" }); pdfFillQuote("q1"); });
+  await page.emulateMedia({ media: "print" });
+  check("a quote with no client and no project prints no lone Dla heading",
+    await page.$eval("[data-pdf-row=forBlock]", (n) => n.hidden));
+  check("with no notes beside it the summary still sits on the right", await page.$eval("#ws-pdf-doc", (doc) => {
+    const sum = doc.querySelector(".qdoc-sum").getBoundingClientRect();
+    const box = doc.querySelector(".qdoc-sum-container").getBoundingClientRect();
+    return doc.querySelector("[data-pdf-row=notesBlock]").hidden && Math.abs(sum.right - box.right) < 2 && sum.left > box.left + 20;
+  }));
+  await page.emulateMedia({ media: "screen" });
+  check("and its price columns in €",
+    (await page.textContent('#ws-pdf-doc [data-pdf="valueHead"]')).includes("€"));
+  await page.goto(base + QUOTES, { waitUntil: "load" });
+  await page.waitForSelector("html[data-quotes-ready]");
+  await page.click('#quo-list li[data-id="q1"] [data-quote-delete]');
+  eq("the list deletes the quote", (await liveQuotes(page)).length, 0);
+  check("and offers it back", await page.locator("#quo-undo").isVisible());
+  await page.click("#quo-undo-go");
+  eq("undo brings it back", (await liveQuotes(page)).length, 1);
   eq("no page error", page.errors.length, 0);
   await page.close();
 }

@@ -742,6 +742,11 @@ function crmUpdateQuote(id, fields) {
   if (f.note !== undefined) quote.note = crmText(f.note, CRM_MAX_NOTE);
   if (f.marginMajor !== undefined) quote.marginPct = crmPct(f.marginMajor);
   if (f.projectId !== undefined) quote.projectId = crmProjectId(f.projectId);
+  if (f.currencyCode !== undefined) {
+    // Never a conversion: the amounts stay as typed and are read in the chosen currency.
+    const code = String(f.currencyCode || "").trim().toUpperCase();
+    if (/^[A-Z]{3}$/.test(code)) quote.currencyCode = code;
+  }
   if (f.clientId !== undefined) quote.clientId = crmClientId(f.clientId);
   if (f.companyId !== undefined) {
     const companyId = crmText(f.companyId, 64);
@@ -845,8 +850,10 @@ const crmLabour = (quoteId) => {
 function crmStampQuote(quote) {
   const money = ["labour", "materials"].reduce((total, list) => total
     + (Array.isArray(quote[list]) ? quote[list] : []).reduce((sum, line) => sum + (line.amountMinor || 0), 0), 0);
-  if (!money) quote.currencyCode = "";
-  else if (!quote.currencyCode) quote.currencyCode = crmCurrency();
+  // A currency chosen on the quote stays when its last amount goes (owner, 2026-10-01: a
+  // firm working in Poland and in Germany picks EUR before it types anything). The label
+  // still follows the money — see crmQuoteTotals().
+  if (money && !quote.currencyCode) quote.currencyCode = crmCurrency();
 }
 
 /**
@@ -1062,8 +1069,10 @@ function crmQuoteSummary(id) {
   const project = quote.projectId && typeof wsProject === "function"
     ? wsProject(quote.projectId) : null;
   const missing = [];
-  // No project is fine once the quote carries its own materials (owner, 2026-10-01).
-  if (!project && !(Array.isArray(quote.materials) && quote.materials.length)) missing.push("project");
+  // No project is fine once the quote carries its own materials or labour (owner,
+  // 2026-10-01: a quote for a door fitted is labour and a door, no project).
+  const own = ["materials", "labour"].some((list) => Array.isArray(quote[list]) && quote[list].length);
+  if (!project && !own) missing.push("project");
   if (!Array.isArray(quote.labour) || !quote.labour.length) missing.push("labour");
   return {
     quote,

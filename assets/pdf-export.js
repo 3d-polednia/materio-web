@@ -368,6 +368,8 @@ function pdfFillQuote(quoteId) {
     pdfSet(doc, slot, clean);
     pdfShow(doc, slot, Boolean(clean));
   }
+  // A quote for nobody in particular prints no lone "Dla" heading.
+  pdfShow(doc, "forBlock", Boolean(client || project));
 
   const lines = crmQuoteLines(quote);
   const projectRows = lines.projectRows.filter((row) => !row.hidden);

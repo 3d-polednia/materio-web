@@ -263,6 +263,9 @@
 .qdoc-sum {
   width: 85mm;
   flex: none;
+  /* Right-hand, under the Wartość column, also when there are no notes beside it — the
+     owner's quote without notes printed it on the left (2026-10-01). */
+  margin-left: auto;
   border-collapse: collapse;
   font-size: 10pt;
 }

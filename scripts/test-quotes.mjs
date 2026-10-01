@@ -616,9 +616,23 @@ head("6. waluta — stamped once, never re-stamped, never converted (chapter VI)
   const lines = crm.crmLabour(q.id);
   crm.crmDeleteLabour(q.id, lines[0].id);
   crm.crmDeleteLabour(q.id, lines[1].id);
-  eq("with the last amount gone the stamp goes too", crm.crmQuote(q.id).currencyCode, "");
+  // Until 2026-10-01 the stamp went with the last amount. A currency can now be chosen on
+  // the quote before anything is typed, so it stays.
+  eq("with the last amount gone the quote keeps its currency", crm.crmQuote(q.id).currencyCode, "PLN");
   crm.crmAddLabour(q.id, { name: "Trzecia praca", priceMajor: "700" });
-  eq("so the next amount is stamped fresh", crm.crmQuote(q.id).currencyCode, "EUR");
+  eq("and the next amount is read in it", crm.crmQuote(q.id).currencyCode, "PLN");
+
+  // Owner, 2026-10-01: a firm working in Poland and Germany picks the quote's currency.
+  const before = crm.crmLabour(q.id)[0].amountMinor;
+  crm.crmUpdateQuote(q.id, { currencyCode: "eur" });
+  eq("a currency chosen on the quote is stored", crm.crmQuote(q.id).currencyCode, "EUR");
+  eq("nothing is converted", crm.crmLabour(q.id)[0].amountMinor, before);
+  eq("the totals are read in it", crm.crmQuoteTotals(q.id).currencyCode, "EUR");
+  crm.crmUpdateQuote(q.id, { currencyCode: "euro" });
+  eq("a code that is not one is ignored", crm.crmQuote(q.id).currencyCode, "EUR");
+  const fresh = crm.crmAddQuote({ name: "Pusta" });
+  crm.crmUpdateQuote(fresh.id, { currencyCode: "EUR" });
+  eq("an empty quote keeps a chosen currency", crm.crmQuoteTotals(fresh.id).currencyCode, "EUR");
 }
 
 head("6b. a quote whose halves are in two currencies is told, never converted");

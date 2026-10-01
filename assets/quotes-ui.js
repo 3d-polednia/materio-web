@@ -185,6 +185,7 @@ function quoRow(q) {
             `<option value="${status}"${status === summary.status ? " selected" : ""}>${quoEsc(quoT(`quo_st_${status}`))}</option>`).join("")}</select>
         </label>
         <strong class="dash-fig">${total}</strong>
+        <button type="button" class="btn btn-ghost btn-sm" data-quote-delete aria-label="${quoEsc(`${quoT("quo_remove")}: ${q.name}`)}">${quoEsc(quoT("quo_remove"))}</button>
       </span>
     </li>`;
 }
@@ -542,6 +543,12 @@ function quoRenderDetail(id) {
   document.getElementById("quo-number").value = q.number || "";
   document.getElementById("quo-created").value = new Date(q.createdAt).toLocaleDateString(quoLang());
   document.getElementById("quo-valid-until").value = q.validUntil || "";
+  // The quote's own currency, independent of the page language and of the site-wide one.
+  const currency = document.getElementById("quo-currency");
+  const codes = typeof LM_CURRENCIES !== "undefined" ? LM_CURRENCIES : ["PLN", "EUR"];
+  const current = q.currencyCode || crmQuoteTotals(q.id).currencyCode;
+  currency.innerHTML = (codes.indexOf(current) === -1 ? [current, ...codes] : codes)
+    .map((code) => `<option${code === current ? " selected" : ""}>${quoEsc(code)}</option>`).join("");
 
   // Chapter XXII's five figures. Three of them are the project's own money, read through
   // wsProjectCosts() rather than copied, so this page and the project screen can never
@@ -690,6 +697,7 @@ function wireQuoteDetail() {
   on("quo-company", "change", (e) => { crmUpdateQuote(quoOpenId, { companyId: e.target.value }); });
   on("quo-number", "change", (e) => { crmUpdateQuote(quoOpenId, { number: e.target.value }); });
   on("quo-valid-until", "change", (e) => { crmUpdateQuote(quoOpenId, { validUntil: e.target.value }); });
+  on("quo-currency", "change", (e) => { crmUpdateQuote(quoOpenId, { currencyCode: e.target.value }); });
   on("quo-vat", "change", (e) => {
     const custom = document.getElementById("quo-vat-custom");
     custom.hidden = e.target.value !== "custom";
@@ -887,6 +895,19 @@ function buildQuotesPage() {
     const quote = crmAddQuote({ name: name.value, projectId: project.value });
     if (quote) location.href = `${location.pathname}?id=${encodeURIComponent(quote.id)}`;
     else document.getElementById("quo-add-message").textContent = quoT("quo_save_failed");
+  });
+
+  // Owner, 2026-10-01: a quote could be deleted only from inside it. The list offers it per
+  // row; the same undo strip as the editor's delete gives it back.
+  document.getElementById("quo-list").addEventListener("click", (e) => {
+    const button = e.target.closest("[data-quote-delete]");
+    const row = e.target.closest("li[data-id]");
+    if (!button || !row || !quoAllowed()) return;
+    const q = crmQuote(row.dataset.id);
+    if (!q) return;
+    const token = crmDeleteQuote(q.id);
+    quoUndone = token ? { token, name: q.name, restored: false } : null;
+    quoRender();
   });
 
   document.getElementById("quo-list").addEventListener("change", (e) => {

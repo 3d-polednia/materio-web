@@ -763,7 +763,8 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
         marginPct: Math.min(1000, Math.max(0, num(q.marginPct))),
         status: typeof crmQuoteStatus === "function" ? crmQuoteStatus(q) : "draft",
         note: text(q.note, 2000),
-        currencyCode: money === 0 ? "" : text(q.currencyCode, 3),
+        // Sent with no money too since 2026-10-01: a currency chosen before anything is typed.
+        currencyCode: text(q.currencyCode, 3),
         ...syncFields(q.createdAt, q.deletedAt),
       }, MERGE);
     }

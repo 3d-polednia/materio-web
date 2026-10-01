@@ -1410,7 +1410,7 @@ function quotePdfBlock(lang, t, features, stamp = "") {
                     <img class="qdoc-logo" data-pdf="companyLogo" alt="${esc(c("qdoc_company_logo"))}" width="227" height="83" decoding="async" loading="eager">
                     <div class="qdoc-logo-name" data-pdf="logoCompanyName"></div>
                   </div><div class="qdoc-title">${esc(c("qdoc_title"))}</div></div></header>
-                  <div class="qdoc-meta"><div class="qdoc-for"><div class="qdoc-meta-label">${esc(c("qdoc_for"))}</div>
+                  <div class="qdoc-meta"><div class="qdoc-for" data-pdf-row="forBlock"><div class="qdoc-meta-label">${esc(c("qdoc_for"))}</div>
                     <div class="qdoc-for-name" data-pdf-row="clientName" hidden data-pdf="clientName"></div>
                     <div data-pdf-row="clientStreet" hidden data-pdf="clientStreet"></div>
                     <div data-pdf-row="clientPostalCity" hidden data-pdf="clientPostalCity"></div>
@@ -2322,6 +2322,7 @@ export function quotesMain(lang, t, features, stamp = "") {
               <label class="ws-mat-f"><span class="ws-bar-label">${esc(t("quo_number"))}</span><input id="quo-number" maxlength="40"></label>
               <label class="ws-mat-f"><span class="ws-bar-label">${esc(t("quo_date"))}</span><input id="quo-created" readonly></label>
               <label class="ws-mat-f"><span class="ws-bar-label">${esc(t("quo_valid_until"))}</span><input id="quo-valid-until" type="date"></label>
+              <label class="ws-mat-f"><span class="ws-bar-label">${esc(t("cur_label"))}</span><select id="quo-currency"></select></label>
             </div>
           </section>
 
