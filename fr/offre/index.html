@@ -137,11 +137,13 @@
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main" tabindex="-1" class="quote-view-main">
-    <div class="wrap quote-view-wrap" data-title="Offre en ligne" data-missing="Ce lien vers l’offre n’est plus valable ou a été désactivé." data-config="Impossible de charger l’offre car Firebase n’est pas configuré.">
+    <div class="wrap quote-view-wrap" data-title="Offre en ligne" data-missing="Ce lien vers l’offre n’est plus valable ou a été désactivé." data-config="Impossible de charger l’offre car Firebase n’est pas configuré." data-downloading="Préparation du PDF…" data-download-failed="Impossible de télécharger le PDF.">
       <h1 id="quote-view-title">Chargement de l’offre…</h1>
       <p id="quote-view-state" class="muted" role="status">Chargement de l’offre…</p>
       <div id="quote-view-toolbar" class="quote-view-toolbar" hidden>
-        <button type="button" class="btn btn-primary" id="quote-view-print">Télécharger le PDF / Imprimer</button>
+        <button type="button" class="btn btn-primary" id="quote-view-download">Télécharger le PDF</button>
+        <button type="button" class="btn btn-ghost" id="quote-view-print">Imprimer</button>
+        <span id="quote-view-download-error" class="quote-view-download-error" role="status"></span>
       </div>
       <section class="ws-pdf" id="ws-pdf">
             <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>

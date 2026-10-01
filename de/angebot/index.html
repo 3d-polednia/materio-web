@@ -137,11 +137,13 @@
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main" tabindex="-1" class="quote-view-main">
-    <div class="wrap quote-view-wrap" data-title="Online-Angebot" data-missing="Dieser Angebotslink ist nicht mehr aktuell oder wurde deaktiviert." data-config="Das Angebot kann nicht geladen werden, da Firebase nicht konfiguriert ist.">
+    <div class="wrap quote-view-wrap" data-title="Online-Angebot" data-missing="Dieser Angebotslink ist nicht mehr aktuell oder wurde deaktiviert." data-config="Das Angebot kann nicht geladen werden, da Firebase nicht konfiguriert ist." data-downloading="PDF wird vorbereitet…" data-download-failed="PDF konnte nicht heruntergeladen werden.">
       <h1 id="quote-view-title">Angebot wird geladen…</h1>
       <p id="quote-view-state" class="muted" role="status">Angebot wird geladen…</p>
       <div id="quote-view-toolbar" class="quote-view-toolbar" hidden>
-        <button type="button" class="btn btn-primary" id="quote-view-print">PDF herunterladen / Drucken</button>
+        <button type="button" class="btn btn-primary" id="quote-view-download">PDF herunterladen</button>
+        <button type="button" class="btn btn-ghost" id="quote-view-print">Drucken</button>
+        <span id="quote-view-download-error" class="quote-view-download-error" role="status"></span>
       </div>
       <section class="ws-pdf" id="ws-pdf">
             <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>

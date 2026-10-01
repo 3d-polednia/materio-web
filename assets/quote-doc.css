@@ -637,7 +637,8 @@ MARKUP SKELETON
 .quo-share-link input { flex: 1; min-width: 0; }
 .quo-share-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
 .quote-view-wrap { max-width: 1100px; padding-block: 2rem; }
-.quote-view-toolbar { margin: 0 0 1rem; }
+.quote-view-toolbar { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0 0 1rem; }
+.quote-view-download-error { align-self: center; color: var(--error); flex-basis: 100%; }
 .quote-view-page #ws-pdf { margin: 0; }
 .quote-view-page #pdf-tool { overflow: visible; }
 .quote-view-page .qdoc { margin-inline: auto; }

@@ -137,11 +137,13 @@
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main" tabindex="-1" class="quote-view-main">
-    <div class="wrap quote-view-wrap" data-title="Online quote" data-missing="This quote link is no longer current or has been disabled." data-config="The quote cannot be loaded because Firebase is not configured.">
+    <div class="wrap quote-view-wrap" data-title="Online quote" data-missing="This quote link is no longer current or has been disabled." data-config="The quote cannot be loaded because Firebase is not configured." data-downloading="Preparing PDF…" data-download-failed="The PDF could not be downloaded.">
       <h1 id="quote-view-title">Loading quote…</h1>
       <p id="quote-view-state" class="muted" role="status">Loading quote…</p>
       <div id="quote-view-toolbar" class="quote-view-toolbar" hidden>
-        <button type="button" class="btn btn-primary" id="quote-view-print">Download PDF / Print</button>
+        <button type="button" class="btn btn-primary" id="quote-view-download">Download PDF</button>
+        <button type="button" class="btn btn-ghost" id="quote-view-print">Print</button>
+        <span id="quote-view-download-error" class="quote-view-download-error" role="status"></span>
       </div>
       <section class="ws-pdf" id="ws-pdf">
             <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>

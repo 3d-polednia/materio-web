@@ -1449,11 +1449,13 @@ export function quotePdfBlock(lang, t, features, stamp = "") {
 /** Public shell around the exact same quote-document builder used by the owner page. */
 export function quoteViewMain(lang, t, features, stamp = "", copy) {
   return `<main id="main" tabindex="-1" class="quote-view-main">
-    <div class="wrap quote-view-wrap" data-title="${esc(copy.title)}" data-missing="${esc(copy.missing)}" data-config="${esc(copy.config)}">
+    <div class="wrap quote-view-wrap" data-title="${esc(copy.title)}" data-missing="${esc(copy.missing)}" data-config="${esc(copy.config)}" data-downloading="${esc(copy.downloading)}" data-download-failed="${esc(copy.downloadFailed)}">
       <h1 id="quote-view-title">${esc(copy.loading)}</h1>
       <p id="quote-view-state" class="muted" role="status">${esc(copy.loading)}</p>
       <div id="quote-view-toolbar" class="quote-view-toolbar" hidden>
-        <button type="button" class="btn btn-primary" id="quote-view-print">${esc(copy.print)}</button>
+        <button type="button" class="btn btn-primary" id="quote-view-download">${esc(copy.download)}</button>
+        <button type="button" class="btn btn-ghost" id="quote-view-print">${esc(copy.print)}</button>
+        <span id="quote-view-download-error" class="quote-view-download-error" role="status"></span>
       </div>
       ${quotePdfBlock(lang, t, features, stamp)}
     </div>

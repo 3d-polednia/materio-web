@@ -187,18 +187,42 @@ head("editor sharing");
 async function publicPage(path, snap, viewport = { width: 1280, height: 900 }) {
   const ctx = await context(viewport);
   const page = await ctx.newPage();
-  await page.addInitScript((value) => { window.__LM_SHARED_QUOTE__ = { quote: value }; }, snap);
+  const requests = [];
+  page.on("request", (request) => requests.push(request.url()));
+  await page.addInitScript((value) => {
+    window.__LM_SHARED_QUOTE__ = { quote: value };
+    window.__printCalls = 0;
+    window.print = () => { window.__printCalls += 1; };
+  }, snap);
   await page.goto(base + path, { waitUntil: "load" });
-  return { ctx, page };
+  return { ctx, page, requests };
 }
 
 head("public quote page");
 {
-  const { ctx, page } = await publicPage(`${urlQuoteView("pl")}?t=AAAAAAAAAAAAAAAAAAAAAA`, snapshot);
+  const { ctx, page, requests } = await publicPage(`${urlQuoteView("pl")}?t=AAAAAAAAAAAAAAAAAAAAAA`, snapshot);
   const text = await page.locator("#ws-pdf-doc").innerText();
   for (const value of ["Firma Testowa", "Jan Kowalski", "Gres premium"]) check(`renders ${value}`, text.includes(value), text);
   check("renders the total", text.includes("zł") || text.includes("PLN"), text);
   check("title contains the quote number", (await page.title()).includes(snapshot.quote.number), await page.title());
+  eq("Polish download label", (await page.textContent("#quote-view-download")).trim(), "Pobierz PDF");
+  eq("Polish print label", (await page.textContent("#quote-view-print")).trim(), "Drukuj");
+  eq("vendor scripts are absent on load", requests.filter((url) => url.includes("/assets/vendor/")).length, 0);
+  const downloadPromise = page.waitForEvent("download");
+  await page.click("#quote-view-download");
+  const download = await downloadPromise;
+  const filename = download.suggestedFilename();
+  check("download has a PDF filename", filename.endsWith(".pdf"), filename);
+  check("filename contains the safe quote number", filename.includes("OF-1-2026"), filename);
+  const bytes = readFileSync(await download.path());
+  eq("download starts with the PDF signature", bytes.subarray(0, 4).toString(), "%PDF");
+  check("download is larger than 20 kB", bytes.length > 20 * 1024, `${bytes.length} bytes`);
+  eq("download does not print", await page.evaluate(() => window.__printCalls), 0);
+  check("vendor scripts are requested after the click",
+    requests.filter((url) => url.includes("/assets/vendor/")).length === 2,
+    requests.filter((url) => url.includes("/assets/vendor/")).join(", "));
+  await page.click("#quote-view-print");
+  eq("print button prints once", await page.evaluate(() => window.__printCalls), 1);
   await page.emulateMedia({ media: "print" });
   eq("toolbar is hidden in print", await page.locator("#quote-view-toolbar").isVisible(), false);
   await ctx.close();
@@ -227,12 +251,35 @@ head("public quote page");
   const { ctx, page } = await publicPage(`${urlQuoteView("pl")}?t=AAAAAAAAAAAAAAAAAAAAAA`, snapshot, { width: 390, height: 844 });
   check("390 px has no horizontal overflow", await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
     await page.evaluate(() => `${document.documentElement.scrollWidth} > ${innerWidth + 1}`));
+  check("both toolbar buttons are visible at 390 px",
+    await page.locator("#quote-view-download").isVisible() && await page.locator("#quote-view-print").isVisible());
+  // Owner's phone, 2026-10-01: the first build captured the narrow one-column layout and
+  // a one-page quote came out as three pages of oversized text plus a cropped QR code.
+  const downloadPromise = page.waitForEvent("download");
+  await page.click("#quote-view-download");
+  const pdf = readFileSync(await (await downloadPromise).path()).toString("latin1");
+  eq("on a phone a short quote is one A4 page", (pdf.match(/\/Type\s*\/Page\b/g) || []).length, 1);
   await ctx.close();
 }
 {
   const { ctx, page } = await publicPage(`${urlQuoteView("de")}?t=AAAAAAAAAAAAAAAAAAAAAA`, snapshot);
-  const label = (await page.textContent("#quote-view-print")).trim();
-  check("German print label is translated", label !== "Pobierz PDF / Drukuj" && label !== "quote_view_print" && /PDF|Druck/i.test(label), label);
+  eq("German download label", (await page.textContent("#quote-view-download")).trim(), "PDF herunterladen");
+  eq("German print label", (await page.textContent("#quote-view-print")).trim(), "Drucken");
+  await ctx.close();
+}
+{
+  const long = JSON.parse(JSON.stringify(snapshot));
+  long.materialRows = Array.from({ length: 40 }, (_, index) => ({
+    ...long.materialRows[0],
+    id: `m${index + 1}`,
+    name: `Materiał testowy ${index + 1}`,
+  }));
+  const { ctx, page } = await publicPage(`${urlQuoteView("pl")}?t=AAAAAAAAAAAAAAAAAAAAAA`, long);
+  const downloadPromise = page.waitForEvent("download");
+  await page.click("#quote-view-download");
+  const pdf = readFileSync(await (await downloadPromise).path()).toString("latin1");
+  check("40 material rows produce more than one PDF page",
+    (pdf.match(/\/Type\s*\/Page\b/g) || []).length > 1);
   await ctx.close();
 }
 
