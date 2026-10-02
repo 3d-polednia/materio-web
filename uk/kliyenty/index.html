@@ -408,10 +408,22 @@
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Проєкти</h2>
-              <a class="dash-more" href="/uk/proekty/">Проєкти та приміщення</a>
+              <span class="section-head-actions">
+                <button type="button" class="section-add" id="crm-project-new-toggle" aria-expanded="false">
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12"/></svg>
+  <span>Новий проєкт</span>
+</button>
+                <a class="dash-more" href="/uk/proekty/">Проєкти та приміщення</a>
+              </span>
             </div>
             <p class="muted">Проєкти, прив'язані до цього клієнта. Це ті самі проєкти, що й на сторінці проєктів; тут ніщо їх не змінює.</p>
             <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-new-form" class="inline-form section-add-panel" hidden>
+              <label class="field" for="crm-project-new-name"><span class="fld-label">Назва проєкту</span>
+                <input id="crm-project-new-name" type="text" maxlength="120" required></label>
+              <button type="submit" class="btn btn-primary btn-sm">Додати</button>
+            </form>
+            <p class="section-option-label">Прив'язати наявний</p>
             <form id="crm-project-form" class="inline-form">
               <select id="crm-project-pick" aria-label="Прив'язати проєкт"></select>
               <button type="submit" class="btn btn-primary btn-sm">Прив'язати проєкт</button>

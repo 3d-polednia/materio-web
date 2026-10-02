@@ -408,10 +408,22 @@
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Proyectos</h2>
-              <a class="dash-more" href="/es/proyectos/">Proyectos y estancias</a>
+              <span class="section-head-actions">
+                <button type="button" class="section-add" id="crm-project-new-toggle" aria-expanded="false">
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12"/></svg>
+  <span>Nuevo proyecto</span>
+</button>
+                <a class="dash-more" href="/es/proyectos/">Proyectos y estancias</a>
+              </span>
             </div>
             <p class="muted">Los proyectos archivados bajo este cliente. Son los mismos proyectos de la página de proyectos; aquí nada los cambia.</p>
             <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-new-form" class="inline-form section-add-panel" hidden>
+              <label class="field" for="crm-project-new-name"><span class="fld-label">Nombre del proyecto</span>
+                <input id="crm-project-new-name" type="text" maxlength="120" required></label>
+              <button type="submit" class="btn btn-primary btn-sm">Añadir</button>
+            </form>
+            <p class="section-option-label">Asignar uno existente</p>
             <form id="crm-project-form" class="inline-form">
               <select id="crm-project-pick" aria-label="Añadir un proyecto"></select>
               <button type="submit" class="btn btn-primary btn-sm">Añadir un proyecto</button>

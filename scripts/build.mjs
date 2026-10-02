@@ -839,7 +839,7 @@ const WS_SCRIPTS = [
   "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   // Both halves: these two pages draw the screens, and the screens speak the vocabulary
   // assets/workspace-calc.js defines. Order matters — plain scripts, one global scope.
-  "/assets/workspace-calc.js", "/assets/workspace-ui.js",
+  "/assets/recent.js", "/assets/workspace-calc.js", "/assets/workspace-ui.js",
   // The PDF export of session 59 (C6). Last, because it reads the workspace through the
   // globals above and writes into markup the build already put on the page.
   "/assets/pdf-export.js",
@@ -1494,6 +1494,7 @@ function buildWorkspacePages() {
       // before the script that reads it.
       headExtra: `<script>window.LM_PROJ = ${JSON.stringify({
         calcs: Object.fromEntries(CALCS.map((c) => [c.id, urlCalc(lang, c.id)])),
+        calcIndex: urlCalcIndex(lang),
         // The shop aisles, for the material the visitor edits or types in by hand
         // (session 18). The page does not load assets/materials.js — 12 kB of catalogue
         // to render a fifteen-item <select> — so the build hands it the list instead.

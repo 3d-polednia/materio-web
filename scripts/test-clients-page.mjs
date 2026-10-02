@@ -417,6 +417,8 @@ head("3c. deleting asks first, keeps the projects, and offers the client back");
 head("4. a project is filed under a client, and taken off again");
 {
   const page = await open(ctx, `${CLIENTS}?id=c1`, { workspace: workspace(), clients: clients() });
+  check("the existing-project form exists and is visible", await page.locator("#crm-project-form").isVisible());
+  check("the existing-project picker exists and is visible", await page.locator("#crm-project-pick").isVisible());
   // p1 is already filed, so the picker offers p2 and nothing else.
   const options = await page.$$eval("#crm-project-pick option", (o) => o.map((n) => n.textContent));
   eq("the picker offers the project nobody has filed", options.join(), "Salon");
@@ -445,6 +447,38 @@ head("4. a project is filed under a client, and taken off again");
   check("and the one left is not the one taken off", left[0] !== doomed, `${left[0]} vs ${doomed}`);
   eq("and the project itself is untouched", await page.evaluate(() =>
     JSON.parse(localStorage.getItem("materio-workspace-v1")).projects.length), 2);
+  await page.close();
+}
+
+head("4b. a new project starts on the client card and belongs to that client");
+{
+  const emptyWorkspace = { projects: [], rooms: [], estimations: [], shoppingItems: [] };
+  const oneClient = clients();
+  oneClient.clients[0].projectIds = [];
+  const page = await open(ctx, `${CLIENTS}?id=c1`, { workspace: emptyWorkspace, clients: oneClient });
+
+  check("the new-project button exists and is visible", await page.locator("#crm-project-new-toggle").isVisible());
+  await page.click("#crm-project-new-toggle");
+  check("the new-project name exists and is visible", await page.locator("#crm-project-new-name").isVisible());
+  check("the new-project submit exists and is visible",
+    await page.locator("#crm-project-new-form button[type=submit]").isVisible());
+  await page.fill("#crm-project-new-name", "Dach klienta");
+  await page.click("#crm-project-new-form button[type=submit]");
+  await page.waitForFunction(() => document.querySelector("#crm-client-projects li[data-id]"));
+
+  check("the created project row exists and is visible",
+    await page.locator("#crm-client-projects li[data-id]").isVisible());
+  const state = await page.evaluate(() => ({
+    workspace: JSON.parse(localStorage.getItem("materio-workspace-v1")),
+    crm: JSON.parse(localStorage.getItem("liczmat-crm-v1")),
+  }));
+  const made = state.workspace.projects.find((project) => project.name === "Dach klienta");
+  check("the project is present in the workspace store", Boolean(made));
+  eq("the project stores the open client", made && made.clientId, "c1");
+  check("the client stores the new project id",
+    Boolean(made) && state.crm.clients[0].projectIds.includes(made.id));
+  check("the project has an open link on the card",
+    await page.locator(`#crm-client-projects li[data-id="${made.id}"] a`).isVisible());
   await page.close();
 }
 

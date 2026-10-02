@@ -408,10 +408,22 @@
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Projekty</h2>
-              <a class="dash-more" href="/sk/projekty/">Projekty a miestnosti</a>
+              <span class="section-head-actions">
+                <button type="button" class="section-add" id="crm-project-new-toggle" aria-expanded="false">
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12"/></svg>
+  <span>Nový projekt</span>
+</button>
+                <a class="dash-more" href="/sk/projekty/">Projekty a miestnosti</a>
+              </span>
             </div>
             <p class="muted">Projekty priradené tomuto klientovi. Sú to tie isté projekty ako na stránke projektov. Tu ich nič nemení.</p>
             <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-new-form" class="inline-form section-add-panel" hidden>
+              <label class="field" for="crm-project-new-name"><span class="fld-label">Názov projektu</span>
+                <input id="crm-project-new-name" type="text" maxlength="120" required></label>
+              <button type="submit" class="btn btn-primary btn-sm">Pridať</button>
+            </form>
+            <p class="section-option-label">Priradiť existujúci</p>
             <form id="crm-project-form" class="inline-form">
               <select id="crm-project-pick" aria-label="Priradiť projekt"></select>
               <button type="submit" class="btn btn-primary btn-sm">Priradiť projekt</button>

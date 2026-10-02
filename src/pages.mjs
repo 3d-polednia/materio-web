@@ -42,6 +42,12 @@ const fold = (s) => String(s).toLowerCase().normalize("NFD")
 
 const PICK_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg>';
 
+/** The compact add action shared by project and client section headings. */
+const sectionAddButton = (id, label) => `<button type="button" class="section-add" id="${id}" aria-expanded="false">
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12"/></svg>
+  <span>${esc(label)}</span>
+</button>`;
+
 /**
  * The tool itself: the form on one side, the result and the actions on the other.
  *
@@ -1634,7 +1640,14 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           <section class="dash-sec">
             <div class="dash-head">
               <h2>${esc(t("proj_lines_t"))}</h2>
-              <a class="dash-more" href="${urlQuotes(lang)}" id="ws-project-estimate">${esc(t("quopage_title"))}</a>
+              <span class="section-head-actions">
+                ${sectionAddButton("ws-project-calc-toggle", t("proj_calc_add"))}
+                <a class="dash-more" href="${urlQuotes(lang)}" id="ws-project-estimate">${esc(t("quopage_title"))}</a>
+              </span>
+            </div>
+            <div class="section-add-panel" id="ws-project-calc-panel" hidden>
+              <ul class="section-add-list" id="ws-project-calcs"></ul>
+              <a class="dash-more" id="ws-project-calcs-all" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
             </div>
             <p class="muted">${esc(t("proj_lines_d"))}</p>
             <ul id="ws-project-lines" class="data-list"></ul>
@@ -2136,10 +2149,19 @@ export function clientsMain(lang, t, features) {
           <section class="dash-sec">
             <div class="dash-head">
               <h2>${esc(t("cli_projects_t"))}</h2>
-              <a class="dash-more" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+              <span class="section-head-actions">
+                ${sectionAddButton("crm-project-new-toggle", t("cli_project_new"))}
+                <a class="dash-more" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
+              </span>
             </div>
             <p class="muted">${esc(t("cli_projects_d"))}</p>
             <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-new-form" class="inline-form section-add-panel" hidden>
+              <label class="field" for="crm-project-new-name"><span class="fld-label">${esc(t("ws_new_project"))}</span>
+                <input id="crm-project-new-name" type="text" maxlength="120" required></label>
+              <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+            </form>
+            <p class="section-option-label">${esc(t("cli_project_assign"))}</p>
             <form id="crm-project-form" class="inline-form">
               <select id="crm-project-pick" aria-label="${esc(t("cli_project_add"))}"></select>
               <button type="submit" class="btn btn-primary btn-sm">${esc(t("cli_project_add"))}</button>

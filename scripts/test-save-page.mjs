@@ -203,7 +203,7 @@ head("1. a result goes into a project in one click, from a browser with nothing 
 
   // Chapter XV's arrow ends at the project, so the project is a click away.
   eq("the page says where it went", await text(page, "[data-ws-saved]"),
-    `Zapisano w projekcie: Mój projekt Otwórz projekt`);
+    `Zapisano w projekcie: Mój projekt Wróć do projektu Mój projekt`);
   const href = await page.$eval("[data-ws-saved] a", (a) => a.getAttribute("href"));
   eq("with a link to that project, in this language", href,
     `${PROJECTS}?id=${encodeURIComponent(data.projects[0].id)}`);

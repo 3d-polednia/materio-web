@@ -30,7 +30,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LANGS, urlProjects, urlQuotes } from "../src/site.mjs";
+import { LANGS, urlCalc, urlProjects, urlQuotes } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -201,7 +201,11 @@ async function open(ctx, url, opts = {}) {
 
   await page.goto(base + url, { waitUntil: "load" });
   // The page says when it is wired, so a click cannot land on a button nobody listens to.
-  await page.waitForSelector("html[data-ws-ready]");
+  if (url.startsWith(urlProjects(opts.lang || "pl"))) {
+    await page.waitForSelector("html[data-ws-ready]");
+  } else {
+    await page.waitForSelector(".calc[data-calc]");
+  }
   page.errors = errors;
   return page;
 }
@@ -216,6 +220,7 @@ const activeId = (page) => page.evaluate(() => localStorage.getItem("materio-act
 const shown = (page, sel) => page.$eval(sel, (n) => !n.hidden && n.offsetParent !== null);
 
 const PROJECTS = urlProjects("pl");
+const TILES = urlCalc("pl", "waste");
 const ctx = await context({ viewport: { width: 1280, height: 900 } });
 
 /* ------------------------------------------------------------------ 1. the index */
@@ -592,6 +597,46 @@ head("11. the two screens are addresses, not tabs");
   await link.waitForURL(`**${urlQuotes("pl")}`);
   eq("opening the quotes makes this the project they start from", await activeId(link), "p1");
   await link.close();
+}
+
+head("11b. a calculator opened from project B saves into B");
+{
+  const page = await open(ctx, `${PROJECTS}?id=p2`, { workspace: fixture(), active: "p1" });
+  check("the add-calculation button exists and is visible",
+    await page.locator("#ws-project-calc-toggle").isVisible());
+  await page.click("#ws-project-calc-toggle");
+  check("a calculator link exists and is visible",
+    await page.locator(`#ws-project-calcs a[href^="${TILES}?"]`).isVisible());
+  const href = await page.getAttribute(`#ws-project-calcs a[href^="${TILES}?"]`, "href");
+  eq("the calculator link names project B", new URL(href, base).searchParams.get("project"), "p2");
+  await page.click(`#ws-project-calcs a[href^="${TILES}?"]`);
+  await page.waitForURL(`**${TILES}?project=p2`);
+
+  check("the calculator run button exists and is visible", await page.locator("[data-run]").isVisible());
+  await page.fill('[data-k="area"]', "12");
+  await page.click("[data-run]");
+  check("the add-to-project button exists and is visible", await page.locator("[data-ws-save]").isVisible());
+  await page.click("[data-ws-save]");
+  const after = await store(page);
+  eq("the new line lands in project B", after.estimations.filter((line) => line.projectId === "p2").length, 3);
+  eq("the new line does not land in active project A", after.estimations.filter((line) => line.projectId === "p1").length, 2);
+  check("the return link exists and is visible", await page.locator("[data-ws-saved] a").isVisible());
+  eq("the return link opens project B", new URL(await page.getAttribute("[data-ws-saved] a", "href"), base).searchParams.get("id"), "p2");
+  await page.close();
+}
+
+head("11c. a bad project query leaves the calculator on the active project");
+{
+  const page = await open(ctx, `${TILES}?project=xyz`, { workspace: fixture(), active: "p1" });
+  check("the calculator run button exists and is visible", await page.locator("[data-run]").isVisible());
+  await page.fill('[data-k="area"]', "8");
+  await page.click("[data-run]");
+  check("the add-to-project button exists and is visible", await page.locator("[data-ws-save]").isVisible());
+  await page.click("[data-ws-save]");
+  const after = await store(page);
+  eq("the invalid query keeps the active project", await activeId(page), "p1");
+  eq("the saved line uses the active project", after.estimations.filter((line) => line.projectId === "p1").length, 3);
+  await page.close();
 }
 
 /* ------------------------------------------------------------------ 12. languages */

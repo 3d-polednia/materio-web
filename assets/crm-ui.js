@@ -424,6 +424,27 @@ function wireClientDetail() {
     crmLinkProject(crmOpenId, pick.value);
   });
 
+  on("crm-project-new-toggle", "click", (e) => {
+    const form = document.getElementById("crm-project-new-form");
+    if (!form) return;
+    form.hidden = !form.hidden;
+    e.currentTarget.setAttribute("aria-expanded", String(!form.hidden));
+    if (!form.hidden) document.getElementById("crm-project-new-name").focus();
+  });
+
+  on("crm-project-new-form", "submit", (e) => {
+    e.preventDefault();
+    const input = document.getElementById("crm-project-new-name");
+    const name = input.value.trim();
+    if (!name || !crmOpenId) return;
+    // This form lives inside the same Pro account gate as the rest of /klienci/;
+    // the project write is the same free-account write used on /projekty/.
+    const project = wsAddProject(name, { clientId: crmOpenId });
+    if (!project) return;
+    crmLinkProject(crmOpenId, project.id);
+    input.value = "";
+  });
+
   on("crm-client-projects", "click", (e) => {
     const li = e.target.closest("li[data-id]");
     if (li && e.target.closest("[data-unlink]")) crmUnlinkProject(crmOpenId, li.dataset.id);

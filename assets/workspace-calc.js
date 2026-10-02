@@ -176,6 +176,14 @@ function wsWireCard(card) {
   });
 
   wsFillRoomSelect(card);
+  if (card.dataset.wsRequestedRoom) {
+    const room = wsRoom(card.dataset.wsRequestedRoom);
+    if (room) {
+      bar.querySelector("[data-ws-room]").value = room.id;
+      card.dataset.wsRoomId = room.id;
+      card.dataset.wsRoomName = room.name;
+    }
+  }
 }
 
 /**
@@ -464,7 +472,7 @@ function wsSaid(box, projectName, projectId, roomName) {
   const slot = box.closest("[data-calc-actions]");
   const base = (slot && slot.dataset.projectsUrl) || "";
   const link = base && projectId
-    ? ` <a href="${wsEsc(base)}?id=${encodeURIComponent(projectId)}">${wsEsc(wsT("proj_open"))}</a>`
+    ? ` <a href="${wsEsc(base)}?id=${encodeURIComponent(projectId)}">${wsEsc(wsT("proj_return").replace("{name}", projectName))}</a>`
     : "";
   // The room is named only when there is one — a project without rooms has no picker, and
   // "· " with nothing after it would be punctuation reporting on an absence.
@@ -476,6 +484,17 @@ function wsSaid(box, projectName, projectId, roomName) {
 function buildWorkspaceCalculators() {
   const cards = document.querySelectorAll(".calc[data-calc]");
   if (!cards.length) return;
+  let requestedRoom = "";
+  try {
+    const params = new URLSearchParams(location.search);
+    const project = wsProject(params.get("project") || "");
+    if (project && !project.archived) {
+      wsSetActiveProject(project.id);
+      const room = wsRoom(params.get("room") || "");
+      if (room && room.projectId === project.id) requestedRoom = room.id;
+    }
+  } catch (e) {}
+  if (requestedRoom) cards.forEach((card) => { card.dataset.wsRequestedRoom = requestedRoom; });
   cards.forEach(wsWireCard);
   document.addEventListener("calcresult", (e) => wsRenderSave(e.detail.card, e.detail.result));
   document.addEventListener("workspacechange", () => cards.forEach((card) => {

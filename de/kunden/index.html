@@ -408,10 +408,22 @@
           <section class="dash-sec">
             <div class="dash-head">
               <h2>Projekte</h2>
-              <a class="dash-more" href="/de/projekte/">Projekte und Räume</a>
+              <span class="section-head-actions">
+                <button type="button" class="section-add" id="crm-project-new-toggle" aria-expanded="false">
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12"/></svg>
+  <span>Neues Projekt</span>
+</button>
+                <a class="dash-more" href="/de/projekte/">Projekte und Räume</a>
+              </span>
             </div>
             <p class="muted">Projekte, die diesem Kunden zugeordnet sind. Es sind dieselben Projekte wie auf der Projektseite; hier ändert sie nichts.</p>
             <ul id="crm-client-projects" class="data-list"></ul>
+            <form id="crm-project-new-form" class="inline-form section-add-panel" hidden>
+              <label class="field" for="crm-project-new-name"><span class="fld-label">Projektname</span>
+                <input id="crm-project-new-name" type="text" maxlength="120" required></label>
+              <button type="submit" class="btn btn-primary btn-sm">Hinzufügen</button>
+            </form>
+            <p class="section-option-label">Vorhandenes Projekt zuordnen</p>
             <form id="crm-project-form" class="inline-form">
               <select id="crm-project-pick" aria-label="Projekt zuordnen"></select>
               <button type="submit" class="btn btn-primary btn-sm">Projekt zuordnen</button>
