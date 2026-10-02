@@ -192,7 +192,11 @@ async function publicPage(path, snap, viewport = { width: 1280, height: 900 }) {
   await page.addInitScript((value) => {
     window.__LM_SHARED_QUOTE__ = { quote: value };
     window.__printCalls = 0;
-    window.print = () => { window.__printCalls += 1; };
+    window.print = () => {
+      window.__printCalls += 1;
+      const doc = document.getElementById("ws-pdf-doc");
+      window.__printedAlone = doc.parentElement === document.body && document.body.dataset.pdfPrint === "1";
+    };
   }, snap);
   await page.goto(base + path, { waitUntil: "load" });
   return { ctx, page, requests };
@@ -222,7 +226,18 @@ head("public quote page");
     requests.filter((url) => url.includes("/assets/vendor/")).length === 2,
     requests.filter((url) => url.includes("/assets/vendor/")).join(", "));
   await page.click("#quote-view-print");
+  await page.waitForFunction(() => window.__printCalls > 0, null, { timeout: 5000 }).catch(() => {});
   eq("print button prints once", await page.evaluate(() => window.__printCalls), 1);
+  // Inside the page's wrappers Chrome pushed the sheet's <tfoot> (and the signatures above it)
+  // onto a second sheet; the print moves the sheet to <body> for the length of the dialog.
+  eq("the sheet prints as a direct child of body", await page.evaluate(() => window.__printedAlone), true);
+  await page.waitForTimeout(1300);
+  eq("the sheet goes back after printing", await page.evaluate(() =>
+    document.getElementById("ws-pdf-doc").parentElement !== document.body && !document.body.dataset.pdfPrint), true);
+  await page.evaluate(() => { document.body.appendChild(document.getElementById("ws-pdf-doc")); document.body.dataset.pdfPrint = "1"; });
+  const printed = (await page.pdf({ format: "A4", preferCSSPageSize: true, printBackground: true })).toString("latin1");
+  eq("a short quote prints on one sheet, signatures and footer included", (printed.match(/\/Type\s*\/Page(?![s\w])/g) || []).length, 1);
+  await page.evaluate(() => { delete document.body.dataset.pdfPrint; document.querySelector("#pdf-tool").appendChild(document.getElementById("ws-pdf-doc")); });
   await page.emulateMedia({ media: "print" });
   eq("toolbar is hidden in print", await page.locator("#quote-view-toolbar").isVisible(), false);
   await ctx.close();

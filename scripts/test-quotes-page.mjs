@@ -868,9 +868,9 @@ head("7f. the client quote prints as one complete page");
     const bare = all.replace(/\/\*[\s\S]*?\*\//g, "");
     const css = bare.slice(bare.indexOf("@media print"));
     return /@page\s*{[^}]*margin:\s*0\s*;/s.test(css)
-      && /\.qdoc-head-space\s*{\s*height:\s*12mm/s.test(css)
-      && /\.qdoc-print-wrap\s*{\s*height:\s*296mm/s.test(css)
-      && /\.qdoc-foot-cell\s*{[^}]*padding:\s*3mm 0 10mm/s.test(css)
+      && /--qdoc-paper-head-space:\s*12mm/.test(css)
+      && /--qdoc-paper-wrap-height:\s*296mm/.test(css)
+      && /--qdoc-paper-foot-padding:\s*3mm 0 10mm/.test(css)
       && !/position:\s*fixed/.test(css);
   }));
   await page.evaluate(() => document.getElementById("ws-pdf-form").requestSubmit());

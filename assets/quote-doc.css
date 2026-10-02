@@ -67,6 +67,7 @@
 /* Print Container to reserve footer space */
 .qdoc-print-wrap {
   width: 100%;
+  height: 267mm;
   border-collapse: collapse;
   border: none;
 }
@@ -334,6 +335,23 @@
   page-break-inside: avoid;
 }
 
+/* The content row consumes spare paper, leaving the natural-height signature row at its
+   bottom. That row occurs once, while the following <tfoot> still repeats on every page. */
+.qdoc-print-wrap > tbody > tr:first-child {
+  height: 100%;
+}
+
+/* A table cell centres by default, which in the downloaded PDF floated a short quote to the
+   middle of the sheet. The content starts at the top on screen, on paper and in the file. */
+.qdoc-print-wrap > tbody > tr:first-child > td {
+  vertical-align: top;
+}
+
+.qdoc-sign-row > td {
+  padding: 0;
+  vertical-align: bottom;
+}
+
 .qdoc-sign-box {
   width: 50mm;
   text-align: center;
@@ -464,57 +482,95 @@
   }
 }
 
+/* html2canvas cannot ask its clone for print media, so download mode carries the same
+   paper switches as print through variables. The layout declarations below are shared. */
+.qdoc {
+  --qdoc-paper-width: 210mm;
+  --qdoc-paper-min-height: 297mm;
+  --qdoc-paper-padding: 14mm 14mm 16mm;
+  --qdoc-paper-margin: 0 auto;
+  --qdoc-paper-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  --qdoc-paper-outline: 1px solid var(--qdoc-line);
+  --qdoc-paper-background: var(--qdoc-surface);
+  --qdoc-paper-wrap-height: 267mm;
+  --qdoc-paper-head-space: 0;
+  --qdoc-paper-caption-top: 10pt;
+  --qdoc-paper-table-bottom: 12pt;
+  --qdoc-paper-th-y: 4pt;
+  --qdoc-paper-td-y: 3pt;
+  --qdoc-paper-foot-padding: 0;
+}
+
+.qdoc.qdoc--paper {
+  --qdoc-paper-min-height: auto;
+  --qdoc-paper-padding: 0 14mm;
+  --qdoc-paper-margin: 0;
+  --qdoc-paper-shadow: none;
+  --qdoc-paper-outline: none;
+  --qdoc-paper-background: none;
+  --qdoc-paper-wrap-height: 296mm;
+  --qdoc-paper-head-space: 12mm;
+  --qdoc-paper-caption-top: 6pt;
+  --qdoc-paper-table-bottom: 7pt;
+  --qdoc-paper-th-y: 3pt;
+  --qdoc-paper-td-y: 2pt;
+  --qdoc-paper-foot-padding: 3mm 0 10mm;
+}
+
+.qdoc {
+  width: var(--qdoc-paper-width);
+  min-height: var(--qdoc-paper-min-height);
+  padding: var(--qdoc-paper-padding);
+  margin: var(--qdoc-paper-margin);
+  box-shadow: var(--qdoc-paper-shadow);
+  outline: var(--qdoc-paper-outline);
+  background: var(--qdoc-paper-background);
+}
+
+.qdoc-head-space { height: var(--qdoc-paper-head-space); }
+.qdoc-caption { margin-top: var(--qdoc-paper-caption-top); }
+.qdoc-table { margin-bottom: var(--qdoc-paper-table-bottom); }
+.qdoc-table th { padding-top: var(--qdoc-paper-th-y); padding-bottom: var(--qdoc-paper-th-y); }
+.qdoc-table td { padding-top: var(--qdoc-paper-td-y); padding-bottom: var(--qdoc-paper-td-y); }
+.qdoc-print-wrap { height: var(--qdoc-paper-wrap-height); }
+.qdoc-foot-cell { vertical-align: bottom; padding: var(--qdoc-paper-foot-padding); }
+
 @media print {
   @page {
     size: A4;
     margin: 0;
   }
   .qdoc {
-    width: 210mm;
-    min-height: auto;
+    --qdoc-paper-min-height: auto;
     /* The page margin is 0 so the browser has nowhere to print its own date, title and URL
        (2026-10-01: they landed on the owner's quote). The side margins live here instead —
        not on .qdoc-print-wrap, whose collapsed borders make its padding a no-op. */
-    padding: 0 14mm;
-    margin: 0;
-    box-shadow: none;
-    outline: none;
-    background: none;
+    --qdoc-paper-padding: 0 14mm;
+    --qdoc-paper-margin: 0;
+    --qdoc-paper-shadow: none;
+    --qdoc-paper-outline: none;
+    --qdoc-paper-background: none;
+    --qdoc-paper-wrap-height: 296mm;
+    --qdoc-paper-head-space: 12mm;
+    --qdoc-paper-caption-top: 6pt;
+    --qdoc-paper-table-bottom: 7pt;
+    --qdoc-paper-th-y: 3pt;
+    --qdoc-paper-td-y: 2pt;
+    --qdoc-paper-foot-padding: 3mm 0 10mm;
     display: block;
   }
   /* 12mm top and bottom, not the 14/16mm of the old @page margins: the Inne koszty table
      (2026-10-01) made a 5 + 1 + 3 line quote with VAT and margin 4mm too tall for one sheet. */
-  .qdoc-head-space {
-    height: 12mm;
-  }
-  .qdoc-caption {
-    margin-top: 6pt;
-  }
-  .qdoc-table {
-    margin-bottom: 7pt;
-  }
-  .qdoc-table th {
-    padding-top: 3pt;
-    padding-bottom: 3pt;
-  }
-  .qdoc-table td {
-    padding-top: 2pt;
-    padding-bottom: 2pt;
-  }
   /* Why the footer is the table's <tfoot> and not position: fixed (2026-10-01): in the
      owner's Chrome print preview the fixed footer was simply not there, though every
      headless print had it. A table footer is repeated on every sheet by the browser
      itself. The table is one sheet tall, so on a one-page quote the footer sits at the
      bottom of the paper; on a longer one it closes every sheet and follows the last row. */
-  .qdoc-print-wrap {
-    height: 296mm;
-  }
   .qdoc-print-wrap > tbody > tr > td {
     vertical-align: top;
   }
-  .qdoc-foot-cell {
+  .qdoc-print-wrap > tbody > .qdoc-sign-row > td {
     vertical-align: bottom;
-    padding: 3mm 0 10mm;
   }
 }
 
@@ -660,6 +716,5 @@ MARKUP SKELETON
   .quote-view-page #pdf-tool { width: calc(794px * ((100vw - 24px) / 794)); }
 }
 @media print {
-  .quote-view-toolbar, .quote-view-main > .wrap > h1, #quote-view-state { display: none !important; }
-  .quote-view-page .qdoc { transform: none !important; }
+  .quote-view-toolbar, .quote-view-main > .wrap > h1, #quote-view-state { display: none !important; }  .quote-view-page .qdoc { transform: none !important; }
 }

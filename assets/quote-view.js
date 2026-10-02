@@ -60,9 +60,31 @@ byId("quote-view-download")?.addEventListener("click", async () => {
   }
 });
 
+/*
+ * The sheet prints as a direct child of <body>, the way the editor prints it (pdf-export.js).
+ * Inside the page's wrappers Chrome laid the one-sheet table out on paper with its <tfoot>
+ * pushed onto a second sheet — the footer, and since 2026-10-01 the signatures above it, landed
+ * alone on page 2. body[data-pdf-print] in styles.css hides everything else meanwhile.
+ */
 byId("quote-view-print")?.addEventListener("click", async () => {
-  await pdfWaitForDocumentImages(byId("ws-pdf-doc"));
+  const doc = byId("ws-pdf-doc");
+  await pdfWaitForDocumentImages(doc);
+  const marker = document.createComment("pdf-document-home");
+  doc.parentNode.insertBefore(marker, doc);
+  document.body.appendChild(doc);
+  document.body.dataset.pdfPrint = "1";
+  let fallback = 0;
+  const done = () => {
+    delete document.body.dataset.pdfPrint;
+    if (marker.parentNode) marker.parentNode.insertBefore(doc, marker);
+    marker.remove();
+    window.removeEventListener("afterprint", done);
+    clearTimeout(fallback);
+  };
+  window.addEventListener("afterprint", done);
   window.print();
+  // Some browsers never fire afterprint; the page must not stay emptied.
+  fallback = setTimeout(done, 1000);
 });
 
 load().catch(() => fail());

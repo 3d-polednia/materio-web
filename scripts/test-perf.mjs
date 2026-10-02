@@ -232,7 +232,9 @@ const BUDGET = {
   // 2026-10-01: measured 455.4 kB raw; quote sharing adds its panel and account API.
   // 2026-10-01, measured 457.6 kB: the e-mail chooser of the share panel (Gmail, Outlook, mail
   // program, copy the message) and the share strings translated in ten languages that had shipped English.
-  "wyceny/index.html": [464, 135],
+  // 2026-10-01, measured 465.3 kB: the shared print/download paper variables and the final
+  // signature table row keep both PDF paths on the same A4 layout.
+  "wyceny/index.html": [466, 135],
   "terminarz/index.html": [418, 126],
   // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
   // one page that carries every store the account syncs, and session 59 gave it a third:
