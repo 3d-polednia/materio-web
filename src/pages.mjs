@@ -88,12 +88,11 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
 
   const chips = calc.presets
     ? `<div class="chips">${calc.presets.map((p, i) =>
-        `<button type="button" class="chip" data-preset="${i}">${esc(p.k ? t(p.k) : p.l)}</button>`).join("")}</div>`
+        `<button type="button" class="chip" data-preset="${i}" data-material="${esc(p.m)}" aria-pressed="false">${esc(p.k ? t(p.k) : p.l)}</button>`).join("")}</div>`
     : "";
 
   const picker = materials
-    ? `<button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open>${PICK_ICON}<span>${esc(t("mat_pick"))}</span></button>
-      <p class="mat-chosen" data-mat-chosen hidden></p>`
+    ? `<button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open>${PICK_ICON}<span>${esc(t("mat_pick"))}</span></button>`
     : "";
 
   const rows = example.rows
@@ -117,7 +116,7 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
      submits it. */
   return `<div class="calc" data-calc="${calc.id}" data-tab="${calc.tab}">
       <form class="calc-form" novalidate>
-        <h2 id="calc-form-h">${esc(t("calc_form_h"))}</h2>
+        <h2 id="calc-form-h" data-calc-form-heading>${esc(t("calc_form_h"))}</h2>
         ${picker}${chips}${fields}
         <button type="submit" class="btn btn-primary" data-run
           data-label-run="${esc(t("act_calc"))}"
