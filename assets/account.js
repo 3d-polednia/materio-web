@@ -129,6 +129,34 @@ function lmWriteRemember(on) {
 }
 
 /**
+ * "Don't remember me" ends the sign-in with the browser, not with the tab.
+ *
+ * Until 2026-10-02 it was Firebase's browserSessionPersistence, which is sessionStorage —
+ * one tab's. Every new tab of the site had no session, /app/ in it wrote the hint back to
+ * GOŚĆ, and the storage event took every other open tab out of the account with it: the
+ * owner had to sign in again after a few seconds on another tab. The sign-in is now
+ * always kept by Firebase, and this cookie, which has no expiry and so dies with the
+ * browser, is what says the browser has not been closed since.
+ */
+var LM_BROWSER_SESSION_COOKIE = "liczmat-session";
+
+function lmBrowserSessionAlive() {
+  try { return document.cookie.split(/;\s*/).indexOf(LM_BROWSER_SESSION_COOKIE + "=1") >= 0; } catch (e) { return false; }
+}
+
+function lmMarkBrowserSession() {
+  try {
+    var secure = location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = LM_BROWSER_SESSION_COOKIE + "=1; path=/; SameSite=Lax" + secure;
+  } catch (e) {}
+}
+
+/** Signed in, asked not to be remembered, and the browser was closed since: a guest. */
+function lmBrowserSessionEnded() {
+  return !lmReadRemember() && !lmBrowserSessionAlive();
+}
+
+/**
  * Where to send somebody back to after they sign in, from a `?next=` parameter.
  *
  * Only a path on this site is ever accepted. `//evil.example` is a protocol-relative URL
@@ -216,6 +244,12 @@ function lmMarkAccountLocalData() {
 }
 
 if (typeof document !== "undefined") {
+  // The browser was closed since a sign-in that asked not to be remembered: the hint goes
+  // before anything reads it, and /app/ signs Firebase out on its next visit (app.js).
+  if (lmBrowserSessionEnded() && lmReadLevel() !== LM_LEVEL.GUEST) {
+    lmWriteLevel(LM_LEVEL.GUEST);
+    lmMarkLevel();
+  }
   document.addEventListener("DOMContentLoaded", lmMarkHeader);
   document.addEventListener("DOMContentLoaded", lmMarkAccountLocalData);
   document.addEventListener("lm-session", lmMarkHeader);

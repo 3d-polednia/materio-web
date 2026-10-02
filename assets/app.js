@@ -149,6 +149,7 @@ async function boot() {
     // Two tabs open, or a browser without IndexedDB — the app still works online.
   }
 
+  await endClosedBrowserSession();
   authMod.onAuthStateChanged(auth, (user) => (user ? onSignedIn(user) : onSignedOut()));
   wireAuthForms();
   authWired = true;
@@ -218,18 +219,43 @@ function showAuthView(view, focus) {
 /**
  * How long the sign-in survives, decided before it happens.
  *
- * Firebase defaults to browserLocalPersistence — the session outlives the window, which
- * is what a phone wants and a shared computer does not. The checkbox is remembered on
- * the device, so the answer is given once rather than at every sign-in.
+ * Firebase keeps the sign-in in browserLocalPersistence either way, shared by every tab.
+ * Not remembering it is the session cookie in assets/account.js plus
+ * endClosedBrowserSession() below, so it ends with the browser — browserSessionPersistence
+ * ended it with the tab, and a second tab signed the first one out (2026-10-02). The
+ * checkbox is remembered on the device, so the answer is given once rather than at every
+ * sign-in.
  */
 async function applyPersistence(remember) {
   lmWriteRemember(remember);
+  lmMarkBrowserSession();
   try {
-    await fb.setPersistence(auth, remember ? fb.browserLocalPersistence : fb.browserSessionPersistence);
+    await fb.setPersistence(auth, fb.browserLocalPersistence);
   } catch (e) {
     // A browser with no storage at all: Firebase falls back to in-memory, which is the
     // stricter of the two anyway. Nothing here should stop somebody signing in.
   }
+}
+
+/** A sign-in made before 2026-10-02 with "don't remember", still in this tab's sessionStorage. */
+const tabOnlySession = () => {
+  try { return Object.keys(sessionStorage).some((key) => key.startsWith("firebase:authUser:")); } catch (e) { return false; }
+};
+
+/**
+ * Before the page listens to Firebase: a sign-in that asked not to be remembered does not
+ * outlive the browser. Asked to be remembered, or the browser still open — nothing to do,
+ * except moving an old tab-only session into the shared store so other tabs see it too.
+ */
+async function endClosedBrowserSession() {
+  if (lmReadRemember()) return;
+  if (typeof auth.authStateReady === "function") await auth.authStateReady().catch(() => {});
+  if (!auth.currentUser) return;
+  if (lmBrowserSessionAlive() || tabOnlySession()) {
+    await applyPersistence(false);
+    return;
+  }
+  await fb.signOut(auth).catch(() => {});
 }
 
 /** The remember checkbox next to whichever form was just submitted. */

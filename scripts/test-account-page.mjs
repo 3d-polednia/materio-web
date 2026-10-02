@@ -466,8 +466,12 @@ head("6. how long the session lasts is asked once, per device");
 
   const calls = await page.evaluate(() => window.__fbCalls);
   const persistence = calls.filter((c) => c[0] === "setPersistence").map((c) => c[1]);
-  eq("unticking it asks Firebase for a session that ends with the window",
-    persistence[persistence.length - 1], "session");
+  // Not "session": that was one tab's sessionStorage, and a second tab signed the first one
+  // out (2026-10-02). The sign-in is shared by the tabs; a cookie with no expiry ends it.
+  eq("unticking it keeps the sign-in shared by every tab",
+    persistence[persistence.length - 1], "local");
+  check("and marks the browser session with a cookie that dies with the browser",
+    (await ctx.cookies()).some((c) => c.name === "liczmat-session" && c.value === "1" && c.expires === -1));
   eq("and the answer is remembered on this device",
     await page.evaluate(() => localStorage.getItem("liczmat-remember")), "0");
 
@@ -478,9 +482,59 @@ head("6. how long the session lasts is asked once, per device");
 
   await page.check("#prof-remember");
   const after = await page.evaluate(() => window.__fbCalls.filter((c) => c[0] === "setPersistence").pop());
-  eq("changing it in the profile migrates the session Firebase already has", after[1], "local");
+  eq("changing it in the profile keeps the sign-in where it was", after[1], "local");
   eq("and is remembered", await page.evaluate(() => localStorage.getItem("liczmat-remember")), "1");
   eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+head("6b. not remembered ends with the browser, not with the tab (2026-10-02)");
+{
+  // The browser was closed: "don't remember" was the answer, Firebase's user and the hint
+  // survived on disk, the session cookie did not.
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  await ctx.addInitScript(() => { window.__fbSignedIn = "uid-closed"; });
+  const page = await openApp(ctx, "/app/", { storage: { "liczmat-remember": "0", "liczmat-signed-in": "liczmat" } });
+  await page.locator("#app-auth").waitFor({ state: "visible", timeout: 5000 });
+  const calls = await page.evaluate(() => window.__fbCalls.map((c) => c[0]));
+  check("/app/ signs Firebase out", calls.includes("signOut"), calls.join(","));
+  eq("and the hint is gone", await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), null);
+  eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+{
+  // The browser is still open — this is the second tab, which used to sign everybody out.
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  await ctx.addCookies([{ name: "liczmat-session", value: "1", url: base }]);
+  await ctx.addInitScript(() => { window.__fbSignedIn = "uid-open"; });
+  const page = await openApp(ctx, "/app/", { storage: { "liczmat-remember": "0", "liczmat-signed-in": "liczmat" } });
+  await signedIn(page);
+  const calls = await page.evaluate(() => window.__fbCalls.map((c) => c[0]));
+  check("a new tab stays in the account", !calls.includes("signOut"), calls.join(","));
+  check("and the hint stays", Boolean(await page.evaluate(() => localStorage.getItem("liczmat-signed-in"))));
+  await page.close();
+  await ctx.close();
+}
+{
+  // A tool page after the browser was closed: the hint goes before anything reads it.
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openApp(ctx, "/wyceny/", { storage: { "liczmat-remember": "0", "liczmat-signed-in": "pro" } });
+  await page.waitForLoadState("load");
+  eq("a tool page forgets the hint", await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), null);
+  eq("and draws the guest", await page.evaluate(() => document.documentElement.getAttribute("data-lm-level")), null);
+  await page.close();
+  await ctx.close();
+}
+{
+  // Remembered: no cookie is needed, nothing is signed out.
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  await ctx.addInitScript(() => { window.__fbSignedIn = "uid-kept"; });
+  const page = await openApp(ctx, "/app/", { storage: { "liczmat-signed-in": "liczmat" } });
+  await signedIn(page);
+  const calls = await page.evaluate(() => window.__fbCalls.map((c) => c[0]));
+  check("a remembered sign-in survives a closed browser", !calls.includes("signOut"), calls.join(","));
   await page.close();
   await ctx.close();
 }

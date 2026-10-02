@@ -835,6 +835,7 @@ export const COOKIE_ROWS = [
   { name: "liczmat-theme", type: "ck_type_local", purpose: "ck_p_theme", life: "ck_life_until_cleared" },
   { name: "liczmat-signed-in", type: "ck_type_local", purpose: "ck_p_signed_in", life: "ck_life_until_signout" },
   { name: "liczmat-remember", type: "ck_type_local", purpose: "ck_p_remember", life: "ck_life_until_cleared" },
+  { name: "liczmat-session", type: "ck_type_cookie", purpose: "ck_p_remember", life: "ck_life_session" },
   { name: "materio-redirected", type: "ck_type_session", purpose: "ck_p_redirect", life: "ck_life_session" },
   { name: "materio-workspace-v1", type: "ck_type_local", purpose: "ck_p_workspace", life: "ck_life_until_cleared" },
   { name: "materio-active-project", type: "ck_type_local", purpose: "ck_p_active", life: "ck_life_until_cleared" },

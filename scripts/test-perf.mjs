@@ -130,7 +130,9 @@ const BUDGET = {
   // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
   // 2026-10-01, measured 237.1 kB: the e-mail chooser of the share panel (Gmail, Outlook, mail
   // program, copy the message) and the share strings translated in ten languages that had shipped English.
-  "index.html": [238, 62],
+  // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
+  // liczmat-session cookie helpers in assets/account.js, which every page inlines.
+  "index.html": [239, 62],
   // Raised 2026-09-26 from 248, measured at 248.8 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -159,7 +161,9 @@ const BUDGET = {
   // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
   // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
   // 2026-10-01: measured 243.1 kB raw after the quote editor's two runtime status keys.
-  "konwerter-jednostek/index.html": [244, 68],
+  // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
+  // liczmat-session cookie helpers in assets/account.js, which every page inlines.
+  "konwerter-jednostek/index.html": [245, 68],
   // Raised 2026-09-26 from 227, measured at 229.4 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -171,7 +175,9 @@ const BUDGET = {
   // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
   // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
   // 2026-10-01: measured 235.3 kB raw after the quote editor's two runtime status keys.
-  "poradniki/ile-farby-na-pokoj/index.html": [236, 63],
+  // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
+  // liczmat-session cookie helpers in assets/account.js, which every page inlines.
+  "poradniki/ile-farby-na-pokoj/index.html": [237, 63],
   // Raised 2026-09-26 from 234, measured at 235.6 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -183,7 +189,9 @@ const BUDGET = {
   // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
   // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
   // 2026-10-01: measured 241.5 kB raw after the quote editor's two runtime status keys.
-  "sklepy/index.html": [242, 65],
+  // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
+  // liczmat-session cookie helpers in assets/account.js, which every page inlines.
+  "sklepy/index.html": [243, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
   // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
@@ -234,7 +242,9 @@ const BUDGET = {
   // program, copy the message) and the share strings translated in ten languages that had shipped English.
   // 2026-10-01, measured 465.3 kB: the shared print/download paper variables and the final
   // signature table row keep both PDF paths on the same A4 layout.
-  "wyceny/index.html": [466, 135],
+  // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
+  // liczmat-session cookie helpers in assets/account.js, which every page inlines.
+  "wyceny/index.html": [467, 135],
   "terminarz/index.html": [418, 126],
   // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
   // one page that carries every store the account syncs, and session 59 gave it a third:
@@ -275,7 +285,9 @@ const BUDGET = {
   // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
   // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
   // 2026-10-01: measured 397.1/103.6 kB; quote revocation joins account deletion.
-  "app/index.html": [398, 104],
+  // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
+  // liczmat-session cookie helpers in assets/account.js, which every page inlines.
+  "app/index.html": [399, 104],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
@@ -293,7 +305,9 @@ const BUDGET = {
   // 2026-10-01, +1 kB raw: the compact own-materials list shared by /moje-materialy/ and the
   // quote picker (one set of row rules, ~0.8 kB of assets/styles.css on every page) and six keys.
   // 2026-10-01: measured 223.1 kB raw after the quote editor's two runtime status keys.
-  "p/index.html": [224, 62],
+  // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
+  // liczmat-session cookie helpers in assets/account.js, which every page inlines.
+  "p/index.html": [225, 62],
 };
 
 /**

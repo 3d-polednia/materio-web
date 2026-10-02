@@ -504,8 +504,10 @@ const BUDGET = {
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
      printed the key name localStorage, which is three words in French; widest is French at 650.
      2026-09-26: two more rows, the per-account sync clocks the account pages keep
-     (assets/account-sync.js); widest is French at 726. */
-  cookies: 740,
+     (assets/account-sync.js); widest is French at 726.
+     2026-10-02: the liczmat-session cookie row ("don't remember me" ends with the browser);
+     widest is French at 766. */
+  cookies: 780,
   /* Session 62, audit item H7, and 220 rather than the 180 it was measured at the same
      day: the owner's Gewerbe is registered in Germany, so the page went from a name and
      an address to the set §5 DDG asks for — postal address, telephone, USt-IdNr., the

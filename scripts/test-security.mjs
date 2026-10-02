@@ -715,7 +715,7 @@ head("11. izolacja danych: the way to empty a shared device");
   // either data (and is wiped) or a setting (and is deliberately kept); a row that is
   // neither is a store somebody added and nobody can clear.
   const SETTINGS = ["materio_consent", "materio-lang", "liczmat-currency", "liczmat-theme",
-    "liczmat-signed-in", "liczmat-remember", "materio-redirected"];
+    "liczmat-signed-in", "liczmat-remember", "liczmat-session", "materio-redirected"];
   for (const row of COOKIE_ROWS) {
     // 2026-09-26: per-account sync clocks are cleared with that account's device data.
     const syncClock = /^liczmat-sync-(?:pushed|pulled)-at:<uid>$/.test(row.name);
