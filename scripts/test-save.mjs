@@ -170,7 +170,7 @@ head("0b. saved-line naming is material-aware, never room-aware");
     wsResolvedLine(card("coverage", { matName: "Gładź gipsowa 20 kg", matCat: "CHEMICALS" })).name,
     "Gładź gipsowa 20 kg");
   const grout = wsResolvedLine(card("grout", { matName: "Gres 60×60", matCat: "TILES" }));
-  eq("grout names the bought product and tile", grout.name, `${tr("pl")("c_grout_t")} — Gres 60×60`);
+  eq("grout names the bought product and tile", grout.name, `${tr("pl")("c_grout_t")}: Gres 60×60`);
   eq("grout is filed as chemicals", grout.category, "CHEMICALS");
   const bare = wsResolvedLine(card("coverage", { wsRoomName: "Kuchnia Moryc" }));
   eq("a missing material falls back to the calculator", bare.name, tr("pl")("c_coverage_t"));

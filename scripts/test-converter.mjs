@@ -339,9 +339,9 @@ head("5. a whole number stays whole, and the language writes it");
     convFormat(1234.5, "pl") !== convFormat(1234.5, "en"),
     `${convFormat(1234.5, "pl")} / ${convFormat(1234.5, "en")}`);
 
-  eq("nothing to show is a dash, not a NaN", convFormat(NaN, "pl"), "—");
-  eq("infinity is a dash too", convFormat(Infinity, "pl"), "—");
-  eq("null is a dash", convFormat(null, "pl"), "—");
+  eq("nothing to show is empty, not a NaN", convFormat(NaN, "pl"), "");
+  eq("infinity is empty too", convFormat(Infinity, "pl"), "");
+  eq("null is empty", convFormat(null, "pl"), "");
 }
 
 /* ================================================================== 6. the route */

@@ -206,7 +206,7 @@ function quoRow(q) {
   // No "Bez projektu" here when there is none: the missing line under it says so.
   const where = names.join(" · ");
   const missing = summary.missing.map((part) => quoEsc(quoT(`quo_missing_${part}`))).join(" · ");
-  const total = summary.totals.total === null ? "—"
+  const total = summary.totals.total === null ? ""
     : quoEsc(quoMoney(summary.totals.total, summary.totals.currencyCode));
   let saved = "";
   try { saved = new URLSearchParams(location.search).get("saved") || ""; } catch (e) {}
@@ -649,7 +649,7 @@ function quoRenderDetail(id) {
     const node = document.getElementById(el);
     if (!node) return;
     node.textContent = minor === null
-      ? (instead || "—")
+      ? (instead || "")
       : quoMoney(minor, money.currencyCode);
   };
   const per = (field) => wsSumsText(money.projectByCurrency, field, quoMoney);

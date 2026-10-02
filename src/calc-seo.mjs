@@ -38,7 +38,7 @@ export const TITLE_MAX = 50;
 export const CALC_SEO = {
   coverage: {
     pl: {
-      title: "Kalkulator farby — ile puszek na m²",
+      title: "Kalkulator farby: ile puszek na m²",
       desc: "Powierzchnia, wydajność z etykiety i liczba warstw dają liczbę całych opakowań farby, tynku albo gruntu oraz procent odpadu.",
       faq: [
         ["Ile farby potrzeba na 1 m²?",
@@ -170,13 +170,13 @@ export const CALC_SEO = {
   },
   waste: {
     pl: {
-      title: "Kalkulator płytek i paneli — ile kartonów",
+      title: "Kalkulator płytek i paneli: ile kartonów",
       desc: "Powierzchnia plus zapas na docinkę przeliczone na całe kartony płytek, paneli albo gresu, z metrami, które faktycznie kupujesz.",
       faq: [
         ["Ile płytek trzeba na 10 m²?",
          "Do pola dolicz zapas na docinkę i podziel wynik przez metraż z kartonu. Kalkulator zaokrągla w górę do całego kartonu i pokazuje, ile metrów wyjdzie z zakupu."],
         ["Ile zapasu doliczyć do płytek?",
-         "Przy prostym układzie 5–7%, przy dużym formacie, skosie albo cegiełce 10–15%. Kalkulator dolicza ten procent do powierzchni, zanim przeliczy ją na kartony."],
+         "Przy prostym układzie 5-7%, przy dużym formacie, skosie albo cegiełce 10-15%. Kalkulator dolicza ten procent do powierzchni, zanim przeliczy ją na kartony."],
       ],
     },
     uk: {
@@ -186,7 +186,7 @@ export const CALC_SEO = {
         ["Скільки плитки треба на 10 м²?",
          "До площі додайте запас на підрізку і поділіть на метраж з коробки. Калькулятор округлює вгору до цілої коробки й показує, скільки метрів вийде з покупки."],
         ["Скільки запасу додавати?",
-         "Запас 5–7% вистачає для простого розкладання. Великий формат, укладання по діагоналі чи «цеглинкою» потребують 10–15%. Беріть з однієї партії, бо наступна може мати інший відтінок."],
+         "Запас 5-7% вистачає для простого розкладання. Великий формат, укладання по діагоналі чи «цеглинкою» потребують 10-15%. Беріть з однієї партії, бо наступна може мати інший відтінок."],
       ],
     },
     de: {
@@ -196,7 +196,7 @@ export const CALC_SEO = {
         ["Wie viele Fliesen braucht man für 10 m²?",
          "Zur Fläche kommt der Verschnitt, das Ergebnis wird durch die Quadratmeter je Karton geteilt. Der Rechner rundet auf ganze Kartons auf und zeigt, wie viele m² der Kauf ergibt."],
         ["Wie viel Verschnitt sollte man einrechnen?",
-         "5–7% reichen bei geradem Verlegemuster. Großformat, diagonale Verlegung oder Verband brauchen 10–15%. Kaufe aus einer Charge, die nächste kann einen anderen Farbton haben."],
+         "5-7% reichen bei geradem Verlegemuster. Großformat, diagonale Verlegung oder Verband brauchen 10-15%. Kaufe aus einer Charge, die nächste kann einen anderen Farbton haben."],
       ],
     },
     en: {
@@ -206,7 +206,7 @@ export const CALC_SEO = {
         ["How many tiles do you need for 10 m²?",
          "Add the waste allowance to the area and divide by the coverage of one box. The calculator rounds up to a whole box and shows how many square metres the purchase comes to."],
         ["How much waste should you allow for tiles?",
-         "5–7% for a straight layout, 10–15% for large format, diagonal or brick-bond. The calculator adds that percentage to the area before turning it into boxes."],
+         "5-7% for a straight layout, 10-15% for large format, diagonal or brick-bond. The calculator adds that percentage to the area before turning it into boxes."],
       ],
     },
     cs: {
@@ -216,7 +216,7 @@ export const CALC_SEO = {
         ["Kolik obkladů je potřeba na 10 m²?",
          "K ploše přičtěte prořez a vydělte metráží jednoho balení. Kalkulačka zaokrouhlí nahoru na celé balení a ukáže, kolik metrů nákup vydá."],
         ["Kolik prořezu počítat?",
-         "5–7% stačí u rovné pokládky. Velký formát, diagonála nebo vazba na půl potřebují 10–15%. Kupujte z jedné výrobní šarže, další může mít jiný odstín."],
+         "5-7% stačí u rovné pokládky. Velký formát, diagonála nebo vazba na půl potřebují 10-15%. Kupujte z jedné výrobní šarže, další může mít jiný odstín."],
       ],
     },
     sk: {
@@ -226,7 +226,7 @@ export const CALC_SEO = {
         ["Koľko obkladov treba na 10 m²?",
          "K ploche pripočítajte prerez a vydeľte metrážou jedného balenia. Kalkulačka zaokrúhli nahor na celé balenie a ukáže, koľko metrov nákup vydá."],
         ["Koľko prerezu počítať?",
-         "5–7% stačí pri rovnej pokládke. Veľký formát, diagonála alebo väzba na pol potrebujú 10–15%. Kupujte z jednej výrobnej šarže, ďalšia môže mať iný odtieň."],
+         "5-7% stačí pri rovnej pokládke. Veľký formát, diagonála alebo väzba na pol potrebujú 10-15%. Kupujte z jednej výrobnej šarže, ďalšia môže mať iný odtieň."],
       ],
     },
     ro: {
@@ -236,7 +236,7 @@ export const CALC_SEO = {
         ["Câtă gresie trebuie pentru 10 m²?",
          "Adaugă pierderea la suprafață și împarte la metrii dintr-o cutie. Calculatorul rotunjește în sus la cutie întreagă și arată câți metri iese cumpărătura."],
         ["Cât adaos trebuie calculat?",
-         "5–7% la montaj drept, 10–15% la format mare, diagonală sau șah. Calculatorul adaugă procentul la suprafață înainte de a o transforma în cutii."],
+         "5-7% la montaj drept, 10-15% la format mare, diagonală sau șah. Calculatorul adaugă procentul la suprafață înainte de a o transforma în cutii."],
       ],
     },
     hr: {
@@ -246,7 +246,7 @@ export const CALC_SEO = {
         ["Koliko pločica treba za 10 m²?",
          "Površini dodajte otpad i podijelite s kvadraturom jedne kutije. Kalkulator zaokružuje naviše na cijelu kutiju i pokazuje koliko kvadrata daje kupnja."],
         ["Koliko otpada treba računati?",
-         "5–7% dovoljno je za ravno polaganje. Veliki format, dijagonala ili polaganje u opeku traže 10–15%. Kupujte iz iste proizvodne serije jer sljedeća zna imati drugi ton."],
+         "5-7% dovoljno je za ravno polaganje. Veliki format, dijagonala ili polaganje u opeku traže 10-15%. Kupujte iz iste proizvodne serije jer sljedeća zna imati drugi ton."],
       ],
     },
     sr: {
@@ -256,7 +256,7 @@ export const CALC_SEO = {
         ["Koliko pločica treba za 10 m²?",
          "Površini dodajte otpad i podelite kvadraturom jedne kutije. Kalkulator zaokružuje naviše na celu kutiju i pokazuje koliko kvadrata daje kupovina."],
         ["Koliko otpada treba računati?",
-         "5–7% je dovoljno za ravno polaganje. Veliki format, dijagonala ili polaganje u cigli traže 10–15%. Kupujte iz iste proizvodne serije jer sledeća ume da ima drugi ton."],
+         "5-7% je dovoljno za ravno polaganje. Veliki format, dijagonala ili polaganje u cigli traže 10-15%. Kupujte iz iste proizvodne serije jer sledeća ume da ima drugi ton."],
       ],
     },
     it: {
@@ -266,7 +266,7 @@ export const CALC_SEO = {
         ["Quante piastrelle servono per 10 m²?",
          "Aggiungi la scorta alla superficie e dividi per la resa di una scatola. Il calcolatore arrotonda alla scatola intera e mostra a quanti metri quadri arriva l'acquisto."],
         ["Quanta scorta prevedere per le piastrelle?",
-         "Il 5–7% per una posa dritta, il 10–15% per il grande formato, la diagonale o la posa a correre. Il calcolatore somma quella percentuale prima di convertire in scatole."],
+         "Il 5-7% per una posa dritta, il 10-15% per il grande formato, la diagonale o la posa a correre. Il calcolatore somma quella percentuale prima di convertire in scatole."],
       ],
     },
     nl: {
@@ -276,7 +276,7 @@ export const CALC_SEO = {
         ["Hoeveel tegels heb je nodig voor 10 m²?",
          "Tel de marge bij het oppervlak op en deel door het rendement van één doos. De rekenmachine rondt af naar een hele doos en toont op hoeveel vierkante meter de aankoop uitkomt."],
         ["Hoeveel marge reken je voor tegels?",
-         "5–7% bij recht leggen, 10–15% bij groot formaat, diagonaal of halfsteens. De rekenmachine telt dat percentage bij het oppervlak op voordat ze het naar hele dozen omzet."],
+         "5-7% bij recht leggen, 10-15% bij groot formaat, diagonaal of halfsteens. De rekenmachine telt dat percentage bij het oppervlak op voordat ze het naar hele dozen omzet."],
       ],
     },
     es: {
@@ -286,7 +286,7 @@ export const CALC_SEO = {
         ["¿Cuántos azulejos hacen falta para 10 m²?",
          "Suma la merma a la superficie y divide por el rendimiento de una caja. La calculadora redondea a caja entera y muestra a cuántos metros cuadrados llega la compra."],
         ["¿Cuánta merma dejar en el alicatado?",
-         "Un 5–7% en colocación recta, un 10–15% en gran formato, diagonal o a matajunta. La calculadora suma ese porcentaje antes de pasar a cajas."],
+         "Un 5-7% en colocación recta, un 10-15% en gran formato, diagonal o a matajunta. La calculadora suma ese porcentaje antes de pasar a cajas."],
       ],
     },
     fr: {
@@ -296,13 +296,13 @@ export const CALC_SEO = {
         ["Combien de carrelage faut-il pour 10 m² ?",
          "Ajoute la marge à la surface et divise par le rendement d'un carton. Le calculateur arrondit au carton entier et montre à combien de mètres carrés revient l'achat."],
         ["Quelle marge prévoir pour le carrelage ?",
-         "5–7 % en pose droite, 10–15 % en grand format, en diagonale ou à coupe de pierre. Le calculateur ajoute ce pourcentage à la surface avant de la convertir en cartons."],
+         "5-7 % en pose droite, 10-15 % en grand format, en diagonale ou à coupe de pierre. Le calculateur ajoute ce pourcentage à la surface avant de la convertir en cartons."],
       ],
     },
   },
   wallpaper: {
     pl: {
-      title: "Kalkulator tapety — ile rolek na pokój",
+      title: "Kalkulator tapety: ile rolek na pokój",
       desc: "Szerokość i wysokość ściany, wymiary rolki i raport wzoru dają liczbę rolek oraz liczbę pasów, które wychodzą z jednej rolki.",
       faq: [
         ["Ile rolek tapety na pokój?",
@@ -434,7 +434,7 @@ export const CALC_SEO = {
   },
   linear: {
     pl: {
-      title: "Kalkulator rozkroju 1D — ile sztang",
+      title: "Kalkulator rozkroju 1D: ile sztang",
       desc: "Lista elementów, długość sztangi i rzaz piły dają liczbę sztang do kupienia oraz gotowy plan cięcia z procentem odpadu.",
       faq: [
         ["Ile sztang kupić na listę elementów?",
@@ -448,7 +448,7 @@ export const CALC_SEO = {
       desc: "Список елементів, довжина хлиста і ширина різу дають кількість хлистів до покупки та готовий план розпилу з відсотком відходу.",
       faq: [
         ["Скільки хлистів купити на список елементів?",
-         "Калькулятор сортує елементи від найдовшого і кладе кожен у перший хлист, де він поміщається. Кількість відкритих хлистів — це те, що ви купуєте, а план показує, що з якого різати."],
+         "Калькулятор сортує елементи від найдовшого і кладе кожен у перший хлист, де він поміщається. Кількість відкритих хлистів. Це те, що ви купуєте, а план показує, що з якого різати."],
         ["Чи враховується ширина різу?",
          "Так. Різ віднімається при кожному наступному розпилі в хлисті, але не при першому, бо перший елемент починається від торця матеріалу."],
       ],
@@ -566,7 +566,7 @@ export const CALC_SEO = {
   },
   sheet: {
     pl: {
-      title: "Kalkulator rozkroju płyt — ile arkuszy",
+      title: "Kalkulator rozkroju płyt: ile arkuszy",
       desc: "Formatki, wymiar płyty i rzaz piły dają liczbę arkuszy i plan rozkroju gilotynowego, z obrotem elementów albo bez niego.",
       faq: [
         ["Ile płyt wyjdzie na moje formatki?",
@@ -580,7 +580,7 @@ export const CALC_SEO = {
       desc: "Деталі, розмір плити й ширина різу дають кількість аркушів і план гільйотинного розкрою, з обертанням деталей або без нього.",
       faq: [
         ["Скільки плит вийде на мої деталі?",
-         "Калькулятор бере деталі від найбільшої і кладе кожну у вільний прямокутник із найменшим залишком. Коли на плиті вже нічого не поміщається, відкривається наступна — це і є кількість аркушів."],
+         "Калькулятор бере деталі від найбільшої і кладе кожну у вільний прямокутник із найменшим залишком. Коли на плиті вже нічого не поміщається, відкривається наступна. Це і є кількість аркушів."],
         ["Коли вимикати обертання деталей?",
          "Коли плита має текстуру або напрямний малюнок. Обернена деталь тоді має інший напрямок, хоч розмір і збігається."],
       ],
@@ -698,7 +698,7 @@ export const CALC_SEO = {
   },
   concrete: {
     pl: {
-      title: "Kalkulator betonu — ile worków na m³",
+      title: "Kalkulator betonu: ile worków na m³",
       desc: "Objętość i wydajność worka dają liczbę worków suchej mieszanki oraz przybliżoną ilość wody do zarobienia betonu.",
       faq: [
         ["Ile worków betonu na 1 m³?",
@@ -712,7 +712,7 @@ export const CALC_SEO = {
       desc: "Об'єм і вихід мішка дають кількість мішків сухої суміші та приблизну кількість води для замішування бетону.",
       faq: [
         ["Скільки мішків бетону на 1 м³?",
-         "Кубометр — це 1000 літрів готової суміші. Поділіть ці літри на вихід одного мішка, вказаний на упаковці, а калькулятор округлить результат вгору до цілих мішків."],
+         "Кубометр. Це 1000 літрів готової суміші. Поділіть ці літри на вихід одного мішка, вказаний на упаковці, а калькулятор округлить результат вгору до цілих мішків."],
         ["Скільки літрів дає один мішок?",
          "Розрахунок припускає мішок 25 кг, який дає близько 12,5 л бетону. Перевірте вихід на своєму мішку, бо він різний у виробників, і впишіть його у форму."],
       ],
@@ -830,7 +830,7 @@ export const CALC_SEO = {
   },
   mortar: {
     pl: {
-      title: "Kalkulator kleju do płytek — ile worków",
+      title: "Kalkulator kleju do płytek: ile worków",
       desc: "Powierzchnia i zużycie w kg/m² z karty technicznej dają liczbę całych worków kleju albo zaprawy do kupienia.",
       faq: [
         ["Ile kleju na 1 m² płytek?",
@@ -962,7 +962,7 @@ export const CALC_SEO = {
   },
   screed: {
     pl: {
-      title: "Kalkulator wylewki — ile worków na m²",
+      title: "Kalkulator wylewki: ile worków na m²",
       desc: "Powierzchnia, grubość warstwy i zużycie w kg na m² i mm dają liczbę worków wylewki, jastrychu albo tynku.",
       faq: [
         ["Ile worków wylewki na m²?",
@@ -1094,7 +1094,7 @@ export const CALC_SEO = {
   },
   grout: {
     pl: {
-      title: "Kalkulator fugi — ile kg na płytki",
+      title: "Kalkulator fugi: ile kg na płytki",
       desc: "Wymiary płytki, szerokość spoiny i powierzchnia dają zużycie fugi w kilogramach i liczbę worków do kupienia.",
       faq: [
         ["Ile fugi na 1 m² płytek?",
@@ -1108,7 +1108,7 @@ export const CALC_SEO = {
       desc: "Розміри плитки, ширина шва й площа дають витрату затирки в кілограмах і кількість мішків до покупки.",
       faq: [
         ["Скільки затирки на 1 м² плитки?",
-         "Витрата росте з шириною шва й товщиною плитки та зменшується з форматом. На великому керамограніті з тонким швом виходить дуже мало, на мозаїці — багато."],
+         "Витрата росте з шириною шва й товщиною плитки та зменшується з форматом. На великому керамограніті з тонким швом виходить дуже мало, на мозаїці. Багато."],
         ["Які розміри плитки вказувати?",
          "Довжину, ширину й товщину однієї плитки та ширину шва. З цих чотирьох чисел виходить об'єм швів на квадратному метрі, а з нього кілограми."],
       ],
@@ -1226,7 +1226,7 @@ export const CALC_SEO = {
   },
   masonry: {
     pl: {
-      title: "Kalkulator muru — ile bloczków i zaprawy",
+      title: "Kalkulator muru: ile bloczków i zaprawy",
       desc: "Powierzchnia ściany minus otwory, liczba sztuk na m² i zapas dają liczbę bloczków lub cegieł oraz kilogramy zaprawy.",
       faq: [
         ["Ile bloczków na m² ściany?",
@@ -1358,7 +1358,7 @@ export const CALC_SEO = {
   },
   insulation: {
     pl: {
-      title: "Kalkulator ocieplenia — styropian i kołki",
+      title: "Kalkulator ocieplenia: styropian i kołki",
       desc: "Powierzchnia elewacji daje płyty styropianu, kołki, kilogramy kleju i metry siatki na ocieplenie w systemie ETICS.",
       faq: [
         ["Ile kołków na m² styropianu?",
@@ -1372,7 +1372,7 @@ export const CALC_SEO = {
       desc: "Площа фасаду дає плити пінопласту, дюбелі, кілограми клею та метри сітки для утеплення в системі ETICS.",
       faq: [
         ["Скільки дюбелів на м² пінопласту?",
-         "6 штук на м² — типове значення для першого й другого поверху. Кількість залежить від висоти будинку та вітрової зони, тож для вищих стін вписуйте більше."],
+         "6 штук на м². Типове значення для першого й другого поверху. Кількість залежить від висоти будинку та вітрової зони, тож для вищих стін вписуйте більше."],
         ["Скільки сітки на утеплення?",
          "Сітку рахуйте із запасом 10%, бо сусідні смуги мають перекриватися. Калькулятор додає цей нахлест до площі фасаду."],
       ],
@@ -1490,13 +1490,13 @@ export const CALC_SEO = {
   },
   studwall: {
     pl: {
-      title: "Kalkulator ściany G-K — profile i płyty",
+      title: "Kalkulator ściany G-K: profile i płyty",
       desc: "Szerokość, wysokość i rozstaw profili dają liczbę profili CW i UW, płyt gipsowo-kartonowych oraz kołków na ścianę działową.",
       faq: [
         ["Ile profili na ścianę działową?",
          "Profile CW stoją co tyle, ile wynosi rozstaw, a UW biegną górą i dołem. Kalkulator przelicza jedno i drugie na całe profile o zadanej długości."],
         ["Jaki rozstaw profili wybrać?",
-         "60 cm pod płytę o szerokości 1,2 m. Pod płytki albo cięższą okładzinę zejdź do 40 cm — profili wychodzi wtedy więcej."],
+         "60 cm pod płytę o szerokości 1,2 m. Pod płytki albo cięższą okładzinę zejdź do 40 cm. Profili wychodzi wtedy więcej."],
       ],
     },
     uk: {
@@ -1506,7 +1506,7 @@ export const CALC_SEO = {
         ["Скільки профілів на перегородку?",
          "Профілі CW стоять із заданим кроком, а UW ідуть згори та знизу. Калькулятор переводить обидва на цілі профілі заданої довжини."],
         ["Який крок профілів обрати?",
-         "Крок 60 см — стандарт під лист шириною 1,2 м. Під важче облицювання чи плитку зменшіть до 40 см. Листи рахуйте на обидва боки стіни."],
+         "Крок 60 см. Стандарт під лист шириною 1,2 м. Під важче облицювання чи плитку зменшіть до 40 см. Листи рахуйте на обидва боки стіни."],
       ],
     },
     de: {
@@ -1622,7 +1622,7 @@ export const CALC_SEO = {
   },
   ceiling: {
     pl: {
-      title: "Kalkulator sufitu podwieszanego — profile",
+      title: "Kalkulator sufitu podwieszanego: profile",
       desc: "Wymiary sufitu i rozstawy dają liczbę profili CD i UD, wieszaków oraz płyt gipsowo-kartonowych na sufit podwieszany.",
       faq: [
         ["Ile profili na sufit podwieszany?",
@@ -1638,7 +1638,7 @@ export const CALC_SEO = {
         ["Скільки профілів на підвісну стелю?",
          "Несучі профілі CD ідуть із заданим кроком, а UD обходять стіни. Калькулятор рахує обидва з розмірів стелі й подає в цілих профілях."],
         ["Який крок підвісів прийняти?",
-         "Крок CD 40 см і підвісів 90 см — типова стеля під лист. За більшого навантаження кроки треба зменшити."],
+         "Крок CD 40 см і підвісів 90 см. Типова стеля під лист. За більшого навантаження кроки треба зменшити."],
       ],
     },
     de: {
@@ -1754,7 +1754,7 @@ export const CALC_SEO = {
   },
   drylining: {
     pl: {
-      title: "Kalkulator płyt G-K na klej — ile płyt",
+      title: "Kalkulator płyt G-K na klej: ile płyt",
       desc: "Powierzchnia ściany i zużycie kleju gipsowego dają liczbę płyt gipsowo-kartonowych i worków kleju do montażu na placki.",
       faq: [
         ["Ile płyt G-K na m² ściany?",
@@ -1886,7 +1886,7 @@ export const CALC_SEO = {
   },
   sheathing: {
     pl: {
-      title: "Kalkulator poszycia OSB — ile arkuszy",
+      title: "Kalkulator poszycia OSB: ile arkuszy",
       desc: "Powierzchnia do pokrycia, wymiar arkusza i zapas dają liczbę całych płyt OSB albo desek na poszycie ściany lub dachu.",
       faq: [
         ["Ile płyt OSB na m² poszycia?",

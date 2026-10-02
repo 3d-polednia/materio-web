@@ -828,7 +828,7 @@ function wsRenderProject(id) {
         && (!costs.currencyCode || !project.currencyCode || costs.currencyCode === project.currencyCode);
       setText("ws-biz-left", comparable
         ? wsMoney(project.valueMinor - costs.total, project.currencyCode)
-        : "—");
+        : "");
     }
   }
 

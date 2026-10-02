@@ -413,7 +413,7 @@ function pdfRenderQuote(doc, snap) {
     }
   };
   const money = (v) => {
-    if (v === null) return "—";
+    if (v === null) return "";
     try { return new Intl.NumberFormat(lang, { style: "currency", currency: str(totals.currencyCode) || "PLN" }).format((Number(v) || 0) / 100); }
     catch (e) { return `${minor(v)} ${str(totals.currencyCode)}`.trim(); }
   };
@@ -451,7 +451,7 @@ function pdfRenderQuote(doc, snap) {
     (Array.isArray(rows) ? rows : []).forEach((raw, index) => {
       const row = raw && typeof raw === "object" ? raw : {};
       const tr = document.createElement("tr");
-      [index + 1, str(row.name), str(row.qtyText), row.unitPriceMinor == null ? "—" : minor(row.unitPriceMinor), minor(row.valueMinor)]
+      [index + 1, str(row.name), str(row.qtyText), row.unitPriceMinor == null ? "" : minor(row.unitPriceMinor), minor(row.valueMinor)]
         .forEach((value, i) => {
           const td = document.createElement("td");
           td.textContent = String(value);

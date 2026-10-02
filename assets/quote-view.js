@@ -15,9 +15,9 @@ function render(data) {
   if (!snap || typeof pdfRenderQuote !== "function" || !pdfRenderQuote(doc, snap)) return fail();
   const company = String(snap.company && snap.company.name || "");
   const number = String(snap.quote && snap.quote.number || "");
-  const title = [number, company].filter(Boolean).join(" — ");
+  const title = [number, company].filter(Boolean).join(". ");
   byId("quote-view-title").textContent = title || copy.title;
-  document.title = `${title || copy.title} — LiczMat`;
+  document.title = `${title || copy.title} | LiczMat`;
   byId("quote-view-state").hidden = true;
   byId("quote-view-toolbar").hidden = false;
   byId("pdf-gate").hidden = true;

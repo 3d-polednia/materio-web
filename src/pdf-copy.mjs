@@ -79,7 +79,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Suma brutto",
     pdfdoc_notes: "Uwagi:",
     pdfdoc_notes_default: "Wycena obejmuje szacunkowe zapotrzebowanie na materiały.",
-    pdfdoc_footer: "LiczMat — Policz. Zaplanuj. Zrealizuj.",
+    pdfdoc_footer: "LiczMat. Policz. Zaplanuj. Zrealizuj.",
   },
   en: {
     pdf_title: "Export estimate",
@@ -132,7 +132,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Gross total",
     pdfdoc_notes: "Notes:",
     pdfdoc_notes_default: "The estimate covers approximate material requirements.",
-    pdfdoc_footer: "LiczMat — Count. Plan. Build.",
+    pdfdoc_footer: "LiczMat. Count. Plan. Build.",
   },
   de: {
     pdf_title: "Angebot exportieren",
@@ -185,7 +185,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Bruttosumme",
     pdfdoc_notes: "Anmerkungen:",
     pdfdoc_notes_default: "Die Schätzung umfasst den ungefähren Materialbedarf.",
-    pdfdoc_footer: "LiczMat — Rechnen. Planen. Umsetzen.",
+    pdfdoc_footer: "LiczMat. Rechnen. Planen. Umsetzen.",
   },
   uk: {
     pdf_title: "Експортувати кошторис",
@@ -238,7 +238,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Разом з ПДВ",
     pdfdoc_notes: "Примітки:",
     pdfdoc_notes_default: "Кошторис охоплює приблизну потребу в матеріалі.",
-    pdfdoc_footer: "LiczMat — Порахуй. Сплануй. Зроби.",
+    pdfdoc_footer: "LiczMat. Порахуй. Сплануй. Зроби.",
   },
   cs: {
     pdf_title: "Exportovat rozpočet",
@@ -291,7 +291,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Celkem s DPH",
     pdfdoc_notes: "Poznámky:",
     pdfdoc_notes_default: "Rozpočet zahrnuje přibližnou potřebu materiálu.",
-    pdfdoc_footer: "LiczMat — Spočítej. Naplánuj. Realizuj.",
+    pdfdoc_footer: "LiczMat. Spočítej. Naplánuj. Realizuj.",
   },
   sk: {
     pdf_title: "Exportovať rozpočet",
@@ -344,7 +344,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Spolu s DPH",
     pdfdoc_notes: "Poznámky:",
     pdfdoc_notes_default: "Rozpočet zahŕňa približnú potrebu materiálu.",
-    pdfdoc_footer: "LiczMat — Spočítaj. Naplánuj. Realizuj.",
+    pdfdoc_footer: "LiczMat. Spočítaj. Naplánuj. Realizuj.",
   },
   ro: {
     pdf_title: "Exportă devizul",
@@ -397,7 +397,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Total cu TVA",
     pdfdoc_notes: "Note:",
     pdfdoc_notes_default: "Devizul acoperă necesarul aproximativ de material.",
-    pdfdoc_footer: "LiczMat — Calculează. Planifică. Realizează.",
+    pdfdoc_footer: "LiczMat. Calculează. Planifică. Realizează.",
   },
   hr: {
     pdf_title: "Izvezi troškovnik",
@@ -450,7 +450,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Ukupno s PDV-om",
     pdfdoc_notes: "Napomene:",
     pdfdoc_notes_default: "Troškovnik obuhvaća približnu potrebu za materijalom.",
-    pdfdoc_footer: "LiczMat — Izračunaj. Isplaniraj. Izvedi.",
+    pdfdoc_footer: "LiczMat. Izračunaj. Isplaniraj. Izvedi.",
   },
   sr: {
     pdf_title: "Izvezi predračun",
@@ -503,7 +503,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Ukupno sa PDV-om",
     pdfdoc_notes: "Napomene:",
     pdfdoc_notes_default: "Predračun obuhvata približnu potrebu za materijalom.",
-    pdfdoc_footer: "LiczMat — Izračunaj. Isplaniraj. Izvedi.",
+    pdfdoc_footer: "LiczMat. Izračunaj. Isplaniraj. Izvedi.",
   },
   it: {
     pdf_title: "Esporta il preventivo",
@@ -556,7 +556,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Totale lordo",
     pdfdoc_notes: "Note:",
     pdfdoc_notes_default: "Il preventivo copre il fabbisogno approssimativo di materiale.",
-    pdfdoc_footer: "LiczMat — Calcola. Pianifica. Realizza.",
+    pdfdoc_footer: "LiczMat. Calcola. Pianifica. Realizza.",
   },
   nl: {
     pdf_title: "Raming exporteren",
@@ -609,7 +609,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Totaal bruto",
     pdfdoc_notes: "Notities:",
     pdfdoc_notes_default: "De raming dekt de globale materiaalbehoefte.",
-    pdfdoc_footer: "LiczMat — Reken. Plan. Bouw.",
+    pdfdoc_footer: "LiczMat. Reken. Plan. Bouw.",
   },
   es: {
     pdf_title: "Exportar el presupuesto",
@@ -662,7 +662,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Total bruto",
     pdfdoc_notes: "Notas:",
     pdfdoc_notes_default: "El presupuesto cubre la necesidad aproximada de material.",
-    pdfdoc_footer: "LiczMat — Calcula. Planifica. Construye.",
+    pdfdoc_footer: "LiczMat. Calcula. Planifica. Construye.",
   },
   fr: {
     pdf_title: "Exporter le devis",
@@ -715,7 +715,7 @@ export const PDF_COPY = {
     pdfdoc_gross_total: "Total TTC",
     pdfdoc_notes: "Notes :",
     pdfdoc_notes_default: "Le devis couvre le besoin approximatif en matériaux.",
-    pdfdoc_footer: "LiczMat — Calcule. Planifie. Réalise.",
+    pdfdoc_footer: "LiczMat. Calcule. Planifie. Réalise.",
   },
 };
 

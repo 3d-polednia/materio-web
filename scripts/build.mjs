@@ -57,7 +57,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20261002b";
+const STAMP = "20261002c";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -1303,7 +1303,7 @@ function buildCalculatorPages() {
     const { main, ld } = calcHubMain(lang, t, CALCS, GUIDES, CONV_COPY[lang]);
     write(join(urlCalcIndex(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("calchub_title")} — LiczMat`,
+      title: `${t("calchub_title")} | LiczMat`,
       description: t("calchub_meta"),
       path: urlCalcIndex(lang),
       alternates: hubAlt,
@@ -1363,7 +1363,7 @@ function buildGuides() {
     const { main, ld } = guideIndexMain(lang, t, GUIDES);
     write(join(urlGuideIndex(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("guides_title")} — LiczMat`,
+      title: `${t("guides_title")} | LiczMat`,
       description: t("guides_meta"),
       path: urlGuideIndex(lang),
       alternates: indexAlt,
@@ -1378,7 +1378,7 @@ function buildGuides() {
       const { main, ld } = guideMain(guide, lang, t);
       write(join(urlGuide(lang, guide), "index.html").replace(/^\//, ""), page({
         lang, t, stamp: STAMP,
-        title: `${t(`g_${guide.id}_t`)} — LiczMat`,
+        title: `${t(`g_${guide.id}_t`)} | LiczMat`,
         description: t(`g_${guide.id}_d`),
         path: urlGuide(lang, guide),
         alternates: alt,
@@ -1395,7 +1395,7 @@ function buildMaterials() {
     const { main, ld } = materialsMain(lang, t, CAT, CATALOG.MAT_CATS_USED, OMAT_COPY[lang]);
     write(join(urlMaterials(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("matpage_title")} — LiczMat`,
+      title: `${t("matpage_title")} | LiczMat`,
       description: t("matpage_meta"),
       path: urlMaterials(lang),
       alternates: alt,
@@ -1416,7 +1416,7 @@ function buildCookiesPage() {
     const { main, ld } = cookiesMain(lang, t);
     write(join(urlCookies(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("cookiepage_title")} \u2014 LiczMat`,
+      title: `${t("cookiepage_title")} | LiczMat`,
       description: t("cookiepage_meta"),
       path: urlCookies(lang),
       alternates: alt,
@@ -1436,7 +1436,7 @@ function buildContactPage() {
     const { main, ld } = contactMain(lang, t);
     write(join(urlContact(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("contactpage_title")} — LiczMat`,
+      title: `${t("contactpage_title")} | LiczMat`,
       description: t("contactpage_meta"),
       path: urlContact(lang),
       alternates: alt,
@@ -1452,7 +1452,7 @@ function buildAndroidPage() {
     const { main, ld } = androidMain(lang, t, CALCS, CAT);
     write(join(urlAndroid(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("apppage_title")} \u2014 LiczMat`,
+      title: `${t("apppage_title")} | LiczMat`,
       description: t("apppage_meta"),
       path: urlAndroid(lang),
       alternates: alt,
@@ -1471,7 +1471,7 @@ function buildWorkspacePages() {
         const material = CATALOG.materialById(preset.m);
         const materialName = CAT.name(material, lang, t);
         return {
-          name: calc.id === "grout" ? `${t("c_grout_t")} — ${materialName}` : materialName,
+          name: calc.id === "grout" ? `${t("c_grout_t")}: ${materialName}` : materialName,
           c: calc.id === "grout" ? "CHEMICALS" : material.c,
           fill: CATALOG.materialFill(material, calc.id),
         };
@@ -1481,7 +1481,7 @@ function buildWorkspacePages() {
     const projects = projectsMain(lang, t, CAT.categories, LM_FEATURES);
     write(join(urlProjects(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("wspage_title")} \u2014 LiczMat`,
+      title: `${t("wspage_title")} | LiczMat`,
       description: t("wspage_meta"),
       bodyClass: "tool-page",
       path: urlProjects(lang),
@@ -1516,7 +1516,7 @@ function buildWorkspacePages() {
       + `</div></section></main>`;
     write(join(urlEstimate(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("estpage_title")} \u2014 LiczMat`,
+      title: `${t("estpage_title")} | LiczMat`,
       description: t("estpage_meta"),
       path: urlEstimate(lang),
       alternates: estAlt,
@@ -1539,7 +1539,7 @@ function buildCompanyPages() {
     const t = translator(lang);
     const { main, ld } = companyMain(lang, t, LM_FEATURES);
     write(join(urlCompany(lang), "index.html").replace(/^\//, ""), page({
-      lang, t, stamp: STAMP, title: `${t("companypage_title")} — LiczMat`,
+      lang, t, stamp: STAMP, title: `${t("companypage_title")} | LiczMat`,
       description: t("companypage_meta"), bodyClass: "tool-page", path: urlCompany(lang),
       alternates: alt, noindex: true, main, jsonld: [ld], scripts: COMPANY_SCRIPTS,
       modules: ["/assets/account-sync-page.js"],
@@ -1561,7 +1561,7 @@ function buildClientsPages() {
     const { main, ld } = clientsMain(lang, t, LM_FEATURES);
     write(join(urlClients(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("clipage_title")} \u2014 LiczMat`,
+      title: `${t("clipage_title")} | LiczMat`,
       description: t("clipage_meta"),
       bodyClass: "tool-page",
       path: urlClients(lang),
@@ -1604,7 +1604,7 @@ function buildJobsPages() {
       + `</div></section></main>`;
     write(join(urlJobs(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("jobpage_title")} \u2014 LiczMat`,
+      title: `${t("jobpage_title")} | LiczMat`,
       description: t("jobpage_meta"),
       bodyClass: "tool-page",
       // Self-canonical, NOT /projekty/. A head that says "do not index me" and "the real
@@ -1638,7 +1638,7 @@ function buildQuotesPages() {
     const { main, ld } = quotesMain(lang, t, LM_FEATURES, STAMP);
     write(join(urlQuotes(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("quopage_title")} \u2014 LiczMat`,
+      title: `${t("quopage_title")} | LiczMat`,
       description: t("quopage_meta"),
       bodyClass: "tool-page",
       path: urlQuotes(lang),
@@ -1666,7 +1666,7 @@ function buildQuoteViewPages() {
     const t = translator(lang);
     write(join(urlQuoteView(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${QUOTE_VIEW_COPY[lang].title} — LiczMat`,
+      title: `${QUOTE_VIEW_COPY[lang].title} | LiczMat`,
       description: QUOTE_VIEW_COPY[lang].title, bodyClass: "tool-page quote-view-page",
       path: urlQuoteView(lang), alternates: {}, noindex: true,
       main: quoteViewMain(lang, t, LM_FEATURES, STAMP, QUOTE_VIEW_COPY[lang]),
@@ -1692,7 +1692,7 @@ function buildCalendarPages() {
     const { main, ld } = calendarMain(lang, t, LM_FEATURES);
     write(join(urlCalendar(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("calpage_title")} \u2014 LiczMat`,
+      title: `${t("calpage_title")} | LiczMat`,
       description: t("calpage_meta"),
       bodyClass: "tool-page",
       path: urlCalendar(lang),
@@ -1761,7 +1761,7 @@ function buildProPage() {
     const { main, ld } = proPageMain(lang, t, LM_FEATURES, planPrices(lang));
     write(join(urlLiczmatPro(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("pro_t")} \u2014 LiczMat`,
+      title: `${t("pro_t")} | LiczMat`,
       description: t("propage_meta"),
       path: urlLiczmatPro(lang),
       alternates: alt,
@@ -1792,7 +1792,7 @@ function buildConverterPage() {
     const { main, ld } = converterMain(lang, t, CONV_CATS, example, CONV_COPY[lang]);
     write(join(urlConverter(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("convpage_title")} \u2014 LiczMat`,
+      title: `${t("convpage_title")} | LiczMat`,
       description: CONV_COPY[lang].convpage_meta,
       path: urlConverter(lang),
       alternates: alt,
@@ -1815,7 +1815,7 @@ function buildOwnMaterialsPage() {
     const { main, ld } = ownMaterialsMain(lang, t, CATALOG.MAT_CATS_USED, OMAT_COPY[lang]);
     write(join(urlOwnMaterials(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("omatpage_title")} \u2014 LiczMat`,
+      title: `${t("omatpage_title")} | LiczMat`,
       description: OMAT_COPY[lang].omatpage_meta,
       path: urlOwnMaterials(lang),
       alternates: alt,
@@ -1837,7 +1837,7 @@ function buildStores() {
     const { main, ld } = storesMain(lang, t);
     write(join(urlStores(lang), "index.html").replace(/^\//, ""), page({
       lang, t, stamp: STAMP,
-      title: `${t("storespage_title")} — LiczMat`,
+      title: `${t("storespage_title")} | LiczMat`,
       description: t("storespage_meta"),
       path: urlStores(lang),
       alternates: alt,
@@ -1903,7 +1903,7 @@ function buildPrivatePages() {
   write("app/index.html", page({
     ...common,
     bodyClass: "workspace-page",
-    title: `${t("app_title")} — LiczMat`,
+    title: `${t("app_title")} | LiczMat`,
     description: t("app_lead"),
     path: URL_APP,
     main: appMain(t, LM_FEATURES),
@@ -1938,7 +1938,7 @@ function buildPrivatePages() {
   // rendered link is /app/, while the calculator map above belongs to /app/'s overview.
   write("app/dashboard/index.html", page({
     ...common,
-    title: `${t("dash_title")} — LiczMat`,
+    title: `${t("dash_title")} | LiczMat`,
     description: t("dash_lead"),
     path: URL_DASHBOARD,
     main: dashboardRedirectMain(t),
@@ -1956,7 +1956,7 @@ function buildPrivatePages() {
 
   write("p/index.html", page({
     ...common,
-    title: `${t("share_title")} — LiczMat`,
+    title: `${t("share_title")} | LiczMat`,
     description: t("share_lead"),
     path: URL_SHARE,
     main: shareMain(t),

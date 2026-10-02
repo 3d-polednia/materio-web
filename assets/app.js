@@ -531,9 +531,9 @@ function renderIdentity() {
 
 /** A stored millisecond timestamp as a date in the page's language, or a dash. */
 function whenText(millis) {
-  if (!millis) return "—";
+  if (!millis) return "";
   const date = new Date(Number(millis));
-  if (isNaN(date.getTime())) return "—";
+  if (isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat(document.documentElement.lang || "pl",
     { dateStyle: "medium" }).format(date);
 }
@@ -544,7 +544,7 @@ function renderProfile() {
   if (!user) return;
   const profile = state.profile || {};
 
-  $("prof-email").textContent = user.email || "—";
+  $("prof-email").textContent = user.email || "";
   $("prof-provider").textContent = hasPasswordProvider(user)
     ? T("app_provider_password") : T("app_provider_google");
   $("prof-created").textContent = whenText(profile.createdAt);
@@ -1115,7 +1115,7 @@ function renderOverview() {
     const sched = typeof crmSchedule === "function" ? crmSchedule() : null;
     const items = sched ? [...sched.buckets.late, ...sched.buckets.today, ...sched.buckets.soon].slice(0, 5) : [];
     schedList.innerHTML = items.length
-      ? items.map((j) => `<li><span class="row-name">${escapeHtml(j.name)}<em class="muted"> — ${fmtDay(j.dueDate)}</em></span></li>`).join("")
+      ? items.map((j) => `<li><span class="row-name">${escapeHtml(j.name)}<em class="muted">, ${fmtDay(j.dueDate)}</em></span></li>`).join("")
       : `<li class="empty muted">${T("app_schedule_empty_day")}</li>`;
   }
 

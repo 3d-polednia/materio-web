@@ -105,7 +105,7 @@ function wsFillRoomSelect(card) {
   const rooms = wsRooms();
   const keep = sel.value;
   const option = (r) =>
-    `<option value="${wsEsc(r.id)}">${wsEsc(r.name)} — ${wsNum(wsRoomAreas(r).floor)} m²</option>`;
+    `<option value="${wsEsc(r.id)}">${wsEsc(r.name)}, ${wsNum(wsRoomAreas(r).floor)} m²</option>`;
   const groups = wsRoomGroups();
   // A single group would be a heading over the whole list, saying nothing the list does not.
   sel.innerHTML = `<option value="">${wsEsc(wsT("ws_room_none"))}</option>` + (groups.length > 1
@@ -310,7 +310,7 @@ function wsResolvedLine(card) {
   const calc = card.dataset.calc;
   if (!card.dataset.matName) return { name: wsT(`c_${calc}_t`), category: "OTHER" };
   if (calc === "grout") return {
-    name: `${wsT("c_grout_t")} — ${card.dataset.matName}`, category: "CHEMICALS",
+    name: `${wsT("c_grout_t")}: ${card.dataset.matName}`, category: "CHEMICALS",
   };
   return { name: card.dataset.matName, category: card.dataset.matCat || "OTHER" };
 }

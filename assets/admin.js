@@ -38,26 +38,26 @@ const esc = (s) => String(s == null ? "" : s)
 
 /** "2027-08-27", or a dash. A calendar day is all a plan's end is ever read as here. */
 const day = (ms) => {
-  if (!ms) return "—";
+  if (!ms) return "";
   const d = new Date(Number(ms));
-  return isNaN(d.getTime()) ? "—" : d.toISOString().slice(0, 10);
+  return isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 10);
 };
 
 /** Local date and time, or a dash. */
 const when = (ms) => {
   const d = new Date(Number(ms));
-  if (!ms || isNaN(d.getTime())) return "—";
+  if (!ms || isNaN(d.getTime())) return "";
   const two = (value) => String(value).padStart(2, "0");
   return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())} ${two(d.getHours())}:${two(d.getMinutes())}`;
 };
 
 const platform = (value) => value === "web" ? "strona"
-  : typeof value === "string" && value ? `Android ${value}` : "—";
+  : typeof value === "string" && value ? `Android ${value}` : "";
 
 const login = (providers) => Array.isArray(providers) && providers.length
   ? providers.map((value) => value === "google.com" ? "Google"
     : value === "password" ? "hasło" : value).join(" + ")
-  : "—";
+  : "";
 
 /**
  * One account's plan, in one line.
@@ -69,7 +69,7 @@ const login = (providers) => Array.isArray(providers) && providers.length
 function planLine(acc) {
   const sources = { trial: "okres próbny", stripe: "Stripe", manual: "ręcznie" };
   const source = sources[acc.source] ? ` (${sources[acc.source]})` : "";
-  if (acc.state === "expired") return `Pro — wygasł ${day(acc.validUntil)}${source}`;
+  if (acc.state === "expired") return `Pro, wygasł ${day(acc.validUntil)}${source}`;
   if (acc.state === "pro") {
     return `Pro do ${day(acc.validUntil)}${acc.renews ? ", odnawia się" : ""}${source}`;
   }
@@ -95,7 +95,7 @@ function errorText(err) {
   if (map[code]) return map[code];
   if (err && err.code === "functions/unauthenticated") return map["not-admin"];
   if (err && err.code === "functions/internal") {
-    return "Funkcja nie odpowiedziała. Sprawdź, czy jest wdrożona — docs/ADMIN.md.";
+    return "Funkcja nie odpowiedziała. Sprawdź, czy jest wdrożona. Docs/ADMIN.md.";
   }
   return `Nie udało się: ${code || "brak połączenia"}.`;
 }
@@ -114,7 +114,7 @@ const PANEL = `
         placeholder="ktos@example.com">
     </div>
     <div class="field">
-      <label for="admin-months">Na ile miesięcy (1–120)</label>
+      <label for="admin-months">Na ile miesięcy (1-120)</label>
       <input id="admin-months" type="text" inputmode="numeric" maxlength="3" value="12">
     </div>
     <p class="ws-links">
@@ -214,7 +214,7 @@ export async function mountAdmin({ app }) {
   const emailValue = () => $("admin-email").value.trim();
 
   const firstEntry = (acc) => acc.firstApp ? platform(acc.firstApp)
-    : acc.profileByServer ? "serwer" : "—";
+    : acc.profileByServer ? "serwer" : "";
   const verified = (acc) => acc.emailVerified === true ? "potwierdzony"
     : acc.emailVerified === false ? "niepotwierdzony" : "";
   let detailAccount = null;
@@ -223,15 +223,15 @@ export async function mountAdmin({ app }) {
     const detail = $("admin-detail");
     const counts = Object.prototype.hasOwnProperty.call(acc, "counts") ? acc.counts : previousCounts;
     const rows = [
-      ["UID", acc.uid || "—"],
-      ["E-mail potwierdzony", acc.emailVerified === true ? "tak" : acc.emailVerified === false ? "nie" : "—"],
+      ["UID", acc.uid || ""],
+      ["E-mail potwierdzony", acc.emailVerified === true ? "tak" : acc.emailVerified === false ? "nie" : ""],
       ["Logowanie", login(acc.providers)],
       ["Założone (Auth)", when(acc.createdAt)],
       ["Ostatnie logowanie", when(acc.lastSignInAt)],
       ["Ostatnio w LiczMat", acc.lastApp
         ? `${when(acc.lastSeenAt)}, ${platform(acc.lastApp)}` : when(acc.lastSeenAt)],
       ["Pierwsze wejście", firstEntry(acc)],
-      ["Profil w bazie", acc.hasProfile === true ? "jest" : acc.hasProfile === false ? "brak" : "—"],
+      ["Profil w bazie", acc.hasProfile === true ? "jest" : acc.hasProfile === false ? "brak" : ""],
       ["Plan", planLine(acc)],
       ["Panel admina", acc.admin ? "tak" : "nie"],
     ];
@@ -242,13 +242,13 @@ export async function mountAdmin({ app }) {
     ];
     const list = rows.map(([label, value]) => `<div class="fact"><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join("");
     const countList = counts && typeof counts === "object"
-      ? countLabels.map(([key, label]) => `<div class="fact"><dt>${esc(label)}</dt><dd>${esc(Number.isInteger(counts[key]) ? counts[key] : "—")}</dd></div>`).join("")
+      ? countLabels.map(([key, label]) => `<div class="fact"><dt>${esc(label)}</dt><dd>${esc(Number.isInteger(counts[key]) ? counts[key] : "")}</dd></div>`).join("")
       : "";
     const unavailable = countList ? "" : "<p class=\"muted\">Liczby niedostępne.</p>";
     const note = acc.hasProfile === false
       ? "<p class=\"muted\">Brak profilu: konto nie dostało okresu próbnego. Zwykle to aplikacja, w której synchronizacja czeka na wybór użytkownika.</p>"
       : "";
-    detail.innerHTML = `<h3 class="app-identity"><b>Konto: ${esc(acc.email || "—")}</b></h3><dl class="facts">${list}${countList}</dl>${unavailable}${note}`;
+    detail.innerHTML = `<h3 class="app-identity"><b>Konto: ${esc(acc.email || "")}</b></h3><dl class="facts">${list}${countList}</dl>${unavailable}${note}`;
     detail.hidden = false;
     detailAccount = { ...acc, counts: counts || null };
   };
@@ -296,7 +296,7 @@ export async function mountAdmin({ app }) {
     },
     firstEntry: (acc) => {
       const value = firstEntry(acc);
-      return value && value !== "—" ? value : null;
+      return value && value !== "" ? value : null;
     },
     created: (acc) => Number.isFinite(Number(acc.createdAt)) && Number(acc.createdAt) !== 0
       ? Number(acc.createdAt) : null,
@@ -333,7 +333,7 @@ export async function mountAdmin({ app }) {
     const rows = accounts.map((acc) => `<tr>
         <td><button type="button" class="btn linkish" data-admin-email="${esc(acc.email)}">${esc(acc.email)}${acc.admin ? " (admin)" : ""}${acc.disabled ? " (zablokowane)" : ""}</button></td>
         <td>${esc(planLine(acc)).replace(/\d{4}-\d{2}-\d{2}/, '<span class="num">$&</span>')}</td>
-        <td>${acc.hasProfile === false ? "<strong>brak</strong>" : acc.hasProfile === true ? "jest" : "—"}</td>
+        <td>${acc.hasProfile === false ? "<strong>brak</strong>" : acc.hasProfile === true ? "jest" : ""}</td>
         <td>${esc(login(acc.providers))}${verified(acc) ? `<br><span class="muted">${verified(acc)}</span>` : ""}</td>
         <td><span class="num">${esc(when(acc.lastSeenAt ?? acc.lastSignInAt))}</span>${acc.lastApp ? `, ${esc(platform(acc.lastApp))}` : ""}</td>
         <td>${esc(firstEntry(acc))}</td>

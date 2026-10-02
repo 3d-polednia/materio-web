@@ -46,7 +46,7 @@
  * changes how much prose a page carries.
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -792,6 +792,53 @@ for (const page of PAGES.filter((x) => x.lang === "pl" || x.file === "index.html
 }
 checkMany("copy contains no banned phrase or Polish question heading outside FAQ", phraseSlop,
   (x) => x);
+
+/* ------------------------------------------------------------------ §11 stop slop: AI dashes */
+
+head("§11 stop slop: AI dashes");
+
+const dashSlop = [];
+const badDash = /—|–|\s-\s/;
+const inspectDashes = (where, value) => {
+  if (typeof value !== "string") return;
+  const match = value.match(badDash);
+  if (match) dashSlop.push(`${where}: ${JSON.stringify(match[0])} in ${JSON.stringify(value.slice(0, 180))}`);
+};
+
+const shippedHtml = [];
+const collectHtml = (dir = "") => {
+  for (const entry of readdirSync(p(dir), { withFileTypes: true })) {
+    const rel = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (![".git", "docs", "node_modules"].includes(entry.name)) collectHtml(rel);
+    } else if (entry.name.endsWith(".html")) shippedHtml.push(rel);
+  }
+};
+collectHtml();
+
+for (const lang of LANGS) {
+  const built = evalScript(`assets/i18n.${lang}.js`, ["I18N"]);
+  for (const [key, value] of Object.entries(built.I18N[lang] || {})) {
+    inspectDashes(`assets/i18n.${lang}.js:${key}`, value);
+  }
+}
+
+for (const file of shippedHtml) {
+  let html;
+  try { html = read(file); } catch { continue; }
+  const clean = html.replace(/<!--[\s\S]*?-->/g, "");
+  for (const match of clean.matchAll(/<title[^>]*>([\s\S]*?)<\/title>/gi)) inspectDashes(`${file}:title`, strip(match[1]));
+  for (const match of clean.matchAll(/<meta\b[^>]*(?:name="description"|property="og:[^"]+")[^>]*\bcontent="([^"]*)"[^>]*>/gi)) {
+    inspectDashes(`${file}:meta`, match[1]);
+  }
+  for (const match of clean.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)) {
+    inspectDashes(`${file}:json-ld`, match[1]);
+  }
+  const visible = clean.replace(/<script\b[\s\S]*?<\/script>/gi, " ").replace(/<style\b[\s\S]*?<\/style>/gi, " ");
+  inspectDashes(`${file}:visible`, strip(visible));
+}
+checkMany("shipped HTML and built dictionaries contain no AI-looking dash", dashSlop, (x) => x,
+  shippedHtml.length + LANGS.length);
 
 /* ------------------------------------------------------------------ the report */
 

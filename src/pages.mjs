@@ -519,7 +519,7 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
   <section class="block alt calc-tool">
     <div class="wrap">
       ${calcCard(calc, t, { materials, example, projectsUrl: urlProjects(lang) })}
-      ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a> — ${esc(materials)} ${esc(t.plural("mat_count_label", materials))}</p>` : ""}
+      ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>: ${esc(materials)} ${esc(t.plural("mat_count_label", materials))}</p>` : ""}
     </div>
   </section>
 
@@ -2645,7 +2645,7 @@ export function converterMain(lang, t, cats, example, copy) {
     .join("");
 
   const inventory = cats.map((cat) =>
-    `<li><b>${esc(c(`conv_c_${cat.id}`))}</b> — ${esc(cat.units.map(([sym]) => sym).join(", "))}</li>`).join("");
+    `<li><b>${esc(c(`conv_c_${cat.id}`))}</b>: ${esc(cat.units.map(([sym]) => sym).join(", "))}</li>`).join("");
 
   const main = `<main id="main" tabindex="-1">
   <section class="block page-head">

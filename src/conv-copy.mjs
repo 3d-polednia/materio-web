@@ -37,7 +37,7 @@ export const CONV_COPY = {
   pl: {
     convpage_lead: "Przelicz długość, powierzchnię, objętość, masę, temperaturę, ciśnienie i moc. Liczy przeglądarka, bez konta.",
     convpage_meta: "Konwerter jednostek online: metry i cale, metry kwadratowe i stopy, litry, kilogramy, stopnie, bary, kilowaty. Jedenaście kategorii, bez rejestracji.",
-    conv_hub_d: "Metry, cale, litry, kilogramy, stopnie i dalsze — jedenaście kategorii jednostek.",
+    conv_hub_d: "Metry, cale, litry, kilogramy, stopnie i dalsze. Jedenaście kategorii jednostek.",
     conv_open: "Otwórz konwerter",
     conv_cat: "Wybierz kategorię",
     conv_value: "Wartość",
@@ -62,7 +62,7 @@ export const CONV_COPY = {
   uk: {
     convpage_lead: "Переведіть довжину, площу, обʼєм, масу, температуру, тиск і потужність. Рахує браузер, без облікового запису.",
     convpage_meta: "Конвертер одиниць онлайн: метри й дюйми, квадратні метри й фути, літри, кілограми, градуси, бари, кіловати. Одинадцять категорій, без реєстрації.",
-    conv_hub_d: "Метри, дюйми, літри, кілограми, градуси й інше — одинадцять категорій одиниць.",
+    conv_hub_d: "Метри, дюйми, літри, кілограми, градуси й інше. Одинадцять категорій одиниць.",
     conv_open: "Відкрити конвертер",
     conv_cat: "Виберіть категорію",
     conv_value: "Значення",
@@ -70,8 +70,8 @@ export const CONV_COPY = {
     conv_to: "На",
     conv_swap: "Поміняти",
     conv_units_t: "Що переводить",
-    conv_how_d: "Кожна категорія має базову одиницю. Значення переводимо в базову, а з неї — у цільову, тому будь-яка пара одиниць працює однаково.",
-    conv_temp_d: "Температура — виняток: шкали відрізняються ще й нулем, тому °C, °F і K переводимо через градуси Цельсія, а не множником.",
+    conv_how_d: "Кожна категорія має базову одиницю. Значення переводимо в базову, а з неї. У цільову, тому будь-яка пара одиниць працює однаково.",
+    conv_temp_d: "Температура. Виняток: шкали відрізняються ще й нулем, тому °C, °F і K переводимо через градуси Цельсія, а не множником.",
     conv_c_length: "Довжина",
     conv_c_area: "Площа",
     conv_c_volume: "Обʼєм",
@@ -87,7 +87,7 @@ export const CONV_COPY = {
   de: {
     convpage_lead: "Rechne Länge, Fläche, Volumen, Masse, Temperatur, Druck und Leistung um. Der Browser rechnet, ohne Konto.",
     convpage_meta: "Einheitenumrechner online: Meter und Zoll, Quadratmeter und Fuß, Liter, Kilogramm, Grad, Bar, Kilowatt. Elf Kategorien, ohne Anmeldung.",
-    conv_hub_d: "Meter, Zoll, Liter, Kilogramm, Grad und mehr — elf Kategorien von Einheiten.",
+    conv_hub_d: "Meter, Zoll, Liter, Kilogramm, Grad und mehr. Elf Kategorien von Einheiten.",
     conv_open: "Umrechner öffnen",
     conv_cat: "Kategorie wählen",
     conv_value: "Wert",
@@ -112,7 +112,7 @@ export const CONV_COPY = {
   en: {
     convpage_lead: "Convert length, area, volume, mass, temperature, pressure and power. Your browser does it, with no account.",
     convpage_meta: "Unit converter online: metres and inches, square metres and feet, litres, kilograms, degrees, bars, kilowatts. Eleven categories, no sign-up.",
-    conv_hub_d: "Metres, inches, litres, kilograms, degrees and more — eleven categories of units.",
+    conv_hub_d: "Metres, inches, litres, kilograms, degrees and more. Eleven categories of units.",
     conv_open: "Open the converter",
     conv_cat: "Choose category",
     conv_value: "Value",
@@ -137,7 +137,7 @@ export const CONV_COPY = {
   cs: {
     convpage_lead: "Převeďte délku, plochu, objem, hmotnost, teplotu, tlak a výkon. Počítá prohlížeč, bez účtu.",
     convpage_meta: "Převodník jednotek online: metry a palce, metry čtvereční a stopy, litry, kilogramy, stupně, bary, kilowatty. Jedenáct kategorií, bez registrace.",
-    conv_hub_d: "Metry, palce, litry, kilogramy, stupně a další — jedenáct kategorií jednotek.",
+    conv_hub_d: "Metry, palce, litry, kilogramy, stupně a další. Jedenáct kategorií jednotek.",
     conv_open: "Otevřít převodník",
     conv_cat: "Vyberte kategorii",
     conv_value: "Hodnota",
@@ -162,7 +162,7 @@ export const CONV_COPY = {
   sk: {
     convpage_lead: "Preveďte dĺžku, plochu, objem, hmotnosť, teplotu, tlak a výkon. Počíta prehliadač, bez účtu.",
     convpage_meta: "Prevodník jednotiek online: metre a palce, štvorcové metre a stopy, litre, kilogramy, stupne, bary, kilowatty. Jedenásť kategórií, bez registrácie.",
-    conv_hub_d: "Metre, palce, litre, kilogramy, stupne a ďalšie — jedenásť kategórií jednotiek.",
+    conv_hub_d: "Metre, palce, litre, kilogramy, stupne a ďalšie. Jedenásť kategórií jednotiek.",
     conv_open: "Otvoriť prevodník",
     conv_cat: "Vyberte kategóriu",
     conv_value: "Hodnota",
@@ -187,7 +187,7 @@ export const CONV_COPY = {
   ro: {
     convpage_lead: "Convertește lungimea, suprafața, volumul, masa, temperatura, presiunea și puterea. Calculează browserul, fără cont.",
     convpage_meta: "Convertor de unități online: metri și țoli, metri pătrați și picioare, litri, kilograme, grade, bari, kilowați. Unsprezece categorii, fără cont.",
-    conv_hub_d: "Metri, țoli, litri, kilograme, grade și altele — unsprezece categorii de unități.",
+    conv_hub_d: "Metri, țoli, litri, kilograme, grade și altele. Unsprezece categorii de unități.",
     conv_open: "Deschide convertorul",
     conv_cat: "Alege categoria",
     conv_value: "Valoare",
@@ -212,7 +212,7 @@ export const CONV_COPY = {
   hr: {
     convpage_lead: "Pretvori duljinu, površinu, volumen, masu, temperaturu, tlak i snagu. Računa preglednik, bez korisničkog računa.",
     convpage_meta: "Pretvarač jedinica online: metri i inči, četvorni metri i stope, litre, kilogrami, stupnjevi, bari, kilovati. Jedanaest kategorija, bez registracije.",
-    conv_hub_d: "Metri, inči, litre, kilogrami, stupnjevi i više — jedanaest kategorija jedinica.",
+    conv_hub_d: "Metri, inči, litre, kilogrami, stupnjevi i više. Jedanaest kategorija jedinica.",
     conv_open: "Otvori pretvarač",
     conv_cat: "Odaberi kategoriju",
     conv_value: "Vrijednost",
@@ -237,7 +237,7 @@ export const CONV_COPY = {
   sr: {
     convpage_lead: "Pretvori dužinu, površinu, zapreminu, masu, temperaturu, pritisak i snagu. Računa pregledač, bez naloga.",
     convpage_meta: "Konvertor jedinica onlajn: metri i inči, kvadratni metri i stope, litri, kilogrami, stepeni, bari, kilovati. Jedanaest kategorija, bez registracije.",
-    conv_hub_d: "Metri, inči, litri, kilogrami, stepeni i još — jedanaest kategorija jedinica.",
+    conv_hub_d: "Metri, inči, litri, kilogrami, stepeni i još. Jedanaest kategorija jedinica.",
     conv_open: "Otvori konvertor",
     conv_cat: "Izaberi kategoriju",
     conv_value: "Vrednost",
@@ -287,7 +287,7 @@ export const CONV_COPY = {
   nl: {
     convpage_lead: "Reken lengte, oppervlak, volume, massa, temperatuur, druk en vermogen om. Je browser doet het, zonder account.",
     convpage_meta: "Eenheden omrekenen online: meters en inches, vierkante meters en voet, liters, kilo's, graden, bar, kilowatt. Elf categorieën, zonder registratie.",
-    conv_hub_d: "Meters, inches, liters, kilo's, graden en meer — elf categorieën eenheden.",
+    conv_hub_d: "Meters, inches, liters, kilo's, graden en meer. Elf categorieën eenheden.",
     conv_open: "Open de omrekening",
     conv_cat: "Kies een categorie",
     conv_value: "Waarde",
@@ -337,7 +337,7 @@ export const CONV_COPY = {
   fr: {
     convpage_lead: "Convertis longueur, surface, volume, masse, température, pression et puissance. C'est le navigateur qui calcule, sans compte.",
     convpage_meta: "Convertisseur d'unités en ligne : mètres et pouces, mètres carrés et pieds, litres, kilogrammes, degrés, bars, kilowatts. Onze catégories, sans inscription.",
-    conv_hub_d: "Mètres, pouces, litres, kilogrammes, degrés et plus — onze catégories d'unités.",
+    conv_hub_d: "Mètres, pouces, litres, kilogrammes, degrés et plus. Onze catégories d'unités.",
     conv_open: "Ouvrir le convertisseur",
     conv_cat: "Choisis la catégorie",
     conv_value: "Valeur",

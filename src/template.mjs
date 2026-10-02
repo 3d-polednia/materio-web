@@ -57,7 +57,7 @@ export const LOGO_MARK = logoMark(30);
    The image has the wordmark and the slogan painted into the pixels, so this line has to
    be changed in the same commit as the image — it was left behind once already, and every
    share of every page carried the retired "Policz. Kup. Nie marnuj." for it. */
-export const OG_IMAGE_ALT = "LiczMat — Policz. Zaplanuj. Zrealizuj.";
+export const OG_IMAGE_ALT = "LiczMat. Policz. Zaplanuj. Zrealizuj.";
 
 const ICON = {
   cut: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">${ICON_CUT_PATH}</svg>`,

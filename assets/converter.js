@@ -193,7 +193,7 @@ function convNum(v) {
  * exactly what it says it is.
  */
 function convFormat(v, lang) {
-  if (typeof v !== "number" || !isFinite(v)) return "—";
+  if (typeof v !== "number" || !isFinite(v)) return "";
   const loc = typeof lmLocale === "function" ? lmLocale(lang) : "pl-PL";
   if (v === Math.round(v) && Math.abs(v) < 1e15) {
     return new Intl.NumberFormat(loc, { maximumFractionDigits: 0 }).format(v);

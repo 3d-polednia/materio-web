@@ -102,7 +102,7 @@ export function proMoreLink(t, lang) {
   if (pro && pro.status === STATUS.LIVE) {
     return `<a class="btn btn-ghost btn-sm btn-go" href="${pro.path(lang || DEFAULT_LANG)}" data-i18n="pro_more">${esc(t("pro_more"))}</a>`;
   }
-  return `<span class="muted"><span data-i18n="pro_more">${esc(t("pro_more"))}</span> — <span data-i18n="door_soon">${esc(t("door_soon"))}</span></span>`;
+  return `<span class="muted"><span data-i18n="pro_more">${esc(t("pro_more"))}</span>. <span data-i18n="door_soon">${esc(t("door_soon"))}</span></span>`;
 }
 
 /**
@@ -234,7 +234,7 @@ export function proGate(t, featureId, features, lang, opts) {
   // longer route.
   const others = proModules(features)
     .filter((f) => f.id !== feature.id)
-    .map((f) => `<li><b data-i18n="${f.key}_t">${esc(t(`${f.key}_t`))}</b> — <span class="muted" data-i18n="${f.key}_d">${esc(t(`${f.key}_d`))}</span></li>`)
+    .map((f) => `<li><b data-i18n="${f.key}_t">${esc(t(`${f.key}_t`))}</b>: <span class="muted" data-i18n="${f.key}_d">${esc(t(`${f.key}_d`))}</span></li>`)
     .join("\n            ");
 
   // The two blocks a second wall on the same page leaves to the first — see `brief`.
@@ -300,7 +300,7 @@ export function proPanel(t, features) {
   const pro = route("liczmat-pro");
   const more = pro && pro.status === STATUS.LIVE
     ? `<p><a class="btn btn-ghost btn-sm btn-go" data-nav-route="liczmat-pro" href="${pro.path("pl")}" data-i18n="pro_more">${esc(t("pro_more"))}</a></p>`
-    : `<p class="muted pro-more"><span data-i18n="pro_more">${esc(t("pro_more"))}</span> — <span data-i18n="door_soon">${esc(t("door_soon"))}</span></p>`;
+    : `<p class="muted pro-more"><span data-i18n="pro_more">${esc(t("pro_more"))}</span>. <span data-i18n="door_soon">${esc(t("door_soon"))}</span></p>`;
 
   return `<h2 data-i18n="pro_t">${esc(t("pro_t"))}</h2>
       ${i("pro_d", "p", "muted")}

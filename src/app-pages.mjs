@@ -171,7 +171,7 @@ export function appMain(t, features) {
 
   /** One row of the profile's read-only facts. The value is filled in by assets/app.js. */
   const fact = (id, key) =>
-    `<div class="fact"><dt data-i18n="${key}">${esc(t(key))}</dt><dd id="${id}">—</dd></div>`;
+    `<div class="fact"><dt data-i18n="${key}">${esc(t(key))}</dt><dd id="${id}"></dd></div>`;
 
   const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
@@ -442,7 +442,7 @@ export function appMain(t, features) {
                 <button type="button" id="app-export" class="btn btn-ghost btn-sm" data-i18n="app_export_btn">${esc(t("app_export_btn"))}</button>
               </div>
 
-              <!-- Session 35. "Dane w tej przeglądarce zostają — wyczyść je osobno" has been
+              <!-- Session 35. "Dane w tej przeglądarce zostają. Wyczyść je osobno" has been
                    in the card below since /app/ was built, and until now there was nothing on
                    the site to clear them with. It is also the way out of a browser holding
                    another account's copy, which the sync tab now refuses to touch. -->
