@@ -1350,6 +1350,7 @@ padding-top: var(--sp-3); border-top: 1px solid var(--outline);
 }
 .app-side-who { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); min-width: 0; }
 .app-side-who b { font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; }
+.app-verify-link { color: var(--error); font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 .app-side-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-left: auto; }
 .app-side-actions > .btn { flex: 1 1 auto; }
 @media (min-width: 900px) {
@@ -1398,9 +1399,9 @@ background: var(--surface); box-shadow: var(--shadow-1);
 .app-stat-body { display: flex; flex-direction: column; min-width: 0; }
 .app-stat-card .val { font-size: var(--fs-lg); line-height: 1.1; font-weight: var(--fw-black); font-variant-numeric: tabular-nums; }
 .app-stat-card .lbl { font-size: var(--fs-sm); color: var(--muted); font-weight: var(--fw-semi); margin: 0; }
-.app-two-col { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; align-items: start; }
-@media (min-width: 900px) { .app-two-col { grid-template-columns: 1.5fr 1fr; } }
-.app-stack { display: flex; flex-direction: column; gap: var(--sp-4); }
+.app-overview-grid { display: grid; gap: var(--sp-3); grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+@media (min-width: 900px) { .app-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .app-overview-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; } }
 .cal-wrap { display: grid; gap: var(--sp-4); grid-template-columns: minmax(0, 1fr); align-items: start; }
 @media (min-width: 760px) { .cal-wrap { grid-template-columns: minmax(0, 1fr) 280px; } }
 .cal-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-3); }
@@ -1510,6 +1511,9 @@ font-size: var(--fs-sm); font-weight: var(--fw-semi);
 @media (min-width: 1160px) { .dash-quad { grid-template-columns: repeat(4, 1fr); } }
 @media (min-width: 1160px) { .app-card .dash-quad { grid-template-columns: repeat(2, 1fr); } }
 .dash-quad > .empty { grid-column: 1 / -1; }
+.dash-quad > li.empty {
+border: 1px dashed var(--outline); border-radius: var(--radius-sm); padding: var(--sp-3) var(--sp-4);
+}
 .dash-fig {
 display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
 flex: none; text-align: right; font-variant-numeric: tabular-nums;

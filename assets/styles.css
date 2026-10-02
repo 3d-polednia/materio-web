@@ -2049,6 +2049,8 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 }
 .app-side-who { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); min-width: 0; }
 .app-side-who b { font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; }
+/* An unverified address needs one route to the account action, without restoring the removed status chips. */
+.app-verify-link { color: var(--error); font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 .app-side-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-left: auto; }
 /* The 248 px sidebar had 6 px to spare for "Pulpit" and "Wyloguj" side by side once the
    dashboard link carried its arrow, so a browser with a larger default font broke both
@@ -2136,9 +2138,12 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .app-stat-card .val { font-size: var(--fs-lg); line-height: 1.1; font-weight: var(--fw-black); font-variant-numeric: tabular-nums; }
 .app-stat-card .lbl { font-size: var(--fs-sm); color: var(--muted); font-weight: var(--fw-semi); margin: 0; }
 
-.app-two-col { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; align-items: start; }
-@media (min-width: 900px) { .app-two-col { grid-template-columns: 1.5fr 1fr; } }
-.app-stack { display: flex; flex-direction: column; gap: var(--sp-4); }
+/* One overview grid keeps paired cards equal and lets the final odd card use the full row. */
+.app-overview-grid { display: grid; gap: var(--sp-3); grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+/* Two equal columns start where the account shell has enough room for both card headings. */
+@media (min-width: 900px) { .app-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* The fifth overview card spans the row so an odd card never leaves an empty grid cell. */
+@media (min-width: 900px) { .app-overview-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; } }
 
 /* The Terminarz month grid — the owner's explicit exception to chapter XXIII, see the
    note in src/app-pages.mjs above the schedule panel. */
@@ -2304,6 +2309,11 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
    empty-state line spans the row instead of sitting in the first cell. */
 @media (min-width: 1160px) { .app-card .dash-quad { grid-template-columns: repeat(2, 1fr); } }
 .dash-quad > .empty { grid-column: 1 / -1; }
+/* The tools list is a grid, not a .data-list, so its empty state borrows the same dashed
+   box every other empty overview card wears (review 2026-10-02, P11). */
+.dash-quad > li.empty {
+  border: 1px dashed var(--outline); border-radius: var(--radius-sm); padding: var(--sp-3) var(--sp-4);
+}
 /* The number a row is about, on the right: quantity over cost, right-aligned so the
    figures in a list line up under each other. */
 .dash-fig {

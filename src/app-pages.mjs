@@ -272,8 +272,7 @@ export function appMain(t, features) {
           ${accountSidebar(t, { inPlace: true, foot: `<div class="app-side-foot">
               <span class="app-side-who">
                 <b id="app-who"></b>
-                <span id="app-provider" class="chip"></span>
-                <span id="app-verified" class="chip"></span>
+                <a id="app-verify-link" class="app-verify-link" href="#app-verify-row" data-i18n="app_verify_link" hidden>${esc(t("app_verify_link"))}</a>
               </span>
               <span class="app-side-actions">
                 <!-- Session 14: the dashboard is where somebody signed in actually starts —
@@ -299,7 +298,7 @@ export function appMain(t, features) {
               <h2 data-i18n="app_overview_title">${esc(t("app_overview_title"))}</h2>
               ${i("app_overview_lead", "p", "muted")}
               <div class="app-stats" id="overview-stats"></div>
-              <div class="app-two-col">
+              <div class="app-overview-grid">
                 <section class="app-card">
                   <div class="dash-head">
                     <h3 data-i18n="app_overview_projects_t">${esc(t("app_overview_projects_t"))}</h3>
@@ -307,30 +306,26 @@ export function appMain(t, features) {
                   </div>
                   <ul id="overview-projects" class="data-list"></ul>
                 </section>
-                <div class="app-stack">
-                  <section class="app-card">
-                    <div class="dash-head">
-                      <h3 data-i18n="app_overview_schedule_t">${esc(t("app_overview_schedule_t"))}</h3>
-                      <a class="linkish dash-more" href="${urlCalendar(DEFAULT_LANG)}" data-nav-route="calendar" data-i18n="app_tab_schedule">${esc(t("app_tab_schedule"))}</a>
-                    </div>
-                    <ul id="overview-schedule" class="data-list"></ul>
-                  </section>
-                  <section class="app-card">
-                    <div class="dash-head">
-                      <h3 data-i18n="app_overview_materials_t">${esc(t("app_overview_materials_t"))}</h3>
-                      <a class="linkish dash-more" href="${urlOwnMaterials(DEFAULT_LANG)}" data-nav-route="own-materials" data-i18n="app_tab_materials">${esc(t("app_tab_materials"))}</a>
-                    </div>
-                    <ul id="overview-materials" class="data-list"></ul>
-                  </section>
-                </div>
-              </div>
-              <div class="app-two-col">
+                <section class="app-card">
+                  <div class="dash-head">
+                    <h3 data-i18n="app_overview_schedule_t">${esc(t("app_overview_schedule_t"))}</h3>
+                    <a class="linkish dash-more" href="${urlCalendar(DEFAULT_LANG)}" data-nav-route="calendar" data-i18n="app_tab_schedule">${esc(t("app_tab_schedule"))}</a>
+                  </div>
+                  <ul id="overview-schedule" class="data-list"></ul>
+                </section>
                 <section class="app-card" aria-labelledby="dash-recent-h">
                   <div class="dash-head">
                     <h3 id="dash-recent-h" data-i18n="dash_recent_t">${esc(t("dash_recent_t"))}</h3>
                     <a class="linkish dash-more" href="${DASH_HREF.estimate}" data-dash-url="estimate" data-i18n="dash_recent_all">${esc(t("dash_recent_all"))}</a>
                   </div>
                   <ul id="dash-recent" class="data-list"></ul>
+                </section>
+                <section class="app-card">
+                  <div class="dash-head">
+                    <h3 data-i18n="app_overview_materials_t">${esc(t("app_overview_materials_t"))}</h3>
+                    <a class="linkish dash-more" href="${urlOwnMaterials(DEFAULT_LANG)}" data-nav-route="own-materials" data-i18n="app_tab_materials">${esc(t("app_tab_materials"))}</a>
+                  </div>
+                  <ul id="overview-materials" class="data-list"></ul>
                 </section>
                 <section class="app-card" aria-labelledby="dash-tools-h">
                   <div class="dash-head">
@@ -416,6 +411,10 @@ export function appMain(t, features) {
 
             <section data-panel="account" id="panel-account" hidden>
               <h2 data-i18n="app_sec_title">${esc(t("app_sec_title"))}</h2>
+
+              <dl class="facts app-card">
+                ${fact("app-provider", "prof_provider")}
+              </dl>
 
               <div id="app-verify-row" class="app-card" hidden>
                 ${i("app_verify_d", "p", "muted")}

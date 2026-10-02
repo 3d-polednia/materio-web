@@ -160,7 +160,7 @@ function eqText(name, got, want) {
   check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
 }
 
-for (const width of [1400, 390]) {
+for (const width of [1400, 900, 390]) {
   const ctx = await context({ width, height: 900 });
   const stored = { "materio-workspace-v1": JSON.stringify(workspace), "liczmat-signed-in": "pro" };
   const projects = await openLocal(ctx, "/projekty/", stored);
@@ -245,7 +245,7 @@ for (const width of [1400, 390]) {
   await ctx.close();
 }
 
-for (const width of [1400, 390]) {
+for (const width of [1400, 900, 390]) {
   const ctx = await context({ width, height: 900 }, true);
   await ctx.addInitScript(() => {
     window.__fbSignedIn = "layout-user";
@@ -258,10 +258,33 @@ for (const width of [1400, 390]) {
   const page = await ctx.newPage();
   await page.goto(base + "/app/", { waitUntil: "domcontentloaded" });
   await page.waitForSelector("html[data-app-ready]", { state: "attached", timeout: 10000 });
+  // LM_SHOTS=<dir> keeps a picture of each width for the eye that the numbers cannot replace.
+  if (process.env.LM_SHOTS) await page.screenshot({ path: join(process.env.LM_SHOTS, `app-overview-${width}.png`), fullPage: true });
   const side = await visibleRect(page, ".app-side", `${width}px app side`);
   if (width === 1400 && side) {
     const scroll = await page.locator(".app-side").evaluate((node) => ({ scroll: node.scrollHeight, client: node.clientHeight }));
     check("account side menu does not scroll at 1400x900", scroll.scroll <= scroll.client, JSON.stringify(scroll));
+  }
+  const statsLast = await visibleRect(page, "#overview-stats .app-stat-card:last-child", `${width}px last stat tile`);
+  const grid = await visibleRect(page, ".app-overview-grid", `${width}px overview grid`);
+  const cards = [];
+  for (let index = 1; index <= 5; index++) {
+    cards.push(await visibleRect(page, `.app-overview-grid > .app-card:nth-child(${index})`,
+      `${width}px overview card ${index}`));
+  }
+  if (width >= 900 && cards.every(Boolean) && grid && statsLast) {
+    check(`${width}px first overview row has equal heights`, close(cards[0].height, cards[1].height),
+      `${cards[0].height} vs ${cards[1].height}`);
+    check(`${width}px second overview row has equal heights`, close(cards[2].height, cards[3].height),
+      `${cards[2].height} vs ${cards[3].height}`);
+    check(`${width}px final overview card fills its row`, close(cards[4].left, grid.left) && close(cards[4].right, grid.right),
+      `${cards[4].left}-${cards[4].right} vs ${grid.left}-${grid.right}`);
+    check(`${width}px cards align with the stats right edge`, close(cards[1].right, statsLast.right),
+      `${cards[1].right} vs ${statsLast.right}`);
+  }
+  if (width === 390 && cards.every(Boolean) && grid) {
+    check("390px overview is one column", cards.every((card) => close(card.left, grid.left) && close(card.right, grid.right)),
+      cards.map((card) => `${card.left}-${card.right}`).join(", "));
   }
   if (width === 390) await noHorizontalScroll(page, "/app/", "app phone");
   await ctx.close();

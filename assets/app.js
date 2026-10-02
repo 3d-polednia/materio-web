@@ -525,8 +525,7 @@ function renderIdentity() {
   $("app-level").textContent = T(state.level === LM_LEVEL.PRO ? "acc_pro_t" : "acc_liczmat_t");
   $("app-provider").textContent = hasPasswordProvider(user)
     ? T("app_provider_password") : T("app_provider_google");
-  $("app-verified").textContent = user.emailVerified ? T("app_verified") : T("app_unverified");
-  $("app-verified").classList.toggle("warn", !user.emailVerified);
+  $("app-verify-link").hidden = user.emailVerified;
   $("app-verify-row").hidden = user.emailVerified;
 }
 
@@ -999,6 +998,11 @@ function wireHashPanels() {
     if (id === "pro") renderPlan();
   };
   window.addEventListener("hashchange", show);
+  $("app-verify-link").addEventListener("click", (event) => {
+    event.preventDefault();
+    location.hash = "#konto";
+    requestAnimationFrame(() => $("app-verify-row").scrollIntoView({ block: "nearest" }));
+  });
   show();
 }
 
@@ -1114,10 +1118,12 @@ function renderOverview() {
   const schedList = $("overview-schedule");
   if (schedList) {
     const sched = typeof crmSchedule === "function" ? crmSchedule() : null;
-    const items = sched ? [...sched.buckets.late, ...sched.buckets.today, ...sched.buckets.soon].slice(0, 5) : [];
+    const items = sched ? [
+      ...sched.buckets.late, ...sched.buckets.today, ...sched.buckets.soon, ...sched.buckets.later,
+    ].slice(0, 5) : [];
     schedList.innerHTML = items.length
       ? items.map((j) => `<li><span class="row-name">${escapeHtml(j.name)}<em class="muted">, ${fmtDay(j.dueDate)}</em></span></li>`).join("")
-      : `<li class="empty muted">${T("app_schedule_empty_day")}</li>`;
+      : `<li class="empty muted">${T("app_schedule_empty_upcoming")}</li>`;
   }
 
   const matList = $("overview-materials");

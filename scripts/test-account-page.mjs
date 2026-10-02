@@ -901,12 +901,21 @@ head("11. switching language redraws what JavaScript wrote");
   await page.fill("#signin-password", "sekret123");
   await page.click("#signin-form button[type=submit]");
   await signedIn(page);
-  eq("the identity bar starts in Polish",
+  eq("the account footer contains no status chip",
+    await page.locator(".app-side-foot .chip").count(), 0);
+  check("a verified account has no verification link in the footer",
+    !(await visible(page, "#app-verify-link")));
+  eq("the overview uses the upcoming-deadlines empty state",
+    await page.locator("#overview-schedule .empty").innerText(), "Brak nadchodzących terminów.");
+  check("the overview does not reuse the selected-day empty state",
+    (await page.locator("#overview-schedule").innerText()) !== "Brak terminów tego dnia.");
+  await page.click('.app-nav-item[href$="#konto"]');
+  eq("the sign-in method starts in Polish in the account panel",
     await page.locator("#app-provider").innerText(), "E-mail i hasło");
 
   await page.click("#lang-toggle");
   await pickLang(page, "de");
-  eq("and follows the picker into German",
+  eq("and follows the picker into German in the account panel",
     await page.locator("#app-provider").innerText(), "E-Mail und Passwort");
   eq("including the tab labels",
     await page.locator('.app-nav-item[href$="#profil"]').innerText(), "Profil");
@@ -916,6 +925,44 @@ head("11. switching language redraws what JavaScript wrote");
     "Du bleibst angemeldet, auch wenn der Browser geschlossen wird.");
   eq("no console error", page.lmErrors.join(" / "), "");
   await page.close();
+
+  const unverified = await openApp(ctx, "/app/", { accounts: {
+    "nowy@example.com": { password: "sekret123", user: { uid: "u2", email: "nowy@example.com",
+      emailVerified: false, displayName: "", providerData: [{ providerId: "password" }] } },
+  } });
+  await unverified.fill("#signin-email", "nowy@example.com");
+  await unverified.fill("#signin-password", "sekret123");
+  await unverified.click("#signin-form button[type=submit]");
+  await signedIn(unverified);
+  eq("an unverified account gets the verification text link",
+    await unverified.locator("#app-verify-link").innerText(), "Potwierdź e-mail");
+  eq("the verification link points at its action row",
+    await unverified.locator("#app-verify-link").getAttribute("href"), "#app-verify-row");
+  await unverified.click("#app-verify-link");
+  await unverified.waitForFunction(() => !document.getElementById("panel-account").hidden);
+  check("the verification link opens the account panel", await visible(unverified, "#panel-account"));
+  check("the verification action is visible there", await visible(unverified, "#app-verify-row"));
+  await unverified.close();
+
+  const due = new Date();
+  due.setDate(due.getDate() + 18);
+  const dueDay = [due.getFullYear(), String(due.getMonth() + 1).padStart(2, "0"),
+    String(due.getDate()).padStart(2, "0")].join("-");
+  const upcoming = await openApp(ctx, "/app/", {
+    accounts: { "termin@example.com": { password: "sekret123", user: { uid: "u3", email: "termin@example.com",
+      emailVerified: true, displayName: "", providerData: [{ providerId: "password" }] } } },
+    docs: { "users/u3/projects/p18": { name: "Projekt za osiemnaście dni", status: "new",
+      dueDate: dueDay, archived: false, createdAt: Date.now(), updatedAt: Date.now(), deletedAt: null,
+      schemaVersion: 1 } },
+  });
+  await upcoming.fill("#signin-email", "termin@example.com");
+  await upcoming.fill("#signin-password", "sekret123");
+  await upcoming.click("#signin-form button[type=submit]");
+  await signedIn(upcoming);
+  await upcoming.waitForFunction(() => document.getElementById("overview-schedule").textContent.includes("Projekt za osiemnaście dni"));
+  check("a project due in 18 days appears in upcoming deadlines",
+    (await upcoming.locator("#overview-schedule").innerText()).includes("Projekt za osiemnaście dni"));
+  await upcoming.close();
   await ctx.close();
 }
 
