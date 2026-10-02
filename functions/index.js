@@ -61,6 +61,7 @@ import * as logger from "firebase-functions/logger";
 import { initializeApp } from "firebase-admin/app";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
+import nodemailer from "nodemailer";
 
 import {
   DELETE_FIELD, PLAN_FREE, acceptEvent, decide, verifyStripeSignature,
@@ -69,6 +70,9 @@ import {
   COUNTED, LIST_LIMIT, accountRow, grantWrite, isAdmin, parseRequest, planSummary, revokeWrite,
 } from "./admin-map.mjs";
 import { looksLikeTicket, mintTicket, readTicket } from "./pay-ticket.mjs";
+import {
+  WELCOME_FROM, WELCOME_REPLY_TO, welcomeDecision, welcomeLang, welcomeMarkerDoc, welcomeMessage,
+} from "./welcome-map.mjs";
 import {
   SERVER_PROFILE_DELAY_MS, TRIAL_DAYS, firstAppWrite, serverProfileDoc,
   trialDecision, trialGrantDoc,
@@ -89,6 +93,11 @@ const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
  * przypisywała się dotąd każda płatność bez `client_reference_id`.
  */
 const PAY_TICKET_SECRET = defineSecret("PAY_TICKET_SECRET");
+
+/**
+ * Hasło skrzynki OVH contact@liczmat.com, ustawione przez właściciela za pomocą firebase functions:secrets:set SMTP_PASSWORD.
+ */
+const SMTP_PASSWORD = defineSecret("SMTP_PASSWORD");
 
 /**
  * Które subskrypcje są LiczMat Pro i z którego konta Stripe'a. Znaleziska H1 i H2.
@@ -687,4 +696,83 @@ export const grantTrial = onDocumentCreated(
       uid, days: TRIAL_DAYS, until: outcome.until, firstAppVersion: outcome.firstAppVersion,
     });
   },
+);
+
+
+/**
+ * E-mail powitalny dla nowego konta (przegląd 2026-10-02, P3).
+ *
+ * Ten sam wyzwalacz co `grantTrial`, więc obejmuje rejestrację w przeglądarce i w telefonie.
+ * Język bierzemy z `users/{uid}.lang`, który strona zapisuje przy zakładaniu profilu;
+ * Android go nie wysyła i wtedy mail jest po polsku (`welcomeLang`).
+ *
+ * Znacznik `welcomeMails/{uid}` powstaje przez `create()` PRZED wysyłką: drugie wywołanie
+ * tego samego zdarzenia trafia na ALREADY_EXISTS i nic nie wysyła. Żadna reguła Firestore
+ * nie pasuje do tej kolekcji, więc przeglądarka jej nie przeczyta ani nie podrobi.
+ * Błąd wysyłki zapisujemy w znaczniku zamiast rzucać: ponowienie i tak by nie nastąpiło,
+ * a drugi mail do tej samej osoby jest gorszy niż brak maila.
+ */
+export const welcomeMail = onDocumentCreated(
+  { document: "users/{uid}", region: REGION, maxInstances: 10, secrets: [SMTP_PASSWORD] },
+  async (event) => {
+    const uid = event.params.uid;
+    const profile = event.data.data();
+    const now = Date.now();
+    const lang = welcomeLang(profile);
+
+    const db = getFirestore();
+    const markerRef = db.collection("welcomeMails").doc(uid);
+
+    try {
+      await markerRef.create(welcomeMarkerDoc(uid, now, lang));
+    } catch (e) {
+      if (e && (e.code === 6 || e.code === "already-exists")) {
+        logger.info("welcome: marker juz istnieje", { uid });
+        return;
+      }
+      logger.error("welcome: awaria markera", { uid, message: String(e && e.message || e).substring(0, 300) });
+      return;
+    }
+
+    try {
+      const auth = getAuth();
+      const user = await auth.getUser(uid);
+      const email = user.email;
+      const displayName = user.displayName;
+
+      const verdict = welcomeDecision({ marker: null, email });
+      if (!verdict.send) {
+        await markerRef.update({ status: "skipped", reason: verdict.reason });
+        return;
+      }
+
+      const msg = welcomeMessage({ lang, displayName });
+
+      const transporter = nodemailer.createTransport({
+        host: "ssl0.ovh.net",
+        port: 465,
+        secure: true,
+        auth: {
+          user: "contact@liczmat.com",
+          pass: SMTP_PASSWORD.value()
+        }
+      });
+
+      await transporter.sendMail({
+        from: WELCOME_FROM,
+        replyTo: WELCOME_REPLY_TO,
+        to: email,
+        subject: msg.subject,
+        text: msg.text,
+        html: msg.html
+      });
+
+      await markerRef.update({ status: "sent", sentAt: Date.now() });
+      logger.info("welcome: wyslano", { uid });
+    } catch (e) {
+      const errorMsg = String(e && e.message || e).substring(0, 300);
+      await markerRef.update({ status: "failed", error: errorMsg }).catch(() => {});
+      logger.error("welcome: blad", { uid, message: errorMsg });
+    }
+  }
 );
