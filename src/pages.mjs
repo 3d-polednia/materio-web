@@ -1801,7 +1801,6 @@ export function projectsMain(lang, t, aisles = [], features = []) {
              this offer until then. -->
         <a class="btn btn-ghost btn-go" href="${urlCalendar(lang)}">${esc(t("calpage_title"))}</a>
         <a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-        <a class="btn btn-ghost btn-go" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
       </p>
       <p class="muted src-note">${esc(t("wspage_local_note"))}</p>
     </div>
@@ -2232,7 +2231,6 @@ export function clientsMain(lang, t, features) {
 
       <p class="ws-links">
         <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-        <a class="btn btn-ghost btn-go" href="${URL_APP}" rel="nofollow">${esc(t("nav_app"))}</a>
       </p>
       <p class="muted src-note">${esc(t("cli_local_note"))}</p>
     </div>

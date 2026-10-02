@@ -239,6 +239,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Kontakt",
+    foot_contact: "Kontakt i Impressum",
     contactpage_lead: "LiczMat prowadzi jedna osoba. Ten sam adres e-mail odpowiada na pytania o kalkulatory, konto, abonament Pro i dane osobowe.",
     contactpage_meta: "Kto prowadzi LiczMat i jak się skontaktować: adres e-mail i dane administratora danych osobowych.",
     contactpage_h_write: "Napisz do nas",
@@ -1196,6 +1197,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Contact",
+    foot_contact: "Contact and Impressum",
     contactpage_lead: "One person runs LiczMat. The same email address answers questions about the calculators, the account, the Pro subscription and your personal data.",
     contactpage_meta: "Who runs LiczMat and how to reach them: the email address and the identity of the data controller.",
     contactpage_h_write: "Write to us",
@@ -2147,6 +2149,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Impressum",
+    foot_contact: "Impressum",
     contactpage_lead: "Eine Person leitet LiczMat. Dieselbe E-Mail beantwortet deine Fragen zu Rechnern, Konto, Pro-Abo und deinen Daten.",
     contactpage_meta: "Impressum von LiczMat: Anbieter, Anschrift, USt-IdNr. und die E-Mail-Adresse für Datenanfragen.",
     contactpage_h_write: "Schreib uns",
@@ -3098,6 +3101,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Контакти",
+    foot_contact: "Контакти та Impressum",
     contactpage_lead: "LiczMat керує одна людина. Ця ж електронна адреса відповідає на твої запитання про калькулятори, акаунт, підписку Pro та особисті дані.",
     contactpage_meta: "Хто веде LiczMat і як зв'язатися: адреса електронної пошти та дані адміністратора персональних даних.",
     contactpage_h_write: "Напиши нам",
@@ -4048,6 +4052,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Kontakt",
+    foot_contact: "Kontakt a Impressum",
     contactpage_lead: "LiczMat vede jedna osoba. Stejný e-mail odpovídá na tvé dotazy ohledně kalkulaček, účtu, předplatného Pro a tvých osobních údajů.",
     contactpage_meta: "Kdo provozuje LiczMat a jak se spojit: e-mailová adresa a údaje správce osobních údajů.",
     contactpage_h_write: "Napiš nám",
@@ -4964,6 +4969,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Kontakt",
+    foot_contact: "Kontakt a Impressum",
     contactpage_lead: "LiczMat vedie jedna osoba. Rovnaký e-mail odpovedá na tvoje otázky o kalkulačkách, účte, predplatnom Pro a tvojich osobných údajoch.",
     contactpage_meta: "Kto prevádzkuje LiczMat a ako sa spojiť: e-mailová adresa a údaje správcu osobných údajov.",
     contactpage_h_write: "Napíš nám",
@@ -5880,6 +5886,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Contact",
+    foot_contact: "Contact și Impressum",
     contactpage_lead: "O singură persoană conduce LiczMat. Aceeași adresă de e-mail răspunde la întrebările tale despre calculatoare, cont, abonamentul Pro și datele personale.",
     contactpage_meta: "Cine administrează LiczMat și cum se contactează: adresa de e-mail și datele operatorului de date.",
     contactpage_h_write: "Scrie-ne",
@@ -6796,6 +6803,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Kontakt",
+    foot_contact: "Kontakt i Impressum",
     contactpage_lead: "LiczMat vodi jedna osoba. Ista e-mail adresa odgovara na tvoja pitanja o kalkulatorima, računu, Pro pretplati i osobnim podacima.",
     contactpage_meta: "Tko vodi LiczMat i kako kontaktirati: e-mail adresa i podaci voditelja obrade podataka.",
     contactpage_h_write: "Piši nam",
@@ -7712,6 +7720,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Kontakt",
+    foot_contact: "Kontakt i Impressum",
     contactpage_lead: "LiczMat vodi jedna osoba. Ista imejl adresa odgovara na tvoja pitanja o kalkulatorima, nalogu, Pro pretplati i ličnim podacima.",
     contactpage_meta: "Ко води LiczMat и како контактирати: адреса е-поште и подаци руковаоца подацима.",
     contactpage_h_write: "Piši nam",
@@ -8622,6 +8631,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Contatti",
+    foot_contact: "Contatti e Impressum",
     contactpage_lead: "Una sola persona gestisce LiczMat. La stessa email risponde alle tue domande su calcolatrici, account, abbonamento Pro e dati personali.",
     contactpage_meta: "Chi gestisce LiczMat e come contattare: indirizzo e-mail e dettagli del titolare del trattamento dei dati.",
     contactpage_h_write: "Scrivici",
@@ -9529,6 +9539,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Contact",
+    foot_contact: "Contact en Impressum",
     contactpage_lead: "Eén persoon beheert LiczMat. Hetzelfde e-mailadres beantwoordt je vragen over rekenmachines, je account, het Pro abonnement en je persoonsgegevens.",
     contactpage_meta: "Wie LiczMat beheert en hoe contact op te nemen: e-mailadres en gegevens van de verwerkingsverantwoordelijke.",
     contactpage_h_write: "Schrijf ons",
@@ -10436,6 +10447,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Contacto",
+    foot_contact: "Contacto e Impressum",
     contactpage_lead: "Una persona dirige LiczMat. El mismo correo responde a tus preguntas sobre calculadoras, cuenta, suscripción Pro y datos personales.",
     contactpage_meta: "Quién gestiona LiczMat y cómo contactar: dirección de correo electrónico y datos del responsable del tratamiento.",
     contactpage_h_write: "Escríbenos",
@@ -11343,6 +11355,7 @@ const I18N_PAGES = {
        actually carries, so the two register numbers wait here unused until
        there are any to print. */
     contactpage_title: "Contact",
+    foot_contact: "Contact et Impressum",
     contactpage_lead: "Une seule personne gère LiczMat. Le même e-mail répond à tes questions sur les calculatrices, ton compte, l'abonnement Pro et tes données.",
     contactpage_meta: "Qui gère LiczMat et comment contacter : adresse e-mail et coordonnées du responsable du traitement des données.",
     contactpage_h_write: "Écris-nous",

@@ -580,7 +580,7 @@ export function siteFooter(f) {
       <span>© <span data-year>2026</span> LiczMat.${minimal ? "" : ` ${esc(t("foot_rights"))}`}</span>
       ${who}
       ${minimal
-        ? `<span><a href="${URL_PRIVACY}"${inPlace ? ' data-i18n="foot_privacy"' : ""}>${esc(t("foot_privacy"))}</a></span>
+        ? `<span><a href="${urlContact(DEFAULT_LANG)}"${inPlace ? ' data-i18n="foot_contact"' : ""}>${esc(t("foot_contact"))}</a> &middot; <a href="${URL_PRIVACY}"${inPlace ? ' data-i18n="foot_privacy"' : ""}>${esc(t("foot_privacy"))}</a></span>
       <span class="muted"${inPlace ? ' data-i18n="app_noindex_note"' : ""}>${esc(t("app_noindex_note"))}</span>`
         : `<span>${esc(t("foot_disclaimer"))}</span>`}
     </div>`;
@@ -623,7 +623,7 @@ export function siteFooter(f) {
       <div class="foot-group foot-legal">
         <h2>${esc(t("foot_legal"))}</h2>
         <ul>
-          <li><a href="${urlContact(lang)}">${esc(t("contactpage_title"))}</a></li>
+          <li><a href="${urlContact(lang)}">${esc(t("foot_contact"))}</a></li>
           <li><a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a></li>
           <li><a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a></li>
         </ul>
