@@ -599,6 +599,9 @@ async function pdfDownloadQuote(doc, stage = false) {
         sheet.classList.remove("pdf-download-stage");
         sheet.classList.add("qdoc--paper");
         sheet.style.width = `${pdfA4Px}px`;
+        // The editor's sheet sits in .wrap.narrow, and .qdoc's max-width: 100% held it to
+        // that 675px column: the file came out with the text squeezed off-centre to the left.
+        sheet.style.maxWidth = "none";
         sheet.style.transform = "none";
         sheet.style.margin = "0";
         sheet.style.opacity = "1";
