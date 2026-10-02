@@ -987,7 +987,7 @@ function wsRenderRooms() {
     return `<section class="app-card ws-room-card${color ? ` ws-room-card-${color}` : ""}" data-project-id="${wsEsc(projectId)}">
       <div class="ws-room-card-head">
         <h3>${color ? '<span class="ws-room-card-dot" aria-hidden="true"></span>' : ""}${title}</h3>
-        <span class="chip" data-room-count>${groupedRooms.length}</span>
+        <span data-room-count>${groupedRooms.length} ${wsEsc(wsUnit("ws_room_count", groupedRooms.length))}</span>
       </div>
       <ul class="data-list">${groupedRooms.length
         ? groupedRooms.map(roomRow).join("")

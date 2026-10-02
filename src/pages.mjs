@@ -1761,7 +1761,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
         <p class="muted">${esc(t("wspage_projects_d"))}</p>
         <!-- Visible labels, not placeholders: a placeholder is the only thing naming
              these boxes and it leaves the moment the visitor types (audit 2026-09-18). -->
-        <form id="ws-project-form" class="inline-form">
+        <form id="ws-project-form" class="inline-form ws-project-grid">
           <label class="field" for="ws-project-name"><span class="fld-label">${esc(t("ws_new_project"))}</span>
             <input id="ws-project-name" type="text" maxlength="120" required></label>
           <label class="field" for="ws-project-client"><span class="fld-label">${esc(t("job_client"))}</span>

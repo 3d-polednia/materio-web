@@ -25,7 +25,7 @@
    every result unit the site spells out as a word, plus ws_lines, which is the same
    sentence one screen further on: a project row saying "1 pozycji". */
 const PLURAL_UNITS = new Set([
-  "res_bags", "res_rolls", "res_boards", "res_stocks", "res_sheets", "ws_lines",
+  "res_bags", "res_rolls", "res_boards", "res_stocks", "res_sheets", "ws_lines", "ws_room_count",
   // Not a unit, but the same sentence: the home page counts calculators and the catalogue
   // counts materials, and both used to print one genitive plural whatever the number was
   // — "161 матеріалів" where Ukrainian wants "161 матеріал" after a number ending in 1.

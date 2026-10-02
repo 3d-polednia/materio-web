@@ -440,6 +440,10 @@ h1 { font-size: var(--fs-h1); font-weight: var(--fw-black); }
 h2 { font-size: var(--fs-h2); font-weight: var(--fw-bold); }
 h3 { font-size: var(--fs-h3); font-weight: var(--fw-bold); }
 h4 { font-size: var(--fs-base); font-weight: var(--fw-bold); }
+/* Body copy avoids a single-word last line where the browser supports pretty wrapping. */
+p, li, figcaption, .muted { text-wrap: pretty; }
+/* Headings and short notes share their words across lines instead of leaving a short tail. */
+h1, h2, h3, .app-note, .src-note, .lead, li.empty { text-wrap: balance; }
 p { margin: 0 0 1rem; }
 a { color: var(--accent-strong); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -857,6 +861,10 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .field label, .fld-label, .ws-bar-label {
   display: block; font-weight: var(--fw-semi); font-size: var(--fs-sm); margin-bottom: var(--sp-1);
 }
+/* Stacked labels follow the same text column as the controls below them. */
+.field > .fld-label, .field > label, .ws-bar-label { padding-inline: var(--control-px); }
+/* Field feedback follows the label and control text column. */
+.field > .form-error, .field > .muted { padding-inline: var(--control-px); }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
 /* A field inside an "add a row" form. Same label + control pair as a stacked field, laid
    out along the row instead of down the card, so the submit button lines up with the
@@ -870,6 +878,20 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .inline-form .field input, .inline-form .field select, .inline-form .field textarea { width: 100%; }
 .inline-form .field-narrow { flex: 0 1 12rem; }
 .field textarea { min-height: var(--control-h-lg); resize: vertical; }
+/* The new-project form uses fixed spans so every field row ends on the same grid edge. */
+.inline-form.ws-project-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+/* The project name and client each take half of the wide form row. */
+.ws-project-grid > .field:nth-child(-n + 2) { grid-column: span 3; }
+/* Status, deadline and value divide their row into equal thirds. */
+.ws-project-grid > .field:nth-child(n + 3):nth-child(-n + 5) { grid-column: span 2; }
+/* Project notes align their right edge with every complete row above. */
+.ws-project-grid > .field:nth-child(6) { grid-column: 1 / -1; }
+/* The colour and submit button stay together on the final grid row. */
+.ws-project-grid > .field:nth-child(7) { grid-column: span 2; }
+/* Grid tracks, rather than the account page's general field cap, set project control widths. */
+.app-main .ws-project-grid .field input, .app-main .ws-project-grid .field select { max-width: none; }
+/* A phone stacks the project form without creating a narrow grid track. */
+@media (max-width: 560px) { .ws-project-grid > * { grid-column: 1 / -1 !important; } }
 
 /* ---------- Message
    One box for "here is your answer" and "that did not work": the calculator's
@@ -925,9 +947,13 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .row-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .row-name em { display: block; font-style: normal; font-size: var(--fs-sm); }
 .row-actions { display: flex; gap: var(--sp-2); flex: none; }
+/* A labelled field in a row must not add its normal card-form bottom margin. */
+.row-actions > .field { margin-bottom: 0; }
 /* 2026-09-26: a status field (label over select) sits in some rows now; the button beside
    it keeps its own height and lines up with the select instead of stretching to the pair. */
 .row-actions > .btn { align-self: flex-end; }
+/* A row button beside a labelled control matches that control's height. */
+.row-actions:has(> .field) > .btn { --btn-h: var(--control-h); }
 /* A row whose name and buttons do not fit side by side puts the buttons on a line of their
    own, as .ws-proj-row already does. On a 320 px phone the client row's "Otwórz pełny
    widok" and "Usuń" ran past the card and over the name, worse once the link got its arrow. */
@@ -1932,12 +1958,20 @@ a.chip:hover { text-decoration: none; }
        taller than the screen. */
     position: sticky; top: 0; align-self: start;
     max-height: 100vh; max-height: 100dvh; overflow-y: auto;
+    /* A narrow window keeps a stable, page-coloured scrollbar without widening the rail. */
+    scrollbar-width: thin; scrollbar-color: var(--outline) transparent; scrollbar-gutter: stable;
     /* The full-width shell begins at the viewport edge; the shared gutter keeps the
        26px logo and the navigation aligned with public-page chrome instead of the glass. */
     padding: var(--sp-5) var(--gutter);
     border-bottom: 0; border-right: 0;
   }
 }
+/* Chromium and Safari use the matching narrow rail scrollbar. */
+.app-side::-webkit-scrollbar { width: 6px; }
+/* The sidebar scrollbar track stays transparent in both themes. */
+.app-side::-webkit-scrollbar-track { background: transparent; }
+/* The sidebar scrollbar thumb uses the theme outline and the site's rounded geometry. */
+.app-side::-webkit-scrollbar-thumb { background: var(--outline); border-radius: var(--radius-pill); }
 
 .app-side-brand { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; padding: 0 var(--sp-2); }
 .app-side-brand span { font-weight: var(--fw-black); white-space: nowrap; }
@@ -1990,7 +2024,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 
 @media (min-width: 900px) {
   .app-nav {
-    display: flex; flex-direction: column; overflow-x: visible; gap: var(--sp-5); padding: 0;
+    display: flex; flex-direction: column; overflow-x: visible; gap: var(--sp-3); padding: 0;
     mask-image: none;
   }
   .app-nav-group { display: flex; flex-direction: column; gap: var(--sp-1); }
@@ -1999,7 +2033,8 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
     font-size: var(--fs-xs); font-weight: var(--fw-bold); letter-spacing: var(--track-wider);
     text-transform: uppercase; color: var(--muted);
   }
-  .app-nav-item { width: 100%; padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm); }
+  /* Compact desktop rows keep the complete account menu inside a 900px-tall rail. */
+  .app-nav-item { width: 100%; min-height: 36px; padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); }
 }
 
 .app-side-foot {
@@ -2575,10 +2610,13 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .ws-room-cards { display: grid; gap: var(--sp-4); }
 .ws-room-card { margin: 0; min-width: 0; }
 .ws-room-card-head {
-  display: flex; align-items: baseline; justify-content: space-between;
-  gap: var(--sp-3); flex-wrap: wrap;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-3);
 }
-.ws-room-card-head h3 { min-width: 0; overflow-wrap: anywhere; }
+/* The passive room count reads as metadata, not as a clickable chip. */
+.ws-room-card-head [data-room-count] { color: var(--muted); font-size: var(--fs-sm); }
+/* The card header owns its spacing, so the heading margin cannot protrude into the list. */
+.ws-room-card-head h3 { min-width: 0; margin-bottom: 0; overflow-wrap: anywhere; }
 .ws-room-card-dot {
   display: inline-block; width: .65rem; height: .65rem; margin-right: var(--sp-2);
   border-radius: 50%; background: currentColor;
