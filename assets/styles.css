@@ -898,6 +898,17 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .app-main .ws-project-grid .field input, .app-main .ws-project-grid .field select { max-width: none; }
 /* A phone stacks the project form without creating a narrow grid track. */
 @media (max-width: 560px) { .ws-project-grid > * { grid-column: 1 / -1 !important; } }
+/* The new-client form gets the same six tracks once the country field joined it (P4): name and
+   phone, e-mail and country in halves, a short postal code beside a wide city, the street beside
+   the button, so no row ends in its own place. */
+.inline-form.crm-client-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.crm-client-grid > .field { grid-column: span 3; }
+/* The account shell caps fields and controls at a reading measure; inside these tracks the grid sets the width. */
+#crm-client-form.crm-client-grid > .field, #crm-client-form.crm-client-grid .field input, #crm-client-form.crm-client-grid .field select { max-width: none; }
+.crm-client-grid > .field[for="crm-client-postal-code"] { grid-column: span 2; }
+.crm-client-grid > .field[for="crm-client-city"], .crm-client-grid > .field[for="crm-client-street"] { grid-column: span 4; }
+.crm-client-grid > .btn { grid-column: span 2; justify-self: start; align-self: end; }
+@media (max-width: 560px) { .crm-client-grid > * { grid-column: 1 / -1 !important; } }
 
 /* ---------- Message
    One box for "here is your answer" and "that did not work": the calculator's

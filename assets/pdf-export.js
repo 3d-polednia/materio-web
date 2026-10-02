@@ -441,7 +441,12 @@ function pdfRenderQuote(doc, snap) {
   optional("clientPhone", client && client.phone);
   optional("clientEmail", client && client.email);
   optional("clientStreet", client && client.street);
-  optional("clientPostalCity", client && [client.postalCode, client.city].map(str).filter(Boolean).join(" "));
+  const clientCountry = client && str(client.country).toUpperCase();
+  const companyCountry = str(company.country).toUpperCase();
+  const clientCountryName = clientCountry && companyCountry && clientCountry !== companyCountry
+    ? LMPostal.countryName(clientCountry, lang) : "";
+  optional("clientPostalCity", client && [client.postalCode, client.city, clientCountryName]
+    .map(str).filter(Boolean).join(" "));
   optional("projectName", snap.projectName);
   pdfShow(doc, "forBlock", Boolean(client || str(snap.projectName)));
   const renderRows = (slot, rows) => {

@@ -542,6 +542,13 @@ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 .ws-project-grid > .field:nth-child(7) { grid-column: span 2; }
 .app-main .ws-project-grid .field input, .app-main .ws-project-grid .field select { max-width: none; }
 @media (max-width: 560px) { .ws-project-grid > * { grid-column: 1 / -1 !important; } }
+.inline-form.crm-client-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.crm-client-grid > .field { grid-column: span 3; }
+#crm-client-form.crm-client-grid > .field, #crm-client-form.crm-client-grid .field input, #crm-client-form.crm-client-grid .field select { max-width: none; }
+.crm-client-grid > .field[for="crm-client-postal-code"] { grid-column: span 2; }
+.crm-client-grid > .field[for="crm-client-city"], .crm-client-grid > .field[for="crm-client-street"] { grid-column: span 4; }
+.crm-client-grid > .btn { grid-column: span 2; justify-self: start; align-self: end; }
+@media (max-width: 560px) { .crm-client-grid > * { grid-column: 1 / -1 !important; } }
 .result {
 margin-top: var(--sp-4); padding: var(--sp-4); border-radius: var(--radius-sm);
 background: var(--accent-soft); color: var(--on-accent-soft);

@@ -110,6 +110,7 @@ function crmAddCompany(fields) {
   const now = Date.now();
   const company = {
     id: crmId(), name, nip: crmText(f.nip, 20), street: crmText(f.street, CRM_MAX_STREET),
+    country: crmText(f.country, 2).toUpperCase(),
     postalCode: crmText(f.postalCode, CRM_MAX_POSTAL_CODE), city: crmText(f.city, CRM_MAX_CITY),
     phone: crmText(f.phone, CRM_MAX_CONTACT), email: crmText(f.email, CRM_MAX_CONTACT),
     www: crmText(f.www, CRM_MAX_CONTACT), bankAccount: crmText(f.bankAccount, 40), logo,
@@ -132,12 +133,13 @@ function crmUpdateCompany(id, fields) {
     if (!name) return null;
     company.name = name;
   }
-  const limits = { nip: 20, street: CRM_MAX_STREET, postalCode: CRM_MAX_POSTAL_CODE,
+  const limits = { nip: 20, country: 2, street: CRM_MAX_STREET, postalCode: CRM_MAX_POSTAL_CODE,
     city: CRM_MAX_CITY, phone: CRM_MAX_CONTACT, email: CRM_MAX_CONTACT,
     www: CRM_MAX_CONTACT, bankAccount: 40 };
   Object.keys(limits).forEach((key) => {
     if (f[key] !== undefined) company[key] = crmText(f[key], limits[key]);
   });
+  if (f.country !== undefined) company.country = company.country.toUpperCase();
   if (f.logo !== undefined) {
     const logo = crmCompanyLogo(f.logo);
     if (logo === null) return null;
@@ -225,7 +227,7 @@ const crmClient = (id) => crmAllClients().find((c) => c.id === id) || null;
  * tradesman fills in when they have them, and a client with a name and nothing else is
  * still the row they wanted.
  *
- * @param {{name:string, phone?:string, email?:string, address?:string, street?:string, postalCode?:string, city?:string, note?:string}} fields
+ * @param {{name:string, phone?:string, email?:string, address?:string, country?:string, street?:string, postalCode?:string, city?:string, note?:string}} fields
  * @returns {object|null} the stored client, or null when there is no name
  */
 function crmAddClient(fields) {
@@ -240,6 +242,7 @@ function crmAddClient(fields) {
     phone: crmText(f.phone, CRM_MAX_CONTACT),
     email: crmText(f.email, CRM_MAX_CONTACT),
     address: crmText(f.address, CRM_MAX_CONTACT),
+    country: crmText(f.country, 2).toUpperCase(),
     street: crmText(f.street, CRM_MAX_STREET),
     postalCode: crmText(f.postalCode, CRM_MAX_POSTAL_CODE),
     city: crmText(f.city, CRM_MAX_CITY),
@@ -276,6 +279,7 @@ function crmUpdateClient(id, fields) {
   if (f.phone !== undefined) client.phone = crmText(f.phone, CRM_MAX_CONTACT);
   if (f.email !== undefined) client.email = crmText(f.email, CRM_MAX_CONTACT);
   if (f.address !== undefined) client.address = crmText(f.address, CRM_MAX_CONTACT);
+  if (f.country !== undefined) client.country = crmText(f.country, 2).toUpperCase();
   if (f.street !== undefined) client.street = crmText(f.street, CRM_MAX_STREET);
   if (f.postalCode !== undefined) client.postalCode = crmText(f.postalCode, CRM_MAX_POSTAL_CODE);
   if (f.city !== undefined) client.city = crmText(f.city, CRM_MAX_CITY);

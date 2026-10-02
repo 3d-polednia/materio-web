@@ -227,12 +227,22 @@ head("1b. an empty list says what to do about it");
 head("1c. a client is added from the form, with the details typed beside the name");
 {
   const page = await open(ctx, CLIENTS, { workspace: workspace() });
+  check("the country field exists and is visible", await page.locator("#crm-client-country").isVisible());
+  check("the postal field exists and is visible", await page.locator("#crm-client-postal-code").isVisible());
+  check("the city field exists and is visible", await page.locator("#crm-client-city").isVisible());
+  await page.selectOption("#crm-client-country", "PL");
+  await page.fill("#crm-client-postal-code", "00100");
+  await page.waitForFunction(() => document.querySelectorAll("#crm-client-city-list option").length > 1);
+  check("a code with several places offers a list",
+    await page.locator("#crm-client-city-list option").count() > 1);
   await page.fill("#crm-client-name", "Biuro Nowak");
   await page.fill("#crm-client-phone", "500 400 300");
   await page.fill("#crm-client-email", "biuro@example.com");
   await page.fill("#crm-client-street", "Długa 7");
-  await page.fill("#crm-client-postal-code", "00-001");
-  await page.fill("#crm-client-city", "Warszawa");
+  await page.fill("#crm-client-postal-code", "44100");
+  await page.waitForFunction(() => document.getElementById("crm-client-city").value === "Gliwice");
+  eq("the postal code is formatted", await page.inputValue("#crm-client-postal-code"), "44-100");
+  eq("the city is filled from the postal code", await page.inputValue("#crm-client-city"), "Gliwice");
   await page.click("#crm-client-form button[type=submit]");
   await page.waitForFunction(() =>
     document.querySelectorAll("#crm-client-list > li[data-id]").length === 1);
@@ -242,10 +252,24 @@ head("1c. a client is added from the form, with the details typed beside the nam
   eq("so did the phone", saved.phone, "500 400 300");
   eq("and the e-mail", saved.email, "biuro@example.com");
   eq("and the street", saved.street, "Długa 7");
-  eq("the postal code", saved.postalCode, "00-001");
-  eq("and the city", saved.city, "Warszawa");
+  eq("the postal code", saved.postalCode, "44-100");
+  eq("and the city", saved.city, "Gliwice");
+  eq("and the country", saved.country, "PL");
   eq("a new client keeps the legacy address empty", saved.address, "");
   eq("the form is cleared for the next one", await page.inputValue("#crm-client-name"), "");
+  await page.close();
+}
+
+head("1d. an invalid postal code blocks saving beside the field");
+{
+  const page = await open(ctx, CLIENTS, { workspace: workspace() });
+  check("the postal field exists and is visible", await page.locator("#crm-client-postal-code").isVisible());
+  await page.fill("#crm-client-name", "Błędny kod");
+  await page.selectOption("#crm-client-country", "PL");
+  await page.fill("#crm-client-postal-code", "44223423434");
+  await page.click("#crm-client-form button[type=submit]");
+  check("the message next to the field is visible", await page.locator("#crm-client-postal-error").isVisible());
+  eq("the client is not saved", (await liveClients(page)).length, 0);
   await page.close();
 }
 

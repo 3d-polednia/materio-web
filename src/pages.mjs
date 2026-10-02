@@ -1976,9 +1976,10 @@ export function companyMain(lang, t, features) {
   const fields = [
     ["name", "company_name", "text", "120", "organization"],
     ["nip", "company_nip", "text", "20", "off"],
-    ["street", "company_street", "text", "200", "street-address"],
+    ["country", "company_country", "select", "2", "country"],
     ["postalCode", "company_postal", "text", "12", "postal-code"],
     ["city", "company_city", "text", "120", "address-level2"],
+    ["street", "company_street", "text", "200", "street-address"],
     ["phone", "company_phone", "tel", "200", "tel"],
     ["email", "company_email", "email", "200", "email"],
     ["www", "company_www", "text", "200", "url"],
@@ -2006,9 +2007,14 @@ export function companyMain(lang, t, features) {
         <div class="ws-mat-grid">
           ${fields.map(([id, key, type, max, autocomplete]) => `<label class="ws-mat-f">
             <span class="ws-bar-label">${esc(t(key))}${id === "name" ? "*" : ""}</span>
-            <input id="company-${id}" name="${id}" type="${type}" maxlength="${max}" autocomplete="${autocomplete}"${id === "name" ? " required" : ""}>
+            ${type === "select"
+    ? `<select id="company-${id}" name="${id}" autocomplete="${autocomplete}"></select>`
+    : `<input id="company-${id}" name="${id}" type="${type}" maxlength="${max}" autocomplete="${autocomplete}"${id === "postalCode" ? ` aria-describedby="company-postal-error"` : ""}${id === "city" ? ` list="company-city-list"` : ""}${id === "name" ? " required" : ""}>`}${id === "postalCode" ? `
+            <span id="company-postal-error" class="field-error" role="alert" hidden>${esc(t("postal_invalid"))}</span>` : ""}
           </label>`).join("\n")}
+          <datalist id="company-city-list"></datalist>
         </div>
+        <p class="muted field-note">${esc(t("postal_source"))}</p>
         ${/* The browser's own file control prints "Choose File / No file chosen" in the
              browser's language, not the page's, and cannot be styled: the label is the button. */ ""}
         <div class="ws-mat-f company-logo-field">
@@ -2100,16 +2106,22 @@ export function clientsMain(lang, t, features) {
                 <input id="crm-edit-email" type="email" maxlength="200" autocomplete="email">
               </label>
               <label class="ws-mat-f">
-                <span class="ws-bar-label">${esc(t("cli_street"))}</span>
-                <input id="crm-edit-street" type="text" maxlength="200" autocomplete="off">
+                <span class="ws-bar-label">${esc(t("cli_country"))}</span>
+                <select id="crm-edit-country" autocomplete="country"></select>
               </label>
               <label class="ws-mat-f ws-mat-f-postal">
                 <span class="ws-bar-label">${esc(t("cli_postal_code"))}</span>
-                <input id="crm-edit-postal-code" type="text" maxlength="12" autocomplete="off">
+                <input id="crm-edit-postal-code" type="text" maxlength="12" autocomplete="postal-code" aria-describedby="crm-edit-postal-error">
+                <span id="crm-edit-postal-error" class="field-error" role="alert" hidden>${esc(t("postal_invalid"))}</span>
               </label>
               <label class="ws-mat-f">
                 <span class="ws-bar-label">${esc(t("cli_city"))}</span>
-                <input id="crm-edit-city" type="text" maxlength="120" autocomplete="off">
+                <input id="crm-edit-city" type="text" maxlength="120" autocomplete="address-level2" list="crm-edit-city-list">
+                <datalist id="crm-edit-city-list"></datalist>
+              </label>
+              <label class="ws-mat-f">
+                <span class="ws-bar-label">${esc(t("cli_street"))}</span>
+                <input id="crm-edit-street" type="text" maxlength="200" autocomplete="street-address">
               </label>
               <label class="ws-mat-f" id="crm-edit-address-field" hidden>
                 <span class="ws-bar-label">${esc(t("cli_address"))}</span>
@@ -2206,21 +2218,26 @@ export function clientsMain(lang, t, features) {
 
         <h2>${esc(t("cli_list_t"))}</h2>
         <p class="muted">${esc(t("cli_list_d"))}</p>
-        <form id="crm-client-form" class="inline-form">
+        <form id="crm-client-form" class="inline-form crm-client-grid">
           <label class="field" for="crm-client-name"><span class="fld-label">${esc(t("cli_new"))}</span>
             <input id="crm-client-name" type="text" maxlength="120" required></label>
           <label class="field" for="crm-client-phone"><span class="fld-label">${esc(t("cli_phone"))}</span>
             <input id="crm-client-phone" type="tel" maxlength="200" autocomplete="off"></label>
           <label class="field" for="crm-client-email"><span class="fld-label">${esc(t("cli_email"))}</span>
             <input id="crm-client-email" type="email" maxlength="200" autocomplete="off"></label>
-          <label class="field" for="crm-client-street"><span class="fld-label">${esc(t("cli_street"))}</span>
-            <input id="crm-client-street" type="text" maxlength="200" autocomplete="off"></label>
+          <label class="field" for="crm-client-country"><span class="fld-label">${esc(t("cli_country"))}</span>
+            <select id="crm-client-country" autocomplete="country"></select></label>
           <label class="field field-narrow" for="crm-client-postal-code"><span class="fld-label">${esc(t("cli_postal_code"))}</span>
-            <input id="crm-client-postal-code" type="text" maxlength="12" autocomplete="off"></label>
+            <input id="crm-client-postal-code" type="text" maxlength="12" autocomplete="postal-code" aria-describedby="crm-client-postal-error">
+            <span id="crm-client-postal-error" class="field-error" role="alert" hidden>${esc(t("postal_invalid"))}</span></label>
           <label class="field" for="crm-client-city"><span class="fld-label">${esc(t("cli_city"))}</span>
-            <input id="crm-client-city" type="text" maxlength="120" autocomplete="off"></label>
+            <input id="crm-client-city" type="text" maxlength="120" autocomplete="address-level2" list="crm-client-city-list">
+            <datalist id="crm-client-city-list"></datalist></label>
+          <label class="field" for="crm-client-street"><span class="fld-label">${esc(t("cli_street"))}</span>
+            <input id="crm-client-street" type="text" maxlength="200" autocomplete="street-address"></label>
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
         </form>
+        <p class="muted field-note">${esc(t("postal_source"))}</p>
         <ul id="crm-client-list" class="data-list"></ul>
 
         <details id="crm-archive" class="ws-archive" hidden>

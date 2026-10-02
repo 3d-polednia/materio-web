@@ -131,6 +131,18 @@ head("2. Pro company workflow");
 {
   const { ctx, page, errors } = await open("pro");
   await page.locator("#company-form").waitFor({ state: "visible" });
+  check("the country field exists and is visible", await page.locator("#company-country").isVisible());
+  check("the postal field exists and is visible", await page.locator("#company-postalCode").isVisible());
+  check("the city field exists and is visible", await page.locator("#company-city").isVisible());
+  await page.selectOption("#company-country", "PL");
+  await page.fill("#company-postalCode", "00100");
+  await page.waitForFunction(() => document.querySelectorAll("#company-city-list option").length > 1);
+  check("a code with several places offers a list",
+    await page.locator("#company-city-list option").count() > 1);
+  await page.fill("#company-postalCode", "44100");
+  await page.waitForFunction(() => document.getElementById("company-city").value === "Gliwice");
+  eq("the postal code is formatted", await page.inputValue("#company-postalCode"), "44-100");
+  eq("the city is filled from the postal code", await page.inputValue("#company-city"), "Gliwice");
   await page.fill("#company-name", "Pierwsza Firma");
   // The owner (2026-10-01) could not save "www.stronainternetowa.pl": a type=url field wants
   // the https:// a tradesman never types. Whatever is typed is kept as typed.
@@ -153,6 +165,7 @@ head("2. Pro company workflow");
     await page.locator("#company-logo-error").innerText());
   await page.click('#company-form button[type="submit"]');
   await page.locator("#company-list > li").waitFor();
+  eq("the company country is saved", await page.evaluate(() => crmCompanies()[0].country), "PL");
   eq("a website typed without https:// is saved as typed", await page.evaluate(() => crmCompanies()[0].www), "www.stronainternetowa.pl");
   check("empty logo margins are trimmed before storage", await page.evaluate(async () => {
     const image = new Image();
@@ -204,6 +217,20 @@ head("2. Pro company workflow");
   eq("wrong type shows the type message", await page.locator("#company-logo-error").innerText(),
     await page.evaluate(() => t("company_logo_type")));
   eq("no console errors", errors.join(" / "), "");
+  await ctx.close();
+}
+
+head("2b. an invalid postal code blocks company saving");
+{
+  const { ctx, page } = await open("pro");
+  await page.locator("#company-form").waitFor({ state: "visible" });
+  check("the postal field exists and is visible", await page.locator("#company-postalCode").isVisible());
+  await page.fill("#company-name", "Błędny kod");
+  await page.selectOption("#company-country", "PL");
+  await page.fill("#company-postalCode", "44223423434");
+  await page.click('#company-form button[type="submit"]');
+  check("the message next to the field is visible", await page.locator("#company-postal-error").isVisible());
+  eq("the company is not saved", await page.evaluate(() => crmCompanies().length), 0);
   await ctx.close();
 }
 

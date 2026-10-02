@@ -57,7 +57,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20261003a";
+const STAMP = "20261003b";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -867,6 +867,7 @@ const CRM_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
+  "/assets/postal.js",
   "/assets/own-materials.js",
   "/assets/crm-chain.js", "/assets/crm-ui.js",
 ];
@@ -874,6 +875,7 @@ const CRM_SCRIPTS = [
 const COMPANY_SCRIPTS = [
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
+  "/assets/postal.js",
   "/assets/company-logo.js", "/assets/company-ui.js",
 ];
 
@@ -897,7 +899,7 @@ const QUOTES_SCRIPTS = [
   "/assets/crm-store.js",
   "/assets/crm.js",
   "/assets/own-materials.js",
-  "/assets/crm-chain.js", "/assets/pdf-export.js", "/assets/quotes-ui.js",
+  "/assets/crm-chain.js", "/assets/postal.js", "/assets/pdf-export.js", "/assets/quotes-ui.js",
 ];
 
 /**

@@ -728,6 +728,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
       requireSyncUid(uid);
       await fb.setDoc(proDoc("companies", seg, uid), {
         name: text(company.name, 120), nip: text(company.nip, 20),
+        country: text(company.country, 2).toUpperCase(),
         street: text(company.street, 200), postalCode: text(company.postalCode, 12),
         city: text(company.city, 120), phone: text(company.phone, 200),
         email: text(company.email, 200), www: text(company.www, 200),
@@ -747,6 +748,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
         phone: text(c.phone, 200),
         email: text(c.email, 200),
         address: text(c.address, 200),
+        country: text(c.country, 2).toUpperCase(),
         street: text(c.street, 200),
         postalCode: text(c.postalCode, 12),
         city: text(c.city, 120),

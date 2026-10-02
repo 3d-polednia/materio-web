@@ -23,6 +23,11 @@ function companyMount() {
   let logo = "";
 
   const field = (name) => document.getElementById(`company-${name}`);
+  const postal = LMPostal.bind({
+    country: field("country"), postal: field("postalCode"), city: field("city"),
+    error: document.getElementById("company-postal-error"),
+    datalist: document.getElementById("company-city-list"),
+  });
   const showLogo = () => {
     preview.hidden = !logo;
     remove.hidden = !logo;
@@ -32,6 +37,7 @@ function companyMount() {
     editing = "";
     logo = "";
     form.reset();
+    postal.setCountry(LMPostal.defaultCountry(document.documentElement.lang));
     showLogo();
     cancel.hidden = true;
     document.getElementById("company-form-title").textContent = companyT("company_add");
@@ -67,8 +73,10 @@ function companyMount() {
     if (event.target.closest("[data-company-edit]")) {
       editing = company.id;
       logo = company.logo || "";
-      ["name", "nip", "street", "postalCode", "city", "phone", "email", "www", "bankAccount"]
+      ["name", "nip", "country", "street", "postalCode", "city", "phone", "email", "www", "bankAccount"]
         .forEach((name) => { field(name).value = company[name] || ""; });
+      postal.setCountry(company.country || LMPostal.defaultCountry(document.documentElement.lang));
+      postal.refresh(false);
       showLogo();
       cancel.hidden = false;
       document.getElementById("company-form-title").textContent = companyT("company_edit");
@@ -93,8 +101,9 @@ function companyMount() {
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (!postal.validate()) return;
     const values = { logo };
-    ["name", "nip", "street", "postalCode", "city", "phone", "email", "www", "bankAccount"]
+    ["name", "nip", "country", "street", "postalCode", "city", "phone", "email", "www", "bankAccount"]
       .forEach((name) => { values[name] = field(name).value; });
     const saved = editing ? crmUpdateCompany(editing, values) : crmAddCompany(values);
     if (saved) {

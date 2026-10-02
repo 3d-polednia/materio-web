@@ -59,6 +59,8 @@ let crmEditing = false;
 let crmAsking = false;
 /** The last delete, until the visitor undoes it or moves on. */
 let crmUndone = null;
+let crmNewPostal = null;
+let crmEditPostal = null;
 
 /* ------------------------------------------------------------------ the Pro notice */
 
@@ -291,9 +293,11 @@ function crmRenderClient(id) {
       document.getElementById("crm-edit-name").value = client.name;
       document.getElementById("crm-edit-phone").value = client.phone || "";
       document.getElementById("crm-edit-email").value = client.email || "";
+      crmEditPostal.setCountry(client.country || LMPostal.defaultCountry(crmLang()));
       document.getElementById("crm-edit-street").value = client.street || "";
       document.getElementById("crm-edit-postal-code").value = client.postalCode || "";
       document.getElementById("crm-edit-city").value = client.city || "";
+      crmEditPostal.refresh(false);
       const legacy = document.getElementById("crm-edit-address-field");
       legacy.hidden = !(client.address && !client.street && !client.postalCode && !client.city);
       document.getElementById("crm-edit-address").value = client.address || "";
@@ -374,11 +378,13 @@ function wireClientDetail() {
     e.preventDefault();
     const name = document.getElementById("crm-edit-name").value.trim();
     if (!name) return;
+    if (!crmEditPostal.validate()) return;
     crmUpdateClient(crmOpenId, {
       name,
       phone: document.getElementById("crm-edit-phone").value,
       email: document.getElementById("crm-edit-email").value,
       address: document.getElementById("crm-edit-address").value,
+      country: document.getElementById("crm-edit-country").value,
       street: document.getElementById("crm-edit-street").value,
       postalCode: document.getElementById("crm-edit-postal-code").value,
       city: document.getElementById("crm-edit-city").value,
@@ -455,6 +461,26 @@ function buildClientsPage() {
   const page = document.getElementById("crm-page");
   if (!page) return;
 
+  const company = typeof crmDefaultCompany === "function" ? crmDefaultCompany() : null;
+  const fallbackCountry = company && company.country
+    ? company.country : LMPostal.defaultCountry(crmLang());
+  crmNewPostal = LMPostal.bind({
+    country: document.getElementById("crm-client-country"),
+    postal: document.getElementById("crm-client-postal-code"),
+    city: document.getElementById("crm-client-city"),
+    error: document.getElementById("crm-client-postal-error"),
+    datalist: document.getElementById("crm-client-city-list"),
+    defaultCountry: fallbackCountry,
+  });
+  crmEditPostal = LMPostal.bind({
+    country: document.getElementById("crm-edit-country"),
+    postal: document.getElementById("crm-edit-postal-code"),
+    city: document.getElementById("crm-edit-city"),
+    error: document.getElementById("crm-edit-postal-error"),
+    datalist: document.getElementById("crm-edit-city-list"),
+    defaultCountry: fallbackCountry,
+  });
+
   document.getElementById("crm-client-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const name = document.getElementById("crm-client-name");
@@ -464,12 +490,14 @@ function buildClientsPage() {
     const postalCode = document.getElementById("crm-client-postal-code");
     const city = document.getElementById("crm-client-city");
     if (!name.value.trim()) return;
+    if (!crmNewPostal.validate()) return;
     crmUndone = null; // a new client is a new subject; the old undo is stale
     crmAddClient({
       name: name.value,
       phone: phone ? phone.value : "",
       email: email ? email.value : "",
       address: "",
+      country: document.getElementById("crm-client-country").value,
       street: street ? street.value : "",
       postalCode: postalCode ? postalCode.value : "",
       city: city ? city.value : "",
