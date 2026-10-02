@@ -411,7 +411,8 @@ async function onSignedIn(user) {
       await fb.updateDoc(profile, { lastSeenAt: now, appVersion: "web" });
       accountSync.requireSyncUid(uid);
     } else {
-      applyProfile({ createdAt: now, lastSeenAt: now, appVersion: "web" });
+      // `lang` once, at creation: the welcome e-mail (functions/ welcomeMail) speaks it.
+      applyProfile({ createdAt: now, lastSeenAt: now, appVersion: "web", lang: String(document.documentElement.lang || "pl").slice(0, 5) });
       await fb.setDoc(profile, state.profile);
       accountSync.requireSyncUid(uid);
     }

@@ -288,9 +288,12 @@ head("3. registration");
   check("and the verification mail goes out", calls.includes("verifyMail"), calls.join(","));
 
   const profile = await page.evaluate(() => window.__fbDocs.get("users/uid-0"));
-  check("the profile document is created with the three fields the rules allow",
-    profile && Object.keys(profile).sort().join() === "appVersion,createdAt,lastSeenAt",
+  // `lang` joined the three on 2026-10-02: the welcome e-mail speaks the language of the
+  // page the account was opened on, and the deployed rules allow it at creation only.
+  check("the profile document is created with the four fields the rules allow",
+    profile && Object.keys(profile).sort().join() === "appVersion,createdAt,lang,lastSeenAt",
     JSON.stringify(profile));
+  eq("and the language is the page's", profile && profile.lang, "pl");
 
   eq("no console error", page.lmErrors.join(" / "), "");
   await page.close();
