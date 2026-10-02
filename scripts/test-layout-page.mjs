@@ -74,7 +74,8 @@ const close = (a, b) => Math.abs(a - b) <= 1;
 const T = Date.UTC(2026, 6, 1);
 const workspace = {
   projects: [{ id: "p1", name: "Bardzo długa nazwa projektu do sprawdzenia telefonu", status: "new",
-    archived: false, createdAt: T, updatedAt: T, deletedAt: null, schemaVersion: 1 }],
+    valueMinor: 100_000, currencyCode: "EUR", archived: false, createdAt: T, updatedAt: T,
+    deletedAt: null, schemaVersion: 1 }],
   rooms: [], estimations: [], shoppingItems: [],
 };
 const crm = { clients: [{ id: "c1", name: "Jan Kowalski", phone: "600100200", projectIds: [],
@@ -142,10 +143,29 @@ async function noHorizontalScroll(page, path, name) {
   check(`${name}: no horizontal page scroll`, size.width <= size.viewport, `${path}: ${size.width} > ${size.viewport}`);
 }
 
+async function checkCurrencyAffix(page, fieldSelector, affixSelector, expected, name) {
+  const affix = await visibleRect(page, affixSelector, `${name} currency suffix`);
+  if (!affix) return;
+  const field = await page.locator(fieldSelector).evaluate((node) => {
+    const style = getComputedStyle(node);
+    return { paddingRight: parseFloat(style.paddingRight), value: node.value };
+  });
+  const text = await page.locator(affixSelector).textContent();
+  eqText(`${name} currency suffix text`, text.trim(), expected);
+  check(`${name} text clears the currency suffix`, field.paddingRight >= affix.width,
+    `${field.paddingRight}px padding for ${affix.width}px suffix`);
+}
+
+function eqText(name, got, want) {
+  check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
+}
+
 for (const width of [1400, 390]) {
   const ctx = await context({ width, height: 900 });
   const stored = { "materio-workspace-v1": JSON.stringify(workspace), "liczmat-signed-in": "pro" };
   const projects = await openLocal(ctx, "/projekty/", stored);
+  await checkCurrencyAffix(projects, "#ws-project-value", "#ws-project-value-currency", "zł",
+    `${width}px new project value`);
   const select = await visibleRect(projects, "#ws-project-list .row-actions > .field select", `${width}px project status`);
   const button = await visibleRect(projects, "#ws-project-list .row-actions > [data-del-project]", `${width}px project delete`);
   if (select && button) {
@@ -173,6 +193,22 @@ for (const width of [1400, 390]) {
     if (client && notes) check("client and notes right edges align", close(client.right, notes.right), `${client.right} vs ${notes.right}`);
   }
   if (width === 390) await noHorizontalScroll(projects, "/projekty/", "projects phone");
+
+  if (width === 1400) {
+    await projects.evaluate(() => lmSetCurrency("EUR"));
+    eqText("currencychange updates the new project suffix",
+      (await projects.locator("#ws-project-value-currency").textContent()).trim(), "€");
+    await projects.evaluate(() => lmSetCurrency("PLN"));
+  }
+
+  const detail = await openLocal(ctx, "/projekty/?id=p1", stored);
+  await detail.waitForSelector("#ws-project:not([hidden])");
+  await checkCurrencyAffix(detail, "#ws-biz-value", "#ws-biz-value-currency", "€",
+    `${width}px edited EUR project value`);
+  check(`${width}px edited EUR project explains its stored currency`,
+    await detail.locator("#ws-biz-value-note").isVisible(),
+    await detail.locator("#ws-biz-value-note").textContent());
+  if (width === 390) await noHorizontalScroll(detail, "/projekty/?id=p1", "project detail phone");
 
   const rooms = await openLocal(ctx, "/projekty/#ws-rooms", stored);
   const head = await visibleRect(rooms, ".ws-room-card-head", `${width}px room card head`);

@@ -1569,7 +1569,9 @@ export function projectsMain(lang, t, aisles = [], features = []) {
             <label class="field field-narrow" for="ws-biz-due"><span class="fld-label">${esc(t("job_due"))}</span>
               <input id="ws-biz-due" type="date"></label>
             <label class="field field-narrow" for="ws-biz-value"><span class="fld-label">${esc(t("job_value"))}</span>
-              <input id="ws-biz-value" type="text" inputmode="decimal"></label>
+              <span class="field-affix"><input id="ws-biz-value" type="text" inputmode="decimal">
+                <span id="ws-biz-value-currency" aria-hidden="true"></span></span>
+              <small id="ws-biz-value-note" class="muted" hidden></small></label>
             <label class="field field-narrow" for="ws-biz-color"><span class="fld-label">${esc(t("job_color"))}</span>
               <select id="ws-biz-color"><option value="">${esc(t("job_color_none"))}</option>${["lime", "blue", "amber", "red", "violet"].map((v) => `<option value="${v}">${esc(t(`job_color_${v}`))}</option>`).join("")}</select></label>
             <label class="field field-wide" for="ws-biz-note"><span class="fld-label">${esc(t("job_note"))}</span>
@@ -1671,7 +1673,8 @@ export function projectsMain(lang, t, aisles = [], features = []) {
                   </label>
                   <label class="ws-mat-f ws-mat-f-sm">
                     <span class="ws-bar-label">${esc(t("proj_mat_price"))}</span>
-                    <input id="ws-mat-price" type="text" inputmode="decimal" data-f="priceMajor">
+                    <span class="field-affix"><input id="ws-mat-price" type="text" inputmode="decimal" data-f="priceMajor">
+                      <span id="ws-mat-price-currency" aria-hidden="true"></span></span>
                   </label>
                   <label class="ws-mat-f">
                     <span class="ws-bar-label">${esc(t("proj_mat_aisle"))}</span>
@@ -1726,7 +1729,8 @@ export function projectsMain(lang, t, aisles = [], features = []) {
                   </label>
                   <label class="ws-mat-f ws-mat-f-sm">
                     <span class="ws-bar-label">${esc(t("ws_col_cost"))}</span>
-                    <input id="ws-other-cost" type="text" inputmode="decimal">
+                    <span class="field-affix"><input id="ws-other-cost" type="text" inputmode="decimal">
+                      <span id="ws-other-cost-currency" aria-hidden="true"></span></span>
                   </label>
                 </p>
                 <p><button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button></p>
@@ -1771,7 +1775,8 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           <label class="field field-narrow" for="ws-project-due"><span class="fld-label">${esc(t("job_due"))}</span>
             <input id="ws-project-due" type="date"></label>
           <label class="field field-narrow" for="ws-project-value"><span class="fld-label">${esc(t("job_value"))}</span>
-            <input id="ws-project-value" type="text" inputmode="decimal"></label>
+            <span class="field-affix"><input id="ws-project-value" type="text" inputmode="decimal">
+              <span id="ws-project-value-currency" aria-hidden="true"></span></span></label>
           <label class="field field-wide" for="ws-project-note"><span class="fld-label">${esc(t("job_note"))}</span>
             <textarea id="ws-project-note" maxlength="2000" rows="6"></textarea></label>
           <label class="field field-narrow" for="ws-project-color"><span class="fld-label">${esc(t("job_color"))}</span>

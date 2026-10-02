@@ -13,6 +13,37 @@ const wsUrlId = () => {
   try { return new URLSearchParams(location.search).get("id") || ""; } catch (e) { return ""; }
 };
 
+/** Keep an edited amount in its stored currency; only a new amount takes the site currency. */
+function wsEditedProjectMoney(project, valueMinor, currentCurrency) {
+  return {
+    valueMinor,
+    currencyCode: valueMinor === null ? "" : ((project && project.currencyCode) || currentCurrency || ""),
+  };
+}
+
+/** The currency part alone, in the same locale-aware form used by the money formatter. */
+function wsCurrencyAffix(currencyCode) {
+  if (!currencyCode) return "";
+  try {
+    const part = new Intl.NumberFormat(wsLang(), { style: "currency", currency: currencyCode })
+      .formatToParts(0).find((item) => item.type === "currency");
+    return part ? part.value : currencyCode;
+  } catch (e) { return currencyCode; }
+}
+
+/** Put a currency suffix beside an amount without making it part of the editable value. */
+function wsSetCurrencyAffix(id, currencyCode) {
+  const affix = document.getElementById(id);
+  if (affix) affix.textContent = wsCurrencyAffix(currencyCode);
+}
+
+/** New amounts follow the header currency until they are saved. */
+function wsRefreshNewMoneyAffixes() {
+  const currencyCode = typeof crmCurrency === "function" ? crmCurrency() : "";
+  for (const id of ["ws-project-value-currency", "ws-mat-price-currency", "ws-other-cost-currency"])
+    wsSetCurrencyAffix(id, currencyCode);
+}
+
 /**
  * May this browser be shown money? — `costs` in LM_FEATURES, PRO since 2026-09-03.
  *
@@ -804,6 +835,16 @@ function wsRenderProject(id) {
   // integer arithmetic, never a division into a float, because money is minor units.
   setField("ws-biz-value", project.valueMinor === null || project.valueMinor === undefined
     ? "" : `${Math.trunc(project.valueMinor / 100)}.${String(Math.abs(project.valueMinor % 100)).padStart(2, "0")}`);
+  const projectCurrency = project.currencyCode || (typeof crmCurrency === "function" ? crmCurrency() : "");
+  wsSetCurrencyAffix("ws-biz-value-currency", projectCurrency);
+  const currencyNote = document.getElementById("ws-biz-value-note");
+  if (currencyNote) {
+    const siteCurrency = typeof crmCurrency === "function" ? crmCurrency() : "";
+    currencyNote.hidden = project.valueMinor === null || project.valueMinor === undefined
+      || !project.currencyCode || project.currencyCode === siteCurrency;
+    currencyNote.textContent = currencyNote.hidden
+      ? "" : wsT("job_value_saved_currency").replace("{currency}", project.currencyCode);
+  }
   setField("ws-biz-color", project.color || "");
   setField("ws-biz-note", project.note || "");
 
@@ -1022,6 +1063,7 @@ function buildProjectsPage() {
     pwMount("cost-other", "costs");
   }
   wsGateMoneyFields();
+  wsRefreshNewMoneyAffixes();
   /* Signing in or out — in this tab or another — moves the level, and the rows on this
      screen were built for the level before it. Hiding the blocks is not enough: a project
      row, a saved calculation and a material row each carry an amount inside them, and an
@@ -1236,12 +1278,13 @@ function wireProjectDetail() {
     const clientId = val("ws-biz-client");
     // crmCurrency() stamps an amount that has never carried one; an amount cleared to
     // nothing takes its currency with it, because "" with a number is not a price.
+    const money = wsEditedProjectMoney(wsProject(wsOpenId), valueMinor, crmCurrency());
     const saved = wsUpdateProject(wsOpenId, {
       clientId,
       status: val("ws-biz-status"),
       dueDate: val("ws-biz-due"),
-      valueMinor,
-      currencyCode: valueMinor === null ? "" : crmCurrency(),
+      valueMinor: money.valueMinor,
+      currencyCode: money.currencyCode,
       color: val("ws-biz-color"),
       note: val("ws-biz-note"),
     });
@@ -1492,5 +1535,6 @@ document.addEventListener("DOMContentLoaded", () => {
 /* Saved lines keep the currency they were priced in, but a new line is stamped with the
    one in force — so every list that prints money is redrawn when the visitor switches. */
 document.addEventListener("currencychange", () => {
+  wsRefreshNewMoneyAffixes();
   wsRenderWorkspace();
 });

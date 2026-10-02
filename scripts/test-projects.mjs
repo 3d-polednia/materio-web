@@ -173,6 +173,11 @@ function check(name, cond, detail) {
 const eq = (name, got, want) =>
   check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
 
+/** The pure money part of the project edit form, without mounting the browser screen. */
+const { wsEditedProjectMoney } = evalScript("assets/workspace-ui.js", ["wsEditedProjectMoney"], {
+  document: { addEventListener: () => {} },
+});
+
 /* ------------------------------------------------------------------ 1. the route */
 
 head("1. one project is a declared screen, not a page that just appeared");
@@ -825,6 +830,10 @@ head("9. a project is also the Pro work row");
   eq("a project accepts a calendar colour", ws.wsUpdateProject(project.id, { color: "amber" }).color, "amber");
   eq("an unknown colour is refused", ws.wsUpdateProject(project.id, { color: "pink" }).color, "amber");
   eq("the colour can be cleared", ws.wsUpdateProject(project.id, { color: "" }).color, "");
+
+  const eurStatusEdit = wsEditedProjectMoney({ valueMinor: 100_000, currencyCode: "EUR" }, 100_000, "PLN");
+  eq("editing an EUR project's status keeps its amount", eurStatusEdit.valueMinor, 100_000);
+  eq("editing an EUR project's status keeps its currency", eurStatusEdit.currencyCode, "EUR");
 }
 
 /* ------------------------------------------------------------------ report */

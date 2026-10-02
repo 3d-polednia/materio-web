@@ -865,6 +865,12 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .field > .fld-label, .field > label, .ws-bar-label { padding-inline: var(--control-px); }
 /* Field feedback follows the label and control text column. */
 .field > .form-error, .field > .muted { padding-inline: var(--control-px); }
+/* A money suffix stays inside the field edge without becoming part of the typed amount. */
+.field-affix { display: block; position: relative; }
+/* The suffix sits at the logical end for every language and never catches a field click. */
+.field-affix > span { position: absolute; inset-inline-end: var(--control-px); top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
+/* Reserved space keeps long amounts from running underneath their currency suffix. */
+.field-affix > input { padding-inline-end: calc(var(--control-px) + 2.5rem) !important; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
 /* A field inside an "add a row" form. Same label + control pair as a stacked field, laid
    out along the row instead of down the card, so the submit button lines up with the
