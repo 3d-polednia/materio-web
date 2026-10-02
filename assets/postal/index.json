@@ -1,0 +1,70 @@
+{
+  "source": "GeoNames (geonames.org), CC BY 4.0",
+  "built": "2026-10-02",
+  "countries": {
+    "pl": {
+      "files": 99,
+      "codes": 20299
+    },
+    "de": {
+      "files": 96,
+      "codes": 10813
+    },
+    "at": {
+      "files": 79,
+      "codes": 2501
+    },
+    "ch": {
+      "files": 83,
+      "codes": 3362
+    },
+    "cz": {
+      "files": 59,
+      "codes": 2694
+    },
+    "sk": {
+      "files": 24,
+      "codes": 3480
+    },
+    "ro": {
+      "files": 47,
+      "codes": 37914
+    },
+    "hr": {
+      "files": 20,
+      "codes": 309
+    },
+    "rs": {
+      "files": 20,
+      "codes": 1149
+    },
+    "it": {
+      "files": 93,
+      "codes": 4735
+    },
+    "nl": {
+      "files": 90,
+      "codes": 4086
+    },
+    "be": {
+      "files": 80,
+      "codes": 1146
+    },
+    "es": {
+      "files": 52,
+      "codes": 11150
+    },
+    "fr": {
+      "files": 96,
+      "codes": 20418
+    },
+    "ua": {
+      "files": 90,
+      "codes": 26579
+    },
+    "lu": {
+      "files": 9,
+      "codes": 4330
+    }
+  }
+}

@@ -1,0 +1,4 @@
+Data from GeoNames (https://www.geonames.org/)
+Licensed under Creative Commons Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/)
+Built on: 2026-10-02
+Note: The original data was regrouped into per-prefix JSON files.
