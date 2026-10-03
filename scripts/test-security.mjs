@@ -475,7 +475,7 @@ head("6. izolacja danych: one account's copy on a device two people use");
   /* A browser that refused the write — a private window, a full quota — is told so and is
      NOT stamped: the account name would claim rows this device never received. */
   check("a refused pull is not stamped",
-    before('if (!ok) { status(T("ws_save_failed"), true); return; }', PULL_STAMP, pullClick));
+    before('if (!ok) { statusKey("ws_save_failed", true); return; }', PULL_STAMP, pullClick));
   // The same order at sign-in, where nobody pressed anything.
   const auto = fn("autoReconcile");
   check("sign-in pulls, stamps, then pushes",

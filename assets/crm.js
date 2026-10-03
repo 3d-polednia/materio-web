@@ -58,6 +58,14 @@ const PROJECT_OPEN_STATUS = ["new", "active"];
 const PROJECT_DEFAULT_STATUS = "new";
 const PROJECT_COLORS = ["lime", "blue", "amber", "red", "violet"];
 
+/** Optional phone: familiar separators only, one leading plus, and 6 to 15 digits. */
+function crmPhoneValid(value) {
+  const phone = String(value == null ? "" : value).trim();
+  if (!phone) return true;
+  const digits = phone.replace(/\D/g, "").length;
+  return /^\+?[0-9 ()/.\-]+$/.test(phone) && digits >= 6 && digits <= 15;
+}
+
 /**
  * The terminarz's buckets, in the order the page draws them — session 25, chapter XXIII.
  *
@@ -105,7 +113,7 @@ function crmAddCompany(fields) {
   const f = fields || {};
   const name = crmText(f.name, CRM_MAX_NAME);
   const logo = crmCompanyLogo(f.logo);
-  if (!name || logo === null) return null;
+  if (!name || logo === null || !crmPhoneValid(f.phone)) return null;
   const data = crmLoad();
   const now = Date.now();
   const company = {
@@ -125,6 +133,7 @@ function crmAddCompany(fields) {
 function crmUpdateCompany(id, fields) {
   if (!crmCanCompany()) return null;
   const f = fields || {};
+  if (f.phone !== undefined && !crmPhoneValid(f.phone)) return null;
   const data = crmLoad();
   const company = data.companies.find((row) => row.id === id && !row.deletedAt);
   if (!company) return null;
@@ -233,7 +242,7 @@ const crmClient = (id) => crmAllClients().find((c) => c.id === id) || null;
 function crmAddClient(fields) {
   const f = fields || {};
   const name = crmText(f.name, CRM_MAX_NAME);
-  if (!name) return null; // a client with no name is a row nobody can tell apart
+  if (!name || !crmPhoneValid(f.phone)) return null; // a client with no name is a row nobody can tell apart
   const data = crmLoad();
   const now = Date.now();
   const client = {
@@ -268,6 +277,7 @@ function crmAddClient(fields) {
  */
 function crmUpdateClient(id, fields) {
   const f = fields || {};
+  if (f.phone !== undefined && !crmPhoneValid(f.phone)) return null;
   const data = crmLoad();
   const client = data.clients.find((c) => c.id === id && !c.deletedAt);
   if (!client) return null;

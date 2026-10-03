@@ -18,7 +18,7 @@ export const NAV_ICON = {
   profile: '<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-4 4-6 7.5-6s6.1 2 7.5 6"/>',
   sync: '<path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
   pro: '<path d="m12 2 2.7 5.9 6.3.7-4.7 4.4 1.3 6.3L12 16.2 6.4 19.3l1.3-6.3-4.7-4.4 6.3-.7Z"/>',
-  account: '<path d="M12 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 19.5a7.7 7.7 0 0 1 15 0"/>',
+  account: '<circle cx="15.5" cy="7.5" r="4.5"/><path d="m12 11-9 9v2h3l1-2h2l1-2h2l2-2"/>',
 };
 
 const item = (t, entry, current) => {

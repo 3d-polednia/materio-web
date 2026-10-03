@@ -499,7 +499,9 @@ const BUDGET = {
   // 2026-10-01: the share panel makes French widest at 771; four words remain for drift.
   // 2026-10-01, 775 -> 780, measured 776 words (fr): the share panel's e-mail chooser.
   // A full thirteen-language rebuild measures French at 556; these are existing form labels.
-  company: 330, clients: 560, jobs: 544, quotes: 780, calendar: 450,
+  // 2026-10-03, 560 -> 572, measured 568 words (fr): the phone error under both client forms
+  // (hidden until a number is refused, but it is text the visitor can be shown).
+  company: 330, clients: 572, jobs: 544, quotes: 780, calendar: 450,
   // 2026-10-01: public quote markup is widest in French at 176; four words remain for drift.
   "quote-share": 180,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it

@@ -448,7 +448,7 @@ ${LOGO_DEFS}
      src/pages.mjs and src/app-pages.mjs): without it the browser scrolls to the landmark
      and leaves the keyboard focus on the link, so the next Tab goes back into the header
      the visitor just asked to skip. -->
-<a class="skip-link" href="#main">${esc(t("skip_main"))}</a>
+<a class="skip-link" href="#main" data-i18n="skip_main">${esc(t("skip_main"))}</a>
 ${bare ? main : `${siteHeader({ lang, t, alternates, path })}\n${main}\n${siteFooter({ lang, t, alternates })}\n${consentBanner(lang, t)}`}
 ${p.bodyEnd || ""}
 </body>
@@ -667,8 +667,8 @@ function consentBanner(lang, t) {
 }
 
 /** Breadcrumb trail plus the matching schema.org BreadcrumbList. */
-export function breadcrumbs(items) {
-  const nav = `<nav class="breadcrumbs" aria-label="Breadcrumb"><ol>${items.map((it, i) =>
+export function breadcrumbs(t, items) {
+  const nav = `<nav class="breadcrumbs" aria-label="${esc(t("bc_label"))}"><ol>${items.map((it, i) =>
     i === items.length - 1
       ? `<li aria-current="page">${esc(it.name)}</li>`
       : `<li><a href="${esc(it.path)}">${esc(it.name)}</a></li>`

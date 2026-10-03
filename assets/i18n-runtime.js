@@ -214,7 +214,13 @@ function applyLang(lang) {
   // Controls whose whole label is the aria-label: the menu button, the theme switch,
   // the currency select. Nothing about them is visible text, so nothing else would
   // translate them.
-  document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t(el.dataset.i18nAria, l)); });
+  // A tooltip (title) that repeats the label follows it, or the pointer would show the
+  // language the page was built in.
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+    const label = t(el.dataset.i18nAria, l);
+    el.setAttribute("aria-label", label);
+    if (el.hasAttribute("title")) el.setAttribute("title", label);
+  });
   applyNavUrls(l);
   // Only a language that actually arrived is written down. A bundle that failed to load
   // leaves the page where it was, and recording that as the visitor's choice would turn

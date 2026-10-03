@@ -91,6 +91,7 @@ function loadCrm(shared) {
     "wsAddProject", "wsUpdateProject", "wsProject", "wsProjects", "wsDeleteProject", "wsRestoreProject",
     "wsAddEstimation", "wsAddManualEstimation", "wsEstimations", "wsProjectCosts", "wsExport",
     "crmAddClient", "crmClient", "crmDeleteClient", "crmRestoreClient", "crmLinkProject",
+    "crmPhoneValid",
     "crmClientProjects", "crmClientQuotes", "crmClientCosts", "crmProjectQuotes",
     "crmAddQuote", "crmQuote", "crmQuotes", "crmDeleteQuote", "crmProjectQuotes",
     "crmQuoteTotals", "crmQuoteChain", "crmAddLabour",
@@ -211,6 +212,17 @@ const eq = (name, got, want) =>
   check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
 
 /* ================================================================== 1. it stores nothing */
+
+head("0. phone validation");
+{
+  const { crmPhoneValid } = loadCrm();
+  for (const phone of ["+48 600 700 800", "600-700-800", "(22) 123 45 67", ""]) {
+    check(`${JSON.stringify(phone)} is accepted`, crmPhoneValid(phone));
+  }
+  for (const phone of ["abc", "12345", "+48+600700800", "600 700 800 ext", "1234567890123456"]) {
+    check(`${JSON.stringify(phone)} is rejected`, !crmPhoneValid(phone));
+  }
+}
 
 head("1. the chain is walked, never stored");
 {

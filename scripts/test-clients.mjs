@@ -334,7 +334,7 @@ head("2b. every write tells the page, so nothing is redrawn by guesswork");
   const crm = loadCrm();
   const before = crm.events.length;
   const c = crm.crmAddClient({ name: "Jan" });
-  crm.crmUpdateClient(c.id, { phone: "600" });
+  crm.crmUpdateClient(c.id, { phone: "600000" });
   crm.crmDeleteClient(c.id);
   eq("three writes, three events", crm.events.length - before, 3);
   eq("and they are the client store's own event",

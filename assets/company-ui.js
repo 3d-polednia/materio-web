@@ -28,6 +28,15 @@ function companyMount() {
     error: document.getElementById("company-postal-error"),
     datalist: document.getElementById("company-city-list"),
   });
+  const phone = field("phone");
+  const phoneError = document.getElementById("company-phone-error");
+  const showPhoneError = (show) => {
+    phone.setAttribute("aria-invalid", String(show));
+    phoneError.hidden = !show;
+  };
+  phone.addEventListener("input", () => {
+    if (crmPhoneValid(phone.value)) showPhoneError(false);
+  });
   const showLogo = () => {
     preview.hidden = !logo;
     remove.hidden = !logo;
@@ -37,6 +46,7 @@ function companyMount() {
     editing = "";
     logo = "";
     form.reset();
+    showPhoneError(false);
     postal.setCountry(LMPostal.defaultCountry(document.documentElement.lang));
     showLogo();
     cancel.hidden = true;
@@ -75,6 +85,7 @@ function companyMount() {
       logo = company.logo || "";
       ["name", "nip", "country", "street", "postalCode", "city", "phone", "email", "www", "bankAccount"]
         .forEach((name) => { field(name).value = company[name] || ""; });
+      showPhoneError(false);
       postal.setCountry(company.country || LMPostal.defaultCountry(document.documentElement.lang));
       postal.refresh(false);
       showLogo();
@@ -101,6 +112,11 @@ function companyMount() {
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (!crmPhoneValid(phone.value)) {
+      showPhoneError(true);
+      phone.focus();
+      return;
+    }
     if (!postal.validate()) return;
     const values = { logo };
     ["name", "nip", "country", "street", "postalCode", "city", "phone", "email", "www", "bankAccount"]

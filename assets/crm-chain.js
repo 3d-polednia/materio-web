@@ -79,6 +79,10 @@ function chnRenderStrip(el, chain, current) {
   if (!el) return;
   const at = String(current || (chain && chain.from) || "");
   const nodes = (typeof CRM_CHAIN !== "undefined" ? CRM_CHAIN : ["client", "project", "quote"]);
+  // Walked from a client or a project, the chain has the quotes as a list and no single
+  // quote, so the step stays the way to the list. But "none yet, add one" beside a project
+  // that has quotes contradicted the Angebote box right under the strip (2026-10-03).
+  const hasQuotes = Boolean(chain && Array.isArray(chain.quotes) && chain.quotes.length);
   el.innerHTML = `<ol class="crm-chain-list">${nodes.map((node) => {
     const row = chain ? chain[node] : null;
     const label = `<span class="eyebrow muted">${chnEsc(chnT(`crm_node_${node}`))}</span>`;
@@ -90,7 +94,7 @@ function chnRenderStrip(el, chain, current) {
         chnEsc(chnRowUrl(CHN_SECTION[node], row.id))}">${chnEsc(row.name)}</a></li>`;
     }
     return `<li class="off" data-node="${node}">${label} <a class="muted" href="${
-      chnEsc(chnUrl(CHN_SECTION[node]))}">${chnEsc(chnT("crm_node_none"))}</a></li>`;
+      chnEsc(chnUrl(CHN_SECTION[node]))}">${chnEsc(chnT(node === "quote" && hasQuotes ? "crm_quotes_all" : "crm_node_none"))}</a></li>`;
   }).join("")}</ol>`;
 }
 

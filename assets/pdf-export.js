@@ -487,7 +487,11 @@ function pdfRenderQuote(doc, snap) {
   put("net", money(totals.net));
   pdfShow(doc, "net", totals.vatPct !== null);
   const vatRate = totals.vatPct === null ? "" : `${percent(totals.vatPct)} %`;
-  put("vatLabel", `VAT ${vatRate}`.trim());
+  // The tax is named in the document's language (MwSt., DPH, TVA, ...), carried on the cell
+  // by the template the same way the total's label is.
+  doc.querySelectorAll('[data-pdf="vatLabel"]').forEach((el) => {
+    el.textContent = `${el.dataset.label} ${vatRate}`.trim();
+  });
   put("vat", money(totals.vat));
   pdfShow(doc, "vatRow", totals.vatPct !== null);
   put("total", money(totals.gross));

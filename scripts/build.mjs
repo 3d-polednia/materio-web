@@ -62,7 +62,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20261003d";
+const STAMP = "20261003f";
 
 /* ------------------------------------------------------------------ load sources */
 

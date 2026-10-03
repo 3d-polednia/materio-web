@@ -548,6 +548,9 @@ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 .crm-client-grid > .field[for="crm-client-postal-code"] { grid-column: span 2; }
 .crm-client-grid > .field[for="crm-client-city"], .crm-client-grid > .field[for="crm-client-street"] { grid-column: span 4; }
 .crm-client-grid > .btn { grid-column: span 2; justify-self: start; align-self: end; }
+.inline-form.crm-client-grid { align-items: start; }
+.field-error { display: block; margin-top: var(--sp-1); padding-inline: var(--control-px); color: var(--error); font-size: var(--fs-sm); }
+.field-error[hidden] { display: none; }
 @media (max-width: 560px) { .crm-client-grid > * { grid-column: 1 / -1 !important; } }
 .result {
 margin-top: var(--sp-4); padding: var(--sp-4); border-radius: var(--radius-sm);
@@ -1521,6 +1524,10 @@ gap: var(--sp-2) var(--sp-4); margin-bottom: var(--sp-4);
 .section-add-panel { margin: calc(var(--sp-2) * -1) 0 var(--sp-4); }
 .section-add-list { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); margin: 0 0 var(--sp-2); padding: 0; list-style: none; }
 .section-add-list a { display: inline-flex; align-items: center; min-height: var(--sp-6); font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.calc-presets { align-items: center; }
+.calc-presets-label { font-size: var(--fs-sm); color: var(--muted); }
+[data-preset]:hover { text-decoration: underline; }
+[data-preset][aria-pressed="true"] { font-weight: var(--fw-bold); }
 .section-option-label { margin: var(--sp-4) 0 var(--sp-2); font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 .dash-more {
 display: inline-flex; align-items: center; min-height: var(--sp-6);
@@ -1642,6 +1649,11 @@ background: var(--surface); padding: var(--sp-4);
 .ws-proj-row > .row-name { flex: 1 1 14rem; }
 .ws-proj-row > .row-actions { margin-left: auto; flex-wrap: wrap; }
 .ws-proj-row > .row-actions .btn { white-space: nowrap; }
+.ws-proj-status {
+min-height: var(--control-h); padding-block: 0; border: 0; border-radius: 0;
+background-color: transparent; color: var(--on-bg);
+}
+.ws-proj-status:hover { color: var(--accent-strong); }
 .ws-row-ask { flex: 1 0 100%; min-width: 0; }
 .ws-row-ask .btn { white-space: nowrap; }
 .ws-undo {

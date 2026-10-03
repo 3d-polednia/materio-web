@@ -87,8 +87,8 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
   }).join("");
 
   const chips = calc.presets
-    ? `<div class="chips">${calc.presets.map((p, i) =>
-        `<button type="button" class="chip" data-preset="${i}" data-material="${esc(p.m)}" aria-pressed="false">${esc(p.k ? t(p.k) : p.l)}</button>`).join("")}</div>`
+    ? `<div class="section-add-list calc-presets"><span class="calc-presets-label">${esc(t("calc_presets"))}</span>${calc.presets.map((p, i) =>
+        `<button type="button" class="section-add" data-preset="${i}" data-material="${esc(p.m)}" aria-pressed="false">${esc(p.k ? t(p.k) : p.l)}</button>`).join("")}</div>`
     : "";
 
   const picker = materials
@@ -335,7 +335,7 @@ function appNote(t) {
  * build time keeps the script down to comparing two strings.
  */
 export function calcHubMain(lang, t, calcs, guides, convCopy) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("calchub_title"), path: urlCalcIndex(lang) },
   ]);
@@ -493,7 +493,7 @@ export function renderFormula(lines, lang, t) {
 export function calcPageMain(calc, lang, t, { seo, example, formula, materials = 0, guides = [] }) {
   const meta = CALC_META[calc.id];
   const name = t(`c_${calc.id}_t`);
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("calchub_title"), path: urlCalcIndex(lang) },
     { name, path: urlCalc(lang, calc.id) },
@@ -580,7 +580,7 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
 /* ------------------------------------------------------------------ guides */
 
 export function guideIndexMain(lang, t, guides) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("guides_title"), path: urlGuideIndex(lang) },
   ]);
@@ -610,7 +610,7 @@ export function guideIndexMain(lang, t, guides) {
 
 export function guideMain(guide, lang, t) {
   const title = t(`g_${guide.id}_t`);
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("guides_title"), path: urlGuideIndex(lang) },
     { name: title, path: urlGuide(lang, guide) },
@@ -673,7 +673,7 @@ export function guideMain(guide, lang, t) {
  */
 export function materialsMain(lang, t, cat, aisles, copy) {
   const c = (key) => copy[key];
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("matpage_title"), path: urlMaterials(lang) },
   ]);
@@ -859,7 +859,7 @@ const COOKIE_THIRD_ROWS = [
 ];
 
 export function cookiesMain(lang, t) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("cookiepage_title"), path: urlCookies(lang) },
   ]);
@@ -940,7 +940,7 @@ export function cookiesMain(lang, t) {
  * that is absent rather than a label with nothing after it.
  */
 export function contactMain(lang, t) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("contactpage_title"), path: urlContact(lang) },
   ]);
@@ -1443,7 +1443,7 @@ export function quotePdfBlock(lang, t, features, stamp = "") {
                     <tr data-pdf-row="subtotal"><th scope="row">${esc(c("qdoc_sum"))}</th><td class="qdoc-num" data-pdf="subtotal"></td></tr>
                     <tr data-pdf-row="marginRow" hidden><th scope="row" data-pdf="marginLabel"></th><td class="qdoc-num" data-pdf="margin"></td></tr>
                     <tr data-pdf-row="net"><th scope="row">${esc(c("qdoc_net"))}</th><td class="qdoc-num" data-pdf="net"></td></tr>
-                    <tr data-pdf-row="vatRow" hidden><th scope="row" data-pdf="vatLabel"></th><td class="qdoc-num" data-pdf="vat"></td></tr>
+                    <tr data-pdf-row="vatRow" hidden><th scope="row" data-pdf="vatLabel" data-label="${esc(PDF_COPY[lang].pdfdoc_vat)}"></th><td class="qdoc-num" data-pdf="vat"></td></tr>
                     <tr class="qdoc-total"><th scope="row" data-pdf="totalLabel" data-label="${esc(c("qdoc_total"))}">${esc(c("qdoc_total"))}</th><td class="qdoc-num" data-pdf="total"></td></tr>
                   </tbody></table></div>
                 </div></td></tr><tr class="qdoc-sign-row"><td><div class="qdoc-sign"><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">${esc(c("qdoc_contractor"))}</div></div><div class="qdoc-sign-box"><div class="qdoc-sign-line"></div><div class="qdoc-sign-caption">${esc(c("qdoc_customer"))}</div></div></div></td></tr></tbody><tfoot><tr><td class="qdoc-foot-cell"><footer class="qdoc-foot"><div class="qdoc-foot-left"><img src="${asset("logo-mark.svg")}" alt="LiczMat" class="qdoc-foot-mark" width="24" height="24" decoding="async" loading="eager"><div class="qdoc-foot-text"><div class="qdoc-foot-primary">${esc(c("qdoc_footer_primary"))}</div><div class="qdoc-foot-secondary">${esc(c("qdoc_footer_secondary"))}</div></div></div><div class="qdoc-foot-right"><img src="${asset("qr-liczmat.svg")}" alt="${esc(c("qdoc_qr_alt"))}" class="qdoc-qr" width="60" height="60" decoding="async" loading="eager"><div class="qdoc-qr-caption">liczmat.com</div></div></footer></td></tr></tfoot></table>
@@ -1469,7 +1469,7 @@ export function quoteViewMain(lang, t, features, stamp = "", copy) {
 }
 
 export function projectsMain(lang, t, aisles = [], features = []) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("wspage_title"), path: urlProjects(lang) },
   ]);
@@ -1867,7 +1867,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
  *   assets/paywall.js replaces it with the visitor's own currency when there is one.
  */
 export function proPageMain(lang, t, features, prices) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("pro_t"), path: urlLiczmatPro(lang) },
   ]);
@@ -1968,7 +1968,7 @@ export function proPageMain(lang, t, features, prices) {
  * preview because those depend on this browser's local CRM store.
  */
 export function companyMain(lang, t, features) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("companypage_title"), path: urlCompany(lang) },
   ]);
@@ -2009,7 +2009,8 @@ export function companyMain(lang, t, features) {
             <span class="ws-bar-label">${esc(t(key))}${id === "name" ? "*" : ""}</span>
             ${type === "select"
     ? `<select id="company-${id}" name="${id}" autocomplete="${autocomplete}"></select>`
-    : `<input id="company-${id}" name="${id}" type="${type}" maxlength="${max}" autocomplete="${autocomplete}"${id === "postalCode" ? ` aria-describedby="company-postal-error"` : ""}${id === "city" ? ` list="company-city-list"` : ""}${id === "name" ? " required" : ""}>`}${id === "postalCode" ? `
+    : `<input id="company-${id}" name="${id}" type="${type}" maxlength="${max}" autocomplete="${autocomplete}"${id === "phone" ? ` inputmode="tel" aria-describedby="company-phone-error"` : ""}${id === "postalCode" ? ` aria-describedby="company-postal-error"` : ""}${id === "city" ? ` list="company-city-list"` : ""}${id === "name" ? " required" : ""}>`}${id === "phone" ? `
+            <span id="company-phone-error" class="field-error" role="alert" hidden>${esc(t("phone_invalid"))}</span>` : ""}${id === "postalCode" ? `
             <span id="company-postal-error" class="field-error" role="alert" hidden>${esc(t("postal_invalid"))}</span>` : ""}
           </label>`).join("\n")}
           <datalist id="company-city-list"></datalist>
@@ -2050,7 +2051,7 @@ export function companyMain(lang, t, features) {
  * translated twice.
  */
 export function clientsMain(lang, t, features) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("clipage_title"), path: urlClients(lang) },
   ]);
@@ -2099,7 +2100,8 @@ export function clientsMain(lang, t, features) {
               </label>
               <label class="ws-mat-f ws-mat-f-sm">
                 <span class="ws-bar-label">${esc(t("cli_phone"))}</span>
-                <input id="crm-edit-phone" type="tel" maxlength="200" autocomplete="tel">
+                <input id="crm-edit-phone" type="tel" inputmode="tel" maxlength="200" autocomplete="tel" aria-describedby="crm-edit-phone-error">
+                <span id="crm-edit-phone-error" class="field-error" role="alert" hidden>${esc(t("phone_invalid"))}</span>
               </label>
               <label class="ws-mat-f ws-mat-f-sm">
                 <span class="ws-bar-label">${esc(t("cli_email"))}</span>
@@ -2222,7 +2224,8 @@ export function clientsMain(lang, t, features) {
           <label class="field" for="crm-client-name"><span class="fld-label">${esc(t("cli_new"))}</span>
             <input id="crm-client-name" type="text" maxlength="120" required></label>
           <label class="field" for="crm-client-phone"><span class="fld-label">${esc(t("cli_phone"))}</span>
-            <input id="crm-client-phone" type="tel" maxlength="200" autocomplete="off"></label>
+            <input id="crm-client-phone" type="tel" inputmode="tel" maxlength="200" autocomplete="off" aria-describedby="crm-client-phone-error">
+            <span id="crm-client-phone-error" class="field-error" role="alert" hidden>${esc(t("phone_invalid"))}</span></label>
           <label class="field" for="crm-client-email"><span class="fld-label">${esc(t("cli_email"))}</span>
             <input id="crm-client-email" type="email" maxlength="200" autocomplete="off"></label>
           <label class="field" for="crm-client-country"><span class="fld-label">${esc(t("cli_country"))}</span>
@@ -2294,7 +2297,7 @@ export function clientsMain(lang, t, features) {
  */
 export function quotesMain(lang, t, features, stamp = "") {
   const quoteViewCopy = QUOTE_VIEW_COPY[lang];
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("wspage_title"), path: urlProjects(lang) },
     { name: t("quopage_title"), path: urlQuotes(lang) },
@@ -2433,7 +2436,7 @@ export function quotesMain(lang, t, features, stamp = "") {
               <div><dt>${esc(t("quo_fig_sub"))}</dt><dd id="quo-fig-sub"></dd></div>
               <div><dt>${esc(t("quo_fig_margin"))}</dt><dd id="quo-fig-margin"></dd></div>
               <div><dt>${esc(t("quo_net"))}</dt><dd id="quo-fig-net"></dd></div>
-              <div class="quo-vat-row"><dt>VAT</dt><dd><select id="quo-vat" aria-label="VAT"></select> <input id="quo-vat-custom" type="text" inputmode="decimal" aria-label="${esc(t("quo_vat_custom"))}" hidden> <span id="quo-fig-vat"></span></dd></div>
+              <div class="quo-vat-row"><dt>${esc(t("quo_vat"))}</dt><dd><select id="quo-vat" aria-label="${esc(t("quo_vat"))}"></select> <input id="quo-vat-custom" type="text" inputmode="decimal" aria-label="${esc(t("quo_vat_custom"))}" hidden> <span id="quo-fig-vat"></span></dd></div>
               <div class="quo-summary-total"><dt>${esc(t("quo_fig_total"))}</dt><dd id="quo-fig-total"></dd></div>
             </dl>
             <p class="muted ws-estimate-mixed" id="quo-mixed" hidden>${esc(t("ws_mixed_currency"))}</p>
@@ -2565,7 +2568,7 @@ export function quotesMain(lang, t, features, stamp = "") {
  * so a visitor with no JavaScript and a crawler both read what the module is.
  */
 export function calendarMain(lang, t, features) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("wspage_title"), path: urlProjects(lang) },
     { name: t("calpage_title"), path: urlCalendar(lang) },
@@ -2671,7 +2674,7 @@ ${buckets}
  */
 export function converterMain(lang, t, cats, example, copy) {
   const c = (key) => copy[key];
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("calchub_title"), path: urlCalcIndex(lang) },
     { name: t("convpage_title"), path: urlConverter(lang) },
@@ -2764,7 +2767,7 @@ export function converterMain(lang, t, cats, example, copy) {
 /* ------------------------------------------------------------------ stores */
 
 export function storesMain(lang, t) {
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("storespage_title"), path: urlStores(lang) },
   ]);
@@ -2922,7 +2925,7 @@ function omatForm(t, aisles, c, heading = false) {
  */
 export function ownMaterialsMain(lang, t, aisles, copy) {
   const c = (key) => copy[key];
-  const crumbs = breadcrumbs([
+  const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
     { name: t("nav_materials"), path: urlMaterials(lang) },
     { name: t("omatpage_title"), path: urlOwnMaterials(lang) },

@@ -153,7 +153,7 @@ function wsProjectRow(p) {
       <span class="row-actions">
         <label class="field field-narrow">
           <span class="fld-label">${wsEsc(wsT("job_status"))}</span>
-          <select data-project-status>${PROJECT_STATUS.map((status) =>
+          <select class="ws-proj-status" data-project-status>${PROJECT_STATUS.map((status) =>
             `<option value="${status}"${status === (p.status || "new") ? " selected" : ""}>${wsEsc(wsT(`job_st_${status}`))}</option>`).join("")}</select>
         </label>
         ${p.archived

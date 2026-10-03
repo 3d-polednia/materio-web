@@ -78,28 +78,45 @@ const POPUP_UNAVAILABLE = [
   "auth/web-storage-unsupported",
 ];
 
-/** Firebase Auth error codes translated into the copy the page already carries. */
-function authMessage(code) {
+/** Firebase Auth error codes as keys of the copy the page already carries. */
+function authKey(code) {
   switch (code) {
-    case "auth/invalid-email": return T("app_err_email");
-    case "auth/weak-password": return T("app_err_password");
-    case "auth/email-already-in-use": return T("app_err_inuse");
+    case "auth/invalid-email": return "app_err_email";
+    case "auth/weak-password": return "app_err_password";
+    case "auth/email-already-in-use": return "app_err_inuse";
     case "auth/invalid-credential":
     case "auth/wrong-password":
-    case "auth/user-not-found": return T("app_err_credentials");
-    case "auth/network-request-failed": return T("app_err_network");
-    case "auth/requires-recent-login": return T("app_err_recent_login");
+    case "auth/user-not-found": return "app_err_credentials";
+    case "auth/network-request-failed": return "app_err_network";
+    case "auth/requires-recent-login": return "app_err_recent_login";
     case "auth/popup-blocked":
     case "auth/popup-closed-by-user":
-    case "auth/cancelled-popup-request": return T("app_err_popup");
-    case "auth/operation-not-allowed": return T("app_err_provider_off");
-    default: return T("app_err_unknown");
+    case "auth/cancelled-popup-request": return "app_err_popup";
+    case "auth/operation-not-allowed": return "app_err_provider_off";
+    default: return "app_err_unknown";
   }
 }
+
+const authMessage = (code) => T(authKey(code));
+
+/* A message shown by its dictionary key, so a language that arrives (or is picked) after it
+   rewrites it. An error raised while the page loads used to stay in the language the page
+   was built in: a German visitor read "Coś poszło nie tak" (2026-10-03). */
+let statusShown = null;
+
+function statusKey(key, isError) {
+  status(T(key), isError);
+  statusShown = { key, isError };
+}
+
+document.addEventListener("langchange", () => {
+  if (statusShown) statusKey(statusShown.key, statusShown.isError);
+});
 
 function status(message, isError) {
   const box = $("app-status");
   if (!box) return;
+  statusShown = null;
   box.textContent = message || "";
   box.classList.toggle("err", Boolean(isError));
   box.hidden = !message;
@@ -115,7 +132,7 @@ async function accountMail(type, data, fallback) {
     return true;
   } catch (err) {
     if (err && err.code === "functions/resource-exhausted") {
-      status(T("app_mail_later"), true);
+      statusKey("app_mail_later", true);
       return false;
     }
     await fallback();
@@ -178,7 +195,7 @@ async function boot() {
   }
   // The browser may be arriving back from the Google redirect the button falls back to when a
   // popup is blocked. Without this call the finished sign-in would be dropped without a word.
-  authMod.getRedirectResult(auth).catch((err) => status(authMessage(err && err.code), true));
+  authMod.getRedirectResult(auth).catch((err) => statusKey(authKey(err && err.code), true));
   wireHashPanels();
   wireProfilePanel();
   wireAccountPanel();
@@ -332,7 +349,7 @@ function wireAuthForms() {
     submitting(form, async () => {
       const email = $("reset-email").value.trim();
       if (await accountMail("reset", { email }, () => fb.sendPasswordResetEmail(auth, email))) {
-        status(T("app_reset_sent"));
+        statusKey("app_reset_sent");
       }
     });
   });
@@ -376,7 +393,7 @@ function wireAuthForms() {
       status(authMessage(err && err.code), true);
       return;
     }
-    status(T("app_signed_out"));
+    statusKey("app_signed_out");
   };
   $("app-signout").addEventListener("click", signOut);
   $("prof-signout").addEventListener("click", signOut);
@@ -528,7 +545,7 @@ function listenProfile() {
       // Same straggler as listen(): signing out revokes the read mid-flight, and that is
       // not something to put on the screen.
       if (!state.uid || (err && err.code === "permission-denied")) return;
-      status(T("app_err_unknown"), true);
+      statusKey("app_err_unknown", true);
     },
   );
   state.unsub.push(unsub);
@@ -735,7 +752,7 @@ async function goToCheckout(planId) {
   if (!url) {
     payLeaving = false;
     document.querySelectorAll("[data-pw-checkout]").forEach((button) => { button.disabled = false; });
-    status(T("pay_soon"), true);
+    statusKey("pay_soon", true);
     return;
   }
   payPendingSet();
@@ -858,7 +875,7 @@ function wireProfilePanel() {
       // nothing but lastSeenAt and appVersion in users/{uid}, and this needs no rules.
       await fb.updateProfile(auth.currentUser, { displayName: $("prof-name").value.trim().slice(0, 60) });
       renderIdentity();
-      status(T("prof_name_saved"));
+      statusKey("prof_name_saved");
     });
   });
 
@@ -982,7 +999,7 @@ function listen(collectionName, onRows) {
       // purpose, and stopListening() gets ahead of it — this is the belt to that
       // braces, so a straggler cannot land on top of "Konto usunięte."
       if (!state.uid || (err && err.code === "permission-denied")) return;
-      status(T("app_err_unknown"), true);
+      statusKey("app_err_unknown", true);
     },
   );
   state.unsub.push(unsub);
@@ -1215,9 +1232,9 @@ function wireSyncPanel() {
       if (!accountSync.setSyncAccount(uid)) throw new Error("sync stamp failed");
       await accountSync.syncPushAll(uid);
       renderLocalSummary();
-      status(T("app_sync_pushed"));
+      statusKey("app_sync_pushed");
     } catch (err) {
-      status(T("app_err_unknown"), true);
+      statusKey("app_err_unknown", true);
     } finally {
       accountSync.state.syncBusy--;
       renderLocalSummary();
@@ -1232,11 +1249,11 @@ function wireSyncPanel() {
     try {
       const ok = await accountSync.syncPullAll(uid);
       renderLocalSummary();
-      if (!ok) { status(T("ws_save_failed"), true); return; }
+      if (!ok) { statusKey("ws_save_failed", true); return; }
       if (!accountSync.setSyncAccount(uid)) throw new Error("sync stamp failed");
-      status(T("app_sync_pulled"));
+      statusKey("app_sync_pulled");
     } catch (err) {
-      status(T("app_err_unknown"), true);
+      statusKey("app_err_unknown", true);
     } finally {
       accountSync.state.syncBusy--;
       renderLocalSummary();
@@ -1246,7 +1263,7 @@ function wireSyncPanel() {
   $("app-sync-claim-mine").addEventListener("click", async () => {
     const uid = state.uid;
     if (!accountSync.unclaimedWorkspace() || !accountSync.setSyncAccount(uid)) {
-      status(T("app_err_unknown"), true);
+      statusKey("app_err_unknown", true);
       return;
     }
     renderLocalSummary();
@@ -1261,7 +1278,7 @@ function wireSyncPanel() {
     // away everything the browser is holding, and nobody gets it back by clicking again.
     if (!accountSync.unclaimedWorkspace() || !confirm(T("app_wipe_confirm"))) return;
     if (!clearDeviceData()) {
-      status(T("app_err_unknown"), true);
+      statusKey("app_err_unknown", true);
       return;
     }
     renderLocalSummary();
@@ -1292,7 +1309,7 @@ function wireAccountPanel() {
   $("app-verify-send").addEventListener("click", async () => {
     try {
       if (await accountMail("verify", {}, () => fb.sendEmailVerification(auth.currentUser))) {
-        status(T("app_verify_sent"));
+        statusKey("app_verify_sent");
       }
     } catch (err) { status(authMessage(err && err.code), true); }
   });
@@ -1305,7 +1322,7 @@ function wireAccountPanel() {
       if (await accountMail("change", { newEmail },
         () => fb.verifyBeforeUpdateEmail(auth.currentUser, newEmail))) {
         $("email-password").value = "";
-        status(T("app_email_changed"));
+        statusKey("app_email_changed");
       }
     } catch (err) { status(authMessage(err && err.code), true); }
   });
@@ -1317,7 +1334,7 @@ function wireAccountPanel() {
       await fb.updatePassword(auth.currentUser, $("password-new").value);
       $("password-current").value = "";
       $("password-new").value = "";
-      status(T("app_password_changed"));
+      statusKey("app_password_changed");
     } catch (err) { status(authMessage(err && err.code), true); }
   });
 
@@ -1339,7 +1356,7 @@ function wireAccountPanel() {
   $("app-wipe").addEventListener("click", () => {
     if (!confirm(T("app_wipe_confirm"))) return;
     if (!clearDeviceData()) {
-      status(T("app_err_unknown"), true);
+      statusKey("app_err_unknown", true);
       return;
     }
     // The workspace is read fresh from localStorage on every call, so the lists redraw
@@ -1347,7 +1364,7 @@ function wireAccountPanel() {
     // so the only thing on this page that changes is the sync tab's summary.
     document.dispatchEvent(new CustomEvent("workspacechange"));
     renderLocalSummary();
-    status(T("app_wipe_done"));
+    statusKey("app_wipe_done");
   });
 
   $("app-export").addEventListener("click", async () => {
@@ -1364,7 +1381,7 @@ function wireAccountPanel() {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch (err) { status(T("app_err_unknown"), true); }
+    } catch (err) { statusKey("app_err_unknown", true); }
   });
 
   $("app-delete-account").addEventListener("click", async () => {
@@ -1383,7 +1400,7 @@ function wireAccountPanel() {
       accountSync.setSyncAccount("");
       await deleteEverything();
       await fb.deleteUser(auth.currentUser);
-      status(T("app_deleted"));
+      statusKey("app_deleted");
     } catch (err) {
       const code = err && err.code;
       // Firestore refusing the delete is not the visitor getting something wrong, and
@@ -1461,6 +1478,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // through leaves a page where some buttons answer and others are dead — and with a
     // bare catch that looked exactly like a page that had simply not loaded.
     console.error("LiczMat /app/ did not finish starting:", err);
-    status(T("app_err_unknown"), true);
+    statusKey("app_err_unknown", true);
   });
 });

@@ -151,7 +151,9 @@ const BUDGET = {
   // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
   // the runtime half of the one-letter-word rule; the quote and account pages also carry the
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
-  "kalkulatory/index.html": [262, 66],
+  // 2026-10-03 (RESZTKI): field errors, the phone check, plain status and preset links in
+  // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
+  "kalkulatory/index.html": [263, 66],
   "kalkulatory/plytki-panele-gres/index.html": [420, 128],
   // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
   // (the header menu and the footer's list) and it went from ten rows to thirteen. That is
@@ -211,7 +213,9 @@ const BUDGET = {
   // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
   // the runtime half of the one-letter-word rule; the quote and account pages also carry the
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
-  "sklepy/index.html": [249, 65],
+  // 2026-10-03 (RESZTKI): field errors, the phone check, plain status and preset links in
+  // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
+  "sklepy/index.html": [250, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
   // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
@@ -268,7 +272,9 @@ const BUDGET = {
   // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
   // the runtime half of the one-letter-word rule; the quote and account pages also carry the
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
-  "wyceny/index.html": [481, 135],
+  // 2026-10-03 (RESZTKI): field errors, the phone check, plain status and preset links in
+  // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
+  "wyceny/index.html": [482, 135],
   "terminarz/index.html": [418, 126],
   // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
   // one page that carries every store the account syncs, and session 59 gave it a third:
@@ -315,7 +321,11 @@ const BUDGET = {
   // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
   // the runtime half of the one-letter-word rule; the quote and account pages also carry the
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
-  "app/index.html": [406, 106],
+  // 2026-10-03, +0.6 kB raw: shared phone validation and its translated feedback now
+  // protect client and company writes; the account dashboard loads that shared CRM model.
+  // 2026-10-03 (RESZTKI): field errors, the phone check, plain status and preset links in
+  // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
+  "app/index.html": [408, 106],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
@@ -379,7 +389,9 @@ const CEILING = [520, 145];
  * it is half again the size of the Latin ones and there is nothing to be done about it
  * short of not shipping the language. assets/app.js is 29.4 kB gzipped.
  */
-const ASSET_CEILING = [106, 31];
+// 2026-10-03: assets/styles.min.css reached 106.4 kB raw (17 kB gzipped) with the review's
+// fixes and is now the largest file by raw size; 107 keeps the ceiling a ceiling.
+const ASSET_CEILING = [107, 31];
 
 /** The two pages the build does not generate and never overwrites. */
 const HAND_WRITTEN = ["privacy-policy.html", "404.html"];
