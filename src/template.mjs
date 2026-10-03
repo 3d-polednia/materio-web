@@ -308,7 +308,14 @@ export function page(p) {
      arrives — the consent defaults, the saved "accept", the config, an event from the
      consent banner — is queued and replayed by it in order. Consent is therefore still
      set before the library can read a cookie, which is the one thing about this block
-     that must not move. -->
+     that must not move.
+
+     The library is also fetched only once the visitor has said yes (Consent Mode
+     "basic"). Until 2026-10 it was fetched for everyone and sent cookieless pings while
+     consent was still denied ("advanced"); those pings carry the IP address, the German
+     DSK counts that as needing consent, and the privacy policy promises that Analytics
+     starts only after it is given. A saved "accept" loads it after load as before, a
+     click on the banner's accept loads it then, through the consentchange event. -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -335,16 +342,25 @@ export function page(p) {
   // that keeps this from being the one navigation that goes uncounted.
   (function () {
     var sent = false;
+    function granted() {
+      try { return localStorage.getItem('materio_consent') === 'granted'; } catch (e) { return false; }
+    }
     function loadTag() {
-      if (sent) return;
+      if (sent || !granted()) return;
       sent = true;
       var s = document.createElement('script');
       s.async = true;
       s.src = 'https://www.googletagmanager.com/gtag/js?id=${GA_ID}';
       document.head.appendChild(s);
     }
-    if (document.readyState === 'complete') setTimeout(loadTag, 0);
-    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+    function afterLoad() {
+      if (document.readyState === 'complete') setTimeout(loadTag, 0);
+      else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+    }
+    afterLoad();
+    document.addEventListener('consentchange', function (e) {
+      if (e.detail && e.detail.granted) afterLoad();
+    });
   })();
 </script>`;
   const dnsPrefetch = secret ? "" : `<!-- The analytics tag is the only third-party request a public page makes, and since

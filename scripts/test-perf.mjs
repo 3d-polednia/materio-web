@@ -610,6 +610,10 @@ head("5. what stands between the visitor and the first paint");
         w.html.indexOf("gtag('consent', 'default'") < w.html.indexOf("googletagmanager.com/gtag/js"));
       check(`${w.file} waits for load before fetching the tag`,
         w.html.includes("window.addEventListener('load'"));
+      // P18, 2026-10-03: Consent Mode "basic". No consent, no request to Google at all.
+      check(`${w.file} fetches the tag only after consent`,
+        w.html.includes("if (sent || !granted()) return;")
+        && w.html.includes("document.addEventListener('consentchange'"));
     }
     check(`${w.file} opens no connection it will not use during the render`,
       !w.html.includes('rel="preconnect"'));

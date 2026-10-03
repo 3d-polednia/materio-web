@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com 'sha256-U90HsvI1oAM1K+XtcHRs58ChSIOUGMMnFJnUluIJTUM=' 'sha256-vps+zE8Yo8MxrliKpZcbdJBhzWyvyN5AfH4FYefmIp4=' 'sha256-kzrCuQbwvLQ3gH4TIYy5b0/BnHaxFIBphPfEwMCWExE='; style-src 'self'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' blob: https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net; frame-src 'self'; manifest-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com 'sha256-U90HsvI1oAM1K+XtcHRs58ChSIOUGMMnFJnUluIJTUM=' 'sha256-oa3ynefWb1ZxYFVg6U5KKmXy2ecmWWCgP8lCgw0kTNI=' 'sha256-kzrCuQbwvLQ3gH4TIYy5b0/BnHaxFIBphPfEwMCWExE='; style-src 'self'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' blob: https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net; frame-src 'self'; manifest-src 'self'">
 <script>
   // "js" says the drawer, the pop-up menus and everything else that needs a script
   // will work. Without it the navigation renders as a plain list instead of hiding
@@ -46,16 +46,25 @@
   // that keeps this from being the one navigation that goes uncounted.
   (function () {
     var sent = false;
+    function granted() {
+      try { return localStorage.getItem('materio_consent') === 'granted'; } catch (e) { return false; }
+    }
     function loadTag() {
-      if (sent) return;
+      if (sent || !granted()) return;
       sent = true;
       var s = document.createElement('script');
       s.async = true;
       s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
       document.head.appendChild(s);
     }
-    if (document.readyState === 'complete') setTimeout(loadTag, 0);
-    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+    function afterLoad() {
+      if (document.readyState === 'complete') setTimeout(loadTag, 0);
+      else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+    }
+    afterLoad();
+    document.addEventListener('consentchange', function (e) {
+      if (e.detail && e.detail.granted) afterLoad();
+    });
   })();
 </script>
 <meta charset="utf-8">

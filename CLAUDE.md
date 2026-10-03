@@ -2030,6 +2030,12 @@ Kotlin side of it. Change one, change all three.
   third-party request on the render path and by some distance the largest download on a
   page. There is no `preconnect` any more either: it opened a TLS connection for a request
   that no longer happens during the render.
+- **Analytics is fetched only after consent (Consent Mode "basic", 2026-10-03, P18).** The
+  loader in the same block checks `localStorage['materio_consent'] === 'granted'` before it
+  appends `gtag/js`, and listens for `consentchange` so the banner's accept loads it at once.
+  Before that the library loaded for everyone and sent cookieless pings with the IP while
+  consent was denied ("advanced"), which the German DSK treats as needing consent and which
+  the privacy policy ("starts only after consent") did not allow. Do not go back to advanced.
 - **Bump `STAMP` in `scripts/build.mjs`** whenever a shipped asset changes, then rebuild.
   It is the single `?v=` value for every page. GitHub Pages serves assets with
   `max-age=600`, so without it a visitor can run new markup against a stale stylesheet.

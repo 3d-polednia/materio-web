@@ -65,7 +65,8 @@ sklepów, SEO oraz zarządzanie assetami.
 - **Minimum zewnętrznych zapytań.** Strona nie ładuje czcionek z sieci. Google
   Analytics (GA4) działa w Consent Mode v2: `analytics_storage` startuje jako
   `denied` i włącza się dopiero po kliknięciu zgody w banerze — wybór zapisuje
-  `localStorage['materio_consent']`. Pozostałe wyjątki, tylko na żądanie
+  `localStorage['materio_consent']`. Sama biblioteka `gtag.js` pobiera się dopiero
+  po zgodzie (tryb „basic”, od 2026-10-03); bez zgody strona nie wysyła nic do Google. Pozostałe wyjątki, tylko na żądanie
   użytkownika w sekcji „Sklepy": embed Google Maps oraz zapytanie do
   OpenStreetMap/Overpass.
 - **Treść indeksowalna w każdym z 10 języków.** Każdy język ma własny adres
