@@ -13,6 +13,13 @@ export const WELCOME_LANGS = [
 export const WELCOME_FROM = "LiczMat <contact@liczmat.com>";
 export const WELCOME_REPLY_TO = "contact@liczmat.com";
 
+/**
+ * The signature's logo: the mark and the word, rendered once to a 2x PNG on a white ground
+ * (assets/email/liczmat-logo.png, 432 x 144) so it reads in light and dark mail clients.
+ * Served by liczmat.com itself; mail clients do not show SVG.
+ */
+export const WELCOME_LOGO = "https://liczmat.com/assets/email/liczmat-logo.png";
+
 const URL_CALC_INDEX = Object.freeze({
   "pl": "https://liczmat.com/kalkulatory/",
   "uk": "https://liczmat.com/uk/kalkulyatory/",
@@ -99,7 +106,8 @@ const T = {
     calcText: "Kalkulatory",
     appText: "Konto",
     playText: "Google Play",
-    privacyText: "Polityka prywatności"
+    privacyText: "Polityka prywatności",
+    roleText: "Kalkulator materiałów budowlanych"
   },
   uk: {
     subject: "Вітаємо в LiczMat",
@@ -110,7 +118,8 @@ const T = {
     calcText: "Калькулятори",
     appText: "Обліковий запис",
     playText: "Google Play",
-    privacyText: "Політика конфіденційності"
+    privacyText: "Політика конфіденційності",
+    roleText: "Калькулятор будівельних матеріалів"
   },
   de: {
     subject: "Willkommen bei LiczMat",
@@ -121,7 +130,8 @@ const T = {
     calcText: "Rechner",
     appText: "Ihr Konto",
     playText: "Google Play",
-    privacyText: "Datenschutzerklärung"
+    privacyText: "Datenschutzerklärung",
+    roleText: "Baustoffrechner"
   },
   en: {
     subject: "Welcome to LiczMat",
@@ -132,7 +142,8 @@ const T = {
     calcText: "Calculators",
     appText: "Account",
     playText: "Google Play",
-    privacyText: "Privacy policy"
+    privacyText: "Privacy policy",
+    roleText: "Building material calculator"
   },
   cs: {
     subject: "Vítejte v LiczMat",
@@ -143,7 +154,8 @@ const T = {
     calcText: "Kalkulačky",
     appText: "Účet",
     playText: "Google Play",
-    privacyText: "Zásady ochrany osobních údajů"
+    privacyText: "Zásady ochrany osobních údajů",
+    roleText: "Kalkulačka stavebních materiálů"
   },
   sk: {
     subject: "Vitajte v LiczMat",
@@ -154,7 +166,8 @@ const T = {
     calcText: "Kalkulačky",
     appText: "Účet",
     playText: "Google Play",
-    privacyText: "Zásady ochrany osobných údajov"
+    privacyText: "Zásady ochrany osobných údajov",
+    roleText: "Kalkulačka stavebných materiálov"
   },
   ro: {
     subject: "Bun venit la LiczMat",
@@ -165,7 +178,8 @@ const T = {
     calcText: "Calculatoare",
     appText: "Cont",
     playText: "Google Play",
-    privacyText: "Politica de confidențialitate"
+    privacyText: "Politica de confidențialitate",
+    roleText: "Calculator de materiale de construcții"
   },
   hr: {
     subject: "Dobrodošli u LiczMat",
@@ -176,7 +190,8 @@ const T = {
     calcText: "Kalkulatori",
     appText: "Račun",
     playText: "Google Play",
-    privacyText: "Pravila privatnosti"
+    privacyText: "Pravila privatnosti",
+    roleText: "Kalkulator građevinskog materijala"
   },
   sr: {
     subject: "Dobrodošli u LiczMat",
@@ -187,7 +202,8 @@ const T = {
     calcText: "Kalkulatori",
     appText: "Nalog",
     playText: "Google Play",
-    privacyText: "Politika privatnosti"
+    privacyText: "Politika privatnosti",
+    roleText: "Kalkulator građevinskog materijala"
   },
   it: {
     subject: "Benvenuto su LiczMat",
@@ -198,7 +214,8 @@ const T = {
     calcText: "Calcolatori",
     appText: "Account",
     playText: "Google Play",
-    privacyText: "Informativa sulla privacy"
+    privacyText: "Informativa sulla privacy",
+    roleText: "Calcolatore di materiali edili"
   },
   nl: {
     subject: "Welkom bij LiczMat",
@@ -209,7 +226,8 @@ const T = {
     calcText: "Rekenmachines",
     appText: "Account",
     playText: "Google Play",
-    privacyText: "Privacybeleid"
+    privacyText: "Privacybeleid",
+    roleText: "Rekenhulp voor bouwmaterialen"
   },
   es: {
     subject: "Bienvenido a LiczMat",
@@ -220,7 +238,8 @@ const T = {
     calcText: "Calculadoras",
     appText: "Cuenta",
     playText: "Google Play",
-    privacyText: "Política de privacidad"
+    privacyText: "Política de privacidad",
+    roleText: "Calculadora de materiales de construcción"
   },
   fr: {
     subject: "Bienvenue sur LiczMat",
@@ -231,7 +250,8 @@ const T = {
     calcText: "Calculateurs",
     appText: "Compte",
     playText: "Google Play",
-    privacyText: "Politique de confidentialité"
+    privacyText: "Politique de confidentialité",
+    roleText: "Calculateur de matériaux de construction"
   }
 };
 
@@ -263,6 +283,11 @@ ${t.playText}: ${urlPlay}
 
 ${t.questions}
 
+--
+${OPERATOR.name}
+LiczMat · ${t.roleText}
+https://liczmat.com · contact@liczmat.com
+
 ${OPERATOR.name}, ${OPERATOR.address}, USt-IdNr. ${OPERATOR.taxId}
 ${t.privacyText}: ${urlPrivacy}
 `;
@@ -290,6 +315,21 @@ ${t.privacyText}: ${urlPrivacy}
     
     <p style="font-size: 16px; margin: 0 0 32px 0;">${t.questions}</p>
     
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; margin: 0 0 24px 0;">
+      <tr>
+        <td style="padding: 0 16px 0 0; vertical-align: middle;">
+          <a href="https://liczmat.com/" style="text-decoration: none;"><img src="${WELCOME_LOGO}" width="162" height="54" alt="LiczMat" style="display: block; border: 0; outline: none;"></a>
+        </td>
+        <td style="padding: 0 0 0 16px; vertical-align: middle; border-left: 1px solid #dddddd; font-size: 14px; line-height: 1.5; color: #111111;">
+          <strong style="font-size: 15px;">${OPERATOR.name}</strong><br>
+          <span style="color: #555555;">LiczMat · ${t.roleText}</span><br>
+          <a href="https://liczmat.com/" style="color: #3d6b00; text-decoration: underline;">liczmat.com</a>
+          <span style="color: #999999;">&nbsp;·&nbsp;</span>
+          <a href="mailto:contact@liczmat.com" style="color: #3d6b00; text-decoration: underline;">contact@liczmat.com</a>
+        </td>
+      </tr>
+    </table>
+
     <div style="font-size: 12px; color: #555555; border-top: 1px solid #eeeeee; padding-top: 16px;">
       ${OPERATOR.name}, ${OPERATOR.address}, USt-IdNr. ${OPERATOR.taxId}<br>
       <a href="${urlPrivacy}" style="color: #555555; text-decoration: underline;">${t.privacyText}</a>
