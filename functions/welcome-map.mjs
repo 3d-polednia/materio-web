@@ -84,8 +84,7 @@ const T = {
     calcText: "Kalkulatory",
     appText: "Konto",
     playText: "Google Play",
-    privacyText: "Polityka prywatności",
-    roleText: "Kalkulator materiałów budowlanych"
+    privacyText: "Polityka prywatności"
   },
   uk: {
     subject: "Вітаємо в LiczMat",
@@ -96,8 +95,7 @@ const T = {
     calcText: "Калькулятори",
     appText: "Обліковий запис",
     playText: "Google Play",
-    privacyText: "Політика конфіденційності",
-    roleText: "Калькулятор будівельних матеріалів"
+    privacyText: "Політика конфіденційності"
   },
   de: {
     subject: "Willkommen bei LiczMat",
@@ -108,8 +106,7 @@ const T = {
     calcText: "Rechner",
     appText: "Ihr Konto",
     playText: "Google Play",
-    privacyText: "Datenschutzerklärung",
-    roleText: "Baustoffrechner"
+    privacyText: "Datenschutzerklärung"
   },
   en: {
     subject: "Welcome to LiczMat",
@@ -120,8 +117,7 @@ const T = {
     calcText: "Calculators",
     appText: "Account",
     playText: "Google Play",
-    privacyText: "Privacy policy",
-    roleText: "Building material calculator"
+    privacyText: "Privacy policy"
   },
   cs: {
     subject: "Vítejte v LiczMat",
@@ -132,8 +128,7 @@ const T = {
     calcText: "Kalkulačky",
     appText: "Účet",
     playText: "Google Play",
-    privacyText: "Zásady ochrany osobních údajů",
-    roleText: "Kalkulačka stavebních materiálů"
+    privacyText: "Zásady ochrany osobních údajů"
   },
   sk: {
     subject: "Vitajte v LiczMat",
@@ -144,8 +139,7 @@ const T = {
     calcText: "Kalkulačky",
     appText: "Účet",
     playText: "Google Play",
-    privacyText: "Zásady ochrany osobných údajov",
-    roleText: "Kalkulačka stavebných materiálov"
+    privacyText: "Zásady ochrany osobných údajov"
   },
   ro: {
     subject: "Bun venit la LiczMat",
@@ -156,8 +150,7 @@ const T = {
     calcText: "Calculatoare",
     appText: "Cont",
     playText: "Google Play",
-    privacyText: "Politica de confidențialitate",
-    roleText: "Calculator de materiale de construcții"
+    privacyText: "Politica de confidențialitate"
   },
   hr: {
     subject: "Dobrodošli u LiczMat",
@@ -168,8 +161,7 @@ const T = {
     calcText: "Kalkulatori",
     appText: "Račun",
     playText: "Google Play",
-    privacyText: "Pravila privatnosti",
-    roleText: "Kalkulator građevinskog materijala"
+    privacyText: "Pravila privatnosti"
   },
   sr: {
     subject: "Dobrodošli u LiczMat",
@@ -180,8 +172,7 @@ const T = {
     calcText: "Kalkulatori",
     appText: "Nalog",
     playText: "Google Play",
-    privacyText: "Politika privatnosti",
-    roleText: "Kalkulator građevinskog materijala"
+    privacyText: "Politika privatnosti"
   },
   it: {
     subject: "Benvenuto su LiczMat",
@@ -192,8 +183,7 @@ const T = {
     calcText: "Calcolatori",
     appText: "Account",
     playText: "Google Play",
-    privacyText: "Informativa sulla privacy",
-    roleText: "Calcolatore di materiali edili"
+    privacyText: "Informativa sulla privacy"
   },
   nl: {
     subject: "Welkom bij LiczMat",
@@ -204,8 +194,7 @@ const T = {
     calcText: "Rekenmachines",
     appText: "Account",
     playText: "Google Play",
-    privacyText: "Privacybeleid",
-    roleText: "Rekenhulp voor bouwmaterialen"
+    privacyText: "Privacybeleid"
   },
   es: {
     subject: "Bienvenido a LiczMat",
@@ -216,8 +205,7 @@ const T = {
     calcText: "Calculadoras",
     appText: "Cuenta",
     playText: "Google Play",
-    privacyText: "Política de privacidad",
-    roleText: "Calculadora de materiales de construcción"
+    privacyText: "Política de privacidad"
   },
   fr: {
     subject: "Bienvenue sur LiczMat",
@@ -228,8 +216,7 @@ const T = {
     calcText: "Calculateurs",
     appText: "Compte",
     playText: "Google Play",
-    privacyText: "Politique de confidentialité",
-    roleText: "Calculateur de matériaux de construction"
+    privacyText: "Politique de confidentialité"
   }
 };
 

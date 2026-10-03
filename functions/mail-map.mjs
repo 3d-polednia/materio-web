@@ -27,19 +27,19 @@ export const URL_PRIVACY = Object.freeze({
 });
 
 const SIGNATURE = Object.freeze({
-  pl: ["Zespół LiczMat", "Kalkulator materiałów budowlanych", "Polityka prywatności"],
-  uk: ["Команда LiczMat", "Калькулятор будівельних матеріалів", "Політика конфіденційності"],
-  de: ["Das LiczMat-Team", "Baustoffrechner", "Datenschutzerklärung"],
-  en: ["The LiczMat team", "Building material calculator", "Privacy policy"],
-  cs: ["Tým LiczMat", "Kalkulačka stavebních materiálů", "Zásady ochrany osobních údajů"],
-  sk: ["Tím LiczMat", "Kalkulačka stavebných materiálov", "Zásady ochrany osobných údajov"],
-  ro: ["Echipa LiczMat", "Calculator de materiale de construcții", "Politica de confidențialitate"],
-  hr: ["Tim LiczMat", "Kalkulator građevinskog materijala", "Pravila privatnosti"],
-  sr: ["Tim LiczMat", "Kalkulator građevinskog materijala", "Politika privatnosti"],
-  it: ["Il team di LiczMat", "Calcolatore di materiali edili", "Informativa sulla privacy"],
-  nl: ["Het LiczMat-team", "Rekenhulp voor bouwmaterialen", "Privacybeleid"],
-  es: ["El equipo de LiczMat", "Calculadora de materiales de construcción", "Política de privacidad"],
-  fr: ["L'équipe LiczMat", "Calculateur de matériaux de construction", "Politique de confidentialité"]
+  pl: ["Zespół LiczMat", "Kalkulatory materiałów i organizacja pracy dla firm", "Polityka prywatności"],
+  uk: ["Команда LiczMat", "Калькулятори матеріалів і організація роботи для фірм", "Політика конфіденційності"],
+  de: ["Das LiczMat-Team", "Materialrechner und Arbeitsorganisation für Betriebe", "Datenschutzerklärung"],
+  en: ["The LiczMat team", "Material calculators and job management for businesses", "Privacy policy"],
+  cs: ["Tým LiczMat", "Kalkulačky materiálu a organizace práce pro firmy", "Zásady ochrany osobních údajů"],
+  sk: ["Tím LiczMat", "Kalkulačky materiálu a organizácia práce pre firmy", "Zásady ochrany osobných údajov"],
+  ro: ["Echipa LiczMat", "Calculatoare de materiale și organizarea lucrărilor pentru firme", "Politica de confidențialitate"],
+  hr: ["Tim LiczMat", "Kalkulatori materijala i organizacija posla za tvrtke", "Pravila privatnosti"],
+  sr: ["Tim LiczMat", "Kalkulatori materijala i organizacija posla za firme", "Politika privatnosti"],
+  it: ["Il team di LiczMat", "Calcolatori di materiali e organizzazione del lavoro per imprese", "Informativa sulla privacy"],
+  nl: ["Het LiczMat-team", "Materiaalcalculators en werkplanning voor bedrijven", "Privacybeleid"],
+  es: ["El equipo de LiczMat", "Calculadoras de materiales y organización del trabajo para empresas", "Política de privacidad"],
+  fr: ["L'équipe LiczMat", "Calculateurs de matériaux et organisation du travail pour les entreprises", "Politique de confidentialité"]
 });
 
 export function mailLang(lang) {
