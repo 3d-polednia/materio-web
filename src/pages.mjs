@@ -13,7 +13,7 @@ import {
   BASE as BASE_URL, LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlAndroid, urlCookies, urlCompany, urlClients, urlQuotes,
-  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact,
+  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact, urlPrivacy,
   CALC_SLUG, PLAY_URL, URL_APP, URL_PRIVACY, ENTITY, entityRows,
 } from "./site.mjs";
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
@@ -284,7 +284,7 @@ function faqSection(t) {
     <div class="faq">
       ${FAQ_KEYS.map((n, i) => {
         const answer = n === 5
-          ? `<p><span>${esc(t("faq_a5"))}</span> <a href="/privacy-policy.html">${esc(t("faq_a5_link"))}</a>.</p>`
+          ? `<p><span>${esc(t("faq_a5"))}</span> <a href="${urlPrivacy(t.lang)}">${esc(t("faq_a5_link"))}</a>.</p>`
           : `<p>${esc(t(`faq_a${n}`))}</p>`;
         return `<details${i === 0 ? " open" : ""}><summary>${esc(t(`faq_q${n}`))}</summary>${answer}</details>`;
       }).join("\n      ")}
@@ -913,7 +913,7 @@ export function cookiesMain(lang, t) {
       <p class="muted">${esc(t("cookiepage_third_d"))}</p>
       ${table(COOKIE_THIRD_ROWS)}
       <p class="muted src-note">${esc(t("cookiepage_note"))}
-        <a href="/privacy-policy.html">${esc(t("foot_privacy"))}</a></p>
+        <a href="${urlPrivacy(lang)}">${esc(t("foot_privacy"))}</a></p>
     </div>
   </section>
 
@@ -995,7 +995,7 @@ export function contactMain(lang, t) {
       <h2>${esc(t("contactpage_h_data"))}</h2>
       <p class="muted">${esc(t("contactpage_data_d"))}</p>
       <p class="ws-links">
-        <a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a>
+        <a href="${urlPrivacy(lang)}">${esc(t("foot_privacy"))}</a>
         <a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a>
       </p>
     </div>
@@ -1141,7 +1141,7 @@ export function androidMain(lang, t, calcs, cat) {
       </ul>
       ${playBadge(lang, "install")}
       <p class="gp-tm">${esc(t("gp_tm"))}</p>
-      <p class="muted src-note"><a href="/privacy-policy.html">${esc(t("foot_privacy"))}</a></p>
+      <p class="muted src-note"><a href="${urlPrivacy(lang)}">${esc(t("foot_privacy"))}</a></p>
     </div>
   </section>
 </main>`;

@@ -498,7 +498,8 @@ const BUDGET = {
   // one-line link to Moje materiały under the quote's material form.
   // 2026-10-01: the share panel makes French widest at 771; four words remain for drift.
   // 2026-10-01, 775 -> 780, measured 776 words (fr): the share panel's e-mail chooser.
-  company: 330, clients: 550, jobs: 544, quotes: 780, calendar: 450,
+  // A full thirteen-language rebuild measures French at 556; these are existing form labels.
+  company: 330, clients: 560, jobs: 544, quotes: 780, calendar: 450,
   // 2026-10-01: public quote markup is widest in French at 176; four words remain for drift.
   "quote-share": 180,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
@@ -535,6 +536,8 @@ const BUDGET = {
      because it leaves when the typing starts. The widest single panel is still the
      profile; Klienci with its four labelled fields is what moved the number. */
   "liczmat-pro": 477, account: 470, dashboard: 130, share: 40, privacy: 3820,
+  // The compatibility URL carries the complete Polish and English policies in sequence.
+  "privacy-legacy": 4800,
 };
 
 /**
@@ -587,7 +590,7 @@ function strip(markup) {
     .trim();
 }
 
-const wordCount = (text) => (text ? text.split(" ").filter(Boolean).length : 0);
+const wordCount = (text) => (text ? text.replace(/\u00a0/g, " ").split(/\s+/).filter(Boolean).length : 0);
 
 /**
  * One element and everything inside it, found from a position in its opening tag.
@@ -778,7 +781,7 @@ for (const [lang, phrases] of Object.entries(SLOP_BY_LANG)) {
     }
   }
 }
-for (const page of PAGES.filter((x) => x.lang === "pl" || x.file === "index.html")) {
+for (const page of PAGES.filter((x) => (x.lang === "pl" || x.file === "index.html") && x.id !== "privacy")) {
   let html;
   try { html = read(page.file); } catch { continue; }
   const visible = strip(html);

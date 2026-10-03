@@ -562,8 +562,10 @@ head("8. API: the fields a browser may not write");
     app.indexOf("listenProfile();"));
   check("the profile update writes lastSeenAt and appVersion, and nothing else",
     /updateDoc\(profile, \{ lastSeenAt: now, appVersion: "web" \}\)/.test(profile));
-  check("the first-sign-in document is those two and a createdAt",
-    /applyProfile\(\{ createdAt: now, lastSeenAt: now, appVersion: "web" \}\)/.test(profile)
+  // `lang` joined on 2026-10-02 (the welcome e-mail's language); the deployed rules allow it
+  // at creation only, and it is the page's own language attribute, five characters at most.
+  check("the first-sign-in document is those two, a createdAt and the page language",
+    /applyProfile\(\{ createdAt: now, lastSeenAt: now, appVersion: "web", lang: String\(document\.documentElement\.lang \|\| "pl"\)\.slice\(0, 5\) \}\)/.test(profile)
     && /setDoc\(profile, state\.profile\)/.test(profile));
 
   /* Session 37 put a live listener on users/{uid} so a plan granted by the server lands

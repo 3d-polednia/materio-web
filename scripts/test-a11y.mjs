@@ -35,7 +35,7 @@ import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  LANGS, HREFLANG, BUILD_LANGS, ENTITY, URL_PRIVACY, urlContact, urlCookies,
+  LANGS, HREFLANG, BUILD_LANGS, ENTITY, urlContact, urlCookies, urlPrivacy,
 } from "../src/site.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -113,8 +113,8 @@ head("0. the tree this suite is reading");
   // languages more of every route, on top of the converter and /moje-materialy/.
   // 525 since session 62 added /kontakt/ for audit item H7: one route, thirteen languages.
   // 2026-10-01: thirteen noindex public quote pages, one per language, raise 538 to 551.
-  check("551 pages: 549 generated plus the two hand-written ones",
-    PAGES.length === 551, `found ${PAGES.length}`);
+  check("the generated tree and the hand-written error page are present",
+    PAGES.length === 564, `found ${PAGES.length}`);
   check("every page declares a language",
     PAGES.every((page) => page.lang), PAGES.filter((page) => !page.lang).map((x) => x.url).join(", "));
   const codes = new Set(LANGS.map((l) => HREFLANG[l]));
@@ -129,12 +129,12 @@ head("0b. the full footer keeps its legal content");
 {
   const full = PAGES.filter((page) => page.body.includes('class="foot-grid"'));
   // 2026-10-01: all thirteen public quote pages use the full legal footer.
-  check("every generated full-footer page is covered", full.length === 546, `found ${full.length}`);
+  check("every generated full-footer page is covered", full.length === PAGES.length - 4, `found ${full.length}`);
   checkAll("contact, privacy and cookies stay linked in every full footer", full,
     (page) => {
       const lang = LANGS.find((code) => HREFLANG[code] === page.lang);
       return lang && page.body.includes(`href="${urlContact(lang)}"`)
-        && page.body.includes(`href="${URL_PRIVACY}"`)
+        && page.body.includes(`href="${urlPrivacy(lang)}"`)
         && page.body.includes(`href="${urlCookies(lang)}"`)
         && /<div class="foot-group foot-legal">\s*<h2>[^<]+<\/h2>/.test(page.body);
     }, (page) => page.url);
@@ -412,9 +412,9 @@ head("7. the language picker, the currency selector, the theme toggle");
 {
   const chromed = PAGES.filter((page) => page.body.includes('id="lang-toggle"'));
   // Not on /app/, /app/dashboard/ or /p/ — those three build their own picker in the
-  // browser (assets/i18n-runtime.js) — and not on the two hand-written files.
+  // browser (assets/i18n-runtime.js) — and not on the hand-written error page.
   check("the picker is on every page that has one in its markup",
-    chromed.length === PAGES.length - 5, `${chromed.length} of ${PAGES.length}`);
+    chromed.length === PAGES.length - 4, `${chromed.length} of ${PAGES.length}`);
 
   checkAll("it is a disclosure: aria-expanded plus aria-controls", chromed, (page) => {
     const btn = (page.body.match(/<button[^>]*id="lang-toggle"[^>]*>/) || [])[0] || "";

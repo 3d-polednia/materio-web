@@ -346,7 +346,7 @@ head("6. an own material is offered in a calculator, beside the catalogue");
   eq("choosing it fills the package area", cov, "1.44");
   eq("and the allowance", waste, "7");
   check("and the page says which material went in",
-    /Kowalskiego/.test(await page.$eval("[data-mat-chosen]", (e) => e.textContent)));
+    /Kowalskiego/.test(await page.$eval(".mat-open.has-material", (e) => e.textContent)));
   await page.close();
 }
 

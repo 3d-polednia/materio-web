@@ -753,7 +753,9 @@ export const welcomeMail = onDocumentCreated(
         port: 465,
         secure: true,
         auth: {
-          user: "contact@liczmat.com",
+          // Wysyła ta sama skrzynka, na którą przychodzą odpowiedzi (welcome-map.mjs).
+          // test-admin-map pilnuje, żeby w kodzie tego pliku nie było żadnego adresu.
+          user: WELCOME_REPLY_TO,
           pass: SMTP_PASSWORD.value()
         }
       });

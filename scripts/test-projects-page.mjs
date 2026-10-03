@@ -143,8 +143,9 @@ function check(name, cond, detail) {
   failures.push(`${section} — ${name}${detail ? `\n      ${detail}` : ""}`);
   return false;
 }
+const plainSpaces = (value) => typeof value === "string" ? value.replace(/\u00a0/g, " ") : value;
 const eq = (name, got, want) =>
-  check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
+  check(name, plainSpaces(got) === plainSpaces(want), `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
 
 const exe = findChromium();
 const { server, port } = await serve();

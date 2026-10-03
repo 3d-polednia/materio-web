@@ -66,10 +66,29 @@ function ensureLang(lang, done) {
   document.head.appendChild(el);
 }
 
+/* Keep this table identical to SHORT_WORDS in src/nbsp.mjs. The runtime is a classic
+   browser script, so it cannot import the build helper. */
+var LM_SHORT_WORDS = {
+  pl: ["a", "i", "o", "u", "w", "z"],
+  cs: ["a", "i", "k", "o", "s", "u", "v", "z"],
+  sk: ["a", "i", "k", "o", "s", "u", "v", "z"],
+  hr: ["a", "i", "k", "o", "s", "u", "v"],
+  sr: ["a", "i", "k", "o", "s", "u", "v"]
+};
+
+/** Bind a one-letter word to the word after it in languages that require this. */
+function nbspShortWordsRuntime(text, lang) {
+  var list = LM_SHORT_WORDS[lang];
+  if (typeof text !== "string" || !list) return text;
+  var re = new RegExp("(^|[\\s„\"(\\[/])([" + list.join("") + "]) ", "gi");
+  return text.replace(re, "$1$2\u00a0");
+}
+
 /** Translate a key for the page's language, falling back to the key itself. */
 function t(key, lang) {
   const l = lang || document.documentElement.lang || "pl";
-  return (I18N[l] && I18N[l][key]) || (I18N[Object.keys(I18N)[0]] || {})[key] || key;
+  const text = (I18N[l] && I18N[l][key]) || (I18N[Object.keys(I18N)[0]] || {})[key] || key;
+  return nbspShortWordsRuntime(text, l);
 }
 
 /** The language this page is written in. */

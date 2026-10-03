@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; script-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com 'sha256-U90HsvI1oAM1K+XtcHRs58ChSIOUGMMnFJnUluIJTUM=' 'sha256-vps+zE8Yo8MxrliKpZcbdJBhzWyvyN5AfH4FYefmIp4=' 'sha256-UG6QuMDbNmDaVHVqCCNzH+Lb6hpSKENFtStHmwy9vc4=' 'sha256-4S9trO2hEQuY9LAT9Fh6hcbynEmygzE/gT3uKYr+lAk='; style-src 'self'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' blob: https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net; frame-src 'self'; manifest-src 'self'">
+<script>
+  // "js" says the drawer, the pop-up menus and everything else that needs a script
+  // will work. Without it the navigation renders as a plain list instead of hiding
+  // behind a menu button nothing would answer.
+  document.documentElement.className += ' js';
+  try {
+    var m = localStorage.getItem('liczmat-theme');
+    if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    document.documentElement.setAttribute('data-theme-mode', m === 'dark' || m === 'light' ? m : 'system');
+    // What this browser was last told about the session (assets/account.js writes the
+    // key). It is read here, before the first paint, because a navigation link hangs off
+    // it: doing it in account.js, which loads at the end of the document, would show the
+    // link and then take it away. Still a hint and still never a gate: it decides which
+    // links are offered, and nothing may gate saving, counting or reading on it.
+    var s = localStorage.getItem('liczmat-signed-in');
+    if (s) document.documentElement.setAttribute('data-lm-level', s === '1' ? 'liczmat' : s);
+  } catch (e) {}
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // GDPR: analytics stays off until the visitor agrees (see consent banner).
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Re-apply a previously saved "accept" as early as possible.
+  try {
+    if (localStorage.getItem('materio_consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
+
+  gtag('config', 'G-22PS16K79V');
+
+  // After the page is usable, and never before. A page restored from the back/forward
+  // cache has already fired its load event, so the readyState branch is the fallback
+  // that keeps this from being the one navigation that goes uncounted.
+  (function () {
+    var sent = false;
+    function loadTag() {
+      if (sent) return;
+      sent = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-22PS16K79V';
+      document.head.appendChild(s);
+    }
+    if (document.readyState === 'complete') setTimeout(loadTag, 0);
+    else window.addEventListener('load', function () { setTimeout(loadTag, 0); });
+  })();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="dns-prefetch" href="https://www.googletagmanager.com">
+<title>Privacy Policy | LiczMat</title>
+<meta name="description" content="This policy describes what data the mobile application LiczMat, building materials calculator (App) and the website liczmat.com (Website) process, and for...">
+<meta name="author" content="LiczMat">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#faf7f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060c12" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="LiczMat">
+<meta name="application-name" content="LiczMat">
+<link rel="canonical" href="https://liczmat.com/en/privacy-policy/">
+<link rel="alternate" hreflang="pl" href="https://liczmat.com/polityka-prywatnosci/">
+<link rel="alternate" hreflang="uk" href="https://liczmat.com/uk/polityka-konfidentsiinosti/">
+<link rel="alternate" hreflang="de" href="https://liczmat.com/de/datenschutz/">
+<link rel="alternate" hreflang="en" href="https://liczmat.com/en/privacy-policy/">
+<link rel="alternate" hreflang="cs" href="https://liczmat.com/cs/ochrana-osobnich-udaju/">
+<link rel="alternate" hreflang="sk" href="https://liczmat.com/sk/ochrana-osobnych-udajov/">
+<link rel="alternate" hreflang="ro" href="https://liczmat.com/ro/politica-de-confidentialitate/">
+<link rel="alternate" hreflang="hr" href="https://liczmat.com/hr/pravila-privatnosti/">
+<link rel="alternate" hreflang="sr" href="https://liczmat.com/sr/politika-privatnosti/">
+<link rel="alternate" hreflang="it" href="https://liczmat.com/it/informativa-privacy/">
+<link rel="alternate" hreflang="nl" href="https://liczmat.com/nl/privacybeleid/">
+<link rel="alternate" hreflang="es" href="https://liczmat.com/es/politica-de-privacidad/">
+<link rel="alternate" hreflang="fr" href="https://liczmat.com/fr/politique-de-confidentialite/">
+<link rel="alternate" hreflang="x-default" href="https://liczmat.com/polityka-prywatnosci/">
+<link rel="icon" href="/assets/favicon.svg?v=20261003c" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png?v=20261003c" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=20261003c">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LiczMat">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="pl_PL">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="cs_CZ">
+<meta property="og:locale:alternate" content="sk_SK">
+<meta property="og:locale:alternate" content="ro_RO">
+<meta property="og:locale:alternate" content="hr_HR">
+<meta property="og:locale:alternate" content="sr_RS">
+<meta property="og:locale:alternate" content="it_IT">
+<meta property="og:locale:alternate" content="nl_NL">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:title" content="Privacy Policy | LiczMat">
+<meta property="og:description" content="This policy describes what data the mobile application LiczMat, building materials calculator (App) and the website liczmat.com (Website) process, and for...">
+<meta property="og:url" content="https://liczmat.com/en/privacy-policy/">
+<meta property="og:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="LiczMat. Policz. Zaplanuj. Zrealizuj.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Privacy Policy | LiczMat">
+<meta name="twitter:description" content="This policy describes what data the mobile application LiczMat, building materials calculator (App) and the website liczmat.com (Website) process, and for...">
+<meta name="twitter:image" content="https://liczmat.com/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="LiczMat. Policz. Zaplanuj. Zrealizuj.">
+<link rel="stylesheet" href="/assets/styles.min.css?v=20261003c">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "LiczMat",
+      "item": "https://liczmat.com/en/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Privacy Policy",
+      "item": "https://liczmat.com/en/privacy-policy/"
+    }
+  ]
+}
+</script>
+
+<script>window.LICZMAT_ALTERNATES = {
+  "pl": "/polityka-prywatnosci/",
+  "uk": "/uk/polityka-konfidentsiinosti/",
+  "de": "/de/datenschutz/",
+  "en": "/en/privacy-policy/",
+  "cs": "/cs/ochrana-osobnich-udaju/",
+  "sk": "/sk/ochrana-osobnych-udajov/",
+  "ro": "/ro/politica-de-confidentialitate/",
+  "hr": "/hr/pravila-privatnosti/",
+  "sr": "/sr/politika-privatnosti/",
+  "it": "/it/informativa-privacy/",
+  "nl": "/nl/privacybeleid/",
+  "es": "/es/politica-de-privacidad/",
+  "fr": "/fr/politique-de-confidentialite/"
+};</script>
+<script defer src="/assets/i18n.en.js?v=20261003c"></script>
+<script defer src="/assets/i18n-runtime.min.js?v=20261003c"></script>
+<script defer src="/assets/currency.min.js?v=20261003c"></script>
+<script defer src="/assets/account.min.js?v=20261003c"></script>
+<script defer src="/assets/main.min.js?v=20261003c"></script>
+</head>
+<body>
+<svg class="logo-defs" aria-hidden="true" focusable="false"><symbol id="lm-mark" viewBox="67.75 577 372 372"><g transform="translate(0,1024) scale(0.5,-0.5)"><path fill="currentColor" d="m148 787l0-107 22-24c11-14 24-28 27-32 3-4 18-21 33-38 25-29 54-62 89-104 8-9 19-23 26-31 13-15 52-62 76-92 9-11 21-25 26-32 6-7 21-26 35-42 13-17 25-31 26-31 1 0 16 18 33 39 18 22 37 46 43 53 6 7 15 18 19 23 4 6 18 23 31 38 13 15 28 34 35 42 7 8 19 22 27 32 8 10 29 34 45 53 17 19 33 38 37 43 4 4 26 29 48 55l42 48 0 107 0 107-59 0-60 0-12-17c-7-10-16-23-20-29-5-6-26-36-48-67-22-31-45-63-51-72-7-9-23-32-37-52-14-20-33-47-43-60-10-13-20-28-23-32-3-5-6-9-7-9-1 0-14 18-29 40-15 21-49 69-76 106-26 37-67 95-92 129l-44 63-59 0-60 0 0-107zm130-32c24-33 57-77 73-98 16-21 45-61 66-89 21-28 42-57 48-65 6-8 17-24 26-35 9-12 16-22 17-22 1 0 6 6 11 14 15 21 102 138 141 190 73 99 123 166 127 171l5 6 0-63 0-64-9-9c-19-22-205-249-254-308l-21-27-7 9c-4 4-27 33-51 63-25 30-51 62-58 71-8 9-21 25-30 36-34 41-90 108-113 137l-25 29 0 63 0 63 5-6c2-3 24-33 49-66z"/><path fill="var(--brand-lime)" d="m146 596l0-42 14 0c11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5 0-5 0-5 14-5 13 0 14 0 14-4 0-4-1-4-14-4-14 1-14 1-14-4 0-5 1-5 5-4 8 1 23-2 23-5 0-2-3-3-14-3-14 0-14 0-14-5l0-6 14 1c13 0 14 0 14-4 0-4-1-4-14-4l-14 1 0-5 0-6 25 0c21 0 25 0 25-3 0-3-4-3-25-3l-25 0 0-5 0-6 14 1c13 0 14 0 14-4 0-4-1-4-14-4-11 1-14 0-15-2-1-7 1-8 15-8 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5 0-5 0-5 14-5 13 0 14 0 14-4 0-4-1-4-14-4l-14 1 0-6 0-5 13 0c12 1 14 0 15-2 0-4-1-4-14-4-14 0-14 0-14-5l0-5 25 0c22 0 25 0 25-3-1-3-5-3-25-3l-25-1 0-5c0-5 0-5 9-4 12 1 19-1 19-5 0-2-3-3-14-3-14 0-14 0-14-5 0-5 0-5 14-5 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5l0-6 14 1c13 0 14 0 14-4 0-4-1-4-14-4l-14 1 0-5c0-6 0-6 14-6 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5l0-6 24 0c22 0 25 0 26-3 0-4-2-4-25-4l-25 0 0-5c0-5 0-5 14-5 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5 0-5 0-5 14-5 13 0 14 0 14-4 0-4-1-4-14-4-14 0-14 0-14-5 0-5 0-5 14-5 11 0 14-1 14-3 0-2-3-3-14-3-14 0-14 0-14-5l0-6 14 1c13 0 14 0 14-3-1-3-3-4-15-4-13 0-13 0-13-6l0-5 24 0c22 1 25 1 26-2 0-4-2-4-25-4l-25 0 0-38 0-38 39 0 39 0 0 7c0 11 2 19 5 19 2 0 3-3 3-13 0-12 0-13 5-13l5 0 0 25c1 22 2 26 4 26 2 0 3-4 4-26l0-25 5 0c5 0 5 1 5 13 1 7 2 13 3 13 1 0 2-6 3-13 0-12 0-13 5-13 4 0 5 1 5 6 0 10 3 20 5 20 2 0 3-3 3-13 0-13 0-13 5-13 5 0 5 0 5 13 0 12 0 13 4 13 4 0 4-1 4-13 0-13 0-13 5-13 5 0 5 0 5 13 0 10 1 13 3 13 2 0 3-3 3-13 1-11 1-12 5-13 5 0 5 0 5 25 1 23 1 26 5 27 3 0 3-2 3-26l0-26 5 0c5 0 5 0 5 13 0 12 0 13 4 13 4 0 4-1 4-13 0-13 0-13 5-13 5 0 5 0 5 13 0 10 1 13 3 13 2 0 3-3 3-13l0-13 6 0 6 0 0 13c0 10 1 13 3 13 2 0 3-3 3-13 0-13 0-13 5-13 5 0 5 1 5 10 0 12 1 16 5 16 2 0 3-3 3-13 0-12 0-13 5-13l5 0 0 25c1 22 2 26 4 26 3 0 3-4 3-26l0-25 6 0c5 0 5 0 5 13 0 10 1 13 3 13 2 0 3-3 3-13 0-13 0-13 5-13 5 0 5 0 5 13 0 12 0 13 4 13 4 0 4-1 4-13 0-13 0-13 5-13 5 0 5 0 5 13 0 10 1 13 3 13 2 0 3-3 3-13 0-13 0-13 6-13l5 0-1 13c0 10 0 13 3 14 4 1 6-3 5-16-1-11-1-11 4-11l6 0 0 26c1 21 2 25 4 25 2 0 3-4 4-25 0-22 1-26 3-26 3 0 3 5 3 36l-1 35-148 1-148 1-1 170-1 170-10 12c-5 7-14 16-18 21-5 5-11 12-14 16-10 13-23 26-26 26-3 0-3-7-3-42zm46-399c5-7 5-10 1-16-7-10-21-4-21 8 0 5 8 13 13 13 2 0 5-2 7-5z"/><path fill="var(--brand-lime)" d="m856 628c-5-6-14-16-21-23-22-25-21-21-21-61l0-36-23 0c-13 0-24-1-25-1-2 0-3-5-4-16-1-26-2-25 27-25l25 0 0-21 0-21-10 0c-6 0-10-1-12-3-1-2-2-9-2-20l1-18 12-1 11 0 0-22-1-21-23 0c-13-1-24-1-26-2-1-1-2-6-2-19l1-19 25-1 25-1 1-17c0-19-1-22-13-22l-7 0 0-19 1-20 9-1 9-1 1-18 0-19-25 0-26-1-1-14 0-15 54 0c30 1 42 1 27 1-27 1-29 1-29 5 0 4 1 4 28 4 28 0 28 0 28 4-1 4-2 5-12 4-14 0-20 1-20 5 0 2 3 3 16 3 16 0 16 0 16 5 0 5 0 5-16 5-13 0-16 1-16 3 0 2 3 3 16 3 16 0 16 0 16 5 0 5 0 5-16 5-13 0-16 1-16 3 0 2 3 3 16 3l16 0 0 6 0 5-16-1c-14 0-16 0-16 3 0 2 3 3 16 3 16 0 16 0 16 5l0 5-28 0c-24 1-29 1-29 4 0 3 5 3 29 4 26 0 28 0 28 4 0 4-1 4-13 4-8 0-15 1-17 2-6 3 1 6 15 6 14 0 15 0 15 5 0 4-1 4-15 4-14 0-16 0-17 4 0 3 1 3 16 3l16-1 0 6c0 5 0 5-11 4-13-2-21 0-21 4 0 2 3 3 16 3 16 0 16 0 16 5 0 5 0 5-16 5-13 0-16 1-16 3 0 2 3 3 16 3 16 0 16 0 16 5l0 5-28 0c-24 0-28 0-28 3 0 3 4 3 28 3l28 0 0 5c0 5 0 5-16 5-12 0-16 1-16 3 0 4 5 5 19 5 12 0 13 0 13 5 0 4-1 4-15 4-13 0-16 1-16 3 0 2 3 3 16 3 15 0 15 0 15 5 0 6 0 6-12 5-15-1-20 0-20 4 0 2 3 3 16 3 16 0 16 0 16 5 0 5 0 5-16 5-13 0-16 1-16 3 0 3 2 3 16 3l16-1 0 6 0 5-29 0c-24 0-29 0-29 3 0 3 5 3 29 3l29 0 0 5c0 5 0 5-16 5-12 0-16 1-16 3 0 2 4 3 14 4 8 1 15 1 16 0 1-1 2 1 2 4 0 5 0 5-16 5-15 0-16 0-16 4 0 4 1 4 16 4 16-1 16-1 16 4 0 5 0 5-15 5-13 0-16 1-16 3 0 2 3 3 16 3 14 0 15 0 15 5 0 4-1 4-13 4-8 0-15 1-17 2-6 3 1 6 15 6l15 0 0 6 0 5-28 0c-38 0-38 4 0 5l28 0 0 76c0 86 0 83-14 66z"/></g></symbol></svg>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/en/"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Main navigation">
+      <ul class="nav-list">
+        <li><a href="/en/calculators/">Calculators</a></li>
+        <li><a href="/en/materials/">Materials</a></li>
+        <li><a href="/en/stores/">Stores</a></li>
+        <li><a href="/en/liczmat-pro/">LiczMat Pro</a></li>
+        <li><a href="/en/android-app/">The app</a></li>
+      </ul>
+      <div class="pickers">
+        <div class="lang-picker" id="lang-picker">
+    <button type="button" class="lang-btn" id="lang-toggle" aria-expanded="false" aria-controls="lang-menu" aria-label="Language">
+      <span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span class="lang-btn-name">English</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <ul class="lang-menu" id="lang-menu" hidden>
+      <li><a class="lang-item" href="/polityka-prywatnosci/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+      <li><a class="lang-item" href="/uk/polityka-konfidentsiinosti/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+      <li><a class="lang-item" href="/de/datenschutz/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+      <li><span class="lang-item is-current" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></span></li>
+      <li><a class="lang-item" href="/cs/ochrana-osobnich-udaju/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+      <li><a class="lang-item" href="/sk/ochrana-osobnych-udajov/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+      <li><a class="lang-item" href="/ro/politica-de-confidentialitate/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+      <li><a class="lang-item" href="/hr/pravila-privatnosti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+      <li><a class="lang-item" href="/sr/politika-privatnosti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+      <li><a class="lang-item" href="/it/informativa-privacy/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+      <li><a class="lang-item" href="/nl/privacybeleid/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+      <li><a class="lang-item" href="/es/politica-de-privacidad/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+      <li><a class="lang-item" href="/fr/politique-de-confidentialite/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+    </ul>
+  </div>
+        <span class="cur-picker"><select id="currency-select" class="cur-select" aria-label="Currency" title="Currency"><option value="PLN">PLN</option><option value="EUR">EUR</option><option value="USD" selected>USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-account-cta>My account</a>
+    </nav>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
+<main id="main" tabindex="-1" class="doc">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="/en/">LiczMat</a></li><li aria-current="page">Privacy Policy</li></ol></nav>
+    <article lang="en">
+    <h1>Privacy Policy</h1>
+    <p class="muted"><time datetime="2026-10-02">2026-10-02</time></p>
+    <p class="muted privacy-translation"><a href="/de/datenschutz/">This is a translation. The German version is binding.</a></p>
+    <nav class="toc" aria-label="Contents"><ul><li><a href="#podejscie">1. Privacy approach</a></li><li><a href="#urzadzenie">2. Data stored on the device</a></li><li><a href="#konto">3. LiczMat account and synchronization (optional)</a></li><li><a href="#konto-jakie">3.1. What data we process when you have an account</a></li><li><a href="#konto-gdzie">3.2. Where the data is stored</a></li><li><a href="#konto-kto">3.3. Who has access to it</a></li><li><a href="#konto-sync">3.4. How synchronization works</a></li><li><a href="#konto-link">3.5. Sharing an estimate via link</a></li><li><a href="#konto-usun">3.6. How long we keep data and how to delete it</a></li><li><a href="#konto-podstawa">3.7. Legal basis</a></li><li><a href="#reklamy">4. Ads (Google AdMob)</a></li><li><a href="#reklamy-zgoda">4.1. Consent (GDPR) and personalized ads</a></li><li><a href="#reklamy-analiza">4.2. App analytics (Firebase / Google Analytics)</a></li><li><a href="#lokalizacja">5. Location and store search (Google Maps / Places)</a></li><li><a href="#strona">6. Website</a></li><li><a href="#komu">7. Who we share data with</a></li><li><a href="#komu-stripe">7.1. Payments (Stripe)</a></li><li><a href="#poza-eog">8. Data transfers outside the EEA</a></li><li><a href="#prawa">9. Your rights (GDPR)</a></li><li><a href="#dzieci">10. Children</a></li><li><a href="#zmiany">11. Changes and contact</a></li></ul></nav>
+    <h2 id="podejscie">1. Privacy approach</h2><p>This policy describes what data the mobile application <b>LiczMat, building materials calculator</b> ("App") and the website <b>liczmat.com</b> ("Website") process, and for what purpose. The data controller is <b>Michał Polednia</b>, Widderweg 17, 85570 Markt Schwaben, Deutschland ("we"), contact: <a href="mailto:contact@liczmat.com">contact@liczmat.com</a>.</p><p>LiczMat is built <b>offline-first</b>. All calculations are performed on your device and work without the internet. The local database is the single source of truth, and the cloud is merely a copy of it.</p><p><b>An account is optional.</b> You do not need to sign in to perform calculations. As long as you do not create an account, we do not send your projects or calculations to any server. A backup is a file that you export and store yourself. If you choose to create an account, the data described below will be sent to <b>Google Firebase</b>. See section 3 for details.</p><p>The App also uses other <b>Google</b> services (ads and map/store search), which process certain data. We describe this below.</p><h2 id="urzadzenie">2. Data stored on the device</h2><p>Locally, on your device, we store: projects, calculations, shopping lists, rooms, custom materials, and settings (e.g. language, currency, theme, contractor details). Uninstalling the App or clearing its data permanently removes this information from the device. You create and store the backup (export to a file) yourself.</p><p><b>The material catalog, your custom materials and prices, and settings are not synchronized.</b> They remain exclusively on the device, even if you have an account.</p><h2 id="konto">3. LiczMat account and synchronization (optional)</h2><p>You can create a <b>LiczMat account</b> to have the same projects on your smartphone and in your browser (<a href="/app/">liczmat.com/app/</a>). The account is free and completely voluntary. Without an account, the App and Website function as before.</p><h3 id="konto-jakie">3.1. What data we process when you have an account</h3><ul><li><b>Email address and password.</b> Handled by <b>Firebase Authentication</b>. We do not see or store your password, it is stored by Google as a hash. The Google sign-in window and pages accessed via links in account emails (e.g. password reset, email confirmation) are served by <b>auth.liczmat.com</b>, a Firebase Hosting service (Google) within the same project.</li><li><b>Sign in with Google</b> (optional alternative to password). In this case, there is no password. We receive the email address, display name, and an account ID from Google to link them to your data in LiczMat (the display name is used in the welcome email). We do not retrieve any other data from your Google account.</li><li><b>Account ID (UID)</b> assigned by Firebase.</li><li><b>Account content:</b> projects, rooms, estimates, and shopping lists. Names, quantities, units, prices, currency, calculator inputs, as well as creation and modification timestamps.</li><li><b>Technical data:</b> account creation date, last used date, and whether you are connecting via the App or the Website.</li></ul><h3 id="konto-gdzie">3.2. Where the data is stored</h3><p>The <b>Google Cloud Firestore</b> database and <b>Cloud Functions</b> run in the <b>europe-central2 (Warsaw)</b> region, which is within the European Union. However, the <b>Firebase Authentication</b> service (your login data, such as email address, display name, password hash, and Google account ID) runs on Google's global infrastructure, so this data may be processed in the United States (see section 8). Google acts here as a data processor on our behalf.</p><h3 id="konto-kto">3.3. Who has access to it</h3><p>Only the account owner. Firestore security rules allow reading and writing account data only for the authenticated user with the same ID. The only exception is a link that you create yourself. See section 3.5.</p><h3 id="konto-sync">3.4. How synchronization works</h3><p>After every local change, the App sends the document to Firestore and pulls changes from the cloud back into the device database. In case of a conflict, the newer entry wins (comparing timestamps). Deleting a record does not immediately remove it from the cloud: the document is marked as deleted so the other device learns about the deletion and does not restore it. These marks are cleared after <b>30 days</b>.</p><h3 id="konto-link">3.5. Sharing an estimate via link</h3><p>If you tap "Share", we create a <b>copy</b> of the selected project (name, estimates, shopping list, currency) at a random 128-bit address liczmat.com/p/&lt;token&gt;. This copy is <b>publicly readable for anyone who knows the link</b>. The token in the address is the only protection, so only share it with people who should see the estimate. The copy does not update automatically, you must update it manually via a button. Deleting the link revokes access immediately. The person opening the link does not need an account, and we collect no data about them other than standard Website analytics (section 6).</p><h3 id="konto-usun">3.6. How long we keep data and how to delete it</h3><p>We keep account data for as long as the account exists. You can delete individual projects and rooms at any time. You can delete the entire account yourself at <a href="/app/">liczmat.com/app/</a> → <b>Account</b> tab → <b>Delete account</b>. This deletes all account documents in Firestore (projects, rooms, estimates, shopping lists, and created links), and finally the account itself in Firebase Authentication. This cannot be undone. In the same tab, you can previously download all your account content as a JSON file. If you want us to do this for you, write to <a href="mailto:contact@liczmat.com">contact@liczmat.com</a>. You delete data stored on your device or in the browser separately by clearing the App data or site data.</p><h3 id="konto-podstawa">3.7. Legal basis</h3><p>Processing account data is necessary for the performance of the service you request. Art. 6(1)(b) GDPR (performance of a contract). Creating an account is voluntary, without it you can use all calculator features.</p><h2 id="reklamy">4. Ads (Google AdMob)</h2><p>The App is free and supported by ads provided by <b>Google AdMob</b>. Therefore, Google, as an ad provider, may collect and process:</p><ul><li><b>the advertising ID</b> (Android Advertising ID),</li><li>IP address and device data (model, operating system, language settings),</li><li>approximate location (based on IP address),</li><li>information about ad interactions (impressions, clicks).</li></ul><p>This data is used to serve ads, cap their frequency, measure performance, and prevent fraud. Google's policies describe this: <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">Google's Partner Sites Policy</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p><h3 id="reklamy-zgoda">4.1. Consent (GDPR) and personalized ads</h3><p>If you are located in the European Economic Area, the UK, or Switzerland, we show a consent dialog (Google User Messaging Platform) on the first launch, where you decide on personalized ads. Without your consent, only <b>non-personalized</b> ads are shown. You can change or withdraw your consent at any time by clearing the app data in system settings or resetting the advertising ID in Android settings. The legal basis for personalised ads is consent, Art. 6(1)(a) GDPR, and for reading or storing information on the device additionally § 25(1) TDDDG (German law on data protection in telecommunications and digital services). Non-personalised ads: legitimate interest in financing the free app, Art. 6(1)(f) GDPR.</p><h3 id="reklamy-analiza">4.2. App analytics (Firebase / Google Analytics)</h3><p>The App uses <b>Google Analytics for Firebase</b> to anonymously and in aggregate measure how its features are used (e.g. which calculators you open, the number of active users). This helps us improve LiczMat. Analytics is <b>disabled</b> by default and is only enabled after you give your consent in the same dialog (Google User Messaging Platform). Without consent, nothing is collected. The data is processed by Google in accordance with the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>. The legal basis is consent, Art. 6(1)(a) GDPR and § 25(1) TDDDG; consent can be withdrawn at any time with effect for the future.</p><h2 id="lokalizacja">5. Location and store search (Google Maps / Places)</h2><p>The "Find store" feature uses <b>Google Maps</b> and <b>Google Places</b>. If you grant location permission, the App uses your approximate or precise location to show nearby hardware stores and route you there. Requests to map services are processed by Google according to their privacy policy. You can deny location access. In that case, stores will not be found automatically, but all other features will work normally. We do not store your location, neither on the device nor in the account.</p><h2 id="strona">6. Website</h2><p>The website <b>liczmat.com</b> is static. When the site is opened, the host GitHub Pages (GitHub, Inc.) processes standard server log data (IP address, time, requested page, browser) to deliver the site securely; legal basis Art. 6(1)(f) GDPR (legitimate interest in a secure and reliable website). It uses <b>Google Analytics</b> (GA4) to anonymously and in aggregate measure traffic (e.g. how many people visit the Website and how many click through to Google Play), so we can improve it. Analytics is disabled by default: in accordance with the GDPR, we first ask for your consent, and Google Analytics (including setting cookies) only starts after you grant it. You can decline, and all other features will remain usable. The legal basis is consent, Art. 6(1)(a) GDPR and § 25(1) TDDDG; withdrawal at any time via the cookie/consent setting on the site, with effect for the future. Apart from Analytics, the Website does not use web fonts. All other code and styles are served from the Website's domain, and interactive calculators compute exclusively in your browser.</p><p>The exceptions are areas where external services are integrated. <b>Stores:</b> The Website embeds a <b>Google Maps</b> map, which is loaded from Google's servers. If you share your location, it is only used to center the map and is not stored anywhere. To show the list of nearest stores, the Website sends your approximate coordinates to the <b>OpenStreetMap (Overpass API)</b> service and retrieves public store data. The "Navigate" button opens the route in Google Maps. City suggestions based on postal codes use a GeoNames (geonames.org) database, CC BY 4.0, hosted directly on our server, and no third party receives the entered postal code. The legal basis is Art. 6(1)(a) GDPR when the visitor shares the location, otherwise the map loads only when the visitor opens the store finder. <b>/app/:</b> After logging in, the Website connects to <b>Firebase</b> (Authentication and Firestore) under the terms in section 3 and stores login data in the browser so you are not asked for a password on every visit. <b>/p/&lt;token&gt;:</b> The Website fetches the shared copy of an estimate from Firestore without logging in and without collecting data about the person opening the link. Both these subpages are excluded from indexing.</p><p><b>Projects, rooms, and estimates saved on the Website without logging in</b> remain exclusively in your browser's local storage (localStorage) and are not sent anywhere. We do not see them and have no access to them. You delete them by clearing site data in your browser. They only go to the cloud when you log into your account and manually click "Send from browser to account". From that moment, section 3 applies. We also store your language choice, currency choice, theme choice, and your decision regarding analytics consent in the browser.</p><h2 id="komu">7. Who we share data with</h2><p>We do not sell data and do not create user profiles. The data described above is processed by <b>Google</b> as a data processor: AdMob (ads), Maps and Places (maps and stores), Analytics (statistics), and, if you create an account, Firebase Authentication, Cloud Firestore, and Firebase Hosting (account and synchronization). In addition, after account creation, we send a one-time welcome email to your email address in the language of the page on which the account was created. This email is processed and sent via the servers of <b>OVH SAS</b> (France, EU), our email provider, acting as a data processor on our behalf, based on Art. 6(1)(b) GDPR. Otherwise, we only share data with the people you yourself give the estimate link to (section 3.5), and when required by applicable law.</p><h3 id="komu-stripe">7.1. Payments (Stripe)</h3><p>The <b>LiczMat Pro</b> subscription is handled by <b>Stripe</b> (Stripe Payments Europe, Ltd., Ireland). If you decide to purchase it, you will be redirected to the Stripe payment page. Stripe, as an independent data controller, receives and processes payment data: card number, billing details, and payment history. <b>We do not see or store your card number.</b> Your email address and account ID (UID) are sent to Stripe so that the paid subscription can be assigned to the correct account. In return, we only receive the plan status (Free or Pro), its expiration date, and whether the subscription will renew. You manage invoices, card changes, and cancellations in the Stripe customer portal. Stripe's privacy policy is available at: <a href="https://stripe.com/privacy" rel="noopener" target="_blank">stripe.com/privacy</a>.</p><h2 id="poza-eog">8. Data transfers outside the EEA</h2><p>Google LLC (responsible for Firebase Authentication, Google Analytics, AdMob, Maps, Places, and Firebase Hosting) and GitHub, Inc. (which hosts our website and processes standard server logs, including IP addresses) are US companies. The transfer of your data to the US is based on the <b>adequacy decision of the European Commission for the EU-US Data Privacy Framework</b>, as both companies are certified. Additionally, it is based on the <b>standard contractual clauses</b> included in their data processing terms (Google Cloud Data Processing Addendum, GitHub Data Protection Agreement).</p><h2 id="prawa">9. Your rights (GDPR)</h2><p>Under the GDPR, you have the right to access, rectify, erase, restrict processing, data portability, and object, as well as the right to withdraw your consent to personalized ads and analytics. <b>Where processing is based on Art. 6(1)(f) GDPR, you may object at any time on grounds relating to your particular situation (Art. 21 GDPR).</b></p><p>You directly control data that remains on the device (app data, permissions, advertising ID in Android settings). You can review and change account data in the App or at <a href="/app/">liczmat.com/app/</a>, export it via the backup feature, and delete it by removing individual records or requesting the deletion of the entire account (section 3.6). For questions regarding your data, write to: <a href="mailto:contact@liczmat.com">contact@liczmat.com</a>. You also have the right to lodge a complaint with the competent supervisory authority: <b>Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)</b>, Promenade 18, 91522 Ansbach, <a href="https://www.lda.bayern.de" target="_blank" rel="noopener">www.lda.bayern.de</a>, or with the data protection supervisory authority in your country of residence within the EU.</p><h2 id="dzieci">10. Children</h2><p>The App is not directed at children, and we do not knowingly collect data from persons under 13 years of age. A LiczMat account is intended for persons who are 16 years of age or older, or have the consent of their legal guardians.</p><h2 id="zmiany">11. Changes and contact</h2><p>We may update this policy. We will announce significant changes in the App or on Google Play. The date of the last update is at the top of the document. Contact: <b>Michał Polednia</b>, email: <a href="mailto:contact@liczmat.com">contact@liczmat.com</a>.</p>
+  </article>
+  </main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
+        <p class="muted">Building-material calculator. Count. Plan. Build.</p>
+      </div>
+      <div class="foot-group">
+        <h2>Product</h2>
+        <ul class="foot-product">
+          <li><a href="/en/calculators/">All calculators</a></li>
+          <li><a href="/en/unit-converter/">Unit converter</a></li>
+          <li><a href="/en/materials/">Materials</a></li>
+          <li><a href="/en/guides/">Guides</a></li>
+          <li><a href="/en/stores/">Stores</a></li>
+          <li><a href="/en/liczmat-pro/">LiczMat Pro</a></li>
+          <li><a href="/en/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="foot-group">
+        <h2>Account</h2>
+        <ul>
+          <li><a href="/en/android-app/">The app</a></li>
+          <li><a href="/app/" rel="nofollow">My account</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div class="foot-group foot-legal">
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/en/contact/">Contact and Impressum</a></li>
+          <li><a href="/en/privacy-policy/">Privacy policy</a></li>
+          <li><a href="/en/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <nav class="foot-langs" aria-label="Language">
+      <h2>Language</h2>
+      <ul>
+        <li><a href="/polityka-prywatnosci/" hreflang="pl" lang="pl" data-lang="pl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#dc143c"/></svg></span><span>Polski</span></a></li>
+        <li><a href="/uk/polityka-konfidentsiinosti/" hreflang="uk" lang="uk" data-lang="uk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#005bbb"/><rect y="7" width="20" height="7" fill="#ffd500"/></svg></span><span>Українська</span></a></li>
+        <li><a href="/de/datenschutz/" hreflang="de" lang="de" data-lang="de"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#000000"/><rect y="4.667" width="20" height="4.666" fill="#dd0000"/><rect y="9.333" width="20" height="4.667" fill="#ffce00"/></svg></span><span>Deutsch</span></a></li>
+        <li><a href="/en/privacy-policy/" hreflang="en" lang="en" data-lang="en" aria-current="true"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#012169"/><g stroke="#ffffff" stroke-width="3"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#c8102e" stroke-width="1.4"><path d="M0 0 20 14M20 0 0 14"/></g><g stroke="#ffffff" stroke-width="4.6"><path d="M10 0V14M0 7H20"/></g><g stroke="#c8102e" stroke-width="2.8"><path d="M10 0V14M0 7H20"/></g></svg></span><span>English</span></a></li>
+        <li><a href="/cs/ochrana-osobnich-udaju/" hreflang="cs" lang="cs" data-lang="cs"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="7" width="20" height="7" fill="#d7141a"/><path d="M0 0 10 7 0 14Z" fill="#11457e"/></svg></span><span>Čeština</span></a></li>
+        <li><a href="/sk/ochrana-osobnych-udajov/" hreflang="sk" lang="sk" data-lang="sk"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ffffff"/><rect y="4.667" width="20" height="4.666" fill="#0b4ea2"/><rect y="9.333" width="20" height="4.667" fill="#ee1c25"/><path d="M4 3.2h4.4v4.3c0 1.7-1.3 2.7-2.2 3.1-0.9-0.4-2.2-1.4-2.2-3.1z" fill="#ee1c25" stroke="#ffffff" stroke-width="0.5"/></svg></span><span>Slovenčina</span></a></li>
+        <li><a href="/ro/politica-de-confidentialitate/" hreflang="ro" lang="ro" data-lang="ro"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002b7f"/><rect x="6.667" width="6.666" height="14" fill="#fcd116"/><rect x="13.333" width="6.667" height="14" fill="#ce1126"/></svg></span><span>Română</span></a></li>
+        <li><a href="/hr/pravila-privatnosti/" hreflang="hr" lang="hr" data-lang="hr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ff0000"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#171796"/><path d="M8.4 4.6h3.2v3.1c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#ffffff" stroke="#ff0000" stroke-width="0.4"/><path d="M8.4 4.6h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8zm-0.8 0.8h0.8v0.8h-0.8zm1.6 0h0.8v0.8h-0.8z" fill="#ff0000"/></svg></span><span>Hrvatski</span></a></li>
+        <li><a href="/sr/politika-privatnosti/" hreflang="sr" lang="sr" data-lang="sr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#c6363c"/><rect y="4.667" width="20" height="4.666" fill="#0c4076"/><rect y="9.333" width="20" height="4.667" fill="#ffffff"/><path d="M6.6 4.4h3.2v3.2c0 1.3-1 2.1-1.6 2.4-0.6-0.3-1.6-1.1-1.6-2.4z" fill="#c6363c" stroke="#ffffff" stroke-width="0.4"/></svg></span><span>Srpski</span></a></li>
+        <li><a href="/it/informativa-privacy/" hreflang="it" lang="it" data-lang="it"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#009246"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ce2b37"/></svg></span><span>Italiano</span></a></li>
+        <li><a href="/nl/privacybeleid/" hreflang="nl" lang="nl" data-lang="nl"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#ae1c28"/><rect y="4.667" width="20" height="4.666" fill="#ffffff"/><rect y="9.333" width="20" height="4.667" fill="#21468b"/></svg></span><span>Nederlands</span></a></li>
+        <li><a href="/es/politica-de-privacidad/" hreflang="es" lang="es" data-lang="es"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#aa151b"/><rect y="3.5" width="20" height="7" fill="#f1bf00"/></svg></span><span>Español</span></a></li>
+        <li><a href="/fr/politique-de-confidentialite/" hreflang="fr" lang="fr" data-lang="fr"><span class="flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 14" width="20" height="14" aria-hidden="true" focusable="false"><rect width="20" height="14" fill="#002395"/><rect x="6.667" width="6.666" height="14" fill="#ffffff"/><rect x="13.333" width="6.667" height="14" fill="#ed2939"/></svg></span><span>Français</span></a></li>
+      </ul>
+    </nav>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> LiczMat. All rights reserved.</span>
+      <span class="foot-who">Michał Polednia · Widderweg 17, 85570 Markt Schwaben, Deutschland · <a href="mailto:contact@liczmat.com">contact@liczmat.com</a></span>
+      <span>Results are estimates. Always verify before buying.</span>
+    </div>
+  </div>
+</footer>
+<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
+  <p class="consent-text" id="consent-text">We use Google Analytics to measure anonymous site traffic and how many people head to Google Play. Do you agree?</p>
+  <div class="consent-actions">
+    <a class="consent-more" href="/en/privacy-policy/">More in the privacy policy</a>
+    <a class="consent-more" href="/en/cookies/">Cookies</a>
+    <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">Decline</button>
+    <button type="button" id="consent-accept" class="btn btn-primary btn-sm">Agree</button>
+  </div>
+</div>
+
+</body>
+</html>

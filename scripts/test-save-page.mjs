@@ -158,7 +158,8 @@ const snapshotOf = (row) => {
   const data = JSON.parse(row.inputJson);
   return { ...data._lm, input: data };
 };
-const text = (page, sel) => page.$eval(sel, (n) => n.innerText.trim());
+// U+00A0 binds one-letter words since 2026-10-03; the copy below is written with spaces.
+const text = (page, sel) => page.$eval(sel, (n) => n.innerText.replace(/\u00a0/g, " ").trim());
 const shown = (page, sel) => page.$eval(sel, (n) => !n.hidden && n.offsetParent !== null);
 
 head("0. a guest gets account links, and the session hint swaps the box");
@@ -461,7 +462,7 @@ head("8. a catalogue shortcut names the saved line, and a typed name wins");
   eq("the shortcut prefills the shopping-list name",
     await page.inputValue("[data-ws-line-name]"), "Gładź gipsowa 20 kg");
   check("the latest catalogue choice is named above the form",
-    (await text(page, "[data-mat-chosen]")).includes("Gładź gipsowa"));
+    (await text(page, ".mat-open.has-material")).includes("Gładź gipsowa"));
   await page.click("[data-ws-save]");
   await page.fill("[data-ws-line-name]", "Gładź biała finiszowa");
   await page.click("[data-ws-save]");

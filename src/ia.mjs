@@ -29,7 +29,7 @@ import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlClient,
   urlJobs, urlJob, urlQuotes, urlQuote, urlQuoteView, urlCalendar, urlLiczmatPro, urlConverter,
-  urlOwnMaterials, urlContact,
+  urlOwnMaterials, urlContact, urlPrivacy,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -455,11 +455,18 @@ export const ROUTES = [
   {
     id: "privacy",
     level: LEVEL.GUEST, status: STATUS.LIVE,
-    parent: "home", localized: false, indexable: true,
+    parent: "home", localized: true, indexable: true,
+    path: urlPrivacy,
+    note: "The German text is binding. Every other language links to it from a visible " +
+      "translation note. /privacy-policy.html remains a generated compatibility page.",
+  },
+  {
+    id: "privacy-legacy",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "privacy", localized: false, indexable: true,
     path: URL_PRIVACY,
-    generated: false,
-    note: "Hand-written, PL + EN in one file. Its twin is docs/privacy-policy.html in " +
-      "the app repo; change one, change both.",
+    note: "Stable Android and Google Play URL. It publishes the Polish and English texts " +
+      "in full and links to all thirteen localized versions.",
   },
 
   {
@@ -777,7 +784,7 @@ export const FLOWS = [
  */
 export function livePaths(calcs, guides) {
   const out = new Set();
-  const file = (url) => `${url.replace(/^\//, "")}index.html`;
+  const file = (url) => url.endsWith(".html") ? url.replace(/^\//, "") : `${url.replace(/^\//, "")}index.html`;
 
   for (const r of liveRoutes()) {
     if (r.generated === false) continue; // hand-written: privacy-policy.html

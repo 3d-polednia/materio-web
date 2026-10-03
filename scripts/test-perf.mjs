@@ -132,7 +132,11 @@ const BUDGET = {
   // program, copy the message) and the share strings translated in ten languages that had shipped English.
   // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
   // liczmat-session cookie helpers in assets/account.js, which every page inlines.
-  "index.html": [239, 62],
+  // 2026-10-03, the review of 2026-10-02: about 4.3 kB more of assets/styles.css on every page (row
+  // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
+  // the runtime half of the one-letter-word rule; the quote and account pages also carry the
+  // country field and assets/postal.js. Measured, then a kilobyte of headroom.
+  "index.html": [245, 63],
   // Raised 2026-09-26 from 248, measured at 248.8 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -143,7 +147,11 @@ const BUDGET = {
   // validity, VAT, own materials, draft save, CSV head) in every dictionary bundle.
   // 2026-10-01: measured 254.8 kB raw after the quote editor's two runtime status keys.
   // 2026-10-01: measured 255.1 kB raw after the quote editor's "Pobierz PDF" / "Drukuj" pair in styles.css.
-  "kalkulatory/index.html": [256, 66],
+  // 2026-10-03, the review of 2026-10-02: about 4.3 kB more of assets/styles.css on every page (row
+  // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
+  // the runtime half of the one-letter-word rule; the quote and account pages also carry the
+  // country field and assets/postal.js. Measured, then a kilobyte of headroom.
+  "kalkulatory/index.html": [262, 66],
   "kalkulatory/plytki-panele-gres/index.html": [420, 128],
   // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
   // (the header menu and the footer's list) and it went from ten rows to thirteen. That is
@@ -163,7 +171,11 @@ const BUDGET = {
   // 2026-10-01: measured 243.1 kB raw after the quote editor's two runtime status keys.
   // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
   // liczmat-session cookie helpers in assets/account.js, which every page inlines.
-  "konwerter-jednostek/index.html": [245, 68],
+  // 2026-10-03, the review of 2026-10-02: about 4.3 kB more of assets/styles.css on every page (row
+  // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
+  // the runtime half of the one-letter-word rule; the quote and account pages also carry the
+  // country field and assets/postal.js. Measured, then a kilobyte of headroom.
+  "konwerter-jednostek/index.html": [251, 68],
   // Raised 2026-09-26 from 227, measured at 229.4 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -177,7 +189,11 @@ const BUDGET = {
   // 2026-10-01: measured 235.3 kB raw after the quote editor's two runtime status keys.
   // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
   // liczmat-session cookie helpers in assets/account.js, which every page inlines.
-  "poradniki/ile-farby-na-pokoj/index.html": [237, 63],
+  // 2026-10-03, the review of 2026-10-02: about 4.3 kB more of assets/styles.css on every page (row
+  // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
+  // the runtime half of the one-letter-word rule; the quote and account pages also carry the
+  // country field and assets/postal.js. Measured, then a kilobyte of headroom.
+  "poradniki/ile-farby-na-pokoj/index.html": [243, 63],
   // Raised 2026-09-26 from 234, measured at 235.6 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -191,7 +207,11 @@ const BUDGET = {
   // 2026-10-01: measured 241.5 kB raw after the quote editor's two runtime status keys.
   // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
   // liczmat-session cookie helpers in assets/account.js, which every page inlines.
-  "sklepy/index.html": [243, 65],
+  // 2026-10-03, the review of 2026-10-02: about 4.3 kB more of assets/styles.css on every page (row
+  // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
+  // the runtime half of the one-letter-word rule; the quote and account pages also carry the
+  // country field and assets/postal.js. Measured, then a kilobyte of headroom.
+  "sklepy/index.html": [249, 65],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
   // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
@@ -244,7 +264,11 @@ const BUDGET = {
   // signature table row keep both PDF paths on the same A4 layout.
   // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
   // liczmat-session cookie helpers in assets/account.js, which every page inlines.
-  "wyceny/index.html": [467, 135],
+  // 2026-10-03, the review of 2026-10-02: about 4.3 kB more of assets/styles.css on every page (row
+  // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
+  // the runtime half of the one-letter-word rule; the quote and account pages also carry the
+  // country field and assets/postal.js. Measured, then a kilobyte of headroom.
+  "wyceny/index.html": [481, 135],
   "terminarz/index.html": [418, 126],
   // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
   // one page that carries every store the account syncs, and session 59 gave it a third:
@@ -287,7 +311,11 @@ const BUDGET = {
   // 2026-10-01: measured 397.1/103.6 kB; quote revocation joins account deletion.
   // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
   // liczmat-session cookie helpers in assets/account.js, which every page inlines.
-  "app/index.html": [399, 104],
+  // 2026-10-03, the review of 2026-10-02: about 4.3 kB more of assets/styles.css on every page (row
+  // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
+  // the runtime half of the one-letter-word rule; the quote and account pages also carry the
+  // country field and assets/postal.js. Measured, then a kilobyte of headroom.
+  "app/index.html": [406, 106],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
@@ -307,7 +335,11 @@ const BUDGET = {
   // 2026-10-01: measured 223.1 kB raw after the quote editor's two runtime status keys.
   // 2026-10-02, +1 kB raw: "don't remember me" ends with the browser, not the tab — the
   // liczmat-session cookie helpers in assets/account.js, which every page inlines.
-  "p/index.html": [225, 62],
+  // 2026-10-03, the review of 2026-10-02: about 4.3 kB more of assets/styles.css on every page (row
+  // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
+  // the runtime half of the one-letter-word rule; the quote and account pages also carry the
+  // country field and assets/postal.js. Measured, then a kilobyte of headroom.
+  "p/index.html": [231, 62],
 };
 
 /**
@@ -333,8 +365,11 @@ const BUDGET = {
  * finding and it is left failing on purpose rather than papered over by a ceiling written
  * around it — the same page is over its prose budget in scripts/test-copy.mjs for the same
  * reason, and both are waiting for the session that trims the account page.
+ *
+ * Raised on 2026-10-03 to [520, 145] by /uk/koshtorysy-pro/ at 516.5 kB raw: the quote editor
+ * now carries the client and company country fields and assets/postal.js (review 2026-10-02, P4).
  */
-const CEILING = [505, 145];
+const CEILING = [520, 145];
 
 /**
  * And no single asset may, either — one file is one thing a browser waits for.

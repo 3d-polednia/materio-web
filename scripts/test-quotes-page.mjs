@@ -170,8 +170,9 @@ function check(name, cond, detail) {
   failures.push(`${section} — ${name}${detail ? `\n      ${detail}` : ""}`);
   return false;
 }
+const plainSpaces = (value) => typeof value === "string" ? value.replace(/\u00a0/g, " ") : value;
 const eq = (name, got, want) =>
-  check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
+  check(name, plainSpaces(got) === plainSpaces(want), `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
 
 const exe = findChromium();
 const { server, port } = await serve();
@@ -1171,7 +1172,8 @@ head("8. own materials in a quote");
   eq("Dodaj copies the unit", picked.unit, "szt.");
   eq("Dodaj copies the compatible price", picked.amountMinor, 360000);
   eq("Dodaj stores the own-material link", picked.ownId, "m1");
-  check("the linked row says it is in the quote", (await page.textContent("[data-quo-own-id=m1]")).includes("W wycenie"));
+  check("the linked row says it is in the quote",
+    plainSpaces(await page.textContent("[data-quo-own-id=m1]")).includes("W wycenie"));
   check("the linked row offers removal", await page.locator("[data-quo-own-id=m1] [data-quo-own-remove]").isVisible());
   await page.click("[data-quo-own-id=m1] [data-quo-own-remove]");
   eq("Usuń removes the linked quote line", (await liveQuotes(page))[0].materials.length, 0);

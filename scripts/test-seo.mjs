@@ -36,9 +36,10 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, GUIDES,
-  urlHome, urlCalc, urlJobs, urlQuoteView, urlAndroid, URL_PRIVACY,
+  urlHome, urlCalc, urlJobs, urlQuoteView, urlAndroid, urlPrivacy, URL_PRIVACY,
 } from "../src/site.mjs";
-import { ROUTES, sitemapUrls, liveRoutes, route } from "../src/ia.mjs";
+import { ROUTES, sitemapUrls, livePaths, liveRoutes, route } from "../src/ia.mjs";
+import { PRIVACY } from "../src/privacy-page.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
@@ -119,8 +120,9 @@ head("0. the tree this suite is reading");
   // Spanish and French, which is three languages more of every route, and 512 until
   // session 62 added /kontakt/ for audit item H7: one route in thirteen languages.
   // 2026-10-01: thirteen noindex public quote pages, one per language, raise 538 to 551.
-  check("551 pages: 549 generated plus the two hand-written ones",
-    PAGES.length === 551, `found ${PAGES.length}`);
+  const declared = livePaths(CALCS, GUIDES).size;
+  check("every declared page plus the hand-written error page is present",
+    PAGES.length === declared + 1, `found ${PAGES.length}, declared ${declared}`);
   check("every page has a <title>", PAGES.every((page) => page.title), 
     PAGES.filter((page) => !page.title).map((page) => page.url).join(", "));
   check("every page has a robots directive", PAGES.every((page) => page.robots),
@@ -225,8 +227,8 @@ head("2. sitemap.xml: the list, and where it comes from");
   // merge of 2026-09-21: /zlecenia/ and its twelve translations became redirects to
   // /projekty/, and a sitemap that still offered a crawler thirteen redirects would be
   // asking it to index a page that exists only to send it somewhere else.
-  check("430 indexable URLs remain after account work pages leave the sitemap",
-    ENTRIES.length === 430, `found ${ENTRIES.length}`);
+  check("the sitemap has exactly the indexable URLs declared by the architecture",
+    ENTRIES.length === sitemapUrls(CALCS, GUIDES).length, `found ${ENTRIES.length}`);
 
   for (const entry of ENTRIES) {
     check(`${entry.loc} is absolute and on the live domain`, entry.loc.startsWith(`${BASE}/`));
@@ -250,11 +252,6 @@ head("2b. sitemap.xml: lastmod, and the two elements that are not there");
   // ?v= stamp so bumping STAMP does not re-date everything.
   const today = new Date().toISOString().slice(0, 10);
   for (const entry of ENTRIES) {
-    if (entry.loc === BASE + URL_PRIVACY) {
-      check("the hand-written page carries no lastmod rather than a guessed one",
-        entry.lastmod === null, entry.lastmod);
-      continue;
-    }
     check(`${entry.loc} has a lastmod`, Boolean(entry.lastmod));
     if (!entry.lastmod) continue;
     check(`${entry.loc}: lastmod is a plain calendar day`, /^\d{4}-\d{2}-\d{2}$/.test(entry.lastmod), entry.lastmod);
@@ -405,11 +402,45 @@ head("5. metadata: the title and the description of every page");
   for (const lang of LANGS) {
     const seen = new Map();
     for (const page of INDEXED.filter((x) => x.lang === HREFLANG[lang])) {
+      if (page.url === URL_PRIVACY) continue;
       check(`${page.url}: its title is unique within ${lang}`, !seen.has(page.title),
         `also ${seen.get(page.title)}`);
       seen.set(page.title, page.url);
     }
   }
+}
+
+head("5b. privacy policies: complete localized documents and compatibility URL");
+{
+  for (const lang of LANGS) {
+    const page = byUrl.get(urlPrivacy(lang));
+    check(`${lang}: privacy page exists`, Boolean(page));
+    if (!page) continue;
+    for (const section of PRIVACY[lang].sections) {
+      check(`${lang}: section #${section.id} exists`, page.html.includes(`id="${section.id}"`));
+    }
+    if (lang === "de") {
+      check("de: binding page has no translation note", !page.html.includes(PRIVACY.en.translationNote));
+    } else {
+      check(`${lang}: translation note links to German`,
+        page.html.includes('class="muted privacy-translation"') && page.html.includes('href="/de/datenschutz/"'));
+    }
+    check(`${lang}: footer links to its localized policy`,
+      page.html.includes(`<li><a href="${urlPrivacy(lang)}">`));
+  }
+
+  const legacy = byUrl.get(URL_PRIVACY);
+  check("compatibility privacy page exists", Boolean(legacy));
+  if (legacy) {
+    check("compatibility page contains the Polish policy", legacy.html.includes(PRIVACY.pl.sections[0].id));
+    check("compatibility page contains the English policy", legacy.html.includes(PRIVACY.en.sections[0].id));
+    for (const lang of LANGS) {
+      check(`compatibility page links to ${lang}`, legacy.html.includes(`href="${urlPrivacy(lang)}"`));
+    }
+    check("compatibility page keeps its own canonical", legacy.canonical === BASE + URL_PRIVACY);
+  }
+  check("the published policy attributes GeoNames",
+    byUrl.get(urlPrivacy("de")).html.includes("GeoNames") && byUrl.get(urlPrivacy("de")).html.includes("CC BY 4.0"));
 }
 
 /* ------------------------------------------------------------------ 6. Open Graph */

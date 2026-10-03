@@ -34,3 +34,38 @@ export function nbspShortWords(text, lang) {
 
   return text.replace(re, "$1\u00a0");
 }
+
+/* Elements whose content is not prose: code, styles, data and what the visitor types. They
+   are cut out whole first, because a script may well contain a "<" that is not a tag. */
+const RAW_BLOCK = /(<(script|style|textarea|pre|code)\b[\s\S]*?<\/\2\s*>)/i;
+
+/**
+ * The same rule over a whole generated page, applied to text between tags only.
+ *
+ * Wrapping the dictionary lookup alone missed every sentence that reaches a page another
+ * way (the calculator SEO copy, the guides, the policy), so scripts/build.mjs runs this on
+ * each page as it is written. Tags and their attributes are left byte for byte, and so is
+ * the content of <script>, <style>, <textarea>, <pre> and <code>: an inline script's CSP
+ * hash is taken after this step, and a textarea's value is the visitor's, not ours.
+ *
+ * @param {string} html  a complete page
+ * @param {string} lang  the page's language
+ * @returns {string}
+ */
+export function nbspHtml(html, lang) {
+  if (typeof html !== "string" || !SHORT_WORDS[lang]) return html;
+  let out = "";
+  let rest = html;
+  for (let raw = rest.match(RAW_BLOCK); raw; raw = rest.match(RAW_BLOCK)) {
+    out += nbspProse(rest.slice(0, raw.index), lang) + raw[1];
+    rest = rest.slice(raw.index + raw[1].length);
+  }
+  return out + nbspProse(rest, lang);
+}
+
+/** Markup with no raw blocks left in it: bind in the text, keep every tag as it is. */
+function nbspProse(markup, lang) {
+  return markup.split(/(<[^>]*>)/)
+    .map((part, index) => (index % 2 === 1 || !part ? part : nbspShortWords(part, lang)))
+    .join("");
+}

@@ -148,6 +148,10 @@ contact: {
     pl: "kontakt", uk: "kontakty", de: "impressum", en: "contact",
     cs: "kontakt", sk: "kontakt", ro: "contact", hr: "kontakt", sr: "kontakt", it: "contatti", nl: "contact", es: "contacto", fr: "contact",
   },
+privacy: {
+    pl: "polityka-prywatnosci", uk: "polityka-konfidentsiinosti", de: "datenschutz", en: "privacy-policy",
+    cs: "ochrana-osobnich-udaju", sk: "ochrana-osobnych-udajov", ro: "politica-de-confidentialitate", hr: "pravila-privatnosti", sr: "politika-privatnosti", it: "informativa-privacy", nl: "privacybeleid", es: "politica-de-privacidad", fr: "politique-de-confidentialite",
+  },
 estimate: {
     pl: "kosztorys", uk: "koshtorys", de: "kostenvoranschlag", en: "cost-estimate",
     cs: "rozpocet", sk: "rozpocet", ro: "deviz", hr: "troskovnik", sr: "predracun", it: "preventivo", nl: "kostenraming", es: "presupuesto", fr: "devis",
@@ -447,6 +451,9 @@ export const urlCookies = (lang) => `${prefix(lang)}/${SECTION.cookies[lang]}/`;
  */
 export const urlContact = (lang) => `${prefix(lang)}/${SECTION.contact[lang]}/`;
 
+/** The full privacy policy in the language of the page. */
+export const urlPrivacy = (lang) => `${prefix(lang)}/${SECTION.privacy[lang]}/`;
+
 /**
  * Who runs LiczMat. The one place the operator identity is written down.
  *
@@ -499,7 +506,7 @@ export const entityRows = () => [
 /** The Android app's own page. Not the same thing as URL_APP, which is the account. */
 export const urlAndroid = (lang) => `${prefix(lang)}/${SECTION.app[lang]}/`;
 
-/** Privacy policy, the workspace and the shared-project view are single, language-neutral pages. */
+/** The legacy policy, the workspace and the shared-project view are language-neutral pages. */
 export const URL_PRIVACY = "/privacy-policy.html";
 export const URL_APP = "/app/";
 export const URL_SHARE = "/p/";

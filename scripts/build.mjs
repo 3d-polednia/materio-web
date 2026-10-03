@@ -30,6 +30,7 @@ import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlJobs, urlQuotes,
   urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact, urlQuoteView,
+  urlPrivacy, URL_PRIVACY,
 } from "../src/site.mjs";
 import {
   livePaths, sitemapUrls, validateIA, validateCalcHub, accountLevelKeys, HOME_DOORS,
@@ -52,12 +53,16 @@ import { OMAT_COPY, OMAT_COPY_KEYS } from "../src/omat-copy.mjs";
 import { QUOTE_VIEW_COPY, QUOTE_VIEW_COPY_KEYS } from "../src/quote-view-copy.mjs";
 import { PDF_COPY, PDF_COPY_KEYS } from "../src/pdf-copy.mjs";
 import { appMain, shareMain, dashboardMain, dashboardRedirectMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
+import { nbspHtml, nbspShortWords } from "../src/nbsp.mjs";
+import {
+  privacyMain, privacyLegacyMain, privacyBreadcrumbLd, privacyDescription, PRIVACY,
+} from "../src/privacy-page.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20261003b";
+const STAMP = "20261003c";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -523,7 +528,7 @@ function validate() {
   // Two pages must never claim the same URL.
   const seen = new Map();
   for (const lang of LANGS) {
-    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlContact(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang), urlCalendar(lang), urlLiczmatPro(lang)]
+    const urls = [urlHome(lang), urlCalcIndex(lang), urlGuideIndex(lang), urlStores(lang), urlMaterials(lang), urlProjects(lang), urlEstimate(lang), urlAndroid(lang), urlCookies(lang), urlContact(lang), urlPrivacy(lang), urlClients(lang), urlJobs(lang), urlQuotes(lang), urlCalendar(lang), urlLiczmatPro(lang)]
       .concat(CALCS.map((c) => urlCalc(lang, c.id)))
       .concat(GUIDES.map((g) => urlGuide(lang, g)));
     for (const u of urls) {
@@ -544,7 +549,8 @@ function validate() {
  * gets the translator and nothing else, which is why this hangs off it.
  */
 const translator = (lang) => {
-  const t = (key) => (DICT[lang] && DICT[lang][key]) || DICT.en[key] || DICT[DEFAULT_LANG][key] || key;
+  const t = (key) => nbspShortWords((DICT[lang] && DICT[lang][key]) || DICT.en[key] || DICT[DEFAULT_LANG][key] || key, lang);
+  t.lang = lang;
   t.plural = (key, n) => unitLabel(key, n, lang, t);
   return t;
 };
@@ -789,7 +795,11 @@ function write(relPath, contents) {
       (whole, name) => (strippedTwin(name) ? `/assets/${name}.min.js?v=` : whole));
     // Comments first: the policy is a hash of the script text that ships, and stripping
     // runs over the file the hash would otherwise be taken from.
-    contents = withCsp(stripHtmlComments(contents));
+    // One-letter words are bound to the next word in the page text, whatever source the
+    // sentence came from (review 2026-10-02, P14). Before the policy: it hashes inline scripts,
+    // and nbspHtml() leaves those untouched anyway.
+    const pageLang = (contents.match(/<html[^>]*\slang="([a-z]{2})/i) || [])[1] || "";
+    contents = withCsp(nbspHtml(stripHtmlComments(contents), pageLang));
     if (previous.get(relPath) !== fingerprint(contents)) changed.add(relPath);
     if (/<meta name="robots" content="noindex/.test(contents)) noindexed.add(relPath);
   }
@@ -1445,6 +1455,36 @@ function buildContactPage() {
       main, jsonld: ld,
     }));
   }
+}
+
+function buildPrivacyPages() {
+  const alt = alternatesFor(urlPrivacy);
+  for (const lang of BUILD_LANGS) {
+    const t = translator(lang);
+    const policy = PRIVACY[lang];
+    write(join(urlPrivacy(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${policy.title} | LiczMat`,
+      description: privacyDescription(policy),
+      path: urlPrivacy(lang),
+      alternates: alt,
+      main: privacyMain(policy),
+      jsonld: [privacyBreadcrumbLd(policy)],
+    }));
+  }
+}
+
+function buildPrivacyLegacyPage() {
+  const lang = DEFAULT_LANG;
+  const t = translator(lang);
+  write(URL_PRIVACY.replace(/^\//, ""), page({
+    lang, t, stamp: STAMP,
+    title: `${PRIVACY.pl.title} | LiczMat`,
+    description: "Polityka prywatności LiczMat po polsku i angielsku: zasady przetwarzania danych w aplikacji oraz na stronie internetowej.",
+    path: URL_PRIVACY,
+    alternates: {},
+    main: privacyLegacyMain(PRIVACY),
+  }));
 }
 
 function buildAndroidPage() {
@@ -2197,6 +2237,8 @@ buildMaterials();
 buildAndroidPage();
 buildCookiesPage();
 buildContactPage();
+buildPrivacyPages();
+buildPrivacyLegacyPage();
 buildWorkspacePages();
 buildCompanyPages();
 buildClientsPages();
@@ -2235,10 +2277,9 @@ function checkAgainstIA() {
     ...[...built].filter((f) => !declared.has(f)).map((f) => `built but not declared: ${f}`),
     ...missing.map((f) => `declared but not built: ${f}`),
   ];
-  // The two hand-written pages are declared too. They are not generated, but they link
-  // to generated assets. Re-stamping them in place keeps their cache-busters from drifting
-  // away from the rest of the site when a new stamp ships.
-  for (const f of ["privacy-policy.html", "404.html"]) {
+  // The hand-written error page links to generated assets. Re-stamping it in place keeps
+  // its cache-busters from drifting away from the rest of the site when a new stamp ships.
+  for (const f of ["404.html"]) {
     if (!existsSync(p(f))) {
       mismatches.push(`hand-written page is missing: ${f}`);
       continue;

@@ -7,7 +7,7 @@
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, SECTION,
-  urlHome, urlAndroid, urlCookies, urlContact, ENTITY,
+  urlHome, urlAndroid, urlCookies, urlContact, urlPrivacy, ENTITY,
   URL_PRIVACY, URL_APP, PLAY_URL,
 } from "./site.mjs";
 import { FLAG, LANG_NAME } from "./flags.mjs";
@@ -624,7 +624,7 @@ export function siteFooter(f) {
         <h2>${esc(t("foot_legal"))}</h2>
         <ul>
           <li><a href="${urlContact(lang)}">${esc(t("foot_contact"))}</a></li>
-          <li><a href="${URL_PRIVACY}">${esc(t("foot_privacy"))}</a></li>
+          <li><a href="${urlPrivacy(lang)}">${esc(t("foot_privacy"))}</a></li>
           <li><a href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a></li>
         </ul>
       </div>
@@ -642,7 +642,7 @@ function consentBanner(lang, t) {
   return `<div id="consent-banner" class="consent-banner" role="dialog" aria-labelledby="consent-text" hidden>
   <p class="consent-text" id="consent-text">${esc(t("consent_text"))}</p>
   <div class="consent-actions">
-    <a class="consent-more" href="${URL_PRIVACY}">${esc(t("consent_more"))}</a>
+    <a class="consent-more" href="${urlPrivacy(lang)}">${esc(t("consent_more"))}</a>
     <a class="consent-more" href="${urlCookies(lang)}">${esc(t("foot_cookies"))}</a>
     <button type="button" id="consent-reject" class="btn btn-ghost btn-sm">${esc(t("consent_reject"))}</button>
     <button type="button" id="consent-accept" class="btn btn-primary btn-sm">${esc(t("consent_accept"))}</button>

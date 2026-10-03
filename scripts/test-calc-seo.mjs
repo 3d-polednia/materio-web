@@ -73,7 +73,9 @@ const decode = (s) => s
 /** One shipped calculator page, parsed down to the parts this suite reads. */
 function load(lang, calc) {
   const url = urlCalc(lang, calc.id);
-  const html = read(join(url.replace(/^\//, ""), "index.html"));
+  // The build binds one-letter words with U+00A0 (2026-10-03); the copy is written with
+  // ordinary spaces, so the page is read the way a person reads it.
+  const html = read(join(url.replace(/^\//, ""), "index.html")).replace(/\u00a0/g, " ");
   const one = (re) => { const m = html.match(re); return m ? decode(m[1].trim()) : ""; };
   return {
     lang, id: calc.id, url, html,

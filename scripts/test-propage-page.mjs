@@ -179,7 +179,8 @@ head("1. what a visitor with no account sees");
   eq("the page is the one about Pro", await page.textContent("h1"), "LiczMat Pro");
   eq("the four modules are on it", await page.locator(".pro-mod").count(), 4);
   for (const name of ["Klienci", "Wyceny", "Terminarz", "Historia i CRM"]) {
-    check(`${name} is named`, (await page.textContent("main")).includes(name));
+    // U+00A0 binds Polish one-letter words since 2026-10-03 ("Historia i CRM").
+    check(`${name} is named`, (await page.textContent("main")).replace(/\u00a0/g, " ").includes(name));
   }
 
   // The price, in this language's currency, drawn by assets/paywall.js out of the amount

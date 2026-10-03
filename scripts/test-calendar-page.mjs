@@ -581,7 +581,9 @@ head("6. with JavaScript off the page is still an honest page");
   const noJs = await context({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
   const page = await noJs.newPage();
   await page.goto(base + CAL, { waitUntil: "load" });
-  const html = await page.content();
+  // Polish one-letter words are bound with U+00A0 since 2026-10-03; the serializer writes it
+  // as &nbsp;, and the buckets are read as words.
+  const html = (await page.content()).replace(/&nbsp;|\u00a0/g, " ");
   check("the module is named", html.includes("Terminarz"));
   check("and said to be LiczMat Pro — chapter XXV", html.includes("LiczMat Pro"));
   for (const word of ["Po terminie", "Dziś", "W ciągu 7 dni", "Później", "Bez terminu"]) {

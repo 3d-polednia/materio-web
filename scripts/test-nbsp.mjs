@@ -8,7 +8,8 @@
  */
 
 import assert from "node:assert";
-import { nbspShortWords } from "../src/nbsp.mjs";
+import { readFileSync } from "node:fs";
+import { nbspHtml, nbspShortWords } from "../src/nbsp.mjs";
 
 /* ------------------------------------------------------------------ the runner */
 
@@ -150,6 +151,48 @@ head("10. text containing a URL: documented behavior");
   const url = "https://liczmat.com/a b";
   const expected = "https://liczmat.com/a\u00a0b";
   eq("slash before a acts as word boundary and binds trailing space", nbspShortWords(url, "pl"), expected);
+}
+
+/* ================================================================== 11. runtime table parity */
+
+head("11. browser runtime keeps the same language tables");
+{
+  const runtime = readFileSync(new URL("../assets/i18n-runtime.js", import.meta.url), "utf8");
+  const match = runtime.match(/var LM_SHORT_WORDS = (\{[\s\S]*?\n\});/);
+  check("runtime table is present", match);
+  if (match) {
+    const table = Function(`return (${match[1]})`)();
+    const expected = {
+      pl: ["a", "i", "o", "u", "w", "z"],
+      cs: ["a", "i", "k", "o", "s", "u", "v", "z"],
+      sk: ["a", "i", "k", "o", "s", "u", "v", "z"],
+      hr: ["a", "i", "k", "o", "s", "u", "v"],
+      sr: ["a", "i", "k", "o", "s", "u", "v"],
+    };
+    eq("runtime table matches src/nbsp.mjs", JSON.stringify(table), JSON.stringify(expected));
+  }
+}
+
+head("12. a whole page: text between tags only");
+{
+  const N = " ";
+  const page = [
+    "<html lang=\"pl\"><head><title>Farba i grunt</title>",
+    "<script>if (a < b && c) { x = \"w domu\"; }</script><style>a i { color: red }</style></head>",
+    "<body><p class=\"a b\" title=\"w domu\">Wynik zapisujesz w projekcie, <b>z pomieszczeniami</b> i listą.</p>",
+    "<textarea>w domu</textarea><pre>i tak</pre><a href=\"/a b\">o tym</a></body></html>",
+  ].join("");
+  const out = nbspHtml(page, "pl");
+  check("prose in a paragraph is bound", out.includes(`zapisujesz w${N}projekcie`) && out.includes(`</b> i${N}listą`));
+  check("text right after a tag is bound", out.includes(`<b>z${N}pomieszczeniami`) && out.includes(`>o${N}tym<`));
+  check("the title is bound", out.includes(`<title>Farba i${N}grunt</title>`));
+  check("attributes are untouched", out.includes(`class="a b" title="w domu"`) && out.includes(`href="/a b"`));
+  check("script content is untouched", out.includes(`x = "w domu"`));
+  check("style content is untouched", out.includes("a i { color: red }"));
+  check("textarea and pre are untouched", out.includes("<textarea>w domu</textarea>") && out.includes("<pre>i tak</pre>"));
+  eq("only spaces changed, nothing else", out.replace(/\u00a0/g, " "), page);
+  eq("a language without the rule is returned as is", nbspHtml(page, "en"), page);
+  eq("idempotent on a page", nbspHtml(out, "pl"), out);
 }
 
 /* ------------------------------------------------------------------ report */

@@ -87,6 +87,7 @@ function collect(dir = ROOT, out = []) {
 const words = (html) => html
   .replace(/<svg[\s\S]*?<\/svg>/g, "\n")
   .replace(/<[^>]+>/g, "\n")
+  .replace(/\u00a0/g, " ")
   .split("\n").map((s) => s.trim()).filter(Boolean);
 
 const between = (html, open, close) => {
@@ -100,8 +101,8 @@ const PAGES = collect();
 
 /** The three that translate in place: the container is in the markup and is empty. */
 const IN_PLACE = ["app/index.html", "app/dashboard/index.html", "p/index.html"];
-/** The two the generator does not write at all. */
-const HAND_WRITTEN = ["404.html", "privacy-policy.html"];
+/** The error page is the only page the generator does not write. */
+const HAND_WRITTEN = ["404.html"];
 
 /** The 370 per-language pages: the ones whose picker the generator filled in. */
 const WITH_PICKER = PAGES.filter((x) => x.html.includes('<span class="lang-btn-name">'));
@@ -187,8 +188,8 @@ checkAll("the Cyrillic name is written in Cyrillic", ["uk"],
 
 head("§3 every shipped page, both pickers");
 
-check("380 of the 385 pages carry a picker the generator filled in",
-  WITH_PICKER.length === PAGES.length - 5,
+check("every localized page carries a picker the generator filled in",
+  WITH_PICKER.length === PAGES.length - IN_PLACE.length - HAND_WRITTEN.length,
   `${WITH_PICKER.length} of ${PAGES.length}`);
 
 checkAll("the five without one are exactly the five that cannot have one", PAGES,
