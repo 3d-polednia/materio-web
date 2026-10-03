@@ -48,7 +48,11 @@
  * (https://auth.liczmat.com/*) and Auth's authorized domains. Miss the first and the mail
  * arrives, the link opens and the page answers 403 API_KEY_HTTP_REFERRER_BLOCKED — the
  * failure looks like a broken reset rather than a missing referrer.
- * `authDomain` below does NOT move: it is the OAuth popup's handler, a different door.
+ * Since 2026-10-03 `authDomain` below is auth.liczmat.com too (review item P2): the Google
+ * sign-in window named materio-502513.firebaseapp.com, because it shows the handler's host.
+ * The owner first added https://auth.liczmat.com/__/auth/handler to the OAuth Web client's
+ * authorized redirect URIs; without that entry Google answers redirect_uri_mismatch and
+ * Google sign-in stops working. Keep the entry if that client is ever edited.
  * This is a requirement, not a measurement — the console cannot be read from here, and
  * nothing in this repository can tell you whether the owner has done it.
  *
@@ -60,7 +64,7 @@
 
 export const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBruPqs3ZLmZnuZuC2uRJNVu2GzMFVGkUQ",
-  authDomain: "materio-502513.firebaseapp.com",
+  authDomain: "auth.liczmat.com",
   projectId: "materio-502513",
   storageBucket: "materio-502513.firebasestorage.app",
   messagingSenderId: "630563506659",

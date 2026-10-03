@@ -1126,11 +1126,14 @@ Kotlin side of it. Change one, change all three.
   `authDomain` **on the apex** was never an option — GitHub Pages cannot serve `/__/auth/`,
   and `liczmat.com` is on GitHub Pages. That is a fact about the apex, not about the
   project: a Firebase Hosting site serves `/__/auth/` natively, which is exactly what
-  `auth.liczmat.com` is for (next bullet). The SDK's `authDomain` in
-  `assets/firebase-config.js` stays `materio-502513.firebaseapp.com` all the same — moving
-  it would move the Google popup handler, and that is a different door from the one the
-  e-mails knock on. **Keep those two entries** if the key's restrictions are ever edited
-  again.
+  `auth.liczmat.com` is for (next bullet). **Since 2026-10-03 the SDK's `authDomain` in
+  `assets/firebase-config.js` is `auth.liczmat.com`** (review item P2: the Google window
+  said "materio-502513.firebaseapp.com"). It works only because the OAuth Web client lists
+  `https://auth.liczmat.com/__/auth/handler` as an authorized redirect URI (owner, same day);
+  without that entry Google answers `redirect_uri_mismatch`. The window shows "LiczMat"
+  instead of the domain only after brand verification in Google Auth Platform. **Keep the
+  two firebaseapp.com referrer entries** on the key all the same if its restrictions are
+  ever edited: other clients of the project still use that handler.
 - **The account e-mails are meant to come from `auth.liczmat.com`, and the repository half
   of that is here (2026-09-09).** Firebase Authentication will only put a custom address in
   the `From` field of the verification, password-reset and address-change mails if the
