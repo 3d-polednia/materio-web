@@ -392,12 +392,15 @@ export function httpsCallable(fns, name) {
   return (data) => {
     S.calls.push([name, data === undefined ? null : data]);
     const answers = window.__fnAnswers || {};
-    const action = (data && data.action) || "";
+    const action = (data && (data.action || data.type)) || "";
     const failure = answers[action + "Error"];
     if (failure) {
       const e = new Error(failure);
       e.code = "functions/" + (failure === "not-admin" ? "permission-denied" : "invalid-argument");
       return Promise.reject(e);
+    }
+    if (name === "sendAccountMail" && !(action in answers)) {
+      return Promise.resolve({ data: { ok: true } });
     }
     if (!(action in answers)) {
       const e = new Error("not-admin");

@@ -6,19 +6,14 @@
  * można go testować w node.
  */
 
-export const WELCOME_LANGS = [
-  "pl", "uk", "de", "en", "cs", "sk", "ro", "hr", "sr", "it", "nl", "es", "fr"
-];
+import {
+  MAIL_FROM, MAIL_LANGS, MAIL_LOGO, MAIL_REPLY_TO, escapeHtml, renderMail
+} from "./mail-map.mjs";
 
-export const WELCOME_FROM = "LiczMat <contact@liczmat.com>";
-export const WELCOME_REPLY_TO = "contact@liczmat.com";
-
-/**
- * The signature's logo: the mark and the word, rendered once to a 2x PNG on a white ground
- * (assets/email/liczmat-logo.png, 432 x 144) so it reads in light and dark mail clients.
- * Served by liczmat.com itself; mail clients do not show SVG.
- */
-export const WELCOME_LOGO = "https://liczmat.com/assets/email/liczmat-logo.png";
+export const WELCOME_LANGS = MAIL_LANGS;
+export const WELCOME_FROM = MAIL_FROM;
+export const WELCOME_REPLY_TO = MAIL_REPLY_TO;
+export const WELCOME_LOGO = MAIL_LOGO;
 
 const URL_CALC_INDEX = Object.freeze({
   "pl": "https://liczmat.com/kalkulatory/",
@@ -34,13 +29,6 @@ const URL_CALC_INDEX = Object.freeze({
   "nl": "https://liczmat.com/nl/rekenmachines/",
   "es": "https://liczmat.com/es/calculadoras/",
   "fr": "https://liczmat.com/fr/calculateurs/"
-});
-
-/** Źródło prawdy dla tych danych to ENTITY w src/site.mjs */
-export const OPERATOR = Object.freeze({
-  name: "Michał Polednia",
-  address: "Widderweg 17, 85570 Markt Schwaben, Deutschland",
-  taxId: "DE329791818"
 });
 
 /**
@@ -84,16 +72,6 @@ export function welcomeMarkerDoc(uid, nowMs, lang) {
     createdAt: nowMs,
     status: "sending"
   };
-}
-
-function escapeHtml(unsafe) {
-  if (!unsafe) return "";
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
 
 const T = {
@@ -267,12 +245,10 @@ export function welcomeMessage({ lang, displayName }) {
   const urlCalc = URL_CALC_INDEX[code];
   const urlApp = "https://liczmat.com/app/";
   const urlPlay = "https://play.google.com/store/apps/details?id=pl.materio.app";
-  const urlPrivacy = "https://liczmat.com/privacy-policy.html";
-
   const greetingPlain = t.greeting(displayName);
   const greetingHtml = t.greeting(escapeHtml(displayName));
 
-  const text = `${greetingPlain}
+  const bodyText = `${greetingPlain}
 
 ${t.ready}
 ${t.pro}
@@ -281,66 +257,13 @@ ${t.calcText}: ${urlCalc}
 ${t.appText}: ${urlApp}
 ${t.playText}: ${urlPlay}
 
-${t.questions}
+${t.questions}`;
 
---
-${OPERATOR.name}
-LiczMat · ${t.roleText}
-https://liczmat.com · contact@liczmat.com
+  const bodyHtml = `<p style="font-size: 16px; margin: 0 0 16px 0;">${greetingHtml}</p>
+<p style="font-size: 16px; margin: 0 0 16px 0;">${t.ready}</p>
+<p style="font-size: 16px; margin: 0 0 24px 0;">${t.pro}</p>
+<ul style="font-size: 16px; margin: 0 0 24px 0; padding-left: 20px;"><li style="margin-bottom: 8px;"><a href="${urlCalc}" style="color: #0056b3; text-decoration: underline;">${t.calcText}</a></li><li style="margin-bottom: 8px;"><a href="${urlApp}" style="color: #0056b3; text-decoration: underline;">${t.appText}</a></li><li style="margin-bottom: 8px;"><a href="${urlPlay}" style="color: #0056b3; text-decoration: underline;">${t.playText}</a></li></ul>
+<p style="font-size: 16px; margin: 0 0 32px 0;">${t.questions}</p>`;
 
-${OPERATOR.name}, ${OPERATOR.address}, USt-IdNr. ${OPERATOR.taxId}
-${t.privacyText}: ${urlPrivacy}
-`;
-
-  const html = `<!DOCTYPE html>
-<html lang="${code}">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(t.subject)}</title>
-</head>
-<body style="margin: 0; padding: 24px; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; color: #111111; line-height: 1.5;">
-  <div style="max-width: 560px; margin: 0 auto;">
-    <p style="font-size: 16px; margin: 0 0 16px 0;">${greetingHtml}</p>
-    
-    <p style="font-size: 16px; margin: 0 0 16px 0;">${t.ready}</p>
-    
-    <p style="font-size: 16px; margin: 0 0 24px 0;">${t.pro}</p>
-    
-    <ul style="font-size: 16px; margin: 0 0 24px 0; padding-left: 20px;">
-      <li style="margin-bottom: 8px;"><a href="${urlCalc}" style="color: #0056b3; text-decoration: underline;">${t.calcText}</a></li>
-      <li style="margin-bottom: 8px;"><a href="${urlApp}" style="color: #0056b3; text-decoration: underline;">${t.appText}</a></li>
-      <li style="margin-bottom: 8px;"><a href="${urlPlay}" style="color: #0056b3; text-decoration: underline;">${t.playText}</a></li>
-    </ul>
-    
-    <p style="font-size: 16px; margin: 0 0 32px 0;">${t.questions}</p>
-    
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; margin: 0 0 24px 0;">
-      <tr>
-        <td style="padding: 0 16px 0 0; vertical-align: middle;">
-          <a href="https://liczmat.com/" style="text-decoration: none;"><img src="${WELCOME_LOGO}" width="162" height="54" alt="LiczMat" style="display: block; border: 0; outline: none;"></a>
-        </td>
-        <td style="padding: 0 0 0 16px; vertical-align: middle; border-left: 1px solid #dddddd; font-size: 14px; line-height: 1.5; color: #111111;">
-          <strong style="font-size: 15px;">${OPERATOR.name}</strong><br>
-          <span style="color: #555555;">LiczMat · ${t.roleText}</span><br>
-          <a href="https://liczmat.com/" style="color: #3d6b00; text-decoration: underline;">liczmat.com</a>
-          <span style="color: #999999;">&nbsp;·&nbsp;</span>
-          <a href="mailto:contact@liczmat.com" style="color: #3d6b00; text-decoration: underline;">contact@liczmat.com</a>
-        </td>
-      </tr>
-    </table>
-
-    <div style="font-size: 12px; color: #555555; border-top: 1px solid #eeeeee; padding-top: 16px;">
-      ${OPERATOR.name}, ${OPERATOR.address}, USt-IdNr. ${OPERATOR.taxId}<br>
-      <a href="${urlPrivacy}" style="color: #555555; text-decoration: underline;">${t.privacyText}</a>
-    </div>
-  </div>
-</body>
-</html>`;
-
-  return {
-    subject: t.subject,
-    text,
-    html
-  };
+  return renderMail({ lang: code, subject: t.subject, bodyText, bodyHtml });
 }

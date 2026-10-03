@@ -32,7 +32,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { FAKE_APP, FAKE_AUTH, FAKE_STORE } from "./fake-firebase.mjs";
+import { FAKE_APP, FAKE_AUTH, FAKE_FUNCTIONS, FAKE_STORE } from "./fake-firebase.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -130,6 +130,9 @@ async function context(options) {
     }
     if (url.includes("/firebasejs/") && url.endsWith("firebase-firestore.js")) {
       return route.fulfill({ status: 200, contentType: "text/javascript", body: FAKE_STORE });
+    }
+    if (url.includes("/firebasejs/") && url.endsWith("firebase-functions.js")) {
+      return route.fulfill({ status: 200, contentType: "text/javascript", body: FAKE_FUNCTIONS });
     }
     if (url.startsWith(base)) return route.continue();
     return route.abort();
@@ -286,7 +289,9 @@ head("3. registration");
   const calls = await page.evaluate(() => window.__fbCalls.map((c) => c[0]));
   check("persistence is chosen before the account is created",
     calls.indexOf("setPersistence") < calls.indexOf("createUser"), calls.join(","));
-  check("and the verification mail goes out", calls.includes("verifyMail"), calls.join(","));
+  const mailCall = await page.evaluate(() => window.__fnCalls.find((c) => c[0] === "sendAccountMail"));
+  check("and the verification mail uses the callable",
+    mailCall && mailCall[1].type === "verify" && mailCall[1].lang === "pl", JSON.stringify(mailCall));
 
   const profile = await page.evaluate(() => window.__fbDocs.get("users/uid-0"));
   // `lang` joined the three on 2026-10-02: the welcome e-mail speaks the language of the
@@ -553,9 +558,10 @@ head("7. resetting a password");
   await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
   eq("the link is sent", await page.locator("#app-status").innerText(),
     "Wysłaliśmy link do zmiany hasła. Sprawdź pocztę.");
-  const calls = await page.evaluate(() => window.__fbCalls);
-  eq("to the address that was typed", calls.filter((c) => c[0] === "resetMail").pop()[1],
-    "kto@example.com");
+  const mailCall = await page.evaluate(() => window.__fnCalls.find((c) => c[0] === "sendAccountMail"));
+  check("the callable gets the reset type, address and language",
+    mailCall && mailCall[1].type === "reset" && mailCall[1].email === "kto@example.com"
+      && mailCall[1].lang === "pl", JSON.stringify(mailCall));
   check("and the box does not read as an error",
     (await page.locator("#app-status.err").count()) === 0);
   eq("no console error", page.lmErrors.join(" / "), "");
@@ -604,6 +610,31 @@ head("8. the profile");
     Object.keys(doc).sort().join() === "appVersion,createdAt,lastSeenAt", JSON.stringify(doc));
 
   eq("no console error", page.lmErrors.join(" / "), "");
+  await page.close();
+  await ctx.close();
+}
+
+head("8b. resend and address change use the account-mail callable");
+{
+  const unverified = structuredClone(ACCOUNT);
+  unverified["kto@example.com"].user.emailVerified = false;
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openApp(ctx, "/app/", { accounts: unverified });
+  await page.fill("#signin-email", "kto@example.com");
+  await page.fill("#signin-password", "sekret123");
+  await page.click("#signin-form button[type=submit]");
+  await signedIn(page);
+  await page.click('.app-nav-item[href$="#konto"]');
+  await page.waitForSelector('[data-panel="account"]:not([hidden])', { timeout: 3000 });
+  await page.click("#app-verify-send");
+  await page.fill("#email-new", "nowy@example.com");
+  await page.fill("#email-password", "sekret123");
+  await page.click("#email-form button[type=submit]");
+  await page.waitForFunction(() => (window.__fnCalls || []).filter((c) => c[0] === "sendAccountMail").length === 2);
+  const calls = await page.evaluate(() => window.__fnCalls.filter((c) => c[0] === "sendAccountMail"));
+  check("resend carries verify and pl", calls.some((c) => c[1].type === "verify" && c[1].lang === "pl"), JSON.stringify(calls));
+  check("change carries the new address and pl", calls.some((c) => c[1].type === "change"
+    && c[1].newEmail === "nowy@example.com" && c[1].lang === "pl"), JSON.stringify(calls));
   await page.close();
   await ctx.close();
 }
@@ -964,6 +995,20 @@ head("11. switching language redraws what JavaScript wrote");
   check("a project due in 18 days appears in upcoming deadlines",
     (await upcoming.locator("#overview-schedule").innerText()).includes("Projekt za osiemnaście dni"));
   await upcoming.close();
+  await ctx.close();
+}
+
+head("7b. a failed account-mail callable falls back to Firebase Auth");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 } });
+  const page = await openApp(ctx, "/app/?mode=reset");
+  await page.evaluate(() => { window.__fnAnswers = { resetError: "function-missing" }; });
+  await page.fill("#reset-email", "kto@example.com");
+  await page.click("#reset-form button[type=submit]");
+  await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
+  const fallback = await page.evaluate(() => window.__fbCalls.filter((c) => c[0] === "resetMail").pop());
+  eq("the SDK receives the address", fallback && fallback[1], "kto@example.com");
+  await page.close();
   await ctx.close();
 }
 

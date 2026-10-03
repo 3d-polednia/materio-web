@@ -51,7 +51,7 @@
  * połowa to functions/admin-map.mjs, sprawdzana przez `node scripts/test-admin-map.mjs`.
  */
 
-import { createHmac } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 
 import * as functionsV1 from "firebase-functions/v1";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
@@ -73,6 +73,9 @@ import { looksLikeTicket, mintTicket, readTicket } from "./pay-ticket.mjs";
 import {
   WELCOME_FROM, WELCOME_REPLY_TO, welcomeDecision, welcomeLang, welcomeMarkerDoc, welcomeMessage,
 } from "./welcome-map.mjs";
+import {
+  IP_LIMIT, TARGET_LIMIT, changeEmail, limitDecision, parseAccountMail, resetPassword, verifyEmail,
+} from "./account-mail-map.mjs";
 import {
   SERVER_PROFILE_DELAY_MS, TRIAL_DAYS, firstAppWrite, serverProfileDoc,
   trialDecision, trialGrantDoc,
@@ -123,6 +126,17 @@ initializeApp();
 
 /** Ten sam region, w którym stoi Firestore (europe-central2, Warszawa). */
 const REGION = "europe-central2";
+
+/** Wspolny transport skrzynki OVH dla wszystkich wiadomosci konta. */
+async function sendMail({ to, subject, text, html }) {
+  const transporter = nodemailer.createTransport({
+    host: "ssl0.ovh.net", port: 465, secure: true,
+    auth: { user: WELCOME_REPLY_TO, pass: SMTP_PASSWORD.value() }
+  });
+  await transporter.sendMail({
+    from: WELCOME_FROM, replyTo: WELCOME_REPLY_TO, to, subject, text, html
+  });
+}
 
 const hmacSha256 = (secret, payload) =>
   createHmac("sha256", secret).update(payload, "utf8").digest("hex");
@@ -699,6 +713,85 @@ export const grantTrial = onDocumentCreated(
 );
 
 
+const mailLimitId = (value) => createHash("sha256").update(value).digest("hex");
+
+/** Rezerwuje oba limity w jednej transakcji, zanim powstanie link i wiadomosc. */
+async function reserveMailLimit(db, type, email, ip, now) {
+  const targetRef = db.collection("mailLimits").doc(mailLimitId(`${type}${email}`));
+  const ipRef = db.collection("mailLimits").doc(mailLimitId(`ip:${ip || "unknown"}`));
+  return db.runTransaction(async (tx) => {
+    const [targetSnap, ipSnap] = await Promise.all([tx.get(targetRef), tx.get(ipRef)]);
+    const target = limitDecision(targetSnap.exists ? targetSnap.data().timestamps : [], now, TARGET_LIMIT);
+    const client = limitDecision(ipSnap.exists ? ipSnap.data().timestamps : [], now, IP_LIMIT);
+    if (!target.allowed || !client.allowed) return false;
+    tx.set(targetRef, { timestamps: target.timestamps, updatedAt: now });
+    tx.set(ipRef, { timestamps: client.timestamps, updatedAt: now });
+    return true;
+  });
+}
+
+/** Wysyla wlasne wiadomosci Auth, ktorych szablonow Firebase nie da sie ostylowac. */
+export const sendAccountMail = onCall(
+  { region: REGION, secrets: [SMTP_PASSWORD], maxInstances: 10 },
+  async (request) => {
+    const parsed = parseAccountMail(request.data);
+    if (parsed.error) throw new HttpsError("invalid-argument", parsed.error);
+    if (parsed.type !== "reset" && !request.auth) {
+      throw new HttpsError("unauthenticated", "sign-in-required");
+    }
+
+    const auth = getAuth();
+    let email;
+    let user;
+    if (parsed.type === "reset") {
+      email = parsed.email;
+      try {
+        user = await auth.getUserByEmail(email);
+      } catch (e) {
+        if (e && e.code === "auth/user-not-found") return { ok: true };
+        throw e;
+      }
+    } else {
+      user = await auth.getUser(request.auth.uid);
+      email = user.email;
+      if (!email) throw new HttpsError("failed-precondition", "no-email");
+    }
+
+    const now = Date.now();
+    const allowed = await reserveMailLimit(
+      getFirestore(), parsed.type, parsed.type === "change" ? parsed.newEmail : email,
+      request.rawRequest && request.rawRequest.ip, now
+    );
+    if (!allowed) {
+      if (parsed.type === "reset") return { ok: true };
+      throw new HttpsError("resource-exhausted", "mail-limit");
+    }
+
+    const settings = { url: "https://liczmat.com/app/" };
+    let link;
+    let message;
+    let recipient = email;
+    if (parsed.type === "verify") {
+      link = await auth.generateEmailVerificationLink(email, settings);
+      message = verifyEmail({ lang: parsed.lang, displayName: user.displayName, link });
+    } else if (parsed.type === "reset") {
+      link = await auth.generatePasswordResetLink(email, settings);
+      message = resetPassword({ lang: parsed.lang, link });
+    } else {
+      link = await auth.generateVerifyAndChangeEmailLink(email, parsed.newEmail, settings);
+      recipient = parsed.newEmail;
+      message = changeEmail({ lang: parsed.lang, link, newEmail: parsed.newEmail });
+    }
+
+    await sendMail({ to: recipient, ...message });
+    logger.info("account-mail: wyslano", {
+      uid: request.auth && request.auth.uid,
+      target: mailLimitId(recipient).slice(0, 16), type: parsed.type
+    });
+    return { ok: true };
+  }
+);
+
 /**
  * E-mail powitalny dla nowego konta (przegląd 2026-10-02, P3).
  *
@@ -748,26 +841,7 @@ export const welcomeMail = onDocumentCreated(
 
       const msg = welcomeMessage({ lang, displayName });
 
-      const transporter = nodemailer.createTransport({
-        host: "ssl0.ovh.net",
-        port: 465,
-        secure: true,
-        auth: {
-          // Wysyła ta sama skrzynka, na którą przychodzą odpowiedzi (welcome-map.mjs).
-          // test-admin-map pilnuje, żeby w kodzie tego pliku nie było żadnego adresu.
-          user: WELCOME_REPLY_TO,
-          pass: SMTP_PASSWORD.value()
-        }
-      });
-
-      await transporter.sendMail({
-        from: WELCOME_FROM,
-        replyTo: WELCOME_REPLY_TO,
-        to: email,
-        subject: msg.subject,
-        text: msg.text,
-        html: msg.html
-      });
+      await sendMail({ to: email, ...msg });
 
       await markerRef.update({ status: "sent", sentAt: Date.now() });
       logger.info("welcome: wyslano", { uid });

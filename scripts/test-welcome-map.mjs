@@ -12,11 +12,11 @@
  * 2. welcomeDecision: marker exists -> already-sent; no email -> no-email; otherwise send.
  * 3. welcomeMessage for EVERY language: subject, text and html non-empty; contains "14"; 
  *    contains the calculators URL for that language; contains https://liczmat.com/app/ 
- *    and the Play link and the privacy link; contains the operator name and DE329791818.
+ *    and the Play link, localized signature and legal links; contains no VAT id.
  * 4. No U+2014 and no U+2013 in any subject/text/html of any language.
  * 5. displayName "<script>alert(1)</script>" is escaped in html, unescaped in text.
  * 6. The calculators paths equal urlCalcIndex(lang) from src/site.mjs.
- * 7. The OPERATOR object equals ENTITY from src/site.mjs.
+ * 7. Contact and privacy paths equal src/site.mjs.
  * 8. welcomeMarkerDoc shape: exactly the keys uid, lang, createdAt, status.
  */
 
@@ -26,10 +26,17 @@ import {
   welcomeLang,
   welcomeDecision,
   welcomeMessage,
-  welcomeMarkerDoc,
-  OPERATOR
+  welcomeMarkerDoc
 } from "../functions/welcome-map.mjs";
-import { urlCalcIndex, ENTITY } from "../src/site.mjs";
+import { URL_CONTACT, URL_PRIVACY } from "../functions/mail-map.mjs";
+import { urlCalcIndex, urlContact, urlPrivacy } from "../src/site.mjs";
+
+const TEAM = {
+  pl: "Zespół LiczMat", de: "Das LiczMat-Team", en: "The LiczMat team", uk: "Команда LiczMat",
+  cs: "Tým LiczMat", sk: "Tím LiczMat", ro: "Echipa LiczMat", hr: "Tim LiczMat",
+  sr: "Tim LiczMat", it: "Il team di LiczMat", nl: "Het LiczMat-team",
+  es: "El equipo de LiczMat", fr: "L'équipe LiczMat"
+};
 
 let passed = 0;
 const failures = [];
@@ -97,14 +104,13 @@ head("3, 4, 6. welcomeMessage checks");
     check(`[${lang}] text contains Play link`, msg.text.includes("https://play.google.com/store/apps/details?id=pl.materio.app"));
     check(`[${lang}] html contains Play link`, msg.html.includes("https://play.google.com/store/apps/details?id=pl.materio.app"));
 
-    check(`[${lang}] text contains privacy link`, msg.text.includes("https://liczmat.com/privacy-policy.html"));
-    check(`[${lang}] html contains privacy link`, msg.html.includes("https://liczmat.com/privacy-policy.html"));
-
-    check(`[${lang}] text contains operator name`, msg.text.includes(OPERATOR.name));
-    check(`[${lang}] html contains operator name`, msg.html.includes(OPERATOR.name));
-    
-    check(`[${lang}] text contains taxId`, msg.text.includes(OPERATOR.taxId));
-    check(`[${lang}] html contains taxId`, msg.html.includes(OPERATOR.taxId));
+    for (const value of [TEAM[lang], `https://liczmat.com${URL_CONTACT[lang]}`,
+      `https://liczmat.com${URL_PRIVACY[lang]}`]) {
+      check(`[${lang}] text contains ${value}`, msg.text.includes(value));
+      check(`[${lang}] html contains ${value}`, msg.html.includes(value));
+    }
+    check(`[${lang}] text has no VAT id`, !msg.text.includes("DE329791818"));
+    check(`[${lang}] html has no VAT id`, !msg.html.includes("DE329791818"));
 
     // No em-dash or en-dash
     check(`[${lang}] no em-dash in subject`, !msg.subject.includes("\u2014"));
@@ -125,12 +131,13 @@ head("5. displayName escaping");
   check("unescaped in text", msg.text.includes("<script>alert(1)</script>"));
 }
 
-/* 7. OPERATOR equals ENTITY */
-head("7. OPERATOR vs ENTITY");
+/* 7. frozen legal paths equal src/site.mjs */
+head("7. legal URL maps");
 {
-  eq("OPERATOR.name", OPERATOR.name, ENTITY.name);
-  eq("OPERATOR.address", OPERATOR.address, ENTITY.address);
-  eq("OPERATOR.taxId", OPERATOR.taxId, ENTITY.taxId);
+  for (const lang of WELCOME_LANGS) {
+    eq(`[${lang}] contact`, URL_CONTACT[lang], urlContact(lang));
+    eq(`[${lang}] privacy`, URL_PRIVACY[lang], urlPrivacy(lang));
+  }
 }
 
 /* 8. welcomeMarkerDoc shape */

@@ -105,6 +105,24 @@ function status(message, isError) {
   box.hidden = !message;
 }
 
+/** Wlasna wiadomosc konta, z awaryjnym powrotem do szablonu Firebase. */
+async function accountMail(type, data, fallback) {
+  try {
+    const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
+    await httpsCallable(getFunctions(state.fbApp, "europe-central2"), "sendAccountMail")({
+      type, lang: document.documentElement.lang || "pl", ...data
+    });
+    return true;
+  } catch (err) {
+    if (err && err.code === "functions/resource-exhausted") {
+      status(T("app_mail_later"), true);
+      return false;
+    }
+    await fallback();
+    return true;
+  }
+}
+
 const escapeHtml = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -304,7 +322,7 @@ function wireAuthForms() {
         auth, $("signup-email").value.trim(), $("signup-password").value);
       // A fresh account gets its verification mail straight away; nothing is gated
       // on it, it is there so a password reset has somewhere to land.
-      fb.sendEmailVerification(cred.user).catch(() => {});
+      accountMail("verify", {}, () => fb.sendEmailVerification(cred.user)).catch(() => {});
     });
   });
 
@@ -312,8 +330,10 @@ function wireAuthForms() {
     e.preventDefault();
     const form = e.currentTarget;
     submitting(form, async () => {
-      await fb.sendPasswordResetEmail(auth, $("reset-email").value.trim());
-      status(T("app_reset_sent"));
+      const email = $("reset-email").value.trim();
+      if (await accountMail("reset", { email }, () => fb.sendPasswordResetEmail(auth, email))) {
+        status(T("app_reset_sent"));
+      }
     });
   });
 
@@ -1271,8 +1291,9 @@ async function reauthenticate(password) {
 function wireAccountPanel() {
   $("app-verify-send").addEventListener("click", async () => {
     try {
-      await fb.sendEmailVerification(auth.currentUser);
-      status(T("app_verify_sent"));
+      if (await accountMail("verify", {}, () => fb.sendEmailVerification(auth.currentUser))) {
+        status(T("app_verify_sent"));
+      }
     } catch (err) { status(authMessage(err && err.code), true); }
   });
 
@@ -1280,11 +1301,12 @@ function wireAccountPanel() {
     e.preventDefault();
     try {
       await reauthenticate($("email-password").value);
-      // verifyBeforeUpdateEmail, not updateEmail: the address only changes once the
-      // owner has proved they can read mail at it.
-      await fb.verifyBeforeUpdateEmail(auth.currentUser, $("email-new").value.trim());
-      $("email-password").value = "";
-      status(T("app_email_changed"));
+      const newEmail = $("email-new").value.trim();
+      if (await accountMail("change", { newEmail },
+        () => fb.verifyBeforeUpdateEmail(auth.currentUser, newEmail))) {
+        $("email-password").value = "";
+        status(T("app_email_changed"));
+      }
     } catch (err) { status(authMessage(err && err.code), true); }
   });
 
