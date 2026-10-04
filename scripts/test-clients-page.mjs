@@ -207,6 +207,10 @@ head("1. the client list");
   const list = await rows(page, "#crm-client-list");
   eq("the client is on the page", list.length, 1);
   check("with their name", list[0].includes("Jan Kowalski"), list[0]);
+  const edit = page.locator("#crm-client-list li[data-id] a.btn-go");
+  eq("every client row has an edit link", await edit.count(), list.length);
+  eq("the edit link has the client address", await edit.getAttribute("href"), "?id=c1");
+  check("the edit link names the client", (await edit.getAttribute("aria-label")).includes("Jan Kowalski"));
   check("and the number worth calling", list[0].includes("600 100 200"), list[0]);
   // p1 holds a calculation (749,85) and a hand-typed cost (1200,00) — 1949,85 in total,
   // counted by wsProjectCosts() and summed for the client.
@@ -278,7 +282,7 @@ head("1d. an invalid postal code blocks saving beside the field");
 head("2. opening a client shows chapter XX's record");
 {
   const page = await open(ctx, CLIENTS, { workspace: workspace(), clients: clients() });
-  await page.click("#crm-client-list a[data-open]");
+  await page.click("#crm-client-list a.btn-go[data-open]");
   await page.waitForSelector("#crm-client-body:not([hidden])");
 
   eq("the heading is the client", (await page.textContent("#crm-title")).trim(), "Jan Kowalski");

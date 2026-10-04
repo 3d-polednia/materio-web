@@ -223,6 +223,7 @@ function quoRow(q) {
             `<option value="${status}"${status === summary.status ? " selected" : ""}>${quoEsc(quoT(`quo_st_${status}`))}</option>`).join("")}</select>
         </label>
         <strong class="dash-fig">${total}</strong>
+        <a class="btn btn-ghost btn-sm btn-go" href="?id=${encodeURIComponent(q.id)}" data-open aria-label="${quoEsc(quoT("row_edit_named").replace("{name}", q.name))}">${quoEsc(quoT("row_edit"))}</a>
         <button type="button" class="btn btn-ghost btn-sm" data-quote-delete aria-label="${quoEsc(`${quoT("quo_remove")}: ${q.name}`)}">${quoEsc(quoT("quo_remove"))}</button>
       </span>
     </li>`;

@@ -96,6 +96,7 @@ function crmClientRow(c) {
     costs.projects}${money} · ${crmEsc(crmDate(crmClientLastAt(c.id)))}${mixed}</em>
       </span>
       <span class="row-actions">
+        <a class="btn btn-ghost btn-sm btn-go" href="?id=${encodeURIComponent(c.id)}" data-open aria-label="${crmEsc(crmT("row_edit_named").replace("{name}", c.name))}">${crmEsc(crmT("row_edit"))}</a>
         ${c.archived
           ? `<button type="button" class="btn btn-ghost btn-sm" data-unarchive>${crmEsc(crmT("cli_archive_undo"))}</button>`
           : ""}

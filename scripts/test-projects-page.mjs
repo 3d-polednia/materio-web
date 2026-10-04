@@ -272,6 +272,13 @@ head("2. the index, with projects in it");
   check("every project name is a real link to its own address",
     (await page.$$eval("#ws-project-list .row-name a, #ws-archive-list .row-name a",
       (a) => a.map((n) => n.getAttribute("href")))).join(",") === "?id=p1,?id=p2,?id=p3");
+  check("every project row has an edit link to the same address and named for the project",
+    await page.$$eval("#ws-project-list li[data-id], #ws-archive-list li[data-id]", (rows) => rows.every((row) => {
+      const name = row.querySelector(".row-name a");
+      const edit = row.querySelector(".row-actions a.btn-go");
+      return edit && edit.getAttribute("href") === name.getAttribute("href")
+        && edit.getAttribute("aria-label").includes(name.textContent.trim());
+    })));
 
   check("the rooms of session 20 are still there",
     await page.$$eval("#ws-room-list li[data-id]", (li) => li.length) === 1);
@@ -305,7 +312,7 @@ head("3. create");
 head("4. one project — chapter XIV");
 {
   const page = await open(ctx, PROJECTS, { workspace: fixture(), active: "p2" });
-  await page.click('#ws-project-list a[href="?id=p1"]');
+  await page.click('#ws-project-list a.btn-go[href="?id=p1"]');
   await page.waitForSelector("#ws-project-body:not([hidden])");
 
   eq("the heading becomes the project", await text(page, "#ws-title"), "Łazienka");
