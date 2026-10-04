@@ -63,7 +63,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20261004h";
+const STAMP = "20261004i";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -851,6 +851,7 @@ const CALC_SCRIPTS = [
  * number (assets/units.js), which is the reason that file exists apart from the engines.
  */
 const WS_SCRIPTS = [
+  "/assets/datepick.js", "/assets/suggest.js",
   "/assets/units.js", "/assets/workspace.js", "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
   // The permission table and the wall it draws. Both pages print money and offer the PDF,
   // and since 2026-09-03 both of those are PRO — so both pages have to be able to ask
@@ -886,6 +887,7 @@ const WS_SCRIPTS = [
  * the prices are in pay.js.
  */
 const CRM_SCRIPTS = [
+  "/assets/suggest.js",
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
@@ -895,6 +897,7 @@ const CRM_SCRIPTS = [
 ];
 
 const COMPANY_SCRIPTS = [
+  "/assets/suggest.js",
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
   "/assets/postal.js",
@@ -917,6 +920,7 @@ const COMPANY_SCRIPTS = [
  * wsEsc/wsNum vocabulary from workspace-calc.js, so that file must load before the exporter.
  */
 const QUOTES_SCRIPTS = [
+  "/assets/datepick.js", "/assets/suggest.js",
   "/assets/workspace.js", "/assets/workspace-calc.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
@@ -931,6 +935,7 @@ const QUOTES_SCRIPTS = [
  * without it would leave those answering for a workspace that is not there.
  */
 const CALENDAR_SCRIPTS = [
+  "/assets/datepick.js",
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js",
   "/assets/crm.js",
@@ -1993,6 +1998,7 @@ function buildPrivatePages() {
     // as a ninth collection, so the sync tab has a third store to push and pull, and the
     // Materiały tab reads its list through the same globals.
     classicScripts: [
+      "/assets/datepick.js", "/assets/suggest.js",
       "/assets/units.js", "/assets/workspace.js", "/assets/recent.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
       "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
       "/assets/dashboard.js",

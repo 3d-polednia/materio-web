@@ -1,0 +1,179 @@
+/* LiczMat date input picker. Mouse/Chromium only; touch, forced colours and Firefox keep
+   the native control. Firefox does not expose a reliable way to suppress its date popup,
+   so selector support for WebKit's indicator is the deliberate enhancement boundary. */
+(function () {
+  "use strict";
+
+  const fine = matchMedia("(pointer: fine) and (not (forced-colors: active))");
+  const webkitDate = typeof CSS !== "undefined" && CSS.supports
+    && CSS.supports("selector(input::-webkit-calendar-picker-indicator)");
+  if (!fine.matches || !webkitDate) return;
+
+  let input = null;
+  let shown = null;
+  let cursor = null;
+  let pop = null;
+  const pad = (n) => String(n).padStart(2, "0");
+  const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const date = (value) => {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
+    return match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12) : null;
+  };
+  const add = (d, days) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + days, 12);
+  const cap = (value) => value ? value.charAt(0).toLocaleUpperCase(document.documentElement.lang) + value.slice(1) : value;
+  const word = (key, fallback) => typeof t === "function" ? t(key) : fallback;
+
+  function fieldLabel(el) {
+    if (el.getAttribute("aria-label")) return el.getAttribute("aria-label");
+    const labelled = el.getAttribute("aria-labelledby");
+    if (labelled) return labelled.split(/\s+/).map((id) => document.getElementById(id)?.textContent || "").join(" ").trim();
+    const label = el.labels && el.labels[0];
+    return label ? label.textContent.trim() : "Date";
+  }
+
+  function allowed(value) {
+    return (!input.min || value >= input.min) && (!input.max || value <= input.max);
+  }
+
+  function position() {
+    if (!pop || !input) return;
+    const r = input.getBoundingClientRect();
+    const gap = 4;
+    const width = pop.offsetWidth;
+    const height = pop.offsetHeight;
+    const left = Math.max(8, Math.min(r.left, innerWidth - width - 8));
+    const below = innerHeight - r.bottom;
+    const top = below >= height + gap || below >= r.top ? r.bottom + gap : Math.max(8, r.top - height - gap);
+    pop.style.left = `${left}px`;
+    pop.style.top = `${top}px`;
+  }
+
+  function close(focus) {
+    if (!pop) return;
+    pop.remove();
+    pop = null;
+    const old = input;
+    input = null;
+    if (focus && old) old.focus({ preventScroll: true });
+  }
+
+  function choose(value) {
+    if (!allowed(value)) return;
+    input.value = value;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    close(true);
+  }
+
+  function weekdays(lang) {
+    const sundayFirst = /^en(?:-|$)/i.test(lang);
+    const monday = new Date(2026, 0, sundayFirst ? 4 : 5, 12);
+    return Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(lang, { weekday: "short" }).format(add(monday, i)));
+  }
+
+  function render(focusDay) {
+    if (!pop || !input) return;
+    const lang = document.documentElement.lang || "pl";
+    const first = new Date(shown.getFullYear(), shown.getMonth(), 1, 12);
+    const sundayFirst = /^en(?:-|$)/i.test(lang);
+    const offset = sundayFirst ? first.getDay() : (first.getDay() + 6) % 7;
+    const start = add(first, -offset);
+    const selected = input.value;
+    const today = iso(new Date());
+    const title = cap(new Intl.DateTimeFormat(lang, { month: "long", year: "numeric" }).format(first));
+    const days = Array.from({ length: 42 }, (_, index) => {
+      const d = add(start, index);
+      const value = iso(d);
+      const classes = ["lm-pop-row", "lm-date-day"];
+      if (d.getMonth() !== shown.getMonth()) classes.push("is-out");
+      if (value === today) classes.push("is-today");
+      return `<button type="button" class="${classes.join(" ")}" role="gridcell" data-date="${value}" aria-selected="${value === selected}"${allowed(value) ? "" : " disabled"}>${d.getDate()}</button>`;
+    }).join("");
+    pop.innerHTML = `<div class="lm-date-head"><button type="button" class="lm-pop-row lm-date-nav" data-month="-1" aria-label="${word("app_schedule_prev", "Previous month")}">‹</button><div class="lm-date-title">${title}</div><button type="button" class="lm-pop-row lm-date-nav" data-month="1" aria-label="${word("app_schedule_next", "Next month")}">›</button></div><div class="lm-date-week" aria-hidden="true">${weekdays(lang).map((v) => `<span>${v}</span>`).join("")}</div><div class="lm-date-grid" role="grid">${days}</div><div class="lm-date-foot"><button type="button" class="lm-pop-row lm-date-action" data-clear${input.required ? " disabled" : ""}>${word("dp_clear", "Clear")}</button><button type="button" class="lm-pop-row lm-date-action" data-today${allowed(today) ? "" : " disabled"}>${word("dp_today", "Today")}</button></div>`;
+    position();
+    const target = pop.querySelector(`[data-date="${focusDay || cursor || selected || today}"]:not(:disabled)`)
+      || pop.querySelector("[data-date]:not(:disabled)");
+    cursor = target ? target.dataset.date : null;
+    if (focusDay && target) target.focus();
+  }
+
+  function move(next) {
+    const value = iso(next);
+    cursor = value;
+    if (next.getMonth() !== shown.getMonth() || next.getFullYear() !== shown.getFullYear()) shown = new Date(next.getFullYear(), next.getMonth(), 1, 12);
+    render(value);
+  }
+
+  function open(el, keyboard) {
+    if (pop && input === el) return;
+    close(false);
+    input = el;
+    const base = date(el.value) || date(el.min) || new Date();
+    shown = new Date(base.getFullYear(), base.getMonth(), 1, 12);
+    cursor = iso(base);
+    pop = document.createElement("div");
+    pop.className = "lm-pop lm-date-pop";
+    pop.setAttribute("role", "dialog");
+    pop.setAttribute("aria-modal", "false");
+    pop.setAttribute("aria-label", fieldLabel(el));
+    document.body.appendChild(pop);
+    render(keyboard ? cursor : null);
+  }
+
+  document.addEventListener("click", (event) => {
+    const el = event.target.closest && (event.target.closest('input[type="date"]')
+      || event.target.closest(".lm-date-wrap")?.querySelector('input[type="date"]'));
+    if (el) { event.preventDefault(); el.classList.add("lm-date"); open(el, false); return; }
+    if (!pop) return;
+    const day = event.target.closest("[data-date]");
+    if (day) { choose(day.dataset.date); return; }
+    const month = event.target.closest("[data-month]");
+    if (month) { shown = new Date(shown.getFullYear(), shown.getMonth() + Number(month.dataset.month), 1, 12); cursor = iso(shown); render(false); return; }
+    if (event.target.closest("[data-clear]")) { input.value = ""; input.dispatchEvent(new Event("input", { bubbles: true })); input.dispatchEvent(new Event("change", { bubbles: true })); close(true); return; }
+    if (event.target.closest("[data-today]")) choose(iso(new Date()));
+    else if (!event.target.closest(".lm-date-pop")) close(false);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const el = event.target.closest && event.target.closest('input[type="date"]');
+    if (el && ((event.altKey && event.key === "ArrowDown") || event.key === "F4")) { event.preventDefault(); el.classList.add("lm-date"); open(el, true); return; }
+    if (!pop) return;
+    if (event.key === "Escape") { event.preventDefault(); close(true); return; }
+    if (!event.target.closest(".lm-date-pop")) return;
+    const current = date(cursor) || new Date();
+    let next = null;
+    if (event.key === "ArrowLeft") next = add(current, -1);
+    else if (event.key === "ArrowRight") next = add(current, 1);
+    else if (event.key === "ArrowUp") next = add(current, -7);
+    else if (event.key === "ArrowDown") next = add(current, 7);
+    else if (event.key === "Home") next = add(current, -((/^en(?:-|$)/i.test(document.documentElement.lang) ? current.getDay() : (current.getDay() + 6) % 7)));
+    else if (event.key === "End") next = add(current, 6 - ((/^en(?:-|$)/i.test(document.documentElement.lang) ? current.getDay() : (current.getDay() + 6) % 7)));
+    else if (event.key === "PageUp") next = new Date(current.getFullYear(), current.getMonth() - 1, current.getDate(), 12);
+    else if (event.key === "PageDown") next = new Date(current.getFullYear(), current.getMonth() + 1, current.getDate(), 12);
+    else if ((event.key === "Enter" || event.key === " ") && event.target.matches("[data-date]")) { event.preventDefault(); choose(event.target.dataset.date); return; }
+    if (next) { event.preventDefault(); move(next); }
+  });
+
+  function mark(el) {
+    if (!el.matches?.('input[type="date"]')) return;
+    el.classList.add("lm-date");
+    if (el.parentElement?.classList.contains("lm-date-wrap")) return;
+    const wrap = document.createElement("span");
+    wrap.className = "lm-date-wrap";
+    el.before(wrap);
+    wrap.append(el);
+    const icon = document.createElement("span");
+    icon.className = "lm-date-icon";
+    icon.setAttribute("aria-hidden", "true");
+    wrap.append(icon);
+  }
+  document.querySelectorAll('input[type="date"]').forEach(mark);
+  new MutationObserver((rows) => rows.forEach((row) => row.addedNodes.forEach((node) => {
+    if (node.nodeType !== 1) return;
+    mark(node);
+    node.querySelectorAll?.('input[type="date"]').forEach(mark);
+  }))).observe(document.documentElement, { childList: true, subtree: true });
+  addEventListener("resize", position);
+  addEventListener("scroll", position, true);
+  document.addEventListener("langchange", () => { if (pop) render(false); });
+}());

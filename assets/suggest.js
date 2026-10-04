@@ -1,0 +1,130 @@
+/* LiczMat datalist replacement for fine pointers. The native datalist stays intact on
+   touch devices and in forced-colour mode. */
+(function () {
+  "use strict";
+  if (!matchMedia("(pointer: fine) and (not (forced-colors: active))").matches) return;
+
+  let input = null;
+  let list = null;
+  let active = -1;
+  let rows = [];
+  let serial = 0;
+  const normalize = (value) => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase(document.documentElement.lang || "pl");
+  const datalist = (el) => document.getElementById(el.dataset.lmList || "");
+
+  function position() {
+    if (!list || !input) return;
+    const r = input.getBoundingClientRect();
+    const gap = 4;
+    list.style.width = `${Math.max(r.width, 192)}px`;
+    const left = Math.max(8, Math.min(r.left, innerWidth - list.offsetWidth - 8));
+    const below = innerHeight - r.bottom;
+    const top = below >= list.offsetHeight + gap || below >= r.top ? r.bottom + gap : Math.max(8, r.top - list.offsetHeight - gap);
+    list.style.left = `${left}px`;
+    list.style.top = `${top}px`;
+  }
+
+  function close() {
+    if (list) list.remove();
+    if (input) { input.setAttribute("aria-expanded", "false"); input.removeAttribute("aria-activedescendant"); }
+    list = null; input = null; rows = []; active = -1;
+  }
+
+  function values(el) {
+    const dl = datalist(el);
+    const needle = normalize(el.value);
+    return dl ? Array.from(dl.options).map((option) => option.value).filter((value, index, all) => value && all.indexOf(value) === index && (!needle || normalize(value).includes(needle))) : [];
+  }
+
+  function setActive(index) {
+    if (!rows.length) return;
+    active = (index + rows.length) % rows.length;
+    rows.forEach((row, i) => row.setAttribute("aria-selected", String(i === active)));
+    input.setAttribute("aria-activedescendant", rows[active].id);
+    rows[active].scrollIntoView({ block: "nearest" });
+  }
+
+  function render(el, forceOpen) {
+    const options = values(el);
+    const dl = datalist(el);
+    el.dataset.lmHasOptions = String(Boolean(dl && dl.options.length));
+    if (!options.length || (document.activeElement !== el && !forceOpen)) { if (input === el) close(); return; }
+    if (input !== el) close();
+    input = el;
+    if (!list) {
+      list = document.createElement("div");
+      list.className = "lm-pop lm-suggest-pop";
+      list.id = `lm-suggest-${++serial}`;
+      list.setAttribute("role", "listbox");
+      document.body.appendChild(list);
+      el.setAttribute("aria-controls", list.id);
+      el.setAttribute("aria-expanded", "true");
+    }
+    list.innerHTML = options.map((value, index) => `<button type="button" class="lm-pop-row" role="option" id="${list.id}-${index}" data-value="${value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")}" aria-selected="false">${value.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</button>`).join("");
+    rows = Array.from(list.querySelectorAll('[role="option"]'));
+    active = -1;
+    position();
+  }
+
+  function select(value) {
+    const el = input;
+    el.value = value;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    close();
+    el.focus({ preventScroll: true });
+  }
+
+  function enhance(el) {
+    if (!el.matches?.("input[list]") || el.dataset.lmList) return;
+    const id = el.getAttribute("list");
+    if (!id || !document.getElementById(id)) return;
+    el.dataset.lmList = id;
+    el.removeAttribute("list");
+    el.classList.add("lm-suggest");
+    el.setAttribute("role", "combobox");
+    el.setAttribute("aria-expanded", "false");
+    el.setAttribute("aria-autocomplete", "list");
+    el.dataset.lmHasOptions = String(Boolean(datalist(el)?.options.length));
+  }
+
+  document.querySelectorAll("input[list]").forEach(enhance);
+  document.addEventListener("focusin", (event) => { if (event.target.matches?.("input[data-lm-list]")) render(event.target, true); });
+  document.addEventListener("click", (event) => {
+    const option = event.target.closest?.('[role="option"][data-value]');
+    if (option && list?.contains(option)) { select(option.dataset.value); return; }
+    if (event.target.matches?.("input[data-lm-list]")) render(event.target, true);
+    else if (!event.target.closest?.(".lm-suggest-pop")) close();
+  });
+  document.addEventListener("input", (event) => { if (event.target.matches?.("input[data-lm-list]")) render(event.target, true); });
+  document.addEventListener("keydown", (event) => {
+    if (!event.target.matches?.("input[data-lm-list]")) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!list) render(event.target, true);
+      setActive(active + (event.key === "ArrowDown" ? 1 : -1));
+    } else if (event.key === "Enter" && list && active >= 0) { event.preventDefault(); select(rows[active].dataset.value); }
+    else if (event.key === "Escape") { event.preventDefault(); close(); event.target.focus(); }
+    else if (event.key === "Tab") close();
+  });
+  new MutationObserver((changes) => {
+    let refresh = false;
+    changes.forEach((change) => {
+      change.addedNodes.forEach((node) => {
+        if (node.nodeType !== 1) return;
+        enhance(node);
+        node.querySelectorAll?.("input[list]").forEach(enhance);
+      });
+      const dl = change.target.closest?.("datalist");
+      if (dl) {
+        document.querySelectorAll(`input[data-lm-list="${CSS.escape(dl.id)}"]`).forEach((el) => {
+          el.dataset.lmHasOptions = String(Boolean(dl.options.length));
+          if (document.activeElement === el) { refresh = true; input = el; }
+        });
+      }
+    });
+    if (refresh && input) render(input, true);
+  }).observe(document.documentElement, { childList: true, subtree: true });
+  addEventListener("resize", position);
+  addEventListener("scroll", position, true);
+}());

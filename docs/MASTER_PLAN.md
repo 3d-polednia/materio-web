@@ -978,6 +978,19 @@ głównej.
 
 > Pozycje już rozstrzygnięte przeniesiono 2026-09-09 do `Obsidian/Liczmat/Historia/Rozstrzygniete decyzje i zamkniete ostrzezenia.md`.
 
+### Własne pickery daty i podpowiedzi — 2026-10-04
+
+Desktopowe Chrome i Edge dostały wspólną, rysowaną przez stronę kartę `.lm-pop` dla pól
+`date` i `datalist`. Dotyk, forced colors i Firefox zachowują kontrolki systemowe. Kalendarz
+zostawia `type="date"`, wartość ISO i zdarzenia formularza bez zmian; podpowiedzi dalej
+czytają opcje wpisywane asynchronicznie przez `postal.js`. Oba komponenty działają przez
+delegację także dla pól tworzonych po starcie strony.
+
+Test przeglądarkowy: 25/25. Wskazany zestaw regresji nie dostał nowych błędów; zostały
+wcześniejsze: `test-quotes-page` 1, `test-account-page` 4, `test-langs` 3. Zrzuty jasne
+i ciemne kalendarza, miejscowości oraz referencyjnego selecta są w
+`C:\Projekty\liczmat-makiety\pickers\`. Budżety po pomiarze: test wydajności 21278/21278.
+
 ## Czego plan nie obejmuje, a warto wiedzieć
 
 - **`docs/` nie jest publikowane.** `.github/workflows/pages.yml` usuwa `docs/`, `src/`,
