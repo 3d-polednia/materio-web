@@ -2801,7 +2801,7 @@ function omatForm(t, aisles, c, heading = false) {
             <label class="field omat-f">
               <span class="fld-label">${esc(c("omat_unit"))}</span>
               <select data-omat-in="unit">${t("quo_units").split("|").filter(Boolean).map((unit, index) => `<option${index === 0 ? " selected" : ""}>${esc(unit)}</option>`).join("")}</select>
-            </label>` : fields.map(measureField).join("\n            ")}
+            </label>` : `<div class="omat-measure-grid">${fields.map(measureField).join("\n            ")}</div>`}
           </div>`).join("\n          ");
 
   return `<form class="card omat-form" data-omat-form>
@@ -2823,13 +2823,13 @@ function omatForm(t, aisles, c, heading = false) {
           </label>
         </div>
         ${groups}
-        <label class="field">
+        <label class="field omat-price-field">
           <span class="fld-label" data-omat-price-label="pack">${esc(c("omat_price"))}</span>
           <span class="fld-label" data-omat-price-label="unit" hidden>${esc(c("omat_price_unit"))}</span>
           <input type="text" inputmode="decimal" data-omat-in="priceMajor">
         </label>
-        <p class="muted">${esc(c("omat_cur_note"))}</p>
-        <button type="submit" class="btn btn-primary btn-block">${esc(c("omat_save"))}</button>
+        <p class="muted field-note">${esc(c("omat_cur_note"))}</p>
+        <div class="form-foot"><button type="submit" class="btn btn-primary">${esc(c("omat_save"))}</button></div>
         <!-- Written by the script when a name is missing; empty and announced, so a
              refusal reaches somebody who cannot see the field turn red. -->
         <p class="omat-err" data-omat-err role="alert" hidden></p>

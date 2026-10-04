@@ -318,6 +318,8 @@
   --sp-10: 40px;
   --sp-12: 48px;
   --sp-16: 64px;
+  --form-row-gap: var(--sp-5);
+  --form-col-gap: var(--sp-4);
 
   --radius-xs: 8px;
   --radius-sm: 12px;
@@ -933,7 +935,7 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 [aria-invalid="true"] { border-color: var(--error) !important; }
 [aria-invalid="true"]:focus-visible { outline-color: var(--error); }
 
-.field { margin-bottom: var(--sp-3); }
+.field { display: block; margin-bottom: var(--form-row-gap); }
 .field label, .fld-label, .ws-bar-label {
   display: block; font-weight: var(--fw-semi); font-size: var(--fs-sm); margin-bottom: var(--sp-1);
 }
@@ -947,7 +949,7 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .field-affix > span { position: absolute; inset-inline-end: var(--control-px); top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
 /* Reserved space keeps long amounts from running underneath their currency suffix. */
 .field-affix > input { padding-inline-end: calc(var(--control-px) + 2.5rem) !important; }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--form-row-gap) var(--form-col-gap); }
 /* A field inside an "add a row" form. Same label + control pair as a stacked field, laid
    out along the row instead of down the card, so the submit button lines up with the
    controls rather than with the labels above them. */
@@ -961,7 +963,7 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .inline-form .field-narrow { flex: 0 1 12rem; }
 .field textarea { min-height: var(--control-h-lg); resize: vertical; }
 /* The new-project form uses fixed spans so every field row ends on the same grid edge. */
-.inline-form.ws-project-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.inline-form.ws-project-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--form-row-gap) var(--form-col-gap); }
 /* The project name and client each take half of the wide form row. */
 .ws-project-grid > .field:nth-child(-n + 2) { grid-column: span 3; }
 /* Status, deadline and value divide their row into equal thirds. */
@@ -977,7 +979,7 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 /* The new-client form gets the same six tracks once the country field joined it (P4): name and
    phone, e-mail and country in halves, a short postal code beside a wide city, the street beside
    the button, so no row ends in its own place. */
-.inline-form.crm-client-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.inline-form.crm-client-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--form-row-gap) var(--form-col-gap); }
 .crm-client-grid > .field { grid-column: span 3; }
 /* The account shell caps fields and controls at a reading measure; inside these tracks the grid sets the width. */
 #crm-client-form.crm-client-grid > .field, #crm-client-form.crm-client-grid .field input, #crm-client-form.crm-client-grid .field select { max-width: none; }
@@ -1063,7 +1065,7 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .company-logo-thumb { width: 120px; height: 60px; display: grid; place-items: center; flex: none; background: var(--surface-alt); }
 .company-logo-thumb img { max-width: 120px; max-height: 60px; object-fit: contain; }
 #company-form h2 { font-size: var(--fs-h3); margin: 0 0 var(--sp-4); }
-.company-logo-field { position: relative; align-items: flex-start; margin: var(--sp-3) 0; }
+.company-logo-field { position: relative; align-items: flex-start; margin: 0 0 var(--form-row-gap); }
 /* The native file input stays in the page for the keyboard and the label's click, only
    out of sight; its focus is drawn on the label that stands in for it. */
 .company-logo-field .company-logo-input { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; min-height: 0; padding: 0; border: 0; opacity: 0; overflow: hidden; }
@@ -2017,7 +2019,7 @@ html.js #pro-pay[data-pro-period="monthly"] [data-pw-plan="yearly"], html.js #pr
   gap: var(--sp-3); margin-bottom: var(--sp-6); padding-bottom: var(--sp-3);
   border-bottom: 1px solid var(--outline);
 }
-.inline-form { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-3); }
+.inline-form { display: flex; flex-wrap: wrap; gap: var(--form-row-gap) var(--form-col-gap); margin-bottom: var(--form-row-gap); }
 .inline-form input { flex: 1 1 160px; min-width: 0; width: auto; }
 .inline-form input[inputmode="decimal"] { flex: 0 1 84px; }
 .inline-form button { flex: none; }
@@ -2069,7 +2071,13 @@ html.js #pro-pay[data-pro-period="monthly"] [data-pw-plan="yearly"], html.js #pr
    "pamiętaj mnie" is the one box on the sign-in card. */
 .field-check input { width: var(--sp-6); height: var(--sp-6); flex: none; accent-color: var(--accent-strong); }
 .field-check label { font-size: var(--fs-sm); margin: 0; }
-.field-note { font-size: var(--fs-sm); margin: calc(-1 * var(--sp-2)) 0 var(--sp-4); }
+.field-note { font-size: var(--fs-sm); margin: var(--sp-2) 0 var(--form-row-gap); }
+
+.form-foot {
+  display: flex; justify-content: flex-end; gap: var(--sp-3);
+  margin-top: var(--sp-6); padding-top: var(--sp-4); border-top: 1px solid var(--outline);
+}
+@media (max-width: 560px) { .form-foot .btn { width: 100%; } }
 
 /* ---------- The three access levels (master plan II)
    One card per level, on the signed-out page and again in the Profil tab. The card
@@ -2725,8 +2733,11 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 /* Two fields side by side above 560 px and one below it, which is the width every other
    two-column row on this site folds at. */
 .omat-row-fields, .omat-row + .omat-row-fields { display: block; }
-.omat-form .omat-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin: 0; }
-@media (max-width: 560px) { .omat-form .omat-row { grid-template-columns: 1fr; } }
+.omat-form .omat-row, .omat-measure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--form-row-gap) var(--form-col-gap); margin: 0 0 var(--form-row-gap); }
+.omat-form :is(.omat-row, .omat-measure-grid) .field, .omat-form .omat-price-field { margin-bottom: 0; }
+/* Every field in the card fills its column, the name and the price included (colleague review, P6). */
+.omat-form .field, .omat-form .field :is(input, select) { width: 100%; max-width: none; }
+@media (max-width: 560px) { .omat-form :is(.omat-row, .omat-measure-grid) { grid-template-columns: 1fr; } }
 
 /* The price field and its button on one line: the button is the action for the field
    beside it, and a full-width button under a narrow field reads as the form's action. */
@@ -2808,8 +2819,9 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 /* Editing a material, and typing one in by hand: the same form in two places, so it reads
    and wraps the same way. One column on a phone, name-wide + two narrow + aisle above it. */
 .ws-mat-edit, .ws-mat-add form { flex-basis: 100%; }
-.ws-mat-grid { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: 0 0 var(--sp-3); }
-.ws-mat-f { display: flex; flex-direction: column; gap: 2px; flex: 1 1 12rem; min-width: 0; }
+.ws-mat-grid { display: flex; flex-wrap: wrap; gap: var(--form-row-gap) var(--form-col-gap); margin: 0 0 var(--form-row-gap); }
+.ws-mat-f { display: flex; flex-direction: column; gap: var(--sp-1); flex: 1 1 12rem; min-width: 0; }
+.ws-mat-f .ws-bar-label { margin-bottom: 0; }
 .ws-mat-f-sm { flex: 1 1 5.5rem; }
 /* A postal code is short, its label is not: "Kod pocztowy" broke onto two lines at 5.5rem
    and dropped the field below its neighbours. The label keeps one line, the box its width. */
@@ -3000,7 +3012,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 #quo-page .quo-new-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-3);
+  gap: var(--form-row-gap) var(--form-col-gap);
   margin-top: var(--sp-4);
 }
 #quo-page .quo-new-grid details {
@@ -3073,7 +3085,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 #quo-page .quo-action-bar #quo-saved:empty { margin-inline-end: calc(-1 * var(--sp-3)); }
 #quo-page .quo-action-bar .quo-delete-zone { margin-left: auto; }
 #quo-page .quo-action-bar .ws-ask { flex-basis: 100%; }
-#quo-page .quo-issuer-field { margin: 0 0 var(--sp-2); max-width: 26rem; }
+#quo-page .quo-issuer-field { margin: 0 0 var(--form-row-gap); max-width: 26rem; }
 #quo-page .quo-issuer-field select { width: 100%; }
 #quo-page .quo-index-row { align-items: flex-start; }
 #quo-page .quo-index-missing { color: var(--warning); }
