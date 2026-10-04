@@ -1409,7 +1409,7 @@ export function quotePdfBlock(lang, t, features, stamp = "") {
                     <div class="qdoc-company-name" data-pdf="companyName"></div>
                     <div data-pdf-row="companyStreet" hidden data-pdf="companyStreet"></div>
                     <div data-pdf-row="companyPostalCity" hidden data-pdf="companyPostalCity"></div>
-                    <div data-pdf-row="companyNip" hidden><span class="qdoc-label">${esc(t("company_nip"))}</span> <span data-pdf="companyNip"></span></div>
+                    <div data-pdf-row="companyNip" hidden><span class="qdoc-label" data-pdf="companyTaxLabel" data-generic="${esc(t("company_nip"))}">${esc(t("company_nip"))}</span> <span data-pdf="companyNip"></span></div>
                     <div data-pdf-row="companyPhone" hidden><span class="qdoc-label">${esc(c("qdoc_phone"))}</span> <span data-pdf="companyPhone"></span></div>
                     <div data-pdf-row="companyEmail" hidden><span class="qdoc-label">${esc(c("qdoc_email"))}</span> <span data-pdf="companyEmail"></span></div>
                     <div data-pdf-row="companyWww" hidden data-pdf="companyWww"></div>
@@ -1906,8 +1906,8 @@ export function companyMain(lang, t, features) {
   const gate = proGate(t, "company", features, lang, { id: "company-gate" });
   const fields = [
     ["name", "company_name", "text", "120", "organization"],
-    ["nip", "company_nip", "text", "20", "off"],
     ["country", "company_country", "select", "2", "country"],
+    ["nip", "company_nip", "text", "20", "off"],
     ["postalCode", "company_postal", "text", "12", "postal-code"],
     ["city", "company_city", "text", "120", "address-level2"],
     ["street", "company_street", "text", "200", "street-address"],
@@ -1937,10 +1937,10 @@ export function companyMain(lang, t, features) {
         <h2 id="company-form-title">${esc(t("company_add"))}</h2>
         <div class="ws-mat-grid">
           ${fields.map(([id, key, type, max, autocomplete]) => `<label class="ws-mat-f">
-            <span class="ws-bar-label">${esc(t(key))}${id === "name" ? "*" : ""}</span>
+            <span class="ws-bar-label"${id === "nip" ? ` id="company-nip-label"` : ""}>${esc(t(key))}${id === "name" ? "*" : ""}</span>
             ${type === "select"
     ? `<select id="company-${id}" name="${id}" autocomplete="${autocomplete}"></select>`
-    : `<input id="company-${id}" name="${id}" type="${type}" maxlength="${max}" autocomplete="${autocomplete}"${id === "phone" ? ` inputmode="tel" aria-describedby="company-phone-error"` : ""}${id === "postalCode" ? ` aria-describedby="company-postal-error"` : ""}${id === "city" ? ` list="company-city-list"` : ""}${id === "name" ? " required" : ""}>`}${id === "phone" ? `
+    : `<input id="company-${id}" name="${id}" type="${type}" maxlength="${max}" autocomplete="${autocomplete}"${id === "nip" ? ` aria-labelledby="company-nip-label"` : ""}${id === "phone" ? ` inputmode="tel" aria-describedby="company-phone-error"` : ""}${id === "postalCode" ? ` aria-describedby="company-postal-error"` : ""}${id === "city" ? ` list="company-city-list"` : ""}${id === "name" ? " required" : ""}>`}${id === "phone" ? `
             <span id="company-phone-error" class="field-error" role="alert" hidden>${esc(t("phone_invalid"))}</span>` : ""}${id === "postalCode" ? `
             <span id="company-postal-error" class="field-error" role="alert" hidden>${esc(t("postal_invalid"))}</span>` : ""}
           </label>`).join("\n")}

@@ -349,7 +349,7 @@ function pdfQuoteSnapshot(quoteId) {
   const per = (field) => typeof wsSumsText === "function"
     ? wsSumsText(totals.projectByCurrency, field) : "";
   const cleanCompany = {};
-  for (const key of ["name", "street", "postalCode", "city", "nip", "phone", "email", "www", "bankAccount", "logo"])
+  for (const key of ["name", "country", "street", "postalCode", "city", "nip", "phone", "email", "www", "bankAccount", "logo"])
     cleanCompany[key] = String(company[key] || "");
   return JSON.parse(JSON.stringify({
     lang: document.documentElement.lang || "pl",
@@ -426,6 +426,10 @@ function pdfRenderQuote(doc, snap) {
   put("logoCompanyName", company.name);
   optional("companyStreet", company.street);
   optional("companyPostalCity", [company.postalCode, company.city].map(str).filter(Boolean).join(" "));
+  // The tax number goes by its name in the issuing company's country (DE: USt-IdNr.);
+  // anywhere else by the page's own generic label, which the build wrote on the element.
+  const taxLabel = pdfEl(doc, "companyTaxLabel");
+  if (taxLabel && typeof LMTaxId !== "undefined") taxLabel.textContent = LMTaxId.taxId(company.country, taxLabel.dataset.generic).label;
   for (const key of ["Nip", "Phone", "Email", "Www"]) optional(`company${key}`, company[key.toLowerCase()]);
   const logo = pdfEl(doc, "companyLogo");
   const logoSrc = pdfQuoteLogo(company.logo);

@@ -63,7 +63,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20261004q";
+const STAMP = "20261004s";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -900,7 +900,7 @@ const COMPANY_SCRIPTS = [
   "/assets/suggest.js",
   "/assets/workspace.js", "/assets/plan.js", "/assets/pay.js", "/assets/paywall.js",
   "/assets/crm-store.js", "/assets/crm.js", "/assets/own-materials.js",
-  "/assets/postal.js",
+  "/assets/postal.js", "/assets/tax-id.js",
   "/assets/company-logo.js", "/assets/company-ui.js",
 ];
 
@@ -925,7 +925,7 @@ const QUOTES_SCRIPTS = [
   "/assets/crm-store.js",
   "/assets/crm.js",
   "/assets/own-materials.js",
-  "/assets/postal.js", "/assets/pdf-export.js", "/assets/quotes-ui.js",
+  "/assets/postal.js", "/assets/tax-id.js", "/assets/pdf-export.js", "/assets/quotes-ui.js",
 ];
 
 /**
@@ -1732,7 +1732,7 @@ function buildQuoteViewPages() {
       main: quoteViewMain(lang, t, LM_FEATURES, STAMP, QUOTE_VIEW_COPY[lang]),
       headExtra: `<link rel="stylesheet" href="/assets/quote-doc.css?v=${STAMP}">
 <script>window.LM_QUOTE_VIEW_LANG=${JSON.stringify(lang)};</script>`,
-      scripts: ["/assets/pdf-export.js"], modules: ["/assets/quote-view.js"],
+      scripts: ["/assets/tax-id.js", "/assets/pdf-export.js"], modules: ["/assets/quote-view.js"],
     }));
   }
 }

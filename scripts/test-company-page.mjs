@@ -135,6 +135,15 @@ head("2. Pro company workflow");
   check("the postal field exists and is visible", await page.locator("#company-postalCode").isVisible());
   check("the city field exists and is visible", await page.locator("#company-city").isVisible());
   await page.selectOption("#company-country", "PL");
+  eq("Poland uses NIP", await page.locator("#company-nip-label").innerText(), "NIP");
+  await page.selectOption("#company-country", "DE");
+  eq("Germany uses USt-IdNr.", await page.locator("#company-nip-label").innerText(), "USt-IdNr.");
+  eq("Germany shows its tax-number example", await page.getAttribute("#company-nip", "placeholder"), "DE123456789");
+  await page.selectOption("#company-country", "GB");
+  eq("an unknown country uses the generic label", await page.locator("#company-nip-label").innerText(), "Numer podatkowy");
+  eq("an unknown country has no example", await page.getAttribute("#company-nip", "placeholder"), "");
+  await page.selectOption("#company-country", "PL");
+  await page.fill("#company-nip", "1234567890");
   await page.fill("#company-postalCode", "00100");
   await page.waitForFunction(() => document.querySelectorAll("#company-city-list option").length > 1);
   check("a code with several places offers a list",
@@ -166,6 +175,9 @@ head("2. Pro company workflow");
   await page.click('#company-form button[type="submit"]');
   await page.locator("#company-list > li").waitFor();
   eq("the company country is saved", await page.evaluate(() => crmCompanies()[0].country), "PL");
+  await page.reload({ waitUntil: "load" });
+  await page.locator("#company-list > li").waitFor();
+  eq("saving and reloading keeps nip unchanged", await page.evaluate(() => crmCompanies()[0].nip), "1234567890");
   eq("a website typed without https:// is saved as typed", await page.evaluate(() => crmCompanies()[0].www), "www.stronainternetowa.pl");
   check("empty logo margins are trimmed before storage", await page.evaluate(async () => {
     const image = new Image();

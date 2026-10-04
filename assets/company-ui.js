@@ -23,11 +23,19 @@ function companyMount() {
   let logo = "";
 
   const field = (name) => document.getElementById(`company-${name}`);
+  const taxLabel = document.getElementById("company-nip-label");
+  const taxNumber = field("nip");
+  const updateTaxId = () => {
+    const local = LMTaxId.taxId(field("country").value, companyT("company_nip"));
+    taxLabel.textContent = local.label;
+    taxNumber.placeholder = local.example;
+  };
   const postal = LMPostal.bind({
     country: field("country"), postal: field("postalCode"), city: field("city"),
     error: document.getElementById("company-postal-error"),
     datalist: document.getElementById("company-city-list"),
   });
+  field("country").addEventListener("change", updateTaxId);
   const phone = field("phone");
   const phoneError = document.getElementById("company-phone-error");
   const showPhoneError = (show) => {
@@ -48,6 +56,7 @@ function companyMount() {
     form.reset();
     showPhoneError(false);
     postal.setCountry(LMPostal.defaultCountry(document.documentElement.lang));
+    updateTaxId();
     showLogo();
     cancel.hidden = true;
     document.getElementById("company-form-title").textContent = companyT("company_add");
@@ -63,7 +72,7 @@ function companyMount() {
       </span>
       <span class="row-name">
         <b>${companyEsc(company.name)}</b>
-        ${company.nip ? `<small>${companyEsc(companyT("company_nip"))}: ${companyEsc(company.nip)}</small>` : ""}
+        ${company.nip ? `<small>${companyEsc(LMTaxId.taxId(company.country, companyT("company_nip")).label)}: ${companyEsc(company.nip)}</small>` : ""}
         ${company.city ? `<small>${companyEsc(company.city)}</small>` : ""}
         ${company.isDefault ? `<small>${companyEsc(companyT("company_default"))}</small>` : ""}
       </span>
@@ -87,6 +96,7 @@ function companyMount() {
         .forEach((name) => { field(name).value = company[name] || ""; });
       showPhoneError(false);
       postal.setCountry(company.country || LMPostal.defaultCountry(document.documentElement.lang));
+      updateTaxId();
       postal.refresh(false);
       showLogo();
       cancel.hidden = false;
@@ -148,6 +158,7 @@ function companyMount() {
     // Missing or unknown levels stay closed; paywall.js owns that conservative default.
     pwMount("company", "company");
   }
+  updateTaxId();
   draw();
 }
 

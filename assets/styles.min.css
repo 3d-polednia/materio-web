@@ -1391,7 +1391,7 @@ text-decoration: underline; text-underline-offset: var(--sp-1);
 .field-check { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-4); }
 .field-check input { width: var(--sp-6); height: var(--sp-6); flex: none; accent-color: var(--accent-strong); }
 .field-check label { font-size: var(--fs-sm); margin: 0; }
-.field-note { font-size: var(--fs-sm); margin: var(--sp-2) 0 var(--form-row-gap); }
+.field-note, .card .field-note { font-size: var(--fs-sm); margin: var(--sp-2) 0 var(--form-row-gap); }
 .form-foot {
 display: flex; justify-content: flex-end; gap: var(--sp-3);
 margin-top: var(--sp-6); padding-top: var(--sp-4); border-top: 1px solid var(--outline);

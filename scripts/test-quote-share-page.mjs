@@ -54,7 +54,7 @@ const sync = { createdAt: T0, updatedAt: T0, deletedAt: null, schemaVersion: 1 }
 const workspace = { projects: [{ id: "p1", name: "Remont łazienki", archived: false, ...sync }], rooms: [], estimations: [], shoppingItems: [] };
 const fixture = (withCompany = true) => ({
   clients: [{ id: "c1", name: "Jan Kowalski", phone: "600 123 456", email: "jan@firma.pl", address: "", note: "", projectIds: ["p1"], archived: false, ...sync }],
-  companies: withCompany ? [{ id: "co1", name: "Firma Testowa", nip: "", phone: "", email: "", street: "", postalCode: "", city: "", logo: "", bankAccount: "", ...sync }] : [],
+  companies: withCompany ? [{ id: "co1", name: "Firma Testowa", country: "PL", nip: "1234567890", phone: "", email: "", street: "", postalCode: "", city: "", logo: "", bankAccount: "", ...sync }] : [],
   jobs: [],
   quotes: [{ id: "q1", name: "Łazienka — wycena", number: "OF/1/2026", projectId: "p1", companyId: withCompany ? "co1" : "", clientId: "c1", materials: [{ id: "m1", name: "Gres premium", quantity: 2, unit: "opak.", amountMinor: 50000 }], labour: [{ id: "l1", name: "Układanie", quantity: 10, unit: "m²", amountMinor: 80000 }], marginPct: 10, vatPct: 23, note: "", currencyCode: "PLN", ...sync }],
 });
@@ -207,6 +207,7 @@ head("public quote page");
   const { ctx, page, requests } = await publicPage(`${urlQuoteView("pl")}?t=AAAAAAAAAAAAAAAAAAAAAA`, snapshot);
   const text = await page.locator("#ws-pdf-doc").innerText();
   for (const value of ["Firma Testowa", "Jan Kowalski", "Gres premium"]) check(`renders ${value}`, text.includes(value), text);
+  check("a Polish issuing company prints NIP", text.includes("NIP 1234567890"), text);
   check("renders the total", text.includes("zł") || text.includes("PLN"), text);
   check("title contains the quote number", (await page.title()).includes(snapshot.quote.number), await page.title());
   eq("Polish download label", (await page.textContent("#quote-view-download")).trim(), "Pobierz PDF");
@@ -240,6 +241,15 @@ head("public quote page");
   await page.evaluate(() => { delete document.body.dataset.pdfPrint; document.querySelector("#pdf-tool").appendChild(document.getElementById("ws-pdf-doc")); });
   await page.emulateMedia({ media: "print" });
   eq("toolbar is hidden in print", await page.locator("#quote-view-toolbar").isVisible(), false);
+  await ctx.close();
+}
+{
+  const german = JSON.parse(JSON.stringify(snapshot));
+  german.company.country = "DE";
+  german.company.nip = "DE123456789";
+  const { ctx, page } = await publicPage(`${urlQuoteView("pl")}?t=AAAAAAAAAAAAAAAAAAAAAA`, german);
+  const text = await page.locator("#ws-pdf-doc").innerText();
+  check("a German issuing company prints USt-IdNr.", text.includes("USt-IdNr. DE123456789"), text);
   await ctx.close();
 }
 {

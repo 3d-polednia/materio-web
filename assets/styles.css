@@ -2071,7 +2071,8 @@ html.js #pro-pay[data-pro-period="monthly"] [data-pw-plan="yearly"], html.js #pr
    "pamiętaj mnie" is the one box on the sign-in card. */
 .field-check input { width: var(--sp-6); height: var(--sp-6); flex: none; accent-color: var(--accent-strong); }
 .field-check label { font-size: var(--fs-sm); margin: 0; }
-.field-note { font-size: var(--fs-sm); margin: var(--sp-2) 0 var(--form-row-gap); }
+/* `.card p` zeroes paragraph margins; a note inside a card keeps its own. */
+.field-note, .card .field-note { font-size: var(--fs-sm); margin: var(--sp-2) 0 var(--form-row-gap); }
 
 .form-foot {
   display: flex; justify-content: flex-end; gap: var(--sp-3);
