@@ -1658,6 +1658,7 @@ display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-be
 gap: var(--sp-2) var(--sp-4); margin-bottom: var(--sp-4);
 }
 .dash-head :is(h2, .pro-sample-h2) { margin: 0; }
+.dash-head:has(> .btn, > .section-head-actions) { align-items: center; }
 .pro-sample-h { font-weight: var(--fw-bold); line-height: var(--lh-tight); letter-spacing: var(--track-tight); margin: 0 0 .5em; }
 .pro-sample-h3 { font-size: var(--fs-md); }
 .section-head-actions { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--sp-2) var(--sp-4); }

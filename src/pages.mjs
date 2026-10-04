@@ -1496,8 +1496,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           <section class="dash-sec">
             <div class="dash-head">
               <h2>${esc(t("crm_quotes_t"))}</h2>
-              <span><a class="dash-more" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
-              <button type="button" class="btn btn-primary btn-sm" id="ws-project-new-quote" hidden>${esc(t("proj_new_quote"))}</button></span>
+              <button type="button" class="btn btn-primary btn-sm" id="ws-project-new-quote" hidden>${esc(t("proj_new_quote"))}</button>
             </div>
             <ul id="ws-chain-quotes" class="data-list"></ul>
           </section>
@@ -1636,7 +1635,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
               <h2>${esc(t("proj_lines_t"))}</h2>
               <span class="section-head-actions">
                 ${sectionAddButton("ws-project-calc-toggle", t("proj_calc_add"))}
-                <a class="dash-more" href="${urlQuotes(lang)}" id="ws-project-estimate">${esc(t("quopage_title"))}</a>
+                <a class="btn btn-ghost btn-sm btn-go" href="${urlQuotes(lang)}" id="ws-project-estimate">${esc(t("quopage_title"))}</a>
               </span>
             </div>
             <div class="section-add-panel" id="ws-project-calc-panel" hidden>

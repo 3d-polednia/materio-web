@@ -2479,6 +2479,8 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
   gap: var(--sp-2) var(--sp-4); margin-bottom: var(--sp-4);
 }
 .dash-head :is(h2, .pro-sample-h2) { margin: 0; }
+/* A real button beside the heading is taller than a text link: centre the two instead. */
+.dash-head:has(> .btn, > .section-head-actions) { align-items: center; }
 /* The sample fragments on /liczmat-pro/ carry their headings as paragraphs (the page has its
    own outline), so they take the heading look here: weight, line height and tracking of h2/h3. */
 .pro-sample-h { font-weight: var(--fw-bold); line-height: var(--lh-tight); letter-spacing: var(--track-tight); margin: 0 0 .5em; }
