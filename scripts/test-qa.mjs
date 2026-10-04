@@ -656,17 +656,13 @@ async function walk(cfg) {
   eq("with no currency warning, because there is nothing to convert",
     await page.locator("#ws-project-mixed").isHidden(), true);
 
-  /* ---------------------------------------------------------------- 13. the chain */
+  /* ---------------------------------------------------------------- 13. the project relations */
 
-  head(`${who} — 13. the chain, read from the project it runs through`);
-  const steps = await page.$$eval("#ws-chain li", (li) => li.map((n) => ({
-    node: n.getAttribute("data-node"),
-    href: n.querySelector("a") ? n.querySelector("a").getAttribute("href") : "",
-  })));
-  eq("the strip is the chapter's three steps in the chapter's order",
-    steps.map((s) => s.node).join(), "client,project,quote");
-  eq("the client step resolved to the client this walk made", steps[0].href, clientUrl);
-  check("the project is the step being stood on, so it links nowhere", steps[1].href === "");
+  head(`${who} — 13. the relations that remain on the project`);
+  // Owner, 2026-10-04: project controls and lists replace the duplicate path strip.
+  eq("the duplicate project strip does not exist", await page.$("#ws-chain"), null);
+  eq("the client picker resolves to the client this walk made",
+    await page.inputValue("#ws-biz-client"), client.id);
   check("the project opened is the one with the walk's material in it",
     (await textOf(page, "#ws-project-materials")).length > 3);
   eq("still in this walk's language", await page.getAttribute("html", "lang"), lang);

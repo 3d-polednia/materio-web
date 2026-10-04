@@ -1493,11 +1493,6 @@ export function projectsMain(lang, t, aisles = [], features = []) {
         <div id="ws-project-body" hidden>
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
 
-          <!-- Chapter XXIV's path. It used to be drawn on /zlecenia/, because the job was
-               the middle step; the merge of 2026-09-21 made the project that step, so the
-               strip moved here with it. Read-only and never stored: assets/crm-chain.js
-               fills all three from crmChain(), which walks the links that already exist. -->
-          <nav class="crm-chain" id="ws-chain" aria-label="${esc(t("crm_chain_t"))}"></nav>
           <section class="dash-sec">
             <div class="dash-head">
               <h2>${esc(t("crm_quotes_t"))}</h2>

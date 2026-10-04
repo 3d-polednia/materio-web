@@ -873,12 +873,7 @@ function wsRenderProject(id) {
     }
   }
 
-  // Chapter XXIV's path, drawn where the middle step lives. Until 2026-09-21 that was the
-  // job and the strip was on /zlecenia/; a job is a project now, so it is here. All three
-  // are derived on every draw and none of them is stored — crmChain() walks the links the
-  // rows already carry, so a project that changed hands this morning reads correctly.
-  if (typeof chnRenderStrip === "function") {
-    chnRenderStrip(document.getElementById("ws-chain"), crmChain("project", project.id), "project");
+  if (typeof chnRenderQuotes === "function") {
     chnRenderQuotes(document.getElementById("ws-chain-quotes"), crmProjectQuotes(project.id));
     chnRenderHistory(document.getElementById("ws-chain-history"),
       crmHistory({ projectId: project.id }, 8));

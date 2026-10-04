@@ -60,44 +60,6 @@ const chnMoney = (minor, code) =>
 /** Which section of the site owns each node of the chain. */
 const CHN_SECTION = { client: "clients", project: "projects", quote: "quotes" };
 
-/**
- * Chapter XXIV's path, as one row of links.
- *
- * A node the walk resolved is its name, linked to the page that owns it — except the node
- * the visitor is already standing on, which is bold and links nowhere: a link to the page
- * you are on is a dead click.
- *
- * A node the walk did **not** resolve is the section's own index instead of a name. Two
- * It means a step nobody has filled in yet. The way forward is the section's page, so the
- * strip remains a way to keep walking rather than a report.
- *
- * @param {HTMLElement} el
- * @param {object} chain crmChain()
- * @param {string} [current] the node this page is showing: "client" | "project" | ...
- */
-function chnRenderStrip(el, chain, current) {
-  if (!el) return;
-  const at = String(current || (chain && chain.from) || "");
-  const nodes = (typeof CRM_CHAIN !== "undefined" ? CRM_CHAIN : ["client", "project", "quote"]);
-  // Walked from a client or a project, the chain has the quotes as a list and no single
-  // quote, so the step stays the way to the list. But "none yet, add one" beside a project
-  // that has quotes contradicted the Angebote box right under the strip (2026-10-03).
-  const hasQuotes = Boolean(chain && Array.isArray(chain.quotes) && chain.quotes.length);
-  el.innerHTML = `<ol class="crm-chain-list">${nodes.map((node) => {
-    const row = chain ? chain[node] : null;
-    const label = `<span class="eyebrow muted">${chnEsc(chnT(`crm_node_${node}`))}</span>`;
-    if (row && node === at) {
-      return `<li class="on" data-node="${node}">${label} <b>${chnEsc(row.name)}</b></li>`;
-    }
-    if (row) {
-      return `<li data-node="${node}">${label} <a href="${
-        chnEsc(chnRowUrl(CHN_SECTION[node], row.id))}">${chnEsc(row.name)}</a></li>`;
-    }
-    return `<li class="off" data-node="${node}">${label} <a class="muted" href="${
-      chnEsc(chnUrl(CHN_SECTION[node]))}">${chnEsc(chnT(node === "quote" && hasQuotes ? "crm_quotes_all" : "crm_node_none"))}</a></li>`;
-  }).join("")}</ol>`;
-}
-
 /* ------------------------------------------------------------------ the quotes */
 
 /**

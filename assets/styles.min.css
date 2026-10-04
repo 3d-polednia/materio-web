@@ -1910,15 +1910,6 @@ margin-bottom: var(--sp-4);
 .job-head-row select, .job-head-row input { width: 100%; }
 .job-chip { font-size: var(--fs-xs); }
 .job-due-late { color: var(--error); font-weight: var(--fw-semi); }
-.crm-chain { margin-bottom: var(--sp-4); }
-.crm-chain-list {
-display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2) var(--sp-4);
-margin: 0; padding: 0; list-style: none;
-}
-.crm-chain-list li { display: flex; align-items: baseline; gap: var(--sp-2); }
-.crm-chain-list li + li::before { content: "\2192"; color: var(--muted); }
-.crm-chain-list .eyebrow { font-size: var(--fs-xs); }
-.crm-chain-list li.on b { font-weight: var(--fw-semi); }
 .cal-when { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); }
 .cal-rel { font-size: var(--fs-xs); font-style: normal; }
 .cal-rel.job-due-today { color: var(--ev-blue); font-weight: var(--fw-semi); }

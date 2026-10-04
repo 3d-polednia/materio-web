@@ -240,14 +240,6 @@ async function open(ctx, url, opts = {}) {
 
 const rows = (page, sel) =>
   page.$$eval(`${sel} > li`, (li) => li.map((n) => n.textContent.replace(/\s+/g, " ").trim()));
-/** The chain strip as it reads: one entry per step, with its href when it has one. */
-const strip = (page, sel) => page.$$eval(`${sel} li`, (li) => li.map((n) => ({
-  node: n.getAttribute("data-node"),
-  text: n.textContent.replace(/\s+/g, " ").trim(),
-  href: n.querySelector("a") ? n.querySelector("a").getAttribute("href") : "",
-  on: n.classList.contains("on"),
-  off: n.classList.contains("off"),
-})));
 const digits = (s) => String(s).replace(/\D/g, "");
 
 const PROJECTS = urlProjects("pl");
@@ -255,43 +247,26 @@ const CLIENTS = urlClients("pl");
 const QUOTES = urlQuotes("pl");
 const ctx = await context({ viewport: { width: 1280, height: 900 } });
 
-/* ------------------------------------------------ 1. the strip on a project */
+/* ------------------------------------------------ 1. no duplicate strip on a project */
 
-head("1. the strip on a project: chapter XXIV's three steps, in the chapter's order");
+head("1. the duplicate relation strip is absent from a project");
 {
   const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: workspace(), crm: crm() });
-  const steps = await strip(page, "#ws-chain");
-  // Three since the merge of 2026-09-21: the job step and the project step were one row
-  // described twice, so they are one step now.
-  eq("three steps", steps.length, 3);
-  eq("in the chapter's order", steps.map((s) => s.node).join(), "client,project,quote");
-
-  check("the client is a link to their own page",
-    steps[0].href === `${CLIENTS}?id=c1`, steps[0].href);
-  check("and carries their name", steps[0].text.includes("Jan Kowalski"), steps[0].text);
-  check("the project is the step you are standing on", steps[1].on, JSON.stringify(steps[1]));
-  eq("so it links nowhere", steps[1].href, "");
-  // A project's walk resolves no single quote — a project may carry several, and the
-  // walker does not guess between them. The step is the way to the list instead.
-  check("the quote step is the way to the quotes", steps[2].off, JSON.stringify(steps[2]));
-  eq("which is the quotes page itself", steps[2].href, QUOTES);
-  check("every step says which step it is",
-    steps.every((s) => s.text.length > 2), JSON.stringify(steps.map((s) => s.text)));
+  // Owner, 2026-10-04: the project controls and lists already carry these relations.
+  eq("the duplicate project strip does not exist", await page.$("#ws-chain"), null);
+  eq("the remaining client picker carries the project's client",
+    await page.inputValue("#ws-biz-client"), "c1");
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
 
-head("1b. a step nobody has filled in is the page that would fill it");
+head("1b. a project without relations still has no duplicate strip");
 {
   const page = await open(ctx, `${PROJECTS}?id=p1`,
     { workspace: workspaceBare(), crm: crmBare() });
-  const steps = await strip(page, "#ws-chain");
-  check("the client is the step nobody filled in", steps[0].off, JSON.stringify(steps[0]));
-  eq("and offers the clients page", steps[0].href, CLIENTS);
-  check("the project is still the one you stand on", steps[1].on, JSON.stringify(steps[1]));
-  check("the quote is not resolved either", steps[2].off, JSON.stringify(steps[2]));
-  eq("no step of the chain pretends to have an id",
-    await page.$$eval("#ws-chain a[href*='?id=']", (a) => a.length), 0);
+  // Owner, 2026-10-04: an empty relation is represented by the surviving picker and lists.
+  eq("the duplicate project strip does not exist", await page.$("#ws-chain"), null);
+  eq("the remaining client picker is empty", await page.inputValue("#ws-biz-client"), "");
   check("no error in the console", page.errors.length === 0, page.errors.join("\n      "));
   await page.close();
 }
@@ -364,8 +339,11 @@ head("3. the whole path, clicked: project → client → quote → project");
 {
   const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: workspace(), crm: crm() });
 
-  // PROJEKT → KLIENT
-  await page.click("#ws-chain li[data-node='client'] a");
+  // PROJEKT → KLIENT through the relation picker and the surviving client list.
+  eq("the project identifies its client", await page.inputValue("#ws-biz-client"), "c1");
+  await page.goto(base + CLIENTS, { waitUntil: "load" });
+  await page.waitForSelector("html[data-crm-ready]");
+  await page.click("#crm-client-list a[data-open]");
   await page.waitForSelector("html[data-crm-ready]");
   await page.waitForSelector("#crm-client-body:not([hidden])");
   eq("the client opens", (await page.textContent("#crm-title")).trim(), "Jan Kowalski");
@@ -400,7 +378,10 @@ head("3b. nothing about the walk is written down");
 {
   const page = await open(ctx, `${PROJECTS}?id=p1`, { workspace: workspace(), crm: crm() });
   const before = await page.evaluate(() => localStorage.getItem("liczmat-crm-v1"));
-  await page.click("#ws-chain li[data-node='client'] a");
+  eq("the surviving picker identifies the client", await page.inputValue("#ws-biz-client"), "c1");
+  await page.goto(base + CLIENTS, { waitUntil: "load" });
+  await page.waitForSelector("html[data-crm-ready]");
+  await page.click("#crm-client-list a[data-open]");
   await page.waitForSelector("#crm-client-body:not([hidden])");
   await page.click("#crm-client-quotes a");
   await page.waitForSelector("#quo-body:not([hidden])");
@@ -411,17 +392,14 @@ head("3b. nothing about the walk is written down");
 
 /* ---------------------------------------------------- 4. four languages */
 
-head("4. the path reads the same in four languages, and links inside its own");
+head("4. the project relations remain readable in four languages");
 {
   for (const lang of LANGS) {
     const page = await open(ctx, `${urlProjects(lang)}?id=p1`,
       { workspace: workspace(), crm: crm(), lang, ready: "html[data-ws-ready]" });
-    const steps = await strip(page, "#ws-chain");
-    eq(`${lang}: three steps`, steps.length, 3);
-    check(`${lang}: the client link is this language's address`,
-      steps[0].href === `${urlClients(lang)}?id=c1`, steps[0].href);
-    check(`${lang}: the project is the step being stood on`, steps[1].on, steps[1].href);
-    check(`${lang}: the quotes page too`, steps[2].href === urlQuotes(lang), steps[2].href);
+    // Owner, 2026-10-04: relations live in the project controls and lists, not a strip.
+    eq(`${lang}: the duplicate project strip does not exist`, await page.$("#ws-chain"), null);
+    eq(`${lang}: the client picker keeps the relation`, await page.inputValue("#ws-biz-client"), "c1");
     check(`${lang}: nothing shows a raw dictionary key`,
       !(await page.content()).includes("crm_node_") && !(await page.content()).includes("crm_ev_"),
       lang);
@@ -446,7 +424,7 @@ head("4b. the currency the visitor chose is the one the derived figures speak");
 
 /* ---------------------------------------------------- 5. the widths */
 
-head("5. chapter XXVIII: the strip fits every width the chapter names");
+head("5. chapter XXVIII: the project fits every width after the strip is removed");
 {
   for (const width of [320, 375, 390, 430, 768, 1280]) {
     const narrow = await context({ viewport: { width, height: 900 } });
@@ -454,16 +432,8 @@ head("5. chapter XXVIII: the strip fits every width the chapter names");
     const overflow = await page.evaluate(() =>
       document.documentElement.scrollWidth - document.documentElement.clientWidth);
     check(`${width}px: the page does not scroll sideways`, overflow <= 1, `overflow ${overflow}px`);
-    const box = await page.$eval("#ws-chain", (n) => {
-      const r = n.getBoundingClientRect();
-      return { left: r.left, right: r.right };
-    });
-    check(`${width}px: the strip stays inside the viewport`,
-      box.left >= -1 && box.right <= width + 1, JSON.stringify(box));
-    const tap = await page.$$eval("#ws-chain a", (a) =>
-      a.map((n) => Math.round(n.getBoundingClientRect().height)));
-    check(`${width}px: every step is a real tap target`, tap.every((h) => h >= 14),
-      JSON.stringify(tap));
+    // Owner, 2026-10-04: the duplicate project strip must not return at any breakpoint.
+    eq(`${width}px: the duplicate project strip does not exist`, await page.$("#ws-chain"), null);
     await page.close();
     await narrow.close();
   }
@@ -471,7 +441,7 @@ head("5. chapter XXVIII: the strip fits every width the chapter names");
 
 /* ---------------------------------------------------- 6. no JavaScript */
 
-head("6. without a script the chain is empty, and nothing is broken or half-said");
+head("6. without a script the removed strip stays absent, and nothing is broken or half-said");
 {
   const noJs = await context({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
   const page = await noJs.newPage();
@@ -479,8 +449,8 @@ head("6. without a script the chain is empty, and nothing is broken or half-said
   const html = await page.content();
   check("the heading of the history is still readable", html.includes("Historia"));
   check("and the heading of the quotes", html.includes("Wyceny"));
-  eq("the strip is drawn empty rather than wrongly",
-    await page.$$eval("#ws-chain li", (li) => li.length), 0);
+  // Owner, 2026-10-04: it is removed from markup, not merely left empty for JavaScript.
+  eq("the duplicate project strip does not exist", await page.$("#ws-chain"), null);
   eq("the detail is hidden, because a project comes out of storage",
     await page.$eval("#ws-project", (n) => n.hidden), true);
   check("no dictionary key leaks into the markup", !html.includes("crm_hist_"));

@@ -507,17 +507,16 @@ head("6. the frame the build writes, and the one link map behind it");
 
   for (const [where, html, ids] of [
     ["/klienci/", client, ["crm-client-quotes", "crm-history"]],
-    ["/projekty/", project, ["ws-chain", "ws-chain-quotes", "ws-chain-history"]],
+    ["/projekty/", project, ["ws-chain-quotes", "ws-chain-history"]],
   ]) {
     for (const id of ids) {
       check(`${where} carries #${id} for the script to fill`, html.includes(`id="${id}"`), id);
     }
   }
-  check("the strip is a <nav> on /projekty/", /<nav class="crm-chain" id="ws-chain"/.test(project));
+  // Owner, 2026-10-04: project controls and lists already expose these relations.
+  check("the duplicate strip does not exist on /projekty/", !project.includes('id="ws-chain"'));
   // Owner, 2026-10-04: the Client and project card already shows and changes both links.
   check("the duplicate strip does not exist on /wyceny/", !quote.includes('id="quo-chain-line"'));
-  check("the project strip is labelled for a screen reader",
-    project.includes(`aria-label="${t("crm_chain_t")}"`));
   check("the history says out loud what it leaves out",
     client.includes(t("crm_hist_note")) && project.includes(t("crm_hist_note")));
   check("the quotes block links to the whole list", client.includes(urlQuotes(DEFAULT_LANG)));
@@ -585,7 +584,7 @@ head("6. the frame the build writes, and the one link map behind it");
 head("7. the words, in four languages");
 {
   const KEYS = [
-    "crm_chain_t", "crm_chain_d",
+    "crm_chain_d",
     "crm_node_client", "crm_node_project", "crm_node_quote", "crm_node_none",
     "crm_quotes_t", "crm_quotes_d", "crm_quotes_empty", "crm_quotes_all",
     "crm_hist_t", "crm_hist_d", "crm_hist_empty", "crm_hist_note",
@@ -608,7 +607,7 @@ head("7. the words, in four languages");
       new Set(["client", "project", "quote", "calc", "cost"]
         .map((k) => DICT[lang][`crm_ev_${k}`])).size === 5);
   }
-  for (const key of ["crm_chain_t", "crm_node_project", "crm_hist_t", "crm_quotes_t"]) {
+  for (const key of ["crm_node_project", "crm_hist_t", "crm_quotes_t"]) {
     const all = LANGS.map((l) => DICT[l][key]);
     check(`${key} is actually translated, not copied`, new Set(all).size > 1, all.join(" | "));
   }
