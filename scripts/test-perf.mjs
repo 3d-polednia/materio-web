@@ -154,7 +154,8 @@ const BUDGET = {
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
   // 2026-10-03 (RESZTKI): field errors, the phone check, plain status and preset links in
   // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
-  "kalkulatory/index.html": [269, 66],
+  // 2026-10-04: the /liczmat-pro/ breakpoints for wider fonts tipped the gzip size to 66.0 kB.
+  "kalkulatory/index.html": [269, 67],
   "kalkulatory/plytki-panele-gres/index.html": [420, 128],
   // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
   // (the header menu and the footer's list) and it went from ten rows to thirteen. That is

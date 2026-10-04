@@ -217,6 +217,10 @@ function pwPage() {
   // The period switch only chooses between prices, so an account that already pays loses it too.
   const period = document.querySelector(".pro-period");
   if (period) period.hidden = isPro;
+  // The trial comes with a new account, so somebody already signed in has had it.
+  const signedIn = pwLevel() !== pwGuest();
+  const trials = document.querySelectorAll("[data-pro-trial]");
+  for (let i = 0; i < trials.length; i++) trials[i].hidden = signedIn;
   const buys = document.querySelectorAll("[data-pro-buy]");
   for (let i = 0; i < buys.length; i++) buys[i].hidden = isPro;
   if (!isPro) {
