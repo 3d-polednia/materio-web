@@ -1326,11 +1326,13 @@ text-decoration: underline; text-underline-offset: var(--sp-1);
 padding: var(--sp-5); border: 1px solid var(--outline); border-radius: var(--radius-sm);
 background: var(--surface);
 }
-.lvl-card[data-current] { border-color: var(--accent-edge); background: var(--accent-soft); }
-.lvl-card[data-current] .muted { color: var(--on-accent-soft); }
+.lvl-card[data-current] { border: 2px solid var(--accent-edge); background: var(--surface); }
 .lvl-card h3 { margin: var(--sp-2) 0 var(--sp-2); font-size: var(--fs-base); }
 .lvl-card p { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); }
-.lvl-badge { cursor: default; background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.lvl-badge {
+font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: var(--track-wider);
+color: var(--accent-strong); font-weight: var(--fw-bold);
+}
 .lvl-can { list-style: none; margin: 0; padding: 0; font-size: var(--fs-sm); }
 .lvl-can li { padding-left: var(--sp-5); position: relative; margin-bottom: var(--sp-1); }
 .lvl-can li::before { content: "✓"; position: absolute; left: 0; color: var(--accent-strong); }

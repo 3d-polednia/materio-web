@@ -144,7 +144,7 @@ function levelCards(t, current) {
 
     const here = entry.level === current;
     return `<article class="lvl-card" data-level="${entry.level}"${here ? ' data-current="1"' : ""}>
-        <span class="lvl-badge chip" data-i18n="acc_you_are"${here ? "" : " hidden"}>${esc(t("acc_you_are"))}</span>
+        <span class="lvl-badge" data-i18n="acc_you_are"${here ? "" : " hidden"}>${esc(t("acc_you_are"))}</span>
         <h3 data-i18n="${entry.key}_t">${esc(t(`${entry.key}_t`))}</h3>
         <p class="muted" data-i18n="${entry.key}_d">${esc(t(`${entry.key}_d`))}</p>
         <ul class="lvl-can">${bullets}</ul>

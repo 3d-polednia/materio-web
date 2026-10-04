@@ -1777,7 +1777,9 @@ export function projectsMain(lang, t, aisles = [], features = []) {
         <p class="muted">${esc(t("wspage_projects_d"))}</p>
         <!-- Visible labels, not placeholders: a placeholder is the only thing naming
              these boxes and it leaves the moment the visitor types (audit 2026-09-18). -->
-        <form id="ws-project-form" class="inline-form ws-project-grid">
+        <div class="card">
+          <h3 data-i18n="app_new_project">${esc(t("app_new_project"))}</h3>
+          <form id="ws-project-form" class="inline-form ws-project-grid">
           <label class="field" for="ws-project-name"><span class="fld-label">${esc(t("ws_new_project"))}</span>
             <input id="ws-project-name" type="text" maxlength="120" required></label>
           <label class="field" for="ws-project-client"><span class="fld-label">${esc(t("job_client"))}</span>
@@ -1793,8 +1795,9 @@ export function projectsMain(lang, t, aisles = [], features = []) {
             <textarea id="ws-project-note" maxlength="2000" rows="6"></textarea></label>
           <label class="field field-narrow" for="ws-project-color"><span class="fld-label">${esc(t("job_color"))}</span>
             <select id="ws-project-color"><option value="">${esc(t("job_color_none"))}</option>${["lime", "blue", "amber", "red", "violet"].map((v) => `<option value="${v}">${esc(t(`job_color_${v}`))}</option>`).join("")}</select></label>
-          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
-        </form>
+            <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+          </form>
+        </div>
         <ul id="ws-project-list" class="data-list"></ul>
 
         <details id="ws-archive" class="ws-archive" hidden>
@@ -2154,7 +2157,9 @@ export function clientsMain(lang, t, features) {
 
         <h2>${esc(t("cli_list_t"))}</h2>
         <p class="muted">${esc(t("cli_list_d"))}</p>
-        <form id="crm-client-form" class="inline-form crm-client-grid">
+        <div class="card">
+          <h3 data-i18n="app_clients_new">${esc(t("app_clients_new"))}</h3>
+          <form id="crm-client-form" class="inline-form crm-client-grid">
           <label class="field" for="crm-client-name"><span class="fld-label">${esc(t("cli_new"))}</span>
             <input id="crm-client-name" type="text" maxlength="120" required></label>
           <label class="field" for="crm-client-phone"><span class="fld-label">${esc(t("cli_phone"))}</span>
@@ -2172,9 +2177,10 @@ export function clientsMain(lang, t, features) {
             <datalist id="crm-client-city-list"></datalist></label>
           <label class="field" for="crm-client-street"><span class="fld-label">${esc(t("cli_street"))}</span>
             <input id="crm-client-street" type="text" maxlength="200" autocomplete="street-address"></label>
-          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
-        </form>
-        <p class="muted field-note">${esc(t("postal_source"))}</p>
+            <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+          </form>
+          <p class="muted field-note">${esc(t("postal_source"))}</p>
+        </div>
         <ul id="crm-client-list" class="data-list"></ul>
 
         <details id="crm-archive" class="ws-archive" hidden>
@@ -2441,11 +2447,14 @@ export function quotesMain(lang, t, features, stamp = "") {
         </p>
 
         <p class="lead">${esc(t("quo_list_d"))}</p>
-        <form id="quo-form" class="inline-form">
-          <div class="field"><label for="quo-name">${esc(t("quo_new"))}</label><input id="quo-name" type="text" maxlength="120" required></div>
-          <div class="field field-narrow"><label for="quo-project">${esc(t("quo_project"))}</label><select id="quo-project"></select></div>
-          <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
-        </form>
+        <div class="card">
+          <h3 data-i18n="proj_new_quote">${esc(t("proj_new_quote"))}</h3>
+          <form id="quo-form" class="inline-form">
+            <div class="field"><label for="quo-name">${esc(t("quo_new"))}</label><input id="quo-name" type="text" maxlength="120" required></div>
+            <div class="field field-narrow"><label for="quo-project">${esc(t("quo_project"))}</label><select id="quo-project"></select></div>
+            <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+          </form>
+        </div>
         <p id="quo-add-message" class="muted" role="status"></p>
         <ul id="quo-list" class="data-list"></ul>
       </div>`;
@@ -2515,7 +2524,7 @@ export function calendarMain(lang, t, features) {
      The script hides the ones that are empty; the markup carries all five, so the page
      says what a terminarz sorts by even before anything has a date. */
   const buckets = ["late", "today", "soon", "later", "none"].map((b) => `
-          <section class="dash-sec cal-sec" id="cal-sec-${b}">
+          <section class="dash-sec cal-sec card" id="cal-sec-${b}">
             <div class="dash-head">
               <h2 id="cal-h-${b}">${esc(t(`cal_${b}_t`))}</h2>
             </div>
@@ -2545,12 +2554,14 @@ export function calendarMain(lang, t, features) {
         ${calendarGrid(t, "cal")}
         <!-- What "late" and "today" are measured against, said out loud: the visitor's
              own calendar day, which is the only reckoning a deadline has. -->
-        <p class="crm-contact"><span class="eyebrow muted">${esc(t("cal_today_is"))}</span> <b id="cal-today-date"></b></p>
+        <div class="card">
+          <p class="crm-contact"><span class="eyebrow muted">${esc(t("cal_today_is"))}</span> <b id="cal-today-date"></b></p>
 
-        <div class="ws-project-figs">
-          <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_late_t"))}</span> <b id="cal-fig-late"></b></p>
-          <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_today_t"))}</span> <b id="cal-fig-today"></b></p>
-          <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_soon_t"))}</span> <b id="cal-fig-soon"></b></p>
+          <div class="ws-project-figs">
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_late_t"))}</span> <b id="cal-fig-late"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_today_t"))}</span> <b id="cal-fig-today"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">${esc(t("cal_soon_t"))}</span> <b id="cal-fig-soon"></b></p>
+          </div>
         </div>
 
         <p class="muted" id="cal-empty" hidden>${esc(t("cal_empty"))}</p>
@@ -2882,11 +2893,12 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
 
   <section class="block">
     <div class="wrap narrow">
-      <h2>${esc(c("omat_list_t"))}</h2>
-      <label class="field" data-omat-search-wrap hidden>
-        <span class="fld-label">${esc(c("omat_search"))}</span>
-        <input type="search" data-omat-search aria-label="${esc(c("omat_search"))}">
-      </label>
+      <div class="card">
+        <h2>${esc(c("omat_list_t"))}</h2>
+        <label class="field" data-omat-search-wrap hidden>
+          <span class="fld-label">${esc(c("omat_search"))}</span>
+          <input type="search" data-omat-search aria-label="${esc(c("omat_search"))}">
+        </label>
       <!-- The list is this browser's own rows, so it is written at runtime. The empty
            state ships in the markup rather than being created later: a heading a script
            fills either ships with the text the script would use, or it is an empty
@@ -2896,14 +2908,17 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
       <p class="muted" data-omat-search-none hidden>${esc(c("omat_search_none"))}</p>
       <p class="ws-undo" data-omat-undo role="status" hidden></p>
       <p class="muted">${esc(c("omat_use_note"))}</p>
-      <p class="muted">${esc(c("omat_sync_note"))}</p>
+        <p class="muted">${esc(c("omat_sync_note"))}</p>
+      </div>
     </div>
   </section>
 
   <section class="block alt">
     <div class="wrap narrow">
-      <h2>${esc(c("omat_hist_t"))}</h2>
-      <p>${esc(c("omat_hist_note"))}</p>
+      <div class="card">
+        <h2>${esc(c("omat_hist_t"))}</h2>
+        <p>${esc(c("omat_hist_note"))}</p>
+      </div>
     </div>
   </section>
 </main>`;
