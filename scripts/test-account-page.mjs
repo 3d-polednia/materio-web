@@ -985,7 +985,11 @@ head("11. switching language redraws what JavaScript wrote");
       emailVerified: true, displayName: "", providerData: [{ providerId: "password" }] } } },
     docs: { "users/u3/projects/p18": { name: "Projekt za osiemnaście dni", status: "new",
       dueDate: dueDay, archived: false, createdAt: Date.now(), updatedAt: Date.now(), deletedAt: null,
-      schemaVersion: 1 } },
+      schemaVersion: 1 },
+      "users/u3/projects/p19": { name: "Projekt z klientem", status: "new", clientId: "c9",
+      dueDate: dueDay, archived: false, createdAt: Date.now(), updatedAt: Date.now(), deletedAt: null,
+      schemaVersion: 1 },
+    },
   });
   await upcoming.fill("#signin-email", "termin@example.com");
   await upcoming.fill("#signin-password", "sekret123");
@@ -994,6 +998,15 @@ head("11. switching language redraws what JavaScript wrote");
   await upcoming.waitForFunction(() => document.getElementById("overview-schedule").textContent.includes("Projekt za osiemnaście dni"));
   check("a project due in 18 days appears in upcoming deadlines",
     (await upcoming.locator("#overview-schedule").innerText()).includes("Projekt za osiemnaście dni"));
+  // The client lives in the Pro store on this device; landing it there and coming back to
+  // the overview is enough to redraw the list (wireHashPanels() renders it on the way in).
+  await upcoming.evaluate(() => { crmImport({ clients: [{ id: "c9", name: "Anna Nowak", updatedAt: Date.now() }] }); location.hash = "#profil"; });
+  await upcoming.evaluate(() => { location.hash = "#przeglad"; });
+  await upcoming.waitForFunction(() => document.getElementById("overview-schedule").textContent.includes("Anna Nowak"));
+  const dueLines = await upcoming.$$eval("#overview-schedule li em", (ems) => ems.map((n) => n.textContent.trim()));
+  check("a deadline with a client reads \"client · date\"", dueLines.some((s) => /^Anna Nowak · \S/.test(s)));
+  check("a deadline without a client shows the date alone", dueLines.some((s) => !s.includes("·") && s.length > 0));
+  check("no deadline line starts with a comma", dueLines.every((s) => !s.startsWith(",")));
   await upcoming.close();
   await ctx.close();
 }
