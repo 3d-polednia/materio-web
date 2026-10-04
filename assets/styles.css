@@ -1075,7 +1075,7 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 /* The account quote list is a compact hand-off to the full editor. Its total is the one
    figure that must stay easy to scan; the name and provenance take the flexible column. */
 #acctquo-list .acctquo-row { align-items: start; }
-#quo-page .quo-margin-field + .field-note { margin-top: var(--sp-2); }
+:is(#quo-page, .pro-editor) .quo-margin-field + .field-note { margin-top: var(--sp-2); }
 #acctquo-list .acctquo-main {
   display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0;
 }
@@ -3024,7 +3024,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
   background: var(--surface);
   box-shadow: var(--shadow-1);
 }
-#quo-page .quo-margin-field { max-width: 12rem; }
+:is(#quo-page, .pro-editor) .quo-margin-field { max-width: 12rem; }
 :is(#quo-page, .pro-editor) .quo-summary-list { margin: var(--sp-5) 0 0; }
 :is(#quo-page, .pro-editor) .quo-summary-list div {
   display: grid;

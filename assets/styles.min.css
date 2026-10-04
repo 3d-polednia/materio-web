@@ -679,7 +679,7 @@ border-radius: var(--radius-sm); padding: var(--sp-3) var(--sp-4);
 .company-logo-preview img { max-width: 300px; max-height: 150px; object-fit: contain; }
 .row-name small { display: block; color: var(--muted); }
 #acctquo-list .acctquo-row { align-items: start; }
-#quo-page .quo-margin-field + .field-note { margin-top: var(--sp-2); }
+:is(#quo-page, .pro-editor) .quo-margin-field + .field-note { margin-top: var(--sp-2); }
 #acctquo-list .acctquo-main {
 display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0;
 }
@@ -2017,7 +2017,7 @@ border-radius: var(--radius-sm);
 background: var(--surface);
 box-shadow: var(--shadow-1);
 }
-#quo-page .quo-margin-field { max-width: 12rem; }
+:is(#quo-page, .pro-editor) .quo-margin-field { max-width: 12rem; }
 :is(#quo-page, .pro-editor) .quo-summary-list { margin: var(--sp-5) 0 0; }
 :is(#quo-page, .pro-editor) .quo-summary-list div {
 display: grid;
