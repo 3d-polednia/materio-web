@@ -424,6 +424,45 @@ head("3b. the terminarz has no screen of its own to open");
   await page.close();
 }
 
+head("3c. the day panel date editor");
+{
+  const page = await open(ctx, CAL, { workspace: workspace(), crm: crm() });
+  // Click on today to see j-today in the panel
+  await page.click(`#cal-grid .cal-day[data-day="${day(0)}"]`);
+
+  const buttons = await page.$$("#cal-daypanel [data-redate]");
+  check("the redate button exists for the project in the day panel", buttons.length > 0);
+
+  await page.click('#cal-daypanel [data-redate="j-today"]');
+  check("clicking it replaces it with a date input",
+    (await page.$$("#cal-daypanel input[type=date]#cal-redate-input")).length === 1);
+
+  // Test Escape
+  await page.press('#cal-daypanel input[type=date]#cal-redate-input', 'Escape');
+  check("Escape restores the button",
+    (await page.$$("#cal-daypanel [data-redate]")).length > 0);
+  eq("and changes nothing", (await projectById(page, "j-today")).dueDate, day(0));
+
+  // Test changing date
+  await page.click('#cal-daypanel [data-redate="j-today"]');
+  const target = day(14);
+  await page.fill('#cal-daypanel input[type=date]#cal-redate-input', target);
+
+  // Changing the input moves it to another day in the grid, so instance.state.day is updated
+  // the panel is refreshed, now showing the selected new date target.
+  await page.waitForFunction(() => document.querySelector("#cal-daypanel")?.innerText.includes("Malowanie dziś"));
+  check("picking a new date moves the project to that day in the day panel",
+    (await page.textContent("#cal-daypanel")).includes("Malowanie dziś"));
+
+  check("and the project moves to that day in the grid",
+    (await page.textContent(`#cal-grid .cal-day[data-day="${target}"]`)).includes("Malowanie dziś"));
+
+  const stored = await projectById(page, "j-today");
+  eq("and stores the new dueDate", stored.dueDate, target);
+
+  await page.close();
+}
+
 /* ---------------------------------------------------- 4. chapter XXV */
 
 head("4. chapter XXV's paywall: the wall, the two rungs and the one door through it");

@@ -40,11 +40,17 @@ function sgRenderDayPanel(instance) {
   const slots = projects.map((project) => {
     const client = project.clientId && typeof crmClient === "function" ? crmClient(project.clientId) : null;
     const color = sgProjectColor(project.color);
-    const clientName = client ? `${sgEsc(client.name)}, ` : "";
+    const clientName = client ? `${sgEsc(client.name)} · ` : "";
+    // "Zmień datę" under the slot, outside its link; once pressed, a date field in its place.
+    const controls = instance.state.redating === project.id
+      ? `<p class="cal-redate"><input type="date" id="${sgId(instance, "redate-input")}" value="${sgEsc(project.dueDate || "")}" aria-label="${sgEsc(sgT("cal_due_set"))}">
+        <button type="button" class="btn btn-ghost btn-sm" id="${sgId(instance, "redate-cancel")}">${sgEsc(sgT("app_cancel"))}</button></p>`
+      : `<p class="cal-redate"><button type="button" class="btn btn-ghost btn-sm" data-redate="${sgEsc(project.id)}"
+        aria-label="${sgEsc(sgT("cal_due_change_named").replace("{name}", project.name))}">${sgEsc(sgT("cal_due_change"))}</button></p>`;
     return `<a class="cal-slot${color ? ` cal-slot-${color}` : ""}" href="${sgEsc(instance.projectUrl(project.id))}"><div>
         <div class="t">${sgEsc(project.name)}</div>
         <div class="d">${clientName}${sgEsc(sgT("job_st_" + project.status))}</div>
-      </div></a>`;
+      </div></a>${controls}`;
   }).join("");
   const clients = typeof crmClients === "function" ? crmClients() : [];
   const clientOptions = [`<option value="">${sgEsc(sgT("cal_add_noclient"))}</option>`]
@@ -69,6 +75,28 @@ function sgRenderDayPanel(instance) {
         <button type="button" id="${id("cancel")}" class="btn btn-ghost btn-sm">${sgEsc(sgT("app_cancel"))}</button></p>
       <p class="muted">${sgEsc(sgT("cal_add_hint"))}</p>
     </form>`;
+}
+
+/** Focus the date field that replaced "Zmień datę" and open its calendar. */
+function sgOpenRedate(instance) {
+  const input = sgEl(instance, "redate-input");
+  if (!input) return;
+  input.focus();
+  // The click that asked for the field is still bubbling, and the site's own date list
+  // (assets/datepick.js) closes on any click outside it: open it once that click is done.
+  setTimeout(() => {
+    input.click();
+    if (!document.querySelector(".lm-date-pop")) { try { input.showPicker(); } catch (e) {} }
+  }, 0);
+}
+
+/** Leave the date field without saving and put the focus back on its button. */
+function sgStopRedate(instance) {
+  const id = instance.state.redating;
+  instance.state.redating = null;
+  sgRenderDayPanel(instance);
+  const button = id && sgEl(instance, "daypanel").querySelector(`[data-redate="${CSS.escape(id)}"]`);
+  if (button) button.focus();
 }
 
 function sgRenderInstance(instance) {
@@ -145,8 +173,33 @@ function sgWire(instance) {
   sgEl(instance, "daypanel").addEventListener("click", (event) => {
     if (event.target.closest(`#${sgId(instance, "add-toggle")}`)) instance.state.adding = true;
     else if (event.target.closest(`#${sgId(instance, "add-cancel")}`)) instance.state.adding = false;
+    else if (event.target.closest("[data-redate]")) {
+      instance.state.redating = event.target.closest("[data-redate]").dataset.redate;
+      sgRenderDayPanel(instance);
+      sgOpenRedate(instance);
+      return;
+    }
+    else if (event.target.closest(`#${sgId(instance, "redate-cancel")}`)) { sgStopRedate(instance); return; }
     else return;
     sgRenderDayPanel(instance);
+  });
+  sgEl(instance, "daypanel").addEventListener("change", (event) => {
+    if (event.target.id !== sgId(instance, "redate-input")) return;
+    const dueDate = event.target.value;
+    const id = instance.state.redating;
+    if (!dueDate || !id || typeof wsUpdateProject !== "function") return;
+    wsUpdateProject(id, { dueDate });
+    instance.state.redating = null;
+    instance.state.day = dueDate;
+    const date = new Date(`${dueDate}T00:00:00`);
+    if (!isNaN(date.getTime())) { instance.state.year = date.getFullYear(); instance.state.month = date.getMonth(); }
+    sgRenderInstance(instance);
+    const moved = sgEl(instance, "daypanel").querySelector(`[data-redate="${CSS.escape(id)}"]`);
+    if (moved) moved.focus();
+  });
+  sgEl(instance, "daypanel").addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || event.target.id !== sgId(instance, "redate-input")) return;
+    sgStopRedate(instance);
   });
   sgEl(instance, "daypanel").addEventListener("submit", (event) => {
     if (event.target.id !== sgId(instance, "add-form")) return;

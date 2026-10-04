@@ -1634,6 +1634,8 @@ background: var(--accent-soft-2); color: var(--on-accent-soft);
 .cal-slot:first-of-type { border-top: 0; }
 .cal-slot .t { font-weight: var(--fw-semi); font-size: var(--fs-sm); }
 .cal-slot .d { color: var(--muted); font-size: var(--fs-sm); }
+.cal-redate { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin: 0 0 var(--sp-3); }
+.cal-redate :is(.lm-date-wrap, input[type="date"]) { flex: 1 1 10rem; min-width: 0; }
 .cal-slot-lime::before,
 .cal-slot-blue::before,
 .cal-slot-amber::before,

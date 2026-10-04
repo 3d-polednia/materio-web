@@ -2436,6 +2436,9 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .cal-slot:first-of-type { border-top: 0; }
 .cal-slot .t { font-weight: var(--fw-semi); font-size: var(--fs-sm); }
 .cal-slot .d { color: var(--muted); font-size: var(--fs-sm); }
+/* "Zmień datę" under its slot, and the date field with "Anuluj" that replaces it. */
+.cal-redate { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin: 0 0 var(--sp-3); }
+.cal-redate :is(.lm-date-wrap, input[type="date"]) { flex: 1 1 10rem; min-width: 0; }
 /* The day-panel row marks its job category with a small round swatch. A swatch
    becomes a second flex item beside the text column and lets .cal-slot's existing
    gap separate them cleanly, whereas a left border would collide with the top
