@@ -449,6 +449,7 @@ async function onSignedIn(user) {
   $("password-form").hidden = !password;
   $("email-form").hidden = !password;
   $("app-delete-password-field").hidden = !password;
+  $("google-note").hidden = password;
 
   // Profile: create on first sign-in, then only ever touch lastSeenAt/appVersion —
   // the rules reject anything else, and `plan` is server-side only.
@@ -1408,26 +1409,53 @@ function wireAccountPanel() {
     statusKey("app_wipe_done");
   });
 
-  $("app-export").addEventListener("click", async () => {
+  async function performExport() {
     try {
       const uid = state.uid;
       const data = await accountSync.downloadAccount(uid);
-      const blob = new Blob([JSON.stringify({ ...data, exportedAt: Date.now(), uid }, null, 2)],
+      // The profile document too (e-mail, plan, dates): the whole account, RODO art. 20.
+      const snap = await fb.getDoc(fb.doc(db, "users", uid));
+      const profile = snap.exists() ? snap.data() : {};
+      const d = new Date();
+      const day = [d.getFullYear(), String(d.getMonth() + 1).padStart(2, "0"), String(d.getDate()).padStart(2, "0")].join("-");
+      const blob = new Blob([JSON.stringify({ ...data, profile, exportedAt: Date.now(), uid }, null, 2)],
         { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "materio-account.json";
+      a.download = `liczmat-konto-${day}.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (err) { statusKey("app_err_unknown", true); }
+  }
+
+  $("app-export").addEventListener("click", performExport);
+  $("app-delete-export-btn").addEventListener("click", performExport);
+  $("app-delete-export-btn-confirm").addEventListener("click", performExport);
+
+  // Deleting the account is two steps inside the card, the second one offering the data first.
+  $("app-delete-account").addEventListener("click", () => {
+    $("delete-initial").hidden = true;
+    $("delete-confirm").hidden = false;
+    $("app-delete-export-btn-confirm").focus();
   });
 
-  $("app-delete-account").addEventListener("click", async () => {
-    if (!confirm(T("app_delete_confirm"))) return;
-    const button = $("app-delete-account");
+  const hideConfirm = () => {
+    $("delete-confirm").hidden = true;
+    $("delete-initial").hidden = false;
+  };
+
+  $("app-delete-cancel").addEventListener("click", hideConfirm);
+  $("delete-confirm").addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    hideConfirm();
+    $("app-delete-account").focus();
+  });
+
+  $("app-delete-yes").addEventListener("click", async () => {
+    const button = $("app-delete-yes");
     button.disabled = true;
     let stamp = "";
     try {

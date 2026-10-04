@@ -412,9 +412,13 @@ export function appMain(t, features) {
             <section data-panel="account" id="panel-account" hidden>
               <h2 data-i18n="app_sec_title">${esc(t("app_sec_title"))}</h2>
 
-              <dl class="facts app-card">
-                ${fact("app-provider", "prof_provider")}
-              </dl>
+              <div class="app-card">
+                <dl class="facts">
+                  ${fact("app-provider", "prof_provider")}
+                </dl>
+                <p id="google-note" class="muted" hidden><span data-i18n="prof_google_note">${esc(t("prof_google_note"))}</span>
+                  <a id="google-link" href="https://myaccount.google.com/security" target="_blank" rel="noopener" data-i18n="prof_google_link">${esc(t("prof_google_link"))}</a></p>
+              </div>
 
               <div id="app-verify-row" class="app-card" hidden>
                 ${i("app_verify_d", "p", "muted")}
@@ -452,13 +456,25 @@ export function appMain(t, features) {
               </div>
 
               <div class="app-card danger">
-                <h3 data-i18n="app_delete_account">${esc(t("app_delete_account"))}</h3>
-                ${i("app_delete_account_d", "p", "muted")}
-                <div class="field" id="app-delete-password-field">
-                  <label for="delete-password" data-i18n="app_current_password">${esc(t("app_current_password"))}</label>
-                  <input id="delete-password" type="password" autocomplete="current-password">
+                <div id="delete-initial">
+                  <h3 data-i18n="app_delete_account">${esc(t("app_delete_account"))}</h3>
+                  ${i("app_delete_account_d", "p", "muted")}
+                  <div class="field" id="app-delete-password-field">
+                    <label for="delete-password" data-i18n="app_current_password">${esc(t("app_current_password"))}</label>
+                    <input id="delete-password" type="password" autocomplete="current-password">
+                  </div>
+                  ${i("app_delete_export_d", "p", "muted")}
+                  <button type="button" id="app-delete-export-btn" class="btn btn-ghost btn-sm" data-i18n="app_delete_export_btn">${esc(t("app_delete_export_btn"))}</button>
+                  <button type="button" id="app-delete-account" class="btn btn-danger btn-sm" data-i18n="app_delete_account">${esc(t("app_delete_account"))}</button>
                 </div>
-                <button type="button" id="app-delete-account" class="btn btn-danger btn-sm" data-i18n="app_delete_account">${esc(t("app_delete_account"))}</button>
+                <div id="delete-confirm" hidden>
+                  <h3 data-i18n="app_delete_account">${esc(t("app_delete_account"))}</h3>
+                  <p class="muted" data-i18n="app_delete_confirm">${esc(t("app_delete_confirm"))}</p>
+                  <p><strong data-i18n="app_delete_export_first">${esc(t("app_delete_export_first"))}</strong></p>
+                  <button type="button" id="app-delete-export-btn-confirm" class="btn btn-ghost btn-sm" data-i18n="app_delete_export_btn">${esc(t("app_delete_export_btn"))}</button>
+                  <button type="button" id="app-delete-yes" class="btn btn-danger btn-sm" data-i18n="app_delete_yes">${esc(t("app_delete_yes"))}</button>
+                  <button type="button" id="app-delete-cancel" class="btn btn-ghost btn-sm" data-i18n="app_cancel">${esc(t("app_cancel"))}</button>
+                </div>
               </div>
             </section>
           </div>

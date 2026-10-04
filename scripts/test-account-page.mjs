@@ -639,6 +639,78 @@ head("8b. resend and address change use the account-mail callable");
   await ctx.close();
 }
 
+head("8c. Google account vs password account UI");
+{
+  const ctx = await context({ viewport: { width: 1280, height: 900 }, acceptDownloads: true });
+
+  // Google account
+  const gAccount = {
+    "google@example.com": {
+      password: "123",
+      user: {
+        uid: "g1", email: "google@example.com", emailVerified: true, displayName: "G",
+        providerData: [{ providerId: "google.com" }],
+      }
+    }
+  };
+  const gPage = await openApp(ctx, "/app/", { accounts: gAccount });
+  await gPage.click("#auth-google");
+  await signedIn(gPage);
+  await gPage.click('.app-nav-item[href$="#konto"]');
+  await gPage.waitForSelector('[data-panel="account"]:not([hidden])', { timeout: 3000 });
+
+  check("Google account shows the note", await visible(gPage, "#google-note"));
+  check("Google account shows the link", await visible(gPage, "#google-link"));
+  eq("Link is correct", await gPage.locator("#google-link").getAttribute("href"), "https://myaccount.google.com/security");
+  check("Password form hidden", !(await visible(gPage, "#password-form")));
+  check("Email form hidden", !(await visible(gPage, "#email-form")));
+  await gPage.close();
+
+  // Password account
+  const pPage = await openApp(ctx, "/app/", { accounts: ACCOUNT, docs: { "users/u1": { createdAt: 1, appVersion: "web" } } });
+  await pPage.fill("#signin-email", "kto@example.com");
+  await pPage.fill("#signin-password", "sekret123");
+  await pPage.click("#signin-form button[type=submit]");
+  await signedIn(pPage);
+  await pPage.click('.app-nav-item[href$="#konto"]');
+  await pPage.waitForSelector('[data-panel="account"]:not([hidden])', { timeout: 3000 });
+
+  check("Password account hides the note", !(await visible(pPage, "#google-note")));
+  check("Password account hides the link", !(await visible(pPage, "#google-link")));
+  check("Password form visible", await visible(pPage, "#password-form"));
+  check("Email form visible", await visible(pPage, "#email-form"));
+
+  // Delete account confirmation flow
+  check("Initial delete card shows export button", await visible(pPage, "#app-delete-export-btn"));
+  await pPage.click("#app-delete-account");
+  check("Confirm step visible", await visible(pPage, "#delete-confirm"));
+  check("Initial step hidden", !(await visible(pPage, "#delete-initial")));
+
+  // Cancel
+  await pPage.click("#app-delete-cancel");
+  check("Confirm step hidden after cancel", !(await visible(pPage, "#delete-confirm")));
+  check("Initial step visible after cancel", await visible(pPage, "#delete-initial"));
+
+  // Export testing
+  const d = new Date();
+  const localDate = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const expectedName = `liczmat-konto-${localDate}.json`;
+
+  const [download] = await Promise.all([
+    pPage.waitForEvent("download", { timeout: 3000 }),
+    pPage.click("#app-delete-export-btn"),
+  ]);
+  eq("Download name matches", download.suggestedFilename(), expectedName);
+
+  const downloadPath = await download.path();
+  const fs = await import("node:fs");
+  const exported = JSON.parse(fs.readFileSync(downloadPath, "utf-8"));
+  check("Exported JSON contains profile", !!exported.profile);
+
+  await pPage.close();
+  await ctx.close();
+}
+
 head("9. the level comes from the profile the server owns");
 {
   const ctx = await context({ viewport: { width: 1280, height: 900 } });
@@ -1122,6 +1194,7 @@ head("12c. deleting the account, against the rules as deployed today");
 
   await page.fill("#delete-password", "sekret123");
   await page.click("#app-delete-account");
+  await page.click("#app-delete-yes");
   await page.waitForSelector("#app-status.err", { timeout: 5000 });
 
   eq("the visitor is told the refusal, not \"something went wrong\"",
@@ -1171,6 +1244,7 @@ head("12d. deleting the account, once the rules are deployed");
   page.on("dialog", (d) => d.accept());
   await page.fill("#delete-password", "sekret123");
   await page.click("#app-delete-account");
+  await page.click("#app-delete-yes");
   await page.locator("#app-auth").waitFor({ state: "visible", timeout: 5000 });
 
   const left = await page.evaluate(() => [...window.__fbDocs.keys()]);
