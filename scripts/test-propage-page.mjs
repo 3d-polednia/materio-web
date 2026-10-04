@@ -6,7 +6,7 @@
  *
  * Master plan, session 29 (STRONA LICZMAT PRO), in the half that needs a browser: the
  * price in the visitor's own currency, the currency switched while the page is open, a
- * Pro account shown their plan instead of a price, the ten languages each carrying their
+ * Pro account shown the price and a note about its plan, the ten languages each carrying their
  * own addresses, the widths chapter XXVIII names — and the variant that matters most on
  * a page whose job is to be read: no JavaScript at all, where the amount is still on the
  * screen because the build wrote it into the HTML.
@@ -256,12 +256,16 @@ head("2. the amount follows the currency, and nothing is converted");
 
 /* ---------------------------------------------------- 3. somebody who already pays */
 
-head("3. a Pro account is shown their plan, not a price");
+/* Owner, 2026-10-04: prices and buying stay for a Pro account too. The level is a hint that
+   cannot tell a trial from a paid plan, and a trial has to be able to buy. */
+head("3. a Pro account sees the price, the way to buy, and where its plan lives");
 {
   const page = await open(ctx, PRO, { level: "pro" });
-  eq("the price block is hidden", await page.locator("#pro-pay").isVisible(), false);
-  eq("and the plan is what stands there", await page.locator("#pro-yours").isVisible(), true);
-  eq("the purchase CTAs are hidden", await page.locator("[data-pro-buy]:visible").count(), 0);
+  eq("the price block is shown", await page.locator("#pro-pay").isVisible(), true);
+  eq("and the plan note stands beside it", await page.locator("#pro-yours").isVisible(), true);
+  eq("the purchase CTAs are shown", await page.locator("[data-pro-buy]:visible").count() > 0, true);
+  eq("the period switch is shown", await page.locator(".pro-period").isVisible(), true);
+  eq("the trial offer is not", await page.locator("[data-pro-trial]:visible").count(), 0);
   // Everything else about the product is still readable: this is the page that describes
   // Pro, and a subscriber is allowed to read what they are paying for.
   eq("the product panes are still described", await page.locator(".pro-pane").count(), 2);

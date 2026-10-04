@@ -28,7 +28,8 @@ check("build validates PRO_COPY", build.includes("PRO_COPY_KEYS") && build.inclu
 check("meta comes from PRO_COPY", build.includes("description: PRO_COPY[lang].meta"));
 const paywall = read("assets/paywall.js");
 check("paywall formats zero", paywall.includes("lmMoneyMinor(0, code)"));
-check("paywall hides page CTAs for Pro", paywall.includes('querySelectorAll("[data-pro-buy]")'));
+// Owner, 2026-10-04: a Pro account (trial included) keeps the prices and the way to buy.
+check("paywall keeps the price block for Pro too", paywall.includes("pay.hidden = false") && !paywall.includes("buys[i].hidden = isPro"));
 check("period switch is wired", paywall.includes("data-pro-set") && paywall.includes("data-pro-period"));
 
 if (failed.length) {

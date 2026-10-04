@@ -698,7 +698,8 @@ function consumePayBuy(sub) {
   url.searchParams.delete("buy");
   history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
 
-  if (sub.state === "active") return;
+  // Somebody who already pays clicked "Wykup": say the subscription is running rather than nothing.
+  if (sub.state === "active") { statusKey("plan_active_d"); return; }
   const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
   if (payBuyIntent(`?buy=${encodeURIComponent(id)}`, sub, code)) {
     goToCheckout(id);

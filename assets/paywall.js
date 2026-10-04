@@ -212,24 +212,21 @@ function pwPage() {
   if (!pay) return;
   const yours = document.getElementById("pro-yours");
   const isPro = pwLevel() === (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro");
-  pay.hidden = isPro;
+  // Prices and the way to buy stay for every visitor (owner, 2026-10-04). The level here is a
+  // hint that cannot tell a 14-day trial from a paid plan, and the trial is exactly the account
+  // that has to be able to buy; /app/ will not start a second subscription for an active one.
+  // A Pro account is additionally told where its plan lives.
+  pay.hidden = false;
   if (yours) yours.hidden = !isPro;
-  // The period switch only chooses between prices, so an account that already pays loses it too.
-  const period = document.querySelector(".pro-period");
-  if (period) period.hidden = isPro;
   // The trial comes with a new account, so somebody already signed in has had it.
   const signedIn = pwLevel() !== pwGuest();
   const trials = document.querySelectorAll("[data-pro-trial]");
   for (let i = 0; i < trials.length; i++) trials[i].hidden = signedIn;
-  const buys = document.querySelectorAll("[data-pro-buy]");
-  for (let i = 0; i < buys.length; i++) buys[i].hidden = isPro;
-  if (!isPro) {
-    pwPrices(pay);
-    const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
-    const zeros = document.querySelectorAll("[data-pro-zero]");
-    for (let i = 0; i < zeros.length; i++) {
-      zeros[i].textContent = typeof lmMoneyMinor === "function" ? lmMoneyMinor(0, code) : `0.00 ${code}`;
-    }
+  pwPrices(pay);
+  const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
+  const zeros = document.querySelectorAll("[data-pro-zero]");
+  for (let i = 0; i < zeros.length; i++) {
+    zeros[i].textContent = typeof lmMoneyMinor === "function" ? lmMoneyMinor(0, code) : `0.00 ${code}`;
   }
 }
 
