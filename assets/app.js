@@ -51,6 +51,20 @@ let accountSync = null;
 /** The account room card whose successful add is being redrawn by Firestore. */
 let openAccountRoomProjectId = null;
 
+/** A Pro-page purchase must wait here for Firebase: only /app/ can identify its buyer. */
+function payBuyPlan(search) {
+  const id = new URLSearchParams(search || "").get("buy");
+  return id && LM_PAY.plans.some((plan) => plan.id === id) ? id : null;
+}
+
+function payBuyIntent(search, sub, code) {
+  const id = payBuyPlan(search);
+  return id && sub && sub.state !== "active" && lmPayBuyable(id, code) ? id : null;
+}
+
+let payBuyPending = payBuyPlan(typeof location !== "undefined" ? location.search : "");
+let payBuyHandled = false;
+
 /*
  * A sign-in, sign-up or reset form submitted before boot() has wired it — the Firebase SDK
  * is still on its way from gstatic — used to be a plain GET: the page reloaded as "/app/?",
@@ -671,6 +685,26 @@ function renderPlan() {
   if (manage && portal) $("plan-manage-link").href = portal;
 
   renderPlanPrices(sub);
+  consumePayBuy(sub);
+}
+
+function consumePayBuy(sub) {
+  if (!payBuyPending) return;
+  const id = payBuyPending;
+  payBuyPending = null;
+  payBuyHandled = true;
+
+  const url = new URL(location.href);
+  url.searchParams.delete("buy");
+  history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
+
+  if (sub.state === "active") return;
+  const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
+  if (payBuyIntent(`?buy=${encodeURIComponent(id)}`, sub, code)) {
+    goToCheckout(id);
+  } else {
+    statusKey("pay_soon", true);
+  }
 }
 
 /**
@@ -856,6 +890,7 @@ function nextTarget() {
 function renderNext() {
   const next = nextTarget();
   if (!next) return false;
+  if (payBuyHandled) return false;
   $("app-next-link").href = next;
   $("app-next").hidden = false;
   if (accountSync.blockedWorkspace()) {

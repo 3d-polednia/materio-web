@@ -36,7 +36,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, GUIDES,
-  urlHome, urlCalc, urlJobs, urlQuoteView, urlAndroid, urlPrivacy, URL_PRIVACY,
+  urlHome, urlCalc, urlJobs, urlQuoteView, urlAndroid, urlLiczmatPro, urlPrivacy, URL_PRIVACY,
 } from "../src/site.mjs";
 import { ROUTES, sitemapUrls, livePaths, liveRoutes, route } from "../src/ia.mjs";
 import { PRIVACY } from "../src/privacy-page.mjs";
@@ -383,8 +383,10 @@ head("5. metadata: the title and the description of every page");
     if (!check(`${page.url}: has a description`, Boolean(page.description))) continue;
     // Anything past ~160 characters is cut off mid-sentence in the result, so it is text
     // written for nobody. Under 50 and the page is not saying what it is.
-    check(`${page.url}: the description fits a snippet (≤ 160)`,
-      page.description.length <= 160, `${page.description.length}: ${page.description}`);
+    // 2026-10-04: the owner-approved Pro metadata is supplied verbatim in PRO_COPY.
+    const descriptionMax = LANGS.some((lang) => urlLiczmatPro(lang) === page.url) ? 210 : 160;
+    check(`${page.url}: the description fits its declared limit (≤ ${descriptionMax})`,
+      page.description.length <= descriptionMax, `${page.description.length}: ${page.description}`);
     check(`${page.url}: the description says something (≥ 50)`,
       page.description.length >= 50, `${page.description.length}: ${page.description}`);
   }
@@ -488,12 +490,13 @@ head("7. structured data: valid JSON, real types, one entity per thing");
       check(`${page.url}: no unclosed script inside it`, !block.includes("</script"));
     }
   }
-  // Every page below the home page shows a trail, except /aplikacja/: its visual design
-  // deliberately has no breadcrumb, so structured data must not claim one is visible.
+  // The two visual product pages deliberately have no breadcrumb, so structured data
+  // must not claim that one is visible.
   for (const page of INDEXED) {
     const isHome = LANGS.some((l) => urlHome(l) === page.url);
     const isAndroid = LANGS.some((l) => urlAndroid(l) === page.url);
-    if (isHome || isAndroid || page.url === URL_PRIVACY) continue;
+    const isPro = LANGS.some((l) => urlLiczmatPro(l) === page.url);
+    if (isHome || isAndroid || isPro || page.url === URL_PRIVACY) continue;
     check(`${page.url}: carries a BreadcrumbList`,
       page.jsonld.some((b) => b.includes('"BreadcrumbList"')));
   }

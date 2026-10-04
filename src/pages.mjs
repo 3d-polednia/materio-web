@@ -19,7 +19,7 @@ import {
 import { CALC_META, FORMULA_I18N, FORMULA_UNITS, DECIMAL_POINT } from "./calc-meta.mjs";
 import { proGate, proModules, proPlansBlock } from "./pro.mjs";
 import { PDF_COPY, QUOTE_PDF_COPY, pdfSplit } from "./pdf-copy.mjs";
-import { CURRENCIES } from "./currency.mjs";
+import { CURRENCIES, MONEY_LOCALE } from "./currency.mjs";
 import { calendarGrid } from "./app-pages.mjs";
 import { accountPageMain } from "./account-sidebar.mjs";
 import { QUOTE_VIEW_COPY } from "./quote-view-copy.mjs";
@@ -1866,107 +1866,41 @@ export function projectsMain(lang, t, aisles = [], features = []) {
  *   price is in the markup so that a crawler and a visitor with no script both see it;
  *   assets/paywall.js replaces it with the visitor's own currency when there is one.
  */
-export function proPageMain(lang, t, features, prices) {
-  const crumbs = breadcrumbs(t, [
-    { name: t("bc_home"), path: urlHome(lang) },
-    { name: t("pro_t"), path: urlLiczmatPro(lang) },
-  ]);
-
-  /* The five modules, named and described in full. No chip on any of them: the whole page
-     is about what Pro contains, so "Dostępne w LiczMat Pro" under each card would be the
-     same sentence five times. No link either — each module is behind the wall, and a link
-     onto a wall that describes this page is a circle. */
-  const mods = proModules(features).map((f) => `<article class="pro-mod">
-          <h3>${esc(t(`${f.key}_t`))}</h3>
-          <p class="muted">${esc(t(`${f.key}_d`))}</p>
-        </article>`).join("\n        ");
-
-  const list = (keys) => `<ul class="steps-list">
-        ${keys.map((k) => `<li>${esc(t(k))}</li>`).join("\n        ")}
-      </ul>`;
-
+export function proPageMain(lang, t, features, prices, copy, samples, counts) {
+  const c = (key) => esc(String(copy[key]).replaceAll("{n}", String(counts.calcs)).replaceAll("{materials}", String(counts.materials)));
+  const list = (keys) => `<ul class="app-list">${keys.map((key) => `<li>${c(key)}</li>`).join("")}</ul>`;
+  const facts = [1, 2, 3, 4].map((n) => `<li><span aria-hidden="true">✓</span><div><b>${c(`f${n}_t`)}</b><small>${c(`f${n}_d`)}</small></div></li>`).join("");
+  const steps = [1, 2, 3, 4].map((n) => `<li><span class="app-step-n">0${n}</span><b>${c(`s${n}_t`)}</b><span>${c(`s${n}_d`)}</span></li>`).join("");
+  const groups = [
+    ["g_count", [["r_calcs", 1, 1, 1], ["r_materials", 1, 1, 1], ["r_converter", 1, 1, 1]]],
+    ["g_projects", [["r_projects", 0, 1, 1], ["r_saved", 0, 1, 1], ["r_shopping", 0, 1, 1], ["r_sync", 0, 1, 1]]],
+    ["g_money", [["r_prices", 0, 0, 1], ["r_waste", 0, 0, 1], ["r_quotes", 0, 0, 1], ["r_vat", 0, 0, 1]]],
+    ["g_work", [["r_clients", 0, 0, 1], ["r_calendar", 0, 0, 1], ["r_history", 0, 0, 1]]],
+    ["g_docs", [["r_pdf", 0, 0, 1], ["r_link", 0, 0, 1]]],
+  ];
+  const cell = (yes) => `<td class="${yes ? "pro-check" : "pro-no"}"><span aria-hidden="true">${yes ? "✓" : "×"}</span><span class="sr-only">${c(yes ? "t_yes" : "t_no")}</span></td>`;
+  const rows = groups.map(([group, items]) => `<tr class="pro-group"><th colspan="4" scope="colgroup">${c(group)}</th></tr>${items.map(([key, ...values]) => `<tr><th scope="row">${c(key)}</th>${values.map(cell).join("")}</tr>`).join("")}`).join("");
+  const price = (id, per) => `<p class="pro-price" data-pw-plan="${id}"${prices[id] ? "" : " hidden"}><b data-pw-price>${prices[id] ? esc(prices[id]) : ""}</b> <span class="muted">${esc(t(per))}</span></p>`;
+  const plan = (title, keys, top, button, cls = "") => `<article class="pro-plan${cls ? ` ${cls}` : ""}"><h3>${title}</h3>${top}${list(keys)}${button}</article>`;
+  const app = URL_APP;
+  const signup = `${app}?mode=signup`;
+  const date = new Intl.DateTimeFormat(MONEY_LOCALE[lang], { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date("2026-10-14T00:00:00Z"));
   const main = `<main id="main" tabindex="-1">
-  <section class="block page-head">
-    <div class="wrap">
-      ${crumbs.nav}
-      <h1>${esc(t("pro_t"))}</h1>
-      <p class="lead">${esc(t("pro_d"))}</p>
-    </div>
-  </section>
-
-  <section class="block" aria-labelledby="promods-h">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="promods-h">${esc(t("propage_h_mods"))}</h2>
-        <p class="muted">${esc(t("propage_mods_d"))}</p>
-      </div>
-      <div class="pro-mods">
-        ${mods}
-      </div>
-    </div>
-  </section>
-
-  <section class="block alt" aria-labelledby="profree-h">
-    <div class="wrap narrow">
-      <h2 id="profree-h">${esc(t("propage_h_free"))}</h2>
-      <p class="muted">${esc(t("propage_free_d"))}</p>
-      ${list(["propage_free_1", "propage_free_2", "propage_free_3"])}
-      <p class="ws-links">
-        <a class="btn btn-ghost btn-sm btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-        <a class="btn btn-ghost btn-sm btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-      </p>
-    </div>
-  </section>
-
-  <!-- What Pro is not. Chapter XXIV ends on "to nie jest ERP", chapter XXII rules the
-       accounting package out by name and chapter XXIII rules out a second calendar; a
-       page that sold Pro without saying any of it would be selling something else. -->
-  <section class="block" aria-labelledby="pronot-h">
-    <div class="wrap narrow">
-      <h2 id="pronot-h">${esc(t("propage_h_not"))}</h2>
-      ${list(["propage_not_1", "propage_not_2", "propage_not_3"])}
-      <p class="muted src-note">${esc(t("propage_local"))}</p>
-    </div>
-  </section>
-
-  <!-- The price. The block is proPlansBlock() — the same markup the wall in front of a
-       module carries, so the two can never quote different prices — and the amounts in it
-       are empty: assets/pay.js knows them per currency and assets/paywall.js writes them
-       in once the visitor's currency is known. Somebody already on Pro is shown their
-       plan instead: pwMountPage() hides the whole block for them. -->
-  <section class="block alt" aria-labelledby="propay-h">
-    <div class="wrap narrow">
-      <h2 id="propay-h">${esc(t("propage_h_pay"))}</h2>
-      <div id="pro-pay">
-        ${proPlansBlock(t, { checkout: false, prices })}
-      </div>
-      <p id="pro-yours" hidden><span class="chip on">${esc(t("cli_pro_yours"))}</span></p>
-    </div>
-  </section>
-
-  <section class="block" aria-labelledby="prohow-h">
-    <div class="wrap narrow">
-      <h2 id="prohow-h">${esc(t("propage_h_how"))}</h2>
-      ${list(["propage_how_1", "propage_how_2", "propage_how_3"])}
-      <p class="ws-links">
-        <a class="btn btn-primary btn-sm btn-go" href="${URL_APP}?mode=signup&amp;next=${encodeURIComponent(urlLiczmatPro(lang))}" rel="nofollow">${esc(t("pro_signin"))}</a>
-        <a class="btn btn-ghost btn-sm btn-go" href="${URL_APP}" rel="nofollow">${esc(t("pay_go"))}</a>
-      </p>
-    </div>
-  </section>
-
-  ${appNote(t)}
+  <section class="block app-hero-b pro-stage"><div class="wrap"><div class="app-stage"><div class="app-stage-copy"><h1>${esc(t("pro_t"))}</h1><p class="lead">${c("lead")}</p><p class="pro-actions"><a class="btn btn-buy" href="#cennik" data-pro-buy>${c("buy")}</a><a class="btn btn-ghost btn-go" href="${signup}" rel="nofollow">${c("trial")}</a></p><ul class="pro-facts">${facts}</ul></div><div class="app-stage-media" aria-hidden="true" inert><div class="pro-sheet">${samples.quote}</div><p class="app-float pro-float-client"><span class="app-float-k">${c("k_client")}</span><b>${c("x_client")}</b><span>${c("x_city")} · ${c("x_phone")}</span></p><p class="app-float pro-float-date"><span class="app-float-k">${c("k_date")}</span><b>${esc(date)}</b><span>${c("x_project")}</span></p></div></div></div></section>
+  <section class="block app-steps-block"><div class="wrap"><ol class="app-steps">${steps}</ol></div></section>
+  <section class="block"><div class="wrap"><div class="app-pane pro-pane"><div class="app-work" aria-hidden="true" inert>${samples.editor}</div><div class="pro-pane-copy"><h2>${c("q_h")}</h2><p>${c("q_d")}</p>${list(["q_1", "q_2", "q_3", "q_4"])}</div></div></div></section>
+  <section class="block"><div class="wrap"><div class="app-pane pro-pane pro-pane-reverse"><div class="pro-pane-copy"><h2>${c("c_h")}</h2><p>${c("c_d")}</p>${list(["c_1", "c_2", "c_3", "c_4"])}</div><div class="app-work pro-calendar" aria-hidden="true" inert>${samples.calendar}</div></div></div></section>
+  <section class="block alt" id="cennik" aria-labelledby="pro-price-h"><div class="wrap"><div class="pro-pricing-head"><h2 id="pro-price-h">${c("p_h")}</h2><div class="pro-period" hidden><button type="button" data-pro-set="monthly" aria-pressed="true">${c("p_month")}</button><button type="button" data-pro-set="yearly" aria-pressed="false">${c("p_year")}</button></div></div><div class="pro-plans">
+  ${plan(c("p_guest"), ["p_guest_1", "p_guest_2", "p_guest_3"], `<p class="pro-price"><b data-pro-zero>${esc(prices.zero)}</b></p><p class="muted">${c("p_nofee")}</p>`, `<a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${c("p_open_calc")}</a>`)}
+  ${plan(c("p_free"), ["p_free_1", "p_free_2", "p_free_3", "p_free_4", "p_free_5"], `<p class="pro-price"><b data-pro-zero>${esc(prices.zero)}</b></p><p class="muted">${c("p_nofee")}</p>`, `<a class="btn btn-ghost btn-go" href="${signup}" rel="nofollow">${c("p_signup")}</a>`)}
+  <article class="pro-plan pro-plan-pro"><h3>${esc(t("pro_t"))}</h3><div id="pro-pay" class="pro-pay" data-pro-period="monthly">${price("monthly", "pay_monthly_per")}${price("yearly", "pay_yearly_per")}${list(["p_pro_1", "p_pro_2", "p_pro_3", "p_pro_4", "p_pro_5", "p_pro_6", "p_pro_7"])}<p data-pw-buy hidden><a class="btn btn-buy btn-go" data-pro-plan="monthly" href="${app}?buy=monthly" rel="nofollow">${c("buy")}</a><a class="btn btn-buy btn-go" data-pro-plan="yearly" href="${app}?buy=yearly" rel="nofollow">${c("buy")}</a></p><a class="pro-trial" href="${signup}" rel="nofollow">${c("p_trial_line")}</a><p class="muted" data-pw-soon>${esc(t("pay_soon"))}</p></div><p id="pro-yours" hidden>${c("p_yours")} <a href="${app}">${c("p_account")}</a></p></article>
+  </div><p class="pro-payment">${c("p_pay_line")}</p></div></section>
+  <section class="block" aria-labelledby="pro-table-h"><div class="wrap"><div class="section-head"><h2 id="pro-table-h">${c("t_h")}</h2></div><div class="pro-table-shell"><table class="pro-table"><thead><tr><th scope="col">${c("t_feature")}</th><th scope="col">${c("p_guest")}</th><th scope="col">${c("p_free")}</th><th scope="col">${esc(t("pro_t"))}</th></tr></thead><tbody>${rows}</tbody></table></div></div></section>
+  <section class="block"><div class="wrap"><div class="app-install pro-before"><h2>${c("b_h")}</h2>${list(["b_1", "b_2", "b_3", "b_4"])}<a class="btn btn-buy" href="#cennik" data-pro-buy>${c("buy")}</a></div></div></section>
 </main>`;
-
-  return { main, ld: crumbs.ld };
+  return { main, ld: null };
 }
 
-/**
- * /moja-firma/ — the seller details kept for later use on quote documents.
- *
- * The build owns the form and the Pro wall; assets/company-ui.js owns the rows and logo
- * preview because those depend on this browser's local CRM store.
- */
 export function companyMain(lang, t, features) {
   const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },

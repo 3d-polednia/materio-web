@@ -214,7 +214,19 @@ function pwPage() {
   const isPro = pwLevel() === (typeof LM_LEVEL === "object" && LM_LEVEL ? LM_LEVEL.PRO : "pro");
   pay.hidden = isPro;
   if (yours) yours.hidden = !isPro;
-  if (!isPro) pwPrices(pay);
+  // The period switch only chooses between prices, so an account that already pays loses it too.
+  const period = document.querySelector(".pro-period");
+  if (period) period.hidden = isPro;
+  const buys = document.querySelectorAll("[data-pro-buy]");
+  for (let i = 0; i < buys.length; i++) buys[i].hidden = isPro;
+  if (!isPro) {
+    pwPrices(pay);
+    const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
+    const zeros = document.querySelectorAll("[data-pro-zero]");
+    for (let i = 0; i < zeros.length; i++) {
+      zeros[i].textContent = typeof lmMoneyMinor === "function" ? lmMoneyMinor(0, code) : `0.00 ${code}`;
+    }
+  }
 }
 
 /* Redrawn for the same three reasons a wall is: somebody signed in or out (in this tab or
@@ -222,6 +234,18 @@ function pwPage() {
    a translated word. The page has no script of its own to call this, so it wires itself
    and does nothing at all on the pages that carry no #pro-pay. */
 if (typeof document !== "undefined" && document.getElementById("pro-pay")) {
+  const period = document.querySelector(".pro-period");
+  if (period) {
+    period.hidden = false;
+    period.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-pro-set]");
+      if (!button) return;
+      const value = button.getAttribute("data-pro-set");
+      document.getElementById("pro-pay").setAttribute("data-pro-period", value);
+      const buttons = period.querySelectorAll("[data-pro-set]");
+      for (let i = 0; i < buttons.length; i++) buttons[i].setAttribute("aria-pressed", String(buttons[i] === button));
+    });
+  }
   document.addEventListener("lm-session", pwPage);
   document.addEventListener("currencychange", pwPage);
   document.addEventListener("langchange", pwPage);

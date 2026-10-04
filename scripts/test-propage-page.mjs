@@ -33,7 +33,7 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join, extname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { LANGS, urlHome, urlLiczmatPro, urlCalcIndex, urlProjects } from "../src/site.mjs";
+import { LANGS, urlHome, urlLiczmatPro, urlCalcIndex } from "../src/site.mjs";
 import { DEFAULT_CURRENCY, MONEY_LOCALE } from "../src/currency.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -177,11 +177,8 @@ head("1. what a visitor with no account sees");
   const page = await open(ctx, PRO);
 
   eq("the page is the one about Pro", await page.textContent("h1"), "LiczMat Pro");
-  eq("the four modules are on it", await page.locator(".pro-mod").count(), 4);
-  for (const name of ["Klienci", "Wyceny", "Terminarz", "Historia i CRM"]) {
-    // U+00A0 binds Polish one-letter words since 2026-10-03 ("Historia i CRM").
-    check(`${name} is named`, (await page.textContent("main")).replace(/\u00a0/g, " ").includes(name));
-  }
+  eq("the two real product panes are on it", await page.locator(".pro-pane").count(), 2);
+  eq("the three access levels are compared", await page.locator(".pro-plan").count(), 3);
 
   // The price, in this language's currency, drawn by assets/paywall.js out of the amount
   // the build already wrote — the two agree, so nothing moves when the script runs.
@@ -191,7 +188,8 @@ head("1. what a visitor with no account sees");
   eq("and so is the yearly one",
     (await page.textContent('[data-pw-plan="yearly"] [data-pw-price]')).trim(),
     priceIn("PLN", "pl", "yearly"));
-  eq("both plans are visible", await page.locator(".pw-plan:visible").count(), 2);
+  eq("the selected monthly plan is visible", await page.locator('[data-pw-plan="monthly"]:visible').count(), 1);
+  eq("the yearly plan starts hidden", await page.locator('[data-pw-plan="yearly"]:visible').count(), 0);
 
   /* Sessions 70 and 71 opened the subscription, so the page names the way in rather than
      apologising for not having one. Exactly one of the two ever shows: a page carrying
@@ -215,9 +213,13 @@ head("1. what a visitor with no account sees");
 
   // The way in, and the way back to it.
   const signup = page.locator('a[href*="mode=signup"]');
-  eq("the sign-up link is offered once", await signup.count(), 1);
-  check("and it comes back to this page",
-    (await signup.getAttribute("href")).includes(encodeURIComponent(PRO)));
+  eq("the sign-up route is offered in three relevant places", await signup.count(), 3);
+  check("and every one opens sign-up", (await signup.evaluateAll((nodes) => nodes.every((n) => n.getAttribute("href").includes("mode=signup")))));
+
+  await page.click('[data-pro-set="yearly"]');
+  eq("the switch shows the yearly price", await page.locator('[data-pw-plan="yearly"]:visible').count(), 1);
+  eq("and its yearly buy button", await page.locator('[data-pro-plan="yearly"]:visible').count(), 1);
+  eq("the yearly button leads through the app", await page.getAttribute('[data-pro-plan="yearly"]', "href"), "/app/?buy=yearly");
 
   eq("no error in the console", page.errors.join(" | "), "");
   await page.close();
@@ -259,11 +261,10 @@ head("3. a Pro account is shown their plan, not a price");
   const page = await open(ctx, PRO, { level: "pro" });
   eq("the price block is hidden", await page.locator("#pro-pay").isVisible(), false);
   eq("and the plan is what stands there", await page.locator("#pro-yours").isVisible(), true);
-  check("said as the chip that marks a plan somebody has",
-    await page.$eval("#pro-yours .chip", (n) => n.classList.contains("on")));
+  eq("the purchase CTAs are hidden", await page.locator("[data-pro-buy]:visible").count(), 0);
   // Everything else about the product is still readable: this is the page that describes
   // Pro, and a subscriber is allowed to read what they are paying for.
-  eq("the four modules are still described", await page.locator(".pro-mod").count(), 4);
+  eq("the product panes are still described", await page.locator(".pro-pane").count(), 2);
   await page.close();
 
   // A free account is quoted the price, exactly like a guest: they are the visitor the
@@ -299,8 +300,7 @@ for (const lang of LANGS) {
   // to /kalkulatory/ is the mistake a per-language URL exists to prevent.
   const hrefs = await page.$$eval("main a[href]", (a) => a.map((n) => n.getAttribute("href")));
   check(`${lang}: the calculators are linked in this language`, hrefs.includes(urlCalcIndex(lang)));
-  check(`${lang}: the projects are linked in this language`, hrefs.includes(urlProjects(lang)));
-  check(`${lang}: the breadcrumb goes home in this language`, hrefs.includes(urlHome(lang)));
+  check(`${lang}: the page deliberately has no breadcrumb`, !(await page.content()).includes('"BreadcrumbList"'));
 
   eq(`${lang}: no error in the console`, page.errors.join(" | "), "");
   await page.close();
@@ -344,7 +344,7 @@ head("6. with no script at all — the page still says what Pro is and what it c
   await page.goto(base + PRO, { waitUntil: "load" });
 
   eq("the page is there", await page.textContent("h1"), "LiczMat Pro");
-  eq("the four modules are there", await page.locator(".pro-mod").count(), 4);
+  eq("the two product panes are there", await page.locator(".pro-pane").count(), 2);
   eq("the monthly price is in the markup and visible",
     (await page.textContent('[data-pw-plan="monthly"] [data-pw-price]')).trim(),
     priceIn("PLN", "pl", "monthly"));

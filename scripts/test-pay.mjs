@@ -66,6 +66,16 @@ function loadPay(over) {
   return api;
 }
 
+function loadBuyIntent(pay) {
+  const src = read("assets/app.js");
+  const start = src.indexOf("function payBuyPlan(");
+  const end = src.indexOf("let payBuyPending", start);
+  if (start < 0 || end < 0) throw new Error("purchase-intent helpers missing from assets/app.js");
+  return evalSource(src.slice(start, end), ["payBuyIntent"], {
+    URLSearchParams, LM_PAY: pay.LM_PAY, lmPayBuyable: pay.lmPayBuyable,
+  }).payBuyIntent;
+}
+
 /* ------------------------------------------------------------------ the runner */
 
 let passed = 0;
@@ -80,6 +90,20 @@ function check(name, cond, detail) {
 }
 const eq = (name, got, want) =>
   check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
+
+head("purchase intent arriving at /app/");
+{
+  const pay = loadPay();
+  const intent = loadBuyIntent(pay);
+  eq("no parameter does nothing", intent("?mode=signup", { state: "free" }, "PLN"), null);
+  eq("an unknown plan does nothing", intent("?buy=forever", { state: "free" }, "PLN"), null);
+  eq("a guest waits for authentication", intent("?buy=monthly", null, "PLN"), null);
+  eq("a free account buys", intent("?buy=monthly", { state: "free" }, "PLN"), "monthly");
+  eq("a trial account buys", intent("?buy=yearly", { state: "trial" }, "PLN"), "yearly");
+  eq("a cancelled account buys", intent("?buy=monthly", { state: "cancelled" }, "PLN"), "monthly");
+  eq("an active account does not buy", intent("?buy=monthly", { state: "active" }, "PLN"), null);
+  eq("a currency without a price does not buy", intent("?buy=monthly", { state: "free" }, "XXX"), null);
+}
 
 /* ================================================================== 1. the prices */
 

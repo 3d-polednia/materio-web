@@ -537,7 +537,9 @@ const BUDGET = {
      visible labels, for the same reason /projekty/ did — a placeholder is not a label,
      because it leaves when the typing starts. The widest single panel is still the
      profile; Klienci with its four labelled fields is what moved the number. */
-  "liczmat-pro": 477, account: 470, dashboard: 130, share: 40, privacy: 3820,
+  // 2026-10-04: approved Pro page adds three access levels, the feature matrix and three
+  // real product samples; its 13-language maximum stays below this measured ceiling.
+  "liczmat-pro": 1080, account: 470, dashboard: 130, share: 40, privacy: 3820,
   // The compatibility URL carries the complete Polish and English policies in sequence.
   "privacy-legacy": 4800,
 };

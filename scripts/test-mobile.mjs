@@ -292,6 +292,10 @@ const AUDIT = (phone) => {
   const tables = [];
   for (const t of document.querySelectorAll("table")) {
     if (!seen(t)) continue;
+    // 2026-10-04: /liczmat-pro/ contains inert, scaled product samples and a deliberately
+    // fixed four-column comparison that fits at 390 px; neither is an interactive data
+    // table that should acquire its own horizontal scroller.
+    if (t.closest("[inert]") || t.classList.contains("pro-table")) continue;
     const box = getComputedStyle(t.parentElement).overflowX;
     if (box !== "auto" && box !== "scroll") tables.push(`${name(t)} in ${name(t.parentElement)}`);
   }
