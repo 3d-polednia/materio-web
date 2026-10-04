@@ -1847,13 +1847,19 @@ a.chip:hover { text-decoration: none; }
 html.js #pro-pay[data-pro-period="monthly"] [data-pw-plan="yearly"], html.js #pro-pay[data-pro-period="monthly"] [data-pro-plan="yearly"], html.js #pro-pay[data-pro-period="yearly"] [data-pw-plan="monthly"], html.js #pro-pay[data-pro-period="yearly"] [data-pro-plan="monthly"] { display: none; }
 /* /liczmat-pro/ below 75em. In em, not px, so a browser with a larger default font (the
    owner's phone, 2026-10-04) stacks the page before the two columns squeeze the editor and
-   the calendar. The hero stacks too: text first, the sheet under it at the same scale. */
+   the calendar. The hero keeps the sheet beside the text (owner, 2026-10-04), only smaller. */
 @media (max-width: 75em) {
+  .pro-sheet { transform: translateX(-50%) rotate(-3deg) scale(.5); }
+  .pro-facts { grid-template-columns: 1fr; }
+  .pro-pane, .pro-pane-reverse { grid-template-columns: 1fr; }
+  .pro-pane-reverse .pro-pane-copy { order: 2; }
+}
+/* Where /aplikacja/ stacks its stage, so does this one: text first, the sheet under it. */
+@media (max-width: 900px) {
   .pro-stage .app-stage { grid-template-columns: 1fr; min-height: 0; }
   .pro-stage .app-stage-copy { padding: var(--sp-10) var(--sp-8) var(--sp-4); }
   .pro-stage .app-stage-media { min-height: 720px; }
-  .pro-pane, .pro-pane-reverse { grid-template-columns: 1fr; }
-  .pro-pane-reverse .pro-pane-copy { order: 2; }
+  .pro-sheet { transform: translateX(-50%) rotate(-3deg) scale(.6); }
 }
 /* The calendar keeps its day panel beside it while the month still has room for its chips. */
 @media (max-width: 48em) {

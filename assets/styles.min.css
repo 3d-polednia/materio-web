@@ -1212,11 +1212,16 @@ box-shadow: var(--shadow-3);
 .pro-before { width: auto; height: auto; padding: var(--sp-8); border: 1px solid var(--outline); border-radius: var(--radius-lg); background: var(--surface); }
 html.js #pro-pay[data-pro-period="monthly"] [data-pw-plan="yearly"], html.js #pro-pay[data-pro-period="monthly"] [data-pro-plan="yearly"], html.js #pro-pay[data-pro-period="yearly"] [data-pw-plan="monthly"], html.js #pro-pay[data-pro-period="yearly"] [data-pro-plan="monthly"] { display: none; }
 @media (max-width: 75em) {
+.pro-sheet { transform: translateX(-50%) rotate(-3deg) scale(.5); }
+.pro-facts { grid-template-columns: 1fr; }
+.pro-pane, .pro-pane-reverse { grid-template-columns: 1fr; }
+.pro-pane-reverse .pro-pane-copy { order: 2; }
+}
+@media (max-width: 900px) {
 .pro-stage .app-stage { grid-template-columns: 1fr; min-height: 0; }
 .pro-stage .app-stage-copy { padding: var(--sp-10) var(--sp-8) var(--sp-4); }
 .pro-stage .app-stage-media { min-height: 720px; }
-.pro-pane, .pro-pane-reverse { grid-template-columns: 1fr; }
-.pro-pane-reverse .pro-pane-copy { order: 2; }
+.pro-sheet { transform: translateX(-50%) rotate(-3deg) scale(.6); }
 }
 @media (max-width: 48em) {
 .pro-calendar .cal-wrap { grid-template-columns: 1fr; }
