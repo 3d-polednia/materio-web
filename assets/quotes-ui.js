@@ -181,7 +181,7 @@ const quoAllowed = () => typeof pwAllows === "function" && pwAllows("quotes");
  * the previous account's figures would still be holding them.
  */
 function quoClear() {
-  const ids = ["quo-list", "quo-labour-list", "quo-chain-line"];
+  const ids = ["quo-list", "quo-labour-list"];
   for (let i = 0; i < ids.length; i++) {
     const el = document.getElementById(ids[i]);
     if (el) el.innerHTML = "";
@@ -275,19 +275,6 @@ function quoCrumb(name) {
   li.setAttribute("data-quo-crumb", "1");
   li.textContent = name;
   if (!extra) ol.appendChild(li);
-}
-
-/**
- * Chapter XXIV's path, read backwards: this quote → its project → the job that project is
- * being done under → the client it is filed with. Every step is derived (crmQuoteChain()),
- * so a client renamed on their own page reads correctly here on the next redraw.
- */
-function quoRenderChain(q) {
-  // Session 26 draws it with the strip assets/crm-chain.js gives every CRM screen, in
-  // place of the client → job line session 24 wrote here: the same four nodes in the
-  // chapter's own order, and a step nobody has filled in linking to the page that would
-  // fill it — which for a quote with no project is the way to give it one.
-  chnRenderStrip(document.getElementById("quo-chain-line"), crmChain("quote", q.id), "quote");
 }
 
 /** Fill one native picker without inventing a second representation of a record. */
@@ -610,7 +597,6 @@ function quoRenderDetail(id) {
   lead.hidden = true;
   quoCrumb(q.name);
 
-  quoRenderChain(q);
   const status = document.getElementById("quo-status");
   if (status) status.value = crmQuoteStatus(q);
 

@@ -1924,13 +1924,6 @@ margin: 0; padding: 0; list-style: none;
 .cal-rel.job-due-today { color: var(--ev-blue); font-weight: var(--fw-semi); }
 .cal-when input[type="date"] { max-width: 11rem; }
 .data-list li.cal-row { flex-wrap: wrap; }
-#quo-page .quo-top-row {
-display: flex;
-align-items: flex-end;
-justify-content: space-between;
-gap: var(--sp-4);
-}
-#quo-page .quo-top-row .crm-chain { flex: 1 1 auto; min-width: 0; }
 #quo-page .quo-status-field { flex: 0 1 12rem; margin: 0; }
 #quo-page .quo-status-field select { width: 100%; min-height: 24px; }
 #quo-page .quo-new-grid {
@@ -2013,7 +2006,6 @@ gap: var(--sp-2);
 min-width: 0;
 }
 @media (max-width: 560px) {
-#quo-page .quo-top-row { align-items: stretch; flex-direction: column; }
 #quo-page .quo-status-field { flex-basis: auto; max-width: none; }
 #quo-page .quo-status-field select { min-height: var(--control-h); }
 #quo-page .quo-new-grid { grid-template-columns: minmax(0, 1fr); }

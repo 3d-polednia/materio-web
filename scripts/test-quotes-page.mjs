@@ -332,26 +332,14 @@ head("2b. chapter XXII's five figures, on the page");
   await page.close();
 }
 
-head("2c. chapter XXIV read backwards: the quote names its job and its client");
+head("2c. the client and project card replaces the duplicate chain");
 {
   const page = await open(ctx, `${QUOTES}?id=q1`, { workspace: workspace(), crm: crm() });
-  // Session 26 draws the strip every CRM screen shares: chapter XXIV's nodes in the
-  // chapter's own order. The quote is the node the visitor is standing on, so it is a name
-  // and not a link — a link to this page is a dead click. Three nodes since the merge of
-  // 2026-09-21, so that leaves two links.
-  const links = await page.$$eval("#quo-chain-line a",
-    (a) => a.map((n) => `${n.getAttribute("href")}|${n.textContent.trim()}`));
-  eq("the two steps above this quote are there", links.length, 2);
-  check("the client, linked to their own page",
-    links[0].includes("c1") && links[0].includes("Jan Kowalski"), links[0]);
-  check("and the project it is priced from, linked to its own",
-    links[1].includes("p1") && links[1].includes("Remont łazienki"), links[1]);
-  check("the client link is this language's address",
-    links[0].startsWith(urlClients("pl")), links[0]);
-  check("and so is the project's", links[1].startsWith(urlProjects("pl")), links[1]);
-  eq("the quote itself is the step you are on, and links nowhere",
-    await page.$eval("#quo-chain-line li.on b", (n) => n.textContent.trim()),
-    "Łazienka — wycena");
+  // Owner, 2026-10-04: the card already shows and changes both relations.
+  eq("the duplicate chain does not exist", await page.$("#quo-chain-line"), null);
+  eq("the client picker shows the derived client", await page.inputValue("#quo-client-pick"), "c1");
+  check("the project card links to the project in this language",
+    (await page.getAttribute("#quo-project-list a", "href")) === `${urlProjects("pl")}?id=p1`);
 
   // Derived means derived: nothing about either is written onto the quote.
   const stored = (await liveQuotes(page))[0];
@@ -573,14 +561,9 @@ head("5. the project is read, never written — and it can be detached and attac
   eq("detaching empties the two derived figures",
     minor(await page.textContent("#quo-fig-other")), 0);
   eq("and the labour is untouched", minor(await page.textContent("#quo-fig-labour")), LABOUR);
-  // With no project there is nothing above the quote any more, so every step of the strip
-  // is the way to make one: the section's own index, with no ?id= behind it.
-  eq("no step of the chain resolves any more",
-    await page.$$eval("#quo-chain-line a[href*='?id=']", (a) => a.length), 0);
-  // Two, not three: the client step and the project step. The job step went when a job
-  // became a project (2026-09-21), and the quote step is the one being stood on.
-  eq("and each one offers the page that would fill it",
-    await page.$$eval("#quo-chain-line li.off a", (a) => a.length), 2);
+  // Owner, 2026-10-04: no chain is redrawn; the card's picker is the editing control.
+  eq("the duplicate chain still does not exist", await page.$("#quo-chain-line"), null);
+  eq("the project picker shows the detached relation", await page.inputValue("#quo-project-pick"), "");
 
   await page.selectOption("#quo-project-pick", { label: "Remont łazienki" });
   await page.dispatchEvent("#quo-project-pick", "change");
@@ -706,9 +689,8 @@ head("7b. the same quote reads in four languages");
       minor(await page.textContent("#quo-fig-total")), TOTAL);
     check(`${lang}: nothing shows a raw dictionary key`,
       !(await page.content()).includes("quo_fig_"), lang);
-    check(`${lang}: the project link is this language's address`,
-      (await page.$$eval("#quo-chain-line a", (a) => a.map((n) => n.getAttribute("href"))))
-        .some((h) => h.startsWith(urlProjects(lang))), lang);
+    check(`${lang}: the project card link is this language's address`,
+      (await page.getAttribute("#quo-project-list a", "href")).startsWith(urlProjects(lang)), lang);
     check(`${lang}: no error in the console`, page.errors.length === 0,
       page.errors.join("\n      "));
     await page.close();

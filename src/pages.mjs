@@ -2279,15 +2279,6 @@ export function quotesMain(lang, t, features, stamp = "") {
             <p class="muted" id="quo-company-logo-hint" hidden>${esc(t("quo_company_logo_hint"))} <a href="${urlCompany(lang)}">${esc(t("quo_add_logo"))}</a></p>
             <p class="muted" id="quo-company-empty" hidden><a href="${urlCompany(lang)}">${esc(t("quo_company_empty"))}</a></p>
           </section>
-          <!-- Chapter XXIV read backwards: WYCENA → PROJEKT → ZLECENIE → KLIENT. Every
-               step is derived from the one link the quote stores, so nothing here can
-               disagree with the job's own page. Session 26 draws it with the same strip
-               /zlecenia/ uses — assets/crm-chain.js — so the path reads identically from
-               both ends. -->
-          <div class="quo-top-row">
-            <nav class="crm-chain" id="quo-chain-line" aria-label="${esc(t("crm_chain_t"))}"></nav>
-          </div>
-
           <section class="dash-sec">
             <div class="dash-head"><h2>${esc(t("quo_who_t"))}</h2></div>
             <p class="muted">${esc(t("crm_chain_d"))}</p>

@@ -377,13 +377,13 @@ head("3. the whole path, clicked: project → client → quote → project");
   await page.waitForSelector("html[data-quotes-ready]");
   await page.waitForSelector("#quo-body:not([hidden])");
   eq("the quote opens", (await page.textContent("#quo-title")).trim(), "Łazienka — wycena");
-  const steps = await strip(page, "#quo-chain-line");
-  eq("its strip has the same three steps", steps.length, 3);
-  check("the quote is the one you are standing on", steps[2].on, JSON.stringify(steps[2]));
-  eq("and the project above it is the one we came from", steps[1].href, `${PROJECTS}?id=p1`);
+  // Owner, 2026-10-04: the Client and project card already carries this relation.
+  eq("the duplicate quote strip does not exist", await page.$("#quo-chain-line"), null);
+  eq("the relation card names the project we came from",
+    await page.getAttribute("#quo-project-list a", "href"), `${PROJECTS}?id=p1`);
 
-  // WYCENA → PROJEKT, which closes the loop chapter XXIV draws.
-  await page.click("#quo-chain-line li[data-node='project'] a");
+  // WYCENA → PROJEKT through the Client and project card closes the loop.
+  await page.click("#quo-project-list a");
   await page.waitForSelector("html[data-ws-ready]");
   await page.waitForSelector("#ws-project-body:not([hidden])");
   eq("the project opens again", (await page.textContent("#ws-title")).trim(), "Remont łazienki");

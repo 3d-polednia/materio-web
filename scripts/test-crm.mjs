@@ -508,17 +508,16 @@ head("6. the frame the build writes, and the one link map behind it");
   for (const [where, html, ids] of [
     ["/klienci/", client, ["crm-client-quotes", "crm-history"]],
     ["/projekty/", project, ["ws-chain", "ws-chain-quotes", "ws-chain-history"]],
-    ["/wyceny/", quote, ["quo-chain-line"]],
   ]) {
     for (const id of ids) {
       check(`${where} carries #${id} for the script to fill`, html.includes(`id="${id}"`), id);
     }
   }
   check("the strip is a <nav> on /projekty/", /<nav class="crm-chain" id="ws-chain"/.test(project));
-  check("and on /wyceny/", /<nav class="crm-chain" id="quo-chain-line"/.test(quote));
-  check("both label it for a screen reader",
-    project.includes(`aria-label="${t("crm_chain_t")}"`)
-    && quote.includes(`aria-label="${t("crm_chain_t")}"`));
+  // Owner, 2026-10-04: the Client and project card already shows and changes both links.
+  check("the duplicate strip does not exist on /wyceny/", !quote.includes('id="quo-chain-line"'));
+  check("the project strip is labelled for a screen reader",
+    project.includes(`aria-label="${t("crm_chain_t")}"`));
   check("the history says out loud what it leaves out",
     client.includes(t("crm_hist_note")) && project.includes(t("crm_hist_note")));
   check("the quotes block links to the whole list", client.includes(urlQuotes(DEFAULT_LANG)));
@@ -538,10 +537,9 @@ head("6. the frame the build writes, and the one link map behind it");
     check(`${file} reads that one map`, read(file).includes("LM_LINKS"), file);
   }
 
-  // The three screens that draw the chain load the file that draws it; the terminarz draws
-  // none, so it does not download it.
+  // Owner, 2026-10-04: /wyceny/ no longer draws the duplicate chain above its relation card.
   for (const [page, wants] of [["buildClientsPages", true], ["buildProjectsPages", true],
-    ["buildQuotesPages", true], ["buildCalendarPages", false]]) {
+    ["buildQuotesPages", false], ["buildCalendarPages", false]]) {
     const list = { buildClientsPages: "CRM_SCRIPTS", buildProjectsPages: "WS_SCRIPTS",
       buildQuotesPages: "QUOTES_SCRIPTS", buildCalendarPages: "CALENDAR_SCRIPTS" }[page];
     const decl = build.slice(build.indexOf(`const ${list} = [`));

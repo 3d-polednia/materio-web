@@ -944,10 +944,12 @@ head("9. the frame the build writes");
       "quo-project-pick", "quo-project-new-form",
       "quo-room-list", "quo-material-list", "ws-pdf-form", "ws-pdf-doc",
       "quo-margin", "quo-status", "quo-fig-materials", "quo-fig-other", "quo-fig-labour",
-      "quo-fig-sub", "quo-fig-margin", "quo-fig-total", "quo-mixed", "quo-chain-line",
+      "quo-fig-sub", "quo-fig-margin", "quo-fig-total", "quo-mixed",
       "quo-undo", "quo-gate", "quo-tool", "quo-pro-chip"]) {
       check(`${lang}: the page carries #${id}`, main.includes(`id="${id}"`), id);
     }
+    // Owner, 2026-10-04: the Client and project card already shows and changes both links.
+    check(`${lang}: the duplicate quote strip does not exist`, !main.includes('id="quo-chain-line"'));
     // Chapter XXV's block is in the markup from the first paint, not injected later.
     check(`${lang}: the gate is written, hidden`, main.includes('id="quo-gate" hidden'));
     check(`${lang}: the module says it is Pro`, main.includes(t("pro_locked")));

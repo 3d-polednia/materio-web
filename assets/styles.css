@@ -2936,13 +2936,6 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 /* The quote editor follows the document it produces: relation, project materials,
    labour, then one financial summary. Keep every rule under the page root so the
    denser account quote rows retain their own rhythm. */
-#quo-page .quo-top-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--sp-4);
-}
-#quo-page .quo-top-row .crm-chain { flex: 1 1 auto; min-width: 0; }
 #quo-page .quo-status-field { flex: 0 1 12rem; margin: 0; }
 #quo-page .quo-status-field select { width: 100%; min-height: 24px; }
 #quo-page .quo-new-grid {
@@ -3034,7 +3027,6 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 }
 
 @media (max-width: 560px) {
-  #quo-page .quo-top-row { align-items: stretch; flex-direction: column; }
   #quo-page .quo-status-field { flex-basis: auto; max-width: none; }
   #quo-page .quo-status-field select { min-height: var(--control-h); }
   #quo-page .quo-new-grid { grid-template-columns: minmax(0, 1fr); }
