@@ -1306,7 +1306,7 @@ function pdfBlock(lang, t, features) {
                 <textarea data-pdf-in="notesText" rows="3"></textarea></label>
             </details>
 
-            <p><button type="submit" class="btn btn-primary">${esc(web.make)}</button></p>
+            <div class="form-foot"><button type="submit" class="btn btn-primary">${esc(web.make)}</button></div>
           </form>`;
 
   // The document. Every heading and column header is here in this page's language; the
