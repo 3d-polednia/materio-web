@@ -259,14 +259,18 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     const pro = typeof crmExport === "function" ? crmExport() : null;
     const own = typeof omExport === "function" ? omExport() : null;
     const all = (rows) => (rows || []).length;
+    const sum = (count) => count(local.projects) + count(local.rooms) + count(local.estimations)
+      + count(local.shoppingItems) + count(pro && pro.companies) + count(pro && pro.clients)
+      + count(pro && pro.jobs) + count(pro && pro.quotes) + count(own && own.materials);
     return {
       projects: alive(local.projects), rooms: alive(local.rooms),
       estimations: alive(local.estimations), shoppingItems: alive(local.shoppingItems),
       companies: alive(pro && pro.companies), clients: alive(pro && pro.clients), jobs: alive(pro && pro.jobs),
       quotes: alive(pro && pro.quotes),
-      total: all(local.projects) + all(local.rooms) + all(local.estimations)
-        + all(local.shoppingItems) + all(pro && pro.companies) + all(pro && pro.clients) + all(pro && pro.jobs)
-        + all(pro && pro.quotes) + all(own && own.materials),
+      // Every row, tombstones included: what another account's copy is judged by.
+      total: sum(all),
+      // Rows somebody could still lose or claim: what an unstamped browser is judged by.
+      live: sum(alive),
     };
   }
 
@@ -284,14 +288,37 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     return !!counts && counts.total > 0;
   }
 
-  /** Non-empty local data whose owner has never been recorded requires an explicit choice. */
+  /**
+   * Non-empty local data whose owner has never been recorded requires an explicit choice.
+   *
+   * Live rows only (audit AUDYT3 L1, 2026-10-05). A tombstone is nobody's work: it is a
+   * deletion, and in a fresh browser it is usually the account's own deletion, mirrored in
+   * by a listener before the first pull had stamped the browser. Counting it here put half
+   * of the clean browsers in the audit into the "unclaimed" state with 0/0/0/0 on screen,
+   * and from then on nothing synced in either direction. Another account's copy is still
+   * judged by every row, tombstones included (foreignWorkspace()).
+   */
   function unclaimedWorkspace() {
     if (syncAccount() || !state.uid) return false;
     const counts = localCounts();
-    return !!counts && counts.total > 0;
+    return !!counts && counts.live > 0;
   }
 
   const blockedWorkspace = () => foreignWorkspace() || unclaimedWorkspace();
+
+  /**
+   * Stamp an unstamped browser that holds nothing to claim, before anything arrives.
+   *
+   * With nothing live here there is no question to ask, and whatever the account sends next
+   * is the account's own. Stamping only at the end of the first reconcile left a window in
+   * which a listener could mirror the account's rows in, and a pull that then failed (or a
+   * page closed mid-way) left those rows unstamped: the next page load called them
+   * unclaimed and stopped syncing.
+   */
+  function claimEmpty(uid = state.uid) {
+    if (syncAccount() || !syncUidActive(uid) || blockedWorkspace()) return false;
+    return setSyncAccount(uid);
+  }
 
   /**
    * Mirror incoming Firestore documents into localStorage without triggering an up-sync.
@@ -306,6 +333,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
    */
   function mirrorToLocal(incoming) {
     if (blockedWorkspace() || typeof wsImport !== "function") return;
+    claimEmpty();
     state.syncBusy++;
     try {
       wsImport(incoming);
@@ -576,6 +604,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
    */
   async function autoReconcile(uid) {
     if (!syncUidActive(uid) || blockedWorkspace()) return;
+    claimEmpty(uid);
     state.syncBusy++;
     try {
       await syncPullAll(uid);
@@ -924,7 +953,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
   }
 
   return { state, setUid, syncAccount, setSyncAccount, localCounts, foreignWorkspace,
-    unclaimedWorkspace, blockedWorkspace, syncUidActive, requireSyncUid, sawRemote,
+    unclaimedWorkspace, blockedWorkspace, claimEmpty, syncUidActive, requireSyncUid, sawRemote,
     sawOwnWrite, clearRemoteStamps, mirrorToLocal, syncPushAll, syncPullAll,
     autoReconcile, incrementalPush, armUpSync, downloadAccount, shareProject, shareQuote, unshareQuote,
     projectDoc, roomDoc };

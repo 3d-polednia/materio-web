@@ -238,7 +238,7 @@
     <div class="wrap">
       <nav class="breadcrumbs" aria-label="Brotkrümelnavigation"><ol><li><a href="/de/">Start</a></li><li><a href="/de/projekte/">Projekte und Räume</a></li><li aria-current="page">Angebote</li></ol></nav>
       <h1 id="quo-title">Angebote</h1>
-      <p class="lead" id="quo-lead">Ein Angebot in LiczMat Pro: Material und weitere Kosten aus dem Projekt, die Arbeitszeit von Hand eingetragen, Marge und Summe.</p>
+      <p class="lead" id="quo-lead">Ein Angebot in LiczMat Pro: Material und weitere Kosten aus dem Projekt, die Arbeitskosten von Hand eingetragen, Marge und Summe.</p>
     </div>
   </section><section class="block account-guest-card" data-account-guest>
     <div class="wrap narrow"><div class="card">
@@ -324,7 +324,7 @@
 
         <div class="pw-plans">
           <h3 data-i18n="pay_t">LiczMat-Pro-Abo</h3>
-          <p class="muted" data-i18n="pay_d">Ein Tarif, alle vier Pro-Module. Die Zahlung läuft über Stripe; du kannst jederzeit kündigen, und Pro läuft bis zum Ende des bezahlten Zeitraums.</p>
+          <p class="muted" data-i18n="pay_d">Ein Tarif: Kunden, Angebote mit PDF und Link, Terminplanung sowie Preise und Kosten in Projekten. Die Zahlung läuft über Stripe; du kannst jederzeit kündigen, und Pro bleibt bis zum Ende des bezahlten Zeitraums aktiv.</p>
           <div class="pw-plan-row">
             <div class="pw-plan" data-pw-plan="monthly" hidden>
             <h4 data-i18n="pay_monthly_t">Monatlich</h4>
@@ -361,7 +361,7 @@
           </section>
           <section class="dash-sec">
             <div class="dash-head"><h2>Kunde und Projekt</h2></div>
-            <p class="muted">Kunde → Projekt → Angebot. Jeder Schritt öffnet die Seite, auf der du ihn änderst.</p>
+            <p class="muted">Klicke auf einen Kunden, ein Projekt oder ein Angebot, um die zugehörige Seite zu öffnen.</p>
             <div class="ws-mat-grid">
               <div id="quo-client-form" class="ws-mat-f">
                 <label class="ws-bar-label" for="quo-client-pick">Kunde</label>
@@ -434,9 +434,9 @@
           
           <section class="dash-sec">
             <div class="dash-head">
-              <h2>Arbeitszeit</h2>
+              <h2>Arbeitskosten</h2>
             </div>
-            <p class="muted">Der einzige Teil eines Angebots, den dir nichts ausrechnet. Menge mal Satz; für eine Pauschale lässt du die Menge leer.</p>
+            <p class="muted">Arbeitskosten trägst du selbst ein: Menge mal Satz. Bei einer Pauschale lässt du die Menge leer.</p>
             <ul id="quo-labour-list" class="data-list"></ul>
             <form id="quo-labour-form" data-quote-list="labour">
               <p class="ws-mat-grid">
@@ -446,9 +446,9 @@
                 <label class="ws-mat-f ws-mat-f-sm"><span class="ws-bar-label" id="quo-labour-price-label">Satz</span><input id="quo-labour-price" type="text" inputmode="decimal"></label>
               </p>
               
-              <p><button type="submit" class="btn btn-primary btn-sm">Arbeitszeit hinzufügen</button><span class="muted" id="quo-labour-run"></span></p>
+              <p><button type="submit" class="btn btn-primary btn-sm">Arbeitskosten hinzufügen</button><span class="muted" id="quo-labour-run"></span></p>
             </form>
-            <p class="muted" id="quo-labour-full" hidden>Dieses Angebot hat bereits alle Positionen für Arbeitszeit.</p>
+            <p class="muted" id="quo-labour-full" hidden>Dieses Angebot hat bereits alle Positionen für Arbeitskosten.</p>
           </section>
 
           <section class="dash-sec quo-summary-card">
@@ -457,11 +457,11 @@
               <span class="ws-bar-label">Marge (%)</span>
               <input id="quo-margin" type="text" inputmode="decimal">
             </label>
-            <p class="muted field-note">Prozent auf Material, weitere Kosten und Arbeitszeit zusammen.</p>
+            <p class="muted field-note">Prozent auf Material, weitere Kosten und Arbeitskosten zusammen.</p>
             <dl class="quo-summary-list">
               <div><dt>Material</dt><dd id="quo-fig-materials"></dd></div>
               <div><dt>Weitere Kosten</dt><dd id="quo-fig-other"></dd></div>
-              <div><dt>Arbeitszeit</dt><dd id="quo-fig-labour"></dd></div>
+              <div><dt>Arbeitskosten</dt><dd id="quo-fig-labour"></dd></div>
               <div><dt>Summe ohne Marge</dt><dd id="quo-fig-sub"></dd></div>
               <div><dt>Marge</dt><dd id="quo-fig-margin"></dd></div>
               <div><dt>Netto</dt><dd id="quo-fig-net"></dd></div>
@@ -498,7 +498,7 @@
           <section class="ws-pdf" id="ws-pdf">
             <div class="app-card crm-gate pw-gate" id="pdf-gate" hidden>
         <h2 data-i18n="feat_pdf_t">PDF-Export</h2>
-        <p class="muted" data-i18n="feat_pdf_d">Technischer Bericht und Kostenvoranschlag für den Investor: Arbeitszeit, Marge, MwSt. und Summe, druckfertig.</p>
+        <p class="muted" data-i18n="feat_pdf_d">Technischer Bericht und Kostenvoranschlag für den Investor: Arbeitskosten, Marge, MwSt. und Summe, druckfertig.</p>
         <p><span class="chip" data-i18n="pro_locked">In LiczMat Pro verfügbar</span></p>
 
         
@@ -618,7 +618,7 @@
           <button type="button" class="btn btn-ghost btn-sm" id="quo-undo-go">Rückgängig</button>
         </p>
 
-        <p class="lead">Ein Angebot nimmt Material und weitere Kosten aus einem Projekt. Arbeitszeit und Marge trägst du darin ein.</p>
+        <p class="lead">Ein Angebot nimmt Material und weitere Kosten aus einem Projekt. Arbeitskosten und Marge trägst du darin ein.</p>
         <div class="card">
           <h3 data-i18n="proj_new_quote">Neues Angebot</h3>
           <form id="quo-form" class="inline-form">
@@ -652,7 +652,7 @@
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
-        <p class="muted">Baustoff-Rechner. Rechnen. Planen. Umsetzen.</p>
+        <p class="muted">Baustoffrechner.</p>
       </div>
       <div class="foot-group">
         <h2>Produkt</h2>

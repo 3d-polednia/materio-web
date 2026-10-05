@@ -14,6 +14,49 @@ import { FULL_PULL_KEY_PREFIX } from "./account-sync.js";
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
+/**
+ * A call to the server that has not answered in this long is reported as failed.
+ *
+ * Without a limit a share or calendar button waited forever on a call that never came back
+ * (audit AUDYT3 L1: a refused network left "Udostępnij" spinning with no word). The error
+ * carries `code: "timeout"`, which the buttons turn into err_timeout.
+ */
+const CALL_LIMIT = 20000;
+function inTime(promise) {
+  let timer = 0;
+  const limit = new Promise((resolve, reject) => {
+    timer = setTimeout(() => reject(Object.assign(new Error("timeout"), { code: "timeout" })), CALL_LIMIT);
+  });
+  return Promise.race([promise, limit]).finally(() => clearTimeout(timer));
+}
+
+/**
+ * The sync is on hold, and every account page says so (audit AUDYT3 L1).
+ *
+ * The choice itself stays on /app/ under Synchronizacja, where the counts are; this bar only
+ * makes the state visible where people work. It used to be visible on that one tab, so an
+ * hour of work could go by with nothing reaching the account and nothing on screen saying it.
+ */
+function showBlocked(on) {
+  const old = document.getElementById("lm-sync-blocked");
+  if (!on) { if (old) old.remove(); return; }
+  if (old || typeof t !== "function") return;
+  const main = document.querySelector("main");
+  if (!main) return;
+  const bar = document.createElement("div");
+  bar.id = "lm-sync-blocked";
+  bar.className = "result show err sync-blocked";
+  bar.setAttribute("role", "status");
+  const text = document.createElement("p");
+  text.textContent = t("sync_blocked_bar");
+  const link = document.createElement("a");
+  link.className = "btn btn-ghost btn-go";
+  link.href = "/app/#synchronizacja";
+  link.textContent = t("sync_blocked_go");
+  bar.append(text, link);
+  main.prepend(bar);
+}
+
 async function start() {
   // The account hint is intentionally checked before any Firebase SDK import.
   if (!FIREBASE_READY || typeof lmSignedIn !== "function" || !lmSignedIn()) return;
@@ -38,6 +81,7 @@ async function start() {
   const markPulled = (uid) => { try { localStorage.setItem(pullKey(uid), String(Date.now())); } catch (e) {} };
   const reconcile = async (uid) => {
     if (!uid || uid !== activeUid || sync.blockedWorkspace()) return;
+    sync.claimEmpty(uid);
     if (dueForPull(uid)) {
       const ok = await sync.syncPullAll(uid);
       if (!ok || uid !== activeUid) return;
@@ -64,6 +108,7 @@ async function start() {
     activeUid = user && user.uid || "";
     sync.setUid(activeUid);
     delete window.lmAccount;
+    showBlocked(!!activeUid && sync.blockedWorkspace());
     if (!activeUid || sync.blockedWorkspace()) return;
     const uid = activeUid;
     reconcile(uid).catch(() => {});
@@ -75,17 +120,17 @@ async function start() {
       if (activeUid !== uid || sync.blockedWorkspace()) return;
       const level = lmLevelOf(user, snap.exists() ? snap.data() : {});
       window.lmAccount = {
-        calendarFeed: async (action) => {
+        calendarFeed: (action) => inTime((async () => {
           const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
           const result = await httpsCallable(getFunctions(app, "europe-central2"), "calendarFeedToken")({ action });
           return result.data.token;
-        },
-        shareProject: async (projectId) => {
+        })()),
+        shareProject: (projectId) => inTime((async () => {
           await sync.incrementalPush(uid).catch(() => false);
           return sync.shareProject(projectId, level);
-        },
-        shareQuote: (quoteId, snapshot) => sync.shareQuote(quoteId, snapshot, level),
-        unshareQuote: (quoteId) => sync.unshareQuote(quoteId),
+        })()),
+        shareQuote: (quoteId, snapshot) => inTime(sync.shareQuote(quoteId, snapshot, level)),
+        unshareQuote: (quoteId) => inTime(sync.unshareQuote(quoteId)),
         uid,
       };
       document.dispatchEvent(new CustomEvent("lm-account-ready"));

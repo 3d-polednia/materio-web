@@ -1037,7 +1037,8 @@ function wireQuoteDetail() {
         quoT("quo_share_stamp"), { date: new Date(refreshedAt).toLocaleString(quoLang()) });
       panel.hidden = false;
     } catch (e) {
-      document.getElementById("quo-share-note").textContent = quoT("quo_share_failed");
+      document.getElementById("quo-share-note").textContent =
+        quoT(e && e.code === "timeout" ? "err_timeout" : "quo_share_failed");
       panel.hidden = false;
     } finally {
       button.disabled = false;
@@ -1082,7 +1083,8 @@ function wireQuoteDetail() {
       document.getElementById("quo-share-mail").hidden = true;
       document.getElementById("quo-share-note").textContent = quoT("quo_share_off_done");
     } catch (e) {
-      document.getElementById("quo-share-note").textContent = quoT("quo_share_failed");
+      document.getElementById("quo-share-note").textContent =
+        quoT(e && e.code === "timeout" ? "err_timeout" : "quo_share_failed");
     }
   });
 

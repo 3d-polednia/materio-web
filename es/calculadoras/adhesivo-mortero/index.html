@@ -287,7 +287,7 @@
       <div class="calc" data-calc="mortar" data-tab="trade">
       <form class="calc-form" novalidate>
         <h2 id="calc-form-h" data-calc-form-heading>Tus datos</h2>
-        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Elige un material</span></button><div class="field"><label for="f-mortar-area">Superficie (m²)</label><input id="f-mortar-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="20"></div><div class="field"><label for="f-mortar-usage">Consumo (kg/m²)</label><input id="f-mortar-usage" type="text" inputmode="decimal" data-k="usage" data-lk="fld_usage" value="5"></div><div class="field"><label for="f-mortar-bag">Saco (kg)</label><input id="f-mortar-bag" type="text" inputmode="decimal" data-k="bag" data-lk="fld_bag_kg" value="25"></div><div class="field"><label for="f-mortar-price">Precio por saco</label><input id="f-mortar-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bag" value=""></div>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Elige un material</span></button><div class="field"><label for="f-mortar-area">Superficie (m²)</label><input id="f-mortar-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="20"><span id="f-mortar-area-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-mortar-usage">Consumo (kg/m²)</label><input id="f-mortar-usage" type="text" inputmode="decimal" data-k="usage" data-lk="fld_usage" value="5"><span id="f-mortar-usage-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-mortar-bag">Saco (kg)</label><input id="f-mortar-bag" type="text" inputmode="decimal" data-k="bag" data-lk="fld_bag_kg" value="25" placeholder="25"><span id="f-mortar-bag-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-mortar-price">Precio por saco</label><input id="f-mortar-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bag" value="" placeholder="0"><span id="f-mortar-price-error" class="field-error" role="alert" hidden></span></div>
         <button type="submit" class="btn btn-primary" data-run
           data-label-run="Calcular"
           data-label-again="Calcular de nuevo">Calcular</button>
@@ -366,7 +366,7 @@ worki = ⌈ kilogramy ÷ Saco ⌉</code></pre>
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
-        <p class="muted">Calculadora de materiales de construcción. Calcula. Planifica. Construye.</p>
+        <p class="muted">Calculadora de materiales de construcción.</p>
       </div>
       <div class="foot-group">
         <h2>Producto</h2>

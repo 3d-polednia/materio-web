@@ -126,8 +126,9 @@ function loadApp(store) {
   // assets/own-materials.js is the third — what somebody pays their own supplier is
   // theirs, and it must not travel into the next person's account either.
   return new Function("document", "localStorage", "window", "crypto", "CustomEvent",
-    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${read("assets/own-materials.js")}\nconst { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, shareToken, pathId: syncPathId } = (() => {\n${syncSrc}\nreturn { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, shareToken, pathId };\n})();\n${src}\nconst testSync = createAccountSync({ fb: {}, db: {}, auth: { currentUser: null } });\nreturn {
+    `${read("assets/account.js")}\n${read("assets/workspace.js")}\n${read("assets/crm-store.js")}\n${read("assets/own-materials.js")}\nconst { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, shareToken, pathId: syncPathId } = (() => {\n${syncSrc}\nreturn { createAccountSync, DEVICE_DATA_KEYS, AUTO_PUSH_KEY_PREFIX, FULL_PULL_KEY_PREFIX, SYNC_ACCOUNT_KEY, num, syncFields, shareToken, pathId };\n})();\n${src}\nconst testAuth = { currentUser: null };\nconst testSync = createAccountSync({ fb: {}, db: {}, auth: testAuth });\nreturn {
        pathId: syncPathId, foreignWorkspace: testSync.foreignWorkspace, unclaimedWorkspace: testSync.unclaimedWorkspace,
+       claimEmpty: testSync.claimEmpty, testAuth,
        localCounts: testSync.localCounts, syncAccount: testSync.syncAccount,
        setSyncAccount: testSync.setSyncAccount, state: testSync.state, SYNC_ACCOUNT_KEY,
        lmSafeNext, lmAuthMode, lmSignupUrl, lmReadLevel, lmLevelOf, LM_LEVEL,
@@ -399,6 +400,41 @@ head("6. izolacja danych: one account's copy on a device two people use");
   const tombstoneApp = signedIn({ "materio-workspace-v1": tombstones, "liczmat-sync-account": UID_A }, UID_B);
   eq("a tombstone alone is enough to refuse", tombstoneApp.foreignWorkspace(), true);
   eq("but tombstones stay out of the visible count", tombstoneApp.localCounts().projects, 0);
+
+  // AUDYT3 L1 (2026-10-05): a fresh browser whose only rows are deletions, usually the
+  // account's own mirrored in by a listener before the first pull stamped the browser,
+  // has nothing to claim. Calling it unclaimed stopped every sync with 0/0/0/0 on screen.
+  eq("an unstamped browser holding only tombstones is not unclaimed",
+    signedIn({ "materio-workspace-v1": tombstones }, UID_A).unclaimedWorkspace(), false);
+  const crmTomb = JSON.stringify({ clients: [{ id: "c-1", name: "", deletedAt: 2, updatedAt: 2 }], jobs: [], quotes: [] });
+  eq("nor one holding only a deleted client",
+    signedIn({ "liczmat-crm-v1": crmTomb }, UID_A).unclaimedWorkspace(), false);
+  eq("but one live row beside the tombstones still asks",
+    signedIn({ "materio-workspace-v1": JSON.stringify({
+      projects: [{ id: "p1", name: "", deletedAt: 2, updatedAt: 2 }, { id: "p2", name: "Kowalski", updatedAt: 3 }],
+      rooms: [], estimations: [], shoppingItems: [] }) }, UID_A).unclaimedWorkspace(), true);
+  {
+    const store = { "materio-workspace-v1": tombstones };
+    const app = signedIn(store, UID_A);
+    eq("claimEmpty() stamps nothing while the session is not this account's", app.claimEmpty(UID_A), false);
+    app.testAuth.currentUser = { uid: UID_A };
+    eq("claimEmpty() stamps an unstamped browser with nothing live", app.claimEmpty(UID_A), true);
+    eq("with this account", store["liczmat-sync-account"], UID_A);
+  }
+  {
+    const store = { "materio-workspace-v1": workspace(true) };
+    const app = signedIn(store, UID_A);
+    app.testAuth.currentUser = { uid: UID_A };
+    eq("claimEmpty() never stamps live work whose owner is unknown", app.claimEmpty(UID_A), false);
+    eq("and leaves it unstamped", store["liczmat-sync-account"], undefined);
+  }
+  {
+    const store = { "materio-workspace-v1": tombstones, "liczmat-sync-account": UID_B };
+    const app = signedIn(store, UID_A);
+    app.testAuth.currentUser = { uid: UID_A };
+    eq("claimEmpty() never restamps another account's copy", app.claimEmpty(UID_A), false);
+    eq("which keeps its stamp", store["liczmat-sync-account"], UID_B);
+  }
 
   eq("an empty workspace holds nobody's data",
     signedIn({ "materio-workspace-v1": workspace(false), "liczmat-sync-account": UID_A },

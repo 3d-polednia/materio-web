@@ -287,7 +287,7 @@
       <div class="calc" data-calc="insulation" data-tab="trade">
       <form class="calc-form" novalidate>
         <h2 id="calc-form-h" data-calc-form-heading>Tus datos</h2>
-        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Elige un material</span></button><div class="field"><label for="f-insulation-area">Superficie (m²)</label><input id="f-insulation-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="80"></div><div class="field"><label for="f-insulation-foamThk">Espesor del poliestireno (cm)</label><input id="f-insulation-foamThk" type="text" inputmode="decimal" data-k="foamThk" data-lk="fld_foam_thk" value="15"></div><div class="field"><label for="f-insulation-dowels">Tacos por m²</label><input id="f-insulation-dowels" type="text" inputmode="decimal" data-k="dowels" data-lk="fld_dowels_m2" value="6"></div><div class="field"><label for="f-insulation-adhesive">Adhesivo (kg/m²)</label><input id="f-insulation-adhesive" type="text" inputmode="decimal" data-k="adhesive" data-lk="fld_adhesive_m2" value="5"></div><div class="field"><label for="f-insulation-price">Precio por envase</label><input id="f-insulation-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_pkg" value=""></div>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Elige un material</span></button><div class="field"><label for="f-insulation-area">Superficie (m²)</label><input id="f-insulation-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="80"><span id="f-insulation-area-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-insulation-foamThk">Espesor del poliestireno (cm)</label><input id="f-insulation-foamThk" type="text" inputmode="decimal" data-k="foamThk" data-lk="fld_foam_thk" value="15" placeholder="15"><span id="f-insulation-foamThk-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-insulation-dowels">Tacos por m²</label><input id="f-insulation-dowels" type="text" inputmode="decimal" data-k="dowels" data-lk="fld_dowels_m2" value="6" placeholder="6"><span id="f-insulation-dowels-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-insulation-adhesive">Adhesivo (kg/m²)</label><input id="f-insulation-adhesive" type="text" inputmode="decimal" data-k="adhesive" data-lk="fld_adhesive_m2" value="5" placeholder="5"><span id="f-insulation-adhesive-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-insulation-price">Precio por envase</label><input id="f-insulation-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_pkg" value="" placeholder="0"><span id="f-insulation-price-error" class="field-error" role="alert" hidden></span></div>
         <button type="submit" class="btn btn-primary" data-run
           data-label-run="Calcular"
           data-label-again="Calcular de nuevo">Calcular</button>
@@ -305,7 +305,7 @@
         <div class="calc-actions" data-calc-actions data-projects-url="/es/proyectos/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/es/materiales/">Catálogo de materiales de construcción</a>: 13 materiales en el catálogo</p>
+      <p class="muted src-note"><a href="/es/materiales/">Catálogo de materiales de construcción</a>: 14 materiales en el catálogo</p>
     </div>
   </section>
 
@@ -370,7 +370,7 @@ siatka = Superficie × 1,10 m²</code></pre>
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
-        <p class="muted">Calculadora de materiales de construcción. Calcula. Planifica. Construye.</p>
+        <p class="muted">Calculadora de materiales de construcción.</p>
       </div>
       <div class="foot-group">
         <h2>Producto</h2>

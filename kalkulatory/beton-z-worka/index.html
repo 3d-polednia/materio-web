@@ -287,7 +287,7 @@
       <div class="calc" data-calc="concrete" data-tab="trade">
       <form class="calc-form" novalidate>
         <h2 id="calc-form-h" data-calc-form-heading>Twoje dane</h2>
-        <div class="field"><label for="f-concrete-vol">Objętość (m³)</label><input id="f-concrete-vol" type="text" inputmode="decimal" data-k="vol" data-lk="fld_volume" value="0.5"></div><div class="field"><label for="f-concrete-yield">Wydajność worka (l)</label><input id="f-concrete-yield" type="text" inputmode="decimal" data-k="yield" data-lk="fld_bag_yield" value="12.5"></div><div class="field"><label for="f-concrete-price">Cena za worek</label><input id="f-concrete-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bag" value=""></div>
+        <div class="field"><label for="f-concrete-vol">Objętość (m³)</label><input id="f-concrete-vol" type="text" inputmode="decimal" data-k="vol" data-lk="fld_volume" value="0.5"><span id="f-concrete-vol-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-concrete-yield">Wydajność worka (l)</label><input id="f-concrete-yield" type="text" inputmode="decimal" data-k="yield" data-lk="fld_bag_yield" value="12.5" placeholder="12.5"><span id="f-concrete-yield-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-concrete-price">Cena za worek</label><input id="f-concrete-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bag" value="" placeholder="0"><span id="f-concrete-price-error" class="field-error" role="alert" hidden></span></div>
         <button type="submit" class="btn btn-primary" data-run
           data-label-run="Policz"
           data-label-again="Oblicz ponownie">Policz</button>
@@ -366,7 +366,7 @@ woda ≈ worki × 2 l</code></pre>
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
-        <p class="muted">Kalkulator materiałów budowlanych. Policz. Zaplanuj. Zrealizuj.</p>
+        <p class="muted">Kalkulator materiałów budowlanych.</p>
       </div>
       <div class="foot-group">
         <h2>Produkt</h2>

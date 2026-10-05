@@ -287,7 +287,7 @@
       <div class="calc" data-calc="masonry" data-tab="trade">
       <form class="calc-form" novalidate>
         <h2 id="calc-form-h" data-calc-form-heading>Tes données</h2>
-        <div class="field"><label for="f-masonry-area">Surface (m²)</label><input id="f-masonry-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="12"></div><div class="field"><label for="f-masonry-openings">Ouvertures (m²)</label><input id="f-masonry-openings" type="text" inputmode="decimal" data-k="openings" data-lk="fld_openings" value="2"></div><div class="field"><label for="f-masonry-pieces">Pièces par m²</label><input id="f-masonry-pieces" type="text" inputmode="decimal" data-k="pieces" data-lk="fld_pieces_per_m2" value="11"></div><div class="field"><label for="f-masonry-binder">Mortier (kg/m²)</label><input id="f-masonry-binder" type="text" inputmode="decimal" data-k="binder" data-lk="fld_binder" value="20"></div><div class="field"><label for="f-masonry-waste">Marge (%)</label><input id="f-masonry-waste" type="text" inputmode="decimal" data-k="waste" data-lk="fld_waste" value="5"></div><div class="field"><label for="f-masonry-price">Prix par pièce</label><input id="f-masonry-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_pc" value=""></div>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Choisis un matériau</span></button><div class="field"><label for="f-masonry-area">Surface (m²)</label><input id="f-masonry-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="12"><span id="f-masonry-area-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-masonry-openings">Ouvertures (m²)</label><input id="f-masonry-openings" type="text" inputmode="decimal" data-k="openings" data-lk="fld_openings" value="2" placeholder="0"><span id="f-masonry-openings-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-masonry-pieces">Pièces par m²</label><input id="f-masonry-pieces" type="text" inputmode="decimal" data-k="pieces" data-lk="fld_pieces_per_m2" value="11"><span id="f-masonry-pieces-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-masonry-binder">Mortier (kg/m²)</label><input id="f-masonry-binder" type="text" inputmode="decimal" data-k="binder" data-lk="fld_binder" value="20" placeholder="0"><span id="f-masonry-binder-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-masonry-waste">Marge (%)</label><input id="f-masonry-waste" type="text" inputmode="decimal" data-k="waste" data-lk="fld_waste" value="5" placeholder="5"><span id="f-masonry-waste-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-masonry-price">Prix par pièce</label><input id="f-masonry-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_pc" value="" placeholder="0"><span id="f-masonry-price-error" class="field-error" role="alert" hidden></span></div>
         <button type="submit" class="btn btn-primary" data-run
           data-label-run="Calculer"
           data-label-again="Calculer à nouveau">Calculer</button>
@@ -305,7 +305,7 @@
         <div class="calc-actions" data-calc-actions data-projects-url="/fr/projets/"></div>
       </div>
     </div>
-      
+      <p class="muted src-note"><a href="/fr/materiaux/">Catalogue des matériaux de construction</a>: 1 matériau au catalogue</p>
     </div>
   </section>
 
@@ -366,7 +366,7 @@ zaprawa razem = netto × Mortier kg</code></pre>
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
-        <p class="muted">Calculateur de matériaux de construction. Calcule. Planifie. Réalise.</p>
+        <p class="muted">Calculateur de matériaux de construction.</p>
       </div>
       <div class="foot-group">
         <h2>Produit</h2>

@@ -287,7 +287,7 @@
       <div class="calc" data-calc="mortar" data-tab="trade">
       <form class="calc-form" novalidate>
         <h2 id="calc-form-h" data-calc-form-heading>Deine Angaben</h2>
-        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button><div class="field"><label for="f-mortar-area">Fläche (m²)</label><input id="f-mortar-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="20"></div><div class="field"><label for="f-mortar-usage">Verbrauch (kg/m²)</label><input id="f-mortar-usage" type="text" inputmode="decimal" data-k="usage" data-lk="fld_usage" value="5"></div><div class="field"><label for="f-mortar-bag">Sack (kg)</label><input id="f-mortar-bag" type="text" inputmode="decimal" data-k="bag" data-lk="fld_bag_kg" value="25"></div><div class="field"><label for="f-mortar-price">Preis je Sack</label><input id="f-mortar-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bag" value=""></div>
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Material wählen</span></button><div class="field"><label for="f-mortar-area">Fläche (m²)</label><input id="f-mortar-area" type="text" inputmode="decimal" data-k="area" data-lk="fld_area" value="20"><span id="f-mortar-area-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-mortar-usage">Verbrauch (kg/m²)</label><input id="f-mortar-usage" type="text" inputmode="decimal" data-k="usage" data-lk="fld_usage" value="5"><span id="f-mortar-usage-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-mortar-bag">Sack (kg)</label><input id="f-mortar-bag" type="text" inputmode="decimal" data-k="bag" data-lk="fld_bag_kg" value="25" placeholder="25"><span id="f-mortar-bag-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-mortar-price">Preis je Sack</label><input id="f-mortar-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bag" value="" placeholder="0"><span id="f-mortar-price-error" class="field-error" role="alert" hidden></span></div>
         <button type="submit" class="btn btn-primary" data-run
           data-label-run="Berechnen"
           data-label-again="Neu berechnen">Berechnen</button>
@@ -344,7 +344,7 @@ Säcke = ⌈ Kilogramm ÷ Sack ⌉</code></pre>
   <section class="block">
     <div class="wrap">
       <h2>Weitere Rechner</h2>
-      <div class="chips"><a class="chip" href="/de/rechner/fliesen-paneele-feinsteinzeug/">Fliesen, Paneele, Gres</a><a class="chip" href="/de/rechner/fugenmasse/">Fugenmasse</a><a class="chip" href="/de/rechner/estrich-putz/">Estrich / Putz</a></div>
+      <div class="chips"><a class="chip" href="/de/rechner/fliesen-paneele-feinsteinzeug/">Fliesen, Paneele, Feinsteinzeug</a><a class="chip" href="/de/rechner/fugenmasse/">Fugenmasse</a><a class="chip" href="/de/rechner/estrich-putz/">Estrich / Putz</a></div>
       <h2 class="mt-8">Ratgeber mit diesem Rechner</h2>
       <div class="chips"><a class="chip" href="/de/ratgeber/fliesen-und-kleber-fuers-bad/">Fliesen und Kleber fürs Bad</a><a class="chip" href="/de/ratgeber/wie-viel-fliesenkleber/">Wie viel Fliesenkleber</a><a class="chip" href="/de/ratgeber/haus-mit-eps-daemmen/">Haus mit EPS dämmen</a></div>
       <p class="mt-6">
@@ -366,7 +366,7 @@ Säcke = ⌈ Kilogramm ÷ Sack ⌉</code></pre>
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
-        <p class="muted">Baustoff-Rechner. Rechnen. Planen. Umsetzen.</p>
+        <p class="muted">Baustoffrechner.</p>
       </div>
       <div class="foot-group">
         <h2>Produkt</h2>

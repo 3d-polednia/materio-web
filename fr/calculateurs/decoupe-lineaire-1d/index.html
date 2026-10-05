@@ -287,9 +287,9 @@
       <div class="calc" data-calc="linear" data-tab="cutting">
       <form class="calc-form" novalidate>
         <h2 id="calc-form-h" data-calc-form-heading>Tes données</h2>
-        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Choisis un matériau</span></button><div class="field"><label for="f-linear-stock">Longueur de la barre (mm)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" data-lk="fld_stock_len" value="6000"></div><div class="field"><label for="f-linear-kerf">Trait de scie (mm)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" data-lk="fld_kerf" value="3"></div><div class="field"><label for="f-linear-cuts">Pièces : longueur×qté (mm)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts" data-lk="fld_cuts">2400x4
+        <button type="button" class="btn btn-ghost btn-sm mat-open" data-mat-open><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/></svg><span>Choisis un matériau</span></button><div class="field"><label for="f-linear-stock">Longueur de la barre (mm)</label><input id="f-linear-stock" type="text" inputmode="decimal" data-k="stock" data-lk="fld_stock_len" value="6000"><span id="f-linear-stock-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-linear-kerf">Trait de scie (mm)</label><input id="f-linear-kerf" type="text" inputmode="decimal" data-k="kerf" data-lk="fld_kerf" value="3" placeholder="0"><span id="f-linear-kerf-error" class="field-error" role="alert" hidden></span></div><div class="field"><label for="f-linear-cuts">Pièces : longueur×qté (mm)</label><textarea id="f-linear-cuts" rows="3" data-k="cuts" data-lk="fld_cuts">2400x4
 1800x6
-900x8</textarea></div><div class="field"><label for="f-linear-price">Prix par barre</label><input id="f-linear-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bar" value=""></div>
+900x8</textarea></div><div class="field"><label for="f-linear-price">Prix par barre</label><input id="f-linear-price" type="text" inputmode="decimal" data-k="price" data-lk="fld_price_bar" value="" placeholder="0"><span id="f-linear-price-error" class="field-error" role="alert" hidden></span></div>
         <button type="submit" class="btn btn-primary" data-run
           data-label-run="Calculer"
           data-label-again="Calculer à nouveau">Calculer</button>
@@ -371,7 +371,7 @@ odpad = (Longueur de la barre × sztangi − Σ elementy) ÷ (Longueur de la bar
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
-        <p class="muted">Calculateur de matériaux de construction. Calcule. Planifie. Réalise.</p>
+        <p class="muted">Calculateur de matériaux de construction.</p>
       </div>
       <div class="foot-group">
         <h2>Produit</h2>
