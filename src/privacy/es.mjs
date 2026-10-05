@@ -48,6 +48,11 @@ export default {
       html: `<p>Si toca «Compartir», creamos una <b>copia</b> del proyecto seleccionado (nombre, estimaciones, lista de compras, moneda) en una dirección aleatoria de 128 bits liczmat.com/p/&lt;token&gt;. Esta copia es <b>públicamente legible para cualquier persona que conozca el enlace</b>. El token de la dirección es la única protección, por lo que solo debe compartirlo con las personas que deberían ver la estimación. La copia no se actualiza automáticamente, debe actualizarla de forma manual mediante un botón. La eliminación del enlace revoca el acceso de inmediato. La persona que abre el enlace no necesita una cuenta y no recopilamos ningún dato sobre ella, aparte de los análisis estándar del Sitio web (sección 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Enlace privado al calendario",
+      html: `<p>Si creas un enlace privado al calendario, cualquiera que conozca esa dirección podrá leer las fechas abiertas de tu agenda, incluidos el nombre, la fecha, el cliente y la nota. Al crear un enlace nuevo, se desactiva el anterior.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Cuánto tiempo conservamos los datos y cómo eliminarlos",
       html: `<p>Conservamos los datos de la cuenta mientras la cuenta exista. Puede eliminar proyectos individuales y habitaciones en cualquier momento. Puede eliminar toda la cuenta usted mismo en <a href="/app/">liczmat.com/app/</a> → pestaña <b>Cuenta</b> → <b>Eliminar cuenta</b>. Esto elimina todos los documentos de la cuenta en Firestore (proyectos, habitaciones, estimaciones, listas de compras y enlaces creados) y, finalmente, la cuenta en sí en Firebase Authentication. Esta acción no se puede deshacer. En la misma pestaña puede descargar todo el contenido de su cuenta por adelantado como un archivo JSON. Si desea que lo hagamos por usted, escriba a <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Los datos almacenados en su dispositivo o en su navegador deben eliminarse por separado borrando los datos de la Aplicación o los datos del sitio.</p>`

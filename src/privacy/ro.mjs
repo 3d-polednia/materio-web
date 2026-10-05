@@ -48,6 +48,11 @@ export default {
       html: `<p>Dacă atingeți „Partajare”, creăm o <b>copie</b> a proiectului selectat (nume, estimări, listă de cumpărături, monedă) la o adresă aleatorie pe 128 de biți liczmat.com/p/&lt;token&gt;. Această copie este <b>lizibilă public pentru oricine cunoaște link-ul</b>. Tokenul din adresă este singura protecție, așadar partajați-l doar cu persoanele care ar trebui să vadă estimarea. Copia nu se actualizează automat, trebuie să o actualizați manual printr-un buton. Ștergerea link-ului revocă accesul imediat. Persoana care deschide link-ul nu are nevoie de un cont, iar noi nu colectăm nicio dată despre ea, în afară de datele analitice standard ale Site-ului web (secțiunea 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Link privat pentru calendar",
+      html: `<p>Dacă creați un link privat pentru calendar, orice persoană care cunoaște adresa poate citi termenele deschise din calendarul dumneavoastră, inclusiv numele, data, clientul și nota. Crearea unui link nou îl dezactivează pe cel vechi.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Cât timp păstrăm datele și cum le puteți șterge",
       html: `<p>Păstrăm datele contului atâta timp cât contul există. Puteți șterge proiecte și camere individuale în orice moment. Puteți șterge singur întregul cont la <a href="/app/">liczmat.com/app/</a> → fila <b>Cont</b> → <b>Ștergeți contul</b>. Aceasta șterge toate documentele contului din Firestore (proiecte, camere, estimări, liste de cumpărături și link-uri create) și, în cele din urmă, contul în sine din Firebase Authentication. Această acțiune nu poate fi anulată. În aceeași filă, puteți descărca în prealabil tot conținutul contului dumneavoastră sub forma unui fișier JSON. Dacă doriți să facem acest lucru pentru dumneavoastră, scrieți la <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Ștergeți separat datele stocate pe dispozitivul dumneavoastră sau în browser, ștergând datele Aplicației sau datele site-ului.</p>`

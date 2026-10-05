@@ -48,6 +48,11 @@ export default {
       html: `<p>Si vous appuyez sur « Partager », nous créons une <b>copie</b> du projet sélectionné (nom, devis, liste de courses, devise) à une adresse aléatoire de 128 bits liczmat.com/p/&lt;token&gt;. Cette copie est <b>publiquement lisible par toute personne connaissant le lien</b>. Le jeton dans l'adresse est la seule protection, ne le partagez donc qu'avec les personnes qui devraient voir le devis. La copie ne se met pas à jour automatiquement, vous devez la mettre à jour manuellement via un bouton. La suppression du lien révoque immédiatement l'accès. La personne qui ouvre le lien n'a pas besoin de compte et nous ne collectons aucune donnée à son sujet, à part les analyses standard du Site web (section 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Lien privé vers le calendrier",
+      html: `<p>Si vous créez un lien privé vers le calendrier, toute personne qui connaît cette adresse peut lire les échéances ouvertes de votre planning, y compris le nom, la date, le client et la note. La création d'un nouveau lien désactive l'ancien.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Combien de temps nous conservons les données et comment les supprimer",
       html: `<p>Nous conservons les données du compte tant que le compte existe. Vous pouvez supprimer des projets individuels et des pièces à tout moment. Vous pouvez supprimer le compte entier vous-même sur <a href="/app/">liczmat.com/app/</a> → onglet <b>Compte</b> → <b>Supprimer le compte</b>. Cela supprime tous les documents du compte dans Firestore (projets, pièces, devis, listes de courses et liens créés) et enfin le compte lui-même dans Firebase Authentication. Cette action ne peut pas être annulée. Dans le même onglet, vous pouvez télécharger au préalable l'intégralité du contenu de votre compte sous forme de fichier JSON. Si vous souhaitez que nous le fassions pour vous, écrivez à <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Les données stockées sur votre appareil ou dans votre navigateur doivent être supprimées séparément en effaçant les données de l'Application ou les données du site.</p>`

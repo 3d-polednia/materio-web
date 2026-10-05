@@ -940,7 +940,9 @@ const CALENDAR_SCRIPTS = [
   "/assets/crm-store.js",
   "/assets/crm.js",
   "/assets/own-materials.js",
+  "/assets/calendar-ics.js",
   "/assets/schedule-grid.js",
+  "/assets/schedule-feed.js",
   "/assets/schedule-ui.js",
 ];
 

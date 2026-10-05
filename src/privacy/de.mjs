@@ -48,6 +48,11 @@ export default {
       html: `<p>Wenn Sie auf „Teilen“ tippen, erstellen wir eine <b>Kopie</b> des gewählten Projekts (Name, Angebote, Einkaufsliste, Währung) unter einer zufälligen 128-Bit-Adresse liczmat.com/p/&lt;token&gt;. Diese Kopie ist <b>für jeden, der den Link kennt, öffentlich einsehbar</b>. Das Token in der Adresse ist der einzige Schutz. Teilen Sie es also nur mit Personen, die das Angebot sehen sollen. Die Kopie wird nicht automatisch aktualisiert, Sie müssen sie manuell per Schaltfläche aktualisieren. Wenn Sie den Link löschen, wird der Zugriff sofort widerrufen. Die Person, die den Link öffnet, benötigt kein Konto, und wir erheben über sie keine Daten außer der Standard-Websiteanalyse (Abschnitt 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Privater Kalenderlink",
+      html: `<p>Wenn Sie einen privaten Kalenderlink erstellen, kann jeder, der diese Adresse kennt, die offenen Termine aus Ihrem Kalender mit Name, Datum, Kunde und Notiz lesen. Ein neuer Link deaktiviert den alten.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Wie lange wir Daten aufbewahren und wie Sie sie löschen",
       html: `<p>Wir bewahren die Kontodaten so lange auf, wie das Konto existiert. Sie können einzelne Projekte und Räume jederzeit löschen. Das gesamte Konto löschen Sie selbst unter <a href="/app/">liczmat.com/app/</a> → Reiter <b>Konto</b> → <b>Konto löschen</b>. Dadurch werden alle Dokumente des Kontos in Firestore (Projekte, Räume, Angebote, Einkaufslisten und erstellte Links) und schließlich das Konto selbst in Firebase Authentication gelöscht. Dies kann nicht rückgängig gemacht werden. Im selben Reiter können Sie zuvor den gesamten Kontoinhalt als JSON-Datei herunterladen. Wenn wir das für Sie erledigen sollen, schreiben Sie an <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Daten, die auf Ihrem Gerät oder im Browser gespeichert sind, löschen Sie separat, indem Sie die App-Daten oder die Website-Daten löschen.</p>`

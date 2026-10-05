@@ -48,6 +48,11 @@ export default {
       html: `<p>Se tocca «Condividi», creiamo una <b>copia</b> del progetto selezionato (nome, preventivi, lista della spesa, valuta) a un indirizzo casuale a 128 bit liczmat.com/p/&lt;token&gt;. Questa copia è <b>pubblicamente leggibile per chiunque conosca il link</b>. Il token nell'indirizzo è l'unica protezione, quindi lo condivida solo con le persone che dovrebbero vedere il preventivo. La copia non si aggiorna automaticamente, deve aggiornarla manualmente tramite un pulsante. L'eliminazione del link revoca immediatamente l'accesso. La persona che apre il link non ha bisogno di un account e non raccogliamo alcun dato su di lei a parte le analisi standard del Sito web (sezione 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Link privato al calendario",
+      html: `<p>Se crea un link privato al calendario, chiunque conosca quell'indirizzo può leggere le scadenze aperte nel Suo calendario, inclusi nome, data, cliente e nota. La creazione di un nuovo link disattiva quello precedente.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Per quanto tempo conserviamo i dati e come cancellarli",
       html: `<p>Conserviamo i dati dell'account per l'intera durata dell'account. Può eliminare i singoli progetti e le stanze in qualsiasi momento. Può eliminare l'intero account Lei stesso su <a href="/app/">liczmat.com/app/</a> → scheda <b>Account</b> → <b>Elimina account</b>. Questo elimina tutti i documenti dell'account in Firestore (progetti, stanze, preventivi, liste della spesa e link creati) e infine l'account stesso in Firebase Authentication. Questa operazione non può essere annullata. Nella stessa scheda può scaricare in anticipo l'intero contenuto del Suo account come file JSON. Se desidera che lo facciamo noi per Lei, scriva a <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. I dati memorizzati sul Suo dispositivo o nel browser devono essere eliminati separatamente cancellando i dati dell'App o i dati del sito.</p>`

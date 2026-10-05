@@ -179,7 +179,9 @@
 <script defer src="/assets/crm-store.min.js?v=20261005a"></script>
 <script defer src="/assets/crm.min.js?v=20261005a"></script>
 <script defer src="/assets/own-materials.min.js?v=20261005a"></script>
+<script defer src="/assets/calendar-ics.min.js?v=20261005a"></script>
 <script defer src="/assets/schedule-grid.min.js?v=20261005a"></script>
+<script defer src="/assets/schedule-feed.min.js?v=20261005a"></script>
 <script defer src="/assets/schedule-ui.min.js?v=20261005a"></script>
 <script type="module" src="/assets/account-sync-page.min.js?v=20261005a"></script>
 <script defer src="/assets/main.min.js?v=20261005a"></script>
@@ -407,6 +409,18 @@
           <p class="muted">Uzavreté projekty, ktoré mali termín. Nikdy sa nerátajú ako zmeškané.</p>
           <ul id="cal-closed-list" class="data-list"></ul>
         </details>
+
+        
+        <section class="dash-sec card" id="calfeed">
+          <div class="dash-head">
+            <h2 id="calfeed-title">Termíny v kalendári telefónu</h2>
+          </div>
+          <p class="muted" id="calfeed-lead">Pripoj Kalendár Google, Outlook alebo iPhone. Termíny z LiczMat sa v ňom zobrazia automaticky.</p>
+          <div id="calfeed-content">
+            <p class="mat-tools"><button type="button" class="btn btn-ghost btn-sm" id="calfeed-connect" disabled>Pripojiť kalendár</button></p>
+          </div>
+          <p class="muted field-note" id="calfeed-status" aria-live="polite"></p>
+        </section>
       </div>
 
       <p class="ws-links">

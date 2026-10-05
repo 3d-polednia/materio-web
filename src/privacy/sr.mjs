@@ -48,6 +48,11 @@ export default {
       html: `<p>Ako dodirnete „Podeli”, pravimo <b>kopiju</b> izabranog projekta (naziv, procene, spisak za kupovinu, valuta) na nasumičnoj 128-bitnoj adresi liczmat.com/p/&lt;token&gt;. Ova kopija je <b>javno čitljiva svakome ko zna link</b>. Token u adresi je jedina zaštita, zato ga delite samo sa osobama koje bi trebalo da vide procenu. Kopija se ne ažurira automatski, morate je ažurirati ručno putem dugmeta. Brisanjem linka se odmah ukida pristup. Osobi koja otvori link nije potreban nalog, a mi o njoj ne prikupljamo nikakve podatke osim standardne analitike Veb sajta (odeljak 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Privatni link kalendara",
+      html: `<p>Ako napravite privatni link kalendara, svako ko zna tu adresu može da pročita otvorene rokove iz Vašeg rasporeda, uključujući naziv, datum, klijenta i belešku. Pravljenje novog linka isključuje stari.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Koliko dugo čuvamo podatke i kako ih obrisati",
       html: `<p>Podatke naloga čuvamo dok nalog postoji. Pojedinačne projekte i prostorije možete obrisati u bilo kom trenutku. Ceo nalog možete obrisati sami na <a href="/app/">liczmat.com/app/</a> → kartica <b>Nalog</b> → <b>Obriši nalog</b>. Time se brišu svi dokumenti naloga u Firestore-u (projekti, prostorije, procene, spiskovi za kupovinu i kreirani linkovi), a na kraju i sam nalog u Firebase Authentication-u. Ova akcija se ne može opozvati. Na istoj kartici možete unapred preuzeti ceo sadržaj Vašeg naloga kao JSON datoteku. Ako želite da mi to uradimo za Vas, pišite na <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Podatke sačuvane na Vašem uređaju ili u pretraživaču brišete zasebno brisanjem podataka Aplikacije ili podataka veb-sajta.</p>`

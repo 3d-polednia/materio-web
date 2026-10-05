@@ -48,6 +48,11 @@ export default {
       html: `<p>Ak kliknete na „Zdieľať“, vytvoríme <b>kópiu</b> vybraného projektu (názov, odhady, nákupný zoznam, mena) na náhodnej 128-bitovej adrese liczmat.com/p/&lt;token&gt;. Táto kópia je <b>verejne čitateľná pre kohokoľvek, kto pozná odkaz</b>. Token v adrese je jedinou ochranou, preto ho zdieľajte iba s osobami, ktoré by mali odhad vidieť. Kópia sa neaktualizuje automaticky, musíte ju aktualizovať ručne pomocou tlačidla. Zmazaním odkazu sa prístup okamžite zruší. Osoba, ktorá odkaz otvorí, nepotrebuje účet a nezhromažďujeme o nej žiadne údaje okrem štandardnej analytiky webovej stránky (časť 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Súkromný odkaz na kalendár",
+      html: `<p>Ak vytvoríte súkromný odkaz na kalendár, každý, kto pozná túto adresu, si môže prečítať otvorené termíny z vášho kalendára vrátane názvu, dátumu, klienta a poznámky. Vytvorením nového odkazu sa starý vypne.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Ako dlho údaje uchovávame a ako ich zmazať",
       html: `<p>Údaje účtu uchovávame po dobu existencie účtu. Jednotlivé projekty a miestnosti môžete kedykoľvek zmazať a celý účet môžete zmazať sami: <a href="/app/">liczmat.com/app/</a> → záložka <b>Účet</b> → <b>Zmazať účet</b>. Tým sa zmažú všetky dokumenty účtu vo Firestore (projekty, miestnosti, odhady, nákupné zoznamy a vytvorené odkazy) a nakoniec aj samotný účet vo Firebase Authentication. Túto akciu nie je možné vrátiť späť. Na rovnakej záložke si môžete vopred stiahnuť celý obsah účtu ako súbor JSON. Ak chcete, aby sme to urobili za vás, napíšte na <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Údaje uložené vo vašom zariadení alebo v prehliadači zmažete samostatne vymazaním dát aplikácie alebo dát webu.</p>`

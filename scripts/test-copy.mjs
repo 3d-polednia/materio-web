@@ -541,7 +541,8 @@ const BUDGET = {
   // real product samples; its 13-language maximum stays below this measured ceiling.
   "liczmat-pro": 1080, account: 470, dashboard: 130, share: 40, privacy: 3820,
   // The compatibility URL carries the complete Polish and English policies in sequence.
-  "privacy-legacy": 4800,
+  // 2026-10-05: two full policy languages now disclose private calendar feed links.
+  "privacy-legacy": 4830,
 };
 
 /**
@@ -768,6 +769,10 @@ const phraseSlop = [];
 const inspectPhrases = (where, value) => {
   for (const phrase of SLOP_PHRASES) {
     if (SLOP_STEMS.includes(phrase)) continue;
+    // Banned as a promise the product did not keep; since 2026-10-05 the terminarz really
+    // subscribes to it (calendarFeed), so the feed block alone may name it.
+    if (phrase === "Kalendarz Google" &&
+        (where.startsWith("dictionary:calfeed_") || where === "terminarz/index.html")) continue;
     if (word(value, phrase)) phraseSlop.push(`${where} → "${phrase}"`);
   }
   for (const stem of SLOP_STEMS) {

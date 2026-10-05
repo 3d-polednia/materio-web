@@ -51,7 +51,7 @@
  * połowa to functions/admin-map.mjs, sprawdzana przez `node scripts/test-admin-map.mjs`.
  */
 
-import { createHash, createHmac } from "node:crypto";
+import { createHash, createHmac, randomBytes } from "node:crypto";
 
 import * as functionsV1 from "firebase-functions/v1";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
@@ -80,6 +80,7 @@ import {
   SERVER_PROFILE_DELAY_MS, TRIAL_DAYS, firstAppWrite, serverProfileDoc,
   trialDecision, trialGrantDoc,
 } from "./trial-map.mjs";
+import { buildIcs, looksLikeFeedToken } from "./calendar-ics.mjs";
 
 const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
 
@@ -433,6 +434,99 @@ export const payTicket = onCall(
       throw new HttpsError("failed-precondition", "no-ticket-secret");
     }
     return { ticket };
+  },
+);
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Terminarz w kalendarzu telefonu — prywatny kanał iCalendar (2026-10-05)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Prywatny kanał iCalendar terminarza.
+ *
+ * Token jest w URL-u, ponieważ aplikacje kalendarza nie wysyłają nagłówków logowania
+ * Firebase. Obrót unieważnia ujawniony link. Po wygaśnięciu Pro kanał zwraca poprawny,
+ * pusty kalendarz, aby telefon nie uznał subskrypcji za uszkodzoną.
+ */
+const CALENDAR_CORS = [
+  "https://liczmat.com", "https://www.liczmat.com", /^http:\/\/localhost(:\d+)?$/,
+];
+
+export const calendarFeedToken = onCall(
+  { region: REGION, cors: CALENDAR_CORS, maxInstances: 10 },
+  async (request) => {
+    if (!request.auth || !request.auth.uid) {
+      throw new HttpsError("unauthenticated", "sign-in-required");
+    }
+    const action = request.data && request.data.action != null ? request.data.action : "get";
+    if (action !== "get" && action !== "rotate") {
+      throw new HttpsError("invalid-argument", "bad-action");
+    }
+    const db = getFirestore();
+    const uid = request.auth.uid;
+    const userRef = db.collection("users").doc(uid);
+    const userSnap = await userRef.get();
+    const profile = userSnap.exists ? userSnap.data() : null;
+    if (planSummary(profile, Date.now()).state !== "pro") {
+      throw new HttpsError("permission-denied", "pro-required");
+    }
+    const oldToken = profile && profile.calendarFeedToken;
+    if (action === "get" && looksLikeFeedToken(oldToken)) {
+      const feedSnap = await db.collection("calendarFeeds").doc(oldToken).get();
+      if (feedSnap.exists && feedSnap.get("uid") === uid) return { token: oldToken };
+    }
+    const token = randomBytes(32).toString("base64url");
+    const batch = db.batch();
+    if (action === "rotate" && looksLikeFeedToken(oldToken)) {
+      batch.delete(db.collection("calendarFeeds").doc(oldToken));
+    }
+    batch.set(db.collection("calendarFeeds").doc(token), { uid, createdAt: Date.now() });
+    batch.set(userRef, { calendarFeedToken: token }, { merge: true });
+    await batch.commit();
+    return { token };
+  },
+);
+
+export const calendarFeed = onRequest(
+  { region: REGION, cors: false, maxInstances: 10 },
+  async (req, res) => {
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      res.status(405).set("Allow", "GET, HEAD").send("method not allowed");
+      return;
+    }
+    const token = req.query.t;
+    if (!looksLikeFeedToken(token)) {
+      res.status(404).send("not found");
+      return;
+    }
+    const db = getFirestore();
+    const feedSnap = await db.collection("calendarFeeds").doc(token).get();
+    if (!feedSnap.exists || typeof feedSnap.get("uid") !== "string") {
+      res.status(404).send("not found");
+      return;
+    }
+    const uid = feedSnap.get("uid");
+    const userSnap = await db.collection("users").doc(uid).get();
+    const isPro = planSummary(userSnap.exists ? userSnap.data() : null, Date.now()).state === "pro";
+    let projects = [];
+    let clientsById = {};
+    if (isPro) {
+      const [projectSnaps, clientSnaps] = await Promise.all([
+        db.collection("users").doc(uid).collection("projects").get(),
+        db.collection("users").doc(uid).collection("clients").get(),
+      ]);
+      projects = projectSnaps.docs.map((snap) => ({ ...snap.data(), id: snap.id }));
+      clientsById = Object.fromEntries(clientSnaps.docs.map((snap) => [snap.id, snap.get("name") || ""]));
+    }
+    const calendar = buildIcs(projects, { calName: "LiczMat", clientsById, now: Date.now() });
+    const eventCount = (calendar.match(/BEGIN:VEVENT\r\n/g) || []).length;
+    logger.info("calendar: feed", { uid, eventCount });
+    res.set({
+      "Content-Type": "text/calendar; charset=utf-8",
+      "Cache-Control": "private, max-age=900",
+      "Content-Disposition": 'inline; filename="liczmat.ics"',
+    });
+    res.status(200).send(calendar);
   },
 );
 

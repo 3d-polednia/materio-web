@@ -48,6 +48,11 @@ export default {
       html: `<p>Als u op 'Delen' tikt, maken we een <b>kopie</b> van het geselecteerde project (naam, schattingen, boodschappenlijstje, valuta) op een willekeurig 128-bit adres liczmat.com/p/&lt;token&gt;. Deze kopie is <b>publiek leesbaar voor iedereen die de link kent</b>. De token in het adres is de enige beveiliging, dus deel deze alleen met mensen die de schatting mogen zien. De kopie wordt niet automatisch bijgewerkt, u moet deze handmatig bijwerken via een knop. Het verwijderen van de link trekt de toegang onmiddellijk in. De persoon die de link opent, heeft geen account nodig en we verzamelen geen gegevens over hem of haar, behalve de standaard Website-analyse (sectie 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Privélink naar de agenda",
+      html: `<p>Als je een privélink naar je agenda maakt, kan iedereen die het adres kent je openstaande deadlines lezen, met naam, datum, klant en notitie. Als je een nieuwe link maakt, wordt de oude uitgeschakeld.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Hoe lang we gegevens bewaren en hoe u ze kunt verwijderen",
       html: `<p>We bewaren accountgegevens zolang het account bestaat. U kunt individuele projecten en kamers op elk moment verwijderen. U kunt het gehele account zelf verwijderen op <a href="/app/">liczmat.com/app/</a> → tabblad <b>Account</b> → <b>Account verwijderen</b>. Hiermee worden alle accountdocumenten in Firestore (projecten, kamers, schattingen, boodschappenlijstjes en aangemaakte links) en uiteindelijk het account zelf in Firebase Authentication verwijderd. Deze actie kan niet ongedaan worden gemaakt. In hetzelfde tabblad kunt u vooraf de volledige inhoud van uw account downloaden als een JSON-bestand. Als u wilt dat wij dit voor u doen, schrijf dan naar <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Gegevens die op uw apparaat of in uw browser zijn opgeslagen, verwijdert u afzonderlijk door de app-gegevens of sitegegevens te wissen.</p>`

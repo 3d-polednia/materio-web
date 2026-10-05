@@ -139,7 +139,8 @@ const BUDGET = {
   // 2026-10-04: the approved /liczmat-pro/ layout adds 4.9 kB of shared responsive CSS.
   // 2026-10-04: custom date/datalist pickers add their shared card rules to the stylesheet
   // and two date-action words to every language bundle. Measured 252.9 kB raw.
-  "index.html": [254, 64],
+  // 2026-10-05: the 13-language calendar feed controls add translated runtime keys.
+  "index.html": [257, 65],
   // Raised 2026-09-26 from 248, measured at 248.8 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -157,7 +158,7 @@ const BUDGET = {
   // 2026-10-03 (RESZTKI): field errors, the phone check, plain status and preset links in
   // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
   // 2026-10-04: the /liczmat-pro/ breakpoints for wider fonts tipped the gzip size to 66.0 kB.
-  "kalkulatory/index.html": [271, 67],
+  "kalkulatory/index.html": [275, 68],
   "kalkulatory/plytki-panele-gres/index.html": [420, 128],
   // 63 rather than 62 since 2026-09-02: the language picker is drawn twice on every page
   // (the header menu and the footer's list) and it went from ten rows to thirteen. That is
@@ -181,7 +182,7 @@ const BUDGET = {
   // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
   // the runtime half of the one-letter-word rule; the quote and account pages also carry the
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
-  "konwerter-jednostek/index.html": [260, 68],
+  "konwerter-jednostek/index.html": [263, 68],
   // Raised 2026-09-26 from 227, measured at 229.4 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -199,7 +200,7 @@ const BUDGET = {
   // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
   // the runtime half of the one-letter-word rule; the quote and account pages also carry the
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
-  "poradniki/ile-farby-na-pokoj/index.html": [252, 64],
+  "poradniki/ile-farby-na-pokoj/index.html": [255, 64],
   // Raised 2026-09-26 from 234, measured at 235.6 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with
@@ -219,7 +220,7 @@ const BUDGET = {
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
   // 2026-10-03 (RESZTKI): field errors, the phone check, plain status and preset links in
   // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
-  "sklepy/index.html": [258, 66],
+  "sklepy/index.html": [262, 68],
   // Raised from [320, 81] when the catalogue page became a tree and took the visitor's
   // own materials with it, measured at 365.7 kB / 90.8 kB gz. Two thirds of the growth is
   // the pair of files the "your materials" block needs — assets/own-materials.js (16.8 kB
@@ -229,7 +230,7 @@ const BUDGET = {
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
-  "materialy/index.html": [401, 95],
+  "materialy/index.html": [403, 95],
   /* Raised on 2026-09-04 from [355, 106] and [345, 104], measured at 432.8 kB / 129.2 kB gz
      and 416.3 kB / 125.2 kB gz. Both numbers were already stale before this session — the
      Polish pages stood at 365.5 and 350.1 — and what moved them the rest of the way is the
@@ -249,7 +250,7 @@ const BUDGET = {
      0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
      rest is the features the sessions since the last measurement shipped, which nothing was gating. */
   // 2026-10-04: datepick.js and suggest.js serve the due-date and unit fields. Measured 488.2 kB.
-  "projekty/index.html": [490, 140],
+  "projekty/index.html": [494, 140],
   /* Four gzip numbers went up by one on 2026-09-05, measured at 128.2, 126.1, 126.1 and
      128.1 kB gz. Nothing on these pages changed: the audit's H7 put the contact page's
      sixteen keys into the dictionary bundle every page loads, which is 1.3 kB raw and
@@ -262,7 +263,8 @@ const BUDGET = {
   "kosztorys/index.html": [450, 136],
   // 2026-10-04: the new Pro page inlines three real product samples (quote sheet, quote
   // editor, calendar) and loads assets/quote-doc.css for the sheet. Measured 297.4 / 74.8 kB.
-  "liczmat-pro/index.html": [301, 76],
+  // 2026-10-05: the phone-calendar line and table row in 13 languages. Measured 76.1 kB gz.
+  "liczmat-pro/index.html": [305, 77],
   // Measured 2026-09-30 at the first build: the page carries the CRM store, Pro wall and
   // the logo resizer, because all three are needed before a company can be saved safely.
   "moja-firma/index.html": [420, 128],
@@ -282,7 +284,7 @@ const BUDGET = {
   // 2026-10-03 (RESZTKI): field errors, the phone check, plain status and preset links in
   // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
   // 2026-10-04: datepick.js and suggest.js serve validity and postal-city fields. Measured 499.9 kB.
-  "wyceny/index.html": [501, 135],
+  "wyceny/index.html": [507, 135],
   "terminarz/index.html": [418, 126],
   // Raised in session 59 from [355, 110], measured at 376.6 kB / 116.5 kB gz. /app/ is the
   // one page that carries every store the account syncs, and session 59 gave it a third:
@@ -335,7 +337,7 @@ const BUDGET = {
   // assets/styles.css, the VAT word and breadcrumb label in every dictionary. Measured, then a kilobyte.
   // 2026-10-04: /app/?buy=<plan> starts the checkout after sign-in (measured 415.1 kB raw, 107.2 kB gz).
   // 2026-10-04: both delegated pickers cover fields created inside account tabs. Measured 432.4/112.4 kB.
-  "app/index.html": [434, 113],
+  "app/index.html": [440, 115],
   // Re-measured 2026-09-10 after the suite was repaired and the per-page CSP meta (about
   // 0.8 kB a page) started shipping. The CSP accounts for under a kilobyte of it and the
   // rest is the features the sessions since the last measurement shipped, which nothing was gating.
@@ -359,7 +361,7 @@ const BUDGET = {
   // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
   // the runtime half of the one-letter-word rule; the quote and account pages also carry the
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
-  "p/index.html": [239, 63],
+  "p/index.html": [243, 63],
 };
 
 /**
@@ -391,7 +393,8 @@ const BUDGET = {
  */
 // 2026-10-04: shared Pro-page CSS adds 4.9 kB to the heaviest localized page.
 // 2026-10-04: the heaviest localized quote page now loads both pickers; measured 536.4 kB raw.
-const CEILING = [538, 145];
+// 2026-10-05: calendar-feed translations add up to 6.6 kB to the Ukrainian dictionary.
+const CEILING = [545, 145];
 
 /**
  * And no single asset may, either — one file is one thing a browser waits for.

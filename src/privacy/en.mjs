@@ -48,6 +48,11 @@ export default {
       html: `<p>If you tap "Share", we create a <b>copy</b> of the selected project (name, estimates, shopping list, currency) at a random 128-bit address liczmat.com/p/&lt;token&gt;. This copy is <b>publicly readable for anyone who knows the link</b>. The token in the address is the only protection, so only share it with people who should see the estimate. The copy does not update automatically, you must update it manually via a button. Deleting the link revokes access immediately. The person opening the link does not need an account, and we collect no data about them other than standard Website analytics (section 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Private calendar link",
+      html: `<p>If you create a private calendar link, anyone who knows that address can read the open due dates in your schedule, including the name, date, client and note. Creating a new link disables the old one.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. How long we keep data and how to delete it",
       html: `<p>We keep account data for as long as the account exists. You can delete individual projects and rooms at any time. You can delete the entire account yourself at <a href="/app/">liczmat.com/app/</a> → <b>Account</b> tab → <b>Delete account</b>. This deletes all account documents in Firestore (projects, rooms, estimates, shopping lists, and created links), and finally the account itself in Firebase Authentication. This cannot be undone. In the same tab, you can previously download all your account content as a JSON file. If you want us to do this for you, write to <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. You delete data stored on your device or in the browser separately by clearing the App data or site data.</p>`

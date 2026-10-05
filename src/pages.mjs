@@ -1872,7 +1872,7 @@ export function proPageMain(lang, t, features, prices, copy, samples, counts) {
     ["g_count", [["r_calcs", 1, 1, 1], ["r_materials", 1, 1, 1], ["r_converter", 1, 1, 1]]],
     ["g_projects", [["r_projects", 0, 1, 1], ["r_saved", 0, 1, 1], ["r_shopping", 0, 1, 1], ["r_sync", 0, 1, 1]]],
     ["g_money", [["r_prices", 0, 0, 1], ["r_waste", 0, 0, 1], ["r_quotes", 0, 0, 1], ["r_vat", 0, 0, 1]]],
-    ["g_work", [["r_clients", 0, 0, 1], ["r_calendar", 0, 0, 1], ["r_history", 0, 0, 1]]],
+    ["g_work", [["r_clients", 0, 0, 1], ["r_calendar", 0, 0, 1], ["r_phonecal", 0, 0, 1], ["r_history", 0, 0, 1]]],
     ["g_docs", [["r_pdf", 0, 0, 1], ["r_link", 0, 0, 1]]],
   ];
   const cell = (yes) => `<td class="${yes ? "pro-check" : "pro-no"}"><span aria-hidden="true">${yes ? "✓" : "×"}</span><span class="sr-only">${c(yes ? "t_yes" : "t_no")}</span></td>`;
@@ -2557,6 +2557,20 @@ ${buckets}
           <p class="muted">${esc(t("cal_closed_d"))}</p>
           <ul id="cal-closed-list" class="data-list"></ul>
         </details>
+
+        <!-- 2026-10-05: the private iCalendar link (calendarFeed in functions/index.js), so
+             the terms show up in the phone calendar itself. Drawn by assets/schedule-feed.js.
+             Last on the page: it is set up once, the lists above are read every day. -->
+        <section class="dash-sec card" id="calfeed">
+          <div class="dash-head">
+            <h2 id="calfeed-title">${esc(t("calfeed_title"))}</h2>
+          </div>
+          <p class="muted" id="calfeed-lead">${esc(t("calfeed_lead"))}</p>
+          <div id="calfeed-content">
+            <p class="mat-tools"><button type="button" class="btn btn-ghost btn-sm" id="calfeed-connect" disabled>${esc(t("calfeed_connect"))}</button></p>
+          </div>
+          <p class="muted field-note" id="calfeed-status" aria-live="polite"></p>
+        </section>
       </div>
 
       <p class="ws-links">

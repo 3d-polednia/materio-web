@@ -75,6 +75,11 @@ async function start() {
       if (activeUid !== uid || sync.blockedWorkspace()) return;
       const level = lmLevelOf(user, snap.exists() ? snap.data() : {});
       window.lmAccount = {
+        calendarFeed: async (action) => {
+          const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
+          const result = await httpsCallable(getFunctions(app, "europe-central2"), "calendarFeedToken")({ action });
+          return result.data.token;
+        },
         shareProject: async (projectId) => {
           await sync.incrementalPush(uid).catch(() => false);
           return sync.shareProject(projectId, level);

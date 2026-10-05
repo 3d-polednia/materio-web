@@ -48,6 +48,11 @@ export default {
       html: `<p>Ako dodirnete „Podijeli”, stvaramo <b>kopiju</b> odabranog projekta (naziv, procjene, popis za kupnju, valuta) na nasumičnoj 128-bitnoj adresi liczmat.com/p/&lt;token&gt;. Ova je kopija <b>javno čitljiva svima koji znaju poveznicu</b>. Token u adresi jedina je zaštita, stoga ga dijelite samo s osobami koje bi trebale vidjeti procjenu. Kopija se ne ažurira automatski, morate je ažurirati ručno putem gumba. Brisanje poveznice odmah ukida pristup. Osobi koja otvori poveznicu ne treba račun, a o njoj ne prikupljamo nikakve podatke osim standardne analitike Web stranice (odjeljak 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Privatna poveznica kalendara",
+      html: `<p>Ako izradite privatnu poveznicu kalendara, svatko tko zna tu adresu može pročitati otvorene rokove iz vašeg rasporeda, uključujući naziv, datum, klijenta i bilješku. Izrada nove poveznice isključuje staru.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Koliko dugo čuvamo podatke i kako ih obrisati",
       html: `<p>Podatke računa čuvamo sve dok račun postoji. Pojedinačne projekte i prostorije možete obrisati u bilo kojem trenutku. Cijeli račun možete obrisati sami na <a href="/app/">liczmat.com/app/</a> → kartica <b>Račun</b> → <b>Obriši račun</b>. Time se brišu svi dokumenti računa u Firestoreu (projekti, prostorije, procjene, popisi za kupnju i izrađene poveznice), a na kraju i sam račun u Firebase Authenticationu. Ova se radnja ne može poništiti. Na istoj kartici prethodno možete preuzeti cijeli sadržaj svog računa kao JSON datoteku. Ako želite da to učinimo umjesto Vas, pišite na <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Podatke pohranjene na Vašem uređaju ili u pregledniku brišete zasebno brisanjem podataka Aplikacije ili podataka web-lokacije.</p>`

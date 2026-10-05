@@ -27,6 +27,31 @@ function sgProjectColor(value) {
   return "";
 }
 
+function sgIcsAvailable(project) {
+  return typeof window.lmIcs === "object" && typeof window.lmIcs.icsProjects === "function" &&
+    window.lmIcs.icsProjects([project]).length > 0;
+}
+
+function sgIcsSlug(value) {
+  return String(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "termin";
+}
+
+function sgDownloadIcs(project) {
+  if (typeof window.lmIcs !== "object" || typeof window.lmIcs.buildIcs !== "function") return;
+  const client = project.clientId && typeof crmClient === "function" ? crmClient(project.clientId) : null;
+  const clientsById = client ? { [project.clientId]: client.name } : {};
+  const text = window.lmIcs.buildIcs([project], { calName: "LiczMat", clientsById, now: Date.now() });
+  const url = URL.createObjectURL(new Blob([text], { type: "text/calendar;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `liczmat-${sgIcsSlug(project.name)}.ics`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
 function sgRenderDayPanel(instance) {
   const box = sgEl(instance, "daypanel");
   if (!box) return;
@@ -42,11 +67,15 @@ function sgRenderDayPanel(instance) {
     const color = sgProjectColor(project.color);
     const clientName = client ? `${sgEsc(client.name)} · ` : "";
     // "Zmień datę" under the slot, outside its link; once pressed, a date field in its place.
+    const ics = sgIcsAvailable(project)
+      ? `<button type="button" class="btn btn-ghost btn-sm" data-ics="${sgEsc(project.id)}"
+        aria-label="${sgEsc(sgT("cal_ics_add_named").replace("{name}", project.name))}">${sgEsc(sgT("cal_ics_add"))}</button>`
+      : "";
     const controls = instance.state.redating === project.id
       ? `<p class="cal-redate"><input type="date" id="${sgId(instance, "redate-input")}" value="${sgEsc(project.dueDate || "")}" aria-label="${sgEsc(sgT("cal_due_set"))}">
         <button type="button" class="btn btn-ghost btn-sm" id="${sgId(instance, "redate-cancel")}">${sgEsc(sgT("app_cancel"))}</button></p>`
       : `<p class="cal-redate"><button type="button" class="btn btn-ghost btn-sm" data-redate="${sgEsc(project.id)}"
-        aria-label="${sgEsc(sgT("cal_due_change_named").replace("{name}", project.name))}">${sgEsc(sgT("cal_due_change"))}</button></p>`;
+        aria-label="${sgEsc(sgT("cal_due_change_named").replace("{name}", project.name))}">${sgEsc(sgT("cal_due_change"))}</button>${ics}</p>`;
     return `<a class="cal-slot${color ? ` cal-slot-${color}` : ""}" href="${sgEsc(instance.projectUrl(project.id))}"><div>
         <div class="t">${sgEsc(project.name)}</div>
         <div class="d">${clientName}${sgEsc(sgT("job_st_" + project.status))}</div>
@@ -173,6 +202,13 @@ function sgWire(instance) {
   sgEl(instance, "daypanel").addEventListener("click", (event) => {
     if (event.target.closest(`#${sgId(instance, "add-toggle")}`)) instance.state.adding = true;
     else if (event.target.closest(`#${sgId(instance, "add-cancel")}`)) instance.state.adding = false;
+    else if (event.target.closest("[data-ics]")) {
+      const id = event.target.closest("[data-ics]").dataset.ics;
+      const byDay = typeof crmProjectsByDay === "function" ? crmProjectsByDay() : {};
+      const project = (byDay[instance.state.day] || []).find((item) => item.id === id);
+      if (project) sgDownloadIcs(project);
+      return;
+    }
     else if (event.target.closest("[data-redate]")) {
       instance.state.redating = event.target.closest("[data-redate]").dataset.redate;
       sgRenderDayPanel(instance);

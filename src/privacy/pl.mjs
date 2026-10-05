@@ -48,6 +48,11 @@ export default {
       html: `<p>Jeżeli klikniesz „Udostępnij”, tworzymy <b>kopię</b> wybranego projektu (nazwa, wyceny, lista zakupów, waluta) pod losowym, 128-bitowym adresem liczmat.com/p/&lt;token&gt;. Ta kopia jest <b>publicznie czytelna dla każdego, kto zna link</b>. Token w adresie jest jedynym zabezpieczeniem, więc udostępniaj go tylko osobom, które mają zobaczyć wycenę. Kopia nie odświeża się sama, aktualizujesz ją przyciskiem. Usunięcie linku odbiera dostęp natychmiast. Osoba otwierająca link nie musi zakładać konta i nie zbieramy o niej żadnych danych poza standardową analityką Strony (sekcja 6).</p>`
     },
     {
+      id: "konto-calendar-link",
+      h: "3.5.1. Prywatny link do kalendarza",
+      html: `<p>Jeśli utworzysz prywatny link do kalendarza, każdy, kto zna ten adres, może odczytać otwarte terminy z Twojego terminarza: nazwę, datę, klienta i notatkę. Utworzenie nowego linku wyłącza stary.</p>`
+    },
+    {
       id: "konto-usun",
       h: "3.6. Jak długo trzymamy dane i jak je usunąć",
       html: `<p>Dane konta trzymamy tak długo, jak długo konto istnieje. Możesz w każdej chwili usunąć pojedyncze projekty i pomieszczenia, a całe konto skasujesz samodzielnie: <a href="/app/">liczmat.com/app/</a> → zakładka <b>Konto</b> → <b>Usuń konto</b>. Kasujemy wtedy wszystkie dokumenty konta w Firestore (projekty, pomieszczenia, wyceny, listy zakupów i utworzone linki do wycen), a na końcu samo konto w Firebase Authentication. Operacji nie da się cofnąć. Na tej samej zakładce pobierzesz wcześniej całą zawartość konta jako plik JSON. Jeżeli wolisz, żebyśmy zrobili to za Ciebie, napisz na <a href="mailto:${ENTITY.email}">${ENTITY.email}</a>. Dane zapisane na urządzeniu albo w przeglądarce usuwasz osobno, czyszcząc dane Aplikacji lub dane witryny.</p>`
