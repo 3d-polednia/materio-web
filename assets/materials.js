@@ -265,6 +265,17 @@ const MAT_KINDS_FOR_CALC = {
 };
 
 /**
+ * Single materials a calculator takes beyond its kinds (AUDYT3 A1, 2026-10-05). A bag is a
+ * bag to MAT_KINDS_FOR_CALC, so letting masonry take "bag" would have listed every skim coat
+ * in its picker; these are the one or two products that calculator is actually about.
+ */
+const MAT_IDS_FOR_CALC = {
+  grout: ["fuga-5"],
+  masonry: ["zaprawa-mur-25"],
+  insulation: ["klej-styro-25"],
+};
+
+/**
  * The calculator a material belongs to when it has to be shown with exactly one:
  * the /materialy/ listing and its "calculate" link. Other calculators still accept it
  * (a bag of adhesive works in both "coverage" and "adhesive/mortar"), this is just the
@@ -275,7 +286,26 @@ const MAT_PRIMARY_CALC = {
   bag: "coverage", pack: "coverage", sheet: "sheet", bar: "linear",
 };
 
-const primaryCalcFor = (m) => MAT_PRIMARY_CALC[m.k];
+/**
+ * The calculator a bagged or packed material is really for. By kind alone grout, tile
+ * adhesive, screeds, plasters and EPS all landed in the paint calculator, and the grout,
+ * adhesive, screed, masonry and insulation calculators had no link from the catalogue at
+ * all (audit AUDYT3 A1, finding AG-5). Read by id prefix; anything not named keeps the
+ * answer of its kind.
+ */
+const MAT_PRIMARY_BY_ID = [
+  ["fuga-", "grout"],
+  ["klej-styro-", "insulation"],
+  ["klej-c", "mortar"],
+  ["zaprawa-mur-", "masonry"],
+  ["wylewka-", "screed"], ["tynk-", "screed"], ["gladz-", "screed"],
+  ["styropian-", "insulation"], ["welna-", "insulation"], ["xps-", "insulation"], ["pir-", "insulation"],
+];
+
+const primaryCalcFor = (m) => {
+  const hit = MAT_PRIMARY_BY_ID.find(([prefix]) => String(m.id || "").startsWith(prefix));
+  return hit ? hit[1] : MAT_PRIMARY_CALC[m.k];
+};
 
 /** Every material a given calculator can be pre-filled from. */
 /**
@@ -294,7 +324,7 @@ function materialById(id) {
 }
 
 function materialsForCalc(calcId) {
-  const kinds = MAT_KINDS_FOR_CALC[calcId];
+  const kinds = MAT_KINDS_FOR_CALC[calcId] || (MAT_IDS_FOR_CALC[calcId] ? [] : null);
   if (!kinds) return [];
   // The visitor's own materials stand beside the bundled ones and are filtered by exactly
   // the same rule — omToCatalogRow() hands back a row in this shape, so the picker, the
@@ -302,7 +332,9 @@ function materialsForCalc(calcId) {
   // is not on every page that loads this file, so its absence is a normal state and not
   // an error: a page without it simply offers the catalogue.
   const own = typeof omCatalogRows === "function" ? omCatalogRows() : [];
-  return own.filter((m) => kinds.includes(m.k)).concat(MATERIALS.filter((m) => kinds.includes(m.k)));
+  const ids = MAT_IDS_FOR_CALC[calcId] || [];
+  return own.filter((m) => kinds.includes(m.k))
+    .concat(MATERIALS.filter((m) => kinds.includes(m.k) || ids.includes(m.id)));
 }
 
 /**
@@ -330,13 +362,15 @@ function materialFill(m, calcId) {
     case "screed":
       return { bag: m.kg };
     case "grout":
-      return { tileL: m.l, tileW: m.w };
+      return m.k === "bag" ? { bag: m.kg } : { tileL: m.l, tileW: m.w };
+    case "masonry":
+      return { binder: m.kgm2 };
     case "drylining":
     case "studwall":
     case "ceiling":
       return {};
     case "insulation":
-      return {};
+      return m.k === "bag" ? { adhesive: m.kgm2 } : {};
     default:
       return {};
   }
