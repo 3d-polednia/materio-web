@@ -462,12 +462,12 @@ const ENGINES = {
   },
   studwall(f) {
     const read = readCalc("studwall", f); if (read.err) return read;
-    const { width, height, studSp: sp, bar, price } = read.values, sides = Math.round(read.values.sides);
-    for (const [field, value] of [["width", width], ["height", height], ["studSp", sp], ["bar", bar], ["sides", sides]]) if (!(value > 0)) return errAt("err_positive", field);
+    const { width, height, studSp: sp, bar, boardArea, price } = read.values, sides = Math.round(read.values.sides);
+    for (const [field, value] of [["width", width], ["height", height], ["studSp", sp], ["bar", bar], ["sides", sides], ["boardArea", boardArea]]) if (!(value > 0)) return errAt("err_positive", field);
     if (price < 0) return errAt("err_price", "price");
     const studCount = profilesAcross(width, sp), studBars = studCount * ceil(height / bar);
     const trackBars = ceil(2 * width / bar), anchors = 2 * profilesAcross(width, 0.6);
-    const boards = boardsFor(width * height, sides);
+    const boards = boardsFor(width * height, sides, boardArea);
     // How many uprights the wall has is not the same number as the bars to buy for them —
     // a wall taller than one bar needs two per stud — and only the second was on the page.
     return { tobuy: boards, unit: "res_boards", cost: boards * price, rows: [
@@ -480,13 +480,13 @@ const ENGINES = {
   },
   ceiling(f) {
     const read = readCalc("ceiling", f); if (read.err) return read;
-    const { width, length, mainSp, hangSp, price } = read.values;
-    for (const [field, value] of [["width", width], ["length", length], ["mainSp", mainSp], ["hangSp", hangSp]]) if (!(value > 0)) return errAt("err_positive", field);
+    const { width, length, mainSp, hangSp, boardArea, price } = read.values;
+    for (const [field, value] of [["width", width], ["length", length], ["mainSp", mainSp], ["hangSp", hangSp], ["boardArea", boardArea]]) if (!(value > 0)) return errAt("err_positive", field);
     if (price < 0) return errAt("err_price", "price");
     const runs = profilesAcross(width, mainSp), mainTotal = runs * length, mainBars = ceil(mainTotal / 4);
     const perimeter = 2 * (width + length);
     const perimBars = ceil(perimeter / 3), hangers = runs * profilesAcross(length, hangSp);
-    const connectors = Math.max(mainBars - runs, 0), boards = boardsFor(width * length, 1);
+    const connectors = Math.max(mainBars - runs, 0), boards = boardsFor(width * length, 1, boardArea);
     // CeilingGridResult carries perimeterAnchors too, and the site dropped it: the UD
     // channel cannot be fixed to the walls without them, so the shopping list was short.
     return { tobuy: boards, unit: "res_boards", cost: boards * price, rows: [
@@ -499,14 +499,15 @@ const ENGINES = {
   },
   drylining(f) {
     const read = readCalc("drylining", f); if (read.err) return read;
-    const { area, adhesive: adh, price } = read.values;
+    const { area, adhesive: adh, boardArea, price } = read.values;
     if (!(area > 0)) return errAt("err_positive", "area");
     if (!(adh > 0)) return errAt("err_positive", "adhesive");
+    if (!(boardArea > 0)) return errAt("err_positive", "boardArea");
     if (price < 0) return errAt("err_price", "price");
-    const boards = boardsFor(area, 1), kg = area * adh, bags = ceil(kg / 25);
+    const boards = boardsFor(area, 1, boardArea), kg = area * adh, bags = ceil(kg / 25);
     return { tobuy: boards, unit: "res_boards", cost: boards * price, rows: [
       ["res_adhesive", qtyG(bags) + " × 25 kg (" + qtyG(kg) + " kg)"],
-      ["res_purchased", qtyG(boards * GK_BOARD) + " m²"],
+      ["res_purchased", qtyG(boards * boardArea) + " m²"],
     ] };
   },
   sheathing(f) {
@@ -611,14 +612,17 @@ const CALCS = [
   // FRAMING
   { id: "studwall", tab: "framing", engine: "studwall", fields: [
     F("width", "fld_width", "4"), F("height", "fld_height", "2.6"), F("studSp", "fld_stud_spacing", "0.6", { opt: true }),
-    F("bar", "fld_bar_len", "3", { opt: true }), F("sides", "fld_board_sides", "2", { opt: true, sel: [["1", "1"], ["2", "2"]] }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
+    F("bar", "fld_bar_len", "3", { opt: true }), F("sides", "fld_board_sides", "2", { opt: true, sel: [["1", "1"], ["2", "2"]] }),
+    F("boardArea", "fld_board_area", "2.4", { opt: true, fallback: 2.4 }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
   { id: "ceiling", tab: "framing", engine: "ceiling", fields: [
     F("width", "fld_width", "4"), F("length", "fld_length", "5"),
-    F("mainSp", "fld_main_spacing", "0.4", { opt: true }), F("hangSp", "fld_hanger_spacing", "0.9", { opt: true }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
+    F("mainSp", "fld_main_spacing", "0.4", { opt: true }), F("hangSp", "fld_hanger_spacing", "0.9", { opt: true }),
+    F("boardArea", "fld_board_area", "2.4", { opt: true, fallback: 2.4 }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
   { id: "drylining", tab: "framing", engine: "drylining", fields: [
-    F("area", "fld_area", "12"), F("adhesive", "fld_adhesive_m2", "5", { opt: true }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
+    F("area", "fld_area", "12"), F("adhesive", "fld_adhesive_m2", "5", { opt: true }),
+    F("boardArea", "fld_board_area", "2.4", { opt: true, fallback: 2.4 }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
   { id: "sheathing", tab: "framing", engine: "sheathing", fields: [
     F("area", "fld_area", "30"), F("pieceW", "fld_sheet_w", "1250"), F("pieceL", "fld_sheet_l", "2500"),

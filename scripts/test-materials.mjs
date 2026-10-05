@@ -158,6 +158,40 @@ function check(name, cond, detail) {
 }
 const eq = (name, got, want) =>
   check(name, got === want, `expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);
+
+head("0a. picked materials carry calculator parameters and matching prices");
+{
+  const clock = { currency: "PLN" };
+  const api = evalScript(["assets/units.js", "assets/calculators.js", "assets/own-materials.js", "assets/materials.js"],
+    ["MATERIALS", "materialFill", "omToCatalogRow", "ENGINES"], {
+      module: undefined,
+      localStorage: { getItem: () => null, setItem: () => {} },
+      document: { documentElement: { lang: "pl" }, dispatchEvent: () => {}, addEventListener: () => {} },
+      CustomEvent: class {}, crypto: { randomUUID: () => "id" },
+      lmCurrency: () => clock.currency,
+    });
+  const board = api.MATERIALS.find((m) => m.id === "gk-zwykla-2600");
+  eq("1200x2600 board fills 3.12 m²", api.materialFill(board, "studwall").boardArea, 3.12);
+  const skim = api.MATERIALS.find((m) => m.id === "gladz-gips-20");
+  eq("20 kg skim coat fills its bag", api.materialFill(skim, "screed").bag, 20);
+  eq("1 mm skim coat fills 1 kg/m²/mm", api.materialFill(skim, "screed").rate, 1);
+  eq("the filled skim coat needs 2 bags for 20 m² at 2 mm",
+    api.ENGINES.screed({ area: "20", thk: "2", rate: "1", bag: "20", price: "" }).tobuy, 2);
+  eq("10 mm plaster converts its rate", api.materialFill(api.MATERIALS.find((m) => m.id === "tynk-gips-30"), "screed").rate, 0.85);
+  eq("1 mm leveller keeps its rate", api.materialFill(api.MATERIALS.find((m) => m.id === "wylewka-samop-25"), "screed").rate, 1.6);
+  eq("a layer-only product leaves the typed rate alone", "rate" in api.materialFill(api.MATERIALS.find((m) => m.id === "tynk-mozaik-25"), "screed"), false);
+
+  const own = api.omToCatalogRow({ id: "mine", name: "Own tile", category: "TILES",
+    application: "WALL_FLOOR_COVERING", widthMm: 600, lengthMm: 600,
+    packageAreaM2: 1.44, wastePercent: 7, coveragePerUnitM2: null, kerfMm: null,
+    prices: [
+      { priceMinor: 5000, currencyCode: "PLN", recordedAt: 10 },
+      { priceMinor: 6990, currencyCode: "PLN", recordedAt: 20 },
+    ] });
+  eq("the newest matching own price fills the calculator", api.materialFill(own, "waste").price, 69.9);
+  clock.currency = "EUR";
+  eq("a differently denominated own price is left alone", "price" in api.materialFill(own, "waste"), false);
+}
 /** Row `i` of a list, or an empty object — so a missing row fails a check, not the run. */
 const at = (rows, i) => rows[i || 0] || {};
 

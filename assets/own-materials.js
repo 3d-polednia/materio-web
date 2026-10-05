@@ -404,7 +404,15 @@ function omToCatalogRow(m) {
   if (m.kerfMm !== null && m.kerfMm !== undefined) row.kerf = m.kerfMm;
   if (m.wastePercent !== null && m.wastePercent !== undefined) row.waste = m.wastePercent;
   if (m.packageAreaM2 !== null && m.packageAreaM2 !== undefined) row.pkg = m.packageAreaM2;
+  else if (app.kind === "board" && row.w !== undefined && row.l !== undefined) row.pkg = (row.w * row.l) / 1e6;
   if (m.coveragePerUnitM2 !== null && m.coveragePerUnitM2 !== undefined) row.cov = m.coveragePerUnitM2;
+  const latestPrice = Array.isArray(m.prices) ? m.prices
+    .filter((p) => p && Number.isFinite(Number(p.priceMinor)) && Number.isFinite(Number(p.recordedAt)))
+    .sort((a, b) => Number(b.recordedAt) - Number(a.recordedAt))[0] : null;
+  if (latestPrice) {
+    row.priceMinor = Math.round(Number(latestPrice.priceMinor));
+    row.priceCurrency = omText(latestPrice.currencyCode, 3);
+  }
   // A bar's stock length is metres of a 1D profile, and the engine wants millimetres —
   // the same number the catalogue's own `len` carries.
   if (app.kind === "bar" && row.l !== undefined) row.len = row.l;

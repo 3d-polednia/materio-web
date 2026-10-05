@@ -343,37 +343,47 @@ function materialsForCalc(calcId) {
  * user typed, because the catalogue cannot know them.
  */
 function materialFill(m, calcId) {
+  let values;
   switch (calcId) {
     case "coverage":
       // `cov` is one coat's worth, so the engine's own `coats` field still applies.
-      return { cov: m.cov, coats: m.k === "paint" ? m.coats : 1 };
+      values = { cov: m.cov, coats: m.k === "paint" ? m.coats : 1 }; break;
     case "waste":
-      return { cov: m.pkg, waste: m.waste };
+      values = { cov: m.pkg, waste: m.waste }; break;
     case "wallpaper":
-      return { rollW: m.w / 1000, rollL: m.l / 1000, pattern: 0 };
+      values = { rollW: m.w / 1000, rollL: m.l / 1000, pattern: 0 }; break;
     case "linear":
-      return { stock: m.len, kerf: m.kerf };
+      values = { stock: m.len, kerf: m.kerf }; break;
     case "sheet":
-      return { sheetW: m.w, sheetL: m.l, kerf: m.kerf };
+      values = { sheetW: m.w, sheetL: m.l, kerf: m.kerf }; break;
     case "sheathing":
-      return { pieceW: m.w, pieceL: m.l };
+      values = { pieceW: m.w, pieceL: m.l }; break;
     case "mortar":
-      return { usage: m.kgm2, bag: m.kg };
+      values = { usage: m.kgm2, bag: m.kg }; break;
     case "screed":
-      return { bag: m.kg };
+      values = { bag: m.kg };
+      if (m.layer === "ml_1mm") values.rate = m.kgm2;
+      else if (m.layer === "ml_10mm") values.rate = m.kgm2 / 10;
+      else if (m.layer === "ml_15mm") values.rate = m.kgm2 / 1.5;
+      break;
     case "grout":
-      return m.k === "bag" ? { bag: m.kg } : { tileL: m.l, tileW: m.w };
+      values = m.k === "bag" ? { bag: m.kg } : { tileL: m.l, tileW: m.w }; break;
     case "masonry":
-      return { binder: m.kgm2 };
+      values = { binder: m.kgm2 }; break;
     case "drylining":
     case "studwall":
     case "ceiling":
-      return {};
+      values = { boardArea: Math.round(m.pkg * 100) / 100 }; break;
     case "insulation":
-      return m.k === "bag" ? { adhesive: m.kgm2 } : {};
+      values = m.k === "bag" ? { adhesive: m.kgm2 } : {}; break;
     default:
-      return {};
+      values = {};
   }
+  if (m.own && Number.isFinite(m.priceMinor) && m.priceCurrency
+      && typeof lmCurrency === "function" && m.priceCurrency === lmCurrency()) {
+    values.price = m.priceMinor / 100;
+  }
+  return values;
 }
 
 /* ------------------------------------------------------------------ display */

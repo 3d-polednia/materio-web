@@ -271,6 +271,7 @@ head("matematyka");
   eq("studwall: ⌈8 m ÷ 3⌉ = 3 track bars", rowNum(r, "res_tracks"), 3);
   eq("studwall: 14 anchors", rowNum(r, "res_anchors"), 14);
   eq("studwall: 10,4 m² × 2 sides × 1,1 ÷ 2,4 = 10 boards", r.tobuy, 10);
+  eq("studwall: a 3.12 m² board cuts the same wall to 8 boards", run("studwall", { boardArea: "3.12" }).tobuy, 8);
   // Taller than one bar is two bars per upright — the number session 11 put on the page.
   eq("studwall: a 3,5 m wall needs 14 stud bars", rowNum(run("studwall", { height: "3.5" }), "res_studs"), 14);
 }
@@ -285,6 +286,7 @@ head("matematyka");
   eq("ceiling: 11 runs × 6 hanger rows = 66", rowNum(r, "res_hangers"), 66);
   eq("ceiling: 18 m ÷ 0,6 = 30 wall anchors", rowNum(r, "res_anchors"), 30);
   eq("ceiling: 20 m² × 1,1 ÷ 2,4 = 10 boards", r.tobuy, 10);
+  eq("ceiling: board area is used", run("ceiling", { boardArea: "3.12" }).tobuy, 8);
 }
 
 {
@@ -292,6 +294,8 @@ head("matematyka");
   const r = run("drylining");
   eq("drylining: 12 m² × 1,1 ÷ 2,4 = 6 boards", r.tobuy, 6);
   eq("drylining: 6 boards are 14,4 m²", rowNum(r, "res_purchased"), 14.4);
+  eq("drylining: board area is used", run("drylining", { boardArea: "3.12" }).tobuy, 5);
+  eq("drylining: purchased area uses the selected board", rowNum(run("drylining", { boardArea: "3.12" }), "res_purchased"), 15.6);
   eq("drylining: 60 kg of adhesive = 3 bags", rowNum(r, "res_adhesive"), 3);
 }
 

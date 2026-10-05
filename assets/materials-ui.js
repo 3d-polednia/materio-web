@@ -30,6 +30,9 @@ function matFold(s) {
  * built-in defaults in assets/calculators.js already look like.
  */
 const matPlain = (v) => String(Math.round(Number(v) * 1000) / 1000);
+const matPricePlain = (v) => new Intl.NumberFormat(matLang(), {
+  useGrouping: false, minimumFractionDigits: 2, maximumFractionDigits: 2,
+}).format(Number(v));
 
 const matT = (key) => (typeof t === "function" ? t(key) : key);
 const matLang = () => document.documentElement.lang || "pl";
@@ -172,7 +175,7 @@ function applyMaterial(card, m) {
   card.dataset.matFields = Object.keys(values).join(",");
   Object.entries(values).forEach(([k, v]) => {
     const el = card.querySelector(`[data-k="${k}"]`);
-    if (el && v !== undefined && v !== null) el.value = matPlain(v);
+    if (el && v !== undefined && v !== null) el.value = k === "price" ? matPricePlain(v) : matPlain(v);
   });
 
   showChosenMaterial(card, m, false);
