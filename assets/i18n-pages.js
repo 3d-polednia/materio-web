@@ -523,6 +523,7 @@ const I18N_PAGES = {
     app_remember: "Pamiętaj mnie na tym urządzeniu",
     app_back_to: "Wróć na poprzednią stronę",
     app_signed_out: "Wylogowano.",
+    app_signout_unsynced: "Nie wszystkie zmiany trafiły na konto (brak połączenia). Wylogować i usunąć je z tej przeglądarki?",
     app_tabs_label: "Sekcje konta",
     app_tab_profile: "Profil",
 
@@ -1514,6 +1515,7 @@ const I18N_PAGES = {
     app_remember: "Keep me signed in on this device",
     app_back_to: "Back to the previous page",
     app_signed_out: "Signed out.",
+    app_signout_unsynced: "Some changes have not reached your account yet (no connection). Sign out and remove them from this browser?",
     app_tabs_label: "Account sections",
     app_tab_profile: "Profile",
 
@@ -2499,6 +2501,7 @@ const I18N_PAGES = {
     app_remember: "Auf diesem Gerät angemeldet bleiben",
     app_back_to: "Zurück zur vorherigen Seite",
     app_signed_out: "Abgemeldet.",
+    app_signout_unsynced: "Einige Änderungen sind noch nicht im Konto (keine Verbindung). Abmelden und sie aus diesem Browser löschen?",
     app_tabs_label: "Bereiche des Kontos",
     app_tab_profile: "Profil",
 
@@ -3484,6 +3487,7 @@ const I18N_PAGES = {
     app_remember: "Запам’ятати мене на цьому пристрої",
     app_back_to: "Повернутися на попередню сторінку",
     app_signed_out: "Ви вийшли з акаунта.",
+    app_signout_unsynced: "Деякі зміни ще не потрапили в акаунт (немає з’єднання). Вийти й видалити їх із цього браузера?",
     app_tabs_label: "Розділи акаунта",
     app_tab_profile: "Профіль",
 
@@ -4458,6 +4462,7 @@ const I18N_PAGES = {
     app_remember: "Zapamatovat si mě na tomto zařízení",
     app_back_to: "Zpět na předchozí stránku",
     app_signed_out: "Odhlášeno.",
+    app_signout_unsynced: "Některé změny ještě nejsou v účtu (chybí připojení). Odhlásit se a smazat je z tohoto prohlížeče?",
     app_tabs_label: "Sekce účtu",
     app_tab_profile: "Profil",
     prof_title: "Profil",
@@ -4533,7 +4538,8 @@ const I18N_PAGES = {
     feat_crm_t: "Historie a CRM",
     feat_crm_d: "U každého klienta jeho projekty, cenové nabídky a historie spolupráce.",
 
-    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */    clipage_title: "Klienti",
+    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */
+    clipage_title: "Klienti",
     clipage_lead: "Seznam klientů LiczMat Pro: kontaktní údaje, poznámky a projekty, které pro ně počítáš.",
     clipage_meta: "Klienti v LiczMat Pro: seznam klientů s kontakty a poznámkami, projekty klienta a historie výpočtů. Synchronizuje se s účtem.",
     cli_pro_yours: "Tvůj tarif: LiczMat Pro",
@@ -5408,6 +5414,7 @@ const I18N_PAGES = {
     app_remember: "Zapamätať si ma na tomto zariadení",
     app_back_to: "Späť na predchádzajúcu stránku",
     app_signed_out: "Odhlásené.",
+    app_signout_unsynced: "Niektoré zmeny ešte nie sú v účte (chýba pripojenie). Odhlásiť sa a vymazať ich z tohto prehliadača?",
     app_tabs_label: "Sekcie účtu",
     app_tab_profile: "Profil",
     prof_title: "Profil",
@@ -5483,7 +5490,8 @@ const I18N_PAGES = {
     feat_crm_t: "História a CRM",
     feat_crm_d: "Pri každom klientovi jeho projekty, cenové ponuky a história spolupráce.",
 
-    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */    clipage_title: "Klienti",
+    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */
+    clipage_title: "Klienti",
     clipage_lead: "Zoznam klientov LiczMat Pro: kontaktné údaje, poznámky a projekty, ktoré pre nich počítaš.",
     clipage_meta: "Klienti v LiczMat Pro: zoznam klientov s kontaktmi a poznámkami, projekty klienta a história výpočtov. Synchronizuje sa s účtom.",
     cli_pro_yours: "Tvoj tarif: LiczMat Pro",
@@ -6358,6 +6366,7 @@ const I18N_PAGES = {
     app_remember: "Ține-mă autentificat pe acest dispozitiv",
     app_back_to: "Înapoi la pagina anterioară",
     app_signed_out: "Deconectat.",
+    app_signout_unsynced: "Unele modificări nu au ajuns încă în cont (fără conexiune). Te deconectezi și le ștergi din acest browser?",
     app_tabs_label: "Secțiunile contului",
     app_tab_profile: "Profil",
     prof_title: "Profil",
@@ -6433,7 +6442,8 @@ const I18N_PAGES = {
     feat_crm_t: "Istoric și CRM",
     feat_crm_d: "La fiecare client, proiectele, ofertele și istoricul colaborării sale.",
 
-    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */    clipage_title: "Clienți",
+    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */
+    clipage_title: "Clienți",
     clipage_lead: "Lista de clienți LiczMat Pro: date de contact, notițe și proiectele pe care le calculezi pentru ei.",
     clipage_meta: "Clienți în LiczMat Pro: listă de clienți cu date de contact și notițe, proiectele clientului și istoricul calculelor. Se sincronizează cu contul.",
     cli_pro_yours: "Planul tău: LiczMat Pro",
@@ -7308,6 +7318,7 @@ const I18N_PAGES = {
     app_remember: "Zapamti me na ovom uređaju",
     app_back_to: "Natrag na prethodnu stranicu",
     app_signed_out: "Odjavljen.",
+    app_signout_unsynced: "Neke promjene još nisu na računu (nema veze). Odjaviti se i izbrisati ih iz ovog preglednika?",
     app_tabs_label: "Odjeljci računa",
     app_tab_profile: "Profil",
     prof_title: "Profil",
@@ -7383,7 +7394,8 @@ const I18N_PAGES = {
     feat_crm_t: "Povijest i CRM",
     feat_crm_d: "Uz svakog klijenta njegovi projekti, ponude i povijest suradnje.",
 
-    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */    clipage_title: "Klijenti",
+    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */
+    clipage_title: "Klijenti",
     clipage_lead: "Popis klijenata LiczMat Pro: kontaktni podaci, bilješke i projekti koje za njih računaš.",
     clipage_meta: "Klijenti u LiczMat Pro: popis klijenata s kontaktima i bilješkama, projekti klijenta i povijest izračuna. Sinkronizira se s računom.",
     cli_pro_yours: "Tvoj plan: LiczMat Pro",
@@ -8258,6 +8270,7 @@ const I18N_PAGES = {
     app_remember: "Zapamti me na ovom uređaju",
     app_back_to: "Nazad na prethodnu stranicu",
     app_signed_out: "Odjavljen.",
+    app_signout_unsynced: "Neke promene još nisu na nalogu (nema veze). Odjaviti se i izbrisati ih iz ovog pregledača?",
     app_tabs_label: "Odeljci naloga",
     app_tab_profile: "Profil",
     prof_title: "Profil",
@@ -8333,7 +8346,8 @@ const I18N_PAGES = {
     feat_crm_t: "Istorija i CRM",
     feat_crm_d: "Uz svakog klijenta njegovi projekti, ponude i istorija saradnje.",
 
-    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */    clipage_title: "Klijenti",
+    /* Session 29 — /liczmat-pro/, the public page for LiczMat Pro. */
+    clipage_title: "Klijenti",
     clipage_lead: "Spisak klijenata LiczMat Pro: kontakt podaci, beleške i projekti koje za njih računaš.",
     clipage_meta: "Klijenti u LiczMat Pro: spisak klijenata sa kontaktima i beleškama, projekti klijenta i istorija izračuna. Sinhronizuje se s nalogom.",
     cli_pro_yours: "Tvoj plan: LiczMat Pro",
@@ -9202,6 +9216,7 @@ const I18N_PAGES = {
     app_remember: "Tienimi connesso su questo dispositivo",
     app_back_to: "Torna alla pagina precedente",
     app_signed_out: "Uscito.",
+    app_signout_unsynced: "Alcune modifiche non sono ancora nell'account (nessuna connessione). Uscire ed eliminarle da questo browser?",
     app_tabs_label: "Sezioni dell'account",
     app_tab_profile: "Profilo",
     prof_title: "Profilo",
@@ -9275,7 +9290,8 @@ const I18N_PAGES = {
     feat_projects_redirect_t: "Reindirizzamento ai progetti",
     feat_projects_redirect_d: "Il vecchio indirizzo delle commesse ora porta ai progetti.",
     feat_crm_t: "Storia e CRM",
-    feat_crm_d: "Accanto a ogni cliente, i suoi progetti, preventivi e la cronologia della collaborazione.",    clipage_title: "Clienti",
+    feat_crm_d: "Accanto a ogni cliente, i suoi progetti, preventivi e la cronologia della collaborazione.",
+    clipage_title: "Clienti",
     clipage_lead: "L'elenco clienti di LiczMat Pro: recapiti, note e i progetti che calcoli per loro.",
     clipage_meta: "Clienti in LiczMat Pro: un elenco clienti con recapiti e note, i progetti del cliente e la storia dei calcoli. Sincronizzato con l'account.",
     cli_pro_yours: "Il tuo piano: LiczMat Pro",
@@ -10143,6 +10159,7 @@ const I18N_PAGES = {
     app_remember: "Houd me ingelogd op dit apparaat",
     app_back_to: "Terug naar de vorige pagina",
     app_signed_out: "Uitgelogd.",
+    app_signout_unsynced: "Sommige wijzigingen staan nog niet in je account (geen verbinding). Uitloggen en ze uit deze browser verwijderen?",
     app_tabs_label: "Onderdelen van het account",
     app_tab_profile: "Profiel",
     prof_title: "Profiel",
@@ -10216,7 +10233,8 @@ const I18N_PAGES = {
     feat_projects_redirect_t: "Doorsturen naar projecten",
     feat_projects_redirect_d: "Het oude adres voor opdrachten leidt nu naar projecten.",
     feat_crm_t: "Geschiedenis en CRM",
-    feat_crm_d: "Bij elke klant zijn projecten, offertes en samenwerkingsgeschiedenis.",    clipage_title: "Klanten",
+    feat_crm_d: "Bij elke klant zijn projecten, offertes en samenwerkingsgeschiedenis.",
+    clipage_title: "Klanten",
     clipage_lead: "De klantenlijst van LiczMat Pro: contactgegevens, notities en de projecten die je voor hen uitrekent.",
     clipage_meta: "Klanten in LiczMat Pro: een klantenlijst met contactgegevens en notities, de projecten van de klant en de geschiedenis. Hoort bij het account.",
     cli_pro_yours: "Jouw plan: LiczMat Pro",
@@ -11084,6 +11102,7 @@ const I18N_PAGES = {
     app_remember: "Mantener la sesión abierta en este dispositivo",
     app_back_to: "Volver a la página anterior",
     app_signed_out: "Sesión cerrada.",
+    app_signout_unsynced: "Algunos cambios aún no han llegado a tu cuenta (sin conexión). ¿Cerrar sesión y borrarlos de este navegador?",
     app_tabs_label: "Secciones de la cuenta",
     app_tab_profile: "Perfil",
     prof_title: "Perfil",
@@ -11157,7 +11176,8 @@ const I18N_PAGES = {
     feat_projects_redirect_t: "Redirección a proyectos",
     feat_projects_redirect_d: "La antigua dirección de encargos ahora lleva a proyectos.",
     feat_crm_t: "Historial y CRM",
-    feat_crm_d: "Junto a cada cliente, sus proyectos, presupuestos e historial de colaboración.",    clipage_title: "Clientes",
+    feat_crm_d: "Junto a cada cliente, sus proyectos, presupuestos e historial de colaboración.",
+    clipage_title: "Clientes",
     clipage_lead: "La lista de clientes de LiczMat Pro: datos de contacto, notas y los proyectos que calculas para ellos.",
     clipage_meta: "Clientes en LiczMat Pro: una lista de clientes con datos de contacto y notas, los proyectos del cliente y el historial de cálculos. Sincronizado con la cuenta.",
     cli_pro_yours: "Tu plan: LiczMat Pro",
@@ -12025,6 +12045,7 @@ const I18N_PAGES = {
     app_remember: "Garde-moi connecté sur cet appareil",
     app_back_to: "Retour à la page précédente",
     app_signed_out: "Déconnecté.",
+    app_signout_unsynced: "Certaines modifications ne sont pas encore sur ton compte (pas de connexion). Te déconnecter et les supprimer de ce navigateur ?",
     app_tabs_label: "Sections du compte",
     app_tab_profile: "Profil",
     prof_title: "Profil",
@@ -12098,7 +12119,8 @@ const I18N_PAGES = {
     feat_projects_redirect_t: "Redirection vers les projets",
     feat_projects_redirect_d: "L'ancienne adresse des chantiers mène maintenant aux projets.",
     feat_crm_t: "Historique et CRM",
-    feat_crm_d: "À côté de chaque client, ses projets, devis et l'historique de coopération.",    clipage_title: "Clients",
+    feat_crm_d: "À côté de chaque client, ses projets, devis et l'historique de coopération.",
+    clipage_title: "Clients",
     clipage_lead: "La liste des clients de LiczMat Pro : coordonnées, notes et les projets que tu calcules pour eux.",
     clipage_meta: "Clients dans LiczMat Pro : une liste de clients avec coordonnées et notes, les projets du client et l'historique des calculs. Synchronisé avec le compte.",
     cli_pro_yours: "Ton forfait : LiczMat Pro",

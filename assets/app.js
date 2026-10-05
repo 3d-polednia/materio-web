@@ -304,7 +304,39 @@ async function endClosedBrowserSession() {
     await applyPersistence(false);
     return;
   }
+  // The session ends with the browser, and so does the account's copy in it (AUDYT3 L2) —
+  // but only once it is on the account: an edit that never went out stays rather than
+  // being thrown away without anybody being asked.
+  await leaveAccountCopy(auth.currentUser.uid, { ask: false });
   await fb.signOut(auth).catch(() => {});
+}
+
+/**
+ * Take this account's copy out of the browser before signing out (AUDYT3 L2, owner's
+ * decision D1 of 2026-10-05: always, "remember me" or not).
+ *
+ * After "Wyloguj" the clients with their telephone numbers, the projects and the prices
+ * used to stay in localStorage, and the next person at the same computer opened
+ * /projekty/?id=... and read the project's name. The account holds all of it in Firestore,
+ * so the browser's copy goes — after one last push, so nothing typed a moment ago is lost.
+ * When that push cannot be made (offline) the visitor is asked; `ask: false` keeps the copy
+ * instead. A copy that is not this account's (another account's, or work never claimed) is
+ * not ours to delete and is left alone, as it was. Resolves false when the sign-out should
+ * not go ahead.
+ */
+async function leaveAccountCopy(uid, { ask = true } = {}) {
+  if (!uid || !accountSync || accountSync.syncAccount() !== uid) return true;
+  let pushed = false;
+  try {
+    let timer = 0;
+    await Promise.race([
+      accountSync.syncPushAll(uid, accountSync.state.lastAutoPushAt),
+      new Promise((resolve, reject) => { timer = setTimeout(() => reject(new Error("timeout")), 15000); }),
+    ]).finally(() => clearTimeout(timer));
+    pushed = true;
+  } catch (e) { /* offline or refused: decided below */ }
+  if (!pushed && (!ask || !confirm(T("app_signout_unsynced")))) return !ask;
+  return clearDeviceData();
 }
 
 /** The remember checkbox next to whichever form was just submitted. */
@@ -397,6 +429,9 @@ function wireAuthForms() {
   }
 
   const signOut = async () => {
+    // The browser's copy of the account goes before the session does: the last push needs
+    // the session (see leaveAccountCopy()). Cancelled, nothing changes.
+    if (!(await leaveAccountCopy(state.uid))) return;
     // The listeners go first, so a failure here leaves the page half out of the account:
     // it has to say so. Without the catch the click handler rejected into nothing and the
     // screen kept the workspace with no data behind it.
