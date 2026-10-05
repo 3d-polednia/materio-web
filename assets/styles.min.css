@@ -1566,7 +1566,8 @@ background: var(--surface); box-shadow: var(--shadow-1);
 .app-overview-grid { display: grid; gap: var(--sp-3); grid-template-columns: minmax(0, 1fr); align-items: stretch; }
 @media (min-width: 900px) { .app-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 900px) { .app-overview-grid > :last-child:nth-child(odd) { grid-column: 1 / -1; } }
-.cal-wrap { display: grid; gap: var(--sp-4); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.cal-wrap { display: grid; gap: var(--sp-8) var(--sp-4); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.cal-wrap > .app-card { margin-bottom: 0; }
 @media (min-width: 760px) { .cal-wrap { grid-template-columns: minmax(0, 1fr) 280px; } }
 .cal-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-3); }
 .cal-head :is(h3, .pro-sample-h3) { margin: 0; font-size: var(--fs-md); text-transform: capitalize; }

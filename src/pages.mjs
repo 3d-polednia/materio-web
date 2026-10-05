@@ -2552,7 +2552,7 @@ export function calendarMain(lang, t, features) {
         </section>
         <!-- What "late" and "today" are measured against, said out loud: the visitor's
              own calendar day, which is the only reckoning a deadline has. -->
-        <div class="card">
+        <div class="dash-sec card">
           <p class="crm-contact"><span class="eyebrow muted">${esc(t("cal_today_is"))}</span> <b id="cal-today-date"></b></p>
 
           <div class="ws-project-figs">
