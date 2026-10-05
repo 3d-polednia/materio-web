@@ -306,7 +306,7 @@
         <div class="calc-actions" data-calc-actions data-projects-url="/hr/projekti/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/hr/materijali/">Katalog građevinskih materijala</a>: 34 materijala u katalogu</p>
+      <p class="muted src-note"><a href="/hr/materijali/">Katalog građevinskih materijala</a>: 34 materijala za ovaj kalkulator</p>
     </div>
   </section>
 
@@ -324,13 +324,7 @@
         </div>
         <div>
           <h3>Formula</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze formatki i posortuj malejąco po polu.
-2. Każda formatka ląduje w wolnym prostokącie o najmniejszej resztce (best-area-fit),
-   z obrotem o 90° jeśli Rotacija dijelova jest włączony.
-3. Cięcie gilotynowe dzieli wykorzystany prostokąt na odpad prawy i dolny,
-   każdy pomniejszony o Rez pile.
-4. Gdy formatka nie mieści się nigdzie, otwierasz nową płytę.
-odpad = (płyty × Širina ploče × Duljina ploče − Σ formatki) ÷ (płyty × Širina ploče × Duljina ploče) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze formatki i posortuj malejąco po polu.</li><li>Umieść każdą formatkę w wolnym prostokącie, po którym zostaje najmniej wolnego pola. Obróć ją o 90° jeśli Rotacija dijelova jest włączony i po obrocie pasuje lepiej.</li><li>Podziel wykorzystany prostokąt cięciem gilotynowym na prawy i dolny odpad. Pomniejsz oba odpady o Rez pile.</li><li>Gdy formatka nie mieści się nigdzie, otwierasz nową płytę.</li></ol><pre class="formula"><code>odpad = (płyty × Širina ploče × Duljina ploče − Σ formatki) ÷ (płyty × Širina ploče × Duljina ploče) × 100%</code></pre>
           <p class="muted src-note">Stranica računa istim kodom kao i Android aplikacija.</p>
         </div>
       </div>

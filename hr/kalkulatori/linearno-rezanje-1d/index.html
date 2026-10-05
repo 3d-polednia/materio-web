@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">Za kupiti</div>
           <div class="big">5 <span class="figure-line">šipki</span></div>
-          <div class="rows"><div><span>Dijelovi</span><b>18</b></div><div><span>Otpad</span><b>8%</b></div><div><span>Šipka</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Šipka</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Šipka</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Šipka</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Šipka</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Dijelovi</span><b>18</b></div><div><span>Otpad</span><b>8%</b></div><div><span>Šipka 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Šipka 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Šipka 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Šipka 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Šipka 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Podaci su se promijenili. Klikni „Izračunaj ponovno” da vidiš novi rezultat.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/hr/projekti/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/hr/materijali/">Katalog građevinskih materijala</a>: 39 materijala u katalogu</p>
+      <p class="muted src-note"><a href="/hr/materijali/">Katalog građevinskih materijala</a>: 39 materijala za ovaj kalkulator</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Formula</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.
-2. Każdy element trafia do pierwszej sztangi, w której się mieści:
-   zajęte + (sztanga niepusta → Rez pile) + element ≤ Duljina šipke
-3. Gdy nie mieści się w żadnej, otwierasz nową sztangę.
-odpad = (Duljina šipke × sztangi − Σ elementy) ÷ (Duljina šipke × sztangi) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.</li><li>Każdy element trafia do pierwszej sztangi, w której się mieści: zajęte + (sztanga niepusta → Rez pile) + element ≤ Duljina šipke</li><li>Gdy nie mieści się w żadnej, otwierasz nową sztangę.</li></ol><pre class="formula"><code>odpad = (Duljina šipke × sztangi − Σ elementy) ÷ (Duljina šipke × sztangi) × 100%</code></pre>
           <p class="muted src-note">Stranica računa istim kodom kao i Android aplikacija.</p>
         </div>
       </div>

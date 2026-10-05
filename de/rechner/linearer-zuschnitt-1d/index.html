@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">Zu kaufen</div>
           <div class="big">5 <span class="figure-line">Stangen</span></div>
-          <div class="rows"><div><span>Teile</span><b>18</b></div><div><span>Verschnitt</span><b>8%</b></div><div><span>Stange</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Stange</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Stange</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Stange</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Stange</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Teile</span><b>18</b></div><div><span>Verschnitt</span><b>8%</b></div><div><span>Stange 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Stange 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Stange 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Stange 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Stange 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Die Angaben haben sich geändert. Klicke „Neu berechnen“ für das neue Ergebnis.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/de/projekte/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a>: 39 Materialien im Katalog</p>
+      <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a>: 39 Materialien für diesen Rechner</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Formel</h3>
-          <pre class="formula"><code>1. Die Liste in einzelne Teile auflösen und nach Länge absteigend sortieren.
-2. Jedes Teil kommt in die erste Stange, in die es Bahnst:
-   belegt + (Stange nicht leer → Schnittfuge) + Teil ≤ Stangenlänge
-3. Passt es in keine, wird eine neue Stange geöffnet.
-tatsächlicher Verschnitt = (Stangenlänge × Stangen − Σ Teile) ÷ (Stangenlänge × Stangen) × 100%</code></pre>
+          <ol class="formula"><li>Die Liste in einzelne Teile auflösen und nach Länge absteigend sortieren.</li><li>Jedes Teil kommt in die erste Stange, in die es Bahnst: belegt + (Stange nicht leer → Schnittfuge) + Teil ≤ Stangenlänge</li><li>Passt es in keine, wird eine neue Stange geöffnet.</li></ol><pre class="formula"><code>tatsächlicher Verschnitt = (Stangenlänge × Stangen − Σ Teile) ÷ (Stangenlänge × Stangen) × 100%</code></pre>
           <p class="muted src-note">Die Seite rechnet mit dem gleichen Code wie die Android-App.</p>
         </div>
       </div>

@@ -243,6 +243,8 @@ function buildMaterialsPage() {
   const empty = page.querySelector("#matpage-empty");
   const count = page.querySelector("#matpage-count");
   if (!search) return;
+  const searchLabel = page.querySelector(`label[for="${search.id}"]`);
+  if (searchLabel) searchLabel.textContent = matT("mat_search_label");
 
   const boxes = Array.from(page.querySelectorAll("[data-cat-details], [data-grp]"));
   const rows = Array.from(page.querySelectorAll("[data-find]"));

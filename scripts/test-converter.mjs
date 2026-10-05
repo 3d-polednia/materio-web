@@ -558,6 +558,14 @@ head("8. the copy in ten languages, and the module's one name");
     }
   }
   eq("no unit symbol is a dictionary entry", inDict.join(", "), "");
+
+  // A unit symbol is case-sensitive: m is metres while M is mega. The source value in
+  // the result therefore opts out of the shared eyebrow's uppercase treatment.
+  const converterJs = read("assets/converter.js");
+  const styles = read("assets/styles.css");
+  check("the source value has its converter-only class", converterJs.includes("eyebrow conv-figure-source"));
+  check("converter units are never uppercased",
+    /\.result\[data-conv-result\] \.eyebrow\s*\{[^}]*text-transform:\s*none/.test(styles));
 }
 
 /* ------------------------------------------------------------------ the report */

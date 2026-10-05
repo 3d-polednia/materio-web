@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">Koupit</div>
           <div class="big">5 <span class="figure-line">tyčí</span></div>
-          <div class="rows"><div><span>Díly</span><b>18</b></div><div><span>Odpad</span><b>8%</b></div><div><span>Tyč</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Tyč</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Tyč</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Tyč</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Tyč</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Díly</span><b>18</b></div><div><span>Odpad</span><b>8%</b></div><div><span>Tyč 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Tyč 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Tyč 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Tyč 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Tyč 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Údaje se změnily. Klikni na „Přepočítat“ a uvidíš nový výsledek.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/cs/projekty/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/cs/materialy/">Katalog stavebních materiálů</a>: 39 materiálů v katalogu</p>
+      <p class="muted src-note"><a href="/cs/materialy/">Katalog stavebních materiálů</a>: 39 materiálů pro tuto kalkulačku</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Vzorec</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.
-2. Każdy element trafia do pierwszej sztangi, w której się mieści:
-   zajęte + (sztanga niepusta → Prořez pily) + element ≤ Délka tyče
-3. Gdy nie mieści się w żadnej, otwierasz nową sztangę.
-odpad = (Délka tyče × sztangi − Σ elementy) ÷ (Délka tyče × sztangi) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.</li><li>Każdy element trafia do pierwszej sztangi, w której się mieści: zajęte + (sztanga niepusta → Prořez pily) + element ≤ Délka tyče</li><li>Gdy nie mieści się w żadnej, otwierasz nową sztangę.</li></ol><pre class="formula"><code>odpad = (Délka tyče × sztangi − Σ elementy) ÷ (Délka tyče × sztangi) × 100%</code></pre>
           <p class="muted src-note">Web počítá stejným kódem jako aplikace pro Android.</p>
         </div>
       </div>

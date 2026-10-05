@@ -306,7 +306,7 @@
         <div class="calc-actions" data-calc-actions data-projects-url="/en/projects/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/en/materials/">Building material catalogue</a>: 34 materials in the catalogue</p>
+      <p class="muted src-note"><a href="/en/materials/">Building material catalogue</a>: 34 materials for this calculator</p>
     </div>
   </section>
 
@@ -324,13 +324,7 @@
         </div>
         <div>
           <h3>Formula</h3>
-          <pre class="formula"><code>1. Expand the list into individual parts and sort them by area, largest first.
-2. Each part lands in the free rectangle with the smallest leftover (best-area-fit),
-   rotated by 90° if Rotate pieces is on.
-3. A guillotine cut splits the used rectangle into a right and a bottom offcut,
-   each shrunk by Saw kerf.
-4. When a part fits nowhere, a new sheet is opened.
-actual waste = (boards × Sheet width × Sheet length − Σ parts) ÷ (boards × Sheet width × Sheet length) × 100%</code></pre>
+          <ol class="formula"><li>Expand the list into individual parts and sort them by area, largest first.</li><li>Place each part in the free rectangle that leaves the least free area. Rotate it by 90° if Rotate pieces jest włączony is on and it fits better after rotation.</li><li>Split the used rectangle with a guillotine cut into a right and a bottom offcut. Reduce both offcuts by Saw kerf.</li><li>When a part fits nowhere, a new sheet is opened.</li></ol><pre class="formula"><code>actual waste = (boards × Sheet width × Sheet length − Σ parts) ÷ (boards × Sheet width × Sheet length) × 100%</code></pre>
           <p class="muted src-note">The site calculates with the same code as the Android app.</p>
         </div>
       </div>

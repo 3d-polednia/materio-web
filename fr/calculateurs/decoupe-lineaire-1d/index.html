@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">À acheter</div>
           <div class="big">5 <span class="figure-line">barres</span></div>
-          <div class="rows"><div><span>Pièces</span><b>18</b></div><div><span>Chutes</span><b>8%</b></div><div><span>Barre</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Barre</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Barre</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Barre</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Barre</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Pièces</span><b>18</b></div><div><span>Chutes</span><b>8%</b></div><div><span>Barre 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Barre 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Barre 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Barre 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Barre 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Les données ont changé. Appuie sur « Calculer à nouveau » pour voir le nouveau résultat.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/fr/projets/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/fr/materiaux/">Catalogue des matériaux de construction</a>: 39 matériaux au catalogue</p>
+      <p class="muted src-note"><a href="/fr/materiaux/">Catalogue des matériaux de construction</a>: 39 matériaux pour ce calculateur</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Formule</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.
-2. Każdy element trafia do pierwszej sztangi, w której się mieści:
-   zajęte + (sztanga niepusta → Trait de scie) + element ≤ Longueur de la barre
-3. Gdy nie mieści się w żadnej, otwierasz nową sztangę.
-odpad = (Longueur de la barre × sztangi − Σ elementy) ÷ (Longueur de la barre × sztangi) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.</li><li>Każdy element trafia do pierwszej sztangi, w której się mieści: zajęte + (sztanga niepusta → Trait de scie) + element ≤ Longueur de la barre</li><li>Gdy nie mieści się w żadnej, otwierasz nową sztangę.</li></ol><pre class="formula"><code>odpad = (Longueur de la barre × sztangi − Σ elementy) ÷ (Longueur de la barre × sztangi) × 100%</code></pre>
           <p class="muted src-note">Le site calcule avec le même code que l'appli Android.</p>
         </div>
       </div>

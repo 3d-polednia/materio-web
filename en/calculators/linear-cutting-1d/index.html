@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">To buy</div>
           <div class="big">5 <span class="figure-line">bars</span></div>
-          <div class="rows"><div><span>Pieces</span><b>18</b></div><div><span>Waste</span><b>8%</b></div><div><span>Bar</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Bar</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Bar</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Bar</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Bar</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Pieces</span><b>18</b></div><div><span>Waste</span><b>8%</b></div><div><span>Bar 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Bar 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Bar 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Bar 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Bar 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>The figures changed. Press “Calculate again” to see the new result.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/en/projects/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/en/materials/">Building material catalogue</a>: 39 materials in the catalogue</p>
+      <p class="muted src-note"><a href="/en/materials/">Building material catalogue</a>: 39 materials for this calculator</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Formula</h3>
-          <pre class="formula"><code>1. Expand the list into individual pieces and sort them longest first.
-2. Each piece goes into the first bar it fits in:
-   used + (bar not empty → Saw kerf) + piece ≤ Stock length
-3. When it fits in none of them, a new bar is opened.
-actual waste = (Stock length × bars − Σ pieces) ÷ (Stock length × bars) × 100%</code></pre>
+          <ol class="formula"><li>Expand the list into individual pieces and sort them longest first.</li><li>Each piece goes into the first bar it fits in: used + (bar not empty → Saw kerf) + piece ≤ Stock length</li><li>When it fits in none of them, a new bar is opened.</li></ol><pre class="formula"><code>actual waste = (Stock length × bars − Σ pieces) ÷ (Stock length × bars) × 100%</code></pre>
           <p class="muted src-note">The site calculates with the same code as the Android app.</p>
         </div>
       </div>

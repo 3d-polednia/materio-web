@@ -306,7 +306,7 @@
         <div class="calc-actions" data-calc-actions data-projects-url="/projekty/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/materialy/">Katalog materiałów budowlanych</a>: 34 materiały w katalogu</p>
+      <p class="muted src-note"><a href="/materialy/">Katalog materiałów budowlanych</a>: 34 materiałów do tego kalkulatora</p>
     </div>
   </section>
 
@@ -324,13 +324,7 @@
         </div>
         <div>
           <h3>Wzór</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze formatki i posortuj malejąco po polu.
-2. Każda formatka ląduje w wolnym prostokącie o najmniejszej resztce (best-area-fit),
-   z obrotem o 90° jeśli Obrót elementów jest włączony.
-3. Cięcie gilotynowe dzieli wykorzystany prostokąt na odpad prawy i dolny,
-   każdy pomniejszony o Rzaz piły.
-4. Gdy formatka nie mieści się nigdzie, otwierasz nową płytę.
-odpad = (płyty × Szerokość płyty × Długość płyty − Σ formatki) ÷ (płyty × Szerokość płyty × Długość płyty) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze formatki i posortuj malejąco po polu.</li><li>Umieść każdą formatkę w wolnym prostokącie, po którym zostaje najmniej wolnego pola. Obróć ją o 90° jeśli Obrót elementów jest włączony i po obrocie pasuje lepiej.</li><li>Podziel wykorzystany prostokąt cięciem gilotynowym na prawy i dolny odpad. Pomniejsz oba odpady o Rzaz piły.</li><li>Gdy formatka nie mieści się nigdzie, otwierasz nową płytę.</li></ol><pre class="formula"><code>odpad = (płyty × Szerokość płyty × Długość płyty − Σ formatki) ÷ (płyty × Szerokość płyty × Długość płyty) × 100%</code></pre>
           <p class="muted src-note">Strona liczy tym samym kodem co aplikacja na Androida.</p>
         </div>
       </div>

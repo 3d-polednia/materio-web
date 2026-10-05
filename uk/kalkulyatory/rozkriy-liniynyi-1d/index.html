@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">Купити</div>
           <div class="big">5 <span class="figure-line">хлистів</span></div>
-          <div class="rows"><div><span>Елементи</span><b>18</b></div><div><span>Відходи</span><b>8%</b></div><div><span>Хлист</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Хлист</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Хлист</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Хлист</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Хлист</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Елементи</span><b>18</b></div><div><span>Відходи</span><b>8%</b></div><div><span>Хлист 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Хлист 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Хлист 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Хлист 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Хлист 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Дані змінилися. Натисни «Порахувати знову», щоб побачити новий результат.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/uk/proekty/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a>: 39 матеріалів у каталозі</p>
+      <p class="muted src-note"><a href="/uk/materialy/">Каталог будівельних матеріалів</a>: 39 матеріалів для цього калькулятора</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Формула</h3>
-          <pre class="formula"><code>1. Розгорни список на окремі елементи і посортуй за спаданням довжини.
-2. Кожен елемент іде в перший хлист, у який поміщається:
-   зайнято + (хлист не порожній → Різ пилки) + елемент ≤ Довжина хлиста
-3. Коли не поміщається в жоден, відкривається новий хлист.
-відходи = (Довжина хлиста × хлисти − Σ елементи) ÷ (Довжина хлиста × хлисти) × 100%</code></pre>
+          <ol class="formula"><li>Розгорни список на окремі елементи і посортуй за спаданням довжини.</li><li>Кожен елемент іде в перший хлист, у який поміщається: зайнято + (хлист не порожній → Різ пилки) + елемент ≤ Довжина хлиста</li><li>Коли не поміщається в жоден, відкривається новий хлист.</li></ol><pre class="formula"><code>відходи = (Довжина хлиста × хлисти − Σ елементи) ÷ (Довжина хлиста × хлисти) × 100%</code></pre>
           <p class="muted src-note">Сайт рахує тим самим кодом, що й додаток для Android.</p>
         </div>
       </div>

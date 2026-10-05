@@ -1015,11 +1015,13 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
    scale so the visitor sees where the off-cut lands, not just the waste percentage.
    Ported from the app's SheetCutPlan (feature/calculator/CutPlanView.kt). */
 .cutplan { margin-top: var(--sp-3); }
-.cutplan-sheets { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--sp-3); margin-top: var(--sp-1); }
+/* One sheet per row, the width of the result column: at 120 px a plan could not be read (AUDYT3 C3). */
+.cutplan-sheets { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); margin-top: var(--sp-1); }
 .cutplan-sheet-box { min-width: 0; }
 .cutplan-label { font-size: var(--fs-xs); font-weight: var(--fw-semi); margin-bottom: 2px; }
 .cutplan-sheet { display: block; width: 100%; height: auto; border-radius: 2px; background: var(--surface); }
 .cutplan-more { font-size: var(--fs-xs); margin-top: var(--sp-2); }
+.cutplan-open { display: inline-block; margin-top: var(--sp-1); font-size: var(--fs-sm); }
 
 /* A quiet aside inside body copy: the practical warning at the end of a guide. */
 .tip {
@@ -1372,7 +1374,7 @@ body.nav-open { overflow: hidden; }
 }
 .lang-menu[hidden] { display: none; }
 .lang-item {
-  display: flex; align-items: center; gap: var(--sp-3); width: 100%;
+  display: flex; align-items: center; column-gap: var(--sp-3); width: 100%;
   font: inherit; font-weight: var(--fw-semi); font-size: var(--fs-sm); text-align: left;
   color: var(--on-bg); background: none; border: 0; border-radius: var(--radius-xs);
   min-height: var(--control-h-sm); padding: var(--sp-2) var(--sp-3); cursor: pointer;
@@ -1752,7 +1754,7 @@ a.chip:hover { text-decoration: none; }
    screen the list under the heading says what is being counted. */
 .mat-count { flex: none; color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
 .mat-count-w { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.mat-tools { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-3) 0 0; }
+.mat-tools { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-3) 0 0; }
 .mat-add summary { cursor: pointer; font-weight: var(--fw-semi); }
 .mat-add { margin-bottom: var(--sp-4); }
 .mat-page-list { display: grid; gap: 0; }
@@ -1771,7 +1773,7 @@ a.chip:hover { text-decoration: none; }
 /* ---------- Stores ---------- */
 .stores-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-7); align-items: start; }
 .map-frame {
-  width: 100%; aspect-ratio: 4/3; border: 0; border-radius: var(--radius);
+  display: block; width: 100%; min-width: 100%; max-width: 100%; aspect-ratio: 4/3; border: 0; border-radius: var(--radius);
   box-shadow: var(--shadow-2); background: var(--surface-alt);
 }
 .chain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--sp-3); margin-top: var(--sp-4); }
@@ -3167,6 +3169,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .text-xs { font-size: var(--fs-xs); }
 /* The label above a result figure: small, upper-case, quiet. */
 .eyebrow { font-size: var(--fs-xs); font-weight: var(--fw-bold); text-transform: uppercase; letter-spacing: var(--track-wide); }
+.result[data-conv-result] .eyebrow { text-transform: none; letter-spacing: normal; }
 .figure-line { font-size: var(--fs-base); font-weight: var(--fw-semi); }
 
 /* ========================================================== 8. RESPONSIVE
@@ -3196,7 +3199,9 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
   .nav, .nav-links { gap: var(--sp-2); }
   .nav-list { gap: 0; }
   .nav-list a { padding-left: var(--sp-2); padding-right: var(--sp-2); }
-  .lang-btn, .cur-select { padding-left: var(--sp-2); padding-right: var(--sp-2); }
+  .lang-btn, .cur-select { padding-left: var(--sp-2); }
+  .lang-btn { padding-right: var(--sp-2); }
+  .cur-select { padding-right: var(--sp-8); }
 }
 /* Below 1160px the type is back to 100% and the row is at its tightest: signed-in Ukrainian
    at 1061px was 9px past the edge in Arial. The account button gives up 12px. */

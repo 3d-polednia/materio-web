@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">Te kopen</div>
           <div class="big">5 <span class="figure-line">stangen</span></div>
-          <div class="rows"><div><span>Stukken</span><b>18</b></div><div><span>Afval</span><b>8%</b></div><div><span>Stang</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Stang</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Stang</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Stang</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Stang</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Stukken</span><b>18</b></div><div><span>Afval</span><b>8%</b></div><div><span>Stang 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Stang 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Stang 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Stang 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Stang 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>De gegevens zijn veranderd. Druk op „Bereken opnieuw” om het nieuwe resultaat te zien.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/nl/projecten/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/nl/materialen/">Catalogus van bouwmaterialen</a>: 39 materialen in de catalogus</p>
+      <p class="muted src-note"><a href="/nl/materialen/">Catalogus van bouwmaterialen</a>: 39 materialen voor deze calculator</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Formule</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.
-2. Każdy element trafia do pierwszej sztangi, w której się mieści:
-   zajęte + (sztanga niepusta → Zaagsnede) + element ≤ Lengte van de stang
-3. Gdy nie mieści się w żadnej, otwierasz nową sztangę.
-odpad = (Lengte van de stang × sztangi − Σ elementy) ÷ (Lengte van de stang × sztangi) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.</li><li>Każdy element trafia do pierwszej sztangi, w której się mieści: zajęte + (sztanga niepusta → Zaagsnede) + element ≤ Lengte van de stang</li><li>Gdy nie mieści się w żadnej, otwierasz nową sztangę.</li></ol><pre class="formula"><code>odpad = (Lengte van de stang × sztangi − Σ elementy) ÷ (Lengte van de stang × sztangi) × 100%</code></pre>
           <p class="muted src-note">De site rekent met dezelfde code als de Android app.</p>
         </div>
       </div>

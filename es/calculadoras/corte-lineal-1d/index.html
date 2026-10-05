@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">Para comprar</div>
           <div class="big">5 <span class="figure-line">barras</span></div>
-          <div class="rows"><div><span>Piezas</span><b>18</b></div><div><span>Desperdicio</span><b>8%</b></div><div><span>Barra</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Barra</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Barra</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Barra</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Barra</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Piezas</span><b>18</b></div><div><span>Desperdicio</span><b>8%</b></div><div><span>Barra 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Barra 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Barra 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Barra 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Barra 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Los datos han cambiado. Pulsa «Calcular de nuevo» para ver el resultado nuevo.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/es/proyectos/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/es/materiales/">Catálogo de materiales de construcción</a>: 39 materiales en el catálogo</p>
+      <p class="muted src-note"><a href="/es/materiales/">Catálogo de materiales de construcción</a>: 39 materiales para esta calculadora</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Fórmula</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.
-2. Każdy element trafia do pierwszej sztangi, w której się mieści:
-   zajęte + (sztanga niepusta → Grosor de corte) + element ≤ Longitud de la barra
-3. Gdy nie mieści się w żadnej, otwierasz nową sztangę.
-odpad = (Longitud de la barra × sztangi − Σ elementy) ÷ (Longitud de la barra × sztangi) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.</li><li>Każdy element trafia do pierwszej sztangi, w której się mieści: zajęte + (sztanga niepusta → Grosor de corte) + element ≤ Longitud de la barra</li><li>Gdy nie mieści się w żadnej, otwierasz nową sztangę.</li></ol><pre class="formula"><code>odpad = (Longitud de la barra × sztangi − Σ elementy) ÷ (Longitud de la barra × sztangi) × 100%</code></pre>
           <p class="muted src-note">La web calcula con el mismo código que la app de Android.</p>
         </div>
       </div>

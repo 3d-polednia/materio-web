@@ -20,6 +20,7 @@
 
 const I18N_PAGES = {
   pl: {
+    mat_search_label: "Szukaj materiału",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -1019,6 +1020,7 @@ const I18N_PAGES = {
   },
 
   en: {
+    mat_search_label: "Search for a material",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -2005,6 +2007,7 @@ const I18N_PAGES = {
   },
 
   de: {
+    mat_search_label: "Material suchen",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -2991,6 +2994,7 @@ const I18N_PAGES = {
   },
 
   uk: {
+    mat_search_label: "Пошук матеріалу",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -3977,6 +3981,7 @@ const I18N_PAGES = {
   },
 
   cs: {
+    mat_search_label: "Hledat materiál",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -4929,6 +4934,7 @@ const I18N_PAGES = {
   },
 
   sk: {
+    mat_search_label: "Hľadať materiál",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -5881,6 +5887,7 @@ const I18N_PAGES = {
   },
 
   ro: {
+    mat_search_label: "Caută material",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -6833,6 +6840,7 @@ const I18N_PAGES = {
   },
 
   hr: {
+    mat_search_label: "Traži materijal",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -7785,6 +7793,7 @@ const I18N_PAGES = {
   },
 
   sr: {
+    mat_search_label: "Traži materijal",
 
     /* Session 59 (C6): the runtime half of /moje-materialy/. The page's own copy is
        build-time, in src/omat-copy.mjs — these are the strings JavaScript picks after
@@ -8737,6 +8746,7 @@ const I18N_PAGES = {
   },
 
   it: {
+    mat_search_label: "Cerca materiale",
     omatpage_title: "I miei materiali",
     omat_empty: "Non hai ancora materiali tuoi.",
     omat_edit: "Modifica",
@@ -9680,6 +9690,7 @@ const I18N_PAGES = {
     estpage_meta: "Preventivo edile online: raccogli i risultati dei calcolatori in un unico elenco con quantità e costo, poi stampalo o salvalo in PDF.",
   },
   nl: {
+    mat_search_label: "Materiaal zoeken",
     omatpage_title: "Mijn materialen",
     omat_empty: "Je hebt nog geen eigen materialen.",
     omat_edit: "Bewerken",
@@ -10623,6 +10634,7 @@ const I18N_PAGES = {
     estpage_meta: "Online bouwkostenraming: verzamel de resultaten in één lijst met aantallen en kosten en print die of sla hem op als PDF.",
   },
   es: {
+    mat_search_label: "Buscar material",
     omatpage_title: "Mis materiales",
     omat_empty: "Todavía no tienes materiales propios.",
     omat_edit: "Editar",
@@ -11566,6 +11578,7 @@ const I18N_PAGES = {
     estpage_meta: "Presupuesto de obra en línea: reúne los resultados de las calculadoras en una lista con cantidades y coste, y después imprímela o guárdala en PDF.",
   },
   fr: {
+    mat_search_label: "Rechercher un matériau",
     omatpage_title: "Mes matériaux",
     omat_empty: "Tu n'as pas encore de matériaux à toi.",
     omat_edit: "Modifier",

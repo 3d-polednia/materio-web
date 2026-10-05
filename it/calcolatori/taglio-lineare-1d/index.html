@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">Da comprare</div>
           <div class="big">5 <span class="figure-line">barre</span></div>
-          <div class="rows"><div><span>Pezzi</span><b>18</b></div><div><span>Scarto</span><b>8%</b></div><div><span>Barra</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Barra</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Barra</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Barra</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Barra</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Pezzi</span><b>18</b></div><div><span>Scarto</span><b>8%</b></div><div><span>Barra 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Barra 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Barra 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Barra 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Barra 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>I dati sono cambiati. Premi «Calcola di nuovo» per vedere il nuovo risultato.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/it/progetti/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/it/materiali/">Catalogo dei materiali edili</a>: 39 materiali nel catalogo</p>
+      <p class="muted src-note"><a href="/it/materiali/">Catalogo dei materiali edili</a>: 39 materiali per questo calcolatore</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Formula</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.
-2. Każdy element trafia do pierwszej sztangi, w której się mieści:
-   zajęte + (sztanga niepusta → Spessore di taglio) + element ≤ Lunghezza della barra
-3. Gdy nie mieści się w żadnej, otwierasz nową sztangę.
-odpad = (Lunghezza della barra × sztangi − Σ elementy) ÷ (Lunghezza della barra × sztangi) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.</li><li>Każdy element trafia do pierwszej sztangi, w której się mieści: zajęte + (sztanga niepusta → Spessore di taglio) + element ≤ Lunghezza della barra</li><li>Gdy nie mieści się w żadnej, otwierasz nową sztangę.</li></ol><pre class="formula"><code>odpad = (Lunghezza della barra × sztangi − Σ elementy) ÷ (Lunghezza della barra × sztangi) × 100%</code></pre>
           <p class="muted src-note">Il sito calcola con lo stesso codice dell'app Android.</p>
         </div>
       </div>

@@ -301,13 +301,13 @@
         <div class="result show" id="calc-result" data-result role="status">
           <div class="muted eyebrow">Do kupienia</div>
           <div class="big">5 <span class="figure-line">sztang</span></div>
-          <div class="rows"><div><span>Elementy</span><b>18</b></div><div><span>Odpad</span><b>8%</b></div><div><span>Sztanga</span><b>1: 2400 + 2400 + 900 mm</b></div><div><span>Sztanga</span><b>2: 2400 + 2400 + 900 mm</b></div><div><span>Sztanga</span><b>3: 1800 + 1800 + 1800 mm</b></div><div><span>Sztanga</span><b>4: 1800 + 1800 + 1800 mm</b></div><div><span>Sztanga</span><b>5: 900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
+          <div class="rows"><div><span>Elementy</span><b>18</b></div><div><span>Odpad</span><b>8%</b></div><div><span>Sztanga 1</span><b>2400 + 2400 + 900 mm</b></div><div><span>Sztanga 2</span><b>2400 + 2400 + 900 mm</b></div><div><span>Sztanga 3</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Sztanga 4</span><b>1800 + 1800 + 1800 mm</b></div><div><span>Sztanga 5</span><b>900 + 900 + 900 + 900 + 900 + 900 mm</b></div></div>
         </div>
         <p class="calc-stale" data-calc-stale hidden>Dane się zmieniły. Kliknij „Oblicz ponownie”, żeby zobaczyć nowy wynik.</p>
         <div class="calc-actions" data-calc-actions data-projects-url="/projekty/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/materialy/">Katalog materiałów budowlanych</a>: 39 materiałów w katalogu</p>
+      <p class="muted src-note"><a href="/materialy/">Katalog materiałów budowlanych</a>: 39 materiałów do tego kalkulatora</p>
     </div>
   </section>
 
@@ -325,11 +325,7 @@
         </div>
         <div>
           <h3>Wzór</h3>
-          <pre class="formula"><code>1. Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.
-2. Każdy element trafia do pierwszej sztangi, w której się mieści:
-   zajęte + (sztanga niepusta → Rzaz piły) + element ≤ Długość sztangi
-3. Gdy nie mieści się w żadnej, otwierasz nową sztangę.
-odpad = (Długość sztangi × sztangi − Σ elementy) ÷ (Długość sztangi × sztangi) × 100%</code></pre>
+          <ol class="formula"><li>Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.</li><li>Każdy element trafia do pierwszej sztangi, w której się mieści: zajęte + (sztanga niepusta → Rzaz piły) + element ≤ Długość sztangi</li><li>Gdy nie mieści się w żadnej, otwierasz nową sztangę.</li></ol><pre class="formula"><code>odpad = (Długość sztangi × sztangi − Σ elementy) ÷ (Długość sztangi × sztangi) × 100%</code></pre>
           <p class="muted src-note">Strona liczy tym samym kodem co aplikacja na Androida.</p>
         </div>
       </div>

@@ -306,7 +306,7 @@
         <div class="calc-actions" data-calc-actions data-projects-url="/de/projekte/"></div>
       </div>
     </div>
-      <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a>: 34 Materialien im Katalog</p>
+      <p class="muted src-note"><a href="/de/materialien/">Baustoffkatalog</a>: 34 Materialien für diesen Rechner</p>
     </div>
   </section>
 
@@ -324,13 +324,7 @@
         </div>
         <div>
           <h3>Formel</h3>
-          <pre class="formula"><code>1. Die Liste in einzelne Zuschnitte auflösen und nach Fläche absteigend sortieren.
-2. Jeder Zuschnitt landet im freien Rechteck mit dem kleinsten Rest (Best-Area-Fit),
-   um 90° gedreht, wenn Teile drehen eingeschaltet ist.
-3. Der Guillotine-Schnitt teilt das genutzte Rechteck in einen rechten und einen unteren Rest,
-   jeder verkleinert um Schnittfuge.
-4. Passt ein Zuschnitt nirgends, wird eine neue Platte geöffnet.
-tatsächlicher Verschnitt = (Platten × Plattenbreite × Plattenlänge − Σ Zuschnitte) ÷ (Platten × Plattenbreite × Plattenlänge) × 100%</code></pre>
+          <ol class="formula"><li>Die Liste in einzelne Zuschnitte auflösen und nach Fläche absteigend sortieren.</li><li>Jeden Zuschnitt in das freie Rechteck legen, das die kleinste freie Fläche übrig lässt. Um 90° drehen, wenn Teile drehen jest włączony eingeschaltet ist und der Zuschnitt gedreht besser Bahnst.</li><li>Das genutzte Rechteck mit einem Guillotine-Schnitt in einen rechten und einen unteren Rest teilen. Beide Reste verkleinern um Schnittfuge.</li><li>Passt ein Zuschnitt nirgends, wird eine neue Platte geöffnet.</li></ol><pre class="formula"><code>tatsächlicher Verschnitt = (Platten × Plattenbreite × Plattenlänge − Σ Zuschnitte) ÷ (Platten × Plattenbreite × Plattenlänge) × 100%</code></pre>
           <p class="muted src-note">Die Seite rechnet mit dem gleichen Code wie die Android-App.</p>
         </div>
       </div>
