@@ -1451,6 +1451,12 @@ footer h2 {
   box-shadow: var(--shadow-3);
   display: flex; flex-direction: column; gap: var(--sp-3);
 }
+/* Wider than a phone it is one row, text and buttons side by side, so it takes a strip at the
+   bottom edge rather than a block (AUDYT3 A2). */
+@media (min-width: 561px) {
+  .lang-suggest-banner { flex-direction: row; align-items: center; max-width: 760px; padding-block: var(--sp-3); }
+  .lang-suggest-text { flex: 1 1 auto; }
+}
 .lang-suggest-text { margin: 0; font-size: var(--fs-sm); line-height: var(--lh-snug); }
 .lang-suggest-actions { display: flex; align-items: center; gap: var(--sp-3); }
 .lang-suggest-close {

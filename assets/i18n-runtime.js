@@ -139,6 +139,18 @@ function bannerDismissed() {
 }
 
 function renderLangBanner(code, href) {
+  // One sheet at a time: while the cookie question is open the suggestion waits for it, so
+  // the two never stack into a tower over the middle of the page (AUDYT3 A2).
+  const consent = document.querySelector(".consent-banner");
+  if (consent && !consent.hidden && typeof MutationObserver === "function") {
+    const wait = new MutationObserver(() => {
+      if (!consent.hidden && consent.isConnected) return;
+      wait.disconnect();
+      renderLangBanner(code, href);
+    });
+    wait.observe(consent, { attributes: true, attributeFilter: ["hidden"] });
+    return;
+  }
   const copy = LANG_BANNER[code];
   const banner = document.createElement("div");
   banner.id = "lang-suggest";
@@ -431,7 +443,17 @@ function buildLangPicker() {
   const alternates = window.LICZMAT_ALTERNATES;
   const here = pageLang();
   const wanted = chosenLang();
+  //
+  // Only the bare home page redirects (AUDYT3 A2, 2026-10-05). A deep link someone sent in
+  // German, /de/projekte/?id=..., used to land in Polish when it was the first page of the
+  // session and in German when it was the second: the session flag made the same link
+  // behave two ways. A deep link now opens in its own language and offers the saved one.
+  const bareHome = location.pathname === "/" || location.pathname === "/index.html";
   if (wanted && wanted !== here && alternates[wanted]) {
+    if (!bareHome) {
+      if (LANG_BANNER[wanted] && !bannerDismissed()) renderLangBanner(wanted, alternates[wanted] + langQuery());
+      return;
+    }
     let redirected = "1";
     try {
       redirected = sessionStorage.getItem("materio-redirected") || "";
