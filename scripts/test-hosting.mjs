@@ -18,7 +18,8 @@
  *
  * Sprawdzane jest to:
  *
- *   1. blok `hosting` wskazuje na `hosting/auth`, nigdy na katalog główny;
+ *   1. dwie witryny: `hosting/auth` dla poczty i sam serwis z katalogu głównego (AUDYT3 L4,
+ *      decyzja D2), z listą tego, czego nie wysyłać, i nagłówkami bezpieczeństwa;
  *   2. w `hosting/auth` leżą dokładnie dwa pliki i żaden z nich nie jest stroną serwisu;
  *   3. subdomena prosi o nieindeksowanie — w `robots.txt` i w `<meta name="robots">`;
  *   4. blok `functions` jest nietknięty, bo to ten sam plik;
@@ -55,19 +56,35 @@ const config = JSON.parse(read("firebase.json"));
 head("1. hosting: what a deploy would upload");
 {
   const sites = Array.isArray(config.hosting) ? config.hosting : [config.hosting];
-  eq("exactly one Hosting site is declared", sites.length, 1);
+  eq("two Hosting sites are declared", sites.length, 2);
 
-  const site = sites[0] || {};
-  eq("and it is the auth subdomain's site", site.site, "liczmat-auth");
-  eq("publishing the two-file directory", site.public, "hosting/auth");
-
-  // The whole point of the test. "." would be the repository root, and a repository root
-  // on Firebase Hosting is the entire site published a second time.
-  for (const bad of [".", "./", "", "/", "public"]) {
-    check(`"${bad}" is not what would be uploaded`, site.public !== bad);
-  }
-  check("no rewrite turns the site into a single-page app",
+  const site = sites.find((s) => s.site === "liczmat-auth") || {};
+  eq("the auth subdomain's site publishes the two-file directory", site.public, "hosting/auth");
+  check("no rewrite turns the auth site into a single-page app",
     !site.rewrites, "a rewrite here would answer /__/auth/action itself");
+
+  // AUDYT3 L4, the owner's decision D2 of 2026-10-05: the site itself moves to Firebase
+  // Hosting, because GitHub Pages cannot send the headers that keep /app/ out of somebody
+  // else's frame. The root IS published now, so what must not go up is named instead: the
+  // same list .github/workflows/pages.yml deletes from the Pages artifact.
+  const web = sites.find((s) => s.site === "materio-502513") || {};
+  eq("the site itself is published from the repository root", web.public, ".");
+  const ignore = web.ignore || [];
+  for (const dir of ["docs/**", "src/**", "scripts/**", "functions/**", "hosting/**",
+    "firebase.json", ".firebaserc", "CLAUDE.md", "README.md", "**/.*"]) {
+    check(`${dir} is never uploaded`, ignore.includes(dir));
+  }
+  check("no rewrite: a missing page answers 404.html, as on Pages", !web.rewrites);
+  const all = (web.headers || []).find((h) => h.source === "**");
+  const header = (key) => ((all && all.headers) || []).find((h) => h.key === key);
+  check("every response forbids framing (CSP frame-ancestors)",
+    /frame-ancestors 'none'/.test((header("Content-Security-Policy") || {}).value || ""));
+  eq("and X-Frame-Options for older browsers", (header("X-Frame-Options") || {}).value, "DENY");
+  check("HSTS", /max-age=\d{7,}/.test((header("Strict-Transport-Security") || {}).value || ""));
+  check("a Referrer-Policy", !!header("Referrer-Policy"));
+  eq("nosniff", (header("X-Content-Type-Options") || {}).value, "nosniff");
+  check("the store finder may still ask for the location",
+    /geolocation=\(self\)/.test((header("Permissions-Policy") || {}).value || ""));
 }
 
 /* ================================================================== 2. the directory */
