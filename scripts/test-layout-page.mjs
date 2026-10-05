@@ -168,8 +168,14 @@ for (const width of [1400, 900, 390]) {
     `${width}px new project value`);
   const select = await visibleRect(projects, "#ws-project-list .row-actions > .field select", `${width}px project status`);
   const button = await visibleRect(projects, "#ws-project-list .row-actions > [data-del-project]", `${width}px project delete`);
+  // Since Edytuj joined the row (KOLEGA2, P2) the status sits beside it; on a phone the three
+  // controls do not fit one line and the delete button wraps under them, which is fine.
+  const edit = await visibleRect(projects, "#ws-project-list .row-actions > a.btn-go", `${width}px project edit`);
+  if (select && edit) {
+    check(`${width}px project status and edit have equal bottoms`, close(select.bottom, edit.bottom), `${select.bottom} vs ${edit.bottom}`);
+  }
   if (select && button) {
-    check(`${width}px project controls have equal bottoms`, close(select.bottom, button.bottom), `${select.bottom} vs ${button.bottom}`);
+    if (width > 560) check(`${width}px project controls have equal bottoms`, close(select.bottom, button.bottom), `${select.bottom} vs ${button.bottom}`);
     check(`${width}px project controls have equal heights`, close(select.height, button.height), `${select.height} vs ${button.height}`);
     check(`${width}px project delete keeps a 24px target`, button.height >= 24, String(button.height));
   }
