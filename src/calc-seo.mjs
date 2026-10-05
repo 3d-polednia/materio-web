@@ -190,7 +190,7 @@ export const CALC_SEO = {
       ],
     },
     de: {
-      title: "Fliesenrechner: wie viele Kartons",
+      title: "Fliesenrechner: wie viele Pakete",
       desc: "Fläche plus Verschnitt, umgerechnet in ganze Kartons Fliesen, Paneele oder Feinsteinzeug, samt den Quadratmetern, die du tatsächlich kaufst.",
       faq: [
         ["Wie viele Fliesen braucht man für 10 m²?",
