@@ -356,6 +356,17 @@
     <aside class="cal-day-panel app-card" id="cal-daypanel"></aside>
   </div>
         
+        <section class="dash-sec card" id="calfeed">
+          <div class="dash-head">
+            <h2 id="calfeed-title">Échéances dans le calendrier du téléphone</h2>
+          </div>
+          <p class="muted" id="calfeed-lead">Connecte Google Agenda, Outlook ou iPhone. Tes échéances LiczMat y apparaîtront automatiquement.</p>
+          <div id="calfeed-content">
+            <p class="mat-tools"><button type="button" class="btn btn-ghost btn-sm" id="calfeed-connect" disabled>Connecter le calendrier</button></p>
+          </div>
+          <p class="muted field-note" id="calfeed-status" aria-live="polite"></p>
+        </section>
+        
         <div class="card">
           <p class="crm-contact"><span class="eyebrow muted">Aujourd'hui</span> <b id="cal-today-date"></b></p>
 
@@ -409,18 +420,6 @@
           <p class="muted">Projets clos qui avaient une date. Ils ne comptent jamais comme en retard.</p>
           <ul id="cal-closed-list" class="data-list"></ul>
         </details>
-
-        
-        <section class="dash-sec card" id="calfeed">
-          <div class="dash-head">
-            <h2 id="calfeed-title">Échéances dans le calendrier du téléphone</h2>
-          </div>
-          <p class="muted" id="calfeed-lead">Connecte Google Agenda, Outlook ou iPhone. Tes échéances LiczMat y apparaîtront automatiquement.</p>
-          <div id="calfeed-content">
-            <p class="mat-tools"><button type="button" class="btn btn-ghost btn-sm" id="calfeed-connect" disabled>Connecter le calendrier</button></p>
-          </div>
-          <p class="muted field-note" id="calfeed-status" aria-live="polite"></p>
-        </section>
       </div>
 
       <p class="ws-links">

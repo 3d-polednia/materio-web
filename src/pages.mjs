@@ -2537,6 +2537,19 @@ export function calendarMain(lang, t, features) {
 
       <div id="cal-tool">
         ${calendarGrid(t, "cal")}
+        <!-- 2026-10-05: the private iCalendar link (calendarFeed in functions/index.js), so
+             the terms show up in the phone calendar itself. Drawn by assets/schedule-feed.js.
+             Straight under the month grid, first on the page (owner, 2026-10-05). -->
+        <section class="dash-sec card" id="calfeed">
+          <div class="dash-head">
+            <h2 id="calfeed-title">${esc(t("calfeed_title"))}</h2>
+          </div>
+          <p class="muted" id="calfeed-lead">${esc(t("calfeed_lead"))}</p>
+          <div id="calfeed-content">
+            <p class="mat-tools"><button type="button" class="btn btn-ghost btn-sm" id="calfeed-connect" disabled>${esc(t("calfeed_connect"))}</button></p>
+          </div>
+          <p class="muted field-note" id="calfeed-status" aria-live="polite"></p>
+        </section>
         <!-- What "late" and "today" are measured against, said out loud: the visitor's
              own calendar day, which is the only reckoning a deadline has. -->
         <div class="card">
@@ -2557,20 +2570,6 @@ ${buckets}
           <p class="muted">${esc(t("cal_closed_d"))}</p>
           <ul id="cal-closed-list" class="data-list"></ul>
         </details>
-
-        <!-- 2026-10-05: the private iCalendar link (calendarFeed in functions/index.js), so
-             the terms show up in the phone calendar itself. Drawn by assets/schedule-feed.js.
-             Last on the page: it is set up once, the lists above are read every day. -->
-        <section class="dash-sec card" id="calfeed">
-          <div class="dash-head">
-            <h2 id="calfeed-title">${esc(t("calfeed_title"))}</h2>
-          </div>
-          <p class="muted" id="calfeed-lead">${esc(t("calfeed_lead"))}</p>
-          <div id="calfeed-content">
-            <p class="mat-tools"><button type="button" class="btn btn-ghost btn-sm" id="calfeed-connect" disabled>${esc(t("calfeed_connect"))}</button></p>
-          </div>
-          <p class="muted field-note" id="calfeed-status" aria-live="polite"></p>
-        </section>
       </div>
 
       <p class="ws-links">
