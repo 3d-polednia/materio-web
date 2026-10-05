@@ -100,9 +100,9 @@ const between = (html, open, close) => {
 const PAGES = collect();
 
 /** The three that translate in place: the container is in the markup and is empty. */
-// p/index.html left this list on 2026-10-05 (AUDYT3 C4): it only forwards an old link to /wycena/.
-const IN_PLACE = ["app/index.html", "app/dashboard/index.html"];
-const REDIRECTS = ["p/index.html"];
+
+const IN_PLACE = ["app/index.html", "app/dashboard/index.html", "p/index.html"];
+const REDIRECTS = [];
 /** The error page is the only page the generator does not write. */
 const HAND_WRITTEN = ["404.html"];
 

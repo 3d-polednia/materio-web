@@ -1,10 +1,6 @@
 /* Public, read-only quote snapshot. The token is the only credential. */
 import { FIREBASE_CONFIG, FIREBASE_READY, FIREBASE_SDK } from "./firebase-config.js";
 
-const legacyQuoteRoute = location.pathname.replace(/\/+$/, "") === "/p";
-if (legacyQuoteRoute) {
-  location.replace(`/wycena/${location.search}${location.hash}`);
-} else {
 
 const tokenPattern = /^[A-Za-z0-9_-]{16,64}$/;
 const byId = (id) => document.getElementById(id);
@@ -99,4 +95,3 @@ document.querySelector(".cur-picker")?.setAttribute("hidden", "");
 const languageBlock = document.querySelector(".foot-langs");
 if (languageBlock && !languageBlock.querySelector("li")) languageBlock.hidden = true;
 load().catch(() => fail());
-}

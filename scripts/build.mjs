@@ -1487,8 +1487,8 @@ function buildPrivacyPages() {
       description: privacyDescription(policy),
       path: urlPrivacy(lang),
       alternates: alt,
-      main: privacyMain(policy),
-      jsonld: [privacyBreadcrumbLd(policy)],
+      main: privacyMain(policy, t("bc_home")),
+      jsonld: [privacyBreadcrumbLd(policy, t("bc_home"))],
     }));
   }
 }
@@ -2033,8 +2033,8 @@ function buildPrivatePages() {
     title: `${t("share_title")} | LiczMat`,
     description: t("share_lead"),
     path: URL_SHARE,
-    main: `<main id="main"></main>`,
-    modules: ["/assets/quote-view.js"],
+    main: shareMain(t),
+    scripts: ["/assets/share.js"],
     // The one page on the site whose address is a credential: /p/<token> is opened by
     // somebody who was handed the link, and the token in it is the whole of the
     // authorisation (FIRESTORE_SYNC §6). `secret` takes the analytics tag off it — GA4
