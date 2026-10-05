@@ -828,7 +828,7 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
     --lm-pop-row-radius: var(--radius-xs);
   }
   @supports (appearance: base-select) {
-    select:not(.cur-select, .row-actions select, .cal-month-pick select, .inline-form > select) {
+    select:not(.cur-select, .row-actions select:not(.ws-proj-status), .cal-month-pick select, .inline-form > select) {
       &, &::picker(select) { appearance: base-select; }
       &::picker-icon { display: none; }
       /* The browser's default opens the list toward the larger space, so a select in
@@ -2689,14 +2689,17 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .ws-proj-row > .row-name { flex: 1 1 14rem; }
 .ws-proj-row > .row-actions { margin-left: auto; flex-wrap: wrap; }
 .ws-proj-row > .row-actions .btn { white-space: nowrap; }
-/* The status in a project row reads as text with a caret, not as a filled pill (owner,
-   2026-10-03). It is still the select, so the focus ring of every control stays, and it keeps
-   a control's height so its text sits level with the button beside it (P6). */
-.ws-proj-status {
-  min-height: var(--control-h); padding-block: 0; border: 0; border-radius: 0;
-  background-color: transparent; color: var(--on-bg);
-}
-.ws-proj-status:hover { color: var(--accent-strong); }
+/* The status in a project row is a select like every other one: the pill, the caret and the
+   page-drawn list (owner, 2026-10-05: as plain text with a caret nobody saw it opened, and
+   the 2026-10-03 look is withdrawn). It is the one select in .row-actions that takes the
+   page-drawn list; base-select sizes a select by the option it shows, so a fixed width
+   keeps it from changing width when the status changes. 12rem holds the longest status in
+   every language with the caret. It keeps a control's height so its text sits level
+   with the button beside it (P6). */
+.ws-proj-row .ws-proj-status { inline-size: 12rem; }
+/* On a phone 12rem pushes Edytuj off the status line; there the phone's own picker opens
+   and the select takes the width of what it shows. */
+@media (max-width: 560px) { .ws-proj-row .ws-proj-status { inline-size: auto; } }
 .ws-row-ask { flex: 1 0 100%; min-width: 0; }
 .ws-row-ask .btn { white-space: nowrap; }
 

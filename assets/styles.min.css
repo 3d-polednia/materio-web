@@ -497,7 +497,7 @@ select:not(.cur-select) { appearance: auto; padding-right: var(--control-px); }
 --lm-pop-row-radius: var(--radius-xs);
 }
 @supports (appearance: base-select) {
-select:not(.cur-select, .row-actions select, .cal-month-pick select, .inline-form > select) {
+select:not(.cur-select, .row-actions select:not(.ws-proj-status), .cal-month-pick select, .inline-form > select) {
 &, &::picker(select) { appearance: base-select; }
 &::picker-icon { display: none; }
 &::picker(select) {
@@ -1802,11 +1802,8 @@ background: var(--surface); padding: var(--sp-4);
 .ws-proj-row > .row-name { flex: 1 1 14rem; }
 .ws-proj-row > .row-actions { margin-left: auto; flex-wrap: wrap; }
 .ws-proj-row > .row-actions .btn { white-space: nowrap; }
-.ws-proj-status {
-min-height: var(--control-h); padding-block: 0; border: 0; border-radius: 0;
-background-color: transparent; color: var(--on-bg);
-}
-.ws-proj-status:hover { color: var(--accent-strong); }
+.ws-proj-row .ws-proj-status { inline-size: 12rem; }
+@media (max-width: 560px) { .ws-proj-row .ws-proj-status { inline-size: auto; } }
 .ws-row-ask { flex: 1 0 100%; min-width: 0; }
 .ws-row-ask .btn { white-space: nowrap; }
 .ws-undo {
