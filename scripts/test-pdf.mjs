@@ -80,7 +80,7 @@ function loadPdf({ allow = undefined, doc = null } = {}) {
   };
   if (allow !== undefined) globals.pwAllows = (feature) => Boolean(allow && allow[feature]);
   return evalScript("assets/pdf-export.js",
-    ["pdfNum", "pdfBreakdown", "pdfHasPricing", "pdfAllowed", "pdfFill"], globals);
+    ["pdfNum", "pdfBreakdown", "pdfHasPricing", "pdfAllowed", "pdfFill", "pdfClientQuoteSnapshot"], globals);
 }
 
 /* ------------------------------------------------------------------ the runner */
@@ -188,6 +188,29 @@ head("1b. the same numbers as the Kotlin, read out of the app repo");
     check("the two document types are the app's two",
       /TECHNICAL_REPORT/.test(src) && /INVESTOR_ESTIMATE/.test(src));
   }
+}
+
+head("1c. client quote margins are hidden or shown by decision D4");
+{
+  const { pdfClientQuoteSnapshot } = loadPdf();
+  const base = () => ({
+    materialRows: [{ name: "Materiały", qtyText: "1 szt.", unitPriceMinor: 83650, valueMinor: 83650 }],
+    otherRows: [{ name: "Transport", qtyText: "", unitPriceMinor: null, valueMinor: 8000 }],
+    labourRows: [{ name: "Robocizna", qtyText: "", unitPriceMinor: null, valueMinor: 92160 }],
+    totals: { materials: 83650, other: 8000, labour: 92160, subtotal: 183810,
+      marginPct: 10, margin: 18381, net: 202191, vatPct: 23, vat: 46504, gross: 248695, mixed: false },
+  });
+  const hidden = pdfClientQuoteSnapshot(base(), false);
+  const rows = [...hidden.materialRows, ...hidden.otherRows, ...hidden.labourRows];
+  eq("hidden margin lines sum exactly to net", rows.reduce((sum, row) => sum + row.valueMinor, 0), 202191);
+  eq("hidden margin keeps the audited net", hidden.totals.net, 202191);
+  eq("hidden margin keeps the audited VAT", hidden.totals.vat, 46504);
+  eq("hidden margin keeps the audited gross", hidden.totals.gross, 248695);
+  eq("hidden margin removes the separate percentage", hidden.totals.marginPct, 0);
+  const shown = pdfClientQuoteSnapshot(base(), true);
+  eq("shown margin keeps the old subtotal", shown.totals.subtotal, 183810);
+  eq("shown margin keeps the old margin", shown.totals.margin, 18381);
+  eq("shown margin keeps the old line values", shown.materialRows[0].valueMinor, 83650);
 }
 
 /* ================================================================== 2. the rows */

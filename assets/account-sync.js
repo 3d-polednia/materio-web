@@ -830,6 +830,9 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
         hiddenRows,
         labour: labour,
         marginPct: Math.min(1000, Math.max(0, num(q.marginPct))),
+        // AUDYT3 C4 (owner's decision D4): the client sees the margin only when asked to.
+        // validQuote() has no hasOnly(), so the rules accept the field as they stand.
+        showMargin: q.showMargin === true,
         status: typeof crmQuoteStatus === "function" ? crmQuoteStatus(q) : "draft",
         note: text(q.note, 2000),
         // Sent with no money too since 2026-10-01: a currency chosen before anything is typed.

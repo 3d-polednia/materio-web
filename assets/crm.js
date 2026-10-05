@@ -725,6 +725,7 @@ function crmAddQuote(fields) {
     hiddenRows: [],
     labour: [],
     marginPct: crmPct(f.marginMajor),
+    showMargin: false,
     status: "draft",
     note: crmText(f.note, CRM_MAX_NOTE),
     // Stamped by the first labour amount, not here: a quote with no money in it yet has
@@ -755,6 +756,7 @@ function crmUpdateQuote(id, fields) {
   }
   if (f.note !== undefined) quote.note = crmText(f.note, CRM_MAX_NOTE);
   if (f.marginMajor !== undefined) quote.marginPct = crmPct(f.marginMajor);
+  if (f.showMargin !== undefined) quote.showMargin = f.showMargin === true;
   if (f.projectId !== undefined) quote.projectId = crmProjectId(f.projectId);
   if (f.currencyCode !== undefined) {
     // Never a conversion: the amounts stay as typed and are read in the chosen currency.

@@ -147,9 +147,10 @@
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main" tabindex="-1" class="quote-view-main">
-    <div class="wrap quote-view-wrap" data-title="Online quote" data-missing="This quote link is no longer current or has been disabled." data-config="The quote cannot be loaded because Firebase is not configured." data-downloading="Preparing PDF…" data-download-failed="The PDF could not be downloaded.">
+    <div class="wrap quote-view-wrap" data-title="Online quote" data-stale-title="Link no longer current" data-missing="This quote link is no longer current or has been disabled." data-config="The quote cannot be loaded because Firebase is not configured." data-downloading="Preparing PDF…" data-download-failed="The PDF could not be downloaded.">
       <h1 id="quote-view-title">Loading quote…</h1>
       <p id="quote-view-state" class="muted" role="status">Loading quote…</p>
+      <p id="quote-view-home" hidden><a href="/en/">LiczMat</a></p>
       <div id="quote-view-toolbar" class="quote-view-toolbar" hidden>
         <button type="button" class="btn btn-primary" id="quote-view-download">Download PDF</button>
         <button type="button" class="btn btn-ghost" id="quote-view-print">Print</button>

@@ -458,6 +458,7 @@
               <input id="quo-margin" type="text" inputmode="decimal">
             </label>
             <p class="muted field-note">Un pourcentage des matériaux, des autres coûts et de la main-d'œuvre réunis.</p>
+            <label class="check"><input id="quo-show-margin" type="checkbox"> <span>Afficher la marge au client</span></label>
             <dl class="quo-summary-list">
               <div><dt>Matériaux</dt><dd id="quo-fig-materials"></dd></div>
               <div><dt>Autres coûts</dt><dd id="quo-fig-other"></dd></div>
@@ -591,10 +592,10 @@
             </label>
             <button type="button" class="btn btn-primary btn-sm" id="quo-save-draft">Enregistrer le brouillon</button>
             <span class="muted" id="quo-saved" aria-live="polite"></span>
+            <p class="result warn show" id="quo-price-warning" hidden></p>
             <form id="ws-pdf-form" data-pdf-quote data-downloading="Préparation du PDF…" data-download-failed="Impossible de télécharger le PDF."><button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="download">Télécharger le PDF</button> <button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="print">Imprimer</button> <span class="quo-pdf-download-status" role="status"></span></form>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-share">Partager</button>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-csv">CSV</button>
-            <button type="button" class="btn btn-ghost btn-sm quo-delete-zone" id="quo-delete">Supprimer le devis</button>
             <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
               <p id="quo-delete-q"></p>
               <p class="ws-ask-row">
@@ -609,6 +610,10 @@
               <p class="muted" id="quo-share-note"></p>
             </div>
             <p class="muted" id="quo-share-account" hidden>Le partage nécessite un compte connecté. <a href="/app/">Mon compte</a></p>
+            <p class="muted" id="quo-share-company" hidden>Ajoute une entreprise dans Mon entreprise pour partager le devis. <a href="/fr/mon-entreprise/">Mon entreprise</a></p>
+          </section>
+          <section class="dash-sec">
+            <button type="button" class="btn btn-danger btn-sm quo-delete-zone" id="quo-delete">Supprimer le devis</button>
           </section>
         </div>
       </article>

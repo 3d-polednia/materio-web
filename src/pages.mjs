@@ -1477,9 +1477,10 @@ export function quotePdfBlock(lang, t, features, stamp = "") {
 /** Public shell around the exact same quote-document builder used by the owner page. */
 export function quoteViewMain(lang, t, features, stamp = "", copy) {
   return `<main id="main" tabindex="-1" class="quote-view-main">
-    <div class="wrap quote-view-wrap" data-title="${esc(copy.title)}" data-missing="${esc(copy.missing)}" data-config="${esc(copy.config)}" data-downloading="${esc(copy.downloading)}" data-download-failed="${esc(copy.downloadFailed)}">
+    <div class="wrap quote-view-wrap" data-title="${esc(copy.title)}" data-stale-title="${esc(t("quote_link_stale"))}" data-missing="${esc(copy.missing)}" data-config="${esc(copy.config)}" data-downloading="${esc(copy.downloading)}" data-download-failed="${esc(copy.downloadFailed)}">
       <h1 id="quote-view-title">${esc(copy.loading)}</h1>
       <p id="quote-view-state" class="muted" role="status">${esc(copy.loading)}</p>
+      <p id="quote-view-home" hidden><a href="${urlHome(lang)}">LiczMat</a></p>
       <div id="quote-view-toolbar" class="quote-view-toolbar" hidden>
         <button type="button" class="btn btn-primary" id="quote-view-download">${esc(copy.download)}</button>
         <button type="button" class="btn btn-ghost" id="quote-view-print">${esc(copy.print)}</button>
@@ -2376,6 +2377,7 @@ export function quotesMain(lang, t, features, stamp = "") {
               <input id="quo-margin" type="text" inputmode="decimal">
             </label>
             <p class="muted field-note">${esc(t("quo_margin_d"))}</p>
+            <label class="check"><input id="quo-show-margin" type="checkbox"> <span>${esc(t("quo_show_margin"))}</span></label>
             <dl class="quo-summary-list">
               <div><dt>${esc(t("quo_fig_materials"))}</dt><dd id="quo-fig-materials"></dd></div>
               <div><dt>${esc(t("quo_fig_other"))}</dt><dd id="quo-fig-other"></dd></div>
@@ -2425,10 +2427,10 @@ export function quotesMain(lang, t, features, stamp = "") {
             </label>
             <button type="button" class="btn btn-primary btn-sm" id="quo-save-draft">${esc(t("quo_save_draft"))}</button>
             <span class="muted" id="quo-saved" aria-live="polite"></span>
+            <p class="result warn show" id="quo-price-warning" hidden></p>
             <form id="ws-pdf-form" data-pdf-quote data-downloading="${esc(quoteViewCopy.downloading)}" data-download-failed="${esc(quoteViewCopy.downloadFailed)}"><button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="download">${esc(quoteViewCopy.download)}</button> <button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="print">${esc(quoteViewCopy.print)}</button> <span class="quo-pdf-download-status" role="status"></span></form>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-share">${esc(t("quo_share"))}</button>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-csv">CSV</button>
-            <button type="button" class="btn btn-ghost btn-sm quo-delete-zone" id="quo-delete">${esc(t("quo_delete_yes"))}</button>
             <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
               <p id="quo-delete-q"></p>
               <p class="ws-ask-row">
@@ -2443,6 +2445,10 @@ export function quotesMain(lang, t, features, stamp = "") {
               <p class="muted" id="quo-share-note"></p>
             </div>
             <p class="muted" id="quo-share-account" hidden>${esc(t("quo_share_account"))} <a href="${URL_APP}">${esc(t("nav_app"))}</a></p>
+            <p class="muted" id="quo-share-company" hidden>${esc(t("quo_share_company"))} <a href="${urlCompany(lang)}">${esc(t("companypage_title"))}</a></p>
+          </section>
+          <section class="dash-sec">
+            <button type="button" class="btn btn-danger btn-sm quo-delete-zone" id="quo-delete">${esc(t("quo_delete_yes"))}</button>
           </section>
         </div>
       </article>`;

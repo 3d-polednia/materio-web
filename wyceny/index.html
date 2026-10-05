@@ -458,6 +458,7 @@
               <input id="quo-margin" type="text" inputmode="decimal">
             </label>
             <p class="muted field-note">Procent liczony od materiału, dodatkowych kosztów i robocizny razem.</p>
+            <label class="check"><input id="quo-show-margin" type="checkbox"> <span>Pokaż marżę klientowi</span></label>
             <dl class="quo-summary-list">
               <div><dt>Materiał</dt><dd id="quo-fig-materials"></dd></div>
               <div><dt>Dodatkowe koszty</dt><dd id="quo-fig-other"></dd></div>
@@ -591,10 +592,10 @@
             </label>
             <button type="button" class="btn btn-primary btn-sm" id="quo-save-draft">Zapisz szkic</button>
             <span class="muted" id="quo-saved" aria-live="polite"></span>
+            <p class="result warn show" id="quo-price-warning" hidden></p>
             <form id="ws-pdf-form" data-pdf-quote data-downloading="Przygotowuję PDF…" data-download-failed="Nie udało się pobrać PDF."><button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="download">Pobierz PDF</button> <button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="print">Drukuj</button> <span class="quo-pdf-download-status" role="status"></span></form>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-share">Udostępnij</button>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-csv">CSV</button>
-            <button type="button" class="btn btn-ghost btn-sm quo-delete-zone" id="quo-delete">Usuń wycenę</button>
             <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
               <p id="quo-delete-q"></p>
               <p class="ws-ask-row">
@@ -609,6 +610,10 @@
               <p class="muted" id="quo-share-note"></p>
             </div>
             <p class="muted" id="quo-share-account" hidden>Udostępnianie wymaga zalogowanego konta. <a href="/app/">Moje konto</a></p>
+            <p class="muted" id="quo-share-company" hidden>Dodaj firmę w Moja firma, żeby udostępnić wycenę. <a href="/moja-firma/">Moja firma</a></p>
+          </section>
+          <section class="dash-sec">
+            <button type="button" class="btn btn-danger btn-sm quo-delete-zone" id="quo-delete">Usuń wycenę</button>
           </section>
         </div>
       </article>

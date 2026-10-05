@@ -100,7 +100,9 @@ const between = (html, open, close) => {
 const PAGES = collect();
 
 /** The three that translate in place: the container is in the markup and is empty. */
-const IN_PLACE = ["app/index.html", "app/dashboard/index.html", "p/index.html"];
+// p/index.html left this list on 2026-10-05 (AUDYT3 C4): it only forwards an old link to /wycena/.
+const IN_PLACE = ["app/index.html", "app/dashboard/index.html"];
+const REDIRECTS = ["p/index.html"];
 /** The error page is the only page the generator does not write. */
 const HAND_WRITTEN = ["404.html"];
 
@@ -189,12 +191,12 @@ checkAll("the Cyrillic name is written in Cyrillic", ["uk"],
 head("§3 every shipped page, both pickers");
 
 check("every localized page carries a picker the generator filled in",
-  WITH_PICKER.length === PAGES.length - IN_PLACE.length - HAND_WRITTEN.length,
+  WITH_PICKER.length === PAGES.length - IN_PLACE.length - HAND_WRITTEN.length - REDIRECTS.length,
   `${WITH_PICKER.length} of ${PAGES.length}`);
 
 checkAll("the five without one are exactly the five that cannot have one", PAGES,
   (x) => x.html.includes('<span class="lang-btn-name">')
-    || IN_PLACE.includes(x.file) || HAND_WRITTEN.includes(x.file),
+    || IN_PLACE.includes(x.file) || HAND_WRITTEN.includes(x.file) || REDIRECTS.includes(x.file),
   (x) => x.file);
 
 // Empty on purpose: those three have no language in their URL, so drawLangPicker() in

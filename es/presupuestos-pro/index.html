@@ -458,6 +458,7 @@
               <input id="quo-margin" type="text" inputmode="decimal">
             </label>
             <p class="muted field-note">Un porcentaje del material, los otros costes y la mano de obra juntos.</p>
+            <label class="check"><input id="quo-show-margin" type="checkbox"> <span>Mostrar el margen al cliente</span></label>
             <dl class="quo-summary-list">
               <div><dt>Material</dt><dd id="quo-fig-materials"></dd></div>
               <div><dt>Otros costes</dt><dd id="quo-fig-other"></dd></div>
@@ -591,10 +592,10 @@
             </label>
             <button type="button" class="btn btn-primary btn-sm" id="quo-save-draft">Guardar borrador</button>
             <span class="muted" id="quo-saved" aria-live="polite"></span>
+            <p class="result warn show" id="quo-price-warning" hidden></p>
             <form id="ws-pdf-form" data-pdf-quote data-downloading="Preparando el PDF…" data-download-failed="No se pudo descargar el PDF."><button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="download">Descargar PDF</button> <button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="print">Imprimir</button> <span class="quo-pdf-download-status" role="status"></span></form>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-share">Compartir</button>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-csv">CSV</button>
-            <button type="button" class="btn btn-ghost btn-sm quo-delete-zone" id="quo-delete">Eliminar el presupuesto</button>
             <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
               <p id="quo-delete-q"></p>
               <p class="ws-ask-row">
@@ -609,6 +610,10 @@
               <p class="muted" id="quo-share-note"></p>
             </div>
             <p class="muted" id="quo-share-account" hidden>Para compartir es necesario iniciar sesión. <a href="/app/">Mi cuenta</a></p>
+            <p class="muted" id="quo-share-company" hidden>Añade una empresa en Mi empresa para compartir el presupuesto. <a href="/es/mi-empresa/">Mi empresa</a></p>
+          </section>
+          <section class="dash-sec">
+            <button type="button" class="btn btn-danger btn-sm quo-delete-zone" id="quo-delete">Eliminar el presupuesto</button>
           </section>
         </div>
       </article>

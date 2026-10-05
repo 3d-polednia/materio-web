@@ -393,9 +393,10 @@ function quoProjectRow(row) {
       amountMinor: row.minor,
     }, row.key);
   }
+  const figure = [row.qty, quoMoney(row.minor, row.currencyCode)].filter((part) => String(part || "").trim()).join(" · ");
   return `<li data-key="${quoEsc(row.key)}">
       <span class="row-name"><b>${quoEsc(row.name)}</b></span>
-      <span class="dash-fig">${quoEsc(row.qty)} · ${quoEsc(quoMoney(row.minor, row.currencyCode))}</span>
+      <span class="dash-fig">${quoEsc(figure)}</span>
       <span class="row-actions">
         <button type="button" class="btn btn-ghost btn-sm" data-project-row-edit>${quoEsc(quoT("proj_mat_edit"))}</button>
         <button type="button" class="btn btn-ghost btn-sm" data-hide-row>${quoEsc(quoT("quo_hide_row"))}</button>
@@ -445,7 +446,7 @@ function quoLineRow(list, line) {
     ? `<em class="muted">${quoEsc(quoT("quo_lump"))}</em>`
     : `<b>${quoNum(line.quantity)} ${quoEsc(line.unit)}</b>`;
   const at = rate !== null
-    ? `<em class="muted ws-mat-price">× ${quoEsc(quoMoney(Math.round(rate), code))}</em>` : "";
+    ? `<em class="muted ws-mat-price">${line.quantity === null ? "" : "× "}${quoEsc(quoMoney(Math.round(rate), code))}</em>` : "";
   const amount = line.amountMinor > 0
     ? `<em class="muted">${rate !== null ? "= " : ""}${quoEsc(quoMoney(line.amountMinor, code))}</em>` : "";
   return `<li class="ws-mat" data-line="${quoEsc(line.id)}" data-list="${list}">
@@ -608,8 +609,11 @@ function quoRenderDetail(id) {
   const company = companies.find((row) => row.id === companyId) || null;
   const share = document.getElementById("quo-share");
   if (share) { share.disabled = !company; share.title = company ? "" : quoT("quo_pdf_company"); }
+  const hasAccount = Boolean(window.lmAccount && window.lmAccount.uid);
   const accountNote = document.getElementById("quo-share-account");
-  if (accountNote) accountNote.hidden = Boolean(window.lmAccount && window.lmAccount.uid && window.lmAccount.shareQuote);
+  if (accountNote) accountNote.hidden = hasAccount;
+  const companyNote = document.getElementById("quo-share-company");
+  if (companyNote) companyNote.hidden = Boolean(company) || !hasAccount;
   document.getElementById("quo-company-preview").textContent = company
     ? [company.name, company.nip && `${LMTaxId.taxId(company.country, quoT("company_nip")).label} ${company.nip}`, company.city].filter(Boolean).join(" · ") : "";
   document.getElementById("quo-company-empty").hidden = companies.length > 0;
@@ -654,8 +658,8 @@ function quoRenderDetail(id) {
   const stored = money.vatPct === null ? "" : String(money.vatPct);
   const foreign = stored !== "" && rates.indexOf(Number(stored)) === -1;
   vat.innerHTML = `<option value="">${quoEsc(quoT("quo_vat_none"))}</option>`
-    + rates.map((rate) => `<option value="${rate}">${quoEsc(String(rate).replace(".", ","))} %</option>`).join("")
-    + (foreign ? `<option value="${quoEsc(stored)}">${quoEsc(stored.replace(".", ","))} %</option>` : "")
+    + rates.map((rate) => `<option value="${rate}">${quoEsc(String(rate).replace(".", ","))}%</option>`).join("")
+    + (foreign ? `<option value="${quoEsc(stored)}">${quoEsc(stored.replace(".", ","))}%</option>` : "")
     + `<option value="custom">${quoEsc(quoT("quo_vat_custom"))}</option>`;
   vat.value = stored;
   vatCustom.hidden = true;
@@ -665,6 +669,22 @@ function quoRenderDetail(id) {
   // Never overwritten while it has the focus: the visitor is typing into it.
   if (margin && document.activeElement !== margin) {
     margin.value = money.marginPct ? String(money.marginPct) : "";
+  }
+  const showMargin = document.getElementById("quo-show-margin");
+  if (showMargin) showMargin.checked = q.showMargin === true;
+
+  const quoteLines = crmQuoteLines(q);
+  const unpriced = [
+    ...quoteLines.projectRows.filter((row) => !row.hidden),
+    ...quoteLines.ownMaterials,
+    ...quoteLines.labour,
+  ].filter((line) => Number(line.minor == null ? line.amountMinor : line.minor) === 0).length;
+  const priceWarning = document.getElementById("quo-price-warning");
+  if (priceWarning) {
+    priceWarning.hidden = unpriced === 0;
+    priceWarning.textContent = unpriced === 1
+      ? quoT("quo_unpriced_one")
+      : quoT("quo_unpriced_many").replace("{count}", String(unpriced));
   }
 
   const note = document.getElementById("quo-note");
@@ -767,6 +787,7 @@ function wireQuoteDetail() {
     clearTimeout(quoMarginTimer);
     quoMarginTimer = setTimeout(() => crmUpdateQuote(quoOpenId, { marginMajor: e.target.value }), 400);
   });
+  on("quo-show-margin", "change", (e) => { crmUpdateQuote(quoOpenId, { showMargin: e.target.checked }); });
   on("quo-status", "change", (e) => { crmUpdateQuote(quoOpenId, { status: e.target.value }); });
   on("quo-company", "change", (e) => { crmUpdateQuote(quoOpenId, { companyId: e.target.value }); });
   on("quo-number", "change", (e) => { crmUpdateQuote(quoOpenId, { number: e.target.value }); });
@@ -976,9 +997,7 @@ function wireQuoteDetail() {
     if (margin) crmUpdateQuote(quoOpenId, { marginMajor: margin.value });
     if (quoEditing) document.getElementById("quo-edit-form").requestSubmit();
     if (quote && !quote.status) crmUpdateQuote(quoOpenId, { status: "draft" });
-    document.getElementById("quo-saved").textContent = `${quoT("quo_saved")} ${new Date().toLocaleTimeString(quoLang(), { hour: "2-digit", minute: "2-digit" })}`;
-    const id = quoOpenId;
-    setTimeout(() => { location.href = `${location.pathname}?saved=${encodeURIComponent(id)}`; }, 50);
+    document.getElementById("quo-saved").textContent = `${quoT("quo_saved")}.`;
   });
 
   on("quo-share", "click", async () => {

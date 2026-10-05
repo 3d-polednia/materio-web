@@ -458,6 +458,7 @@
               <input id="quo-margin" type="text" inputmode="decimal">
             </label>
             <p class="muted field-note">A percentage of the material, the other costs and the labour together.</p>
+            <label class="check"><input id="quo-show-margin" type="checkbox"> <span>Show margin to the client</span></label>
             <dl class="quo-summary-list">
               <div><dt>Material</dt><dd id="quo-fig-materials"></dd></div>
               <div><dt>Other costs</dt><dd id="quo-fig-other"></dd></div>
@@ -591,10 +592,10 @@
             </label>
             <button type="button" class="btn btn-primary btn-sm" id="quo-save-draft">Save draft</button>
             <span class="muted" id="quo-saved" aria-live="polite"></span>
+            <p class="result warn show" id="quo-price-warning" hidden></p>
             <form id="ws-pdf-form" data-pdf-quote data-downloading="Preparing PDF…" data-download-failed="The PDF could not be downloaded."><button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="download">Download PDF</button> <button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="print">Print</button> <span class="quo-pdf-download-status" role="status"></span></form>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-share">Share</button>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-csv">CSV</button>
-            <button type="button" class="btn btn-ghost btn-sm quo-delete-zone" id="quo-delete">Delete quote</button>
             <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
               <p id="quo-delete-q"></p>
               <p class="ws-ask-row">
@@ -609,6 +610,10 @@
               <p class="muted" id="quo-share-note"></p>
             </div>
             <p class="muted" id="quo-share-account" hidden>Sharing requires a signed-in account. <a href="/app/">My account</a></p>
+            <p class="muted" id="quo-share-company" hidden>Add a company in My company to share the quote. <a href="/en/my-company/">My company</a></p>
+          </section>
+          <section class="dash-sec">
+            <button type="button" class="btn btn-danger btn-sm quo-delete-zone" id="quo-delete">Delete quote</button>
           </section>
         </div>
       </article>

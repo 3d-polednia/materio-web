@@ -333,6 +333,7 @@ function pdfQuoteSnapshot(quoteId) {
     const rate = labour && typeof crmLabourRate === "function" ? crmLabourRate(line) : null;
     return {
       name: String(line.name || ""),
+      quantity,
       qtyText: quantity === null ? word("quo_lump")
         : `${typeof wsNum === "function" ? wsNum(quantity) : quantity} ${line.unit || ""}`.trim(),
       unitPriceMinor: quantity > 0
@@ -351,7 +352,7 @@ function pdfQuoteSnapshot(quoteId) {
   const cleanCompany = {};
   for (const key of ["name", "country", "street", "postalCode", "city", "nip", "phone", "email", "www", "bankAccount", "logo"])
     cleanCompany[key] = String(company[key] || "");
-  return JSON.parse(JSON.stringify({
+  const snapshot = {
     lang: document.documentElement.lang || "pl",
     company: cleanCompany,
     quote: { number: String(quote.number || ""), createdAt: Number(quote.createdAt) || 0,
@@ -375,7 +376,42 @@ function pdfQuoteSnapshot(quoteId) {
       otherText: totals.other === null ? per("other") : "",
     },
     visibility: { forBlock: Boolean(client || chain.project) },
-  }));
+  };
+  return JSON.parse(JSON.stringify(pdfClientQuoteSnapshot(snapshot, quote.showMargin === true)));
+}
+
+/** Put a hidden margin into client-facing lines, with the rounding remainder on the largest line. */
+function pdfClientQuoteSnapshot(snapshot, showMargin) {
+  if (!snapshot || showMargin || !snapshot.totals || snapshot.totals.mixed) return snapshot;
+  const totals = snapshot.totals;
+  const groups = ["materialRows", "otherRows", "labourRows"];
+  const refs = groups.flatMap((group) => (Array.isArray(snapshot[group]) ? snapshot[group] : [])
+    .map((row) => ({ group, row, value: Math.max(0, Math.round(Number(row.valueMinor) || 0)) })));
+  const source = refs.reduce((sum, ref) => sum + ref.value, 0);
+  const target = Math.max(0, Math.round(Number(totals.net) || 0));
+  if (source > 0 && refs.length) {
+    let assigned = 0;
+    refs.forEach((ref) => {
+      ref.next = Math.floor(ref.value * target / source);
+      assigned += ref.next;
+    });
+    const largest = refs.reduce((best, ref) => ref.value > best.value ? ref : best, refs[0]);
+    largest.next += target - assigned;
+    refs.forEach((ref) => {
+      ref.row.valueMinor = ref.next;
+      const qty = Number(ref.row.quantity);
+      ref.row.unitPriceMinor = qty > 0 ? Math.round(ref.next / qty) : null;
+    });
+    const groupTotal = (group) => refs.filter((ref) => ref.group === group)
+      .reduce((sum, ref) => sum + ref.next, 0);
+    totals.materials = groupTotal("materialRows");
+    totals.other = groupTotal("otherRows");
+    totals.labour = groupTotal("labourRows");
+  }
+  totals.subtotal = target;
+  totals.marginPct = 0;
+  totals.margin = 0;
+  return snapshot;
 }
 
 const pdfQuoteLogo = (value) => {
@@ -484,13 +520,13 @@ function pdfRenderQuote(doc, snap) {
   pdfShow(doc, "labour", (snap.labourRows || []).length > 0);
   put("subtotal", money(totals.subtotal));
   const marginWord = typeof t === "function" ? t("quo_fig_margin") : "Margin";
-  put("marginLabel", `${marginWord} ${percent(totals.marginPct)} %`);
+  put("marginLabel", `${marginWord} ${percent(totals.marginPct)}%`);
   put("margin", money(totals.margin));
   pdfShow(doc, "marginRow", Number(totals.marginPct) > 0);
   pdfShow(doc, "subtotal", Number(totals.marginPct) > 0);
   put("net", money(totals.net));
   pdfShow(doc, "net", totals.vatPct !== null);
-  const vatRate = totals.vatPct === null ? "" : `${percent(totals.vatPct)} %`;
+  const vatRate = totals.vatPct === null ? "" : `${percent(totals.vatPct)}%`;
   // The tax is named in the document's language (MwSt., DPH, TVA, ...), carried on the cell
   // by the template the same way the total's label is.
   doc.querySelectorAll('[data-pdf="vatLabel"]').forEach((el) => {

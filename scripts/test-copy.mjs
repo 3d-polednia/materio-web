@@ -501,9 +501,9 @@ const BUDGET = {
   // A full thirteen-language rebuild measures French at 556; these are existing form labels.
   // 2026-10-03, 560 -> 572, measured 568 words (fr): the phone error under both client forms
   // (hidden until a number is refused, but it is text the visitor can be shown).
-  company: 330, clients: 572, jobs: 544, quotes: 780, calendar: 450,
+  company: 330, clients: 572, jobs: 544, quotes: 800, calendar: 450,
   // 2026-10-01: public quote markup is widest in French at 176; four words remain for drift.
-  "quote-share": 180,
+  "quote-share": 190,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
      printed the key name localStorage, which is three words in French; widest is French at 650.
      2026-09-26: two more rows, the per-account sync clocks the account pages keep

@@ -200,6 +200,8 @@ head("1. a quote stores two of chapter XXII's five figures and derives the rest"
   eq("the name", q.name, "Łazienka — wycena");
   eq("the one link it stores is the project", q.projectId, project.id);
   eq("the margin is chapter XXII's, in percent", q.marginPct, 15);
+  eq("the client margin starts hidden", q.showMargin, false);
+  eq("the client margin can be shown", crm.crmUpdateQuote(q.id, { showMargin: true }).showMargin, true);
   eq("the labour starts empty", q.labour.length, 0);
   eq("the note", q.note, "Termin do końca miesiąca.");
 
@@ -1000,6 +1002,11 @@ head("9a. the quote owns the chain controls and the PDF document");
     pdf.includes("const lines = crmQuoteLines(quote);") &&
       pdf.includes('renderRows("materialRows", snap.materialRows)') &&
       pdf.includes('renderRows("labourRows", snap.labourRows)'));
+  const quoteUiSource = read("assets/quotes-ui.js");
+  check("the editor joins quantity and price only when both exist",
+    quoteUiSource.includes('.filter((part) => String(part || "").trim()).join(" · ")'));
+  check("VAT option labels have no space before percent",
+    quoteUiSource.includes('replace(".", ","))}%</option>') && !quoteUiSource.includes('replace(".", ","))} %</option>'));
 }
 
 head("9b. the copy, in four languages");

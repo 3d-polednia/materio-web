@@ -458,6 +458,7 @@
               <input id="quo-margin" type="text" inputmode="decimal">
             </label>
             <p class="muted field-note">Procento počítané z materiálu, dalších nákladů a práce dohromady.</p>
+            <label class="check"><input id="quo-show-margin" type="checkbox"> <span>Zobrazit marži klientovi</span></label>
             <dl class="quo-summary-list">
               <div><dt>Materiál</dt><dd id="quo-fig-materials"></dd></div>
               <div><dt>Další náklady</dt><dd id="quo-fig-other"></dd></div>
@@ -591,10 +592,10 @@
             </label>
             <button type="button" class="btn btn-primary btn-sm" id="quo-save-draft">Uložit koncept</button>
             <span class="muted" id="quo-saved" aria-live="polite"></span>
+            <p class="result warn show" id="quo-price-warning" hidden></p>
             <form id="ws-pdf-form" data-pdf-quote data-downloading="Připravuji PDF…" data-download-failed="PDF se nepodařilo stáhnout."><button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="download">Stáhnout PDF</button> <button type="submit" class="btn btn-ghost btn-sm" data-pdf-action="print">Tisk</button> <span class="quo-pdf-download-status" role="status"></span></form>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-share">Sdílet</button>
             <button type="button" class="btn btn-ghost btn-sm" id="quo-csv">CSV</button>
-            <button type="button" class="btn btn-ghost btn-sm quo-delete-zone" id="quo-delete">Smazat nabídku</button>
             <div id="quo-delete-ask" class="ws-ask mt-4" hidden>
               <p id="quo-delete-q"></p>
               <p class="ws-ask-row">
@@ -609,6 +610,10 @@
               <p class="muted" id="quo-share-note"></p>
             </div>
             <p class="muted" id="quo-share-account" hidden>Sdílení vyžaduje přihlášený účet. <a href="/app/">Můj účet</a></p>
+            <p class="muted" id="quo-share-company" hidden>Pro sdílení nabídky přidejte firmu v části Moje firma. <a href="/cs/moje-firma/">Moje firma</a></p>
+          </section>
+          <section class="dash-sec">
+            <button type="button" class="btn btn-danger btn-sm quo-delete-zone" id="quo-delete">Smazat nabídku</button>
           </section>
         </div>
       </article>

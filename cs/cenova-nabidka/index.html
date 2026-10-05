@@ -147,9 +147,10 @@
 </header>
 <div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main" tabindex="-1" class="quote-view-main">
-    <div class="wrap quote-view-wrap" data-title="Online nabídka" data-missing="Tento odkaz na nabídku již není aktuální nebo byl vypnut." data-config="Nabídku nelze načíst, protože Firebase není nastaven." data-downloading="Připravuji PDF…" data-download-failed="PDF se nepodařilo stáhnout.">
+    <div class="wrap quote-view-wrap" data-title="Online nabídka" data-stale-title="Odkaz již není aktuální" data-missing="Tento odkaz na nabídku již není aktuální nebo byl vypnut." data-config="Nabídku nelze načíst, protože Firebase není nastaven." data-downloading="Připravuji PDF…" data-download-failed="PDF se nepodařilo stáhnout.">
       <h1 id="quote-view-title">Načítání nabídky…</h1>
       <p id="quote-view-state" class="muted" role="status">Načítání nabídky…</p>
+      <p id="quote-view-home" hidden><a href="/cs/">LiczMat</a></p>
       <div id="quote-view-toolbar" class="quote-view-toolbar" hidden>
         <button type="button" class="btn btn-primary" id="quote-view-download">Stáhnout PDF</button>
         <button type="button" class="btn btn-ghost" id="quote-view-print">Tisk</button>
