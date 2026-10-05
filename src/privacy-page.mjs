@@ -25,6 +25,17 @@ import { LANG_NAME } from "./flags.mjs";
 
 export const PRIVACY = { pl, uk, de, en, cs, sk, ro, hr, sr, it, nl, es, fr };
 
+/**
+ * The date as the page's language writes it (AUDYT3 A7): "2 października 2026", not the ISO
+ * "2026-10-02" that stays in the datetime attribute for machines.
+ */
+function policyDate(policy) {
+  try {
+    return new Intl.DateTimeFormat(policy.lang, { dateStyle: "long", timeZone: "UTC" })
+      .format(new Date(`${policy.updated}T00:00:00Z`));
+  } catch (e) { return policy.updated; }
+}
+
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 }[c]));
@@ -46,26 +57,26 @@ function policyArticle(policy, prefix = "") {
 
   return `<article lang="${esc(policy.lang)}">
     <h1>${noLongDash(esc(policy.title))}</h1>
-    <p class="muted"><time datetime="${esc(policy.updated)}">${esc(policy.updated)}</time></p>
+    <p class="muted"><time datetime="${esc(policy.updated)}">${esc(policyDate(policy))}</time></p>
     ${note}
     ${toc}
     ${sections}
   </article>`;
 }
 
-export function privacyMain(policy) {
+export function privacyMain(policy, home = "LiczMat") {
   return `<main id="main" tabindex="-1" class="doc">
-    <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="${urlHome(policy.lang)}">LiczMat</a></li><li aria-current="page">${esc(policy.title)}</li></ol></nav>
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><ol><li><a href="${urlHome(policy.lang)}">${esc(home)}</a></li><li aria-current="page">${esc(policy.title)}</li></ol></nav>
     ${policyArticle(policy)}
   </main>`;
 }
 
-export function privacyBreadcrumbLd(policy) {
+export function privacyBreadcrumbLd(policy, home = "LiczMat") {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "LiczMat", item: BASE + urlHome(policy.lang) },
+      { "@type": "ListItem", position: 1, name: home, item: BASE + urlHome(policy.lang) },
       { "@type": "ListItem", position: 2, name: policy.title, item: BASE + urlPrivacy(policy.lang) },
     ],
   };

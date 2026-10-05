@@ -586,7 +586,8 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
       <div class="chips">${related}</div>
       ${guideLinks ? `<h2 class="mt-8">${esc(t("guide_calcs_back"))}</h2>
       <div class="chips">${guideLinks}</div>` : ""}
-      <p class="mt-6">
+      <!-- AUDYT3 A7: shared row keeps the calculator navigation buttons apart. -->
+      <p class="calc-page-actions mt-6">
         <a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
         <a class="btn btn-ghost btn-go" href="${urlGuideIndex(lang)}">${esc(t("guide_all"))}</a>
       </p>
@@ -1008,7 +1009,8 @@ export function contactMain(lang, t) {
       <dl class="facts">
         ${rows}
       </dl>
-      <p class="muted">${esc(t("contactpage_dispute"))}</p>
+      <!-- AUDYT3 A7: the follow-up paragraph needs space after the facts table. -->
+      <p class="contact-dispute muted">${esc(t("contactpage_dispute"))}</p>
     </div>
   </section>
 
