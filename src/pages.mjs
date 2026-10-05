@@ -67,6 +67,8 @@ const sectionAddButton = (id, label) => `<button type="button" class="section-ad
  * than opening an empty dialog.
  */
 export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) {
+  const fieldNumber = (value) => DECIMAL_POINT.has(t.lang || "")
+    ? String(value).replace(/,/g, ".") : String(value).replace(/\./g, ",");
   /* `data-lk` is the field's dictionary key, next to the value the field holds. Saving a
      result keeps what the visitor typed (chapter XV), and a saved line has to stay
      readable after a switch to another language — so the line keeps the key and the page
@@ -85,7 +87,7 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
     }
     // An optional field keeps its starting value; emptied, it shows the value the engine then
     // uses, so an empty field never stands for a number nobody can see (AUDYT3 C1).
-    const hint = ` value="${esc(f.def)}"` + (f.opt ? ` placeholder="${esc(f.fallback === undefined ? f.def : f.fallback)}"` : "");
+    const hint = ` value="${esc(fieldNumber(f.def))}"` + (f.opt ? ` placeholder="${esc(fieldNumber(f.fallback === undefined ? f.def : f.fallback))}"` : "");
     const errorId = `f-${calc.id}-${f.k}-error`;
     return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><input id="f-${calc.id}-${f.k}" type="text" inputmode="decimal" ${keys}${hint}><span id="${errorId}" class="field-error" role="alert" hidden></span></div>`;
   }).join("");
@@ -100,7 +102,10 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
     : "";
 
   const rows = example.rows
-    .map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("");
+    .map(([k, v]) => {
+      const numbered = String(v).match(/^§row-n:(\d+)§/);
+      return `<div><span>${esc(numbered ? k.replace("{n}", numbered[1]) : k)}</span><b>${esc(String(v).replace(/^§row-n:\d+§/, ""))}</b></div>`;
+    }).join("");
 
   // The card carries both labels so the script can swap them without a dictionary of its
   // own: "Policz" until the visitor has asked for a number, "Oblicz ponownie" after.
@@ -516,6 +521,19 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
     .filter((g) => g.calcs.includes(calc.id))
     .map((g) => `<a class="chip" href="${urlGuide(lang, g)}">${esc(t(`g_${g.id}_t`))}</a>`).join("");
 
+  const formulaMarkup = (() => {
+    if (!meta.algorithm) return `<pre class="formula"><code>${formula.map(esc).join("\n")}</code></pre>`;
+    const steps = [];
+    const equations = [];
+    for (const line of formula) {
+      const numbered = line.match(/^\d+\.\s*(.*)$/);
+      if (numbered) steps.push(numbered[1]);
+      else if (/^\s+/.test(line) && steps.length) steps[steps.length - 1] += ` ${line.trim()}`;
+      else equations.push(line);
+    }
+    return `<ol class="formula">${steps.map((step) => `<li>${esc(step)}</li>`).join("")}</ol>${equations.length ? `<pre class="formula"><code>${equations.map(esc).join("\n")}</code></pre>` : ""}`;
+  })();
+
   const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
     <div class="wrap">
@@ -528,7 +546,7 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
   <section class="block alt calc-tool">
     <div class="wrap">
       ${calcCard(calc, t, { materials, example, projectsUrl: urlProjects(lang) })}
-      ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>: ${esc(materials)} ${esc(t.plural("mat_count_label", materials))}</p>` : ""}
+      ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>: ${esc(t(["mat", "for", "calc"].join("_")).replace("{n}", materials))}</p>` : ""}
     </div>
   </section>
 
@@ -546,7 +564,7 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
         </div>
         <div>
           <h3>${esc(t("hwc_formula"))}</h3>
-          <pre class="formula"><code>${formula.map(esc).join("\n")}</code></pre>
+          ${formulaMarkup}
           <p class="muted src-note">${esc(t("hwc_source"))}</p>
         </div>
       </div>

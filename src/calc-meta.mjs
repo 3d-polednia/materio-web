@@ -35,7 +35,8 @@ export const CALC_META = {
   },
   wallpaper: {
     formula: [
-      "pas = {fld_pattern} > 0 → ⌈ {fld_height} ÷ {fld_pattern} ⌉ × {fld_pattern}; inaczej {fld_height}",
+      "długość do cięcia = {fld_height} + {fld_trim} ÷ 100",
+      "pas = {fld_pattern} > 0 → ⌈ długość do cięcia ÷ {fld_pattern} ⌉ × {fld_pattern}; inaczej długość do cięcia",
       "pasów potrzeba = ⌈ {fld_width} ÷ {fld_roll_w} ⌉",
       "pasów z rolki = ⌊ {fld_roll_l} ÷ pas ⌋",
       "rolki = ⌈ pasów potrzeba ÷ pasów z rolki ⌉",
@@ -57,10 +58,10 @@ export const CALC_META = {
     algorithm: true,
     formula: [
       "1. Rozwiń listę na pojedyncze formatki i posortuj malejąco po polu.",
-      "2. Każda formatka ląduje w wolnym prostokącie o najmniejszej resztce (best-area-fit),",
-      "   z obrotem o 90° jeśli {fld_rotate} jest włączony.",
-      "3. Cięcie gilotynowe dzieli wykorzystany prostokąt na odpad prawy i dolny,",
-      "   każdy pomniejszony o {fld_kerf}.",
+      "2. Umieść każdą formatkę w wolnym prostokącie, po którym zostaje najmniej wolnego pola.",
+      "   Obróć ją o 90° jeśli {fld_rotate} jest włączony i po obrocie pasuje lepiej.",
+      "3. Podziel wykorzystany prostokąt cięciem gilotynowym na prawy i dolny odpad.",
+      "   Pomniejsz oba odpady o {fld_kerf}.",
       "4. Gdy formatka nie mieści się nigdzie, otwierasz nową płytę.",
       "odpad = (płyty × {fld_sheet_w} × {fld_sheet_l} − Σ formatki) ÷ (płyty × {fld_sheet_w} × {fld_sheet_l}) × 100%",
     ],
@@ -117,7 +118,7 @@ export const CALC_META = {
   },
   studwall: {
     formula: [
-      "słupki = ⌊ {fld_width} ÷ {fld_stud_spacing} ⌋ + 1",
+      "słupki = ⌈ {fld_width} ÷ {fld_stud_spacing} ⌉ + 1",
       "profile CW = słupki × ⌈ {fld_height} ÷ {fld_bar_len} ⌉",
       "profile UW = ⌈ 2 × {fld_width} ÷ {fld_bar_len} ⌉",
       "kotwy = 2 × (⌊ {fld_width} ÷ 0,6 ⌋ + 1)",
@@ -176,6 +177,14 @@ export const FORMULA_I18N = {
     "opakowania styropianu": "EPS packs", "zajęte": "used", "element": "piece",
     "sztangi": "bars", "sztangę": "bar", "elementy": "pieces", "formatki": "parts",
     "formatka": "part", "inaczej": "otherwise",
+    "długość do cięcia": "cut length",
+    "Umieść każdą formatkę w wolnym prostokącie, po którym zostaje najmniej wolnego pola.":
+      "Place each part in the free rectangle that leaves the least free area.",
+    "Obróć ją o 90° jeśli": "Rotate it by 90° if",
+    "i po obrocie pasuje lepiej.": "is on and it fits better after rotation.",
+    "Podziel wykorzystany prostokąt cięciem gilotynowym na prawy i dolny odpad.":
+      "Split the used rectangle with a guillotine cut into a right and a bottom offcut.",
+    "Pomniejsz oba odpady o": "Reduce both offcuts by",
     "Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.":
       "Expand the list into individual pieces and sort them longest first.",
     "Każdy element trafia do pierwszej sztangi, w której się mieści:":
@@ -209,6 +218,14 @@ export const FORMULA_I18N = {
     "opakowania styropianu": "EPS-Pakete", "zajęte": "belegt", "element": "Teil",
     "sztangi": "Stangen", "sztangę": "Stange", "elementy": "Teile", "formatki": "Zuschnitte",
     "formatka": "Zuschnitt", "inaczej": "sonst",
+    "długość do cięcia": "Schnittlänge",
+    "Umieść każdą formatkę w wolnym prostokącie, po którym zostaje najmniej wolnego pola.":
+      "Jeden Zuschnitt in das freie Rechteck legen, das die kleinste freie Fläche übrig lässt.",
+    "Obróć ją o 90° jeśli": "Um 90° drehen, wenn",
+    "i po obrocie pasuje lepiej.": "eingeschaltet ist und der Zuschnitt gedreht besser passt.",
+    "Podziel wykorzystany prostokąt cięciem gilotynowym na prawy i dolny odpad.":
+      "Das genutzte Rechteck mit einem Guillotine-Schnitt in einen rechten und einen unteren Rest teilen.",
+    "Pomniejsz oba odpady o": "Beide Reste verkleinern um",
     "Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.":
       "Die Liste in einzelne Teile auflösen und nach Länge absteigend sortieren.",
     "Każdy element trafia do pierwszej sztangi, w której się mieści:":
@@ -242,6 +259,14 @@ export const FORMULA_I18N = {
     "opakowania styropianu": "упаковки пінопласту", "zajęte": "зайнято", "element": "елемент",
     "sztangi": "хлисти", "sztangę": "хлист", "elementy": "елементи", "formatki": "заготовки",
     "formatka": "заготовка", "inaczej": "інакше",
+    "długość do cięcia": "довжина відрізу",
+    "Umieść każdą formatkę w wolnym prostokącie, po którym zostaje najmniej wolnego pola.":
+      "Розмісти кожну заготовку у вільному прямокутнику, після якого лишається найменша вільна площа.",
+    "Obróć ją o 90° jeśli": "Поверни її на 90°, якщо",
+    "i po obrocie pasuje lepiej.": "увімкнено і після повороту вона поміщається краще.",
+    "Podziel wykorzystany prostokąt cięciem gilotynowym na prawy i dolny odpad.":
+      "Розділи використаний прямокутник гільйотинним різом на правий і нижній залишок.",
+    "Pomniejsz oba odpady o": "Зменш обидва залишки на",
     "Rozwiń listę na pojedyncze elementy i posortuj malejąco po długości.":
       "Розгорни список на окремі елементи і посортуй за спаданням довжини.",
     "Każdy element trafia do pierwszej sztangi, w której się mieści:":

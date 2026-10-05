@@ -116,7 +116,7 @@ function wsFillRoomSelect(card) {
   const bar = card.querySelector("[data-ws-bar]");
   if (bar) bar.hidden = rooms.length === 0;
   const empty = card.querySelector("[data-ws-empty]");
-  if (empty) empty.hidden = rooms.length > 0;
+  if (empty) empty.hidden = rooms.length > 0 || !wsHasAccount();
 }
 
 /** Put the room bar on one server-rendered calculator card and wire it. */
@@ -152,7 +152,7 @@ function wsWireCard(card) {
     const surface = surfaceSel ? surfaceSel.value : surfaces[0];
     Object.entries(wsRoomFill(room, calcId, surface)).forEach(([k, v]) => {
       const el = card.querySelector(`[data-k="${k}"]`);
-      if (el) el.value = wsPlain(v);
+      if (el) el.value = typeof calcFieldValue === "function" ? calcFieldValue(wsPlain(v), wsLang()) : wsPlain(v);
     });
     card.dataset.wsRoomName = room.name;
     // Chapter XVIII: the result about to be produced is a result *for this room*, so the

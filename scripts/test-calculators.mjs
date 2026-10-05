@@ -46,10 +46,10 @@ const { I18N_PAGES } = evalScript("assets/i18n-pages.js", ["I18N_PAGES"]);
 const { I18N_MATERIALS } = evalScript("assets/i18n-materials.js", ["I18N_MATERIALS"]);
 const {
   CALCS, ENGINES, localizeRow, unitLabel, pluralForm, num, orDefault, parseCuts, parsePieces,
-  invalidFields,
+  invalidFields, calcFieldValue,
 } = evalScript(["assets/units.js", "assets/calculators.js"], [
   "CALCS", "ENGINES", "localizeRow", "unitLabel", "pluralForm", "num", "orDefault",
-  "parseCuts", "parsePieces", "invalidFields",
+  "parseCuts", "parsePieces", "invalidFields", "calcFieldValue",
 ]);
 
 const CODES = LANGS.map((l) => l.code);
@@ -179,18 +179,18 @@ head("matematyka");
 }
 
 {
-  // wallpaper: strip = ⌈height ÷ repeat⌉ × repeat (or the height); strips = ⌈wall ÷ roll width⌉;
+  // wallpaper: strip = height + trim, rounded to the repeat; strips = ⌈wall ÷ roll width⌉;
   // per roll = ⌊roll length ÷ strip⌋; rolls = ⌈strips ÷ per roll⌉.
-  // 4 m ÷ 0,53 = 7,55 → 8 strips of 2,6 m; 10,05 ÷ 2,6 = 3,86 → 3 per roll; ⌈8 ÷ 3⌉ = 3.
+  // 4 m ÷ 0,53 = 7,55 → 8 strips of 2,7 m; 10,05 ÷ 2,7 = 3,72 → 3 per roll; ⌈8 ÷ 3⌉ = 3.
   const r = run("wallpaper");
-  eq("wallpaper: 8 strips of 2,6 m → 3 rolls", r.tobuy, 3);
+  eq("wallpaper: 10 cm trim makes 8 strips of 2,7 m → 3 rolls", r.tobuy, 3);
   eq("wallpaper: 3 strips out of one roll", rowNum(r, "res_strips_roll"), 3);
   // A pattern repeat lengthens the strip and can cost a whole roll:
-  // 3,3 m wall → ⌊10,05 ÷ 3,3⌋ = 3 per roll → 3 rolls; with a 0,5 m repeat the strip
-  // grows to ⌈3,3 ÷ 0,5⌉ × 0,5 = 3,5 m → ⌊10,05 ÷ 3,5⌋ = 2 per roll → 4 rolls.
-  eq("wallpaper: 3,3 m wall, no repeat → 3 rolls", run("wallpaper", { wallH: "3.3" }).tobuy, 3);
+  // A 3,3 m wall plus 0,1 m trim yields two strips per roll and 4 rolls. With a 0,5 m
+  // repeat it rounds from 3,4 m to 3,5 m and remains two strips per roll.
+  eq("wallpaper: 3,3 m wall plus trim, no repeat → 4 rolls", run("wallpaper", { wallH: "3.3" }).tobuy, 4);
   const rep = run("wallpaper", { wallH: "3.3", pattern: "0.5" });
-  eq("wallpaper: the same wall with a 0,5 m repeat → 4 rolls", rep.tobuy, 4);
+  eq("wallpaper: the same wall with trim and a 0,5 m repeat → 4 rolls", rep.tobuy, 4);
   eq("wallpaper: the repeat rounds the strip up to 3,5 m", /\|n:3\.5\|/.test(rep.rows[0][1]), true);
 }
 
@@ -202,6 +202,8 @@ head("matematyka");
   eq("linear: 18 pieces into 5 bars", r.tobuy, 5);
   eq("linear: 18 pieces counted", rowNum(r, "res_pieces_cut"), 18);
   eq("linear: 2400 of 30 000 mm wasted = 8 %", rowNum(r, "res_waste"), 8);
+  eq("linear: every plan row uses the numbered label key", r.rows.filter((x) => x[0] === "res_bar_n").length, 5);
+  check("linear: the row number is carried separately from the cut values", /^§row-n:1§2400/.test(r.rows.find((x) => x[0] === "res_bar_n")[1]));
 }
 
 {
@@ -257,23 +259,25 @@ head("matematyka");
   eq("insulation: 160 boards of 0,5 m²", rowNum(r, "res_foam_boards"), 160);
   eq("insulation: 80 × 6 = 480 dowels", rowNum(r, "res_dowels"), 480);
   eq("insulation: 80 × 5 = 400 kg of adhesive", rowNum(r, "res_adhesive"), 400);
+  check("insulation: adhesive also says 16 bags of 25 kg", /\|n:16\| \|res_bags\| × 25 kg/.test(r.rows.find((x) => x[0] === "res_adhesive")[1]));
+  eq("insulation: one pack contains 4 boards", rowNum(r, "res_boards_per_pkg"), 4);
   eq("insulation: mesh with a 10 % overlap = 88 m²", rowNum(r, "res_mesh"), 88);
   // Half the thickness is twice the coverage per pack: 0,30 ÷ 0,075 = 4 m².
   eq("insulation: a 7,5 cm pack covers 4 m² → 20 packs", run("insulation", { foamThk: "7.5" }).tobuy, 20);
 }
 
 {
-  // studwall: studs across = ⌊width ÷ spacing⌋ + 1; bars per stud = ⌈height ÷ bar⌉;
+  // studwall: studs across = ⌈width ÷ spacing⌉ + 1; bars per stud = ⌈height ÷ bar⌉;
   // boards = ⌈area × sides × 1,1 ÷ 2,4⌉.
   const r = run("studwall");
-  eq("studwall: 4 m ÷ 0,6 → 7 uprights", rowNum(r, "res_stud_count"), 7);
-  eq("studwall: 7 bars, one per upright at 2,6 m", rowNum(r, "res_studs"), 7);
+  eq("studwall: 4 m ÷ 0,6 plus both ends → 8 uprights", rowNum(r, "res_stud_count"), 8);
+  eq("studwall: 8 bars, one per upright at 2,6 m", rowNum(r, "res_studs"), 8);
   eq("studwall: ⌈8 m ÷ 3⌉ = 3 track bars", rowNum(r, "res_tracks"), 3);
   eq("studwall: 14 anchors", rowNum(r, "res_anchors"), 14);
   eq("studwall: 10,4 m² × 2 sides × 1,1 ÷ 2,4 = 10 boards", r.tobuy, 10);
   eq("studwall: a 3.12 m² board cuts the same wall to 8 boards", run("studwall", { boardArea: "3.12" }).tobuy, 8);
   // Taller than one bar is two bars per upright — the number session 11 put on the page.
-  eq("studwall: a 3,5 m wall needs 14 stud bars", rowNum(run("studwall", { height: "3.5" }), "res_studs"), 14);
+  eq("studwall: a 3,5 m wall needs 16 stud bars", rowNum(run("studwall", { height: "3.5" }), "res_studs"), 16);
 }
 
 {
@@ -281,9 +285,10 @@ head("matematyka");
   // 4 m ÷ 0,4 → 11 runs × 5 m = 55 m → ⌈55 ÷ 4⌉ = 14 bars.
   const r = run("ceiling");
   eq("ceiling: 20 m²", rowNum(r, "res_area"), 20);
-  eq("ceiling: 11 CD runs → 14 bars of 4 m", rowNum(r, "res_studs"), 14);
-  eq("ceiling: ⌈18 m ÷ 3⌉ = 6 UD bars", rowNum(r, "res_tracks"), 6);
+  eq("ceiling: 11 CD runs → 14 bars of 4 m", rowNum(r, "res_cd_profiles"), 14);
+  eq("ceiling: ⌈18 m ÷ 3⌉ = 6 UD bars", rowNum(r, "res_ud_profiles"), 6);
   eq("ceiling: 11 runs × 6 hanger rows = 66", rowNum(r, "res_hangers"), 66);
+  eq("ceiling: 14 bars over 11 runs need 3 CD connectors", rowNum(r, "res_cd_connectors"), 3);
   eq("ceiling: 18 m ÷ 0,6 = 30 wall anchors", rowNum(r, "res_anchors"), 30);
   eq("ceiling: 20 m² × 1,1 ÷ 2,4 = 10 boards", r.tobuy, 10);
   eq("ceiling: board area is used", run("ceiling", { boardArea: "3.12" }).tobuy, 8);
@@ -317,6 +322,8 @@ head("matematyka");
   eq("sheet: 2,4 m² of useful area", rowNum(r, "res_useful"), 2.4);
   eq("sheet: one 2800×2070 sheet is 5,796 m²", rowNum(r, "res_purchased"), 5.8);
   eq("sheet: regression baseline — the default form fits on one sheet", r.tobuy, 1);
+  eq("sheet: plan carries the full sheet width", r.plan.sheetW, 2800);
+  eq("sheet: plan carries placed piece dimensions", r.plan.sheets[0][0].w > 0 && r.plan.sheets[0][0].h > 0, true);
 }
 
 /* =================================================================== 2. INPUT DATA
@@ -492,8 +499,8 @@ eq("studwall: a 11,7 m wall at 0,9 m spacing has 14 uprights",
 // real remainder.
 eq("waste: 21,61 m² ÷ 1,44 needs a 16th pack", run("waste", { area: "21.61", cov: "1.44", waste: "0" }).tobuy, 16);
 eq("mortar: 100,1 kg needs a 5th bag", run("mortar", { area: "20.02", usage: "5", bag: "25" }).tobuy, 5);
-eq("studwall: a 1,21 m wall at 0,4 m spacing still has 4 uprights",
-  rowNum(run("studwall", { width: "1.21", studSp: "0.4" }), "res_stud_count"), 4);
+eq("studwall: a 1,21 m wall at 0,4 m spacing needs 5 uprights to include both ends",
+  rowNum(run("studwall", { width: "1.21", studSp: "0.4" }), "res_stud_count"), 5);
 eq("studwall: a 1,6 m wall at 0,4 m spacing has 5 uprights",
   rowNum(run("studwall", { width: "1.6", studSp: "0.4" }), "res_stud_count"), 5);
 
@@ -608,14 +615,14 @@ eq("grout: a hairline 0,1 mm joint is allowed", run("grout", { joint: "0.1" }).t
   eq("wallpaper: a wall taller than the roll is refused", run("wallpaper", { wallH: "11" }).err, "err_toobig");
   eq("wallpaper: a 2,6 m wall off a 2 m roll is refused",
     run("wallpaper", { wallW: "4", wallH: "2.6", rollW: "0.53", rollL: "2" }).err, "err_toobig");
-  eq("wallpaper: a strip exactly as long as the roll still counts",
-    run("wallpaper", { wallW: "4", wallH: "2", rollW: "0.53", rollL: "2" }).tobuy, 8);
+  eq("wallpaper: a strip exactly as long as the roll still counts when trim is zero",
+    run("wallpaper", { wallW: "4", wallH: "2", rollW: "0.53", rollL: "2", trim: "0" }).tobuy, 8);
 }
 {
   // The cutting plan is printed for eight bars; a longer job says how many are missing
   // rather than quietly showing eight.
   const r = run("linear", { stock: "6000", kerf: "3", cuts: "5000x12" });
-  eq("linear: 12 bars of plan → 8 shown", r.rows.filter((x) => x[0] === "res_bar").length, 8);
+  eq("linear: 12 bars of plan → 8 shown", r.rows.filter((x) => x[0] === "res_bar_n").length, 8);
   eq("linear: …and 4 declared as not shown", rowNum(r, "res_plan_more"), 4);
 }
 
@@ -624,6 +631,9 @@ eq("grout: a hairline 0,1 mm joint is allowed", run("grout", { joint: "0.1" }).t
    the form that language uses for that count. */
 
 head("lokalizacja");
+
+eq("field formatting: Polish writes 1,44", calcFieldValue("1.44", "pl"), "1,44");
+eq("field formatting: English writes 1.44", calcFieldValue("1,44", "en"), "1.44");
 
 // Polish and Ukrainian inflect a counted noun in three forms, German and English in two,
 // and an abbreviation in none.

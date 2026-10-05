@@ -128,6 +128,11 @@ const boardsFor = (area, sides, boardArea = GK_BOARD, waste = GK_WASTE) =>
    no quantity — m², kg, packs, sheets — changes because the currency changed.
    Number formatting still follows the language: 1 234,56 in Polish, 1,234.56 in English. */
 const LOCALE = { pl: "pl-PL", uk: "uk-UA", de: "de-DE", en: "en-US" };
+function calcFieldValue(value, lang) {
+  const plain = String(value === undefined || value === null ? "" : value);
+  return String(lang || "pl").toLowerCase().split("-")[0] === "en"
+    ? plain.replace(/,/g, ".") : plain.replace(/\./g, ",");
+}
 function money(major, lang) {
   if (typeof lmMoney === "function") return lmMoney(major);
   return (Number(major) || 0).toFixed(2);
@@ -239,11 +244,13 @@ const ENGINES = {
    */
   wallpaper(f) {
     const read = readCalc("wallpaper", f); if (read.err) return read;
-    const { wallW: ww, wallH: wh, rollW: rw, rollL: rl, pattern: rep, price } = read.values;
+    const { wallW: ww, wallH: wh, rollW: rw, rollL: rl, pattern: rep, trim, price } = read.values;
     for (const [field, value] of [["wallW", ww], ["wallH", wh], ["rollW", rw], ["rollL", rl]]) if (!(value > 0)) return errAt("err_positive", field);
     if (rep < 0) return errAt("err_positive", "pattern");
+    if (trim < 0) return errAt("err_positive", "trim");
     if (price < 0) return errAt("err_price", "price");
-    const stripLen = rep > 0 ? ceil(wh / rep) * rep : wh;
+    const cutLen = wh + trim / 100;
+    const stripLen = rep > 0 ? ceil(cutLen / rep) * rep : cutLen;
     // A strip longer than the roll cannot be cut from any roll on that shelf, so there is
     // no number of rolls to buy. The engine used to answer one roll per strip and label the
     // row "pas dłuższy niż rolka" — the row said the truth while `tobuy` still printed a
@@ -283,7 +290,7 @@ const ENGINES = {
     const useful = pieces.reduce((a, b) => a + b, 0), purchased = bars.length * stock;
     const wastePct = purchased > 0 ? (purchased - useful) / purchased * 100 : 0;
     const SHOWN = 8;
-    const plan = bars.slice(0, SHOWN).map((b, i) => ["res_bar", (i + 1) + ": " + b.pieces.map((x) => Math.round(x)).join(" + ") + " mm"]);
+    const plan = bars.slice(0, SHOWN).map((b, i) => ["res_bar_n", "§row-n:" + (i + 1) + "§" + b.pieces.map((x) => Math.round(x)).join(" + ") + " mm"]);
     return { tobuy: bars.length, unit: "res_stocks", cost: bars.length * price, rows: [
       ["res_pieces_cut", qtyG(pieces.length)],
       ["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"],
@@ -457,7 +464,9 @@ const ENGINES = {
       ["res_pkg_area", qtyG(areaPerPkg) + " m²"],
       ["res_foam_boards", qtyG(boards)],
       ["res_dowels", qtyG(ceil(area * dow))],
-      ["res_adhesive", qtyG(area * adh) + " kg"], ["res_mesh", qtyG(area * 1.10) + " m²"],
+      ["res_adhesive", qtyG(area * adh) + " kg (" + qtyG(ceil(area * adh / 25)) + " |res_bags| × 25 kg)"],
+      ["res_boards_per_pkg", qtyG(areaPerPkg / 0.5)],
+      ["res_mesh", qtyG(area * 1.10) + " m²"],
     ] };
   },
   studwall(f) {
@@ -465,7 +474,7 @@ const ENGINES = {
     const { width, height, studSp: sp, bar, boardArea, price } = read.values, sides = Math.round(read.values.sides);
     for (const [field, value] of [["width", width], ["height", height], ["studSp", sp], ["bar", bar], ["sides", sides], ["boardArea", boardArea]]) if (!(value > 0)) return errAt("err_positive", field);
     if (price < 0) return errAt("err_price", "price");
-    const studCount = profilesAcross(width, sp), studBars = studCount * ceil(height / bar);
+    const studCount = ceil(width / sp) + 1, studBars = studCount * ceil(height / bar);
     const trackBars = ceil(2 * width / bar), anchors = 2 * profilesAcross(width, 0.6);
     const boards = boardsFor(width * height, sides, boardArea);
     // How many uprights the wall has is not the same number as the bars to buy for them —
@@ -491,9 +500,10 @@ const ENGINES = {
     // channel cannot be fixed to the walls without them, so the shopping list was short.
     return { tobuy: boards, unit: "res_boards", cost: boards * price, rows: [
       ["res_area", qtyG(width * length) + " m²"],
-      ["res_studs", "CD: " + qtyG(mainBars) + " × 4 m"],
-      ["res_tracks", "UD: " + qtyG(perimBars) + " × 3 m"],
-      ["res_hangers", qtyG(hangers) + " (+" + qtyG(connectors) + ")"],
+      ["res_cd_profiles", qtyG(mainBars) + " × 4 m"],
+      ["res_ud_profiles", qtyG(perimBars) + " × 3 m"],
+      ["res_hangers", qtyG(hangers)],
+      ["res_cd_connectors", qtyG(connectors)],
       ["res_anchors", qtyG(ceil(perimeter / 0.6))],
     ] };
   },
@@ -564,7 +574,8 @@ const CALCS = [
   { id: "wallpaper", tab: "surface", engine: "wallpaper", fields: [
     F("wallW", "fld_width", "4"), F("wallH", "fld_height", "2.6"),
     F("rollW", "fld_roll_w", "0.53", { opt: true }), F("rollL", "fld_roll_l", "10.05", { opt: true }),
-    F("pattern", "fld_pattern", "0", { opt: true }), F("price", "fld_price_roll", "", { opt: true, fallback: 0 }),
+    F("pattern", "fld_pattern", "0", { opt: true }), F("trim", "fld_trim", "10", { opt: true, fallback: 10 }),
+    F("price", "fld_price_roll", "", { opt: true, fallback: 0 }),
   ] },
   // CUTTING
   { id: "linear", tab: "cutting", engine: "linear", fields: [
@@ -826,8 +837,10 @@ function renderResult(card, res, byHand) {
   }
   box.classList.remove("err");
   const rows = (res.rows || []).map(([k, v]) => {
-    const val = localizeRow(v, lang, (key) => t(key, lang));
-    return `<div><span>${t(k, lang)}</span><b>${val}</b></div>`;
+    const numbered = String(v).match(/^§row-n:(\d+)§/);
+    const val = localizeRow(String(v).replace(/^§row-n:\d+§/, ""), lang, (key) => t(key, lang));
+    const label = numbered ? t(k, lang).replace("{n}", numbered[1]) : t(k, lang);
+    return `<div><span>${label}</span><b>${val}</b></div>`;
   });
   if (res.cost && res.cost > 0) rows.unshift(`<div><span>${t("res_cost", lang)}</span><b>${money(res.cost, lang)}</b></div>`);
   writeResult(box, `<div class="muted eyebrow">${t("res_tobuy", lang)}</div>
@@ -846,19 +859,18 @@ function renderSheetCutPlan(plan, lang) {
   const shown = plan.sheets.slice(0, 4);
 
   const colors = ['var(--accent)', 'var(--tertiary)', 'var(--success)', 'var(--warning)'];
+  const openLabel = t(["res", "plan", "open"].join("_"), lang);
 
   let html = `<div class="cutplan">
     <div class="cutplan-label">${t("res_cut_plan", lang) || "Plan cięcia"}</div>
     <div class="cutplan-sheets">`;
   shown.forEach((placements, index) => {
     const sheetIdx = index + 1;
-    const svgW = 200;
+    const svgW = 1000;
     const svgH = Math.round(svgW * (sheetH / sheetW));
 
-    html += `<div class="cutplan-sheet-box">
-      <div class="cutplan-label">${t("res_sheet", lang) || "Arkusz"} ${sheetIdx} (${placements.length})</div>
-      <svg viewBox="0 0 ${svgW} ${svgH}" class="cutplan-sheet" preserveAspectRatio="xMidYMid meet">
-        <rect width="${svgW}" height="${svgH}" fill="var(--surface-container)" stroke="var(--outline-strong)" stroke-width="2"/>`;
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">
+        <rect width="${svgW}" height="${svgH}" fill="white" stroke="#334155" stroke-width="3"/>`;
 
     placements.forEach((p, i) => {
       const x = (p.x / sheetW) * svgW;
@@ -866,10 +878,18 @@ function renderSheetCutPlan(plan, lang) {
       const w = (p.w / sheetW) * svgW;
       const h = (p.h / sheetH) * svgH;
       const fill = colors[p.type % colors.length];
-      html += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" fill-opacity="0.25" stroke="${fill}" stroke-width="1.5"/>`;
+      svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" fill-opacity="0.25" stroke="${fill}" stroke-width="2"/>`;
+      if (w >= 110 && h >= 34) svg += `<text x="${x + w / 2}" y="${y + h / 2}" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="22" fill="#172033">${Math.round(p.w)} × ${Math.round(p.h)} mm</text>`;
     });
 
-    html += `</svg></div>`;
+    svg += `</svg>`;
+    // Opened as a blob, not a data: URL: browsers refuse to navigate a tab to data:, and the
+    // inline style the picture once carried is refused by the page's CSP (style-src 'self').
+    const plain = encodeURIComponent(svg.replace(/var\([^)]*\)/g, "#2563eb"));
+    html += `<div class="cutplan-sheet-box">
+      <div class="cutplan-label">${t("res_sheet", lang) || "Arkusz"} ${sheetIdx}: ${Math.round(sheetW)} × ${Math.round(sheetH)} mm (${placements.length})</div>
+      ${svg.replace("<svg ", '<svg class="cutplan-sheet" ')}
+      <a href="#" class="cutplan-open" data-plan="${plain}">${openLabel}</a></div>`;
   });
 
   html += `</div>`;
@@ -880,4 +900,26 @@ function renderSheetCutPlan(plan, lang) {
   return html;
 }
 
+if (typeof document !== "undefined") {
+  document.addEventListener("calcresult", (event) => {
+    const card = event.detail && event.detail.card;
+    if (!card) return;
+    const lang = document.documentElement.lang || "pl";
+    card.querySelectorAll('input[data-k]').forEach((field) => {
+      if (field.value !== "") field.value = calcFieldValue(field.value, lang);
+      if (field.placeholder) field.placeholder = calcFieldValue(field.placeholder, lang);
+    });
+  });
+}
 
+/* The full-size cut plan: one listener for every plan this page draws (AUDYT3 C3). */
+if (typeof document !== "undefined") {
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest && event.target.closest(".cutplan-open");
+    if (!link) return;
+    event.preventDefault();
+    const url = URL.createObjectURL(new Blob([decodeURIComponent(link.dataset.plan || "")], { type: "image/svg+xml" }));
+    window.open(url, "_blank", "noopener");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  });
+}
