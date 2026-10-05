@@ -83,7 +83,11 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
     if (f.ta) {
       return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><textarea id="f-${calc.id}-${f.k}" rows="3" ${keys}>${esc(f.def)}</textarea></div>`;
     }
-    return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><input id="f-${calc.id}-${f.k}" type="text" inputmode="decimal" ${keys} value="${esc(f.def)}"></div>`;
+    // An optional field keeps its starting value; emptied, it shows the value the engine then
+    // uses, so an empty field never stands for a number nobody can see (AUDYT3 C1).
+    const hint = ` value="${esc(f.def)}"` + (f.opt ? ` placeholder="${esc(f.fallback === undefined ? f.def : f.fallback)}"` : "");
+    const errorId = `f-${calc.id}-${f.k}-error`;
+    return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><input id="f-${calc.id}-${f.k}" type="text" inputmode="decimal" ${keys}${hint}><span id="${errorId}" class="field-error" role="alert" hidden></span></div>`;
   }).join("");
 
   const chips = calc.presets
@@ -589,7 +593,7 @@ export function guideIndexMain(lang, t, guides) {
         <b>${esc(t(`g_${g.id}_t`))}</b>
         <span class="muted">${esc(t(`g_${g.id}_d`))}</span>
       </span>
-      <span class="calc-link-go">${esc(t("calc_open"))}</span>
+      <span class="calc-link-go">${esc(t("guide_open"))}</span>
     </a>`).join("");
 
   const main = `<main id="main" tabindex="-1">

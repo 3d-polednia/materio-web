@@ -44,9 +44,27 @@ const ceil = (x) => Math.ceil(snap(x)), floor = (x) => Math.floor(snap(x));
  * own answer, and the ones here are NaN.
  */
 const typedDigits = (v) => {
-  const raw = [...String(v === undefined || v === null ? "" : v)].filter((ch) => ch.trim() !== "").join("");
-  const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
-  return cut === -1 ? raw : `${raw.slice(0, cut).replace(/[.,]/g, "")}.${raw.slice(cut + 1)}`;
+  const raw = String(v === undefined || v === null ? "" : v).replace(/[ \u00a0\u202f]/g, "");
+  if (!/^[+-]?\d+(?:[.,]\d+)*$/.test(raw)) return "";
+  const unsigned = raw.replace(/^[+-]/, ""), sign = raw.slice(0, raw.length - unsigned.length);
+  const seps = [...unsigned].filter((ch) => ch === "," || ch === ".");
+  if (!seps.length) return raw;
+  if (seps.length === 1) {
+    const cut = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+    return `${raw.slice(0, cut)}.${raw.slice(cut + 1)}`;
+  }
+  const kinds = new Set(seps);
+  if (kinds.size === 1) {
+    const groups = unsigned.split(seps[0]);
+    return groups[0].length <= 3 && groups.slice(1).every((g) => g.length === 3)
+      ? sign + groups.join("") : "";
+  }
+  const cut = Math.max(unsigned.lastIndexOf(","), unsigned.lastIndexOf("."));
+  const whole = unsigned.slice(0, cut), fraction = unsigned.slice(cut + 1);
+  const grouping = whole.includes(",") ? "," : ".";
+  const groups = whole.split(grouping);
+  if (!fraction || groups[0].length > 3 || !groups.slice(1).every((g) => g.length === 3)) return "";
+  return sign + groups.join("") + "." + fraction;
 };
 const num = (v) => { const n = parseFloat(typedDigits(v)); return isFinite(n) ? n : NaN; };
 /**
@@ -77,6 +95,28 @@ const orDefault = (v, fallback) => {
   const s = String(v === undefined || v === null ? "" : v).trim();
   return s === "" ? fallback : num(s);
 };
+
+/** Read one numeric calculator field, preserving its identity on failure. */
+function readField(field, raw) {
+  const blank = String(raw === undefined || raw === null ? "" : raw).trim() === "";
+  if (blank) return field.opt
+    ? { value: field.fallback === undefined ? num(field.def) : field.fallback }
+    : { err: "err_required", field: field.k };
+  const value = num(raw);
+  return Number.isFinite(value) ? { value } : { err: "err_number", field: field.k };
+}
+
+function readCalc(id, raw) {
+  const calc = CALCS.find((c) => c.id === id), values = {};
+  for (const field of calc.fields) {
+    if (field.ta) continue;
+    const got = readField(field, raw[field.k]);
+    if (got.err) return got;
+    values[field.k] = got.value;
+  }
+  return { values };
+}
+const errAt = (err, field) => ({ err, field });
 const GK_BOARD = 2.4, GK_WASTE = 10.0;
 const boardsFor = (area, sides, boardArea = GK_BOARD, waste = GK_WASTE) =>
   ceil((area * sides * (1 + waste / 100)) / boardArea);
@@ -153,9 +193,14 @@ function tryPlaceGuillotine(sheet, w, h, canRotate, kerf, type) {
 /* ---------- Engines (ports) ---------- */
 const ENGINES = {
   coverage(f) {
-    const gross = num(f.area), cov = num(f.cov), coats = Math.round(orDefault(f.coats, 1)), price = priceOf(f.price), open = num(f.openings) || 0;
-    if (!(gross > 0) || !(cov > 0) || coats < 1 || open < 0 || open > gross) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("coverage", f); if (read.err) return read;
+    const { area: gross, cov, openings: open, price } = read.values, coats = Math.round(read.values.coats);
+    if (!(gross > 0)) return errAt("err_positive", "area");
+    if (!(cov > 0)) return errAt("err_positive", "cov");
+    if (coats < 1) return errAt("err_positive", "coats");
+    if (open < 0) return errAt("err_positive", "openings");
+    if (open > gross) return errAt("err_openings", "openings");
+    if (price < 0) return errAt("err_price", "price");
     const net = Math.max(gross - open, 0), covered = net * coats;
     const units = ceil(covered / cov), purchased = units * cov;
     const wastePct = purchased > 0 ? (purchased - covered) / purchased * 100 : 0;
@@ -170,9 +215,12 @@ const ENGINES = {
     ] };
   },
   waste(f) {
-    const area = num(f.area), cov = num(f.cov), w = num(f.waste) || 0, price = priceOf(f.price);
-    if (!(area > 0) || !(cov > 0) || w < 0) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("waste", f); if (read.err) return read;
+    const { area, cov, waste: w, price } = read.values;
+    if (!(area > 0)) return errAt("err_positive", "area");
+    if (!(cov > 0)) return errAt("err_positive", "cov");
+    if (w < 0) return errAt("err_positive", "waste");
+    if (price < 0) return errAt("err_price", "price");
     const req = area * (1 + w / 100), pkgs = ceil(req / cov), purchased = pkgs * cov;
     const wastePct = purchased > 0 ? (purchased - area) / purchased * 100 : 0;
     // `purchased` is the m² those whole packs actually contain — the figure the waste
@@ -190,16 +238,18 @@ const ENGINES = {
    * them on the page. The arithmetic is unchanged.
    */
   wallpaper(f) {
-    const ww = num(f.wallW), wh = num(f.wallH), rw = orDefault(f.rollW, 0.53), rl = orDefault(f.rollL, 10.05), rep = num(f.pattern) || 0, price = priceOf(f.price);
-    if (!(ww > 0) || !(wh > 0) || !(rw > 0) || !(rl > 0) || rep < 0) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("wallpaper", f); if (read.err) return read;
+    const { wallW: ww, wallH: wh, rollW: rw, rollL: rl, pattern: rep, price } = read.values;
+    for (const [field, value] of [["wallW", ww], ["wallH", wh], ["rollW", rw], ["rollL", rl]]) if (!(value > 0)) return errAt("err_positive", field);
+    if (rep < 0) return errAt("err_positive", "pattern");
+    if (price < 0) return errAt("err_price", "price");
     const stripLen = rep > 0 ? ceil(wh / rep) * rep : wh;
     // A strip longer than the roll cannot be cut from any roll on that shelf, so there is
     // no number of rolls to buy. The engine used to answer one roll per strip and label the
     // row "pas dłuższy niż rolka" — the row said the truth while `tobuy` still printed a
     // figure that reads like an order. `linear` refuses a piece longer than the bar with
     // err_toobig; a strip longer than the roll is the same refusal.
-    if (stripLen > rl) return { err: "err_toobig" };
+    if (stripLen > rl) return errAt("err_toobig", "rollL");
     const stripsNeeded = ceil(ww / rw), stripsPerRoll = floor(rl / stripLen);
     const rolls = ceil(stripsNeeded / stripsPerRoll);
     return { tobuy: rolls, unit: "res_rolls", cost: rolls * price, rows: [
@@ -208,19 +258,21 @@ const ENGINES = {
     ] };
   },
   linear(f) {
-    const stock = num(f.stock), kerf = num(f.kerf) || 0, price = priceOf(f.price), cuts = parseCuts(f.cuts);
-    if (!(stock > 0) || kerf < 0 || kerf >= stock) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("linear", f); if (read.err) return read;
+    const { stock, kerf, price } = read.values, cuts = parseCuts(f.cuts);
+    if (!(stock > 0)) return errAt("err_positive", "stock");
+    if (kerf < 0 || kerf >= stock) return errAt("err_positive", "kerf");
+    if (price < 0) return errAt("err_price", "price");
     // Count the whole list first, expand it second: the row that breaks the ceiling can be
     // the last one, and by then the earlier rows would already be numbers in memory.
     let wanted = 0;
     for (const c of cuts) { if (!(c.len > 0) || c.q <= 0) continue; wanted += c.q; }
-    if (wanted > PACK_MAX_PIECES) return { err: "err_toomany" };
+    if (wanted > PACK_MAX_PIECES) return errAt("err_toomany", "cuts");
 
     const pieces = [];
     for (const c of cuts) { if (!(c.len > 0) || c.q <= 0) continue; for (let i = 0; i < c.q; i++) pieces.push(c.len); }
-    if (!pieces.length) return { err: "err_positive" };
-    if (Math.max(...pieces) > stock) return { err: "err_toobig" };
+    if (!pieces.length) return errAt("err_positive", "cuts");
+    if (Math.max(...pieces) > stock) return errAt("err_toobig", "cuts");
     pieces.sort((a, b) => b - a);
     const bars = [];
     for (const p of pieces) {
@@ -245,11 +297,14 @@ const ENGINES = {
     // 2D guillotine bin-packing — ported 1:1 from GuillotinePackingEngine.kt.
     // Free-rectangle guillotine split: on each placement the used free rect is cut into a
     // right and a bottom offcut, both shrunk by the kerf. Placement is best-area-fit.
-    const SW = num(f.sheetW), SH = num(f.sheetL), kerf = num(f.kerf) || 0, price = priceOf(f.price);
+    const read = readCalc("sheet", f); if (read.err) return read;
+    const { sheetW: SW, sheetL: SH, kerf, price } = read.values;
     const canRotate = String(f.rotate === undefined ? "1" : f.rotate) !== "0";
-    if (!(SW > 0) || !(SH > 0) || kerf < 0) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
-    if (kerf >= SW || kerf >= SH) return { err: "err_kerf" };
+    if (!(SW > 0)) return errAt("err_positive", "sheetW");
+    if (!(SH > 0)) return errAt("err_positive", "sheetL");
+    if (kerf < 0) return errAt("err_positive", "kerf");
+    if (price < 0) return errAt("err_price", "price");
+    if (kerf >= SW || kerf >= SH) return errAt("err_kerf", "kerf");
 
     const fitsSheet = (w, h) =>
       (w <= SW + PACK_EPS && h <= SH + PACK_EPS) || (canRotate && h <= SW + PACK_EPS && w <= SH + PACK_EPS);
@@ -259,22 +314,22 @@ const ENGINES = {
     const rows = [];
     let wanted = 0;
     for (const p of parsePieces(f.pieces)) {
-      if (!(p.w > 0) || !(p.l > 0)) return { err: "err_positive" };
+      if (!(p.w > 0) || !(p.l > 0)) return errAt("err_positive", "pieces");
       if (p.q <= 0) continue;
       wanted += p.q;
       rows.push(p);
     }
-    if (wanted > PACK_MAX_PIECES) return { err: "err_toomany" };
+    if (wanted > PACK_MAX_PIECES) return errAt("err_toomany", "pieces");
 
     const units = [];
     let type = 0;
     for (const p of rows) {
-      if (!fitsSheet(p.w, p.l)) return { err: "err_toobig" };
+      if (!fitsSheet(p.w, p.l)) return errAt("err_toobig", "pieces");
       // One colour per distinct piece row so the picture reads like the input list.
       for (let i = 0; i < p.q; i++) units.push({ w: p.w, h: p.l, type });
       type++;
     }
-    if (!units.length) return { err: "err_positive" };
+    if (!units.length) return errAt("err_positive", "pieces");
 
     // Largest area first — better packing.
     const sorted = units.slice().sort((a, b) => b.w * b.h - a.w * a.h);
@@ -288,7 +343,7 @@ const ENGINES = {
         const sheet = { index: sheets.length + 1, free: [{ x: 0, y: 0, w: SW, h: SH }], placements: [] };
         sheets.push(sheet);
         // Guaranteed to fit an empty sheet (validated above), but guard anyway.
-        if (!tryPlaceGuillotine(sheet, u.w, u.h, canRotate, kerf, u.type)) return { err: "err_toobig" };
+        if (!tryPlaceGuillotine(sheet, u.w, u.h, canRotate, kerf, u.type)) return errAt("err_toobig", "pieces");
       }
     }
 
@@ -315,9 +370,11 @@ const ENGINES = {
    * for the values the page opens with does not move.
    */
   concrete(f) {
-    const vol = num(f.vol), yield_ = orDefault(f.yield, 12.5), price = priceOf(f.price);
-    if (!(vol > 0) || !(yield_ > 0)) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("concrete", f); if (read.err) return read;
+    const { vol, yield: yield_, price } = read.values;
+    if (!(vol > 0)) return errAt("err_positive", "vol");
+    if (!(yield_ > 0)) return errAt("err_positive", "yield");
+    if (price < 0) return errAt("err_price", "price");
     const litres = vol * 1000, bags = ceil(litres / yield_);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
       ["res_volume_l", qtyG(litres) + " |res_water_l|"],
@@ -325,9 +382,10 @@ const ENGINES = {
     ] };
   },
   mortar(f) {
-    const area = num(f.area), usage = num(f.usage), bag = orDefault(f.bag, 25), price = priceOf(f.price);
-    if (!(area > 0) || !(usage > 0) || !(bag > 0)) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("mortar", f); if (read.err) return read;
+    const { area, usage, bag, price } = read.values;
+    for (const [field, value] of [["area", area], ["usage", usage], ["bag", bag]]) if (!(value > 0)) return errAt("err_positive", field);
+    if (price < 0) return errAt("err_price", "price");
     const kg = area * usage, bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [["res_kg_total", qtyG(kg) + " kg"]] };
   },
@@ -337,10 +395,10 @@ const ENGINES = {
    * all. It is a field now, at the same default — the same move as the concrete yield.
    */
   screed(f) {
-    const area = num(f.area), thk = num(f.thk), rate = orDefault(f.rate, 2.0);
-    const bag = orDefault(f.bag, 25), price = priceOf(f.price);
-    if (!(area > 0) || !(thk > 0) || !(rate > 0) || !(bag > 0)) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("screed", f); if (read.err) return read;
+    const { area, thk, rate, bag, price } = read.values;
+    for (const [field, value] of [["area", area], ["thk", thk], ["rate", rate], ["bag", bag]]) if (!(value > 0)) return errAt("err_positive", field);
+    if (price < 0) return errAt("err_price", "price");
     const kg = area * thk * rate, bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
       ["res_kg_total", qtyG(kg) + " kg"],
@@ -356,10 +414,10 @@ const ENGINES = {
    * all along. The 5 kg default is the `fuga-5` bag in assets/materials.js.
    */
   grout(f) {
-    const area = num(f.area), L = num(f.tileL), W = num(f.tileW), thk = num(f.tileThk), joint = num(f.joint);
-    const bag = orDefault(f.bag, 5), price = priceOf(f.price);
-    if (!(area > 0) || !(L > 0) || !(W > 0) || !(thk > 0) || !(joint > 0) || !(bag > 0)) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("grout", f); if (read.err) return read;
+    const { area, tileL: L, tileW: W, tileThk: thk, joint, bag, price } = read.values;
+    for (const [field, value] of [["area", area], ["tileL", L], ["tileW", W], ["tileThk", thk], ["joint", joint], ["bag", bag]]) if (!(value > 0)) return errAt("err_positive", field);
+    if (price < 0) return errAt("err_price", "price");
     const kgPerM2 = (L + W) / (L * W) * thk * joint * 1.8, kg = kgPerM2 * area;
     const bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
@@ -369,12 +427,16 @@ const ENGINES = {
   },
   masonry(f) {
     // `|| 5` turned a typed 0 into 5 % waste, so asking for no allowance quietly added one.
-    const area = num(f.area), open = num(f.openings) || 0, pcs = num(f.pieces), binder = num(f.binder) || 0, w = orDefault(f.waste, 5), price = priceOf(f.price);
+    const read = readCalc("masonry", f); if (read.err) return read;
+    const { area, openings: open, pieces: pcs, binder, waste: w, price } = read.values;
     // `coverage` above rejects `open > gross`; this engine clamped the same case to a net of
     // zero and answered "0 bloczków" as a valid result (audit 2026-09-04, M4). One calculator,
     // one answer: more openings than wall is bad data in both.
-    if (!(area > 0) || !(pcs > 0) || binder < 0 || w < 0 || open < 0 || open > area) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    if (!(area > 0)) return errAt("err_positive", "area");
+    if (!(pcs > 0)) return errAt("err_positive", "pieces");
+    for (const [field, value] of [["binder", binder], ["waste", w], ["openings", open]]) if (value < 0) return errAt("err_positive", field);
+    if (open > area) return errAt("err_openings", "openings");
+    if (price < 0) return errAt("err_price", "price");
     const net = Math.max(area - Math.max(open, 0), 0), units = ceil(net * pcs * (1 + w / 100));
     return { tobuy: units, unit: "res_pieces", cost: units * price, rows: [
       ["res_net", qtyG(net) + " m²"],
@@ -382,9 +444,10 @@ const ENGINES = {
     ] };
   },
   insulation(f) {
-    const area = num(f.area), dow = orDefault(f.dowels, 6), adh = orDefault(f.adhesive, 5), thk = orDefault(f.foamThk, 15), price = priceOf(f.price);
-    if (!(area > 0) || !(dow > 0) || !(adh > 0) || !(thk > 0)) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("insulation", f); if (read.err) return read;
+    const { area, dowels: dow, adhesive: adh, foamThk: thk, price } = read.values;
+    for (const [field, value] of [["area", area], ["dowels", dow], ["adhesive", adh], ["foamThk", thk]]) if (!(value > 0)) return errAt("err_positive", field);
+    if (price < 0) return errAt("err_price", "price");
     const areaPerPkg = 0.30 * 100 / thk, foamPkgs = ceil(area / areaPerPkg);
     // The old first row read "80 m² · 15 cm" — the two values already in the fields above
     // it. TradeCalc.insulation returns the two figures that actually explain the pack
@@ -398,9 +461,10 @@ const ENGINES = {
     ] };
   },
   studwall(f) {
-    const width = num(f.width), height = num(f.height), sp = orDefault(f.studSp, 0.6), bar = orDefault(f.bar, 3), sides = Math.round(orDefault(f.sides, 2)), price = priceOf(f.price);
-    if (!(width > 0) || !(height > 0) || !(sp > 0) || !(bar > 0) || sides < 1) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("studwall", f); if (read.err) return read;
+    const { width, height, studSp: sp, bar, price } = read.values, sides = Math.round(read.values.sides);
+    for (const [field, value] of [["width", width], ["height", height], ["studSp", sp], ["bar", bar], ["sides", sides]]) if (!(value > 0)) return errAt("err_positive", field);
+    if (price < 0) return errAt("err_price", "price");
     const studCount = profilesAcross(width, sp), studBars = studCount * ceil(height / bar);
     const trackBars = ceil(2 * width / bar), anchors = 2 * profilesAcross(width, 0.6);
     const boards = boardsFor(width * height, sides);
@@ -415,9 +479,10 @@ const ENGINES = {
     ] };
   },
   ceiling(f) {
-    const width = num(f.width), length = num(f.length), mainSp = orDefault(f.mainSp, 0.4), hangSp = orDefault(f.hangSp, 0.9), price = priceOf(f.price);
-    if (!(width > 0) || !(length > 0) || !(mainSp > 0) || !(hangSp > 0)) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("ceiling", f); if (read.err) return read;
+    const { width, length, mainSp, hangSp, price } = read.values;
+    for (const [field, value] of [["width", width], ["length", length], ["mainSp", mainSp], ["hangSp", hangSp]]) if (!(value > 0)) return errAt("err_positive", field);
+    if (price < 0) return errAt("err_price", "price");
     const runs = profilesAcross(width, mainSp), mainTotal = runs * length, mainBars = ceil(mainTotal / 4);
     const perimeter = 2 * (width + length);
     const perimBars = ceil(perimeter / 3), hangers = runs * profilesAcross(length, hangSp);
@@ -433,9 +498,11 @@ const ENGINES = {
     ] };
   },
   drylining(f) {
-    const area = num(f.area), adh = orDefault(f.adhesive, 5), price = priceOf(f.price);
-    if (!(area > 0) || !(adh > 0)) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("drylining", f); if (read.err) return read;
+    const { area, adhesive: adh, price } = read.values;
+    if (!(area > 0)) return errAt("err_positive", "area");
+    if (!(adh > 0)) return errAt("err_positive", "adhesive");
+    if (price < 0) return errAt("err_price", "price");
     const boards = boardsFor(area, 1), kg = area * adh, bags = ceil(kg / 25);
     return { tobuy: boards, unit: "res_boards", cost: boards * price, rows: [
       ["res_adhesive", qtyG(bags) + " × 25 kg (" + qtyG(kg) + " kg)"],
@@ -444,9 +511,11 @@ const ENGINES = {
   },
   sheathing(f) {
     // `|| 10` turned a typed 0 into a 10 % allowance nobody asked for.
-    const area = num(f.area), pw = num(f.pieceW), pl = num(f.pieceL), w = orDefault(f.waste, 10), price = priceOf(f.price);
-    if (!(area > 0) || !(pw > 0) || !(pl > 0) || w < 0) return { err: "err_positive" };
-    if (!(price >= 0)) return { err: "err_price" };
+    const read = readCalc("sheathing", f); if (read.err) return read;
+    const { area, pieceW: pw, pieceL: pl, waste: w, price } = read.values;
+    for (const [field, value] of [["area", area], ["pieceW", pw], ["pieceL", pl]]) if (!(value > 0)) return errAt("err_positive", field);
+    if (w < 0) return errAt("err_positive", "waste");
+    if (price < 0) return errAt("err_price", "price");
     const pieceArea = (pw / 1000) * (pl / 1000), withWaste = area * (1 + w / 100), pieces = ceil(withWaste / pieceArea);
     // The panel was the sheet count and nothing else. SheathingResult returns both of
     // these, and one sheet's area is the number that makes the count checkable.
@@ -479,49 +548,49 @@ const CALCS = [
   // SURFACES
   { id: "coverage", tab: "surface", engine: "coverage", fields: [
     F("area", "fld_area", "25"), F("cov", "fld_coverage_unit", "40"),
-    F("coats", "fld_coats", "2"), F("openings", "fld_openings", "0"), F("price", "fld_price_pkg", ""),
+    F("coats", "fld_coats", "2", { opt: true, fallback: 1 }), F("openings", "fld_openings", "0", { opt: true, fallback: 0 }), F("price", "fld_price_pkg", "", { opt: true, fallback: 0 }),
   ], presets: [
     { l: "Farba 10 l", k: "preset_paint", m: "farba-scienna-10" }, { l: "Grunt 5 l", k: "preset_primer", m: "grunt-gleb-5" },
     { l: "Gładź 20 kg", k: "preset_filler", m: "gladz-gips-20" }, { l: "Klej C2 25 kg", k: "preset_adhesive", m: "klej-c2-25" },
   ] },
   { id: "waste", tab: "surface", engine: "waste", fields: [
     F("area", "fld_area", "20"), F("cov", "fld_pkg_cov", "1.44"),
-    F("waste", "fld_waste", "7"), F("price", "fld_price_pkg", ""),
+    F("waste", "fld_waste", "7", { opt: true, fallback: 0 }), F("price", "fld_price_pkg", "", { opt: true, fallback: 0 }),
   ], presets: [
     { l: "Gres 60×60", k: "preset_gres1", m: "gres-60x60" }, { l: "Gres 120×278", k: "preset_gres2", m: "gres-120x278" },
     { l: "Panel AC4", k: "preset_panel", m: "panel-ac4" }, { l: "Glazura 30×60", k: "preset_glaze", m: "glaz-30x60" },
   ] },
   { id: "wallpaper", tab: "surface", engine: "wallpaper", fields: [
     F("wallW", "fld_width", "4"), F("wallH", "fld_height", "2.6"),
-    F("rollW", "fld_roll_w", "0.53"), F("rollL", "fld_roll_l", "10.05"),
-    F("pattern", "fld_pattern", "0"), F("price", "fld_price_roll", ""),
+    F("rollW", "fld_roll_w", "0.53", { opt: true }), F("rollL", "fld_roll_l", "10.05", { opt: true }),
+    F("pattern", "fld_pattern", "0", { opt: true }), F("price", "fld_price_roll", "", { opt: true, fallback: 0 }),
   ] },
   // CUTTING
   { id: "linear", tab: "cutting", engine: "linear", fields: [
-    F("stock", "fld_stock_len", "6000"), F("kerf", "fld_kerf", "3"),
-    F("cuts", "fld_cuts", "2400x4\n1800x6\n900x8", { ta: true }), F("price", "fld_price_bar", ""),
+    F("stock", "fld_stock_len", "6000"), F("kerf", "fld_kerf", "3", { opt: true, fallback: 0 }),
+    F("cuts", "fld_cuts", "2400x4\n1800x6\n900x8", { ta: true }), F("price", "fld_price_bar", "", { opt: true, fallback: 0 }),
   ] },
   { id: "sheet", tab: "cutting", engine: "sheet", fields: [
-    F("sheetW", "fld_sheet_w", "2800"), F("sheetL", "fld_sheet_l", "2070"), F("kerf", "fld_kerf", "3"),
+    F("sheetW", "fld_sheet_w", "2800"), F("sheetL", "fld_sheet_l", "2070"), F("kerf", "fld_kerf", "3", { opt: true, fallback: 0 }),
     F("pieces", "fld_pieces_list", "600x400x6\n800x300x4", { ta: true }),
     F("rotate", "fld_rotate", "1", { sel: [["1", "Tak", "opt_yes"], ["0", "Nie", "opt_no"]] }),
-    F("price", "fld_price_sheet", ""),
+    F("price", "fld_price_sheet", "", { opt: true, fallback: 0 }),
   ] },
   // TRADE
   { id: "concrete", tab: "trade", engine: "concrete", fields: [
-    F("vol", "fld_volume", "0.5"), F("yield", "fld_bag_yield", "12.5"), F("price", "fld_price_bag", ""),
+    F("vol", "fld_volume", "0.5"), F("yield", "fld_bag_yield", "12.5", { opt: true }), F("price", "fld_price_bag", "", { opt: true, fallback: 0 }),
   ] },
   { id: "mortar", tab: "trade", engine: "mortar", fields: [
-    F("area", "fld_area", "20"), F("usage", "fld_usage", "5"), F("bag", "fld_bag_kg", "25"), F("price", "fld_price_bag", ""),
+    F("area", "fld_area", "20"), F("usage", "fld_usage", "5"), F("bag", "fld_bag_kg", "25", { opt: true }), F("price", "fld_price_bag", "", { opt: true, fallback: 0 }),
   ] },
   { id: "screed", tab: "trade", engine: "screed", fields: [
-    F("area", "fld_area", "20"), F("thk", "fld_thickness", "40"), F("rate", "fld_kg_m2_mm", "2"),
-    F("bag", "fld_bag_kg", "25"), F("price", "fld_price_bag", ""),
+    F("area", "fld_area", "20"), F("thk", "fld_thickness", "40"), F("rate", "fld_kg_m2_mm", "2", { opt: true }),
+    F("bag", "fld_bag_kg", "25", { opt: true }), F("price", "fld_price_bag", "", { opt: true, fallback: 0 }),
   ] },
   { id: "grout", tab: "trade", engine: "grout", fields: [
     F("area", "fld_area", "20"), F("tileL", "fld_tile_len", "600"), F("tileW", "fld_tile_w", "600"),
     F("tileThk", "fld_tile_thk", "9"), F("joint", "fld_joint", "3"),
-    F("bag", "fld_bag_kg", "5"), F("price", "fld_price_bag", ""),
+    F("bag", "fld_bag_kg", "5", { opt: true }), F("price", "fld_price_bag", "", { opt: true, fallback: 0 }),
   ], presets: [
     // The same tile sizes the "tiles, panels, porcelain" calculator offers, minus the
     // laminate panel: a floating floor has no grouted joint. Only the two dimensions —
@@ -532,28 +601,28 @@ const CALCS = [
     { l: "Glazura 30×60", k: "preset_glaze", m: "glaz-30x60" },
   ] },
   { id: "masonry", tab: "trade", engine: "masonry", fields: [
-    F("area", "fld_area", "12"), F("openings", "fld_openings", "2"), F("pieces", "fld_pieces_per_m2", "11"),
-    F("binder", "fld_binder", "20"), F("waste", "fld_waste", "5"), F("price", "fld_price_pc", ""),
+    F("area", "fld_area", "12"), F("openings", "fld_openings", "2", { opt: true, fallback: 0 }), F("pieces", "fld_pieces_per_m2", "11"),
+    F("binder", "fld_binder", "20", { opt: true, fallback: 0 }), F("waste", "fld_waste", "5", { opt: true }), F("price", "fld_price_pc", "", { opt: true, fallback: 0 }),
   ] },
   { id: "insulation", tab: "trade", engine: "insulation", fields: [
-    F("area", "fld_area", "80"), F("foamThk", "fld_foam_thk", "15"), F("dowels", "fld_dowels_m2", "6"),
-    F("adhesive", "fld_adhesive_m2", "5"), F("price", "fld_price_pkg", ""),
+    F("area", "fld_area", "80"), F("foamThk", "fld_foam_thk", "15", { opt: true }), F("dowels", "fld_dowels_m2", "6", { opt: true }),
+    F("adhesive", "fld_adhesive_m2", "5", { opt: true }), F("price", "fld_price_pkg", "", { opt: true, fallback: 0 }),
   ] },
   // FRAMING
   { id: "studwall", tab: "framing", engine: "studwall", fields: [
-    F("width", "fld_width", "4"), F("height", "fld_height", "2.6"), F("studSp", "fld_stud_spacing", "0.6"),
-    F("bar", "fld_bar_len", "3"), F("sides", "fld_board_sides", "2", { sel: [["1", "1"], ["2", "2"]] }), F("price", "fld_price_board", ""),
+    F("width", "fld_width", "4"), F("height", "fld_height", "2.6"), F("studSp", "fld_stud_spacing", "0.6", { opt: true }),
+    F("bar", "fld_bar_len", "3", { opt: true }), F("sides", "fld_board_sides", "2", { opt: true, sel: [["1", "1"], ["2", "2"]] }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
   { id: "ceiling", tab: "framing", engine: "ceiling", fields: [
     F("width", "fld_width", "4"), F("length", "fld_length", "5"),
-    F("mainSp", "fld_main_spacing", "0.4"), F("hangSp", "fld_hanger_spacing", "0.9"), F("price", "fld_price_board", ""),
+    F("mainSp", "fld_main_spacing", "0.4", { opt: true }), F("hangSp", "fld_hanger_spacing", "0.9", { opt: true }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
   { id: "drylining", tab: "framing", engine: "drylining", fields: [
-    F("area", "fld_area", "12"), F("adhesive", "fld_adhesive_m2", "5"), F("price", "fld_price_board", ""),
+    F("area", "fld_area", "12"), F("adhesive", "fld_adhesive_m2", "5", { opt: true }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
   { id: "sheathing", tab: "framing", engine: "sheathing", fields: [
     F("area", "fld_area", "30"), F("pieceW", "fld_sheet_w", "1250"), F("pieceL", "fld_sheet_l", "2500"),
-    F("waste", "fld_waste", "10"), F("price", "fld_price_sheet", ""),
+    F("waste", "fld_waste", "10", { opt: true }), F("price", "fld_price_sheet", "", { opt: true, fallback: 0 }),
   ] },
 ];
 
@@ -582,12 +651,8 @@ function invalidFields(calcId, values) {
   const def = CALCS.find((c) => c.id === calcId);
   if (!def) return [];
   const engine = ENGINES[def.engine];
-  if (!engine || !engine(values).err) return [];
-  const opens = {};
-  def.fields.forEach((f) => { opens[f.k] = f.def; });
-  return def.fields
-    .filter((f) => !f.sel && engine({ ...opens, [f.k]: values[f.k] }).err)
-    .map((f) => f.k);
+  const result = engine && engine(values);
+  return result && result.err && result.field ? [result.field] : [];
 }
 
 /** Attach run / preset / Enter-key behaviour to one server-rendered `.calc` card. */
@@ -643,7 +708,13 @@ function wireCalculator(card) {
   // Editing anything says so until the next calculation clears it.
   if (stale) {
     card.querySelectorAll("[data-k]").forEach((el) =>
-      el.addEventListener("input", () => { stale.hidden = false; }));
+      el.addEventListener("input", () => {
+        stale.hidden = false;
+        el.removeAttribute("aria-invalid");
+        const message = card.querySelector(`#${el.id}-error`);
+        if (message) { message.hidden = true; message.textContent = ""; }
+        if (el.getAttribute("aria-describedby") === `${el.id}-error`) el.removeAttribute("aria-describedby");
+      }));
   }
 
   if (def.presets) card.querySelectorAll("[data-preset]").forEach((btn) => btn.addEventListener("click", () => {
@@ -715,18 +786,24 @@ function writeResult(box, html) {
  * `aria-describedby` this file did not write is left alone.
  */
 function markInvalidFields(card, res) {
-  const box = card.querySelector("[data-result]");
-  const id = box && box.id;
-  const values = {};
-  card.querySelectorAll("[data-k]").forEach((el) => (values[el.dataset.k] = el.value));
-  const bad = new Set(res.err ? invalidFields(card.dataset.calc, values) : []);
+  const bad = res.err && res.field ? res.field : "";
+  const lang = document.documentElement.lang || "pl";
   card.querySelectorAll("[data-k]").forEach((el) => {
-    if (bad.has(el.dataset.k)) {
+    const message = card.querySelector(`#${el.id}-error`);
+    if (bad === el.dataset.k) {
       el.setAttribute("aria-invalid", "true");
-      if (id) el.setAttribute("aria-describedby", id);
+      if (message) {
+        message.textContent = t(res.err, lang);
+        message.hidden = false;
+        el.setAttribute("aria-describedby", message.id);
+      }
     } else {
       el.removeAttribute("aria-invalid");
-      if (id && el.getAttribute("aria-describedby") === id) el.removeAttribute("aria-describedby");
+      if (message) {
+        message.hidden = true;
+        message.textContent = "";
+        if (el.getAttribute("aria-describedby") === message.id) el.removeAttribute("aria-describedby");
+      }
     }
   });
 }

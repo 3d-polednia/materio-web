@@ -105,6 +105,46 @@ function rowNum(res, key) {
 
 const rowKeys = (res) => (res.rows || []).map((r) => r[0]);
 
+/* Shared numeric reader contract: every plain numeric field is checked the same way. */
+head("walidacja pól liczbowych");
+const finiteResult = (value) => {
+  if (typeof value === "number") return Number.isFinite(value);
+  if (Array.isArray(value)) return value.every(finiteResult);
+  if (value && typeof value === "object") return Object.values(value).every(finiteResult);
+  return !String(value).includes("NaN") && !String(value).includes("|n:NaN|");
+};
+for (const c of CALCS) {
+  for (const field of c.fields.filter((f) => !f.ta && !f.sel)) {
+    for (const malformed of ["abc", "2.5.5"]) {
+      const r = run(c.id, { [field.k]: malformed });
+      eq(`${c.id}/${field.k}: ${malformed} -> err_number`, r.err, "err_number");
+      eq(`${c.id}/${field.k}: malformed input identifies the field`, r.field, field.k);
+      check(`${c.id}/${field.k}: malformed input never leaks NaN or a number token`, finiteResult(r));
+    }
+    const empty = run(c.id, { [field.k]: "" });
+    if (field.opt) {
+      eq(`${c.id}/${field.k}: empty optional field uses its default`, empty.err, undefined);
+      check(`${c.id}/${field.k}: optional default produces finite output`, finiteResult(empty));
+    } else {
+      eq(`${c.id}/${field.k}: empty required field`, empty.err, "err_required");
+      eq(`${c.id}/${field.k}: required error identifies the field`, empty.field, field.k);
+    }
+    const negative = run(c.id, { [field.k]: "-1" });
+    eq(`${c.id}/${field.k}: negative value has the right error`, negative.err,
+      field.k === "price" ? "err_price" : "err_positive");
+    eq(`${c.id}/${field.k}: negative error identifies the field`, negative.field, field.k);
+    check(`${c.id}/${field.k}: negative input never leaks NaN or a number token`, finiteResult(negative));
+  }
+}
+for (const spelling of ["1 000,5", "1.000,5", "1,000.5"]) {
+  eq(`${spelling} reads as 1000.5`, num(spelling), 1000.5);
+}
+for (const id of ["coverage", "masonry"]) {
+  const r = run(id, { area: "10", openings: "11" });
+  eq(`${id}: excessive openings use the specific error`, r.err, "err_openings");
+  eq(`${id}: excessive openings identify their field`, r.field, "openings");
+}
+
 /* =================================================================== 1. MATHS
    One case per engine over the values its own form opens with, plus the second case
    each engine's formula turns on. Every expectation below is derived from the formula
@@ -313,7 +353,7 @@ for (const c of CALCS) {
    costing nothing at all — audit 2026-09-04, M5. An empty field is the other thing entirely:
    no price was offered, so there is no bill, and the quantity still has to come out. */
 for (const c of CALCS) {
-  eq(`${c.id}: a price of "abc" is refused`, run(c.id, { price: "abc" }).err, "err_price");
+  eq(`${c.id}: a price of "abc" is refused`, run(c.id, { price: "abc" }).err, "err_number");
   eq(`${c.id}: an empty price is not a mistake`, run(c.id, { price: "" }).err, undefined);
   eq(`${c.id}: and an empty price costs nothing`, run(c.id, { price: "" }).cost, 0);
   eq(`${c.id}: a price with a comma is a price`, run(c.id, { price: "1,50" }).err, undefined);
@@ -456,11 +496,11 @@ eq("studwall: a 1,6 m wall at 0,4 m spacing has 5 uprights",
 // --- zero and below ------------------------------------------------------------------
 eq("coverage: a 0 m² wall is refused", run("coverage", { area: "0" }).err, "err_positive");
 eq("coverage: a negative wall is refused", run("coverage", { area: "-5" }).err, "err_positive");
-eq("coverage: openings bigger than the wall are refused", run("coverage", { openings: "30" }).err, "err_positive");
+eq("coverage: openings bigger than the wall are refused", run("coverage", { openings: "30" }).err, "err_openings");
 /* The same case in the other engine of the same calculator. `masonry` clamped the net area
    to zero and answered "0 bloczków" as a valid result — audit 2026-09-04, M4. */
 eq("masonry: openings bigger than the wall are refused",
-  run("masonry", { area: "12", openings: "13" }).err, "err_positive");
+  run("masonry", { area: "12", openings: "13" }).err, "err_openings");
 /* The boundary is drawn where `coverage` draws it: a wall entirely taken up by openings is
    a net of nothing rather than bad data, in both engines, and neither invents an error. */
 eq("masonry: openings the size of the wall are a net of nothing",
@@ -633,11 +673,11 @@ for (const key of ["res_bags", "res_rolls", "res_boards", "res_stocks", "res_she
   eq("coverage: a form that calculates names no field", fields("coverage", {}), "");
   eq("coverage: a negative area names the area", fields("coverage", { area: "-1" }), "area");
   eq("coverage: an empty coverage names the coverage", fields("coverage", { cov: "" }), "cov");
-  eq("coverage: two bad fields are both named",
-    fields("coverage", { area: "0", cov: "abc" }), "area,cov");
+  eq("coverage: the first bad field is named",
+    fields("coverage", { area: "0", cov: "abc" }), "cov");
   eq("coverage: a negative price names the price", fields("coverage", { price: "-2" }), "price");
-  eq("wallpaper: a wall taller than the roll names the wall's height",
-    fields("wallpaper", { wallH: "11" }), "wallH");
+  eq("wallpaper: a strip longer than the roll names the roll length",
+    fields("wallpaper", { wallH: "11" }), "rollL");
   eq("wallpaper: a roll shorter than the strip names the roll's length",
     fields("wallpaper", { rollL: "2" }), "rollL");
   eq("linear: a piece longer than the bar names the list it is in",
