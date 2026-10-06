@@ -965,7 +965,7 @@ head("14. what the page tells the browser it is allowed to run");
       .split(" ").filter((s) => s.trim() !== "");
     if (connectHosts.includes("https:")) bareWildcard = `${file}: connect-src`;
     for (const h of connectHosts) {
-      if (!/^(?:'self'|https:\/\/\*\.googleapis\.com|wss:\/\/\*\.googleapis\.com|https:\/\/\*\.cloudfunctions\.net|https:\/\/www\.googletagmanager\.com|https:\/\/\*\.google-analytics\.com|https:\/\/\*\.analytics\.google\.com|https:\/\/stats\.g\.doubleclick\.net|https:\/\/www\.gstatic\.com|https:\/\/overpass-api\.de|https:\/\/overpass\.kumi\.systems|blob:)$/.test(h)) {
+      if (!/^(?:'self'|https:\/\/\*\.googleapis\.com|wss:\/\/\*\.googleapis\.com|https:\/\/\*\.cloudfunctions\.net|https:\/\/www\.googletagmanager\.com|https:\/\/\*\.google-analytics\.com|https:\/\/\*\.analytics\.google\.com|https:\/\/stats\.g\.doubleclick\.net|https:\/\/www\.gstatic\.com|https:\/\/overpass-api\.de|https:\/\/overpass\.kumi\.systems|https:\/\/overpass\.private\.coffee|blob:)$/.test(h)) {
         invalidConnect = `${file}: ${h}`;
       }
     }

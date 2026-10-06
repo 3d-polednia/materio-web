@@ -734,7 +734,7 @@ const CSP_FIREBASE = "https://www.gstatic.com https://apis.google.com";
    - gstatic.com: the Firebase SDK is imported from there
    - overpass-api.de, overpass.kumi.systems: the two Overpass endpoints assets/stores.js queries for the shops map (see OVERPASS) */
 const CSP_CONNECT_BASE = "'self' blob:";
-const CSP_CONNECT_STORES = "https://overpass-api.de https://overpass.kumi.systems";
+const CSP_CONNECT_STORES = "https://overpass-api.de https://overpass.private.coffee https://overpass.kumi.systems";
 const CSP_CONNECT_ANALYTICS = "https://www.googletagmanager.com " +
   "https://*.google-analytics.com https://*.analytics.google.com " +
   "https://stats.g.doubleclick.net";
@@ -797,7 +797,9 @@ function withCsp(html) {
   const hasAnalytics = /googletagmanager\.com/.test(html);
   const hasFirebase = /<script type="module"/.test(html);
   const hasMap = /store-map/.test(html);
-  const hasStores = html.includes("/assets/stores.js");
+  // Either file name: the pages load the minified copy, and matching only "stores.js" left
+  // the Overpass mirrors out of the policy, so /sklepy/ refused its own list (2026-10-06).
+  const hasStores = /\/assets\/stores(\.min)?\.js/.test(html);
 
   const scriptHosts = [
     hasAnalytics ? CSP_ANALYTICS : "",

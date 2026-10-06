@@ -17,7 +17,14 @@ const TYPE_KEY = {
   trade: "st_trade", building_materials: "st_building",
   paint: "st_paint", tiles: "st_tiles", timber: "st_timber",
 };
-const OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"];
+// Three public Overpass servers, tried in turn: the main one answers 504 when it is busy,
+// and a list that fails on the first server is a list nobody sees (2026-10-06).
+const OVERPASS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+];
+const OVERPASS_WAIT_MS = 15000;
 const COUNTRY_VIEW = {
   pl: [51.92, 19.15, 6], de: [51.17, 10.45, 6], uk: [48.38, 31.17, 5],
   cs: [49.82, 15.47, 7], sk: [48.67, 19.70, 7], ro: [45.94, 24.97, 6],
@@ -44,12 +51,22 @@ function buildQuery(lat, lon) {
 async function fetchStores(lat, lon) {
   const q = buildQuery(lat, lon);
   let lastErr;
-  for (const url of OVERPASS) {
+  // Two rounds: a 504 from a busy server is usually gone a few seconds later.
+  const tries = OVERPASS.concat(OVERPASS);
+  for (let i = 0; i < tries.length; i++) {
+    const url = tries[i];
+    if (i === OVERPASS.length) await new Promise((r) => setTimeout(r, 2000));
     try {
-      const res = await fetch(url, { method: "POST", body: "data=" + encodeURIComponent(q), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      return data.elements || [];
+      // A server that does not answer in time is given up on, so the next one gets a turn.
+      const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+      const timer = ctrl ? setTimeout(() => ctrl.abort(), OVERPASS_WAIT_MS) : 0;
+      try {
+        const res = await fetch(url, { method: "POST", body: "data=" + encodeURIComponent(q),
+          headers: { "Content-Type": "application/x-www-form-urlencoded" }, signal: ctrl ? ctrl.signal : undefined });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        return data.elements || [];
+      } finally { clearTimeout(timer); }
     } catch (e) { lastErr = e; }
   }
   throw lastErr || new Error("overpass");
