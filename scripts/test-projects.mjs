@@ -409,7 +409,7 @@ head("7. delete");
 
   const token = ws.wsDeleteProject(b.id);
   check("the delete reports what it tombstoned",
-    Number.isInteger(token.at) && token.id === b.id && token.lines.length === 2);
+    Number.isInteger(token.at) && token.id === b.id && token.lines.length === 2 && token.rooms.length === 1);
   eq("the project is gone from every list", ws.wsAllProjects().length, 1);
   eq("and cannot be read by id", ws.wsProject(b.id), null);
   eq("its lines went with it", ws.wsEstimations(b.id).length, 0);
@@ -424,11 +424,12 @@ head("7. delete");
   eq("with the same stamp on its lines",
     raw.estimations.filter((e) => e.deletedAt === token.at).length, 2);
 
-  // A room is a physical place and outlives the project it was measured for. It used to
-  // be unlinked here, which threw away the one fact an undo needs.
-  eq("the room survives", ws.wsRooms().length, 1);
+  // D5 replaces the old rule that a project's delete did nothing to its rooms. Rooms are
+  // synced documents, so the cascade tombstones them and keeps the link for exact undo.
+  eq("the room is removed with the project", ws.wsRooms().length, 0);
   eq("still pointing at the project", ws.raw().rooms[0].projectId, b.id);
-  eq("and it is the room that was made", ws.wsRooms()[0].id, room.id);
+  eq("and its tombstone has the cascade stamp", ws.raw().rooms[0].deletedAt, token.at);
+  eq("and it is the room that was made", ws.raw().rooms[0].id, room.id);
 
   eq("deleting it twice does nothing the second time", ws.wsDeleteProject(b.id), null);
   eq("deleting something that is not there does nothing", ws.wsDeleteProject("nope"), null);

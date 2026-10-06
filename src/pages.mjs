@@ -1516,20 +1516,9 @@ export function projectsMain(lang, t, aisles = [], features = []) {
         </div>
 
         <div id="ws-project-body" hidden>
+          <section class="card ws-project-info">
+          <h2 id="ws-project-card-name"></h2>
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
-
-          <section class="dash-sec">
-            <div class="dash-head">
-              <h2>${esc(t("crm_quotes_t"))}</h2>
-              <button type="button" class="btn btn-primary btn-sm" id="ws-project-new-quote" hidden>${esc(t("proj_new_quote"))}</button>
-            </div>
-            <ul id="ws-chain-quotes" class="data-list"></ul>
-          </section>
-          <section class="dash-sec">
-            <div class="dash-head"><h2>${esc(t("crm_hist_t"))}</h2></div>
-            <p class="muted">${esc(t("crm_hist_note"))}</p>
-            <ul id="ws-chain-history" class="data-list"></ul>
-          </section>
 
           <!-- Chapter XVII: "Projekt może pokazywać: koszt materiałów, inne koszty, sumę
                projektu." The three are written by assets/workspace.js's wsProjectCosts(),
@@ -1611,6 +1600,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
               <button type="button" class="btn btn-ghost btn-sm" id="ws-delete-no">${esc(t("action_cancel"))}</button>
             </p>
           </div>
+          </section>
 
           <!-- Chapter XVIII: "Pomieszczenia są elementem projektu." It stands above the
                calculations because that is the order chapter XIV lists a project's parts
@@ -1630,7 +1620,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
               <form id="ws-proj-room-form">
                 <p class="ws-mat-grid">
                   <label class="ws-mat-f">
-                    <span class="ws-bar-label">${esc(t("ws_col_name"))}</span>
+                    <span class="ws-bar-label">${esc(t("ws_room_name"))}</span>
                     <input id="ws-proj-room-name" type="text" maxlength="120" required>
                   </label>
                   <label class="ws-mat-f ws-mat-f-sm">
@@ -1767,6 +1757,19 @@ export function projectsMain(lang, t, aisles = [], features = []) {
                 <p><button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button></p>
               </form>
             </details>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>${esc(t("crm_quotes_t"))}</h2>
+              <button type="button" class="btn btn-primary btn-sm" id="ws-project-new-quote" hidden>${esc(t("proj_new_quote"))}</button>
+            </div>
+            <ul id="ws-chain-quotes" class="data-list"></ul>
+          </section>
+          <section class="dash-sec">
+            <div class="dash-head"><h2>${esc(t("crm_hist_t"))}</h2></div>
+            <p class="muted">${esc(t("crm_hist_note"))}</p>
+            <ul id="ws-chain-history" class="data-list"></ul>
           </section>
 
           ${pdfBlock(lang, t, features)}

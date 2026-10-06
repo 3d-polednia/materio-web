@@ -174,6 +174,7 @@ head("0b. saved-line naming is material-aware, never room-aware");
   eq("grout is filed as chemicals", grout.category, "CHEMICALS");
   const bare = wsResolvedLine(card("coverage", { wsRoomName: "Kuchnia Moryc" }));
   eq("a missing material falls back to the calculator", bare.name, tr("pl")("c_coverage_t"));
+  eq("coverage without a catalog material is filed as paint", bare.category, "PAINT");
   check("the room never becomes the material name", bare.name !== "Kuchnia Moryc");
 }
 

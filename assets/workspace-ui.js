@@ -172,11 +172,10 @@ function wsDeleteQuestion(project) {
   const items = wsItems(project.id).length;
   const rooms = wsRooms(project.id).length;
   const gone = [];
-  if (lines) gone.push(`${wsT("ws_delete_calculations")} (${lines})`);
   if (items) gone.push(`${wsT("ws_delete_materials")} (${items})`);
   let text = wsT("ws_delete_named").replace("{name}", project.name);
   if (gone.length) text += ` ${wsT("ws_delete_disappear").replace("{parts}", gone.join(` ${wsT("ws_delete_and")} `))}`;
-  if (rooms) text += ` ${wsT("ws_delete_rooms_move").replace("{count}", rooms)}`;
+  if (rooms || lines) text += ` ${wsT("ws_delete_rooms_move").replace("{rooms}", rooms).replace("{calculations}", lines)}`;
   return text;
 }
 
@@ -776,6 +775,8 @@ function wsRenderProject(id) {
   }
 
   title.textContent = project.name;
+  const cardName = document.getElementById("ws-project-card-name");
+  if (cardName) cardName.textContent = project.name;
   wsCrumb(project.name);
   const newQuote = document.getElementById("ws-project-new-quote");
   if (newQuote) newQuote.hidden = !(typeof crmCanQuote === "function" && crmCanQuote());
@@ -835,7 +836,8 @@ function wsRenderProject(id) {
   // Major units for a human to read and retype; the store keeps the integer. Written with
   // integer arithmetic, never a division into a float, because money is minor units.
   setField("ws-biz-value", project.valueMinor === null || project.valueMinor === undefined
-    ? "" : `${Math.trunc(project.valueMinor / 100)}.${String(Math.abs(project.valueMinor % 100)).padStart(2, "0")}`);
+    ? "" : new Intl.NumberFormat(wsLang(), { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: true })
+      .format(project.valueMinor / 100));
   const projectCurrency = project.currencyCode || (typeof crmCurrency === "function" ? crmCurrency() : "");
   wsSetCurrencyAffix("ws-biz-value-currency", projectCurrency);
   const currencyNote = document.getElementById("ws-biz-value-note");

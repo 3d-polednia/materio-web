@@ -350,7 +350,7 @@ function wsMergeJobs(incoming) {
 }
 
 /**
- * Tombstone the project, its estimate lines and its materials, exactly as the app cascades.
+ * Tombstone the project, its rooms, estimate lines and materials.
  *
  * Both subcollections go, because both are subcollections: in Room they hang off `projects`
  * with `ForeignKey(onDelete = CASCADE)`, and `ProjectRepository.recordTombstones()` writes a
@@ -358,16 +358,11 @@ function wsMergeJobs(incoming) {
  * otherwise the next pull from another device puts the materials back under a project that
  * no longer exists.
  *
- * Rooms are deliberately left alone, and session 20 — which is what put a room on a
- * project screen — kept it that way. They used to be unlinked here, which threw away the
- * one fact needed to put the project back. Beyond that, the phone does not cascade them
- * either: `recordTombstones()` walks the estimations and the shopping items of every
- * project it deletes and stops there, because rooms are not a subcollection of a project
- * at all (FIRESTORE_SYNC §2). Deleting rooms here would mean one click doing two different
- * things on two devices — session 17's argument, unchanged. A room is a physical place; it
- * survives the project measured for it, keeps its `projectId`, and comes back with it.
+ * Owner decision D5 makes rooms part of this cascade. They remain separate synced
+ * documents, so each receives the same deletedAt tombstone as wsDeleteRoom() would write.
+ * Their projectId is retained so the undo can restore the complete relationship.
  *
- * @returns {{id: string, at: number, lines: string[], items: string[]}|null} what was
+ * @returns {{id: string, at: number, rooms: string[], lines: string[], items: string[]}|null} what was
  *   tombstoned. Hand it to wsRestoreProject() to undo exactly this delete and nothing else.
  */
 function wsDeleteProject(id) {
@@ -377,6 +372,8 @@ function wsDeleteProject(id) {
   const now = Date.now();
   project.deletedAt = now;
   project.updatedAt = now;
+  const rooms = data.rooms.filter((r) => r.projectId === id && !r.deletedAt);
+  rooms.forEach((r) => { r.deletedAt = now; r.updatedAt = now; });
   const lines = data.estimations.filter((e) => e.projectId === id && !e.deletedAt);
   lines.forEach((e) => { e.deletedAt = now; e.updatedAt = now; });
   const items = data.shoppingItems.filter((s) => s.projectId === id && !s.deletedAt);
@@ -387,7 +384,7 @@ function wsDeleteProject(id) {
   // the stored id with the deleted one has just stopped matching, because the resolution
   // moved on the moment the row was tombstoned, leaving the deleted id in storage.
   wsSetActiveProject(wsActiveProjectId());
-  return { id, at: now, lines: lines.map((e) => e.id), items: items.map((s) => s.id) };
+  return { id, at: now, rooms: rooms.map((r) => r.id), lines: lines.map((e) => e.id), items: items.map((s) => s.id) };
 }
 
 /**
@@ -402,12 +399,13 @@ function wsDeleteProject(id) {
  * `updatedAt` moves to now, so a phone that already heard about the delete hears about
  * the undo as well instead of re-deleting the row on the next sync.
  *
- * @param {{id: string, lines: string[], items: string[]}|string} token what
+ * @param {{id: string, rooms: string[], lines: string[], items: string[]}|string} token what
  *   wsDeleteProject() returned. A bare id restores the project on its own, which is what a
  *   project with no lines and no materials is.
  */
 function wsRestoreProject(token) {
   const id = typeof token === "string" ? token : (token && token.id);
+  const rooms = (token && token.rooms) || [];
   const lines = (token && token.lines) || [];
   const items = (token && token.items) || [];
   if (!id) return null;
@@ -429,6 +427,7 @@ function wsRestoreProject(token) {
   };
   revive(data.estimations, lines);
   revive(data.shoppingItems, items);
+  revive(data.rooms, rooms);
   if (!wsSave(data)) return null;
   return project;
 }
@@ -486,10 +485,9 @@ const wsActiveProject = () => wsProjects().find((p) => p.id === wsActiveProjectI
 /**
  * The rooms of one project, or every live room when no project is named.
  *
- * A room whose project was deleted keeps naming it — that is what makes the undo exact —
- * and stays in the flat list. Nothing draws a deleted project's rooms, because nothing
- * draws a deleted project; the index simply stops printing a name it can no longer look
- * up. See wsDeleteProject(): a room is a place, not a line of the project's paperwork.
+ * A legacy room whose project was deleted before D5 can still name that missing project
+ * and remains in the flat list as a loose room. Current project deletion tombstones its
+ * rooms and the undo token restores them with their projectId intact.
  */
 function wsRooms(projectId) {
   const rows = wsAlive(wsLoad().rooms).sort((a, b) => b.updatedAt - a.updatedAt);

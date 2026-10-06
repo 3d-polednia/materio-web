@@ -305,7 +305,7 @@ head("2. add, read by project, correct, take off");
 
 /* ================================================================== 3. the project's delete */
 
-head("3. deleting a project leaves its rooms alone — the phone does the same");
+head("3. deleting a project tombstones its rooms and undo restores them, per D5");
 {
   const ws = loadWorkspace();
   const project = ws.wsAddProject("Remont łazienki");
@@ -316,14 +316,12 @@ head("3. deleting a project leaves its rooms alone — the phone does the same")
   const token = ws.wsDeleteProject(project.id);
   eq("the estimate line went with the project", ws.wsEstimations(project.id).length, 0);
   eq("its material went too", ws.wsItems(project.id).length, 0);
-  // `ProjectRepository.recordTombstones()` walks estimations and shopping items and stops.
-  // Rooms are not a subcollection of a project at all, so cascading here would mean one
-  // click doing two different things on two devices.
-  eq("the room did not", ws.wsRooms().length, 1);
-  eq("and still names the project it was measured for", ws.wsRoom(room.id).projectId, project.id);
-  // The link is kept rather than cleared, which is what makes the undo exact: the project
-  // that comes back comes back with the rooms it had. Nothing renders a deleted project's
-  // rooms, because nothing renders a deleted project.
+  // D5 replaces the old rule that a project's delete did nothing to its rooms. Rooms are
+  // synced documents, so the cascade gives them the same tombstone as a hand deletion.
+  eq("the room went too", ws.wsRooms().length, 0);
+  eq("and still names the project it was measured for", ws.raw().rooms[0].projectId, project.id);
+  eq("with the same tombstone as the project", ws.raw().rooms[0].deletedAt, token.at);
+  // The link is kept rather than cleared, so undo restores the room to the same project.
   eq("the project it names is gone", ws.wsProject(project.id), null);
 
   ws.wsRestoreProject(token);
@@ -574,6 +572,10 @@ head("7. the frame the build writes");
   // The index keeps one script-filled container. Its project cards each own their add
   // form, so repeated controls use data/name attributes rather than duplicate ids.
   check("the index keeps its rooms container", built.includes('id="ws-room-list"'));
+  const ui = readFileSync(p("assets", "workspace-ui.js"), "utf8");
+  check("loose rooms are rendered only when the group is nonempty",
+    /const looseGroup = loose\.length \?/.test(ui) && ui.includes('wsT("app_rooms_loose")'));
+  check("a loose room keeps its delete button", ui.includes('data-del'));
   check("the old global room form is gone", !built.includes('id="ws-room-form"'));
   check("and so is its global project picker", !built.includes('id="ws-room-project"'));
 

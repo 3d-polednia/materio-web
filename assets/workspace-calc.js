@@ -182,6 +182,22 @@ function wsWireCard(card) {
       bar.querySelector("[data-ws-room]").value = room.id;
       card.dataset.wsRoomId = room.id;
       card.dataset.wsRoomName = room.name;
+      const surfaceSel = bar.querySelector("[data-ws-surface]");
+      const surface = surfaceSel ? surfaceSel.value : surfaces[0];
+      Object.entries(wsRoomFill(room, calcId, surface)).forEach(([k, v]) => {
+        const el = card.querySelector(`[data-k="${k}"]`);
+        if (el) el.value = typeof calcFieldValue === "function" ? calcFieldValue(wsPlain(v), wsLang()) : wsPlain(v);
+      });
+      // This runs at DOMContentLoaded, before assets/main.js has wired the calculator: a
+      // click on an unwired "Policz" submits the form natively, the page reloads with "?"
+      // and the room is gone. Wait until the card is wired, then count.
+      const run = card.querySelector("[data-run]");
+      let tries = 0;
+      const go = () => {
+        if (card.dataset.wired) { if (run) run.click(); return; }
+        if (++tries < 100) setTimeout(go, 30);
+      };
+      go();
     }
   }
 }
@@ -316,7 +332,14 @@ function wsRenderSave(card, result) {
 /** Resolve the saved material independently from the room that supplied dimensions. */
 function wsResolvedLine(card) {
   const calc = card.dataset.calc;
-  if (!card.dataset.matName) return { name: wsT(`c_${calc}_t`), category: "OTHER" };
+  const categories = {
+    coverage: "PAINT", waste: "TILES", wallpaper: "TEXTILES",
+    linear: "WOOD", sheet: "BOARDS", concrete: "CHEMICALS", mortar: "CHEMICALS",
+    screed: "CHEMICALS", grout: "CHEMICALS", masonry: "OTHER",
+    insulation: "INSULATION", studwall: "BOARDS", ceiling: "BOARDS",
+    drylining: "BOARDS", sheathing: "BOARDS",
+  };
+  if (!card.dataset.matName) return { name: wsT(`c_${calc}_t`), category: categories[calc] || "OTHER" };
   if (calc === "grout") return {
     name: `${wsT("c_grout_t")}: ${card.dataset.matName}`, category: "CHEMICALS",
   };
@@ -357,10 +380,10 @@ function wsBuildSaveBox(card) {
         data-ws-line-name placeholder="${wsEsc(wsT("ws_line_name_ph"))}">
     </div>
     <div class="ws-save-row">
-      <button type="button" class="btn btn-primary btn-sm" data-ws-save>${wsEsc(wsT("ws_add_to_project"))}</button>
       <select data-ws-project aria-label="${wsEsc(wsT("ws_project"))}" hidden></select>
       <select data-ws-room-pick aria-label="${wsEsc(wsT("ws_room"))}" hidden></select>
       <span class="muted ws-save-note" data-ws-note hidden>${wsEsc(wsT("ws_no_project"))}</span>
+      <button type="button" class="btn btn-primary btn-sm" data-ws-save>${wsEsc(wsT("ws_add_to_project"))}</button>
     </div>
     <div class="ws-save-new" data-ws-new hidden>
       <label class="ws-bar-label" for="ws-new-${wsEsc(card.dataset.calc)}">${wsEsc(wsT("ws_new_project"))}</label>
