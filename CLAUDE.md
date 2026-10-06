@@ -31,6 +31,15 @@ construction-material calculator. *Policz. Zaplanuj. Zrealizuj.*
 > `scripts/`, `CLAUDE.md` and `README.md` out of the Pages artifact, because the repo
 > root is the site root and everything in it is otherwise world-readable.
 >
+> **Since 2026-10-06 liczmat.com is served by Firebase Hosting, not GitHub Pages** (audit
+> AUDYT3 L4, owner's decision D2: Pages cannot send frame-ancestors, HSTS and the other
+> headers in `firebase.json`). DNS at OVH: apex A `199.36.158.100`, TXT
+> `hosting-site=materio-502513`, `_acme-challenge` TXT. **After every push to `main`, deploy:**
+> from a clean worktree of `origin/main` (never the working copy, which may hold a worker's
+> half-done edits) run `firebase deploy --only hosting:materio-502513`. The Pages workflow
+> still runs and keeps the old host warm as the rollback: put back the four GitHub A records
+> (185.199.108-111.153) and the AAAA ones and the site is on Pages again.
+>
 > **The live domain is `liczmat.com` since 2026-08-14.** The owner bought it, pointed the
 > GitHub Pages custom domain at it and switched `materio-app.com` off on purpose — it had
 > served 500 views in two days and no redirect was wanted, so the old host now answers
