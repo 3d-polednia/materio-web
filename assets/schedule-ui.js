@@ -96,7 +96,7 @@ function calRow(job, editable, today) {
   const who = client ? `${calEsc(client.name)} · ` : "";
   const money = job.valueMinor !== null && job.valueMinor !== undefined
     ? ` · ${calEsc(calMoney(job.valueMinor, job.currencyCode))}` : "";
-  const status = `<span class="cal-status"> · ${calEsc(calT(`job_st_${job.status}`))}</span>`;
+  const status = `<span class="cal-status"> · ${calEsc(calT(job.kind === "event" ? "cal_event" : `job_st_${job.status}`))}</span>`;
   const jobs = calUrl("projects", "/projekty/");
 
   const days = typeof crmDaysUntil === "function" ? crmDaysUntil(job.dueDate, today) : null;
@@ -113,9 +113,11 @@ function calRow(job, editable, today) {
           aria-label="${calEsc(calT("cal_due_set"))}"><span class="lm-date-icon" aria-hidden="true"></span></span>`
     : `<span class="muted">${calEsc(calDay(job.dueDate))}</span>`;
 
-  return `<li data-id="${calEsc(job.id)}" class="cal-row">
+  const title = job.kind === "event" ? `<b>${calEsc(job.name)}</b>`
+    : `<a href="${calEsc(jobs)}?id=${encodeURIComponent(job.id)}"><b>${calEsc(job.name)}</b></a>`;
+  return `<li data-id="${calEsc(job.id)}"${job.kind === "event" ? ' data-kind="event"' : ""} class="cal-row">
       <span class="row-name">
-        <a href="${calEsc(jobs)}?id=${encodeURIComponent(job.id)}"><b>${calEsc(job.name)}</b></a>
+        ${title}
         <em class="muted">${who}${money}</em>
       </span>
       <span class="row-actions cal-when">${when}${date}${status}</span>
@@ -192,7 +194,10 @@ function buildSchedulePage() {
     const input = e.target.closest(".cal-due");
     if (!input) return;
     const row = input.closest("li[data-id]");
-    if (row && typeof wsUpdateProject === "function") wsUpdateProject(row.dataset.id, { dueDate: input.value });
+    if (!row) return;
+    // A term's day is the term's own field; a project's is its deadline.
+    if (row.dataset.kind === "event" && typeof crmUpdateEvent === "function") crmUpdateEvent(row.dataset.id, { date: input.value });
+    else if (typeof wsUpdateProject === "function") wsUpdateProject(row.dataset.id, { dueDate: input.value });
   });
 
   // Both stores, because since the merge of 2026-09-21 the rows this page draws are

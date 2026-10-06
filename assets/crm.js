@@ -1355,13 +1355,81 @@ function crmProjectBucket(project, today) {
  *   leaves it out and gets crmToday().
  * @returns {{day:string, buckets:object, closed:object[], counts:object, total:number}}
  */
+/* ------------------------------------------------------------------ terminarz entries
+ *
+ * A term (owner, 2026-10-06): something on a day that is not a project. "Dodaj termin" in the
+ * terminarz used to make a project with that date, so a call or a delivery showed up on the
+ * project list. A term is its own row in this store and its own Firestore collection
+ * (users/{uid}/events): name, day, an optional client, colour and note.
+ */
+const crmEvents = () => crmAlive(crmLoad().events || []);
+const crmEvent = (id) => crmEvents().find((row) => row.id === id) || null;
+
+function crmAddEvent(f) {
+  const name = crmText(f && f.name, CRM_MAX_NAME);
+  const date = crmDay(f && f.date);
+  if (!name || !date) return null;
+  const data = crmLoad();
+  const now = Date.now();
+  const row = {
+    id: crmId(),
+    name,
+    date,
+    clientId: crmClientId(f.clientId),
+    color: crmProjectColor(f.color) || "",
+    note: crmText(f.note, CRM_MAX_NOTE),
+    createdAt: now,
+    updatedAt: now,
+    deletedAt: null,
+    schemaVersion: CRM_SCHEMA,
+  };
+  data.events = (data.events || []).concat(row);
+  return crmSave(data) ? row : null;
+}
+
+function crmUpdateEvent(id, fields) {
+  const data = crmLoad();
+  const row = (data.events || []).find((r) => r.id === id && !r.deletedAt);
+  if (!row) return null;
+  if (fields.name !== undefined) { const name = crmText(fields.name, CRM_MAX_NAME); if (name) row.name = name; }
+  if (fields.date !== undefined) { const date = crmDay(fields.date); if (date) row.date = date; }
+  if (fields.clientId !== undefined) row.clientId = crmClientId(fields.clientId);
+  if (fields.color !== undefined) row.color = crmProjectColor(fields.color) || "";
+  if (fields.note !== undefined) row.note = crmText(fields.note, CRM_MAX_NOTE);
+  row.updatedAt = Date.now();
+  return crmSave(data) ? row : null;
+}
+
+function crmDeleteEvent(id) {
+  const data = crmLoad();
+  const row = (data.events || []).find((r) => r.id === id && !r.deletedAt);
+  if (!row) return false;
+  row.deletedAt = row.updatedAt = Date.now();
+  return crmSave(data);
+}
+
+/**
+ * What the terminarz draws: the projects, and each term dressed as one (`kind: "event"`,
+ * `dueDate` = its day, always open), so the grid, the day panel, the lists and the .ics
+ * export need one shape. Nothing outside the terminarz reads this.
+ */
+function crmCalendarItems() {
+  const projects = typeof wsAllProjects === "function" ? wsAllProjects() : [];
+  const events = crmEvents().map((e) => ({
+    kind: "event", id: e.id, name: e.name, dueDate: e.date, clientId: e.clientId || "",
+    color: e.color || "", note: e.note || "", status: "active", valueMinor: null,
+    createdAt: e.createdAt, updatedAt: e.updatedAt,
+  }));
+  return projects.concat(events);
+}
+
 function crmSchedule(today) {
   const day = crmDay(today) || crmToday();
   const buckets = {};
   CAL_BUCKETS.forEach((b) => { buckets[b] = []; });
   const closed = [];
 
-  const projects = typeof wsAllProjects === "function" ? wsAllProjects() : [];
+  const projects = crmCalendarItems();
   projects.forEach((project) => {
     const bucket = crmProjectBucket(project, day);
     if (bucket) buckets[bucket].push(project);
@@ -1403,7 +1471,7 @@ function crmSchedule(today) {
  */
 function crmProjectsByDay() {
   const byDay = {};
-  const projects = typeof wsAllProjects === "function" ? wsAllProjects() : [];
+  const projects = crmCalendarItems();
   projects.forEach((project) => {
     if (!project.dueDate) return;
     (byDay[project.dueDate] || (byDay[project.dueDate] = [])).push(project);

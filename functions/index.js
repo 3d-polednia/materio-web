@@ -511,11 +511,19 @@ export const calendarFeed = onRequest(
     let projects = [];
     let clientsById = {};
     if (isPro) {
-      const [projectSnaps, clientSnaps] = await Promise.all([
+      const [projectSnaps, clientSnaps, eventSnaps] = await Promise.all([
         db.collection("users").doc(uid).collection("projects").get(),
         db.collection("users").doc(uid).collection("clients").get(),
+        db.collection("users").doc(uid).collection("events").get(),
       ]);
       projects = projectSnaps.docs.map((snap) => ({ ...snap.data(), id: snap.id }));
+      // Terminarz entries that are not projects (owner, 2026-10-06) travel the same way:
+      // their day is the deadline, and they are always open.
+      projects = projects.concat(eventSnaps.docs.map((snap) => {
+        const e = snap.data() || {};
+        return { id: snap.id, name: e.name || "", dueDate: e.date || "", clientId: e.clientId || "",
+          note: e.note || "", status: "active", deletedAt: e.deletedAt || null };
+      }));
       clientsById = Object.fromEntries(clientSnaps.docs.map((snap) => {
         const client = snap.data() || {};
         return [snap.id, {

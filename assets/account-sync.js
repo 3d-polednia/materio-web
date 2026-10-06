@@ -114,6 +114,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     remoteStamps: {
       projects: new Map(), rooms: new Map(), estimations: new Map(), shoppingItems: new Map(),
       companies: new Map(), clients: new Map(), quotes: new Map(), materials: new Map(),
+      events: new Map(),
     },
     upSyncTimer: null,
   };
@@ -261,12 +262,13 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     const all = (rows) => (rows || []).length;
     const sum = (count) => count(local.projects) + count(local.rooms) + count(local.estimations)
       + count(local.shoppingItems) + count(pro && pro.companies) + count(pro && pro.clients)
-      + count(pro && pro.jobs) + count(pro && pro.quotes) + count(own && own.materials);
+      + count(pro && pro.jobs) + count(pro && pro.quotes) + count(pro && pro.events) + count(own && own.materials);
     return {
       projects: alive(local.projects), rooms: alive(local.rooms),
       estimations: alive(local.estimations), shoppingItems: alive(local.shoppingItems),
       companies: alive(pro && pro.companies), clients: alive(pro && pro.clients), jobs: alive(pro && pro.jobs),
       quotes: alive(pro && pro.quotes),
+      events: alive(pro && pro.events),
       // Every row, tombstones included: what another account's copy is judged by.
       total: sum(all),
       // Rows somebody could still lose or claim: what an unstamped browser is judged by.
@@ -767,6 +769,24 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
       }, MERGE);
     }
 
+    // Terminarz entries that are not projects (owner, 2026-10-06), validEvent() in the rules.
+    for (const e of pro.events || []) {
+      const seg = pathId(e.id);
+      if (!seg) continue;
+      if (skippable(e) || (Number.isFinite(since) && remoteIsRow("events", e))) continue;
+      const day = String(e.date || "");
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) continue;
+      requireSyncUid(uid);
+      await fb.setDoc(proDoc("events", seg, uid), {
+        name: text(e.name, 120),
+        date: day,
+        clientId: pathId(e.clientId) ? text(e.clientId, 64) : "",
+        color: text(e.color, 16),
+        note: text(e.note, 2000),
+        ...syncFields(e.createdAt, e.deletedAt),
+      }, MERGE);
+    }
+
     for (const c of pro.clients || []) {
       const seg = pathId(c.id);
       if (!seg) continue;
@@ -912,7 +932,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
   async function downloadAccount(uid = state.uid) {
     const out = {
       projects: [], rooms: [], estimations: [], shoppingItems: [],
-      companies: [], clients: [], jobs: [], quotes: [], materials: [],
+      companies: [], clients: [], jobs: [], quotes: [], materials: [], events: [],
     };
     const rows = (snap) => { const list = []; snap.forEach((d) => list.push({ id: d.id, ...d.data() })); return list; };
 
@@ -933,7 +953,7 @@ export function createAccountSync({ fb, db, auth, onChange = () => {} }) {
     // fail open, in the direction of the visitor's own data.
     // Keep `jobs` for one release of tolerant reading. Remove it in the release after this
     // one, together with the phone's database migration from schema 9 to 10.
-    for (const name of ["companies", "clients", "jobs", "quotes", "materials"]) {
+    for (const name of ["companies", "clients", "jobs", "quotes", "materials", "events"]) {
       try {
         requireSyncUid(uid);
         out[name] = rows(await fb.getDocs(fb.collection(db, "users", uid, name)));

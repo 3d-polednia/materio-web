@@ -39,7 +39,7 @@ const CRM_MAX_NOTE = 2000;
 const CRM_MAX_UNIT = 24;
 /* ------------------------------------------------------------------ storage */
 
-const crmEmpty = () => ({ companies: [], clients: [], jobs: [], quotes: [] });
+const crmEmpty = () => ({ companies: [], clients: [], jobs: [], quotes: [], events: [] });
 let crmLegacyJobsChecked = false;
 
 /** Read the whole Pro workspace. A corrupt or absent store reads as an empty one. */
@@ -57,6 +57,8 @@ function crmLoad() {
       jobs: Array.isArray(data.jobs) ? data.jobs : [],
       // The same for the quotes of session 24.
       quotes: Array.isArray(data.quotes) ? data.quotes : [],
+      // Terminarz entries that are not projects (owner, 2026-10-06): a name and a day.
+      events: Array.isArray(data.events) ? data.events : [],
     };
     const migrateJobs = !crmLegacyJobsChecked;
     if (migrateJobs && result.jobs.length && typeof wsMergeJobs === "function") {
@@ -156,7 +158,7 @@ const crmExport = () => ({ ...crmLoad(), exportedAt: Date.now(), schemaVersion: 
  */
 function crmImport(incoming) {
   const data = crmLoad();
-  ["companies", "clients", "quotes"].forEach((key) => {
+  ["companies", "clients", "quotes", "events"].forEach((key) => {
     const rows = Array.isArray(incoming && incoming[key]) ? incoming[key] : [];
     rows.forEach((row) => {
       if (!row || !row.id) return;
