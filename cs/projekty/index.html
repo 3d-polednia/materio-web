@@ -298,25 +298,14 @@
         </div>
 
         <div id="ws-project-body" hidden>
+          <section class="card ws-project-info">
+          <h2 id="ws-project-card-name"></h2>
           <p class="ws-project-hist muted" id="ws-project-hist"></p>
-
-          <section class="dash-sec">
-            <div class="dash-head">
-              <h2>Cenové nabídky</h2>
-              <button type="button" class="btn btn-primary btn-sm" id="ws-project-new-quote" hidden>Nová nabídka</button>
-            </div>
-            <ul id="ws-chain-quotes" class="data-list"></ul>
-          </section>
-          <section class="dash-sec">
-            <div class="dash-head"><h2>Historie</h2></div>
-            <p class="muted">Historie ukazuje uložené dokumenty s jejich daty. Změna stavu nebo termínu nepřidá záznam.</p>
-            <ul id="ws-chain-history" class="data-list"></ul>
-          </section>
 
           
           
           <div class="ws-project-figs">
-            <p class="ws-project-fig"><span class="eyebrow muted">Položek</span> <b id="ws-project-count"></b></p>
+            <p class="ws-project-fig"><span class="eyebrow muted">Položky</span> <b id="ws-project-count"></b></p>
           </div>
 
           <div class="app-card crm-gate pw-gate" id="cost-gate" hidden>
@@ -421,6 +410,7 @@
               <button type="button" class="btn btn-ghost btn-sm" id="ws-delete-no">Zrušit</button>
             </p>
           </div>
+          </section>
 
           
           <section class="dash-sec">
@@ -435,7 +425,7 @@
               <form id="ws-proj-room-form">
                 <p class="ws-mat-grid">
                   <label class="ws-mat-f">
-                    <span class="ws-bar-label">Položka</span>
+                    <span class="ws-bar-label">Název místnosti</span>
                     <input id="ws-proj-room-name" type="text" maxlength="120" required>
                   </label>
                   <label class="ws-mat-f ws-mat-f-sm">
@@ -555,6 +545,19 @@
                 <p><button type="submit" class="btn btn-primary btn-sm">Přidat</button></p>
               </form>
             </details>
+          </section>
+
+          <section class="dash-sec">
+            <div class="dash-head">
+              <h2>Cenové nabídky</h2>
+              <button type="button" class="btn btn-primary btn-sm" id="ws-project-new-quote" hidden>Nová nabídka</button>
+            </div>
+            <ul id="ws-chain-quotes" class="data-list"></ul>
+          </section>
+          <section class="dash-sec">
+            <div class="dash-head"><h2>Historie</h2></div>
+            <p class="muted">Historie ukazuje uložené dokumenty s jejich daty. Změna stavu nebo termínu nepřidá záznam.</p>
+            <ul id="ws-chain-history" class="data-list"></ul>
           </section>
 
           <section class="dash-sec ws-pdf" id="ws-pdf">
