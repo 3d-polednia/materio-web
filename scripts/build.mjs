@@ -734,7 +734,15 @@ const CSP_FIREBASE = "https://www.gstatic.com https://apis.google.com";
    - gstatic.com: the Firebase SDK is imported from there
    - overpass-api.de, overpass.kumi.systems: the two Overpass endpoints assets/stores.js queries for the shops map (see OVERPASS) */
 const CSP_CONNECT_BASE = "'self' blob:";
-const CSP_CONNECT_STORES = "https://overpass-api.de https://overpass.private.coffee https://overpass.kumi.systems";
+const CSP_CONNECT_STORES = "https://overpass-api.de https://overpass.private.coffee https://overpass.kumi.systems " +
+  "https://maps.googleapis.com https://maps.gstatic.com";
+/* Google Maps JavaScript API on /sklepy/ (owner, 2026-10-06): the loader and its modules come
+   from maps.googleapis.com and maps.gstatic.com, and it writes <style> elements of its own,
+   which a static page cannot give a nonce, so the stores pages alone allow inline styles.
+   Inline *scripts* stay refused everywhere, and no font host is allowed: the map falls back
+   to the device's sans-serif like the rest of the site. */
+const CSP_SCRIPT_GMAPS = "https://maps.googleapis.com https://maps.gstatic.com";
+const CSP_STYLE_GMAPS = "'unsafe-inline'";
 const CSP_CONNECT_ANALYTICS = "https://www.googletagmanager.com " +
   "https://*.google-analytics.com https://*.analytics.google.com " +
   "https://stats.g.doubleclick.net";
@@ -804,6 +812,7 @@ function withCsp(html) {
   const scriptHosts = [
     hasAnalytics ? CSP_ANALYTICS : "",
     hasFirebase ? CSP_FIREBASE : "",
+    hasStores ? CSP_SCRIPT_GMAPS : "",
   ].filter(Boolean);
   const scriptSrc = [...scriptHosts, ...inlineScriptHashes(html)].join(" ");
 
@@ -824,6 +833,7 @@ function withCsp(html) {
     if (d === "script-src 'self'" && scriptSrc) return `${d} ${scriptSrc}`;
     if (d === "connect-src") return `${d} ${connectSrc}`;
     if (d === "frame-src") return `${d} ${frameSrc}`;
+    if (d === "style-src 'self'" && hasStores) return `${d} ${CSP_STYLE_GMAPS}`;
     return d;
   });
   const meta = `<meta http-equiv="Content-Security-Policy" content="${directives.join("; ")}">`;

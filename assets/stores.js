@@ -116,6 +116,36 @@ function storeRow(s) {
    it while the app marks them all. Once there is a list, the frame gives way to a Leaflet map
    on OpenStreetMap tiles (no key, no cookies) with one marker per store and one for you.
    Leaflet is fetched only then, from this site (assets/vendor/leaflet, BSD-2-Clause). */
+/* Google Maps on the stores page (owner, 2026-10-06: "the OpenStreetMap map is ugly, it has
+   to be Google Maps"). The Maps JavaScript API needs a browser key; this one is restricted to
+   liczmat.com referrers and to that one API, so it is not a secret and lives here. Empty means
+   no key yet: the Leaflet map below stays the fallback, also when Google cannot be loaded. */
+const GMAPS_KEY = "";
+let gmapsReady = null, gmapsFailed = false;
+function loadGoogleMaps() {
+  if (gmapsFailed || !GMAPS_KEY) return Promise.reject(new Error("no google maps"));
+  if (window.google && google.maps && google.maps.Map) return Promise.resolve(google.maps);
+  if (gmapsReady) return gmapsReady;
+  gmapsReady = new Promise((resolve, reject) => {
+    const lang = document.documentElement.lang || "pl";
+    window.lmGoogleMapsReady = () => resolve(google.maps);
+    const js = document.createElement("script");
+    js.src = "https://maps.googleapis.com/maps/api/js?key=" + encodeURIComponent(GMAPS_KEY) +
+      "&loading=async&callback=lmGoogleMapsReady&language=" + encodeURIComponent(lang);
+    js.async = true;
+    js.onerror = () => { gmapsReady = null; reject(new Error("maps")); };
+    document.head.appendChild(js);
+    // A key Google refuses still loads the script and draws a grey "something went wrong"
+    // map, then calls this. The page goes back to the Leaflet map rather than show that.
+    window.gm_authFailure = () => {
+      gmapsFailed = true;
+      reject(new Error("key"));
+      document.dispatchEvent(new CustomEvent("lm-gmaps-failed"));
+    };
+  });
+  return gmapsReady;
+}
+
 let leafletReady = null;
 function loadLeaflet() {
   if (window.L) return Promise.resolve(window.L);
@@ -165,10 +195,68 @@ function buildStoreFinder() {
   const markers = new Map();
   const accent = () => getComputedStyle(document.documentElement).getPropertyValue("--accent-edge").trim() || "#476c00";
 
+  let gmap = null, gInfo = null, gMarkers = [];
+  const navUrl = (lat, lon) => "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon;
+  const popupHtml = (st, lat, lon) =>
+    `<div class="store-popup"><b>${esc(st.name)}</b><br>${esc(t(st.typeKey))} · ${fmtDist(st.dist)}` +
+    `${st.addr ? "<br>" + esc(st.addr) : ""}<br><a href="${esc(navUrl(lat, lon))}" target="_blank" rel="noopener">${esc(t("res_navigate"))}</a></div>`;
+
+  /* The list's stores on a Google map, one pin each and a blue dot for you. Returns false when
+     Google cannot be used (no key, blocked, refused key), and the Leaflet map takes over. */
+  async function drawGoogleMap(list, box) {
+    let gm;
+    try { gm = await loadGoogleMaps(); } catch (e) { return false; }
+    box.classList.add("is-google");
+    if (!gmap) {
+      gmap = new gm.Map(box, {
+        center: { lat: loc.lat, lng: loc.lng }, zoom: 13,
+        mapTypeControl: false, streetViewControl: false, fullscreenControl: true,
+        clickableIcons: false, gestureHandling: "cooperative",
+      });
+      gInfo = new gm.InfoWindow();
+    }
+    gMarkers.forEach((m) => m.setMap(null));
+    gMarkers = [];
+    markers.clear();
+    const color = accent();
+    const bounds = new gm.LatLngBounds();
+    const you = new gm.Marker({
+      position: { lat: loc.lat, lng: loc.lng }, map: gmap, zIndex: 1000,
+      icon: { path: gm.SymbolPath.CIRCLE, scale: 7, fillColor: "#1d5fa8", fillOpacity: 1, strokeColor: "#ffffff", strokeWeight: 2 },
+    });
+    gMarkers.push(you);
+    bounds.extend(you.getPosition());
+    for (const st of list) {
+      const lat = Number(st.lat), lon = Number(st.lon);
+      if (!isFinite(lat) || !isFinite(lon)) continue;
+      const mk = new gm.Marker({
+        position: { lat, lng: lon }, map: gmap, title: st.name,
+        icon: { path: gm.SymbolPath.CIRCLE, scale: 9, fillColor: color, fillOpacity: 0.95, strokeColor: "#ffffff", strokeWeight: 2 },
+      });
+      const open = () => { gInfo.setContent(popupHtml(st, lat, lon)); gInfo.open({ map: gmap, anchor: mk }); };
+      mk.addListener("click", open);
+      markers.set(`${lat},${lon}`, { open, lat, lon });
+      gMarkers.push(mk);
+      bounds.extend(mk.getPosition());
+    }
+    gmap.fitBounds(bounds, 32);
+    gm.event.addListenerOnce(gmap, "idle", () => { if (gmap.getZoom() > 15) gmap.setZoom(15); });
+    return true;
+  }
+
+  document.addEventListener("lm-gmaps-failed", () => {
+    const box = document.getElementById("store-leaflet");
+    if (!box || !box.classList.contains("is-google")) return;
+    box.classList.remove("is-google");
+    box.innerHTML = "";
+    gmap = null; gInfo = null; gMarkers = [];
+    if (lastMapList) drawStoresMap(lastMapList);
+  });
+
+  let lastMapList = null;
   async function drawStoresMap(list) {
     if (!map || !loc || !list.length) return;
-    let L;
-    try { L = await loadLeaflet(); } catch (e) { return; }   // the embed simply stays
+    lastMapList = list;
     let box = document.getElementById("store-leaflet");
     if (!box) {
       box = document.createElement("div");
@@ -180,6 +268,9 @@ function buildStoreFinder() {
     }
     map.hidden = true;
     box.hidden = false;
+    if (!storesMap && await drawGoogleMap(list, box)) return;
+    let L;
+    try { L = await loadLeaflet(); } catch (e) { box.hidden = true; map.hidden = false; return; }   // the embed stays
     if (!storesMap) {
       storesMap = L.map(box, { scrollWheelZoom: false });
       storesMap.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
@@ -197,11 +288,12 @@ function buildStoreFinder() {
     for (const st of list) {
       const lat = Number(st.lat), lon = Number(st.lon);
       if (!isFinite(lat) || !isFinite(lon)) continue;
-      const nav = "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon;
       const mk = L.circleMarker([lat, lon], { radius: 8, color, fillColor: color, fillOpacity: 0.85, weight: 2 })
-        .bindPopup(`<b>${esc(st.name)}</b><br>${esc(t(st.typeKey))} · ${fmtDist(st.dist)}<br><a href="${esc(nav)}" target="_blank" rel="noopener">${esc(t("res_navigate"))}</a>`)
+        .bindPopup(popupHtml(st, lat, lon))
         .addTo(storesLayer);
-      markers.set(`${lat},${lon}`, mk);
+      markers.set(`${lat},${lon}`, {
+        open: () => { storesMap.setView([lat, lon], Math.max(storesMap.getZoom(), 15)); mk.openPopup(); }, lat, lon,
+      });
       points.push([lat, lon]);
     }
     storesMap.invalidateSize();
@@ -247,16 +339,21 @@ function buildStoreFinder() {
     const lat = Number(pin.dataset.lat), lon = Number(pin.dataset.lon);
     if (!isFinite(lat) || !isFinite(lon)) return;
     const mk = markers.get(`${lat},${lon}`);
-    if (storesMap && mk && !document.getElementById("store-leaflet").hidden) {
-      storesMap.setView([lat, lon], Math.max(storesMap.getZoom(), 15));
-      mk.openPopup();
+    const box = document.getElementById("store-leaflet");
+    const onMap = mk && box && !box.hidden;
+    if (onMap) {
+      if (gmap && box.classList.contains("is-google")) {
+        gmap.panTo({ lat, lng: lon });
+        if (gmap.getZoom() < 15) gmap.setZoom(15);
+      }
+      mk.open();
     } else {
       const label = encodeURIComponent(`${lat},${lon} (${pin.dataset.name || ""})`);
       map.src = `https://maps.google.com/maps?q=${label}&z=16&output=embed`;
     }
     listEl.querySelectorAll(".store-item.is-picked").forEach((row) => row.classList.remove("is-picked"));
     pin.closest(".store-item").classList.add("is-picked");
-    const shown = storesMap && !document.getElementById("store-leaflet").hidden ? document.getElementById("store-leaflet") : map;
+    const shown = onMap ? box : map;
     if (shown.getBoundingClientRect().top < 0) shown.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
