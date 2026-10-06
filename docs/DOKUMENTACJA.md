@@ -30,7 +30,7 @@ sklepów, SEO oraz zarządzanie assetami.
 1. [Filozofia i założenia](#1-filozofia-i-założenia)
 2. [Struktura plików](#2-struktura-plików)
 3. [Uruchomienie lokalnie](#3-uruchomienie-lokalnie)
-4. [Wdrożenie na GitHub Pages](#4-wdrożenie-na-github-pages)
+4. [Wdrożenie (Firebase Hosting)](#4-wdrożenie-firebase-hosting)
 5. [Własna domena i zmiana adresu bazowego](#5-własna-domena-i-zmiana-adresu-bazowego)
 6. [Treści i tłumaczenia (i18n)](#6-treści-i-tłumaczenia-i18n)
 7. [Kalkulatory](#7-kalkulatory)
@@ -52,8 +52,8 @@ sklepów, SEO oraz zarządzanie assetami.
   bez frameworka, bundlera i zależności runtime. Strony powstają jednak z jednego
   szablonu: `node scripts/build.mjs` (Node bez `package.json` i bez `node_modules`)
   zapisuje 373 pliki `.html` — plus `privacy-policy.html` i `404.html`, które są pisane
-  ręcznie, czyli 375 stron w repo. Wynik jest commitowany, bo GitHub Pages serwuje
-  katalog repo bez własnego budowania. Pliki, które widzisz w repo, to pliki, które
+  ręcznie, czyli 375 stron w repo. Wynik jest commitowany, bo hosting (Firebase
+  Hosting, zapasowo GitHub Pages) serwuje katalog repo bez własnego budowania. Pliki, które widzisz w repo, to pliki, które
   trafiają na serwer — część z nich pisze generator, nie człowiek.
 - **Prawda ponad marketing.** Aplikacja w wydaniu produkcyjnym zawiera reklamy
   (Google AdMob) oraz mapy/lokalizację (Google Maps/Places). Strona **nie**
@@ -104,14 +104,15 @@ src/flags.mjs            Nazwy języków przy flagach (czyta LANGS z assets/i18n
 src/currency.mjs         Waluty po stronie builda
 src/tokens.mjs           validateTokens(): system projektowy sprawdzany w buildzie
 functions/               Cloud Function: webhook Stripe nadający plan. Wdrażana osobno
-                         (`firebase deploy --only functions`), NIGDY nie trafia na Pages;
-                         `firebase.json` i `.firebaserc` w korzeniu to jej konfiguracja
+                         (`firebase deploy --only functions`), NIGDY nie trafia do serwisu;
+                         `firebase.json` i `.firebaserc` w korzeniu konfigurują ją, hosting
+                         serwisu (witryna `materio-502513`) i `auth.liczmat.com`
 privacy-policy.html      Polityka prywatności (PL + EN) — wymóg Google Play
 404.html                 Strona błędu 404; przekierowuje też /p/<token> na /p/?t=<token>
 site.webmanifest         Manifest PWA (nazwa, ikony, kolory)
 robots.txt               Reguły dla robotów + odnośnik do sitemap
-CNAME                    Domena własna (liczmat.com)
-.nojekyll                Wyłącza przetwarzanie Jekyll na GitHub Pages
+CNAME                    Domena własna dla zapasowej kopii na GitHub Pages
+.nojekyll                Wyłącza przetwarzanie Jekyll na GitHub Pages (kopia zapasowa)
 assets/
   styles.css             System projektowy: tokeny + komponenty (DESIGN_SYSTEM.md).
                          To plik do edycji; strony linkują styles.min.css
@@ -151,7 +152,7 @@ assets/
   og-image.jpg           Podgląd społecznościowy 1200×630
   banner.jpg             Baner promocyjny
 .github/workflows/
-  pages.yml              Wdrożenie na GitHub Pages (tylko z gałęzi main)
+  pages.yml              Zapasowa kopia serwisu na GitHub Pages (tylko z gałęzi main)
 docs/
   DOKUMENTACJA.md        Ten plik
   MASTER_PLAN.txt        Plan produktu — oryginał właściciela, źródło prawdy o zakresie
@@ -202,10 +203,42 @@ python3 -m http.server 8080
 Otwarcie `index.html` z dysku (`file://`) **nie** wystarczy: strony linkują się
 adresami bezwzględnymi (`/kalkulatory/…`), więc bez serwera nawigacja nie działa.
 
-## 4. Wdrożenie na GitHub Pages
+## 4. Wdrożenie (Firebase Hosting)
 
-Wdrożenie jest automatyczne — workflow `.github/workflows/pages.yml` przy każdym
-pushu pakuje katalog główny repo i publikuje go na Pages.
+**Od 2026-10-06 serwis stoi na Firebase Hosting** (witryna `materio-502513`, projekt
+`materio-502513`; audyt AUDYT3, pozycja L4, decyzja właściciela D2). Powód: GitHub Pages
+nie wysyła nagłówków `frame-ancestors`, HSTS, `X-Frame-Options` i pozostałych, które są
+teraz w `firebase.json`.
+
+**Wdrożenie po każdym pushu do `main`**, z czystej kopii `origin/main` (nigdy z katalogu
+roboczego, w którym mogą leżeć niedokończone zmiany):
+
+```
+cd C:\Projekty\mw-deploy
+git fetch -q origin && git checkout -q --detach origin/main
+firebase deploy --only hosting:materio-502513
+```
+
+**Co NIE trafia na serwer.** `firebase.json` (`hosting[].ignore` witryny `materio-502513`)
+wyklucza `docs/`, `src/`, `scripts/`, `functions/`, `hosting/`, `firebase.json`,
+`.firebaserc`, `CLAUDE.md`, `README.md` i pliki ukryte. Dodając katalog, który ma zostać
+prywatny, dopisz go tam **i** w kroku „Drop internal files" w `pages.yml`.
+
+**Cache i błędy.** Strony mają `Cache-Control: no-cache`, `assets/` `max-age=3600`.
+Nieznany adres dostaje `404.html` ze statusem 404, tak jak na Pages, więc `/p/<token>`
+działa bez zmian. Przepisywania adresów (`rewrites`) celowo nie ma: te same pliki muszą
+działać także na zapasowym GitHub Pages.
+
+**DNS w OVH:** apeks `A 199.36.158.100`, TXT `hosting-site=materio-502513`, rekord
+`_acme-challenge` dla certyfikatu. MX, SPF i rekordy `auth` bez zmian.
+
+**Powrót na GitHub Pages (plan B).** Workflow `.github/workflows/pages.yml` nadal publikuje
+każdy push do `main`, więc kopia na Pages jest zawsze świeża. Wystarczy w OVH przywrócić
+cztery rekordy A `185.199.108.153`, `.109.153`, `.110.153`, `.111.153` i AAAA
+`2606:50c0:8000::153` … `2606:50c0:8003::153` w miejsce rekordu A Firebase. Opis poniżej
+dotyczy już tylko tej kopii zapasowej.
+
+### Kopia zapasowa na GitHub Pages
 
 **Jednorazowa konfiguracja (wymaga właściciela repo):**
 
@@ -223,7 +256,7 @@ Po tym strona jest pod `https://liczmat.com/`.
 Workflow reaguje **wyłącznie** na push do `main` (plus ręczne `workflow_dispatch`).
 Praca w tym repo i tak idzie na `main` — patrz „Repo policy" w `CLAUDE.md`.
 
-**Co NIE trafia na serwer.** Krok „Drop internal files from the published site" kasuje
+**Co NIE trafia do kopii na Pages.** Krok „Drop internal files from the published site" kasuje
 z artefaktu `docs/`, `src/`, `scripts/`, `functions/`, `firebase.json`, `.firebaserc`,
 `CLAUDE.md`, `README.md`, `.claude` i `.gitignore`. Korzeń repo jest korzeniem serwisu,
 więc wszystko, czego ten krok nie skasuje, jest publiczne. Dodając katalog, który ma
@@ -247,9 +280,10 @@ w kilku miejscach"; to było prawdą przed wprowadzeniem builda i przestało ni�
    ```
    materio.pl
    ```
-2. DNS zgodnie z instrukcją GitHub Pages. GitHub wystawi certyfikat dopiero, gdy
-   **wszystkie** rekordy A i AAAA wierzchołka wskazują na Pages — jeden obcy AAAA
-   blokuje HTTPS i to właśnie zatrzymało migrację na `liczmat.com`.
+2. Domena w Firebase Hosting (konsola → Hosting → witryna `materio-502513` → Dodaj
+   domenę niestandardową) i rekordy, które poda Firebase. Jeden obcy rekord A albo AAAA
+   wierzchołka blokuje certyfikat; tak zatrzymała się kiedyś migracja na `liczmat.com`.
+   Dla kopii zapasowej także plik `CNAME` i domena w ustawieniach GitHub Pages.
 3. `BASE` w `src/site.mjs` → `https://materio.pl`.
 4. `robots.txt` — linia `Sitemap:` (plik jest pisany ręcznie).
 5. `privacy-policy.html` — `canonical`, `og:url`, `og:image` (plik jest pisany ręcznie).
@@ -383,7 +417,8 @@ LM_PLAYWRIGHT=/tmp/lm-test/node_modules/playwright \
   element większy od arkusza); reszta jest zapisana jako punkt odniesienia i mówi o tym
   wprost w komentarzu.
 - **`scripts/test-pages.mjs`** podnosi statyczny serwer na katalogu repozytorium
-  (to samo, co robi GitHub Pages) i przechodzi po stronach w Chromium. Jedyna zależność
+  (to samo, co robi hosting: pliki bez przepisywania adresów) i przechodzi po stronach
+  w Chromium. Jedyna zależność
   zewnętrzna — Playwright — **leży poza repozytorium**, bo serwis nie ma i nie ma mieć
   `package.json` ani `node_modules`. Bez Playwrighta skrypt mówi, że go pomija, i kończy
   się kodem 0, żeby brak przeglądarki nie blokował testów czystej logiki.
@@ -683,8 +718,9 @@ więc liczba na stronie nie może rozjechać się z kodem. Wzory żyją w
 - Synchronizacja obejmuje dwa magazyny: warsztat (`materio-workspace-v1`) i magazyn
   LiczMat Pro (`liczmat-crm-v1`). Osobne klucze zostają osobne — dwa pliki piszące do
   jednego klucza to jeden wyścig od zgubionego zapisu.
-- `/p/<token>` — kopia wyceny tylko do odczytu, bez logowania. GitHub Pages nie ma
-  przepisywania adresów, więc `404.html` przekierowuje na `/p/?t=<token>`. Token **jest**
+- `/p/<token>` — kopia wyceny tylko do odczytu, bez logowania. Serwis nie używa
+  przepisywania adresów (Firebase by umiał, ale kopia zapasowa na GitHub Pages nie),
+  więc `404.html` przekierowuje na `/p/?t=<token>`. Token **jest**
   poświadczeniem, więc od Sesji 35 ta jedna strona nie ładuje analityki (GA4 raportuje
   cały adres jako `page_location`) i niesie `<meta name="referrer" content="no-referrer">`.
   Kształt tokenu sprawdzany jest przed zapytaniem: `[A-Za-z0-9_-]{16,64}`, bo Firestore

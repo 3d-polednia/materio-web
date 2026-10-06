@@ -13,11 +13,14 @@ Dotyczy obu produktów naraz — strona i aplikacja Android siedzą w tym samym 
 
 Firebase wstawi własny adres w pole „Od" wyłącznie dla domeny, która jest **witryną
 Firebase Hosting w tym samym projekcie**. Powód jest mechaniczny: z tej samej domeny
-serwuje link akcji, `https://<domena>/__/auth/action?mode=…&oobCode=…`. Apeks
-`liczmat.com` stoi na GitHub Pages i ścieżki `/__/auth/` obsłużyć nie umie, a przeniesienie
-całego serwisu na Hosting to zupełnie inna zmiana niż poprawienie adresu nadawcy.
+serwuje link akcji, `https://<domena>/__/auth/action?mode=…&oobCode=…`. Gdy to pisano
+(2026-09-09), apeks `liczmat.com` stał na GitHub Pages i ścieżki `/__/auth/` obsłużyć nie
+umiał, a przeniesienie całego serwisu na Hosting było zupełnie inną zmianą niż poprawienie
+adresu nadawcy. **Od 2026-10-06 apeks też stoi na Firebase Hosting** (witryna
+`materio-502513`, audyt AUDYT3 L4); subdomena `auth` zostaje, bo na niej jest już
+skonfigurowana poczta konta.
 
-Subdomena rozwiązuje to bez dotykania niczego, co działa: apeks zostaje na GitHub Pages,
+Subdomena rozwiązuje to bez dotykania niczego, co działa: apeks nie zmienia hostingu dla poczty,
 skrzynka `contact@liczmat.com` zostaje na Zimbrze OVH, a `auth.liczmat.com` niesie samą
 pocztę konta. Odbiorca zobaczy tę subdomenę dwa razy — w polu „Od" i w linku, w który
 kliknie.
@@ -28,7 +31,7 @@ W strefie DNS `liczmat.com` w panelu OVH **zostają nietknięte**:
 
 | Rekord | Wartość | Po co |
 |---|---|---|
-| `liczmat.com` A ×4 | `185.199.108.153`, `.109.153`, `.110.153`, `.111.153` | serwis na GitHub Pages |
+| `liczmat.com` A | `199.36.158.100` (od 2026-10-06; wcześniej cztery adresy GitHub Pages `185.199.108-111.153`) | serwis na Firebase Hosting |
 | `liczmat.com` MX ×3 | `mx1`, `mx2`, `mx3.mail.ovh.net` | skrzynka `contact@liczmat.com` |
 | `liczmat.com` TXT | `v=spf1 include:mx.ovh.com ~all` | SPF poczty OVH |
 

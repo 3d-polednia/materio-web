@@ -52,8 +52,10 @@ construction-material calculator. *Policz. Zaplanuj. Zrealizuj.*
 
 Plain static HTML/CSS/JS in the browser: no framework, no runtime dependency, no
 package manager. There **is** a build step now — a dependency-free Node script that
-generates the pages — see "The build step" below. Deployed to GitHub Pages from the repo
-root by `.github/workflows/pages.yml` on every push to `main` → <https://liczmat.com/>.
+generates the pages — see "The build step" below. Served from the repo root by Firebase
+Hosting (site `materio-502513`, deployed by hand after every push, see the note at the
+top) → <https://liczmat.com/>; `.github/workflows/pages.yml` keeps a GitHub Pages copy as
+the rollback.
 
 ---
 
@@ -186,7 +188,7 @@ a calculator is still authored exactly once. The browser still gets plain HTML/C
 no dependency; the build only moves the work from the visitor's browser to commit time.
 
 **Run the build and commit its output whenever you touch anything it reads.** The output
-is committed because GitHub Pages serves the repo root as-is — there is no CI build.
+is committed because the host serves the repo root as-is — there is no CI build.
 
 ### Authored vs generated
 
@@ -228,7 +230,7 @@ switch on, a key may exist in Polish alone: `defer()` in `scripts/build.mjs` rec
 instead of aborting.
 
 **Freezing is not deleting, and it is not translating badly either.** All thirteen
-languages keep every file they have, GitHub Pages keeps serving them, and every URL that
+languages keep every file they have, the host keeps serving them, and every URL that
 answered before still answers, in its own language, exactly as it read yesterday. Nothing
 Polish is ever written into a German page: the twelve simply stop moving while Polish does.
 The switch is `BUILD_LANGS`, which every loop that writes a file reads; `LANGS` is still
@@ -664,9 +666,10 @@ scripts/test-copy.mjs  Stop slop (sessions 44 and 45): six rules over every stri
                       src/calc-seo.mjs, or anything that changes how much prose a page
                       carries
 functions/            The Cloud Functions codebase — deployed with `firebase deploy
-                      --only functions`, NEVER served by GitHub Pages. It is stripped from
-                      the artifact in `.github/workflows/pages.yml` alongside docs/, src/
-                      and scripts/, because the repo root is the site root. `firebase.json`
+                      --only functions:<name>`, NEVER served as part of the site. The
+                      `materio-502513` hosting site ignores it in `firebase.json`, and
+                      `.github/workflows/pages.yml` strips it from the Pages copy, alongside
+                      docs/, src/ and scripts/, because the repo root is the site root. `firebase.json`
                       and `.firebaserc` at the root are its deployment configuration
 functions/stripe-map.mjs  The whole decision half of the Stripe webhook, and it imports
                       NOTHING: the signature check, the subscription status → plan mapping
@@ -1034,8 +1037,9 @@ Kotlin side of it. Change one, change all three.
   `?mode=reset` open a view directly, and `?next=<path>` offers the way back afterwards.
   Only a path on this site is ever accepted there (`lmSafeNext()`): a sign-in page that
   redirects anywhere is a phishing link with a real domain on it.
-- `/p/<token>` cannot be a real directory, and GitHub Pages has no rewrites — `404.html`
-  forwards `/p/<token>` to `/p/?t=<token>`.
+- `/p/<token>` cannot be a real directory, and the site uses no rewrites (Firebase Hosting
+  has them, but `firebase.json` declares none so the GitHub Pages rollback still works) —
+  `404.html` forwards `/p/<token>` to `/p/?t=<token>`.
 - **`assets/firebase-config.js` holds the live values** for the Web app registered in
   project `materio-502513` (2026-08-07). A Firebase Web apiKey is *not* a secret — it
   cannot be hidden in a browser app. The security rules and the authorized-domains list
@@ -1132,8 +1136,9 @@ Kotlin side of it. Change one, change all three.
   `https://materio-502513.firebaseapp.com/*` and `https://materio-502513.web.app/*` in the
   Google Cloud console. Verified after: the key answers 200 for that referrer and for
   `materio-app.com`, and both hosts are on the Auth authorized-domains list. A custom
-  `authDomain` **on the apex** was never an option — GitHub Pages cannot serve `/__/auth/`,
-  and `liczmat.com` is on GitHub Pages. That is a fact about the apex, not about the
+  `authDomain` **on the apex** was not an option while `liczmat.com` was on GitHub Pages,
+  which cannot serve `/__/auth/` (the apex moved to Firebase Hosting on 2026-10-06; the
+  `auth.liczmat.com` setup stays as it is). That was a fact about the apex, not about the
   project: a Firebase Hosting site serves `/__/auth/` natively, which is exactly what
   `auth.liczmat.com` is for (next bullet). **Since 2026-10-03 the SDK's `authDomain` in
   `assets/firebase-config.js` is `auth.liczmat.com`** (review item P2: the Google window
@@ -1147,13 +1152,14 @@ Kotlin side of it. Change one, change all three.
   of that is here (2026-09-09).** Firebase Authentication will only put a custom address in
   the `From` field of the verification, password-reset and address-change mails if the
   domain is a Hosting site in the same project, because it serves the action link
-  `/__/auth/action?mode=…&oobCode=…` from that same host. The apex cannot be that site
-  without abandoning GitHub Pages, so a subdomain carries the mail half alone: the
+  `/__/auth/action?mode=…&oobCode=…` from that same host. In 2026-09 the apex was on
+  GitHub Pages and could not be that site, so a subdomain carries the mail half alone: the
   `hosting` block in `firebase.json` publishes `hosting/auth/` — two files, an explanation
   page and a `robots.txt` — to the Hosting site `liczmat-auth`. **Deploy it with
   `firebase deploy --only hosting:liczmat-auth`, never a bare `firebase deploy`**, and read
   `docs/AUTH-EMAIL.md` before touching the console or the DNS zone: the apex `MX`, its
-  single `v=spf1` record and the GitHub Pages `A` records must not be edited, and Firebase's
+  single `v=spf1` record and the apex `A` record (Firebase Hosting since 2026-10-06) must not
+  be edited, and Firebase's
   own SPF include, if it asks for one, belongs on the subdomain. `scripts/test-hosting.mjs`
   is what stops a later edit from publishing the 523 pages to Hosting as a second site.
   **The console and DNS half is the owner's and cannot be read back from here** — until he
@@ -2049,8 +2055,9 @@ Kotlin side of it. Change one, change all three.
   consent was denied ("advanced"), which the German DSK treats as needing consent and which
   the privacy policy ("starts only after consent") did not allow. Do not go back to advanced.
 - **Bump `STAMP` in `scripts/build.mjs`** whenever a shipped asset changes, then rebuild.
-  It is the single `?v=` value for every page. GitHub Pages serves assets with
-  `max-age=600`, so without it a visitor can run new markup against a stale stylesheet.
+  It is the single `?v=` value for every page. Firebase Hosting serves `assets/` with
+  `max-age=3600` (`firebase.json`; GitHub Pages used 600), so without it a visitor can run
+  new markup against a stale stylesheet.
   `privacy-policy.html` and `404.html` are hand-written — bump their `?v=` by hand too.
 - **A language's own name is written down once, in `LANGS` in `assets/i18n.js`.**
   `LANG_NAME` in `src/flags.mjs` reads that list; it used to be typed out there a second

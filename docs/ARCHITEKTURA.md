@@ -221,8 +221,10 @@ Ręcznie pisana polityka prywatności nie dostaje `lastmod` w ogóle — build j
 więc nie wie, kiedy się zmieniła. `<changefreq>` i `<priority>` zniknęły: Google ich nie
 czyta, nikt inny też, a każda nowa strona musiała je sobie wymyślić.
 
-**GitHub Pages nie ma przepisywania adresów.** To ogranicza routing i trzeba to wiedzieć
-zanim się zaprojektuje adres:
+**Serwis nie używa przepisywania adresów.** Do 2026-10-06 stał na GitHub Pages, który go
+nie ma; Firebase Hosting, na którym stoi teraz, by je miał, ale `firebase.json` celowo
+nie ma `rewrites`, bo GitHub Pages zostaje kopią zapasową i te same pliki muszą działać na
+obu. To ogranicza routing i trzeba to wiedzieć zanim się zaprojektuje adres:
 
 - każdy stały adres musi być prawdziwym katalogiem z `index.html`, który wypisuje build;
 - adres z nieograniczonym identyfikatorem (token, id projektu) **nie może** być katalogiem.
@@ -941,7 +943,7 @@ więc Sesja 22 buduje samego klienta i jedyne powiązanie, które **dziś istnie
 
 **Strona.** `/klienci/` w trzynastu językach, plus `/klienci/?id=<clientId>` jako `view` —
 dokładnie z tego powodu, z którego `project` nim jest: identyfikator powstaje
-w przeglądarce, a GitHub Pages nie ma przepisywania adresów (§3). Indeks to lista klientów
+w przeglądarce, a serwis nie używa przepisywania adresów (§3). Indeks to lista klientów
 i archiwum; ekran klienta to dane kontaktowe, notatki, jego projekty razem z tym, ile już
 kosztują, i historia.
 

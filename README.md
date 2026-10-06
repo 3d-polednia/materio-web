@@ -63,7 +63,8 @@ node scripts/build.mjs --check  # tylko walidacja słowników i slugów, nic nie
 
 Bez `package.json` i bez `node_modules` — skrypt czyta te same `assets/i18n.js`
 i `assets/calculators.js`, których używa przeglądarka. **Wynik jest commitowany**,
-bo GitHub Pages serwuje katalog repo bez żadnego budowania po swojej stronie.
+bo hosting (Firebase Hosting, a zapasowo GitHub Pages) serwuje katalog repo bez
+żadnego budowania po swojej stronie.
 Nie edytuj wygenerowanych plików `.html` — kolejny build je nadpisze.
 
 Build **przerywa**, zamiast wypuścić zepsutą stronę: brakujący klucz w jednym
@@ -137,14 +138,16 @@ assets/
   og-image.jpg · banner.jpg · icon-*.png · apple-touch-icon.png · favicon-32.png
 functions/              Cloud Function: webhook Stripe nadający plan. Wdrażana
                         osobno (`firebase deploy --only functions`), NIGDY nie
-                        trafia na Pages
+                        trafia do serwisu (`firebase.json` go wyklucza)
 hosting/auth/           Dwa pliki witryny `auth.liczmat.com` w Firebase Hosting —
                         subdomena istnieje po to, żeby maile konta wychodziły
                         z własnej domeny (`docs/AUTH-EMAIL.md`). Wdrażana osobno
                         (`firebase deploy --only hosting:liczmat-auth`), tak samo
-                        jak `functions/` nie trafia na Pages
+                        jak `functions/` nie trafia do serwisu
 privacy-policy.html · 404.html · robots.txt · site.webmanifest · .nojekyll
-.github/workflows/pages.yml   Wdrożenie na GitHub Pages (tylko z gałęzi main)
+.github/workflows/pages.yml   Zapasowa kopia serwisu na GitHub Pages (tylko z main)
+firebase.json           Hosting serwisu (witryna `materio-502513`), nagłówki
+                        bezpieczeństwa i cache; też `functions/` i `hosting/auth/`
 docs/                   Dokumentacja i plan produktu
 ```
 
@@ -174,14 +177,30 @@ node scripts/build.mjs        # jeśli zmieniałeś cokolwiek, co czyta build
 python3 -m http.server 8080   # potem wejdź na http://localhost:8080
 ```
 
-## Wdrożenie (GitHub Pages)
+## Wdrożenie (Firebase Hosting)
 
-Workflow `.github/workflows/pages.yml` publikuje katalog główny repo przy każdym
-pushu **do `main`**, po wyrzuceniu z artefaktu `docs/`, `src/`, `scripts/`,
-`functions/`, `hosting/`, `CLAUDE.md` i `README.md` — korzeń repo jest korzeniem
-serwisu, więc
-wszystko, co w nim zostanie, jest publiczne. Domena własna: `liczmat.com`
-(plik `CNAME` + `BASE` w `src/site.mjs`).
+Od 2026-10-06 `liczmat.com` serwuje **Firebase Hosting**, witryna `materio-502513`
+(audyt AUDYT3, pozycja L4: GitHub Pages nie umie wysłać nagłówków bezpieczeństwa,
+które są w `firebase.json`). Po każdym pushu do `main` wdrożenie robi się ręcznie,
+z czystej kopii `origin/main`, nigdy z katalogu roboczego:
+
+```
+cd C:\Projekty\mw-deploy
+git fetch -q origin && git checkout -q --detach origin/main
+firebase deploy --only hosting:materio-502513
+```
+
+`firebase.json` wyklucza z serwisu `docs/`, `src/`, `scripts/`, `functions/`,
+`hosting/`, `CLAUDE.md`, `README.md` i pliki ukryte; korzeń repo jest korzeniem
+serwisu, więc wszystko inne jest publiczne. Strony mają `Cache-Control: no-cache`,
+`assets/` godzinę. Nieznany adres dostaje `404.html` (tak działa `/p/<token>`);
+przepisywania adresów celowo nie ma, żeby te same pliki działały też na GitHub Pages.
+
+DNS w OVH: apeks `A 199.36.158.100`, TXT `hosting-site=materio-502513`.
+**Powrót na GitHub Pages:** workflow `.github/workflows/pages.yml` dalej publikuje
+każdy push do `main`, więc wystarczy przywrócić cztery rekordy A
+`185.199.108.153` … `185.199.111.153` (i AAAA `2606:50c0:8000::153` … `8003::153`).
+Adres bazowy: `BASE` w `src/site.mjs`.
 
 ## Licencja
 
