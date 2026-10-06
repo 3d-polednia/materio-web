@@ -203,10 +203,12 @@ export function appMain(t, features) {
                at all and borrowed the sign-in one, which failed when it was empty. -->
           <div data-auth-view="signin">
             <h2 data-i18n="app_signin">${esc(t("app_signin"))}</h2>
-            <form id="signin-form" autocomplete="on">
+            <form id="signin-form" autocomplete="on" novalidate>
               ${field("signin-email", "app_email", t, { type: "email", autocomplete: "email" })}
               ${field("signin-password", "app_password", t, { type: "password", autocomplete: "current-password", minlength: 6 })}
+              <button type="button" class="linkish" data-password-toggle="signin-password" data-i18n="app_pass_show">${esc(t("app_pass_show"))}</button>
               ${rememberBox("signin-remember", t)}
+              <p class="result err show" data-auth-error role="alert" hidden></p>
               <button type="submit" class="btn btn-primary" data-i18n="app_signin">${esc(t("app_signin"))}</button>
             </form>
             <p class="auth-links">
@@ -218,11 +220,15 @@ export function appMain(t, features) {
           <div data-auth-view="signup" hidden>
             <h2 data-i18n="app_signup_t">${esc(t("app_signup_t"))}</h2>
             <p class="muted" data-i18n="app_signup_d">${esc(t("app_signup_d"))}</p>
-            <form id="signup-form" autocomplete="on">
+            <form id="signup-form" autocomplete="on" novalidate>
               ${field("signup-email", "app_email", t, { type: "email", autocomplete: "email" })}
               ${field("signup-password", "app_password", t, { type: "password", autocomplete: "new-password", minlength: 6 })}
+              <button type="button" class="linkish" data-password-toggle="signup-password" data-i18n="app_pass_show">${esc(t("app_pass_show"))}</button>
+              ${field("signup-password-repeat", "app_password_repeat", t, { type: "password", autocomplete: "new-password", minlength: 6 })}
+              <button type="button" class="linkish" data-password-toggle="signup-password-repeat" data-i18n="app_pass_show">${esc(t("app_pass_show"))}</button>
               ${i("app_password_rule", "p", "muted field-note")}
               ${rememberBox("signup-remember", t)}
+              <p class="result err show" data-auth-error role="alert" hidden></p>
               <button type="submit" class="btn btn-primary" data-i18n="app_signup">${esc(t("app_signup"))}</button>
             </form>
             <p class="auth-links">
@@ -234,8 +240,9 @@ export function appMain(t, features) {
           <div data-auth-view="reset" hidden>
             <h2 data-i18n="app_reset_t">${esc(t("app_reset_t"))}</h2>
             <p class="muted" data-i18n="app_reset_d">${esc(t("app_reset_d"))}</p>
-            <form id="reset-form" autocomplete="on">
+            <form id="reset-form" autocomplete="on" novalidate>
               ${field("reset-email", "app_email", t, { type: "email", autocomplete: "email" })}
+              <p class="result err show" data-auth-error role="alert" hidden></p>
               <button type="submit" class="btn btn-primary" data-i18n="app_reset_send">${esc(t("app_reset_send"))}</button>
             </form>
             <p class="auth-links">
@@ -381,12 +388,6 @@ export function appMain(t, features) {
               </form>
 
               <div class="app-card">
-                <h3 data-i18n="prof_level_t">${esc(t("prof_level_t"))}</h3>
-                ${i("prof_level_d", "p", "muted")}
-                ${levelCards(t, "")}
-              </div>
-
-              <div class="app-card">
                 <h3 data-i18n="prof_session_t">${esc(t("prof_session_t"))}</h3>
                 ${i("prof_session_d", "p", "muted")}
                 <div class="field-check">
@@ -394,7 +395,6 @@ export function appMain(t, features) {
                   <label for="prof-remember" data-i18n="app_remember">${esc(t("app_remember"))}</label>
                 </div>
                 <p id="prof-session-state" class="muted field-note"></p>
-                <button type="button" id="prof-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">${esc(t("app_signout"))}</button>
               </div>
             </section>
 

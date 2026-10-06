@@ -239,12 +239,16 @@ head("8. /app/ carries the account system in every language");
   has('id="signup-form"', "sign-up is its own form");
   has('id="reset-form"', "resetting has its own form, and its own e-mail field");
   has('id="reset-email"', "which is where the address goes");
+  for (const id of ["signin-form", "signup-form", "reset-form"]) {
+    check(`${id} disables native validation`,
+      new RegExp(`<form id="${id}"[^>]*\\bnovalidate\\b`).test(html));
+  }
   // Back on the owner's word (2026-09-17): GOOGLE_SIGN_IN in src/app-pages.mjs emits
   // the Google sign-in markup into the page.
   has('id="auth-google"', "Google sign-in is offered");
   has('id="auth-google-box"', "and so is the separator above it");
   has('id="app-signout"', "signing out is still there");
-  has('id="prof-signout"', "and again in the profile");
+  hasNot('id="prof-signout"', "the profile does not repeat the side-menu sign-out");
   has('data-panel="profile"', "the profile is a panel of its own");
   has('id="prof-name"', "the profile can name the account");
   has('id="prof-remember"', "and decide how long the session lasts");
@@ -254,17 +258,23 @@ head("8. /app/ carries the account system in every language");
   // was one field shared by both modes before, so a browser filled in the old password
   // on the form meant to create an account.
   const signup = html.slice(html.indexOf('data-auth-view="signup"'), html.indexOf('data-auth-view="reset"'));
+  check("the sign-up form has the repeat-password field",
+    signup.includes('id="signup-password-repeat"'));
   check("the sign-up password field asks for a new password",
     signup.includes('autocomplete="new-password"'));
   const signin = html.slice(html.indexOf('data-auth-view="signin"'), html.indexOf('data-auth-view="signup"'));
+  check("the sign-in form has no repeat-password field",
+    !signin.includes('id="signup-password-repeat"'));
   check("the sign-in password field asks for the saved one",
     signin.includes('autocomplete="current-password"'));
 
-  // Every level of chapter II is on the page, twice: once for a guest deciding whether
-  // to sign up, once inside the profile.
+  const profile = html.slice(html.indexOf('data-panel="profile"'), html.indexOf('data-panel="pro"'));
+  check("the profile does not repeat the level comparison", !profile.includes("data-levels"));
+
+  // Every level of chapter II is on the page once, for a guest deciding whether to sign up.
   for (const entry of ACCOUNT_LEVELS) {
     const count = html.split(`data-level="${entry.level}"`).length - 1;
-    eq(`the ${entry.level} card is on the page twice`, count, 2);
+    eq(`the ${entry.level} card is on the page once`, count, 1);
   }
   check("the guest card is the marked one while signed out",
     html.includes(`data-level="${LEVEL.GUEST}" data-current="1"`));
@@ -276,7 +286,7 @@ head("8. /app/ carries the account system in every language");
   // nothing grants the plan (FIRESTORE_SYNC §9.2) and the checkout lives on the Pro tab.
   const proCards = html.split('data-level="pro"').slice(1)
     .map((rest) => rest.slice(0, rest.indexOf("</article>")));
-  eq("both copies of the Pro card were found", proCards.length, 2);
+  eq("the Pro card was found", proCards.length, 1);
   for (const card of proCards) {
     check("the Pro card points at the page that explains the level",
       card.includes('href="/liczmat-pro/"') && card.includes('data-nav-route="liczmat-pro"'),
@@ -317,6 +327,9 @@ head("9. the copy exists in all four languages");
     "acc_levels_t", "acc_levels_d", "acc_you_are",
     "app_title", "app_lead", "app_signin", "app_signup", "app_signout",
     "app_signup_t", "app_signup_d", "app_signup_free", "app_password_rule",
+    "app_password_repeat", "app_err_email_empty", "app_err_email_bad",
+    "app_err_pass_empty", "app_err_pass_short", "app_err_pass_mismatch",
+    "app_pass_show", "app_pass_hide", "pay_resume",
     "app_reset_t", "app_reset_d", "app_reset_send", "app_back_signin", "app_reset_sent",
     "app_forgot", "app_switch_signup", "app_switch_signin",
     "app_remember", "app_back_to", "app_signed_out", "app_tabs_label", "app_tab_profile",

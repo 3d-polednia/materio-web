@@ -59,7 +59,7 @@ function payBuyPlan(search) {
 
 function payBuyIntent(search, sub, code) {
   const id = payBuyPlan(search);
-  return id && sub && sub.state !== "active" && lmPayBuyable(id, code) ? id : null;
+  return id && sub && !["active", "cancelled"].includes(sub.state) && lmPayBuyable(id, code) ? id : null;
 }
 
 let payBuyPending = payBuyPlan(typeof location !== "undefined" ? location.search : "");
@@ -349,14 +349,69 @@ const rememberedIn = (form) => {
 async function submitting(form, run) {
   const button = form.querySelector("button[type=submit]");
   if (button) button.disabled = true;
-  status("");
+  clearAuthErrors(form);
   try {
     await run();
   } catch (err) {
-    status(authMessage(err && err.code), true);
+    showAuthError(form, authMessage(err && err.code));
   } finally {
     if (button) button.disabled = false;
   }
+}
+
+function clearAuthErrors(form) {
+  const box = form.querySelector("[data-auth-error]");
+  if (box) { box.textContent = ""; box.hidden = true; }
+  form.querySelectorAll('[aria-invalid="true"]').forEach((input) => {
+    input.removeAttribute("aria-invalid");
+    input.removeAttribute("aria-describedby");
+  });
+  form.querySelectorAll("[data-field-error]").forEach((error) => error.remove());
+}
+
+function showAuthError(form, message) {
+  const box = form.querySelector("[data-auth-error]");
+  if (!box) return;
+  box.textContent = message;
+  box.hidden = false;
+}
+
+function fieldError(input, key) {
+  const id = `${input.id}-error`;
+  const error = document.createElement("p");
+  error.id = id;
+  error.className = "field-error";
+  error.dataset.fieldError = "";
+  error.textContent = T(key);
+  input.setAttribute("aria-invalid", "true");
+  input.setAttribute("aria-describedby", id);
+  input.closest(".field").append(error);
+}
+
+function validEmail(value) {
+  const at = value.indexOf("@");
+  return at > 0 && at < value.length - 1 && value.slice(at + 1).includes(".")
+    && !/\s/.test(value);
+}
+
+function validateAuthForm(form) {
+  clearAuthErrors(form);
+  const email = form.querySelector('input[type="email"]');
+  const passwords = [...form.querySelectorAll('input[type="password"], input[data-password-visible]')];
+  if (email && !email.value.trim()) fieldError(email, "app_err_email_empty");
+  else if (email && !validEmail(email.value.trim())) fieldError(email, "app_err_email_bad");
+  passwords.forEach((input) => {
+    if (!input.value) fieldError(input, "app_err_pass_empty");
+    else if (input.value.length < 6) fieldError(input, "app_err_pass_short");
+  });
+  const repeat = form.querySelector("#signup-password-repeat");
+  const password = form.querySelector("#signup-password");
+  if (repeat && password && repeat.value && repeat.value.length >= 6 && repeat.value !== password.value) {
+    if (repeat.getAttribute("aria-invalid") !== "true") fieldError(repeat, "app_err_pass_mismatch");
+  }
+  const first = form.querySelector('[aria-invalid="true"]');
+  if (first) first.focus();
+  return !first;
 }
 
 function wireAuthForms() {
@@ -367,9 +422,22 @@ function wireAuthForms() {
     button.addEventListener("click", () => showAuthView(button.dataset.authGo, true));
   });
 
+  document.querySelectorAll("[data-password-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = $(button.dataset.passwordToggle);
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      if (show) input.dataset.passwordVisible = "";
+      else delete input.dataset.passwordVisible;
+      button.textContent = T(show ? "app_pass_hide" : "app_pass_show");
+      button.dataset.i18n = show ? "app_pass_hide" : "app_pass_show";
+    });
+  });
+
   $("signin-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const form = e.currentTarget;
+    if (!validateAuthForm(form)) return;
     submitting(form, async () => {
       await applyPersistence(rememberedIn(form));
       await fb.signInWithEmailAndPassword(auth, $("signin-email").value.trim(), $("signin-password").value);
@@ -379,6 +447,7 @@ function wireAuthForms() {
   $("signup-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const form = e.currentTarget;
+    if (!validateAuthForm(form)) return;
     submitting(form, async () => {
       await applyPersistence(rememberedIn(form));
       const cred = await fb.createUserWithEmailAndPassword(
@@ -392,6 +461,7 @@ function wireAuthForms() {
   $("reset-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const form = e.currentTarget;
+    if (!validateAuthForm(form)) return;
     submitting(form, async () => {
       const email = $("reset-email").value.trim();
       if (await accountMail("reset", { email }, () => fb.sendPasswordResetEmail(auth, email))) {
@@ -445,7 +515,6 @@ function wireAuthForms() {
     statusKey("app_signed_out");
   };
   $("app-signout").addEventListener("click", signOut);
-  $("prof-signout").addEventListener("click", signOut);
 
   // A link from a calculator can ask for the sign-up form directly: chapter II wants
   // registration to be the next step after a result, not a form somebody has to find.
@@ -718,7 +787,14 @@ function renderPlan() {
   const portal = typeof lmPortalUrl === "function" ? lmPortalUrl() : null;
   const manage = sub.state === "active" || sub.state === "cancelled";
   $("plan-manage").hidden = !(manage && portal);
-  if (manage && portal) $("plan-manage-link").href = portal;
+  if (manage && portal) {
+    const link = $("plan-manage-link");
+    link.href = portal;
+    link.textContent = T(sub.state === "cancelled" ? "pay_resume" : "pay_manage");
+    link.dataset.i18n = sub.state === "cancelled" ? "pay_resume" : "pay_manage";
+    const detail = $("plan-manage").querySelector(".field-note");
+    if (detail) detail.hidden = sub.state === "cancelled";
+  }
 
   renderPlanPrices(sub);
   consumePayBuy(sub);
@@ -734,8 +810,10 @@ function consumePayBuy(sub) {
   url.searchParams.delete("buy");
   history.replaceState(history.state, "", `${url.pathname}${url.search}${url.hash}`);
 
-  // Somebody who already pays clicked "Wykup": say the subscription is running rather than nothing.
+  // Somebody who already pays clicked "Wykup": explain the current subscription rather
+  // than allowing a second checkout. A cancelled plan remains paid through its end date.
   if (sub.state === "active") { statusKey("plan_active_d"); return; }
+  if (sub.state === "cancelled") { statusKey("plan_cancel_d"); return; }
   const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
   if (payBuyIntent(`?buy=${encodeURIComponent(id)}`, sub, code)) {
     goToCheckout(id);
@@ -748,8 +826,8 @@ function consumePayBuy(sub) {
  * The two plans and the checkout button, for an account that does not have Pro.
  *
  * Hidden entirely for somebody who already pays: quoting a price to an existing
- * subscriber is asking them to buy what they own. A cancelled subscription still sees it,
- * because re-subscribing is exactly what that account might want to do. So does a trial,
+ * subscriber is asking them to buy what they own. A cancelled subscription opens Stripe's
+ * portal to resume without risking a second payment. A trial still sees the prices,
  * and for the stronger reason: the fourteen days are the whole window in which somebody
  * who has seen what Pro does can decide to keep it.
  *
@@ -759,7 +837,7 @@ function consumePayBuy(sub) {
 function renderPlanPrices(sub) {
   const box = $("plan-buy");
   if (!box || typeof lmPayPrice !== "function") return;
-  box.hidden = sub.state === "active";
+  box.hidden = sub.state === "active" || sub.state === "cancelled";
 
   const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
   let chosen = false;

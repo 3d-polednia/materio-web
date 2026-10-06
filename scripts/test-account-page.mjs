@@ -276,6 +276,7 @@ head("3. registration");
 
   await page.fill("#signup-email", "nowy@example.com");
   await page.fill("#signup-password", "sekret123");
+  await page.fill("#signup-password-repeat", "sekret123");
   await page.click("#signup-form button[type=submit]");
   await signedIn(page);
 
@@ -313,6 +314,7 @@ head("3b. signing up from a calculator goes back to it");
   const page = await openApp(ctx, "/app/?mode=signup&next=%2Fkalkulatory%2Fplytki-panele-gres%2F");
   await page.fill("#signup-email", "wraca@example.com");
   await page.fill("#signup-password", "sekret123");
+  await page.fill("#signup-password-repeat", "sekret123");
   await page.click("#signup-form button[type=submit]");
   await page.waitForURL((u) => u.pathname === "/kalkulatory/plytki-panele-gres/", { timeout: 10000 });
   eq("the page returns to the calculator",
@@ -401,10 +403,11 @@ head("4. registration refuses what it should");
   });
   await page.fill("#signup-email", "zajety@example.com");
   await page.fill("#signup-password", "sekret123");
+  await page.fill("#signup-password-repeat", "sekret123");
   await page.click("#signup-form button[type=submit]");
-  await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
+  await page.waitForSelector("#signup-form [data-auth-error]:not([hidden])", { timeout: 5000 });
   eq("an address that already has an account is named as such",
-    await page.locator("#app-status").innerText(), "Konto z tym adresem już istnieje.");
+    await page.locator("#signup-form [data-auth-error]").innerText(), "Konto z tym adresem już istnieje.");
   check("and the visitor is not signed in", !(await visible(page, "#app-workspace")));
 
   // The browser refuses a five-character password before Firebase is asked; the field
@@ -435,10 +438,11 @@ head("5. signing in and signing out");
   await page.fill("#signin-email", "kto@example.com");
   await page.fill("#signin-password", "zle-haslo");
   await page.click("#signin-form button[type=submit]");
-  await page.waitForSelector("#app-status:not([hidden])", { timeout: 5000 });
+  await page.waitForSelector("#signin-form [data-auth-error]:not([hidden])", { timeout: 5000 });
   eq("a wrong password is named as such",
-    await page.locator("#app-status").innerText(), "Zły e-mail lub hasło.");
-  check("the status box reads as an error", await page.locator("#app-status.err").count() === 1);
+    await page.locator("#signin-form [data-auth-error]").innerText(), "Zły e-mail lub hasło.");
+  check("the form message reads as an error",
+    await page.locator("#signin-form [data-auth-error].err").count() === 1);
   eq("and nothing is written about a session",
     await page.evaluate(() => localStorage.getItem("liczmat-signed-in")), null);
 
@@ -867,8 +871,10 @@ head("9b. the LiczMat Pro tab: what the plan is, and the one place that sells it
   check("and the card explains what happens then",
     (await cancelled.locator("#plan-note").innerText()).includes("do końca opłaconego okresu"),
     await cancelled.locator("#plan-note").innerText());
-  // Re-subscribing is exactly what this account might want, so the price comes back.
-  eq("the plans are offered again", await cancelled.locator("#plan-buy").isVisible(), true);
+  // Resuming happens in Stripe's portal, without opening a second checkout.
+  eq("the plans are not offered again", await cancelled.locator("#plan-buy").isVisible(), false);
+  eq("the portal becomes the resume action",
+    await cancelled.locator("#plan-manage-link").innerText(), "Wznów subskrypcję");
   await cancelled.close();
 
   // The one case the page can explain from the document itself: plan still says premium,

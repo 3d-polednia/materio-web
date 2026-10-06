@@ -100,7 +100,7 @@ head("purchase intent arriving at /app/");
   eq("a guest waits for authentication", intent("?buy=monthly", null, "PLN"), null);
   eq("a free account buys", intent("?buy=monthly", { state: "free" }, "PLN"), "monthly");
   eq("a trial account buys", intent("?buy=yearly", { state: "trial" }, "PLN"), "yearly");
-  eq("a cancelled account buys", intent("?buy=monthly", { state: "cancelled" }, "PLN"), "monthly");
+  eq("a cancelled account cannot buy twice", intent("?buy=monthly", { state: "cancelled" }, "PLN"), null);
   eq("an active account does not buy", intent("?buy=monthly", { state: "active" }, "PLN"), null);
   eq("a currency without a price does not buy", intent("?buy=monthly", { state: "free" }, "XXX"), null);
 }
@@ -463,7 +463,7 @@ head("6b. every selector the scripts query exists in the markup the build writes
 head("7. the subscription, said in four languages");
 {
   const keys = [
-    "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_buy_monthly", "pay_buy_yearly", "pay_go", "pay_manage", "pay_manage_d",
+    "pay_t", "pay_d", "pay_soon", "pay_buy", "pay_buy_monthly", "pay_buy_yearly", "pay_go", "pay_manage", "pay_resume", "pay_manage_d",
     "pay_monthly_t", "pay_monthly_per", "pay_yearly_t", "pay_yearly_per",
     "plan_renews", "plan_cancelled", "plan_active_d", "plan_cancel_d",
   ];
