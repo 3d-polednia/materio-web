@@ -64,6 +64,8 @@ function payBuyIntent(search, sub, code) {
 
 let payBuyPending = payBuyPlan(typeof location !== "undefined" ? location.search : "");
 let payBuyHandled = false;
+/** A cancelled plan arrived through "Wykup": its note says which button does what. */
+let payBuyCancelled = false;
 
 /*
  * A sign-in, sign-up or reset form submitted before boot() has wired it — the Firebase SDK
@@ -767,7 +769,7 @@ function renderPlan() {
     expired: "plan_expired",
     free: "plan_none",
   }[sub.state] || "plan_none";
-  $("plan-note").textContent = T(note);
+  $("plan-note").textContent = T(sub.state === "cancelled" && payBuyCancelled ? "plan_cancel_buy_d" : note);
   $("plan-note").classList.toggle("warn", sub.state === "expired");
 
   /* Paid, and the plan has not arrived. The line goes away by itself: this runs again on
@@ -819,6 +821,7 @@ function consumePayBuy(sub) {
   // A cancelled plan that clicked "Wykup" lands on the LiczMat Pro tab, where the resume
   // button and the prices are, with one sentence saying which is which (owner, 2026-10-06).
   if (sub.state === "cancelled") {
+    payBuyCancelled = true;
     if (location.hash !== "#pro") location.hash = "#pro";
     $("plan-note").textContent = T("plan_cancel_buy_d");
     return;
