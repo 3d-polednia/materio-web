@@ -188,6 +188,7 @@ export function homeMain(lang, t, calcs, cat) {
   return `<main id="main" tabindex="-1">
 ${homeHero(t)}
 ${homeDoors(lang, t, calcs, cat)}
+${homePath(t)}
 ${faqSection(t)}
 </main>`;
 }
@@ -202,6 +203,21 @@ function homeHero(t) {
     <h1 id="hero-h">${esc(t("hero_title"))}</h1>
     <p class="lead">${esc(t("hero_lead"))}</p>
    </div>
+  </div>
+</section>`;
+}
+
+/** POLICZ → WYCEŃ → KUP → ZREALIZUJ: the idea of chapter I, in four lines (owner, 2026-10-06). */
+function homePath(t) {
+  return `<section class="block alt" aria-labelledby="path-h">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 id="path-h">${esc(t("path_title"))}</h2>
+    </div>
+    <div class="steps">
+      ${[1, 2, 3, 4].map((n) =>
+        `<div class="step"><h3>${esc(t(`path_${n}_t`))}</h3><p>${esc(t(`path_${n}_d`))}</p></div>`).join("\n      ")}
+    </div>
   </div>
 </section>`;
 }
