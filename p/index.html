@@ -78,7 +78,7 @@
         <div class="lang-picker" id="lang-picker"></div>
         <span class="cur-picker"><select id="currency-select" class="cur-select" aria-label="Waluta" title="Waluta" data-i18n-aria="cur_label"><option value="PLN" selected>PLN</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="GBP">GBP</option><option value="UAH">UAH</option><option value="CZK">CZK</option><option value="RON">RON</option><option value="RSD">RSD</option></select><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span>
       </div>
-      <a class="btn btn-primary btn-sm nav-cta" href="https://play.google.com/store/apps/details?id=pl.materio.app" rel="noopener" target="_blank" data-loc="app" data-i18n="nav_download">Pobierz</a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow" data-i18n="nav_app">Moje konto</a>
     </nav>
     <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Zmień motyw" title="Zmień motyw" data-i18n-aria="theme_toggle"><svg class="ico-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg><svg class="ico-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.3A8.5 8.5 0 1 1 9.7 3.5a6.8 6.8 0 0 0 10.8 10.8Z"/></svg><svg class="ico-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M12 7v7a3.5 3.5 0 0 0 0-7Z" fill="currentColor" stroke="none"/></svg></button>
     <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Otwórz menu" data-i18n-aria="nav_menu"><svg class="ico-menu" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg><svg class="ico-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></button>
@@ -122,11 +122,45 @@
 </main>
 <footer class="site">
   <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="brand"><svg class="logo" width="30" height="30" aria-hidden="true" focusable="false"><use href="#lm-mark"></use></svg><span>LiczMat</span></div>
+        <p class="muted">Kalkulator materiałów budowlanych.</p>
+      </div>
+      <div class="foot-group">
+        <h2>Produkt</h2>
+        <ul class="foot-product">
+          <li><a href="/kalkulatory/" data-i18n="foot_calc_all" data-nav-route="calculators">Wszystkie kalkulatory</a></li>
+          <li><a href="/konwerter-jednostek/" data-i18n="convpage_title" data-nav-route="converter">Konwerter jednostek</a></li>
+          <li><a href="/materialy/" data-i18n="nav_materials" data-nav-route="materials">Materiały</a></li>
+          <li><a href="/poradniki/" data-i18n="foot_guides" data-nav-route="guides">Poradniki</a></li>
+          <li><a href="/sklepy/" data-i18n="nav_stores" data-nav-route="stores">Sklepy</a></li>
+          <li><a href="/liczmat-pro/" data-i18n="pro_t" data-nav-route="liczmat-pro">LiczMat Pro</a></li>
+          <li><a href="/#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="foot-group">
+        <h2>Konto</h2>
+        <ul>
+          <li><a href="/aplikacja/" data-i18n="nav_app_page" data-nav-route="android">Aplikacja</a></li>
+          <li><a href="/app/" rel="nofollow" data-i18n="nav_app" data-nav-route="account">Moje konto</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=pl.materio.app" target="_blank" rel="noopener" data-loc="footer">Google Play</a></li>
+        </ul>
+      </div>
+      <div class="foot-group foot-legal">
+        <h2>Informacje prawne</h2>
+        <ul>
+          <li><a href="/kontakt/">Kontakt i Impressum</a></li>
+          <li><a href="/polityka-prywatnosci/">Polityka prywatności</a></li>
+          <li><a href="/cookies/">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    
     <div class="foot-bottom">
-      <span>© <span data-year>2026</span> LiczMat.</span>
+      <span>© <span data-year>2026</span> LiczMat. Wszelkie prawa zastrzeżone.</span>
       <span class="foot-who">Michał Polednia · Widderweg 17, 85570 Markt Schwaben, Deutschland · <a href="mailto:contact@liczmat.com">contact@liczmat.com</a></span>
-      <span><a href="/kontakt/" data-i18n="foot_contact">Kontakt i Impressum</a> &middot; <a href="/privacy-policy.html" data-i18n="foot_privacy">Polityka prywatności</a></span>
-      <span class="muted" data-i18n="app_noindex_note">Ta strona nie jest indeksowana przez wyszukiwarki.</span>
+      <span>Wyniki są szacunkowe. Zawsze zweryfikuj przed zakupem.</span>
     </div>
   </div>
 </footer>

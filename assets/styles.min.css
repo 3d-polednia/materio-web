@@ -313,6 +313,9 @@ text-transform: uppercase; letter-spacing: var(--track-wider); font-size: var(--
 .page-head { padding-bottom: var(--sp-2); }
 .page-head h1 { margin: var(--sp-2) 0 var(--sp-2); }
 .page-head .lead { color: var(--muted); max-width: var(--measure); margin: 0; }
+.account-page-head > .wrap { max-width: 1120px !important; margin-inline: auto !important; text-align: left !important; }
+.account-page-head .lead { margin-inline: 0 !important; color: var(--muted); }
+.account-page-head .breadcrumbs ol { justify-content: flex-start !important; }
 .tool-page { --tool-w: 760px; }
 @media (min-width: 1280px) { .tool-page { --tool-w: 1120px; } }
 .tool-page .page-head > .wrap,
@@ -613,6 +616,7 @@ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 .ws-project-grid > .field:nth-child(n + 3):nth-child(-n + 5) { grid-column: span 2; }
 .ws-project-grid > .field:nth-child(6) { grid-column: 1 / -1; }
 .ws-project-grid > .field:nth-child(7) { grid-column: span 2; }
+.ws-project-grid .fld-label { min-height: 2.4em; display: flex; align-items: flex-end; }
 .app-main .ws-project-grid .field input, .app-main .ws-project-grid .field select { max-width: none; }
 @media (max-width: 560px) { .ws-project-grid > * { grid-column: 1 / -1 !important; } }
 .inline-form.crm-client-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--form-row-gap) var(--form-col-gap); }
@@ -1403,6 +1407,11 @@ text-decoration: underline; text-underline-offset: var(--sp-1);
 display: flex; justify-content: flex-end; gap: var(--sp-3);
 margin-top: var(--sp-6); padding-top: var(--sp-4); border-top: 1px solid var(--outline);
 }
+.ws-project-grid > .form-foot, .crm-client-grid > .form-foot {
+grid-column: 1 / -1; justify-content: flex-start; width: 100%;
+}
+.inline-form > .form-foot { flex: 1 0 100%; justify-content: flex-start; }
+.company-logo-field + .company-logo-preview + p + .field-error + .form-foot { justify-content: flex-start; }
 @media (max-width: 560px) { .form-foot .btn { width: 100%; } }
 .app-levels { margin-top: var(--sp-10); }
 .lvl-cards { display: grid; gap: var(--sp-4); grid-template-columns: 1fr; margin-top: var(--sp-4); }
@@ -1469,7 +1478,7 @@ border-bottom: 0; border-right: 0;
 .app-side::-webkit-scrollbar-thumb { background: var(--outline); border-radius: var(--radius-pill); }
 .app-side-brand { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; padding: 0 var(--sp-2); }
 .app-side-brand span { font-weight: var(--fw-black); white-space: nowrap; }
-.app-plan-pill { margin-left: auto; cursor: default; }
+.app-plan-pill { margin-left: auto; cursor: default; background: transparent; border-color: var(--accent-edge); color: var(--accent-strong); }
 .app-nav {
 display: grid; grid-template-rows: repeat(2, auto); grid-auto-flow: column; grid-auto-columns: max-content;
 gap: var(--sp-2); max-width: 100%; overflow-x: auto; padding: 0 var(--sp-8) var(--sp-2) 0;
@@ -1898,6 +1907,7 @@ display: grid; grid-template-columns: auto 1fr auto; column-gap: var(--sp-3); ro
 .ws-mat-grid { display: flex; flex-wrap: wrap; gap: var(--form-row-gap) var(--form-col-gap); margin: 0 0 var(--form-row-gap); }
 .ws-mat-f { display: flex; flex-direction: column; gap: var(--sp-1); flex: 1 1 12rem; min-width: 0; }
 .ws-mat-f .ws-bar-label { margin-bottom: 0; }
+.ws-mat-grid > .ws-mat-f > .ws-bar-label { min-height: 2.4em; display: flex; align-items: flex-end; }
 .ws-mat-f-sm { flex: 1 1 5.5rem; }
 .ws-mat-f-postal { flex: 0 1 9rem; }
 .ws-mat-f-postal .ws-bar-label { white-space: nowrap; }
@@ -2320,3 +2330,4 @@ font-variant-numeric: tabular-nums;
 .app-stat-card .val {
 color: var(--accent-strong);
 }
+#cal-empty { margin-block: var(--sp-4); }

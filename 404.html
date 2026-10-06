@@ -16,6 +16,9 @@
 <link rel="icon" href="/assets/favicon.svg?v=20261005a" type="image/svg+xml">
 <link rel="icon" href="/assets/favicon-32.png?v=20261005a" sizes="32x32" type="image/png">
 <link rel="stylesheet" href="/assets/styles.min.css?v=20261005a">
+<script defer src="/assets/i18n.pl.js?v=20261005a"></script>
+<script defer src="/assets/account.min.js?v=20261005a"></script>
+<script defer src="/assets/main.min.js?v=20261005a"></script>
 <script>
   // GitHub Pages serves this file for every path it cannot resolve, and it has no
   // rewrite rules. A shared estimate lives at /p/<token>, where the token is a random
@@ -48,6 +51,25 @@
 </script>
 </head>
 <body>
+<!-- AUDYT3 C6: the missing-page view uses the same site chrome as normal pages. -->
+<a class="skip-link" href="#main">Przejdź do treści</a>
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/"><span>LiczMat</span></a>
+    <nav id="nav-links" class="nav-links" aria-label="Główna nawigacja">
+      <ul class="nav-list">
+        <li><a href="/kalkulatory/">Kalkulatory</a></li>
+        <li><a href="/materialy/">Materiały</a></li>
+        <li><a href="/sklepy/">Sklepy</a></li>
+        <li><a href="/liczmat-pro/">LiczMat Pro</a></li>
+      </ul>
+      <div class="pickers"><div class="lang-picker"><a href="/" lang="pl">Polski</a></div></div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app/" rel="nofollow">Moje konto</a>
+    </nav>
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Menu">Menu</button>
+  </div>
+</header>
+<div id="nav-scrim" class="nav-scrim" hidden></div>
 <main id="main" class="block block-fill">
   <div class="wrap narrow center">
     <h1>404</h1>
@@ -59,5 +81,17 @@
     </p>
   </div>
 </main>
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand"><div class="brand"><span>LiczMat</span></div><p class="muted">Policz. Zaplanuj. Zrealizuj.</p></div>
+      <div class="foot-group"><h2>Produkt</h2><ul><li><a href="/kalkulatory/">Kalkulatory</a></li><li><a href="/materialy/">Materiały</a></li><li><a href="/sklepy/">Sklepy</a></li></ul></div>
+      <div class="foot-group"><h2>Konto</h2><ul><li><a href="/app/">Moje konto</a></li><li><a href="/projekty/">Projekty i pomieszczenia</a></li><li><a href="/moje-materialy/">Moje materiały</a></li></ul></div>
+      <div class="foot-group foot-legal"><h2>Informacje</h2><ul><li><a href="/kontakt/">Kontakt</a></li><li><a href="/polityka-prywatnosci/">Prywatność</a></li><li><a href="/cookies/">Cookies</a></li></ul></div>
+    </div>
+    <nav class="foot-langs" aria-label="Język"><h2>Język</h2><ul><li><a href="/" lang="pl" aria-current="true">Polski</a></li><li><a href="/en/" lang="en">English</a></li><li><a href="/de/" lang="de">Deutsch</a></li></ul></nav>
+    <div class="foot-bottom"><span>© <span data-year>2026</span> LiczMat. Wszelkie prawa zastrzeżone.</span><span>Michał Polednia · Widderweg 17, 85570 Markt Schwaben, Deutschland · <a href="mailto:contact@liczmat.com">contact@liczmat.com</a></span><span>Wyniki są szacunkowe. Zawsze zweryfikuj przed zakupem.</span></div>
+  </div>
+</footer>
 </body>
 </html>
