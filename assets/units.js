@@ -91,6 +91,27 @@ function unitLabel(key, n, lang, tr) {
 }
 
 /**
+ * A unit saved by an older page or by Android is display data, not a translation key.
+ * assets/unit-map.js identifies the known spellings without changing the stored row.
+ * Anything outside that map is visitor-authored text and must survive verbatim.
+ */
+function unitText(stored, qty, lang) {
+  const original = String(stored == null ? "" : stored);
+  const key = typeof UNIT_MAP === "object" && UNIT_MAP
+    ? UNIT_MAP[original.trim().toLowerCase()] : "";
+  if (!key) return original;
+  const code = String(lang || "pl").slice(0, 2);
+  const tr = (name) => typeof t === "function" ? t(name, code) : name;
+  if (key.startsWith("fixed:")) return key.slice(6);
+  if (key.startsWith("quo_unit_")) {
+    const at = Number(key.slice(9));
+    const choices = String(tr("quo_units")).split("|");
+    return choices[at] == null ? original : choices[at];
+  }
+  return unitLabel(key, Number(qty), code, tr);
+}
+
+/**
  * Replace every |n:…| number and every |key| word in a row value with localized text.
  *
  * The word form started as the single `|res_water_l|` litre token. Sessions 10 and 11 need

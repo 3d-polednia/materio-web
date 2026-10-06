@@ -94,7 +94,7 @@ function omuPriceLine(m) {
   if (m.priceMinor === null || m.priceMinor === undefined) {
     return `<span class="muted">${omuEsc(omuT("omat_price_none"))}</span>`;
   }
-  const unit = m.unit ? ` / ${omuEsc(m.unit)}` : "";
+  const unit = m.unit ? ` / ${omuEsc(unitText(m.unit, 1, omuLang()))}` : "";
   return `<b>${omuEsc(omuMoney(m.priceMinor, m.currencyCode))}${unit}</b>`;
 }
 

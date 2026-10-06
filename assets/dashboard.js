@@ -197,7 +197,7 @@ function dashRenderRecent() {
           <em class="muted">${where}${dashEsc(dashDate(r.createdAt))}</em>
         </span>
         <span class="dash-fig">
-          <b>${dashEsc(dashNum(r.requiredUnits))} ${dashEsc(r.unitLabel)}</b>
+          <b>${dashEsc(dashNum(r.requiredUnits))} ${dashEsc(unitText(r.unitLabel, r.requiredUnits, dashLang()))}</b>
           ${cost}
         </span>
       </li>`;
