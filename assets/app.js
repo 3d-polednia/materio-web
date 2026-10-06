@@ -791,6 +791,9 @@ function renderPlan() {
     const link = $("plan-manage-link");
     link.href = portal;
     link.textContent = T(sub.state === "cancelled" ? "pay_resume" : "pay_manage");
+    // Resuming is the first thing a cancelled plan should do, so it is the filled button.
+    link.classList.toggle("btn-primary", sub.state === "cancelled");
+    link.classList.toggle("btn-ghost", sub.state !== "cancelled");
     link.dataset.i18n = sub.state === "cancelled" ? "pay_resume" : "pay_manage";
     const detail = $("plan-manage").querySelector(".field-note");
     if (detail) detail.hidden = sub.state === "cancelled";
@@ -813,7 +816,13 @@ function consumePayBuy(sub) {
   // Somebody who already pays clicked "Wykup": explain the current subscription rather
   // than allowing a second checkout. A cancelled plan remains paid through its end date.
   if (sub.state === "active") { statusKey("plan_active_d"); return; }
-  if (sub.state === "cancelled") { statusKey("plan_cancel_d"); return; }
+  // A cancelled plan that clicked "Wykup" lands on the LiczMat Pro tab, where the resume
+  // button and the prices are, with one sentence saying which is which (owner, 2026-10-06).
+  if (sub.state === "cancelled") {
+    if (location.hash !== "#pro") location.hash = "#pro";
+    $("plan-note").textContent = T("plan_cancel_buy_d");
+    return;
+  }
   const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
   if (payBuyIntent(`?buy=${encodeURIComponent(id)}`, sub, code)) {
     goToCheckout(id);
@@ -837,7 +846,9 @@ function consumePayBuy(sub) {
 function renderPlanPrices(sub) {
   const box = $("plan-buy");
   if (!box || typeof lmPayPrice !== "function") return;
-  box.hidden = sub.state === "active" || sub.state === "cancelled";
+  // A cancelled plan sees the prices and the buy buttons again (owner, 2026-10-06): the
+  // resume button above stays first, and plan_cancel_buy_d says what a new purchase does.
+  box.hidden = sub.state === "active";
 
   const code = typeof lmCurrency === "function" ? lmCurrency() : "PLN";
   let chosen = false;
