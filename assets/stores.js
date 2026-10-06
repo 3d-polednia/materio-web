@@ -105,7 +105,7 @@ function storeRow(s) {
   if (!isFinite(lat) || !isFinite(lon)) return "";
   const nav = esc("https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon);
   return `<li class="store-item">
-      <div class="store-info"><b>${esc(s.name)}</b><span class="store-meta">${t(s.typeKey)}${s.addr ? " · " + esc(s.addr) : ""}</span></div>
+      <div class="store-info"><button type="button" class="store-pin" data-lat="${lat}" data-lon="${lon}" data-name="${esc(s.name)}" title="${esc(t("stores_show_map"))}"><b>${esc(s.name)}</b></button><span class="store-meta">${t(s.typeKey)}${s.addr ? " · " + esc(s.addr) : ""}</span></div>
       <div class="store-actions"><span class="store-dist">${fmtDist(s.dist)}</span>
         <a class="btn btn-primary btn-sm btn-go" href="${nav}" target="_blank" rel="noopener">${t("res_navigate")}</a></div>
     </li>`;
@@ -160,6 +160,21 @@ function buildStoreFinder() {
     moreBtn.onclick = () => { expanded = !expanded; draw(); if (!expanded) listEl.scrollIntoView({ behavior: "smooth", block: "nearest" }); };
     draw();
   }
+
+  // A row's name puts that store on the map (2026-10-06, owner: "the list is there, the map
+  // does not show them"). The embed takes one place per query, so the map shows the store
+  // picked, marked, and on a phone the page scrolls up to it.
+  listEl.addEventListener("click", (e) => {
+    const pin = e.target.closest(".store-pin");
+    if (!pin) return;
+    const lat = Number(pin.dataset.lat), lon = Number(pin.dataset.lon);
+    if (!isFinite(lat) || !isFinite(lon)) return;
+    const label = encodeURIComponent(`${lat},${lon} (${pin.dataset.name || ""})`);
+    map.src = `https://maps.google.com/maps?q=${label}&z=16&output=embed`;
+    listEl.querySelectorAll(".store-item.is-picked").forEach((row) => row.classList.remove("is-picked"));
+    pin.closest(".store-item").classList.add("is-picked");
+    if (map.getBoundingClientRect().top < 0) map.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   // Re-render the store list and its status when the language changes.
   document.addEventListener("langchange", () => { if (currentList) renderList(currentList, true); });
