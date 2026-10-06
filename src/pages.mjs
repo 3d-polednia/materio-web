@@ -186,22 +186,24 @@ function calcLinkCard(calc, lang, t) {
  */
 export function homeMain(lang, t, calcs, cat) {
   return `<main id="main" tabindex="-1">
-${homeHero(t)}
+${homeHero(lang, t)}
 ${homeDoors(lang, t, calcs, cat)}
 ${homePath(t)}
 ${faqSection(t)}
 </main>`;
 }
 
-/** Title and one sentence. No button: the three doors below are the choice, and chapter X
-    rules out repeating a CTA. The row of icon-and-fact chips under the lead went in
-    session W (stop slop): it repeated what the doors and the FAQ already say. */
-function homeHero(t) {
+/** Title, one sentence and the two first actions. Owner, 2026-10-06 (AUDYT3 A7), after
+    seeing both versions: the first screen offers what to do, as sites like this one do,
+    instead of leaving it to the three doors further down. The doors keep their own
+    buttons; these two are the shortcut. */
+function homeHero(lang, t) {
   return `<section class="hero home-hero" aria-labelledby="hero-h">
   <div class="wrap">
    <div class="hero-copy">
     <h1 id="hero-h">${esc(t("hero_title"))}</h1>
     <p class="lead">${esc(t("hero_lead"))}</p>
+    <p class="hero-actions"><a class="btn btn-primary btn-go" href="${urlCalcIndex(lang)}">${esc(t("door_calc_go"))}</a><a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("door_lm_go"))}</a></p>
    </div>
   </div>
 </section>`;
