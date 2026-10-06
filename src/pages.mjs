@@ -1120,7 +1120,8 @@ export function androidMain(lang, t, calcs, cat) {
           <h2 id="appresult-h">${esc(t("apppage_h_result"))}</h2>
           <p>${esc(t("apppage_result_d"))}</p>
           <ul class="app-list"><li>${esc(t("f_calc_t"))}</li><li>${esc(t("f_optim_t"))}</li><li>${esc(t("f_catalog_t"))}</li><li>${esc(t("af_converter_t"))}</li></ul>
-          <p class="app-buy"><span class="app-float-k">${esc(t("apppage_buy_k"))}</span> <b>${esc(t("apppage_buy_v"))}</b> <span class="app-float-a">${esc(t("apppage_buy_w"))}</span></p>
+          <!-- AUDYT3 A7: the "Do kupienia 15 opak. · odpad 7,4%" line went; the hero card and the
+               screenshot beside it already give that same tile result, three times was two too many. -->
         </div>
         <div class="app-work">
           <span class="app-dim" aria-hidden="true"><span>${dim}</span></span>
