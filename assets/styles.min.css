@@ -2362,3 +2362,4 @@ color: var(--accent-strong);
 .store-pin { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--accent-edge); text-underline-offset: 3px; }
 .store-pin:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .store-item.is-picked { border-color: var(--accent-edge); }
+.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-3); margin-top: var(--sp-6); }
