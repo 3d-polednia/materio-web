@@ -111,6 +111,29 @@ function storeRow(s) {
     </li>`;
 }
 
+/* ---------- The map with every store of the list (owner, 2026-10-06) ----------
+   The Google embed shows one place per query, so the stores the list found were nowhere on
+   it while the app marks them all. Once there is a list, the frame gives way to a Leaflet map
+   on OpenStreetMap tiles (no key, no cookies) with one marker per store and one for you.
+   Leaflet is fetched only then, from this site (assets/vendor/leaflet, BSD-2-Clause). */
+let leafletReady = null;
+function loadLeaflet() {
+  if (window.L) return Promise.resolve(window.L);
+  if (leafletReady) return leafletReady;
+  leafletReady = new Promise((resolve, reject) => {
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "/assets/vendor/leaflet/leaflet.css";
+    document.head.appendChild(css);
+    const js = document.createElement("script");
+    js.src = "/assets/vendor/leaflet/leaflet.js";
+    js.onload = () => resolve(window.L);
+    js.onerror = reject;
+    document.head.appendChild(js);
+  });
+  return leafletReady;
+}
+
 function buildStoreFinder() {
   const panel = document.getElementById("store-panel");
   if (!panel) return;
@@ -129,7 +152,7 @@ function buildStoreFinder() {
     const view = COUNTRY_VIEW[document.documentElement.lang] || COUNTRY_VIEW.pl;
     return `https://maps.google.com/maps?q=${q}&ll=${view[0]},${view[1]}&z=${view[2]}&output=embed`;
   };
-  const recenter = () => { if (map) map.src = mapSrc(input ? input.value : ""); };
+  const recenter = () => { if (map) { showEmbed(); map.src = mapSrc(input ? input.value : ""); } };
 
   if (form) form.addEventListener("submit", (e) => { e.preventDefault(); recenter(); });
   document.querySelectorAll("[data-example]").forEach((chip) => {
@@ -137,6 +160,60 @@ function buildStoreFinder() {
     // query matches the active language; fall back to the raw data-example.
     chip.addEventListener("click", () => { input.value = (chip.textContent || chip.dataset.example).trim(); recenter(); input.focus(); });
   });
+
+  let storesMap = null, storesLayer = null;
+  const markers = new Map();
+  const accent = () => getComputedStyle(document.documentElement).getPropertyValue("--accent-edge").trim() || "#476c00";
+
+  async function drawStoresMap(list) {
+    if (!map || !loc || !list.length) return;
+    let L;
+    try { L = await loadLeaflet(); } catch (e) { return; }   // the embed simply stays
+    let box = document.getElementById("store-leaflet");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "store-leaflet";
+      box.className = "map-frame store-leaflet";
+      box.setAttribute("role", "region");
+      box.setAttribute("aria-label", map.getAttribute("title") || "");
+      map.insertAdjacentElement("afterend", box);
+    }
+    map.hidden = true;
+    box.hidden = false;
+    if (!storesMap) {
+      storesMap = L.map(box, { scrollWheelZoom: false });
+      storesMap.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+      }).addTo(storesMap);
+    }
+    if (storesLayer) storesLayer.remove();
+    storesLayer = L.layerGroup().addTo(storesMap);
+    markers.clear();
+    const color = accent();
+    L.circleMarker([loc.lat, loc.lng], { radius: 7, color: "#1d5fa8", fillColor: "#1d5fa8", fillOpacity: 0.9, weight: 2 }).addTo(storesLayer);
+    const points = [[loc.lat, loc.lng]];
+    for (const st of list) {
+      const lat = Number(st.lat), lon = Number(st.lon);
+      if (!isFinite(lat) || !isFinite(lon)) continue;
+      const nav = "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon;
+      const mk = L.circleMarker([lat, lon], { radius: 8, color, fillColor: color, fillOpacity: 0.85, weight: 2 })
+        .bindPopup(`<b>${esc(st.name)}</b><br>${esc(t(st.typeKey))} · ${fmtDist(st.dist)}<br><a href="${esc(nav)}" target="_blank" rel="noopener">${esc(t("res_navigate"))}</a>`)
+        .addTo(storesLayer);
+      markers.set(`${lat},${lon}`, mk);
+      points.push([lat, lon]);
+    }
+    storesMap.invalidateSize();
+    storesMap.fitBounds(points, { padding: [24, 24], maxZoom: 15 });
+  }
+
+  // A search by name goes back to the Google frame, which can look a name up.
+  const showEmbed = () => {
+    const box = document.getElementById("store-leaflet");
+    if (box) box.hidden = true;
+    if (map) map.hidden = false;
+  };
 
   let currentList = null;   // last rendered list, so we can re-render on language change
   let expanded = false;
@@ -169,11 +246,18 @@ function buildStoreFinder() {
     if (!pin) return;
     const lat = Number(pin.dataset.lat), lon = Number(pin.dataset.lon);
     if (!isFinite(lat) || !isFinite(lon)) return;
-    const label = encodeURIComponent(`${lat},${lon} (${pin.dataset.name || ""})`);
-    map.src = `https://maps.google.com/maps?q=${label}&z=16&output=embed`;
+    const mk = markers.get(`${lat},${lon}`);
+    if (storesMap && mk && !document.getElementById("store-leaflet").hidden) {
+      storesMap.setView([lat, lon], Math.max(storesMap.getZoom(), 15));
+      mk.openPopup();
+    } else {
+      const label = encodeURIComponent(`${lat},${lon} (${pin.dataset.name || ""})`);
+      map.src = `https://maps.google.com/maps?q=${label}&z=16&output=embed`;
+    }
     listEl.querySelectorAll(".store-item.is-picked").forEach((row) => row.classList.remove("is-picked"));
     pin.closest(".store-item").classList.add("is-picked");
-    if (map.getBoundingClientRect().top < 0) map.scrollIntoView({ behavior: "smooth", block: "start" });
+    const shown = storesMap && !document.getElementById("store-leaflet").hidden ? document.getElementById("store-leaflet") : map;
+    if (shown.getBoundingClientRect().top < 0) shown.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   // Re-render the store list and its status when the language changes.
@@ -192,6 +276,7 @@ function buildStoreFinder() {
         const list = normalize(raw, loc.lat, loc.lng);
         status.textContent = list.length ? t("stores_found").replace("{n}", list.length) : "";
         renderList(list);
+        drawStoresMap(list);
       } catch (e) {
         status.innerHTML = `${esc(t("stores_failed"))} <a href="https://www.google.com/maps/search/sklep+budowlany/@${loc.lat},${loc.lng},12z" target="_blank" rel="noopener">${esc(t("stores_open_maps"))}</a>`;
       } finally { near.disabled = false; }

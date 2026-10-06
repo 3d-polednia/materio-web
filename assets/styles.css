@@ -3544,3 +3544,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 
 /* The home hero's two first actions (owner, 2026-10-06). */
 .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-3); margin-top: var(--sp-6); }
+
+/* The Leaflet map with every store of the list takes the frame's place (2026-10-06). */
+.store-leaflet { overflow: hidden; z-index: 0; }
+.store-leaflet[hidden] { display: none; }
