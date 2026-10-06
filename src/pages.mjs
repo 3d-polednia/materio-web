@@ -7,7 +7,7 @@
 
 import { esc, calcIcon, playBadge, breadcrumbs } from "./template.mjs";
 import {
-  HOME_DOORS, route as iaRoute, STATUS, CALC_CATEGORIES, calcCategory, popularCalcs,
+  HOME_DOORS, route as iaRoute, STATUS, CALC_CATEGORIES, calcCategory,
 } from "./ia.mjs";
 import {
   BASE as BASE_URL, LANGS,
@@ -188,7 +188,6 @@ export function homeMain(lang, t, calcs, cat) {
   return `<main id="main" tabindex="-1">
 ${homeHero(t)}
 ${homeDoors(lang, t, calcs, cat)}
-${homePath(t)}
 ${faqSection(t)}
 </main>`;
 }
@@ -253,21 +252,6 @@ function homeDoors(lang, t, calcs, cat) {
     </div>
     <div class="doors">
       ${cards}
-    </div>
-  </div>
-</section>`;
-}
-
-/** POLICZ → ZAPISZ → ZORGANIZUJ → ZREALIZUJ — the idea of chapter I, in four lines. */
-function homePath(t) {
-  return `<section class="block alt" aria-labelledby="path-h">
-  <div class="wrap">
-    <div class="section-head">
-      <h2 id="path-h">${esc(t("path_title"))}</h2>
-    </div>
-    <div class="steps">
-      ${[1, 2, 3, 4].map((n) =>
-        `<div class="step"><h3>${esc(t(`path_${n}_t`))}</h3><p>${esc(t(`path_${n}_d`))}</p></div>`).join("\n      ")}
     </div>
   </div>
 </section>`;
@@ -374,7 +358,6 @@ export function calcHubMain(lang, t, calcs, guides, convCopy) {
       </section>`;
   }).join("\n      ");
 
-  const popular = popularCalcs(guides, calcs);
 
   const main = `<main id="main" tabindex="-1">
   <section class="block page-head">
@@ -396,22 +379,13 @@ export function calcHubMain(lang, t, calcs, guides, convCopy) {
         <div class="chips calc-cats">
         ${chips}
         </div>
-        <p class="muted calc-shown" role="status" data-calc-shown="${esc(t("calchub_shown"))}">${esc(
+        <p class="muted calc-shown" role="status" data-calc-shown="${esc(t("calchub_shown"))}" hidden>${esc(
           t("calchub_shown").replace("{n}", calcs.length).replace("{total}", calcs.length))}</p>
       </div>
     </section>
 
-    <section class="block" aria-labelledby="popular-h" data-hub-popular>
-      <div class="wrap">
-        <div class="section-head left">
-          <h2 id="popular-h">${esc(t("calchub_start_t"))}</h2>
-          <p class="muted">${esc(t("calchub_start_d"))}</p>
-        </div>
-        <ul class="calc-links">${popular.map((c) =>
-          `<li>${calcLinkCard(c, lang, t)}</li>`).join("")}</ul>
-      </div>
-    </section>
-
+    <!-- AUDYT3 A7: the "Od czego zacząć" shortlist repeated four cards of the list right
+         below it, title for title; it went on 2026-10-06. -->
     <section class="block alt" id="g-all" aria-labelledby="all-h">
       <div class="wrap">
         <div class="section-head left">

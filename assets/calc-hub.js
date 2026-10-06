@@ -58,7 +58,10 @@
     if (empty) empty.hidden = visible !== 0;
     // The build put the untranslated sentence in the attribute and the filled-in one in
     // the element, so the numbers can be replaced without parsing them back out of it.
+    // "15 z 15" with nothing filtered is a number that says nothing (AUDYT3 A7): the counter
+    // shows only while a search or a category narrows the list.
     if (shown) {
+      shown.hidden = !(pattern || category);
       shown.textContent = String(shown.dataset.calcShown || "")
         .replace("{n}", String(visible)).replace("{total}", String(total));
     }
