@@ -537,8 +537,10 @@ section.block > .wrap > p { max-width: var(--measure); }
 }
 
 .breadcrumbs { font-size: var(--fs-sm); color: var(--muted); }
-.breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: 0; padding: 0; }
-.breadcrumbs li + li::before { content: "›"; margin-right: var(--sp-2); color: var(--outline-strong); }
+/* AUDYT3 A4: compact inline gaps keep multiple crumbs on each enlarged-text line. */
+.breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: var(--sp-1); margin: 0; padding: 0; }
+.breadcrumbs li { display: inline-flex; width: auto; }
+.breadcrumbs li + li::before { content: "›"; margin-right: var(--sp-1); color: var(--outline-strong); }
 .breadcrumbs a { color: var(--muted); text-decoration: none; }
 .breadcrumbs a:hover { color: var(--accent-strong); text-decoration: underline; }
 
@@ -1224,6 +1226,8 @@ pre.formula code {
 
 /* ---------- Header / nav ---------- */
 header.site {
+  /* AUDYT3 A4: the header exposes its usable width to a text-relative collapse query. */
+  container-type: inline-size;
   position: sticky; top: 0; z-index: 50;
   backdrop-filter: saturate(160%) blur(12px);
   background: color-mix(in srgb, var(--bg) 82%, transparent);
@@ -1482,6 +1486,10 @@ footer h2 {
    its own sentence, so it gives up its padding and its gaps instead, and sits against
    the screen edges rather than inside a 16 px inset. */
 @media (max-width: 560px) {
+  /* AUDYT3 A4: cap the dialog while its copy scrolls and its decisions stay visible. */
+  .consent-banner { max-height: 60vh; overflow: hidden; }
+  .consent-banner .consent-text { min-height: 0; overflow-y: auto; }
+  .consent-banner .consent-actions { flex: none; }
   .consent-banner, .lang-suggest-banner {
     left: var(--sp-2); right: var(--sp-2); bottom: var(--sp-2);
     padding: var(--sp-3) var(--sp-4); gap: var(--sp-2);
@@ -2842,6 +2850,14 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
    letters a line. It gets the whole line beside the box instead, and the quantity and the
    buttons take the line under it, the quantity lined up under the name. */
 @media (max-width: 560px) {
+  /* AUDYT3 A4: phone account navigation wraps into full-label rows without side scrolling. */
+  .app-nav {
+    grid-template-rows: none; grid-auto-flow: row; grid-auto-columns: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); overflow-x: visible;
+    padding: 0; mask-image: none;
+  }
+  .app-nav-item { min-width: 0; white-space: normal; }
+
   .data-list li.ws-mat:not(.ws-editing) {
     display: grid; grid-template-columns: auto 1fr auto; column-gap: var(--sp-3); row-gap: var(--sp-2);
   }
@@ -2850,6 +2866,25 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
   .ws-mat:not(.ws-editing) > .dash-fig { grid-column: 2; grid-row: 2; align-items: flex-start; text-align: left; }
   .ws-mat:not(.ws-editing) > .row-actions { grid-column: 3; grid-row: 2; }
   .ws-mat:not(.ws-editing) > .ws-mat-note { grid-column: 2 / -1; }
+
+  /* AUDYT3 A4: quote rows reserve one line each for name, calculation, and paired actions. */
+  #quo-page :is(#quo-own-material-list, #quo-labour-list) > .ws-mat:not(.ws-editing) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #quo-page :is(#quo-own-material-list, #quo-labour-list) > .ws-mat:not(.ws-editing) > .row-name {
+    grid-column: 1; grid-row: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #quo-page :is(#quo-own-material-list, #quo-labour-list) > .ws-mat:not(.ws-editing) > .dash-fig {
+    grid-column: 1; grid-row: 2; flex-direction: row; align-items: baseline; gap: var(--sp-1);
+    text-align: left; white-space: nowrap;
+  }
+  #quo-page :is(#quo-own-material-list, #quo-labour-list) > .ws-mat:not(.ws-editing) > .row-actions {
+    grid-column: 1; grid-row: 3; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%; margin-left: 0;
+  }
+  #quo-page :is(#quo-own-material-list, #quo-labour-list) > .ws-mat:not(.ws-editing) > .row-actions .btn {
+    width: 100%; white-space: nowrap;
+  }
 }
 .ws-mat-note { flex-basis: 100%; font-size: var(--fs-sm); }
 .data-list li.ws-mat.done .ws-mat-note { opacity: .6; }
@@ -3240,7 +3275,8 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
    edge and every page scrolled sideways (session 32). The row is widest in Russian and
    Ukrainian; ten languages have to fit it, not four, so the breakpoint moved up from the
    900 px that fitted the four it was measured against. */
-@media (max-width: 1060px) {
+@container (max-width: 66.25em) {
+  /* AUDYT3 A4: 66.25em matches 1060px normally and collapses sooner as text grows. */
   /* The navigation becomes a drawer under the header. The theme switch and the menu
      button stay outside it, so both are reachable with the drawer shut. A drawer
      taller than the phone scrolls on its own; the page behind it does not. */
@@ -3500,3 +3536,9 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 
 /* AUDYT3 A5: the empty-terminarz sentence keeps clear of the card above it. */
 #cal-empty { margin-block: var(--sp-4); }
+
+/* A store's name is the button that puts it on the map (2026-10-06). */
+.store-pin { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--accent-edge); text-underline-offset: 3px; }
+.store-pin:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.store-item.is-picked { border-color: var(--accent-edge); }
+

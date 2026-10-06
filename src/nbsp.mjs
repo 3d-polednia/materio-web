@@ -24,15 +24,20 @@ const REGEX_CACHE = new Map();
 export function nbspShortWords(text, lang) {
   if (typeof text !== "string") return text;
   const list = SHORT_WORDS[lang];
-  if (!list) return text;
-
-  let re = REGEX_CACHE.get(lang);
-  if (!re) {
-    re = new RegExp(`(?<=^|[\\s„"(\\[/])([${list.join("")}]) `, "gi");
-    REGEX_CACHE.set(lang, re);
+  let output = text;
+  if (list) {
+    let re = REGEX_CACHE.get(lang);
+    if (!re) {
+      re = new RegExp(`(?<=^|[\\s„"(\\[/])([${list.join("")}]) `, "gi");
+      REGEX_CACHE.set(lang, re);
+    }
+    output = output.replace(re, "$1\u00a0");
   }
 
-  return text.replace(re, "$1\u00a0");
+  /* AUDYT3 A4: bind generated phone groups and street abbreviations across languages. */
+  return output
+    .replace(/(?<!\d)(?:\+?\d{1,3} )?\d{3} \d{3} \d{3}(?!\d)/g, (phone) => phone.replaceAll(" ", "\u00a0"))
+    .replace(/\b(ul\.|al\.|pl\.) ([\p{L}\p{N}])/giu, "$1\u00a0$2");
 }
 
 /* Elements whose content is not prose: code, styles, data and what the visitor types. They
@@ -53,7 +58,7 @@ const RAW_BLOCK = /(<(script|style|textarea|pre|code)\b[\s\S]*?<\/\2\s*>)/i;
  * @returns {string}
  */
 export function nbspHtml(html, lang) {
-  if (typeof html !== "string" || !SHORT_WORDS[lang]) return html;
+  if (typeof html !== "string") return html;
   let out = "";
   let rest = html;
   for (let raw = rest.match(RAW_BLOCK); raw; raw = rest.match(RAW_BLOCK)) {
