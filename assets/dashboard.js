@@ -114,6 +114,12 @@ function dashRenderLinks() {
   });
 }
 
+/** A project is the owner of a saved calculation, so it is also its destination. */
+function dashProjectUrl(projectId) {
+  const base = dashUrl("projects");
+  return projectId ? `${base}?id=${encodeURIComponent(projectId)}` : base;
+}
+
 /* ------------------------------------------------------------------ projekty */
 
 function dashRenderProjects() {
@@ -178,10 +184,19 @@ function dashRenderRecent() {
   const names = {};
   wsAllProjects().forEach((p) => { names[p.id] = p.name; });
 
-  const rows = wsEstimations()
+  const rows = (typeof wsCalcLines === "function" ? wsCalcLines() : wsEstimations())
     .slice()
     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
     .slice(0, DASH_LINES);
+
+  // On the account overview this link used to say "all estimates" but open the quotes
+  // list. Calculations belong to projects: one project's shortlist opens that project,
+  // while a mixed or empty shortlist opens the projects list.
+  const all = document.querySelector('[aria-labelledby="dash-recent-h"] [data-dash-url="estimate"]');
+  if (all) {
+    const projectIds = [...new Set(rows.map((row) => row.projectId).filter(Boolean))];
+    all.setAttribute("href", projectIds.length === 1 ? dashProjectUrl(projectIds[0]) : dashUrl("projects"));
+  }
 
   if (!rows.length) { list.innerHTML = dashEmpty("dash_recent_empty"); return; }
 
@@ -193,7 +208,7 @@ function dashRenderRecent() {
       ? `<em class="muted">${dashEsc(wsMoney(r.totalCostMinor, r.currencyCode))}</em>` : "";
     return `<li>
         <span class="row-name">
-          <b>${dashEsc(r.name)}</b>
+          <a href="${dashEsc(dashProjectUrl(r.projectId))}"><b>${dashEsc(r.name)}</b></a>
           <em class="muted">${where}${dashEsc(dashDate(r.createdAt))}</em>
         </span>
         <span class="dash-fig">

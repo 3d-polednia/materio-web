@@ -516,7 +516,13 @@ export const calendarFeed = onRequest(
         db.collection("users").doc(uid).collection("clients").get(),
       ]);
       projects = projectSnaps.docs.map((snap) => ({ ...snap.data(), id: snap.id }));
-      clientsById = Object.fromEntries(clientSnaps.docs.map((snap) => [snap.id, snap.get("name") || ""]));
+      clientsById = Object.fromEntries(clientSnaps.docs.map((snap) => {
+        const client = snap.data() || {};
+        return [snap.id, {
+          name: client.name || "", street: client.street || "", address: client.address || "",
+          postalCode: client.postalCode || "", city: client.city || "", country: client.country || "",
+        }];
+      }));
     }
     const calendar = buildIcs(projects, { calName: "LiczMat", clientsById, now: Date.now() });
     const eventCount = (calendar.match(/BEGIN:VEVENT\r\n/g) || []).length;

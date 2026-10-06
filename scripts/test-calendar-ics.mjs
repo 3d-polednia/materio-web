@@ -73,6 +73,19 @@ const rich = buildIcs([{ ...base, clientId: "c1", note: "Notatka", updatedAt: NO
   { calName: "LiczMat", clientsById: { c1: "Klient" }, now: 0 }).replace(/\r\n /g, "");
 check("6. stable UID", rich.includes("UID:projekt-1@liczmat.com\r\n"));
 check("6. client and note in description", rich.includes("DESCRIPTION:Klient\\nNotatka\r\n"));
+const located = buildIcs([{ ...base, clientId: "c1", note: "Opis zostaje" }], {
+  calName: "LiczMat",
+  clientsById: { c1: {
+    name: "Klient", street: "Długa 1, lokal 2; oficyna\\A", postalCode: "00-001",
+    city: "Bardzo Długie Miasto Żółtej Gęśli", country: "PL",
+  } },
+  now: NOW,
+});
+const locatedUnfolded = located.replace(/\r\n /g, "");
+check("6. location escapes address punctuation", locatedUnfolded.includes(
+  "LOCATION:Długa 1\\, lokal 2\\; oficyna\\\\A\\, 00-001 Bardzo Długie Miasto Żółtej Gęśli\\, PL\r\n"));
+check("6. long escaped location is folded", /LOCATION:[^\r\n]+\r\n [^\r\n]+/.test(located));
+check("6. location does not replace description", locatedUnfolded.includes("DESCRIPTION:Klient\\nOpis zostaje\r\n"));
 const empty = buildIcs([], { calName: "LiczMat", now: NOW });
 check("6. empty calendar has boundaries", empty.startsWith("BEGIN:VCALENDAR\r\n")
   && empty.endsWith("END:VCALENDAR\r\n") && !empty.includes("BEGIN:VEVENT"));

@@ -30,6 +30,14 @@ function calDay(day) {
   return d.toLocaleDateString(calLang(), { day: "numeric", month: "long", year: "numeric" });
 }
 
+/** The page's reference day, written without a second "Today" label. */
+function calTodayDay(day) {
+  if (!day) return "";
+  const d = new Date(`${day}T00:00:00`);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(calLang(), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
 /**
  * "za 3 dni", "in 3 Tagen", "yesterday" — the distance to a deadline, in words.
  *
@@ -88,7 +96,7 @@ function calRow(job, editable, today) {
   const who = client ? `${calEsc(client.name)} · ` : "";
   const money = job.valueMinor !== null && job.valueMinor !== undefined
     ? ` · ${calEsc(calMoney(job.valueMinor, job.currencyCode))}` : "";
-  const status = `<span class="chip job-chip">${calEsc(calT(`job_st_${job.status}`))}</span>`;
+  const status = `<span class="cal-status"> · ${calEsc(calT(`job_st_${job.status}`))}</span>`;
   const jobs = calUrl("projects", "/projekty/");
 
   const days = typeof crmDaysUntil === "function" ? crmDaysUntil(job.dueDate, today) : null;
@@ -101,16 +109,16 @@ function calRow(job, editable, today) {
   const when = rel ? `<em class="cal-rel ${dueClass}">${calEsc(rel)}</em>` : "";
 
   const date = editable
-    ? `<input type="date" class="cal-due" value="${calEsc(job.dueDate || "")}"
-          aria-label="${calEsc(calT("cal_due_set"))}">`
+    ? `<span class="lm-date-wrap"><input type="date" class="cal-due lm-date" value="${calEsc(job.dueDate || "")}"
+          aria-label="${calEsc(calT("cal_due_set"))}"><span class="lm-date-icon" aria-hidden="true"></span></span>`
     : `<span class="muted">${calEsc(calDay(job.dueDate))}</span>`;
 
   return `<li data-id="${calEsc(job.id)}" class="cal-row">
       <span class="row-name">
         <a href="${calEsc(jobs)}?id=${encodeURIComponent(job.id)}"><b>${calEsc(job.name)}</b></a>
-        <em class="muted">${who}${status}${money}</em>
+        <em class="muted">${who}${money}</em>
       </span>
-      <span class="row-actions cal-when">${when}${date}</span>
+      <span class="row-actions cal-when">${when}${date}${status}</span>
     </li>`;
 }
 
@@ -139,7 +147,11 @@ function calRender() {
   if (!sched) return;
 
   const day = document.getElementById("cal-today-date");
-  if (day) day.textContent = calDay(sched.day);
+  if (day) {
+    day.textContent = calTodayDay(sched.day);
+    const duplicate = day.parentElement && day.parentElement.querySelector(".eyebrow");
+    if (duplicate) duplicate.hidden = true;
+  }
 
   document.getElementById("cal-fig-late").textContent = String(sched.counts.late);
   document.getElementById("cal-fig-today").textContent = String(sched.counts.today);

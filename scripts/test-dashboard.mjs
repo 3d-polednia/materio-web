@@ -85,7 +85,7 @@ function loadDashboard(lmDash, lang) {
     addEventListener() {},
   };
   return evalScript("assets/dashboard.js", [
-    "DASH_PROJECTS", "DASH_LINES", "DASH_TOOLS", "DASH", "dashUrl", "dashLang",
+    "DASH_PROJECTS", "DASH_LINES", "DASH_TOOLS", "DASH", "dashUrl", "dashLang", "dashProjectUrl",
   ], { document, window: { LM_DASH: lmDash } });
 }
 
@@ -336,6 +336,7 @@ head("9. how much of each list the dashboard shows");
     dash.DASH_PROJECTS > 0 && dash.DASH_LINES > 0 && dash.DASH_TOOLS > 0);
   eq("the page it is on is the language it renders", dash.dashLang(), "de");
   eq("a link follows that language", dash.dashUrl("calculators"), "/de/rechner/");
+  eq("a calculation opens its project", dash.dashProjectUrl("projekt 1"), "/?id=projekt%201");
 
   const pl = loadDashboard(data, "pl");
   eq("and the Polish one is the Polish address", pl.dashUrl("calculators"), "/kalkulatory/");

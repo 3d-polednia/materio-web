@@ -93,6 +93,11 @@ export function buildIcs(projects, { calName, clientsById = {}, now }) {
     const stamp = utcStamp(project.updatedAt ?? project.createdAt, now);
     const client = clientsById && clientsById[project.clientId];
     const clientName = typeof client === "string" ? client : client && client.name;
+    const clientLocation = client && typeof client === "object"
+      ? [client.street || client.address,
+          [client.postalCode, client.city].filter(Boolean).join(" "), client.country]
+        .filter((value) => value != null && String(value).trim() !== "").map(String).join(", ")
+      : "";
     const description = [clientName, project.note].filter((value) => value != null && value !== "")
       .map(String).join("\n");
     lines.push(
@@ -104,6 +109,7 @@ export function buildIcs(projects, { calName, clientsById = {}, now }) {
       `DTEND;VALUE=DATE:${nextDay(project.dueDate)}`,
       `SUMMARY:${text(project.name)}`,
     );
+    if (clientLocation) lines.push(`LOCATION:${text(clientLocation)}`);
     if (description) lines.push(`DESCRIPTION:${text(description)}`);
     lines.push("TRANSP:TRANSPARENT", "END:VEVENT");
   }
