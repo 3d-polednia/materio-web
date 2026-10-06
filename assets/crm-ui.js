@@ -61,6 +61,13 @@ let crmAsking = false;
 let crmUndone = null;
 let crmNewPostal = null;
 let crmEditPostal = null;
+let crmSearchQuery = "";
+
+/** Search text without case or accents, so "Lodz" also finds "Łódź" where possible. */
+function crmSearchText(value) {
+  return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/ł/g, "l").replace(/Ł/g, "L").toLocaleLowerCase(crmLang());
+}
 
 /* ------------------------------------------------------------------ the Pro notice */
 
@@ -89,9 +96,10 @@ function crmClientRow(c) {
   // The contact line is what a phone-shaped list is for: the number is the reason to open
   // the page at all, so it is on the row rather than one navigation away.
   const contact = [c.phone, c.email].filter(Boolean).join(" · ");
+  const heading = [c.name, c.city].filter(Boolean).join(" · ");
   return `<li data-id="${crmEsc(c.id)}">
       <span class="row-name">
-        <a href="?id=${encodeURIComponent(c.id)}" data-open><b>${crmEsc(c.name)}</b></a>
+        <a href="?id=${encodeURIComponent(c.id)}" data-open><b>${crmEsc(heading)}</b></a>
         <em class="muted">${contact ? `${crmEsc(contact)} · ` : ""}${crmT("cli_fig_projects")}: ${
     costs.projects}${money} · ${crmEsc(crmDate(crmClientLastAt(c.id)))}${mixed}</em>
       </span>
@@ -108,9 +116,27 @@ function crmRenderClients() {
   const list = document.getElementById("crm-client-list");
   if (!list) return;
   const clients = crmClients();
-  list.innerHTML = clients.length
-    ? clients.map((c) => crmClientRow(c)).join("")
-    : `<li class="empty muted">${crmEsc(crmT("cli_empty"))}</li>`;
+  let search = document.getElementById("crm-client-search");
+  if (!search) {
+    search = document.createElement("label");
+    search.className = "field";
+    search.id = "crm-client-search";
+    search.innerHTML = `<span class="fld-label">${crmEsc(crmT("cli_search"))}</span><input type="search" aria-label="${crmEsc(crmT("cli_search"))}">`;
+    list.parentNode.insertBefore(search, list);
+    search.querySelector("input").addEventListener("input", (event) => {
+      crmSearchQuery = event.currentTarget.value;
+      crmRenderClients();
+    });
+  }
+  const input = search.querySelector("input");
+  if (input && input.value !== crmSearchQuery) input.value = crmSearchQuery;
+  const query = crmSearchText(crmSearchQuery.trim());
+  const shown = query ? clients.filter((c) => crmSearchText([
+    c.name, c.company, c.city, c.phone, c.email,
+  ].join(" ")).includes(query)) : clients;
+  list.innerHTML = shown.length
+    ? shown.map((c) => crmClientRow(c)).join("")
+    : `<li class="empty muted">${crmEsc(crmT(clients.length ? "cli_search_none" : "cli_empty"))}</li>`;
 
   // The archive is absent entirely while it is empty: a disclosure with nothing behind it
   // is a control that lies about having content.
@@ -209,7 +235,8 @@ function crmRenderProjects(id) {
     none.className = "muted";
     form.parentNode.insertBefore(none, form);
   }
-  none.textContent = crmT("cli_project_none");
+  const all = typeof wsProjects === "function" ? wsProjects() : [];
+  none.textContent = crmT(all.length ? "cli_project_none" : "cli_project_none_any");
   none.hidden = free.length > 0;
 }
 
@@ -501,6 +528,22 @@ function buildClientsPage() {
     error: document.getElementById("crm-edit-postal-error"),
     datalist: document.getElementById("crm-edit-city-list"),
     defaultCountry: fallbackCountry,
+  });
+  [
+    ["crm-client-country", "crm-client-postal-code", "crm-client-city", "crm-client-city-list"],
+    ["crm-edit-country", "crm-edit-postal-code", "crm-edit-city", "crm-edit-city-list"],
+  ].forEach(([countryId, postalId, cityId, listId]) => {
+    document.getElementById(countryId).addEventListener("change", (event) => {
+      const country = document.getElementById(countryId);
+      const code = document.getElementById(postalId);
+      const raw = code.value.trim();
+      if (LMPostal.validate(country.value, raw) && LMPostal.format(country.value, raw) === raw) return;
+      event.stopImmediatePropagation();
+      document.getElementById(listId).replaceChildren();
+      const city = document.getElementById(cityId);
+      if (city.dataset.autoCity && city.value === city.dataset.autoCity) city.value = "";
+      delete city.dataset.autoCity;
+    }, true);
   });
 
   crmBindPhoneField(document.getElementById("crm-client-phone"), document.getElementById("crm-client-phone-error"));

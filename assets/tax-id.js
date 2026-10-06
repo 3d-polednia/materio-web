@@ -4,7 +4,7 @@
   "use strict";
 
   const TAX_IDS = {
-    PL: { label: "NIP", example: "1234567890" },
+    PL: { label: "NIP", example: "123-456-78-90" },
     DE: { label: "USt-IdNr.", example: "DE123456789" },
     AT: { label: "UID", example: "ATU12345678" },
     CZ: { label: "DIČ", example: "CZ12345678" },

@@ -35,6 +35,16 @@ function companyMount() {
     error: document.getElementById("company-postal-error"),
     datalist: document.getElementById("company-city-list"),
   });
+  field("country").addEventListener("change", (event) => {
+    const raw = field("postalCode").value.trim();
+    if (LMPostal.validate(field("country").value, raw) && LMPostal.format(field("country").value, raw) === raw) return;
+    updateTaxId();
+    event.stopImmediatePropagation();
+    document.getElementById("company-city-list").replaceChildren();
+    const city = field("city");
+    if (city.dataset.autoCity && city.value === city.dataset.autoCity) city.value = "";
+    delete city.dataset.autoCity;
+  }, true);
   field("country").addEventListener("change", updateTaxId);
   const phone = field("phone");
   const phoneError = document.getElementById("company-phone-error");

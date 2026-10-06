@@ -38,6 +38,7 @@ function omuDate(ms) {
 
 /** The last delete, until the visitor undoes it or does something else. */
 let omuUndone = null;
+let omuEditingId = "";
 
 /* ------------------------------------------------------------------ the form */
 
@@ -87,6 +88,15 @@ function omuClearForm(form) {
   });
 }
 
+function omuFillForm(form, material) {
+  form.querySelectorAll("[data-omat-in]").forEach((el) => {
+    const key = el.dataset.omatIn;
+    if (key === "priceMajor") { el.value = ""; return; }
+    el.value = material[key] == null ? "" : material[key];
+  });
+  omuShowGroup(form, material.application);
+}
+
 /* ------------------------------------------------------------------ the list */
 
 /** The price line of one material: what it costs now, or that nobody has priced it. */
@@ -123,8 +133,10 @@ function omuTrendLine(id) {
 function omuHistory(id) {
   const points = omHistory(id);
   if (!points.length) return `<p class="muted">${omuEsc(omuT("omat_hist_empty"))}</p>`;
+  const material = omMaterials().find((item) => item.id === id);
+  const unit = material && material.unit ? ` / ${omuEsc(unitText(material.unit, 1, omuLang()))}` : "";
   return `<ol class="omat-hist">${points.map((p) =>
-    `<li><span>${omuEsc(omuDate(p.recordedAt))}</span> <b>${omuEsc(omuMoney(p.priceMinor, p.currencyCode))}</b></li>`,
+    `<li><span>${omuEsc(omuDate(p.recordedAt))}</span> <b>${omuEsc(omuMoney(p.priceMinor, p.currencyCode))}${unit}</b></li>`,
   ).join("")}</ol>`;
 }
 
@@ -178,12 +190,14 @@ function omuHistLabel() {
 function omuRow(m) {
   const description = m.application === "OTHER" ? (m.purpose || omuAppLabel("OTHER")) : omuAppLabel(m.application);
   const category = typeof t === "function" ? t(`cat_${m.category || ""}`) : "";
-  const meta = [description, category && category !== `cat_${m.category}` ? category : ""].filter(Boolean).join(" · ");
+  const categoryLabel = category && category !== `cat_${m.category}` ? category : "";
+  const meta = [description, categoryLabel !== description ? categoryLabel : ""].filter(Boolean).join(" · ");
   const when = m.priceUpdatedAt ? omuDate(m.priceUpdatedAt) : "";
   return `<article class="mrow" data-omat-row="${omuEsc(m.id)}">
     <div class="mrow-main"><h3>${omuEsc(m.name)}</h3><p class="muted">${omuEsc(meta)}</p></div>
     <div class="mrow-price"><p>${omuPriceLine(m)}</p>${when ? `<p class="muted">${omuEsc(when)}</p>` : ""}</div>
     <div class="mrow-act">
+      <button type="button" class="btn btn-ghost btn-sm" data-omat-edit>${omuEsc(omuT("row_edit"))}</button>
       <button type="button" class="btn btn-ghost btn-sm" data-omat-price-toggle aria-expanded="false">${omuEsc(omuT("omat_price_change"))}</button>
       <button type="button" class="btn btn-ghost btn-sm" data-omat-delete>${omuEsc(omuT("omat_delete"))}</button>
     </div>
@@ -214,6 +228,10 @@ function omuRender() {
   if (searchWrap) searchWrap.hidden = rows.length < 6;
   const noMatch = document.querySelector("[data-omat-search-none]");
   if (noMatch) noMatch.hidden = !query || shown.length > 0 || rows.length === 0;
+  const historyHeading = Array.from(document.querySelectorAll(".card h2"))
+    .find((heading) => heading.textContent.trim() === omuHistLabel());
+  const historySection = historyHeading && historyHeading.closest("section");
+  if (historySection) historySection.hidden = rows.length === 0;
   omuRenderUndo();
 }
 
@@ -255,8 +273,9 @@ function omuInit() {
     // synchronously, so the redraw runs inside omAdd() — a token cleared afterwards leaves
     // the strip offering to undo a delete that has already been drawn over.
     omuUndone = null;
-    const added = omAdd(omuFormFields(form));
-    if (!added) {
+    const fields = omuFormFields(form);
+    const saved = omuEditingId ? omUpdate(omuEditingId, fields) : omAdd(fields);
+    if (!saved) {
       // A material with no name is a row nobody can tell apart. Said out loud rather than
       // left to the browser's own validation bubble, which no screen reader announces here.
       if (err) { err.textContent = omuT("omat_name_needed"); err.hidden = false; }
@@ -266,6 +285,7 @@ function omuInit() {
     }
     if (err) { err.hidden = true; err.textContent = ""; }
     omuUndone = null;
+    omuEditingId = "";
     omuClearForm(form);
   });
 
@@ -277,6 +297,16 @@ function omuInit() {
       const row = e.target.closest("[data-omat-row]");
       if (!row) return;
       const id = row.dataset.omatRow;
+      if (e.target.closest("[data-omat-edit]")) {
+        const material = omMaterials().find((item) => item.id === id);
+        if (!material) return;
+        omuEditingId = id;
+        omuFillForm(form, material);
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+        const name = form.querySelector('[data-omat-in="name"]');
+        if (name) name.focus();
+        return;
+      }
       if (e.target.closest("[data-omat-price-toggle]")) {
         const button = e.target.closest("[data-omat-price-toggle]");
         const panel = row.querySelector("[data-omat-price-panel]");

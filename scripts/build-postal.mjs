@@ -17,6 +17,11 @@ import zlib from 'node:zlib';
 const COUNTRIES = ['PL', 'DE', 'AT', 'CH', 'CZ', 'SK', 'RO', 'HR', 'RS', 'IT', 'NL', 'BE', 'ES', 'FR', 'UA', 'LU'];
 const LOCALES = { PL: 'pl', DE: 'de', AT: 'de', CH: 'de', CZ: 'cs', SK: 'sk', RO: 'ro', HR: 'hr', RS: 'sr', IT: 'it', NL: 'nl', BE: 'nl', ES: 'es', FR: 'fr', UA: 'uk', LU: 'fr' };
 const ASSETS_DIR = path.join(process.cwd(), 'assets', 'postal');
+const POSTAL_OVERRIDES = {
+  PL: { '00001': ['Warszawa'] },
+  CZ: { '11000': ['Praha'] },
+  AT: { '1010': ['Wien'] },
+};
 
 function extractFileFromZip(buffer, filename) {
   // Simple zip extractor without external dependencies.
@@ -114,6 +119,13 @@ async function build() {
       }
       keyMap.get(key).add(placeName);
     }
+
+    // Reviewed corrections for principal cities missing or over-specified in GeoNames.
+    Object.entries(POSTAL_OVERRIDES[cc] || {}).forEach(([key, places]) => {
+      const prefix = key.slice(0, 2);
+      if (!prefixMap.has(prefix)) prefixMap.set(prefix, new Map());
+      prefixMap.get(prefix).set(key, new Set(places));
+    });
     
     const countryDir = path.join(ASSETS_DIR, ccLower);
     fs.mkdirSync(countryDir, { recursive: true });
@@ -155,7 +167,21 @@ Note: The original data was regrouped into per-prefix JSON files.
   console.log("Done.");
 }
 
-build().catch(err => {
+function applyOverridesToExisting() {
+  Object.entries(POSTAL_OVERRIDES).forEach(([cc, overrides]) => {
+    Object.entries(overrides).forEach(([key, places]) => {
+      const filePath = path.join(ASSETS_DIR, cc.toLowerCase(), `${key.slice(0, 2)}.json`);
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      data[key] = places;
+      const sorted = Object.fromEntries(Object.entries(data).sort(([a], [b]) => a.localeCompare(b)));
+      fs.writeFileSync(filePath, JSON.stringify(sorted) + '\n', 'utf8');
+    });
+  });
+  console.log('Postal overrides applied.');
+}
+
+const task = process.argv.includes('--overrides-only') ? Promise.resolve(applyOverridesToExisting()) : build();
+task.catch(err => {
   console.error(err);
   process.exit(1);
 });

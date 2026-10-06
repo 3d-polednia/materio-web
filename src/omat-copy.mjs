@@ -33,7 +33,7 @@
 
 export const OMAT_COPY = {
   pl: {
-    omatpage_lead: "Zapisz materiał, którego nie ma w katalogu, razem z ceną u twojego dostawcy. Każda kolejna cena zostaje w historii.",
+    omatpage_lead: "Zapisz materiał, którego nie ma w katalogu, razem z ceną u Twojego dostawcy. Każda kolejna cena zostaje w historii.",
     omatpage_meta: "Własne materiały i historia cen na koncie LiczMat.",
     omat_add_t: "Nowy materiał",
     omat_name: "Nazwa",
