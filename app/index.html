@@ -111,6 +111,7 @@
 <script defer src="/assets/account.min.js?v=20261005a"></script>
 <script defer src="/assets/datepick.min.js?v=20261005a"></script>
 <script defer src="/assets/suggest.min.js?v=20261005a"></script>
+<script defer src="/assets/unit-map.min.js?v=20261005a"></script>
 <script defer src="/assets/units.min.js?v=20261005a"></script>
 <script defer src="/assets/workspace.min.js?v=20261005a"></script>
 <script defer src="/assets/recent.min.js?v=20261005a"></script>
@@ -169,7 +170,7 @@
           
           <div data-auth-view="signin">
             <h2 data-i18n="app_signin">Zaloguj się</h2>
-            <form id="signin-form" autocomplete="on">
+            <form id="signin-form" autocomplete="on" novalidate>
               <div class="field">
     <label for="signin-email" data-i18n="app_email">E-mail</label>
     <input id="signin-email" type="email" autocomplete="email" required>
@@ -178,10 +179,12 @@
     <label for="signin-password" data-i18n="app_password">Hasło</label>
     <input id="signin-password" type="password" autocomplete="current-password" minlength="6" required>
   </div>
+              <button type="button" class="linkish" data-password-toggle="signin-password" data-i18n="app_pass_show">Pokaż hasło</button>
               <div class="field-check">
     <input id="signin-remember" type="checkbox" data-remember checked>
     <label for="signin-remember" data-i18n="app_remember">Pamiętaj mnie na tym urządzeniu</label>
   </div>
+              <p class="result err show" data-auth-error role="alert" hidden></p>
               <button type="submit" class="btn btn-primary" data-i18n="app_signin">Zaloguj się</button>
             </form>
             <p class="auth-links">
@@ -193,7 +196,7 @@
           <div data-auth-view="signup" hidden>
             <h2 data-i18n="app_signup_t">Załóż darmowe konto</h2>
             <p class="muted" data-i18n="app_signup_d">Konto jest darmowe i służy do jednego: żeby to, co policzyłeś, nie zniknęło.</p>
-            <form id="signup-form" autocomplete="on">
+            <form id="signup-form" autocomplete="on" novalidate>
               <div class="field">
     <label for="signup-email" data-i18n="app_email">E-mail</label>
     <input id="signup-email" type="email" autocomplete="email" required>
@@ -202,11 +205,18 @@
     <label for="signup-password" data-i18n="app_password">Hasło</label>
     <input id="signup-password" type="password" autocomplete="new-password" minlength="6" required>
   </div>
+              <button type="button" class="linkish" data-password-toggle="signup-password" data-i18n="app_pass_show">Pokaż hasło</button>
+              <div class="field">
+    <label for="signup-password-repeat" data-i18n="app_password_repeat">Powtórz hasło</label>
+    <input id="signup-password-repeat" type="password" autocomplete="new-password" minlength="6" required>
+  </div>
+              <button type="button" class="linkish" data-password-toggle="signup-password-repeat" data-i18n="app_pass_show">Pokaż hasło</button>
               <p class="muted field-note" data-i18n="app_password_rule">Hasło musi mieć co najmniej 6 znaków.</p>
               <div class="field-check">
     <input id="signup-remember" type="checkbox" data-remember checked>
     <label for="signup-remember" data-i18n="app_remember">Pamiętaj mnie na tym urządzeniu</label>
   </div>
+              <p class="result err show" data-auth-error role="alert" hidden></p>
               <button type="submit" class="btn btn-primary" data-i18n="app_signup">Załóż konto</button>
             </form>
             <p class="auth-links">
@@ -218,11 +228,12 @@
           <div data-auth-view="reset" hidden>
             <h2 data-i18n="app_reset_t">Resetowanie hasła</h2>
             <p class="muted" data-i18n="app_reset_d">Podaj adres konta. Wyślemy na niego link do ustawienia nowego hasła.</p>
-            <form id="reset-form" autocomplete="on">
+            <form id="reset-form" autocomplete="on" novalidate>
               <div class="field">
     <label for="reset-email" data-i18n="app_email">E-mail</label>
     <input id="reset-email" type="email" autocomplete="email" required>
   </div>
+              <p class="result err show" data-auth-error role="alert" hidden></p>
               <button type="submit" class="btn btn-primary" data-i18n="app_reset_send">Wyślij link</button>
             </form>
             <p class="auth-links">
@@ -422,34 +433,6 @@
               </form>
 
               <div class="app-card">
-                <h3 data-i18n="prof_level_t">Poziom konta</h3>
-                <p class="muted" data-i18n="prof_level_d">Poziom konta zmienia się po zakupie albo anulowaniu LiczMat Pro.</p>
-                <div class="lvl-cards" data-levels>
-      <article class="lvl-card" data-level="guest">
-        <span class="lvl-badge" data-i18n="acc_you_are" hidden>Tu jesteś</span>
-        <h3 data-i18n="acc_guest_t">Gość</h3>
-        <p class="muted" data-i18n="acc_guest_d">Bez konta. Kalkulatory pokazują ilość, zapas i odpad.</p>
-        <ul class="lvl-can"><li data-i18n="acc_guest_1">Wszystkie kalkulatory i cały katalog materiałów</li><li data-i18n="acc_guest_2">Wynik bez rejestracji</li><li data-i18n="acc_guest_3">Poradniki i mapa sklepów</li></ul>
-        
-      </article>
-      <article class="lvl-card" data-level="liczmat">
-        <span class="lvl-badge" data-i18n="acc_you_are" hidden>Tu jesteś</span>
-        <h3 data-i18n="acc_liczmat_t">LiczMat</h3>
-        <p class="muted" data-i18n="acc_liczmat_d">Darmowe konto. Zapisane wyniki masz w przeglądarce i w telefonie.</p>
-        <ul class="lvl-can"><li data-i18n="acc_liczmat_1">Zapisane kalkulacje, do których wracasz</li><li data-i18n="acc_liczmat_2">Projekty: pomieszczenia i lista materiałów</li><li data-i18n="acc_liczmat_3">Te same dane w telefonie i w przeglądarce</li><li data-i18n="acc_liczmat_4">Kosztorys udostępniony linkiem, bez konta po drugiej stronie</li></ul>
-        
-      </article>
-      <article class="lvl-card" data-level="pro">
-        <span class="lvl-badge" data-i18n="acc_you_are" hidden>Tu jesteś</span>
-        <h3 data-i18n="acc_pro_t">LiczMat Pro</h3>
-        <p class="muted" data-i18n="acc_pro_d">Płatne rozszerzenie dla fachowców: ceny i koszty, klienci, wyceny i terminarz.</p>
-        <ul class="lvl-can"><li data-i18n="acc_pro_1">Klienci i historia współpracy</li><li data-i18n="acc_pro_2">Projekty ze statusem i terminem</li><li data-i18n="acc_pro_3">Wyceny: materiał, robocizna, marża</li><li data-i18n="acc_pro_4">Terminarz projektów</li></ul>
-        <p><a class="btn btn-ghost btn-sm btn-go" data-nav-route="liczmat-pro" href="/liczmat-pro/" data-i18n="pro_more">Poznaj LiczMat Pro</a></p>
-      </article>
-    </div>
-              </div>
-
-              <div class="app-card">
                 <h3 data-i18n="prof_session_t">Sesja na tym urządzeniu</h3>
                 <p class="muted" data-i18n="prof_session_d">Jak długo zostajesz zalogowany na tym telefonie albo komputerze. Na cudzym sprzęcie wyłącz.</p>
                 <div class="field-check">
@@ -457,7 +440,6 @@
                   <label for="prof-remember" data-i18n="app_remember">Pamiętaj mnie na tym urządzeniu</label>
                 </div>
                 <p id="prof-session-state" class="muted field-note"></p>
-                <button type="button" id="prof-signout" class="btn btn-ghost btn-sm" data-i18n="app_signout">Wyloguj</button>
               </div>
             </section>
 

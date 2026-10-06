@@ -624,6 +624,7 @@ white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 .inline-form.crm-client-grid { align-items: start; }
 .field-error { display: block; margin-top: var(--sp-1); padding-inline: var(--control-px); color: var(--error); font-size: var(--fs-sm); }
 .field-error[hidden] { display: none; }
+[data-password-toggle] { display: inline-block; margin-block: var(--sp-1) var(--sp-3); }
 @media (max-width: 560px) { .crm-client-grid > * { grid-column: 1 / -1 !important; } }
 .result {
 margin-top: var(--sp-4); padding: var(--sp-4); border-radius: var(--radius-sm);
