@@ -516,7 +516,7 @@ head("7. the page the build writes");
   // Every id assets/schedule-ui.js reaches for. A renamed element is a screen that
   // silently stops filling in, and the browser test would be the only thing to notice.
   for (const id of [
-    "cal-page", "cal-pro", "cal-pro-chip", "cal-gate", "cal-tool",
+    "cal-page", "cal-gate", "cal-tool",
     "cal-today-date", "cal-fig-late", "cal-fig-today", "cal-fig-soon", "cal-empty",
     "cal-closed", "cal-closed-summary", "cal-closed-list",
   ]) {
@@ -535,7 +535,7 @@ head("7. the page the build writes");
   has(t("pro_locked"), "chapter XXV's words are in the markup, not only in a script");
   has(t("pro_need_pro"), "with the sentence a free account is shown");
   has(t("cal_local_note"), "and the honest note about where the rows live");
-  has(t("cal_source_note"), "and the one that says the module stores nothing");
+  // cal_source_note left with AUDYT3 C6: it repeated the lead (the terminarz is the projects' deadlines).
   has(t("feat_calendar_t"), "the gate names the module");
   has(t("feat_calendar_d"), "and describes it in full — chapter XXV");
   has('id="cal-gate" hidden', "the gate starts hidden");
@@ -587,7 +587,7 @@ head("8. the copy, in four languages");
 {
   const KEYS = [
     "calpage_title", "calpage_lead", "calpage_meta",
-    "cal_local_note", "cal_source_note",
+    "cal_local_note",
     "cal_today_is", "cal_empty", "cal_due", "cal_due_set", "cal_jobs_all",
     "cal_late_t", "cal_late_d", "cal_today_t", "cal_today_d", "cal_soon_t", "cal_soon_d",
     "cal_later_t", "cal_later_d", "cal_none_t", "cal_none_d",
@@ -629,8 +629,7 @@ head("8. the copy, in four languages");
     check(`${lang}: and it no longer names localStorage`,
       !DICT[lang].cal_local_note.includes("localStorage"), DICT[lang].cal_local_note);
     check(`${lang}: and it is a full sentence`, DICT[lang].cal_local_note.length > 100);
-    // The sentence this session turns on: the module stores nothing of its own.
-    check(`${lang}: the source note is a full sentence`, DICT[lang].cal_source_note.length > 60);
+    // The source note (cal_source_note) left with AUDYT3 C6: it said again what the lead says.
     check(`${lang}: the five buckets are five different words`,
       new Set(["late", "today", "soon", "later", "none"]
         .map((b) => DICT[lang][`cal_${b}_t`])).size === 5);

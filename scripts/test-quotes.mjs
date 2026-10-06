@@ -947,7 +947,7 @@ head("9. the frame the build writes");
       "quo-room-list", "quo-material-list", "ws-pdf-form", "ws-pdf-doc",
       "quo-margin", "quo-status", "quo-fig-materials", "quo-fig-other", "quo-fig-labour",
       "quo-fig-sub", "quo-fig-margin", "quo-fig-total", "quo-mixed",
-      "quo-undo", "quo-gate", "quo-tool", "quo-pro-chip"]) {
+      "quo-undo", "quo-gate", "quo-tool"]) {
       check(`${lang}: the page carries #${id}`, main.includes(`id="${id}"`), id);
     }
     // Owner, 2026-10-04: the Client and project card already shows and changes both links.

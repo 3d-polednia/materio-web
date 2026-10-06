@@ -536,9 +536,7 @@ export function siteHeader(h) {
     cta.rel ? `rel="${cta.rel}"` : "",
     cta.target ? `target="${cta.target}"` : "",
     cta.loc ? `data-loc="${cta.loc}"` : "",
-    // The account button is the one place the session is visible outside /app/;
-    // lmMarkHeader() in assets/account.js hangs a dot off this attribute.
-    cta.href === URL_APP ? "data-account-cta" : "",
+    // AUDYT3 C6: the account action stays plain, without a session dot.
     inPlace ? `data-i18n="${cta.key}"` : "",
   ].filter(Boolean).join(" ");
 

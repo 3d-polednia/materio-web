@@ -78,7 +78,9 @@ export function accountPageMain(main, t, lang, current) {
   const headAt = body.search(/<section class="block page-head[^"]*">/);
   const headEnd = headAt < 0 ? -1 : body.indexOf("</section>", headAt);
   if (headAt < 0 || headEnd < 0) throw new Error(`Account page "${current}" needs a page head`);
-  const head = body.slice(0, headEnd + "</section>".length);
+  // AUDYT3 C6: one header class gives all account routes the same alignment.
+  const head = body.slice(0, headEnd + "</section>".length)
+    .replace('class="block page-head"', 'class="block page-head account-page-head"');
   const tool = body.slice(headEnd + "</section>".length);
   const next = {
     projects: urlProjects, estimate: urlQuotes, company: urlCompany, clients: urlClients, quotes: urlQuotes,

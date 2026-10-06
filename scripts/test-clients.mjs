@@ -601,7 +601,7 @@ head("6. the page the build writes");
   // stops filling in, and the browser test would be the only thing to notice.
   for (const id of [
     "crm-page", "crm-index", "crm-client", "crm-client-missing", "crm-client-body",
-    "crm-title", "crm-lead", "crm-pro", "crm-pro-chip", "crm-gate",
+    "crm-title", "crm-lead", "crm-gate", // the plan strip left with AUDYT3 C6: the side panel says the plan
     "crm-tool", "crm-client-form", "crm-client-name", "crm-client-phone",
     "crm-client-email", "crm-client-street", "crm-client-postal-code", "crm-client-city",
     "crm-client-list", "crm-archive", "crm-archive-summary",

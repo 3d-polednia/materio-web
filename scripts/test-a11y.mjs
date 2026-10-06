@@ -129,7 +129,8 @@ head("0b. the full footer keeps its legal content");
 {
   const full = PAGES.filter((page) => page.body.includes('class="foot-grid"'));
   // 2026-10-01: all thirteen public quote pages use the full legal footer.
-  check("every generated full-footer page is covered", full.length === PAGES.length - 4, `found ${full.length}`);
+  // AUDYT3 C6: 404 and /app/ use the full page template too, so every page carries it.
+  check("every generated full-footer page is covered", full.length === PAGES.length, `found ${full.length}`);
   checkAll("contact, privacy and cookies stay linked in every full footer", full,
     (page) => {
       const lang = LANGS.find((code) => HREFLANG[code] === page.lang);
@@ -152,8 +153,8 @@ head("0b. the full footer keeps its legal content");
 head("1. landmarks and the skip link");
 {
   const chromed = PAGES.filter((page) => page.body.includes('class="skip-link"'));
-  check("every page but 404 carries the skip link",
-    chromed.length === PAGES.length - 1, `${chromed.length} of ${PAGES.length}`);
+  check("every page carries the skip link",
+    chromed.length === PAGES.length, `${chromed.length} of ${PAGES.length}`);
 
   checkAll("the skip link points at #main", chromed,
     (page) => /<a class="skip-link" href="#main"/.test(page.body), (page) => page.url);

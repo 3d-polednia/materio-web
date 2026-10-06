@@ -506,6 +506,10 @@ section.block > .wrap > p { max-width: var(--measure); }
 .page-head { padding-bottom: var(--sp-2); }
 .page-head h1 { margin: var(--sp-2) 0 var(--sp-2); }
 .page-head .lead { color: var(--muted); max-width: var(--measure); margin: 0; }
+/* AUDYT3 C6: every account header shares one left edge, width and lead treatment. */
+.account-page-head > .wrap { max-width: 1120px !important; margin-inline: auto !important; text-align: left !important; }
+.account-page-head .lead { margin-inline: 0 !important; color: var(--muted); }
+.account-page-head .breadcrumbs ol { justify-content: flex-start !important; }
 
 /* The five Pro tool pages — /projekty/, /klienci/, /zlecenia/, /wyceny/, /terminarz/ —
    put their head in .wrap (1600px) and the tool itself in .wrap.narrow (760px). On a
@@ -972,6 +976,8 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .ws-project-grid > .field:nth-child(6) { grid-column: 1 / -1; }
 /* The colour and submit button stay together on the final grid row. */
 .ws-project-grid > .field:nth-child(7) { grid-column: span 2; }
+/* AUDYT3 C6: status, deadline and value labels share one baseline. */
+.ws-project-grid .fld-label { min-height: 2.4em; display: flex; align-items: flex-end; }
 /* Grid tracks, rather than the account page's general field cap, set project control widths. */
 .app-main .ws-project-grid .field input, .app-main .ws-project-grid .field select { max-width: none; }
 /* A phone stacks the project form without creating a narrow grid track. */
@@ -2091,6 +2097,12 @@ html.js #pro-pay[data-pro-period="monthly"] [data-pw-plan="yearly"], html.js #pr
   display: flex; justify-content: flex-end; gap: var(--sp-3);
   margin-top: var(--sp-6); padding-top: var(--sp-4); border-top: 1px solid var(--outline);
 }
+/* AUDYT3 C6: finishing actions occupy the final row of account form grids. */
+.ws-project-grid > .form-foot, .crm-client-grid > .form-foot {
+  grid-column: 1 / -1; justify-content: flex-start; width: 100%;
+}
+.inline-form > .form-foot { flex: 1 0 100%; justify-content: flex-start; }
+.company-logo-field + .company-logo-preview + p + .field-error + .form-foot { justify-content: flex-start; }
 @media (max-width: 560px) { .form-foot .btn { width: 100%; } }
 
 /* ---------- The three access levels (master plan II)
@@ -2192,7 +2204,7 @@ html.js #pro-pay[data-pro-period="monthly"] [data-pw-plan="yearly"], html.js #pr
 
 .app-side-brand { display: flex; align-items: center; gap: var(--sp-2); min-width: 0; padding: 0 var(--sp-2); }
 .app-side-brand span { font-weight: var(--fw-black); white-space: nowrap; }
-.app-plan-pill { margin-left: auto; cursor: default; }
+.app-plan-pill { margin-left: auto; cursor: default; background: transparent; border-color: var(--accent-edge); color: var(--accent-strong); }
 
 /* Narrow: two horizontally scrolling rows of pill buttons. The second row plus trailing
    fade makes the rest of the product discoverable without making the account rail several
@@ -2848,6 +2860,8 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .ws-mat-grid { display: flex; flex-wrap: wrap; gap: var(--form-row-gap) var(--form-col-gap); margin: 0 0 var(--form-row-gap); }
 .ws-mat-f { display: flex; flex-direction: column; gap: var(--sp-1); flex: 1 1 12rem; min-width: 0; }
 .ws-mat-f .ws-bar-label { margin-bottom: 0; }
+/* AUDYT3 C6: wrapped labels reserve equal height so controls share a baseline. */
+.ws-mat-grid > .ws-mat-f > .ws-bar-label { min-height: 2.4em; display: flex; align-items: flex-end; }
 .ws-mat-f-sm { flex: 1 1 5.5rem; }
 /* A postal code is short, its label is not: "Kod pocztowy" broke onto two lines at 5.5rem
    and dropped the field below its neighbours. The label keeps one line, the box its width. */
@@ -3483,3 +3497,6 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .app-stat-card .val {
   color: var(--accent-strong);
 }
+
+/* AUDYT3 A5: the empty-terminarz sentence keeps clear of the card above it. */
+#cal-empty { margin-block: var(--sp-4); }

@@ -1496,6 +1496,7 @@ export function quoteViewMain(lang, t, features, stamp = "", copy) {
 export function projectsMain(lang, t, aisles = [], features = []) {
   const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("nav_app"), path: URL_APP },
     { name: t("wspage_title"), path: urlProjects(lang) },
   ]);
 
@@ -1795,7 +1796,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
           <button type="button" class="btn btn-ghost btn-sm" id="ws-undo-go">${esc(t("proj_undo"))}</button>
         </p>
 
-        <h2>${esc(t("ws_projects"))}</h2>
+        <!-- AUDYT3 C6: the page H1 already names this list. -->
         <p class="muted">${esc(t("wspage_projects_d"))}</p>
         <!-- Visible labels, not placeholders: a placeholder is the only thing naming
              these boxes and it leaves the moment the visitor types (audit 2026-09-18). -->
@@ -1817,7 +1818,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
             <textarea id="ws-project-note" maxlength="2000" rows="6"></textarea></label>
           <label class="field field-narrow" for="ws-project-color"><span class="fld-label">${esc(t("job_color"))}</span>
             <select id="ws-project-color"><option value="">${esc(t("job_color_none"))}</option>${["lime", "blue", "amber", "red", "violet"].map((v) => `<option value="${v}">${esc(t(`job_color_${v}`))}</option>`).join("")}</select></label>
-            <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+            <div class="form-foot"><button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button></div>
           </form>
         </div>
         <ul id="ws-project-list" class="data-list"></ul>
@@ -1836,15 +1837,7 @@ export function projectsMain(lang, t, aisles = [], features = []) {
         <div id="ws-room-list" class="ws-room-cards"></div>
       </div>
 
-      <p class="ws-links">
-        <a class="btn btn-ghost btn-go" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
-        <!-- A deadline is a field of a project since the merge of 2026-09-21, so the page
-             that owns the deadline offers the page that shows them all. /zlecenia/ made
-             this offer until then. -->
-        <a class="btn btn-ghost btn-go" href="${urlCalendar(lang)}">${esc(t("calpage_title"))}</a>
-        <a class="btn btn-ghost btn-go" href="${urlCalcIndex(lang)}">${esc(t("foot_calc_all"))}</a>
-      </p>
-      <p class="muted src-note">${esc(t("wspage_local_note"))}</p>
+      <!-- AUDYT3 C6: the account rail replaces route buttons and repeated sync copy. -->
     </div>
   </section>
 
@@ -1929,6 +1922,7 @@ export function proPageMain(lang, t, features, prices, copy, samples, counts) {
 export function companyMain(lang, t, features) {
   const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("nav_app"), path: URL_APP },
     { name: t("companypage_title"), path: urlCompany(lang) },
   ]);
   const gate = proGate(t, "company", features, lang, { id: "company-gate" });
@@ -1949,7 +1943,7 @@ export function companyMain(lang, t, features) {
     <div class="wrap narrow">
       ${crumbs.nav}
       <h1>${esc(t("companypage_title"))}</h1>
-      <p>${esc(t("companypage_lead"))}</p>
+      <p class="lead">${esc(t("companypage_lead"))}</p>
     </div>
   </section>
 
@@ -1986,10 +1980,10 @@ export function companyMain(lang, t, features) {
         <div id="company-logo-preview" class="company-logo-preview" hidden></div>
         <p><button id="company-logo-remove" type="button" class="btn btn-ghost btn-sm" hidden>${esc(t("company_logo_remove"))}</button></p>
         <p id="company-logo-error" class="field-error" role="alert" hidden></p>
-        <p>
+        <div class="form-foot">
           <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_save"))}</button>
           <button id="company-cancel" type="button" class="btn btn-ghost btn-sm" hidden>${esc(t("action_cancel"))}</button>
-        </p>
+        </div>
       </form>
     </div>
   </section>
@@ -2012,6 +2006,7 @@ export function companyMain(lang, t, features) {
 export function clientsMain(lang, t, features) {
   const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
+    { name: t("nav_app"), path: URL_APP },
     { name: t("clipage_title"), path: urlClients(lang) },
   ]);
 
@@ -2177,7 +2172,7 @@ export function clientsMain(lang, t, features) {
           <button type="button" class="btn btn-ghost btn-sm" id="crm-undo-go">${esc(t("cli_undo"))}</button>
         </p>
 
-        <h2>${esc(t("cli_list_t"))}</h2>
+        <!-- AUDYT3 C6: the page H1 already names this list. -->
         <p class="muted">${esc(t("cli_list_d"))}</p>
         <div class="card">
           <h3 data-i18n="app_clients_new">${esc(t("app_clients_new"))}</h3>
@@ -2199,7 +2194,7 @@ export function clientsMain(lang, t, features) {
             <datalist id="crm-client-city-list"></datalist></label>
           <label class="field" for="crm-client-street"><span class="fld-label">${esc(t("cli_street"))}</span>
             <input id="crm-client-street" type="text" maxlength="200" autocomplete="street-address"></label>
-            <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+            <div class="form-foot"><button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button></div>
           </form>
           <p class="muted field-note">${esc(t("postal_source"))}</p>
         </div>
@@ -2226,10 +2221,6 @@ export function clientsMain(lang, t, features) {
       <!-- Chapter XXV's strip, above the module for somebody who may use it: which plan
            opened it. assets/paywall.js hides the whole strip when the wall is up,
            because the wall says all of it and twice is worse than once. -->
-      <p class="crm-pro" id="crm-pro" hidden>
-        <span class="chip" id="crm-pro-chip">${esc(t("pro_locked"))}</span>
-      </p>
-
       ${gate}
 
       <div id="crm-tool">
@@ -2237,9 +2228,7 @@ export function clientsMain(lang, t, features) {
         ${index}
       </div>
 
-      <p class="ws-links">
-        <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-      </p>
+      <!-- AUDYT3 C6: the account rail is the route navigation. -->
       <p class="muted src-note">${esc(t("cli_local_note"))}</p>
     </div>
   </section>
@@ -2261,7 +2250,7 @@ export function quotesMain(lang, t, features, stamp = "") {
   const quoteViewCopy = QUOTE_VIEW_COPY[lang];
   const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
-    { name: t("wspage_title"), path: urlProjects(lang) },
+    { name: t("nav_app"), path: URL_APP },
     { name: t("quopage_title"), path: urlQuotes(lang) },
   ]);
 
@@ -2464,13 +2453,12 @@ export function quotesMain(lang, t, features, stamp = "") {
           <button type="button" class="btn btn-ghost btn-sm" id="quo-undo-go">${esc(t("quo_undo"))}</button>
         </p>
 
-        <p class="lead">${esc(t("quo_list_d"))}</p>
         <div class="card">
           <h3 data-i18n="proj_new_quote">${esc(t("proj_new_quote"))}</h3>
           <form id="quo-form" class="inline-form">
             <div class="field"><label for="quo-name">${esc(t("quo_new"))}</label><input id="quo-name" type="text" maxlength="120" required></div>
             <div class="field field-narrow"><label for="quo-project">${esc(t("quo_project"))}</label><select id="quo-project"></select></div>
-            <button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button>
+            <div class="form-foot"><button type="submit" class="btn btn-primary btn-sm">${esc(t("app_add"))}</button></div>
           </form>
         </div>
         <p id="quo-add-message" class="muted" role="status"></p>
@@ -2489,10 +2477,6 @@ export function quotesMain(lang, t, features, stamp = "") {
   <section class="block alt" id="quo-page">
     <div class="wrap narrow">
       <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
-      <p class="crm-pro" id="quo-pro" hidden>
-        <span class="chip" id="quo-pro-chip">${esc(t("pro_locked"))}</span>
-      </p>
-
       ${gate}
 
       <div id="quo-tool">
@@ -2500,9 +2484,7 @@ export function quotesMain(lang, t, features, stamp = "") {
         ${index}
       </div>
 
-      <p class="ws-links">
-        <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("wspage_title"))}</a>
-      </p>
+      <!-- AUDYT3 C6: the account rail is the route navigation. -->
       <p class="muted src-note">${esc(t("quo_local_note"))}</p>
     </div>
   </section>
@@ -2531,7 +2513,7 @@ export function quotesMain(lang, t, features, stamp = "") {
 export function calendarMain(lang, t, features) {
   const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
-    { name: t("wspage_title"), path: urlProjects(lang) },
+    { name: t("nav_app"), path: URL_APP },
     { name: t("calpage_title"), path: urlCalendar(lang) },
   ]);
 
@@ -2562,10 +2544,6 @@ export function calendarMain(lang, t, features) {
   <section class="block alt" id="cal-page">
     <div class="wrap narrow">
       <!-- Chapter XXV's strip, as on /klienci/ — see the comment there. -->
-      <p class="crm-pro" id="cal-pro" hidden>
-        <span class="chip" id="cal-pro-chip">${esc(t("pro_locked"))}</span>
-      </p>
-
       ${gate}
 
       <div id="cal-tool">
@@ -2605,12 +2583,7 @@ ${buckets}
         </details>
       </div>
 
-      <p class="ws-links">
-        <a class="btn btn-ghost btn-go" href="${urlProjects(lang)}">${esc(t("cal_jobs_all"))}</a>
-        <a class="btn btn-ghost btn-go" href="${urlClients(lang)}">${esc(t("clipage_title"))}</a>
-        <a class="btn btn-ghost btn-go" href="${urlQuotes(lang)}">${esc(t("quopage_title"))}</a>
-      </p>
-      <p class="muted field-note">${esc(t("cal_source_note"))}</p>
+      <!-- AUDYT3 C6: the account rail replaces unrelated route buttons. -->
       <p class="muted src-note">${esc(t("cal_local_note"))}</p>
     </div>
   </section>
@@ -2903,7 +2876,7 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
   const c = (key) => copy[key];
   const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },
-    { name: t("nav_materials"), path: urlMaterials(lang) },
+    { name: t("nav_app"), path: URL_APP },
     { name: t("omatpage_title"), path: urlOwnMaterials(lang) },
   ]);
 
@@ -2944,14 +2917,7 @@ export function ownMaterialsMain(lang, t, aisles, copy) {
     </div>
   </section>
 
-  <section class="block alt">
-    <div class="wrap narrow">
-      <div class="card">
-        <h2>${esc(c("omat_hist_t"))}</h2>
-        <p>${esc(c("omat_hist_note"))}</p>
-      </div>
-    </div>
-  </section>
+  <!-- AUDYT3 C6: price history appears only beside rows that contain history. -->
 </main>`;
 
   return { main: accountPageMain(main, t, lang, "materials"), ld: crumbs.ld };

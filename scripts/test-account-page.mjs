@@ -1308,17 +1308,18 @@ head("13. the session, as the other pages see it");
   });
   check("with a session, the sentence is about sync instead",
     (await member.locator(".ws-save-account a").count()) === 0);
-  eq("and the header's account button is marked",
-    await member.locator(".nav-cta").getAttribute("data-level"), "liczmat");
-  eq("with the wording in the page's language",
-    await member.locator(".nav-cta").getAttribute("title"), "Jesteś zalogowany");
+  // AUDYT3 C6: session state no longer marks the account action.
+  eq("and the header's account button stays unmarked",
+    await member.locator(".nav-cta").getAttribute("data-level"), null);
+  eq("with no session tooltip",
+    await member.locator(".nav-cta").getAttribute("title"), null);
   await member.close();
 
   const pro = await openApp(ctx, "/en/calculators/tiles-panels-porcelain/", {
     storage: { "liczmat-signed-in": "pro" },
   });
-  eq("Pro is marked as Pro, in the language of the page",
-    await pro.locator(".nav-cta").getAttribute("title"), "You are signed in — LiczMat Pro");
+  eq("Pro keeps the same plain account action",
+    await pro.locator(".nav-cta").getAttribute("title"), null);
   await pro.close();
 
   // The hint decides copy and nothing else. Saving a result must work with it absent,

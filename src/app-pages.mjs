@@ -8,7 +8,7 @@
    text in place — see buildInPlacePicker() in assets/i18n-runtime.js. That is why the
    markup below uses data-i18n attributes while every generated page uses real text. */
 
-import { esc, siteHeader, siteFooter } from "./template.mjs";
+import { esc, siteHeader, siteFooter, breadcrumbs } from "./template.mjs";
 import {
   urlCalcIndex, urlHome, urlProjects, urlQuotes, urlCalendar, urlOwnMaterials,
   DEFAULT_LANG, PLAY_URL, URL_APP, URL_DASHBOARD,
@@ -41,10 +41,11 @@ import { accountSidebar } from "./account-sidebar.mjs";
 const chrome = (t, bodyMain, links) => `${siteHeader({
   lang: DEFAULT_LANG, t, inPlace: true,
   ...(links ? { links } : {}),
-  cta: { href: PLAY_URL, key: "nav_download", target: "_blank", rel: "noopener", loc: "app" },
+  // AUDYT3 C6: every account page exposes the same account action.
+  cta: { href: URL_APP, key: "nav_app", rel: "nofollow" },
 })}
 ${bodyMain}
-${siteFooter({ lang: DEFAULT_LANG, t, minimal: true, inPlace: true })}`;
+${siteFooter({ lang: DEFAULT_LANG, t, inPlace: true })}`;
 
 /** The short list /p/<token> keeps — one way back into the product, and no more. */
 const SHARE_LINKS = [{ href: urlCalcIndex(DEFAULT_LANG), key: "nav_calc" }];
@@ -173,9 +174,14 @@ export function appMain(t, features) {
   const fact = (id, key) =>
     `<div class="fact"><dt data-i18n="${key}">${esc(t(key))}</dt><dd id="${id}"></dd></div>`;
 
+  const crumbs = breadcrumbs(t, [
+    { name: t("bc_home"), path: urlHome(DEFAULT_LANG) },
+    { name: t("nav_app"), path: URL_APP },
+  ]);
   const main = `<main id="main" tabindex="-1">
-  <section class="block page-head">
-    <div class="wrap narrow">
+  <section class="block page-head account-page-head">
+    <div class="wrap">
+      ${crumbs.nav}
       <h1 data-i18n="app_title">${esc(t("app_title"))}</h1>
       <p class="lead" data-i18n="app_lead">${esc(t("app_lead"))}</p>
     </div>
