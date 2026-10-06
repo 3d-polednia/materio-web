@@ -1766,7 +1766,8 @@ export function projectsMain(lang, t, aisles = [], features = []) {
             <ul id="ws-chain-history" class="data-list"></ul>
           </section>
 
-          ${pdfBlock(lang, t, features)}
+          <!-- The PDF export left the project on 2026-10-06 (owner): a quote is made and
+               printed on /wyceny/, which the "Wyceny" button in Kalkulacje leads to. -->
         </div>
       </article>`;
 

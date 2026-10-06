@@ -100,6 +100,11 @@ const eq = (name, got, want) =>
 
 /* ================================================================== 1. the arithmetic */
 
+// The project page lost its PDF export on 2026-10-06 (owner). The sections that read that
+// block on /projekty/ (3, 4, 5, 8) stand down when it is not there; the quote document on
+// /wyceny/ is still checked by 1c and 4b.
+const PROJECT_PDF = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), ["TILES", "OTHER"], FEATURES).main.includes('id="ws-pdf-form"');
+
 head("1. the investor breakdown is the app's, layer for layer");
 {
   const { pdfBreakdown, pdfNum, pdfHasPricing } = loadPdf();
@@ -244,7 +249,8 @@ head("2. the rows are what wsProjectCosts() counts, and they add up to it");
 /* ================================================================== 3. the document */
 
 head("3. the document is markup, not a script's output");
-{
+if (!PROJECT_PDF) check("the project page carries no PDF export since 2026-10-06 (owner: the quote PDF lives on /wyceny/)", true);
+else {
   const { main } = projectsMain(DEFAULT_LANG, tr(DEFAULT_LANG), ["TILES", "OTHER"], FEATURES);
   check("the block is on the project screen", main.includes('id="ws-pdf"'));
   check("the document ships in the page", main.includes('id="ws-pdf-doc"'));
@@ -275,7 +281,8 @@ head("3. the document is markup, not a script's output");
 /* ================================================================== 4. the words */
 
 head("4. every string is the app's own");
-{
+if (!PROJECT_PDF) check("the project page carries no PDF export since 2026-10-06 (owner: the quote PDF lives on /wyceny/)", true);
+else {
   for (const lang of LANGS) {
     check(`${lang}: copy exists`, Boolean(PDF_COPY[lang]));
     for (const key of PDF_COPY_KEYS) {
@@ -339,7 +346,8 @@ head("4b. the quote document has client-facing words in every language");
 }
 
 head("5. the three templates keep their hole");
-{
+if (!PROJECT_PDF) check("the project page carries no PDF export since 2026-10-06 (owner: the quote PDF lives on /wyceny/)", true);
+else {
   for (const lang of LANGS) {
     for (const key of ["pdfdoc_project", "pdfdoc_date", "pdfdoc_estimate_no"]) {
       const value = PDF_COPY[lang][key];
@@ -408,7 +416,8 @@ head("7. no key is printed where a visitor can read it");
 /* ============================================== 8. the export belongs to LiczMat Pro */
 
 head("8. a guest and a free account cannot produce a PDF");
-{
+if (!PROJECT_PDF) check("the project page carries no PDF export since 2026-10-06 (owner: the quote PDF lives on /wyceny/)", true);
+else {
   /* The owner's decision of 2026-09-03. The permission table is the one place it is
      written down, so it is read here rather than restated: `pdf` and `costs` are both PRO
      and the export needs both — the document is a list of amounts. */
