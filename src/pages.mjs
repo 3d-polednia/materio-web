@@ -74,22 +74,26 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
      readable after a switch to another language — so the line keeps the key and the page
      showing it translates, instead of freezing "Powierzchnia" into storage. A <select>
      puts the same on its options: the answer is the word, not the "1". */
+  // Tiles and the ceiling take dimensions or an area (owner, 2026-10-06): a field that
+  // belongs to one way of giving the size carries it, and the other way's fields start hidden.
+  const startMode = (calc.fields.find((f) => f.pick) || {}).def;
   const fields = calc.fields.map((f) => {
     const label = esc(t(f.label));
     const keys = `data-k="${f.k}" data-lk="${esc(f.label)}"`;
+    const box = f.mode ? `<div class="field" data-mode="${f.mode}"${f.mode === startMode ? "" : " hidden"}>` : `<div class="field">`;
     if (f.sel) {
       const opts = f.sel.map(([v, l, key]) =>
         `<option value="${esc(v)}"${key ? ` data-ok="${esc(key)}"` : ""}${v === f.def ? " selected" : ""}>${esc(key ? t(key) : l)}</option>`).join("");
-      return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><select id="f-${calc.id}-${f.k}" ${keys}>${opts}</select></div>`;
+      return `${box}<label for="f-${calc.id}-${f.k}">${label}</label><select id="f-${calc.id}-${f.k}" ${keys}>${opts}</select></div>`;
     }
     if (f.ta) {
       return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><textarea id="f-${calc.id}-${f.k}" rows="3" ${keys}>${esc(f.def)}</textarea></div>`;
     }
     // An optional field keeps its starting value; emptied, it shows the value the engine then
     // uses, so an empty field never stands for a number nobody can see (AUDYT3 C1).
-    const hint = ` value="${esc(fieldNumber(f.def))}"` + (f.opt ? ` placeholder="${esc(fieldNumber(f.fallback === undefined ? f.def : f.fallback))}"` : "");
+    const hint = ` value="${esc(fieldNumber(f.def))}"` + (f.opt && !f.noHint ? ` placeholder="${esc(fieldNumber(f.fallback === undefined ? f.def : f.fallback))}"` : "");
     const errorId = `f-${calc.id}-${f.k}-error`;
-    return `<div class="field"><label for="f-${calc.id}-${f.k}">${label}</label><input id="f-${calc.id}-${f.k}" type="text" inputmode="decimal" ${keys}${hint}><span id="${errorId}" class="field-error" role="alert" hidden></span></div>`;
+    return `${box}<label for="f-${calc.id}-${f.k}">${label}</label><input id="f-${calc.id}-${f.k}" type="text" inputmode="decimal" ${keys}${hint}><span id="${errorId}" class="field-error" role="alert" hidden></span></div>`;
   }).join("");
 
   const chips = calc.presets

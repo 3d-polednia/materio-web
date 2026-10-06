@@ -128,6 +128,7 @@ export const CALC_META = {
   },
   ceiling: {
     formula: [
+      "{fld_width} × {fld_length} = {fld_area}, 2 × ({fld_width} + {fld_length}) = {fld_perimeter}",
       "rzędy CD = ⌊ {fld_width} ÷ {fld_main_spacing} ⌋ + 1",
       "profile CD = ⌈ rzędy CD × {fld_length} ÷ 4 ⌉",
       "profile UD = ⌈ 2 × ({fld_width} + {fld_length}) ÷ 3 ⌉",

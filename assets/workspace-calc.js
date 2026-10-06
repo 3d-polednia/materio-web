@@ -152,8 +152,9 @@ function wsWireCard(card) {
     const surface = surfaceSel ? surfaceSel.value : surfaces[0];
     Object.entries(wsRoomFill(room, calcId, surface)).forEach(([k, v]) => {
       const el = card.querySelector(`[data-k="${k}"]`);
-      if (el) el.value = typeof calcFieldValue === "function" ? calcFieldValue(wsPlain(v), wsLang()) : wsPlain(v);
+      if (el) el.value = el.tagName === "SELECT" ? String(v) : typeof calcFieldValue === "function" ? calcFieldValue(wsPlain(v), wsLang()) : wsPlain(v);
     });
+    if (typeof calcSyncModes === "function") calcSyncModes(card);
     card.dataset.wsRoomName = room.name;
     // Chapter XVIII: the result about to be produced is a result *for this room*, so the
     // save box below offers that room already chosen. The visitor can still change it —
@@ -186,8 +187,9 @@ function wsWireCard(card) {
       const surface = surfaceSel ? surfaceSel.value : surfaces[0];
       Object.entries(wsRoomFill(room, calcId, surface)).forEach(([k, v]) => {
         const el = card.querySelector(`[data-k="${k}"]`);
-        if (el) el.value = typeof calcFieldValue === "function" ? calcFieldValue(wsPlain(v), wsLang()) : wsPlain(v);
+        if (el) el.value = el.tagName === "SELECT" ? String(v) : typeof calcFieldValue === "function" ? calcFieldValue(wsPlain(v), wsLang()) : wsPlain(v);
       });
+      if (typeof calcSyncModes === "function") calcSyncModes(card);
       // This runs at DOMContentLoaded, before assets/main.js has wired the calculator: a
       // click on an unwired "Policz" submits the form natively, the page reloads with "?"
       // and the room is gone. Wait until the card is wired, then count.
@@ -236,6 +238,9 @@ const WS_NEW_PROJECT = "__new";
 function wsSnapshotOf(card, result) {
   const fields = [];
   card.querySelectorAll("[data-k]").forEach((el) => {
+    // The fields of the way of giving the size that was not used say nothing about the result.
+    const box = el.closest(".field");
+    if (box && box.hidden) return;
     const f = { k: el.dataset.k };
     if (el.dataset.lk) f.l = el.dataset.lk;
     const chosen = el.tagName === "SELECT" ? el.options[el.selectedIndex] : null;

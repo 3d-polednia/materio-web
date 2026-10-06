@@ -110,6 +110,14 @@ function readCalc(id, raw) {
   const calc = CALCS.find((c) => c.id === id), values = {};
   for (const field of calc.fields) {
     if (field.ta) continue;
+    // A mode switch is a word, not a number; the fields of the mode not chosen are not read,
+    // so an empty "Szerokość" cannot refuse a calculation made from the area.
+    if (field.pick) {
+      const word = String(raw[field.k] === undefined || raw[field.k] === null ? "" : raw[field.k]);
+      values[field.k] = field.sel.some(([v]) => v === word) ? word : field.def;
+      continue;
+    }
+    if (field.mode && field.mode !== values.mode) continue;
     const got = readField(field, raw[field.k]);
     if (got.err) return got;
     values[field.k] = got.value;
@@ -120,6 +128,22 @@ const errAt = (err, field) => ({ err, field });
 const GK_BOARD = 2.4, GK_WASTE = 10.0;
 const boardsFor = (area, sides, boardArea = GK_BOARD, waste = GK_WASTE) =>
   ceil((area * sides * (1 + waste / 100)) / boardArea);
+/**
+ * A room given by its area, and its perimeter if known, as the rectangle a ceiling grid is
+ * counted on (owner, 2026-10-06). Area and perimeter fix the rectangle with the same two
+ * numbers: exact for a rectangular room, a fair stand-in for an L-shaped one. Without a
+ * perimeter the square is assumed, which has the shortest perimeter of all, so the UD
+ * channel and its anchors are the least it can be; the result says so. A perimeter shorter
+ * than the square's (4 × √A) belongs to no room of that area and is refused (null).
+ * FramingCalc.ceilingDimsFromArea() in the app is the same arithmetic.
+ */
+function ceilingDimsFromArea(area, perimeter) {
+  if (!(perimeter > 0)) { const side = Math.sqrt(area); return { width: side, length: side, square: true }; }
+  const s = perimeter / 2, disc = s * s - 4 * area;
+  if (disc < -1e-9) return null;
+  const root = Math.sqrt(Math.max(disc, 0));
+  return { width: (s - root) / 2, length: (s + root) / 2, square: false };
+}
 
 /* -------- money and quantities --------
    The currency is the visitor's own choice and no longer follows the language
@@ -221,7 +245,12 @@ const ENGINES = {
   },
   waste(f) {
     const read = readCalc("waste", f); if (read.err) return read;
-    const { area, cov, waste: w, price } = read.values;
+    const { mode, width, length, cov, waste: w, price } = read.values;
+    if (mode === "dims") {
+      if (!(width > 0)) return errAt("err_positive", "width");
+      if (!(length > 0)) return errAt("err_positive", "length");
+    }
+    const area = mode === "dims" ? width * length : read.values.area;
     if (!(area > 0)) return errAt("err_positive", "area");
     if (!(cov > 0)) return errAt("err_positive", "cov");
     if (w < 0) return errAt("err_positive", "waste");
@@ -230,10 +259,13 @@ const ENGINES = {
     const wastePct = purchased > 0 ? (purchased - area) / purchased * 100 : 0;
     // `purchased` is the m² those whole packs actually contain — the figure the waste
     // percentage is measured against, and the only one you can check against the floor.
-    return { tobuy: pkgs, unit: "res_pkgs", cost: pkgs * price, rows: [
+    const rows = [
       ["res_purchased", qtyG(purchased) + " m²"],
       ["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"],
-    ] };
+    ];
+    // From the dimensions, the area the packs were counted for is worth seeing.
+    if (mode === "dims") rows.unshift(["res_area", qtyG(area) + " m²"]);
+    return { tobuy: pkgs, unit: "res_pkgs", cost: pkgs * price, rows };
   },
   /**
    * Wallpaper. The result panel was a bare roll count: TradeCalc.wallpaper returns
@@ -489,23 +521,33 @@ const ENGINES = {
   },
   ceiling(f) {
     const read = readCalc("ceiling", f); if (read.err) return read;
-    const { width, length, mainSp, hangSp, boardArea, price } = read.values;
+    const { mode, area, perimeter, mainSp, hangSp, boardArea, price } = read.values;
+    let { width, length } = read.values, dims = null;
+    if (mode === "area") {
+      if (!(area > 0)) return errAt("err_positive", "area");
+      if (!(perimeter >= 0)) return errAt("err_positive", "perimeter");
+      dims = ceilingDimsFromArea(area, perimeter);
+      if (!dims) return errAt("err_perimeter_short", "perimeter");
+      ({ width, length } = dims);
+    }
     for (const [field, value] of [["width", width], ["length", length], ["mainSp", mainSp], ["hangSp", hangSp], ["boardArea", boardArea]]) if (!(value > 0)) return errAt("err_positive", field);
     if (price < 0) return errAt("err_price", "price");
     const runs = profilesAcross(width, mainSp), mainTotal = runs * length, mainBars = ceil(mainTotal / 4);
-    const perimeter = 2 * (width + length);
-    const perimBars = ceil(perimeter / 3), hangers = runs * profilesAcross(length, hangSp);
+    const roomPerimeter = 2 * (width + length);
+    const perimBars = ceil(roomPerimeter / 3), hangers = runs * profilesAcross(length, hangSp);
     const connectors = Math.max(mainBars - runs, 0), boards = boardsFor(width * length, 1, boardArea);
     // CeilingGridResult carries perimeterAnchors too, and the site dropped it: the UD
     // channel cannot be fixed to the walls without them, so the shopping list was short.
-    return { tobuy: boards, unit: "res_boards", cost: boards * price, rows: [
+    const rows = [
       ["res_area", qtyG(width * length) + " m²"],
       ["res_cd_profiles", qtyG(mainBars) + " × 4 m"],
       ["res_ud_profiles", qtyG(perimBars) + " × 3 m"],
       ["res_hangers", qtyG(hangers)],
       ["res_cd_connectors", qtyG(connectors)],
-      ["res_anchors", qtyG(ceil(perimeter / 0.6))],
-    ] };
+      ["res_anchors", qtyG(ceil(roomPerimeter / 0.6))],
+    ];
+    if (dims) rows.splice(1, 0, ["res_dims_used", qtyG(width) + " × " + qtyG(length) + " m"]);
+    return { tobuy: boards, unit: "res_boards", cost: boards * price, rows, note: dims && dims.square ? "res_square_note" : "" };
   },
   drylining(f) {
     const read = readCalc("drylining", f); if (read.err) return read;
@@ -565,7 +607,9 @@ const CALCS = [
     { l: "Gładź 20 kg", k: "preset_filler", m: "gladz-gips-20" }, { l: "Klej C2 25 kg", k: "preset_adhesive", m: "klej-c2-25" },
   ] },
   { id: "waste", tab: "surface", engine: "waste", fields: [
-    F("area", "fld_area", "20"), F("cov", "fld_pkg_cov", "1.44"),
+    F("mode", "fld_input_mode", "area", { pick: true, sel: [["dims", "Wymiary", "opt_dims"], ["area", "Powierzchnia (m²)", "fld_area"]] }),
+    F("width", "fld_width", "4", { mode: "dims" }), F("length", "fld_length", "5", { mode: "dims" }),
+    F("area", "fld_area", "20", { mode: "area" }), F("cov", "fld_pkg_cov", "1.44"),
     F("waste", "fld_waste", "7", { opt: true, fallback: 0 }), F("price", "fld_price_pkg", "", { opt: true, fallback: 0 }),
   ], presets: [
     { l: "Gres 60×60", k: "preset_gres1", m: "gres-60x60" }, { l: "Gres 120×278", k: "preset_gres2", m: "gres-120x278" },
@@ -627,7 +671,9 @@ const CALCS = [
     F("boardArea", "fld_board_area", "2.4", { opt: true, fallback: 2.4 }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
   { id: "ceiling", tab: "framing", engine: "ceiling", fields: [
-    F("width", "fld_width", "4"), F("length", "fld_length", "5"),
+    F("mode", "fld_input_mode", "dims", { pick: true, sel: [["dims", "Wymiary", "opt_dims"], ["area", "Powierzchnia (m²)", "fld_area"]] }),
+    F("width", "fld_width", "4", { mode: "dims" }), F("length", "fld_length", "5", { mode: "dims" }),
+    F("area", "fld_area", "20", { mode: "area" }), F("perimeter", "fld_perimeter", "", { mode: "area", opt: true, fallback: 0, noHint: true }),
     F("mainSp", "fld_main_spacing", "0.4", { opt: true }), F("hangSp", "fld_hanger_spacing", "0.9", { opt: true }),
     F("boardArea", "fld_board_area", "2.4", { opt: true, fallback: 2.4 }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
@@ -683,6 +729,9 @@ function wireCalculator(card) {
   };
   const runBtn = card.querySelector("[data-run]");
   const stale = card.querySelector("[data-calc-stale]");
+  const modeSelect = card.querySelector('select[data-k="mode"]');
+  if (modeSelect) modeSelect.addEventListener("change", () => calcSyncModes(card));
+  calcSyncModes(card);
 
   /**
    * `byHand` separates the visitor asking for a number from the page catching up with
@@ -744,6 +793,18 @@ function wireCalculator(card) {
   // form opens with (see calcCard() in src/pages.mjs). Running once turns that markup into
   // a real result object, so the actions under it work before the visitor changes anything.
   run(false);
+}
+
+/**
+ * Show the fields of the mode chosen in the card's "Sposób podania" switch and hide the
+ * others (owner, 2026-10-06: tiles and the ceiling take dimensions or an area). The build
+ * already renders the starting mode this way; this keeps it true after a change, and after
+ * a room from /projekty/ writes its own mode into the form (assets/workspace-calc.js).
+ */
+function calcSyncModes(card) {
+  const select = card.querySelector('select[data-k="mode"]');
+  if (!select) return;
+  card.querySelectorAll(".field[data-mode]").forEach((box) => { box.hidden = box.dataset.mode !== select.value; });
 }
 
 /** Wire every calculator present on the page. */
@@ -845,7 +906,7 @@ function renderResult(card, res, byHand) {
   if (res.cost && res.cost > 0) rows.unshift(`<div><span>${t("res_cost", lang)}</span><b>${money(res.cost, lang)}</b></div>`);
   writeResult(box, `<div class="muted eyebrow">${t("res_tobuy", lang)}</div>
     <div class="big">${qty(res.tobuy, lang)} <span class="figure-line">${unitLabel(res.unit, res.tobuy, lang, (k) => t(k, lang))}</span></div>
-    <div class="rows">${rows.join("")}</div>${card.dataset.calc === "sheet" && res.plan ? renderSheetCutPlan(res.plan, lang) : ""}`);
+    <div class="rows">${rows.join("")}</div>${res.note ? `<p class="muted calc-note">${t(res.note, lang)}</p>` : ""}${card.dataset.calc === "sheet" && res.plan ? renderSheetCutPlan(res.plan, lang) : ""}`);
 
   // The workspace (assets/workspace-ui.js) hangs the "save to the estimate" button off
   // this. Nothing else listens, and the calculators keep working when it is not loaded.

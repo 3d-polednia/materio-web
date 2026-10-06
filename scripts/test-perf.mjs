@@ -182,7 +182,9 @@ const BUDGET = {
   // alignment, label column, room counter, rail, two form grids, currency suffix, material row) and
   // the runtime half of the one-letter-word rule; the quote and account pages also carry the
   // country field and assets/postal.js. Measured, then a kilobyte of headroom.
-  "konwerter-jednostek/index.html": [263, 68],
+  // gzip 68 -> 69 on 2026-10-06, measured at 68.1 kB: the dimensions/area switch of the
+  // tiles and ceiling calculators (calculators.js and six dictionary keys) loads here too.
+  "konwerter-jednostek/index.html": [263, 69],
   // Raised 2026-09-26 from 227, measured at 229.4 kB raw: the site's new buttons (disc,
   // corner, arrow links, rows that wrap) and the layout fixes for wider fonts (headings,
   // footer, header row, calendar) — about 3 kB of assets/styles.css on every page — with

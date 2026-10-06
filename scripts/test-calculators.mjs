@@ -115,13 +115,15 @@ const finiteResult = (value) => {
 };
 for (const c of CALCS) {
   for (const field of c.fields.filter((f) => !f.ta && !f.sel)) {
+    // A field of one way of giving the size is only read in that way (owner, 2026-10-06).
+    const mode = field.mode ? { mode: field.mode } : {};
     for (const malformed of ["abc", "2.5.5"]) {
-      const r = run(c.id, { [field.k]: malformed });
+      const r = run(c.id, { ...mode, [field.k]: malformed });
       eq(`${c.id}/${field.k}: ${malformed} -> err_number`, r.err, "err_number");
       eq(`${c.id}/${field.k}: malformed input identifies the field`, r.field, field.k);
       check(`${c.id}/${field.k}: malformed input never leaks NaN or a number token`, finiteResult(r));
     }
-    const empty = run(c.id, { [field.k]: "" });
+    const empty = run(c.id, { ...mode, [field.k]: "" });
     if (field.opt) {
       eq(`${c.id}/${field.k}: empty optional field uses its default`, empty.err, undefined);
       check(`${c.id}/${field.k}: optional default produces finite output`, finiteResult(empty));
@@ -129,13 +131,42 @@ for (const c of CALCS) {
       eq(`${c.id}/${field.k}: empty required field`, empty.err, "err_required");
       eq(`${c.id}/${field.k}: required error identifies the field`, empty.field, field.k);
     }
-    const negative = run(c.id, { [field.k]: "-1" });
+    const negative = run(c.id, { ...mode, [field.k]: "-1" });
     eq(`${c.id}/${field.k}: negative value has the right error`, negative.err,
       field.k === "price" ? "err_price" : "err_positive");
     eq(`${c.id}/${field.k}: negative error identifies the field`, negative.field, field.k);
     check(`${c.id}/${field.k}: negative input never leaks NaN or a number token`, finiteResult(negative));
   }
 }
+head("wymiary albo powierzchnia (sufit, płytki)");
+{
+  // Area 20 m² with an 18 m perimeter is exactly the 4 × 5 m room.
+  const dims = run("ceiling", { mode: "dims", width: "4", length: "5" });
+  const byArea = run("ceiling", { mode: "area", area: "20", perimeter: "18" });
+  for (const key of ["res_cd_profiles", "res_ud_profiles", "res_hangers", "res_cd_connectors", "res_anchors"]) {
+    eq(`ceiling: area + perimeter gives the 4 × 5 room's ${key}`, rowNum(byArea, key), rowNum(dims, key));
+  }
+  eq("ceiling: area + perimeter gives the same boards", byArea.tobuy, dims.tobuy);
+  check("ceiling: area mode shows the dimensions it used", rowKeys(byArea).includes("res_dims_used"));
+  eq("ceiling: a known perimeter carries no square note", byArea.note, "");
+  const square = run("ceiling", { mode: "area", area: "16", perimeter: "" });
+  eq("ceiling: no perimeter counts a square, 4 × 4 for 16 m²", rowNum(square, "res_dims_used"), 4);
+  eq("ceiling: the square says so", square.note, "res_square_note");
+  eq("ceiling: the square's boards follow the area", square.tobuy, run("ceiling", { mode: "dims", width: "4", length: "4" }).tobuy);
+  const short = run("ceiling", { mode: "area", area: "20", perimeter: "17" });
+  eq("ceiling: a perimeter shorter than the square's is refused", short.err, "err_perimeter_short");
+  eq("ceiling: and the refusal points at the perimeter", short.field, "perimeter");
+  eq("ceiling: an empty width does not refuse an area calculation", run("ceiling", { mode: "area", width: "" }).err, undefined);
+  eq("ceiling: opens in dimensions mode", run("ceiling").err, undefined);
+  check("ceiling: dimensions mode shows no dimensions row", !rowKeys(dims).includes("res_dims_used"));
+  const tilesArea = run("waste", { mode: "area", area: "20" });
+  const tilesDims = run("waste", { mode: "dims", width: "4", length: "5" });
+  eq("tiles: 4 × 5 m buys what 20 m² buys", tilesDims.tobuy, tilesArea.tobuy);
+  eq("tiles: dimensions mode shows the area it counted", rowNum(tilesDims, "res_area"), 20);
+  eq("tiles: an empty area does not refuse a dimensions calculation", run("waste", { mode: "dims", area: "" }).err, undefined);
+  eq("tiles: opens in area mode, as before", byId.waste.fields.find((f) => f.k === "mode").def, "area");
+}
+
 for (const spelling of ["1 000,5", "1.000,5", "1,000.5"]) {
   eq(`${spelling} reads as 1000.5`, num(spelling), 1000.5);
 }

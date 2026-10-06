@@ -576,14 +576,15 @@ function wsRoomFill(room, calcId, surface) {
     case "studwall":
       return { width: a.L, height: a.H };
     case "ceiling":
-      return { width: a.W, length: a.L };
+      return { mode: "dims", width: a.W, length: a.L };
     case "concrete":
       return {};
     case "linear":
     case "sheet":
       return {};
     default:
-      return { area };
+      // `mode` only lands where the card has a dimensions/area switch (tiles).
+      return { mode: "area", area };
   }
 }
 
