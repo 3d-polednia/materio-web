@@ -2363,3 +2363,5 @@ color: var(--accent-strong);
 .store-pin:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .store-item.is-picked { border-color: var(--accent-edge); }
 .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-3); margin-top: var(--sp-6); }
+.store-leaflet { overflow: hidden; z-index: 0; }
+.store-leaflet[hidden] { display: none; }
