@@ -124,6 +124,11 @@ function storeRow(s) {
    only). Empty means no key: the Leaflet map below is the fallback, also when Google cannot be
    loaded or refuses the key. */
 const GMAPS_KEY = "AIzaSyCSdWHEzY94JLf-JhCRfcPINOYn0oMTVV4";
+/* The map's Map ID (Google Cloud → Google Maps Platform → Map management, style "LiczMat
+   sklepy" hides Google's own points of interest). Advanced markers, Google's current pins,
+   exist only on a map with an ID; without one the map falls back to the older google.maps.Marker
+   and the `styles` array below. Public like the key. */
+const GMAPS_MAP_ID = "";
 let gmapsReady = null, gmapsFailed = false;
 function loadGoogleMaps() {
   if (gmapsFailed || !GMAPS_KEY) return Promise.reject(new Error("no google maps"));
@@ -134,7 +139,8 @@ function loadGoogleMaps() {
     window.lmGoogleMapsReady = () => resolve(google.maps);
     const js = document.createElement("script");
     js.src = "https://maps.googleapis.com/maps/api/js?key=" + encodeURIComponent(GMAPS_KEY) +
-      "&loading=async&callback=lmGoogleMapsReady&language=" + encodeURIComponent(lang);
+      "&loading=async&callback=lmGoogleMapsReady&language=" + encodeURIComponent(lang) +
+      (GMAPS_MAP_ID ? "&libraries=marker" : "");
     js.async = true;
     js.onerror = () => { gmapsReady = null; reject(new Error("maps")); };
     document.head.appendChild(js);
@@ -210,43 +216,69 @@ function buildStoreFinder() {
     let gm;
     try { gm = await loadGoogleMaps(); } catch (e) { return false; }
     box.classList.add("is-google");
+    const advanced = Boolean(GMAPS_MAP_ID && gm.marker && gm.marker.AdvancedMarkerElement);
     if (!gmap) {
-      gmap = new gm.Map(box, {
+      const options = {
         center: { lat: loc.lat, lng: loc.lng }, zoom: 13,
         mapTypeControl: false, streetViewControl: false, fullscreenControl: true,
         clickableIcons: false, gestureHandling: "cooperative",
-        // Google's own points of interest (restaurants, hotels) hide the stores; streets and
-        // place names stay.
-        styles: [
-          { featureType: "poi", stylers: [{ visibility: "off" }] },
-          { featureType: "transit", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-        ],
-      });
+      };
+      // Google's own points of interest (restaurants, hotels) hide the stores; streets and
+      // place names stay. A map with an ID takes that from its cloud style instead, and
+      // ignores (and warns about) a `styles` array.
+      if (advanced) options.mapId = GMAPS_MAP_ID;
+      else options.styles = [
+        { featureType: "poi", stylers: [{ visibility: "off" }] },
+        { featureType: "transit", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+      ];
+      gmap = new gm.Map(box, options);
       gInfo = new gm.InfoWindow();
     }
-    gMarkers.forEach((m) => m.setMap(null));
+    gMarkers.forEach((m) => { if (m.setMap) m.setMap(null); else m.map = null; });
     gMarkers = [];
     markers.clear();
     const color = accent();
     const bounds = new gm.LatLngBounds();
-    const you = new gm.Marker({
-      position: { lat: loc.lat, lng: loc.lng }, map: gmap, zIndex: 1000,
-      icon: { path: gm.SymbolPath.CIRCLE, scale: 7, fillColor: "#1d5fa8", fillOpacity: 1, strokeColor: "#ffffff", strokeWeight: 2 },
-    });
+    const here = { lat: loc.lat, lng: loc.lng };
+    let you;
+    if (advanced) {
+      // The same blue dot the older marker draws; set here because the design system has no
+      // blue token and this colour belongs to the map, not to the site.
+      const dot = document.createElement("div");
+      Object.assign(dot.style, {
+        width: "14px", height: "14px", borderRadius: "50%", background: "#1d5fa8",
+        border: "2px solid #ffffff", boxShadow: "0 0 0 4px rgba(29, 95, 168, 0.25)",
+      });
+      you = new gm.marker.AdvancedMarkerElement({ map: gmap, position: here, content: dot, zIndex: 1000 });
+    } else {
+      you = new gm.Marker({
+        position: here, map: gmap, zIndex: 1000,
+        icon: { path: gm.SymbolPath.CIRCLE, scale: 7, fillColor: "#1d5fa8", fillOpacity: 1, strokeColor: "#ffffff", strokeWeight: 2 },
+      });
+    }
     gMarkers.push(you);
-    bounds.extend(you.getPosition());
+    bounds.extend(here);
     for (const st of list) {
       const lat = Number(st.lat), lon = Number(st.lon);
       if (!isFinite(lat) || !isFinite(lon)) continue;
-      const mk = new gm.Marker({
-        position: { lat, lng: lon }, map: gmap, title: st.name,
-        icon: { path: gm.SymbolPath.CIRCLE, scale: 9, fillColor: color, fillOpacity: 0.95, strokeColor: "#ffffff", strokeWeight: 2 },
-      });
+      const position = { lat, lng: lon };
+      let mk;
+      if (advanced) {
+        // Google's own teardrop pin in the site's green, with a white dot for a glyph.
+        const pin = new gm.marker.PinElement({ background: color, borderColor: "#2f4a00", glyphColor: "#ffffff" });
+        mk = new gm.marker.AdvancedMarkerElement({ map: gmap, position, title: st.name, content: pin, gmpClickable: true });
+      } else {
+        mk = new gm.Marker({
+          position, map: gmap, title: st.name,
+          icon: { path: gm.SymbolPath.CIRCLE, scale: 9, fillColor: color, fillOpacity: 0.95, strokeColor: "#ffffff", strokeWeight: 2 },
+        });
+      }
       const open = () => { gInfo.setContent(popupHtml(st, lat, lon)); gInfo.open({ map: gmap, anchor: mk }); };
-      mk.addListener("click", open);
+      if (advanced) mk.addEventListener("gmp-click", open);
+      else mk.addListener("click", open);
       markers.set(`${lat},${lon}`, { open, lat, lon });
       gMarkers.push(mk);
-      bounds.extend(mk.getPosition());
+      bounds.extend(position);
     }
     gmap.fitBounds(bounds, 32);
     gm.event.addListenerOnce(gmap, "idle", () => { if (gmap.getZoom() > 15) gmap.setZoom(15); });
