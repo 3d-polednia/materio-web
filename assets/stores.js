@@ -124,11 +124,6 @@ function storeRow(s) {
    only). Empty means no key: the Leaflet map below is the fallback, also when Google cannot be
    loaded or refuses the key. */
 const GMAPS_KEY = "AIzaSyCSdWHEzY94JLf-JhCRfcPINOYn0oMTVV4";
-/* The map's Map ID (Google Cloud → Google Maps Platform → Map management, style "LiczMat
-   sklepy" hides Google's own points of interest). Advanced markers, Google's current pins,
-   exist only on a map with an ID; without one the map falls back to the older google.maps.Marker
-   and the `styles` array below. Public like the key. */
-const GMAPS_MAP_ID = "affec4ed306ba7f7f5d7bbef";
 let gmapsReady = null, gmapsFailed = false;
 function loadGoogleMaps() {
   if (gmapsFailed || !GMAPS_KEY) return Promise.reject(new Error("no google maps"));
@@ -139,8 +134,7 @@ function loadGoogleMaps() {
     window.lmGoogleMapsReady = () => resolve(google.maps);
     const js = document.createElement("script");
     js.src = "https://maps.googleapis.com/maps/api/js?key=" + encodeURIComponent(GMAPS_KEY) +
-      "&loading=async&callback=lmGoogleMapsReady&language=" + encodeURIComponent(lang) +
-      (GMAPS_MAP_ID ? "&libraries=marker" : "");
+      "&loading=async&callback=lmGoogleMapsReady&language=" + encodeURIComponent(lang);
     js.async = true;
     js.onerror = () => { gmapsReady = null; reject(new Error("maps")); };
     document.head.appendChild(js);
@@ -204,7 +198,7 @@ function buildStoreFinder() {
   const markers = new Map();
   const accent = () => getComputedStyle(document.documentElement).getPropertyValue("--accent-edge").trim() || "#476c00";
 
-  let gmap = null, gInfo = null, gMarkers = [];
+  let gmap = null, gInfo = null, gPins = null;
   const navUrl = (lat, lon) => "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon;
   const popupHtml = (st, lat, lon) =>
     `<div class="store-popup"><b>${esc(st.name)}</b>${esc(t(st.typeKey))} · ${fmtDist(st.dist)}` +
@@ -212,74 +206,91 @@ function buildStoreFinder() {
 
   /* The list's stores on a Google map, one pin each and a blue dot for you. Returns false when
      Google cannot be used (no key, blocked, refused key), and the Leaflet map takes over. */
+  /* The pins are the page's own: a teardrop like Google's in the site's green (.gmap-pin in
+     styles.css), drawn by one OverlayView over a plain map. Google's own pins (advanced
+     markers) exist only on a map with a Map ID, and such a map takes its look from a style kept
+     in the Cloud console, which nothing here can set; this way the map keeps its `styles`
+     array (Google's points of interest hidden), needs no console and uses nothing deprecated. */
+  function pinLayer(gm) {
+    class PinLayer extends gm.OverlayView {
+      constructor() { super(); this.items = []; this.layer = document.createElement("div"); }
+      onAdd() { this.getPanes().overlayMouseTarget.appendChild(this.layer); }
+      onRemove() { this.layer.remove(); }
+      draw() {
+        const projection = this.getProjection();
+        if (!projection) return;
+        for (const item of this.items) {
+          const point = projection.fromLatLngToDivPixel(new gm.LatLng(item.lat, item.lng));
+          item.el.style.left = point.x + "px";
+          item.el.style.top = point.y + "px";
+        }
+      }
+      show(items) {
+        this.items = items;
+        this.layer.replaceChildren(...items.map((item) => item.el));
+        this.draw();
+      }
+    }
+    return new PinLayer();
+  }
+
+  const PIN_SVG = '<svg viewBox="0 0 27 43" width="27" height="43" aria-hidden="true" focusable="false">' +
+    '<path d="M13.5 1C6.6 1 1 6.6 1 13.5 1 22.9 13.5 42 13.5 42S26 22.9 26 13.5C26 6.6 20.4 1 13.5 1z"/>' +
+    '<circle cx="13.5" cy="13.5" r="4.6"/></svg>';
+
   async function drawGoogleMap(list, box) {
     let gm;
     try { gm = await loadGoogleMaps(); } catch (e) { return false; }
     box.classList.add("is-google");
-    const advanced = Boolean(GMAPS_MAP_ID && gm.marker && gm.marker.AdvancedMarkerElement);
     if (!gmap) {
-      const options = {
+      gmap = new gm.Map(box, {
         center: { lat: loc.lat, lng: loc.lng }, zoom: 13,
         mapTypeControl: false, streetViewControl: false, fullscreenControl: true,
         clickableIcons: false, gestureHandling: "cooperative",
-      };
-      // Google's own points of interest (restaurants, hotels) hide the stores; streets and
-      // place names stay. A map with an ID takes that from its cloud style instead, and
-      // ignores (and warns about) a `styles` array.
-      if (advanced) options.mapId = GMAPS_MAP_ID;
-      else options.styles = [
-        { featureType: "poi", stylers: [{ visibility: "off" }] },
-        { featureType: "transit", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-      ];
-      gmap = new gm.Map(box, options);
-      gInfo = new gm.InfoWindow();
+        // Google's own points of interest (restaurants, hotels) hide the stores; streets and
+        // place names stay.
+        styles: [
+          { featureType: "poi", stylers: [{ visibility: "off" }] },
+          { featureType: "transit", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+        ],
+      });
+      gInfo = new gm.InfoWindow({ pixelOffset: new gm.Size(0, -40) });
+      gPins = pinLayer(gm);
+      gPins.setMap(gmap);
     }
-    gMarkers.forEach((m) => { if (m.setMap) m.setMap(null); else m.map = null; });
-    gMarkers = [];
+    gInfo.close();
     markers.clear();
-    const color = accent();
     const bounds = new gm.LatLngBounds();
-    const here = { lat: loc.lat, lng: loc.lng };
-    let you;
-    if (advanced) {
-      // The same blue dot the older marker draws; set here because the design system has no
-      // blue token and this colour belongs to the map, not to the site.
-      const dot = document.createElement("div");
-      Object.assign(dot.style, {
-        width: "14px", height: "14px", borderRadius: "50%", background: "#1d5fa8",
-        border: "2px solid #ffffff", boxShadow: "0 0 0 4px rgba(29, 95, 168, 0.25)",
-      });
-      you = new gm.marker.AdvancedMarkerElement({ map: gmap, position: here, content: dot, zIndex: 1000 });
-    } else {
-      you = new gm.Marker({
-        position: here, map: gmap, zIndex: 1000,
-        icon: { path: gm.SymbolPath.CIRCLE, scale: 7, fillColor: "#1d5fa8", fillOpacity: 1, strokeColor: "#ffffff", strokeWeight: 2 },
-      });
-    }
-    gMarkers.push(you);
-    bounds.extend(here);
+    const items = [];
+
+    // You: a blue dot. Its colour is set here because the design system has no blue token
+    // and the colour belongs to the map, not to the site.
+    const dot = document.createElement("div");
+    dot.className = "gmap-you";
+    Object.assign(dot.style, { background: "#1d5fa8", boxShadow: "0 0 0 4px rgba(29, 95, 168, 0.25)" });
+    bounds.extend({ lat: loc.lat, lng: loc.lng });
+
     for (const st of list) {
       const lat = Number(st.lat), lon = Number(st.lon);
       if (!isFinite(lat) || !isFinite(lon)) continue;
-      const position = { lat, lng: lon };
-      let mk;
-      if (advanced) {
-        // Google's own teardrop pin in the site's green, with a white dot for a glyph.
-        const pin = new gm.marker.PinElement({ background: color, borderColor: "#2f4a00", glyphColor: "#ffffff" });
-        mk = new gm.marker.AdvancedMarkerElement({ map: gmap, position, title: st.name, content: pin, gmpClickable: true });
-      } else {
-        mk = new gm.Marker({
-          position, map: gmap, title: st.name,
-          icon: { path: gm.SymbolPath.CIRCLE, scale: 9, fillColor: color, fillOpacity: 0.95, strokeColor: "#ffffff", strokeWeight: 2 },
-        });
-      }
-      const open = () => { gInfo.setContent(popupHtml(st, lat, lon)); gInfo.open({ map: gmap, anchor: mk }); };
-      if (advanced) mk.addEventListener("gmp-click", open);
-      else mk.addListener("click", open);
+      const pin = document.createElement("button");
+      pin.type = "button";
+      pin.className = "gmap-pin";
+      pin.title = st.name;
+      pin.setAttribute("aria-label", st.name);
+      pin.innerHTML = PIN_SVG;
+      const open = () => {
+        gInfo.setContent(popupHtml(st, lat, lon));
+        gInfo.setPosition({ lat, lng: lon });
+        gInfo.open({ map: gmap });
+      };
+      pin.addEventListener("click", (e) => { e.stopPropagation(); open(); });
+      items.push({ el: pin, lat, lng: lon });
       markers.set(`${lat},${lon}`, { open, lat, lon });
-      gMarkers.push(mk);
-      bounds.extend(position);
+      bounds.extend({ lat, lng: lon });
     }
+    items.push({ el: dot, lat: loc.lat, lng: loc.lng });   // last, so it is drawn over the pins
+    gPins.show(items);
     gmap.fitBounds(bounds, 32);
     gm.event.addListenerOnce(gmap, "idle", () => { if (gmap.getZoom() > 15) gmap.setZoom(15); });
     return true;
@@ -290,7 +301,7 @@ function buildStoreFinder() {
     if (!box || !box.classList.contains("is-google")) return;
     box.classList.remove("is-google");
     box.innerHTML = "";
-    gmap = null; gInfo = null; gMarkers = [];
+    gmap = null; gInfo = null; gPins = null;
     if (lastMapList) drawStoresMap(lastMapList);
   });
 

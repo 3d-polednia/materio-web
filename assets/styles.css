@@ -1023,6 +1023,13 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .store-popup { font-size: 13px; line-height: 1.45; }
 .store-popup b { display: block; font-size: 15px; font-weight: 700; }
 .store-popup a { font-weight: 600; }
+.gmap-pin { position: absolute; width: 27px; height: 43px; padding: 0; border: 0; background: none; cursor: pointer; transform: translate(-50%, -100%); }
+.gmap-pin svg { display: block; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .35)); }
+.gmap-pin path { fill: var(--accent-edge); stroke: rgba(0, 0, 0, .3); stroke-width: 1.5; }
+.gmap-pin circle { fill: var(--surface, #fff); }
+.gmap-pin:hover path, .gmap-pin:focus-visible path { fill: var(--accent); }
+.gmap-pin:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
+.gmap-you { position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--surface, #fff); transform: translate(-50%, -50%); }
 
 /* The 2D cut-plan picture (assets/calculators.js renderResult): each sheet drawn to
    scale so the visitor sees where the off-cut lands, not just the waste percentage.
