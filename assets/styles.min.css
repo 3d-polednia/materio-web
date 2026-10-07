@@ -642,6 +642,9 @@ display: none;
 .result .big { font-size: var(--fs-2xl); font-weight: var(--fw-black); line-height: var(--lh-tight); }
 .result .rows { margin-top: var(--sp-3); display: grid; gap: 3px; font-size: var(--fs-sm); }
 .result .rows div { display: flex; justify-content: space-between; gap: var(--sp-3); }
+.store-popup { font-size: 13px; line-height: 1.45; }
+.store-popup b { display: block; font-size: 15px; font-weight: 700; }
+.store-popup a { font-weight: 600; }
 .cutplan { margin-top: var(--sp-3); }
 .cutplan-sheets { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); margin-top: var(--sp-1); }
 .cutplan-sheet-box { min-width: 0; }
