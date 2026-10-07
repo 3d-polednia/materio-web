@@ -117,10 +117,13 @@ function storeRow(s) {
    on OpenStreetMap tiles (no key, no cookies) with one marker per store and one for you.
    Leaflet is fetched only then, from this site (assets/vendor/leaflet, BSD-2-Clause). */
 /* Google Maps on the stores page (owner, 2026-10-06: "the OpenStreetMap map is ugly, it has
-   to be Google Maps"). The Maps JavaScript API needs a browser key; this one is restricted to
-   liczmat.com referrers and to that one API, so it is not a secret and lives here. Empty means
-   no key yet: the Leaflet map below stays the fallback, also when Google cannot be loaded. */
-const GMAPS_KEY = "";
+   to be Google Maps"). IS THIS A SECRET? No. A browser key for the Maps JavaScript API is sent
+   to Google from every visitor's browser, so it is public by design; what protects it is the
+   key's restriction in Google Cloud (key "LiczMat web Maps JS (liczmat.com)": the liczmat.com,
+   www.liczmat.com, materio-502513.web.app and localhost:8099 referrers, Maps JavaScript API
+   only). Empty means no key: the Leaflet map below is the fallback, also when Google cannot be
+   loaded or refuses the key. */
+const GMAPS_KEY = "AIzaSyCSdWHEzY94JLf-JhCRfcPINOYn0oMTVV4";
 let gmapsReady = null, gmapsFailed = false;
 function loadGoogleMaps() {
   if (gmapsFailed || !GMAPS_KEY) return Promise.reject(new Error("no google maps"));
@@ -198,7 +201,7 @@ function buildStoreFinder() {
   let gmap = null, gInfo = null, gMarkers = [];
   const navUrl = (lat, lon) => "https://www.google.com/maps/dir/?api=1&destination=" + lat + "," + lon;
   const popupHtml = (st, lat, lon) =>
-    `<div class="store-popup"><b>${esc(st.name)}</b><br>${esc(t(st.typeKey))} · ${fmtDist(st.dist)}` +
+    `<div class="store-popup"><b>${esc(st.name)}</b>${esc(t(st.typeKey))} · ${fmtDist(st.dist)}` +
     `${st.addr ? "<br>" + esc(st.addr) : ""}<br><a href="${esc(navUrl(lat, lon))}" target="_blank" rel="noopener">${esc(t("res_navigate"))}</a></div>`;
 
   /* The list's stores on a Google map, one pin each and a blue dot for you. Returns false when
@@ -212,6 +215,12 @@ function buildStoreFinder() {
         center: { lat: loc.lat, lng: loc.lng }, zoom: 13,
         mapTypeControl: false, streetViewControl: false, fullscreenControl: true,
         clickableIcons: false, gestureHandling: "cooperative",
+        // Google's own points of interest (restaurants, hotels) hide the stores; streets and
+        // place names stay.
+        styles: [
+          { featureType: "poi", stylers: [{ visibility: "off" }] },
+          { featureType: "transit", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+        ],
       });
       gInfo = new gm.InfoWindow();
     }

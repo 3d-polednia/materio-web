@@ -1020,6 +1020,9 @@ select:not(.cur-select):hover { --select-chev: var(--on-surface); }
 .result .big { font-size: var(--fs-2xl); font-weight: var(--fw-black); line-height: var(--lh-tight); }
 .result .rows { margin-top: var(--sp-3); display: grid; gap: 3px; font-size: var(--fs-sm); }
 .result .rows div { display: flex; justify-content: space-between; gap: var(--sp-3); }
+.store-popup { font-size: 13px; line-height: 1.45; }
+.store-popup b { display: block; font-size: 15px; font-weight: 700; }
+.store-popup a { font-weight: 600; }
 
 /* The 2D cut-plan picture (assets/calculators.js renderResult): each sheet drawn to
    scale so the visitor sees where the off-cut lands, not just the waste percentage.

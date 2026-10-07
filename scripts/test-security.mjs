@@ -827,10 +827,15 @@ head("12. API: what the repo does not carry");
       // The one browser key the site cannot hide, in the one file that holds it and says
       // why (assets/firebase-config.js). Anywhere else it is a copy nobody is watching.
       if (file === "assets/firebase-config.js" && what === "a Google API key") continue;
+      // And the Maps JavaScript API key of the stores page (2026-10-06), restricted to the
+      // liczmat.com referrers and to that one API; assets/stores.js says so next to it.
+      if (/^assets\/stores(\.min)?\.js$/.test(file) && what === "a Google API key") continue;
       check(`${file} carries no ${what}`, !re.test(src));
     }
   }
   check("there is no .env in the repo", !existsSync(p(".env")));
+  check("the stores page says why its Maps key is public",
+    /IS THIS A SECRET\? No\. A browser key for the Maps JavaScript API/.test(read("assets/stores.js")));
   check("the Firebase config says why its key is public",
     /IS THIS A SECRET\?[\s\S]{0,120}No\. A Firebase Web apiKey is a public project identifier/
       .test(read("assets/firebase-config.js")));

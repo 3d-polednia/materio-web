@@ -764,8 +764,10 @@ head("9. fonts");
   check("no @font-face anywhere in the design system", !css.includes("@font-face"));
   for (const w of WEIGHED.values()) {
     check(`${w.file} fetches no font`, !/\.(woff2?|ttf|otf|eot)\b/.test(w.html));
-    check(`${w.file} opens no connection to a font host`,
-      !/fonts\.(googleapis|gstatic)\.com/.test(w.html));
+    // The one exception is the stores pages: their policy lets the Google map's controls fetch
+    // Google's fonts (scripts/build.mjs, CSP_STYLE_GMAPS). The page itself still asks for none.
+    const fontHost = /fonts\.(googleapis|gstatic)\.com/.test(w.html.replace(/<meta http-equiv="Content-Security-Policy"[^>]*>/, ""));
+    check(`${w.file} opens no connection to a font host`, !fontHost);
   }
 }
 

@@ -739,10 +739,12 @@ const CSP_CONNECT_STORES = "https://overpass-api.de https://overpass.private.cof
 /* Google Maps JavaScript API on /sklepy/ (owner, 2026-10-06): the loader and its modules come
    from maps.googleapis.com and maps.gstatic.com, and it writes <style> elements of its own,
    which a static page cannot give a nonce, so the stores pages alone allow inline styles.
-   Inline *scripts* stay refused everywhere, and no font host is allowed: the map falls back
-   to the device's sans-serif like the rest of the site. */
+   Inline *scripts* stay refused everywhere. The map's own controls load Google's fonts
+   (Roboto, Google Sans) from fonts.googleapis.com / fonts.gstatic.com; refused, they fill the
+   console with errors, so those two hosts are allowed on the stores pages and nowhere else. */
 const CSP_SCRIPT_GMAPS = "https://maps.googleapis.com https://maps.gstatic.com";
-const CSP_STYLE_GMAPS = "'unsafe-inline'";
+const CSP_STYLE_GMAPS = "'unsafe-inline' https://fonts.googleapis.com";
+const CSP_FONT_GMAPS = "https://fonts.gstatic.com";
 const CSP_CONNECT_ANALYTICS = "https://www.googletagmanager.com " +
   "https://*.google-analytics.com https://*.analytics.google.com " +
   "https://stats.g.doubleclick.net";
@@ -834,6 +836,7 @@ function withCsp(html) {
     if (d === "connect-src") return `${d} ${connectSrc}`;
     if (d === "frame-src") return `${d} ${frameSrc}`;
     if (d === "style-src 'self'" && hasStores) return `${d} ${CSP_STYLE_GMAPS}`;
+    if (d === "font-src 'self'" && hasStores) return `${d} ${CSP_FONT_GMAPS}`;
     return d;
   });
   const meta = `<meta http-equiv="Content-Security-Policy" content="${directives.join("; ")}">`;
