@@ -745,6 +745,8 @@ const CSP_CONNECT_STORES = "https://overpass-api.de https://overpass.private.cof
 const CSP_SCRIPT_GMAPS = "https://maps.googleapis.com https://maps.gstatic.com";
 const CSP_STYLE_GMAPS = "'unsafe-inline' https://fonts.googleapis.com";
 const CSP_FONT_GMAPS = "https://fonts.gstatic.com";
+// The vector map (it has a Map ID since 2026-10-07) renders in Web Workers it makes from blob: URLs.
+const CSP_WORKER_GMAPS = "worker-src 'self' blob:";
 const CSP_CONNECT_ANALYTICS = "https://www.googletagmanager.com " +
   "https://*.google-analytics.com https://*.analytics.google.com " +
   "https://stats.g.doubleclick.net";
@@ -839,6 +841,7 @@ function withCsp(html) {
     if (d === "font-src 'self'" && hasStores) return `${d} ${CSP_FONT_GMAPS}`;
     return d;
   });
+  if (hasStores) directives.push(CSP_WORKER_GMAPS);
   const meta = `<meta http-equiv="Content-Security-Policy" content="${directives.join("; ")}">`;
   // A page that quietly came out without a policy is the failure this whole block exists
   // to prevent, so a <head> that is not there stops the build instead of shipping 523

@@ -128,7 +128,7 @@ const GMAPS_KEY = "AIzaSyCSdWHEzY94JLf-JhCRfcPINOYn0oMTVV4";
    sklepy" hides Google's own points of interest). Advanced markers, Google's current pins,
    exist only on a map with an ID; without one the map falls back to the older google.maps.Marker
    and the `styles` array below. Public like the key. */
-const GMAPS_MAP_ID = "";
+const GMAPS_MAP_ID = "affec4ed306ba7f7f5d7bbef";
 let gmapsReady = null, gmapsFailed = false;
 function loadGoogleMaps() {
   if (gmapsFailed || !GMAPS_KEY) return Promise.reject(new Error("no google maps"));
