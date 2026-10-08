@@ -1712,6 +1712,7 @@ gap: var(--sp-2) var(--sp-4); margin-bottom: var(--sp-4);
 .section-add-list a { display: inline-flex; align-items: center; min-height: var(--sp-6); font-size: var(--fs-sm); font-weight: var(--fw-semi); }
 .calc-presets { align-items: center; }
 .calc-presets-label { font-size: var(--fs-sm); color: var(--muted); }
+.calc-chain { margin-top: var(--sp-4); }
 [data-preset]:hover { text-decoration: underline; }
 [data-preset][aria-pressed="true"] { font-weight: var(--fw-bold); }
 .section-option-label { margin: var(--sp-4) 0 var(--sp-2); font-size: var(--fs-sm); font-weight: var(--fw-semi); }
