@@ -141,7 +141,7 @@ const MATERIALS = [
   mBag("tynk-baranek-25", "m_tynk_baranek", "1,5 mm · 25 kg", 25, 2.5, "ml_15mm"),
   mBag("tynk-silik-25", "m_tynk_silik", "1,5 mm · 25 kg", 25, 2.5, "ml_15mm"),
   mBag("tynk-akryl-25", "m_tynk_akryl", "1,5 mm · 25 kg", 25, 2.5, "ml_15mm"),
-  mBag("klej-c1-25", "m_klej_c1", "25 kg", 25, 4.0, "ml_comb6"),
+  mBag("klej-c1-25", "m_klej_c1", "25 kg", 25, 2.5, "ml_comb6"),
   mBag("klej-c2-25", "m_klej_c2", "25 kg", 25, 5.0, "ml_comb10"),
   mBag("klej-styro-25", "m_klej_styro", "25 kg", 25, 4.5, "ml_reinf"),
   mBag("zaprawa-mur-25", "m_zaprawa_mur", "25 kg", 25, 25.0, "ml_joint10"),
@@ -154,7 +154,7 @@ const MATERIALS = [
   mPack("welna-15", "m_welna", "15 cm", 4.5),
   mPack("welna-podd-20", "m_welna_podd", "20 cm", 3.5),
   mPack("welna-fasada-15", "m_welna_fasada", "15 cm", 2.0),
-  mPack("styropian-5", "m_styropian", "5 cm", 3.0),
+  mPack("styropian-5", "m_styropian", "5 cm", 6.0),
   mPack("styropian-fasada-10", "m_styropian_fasada", "10 cm", 3.0),
   mPack("styropian-fasada-15", "m_styropian_fasada", "15 cm", 2.0),
   mPack("styropian-podloga-10", "m_styropian_podloga", "EPS 100 · 10 cm", 3.0),
@@ -275,6 +275,15 @@ const MAT_IDS_FOR_CALC = {
   insulation: ["klej-styro-25"],
 };
 
+/* These calculators need a narrower product model than their shared material kind. */
+const MAT_FILTER_FOR_CALC = {
+  grout: (m) => m.c === "TILES" || m.id.startsWith("gres-") || m.id === "fuga-5",
+  screed: (m) => m.k === "bag" && ["ml_1mm", "ml_10mm", "ml_15mm"].includes(m.layer),
+  mortar: (m) => m.k === "bag" && (m.id.startsWith("klej-") || m.id.startsWith("zaprawa-")),
+  insulation: (m) => (m.k === "pack" && m.id.startsWith("styropian-")) || m.id === "klej-styro-25",
+  sheathing: (m) => m.k === "sheet" && ["osb", "sklejka-", "szalunek-", "mfp-", "cetris-", "fermacell-", "wior-"].some((prefix) => m.id.startsWith(prefix)),
+};
+
 /**
  * The calculator a material belongs to when it has to be shown with exactly one:
  * the /materialy/ listing and its "calculate" link. Other calculators still accept it
@@ -333,8 +342,10 @@ function materialsForCalc(calcId) {
   // an error: a page without it simply offers the catalogue.
   const own = typeof omCatalogRows === "function" ? omCatalogRows() : [];
   const ids = MAT_IDS_FOR_CALC[calcId] || [];
-  return own.filter((m) => kinds.includes(m.k))
-    .concat(MATERIALS.filter((m) => kinds.includes(m.k) || ids.includes(m.id)));
+  const accepts = (m) => kinds.includes(m.k) || ids.includes(m.id);
+  const filter = MAT_FILTER_FOR_CALC[calcId] || (() => true);
+  return own.filter((m) => accepts(m) && filter(m))
+    .concat(MATERIALS.filter((m) => accepts(m) && filter(m)));
 }
 
 /**
@@ -375,7 +386,10 @@ function materialFill(m, calcId) {
     case "ceiling":
       values = { boardArea: Math.round(m.pkg * 100) / 100 }; break;
     case "insulation":
-      values = m.k === "bag" ? { adhesive: m.kgm2 } : {}; break;
+      values = m.k === "bag"
+        ? { adhesive: m.kgm2, adhBag: m.kg }
+        : { foamThk: Math.round(30 / m.cov) };
+      break;
     default:
       values = {};
   }

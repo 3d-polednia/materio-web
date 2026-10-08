@@ -167,17 +167,28 @@ function qty(v, lang) {
 }
 
 /* ---------- Parsers for list inputs ---------- */
+/**
+ * One line of a cutting list split into its numbers. "x", "×", "*" and spaces always
+ * separate. A comma is the old separator too ("1200,4" is four pieces of 1200 mm), except
+ * on a line that already uses x/×/*: there a comma between digits is a decimal comma, so
+ * "500,5×2" is two pieces of 500,5 mm rather than five of 500 (audit 2026-10-08).
+ */
+function cutListNumbers(line) {
+  const decimalComma = /[xX×*]/.test(line);
+  const parts = decimalComma ? line.split(/[xX×*\s]+|,(?=\s|$)/) : line.split(/[xX×*,\s]+/);
+  return parts.map((s) => num(s)).filter((n) => !isNaN(n));
+}
 function parseCuts(text) {
   // lines like "2400x3", "800*2", "1200 4" → [{len, q}]
   return String(text).split(/[\n;]+/).map((l) => l.trim()).filter(Boolean).map((l) => {
-    const p = l.split(/[x×*, ]+/).map((s) => num(s)).filter((n) => !isNaN(n));
+    const p = cutListNumbers(l);
     return p.length >= 2 ? { len: p[0], q: Math.round(p[1]) } : (p.length === 1 ? { len: p[0], q: 1 } : null);
   }).filter(Boolean);
 }
 function parsePieces(text) {
   // lines like "600x400x3" → [{w, l, q}]
   return String(text).split(/[\n;]+/).map((l) => l.trim()).filter(Boolean).map((l) => {
-    const p = l.split(/[x×*, ]+/).map((s) => num(s)).filter((n) => !isNaN(n));
+    const p = cutListNumbers(l);
     if (p.length >= 3) return { w: p[0], l: p[1], q: Math.round(p[2]) };
     if (p.length === 2) return { w: p[0], l: p[1], q: 1 };
     return null;
@@ -322,7 +333,7 @@ const ENGINES = {
     const useful = pieces.reduce((a, b) => a + b, 0), purchased = bars.length * stock;
     const wastePct = purchased > 0 ? (purchased - useful) / purchased * 100 : 0;
     const SHOWN = 8;
-    const plan = bars.slice(0, SHOWN).map((b, i) => ["res_bar_n", "§row-n:" + (i + 1) + "§" + b.pieces.map((x) => Math.round(x)).join(" + ") + " mm"]);
+    const plan = bars.slice(0, SHOWN).map((b, i) => ["res_bar_n", "§row-n:" + (i + 1) + "§" + b.pieces.map((x) => qtyG(Math.round(x * 10) / 10)).join(" + ") + " mm"]);
     return { tobuy: bars.length, unit: "res_stocks", cost: bars.length * price, rows: [
       ["res_pieces_cut", qtyG(pieces.length)],
       ["res_waste", qtyG(Math.round(wastePct * 10) / 10) + "%"],
@@ -426,7 +437,10 @@ const ENGINES = {
     for (const [field, value] of [["area", area], ["usage", usage], ["bag", bag]]) if (!(value > 0)) return errAt("err_positive", field);
     if (price < 0) return errAt("err_price", "price");
     const kg = area * usage, bags = ceil(kg / bag);
-    return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [["res_kg_total", qtyG(kg) + " kg"]] };
+    return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
+      ["res_need", qtyG(kg) + " kg"],
+      ["res_purchased", qtyG(bags * bag) + " kg (" + qtyG(bags) + " × " + qtyG(bag) + " kg)"],
+    ] };
   },
   /**
    * Screed / plaster. `kgPerM2PerMm` is a Kotlin parameter (2,0 for cement screed) that the
@@ -440,7 +454,8 @@ const ENGINES = {
     if (price < 0) return errAt("err_price", "price");
     const kg = area * thk * rate, bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
-      ["res_kg_total", qtyG(kg) + " kg"],
+      ["res_need", qtyG(kg) + " kg"],
+      ["res_purchased", qtyG(bags * bag) + " kg (" + qtyG(bags) + " × " + qtyG(bag) + " kg)"],
       ["res_kg_m2", qtyG(thk * rate) + " kg/m²"],
     ] };
   },
@@ -460,7 +475,8 @@ const ENGINES = {
     const kgPerM2 = (L + W) / (L * W) * thk * joint * 1.8, kg = kgPerM2 * area;
     const bags = ceil(kg / bag);
     return { tobuy: bags, unit: "res_bags", cost: bags * price, rows: [
-      ["res_kg_total", qtyG(kg) + " kg"],
+      ["res_need", qtyG(kg) + " kg"],
+      ["res_purchased", qtyG(bags * bag) + " kg (" + qtyG(bags) + " × " + qtyG(bag) + " kg)"],
       ["res_kg_m2", qtyG(kgPerM2) + " kg/m²"],
     ] };
   },
@@ -484,8 +500,8 @@ const ENGINES = {
   },
   insulation(f) {
     const read = readCalc("insulation", f); if (read.err) return read;
-    const { area, dowels: dow, adhesive: adh, foamThk: thk, price } = read.values;
-    for (const [field, value] of [["area", area], ["dowels", dow], ["adhesive", adh], ["foamThk", thk]]) if (!(value > 0)) return errAt("err_positive", field);
+    const { area, dowels: dow, adhesive: adh, adhBag, foamThk: thk, price } = read.values;
+    for (const [field, value] of [["area", area], ["dowels", dow], ["adhesive", adh], ["adhBag", adhBag], ["foamThk", thk]]) if (!(value > 0)) return errAt("err_positive", field);
     if (price < 0) return errAt("err_price", "price");
     const areaPerPkg = 0.30 * 100 / thk, foamPkgs = ceil(area / areaPerPkg);
     // The old first row read "80 m² · 15 cm" — the two values already in the fields above
@@ -496,7 +512,8 @@ const ENGINES = {
       ["res_pkg_area", qtyG(areaPerPkg) + " m²"],
       ["res_foam_boards", qtyG(boards)],
       ["res_dowels", qtyG(ceil(area * dow))],
-      ["res_adhesive", qtyG(area * adh) + " kg (" + qtyG(ceil(area * adh / 25)) + " |res_bags| × 25 kg)"],
+      ["res_adhesive_need", qtyG(area * adh) + " kg"],
+      ["res_adhesive_purchased", qtyG(ceil(area * adh / adhBag) * adhBag) + " kg (" + qtyG(ceil(area * adh / adhBag)) + " × " + qtyG(adhBag) + " kg)"],
       ["res_boards_per_pkg", qtyG(areaPerPkg / 0.5)],
       ["res_mesh", qtyG(area * 1.10) + " m²"],
     ] };
@@ -551,15 +568,19 @@ const ENGINES = {
   },
   drylining(f) {
     const read = readCalc("drylining", f); if (read.err) return read;
-    const { area, adhesive: adh, boardArea, price } = read.values;
+    const { area, adhesive: adh, adhBag, boardArea, price } = read.values;
     if (!(area > 0)) return errAt("err_positive", "area");
     if (!(adh > 0)) return errAt("err_positive", "adhesive");
+    if (!(adhBag > 0)) return errAt("err_positive", "adhBag");
     if (!(boardArea > 0)) return errAt("err_positive", "boardArea");
     if (price < 0) return errAt("err_price", "price");
-    const boards = boardsFor(area, 1, boardArea), kg = area * adh, bags = ceil(kg / 25);
+    const boards = boardsFor(area, 1, boardArea), kg = area * adh, bags = ceil(kg / adhBag);
+    // The boards' own "Kupujesz" row sits right under the board count it explains; below
+    // the two adhesive rows it read as the adhesive's purchase.
     return { tobuy: boards, unit: "res_boards", cost: boards * price, rows: [
-      ["res_adhesive", qtyG(bags) + " × 25 kg (" + qtyG(kg) + " kg)"],
       ["res_purchased", qtyG(boards * boardArea) + " m²"],
+      ["res_adhesive_need", qtyG(kg) + " kg"],
+      ["res_adhesive_purchased", qtyG(bags * adhBag) + " kg (" + qtyG(bags) + " × " + qtyG(adhBag) + " kg)"],
     ] };
   },
   sheathing(f) {
@@ -662,7 +683,8 @@ const CALCS = [
   ] },
   { id: "insulation", tab: "trade", engine: "insulation", fields: [
     F("area", "fld_area", "80"), F("foamThk", "fld_foam_thk", "15", { opt: true }), F("dowels", "fld_dowels_m2", "6", { opt: true }),
-    F("adhesive", "fld_adhesive_m2", "5", { opt: true }), F("price", "fld_price_pkg", "", { opt: true, fallback: 0 }),
+    F("adhesive", "fld_adhesive_m2", "5", { opt: true }), F("adhBag", "fld_adh_bag_kg", "25", { opt: true, fallback: 25 }),
+    F("price", "fld_price_pkg", "", { opt: true, fallback: 0 }),
   ] },
   // FRAMING
   { id: "studwall", tab: "framing", engine: "studwall", fields: [
@@ -679,7 +701,8 @@ const CALCS = [
   ] },
   { id: "drylining", tab: "framing", engine: "drylining", fields: [
     F("area", "fld_area", "12"), F("adhesive", "fld_adhesive_m2", "5", { opt: true }),
-    F("boardArea", "fld_board_area", "2.4", { opt: true, fallback: 2.4 }), F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
+    F("adhBag", "fld_adh_bag_kg", "25", { opt: true, fallback: 25 }), F("boardArea", "fld_board_area", "2.4", { opt: true, fallback: 2.4 }),
+    F("price", "fld_price_board", "", { opt: true, fallback: 0 }),
   ] },
   { id: "sheathing", tab: "framing", engine: "sheathing", fields: [
     F("area", "fld_area", "30"), F("pieceW", "fld_sheet_w", "1250"), F("pieceL", "fld_sheet_l", "2500"),

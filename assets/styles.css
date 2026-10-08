@@ -79,6 +79,7 @@
   --surface-alt: #f3efe5;
   --surface-container: #eee9dd;
   --on-bg: #14181c;
+  --text: #14181c;
   --on-surface: #14181c;
   --muted: #5c6570;
   --outline: #e0dacd;
@@ -154,6 +155,7 @@
     --surface-alt: #111a22;
     --surface-container: #0e1720;
     --on-bg: #e9edf0;
+    --text: #e9edf0;
     --on-surface: #e9edf0;
     --muted: #a4abb3;
     --outline: #202932;
@@ -215,6 +217,7 @@
   --surface-alt: #111a22;
   --surface-container: #0e1720;
   --on-bg: #e9edf0;
+  --text: #e9edf0;
   --on-surface: #e9edf0;
   --muted: #a4abb3;
   --outline: #202932;
@@ -1619,7 +1622,8 @@ footer h2 {
    content) and in the hero, but it must stay card-sized either way. */
 /* Both of the card's own buttons own their line: "Policz" closes the fields, and
    "Dodaj do projektu" is the step the result leads to (chapter XII's AKCJE). */
-.calc-form > .btn-primary, .ws-save-row > .btn-primary { width: 100%; margin-top: var(--sp-2); }
+.calc-form > .btn-primary { width: 100%; margin-top: var(--sp-2); }
+.ws-save-row > .btn-primary { width: 100%; margin-top: 0; }
 
 .calc-group {
   margin: 0 0 var(--sp-3); font-size: var(--fs-base); text-transform: uppercase;
@@ -2564,7 +2568,22 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
    (owner, 2026-10-03). The chosen one is the bold one, with aria-pressed saying the same. */
 .calc-presets { align-items: center; }
 .calc-presets-label { font-size: var(--fs-sm); color: var(--muted); }
-.calc-chain { margin-top: var(--sp-4); }
+.calc-chain { margin-top: var(--sp-5); gap: var(--sp-2); }
+.calc-chain .calc-presets-label {
+  flex-basis: 100%; color: var(--text); font-size: var(--fs-base); font-weight: var(--fw-semi);
+}
+/* Owner-approved pill exception for calculator chains only, 2026-10-08. */
+.calc-chain .section-add {
+  min-height: var(--control-h-sm); padding: 0 var(--sp-4); border: 0;
+  border-radius: var(--radius-pill); background: var(--accent-strong); color: var(--on-accent-strong);
+  text-decoration: none; transition: background-color var(--dur) var(--ease);
+}
+.calc-chain .section-add::after { content: "→"; margin-left: var(--sp-1); }
+.calc-chain .section-add:hover { background: color-mix(in srgb, var(--accent-strong) 86%, black); text-decoration: none; }
+.calc-chain .section-add:focus-visible {
+  background: color-mix(in srgb, var(--accent-strong) 86%, black);
+  outline: 2px solid var(--focus); outline-offset: 3px;
+}
 [data-preset]:hover { text-decoration: underline; }
 [data-preset][aria-pressed="true"] { font-weight: var(--fw-bold); }
 /* The existing-project route is named separately from the new-project form above it. */
@@ -2618,7 +2637,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
 .ws-bar-row .btn { flex: none; }
 .ws-bar-hint { font-size: var(--fs-sm); margin: 0; }
 .ws-save { margin-top: var(--sp-4); }
-.ws-save-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
+.ws-save-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); }
 .ws-save-note { font-size: var(--fs-sm); }
 /* Which project the result goes into — chapter XV. The picker sits next to the button
    it feeds and takes the rest of the line; on a phone it wraps under it. */

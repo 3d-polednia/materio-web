@@ -234,7 +234,7 @@ head("matematyka");
   eq("linear: 18 pieces counted", rowNum(r, "res_pieces_cut"), 18);
   eq("linear: 2400 of 30 000 mm wasted = 8 %", rowNum(r, "res_waste"), 8);
   eq("linear: every plan row uses the numbered label key", r.rows.filter((x) => x[0] === "res_bar_n").length, 5);
-  check("linear: the row number is carried separately from the cut values", /^§row-n:1§2400/.test(r.rows.find((x) => x[0] === "res_bar_n")[1]));
+  check("linear: the row number is carried separately from the cut values", /^§row-n:1§\|n:2400\|/.test(r.rows.find((x) => x[0] === "res_bar_n")[1]));
 }
 
 {
@@ -250,7 +250,8 @@ head("matematyka");
 {
   // mortar: kg = area × usage; bags = ⌈kg ÷ bag⌉.
   const r = run("mortar");
-  eq("mortar: 20 m² × 5 kg = 100 kg", rowNum(r, "res_kg_total"), 100);
+  eq("mortar: 20 m² × 5 kg = 100 kg needed", rowNum(r, "res_need"), 100);
+  eq("mortar: four full bags mean 100 kg purchased", rowNum(r, "res_purchased"), 100);
   eq("mortar: 100 kg ÷ 25 = 4 bags", r.tobuy, 4);
   eq("mortar: 102 kg still fits 5 bags, not 4", run("mortar", { usage: "5.1" }).tobuy, 5);
 }
@@ -258,7 +259,8 @@ head("matematyka");
 {
   // screed: kg = area × thickness(mm) × kg/m²/mm; bags = ⌈kg ÷ bag⌉.
   const r = run("screed");
-  eq("screed: 20 m² × 40 mm × 2 = 1600 kg", rowNum(r, "res_kg_total"), 1600);
+  eq("screed: 20 m² × 40 mm × 2 = 1600 kg needed", rowNum(r, "res_need"), 1600);
+  eq("screed: 64 full bags mean 1600 kg purchased", rowNum(r, "res_purchased"), 1600);
   eq("screed: 1600 kg ÷ 25 = 64 bags", r.tobuy, 64);
   eq("screed: 80 kg per m²", rowNum(r, "res_kg_m2"), 80);
 }
@@ -268,7 +270,8 @@ head("matematyka");
   // 60×60 cm tiles, 9 mm thick, 3 mm joint → 1200/360000 × 9 × 3 × 1,8 = 0,162 kg/m².
   const r = run("grout");
   eq("grout: 0,162 kg/m² for 60×60 / 9 mm / 3 mm", rowNum(r, "res_kg_m2"), 0.16);
-  eq("grout: 20 m² → 3,24 kg", rowNum(r, "res_kg_total"), 3.24);
+  eq("grout: 20 m² → 3,24 kg needed", rowNum(r, "res_need"), 3.24);
+  eq("grout: one full bag means 5 kg purchased", rowNum(r, "res_purchased"), 5);
   eq("grout: 3,24 kg is one 5 kg bag", r.tobuy, 1);
   // Ten times the floor is 32,4 kg — seven bags, the packaging step session 9 added.
   eq("grout: 200 m² → 7 bags", run("grout", { area: "200" }).tobuy, 7);
@@ -289,8 +292,9 @@ head("matematyka");
   eq("insulation: 80 m² ÷ 2 = 40 packs", r.tobuy, 40);
   eq("insulation: 160 boards of 0,5 m²", rowNum(r, "res_foam_boards"), 160);
   eq("insulation: 80 × 6 = 480 dowels", rowNum(r, "res_dowels"), 480);
-  eq("insulation: 80 × 5 = 400 kg of adhesive", rowNum(r, "res_adhesive"), 400);
-  check("insulation: adhesive also says 16 bags of 25 kg", /\|n:16\| \|res_bags\| × 25 kg/.test(r.rows.find((x) => x[0] === "res_adhesive")[1]));
+  eq("insulation: 80 × 5 = 400 kg of adhesive needed", rowNum(r, "res_adhesive_need"), 400);
+  eq("insulation: 16 full bags mean 400 kg purchased", rowNum(r, "res_adhesive_purchased"), 400);
+  eq("insulation: a 30 kg bag changes the purchase to 420 kg", rowNum(run("insulation", { adhBag: "30" }), "res_adhesive_purchased"), 420);
   eq("insulation: one pack contains 4 boards", rowNum(r, "res_boards_per_pkg"), 4);
   eq("insulation: mesh with a 10 % overlap = 88 m²", rowNum(r, "res_mesh"), 88);
   // Half the thickness is twice the coverage per pack: 0,30 ÷ 0,075 = 4 m².
@@ -326,13 +330,15 @@ head("matematyka");
 }
 
 {
-  // drylining: boards = ⌈area × 1,1 ÷ 2,4⌉; adhesive = area × kg/m², in 25 kg bags.
+  // drylining: boards = ⌈area × 1,1 ÷ 2,4⌉; adhesive uses the selected bag size.
   const r = run("drylining");
   eq("drylining: 12 m² × 1,1 ÷ 2,4 = 6 boards", r.tobuy, 6);
   eq("drylining: 6 boards are 14,4 m²", rowNum(r, "res_purchased"), 14.4);
   eq("drylining: board area is used", run("drylining", { boardArea: "3.12" }).tobuy, 5);
   eq("drylining: purchased area uses the selected board", rowNum(run("drylining", { boardArea: "3.12" }), "res_purchased"), 15.6);
-  eq("drylining: 60 kg of adhesive = 3 bags", rowNum(r, "res_adhesive"), 3);
+  eq("drylining: 60 kg of adhesive is needed", rowNum(r, "res_adhesive_need"), 60);
+  eq("drylining: three 25 kg bags mean 75 kg purchased", rowNum(r, "res_adhesive_purchased"), 75);
+  eq("drylining: two 30 kg bags buy exactly 60 kg", rowNum(run("drylining", { adhBag: "30" }), "res_adhesive_purchased"), 60);
 }
 
 {
@@ -419,9 +425,20 @@ eq("cuts: …of 2400 mm", parseCuts("2400x4")[0].len, 2400);
 eq("cuts: ×, * and a space all separate", parseCuts("2400×4\n1800*2\n900 3").length, 3);
 eq("cuts: a bare length is one piece", parseCuts("2400")[0].q, 1);
 eq("cuts: blank lines are dropped", parseCuts("2400x2\n\n\n1800x1").length, 2);
+eq("cuts: a decimal comma stays inside the length", parseCuts("500,5×2")[0].len, 500.5);
+eq("cuts: a decimal comma length keeps its count", parseCuts("500,5×2")[0].q, 2);
+eq("cuts: comma and space still separate the count", parseCuts("2400, 3")[0].q, 3);
+eq("linear: decimal cuts use two bars",
+  run("linear", { stock: "1000,5", kerf: "0,5", cuts: "500,5×2" }).tobuy, 2);
+check("linear: the plan keeps the half millimetre",
+  run("linear", { stock: "1000,5", kerf: "0,5", cuts: "500,5×2" }).rows.some((r) => r[1].includes("|n:500.5|")));
 eq("pieces: 600x400x3 is width, length, count", parsePieces("600x400x3")[0].q, 3);
 eq("pieces: two numbers mean one piece", parsePieces("600x400")[0].q, 1);
 eq("pieces: a single number is not a piece", parsePieces("600").length, 0);
+eq("pieces: decimal commas stay inside both dimensions", JSON.stringify(parsePieces("500,5×500,5×2")[0]),
+  JSON.stringify({ w: 500.5, l: 500.5, q: 2 }));
+eq("sheet: two decimal squares fit one exact sheet",
+  run("sheet", { sheetW: "1001,5", sheetL: "500,5", kerf: "0,5", pieces: "500,5×500,5×2", rotate: "0" }).tobuy, 1);
 
 /* =================================================================== 3. UNITS
    The unit next to the number, and the unit inside every row. */
@@ -460,7 +477,7 @@ eq("every calculator has an expected unit declared", Object.keys(EXPECTED_UNIT).
 
 // A physical unit is spelled out in the row itself. These are the ones a wrong symbol
 // would make dangerous: kilograms are not litres, m² is not m.
-eq("mortar: kilograms carry kg", /kg$/.test(run("mortar").rows.find((r) => r[0] === "res_kg_total")[1]), true);
+eq("mortar: needed kilograms carry kg", /kg$/.test(run("mortar").rows.find((r) => r[0] === "res_need")[1]), true);
 eq("screed: the rate carries kg/m²", /kg\/m²$/.test(run("screed").rows.find((r) => r[0] === "res_kg_m2")[1]), true);
 eq("concrete: the mix is in litres", /\|res_water_l\|$/.test(run("concrete").rows[0][1]), true);
 eq("insulation: a pack covers m²", /m²$/.test(run("insulation").rows[0][1]), true);

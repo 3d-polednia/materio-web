@@ -87,6 +87,12 @@ eq("masonry workflow", targets("masonry", ""), [
 eq("screed workflow", targets("screed", ""), [
   { calc: "waste", area: 20 }, { calc: "coverage", m: "folia-paro", area: 20 },
 ]);
+eq("plaster in the screed calculator goes on to the wall", targets("screed", "tynk-gips-30"), [
+  { calc: "coverage", m: "gladz-gips-20", area: 20 }, { calc: "coverage", m: "farba-scienna-10", area: 20 },
+]);
+eq("skim coat in the screed calculator goes on to primer and paint", targets("screed", "gladz-gips-20"), [
+  { calc: "coverage", m: "grunt-gleb-5", area: 20 }, { calc: "coverage", m: "farba-scienna-10", area: 20 },
+]);
 eq("dry lining workflow", targets("drylining", "", { area: "12" }), [
   { calc: "coverage", m: "gladz-gips-20", area: 12 },
 ]);

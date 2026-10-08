@@ -163,7 +163,7 @@ head("0a. picked materials carry calculator parameters and matching prices");
 {
   const clock = { currency: "PLN" };
   const api = evalScript(["assets/units.js", "assets/calculators.js", "assets/own-materials.js", "assets/materials.js"],
-    ["MATERIALS", "materialFill", "omToCatalogRow", "ENGINES"], {
+    ["MATERIALS", "materialsForCalc", "materialFill", "omToCatalogRow", "ENGINES"], {
       module: undefined,
       localStorage: { getItem: () => null, setItem: () => {} },
       document: { documentElement: { lang: "pl" }, dispatchEvent: () => {}, addEventListener: () => {} },
@@ -180,6 +180,28 @@ head("0a. picked materials carry calculator parameters and matching prices");
   eq("10 mm plaster converts its rate", api.materialFill(api.MATERIALS.find((m) => m.id === "tynk-gips-30"), "screed").rate, 0.85);
   eq("1 mm leveller keeps its rate", api.materialFill(api.MATERIALS.find((m) => m.id === "wylewka-samop-25"), "screed").rate, 1.6);
   eq("a layer-only product leaves the typed rate alone", "rate" in api.materialFill(api.MATERIALS.find((m) => m.id === "tynk-mozaik-25"), "screed"), false);
+  eq("C1 adhesive uses the Android catalogue rate", api.MATERIALS.find((m) => m.id === "klej-c1-25").kgm2, 2.5);
+  eq("5 cm EPS covers 6 m² per 0.30 m³ pack", api.MATERIALS.find((m) => m.id === "styropian-5").cov, 6);
+
+  const pickerIds = (calcId) => api.materialsForCalc(calcId).map((m) => m.id).join(",");
+  eq("grout picker has only ceramic or stone tiles and grout", pickerIds("grout"),
+    "gres-30x30,gres-30x60,gres-40x40,gres-45x45,gres-60x60,gres-75x75,gres-80x80,gres-90x90,gres-60x120,gres-120x120,gres-120x278,glaz-20x20,glaz-25x40,glaz-30x60,glaz-30x90,terakota-33,metro-75x150,metro-60x250,mozaika-30x30,heksagon,taras-60x60,klinkier-25x6,elew-plytka,gres-deska-20x120,fuga-5");
+  eq("screed picker has only per-thickness bags", pickerIds("screed"),
+    "gladz-gips-20,gladz-polim-20,gladz-gotowa-18,tynk-gips-30,tynk-cw-30,tynk-baranek-25,tynk-silik-25,tynk-akryl-25,wylewka-samop-25");
+  eq("mortar picker has only adhesives and mortars", pickerIds("mortar"),
+    "klej-c1-25,klej-c2-25,klej-styro-25,zaprawa-mur-25");
+  eq("insulation picker has EPS packs and EPS adhesive", pickerIds("insulation"),
+    "klej-styro-25,styropian-5,styropian-fasada-10,styropian-fasada-15,styropian-podloga-10");
+  eq("sheathing picker has only boarding sheets", pickerIds("sheathing"),
+    "wior-surowa,mfp-2500,sklejka-lisc,sklejka-brzoza,sklejka-wodo,osb3-2500,osb3-2800,cetris-3350,fermacell-1500,szalunek-2000");
+
+  for (const [id, thickness] of [["styropian-5", 5], ["styropian-fasada-10", 10],
+    ["styropian-fasada-15", 15], ["styropian-podloga-10", 10]]) {
+    eq(`${id} fills its EPS thickness`, api.materialFill(api.MATERIALS.find((m) => m.id === id), "insulation").foamThk, thickness);
+  }
+  const epsAdhesive = api.materialFill(api.MATERIALS.find((m) => m.id === "klej-styro-25"), "insulation");
+  eq("EPS adhesive fills its usage", epsAdhesive.adhesive, 4.5);
+  eq("EPS adhesive fills its bag weight", epsAdhesive.adhBag, 25);
 
   const own = api.omToCatalogRow({ id: "mine", name: "Own tile", category: "TILES",
     application: "WALL_FLOOR_COVERING", widthMm: 600, lengthMm: 600,

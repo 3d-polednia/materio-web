@@ -212,12 +212,19 @@ head("3. the cutting list keeps its own grammar, where a space separates two num
   const { parseCuts, parsePieces } = evalScript(["assets/units.js", "assets/calculators.js"],
     ["parseCuts", "parsePieces"]);
 
-  /* This one field is not a number: `parseCuts` splits a line on `[x×*, ]+` and only then
-     reads each piece, so a space and a comma are separators here and never grouping. The
-     shared rule must not reach past the split — "1200 4" is four boards of 1200 mm. */
+  /* A comma keeps its old job as a separator ("1200,4" is four boards of 1200 mm), except
+     on a line written with x/×/*, where a comma between digits is a decimal comma. */
   eq("a space is a separator, not a group", JSON.stringify(parseCuts("1200 4")),
     JSON.stringify([{ len: 1200, q: 4 }]));
-  eq("so is a comma", JSON.stringify(parseCuts("1200,4")),
+  eq("without x a comma still separates", JSON.stringify(parseCuts("1200,4")),
+    JSON.stringify([{ len: 1200, q: 4 }]));
+  eq("with x a comma between digits is decimal", JSON.stringify(parseCuts("500,5x2")),
+    JSON.stringify([{ len: 500.5, q: 2 }]));
+  eq("a sheet with decimal commas", JSON.stringify(parsePieces("500,5×400,5×2")),
+    JSON.stringify([{ w: 500.5, l: 400.5, q: 2 }]));
+  eq("a sheet in the old comma grammar", JSON.stringify(parsePieces("600,400,3")),
+    JSON.stringify([{ w: 600, l: 400, q: 3 }]));
+  eq("a comma followed by space separates the count", JSON.stringify(parseCuts("1200, 4")),
     JSON.stringify([{ len: 1200, q: 4 }]));
   eq("one piece with a count reads as one row", JSON.stringify(parseCuts("2400x3")),
     JSON.stringify([{ len: 2400, q: 3 }]));

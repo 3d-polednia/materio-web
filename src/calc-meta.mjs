@@ -77,23 +77,26 @@ export const CALC_META = {
   },
   mortar: {
     formula: [
-      "kilogramy = {fld_area} × {fld_usage}",
-      "worki = ⌈ kilogramy ÷ {fld_bag_kg} ⌉",
+      "potrzeba = {fld_area} × {fld_usage}",
+      "worki = ⌈ potrzeba ÷ {fld_bag_kg} ⌉",
+      "kupujesz = worki × {fld_bag_kg}",
     ],
     related: ["waste", "grout", "screed"],
   },
   screed: {
     formula: [
-      "kilogramy = {fld_area} × {fld_thickness} × {fld_kg_m2_mm}",
-      "worki = ⌈ kilogramy ÷ {fld_bag_kg} ⌉",
+      "potrzeba = {fld_area} × {fld_thickness} × {fld_kg_m2_mm}",
+      "worki = ⌈ potrzeba ÷ {fld_bag_kg} ⌉",
+      "kupujesz = worki × {fld_bag_kg}",
     ],
     related: ["concrete", "mortar", "coverage"],
   },
   grout: {
     formula: [
       "kg/m² = ({fld_tile_len} + {fld_tile_w}) ÷ ({fld_tile_len} × {fld_tile_w}) × {fld_tile_thk} × {fld_joint} × 1,8",
-      "kilogramy = kg/m² × {fld_area}",
-      "worki = ⌈ kilogramy ÷ {fld_bag_kg} ⌉",
+      "potrzeba = kg/m² × {fld_area}",
+      "worki = ⌈ potrzeba ÷ {fld_bag_kg} ⌉",
+      "kupujesz = worki × {fld_bag_kg}",
     ],
     related: ["waste", "mortar", "coverage"],
   },
@@ -101,7 +104,7 @@ export const CALC_META = {
     formula: [
       "netto = {fld_area} − {fld_openings}",
       "sztuki = ⌈ netto × {fld_pieces_per_m2} × (1 + {fld_waste} ÷ 100) ⌉",
-      "zaprawa razem = netto × {fld_binder} {kg}",
+      "potrzeba = netto × {fld_binder} {kg}",
     ],
     related: ["mortar", "concrete", "insulation"],
   },
@@ -111,7 +114,9 @@ export const CALC_META = {
       "opakowania styropianu = ⌈ {fld_area} ÷ m² z opakowania ⌉",
       "płyty styropianu = ⌈ {fld_area} ÷ 0,5 ⌉",
       "kołki = ⌈ {fld_area} × {fld_dowels_m2} ⌉",
-      "klej razem = {fld_area} × {fld_adhesive_m2} {kg}",
+      "potrzeba = {fld_area} × {fld_adhesive_m2} {kg}",
+      "worki = ⌈ potrzeba ÷ {fld_adh_bag_kg} ⌉",
+      "kupujesz = worki × {fld_adh_bag_kg}",
       "siatka = {fld_area} × 1,10 {m2}",
     ],
     related: ["mortar", "masonry", "coverage"],
@@ -141,7 +146,9 @@ export const CALC_META = {
   drylining: {
     formula: [
       "płyty = ⌈ {fld_area} × 1,10 ÷ 2,4 ⌉",
-      "klej gipsowy = ⌈ {fld_area} × {fld_adhesive_m2} ÷ 25 ⌉ worków",
+      "potrzeba = {fld_area} × {fld_adhesive_m2}",
+      "worki = ⌈ potrzeba ÷ {fld_adh_bag_kg} ⌉",
+      "kupujesz = worki × {fld_adh_bag_kg}",
     ],
     related: ["studwall", "ceiling", "mortar"],
   },
