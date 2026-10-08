@@ -63,7 +63,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...s) => join(ROOT, ...s);
 
 /** Cache-busting stamp for /assets/*. Bump it whenever a shipped asset changes. */
-const STAMP = "20261005a";
+const STAMP = "20261008a";
 
 /* ------------------------------------------------------------------ load sources */
 
@@ -899,7 +899,7 @@ const CALC_SCRIPTS = [
   // — /moje-materialy/ draws the list, a calculator page only reads it.
   "/assets/units.js", "/assets/own-materials.js",
   "/assets/calculators.js", "/assets/materials.js", "/assets/materials-ui.js",
-  "/assets/workspace.js", "/assets/workspace-calc.js", "/assets/recent.js",
+  "/assets/workspace.js", "/assets/workspace-calc.js", "/assets/calc-chain.js", "/assets/recent.js",
 ];
 
 /**

@@ -513,8 +513,10 @@ function buildWorkspaceCalculators() {
   const cards = document.querySelectorAll(".calc[data-calc]");
   if (!cards.length) return;
   let requestedRoom = "";
+  let carriesArea = false;
   try {
     const params = new URLSearchParams(location.search);
+    carriesArea = params.has("area");
     const project = wsProject(params.get("project") || "");
     if (project && !project.archived) {
       wsSetActiveProject(project.id);
@@ -522,7 +524,10 @@ function buildWorkspaceCalculators() {
       if (room && room.projectId === project.id) requestedRoom = room.id;
     }
   } catch (e) {}
-  if (requestedRoom) cards.forEach((card) => { card.dataset.wsRequestedRoom = requestedRoom; });
+  if (requestedRoom) cards.forEach((card) => {
+    card.dataset.wsRoomId = requestedRoom;
+    if (!carriesArea) card.dataset.wsRequestedRoom = requestedRoom;
+  });
   cards.forEach(wsWireCard);
   document.addEventListener("calcresult", (e) => wsRenderSave(e.detail.card, e.detail.result));
   document.addEventListener("workspacechange", () => cards.forEach((card) => {

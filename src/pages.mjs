@@ -66,7 +66,7 @@ const sectionAddButton = (id, label) => `<button type="button" class="section-ad
  * none (volume of concrete, blocks per m²) the picker button is left out entirely rather
  * than opening an empty dialog.
  */
-export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) {
+export function calcCard(calc, t, { materials = 0, example, projectsUrl = "", calcUrls = {} }) {
   const fieldNumber = (value) => DECIMAL_POINT.has(t.lang || "")
     ? String(value).replace(/,/g, ".") : String(value).replace(/\./g, ",");
   /* `data-lk` is the field's dictionary key, next to the value the field holds. Saving a
@@ -127,7 +127,8 @@ export function calcCard(calc, t, { materials = 0, example, projectsUrl = "" }) 
      the engines in assets/calculators.js do all of the checking. The preset chips and
      the material picker stay type="button": inside a form, a button with no type
      submits it. */
-  return `<div class="calc" data-calc="${calc.id}" data-tab="${calc.tab}">
+  return `<div class="calc" data-calc="${calc.id}" data-tab="${calc.tab}"
+      data-calc-urls="${esc(JSON.stringify(calcUrls))}">
       <form class="calc-form" novalidate>
         <h2 id="calc-form-h" data-calc-form-heading>${esc(t("calc_form_h"))}</h2>
         ${picker}${chips}${fields}
@@ -541,7 +542,10 @@ export function calcPageMain(calc, lang, t, { seo, example, formula, materials =
 
   <section class="block alt calc-tool">
     <div class="wrap">
-      ${calcCard(calc, t, { materials, example, projectsUrl: urlProjects(lang) })}
+      ${calcCard(calc, t, {
+        materials, example, projectsUrl: urlProjects(lang),
+        calcUrls: Object.fromEntries(Object.keys(CALC_SLUG).map((id) => [id, urlCalc(lang, id)])),
+      })}
       ${materials ? `<p class="muted src-note"><a href="${urlMaterials(lang)}">${esc(t("matpage_title"))}</a>: ${esc(t(["mat", "for", "calc"].join("_")).replace("{n}", materials))}</p>` : ""}
     </div>
   </section>

@@ -2564,6 +2564,7 @@ html.js:not([data-lm-level="liczmat"]):not([data-lm-level="pro"]) .account-page-
    (owner, 2026-10-03). The chosen one is the bold one, with aria-pressed saying the same. */
 .calc-presets { align-items: center; }
 .calc-presets-label { font-size: var(--fs-sm); color: var(--muted); }
+.calc-chain { margin-top: var(--sp-4); }
 [data-preset]:hover { text-decoration: underline; }
 [data-preset][aria-pressed="true"] { font-weight: var(--fw-bold); }
 /* The existing-project route is named separately from the new-project form above it. */

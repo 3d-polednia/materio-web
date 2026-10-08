@@ -163,7 +163,7 @@ function showChosenMaterial(card, m, modified) {
 }
 
 /** Write a material's values into one calculator card and show what was filled in. */
-function applyMaterial(card, m) {
+function applyMaterial(card, m, runAfter = true) {
   const calcId = card.dataset.calc;
   // Remembered so a saved estimate can carry the material's name and shop aisle.
   card.dataset.matId = m.id;
@@ -187,7 +187,7 @@ function applyMaterial(card, m) {
   const heading = card.querySelector("[data-calc-form-heading]");
   if (heading) heading.textContent = `${matT("mat_counting")} ${card.dataset.matName}`;
   const run = card.querySelector("[data-run]");
-  if (!run) return;
+  if (!run || !runAfter) return;
   // The URL material is applied by an earlier DOMContentLoaded listener than the one
   // that wires calculator submission. Wait for that listener instead of submitting the
   // form natively and losing `?m`; picker and preset clicks are already wired by then.
@@ -211,14 +211,32 @@ function buildMaterialPickers() {
     }));
   });
 
-  // ?m=<id> — /materialy/ links straight into a pre-filled calculation.
-  const wanted = new URLSearchParams(location.search).get("m");
-  if (!wanted) return;
-  const m = materialById(wanted);
-  if (!m) return;
-  const card = Array.from(document.querySelectorAll(".calc[data-calc]"))
-    .find((c) => materialsForCalc(c.dataset.calc).some((x) => x.id === wanted));
-  if (card) applyMaterial(card, m);
+  // URL values arrive together, then one run calculates the fully filled form.
+  const params = new URLSearchParams(location.search);
+  const wanted = params.get("m") || "";
+  // num() lives in assets/calculators.js, which /materialy/ does not load.
+  const area = typeof num === "function" ? num(params.get("area")) : NaN;
+  const m = wanted ? materialById(wanted) : null;
+  const cards = Array.from(document.querySelectorAll(".calc[data-calc]"));
+  const card = m
+    ? cards.find((c) => materialsForCalc(c.dataset.calc).some((x) => x.id === wanted))
+    : cards[0];
+  if (!card || (!m && !(area > 0))) return;
+  if (m) applyMaterial(card, m, false);
+  if (area > 0) {
+    if (card.dataset.calc === "waste" || card.dataset.calc === "ceiling") {
+      const mode = card.querySelector('[data-k="mode"]');
+      if (mode) mode.value = "area";
+      if (typeof calcSyncModes === "function") calcSyncModes(card);
+    }
+    const field = card.querySelector('[data-k="area"]');
+    if (field) field.value = typeof calcFieldValue === "function"
+      ? calcFieldValue(area, matLang()) : matPlain(area);
+  }
+  const run = card.querySelector("[data-run]");
+  if (!run) return;
+  if (card.dataset.wired) run.click();
+  else setTimeout(() => run.click(), 0);
 }
 
 /* ------------------------------------------------------------------ /materialy/ */
