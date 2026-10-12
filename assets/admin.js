@@ -45,7 +45,11 @@ const day = (ms) => {
 
 /** Local date and time, or a dash. */
 const when = (ms) => {
-  const d = new Date(Number(ms));
+  const value = ms && typeof ms.toMillis === "function" ? ms.toMillis()
+    : ms && Number.isFinite(Number(ms._seconds)) ? Number(ms._seconds) * 1000
+      : ms && Number.isFinite(Number(ms.seconds)) ? Number(ms.seconds) * 1000
+        : Number(ms);
+  const d = new Date(value);
   if (!ms || isNaN(d.getTime())) return "";
   const two = (value) => String(value).padStart(2, "0");
   return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())} ${two(d.getHours())}:${two(d.getMinutes())}`;
@@ -130,6 +134,37 @@ const PANEL = `
 
   <div class="app-card" id="admin-detail" hidden></div>
 
+  <div class="app-card" id="admin-mail">
+    <h3>Maile i ankiety</h3>
+    <div class="inline-form">
+      <div class="field">
+        <label for="admin-mail-lang">Język podglądu</label>
+        <select id="admin-mail-lang">
+          <option value="pl">pl</option><option value="en">en</option>
+          <option value="de">de</option><option value="uk">uk</option>
+          <option value="cs">cs</option><option value="sk">sk</option>
+          <option value="ro">ro</option><option value="hr">hr</option>
+          <option value="sr">sr</option><option value="it">it</option>
+          <option value="nl">nl</option><option value="es">es</option>
+          <option value="fr">fr</option>
+        </select>
+      </div>
+      <button type="button" id="admin-mail-preview" class="btn btn-ghost btn-sm">Wyślij mi podgląd</button>
+    </div>
+    <p id="admin-mail-result" class="result show" role="status" aria-live="polite" hidden></p>
+    <dl class="facts" id="admin-mail-counts">
+      <div class="fact"><dt>Ankiety wysłane</dt><dd data-mail-count="survey">0</dd></div>
+      <div class="fact"><dt>Porady wysłane</dt><dd data-mail-count="tips">0</dd></div>
+      <div class="fact"><dt>Przypomnienia wysłane</dt><dd data-mail-count="reminder">0</dd></div>
+    </dl>
+    <div class="table-scroll"><table id="admin-survey-table" class="ws-table" hidden>
+      <thead><tr><th scope="col">E-mail</th><th scope="col">Ocena</th>
+        <th scope="col">Użycie</th><th scope="col">Czego brakuje</th>
+        <th scope="col">Data</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </div>
+
   <div class="app-card">
     <h3>Wszystkie konta</h3>
     <p class="muted">Adres, logowanie, aktywność, profil i plan. Kliknij adres, żeby zobaczyć
@@ -183,6 +218,7 @@ export async function mountAdmin({ app }) {
 
   const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
   const callable = httpsCallable(getFunctions(app, REGION), "adminPlan");
+  const mailCallable = httpsCallable(getFunctions(app, REGION), "adminMail");
 
   const $ = (id) => document.getElementById(id);
   const out = $("admin-result");
@@ -212,6 +248,85 @@ export async function mountAdmin({ app }) {
   }
 
   const emailValue = () => $("admin-email").value.trim();
+
+  const mailOut = $("admin-mail-result");
+  const sayMail = (message, isError) => {
+    mailOut.textContent = message;
+    mailOut.classList.toggle("err", Boolean(isError));
+    mailOut.hidden = !message;
+  };
+  let surveysLoaded = false;
+  let surveysLoading = false;
+
+  function drawSurveys(data) {
+    const counts = data && data.counts ? data.counts : {};
+    ["survey", "tips", "reminder"].forEach((key) => {
+      const target = document.querySelector(`[data-mail-count="${key}"]`);
+      if (target) target.textContent = String(Number.isInteger(counts[key]) ? counts[key] : 0);
+    });
+
+    const table = $("admin-survey-table");
+    const body = table.querySelector("tbody");
+    body.replaceChildren();
+    const uses = { home: "własny remont", business: "firma", other: "inne" };
+    const rows = Array.isArray(data && data.rows) ? data.rows : [];
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      const values = [
+        row.email || "",
+        Number.isInteger(row.rating) ? row.rating : "",
+        uses[row.use] || row.use || "",
+        row.missing || "",
+        when(row.answeredAt || row.ratedAt),
+      ];
+      values.forEach((value) => {
+        const td = document.createElement("td");
+        td.textContent = String(value);
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+    if (!rows.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.textContent = "Brak odpowiedzi.";
+      tr.appendChild(td);
+      body.appendChild(tr);
+    }
+    table.hidden = false;
+  }
+
+  async function loadSurveys() {
+    if (surveysLoaded || surveysLoading) return;
+    surveysLoading = true;
+    try {
+      const response = await mailCallable({ action: "surveys" });
+      drawSurveys(response && response.data ? response.data : {});
+      surveysLoaded = true;
+    } catch (error) {
+      sayMail(errorText(error), true);
+    } finally {
+      surveysLoading = false;
+    }
+  }
+
+  $("admin-mail-preview").addEventListener("click", async () => {
+    const button = $("admin-mail-preview");
+    button.disabled = true;
+    sayMail("Wysyłanie...");
+    try {
+      await mailCallable({ action: "preview", lang: $("admin-mail-lang").value });
+      sayMail("Wysłano na Twój adres");
+    } catch (error) {
+      sayMail(errorText(error), true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  tab.addEventListener("click", loadSurveys);
+  if (location.hash === "#admin") loadSurveys();
 
   const firstEntry = (acc) => acc.firstApp ? platform(acc.firstApp)
     : acc.profileByServer ? "serwer" : "";

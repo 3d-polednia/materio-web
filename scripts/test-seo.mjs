@@ -36,7 +36,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   BASE, LANGS, DEFAULT_LANG, HREFLANG, OG_LOCALE, GUIDES,
-  urlHome, urlCalc, urlJobs, urlQuoteView, urlAndroid, urlLiczmatPro, urlPrivacy, URL_PRIVACY,
+  urlHome, urlCalc, urlJobs, urlQuoteView, urlMail, urlAndroid, urlLiczmatPro, urlPrivacy, URL_PRIVACY,
 } from "../src/site.mjs";
 import { ROUTES, sitemapUrls, livePaths, liveRoutes, route } from "../src/ia.mjs";
 import { PRIVACY } from "../src/privacy-page.mjs";
@@ -150,8 +150,10 @@ head("1. indexing: which pages are open to a crawler at all");
     .flatMap((r) => LANGS.map((lang) => r.path(lang)));
   // 2026-10-01: token-addressed quote views are public utilities, never sitemap entries.
   const quoteViews = LANGS.map((lang) => urlQuoteView(lang));
+  // 2026-10-12: the token-addressed /maile/ page answers the trial e-mails; never indexed.
+  const mailPages = LANGS.map((lang) => urlMail(lang));
   const expectedClosed = ["/404.html", "/app/", "/app/dashboard/", "/p/"]
-    .concat(jobRedirects, accountRoutes, quoteViews).sort();
+    .concat(jobRedirects, accountRoutes, quoteViews, mailPages).sort();
   check("account work pages, redirects and private utility pages are closed to crawlers",
     closed.join(" ") === expectedClosed.join(" "), closed.join(" "));
 

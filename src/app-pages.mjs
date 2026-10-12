@@ -461,6 +461,14 @@ export function appMain(t, features) {
                 <button type="button" id="app-wipe" class="btn btn-ghost btn-sm" data-i18n="app_wipe_btn">${esc(t("app_wipe_btn"))}</button>
               </div>
 
+              <div class="app-card" id="app-mail-pref-card">
+                <div class="field-check">
+                  <input id="app-mail-pref" type="checkbox" checked>
+                  <label for="app-mail-pref" data-i18n="app_mail_pref">${esc(t("app_mail_pref"))}</label>
+                </div>
+                ${i("app_mail_pref_help", "p", "muted field-note")}
+              </div>
+
               <div class="app-card danger">
                 <div id="delete-initial">
                   <h3 data-i18n="app_delete_account">${esc(t("app_delete_account"))}</h3>

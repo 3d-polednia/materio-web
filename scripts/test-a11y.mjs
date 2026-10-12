@@ -113,8 +113,9 @@ head("0. the tree this suite is reading");
   // languages more of every route, on top of the converter and /moje-materialy/.
   // 525 since session 62 added /kontakt/ for audit item H7: one route, thirteen languages.
   // 2026-10-01: thirteen noindex public quote pages, one per language, raise 538 to 551.
+  // 2026-10-12: thirteen noindex /maile/ pages (survey and unsubscribe from the trial e-mails).
   check("the generated tree and the hand-written error page are present",
-    PAGES.length === 564, `found ${PAGES.length}`);
+    PAGES.length === 577, `found ${PAGES.length}`);
   check("every page declares a language",
     PAGES.every((page) => page.lang), PAGES.filter((page) => !page.lang).map((x) => x.url).join(", "));
   const codes = new Set(LANGS.map((l) => HREFLANG[l]));

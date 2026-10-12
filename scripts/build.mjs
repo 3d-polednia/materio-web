@@ -29,7 +29,7 @@ import {
   URL_APP, URL_SHARE, URL_DASHBOARD, RETIRED_LANGS,
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlJobs, urlQuotes,
-  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact, urlQuoteView,
+  urlCalendar, urlLiczmatPro, urlConverter, urlOwnMaterials, urlContact, urlQuoteView, urlMail,
   urlPrivacy, URL_PRIVACY,
 } from "../src/site.mjs";
 import {
@@ -43,7 +43,7 @@ import { page, calcIcon } from "../src/template.mjs";
 import {
   homeMain, calcHubMain, calcPageMain, guideIndexMain, guideMain, storesMain,
   materialsMain, projectsMain, androidMain, cookiesMain, contactMain, companyMain, clientsMain,
-  quotesMain, quoteViewMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
+  quotesMain, quoteViewMain, mailPageMain, calendarMain, proPageMain, converterMain, ownMaterialsMain,
   renderFormula, FAQ_KEYS,
 } from "../src/pages.mjs";
 import { CALC_META } from "../src/calc-meta.mjs";
@@ -52,6 +52,7 @@ import { CONV_COPY, CONV_COPY_KEYS } from "../src/conv-copy.mjs";
 import { PRO_COPY, PRO_COPY_KEYS } from "../src/pro-copy.mjs";
 import { OMAT_COPY, OMAT_COPY_KEYS } from "../src/omat-copy.mjs";
 import { QUOTE_VIEW_COPY, QUOTE_VIEW_COPY_KEYS } from "../src/quote-view-copy.mjs";
+import { MAIL_PAGE_COPY, MAIL_PAGE_COPY_KEYS } from "../src/mail-page-copy.mjs";
 import { PDF_COPY, PDF_COPY_KEYS } from "../src/pdf-copy.mjs";
 import { appMain, shareMain, dashboardMain, dashboardRedirectMain, dashboardKeys, appProKeys } from "../src/app-pages.mjs";
 import { nbspHtml, nbspShortWords } from "../src/nbsp.mjs";
@@ -274,6 +275,15 @@ function validate() {
     if (!copy) { problems.push(`quote-view: no ${lang} copy (src/quote-view-copy.mjs)`); continue; }
     for (const key of QUOTE_VIEW_COPY_KEYS) {
       if (!copy[key] || !String(copy[key]).trim()) problems.push(`quote-view/${lang}: no ${key}`);
+    }
+  }
+
+  // Public /maile/ copy is build-time only, so missing text must fail before markup ships.
+  for (const lang of LANGS) {
+    const copy = MAIL_PAGE_COPY[lang];
+    if (!copy) { problems.push(`mail-page: no ${lang} copy (src/mail-page-copy.mjs)`); continue; }
+    for (const key of MAIL_PAGE_COPY_KEYS) {
+      if (!copy[key] || !String(copy[key]).trim()) problems.push(`mail-page/${lang}: no ${key}`);
     }
   }
 
@@ -1796,6 +1806,20 @@ function buildQuoteViewPages() {
   }
 }
 
+function buildMailPages() {
+  for (const lang of BUILD_LANGS) {
+    const t = translator(lang);
+    write(join(urlMail(lang), "index.html").replace(/^\//, ""), page({
+      lang, t, stamp: STAMP,
+      title: `${MAIL_PAGE_COPY[lang].title} | LiczMat`,
+      description: MAIL_PAGE_COPY[lang].title, bodyClass: "tool-page mail-page",
+      path: urlMail(lang), alternates: {}, noindex: true,
+      main: mailPageMain(lang, t, MAIL_PAGE_COPY[lang]),
+      modules: ["/assets/mail-page.js"],
+    }));
+  }
+}
+
 /**
  * /terminarz/ — the schedule of LiczMat Pro. Session 25, chapter XXIII.
  *
@@ -2337,6 +2361,7 @@ buildClientsPages();
 buildJobsPages();
 buildQuotesPages();
 buildQuoteViewPages();
+buildMailPages();
 buildCalendarPages();
 buildProPage();
 buildConverterPage();

@@ -156,6 +156,28 @@ async function accountMail(type, data, fallback) {
   }
 }
 
+async function mailPrefs(payload) {
+  const { getFunctions, httpsCallable } = await import(`${FIREBASE_SDK}/firebase-functions.js`);
+  const callable = httpsCallable(getFunctions(state.fbApp, "europe-central2"), "mailPrefs");
+  const response = await callable(payload);
+  return response && response.data ? response.data : {};
+}
+
+async function loadMailPrefs(uid) {
+  const checkbox = $("app-mail-pref");
+  if (!checkbox) return;
+  checkbox.disabled = true;
+  try {
+    const data = await mailPrefs({ action: "get" });
+    if (!accountSync.syncUidActive(uid)) return;
+    checkbox.checked = !Boolean(data.optOut);
+  } catch (error) {
+    if (accountSync.syncUidActive(uid)) statusKey("app_err_unknown", true);
+  } finally {
+    if (accountSync.syncUidActive(uid)) checkbox.disabled = false;
+  }
+}
+
 const escapeHtml = (s) => String(s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -591,6 +613,7 @@ async function onSignedIn(user) {
 
   renderIdentity();
   renderProfile();
+  loadMailPrefs(uid);
   if (renderNext()) return;
 
   listen("projects", (rows, all) => { state.projects = rows; renderOverview(); accountSync.mirrorToLocal({ projects: all }); });
@@ -619,6 +642,11 @@ function onSignedOut() {
   $("app-auth").hidden = false;
   $("app-workspace").hidden = true;
   document.body.classList.remove("app-signed-in");
+  const mailPref = $("app-mail-pref");
+  if (mailPref) {
+    mailPref.checked = true;
+    mailPref.disabled = false;
+  }
   unmountAdmin();
   showAuthView("signin");
 }
@@ -1475,6 +1503,20 @@ async function reauthenticate(password) {
 }
 
 function wireAccountPanel() {
+  $("app-mail-pref").addEventListener("change", async (event) => {
+    const checkbox = event.currentTarget;
+    const checked = checkbox.checked;
+    checkbox.disabled = true;
+    try {
+      await mailPrefs({ action: "set", optOut: !checked });
+    } catch (error) {
+      checkbox.checked = !checked;
+      statusKey("app_err_unknown", true);
+    } finally {
+      checkbox.disabled = false;
+    }
+  });
+
   $("app-verify-send").addEventListener("click", async () => {
     try {
       if (await accountMail("verify", {}, () => fb.sendEmailVerification(auth.currentUser))) {

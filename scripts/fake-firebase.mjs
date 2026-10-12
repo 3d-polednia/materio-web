@@ -402,6 +402,9 @@ export function httpsCallable(fns, name) {
     if (name === "sendAccountMail" && !(action in answers)) {
       return Promise.resolve({ data: { ok: true } });
     }
+    if (name === "mailPrefs" && !(action in answers)) {
+      return Promise.resolve({ data: action === "get" ? { optOut: false } : { ok: true } });
+    }
     if (!(action in answers)) {
       const e = new Error("not-admin");
       e.code = "functions/permission-denied";

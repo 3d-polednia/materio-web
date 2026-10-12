@@ -417,6 +417,9 @@ export const urlQuotes = (lang) => `${prefix(lang)}/${SECTION.quotes[lang]}/`;
 /** A public, token-addressed quote snapshot in the document's language. */
 export const urlQuoteView = (lang) => `${prefix(lang)}/${SECTION.quoteView[lang]}/`;
 
+/** A public, token-addressed trial mail action page (/maile/). */
+export const urlMail = (lang) => `${prefix(lang)}/maile/`;
+
 /** One quote, as a query string on /wyceny/ — the same wall urlJob() hits. */
 export const urlQuote = (lang, id) => `${urlQuotes(lang)}?id=${encodeURIComponent(id)}`;
 

@@ -1494,6 +1494,79 @@ export function quoteViewMain(lang, t, features, stamp = "", copy) {
   </main>`;
 }
 
+/** Public shell for /maile/ trial mail responses (survey, feedback, unsub). */
+export function mailPageMain(lang, t, copy) {
+  return `<main id="main" tabindex="-1" class="mail-page-main">
+    <section class="block">
+      <div class="wrap narrow mail-page-wrap"
+        data-title="${esc(copy.title)}"
+        data-invalid="${esc(copy.invalid)}"
+        data-rate-saved="${esc(copy.rateSaved)}"
+        data-sending="${esc(copy.sending)}"
+        data-thank-you="${esc(copy.thankYou)}"
+        data-unsub-done="${esc(copy.unsubDone)}"
+        data-error-generic="${esc(copy.errorGeneric)}">
+        <div class="card mail-card">
+          <h1 id="mail-title">${esc(copy.title)}</h1>
+
+          <div id="mail-state-invalid" hidden>
+            <p class="muted">${esc(copy.invalid)}</p>
+            <p><a href="${urlHome(lang)}" class="btn btn-ghost btn-sm">LiczMat</a></p>
+          </div>
+
+          <div id="mail-state-rate" hidden>
+            <p class="mail-prompt">${esc(copy.ratePrompt)}</p>
+            <div class="mail-rating-buttons" role="group" aria-label="${esc(copy.ratePrompt)}">
+              <button type="button" class="btn btn-ghost mail-rate-btn" data-rating="1">1</button>
+              <button type="button" class="btn btn-ghost mail-rate-btn" data-rating="2">2</button>
+              <button type="button" class="btn btn-ghost mail-rate-btn" data-rating="3">3</button>
+              <button type="button" class="btn btn-ghost mail-rate-btn" data-rating="4">4</button>
+              <button type="button" class="btn btn-ghost mail-rate-btn" data-rating="5">5</button>
+            </div>
+            <p id="mail-rate-status" class="muted mail-status" role="status" aria-live="polite"></p>
+
+            <form id="mail-feedback-form" class="mail-feedback-form">
+              <div class="field">
+                <span class="fld-label">${esc(copy.questionUse)}</span>
+                <div class="mail-radio-group">
+                  <label><input type="radio" name="use" value="home"> ${esc(copy.useHome)}</label>
+                  <label><input type="radio" name="use" value="business"> ${esc(copy.useBusiness)}</label>
+                  <label><input type="radio" name="use" value="other"> ${esc(copy.useOther)}</label>
+                </div>
+              </div>
+              <div class="field">
+                <label for="mail-missing">${esc(copy.questionMissing)}</label>
+                <textarea id="mail-missing" name="missing" maxlength="1000" rows="4" placeholder="${esc(copy.questionMissingPlaceholder)}"></textarea>
+              </div>
+              <p class="ws-links">
+                <button type="submit" id="mail-feedback-submit" class="btn btn-primary">${esc(copy.submitBtn)}</button>
+              </p>
+              <p id="mail-feedback-status" class="muted mail-status" role="status" aria-live="polite"></p>
+            </form>
+
+            <div id="mail-thank-you" class="mail-thank-you" hidden>
+              <p>${esc(copy.thankYou)}</p>
+              <p><a href="${urlHome(lang)}" class="btn btn-ghost btn-sm">LiczMat</a></p>
+            </div>
+          </div>
+
+          <div id="mail-state-unsub" hidden>
+            <p class="mail-prompt">${esc(copy.unsubPrompt)}</p>
+            <p class="ws-links">
+              <button type="button" id="mail-unsub-btn" class="btn btn-danger">${esc(copy.unsubBtn)}</button>
+            </p>
+            <p id="mail-unsub-status" class="muted mail-status" role="status" aria-live="polite"></p>
+            <div id="mail-unsub-done" hidden>
+              <p>${esc(copy.unsubDone)}</p>
+              <p><a href="${urlHome(lang)}" class="btn btn-ghost btn-sm">LiczMat</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>`;
+}
+
 export function projectsMain(lang, t, aisles = [], features = []) {
   const crumbs = breadcrumbs(t, [
     { name: t("bc_home"), path: urlHome(lang) },

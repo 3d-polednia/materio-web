@@ -504,6 +504,8 @@ const BUDGET = {
   company: 330, clients: 572, jobs: 544, quotes: 800, calendar: 450,
   // 2026-10-01: public quote markup is widest in French at 176; four words remain for drift.
   "quote-share": 190,
+  // 2026-10-12: the public mail-response page is a short survey form; French is widest at 67 words.
+  "mail-feedback": 75,
   /* 2026-09-24 (session W): the cookies table now says "browser storage" in words where it
      printed the key name localStorage, which is three words in French; widest is French at 650.
      2026-09-26: two more rows, the per-account sync clocks the account pages keep

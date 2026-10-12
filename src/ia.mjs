@@ -29,7 +29,7 @@ import {
   urlHome, urlCalcIndex, urlCalc, urlGuideIndex, urlGuide, urlStores, urlMaterials,
   urlProjects, urlProject, urlEstimate, urlAndroid, urlCookies, urlCompany, urlClients, urlClient,
   urlJobs, urlJob, urlQuotes, urlQuote, urlQuoteView, urlCalendar, urlLiczmatPro, urlConverter,
-  urlOwnMaterials, urlContact, urlPrivacy,
+  urlOwnMaterials, urlContact, urlPrivacy, urlMail,
   URL_APP, URL_SHARE, URL_PRIVACY, URL_DASHBOARD,
 } from "./site.mjs";
 
@@ -427,6 +427,13 @@ export const ROUTES = [
     parent: "quotes", localized: true, indexable: false,
     path: urlQuoteView,
     note: "A token-addressed, read-only quote snapshot. It is deliberately GUEST and noindex; recipients do not need an account.",
+  },
+  {
+    id: "mail-feedback",
+    level: LEVEL.GUEST, status: STATUS.LIVE,
+    parent: "home", localized: true, indexable: false,
+    path: urlMail,
+    note: "A token-addressed trial mail action page (survey, feedback and unsub). It is deliberately GUEST and noindex.",
   },
 
   /* ---------------------------------------------------------------- legal */
